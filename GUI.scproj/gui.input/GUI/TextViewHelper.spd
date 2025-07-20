@@ -11,6 +11,7 @@ datatype TextLineFlags (uint16)
 		StartsNormally
 		AvoidLastChar
 		FakeMsg
+		FakeLine
 
 
 class TextViewLine (list)
@@ -386,18 +387,19 @@ helper TextView.UseColorAnyway (|int|)
 helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol, |imagepixel| lc)
 	opt norefcounts
 	opt min 3
-	|| GoUp = (7 - .lineheight)/2
-	if d.LineError
-		if .MyError
-			.DrawErrorBackground(where, y+GoUp, d)
-		  else
-			d.LineError = nil // sigh. crappy bug fix
-
-	if .CanDrawLight(d)				// linelight
-		lc.r += 80
-		lc.g += 80
-		lc.b += 80
-		.DrawLighter(where, y+GoUp)
+	if d isnt FakeLine
+		|| GoUp = (7 - .lineheight)/2
+		if d.LineError
+			if .MyError
+				.DrawErrorBackground(where, y+GoUp, d)
+			  else
+				d.LineError = nil // sigh. crappy bug fix
+	
+		if .CanDrawLight(d)				// linelight
+			lc.r += 80
+			lc.g += 80
+			lc.b += 80
+			.DrawLighter(where, y+GoUp)
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1
 	|| state = MsgTextDrawState(x, d)
