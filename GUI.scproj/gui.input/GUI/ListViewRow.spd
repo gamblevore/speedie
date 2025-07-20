@@ -165,24 +165,23 @@ role ListViewRow (message)
 
 	helper DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
 		opt NoRefCounts
-		
-		|| g		= parent.gnormal // unecessary? drawsep doesnt even use gnormal!
+
+		require .vis(column)
+
 		|| na = .__text__(column)
 		if !na and (self is disabled)
 			.DrawSep(Rect, where, str)
 			return
-		
-		|| R		= Rect.TextCorner(g, na, .state)
+
+		|| R		= Rect.TextCorner(parent.gnormal, na, .state)
 		|| sighy	= ((rect.y + rect.y2)/2) - 3
 		|| moved	= (parent.OnDrawRow)(self, Rect.y1, sighy, where, parent, column, str)?
-
 		R.x += moved.x
-		if .vis(column)
-			if parent.MultiLineDraw
-				r.y = rect.y2-10
-			|| TextCol	= parent.colorrow(depth, column, moved.y)
-			textcol.alpha *= str
-			font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
+		if parent.MultiLineDraw
+			r.y = rect.y2 - 10
+		|| TextCol	= parent.ColorRow(depth, column, moved.y)
+		TextCol.alpha *= str
+		font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
 		
 
 	function Cell (|int| i=0, |ListViewCell|)

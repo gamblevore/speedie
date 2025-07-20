@@ -614,6 +614,10 @@ module GUI
 		require ._NeedsResize or force
 		._NeedsResize = false
 
+		|ivec4| OldSize
+		|| Sexy = .MouSexy
+		|| Curr = .ControlOrMenuAt(Sexy)
+			oldsize = curr.lastrect
 		|| p = .parent ?? window.all
 		|| D = GUI.Screen
 		|| BigRect = d.rect
@@ -623,8 +627,7 @@ module GUI
 				rect = b.lastrect
 		.CalculateSize(BigRect, rect, BigRect)
 		
-		|| Sexy = .MouSexy
-		|| Curr = .ControlOrMenuAt(Sexy)
+		if curr and curr.lastrect != OldSize
 			curr.__MouseMove__(Sexy, Sexy - gui.CurrMouseXY, SDL_WindowEventID.moved)
 		/////
 

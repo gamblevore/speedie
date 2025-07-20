@@ -17,17 +17,20 @@ function image.DrawText (|string| Str, |ivec2| xy, |vec4| Col = colors.clear, |b
 
 		
 function image.DrawFont (|string| Str, |ivec2| xy, |vec4| Col, |bool| DrawInvis, |image| Where, |int|)
-	// perhaps this should just use a global textviewline...
-	// could be simpler. And it means we can get the tab-widths properly.
 	opt min 3
+	
 	require (str and Where.Pixels and .Pixels)
-	for c.codepoints in str
-		if DrawInvis
-			c = -c
-		|| next = .DrawChar(c, Where, xy, Col) #loop
-		xy.x = next
+
+	|| i = 0	
+	for (c.codepoints in str) (ptr)
+		|codepoint| pc = c.SetSign(drawinvis)
+		pc = pc.ImproveDraw(str, ptr - str.addr)
+		.DrawChar(pc, Where, xy, Col)
+
+		|| w = (1, i.tabsWidth)(c != '\t')
+		i += w
+		xy.x += w * font.width
 	return xy.x
-		
 
 
 function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col, |int| H)
@@ -36,16 +39,21 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col
 	if lines <= 1
 		.Drawfont(str, xy, col, false, where)
 		return
-		
-	|| i	= 0
-	|| mw	= where.ControlClip.width/font.width
-	while (i < str.length) and lines >= 1
+	
+	// how can we make this do tabs?
+	// use the standard textview drawer?
+	// how to pass it in?
+	
+	|| i  = 0
+	|| mw = where.ControlClip.width/font.width
+	while (i < str.length) and (lines >= 1)
 		|| p = i
-		i = str.wrapsub(mw, false, p)
+		i = str.WrapSub(mw, false, p)
 		|| ttt = str[p, i]
 		.DrawFont(ttt, xy, col, false, where)
 		xy.y -= 12
 		lines--
+
 
 
 helper string.FontLoad (|image|)
@@ -59,12 +67,14 @@ helper string.FontLoad (|image|)
 		if c > 32
 			rz.FontCleanupChar((c*6, 0))
 
+
 	
 function image.FontCleanupChar (|ivec2| s)
 	for v in (6, 8)
 		|| p = v+s
 		|| c = self[p].color
 		self[p] <~ c.FontPixelCleanup
+
 
 
 function vec4.FontPixelCleanup (|vec4|)
@@ -82,11 +92,11 @@ function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col=co
 	.drawchar(c, where, xy, col, 0) 
 
 
-function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |int| DrawMode=1, |int|)
+function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |int| DrawMode=1)
 	opt min 3
-	rz = (font.Width + XY.x) max 1
+//	rz = (font.Width + XY.x) max 1
 	if c.iswhite
-		return rz
+		return
 	if c|int| < 0
 		c = -c // draw white-space
 	
@@ -113,7 +123,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 	|| Read		= (font.Width, font.Height-1)
 	|| Clip		= where.clip((XY, xy+Read))
 	if !clip.ispositive
-		return rz
+		return
 	
 	|| X2  		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy
@@ -151,8 +161,5 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 		y++
 
 
-function message.Now (||)
-	|| a = .slowcount #require
-	|int| b = date.now mod a
-	return self[b]
+
 

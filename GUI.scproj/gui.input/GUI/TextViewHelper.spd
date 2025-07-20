@@ -79,17 +79,18 @@ class TextViewLine (list)
 
 	
 	function SquaresAtByte (|ind| B, |int|)
+		opt norefcounts
 		b -= .position
 		require b > 0
 		
 		|| StrEnd = b + .text.addr
-		for (c.CodePoints in .text) (after)
+		for (c.CodePoints in .text) (Start)
+			if Start >= Strend
+				exit
 			if c == '\t'
 				rz += rz.tabswidth
 			  else
 				rz++
-			if after >= Strend
-				exit
 
 	
 	function After (|int|)
@@ -368,8 +369,11 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |im
 				if c != '0'
 					draw = true
 				if draw
-					p.x = font.small!.DrawChar(c, Where, p, lc)
+					font.small!.DrawChar(c, Where, p, lc)
+					p.x += font.Width
+
 		x += big * font.width
+	
 	if .Alignment is right and .Alignment isnt left
 		|| m = d.text.Bounds.x*font.width+8
 		|| w = .width
@@ -462,16 +466,16 @@ struct MsgTextDrawState
 	|string--|				t
 	|image--|				font
 	
-	function Next (|$codepoint| pc, |$int| ppos, |int|)
+	function Next (|$codepoint| Char, |$int| ppos, |int|)
 		opt norefcounts
-		|| c = pc
+		|| c = Char
 		|| w = (1, .i.tabsWidth)(c != '\t')
 		rz   = .x
 		.x   = rz + w*font.width
 		.i  += w
 		|| m = .msg
 			|| pos	= ppos
-			pc	    = c.ImproveDraw(.t, pos)
+			Char    = c.ImproveDraw(.t, pos)
 			pos	   += .adder, ppos = pos
 			.msg	= m.NextColor(pos)
 			
@@ -486,7 +490,7 @@ struct MsgTextDrawState
 			rz.font = font.small!
 
 
-helper codepoint.ImproveDraw (|string| t, |int|pos, |codepoint|)
+helper codepoint.ImproveDraw (|string| t, |int| pos, |codepoint|)
 	if self == '!'
 		if t[pos+1] == '='
 			return 130
@@ -525,15 +529,17 @@ function string.TextLineCount (|int|)
 
 helper string.CountBytesInSquares (|int| Remain, |int|)
 	|| n = .length
-	|| i = 0
 	require remain > 0 and n > 0
+	|| i = 0
+
 	for (c.codepoints in self) (After)
+		if i >= remain
+			return (after - .addr)|int|
 		if c == '\t'
 			i += i.tabswidth
 		  else
 			i++
-		if i >= remain
-			return (after - .addr)|int|
+
 	return .length
 
 
