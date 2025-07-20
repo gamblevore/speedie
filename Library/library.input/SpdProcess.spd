@@ -264,6 +264,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
+				rz.DebugName = DebugName
 				if !rz.SpawnChild(delay)
 					rz = nil
 
