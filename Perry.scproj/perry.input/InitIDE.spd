@@ -788,7 +788,7 @@ extend PerryIDE
 				|| str = .ExpandStr(ro.name)
 					f.addroot(str.file)
 				  else
-					error (ro, "Can't find this project root. Please fix this path.")
+/					error (ro, "Can't find this project root. Please fix this path.")
 			error.SourceRemove
 		
 		f.CheckSize

@@ -699,8 +699,9 @@ class String
 		|| Start	= .Addr
 		|| End		= Start + .Length
 		while (Start < End)
+			|| BeforeChar = Start
 			|| c = codepoint.UTF8Read(start)
-			yield (c) (start)
+			yield (c) (BeforeChar)
 
 
 	iterator CodePoints2
