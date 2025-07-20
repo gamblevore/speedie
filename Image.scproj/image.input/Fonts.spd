@@ -14,14 +14,17 @@ function image.DrawText (|string| Str, |ivec2| xy, |vec4| Col = colors.clear, |b
 	opt norefcounts
 	|| sf = font.small
 		return sf.DrawFont(str, xy, col, drawinvis, self)
+
 		
 function image.DrawFont (|string| Str, |ivec2| xy, |vec4| Col, |bool| DrawInvis, |image| Where, |int|)
+	// perhaps this should just use a global textviewline...
+	// could be simpler. And it means we can get the tab-widths properly.
 	opt min 3
 	require (str and Where.Pixels and .Pixels)
 	for c.codepoints in str
 		if DrawInvis
 			c = -c
-		|| next = .DrawChar(c, Where, xy, Col)#loop
+		|| next = .DrawChar(c, Where, xy, Col) #loop
 		xy.x = next
 	return xy.x
 		
