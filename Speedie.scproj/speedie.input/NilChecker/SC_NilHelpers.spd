@@ -57,7 +57,7 @@ function FastDecl (|SCDecl!|)
 		if l isa scdecl
 			return l
 		return obj
-	error (self, "No decl found.".internal)
+	error (self, "No decl found on: " + .locate)
 	return Compiler.GetTypeVoid
 
 

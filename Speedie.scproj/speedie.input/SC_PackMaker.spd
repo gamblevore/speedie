@@ -342,7 +342,6 @@ module PackMaker
 		
 	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
-//		packmaker.packglobs <~ .ClassType // wait, we do this twice?
 		|| sz = (0, .size)(.iswrapper)
 		j.addint(sz)
 		

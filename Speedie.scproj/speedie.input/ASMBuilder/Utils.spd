@@ -5,10 +5,11 @@ function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
 	if (rz is Global) and !rz.au.ExportPosition // oof
-		|| P = .first
-			rz.au.ExportPosition = p.ASMDecl.au.ExportPosition
-			rz.sanity
-			target debug:  if !rz.au.ExportPosition // oof
+		error (self, "No export position!")
+//		|| P = .first
+//			rz.au.ExportPosition = p.ASMDecl.au.ExportPosition
+//			rz.sanity
+//			target debug:  if !rz.au.ExportPosition // oof
 				
 	
 	if rz.typeonly == 0//datatypecode.unusedtype

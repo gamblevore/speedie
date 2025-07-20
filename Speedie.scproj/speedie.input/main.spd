@@ -48,9 +48,6 @@ function compiler.ClearEnvs
 			app.childenv(k) = nil
 
 
-function WhyCantWeASMThis //why?
-	options.dev = app.prefs["dev"].int
-
 
 function compiler.SetupEnv
 	opt norefcounts

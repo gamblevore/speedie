@@ -406,14 +406,13 @@ function Dot (fn_asm)										// a.b
 	if prop is const
 		return DotConst(self, dest, exp, prop)
 	
-	
 	if prop is global
 		return DoGlobal(self, dest, exp, prop)
 	
-	|| OV = .openvars				// is this safe? Not sure! delete if it causes problems.
+	|| OV = .OpenVars				// is this safe? Not sure! delete if it causes problems.
 	|| Obj = .µGetASM(exp.first!)
 	dest.µtype = prop.typeinfo
-	.closevars(ov)					// in terms of anything simple... I can't see problems.
+	.CloseVars(ov)					// in terms of anything simple... I can't see problems.
 	
 	|| Index = prop.au.ExportPosition 
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?

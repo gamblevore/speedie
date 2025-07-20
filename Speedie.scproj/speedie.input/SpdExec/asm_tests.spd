@@ -15,6 +15,9 @@ module ASMExamples {
 
 target pack { 
 
+function WhyCantWeASMThis //why?
+	options.dev = app.prefs["dev"].int
+
 function Swap
 	|| x = 1
 	|| y = 2
