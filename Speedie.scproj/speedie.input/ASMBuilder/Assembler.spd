@@ -1,6 +1,6 @@
 
 
-struct InlineBlock
+struct ASMState
 	|scfunction!--|	Fn    
 	|asmreg|		Return
 	|uint64|		ParentVars
@@ -14,7 +14,7 @@ struct Assembler
 	|DataTypeCode|				ReturnASM
 	|uint16| 					BasicBlock
 
-	|InlineBlock|				State
+	|ASMState|					State
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
 	|byte|						StackSize
@@ -160,7 +160,7 @@ struct Assembler
 		return t
 
 
-	function TempTyped (|Message| where, |asmreg| T, |scdecl| Type,  |asmreg|)
+	function TempTyped (|Message| where, |scdecl| Type, |asmreg| T,  |asmreg|)
 		t.µtype = type.au.DataType
 		return .TempOnly(where, t)
 	
@@ -232,36 +232,44 @@ struct Assembler
 					return true
 	
 	
-	function SimpleNop (|FATASM| Fat)
+	function Nop (|FATASM| Fat)
+		opt inline
+		return .nopsub(fat, false, 0)
+	
+	
+	function SoftNop (|FATASM| Fat)
+		opt inline
+		return .nopsub(fat, true, 0)
+	
+	
+	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
 		|| C = .curr - 1
 		if fat == C
-			._curr = C // nice
+			._curr = C // do it before both kinds of nop...
+
+		depth++
+		if depth > 7
+		
+		for f.fatinputs in fat
+			.Decr(f, Soft, depth)
+		
 		for v.regoutputs in fat
-			v&=31
+			v &= 31
 			if .Registers[v] == fat
 				.Registers[v] = nil
 				.KnownValuesMap &=~ (1<<v)
 		|| Type = asm.noop * (fat < ._curr)
 		fat.setop = Type
 
-
-	function Nop (|FATASM| Fat, |int| Depth=0)
-		depth++
-		if depth > 7
-		for f.fatinputs in fat
-			.Decr(f, depth)
-
-		.SimpleNop(fat)
-
 	
 	
-	function Decr (|?&fatasm| f, |int| Depth=0)
+	function Decr (|?&fatasm| f, |bool| Soft, |int| Depth)
 		if f
 			|| C = f.µrefcount
 			C -= (C > 0)
 			f.µrefcount = C
-			if C <= 0
-				.Nop(f, depth)
+			if !soft and C <= 0
+				.NopSub(f, soft, depth)
 
 
 	function AskNop (|fatasm| f)
@@ -280,9 +288,13 @@ struct Assembler
 		|| X = .ExistingVar(Exp) // superfluous?
 		if !x
 			x = .µInto(exp, dest)
+
+		if !x.reg
+			x.µtype = datatypecode.bool
 		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
 			return .exists(dest as (X bitand ASMReg.FromExistingVar), X, exp)
-		return .Assign(x.reg(dest), X, exp)
+
+		return .Assign(x.into(dest), X, exp)
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -302,8 +314,7 @@ struct Assembler
 			|| f = r.fat
 				return .ReDest(f, dest)
 		
-		|| dest2 = r.reg(dest)
-		dest2.µtype = dest.µtype 	 		// sigh. I guess we copy some wierd flags, from r into dest2
+		|| dest2 = r.into(dest)
 		return .Assign(Dest2, r, exp)
 
 		
@@ -335,7 +346,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 3117
+			// if trap == 3489
 				
 		  else
 			opt inline

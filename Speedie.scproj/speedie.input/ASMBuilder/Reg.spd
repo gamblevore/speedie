@@ -216,6 +216,13 @@ datatype ASMReg (uint64)
 	function Reg (|int|)
 		return (self|uint64| >> 11)&31
 	
+	
+	function Into (|asmreg| dest, |asmreg|)
+		rz = .reg(dest)
+		rz.µtype = dest.µtype			// I guess we copy some wierd flags... sigh.
+		(rz is exitatall) = (dest is ExitAtAll) // not sure what else to copy? do this for now.
+		
+		
 	function Reg (assigns:|int|, |AsmReg|)
 		|| Bugged = value&31
 		self &= ~(31 << 11)|asmreg|

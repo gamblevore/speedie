@@ -73,7 +73,7 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	
 	check ((v < 32) and !(vd & .vtemps)) (exp, "Too many registers in use. No space for result.")
 	if (dest is ExitAtAll) and .state.return
-		v = 1 max (.state.parentvars >> 32) // a simple max will fix this?
+		v = 1 max (.state.parentvars|uint|) // a simple max will fix this?
 	dest.reg = v
 	dest.µtype = fn.ASMRegType
 	dest = dest.ReallySimplify
@@ -102,7 +102,7 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	|| Start = .curr
 	|| OV = .OpenVars
 	
-	|inlineblock| Old = .State				// can't use implicit types for barestructs
+	|ASMState| Old = .State				// can't use implicit types for barestructs
 	if !dest.reg and fn.ASMReturn
 		if dest isnt discard
 			Dest = .TempOnly(prms, dest)
@@ -206,7 +206,6 @@ function InlineVar (|message| prms, |message| m, |scdecl| a, |asmreg|)
 
 
 function InlineParameters (|message| prms, |bool| IsLeaf)
-	// if "InlineParam".trap
 	opt norefcounts
 	|| p = prms.first!
 
@@ -216,6 +215,8 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 			|| o = .OpenVars
 			v = .DeclareMe(a.source, a)
 			if IsLeaf and a isnt altered
+//				v = .temptyped(a.source, a, asmreg())		// temps are easier to optimise
+// not safe... if read 2x or more, it can be nopped before the second read
 				|| v2 = .µGetASM(p, v)
 				if v2.reg != v.reg
 					.CloseVars(o) // close the var if v2 is unused.

@@ -81,6 +81,8 @@ extend Assembler
 
 
 	function MegaNumFinder (|int64| V, |DataTypeCode| Type, |ASMReg|)
+		if v == 0
+			return asmreg.zero.µtype(type)
 		|| normal = Type.IsIntReg
 		for f in self
 			if f isa asm.KNST and f._const == v

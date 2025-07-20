@@ -394,8 +394,8 @@ function LoadSuperClass
 
 function LoadSuperBehaviours
 	opt norefcounts
-	|| s = .super
 	|| b = .behaviour
+		|| s = .super
 		while (s and !S.behaviour)
 			s = s.super
 		if s

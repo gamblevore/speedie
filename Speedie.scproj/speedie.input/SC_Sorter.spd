@@ -38,7 +38,7 @@ function SCFunction.MarkRecursive (|scfunction| EndAt)
 		(s is Recursive)
 		require s != endat
 		s = s.DepthFinder
-		require s != nil and EndAt
+		require s != nil and s != EndAt
 
 
 function SCFunction.FindDepths (|int|)
@@ -51,15 +51,36 @@ function SCFunction.FindDepths (|int|)
 		return L
 	
 	rz = 1
+
 	for f in .LinkTo
 		if (f isa SCFunction)
 			if (f == self) or f.DepthFinder
 				.MarkRecursive(f)
-			  else
+				
+			  elseif f.iscppinbuilt
+				0 // do nothing. This affects nothing.
+
+			  elseif f isnt cpp
 				f.DepthFinder = self
-				|| D = f.FindDepths+1
+				|| D = f.FindDepths + ((1))
 				(rz max= D)
 				f.DepthFinder = nil
+
+			  else
+				(rz max= 2)
+				/*
+					function SpdWrapper
+						|| x = spdcaller(2)
+					
+					function SpdCaller (|int| x, |int|)
+						return mycppfunc(x, 123)
+				*/
+				
+				// The question... is should I allocate params as temps, or declarations.
+				// speedie vm temp vars, gets wiped by spd func calls.
+				// cpp funcs also can wipe some vars. Its not an issue for the VM
+				// but for "real code" it is.
+				// for simplicity, lets assume cpp wipes regs, even in the VM.
 
 	.LinkDepth = rz
 

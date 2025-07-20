@@ -259,11 +259,6 @@ function SemiConst (|int| f1, |int|)
 	|| y6  =  1  or  f1
 	y6  =  true  or  f1
 
-function Bug (|int| f1, |int|)
-	visible
-	|| x2 = f1  or  1
-	return x2|int|
-
 
 target nothing
 	function DidntReportError (|int| f1, |int|) // this should report an error in perry!

@@ -28,7 +28,7 @@ extend Assembler
 			return .NumToReg(exp, num, res, DataTypeCode.bool)
 		
 		if dest isnt CondRequest
-			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
+			dest = .TempTyped(exp, TypeBool!.TypeNormal, dest)
 			|| Mode = negate|int| xor 1
 			mode |= l.Small << 2
 			mode |= R.Small << 3
@@ -734,38 +734,43 @@ extend Assembler
 		(rz is constinput) = (dest is ConstInput)
 		rz.µtype = dest.µtype
 	
-
-	function CanImproveAssign (|asmreg| dest, |asmreg| src, |fatasm| f, |asmreg|)
+	
+	function IsTempable (|asmreg| Src, |asmreg| Dest, |bool|)
+		if src is temp
+			return true
+			
+		if (dest is exitatall)
+			|| vdecls = .state.parentvars|uint|
+			|| find = 1<<src.reg
+			return !(vdecls & find) // the decl is out of range! IE... it won't be missed.
+									// we can fuck around with it as much as we like >:3
+			
+	
+	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)
 		opt inline
-		if .IsCurr(f)
-			if (src is temp) and (f isa asm.bflg)
-				f.prms[0] = dest.reg
-				return dest
+		|| f = src.fat$
+		if .IsTempable(src,dest) and .IsCurr(f)
+			return .redest(f, dest)
 	
 	
-	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (		
+	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
 		|| sr = src.reg
 		|| dr = dest.reg
-		if sr == dr
-// if we wanted to... we could make this stricter, just like the test below... that does bflg.
-// for now leave as is.
-// we could "unstricten" it by using f.isread
-			return dest
-
-		if (dest.IsVec != src.IsVec) and src.reg
-		if dest.IsVec
-			return exp.VMOV(dest, src, asmreg(), asmreg()) * dest
-		
 		if !sr										// must be assigning zero
 			return .LoadNumber(exp, 0, dest)		// More readable ASM.
 
-		|| f = src.fat
-			|| improve = .CanImproveAssign(dest, src, f)
-				return improve
-
+		if sr == dr
+			return dest
 		
-		// BFLG is VERY optimisable :]
-		// prefered op for most things. Chainability of optimisations is very good.
+		target debug: if (dest.IsVec != src.IsVec) and src.reg
+		
+		if dest.IsVec
+			return exp.VMOV(dest, src, asmreg(), asmreg()) * dest
+
+		|| improve = .ImproveAssign(dest, src)
+			return improve
+		
+		// BFLG is VERY optimisable :]  Prefered op for most things.
 		
 		dest = dest.CopyConst(Src)
 		|| sh = src.BitCount - dest.BitCount

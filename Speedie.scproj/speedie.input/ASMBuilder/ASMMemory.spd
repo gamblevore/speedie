@@ -66,7 +66,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		VarAdd = ASMReg()
 	
 	if decl isnt ClassObj
-		base = .MemOffsetFix(Base, bytes, index, 7, Decl)
+		base = .MemOffsetFix(Base, bytes, index, 7, Decl, exp)
 	
 	|| pinc = .MemOpt(base, index, bytes)
 	
@@ -83,8 +83,8 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 	|| Before = bs isa asm.addk
 	require before or (bs isa asm.ADAK)
 	if base isnt temp
-		require .last == bs
-		require bs.reg(0) == bs.reg(1)
+		require  .last == bs
+		require  bs.reg(0) == bs.reg(1)
 	
 	rz = bs.prms[2]|int| >> bytes
 	
@@ -104,30 +104,28 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 
 	index = i
 	base = bs.RegInput(1)
-	.nop(bs)
+	.softnop(bs)
 
 
-function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |uint| MaxBits, |scdecl?| Decl, |asmreg|)
-	rz = .MemOffsetFix(Base, bytes, index, maxbits, Decl)
+function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |uint| MaxBits, |scdecl?| Decl, |message| exp, |asmreg|)
+	rz = .MemOffsetFix(Base, bytes, index, maxbits, Decl, exp)
 	.MemOpt(rz, index, bytes)
 
 
-function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |asmreg|)
+function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, |asmreg|)
 	opt norefcounts
-	|| bs = base.fat
-	if !bs
-		return base
-
 	|uint| maximum = (1 << maxbits) - 1
 	|int64| LostBytes = 0
 	if base is GlobalMemory
 		expect (glob)
-		LostBytes = glob.au.ExportPosition
 		
-		|| K = bs.const
+		// perhaps... the "dot" function should remove the globalmemory flag?
 		if (glob isnt global) and (glob is property)		// a property on a global struct
-			/LostBytes = 0 // assume index is already set! 
+			0 //  
 		  else
+			|| bs = base.fat!
+			LostBytes = glob.au.ExportPosition
+			|| K = bs.const
 			LostBytes -= K
 			expect LostBytes >= 0
 		
@@ -135,7 +133,8 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 		#!not good. We'd need to use an addk. but should never happen
 		debugger
 
-	|| i = index + (LostBytes >> pow2) 
+	|| i = index 
+	i += (LostBytes >> pow2) 
 	if i <= maximum|int|
 		index = i
 		return base
@@ -143,7 +142,7 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 													// Unstorable. increase externally				
 	i = (index << pow2) + lostbytes
 	index = 0
-	return .AddToReg(bs.msg, base, base as asmreg.noscale, i)
+	return .AddToReg(exp, base, base as asmreg.noscale, i)
 
 
 

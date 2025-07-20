@@ -383,7 +383,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
 	|| V = kr.const!=0
 	if v == (opp is AND)
-		.simplenop jump
+		.softnop jump
 		.NopReg(kr)
 		return ml
 		

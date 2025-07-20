@@ -174,6 +174,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 
 function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
 	opt norefcounts
+	(self)
 	|| inner = exp.first
 	expect ((inner == @arg) and !inner.hasany) (exp) // nil
 	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
@@ -380,8 +381,9 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.au.DataType
-		// readorwrite already can convert vara to a const index, if needed.
-		return .ReadOrWrite(Dest, exp, base, vara, d.internal, 0)
+		if !d.iscarray			// so its a pointer? what if its a carray to a pointer?
+			d = d.internal!		
+		return .ReadOrWrite(Dest, exp, base, vara, d, 0) // readorwrite can convert vara to a const
 	
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
@@ -407,22 +409,22 @@ function Dot (fn_asm)										// a.b
 	
 	if prop is global
 		return DoGlobal(self, dest, exp, prop)
-		
+	
+	|| OV = .openvars				// is this safe? Not sure! delete if it causes problems.
 	|| Obj = .µGetASM(exp.first!)
 	dest.µtype = prop.typeinfo
-	
+	.closevars(ov)					// in terms of anything simple... I can't see problems.
 	
 	|| Index = prop.au.ExportPosition 
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
 	
-	#! We should use a temp for the addr... it helps with figuring out what we are doing.
-	// optimisation of course.
-	#! Of course, if it doesn't change, we can just return the original.
-	#! Also... ReadOrWrite needs to understand addk.
+	if !dest.reg and (obj is temp)
+		dest.reg = obj
 	
 	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
 		return .DotAddr(exp, dest, Index, prop, obj)
-
+	
+	index >>= dest.ByteShift
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, Index)
 
 
@@ -460,7 +462,7 @@ function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scd
 
 function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
 	opt norefcounts
-	dest = .TempTyped(exp, dest, d)
+	dest = .TempTyped(exp, d, dest)
 
 	|| fat = exp.GRAB(dest, t)
 	if d.IsInt and !d.IsBool
@@ -563,7 +565,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
-	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob)
+	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob, exp)
 	
 	|| fat = exp.CNTC(dest, Addr, offset, amount, bc)
 	if !dest.reg
