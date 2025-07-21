@@ -189,6 +189,7 @@ extend PerryIDE
 
 		with .ASMView
 			.tooltip		= "Displays ASM"
+			.MultiSelection = true
 			.TakesFocus 	= TakesFocusFlag.CanFocus
 			.ID				= "ASMView"
 			.size 			= the~area
@@ -199,8 +200,7 @@ extend PerryIDE
 			.GNormal.Edge.a = (0.05*255.0)|int|
 			
 			.OnKeyDown = ASMViewKeys
-		.ASMVis = false
-
+		
 
 		with .autocomplete
 			.OnRightClick   = PerrySuperAutoComplete
@@ -232,6 +232,7 @@ extend PerryIDE
 			.GNormal.Solid = LeftBG
 		
 		
+		.ASMVis = false
 		.ErrorLogInit(.Errorlist, "ErrorList" )
 		.ErrorLogInit(.CommsLogList,   "LogArea" )
 

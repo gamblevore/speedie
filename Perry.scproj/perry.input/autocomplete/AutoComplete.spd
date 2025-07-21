@@ -16,10 +16,11 @@ function message.PrependHeader (|string| name, |int| pos)
 function PerryIDE.CallFromSelect (|listviewrow| list)
 	opt norefcounts
 	for s in list
-		|| mark = s.last
-		|| IsCurr = mark == @char and "curr"
-		(s is Active) = iscurr
-		(s is selected) = iscurr
+		|| IsCurr = s ~= "curr"
+			(s is Active)
+			(s is selected)
+		if s.last.int < 0
+			(s is disabled)
 
 
 function PerryIDE.CallFromFB (|message| list, |bool|)
@@ -32,7 +33,6 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	define.name = "line"
 	
 	list.sort(CallFromSorter)
-//	.ImproveFuncList(list) // the lists are too different. I'd need to reorganise it
 	list.PrependHeader("", 1)
 	list.first = define
 	.autocomplete.listsource = list!
@@ -43,13 +43,12 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 
 
 function message.DefineToLine (|int| count)
-	|| l = self[-1]			#require
-	if self ~= "define"  and  l == @str  and  self > 1 // is that all?
+	|| l = self[-1]											#require
+	if self ~= "define"  and  l == @str  and  self > 1		// is that all?
 		.first!.next = l
-		// count can't be 0 here	
 		l.name += " has " + (count of "caller")
 	  else
-		|| s = "place".pluralize(count, "Nowhere")
+		|| s = "place".Pluralize(count, "Nowhere")
 		l.name = " - Called From " + s + " - "
 		
 
@@ -72,7 +71,6 @@ function string.LowerDiffAt (|string| A, |ind|)
 function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |string| reason, |bool|)
 	opt NoRefCounts
 	require .EditMe.CanAutoComplete == 1
-//	|| w		= 5
 	|| Common	= int.max
 	|| shortest = Common
 	|| longest  = 0
