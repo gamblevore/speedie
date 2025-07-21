@@ -60,6 +60,7 @@ module PackMaker
 			rz = rz align s16
 			if alter
 				d.au.ExportPosition = rz
+				if d~="dev"
 			rz += s
 	
 
@@ -76,19 +77,17 @@ module PackMaker
 		TypeObject!.PackClassChildren(nil)
 		
 		.PackGlobs.sort(GlobalsSorter)
-		.SortLibStuff()
-	
-	
-	function SortLibStuff
-		opt norefcounts
+
 		|&&nil| Table
+		|| frogs = .PackGlobSize
 		if platform.isdebug
-			Table = jb_vm.vm.InitTable(.libfuncs.length+31, .PackGlobSize)
+			Table = jb_vm.vm.InitTable(.libfuncs.length+31, frogs)
 		.SortASMFuncs(.LibFuncs, Table)
 		.LibGlobs.sort(GlobalsSorter)
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.au.ExportPosition = i + 1
+			if g~="dev"
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)

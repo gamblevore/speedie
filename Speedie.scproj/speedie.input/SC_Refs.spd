@@ -334,14 +334,6 @@ function RelNeedsRef (|Message| first, |bool|)
 	Return first.VarOptFlag(kSufferedNoise)
 
 
-function Message.SetType (|DotUseType|)
-	opt norefcounts
-	|| d = .dottype
-		return d
-	if .func == @acc
-		return DotUseType.memory
-
-
 function Message.DotType (|DotUseType|)
 	opt norefcounts
 	if .func == @Dot
@@ -857,7 +849,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 	|| root				= .SourceArg
 	|| IsConstructor	= self is Constructor
 	for (msg.flat in root)
-		|| it = msg.RC_HasTemporary  // need to always do this?
+		|| it = msg.RC_HasTemporary							// need to always do this?
 			if .dorefs or (it != screfs.kBasisObj)
 				SCRefs.RC_HandleDisappearing( msg, it )
 	
@@ -936,7 +928,6 @@ function scdecl.DeclToDot (|SCDecl| P0, |Message|)
 	opt norefcounts
 	rz = @dot + .Name
 	|| thg = rz.msg(@thg, "self")
-	//thg.resetasm
 	thg.obj = p0
 	rz <~ @emb
 	rz.obj = self
@@ -950,6 +941,10 @@ function scdecl.RefDestructor (|message|)
 		return screfs.DecrMulti(self, m)
 	return SCRefs.RefClearMsg( m )
 
+
 function message.CheckFreeIfDeadValid
 	opt inline
+	opt norefcounts
 	check (self == @func) (self, "assumption #749 invalid") // JB_FreeIfDead should exist on function calls.
+
+

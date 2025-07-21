@@ -181,7 +181,6 @@ function UpdateInlineReg (|asmreg| V, |scdecl| D, |asmreg|)
 	if v is constoutput and d isnt Altered
 		(d is const)
 
-	|| T = D.WholeType
 	v.TmpCheck
 	D.AsmReg = v												// update reg!
 	return v

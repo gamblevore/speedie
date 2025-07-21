@@ -596,9 +596,8 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 		return
 	check (src isnt temp) (p, "Can't increment temporary value.")
 
-
+	
 function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)				// --a++
-	visible
 	opt	NoRefCounts
 	
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)

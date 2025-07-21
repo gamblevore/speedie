@@ -14,8 +14,8 @@ function Assembler.Optimise
 	
 
 
-function uint.IsTemp (|bool|)
-	return self & 1<<31
+//function uint.IsTemp (|bool|)
+//	return self & 1<<31
 
 
 
@@ -24,9 +24,9 @@ function uint.OperatorSameReg (|uint| R, |bool|)
 
 
 
-function fatasm.OptBFLG (|Assembler| A)
-	// dest, src, up, down, sign
-	return // do this later.
+//function fatasm.OptBFLG (|Assembler| A)
+//	// dest, src, up, down, sign
+//	return // do this later.
 
 /*
 	// this is my BOR code.
@@ -62,7 +62,7 @@ function FatASM.ReplaceReg (|uint| Dest, |uint| New, |bool|)
 
 function fatasm.MiniOpt (|Assembler| A)
 // we aren't doing a full optimiser. A few mini-opts could be nice
-	if self isa asm.bflg
-		.OptBFLG(A)
+//	if self isa asm.bflg
+//		.OptBFLG(A)
 
 

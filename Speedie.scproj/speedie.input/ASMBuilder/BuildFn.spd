@@ -12,7 +12,7 @@ extend_module ASM
 		|| fn = .GetASMFunc(testname)
 			|| ff = fn.µTest
 			jb_vm.vm.Registers(true)
-			|| result = jb_vm.Run(ff.ptr, ff.length)
+			jb_vm.Run(ff.ptr, ff.length)
 
 
 	helper GetASMFunc (|message| m, |scfunction|)

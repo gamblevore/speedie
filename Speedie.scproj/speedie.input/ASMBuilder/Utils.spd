@@ -5,7 +5,7 @@ function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
 	if (rz is Global) and !rz.au.ExportPosition // oof
-		error (self, "No export position!")
+		error (self, "No export position on: " + .locate)
 //		|| P = .first
 //			rz.au.ExportPosition = p.ASMDecl.au.ExportPosition
 //			rz.sanity
@@ -34,9 +34,9 @@ function assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	return .start
 	
 	
-function message.OperatorMul (|asm| op, |&fatasm|)
-	|| a = Assembler.sh
-	return a.RequestOp(op, self)
+//function message.OperatorMul (|asm| op, |&fatasm|)
+//	|| a = Assembler.sh
+//	return a.RequestOp(op, self)
 	
 
 

@@ -442,7 +442,7 @@ struct FatASM
 		// and long-jumps might require more awkward encoding.
 		if .Exists
 			if ._op < 32
-				return 2 + ._op&1
+				return 2 + (._op&1)
 			return 1
 	
 	
