@@ -115,14 +115,18 @@ function SettingMemory (|Message| Rel, |bool|)
 	// bla.bla = X
 	opt norefcounts
 	require Rel.IsSetRel
-	|| f = Rel.first
-		|| d = f.SetType
-			return true
+
+	|| f = Rel.first$
+	if f.func == @acc
+		return true
+	|| d = f.obj
+	if d isa scdecl
+		return  d is Property  or  d is Global
 
 
 function SCFunction.NilSelff (|message| where, |nilstate| v)
 	expect (!.nilself) (where, "Already stated")
-	.nilself = v
+	.NilSelf = v
 
 
 function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)

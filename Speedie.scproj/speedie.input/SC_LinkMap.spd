@@ -93,14 +93,15 @@ function ReachFunc (|SCNode| from)
 	opt norefcounts
 	flow off // memory order dependant!
 	
-	if .borked
-		error (.source,    "Borked function reached!")
-		error (from.source, from.ReachedName)
-	
 	|| MR = .MyReacher
 		if mr == Compiler.VisibleFuncs
 			.MyReacher = from
 		return
+
+	if .borked
+		error (.source,    "Borked function reached!")
+		error (from.source, from.ReachedName)
+
 	.MyReacher = from
 		
 	Compiler.stReachedFunc++
@@ -110,9 +111,7 @@ function ReachFunc (|SCNode| from)
 	.cls.Reach(self)?
 		
 	for o in .LinkTo
-		if (o.MyReacher)
-			//
-		  elseif (o isa SCFunction)
+		if (o isa SCFunction)
 			o.ReachFunc(self)
 		  elseif (o isa SCClass)
 			o.Reach(self)
@@ -130,6 +129,9 @@ function IsUnused (|bool|)
 	if MR and MR != Compiler.VisibleFuncs
 		return false
 	
+//	if .LinkFrom > 0
+//		return false
+	
 	if .isvisible and .islibrary
 		return false
 
@@ -140,7 +142,7 @@ function IsUnused (|bool|)
 
 function message.HateUnusedFuncs
 	opt norefcounts
-	|| imp = scimport.findimport(.name)
+	|| imp = scimport.FindImport(.name)
 		imp.warnunusedfuncs = true
 	  else
 		.expect(.func, "Can't find project")

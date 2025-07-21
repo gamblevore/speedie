@@ -202,6 +202,7 @@ function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts
 	require self isnt Disabled
 	require self isnt InitFunc
+
 	if .isunused
 		|| src = .source
 			|| str = "()".ItsUnused
@@ -332,7 +333,6 @@ function GetFunc2 (|scfile| myfile, |int| f, |int| n,  |scfunction|)
 	
 function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction|)
 	opt norefcounts
-	if cmd contains "DidntReportError"
 	|| src = cmd.last
 	if src != @dot
 		return .getfunc2(myfile, ff, n)
@@ -595,10 +595,14 @@ function SCObject.BaseIcon (|string|)
 
 
 function SCObject.CallFromName (|string|)
-	if self isa scfunction
+	if self isa SCFunction
+		if self is InitFunc
+			return "(Initialiser)"	
 		return .RenderName
-	if self isa scdecl
+		
+	if self isa SCDecl
 		return .AutoCompleteName
+	
 	return .Name
 
 	
@@ -969,21 +973,35 @@ function CallFromSub (|message| arg, |scfunction| fn)
 	opt norefcounts
 	for call_point in fn.linkfrom
 		|| s = call_point.source
-			|| f = s.filepath
-				|| item = arg.msg(@tmp, "line")
-				item <~ (@sstr, f)
-				item <~ call_point.CallFromName
-				item <~ s.FuncPos(fn)
-				if call_point == OrigFn
-					item <~ (@char, "curr")			
+			|| item = arg.msg(@tmp, "line")
+			|| pos = -1
+			|| f = s.FuncPos(fn, pos)
+			item <~ (@sstr, f)
+			item <~ call_point.CallFromName
+			item <~ pos
+			if call_point == OrigFn
+				item.name = "curr"
 			
 
-helper Message.FuncPos (|scfunction| fn, |int|)				
+function message.FoundFunc (|scfunction| f, |bool|)
 	opt norefcounts
+	|| o = .obj
+	if o == f
+		return true
+	if o isa SCDecl
+		return o.IsLookupOnly == f
+
+
+helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
+	opt norefcounts
+	rz = .filepath
 	for ss.flat in self
-		if ss.obj == fn
-			return ss.position
-	return .position // oh well
+		if ss.foundfunc(fn)
+			rz ?= ss.FilePath
+			self = ss
+			exit
+	if rz
+		pos = .Position // oh well
 
 
 function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |message|)
