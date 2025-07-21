@@ -119,7 +119,7 @@ class FileRow (ListViewRow)
 
 	function AddFile (|file| f, |fileviewer| o)
 		|| Count = 2000
-		.addfilesub(f,  o.excludes,  o.folfile,  Count)
+		.AddFileSub(f,  o.excludes,  o.folfile,  Count)
 
 
 	helper AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |$int| Count, |bool|)
