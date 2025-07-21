@@ -1847,19 +1847,18 @@ JB_String* JB_Str_FromInt( int L, int R ) {
 }
 
 
+struct ChrBData {
+	JB_String* Objects[256];
+};
+static ChrBData StrByteObjs = {};
+
 JB_String* JB_Str__Byte(int i) {
-    struct ChrBData {
-        JB_String* Objects[256];
-    };
-	static ChrBData block = {};
-    
-	i = i & 0xFF; // make sure it's actually a byte!!
-	JB_String* Result = block.Objects[i];
+	JB_String* Result = StrByteObjs.Objects[i&0xFF];
 	if (Result)
 		return Result;
 
     Result = JB_Str_New(1);
-	block.Objects[i] = (JB_String*)JB_Incr(Result);
+	StrByteObjs.Objects[i&0xFF] = (JB_String*)JB_Incr(Result);
     Result->Addr[0] = i;
 	return Result;
 }
