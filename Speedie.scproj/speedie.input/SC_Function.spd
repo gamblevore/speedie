@@ -85,7 +85,6 @@ linkage
 |byte| 					Badness
 |byte|					StructReturnPos
 |byte| 					OptCounts
-//|byte|					IntPrmCount
 |uint16|				µStart
 |uint16|				µLength
 
@@ -1869,6 +1868,7 @@ function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 		f.clear
 	|| StillOK = StdErr.Mark
 	.FuncInfo = 0
+	.TmpCounter = 0
 	.Init_Sub(src, nil)
 	require StillOK
 

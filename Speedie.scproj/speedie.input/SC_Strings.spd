@@ -64,8 +64,22 @@ function NewRender (CollectFunc)
 		
 
 
-function ObjectifyString (|Message| msg)
-	msg.func = @sstr
+function ObjectifyString (|Message| func)
+	opt norefcounts
+	//if func.name != 1
+	func.func = @sstr
+
+/*
+	// this causes extra refcounting... due to it being a function
+	// which speedie doesn't know is fully owned.
+	func.func = @dot
+	func <~ (@thg, "string")
+	|| prm = func.msg(@prm)
+	prm <~ func.name[0]
+	func.name = "byte"
+*/
+		
+	
 
 
 function GetFileString (|Message| msg, |string| name, |message|)
@@ -115,7 +129,7 @@ function InBuiltFunc (|message| self, |string| name, |bool|)
 function String_Expand (|Message| msg, |SCFunction| fn) {
 	|| P = msg.parent !
 	if (P istmp "disabled" or "description")
-		msg.Func = @str					// in case of description ''
+		msg.Func = @str								// in case of description ''
 		return
 	
 	|| URL = msg in @url

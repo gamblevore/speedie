@@ -660,7 +660,7 @@ function Not (niltrackerfn)
 	return a &~ nilstate.FnBecomesNilCh
 
 
-function arel (Niltrackerfn)
+function Arel (Niltrackerfn)
 	opt norefcounts
 	|| ch = msg.first
 		rz = .jump(ch, test)
