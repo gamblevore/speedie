@@ -197,12 +197,13 @@ class GUIControl (list)
 
 	syntax cast (|ivec4|)
 		return .lastrect
+	
 	syntax append (|guicontrol| g)
 		super <~ g
 		
 	syntax is (|guicontrolflags| F, |bool|)
 		if self
-			return .state&F
+			return .state & F
 		
 	syntax is (|guicontrolflags|F, assigns:|bool|)
 		require ((.state&f)!=0) != value
@@ -211,10 +212,14 @@ class GUIControl (list)
 			.state |= f
 		  else
 			.state &= ~F
+		
 		if f & guicontrolflags.visible
 			if self is TrapVisibleChange
-			#!VisibleChange
-			GUI.resized(self)
+			if .HasAny // children!
+				GUI.resized(self)
+			  else
+				gui.Touch(self)
+			
 
 	function Decluttering (|bool|)
 		return .Declutterer.final
