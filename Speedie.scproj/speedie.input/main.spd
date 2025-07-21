@@ -63,9 +63,7 @@ function compiler.SetupEnv
 	error.AutoPrint = 1
 	pico.GlobalConfig.DesiredThreadCount = 1
 	
-	// platform.log "00"
 	if app.parent
-		// platform.log "11"
 		error.AutoPrint = 0
 		ErrorColors.enabled = false
 
