@@ -617,7 +617,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
 			self <~ '\n'
 
 	  elseif prop.TypeIsReached
-		if prop.islib and prop is Global
+		if prop is library and prop is Global
 			if !intomodule
 				self <~ "#define "
 				self <~ prop.exportName		// 
@@ -793,7 +793,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		if (d.exportName)
 			T <~ ' '
-			if d.islib and d is Global
+			if d is library and d is Global
 				t.Appendlibglob(d)
 			  else
 				d.exportName.safe(t, d is local)

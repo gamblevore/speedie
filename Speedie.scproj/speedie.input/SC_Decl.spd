@@ -87,6 +87,7 @@ datatype SCDeclInfo (uint)
 		VarThatGotReturned
 		ReturnedStruct
 		IntendedAsReturn
+		Library
 		
 		Temp			= body ||| CompilerCreated
 		VarType			= Param ||| Body ||| Global ||| Property
@@ -99,7 +100,7 @@ datatype SCDeclInfo (uint)
 		|| x = IntendedAsReturn
 	
 	
-	syntax is (|scdeclinfo| d, |bool|)
+	syntax is (|SCDeclInfo| d, |bool|)
 		return self & d // for debug
 	
 	
@@ -190,7 +191,7 @@ class SCDecl (SCObject) {
 	function IsNil (|bool|)
 		return self == typenil
 	
-	function IsLib (|bool|)
+	function ProjectIsLib (|bool|)
 		opt norefcounts
 		return .project.isstdlib
 

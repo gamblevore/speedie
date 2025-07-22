@@ -35,6 +35,6 @@ function message.ADD_ (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm
 function Assembler.MUL_ (|ASMReg| dest, |ASMReg| A, |ASMReg| B, |asmreg| Add, |message| exp, |&fatasm|)
 	|| A2 = .SmallToBig(A, B, exp)
 	|| B2 = .SmallToBig(B, A, exp)
-/	return exp.MUL(Dest, A2, B2, add)
+	return exp.MUL(Dest, A2, B2, add)
 
 

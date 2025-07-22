@@ -547,7 +547,7 @@ module StringCorrector
 		for d in compiler.DeclConstants
 			|| def = d.default
 			if def.IsString
-				.CollectString(def, d.IsLib)
+				.CollectString(def, d.ProjectIsLib)
 	
 	
 	function CorrectStrings

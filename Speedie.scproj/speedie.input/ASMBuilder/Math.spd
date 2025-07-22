@@ -392,7 +392,7 @@ extend Assembler
 		if src.small and cmp.IsBig
 			cmp.reg = 0
 			|| dest = .TempOnly(exp, cmp)
-			return exp.BFLG(dest, src, 32, 32, 0) * dest
+/			return exp.BFLG(dest, src, 32, 32, 0) * dest
 		return src
 		
 

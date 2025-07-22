@@ -205,8 +205,9 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	if B ||| C
 		(dcl is hidden)
 		
-	if dcl.islib
+	if dcl.ProjectIsLib
 		PackMaker.LibGlobs <~ dcl
+		(dcl is Library)
 	  else
 		packmaker.PackGlobs <~ dcl
 

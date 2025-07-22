@@ -60,7 +60,6 @@ module PackMaker
 			rz = rz align s16
 			if alter
 				d.au.ExportPosition = rz
-				if d~="dev"
 			rz += s
 	
 
@@ -87,7 +86,6 @@ module PackMaker
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.au.ExportPosition = i + 1
-			if g~="dev"
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
@@ -330,12 +328,14 @@ module PackMaker
 			.PackClassChildren(j)
 			j.exit
 		  else
+			|| T = .ClassType!
 			if !output
 				0
 			  elseif .islibrary
-				packmaker.libglobs <~ .classtype
+				packmaker.libglobs <~ T
+				(T is Library)
 			  else
-				packmaker.packglobs <~ .classtype
+				packmaker.packglobs <~ T
 			.PackClassChildren(j)
 		
 		
