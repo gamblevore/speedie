@@ -168,7 +168,7 @@ function scdecl.TypeSuffers (|bool|)
 	if .PointerCount
 		return true
 	|| d = .type.BaseType
-	return d == SCNodetype.FuncProto or SCNodetype.Object
+	return d == SCNodetype.ProtoType or SCNodetype.Object
 
 
 function SCdecl.IsCArray (|bool|)

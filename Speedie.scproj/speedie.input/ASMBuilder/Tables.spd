@@ -416,7 +416,9 @@ function Dot (fn_asm)										// a.b
 	
 	|| Index = prop.au.ExportPosition 
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
-	
+		debugger
+		prop.typeinfo
+		
 	if !dest.reg and (obj is temp)
 		dest.reg = obj
 	
@@ -644,9 +646,9 @@ function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	|| S = exp.name
 	|| n = S[]
 	if n == '~'
-		return .DoMathSub(exp, dest, scoperator.bnot.asm!)
+		return .DoMathSub(exp, dest, scoperator.bnot.OpASM!)
 	if n == '-' and S == 1								// -a
-		return .DoMathSub(exp, dest, scoperator.Negative.asm!)
+		return .DoMathSub(exp, dest, scoperator.Negative.OpASM!)
 
 	|| F = exp.first!
 	if n == '!'
@@ -665,7 +667,7 @@ function DoMath (fn_asm)
 	|| scop = op.obj|scoperator|
 		if scop is AndOr
 			return .ASMBoolBadnessMadness(exp, dest, scop.Kind)
-		|| fn = scop.asm
+		|| fn = scop.OpASM
 			return .DoMathSub(exp, dest, fn)
 	error (op, "No ASM for this operator?")
 	debugger // what?

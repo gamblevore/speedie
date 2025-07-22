@@ -650,7 +650,7 @@ function SCObject.AutoCompleteType (|int|)
 		if .cls
 			|| r = 1
 			// probably better to copy the actual basetype-info over... but whatever.
-			if .cls == SCNodetype.FuncProto
+			if .cls == SCNodetype.ProtoType
 				r |= 8
 			return r
 		return 2
@@ -1308,7 +1308,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 
 	if !ty
 		return msg.ModuleSrc
-	if ty.type == SCNodetype.funcproto
+	if ty.type == SCNodetype.ProtoType
 		|| l = ty.IsLookupOnly 
 		if l isa scfunction
 			return l.source

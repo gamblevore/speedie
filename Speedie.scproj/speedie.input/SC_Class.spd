@@ -87,7 +87,7 @@ constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	.Modul = m
 	.IsVisible = SCNode.CurrVisibility
 	.saveas = ""
-	.TypeInfo = 0//DataTypeCode.UnusedType
+	.TypeInfo = 0
 	(self is Banned) = .TestBanned
 	
 	|| T = SCDecl(self)
@@ -984,6 +984,8 @@ module
 			cls.typeinfo = datatypecode._Voidptr
 		if cls.IsDataTypeOrFP
 			(cls is stateless)
+			if base is prototype
+				cls.Typeinfo = DataTypeCode._voidptr
 		cls.IsRole = (node ~= "role")|int|
 
 		|| SA = cls.SourceArg
@@ -1047,7 +1049,7 @@ module
 	function SCClass.DataTypePostLoad
 		require .IsDataTypeOnly
 		if self ~= "_void"
-			.typeinfo = 0//datatypecode._void
+			.typeinfo = 0
 			return
 
 		|| node = .Source!

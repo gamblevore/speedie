@@ -8,7 +8,7 @@ datatype SCNodeType (byte)
 		Module = 0	// not actually a type
 		Nil			// hasptr
 		DataType
-		FuncProto	// hasptr
+		ProtoType	// hasptr
 		Struct
 		Object		// hasptr
 	)
@@ -27,7 +27,7 @@ extend scclass
 		return .BaseType is datatype
 	
 	function IsDataTypeOrFP (|bool|)
-		return .BaseType is datatype or funcproto
+		return .BaseType is datatype or ProtoType
 	
 
 	syntax equals (|string| name, |bool| aware, |bool|)

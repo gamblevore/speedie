@@ -1321,9 +1321,9 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	tmp <~ (@thg, f.Name)
 	tmp <~ node.last
 	
-	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, SCNodetype.funcproto )
+	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, SCNodetype.ProtoType )
 		|| clss = modul.Cls!
-		clss.BaseType = SCNodeType.funcproto
+		clss.BaseType = SCNodeType.ProtoType
 		(clss isnt Builtin)		// datatype sets it to true.
 		clss.FuncProto = f
 		clss.size = platform.pointerbytes

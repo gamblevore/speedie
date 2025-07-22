@@ -50,7 +50,7 @@ linkage
 |string|		CompOp
 |string|		CompParam
 |string|		FuncName
-|fn_OpASM?|		ASM
+|fn_OpASM?|		OpASM
 |OpMode|		Kind
 |SCOperator--?|	Opposite 
 
@@ -58,7 +58,7 @@ linkage
 constructor (|string| name="", |fn_opasm?| ASM, |OpMode| mode=0)
 	.name = name
 	.kind = mode
-	.asm = asm
+	.OpASM = asm
 	if name
 		dict[name] = self
 

@@ -176,7 +176,7 @@ dispatch ClassLinkageTable (TranFunc)
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")
 			|| type = node[@thg]$
-			name_space.typeinfo = 0//datatypecode.unusedtype
+			name_space.typeinfo = 0
 			if type == "false" or "symbol"
 				(name_space is symbol)
 			  elseif type == "fixed"

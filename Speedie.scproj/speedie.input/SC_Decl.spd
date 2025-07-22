@@ -1284,14 +1284,16 @@ function scdecl.Complexity (|int|)
 	opt norefcounts
 	|| T = .type
 	rz += T.IsObject
-	rz += (T.baseType is funcproto) << 1
+	rz += (T.baseType is ProtoType) << 1
 	rz += T.IsStruct << 2
 	rz += .IsCarray << 3
+
 
 function SimplestFirst (SorterComparer of scdecl)
 	|| BComp = b.Complexity - .Complexity
 		return BComp
 	return b.carraysize - .carraysize
+
 
 function SmallestAlignedFirst (SorterComparer of scdecl)
 	return b.Alignment(true) - .alignment(True)
