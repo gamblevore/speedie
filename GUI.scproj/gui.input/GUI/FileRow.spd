@@ -52,7 +52,7 @@ class FileRow (ListViewRow)
 		fs <~ "file: "
 		fs <~ .location
 		fs <~ .dirfile
-	
+ 
 	
 	behaviour Text
 		if i == 0
@@ -106,7 +106,8 @@ class FileRow (ListViewRow)
 
 	helper IsAlsoDir (|file| f, |bool|)
 		return f.isdir == .asdir
-		
+	
+	
 	function TryReload (|fileviewer|fv)
 		require .asdir
 		|| f = .location.file

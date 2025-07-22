@@ -1,6 +1,5 @@
 
 
-
 class SpaceMap (memorylayer)
 	constructor
 		super.constructor(SpaceTree)
