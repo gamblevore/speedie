@@ -85,8 +85,8 @@ linkage
 |byte| 					Badness
 |byte|					StructReturnPos
 |byte| 					OptCounts
-|uint16|				µStart
-|uint16|				µLength
+|uint|					µStart
+|uint|					µLength
 
 
 

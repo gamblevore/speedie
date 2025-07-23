@@ -5,7 +5,7 @@ extend SCFunction
 
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
-		rz = asm[.µlength*3]!
+		rz = asm[.µlength|int|*3]!
 		|| p = rz.ptr
 		|| after = .MuRender(P, P+rz.Size)
 		rz.Size = after-p

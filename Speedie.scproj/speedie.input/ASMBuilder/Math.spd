@@ -33,14 +33,23 @@ extend Assembler
 			mode |= l.Small << 2
 			mode |= R.Small << 3
 			return exp.EQUL(dest, L, R, mode) * dest
+
+		if  r is ConstOutput  and  l isnt ConstOutput
+			swap (l) (r)
 		
 		|| RS = r.small
 		|&fatasm| fat
 		if l.reg
 			|| LS = L.Small
-			fat = exp.JMPN(l, r, LS, RS, 0)
-			if !negate
-				fat._op = asm.jmpe
+			if RS
+				|| K = .Const(L, 9, L.signed)
+					fat = exp.JMKE(R, K, 0)
+					if negate
+						fat._op = asm.JMKN
+			if !fat
+				fat = exp.JMPN(l, r, LS, RS, 0)
+				if !negate
+					fat._op = asm.jmpe
 		  else
 			fat = exp.JBAN(r, RS, 0)
 			if !negate
@@ -90,9 +99,9 @@ extend Assembler
 		require l.small and k.fits(9, true)	
 		.NopConst(R)
 		k = k|uint64|.trim(9)
-		|| J = exp.JMPK(l, k)
-		if 0: exp.JMPKN
-		j._op += mode&1						// jmpkn
+		|| J = exp.JMKM(l, k)
+		if 0: exp.JMKL
+		j._op += !(mode&1)						// .JMPL
 		return J * dest
 
 

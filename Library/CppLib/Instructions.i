@@ -132,10 +132,14 @@
 	Code = JumpEq(r, Op, Code);
 ı JMPN: _
 	Code = JumpNeq(r, Op, Code);
-ı JMPK: _
+ı JMKM: _
 	Code = JumpK(r, Op, Code);
-ı JMPKN: _
+ı JMKL: _
 	Code = JumpKN(r, Op, Code);
+ı JMKE: _
+	Code = JumpKE(r, Op, Code);
+ı JMKN: _
+	Code = JumpKNE(r, Op, Code);
 ı JBOR: _
 	if (u1 << (Bra_Smallu << 5)) 
 	Code += Bra_Jmpi

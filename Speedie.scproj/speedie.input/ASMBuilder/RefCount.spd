@@ -51,7 +51,9 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 				if (p.r0 samereg a.reg) and p.r1 == 0
 					p.r1 = 1
 					return p
-			return exp.rfst(asmreg(), a)
+			|| fat = exp.rfst(asmreg(), a)
+			Fat.Outputs = 0
+			return fat
 
 		if fn == Compiler.RefDecr
 			|| P = .last

@@ -73,7 +73,7 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	
 	check ((v < 32) and !(vd & .vtemps)) (exp, "Too many registers in use. No space for result.")
 	if (dest is ExitAtAll) and .state.return
-		v = 1 max (.state.parentvars|uint|) // a simple max will fix this?
+		v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
 	dest.reg = v
 	dest.µtype = fn.ASMRegType
 	dest = dest.ReallySimplify
@@ -103,9 +103,13 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	|| OV = .OpenVars
 	
 	|ASMState| Old = .State				// can't use implicit types for barestructs
-	if !dest.reg and fn.ASMReturn
-		if dest isnt discard
-			Dest = .TempOnly(prms, dest)
+	if dest isnt discard
+		if (!dest.reg or dest is temp)
+			|| type = fn.ASMReturn
+				// lets say it opened something, and then the next thing tried to declare a new var?
+				// lets say for a function call param thing?
+				// but otherwise, its the same.
+				dest = .declareme(prms, type)
 	
 	if dest isnt ExitFunction
 		.TailInlineable = false
@@ -125,7 +129,7 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	|fatrange| LL
 	rz = .TryInlineSub(prms, fn, AllowedGain, LL)
 	if !rz
-		.NopRange(start, .curr)				// rewind
+		.SoftNopRange(start, .curr)				// rewind
 	
 	.state = old
 	if .state.InlineDepth == 0
@@ -252,7 +256,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	for p.fast in prms
 		Grace += .IsASMConst(p)<<2
 
-	require (AllowedGain + Grace) > fn.µlength
+	require (AllowedGain + Grace)|uint| > fn.µlength
 
 	if !.state.InlineDepth
 		.InlineDepthLimit = 3

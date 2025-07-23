@@ -528,11 +528,17 @@ POS 5
 /**/ JMPN  (JCmpEq)
 		Code = JumpNeq(r, Op, Code)
 
-/**/ JMPK  (JCmpK)
+/**/ JMKM  (JCmpK)						// (jump more)
 		Code = JumpK(r, Op, Code)
 
-/**/ JMPKN  (JCmpK)
+/**/ JMKL  (JCmpK)						// (jump less)
 		Code = JumpKN(r, Op, Code)
+
+/**/ JMKE  (JCmpK)
+		Code = JumpKE(r, Op, Code)
+
+/**/ JMKN  (JCmpK) 
+		Code = JumpKNE(r, Op, Code)
 	
 /**/ JBOR  (Bra)
 		if (u1<<(Bra_Smallu<<5))

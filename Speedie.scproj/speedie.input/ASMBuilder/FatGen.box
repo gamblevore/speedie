@@ -603,10 +603,10 @@ function message.JMPN (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| LSmall = nil,
 }
 
 
-function message.JMPK (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JMKM (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.JMPK, self)
+	rz = a.RequestOp(asm.JMKM, self)
 	rz.reginput(0) = r1
 	rz.numinput(1) = K
 	rz.jumpinput(2) = Jmp
@@ -616,10 +616,36 @@ function message.JMPK (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fata
 }
 
 
-function message.JMPKN (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JMKL (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.JMPKN, self)
+	rz = a.RequestOp(asm.JMKL, self)
+	rz.reginput(0) = r1
+	rz.numinput(1) = K
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 22) >> 22) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMKE (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.JMKE, self)
+	rz.reginput(0) = r1
+	rz.numinput(1) = K
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 22) >> 22) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMKN (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.JMKN, self)
 	rz.reginput(0) = r1
 	rz.numinput(1) = K
 	rz.jumpinput(2) = Jmp

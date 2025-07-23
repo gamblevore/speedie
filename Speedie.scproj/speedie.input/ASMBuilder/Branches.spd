@@ -51,7 +51,7 @@ function IfSub (fn_asm)
 		return Arg1Return * b.always					// if k1: return 
 
 	if ArgStart == .curr								// if x {} else {something()}
-		.NopRange(ifstart, argstart)
+		.SoftNopRange(ifstart, argstart)
 		.Branch(cond, B, true)
 		rz = .Else(other) & Arg1Return
 		.AllJumpTo(b)
@@ -106,14 +106,14 @@ function WhileSub (|message| exp,  |asmreg|)
 	// how to step into this? Into the while-true
 	|| LT = .Branch(exp.first!, loop_test)
 	if loop_test.never
-		.NopRange(InitialJump, loop_Test.start)
+		.SoftNopRange(InitialJump, loop_Test.start)
 		return ASMReg()
 	
 	if loop_test.always
 		.Nop(InitialJump)
 		if  loop_test.After != loop_Test.Start  //  EH?
 			debugger
-			.NopRange(loop_Test.start, loop_Test.after)
+			.SoftNopRange(loop_Test.start, loop_Test.after)
 		
 		// now what?
 		exp.JUMP.JumpTo(initialjump+1, self)
@@ -504,22 +504,17 @@ extend Assembler
 	
 	
 
-function @Assembler.PrintProgress (|message| exp=nil)
+function @Assembler.PrintProgress
 	cpp_name adb 
 	visible
 	opt norefcounts
 	"---"
-	printline scfunction.currfunc!
-	|| s = Assembler.sh
-	if exp
-		printline exp
-	  else
-		s.LastDebug = s.funcstart
-	|| Curr = s.LastDebug
-	while curr < s.curr
-		curr.debugprint
-		curr++
-	s.LastDebug = curr
+	|| fn = scfunction.currfunc!
+	printline fn
+	|| Base = assembler.sh.Start + fn.µStart
+	|| amount = fn.µLength ?? (Assembler.sh.curr - base)
+	for n in amount
+		base[n].debugprint
 
 
 function message.Jump (|&Fatasm|)

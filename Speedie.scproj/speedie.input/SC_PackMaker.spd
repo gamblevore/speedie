@@ -148,7 +148,9 @@ module PackMaker
 		opt norefcounts
 		|| mod = compiler.program.FindModule("ASMExamples")
 			|| regs = jb_vm.vm.registers(true) // clears
-			return mod.Findfunction(s)
+			rz = mod.Findfunction(s)
+			scfunction.currfunc = rz 
+			
 	}	
 		
 		

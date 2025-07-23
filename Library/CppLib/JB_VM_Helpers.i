@@ -412,6 +412,17 @@ AlwaysInline ASM* JumpKN (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + J;
 }
 
+AlwaysInline ASM* JumpKE (VMRegister* r, ASM Op, ASM* Code) {
+	auto K = JCmpK_Ki;
+	auto J = JCmpK_Jmpi * (ii1 == K);
+	return Code + J;
+}
+
+AlwaysInline ASM* JumpKNE (VMRegister* r, ASM Op, ASM* Code) {
+	auto K = JCmpK_Ki;
+	auto J = JCmpK_Jmpi * (ii1 != K);
+	return Code + J;
+}
 
 
 #define shu(x) ((((x)<<Shift_Shu))>>Shift_Shu)
