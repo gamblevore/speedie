@@ -20,7 +20,6 @@ extend asmreg
 
 extend Assembler
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
-		if "IncrAmount".trap
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
 		if  L is ConstOutput  and  R is ConstOutput
@@ -29,6 +28,7 @@ extend Assembler
 			return .NumToReg(exp, num, res, DataTypeCode.bool)
 		
 		if dest isnt CondRequest
+			if "IncrAmount".trap
 			dest = .TempTyped(exp, TypeBool!.TypeNormal, dest)
 			|| Mode = negate|int| xor 1
 			mode |= l.Small << 2
@@ -350,10 +350,12 @@ extend Assembler
 				.redest(xy1, xout)
 			return true
 
-
+	
 	function IntPlus     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
+		|| ttt = r.µtype is bool
+		if "AddShifted".trap
 		if dest is ConstOutput // perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntPlus)
 
@@ -723,6 +725,7 @@ extend Assembler
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)
 		|uint| SrcBits = src.BitCount
+		if "AddShifted".trap
 		if up > srcbits or down > SrcBits			// wierd?
 			problem (exp, "Shift too far")
 		

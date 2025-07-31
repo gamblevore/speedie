@@ -161,7 +161,6 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	opt norefcounts
 	LL.Start = .curr
 
-	// if "InlineParam".trap
 	|SavedRegisters| regs 
 	regs.Collect(fn.args, self)
 	
@@ -320,7 +319,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
-	// if "Inline_Consts".trap
 	|| fn = prms.AsFunc
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest

@@ -348,6 +348,9 @@ function StructTest (|float|)
 	|| x = terntest(1,2,3)
 	return rr.amount
 
+function AddShifted (|bool| boolie)
+	|| x = -1
+	x += boolie << 1 // opt!
 
 function TernTest (|int| a, |int| b, |int|)
 	rz = (a, b+1)(a)

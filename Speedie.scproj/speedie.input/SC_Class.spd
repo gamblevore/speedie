@@ -865,18 +865,18 @@ function FirstDestructor (|SCFunction|)
 			
 		  elseif (p.HasStuffToHandleInDestructor or fn.SourceArg.Hasany)
 			return fn
-
+	
 
 function SCFunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
 	opt norefcounts
 	|| sl = cls.SelfDecl					// for my nil-checker
+	sl = sl.CopyDeclForVar					// in case its "being alteredness" is changed later
 	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
-		sl = sl.copydecl
 		if self is destructor
 			sl = sl.MakeNewReal
 		  elseif (self is constructor) and cls.isobject
-			sl = sl.makenewoptional // nice
-		(sl is SelfImplicit)				// I shouldn't have to specify this, it should be copied!
+			sl = sl.makenewoptional			// nice
+	(sl is SelfImplicit)					// I shouldn't have to specify this, it should be copied!
 	space.TryAdd( space.FuncSrc, sl, "self" )
 	.args <~ sl
 

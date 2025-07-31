@@ -150,6 +150,10 @@ datatype DataTypeCode (uint16)
 		return .VecCount << ._Shift
 
 	function BitCount (|int|)
+		// not sure I actually WANT VecCount for most things?
+		// we don't have boolvecs anyhow :)
+		if self is bool
+			return 1
 		return (.VecCount << ._Shift) << 3
 
 	function VecCount (assigns:|int|, |datatypecode|)

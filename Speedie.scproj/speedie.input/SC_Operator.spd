@@ -25,7 +25,7 @@ datatype OpMode (int)
 		Multiply
 		Subtraction = (makessigned + Addition)
 		SameOrLessBits = [NoExtraBits, LoseBits]
-		Shift = ShiftOnly + NoExtraBits
+		RightShift = ShiftOnly + NoExtraBits
 		AndOr = [OR, AND]
 		Custom
 		CaseAware
@@ -180,7 +180,7 @@ module {
 		.AddMath( "*",		"Mul",		&Assembler.Multiply,	/*.mul*/	opmode.Multiply)
 		.AddMath( "/",		"Divide",	&Assembler.Divide,		/*.div*/)
 
-		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,			/*.shru*/	opmode.shift)
+		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,			/*.shru*/	opmode.Rightshift)
 		LeftShift = .addbit( "<<",	"ShiftLeft",	&Assembler.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&Assembler.BitOr,		/*.bor*/)
 		.AddBit( "&",	"BitAnd",		&Assembler.BitAnd,		/*.ban*/	opmode.SameOrLessBits)
@@ -533,11 +533,8 @@ function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
 	expect (rk >= 0) (self, "Invalid bit shift")
 	|| T = lc.typeinfo
 	|| BC = T.BitCount
-	if (T == datatypecode.bool)
-		if bigger
-			BC = 32
-		  else
-			BC = 1
+	if (bigger and T == datatypecode.bool)
+		BC = 32
 	
 	expect (rk < BC) (self, "Too large bit shift")
 		

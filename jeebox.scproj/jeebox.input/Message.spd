@@ -88,6 +88,10 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 ///////////////////////////////////////////////////////////////////////////////
 	
+/*	setter Obj (|object|)
+		if .objectid == 1234
+		super.obj = value
+*/
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
 		rz = pos_msg ?? self

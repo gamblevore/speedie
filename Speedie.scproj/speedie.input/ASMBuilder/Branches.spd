@@ -158,6 +158,11 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
+	// opt this:
+	// x = JB_Ternary(Bool, 1, -1) --> 
+	// x = -1
+	// x += Bool << 1
+	
 	|| DestType = exp.ASMDecl.typeonly
 	|| mA = .ExistingVar(a, varusemode.Sometimes)
 	|| mB = .ExistingVar(b, varusemode.Sometimes)

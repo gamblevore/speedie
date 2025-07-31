@@ -300,18 +300,6 @@ class SCDecl (SCObject) {
 		|| t = ot.type.typeinfo
 			
 		if .isfloat or t.isfloat
-//			|| KS = self is const
-//			|| KO = ot is const
-//			if KS and KO
-//				if s.itembitcount <= t.itembitcount
-//					return .type
-//				return ot.type
-//			if KS != KO
-//				if KO
-//					return .type
-//				  else
-//					return ot.type
-
 			|| bits = .bestfloat(ot)
 			|| FF = (datatypecode.double.floatness, datatypecode.float.floatness)(bits > 32)
 			|| dest = (TypeFloat64!, TypeFloat!)(bits > 32)
@@ -335,9 +323,10 @@ class SCDecl (SCObject) {
 				return TypeInt
 			if Op is LoseBits					// &
 				bits = bme min bt
-			  elseif Op is ShiftOnly			// >>, rotr, rotl
-				bits = bme
-			  elseif Op is NoExtraBits			// (xor, <<) can add bits
+			  elseif Op is ShiftOnly			// >>, <<
+				if op is noextrabits			// >>
+					bits = bme
+			  elseif Op is NoExtraBits			// (xor) can add bits
 				0
 			  elseif (Op is mathlike) and bits < 32
 				bits = 32
@@ -968,10 +957,14 @@ class SCDecl (SCObject) {
 		// About the exportposition for ASM globals:
 		is ExistanceAltered // just for debugging the compiler.
 		
+		rz = .CopyDeclForVar
+		rz.NilDeclared = type
+	
+	
+	function CopyDeclForVar (|scdecl|)
+		opt norefcounts
 		rz = .CopyDecl
 		rz.au.info |= .au.info & scdeclinfo.VarType
-		rz.NilDeclared = type
-
 		
 	
 	function CanNilCheck (|bool|)
