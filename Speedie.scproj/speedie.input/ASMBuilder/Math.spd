@@ -436,14 +436,14 @@ extend Assembler
 
 	function Subtract (fn_opasm)				// x = a - b
 		(l is alternate)						// the logic ismostly shared...
-		return .Plus(dest, l, r, exp)
+		return .Plus(dest, l, r, exp) asnt asmreg.Alternate
 
 
 	function Minus (fn_opasm)					// x = -b
 		// not the same as negative, which is an fn_asm... that means it works on the exp
 		if r != asmreg()
 		(r is alternate)
-		return .plus(dest, r, l, exp)
+		return .plus(dest, r, l, exp) asnt asmreg.Alternate
 
 
 	function FloatMul (fn_opasm)

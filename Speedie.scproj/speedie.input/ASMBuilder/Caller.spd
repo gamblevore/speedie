@@ -352,6 +352,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if dest is Alternate
 		|| v = dest.reg
 		.registers[v] = fat
+		(dest isnt alternate)
 
 	.RegsBitClear(exp, Start)
 	
