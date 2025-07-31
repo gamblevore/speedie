@@ -969,12 +969,12 @@ function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 }
 
 
-function message.MEMZ (|asmreg| r1 = nil, |int| Index = nil, |int| Length = nil, |&fatasm|) {
+function message.RDWR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Length = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.MEMZ, self)
+	rz = a.RequestOp(asm.RDWR, self)
 	rz.reginput(0) = r1
-	rz.numinput(1) = Index
+	rz.reginput(1) = r2
 	rz.numinput(2) = Length
 }
 

@@ -333,7 +333,11 @@ function InitTypes2
 function InlineParam2 (|$int| vq)
 	vq++
 
-
+function JumpConst (|int| x, |int|)
+	if x == 2
+		return 3
+	return 4
+	
 function InlineParam ()
 	|| x = 0
 	.inlineparam2(x)

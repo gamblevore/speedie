@@ -991,8 +991,10 @@ class SCDecl (SCObject) {
 		rz = .CopyDecl
 		rz.NilDeclared = type
 
+
 	function StatedReal (|nilstate|)
 		return .NilDeclared.statedreal
+
 
 	function StatedOptional (|nilstate|)
 		if .NilDeclared&nilstate.optional == NilState.optional

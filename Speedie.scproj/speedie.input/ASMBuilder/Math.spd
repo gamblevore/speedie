@@ -20,6 +20,7 @@ extend asmreg
 
 extend Assembler
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
+		if "IncrAmount".trap
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
 		if  L is ConstOutput  and  R is ConstOutput

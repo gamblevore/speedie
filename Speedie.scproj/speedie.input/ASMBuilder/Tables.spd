@@ -378,18 +378,22 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 
 	target debug
 		if !d.PointerCount and !d.IsCarray
+		
+	// if its just getting the address its ok...
+	// sure. but surely... its just a pointer anyhow.
+	// so... what should the set do? lets just assume it works. for now.
 	
-	if dest isnt AddrRequest
+	if !d.CanCopyNormally
+		if dest is set
+			return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()
+
+	  elseif dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.au.DataType
-		if !d.iscarray			// so its a pointer? what if its a carray to a pointer?
+		if !d.iscarray									 // so its a pointer? what if its a carray to a pointer?
 			d = d.internal!		
 		return .ReadOrWrite(Dest, exp, base, vara, d, 0) // readorwrite can convert vara to a const
 	
-	dest = dest.HaveAddr
-	dest.µType = DataTypeCode._voidptr
-	base = base.HaveAddr
-	return .Plus(dest, base, vara, exp)
-	
+	return .incrpointerbyvar(dest, base, vara, exp)
 
 
 function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)

@@ -30,15 +30,13 @@ datatype NilState (byte) // Exec.scproj needs this here
 		if self is realish
 			return "real"
 		return "lost"
-		
+	
 	syntax is (|nilstate| type, |bool|)
 		return (self & type) == type
 	
 	function StatedReal (|nilstate|)
 		if self & nilstate.optional == NilState.Real
 			return NilState.real
-
-	
 
 
 //struct ASMVarType

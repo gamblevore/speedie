@@ -11,16 +11,14 @@ module VM_Builder {
 |byte| 			XType
 |byte|			NormalPos = 0
 |uint|			FreeMultiASM = ~1
-|faststring|	FatFile
+|FastString|	FatFile
 |[message]|		rdz
 
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down,  |byte| c,  |byte| c2)
 	.form_h <~ "
-#define   ${fname}${c}       (((${c2}int)((Op)<<$down))>>$Up)
-#define   ${fname}${c}_(x)   (((${c2}int)((x)<<$down))>>$Up)
-"
+#define   ${fname}${c}       (((${c2}int)((Op)<<$down))>>$Up)"
 
 
 function DefineGet (|string| fname,  |int| up,  |int| down, |message|)

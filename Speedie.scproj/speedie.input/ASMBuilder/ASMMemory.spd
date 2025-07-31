@@ -11,48 +11,59 @@ function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
 	return .AddToReg(exp, dest, base, Add)
 
 
-function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |&fatasm|)
-	expect (D) (exp)
-	check (!varadd.reg) (exp)
-	|| Amount = D.SizeOfQuery						#require
-	expect (Amount < 4096) (exp, "Object too large to clear via ASM.") // can re-write this to generate a loop.
+function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message| exp, |asmreg|)
+	dest = dest.HaveAddr
+	dest.µType = DataTypeCode._voidptr
+	base = base.HaveAddr
+	return .Plus(dest, base, vara, exp)
 
+
+function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |asmreg| vara, |scdecl| D, |!&fatasm|)
+	if vara.reg
+		#! Did i get this right?
+/		dest = .IncrPointerByVar(dest, dest, vara, exp)
+
+	|| Amount = D.SizeOfQuery			#check exp
+	// what about structs like 53 bytes long? What is their alignment?
+	
 	if index
 		if d isnt property							// Sigh. now what? the size isnt right?
-		|| PropSize = d.CalculateSize min 16
-		Index *= PropSize
-		if index|uint| > (9~bits)|uint|
-			base = .AddConst(index, exp, base)
-			index = 0
+		if amount > 16								// previous version did "min 16". why? thats wrong?
+		dest = .AddConst(index*amount, exp, dest)
 	
-	while
-		|| Sub = Amount min (1<<10)
-		Amount -= Sub
-		
-		rz = exp.MEMZ(base, index, Sub & 10~bits)		// VM treats 0 as the biggest num
-		loop Amount > 0
-		base = .AddConst(Sub, exp, base)
+	check (Amount <= 1<<14) (exp, "Object too large to set to")
+	return exp.RDWR(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
+	
+//	while
+//		|| Partial = Amount min (1<<14)
+//		Amount -= Partial
+//		
+//		rz = exp.RDWR(Src, base, Partial & 14~bits)		// VM treats 0 as the biggest num
+//		loop Amount > 0
+//		// will this leak regs? i think so?
+//		base = .AddConst(Partial, exp, base)
+//		src = .AddConst(Partial, exp, base)
 
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
-
 	if dest is ContainsAddr
-		#!wait?? this is meant to be an addrrequest? not a response.
+		#!wait?? this is meant to be an AddrRequest? not a response.
 		debugger
 	
 	if dest is FromZeroMemory
-		|| fat = .ZeroMemory(index, exp, base, varadd, Decl)
-			return fat
+		if Decl
+			return .CopyMemory(index, exp, asmreg(), base, varadd, Decl)
+		error (exp)
 		dest = asmreg()
 
 	(dest asnt= asmreg.AddrRequest)
 	|| T = dest.µtype
 	|| bytes = t.ByteCount
 	if decl
-		|| curr = Decl.CalculateSize(0)
+		|| curr = Decl.CalculateSize
 		if curr != bytes // just check.
-		bytes = curr.clamp(1,16)
+		bytes = curr.clamp(1, 16)
 	bytes = bytes.log2
 	
 	
@@ -176,6 +187,15 @@ function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarA
 function Dummy (|message| exp)
 	if exp: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16, exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16
 
-
-
 }
+
+
+function scdecl.CanCopyNormally (|bool|)
+	opt norefcounts
+	|| i = .Internal!
+	if i.IsBareStruct
+		|| s = i.calculatesize
+		return (s <= 16) and s.IsPow2
+	return true
+
+

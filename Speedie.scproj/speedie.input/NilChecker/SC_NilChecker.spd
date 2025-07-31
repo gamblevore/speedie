@@ -196,10 +196,9 @@ function Item (NilTrackerFn)
 
 function Access (NilTrackerFn)
 	opt norefcounts
-	|| index = msg.second.first!.unbra!
+	|| index = msg.second.first!.UnBra
 	.jump(index)
-	|| Mode =  nilreason.accessing * (index == @num and "0")
-//	a[b]
+	|| Mode = nilreason.accessing * (index == @num and "0")
 	return .UseChildAsReal(msg, test, Mode)
 
 
