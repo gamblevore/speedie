@@ -108,7 +108,7 @@
 &&WR16,
 &&CNTC,
 &&CNTD,
-&&MEMZ,
+&&RDWR,
 &&FADD,
 &&FADK,
 &&FMUL,

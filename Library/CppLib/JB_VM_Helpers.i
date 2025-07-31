@@ -457,6 +457,18 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 
+AlwaysInline void MemCopyRDWR (VMRegister* r, ASM Op) {
+	byte* d = (byte*)u2;
+	uint s = n1;
+	uint n = MemoryCopy_Lengthu;
+	n |= (!n)<<14; // 0 means 1<<14. Would microcode easier than +1? Simple bit ops no math.
+	if (s) {
+		memcpy(d, r[s].Obj, n);
+	} else { // copying from r0 means zero.
+		memset(d, 0, n);
+	}
+}
+ 
 AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = (int)(CNTC_offsetu);

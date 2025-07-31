@@ -207,14 +207,14 @@ forms
 
 	ConstStretchy
 		r1		R
-		Cond	1	// 0 == always, 1 = only if dest == 0
+		Cond	1		// 0 == always, 1 = only if dest == 0
 		Inv		1
 		Value	17
-		
-	MemoryZero
-		r1		r
-		Index	9
-		Length	10
+	
+	MemoryCopy
+		r1		r		// dest
+		r2		r		// src
+		Length	14
 		
 	AddB
 		r1		R
@@ -632,8 +632,8 @@ POS 5
 /**/ CNTD  (CNTC)
 		IncrementAddr(r, Op, 0)
 
-/**/ MEMZ  (MemoryZero)	// zero
-		memzero((void*)(u1+memz2(u2)), L3)
+/**/ RDWR  (MemoryCopy) // can zero memory, if we pass r0 as src.
+		MemCopyRDWR(r, Op)
 
 
 

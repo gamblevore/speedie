@@ -219,8 +219,8 @@
 	IncrementAddr(r, Op, 1);
 ı CNTD: _
 	IncrementAddr(r, Op, 0);
-ı MEMZ: _
-	memzero((void *)(u1 + memz2(u2)), L3);
+ı RDWR: _
+	MemCopyRDWR(r, Op);
 ı FADD: _
 	if (Float_Du) 
 	d1 = d2 + d3 - d4
