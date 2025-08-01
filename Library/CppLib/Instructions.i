@@ -40,6 +40,8 @@
 	Rare_(r, Op);
 ı CONV: _
 	RegConv(r, Op);
+ı FEAT: _
+	u1 = 0;
 ı KNSR: _
 	RotateConst(r, Op);
 ı KNST: _
@@ -103,11 +105,11 @@
 	u1 = u2 | ((u3 << Shift_Shu) >> Shift_Shu);
 ı BNOT: _
 	u1 = ~u2 & ((u3 << Shift_Shu) >> Shift_Shu);
-ı BANDK: _
+ı BANK: _
 	u1 = u2 & U2_Li;
-ı BXORK: _
+ı BXRK: _
 	u1 = u2 ^ U2_Li;
-ı BORRK: _
+ı BORK: _
 	u1 = u2 | U2_Li;
 ı EQUL: _
 	u1 = BitComp(r, Op);
