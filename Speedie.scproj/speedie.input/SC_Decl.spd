@@ -316,7 +316,6 @@ class SCDecl (SCObject) {
 			if Op is MakesSigned				// -
 				if bme == 32 and bt == 32		// int - uint should stay as int. Or else its surprising! 
 					return typeint
-				// 
 				|| bits2 = (bme + !s.IsSigned) max (bt + !t.IsSigned)
 				if bits2 > 32
 					return TypeInt64

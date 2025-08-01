@@ -153,6 +153,10 @@ function BackCond (|fatasm| start)
 function Ternary		(fn_asm)
 	opt norefcounts
 	
+	// I'd rather actually re-write this to be like an if-condition! Like reuse the code
+	// then we can put back in, the opts in here... into the generalised if thing.
+	// this will do for now.
+	
 	|| prms = exp.second
 	|| cond = prms.first!
 	|| A = cond.next!
@@ -219,7 +223,9 @@ function InbuiltTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond
 	mc = .µ(cond, mc)
 	
 	if mc is ConstOutput
-		return (ma, mb)(mc.Const)
+		|| i = mc.Const
+		.NopConst(mc)
+		return (ma, mb)(i)
 	
 	return cond.TERN(dest, mc, ma, mb, mc.small) * dest
 

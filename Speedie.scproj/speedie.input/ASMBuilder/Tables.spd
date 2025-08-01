@@ -253,6 +253,10 @@ function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| 
 	if oldtype.isfloat or newtype.isfloat
 		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest
 	
+	if oldtype is bool // bools are normally considered bitcorrect. it would be impossible to do jbor otherwise.
+		from.µtype = newtype
+		return from
+
 	|| sh2 = 64 - OldType.BitCount
 	return exp.BFLG(dest, from, sh2, sh2, from.signed|int|) * dest
 

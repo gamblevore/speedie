@@ -510,20 +510,20 @@ struct FatASM
 		fs <~ " #/"
 
 
-	function JumpImprove (|bool|)
-		|| D0 = .jumpto!
+	function assembler.JumpImprove (|int| Opt, |fatasm| S, |bool|)
+		|| D0 = s.jumpto!
 		|| D = D0
 		|| n = 0
 		while d isa asm.jump
 			d = d.JumpTo!
-			expect (++n < 30) (.msg)
+			expect (++n < 30) (s.msg)
 		
-		if  (d isa asm.ret or (d isa asm.tail and options.optimise >= 4))  and  (self isa asm.jump)
-			.CopyFrom(d) // always jumping into an exit.
+		if  (d isa asm.ret or (d isa asm.tail and opt >= 2))  and  (s isa asm.jump)
+			s.CopyFrom(d)		// always jumping into an exit.
 			return true
 		
-		if D != D0 // faster jump
-			.JumpTo(D, Assembler.sh)
+		if D != D0				// faster jump
+			s.JumpTo(D, self)
 			return true
 		
 		
