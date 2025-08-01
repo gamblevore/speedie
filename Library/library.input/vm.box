@@ -386,6 +386,9 @@ AFNC (FuncAddr)
 					//					int64  from int64  --> F64Reg = int64
 					// floats or other size ints shouldn't be affected.
 
+/**/ FEAT (AddK)	// Request available features. do nothing for now
+		u1 = 0		// allows doing stuff like initing hardware.
+
 
 
 #!						 (((((Consts)))))
@@ -485,11 +488,11 @@ POS 5
 		u1 = u2 ||| ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BNOT  (Shift)
 		u1 = ~u2 &  ((u3 << Shift_Shu) >> Shift_Shu)
-/**/ BANDK  (AddK)
+/**/ BANK  (AddK)
 		u1 = u2  &  U2_Li
-/**/ BXORK  (AddK)
+/**/ BXRK  (AddK)
 		u1 = u2  ^  U2_Li
-/**/ BORRK   (AddK)
+/**/ BORK  (AddK)
 		u1 = u2 ||| U2_Li
 
 
