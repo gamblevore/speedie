@@ -26,9 +26,32 @@ function message.ADD_ (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm
 			return .SUBM(dest, L, R, sh)
 /		l = .ExpandBits(L, r.µtype)
 	
-	if L isnt Alternate
-		return .ADD(dest, L, R, sh)
-	return .SUB(dest, L, R, sh)		
+	if L is Alternate
+		return .SUB(dest, L, R, sh)		
+
+	if (r is temp)
+		|| oof = .AddShifted(dest, l, r, sh)
+			return oof
+			
+	// if its a normal add a = b + c, then LMUL==1, which comes through here.
+
+	return .ADD(dest, L, R, sh)
+
+
+function message.AddShifted (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+	|| beef = r.fat
+	require beef isa asm.BFLG
+
+	|| up = beef.Prms[2] + sh
+	|| total = beef.Prms[3] - up
+	require total > 0
+	
+	|| bits = r.BitCount
+	require total|int| < (64-bits)
+	
+	|| input = beef.RegInput(1)
+	Assembler.sh.nop(beef)
+	return .ADD(dest, l, input, total)
 
 
 

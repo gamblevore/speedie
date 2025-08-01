@@ -296,8 +296,10 @@ extend Assembler
 		return (self is containsaddr) or .µtype.ispointer
 
 
-	function ASMReg.LeftScore (|int|) // we want pointers on the left... ints on the left, and consts on the right
-		return (.somepointer<<1) + (self isnt RealConst)
+	function ASMReg.LeftScore (|int|) // we want pointers on the left, and consts on the right
+		rz += .somepointer << 2				// pointers on left
+		rz += (self isnt RealConst) << 1	// consts on right
+		rz += self isnt temp				// temps on right
 	
 	
 	function asmreg.PointerMul (|message| exp, |bool| swapped, |int|)
@@ -347,30 +349,20 @@ extend Assembler
 		if add2.CanStoreAsAddK
 			xy1.r2 = add2
 			if Changed
-				.redest(xy1, xout)
+				.ReDest(xy1, xout)
 			return true
-
-	
+		
+		
 	function IntPlus     (fn_opasm)
-		//		a - 1,		a + 1		//
-		//		1 - a,		1 + a		//
-		|| ttt = r.µtype is bool
-		if "AddShifted".trap
-		if dest is ConstOutput // perhaps we can do this in domathsub?
+		if dest is ConstOutput									// perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntPlus)
-
-		|| swapped = false
-		if  l.LeftScore < r.LeftScore // put consts into R
-			if l is alternate
-				target debug
-					if r.µtype.IsPointer						// 1 - ptr??? we blocked this already.
-			  else
-				swapped = true
-				swap (l) (r) // a+b == b+a
+		
+		|| swapped =  l isnt alternate  and  l.LeftScore < r.LeftScore
+			swap (l) (r) // a+b == b+a
 	
 		if !r.reg // add or subtract zero
 			return .Assign(dest, l, exp)
-		
+
 		|| LMul = 1
 		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
@@ -386,7 +378,6 @@ extend Assembler
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
 		if LMul.IsPow2			  								// x = int1 + int2
-			// if its a normal add a = b + c, then LMUL==1, which comes through here.
 			return exp.ADD_(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
 		
 		// L is now a POINTER.
@@ -644,12 +635,12 @@ extend Assembler
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp,   |asmreg|)
-		if asm.BORRK!=asm.borr+4 // what?
+		if asm.BORK!=asm.borr+4 // what?
 
 		if r.reg and (opp != asm.bnot) and !dest.IsVec
 			|| k = .Const(R, 14, true)
-				if 0:  exp.BORRK,  exp.BXORK
-				|| fat = exp.BANDK(dest, L, K) 
+				if 0:  exp.BORK,  exp.BXRK
+				|| fat = exp.BANK(dest, L, K) 
 				fat._op = opp+4
 				return fat * Dest
 				
@@ -725,21 +716,19 @@ extend Assembler
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)
 		|uint| SrcBits = src.BitCount
-		if "AddShifted".trap
 		if up > srcbits or down > SrcBits			// wierd?
 			problem (exp, "Shift too far")
 		
 		if !up and !down
 			return .assign(dest, src, exp)
 		
-		|| extra = 64 - srcBits // handle extra bits.
-		up += extra
-		down += extra
+		up = 64 - (SrcBits + up)
+		down += 64 - srcBits
 		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest)
 	
 		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
-		return fat.vectorise(dest, asm.QFLG)
+		return fat.Vectorise(dest, asm.QFLG)
 
 
 	function Zeros (|asmreg| dest, |asmreg|)

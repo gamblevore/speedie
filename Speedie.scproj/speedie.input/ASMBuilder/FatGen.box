@@ -173,6 +173,16 @@ function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |
 }
 
 
+function message.FEAT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FEAT, self)
+	rz.dest(0, r1, a)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
 function message.KNSR (|asmreg| r1 = nil, |int| Rot = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -459,30 +469,30 @@ function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BANDK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BANK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BANDK, self)
+	rz = a.RequestOp(asm.BANK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
 }
 
 
-function message.BXORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BXORK, self)
+	rz = a.RequestOp(asm.BXRK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
 }
 
 
-function message.BORRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BORRK, self)
+	rz = a.RequestOp(asm.BORK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K

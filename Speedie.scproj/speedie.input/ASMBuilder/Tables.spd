@@ -802,7 +802,6 @@ function ASMReg.ConstEnough (|bool|)
 
 function LocalThg (|scdecl| d, |asmreg|)
 	opt norefcounts
-	if d ~= "boolie"
 	|| T = d.WholeType as ASMReg.FromExistingVar
 	|| DP = d is param
 	(t is param) = DP
@@ -813,7 +812,7 @@ function LocalThg (|scdecl| d, |asmreg|)
 			t.FatIndex = f.index
 			if f is ConstOutput
 				(T is ConstOutput)
-
+	
 	if d is const
 		(t is constoutput)
 	

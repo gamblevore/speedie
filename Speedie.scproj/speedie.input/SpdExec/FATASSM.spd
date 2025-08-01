@@ -149,7 +149,7 @@ struct FatASM
 	function BytePos (|int|)
 		return .msg.position
 	
-	operator isa (|int| m, |bool|)
+	operator isa (|asm| m, |bool|)
 		nil checker
 		if self
 			return m == .op
