@@ -16,8 +16,8 @@ extend asmreg
 			is CondAnswer
 		return self 
 
-
-
+	
+	
 extend Assembler
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = dest is negate
@@ -30,10 +30,7 @@ extend Assembler
 		if dest isnt CondRequest
 			if "IncrAmount".trap
 			dest = .TempTyped(exp, TypeBool!.TypeNormal, dest)
-			|| Mode = negate|int| xor 1
-			mode |= l.Small << 2
-			mode |= R.Small << 3
-			return exp.EQUL(dest, L, R, mode) * dest
+			return exp.EQUL(dest, L, R, negate.equlmode(l,r)) * dest
 
 		if  r is ConstOutput  and  l isnt ConstOutput
 			swap (l) (r)
@@ -56,7 +53,7 @@ extend Assembler
 			if !negate
 				fat._op = asm.jbor
 		return fat * res
-
+	
 	
 	function Exists (|ASMReg| dest, |ASMReg| L, |message| exp, |ASMReg|)
 		opt inline
@@ -334,10 +331,10 @@ extend Assembler
 //		x = y + 2
 
 
-//		t = y + 1 // t is a temp. Otherwise this would leave a bad value.
-//		z = t + 1
+//		t = y + 1 // t is a temp.
+//		x = t + 1
 //			-->
-//		z = y + 2
+//		x = y + 2
 
 		|| XY1 = .Last(asm.addk)			#require
 		if XOut.IsVec // now what?

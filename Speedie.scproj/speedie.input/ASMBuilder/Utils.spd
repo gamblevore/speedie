@@ -144,7 +144,7 @@ datatype VarUseMode (int)
 		Return = ReturnAble
 		Set = SetAble
 		ExistingVar
-		Sometimes			// unused so far.
+		ForBools
 	
 	syntax is (|VarUseMode| v, |bool|)
 		return self&v

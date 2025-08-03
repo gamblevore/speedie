@@ -674,7 +674,7 @@ function DoMath (fn_asm)
 	|| op = exp.second!
 	|| scop = op.obj|scoperator|
 		if scop is AndOr
-			return .ASMBoolBadnessMadness(exp, dest, scop.Kind)
+			return .ASMBoolMaker(exp, dest, scop.Kind)
 		|| fn = scop.OpASM
 			return .DoMathSub(exp, dest, fn)
 	error (op, "No ASM for this operator?")

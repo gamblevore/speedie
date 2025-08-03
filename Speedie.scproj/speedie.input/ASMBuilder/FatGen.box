@@ -436,10 +436,10 @@ function message.BAND (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.BORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BXOR, self)
+	rz = a.RequestOp(asm.BORR, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -447,10 +447,10 @@ function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BORR, self)
+	rz = a.RequestOp(asm.BXOR, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -479,20 +479,20 @@ function message.BANK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fa
 }
 
 
-function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BXRK, self)
+	rz = a.RequestOp(asm.BORK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
 }
 
 
-function message.BORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BORK, self)
+	rz = a.RequestOp(asm.BXRK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K

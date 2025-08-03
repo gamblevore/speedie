@@ -293,16 +293,44 @@ function SemiConst2 (|int| f1, |int|)
 	return y6+y8
 
 
+function MiniBool (|bool| a1, |bool| b2, |bool| c)
+	c = !(!a1 and !b2)			// c = a or b			//   a|b
+	c = (!a1 and !b2)			// c = !a and !b		// !(a|b)
+	c = !(a1 and b2)			// c = !a or !b			// !(a&b)
+	c = (a1 and b2)				// c = a and b			//  (a&b)
+	
+	c = !(!a1 or !b2)			// c = a and b
+	c = (!a1 or !b2)			// c = !a or !b
+	c = !(a1 or b2)				// c = !a and !b
+	c = (a1 or b2)				// c = a or b
+
+
+function MiniBool2 (|bool| a1, |bool| b2, |bool| c)
+	c = !(a1 and !b2)
+	c = !(!a1 and b2)
+	c = !(a1 and b2)
+	c = !(!a1 and !b2)
+
+	
+function MiniBool3 (|bool| a1, |bool| b2, |bool| c)
+	c = (a1 and !b2)
+	c = (!a1 and b2)
+	c = (a1 and b2)
+	c = (!a1 and !b2)
+
+
 function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	#!AAAA
-	|| x5 = (0 or x3)+1			// x5 = x3+1
-	|| x6 = x3 or x4			// no need cmpb
-	|| x7 = !(!x3 and !x4)
-	|| x8 = x3 and x4
-	|| x9 = !(x3 or x4)
-	|| x10 = !(x3 and x4)
+	|| x5 = !(!x3 and !x4)		// x = x3 or x4
+	|| x6 = a and b
+	|| x7 = x3 and x4
+	|| x8 = !(x3 or x4)
+	|| x9 = !(x3 and x4)
+
 	#!BBBB
+	x5 = x3 or x4				// no need cmpb
 	x3 = (0 or b)+1				// x3 = b+1
+	x7 = (0 or x3)+1			// x7 = x3+1
 	#!CCCC
 	x3 = x4 or x4
 	#!DDDD
@@ -315,7 +343,7 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	x4 = (a and !b)
 	x3 = !(a or !b)
 	#!FFFF
-	return x9 + x10
+	return x9 + x8
 
 
 syntax access (|string| name, |SCNodeFindMode| Mode=0, |SCClass|)

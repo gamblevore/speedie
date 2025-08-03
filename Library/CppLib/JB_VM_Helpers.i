@@ -374,28 +374,33 @@ AlwaysInline void CompF (VMRegister* r, ASM Op) {
 	r[JCmpF_Jmpu].Int = CompF_(r, Op);
 }
 
+
 inline uint64 clip (uint64 x, uint64 s) {
+	s = 64 - (1<<s);
 	return (x << s) >> s;
 }
 
-AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) {	// cmpb
+
+AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) {
 	auto i = CmpI_Cmpu;
-	auto A = clip(u2, (i&4)<<3);
-	auto B = clip(u3, (i&2)<<4);
-	return (A!=B) xor (i&1);							// keep this though...
-	// the first two could be "future upgrades"...?
+	auto A = clip(u2, (i >> 1)&7);
+	auto B = clip(u3, (i >> 4)&7);
+	return (A!=B) xor (i&1);
 }
 
 
+inline uint64 jclip (uint64 x, uint64 s) {
+	return (x << s) >> s;
+}
 
 AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
-	if (clip(u1, JCmpEq_LSmallu<<5) == clip(u2, JCmpEq_RSmallu<<5))
+	if (jclip(u1, JCmpEq_LSmallu<<5) == jclip(u2, JCmpEq_RSmallu<<5))
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }
 
 AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
-	if (clip(u1, JCmpEq_LSmallu<<5) != clip(u2, JCmpEq_RSmallu<<5))
+	if (jclip(u1, JCmpEq_LSmallu<<5) != jclip(u2, JCmpEq_RSmallu<<5))
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }

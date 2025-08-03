@@ -216,20 +216,21 @@ struct Assembler
 		if R is ConstOutput
 			|| k = R.const
 			if k.fits(bits, signed)
-				.NopConst(R, true)
+				.NopConst(R, AnyBlock)
 				return k|uint64|.trim(bits)
 
 
-	function NopConst (|asmreg| R, |bool| Ask=false,   |bool|)
-		// This is used all over. can we make this bool result used all over?
-		// Sigh. So much analysis just to see if we can rework anything
-		// What about temps? (temps can come multiple blocks (ternaries))
-		
-		if (r is RemoveableOutput) or (r is RealConst)
-			|| f = r.fat
-				if !ask or .IsCurr(f)
-					.Nop(f)
-					return true
+	constants
+		AnyBlock = 1
+
+	
+	function NopConst (|asmreg| R, |int| NopMode = 0, |bool|)
+		require (r is RemoveableOutput) or (r is RealConst)
+		|| f = r.fat #require
+		require (NopMode&AnyBlock) or .IsCurr(f)
+		require (f.µRefCount <= 0)
+		.Nop(f)
+		return true
 	
 	
 	function Nop (|FATASM| Fat)
@@ -243,6 +244,7 @@ struct Assembler
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+		if "AndOrConsts".trap and fat.const == 1
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // do it before both kinds of nop...
@@ -270,33 +272,29 @@ struct Assembler
 			f.µrefcount = C
 			if !soft and C <= 0
 				.NopSub(f, soft, depth)
-
-
+	
+	
 	function AskNop (|fatasm| f)
 		if f.µRefCount <= 0
 			.nop(f)	
-
+	
 	
 	function SoftNopRange (|fatasm| Start, |fatasm| After)
 		while start < After
 			.SoftNop(--after)
-			
-		
+	
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		|| X = .ExistingVar(Exp) // superfluous?
-		if !x
-			x = .µInto(exp, dest)
-
-		if !x.reg
-			x.µtype = datatypecode.bool
-		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
-			return .exists(dest as (X bitand ASMReg.FromExistingVar), X, exp)
-
-		return .Assign(x.into(dest), X, exp)
-
-
+		dest.µType = DataTypeCode.bool
+		|| x = .µInto(exp, dest as asmreg.PreferEqul) // easier to optimise.
+		if x.IsBool
+			return x
+		(dest as= X bitand ASMReg.FromExistingVar)
+		return .Exists(dest, X, exp)
+	
+	
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		target debug: if !dest.reg
 		// OK... so... we should really do a type-cast, also.
@@ -315,9 +313,11 @@ struct Assembler
 				return .ReDest(f, dest)
 		
 		|| dest2 = r.into(dest)
+		if dest is preferequl
+			return .Exists(dest, r, exp)
 		return .Assign(Dest2, r, exp)
-
-		
+	
+	
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		description "Same as µGetASM, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars

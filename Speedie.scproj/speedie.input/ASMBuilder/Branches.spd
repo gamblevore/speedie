@@ -154,7 +154,7 @@ function Ternary		(fn_asm)
 	opt norefcounts
 	
 	// I'd rather actually re-write this to be like an if-condition! Like reuse the code
-	// then we can put back in, the opts in here... into the generalised if thing.
+	// then we can put back in, the opts... into the generalised "if" thing.
 	// this will do for now.
 	
 	|| prms = exp.second
@@ -168,8 +168,8 @@ function Ternary		(fn_asm)
 	// x += Bool << 1
 	
 	|| DestType = exp.ASMDecl.typeonly
-	|| mA = .ExistingVar(a, varusemode.Sometimes)
-	|| mB = .ExistingVar(b, varusemode.Sometimes)
+	|| mA = .ExistingVar(a)
+	|| mB = .ExistingVar(b)
 	
 	if ma isa DestType
 		if (mb isa DestType) and !DestType.isfloat
@@ -177,7 +177,7 @@ function Ternary		(fn_asm)
 	
 	dest = .TempTyped(exp, dest)
 	if  ma isa DestType  and  ma isnt ConstOutput						// goes thru kk.isknown!
-		|| mC = .ExistingVar(cond, varusemode.Sometimes)
+		|| mC = .ExistingVar(cond)
 		if (ma == mc)
 			return .MiniTernary(dest, ma, b, cond)
 	
@@ -261,14 +261,6 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 	range.after = .curr
 
 
-helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| BothSame,  |ASMReg|)
-	if bothsame.isbool and (dest isnt Negate)
-		if (dest is CondRequest)								// if  a or a   -->  if a
-			return BothSame.BoolAnswer							
-		return bothsame											// x = a or a   -->  x = a
-	return .Exists(dest, BothSame, exp)							// x = int1 or int1
-
-
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
 	// handles:  a = a and b,  a = a or b
 	dest = .TempTyped(exp, dest)
@@ -286,30 +278,39 @@ function asmreg.IsBoolV (|bool|)
 	return self.IsBool and (self isnt RealConst)
 
 
-helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
+helper ExistingBool (|message| exp, |asmreg|)
+	opt norefcounts
+	|| nega = false
+	while
+		|| fn = exp.func
+		if (fn == @brel) and (exp.name[] == '!')
+			nega = !nega
+		  elseif (fn == @type) and exp.TypeCastDoesnothing
+			0 // do nothing
+		  elseif fn != @bra
+			exit
+		exp = exp.first
+	
+	return .ExistingVar(exp).negate(nega)
+
+
+
+// this was crazy complex before. We simplified it!
+helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫
 	dest.µtype = DataTypeCode.bool
 	
 	|| A = exp.first!
 	|| B = exp.last!
-	|| ml = .ExistingVar(A, varusemode.Sometimes)
-	|| mr = .ExistingVar(B, varusemode.Sometimes)
-	
-	if ml and (ml iz mr)
-		return .ASMBoolShrink(exp, dest, ml)
-
-	if (dest isnt condrequest) and (ml.isboolV and mr.isboolV) 
-		return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
-
-	if dest is negate
-		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
-	
 	if dest is CondRequest									// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		if OPP is OR
 			return .BranchOr(A, B, dest)
 		return .BranchAnd(A, B, Dest)
+	
+//	if (nega == 0) and (ml.isboolV and mr.isboolV) 
+//		return .BoolFromBools(exp, dest, opp, ml, mr)		
 
-	return .BoolValue(A, dest, opp, b)
+	return .BoolAndOrOpt(A, dest, opp, b)
 	
 
 
@@ -348,8 +349,52 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 	return .Exists(mode, req, exp).fat!
 
 
-function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
+function BoolAndOrOpt (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
+	if "minibool".trap or "minibool2".trap or "AndOrRest".trap
+	
+	|| start = .curr
+	|| bowl = .BoolAndOrValue(a, dest, opp, b)
+	|| last = .Last
+	if start + 2 != last
+		return bowl
+	// ok, so its 3 long. its probably equl. but lets check!
+	
+	|asm| middle = (start+1).Op &~ 1
+	ifn  start isa asm.EQUL  and  last isa asm.EQUL  and  middle isa asm.jbor
+		return bowl
+	|| nA = start.prms[3]
+	|| nB = last.prms[3]
+	ifn na.ClipsBothToBool and nb.ClipsBothToBool
+		return bowl
+	
+	// equl: out, r0, in, mode
+/	|| rA = start.RegInput(2)
+	|| rB = last.RegInput(2)
+	na&=1
+	if na == nb&1
+/		.SoftNopRange(start+1, last+1)
+		if ra iz rb  // a and/or a
+			return bowl
+		start.RegInput(1) = rB
+		start.prms[3] = 63
+		start._op = (asm.band, asm.borr)(na)
+		return start.info
+
+	debugger  // do this later! cant be bothered for now.
+	
+	//  int1 and int2      -->  (int1|int2) != 0 
+	//  (bool1 and !bool2) -->  tmp = BNOT(Bool2),  BAND(tmp, bool1)
+	return bowl
+	
+	
+
+	
+function BoolAndOrValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
+
+	if dest is negate
+		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
+
 	dest = .UniqueLocation(a, dest, B)
 
 	|| first = .µBoolInto(A, dest)
@@ -360,13 +405,14 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	|| Second = .µBoolInto(B, dest)
 	if Second is ConstOutput
 		return .BoolConst2(first, second, opp, jump).boolanswer
-
+	
 	JUMP.JumpTo(.curr, self)
 	
 	if first.IsBool and Second.IsBool
 		return dest.boolanswer
 
 	return .Exists(dest, dest, A.next!)
+
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)

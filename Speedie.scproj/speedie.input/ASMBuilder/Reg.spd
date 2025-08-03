@@ -15,7 +15,7 @@ datatype ASMReg (uint64)
 		Temp = 1024 // sigh.
 		(1<<16)		// starting point
 		Negate
-		Param				// Remove? Surely params simply are regs <= the orig?
+		Param
 		FromExistingVar
 		FromZeroMemory
 		AlreadyNegated
@@ -32,6 +32,7 @@ datatype ASMReg (uint64)
 		CondAnswer
 		CompilerCreated
 		GlobalMemory
+		PreferEqul
 		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
 		RealConst   = [ConstInput, ConstOutput]
@@ -154,7 +155,29 @@ datatype ASMReg (uint64)
 		
 	function IsVec (|bool|)
 		return self|datatypecode| & 0x03
-		
+	
+	///
+	function Clip (|int|)
+		if .isbool
+			return 0
+		return 3 + self|datatypecode|._shift
+
+	function bool.EqulMode (|asmreg| L, |asmreg| R, |int|)
+		rz = self|int| xor 1
+		|| CL = l.clip
+		|| CR = R.clip
+		if !L.reg
+			cl = cr
+		if !R.reg
+			cr = cl
+		rz |= CL << 1
+		rz |= CR << 4
+
+	function uint.ClipsBothToBool (|bool|)
+		return (self >> 1) == 0
+	///
+	
+	
 	function IsBig (|bool|)
 		opt inline
 		return self|datatypecode|._shift == 3 // could also be an int?
@@ -246,10 +269,12 @@ datatype ASMReg (uint64)
 			
 	syntax cast (|int|)
 		disabled "use .reg"
-//		return .reg
 		
 	operator bitand (|asmreg| A, |asmreg|)
 		return (self|int64| & A|int64|)|asmreg|
+
+	operator xor (|asmreg| A, |asmreg|)
+		return (self|int64| xor A|int64|)|asmreg|
 	
 	operator as (|asmreg| A, |asmreg|)
 		return (self|int64| ||| A|int64|)|asmreg|

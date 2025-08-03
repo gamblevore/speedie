@@ -482,18 +482,18 @@ POS 5
 
 /**/ BAND  (Shift)
 		u1 = u2  &  ((u3 << Shift_Shu) >> Shift_Shu)
-/**/ BXOR  (Shift)
-		u1 = u2  ^  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BORR  (Shift)
 		u1 = u2 ||| ((u3 << Shift_Shu) >> Shift_Shu)
+/**/ BXOR  (Shift)
+		u1 = u2  ^  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BNOT  (Shift)
 		u1 = ~u2 &  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BANK  (AddK)
 		u1 = u2  &  U2_Li
-/**/ BXRK  (AddK)
-		u1 = u2  ^  U2_Li
 /**/ BORK  (AddK)
 		u1 = u2 ||| U2_Li
+/**/ BXRK  (AddK)
+		u1 = u2  ^  U2_Li
 
 
 
