@@ -4,9 +4,6 @@
 // todo: Ideally we should:
 // * change the format to a pure binary... no jbin
 // * decomp should return an int with the number of unread bytes
-// * compression needs replacing... probably just with "encode"'s balz compressor
-// * dump mz for now. it is very fast, but I wanna work on it, and I can't... if it becomes official.
-	// * I wonder if I can make it use a dictionary, or at least reuse balz's compressor.
 
 
 app.Usage = "Usage: jz File1 [File2...]
