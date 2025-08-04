@@ -104,7 +104,7 @@
 ı BXOR: _
 	u1 = u2 ^ ((u3 << Shift_Shu) >> Shift_Shu);
 ı BNOT: _
-	u1 = ~u2 & ((u3 << Shift_Shu) >> Shift_Shu);
+	u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu);
 ı BANK: _
 	u1 = u2 & U2_Li;
 ı BORK: _

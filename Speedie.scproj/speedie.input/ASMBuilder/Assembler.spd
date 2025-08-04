@@ -244,7 +244,6 @@ struct Assembler
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		if "AndOrConsts".trap and fat.const == 1
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // do it before both kinds of nop...

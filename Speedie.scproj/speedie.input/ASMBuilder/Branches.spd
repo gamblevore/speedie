@@ -306,11 +306,8 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 		if OPP is OR
 			return .BranchOr(A, B, dest)
 		return .BranchAnd(A, B, Dest)
-	
-//	if (nega == 0) and (ml.isboolV and mr.isboolV) 
-//		return .BoolFromBools(exp, dest, opp, ml, mr)		
 
-	return .BoolAndOrOpt(A, dest, opp, b)
+	return .BoolAndOrOpt(A, b, dest, opp)
 	
 
 
@@ -349,8 +346,8 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 	return .Exists(mode, req, exp).fat!
 
 
-function BoolAndOrOpt (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
-	if "minibool".trap or "minibool2".trap or "AndOrRest".trap
+function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
+	opt norefcounts
 	
 	|| start = .curr
 	|| bowl = .BoolAndOrValue(a, dest, opp, b)
@@ -359,41 +356,41 @@ function BoolAndOrOpt (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |A
 		return bowl
 	// ok, so its 3 long. its probably equl. but lets check!
 	
-	|asm| middle = (start+1).Op &~ 1
-	ifn  start isa asm.EQUL  and  last isa asm.EQUL  and  middle isa asm.jbor
+	|asm| middle = (start+1).Op
+	ifn  start isa asm.EQUL  and  last isa asm.EQUL  and  (middle &~ 1) isa asm.jbor
 		return bowl
+	
 	|| nA = start.prms[3]
 	|| nB = last.prms[3]
 	ifn na.ClipsBothToBool and nb.ClipsBothToBool
 		return bowl
 	
 	// equl: out, r0, in, mode
-/	|| rA = start.RegInput(2)
+	|| rA = start.RegInput(2)
 	|| rB = last.RegInput(2)
-	na&=1
+	na &= 1
 	if na == nb&1
-/		.SoftNopRange(start+1, last+1)
-		if ra iz rb  // a and/or a
+		.SoftNopRange(start+1, last+1)
+		if ra iz rb				// a and/or a
 			return bowl
 		start.RegInput(1) = rB
 		start.prms[3] = 63
-		start._op = (asm.band, asm.borr)(na)
+		start._op = (asm.BAND, asm.BORR)((middle == asm.jban) == (na==0))
+		if na
+			A.parent!.BNOT(dest, nil, dest, 63)
 		return start.info
-
-	debugger  // do this later! cant be bothered for now.
 	
-	//  int1 and int2      -->  (int1|int2) != 0 
+	//  int1 or int2       -->  (int1|int2) != 0 
 	//  (bool1 and !bool2) -->  tmp = BNOT(Bool2),  BAND(tmp, bool1)
 	return bowl
 	
-	
 
-	
 function BoolAndOrValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
 
 	if dest is negate
 		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
+		(dest is AlreadyNegated)
 
 	dest = .UniqueLocation(a, dest, B)
 
