@@ -215,7 +215,7 @@ class GUIControl (list)
 		
 		if f & guicontrolflags.visible
 			if self is TrapVisibleChange
-			if .HasAny // children!
+			if true // .HasAny		// seems to cause issues. perhaps I need to check for items AFTER this?
 				GUI.resized(self)
 			  else
 				gui.Touch(self)
