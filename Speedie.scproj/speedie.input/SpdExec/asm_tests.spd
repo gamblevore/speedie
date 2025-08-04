@@ -13,16 +13,21 @@ module ASMExamples {
 |int| Glob
 |int| Bolg
 
-target pack { 
 
-function Swap
+function SwapTest
+	maxasm 4				// "maxasm" allows checking that opts are working properly!
 	|| x = 1
 	|| y = 2
 	swap (x) (y)
 
+
+target pack { 
+
+
 function Grab
 	|| b = '1'
 	.grab2(b)
+
 	
 function grab2 (|$byte| b, |int|)
 	|| fs = FastString()

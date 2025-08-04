@@ -89,7 +89,8 @@ class CppRefs
 	
 	module
 		function Linkage (collectfunc)
-			return name_space.ProcessLinkage(node[@arg], ClassLinkageTable)		
+			return name_space.ProcessLinkage(node[@arg], ClassLinkageTable, true)
+		
 		function ReadIntoCppRefs (CollectFunc)
 			name_space.SpaceModule$.DefaultRefs.Read(node)
 			return compiler.program
@@ -111,14 +112,22 @@ extend_module SCFunction
 
 
 dispatch FuncLinkageTable (TranFunc)
-	cpp_wrapper			{}
-	cpp_part			{
+	+"cpp_wrapper"			{}
+	+"cpp_part"				{
 		SCNode.LoadCppPart(node, name_space, node)
 	}
-	cpp_refs			scfunction.tran_cpprefs
-	visible				{} // (SCFunction.Tran_Visible)
-	ignore				{}
-	inline				{}
+	+"cpp_refs"				SCFunction.tran_cpprefs //(fn, node, name_space), return true}
+	+"visible"				{} // (SCFunction.Tran_Visible)
+	+"ignore"				{}
+	+"inline"				{}
+
+	+"maxasm"
+		opt norefcounts
+		if fn
+			|| n = node[@num]
+				n.expectlast
+				fn.maxasm = n.int
+		return true
 
 
 dispatch ClassLinkageTable (TranFunc)
@@ -138,6 +147,7 @@ dispatch ClassLinkageTable (TranFunc)
 	}
 	
 	+"tighten"
+		opt norefcounts
 		if name_space isa scclass
 			expect (name_Space.isobject or name_Space.isstruct) (name_space, "Only applies to structs or objects")
 			expect !(name_space.iswrapper) (name_space, "Can't tighten wrapper classes")
@@ -145,6 +155,7 @@ dispatch ClassLinkageTable (TranFunc)
 			(name_space is sortsproperties) = yes
 
 	+"wrapper"
+		opt norefcounts
 		if name_space isa scclass
 			name_space.IsWrapper = 1
 			|| f = node.first
@@ -173,6 +184,7 @@ dispatch ClassLinkageTable (TranFunc)
 				value.expectlast
 
 	+"numeric"
+		opt norefcounts
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")
 			|| type = node[@thg]$
@@ -186,16 +198,24 @@ dispatch ClassLinkageTable (TranFunc)
 			  else
 				error type
 
+
 // now we have a numeric reduction... how to disable it nicely?
 // we need a test function
 
-function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |SCNode|)
+function SCNode.ProcessLinkage (|message| node,  |dictionary of tranfunc| Table,  |bool| Strict,  |SCNode|)
 	opt norefcounts
 	|| fn = .owningfunc
 	for ch in node
-		require ch.expect(@tmp)
-		|| linker = Table[ch.name] #expect (ch)
-		(linker[])(fn, ch, self)
+		if ch == @tmp
+			|| linker = Table[ch.name]
+				if (linker[])(fn, ch, self)
+					ch.remove
+			  elseif strict
+				error ch
+		  elseif strict
+			ch.Expect(@tmp)
+		  else
+			return nil
 
 	return compiler.program
 

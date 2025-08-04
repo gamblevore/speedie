@@ -39,6 +39,7 @@ function message.ADD_ (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm
 
 
 function message.AddShifted (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+	// if "LeftScore".trap
 	|| beef = r.fat
 	require beef isa asm.BFLG
 
@@ -50,7 +51,7 @@ function message.AddShifted (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&
 	require total|int| < (64-bits)
 	
 	|| input = beef.RegInput(1)
-	Assembler.sh.nop(beef)
+	Assembler.sh.softnop(beef)
 	return .ADD(dest, l, input, total)
 
 

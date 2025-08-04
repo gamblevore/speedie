@@ -107,7 +107,7 @@ function Assembler.SafeDecr (|asmreg|)
 	|| fat = .last(asm.rfap)
 		|| upon = fat.prms[1]
 		if upon and !fat.prms[0] and !fat.prms[2]
-			.nop(fat)
+			.softnop(fat)
 			rz.reg = upon
 	
 

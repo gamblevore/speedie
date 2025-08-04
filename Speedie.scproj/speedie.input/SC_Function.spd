@@ -77,6 +77,7 @@ linkage
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
+|Byte|					MaxASM
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
 |byte|					CantBeInlined
@@ -321,9 +322,8 @@ function Transform ()
 	|| n = .SourceArg						#require
 	|| Space = n.SCArg( self )				#require
 
-	if (self Is Wrapper)
-		space.ProcessLinkage( n, FuncLinkageTable )
-	  else
+	space.ProcessLinkage( n, FuncLinkageTable, self Is Wrapper )
+	if (self Isnt Wrapper)
 		|| r_z = Tran_Result( self )
 		Tran_All( self, n, space )
 		if r_z

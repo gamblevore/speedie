@@ -185,7 +185,7 @@ struct FatASM
 		rz.reg = v&31
 		rz = rz as ((v >> 15) << 48)|asmreg| // fat index		
 		
-	function Input (|int| a, assigns:|asmreg| Input)
+	function Input (|int| a, assigns:|asmreg| Input) // prm (
 		cpp_part Prm
 		opt inline
 		
@@ -194,7 +194,7 @@ struct FatASM
 		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
-			if src != self
+			if src < self
 				.InputFats |= 1<<a
 				if src
 					src.µRefCount++
