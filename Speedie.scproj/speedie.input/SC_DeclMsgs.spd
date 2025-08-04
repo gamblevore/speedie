@@ -197,19 +197,23 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 		|| d = def.MsgDecl
 		if d and d.StatedReal
 			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
-	(dcl is Property)
-	(dcl is Global)
+
+	return dcl.AddToGlobs
+
+
+function scdecl.AddToGlobs (|bool|)
+	opt norefcounts
+	is Global
 	
-	|| B = '_' == dcl.name[]
-	|| C = '_' == dcl.name.Last
-	if B ||| C
-		(dcl is hidden)
-		
-	if dcl.ProjectIsLib
-		PackMaker.LibGlobs <~ dcl
-		(dcl is Library)
+	|| n = .name
+	if ('_' == n[]) ||| ('_' == n.Last)
+		is hidden
+	
+	if .ProjectIsLib
+		PackMaker.LibGlobs <~ self
+		is Library
 	  else
-		packmaker.PackGlobs <~ dcl
+		packmaker.PackGlobs <~ self
 
 	return true
 

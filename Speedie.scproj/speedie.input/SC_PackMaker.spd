@@ -45,7 +45,7 @@ module PackMaker
 		opt norefcounts
 		.LibGlobs.sort(GlobalsSorter)
 		
-/		lib.enter(@arr)
+		lib.enter(@arr)
 		for (f in LibGlobs)
 			lib.Add(@thg, f.ExportName)
 		lib.exit
@@ -96,8 +96,9 @@ module PackMaker
 		|| ID = 0
 		while (|| f = list[id])
 			f.TableID = ++id
-			|| proto = f.hasproto
-				proto.au.ExportPosition = id
+//			|| proto = f.hasproto
+//				if proto.name contains "LeafFunctionsSorter"
+//				proto.au.ExportPosition = id
 			
 			target debug
 				if Table
