@@ -1149,12 +1149,13 @@ class SCDecl (SCObject) {
 		return self
 			
 
-	function CArraySize (|int|)
+	function CArraySize (|int| mul = 1, |int|)
 		opt norefcounts
 		description "The size of the variable itself, in memory. Default carray size is 1. Objects use the pointer-size."
-		|| mul = 1
-		if .iscarray
-			mul = .CArrayTotal
+		
+		|| c = .c_array
+			return .internal!.CarraySize(c * mul)
+				
 		|| T = .type
 		if T.IsObject or .PointerCount// or t.FuncProto
 			return platform.PointerBytes * mul

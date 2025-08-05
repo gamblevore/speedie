@@ -322,8 +322,11 @@ function Transform ()
 	|| n = .SourceArg						#require
 	|| Space = n.SCArg( self )				#require
 
-	space.ProcessLinkage( n, FuncLinkageTable, self Is Wrapper )
-	if (self Isnt Wrapper)
+	if (self Is Wrapper)
+		space.ProcessLinkage( n, FuncLinkageTable, true )
+	  else
+//	space.ProcessLinkage( n, FuncLinkageTable, self Is Wrapper )
+//	if (self Isnt Wrapper)
 		|| r_z = Tran_Result( self )
 		Tran_All( self, n, space )
 		if r_z
@@ -1276,18 +1279,17 @@ function NewMacro (CollectFunc)
 
 
 function SCFunction.MakeProtoClassName (|string| start, |string|)
-	|| name = start
-	
+	rz = start	
 	|scnode--| p = .parent
 	while p
 		if p isa SCModule
-			|scclass--| CurrCls = p.cls #loop
-			name = currcls.name + "_" + name
+			|scclass--| CurrCls = p.cls			#loop
+			rz = currcls.name + "_" + rz
 		p = p.parent
 	
-	if !name.find('_')
-		name = "FP_" + name
-	return name
+	if !.prototype!.iswrapper
+		if !rz.find('_')
+			rz = "FP_" + rz
 
 
 function SCFunction.ProtoExportName
