@@ -129,9 +129,6 @@ function IsUnused (|bool|)
 	if MR and MR != Compiler.VisibleFuncs
 		return false
 	
-//	if .LinkFrom > 0
-//		return false
-	
 	if .isvisible and .islibrary
 		return false
 
@@ -143,7 +140,7 @@ function IsUnused (|bool|)
 function message.HateUnusedFuncs
 	opt norefcounts
 	|| imp = scimport.FindImport(.name)
-		imp.warnunusedfuncs = true
+		imp.WarnUnusedFuncs = true
 	  else
 		.expect(.func, "Can't find project")
 
@@ -180,12 +177,23 @@ function scclass.ReachBehaviours
 				f.ReachFunc(self)
 
 
+function SCDecl.Reach
+	opt norefcounts
+	.type.Reach(compiler.VisibleFuncs)
+
+
 function compiler.DeadStrip
 	opt norefcounts
 	compiler.MainFunc.ReachedDetect?
 	
 	for f in .FuncList
 		f.ReachedDetect
+		
+	for f in packmaker.libglobs
+		f.reach
+	
+	for f in packmaker.PackGlobs
+		f.reach
 
 	if options.MakeInterpreter // must come before the next loop
 		for c in .classlist

@@ -198,10 +198,10 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 		if d and d.StatedReal
 			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
 
-	return dcl.AddToGlobs
+	return dcl.AddToGlobs(false)
 
 
-function scdecl.AddToGlobs (|bool|)
+function scdecl.AddToGlobs (|bool| IsProtoType, |bool|)
 	opt norefcounts
 	is Global
 	
@@ -209,11 +209,12 @@ function scdecl.AddToGlobs (|bool|)
 	if ('_' == n[]) ||| ('_' == n.Last)
 		is hidden
 	
-	if .ProjectIsLib
-		PackMaker.LibGlobs <~ self
-		is Library
-	  else
+	if !.ProjectIsLib
 		packmaker.PackGlobs <~ self
+	  else
+		is Library
+		if !IsProtoType
+			PackMaker.LibGlobs <~ self
 
 	return true
 
