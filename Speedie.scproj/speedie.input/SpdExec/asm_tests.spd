@@ -15,7 +15,7 @@ module ASMExamples {
 
 
 function SwapTest
-	maxasm 4				// "maxasm" allows checking that opts are working properly!
+	//maxasm 4				// "maxasm" allows checking that opts are working properly!
 	|| x = 1
 	|| y = 2
 	swap (x) (y)
