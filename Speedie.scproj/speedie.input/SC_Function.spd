@@ -778,10 +778,10 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	dcl.source = .source
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
-	(dcl is global)
-	dcl.AddToGlobs(True)
+	dcl.AddToGlobs
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
 	.HasProto = dcl
+	(Dcl is compilercreated)
 	if (.Cls)
 		.parent!.TryAdd( .Source, Dcl, .Name )
 	return dcl

@@ -242,6 +242,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		.size = Platform.PointerBytes
 		.Alignment = Platform.PointerBytes
 		return .size
+	
 	if .IsDataTypeOnly
 		.size = .typeinfo.ByteCount
 		.Alignment = .size

@@ -1266,7 +1266,7 @@ ive been~running #since morning
 		opt inline
 		return (parser.Splitter)(s,e,f)
 
-	function Range (fnidgenerator)
+	function Range (fnIDGenerator)
 		cpp_Wrapper JB_Tk__Range
 
 

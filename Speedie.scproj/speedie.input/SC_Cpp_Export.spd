@@ -26,7 +26,7 @@ linkage
 |FastStringCpp|						AllTypes
 |FastStringCpp|						TypesProj
 |FastStringCpp|						HeaderProj
-|FastStringCpp|						LibGlobs
+|FastStringCpp|						GlobsInLib
 |FastStringCpp|						Syxes
 |FastStringCpp|						Inlines
 |FastStringCpp|						ModuleProperties
@@ -38,7 +38,7 @@ constructor
 	.AllTypes   = .StreamChild( "AllTypes.h"  )
 	.syxes		= .StreamChild( "SyntaxConstants.h" )
 	.TypesProj  = .StreamChild( "Proj.h" )
-	.LibGlobs	= .StreamChild( "LibGlobs.h" )	
+	.GlobsInLib	= .StreamChild( "LibGlobs.h" )	
 	.HeaderProj = .StreamChild( "JB.h" )
 	.Inlines	= .StreamChild( "Inlines.h" )
 	.ModuleProperties = .StreamChild( "ModuleProperties.cpp" )
@@ -76,15 +76,22 @@ function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
 	for prop in PackMaker.LibGlobs
 		if simple and prop.Complexity > 1
 			exit
-		if simple and prop.IsObject
-			fs <~ "JB_Object* "
-			fs.Appendlibglob(prop)
-		  else
-			WriteDecl( prop, fs, nil )
-		fs <~ ";\n\t"
+		if prop.exportglob
+			if simple and prop.IsObject
+				fs <~ "JB_Object* "
+				fs.Appendlibglob(prop)
+			  else
+				WriteDecl( prop, fs, nil )
+			fs <~ ";\n\t"
 	fs.Length--
 	fs <~ "};\nextern JB_Globals JB__;\n\n"
 
+
+function scdecl.ExportGlob (|bool|)
+	if self is Library and CompilerCreated
+		if .type.IsFunc
+			return false
+	return true
 
 
 function CanOpt (|bool| force, |bool|)
@@ -579,7 +586,8 @@ function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
 	fs.appendvoid("0")
 	
 	for g in packmaker.LibGlobs
-		fs.appendvoid(g.exportname, '&')
+		if g.exportglob
+			fs.appendvoid(g.exportname, '&')
 
 	fs.appendvoid("0")
 	fs <~ "};\n"
@@ -892,7 +900,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| exp = Cpp_Export()
 		exp.PreRun
 		exp.ExportSyx
-		exp.FillLibGlobs(exp.libglobs)
+		exp.FillLibGlobs(exp.GlobsInLib)
 		exp.run
 		exp.WriteHeader
 		if Options.MakeInterpreter
