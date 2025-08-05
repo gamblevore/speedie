@@ -226,6 +226,9 @@ helper Object.SaveTryCollect (|&ObjectSaver| Saver)
 
 
 prototype SaverLoadClass (|&ClassData| cls, |&int8| Data)
+	linkage
+		wrapper
+
 
 class SaverClassInfo (array)
 	default nil

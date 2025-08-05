@@ -3,6 +3,10 @@ import "GameExamples/arkanoid3D.spd"
 import "GameExamples/bubbles.spd"
 import "GameExamples/tetris.spd"
 
+bla()
+	
+function bla
+
 main // main { 
 	if app.Yes("crash")
 		app.Crash

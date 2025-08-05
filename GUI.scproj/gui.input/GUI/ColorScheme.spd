@@ -103,7 +103,7 @@ class ColorScheme
 //		.BGCorners[3] = bottom
 		
 		
-	function DrawBackground (GUIDrawBackground)
+	function DrawIntoBackground (|image| where)
 		// so...
 		|| C0 = .BGCorners[0]
 		|| C1 = .BGCorners[1]
