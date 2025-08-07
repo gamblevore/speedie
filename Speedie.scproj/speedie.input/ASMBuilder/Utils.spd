@@ -69,6 +69,20 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	return Return
 
 
+
+function Assembler.ClearAllStructs (|message!| exp,  |bool|)
+	for i in 32
+		|| fat = .Registers[i]
+			.ClearStruct(exp, fat, i)
+
+
+function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|)
+	opt norefcounts
+	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
+		ASMType.AllocBearStruct(-1, exp.DeepLast, v.asm, fat.Reg(1)<<4)
+	return true
+
+
 function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |bool|)
 	opt norefcounts										/// READ TABLE ///
 	target debug
@@ -87,16 +101,11 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |b
 	if fat.µrefcount <= 0 and fat is NotAlteredInbranch		
 		ifn (Orig&1)  and  !.state.inlinedepth  and  options.optimise < 4
 			.Nop(fat) 
-			
-						
+	
 	if fat is CompilerCreated							/// NOP UNUSED VARS ///
 		.AskNop(fat)
 
-
-	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
-		ASMType.AllocBearStruct(-1, exp.DeepLast, v.asm, fat.Reg(1)<<4)
-
-	return true
+	return .ClearStruct(exp, fat, v)
 
 
 

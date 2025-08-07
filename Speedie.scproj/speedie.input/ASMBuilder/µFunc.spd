@@ -40,6 +40,8 @@ extend SCFunction
 			if options.ASMRenderBlocks and µ.BasicBlock != bb
 				bb = µ.BasicBlock
 				fs <~ "//$bb\n"
+			if µ is constoutput
+				fs <~ '/'
 			fs <~ '\t'
 			µ.RenderFat(fs)
 			fs <~ '\n'

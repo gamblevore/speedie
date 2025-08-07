@@ -213,19 +213,7 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 
 	for a in .fn.Args			
 		|| v = .InlineVar(prms, p, a)
-		if !v
-			|| o = .OpenVars
-			v = .DeclareMe(a.source, a)
-			if IsLeaf and a isnt altered
-//				v = .temptyped(a.source, a, asmreg())		// temps are easier to optimise
-// not safe... if read 2x or more, it can be nopped before the second read
-				|| v2 = .µGetASM(p, v)
-				if v2.reg != v.reg
-					.CloseVars(o) // close the var if v2 is unused.
-				v = v2
-			  else
-				v = .µInto(p, v)
-		
+		v ?= .µGetReal(p, nil, IsLeaf and a isnt altered)
 		v = .UpdateInlineReg(V, a)
 		p = p.next!
 
@@ -335,6 +323,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	
 	|| Start = .curr
 	++.CurrFuncGrab
+	
 	|| Closer = .OpenVars
 	|| P = .PrmCollect(prms, fn)
 	.CloseVars(Closer)

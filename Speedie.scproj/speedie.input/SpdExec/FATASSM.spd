@@ -168,7 +168,7 @@ struct FatASM
 		return .reg ||| ((self is Temp)<<31)
 
 
-	function CopyFrom (|fatasm| D)
+	function CopyFrom (|fatasm| D, |bool|)
 		(self)[0] = (d)[0]
 		for i.FatInputs in self
 			if i 
@@ -499,29 +499,41 @@ struct FatASM
 			  else
 				fs <~ "d"
 		fs <~ " #/"
-
-
-	function assembler.JumpImprove (|int| Opt, |fatasm| S, |bool|)
-		|| D0 = s.jumpto!
-		|| D = D0
+		
+	
+	function JumpNegate (|assembler| sh,  |fatasm| mid,  |bool|)
+		|| m = .op
+		if m == asm.jmpi or asm.jmpf
+			.prms[2] xor= 1
+		  else
+			._op = m xor 1
+		|| j = .jumpreg - 1
+		.prms[j] += mid.Jump
+		sh.nop(mid)
+		return true
+		
+	
+	function JumpImprove (|assembler| sh, |bool|)
+		|| D = .JumpTo!					// extend the destination, in case of multiple jumps
 		|| n = 0
+		
 		while d isa asm.jump
 			d = d.JumpTo!
-			expect (++n < 30) (s.msg)
+			expect (++n < 30) (.msg)
 		
-		if  (d isa asm.ret or (d isa asm.tail and opt >= 2))  and  (s isa asm.jump)
-			s.CopyFrom(d)		// always jumping into an exit.
+		|asm| m = .op
+		if  m == asm.jump
+			if  d isa asm.ret  or  d isa asm.tail  
+				return .CopyFrom(d)		// jumping to a function-exit.
+
+		  elseif (d == self + 2) and (m != asm.LUPU and asm.LUPD)
+			|| mid = self + 1
+			if mid isa asm.JUMP
+				return .JumpNegate(sh, mid)
+		
+		if n > 0
+			.JumpTo(D, sh)
 			return true
-		
-		if D != D0				// faster jump
-			s.JumpTo(D, self)
-			return true
-		
-		
-//	function IsReturn (|bool|)
-//		|| o = .op|asm|
-//		if o == asm.ret or asm.TAIL
-//			return true
 	
 
 	function IsFinisher (|bool|)
@@ -570,4 +582,12 @@ struct FatASM
 			oo &=~ i
 			yield .prms[i.log2]
 
- 
+
+	module
+		function VerifyNumbers (|bool|)
+			require (asm.jmpe xor 1) == asm.jmpn
+			require (asm.jmkm xor 1) == asm.jmkl
+			require (asm.jmke xor 1) == asm.jmkn
+			require (asm.jbor xor 1) == asm.jban
+			require (–sizeof FatASM) == 64
+			return true

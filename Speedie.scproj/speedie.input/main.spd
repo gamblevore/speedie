@@ -51,7 +51,7 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
-	if (–sizeof FatASM) != 64
+	expect fatasm.VerifyNumbers
 
 	app.parent // sigh. do this before clearenvs
 	.ClearEnvs

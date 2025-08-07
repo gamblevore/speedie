@@ -81,8 +81,10 @@ struct Assembler
 		if (l isa type) and .IsCurr(L)
 			return L
 	
+	
 	function IsCurr (|&fatasm| f, |bool|)
 		return .basicblock == f.basicblock
+	
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -99,6 +101,7 @@ struct Assembler
 				return 0
 			return v.Log2+1
 
+	
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		if togrow.isint and value.CanStoreAsAddK and !dest.IsVec
@@ -127,37 +130,29 @@ struct Assembler
 		return .Assign(dest, src, exp)
 
 
-//	syntax expect (|message?| where=nil, |string| msg)
-//		cpp_part Fail
-//		|| f = SCFunction.currfunc!
-//		f.µlength = .length
-//		printline f.µrender
-//		debugger
-//		error (where, msg)
-
-
-	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
-		|| t = Type.CalculateASMType
-		|| ret = .state.return
-		if  ret.reg  and  (type is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
-			ret.µtype = T|DataTypeCode|
-			Type.wholetype = ret
-			return ret
+	function DeclareMe (|Message| where,  |scdecl?| Type=nil,  |asmreg|)
+		if type
+			rz = Type.CalculateASMType
+			|| ret = .state.return
+			if  ret.reg  and  (type is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
+				ret.µtype = rz|DataTypeCode|
+				Type.wholetype = ret
+				return ret
 		
 		|| d = .VDecls
 		check (d != -1) (where, "No free local variables.")
-			
-			
+		
 		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
 		d |= FreeBit
-		t.reg = freeBit.log2
+		rz.reg = freeBit.log2
 
-		Type.WholeType = t
-		(t is notalteredinbranch) = (type isnt alteredinbranch)
+		if type
+			Type.WholeType = rz
+			target debug: Type.ASMSanity
+			(rz is notalteredinbranch) = (type isnt alteredinbranch)
+
 		.Vdecls = d
 		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
-		target debug: Type.ASMSanity
-		return t
 
 
 	function TempTyped (|Message| where, |scdecl| Type, |asmreg| T,  |asmreg|)
@@ -262,6 +257,11 @@ struct Assembler
 		|| Type = asm.noop * (fat < ._curr)
 		fat.setop = Type
 
+
+	function RegIsConst (|asmreg| R, |int64| k, |bool|)
+		|| f = .registers[r.reg]
+		if f is constoutput
+			return f.const == k
 	
 	
 	function Decr (|?&fatasm| f, |bool| Soft, |int| Depth)
@@ -292,6 +292,18 @@ struct Assembler
 			return x
 		(dest as= X bitand ASMReg.FromExistingVar)
 		return .Exists(dest, X, exp)
+	
+	
+	function µGetReal (|message| exp,  |asmreg| ModeOnly=nil,  |bool| CanReuse=true,  |asmreg|)
+		|| o = .OpenVars
+		|| v = .DeclareMe(exp)
+		(v as=ModeOnly)
+		if !CanReuse
+			return .µInto(exp, v)
+
+		rz = .µGetASM(exp, v)
+		if rz.reg != v.reg
+			.CloseVars(o) // close the var if v2 is unused.
 	
 	
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -327,7 +339,7 @@ struct Assembler
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
 		rz = asmreg()
 		(rz is AddrNeed) = (a is Reference)
-		rz = .µGetASM(exp, rz)
+		rz = .µGetReal(exp, rz)
 		if (a is reference  and  rz isnt containsaddr)
 			error (exp, "Failed to get address of expression. (Compiler *should* have caught this in transform phase)")
 		

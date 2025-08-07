@@ -5,10 +5,10 @@ function Assembler.Optimise
 	|| A = .Curr
 	|| S = .FuncStart
 	// jumps of 0 can be rendered as a nop
-	|| opt = .Out.MinOpt
+//	|| opt = .Out.MinOpt
 	while A > S
 		if S.JumpReg
-			.JumpImprove(opt, s)
+			s.JumpImprove(self)
 		  else
 			S.MiniOpt(Self)
 		S++

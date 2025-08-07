@@ -183,7 +183,7 @@ function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMRe
 
 function Return (fn_asm)
 	opt norefcounts
-	|| L = .state.return		// can remove constants, so try first
+	|| L = .state.return						// can remove constants, so try first
 		return InlinedReturn(self, exp, L)
 
 	|| bb = .BasicBlock
@@ -194,17 +194,21 @@ function Return (fn_asm)
 	  else
 		dest = asmreg()
 	
-	.closevars(1, exp)
+
+	// The real question is WHY do I do Closevars?
+	// Do I need to CloseVars for some reason?
+	.ClearAllStructs(exp)
+	// only emit the struct clearing stuff
+
 	if ReturnOpt(self, dest.reg, bb)
 		return asmreg.exit
 	
 	|| D0 = .SafeDecr
-		if d0.reg != dest.reg // problem
+		if d0.reg != dest.reg					// problem
 	|| D1 = .decr
 	|| D2 = .decr
 	
-	|ind| K = -1
-	// we shouldn't be able to inline consts from other blocks!
+	|ind| K = -1								// we shouldn't be able to inline consts from other blocks!
 	if !D0
 		K = .Const(dest, 8, true)
 	|| HasK = K>=0
@@ -290,7 +294,7 @@ function SetRel (fn_asm)						// function relset (
 		return .µInto(B, X)
 
 	// probably x.y = z, or x[y] = z 
-	dest = .µGetASM(B, asmreg()) 
+	dest = .µGetReal(B) 
 	(dest isnt RealConst)
 	(dest is SetAlways)
 	return .µ(A, dest)
@@ -349,8 +353,6 @@ function Decl (fn_asm)
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 	opt NoRefCounts
 	for ch.fast in exp
-		//if h
-			//h.HoistNormal(ch)
 		if ch.func == @decl
 			ASMType.Decl(self, ch, AsmReg.RealDiscard)
 		  else
@@ -373,7 +375,7 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	|| f = exp.first!
 	|| d = f.asmdecl
 		
-	|| base = .µGetASM(f, ASMReg.AddrRequest)				// x = a.b[0]
+	|| base = .µGetReal(f, ASMReg.AddrRequest)				// x = a.b[0]
 	|| sc = exp.Second.first!
 	|| vara = .µGetASM(sc)
 
