@@ -556,11 +556,11 @@ POS 5
 		if (!(u1<<(Bra_Smallu<<5)))
 			Code += Bra_Jmpi
 
-/**/ LUPU  (Loop)								// Need LUPUS
+/**/ LUPU  (Loop)
 		if (ii1++ < ii2)
 			Code += Loop_Jmpi
 
-/**/ LUPD  (Loop)			 					// Need LUPDS
+/**/ LUPD  (Loop)
 		if (ii1-- > ii2)
 			Code += Loop_Jmpi
 
