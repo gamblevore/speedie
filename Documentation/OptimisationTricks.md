@@ -211,6 +211,20 @@ Using the stack is very powerful... if you can do it. This just means allocating
 
 This can save you allocating an array object, and having to append into it.
 
+Speedie actually does this, when "opening and closing" variables. That is... when you declare a variable in speedie, it needs to "allocate" a register for that variable. And later, deallocate it, when its no longer accessible.
+
+Speedie acheieves this, by using the stack, instead of appending to some global array of "current variable state". We do something like this:
+
+    function ProcessArgument (|message| Statements)
+        |uint64| OldState = .OpenVars
+        for line in statements
+            .ProcessLine(Line) // recursive function!
+        .CloseVars(OldState)
+
+`ProcessLine()` is recursive. That is: it calls other functions that can call back into `ProcessArgument()`. Best thing here... is that I don't even allocate any objects for my stack. The saved info takes only one register!
+    
+        
+
 
 
 ### Avoid Overly Dynamic Code
