@@ -217,6 +217,16 @@ This can save you allocating an array object, and having to append into it.
 
 This is kind of natural in speedie anyhow, as virtual functions don't "just come naturally" like in C++ or Python. You have to explicitly declare them. But if you don't need them, don't use them.
 
+    function OverComplex (|MyType| A)
+        A.__DoSomething__              // a virtual function
+    
+    function NotOverComplex (|MyType| A)
+        if A.Type == kBigType
+            A.DoBig
+          else
+            A.DoSmall
+        
+
 
 
 ### Tail Functions
