@@ -50,7 +50,7 @@ Anything you can do with bit math instead of other approaches is usually going t
     		return .flags|int|.CountBits
     		
     	function Passed (|bool|)
-    		return self is abc
+    		return .flags is abc
 
     datatype HappyFlags (int)
     	flags
