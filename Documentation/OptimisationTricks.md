@@ -228,12 +228,11 @@ This is kind of natural in speedie anyhow, as virtual functions don't "just come
         
 
 
-
 ### Tail Functions
 
 Tail functions are usually a very good optimisation trick. Sometimes they don't naturally happen, so you can even tweak your code to make it easier to happen.
 
-    function OuterFunc (|string| s, |int|)
+    function ReturnLengthIfNameIsCorrect (|string| s, |int|)
         || x = s.length
         if x > 4
             return innerfunc(s, x) // tail call!
@@ -248,7 +247,7 @@ This works, because the compiler doesn't have to spend so much time popping and 
 
 It works even better, if the variables are all in the same location! For example, this, doesn't tail optimise so well.
 
-    function OuterFunc (|string| s, |int|)
+    function ReturnLengthIfNameIsCorrect (|string| s, |int|)
         || x = s.length
         if x > 4
             return innerfunc(x, s) // compiler has to move registers around
