@@ -475,7 +475,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		// 1 or 0
 		// 1 or b
 		(first is condanswer)
-		return fake*first.boolanswer						// only way around this. Cos we got asm-reg(0)
+		return first.boolanswer						// only way around this. Cos we got asm-reg(0)
 
 	
 	|fatrange| Br2
@@ -568,7 +568,11 @@ function @Assembler.PrintProgress
 	|| Base = assembler.sh.Start + fn.µStart
 	|| amount = fn.µLength ?? (Assembler.sh.curr - base)
 	for n in amount
-		base[n].debugprint
+		|| f = base[n]
+		if f is constoutput
+			print "/"
+		print "\t"
+		f.debugprint
 
 
 function message.Jump (|&Fatasm|)

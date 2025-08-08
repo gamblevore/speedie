@@ -4,15 +4,15 @@
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
-	if (rz is Global) and !rz.au.ExportPosition // oof
+	if (rz is Global) and !rz.au.ExportPosition				// oof
 		error (self, "No export position on: " + .locate)				
 	
-	if rz.typeonly == 0//datatypecode.unusedtype
+	if rz.typeonly == 0										// Datatypecode.unusedtype
 		rz.wholetype = rz.CalculateASMType
 	target debug: rz.ASMSanity
 
 
-function assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
+function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
 		if  exp.Position < 0
@@ -27,12 +27,7 @@ function assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 
 	error (exp, "Function too large (over 64K)")
 	return .start
-	
-	
-//function message.OperatorMul (|asm| op, |&fatasm|)
-//	|| a = Assembler.sh
-//	return a.RequestOp(op, self)
-	
+
 
 
 target debug

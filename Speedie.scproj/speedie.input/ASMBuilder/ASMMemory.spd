@@ -178,9 +178,10 @@ function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |sc
 function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
 	opt inline
 	if dest is set or FromZeroMemory
-		(dest is RealConst)				// make compiler happy
+		(dest is OK)					// make compiler happy
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
+	(dest isnt constoutput)
 	return .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index) * dest
 
 

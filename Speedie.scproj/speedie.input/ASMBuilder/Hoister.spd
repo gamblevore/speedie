@@ -55,10 +55,9 @@ function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	
+	dest = .temptyped(exp, d, dest)
 	|| Glob = .TryGetGlob(D, dest)
 		return Glob
-
-//////
 
 /*
 	Reading of libglobs

@@ -33,6 +33,7 @@ datatype ASMReg (uint64)
 		CompilerCreated
 		GlobalMemory
 		PreferEqul
+		OK
 		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
 		RealConst   = [ConstInput, ConstOutput]
@@ -53,10 +54,9 @@ datatype ASMReg (uint64)
 
 		
 	render
-		if self is temp
-			fs <~ "t"
-		  else
-			fs <~ "r"
+		if self is constoutput
+			fs <~ "k"
+		fs <~ ('r' + ((self is temp)<<1))|byte| // r,t
 		fs <~ .reg
 		fs <~ "("
 		.µtype.render(Fs)
@@ -228,9 +228,6 @@ datatype ASMReg (uint64)
 		K.µtype = self
 		return K
 	
-//	function Fatasm.HaveAddr (|&fatasm|)
-//		.info = .info.HaveAddr
-//		return self
 		
 	function HaveAddr (|asmreg|)
 		rz = self asnt AddrNeed

@@ -357,7 +357,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 34156
+			// if trap == 34156
 		  else
 			opt inline
 		
@@ -367,7 +367,7 @@ struct Assembler
 			.StackSize--
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
-			if !ss or dest is set or ss is set
+			if !ss  or  (dest is set)  or  (ss is set or ok)
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
 				if (ss isnt ExitFunction) and (ss isnt constoutput)

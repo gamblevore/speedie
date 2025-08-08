@@ -59,7 +59,6 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		rz |= (8-ic) << 0
 	  else
 		rz |= (17-ic) << 6
-//		.DeclPrint
 		
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
@@ -332,6 +331,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		TableID = fn.tableid ?? 0xFFFF // 0xffff means unknown?
 		TableID += 31
 	|| PExt = P >> 32
+	(dest isnt constoutput) // why would it be?
 	|| fat = prms.FNC(dest, TableID, P,  PExt) // prms.fncx
 	if fn.HasCVersion
 		fat._op = asm.FNCX

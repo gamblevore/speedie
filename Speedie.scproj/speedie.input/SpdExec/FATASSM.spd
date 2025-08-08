@@ -99,8 +99,26 @@ struct FatASM
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
 		
-		info.FatIndex = .index
-		.info = info
+		|| info2 = info.FatIndex(.index)
+/*
+		if !info.reg
+			(info is constoutput)
+		  else
+			if (info is ConstOutput) != (self isa asm.knst)
+*/		
+/*		if info
+//			if !info.reg
+//				(info is constoutput)
+//			else
+
+			if (info is ConstOutput) != (self isa asm.knst)
+			info.FatIndex = .index
+		  else
+			target debug: if !(self isa asm.noop)
+*/
+		.info = info2
+		if info
+			return info2
 		return info
 	
 	function Const (|int64|)
@@ -211,16 +229,19 @@ struct FatASM
 		
 	function assembler.ReDest (|fatasm| f, |asmreg| info, |uint| a, |asmreg|)
 		// lets see.
-		|| old = f.prms[a] & 31 					// Need to remove the old output.
+		|| U = f.info // save old info. probably quite good.
+		|| old = f.prms[a] & 31 							// Need to remove the old output.
 			if .Registers[old] == f
 				.KnownValuesMap &= ~(1 << old)
 				.Registers[old] = nil
 		
-		return f.Dest(a, info, self)						// Then we set it to the new value
+		U.Reg = f.Dest(a, info, self)						// Then we set it to the new value
+		f.info = u // update reg here.
+		return u
+		
 
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
-		opt inline
 		|| changed = info.treg
 		.prms[a] = changed
 		.Outputs |= 1 << a
@@ -233,9 +254,13 @@ struct FatASM
 			  else
 				sh.KnownValuesMap &= ~map
 
-		|| U = .info
-		U.Reg = info
-		return self * U
+		|asmreg| x // in case i forget to do it later via: fat * asmreg
+		x.FatIndex = .index
+		x.reg = info.reg
+		.info = x
+		
+		return info
+
 	
 	function File (|string|)
 		opt norefcounts
