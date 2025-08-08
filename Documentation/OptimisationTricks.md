@@ -189,7 +189,7 @@ Languages that do this the wrong way, make string searching impossibly slow, any
 
 ### Function Pointers vs if-else Chains
 
-If you have a large amount of if-else tests to decide what code to run... using function pointers instead, is usually a better idea.
+If you have a large if-else table to decide what code to run... using function pointers instead, is usually a better idea. Assuming your code is basically just a table in the first place, that was expressed via if-else.
 
 Use a dictionary instead of a large if/else table on matching strings. You can even store function-pointers in a dictionary. Or use an array if the index is an integer.
 
