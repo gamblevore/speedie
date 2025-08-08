@@ -2,7 +2,7 @@
 
 This is a document meant to explain how to optimise your code. Actually a lot of this is language-independant. Not about Speedie at all.
 
-But I've seen that optimisation strategies are very popular on YouTube... so why not put a few here.
+But I've seen that optimisation strategies are very popular on YouTube... so why not put a few here. The examples here, aren't meant to function as real code. Just be useful examples.
 
 
 
@@ -15,8 +15,6 @@ But I've seen that optimisation strategies are very popular on YouTube... so why
             return true
 
 If you have two or more tests that must be passed, put them in order of speed. Its a simple optimisation, but a good one that is often overlooked.
-
-The examples here, aren't meant to function as real code. Just be useful examples.
 
 
 
@@ -64,8 +62,6 @@ Anything you can do with bit math instead of other approaches is usually going t
     	syntax is (|happyflags| F, |bool|)
     		return (self & f) == f
     	
-        
-    
 Using this approach above, you can actually test for many things at once.
 
 In fact, if you are allocating objects **just** to pass around multiple boolean values, and nothing else... you can reduce it simply to an integer datatype.
@@ -88,6 +84,7 @@ In fact, if you are allocating objects **just** to pass around multiple boolean 
 It may seem obvious, but its easy to forget this in the middle of a lot of late-night hard coding efforts.
 
 
+
 ### Linked Lists Are Faster Than Arrays!
 
 Linked lists, are (usually) faster than arrays! Depending on what you are doing, of course. In general, object arrays are rarely the most optimal approach in fact.
@@ -102,7 +99,7 @@ Again... don't blindly do this. You'll slow your code and blame me. Just do it w
 
 
 
-### Don't Repeat Work (Caching)
+### Don't Repeat Work
     
     function Example (|string| s)
         // slower
@@ -118,7 +115,6 @@ Again... don't blindly do this. You'll slow your code and blame me. Just do it w
         .FuncB(s)
         if isfrog
             .FuncC(s)
-
 
 Another good example, is setting a flag or value on the object itself.
 
@@ -146,6 +142,9 @@ Depending on how your code works... this can be very useful. Especially if done 
         rz = .CreatePlaceFromMsg
         .obj = rz
 
+
+
+### Caching
 
 Caching of results can be useful too. The above cases don't *really* count as caching, as its just simple variable in a function, or a small property in an object. But caching can help, sometimes.
 
@@ -322,9 +321,6 @@ There are many bit-tricks... at least 20 you can learn if you like! But heres a 
         //if b
         //    x = 5
         || x = 5 * b // this optimises well!
-            
-    
-        
     
 Many more are bit-tricks possible!
 
@@ -367,6 +363,7 @@ Name variables clearly, function names clearly. Remove all unused variables or p
 Once you've done this, some optimisations might suddenly "jump out" at you.
 
 
+
 ### Don't Limit Yourself
 
 Don't limit yourself to only thinking about high-level design as if its the only thing that matters. Think about the low-level too! But don't **only** think about low-level stuff... as you'll miss high-level opts.
@@ -378,11 +375,13 @@ Sometimes some big low-level optimisations will require restructuring on a highe
 Efficient people will flow up and down... checking things on each level to make sure everything makes sense on every level. This reflects a classless society, where the "highest" of people also do the most basic simple work. Ensuring everyone has a good time.
 
 
+
 ### ASM-View!
 
 One nice thing about Speedie, is that by using [Perry](Perry.md) you can access the [ASM-View](VM.md) to see your ASM's output. You can see if your code is sub-optimal this way, or perhaps if Speedie itself is missing some obvious optimisations.
 
 This is like an inbuilt [godbolt.org](http://godbolt.org)!
+
 
 
 ## Conclusion
