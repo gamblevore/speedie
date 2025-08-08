@@ -40,10 +40,10 @@ datatype int
 		return (self & (self - 1)) == 0
 
 	function AlignUp (|int| To, |int|)
-		return self + (-self|uint| mod to) // ???
+		return self + (-self|uint| mod to)
 
 	function AlignDown (|int| To, |int64|)
-		return self - (self mod to) // ???
+		return self - (self mod to)
 	
 	operator Div (|int| D, |float|)
 		opt inline
