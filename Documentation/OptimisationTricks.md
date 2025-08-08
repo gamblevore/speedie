@@ -317,6 +317,13 @@ There are many bit-tricks... at least 20 you can learn if you like! But heres a 
         // 1-->4, 2-->4, 3-->4, 4-->4
         // 5-->8, 6-->8, 7-->8, 8-->8
     
+    function BoolMul (|bool| b)
+        //|| x = 0
+        //if b
+        //    x = 5
+        || x = 5 * b // this optimises well!
+            
+    
         
     
 Many more are bit-tricks possible!
@@ -351,7 +358,6 @@ This might help explain FastString:
 
 
 
-
 ### Simplify Your Code!
 
 Well-written simple code... that is understandable, is also easier to optimise. Its hard to optimise something you can't understand. Sometimes the best way to optimise code, is first to simply stick to good programming practices.
@@ -360,6 +366,16 @@ Name variables clearly, function names clearly. Remove all unused variables or p
 
 Once you've done this, some optimisations might suddenly "jump out" at you.
 
+
+### Don't Limit Yourself
+
+Don't limit yourself to only thinking about high-level design as if its the only thing that matters. Think about the low-level too! But don't **only** think about low-level stuff... as you'll miss high-level opts.
+
+Low-level stuff usually can fit around high-level thinking. But not always. 
+
+Sometimes some big low-level optimisations will require restructuring on a higher-level. Embrace it. This is life. Life is not hierarchical. Thats for governments and corporations which are highly inefficient. Or other kind of destructive and oppressive "class-based" human-systems.
+
+Efficient people will flow up and down... checking things on each level to make sure everything makes sense on every level. This reflects a classless society, where the "highest" of people also do the most basic simple work. Ensuring everyone has a good time.
 
 
 ### ASM-View!
