@@ -224,7 +224,6 @@ struct ArchonPurger
 					rec.ReturnErrors(old)
 
 
-
 			
 function message.OrigRender	(|faststring| fs_in=nil, |string|)
 	opt norefcounts
