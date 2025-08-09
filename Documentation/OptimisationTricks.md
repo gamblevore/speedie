@@ -357,9 +357,10 @@ FastString is a class in Speedie, that makes string appends faster. Make good us
 
 FastString is implicitly used anyhow when doing string interpolation.
 
-    function ThisAutomaticallyUsesFastString
-        || x = "Hello $user, my name is $NPC, how can I help you this $time"
-        // time would be morning/evening/afternoon/night
+    || npc  = "snoopy"
+    || user = "Fred"
+    || time = "morning"
+    || str = "Hello $user, my name is $NPC, how can I help you this $time"
         
 This might help explain FastString:
 
