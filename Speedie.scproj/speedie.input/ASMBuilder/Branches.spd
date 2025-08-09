@@ -336,7 +336,7 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	if dest.reg
 		if (dest is Declaration) or .Unchanged(A, dest, B)
 			return dest
-	rz = .TempOnly(A)
+	rz = .TempOnly()
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
 

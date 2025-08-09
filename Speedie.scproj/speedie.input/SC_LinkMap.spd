@@ -62,7 +62,7 @@ module LinkMap
 		
 
 
-extend scfunction {
+extend SCFunction {
 
 function CollectLinks (|object!| obj)
 	opt norefcounts
@@ -80,7 +80,7 @@ function CollectLinks (|object!| obj)
 			.DoLinkto( obj.type )
 			if compiler.InPerry
 				.DoLinkFrom( obj )
-			obj = obj.IsLookupOnly|scdecl| #require
+			obj = obj.IsLookupOnly|SCDecl| #require
 		  else
 			return
 

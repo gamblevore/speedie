@@ -1231,8 +1231,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			t <~ "("
 			.WriteDeclNoName(D,T)
 			t <~ ")"
-		if d.au.ExportPosition and d.IsInt
-			t <~ d.au.ExportPosition|int64|
+		if d.ExportPosition and d.IsInt
+			t <~ d.ExportPosition|int64|
 		  else			
 			D.Default!.Export( T )
 		t <~ ")"
@@ -1452,7 +1452,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderNum (fpMsgRenderCpp)
 		opt norefcounts
 		|| d = .FastDecl
-		|| Num = d.au.ExportPosition|int64|
+		|| Num = d.ExportPosition|int64|
 		if d.IsFloat
 			// no point converting it ourselves...
 			fs <~ .name

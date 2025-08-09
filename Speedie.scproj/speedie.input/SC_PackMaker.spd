@@ -59,7 +59,7 @@ module PackMaker
 			|| s16 = s min 16
 			rz = rz align s16
 			if alter
-				d.au.ExportPosition = rz
+				d.ExportPosition = rz
 			rz += s
 	
 
@@ -85,7 +85,7 @@ module PackMaker
 		.LibGlobs.sort(GlobalsSorter)
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
-			g.au.ExportPosition = i + 1
+			g.ExportPosition = i + 1
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)

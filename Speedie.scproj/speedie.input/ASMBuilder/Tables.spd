@@ -221,7 +221,7 @@ function Return (fn_asm)
 function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
-	dest.µtype = exp.asmdecl.au.DataType
+	dest.µtype = exp.asmdecl.mu.DataType
 	|| fReg = .µGetASM(F, dest)
 	if fReg.µtype == dest.µtype
 		return fReg // already done!
@@ -249,7 +249,7 @@ function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| 
 		from.µtype = newtype
 		return from
 	
-	dest = .TempOnly(exp, dest)
+	dest = .TempOnly(dest)
 	dest.µType = NewType
 	if from is ConstOutput
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
@@ -295,10 +295,10 @@ function SetRel (fn_asm)						// function relset (
 		return .µInto(B, X)
 
 	// probably x.y = z, or x[y] = z 
-	dest = .µGetReal(B) 
+	|| Src = .µGetReal(B) 
 //	(dest isnt RealConst)
-	(dest is SetAlways)
-	return .µ(A, dest)
+	(src is SetAlways)
+	return .µ(A, src)
 
 
 function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
@@ -314,7 +314,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 	if !dr
 		if dest is set // what?
 		dest.µType = Reff.µType
-		dest = .TempOnly(exp, dest)
+		dest = .TempOnly(dest)
 	
 	if dest isnt set
 		if dest is ContainsAddr // how?
@@ -395,7 +395,7 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 			return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()
 
 	  elseif dest isnt AddrRequest
-		dest.µType = exp.ASMDecl.au.DataType
+		dest.µType = exp.ASMDecl.mu.DataType
 		if !d.iscarray									 // so its a pointer? what if its a carray to a pointer?
 			d = d.internal!		
 		return .ReadOrWrite(Dest, exp, base, vara, d, 0) // readorwrite can convert vara to a const
@@ -425,7 +425,7 @@ function Dot (fn_asm)										// a.b
 	dest.µtype = prop.typeinfo
 	.CloseVars(ov)					// in terms of anything simple... I can't see problems.
 	
-	|| Index = prop.au.ExportPosition 
+	|| Index = prop.ExportPosition 
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
 		debugger
 		prop.typeinfo
@@ -451,7 +451,7 @@ function Num (fn_asm)
 	|| T = d.typeonly
 	dest.µtype = T
 	(dest is RealConst)
-	return .NumToReg(exp, d.au.ExportPosition, dest, T)
+	return .NumToReg(exp, d.ExportPosition, dest, T)
 
 
 function Thg (fn_asm)
@@ -466,14 +466,14 @@ function Thg (fn_asm)
 function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is RealConst)
 	if dest isnt ConstRequest
-		dest.µtype = d.au.DataType
-		return .NumToReg(exp, d.au.ExportPosition, dest, dest.µtype)
+		dest.µtype = d.mu.DataType
+		return .NumToReg(exp, d.ExportPosition, dest, dest.µtype)
 	return dest
 
 
 function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
 	opt norefcounts
-	dest = .TempTyped(exp, d, dest)
+	dest = .TempTyped(d, dest)
 
 	|| fat = exp.GRAB(dest, t)
 	if d.IsInt and !d.IsBool
@@ -530,10 +530,10 @@ function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, 
 			debugger
 			.GlobAddr(d, exp, dest)
 		if (dest is AddrRequest) or d.isbarestruct or d.iscarray
-			addr.µtype = d.au.DataType
+			addr.µtype = d.mu.DataType
 			return addr.HaveAddr
 		
-		dest.µtype = d.au.DataType
+		dest.µtype = d.mu.DataType
 		dest = dest asnt ASMReg.ContainsAddr
 		return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
@@ -560,7 +560,7 @@ function BoolNot (fn_asm)							// !a
 function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
 	opt	NoRefCounts											// *a, x = *(a.b)
 	|| TmpCloser = .OpenVars
-	dest = .temponly(f, Dest)
+	dest = .temponly(Dest)
 	.Read(Dest, F, dest, addr, glob)						// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
@@ -740,24 +740,24 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	if fn == @thg
 		return .ExistingThg(m, mode, D)
 
-	|| H = .MegaNumFinder(d.au.ExportPosition, d.au.DataType)
+	|| H = .MegaNumFinder(d.ExportPosition, d.mu.DataType)
 		return H
 
 	// reg0. shouldn't this be part of the meganumfinder?
-	if (d is const) and !d.au.ExportPosition // reg0
-		return .NumToReg(m, 0, asmreg(), d.au.DataType)
+	if (d is const) and !d.ExportPosition // reg0
+		return .NumToReg(m, 0, asmreg(), d.mu.DataType)
 
 
 function Str (fn_asm)
 	opt	norefcounts
-	dest = .TempOnly(exp, dest)
+	dest = .TempOnly(dest)
 	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
 
 
 helper Vectorise (|asmreg| Src, |message| exp,  |asmreg|)
-	|| T = .TempOnly(exp, src.BasicVec)
+	|| T = .TempOnly(src.BasicVec)
 	return exp.VSWZ(T, src, 0) * T
 
 

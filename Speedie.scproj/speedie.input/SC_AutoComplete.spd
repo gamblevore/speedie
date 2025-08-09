@@ -545,7 +545,7 @@ function SCObject.CanAutoSub (|string| search, |string|)
 function SCDecl.RealName (|string|)
 	opt NoRefCounts
 	|| l = .IsLookupOnly
-	if l isa SCObject
+	if (l isa SCObject) and !(l isa SCDecl)
 		return "" // oooff
 	|| s = .source
 	if s == @thg and s in @rel
@@ -1308,6 +1308,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 
 	if !ty
 		return msg.ModuleSrc
+	
 	if ty.type == SCNodetype.ProtoType
 		|| l = ty.IsLookupOnly 
 		if l isa scfunction
@@ -1315,6 +1316,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 	
 	if !displayonly and msg == @decl
 		return ty.Type.Sourcearg
+	
 	|| src = ty.source
 		if  DisplayOnly  and  ty is const
 			ty.name = msg.name		// unimprove it
@@ -1328,6 +1330,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 	if DisplayOnly
 		|| t = ty.type
 		return t.typenormal.source ?? t.source
+	
 	|| found = msg.obj.ClassOrModule
 		return found.source
 		

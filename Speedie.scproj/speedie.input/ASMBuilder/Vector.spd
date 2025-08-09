@@ -42,7 +42,7 @@ extend Assembler
 		dest.µType = T
 		
 		.CloseVars(Closer)
-		dest = .TempOnly(exp, dest)
+		dest = .TempOnly(dest)
 		
 		if 0: exp.VBLD
 		|| fat = .RequestOp(asm.VBLD, exp)

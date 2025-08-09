@@ -113,7 +113,7 @@ struct Assembler
 	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|) // addnum
 		if !dest or dest == asmreg()
 			dest.µtype = orig.µtype
-		dest = .TempOnly(exp, dest)
+		dest = .TempOnly(dest)
 		|| Where = orig • dest
 		(where is realconst)
 		|| K = .NumToReg(exp, amount, where, orig.µtype)
@@ -155,9 +155,9 @@ struct Assembler
 		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
 
 
-	function TempTyped (|Message| where, |scdecl| Type, |asmreg| T,  |asmreg|)
-		t.µtype = type.au.DataType
-		return .TempOnly(where, t)
+	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
+		t.µtype = type.mu.DataType
+		return .TempOnly(t)
 	
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
@@ -165,11 +165,11 @@ struct Assembler
 		if t isnt textual
 			// what if there is a type and its different?
 			// and if its NEVER different... why add it?
-			t.µtype = where.asmdecl.au.DataType
-		return .TempOnly(where, t)
+			t.µtype = where.asmdecl.mu.DataType
+		return .TempOnly(t)
 
 
-	function TempOnly (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
+	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
 		if t.reg
 			return t
@@ -185,7 +185,7 @@ struct Assembler
 		.VTemps = r
 		(t isnt realconst) // why would it be?
 		(t is temp)
-		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
+		check (!(.vdecls & .VTemps)) (.fn.sourcearg, "No free local variables.")	// entirely full
 		return t
 	
 	

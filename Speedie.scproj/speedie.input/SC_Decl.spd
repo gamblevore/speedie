@@ -134,15 +134,15 @@ class SCDecl (SCObject) {
 	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				DepthOfBranch
-	|DeclAlterable|		au // The ASM can alter these, and needs to restore them too.
+	|DeclAlterable|		mu									// The ASM can alter these, and needs to restore them too.
 
 	
 	constructor (|scclass| type)
 		opt norefcounts
 		.type = type
 		.NilDeclared = NilState.Either
-		.au.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
-		.au.datatype = 0//datatypecode.UnusedType
+		.mu.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
+		.mu.datatype = 0
 		|| m = SCModule.curr
 			.ModuleNum = m.ModuleNum
 
@@ -155,20 +155,20 @@ class SCDecl (SCObject) {
 		return (.MemoryLayer.obj as SCImport)!
 	
 	function TypeOnly (|datatypecode|)
-		return .au.DataType & datatypecode.possiblebits
+		return .mu.DataType & datatypecode.possiblebits
 	
 	setter WholeType (|asmreg|)
 		value.tmpcheck
-		.au.DataType = value|datatypecode|
+		.mu.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)
-		return .au.DataType|asmreg|
+		return .mu.DataType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
-		.au.info |= d
+		.mu.info |= d
 
 	function IsTypeImprove (assigns:|bool|)
-		.au.info = .au.info.set(SCDeclInfo.TypeImprove, Value)
+		.mu.info = .mu.info.set(SCDeclInfo.TypeImprove, Value)
 	
 	
 	syntax Compare (|string| s, |bool| aware, |int|)
@@ -180,10 +180,10 @@ class SCDecl (SCObject) {
 		
 	syntax is (|SCDeclInfo| d, |bool|)
 		if self
-			return .au.info & d
+			return .mu.info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
-		.au.info = .au.info.set(d, Value)	
+		.mu.info = .mu.info.set(d, Value)	
 
 	function Sanity 
 		// if .name ~= "&JB_ListData"
@@ -213,7 +213,7 @@ class SCDecl (SCObject) {
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
 	function SpecialRegs (|bool|)
-		return self and !.au.DataType.IsIntReg
+		return self and !.mu.DataType.IsIntReg
 	
 	function IntRegs (|bool|)
 		return !.SpecialRegs 
@@ -380,8 +380,8 @@ class SCDecl (SCObject) {
 		dcl.Contains	= .Contains
 		dcl.internal	= .Internal
 		|| cpyflags		= scdeclinfo.DclCopied
-		dcl.au.info &= ~cpyflags
-		dcl.au.info |= .au.info & cpyflags
+		dcl.mu.info &= ~cpyflags
+		dcl.mu.info |= .mu.info & cpyflags
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
 		
@@ -663,7 +663,6 @@ class SCDecl (SCObject) {
 		|| t = .type.typeinfo
 		if .isnormal and t.isint
 			return !t.IsSigned
-
 		
 	
 	function MatchC (|SCDecl?| O, |bool|)
@@ -953,17 +952,24 @@ class SCDecl (SCObject) {
 		if (Default and self == .type.typenormal)
 			return Default
 		
-		// About the exportposition for ASM globals:
-		is ExistanceAltered // just for debugging the compiler.
+		is ExistanceAltered							// just for debugging the compiler.
 		
 		rz = .CopyDeclForVar
 		rz.NilDeclared = type
 	
 	
+	function ExportPosition (|int64|)
+		return .mu.ExportPosition
+	
+	
+	function ExportPosition (assigns:|int64|)
+		.mu.ExportPosition = value
+		
+	
 	function CopyDeclForVar (|scdecl|)
 		opt norefcounts
 		rz = .CopyDecl
-		rz.au.info |= .au.info & scdeclinfo.VarType
+		rz.mu.info |= .mu.info & scdeclinfo.VarType
 		
 	
 	function CanNilCheck (|bool|)
@@ -1301,4 +1307,3 @@ function array.CArraySize (|[scdecl]| self, |int| size, |int|)
 		size += p.carraysize
 	return size
 
-|scdecl| argh

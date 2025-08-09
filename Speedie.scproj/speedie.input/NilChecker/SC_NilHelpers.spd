@@ -11,7 +11,7 @@
 extend Message {
 
 function RedundantDeclare (|nilstate| D,  |nilstate|)
-	|| str = .OrigRender + " redundantly tested. Declared as real." 
+	|| str = "Redundant test (currently real): " + .OrigRender
 	error (self, str)
 	return D
 
@@ -21,18 +21,11 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 		return Test & nilstate.either
 
 	if ArchonPurger.loops.NestDepth == 0
-		// if .origrender is multi-line, put the string first.
 		|| fs = FastString()
-		|| render = .OrigRender(Fs)
-		|| OOf = render contains Jeebox.CSLine
-			fs <~ "Redundant test."
-		  else
-			fs <~ "$render redundantly tested."
-		fs <~  " Currently is: "
+		fs <~ "Redundant test on "
 		fs <~ dcl.nilcurr.RawName
-		if oof
-			fs <~ " on ${render.Trim}"
-		
+		fs <~ ": "
+		.OrigRender(Fs)
 		error (self, fs)
 	return Test & nilstate.either
 

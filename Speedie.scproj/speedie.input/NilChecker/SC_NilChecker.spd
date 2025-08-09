@@ -698,7 +698,7 @@ function Swapity (|scdecl| LD, |message| L, |scdecl| RD, |message| R, |nilstate|
 	opt norefcounts
 	|| LL = l.Unwrap
 	if ll != @acc // memory access... must work
-		check (LD is VarType) (L, l.origrender + " can't be swapped. Must be a real variable somewhere.")
+		check (LD is VarType) (L, "Can't swap. Must be a real variable somewhere.")
 	return .VariableSet(LD,L,  RD,R,  RN)
 
 
@@ -797,7 +797,7 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 		fs <~ raw
 	fs <~ ':'
 	fs <~ ' '
-	fs <~ where.OrigRender
+	where.OrigRender(fs)
 	if To
 		fs <~ " to "
 		if where.isfirst and to.cls

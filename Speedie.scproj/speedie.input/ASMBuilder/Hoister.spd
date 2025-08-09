@@ -40,7 +40,7 @@ function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
 	|| B = G.ByteCount
 	|uint64| range = 64 * B  // the idea is to be within N items, and before the item, and be aligned.
 							 // So what should N be?  Read/Write takes 7 bits, but CNTC uses 6 bits!
-	|uint64| find = d.au.ExportPosition
+	|uint64| find = d.ExportPosition
 
 	B--	// now, lets align this shit.
 	if mode is AddrForceRequest or d is library // need exact match.
@@ -55,7 +55,7 @@ function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	
-	dest = .temptyped(exp, d, dest)
+	dest = .temptyped(d, dest)
 	|| Glob = .TryGetGlob(D, dest)
 		return Glob
 
@@ -80,7 +80,7 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	Lets remove the opts around libglob reading.
 */	
 	
-	|int64| Original = d.au.ExportPosition
+	|int64| Original = d.ExportPosition
 	check (Original <= 32~bits)				(exp, "Too much global data used: " + original.strsize)
 	if !Original							// What?
 	if  dest isnt AddrForceRequest  and  d isnt ClassObj  and  d isnt Library

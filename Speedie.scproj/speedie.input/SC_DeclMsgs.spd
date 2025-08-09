@@ -28,7 +28,7 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 	
 	|| o = value.obj as scdecl
 		|| dcl = o.copydecl(true)
-		dcl.au.info |= purpose
+		dcl.mu.info |= purpose
 		dcl.Name = name
 		dcl.Default = value
 		NameMsg.obj = dcl		

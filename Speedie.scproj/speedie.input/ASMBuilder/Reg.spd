@@ -98,12 +98,12 @@ datatype ASMReg (uint64)
 		
 //	function Const (assigns:|int64|)
 //		.needfat.const = value
+//
+//	function CanBeKnownValue (|bool|)
+//		 return self is NotAlteredInbranch and constoutput
 
 	function IsConst (|int64| val, |bool|)
 		return  (self is ConstOutput) and (.const == val)
-
-	function CanBeKnownValue (|bool|)
-		 return self is NotAlteredInbranch and constoutput
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
@@ -257,8 +257,8 @@ datatype ASMReg (uint64)
 		return self
 
 	function SCDecl.ASMReg (assigns:|asmreg|)
-		value.µType = .au.DataType
-		.au.DataType = value|datatypecode|
+		value.µType = .mu.DataType
+		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck
 	
 	operator mul (|bool| b, |asmreg|)
@@ -270,8 +270,8 @@ datatype ASMReg (uint64)
 	operator bitand (|asmreg| A, |asmreg|)
 		return (self|int64| & A|int64|)|asmreg|
 
-	operator xor (|asmreg| A, |asmreg|)
-		return (self|int64| xor A|int64|)|asmreg|
+//	operator xor (|asmreg| A, |asmreg|)
+//		return (self|int64| xor A|int64|)|asmreg|
 	
 	operator as (|asmreg| A, |asmreg|)
 		return (self|int64| ||| A|int64|)|asmreg|
@@ -288,6 +288,12 @@ datatype ASMReg (uint64)
 		isnt notalteredinbranch
 		return .reg(dest)
 	
+	function TryReg (assigns:|asmreg| dest, |asmreg|)
+		if .reg or dest isnt temp
+			return self
+		.reg = dest 
+		return self
+	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
 		if InUse.reg == dest.reg				// dest is in use!
 			.reg = 0
@@ -298,6 +304,7 @@ datatype ASMReg (uint64)
 	
 
 	
+	target debug {
 	function DebugPrint 
 		target debug
 			print .render
@@ -306,6 +313,7 @@ datatype ASMReg (uint64)
 				f.DebugPrint
 			  else
 				""
+	}
 	
 	function TmpCheck (|bool|)
 		|| R = .reg

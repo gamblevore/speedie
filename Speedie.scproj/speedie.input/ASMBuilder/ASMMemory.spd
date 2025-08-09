@@ -15,13 +15,16 @@ function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
 	base = base.HaveAddr
+	if !dest.reg
+		dest.TryReg = Vara
+		dest.TryReg = Base
+		dest = .TempOnly(dest)
 	return .Plus(dest, base, vara, exp)
 
 
 function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |asmreg| vara, |scdecl| D, |!&fatasm|)
 	if vara.reg
-		#! Did i get this right?
-/		dest = .IncrPointerByVar(dest, dest, vara, exp)
+		dest = .IncrPointerByVar(nil, dest, vara, exp)
 
 	|| Amount = D.SizeOfQuery			#check exp
 	// what about structs like 53 bytes long? What is their alignment?
@@ -31,19 +34,8 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 		if amount > 16								// previous version did "min 16". why? thats wrong?
 		dest = .AddConst(index*amount, exp, dest)
 	
-	check (Amount <= 1<<14) (exp, "Object too large to set to")
+	check (Amount <= 1<<14) (exp, "Object too large memory-copy requested. Copy this manually.")
 	return exp.RDWR(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
-	
-//	while
-//		|| Partial = Amount min (1<<14)
-//		Amount -= Partial
-//		
-//		rz = exp.RDWR(Src, base, Partial & 14~bits)		// VM treats 0 as the biggest num
-//		loop Amount > 0
-//		// will this leak regs? i think so?
-//		base = .AddConst(Partial, exp, base)
-//		src = .AddConst(Partial, exp, base)
-
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
@@ -137,7 +129,7 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 			0 //  
 		  else
 			|| bs = base.fat!
-			LostBytes = glob.au.ExportPosition
+			LostBytes = glob.ExportPosition
 			|| K = bs.const
 			LostBytes -= K
 			expect LostBytes >= 0
@@ -195,8 +187,11 @@ function scdecl.CanCopyNormally (|bool|)
 	opt norefcounts
 	|| i = .Internal!
 	if i.IsBareStruct
-		|| s = i.calculatesize
-		return (s <= 16) and s.IsPow2
+		return false
+// seems simpler to use a memory copy instruction.
+// why not?
+//		|| s = i.calculatesize
+//		return (s <= 16) and s.IsPow2
 	return true
 
 

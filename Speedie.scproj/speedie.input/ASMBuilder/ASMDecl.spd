@@ -22,7 +22,7 @@ struct SavedRegisters
 		
 		expect args <= 32 - .count
 		for p in args
-			.decls[.Count++] = p.au
+			.decls[.Count++] = p.mu
 
 
 	function Rewind	(|assembler| sh)
@@ -38,7 +38,7 @@ struct SavedRegisters
 
 		expect args >= .count
 		for p.backwards in args
-			p.au = .decls[--.Count]
+			p.mu = .decls[--.Count]
 
 
 
@@ -50,7 +50,7 @@ struct DeclAlterable
 
 
 function assembler.DeclReset (|scdecl| D)
-	d.au.exportposition = 0
+	d.exportposition = 0
 	(d isnt const)
 	d.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
 

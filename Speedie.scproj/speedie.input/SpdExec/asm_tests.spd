@@ -54,9 +54,9 @@ function FastMemory (|&int| x, |int| a, |int| b, |int| c)
 
 function StructInner (|scdecl| d)
 	|| z = 3 // just to make it easier to see
-	|| y = &d.au.info
-	|| x = d.au.info
-	d.au.info = x
+	|| y = &d.mu.info
+	|| x = d.mu.info
+	d.mu.info = x
 	y[] = 1
 	
 	

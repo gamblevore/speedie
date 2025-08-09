@@ -4,8 +4,14 @@
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
-	if (rz is Global) and !rz.au.ExportPosition				// oof
-		error (self, "No export position on: " + .locate)				
+	if (rz is Global) and !rz.ExportPosition
+		while .func == @arel
+			self = .first!
+		rz = .FastDecl
+		if rz.exportposition
+			.parent!.obj = rz // fix it up.
+		  else
+			error (self, "No export position on: " + .locate)				
 	
 	if rz.typeonly == 0										// Datatypecode.unusedtype
 		rz.wholetype = rz.CalculateASMType
