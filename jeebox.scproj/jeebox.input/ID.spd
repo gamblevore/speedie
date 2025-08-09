@@ -17,6 +17,14 @@ class StringShared (string)
 
 
 class MessageID (stringshared)
+	description "Allows replacing message.name with a messageID instead of a string. This allows you to associate extra information on the message.
+	
+Even better if you can share MessageIDs across all messages of the same .name and .func, saving memory. Then you can process the message by a function pointer on the MessageID. (You'll have to subclass MessageID to add the function-pointer.)
+
+This can speed up processing of messages, as each message has the function-pointer, or pointers, needed to process it.
+
+You can also count the number of times that this messageID was applied, via the .frequency property.
+"
 	linkage
 		cpp_part ID
 	
@@ -63,10 +71,7 @@ class MessageID (stringshared)
 	module
 		function ByID (SorterComparer of messageid)
 			opt norefcounts
-			|| diff = b.ID  -  .ID
-				return diff							// more frequent should have lower lengths
-				
-			return b|uint64| - self|uint64|
+			return b.ID  -  .ID					// more frequent should have lower lengths
 		
 		function ByFreq (SorterComparer of messageid)
 			opt norefcounts

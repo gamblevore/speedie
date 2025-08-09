@@ -281,6 +281,29 @@ If you have some large files that need to be parsed often, use [jbin](jbin.md) i
 
 
 
+### Prefer Integer IDs Over String IDs
+
+This is more for application-internal use, not end-users. If you have a human-readable data-format that you are processing... You may want to take actions based on the names provided.
+
+Using string IDs frequently is slower than integer IDs frequently! Just convert the `string` to an `int` using a `dictionary`.
+
+An example is parsing source-code. Or processing a file to drive robot commands.
+
+**Jeebox Example:**
+
+You have a multi-pass system parsing Jeebox... First validation, then clean-up, then actual processing...
+
+It makes more sense during validation, to convert the string ID to an integer ID. This way, you can more quickly process the items.
+
+On `Message`, there is a `.Tag` property, that allows 64K possible IDs. `.Flags` allows another 64K. Theres also the `.Obj` property that lets you store an object of any kind on the `message`, you can store anything you want on that object.
+
+If thats not good enough for you, you can replace the `message`'s name with a `MessageID` class, that acts as a string but also can carry extra information. 
+
+The purpose of `MessageID` is to "share" information across all nodes of the same type. For example all `message` nodes with name "book" and type `@tmp` could share the same `MessageID`, you could place a function-pointer on that `messageID`, and then allow the message to process itself via that function-pointer.
+
+In fact you could place multiple function-pointers on those shared `messageID`, one for each different stage of processing.
+
+
 ### Use Bit-Tricks When Needed
 
 Bit tricks can really speed up code. For example... to check if a number is a power of 2 (1,2,4,8,16,etc)... you **could** test all 32 possibilities in a 32-bit unsigned-integer.
@@ -306,8 +329,10 @@ There are many bit-tricks... at least 20 you can learn if you like! But heres a 
       return (b<<1)-1
     
     function IsOdd (|int| x)
-        // if x mod 2 > 0 // slow
         if x & 1          // fast
+        // if x mod 2 > 0
+        // actually the second is also fast, but an insanely-lazy compiler might not optimise it.
+        // Writing the first way proves you feel comfy with bit-hacks.
 
     function SpaceRequiredInTermsOf (|int| x, |int|)
         || n = 4 // aligns to 4. Change as you like. Powers of 2 are fastest.
@@ -351,6 +376,8 @@ This might help explain FastString:
     render BestAppend (|[string]| items)
         for s in items
             fs <~ s // Best! (fs is automatically created in 'render' functions)
+            
+You can append integers, strings, floats, bytes, and more into FastString. It can even do a string replaceall directly with no temp-buffer needed. Many other string-operations are included. Such as appending text in lowercase, or appending a `date`.
 
 
 
@@ -373,6 +400,16 @@ Low-level stuff usually can fit around high-level thinking. But not always.
 Sometimes some big low-level optimisations will require restructuring on a higher-level. Embrace it. This is life. Life is not hierarchical. Thats for governments and corporations which are highly inefficient. Or other kind of destructive and oppressive "class-based" human-systems.
 
 Efficient people will flow up and down... checking things on each level to make sure everything makes sense on every level. This reflects a classless society, where the "highest" of people also do the most basic simple work. Ensuring everyone has a good time.
+
+
+
+### A Fresh Mind
+
+Come back to your code with a fresh mind. Don't just write stuff and never look at it again. Put it down, come back to it the next day, and clean it up. 
+
+In fact, I find in general... that I work best by working in two phases. The first phase I make a mess of trying to solve a problem. Then I put it away overnight (or longer). The next time I come back and clean it up, or even reimplement it... to something that actually makes sense.
+
+It might seem slower, but it results in far higher quality code. Code that does a lot with a small amount of code, runs super-fast, and is more reliable. Of course... I might need more than 2 attempts. But for anything new, its usually at least 2 attempts.
 
 
 
