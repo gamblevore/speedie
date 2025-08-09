@@ -87,7 +87,7 @@ It may seem obvious, but its easy to forget this in the middle of a lot of late-
 
 ### Linked Lists Are Faster Than Arrays!
 
-Linked lists, are (usually) faster than arrays! Depending on what you are doing, of course, and assuming sequential access.
+Linked lists, are (usually) faster than arrays! Depending on what you are doing, of course, and assuming linear access.
 
 In general, object arrays are rarely the most optimal approach.
 
