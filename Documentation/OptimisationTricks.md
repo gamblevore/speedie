@@ -353,16 +353,16 @@ Many more are bit-tricks possible!
 
 ### Use FastString!
 
-FastString is a class in Speedie, that makes string appends faster. Make good use of it. Its useful for creating large complex documents. But sometimes even smaller strings use it.
+`FastString` is a class, that makes string appends faster. Make good use of it. Its useful for creating large complex documents. But sometimes even smaller strings use it.
 
-FastString is implicitly used anyhow when doing string interpolation.
+`FastString` is implicitly used anyhow when doing string interpolation.
 
     || npc  = "snoopy"
     || user = "Fred"
     || time = "morning"
     || str = "Hello $user, my name is $NPC, how can I help you this $time"
         
-This might help explain FastString:
+This might help explain `FastString`:
 
     function BadAppend (|[string]| items, |string|)
         for s in items
@@ -378,7 +378,15 @@ This might help explain FastString:
         for s in items
             fs <~ s // Best! (fs is automatically created in 'render' functions)
             
-You can append integers, strings, floats, bytes, and more into FastString. It can even do a string replaceall directly with no temp-buffer needed. Many other string-operations are included. Such as appending text in lowercase, or appending a `date`.
+You can append integers, strings, floats, bytes, and more into `FastString`. It can even do a string replaceall directly with no temp-buffer needed. Many other string-operations are included. Such as appending text in lowercase, or appending a `date`.
+
+
+
+### ASM-View!
+
+One nice thing about Speedie, is that by using [Perry](Perry.md) you can access the [ASM-View](VM.md) to see your ASM's output. You can see if your code is sub-optimal this way, or perhaps if Speedie itself is missing some obvious optimisations.
+
+This is like an inbuilt [godbolt.org](http://godbolt.org)!
 
 
 
@@ -411,14 +419,6 @@ Come back to your code with a fresh mind. Don't just write stuff and never look 
 In fact, I find in general... that I work best by working in two phases. The first phase I make a mess of trying to solve a problem. Then I put it away overnight (or longer). The next time I come back and clean it up, or even reimplement it... to something that actually makes sense.
 
 It might seem slower, but it results in far higher quality code. Code that does a lot with a small amount of code, runs super-fast, and is more reliable. Of course... I might need more than 2 attempts. But for anything new, its usually at least 2 attempts.
-
-
-
-### ASM-View!
-
-One nice thing about Speedie, is that by using [Perry](Perry.md) you can access the [ASM-View](VM.md) to see your ASM's output. You can see if your code is sub-optimal this way, or perhaps if Speedie itself is missing some obvious optimisations.
-
-This is like an inbuilt [godbolt.org](http://godbolt.org)!
 
 
 
