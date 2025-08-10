@@ -126,6 +126,7 @@ function Path (|string|)
 		._Path = p
 		return p
 
+
 function PrintStackTrace
 	visible
 	cpp_name JB_PrintStackTrace
