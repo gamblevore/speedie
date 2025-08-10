@@ -52,7 +52,7 @@ class FileRow (ListViewRow)
 		fs <~ "file: "
 		fs <~ .location
 		fs <~ .dirfile
- 
+		
 	
 	behaviour Text
 		if i == 0
@@ -166,7 +166,7 @@ class FileRow (ListViewRow)
 		
 		for lost in found
 			.removefile(lost, o)
-		.filesort
+		.FileSort
 
 
 	helper FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
