@@ -4,6 +4,8 @@
 
 So it is an incredible format... considering that it does so much. That said... I hate over-short example documents... so lets just spell out `Jbin`.
 
+(Don't worry about it not being human-editable. [Perry](Perry.md) lets you edit jbin as plain-text, but resaves it as jbin. [Perry](Perry.md) even transparently works on compressed jbin files.)
+
 
 ### Example Use
 
@@ -94,6 +96,8 @@ Another great thing about digesting Jeebox, is that the documents are "pre-parse
 * Not human readable
 * Does not store formatting, or comments
 
+
+Not being human-readable isn't so big of a problem as you might think! [Perry](Perry.md) automatically converts jbin files to and from text! Meaning you can edit jbin files as text, via [Perry](Perry.md).
 
 #### History
 

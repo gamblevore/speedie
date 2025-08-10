@@ -29,6 +29,7 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 * Hold control key (linux/windows) or command key (OSX) down, over any variable or function, to see how it is defined.
 * Function-List Menu, lists all functions in the current file and has a editable-filter to narrow down the func you are hunting for.
 * File-History Menu and buttons, lists all files previously viewed, or lets you skip forward/backward. The File-History is filterable.
+* Transparent editing of [jbin](jbin.md) files, even when compressed.
 
 ## Great Care
 
