@@ -515,8 +515,6 @@ struct FastStringCpp;
 
 struct FastString;
 
-struct FastString;
-
 struct SCDecl;
 
 struct SCIterator;
@@ -526,10 +524,6 @@ struct SCNode;
 struct SavingTest;
 
 struct JB_String;
-
-struct JB_File;
-
-struct JB_File;
 
 struct Message;
 
@@ -700,6 +694,7 @@ struct ASMState {
 	byte BranchDepth;
 	byte LoopDepth;
 	byte InlineDepth;
+	bool TailInlineable;
 };
 
 struct ArchonPurger {
@@ -843,7 +838,6 @@ struct Assembler {
 	int CurrFuncGrab;
 	bool Inited;
 	bool NeedsRework;
-	bool TailInlineable;
 	SCFunction* Out;
 	FatASM* InlineEnd;
 	uint KnownValuesMap;
@@ -859,6 +853,7 @@ struct Assembler {
 
 struct SavedRegisters {
 	byte Count;
+	u16 BasicBlock;
 	uint KnownValues;
 	DeclAlterable Decls[32];
 	u16 ASM[32];
@@ -1599,18 +1594,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2213])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2216])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2214])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2217])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2215])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2218])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2212])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2215])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2215])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2218])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2216])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2219])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1840,7 +1835,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2221])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2224])
 
 extern int SC_CountASMFuncPrint;
 extern Dictionary* SC_CppRefTable;
@@ -1879,7 +1874,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2217])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2220])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1919,7 +1914,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2222])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2225])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2154,12 +2149,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2220])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2223])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2219])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2222])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2218])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2221])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2432,11 +2427,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_WR8U ((ASM_Write)107)
 
-#define kSC__Reg_AddrForceRequest ((ASMReg)2199023255552)
+#define kSC__Reg_AddrForceRequest ((ASMReg)4398046511104)
 
-#define kSC__Reg_AddrNeed ((ASMReg)3298534883328)
+#define kSC__Reg_AddrNeed ((ASMReg)6597069766656)
 
-#define kSC__Reg_AddrRequest ((ASMReg)1099511627776)
+#define kSC__Reg_AddrRequest ((ASMReg)2199023255552)
 
 #define kSC__Reg_AlreadyNegated ((ASMReg)1048576)
 
@@ -2448,9 +2443,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_CondRequest ((ASMReg)1073741824)
 
-#define kSC__Reg_ConstInput ((ASMReg)274877906944)
+#define kSC__Reg_ConstInput ((ASMReg)549755813888)
 
-#define kSC__Reg_ConstOutput ((ASMReg)549755813888)
+#define kSC__Reg_ConstOutput ((ASMReg)1099511627776)
 
 #define kSC__Reg_ConstRequest ((ASMReg)536870912)
 
@@ -2460,11 +2455,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_Discard ((ASMReg)4194304)
 
-#define kSC__Reg_Exit ((ASMReg)206158430208)
+#define kSC__Reg_Exit ((ASMReg)412316860416)
 
-#define kSC__Reg_ExitAtAll ((ASMReg)137438953472)
+#define kSC__Reg_ExitAtAll ((ASMReg)274877906944)
 
-#define kSC__Reg_ExitFunction ((ASMReg)68719476736)
+#define kSC__Reg_ExitFunction ((ASMReg)137438953472)
 
 #define kSC__Reg_FromExistingVar ((ASMReg)262144)
 
@@ -2472,7 +2467,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_GlobalMemory ((ASMReg)8589934592)
 
-#define kSC__Reg_KnownConst ((ASMReg)549789368320)
+#define kSC__Reg_Inline ((ASMReg)34359738368)
+
+#define kSC__Reg_KnownConst ((ASMReg)1099545182208)
 
 #define kSC__Reg_Negate ((ASMReg)65536)
 
@@ -2480,19 +2477,19 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_NotAlteredInbranch ((ASMReg)33554432)
 
-#define kSC__Reg_NotUnConst ((ASMReg)274878169088)
+#define kSC__Reg_NotUnConst ((ASMReg)549756076032)
 
-#define kSC__Reg_OK ((ASMReg)34359738368)
+#define kSC__Reg_OK ((ASMReg)68719476736)
 
 #define kSC__Reg_Param ((ASMReg)131072)
 
 #define kSC__Reg_PreferEqul ((ASMReg)17179869184)
 
-#define kSC__Reg_RealConst ((ASMReg)824633720832)
+#define kSC__Reg_RealConst ((ASMReg)1649267441664)
 
-#define kSC__Reg_RealDiscard ((ASMReg)824637915136)
+#define kSC__Reg_RealDiscard ((ASMReg)1649271635968)
 
-#define kSC__Reg_RemoveableOutput ((ASMReg)549755814912)
+#define kSC__Reg_RemoveableOutput ((ASMReg)1099511628800)
 
 #define kSC__Reg_Set ((ASMReg)8388608)
 
@@ -2504,9 +2501,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_Textual ((ASMReg)268435456)
 
-#define kSC__Reg_Zero ((ASMReg)824633851960)
+#define kSC__Reg_Zero ((ASMReg)1649267572792)
 
-#define kSC__Reg_ZeroParam ((ASMReg)549755944960)
+#define kSC__Reg_ZeroParam ((ASMReg)1099511758848)
 
 #define kSC__ASMType_IncrAfter ((int)2)
 
@@ -3312,7 +3309,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2211])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2214])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3421,6 +3418,7 @@ extern int SC__Func_OnceCount;
 extern int SC__Func_SyxID;
 extern Dictionary* SC__Func_TemporalStatements;
 extern SCModule* SC__Mod_Curr;
+extern int SC__Mod_ModuleDepth;
 
 //// HEADER LibGlobs.h
 
@@ -3782,12 +3780,15 @@ int JB_ErrorColors__Init_();
 
 
 
+// Existing
+
+
 // FastStringOpts
 void SC_FastStringOpts__FS(Message* Exp, Message* Getresult);
 
 int SC_FastStringOpts__Init_();
 
-void SC_FastStringOpts__String(Message* Str);
+void SC_FastStringOpts__StringCleanup(Message* Str);
 
 
 
@@ -4040,6 +4041,9 @@ bool JB_API__NilHandler();
 
 
 
+// Jeebox
+
+
 // Constants
 void JB_Constants__AddEscape(uint /*byte*/ I, FastString* Fs);
 
@@ -4103,6 +4107,9 @@ bool SC_Options__Color();
 
 int SC_Options__Init_();
 
+
+
+// Output
 
 
 // PackMaker
@@ -5664,6 +5671,8 @@ ASMReg SC_ASMType__ArgumentSub(Assembler* Self, Message* Exp);
 
 ASMReg SC_ASMType__ASMFunction(Assembler* Self, Message* Exp, ASMReg Dest);
 
+bool SC_ASMType__BadBflg(Assembler* Self, FatASM* L, int Rr);
+
 ASMReg SC_ASMType__BoolNot(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_ASMType__BRel(Assembler* Self, Message* Exp, ASMReg Dest);
@@ -5714,7 +5723,7 @@ ASMReg SC_ASMType__Num(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_ASMType__Return(Assembler* Self, Message* Exp, ASMReg Dest);
 
-bool SC_ASMType__ReturnOpt(Assembler* Self, int Ret, int Bb);
+bool SC_ASMType__ReturnOpt(Assembler* Self, ASMReg& Ret_);
 
 ASMReg SC_ASMType__SetRel(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -6799,6 +6808,8 @@ bool SC_FAT_OperatorIsa(FatASM* Self, ASM M);
 
 ASMReg SC_FAT_AsReg(FatASM* Self, ASMReg Info);
 
+uint SC_FAT_Output(FatASM* Self);
+
 void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs);
 
 uint SC_FAT_r0(FatASM* Self);
@@ -6816,8 +6827,6 @@ void SC_FAT_r2SetWithUint(FatASM* Self, uint Value);
 uint SC_FAT_r3(FatASM* Self);
 
 int SC_FAT_Reg(FatASM* Self, int I);
-
-uint SC_FAT_Reg0(FatASM* Self);
 
 void SC_FAT_RegInputSet(FatASM* Self, int A, ASMReg Value);
 
@@ -8937,9 +8946,6 @@ void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
 
 
-// JB_OutputFile
-
-
 // JB_Process
 JB_String* JB_Sh_Render(ShellStream* Self, FastString* Fs_in);
 
@@ -9579,12 +9585,6 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
 JB_List* JB_Tree_WrapWith(JB_List* Self, JB_List* W);
 
-
-
-// JB_ExistingFile
-
-
-// JB_JeeboxFile
 
 
 // JB_Message
@@ -10257,6 +10257,8 @@ void SC_Msg_MacroFixSub(Message* Self, SCDecl* Contains);
 Message* JB_Msg_MacroPrm(Message* Self, Message* Root, Array* Prms, Message* Dest);
 
 Message* JB_Msg_MacroSame(Message* Self, Message* Prm);
+
+Message* SC_Msg_MainArgDotFix(Message* Self);
 
 bool SC_Msg_MainArgsCanBeZero(Message* Self);
 
@@ -11768,12 +11770,12 @@ Message* JB_config__Create(JB_String* Path);
 
 
 // JB_interface
-bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
 
 
 
 // JB_interface
-void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
+bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
 
 
 
