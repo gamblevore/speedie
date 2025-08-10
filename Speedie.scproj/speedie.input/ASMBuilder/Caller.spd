@@ -113,8 +113,6 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
-//	  elseif .state.InlineDepth == 0
-//		.TailInlineable = true
 	
 	|int| D = ++.state.InlineDepth
 	.DeepestInline = D max .DeepestInline
