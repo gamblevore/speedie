@@ -4,10 +4,6 @@
 */
 
 
-    // wouldn't it be better as app properties? or jsut arg properties?
-    // args.f, args.s, args.n? like a module? to be accessable anywhere?
-    // also needs arrays to be useful... and existingfiles.
-
 function TypeOfDotDotDot (ExprResolver)
 	using (exp)
 		exp.become(@bra)
