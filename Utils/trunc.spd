@@ -1,0 +1,14 @@
+#!/usr/local/bin/spd
+
+// Basic empty file
+main (|ExistingFile| FileToShrink, |int| Amount)
+	require FileToShrink.open
+	
+	|| OldSize = FileToShrink.size
+	"OldSize: $OldSize"
+	if OldSize <= Amount
+		"already smaller"
+	  else
+		FileToShrink.size = amount
+		"Truncated to: ${FileToShrink.size}"
+	FileToShrink.close
