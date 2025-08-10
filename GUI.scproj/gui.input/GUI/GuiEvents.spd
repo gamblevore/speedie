@@ -159,7 +159,7 @@ function ivec2.SDLXY (|ivec2|)
 	|| x = xy.x
 	|| y = xy.y
 
-	|| w = __modules__.window.front $
+	|| w = window.front $
 	|| scr = GUI.Screen.size.y
 	|| v = (x, scr - y)
 	v -= w.lastrect.xy

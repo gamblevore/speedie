@@ -477,7 +477,7 @@ module GUI
 	
 	function DroppingInto (|guicontrol|)
 		opt norefcounts
-		return __modules__.window.front.droppinginto?
+		return window.front.droppinginto?
 
 
 	function UpdateTextFocus (|window| w)
@@ -603,7 +603,7 @@ module GUI
 		require .acontrolwasresized
 		.acontrolwasresized = false
 		.Touch
-		for w.fast in __modules__.window.all
+		for w.fast in window.all
 			w.CalculateWindowSize(force, true)
 		for w.fast in notifications.Alerts
 			w.CalculateWindowSize(force, false)
@@ -970,7 +970,7 @@ module GUI
 
 	function StandardKeys (|keys| key, |bool|)
 		opt norefcounts
-		|| w = __modules__.window.front						#require
+		|| w = window.front						#require
 		|| cmd = keys.cmd
 		|| rf = w.realfocus
 			if cmd
@@ -1046,7 +1046,7 @@ module GUI
 		beep.OK = 1		
 		.FlashSelector = false
 		if !.DialogIsOpen
-			for w in __modules__.window.all
+			for w in window.all
 				w.__AppForegroundChange__(!back)
 		.touch
 		return SDLActivity.activity
@@ -1054,6 +1054,8 @@ module GUI
 
 	helper EventWindow (|window--|)
 		opt norefcounts
+		|| window = 0
+		(window) // just test that __modules__ works
 		return .FrontDialog ?? __modules__.window.front
 	
 	
