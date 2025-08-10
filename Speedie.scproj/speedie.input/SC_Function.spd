@@ -325,8 +325,7 @@ function Transform ()
 	if (self Is Wrapper)
 		space.ProcessLinkage( n, FuncLinkageTable, true )
 	  else
-//	space.ProcessLinkage( n, FuncLinkageTable, self Is Wrapper )
-//	if (self Isnt Wrapper)
+	//	space.ProcessLinkage( n, FuncLinkageTable, false )
 		|| r_z = Tran_Result( self )
 		Tran_All( self, n, space )
 		if r_z
@@ -1214,6 +1213,7 @@ function FixCnjSub (|Message| exp)
 
 	
 function ASMRegType (|datatypecode|)
+	opt norefcounts
 	if self
 		return .ASMReturn.regtype
 

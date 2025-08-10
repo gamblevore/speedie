@@ -121,6 +121,7 @@ function SafeName (|string|)
 
 
 function LoadModule (|Message| node)
+	opt norefcounts
 	node.obj = self
 	|| NameMsg = node.first
 	if !.cls
@@ -139,8 +140,12 @@ function LoadModule (|Message| node)
 	arg.expectlast$
 	.Source = arg
 	
-	compiler.disammodules!.TryAdd(nil, self, .safename)
+	if ModuleDepth == 0
+		compiler.disammodules!.TryAdd(nil, self, .SafeName)
+	ModuleDepth++
 	.CollectFromNode( .source, SCNode.CurrVisibility )
+	ModuleDepth--
+
 
 
 function GetTheNewer (|SCObject|)
@@ -155,6 +160,7 @@ function GetTheNewer (|SCObject|)
 
 
 module
+	|int|			ModuleDepth
 	|scmodule--|	Curr
 
 	function SCNode.SpaceModule (|message| errplace = nil, |scmodule|)

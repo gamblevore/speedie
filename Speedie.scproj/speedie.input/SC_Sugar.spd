@@ -95,30 +95,43 @@ function message.Tran_QMark
 		tern.prev = MakeDecl("",  "_t", inside, scdeclinfo.temp)
 
 
-
+function message.MainArgDotFix (|message|)
+	opt norefcounts
+	real self
+	while
+		if self == @thg
+			return self
+		require .expect(@dot)
+		self[@emb, 1]
+		self = .first!
+	
+	
 function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
 	
 	|| type = self[@nil]
-	|| name = type.next(@nil)$
+	|| name = type.next(@nil)
+	require name and type
 	|| IsArray = type == @arr
 		.ExpectLast$
-		type = Type.first
+		type = Type.first!
 	
 	|| MaybeNil = Type isarel "?"
-		Type = Type.first
-
-	require type.expect(@thg)
-	|| cls = Compiler[type] #require
+		Type = Type.first!
+	
+	|| InnerType = type.MainArgDotFix$
+	|| cls = Compiler[InnerType] #require
 	if !maybenil
 		maybenil = cls.IsDataTypeOnly	
 	
 	|| prms = [name, type, i.msg]
 	require (prms == 3)
 	check !(found & 1) (arg, "Can't come after arrays")
+	
 	if IsArray
 		arg.AppendMacro(macros.mainargArray.clean, prms)
 		return 1
+	
 	if name != @rel
 		check !(found & 4) (arg, "Can't come after defaults")
 		if MaybeNil
@@ -126,12 +139,14 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 		  else
 			arg.AppendMacro(macros.MainArgbasicReq.clean, prms)
 		return 2
+	
 	name = name[@thg]					#require
 	prms[0] = name
 	|| opp = name.next(@opp, "=")
 	|| l = opp.Next(@Nil)
 		prms <~ l
-	require prms == 4
+	
+	expect (prms == 4) (prms)
 	arg.AppendMacro(macros.MainArgDefault.clean, prms)
 	return 4
 	

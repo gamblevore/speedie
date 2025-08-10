@@ -6,6 +6,7 @@
 	
 struct SavedRegisters 
 	|byte|					Count
+	|uint16|				BasicBlock
 	|uint|					KnownValues
 	|DeclAlterable[32]|		Decls
 	|uint16[32]|			ASM
@@ -14,6 +15,7 @@ struct SavedRegisters
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
 
+		.BasicBlock = sh.BasicBlock
 		.KnownValues = sh.KnownValuesMap
 		|| S = sh.FuncStart
 		for i in 32
@@ -27,6 +29,7 @@ struct SavedRegisters
 
 	function Rewind	(|assembler| sh)
 		sh.KnownValuesMap = .KnownValues
+		sh.BasicBlock = .BasicBlock
 		|| S = sh.FuncStart
 		for i in 32
 			|| r = .asm[i]

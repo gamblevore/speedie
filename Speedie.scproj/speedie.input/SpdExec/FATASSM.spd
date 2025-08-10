@@ -350,7 +350,7 @@ struct FatASM
 		opt inline
 		return .step(1)
 
-	function Reg0 (|uint|)
+	function Output (|uint|)
 		return .prms[0] & 31
 
 	function Reg (|int| i, |int|)

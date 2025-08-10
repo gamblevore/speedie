@@ -11,7 +11,7 @@ extend_module scfunction
 		if item.msgfunc == "JB_FS_GetResult"
 			FastStringOpts.FS(s, item)
 		  else
-			FastStringOpts.String(item)
+			FastStringOpts.StringCleanup(item)
 
 
 module FastStringOpts {
@@ -42,7 +42,7 @@ function FS (|Message| exp, |Message| getresult)
 	.FSRemoved++
 
 
-function String (|Message| str)
+function StringCleanup (|Message| str)
 	opt norefcounts
 	require (str == @str or @sstr or @back) and (str.name == 1)
 	str.obj = typebyte!.typenormal

@@ -33,6 +33,7 @@ datatype ASMReg (uint64)
 		CompilerCreated
 		GlobalMemory
 		PreferEqul
+		Inline
 		OK
 		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
@@ -254,6 +255,7 @@ datatype ASMReg (uint64)
 	function Reg (assigns:|asmreg|, |asmreg|)
 		.reg = value.reg
 		(self is temp) = (value is temp)
+		.fatindex = value.fatindex
 		return self
 
 	function SCDecl.ASMReg (assigns:|asmreg|)

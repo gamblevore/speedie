@@ -7,6 +7,7 @@ struct ASMState
 	|byte|			BranchDepth
 	|byte|			LoopDepth
 	|byte|			InlineDepth
+	|bool|			TailInlineable
 
 
 struct Assembler
@@ -24,7 +25,6 @@ struct Assembler
 	|int|						CurrFuncGrab
 	|bool|						Inited
 	|bool|						NeedsRework
-	|bool|						TailInlineable
 
 	|scfunction--|				Out
 
@@ -357,7 +357,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 34156
+			if trap == 133482
 		  else
 			opt inline
 		
@@ -415,7 +415,7 @@ struct Assembler
 		.StackSize = 0
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
-		.TailInlineable = true
+		.state.TailInlineable = true
 		.InlineDepthLimit = 3
 		.BasicBlock = 0
 		.VDecls = 1
@@ -450,7 +450,8 @@ struct Assembler
 			debugger !.fn.ASMReturn
 			|| dl = .fn.Source!.DeepLast
 			.closevars(1, dl)
-			if !ASMType.ReturnOpt(self, 0, 0)
+			|asmreg| dest = nil
+			if !ASMType.ReturnOpt(self, dest)
 				dl.RET()
 		.Optimise
 

@@ -71,8 +71,9 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	.Vdecls = vd
 	
 	check ((v < 32) and !(vd & .vtemps)) (exp, "Too many registers in use. No space for result.")
-	if (dest is ExitAtAll) and .state.return
-		v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
+	if (dest is ExitAtAll)
+		if .state.return
+			v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
 	dest.reg = v
 	dest.µtype = fn.ASMRegType
 	dest = dest.ReallySimplify
@@ -111,15 +112,16 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 				dest = .declareme(prms, type)
 	
 	if dest isnt ExitFunction
-		.TailInlineable = false
-	  elseif .state.InlineDepth == 0
-		.TailInlineable = true
+		.state.TailInlineable = false
+//	  elseif .state.InlineDepth == 0
+//		.TailInlineable = true
 	
 	|int| D = ++.state.InlineDepth
 	.DeepestInline = D max .DeepestInline
 	
 	dest = dest.simplify
 	dest.µtype = fn.ASMRegType
+	(dest is Inline)
 	.state.fn = fn
 	.state.Return = dest
 	.state.ParentVars = .openvars
@@ -220,7 +222,9 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 	
 function CurrGain (|&fatasm| Start, |int|)
 	|| C = .curr
+	todo "!"
 	while Start < C
+		#!use start.GuessSize instead!
 		rz += start.exists
 		start++ 
 		
