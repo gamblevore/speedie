@@ -94,6 +94,9 @@ Module MZLab
 
 target minilib {
 struct CompressionStats 
+	|duration| Duration
+	|int|  In
+	|int|  Out
 	|bool| Live
 	linkage:cpp_part MzSt
 	function Start (|&compressionstats|)

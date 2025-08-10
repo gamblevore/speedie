@@ -5,6 +5,9 @@
 
 
 module Platform
+	function BackTrace (|&nil| space, |$int| size, |&cstring|) 
+		cpp_wrapper JB_App__BackTrace
+
 	function Name (|string|)
 		cpp_wrapper JB_Platform
 

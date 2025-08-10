@@ -863,7 +863,7 @@ function MakeMainFunc (|message|)
 	|| f = compiler.MainFunc 
 		f.blindcasts = errorseverity.error // this for now.
 		return f.sourcearg
-	"Compiling as library."
+	"Compiling as library!"
 	Options.ProjectisLibrary = true
 	return .program.CollectStr( "main:\n" ).last				// mainproj.collect
 

@@ -1,4 +1,6 @@
-		
+
+target !minilib {
+
 class SpdProcess (Process)
 	linkage
 		cpp_part Proc
@@ -252,10 +254,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			cpp_wrapper
 
 
-		function BackTrace (|&nil| space, |$int| size, |&cstring|) 
-			cpp_wrapper JB_App__BackTrace
-
-
 		function string.Spawn (|[string]| Params, |spdprocess|)
 			return SpdProcess.Spawn(self, params)		
 		
@@ -331,3 +329,4 @@ To fork and talk to PicoMsg-based apps that aren't speedie, use pico.spawnfork()
 
 prototype SpdDeathActionFn
 
+}

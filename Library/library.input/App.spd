@@ -135,7 +135,7 @@ function PrintStackTrace
 render StackTrace (|int| skip = 2)
 	|(&nil)[128]| arr
 	|| size = –count arr
-	|| strs = SpdProcess.BackTrace(&arr[0], size)
+	|| strs = platform.BackTrace(&arr[0], size)
 	for i in skip to size-1 
 		fs <~ strs[i]
 		fs <~ '\n'
