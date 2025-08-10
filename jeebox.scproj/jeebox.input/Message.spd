@@ -1014,6 +1014,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	function Next (|syntax| Need, |Message|)
 		Opt NoRefCounts
 		cpp_part NextOf
+		nil checker
 		if (self)
 			|| ch = .next
 			if ch and (!need or ch==Need)
