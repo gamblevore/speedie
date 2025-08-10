@@ -204,7 +204,8 @@ class String
 		nil checker
 		cpp_Wrapper JB_Str_HexIntegerSection
 	
-	function ParseInt (|Message| Where=nil, |int64|) 
+	function ParseInt (|Message| Where=nil, |int64|)
+		// could be nice to add KB, MB, GB, TB suffixes to JB_Str_TextIntegerValid
 		nil checker
 		cpp_Wrapper JB_Str_TextIntegerValid
 	

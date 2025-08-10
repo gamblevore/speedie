@@ -561,6 +561,17 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				return "~\AppData\Roaming" // whatever
 			target lin
 				return "~/.config"
+		
+		module Existing
+			helper MainArg (|int| Pos, |string| name, |file|)
+				return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
+		module Jeebox
+			helper MainArg (|int| Pos, |string| name, |messageroot|)
+				return File.existing.MainArg(pos, name)$.parse
+		module Output
+			helper MainArg   (|int| Pos, |string| name, |faststring|)
+				return file.MainArg(pos, name)$.Out
+
 
 	function AnyDate (|date|)
 		return .created ?? .modified

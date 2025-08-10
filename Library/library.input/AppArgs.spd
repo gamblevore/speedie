@@ -53,7 +53,12 @@ function Message.ArgValue (|string|)
 
 
 
-helper @int.MainArg         (|int| Pos, |string| name,  |int|)
+helper @int.MainArg         (|int| Pos, |string| name, |int|)
+	|| big = int64.mainarg(pos, name)
+	expect (big <= int.max and big >= int.min) ("Int out of range")
+	return big
+
+helper @int64.MainArg         (|int| Pos, |string| name,  |int64|)
 	return string.MainArgSub(Pos, name, "integer")$.int
 
 helper @bool.MainArg        (|int| Pos, |string| name,  |bool|)
@@ -71,28 +76,17 @@ helper @float.MainArg       (|int| Pos, |string| name, |Float64|)
 helper @file.MainArg		(|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.file
 
-helper @ExistingFile.MainArg (|int| Pos, |string| name, |file|)
-	return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
-
-helper @JeeboxFile.MainArg   (|int| Pos, |string| name, |messageroot|)
-	return ExistingFile.MainArg(pos, name)$.parse
-
-helper @OutputFile.MainArg   (|int| Pos, |string| name, |faststring|)
-	return file.MainArg(pos, name)$.Out
-
-
-// these roles really should be submodules on the file-module.
-// maybe we can do this now? we do have some kinda name spaces now...
-// like these:
-//			module file.Jeebox: helper MainArg (...)
-// 			module file.Output: helper MainArg (...)
-//			module file.Existing: helper MainArg (...)
-//			module file.Data: helper MainArg (...)
-
-role ExistingFile (file)
-role JeeboxFile   (file)
-role OutputFile   (faststring)
-
+//extend_module File
+// should be possible.
+//	module Existing
+//		helper MainArg (|int| Pos, |string| name, |file|)
+//			return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
+//	module Jeebox
+//		helper MainArg (|int| Pos, |string| name, |messageroot|)
+//			return File.existing.MainArg(pos, name)$.parse
+//	module Output
+//		helper MainArg   (|int| Pos, |string| name, |faststring|)
+//			return file.MainArg(pos, name)$.Out
 
 helper @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
