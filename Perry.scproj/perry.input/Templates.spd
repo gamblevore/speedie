@@ -31,7 +31,6 @@ main
 pwd '.'
 env
 	setting="value"
-*/
 `
 		
 
