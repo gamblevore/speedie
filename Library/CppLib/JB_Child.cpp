@@ -5,6 +5,7 @@
 #ifdef AS_LIBRARY
 
 extern "C" {
+	bool JB_NoExitOnCrash;
 	void JB_Child_Stub() {}
 	void JB_RemoveHandlers() {};
 }
