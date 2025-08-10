@@ -1,6 +1,6 @@
 
 // seems good?
-main (|existingfile| folder, |string| Func, |string| From, |String| To)
+main (|file.existing| folder, |string| Func, |string| From, |String| To)
 	app.Replace(folder)
 
 

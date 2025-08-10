@@ -20,7 +20,7 @@ example:
 |dictionary?|			Types
 |int|					Total
 
-main (|[existingfile]| files)
+main (|[file]| files)
 	if !files
 		printline app.Usage
 		return 0
@@ -49,7 +49,7 @@ function App.FindRemover (|string|)
 		
 
 function app.Collect (|file| f)
-	require	f
+	require	f.MustExist
 	if f.IsDir
 		for c.files in f
 			if c.visible

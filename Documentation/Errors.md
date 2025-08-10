@@ -92,7 +92,7 @@ Jeebox can parse XML files, and JSON files too. Mostly aimed at importing and co
 
 Error handling is a skill to get right. Lets show some speedie code and then convert it to simpler code, to see how much worse the simple way is.
     
-    main (|ExistingFile| F)
+    main (|File.a| F)
         || jobs = f.parse                  #require
         || list = jobs[@tmp, "jobs"][@arg] #require
         for job in list
@@ -140,11 +140,11 @@ Why is it so much worse?
 + Many functions (like `list[@tmp, "jobs"]`) create errors if something goes wrong... so we need to replicate that too.
 + We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
 + We need "`StillOK`" booleans in many places, to replicate how `stderr` previously was catching errors generated in subfunctions.
-+ As a bonus, I showed the main arguments feature: `main (|ExistingFile| F)`. This actually does error-checking! It requires that we pass a file that exists, if not, the app will exit before running the first line of code. "main arguments" allows you to specify the inputs of your program, clearly and cleanly. It is very useful for demos, but utils and even big apps can use it.
++ As a bonus, I showed the main arguments feature: `main (|File.Existing| F)`. This actually does error-checking! It requires that we pass a file that exists, if not, the app will exit before running the first line of code. "main arguments" allows you to specify the inputs of your program, clearly and cleanly. It is very useful for demos, but utils and even big apps can use it.
 
 Take a look again at the first example. Its just **sooo** much better. Everything does what it is meant to do. It is simple, readable... and works better.
 
-    main (|ExistingFile| F)
+    main (|File.Existing| F)
         || jobs = f.parse                  #require
         || list = jobs[@tmp, "jobs"][@arg] #require
         for job in list

@@ -42,7 +42,7 @@ function string.ColumnHex (|int| linelen = 16, |int| chunklen = 2, |string|)
 	return fs
 
 
-main (|existingfile| file)
+main (|file.existing| file)
 	|| data = file.ReadAll
 		printline data.ColumnHex
 	

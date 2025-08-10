@@ -74,7 +74,7 @@ Let's start with an XML data-bank, the first thing we want to do is convert it t
 First, lets test that we can even read a file at all. Lets take the file via command-line arguments. Lets save our code with the name "`booksearch.spd`".
 
     #!/usr/local/bin/spd
-    main (|ExistingFile| file)
+    main (|File.Existing| file)
         || jb = file.parse
         jb.xmltojeebox
         printline jb
@@ -102,7 +102,7 @@ We could do searching in the file, but first a few safety checks. Lets only do t
 Altogether that makes this:
 
     #!/usr/local/speedie
-    main (|ExistingFile| File)
+    main (|File.Existing| File)
         || jb = File.parse
         if file isa "xml"
             jb.XMLToJeebox
@@ -217,7 +217,7 @@ I'll also clean up the code a little... just use the final code. Here is the fin
         
     #!/usr/local/speedie
     
-    main (|ExistingFile| File)
+    main (|File.Existing| File)
         || jb = File.parse
         if file isa "xml"
             jb.XMLToJeebox

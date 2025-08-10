@@ -10,7 +10,7 @@ app.usage = "Usage: size path [...]
 |[message]| Found
 
 
-main (|[existingfile]| FileList)
+main (|[file.existing]| FileList)
 	if !FileList
 		Quit app.Usage
 	

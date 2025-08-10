@@ -4,7 +4,7 @@
 |dictionary?|			Types
 
 
-main (|existingfile| FindPath, |string| Search)
+main (|file.existing| FindPath, |string| Search)
 	expect (Search) ("Requires a search string")
 	types = dictionary.new
 	types!["spd"] = "x"
@@ -16,16 +16,19 @@ main (|existingfile| FindPath, |string| Search)
 		  else
 			types = t.Dict('/')
 	
-	app.Collect(FindPath, Search)
+	|| found = app.Collect(FindPath, Search)
+	if !found
+		"No files contain: $search"
 
 
-function app.Collect (|file| f, |string| pattern)
+function app.Collect (|file| f, |string| pattern, |int|)
 	require	f
 	if f.IsDir
 		for c.files in f
 			if c.visible
-				.collect(c, pattern)
+				rz+=.collect(c, pattern)
 	  elseif !f.isdir and (!types or types[f.ext])
 		if f.ReadAll contains pattern
 			printline f
+			rz++
 

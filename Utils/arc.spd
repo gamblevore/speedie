@@ -4,7 +4,7 @@
 // Just an example project!
 || Excludes = "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal"  /  ','
 
-main (|existingfile| input)
+main (|file.existing| input)
 	"Excluding: $Excludes\n"
 	
 	|| out = (app.Archive(input), app.Unarchive(input))(input.IsDir)

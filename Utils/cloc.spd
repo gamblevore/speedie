@@ -14,7 +14,7 @@ app.usage = "Usage: cloc path [...]
 
 
 
-main  (|[existingfile]| files)
+main  (|[file.existing]| files)
 	if !files
 		Quit app.Usage
 	counts.Init(app["types"])

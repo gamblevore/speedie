@@ -1,7 +1,7 @@
 #!/usr/local/bin/spd
 
 
-main (|ExistingFile| A, |ExistingFile| B)
+main (|file.existing| A, |file.existing| B)
 	|| StrA = A.ReadAll
 	|| StrB = B.ReadAll
 	

@@ -12,7 +12,7 @@
 // still its a good test of speedie! Its working very well!
 
 
-main (|existingfile| file)
+main (|file.existing| file)
 	|| orig = file.ReadAll			#require
 	|Compressor| C
 	C.init

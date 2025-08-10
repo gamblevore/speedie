@@ -1,7 +1,7 @@
 #!/usr/local/bin/spd
 file:///usr/local/speedie/Documentation/Messages.md						 // docs here
 
-main (|ExistingFile| File)
+main (|file.existing| File)
     || jb = File.parse
     if file isa "xml"
         jb.XMLToJeebox
