@@ -70,14 +70,14 @@ In fact, if you are allocating objects **just** to pass around multiple boolean 
 
 ### Combine multiple-passes
 
-    function ProcessItems (|[item]| list)
-        for t in list
+    function ProcessItems (|[item]| array)
+        for t in array
             t.TestForSomething
-        for t in list
+        for t in array
             t.TestSomethingElse
 
         // this is faster
-        for t in list
+        for t in array
             t.TestForSomething
             t.TestSomethingElse
 
@@ -87,17 +87,23 @@ It may seem obvious, but its easy to forget this in the middle of a lot of late-
 
 ### Linked Lists Are Faster Than Arrays!
 
-Linked lists, are (usually) faster than arrays! Depending on what you are doing, of course, and assuming linear access.
+In speedie, the linked-list class is simply called "[`List`](lists.md)". (The "[`message`](message.md)" class is based on [`List`](lists.md).)
 
-In general, object arrays are rarely the most optimal approach.
+So... lists are faster than arrays. This depends on a few things:
 
-In speedie, the linked-list class is simply called "[List](lists.md)".
+    * That it makes sense at all
+    * Linear access
+    * You need only 1 list.
+
+In these cases, a list should be faster.
 
 For example, in Speedie, I have a few lists of "messages" (parsed Jeebox) that need later processing. I remove them from whereever they were... and place them on a list. This list, I can later process. This saves me from having to create an array to store things that need later processing.
 
-The nice thing about linked-lists, is that the next (or prev, parent and child) items are all directly accessable. Whereas for processing an array, three extra memory reads must occur to get the next item, which is slower. Plus you need two extra variables to check (the array itself, and the array index).
+The nice thing about linked-lists, is that the next (or prev, parent and child) items are all directly accessable. Whereas for processing an array, two extra memory locations must be visited, to get the next item. Plus you need two extra variables to check (the array itself, and the array index).
 
-Again... don't blindly do this. You'll slow your code and blame me. Just do it where it makes sense. If the object never made sense to be a list in the first place, don't do it!
+Again... don't blindly convert arrays to lists. In fact, don't blindly do anything. If you are a blind-doer... don't blame me for anything you ever do.
+
+I'm not telling you what to do. Unless it comes from within it won't be helpful.
 
 
 
@@ -184,7 +190,7 @@ Many languages still manage to mess this up, by indexing your UTF-8 strings on a
 
 Speedie is smarter, because it accesses strings on a byte-basis. This is faster. And it "just works", because of how UTF-8 was intelligently designed. [utf8everywhere.org](http://utf8everywhere.org) 
 
-Languages that do this the wrong way, make string searching impossibly slow, any it can only get reasonably fast by using caching techniques, which is just silly, over-complex and never gets the original speed back.
+Languages that do this the wrong way, make string searching impossibly slow, any it can only get reasonably fast by using caching techniques, which is just silly, over-complex, buggy, bloated, and never gets the original speed back.
 
 
 
@@ -196,7 +202,7 @@ Use a dictionary instead of a large if/else table on matching strings. You can e
 
 If your table is large enough, this can help. (Not if its like only 2 or 3 cases, but more like 10 or more).
 
-Another possibility, is to actually place function pointers **on** the actual object to be processed. Perry uses this, and the Speedie GUI system does this a lot too. Makes life a lot easier.
+Another possibility, is to actually place function pointers **on** the actual object to be processed. Perry uses this, and Speedie's GUI does this a lot too. Makes life a lot easier.
 
 
 
@@ -250,11 +256,11 @@ Tail functions are usually a very good optimisation trick. Sometimes they don't 
     function ReturnLengthIfNameIsCorrect (|string| s, |int|)
         || x = s.length
         if x > 4
-            return innerfunc(s, x) // tail call!
+            return InnerFunc(s, x) // tail call!
         return -1
     
     function InnerFunc (|string| s, |int| x, |int|)
-        if s == "elephant" or "horse"
+        if First == "elephant" or "horse"
             return x
         return -1
 
@@ -262,15 +268,15 @@ This works, because the compiler doesn't have to spend so much time popping and 
 
 It works even better, if the variables are all in the same location! For example, this, doesn't tail optimise so well.
 
-    function ReturnLengthIfNameIsCorrect (|string| s, |int|)
-        || x = s.length
-        if x > 4
-            return innerfunc(x, s) // compiler has to move registers around
+    function ReturnLengthIfNameIsCorrect (|string| First, |int|)
+        || Second = First.length
+        if Second > 4
+            return InnerFuncButSlower(Second, First) // compiler has to move registers around
         return -1
     
-    function InnerFunc (|int| x, |string| s, |int|)
-        if s == "elephant" or "horse"
-            return x
+    function InnerFuncButSlower (|int| Second, |string| First, |int|)
+        if First == "elephant" or "horse"
+            return Second
         return -1
 
 
