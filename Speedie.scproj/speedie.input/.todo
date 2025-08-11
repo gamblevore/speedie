@@ -2,6 +2,7 @@
 
 
 Bugs:
+	* "as" should return nil and make no error
 	* SquaresAtByte for loop seems badly optimised? tran_for failing?
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* &uint... allow &int in c++ gen
