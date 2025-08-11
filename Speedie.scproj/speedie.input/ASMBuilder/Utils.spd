@@ -21,7 +21,7 @@ function message.ASMDecl (|SCDecl!|)
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
-		if p ~= 45395
+		// if p ~= 45395
 		if  exp.Position < 0
 		p[0] = nil
 		._curr = p + 1

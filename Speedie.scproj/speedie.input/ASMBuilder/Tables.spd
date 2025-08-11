@@ -182,6 +182,15 @@ function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMRe
 	return zzeerrooo.reg(dest)
 
 
+function FinalDecrements (fn_asm)
+	return nil
+	if "WriteDeclFull".trap and (exp contains "SC_Decl_WriteType")
+	|| D0 = .SafeDecr
+		if d0.reg != dest.reg					// problem
+	|| D1 = .decrObj
+	|| D2 = .decrObj
+
+
 function Return (fn_asm)
 	opt norefcounts
 	|| L = .state.return						// can remove constants, so try first
@@ -196,17 +205,11 @@ function Return (fn_asm)
 	if ReturnOpt(self, dest)
 		return asmreg.exit
 	
-	|| D0 = .SafeDecr
-		if d0.reg != dest.reg					// problem
-	|| D1 = .decrObj
-	|| D2 = .decrObj
-	
-	|ind| K = -1								// we shouldn't be able to inline consts from other blocks!
-	if !D0
-		K = .Const(dest, 8, true)
+	FinalDecrements(self, exp, Dest)	
+	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0
 	if dest.reg and !.out.ReturnType
-	|| fat = exp.RET(dest*!HasK, D1, D2, (D0!=nil)|int|, K * HasK)
+	|| fat = exp.RET(dest*!HasK, nil, nil, nil, K * HasK)
 	fat.µRefCount++
 	return fat * asmreg.Exit
 	
