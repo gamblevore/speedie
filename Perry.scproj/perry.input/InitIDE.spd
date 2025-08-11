@@ -298,7 +298,7 @@ extend PerryIDE
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
 			.IsTree			= true
-			.NoSeps			= true
+			.DontDrawSeparators	= true
 			.tooltip		= self.SearchArea.Tooltip			
 			.OneAlwaysSelected = true
 			.UseColorScheme	= true
@@ -354,7 +354,7 @@ extend PerryIDE
 			isnt DrawsFocus
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
-			.NoSeps			= true
+			.DontDrawSeparators	= true
 			.tooltip		= "The variables in the current function"
 			.UseColorScheme	= true
 			.ID				= "Variables"
@@ -370,7 +370,7 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.RowHeight		= .rowheight + 3
-			.NoSeps			= true
+			.DontDrawSeparators	= true
 			.tooltip		= "The function call stack"
 			.UseColorScheme	= true
 			.ID				= "Stack"
@@ -483,9 +483,9 @@ extend PerryIDE
 		.progress.size =    0~before for 60  by  3~inside
 		
 		.RunButton.ExpandOnMouseOver = 1
-		.buildbutton.ExpandOnMouseOver = 1
-		.progress.ExpandOnMouseOver = 1
-		.currfilename.ExpandOnMouseOver = 1
+		.BuildButton.ExpandOnMouseOver = 1
+		.Progress.ExpandOnMouseOver = 1
+		.CurrFileName.ExpandOnMouseOver = 1
 		.FunctionMenu.ExpandOnMouseOver = 1
 		.ProjectTabs.ExpandOnMouseOver = 2
 	

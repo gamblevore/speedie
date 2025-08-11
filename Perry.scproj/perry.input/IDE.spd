@@ -605,30 +605,31 @@ class PerryIDE (Window)
 			.SaveEditing(documentstate.saving)
 			return true
 		|| NumKey = key.IsNumber
-			if NumKey == 9
-				.ASMButton.Click
-				return true
-			if NumKey == 8
-				.flip(.ProductOut)
-				return true
-			if NumKey == 7
-				.flip(.SpeedieText)
-				return true
-			if NumKey == 6
-				return .FlipJeeboxField			
-			if NumKey == 5
-				return .StrongView(.ViewLog)
-			if NumKey == 4
-				return .StrongView(.ViewDebugger)
-			if NumKey == 3
-				return .SaveAndShowErrors
-			if NumKey == 2
-				return .StrongView(.ViewSearch)
-			if NumKey == 1
-				return .StrongView(.ViewFiles)
-			if NumKey == 0
-				.ViewTextModeSwap
-				return true
+			ifn keys.Shift or keys.option
+				if NumKey == 9
+					.ASMButton.Click
+					return true
+				if NumKey == 8
+					.flip(.ProductOut)
+					return true
+				if NumKey == 7
+					.flip(.SpeedieText)
+					return true
+				if NumKey == 6
+					return .FlipJeeboxField			
+				if NumKey == 5
+					return .StrongView(.ViewLog)
+				if NumKey == 4
+					return .StrongView(.ViewDebugger)
+				if NumKey == 3
+					return .SaveAndShowErrors
+				if NumKey == 2
+					return .StrongView(.ViewSearch)
+				if NumKey == 1
+					return .StrongView(.ViewFiles)
+				if NumKey == 0
+					.ViewTextModeSwap
+					return true
 		if key is p or backslash
 			.CommandsMenu.Click
 			return true
