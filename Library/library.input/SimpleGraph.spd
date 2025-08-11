@@ -12,15 +12,16 @@ class SimpleGraph (dictionary)
 		.name = name
 	
 	syntax append (|SimpleGraph| other, assigns:|bool|value=true)
-		|uint64| A = .ObjectID
-		|uint64| B = other.ObjectID
-		if (A > B)
-			A >>= 32
-		  else
-			B >>= 32
-		|uint64[1]| Data
-		Data[0] = A ||| B
-		|| str = string.Copy(&Data[0], platform.PointerBytes)
+		// We want space for both things. two 32-bit values in 1 string.
+		
+		|| A = .ObjectID
+		|| B = other.ObjectID
+		|| x = (a > b)|int|
+		|uint[2]| Data
+		Data[x] = a
+		data[1-x] = b
+		|| D1 = &Data[0]
+		|| str = string.Copy(D1|&byte|, 8)
 		other[str] = (self, nil)(value)
 		self[str] = (other, nil)(value)
 	
