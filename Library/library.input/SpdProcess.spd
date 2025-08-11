@@ -234,7 +234,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				return p
 
 			if expect
-				error "Application parent lost connection"
+				error "Parent lost connection"
 
 
 
