@@ -24,6 +24,7 @@ class GUIControl (list)
 	|uint16| 					_TransitionFraction
 	|movecode| 					AttachedFrom
 	|byte|						TextAlteredForDraw
+	|byte|						Padding
 	|byte|						ExpandOnMouseOver
 	|bool|						PostLoaded
 	|bool|						ClickOutsideCloses

@@ -8,9 +8,10 @@ class Menu (ListView)
 	|bool|								IsSearchMenu
 	
 	
-	constructor (|guicontrol| p, |GUIKeyEvent| keys, |GUIListEvent| ret)
+	constructor (|guicontrol| p,  |GUIKeyEvent| keys,  |GUIListEvent| ret)
 		super.constructor(p, nil, ret)
 		isnt visible
+		.Padding = 5
 		.MultiSelection = false
 		.OnKeyDown = keys
 		.ClipMode = ControlClipMode.SlideBackInWindow

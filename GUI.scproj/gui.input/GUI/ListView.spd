@@ -519,7 +519,10 @@ class ListView (GUIControl) {
 		|| c = .FindClickedCell(P)
 			|| r = c.row
 			if (r is disabled)
-				cc = SystemCursor.no
+				if cc == SystemCursor.hand
+					cc = SystemCursor.arrow // degrade to arrow, rather than all the way down.
+				  else
+					cc = SystemCursor.no
 			  elseif (r is editable)
 				if r is Selected
 					cc = SystemCursor.IBeam

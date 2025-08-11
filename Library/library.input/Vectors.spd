@@ -224,7 +224,7 @@ datatype ivec4
 	syntax Equals (|ivec4| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w)
 	
-	operator ± (|int|i, |ivec4|)
+	operator ± (|int| i, |ivec4|)
 		cpp_part Shrink
 		return (.x+i, .y+i, .z-i, .w-i)
 	
