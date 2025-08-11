@@ -223,8 +223,8 @@ function CurrGain (|&fatasm| Start, |int|)
 	|| C = .curr
 	todo "!"
 	while Start < C
-		#!use start.GuessSize instead!
-		rz += start.exists
+//		#!use start.GuessSize instead!
+		rz += start.GuessSize
 		start++ 
 		
 
