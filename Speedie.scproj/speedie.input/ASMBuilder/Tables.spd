@@ -312,11 +312,12 @@ function SetRel (fn_asm)						// function relset (
 	if X
 		return .µInto(B, X)
 
-	// probably x.y = z, or x[y] = z 
-	|| Src = .µGetReal(B) 
-//	(dest isnt RealConst)
-	(src is SetAlways)
-	return .µ(A, src)
+	// Probably x.y = z, or x[y] = z 
+
+	|| Src = .µGetReal(B, nil)
+	(Src is SetAlways)
+	return .µ(A, Src)
+
 
 
 function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
@@ -394,7 +395,7 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	|| f = exp.first!
 	|| d = f.asmdecl
 		
-	|| base = .µGetReal(f, ASMReg.AddrRequest)				// x = a.b[0]
+	|| base = .µGetReal(f, nil, ASMReg.AddrRequest)				// x = a.b[0]
 	|| sc = exp.Second.first!
 	|| vara = .µGetASM(sc)
 

@@ -210,9 +210,11 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 	opt norefcounts
 	|| p = prms.first!
 
-	for a in .fn.Args			
-		|| v = .InlineVar(prms, p, a)
-		v ?= .µGetReal(p, nil, IsLeaf and a isnt altered)
+	for a in .fn.Args
+		if "grab2".trap
+		|| V = .InlineVar(prms, p, a)
+		|| R = ASMReg.Discard * (IsLeaf and a isnt altered)
+		v ?= .µGetReal(P, a, R)
 		v = .UpdateInlineReg(V, a)
 		p = p.next!
 

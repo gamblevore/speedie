@@ -120,9 +120,10 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	if dcl.default isthing "nil"
 		dcl.NilDeclared = nilstate.optional
 	
-	if dcl.PointerCount
-		|| n = (func.args.length+(func is constructor)) // hehe 😛 👻
-		func.altersparams |= 1<<n
+// we can no longer get pointers to registers!
+//	if dcl.PointerCount
+//		|| n = (func.args.length+(func is constructor)) // hehe 😛 👻
+//		func.altersparams |= 1<<n
 
 	func.args <~ dcl
 	check (func.args <= 8)    (self, "Too many parameters defined. (8 max)")

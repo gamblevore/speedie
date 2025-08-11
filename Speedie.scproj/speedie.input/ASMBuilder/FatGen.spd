@@ -361,6 +361,7 @@ function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
+	if "AskNop".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BFLG, self)
 	rz.dest(0, r1, a)

@@ -12,7 +12,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 	if fn == Compiler.RefSetRef
 		|| DestMsg = prms.first!
-		|| A = .µGetreal(DestMsg, ASMReg.AddrRequest)
+		|| A = .µGetReal(DestMsg, nil, ASMReg.AddrRequest)
 		|| P = prms.second!
 		|| B = .µ(P, ASMReg.AddrRequest)
 		if A iz B

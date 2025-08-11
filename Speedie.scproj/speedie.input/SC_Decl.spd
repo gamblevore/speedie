@@ -184,6 +184,8 @@ class SCDecl (SCObject) {
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.mu.info = .mu.info.set(d, Value)	
+		if self ~= "ToNop"
+			if self is alteredinbranch
 
 	function Sanity 
 		// if .name ~= "&JB_ListData"

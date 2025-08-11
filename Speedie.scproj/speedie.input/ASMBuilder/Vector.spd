@@ -31,7 +31,7 @@ extend Assembler
 		|asmreg[4]| VV
 		|| Count = 0
 		for s.fast in exp
-			vv[Count++] = .µGetReal(s)
+			vv[Count++] = .µGetReal(s, nil)
 		
 		|| T = vv[0].µType
 		Count += (count == 3)

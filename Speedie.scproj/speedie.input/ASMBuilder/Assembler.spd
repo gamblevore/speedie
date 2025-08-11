@@ -228,9 +228,9 @@ struct Assembler
 		return true
 	
 	
-	function Nop (|FATASM| Fat)
+	function Nop (|FATASM| ToNop)
 		opt inline
-		return .nopsub(fat, false, 0)
+		return .nopsub(ToNop, false, 0)
 	
 	
 	function SoftNop (|FATASM| Fat)
@@ -273,9 +273,9 @@ struct Assembler
 				.NopSub(f, soft, depth)
 	
 	
-	function AskNop (|fatasm| f)
-		if f.µRefCount <= 0
-			.nop(f)	
+	function AskNop (|fatasm| ToNop)
+		if ToNop.µRefCount <= 0
+			.nop(ToNop)
 	
 	
 	function SoftNopRange (|fatasm| Start, |fatasm| After)
@@ -294,12 +294,12 @@ struct Assembler
 		return .Exists(dest, X, exp)
 	
 	
-	function µGetReal (|message| exp,  |asmreg| ModeOnly=nil,  |bool| CanReuse=true,  |asmreg|)
+	function µGetReal (|message| exp,  |scdecl| A, |asmreg| ModeOnly=nil,  |asmreg|)
 		|| o = .OpenVars
-		|| v = .DeclareMe(exp)
-		(v as=ModeOnly)
-		if !CanReuse
-			return .µInto(exp, v)
+		|| v = .DeclareMe(exp, a)
+		(v as= ModeOnly)
+		if ModeOnly is Discard
+			return .µInto(exp, v asnt asmreg.discard)
 
 		rz = .µGetASM(exp, v)
 		if rz.reg != v.reg
@@ -323,6 +323,7 @@ struct Assembler
 			|| f = r.fat
 				return .ReDest(f, dest)
 		
+		if "asknop".trap
 		|| dest2 = r.into(dest)
 		if dest is preferequl
 			return .Exists(dest, r, exp)
@@ -339,7 +340,7 @@ struct Assembler
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
 		rz = asmreg()
 		(rz is AddrNeed) = (a is Reference)
-		rz = .µGetReal(exp, rz)
+		rz = .µGetReal(exp, nil, rz)
 		if (a is reference  and  rz isnt containsaddr)
 			error (exp, "Failed to get address of expression. (Compiler *should* have caught this in transform phase)")
 		
@@ -357,7 +358,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 133482
+			if trap == 1091
 		  else
 			opt inline
 		

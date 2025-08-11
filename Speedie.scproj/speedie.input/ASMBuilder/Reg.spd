@@ -23,7 +23,7 @@ datatype ASMReg (uint64)
 		Discard
 		Set
 		Declaration
-		NotAlteredInbranch
+		NotAlteredInBranch
 		NoScale
 		ContainsAddr
 		Textual
@@ -259,6 +259,7 @@ datatype ASMReg (uint64)
 		return self
 
 	function SCDecl.ASMReg (assigns:|asmreg|)
+		if !value.reg // oof?
 		value.µType = .mu.DataType
 		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck
