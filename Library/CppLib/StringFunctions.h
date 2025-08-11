@@ -26,7 +26,7 @@ JB_String* Str_Shrink(JB_String* self, int Length);
 JB_String* JB_Str_Render(JB_String* self, FastString* fs);
 JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
 JB_StringC* JB_StrC( const char* c );
-JB_String* JB_Str_CopyFromPtr( uint8* Addr, int N );
+JB_String* JB_Str_CopyFromPtr( const void* Addr, int N );
 JB_String* JB_Str_CopyFromCString( const char* C );
 JB_String* JB_Str_Copy( JB_String* self );
 void JB_Str_Destructor(JB_StringShared* self);

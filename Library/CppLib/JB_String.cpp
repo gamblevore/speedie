@@ -88,14 +88,7 @@ void JB_BA_Destructor( JB_String* self ) {
 }
 
 
-//JB_String* JB_Str_Constructor( JB_String* self ) {
-//	JB_New2(JB_String);
-//    * self = {};
-//    return self;
-//}
-
-
-JB_String* JB_Str_CopyFromPtr( uint8* Addr, int N ) {
+JB_String* JB_Str_CopyFromPtr( const void* Addr, int N ) {
     JB_String* e = JB_Str_New( N );
     if (e and N) {
         CopyBytes(Addr, e->Addr, N);
@@ -105,7 +98,7 @@ JB_String* JB_Str_CopyFromPtr( uint8* Addr, int N ) {
 
 JB_String* JB_Str_CopyFromCString( const char* C ) {
 	if (C)
-		return JB_Str_CopyFromPtr((uint8*)C, (int)strlen(C));
+		return JB_Str_CopyFromPtr(C, (int)strlen(C));
 	return 0;
 }
 
