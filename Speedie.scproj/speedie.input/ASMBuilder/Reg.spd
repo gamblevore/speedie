@@ -15,12 +15,12 @@ datatype ASMReg (uint64)
 		Temp = 1024 // sigh.
 		(1<<16)		// starting point
 		Negate
+		Discard
 		Param
 		FromExistingVar
 		FromZeroMemory
 		AlreadyNegated
 		Alternate
-		Discard
 		Set
 		Declaration
 		NotAlteredInBranch
@@ -35,6 +35,7 @@ datatype ASMReg (uint64)
 		PreferEqul
 		Inline
 		OK
+		GetReal		= Param ||| Discard
 		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
 		RealConst   = [ConstInput, ConstOutput]
@@ -234,6 +235,7 @@ datatype ASMReg (uint64)
 		rz = self asnt AddrNeed
 		rz = rz as ContainsAddr
 	
+	
 	function Reg (|int|)
 		return (self|uint64| >> 11)&31
 	
@@ -252,6 +254,13 @@ datatype ASMReg (uint64)
 		target debug: if .reg != Bugged // what?
 		return self
 
+
+//	function RegWithIndex (assigns:|uint|, |asmreg|)
+//		// maybe better to just get fatasm.RegInput(|asmreg|) and use the function below?
+//		.reg = value
+//		.fatindex = (value<<1)>>16 // seems ok?
+
+	
 	function Reg (assigns:|asmreg|, |asmreg|)
 		.reg = value.reg
 		(self is temp) = (value is temp)

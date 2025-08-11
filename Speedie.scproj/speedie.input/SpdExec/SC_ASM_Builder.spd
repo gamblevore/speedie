@@ -15,7 +15,7 @@ function FatASM.AddRegParam (|message| src, |int| write)
 
 
 datatype µParam (uint16)
-	linkage: cpp_class ASMParam
+	linkage: cpp_class MuParam
 	
 	syntax is (|µparam| p, |bool|)
 		return (self & p)

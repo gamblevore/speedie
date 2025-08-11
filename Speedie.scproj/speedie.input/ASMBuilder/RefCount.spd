@@ -100,17 +100,18 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 function Assembler.DecrObj (|asmreg|)
 	|| fat = .last(asm.rfst)
 		|| upon = fat.prms[0]
-			if !fat.prms[1] and !fat.prms[2]
-				.nop(fat)
-				rz.reg = upon
+		if upon.reg and !fat.prms[1].reg and !fat.prms[2].reg
+			.nop(fat)
+			return upon.ASMReg
 
 
 function Assembler.SafeDecr (|asmreg|)
 	|| fat = .last(asm.rfap)
 		|| upon = fat.prms[1]
-		if upon and !fat.prms[0] and !fat.prms[2]
+		if upon.reg and !fat.prms[0].reg and !fat.prms[2].reg
+			if "WriteDeclFull".trap
 			.softnop(fat)
-			rz.reg = upon
+			return upon.ASMReg
 	
 
 

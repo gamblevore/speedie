@@ -211,10 +211,9 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 	|| p = prms.first!
 
 	for a in .fn.Args
-		if "grab2".trap
 		|| V = .InlineVar(prms, p, a)
 		|| R = ASMReg.Discard * (IsLeaf and a isnt altered)
-		v ?= .µGetReal(P, a, R)
+		v ?= .µGetReal(P, a, R as asmreg.set)
 		v = .UpdateInlineReg(V, a)
 		p = p.next!
 
@@ -240,7 +239,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		require SubInline < maxend
 
 	|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
-	|| Grace = 9
+	|| Grace = 6 * (fn isnt constructor)
 	AllowedGain -= .State.inlinedepth
 	
 	for p.fast in prms
@@ -278,7 +277,7 @@ function RegsBitClear (|message| exp, |&fatasm| Start)
 		if (c isa asm.GRAB)
 			|| id = c.Prms[5]
 			if id == .CurrFuncGrab
-				.RegClear(exp, c, c.reg(0))
+				.RegClear(exp, c, c.RegOnly(0))
 		c--
 
 }

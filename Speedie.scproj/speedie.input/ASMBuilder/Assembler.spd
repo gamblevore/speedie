@@ -297,13 +297,20 @@ struct Assembler
 	function µGetReal (|message| exp,  |scdecl| A, |asmreg| ModeOnly=nil,  |asmreg|)
 		|| o = .OpenVars
 		|| v = .DeclareMe(exp, a)
-		(v as= ModeOnly)
+		(v as= ModeOnly asnt asmreg.GetReal)
 		if ModeOnly is Discard
-			return .µInto(exp, v asnt asmreg.discard)
+			return .µInto(exp, v)
 
-		rz = .µGetASM(exp, v)
-		if rz.reg != v.reg
-			.CloseVars(o) // close the var if v2 is unused.
+		|| f = .µGetASM(exp, v)
+		|| roar = f.reg
+		if roar == v.reg
+			return f
+		
+		if !roar and (modeonly is set)
+			return .assign(v, f, exp)	
+		.CloseVars(o) // close the var if v2 is unused.
+		return f
+
 	
 	
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -322,7 +329,7 @@ struct Assembler
 		if r is temp
 			|| f = r.fat
 				return .ReDest(f, dest)
-		
+
 		if "asknop".trap
 		|| dest2 = r.into(dest)
 		if dest is preferequl
@@ -358,7 +365,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 1091
+			if trap == 120681
 		  else
 			opt inline
 		

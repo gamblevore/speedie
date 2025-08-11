@@ -107,7 +107,7 @@ function Sheb (fn_asm)
 	
 
 function BadBflg (|&Assembler| self, |fatasm| L, |int| rr, |bool|)
-	require (l.output == rr)
+	require (l.RegOnly == rr)
 	require .iscurr(l)
 	require (l isa asm.BFLG)
 	require !l.prms[2] and !l.prms[3]
@@ -127,7 +127,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 		// we could make the thing that put it here... change instead?
 		|| input = l.prms[1]&31
 		|| fn = l-1
-		|| fnout = fn.RegInput(0) // fn.output
+		|| fnout = fn.asmreg(0) // fn.output
 		if .iscurr(fn) and (fnout.reg == input)
 			ret.reg = fnout
 			ret_ = ret
@@ -139,7 +139,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 	|| ReturnType = .out.ReturnType
 	require l isa asm.fnc or asm.fnc3
 	require !l.r3							// no pExt (not too many params)
-	require !returntype or l.output == rr	// returning same var, or nothing at all.
+	require !returntype or l.RegOnly == rr	// returning same var, or nothing at all.
 
 	rz = .iscurr(l)							// This fnc must always flow into the return!
 											// So its not required to "just work". But
@@ -150,33 +150,10 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 	l._op = asm.tail
 	(l.info as= ASMReg.exit)
 
-
-
-function PreOptBFLG (|&Assembler| self, |FATASM| l, |int| Ret, |int|)
-	(self)
-	// out, in, up, down, sign
-	require Ret == l.Reg(0)	// return x
-	|| up = l.reg(3)
-	|| down = l.reg(4)
-	
-	require up == down // needs to be the same.
-	require !up // for now, just go with 0 shift.
-	// what about the shifting? doesnt it depend on how many bits the input has?
-	// this is for a return, right? so... we can compare the bits to the number
-	// of bits used by the function's return type.
-	
-
-	rz = l.r1
-	using L // SyntaxUsingComplete needs upgrade to deref?
-		|| nn = l.µRefCount
-		l.msg.ret(rz.asm)
-		l.Operatormul(asmreg.exit)
-		l.µRefCount = nn
-	rz &= 31
-
 	
 function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)
 	opt norefcounts
+	if "StringCleanup".trap
 	// What about getting the address of registers?
 	dest = dest as asmreg.ExitFunction * .state.TailInlineable
 	dest = dest as asmreg.ExitAtAll
@@ -211,7 +188,6 @@ function Return (fn_asm)
 		return InlinedReturn(self, exp, L)
 
 	dest = ASMReg.ExitFunction
-	if "StringCleanup".trap or "AskNop".trap
 	|| f = exp.first
 		dest = .µGetASM(f, dest)
 	

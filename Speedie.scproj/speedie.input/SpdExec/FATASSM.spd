@@ -16,7 +16,7 @@ struct FatASM
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
-	|uint[6]|			Prms
+	|ASMParam[6]|		Prms
 	|uint16| 			BasicBlock
 	|int16|				µRefCount		// could make this a byte and stick at 255.
 	
@@ -100,22 +100,6 @@ struct FatASM
 		cpp_part AsReg
 		
 		|| info2 = info.FatIndex(.index)
-/*
-		if !info.reg
-			(info is constoutput)
-		  else
-			if (info is ConstOutput) != (self isa asm.knst)
-*/		
-/*		if info
-//			if !info.reg
-//				(info is constoutput)
-//			else
-
-			if (info is ConstOutput) != (self isa asm.knst)
-			info.FatIndex = .index
-		  else
-			target debug: if !(self isa asm.noop)
-*/
 		.info = info2
 		if info
 			return info2
@@ -167,10 +151,7 @@ struct FatASM
 		nil checker
 		if self
 			return m == .op
-	
-	operator reallyis (|asmreg| flags, |bool|)
-		return (.info & flags) == flags
-		
+			
 	syntax is (|asmreg| flags, |bool|)
 		nil checker
 		if self
@@ -181,9 +162,6 @@ struct FatASM
 			(.info as= flags)
 		  else
 			(.info asnt= flags)
-			
-	function asmreg.treg (|uint|)
-		return .reg ||| ((self is Temp)<<31)
 
 
 	function CopyFrom (|fatasm| D, |bool|)
@@ -192,34 +170,6 @@ struct FatASM
 			if i 
 				i.µRefCount++
 	
-	
-	function RegInput (|int| a, assigns:|asmreg|)
-		.input(a, value)
-	
-	
-	function RegInput (|int| a, |asmreg|)
-		|uint64| v = .prms[a]
-		(rz is temp) = (v>>31)
-		rz.reg = v&31
-		rz = rz as ((v >> 15) << 48)|asmreg| // fat index		
-		
-	function Input (|int| a, assigns:|asmreg| Input) // prm (
-		cpp_part Prm
-		opt inline
-		
-		|| i = input.FatIndex
-		.prms[a] = input.treg ||| (i << 15)
-		.InputRegs |= 1<<a
-		if i
-			|| src = i.fat // we refcount dests too. shouldn't!
-			if src < self
-				.InputFats |= 1<<a
-				if src
-					src.µRefCount++
-			  else
-				debugger // what?
-
-
 
 	function assembler.ReDest (|fatasm| f, |asmreg| info, |asmreg|)
 		|int| o = f.Outputs
@@ -242,7 +192,7 @@ struct FatASM
 
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
-		|| changed = info.treg
+		|| changed = info.prm
 		.prms[a] = changed
 		.Outputs |= 1 << a
 		changed &= 31
@@ -267,14 +217,6 @@ struct FatASM
 		|| s = SCImport.AllFiles[.filenum]
 			return s
 	
-	syntax Using (|&fatasm|)
-		|| A = Assembler.sh
-		rz = A.curr
-		A._curr = self
-		
-	syntax UsingComplete (|&nil| idk)
-		Assembler.sh._curr = self, (idk)
-	
 	
 	Syntax Expect (|string| Error)
 		|| f = .file|file--|
@@ -283,15 +225,6 @@ struct FatASM
 		nil|errorreceiver| <~ err
 		.DebugPrint
 	
-	function NumInput (|int| a, assigns:|int| v)
-		.prms[a] = v
-
-	function JumpInput (|int| a, assigns:|int| v)
-		.prms[a] = v
-		.JumpReg = a + 1
-		.µRefCount = 1 max .µRefCount // control flow is always used?
-		Assembler.sh.BasicBlock++
-		
 	function Jump (|int|)
 		|| j = .JumpReg
 			return .prms[j-1]
@@ -314,6 +247,7 @@ struct FatASM
 			j = .id
 			debugger
 
+////////////////////////////////////////////////////////////
 	function r0 (|uint|): return .prms[0]
 	function r1 (|uint|): return .prms[1]
 	function r2 (|uint|): return .prms[2]
@@ -323,45 +257,58 @@ struct FatASM
 	function r1 (assigns:|uint|): .prms[1] = value
 	function r2 (assigns:|uint|): .prms[2] = value
 	function r3 (assigns:|uint|): .prms[3] = value
-
-	function r0 (assigns:|asmreg|): .prms[0] = value.treg
-	function r1 (assigns:|asmreg|): .prms[1] = value.treg
-	function r2 (assigns:|asmreg|): .prms[2] = value.treg
-	function r3 (assigns:|asmreg|): .prms[3] = value.treg
-
-
-//	function Swap (|int| a, |int| b)
-//		swap (.prms[a-1]) (.prms[b-1])
-// doesnt take fatinputs or other inputs into account anyhow
 	
-	helper Step (|int| dir, |&FatASM|)
-		real self
-		|| b = .BasicBlock
-		while
-			self += dir
-			if .op != asm.noop
-				return (self, nil)(b == .BasicBlock)
-		
-	function Prev (|&FatASM|)
-		opt inline
-		return .step(-1)
-		
-	function Next (|&FatASM|)
-		opt inline
-		return .step(1)
-
-	function Output (|uint|)
-		return .prms[0] & 31
-
-	function Reg (|int| i, |int|)
+	
+	function RegInput (|int| a, assigns:|asmreg|)
+		.ASMReg(a, value)
+	
+	
+	function RegOnly (|int| i=0, |int|)
 		return .prms[i] & 31 // remove tmpbit + fatindex		
+
+
+	function ASMReg (|int| a=0, |asmreg|)
+		return .prms[a].ASMReg
+	
+	
+	function ASMReg (|int| a, assigns:|asmreg| Input)		// prm (
+		cpp_part Prm
+		opt inline
 		
+		|| i = input.FatIndex
+		.prms[a] = input.Prm
+		.InputRegs |= 1<<a
+		if i
+			|| src = i.fat // we refcount dests too. shouldn't!
+			if src < self
+				.InputFats |= 1<<a
+				if src
+					src.µRefCount++
+			  else
+				debugger // what?
+
+
+	function NumInput (|int| a, assigns:|int| v)
+		.prms[a] = v
+
+
+	function JumpInput (|int| a, assigns:|int| v)
+		.prms[a] = v
+		.JumpReg = a + 1
+		.µRefCount = 1 max .µRefCount // control flow is always used?
+		Assembler.sh.BasicBlock++
+		
+
+
+////////////////////////////////////////////////////////////
+
+
 	function CheckHasOutput 
 		opt inline
 		target debug {
 		opt norefcounts
 		for (b.bits in .outputs|int|) (i)
-			if !.reg(i)
+			if !.regonly(i)
 				error (self, "Missing ASM output")
 		}
 		
@@ -402,9 +349,7 @@ struct FatASM
 	
 	
 	function RenderFat (|FastString| fs, |bool| Simpler=false)
-		opt norefcounts
-		|| obj = .msg.obj
-		
+		opt norefcounts		
 		if (!.exists)  and  (.msg.func == @sheb)
 			.RendaMsg(fs, 0)
 			return 
@@ -616,3 +561,22 @@ struct FatASM
 			require (asm.jbor xor 1) == asm.jban
 			require (–sizeof FatASM) == 64
 			return true
+
+
+
+datatype ASMParam (uint)
+	function ASMReg (|asmreg|)
+		(rz is temp) = (self>>31)
+		rz.reg = self&31
+		|uint64| fatindex = (self >> 15)&0xFFFF
+		rz = rz as (fatindex << 48)|asmreg|
+	function Reg (|int|)
+		return self&31
+
+
+function asmreg.Prm	(|asmparam|)
+	|| i = .FatIndex << 15
+	|| r = .reg
+	|| t = (self is Temp)<<31
+	return r ||| t ||| i
+

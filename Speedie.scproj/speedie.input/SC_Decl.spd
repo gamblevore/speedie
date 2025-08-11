@@ -423,6 +423,7 @@ class SCDecl (SCObject) {
 		
 		if DeclName
 			return .WriteDeclSub(DeclName, minimal)
+		#!----
 		return «decl, .WriteType(minimal) »
 	
 

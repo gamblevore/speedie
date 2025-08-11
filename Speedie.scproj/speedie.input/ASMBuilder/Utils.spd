@@ -21,6 +21,7 @@ function message.ASMDecl (|SCDecl!|)
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
+		if p ~= 45395
 		if  exp.Position < 0
 		p[0] = nil
 		._curr = p + 1
@@ -80,7 +81,7 @@ function Assembler.ClearAllStructs (|message!| exp,  |bool|)
 function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|)
 	opt norefcounts
 	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
-		ASMType.AllocBearStruct(-1, exp.DeepLast, v.asm, fat.Reg(1)<<4)
+		ASMType.AllocBearStruct(-1, exp.DeepLast, v.asm, fat.RegOnly(1)<<4)
 	return true
 
 

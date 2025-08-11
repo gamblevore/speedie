@@ -87,7 +87,7 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 	require before or (bs isa asm.ADAK)
 	if base isnt temp
 		require  .last == bs
-		require  bs.reg(0) == bs.reg(1)
+		require  bs.RegOnly(0) == bs.RegOnly(1)
 	
 	rz = bs.prms[2]|int| >> bytes
 	
@@ -106,7 +106,7 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 		require rz >= -1 and rz <= 1
 
 	index = i
-	base = bs.RegInput(1)
+	base = bs.ASMReg(1)
 	.softnop(bs)
 
 

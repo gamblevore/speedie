@@ -28,7 +28,6 @@ extend Assembler
 			return .NumToReg(exp, num, res, DataTypeCode.bool)
 		
 		if dest isnt CondRequest
-//			if "IncrAmount".trap
 			dest = .TempTyped(TypeBool!.TypeNormal, dest)
 			return exp.EQUL(dest, L, R, negate.equlmode(l,r)) * dest
 
@@ -339,7 +338,7 @@ extend Assembler
 		|| XY1 = .Last(asm.addk)			#require
 		if XOut.IsVec // now what?
 		|| xinreg = XIn.reg
-		require xinreg == XY1.Output
+		require xinreg == XY1.RegOnly
 		|| Changed = xinreg != xout.reg
 			require (xin is temp)
 		|| add2 = XY1.prms[2] + add		
@@ -667,7 +666,7 @@ extend Assembler
 */
 
 		|| xy1 = .last(asm.bflg)$ // what about qflg. allow both?
-		require xy1.output == src.reg
+		require xy1.RegOnly == src.reg
 		require (src is temp) or (dest iz src)
 
 		// src is temp:     dest = (will_be_temp<<3) >> kDown
