@@ -75,7 +75,7 @@ struct InlineEditor
 			.visible = false
 			.text = ""      // wants new
 		if s isa listview
-			s.IsEditing = false
+			s._IsEditing = false
 			if focus
 				s.setfocus
 		.EditingFor = nil
@@ -96,7 +96,7 @@ struct InlineEditor
 			.selrange = .text.length
 		l.Select(r.row)
 		l <~ .editor
-		l.isediting = true
+		l._isediting = true
 		l.ShowFast(r.row)
 		.cell = r
 		.EditingFor = l

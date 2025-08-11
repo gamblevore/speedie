@@ -13,7 +13,7 @@ class MessageView (ListView)
 		.ondrawrow			= InsideJeeboxViewRowDraw
 		.tryeditcell		= JeeboxViewRenamer
 		.IsTree	= true
-		.NoSeps	= true
+		.DontDrawSeparators	= true
 		.EnableDrag	
 	
 	

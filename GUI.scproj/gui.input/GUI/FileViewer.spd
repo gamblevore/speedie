@@ -36,7 +36,7 @@ class FileViewer (ListView)
 
 	function Init
 		.IsTree	= true
-		.NoSeps	= true
+		.DontDrawSeparators	= true
 		.EnableDrag
 		with .quickopen
 			is enabled

@@ -67,10 +67,10 @@ class Menu (ListView)
 		|| l = .FindClickedMenu(P.y)
 		if !l
 			return true
-		.SelJustChanged = false
+		._SelJustChanged = false
 		if (l isnt disabled)
 			.Select(l)
-		return moved or .SelJustChanged 
+		return moved or ._SelJustChanged 
 	
 		
 	helper CmmWidth (|guicontrol?| owner, |int|)
@@ -173,7 +173,7 @@ class MenuItem (ListViewrow)
 		.name = name
 		.MenuEvent = ev
 		.obj = obj
-		isnt editable // why?
+		isnt editable
 		(self is disabled) = (name == "")
 		
 	render

@@ -1054,8 +1054,9 @@ module GUI
 
 	helper EventWindow (|window--|)
 		opt norefcounts
-		|| window = 0
-		(window) // just test that __modules__ works
+//		|| window = 0
+//		(window) // just test that __modules__ works
+//		the c++ won't compile then. sadly.
 		return .FrontDialog ?? __modules__.window.front
 	
 	

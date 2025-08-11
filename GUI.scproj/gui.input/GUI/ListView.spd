@@ -3,28 +3,31 @@ class ListView (GUIControl) {
 	linkage
 		cpp_part LV
 	|int|							RowHeight
-	|int|							ScrollShift
-	|byte|							ColumnCount
-	|byte|							ScrollRealigner
-	|bool|							IsEditing
+	|bool|							MultiLineDraw
+	|bool|							UseColorScheme
+	|bool|							DontDrawSeparators
+
 	|bool|							IsSpreadSheetLike
 	|bool|							IsMainListView
-	|bool|							SelJustChanged
+	|bool|							IsTree
+
+	|int|							ScrollShift
+	|byte|							ColumnCount
 	|bool|							RightClickSelects
 	|bool|							MultiSelection
-	|bool|							MultiLineDraw
 	|bool|							OneAlwaysSelected
-	|bool| 							_BlockedDuringUse
-	|bool|							_DuringSelect
 	|bool|							AlwaysSendChangeEvent
-	|bool|							NoSeps
-	|bool|							IsTree
-	|bool|							UseColorScheme
-	|bool|							Skips
 	|byte|							CommandSelectRow
 
-	|ListViewRow?|					DraggingRowTo
+	|bool|							_IsEditing
+	|byte|							_ScrollRealigner
+	|bool|							_DuringSelect
+	|bool| 							_BlockedDuringUse
+	|bool|							_SelJustChanged
+
+	|ListViewRow?|					_DraggingRowTo
 	|ListViewrow?|					_ScrollStart
+	
 	|ListViewCell?|					EditDelayed
 	|ListViewCell?|					MouseDownCell
 	|ListViewrow?|					DraggingRowFrom
@@ -43,8 +46,8 @@ class ListView (GUIControl) {
 	|GUIListEvent?|					OnRightClick
 	|GUIListDragEvent?|				OnDragRow
 	|ListViewRowDraw?|				OnDrawRow
-	|textview?| 					TypingFilter
 	|GUIListEditEvent?| 			OnTypingFilter
+	|textview?| 					TypingFilter
 
 
 	constructor (|guicontrol| p,  |GUIListEvent| sel,  |GUIListEvent| ret)
@@ -211,8 +214,8 @@ class ListView (GUIControl) {
 	
 	function Clear
 		.listsource.clear
-		._scrollstart	= nil
-		.DraggingRowTo	= nil
+		._ScrollStart	= nil
+		._DraggingRowTo	= nil
 		.DraggingRowFrom= nil
 		.touch
 	
@@ -243,7 +246,7 @@ class ListView (GUIControl) {
 	
 	helper CheckRemoved (|ListViewrow| r)
 		.ScrollStart	= .replaced(r, ._Scrollstart)
-		.DraggingRowTo	= .replaced(r, .DraggingRowTo)
+		._DraggingRowTo	= .replaced(r, ._DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
 	
 
@@ -399,7 +402,7 @@ class ListView (GUIControl) {
 		if key.iscancel
 			if .DraggingRowFrom
 				.DraggingRowFrom = nil
-				.DraggingRowTo = nil
+				._DraggingRowTo = nil
 				return true
 			if .ClearSearch
 				return true
@@ -504,11 +507,6 @@ class ListView (GUIControl) {
 			return m - 2
 		return m
 		
-	
-//	helper CheckDrawUpdate
-//		if ._ScrollDrawTimer and !.inscrollarea(.MouseXY)
-//			GUI.Touch(self)
-
 
 	function EnableDrag
 		.OnDragRow = (nil, &BasicRowDrag)(.istree)
@@ -516,6 +514,8 @@ class ListView (GUIControl) {
 
 	behaviour MouseMove
 		|| cc = SystemCursor.Arrow
+		if self isa menu
+			cc = SystemCursor.Hand
 		|| c = .FindClickedCell(P)
 			|| r = c.row
 			if (r is disabled)
@@ -548,12 +548,12 @@ class ListView (GUIControl) {
 	helper ScrollSet (|ListViewrow?| s)
 		s ?= .start
 		.scrollshift = 0
-		.ScrollRealigner = 0
+		._ScrollRealigner = 0
 		debug_require s != .listsource
 		.scrollstart = s
 		.ExpandParents(s)
 //		.checkdrawupdate
-		if .isediting and (s and !.VisFullyContains(s))
+		if ._isediting and (s and !.VisFullyContains(s))
 			.ClearEdits
 
 
@@ -660,9 +660,9 @@ class ListView (GUIControl) {
 	
 	
 	helper ClearInternalDrops
-		.DraggingRowTo = nil
+		._DraggingRowTo = nil
 		.CommandSelectRow = nil
-		.SelJustChanged = false
+		._SelJustChanged = false
 		.MouseDownCell = nil
 		
 
@@ -670,8 +670,8 @@ class ListView (GUIControl) {
 		ScrollInfo.endDrag
 
 		|| f = .DraggingRowFrom
-		|| t = .DraggingRowTo
-		|| sl = .SelJustChanged
+		|| t = ._DraggingRowTo
+		|| sl = ._SelJustChanged
 		.DraggingRowFrom = nil
 		.ClearInternalDrops
 
@@ -721,7 +721,7 @@ class ListView (GUIControl) {
 	
 	
 	helper CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
-		if .DraggingRowTo or (.FirstSelected != .lastselected)
+		if ._DraggingRowTo or (.FirstSelected != .lastselected)
 			return true
 		require .draggingrowfrom != WantsBefore
 		require .Hiernext(.draggingrowfrom) != wantsbefore
@@ -738,7 +738,7 @@ class ListView (GUIControl) {
 	behaviour MouseDown
 		.EditDelayed = nil
 		if clicks >= 0
-			.SelJustChanged = clicks > 1
+			._SelJustChanged = clicks > 1
 		if (!keys.Cmd) and (.CommandSelectRow)
 			return MouseDragging.handled
 		
@@ -772,7 +772,7 @@ class ListView (GUIControl) {
 					.ScrollByRows(1)
 			
 			if .draggingrowFrom and (.CanDrawDrag(Wantsto))
-				.draggingrowto = wantsto
+				._draggingrowto = wantsto
 			return MouseDragging.EvenIfNoMovement
 		
 		if .ClickedScroll(P, clicks)
@@ -808,7 +808,7 @@ class ListView (GUIControl) {
 
 		if (!.istree and .OnDragRow and l is editable)
 			.DraggingRowFrom = L
-			.DraggingRowTo = nil
+			._draggingrowto = nil
 			return MouseDragging.Within
 		return MouseDragging.handled
 	
@@ -1062,7 +1062,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		require !._DuringSelect
 		.ClearEdits
-		.SelJustChanged = true
+		._SelJustChanged = true
 		if s and (Mode isnt noshow)
 			.Show(s)
 
@@ -1284,7 +1284,7 @@ class ListView (GUIControl) {
 		z2.y2 += .scrollshift
 		z2.y  = z2.y2 - .rowheight
 		
-		if !.noseps and .gnormal.seps.a
+		if !.DontDrawSeparators and .gnormal.seps.a
 			for r.visible in self
 				|| n = .drawcols
 				for i in n
@@ -1337,14 +1337,14 @@ class ListView (GUIControl) {
 		if !shl or .ScrollPixelsSub(0)
 			return 0
 		
-		|| real = .ScrollRealigner
+		|| real = ._ScrollRealigner
 			real--
 			if real < 32
 				shl = .realignscrollshift(shl).clamp(0, .rowheight)
 				.scrollshift = shl
 				if !shl
 					real = 0
-			.ScrollRealigner = real
+			._ScrollRealigner = real
 			GUI.touch(Self)
 		return shl
 
@@ -1353,7 +1353,7 @@ class ListView (GUIControl) {
 		if rem
 			.ScrollPixelsSub(rem)
 			.bumpscroll
-			.ScrollRealigner = (48, 0)(.scrollshift)
+			._ScrollRealigner = (48, 0)(.scrollshift)
 			GUI.touch(self)
 
 
@@ -1427,9 +1427,9 @@ class ListView (GUIControl) {
 		|| cmm = .cmm
 			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.border)
 
-		|| re = .RowBounds(.scrollstart, .DraggingRowTo, 1)
+		|| re = .RowBounds(.scrollstart, ._DraggingRowTo, 1)
 			re = re up .rowheight
-			if !.draggingrowto.prev
+			if !._draggingrowto.prev
 				re = re down 2
 			where.DrawRectStyled(re, ¥.border)
 		

@@ -1298,7 +1298,7 @@ class TextView (GUIControl)
 		|| i = .isinline$
 		|| e = i.editingfor
 		if e isa listview
-			if e.isediting
+			if e._isediting
 				.finishediting(e.IsSpreadSheetLike)
 				return true
 		
