@@ -12,7 +12,12 @@ main
 	|| msg = s as Message
 		"Approach 3: '$s' was tested using 'as'"
 	
+	target !ForBatchTest {
+	
+	|| ThisLineCompilesOK = 1
 	|| blindly = losing_type|message| // comment this out, to get the code working! :)
+
+	}
 	testCasting()
 	
 
