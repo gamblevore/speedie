@@ -112,15 +112,12 @@ function message.GRAB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.RET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| SafeDecr = nil, |int| Value = nil, |&fatasm|) {
+function message.RET (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RET, self)
 	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = SafeDecr
-	rz.numinput(4) = Value
+	rz.numinput(1) = Value
 }
 
 
@@ -776,6 +773,17 @@ function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	rz = a.RequestOp(asm.RALO, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
+}
+
+
+function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.RFRT, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
 }
 
 

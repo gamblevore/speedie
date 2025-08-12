@@ -532,7 +532,7 @@ extend Assembler
 			exp.DIVS
 			exp.QDIV
 		|| fat = exp.DIV(dest, ASMReg(), l, r, dest.signed|int|)
-		fat.outputs &= ~2 // clear this output
+		fat._Outputs &= ~2 // clear this output
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
@@ -540,7 +540,7 @@ extend Assembler
 		if dest is ConstOutput
 			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntMod)
 		|| fat = exp.DIV(asmreg(), dest, L, R, dest.signed|int|)
-		fat.outputs &= ~1 // clear unused output 
+		fat._Outputs &= ~1 // clear unused output 
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 

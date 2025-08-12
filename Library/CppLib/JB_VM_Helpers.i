@@ -508,29 +508,35 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 
-// EXITCODES  REG00  STACK  REG00  REG01						// fn1 {fn2()}
-// EXITCODES  REG00  STACK  REG00  STACK  REG00  REG01			// fn2 
-// EXITCODES  REG00  STACK  REG00  00000 
-
 AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
-	JB_Decr(o2);
-	JB_Decr(o3);
 	auto stck	= r - 1;
 	auto R1		= stck - stck->Stack.SavedReg;
 	auto Code	= stck->Stack.Code;
 	vm.Env.AllocCurr = stck->Stack.Alloc;
-	auto Imm	= RET_Valuei; // get before copy!
+	auto Imm	= RET_Valuei;	// get before copy!
 	auto Src	= r + n1;
 	
 	*stck		= *Src;
-	stck->Uint |= Imm; // immediate
-	if (RET_SafeDecru)
-		JB_SafeDecr(o1);
-	r			= R1 - 1; // NewZero
+	stck->Uint |= Imm;			// immediate
+	r			= R1 - 1;		// NewZero
 	*r			= {};
 	
 	return Code - 1;
 }
+
+
+AlwaysInline ASM* DeRefRegs (jb_vm& vm, VMRegister*& r, ASM Op) {
+	if (n4)
+		JB_Decr(o4);
+	if (n3)
+		JB_Decr(o3);
+	if (n2)
+		JB_Decr(o2);
+	if (n1)
+		JB_SafeDecr(o1);
+	return ReturnFromFunc(vm, r, (Op>>19)<<19);
+}
+
 
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)

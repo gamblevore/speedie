@@ -54,7 +54,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 				p.r1 = 1
 				return p
 		|| fat = exp.rfst(asmreg(), a)
-		Fat.Outputs = 0
+		Fat._Outputs = 0
 		return fat
 
 	if fn == Compiler.RefDecr
@@ -75,7 +75,6 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		return exp.RFAP(asmreg(), a, asmreg())
 
 	debugger 
-	return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
 
 
 function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
@@ -111,6 +110,27 @@ function Assembler.SafeDecr (|asmreg|)
 		if upon.reg and !fat.prms[0].reg
 			.softnop(fat)
 			return upon.ASMReg
+
+
+function FinalDecrements (fn_asm)
+	|| D0 = .SafeDecr$
+	if d0.reg != dest.reg					// problem
+	|| D1 = .decrObj
+	|| D2 = .decrObj
+	|| D3 = .decrObj
+	return exp.RFRT(d0, d1, d2, d3) * asmreg.Exit
+
+
+//	|| fat = exp.RET(dest*!HasK, K * HasK)
+//	fat.µRefCount++
+//	return fat * asmreg.Exit
+
+// OK... lets assume that we got a dest that came from rfap. well... it shouldn't.
+// rfap in fact does not alter anything.
+
+// so... shouldn't nopping reverse the .registers[] back to something that was set before
+// within the same block?
+// then... we can check that reg and use it.
 	
 
 

@@ -251,11 +251,14 @@ struct Assembler
 		
 		for v.regoutputs in fat
 			v &= 31
-			if .Registers[v] == fat
-				.Registers[v] = nil
-				.KnownValuesMap &=~ (1<<v)
+			.RemoveReg(v, fat)
 		|| Type = asm.noop * (fat < ._curr)
 		fat.setop = Type
+
+
+	function Register (|int| i, assigns:|?&FATASM|)
+		if value isa asm.WR8U or asm.WR4U or asm.WR2U or asm.WR1U
+		.Registers[i] = value
 
 
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
@@ -330,7 +333,6 @@ struct Assembler
 			|| f = r.fat
 				return .ReDest(f, dest)
 
-		if "asknop".trap
 		|| dest2 = r.into(dest)
 		if dest is preferequl
 			return .Exists(dest, r, exp)
@@ -365,7 +367,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-//			if trap == 120681
+			// if trap == 5956
 		  else
 			opt inline
 		
@@ -466,12 +468,11 @@ struct Assembler
 
 	function Guard
 		opt norefcounts
-		|| A = asmreg()										// GUARD
 		|| arg = .fn.SourceArg!
 		target debug
 			if arg.position < 0
 				arg.position = 0 // skip error detection
-		Arg.EROR(A,A,A,A,0)
+		Arg.EROR.BasicBlock = -1
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 

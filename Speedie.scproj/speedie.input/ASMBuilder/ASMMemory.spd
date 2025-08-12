@@ -73,10 +73,12 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	
 	|| pinc = .MemOpt(base, index, bytes)
 	
-	rz = exp.RD4U(dest, base, VarAdd, index, pinc)
 	if dest is set
+		// avoid setting ._output
+		rz = exp.WR4U(dest, base, VarAdd, index, pinc)
 		rz._op = ASMType.WriteASM[bytes]
 	  else
+		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
 		|| B = (bytes<<1) + t.issigned
 		rz._op = ASMType.ReadASM[b]
 

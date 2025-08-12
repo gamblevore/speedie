@@ -239,7 +239,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		require SubInline < maxend
 
 	|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
-	|| Grace = 6 * (fn isnt constructor)
+	|| Grace = 2 + (fn isnt constructor)<<2			// 2 for constructors, 6 for others. 
 	AllowedGain -= .State.inlinedepth
 	
 	for p.fast in prms
@@ -341,7 +341,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	fat._op += PExt > 0
 	if dest is Alternate
 		|| v = dest.reg
-		.registers[v] = fat
+		.register(v) = fat
 		(dest isnt alternate)
 
 	.RegsBitClear(exp, Start)

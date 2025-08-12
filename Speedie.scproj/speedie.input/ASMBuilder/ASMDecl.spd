@@ -33,7 +33,7 @@ struct SavedRegisters
 		|| S = sh.FuncStart
 		for i in 32
 			|| r = .asm[i]
-			sh.Registers[i] = (s + r, nil)(r)
+			sh.Register(i) = (s + r, nil)(r)
 
 
 	function Restore (|[scdecl]| args)

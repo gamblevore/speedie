@@ -142,10 +142,8 @@
 #define   Convert_Li       ((( int)((Op)<<22))>>22)
 #define   Convert_Lu       (((uint)((Op)<<22))>>22)
 
-#define   RET_SafeDecri       ((( int)((Op)<<23))>>31)
-#define   RET_SafeDecru       (((uint)((Op)<<23))>>31)
-#define   RET_Valuei       ((( int)((Op)<<24))>>24)
-#define   RET_Valueu       (((uint)((Op)<<24))>>24)
+#define   RET_Valuei       ((( int)((Op)<<13))>>13)
+#define   RET_Valueu       (((uint)((Op)<<13))>>13)
 
 #define   REQ_Modei       ((( int)((Op)<<18))>>28)
 #define   REQ_Modeu       (((uint)((Op)<<18))>>28)
@@ -206,6 +204,9 @@
 
 #define   RefSet1_Li       ((( int)((Op)<<18))>>18)
 #define   RefSet1_Lu       (((uint)((Op)<<18))>>18)
+
+#define   RefReturn_Li       ((( int)((Op)<<28))>>28)
+#define   RefReturn_Lu       (((uint)((Op)<<28))>>28)
 
 #define   RefSetApart_Li       ((( int)((Op)<<23))>>23)
 #define   RefSetApart_Lu       (((uint)((Op)<<23))>>23)

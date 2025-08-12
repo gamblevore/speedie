@@ -168,11 +168,8 @@ forms
 		Mode	4
 		
 	RET
-		r1		r		// return reg1
-		r2		r		// decr
-		r3		r		// decr
-		SafeDecr 1
-		Value	8
+		r1		r
+		Value	19
 
 	REQ
 		r1		r		// 
@@ -251,6 +248,12 @@ forms
 	RefSet1
 		r1		R
 		r2		r
+	
+	RefReturn
+		r1		r
+		r2		r
+		r3		r
+		r4		r
 
 	RefSetApart
 		r1		r
@@ -585,6 +588,9 @@ POS 5
 /**/ RALO  (U2)
 		o1 = alloc(o2)
 		#!should call constructor too.
+	
+/**/ RFRT  (RefReturn)							// this should be a return...
+		Code = DeRefRegs(vm, r, Op)				// its ONLY used for returns...
 
 
 

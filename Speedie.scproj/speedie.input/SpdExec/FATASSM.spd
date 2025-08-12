@@ -8,7 +8,7 @@ struct FatASM
 	// phi-nodes can actually be done simply by linking one fat to the prev
 	|byte|				InputFats
 	|byte|				InputRegs
-	|byte| 				Outputs
+	|byte| 				_Outputs
 	|byte|				_Op
 	|byte|				JumpReg
 	|byte| 				BranchDepth
@@ -36,7 +36,7 @@ struct FatASM
 		.InputFats = 0
 		.InputRegs = 0
 		.jumpreg = 0
-		.outputs = 0
+		._Outputs = 0
 		.BranchDepth = 0
 		.LoopDepth = 0
 		.info = nil // ??? nothing needs this?
@@ -172,7 +172,7 @@ struct FatASM
 	
 
 	function assembler.ReDest (|fatasm| f, |asmreg| info, |asmreg|)
-		|int| o = f.Outputs
+		|int| o = f._Outputs
 		target debug: if !o.IsPow2
 		return .ReDest(f, info, o.log2)
 		
@@ -181,23 +181,45 @@ struct FatASM
 		// lets see.
 		|| U = f.info // save old info. probably quite good.
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
-			if .Registers[old] == f
-				.KnownValuesMap &= ~(1 << old)
-				.Registers[old] = nil
+			.RemoveReg(old, f)
 		
 		U.Reg = f.Dest(a, info, self)						// Then we set it to the new value
 		f.info = u // update reg here.
 		return u
+	
+	
+	function assembler.RemoveReg (|int| i, |fatasm| fat)
+		// now what?
+		require .Registers[i] == fat
+		|| NewFat = fat.FindOlder()
+		.KnownValuesMap &=~ (1<<i)
+		.Register(i) = NewFat
+	
+	
+	function FindOlder (|&fatasm|)
+		|| reg = .Output.reg$
+		|| b = .BasicBlock
+		while 
+			self--
+			require .BasicBlock == b
+
+			if .Output.reg == reg
+				return self
 		
+		
+	function Output (|asmparam|)
+		|| o = ._Outputs|uint|
+			o = o.log2
+			return .Prms[o]
 
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		|| changed = info.prm
 		.prms[a] = changed
-		.Outputs |= 1 << a
+		._Outputs |= 1 << a
 		changed &= 31
 		if changed
-			sh.Registers[changed] = self
+			sh.Register(changed) = self
 			|| map = 1 << changed
 			if info is KnownConst		// Lets see
 				sh.KnownValuesMap |= map
@@ -307,7 +329,7 @@ struct FatASM
 		opt inline
 		target debug {
 		opt norefcounts
-		for (b.bits in .outputs|int|) (i)
+		for (b.bits in ._outputs|int|) (i)
 			if !.regonly(i)
 				error (self, "Missing ASM output")
 		}
@@ -508,7 +530,7 @@ struct FatASM
 
 	function IsFinisher (|bool|)
 		|| o = .op|asm|
-		if o == asm.ret or asm.trap or asm.TAIL
+		if o == asm.ret or asm.trap or asm.TAIL or asm.rfrt
 			return true
 		if o == asm.jump
 			return .jump < 0
@@ -546,7 +568,7 @@ struct FatASM
 			i++
 			
 	iterator RegOutputs
-		|| oo = .outputs|int|
+		|| oo = ._Outputs|int|
 		while oo
 			|| i = oo.lowestbit
 			oo &=~ i

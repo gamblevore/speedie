@@ -92,7 +92,10 @@ function StatExpr (fn_asm)
 	for ch.fast in exp.first
 		if ch.islast
 			return .µGetASM(ch, dest)
-		.µ(ch, asmreg.Discard)
+		if ch.func == @decl
+			ASMType.Decl(self, ch, AsmReg.RealDiscard)
+		  else
+			.µ(ch, asmreg.Discard)
 
 	
 function First (fn_asm)
@@ -143,8 +146,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 
 	rz = .iscurr(l)							// This fnc must always flow into the return!
 											// So its not required to "just work". But
-											// We can't skip the ret if its not curr.
-	l.prms[0] = l.prms[1]
+	l.prms[0] = l.prms[1]					// We can't skip the ret if its not curr.
 	l.prms[1] = l.prms[2]
 	l.prms[2] = 0
 	l._op = asm.tail
@@ -153,7 +155,6 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 	
 function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)
 	opt norefcounts
-	if "StringCleanup".trap
 	// What about getting the address of registers?
 	dest = dest as asmreg.ExitFunction * .state.TailInlineable
 	dest = dest as asmreg.ExitAtAll
@@ -178,17 +179,8 @@ function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMRe
 	(self)
 	|| inner = exp.first
 	expect ((inner == @arg) and !inner.hasany) (exp) // nil
-	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
+	|| Zzeerrooo = asmreg() as asmreg.FromZeroMemory
 	return zzeerrooo.reg(dest)
-
-
-function FinalDecrements (fn_asm)
-	return nil
-	if "WriteDeclFull".trap and (exp contains "SC_Decl_WriteType")
-	|| D0 = .SafeDecr
-		if d0.reg != dest.reg					// problem
-	|| D1 = .decrObj
-	|| D2 = .decrObj
 
 
 function Return (fn_asm)
@@ -205,11 +197,12 @@ function Return (fn_asm)
 	if ReturnOpt(self, dest)
 		return asmreg.exit
 	
-	FinalDecrements(self, exp, Dest)	
+	|| SafeDecr = FinalDecrements(self, exp, Dest)
+		return SafeDecr
+
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0
-	if dest.reg and !.out.ReturnType
-	|| fat = exp.RET(dest*!HasK, nil, nil, nil, K * HasK)
+	|| fat = exp.RET(dest*!HasK, K * HasK)
 	fat.µRefCount++
 	return fat * asmreg.Exit
 	
@@ -428,7 +421,7 @@ function Dot (fn_asm)										// a.b
 		debugger
 		prop.typeinfo
 		
-	if !dest.reg and (obj is temp)
+	if (dest isnt set) and !dest.reg and (obj is temp)
 		dest.reg = obj
 	
 	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
@@ -583,7 +576,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	
 	|| fat = exp.CNTC(dest, Addr, offset, amount, bc)
 	if !dest.reg
-		fat.outputs &= ~1 // clear output
+		fat._Outputs &= ~1 // clear output
 	
 	if mode & IncrAfter
 		if 0: exp.CNTD

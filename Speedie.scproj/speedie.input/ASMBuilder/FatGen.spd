@@ -112,15 +112,12 @@ function message.GRAB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.RET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| SafeDecr = nil, |int| Value = nil, |&fatasm|) {
+function message.RET (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RET, self)
 	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = SafeDecr
-	rz.numinput(4) = Value
+	rz.numinput(1) = Value
 }
 
 
@@ -170,6 +167,16 @@ function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Mode
+}
+
+
+function message.FEAT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FEAT, self)
+	rz.dest(0, r1, a)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
 }
 
 
@@ -361,7 +368,6 @@ function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
-	if "AskNop".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BFLG, self)
 	rz.dest(0, r1, a)
@@ -427,10 +433,10 @@ function message.BAND (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.BORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BXOR, self)
+	rz = a.RequestOp(asm.BORR, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -438,10 +444,10 @@ function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BORR, self)
+	rz = a.RequestOp(asm.BXOR, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -470,20 +476,20 @@ function message.BANK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fa
 }
 
 
-function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BXRK, self)
+	rz = a.RequestOp(asm.BORK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
 }
 
 
-function message.BORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.BORK, self)
+	rz = a.RequestOp(asm.BXRK, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
@@ -767,6 +773,17 @@ function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	rz = a.RequestOp(asm.RALO, self)
 	rz.dest(0, r1, a)
 	rz.reginput(1) = r2
+}
+
+
+function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.RFRT, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
 }
 
 

@@ -172,6 +172,8 @@
 	o1 = alloc(o2);
 	// should call constructor too.
 
+ı RFRT: _
+	Code = DeRefRegs(vm, r, Op);
 ı GSTR: _
 	o1 = strs(vm, Op);
 ı GTAB: _
