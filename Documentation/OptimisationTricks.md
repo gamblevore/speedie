@@ -323,7 +323,7 @@ Neither of those make sense. Theres a simple bit-hack that acheives this in one 
 
     || XIsPowerOfTwo = (x & (x - 1)) == 0
 
-_(Works for numbers above zero, has a false-positive at zero)_. I've wrapped this into a function called .IsPow2, but the point remains. Knowing bit-tricks really helps.
+_(Works for numbers above zero, has a false-positive at zero)_. I've wrapped this into a function called `.IsPow2`, but the point remains. Knowing bit-tricks really helps.
 
 There are many bit-tricks... at least 20 you can learn if you like! But heres a few:
     
