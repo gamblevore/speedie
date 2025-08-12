@@ -91,9 +91,9 @@ In speedie, the linked-list class is simply called "[`List`](lists.md)". (The "[
 
 So... lists are faster than arrays. This depends on a few things:
 
-    * That it makes sense at all
-    * Linear access
-    * You need only 1 list.
+* That it makes sense at all 
+* Linear access
+* You need only 1 list.
 
 In these cases, a list should be faster.
 
@@ -102,9 +102,6 @@ For example, in Speedie, I have a few lists of "messages" (parsed Jeebox) that n
 The nice thing about linked-lists, is that the next (or prev, parent and child) items are all directly accessable. Whereas for processing an array, two extra memory locations must be visited, to get the next item. Plus you need two extra variables to check (the array itself, and the array index).
 
 Again... don't blindly convert arrays to lists. In fact, don't blindly do anything. If you are a blind-doer... don't blame me for anything you ever do.
-
-I'm not telling you what to do. Unless it comes from within it won't be helpful.
-
 
 
 ### Don't Repeat Work
@@ -229,14 +226,16 @@ Speedie acheieves this, by using the stack, instead of appending to some global 
         .CloseVars(OldState)
 
 `ProcessLine()` is recursive. That is: it calls other functions that can call back into `ProcessArgument()`. Best thing here... is that I don't even allocate any objects for my stack. The saved info takes only one register!
-    
-        
 
 
 
 ### Avoid Overly Dynamic Code
 
-This is kind of natural in speedie anyhow, as virtual functions don't "just come naturally" like in C++ or Python. You have to explicitly declare them. But if you don't need them, don't use them.
+Virtual functions are quite slower than normal functions.
+
+But avoiding them, is kind of natural in speedie anyhow, as virtual functions don't "just come naturally" like in Java or Python. They are explicit, both in declaration and in calling.
+
+Explicit because you have to define it as "virtual" instead of "function", and in calling because all virtuals are called like this: `__func__()`.
 
     function OverComplex (|MyType| A)
         A.__DoSomething__              // a virtual function
@@ -246,7 +245,9 @@ This is kind of natural in speedie anyhow, as virtual functions don't "just come
             A.DoBig
           else
             A.DoSmall
-        
+
+Even if you aren't using virtual functions, your code can be overly dynamic, for example using function-pointers, when you only had two possible cases to choose from. So don't do that.
+
 
 
 ### Tail Functions
