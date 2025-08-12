@@ -506,10 +506,11 @@ function CreateEmptyConstructors (|scfunction|)
 	|| pc = .PassableCount
 	|| s = .super
 	if s and rz and s != TypeObject // object has no constructor-func
-		|| l = s.constructorfunc!.Prms 
-		if l.HasAny
-			rz.CopyParams(l)
-			pc = 0 // i guess?
+		|| con2 = s.constructorfunc
+			|| l = con2.Prms 
+			if l.HasAny
+				rz.CopyParams(l)
+				pc = 0 // i guess?
 	
 	if .isobject
 		if pc >= 1 and pc <= 7
