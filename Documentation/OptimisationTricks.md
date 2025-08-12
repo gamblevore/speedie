@@ -300,9 +300,9 @@ An example is parsing source-code. Or processing a file to drive robot commands.
 
 **Jeebox Example:**
 
-You have a multi-pass system parsing Jeebox... First validation, then clean-up, then actual processing...
+You have a multi-pass system using Jeebox... First validation, then clean-up, then actual processing...
 
-It makes more sense during validation, to convert the string ID to an integer ID. This way, you can more quickly process the items.
+It makes more sense during validation, to convert the string ID to an integer ID. This way, you can more quickly process the items, in future passes.
 
 On `Message`, there is a `.Tag` property, that allows 64K possible IDs. `.Flags` allows another 64K. Theres also the `.Obj` property that lets you store an object of any kind on the `message`, you can store anything you want on that object.
 
