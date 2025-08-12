@@ -221,9 +221,7 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 	
 function CurrGain (|&fatasm| Start, |int|)
 	|| C = .curr
-	todo "!"
 	while Start < C
-//		#!use start.GuessSize instead!
 		rz += start.GuessSize
 		start++ 
 		
@@ -236,10 +234,16 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 	|| MaxEnd = .InlineEnd
 		|| SubInline = .curr + (N / 3)
-		require SubInline < maxend
+		require SubInline < MaxEnd
 
-	|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
-	|| Grace = 2 + (fn isnt constructor)<<2			// 2 for constructors, 6 for others. 
+	|| AllowedGain = 5 + (fn is inline) * 23		// Assume that functions have 5 instruction overhead.
+	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
+
+	if .length < 16K								// Don't risk overflowing max-size
+		AllowedGain += (fn.LinkFrom == 1)<<6		// Allow bigger functions inlined if called once.
+													// (needs marked as removed!!)
+													
+													
 	AllowedGain -= .State.inlinedepth
 	
 	for p.fast in prms
@@ -256,7 +260,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		return I
 	
 	// try weaker inline
-	require !.state.InlineDepth and .DeepestInline > 1
+	require !.state.InlineDepth and (.DeepestInline > 1)
 
 	.InlineDepthLimit = 1
 	return .TryInline(prms, dest, fn, AllowedGain)

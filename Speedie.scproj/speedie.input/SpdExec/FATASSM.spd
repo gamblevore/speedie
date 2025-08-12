@@ -189,13 +189,12 @@ struct FatASM
 	
 	
 	function assembler.RemoveReg (|int| i, |fatasm| fat)
-		// now what?
 		require .Registers[i] == fat
-		|| NewFat = fat.FindOlder()
+		|| NewFat = fat.FindOlder
 		.KnownValuesMap &=~ (1<<i)
 		.Register(i) = NewFat
 	
-	
+
 	function FindOlder (|&fatasm|)
 		|| reg = .Output.reg$
 		|| b = .BasicBlock
