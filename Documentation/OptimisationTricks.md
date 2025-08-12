@@ -215,7 +215,9 @@ Using the stack is very powerful... if you can do it. This just means allocating
 
 This can save you allocating an array object, and having to append into it.
 
-Speedie actually does this, when "opening and closing" variables. That is... when you declare a variable in speedie, it needs to "allocate" a register for that variable. And later, deallocate it, when its no longer accessible.
+Speedie actually does this at compile-time, when deciding where and when your code should to "open" and "close" variables.
+
+That is... when you declare a variable in speedie, it needs to "allocate" a register for that variable. And later, deallocate it, when its no longer accessible.
 
 Speedie acheieves this, by using the stack, instead of appending to some global array of "current variable state". We do something like this:
 
