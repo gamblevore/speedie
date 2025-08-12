@@ -9,7 +9,7 @@
 
 // Hope you enjoy!
 
-import "LeFunny"
+import ".Funny"
 
 main (|int| AmountOfSwears=1)
 ////  You can always replace the word-list by altering ////

@@ -7,9 +7,9 @@ main
 class IProcess
 	virtual start (|bool|)
 		return true
-	virtual end
-	virtual update (|date| time)
-	virtual draw
+	virtual end:
+	virtual update (|date| time):
+	virtual draw:
 	
 	
 

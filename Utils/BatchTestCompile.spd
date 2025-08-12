@@ -1,0 +1,30 @@
+
+
+|| OKList = faststring()
+	
+main (|[file]| Files)
+	for f in files
+		if f.MustExist
+			app.TryCompile(f)
+	printline oklist
+		
+
+function app.TryCompile	(|file| f, |bool|)
+	if f isa "scproj" or "spd"
+		return .TryCompileOne(f)
+	if !f.IsDir
+		return true
+	for c.files in f
+		if !c.IsLink // no loopies
+			.TryCompile(c)
+	return true
+		
+		
+function app.TryCompileOne (|file| f, |bool|)
+	|| args = ["--nocompile", f]
+	rz = "/usr/local/bin/spd".Execute(args, processownermode.StdOutSilence).Successful
+	if !rz
+		"Fail: $f"
+	else
+		OKList <~ "\nOK: $f"
+	

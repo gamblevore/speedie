@@ -259,19 +259,19 @@ function ivec4.Edge (|int| where, |ivec4|)
 	|| H = .Height-2
 	while where >= 0 and w > 0 and h > 0
 		if (where < W)		// bottom
-			return (.x + where+1, .Y, 0, -1)
+			return (.x + where+1, .y, 0, -1)
 		where -= w
 
 		if (where < H)		// right
-			return (.X2-1, .y+where+1, 1, 0)
+			return (.x2-1, .y+where+1, 1, 0)
 		where -= h
 
 		if (where < W)		// top
-			return (.x + where+1, .Y2-1, 0, 1)
+			return (.x + where+1, .y2-1, 0, 1)
 		where -= w
 
 		if (where < H)		// left
-			return (.X, .y + where+1, -1, 0)
+			return (.x, .y + where+1, -1, 0)
 		where -= h
 		
 	

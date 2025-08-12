@@ -188,7 +188,7 @@ class Breakout (Window)
 		|| w = where.Width
 		|| src = where[0,0]
 		for x in .Width
-			src++[] = Colors.rainbow(x div w, 1, 0.5)
+			src++[] = Colors.rainbow(x div w, 1, 0.5).px
 		src = where[0,0]
 		|| dest = src
 		for h in where.Height
@@ -199,7 +199,7 @@ class Breakout (Window)
 			b.Color = colors.wheel(H, 0.8, 0.5)
 			where.DrawRect(b, b.color)
 			|| Col = colors.wheel(H, 1.0, 0.4)
-			where.DrawOutlineOnly(b, col)
+			where.DrawOutlineOnly(b, col.px)
 		where.DrawRect(.bar)
 
 		|| L = 24s()
