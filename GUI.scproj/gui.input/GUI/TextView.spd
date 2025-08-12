@@ -106,7 +106,7 @@ class TextView (GUIControl)
 		
 		if .ClickedScroll(P, clicks)
 			return MouseDragging.Within
-		if .ClickedLineNum(P)
+		if (clicks >= 1) and .ClickedLineNum(P)
 			return MouseDragging.Handled
 		
 		if self is editable or AlwaysScrollable
@@ -152,6 +152,7 @@ class TextView (GUIControl)
 
 		
 	helper ClickedLineNum (|ivec2| P, |bool|)
+		require self is editable
 		require p.x < .LineNumRight
 		|| bs = (0, 0)
 		|| d = .ByteAtXY(p, bs)
