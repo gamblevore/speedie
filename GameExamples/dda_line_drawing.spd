@@ -25,8 +25,7 @@ class Demo (Window)
 			for cc in d.RayCast		//		<---- all the magic is in the .raycast function
 				|| DD = ((Cc, Cc+1)*6) + M
 				Where.DrawRect(DD, colors.red(0.5))
-			|| range2 = d2.RayCast
-			for cc in range2
+			for cc in d2.RayCast
 				|| DD = ((Cc, Cc+1)*6) + M
 				Where.DrawRect(DD, colors.blue(0.5))
 

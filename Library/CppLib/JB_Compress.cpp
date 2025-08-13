@@ -1,6 +1,6 @@
 
 #include "JB_Compress.h"
-//#include "divsufsort.h"
+// #include "divsufsort.h"
 // this still seems a lot SLOWER than the original! Despite all my opts!
 // could it be because the original perhaps used... registers? and mine isn't?
 // sigh. That will suck, to change.
@@ -10,8 +10,9 @@
 
 
 struct DateLocker {
-	atomic_int64_t Value;
-	DateLocker  () {Value = 0;}
+	atomic_int64_t	Value;
+	bool			NoLongerNeeded;
+	DateLocker  () {Value = 0; NoLongerNeeded=false;}
 	void unlock () {
 		Value &= ~1;
 	}
@@ -24,11 +25,12 @@ struct DateLocker {
 	}
 	bool start_clear (int Duration) {
 		auto D = (Date)Value;
-		require(D and !(D&1));						// its been used but not in-use
-		require(JB_Date__Now() > D + Duration);		// enough time passed
+		require(D and !(D&1));										// its been used but not in-use
+		require(NoLongerNeeded or JB_Date__Now() > D + Duration);	// enough time passed
 		return Value.compare_exchange_weak(D, -1);
 	}
 	void cleared () {
+		NoLongerNeeded = false;
 		Value = 0;
 	}
 };
@@ -37,15 +39,18 @@ struct DateLocker {
 static DateLocker		Allocator;
 static u8*				Space;
 
-// how to make this so that it frees on command... even while locked by a thread
-// that is already checking if it should be freed.
 extern "C" int CompressionFree(int X) {
 	if (Allocator.start_clear(X)) {
 		JB_Free(Space);
+		puts("cleared");
 		Space = 0;
 		Allocator.cleared();
 	}
 	return 0;
+}
+
+extern "C" void JB_CompFreeNow() {
+	Allocator.NoLongerNeeded = true;
 }
 
 extern "C" int JB_CompFreer() {

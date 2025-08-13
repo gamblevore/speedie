@@ -30,12 +30,18 @@ Module MZLab
 		Strong    = 20			// 
 		Strongest = 30			// 
 		Default   = strong		// its fast enough!
-		
+	
+	
+	function FreeNow
+		cpp_wrapper JB_CompFreeNow
+	
+	
 	function TestMz (|string| path, |bool|)
 		if path
 			|| f = path.ReadFile.decompress(int.max)
 			return f.CompressTest(true) and .ManyTests
-		
+	
+	
 	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
 		if which & 1
 			require .CompressTestSub(mzlab.strong, report)
@@ -64,6 +70,7 @@ Module MZLab
 			if i & (1<<j)
 				fs <~ items[j]!
 
+
 	helper ManyTests (|bool|) // mztest
 		|| Items = "abcd efgh ijkl mnop".words
 		|| fs = faststring()
@@ -90,6 +97,7 @@ Module MZLab
 				expect s == d
 
 		"TestCompression passed."
+
 
 
 target minilib {

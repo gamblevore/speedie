@@ -1,7 +1,6 @@
 #include "JB_FastString.h"
 #include <string>
 #include <iostream>
-//#include <immintrin.h>
 using namespace std;
 
 #define u8 unsigned char
@@ -17,10 +16,14 @@ using namespace std;
 	#define u64Sortable(a) (a)
 #endif
 
+ 
 using std::min;
 using std::max;
 
 extern "C" {
+
+void JB_CompFreeNow();
+
 #if false
 static void ReportOffset_(int Offset, int Length, int C);
 static void ReportEscape_(int Length, int C);

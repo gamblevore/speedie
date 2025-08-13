@@ -122,6 +122,7 @@ JB_String* JB_Upper();
 JB_String* JB_Lower();
 int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level);
 int JB_Str_DecompressChunk (FastString* fs,  JB_String* self);
+void JB_CompFreeNow();
 
 
 
