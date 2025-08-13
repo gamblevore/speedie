@@ -7,10 +7,13 @@
 
 extern "C" {
 
-
-JBClass( JB_File, JB_StringShared,
+struct JB_DirReader {
     void*           Dir;
     void*           DirEnt;
+};
+
+JBClass( JB_File, JB_StringShared,
+	JB_DirReader	Reader;
 	int				OpenMode;
 	int				MyFlags;
 	int				Descriptor;

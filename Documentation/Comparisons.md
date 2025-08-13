@@ -259,8 +259,8 @@ Heres the same in speedie:
     function ReadFile (|string| path, |StringThatWasReadSafely|)
         || f = path.file
         if f.OpenForRead
-            return f.ReadAll(false) // reports errors upon any failiure.
-        // if f.OpenForRead returned false, an error will have been reported.
+            return f.ReadAll(false) // Reports errors upon any failiure.
+        // f.OpenForRead reports errors upon failiure also.
     		
     
     main

@@ -839,20 +839,30 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 }
 
 
+static byte EmptyFilePaths = 0;
 JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
 	JB_New2(JB_File);
-	// empty paths aren't valid. We should make an error, right?
-	if (!Path)
-		Path = JB_Str__Empty();
+	if (!JB_Str_Length(Path)) {
+		Path = JB_Str__Error();
+		if (EmptyFilePaths < 10) {
+			EmptyFilePaths++; // don't spam them if their code is horribly flawed.
+			JB_ErrorHandleFile(Path, nil, ENOENT, nil, "constructing", 3); // means a problem but not necessarily an error
+		}
+	}
 	Path = JB_File_PathFix_(Path);
 	self->Addr = Path->Addr;
 	self->Length = Path->Length;
-	self->Parent = JB_Incr(Path); // not ideal but whatever...
+	self->Parent = JB_Incr(Path);
+	
     self->Descriptor = -1;
     self->MyFlags = 0;
     self->OpenMode = 0;
-    self->Dir = 0;
-    self->DirEnt = 0;
+    
+    // Would be better to split Dir/DirEnt off into a struct... Do this when I can.
+    
+    self->Reader.Dir = 0;
+    self->Reader.DirEnt = 0;
+    
 	if (WorthTestingCase())
 		CaseTest_(self);
 	return self;
@@ -872,18 +882,18 @@ JB_String* JB_File_Render(JB_File* self, FastString* fs_in) {
 //}
 
 bool JB_File_ListStart (JB_File* self) {
-    DirReader* D = (DirReader*) (&self->Dir);
-    self->DirEnt = 0; // in case already set?
+    DirReader* D = (DirReader*) (&self->Reader.Dir);
+    self->Reader.DirEnt = 0; // in case already set?
     return InitOpenDir_( D, (const char*)JB_FastFileThing(self) );
 }
 
 void JB_File_ListEnd( JB_File* self ) {
-    if (self->Dir) {
-        DirReader* D = (DirReader*) (&self->Dir);
+    if (self->Reader.Dir) {
+        DirReader* D = (DirReader*) (&self->Reader.Dir);
         CloseDir_(D);
-        self->Dir = 0;
+        self->Reader.Dir = 0;
     }
-    self->DirEnt = 0;
+    self->Reader.DirEnt = 0;
 }
 
 void JB_File_Destructor( JB_File* self ) {
@@ -1248,9 +1258,9 @@ int JB_File__chdir( JB_String* Path ) {
 
 
 bool JB_File_MoveNext(JB_File* self) {
-    DirReader* D = (DirReader*) (&self->Dir);
-    self->DirEnt = (int*)ReadDir_(D);
-    return self->DirEnt;
+    DirReader* D = (DirReader*) (&self->Reader.Dir);
+    self->Reader.DirEnt = (int*)ReadDir_(D);
+    return self->Reader.DirEnt;
 }
 
 
@@ -1282,7 +1292,7 @@ static bool ChildIsDir (JB_File* self, int MakeDirsObvious, dirent* Child, int C
 
 
 JB_String* JB_File_CurrChild (JB_File* self, int MakeDirsObvious) {
-    dirent* Child = (dirent*)self->DirEnt;
+    dirent* Child = (dirent*)self->Reader.DirEnt;
     if (!Child)
         return JB_Str__Empty();
     
