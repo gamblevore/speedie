@@ -42,7 +42,6 @@ static u8*				Space;
 extern "C" int CompressionFree(int X) {
 	if (Allocator.start_clear(X)) {
 		JB_Free(Space);
-		puts("cleared");
 		Space = 0;
 		Allocator.cleared();
 	}

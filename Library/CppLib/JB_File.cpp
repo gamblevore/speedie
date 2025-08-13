@@ -297,22 +297,26 @@ bool RetryMakePath (JB_String* s) {
 
 
 int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
-    NativeFileChar2* CPath = (NativeFileChar2*)JB_FastFileThing( Path );
-	
-    Flags |= O_Win32Sucks |  O_CLOEXEC; // mostly we dont want this... just for shm
-    int FD = open( CPath,  Flags,  kDefaultMode );
-    if (FD < 0  and  Flags&O_CREAT  and  RetryMakePath(Path))
-		FD = open( CPath,  Flags,  kDefaultMode );
+	if (!JB_Str_Length(Path)) {
+		errno = ENOENT;
+	} else {
+		NativeFileChar2* CPath = (NativeFileChar2*)JB_FastFileThing( Path );
+		
+		Flags |= O_Win32Sucks |  O_CLOEXEC; // mostly we dont want this... just for shm
+		int FD = open( CPath,  Flags,  kDefaultMode );
+		if (FD < 0  and  Flags&O_CREAT  and  RetryMakePath(Path))
+			FD = open( CPath,  Flags,  kDefaultMode );
 
-    if (FD >= 0) {
-		if (Flags & O_CREAT) {
-			RelaxPath_(CPath, false, Path);
+		if (FD >= 0) {
+			if (Flags & O_CREAT) {
+				RelaxPath_(CPath, false, Path);
+			}
+			return FD;
 		}
-        return FD;
+		if ((errno == ENOENT) and AllowMissing)
+			return -2;// ignore it...
 	}
     
-    if ((errno == ENOENT) and AllowMissing)
-        return -2;// ignore it...
 	JB_ErrorHandleFile(Path, nil, errno, nil, "opening");
     return -1;
 }
@@ -837,6 +841,7 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 
 JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
 	JB_New2(JB_File);
+	// empty paths aren't valid. We should make an error, right?
 	if (!Path)
 		Path = JB_Str__Empty();
 	Path = JB_File_PathFix_(Path);

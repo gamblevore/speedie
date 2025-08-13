@@ -84,7 +84,7 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 
 
 static JB_String* Path_(JB_String* self) {
-    if (!self or JB_Str_ByteValue(self, 0)== '/') {
+    if (!JB_Str_Length(self) or JB_Str_ByteValue(self, 0)== '/') {
         return self;
     }
     FastString* FS = JB_FS__FastNew(0);

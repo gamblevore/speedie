@@ -257,17 +257,17 @@ Heres an example of error-handling with files in Go:
 Heres the same in speedie:
 
     function ReadFile (|string| path, |StringThatWasReadSafely|)
-        expect (path) ("Path is empty")
         || f = path.file
-        require f.OpenForRead   // creates an error
-        return f.ReadAll(false) // also creates errors
+        if f.OpenForRead
+            return f.ReadAll(false) // reports errors upon any failiure.
+        // if f.OpenForRead returned false, an error will have been reported.
     		
     
     main
         || f = ReadFile("file.txt")
             printline f
 
-Its a little different, because the file functions already create errors, and we don't want **two** errors created per-operation. Also, our standard `.open` function actually **creates** files if they don't exist, so we use `f.OpenForRead` instead which expects an existing file to exist, and only uses it for reading. So now it does the same as the Go code.
+Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors. Also, we use `f.OpenForRead(false)` which expects a file to exist, and won't create an empty file. So now it does the same as the Go code.
 
 Also, no need to print the error to stderr, as Speedie already does that on exit!
 
