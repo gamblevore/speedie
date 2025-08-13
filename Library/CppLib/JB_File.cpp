@@ -844,10 +844,11 @@ JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
 	JB_New2(JB_File);
 	if (!JB_Str_Length(Path)) {
 		Path = JB_Str__Error();
-		if (EmptyFilePaths < 10) {
-			EmptyFilePaths++; // don't spam them if their code is horribly flawed.
-			JB_ErrorHandleFile(Path, nil, ENOENT, nil, "constructing", 3); // means a problem but not necessarily an error
-		}
+// speedie creates a file with an empty path as a placeholder... so this code can't be used?
+//		if (EmptyFilePaths < 10) {
+//			EmptyFilePaths++; // don't spam them if their code is horribly flawed.
+//			JB_ErrorHandleFile(Path, nil, ENOENT, nil, "constructing", 3); // means a problem but not necessarily an error
+//		}
 	}
 	Path = JB_File_PathFix_(Path);
 	self->Addr = Path->Addr;
