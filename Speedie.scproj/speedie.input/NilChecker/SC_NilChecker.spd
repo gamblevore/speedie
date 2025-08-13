@@ -368,6 +368,7 @@ function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
+	.CloseVars(0)
 	.DeclKill
 	t.anyreturns = true
 	|| ret = t.return
@@ -382,12 +383,14 @@ function Return (NilTrackerFn)
 
 
 function Exit (NilTrackerFn)
+	.CloseVars(.loops.VarCount)
 	.loops.ExitRecord |= .EndBlock
 	.loops.hasEscape = true
 
 
 
 function Continue (NilTrackerFn)
+	.CloseVars(.loops.VarCount)
 	.loops.ContRecord |= .EndBlock
 
 
@@ -558,6 +561,8 @@ function Thing (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.FastDecl
 	rz = .ThingSub(msg, test, dcl)
+	|| nreg = dcl.NilReg
+		t.closers[nreg] = msg
 	msg.Indent = rz				// The msg now knows the current state! Nice!
 	if t.FnAbleToNilCheck and dcl is self
 		rz |= nilstate.FnBecomesNilCh
@@ -566,13 +571,10 @@ function Thing (NilTrackerFn)
 function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstate|)
 	opt norefcounts										// Handles 10 different cases :O
 
-	if !dcl.NilReg
+	if !dcl.Suffers
 		return dcl.nildeclared
 	
-	|| Unknown = dcl.IsUnknownParam 
-//	if (dcl is param) and (test isnt AllowRegisterAddr) and dcl.PointerCount
-//		(dcl is NoRegAddrs)
-		
+	|| Unknown = dcl.IsUnknownParam 		
 	if Unknown and (test isnt soft and disappears)
 		if test isnt Active							// set var A to unknown prm B, so default to real
 			return .BecomeReal(dcl, msg, NilReason.Reading)
@@ -609,6 +611,10 @@ function Argument (Niltrackerfn)
 		if rz is Killer
 			exit
 	
+	if rz isnt Killer
+		.ContinueVars(v-1)
+		
+	// try to close our msgs...
 	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
 	t.value = ArchonPurger.value & Allowed
 
@@ -680,16 +686,17 @@ function Declaration (niltrackerfn) // function decl
 	opt norefcounts
 	|| rel = msg.last!
 	// carrays declared like: |int[1]| LocalVar
+	t.closers[]
 	|| thg = rel.first
 		|| d = thg.FastDecl
 		// if d != rel.FastDecl // some still not updated
 		|| J = .Jump(rel.last!)
 		if d.IsReg
-			return T.Declare(D, J)
+			return T.Declare(D, J, msg)
 	  else
 		|| d = rel.FastDecl
 		if d.IsReg
-			return T.Declare(D, nilstate.real)
+			return T.Declare(D, nilstate.real, msg)
 	
 
 
@@ -764,7 +771,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		error (RecvMsg, "Nil is not allowed on: " + recvmsg.origrender)
 		return nilstate.real
 		
-	if recv.NilReg
+	if recv.Suffers
 		return T.SetNilness(recv, SentState)
 
 
@@ -879,9 +886,4 @@ function message.DenyPreviousUse (|message| msg)
 		if ch.obj == decl
 			error (ch, "Unsafe var passing. (Altered later in expression)")
 	
-	
-	
-	
-	
-
 

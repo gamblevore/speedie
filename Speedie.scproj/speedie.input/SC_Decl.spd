@@ -131,6 +131,7 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
 	|byte|				NilReg
+	|bool|				Suffers
 	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				DepthOfBranch

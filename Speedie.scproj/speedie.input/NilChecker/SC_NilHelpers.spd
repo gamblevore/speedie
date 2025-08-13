@@ -119,11 +119,11 @@ function message.KinderRemoveAfter
 function scdecl.CanUpgradeRegister (|int|)
 	opt norefcounts
 	|| i = .Internal // erase this eventually
-		if (i Is Local) and i.NilReg
+		if (i Is Local) and i.Suffers
 			return 1
 	
 	if (self is Reference)
-		if (self is local) and .nilreg
+		if (self is local) and .Suffers
 			return 2
 		
 

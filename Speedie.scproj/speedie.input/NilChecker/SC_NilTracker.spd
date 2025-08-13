@@ -17,6 +17,7 @@ struct ArchonPurger
 	|&NilRecord| 			RowEnd
 	|Nilrecord| 			Realnesses		// could be removed after we remove the param upgrader!
 	|Scdecl--[32]| 			Decls
+	|message--[32]|			Closers
 	|scdecl?|				Return
 	|int| 					InsideBoolLogic
 	|bool|					FnAbleToNilCheck
@@ -75,18 +76,21 @@ struct ArchonPurger
 		return nilstate.real
 
 			
-	function Declare (|scdecl| D, |nilstate| nd, |nilstate|)
-		rz = .DeclareSub(d, nd)
+	function Declare (|scdecl| D, |nilstate| nd, |message| ToClose, |nilstate|)
+		rz = .DeclareSub(d, nd, toclose)
 		target debugnil	
 			d.NilPrint("add")
 	
 	
-	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
+	function DeclareSub (|scdecl| D, |nilstate| nd, |message| ToClose, |nilstate|)
 		nd &= nilstate.either
 		|| N = .value.DepthOfVars + 1
 		expect (N < 31)							(D.source, "Too many declarations")
 		.decls[n] = d
-		d.NilReg = N * d.TypeSuffers			
+		d.suffers = d.TypeSuffers			
+		d.NilReg = N
+		if !d.Suffers
+			d.NilDeclared = NilState.Real
 		d.NilAllocDepth = .NestDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
@@ -125,7 +129,7 @@ struct ArchonPurger
 		
 		for d in f.args
 			d.Paramfix
-			.DeclareSub(d, d.nildeclared)
+			.DeclareSub(d, d.nildeclared, nil)
 
 		target debugnil
 			f.NilPrint("\n ****** ", false)
@@ -189,6 +193,13 @@ struct ArchonPurger
 			t.value = nilstate.basic
 
 
+		function ContinueVars (|int| NewDepth)			
+//			.CloseVars(newdepth)
+
+
+		function CloseVars (|int| NewDepth)
+
+			
 		function DeclKill
 			opt inline
 			if !t.nestdepth
