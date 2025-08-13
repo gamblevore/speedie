@@ -217,11 +217,6 @@ extend_module scfunction
 
 
 	function TempMoveOut (|Message!| msg, |Message!| place, |Message|)
-		|| OldDecl = msg.AsDecl
-		if !OldDecl
-			place.prev = msg
-			return msg // right?
-	
 		|| Using = msg.syntaxusing
 		|| Name = UniqueTmpVar(msg.msgowningfunc)
 		

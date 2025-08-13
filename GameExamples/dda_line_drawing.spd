@@ -22,8 +22,7 @@ class Demo (Window)
 		for 9
 			d = (d.hash&255)-128
 			d2 = (d2.hash&255)-128
-			|| range = d.RayCast
-			for cc in range		//		<---- all the magic is in the .raycast function
+			for cc in d.RayCast		//		<---- all the magic is in the .raycast function
 				|| DD = ((Cc, Cc+1)*6) + M
 				Where.DrawRect(DD, colors.red(0.5))
 			|| range2 = d2.RayCast

@@ -180,6 +180,7 @@ function scdecl.NotLocal (|scdecl|)
 
 
 function scdecl.AsLocal (|scdecl|)
+	opt norefcounts
 	if (self is local) 
 		return self
 	rz = .copydecl

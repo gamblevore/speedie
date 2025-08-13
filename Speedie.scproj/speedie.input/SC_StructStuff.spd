@@ -54,7 +54,7 @@ function Tran_Rejoin (TranFunc)  // exitter
 	
 
 
-function scfunction.StructImprove (|scfunction| fn, |scparamarray| incoming, |scfunction|)
+function SCFunction.StructImprove (|scfunction| fn, |scparamarray| incoming, |scfunction|)
 	opt norefcounts
 	|| ft = fn.StructReturned
 		incoming.StructReturner(ft.AsLocal, self)
@@ -63,7 +63,7 @@ function scfunction.StructImprove (|scfunction| fn, |scparamarray| incoming, |sc
 	return fn
 
 
-function scfunction.StructReturned (|scdecl|)
+function SCFunction.StructReturned (|scdecl|)
 	opt norefcounts
 	|| p = .StructReturnPos
 		|| f = .args[p-1]
@@ -86,16 +86,22 @@ function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 	|| s = .exp								#require
 	|| Rel = s.UseNonRefChangers(True)
 	|| f = Rel.func
-		
+
 	if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
-		error (rel, "Can't pass structs this way")
+		|| p = rel.ParentPoint!
+		|| nsp = p.parent!.obj|scnode|
+		|| NewThg = SCFunction.TempMoveOut(s, p)
+		|| dcl = s.parent!.parent!
+		dcl.CollectFromBody(nsp)							// right? this will call back into here!
+		NewThg.obj = dcl.obj
 		return
 		
+
 	if  Rel.ASMType is kreturn
         /* return YY.new  -->  yy.new(rz), return */
 		|| prm = s.last
 			prm.func = @prm
-			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
+			|| subrz = prm.msg(@thg, "rz")					// we need to add rz.
 			subrz.obj = SCFunction.currfunc!.StructReturned // right?
 			rel.prev = rel.first
 			f = @nil
@@ -109,7 +115,9 @@ function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 			|| dcltype = dcl.first
 				dcltype.become(@thg, type.type.name)
 			dcl.next = s
-			dcl <~ Neweqrel(name, type.internal!.CreateStructNil(name))
+			|| struct = type.internal!.CreateStructNil(name)
+			|| Rel2 = Neweqrel(name, struct) 
+			dcl <~ rel2
 		  else
 			op.become(@bra)
 			op.obj = nil
