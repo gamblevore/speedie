@@ -498,7 +498,7 @@ return curr
 			visible true
 			|asm| rz = .op|asm| << 24
 		
-ASM.Forms[_1] = &_0.Encode // for now
+ASM.Forms[_1] = &_0.Encode
 ".macro
 
 

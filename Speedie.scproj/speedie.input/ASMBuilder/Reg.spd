@@ -243,7 +243,7 @@ datatype ASMReg (uint64)
 	function Into (|asmreg| dest, |asmreg|)
 		rz = .reg(dest)
 		rz.µtype = dest.µtype			// I guess we copy some wierd flags... sigh.
-		(rz is exitatall) = (dest is ExitAtAll) // not sure what else to copy? do this for now.
+		(rz is exitatall) = (dest is ExitAtAll)
 		
 		
 	function Reg (assigns:|int|, |AsmReg|)

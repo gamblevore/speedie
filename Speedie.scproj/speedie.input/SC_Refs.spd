@@ -197,7 +197,6 @@ function RefDecrMsg (|Message| msg, |Message|)
 
 
 function RefClearMsg (|Message| msg, |Message|)
-	// return refdecrmsg(msg) // for now
 	return RefMsg( msg, "JB_Clear", Compiler.RefClear! )
 
 

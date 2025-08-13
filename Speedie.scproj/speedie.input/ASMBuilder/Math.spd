@@ -778,9 +778,7 @@ extend Assembler
 			sh = 64 - src.bitcount
 		  else
 			sh = 0 // no point otherwise. just make the asm simpler.
-		
-		//if (sh == 0) and (src is constoutput) // COULD make bflg constoutput, but lets not, for now.
-		
+				
 		(dest isnt constoutput)
 		return exp.BFLG(dest, src, sh, sh, src.signed|int|) * Dest
 

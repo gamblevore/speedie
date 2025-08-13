@@ -1548,7 +1548,6 @@ function scdecl.IsConstOf (|scdecl| b, |bool|)
 	
 	// Needs a "constant preservation" system.
 	// basically... takes: (kPositiveInt==1) and return "the false-bool".
-	// typeofrel, etc needs to be changed... just ints, and bools maybe strings is enough for now.
 	// (typeofbrel is already altered!)
 
 	require self is const

@@ -798,7 +798,7 @@ function RootTmpComplete (|message| cmd, |message|)
 	opt norefcounts
 	|| f = cmd[0][0]
 	|| req = f.next.name
-	|| flags = 0 // for now
+	|| flags = 0
 	flags += f.IsModuleType  <<  1
 	flags += f.IsClassType   <<  2
 	flags += f.IsLinkageType <<  3

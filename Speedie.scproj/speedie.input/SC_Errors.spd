@@ -245,7 +245,6 @@ extend Error
 
 		
 	render SCRender
-		// probably not needed, but whatever leave it for now.
 		.path ?= .SCOriginalPath
 		.path ?= "(string)"
 		if options.perryoutput

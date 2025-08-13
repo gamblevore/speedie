@@ -2,18 +2,7 @@
 
 todo:
 
-* opt bit-correction to understand loops/ifs, no require type-casts/prms to take an ASM instruction
-	* go over the thing and remove a lot of testing code/vars once its working...
-	* Inlining... just do a simple version for now.
-		* abc(), if (x) return, def()   -->   abc(), if !x {def()}, return // only for root?
-		* a = func(), return a  -->  tail func()
-		* how to NOP stuff and decr?
-		* prms and refcounting...
-			* use the link thing properly
-	* nil-checker needs to check if vars are totally constant... and mark as constant
-		* also mark if the var was altered within a loop... and then used before the alteration.
-			* what about continue/exit statements?
-		* perhaps check for branched modifications too?
+* go over ASM and remove a lot of testing code/vars once its working...
 
 * if func returns input param... it doesnt need freeifdead? I mean... assuming we didn't incr while sending it in.
 

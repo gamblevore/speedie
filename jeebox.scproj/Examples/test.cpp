@@ -82,7 +82,7 @@ void ExampleOfModifyingJeebox2 (String S) {
     Message M = S.parse();
     // let's alter the name of something in the tree.
     // ideally you want to use std::string or some proper string library, in order to alter names.
-    // but this example is OK for now.
+    // but this example is OK.
     auto Tmp = M.first();
     auto NameMsg = Tmp.first();
     auto Name = NameMsg.name();

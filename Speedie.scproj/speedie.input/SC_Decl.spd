@@ -565,7 +565,7 @@ class SCDecl (SCObject) {
 			return self
 
 		  elseif !NormalContained.isnormalobject
-			return self // yeah not very precise, but good enough for now!
+			return self
 		
 		check .CanWrap (ErrPlace, "Can't store this type as an object (in this version of speedie).")
 		return .NewWrapper(self)

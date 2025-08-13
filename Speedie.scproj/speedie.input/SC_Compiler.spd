@@ -861,7 +861,7 @@ function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.r
 
 function MakeMainFunc (|message|)
 	|| f = compiler.MainFunc 
-		f.blindcasts = errorseverity.error // this for now.
+		f.blindcasts = errorseverity.error
 		return f.sourcearg
 	"Compiling as library!"
 	Options.ProjectisLibrary = true

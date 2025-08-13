@@ -72,7 +72,7 @@ function Tran_Expect (TranFunc)
 
 // its always "newstyle" now? remove this check?
 	|| NewStyle = (N == "check" or "warn")
-	if (NewStyle and !ch1) // work around for now.... for: error where
+	if (NewStyle and !ch1)
 		ch1 = ch
 		ch = @thg + "false"
 		ch1.prev = ch
@@ -938,7 +938,6 @@ function message.ObjCls (|scclass|)
 	opt norefcounts
 	|| o = .obj as scdecl
 		// if (o is classobj) != (o.type == TypeJBClass)
-		// I guess keep this for now. sigh. they aren't always the same
 		if o is ClassObj
 			return o.contains!.type
 
