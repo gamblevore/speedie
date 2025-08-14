@@ -23,13 +23,13 @@ static void SendToStdOut(uint8* d, int N) {
 //		JB_PrintStackTrace();
 //		InPrint = false;
 //	}
-	JB_Write( STDOUT_FILENO, d, N );
+	JB_Write_( STDOUT_FILENO, d, N );
 }
 
 void JB_Str_PrintError(JB_String* s) {
 	int N = JB_Str_Length(s);
     if (N) {
-        JB_Write( STDERR_FILENO, s->Addr, N );
+        JB_Write_( STDERR_FILENO, s->Addr, N );
 		if (!JB_ErrorNumber) {
 			JB_ErrorNumber = 1; // terminals complain if printerror without return 1;
 		}

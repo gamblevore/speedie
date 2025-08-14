@@ -17,7 +17,6 @@ struct JB_DirReader {
 };
 
 JBClass( JB_File, JB_StringShared,
-//	JB_DirReader	Reader;
 	int				Descriptor;
 	byte			OpenMode;
 	byte			MyFlags;
@@ -47,7 +46,7 @@ int JB_Str_CopyFile(JB_String* self, JB_String* To, bool attronly);
 int JB_File_Copy(JB_File* self, JB_File* To, bool attronly);
 uint8* FastShellPath_( JB_String* Path, uint8* WriteTo );
 int JB_File_Delete (JB_String* self);
-u64 JB_File_Size( JB_File* self );
+s64 JB_File_Size( JB_File* self );
 int JB_File_SizeSet( JB_File* self, IntPtr N );
 void JB_File_Flush( JB_File* self );
 bool JB_File_EOF( JB_File* self );
@@ -90,7 +89,7 @@ int JB_App__GetChar();
 void ErrorHandleSub_(JB_String* self, const char* Operation);
 JB_File* JB_File_Constructor(JB_File* self, JB_String* Path);
 int JB_File_OffsetSet( JB_File* self, s64 NewValue );
-int JB_Write(int fd, uint8* buffer, int N);
+int JB_Write_(int fd, uint8* buffer, int N);
 s64 JB_File_Offset( JB_File* self );
 s64 JB_File_Size_( int FileDes );
 int JB_File_Mode( JB_File* self );

@@ -26,8 +26,6 @@
 
 // The design of the system... is "errors are soft"
 // That means... not being pedantic. If we try to delete a file that doesn't exist who cares?
-// I want to keep this "in sync" with my existing system...
-// especially for strings... where nil.length = 0
 
 #ifdef TARGET_WIN32
     #include "JB_DirReaderWin32.h"
@@ -185,7 +183,6 @@ int64 ErrorHandle_(int64 MaybeErr, JB_String* self, JB_String* other, const char
 }
 
 
-
 int JB_File__RelaxSudo(int Active) {
 	SudoRelax += Active;
 	return SudoRelax;
@@ -244,6 +241,7 @@ static bool IsLink_(const char* Path) {
 	auto s = lstat( Path, &st );
 	return (s == 0) and S_ISLNK(st.st_mode);
 }
+
 
 static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
 	require (SudoRelax > 0);
@@ -390,7 +388,7 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 
 // this is what the write() function should do.
 // well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
-int JB_Write(int fd, uint8* buffer, int N) {
+int JB_Write_(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
 
     while (N > TotalCount) {
@@ -502,14 +500,14 @@ static bool CrashLogSub(const char* c) {
 	fputs(c, stderr);
 
 	if (!CrashLogFile) return false;
-    JB_Write( CrashLogFile, (u8*)c, (int)strlen(c) );
+    JB_Write_( CrashLogFile, (u8*)c, (int)strlen(c) );
     return true;
 }
 
 
 void JB_Rec__CrashLog(const char* c) {
 	if (c and CrashLogSub(c))
-		JB_Write( CrashLogFile, (u8*)"\n", 1 );
+		JB_Write_( CrashLogFile, (u8*)"\n", 1 );
 	fputc('\n', stderr);
 }
 
@@ -549,8 +547,8 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 			Result = JB_Str__Empty();
 		
 		} else if (FD >= 0) {
-			u64 S = JB_File_Size(self); 
-			if (S <= (u64)lim) {
+			s64 S = JB_File_Size(self); 
+			if (S <= (s64)lim) {
 				Result = JB_File_Read( self, S, AllowMissing );
 				if (!WasOpen)
 					JB_File_Close(self);
@@ -678,9 +676,6 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	}
 #endif
 
-//int JB_App__ClearEnv() {
-//	clearenv; // sigh. not on osx!
-//}
 
 int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
 	if (name) {
@@ -731,7 +726,7 @@ bool JB_File_EOF( JB_File* self ) {
 
 
 int64 JB_File_WriteRaw_( JB_File* self, uint8* Data, int N ) {
-    N = JB_Write( self->Descriptor, Data, N );
+    N = JB_Write_( self->Descriptor, Data, N );
     return ErrorHandle_(N, self, nil, "write to");
 }
 
@@ -1023,7 +1018,7 @@ int JB_File_SizeSet( JB_File* self, IntPtr N ) {
 }
 
 
-u64 JB_File_Size( JB_File* self ) {
+s64 JB_File_Size( JB_File* self ) {
 	struct _stat st;
 	return Stat_(self, &st) * (u64)st.st_size;
 }
@@ -1033,7 +1028,7 @@ Date JB_File_Accessed( JB_File* self ) {
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
-		return JB_Date__Create(st.st_atime, 0);//st.st_mtime_nsec);
+		return JB_Date__Create(st.st_atime, 0);
 	#else
 		return JB_Date__Create(st.st_atimespec.tv_sec, st.st_atimespec.tv_nsec);
 	#endif
@@ -1041,9 +1036,6 @@ Date JB_File_Accessed( JB_File* self ) {
 
 
 Date JB_File_Modified( JB_File* self ) {
-// IT MAKES NO SENSE!!!
-// I got two files... the newer one is coming out with an OLDER DATE.
-// it seemse USELESS. Whats the point of a date that can't be used.
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
@@ -1052,6 +1044,7 @@ Date JB_File_Modified( JB_File* self ) {
 		return JB_Date__Create(st.st_mtimespec.tv_sec, st.st_mtimespec.tv_nsec);
 	#endif
 }
+
 
 void JB_File_ModifiedSet( JB_File* self, Date when ) {
 	auto path = (const char*)(self->Addr);
@@ -1246,8 +1239,6 @@ JB_File* JB_File__NewPipe(int Pipe) {
 bool JB_File_IsPipe(JB_File* f) {
 	return f->MyFlags & 2;
 }
-
-
 
 JB_File* JB_Str_File( JB_String* Path ) {
 	return JB_File_Constructor( 0, Path );
