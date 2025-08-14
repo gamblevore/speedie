@@ -3,12 +3,12 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+
 class Error (Message)
 	linkage
 		cpp_part	Err
 		cpp_class	JB_Error
 	
-
 	contains	Error
 	
 	|String|				Path

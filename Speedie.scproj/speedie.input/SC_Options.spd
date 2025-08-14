@@ -8,7 +8,7 @@ module Options
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""
-	|| 		Arch					= "" // targetarchitecture
+	|| 		Arch					= "" // TargetArchitecture
 	||		SingleCppOutput			= true
 	|| 		NilTestAllocNeverFails	= true
 	|| 		Beep					= false
@@ -40,7 +40,7 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		ASMRenderBlocks			= false
-	|int|	Optimise				= 1
+	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0

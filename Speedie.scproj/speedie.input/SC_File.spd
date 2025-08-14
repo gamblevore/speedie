@@ -18,9 +18,10 @@ class SCFile (file)
 	constructor (|File| f, |scimport| p)
 		flow off // dates shouldn't matter ///
 		FlowControl.DisabledIncr
-		super.constructor((f.path, "")(f != nil))
+		|string--| x = (f.path, string.error)(f != nil) // just feel like doing this.
+		super.constructor(x)
 		.Proj = p
-		.filenum = scimport.allfiles.length
+		.filenum = scimport.AllFiles.length
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
