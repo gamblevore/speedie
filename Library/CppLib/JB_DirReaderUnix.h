@@ -58,15 +58,6 @@ extern "C" {
 
 
 #define DirReader DIR*
-inline bool InitOpenDir_( DirReader* D, const char* c ) {
-	*D = tropendir( c );
-	return *D;
-}
-
-inline bool CloseDir_( DirReader* D ) {
-	trclosedir( *D );
-    return true;
-}
 
 dirent* ReadDir_( DirReader* D );
     

@@ -9,16 +9,18 @@ extern "C" {
 
 // put this separately as its own struct eventually... 
 // half way there!
+struct JB_File;
 struct JB_DirReader {
     void*           Dir;
-    void*           DirEnt;
+    void*           Item;
+    JB_File*		File;
 };
 
 JBClass( JB_File, JB_StringShared,
-	JB_DirReader	Reader;
-	int				OpenMode;
-	int				MyFlags;
+//	JB_DirReader	Reader;
 	int				Descriptor;
+	byte			OpenMode;
+	byte			MyFlags;
 );
 
 
@@ -28,12 +30,12 @@ int JB_File_WritePng(void* file, int w, int h, const void *data);
 unsigned char* JB_Img__LoadPNG(unsigned char* data, int len, int* x, int* y, int* comp);
 uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size);
 uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len);
-JB_String* JB_File_CurrChild (JB_File* self, int SlashOnDir);
+JB_String* JB_File_CurrChild (JB_DirReader* self, int SlashOnDir);
 long JB_File_Test( );
 JB_String* JB_File_Render(JB_File* self, FastString* fs);
-bool JB_File_MoveNext(JB_File* self);
-bool JB_File_ListStart( JB_File* self );
-void JB_File_ListEnd( JB_File* self );
+bool JB_File_MoveNext(JB_DirReader* self);
+void JB_File_ListStart (JB_File* File, JB_DirReader* Reader);
+void JB_File_ListEnd( JB_DirReader* self );
 //bool JB_File_ListActive( JB_File* self );
 
 JB_Object JB_File__File( JB_File* self );

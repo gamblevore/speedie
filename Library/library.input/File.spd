@@ -276,21 +276,12 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	syntax access (|string| name, |File!|)
 		return .Child(name)
 
-	function ListStart (|bool|)
+	function ListStart (|DirectoryReader|)
 		cpp_wrapper
 
 //	function ListActive (|bool|)
 //		cpp_wrapper
 
-	function ListEnd
-		cpp_wrapper
-
-	helper MoveNext (|bool|)
-		cpp_wrapper JB_File_MoveNext
-
-	helper CurrChild (|int| MakeDirsObvious=0, |String|)
-		cpp_wrapper
-	
 	function Open (|int| Flags = File.ReadWriteMode ||| File.CreateMode, |bool|AllowMissing=false, |filedes|)
 		cpp_wrapper
 
@@ -300,7 +291,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function OpenDes (|filedes|)
 		.openempty
 		return .descriptor
-	
 	
 	function OpenBlank (|filedes|)
 		disabled "Use OpenEmpty instead"
@@ -341,7 +331,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			return f
 		return f.Parent.UniqueChild(.name)
 			
-		
 	function UniqueChild (|string| name, |file|)
 		|| test = name
 		for 1000
@@ -365,7 +354,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 					rz = tmp
 		if !KeepSelf and rz == 0
 			rz = .Delete
-
 
 	operator isfile (|string| ext, |bool|)
 		return !.isdir and self isa ext
@@ -454,16 +442,16 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		.offset += n
 
 	iterator
-		.ListStart
-		while ( .MoveNext )
-			yield .CurrChild
-		.listend
+		|| reader = .ListStart
+		while ( reader.MoveNext )
+			yield reader.CurrChild
+		reader.listend
 
 	iterator Files
-		.ListStart
-		while ( .MoveNext )
-			yield self.child(.CurrChild)
-		.listend
+		|| reader = .ListStart
+		while ( reader.MoveNext )
+			yield self.child(reader.CurrChild)
+		reader.listend
 	
 
 	function SyntaxExpect (|string| Error)
@@ -576,6 +564,23 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function AnyDate (|date|)
 		return .created ?? .modified
 
+
+
+struct DirectoryReader
+	linkage
+		wrapper
+		cpp_class JB_DirReader
+	size 24
+
+	function ListEnd
+		cpp_wrapper JB_File_ListEnd
+
+	helper MoveNext (|bool|)
+		cpp_wrapper JB_File_MoveNext
+
+	helper CurrChild (|int| MakeDirsObvious=0, |String|)
+		cpp_wrapper JB_File_CurrChild
+	
 
 
 

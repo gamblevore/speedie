@@ -866,8 +866,8 @@ JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
     
     // Would be better to split Dir/DirEnt off into a struct... Do this when I can.
     
-    self->Reader.Dir = 0;
-    self->Reader.DirEnt = 0;
+//    self->Reader.Dir = 0;
+//    self->Reader.DirEnt = 0;
     
 	if (WorthTestingCase())
 		CaseTest_(self);
@@ -883,29 +883,29 @@ JB_String* JB_File_Render(JB_File* self, FastString* fs_in) {
 	return self;
 }
 
-//bool JB_File_ListActive (JB_File* self) {
-//	return self->Dir;
-//}
-
-bool JB_File_ListStart (JB_File* self) {
-    DirReader* D = (DirReader*) (&self->Reader.Dir);
-    self->Reader.DirEnt = 0; // in case already set?
-    return InitOpenDir_( D, (const char*)JB_FastFileThing(self) );
+void JB_File_ListStart (JB_File* File, JB_DirReader* Reader) {
+    Reader->File = JB_Incr(File);
+    Reader->Item = 0;									// in case already set?
+    auto P = (const char*)JB_FastFileThing(File); 
+    Reader->Dir = opendir( P );
 }
 
-void JB_File_ListEnd( JB_File* self ) {
-    if (self->Reader.Dir) {
-        DirReader* D = (DirReader*) (&self->Reader.Dir);
-        CloseDir_(D);
-        self->Reader.Dir = 0;
+void JB_File_ListEnd (JB_DirReader* self) {
+    self->Item = 0;
+	auto c = self->Dir;
+    if (c) {
+		self->Dir = 0;
+        closedir((DIR*)c);
     }
-    self->Reader.DirEnt = 0;
+
+    auto f = self->File;
+    self->File = 0;
+    JB_Decr(f);
 }
 
-void JB_File_Destructor( JB_File* self ) {
-    JB_File_Close( self );
+void JB_File_Destructor (JB_File* self) {
+    JB_File_Close(self);
 	JB_Str_Destructor(self);
-	JB_File_ListEnd(self);
 }
 
 
@@ -928,7 +928,6 @@ void JB_File_CloseSub ( JB_File* self ) {
 }
 
 void JB_File_Close ( JB_File* self ) {
-	JB_File_ListEnd(self);
 	JB_File_StopSHM(self);
 	JB_File_CloseSub(self);
 }
@@ -1263,10 +1262,10 @@ int JB_File__chdir( JB_String* Path ) {
 
 
 
-bool JB_File_MoveNext(JB_File* self) {
-    DirReader* D = (DirReader*) (&self->Reader.Dir);
-    self->Reader.DirEnt = (int*)ReadDir_(D);
-    return self->Reader.DirEnt;
+bool JB_File_MoveNext(JB_DirReader* self) {
+    DirReader* D = (DirReader*) (&self->Dir);
+    self->Item = (int*)ReadDir_(D);
+    return self->Item;
 }
 
 
@@ -1297,8 +1296,8 @@ static bool ChildIsDir (JB_File* self, int MakeDirsObvious, dirent* Child, int C
 }
 
 
-JB_String* JB_File_CurrChild (JB_File* self, int MakeDirsObvious) {
-    dirent* Child = (dirent*)self->Reader.DirEnt;
+JB_String* JB_File_CurrChild (JB_DirReader* self, int MakeDirsObvious) {
+    dirent* Child = (dirent*)(self->Item);
     if (!Child)
         return JB_Str__Empty();
     
@@ -1308,7 +1307,7 @@ JB_String* JB_File_CurrChild (JB_File* self, int MakeDirsObvious) {
 #endif
     if ( ! NameLength ) NameLength = strlen( Child->d_name );
 
-	int IsDir = (MakeDirsObvious!=0) and ChildIsDir(self, MakeDirsObvious, Child, NameLength);
+	int IsDir = (MakeDirsObvious!=0) and ChildIsDir(self->File, MakeDirsObvious, Child, NameLength);
 	// what about if its not? we need the full-file-path, then. So we need to concat two strings.
     JB_String* e = JB_Str_New( (int)NameLength + IsDir );
     if (e) {
