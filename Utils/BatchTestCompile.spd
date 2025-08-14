@@ -11,7 +11,7 @@ main (|[file]| Files)
 	if !Fails
 		"All OK"
 	  else
-		"$fails Failiures"
+		"$fails Failiures" 
 	printline oklist
 		
 
