@@ -91,6 +91,7 @@ struct ArchonPurger
 		d.NilReg = N
 		if !d.Suffers
 			d.NilDeclared = NilState.Real
+		t.closers[n] = ToClose
 		d.NilAllocDepth = .NestDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
@@ -122,7 +123,8 @@ struct ArchonPurger
 		.Neel = .rows[0]
 		.rowend = .Neel + 63
 		.Realnesses = -1
-		ArchonPurger.loops = nil
+		loops = nil
+		ArgDepth = nil
 		.AnyReturns = false
 		.RootReturned = false
 		.CheckNilCheck(F)
@@ -179,6 +181,7 @@ struct ArchonPurger
 	module
 		|LoopInfo| 				Loops
 		|ArchonPurger|			T
+		|int|					ArgDepth
 		|byte|					OldPrint
 
 
@@ -192,14 +195,6 @@ struct ArchonPurger
 			rz = .value
 			t.value = nilstate.basic
 
-
-		function ContinueVars (|int| NewDepth)			
-//			.CloseVars(newdepth)
-
-
-		function CloseVars (|int| NewDepth)
-
-			
 		function DeclKill
 			opt inline
 			if !t.nestdepth
@@ -211,6 +206,9 @@ struct ArchonPurger
 			opt norefcounts
 			|| arg = t.Startnil(f)
 				Argument(arg)
+/				.CloseVars(0)
+
+				
 				if t.FnAbleToNilCheck and !f.isnilchecker
 					f.isnilchecker = 1
 			t.FinishNil(f)

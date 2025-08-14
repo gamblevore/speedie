@@ -368,7 +368,7 @@ function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
-	.CloseVars(0)
+/	.CloseVars
 	.DeclKill
 	t.anyreturns = true
 	|| ret = t.return
@@ -383,14 +383,14 @@ function Return (NilTrackerFn)
 
 
 function Exit (NilTrackerFn)
-	.CloseVars(.loops.VarCount)
+/	.CloseVars(.loops.VarCount)
 	.loops.ExitRecord |= .EndBlock
 	.loops.hasEscape = true
 
 
 
 function Continue (NilTrackerFn)
-	.CloseVars(.loops.VarCount)
+/	.CloseVars(.loops.VarCount)
 	.loops.ContRecord |= .EndBlock
 
 
@@ -405,7 +405,7 @@ function While (NilTrackerFn)
 	|| W = .loops.BeginLoop(!condtest.KnownTrue)
 	for i in 3 
 		.SyncJump(cond, NilCheckMode.whilepos)
-		.Argument(cond.next)
+		.Argument(cond.next!)
 		.Loops.NextLoop
 
 	if !condtest.KnownTrue
@@ -561,8 +561,13 @@ function Thing (NilTrackerFn)
 	opt norefcounts
 	|| dcl = msg.FastDecl
 	rz = .ThingSub(msg, test, dcl)
-	|| nreg = dcl.NilReg
-		t.closers[nreg] = msg
+	
+	// should we write it here for params?
+	// depends if its altered?
+	if dcl is NeedsClose//OrAltered
+		|| nreg = dcl.NilReg
+			t.closers[nreg] = msg.UpToArg
+	
 	msg.Indent = rz				// The msg now knows the current state! Nice!
 	if t.FnAbleToNilCheck and dcl is self
 		rz |= nilstate.FnBecomesNilCh
@@ -592,12 +597,14 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 
 function StatExpr (Niltrackerfn)
 	opt norefcounts
-	return Argument(msg.first, test)
+	return Argument(msg.first!, test)
  
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	|| v = .value.DepthOfVars + 1
+/	msg.indent = ++.ArgDepth
+	|| v = .value.DepthOfVars
+	
 	for s.fast in msg
 		|| t = test & -s.islast
 		if (rz is borked) and !stderr.ok
@@ -605,18 +612,16 @@ function Argument (Niltrackerfn)
 		|| prev = rz
 		rz = .SyncJump(s, T ||| nilcheckmode.Disappears)
 		if prev is borked
-			error.autoprint = .oldprint
+			error.AutoPrint = .oldprint
 			expect !(stderr.ok) (s, "Borking but no zergs found?")
 			stderr.clear
 		if rz is Killer
 			exit
 	
-	if rz isnt Killer
-		.ContinueVars(v-1)
-		
-	// try to close our msgs...
-	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
+	|| Allowed = (1|uint64| << (++v<<1)) - 1|uint64|
 	t.value = ArchonPurger.value & Allowed
+	|| dpth = .ArgDepth--
+/	.EndArgumentVars(v, dpth)
 
 
 function Bracket (Niltrackerfn)
@@ -684,17 +689,15 @@ function Arel (Niltrackerfn)
 
 function Declaration (niltrackerfn) // function decl 
 	opt norefcounts
-	|| rel = msg.last!
-	// carrays declared like: |int[1]| LocalVar
-	t.closers[]
-	|| thg = rel.first
+	|| rel = msg.last!			// || x = y  --> x = y
+	|| thg = rel.first			// x = y     --> x
 		|| d = thg.FastDecl
-		// if d != rel.FastDecl // some still not updated
 		|| J = .Jump(rel.last!)
 		if d.IsReg
 			return T.Declare(D, J, msg)
 	  else
-		|| d = rel.FastDecl
+		// carrays declared like: |int[1]| LocalVar
+		|| d = rel.FastDecl // hmmm. a carray?
 		if d.IsReg
 			return T.Declare(D, nilstate.real, msg)
 	

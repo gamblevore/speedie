@@ -1,9 +1,19 @@
 
 
 datatype ASM (uint)
+	function AAAA (|int| y)
+		visible
+		cpp_name AAAA
+		|| x = 0
+		if y
+			x = 1
+			y = 2
+			return
+		x++
+	
 	function Print
 		visible
-		cpp_name ASMPrint
+		cpp_name PrintASM
 	 
 
 	function Length (|int|)

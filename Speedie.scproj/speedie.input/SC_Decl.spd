@@ -94,6 +94,7 @@ datatype SCDeclInfo (uint)
 		Local			= Body  ||| Param
 		SelfImplicit	= Self  ||| local // local is set by CollectOneParam, anyhow?
 		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
+		NeedsClose      = Body// ||| Altered
 
 
 	function CheckHighestValue

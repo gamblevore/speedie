@@ -1,0 +1,68 @@
+
+
+function Message.MarkVarClosed (|scdecl| D)
+	opt norefcounts
+	|| m = Message(@xml, d.name)
+	
+	if d.IsNormalObject
+/		m.func = @func
+		m.name = ""
+/		m.msg(@thg, "JB_Decr")
+		|| p = m.msg(@prm)
+		p.obj = Compiler.RefDecr
+		p.msg(@thg, d.name).obj = d
+		d = TypeVoid
+	
+	m.obj = d
+	.next = m
+
+
+function Message.UpToArg (|message!|)
+	opt norefcounts
+/	while
+		|| p = .parent!
+		if p.func == @arg
+			return self
+		self = p 
+
+
+extend_module ArchonPurger
+	function UndeclareOne (|int| from)
+		opt norefcounts
+/		|| msg = t.closers[from]
+			target debug:if !t.decls[from]
+			msg.MarkVarClosed(t.decls[from]!)
+	
+	
+	function UpdateFoundPlace (|int| from, |int| ArgDepth)
+		opt norefcounts
+		|| msg = t.Closers[from]
+/			|| p = msg.parent!
+			if p.indent >= argdepth
+				t.closers[from] = p.UpToArg
+
+
+	function CloseVars (|int| VarDepth=0)
+		|| From = .value.DepthOfVars
+		while From > VarDepth
+			.UndeclareOne(from)
+			from--
+
+		// now.. how to do this?
+		// lets say we are returning... we just wanna close it, right?
+		// what about up-going? no. the arg does that!
+		// this should work for return
+		// what about exit/continue?
+		// seems the same?
+		// OK... so in theory... this should all work now!
+	
+	function EndArgumentVars (|int| VarDepth, |int| ArgDepth)
+/		|| From = .value.DepthOfVars
+		while From > VarDepth
+			.UndeclareOne(from)
+/			t.closers[from] = nil
+			from--
+
+		while from > 0
+			.UpdateFoundPlace(from--, argdepth)
+

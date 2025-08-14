@@ -984,6 +984,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		@Decl.ExportAddr = C_RenderDcl
 		@Func.ExportAddr = C_RenderFnc
 		@Thg.ExportAddr  = C_RenderThg
+		@SThg.ExportAddr  = C_RenderNothing
 
 		
 		@Type.ExportAddr = C_RenderTyp
@@ -1253,6 +1254,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderBak (fpMsgRenderCpp)
 		opt norefcounts
 		fs <~ .name // assume pre-rendered in C!
+
+
+
+	function C_RenderNothing (fpMsgRenderCpp)
+		opt norefcounts
 
 
 	function C_RenderThg (fpMsgRenderCpp)
