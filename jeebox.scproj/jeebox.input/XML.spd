@@ -149,7 +149,7 @@ extend message
 		for A in atts
 			fs <~ a
 
-		|| Children = (atts.next, nil)(atts)
+		|| Children = atts.next
 		if !Children
 			fs  <~  "/>"
 			return
