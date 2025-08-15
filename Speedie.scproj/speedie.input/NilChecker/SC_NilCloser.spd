@@ -2,6 +2,7 @@
 
 function Message.MarkVarClosed (|scdecl| D)
 	opt norefcounts
+	target debug2 {
 	|| m = Message(@xml, d.name)
 	
 	if d.IsNormalObject
@@ -15,38 +16,48 @@ function Message.MarkVarClosed (|scdecl| D)
 	
 	m.obj = d
 	.next = m
+	}
 
 
 function Message.UpToArg (|message!|)
 	opt norefcounts
+	target debug2 {
 /	while
 		|| p = .parent!
 		if p.func == @arg
 			return self
 		self = p 
+	}
+	return self
 
 
 extend_module ArchonPurger
 	function UndeclareOne (|int| from)
 		opt norefcounts
+		target debug2 {
 /		|| msg = t.closers[from]
 			target debug:if !t.decls[from]
 			msg.MarkVarClosed(t.decls[from]!)
+		}
 	
 	
 	function UpdateFoundPlace (|int| from, |int| ArgDepth)
 		opt norefcounts
+		target debug2 {
 		|| msg = t.Closers[from]
 /			|| p = msg.parent!
 			if p.indent >= argdepth
 				t.closers[from] = p.UpToArg
+		}
 
 
 	function CloseVars (|int| VarDepth=0)
+		target debug2 {
 		|| From = .value.DepthOfVars
 		while From > VarDepth
 			.UndeclareOne(from)
 			from--
+		}
 
 		// now.. how to do this?
 		// lets say we are returning... we just wanna close it, right?
@@ -57,6 +68,7 @@ extend_module ArchonPurger
 		// OK... so in theory... this should all work now!
 	
 	function EndArgumentVars (|int| VarDepth, |int| ArgDepth)
+		target debug2 {
 /		|| From = .value.DepthOfVars
 		while From > VarDepth
 			.UndeclareOne(from)
@@ -65,4 +77,4 @@ extend_module ArchonPurger
 
 		while from > 0
 			.UpdateFoundPlace(from--, argdepth)
-
+		}

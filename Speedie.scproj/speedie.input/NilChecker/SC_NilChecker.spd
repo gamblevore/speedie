@@ -80,7 +80,7 @@ function SyncJump (NilTrackerFn)
 	PostIncrementNil.Clear
 
 
-function JumpWithinBool (niltrackerfn)
+function JumpWithinBool (NilTrackerFn)
 	t.InsideBoolLogic++
 	rz = .jump(msg, test ||| nilcheckmode.ForBools)
 	t.InsideBoolLogic--
@@ -215,11 +215,11 @@ function Number (NilTrackerFn)
 	return .RealBool(msg.name.iszero)
 
 
-function Char (niltrackerfn)
+function Char (NilTrackerFn)
 	return .RealBool(msg.name.isnull)
 
 
-function String (niltrackerfn)
+function String (NilTrackerFn)
 	opt norefcounts
 	StringCorrector.CollectString(msg, scfunction.currfunc!.IsLibrary)
 	return .RealBool(!msg.length)
@@ -448,7 +448,7 @@ function If (NilTrackerFn)
 
 
 
-function Tern (Niltrackerfn)
+function Tern (NilTrackerFn)
 	opt norefcounts
 	test &=~ NilCheckMode.Disappears
 	msg = msg.second!
@@ -470,7 +470,7 @@ function Tern (Niltrackerfn)
 									// where I want this! Just don't do it!
 
 
-function BooleanLogic (niltrackerfn)
+function BooleanLogic (NilTrackerFn)
 	opt norefcounts
 	|| AA = msg.first!
 	|| BB = msg.last!
@@ -595,12 +595,12 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	return msg.Redundantvar(dcl, test)
 
 
-function StatExpr (Niltrackerfn)
+function StatExpr (NilTrackerFn)
 	opt norefcounts
 	return Argument(msg.first!, test)
  
 
-function Argument (Niltrackerfn)
+function Argument (NilTrackerFn)
 	opt norefcounts
 /	msg.indent = ++.ArgDepth
 	|| v = .value.DepthOfVars
@@ -624,7 +624,7 @@ function Argument (Niltrackerfn)
 /	.EndArgumentVars(v, dpth)
 
 
-function Bracket (Niltrackerfn)
+function Bracket (NilTrackerFn)
 	opt norefcounts
 	if msg.length					// a? --> (a) // but the bra has a name
 		test |= NilCheckMode.Soft
@@ -645,7 +645,7 @@ function Type (NilTrackerFn)
 	return d.nildeclared // we created new suffering, so lets pass that back.
 
 
-function Brel (Niltrackerfn)
+function Brel (NilTrackerFn)
 	opt norefcounts
 	|| b = msg.name[]
 	if b == '*'
@@ -664,13 +664,13 @@ function Brel (Niltrackerfn)
 	return nilstate.real						// & ~ both return real
 
 
-function Not (niltrackerfn)
+function Not (NilTrackerFn)
 	test = (test ||| nilcheckmode.reversed).activate
 	|| a = .jump(msg, test)
 	return a &~ nilstate.FnBecomesNilCh
 
 
-function Arel (Niltrackerfn)
+function Arel (NilTrackerFn)
 	opt norefcounts
 	|| ch = msg.first
 		rz = .jump(ch, test)
@@ -687,7 +687,7 @@ function Arel (Niltrackerfn)
 				error (ch, "Can't post-increment within boolean-logic")
 
 
-function Declaration (niltrackerfn) // function decl 
+function Declaration (NilTrackerFn) // function decl 
 	opt norefcounts
 	|| rel = msg.last!			// || x = y  --> x = y
 	|| thg = rel.first			// x = y     --> x
@@ -712,7 +712,7 @@ function Swapity (|scdecl| LD, |message| L, |scdecl| RD, |message| R, |nilstate|
 	return .VariableSet(LD,L,  RD,R,  RN)
 
 
-function Swap (NilTrackerfn)
+function Swap (NilTrackerFn)
 	opt norefcounts
 	|| P = msg.last
 	|| R = P.last!
@@ -726,7 +726,7 @@ function Swap (NilTrackerfn)
 	.swapity(RD,R,  LD,L,  LN)
 
 
-function SetRel (NilTrackerfn)
+function SetRel (NilTrackerFn)
 	opt norefcounts
 	|| R = msg.last!
 	|| L = msg.first!
