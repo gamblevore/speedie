@@ -1,0 +1,36 @@
+
+/*
+We want a special func-finding-table... 
+
+It will find the start of each function, given a random address within the code-block.
+
+We need a stack-trace in general, even for non-crash errors.
+
+We can store the func-names separate from the code-block. Tightens up the code and compresses better.
+
+In fact, we can store the debug-info separate from the func-name table. So the debug-info can be deleted in one go, if needed.
+
+The table should look like this:
+
+|uint16[]| x = {0, 19, 39, 41, 45, 1002, 1004, etc}
+
+Now we can do a binary search in it.
+
+I think we can store this as 16-bit values! Most of the code will fit within 64K ASM (speedie is tight!)
+
+Beyond that, we can just do it in blocks. Like this:
+
+|int[]| y = {34K, 256K, 1000K, 1001K}
+
+This describes how many ASM instructions (total!) fit within the first 64K of ASM distance.
+
+Then we can do another binary search over that! Very quickly we can find any function-number, and it's starting position.
+
+We also can just overwrite the original-jbin. This allows us to store the "call-count" directly in the decompressed code. We'll need 4-bytes per func, i guess. (What about the guard? Can we just over-write that?)
+
+I think... considering that op-0 is an error... unless we reach 16M calls... it stays an error. So thats quite good. We can just over-write the guard :) I guess the guard can start at 0.
+
+So thats great.
+
+We want to keep each function in jbin, separately. This allows modability. Very important!!! Can just copy/paste new code in! wonderful!
+*/
