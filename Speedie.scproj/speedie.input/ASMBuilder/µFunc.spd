@@ -3,6 +3,10 @@ extend SCFunction
 	function StartASM
 		.µstart = Assembler.sh.Index
 
+	function GuessLength (|int|)
+		for s.asm in self
+			rz += s.GuessSize		
+		
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
 		rz = asm[.µlength|int|*3]!

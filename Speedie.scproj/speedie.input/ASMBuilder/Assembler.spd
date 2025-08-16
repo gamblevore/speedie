@@ -512,6 +512,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	if .NeedsRework
 		.Rework(fn)
 	.CapASM
+	compiler.stASMTotalOps += fn.GuessLength
 
 	if StdErr.ok
 		|| max = fn.maxasm

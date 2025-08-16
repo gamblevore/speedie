@@ -71,7 +71,6 @@ linkage
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				TableId
-//|uint16|				AltersParams // pointers no longer alter registers
 |uint16|				ReturnCount
 |int|					StackAllocGuess
 |nilstate|				NilSelf
@@ -1249,6 +1248,15 @@ iterator
 	while (F)
 		yield F
 		F = F.NextFunc
+
+iterator asm
+	|| s = assembler.sh.start + .µStart
+	|| n = .µlength
+	|uint| i = 0
+	while i < n
+		|| op = s[i++]
+		yield (op) (i)
+
 
 
 

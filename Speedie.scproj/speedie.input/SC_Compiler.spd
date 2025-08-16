@@ -138,6 +138,8 @@ linkage
 |int|						stTotalSourceSize
 |int|						stTotalFileCount
 |int|						stParseTimeTotal
+|int|						stASMTotalOps
+
 |int|						CurrStage
 |string|					StageName
 |SCFunction|				ClassListInitFunc
