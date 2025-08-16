@@ -93,13 +93,13 @@ datatype cstring
 	function Copy (|string|)
 		return string.copy(self|&byte|, .length)
 	
-	function Puts
+	function PrintLine
 		cpp_wrapper puts // hehe
 	
 	function Str (|string|)
 		return string.Wrap(self)
 
-	function Name (|cstring|)
+	function FileName (|cstring|)
 		|| c = self|&byte|
 		|| b = c
 		
