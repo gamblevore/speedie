@@ -1441,14 +1441,14 @@ class TextView (GUIControl)
 		return msg
 
 	
-	helper CanAlterRange (|intrange| r, |bool|)
-		disabled "This would be a massive project"
-		opt norefcounts
-		|| p = .ParsedMessage
-		|| s1 = p.findtightest(r.x1)
-		|| s2 = p.findtightest(r.x2)
-		return s1 is editable and s2 is editable
-		// good for now!
+//	helper CanAlterRange (|intrange| r, |bool|)
+//		disabled "This would be a massive project"
+//		opt norefcounts
+//		|| p = .ParsedMessage
+//		|| s1 = p.findtightest(r.x1)
+//		|| s2 = p.findtightest(r.x2)
+//		return s1 is editable and s2 is editable
+//		// good for now!
 
 	
 	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |bool|show=true, |int|)

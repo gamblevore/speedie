@@ -41,7 +41,8 @@ class FileRow (ListViewRow)
 
 		.asdir		= dirfile
 		.name		= name
-		.lastsize	= (path.File.Size, 0)(!.asdir)
+		if path and !.asdir
+			.lastsize = path.File.Size
 		.lastfilecount = (!.asdir)|int|
 		is hierarchical
 	
@@ -110,12 +111,13 @@ class FileRow (ListViewRow)
 	
 	function TryReload (|fileviewer|fv)
 		require .asdir
-		|| f = .location.file
-		|| d = f.modified
-		if d > .reloadedat
-			.reloadedat = d
-			.ReloadFiles(f, fv)
-		fv.checksize
+		|| l = .location
+			|| f = l.file
+			|| d = f.modified
+			if d > .reloadedat
+				.reloadedat = d
+				.ReloadFiles(f, fv)
+			fv.checksize
 	
 
 	function AddFile (|file| f, |fileviewer| o)

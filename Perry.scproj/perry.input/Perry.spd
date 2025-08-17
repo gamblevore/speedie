@@ -5,7 +5,7 @@
 
 
 module Perry
-    |ListViewRow|					Projects
+    |ListViewRow|					Projects = Message()
 	|Dictionary of String|			PathDict
 	|listviewrow|					RecentProjects=message()
     |bool|							Checked	
@@ -20,7 +20,6 @@ module Perry
 	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0
-		.Projects = Message()
 		for arg in app.args // load specified documents
 			|| ide = .LoadAppArg(arg)
 				ide.ProjectTabs.items = .projects
@@ -109,7 +108,8 @@ module Perry
 	
 		|| p = app.prefs
 		|| old = p["currproj"]
-		.Projects = p["lastproj"]|listviewrow|
+		.Projects = p["lastproj", @arg]|listviewrow|
+			
 		
 		if app.CWD == "/"
 			app.args.remove("YES", true)

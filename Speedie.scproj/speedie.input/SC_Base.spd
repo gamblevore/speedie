@@ -16,7 +16,6 @@ linkage
 |SCNode--?|							Parent
 |SCNode--?|							MyReacher
 |SCImport--?|						Project
-//|byte|							Depth // maybe modules should have a depth too.
 
 
 function IsLibrary (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
@@ -964,91 +963,91 @@ function DontRemove (CollectFunc)
 
 
 dispatch RootCollectTable (CollectFunc)
-	+"love"					SCGame3D.Love
-	+"function"				SCFunction.NewFunc
-	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
-	+"api"					SCFunction.NewFunc
-	+"cpp_libwrapper"		SCFunction.NewCppWrapper
-	+"cpp_wrapper"			SCFunction.NewCppWrapper
-	+"cpp_inbuilt"			SCFunction.NewCppWrapper
-	+"cpp_nothing"			SCFunction.NewCppWrapper
-	+"helper"				SCFunction.NewHelper
-	+"macro"				SCFunction.NewMacro
-	+"insertion"			SCThe.NewInsertion
-	+"conf"					compiler.WrongConf
-	+"crash"				{app.crash(node.firstname)}
-	+"module"				SCModule.NeuModule
-	+"static"				{error (node, "static is called 'module' in speedie.")}
-	+"selector"				SCSelector.neu
-	+"class"				SCClass.neuClass
-	+"task"					sctasks.NewTask
-	+"role"					SCClass.neuRole
-	+"export_api"			SC_API.NewExportAPI
-	+"model"				SCGame3D.NeuModel
-	+"prototype"			SCFunction.NewProtoType
-	+"render"				SCFunction.NewRender
-	+"import"				(scimport.DoImport)
-	+"shell_args"			InbuiltShellArgs.collect
-	+"syntax"				SCClass.LoadSyntax
-	+"linkage"				CppRefs.Linkage
-	+"struct"				SCClass.newstruct
-	+"datatype"				SCClass.NewDataType
-	+"extend"				SCClass.StoreExtend
-	+"extend_module"		SCClass.StoreExtendModule
-	+"extends"				{ error (node, "I think you mean 'extend'"), return compiler.program }
-	+"main"					SCFunction.NeuMain
-	+"library"				SCFunction.NeuLibrary
-	+"ignore"				(DontRemove)
-	+"cpp_part"				(SCNode.LoadCppPart)
-	+"constants"			(SCModule.ConstantCollector)
-	+"flags"				(SCModule.ConstantCollector)
+	+'love'					SCGame3D.Love
+	+'function'				SCFunction.NewFunc
+	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
+	+'api'					SCFunction.NewFunc
+	+'cpp_libwrapper'		SCFunction.NewCppWrapper
+	+'cpp_wrapper'			SCFunction.NewCppWrapper
+	+'cpp_inbuilt'			SCFunction.NewCppWrapper
+	+'cpp_nothing'			SCFunction.NewCppWrapper
+	+'helper'				SCFunction.NewHelper
+	+'macro'				SCFunction.NewMacro
+	+'insertion'			SCThe.NewInsertion
+	+'conf'					compiler.WrongConf
+	+'crash'				{app.crash(node.firstname)}
+	+'module'				SCModule.NeuModule
+	+'static'				{error (node, "static is called 'module' in speedie.")}
+	+'selector'				SCSelector.neu
+	+'class'				SCClass.neuClass
+	+'task'					sctasks.NewTask
+	+'role'					SCClass.neuRole
+	+'export_api'			SC_API.NewExportAPI
+	+'model'				SCGame3D.NeuModel
+	+'prototype'			SCFunction.NewProtoType
+	+'render'				SCFunction.NewRender
+	+'import'				(scimport.DoImport)
+	+'shell_args'			InbuiltShellArgs.collect
+	+'syntax'				SCClass.LoadSyntax
+	+'linkage'				CppRefs.Linkage
+	+'struct'				SCClass.newstruct
+	+'datatype'				SCClass.NewDataType
+	+'extend'				SCClass.StoreExtend
+	+'extend_module'		SCClass.StoreExtendModule
+	+'extends'				{ error (node, "I think you mean 'extend'"), return compiler.program }
+	+'main'					SCFunction.NeuMain
+	+'library'				SCFunction.NeuLibrary
+	+'ignore'				(DontRemove)
+	+'cpp_part'				(SCNode.LoadCppPart)
+	+'constants'			(SCModule.ConstantCollector)
+	+'flags'				(SCModule.ConstantCollector)
 	
 
 
 dispatch ClsCollectTable (CollectFunc)
-	+"constructor"			SCFunction.NewConstructor		// ??
-	+"destructor"			SCFunction.NewDestructor		// ??
-	+"render"				SCFunction.NewRender			// ??
-	+"function"				SCFunction.NewFunc
-	+"extend_function"		SCFunction.NewFunc // user shouldn't write these
-	+"setter"				SCFunction.NewHider
-	+"api"					SCFunction.NewFunc
-	+"macro"				SCFunction.NewMacro
-	+"helper"				SCFunction.NewHelper
-	+"behaviour"			SCBehaviour.NewActual
-	+"actual"				SCBehaviour.NewActual
-	+"virtual"				SCBehaviour.NewVirtual
-	+"iterator"				SCIterator.NeuIter
-	+"syx"					SCFunction.NeuSyx			   // jeebox specific
-	+"cpp_wrapper"			SCFunction.NewCppWrapper
-	+"cpp_libwrapper"		SCFunction.NewCppWrapper
-	+"prototype"			SCFunction.NewProtoType
-	+"syntax"				SCClass.LoadSyntax
-	+"operator"				SCClass.LoadSyntax
-	+"processas"			SCClass.ProcessAs
-	+"cpp_refs"				cpprefs.ReadIntoCppRefs
-	+"linkage"				CppRefs.Linkage
-	+"description"
+	+'constructor'			SCFunction.NewConstructor		// ??
+	+'destructor'			SCFunction.NewDestructor		// ??
+	+'render'				SCFunction.NewRender			// ??
+	+'function'				SCFunction.NewFunc
+	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
+	+'setter'				SCFunction.NewHider
+	+'api'					SCFunction.NewFunc
+	+'macro'				SCFunction.NewMacro
+	+'helper'				SCFunction.NewHelper
+	+'behaviour'			SCBehaviour.NewActual
+	+'actual'				SCBehaviour.NewActual
+	+'virtual'				SCBehaviour.NewVirtual
+	+'iterator'				SCIterator.NeuIter
+	+'syx'					SCFunction.NeuSyx			   // jeebox specific
+	+'cpp_wrapper'			SCFunction.NewCppWrapper
+	+'cpp_libwrapper'		SCFunction.NewCppWrapper
+	+'prototype'			SCFunction.NewProtoType
+	+'syntax'				SCClass.LoadSyntax
+	+'operator'				SCClass.LoadSyntax
+	+'processas'			SCClass.ProcessAs
+	+'cpp_refs'				cpprefs.ReadIntoCppRefs
+	+'linkage'				CppRefs.Linkage
+	+'description'
 		if name_space isa scbetternode
 			name_space.ReadDescription(node)
 
-	+"class"				SCClass.NewInnerClass
-	+"role"					SCClass.NewInnerClass
-	+"task"					sctasks.NewTask
+	+'class'				SCClass.NewInnerClass
+	+'role'					SCClass.NewInnerClass
+	+'task'					sctasks.NewTask
 
-	+"initafter"			(SCModule.DoInitAfter)
-	+"ignore"				(DontRemove)
-	+"saveas"				(DontRemove)
-	+"cpp_part"				(DontRemove)
-	+"cpp_class"			(DontRemove)
-	+"cpp_name"				(DontRemove)
-	+"contains"				(DontRemove)
-	+"default"				(SCClass.GetDefault)
-	+"false"				(SCClass.GetFalse)
-	+"size"					(SCClass.SetSize)
-	+"module"				(DontRemove)
-	+"constants"			(SCModule.ConstantCollector)
-	+"flags"				(SCModule.ConstantCollector)
+	+'initafter'			(SCModule.DoInitAfter)
+	+'ignore'				(DontRemove)
+	+'saveas'				(DontRemove)
+	+'cpp_part'				(DontRemove)
+	+'cpp_class'			(DontRemove)
+	+'cpp_name'				(DontRemove)
+	+'contains'				(DontRemove)
+	+'default'				(SCClass.GetDefault)
+	+'false'				(SCClass.GetFalse)
+	+'size'					(SCClass.SetSize)
+	+'module'				(DontRemove)
+	+'constants'			(SCModule.ConstantCollector)
+	+'flags'				(SCModule.ConstantCollector)
 
 
 

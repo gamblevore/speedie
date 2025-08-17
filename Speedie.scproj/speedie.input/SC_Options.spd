@@ -227,76 +227,76 @@ module Feedback
 
 
 	dispatch AppOptions (ShellOption)
-		+"nocompile" // remove this later
+		+'nocompile' // remove this later
 			Explain(Purpose, "Will not compile any .cpp generated.")$
 			Options.Compile = false
 			
-		+"breakonerr" 
+		+'breakonerr' 
 			Explain(Purpose, "")$
 			error.AutoPrint = value.optionint
 		
-		+"path"
+		+'path'
 			Explain(Purpose, "")$
 			printline app.exepath
 			
-		+"beep"
+		+'beep'
 			Explain(Purpose, "Beeps after compile is complete")$
 			options.beep = value.optionbool
 		
-		+"keepallerrors"
+		+'keepallerrors'
 			explain(purpose, "Show more errors that were hidden.")$
 			options.KeepAllErrors = value.optionbool
 
-		+"env"
+		+'env'
 			explain(purpose, "Print environment variables")$
 			for (s in app.env) (k)
 				printline k + ": " + s
 			return true
 		
-		+"x" (AppTransCompile)
+		+'x' (AppTransCompile)
 		
-		+"arch"
+		+'arch'
 			|| str = "intel/arm/ppc/spd" // don't we just want a bitfield?
 			explain(Purpose, "Set to "+str)
 			for v in str / '/'
 				if v~=value
 					options.arch = v
 				
-		+"gcc"
+		+'gcc'
 			explain(Purpose, "Replace gcc with something else")$
 			TransCompiler.CppCompilerPath=value
 				
-		+"perry"
+		+'perry'
 			Explain(Purpose, "")$
 			options.perryoutput = 1
 			|| RealPerry = value~="bin"
 			options.perryoutput += RealPerry // argvalue not needed? just value, right?
 			compiler.insecurewords = file.Prefs("klinkerhoppen.banned").readall.dict
 
-		+"usescriptloc"
+		+'usescriptloc'
 			Explain(Purpose, "")$
 			options.UseScriptLoc = maybebool.Known(true)
 
-		+"check"
+		+'check'
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
 			Options.Compile = false
 			Options.ModeCpp = false
 		
-		+"errortest" 
+		+'errortest' 
 			explain(purpose, "Tests if error handling works OK.")$
 			PrintError "Errors print successefully\n"
 			return true // does something, counts towards operationCount
 		
-		+"flowmode"
+		+'flowmode'
 			0 // placeholder
 			
-		+"flow"
+		+'flow'
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			|| b = value.optionbool
 			Options.GenFlowControlCode = b 
 			SC_Targets["flow"] = b
 
-		+"noisy"
+		+'noisy'
 			Explain(Purpose, "Prints more stuff.")$
 			"NoiseActivated"
 			Options.PrintCompileString = true
@@ -304,109 +304,109 @@ module Feedback
 			options.PrintLibraries = true
 			options.argstats = true
 		
-		+"alive"
+		+'alive'
 			Explain(purpose)$
 			"We seems alive :)" // used by perry
 			return true
 
-		+"ignorecantsave" 
+		+'ignorecantsave' 
 			Explain(Purpose)$
 			options.IgnoreCantSaveErrors = true
 		
-		+"quiet" 
+		+'quiet' 
 			Explain(Purpose, "Prints less stuff")$
 			Options.PrintCompileString = false
 
-		+"silent"
+		+'silent'
 			Explain(Purpose, "Prints much less")$
 			Options.PrintCompileString = false
 			options.silent = true
 		
-		+"stages"
+		+'stages'
 			Explain(Purpose, "Prints the stages")$
 			options.printstages = value.optionbool
 		
-		+"print" 
+		+'print' 
 			Explain(Purpose)$
 			print Value
 			return true // does something, counts towards operationCount
 		
-		+"directtest" 
+		+'directtest' 
 			explain(Purpose, "Allows me to test certain compiler features more easily.")
 			options.isdirecttest = value.OptionBool
 			SC_Targets["direct"] = options.isdirecttest
 		
-		+"single" 
+		+'single' 
 			Explain(Purpose, "")$
 			options.SingleCppOutput = value.optionbool
 		
-		+"elf"
+		+'elf'
 			Explain(Purpose, "Search for any elves")$
 			app.say "theres no elves in here"
 			error "Missing race requested"
 			return true
 			
-		+"self" 
+		+'self' 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
 			if app.no("nocompile")
 				options.perryoutput = 1 // can't remember why. maybe just for copy/paste into perry.
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		
-		+"crash"
+		+'crash'
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
 			app.crash
 		
-		+"pack"
+		+'pack'
 			options.ModePack = value.optionbool
 			if options.modepack
 				options.modecpp = false
 			SC_Targets["pack"] = options.ModePack
 		
-		+"targetdebug" // basically
+		+'targetdebug' // basically
 			Explain(Purpose, "")$
 			options.targetdebug = value.optionbool
 		
-		+"target"
+		+'target'
 			Explain(Purpose, "Set names used by preprocessor. --target=AnyName")$
 			if value ~= "debug"
 				error "Use 'targetdebug' instead."
 			SC_Targets[value] = true
 
-		+"warn"
+		+'warn'
 			Explain(Purpose, "Show warnings.")$
 			Options.Warnings = value.optionbool
 
-		+"maxvars"
+		+'maxvars'
 			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
 			Options.checkmaxvars = value.optionbool
 		
-		+"nocolor"
+		+'nocolor'
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$
 			Options.Color = false
 				
-		+"optimise"
+		+'optimise'
 			Explain(Purpose, "Optimisation level. (0 to 3... EG: '--Optimise=1')")$
 			Options.Optimise = Value.parseint
 
-		+"cpp"
+		+'cpp'
 			explain(purpose, "Compiles to cpp. Default true")$
 			options.ModeCpp = value.optionbool
 			if options.ModeCpp
 				options.modepack = false
 				SC_Targets["pack"] = false
 				
-		+"output_path"
+		+'output_path'
 			explain(purpose, "Specifies the build product path")$
 			options.output_path = value.pathfix
 			options.output_path.parent.file.mustexist
 			options.ForceRecompile = true // it's what we expect
 		
-		+"force"
+		+'force'
 			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$
 			options.ForceRecompile = true
 
-		+"variant"
+		+'variant'
 			Explain(Purpose)$
 			Options.Variant = (Value.ParseInt|int|).Render
 			options.perryoutput = 1
@@ -414,7 +414,7 @@ module Feedback
 			if options.optimise < 0
 				options.optimise = 1
 		
-		+"codesign"
+		+'codesign'
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
 			if value ~= "" or "true"
 				printline "Codesign: " + app.prefs[codesign_native]
@@ -427,25 +427,25 @@ module Feedback
 			printline "Codesign set to " + value
 			return true
 		
-		+"dosign"
+		+'dosign'
 			Explain( Purpose, "Code signs an app." )
 			return true
 		
-		+"mem"
+		+'mem'
 			explain(Purpose, "Prints the memory usage.")
 			options.PrintMemoryUsage = value.yes
 		
-		+"clean"
+		+'clean'
 			Explain(Purpose, "Remove temp files.")$
 			if TransCompiler.Clean
 				"Cleaned"
 			return true // does something, counts towards operationCount
 		
-		+"version" (AppVersionNumber)
+		+'version' (AppVersionNumber)
 		
-		+"v"	   (AppVersionNumber)
+		+'v'	   (AppVersionNumber)
 		
-		+"help"
+		+'help'
 			Explain(Purpose, "This.")$
 			Help()
 			return true

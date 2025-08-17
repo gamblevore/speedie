@@ -3,7 +3,9 @@
 // new task system
 
 module SCTasks {
-
+constants
+	AlreadyDone = 12345
+	
 || tmp = message()
 function CollectAll
 	opt norefcounts
@@ -48,7 +50,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 
 	|| Supper = fields.first
 	while (|| L = fields.Last)
-		(l is Special) // not actually editable
+		(l.RangeLength = AlreadyDone)
 		tmp.First = L
 	
 	
@@ -116,7 +118,7 @@ function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| 
 	
 	for p in .properties
 		|| S = p.source
-			if s is Special
+			if s.RangeLength == sctasks.AlreadyDone
 				S.MakeTaskVar(con, before, depth==0)
 
 

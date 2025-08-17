@@ -2,6 +2,17 @@
 
 // use a message... as a dictionary!!
 
+
+
+// why would a conf-file be so big?
+function file.Config (|int| lim = 1MB,  |config|)
+	opt norefcounts
+	if .exists
+		rz = .parse(lim)|config|
+	rz ?= message()
+	rz.obj = self
+
+
 role config (message)
 	linkage
 		pragma noearlyfree
@@ -57,15 +68,6 @@ role config (message)
 			return .ConfigPath(path).file.config
 
 
-// why would a conf-file be so big?
-function file.Config (|int| lim = 1MB,  |config|)
-	opt norefcounts
-	if .exists
-		rz = .parse(lim)|config|
-	rz ?= message()
-	rz.obj = self
-
-
 extend message
 	function ConfArg (|config|)
 		opt norefcounts
@@ -75,17 +77,35 @@ extend message
 		if w == @arg
 			return w
 
+	function SyntaxAccess (|string| key, |syntax| Needed, |string| DefaultName="", |config|)
+		opt norefcounts
+		description "Creates the correct child type if not found" 
+		|| found = .SyntaxAccess(key)
+		if found == Needed
+			return found
+		|| arg = .confarg
+		if found
+			error (found)
+		found = arg.msg(@tmp, key)
+		return found.msg(Needed, DefaultName)
+
 	function SyntaxAccess (|string| key, |bool| Err=false, |config|)
 		cpp_part GetConf
 		opt norefcounts
-		for item in .confarg
+		|| arg = .confarg
+		for item in arg
 			if item ~= key
 				|| f = item.first
 					return f
-				return item // whatever
+				error (item, "Value missing in config item")
+/				item.remove // cleaner to just remove it. Must have a value. Its a key/value system!
+							// and the values have types, so we can't just create one, without knowing
+							// what type is needed.
+				return nil
 		if err
 			error (self, key + " not found.")
-		
+	
+	
 	function Value (|string|)
 		if self
 			if self == @tmp and self in @arg

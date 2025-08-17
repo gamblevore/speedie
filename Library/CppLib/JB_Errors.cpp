@@ -47,15 +47,30 @@ int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation) {
 	return JB_ErrorHandleFile(JB_StrC(Path), nil, err, nil, Operation);
 }
 
+JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in) {
+	FastString* Fs = JB_FS__FastNew(Fs_in);
+	int Size = 128;
+	void* Arr[128] = {};
+	_cstring* Strs = JB_App__BackTrace((&Arr[0]), &Size);
+	int i = Skip;
+	while (i < Size - 1) {
+		JB_FS_AppendCString(Fs, Strs[i++]);
+		JB_FS_AppendByte(Fs, '\n');
+	};
+	free(Strs);
+	return JB_FS_SmartResult(Fs, Fs_in);
+}
+
 
 static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* str, const char* Operation, const char* verb) {
     FastString* FS = JB_FS__FastNew(0);
+    static const char* EmptyPath = "Path was empty";
 	if (!str) {
 		if (err == ENOENT) {
 			if (JB_Str_Length(self))
 				str = "File doesn't exist";
 			  else
-				str = "Path was empty";
+				str = EmptyPath;
 		}
 		if (!str)
 			str = strerror(err);
@@ -78,6 +93,9 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 			JB_FS_AppendString(FS, other);
 		}
 		JB_FS_AppendCString(FS, "'.");
+	}
+	if (str == EmptyPath) {
+		JB_App__StackTrace(2, FS);
 	}
     return JB_FS_GetResult(FS);
 }

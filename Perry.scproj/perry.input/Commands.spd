@@ -1,49 +1,43 @@
 
 
 dispatch PerryCommands (|perryide| self, |string| s)
-//	+"beep"
-//		for 2s: beep
-
-	+"cr_fix"
+	+'cr_fix'
 		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
 	
-	+"crash"
+	+'crash'
 		app.crash
 	
-	+"cr_use"
+	+'cr_use'
 		.editme.beep = s.ReplaceAll("\n", "\r\n")
 		
-	+"lower"
+	+'lower'
 		.editme.beep = s.lowercase
 		
-	+"upper"
+	+'upper'
 		.editme.beep = s.Uppercase
 		
-	+"ascii"
+	+'ascii'
 		app.alert string.ASCII_Chart
 		
-	+"string"
+	+'string'
 		|| s2 = s.parse
 		if s2 == @arg
 			s2 = s2.first
 		.editme.beep = s2.name
 
-//	+"note"
-//		notifications <~ "Notification Test"
-
-	+"render" // "parse"
+	+'render' // 'parse'
 		.editme.beep = s.parse.Render
 		
-	+"tetris"
+	+'tetris'
 		tetriswin().RunAsMain(60)
 	
-	+"breakout"
+	+'breakout'
 		Breakout().RunAsMain(60)
 
-	+"bubbles"
+	+'bubbles'
 		bubbles().RunAsMain(60)
 
-	+"DebugSwitch"
+	+'DebugSwitch'
 		DebugGUI = !DebugGUI
 
 

@@ -15,25 +15,20 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 		function Open (guiaction)
 			startupwindow.Show
 
-		function Vis (|bool|)
-			return ._win is visible
-
 		function Hide
-			if ._win
-				.show(false)
-		
-		function Show (|bool| vis=true)
 			opt norefcounts
-			if !vis
-				|| i = perry.ide
-				require (.Vis and i)
-			with .create
-				if !vis
-					.hide
-				  elseif GUI.startedproperly
-					(it)()
-				  else
-					.show
+			|| w = ._win
+				w.hide
+				w.closedialog
+
+		
+		function Show
+			opt norefcounts
+			|| w = .create
+			if GUI.startedproperly
+				(w)()
+			  else
+				w.show
 
 
 		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
@@ -58,13 +53,15 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 			t.align		= ListViewState.aligncenter
 
 
-		function Create (|window|)
+		function Create (|startupwindow|)
 			opt norefcounts
-			with ._win
-				return it
-			._win = StartupWindow()
+			rz = ._win
+			if rz
+				return rz
+			rz = StartupWindow()
+			._win = rz
 			
-			with ._win
+			with rz
 				.id				= "startup"
 				.size			= 200 by 140
 				.gnormal        = ¥.SystemStyle.copy
@@ -76,5 +73,38 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 			.CreateOption("Open File",		"\11",	ClickedOpenFile,   "Open a text file.")
 			.CreateOption("Create Project", "\19+",	ClickedCreateProj, "Create new Speedie project!")
 			.CreateOption("Create File",	"\11+",	ClickedCreateFile, "Create new text file.")
-			return ._win
 
+
+
+function ClickedOpenProj (GUIaction)
+	|| start		= "~/".resolve
+	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project", "Open", "OpenProj")	#require
+	|| better_path	= path.GetSpeedieProj
+		perry.IdeAddProj(better_path)
+	  else
+		perry.IdeAddProj(path)
+	perry.HideStartIfNeeded
+
+
+function ClickedCreateProj (GUIAction)
+	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")
+		perry.CreateProj(path)
+	perry.HideStartIfNeeded
+
+
+function ClickedOpenFile (GUIaction)
+	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
+		perry.IdeAddProj(file)
+	perry.HideStartIfNeeded
+
+
+function ClickedCreateFile (GUIaction)
+	|| path = app.AskSave("spd",  "",  "New File",  "New", "OpenProj")
+		perry.CreateProj(path)
+	perry.HideStartIfNeeded
+
+
+function perry.HideStartIfNeeded
+/	if .projects.hasany
+		startupwindow.hide
+		

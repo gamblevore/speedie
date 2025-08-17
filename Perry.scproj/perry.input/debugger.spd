@@ -8,10 +8,10 @@ variables
 
 asm "Abc"
 	file "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
-	+"MULK: r2, r1, 13" 123
-	+"JBRA: r2, 12" 456
+	+'MULK: r2, r1, 13' 123
+	+'JBRA: r2, 12' 456
 	file <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/inlines.spd`)>
-	+"JBRA: r1, 13" 555
+	+'JBRA: r1, 13' 555
 
 
 

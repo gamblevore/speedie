@@ -176,7 +176,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 			fs <~ .name
 		  else
 			fs <~ '+'
-			fs.AppendQuotedEscape(.name) // use +''  ???  it is visually lighter.
+			fs.AppendQuotedEscape(.name, '\'')
 
 		require .hasany
 

@@ -147,7 +147,9 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 		*PtrSpace++ = ByteSpace;
 		memcpy(ByteSpace, B, N);
 		ByteSpace += N+1;
-		self = (JB_String*)JB_Array_Value(R, i);
+		self = nil;
+		if (R)
+			self = (JB_String*)JB_Array_Value(R, i);
 	}
 	PtrSpace++;
 #ifndef AS_LIBRARY

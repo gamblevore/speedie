@@ -50,6 +50,7 @@ extend Parser
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
 		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
+		.Token( `#` )  = .Handler( kTemporalSyx, fTmpSection )
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
 
@@ -108,7 +109,7 @@ extend Parser
 
 
 // Ender //
-		.Tokenz( "] ) } #/ » ” ?>", kEndContainer,			fEndOfLine		)
+		.Tokenz( "] ) } #/ » ” ?>", kEndContainer,		fEndOfLine			)
 
 		.Tokenz( "::",			kThingSyx,				fError				)
 		.Tokenz( "!~=",			kOppSyx,				fError2				)
@@ -308,13 +309,21 @@ extend Parser
 	function fTmpPlus (ParseHandler)
 		opt norefcounts
 		|| c = .nextbyte
-		if c == '"' or '\''  // I prefer '' // deprecate "" later?
+		if c == '\'' or '"' // remove the '"' later.
 			|| tmp = fCharSub(start, start+1, c)
 				tmp.func = @tmp
 				tmp = ftmpsub(tmp, kOpp & ~kOppBra, kthing )
 				if tmp != @thg
 					return tmp
 		return parser.fError2(start, nil)
+
+
+	function fTmpSection (ParseHandler)
+//		#'abc'
+		opt norefcounts
+		|| tmp = .fTmpPlus(start, parent)
+			(tmp is splithere)
+			return tmp
 
 
 	function fAtNamedExp (ParseHandler)
@@ -1280,7 +1289,7 @@ module parser
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData
 
-//	|uint|					CountStats  // better to put in the memory manager itself... right?
+//	|uint|					CountStats  // better to put in the memory manager itself!
 	|message|				_EndOfLineMarker
 	|dictionary of string|  _ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range
@@ -1339,7 +1348,8 @@ extend Message
 
 	function Type (|syntax|)
 		disabled "Use .func instead"
-			
+
+
 	syntax is (|MsgParseFlags| F, |bool|)
 		if self
 			return .flags & F
@@ -1367,12 +1377,13 @@ datatype MsgParseFlags (uint16)
 	syntax is (|MsgParseFlags| v, |bool|)
 		return self & v
 	flags
-		NicelyPositioned	= 0x0400
-		Special				= 0x0800
-		Editable			= 0x0800 // same
-		Inserted			= 0x1000
-		MacroMade			= 0x2000
-		Style2				= 0x4000
-		BreakPoint			= 0x8000
+		// These are not set during parse, but after.
+		Inserted			= 0x0800				// Jeebox sets this on messages created via "syntax using"".
+		MacroMade			= 0x1000				// This is set via Jeebox's Macro system.
+
+		// These are set during parse.
+		SplitHere			= 0x2000				// Tells compressed jbin to split the document at this point.
+		Style2				= 0x4000				// Alters render style. +"name" vs name
+		BreakPoint			= 0x8000				// This message begun with a breakpoint. (The '/' char)
 		MacroInserted		= MacroMade+Inserted
 

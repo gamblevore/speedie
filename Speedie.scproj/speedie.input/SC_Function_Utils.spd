@@ -21,7 +21,7 @@ function SCFunction.PreRead (|message| Arg)
 
 
 dispatch FuncPreReader (fnPreReader)
-	+"disabled"
+	+'disabled'
 		opt norefcounts
 		is disabled
 		.description = "Called a disabled function."
@@ -29,20 +29,20 @@ dispatch FuncPreReader (fnPreReader)
 			s.ExpectString
 			.description = s.name
 			
-	+"todo"
+	+'todo'
 		opt norefcounts
 		msg[@nil].expectlast
 		compiler.TodoList <~ msg
 	
 	
-	+"numeric"
+	+'numeric'
 		opt norefcounts
 		|| f = msg.first
 			error f
 		(self is numbercreator)
 	
 	
-	+"opt"
+	+'opt'
 		opt norefcounts
 		|| f = msg[@thg]
 			if f ~= "min"
@@ -58,7 +58,7 @@ dispatch FuncPreReader (fnPreReader)
 					error f
 	
 	
-	+"nil"
+	+'nil'
 		opt norefcounts
 		|| f = msg[@thg]$
 		if f ~= "self"
@@ -75,7 +75,7 @@ dispatch FuncPreReader (fnPreReader)
 			error f
 	
 	
-	+"real"
+	+'real'
 		opt norefcounts
 		|| f = msg[@thg]$
 		if f ~= "self"
@@ -84,7 +84,7 @@ dispatch FuncPreReader (fnPreReader)
 			error f
 	
 
-	+"description"
+	+'description'
 		expect (self isnt disabled) (msg, "Already disabled")
 		.ReadDescription(msg)
 	

@@ -112,16 +112,16 @@ extend_module SCFunction
 
 
 dispatch FuncLinkageTable (TranFunc)
-	+"cpp_wrapper"			{}
-	+"cpp_part"				{
+	+'cpp_wrapper'			{}
+	+'cpp_part'				{
 		SCNode.LoadCppPart(node, name_space, node)
 	}
-	+"cpp_refs"				SCFunction.tran_cpprefs //(fn, node, name_space), return true}
-	+"visible"				{} // (SCFunction.Tran_Visible)
-	+"ignore"				{}
-	+"inline"				{}
+	+'cpp_refs'				SCFunction.tran_cpprefs //(fn, node, name_space), return true}
+	+'visible'				{} // (SCFunction.Tran_Visible)
+	+'ignore'				{}
+	+'inline'				{}
 
-	+"maxasm"
+	+'maxasm'
 		opt norefcounts
 		if fn
 			|| n = node[@num]
@@ -134,19 +134,19 @@ dispatch ClassLinkageTable (TranFunc)
 	// these items with {} are processed elsewhere...
 	// it would have been better to process them all here. but I wrote this after
 	// So the older code still needs removing and using this instead.
-	+"cpp_wrapper"			{}
-	+"cpp_part"				{SCNode.LoadCppPart(node, name_space, node)}
-	+"cpp_refs"				scfunction.tran_cpprefs
-	+"cpp_class"			{}
-	+"visible"				{} // (SCFunction.Tran_Visible)
-	+"ignore"				{}
-	+"noearlyfree"			{}
-	+"sort_properties"      {
+	+'cpp_wrapper'			{}
+	+'cpp_part'				{SCNode.LoadCppPart(node, name_space, node)}
+	+'cpp_refs'				scfunction.tran_cpprefs
+	+'cpp_class'			{}
+	+'visible'				{} // (SCFunction.Tran_Visible)
+	+'ignore'				{}
+	+'noearlyfree'			{}
+	+'sort_properties'      {
 		if name_space isa scclass
 			(name_Space is SortsProperties) = node.first.yes(true)
 	}
 	
-	+"tighten"
+	+'tighten'
 		opt norefcounts
 		if name_space isa scclass
 			expect (name_Space.isobject or name_Space.isstruct) (name_space, "Only applies to structs or objects")
@@ -154,7 +154,7 @@ dispatch ClassLinkageTable (TranFunc)
 			|| yes = node.first.yes(true)
 			(name_space is sortsproperties) = yes
 
-	+"wrapper"
+	+'wrapper'
 		opt norefcounts
 		if name_space isa scclass
 			name_space.IsWrapper = 1
@@ -166,24 +166,24 @@ dispatch ClassLinkageTable (TranFunc)
 				  else
 					error (f)
 	
-	+"stateless"
+	+'stateless'
 		if name_space isa scclass
 			(name_space is stateless)
 			name_space.CheckStateful(node)
 
-	+"stateful"
+	+'stateful'
 		if name_space isa scclass
 			(name_space is stateful)
 			name_space.CheckStateful(node)
 		
 
-	+"datatype"
+	+'datatype'
 		if name_space isa SCClass
 			expect (name_space.isstruct) (node, "Expected this for a struct")
 			|| value = node[@thg]
 				value.expectlast
 
-	+"numeric"
+	+'numeric'
 		opt norefcounts
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")

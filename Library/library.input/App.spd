@@ -134,13 +134,7 @@ function PrintStackTrace
 
 
 render StackTrace (|int| skip = 2)
-	|(&nil)[128]| arr
-	|| size = –count arr
-	|| strs = platform.BackTrace(&arr[0], size)
-	for i in skip to size-1 
-		fs <~ strs[i]
-		fs <~ '\n'
-	memory.free(strs)
+	cpp_wrapper JB_App__StackTrace
 
 
 function Restart

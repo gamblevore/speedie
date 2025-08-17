@@ -116,10 +116,10 @@ class FastString {
 		for count
 			self <~ data
 
-	function AppendQuotedEscape (|string| s)
-		self <~ '"'
+	function AppendQuotedEscape (|string| s, |byte| Quote = '"')
+		self <~ Quote
 		.appendescape(s)
-		self <~ '"'
+		self <~ Quote
 	
 	function AppendEscape (|string| s)
 		.AppendMultiReplace( s, jeebox.EscapeStr )
