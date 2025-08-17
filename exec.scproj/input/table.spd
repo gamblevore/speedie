@@ -66,6 +66,8 @@ struct FuncASMTable
 	
 	So perhaps compressing the files in chunks could help? Not sure. How would you tell perry to resave it.
 	
+	I think, we need a special TMP. like @@names
 */
 
+//#"names"
 
