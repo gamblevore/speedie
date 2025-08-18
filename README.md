@@ -37,7 +37,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * [Language Guide](Documentation/LanguageGuide.md) _(Learn how to use Speedie)_
 * [Speedie-isms](Documentation/isms.md) _(Fun conventions)_
 * [XML vs Jeebox](Documentation/xml.md) _(Jeebox wins)_
-* [Message (Jeebox)](Documentation/Message.md) _(How to use Jeebox)_
+* [Message (Jeebox)](Documentation/Jeebox.md) _(How to use Jeebox)_
 * [Strings](Documentation/Strings.md) _(Good string support is important)_
 * [Error Handling](Documentation/Errors.md) _(The best error-handling in any language!)_
 * [Perry](Documentation/Perry.md) (_An IDE made specially for Speedie)_
