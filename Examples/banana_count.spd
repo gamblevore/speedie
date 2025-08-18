@@ -12,3 +12,16 @@ main (|int| amount)
 	for count in 0 to Amount
 		app.say count of "banana"
 	app.say "thanks for the bananas"
+
+
+
+
+
+
+
+// This config area, makes perry ask you a helpful question.
+// otherwise ignore it! To get this helpful question, it has to be somewhere!
+// So it might as well be here.
+conf
+	perry_args "args\n\t'how many bananas'?"
+
