@@ -20,9 +20,10 @@ extern "C" {
 // It is bad practice to write() to stdout... (fwrite() is OK)
 // unless thats ALL you do. For example, many other parts of the program
 // might call printf. If any do, (even some lib I'm using), the results
-// can be inter-mixed. However, at least write() will flush!
-// sigh. I found fwrite and even putchar(10) on MacOSX DOES NOT
-// flush! 
+// can be inter-mixed. 
+
+// However, at least write() will flush! sigh. I found 
+// fwrite() and even putchar(10) on MacOSX DOES NOT flush! 
  
 
 void JB_Str_PrintError(JB_String* s) {
