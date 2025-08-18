@@ -4,9 +4,13 @@ https://www.youtube.com/watch?v=pxHd8tLI65Q
 
 main (|float| nn)
 	|| n = nn|float|
-	|| range = 0.0 to n
-	for a in range
+	for a in 0.0 to n
 		|| i = 2.0*(n*a).sqrt
 		|| b = n - i + a
 		if !b.fract
 			printline (a, b).iVec2
+
+
+conf
+	perry_args `args: 6`
+
