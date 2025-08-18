@@ -22,8 +22,16 @@ extend message
 	function ListViewable (|bool|)
 		return self and .func.ListViewable
 
+	// this is for listview. However... a better approach would be to REMOVE these
+	// And just a column-based dictionary finder. Something like:
+	// prototype message.GetNameForColumn (|string| Name, |int| Index, |string|)
+	// prototype message.SetNameForColumn (|string| Name, |int| Index, |string| Value)
+	// then you are free to do it however you like. No wierd OOP complexity.
 
-	virtual Text		(|int| i=0, |string|)
+	// So this isnt really designed the best way. However its OK! Because its only
+	// a little code. Didn't take too long to make.
+	
+	virtual DisplayName		(|int| i=0, |string|)
 		opt norefcounts
 		if i == 0
 			return .TextViewChild.name
@@ -42,6 +50,6 @@ extend message
 
 	function SearchColumns (|string| find, |int| n, |int|)
 		for i in n
-			rz = rz max (find match .__text__(i))
+			rz = rz max (find match .__DisplayName__(i))
 			if rz == 2
 				exit

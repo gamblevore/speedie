@@ -165,7 +165,7 @@ class ListView (GUIControl) {
 	helper TextWidth (|int|)
 		opt norefcounts
 		for row.all in self
-			rz = rz max row.__text__.bounds.x
+			rz = rz max row.__DisplayName__.bounds.x
 		rz *= font.width
 	
 
@@ -449,7 +449,7 @@ class ListView (GUIControl) {
 		|| fs = faststring()
 		for s.listsel in self
 			|| it = s.__copyid__
-			it ?= s.text
+			it ?= s.DisplayName
 			it ?= s.name
 			if fs.length
 				fs <~ '\n'
@@ -1231,8 +1231,8 @@ class ListView (GUIControl) {
 		opt norefcounts
 		require prev
 		for i in 1 to n
-			|| t =     .__text__(i)
-			|| p = prev.__text__(i)
+			|| t =     .__DisplayName__(i)
+			|| p = prev.__DisplayName__(i)
 			if (t == p) // and t and p 
 				rz |= 1<<i
 	

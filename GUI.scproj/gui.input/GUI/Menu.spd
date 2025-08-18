@@ -153,7 +153,7 @@ class Menu (ListView)
 
 	helper FindTypedRow (|string| input, |listviewrow|)
 		for s.all in self
-			if s.__text__[0, input, true]
+			if s.__DisplayName__[0, input, true]
 				return s
 
 

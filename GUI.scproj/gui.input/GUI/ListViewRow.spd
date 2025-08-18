@@ -168,7 +168,7 @@ role ListViewRow (message)
 
 		require .vis(column)
 
-		|| na = .__text__(column)
+		|| na = .__DisplayName__(column)
 		if !na and (self is disabled)
 			.DrawSep(Rect, where, str)
 			return
@@ -251,7 +251,7 @@ role ListViewCell (message)
 		return c.obj == .obj  and  c.position == .position
 	function Value (|string|)
 		require self
-		return .row.__text__(.column)
+		return .row.__DisplayName__(.column)
 	
 	
 	function Tab (|bool| dir, |ListView| lv, |ListViewcell|)

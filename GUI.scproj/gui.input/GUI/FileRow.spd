@@ -55,7 +55,7 @@ class FileRow (ListViewRow)
 		fs <~ .dirfile
 		
 	
-	behaviour Text
+	behaviour DisplayName
 		if i == 0
 			return .name
 
@@ -202,7 +202,7 @@ class FileRow (ListViewRow)
 		return s
 
 
-	function SearchableText (|string|)
+	function FileData (|string|)
 		|| d = ._Document
 			if d.current and d.SimpleUpdateFromDisk
 				return d.text
@@ -233,7 +233,7 @@ class FileRow (ListViewRow)
 
 	function FindInFile (|string| text,  |error| found,  |$int| Remain,  |bool| DoRepl)
 		require text
-		|| t		= .SearchableText$
+		|| t		= .FileData$
 		
 		|error| parent // this is never returned? why is it made?
 		|| Lim		= Remain

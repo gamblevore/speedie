@@ -56,7 +56,7 @@ struct InlineEditor
 		opt norefcounts
 		|| e = .editor
 		|| c = .cell
-		if e and c and e.text != c.__Text__
+		if e and c and e.text != c.__DisplayName__
 			|| l = .editingfor
 			if l isa listview
 				l.TryRenameCellTo(c, e.text)
