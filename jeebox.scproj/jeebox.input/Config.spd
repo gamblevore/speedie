@@ -8,7 +8,7 @@
 function file.Config (|int| lim = 1MB,  |config|)
 	opt norefcounts
 	if .exists
-		rz = .parse(lim)|config|
+		rz = .parse(lim, @arg)|config|
 	rz ?= message()
 	rz.obj = self
 

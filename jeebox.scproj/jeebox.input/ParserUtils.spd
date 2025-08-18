@@ -74,7 +74,7 @@ But parsing "hello you\n" will return:
 		@tmp "hello"
 			@thg "you"
 
-This is actually very useful for technical data. Where you want to have more control over the input, and allow direct control over the output, and not have to deal with annoying @args.
+This is actually very useful for technical data. Where you want to allow direct control over the output, and not have to deal with annoying @args.
 
 However, this doesn't work so well for user-facing data, like config-files. In this case, a config-file will expect to be in an @arg.
 

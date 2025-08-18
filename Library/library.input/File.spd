@@ -123,14 +123,14 @@ class File (String)
 	function Write (|string| Data, |ind|)
 		cpp_wrapper JB_File_Write	
 	
-	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
+	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |syntax| Owner=@nil,  |messageroot|)
 		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
 		|| S = .ReadAll(lim, allowmissing)
 		s = s.Decompress(lim, nil)
 		if s
 			|memorylayer--| L = (Message).CreateUseLayer(self, s) 
-			rz = S.parse(@arg, false) // already decompressed.
+			rz = S.parse(owner, false) // already decompressed.
 			(message).restore
 
 	
