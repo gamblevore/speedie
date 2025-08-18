@@ -386,7 +386,7 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 }
 
 
-// this is what the write() function should do.
+// does what write() should do.
 // well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
 int JB_Write_(int fd, uint8* buffer, int N) {
     int TotalCount = 0;
@@ -403,14 +403,14 @@ int JB_Write_(int fd, uint8* buffer, int N) {
 }
 
 
-// this function does what the C++ read function SHOULD do.
+// does what read() SHOULD do.
 // returns errno, and errno > 0
 // so when we set Error to -1 or -2, its clear that it is not a number from errno. basically, not an error.
 static int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& Error, int Mode) {
     int Total = 0;
 	Error = 0;
     do {
-		// read has 6 possible cases! i fucking hate read()
+		// read() has 6 possible cases! i hate read()
 		int nread = (int)read(fd, buffer, N);
 		if (nread > 0) {				// partial
             Total += nread; buffer += nread; N -= nread;
