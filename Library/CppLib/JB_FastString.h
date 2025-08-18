@@ -44,7 +44,7 @@ void JB_FS_RemoveByte(FastString* self, byte B);
     
 FastString* JB_FS__InternalNew();
 FastString* JB_FS__FastNew(FastString* Old);
-JB_String* JB_FS_SmartResult(FastString* fs, FastString* Orig);
+JB_String* JB_FS_SmartResult(FastString* fs, JB_Object* Orig);
 FastString* JB_FS__FileFlush(JB_File* f, bool b);
 JB_String* JB_FS_Return( JB_String* Data, FastString* Orig );
 #ifdef TARGET_WIN32

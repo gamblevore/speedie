@@ -1,173 +1,80 @@
 
 
-function string.Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
-	|| fs = faststring()
+function string.Compress (|int| Strength=mzlab.default, |?&compressionstats| st = nil, |faststring?| fs_in = nil,  |string|) 
+	|faststring--| fs = FastString(fs_in)
 	.Stream.CompressInto(fs, strength, st)
-	return fs
+	return fs.GetResult(fs_in)
 	
 
-function string.Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
-	if !.iscompressed
-		return self
-	|| err = string.error
-	|| fs = faststring()
-	if .stream.Decompressinto(fs, lim, st)
-		err = fs
-	return err
+
+function string.Decompress (|int|lim=256MB,  |?&compressionstats| st=nil,   |StringThatWasReadSafely|)
+	if !.IsCompressed
+		return self // for string.parse
+	return .stream.decompress(lim, st)
+
 
 
 function string.IsCompressed (|bool|)
 	return self[0, "mz\n\02"]
 
 
+function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default, |?&compressionstats| st=nil) 
+	|| fs = faststring.UseAsOutput(dest)				#require
+	st = st.start
+	fs <~ "mz\n\02"
+	fs.AppendInt(.length)
+	st.Out += 8
+	while .HasAny
+		|| str = .str(4MB)
+		|| O = fs.CompressChunk(str, strength)
+		|| N = str.length
+		st.LiveUpdate(N, O, true)
+		fs.flush
+	st.end
 
-	
-
-Module MZLab 
-	constants
-		None      = 0			// none
-		Fast	  = 10			// old mz?
-		Strong    = 20			// 
-		Strongest = 30			// 
-		Default   = strong		// its fast enough!
-	
-	
-	function FreeNow
-		cpp_wrapper JB_CompFreeNow
-	
-	
-	function TestMz (|string| path, |bool|)
-		if path
-			|| f = path.ReadFile.decompress(int.max)
-			return f.CompressTest(true) and .ManyTests
-	
-	
-	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
-		if which & 1
-			require .CompressTestSub(mzlab.strong, report)
-		if which & 2
-			require .CompressTestSub(mzlab.strongest, report)
-		return true
-	
-	
-	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
-		|compressionstats| stats
-		|| c = .compress(Strength, stats)
-		if report
-			stats.Print(true)
-		stats = nil
-		|| decomp = c.Decompress(int.max, stats)
-		rz = self == decomp
-		if !rz
-			error "Decompression failed on: " + self
-			decomp = c.Decompress(int.max)
-		  elseif report
-			stats.Print(false)
 		
+function StringReader.Decompress (|object| dest=nil,  |uint| Limit=512MB,  |&compressionstats| st=nil,  |stringthatwasreadsafely|)
+	|| header = .str(4)
+	expect (header.IsCompressed)					(self, "Can't decompress non-mz data")
+	|| Remain = .UInt(4)
+	expect (Remain <= Limit)						(self, "mz would decompress too large")
 	
-	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
-		for j in 4 
-			if i & (1<<j)
-				fs <~ items[j]!
+	|| fs = FastString.UseAsOutput(dest)			#require
+	|| d = string.error
+	if .DecompressIntoSub(fs, Limit, st.start, Remain)
+		d = fs.GetResult(dest)
+	return d
 
 
-	helper ManyTests (|bool|) // mztest
-		|| Items = "abcd efgh ijkl mnop".words
-		|| fs = faststring()
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+helper StringReader.DecompressIntoSub (|faststring| fs,  |int| OutLim,  |&compressionstats| st,  |int| OutRemain,  |bool|)
+	while OutRemain > 0
+		|| InSize = .UInt(4) - 4
+		expect (InSize < 16MB) 							(self, "mz chunk too large")
 		
-		for i in 1024*64
-			if i  and  i isa 16K
-				printline i.render
-			for sh in 0 to 4
-				.TestSub(items, fs, i>>(sh*4))
-			|| str = fs.getresult
-			require str.CompressTest(false, (i&1)+1)
-		"Compression Test: OK"
-		return true
-
-
-	function TestCompression
-		|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
-		require f.exists
-		for ch in f.ListFiles
-			if ch.visible
-				|| s = ch.ReadAll
-				|| c = s.compress
-				|| d = c.Decompress
-				expect s == d
-
-		"TestCompression passed."
-
-
-
-target minilib {
-struct CompressionStats 
-	|duration| Duration
-	|int|  In
-	|int|  Out
-	|bool| Live
-	linkage:cpp_part MzSt
-	function Start (|&compressionstats|)
-		nil self
-		if !self
-			return all
-		return self
-	function End
-	function Len (|int| n)
-	function LiveUpdate (|int| s, |int| outt, |bool| compress=true)
-	function Durr (|float|)
-	render Report (|bool| Compression)
-	function Clear
-	function Print (|bool| Compress=true)
-	module
-		|CompressionStats| All
-		function New (|compressionstats|)
-
-} else {
-struct CompressionStats
-	linkage:cpp_part MzSt
-	|duration| Duration
-	|int|  In
-	|int|  Out
-	|bool| Live
-	
-	constructor
-//		.live = true
-	
-	function Clear
-		.Duration = nil
-		.in = nil
-		.out = nil
-
-	function Start (|&CompressionStats|)
-		nil self
-		self ?= CompressionStats.all
-		.Duration -= date.now
-		return self
-	
-	function End
-		.Duration += date.now
-
-	function Print (|bool| Compression)
-		printline .Report(Compression)
+		|| ChunkData = .str(InSize)
+		expect (ChunkData == InSize) 					(self, "mz input too short")
 		
-	function LiveUpdate (|int| in, |int| out, |bool| Compress)
-		.in += in
-		.out += out
-		if .live
-			.print(compress)
+		|| OutSize = fs.DecompressChunk(ChunkData)		#loop
+		OutRemain -= OutSize
+		expect (OutRemain >= 0)							(self, "mz header invalid")		
+		// the "remain" in StringReader.DecompressInto did not add up to the sizes found in this function!
+		
+		fs.Flush
+		st.LiveUpdate(InSize + 4, OutSize, false)
+	st.end
 	
-	function Durr (|duration|)
-		rz = .duration
-		if rz < 0
-			rz += date.now
-	
-	render Report (|bool| Compression)
-		|| a = (.in, .out)(Compression)
-		|| b = (.in, .out)(!Compression)
-		fs.RenderSpeed("", A, .durr, B)
-	
-	module
-		|CompressionStats| All // noice
-}
+	return true
+
+
+
+
+helper faststring.CompressChunk (|string| Input, |int| level, |int|) 
+	cpp_wrapper JB_Str_CompressChunk
+
+
+helper faststring.DecompressChunk (|string| Input, |int|) 
+	cpp_wrapper JB_Str_DecompressChunk
 

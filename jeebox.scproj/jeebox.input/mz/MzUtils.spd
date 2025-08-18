@@ -1,0 +1,162 @@
+
+Module MZLab 
+	constants
+		None      = 0			// none
+		Fast	  = 10			// old mz?
+		Strong    = 20			// 
+		Strongest = 30			// 
+		Default   = strong		// its fast enough!
+	
+	
+	function FreeNow
+		cpp_wrapper JB_CompFreeNow
+	
+	
+	function TestMz (|string| path, |bool|)
+		if path
+			|| f = path.ReadFile.decompress(int.max)
+			return f.CompressTest(true) and .ManyTests
+	
+	
+	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
+		if which & 1
+			require .CompressTestSub(mzlab.strong, report)
+		if which & 2
+			require .CompressTestSub(mzlab.strongest, report)
+		return true
+	
+	
+	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
+		|compressionstats| stats
+		|| c = .compress(Strength, stats)
+		if report
+			stats.Print(true)
+		stats = nil
+		|| decomp = c.Decompress(int.max, stats)
+		rz = self == decomp
+		if !rz
+			error "Decompression failed on: " + self
+			decomp = c.Decompress(int.max)
+		  elseif report
+			stats.Print(false)
+		
+	
+	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
+		for j in 4 
+			if i & (1<<j)
+				fs <~ items[j]!
+
+
+	helper ManyTests (|bool|) // mztest
+		|| Items = "abcd efgh ijkl mnop".words
+		|| fs = faststring()
+		
+		for i in 1024*64
+			if i  and  i isa 16K
+				printline i.render
+			for sh in 0 to 4
+				.TestSub(items, fs, i>>(sh*4))
+			|| str = fs.getresult
+			require str.CompressTest(false, (i&1)+1)
+		"Compression Test: OK"
+		return true
+
+
+	function TestCompression
+		|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
+		require f.exists
+		for ch in f.ListFiles
+			if ch.visible
+				|| s = ch.ReadAll
+				|| c = s.compress
+				|| d = c.Decompress
+				expect s == d
+
+		"TestCompression passed."
+	
+	
+	function TestChunkedCompression		
+/		|| fs = FastString()
+		"abcabc".compress(fs)
+		"defdef".compress(fs)
+		"ghighi".compress(fs)
+		|| y = fs.GetResult.Stream()
+		// so... now we have a stream. lets read from it.
+		expect y.Decompress == "abcabc"
+		expect y.Decompress == "defdef"
+		expect y.Decompress == "ghighi"
+		
+
+
+
+target minilib {
+struct CompressionStats 
+	|duration| Duration
+	|int|  In
+	|int|  Out
+	|bool| Live
+	linkage:cpp_part MzSt
+	function Start (|&compressionstats|)
+		nil self
+		if !self
+			return all
+		return self
+	function End
+	function Len (|int| n)
+	function LiveUpdate (|int| s, |int| outt, |bool| compress=true)
+	function Durr (|float|)
+	render Report (|bool| Compression)
+	function Clear
+	function Print (|bool| Compress=true)
+	module
+		|CompressionStats| All
+		function New (|compressionstats|)
+
+} else {
+struct CompressionStats
+	linkage:cpp_part MzSt
+	|duration| Duration
+	|int|  In
+	|int|  Out
+	|bool| Live
+	
+	constructor
+//		.live = true
+	
+	function Clear
+		.Duration = nil
+		.in = nil
+		.out = nil
+
+	function Start (|&CompressionStats|)
+		nil self
+		self ?= CompressionStats.all
+		.Duration -= date.now
+		return self
+	
+	function End
+		.Duration += date.now
+
+	function Print (|bool| Compression)
+		printline .Report(Compression)
+		
+	function LiveUpdate (|int| in, |int| out, |bool| Compress)
+		.in += in
+		.out += out
+		if .live
+			.print(compress)
+	
+	function Durr (|duration|)
+		rz = .duration
+		if rz < 0
+			rz += date.now
+	
+	render Report (|bool| Compression)
+		|| a = (.in, .out)(Compression)
+		|| b = (.in, .out)(!Compression)
+		fs.RenderSpeed("", A, .durr, B)
+	
+	module
+		|CompressionStats| All // noice
+}
+

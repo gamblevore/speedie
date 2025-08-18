@@ -74,13 +74,13 @@ class FastString {
 	function GetResult (|string|)
 		nil self
 		cpp_wrapper JB_FS_GetResult
-	function GetResult (|FastString?| other, |string|)
+	function GetResult (|object?| other, |string|)
 		nil self
 		cpp_wrapper JB_FS_SmartResult
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy
 		
-	function hInt (|uint64| n)
+	function AppendHInt (|uint64| n)
 		while
 			if n <= 127
 				self <~ (n)|byte|
@@ -89,7 +89,7 @@ class FastString {
 			n >>= 7
 			
 		
-	function lInt (|uint64| n)
+	function AppendLInt (|uint64| n)
 		while n
 			self <~ N|byte|
 			n >>= 8
@@ -100,7 +100,7 @@ class FastString {
 			l2 = 248 + (n|uint|.log2 max 0) >> 3
 		self <~ L2|byte|
 		if N >= 248
-			.lint(N)
+			.AppendLInt(N)
 		
 	render
 		fs <~ self
@@ -127,12 +127,13 @@ class FastString {
 
 	module
 		function UseAsOutput (|object| other, |FastString|)
+			if !other
+				return faststring.new
 			if other isa FastString
 				return other
 			if other isa string
 				return other.out
-			if other
-				error (other, "Faststring can't use this object.")
+			error (other, "Faststring can't use this object.")
 		
 		
 		function New (|FastString?| other, |FastString|)

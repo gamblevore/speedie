@@ -95,7 +95,7 @@ role JBin (Faststring)
 	function AddMemory (|syntax| type, |uint64| L, |bool| GoIn=false, |?&byte| data=nil, |jbinleaver|)
 		|int| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
-		.hint(L)
+		.AppendHInt(L)
 		if data
 			.AppendMemory(data, L|int|)
 		.Indent += GoIn|int|
@@ -121,7 +121,7 @@ role JBin (Faststring)
 
 		self <~ (0|byte|, blen) 
 		self <~ (Type|int|<<1)|byte|
-		.hint(c)
+		.AppendHInt(c)
 		.length = CurrLen
 		|| nf = --.NoFlush
 		if !nf and .Length >= r>>1 // 50%

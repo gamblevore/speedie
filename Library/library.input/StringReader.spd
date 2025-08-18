@@ -49,6 +49,10 @@ class StringReader
 			.position += p
 	
 		
+	helper Remaining (|int|)
+		return .length - .position
+
+
 	function HasAny (|bool|)
 		nil checker
 		require (self != nil)
@@ -129,10 +133,7 @@ class StringReader
 	
 	function Trim (|int| n, |string|)
 		return .str(n).Trim
-	
-	function Remaining (|int|)
-		return .length - .position
-	
+		
 	function StrNoAdvance (|int| n, |string|)
 		|| p = .Position
 		rz = .str(n)

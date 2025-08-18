@@ -1285,7 +1285,7 @@ JB_String* JB_FS_Return( JB_String* Data, FastString* fs_in ) {
     return Data;
 }
 
-JB_String* JB_FS_SmartResult( FastString* fs, FastString* Orig ) {
+JB_String* JB_FS_SmartResult( FastString* fs, JB_Object* Orig ) {
 	if ( !Orig ) {
 		return JB_FS_GetResult( fs );
 	}

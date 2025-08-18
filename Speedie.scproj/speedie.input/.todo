@@ -2,7 +2,6 @@
 
 
 Prerelease:
-	* Compression should use simple header
 	* "as" should return nil and make no error
 	* SquaresAtByte for loop seems badly optimised? tran_for failing?
 	* selectors seem broken. just remove them. Sigh. (language2.scproj)
