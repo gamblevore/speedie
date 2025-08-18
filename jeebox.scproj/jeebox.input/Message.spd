@@ -557,6 +557,9 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 	
 	syx Msg (Message_List)
+		// this would be better as a named-arg.
+		// like my original plan for the argument having a name.
+		
 		fs <~ "«"
 		.FSListSep(fs, ", ")
 		fs <~ " »"

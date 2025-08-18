@@ -4,11 +4,11 @@
 
 
 
-// why would a conf-file be so big?
 function file.Config (|int| lim = 1MB,  |config|)
-	opt norefcounts
-	if .exists
-		rz = .parse(lim, @arg)|config|
+// why would a conf-file be so big?
+	opt NoRefCounts
+	if .Exists
+		rz = .Parse(lim, @arg)|config|
 	rz ?= message()
 	rz.obj = self
 
