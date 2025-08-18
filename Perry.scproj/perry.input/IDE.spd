@@ -167,8 +167,9 @@ class PerryIDE (Window)
 	
 
 	behaviour CancelClose 
+		GUI.SavePrefs					// seems better
 		if !.filelist.AskSaveall
-			return true // failed
+			return true					// failed
 		if !ClickedCancel(self) or !.MakeNothingRunning(" for closing the project?")
 			return true
 			
