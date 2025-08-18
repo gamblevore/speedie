@@ -1,4 +1,5 @@
 
+
 Module MZLab 
 	constants
 		None      = 0			// none
@@ -75,8 +76,9 @@ Module MZLab
 		"TestCompression passed."
 	
 	
-	function TestChunkedCompression		
-/		|| fs = FastString()
+	function TestChunkedCompression
+		// useful for jbin and exec.
+		|| fs = FastString()
 		"abcabc".compress(fs)
 		"defdef".compress(fs)
 		"ghighi".compress(fs)
