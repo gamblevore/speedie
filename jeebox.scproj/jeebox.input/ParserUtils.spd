@@ -57,7 +57,29 @@ helper String.IsJbin (|ind|)
 	return -1
 
 
-function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
+
+function String.Parse (|syntax| owner = @nil, |bool| AllowDecomp=true,  |MessageRoot|)
+	description `Use this to parse jeebox text into a message. Full explanation at file:///usr/local/speedie/Documentation/Jeebox.md and file:///usr/local/speedie/Documentation/Message.md
+
+Single-line strings with single-node output, will take that node as the root.
+
+For example parsing "hello you" will return:
+
+	@tmp "hello"
+		@thg "you"
+
+But parsing "hello you\n" will return:
+
+	@arg
+		@tmp "hello"
+			@thg "you"
+
+This is actually very useful for technical data. Where you want to have more control over the input, and allow direct control over the output, and not have to deal with annoying @args.
+
+However, this doesn't work so well for user-facing data, like config-files. In this case, a config-file will expect to be in an @arg.
+
+To get around this, just do:  x = str.parse(@arg)
+`
 	|| data = self[.isjbin max 0, int.max]
 
 	if AllowDecomp and data.iscompressed
@@ -70,28 +92,31 @@ function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |Message
 		
 
 
-helper String.ParseSub (|syntax| owner,  |MessageRoot|)
-	// language2.scproj uses owner
+helper String.ParseSub (|syntax| Owner, |MessageRoot|)
+	description "My language-parsing idea uses Owner as @list"
 	if !Parser.CppInited
 	    Parser.Init
-//	parser.data	= self
+
 	parser.StartParse( self )
 	parser._StopBars = 0
 	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal
-	|| into		= message.new(nil, owner, 0, "", 0)
-	if owner == @arg
+	|| Func		= Owner
+	Func	   ?= @arg
+	|| into		= message.new(nil, Func, 0, "", 0)
+	if func == @arg
 		(into is style2)
+	
+	// actual parse here.
 	|| lines	= parser.ParseLoopFlags(into, "", Flags)
 	
-	if !Lines and into.HasChildCount(1)
-		into = into.first // nice
+	if (owner == @nil) and (Lines == false) and into.HasChildCount(1)
+		into = into.first // don't do this if owner was specified.
 
 	parser.CleanSpaces
 	if parser.Running
 	    parser.Expect( 0 )
 	
-//	parser.data = ""
 	parser.startparse(nil) // clear error message
 	if !OK
 		into = nil
