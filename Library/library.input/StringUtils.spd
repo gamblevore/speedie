@@ -167,7 +167,7 @@ function String.ExtractPathAndLine (|$ivec2| LineAndByte, |string|)
 	|| v2 = (parts[1].trim.int|int|, parts[2].trim.int|int|) 
 	LineAndByte = v2
 	if rz[] == '~'
-		rz = rz.Resolve(fileResolveMode.allowmissing)
+		rz = rz.pathfix()
 
 
 helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)

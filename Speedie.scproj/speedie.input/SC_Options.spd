@@ -153,17 +153,18 @@ module Feedback
 	function string.IsSpeedieSrc (|bool|)
 		return (self isa "spd")
 
-	function string.ResolveSpd (|string|)
+
+	function string.PathFixSpd (|string|)
 		if self[0, "@spd/"]
-			return (file.Speediedir+self[5...]).Resolve(FileResolveMode.AllowMissing)
-		return .Resolve(FileResolveMode.AllowMissing)
+			return (file.Speediedir+self[5...]).pathfix
+		return .pathfix
 
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
 		ifn (path contains '/' or '.' or '~')
 			Path = compiler.FindProjNoSuffix(Path)
 		
-		|| path2 = path.ResolveSpd
+		|| path2 = path.PathFixSpd
 		if path2: path = path2
 		|| F = Path.File
 		expect !(f inside compiler.library or compiler.jeebox) (f, "Don't compile Library files") 

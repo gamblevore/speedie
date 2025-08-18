@@ -356,10 +356,10 @@ function ViewAsVis (|bool| AsProject)
 
 	if AsProject
 		.CurrFileName.size = 8 ~ after for 140 by 1~inside
-		.FileListersInside(.rborder)
+		.PutFileListersInside(.rborder)
 	  else
 		.CurrFileName.size = 140~wide by 3~inside
-		.FileListersInside(.toolbar)
+		.PutFileListersInside(.toolbar)
 	
 	|| IsPic = .IsGraphics
 	(.editme is visible) = !IsPic
@@ -373,7 +373,7 @@ function ViewAsVis (|bool| AsProject)
 	
 
 
-function FileListersInside (|guicontrol| dest)
+function PutFileListersInside (|guicontrol| dest)
 	dest <~ .CurrFileName
 	dest <~ .FunctionMenu
 	dest <~ .CommandsMenu

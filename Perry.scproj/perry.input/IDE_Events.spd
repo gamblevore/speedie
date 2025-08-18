@@ -113,6 +113,12 @@ function file.FindProjectMain (|file|)
 			return c
 
 
+function PerryIDE.FindConfFile (|filerow|)
+	if .IsSingleFileProject
+		return .FileList[0]
+	return .LocateProjRoot("./index.spd")
+
+
 function PerryIDE.FindNotTodo (|bool|)
 	if .IsSingleFileProject
 		|| c = .CurrFileRow

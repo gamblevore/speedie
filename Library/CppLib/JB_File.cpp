@@ -858,12 +858,7 @@ JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
     self->Descriptor = -1;
     self->MyFlags = 0;
     self->OpenMode = 0;
-    
-    // Would be better to split Dir/DirEnt off into a struct... Do this when I can.
-    
-//    self->Reader.Dir = 0;
-//    self->Reader.DirEnt = 0;
-    
+        
 	if (WorthTestingCase())
 		CaseTest_(self);
 	return self;

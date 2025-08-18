@@ -95,6 +95,7 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 		JB_FS_AppendCString(FS, "'.");
 	}
 	if (str == EmptyPath) {
+		JB_FS_AppendMultiByte(FS, 10, 2);
 		JB_App__StackTrace(2, FS);
 	}
     return JB_FS_GetResult(FS);

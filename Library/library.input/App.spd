@@ -231,7 +231,7 @@ function CWD (|string|)
 
 
 function CWD (assigns:|string|, |ErrorInt|)
-	return ._chdir(Value.resolve)
+	return ._chdir(Value.pathfix)
 
 
 helper _chdir (|string| path, |ErrorInt|)
@@ -318,7 +318,7 @@ function Sudo (|string| p, |ExitCode|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
 
 function Icon (assigns:|string| path)
-	|| ico = path.Resolve
+	|| ico = path.PathFix
 		.SetIcon(ico.cstr)
 
 function SetIcon (|cstring| path)

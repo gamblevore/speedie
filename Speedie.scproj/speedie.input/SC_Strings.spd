@@ -551,7 +551,7 @@ module StringCorrector
 	
 	
 	function CorrectStrings
-		|| f = (compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)(Options.SingleFileInput)!
+/		|| f = (compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)(Options.SingleFileInput)!
 		|| strs = f[".strings.txt"]
 		.CorrectFile( strs )
 

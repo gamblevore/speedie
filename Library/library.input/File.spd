@@ -126,11 +126,10 @@ class File (String)
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |messageroot|)
 		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
-		|| f = .Resolve(allowmissing).file
-		|| S = f.ReadAll(lim, allowmissing)
+		|| S = .ReadAll(lim, allowmissing)
 		s = s.Decompress(lim, nil)
 		if s
-			|memorylayer--| L = (Message).CreateUseLayer(f, s) 
+			|memorylayer--| L = (Message).CreateUseLayer(self, s) 
 			rz = S.parse(@arg, false) // already decompressed.
 			(message).restore
 
@@ -465,12 +464,12 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				
 		function SpeedieDir (|string|)
 			if !_speedie
-				|| paths = app.exepath.resolve(false).parent
+				|| paths = app.exepath.parent
 				|| srch = "/speedie/"
 				|| found = paths.find(srch, 0, int.max, true)
 					_speedie = paths[0, found + srch.length]
 				  else
-					_speedie = "/usr/local/speedie/".Resolve(False)
+					_speedie = "/usr/local/speedie/"
 			return _speedie
 		
 		function SizeSorter (SorterComparer of file)
@@ -520,7 +519,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			cpp_wrapper JB_File__Home
 
 		function Trash (|string|name="", |file|)
-			rz = .TrashPath.Resolve.file
+			rz = .TrashPath.pathfix.file
 			if name
 				rz = rz.uniquechild(name)
 

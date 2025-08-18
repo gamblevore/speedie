@@ -73,7 +73,7 @@ function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |str
 
 
 function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/",  |string|)
-	|| full = .Resolve ?? self
+	|| full = .pathfix ?? self
 	|| dest = full.Scriptcontainer(container)
 	dest.makeentirepath
 	return dest[full.SpdScriptName]

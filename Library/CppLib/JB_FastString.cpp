@@ -198,7 +198,7 @@ void JB_FS_RemoveByte(FastString* self, byte B) {
 }
 
 
-void JB_FS_AppendMultiByte(FastString* self, int byte, int Count) { // - numbers become +2billion!
+void JB_FS_AppendMultiByte(FastString* self, int byte, int Count) {
 	if ( Count > 0 ) {
 		uint8* Write = JB_FS_WriteAlloc_(self, Count);
 		if (Write) {
