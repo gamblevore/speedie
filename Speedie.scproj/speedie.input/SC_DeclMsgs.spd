@@ -7,15 +7,18 @@ function DeclsDefault (|Message| def, |Message|)
 		return def.Last
 
 
-function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message!|)
-	opt norefcounts
+function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose = 0, |Message!|)
+	opt NoRefCounts
 	rz = «decl »
-	|| f = rz.msg(@name)
 	
-	if (Type)
+	|| f = rz
+	if purpose is Borrowed // seems to make no difference? sigh.
+		f = f.msg(@arel, "--")
+
+	f = f.msg(@emb)
+	if Type
+		f.func = @name
 		f.name = type
-	  else
-		f.func = @emb
 	
 	if !Value
 		rz <~ (@thg, name)

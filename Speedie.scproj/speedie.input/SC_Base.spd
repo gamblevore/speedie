@@ -612,9 +612,7 @@ function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
 	if name ~= "super"
 		name = "self"
 	
-	rz = .LookUpSub( name, exp, self, nil, side, kPurposeVar )
-	if rz isa scdecl
-		(rz is UsedByCode)
+	return .LookUpSub( name, exp, self, nil, side, kPurposeVar )
 
 
 

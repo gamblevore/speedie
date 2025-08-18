@@ -155,7 +155,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 		«emb »
 	»
 	
-	|| decl = MakeDecl( "FastString", fsName, Dot )
+	|| decl = MakeDecl( "FastString", fsName, Dot, scdeclinfo.Borrowed )
 	point.Prev = decl
 	|| errpos = msg
 	for item in msg
@@ -551,7 +551,7 @@ module StringCorrector
 	
 	
 	function CorrectStrings
-/		|| f = (compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)(Options.SingleFileInput)!
+		|| f = (compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)(Options.SingleFileInput)!
 		|| strs = f[".strings.txt"]
 		.CorrectFile( strs )
 

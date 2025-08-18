@@ -8,7 +8,6 @@ prototype TranFunc (|SCFunction?| fn, |Message| node, |SCNode| name_space, |bool
 
 extend_module SCFunction {
 
-
 dispatch TemporalStatements (TranFunc)
 	cpp_refs				(Tran_CppRefs)
 
@@ -289,7 +288,6 @@ function Tran_WhileSub (TranFunc)
 				decl.next = macros.WhileDecl.run(dname.copy)
 		  else
 			cond = Cond.ExpandToBool( name_Space ) #require
-
 	
 	Cond.NeedBra
 	arg.CheckContinuesAndExits
@@ -406,7 +404,8 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
 		(d is CompilerCreated)
-	|| Used = (d and d is usedbycode)
+	|| Used = d and (d is readfrom or setto)
+		
 	src.StartUsingAfter
 	if !used
 		r_z.Remove
@@ -417,14 +416,13 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 		|| last = Src.DeepLast
 		using last
 		
-		parser.using.position = last.After+1
+		parser.using.position = last.After + 1
 		|| ret = src.msg(@tmp, "return")
 		ret.ASMType = ASMType.kReturn
 		if used
 			ret.msg(@thg, "rz").obj = d 
 		  else
 			ret <~ f.ReturnType!.CreateDefault(src)
-
 
 
 function Tran_Result (|SCFunction| f, |message|)
@@ -499,7 +497,6 @@ function Tran_ForSub (TranFunc)					// :3
 			IterName = value.Name
 			value = value[@thg]
 			bad +=! value
-	
 	
 				////////  GET ITERATOR
 	|sciterator| iter
@@ -864,7 +861,6 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 
 
 
-
 function message.NotNilRZ (|scdecl| type,  |SCNode|space)
 	opt norefcounts
 	|| rel = .last$
@@ -978,7 +974,6 @@ function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
 	.LastInBlock(ExitCode)
 
 
-
 function scnode.AddNumericConst (|string| name, |int64| value, |message| where, |scdecl|)
 	opt norefcounts
 	|| SyxConst = SCDecl(TypeSyntax!)
@@ -995,5 +990,4 @@ function Message.DeepLast (|message|)
 		|| l = .last #loop
 		self = l
 	return self
-	
 

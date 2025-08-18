@@ -59,7 +59,6 @@ datatype SCDeclInfo (uint)
 		NumberConst = DirectNumber + Const	// const: x = 7
 		UpgradeableContained
 		TypeImprove
-		UsedByCode
 		API
 		ClassObj
 		CompilerCreated
@@ -76,7 +75,6 @@ datatype SCDeclInfo (uint)
 		Altered
 		AlteredInBranch
 		Reference
-		ExistanceAltered
 		Task
 		Self
 		ReadFrom
@@ -97,7 +95,7 @@ datatype SCDeclInfo (uint)
 		NeedsClose      = Body// ||| Altered
 
 
-	function CheckHighestValue
+	function CheckHighestValue 
 		|| x = IntendedAsReturn
 	
 	
@@ -956,8 +954,6 @@ class SCDecl (SCObject) {
 		
 		if (Default and self == .type.typenormal)
 			return Default
-		
-		is ExistanceAltered							// just for debugging the compiler.
 		
 		rz = .CopyDeclForVar
 		rz.NilDeclared = type

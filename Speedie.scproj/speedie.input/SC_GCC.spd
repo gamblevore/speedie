@@ -478,8 +478,7 @@ function ReplaceOld (|file| input, |File| Backs)
 
 function MakeDailyProductPath (|File| B, |string|)
 	|| D = Date.Now.DayOfWeekApprox
-	|byte| x = 'A' + D
-	return B.Path.child( D.Render+"_Speedie" )
+	return B.Path.child( D.Render + "_Speedie" )
 
 
 function BackupCompiler (|bool|)
