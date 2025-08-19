@@ -1897,7 +1897,7 @@
 "parent of found is "
 "\00\00\00\00\00\00"
 "abc "
-"Faststring can't use this object."
+"FastString can't use this object."
 "Can't allocate memory."
 "No name specified for sub-file of directory: "
 " has different length to "
