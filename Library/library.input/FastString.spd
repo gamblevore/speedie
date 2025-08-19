@@ -133,7 +133,7 @@ class FastString {
 				return other
 			if other isa string
 				return other.out
-			error (other, "Faststring can't use this object.")
+			error (other, "FastString can't use this object.")
 		
 		
 		function New (|FastString?| other, |FastString|)

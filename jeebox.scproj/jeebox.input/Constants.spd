@@ -111,7 +111,7 @@ Module Jeebox
 //		return .replaceall("``", "`")
 
 
-	Function string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
+	function string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
 		after = after min .length
 		while (off < after)
 			|| c = self[off++]

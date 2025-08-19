@@ -1516,17 +1516,6 @@ function Tran_DebugAt (TranFunc)
 		node.msg(@prm) <~ ch
 	TypeOfExpr(node, name_Space)
 
-/*
-decl 
-	emb 
-	rel 
-		thg "fs"
-		opp "="
-		func 
-			thg "faststring"
-			prm 
-*/
-
  
 //function message.Tran_FS
 //	macros.fs.clean

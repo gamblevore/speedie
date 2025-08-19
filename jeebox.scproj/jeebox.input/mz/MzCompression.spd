@@ -33,7 +33,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	st.end
 
 		
-function StringReader.Decompress (|object| dest=nil,  |uint| Limit=512MB,  |&compressionstats| st=nil,  |stringthatwasreadsafely|)
+function StringReader.Decompress (|object| dest=nil,  |uint| Limit=256MB,  |&compressionstats| st=nil,  |stringthatwasreadsafely|)
 	|| header = .str(4)
 	expect (header.IsCompressed)					(self, "Can't decompress non-mz data")
 	|| Remain = .UInt(4)
@@ -41,7 +41,7 @@ function StringReader.Decompress (|object| dest=nil,  |uint| Limit=512MB,  |&com
 	
 	|| fs = FastString.UseAsOutput(dest)			#require
 	|| d = string.error
-	if .DecompressIntoSub(fs, Limit, st.start, Remain)
+	if .DecompressIntoSub(fs, st.start, Remain)
 		d = fs.GetResult(dest)
 	return d
 
@@ -49,7 +49,7 @@ function StringReader.Decompress (|object| dest=nil,  |uint| Limit=512MB,  |&com
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
-helper StringReader.DecompressIntoSub (|faststring| fs,  |int| OutLim,  |&compressionstats| st,  |int| OutRemain,  |bool|)
+helper StringReader.DecompressIntoSub (|faststring| fs,  |&compressionstats| st,  |int| OutRemain,  |bool|)
 	while OutRemain > 0
 		|| InSize = .UInt(4) - 4
 		expect (InSize < 16MB) 							(self, "mz chunk too large")
@@ -64,8 +64,8 @@ helper StringReader.DecompressIntoSub (|faststring| fs,  |int| OutLim,  |&compre
 		
 		fs.Flush
 		st.LiveUpdate(InSize + 4, OutSize, false)
+
 	st.end
-	
 	return true
 
 

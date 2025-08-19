@@ -25,6 +25,7 @@ datatype Syntax (Byte)
 	function IsString (|bool|)
 		return self >= @sstr and self <= @str
 
+// relies on me having cleverly ordered all my syntax :> to group them up.
 	function NoChildren (|bool|)
 		return self >= @Cnj	and self <= @Bin
 
