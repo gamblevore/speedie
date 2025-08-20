@@ -90,6 +90,9 @@ class list (Saveable)
 	
 	operator LessOrEqual (|int| N, |bool|)
 		// has N children or less.
+		// would be nice if this could directly work from
+		// a <= b... and just prefer this over the syntaxcompare.
+		
 		opt norefcounts
 		|| c = .first
 		while c
