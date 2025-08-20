@@ -1,5 +1,7 @@
 
 
+// I could make an "simplyescape" header, to avoid the 16-bytes added
+// in case we are compressing a lot of small strings. Seems fair.
 function string.Compress (|int| Strength=mzlab.default, |?&compressionstats| st = nil, |faststring?| fs_in = nil,  |string|) 
 	|faststring--| fs = FastString(fs_in)
 	.Stream.CompressInto(fs, strength, st)

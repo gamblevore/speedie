@@ -61,6 +61,9 @@ Here is an example of how trying to use JSON for "xml-like tasks" becomes unread
 
 ![](xml_json.jpg)
 
+Theres more [example comparisons here](../Examples/comparisons).
+
+
 ## Jeebox
 
 OK, lets try this above example in jeebox. I can't resist talking about jeebox any longer:
