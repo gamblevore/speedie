@@ -64,7 +64,7 @@ extend PerryIDE
 		.DebugArgsText		= textview(self)
 		.AttachedProgram	= ""
 		
-		.init
+		.InitIDE
 		perry.AddRecent(project)
 		.InConstructor = false
 	
@@ -93,7 +93,7 @@ extend PerryIDE
 		Perry.RecentProjects.trim(15)
 	
 	
-	function Init // perryide.init
+	function InitIDE // perryide.init
 		.size      = the~area
 		.CopyPaste = CopyPasteFlags.PasteFile
 		.onpaste   = perryopendoc
