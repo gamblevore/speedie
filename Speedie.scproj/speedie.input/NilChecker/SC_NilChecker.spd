@@ -249,7 +249,7 @@ function NilFunction (NilTrackerFn)
 		fp = fp.unbra
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
-	ifn ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0)
+	ifn ((fn != scfunction.currfunc) or t.anyreturns or t.BranchDepth > 0)
 		ErrorReceiver.NewCriticalError(msg, "Recursion fail: This would freeze.")
 			
 	
@@ -305,7 +305,7 @@ function NilFunction (NilTrackerFn)
 
 	if fn Is Killer
 		.DeclKill
-		if (t.nestdepth == 0)  and  !t.AnyReturns // also if no returns happened...
+		if (t.BranchDepth == 0)  and  !t.AnyReturns // also if no returns happened...
 			(scfunction.currfunc! is killer)
 		msg.LastInBlock(SCBlockage.Quit) // may happen later than expected
 		return nilstate.Killer
@@ -538,7 +538,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 
 	if lnil and rnil
 		|| lld = ll.FastDecl
-		if lld.NilAllocDepth >= .Loops.NestDepth
+		if lld.DepthOfBranch >= .Loops.BranchDepth
 			return ll.Redundantvar(lld, test)
 		if lnil + rnil != 3
 			return nilstate.real
@@ -601,8 +601,8 @@ function StatExpr (NilTrackerFn)
 
 function Argument (NilTrackerFn)
 	opt norefcounts
-//	msg.indent = ++.ArgDepth
 	|| VarDepth = .value.DepthOfVars
+	ArgDepth++
 	
 	for s.fast in msg
 		|| t = test & -s.islast
@@ -617,13 +617,12 @@ function Argument (NilTrackerFn)
 		if rz is Killer
 			exit
 	
+	--ArgDepth
 	|| FinalVars = ArchonPurger.value
 	|| Allowed = (1|uint64| << ((vardepth+1)<<1)) - 1|uint64|
 	t.value = FinalVars & Allowed
-//	|| Dpth = .ArgDepth--
-//	if Dpth == 1
 	
-	.MergeVars(finalvars, vardepth, /*dpth*/)
+	.MergeVars(finalvars, vardepth)
 
 
 function Bracket (NilTrackerFn)

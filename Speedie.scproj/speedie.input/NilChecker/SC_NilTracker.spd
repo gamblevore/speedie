@@ -26,7 +26,7 @@ struct ArchonPurger
 	|NilRecord[64]| 		Rows
 	
 	
-	function NestDepth (|int|)
+	function BranchDepth (|int|)
 		return (.Neel - &.rows[0])|int|
 	
 	
@@ -34,7 +34,7 @@ struct ArchonPurger
 		V.NilDeclared = NilState.real
 		if v is self
 			.FnAbleToNilCheck = false
-		if .NestDepth > 0				// We need to affect the other branches.
+		if .BranchDepth > 0				// We need to affect the other branches.
 			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
 	
@@ -63,7 +63,7 @@ struct ArchonPurger
 	function BranchRestore (|NilRecord| A,  |nilstate|)
 		.Neel--[] = 0 // cleanup
 		t.value = A
-		if .NestDepth == 0
+		if .BranchDepth == 0
 			.Realnesses = -1
 		return NilState.real
 	
@@ -71,7 +71,7 @@ struct ArchonPurger
 		|| B = value()
 		.Neel--[] = 0 // cleanup
 		t.value = A ||| B
-		if .NestDepth == 0
+		if .BranchDepth == 0
 			.Realnesses = -1
 		return nilstate.real
 
@@ -82,7 +82,7 @@ struct ArchonPurger
 			d.NilPrint("add")
 	
 	
-	function DeclareSub (|scdecl| D, |nilstate| nd, |message| ToClose, |nilstate|)
+	function DeclareSub (|scdecl| D, |nilstate| nd, |message?| ToClose, |nilstate|)
 		nd &= nilstate.either
 		|| N = .value.DepthOfVars + 1
 		expect (N < 31)							(D.source, "Too many declarations")
@@ -92,10 +92,12 @@ struct ArchonPurger
 		if !d.Suffers
 			d.NilDeclared = NilState.Real
 		
-		if d isnt Grabbed // grabbed's previous use was only on properties. can't clash.
+		t.closers[n] = nil
+		if d isnt Grabbed						// grabbed's previous use was only on properties. can't clash.
 			t.closers[n] = ToClose
 		
-		d.NilAllocDepth = .NestDepth
+		d.ArgDepth = ArgDepth
+		d.DepthOfBranch = .BranchDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
 		return nd
@@ -127,14 +129,14 @@ struct ArchonPurger
 		.rowend = .Neel + 63
 		.Realnesses = -1
 		loops = nil
-		ArgDepth = nil
+		ArgDepth = 1
 		.AnyReturns = false
 		.RootReturned = false
 		.CheckNilCheck(F)
 		
 		for d in f.args
 			d.Paramfix
-			.DeclareSub(d, d.nildeclared, nil)
+			.DeclareSub(d, d.nildeclared, d.source!)
 
 		target debugnil
 			f.NilPrint("\n ****** ", false)
@@ -183,8 +185,8 @@ struct ArchonPurger
 
 	module
 		|LoopInfo| 				Loops
-		|ArchonPurger|			T
 		|int|					ArgDepth
+		|ArchonPurger|			T
 		|byte|					OldPrint
 
 
@@ -200,7 +202,7 @@ struct ArchonPurger
 
 		function DeclKill
 			opt inline
-			if !t.nestdepth
+			if !t.BranchDepth
 				t.RootReturned = true
 			t.value = nilstate.Basic
 		
@@ -210,7 +212,6 @@ struct ArchonPurger
 			|| arg = t.Startnil(f)
 				Argument(arg)
 				.CloseVars(0)
-
 				
 				if t.FnAbleToNilCheck and !f.isnilchecker
 					f.isnilchecker = 1

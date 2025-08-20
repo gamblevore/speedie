@@ -20,7 +20,7 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	if (Test is soft or while) // allow redundant
 		return Test & nilstate.either
 
-	if ArchonPurger.loops.NestDepth == 0
+	if ArchonPurger.loops.BranchDepth == 0
 		|| fs = FastString()
 		fs <~ "Redundant test on "
 		fs <~ dcl.nilcurr.RawName

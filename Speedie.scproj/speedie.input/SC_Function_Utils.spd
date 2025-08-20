@@ -154,6 +154,7 @@ datatype SCBlockage (int)
 		Continue	= 0x0040
 		Exit		= 0x0080
 		Return		= 0x00C0
+		Reserved    = 0x0100
 	
 		Quit		= Return		// for now
 	

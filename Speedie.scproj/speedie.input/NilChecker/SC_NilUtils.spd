@@ -3,7 +3,7 @@ struct LoopInfo
 	|NilRecord| 		ContRecord
 	|NilRecord| 		ExitRecord
 	|byte| 				VarCount
-	|byte| 				NestDepth
+	|byte| 				BranchDepth
 	|bool| 				HasEscape
 	
 	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
@@ -14,7 +14,7 @@ struct LoopInfo
 		.HasEscape = HasExitCond
 		.ContRecord = V								// in case loop fails the first condition
 		.VarCount = V.DepthOfVars
-		.NestDepth = ArchonPurger.t.nestdepth
+		.BranchDepth = ArchonPurger.t.BranchDepth
 	
 	
 	function FinishLoop (|message| msg)

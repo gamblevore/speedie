@@ -39,11 +39,24 @@ extend_module ArchonPurger
 		}
 	
 	
-	function UpdateFoundPlace (|int| from /*, |int| ArgDepth*/)
+	function UpdateFoundPlace (|int| from)
 		opt norefcounts
 		target debug {
-		|| msg = t.Closers[from]
-			|| p = msg.parent!
+		|| decl = t.decls[from]
+		|| FoundCloser = t.Closers[from]
+			|| p = FoundCloser.parent!
+			|| FoundCloserDepth = p.indent
+			if FoundCloserDepth < argdepth
+				debugat
+				"less" 
+			  elseif FoundCloserDepth == argdepth
+				debugat
+				"equal"
+			  else
+				debugat
+				"more"
+			
+//			if d <= 
 //			if p.indent >= argdepth
 			t.closers[from] = p.UpToArg
 		}
@@ -67,7 +80,7 @@ extend_module ArchonPurger
 		// OK... so in theory... this should all work now!
 	
 	
-	function MergeVars (|Nilrecord| FinalVars, |int| OrigDepth/*, |int| ArgDepth*/)
+	function MergeVars (|Nilrecord| FinalVars, |int| OrigDepth)
 		target debug {
 		|| From = FinalVars.DepthOfVars
 		while From > OrigDepth
@@ -76,5 +89,5 @@ extend_module ArchonPurger
 			from--
 
 		while OrigDepth > 0
-			.UpdateFoundPlace(OrigDepth--/*, argdepth*/)
+			.UpdateFoundPlace(OrigDepth--)
 		}

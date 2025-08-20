@@ -613,16 +613,16 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 
 
 
-function SCDecl.MakeStatic (|Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
-	|| R = ExtractDecl( wrap, name_space, purpose )
-		R.CopyTypeInfoTo(self)
+//function SCDecl.MakeStatic (|Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
+//	|| R = ExtractDecl( wrap, name_space, purpose )
+//		R.CopyTypeInfoTo(self)
 //		is static
-		return true
+//		return true
 
 
 function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
-	if contained == @thg and "static"
-		return .MakeStatic(wrap, name_space, purpose )
+//	if contained == @thg and "static"
+//		return .MakeStatic(wrap, name_space, purpose )
 	|| Cont = ExtractDecl( Contained, Name_Space, purpose )
 		return .LoadContainedSub(cont, wrap, Name_Space, purpose)
 
@@ -871,7 +871,7 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 		return
 
 	|| itm		= type.next
-	|| P		= exp.parent
+//	|| P		= exp.parent
 	|| Place	= exp.IntoVariable(name_space)
 	if place.arg
 		name_space = place.arg.SCArg(name_space) 

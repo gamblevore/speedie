@@ -128,9 +128,9 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
 	|byte|				NilReg
-	|byte| 				NilAllocDepth
-	|byte|				DepthOfBranch
+	|byte|				DepthOfBranch // same?
 	|bool|				Suffers
+	|byte|				ArgDepth
 	|DeclAlterable|		mu									// The ASM can alter these, and needs to restore them too.
 
 	
