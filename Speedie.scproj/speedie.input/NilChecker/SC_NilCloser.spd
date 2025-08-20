@@ -2,10 +2,14 @@
 
 function Message.MarkVarClosed (|scdecl| D)
 	opt norefcounts
-	target debug2 {
-	|| m = Message(@xml, d.name)
+//	target debug {
+	|| next = .next
+	require next and next.ASMType != ASMType.kreturn
 	
+	|| m = Message(@xml, d.name)
+	m.asmtype = ASMType.kIgnore
 	if d.IsNormalObject
+		m.asmtype = 0
 /		m.func = @func
 		m.name = ""
 /		m.msg(@thg, "JB_Decr")
@@ -16,43 +20,38 @@ function Message.MarkVarClosed (|scdecl| D)
 	
 	m.obj = d
 	.next = m
-	}
+//	}
 
-
-function Message.UpToArg (|message!|)
-	opt norefcounts
-	target debug2 {
-/	while
-		|| p = .parent!
-		if p.func == @arg
-			return self
-		self = p 
-	}
-	return self
 
 
 extend_module ArchonPurger
 	function UndeclareOne (|int| from)
 		opt norefcounts
-		target debug2 {
-/		|| msg = t.closers[from]
-			target debug:if !t.decls[from]
-			msg.MarkVarClosed(t.decls[from]!)
+		target debug {
+		|| D = t.decls[from]!
+		target debug2
+			if !D
+		
+		(d is Grabbed)
+		if D is NeedsClose
+			|| msg = t.closers[from]
+				msg.MarkVarClosed(D)
 		}
 	
 	
-	function UpdateFoundPlace (|int| from, |int| ArgDepth)
+	function UpdateFoundPlace (|int| from /*, |int| ArgDepth*/)
 		opt norefcounts
-		target debug2 {
+		target debug {
 		|| msg = t.Closers[from]
-/			|| p = msg.parent!
-			if p.indent >= argdepth
-				t.closers[from] = p.UpToArg
+			|| p = msg.parent!
+//			if p.indent >= argdepth
+			t.closers[from] = p.UpToArg
 		}
 
-
+		
+		
 	function CloseVars (|int| VarDepth=0)
-		target debug2 {
+		target debug {
 		|| From = .value.DepthOfVars
 		while From > VarDepth
 			.UndeclareOne(from)
@@ -67,14 +66,15 @@ extend_module ArchonPurger
 		// seems the same?
 		// OK... so in theory... this should all work now!
 	
-	function EndArgumentVars (|int| VarDepth, |int| ArgDepth)
-		target debug2 {
-/		|| From = .value.DepthOfVars
-		while From > VarDepth
+	
+	function MergeVars (|Nilrecord| FinalVars, |int| OrigDepth/*, |int| ArgDepth*/)
+		target debug {
+		|| From = FinalVars.DepthOfVars
+		while From > OrigDepth
 			.UndeclareOne(from)
-/			t.closers[from] = nil
+			t.closers[from] = nil
 			from--
 
-		while from > 0
-			.UpdateFoundPlace(from--, argdepth)
+		while OrigDepth > 0
+			.UpdateFoundPlace(OrigDepth--/*, argdepth*/)
 		}

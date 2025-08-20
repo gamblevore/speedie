@@ -984,7 +984,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		@Decl.ExportAddr = C_RenderDcl
 		@Func.ExportAddr = C_RenderFnc
 		@Thg.ExportAddr  = C_RenderThg
-		@SThg.ExportAddr  = C_RenderNothing
+		//@SThg.ExportAddr  = C_RenderNothing
+		@xml.ExportAddr  = C_RenderNothing
 
 		
 		@Type.ExportAddr = C_RenderTyp

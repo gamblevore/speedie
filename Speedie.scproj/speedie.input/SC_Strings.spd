@@ -146,7 +146,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 		Return
 	
 	require fn
-	|| Point = msg.ParentPoint!
+	|| Point = msg.UpToArg!
 	using (msg)
 	|| FSName = UniqueTmpVar( fn, "fs" )
 	|| StrName = fsName + "_str"

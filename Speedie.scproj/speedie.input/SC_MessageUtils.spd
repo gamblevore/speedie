@@ -109,14 +109,13 @@ function message.IsInt (|bool|)
 	return (self == @num) and !.name.find('.')
 
 
-function Message.ParentPoint (|Message|)
+function Message.UpToArg (|Message|)
 	opt norefcounts
-	|| curr = self
-	while curr
-		|| OldMsg = curr
-		curr = curr.parent
-		if curr == @Arg
-			Return OldMsg
+	while
+		|| p = .parent!
+		if p.func == @arg
+			return self
+		self = p 
 
 
 function Message.IsVarUseableInLoop (|String| name, |bool|)

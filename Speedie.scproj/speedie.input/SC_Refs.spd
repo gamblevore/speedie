@@ -728,7 +728,7 @@ function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 		if (parent.obj == Compiler.RefFreeIfDead)
 			return nil										// already done!!!
 	
-	|| pp = ch.ParentPoint!
+	|| pp = ch.UpToArg!
 	if RC_NeedsOwnBlock(ch, pp)
 		ch.TempIntoBlock(pp)
 	  else

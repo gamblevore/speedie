@@ -1953,7 +1953,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 
 	|| rel = exp.NiceParent
 	rel.expect(@rel)
-	|| Place = rel.ParentPoint!
+	|| Place = rel.UpToArg!
 	|| d = thg.asdecl
 		d.default = nil
 

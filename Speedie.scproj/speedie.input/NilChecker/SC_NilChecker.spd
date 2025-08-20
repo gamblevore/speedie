@@ -136,6 +136,7 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 
 
 function UseAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
+	opt norefcounts
 	return .UseAsRealSub(msg, test, reason, msg.fastdecl)
 
 
@@ -368,7 +369,7 @@ function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
-/	.CloseVars
+	.CloseVars
 	.DeclKill
 	t.anyreturns = true
 	|| ret = t.return
@@ -562,9 +563,7 @@ function Thing (NilTrackerFn)
 	|| dcl = msg.FastDecl
 	rz = .ThingSub(msg, test, dcl)
 	
-	// should we write it here for params?
-	// depends if its altered?
-	if dcl is NeedsClose//OrAltered
+	if dcl is NeedsClose and dcl isnt Grabbed
 		|| nreg = dcl.NilReg
 			t.closers[nreg] = msg.UpToArg
 	
@@ -602,8 +601,8 @@ function StatExpr (NilTrackerFn)
 
 function Argument (NilTrackerFn)
 	opt norefcounts
-/	msg.indent = ++.ArgDepth
-	|| v = .value.DepthOfVars
+//	msg.indent = ++.ArgDepth
+	|| VarDepth = .value.DepthOfVars
 	
 	for s.fast in msg
 		|| t = test & -s.islast
@@ -618,10 +617,13 @@ function Argument (NilTrackerFn)
 		if rz is Killer
 			exit
 	
-	|| Allowed = (1|uint64| << (++v<<1)) - 1|uint64|
-	t.value = ArchonPurger.value & Allowed
-	|| dpth = .ArgDepth--
-/	.EndArgumentVars(v, dpth)
+	|| FinalVars = ArchonPurger.value
+	|| Allowed = (1|uint64| << ((vardepth+1)<<1)) - 1|uint64|
+	t.value = FinalVars & Allowed
+//	|| Dpth = .ArgDepth--
+//	if Dpth == 1
+	
+	.MergeVars(finalvars, vardepth, /*dpth*/)
 
 
 function Bracket (NilTrackerFn)

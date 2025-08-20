@@ -26,7 +26,7 @@ function FS (|Message| exp, |Message| getresult)
 	|| t2 = TypeOfExpr(fs2, nil)
 	require t2 is compilercreated
 
-	|| Place = t2.default!.ParentPoint
+	|| Place = t2.default!.UpToArg
 	|| arg = place.parent
 	require arg.expect(@arg)
 	

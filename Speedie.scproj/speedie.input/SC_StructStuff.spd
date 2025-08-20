@@ -88,7 +88,7 @@ function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 	|| f = Rel.func
 
 	if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
-		|| p = rel.ParentPoint!
+		|| p = rel.UpToArg!
 		|| nsp = p.parent!.obj|scnode|
 		|| NewThg = SCFunction.TempMoveOut(s, p)
 		|| dcl = s.parent!.parent!

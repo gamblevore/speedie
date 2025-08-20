@@ -72,14 +72,12 @@ datatype SCDeclInfo (uint)
 		///
 		
 		Return
-		Altered
-		AlteredInBranch
+		AlteredCopy = [Altered,AlteredInBranch,AlteredParamObject]
 		Reference
 		Task
 		Self
 		ReadFrom
 		SetTo					// a var sets it... like: rz = obj
-		Hidden					// internal global... should not be exposed to non-lib stuff
 		Grabbed
 		PostIncremented
 		VarThatGotReturned
@@ -92,7 +90,7 @@ datatype SCDeclInfo (uint)
 		Local			= Body  ||| Param
 		SelfImplicit	= Self  ||| local // local is set by CollectOneParam, anyhow?
 		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
-		NeedsClose      = Body// ||| Altered
+		NeedsClose      = Body ||| AlteredParamObject
 
 
 	function CheckHighestValue 
@@ -130,10 +128,9 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
 	|byte|				NilReg
-	|bool|				Suffers
-	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				DepthOfBranch
+	|bool|				Suffers
 	|DeclAlterable|		mu									// The ASM can alter these, and needs to restore them too.
 
 	
@@ -144,7 +141,7 @@ class SCDecl (SCObject) {
 		.mu.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
 		.mu.datatype = 0
 		|| m = SCModule.curr
-			.ModuleNum = m.ModuleNum
+			.mu.ModuleNum = m.ModuleNum
 
 	setter Name (|string|)
 		super.exportname = value
@@ -1277,7 +1274,7 @@ function GlobalsSorter (SorterComparer of scdecl)
 	if !rz
 		rz = (b.type == typejbclass) - (.type == typejbclass)
 	if !rz
-		rz = b.ModuleNum - .ModuleNum // keep commonly accessed stuff together
+		rz = b.mu.ModuleNum - .mu.ModuleNum // keep commonly accessed stuff together
 	if !rz
 		rz = b.name.SyntaxCompare(.name, true)
 	

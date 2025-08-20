@@ -10,6 +10,7 @@ datatype ASM (uint)
 			y = 2
 			return
 		x++
+		y = 0
 	
 	function Print
 		visible

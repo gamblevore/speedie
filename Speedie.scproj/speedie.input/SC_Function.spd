@@ -1141,7 +1141,7 @@ function FixCnjSub (|Message| exp)
 			thg = ch.copy!
 			if (pp == @arg)
 				RemoveMe = ch // i think so...
-			pp = ch.ParentPoint!
+			pp = ch.UpToArg!
 			UsePrev = true
 			Done = 1
 		  elseif (pp.IsSetRel and pp.first == @thg)			
@@ -1215,16 +1215,18 @@ function ASMRegType (|datatypecode|)
 
 function SCDecl.MarkAsAltered 
 	opt norefcounts
-	if self is local
-		(self is altered)
-		if SCFunction.InBranch > .DepthOfBranch
-			is AlteredInBranch
-		if self is TypeImprove
-			|| orig = .IsLookupOnly
-			if orig isa SCDecl
-				(orig is altered)
-				if self is AlteredInBranch
-					(orig is alteredinbranch)
+	require self is local
+
+	(self is altered)
+	if SCFunction.InBranch > .DepthOfBranch
+		is AlteredInBranch
+	if .IsNormalObject and self is param
+		is AlteredParamObject
+
+	require self is TypeImprove
+	|| orig = .IsLookupOnly
+	if orig isa SCDecl
+		orig.mu.info |= .mu.info & scdeclinfo.AlteredCopy
 
 
 

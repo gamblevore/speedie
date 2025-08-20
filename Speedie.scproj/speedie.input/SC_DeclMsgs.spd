@@ -203,7 +203,7 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 		if d and d.StatedReal
 			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
 
-	return dcl.AddToGlobs()
+	return dcl.AddToGlobs
 
 
 function scdecl.AddToGlobs (|bool|)
@@ -211,8 +211,9 @@ function scdecl.AddToGlobs (|bool|)
 	is Global
 	
 	|| n = .name
-	if ('_' == n[]) ||| ('_' == n.Last)
-		is hidden
+//	if ('_' == n[]) ||| ('_' == n.Last)
+//		is hidden
+// maybe just do visibility textually?
 	
 	if !.ProjectIsLib
 		packmaker.PackGlobs <~ self

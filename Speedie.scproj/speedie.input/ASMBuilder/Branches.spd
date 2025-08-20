@@ -21,7 +21,7 @@ function ElseSub (|message?| other, |asmreg|)
 		other = other.first!
 	  else
 		debugger
-	return ASMType.ARG(self, other)
+	return ASMType.Argument(self, other)
 
 
 function If (fn_asm)
@@ -44,7 +44,7 @@ function IfSub (fn_asm)
 		return .Else(other)								// if k0 {b()} else {return}
 
 	.BasicBlock++
-	|| Arg1Return = ASMType.arg(self, arg1)
+	|| Arg1Return = ASMType.Argument(self, arg1)
 	if b.always or !other.HasAsmStuff
 		.AllJumpTo(b)
 		.BasicBlock++

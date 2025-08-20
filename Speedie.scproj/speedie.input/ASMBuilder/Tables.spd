@@ -2,7 +2,7 @@
 
 
 dispatch fn_asm_table (fn_asm)
-	@arg:					ASMType.Arg
+	@arg:					ASMType.Argument
 	@tril:					Assembler.BigWhile
 	@decl:					ASMType.decl
 	@num:					ASMType.num
@@ -353,7 +353,7 @@ function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 				return what
 
 
-function Arg (fn_asm) // argument 
+function Argument (fn_asm) // argument 
 	|| OV = .OpenVars
 	|| what = ArgumentSub(self, exp)
 	return .CloseVars(OV, exp, what)
@@ -896,21 +896,3 @@ function Message.TypeCastDoesNothing (|bool|)
 		return Input.ByteCount == Output.ByteCount
 
 
-datatype HappyFlags (int)
-	flags
-		a
-		b
-		c
-		abc = a+b+c
-	
-class HappyClass
-	|HappyFlags| Flags
-	
-	syntax is (|happyflags| F, |bool|)
-		return (.flags & f) == f
-		
-	function Happyness (|int|)
-		return .flags|int|.CountBits
-		
-	function Passed (|bool|)
-		return self is abc

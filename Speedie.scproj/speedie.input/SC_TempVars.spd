@@ -156,7 +156,7 @@ extend_module scfunction
 //		|| Stealer = msg.func.msg(msg.name)
 //		stealer.takeallfrom  msg
 //		
-//		|| p = msg.ParentPoint!
+//		|| p = msg.UpToArg!
 //		if (msg == @rel)
 //			Stealer = stealer.wrapwith(@bra)
 //		msg.become(@thg, name)
@@ -188,7 +188,7 @@ extend_module scfunction
 		|| insert = msg
 		msg.ReplaceWith( repl )
 		
-		|| p = repl.ParentPoint!
+		|| p = repl.UpToArg!
 		if (msg == @rel)
 			insert = «bra, (msg)»
 	

@@ -49,6 +49,7 @@ struct DeclAlterable
 	|uint64|			ExportPosition
 	|SCDeclInfo|		Info
 	|DataTypeCode|		DataType
+	|uint16| 			ModuleNum
 
 
 

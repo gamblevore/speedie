@@ -8,7 +8,6 @@ function Message.ASMType (|ASMType|)
 	
 // if we can fix this... we can get a bigger ASMType table!
 function Message.ASMType (assigns:|ASMType|)
-	target debug: if .objectid == 0
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 
 

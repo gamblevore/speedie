@@ -91,7 +91,10 @@ struct ArchonPurger
 		d.NilReg = N
 		if !d.Suffers
 			d.NilDeclared = NilState.Real
-		t.closers[n] = ToClose
+		
+		if d isnt Grabbed // grabbed's previous use was only on properties. can't clash.
+			t.closers[n] = ToClose
+		
 		d.NilAllocDepth = .NestDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
@@ -206,7 +209,7 @@ struct ArchonPurger
 			opt norefcounts
 			|| arg = t.Startnil(f)
 				Argument(arg)
-/				.CloseVars(0)
+				.CloseVars(0)
 
 				
 				if t.FnAbleToNilCheck and !f.isnilchecker

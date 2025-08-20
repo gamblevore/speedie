@@ -156,14 +156,14 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 	|| thg = s.IsSetIntoVar
 		
 	if (!thg)
-		thg = scfunction.TempMoveOut(s, s.parentpoint!)
+		thg = scfunction.TempMoveOut(s, s.UpToArg!)
 		|| dcl = thg.asdecl
 			name_Space.tryadd(thg, dcl, thg.name)
 		  else
 			error (thg)
 	
 	|| P = S.NiceParent!
-	|| Place = P.ParentPoint!
+	|| Place = P.UpToArg!
 	
 	using (S)
 	// type.type contains the class to create
