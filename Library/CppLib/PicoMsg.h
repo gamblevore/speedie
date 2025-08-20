@@ -36,7 +36,7 @@ struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;   operator bool () {return Data;}; };
 
 typedef bool	(*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
-typedef int		(*PicoObserverFn)();
+typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Passes the time via clock_gettime(CLOCK_REALTIME)
 
 
 struct 			PicoConfig  {
@@ -132,7 +132,8 @@ struct PicoTrousers { // only one person can wear them at a time.
 
 
 PicoDate pico_date_create ( uint64_t S, uint64_t NS ) {
-	NS /= (uint64_t)15259; // for some reason unless we spell this out, xcode will miscompile this.
+	auto D = (uint64_t)15259; // for some reason unless we spell this out, xcode will miscompile this.
+	NS /= D;
 	S <<= 16;
 	return S + NS;
 }
@@ -769,14 +770,14 @@ static void pico_cleanup () {
 
 
 static bool pico_try_exit () {
-	if (pico_global_conf.Observer and (pico_global_conf.Observer)() < 0)
+	auto D = PicoGetDate();
+	if (pico_global_conf.Observer and (pico_global_conf.Observer)(D) < 0)
 		return true;
 
 	if (!pico_global_conf.TimeOut)
 		return false;
 
 	PicoDate MaxTime = pico_global_conf.TimeOut + pico_last_read;
-	auto D = PicoGetDate();
 	if (MaxTime >= D)
 		return false;
 

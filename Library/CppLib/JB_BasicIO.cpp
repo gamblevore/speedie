@@ -17,13 +17,8 @@ extern "C" {
 #endif
 
 
-// It is bad practice to write() to stdout... (fwrite() is OK)
-// unless thats ALL you do. For example, many other parts of the program
-// might call printf. If any do, (even some lib I'm using), the results
-// can be inter-mixed. 
-
-// However, at least write() will flush! sigh. I found 
-// fwrite() and even putchar(10) on MacOSX DOES NOT flush! 
+// Mixing write() with printf/puts/etc causes buffering issues.
+// This is why I don't use write() here.
  
 
 void JB_Str_PrintError(JB_String* s) {
@@ -33,9 +28,10 @@ void JB_Str_PrintError(JB_String* s) {
 		if (!JB_ErrorNumber) {
 			JB_ErrorNumber = 1; // terminals complain if printerror without return -1;
 		}
-		fflush(stdout);
+		fflush(stderr);
     }
 }
+
 
 void JB_Str_PrintLine(JB_String* s) {
 	int n = JB_Str_Length(s);
@@ -48,14 +44,19 @@ void JB_Str_PrintLine(JB_String* s) {
 
 
 static bool ShouldFlush_ (JB_String* s) {
+	// kinda makes more sense that a thread would check the buffer.
+	// it would only have to check like 64-bytes anyhow.
+	// or none, if the buffer over 64-bytes big.
 	int n = s->Length;
-	if (n > 128)
+	if (n > 64)
 		return true;
+	
 	auto c = s->Addr;
 	while (--n >= 0) {
 		if (c[n] == 10)
 			return true;
 	}
+	
 	return false;
 }
 
@@ -64,8 +65,9 @@ void JB_Str_Print(JB_String* s) {
 	int n = JB_Str_Length(s);
 	if (n) {
 		MyWrite(s->Addr, n, stdout);
-		if (ShouldFlush_(s))
+		if (ShouldFlush_(s)) {
 			fflush(stdout);
+		}
 	}
 }
 

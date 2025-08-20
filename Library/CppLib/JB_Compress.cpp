@@ -52,7 +52,13 @@ extern "C" void JB_CompFreeNow() {
 	Allocator.NoLongerNeeded = true;
 }
 
-extern "C" int JB_CompFreer() {
+PicoDate JB_LastFlush;
+extern "C" int JB_BasicCareTaker(PicoDate D) {
+	if (D - JB_LastFlush >= 64*1024) { // one second.
+		JB_LastFlush = D;
+		fflush(stdout);
+	}
+
 	return CompressionFree(10*64*1024);	// 10s ago!
 }
 

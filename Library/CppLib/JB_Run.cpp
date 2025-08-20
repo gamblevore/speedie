@@ -13,8 +13,6 @@ Hidden Caches:
 	* 256 byte block! speeds up splitting when the length = 1!! for .Mid
 */
 
-#include <experimental/simd>
-
 #include "JB_Umbrella.hpp"
 #include <vector>
 #include <errno.h>
@@ -174,10 +172,13 @@ void JB_FinalEvents() {
 }
 
 
-int JB_CompFreer();
-int JB_GUICareTaker() {
-	JB_CompFreer();
-	return -(getppid() <= 1);
+int JB_BasicCareTaker(PicoDate D);
+int JB_GUICareTaker(PicoDate D) {
+	return JB_BasicCareTaker(D);
+//	return -(getppid() <= 1); // this seems to cause problems and I'm fed up with it
+							  // the idea is to die if the parent process dies.
+							  // seems not so hard... but maybe it is.
+							  // only used for GUIs anyhow.
 }
 
 
@@ -191,7 +192,7 @@ void		JB_App__CrashInstall();
 int			JB_SP_AppInit();
 void		JB_App__GUIMode(bool GUI) {
 // GUICareTaker seems to cause problems and I'm fed up with it.
-//	PicoGlobalConf()->Observer = GUI ? JB_GUICareTaker : JB_CompFreer;
+	PicoGlobalConf()->Observer = GUI ? JB_GUICareTaker : JB_BasicCareTaker;
 	JB_NoExitOnCrash = GUI;
 }
 
@@ -217,7 +218,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 			if (!IsThread) {
 				JB_App__CrashInstall();
 //				if (getppid() > 1)
-				PicoGlobalConf()->Observer = JB_CompFreer;
+				PicoGlobalConf()->Observer = JB_BasicCareTaker;
 			}
 			atexit(JB_KillChildrenOnExit);
 		#endif
