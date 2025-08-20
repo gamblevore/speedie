@@ -358,10 +358,6 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 		if Tran_Temporal( fn, s, p ) or (s == "ignore")
 			return
 		
-	  elseif (f == @list)
-		if (s.first == @item)
-			Tran_MsgList(s)
-
 	  elseif (f == @msg)
 		Tran_Msg(fn, s, p)
 

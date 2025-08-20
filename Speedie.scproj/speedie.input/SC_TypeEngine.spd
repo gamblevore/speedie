@@ -851,27 +851,39 @@ function TypeOfMsg (ExprResolver)
 
 function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message|)
 	using (exp)
-	|| Result = «dot "msg"
+	rz = «dot "msg"
 		type
 		«prm, NameMsg »
 	»
 	Type.become(@thg, "Syx" + Type.name)
 	
 	exp.func = @bra
-	exp.first = Result
-	return result
+	exp.first = rz
 
 
 function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
+	
+/*
+	Now that we are tesing for a name in @msg... we can change the parser!
+	To put the name directly and use a named-arg-syntax!
+	
+	Also remove the use of tran_msg from within the function!
+	its always bad to recursively define code! It ends up having no meaning!
+	«abc »
+	
+	Also would be nice to allow «"abc"» or «(<`abc`>)» for a real super thingy!
+*/
+	|| name = exp.name
+		using exp
+			exp.first = @thg + ""
 	|| Type		= exp.first!
-	|| NameMsg	= Type.first!
+	|| NameMsg	= Type.first
 	if exp LessOrEqual 1
 		|| Mini	= SpellOutMsg(type, exp, namemsg)
 		TypeOfExpr( Mini, name_space )
 		return
 
 	|| itm		= type.next
-//	|| P		= exp.parent
 	|| Place	= exp.IntoVariable(name_space)
 	if place.arg
 		name_space = place.arg.SCArg(name_space) 
@@ -881,7 +893,7 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 			while (itm)
 				|| NextItm = itm.next
 				using (itm)
-				|| Line = «dot "SyntaxAppend"
+				|| Line = «dot "SyntaxAppend" // use normal code not this!
 					«thg place.name »
 					«prm, itm »
 				»
@@ -891,11 +903,6 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 				itm = nextitm
 			
 			TypeOfExpr( Result, name_space )
-
-
-function Tran_MsgList (|message| Exp)
-	error (Exp, `Use «thg "name"» syntax instead!`)
-	scfunction.disabledpoints++
 
 
 function SCDecl.AvoidGlobals (|scdecl|)
