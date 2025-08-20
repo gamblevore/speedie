@@ -99,8 +99,6 @@ typedef int FlowControlStopper;
 
 typedef int FunctionType;
 
-typedef int HappyFlags;
-
 typedef int Ind;
 
 typedef ivec2 IntRange;
@@ -355,8 +353,6 @@ struct FixedDict_Behaviour;
 
 struct FlowControl_Behaviour;
 
-struct HappyClass_Behaviour;
-
 struct Instruction_Behaviour;
 
 struct LeakTester_Behaviour;
@@ -472,8 +468,6 @@ struct JB_ErrorReceiver;
 struct FixedDict;
 
 struct FlowControl;
-
-struct HappyClass;
 
 struct Instruction;
 
@@ -599,6 +593,8 @@ typedef bool (*FP_TranFunc)(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 typedef JB_String* (*__Message_CopyID__)(Message* Self);
 
+typedef JB_String* (*__Message_DisplayName__)(Message* Self, int I);
+
 typedef void (*__Saveable_LoadProperties__)(Saveable* Self, ObjectLoader* Loader);
 
 typedef JB_String* (*__Object_Render__)(JB_Object* Self, FastString* Fs_in);
@@ -608,8 +604,6 @@ typedef void (*__Saveable_SaveCollect__)(Saveable* Self, ObjectSaver* Saver);
 typedef void (*__Saveable_SaveWrite__)(Saveable* Self, ObjectSaver* Saver);
 
 typedef bool (*__Message_TextSet__)(Message* Self, int I, JB_String* V);
-
-typedef JB_String* (*__Message_Text__)(Message* Self, int I);
 
 typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* Self, JB_String* Data);
 
@@ -733,6 +727,7 @@ struct DeclAlterable {
 	uint64 ExportPosition;
 	SCDeclInfo Info;
 	DataTypeCode DataType;
+	u16 ModuleNum;
 };
 
 struct FakeJBString {
@@ -782,7 +777,7 @@ struct LoopInfo {
 	NilRecord ContRecord;
 	NilRecord ExitRecord;
 	byte VarCount;
-	byte NestDepth;
+	byte BranchDepth;
 	bool HasEscape;
 };
 
@@ -1184,21 +1179,20 @@ struct SCDecl_Behaviour: SCObject_Behaviour {
 
 JBClass ( SCDecl , SCObject , 
 	int C_Array;
-	u16 ModuleNum;
 	NilState NilDeclared;
 	byte PointerCount;
+	byte NilReg;
+	byte DepthOfBranch;
 	SCClass* Type;
 	DeclAlterable mu;
 	SCDecl* Contains;
 	SCDecl* LocalVarList;
-	Message* Default;
 	SCDecl* Internal;
 	JB_Object* IsLookupOnly;
 	SCFunction* HiderFunc;
-	byte DepthOfBranch;
-	byte NilAllocDepth;
+	Message* Default;
+	byte ArgDepth;
 	bool Suffers;
-	byte NilReg;
 );
 
 struct SCIterator_Behaviour: SCObject_Behaviour {
@@ -1249,7 +1243,7 @@ struct list_Behaviour: Saveable_Behaviour {
 
 struct Message_Behaviour: list_Behaviour {
 	__Message_CopyID__ copyid;
-	__Message_Text__ text;
+	__Message_DisplayName__ displayname;
 	__Message_TextSet__ textset;
 };
 
@@ -1600,18 +1594,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2217])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2220])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2218])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2221])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2219])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2222])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2216])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2219])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2219])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2222])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2220])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2223])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1843,7 +1837,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2225])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2228])
 
 extern int SC_CountASMFuncPrint;
 extern Dictionary* SC_CppRefTable;
@@ -1882,7 +1876,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2221])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2224])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1922,7 +1916,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2226])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2229])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2157,12 +2151,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2224])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2227])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2223])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2226])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2222])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2225])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2874,14 +2868,6 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kSC__FunctionType_Wrapper ((FunctionType)262144)
 
-#define kSC__HappyFlags_a ((int)1)
-
-#define kSC__HappyFlags_abc ((int)7)
-
-#define kSC__HappyFlags_b ((int)2)
-
-#define kSC__HappyFlags_c ((int)4)
-
 #define kJB__MaybeBool_false ((MaybeBool)0)
 
 #define kJB__MaybeBool_maybefalse ((MaybeBool)8)
@@ -3115,73 +3101,75 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCBlockage_Quit ((int)192)
 
+#define kSC__SCBlockage_Reserved ((int)256)
+
 #define kSC__SCBlockage_Return ((int)192)
 
-#define kSC__SCDeclInfo_Altered ((SCDeclInfo)131072)
+#define kSC__SCDeclInfo_Altered ((SCDeclInfo)65536)
 
-#define kSC__SCDeclInfo_AlteredInBranch ((SCDeclInfo)262144)
+#define kSC__SCDeclInfo_AlteredCopy ((SCDeclInfo)458752)
 
-#define kSC__SCDeclInfo_API ((SCDeclInfo)256)
+#define kSC__SCDeclInfo_AlteredInBranch ((SCDeclInfo)131072)
 
-#define kSC__SCDeclInfo_Body ((SCDeclInfo)8192)
+#define kSC__SCDeclInfo_AlteredParamObject ((SCDeclInfo)262144)
+
+#define kSC__SCDeclInfo_API ((SCDeclInfo)128)
+
+#define kSC__SCDeclInfo_Body ((SCDeclInfo)4096)
 
 #define kSC__SCDeclInfo_Borrowed ((SCDeclInfo)1)
 
-#define kSC__SCDeclInfo_ClassObj ((SCDeclInfo)512)
+#define kSC__SCDeclInfo_ClassObj ((SCDeclInfo)256)
 
-#define kSC__SCDeclInfo_CompilerCreated ((SCDeclInfo)1024)
+#define kSC__SCDeclInfo_CompilerCreated ((SCDeclInfo)512)
 
 #define kSC__SCDeclInfo_Const ((SCDeclInfo)8)
 
-#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)206114)
+#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)103074)
 
 #define kSC__SCDeclInfo_DirectNumber ((SCDeclInfo)4)
 
-#define kSC__SCDeclInfo_ExistanceAltered ((SCDeclInfo)1048576)
+#define kSC__SCDeclInfo_Global ((SCDeclInfo)16384)
 
-#define kSC__SCDeclInfo_Global ((SCDeclInfo)32768)
+#define kSC__SCDeclInfo_Grabbed ((SCDeclInfo)16777216)
 
-#define kSC__SCDeclInfo_Grabbed ((SCDeclInfo)67108864)
+#define kSC__SCDeclInfo_IntendedAsReturn ((SCDeclInfo)268435456)
 
-#define kSC__SCDeclInfo_Hidden ((SCDeclInfo)33554432)
+#define kSC__SCDeclInfo_Library ((SCDeclInfo)536870912)
 
-#define kSC__SCDeclInfo_IntendedAsReturn ((SCDeclInfo)1073741824)
+#define kSC__SCDeclInfo_Local ((SCDeclInfo)6144)
 
-#define kSC__SCDeclInfo_Library ((SCDeclInfo)2147483648)
-
-#define kSC__SCDeclInfo_Local ((SCDeclInfo)12288)
-
-#define kSC__SCDeclInfo_NeedsClose ((SCDeclInfo)8192)
+#define kSC__SCDeclInfo_NeedsClose ((SCDeclInfo)266240)
 
 #define kSC__SCDeclInfo_NumberConst ((SCDeclInfo)12)
 
-#define kSC__SCDeclInfo_Param ((SCDeclInfo)4096)
+#define kSC__SCDeclInfo_Param ((SCDeclInfo)2048)
 
-#define kSC__SCDeclInfo_PostIncremented ((SCDeclInfo)134217728)
+#define kSC__SCDeclInfo_PostIncremented ((SCDeclInfo)33554432)
 
-#define kSC__SCDeclInfo_Property ((SCDeclInfo)16384)
+#define kSC__SCDeclInfo_Property ((SCDeclInfo)8192)
 
-#define kSC__SCDeclInfo_PropertyWasConstructed ((SCDeclInfo)2048)
+#define kSC__SCDeclInfo_PropertyWasConstructed ((SCDeclInfo)1024)
 
-#define kSC__SCDeclInfo_ReadFrom ((SCDeclInfo)8388608)
+#define kSC__SCDeclInfo_ReadFrom ((SCDeclInfo)4194304)
 
 #define kSC__SCDeclInfo_Reference ((SCDeclInfo)524288)
 
-#define kSC__SCDeclInfo_Return ((SCDeclInfo)65536)
+#define kSC__SCDeclInfo_Return ((SCDeclInfo)32768)
 
-#define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)536870912)
+#define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)134217728)
 
-#define kSC__SCDeclInfo_Self ((SCDeclInfo)4194304)
+#define kSC__SCDeclInfo_Self ((SCDeclInfo)2097152)
 
-#define kSC__SCDeclInfo_SelfImplicit ((SCDeclInfo)4206592)
+#define kSC__SCDeclInfo_SelfImplicit ((SCDeclInfo)2103296)
 
-#define kSC__SCDeclInfo_SetTo ((SCDeclInfo)16777216)
+#define kSC__SCDeclInfo_SetTo ((SCDeclInfo)8388608)
 
 #define kSC__SCDeclInfo_StayBorrowed ((SCDeclInfo)2)
 
-#define kSC__SCDeclInfo_Task ((SCDeclInfo)2097152)
+#define kSC__SCDeclInfo_Task ((SCDeclInfo)1048576)
 
-#define kSC__SCDeclInfo_Temp ((SCDeclInfo)9216)
+#define kSC__SCDeclInfo_Temp ((SCDeclInfo)4608)
 
 #define kSC__SCDeclInfo_TypeImprove ((SCDeclInfo)64)
 
@@ -3189,11 +3177,9 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_UpgradeableContained ((SCDeclInfo)32)
 
-#define kSC__SCDeclInfo_UsedByCode ((SCDeclInfo)128)
+#define kSC__SCDeclInfo_VarThatGotReturned ((SCDeclInfo)67108864)
 
-#define kSC__SCDeclInfo_VarThatGotReturned ((SCDeclInfo)268435456)
-
-#define kSC__SCDeclInfo_VarType ((SCDeclInfo)61440)
+#define kSC__SCDeclInfo_VarType ((SCDeclInfo)30720)
 
 #define kSC__SCNodeFindMode_DontGoUp ((SCNodeFindMode)2)
 
@@ -3320,7 +3306,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2215])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2218])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -5682,7 +5668,7 @@ ASMReg SC_ASMType__AllocBearStruct(int Dir, Message* Exp, ASMReg Dest, int Size)
 
 ASMReg SC_ASMType__ARel(Assembler* Self, Message* Exp, ASMReg Dest);
 
-ASMReg SC_ASMType__Arg(Assembler* Self, Message* Exp, ASMReg Dest);
+ASMReg SC_ASMType__Argument(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_ASMType__ArgumentSub(Assembler* Self, Message* Exp);
 
@@ -5949,9 +5935,6 @@ void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Objec
 // FunctionType
 
 
-// HappyFlags
-
-
 // Ind
 
 
@@ -6052,6 +6035,8 @@ bool SC_SCBlockage_SyntaxIs(SCBlockage Self, SCBlockage B);
 
 // SCDeclInfo
 SCDeclInfo SC_SCDeclInfo_Set(SCDeclInfo Self, SCDeclInfo D, bool B);
+
+bool SC_SCDeclInfo_SyntaxIs(SCDeclInfo Self, SCDeclInfo D);
 
 
 
@@ -6474,6 +6459,9 @@ void JB_SorterComparer_Sort(FP_SorterComparer Self, Array* Items);
 // __CopyID__
 
 
+// __DisplayName__
+
+
 // __LoadProperties__
 
 
@@ -6487,9 +6475,6 @@ void JB_SorterComparer_Sort(FP_SorterComparer Self, Array* Items);
 
 
 // __TextSet__
-
-
-// __Text__
 
 
 // fnErrorLogger
@@ -6534,6 +6519,8 @@ void JB_SorterComparer_Sort(FP_SorterComparer Self, Array* Items);
 // JB_ArchonPurger
 void SC_nil_BecomeRealSub(ArchonPurger* Self, SCDecl* V);
 
+int SC_nil_BranchDepth(ArchonPurger* Self);
+
 NilRecord SC_nil_BranchEnter(ArchonPurger* Self, Message* Where);
 
 NilState SC_nil_BranchExit(ArchonPurger* Self, NilRecord A);
@@ -6553,8 +6540,6 @@ NilState SC_nil_DeclareSub(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ Nd, 
 void SC_nil_Destructor(ArchonPurger* Self);
 
 void SC_nil_FinishNil(ArchonPurger* Self, SCFunction* F);
-
-int SC_nil_NestDepth(ArchonPurger* Self);
 
 NilState SC_nil_Self(ArchonPurger* Self);
 
@@ -6590,8 +6575,6 @@ NilState SC_nil__DetectStillChecks(Message* First);
 
 NilState SC_nil__Dummy(Message* Msg, NilCheckMode Test);
 
-void SC_nil__EndArgumentVars(int VarDepth, int ArgDepth);
-
 NilState SC_nil__Exit(Message* Msg, NilCheckMode Test);
 
 void SC_nil__ExterminateZergBugs(SCFunction* F);
@@ -6619,6 +6602,8 @@ void SC_nil__LaunchMothership();
 void SC_nil__LaunchMothershipSub(JB_ErrorReceiver* Old, JB_ErrorReceiver* Rec);
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
+
+void SC_nil__MergeVars(NilRecord FinalVars, int OrigDepth);
 
 NilState SC_nil__NilFunction(Message* Msg, NilCheckMode Test);
 
@@ -7490,9 +7475,6 @@ void adb();
 // JB_FlowControl_Behaviour
 
 
-// JB_HappyClass_Behaviour
-
-
 // JB_Instruction_Behaviour
 
 
@@ -7998,6 +7980,10 @@ void JB_FS_AppendEscape(FastString* Self, JB_String* S);
 
 void JB_FS_AppendHexStr(FastString* Self, JB_String* Data);
 
+void JB_FS_AppendHInt(FastString* Self, uint64 N);
+
+void JB_FS_AppendLInt(FastString* Self, uint64 N);
+
 void JB_FS_AppendObjectID(FastString* Self, Saveable* O);
 
 void JB_FS_AppendObjectOrNil(FastString* Self, JB_Object* O);
@@ -8024,11 +8010,7 @@ void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, Float64 Data);
 
 void JB_FS_FieldStart(FastString* Self, JB_String* Name);
 
-void JB_FS_hInt(FastString* Self, uint64 N);
-
 void SC_FS_IncludeH(FastString* Self, JB_String* Name);
-
-void JB_FS_lInt(FastString* Self, uint64 N);
 
 void JB_FS_MemoryReport(FastString* Self, JB_String* Name, int64 Amount);
 
@@ -8100,9 +8082,6 @@ void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
 
 bool JB_Flow__Cond2(bool Value);
 
-
-
-// JB_HappyClass
 
 
 // JB_Instruction
@@ -8457,7 +8436,7 @@ JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname);
 
 Array* JB_Str_Components(JB_String* Self);
 
-JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St);
+JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St, FastString* Fs_in);
 
 bool JB_Str_CompressTest(JB_String* Self, bool Report, int Which);
 
@@ -8603,6 +8582,8 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner);
 
 JB_String* JB_Str_PathDir(JB_String* Self);
 
+JB_String* SC_Str_PathFixSpd(JB_String* Self);
+
 JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing);
 
 JB_String* JB_Str_Preview(JB_String* Self, int N);
@@ -8612,8 +8593,6 @@ void JB_Str_PrintlineColor(JB_String* Self, JB_String* Color);
 JB_String* JB_Str_ReadFile(JB_String* Self, int Lim, bool AllowMissing);
 
 JB_String* JB_Str_ReplacePathComponent(JB_String* Self, int Num, JB_String* With);
-
-JB_String* SC_Str_ResolveSpd(JB_String* Self);
 
 void SC_Str_Safe(JB_String* Self, FastString* Fs, bool Local);
 
@@ -8709,9 +8688,9 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
-bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, uint Limit, CompressionStats* St);
+JB_String* JB_SS_Decompress(StringReader* Self, JB_Object* Dest, uint Limit, CompressionStats* St);
 
-bool JB_SS_DecompressIntoSub(StringReader* Self, FastString* Fs, int OutLim, CompressionStats* St, int OutRemain);
+bool JB_SS_DecompressIntoSub(StringReader* Self, FastString* Fs, CompressionStats* St, int OutRemain);
 
 void JB_SS_Destructor(StringReader* Self);
 
@@ -8928,7 +8907,7 @@ JB_File* JB_File_OperatorPlus(JB_File* Self, JB_String* S);
 
 JB_File* JB_File_Parent(JB_File* Self);
 
-Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing);
+Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing, Syntax Owner);
 
 JB_File* JB_File_Sibling(JB_File* Self, JB_String* Name);
 
@@ -9226,8 +9205,6 @@ SCDecl* SC_Decl_MakeNewReal(SCDecl* Self);
 SCDecl* SC_Decl_MakeReal(SCDecl* Self);
 
 SCDecl* SC_Decl_MakeReference(SCDecl* Self);
-
-bool SC_Decl_MakeStatic(SCDecl* Self, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
 
 void SC_Decl_MarkAsAltered(SCDecl* Self);
 
@@ -9935,6 +9912,8 @@ void JB_Msg_Destructor(Message* Self);
 
 Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount);
 
+JB_String* JB_Msg_DisplayName(Message* Self, int I);
+
 FatASM* SC_Msg_DIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Kind);
 
 FatASM* SC_Msg_DIV2(Message* Self, ASMReg R1, ASMReg R2, int Sh, int Clear);
@@ -10423,8 +10402,6 @@ Message* SC_Msg_OrigMsg(Message* Self);
 
 JB_String* SC_Msg_OrigRender(Message* Self, FastString* Fs_in);
 
-Message* SC_Msg_ParentPoint(Message* Self);
-
 Message* SC_Msg_ParseShaderSub(Message* Self);
 
 void JB_Msg_pinn__(Message* Self, FastString* Fs);
@@ -10664,8 +10641,6 @@ void JB_Msg_test_style(Message* Self);
 bool SC_Msg_TestFuncName(Message* Self);
 
 bool JB_Msg_TestSub(Message* Self, JB_String* New_render, JB_String* Name);
-
-JB_String* JB_Msg_Text(Message* Self, int I);
 
 bool JB_Msg_TextSet(Message* Self, int I, JB_String* V);
 
@@ -12222,7 +12197,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 }
 
 inline void SC_nil__DeclKill() {
-	if (!SC_nil_NestDepth((&SC__nil_T))) {
+	if (!SC_nil_BranchDepth((&SC__nil_T))) {
 		SC__nil_T.RootReturned = true;
 	}
 	(SC_nil_ValueSet((&SC__nil_T), kSC__NilState_Basic));
