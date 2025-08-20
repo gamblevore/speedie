@@ -69,6 +69,11 @@ module Notifications
 			w.DrawWindow(GUI.Screen)
 
 
+	function Window.Remove
+		gui.Touch
+		super.remove
+		
+		
 	function CheckForDisappear
 		opt norefcounts
 		for w in .Alerts

@@ -577,7 +577,7 @@ class TextView (GUIControl)
 		|| d = ._Start
 		require pos >= d.Position
 		|| d2 = d.movecapped(.MaxPartialVisibleLines)
-		return pos < d2.After
+		return pos <= d2.After
 	
 	
 	helper ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)

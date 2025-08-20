@@ -162,13 +162,6 @@ function FixupColor (|message| self, |ind| pos, |message|)
 helper message.UseRootTmpColor (|bool|)
 	return (self == @tmp)  and  !(.flags & TextView.NotRoot)  and  .atroot
 
-function message.iVec4 (|ivec4|)
-	opt norefcounts
-	if self
-		|| c = .first
-		for i in 4
-			rz[i] = (C #loop).int|int|
-			c++
 
 function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)
 	opt NoRefCounts
@@ -196,7 +189,9 @@ function textview.CanDrawLight (|TextViewLine| D, |bool|)
 	// should involve ._PreferPrevLine or something calling it.
 	// or else we can select "off the end" of a line, by clicking after it
 	// yet we draw the next line "light"
-	|| sr = .selrange
-	if !sr.width and (d contains sr.x)
+	|| sr = .SelRange	
+	if !sr.width and (d.range contains sr.x)
+		return true
+	if (sr.x >= d.range.x2) and !d.next
 		return true
 
