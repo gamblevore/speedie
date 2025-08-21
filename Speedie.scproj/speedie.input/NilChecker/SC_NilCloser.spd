@@ -1,93 +1,80 @@
 
 
-function Message.MarkVarClosed (|scdecl| D)
+
+//
+// I think this idea doesn't work.
+// the refcounter still creates more vars. And yet... it happens after this
+// FUUUCCKKKK. I guess I really am overworked. I can't see the obvious!
+// I'd need to move the entire refcounter over to this, for it to work
+// Theres no way I can continue like this as a human if I can't see the obvious.
+// I used to see the obvious alll the timeeeeee....
+// I had normal instincts. And super ones too. Now I got less... than normal.
+// 
+
+
+function Message.MarkVarClosed (|message| Closer, |scdecl| D)
 	opt norefcounts
-//	target debug {
+	|| T = .asmtype
+	if t is kif or kwhile
+/		0 // what to do? In fact the entire issue seems useless. delete the entire code?
 	|| next = .next
 	require next and next.ASMType != ASMType.kreturn
-	
-	|| m = Message(@xml, d.name)
+		
+/	|| m = Message(@xml, d.name)
 	m.asmtype = ASMType.kIgnore
+	
 	if d.IsNormalObject
 		m.asmtype = 0
-/		m.func = @func
+		m.func = @func
 		m.name = ""
-/		m.msg(@thg, "JB_Decr")
+		m.msg(@thg, "JB_Decr")
 		|| p = m.msg(@prm)
 		p.obj = Compiler.RefDecr
 		p.msg(@thg, d.name).obj = d
-		d = TypeVoid
+/		d = TypeVoid
 	
 	m.obj = d
-	.next = m
-//	}
+	if closer!=@arg
+/		closer.prev = m
+	  else
+/		closer <~ m
 
 
 
 extend_module ArchonPurger
-	function UndeclareOne (|int| from)
+	function UndeclareOne (|message| Closer, |int| from)
 		opt norefcounts
-		target debug {
 		|| D = t.decls[from]!
-		target debug2
-			if !D
-		
 		(d is Grabbed)
 		if D is NeedsClose
 			|| msg = t.closers[from]
-				msg.MarkVarClosed(D)
-		}
+				msg.MarkVarClosed(closer, D)
 	
-	
-	function UpdateFoundPlace (|int| from)
+	function UpdateFoundPlace (|message!| argument, |int| from)
 		opt norefcounts
-		target debug {
-		|| decl = t.decls[from]
-		|| FoundCloser = t.Closers[from]
-			|| p = FoundCloser.parent!
-			|| FoundCloserDepth = p.indent
-			if FoundCloserDepth < argdepth
-				debugat
-				"less" 
-			  elseif FoundCloserDepth == argdepth
-				debugat
-				"equal"
-			  else
-				debugat
-				"more"
-			
-//			if d <= 
-//			if p.indent >= argdepth
-			t.closers[from] = p.UpToArg
-		}
-
+		|| y = t
+		|| FoundCloser = y.Closers[from]
+			|| p = FoundCloser.parent
+			if p == argument
+				y.closers[from] = p.UpToArg
 		
-		
-	function CloseVars (|int| VarDepth=0)
-		target debug {
+	function CloseVars (|message!| Closer, |int| VarDepth=0)
+		disabled "I guess this was a bad idea"
 		|| From = .value.DepthOfVars
 		while From > VarDepth
-			.UndeclareOne(from)
+			.UndeclareOne(closer, from)
 			from--
-		}
-
-		// now.. how to do this?
-		// lets say we are returning... we just wanna close it, right?
-		// what about up-going? no. the arg does that!
-		// this should work for return
-		// what about exit/continue?
-		// seems the same?
-		// OK... so in theory... this should all work now!
+		
 	
-	
-	function MergeVars (|Nilrecord| FinalVars, |int| OrigDepth)
-		target debug {
+	function MergeVars (|message!| argument, |Nilrecord| FinalVars, |int| OrigDepth)
+		disabled "grossss"
 		|| From = FinalVars.DepthOfVars
 		while From > OrigDepth
-			.UndeclareOne(from)
+			.UndeclareOne(argument, from)
 			t.closers[from] = nil
 			from--
-
-		while OrigDepth > 0
-			.UpdateFoundPlace(OrigDepth--)
-		}
+	
+		if argdepth > 1
+			while OrigDepth > 0
+				.UpdateFoundPlace(argument, OrigDepth--)
+		

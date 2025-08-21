@@ -510,6 +510,7 @@ function RefFuncs (|message| a, |string|)
 
 function RefCountOpts (|message| m)
 	|| x = m.name
+	|| y = m.name
 	
 
 function RefCountTests (|string| a, |string| b, |message| m, |message| mm)

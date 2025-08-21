@@ -1,9 +1,8 @@
 
 
 datatype ASM (uint)
-	function AAAA (|int| y)
+	function BBBB (|int| y)
 		visible
-		cpp_name AAAA
 		|| x = 0
 		if y
 			x = 1

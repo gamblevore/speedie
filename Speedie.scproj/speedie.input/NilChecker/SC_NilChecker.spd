@@ -369,7 +369,7 @@ function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
-	.CloseVars
+//	.CloseVars(msg)
 	.DeclKill
 	t.anyreturns = true
 	|| ret = t.return
@@ -384,14 +384,14 @@ function Return (NilTrackerFn)
 
 
 function Exit (NilTrackerFn)
-/	.CloseVars(.loops.VarCount)
+//	.CloseVars(msg, .loops.VarCount)
 	.loops.ExitRecord |= .EndBlock
 	.loops.hasEscape = true
 
 
 
 function Continue (NilTrackerFn)
-/	.CloseVars(.loops.VarCount)
+//	.CloseVars(msg, .loops.VarCount)
 	.loops.ContRecord |= .EndBlock
 
 
@@ -622,7 +622,7 @@ function Argument (NilTrackerFn)
 	|| Allowed = (1|uint64| << ((vardepth+1)<<1)) - 1|uint64|
 	t.value = FinalVars & Allowed
 	
-	.MergeVars(finalvars, vardepth)
+//	.MergeVars(msg, finalvars, vardepth)
 
 
 function Bracket (NilTrackerFn)

@@ -46,7 +46,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 	|| A = .µ(prms.first!)
 	require !.RegIsConst(a, 0)
-	target debug: if A is ContainsAddr						// always a reg!
+	target debug: if A is ContainsAddr							// always a reg!
 
 	if fn == Compiler.RefIncr
 		|| P = .last(asm.gstr)
@@ -61,6 +61,11 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		|| P = .last
 		#! what
 		if (p isa asm.rfst)
+			|| dblinput = p.InputFat(1)
+				if dblinput.isread and (dblinput.basicblock == p.basicblock)
+					.SoftNop(p)
+					return nil
+					// in fact... we don't need this at all.
 			if (p.r1 samereg a.reg) and (p.r0 == 0)
 				p._op = asm.RFAP
 				p.r0 = p.prms[1]
@@ -69,6 +74,8 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		  elseif (p isa asm.gstr)
 			if p.r0 samereg a.reg and p.r1 == 1
 				return nil
+		if "TestExportName".trap
+		.ClearVarEarly(a)
 		return exp.RFST(a, asmreg())
 
 	if fn == Compiler.RefSafeDecr
@@ -110,6 +117,16 @@ function Assembler.SafeDecr (|asmreg|)
 		if upon.reg and !fat.prms[0].reg
 			.softnop(fat)
 			return upon.ASMReg
+
+
+
+function assembler.ClearVarEarly (|asmreg| a)
+	require a isnt temp
+	|| d = .VDecls
+	|| r = a.reg
+	d &=~ (1<<r) // i don't know. Is this good enough? i hope so?
+	.VDecls = d
+
 
 
 function FinalDecrements (fn_asm)

@@ -1,23 +1,20 @@
 
 
-// I could make an "simplyescape" header, to avoid the 16-bytes added
-// in case we are compressing a lot of small strings. Seems fair.
+
+function string.IsCompressed (|bool|)
+	return self[0, "mz\n\02"]
+
+
 function string.Compress (|int| Strength=mzlab.default, |?&compressionstats| st = nil, |faststring?| fs_in = nil,  |string|) 
 	|faststring--| fs = FastString(fs_in)
 	.Stream.CompressInto(fs, strength, st)
 	return fs.GetResult(fs_in)
 	
 
-
 function string.Decompress (|int|lim=256MB,  |?&compressionstats| st=nil,   |StringThatWasReadSafely|)
 	if !.IsCompressed
 		return self // for string.parse
 	return .stream.decompress(lim, st)
-
-
-
-function string.IsCompressed (|bool|)
-	return self[0, "mz\n\02"]
 
 
 function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default, |?&compressionstats| st=nil) 
@@ -43,7 +40,7 @@ function StringReader.Decompress (|object| dest=nil,  |uint| Limit=256MB,  |&com
 	
 	|| fs = FastString.UseAsOutput(dest)			#require
 	|| d = string.error
-	if .DecompressIntoSub(fs, st.start, Remain)
+	if .DecompressSub(fs, st.start, Remain)
 		d = fs.GetResult(dest)
 	return d
 
@@ -51,7 +48,7 @@ function StringReader.Decompress (|object| dest=nil,  |uint| Limit=256MB,  |&com
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
-helper StringReader.DecompressIntoSub (|faststring| fs,  |&compressionstats| st,  |int| OutRemain,  |bool|)
+helper StringReader.DecompressSub (|faststring| fs,  |&compressionstats| st,  |int| OutRemain,  |bool|)
 	while OutRemain > 0
 		|| InSize = .UInt(4) - 4
 		expect (InSize < 16MB) 							(self, "mz chunk too large")
@@ -62,7 +59,7 @@ helper StringReader.DecompressIntoSub (|faststring| fs,  |&compressionstats| st,
 		|| OutSize = fs.DecompressChunk(ChunkData)		#loop
 		OutRemain -= OutSize
 		expect (OutRemain >= 0)							(self, "mz header invalid")		
-		// the "remain" in StringReader.DecompressInto did not add up to the sizes found in this function!
+		// "|uint| Remain" in caller func, did not add up to the sizes found here!
 		
 		fs.Flush
 		st.LiveUpdate(InSize + 4, OutSize, false)
@@ -72,11 +69,36 @@ helper StringReader.DecompressIntoSub (|faststring| fs,  |&compressionstats| st,
 
 
 
-
 helper faststring.CompressChunk (|string| Input, |int| level, |int|) 
 	cpp_wrapper JB_Str_CompressChunk
 
 
 helper faststring.DecompressChunk (|string| Input, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
+
+
+
+/*
+		notes:
+
+I could make an "SimplyEscape" header, to avoid the 16-bytes added
+in case we are compressing a lot of small strings. Seems fair.
+
+We could simply express the chunk-length as a power of 2, starting from 64K.
+Squeeze it in somewhere. Say... in the overall length? Or just have one chunk?
+(what about the offsets to the start? they will get large!)
+Can we assume that whoever wants this data, wants the whole-data?
+perhaps not, if we are compressing a large string, for a large data-bank like a wikipedia dump.
+
+We might want to save it to disk, and later just... load sections at a time.
+
+Perhaps the "final bit-dump" could be 0-stripped, and skipped if it is 0"
+
+The length could be shrunk too. And the header even.
+
+*/
+
+
+
+
 

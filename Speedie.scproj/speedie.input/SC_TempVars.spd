@@ -179,9 +179,20 @@ extend_module scfunction
 
 
 	function TempMoveOut (|Message| msg, |string| name="", |scdecl| type=nil, |Message!|)
+		opt norefcounts
 		cpp_part TypedTempMoveOut 
-		// a.b.c -> || tmp1 = a.b.c
-		
+		/*
+		// to do this "properly" would need all of this:
+		x(a.b.c) --> {(
+			|| t = a.b.c
+			jb_incr(t)
+			|| y = x(tmp1)
+			jb_decr(t)
+			(y)
+		})
+		// thats a lot of syntax!
+		*/
+
 		|| Using = msg.SyntaxUsing
 		name ?= UniqueTmpVar(msg.MsgOwningFunc)
 		|| repl = «thg name »
@@ -190,15 +201,17 @@ extend_module scfunction
 		
 		|| p = repl.UpToArg!
 		if (msg == @rel)
-			insert = «bra, (msg)»
+			insert = «bra, msg »
 	
 		|| dcl = MakeDecl( "", name, insert, scdeclinfo.temp )
 		p.Prev = dcl
 		if (repl in @arg)
 			repl.Remove
+			repl = nil
 		
 		if type
 			msg.obj = type
+		
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			|| Dcl2 = OldDcl.copydecl	// no difference, its a temp
@@ -209,7 +222,8 @@ extend_module scfunction
 			Dcl2.Name = name
 			|| relname = dcl.last.first 
 				relname.obj = Dcl2
-			repl.obj = Dcl2
+			if repl
+				repl.obj = Dcl2
 			dcl.obj = Dcl2
 		
 		Return dcl

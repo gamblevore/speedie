@@ -9,7 +9,7 @@ module App {
 |string| 					Usage
 |message|					_Conf
 |config|					_Prefs
-|string| 					_Path
+|string?| 					_Path = nil
 |file?|						_StdOut
 |file?|						_stdin
 
@@ -38,6 +38,7 @@ function No (|string| name, |bool|)
 	return !.yes(name)
 
 function BuildConfig (|string| name, |string|)
+	opt norefcounts
 	return ._conf[name].value
 
 function BuildConfig (|string| name, assigns:|string|)
@@ -114,17 +115,16 @@ function exepath (|string|)
 
 function Path (|string|)
 	cpp_part OrigPath
+	opt norefcounts
 	visible class~file
 	|| p = ._Path
+	if p != nil
 		return p
 	p = .env["OrigScriptPath"]
-	if p
-		._Path = p
-		return p
-	p = .exepath
-	if p
-		._Path = p
-		return p
+	if p == nil
+		p = .exepath
+	._Path = p
+	return p
 
 
 function PrintStackTrace

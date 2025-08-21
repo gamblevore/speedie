@@ -209,10 +209,10 @@ struct ArchonPurger
 
 		function ExterminateZergBugs (|SCFunction| f)
 			opt norefcounts
+			
 			|| arg = t.Startnil(f)
 				Argument(arg)
-				.CloseVars(0)
-				
+//				.CloseVars(f.sourcearg!, 0)
 				if t.FnAbleToNilCheck and !f.isnilchecker
 					f.isnilchecker = 1
 			t.FinishNil(f)
@@ -226,7 +226,7 @@ struct ArchonPurger
 			SCFunction.currfunc = nil
 	
 	
-		function LaunchMothershipSub (|ErrorReceiver| old, |errorreceiver| rec)
+		function LaunchMothershipSub (|ErrorReceiver| old, |errorreceiver| rec) // purgearchons, firelasers
 			opt norefcounts
 			if !compiler.ConfBool("nil_check")
 				rec.LowerErrorsTo = ErrorSeverity.Warning

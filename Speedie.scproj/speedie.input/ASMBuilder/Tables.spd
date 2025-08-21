@@ -325,7 +325,7 @@ function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |
 	return fat * dest
 
 
-function Decl (fn_asm)
+function Decl (fn_asm) // declaresub declare 
 	opt norefcounts
 	
 	|| rel = exp.last!

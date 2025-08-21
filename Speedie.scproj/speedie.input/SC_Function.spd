@@ -1271,6 +1271,7 @@ module {
 |int[8]|		FuncArgAndReturnTypes
 
 function CurrFunc (assigns:|scfunction?|)
+	opt norefcounts
 	._currfunc = value
 	if flowcontrol.active
 		FlowControl.inputline("function: ", value.name)

@@ -213,7 +213,7 @@ extend Parser
 		  else
 			|| prms = parser.newEmpty(rz, @emb, After, After)
 			if (parent == @arg) and .CanDot
-				|| p = .ProcessThingParent(prms)
+				|| p = .ProcessSyxParent(prms, kopp, kthing)
 					prms <~ p
 					prms.func = @prm
 		
@@ -265,10 +265,11 @@ extend Parser
 	
 	
 	function UnexpectedSyntax (|message| bad, |message|)
-		return .erroradd("Unexpected syntax", bad.position)
+		return .ErrorAdd("Unexpected syntax", bad.position)
 	
 	
 	function fMsgList (ParseHandler)
+		description "This needs upgrading to a cleaner design" 
 		|| Result	= parser.new( nil, @msg, Start )
 		|| name		= .Process( kTemporalWord, true, result ) #require
 		|| it = name.second
@@ -277,8 +278,46 @@ extend Parser
 		|| Ops = kOppSyx (|) kOppTemporal (|) kOppYoda
 		while .NextLineAndIndent(Result).r
 			|| item = .ProcessThing(Ops, false) #loop
-			if item.name endswith "»" 
+			if item.name contains "»" 
 				// design flaw. We need utf-8 text ops to split words.
+				return .ErrorAdd("Needs a space here.", item.position)
+			result <~ item
+
+		parser.ExpectEndChar(start, "»")
+		result.after = parser.nextstart
+		return Result
+
+
+	function fMsgList_v2 (ParseHandler)
+		disabled "sigh... fix this later"
+
+	/*
+		currently, speedie uses syntax like these:
+			«thg name »
+			«bra, msg »
+		which parse differently! What a disaster.
+		
+		This needs to be cleaned out so it makes sense and sticks to arg-syntax.
+		
+		also this fails rn:
+		
+		«thg name.name.moat »
+		
+		because previously... it would interpret thg as @tmp! containing name.name.moat
+		
+		but really... thats not what we want. So we'd need .processthing first, then the lines
+	*/
+
+		|| NameStart = start + 2
+		|int| NameAfter = parser[NameStart]
+		if !jeebox.CSWordStart[NameAfter]
+			return .ErrorAdd("Missing name here", start)
+		NameAfter = .WordAfter(NameStart)						#require
+/		|| Result	= parser.newskip( nil, @msg, Start, namestart, NameAfter )
+		while .NextLineAndIndent(Result).r
+			|| Ops = kOppSyx (|) kOppTemporal (|) kOppYoda
+			|| item = .ProcessThing(Ops, false) #loop
+			if item.name contains "»" 
 				return .ErrorAdd("Needs a space here.", item.position)
 			result <~ item
 
@@ -290,6 +329,7 @@ extend Parser
 	function fAtName (ParseHandler)
 		opt norefcounts
 		return parser.newWord( nil,  @name,  Start,  Parser.NextStart )
+	
 	
 	function NeedName ( |message| thg, |bool|)
 		if (thg == @thg)
@@ -611,7 +651,7 @@ extend Parser
 			|| adj = parser.new( rz, @adj, NeedsAdj.position ) 
 			adj <~ opp
 			adj <~ NeedsAdj
-			rz <~ ProcessThingParent(rz, kOppSyx)
+			rz <~ ProcessSyxParent(rz, kOppSyx, kthing)
 
 
 	function fAsk (ParseHandler)
@@ -762,7 +802,7 @@ extend Parser
 			return result
 		if parser.CanStatement
 			while
-				|| item = .ProcessThingParent( result, opflags, thingflags ) #loop
+				|| item = .ProcessSyxParent( result, opflags, thingflags ) #loop
 				result <~ item
 
 				if parser.WillEnd
@@ -797,7 +837,7 @@ extend Parser
 	
 	
 	function ProcessThingOrTmp (|int| opps = kopp, |message?|)
-		return parser.ProcessThingSub(nil, opps, kthingsyx(|)kthingword(|)ktemporalsyx, false)
+		return parser.ProcessSyxSub(nil, opps, kthingsyx(|)kthingword(|)ktemporalsyx, false)
 
 /*
 ive been~running #since morning
@@ -822,11 +862,6 @@ ive been~running #since morning
 	function fThingWord (ParseHandler)
 		|| name = parser.WordAfter( start )
 		return parser.new( nil, @Thg, start, name )
-
-
-	function EmbeddedArg (|String|close, |Message| R, |int| Flags, |int|)
-		|| arg = parser( R, @Arg, parser.nextstart )
-		return parser.EmbeddedCode( close, arg, Flags )
 
 	
 	function EmbeddedCode (|String| close, |Message| dest, |int| TmpFlags, |int|)
@@ -942,14 +977,14 @@ ive been~running #since morning
 		ifn f == @tmp or @item or @decl
 			return parser.erroradd("Indented blocks not allowed here.", tmp.position)
 		
-		|| it = parser.MakeInvisArg( tmp, i )
+		|| it = parser.MakeInvisArg( tmp )
 			it.indent = i
 			it.range = (pos, pos)
 			it <~ self
 			return it
 	
 	
-	function MakeInvisArg (|message| tmp, |int| indent, |message|)
+	function MakeInvisArg (|message| tmp, |message|)
 		Opt NoRefCounts
 		if (tmp == @item)
 			|| last = tmp.last!
@@ -1102,7 +1137,7 @@ ive been~running #since morning
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
 		|| ch = .Process( kTemporal&TmpoFlags, output)
 		if (!ch)
-			|| item = .ProcessThingparent(output)
+			|| item = .ProcessSyxParent(output, kopp, kthing)
 			if !item or item == Output
 				return item
 			TmpoFlags &= kTemporal&~kTemporalWord		// for consistancy with ftmp
@@ -1169,12 +1204,14 @@ ive been~running #since morning
 				if !.Running
 					nxt = parser.data.length
 				return .FinishParseLoop(lc, output, nxt)
+			
 			if (prev and !info.r)
 				return .finishparseloop(lc, output, .nextstart-1)
 			
 			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.b)
 			if !ch
 				return .FinishParseLoop(lc, output, .nextstart-1)
+			
 			if ch != output // haha
 				LC += (ch == @item)
 				if info.a
@@ -1205,19 +1242,19 @@ ive been~running #since morning
 		return R
 	
 	
-	function ProcessThingParent (|message|parent, |int| Ops=kopp, |int| ThingFlags=kthing, |Message|)
-		return .ProcessThingSub(parent, ops, ThingFlags, false)
+	function ProcessSyxParent (|message|parent, |int| Ops=kopp, |int| ThingFlags, |Message|)
+		return .ProcessSyxSub(parent, ops, ThingFlags, false)
 	
 	
 	function ProcessThingNoBar (|int| Ops = kOppNoBar, |bool| Expect=false, |Message|)
-		return parser.ProcessThingSub(nil, ops, kthingsyx(|)kthingword, expect)
+		return parser.ProcessSyxSub(nil, ops, kthingsyx(|)kthingword, expect)
 
 	
 	function ProcessThing (|int| Ops = kOpp, |bool| Expect=false, |Message?|)
-		return .ProcessThingSub(nil, ops, kThing, expect)
+		return .ProcessSyxSub(nil, ops, kThing, expect)
 
 	
-	function ProcessThingSub (|message?| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
+	function ProcessSyxSub (|message?| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
 		|| result = .Process( KindOfThing, Expect, parent )
 		if !result or (result == parent) or .WillEnd
 			return result
