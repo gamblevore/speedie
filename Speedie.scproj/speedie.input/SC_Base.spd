@@ -734,12 +734,15 @@ function TestExportName (|String| s, |bool| Explicit, |string|) {
 	if !Explicit
 		if (o isnt ExplicitExport)
 			o.RehomeExport
+		#!AAAA
 		|| it = .UniquifyExport(s)
 			return it
 		
+		#!BBBB
 	  elseif o isnt ExplicitExport
 		if o.RehomeExport: return s
 	
+	#!CCCC
 	|| Err = "Export-name conflict: " + s
 	error ( o.Source, Err )
 	error (  .Source, Err )

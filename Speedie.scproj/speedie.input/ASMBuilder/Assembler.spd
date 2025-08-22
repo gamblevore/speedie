@@ -346,6 +346,13 @@ struct Assembler
 		return .CloseVars(Closer, nil, v)
 
 
+	function µArg (|message| exp, |asmreg|)
+		// we want to close it... unless it is a decl.
+		if exp.func == @decl
+			return ASMType.Decl(self, exp, AsmReg.RealDiscard)
+		return .µ(exp, asmreg.realdiscard)
+
+
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
 		rz = asmreg()
 		(rz is AddrNeed) = (a is Reference)
@@ -367,7 +374,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 5956
+			if trap == 863
 		  else
 			opt inline
 		
@@ -380,7 +387,7 @@ struct Assembler
 			if !ss  or  (dest is set)  or  (ss is set or ok)
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
-				if (ss isnt ExitFunction) and (ss isnt constoutput)
+				if !(ss & asmreg.exit) and (ss isnt constoutput)
 					debugger
 					PrintProgress()
 					(fn)(self, exp, dest)

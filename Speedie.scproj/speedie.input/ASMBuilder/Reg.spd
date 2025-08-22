@@ -95,6 +95,7 @@ datatype ASMReg (uint64)
 			return f.const
 		if .reg == 0
 			return 0
+		if self is constoutput // WHA DA FA!
 		if self isnt param
 			.NeedFAT
 		

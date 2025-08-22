@@ -43,11 +43,11 @@ function IfSub (fn_asm)
 	if b.Never
 		return .Else(other)								// if k0 {b()} else {return}
 
-	.BasicBlock++
+	.BasicBlock += b.maybe
 	|| Arg1Return = ASMType.Argument(self, arg1)
 	if b.always or !other.HasAsmStuff
 		.AllJumpTo(b)
-		.BasicBlock++
+		.BasicBlock += b.maybe
 		return Arg1Return * b.always					// if k1: return 
 
 	if ArgStart == .curr								// if x {} else {something()}
@@ -78,15 +78,6 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 			  else       				// exit
 				C.JumpTo(A, self)
 		C++
-
-
-
-function BigWhile (fn_asm)
-	|| OV = .OpenVars
-	//WhileHoister = nil
-	//WhileHoister.HoistLoop(self, exp)
-	|| what = asmtype.ArgumentSub(self, exp)
-	return .CloseVars(OV, exp, what)
 	
 
 function While (fn_asm)
@@ -471,10 +462,8 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	if kf.knowntrue
 		|| fake = A.noop
 		fake.const = KF|int|
-		// 1 or 1
-		// 1 or 0
-		// 1 or b
 		(first is condanswer)
+		first.fatindex = fake.index
 		return first.boolanswer						// only way around this. Cos we got asm-reg(0)
 
 	
@@ -510,6 +499,10 @@ Struct FatRange
 	function Always (|bool|)
 		opt inline
 		return .Constness.KnownTrue
+
+	function Maybe (|bool|)
+		opt inline
+		return !.Constness.IsKnown
 	
 	
 	function Never (|bool|)
@@ -574,6 +567,3 @@ function @Assembler.PrintProgress
 		print "\t"
 		f.debugprint
 
-
-function message.Jump (|&Fatasm|)
-	return .jump(0)

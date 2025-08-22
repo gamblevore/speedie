@@ -56,6 +56,11 @@ function Assembler.OpenVars (|uint64|)
 	return (.VDecls|uint64| << 0) ||| (.VTemps|uint64| << 32)
 
 
+function Assembler.RestoreVars (|uint64| Old)
+	.VDecls = Old 
+	.VTemps = Old >> 32
+
+
 function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Return=nil, |asmreg|)
 	opt NoRefCounts
 	

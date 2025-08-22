@@ -397,9 +397,9 @@ function TernTest (|int| a, |int| b, |int| c, |int|)
 
 
 function AndOrRest2 (|int| a, |int| b) // more stragglers
+	if 1 and b: b = 5
 	if 1 or  b: a = 2
 	if 0 and b: b = 4	
-	if 1 and b: b = 5
 
 	|| x3 = (a, b)(1)
 	|| x4 = (a, b)(0)

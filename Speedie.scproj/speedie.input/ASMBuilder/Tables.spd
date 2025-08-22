@@ -3,7 +3,7 @@
 
 dispatch fn_asm_table (fn_asm)
 	@arg:					ASMType.Argument
-	@tril:					Assembler.BigWhile
+	@tril:					ASMType.ArgumentThatIsAroundWhile
 	@decl:					ASMType.decl
 	@num:					ASMType.num
 	@char:					ASMType.char
@@ -92,10 +92,7 @@ function StatExpr (fn_asm)
 	for ch.fast in exp.first
 		if ch.islast
 			return .µGetASM(ch, dest)
-		if ch.func == @decl
-			ASMType.Decl(self, ch, AsmReg.RealDiscard)
-		  else
-			.µ(ch, asmreg.Discard)
+		.µarg(ch)
 
 	
 function First (fn_asm)
@@ -344,18 +341,29 @@ function Decl (fn_asm) // declaresub declare
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 	opt NoRefCounts
+	|| v = .OpenVars
 	for ch.fast in exp
-		if ch.func == @decl
-			ASMType.Decl(self, ch, AsmReg.RealDiscard)
-		  else
-			|| What = .µ(ch, AsmReg.RealDiscard)
-			if what & asmreg.exit							// .exit has two bits but "is" requires both
-				return what
+		|| x = .µArg(ch) & asmreg.exit
+			return x
+	.restorevars(v)			// causes errors???
+
+
+function ArgumentThatIsAroundWhile (fn_asm)
+	|| OV = .OpenVars
+	|| what = ArgumentSub(self, exp)
+	return .CloseVars(OV, exp, what)
 
 
 function Argument (fn_asm) // argument 
+	// seems like ArgumentSub should be merged into here?
+	// and that ArgumentThatIsAroundWhile is just the same?
+	
 	|| OV = .OpenVars
 	|| what = ArgumentSub(self, exp)
+
+	// should be able to "reopen" vars that were closed early...
+	// due to a decr+return.
+
 	return .CloseVars(OV, exp, what)
 
 
