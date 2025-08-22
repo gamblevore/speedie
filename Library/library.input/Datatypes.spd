@@ -853,10 +853,10 @@ datatype MaybeBool (byte) // could just put these on int? do we need a whole new
 		numeric false
 	constants
 		|maybebool| 
-		true = 1
-		false = 0
-		maybefalse = 8
-		maybetrue = 9
+		True = 1
+		False = 0
+		MaybeFalse = 8 // unknown but will default to false
+		MaybeTrue = 9  // unknown but will default to true
 		
 	default 8|MaybeBool|
 	function Default (|bool|)
