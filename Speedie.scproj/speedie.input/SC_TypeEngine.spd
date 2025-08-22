@@ -863,20 +863,16 @@ function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message
 function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 	
 /*
-	Now that we are tesing for a name in @msg... we can change the parser!
-	To put the name directly and use a named-arg-syntax!
-	
-	Also remove the use of tran_msg from within the function!
-	its always bad to recursively define code! It ends up having no meaning!
-	«abc »
+	want named-arg-syntax!
 	
 	Also would be nice to allow «"abc"» or «(<`abc`>)» for a real super thingy!
 	
 	Also... ideally would convert to the ideal syntax.
 	
-	msg <~ «thg»  -->          msg <~ @thg
-	msg <~ «thg, str» -->      msg <~ (@thg, str)
-	|| x = «arg
+	msg <~ «thg»     -->      msg <~ @thg
+	msg <~ «thg str» -->      msg <~ (@thg, str)
+	|| x =  \
+	«arg
 		«dot "hello"
 			«thg "you"»
 			prms

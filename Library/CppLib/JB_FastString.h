@@ -24,7 +24,6 @@ JBClass( FastString, JB_Object,
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
     bool			Failed;
-    bool			PrintLineOnClear;
     int				NoFlush;
 );
 
@@ -45,7 +44,7 @@ void JB_FS_RemoveByte(FastString* self, byte B);
 FastString* JB_FS__InternalNew();
 FastString* JB_FS__FastNew(FastString* Old);
 JB_String* JB_FS_SmartResult(FastString* fs, JB_Object* Orig);
-FastString* JB_FS__FileFlush(JB_File* f, bool b);
+FastString* JB_FS__FileFlush(JB_File* f);
 JB_String* JB_FS_Return( JB_String* Data, FastString* Orig );
 #ifdef TARGET_WIN32
 	#define JB_FS_AppendFileChar( a, b ) JB_FS_AppendShort( a, b )

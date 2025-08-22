@@ -139,7 +139,7 @@ class FastString {
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 		
-		function New (|file| dest, |bool| PrintLineOnFlush, |FastString|)
+		function New (|file| dest, |FastString|)
 			cpp_wrapper JB_FS__FileFlush
 		
 //		function New (|&byte| b, |int| n, |FastString|)

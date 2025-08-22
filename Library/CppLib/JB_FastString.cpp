@@ -582,9 +582,6 @@ FastString* JB_FS_Constructor(FastString* self) {
 
 void JB_FS_Destructor(FastString* self) {
 	// .dispose can call this.
-	if (self->PrintLineOnClear) {
-		JB_FS_AppendByte(self, '\n');
-	}
     JB_FS_Flush( self );
     JB_SetRef( self->Result, 0 );
 	JB_SetRef( self->File, 0 );
@@ -595,9 +592,6 @@ void JB_FS_Destructor(FastString* self) {
 JB_String* JB_FS_GetResult(FastString* self) {
 	if (!self)
 		return JB_Str__Empty();
-	if (self->PrintLineOnClear) {
-		JB_FS_AppendByte(self, '\n');
-	}
 	int Length = self->Length;
 	JB_String* Result = self->Result;
     if (Result)
@@ -615,10 +609,9 @@ FastString* JB_FS__InternalNew() {
     return JB_FS_Constructor( 0 );
 }
 
-FastString* JB_FS__FileFlush(JB_File* f, bool b) {
+FastString* JB_FS__FileFlush(JB_File* f) {
 	FastString* fs = JB_FS__InternalNew();
 	fs->File = JB_Incr(f);
-	fs->PrintLineOnClear = b;
 	return fs;
 }
 
