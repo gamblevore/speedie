@@ -150,10 +150,9 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	using (msg)
 	|| FSName = UniqueTmpVar( fn, "fs" )
 	|| StrName = fsName + "_str"
-	|| Dot = «dot "new"
-		«Thg "FastString"»
-		«emb »
-	»
+	|| Dot = @dot + "new"
+	dot <~ (@Thg, "FastString")
+	dot <~ @emb
 	
 	|| decl = MakeDecl( "FastString", fsName, Dot, scdeclinfo.Borrowed )
 	point.Prev = decl
@@ -168,7 +167,10 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	check !(scmodule.curr) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
 
 	for (item in msg)
-		point.Prev = «dot "SyntaxAppend", «Thg fsName », «prm, item » »
+		|| dot2 = @dot + "SyntaxAppend"
+		dot2 <~ (@thg, fsname)
+		dot2.msg(@prm) <~ item
+		point.Prev = dot2
 
 	|| WeAreAppending = false
 	|| fnc = msg.parent
@@ -178,8 +180,8 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 			WeAreAppending = true
 	// wrong approach.
 	msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
-	msg <~ «thg fsname » 
-	msg <~ «emb »
+	msg <~ (@thg, fsname)
+	msg <~ @emb
 	(decl)
 }
 }
@@ -298,7 +300,7 @@ function Message.Clean (|bool| erl = false)
 					if options.IsDirectTest
 						curr.name = "if"
 						using (curr)
-						curr.first = «thg "true"»
+						curr.first = @thg + "true"
 					  else
 						curr.name = "ignore"
 
@@ -310,8 +312,8 @@ function message.Tran_Isnt (|string| name)
 	
 	using (self)
 		.BecomeSetRel
-		self <~ «thg name »
-		self <~ «opp .name »
+		self <~ (@thg, name)
+		self <~ (@opp, .name)
 		self <~ type
 
 
@@ -381,7 +383,7 @@ function message.Tran_With
 				continue_with ch.flatafter
 		  elseif ch == @sdot
 			ch.func = @dot
-			ch.first = «thg name »
+			ch.first = @thg + name
 		  elseif ch == @thg
 			if ch == "it"
 				ch.name = name
@@ -400,10 +402,9 @@ function message.WithDeclTransform (|message| decl, |message| rel, |message| arg
 
 function message.BunchFixSub (|message| subject, |message| stuff)
 	while (stuff)
-		|| test = «rel
-			subject
-			.copy
-		»
+		|| test = @rel.msg
+		test <~ subject
+		test <~ .copy
 		if stuff != @rel
 			stuff.replaceinto(Test)
 			exit

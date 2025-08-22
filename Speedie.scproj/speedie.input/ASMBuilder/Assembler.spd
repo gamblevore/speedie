@@ -374,7 +374,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 863
+			if trap == 932
 		  else
 			opt inline
 		
@@ -382,6 +382,10 @@ struct Assembler
 
 		target debug
 			.StackSize--
+			if (ss is constoutput) and (ss.reg and !ss.fatindex) // huh?
+				debugger
+				PrintProgress()
+				(fn)(self, exp, dest)
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
 			if !ss  or  (dest is set)  or  (ss is set or ok)

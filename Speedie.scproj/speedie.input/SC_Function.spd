@@ -1450,7 +1450,11 @@ function AlterPostCond (|Message?| PostCond, |Message?| IterPostCond, |message| 
 	if (!PostCond)
 		Return IterPostCond
 
-	return NewRel( «Bra, postcond », «bra, IterPostCond », "or" )
+	|| a = @bra.msg
+	a <~ PostCond
+	|| b = @bra.msg
+	b <~ IterPostCond
+	return NewRel( a, b, "or" )
 
 
 function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message|)

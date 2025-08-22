@@ -421,7 +421,8 @@ class SCDecl (SCObject) {
 		if DeclName
 			return .WriteDeclSub(DeclName, minimal)
 		#!----
-		return «decl, .WriteType(minimal) »
+		rz = @decl.msg
+		rz <~ .WriteType(minimal)
 	
 
 	render RenderTypeAndName (|int| minimal)
@@ -430,11 +431,14 @@ class SCDecl (SCObject) {
 	
 	function WriteDeclTypeAndName (|String| Name, |int| minimal, |Message|)
 		name ?= .Name
-		return « decl,  .WriteType(minimal),  «Thg name » »
+		rz = @decl.msg
+		rz <~ .WriteType(minimal)
+		rz <~ (@Thg, name)
 	
 	
 	function WriteDeclSub (|String| Name, |int| minimal, |Message|)
-		|| dcl = «decl, .WriteType(minimal) »
+		|| dcl = @decl.msg
+		dcl <~ .WriteType(minimal)
 		|| def = .Default
 		if !def and minimal >= 2
 			dcl.msg(@Thg, name)
@@ -442,21 +446,14 @@ class SCDecl (SCObject) {
 		def ?= .Type.defawlt
 
 		if !def or (.pointercount and minimal < 2)
-			def = «thg "nil"»
+			def = @thg + "nil"
 		  else
 			def = def.copy(.source)
 		
 		|| c = .Contains
-			def = «type ":)"
-				def
-				«rel // seems OK :P
-					«Thg .Type.Name »
-					«opp "of"»
-					«Thg c.Type.Name »
-				»
-			»
-		
-		dcl <~ NewEqRel(«Thg name », def)
+			def = def.wrapwith(@type, ":)")
+			def <~ newrel(@Thg + .Type.Name, @Thg + c.Type.Name, "of")		
+		dcl <~ NewEqRel(@Thg+name, def)
 	
 		Return dcl
 	
@@ -824,7 +821,7 @@ class SCDecl (SCObject) {
 
 	function message.CreateNil (|message|)
 		using (self)
-		rz = «Thg "nil"»
+		rz = @Thg + "nil"
 		rz.Obj = TypeNil
 
 
@@ -1051,10 +1048,9 @@ class SCDecl (SCObject) {
 	function WriteNilDecl (|Message|)
 		opt norefcounts
 		|| l = .WriteNilRel
-		|| dcl = «decl
-			.WriteType
-			l
-		»
+		|| dcl = @decl.msg
+		dcl <~ .WriteType
+		dcl <~ l
 		dcl.obj = self
 		l.obj = self
 		l.First!.Obj = self
@@ -1062,11 +1058,9 @@ class SCDecl (SCObject) {
 
 
 	function WriteTypeCast (|Message| msg, |Message|)
-		|| TheType = «type ":)"
-			msg
-			.WriteType
-		»
-
+		|| TheType = @type + ":)"
+		TheType <~ msg
+		TheType <~ .WriteType
 		TheType.Obj = self // Does InitRootDecl actually want this?
 		return TheType
 

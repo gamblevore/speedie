@@ -311,7 +311,8 @@ struct ArgArrayCounter
 
 	function Do (|string| name, |message| item, |SCNode| name_space, |message|)
 		opt norefcounts
-		|| acc = «acc, «thg name » »
+		|| acc = @acc.msg
+		acc <~ (@thg, name)
 		|| arr = acc.msg(@arr)
 		|| value = item
 		if value == @item

@@ -202,7 +202,7 @@ function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
 	|| Decl = .modul[ "_AllocDraw" ]
 	if (Decl isa scdecl)
 		expect (exp == @thg)
-		|| Thg = «Thg exp.name »
+		|| Thg = @Thg + exp.name
 		thg.obj = decl 
 		exp <~ thg
 		exp.Become( @BRel, "&" )

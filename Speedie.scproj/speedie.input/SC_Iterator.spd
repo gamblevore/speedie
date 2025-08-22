@@ -39,7 +39,7 @@ class SCIterator (SCObject)
 		
 		|| Cond = .WhileLoop.first
 		if (Cond == WhileArg)
-			Cond = «thg "true"»
+			Cond = @thg + "true"
 		  //elseif cond
 			//Cond = Cond.NeedBra
 		.LoopCond = Cond

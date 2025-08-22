@@ -2,9 +2,11 @@
 
 module SC_Init
 	function SCModule.BuildInitArg (|message|)
-		rz = «arg, «arg »»
+		rz = @arg.msg
+		rz <~ @arg
 		if (.Source)
-			|| ig = «tmp "ignore",  rz »
+			|| ig = @tmp + "ignore"
+			ig <~ rz
 			ig.Obj = self // ignore in the renderer.
 			.Source <~ ig
 
@@ -113,11 +115,11 @@ function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_nam
 	opt norefcounts
 	if src and .HasActualCode(src) and (self != Compiler.program)
 		using src
-		dest.AlmostAppend  «sheb "// " + .Name »
-		dest.almostappend  «dot fn_name
-			«thg .Name »
-			«prm »
-		»
+		dest.AlmostAppend  @sheb + ("// " + .Name)
+		|| dot = @dot + fn_name
+		dot <~ (@thg, .name)
+		dot <~ @prm
+		dest.almostappend  dot
 
 
 
@@ -183,7 +185,7 @@ function Message.InitRootDecl (|Message| DeclMsg, |SCNode| name_space, |bool|) {
 		
 		if newdefault
 			if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
-				DeclMsg.Prev = NewRel( «thg .name », NewDefault, "=" )
+				DeclMsg.Prev = NewRel( @thg + .name, NewDefault, "=" )
 		Return true
 }
 

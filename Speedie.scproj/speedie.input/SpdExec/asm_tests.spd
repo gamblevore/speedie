@@ -118,10 +118,10 @@ function gggFunc (|int| A, |int|)
 	return compiler.ConfMsg.SlowCount
 
 
-function gggTest1 (|int| A, |int| B, |int|)
-	if A > 0
-		return B+1
-	return B-1
+function gggTest1 (|int| X, |int| Y, |int|)
+	if X > 0
+		return Y+1
+	return Y-1
 
 
 function gggAlter (|int| QA, |int| B, |int|)

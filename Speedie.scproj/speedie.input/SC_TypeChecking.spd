@@ -23,11 +23,9 @@ function RelSetOrExpansion (|Message| exp)
 	exp.clear
 	l.AppendAllInto(exp)
 	|| cond = r.first!.copy
-	|| tmp = «tmp "if"
-		cond.Negate
-		«arg, R »
-	»
-	
+	|| tmp = @tmp + "if"
+	tmp <~ cond.Negate
+	tmp.msg(@arg) <~ r
 	|| P = exp.parent
 	((p, exp)(P == @decl)).next = tmp
 

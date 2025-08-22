@@ -167,7 +167,9 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 	
 	using (S)
 	// type.type contains the class to create
-	|| DotNew = «dot "new", «thg type.type.Name », «emb »»
+	|| DotNew = @dot + "new"
+	dotnew <~ (@thg, type.type.Name)
+	dotnew <~ @emb
 
 
 	if P in @Decl
@@ -181,16 +183,12 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 		|Message| Rel
 		if item == @Item
 			item.remove
-			Rel = «rel
-				«acc
-					«thg thg.name »
-					«arr
-						item.first
-					»
-				»
-				«opp "="»
-				item.last
-			»
+			Rel = @rel.msg
+			|| acc = rel.msg(@acc)
+			acc <~ (@thg, thg.name)
+			acc.msg(@arr) <~ item.first
+			rel <~ (@opp, "=")
+			rel <~ item.last
 		  else
 			rel = @dot.msg("SyntaxAppend")
 			rel <~ (@thg, thg.name)
@@ -273,7 +271,7 @@ function Tran_WhileSub (TranFunc)
 
 	using (node)
 	if (Cond == @arg)
-		Cond = «Thg "true"»
+		Cond = @Thg + "true"
 		node.first = Cond
 		arg = cond.next
 		
@@ -298,11 +296,10 @@ function Tran_WhileSub (TranFunc)
 		ExitCond.Remove
 		ExitCond = ExitCond.Negate
 	
-		|| Exit = «tmp "exit"»
-		arg <~ «tmp "if"
-			ExitCond//.NeedBra
-			«arg, exit »
-		»
+		|| Exit = @tmp + "exit"
+		|| tmp = arg.msg(@tmp, "if")
+		tmp <~ ExitCond
+		tmp.msg(@arg) <~ exit
 		exit.LoopExit
 		cond = ExitCond
 
@@ -320,7 +317,7 @@ function Tran_PrintSub (TranFunc)
 		|| prm = @prm.msg
 		prm.takeallfrom(node)
 		node <~ prm
-		node.first = «Thg node.Name »
+		node.first = @Thg + node.Name
 		node.become(@Func)
 	
 
@@ -532,10 +529,10 @@ function Tran_ForSub (TranFunc)					// :3
 			|| list_msg = list.PrmFuncStructMsg
 				listname = list_msg.first!
 		  else
-			ListName = «Thg UniqueTmpVar( name_space, "LoopSrc" )»
+			ListName = @Thg + UniqueTmpVar( name_space, "LoopSrc" )
 			MakeDeclOrRel( node, listname, list )
 	  elseif  dcl.IsCArray
-		listname = «ques "."» // not my best code ever
+		listname = @ques + "." // not my best code ever
 
 	iter.RenameSelf( ListName )
 
@@ -563,7 +560,7 @@ function Tran_ForSub (TranFunc)					// :3
 
 	|| FirstInLoop = arg.first
 	if (!FirstInLoop)
-		FirstInLoop = «sheb "empty loop"»
+		FirstInLoop = @sheb + "empty loop"
 		arg <~ FirstInLoop // FIXED!
 	
 	
@@ -641,7 +638,7 @@ function Tran_ForSub (TranFunc)					// :3
 
 function Tran_Sdt (|Message| exp)
 	using (exp)
-	|| f = «thg "self"»
+	|| f = @thg + "self"
 	f.RangeLength = 1 // simpler for autocomplete
 	exp.First = f
 	exp.Func = @dot
@@ -656,16 +653,13 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 	|| CondName = UniqueTmpVar(p, "first")			// copy the index
 	Arg.parent!.Prev = MakeDecl( "", CondName, index.copy(arg), scdeclinfo.temp )
 
-	|| IfTest = «tmp "if"
-		«bra
-			«rel
-				«thg CondName »
-				«opp "!="»
-				index.copy(arg)
-			»
-		»
-		«Arg »
-	»
+	|| IfTest = @tmp + "if"
+	|| bra = iftest.msg(@bra)
+	iftest <~ @arg
+	|| rel = bra.msg(@rel)
+	rel <~ (@thg, CondName)
+	rel <~ (@opp, "!=")
+	rel <~ index.copy(arg)
 	
 	arg.First = IfTest
 	IfTest.Next!.Move( start, iftest.last )
@@ -688,8 +682,10 @@ function Tran_Syx (|Message| msg, |Message|)
 
 	using (msg)
 	if !Params
-		params = «thg »
-		name.Next = «bra, params »
+		params = @thg.msg
+		|| b = @bra.msg
+		b <~ params
+		name.Next = b
 
 
 	|| OldName	= name.name
@@ -772,21 +768,20 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 	if true
 		using msg
 		if (protofirst != @thg)								// seems to work???
-			protomsg.replacewith( «thg protoname » )
+			protomsg.replacewith( @thg + protoname )
 			protoname = "Fn_" + name
 			protomsg.func = @prm
-			|| protoMsg2 = «tmp "prototype"
-				«thg ProtoName »
-				protomsg
-			»
+			|| protoMsg2 = @tmp + "prototype"
+			protoMsg2 <~ (@thg, ProtoName)
+			protoMsg2 <~ protomsg
 			msg.next = protomsg2	
 		
 		items.name = "dispatch"
 		items.Func = @arr
 		msg.clear
 		msg.func = @decl
-		msg <~ «emb »
-		msg <~ NewEqRel( «thg name », items )
+		msg <~ @emb
+		msg <~ NewEqRel( @thg + name, items )
 	
 	for I in items
 		|| item_value	= I.Last
@@ -825,7 +820,7 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 			using item_value
 			if (item_value == @Thg or @dot or @bra)
 				if !ARel
-					ARel = «brel "&"»
+					ARel = @brel + "&"
 				  else
 					arel = arel.copy
 				item_value = item_value.unbra!.WrapWith( ARel )
@@ -838,17 +833,17 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 					// create a function...
 					if !newname
 						NewName = name + "_" + item_name.CollectFuncTableName
-						msg.CollectionPlace <~ ArgToFunc( NewName, «Thg protoName », item_value )
-					I <~ «brel "&", «Thg NewName »»
+						msg.CollectionPlace <~ ArgToFunc( NewName, @Thg+ protoName, item_value )
+					I.msg(@brel, "&") <~ (@Thg, NewName)
 			
 			|| iname = i.name
 			if  (i == @tmp) and table_name // why would this be nil?
-				i.first = «str table_name.name »
+				i.first = @str + table_name.name
 				i.become(@item)
 			
 			if (sigh != @prm) or table_name.IsLast
 				exit
-			|| newi = «tmp iname »
+			|| newi = @tmp + iname
 			i.prev = newi
 			i = newi
 		(sigh)
@@ -865,7 +860,7 @@ function message.NotNilRZ (|scdecl| type,  |SCNode|space)
 		nel = nel.first
 	if (nel isthing "nil") and type.isnormalobject
 		nel.become(@dot, "new")
-		nel <~ «thg type.type.name »
+		nel <~ (@thg, type.type.name)
 		nel <~ @prm
 		nel.obj = nil // clear
 		typeofexpr(nel, space)
@@ -873,8 +868,10 @@ function message.NotNilRZ (|scdecl| type,  |SCNode|space)
 
 function message.MiniTran (|SCNode| name_space, |string| On="app")
 	using (self)
-		self <~ «prm, .first »
-		.first = «thg on »
+		|| f = .first
+		.msg(@prm) <~ f
+		(f) // oof? can't just simplify this. not sure why.
+		.first = @thg + on
 		.func = @dot
 	TypeOfExpr( self, name_space )
 

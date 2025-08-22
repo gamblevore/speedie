@@ -4,10 +4,9 @@ function Message.WrapExpr (|scdecl| src, |int|)
 	if !self
 		Return kNeedsTypeCast
 
-	|| W = «dot "new"
-		«thg "dataobject"»
-		«emb »
-	»
+	|| W = @dot + "new"
+	W <~ (@thg, "dataobject")
+	w <~ @emb
 	if src.isfloat
 		w.name = "newfloat" // sigh
 	.ReplaceWith(W)
@@ -51,7 +50,7 @@ function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_sp
 			return kSimpleMatch			// done.
 
 	using self
-	|| cst = «type ":)" »
+	|| cst = @type + ":)"
 	.prev = cst
 	cst <~ self
 	cst.msg(@thg, typeName).obj = Type.TypeNormal 
@@ -85,9 +84,7 @@ function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 	if WasCArray
 		|| Acc = addr.msg(@acc)
 		acc <~ self
-		acc <~ «arr 
-			«num "0"»
-		»
+		acc.msg(@arr) <~ (@num, "0")
 	  else
 		addr <~ self
 	Return kAddressOfMatch

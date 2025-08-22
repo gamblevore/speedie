@@ -22,11 +22,11 @@ module SC_API
 		
 		using (arg)
 			if (!cpp)
-				cpp = «tmp "cpp_name"»
+				cpp = @tmp + "cpp_name"
 				arg.first = cpp
 			if part
 				part += "_"
-			cpp <~ «thg Proj+part+name.name »
+			cpp <~ (@thg, Proj+part+name.name)
 		
 		|| Fn = scfunction.NewFunc(api, parent, api) // done with it?
 		if (Fn isa scfunction)

@@ -1,6 +1,6 @@
 
 
-|| OKList = faststring()
+|| OKList = faststring() //
 || Fails = 0
 
 main (|[file]| Files)
@@ -8,10 +8,9 @@ main (|[file]| Files)
 		if f.MustExist
 			app.TryCompile(f)
 	
-	if !Fails
-		"All OK"
-	  else
-		"$fails Failiures" 
+	|| Msg = "All OK"
+	if Fails: Msg = "$fails Failiures"
+	app.say Msg
 	printline oklist
 		
 

@@ -225,7 +225,7 @@ class SCBehaviour (SCNode)
 		|| name = .source.first			#expect (.source, "No name found")
 		using name
 			if !prms
-				prms = «prm »
+				prms = @prm.msg
 				name.next = prms
 			
 			prms.first = MakeDecl(cls.name, "self", nil)
@@ -242,11 +242,11 @@ class SCBehaviour (SCNode)
 				|| it = name.next
 					it.expect(@arg)
 				  else
-					node <~ «arg »
-
-				name.next = «prm
-					«thg name.name.moat »
-				»
+					node <~ @arg.msg
+				
+				|| p = @prm.msg
+				p <~ (@thg, name.name.moat)
+				name.next = p
 			return true
 		
 		
@@ -286,8 +286,9 @@ function $InterName (,$InterName)
 			using (errplace)
 			|| cls = name_space.ShouldBeClass(errplace)
 				|| arg = node.find(@arg)
-					|| Beh = «tmp "behaviour"
-						node.first!.copy, arg »
+					|| Beh = @tmp + "behaviour"
+					beh <~ node.first!.copy
+					beh <~ arg
 					node.next = beh
 					name_Space.CollectOne( beh, true ) // cos we collect from a list... sigh
 

@@ -343,7 +343,8 @@ function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 	opt NoRefCounts
 	|| v = .OpenVars
 	for ch.fast in exp
-		|| x = .µArg(ch) & asmreg.exit
+		|| x = .µArg(ch)
+		if x & asmreg.exit
 			return x
 	.restorevars(v)			// causes errors???
 
@@ -788,8 +789,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
 	
-	|| op = exp.second
-	op ?= exp
+	|| op = exp.second!
 	rz = (fn)(self, dest, ml, mr, op)
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?

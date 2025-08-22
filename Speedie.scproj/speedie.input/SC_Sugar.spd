@@ -14,7 +14,10 @@ function TypeOfDotDotDot (ExprResolver)
 			c = p
 			p = p.parent
 		
-		c.next = «dot "max", «thg "int"», «emb »»
+		|| dot = @dot + "max"
+		dot <~ (@thg, "int")
+		dot <~ @emb
+		c.next = dot
 	return TypeOfExpr(exp.first, name_space)
 
 

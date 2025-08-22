@@ -856,7 +856,7 @@ function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.r
 	d.NilDeclared = dcl
 	d.IsLookupOnly = "" // it is lookuponly... but what for? "" i guess... whatever.
 	d.Name = name
-	d.default = «thg name »
+	d.default = @thg + name
 	Compiler.program.TryAdd( nil, d, name )
 	Return d
 

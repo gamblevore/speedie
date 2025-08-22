@@ -27,30 +27,26 @@ class $name (selector)
 
 	
 	function LoadOneSel (|string| sel_name, |string| module_name, |message| LoaderPlace, |message| Prms)
-		|| Line = «sdot "__LoadSel"
-			«prm
-				«brel "&"
-					«dot sel_name
-						«thg module_name »
-						«emb »
-					»
-				»
-				«str sel_name »
-			»
-		»
+		|| Line = @sdot + "__LoadSel"
+		// this code needs deleting anyhow.
+		// selectors suck.!!!
+		|| prm = line.msg(@prm)
+		|| brel = prm.msg(@brel, "&")
+		|| dot = brel.msg(@dot, sel_name)
+		dot <~ (@thg, module_name)
+		dot <~ @emb
+		prm <~ (@str,sel_name)
 		loaderplace.next = line
 		
 		if prms
 			if prms != @prm
-				prms = «prm, prms »
+				prms = prms.WrapWith(@prm)
 			// should be SelectorInit
-			|| Line2 = «dot "selector_init"
-				«dot sel_name
-					«thg module_name »
-					«emb »
-				»
-				Prms
-			»
+			|| Line2 = @dot + "selector_init"
+			|| dot2 = @dot + sel_name
+			dot2 <~ (@thg, module_name)
+			dot2 <~ @emb
+			line2 <~ prms
 			line.parent <~ line2
 	
 	

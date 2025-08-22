@@ -9,7 +9,7 @@ function DeclsDefault (|Message| def, |Message|)
 
 function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose = 0, |Message!|)
 	opt NoRefCounts
-	rz = «decl »
+	rz = @decl.msg
 	
 	|| f = rz
 	if purpose is Borrowed // seems to make no difference? sigh.
@@ -42,9 +42,8 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 
 function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)
 	require into
-	rz = «decl
-		«emb »
-	»
+	rz = @decl.msg
+	rz <~ @emb
 	
 	if value
 		Value = NeweqRel( NameMsg, value )
@@ -384,7 +383,7 @@ function message.AddValue (|scfunction| f)
 	opt inline
 	if !.HasChildCount(2)
 		using f.source!
-			self <~ «thg "Value"»
+			self <~ (@thg, "Value")
 
 
 datatype DeclMode (int)

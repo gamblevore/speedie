@@ -868,11 +868,10 @@ function ConstantExpand (|Message| ch)
 	
 	expect ((op == "=") and (L ==@thg))  ( op, "Expected 'd=(a,b,c...)' ." )
 	
-	|| Rel = «rel
-		L
-		«opp "="»
-		R.ConstantExpandSub
-	»
+	|| Rel = @rel.msg
+	rel <~ l
+	rel <~ (@opp, "=")
+	rel <~ R.ConstantExpandSub
 
 	ch.Next = rel
 	R.MoveAllAfter(ch)

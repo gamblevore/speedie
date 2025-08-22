@@ -64,7 +64,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 		arg = FuncMsg.createownblock #require
 		|| TmpFuncVar = UniqueTmpVar()
 		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.temp )
-		TmpFuncThg = «Thg TmpFuncVar »
+		TmpFuncThg = @Thg + TmpFuncVar
 		TmpFuncThg.obj = TmpFuncDecl.obj
 		arg <~ TmpFuncDecl
 		|| rej = NewRejoin()
@@ -195,13 +195,14 @@ extend_module scfunction
 
 		|| Using = msg.SyntaxUsing
 		name ?= UniqueTmpVar(msg.MsgOwningFunc)
-		|| repl = «thg name »
+		|| repl = @thg + name
 		|| insert = msg
 		msg.ReplaceWith( repl )
 		
 		|| p = repl.UpToArg!
 		if (msg == @rel)
-			insert = «bra, msg »
+			insert = @bra.msg
+			insert <~ msg
 	
 		|| dcl = MakeDecl( "", name, insert, scdeclinfo.temp )
 		p.Prev = dcl

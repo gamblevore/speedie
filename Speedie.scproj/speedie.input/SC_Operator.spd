@@ -271,7 +271,7 @@ or
 ="	
 
 		|| order = strs.split
-		|| fake = «opp ""» 
+		|| fake = @opp + ""
 		for (wi in order) (i)
 			for s2 in wi.words
 				if s2
@@ -393,7 +393,8 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Me
 	opt norefcounts
 	using exp
 	exp.become(@Dot, comp.FuncName)
-	|| prm = «prm, RN » 
+	|| prm = @prm.msg
+	prm <~ RN 
 	exp <~ prm
 	exp.second.Remove
 	

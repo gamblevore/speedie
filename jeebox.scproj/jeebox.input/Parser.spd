@@ -292,14 +292,7 @@ extend Parser
 		disabled "sigh... fix this later"
 
 	/*
-		currently, speedie uses syntax like these:
-			«thg name »
-			«bra, msg »
-		which parse differently! What a disaster.
-		
-		This needs to be cleaned out so it makes sense and sticks to arg-syntax.
-		
-		also this fails rn:
+		this fails rn:
 		
 		«thg name.name.moat »
 		

@@ -628,7 +628,7 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCNode| Nam
 
 
 function SCDecl.MakeDataObject (|SCNode| Name_Space, |declmode| Purpose, |scdecl|)
-	|| wrapp = «thg "dataobject"»
+	|| wrapp = @thg + "dataobject"
 	rz = SCDecl(.type)
 	rz.LoadContainedSub(self, wrapp, name_space, purpose)
 
@@ -850,13 +850,12 @@ function TypeOfMsg (ExprResolver)
 
 
 function SpellOutMsg (|message| type, |message| Exp, |message| namemsg, |message|)
+	opt norefcounts
 	using (exp)
-	rz = «dot "msg"
-		type
-		«prm, NameMsg »
-	»
+	rz = @dot + "msg"
+	rz <~ type
+	rz.msg(@prm) <~ namemsg
 	Type.become(@thg, "Syx" + Type.name)
-	
 	exp.func = @bra
 	exp.first = rz
 
@@ -872,7 +871,24 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 	«abc »
 	
 	Also would be nice to allow «"abc"» or «(<`abc`>)» for a real super thingy!
+	
+	Also... ideally would convert to the ideal syntax.
+	
+	msg <~ «thg»  -->          msg <~ @thg
+	msg <~ «thg, str» -->      msg <~ (@thg, str)
+	|| x = «arg
+		«dot "hello"
+			«thg "you"»
+			prms
+		»
+	»
+	-->
+	|| x = @arg.msg
+	|| d = x.msg(@dot, "hello")
+	d <~ (@thg, "you")
+	d <~ prms
 */
+
 	|| name = exp.name
 		using exp
 			exp.first = @thg + ""
@@ -893,10 +909,9 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 			while (itm)
 				|| NextItm = itm.next
 				using (itm)
-				|| Line = «dot "SyntaxAppend" // use normal code not this!
-					«thg place.name »
-					«prm, itm »
-				»
+				|| Line = @dot + "SyntaxAppend" // use normal code not this!
+				line <~ (@thg, place.name)
+				line.msg(@prm) <~ itm
 				place <~ Line
 				TypeOfExpr( Line, name_space )
 				scfunction.Tran_all(fn, line, name_space)
@@ -1101,13 +1116,9 @@ function TypeOfSwizSub (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 				item = exp.msg(@num,"0")
 			  else
 				expect (field < W) (exp, "Vector access is too large.")
-				|| thg = «thg tmp » 
-				item = «acc
-					thg
-					«arr
-						«num field »
-					»
-				»
+				item = @acc.msg
+				item <~ (@thg, tmp)
+				item.msg(@arr) <~ (@num+field)
 				exp <~ item
 			typeofexpr(item, name_space)
 		
@@ -1366,13 +1377,11 @@ function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |b
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|)
 	using (exp)
-	|| dot = «dot
-		exp.first
-		«prm
-			exp.last
-			«thg comp.CaseAwareStr »
-		»
-	»
+	|| dot = @dot.msg
+	dot <~ exp.first
+	|| p = dot.msg(@prm)
+	p <~ exp.last
+	p <~ (@thg, comp.CaseAwareStr)
 	exp.First = dot
 
 	if (comp Is EqualOrNot)
@@ -1721,7 +1730,7 @@ function TypeOfList (ExprResolver)
 
 	using (exp)
 	|| name = ("vecmix", "ivecmix")(isfloat)
-	|| list = «prm »
+	|| list = @prm.msg
 	exp.AppendAllInto(list)
 	exp <~ (@thg, name)
 	exp <~ list
@@ -1820,7 +1829,7 @@ function AddToStaticSection (|Message| arg, |Message| ToAdd)
 		arg = static.Last
 		expect ( arg == @arg ) ( static, "Missing argument." )
 	  else
-		static = «tmp "module"»
+		static = @tmp + "module"
 		arg <~ static 
 		arg = static.msg(@arg)
 
@@ -1901,7 +1910,7 @@ function SCFunction.DotFuncToNormalFunc (|Message| dot)
 		L.First = first
 
 	using (dot)
-		dot.First = «thg .ExportName »
+		dot.First = @thg + .ExportName
 	if self Is Killer
 		dot.LastInBlock(SCBlockage.Quit)
 
