@@ -973,7 +973,7 @@ So anything not 0 means "its OK"`
 		while (|| err = stderr.pop)
 			notifications <~ err
 			if err.IsBad
-				.StartupErrors <~ err.copy
+				.StartupErrors <~ error(err)
 
 
 	function SaveDrawing

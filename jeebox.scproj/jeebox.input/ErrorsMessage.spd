@@ -64,7 +64,7 @@ extend_module Error
 	
 	
 function message.AsError (|error|)
-	rz = error(nil)
+	rz = error(nil|message|)
 	|| arg = .Last
 	if arg == @arg
 		rz.position = arg..pos.int|int|

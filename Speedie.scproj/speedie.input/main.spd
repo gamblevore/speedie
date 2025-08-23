@@ -5,7 +5,7 @@
 
 
 
-main // speedie main {
+main
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile
@@ -21,13 +21,14 @@ function Compiler.EnterCompile (|bool|)
 
 
 function Compiler.PrintResults
-	|| OK = stderr.ok
+	|| OK = stderr.ok // incase errors happen AFTER success!
 	.PrintStats
 	.PrintCompileErrors
 	if app.parent != nil
 		"Exiting Speedie ${app.id}"
 
 	if options.SelfReplacement and FileDes.StdOut.IsTerminal
+		if ok and !StdErr.ok // how?
 		if .VariantSuffix ~= "Test"
 			|| msg = ("Success", "Failed")(ok)
 			app.say(msg, false)

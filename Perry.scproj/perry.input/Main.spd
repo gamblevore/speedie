@@ -4,7 +4,7 @@ import "GameExamples/bubbles.spd"
 import "GameExamples/tetris.spd"
 
 
-main // main { 
+main
 	if app.Yes("crash")
 		app.Crash
 	GUI.Init

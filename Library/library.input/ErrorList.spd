@@ -135,7 +135,7 @@ class ErrorReceiver
 
 
 	function List (|error|)
-		disabled "Do you mean .Errors?"
+/		disabled "Do you mean .Errors?"
 
 	
 	render

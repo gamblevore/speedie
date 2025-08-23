@@ -14,7 +14,6 @@ class Error (Message)
 	|String|				Path
 	|String|				OriginalData
 	|String|				StackTrace
-	|Float64|				Progress // for long operations where you want to know how far you have gone before getting an error.
 	|message?|				Node
 	|date|					When
 	|ErrorSeverity|			Severity
@@ -26,7 +25,6 @@ class Error (Message)
 		.position = -1
 		.node = node
 		.severity = level
-		.progress = errorreceiver.progress
 		.name = desc // sigh
 		.path = path
 		.when = date.now
@@ -34,7 +32,7 @@ class Error (Message)
 		.UpgradeWithNode
 	
 	
-	constructor ()
+	constructor
 		cpp_part Nothing // Not an error actually.
 		super.constructor
 		.position = -1
@@ -43,7 +41,8 @@ class Error (Message)
 		.func = @arg
 
 
-	constructor (|error| orig, |bool| ErrDummy)
+	constructor (|error| orig) 
+		description "Error Copier" 
 		cpp_Part Copy
 		super.constructor
 		.position = orig.position
@@ -69,9 +68,6 @@ class Error (Message)
 		.OriginalData = node.OriginalParseData
 		
 		
-	function Copy (|error|)
-		return error(self, false)
-
 	syntax is (|ErrorFlags| F, |bool|)
 		return self and .ErrorFlags&F
 		
@@ -94,8 +90,6 @@ class Error (Message)
 		|| node = .node
 			node.position += i
 	
-	function Fired (|bool|)
-		return .when.fired
 	
 	function IsWarning (|bool|)
 		return (.severity <= errorseverity.Warning)
@@ -112,15 +106,6 @@ class Error (Message)
 		.Path = path
 		(self is PreferNoRenderPath) = desc contains path
 		.name = desc 
-	
-	
-	function Reformulate (|string| suffix="")
-		|| list = error.from(.name.parse)
-		while (|| err = list.first)
-			if suffix
-				err.name += suffix
-			nil|errorreceiver| <~ err
-		.remove
 	
 	
 	function GrabLine (|faststring| fs, |bool| Usecolor=false)
@@ -161,11 +146,6 @@ class Error (Message)
 		return true
 
 
-	syntax compare (|date| d, |bool| aware, |int|)
-		|| w = .when + d
-		return date.now - w
-
-
 	render Render
 		fs <~ "error"
 		++fs.indent
@@ -174,8 +154,6 @@ class Error (Message)
 			fs.field( "pos", .position )
 		fs.field( "file", .path )
 		fs.field( "severity", .severity )
-		if .progress
-			fs.fieldfloat( "progress", .progress )
 		if .StackTrace
 			fs.field( "stack", "" )
 			++fs.indent
@@ -189,9 +167,9 @@ class Error (Message)
 	render RenderUnix
 		|| M = fs.mark
 		|| p = .path
-		if ((self isnt PreferNoRenderPath) and P)
-			fs <~ .path
-			fs <~ ":"
+			if self isnt PreferNoRenderPath
+				fs <~ .path
+				fs <~ ":"
 		
 		if (!.LineIdentifiers(fs, P) and .node)
 			.node.render(fs)
