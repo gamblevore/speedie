@@ -967,7 +967,7 @@ function TypeOfTernary (ExprResolver)
 	opt norefcounts
 	|| list		= exp.first
 	|| params	= list.next
-	expect  list.hasany and params.HasChildCount(1)  (exp, "expected: (a,b)(cond)")
+	expect  list.hasany and params.HasOneChild  (exp, "expected: (a,b)(cond)")
 	
 	
 	|| first	= list.first!

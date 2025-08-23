@@ -110,7 +110,7 @@ helper String.ParseSub (|syntax| Owner, |MessageRoot|)
 	// actual parse here.
 	|| lines	= parser.ParseLoopFlags(into, "", Flags)
 	
-	if (owner == @nil) and (Lines == false) and into.HasChildCount(1)
+	if (owner == @nil) and (Lines == false) and into.HasOneChild
 		into = into.first // don't do this if owner was specified.
 
 	parser.CleanSpaces

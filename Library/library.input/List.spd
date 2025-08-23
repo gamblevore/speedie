@@ -286,6 +286,7 @@ class list (Saveable)
 		return .IsLast and .IsFirst
 
 	function HasOneChild (|bool|)
+		nil checker
 		return .HasChildCount(1)
 
 

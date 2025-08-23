@@ -269,53 +269,14 @@ extend Parser
 	
 	
 	function fMsgList (ParseHandler)
-		description "This needs upgrading to a cleaner design" 
-		|| Result	= parser.new( nil, @msg, Start )
-		|| name		= .Process( kTemporalWord, true, result ) #require
-		|| it = name.second
-			return .UnexpectedSyntax(it)
-		
-		|| Ops = kOppSyx (|) kOppTemporal (|) kOppYoda
-		while .NextLineAndIndent(Result).r
-			|| item = .ProcessThing(Ops, false) #loop
-			if item.name contains "»" 
-				// design flaw. We need utf-8 text ops to split words.
-				return .ErrorAdd("Needs a space here.", item.position)
-			result <~ item
-
-		parser.ExpectEndChar(start, "»")
-		result.after = parser.nextstart
-		return Result
-
-
-	function fMsgList_v2 (ParseHandler)
-		disabled "sigh... fix this later"
-
-	/*
-		this fails rn:
-		
-		«thg name.name.moat »
-		
-		because previously... it would interpret thg as @tmp! containing name.name.moat
-		
-		but really... thats not what we want. So we'd need .processthing first, then the lines
-	*/
-
+		opt norefcounts
 		|| NameStart = start + 2
 		|int| NameAfter = parser[NameStart]
 		if !jeebox.CSWordStart[NameAfter]
 			return .ErrorAdd("Missing name here", start)
 		NameAfter = .WordAfter(NameStart)						#require
-/		|| Result	= parser.newskip( nil, @msg, Start, namestart, NameAfter )
-		while .NextLineAndIndent(Result).r
-			|| Ops = kOppSyx (|) kOppTemporal (|) kOppYoda
-			|| item = .ProcessThing(Ops, false) #loop
-			if item.name contains "»" 
-				return .ErrorAdd("Needs a space here.", item.position)
-			result <~ item
-
-		parser.ExpectEndChar(start, "»")
-		result.after = parser.nextstart
+		|| Result = parser.newskip( parent, @msg, Start, namestart, NameAfter )
+		parser.ParseLoopFlags( Result, "»", kTemporalSyxNoBar )
 		return Result
 
 
@@ -423,7 +384,7 @@ extend Parser
 		rz = parser.new(nil, @list, start)
 		|| Lines = parser.ParseLoopFlags( rz, ")", kTemporalSyxNoBar )
 
-		if !Lines and rz.HasChildCount(1)
+		if !Lines and rz.HasOneChild
 			rz.become( @bra )
 
 

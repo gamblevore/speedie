@@ -557,11 +557,27 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 	
 	syx Msg (Message_List)
+		opt norefcounts
 		fs <~ "«"
-		fs <~ .name
+		if .name
+			fs <~ .name
+		  else
+			fs <~ ('"', 2)
 		
-		.FSListSep(fs, ", ")
-		fs <~ " »"
+		|| ch = .first
+		if ch and !ch.next and ch != @msg
+			fs <~ " "
+			fs <~ ch
+			fs <~ " "
+		  else
+			fs.indent += 1
+			while ch
+				fs.indentline
+				fs <~ ch
+				ch++
+			fs.indent -= 1
+			fs.indentline
+		fs <~ "»"
 
 		
 	syx Todo (To_Do_List)
