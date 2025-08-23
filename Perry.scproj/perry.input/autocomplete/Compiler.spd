@@ -17,12 +17,10 @@ extend PerryIDE
 		if .projIsSpeedieCode and !.UsingSpdLib
 			.Feedback = nil
 			.AskCheck
-	
+
+
 	function AskCheck
 		.SendFeedbackStr "check"
-
-//	syntax is (|ListViewState| s, |bool|)
-//		return .projmsg.syntaxis(s)
 		
 
 	syntax is (|ListViewState| s, assigns:|bool| mod)
@@ -203,15 +201,18 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	
-	function CancelCompile
+	function CancelCompile (|bool|)
+		opt norefcounts
 		|| c = .Compilr
-			c.Kill(0)
-			app.Sleep(0.025) // allow pipes to work
-			.Readlog(true)
-		  else
-			.RenableAfterCompile
-	
-	function RenableAfterCompile
+		if !c
+			return .RenableAfterCompile
+		c.Kill(0)
+		app.Sleep(0.025) // allow pipes to work
+		.Readlog(true)
+		return true
+
+
+	function RenableAfterCompile (|bool|)
 		.DebugIsWaitingForCompile = false
 		|| code = .ProjIsSpeedieCode
 		(.buildbutton is enabled) = code
@@ -220,4 +221,5 @@ extend PerryIDE
 		(.progress isnt visible)
 		.HideStuff
 		isnt active
+		return true
 

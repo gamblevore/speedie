@@ -78,6 +78,7 @@ role FileArchive (message)
 	syntax append (|string| path, |string| data)
 		.msg(@tmp, path)..data = data
 
+
 	syntax append (|file| f)
 		cpp_part AppendFile
 		opt norefcounts
@@ -88,6 +89,7 @@ role FileArchive (message)
 			item..data = f.readall
 			item..modified = f.modified.renderint
 			item..mode = f.mode.render
+
 
 	function Base (|string|)
 		opt norefcounts

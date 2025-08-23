@@ -446,8 +446,7 @@ class PerryIDE (Window)
 			fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
 			fs <~ p.ErrorOutput.getresult.FindStacktrace
 			.Notify(fs, @emb + what)
-			.CancelCompile
-			return true
+			return .CancelCompile
 
 
 	function string.FindStacktrace (|string|)

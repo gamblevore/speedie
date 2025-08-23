@@ -1337,7 +1337,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 }
 
 
-class autoitem
+class AutoItem
 	linkage
 		tighten false
 	|string|		Sort
@@ -1388,32 +1388,5 @@ function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 					return ch.unbra
 				Strength = CurrStrength
 				rz = ch
-
-
-extend message
-	render JDB4_
-		fs <~ .Func.name
-		fs <~ ' '
-		if (.name)
-			fs <~ '"'
-			fs.appendescape(.name[0,32])
-			fs <~ '"'
-		if .obj
-			ifn .obj isa message // awkward
-				fs <~ ' '
-				.obj.render(fs)
-		if .hasany
-			fs.indent++
-			for ch in self
-				fs.IndentLine
-				ch.jdb4_(fs)
-			fs.indent--
-			fs.IndentLine
-
-
-	api message.JDB4 (|string|)
-		cpp_name jdb4
-		visible
-		printline .jdb4_
 
 

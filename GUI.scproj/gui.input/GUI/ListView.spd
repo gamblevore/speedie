@@ -512,23 +512,26 @@ class ListView (GUIControl) {
 		.OnDragRow = (nil, &BasicRowDrag)(.istree)
 	
 
-	behaviour MouseMove
-		|| cc = SystemCursor.Arrow
-		if self isa menu
-			cc = SystemCursor.Hand
-		|| c = .FindClickedCell(P)
+	helper CursorForRow (|listviewCell?| c, |systemcursor|)
+		opt norefcounts
+		rz = SystemCursor.Arrow
+		if c and self isa menu
+			rz = SystemCursor.Hand
 			|| r = c.row
 			if (r is disabled)
-				if cc == SystemCursor.hand
-					cc = SystemCursor.arrow // degrade to arrow, rather than all the way down.
-				  else
-					cc = SystemCursor.no
+				if rz == SystemCursor.hand
+					return SystemCursor.arrow // degrade to arrow, rather than all the way down.
+				return SystemCursor.no
 			  elseif (r is editable)
 				if r is Selected
-					cc = SystemCursor.IBeam
-				  else
-					cc = SystemCursor.hand
-		cc.use
+					// should only be if this is CURRENLTY editing!
+					return SystemCursor.IBeam
+				return SystemCursor.hand
+		
+	
+	behaviour MouseMove
+		|| c = .FindClickedCell(P)
+		.cursorforrow(c).use
 			
 		if ._CanSeeAllLines
 			.NoScroll

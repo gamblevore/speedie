@@ -110,7 +110,8 @@ function file.FindProjectMain (|file|)
 		return best
 	for c.files in inp
 		if c.isspd
-			return c
+			rz = c
+			exit
 
 
 function PerryIDE.FindConfFile (|filerow|)
@@ -151,8 +152,7 @@ function PerryIDE.ClickedTodo
 function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
 		if !.IsBuilding
-			.CancelCompile
-			return true
+			return .CancelCompile
 
 
 function PerryIDE.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
@@ -167,8 +167,7 @@ function ClickedCancel (GUIAction)
 	|| name = i.project.TrimCodeExt
 	|| q = "Currently building $name... Cancel Build of $name?"
 	if q.confirm(can)
-		i.CancelCompile
-		return true
+		return i.CancelCompile
 		
 
 function ClickedCompile (GUIaction)

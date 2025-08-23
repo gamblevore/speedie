@@ -16,15 +16,16 @@ main (|[file]| Files)
 function app.TryCompile	(|file| f)
 	if f isa "scproj" or "spd"
 		return .TryCompileOne(f)
-	if f.IsDir
-		for c.files in f
-			if !c.IsLink // LOYOUPSz // (This means LLOOPPPz to non-stupid people who are from a not-stupid dimentshun)
-						 // GNO FNARK gNUR GNORSHELF
-				.TryCompile(c)
+	require f.IsDir
+
+	for c.files in f
+		if !c.IsLink		// LOYOUPSz // (This means LLOOPPPz to non-stupid people who'r from not-stupid dimentshun)
+			.TryCompile(c)  // GNO FNARK gNUR GNORSHELF
+
 
 
 function app.TryCompileOne (|file| f)
-	|| args = ["--nocompile", f, "--target=ForBatchTest"]
+	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
 	if "/usr/local/bin/spd".Execute(args, processownermode.StdOutSilence).Successful
 		"OK: $f"
 		return

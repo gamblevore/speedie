@@ -210,7 +210,8 @@ datatype FlowControlStopper (int)
 	syntax UsingComplete (|object| dummy=nil)
 		flow off
 		flowcontrol.stop
-	
+
+
 	syntax Using (|FlowControlStopper|)
 		flow off
 

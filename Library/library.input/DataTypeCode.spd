@@ -57,8 +57,8 @@ datatype DataTypeCode (uint16)
 		Numeric = 8
 	
 	
-	function DebugPrint
-		printline .Render
+//	function DebugPrint
+//		printline .Render
 	
 	
 	render
@@ -95,9 +95,9 @@ datatype DataTypeCode (uint16)
 	function OK (|bool|)
 		return !(self&failed)
 	
-	function Has (|datatypecode| M, |bool|)
-		opt inline
-		return self&PossibleBits&M
+//	function Has (|datatypecode| M, |bool|)
+//		opt inline
+//		return self&PossibleBits&M
 	
 		
 	syntax is (|datatypecode| M, |bool|)

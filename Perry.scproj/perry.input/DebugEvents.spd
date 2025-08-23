@@ -422,8 +422,4 @@ class asm_test_obj
 		.i = 0
 
 
-function Char (|int| x, |int|) // tab after here
-	return 0
-
-
 
