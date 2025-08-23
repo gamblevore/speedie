@@ -262,6 +262,7 @@ struct MessagePosition
 
 
 helper list.JDB2
+	description "For internal compiler-use only... don't use this"
 	cpp_name jdb2
 	visible
 	if (Self)
@@ -271,6 +272,7 @@ helper list.JDB2
 
 
 helper list.JDB3
+	description "For internal compiler-use only... don't use this"
 	cpp_name jdb3
 	visible
 	if (Self)

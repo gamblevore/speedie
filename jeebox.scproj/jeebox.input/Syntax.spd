@@ -13,9 +13,6 @@ datatype Syntax (Byte)
 		cpp_Part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion
 
-//	function ID (|int|) 
-//		return self|int|
-
 	function Translateable (|bool|) 
 		return self <= @Thg and self >= @tmp
 
@@ -44,7 +41,7 @@ datatype Syntax (Byte)
 	operator plus (|string| m, |message|)
 		return .msg(m)
 	
-	operator plus (|int| m, |message|)
+	operator plus (|int64| m, |message|)
 		opt norefcounts
 		cpp_Part PlusNum
 		return .msg(m.render)
@@ -55,7 +52,6 @@ datatype Syntax (Byte)
 			|| o = .obj
 				return o.name
 		return "child"
-	
 	
 	function LongName (|string|) 
 		Opt NoRefCounts
@@ -71,9 +67,6 @@ datatype Syntax (Byte)
 	function Msg ( |string| name="", |Message| ) 
 		return Message( nil, self, parser.using.position, name, name.length )
 	
-	// remove this? node.msg seems better?
-	function Msg ( |message| parent, |string| name, |Message| )
-		disabled "Use node.msg(@syx, name) instead"
 	
 	function message.Msg ( |syntax| fn, |string| name="", |Message| )
 		return Message( self, fn, parser.using.position, name, name.length )
@@ -81,8 +74,7 @@ datatype Syntax (Byte)
 	
 	// replace with int64.msg? seems better.
 	function Msg ( |int64| name, |Message| )
-		cpp_part IntMsg
-		return .msg(name.render)
+		disabled "Use int64.msg instead"
 		
 	function ExportAddr (assigns:|fpMsgRender|) 
 		Opt NoRefCounts

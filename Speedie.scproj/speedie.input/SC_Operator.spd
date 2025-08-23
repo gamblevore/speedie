@@ -139,6 +139,7 @@ module {
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
+		if opch ~= "~>"
 		|| result = opch.obj|SCOperator|
 			if (result isnt custom)
 				opch.name = result.name

@@ -242,6 +242,9 @@ function Message.Clean (|bool| erl = false)
 			curr.name = curr.name.Lowercase
 			curr.FixErl
 
+		  elseif (f == @msg)
+			continue_with curr.MsgFix
+		
 		  elseif (f == @arel)
 			if !QEscape and curr == "?"
 				curr.Tran_QMark
@@ -332,21 +335,6 @@ function message.FixElseif
 		self <~ curr
 		curr = n
 	
-	
-function message.BecomeAppend (|string| s)
-	// typeofsend actually does a lot more than this
-	// so it can't be removed just yet
-	opt NoRefCounts
-	|| p = .parent!
-	require p.expect(@rel)
-	p.become(@dot, s)
-	.func = @prm
-	|| n = .next
-	if n == @list // i guess itss... fs <~ (' ', 1)
-		.replacewith(n)
-		n.func = @prm
-	  else
-		.last = n
 
 
 function message.Tran_With 

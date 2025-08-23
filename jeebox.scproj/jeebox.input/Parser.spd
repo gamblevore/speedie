@@ -269,6 +269,14 @@ extend Parser
 	
 	
 	function fMsgList (ParseHandler)
+		/* could be cool to allow this
+		
+		«prm   // no "" needed!
+			«num "0"»
+		»
+		
+		*/
+		
 		opt norefcounts
 		|| NameStart = start + 2
 		|int| NameAfter = parser[NameStart]

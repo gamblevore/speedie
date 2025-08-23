@@ -1093,6 +1093,18 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		opt norefcounts
 		cpp_part AppendSyx
 		.msg(fn, name)
+
+	Syntax SendTo (|syntax| Fn, |string| name="", |message|)
+		cpp_part SendSyx
+		opt norefcounts
+		.msg(fn, name)
+		return self
+
+	Syntax SendTo (|message| msg, |message|)
+		cpp_part SendMsg
+		opt norefcounts
+		self <~ msg
+		return self
 	
 	Syntax Append (|int64| Num)
 		cpp_part AppendNum

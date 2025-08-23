@@ -35,6 +35,51 @@ function message.QMarkRel (|message|)
 
 
 
+function message.BecomeAppend (|string| s)
+	opt NoRefCounts
+	|| p = .parent!
+	require p.expect(@rel)
+	p.become(@dot, s)
+	.obj = nil
+	.func = @prm
+	|| n = .next
+		|| b = n.unbra
+		if b == @msg
+			b.MsgFix // «
+	if n == @list // fs <~ (' ', 1)
+		.replacewith(n)
+		n.func = @prm
+	  else
+		.last = n
+
+
+function message.MsgFix (|message| parent=nil, |message!|) // «
+	opt norefcounts
+	using self
+
+	|| f = .first
+	|| n = f.next
+	.func = @list
+	.first = @name + .name
+	.name = ""
+
+//	.SyntaxSendTo( ((@prm, <(`:)`)>).SyntaxSendTo(@num, <(`4`)>)) )
+
+	while n
+		|| n2 = n.next
+		self = .WrapWith(@rel)
+		self <~ (@opp, "~>")
+		self <~ n
+		target debug // can't see whats going on!
+			self = .WrapWith(@bra)
+		n = n.unbra
+		if n == @msg
+			n.msgfix
+		n = n2
+	return self
+
+
+
 function message.Tran_QMark 
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 

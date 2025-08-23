@@ -355,8 +355,8 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 		if Tran_Temporal( fn, s, p ) or (s == "ignore")
 			return
 		
-	  elseif (f == @msg)
-		Tran_Msg(fn, s, p)
+//	  elseif (f == @msg)
+//		Tran_Msg(fn, s, p)
 
 	  elseif !(f == @Thg or @opp or @Item or @prm)
 		TypeOfExpr( s, p )
