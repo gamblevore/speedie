@@ -269,14 +269,6 @@ extend Parser
 	
 	
 	function fMsgList (ParseHandler)
-		/* could be cool to allow this
-		
-		«prm   // no "" needed!
-			«num "0"»
-		»
-		
-		*/
-		
 		opt norefcounts
 		|| NameStart = start + 2
 		|int| NameAfter = parser[NameStart]
@@ -284,6 +276,9 @@ extend Parser
 			return .ErrorAdd("Missing name here", start)
 		NameAfter = .WordAfter(NameStart)						#require
 		|| Result = parser.newskip( parent, @msg, Start, namestart, NameAfter )
+
+		if .Allow(kEndOfLine)
+			result <~ (@str, "")
 		parser.ParseLoopFlags( Result, "»", kTemporalSyxNoBar )
 		return Result
 

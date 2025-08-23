@@ -1,34 +1,32 @@
 
 
-|| OKList = faststring() //
-|| Fails = 0
+|| Fails = faststring()
 
 main (|[file]| Files)
 	for f in files
 		if f.MustExist
 			app.TryCompile(f)
 	
-	|| Msg = "All OK"
-	if Fails: Msg = "$fails Failiures"
-	app.say Msg
-	printline oklist
-		
+	if Fails.length
+		app.say("$fails Failiures")
+	  else
+		app.say("All OK")
+
 
 function app.TryCompile	(|file| f)
 	if f isa "scproj" or "spd"
 		return .TryCompileOne(f)
-	if !f.IsDir
-		return
-	for c.files in f
-		if !c.IsLink // no loopies
-			.TryCompile(c)
-		
-		
+	if f.IsDir
+		for c.files in f
+			if !c.IsLink // LOYOUPSz // (This means LLOOPPPz to non-stupid people who are from a not-stupid dimentshun)
+						 // GNO FNARK gNUR GNORSHELF
+				.TryCompile(c)
+
+
 function app.TryCompileOne (|file| f)
 	|| args = ["--nocompile", f, "--target=ForBatchTest"]
 	if "/usr/local/bin/spd".Execute(args, processownermode.StdOutSilence).Successful
-		OKList <~ "\nOK: $f"
+		"OK: $f"
 		return
-	Fails++
-	"Fail: $f"
-	
+	fails <~ "Fail: $f\n"
+
