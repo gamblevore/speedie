@@ -1132,7 +1132,7 @@ module
 	function datatypecode.SignedStuffClass (|scclass|)
 		opt norefcounts
 		|| s = .SetSigned(!.IsSigned)
-		|| keymsg = Message(@thg)
+		|| keymsg = Message(@thg, "")
 		for (c in datatypecode.Types) (key)
 			if (c == s)
 				keymsg.name = key

@@ -65,11 +65,11 @@ datatype Syntax (Byte)
 	
 	
 	function Msg ( |string| name="", |Message| ) 
-		return Message( nil, self, parser.using.position, name, name.length )
+		return Message( nil, self, name )
 	
 	
 	function message.Msg ( |syntax| fn, |string| name="", |Message| )
-		return Message( self, fn, parser.using.position, name, name.length )
+		return Message( self, fn, name )
 	
 	
 	// replace with int64.msg? seems better.

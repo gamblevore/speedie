@@ -23,8 +23,8 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 
 ////////////////////////////////		
-	|MsgParseFlags|			Flags				// Flags: Output only. Change freely or reuse.
-	|uint16|				Tag					// Tag:   Jeebox does not use this.
+	|MsgParseFlags|			Flags		// Re-purposeable.  May be set by parser.  Can affect render-style.
+	|uint16|				Tag			// Parser does not set or read these.
 ////////////////////////////////		
 	
 	
@@ -54,30 +54,32 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		.tag		= parser.Using.Tag
 
 			
-	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
-		cpp_part ConstructorNormal
-		
+	constructor (|Message| Parent=nil, |Syntax| Func,  |string| name="")
+		description "Default message constructor function. Intended for general-use" 
+		super.constructor(Parent)
 		.name		= name
+		.Position	= parser.using.Position
 		.func		= func
-		.Position	= parser.Using.Position
+		.RangeLength= parser.using.Length
 		.flags		= parser.using.Flags
-		.RangeLength= parser.Using.Length
 		.tag		= parser.Using.Tag
 
-	
-	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
-		cpp_part ConstructorRange
+
+	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength)
+		cpp_part ConstructorParser
+		description "Intended for use by the parser only, not other code." 
 
 		super.constructor(Parent)
 		.name		= name
 		.Position	= BytePos
 		.func		= func
 		.RangeLength= RangeLength
-		.flags		= parser.using.Flags
+		.flags		= 0 // not set, because parsing shouldn't have default flags! These are parse-variables!
 		.tag		= parser.Using.Tag
 
 	
 	constructor (|string| name, |int| BytePos)
+		description "Special message constructor. Intended for re-purposing the message-class."
 		cpp_part ConstructorItems
 
 		.name		= name

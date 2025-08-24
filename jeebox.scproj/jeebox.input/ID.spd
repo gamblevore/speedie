@@ -64,9 +64,7 @@ You can also count the number of times that this messageID was applied, via the 
 		.Func = @arg
 		.ID = 0
 				
-		
-	function Msg (|message| parent=nil, |message|)
-		return Message(parent, .func, -1, .name, .name.length)
+
 
 	module
 		function ByID (SorterComparer of messageid)

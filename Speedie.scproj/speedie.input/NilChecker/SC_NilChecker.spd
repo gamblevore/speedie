@@ -119,7 +119,9 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	Prms.First = upon
 
 	dot.memorylayer.use
-	dot.First = message(nil, @thg, dot.position, fn.exportname, 0)
+	|| f = message(@thg, fn.exportname)
+	f.Position = dot.position
+	dot.First = f
 	return nilstate.real
 	
 
