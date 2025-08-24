@@ -192,6 +192,11 @@ class ConfirmationDialog (Window)
 	module	
 		|ConfirmationDialog| _asker
 
+	
+function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
+	|| can = ConfirmCanceller(self, fn)
+	if q.confirm(can)
+		return true
 
 
 function OnConfirmAnswer (GUIAction)
@@ -200,6 +205,7 @@ function OnConfirmAnswer (GUIAction)
 
 
 
+// this could be better as a task... one less class to think about.
 prototype fnConfirmCanceller (|object| self, |bool|) 
 class ConfirmCanceller
 	linkage

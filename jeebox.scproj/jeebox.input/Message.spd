@@ -41,6 +41,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		.flags		= other.flags ||| parser.using.flags // copies global insertedness flags over
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
+		
 
 
 	constructor
@@ -485,7 +486,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		fs <~ opp.first
 
 	
-	function BinnRender (|faststring| fs, |string| sepa, |string| sepb)
+	function BinnRender (|faststring| fs, |string| sepa)
 		opt norefcounts
 
 		// i can				>~ can i 
@@ -517,11 +518,11 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 	syx binn (InnerAdj)
 		// I slowly~ran home --> >~ slowly i ran home 
-		.BinnRender(fs, ">~ ", "")
+		.BinnRender(fs, ">~ ")
 
 
 	syx Ask
-		.BinnRender(fs, "∆", "")
+		.BinnRender(fs, "∆")
 
 
 	syx Yoda (Yoda_Relationship)
@@ -1045,10 +1046,6 @@ The tree-data-structure represents your data. The Message class is similar to XM
 				return ch
 			.accesserr(Need, nil, ch)
 
-	
-//	syntax Compare (|string| Other, |bool|Aware, |int|)
-//		return .name.Compare(other, Aware)
-
 
 	syntax equals (|string?| name, |bool|Aware, |bool|)
 		return self and .name.SyntaxEquals( name, aware )
@@ -1056,6 +1053,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 	syntax equals (|Syntax| X, |bool|Aware, |bool|)
 		cpp_part EqualsSyx
+		(Aware)
 		return self and (.Func == X)
 
 //	sadly... this would mess up anything that tests msg == 1
@@ -1136,10 +1134,6 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 	Syntax UsingComplete { }
 	
-//	setter Int (|int64|)
-//		.Func = @num
-//		.name = Value.Render // later we can do this a different way. Like directly
-	
 	function Int (|int| StrStart=0, |int64| low, |int64| high, |int64|)
 		cpp_part IntRange
 		|| i = .int(strstart)
@@ -1172,10 +1166,6 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	function Float (|Float64|)
 		if self
 			return .name.ParseFloat(self)
-
-//	function Hex (|int64|)
-//		if self
-//			return .name.ParseInt(self)
 
 	function Float32 (|float|)
 		|| d = .float|float|

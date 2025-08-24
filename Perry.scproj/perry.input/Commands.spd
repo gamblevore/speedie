@@ -37,8 +37,8 @@ dispatch PerryCommands (|perryide| self, |string| s)
 	+'bubbles'
 		bubbles().RunAsMain(60)
 
-	+'DebugSwitch'
-		DebugGUI = !DebugGUI
+//	+'DebugSwitch'
+//		DebugGUI = !DebugGUI
 
 
 |listviewrow| _PerryCommandsMenu

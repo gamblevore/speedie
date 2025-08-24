@@ -1,33 +1,6 @@
 
 
 
-|| DebugGUI = false
-
-function DebugABC1 (|int| i, |int|)
-	|| n = i*9
-	n++
-	return n
-
-
-function DebugABC11 (|int| i, |int|)
-	return i*9 + 1
-
-
-function DebugABC2
-	|| n = "def".length
-	|| i = 2 * 3
-	for 4
-		n *= n + 3
-
-
-function DebugABC2 (|int| x, |int|)
-	|| n = 1
-	if x
-		n = 2
-	  else
-		n = 3
-	return n + 1
-
 
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
@@ -78,12 +51,6 @@ function fnStillRunning (fnConfirmCanceller)
 	if self isa perryide
 		.UpdateDebuggedApp(false)
 		return !.RunCompiledApp
-
-	
-function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
-	|| can = ConfirmCanceller(self, fn)
-	if q.confirm(can)
-		return true
 
 
 function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
@@ -230,7 +197,7 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	r.step
 	.UpdateProductText(r)
 	
-	|| x = r.Status
+	|| x = r.Status	
 	if kill or !x.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"

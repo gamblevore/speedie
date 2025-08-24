@@ -25,7 +25,7 @@ class TextViewLine (list)
 	|int|					MsgPos
 	|int|					vline
 	|int|					tline
-	|TextLineFlags|			State
+	|TextLineFlags|			TextState
 
 	constructor (|int| p=0)
 		.position = p
@@ -43,7 +43,7 @@ class TextViewLine (list)
 
 	helper ClearForPrepare
 		.message = nil
-		.state = nil
+		.TextState = nil
 		.lineerror = nil
 		.text = ""
 
@@ -66,13 +66,13 @@ class TextViewLine (list)
 
 	syntax is (|TextLineFlags| F, |bool|)
 		if self
-			return .state&F
+			return .TextState&F
 	
 	syntax is (|TextLineFlags|F, assigns:|bool|)
 		if value
-			.state |= f
+			.TextState |= f
 		  else
-			.state &= ~F
+			.TextState &= ~F
 
 	function XOfChar (|ind| Pos, |int|)
 		return .SquaresAtByte(pos) * font.width
@@ -567,7 +567,8 @@ extend message
 		
 	
 	
-function Textviewline.ReclaimStart (|int| p, |textviewline|)
+helper Textviewline.ReclaimStart (|int| p, |textviewline|)
+	description "Sigh. Just an idea to 'reclaim' existing textviewlines. Will take probably 3 days work to get this reliable. Don't wanna do this right now! Just a placeholder right now. Actual code not here." 
 	opt norefcounts
 	rz = self
 	while
