@@ -12,19 +12,30 @@ class Message (list)
 
 	description "Usage: Parse a string, get back a tree of nodes.
 
-The tree-data-structure represents your data. The Message class is similar to XML or JSON or even a sourcecode-AST. But superior to all of them.
-	"
-////////////////////////////////
+The tree-data-structure represents your data. The Message class is like a super-set of many formats at once:  XML,  JSON, source-code,  data-files,  network message,  executable files,  media-wrappers,  etc.
+
+The Message class manages to be good at all of these uses. Making it versatile. Like a universal data-format. Like the UTF-8 of data.
+
+Message is also:
+	* Memory tight (64-bytes per-node, excluding string-name).
+	* More expressive (leading to less nodes needed).
+	* Fast to parse.
+	* Saveable as text (jeebox) or binary (jbin).
+	* Elegant due to a simple model, and many utility functions.
+	* Reliable via it's error-reporting system.
+"
 	contains Message
-	|string|				Name
-	|Syntax|				Func
-	|Byte|					Indent
-	|uint16|				RangeLength
 
+////////////////////////////////
+	|string|				Name		// Decides the meaning of the node
+	|Syntax|				Func		// Decides the meaning of the node
 
-////////////////////////////////		
-	|MsgParseFlags|			Flags		// Re-purposeable.  May be set by parser.  Can affect render-style.
-	|uint16|				Tag			// Parser does not set or read these.
+	|Byte|					Indent		// Re-purposeable.  Output only
+	|uint16|				RangeLength // Re-purposeable.  Output only
+	|MsgParseFlags|			Flags		// Re-purposeable.  Input and output. Affects render-style only. Some bits unused.
+	|uint16|				Tag			// Freely-useable.  Not input or output
+//  |Object|				Obj			// Freely-useable.  Not input or output (inherited from List)
+//  |int|					Position	// Re-purposeable.  Output only
 ////////////////////////////////		
 	
 	
@@ -663,6 +674,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	
 	
 	function ParseAST (|message?|)
+		// parse and render AST could use the new «» syntax?
 		if self == @arg
 			|| f = .first$
 			f.ExpectLast
@@ -1231,18 +1243,6 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		opt norefcounts
 		for v.flat in self
 			v.position = -1
-
-	module
-		function Dictionary.Syntax (|string| Key, ||)
-			return self[key.SyntaxLower] 
-		
-
-		function String.SyntaxLower (|string|)
-			cpp_wrapper JB_Str_FastLower
-
-
-		function GetFunc (|Message| msg, |Syntaxobj|)
-			return jeebox._syxdict.Syntax( msg.name )   #expect (msg, "Can’t find syntax: ${msg.name}")
 
 
 
