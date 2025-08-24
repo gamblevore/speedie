@@ -111,7 +111,8 @@ role RogueCell	(message)
 	contains RogueObject
 	
 	constructor (|message| parent, |int| x,  |message| Type)
-		super.Constructor(parent, @tmp, x, type.name)
+		super.Constructor(parent, @tmp, type.name)
+		.Position = x
 		.msg(@arg)
 	
 	function Room (|RogueRoom|)
