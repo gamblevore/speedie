@@ -182,6 +182,8 @@ Message is also:
 		while (ch)
 			if HasArg // hanging args
 				fs.IndentLine
+			if ch == @arg
+				IDK = (ch isnt Style2)|int|
 			fs <~ (' ', IDK)
 			fs <~ ch
 			if ch == @arg

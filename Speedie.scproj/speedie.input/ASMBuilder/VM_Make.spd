@@ -278,13 +278,13 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		asm.encoders[i] ?= badencoder
 
 	
-function VMCpp (|faststring| vm, |faststring| jump)
+function VMCpp (|faststring| vm_code, |faststring| jump)
 	opt norefcounts
 	for tmp in .NameList
-		.MakeVM(tmp, vm)
+		.MakeVM(tmp, vm_code)
 		.MakeJump(tmp, jump)
 
-	vm <~ "ı \n\n"
+	vm_code <~ "ı \n\n"
 
 
 function MakeVM (|message| tmp, |faststring| vm)
