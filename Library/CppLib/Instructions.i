@@ -1,5 +1,5 @@
 ı EROR: _
-	if (u2 == u1 and u3 == u4) 
+	if (u2 == u1 and u3 == u4)  
 	VMFinish
 ;
 ı TAIL: _
@@ -64,7 +64,7 @@
 ı DIV: _
 	DivMath(r, Op);
 ı DIV2: _
-	if (i2 < 0) 
+	if (i2 < 0)  
 	i1 = (((i2 + ((1 << Div2_Shu) - 1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
 	else 
@@ -83,7 +83,7 @@
 ı MULS: _
 	i1 = (ii2 * ii3) + ii4;
 ı BFLG: _
-	if (BFLD_signu) 
+	if (BFLD_signu)  
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 ;
 	else 
@@ -114,7 +114,7 @@
 ı EQUL: _
 	u1 = BitComp(r, Op);
 ı TERN: _
-	if (u2) 
+	if (u2)  
 	r[n1] = r[n3]
 ;
 	else 
@@ -143,19 +143,19 @@
 ı JMKN: _
 	Code = JumpKNE(r, Op, Code);
 ı JBOR: _
-	if (u1 << (Bra_Smallu << 5)) 
+	if (u1 << (Bra_Smallu << 5))  
 	Code += Bra_Jmpi
 ;
 ı JBAN: _
-	if (!(u1 << (Bra_Smallu << 5))) 
+	if (!(u1 << (Bra_Smallu << 5)))  
 	Code += Bra_Jmpi
 ;
 ı LUPU: _
-	if (ii1++ < ii2) 
+	if (ii1++ < ii2)  
 	Code += Loop_Jmpi
 ;
 ı LUPD: _
-	if (ii1-- > ii2) 
+	if (ii1-- > ii2)  
 	Code += Loop_Jmpi
 ;
 ı RFAP: _
@@ -226,7 +226,7 @@
 ı RDWR: _
 	MemCopyRDWR(r, Op);
 ı FADD: _
-	if (Float_Du) 
+	if (Float_Du)  
 	d1 = d2 + d3 - d4
 ;
 	else 
@@ -235,7 +235,7 @@
 ı FADK: _
 	f1 += f2 + FloatIncr1(Op);
 ı FMUL: _
-	if (Float_Du) 
+	if (Float_Du)  
 	d1 = (d2 * d3) + d4
 ;
 	else 
@@ -244,21 +244,21 @@
 ı FMLK: _
 	f1 = f2 * FloatIncr1(Op);
 ı FDIV: _
-	if (Float_Du) 
+	if (Float_Du)  
 	d1 = d2 / d3
 ;
 	else 
 	f1 = f2 / f3
 ;
 ı FFRC: _
-	if (Float_Du) 
+	if (Float_Du)  
 	d1 = (d2 - floor(d2)) * d3
 ;
 	else 
 	f1 = (f2 - floor(f2)) * f3
 ;
 ı FCLM: _
-	if (Float_Du) 
+	if (Float_Du)  
 	d1 = std_min(std_max(d2, d3), d4)
 ;
 	else 
