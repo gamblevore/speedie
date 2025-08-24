@@ -24,10 +24,12 @@ function app.TryCompile	(|file| f)
 			.TryCompile(c)
 
 
-
 function app.TryCompileOne (|file| f)
 	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
-	if "/usr/local/bin/spd".Execute(args, processownermode.StdOutSilence).Successful
+	|| M = ProcessOwnerMode.StdOutSilence
+	|| Speedie = "/usr/local/bin/spd"
+	
+	if Speedie.Execute(args, M).Successful
 		"OK: $f"
 		return
 	fails <~ "Fail: $f\n"
