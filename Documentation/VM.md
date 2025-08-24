@@ -33,7 +33,9 @@ Speedie ASM should be 2x smaller than ARM, on average. <small>(This is just a wi
 * Branching (1 vs 2)
 * Loop specific instructions do in (1 vs 3-4).
 
-**Only needs approx-150 instructions (once finished). I have 122 so far but SIMD is missing. ARM needs over 1000!**
+**Only 122 different instructions so far. Hopefully won't increase much. ARM has over 1000!**
+
+Also simple to decode. Instructions are 4-bytes each, except for instructions from 0 to 31. In this range, they take either 8 or 12 bytes, depending on if the instruction index is odd or even. (This should help make it faster if ever turned into physical hardware.)
 
 
 ### Inbuilt ASM-Viewer
