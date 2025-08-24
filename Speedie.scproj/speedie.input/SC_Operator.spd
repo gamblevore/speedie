@@ -164,7 +164,7 @@ module {
 		Bnot.name = "~"
 
 		.AddComp("==",					&Assembler.Equals,		OpMode.ExactEquals)
-		.AddComp( "<",					&Assembler.Less,		opmode.Comparison + opmode.less)
+		.AddComp("<",					&Assembler.Less,		opmode.Comparison + opmode.less)
 		.AddComp( ">",					&Assembler.More,		opmode.Comparison + opmode.more)
 		.AddComp( "<=",					&Assembler.LessEq,		opmode.Comparison + opmode.LessOrEqual)
 		.AddComp( ">=",					&Assembler.MoreEq,		opmode.Comparison + opmode.MoreOrEqual)

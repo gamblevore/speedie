@@ -124,9 +124,10 @@ function PerryIDE.DebugPath (|message| conf)
 	app.cwd = p
 	
 	|| pwd = conf["pwd"]
-		|| path = pwd.goodname
+		|| path = pwd.GoodArgName
 		if pwd != "."
 			app.cwd = path
+
 
 
 function PerryIDE.StartDebugging (|file!| f)
@@ -145,7 +146,7 @@ function PerryIDE.StartDebugging (|file!| f)
 			a.Become(@str, str)
 			a.clear
 				
-	|| args = ArgMsg.AllNames
+	|| args = ArgMsg.DebugArgNames
 	if debugargs["flags"]["open"].yes
 		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
 		args = [f]

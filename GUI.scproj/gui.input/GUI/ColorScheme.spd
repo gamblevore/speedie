@@ -159,8 +159,16 @@ function FixupColor (|message| self, |ind| pos, |message|)
 	return self
 
 
+function AtRoot (|bool|)
+	opt norefcounts
+
+
 helper message.UseRootTmpColor (|bool|)
-	return (self == @tmp)  and  !(.flags & TextView.NotRoot)  and  .atroot
+	require (self == @tmp)
+	require	!(.flags & TextView.NotRoot)
+	|| p = .parent
+	if !p or !p.parent
+		return true
 
 
 function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)

@@ -92,7 +92,7 @@ module SC_Saver {
 				fs <~ T.ByteCount * Count
 				fs <~ ")\n"
 		
-			 else
+			  else
 				// .count[i] = loader.int|u16|				  // fine
 				// .snakegraphics[i].loadproperties(saver)	  // fine
 				fs <~ '.'
@@ -192,7 +192,7 @@ module SC_Saver {
 				if (d.itemBitCount == 32)
 					return "int"
 			return "" // fail
-		 elseif .isObject
+		  elseif .isObject
 			if self == typeString
 				return "string"
 			  elseif (self == TypeSaveable)

@@ -331,7 +331,7 @@ class SCDecl (SCObject) {
 		
 		|| Signed = s.IsSigned
 		if Op isnt ShiftOnly
-			 signed ?= t.IsSigned
+			signed ?= t.IsSigned
 		if bits > 32
 			return (typeint64, typeuint64)(signed)
 		if bits > 16

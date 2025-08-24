@@ -27,7 +27,7 @@ cpp "Abc"
 			def()
 			pos 150
 			...
-		else
+		  else
 			pos 160
 			xyz()
 			pos 170

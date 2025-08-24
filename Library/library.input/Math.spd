@@ -129,7 +129,7 @@ module Math
 	function int.Reduce (|int| d=1, |int|)
 		if (self > d)
 			return self - d
-		elseif (self < -d)
+		  elseif (self < -d)
 			return self + d
 		
 //	function int.Reduce2 (|int| d, |&int| Zeros, |int|)

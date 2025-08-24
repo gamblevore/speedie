@@ -137,24 +137,8 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	
 	if (curr == @thg) and t2.IsRegister
 		error (curr, "Can't get the address of local vars.")
-//		compiler.LaterAddressChecks <~ curr
 	
 	return true
-
-
-//function Message.ParentForAddress (|syntax|)
-//	opt norefcounts
-//	|| gotaddr = 0
-//	|| p = .parent
-//	while p
-//		|| f = p.func
-//		if (f != @Bra and @Type)
-//			if p.IsAddr
-//				gotaddr++
-//				require gotaddr <= 1
-//			  else
-//				return p.func
-//		p = p.parent
 
 
 function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
@@ -1489,7 +1473,7 @@ function TypeOfRel (ExprResolver)
 	if Custom == CustomOps.needed
 		if !comp.IsCompOrset
 			return CustomFuncOp( exp, comp, name_space, RN )
-		 if RC != TypeNil
+		if RC != TypeNil
 			if (comp is caseaware) or comp.CanOpCompare(lc, rc, exp)
 				return DoOpCompare(exp, lc, rc, comp, name_space)
 	  elseif (comp is Bit)
@@ -1620,11 +1604,15 @@ function TypeOfList (ExprResolver)
 		|| typ = TypeOfExpr(s, name_space) #require
 		|| N = typ.IsNumeric
 		if !n
-			if typ matches TypeSyntax // (@thg, "abc")  -->  @thg + "abc"
-/				if !s.next
-					s.next = @str + ""
+			// (s is inserted) checks to make sure that the user didn't type this.
+			// this is to minimise bad user-habits.
+			// it would be annoying to see lots of (@thg, "abc") instead of «thg "abc"»
+			
+			if (s is inserted)  and  typ matches TypeSyntax // (@thg, "abc")  -->  @thg + "abc"
+				if !s.next
+					s.next = «str »
 				exp.func = @rel
-				s.next = @opp + "+"
+				s.next = «opp "+"»
 				return TypeOfRel(exp, name_space, side)
 			numeric = false
 			

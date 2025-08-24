@@ -32,8 +32,8 @@ datatype Syntax (Byte)
 	function IsAdj (|bool|) 
 		return self >= @adj and self <= @badj
 
-	function IsBra (|bool|) 
-		return self == @bra or @list
+	function IsList (|bool|) 
+		return self >= @bra and self <= @Arr
 
 	function Message.Translateable (|bool|) 
 		return .Func.Translateable
@@ -93,11 +93,10 @@ datatype Syntax (Byte)
 	module 
 		|int|		CurrFuncID_
 		
-		function Func (|string?| name, |message| where=nil, |syntax|)
+		function Func (|string| name, |message| where=nil, |syntax|)
 			visible
-			if name!=nil
-				|| obj = jeebox._syxdict.valuelower(name) #expect (where, "Unknown syntax " + name)
-				return obj.id
+			|| obj = jeebox._syxdict.valuelower(name) #expect (where, "Unknown syntax " + name)
+			return obj.id
 			
 		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |int| ID,  |Syntax|) 
 			|| result = Syntaxobj.new(msg, name, ID)

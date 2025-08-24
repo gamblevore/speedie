@@ -148,7 +148,7 @@ class StringReader
 			if .length <= .startfrom
 				return true
 				
-	 function Str (|int| n, |int| skip = 0, |string|)
+	function Str (|int| n, |int| skip = 0, |string|)
 		ifn n > 0 and skip < n
 			return ""
 		if (.data.has(n)) or (.NoMoreChunksToRead)
@@ -166,8 +166,8 @@ class StringReader
 			dest += copied
 			loop Remaining > 0
 			if !.NextChunk
-				 r = r[0, r.length - remaining].copy
-				 exit
+				r = r[0, r.length - remaining].copy
+				exit
 		return r
 	
 	function HasHeader (|string| Header, |bool|)

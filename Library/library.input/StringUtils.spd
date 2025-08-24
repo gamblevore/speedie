@@ -88,10 +88,10 @@ function string.IsFileLike (|bool|)
 	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
 	
 function byte.IsTextLine (|bool|)
-	 return self == '\n' or '\r'
+	return self == '\n' or '\r'
 
 function codepoint.IsTextLine (|bool|)
-	 return self == '\n' or '\r'
+	return self == '\n' or '\r'
 
 function int.TabsWidth (|int|)
 	return 4-(self & 3)
@@ -187,6 +187,7 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			c = ' '
 		if i >= ParaMax or MaxWidth <= 0
 			return i
+
 		
 		if c == '\t'
 			i++

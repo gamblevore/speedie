@@ -117,13 +117,6 @@ struct NameAndMsg
 	|message?|   Msg
 	|string|	 Name
 	|message?|   Arg
-	
-	syntax append (|message| m)
-		opt norefcounts
-		|| msg = .msg
-			msg.prev = m
-		  else
-			.arg <~ m
 
 
 

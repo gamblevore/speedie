@@ -232,7 +232,7 @@ extend Parser
 		|| BestValue = FindError(num)
 			|| s = e[ BestValue ]
 				fs <~ s
-			else
+			  else
 				fs <~ "something"
 			return num &~ BestValue
 		

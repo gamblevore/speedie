@@ -932,7 +932,7 @@ ive been~running #since morning
 		|| i = .indent|int| align 4
 		|| f = tmp.func
 		ifn f == @tmp or @item or @decl
-			return parser.erroradd("Indented blocks not allowed here.", tmp.position)
+			return parser.ErrorAdd("Indented blocks not allowed here.", tmp.position)
 		
 		|| it = parser.MakeInvisArg( tmp )
 			it.indent = i
@@ -962,12 +962,12 @@ ive been~running #since morning
 
 
 	helper Message.IndentScore (|int|)
-		|| ind = .cleanindent
+		|| ind = .indent //&~ 1
 		if self == @tmp or @item
 			return ind + 2
 		if self == @arg
 			return ind
-		return .cleanindent
+		return ind
 		parser.erroradd("This can't be an indentation parent.", .position)
 	
 	
@@ -975,19 +975,17 @@ ive been~running #since morning
 		return parser.ErrorAlwaysAdd("Indent too low.", curr.position)
 	
 	
-	helper Message.CleanIndent (|int|)
-		return .indent &~ 1
-
-	
 	function LoweredIndent (|message| output, |message| curr, |message|)
 		Opt NoRefCounts
 	
 		|| BackPos = parser.data.find( Jeebox.CSLine, curr.position, 0 )
-		|| chin = curr.CleanIndent
+		|| chin = curr.indent|int|
 		while output.indentScore > chin
 			if output == @arg
 				if  output isnt style2
-					return parser.indentbug(curr)
+				    return parser.indentbug(curr)
+				  else
+					0
 				if backpos > 0
 					output.after = backpos
 			output = output.parent
@@ -997,7 +995,7 @@ ive been~running #since morning
 				output = output.parent!
 		
 		output <~ curr
-		if curr.CleanIndent mod 4				// ifElseStyle
+		if chin & 3				// ifElseStyle
 			return curr
 		return output
 
@@ -1006,8 +1004,8 @@ ive been~running #since morning
 /*
 	ParserLineAndIndent
 		|int|			Lines 
-		|int|			Indent
 		|int|			Pos
+		|int|			Indent
 		|bool|			IsDebug
 */
 		Opt NoRefCounts
@@ -1036,7 +1034,6 @@ ive been~running #since morning
 				State = 0
 
 			  elseif (c == ' ')
-				//     /    
 				State |= 1
 				if rz.a != 3
 					rz.b += !commas
@@ -1086,9 +1083,9 @@ ive been~running #since morning
 		rz.r += commas
 		.NextStart = n
 		
-		rz.b&=~1 // no need for odd indents
-		if ((first > 0) and !rz.r) or (rz.b < 0)
-			rz.b = -1
+//		rz.b&=~1 // no need for odd indents... or is there?
+//		if (first > 0) and !rz.r
+//			rz.b = -1 // shouldn't it be 0?
 
 
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
@@ -1112,22 +1109,24 @@ ive been~running #since morning
 		|| cf = curr.func
 		if (prev.func != @tmp) or (cf != @tmp and @bra)
 			return parser.UnexpectedSyntax(curr)
-		if curr.indent & 1
+		if curr.indent & 1 // we never seem to get this?
 			return .ErrorAdd("Indent is odd", curr.position)
+
 		parser.new(prev, @arg, curr.position)
 		prev <~ curr
 		return prev
 	 
 	 
-	function AddToOutput (|Message| Output,  |message| curr,  |message| prev,  |int| pos, |message|)
+	function AddToOutput (|Message!| Output,  |message| Curr,  |message| Prev,  |int| Pos,  |message|)
 		Opt NoRefCounts
-		if (prev)
+		|| f = Output.func
+		if (prev and !f.IsList)          // and (f==@arg or f==@tmp))
 			|| Extra = curr.PrevIndentCheck(prev)
-			if extra < 0
+			if Extra < 0
 				return parser.LoweredIndent(output, curr)
 			if Extra > 0
 				if (extra == 2) and (prev.indent|int| isa 4)
-					return .elseifadder(prev, curr)
+					return .ElseIfAdder(prev, curr)
 				return curr.GoIntoInvisArg(prev, pos)
 		output <~ curr
 		return output
@@ -1323,21 +1322,19 @@ module parser
 extend Message
 	function PrevIndentCheck (|message| pr, |int|)
 		Opt NoRefCounts
-		|| prin = pr.CleanIndent
-		|| chin =   .CleanIndent
-		require (prin != chin and prin != 254 and chin != 254)
-
-		|| IndExtra = chin - prin
+		|| prin = pr.indent|int|  &~1
+		|| chin =   .indent|int|  &~ 1
+		|| IndExtra = chin - prin #require
 		if (indExtra isa 2)
 			if indextra == 4
 				return indextra
 			if indextra < 0
-				if (indextra isa 4) or (chin isa 4) or (.InInvisArg)
+				if (indextra isa 4) or (.indent|int| isa 4) or (.InInvisArg)
 					return indextra
 			if (IndExtra > 0) and (pr == @tmp)
 				return IndExtra
 
-		parser.ErrorAlwaysAdd( "Indents mismatch ($prin vs $chin spaces)", .position )
+/		parser.ErrorAlwaysAdd( "Indents mismatch ($prin vs $chin spaces)", .position )
 
 
 	function Type (|syntax|)

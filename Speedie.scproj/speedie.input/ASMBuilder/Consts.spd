@@ -214,7 +214,7 @@ function ConstifyFloatPlus (fn_ASMConstifier)
 		  else
 			lf += rf
 		return lf.asint
-	else
+	  else
 		|| rf = r.F64
 		|| lf = l.F64
 		if l is alternate

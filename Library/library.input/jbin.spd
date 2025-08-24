@@ -39,7 +39,7 @@ role JBin (Faststring)
 	linkage: cpp_part bin
 	constructor         (|syntax| type=@arg, |string| name="")
 		cpp_part Constructor
-		 self <~ _JbinHeader
+		self <~ _JbinHeader
 		.enter(type, name)
 	constructor (|int| n)
 		cpp_part Constructor0

@@ -33,46 +33,13 @@ role MessageTable (Dictionary)
 	syntax append (|message| Msg)
 		cpp_part AppendMsg
 		super.valuelower(msg.name) = msg
-		
 	
-function message.AllNames (|[string]|)
-	opt norefcounts
-	for s in self
-		|| i = s.GoodName
-		if i != string.error
-			rz <~ i
 
 
 function message.List (|[Message]|)
 	opt norefcounts
 	for s in self
 		rz <~ s
-
-
- // we want something that looks like it could have a name
-function message.GoodName (|bool| NeedName=false, |string|)
-	|| name = .GoodNamesub
-		return name
-	if name.isok and needname
-		error (self, "No name found")
-		return string.Error
-	return name
-
-
-function message.SmartName (assigns:|string|)
-	if .name != value
-		.name = value // save memory for often generated strings
-	
-	
-helper message.GoodNameSub (|bool| NeedName=false, |string|)
-	opt norefcounts
-	|| f = .func
-	if f.IsString or f == @thg or @num
-		return .name
-	if (f == @tmp) and !.IsFirst
-		return .name
-	error (self, "Make sure this item is a string or a proper-name.")
-	return string.Error
 
 
 function ivec4.List (|message|)

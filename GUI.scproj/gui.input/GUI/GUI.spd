@@ -287,8 +287,8 @@ module GUI
 		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC ||| SDL_INIT_JOYSTICK)
 
 		|| DS = .CurrDisplaySize
-		|| W = SDL_CreateWindow(.NiceAppName.cstr,
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DS.x, DS.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
+		|| W = SDL_CreateWindow(.NiceAppName.cstr, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+			DS.x, DS.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)

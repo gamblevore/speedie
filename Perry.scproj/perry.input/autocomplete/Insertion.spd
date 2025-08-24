@@ -205,7 +205,8 @@ function message.FindPrms (|int| p, |message|)
 	opt norefcounts
 	for ch.flat in self
 		require ch.position < p
-		if ch.func.IsBra and ch.after > p
+		|| fn = ch.func
+		if (fn == @bra or @list) and (ch.after > p)
 			return ch
 
 

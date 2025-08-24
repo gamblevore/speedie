@@ -240,19 +240,20 @@ helper _chdir (|string| path, |ErrorInt|)
 
 
 render MemoryUsage (|int| Over=0)
-	fs <~ "\n"
-
 	|[message]| items
 	
 	for cls in classdata.First
-		|| Mem = cls.memoryused
+		|| Mem = cls.MemoryUsed
 		if mem > over
-			items <~ message(cls.name.str, mem)
+			|| s = message(@str, cls.name.str)
+			s.Position = mem
+			items <~ s
 	
 	items.sort(MessagePositionSorter)
+
+	fs <~ "\n"
 	for I in items
 		fs.memoryreport(i.name, i.position)
-
 	fs <~ "\n"
 
 	fs.memoryreport("obj",	.ObjMemory)

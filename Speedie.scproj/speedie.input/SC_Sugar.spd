@@ -40,6 +40,7 @@ function message.BecomeAppend (|string| s)
 	|| p = .parent!
 	require p.expect(@rel)
 	p.become(@dot, s)
+	|| x = «dot "abc"»
 	.obj = nil
 	.func = @prm
 	|| n = .next

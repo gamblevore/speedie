@@ -39,10 +39,10 @@ class list (Saveable)
 	function Prev (assigns:|...?|)		{ cpp_wrapper JB_Ring_PrevSibSet }
 
 	function First (||)					{ cpp_wrapper JB_Ring_First, nil checker }
-	function First (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_FirstSet, nil checker }
+	function First (assigns:||)			{ cpp_wrapper JB_Ring_FirstSet, nil safe }
 	
 	function Last (||)					{ cpp_wrapper JB_Ring_Last, nil checker }
-	function Last (assigns:||, |bool|)	{ cpp_wrapper JB_Ring_LastSet, nil checker }
+	function Last (assigns:||)			{ cpp_wrapper JB_Ring_LastSet, nil safe}
 
 	function Second (||)
 		nil checker
@@ -65,13 +65,6 @@ class list (Saveable)
 		opt norefcounts
 		while (|| l = src.Last)
 			.First = l
-
-	function AtRoot (|bool|)
-		opt norefcounts
-		|| p = .parent
-		if !p or !p.parent
-			return true
-
 	
 	syntax Compare (|int| n, |bool| Aware, |int|)
 		(Aware)

@@ -43,4 +43,37 @@ function @string.ASCII_Chart (|int| StartAt=32, |string|)
 		fs <~ '\n'
 	return fs
 
-		
+
+	
+function message.DebugArgNames (|[string]|)
+	opt norefcounts
+	for s in self
+		|| i = s.GoodArgName
+		if i != string.error
+			rz <~ i
+
+
+function message.GoodArgName (|bool| NeedName=false, |string|)
+	|| name = .GoodArgNameSub
+		return name
+	if name.isok and needname
+		error (self, "No name found")
+		return string.Error
+	return name
+	
+
+function message.SmartName (assigns:|string|)
+	if .name != value
+		.name = value // save memory for often generated strings
+	
+	
+helper message.GoodArgNameSub (|string|)
+	opt norefcounts
+	|| f = .func
+	if f.IsString or f == @thg or @num
+		return .name
+	if (f == @tmp) and !.IsFirst
+		return .name
+	error (self, "Make sure this item is a string or a proper-name.")
+	return string.Error
+

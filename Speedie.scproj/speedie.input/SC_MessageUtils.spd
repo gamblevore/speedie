@@ -448,9 +448,15 @@ function message.WrapWith (|syntax| f, |string| s="", |message!|)
 	rz <~ self
 
 
+function message.ReplaceInto (|message| w, |message|)
+	.prev = w
+	w <~ self
+	return w
+
+
 function Message.NeedBra (|Message|)
 	if (self == @Bra or self in @bra)
-		 return self
+		return self
 	
 	return .wrapwith(@bra)
 

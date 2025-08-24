@@ -318,30 +318,6 @@ function NilFunction (NilTrackerFn)
 
 
 
-// if its a reference... the object should be assumed real
-//    $string? should be how we say its not
-
-function NilRefTest1 (|$object| X)
-	X = X
-
-
-function NilRefTest2 (|$string| X)
-	X = ""
-
-
-function NilRefTest3 (|$string| X)
-	if (0.5[])
-		X = ""
-
-
-function NilRefTest4 (|$string?| X)
-	if (0.5[])
-		X = ""
-	  else
-		x = nil
-
-
-
 function Rejoin (NilTrackerFn)
 	opt norefcounts
 	return .jump(msg.first!, Test) 
@@ -843,18 +819,13 @@ function message.Trueness (|nilstate| found, |maybebool|)
 	  elseif Ret.IsDataTypeOnly and d.IsDataTypeOnly // nothing special
 		while self == @arg or @bra
 			self = self.last
-		|| rtf = ret.type.false
-		if rtf and self and self matches rtf
+		if self matches ret.type.false
 			return maybebool.Known(false)
 	// return maybe
 
 
-function scdecl.IsProperlyLocal (|bool|)
-	require self is local
-	if .IsBareStruct
-		return false
-	// what about a struct?
-	return true
+function message.operatormatches (|message| m, |bool|)
+	return self and m and (.func == m.func)  and  (.name ~= m.name)
 
 
 function scdecl.Paramfix

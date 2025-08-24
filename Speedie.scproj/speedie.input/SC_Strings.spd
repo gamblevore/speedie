@@ -320,21 +320,41 @@ function message.Tran_Isnt (|string| name)
 		self <~ type
 
 
+
+function message.ElseIfIndentBad (|bool|)
+	opt norefcounts
+	|| bb = .prev
+	if bb is Inserted
+		return !(.indent & 2)
+
+	return !(self in @tmp)
+
+
 function message.FixElseif
 	opt norefcounts
 	|| curr = .next
-	|| f = .first // cond
-	|| needarg = f and (f.next != @arg)
-		
-	while (curr istmp "else" or "elseif")
+	|| f = .first // cond 
+	|| NeedArg = f and (f.next != @arg)
+	
+	while curr istmp "else" or "elseif"			
+		if curr.ElseIfIndentBad
+			|| s = "Add two spaces to nicely indent this"
+			if curr.indent&1
+				s = "Add one space to nicely indent this"
+			problem (curr, s)
 		|| n = curr.next
-		if needarg
+		if NeedArg
 			using (self)
 				self <~ @arg
 				needarg = false
 		self <~ curr
 		curr = n
 	
+	|| inner = self[2] // hopefully theres an @arg before us
+	while inner
+		if inner.indent&1
+			problem (inner, "Indent is odd")
+		inner++
 
 
 function message.Tran_With 
@@ -411,26 +431,6 @@ function Message.BunchFixPrepare (|Message|)
 		return p
 	return scfunction.tempmoveout(self).last!
 
-
-
-/*
-	({
-		|| _t = _0|()--|
-		if !_t
-			_t = _1|()--|
-		rejoin _t
-	})
-*/
-
-// only has 1 caller. why not fix this to use the above macro?
-//function Message.BunchFix 
-//	using (self)
-//	|| P			= .BunchFixPrepare
-//	|| subject		= P.first!
-//	|| multi_opp	= subject.Next
-//		.RelFix(false)
-//		P.ReplaceWith(self)
-//		multi_opp.BunchFixSub(subject, self)
 
 	
 function Message.BunchlessFix

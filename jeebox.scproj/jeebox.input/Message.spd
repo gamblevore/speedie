@@ -12,9 +12,9 @@ class Message (list)
 
 	description "Usage: Parse a string, get back a tree of nodes.
 
-The tree-data-structure represents your data. The Message class is like a super-set of many formats at once:  XML,  JSON, source-code,  data-files,  network message,  executable files,  media-wrappers,  etc.
+The tree-data-structure represents your data. The Message class acts as a super-set of many formats:  XML,  JSON, source-code,  data-files,  network message,  executable files,  media-wrappers,  etc.
 
-The Message class manages to be good at all of these uses. Making it versatile. Like a universal data-format. Like the UTF-8 of data.
+The Message class is versatile enoguh to good at all of these. Like a universal data-format. Like the UTF-8 of data.
 
 Message is also:
 	* Memory tight (64-bytes per-node, excluding string-name).
@@ -54,7 +54,6 @@ Message is also:
 		.Tag		= other.Tag
 		
 
-
 	constructor
 		cpp_part ConstructorEmpty
 		
@@ -89,16 +88,6 @@ Message is also:
 		.tag		= parser.Using.Tag
 
 	
-	constructor (|string| name, |int| BytePos)
-		description "Special message constructor. Intended for re-purposing the message-class."
-		cpp_part ConstructorItems
-
-		.name		= name
-		.Position	= BytePos
-		.func		= @str
-		.flags		= parser.using.Flags
-		.tag		= parser.Using.Tag
-
 
 ///////////////////////////////////////////////////////////////////////////////
 	
@@ -106,37 +95,31 @@ Message is also:
 		if .objectid == 1234
 		super.obj = value
 */
+		
+
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
 		rz = pos_msg ?? self
 		using rz
-			rz = .CopyWithoutUsing(pos_msg)
+			rz = .CopySub(pos_msg)
 	
 	
-	function CopyWithoutUsing (|message?| P = nil, |Message!|)
+	helper CopySub (|message?| P = nil, |Message!|)
+		description "Same as message.copy, except that it doesn't use self's position as the default one." 
 		opt norefcounts
 		rz = message(self)
 		if P
 			rz.position = P.position
 			rz.rangelength = P.rangelength
-		for v in self
-			rz <~ v.CopyWithoutUsing(P)
-
-
-	operator matches (|message| m, |bool|)
-		return .func == m.func  and  .name ~= m.name
+		for v.fast in self
+			rz <~ v.CopySub(P)
 
 
 	operator Starts (|string| s, |bool|)
 		return .name[0, s, true]
 
 
-////////////////////////////////////////////////////////////////////////////////
-	
-	
-	function string.IsStatementName (|bool|)
-		return (jeebox.cswordmiddle contains self) and (!self[].IsInt)
-	
+////////////////////////////////////////////////////////////////////////////////	
 	
 	syx Nil (WildCard)
 		Opt NoRefCounts
@@ -186,23 +169,24 @@ Message is also:
 	
 	syx Tmp (Statement)
 		Opt NoRefCounts
-		if .name.IsStatementName
-			fs <~ .name
+		|| n = .name
+		if (jeebox.cswordmiddle contains n) and !(n[].IsInt)
+			fs <~ n
 		  else
 			fs <~ '+'
 			fs.AppendQuotedEscape(.name, '\'')
 
-		require .hasany
-
-		|| ch = .First
+		|| ch = .First$
 		|| HasArg = false
+		|| IDK = 1
 		while (ch)
 			if HasArg // hanging args
 				fs.IndentLine
-			fs <~ ' '
+			fs <~ (' ', IDK)
 			fs <~ ch
 			if ch == @arg
 				hasarg = true
+			IDK = 2
 			ch++
 
 
@@ -212,6 +196,7 @@ Message is also:
 
 
 	syx Ques (Question)
+		opt norefcounts
 		fs <~ "–"
 		fs <~ .name
 
@@ -273,10 +258,11 @@ Message is also:
 		fs <~ ")#"
 	
 	syx Str (String)
+		opt norefcounts
 		fs <~ '"'
 		fs.appendescape(.name)
 
-		for (ch in self)
+		for (ch.fast in self)
 			if (ch == @Emb)
 				fs.appendescape(ch.Name)
 			  else
@@ -288,6 +274,7 @@ Message is also:
 
 
 	syx Unit						// 20cm
+		opt norefcounts
 		|| num = .FirstName
 		fs <~ num
 		if (num.ishexlike) and (num.last != '_')       // 0xFF
@@ -301,8 +288,8 @@ Message is also:
 
 	
 	syx Name
+		opt norefcounts
 		|| ch = .First
-		if (ch)
 			fs <~ .Name      // sonic
 			fs <~ " @ "			
 			fs <~ ch         // the~hedgehog
@@ -312,6 +299,7 @@ Message is also:
 
 
 	syx Dot (Dot)					// x.fn(a)
+		opt norefcounts
 		|| ch = .First
 			fs <~ ch
 		fs <~ '.'
@@ -321,6 +309,7 @@ Message is also:
 		
 
 	syx SDot (Self_Dot)
+		opt norefcounts
 		// .fn
 		// .fn(a)
 
@@ -330,12 +319,14 @@ Message is also:
 
 
 	syx Func (Function)					// fn(a)
+		opt norefcounts
 		|| ch = .First                  #require
 		fs <~ ch
 		fs <~ ch.Next
 	
 	
 	syx BRel (Before_Relationship)
+		opt norefcounts
 		fs <~ .name
 		fs <~ .First
 	
@@ -359,6 +350,7 @@ Message is also:
 
 
 	syx Acc (Access)				// b[2]
+		opt norefcounts
 		|| f = .first
 			fs <~ f
 			f = f.next
@@ -369,6 +361,7 @@ Message is also:
 //                                   a: b
 // if we can use a name... we can avoid needing two items?
 // problem with that is its very non-standard. Saves 1/3 nodes for XML->jb, though?
+		opt norefcounts
 		|| ch = .First	#require
 		fs <~ ch
 		fs <~ ": "
@@ -376,6 +369,7 @@ Message is also:
 
 	
 	syx Bra (Bracket)
+		opt norefcounts
 		fs <~ '('
 		fs <~ .First
 		fs <~ ')'
@@ -388,7 +382,7 @@ Message is also:
 		if (self is style2)
 			sep = "\n"
 			fs <~ sep
-		for ch in self
+		for ch.fast in self
 			if ++count > 1
 				fs <~ sep
 			fs <~ ch
@@ -402,7 +396,7 @@ Message is also:
 	syx Prm (Parameter_List)
 		Opt NoRefCounts // much simpler!
 		fs <~ '('
-		for ch in self
+		for ch.fast in self
 			fs <~ ", "
 			start
 			fs <~ ch
@@ -419,7 +413,7 @@ Message is also:
 		Opt NoRefCounts // much simpler!
 		fs <~ .name
 		.indent++
-		for ch in self
+		for ch.fast in self
 			fs.IndentLine
 			fs <~ ch
 		.indent--
@@ -428,7 +422,7 @@ Message is also:
 	syx Quot (Quotation)
 		Opt NoRefCounts
 		fs <~ "“"
-		for ch in self
+		for ch.fast in self
 			fs <~ ch
 			if (ch.next)
 				fs <~ ", "
@@ -451,6 +445,7 @@ Message is also:
 		
 	
 	syx ERel (Equals_Relationship)
+		opt norefcounts
 		|| ch = .First					#require
 		fs <~ ch
 		fs <~ ' '
@@ -554,6 +549,7 @@ Message is also:
 
 	
 	syx SCom (Syntactic_Comment)
+		opt norefcounts
 		|| ch = .first
 		if !ch
 			fs <~ " /# "
@@ -573,8 +569,8 @@ Message is also:
 	syx Msg (Message_List)
 		opt norefcounts
 		fs <~ "«"
-		if .name
-			fs <~ .name
+		|| n = .name
+			fs <~ n
 		  else
 			fs <~ ('"', 2)
 		
@@ -606,6 +602,7 @@ Message is also:
 
 	
 	syx url (URL)
+		opt norefcounts
 		fs <~ .Name
 		fs <~ "://"
 		|| f = .first
@@ -623,8 +620,8 @@ Message is also:
 	
 	function ConvertJSONToJB
 		Opt NoRefCounts
-		for (m in self)
-			if (m == @item)
+		for m.fast in self
+			if m == @item
 				|| Tmp = m[@nil] // a string
 					m.prev = Tmp
 					Tmp.Func = @tmp
@@ -646,6 +643,7 @@ Message is also:
 
 
 	render JDB2_  (|int| Flags = 1)			//  function ast,  message.ast
+		opt norefcounts
 		if flags&1
 			fs <~ "«"
 		fs <~ .Func.name
@@ -654,7 +652,7 @@ Message is also:
 			fs.AppendQuotedEscape(( .name[0,32] , .name )(flags & 2))
 		if .hasany
 			fs.indent++
-			for ch in self
+			for ch.fast in self
 				fs.IndentLine
 				ch.jdb2_(flags, fs)
 			fs.indent--
@@ -665,8 +663,9 @@ Message is also:
 	
 	
 	render RenderAST (|int| flags=1)
+		opt norefcounts
 		if (self == @arg) and (.isroot)
-			for ch in self
+			for ch.fast in self
 				ch.jdb2_(flags, fs)
 				fs <~ '\n'
 		  else
@@ -698,7 +697,7 @@ Message is also:
 
 	function FSListSep (|FastString| fs, |String| sep)
 		opt norefcounts
-		for (ch in self)
+		for (ch.fast in self)
 			fs <~ sep
 			start
 			fs <~ ch
@@ -715,7 +714,7 @@ Message is also:
 			fs.IndentLine
 			fs <~ "^"
 			fs.AppendQuotedEscape(.name)
-		for ch in self
+		for ch.fast in self
 			if AddLine
 				fs.IndentLine
 			fs <~ ch
@@ -791,14 +790,14 @@ Message is also:
 		cpp_part FindSyx
 		nil self // remove once we improve the nil-checker to "link" variables
 		Opt NoRefCounts
-		for ch in self
+		for ch.fast in self
 			if ch == s
 				return ch
 
 	function FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
 		opt norefcounts
 		nil self // remove once we improve the nil-checker to "link" variables
-		for s in self
+		for s.fast in self
 			if s.func == fn and s.name == name
 				rz <~ s
 		
@@ -807,8 +806,9 @@ Message is also:
 	function Find (|Syntax| s, |string| name, |bool| Err = false, |Message|)
 		cpp_part FindSyxName
 		opt norefcounts
-		for ch in self
-			if (ch == s  and  ch ~= name): return ch
+		for ch.fast in self
+			if (ch == s  and  ch ~= name)
+				return ch
 
 		if Err
 			.AccessErr(s, name, nil)
@@ -817,7 +817,7 @@ Message is also:
 	function Find (|string| name, |Message|)
 		cpp_part FindName
 		Opt NoRefCounts
-		for ch in self
+		for ch.fast in self
 			if ch ~= name
 				return ch
 	
@@ -829,7 +829,7 @@ Message is also:
 			if curr == fn or fn == nil
 				if name == nil  or  curr ~= name: Return curr
 		if err
-			.accesserr(fn, name, nil)
+			.AccessErr(fn, name, nil)
 	
 	
 	function FastString.MsgErrorName (|string?| name)
@@ -903,17 +903,17 @@ Message is also:
 		error (self, fs)
 	
 
-	syntax call (|string| key, |Message|)
+	syntax Call (|string| key, |Message|)
 		Opt NoRefCounts
 		if self
-			for item in self
+			for item.fast in self
 				if item ~= key
 					return item.GiveArg
 			return .msg(@tmp, key).GiveArg
 		return message() // sigh
 
 
-	syntax append (|string| key)
+	syntax Append (|string| key)
 		cpp_part AppendString
 		self <~ (@str, key)
 
@@ -930,7 +930,7 @@ Message is also:
 		return .msg(@arg)
 
 
-	syntax access (|Syntax| Need, |syntax| OK, |Message|)
+	Syntax Access (|Syntax| Need, |syntax| OK, |Message|)
 		cpp_Part NeedSyxOK
 		Opt NoRefCounts
 		if self
@@ -945,7 +945,7 @@ Message is also:
 		return self[@nil]
 
 
-	syntax access (|Syntax| s, |Message|)
+	Syntax Access (|Syntax| s, |Message|)
 		cpp_Part NeedSyx
 		Opt NoRefCounts
 		|| found = .first
@@ -964,7 +964,7 @@ Message is also:
 		.accesserr(s, Nil, ch)
 	
 	
-	syntax access (|Syntax| s, |string| name, |Message|)
+	Syntax Access (|Syntax| s, |string| name, |Message|)
 		cpp_Part NeedSyxName
 		Opt NoRefCounts
 		|| f = self[s] // why @nil?
@@ -972,17 +972,17 @@ Message is also:
 			return f
 	
 		
-	syntax access (|string| key, assigns:|string|)
+	Syntax Access (|string| key, assigns:|string|)
 		cpp_part SetStr
 		self[key] = @str.msg(Value)
 
 
-	syntax access (|string| key, assigns:|int64|)
+	Syntax Access (|string| key, assigns:|int64|)
 		cpp_part SetInt
 		self[key] = value.msg
 
 	
-	syntax access (|string| key, assigns:|message|)
+	Syntax Access (|string| key, assigns:|message|)
 		cpp_part SetMsg
 		opt norefcounts
 		.AccessAdd(key) <~ Value		
@@ -1010,27 +1010,29 @@ Message is also:
 
 	function Become (|int64| num)
 		cpp_part BecomeNum
-		.clear
 		.func = @num
 		.name = num.render
+		.clear
+
 
 	function Become (|message| src)
 		cpp_part BecomeMsg
-		.BecomeSub(src)
-		.TakeAllFrom(src)
-	
-	helper BecomeSub (|message| src)
 		.func = src.func
 		.name = src.name
 		.clear
+		.TakeAllFrom(src)
+	
 
 	function BecomeCopy (|message| src)
-		.BecomeSub(src)
+		.func = src.func
+		.name = src.name
+		.clear
 		src.CopyAllInto(self)
+
 
 	function CopyAllInto (|Message| j)
 		opt norefcounts
-		for c in self
+		for c.fast in self
 			j <~ c.Copy(j)
 
 	
@@ -1061,11 +1063,11 @@ Message is also:
 			.accesserr(Need, nil, ch)
 
 
-	syntax equals (|string?| name, |bool|Aware, |bool|)
+	syntax Equals (|string?| name, |bool|Aware, |bool|)
 		return self and .name.SyntaxEquals( name, aware )
 
 
-	syntax equals (|Syntax| X, |bool|Aware, |bool|)
+	syntax Equals (|Syntax| X, |bool|Aware, |bool|)
 		cpp_part EqualsSyx
 		(Aware)
 		return self and (.Func == X)
@@ -1078,12 +1080,6 @@ Message is also:
 	
 	function HasPosition (|bool|)
 		return .Position >= 0
-
-
-	function ReplaceInto (|message| w, |message|)
-		.prev = w
-		w <~ self
-		return w
 
 
 	function Export (|FastString| fs)
@@ -1225,15 +1221,9 @@ Message is also:
 		|| p = .parent
 			return p.func == f
 
-	operator In (|syntax| f, |string| name, |bool|)
-		cpp_Part InStr
-		opt norefcounts
-		|| p = .parent
-			return p.func == f and p.name == name
-
 	function IsContainer (|bool|)
 		|| f = .func
-		return f == @arg or @list or @prm or @arr or @bra
+		return f == @arg or @list or @prm or @arr or @bra or @msg
 
 	function IsString (|bool|) // use .expectstring if you need this to be a string
 		if self
@@ -1252,3 +1242,4 @@ Message is also:
 function FastString.SyntaxAppend (|Message| msg)
 	if (msg)
 		(msg.Func.RenderAddr)( msg, self )
+
