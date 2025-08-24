@@ -2,6 +2,7 @@
 
 || Fails = faststring()
 
+
 main (|[file]| Files)
 	for f in files
 		if f.MustExist
@@ -19,8 +20,8 @@ function app.TryCompile	(|file| f)
 	require f.IsDir
 
 	for c.files in f
-		if !c.IsLink		// LOYOUPSz // (This means LLOOPPPz to non-stupid people who'r from not-stupid dimentshun)
-			.TryCompile(c)  // GNO FNARK gNUR GNORSHELF
+		if !c.IsLink // avoid loops lol.
+			.TryCompile(c)
 
 
 

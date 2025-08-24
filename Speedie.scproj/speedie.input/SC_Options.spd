@@ -119,7 +119,6 @@ module Feedback
 				nil|asmreg|.DebugPrint
 				nil|message|.PrintLocate
 //				fdb(nil|[scfunction]|)
-				nil|DataTypeCode|.DebugPrint
 				|fatasm| X
 				X.DebugPrint
 	
