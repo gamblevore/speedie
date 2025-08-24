@@ -28,12 +28,12 @@ Speedie ASM should be 2x smaller than ARM, on average. <small>(This is just a wi
     * Div2 (fast divide by power of 2, on signed ints)  (1 vs 2)
     * Integer Min / Max  (1 vs 3)
     * Multiply or add by a immediate constant, on both ints and floats (1 vs 2)
-    * Increment/decrement  objects and globals (1 vs 3)
+    * Increment/decrement memory (1 vs 3)
 * 64-bit direct constants (and 48-bit and 16-bit versions) without needing to load from a separate location.
 * Branching (1 vs 2)
 * Loop specific instructions do in (1 vs 3-4).
 
-**Only needs approx-100 instructions (once finished). I have 87 so far but SIMD is missing. ARM needs over 1000!**
+**Only needs approx-150 instructions (once finished). I have 122 so far but SIMD is missing. ARM needs over 1000!**
 
 
 ### Inbuilt ASM-Viewer
