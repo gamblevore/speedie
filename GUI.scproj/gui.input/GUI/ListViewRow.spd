@@ -24,7 +24,6 @@ role ListViewRow (message)
 		if self
 			return .tag & s
 
-
 	syntax is (|ListViewState| s, assigns:|bool| b)
 		|| t = .tag
 		|| t2 = t ||| s
@@ -35,7 +34,7 @@ role ListViewRow (message)
 			.tag = t2
 
 
-	helper Vis (|int|i, |bool|)
+	helper Vis (|int| i, |bool|)
 		if !self
 			return true
 		return !((.Indent)&(1<<i))
@@ -70,17 +69,7 @@ role ListViewRow (message)
 		if (self is expanded) or (self == root)
 			return .flatnext
 		return .next ?? .flatafter
-		
-	
-	function InView (|listview| Of, |bool|)
-		opt norefcounts
-		|| f = of.scrollstart$
-		for of.VisibleRows
-			if f == self
-				return true
-			f++
-			require f
-		
+				
 	
 	helper ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
 		// So... what are columns
@@ -151,9 +140,10 @@ role ListViewRow (message)
 			where.horz	= z2.h
 			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1.0)
 				
-		if self is Grayed
-			|| gr = colors.gray(0.4*str)
-			where.DrawRect(z2 + (0,0,0,-1), gr)
+		if self is Disabled
+			|| c = mix(p.GNormal.BG.Color, vec4(0.5), 0.5)
+			c.a = (str * 0.7) min 1.0
+			where.DrawRect(z2 + (0,0,0,-1), c)
 
 		if self is found
 			z2 += (0, 1, 0, 0)
@@ -198,18 +188,20 @@ datatype ListViewState (uint16)
 		Align		= [AlignCenter, AlignRight]
 		Selected 
 		Modified
+
 		Disabled
-		Grayed
+		Broken		// we tried to use the item but it failed
+
 		Active
 		Editable
-		Broken		
-		Dead		
 		Expanded
 		Found
 		Hierarchical
 		DrawWhiteSpace
-		Hidden
+		Hidden // 13. Close to last!
+		
 	syntax is (|ListViewState| s, |bool|)
+		(Hidden)
 		return self & s
 
 

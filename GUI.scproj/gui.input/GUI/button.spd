@@ -38,12 +38,6 @@ class ButtonView (GUIControl)
 			if !pressing
 				.MouseDownDoesClick = true
 			rz = menu(self, nil, ret)
-
-
-//	function Attach (|guicontrol| p)
-//		.SubControl = p
-//		self <~ p
-//		p.ClickOutsideCloses = true
 	
 	
 	function SubMenu (|menu|)
@@ -222,7 +216,7 @@ class ButtonView (GUIControl)
 		return mousedragging.EvenIfNoMovement
 
 	
-	function ivec4.TextCorner (|drawstyle| g, |string| T, |ListViewState|C, |ivec2|)
+	function ivec4.TextCorner (|drawstyle| g, |string| T, |ListViewState| C, |ivec2|)
 		|| MV = (.height - g.height(t))-3
 		if C & ListViewState.aligncenter
 			|| MH = .width - g.width(t)
@@ -236,7 +230,7 @@ class ButtonView (GUIControl)
 			return xy 
 
 
-	function DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
+	helper DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
 		|| disabled = (i and i is disabled) or (self isnt enabled)
 			grow = nil
 		if .MenuIsOpen
@@ -289,20 +283,20 @@ class ButtonView (GUIControl)
 		|| TextCol = colors.white
 		textcol.a = fader
 		pn.x = where.DrawText(t,  Pn, TextCol, DrawInvis) + 2
+		
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
-			if  !disabled and .pressing  and  r.Width > 19  
-				(pn.x min= r.x2-2)
-				|| ago = -.DelayTill.guiago.Float
-					ago *= 4	// effect needs improving
-					if ago > 4	// perhaps something like soft-explode or at least half-pixels
-						ago = 4 // also the maths is wrong somehow...
-					  else
-						.Touch
-					pn.y -= (ago-4.0)|int|
-				  elseif .MenuIsOpen
-					pn.y += 4
-//				where.noclip // hmmmm
-				where.DrawText("\03", pn, TextCol, DrawInvis)
+		require  mi and !disabled and .pressing  and  r.Width > 19  
+		(pn.x min= r.x2-2)
+		|| ago = -.DelayTill.guiago.Float
+			ago *= 4		// effect needs improving
+			if ago > 4		// perhaps something like soft-explode or at least half-pixels
+				ago = 4		// also the maths is wrong somehow...
+			  else
+				.Touch
+			pn.y -= (ago-4.0)|int|
+		  elseif .MenuIsOpen
+			pn.y += 4
+		where.DrawText("\03", pn, TextCol, DrawInvis)
 		
 		
 	function ListViewRow.ButtonText (|string| Default, |string|)
@@ -312,8 +306,8 @@ class ButtonView (GUIControl)
 		rz ?= Default
 		if self is Broken
 			rz += " \17"
-		if self is dead
-			rz += " (!)"
+//		if self is dead
+//			rz += " (!)"
 		if self is Modified
 			rz += "*"
 
@@ -339,7 +333,7 @@ class ButtonView (GUIControl)
 
 	function TrimWidth
 		|| n = .items.slowcount max 1
-		|| w = n * (.itemwidth + .itemgap) - .ItemGap
+		|| w = n * (.ItemWidth + .ItemGap) - .ItemGap
 		.sizer.g(2, self)	= (w) ~ long
 
 			

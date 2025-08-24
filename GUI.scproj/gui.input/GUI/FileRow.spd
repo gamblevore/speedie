@@ -324,7 +324,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 	for f.files in pf // merge these two
 		|| p = f.path
 		|| n = p.name
-		if AllSight or n.platformvisible(ATroot)
+		if AllSight or n.PlatformVisible(ATroot)
 			if --max <= 0
 				exit
 			|| isdirlike = f.isdirlike
@@ -346,7 +346,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 					if isdirlike or f.isdir
 						ext = ext.pathdir
 					isok = types.typecontains(ext)
-			(r is Grayed) = !ISOK 
+			(r isnt disabled) = IsOK 
 			
 	s.filesort
 	return true

@@ -141,7 +141,7 @@ function PerryIDE.ActualCompile (|string| operation)
 	(.RunButton isnt enabled)
 	(.Progress is visible)
 
-	is active
+	(self is active)
 	.ShowCompileTab(.SpeedieText)
 	.ViewAsCurr
 

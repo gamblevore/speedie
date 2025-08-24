@@ -244,7 +244,7 @@ function OnAskSaveAnswer (GUIAction)
 
 function OpenSaveDialog.GoIntoFolder (|bool|)
 	|| f = .files.FirstSelected as filerow #expect beep
-	|| Acceptable = (f isnt grayed) #expect beep
+	|| Acceptable = (f isnt disabled) #expect beep
 	if f.asdir
 		if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")
 			.path.text = f.location

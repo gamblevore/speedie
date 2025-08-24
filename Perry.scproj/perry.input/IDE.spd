@@ -23,7 +23,7 @@ class PerryIDE (Window)
 	
 	|FileRow?|					NotTodo
 	|message?|					CurrASMFunc
-	|message?|					SharedProjectTabSource
+	|listviewrow?|				SharedProjectTabSource
 	|message?| 					LostFunks
 	|[guicontrol]|				Views
 	|File|						Project

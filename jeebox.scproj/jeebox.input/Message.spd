@@ -170,7 +170,7 @@ Message is also:
 	syx Tmp (Statement)
 		Opt NoRefCounts
 		|| n = .name
-		if (jeebox.cswordmiddle contains n) and !(n[].IsInt)
+		if (jeebox.CSWordMiddle contains n) and !(n[].IsInt)
 			fs <~ n
 		  else
 			fs <~ '+'
@@ -178,17 +178,20 @@ Message is also:
 
 		|| ch = .First$
 		|| HasArg = false
-		|| IDK = 1
 		while (ch)
 			if HasArg // hanging args
 				fs.IndentLine
-			if ch == @arg
-				IDK = (ch isnt Style2)|int|
-			fs <~ (' ', IDK)
+			|| spaces = 1
+			|| fn = ch.func
+			if fn == @arg
+				spaces = (ch isnt Style2)|int|
+			  elseif fn == @tmp
+				spaces = 2
+			
+			fs <~ (' ', spaces)
 			fs <~ ch
-			if ch == @arg
+			if fn == @arg
 				hasarg = true
-			IDK = 2
 			ch++
 
 

@@ -47,7 +47,6 @@ class FileViewer (ListView)
 			.size 			= 400~wide by 15~high
 			.OnKeyDown		= QuickOpenKey
 			.OnTextChanged	= QuickOpenModified
-//			.takesfocus		= takesfocusflag.On
 			.onfocus		= QuickOpenFocus
 			.SingleLine		= TextView.SingleLine
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
@@ -442,7 +441,6 @@ class FileViewer (ListView)
 					ch += "/"
 				|| ffr = filerow(s, ch)
 				if filter and !(ch.name starts filter)
-					(ffr is Grayed)
 					(ffr is Disabled)
 				items <~ ffr
 		items.sort(FileRowScoreSorter)
