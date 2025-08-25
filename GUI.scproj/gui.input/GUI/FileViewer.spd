@@ -669,7 +669,7 @@ function FileViewerCopyPath (GuiMenuEvent)
 	opt norefcounts
 	if Clicked
 		|| row = clicked.row as FileRow
-			clipboard.text = row.location
+			row.location.NotifyCopy
 
 
 function FileViewerTrash (GuiMenuEvent)
