@@ -63,30 +63,31 @@ Module MZLab
 		return true
 
 
-	function TestCompression
-		|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
-		require f.exists
-		for ch in f.ListFiles
-			if ch.visible
-				|| s = ch.ReadAll
-				|| c = s.compress
-				|| d = c.Decompress
-				expect s == d
-
-		"TestCompression passed."
+	target debugcompressrion
+		function TestCompression
+			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
+			require f.exists
+			for ch in f.ListFiles
+				if ch.visible
+					|| s = ch.ReadAll
+					|| c = s.compress
+					|| d = c.Decompress
+					expect s == d
 	
+			"TestCompression passed."
+		
 	
-	function TestChunkedCompression
-		// useful for jbin and exec.
-		|| fs = FastString()
-		"abcabc".compress(fs)
-		"defdef".compress(fs)
-		"ghighi".compress(fs)
-		|| y = fs.GetResult.Stream()
-		// so... now we have a stream. lets read from it.
-		expect y.Decompress == "abcabc"
-		expect y.Decompress == "defdef"
-		expect y.Decompress == "ghighi"
+		function TestChunkedCompression
+			// useful for jbin and exec.
+			|| fs = FastString()
+			"abcabc".compress(fs)
+			"defdef".compress(fs)
+			"ghighi".compress(fs)
+			|| y = fs.GetResult.Stream()
+			// so... now we have a stream. lets read from it.
+			expect y.Decompress == "abcabc"
+			expect y.Decompress == "defdef"
+			expect y.Decompress == "ghighi"
 		
 
 
