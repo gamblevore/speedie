@@ -38,7 +38,7 @@ class ListView (GUIControl) {
 	|DrawStyle|						gRowSel 
 	
 	|GUIListEditEvent?|				TryEditCell
-	|GUIListEvent?|					WasEdited
+	|GUIListEvent?|					OnChange
 	|GUIListEvent?|					OnSelected
 	|GUIKeyEvent?|					OnKeyDown
 	|GUIListEvent?|					OnReturn
@@ -78,7 +78,7 @@ class ListView (GUIControl) {
 		|| o = cell.row
 		.touch
 		.show(o)
-		(.WasEdited)(self, o)?
+		(.OnChange)(self, o)?
 		(.onselected)(self, o)?
 		return true
 

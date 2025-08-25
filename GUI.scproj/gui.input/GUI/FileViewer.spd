@@ -345,24 +345,17 @@ class FileViewer (ListView)
 			return true
 	
 	
-	helper BatchFindSub (|string| str, |message| all, |message| Recent, |uint| id, |bool| DoReplace)
-		opt norefcounts
-		|| Remain = 10K
+	function BatchFind (|string| str,  |bool| ForReplace,  |message| FoundList,  |uint| FindID=0)
+		require str
+		
+		|| Remain = 6K
 		for f in self
 			if (f isa filerow) // in case someone added bad stuff.
-			    if .CanFind(f, id)
-					f.FindInFile(str, all, Recent, Remain, DoReplace)
+				if .CanFind(f, FindID)
+					f.FindInFile(str, FoundList, Remain, ForReplace)
 			  else
 /				f.remove
-		
-	
-	function BatchFind (|string| str,  |bool| ForReplace,  |message| Result,  |uint| FindID=0)
-		require str
-		|| Recent = Message()
-		.BatchFindSub(str, Result, Recent, FindID, ForReplace)
-		Result.sort(ErrorSearchSorter)
-		Recent.sort(ErrorSearchSorter)
-		Result.TakeAllFrom(recent)
+		FoundList.sort(BatchFindSorter)
 	
 
 	function HideOpenList (|bool|)
@@ -473,33 +466,30 @@ class FileViewer (ListView)
 			opt norefcounts
 			|| o = cell!.row as filerow
 				return o.moveto(value)
-			
-		function FileRowScoreSorter (SorterComparerFileRow)
+		
+		
+		function FileRowScoreSorter (SorterComparer of FileRow)
 			opt norefcounts
-			if b.rangelength == a.rangelength
-				|| aprj = a.InMainProj
+			if b.rangelength == .rangelength
+				|| aprj = .InMainProj
 				|| bprj = b.InMainProj
 				if aprj == bprj
-					return FileRowNameSorter(a, b)
+					return FileRowNameSorter(self, b)
 				return bprj - aprj
 				
-			return b.rangelength - a.rangelength
+			return b.rangelength - .rangelength
 
 
-		function ErrorSearchSorter (SorterComparerError)
-			// spds first.
-			|| an = a.path.name 
+		function BatchFindSorter (SorterComparer of Error)
+			|| an = .path.name 
 			|| bn = b.path.name 
 			|| ae = an.ext
 			|| be = bn.ext
-			|| it = isbetter(ae, be, "spd")
-				rz = (it == 1)|int|
-			  else
-				it = isbetter(ae, be, "box")
-				if it
-					rz = (it == 1)|int|
-				  else
-					rz = (an ~< bn, ae ~< be)(be == ae)
+			// spds first.
+			rz = isbetter(ae, be, "spd")
+			rz ?= b.flags - .flags
+			rz ?= isbetter(ae, be, "box")
+			rz ?= (an ~< bn, ae ~< be)(be == ae)
 
 
 		function FileRowNameSorter (SorterComparerFileRow)
@@ -565,7 +555,7 @@ class FileViewer (ListView)
 				return (sh, 0)
 
 
-		helper isbetter (|string| a, |string| b, |string| ext, |int|)
+		helper IsBetter (|string| a, |string| b, |string| ext, |int|)
 			if (b == ext) != (a == ext)
 				return (a==ext)+1
 
@@ -667,7 +657,7 @@ function FileViewerCreateFile (GuiMenuEvent)
 
 function FileViewer.SomethingChanged (|filerow?| row)
 	.TryReloadPath
-	(.WasEdited)(self, row)?
+	(.OnChange)(self, row)?
 
 
 function File.CreateEmpty (|bool|)
@@ -709,4 +699,3 @@ function FileViewerSearchWithin (GuiMenuEvent)
 	
 
 prototype SorterComparerFileRow (|filerow| a, |filerow| b, |int|)
-prototype SorterComparerError   (|error|   a, |error|   b, |int|)

@@ -220,26 +220,24 @@ class FileRow (ListViewRow)
 			return f.ReadAll
 
 
-	function FindAllParent (|message| FoundList, |message| RecentList, |error|)
+	function FindAllParent (|message| FoundList, |error|)
 		rz = error(nil, .location, errorseverity.ok)
 		(rz|listviewrow| is expanded)
-		rz.name = ("\11 ", "\19 ")(!.asdir) + .location.name
+		rz.name = ("\t\11 ", "\t\19 ")(!.asdir) + .location.name
 		rz.path = .location
 		rz.obj = self
 		rz.position = -1
-		if ._document.viewdate?
-			RecentList <~ rz
-		  else
-			FoundList <~ rz
+		FoundList <~ rz
+		rz.flags = (._document.viewdate?!=0)|int|
 
 
-	function FindInFile (|string| text,  |message| FoundList,  |Message| RecentList,  |$int| Remain,  |bool| DoRepl)
+	function FindInFile (|string| text,  |message| FoundList,  |$int| Remain,  |bool| DoRepl)
 		require text
-		|| t		= .FileData$
+		|| t = .FileData$
 		
-		|error| parent // this is never returned? why is it made?
-		|| Lim		= Remain
-		|| i		= 0
+		|error| parent
+		|| Lim = Remain
+		|| i = 0
 		|| LastBefore = -1
 		
 		while (i < t.length) and (lim > 0)
@@ -257,7 +255,7 @@ class FileRow (ListViewRow)
 				if !text[0].iswhite
 					s = s.trim.remove(jeebox.csline)
 				|| result = error(nil, ErrorSeverity.OK)
-				parent ?= .FindAllParent(FoundList, RecentList)
+				parent ?= .FindAllParent(FoundList)
 				parent <~ result
 				
 				lim--

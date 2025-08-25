@@ -154,7 +154,7 @@ extend PerryIDE
 			
 			.GNormal.Solid = LeftBG
 			.OnRightClick = PerryFileViewRightClick
-			.WasEdited = PerryRecheckEvent
+			.OnChange = PerryRecheckEvent
 			.UseColorScheme	= true
 			.OneAlwaysSelected = true
 			.SetFocus
