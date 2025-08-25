@@ -136,21 +136,22 @@ module Perry
 		.BuildAppMenu
 		.LoadRecents
 	
-		|| p = app.prefs
-		|| old = p["currproj"]
-		.Projects = p["lastproj", @arg]|listviewrow|
-			
-		
 		if app.CWD == "/"
-			app.args.remove("YES", true)
+			app.args.remove("YES", true)	// MacOSX work around bug
 
 		if filedes.StdOut.IsTerminal
-			app.AllowInteruptCrash = true // fails with 0 params... sigh whatever
+			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
 		
-		if !.LoadWindowsFromArgs
+		if .LoadWindowsFromArgs
+			|| oof = .Projects.First
+				oof.ide.showide
+		  else
+			.Projects = app.prefs["lastproj", @arg]|listviewrow|
 			.LoadWindowsSub
-		|| oof = (.FindProj(old),  .Projects.First)(old)
-			oof.ide.showide
+		
+			|| old = app.prefs["currproj"]
+			|| oof = (.FindProj(old),  .Projects.First)(old)
+				oof.ide.showide
 		
 		perry.FinishedStartUp = true
 			

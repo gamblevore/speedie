@@ -246,8 +246,8 @@ module GUI
 			.Sizeraw = s
 
 		for w in window.all
-			if !w.PostLoaded
-				w.PostLoaded = true
+			if !w._PostLoaded
+				w._PostLoaded = true
 				w.__PostLoad__
 
 
@@ -930,7 +930,10 @@ module GUI
 		return SDLActivity.Terminating
 
 
-	function FileDroppedIntoApp (|window| w, |string| path, |SDLEventType| t, |int|)
+	helper FileDroppedIntoApp (|window| w, |SDL_DropEvent| Drop, |SDLEventType| t, |int|)
+		|| path = drop.file.copy
+		memory.free((drop.file)|&byte|)
+		Drop.file = nil
 		|| p = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)
 		|| c = w[.MouseXY] ?? w
 		c.DoPaste(path, p)
@@ -938,7 +941,7 @@ module GUI
 		return SDLActivity.activity
 
 
-	function AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
+	helper AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
 		opt norefcounts
 		if !.TextInputEnabledAtStart or ev.command
 			return true
@@ -968,7 +971,7 @@ module GUI
 		return .MenuAt(xy, test) ?? self[xy]
 
 
-	function StandardKeys (|keys| key, |bool|)
+	helper StandardKeys (|keys| key, |bool|)
 		opt norefcounts
 		|| w = window.front						#require
 		|| cmd = keys.cmd
@@ -1090,7 +1093,7 @@ module GUI
 			return SDLActivity.activity
 		
 		if t is DROPFILE or Droptext
-			return .FileDroppedIntoApp(w, ev.drop.filestr, t)
+			return .FileDroppedIntoApp(w, ev.drop, t)
 		
 		if t is DropComplete
 			w.DroppingInto = nil
@@ -1158,6 +1161,8 @@ module GUI
 			if !w
 				return sdlactivity.exiting
 								// or .front should only return visible windows...
+			if w.isdialog
+/				return 0 // hmmm. now what to do?
 			if !.WontCloseMainWindow(w)
 				return 0
 			.Quitreason |= SDLActivity.activity
@@ -1286,6 +1291,9 @@ module GUI
 		beep.OK = 1
 		
 		keys.AddKey(key)
+		if keys.cmd and key != 'v'
+			key.eat
+
 		if !w.openedmenu and !.AllowKeyDown(kev)
 			return SDLActivity.nothing
 		

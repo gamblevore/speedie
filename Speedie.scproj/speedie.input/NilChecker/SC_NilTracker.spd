@@ -96,7 +96,7 @@ struct ArchonPurger
 		if d isnt Grabbed						// grabbed's previous use was only on properties. can't clash.
 			t.closers[n] = ToClose
 		
-		d.ArgDepth = ArgDepth
+//		d.ArgDepth = ArgDepth
 		d.DepthOfBranch = .BranchDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
@@ -129,7 +129,7 @@ struct ArchonPurger
 		.rowend = .Neel + 63
 		.Realnesses = -1
 		loops = nil
-		ArgDepth = 1
+//		ArgDepth = 1
 		.AnyReturns = false
 		.RootReturned = false
 		.CheckNilCheck(F)
@@ -152,6 +152,10 @@ struct ArchonPurger
 
 	function FinishNil (|SCFunction| f)
 		opt norefcounts
+		if NewFuncsLoaded
+			NewFuncsLoaded = false
+			linkmap.Collect(f) // more ;|
+			
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
@@ -185,9 +189,10 @@ struct ArchonPurger
 
 	module
 		|LoopInfo| 				Loops
-		|int|					ArgDepth
+//		|int|					ArgDepth
 		|ArchonPurger|			T
 		|byte|					OldPrint
+		|bool|					NewFuncsLoaded
 
 
 		function Value (|NilRecord|)
@@ -212,7 +217,6 @@ struct ArchonPurger
 			
 			|| arg = t.Startnil(f)
 				Argument(arg)
-//				.CloseVars(f.sourcearg!, 0)
 				if t.FnAbleToNilCheck and !f.isnilchecker
 					f.isnilchecker = 1
 			t.FinishNil(f)

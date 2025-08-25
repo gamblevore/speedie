@@ -1,6 +1,6 @@
 
 
-// We should have its own memory-allocator, at least for fixed-size allocations.
+// Could use its own memory-allocator, at least for fixed-size allocations.
 class GridSection
 	contains uint64
 	|&...|		Map

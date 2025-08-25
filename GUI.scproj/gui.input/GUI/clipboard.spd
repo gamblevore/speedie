@@ -1,51 +1,61 @@
 
 
 module clipboard
+	|string| _InternalCopy
+
 	cpp_Wrapper SDL_GetClipboardText (|cstring|) 
-	cpp_wrapper SDL_SetClipboardText (|cstring| s)
-	
-	|stringzeroterminated| _backup = ""
+	cpp_wrapper SDL_SetClipboardText (|cstring| s, |errorint|)
+		
+	function Data (|string|)
+		|| cstr = .SDL_GetClipboardText
+		|| s = cstr.str
+			return s
+		return _InternalCopy
+			
 	function Text (|string|)
-		|| s = .SDL_GetClipboardText.sdltext
-		if !s
-			return ._backup
-		|| s2 = s.FixLineEndings
-			s = s2
-		  else
-			Notifications <~ "Can't fix line-endings in clipboard text."
-		return s
+		return .data.FixLineEndings
 	
 	function Text (assigns: |string| s)
-		if s // don't copy empty string!
-			._backup = s.cstr // macos hates copying binary data.
-			if keys.Shift
-				._backup = ._backup.TabsToSpaces
-			.SDL_SetClipboardText(._backup)
+		description "Pass valid UTF-8 only" 
+		expect (s) (beep)
+
+
+		if s.FindBadUTF8
+			_InternalCopy = s
+			return .Clear
+
+		|| c = (s.TabsToSpaces, s)(keys.shift)
+		|| z = c.cstr
+		|| err = .SDL_SetClipboardText(z.addr|cstring|)
+		if err!=0
+			Notifications.NotifySDLError
 		  else
-			beep
+			_InternalCopy = ""
+		
+	function Clear
+		|byte[1]| null 
+		.SDL_SetClipboardText((&null[0])|cstring|)
 
 
-function cstring.SDLText (|string|)
-	|| s = string.wrap(self).copy
-	memory.free(self|&byte|)
-	return s
+	function NotifiedText (assigns: |string| s)
+		opt norefcounts
+		if s
+			.text = s
+			Notifications <~ "Copied: " + s
+	
+		
 
-
-function string.FixLineEndings (|string| dest="\n", |StringThatWasReadSafely|)
-	|| type = .DetectLineEndings
-	if type <= 1
-		return self
-	if !type.IsPow2
-		return string.error // sigh
-	if type == 4
-		return .ReplaceAll("\r\n", dest)
-	return .ReplaceAll("\r", dest)
+function string.FixLineEndings (|string| dest="\n", |String|)
+	|| type = .DetectLineEndings &~ 1
+		if type & 4
+			self = .ReplaceAll("\r\n", dest)
+		if type & 2
+			self = .ReplaceAll("\r", dest)
+	return self
 	
 	
-function string.DetectLineEndings (|int|)
-	|| n = .Length
-	for i in n
-		|| c = self[i]
+helper string.DetectLineEndings (|int|)
+	for (c in self) (i)
 		if c == 10
 			rz |= 1
 		  elseif c == 13

@@ -126,6 +126,11 @@ module Notifications
 		|| p = data.parse.Rand
 			Notifications.SilentAppend(prefix + p.name)
 
+	cpp_wrapper SDL_GetError (|cstring|)
+		
+	function NotifySDLError
+		opt norefcounts
+		self <~ sdl_geterror().copy		
 
 
 function error.Useable (|date| ago=8s, |error|)

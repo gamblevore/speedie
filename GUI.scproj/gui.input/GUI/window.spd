@@ -6,7 +6,6 @@ class Window (GUIControl)
 	|byte| 								SimulationFPS
 	|bool|								IsDialog
 	|bool|								IsMainWindow
-	|bool|								_NeedsResize
 	|GUIControl?|						Focus
 	|Guicontrol?|						InnerFocus
 	|GUIControl?|						CurrMouseDown
@@ -31,7 +30,9 @@ class Window (GUIControl)
 	|uint16| 							_FrameNext
 	|date| 								_LastTimeSeen
 	|byte|								_FlashSelf
+	|bool|								_NeedsResize
 	|bool|								_BlockRecurseKeyDown
+	|bool|								_PostLoaded
 	|TaskGUI?|							_Scroller
 	|GuiControl?|						_SelBeforeMouseDown
 
@@ -280,16 +281,6 @@ class Window (GUIControl)
 				if menu.__keydown__(key)
 					return true
 				return (menu is typethrough or f in menu) and f.__keydown__(key)
-
-/*
-				if menu isnt typethrough
-					if key isnt tab
-						return menu.__keydown__(key)
-					menu.CloseMenu
-					
-				  elseif key isnt tab
-					return menu.__keydown__(key) or (f.__keydown__(key))
-*/
 		
 		if key is tab
 			f ?= .first

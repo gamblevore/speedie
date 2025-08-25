@@ -118,6 +118,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	Prms.Func = @prm
 	Prms.First = upon
 
+	NewFuncsLoaded = true
 	dot.memorylayer.use
 	|| f = message(@thg, fn.exportname)
 	f.Position = dot.position
@@ -580,7 +581,7 @@ function StatExpr (NilTrackerFn)
 function Argument (NilTrackerFn)
 	opt norefcounts
 	|| VarDepth = .value.DepthOfVars
-	ArgDepth++
+//	ArgDepth++
 	
 	for s.fast in msg
 		|| t = test & -s.islast
@@ -595,7 +596,7 @@ function Argument (NilTrackerFn)
 		if rz is Killer
 			exit
 	
-	--ArgDepth
+//	--ArgDepth
 	|| FinalVars = ArchonPurger.value
 	|| Allowed = (1|uint64| << ((vardepth+1)<<1)) - 1|uint64|
 	t.value = FinalVars & Allowed

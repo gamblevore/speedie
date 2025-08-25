@@ -19,7 +19,7 @@ class StringZeroTerminated (string)
 		return .addr|cstring|
 	
 	syntax cast (|cstring|)
-		return .cstring
+		return .addr|cstring|
 
 	module
 		function New (|cstring| s, |StringZeroTerminated|)

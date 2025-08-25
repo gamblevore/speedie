@@ -1,10 +1,13 @@
 
+
 class FileRow (ListViewRow)
+// this would be better if it were simply a normal class set on message.Obj
+// then fileviewer can handle it...
 	linkage
 		cpp_part FR
 	|string|						Location
 	|Document?|						_Document
-	|date|							ReloadedAt
+	|date|							DateOfFileAtRead
 	|string|						DirFile
 	|int|							LastSize
 	|int|							LastScroll
@@ -114,8 +117,8 @@ class FileRow (ListViewRow)
 		|| l = .location
 			|| f = l.file
 			|| d = f.modified
-			if d > .reloadedat
-				.reloadedat = d
+			if d > .DateOfFileAtRead
+				.DateOfFileAtRead = d
 				.ReloadFiles(f, fv)
 			fv.checksize
 	
@@ -172,7 +175,7 @@ class FileRow (ListViewRow)
 
 
 	helper FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
-		.ReloadedAt = fol.modified
+		.DateOfFileAtRead = fol.modified
 		for f.files in fol // merge these two
 			|| name = f.path.name
 			|| ext = name.ext
@@ -223,12 +226,11 @@ class FileRow (ListViewRow)
 	function FindAllParent (|message| FoundList, |error|)
 		rz = error(nil, .location, errorseverity.ok)
 		(rz|listviewrow| is expanded)
-		rz.name = ("\t\11 ", "\t\19 ")(!.asdir) + .location.name
+		rz.name = ("\11 ", "\19 ")(!.asdir) + .location.name
 		rz.path = .location
 		rz.obj = self
 		rz.position = -1
 		FoundList <~ rz
-		rz.flags = (._document.viewdate?!=0)|int|
 
 
 	function FindInFile (|string| text,  |message| FoundList,  |$int| Remain,  |bool| DoRepl)
@@ -287,6 +289,38 @@ class FileRow (ListViewRow)
 				if r isa filerow
 					if r.location.name ~= name
 						return r
+
+		helper error.ViewDate (|date|)
+			opt norefcounts
+			|| f = .obj as FileRow
+				|| d = f._Document
+					return d.ViewDate
+		
+		function BatchFindSorter (SorterComparer of Error)
+			// the document viewfrom date logic elsewhere
+			// via load seems buggered somehow.... not sure why?
+			|| an = .path.name 
+			|| bn = b.path.name 
+			|| ae = an.ext
+			|| be = bn.ext
+			// spds first.
+			rz = isbetter(ae, be, "spd")
+			if !rz
+				|| af = .ViewDate
+				|| bf = b.ViewDate
+				rz = bf - af
+			if !rz
+				rz = isbetter(ae, be, "box")
+			if !rz
+				if be ~!= ae
+					rz = ae.syntaxcompare(be)
+				  else
+					rz = an.syntaxcompare(bn)
+
+		helper IsBetter (|string| a, |string| b, |string| ext, |int|)
+			if (b == ext) != (a == ext)
+				return (a==ext)+1
+
 		
 	
 

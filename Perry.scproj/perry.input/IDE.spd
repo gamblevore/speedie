@@ -568,28 +568,24 @@ class PerryIDE (Window)
 			return ClickedPrevNext(.gonext)
 		if key is b
 			Clickedcompile(.buildbutton)
-			key.eat
 			return true
 		if key is r
 			if keys.Shift
 				PressingDebug(.runbutton)
 			  else
 				ClickedDebug(.runButton)
-			key.Eat
 			return true
 		if key is o
 			if keys.shift
 				clickedopenfile(self)
 			  else
 				clickedopenproj(self)
-			key.eat
 			return true
 		if key is n
 			if keys.shift
 				clickedCreatefile(self)
 			  else
 				clickedCreateproj(self)
-			key.eat
 			return true
 //		if key is m
 //			return .markup()
@@ -673,8 +669,9 @@ class PerryIDE (Window)
 		if .OpenedMenu or key.IsModifier
 			return false
 		require !keys.cmd
-		if .focus isnt editable
-			.Editme.SetFocus
+		
+		ifn .focus isa textview // the main listview IS considered editable!
+			.Editme.SetFocus	// should I just do this anyhow?
 			return .editme.__KeyDown__(key)
 
 	

@@ -19,13 +19,10 @@ extend_module ErrorReceiver
 		|| Lower = stderr.LowerErrorsTo
 			sev = lower|int| min sev
 		if stderr.CanAddMore(sev)
-			if desc == nil
+/			if !desc
 				desc = node.MiniName("Unexpected ")
 			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path??"")
 
-
-function Message.ErrorLocation (|string| desc = "", |string|)
-	return Error(self, desc).render
 
 
 function Message.FilePath (|string|)
@@ -51,27 +48,4 @@ extend_module Error
 		if !Overflow
 			Str = "Can’t parse number. Found: " + num[pos].render
 		nil|errorreceiver| <~ error(where, str)
-
-
-	function From (|message?| self, |error|)
-		opt norefcounts
-		require self
-		if self != @arg
-			return .AsError
-		rz = error()
-		for s in self
-			rz <~ s.AsError
-	
-	
-function message.AsError (|error|)
-	rz = error(nil|message|)
-	|| arg = .Last
-	if arg == @arg
-		rz.position = arg..pos.int|int|
-		rz.path	= arg..file.value
-		rz.severity = arg..severity.int|errorseverity|
-		rz.name	= arg[@str].name
-	  else
-		rz.name = .name
-		rz.path = ""
 

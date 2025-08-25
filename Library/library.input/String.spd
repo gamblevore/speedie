@@ -548,7 +548,7 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_MidEquals
 
-	syntax Compare (|string| Other, |bool|Aware, |int|)
+	syntax Compare (|string| Other, |bool| Aware=true, |int|)
 		cpp_part CompareStr
 		return .Compare(other, Aware)
 
@@ -561,7 +561,7 @@ class String
 		nil self
 		cpp_wrapper JB_Str_Equals
 	
-	syntax Equals (|int| Other, |bool|Aware, |bool|)
+	syntax Equals (|int| Other, |bool| Aware, |bool|)
 		cpp_part EqualsInt
 		(aware)
 		return .length == other

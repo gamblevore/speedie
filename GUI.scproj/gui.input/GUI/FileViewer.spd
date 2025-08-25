@@ -355,7 +355,7 @@ class FileViewer (ListView)
 					f.FindInFile(str, FoundList, Remain, ForReplace)
 			  else
 /				f.remove
-		FoundList.sort(BatchFindSorter)
+		FoundList.sort(&filerow.BatchFindSorter)
 	
 
 	function HideOpenList (|bool|)
@@ -406,7 +406,7 @@ class FileViewer (ListView)
 			if HasSel and p isnt UnSelectable
 				(p is selected)
 				HasSel = false
-			m.flags = p.flags
+			m.tag = p.tag
 			self <~ m
 			m.obj = p
 		(self is visible) = items.length > 0
@@ -479,19 +479,6 @@ class FileViewer (ListView)
 				
 			return b.rangelength - .rangelength
 
-
-		function BatchFindSorter (SorterComparer of Error)
-			|| an = .path.name 
-			|| bn = b.path.name 
-			|| ae = an.ext
-			|| be = bn.ext
-			// spds first.
-			rz = isbetter(ae, be, "spd")
-			rz ?= b.flags - .flags
-			rz ?= isbetter(ae, be, "box")
-			rz ?= (an ~< bn, ae ~< be)(be == ae)
-
-
 		function FileRowNameSorter (SorterComparerFileRow)
 			opt norefcounts
 			|| c = b.asdir - a.asdir
@@ -555,11 +542,6 @@ class FileViewer (ListView)
 				return (sh, 0)
 
 
-		helper IsBetter (|string| a, |string| b, |string| ext, |int|)
-			if (b == ext) != (a == ext)
-				return (a==ext)+1
-
-
 helper string.PlatformVisible (|bool| AtRoot, |bool|)
 	require self[0] != '.'
 	if !atroot
@@ -614,7 +596,7 @@ function fileviewer.RightClickFileList (GUIListEvent)
 		m <~ ("Show In Desktop",	FileViewerCMMShow)
 		m <~ ("Copy File Path",		FileViewerCopyPath)
 		m <~ ("Rename File",		FileViewerRenameFile)
-		m.addsep
+		m.AddSep
 		|| within = .FindSearchWithin
 			m <~ ("Search Within: " + within.name, FileViewerSearchWithin, within)
 		
@@ -669,7 +651,7 @@ function FileViewerCopyPath (GuiMenuEvent)
 	opt norefcounts
 	if Clicked
 		|| row = clicked.row as FileRow
-			row.location.NotifyCopy
+			clipboard.NotifiedText = row.location
 
 
 function FileViewerTrash (GuiMenuEvent)

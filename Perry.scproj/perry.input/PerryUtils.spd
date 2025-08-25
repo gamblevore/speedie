@@ -77,3 +77,26 @@ helper message.GoodArgNameSub (|string|)
 	error (self, "Make sure this item is a string or a proper-name.")
 	return string.Error
 
+
+function @error.From (|message?| self, |error|)
+	opt norefcounts
+	require self
+	if self != @arg
+		return .AsError
+	rz = error()
+	for s in self
+		rz <~ s.AsError
+	
+	
+function message.AsError (|error|)
+	rz = error(nil|message|)
+	|| arg = .Last
+	if arg == @arg
+		rz.position = arg..pos.int|int|
+		rz.path	= arg..file.value
+		rz.severity = arg..severity.int|errorseverity|
+		rz.name	= arg[@str].name
+	  else
+		rz.name = .name
+		rz.path = ""
+

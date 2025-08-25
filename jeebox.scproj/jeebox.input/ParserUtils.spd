@@ -127,6 +127,7 @@ helper String.ParseSub (|syntax| Owner, |MessageRoot|)
 extend Parser
 	function fError (ParseHandler)
 	    return nil // seems OK... doesn't need to do more
+
 	function fError2 (ParseHandler)
 		return .erroradd("Unexpected syntax", start)
 	

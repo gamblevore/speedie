@@ -209,9 +209,6 @@ struct SDL_DropEvent
     |Uint|		timestamp			/**< In milliseconds, populated using SDL_GetTicks() */
     |cstring|	file				/**< Should be freed with SDL_free(), NULL on begin/complete */
     |Uint|		windowID			/**< The window that was dropped on, if any */
-    
-    function FileStr (|string|)
-		return .file.sdltext
 
 
 

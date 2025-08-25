@@ -757,7 +757,7 @@ Message is also:
 			A = A.flatnext
 			b = b.flatnext
 
-		
+	
 	function Name (|string|)
 		nil safe
 		if self
@@ -847,13 +847,13 @@ Message is also:
 		errorreceiver.NewError( found, fs.getresult )
 
 
-	function ExpectLast (|string| err="", |bool|)
-		opt norefcounts
+	function ExpectLast (|string?| Err=nil, |bool|)
+		opt NoRefCounts
 		if self
 			|| N = .next
-				N.syntaxexpect(err)
-			  else
+			if !N
 				return true
+			N.SyntaxExpect(err)
 
 
 	function ExpectString (|bool|)
@@ -1053,8 +1053,8 @@ Message is also:
 		cpp_part Fail
 		errorreceiver.NewError( self, Error )
 
-	Syntax Deprecate ( |string| Error = "Deprecated." )
-		.SyntaxProblem(error)
+//	Syntax Deprecate ( |string| Error = "Deprecated." )
+//		.SyntaxProblem(error)
 
 	Syntax Problem ( |string?| Error = nil )
 		errorreceiver.NewProblem( self, Error )

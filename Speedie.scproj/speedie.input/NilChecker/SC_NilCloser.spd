@@ -74,7 +74,7 @@ extend_module ArchonPurger
 			t.closers[from] = nil
 			from--
 	
-		if argdepth > 1
+		if 0//argdepth > 1
 			while OrigDepth > 0
 				.UpdateFoundPlace(argument, OrigDepth--)
 		

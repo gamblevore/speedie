@@ -91,7 +91,8 @@ datatype cstring
 		cpp_wrapper strlen
 	
 	function Copy (|string|)
-		return string.copy(self|&byte|, .length)
+		|| n = .length
+			return string.copy(self|&byte|, n)
 	
 	function PrintLine
 		cpp_wrapper puts // hehe
@@ -112,7 +113,6 @@ datatype cstring
 		return self|&byte|
 	
 	render
-		if fs_in
-			fs_in <~ self
-		  else
+		if !fs_in
 			return .copy
+		fs_in <~ self

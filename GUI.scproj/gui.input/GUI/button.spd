@@ -91,16 +91,6 @@ class ButtonView (GUIControl)
 			if i is Selected
 				return i
 
-//		|| InScroll = .MouseMoveInScrollArea(P)
-//		if state is enter or moved
-//			if InScroll
-//				SystemCursor.hand.use
-//			  else
-//				|| InLines = ._LineNumWidth and (State isnt leave) and (p.x < .LineNumRight)
-//					SystemCursor.hand.use
-//				  else
-//					super.MouseMove(p, move, state)
-
 	behaviour MouseMove
 		opt NoRefCounts
 		if state isnt LEAVE

@@ -130,21 +130,16 @@ function ClickedOpenRecent (GUIaction)
 			.OpenMenu
 
 
-function string.NotifyCopy
-	clipboard.text = self
-	Notifications <~ "Copied: " + self
-
-
 function MenuCopyProject (guimenuevent)
 	opt norefcounts
 	|| ide = menu.ide
-		ide.project.NotifyCopy
+		clipboard.notifiedtext = ide.project
 
 
 function MenuCopyFile (guimenuevent)
 	opt norefcounts
 	|| ide = menu.ide
-		ide.Path.NotifyCopy
+		clipboard.notifiedtext = ide.Path
 
 
 function MenuCloseProject (guimenuevent)

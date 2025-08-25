@@ -5,16 +5,19 @@ class GUIControl (list)
 	
 	contains GuiControl
 	
+	
+	|GUIAction?|				OnClicked
+	|GUIAction?|				OnFocus
+	|GUIPasteEvent?|			OnPaste
+	|GUICopyEvent?|				OnCopy
+
 	|ivec4| 					LastRect
 	|string|					ID
 	|string|					Text
 	|string|					Tooltip
 	|object?|					Tag
 	|Drawstyle|  				GNormal
-	|GUIAction?|				OnClicked
-	|GUIAction?|				OnFocus
-	|GUIPasteEvent?|			OnPaste
-	|GUICopyEvent?|				OnCopy
+	
 	|TimeFader|					Declutterer
 	|ControlSize|				Sizer
 	|uint16|					TabIndex
@@ -26,7 +29,6 @@ class GUIControl (list)
 	|byte|						TextAlteredForDraw
 	|byte|						Padding
 	|byte|						ExpandOnMouseOver
-	|bool|						PostLoaded
 	|bool|						ClickOutsideCloses
 	|bool|						_CanSeeAllLines
 	|CopyPasteFlags|			CopyPaste

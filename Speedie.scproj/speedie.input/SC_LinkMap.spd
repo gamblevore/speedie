@@ -35,6 +35,7 @@ module LinkMap
 		opt norefcounts
 		for s in compiler.funclist
 			.collect(s)
+		scfunction.currfunc = nil
 
 
 	function Collect (|scfunction| self)
