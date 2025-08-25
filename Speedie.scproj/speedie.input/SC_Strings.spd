@@ -48,6 +48,7 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 	if msg.FindNested( @thg, "fs" )
 		SCStrings.RenderFinish.CopyAllBeforeInto( arg, arg )
 		SCStrings.RenderFinish.CopyAllAfterInto( arg, arg )
+	
 	if msg.isbehaviour
 		msg.second.remove
 		return true
@@ -190,7 +191,8 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 function String.ParseCleanWipe (|Message|)
 	rz = .parseclean
 	if rz
-		rz.wipepositions
+		for v.flat in rz
+			v.position = -1
 
 
 function String.ParseClean (|Message|)

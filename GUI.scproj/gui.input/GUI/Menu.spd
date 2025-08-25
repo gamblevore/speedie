@@ -38,7 +38,7 @@ class Menu (ListView)
 		if .ClickedScroll(P, clicks)
 			return mousedragging.within
 		|| L = .FindClicked(P) as listviewrow
-		if L isnt disabled
+		if L isnt UnSelectable
 			if L isnt selected
 				.Select(L)
 			  else
@@ -69,8 +69,7 @@ class Menu (ListView)
 		if !l
 			return true
 		._SelJustChanged = false
-		if (l isnt disabled)
-			.Select(l)
+		.Select(l)
 		return moved or ._SelJustChanged 
 	
 		
@@ -175,7 +174,7 @@ class MenuItem (ListViewrow)
 		.MenuEvent = ev
 		.obj = obj
 		isnt editable
-		(self is disabled) = (name == "")
+		(self is Separator) = (!name)
 		
 	render
 		fs <~ .name

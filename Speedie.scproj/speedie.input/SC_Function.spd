@@ -962,7 +962,7 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 function ConstructorLinePlace (|message|)
 	opt norefcounts
 	|| s = .Source
-		if s.HasPosition
+		if s.Position >= 0
 			return s
 	|| c = .cls
 		return c.source

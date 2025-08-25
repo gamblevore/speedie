@@ -178,6 +178,7 @@ void JB_FS_AppendByte(FastString* self, int byte) {
 	FS_SanityCheck_(self);
 }
 
+
 int JB_FS_Last (FastString* self, int off) {
 	int N = self->Length; 
 	int i = N-(1+off);

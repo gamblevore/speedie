@@ -10,11 +10,11 @@ class Message (list)
 		cpp_part Msg
 		visible true
 
-	description "Usage: Parse a string, get back a tree of nodes.
+	description "Usage: Parse a string, and receive a tree of nodes.
 
-The tree-data-structure represents your data. The Message class acts as a super-set of many formats:  XML,  JSON, source-code,  data-files,  network message,  executable files,  media-wrappers,  etc.
+The tree data-structure represents your data. The Message class acts as a super-set of many formats:  XML,  JSON, source-code,  data-files,  network messages,  executable files,  media-wrappers,  etc.
 
-The Message class is versatile enoguh to good at all of these. Like a universal data-format. Like the UTF-8 of data.
+The Message class is versatile enough to good at all of these. Like a universal data-format. Like the UTF-8 of data.
 
 Message is also:
 	* Memory tight (64-bytes per-node, excluding string-name).
@@ -769,13 +769,6 @@ Message is also:
 		if self
 			return .func
 
-	function Name_ (|string|) // for use within the message class!
-		// seems unnecessary?
-		description "For use within the message class, which can't use the 'name' function directly."
-		nil safe
-		if self
-			return .Name
-
 
 	function FirstName (|string|)
 		nil checker
@@ -798,33 +791,18 @@ Message is also:
 		for ch.fast in self
 			if ch == s
 				return ch
-
-	function FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
-		opt norefcounts
-		nil self // remove once we improve the nil-checker to "link" variables
-		for s.fast in self
-			if s.func == fn and s.name == name
-				rz <~ s
 		
 	
 // merge these two! find and find flat... seem to do the same except the err-param
-	function Find (|Syntax| s, |string| name, |bool| Err = false, |Message|)
+	function Find (|Syntax| s=@nil, |string| name, |bool| Err = false, |Message|)
 		cpp_part FindSyxName
 		opt norefcounts
 		for ch.fast in self
-			if (ch == s  and  ch ~= name)
+			if ((!s or ch == s)  and  ch ~= name)
 				return ch
 
 		if Err
 			.AccessErr(s, name, nil)
-
-
-	function Find (|string| name, |Message|)
-		cpp_part FindName
-		Opt NoRefCounts
-		for ch.fast in self
-			if ch ~= name
-				return ch
 	
 
 	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err=false, |Message|)
@@ -844,7 +822,7 @@ Message is also:
 			self <~ "' "
 
 
-	function AccessErr (|syntax|s, |string?| name=nil, |message?| found=nil)
+	helper AccessErr (|syntax|s, |string?| name=nil, |message?| found=nil)
 		cpp_part CantFind
 		if !self
 			jb_api.NilHandler
@@ -867,12 +845,6 @@ Message is also:
 			found = self
 
 		errorreceiver.NewError( found, fs.getresult )
-	
-
-//	function AccessErr (|int| i)
-//		cpp_part CantFindAt
-//		|| errnum = (" at item " + i.render, "")(i)
-//		errorreceiver.NewError( self, "Incomplete syntax" + errnum )
 
 
 	function ExpectLast (|string| err="", |bool|)
@@ -993,7 +965,7 @@ Message is also:
 		.AccessAdd(key) <~ Value		
 	
 	
-	function AccessAdd (|string| key, |message|)
+	helper AccessAdd (|string| key, |message|)
 		opt norefcounts
 		|| l = self
 		if self == @tmp
@@ -1011,13 +983,6 @@ Message is also:
 		cpp_part BecomeStr
 		.func = fn
 		.name = name
-
-
-	function Become (|int64| num)
-		cpp_part BecomeNum
-		.func = @num
-		.name = num.render
-		.clear
 
 
 	function Become (|message| src)
@@ -1040,14 +1005,6 @@ Message is also:
 		for c.fast in self
 			j <~ c.Copy(j)
 
-	
-	function Next (|syntax| Need, |string| Name, |Message|)
-		Opt NoRefCounts
-		cpp_part NextOfName
-		|| ch = .Next(need) #require
-		if ch ~= name
-			return ch
-		.accesserr(need, nil, ch)
 
 	function Last (|syntax| Need, |Message|)
 		Opt NoRefCounts
@@ -1057,14 +1014,14 @@ Message is also:
 		.accesserr(Need, nil, ch)
 
 	
-	function Next (|syntax| Need, |Message|)
+	function Next (|syntax| Need, |string?| name=nil,  |Message|)
 		Opt NoRefCounts
 		cpp_part NextOf
 		nil checker
 		if (self)
 			|| ch = .next
-			if ch and (!need or ch==Need)
-				return ch
+				if (!need or ch.func==Need)  and  (name == nil or ch.name ~= name)
+					return ch
 			.accesserr(Need, nil, ch)
 
 
@@ -1083,9 +1040,6 @@ Message is also:
 //		cpp_part EqualsByte
 //		return self and .name == B
 	
-	function HasPosition (|bool|)
-		return .Position >= 0
-
 
 	function Export (|FastString| fs)
 		|| fn = (.Func.ExportAddr)
@@ -1233,11 +1187,6 @@ Message is also:
 	function IsString (|bool|) // use .expectstring if you need this to be a string
 		if self
 			return .func.isstring
-
-	function WipePositions
-		opt norefcounts
-		for v.flat in self
-			v.position = -1
 
 
 

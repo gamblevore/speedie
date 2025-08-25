@@ -343,7 +343,7 @@ function perryide.GotASMSub (|message| asm)
 	|message| file
 	for s in arg
 		if !s.name
-			(s|listviewrow| is disabled)
+			(s|listviewrow| is separator)
 			(s|listviewrow| is active)
 		if s == "file"
 			file = s.first

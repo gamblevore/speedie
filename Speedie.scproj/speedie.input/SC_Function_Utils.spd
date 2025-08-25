@@ -11,8 +11,13 @@ constants
 
 prototype fnPreReader (|scfunction| self, |message| msg, |bool|)
 
+
 function SCFunction.PreRead (|message| Arg)
 	opt NoRefCounts
+
+	.NilSelf = 0			// need to clear stuff that could be error-checked, or removed.
+	isnt disabled			// Autocomplete, will call .PreRead
+	
 	for s in arg
 		if s == @tmp
 			|| fn = FuncPreReader[s.name]
@@ -125,7 +130,7 @@ function SettingMemory (|Message| Rel, |bool|)
 
 
 function SCFunction.NilSelff (|message| where, |nilstate| v)
-	expect (!.nilself) (where, "Already stated")
+	expect (!.nilself) (where, "Nilness of self, already stated")
 	.NilSelf = v
 
 

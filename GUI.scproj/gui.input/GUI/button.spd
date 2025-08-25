@@ -279,10 +279,10 @@ class ButtonView (GUIControl)
 			i = .ListSource // allow these text to be added.
 		|| t = i.ButtonText(.text)
 		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
-		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
+//		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
 		textcol.a = fader
-		pn.x = where.DrawText(t,  Pn, TextCol, DrawInvis) + 2
+		pn.x = where.DrawText(t,  Pn, TextCol, false) + 2
 		
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
 		require  mi and !disabled and .pressing  and  r.Width > 19  
@@ -296,7 +296,7 @@ class ButtonView (GUIControl)
 			pn.y -= (ago-4.0)|int|
 		  elseif .MenuIsOpen
 			pn.y += 4
-		where.DrawText("\03", pn, TextCol, DrawInvis)
+		where.DrawText("\03", pn, TextCol, false)
 		
 		
 	function ListViewRow.ButtonText (|string| Default, |string|)

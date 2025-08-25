@@ -6,12 +6,6 @@ helper message.list_desired (|int| common, |string|)
 		rz = "" // oof
 
 
-function message.PrependHeader (|string| name, |int| pos)
-	|ListViewRow| Header = @str + name
-	header.Position = pos
-	.first = Header
-	(header is Disabled)
-
 
 function PerryIDE.CallFromSelect (|listviewrow| list)
 	opt norefcounts
@@ -20,7 +14,7 @@ function PerryIDE.CallFromSelect (|listviewrow| list)
 			(s is Active)
 			(s is selected)
 		if s.last.int < 0
-			(s is disabled)
+			(s is separator)
 
 
 function PerryIDE.CallFromFB (|message| list, |bool|)
@@ -33,7 +27,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	define.name = "line"
 	
 	list.sort(CallFromSorter)
-	list.PrependHeader("", 1)
+	list.first = listviewrow.NewSeparator(1)
 	list.first = define
 	.autocomplete.listsource = list!
 	.SetAutoPoint(.editme.sel0)
@@ -139,7 +133,7 @@ function AutoCompleteKeys (guikeyEvent)
 			|| n = row.next
 			|| p = row.prev
 				row.Remove
-				if p isnt Disabled
+				if p isnt UnSelectable
 					.Select(p)
 				  else
 					.Select(n)
@@ -594,7 +588,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 		f.first.RemoveAfter
 		f <~ prm
 		return f
-	|| name = f.name_
+	|| name = f.name
 	if self ~= "syntax" or "operator"
 		name = .name.lowercase + name
 	if self ~= "behaviour" or "virtual"
@@ -614,7 +608,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 			mod_class = sub
 	
 	rz = @dot.msg(name)
-	|| modname = mod_class[0].name_
+	|| modname = mod_class[0].name
 	
 
 	// ModName needs to be able to handle module.class.func not just class.func

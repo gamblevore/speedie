@@ -121,12 +121,12 @@ function Error.Improve					// sc_improve
 
 function FindBytePosSub (|Message?| Node, |Message?|)
 	opt norefcounts
-	if !node or node.HasPosition
+	if !node or node.Position >= 0
 		Return node
 
 	// OK so now let's go inside...
 	for m.flat in node
-		if m.HasPosition
+		if m.Position >= 0
 			Return m
 
 

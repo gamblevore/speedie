@@ -152,6 +152,14 @@ function VMBox (|message|)
 		error "Can't find vm.box"
 
 
+function message.Find (|string| name, |Message|)
+	cpp_part FindName
+	Opt NoRefCounts
+	for ch.fast in self
+		if ch ~= name
+			return ch
+
+
 function JustDefineInstructions (|bool|)
 	description "Shorter version that just makes the stuff we need, rather than generate the entire VM."
 	require !ModuleArg

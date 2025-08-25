@@ -168,11 +168,12 @@ class FileViewer (ListView)
 	function ClearErrors
 		opt norefcounts
 		for s in self
-			s.HasError = false
+			if s isa filerow
+				s.HasError = false
 
 
 	iterator
-		|| _curr = .listsource.first as filerow
+		|| _curr = .listsource.first
 		while _curr
 			|| N_ = _curr.FlatNext
 			yield _curr
@@ -217,8 +218,9 @@ class FileViewer (ListView)
 	function Modified (|[FileRow]|)
 		opt norefcounts
 		for f in self
-			if f.ismodified
-				rz <~ f
+			if f isa filerow
+				if f.ismodified
+					rz <~ f
 
 
 	function AskSaveAll (|bool|)
@@ -253,8 +255,9 @@ class FileViewer (ListView)
 		if path.file.IsDir
 			path = path.PathDir // standardise
 		for f in self
-			if path ~= f.location or f.ReadFrom
-				return f
+			if f isa filerow
+				if path ~= f.location or f.ReadFrom
+					return f
 
 
 	helper string.name (|bool| YeahReally, |string|)
@@ -327,12 +330,6 @@ class FileViewer (ListView)
 		.sort(&fileviewer.FileRowNameSorter)
 	
 
-	helper error.ExtractRecent (|message| into)
-		opt norefcounts
-		for s in self
-			if s|error|.when
-				into <~ s
-
 		
 	helper CanFind (|filerow| f, |uint| id, |bool|)
 		if id
@@ -348,31 +345,25 @@ class FileViewer (ListView)
 			return true
 	
 	
-	helper BatchFindSub (|string| str, |error| all, |uint| id, |bool| DoReplace)
+	helper BatchFindSub (|string| str, |message| all, |message| Recent, |uint| id, |bool| DoReplace)
 		opt norefcounts
 		|| Remain = 10K
 		for f in self
-			if (f isa filerow)
-				if .CanFind(f, id)
-					f.FindInFile(str, all, remain, DoReplace)
-
-
-	function BatchFind (|string| str,  |message|)
-		cpp_part BatchFindWrap
-		return .BatchFindReplace(str, 0, false)
+			if (f isa filerow) // in case someone added bad stuff.
+			    if .CanFind(f, id)
+					f.FindInFile(str, all, Recent, Remain, DoReplace)
+			  else
+/				f.remove
 		
-
-	function BatchFindReplace (|string| str,  |uint| FindID,  |bool| ForReplace,  |message|)
-		|| All = error()
-		if !str
-			return all
-		.BatchFindSub(str, all, FindID, ForReplace)
-		all.ExtractRecent(rz)				// Split into recent and not recent
-		rz.sort(ErrorSearchSorter)			// recent
-		all.sort(ErrorSearchSorter)			// not recent
-		for s in all
-			rz <~ s
-
+	
+	function BatchFind (|string| str,  |bool| ForReplace,  |message| Result,  |uint| FindID=0)
+		require str
+		|| Recent = Message()
+		.BatchFindSub(str, Result, Recent, FindID, ForReplace)
+		Result.sort(ErrorSearchSorter)
+		Recent.sort(ErrorSearchSorter)
+		Result.TakeAllFrom(recent)
+	
 
 	function HideOpenList (|bool|)
 		.ListOpen.clear
@@ -419,7 +410,7 @@ class FileViewer (ListView)
 			|| dir = p.Location.file.isdir
 			m.name = ("\10 ", "\11 ")(dir) + m.name
 			
-			if HasSel and p isnt disabled
+			if HasSel and p isnt UnSelectable
 				(p is selected)
 				HasSel = false
 			m.flags = p.flags

@@ -62,7 +62,7 @@ function PerryIDE.ImproveFuncList (|message| result)
 			if !p0 or !p.ShallowEquals(p0, true)
 				|| d = listviewrow()
 				d.name = p.name.funclistsep
-				(d is disabled)
+				(d is Separator)
 				s.prev = d
 			|| n = s.first!.name
 			if p != @name

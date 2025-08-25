@@ -87,7 +87,7 @@ struct InlineEditor
 		
 		debug_require l and r
 		|| row = r.row
-		require row is editable and row isnt disabled and l is editable
+		require row is editable and row isnt UnSelectable and l is editable
 		with .editor
 			.FinishEditing(false)
 			.visible = true

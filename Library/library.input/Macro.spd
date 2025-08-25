@@ -19,7 +19,8 @@ class Macro
 		if !rz
 			rz = .input.parse
 			if rz
-				rz.wipepositions
+				for v.flat in rz
+					v.position = -1
 				._parsed = rz
 	
 	function Run (|[message]| prms=nil, |message|)

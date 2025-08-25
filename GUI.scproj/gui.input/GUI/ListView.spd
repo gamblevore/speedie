@@ -186,7 +186,7 @@ class ListView (GUIControl) {
 		.MouseDownCell = .FindClickedCell(P)
 		|| mdc = .MouseDownCell$
 		|| r = mdc.row
-		require (r isnt disabled)
+		require (r isnt UnSelectable)
 		|| y = .DrawYRow(r)
 		
 		if (.RightClickSelects or .OnRightClick)
@@ -253,7 +253,7 @@ class ListView (GUIControl) {
 	helper ChangeSel (|listviewrow| Row, |bool| NewState, |int|)
 		if NewState == (row is selected)
 			return 0
-		if NewState and (row is disabled)
+		if NewState and (row is UnSelectable)
 			return 0
 		if !gui.TouchCount and .RowIsViewable(row)
 			gui.touch
@@ -605,14 +605,14 @@ class ListView (GUIControl) {
 			if m == before
 				return answer
 			require m
-			if m is disabled
+			if m is Separator
 				answer = true
 			
 
 	helper CanBasicRowDragOne (|ListViewrow| s, |ListViewrow| before, |bool|)
 		opt norefcounts
 		if before
-			require before isnt disabled
+			require before isnt UnSelectable
 			require !.FoundSep(s, before, -1)
 		return .FoundSep(s, before, 1)
 		
@@ -621,7 +621,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| l = .start
 		while l
-			if l is disabled
+			if l is Separator
 				return true
 			l++
 
@@ -686,7 +686,7 @@ class ListView (GUIControl) {
 		  elseif !sl
 			|| LC = .FindClickedCell(P)
 				|| L = LC.row
-				require (L isnt disabled)
+				require (L isnt UnSelectable)
 				if (L is selected) and (.SelCount > 1)
 					.Select(l)
 				  elseif !keys.Cmd and (.window!._SelBeforeMouseDown == self)
@@ -702,8 +702,7 @@ class ListView (GUIControl) {
 	function SelectableCount (|int|)
 		opt norefcounts
 		for f.all in self 
-			if f isnt disabled
-				rz++
+			rz += f isnt UnSelectable
 
 
 	helper DelayedRename (|ListViewCell| i)
@@ -746,7 +745,6 @@ class ListView (GUIControl) {
 		|| AdjustScroll = (clicks == -1) and (.draggingrowFrom)
 		if (clicks == -1) and (.window!.droppinginto == self) // I guess the filter is already done...
 			|| i = .FindClicked(p)
-			if (i isnt disabled)
 				.Select(i)
 			AdjustScroll = true
 
@@ -792,7 +790,7 @@ class ListView (GUIControl) {
 				.selectnone
 			return MouseDragging.handled
 		|| l = lc.row 
-		if L is disabled
+		if L is Separator
 			return MouseDragging.handled
 			
 		if keys.Cmd
@@ -833,7 +831,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		rz = (.end, .start)(i > 0)
 		if selectable
-			while rz and rz is disabled
+			while rz and rz is UnSelectable
 				rz = rz.step(i <= 0)
 		
 	helper Start (|ListViewrow|)
@@ -864,7 +862,7 @@ class ListView (GUIControl) {
 		|| n = req.abs
 		while n > 0 
 			l = .hierstep(l, req > 0) #loop
-			if l isnt Disabled // skip as if non-existing
+			if l isnt UnSelectable // skip as if non-existing
 				rz = l
 				n--
 
@@ -974,8 +972,7 @@ class ListView (GUIControl) {
 		|| i		= .DistBetween(l,m)
 		|| n		= i.abs + 1
 		for n
-			if (l isnt disabled)
-				modified += .ChangeSel(l, true)
+			modified += .ChangeSel(l, (l isnt UnSelectable))
 			 l = .hierstep(l, i > 0)#loop
 
 		if modified
@@ -997,8 +994,6 @@ class ListView (GUIControl) {
 		
 		|| m = .bmove(l, i)
 		ifn .multiselection and multi
-			while m  and  m is disabled
-				m = .hierstep(m, i > 0)
 			return .Select(m)
 		
 		if multi
@@ -1038,6 +1033,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		require !._DuringSelect
 		require s and s != .ListSource
+		require s isnt UnSelectable
 		require .owns(s)
 		
 		.ExpandParents(s)

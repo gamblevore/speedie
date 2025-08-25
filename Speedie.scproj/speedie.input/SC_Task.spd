@@ -175,6 +175,15 @@ function Message.BuildRunTask (|message| fields, |int| level, |bool|)
 	return true
 
 
+
+function message.FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
+	opt norefcounts
+	nil self // remove once we improve the nil-checker to "link" variables
+	for s.fast in self
+		if s.func == fn and s.name == name
+			rz <~ s
+
+
 function Message.BuildTask (|message| fields, |int| level)
 	|| Runs = .FindAll("run")
 	|| run = runs[0]

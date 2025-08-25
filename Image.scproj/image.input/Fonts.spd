@@ -94,12 +94,11 @@ function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col=co
 
 function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |int| DrawMode=1)
 	opt min 3
-//	rz = (font.Width + XY.x) max 1
 	if c.iswhite
 		return
 	if c|int| < 0
 		c = -c // draw white-space
-	
+
 	|uint64| MissingChar = 0
 	if c == 0xAB
 		c = 128
@@ -107,6 +106,8 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 		c = 129
 	  elseif c >= 130 and c <= 133
 		0 // idk
+	  elseif c == 0x2261
+		c = 13
 	  elseif c >= 0x80
 		MissingChar = c.hash
 		c = 0x80
@@ -122,8 +123,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 	
 	|| Read		= (font.Width, font.Height-1)
 	|| Clip		= where.clip((XY, xy+Read))
-	if !clip.ispositive
-		return
+	require clip.ispositive
 	
 	|| X2  		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy

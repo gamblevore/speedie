@@ -295,6 +295,7 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			.Headers = ListViewRow("", listviewstate.aligncenter)
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
 			.IsTree			= true
@@ -309,6 +310,8 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+		.UpdateFoundHeader
+			
 
 		
 		with .debugger 
@@ -529,7 +532,7 @@ extend PerryIDE
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
 		.AddViewButton(.viewdebugger,	"\18",	.debugger)
 		if app.prefs["dev"]
-			.AddViewButton(.viewlog,		"\0D",	.CommsLogList)
+			.AddViewButton(.viewlog,	"  &#x2261;",	.CommsLogList)
 
 		.viewfiles.left = 5 ~ right
 		.view(.Viewfiles)
@@ -677,7 +680,6 @@ extend PerryIDE
 		.addlbutton(Btn, oof, tag.id, tag.tooltip)
 		btn.id		= "btn_"+tag.id
 		btn.size    = 3~after for 21  by  1~down back 13
-		btn.align  |= listviewstate.DrawWhiteSpace
 		tag.tooltip = ""
 	
 	

@@ -220,18 +220,20 @@ class FileRow (ListViewRow)
 			return f.ReadAll
 
 
-	function FindAllParent (|message| found, |error|)
+	function FindAllParent (|message| FoundList, |message| RecentList, |error|)
 		rz = error(nil, .location, errorseverity.ok)
 		(rz|listviewrow| is expanded)
 		rz.name = ("\11 ", "\19 ")(!.asdir) + .location.name
 		rz.path = .location
 		rz.obj = self
 		rz.position = -1
-		rz.when = ._document.viewdate?
-		found <~ rz
+		if ._document.viewdate?
+			RecentList <~ rz
+		  else
+			FoundList <~ rz
 
 
-	function FindInFile (|string| text,  |error| found,  |$int| Remain,  |bool| DoRepl)
+	function FindInFile (|string| text,  |message| FoundList,  |Message| RecentList,  |$int| Remain,  |bool| DoRepl)
 		require text
 		|| t		= .FileData$
 		
@@ -255,7 +257,7 @@ class FileRow (ListViewRow)
 				if !text[0].iswhite
 					s = s.trim.remove(jeebox.csline)
 				|| result = error(nil, ErrorSeverity.OK)
-				parent ?= .FindAllParent(found)
+				parent ?= .FindAllParent(FoundList, RecentList)
 				parent <~ result
 				
 				lim--

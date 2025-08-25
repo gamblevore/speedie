@@ -287,11 +287,29 @@ function PerryIDE.UpdateJeeboxField (|bool|)
 	return true
 
 
-function PerryIDE.BatchPhind (|string| text,  |uint| ID,  |bool| DoReplace,  |bool|)
-	|| found = .filelist.BatchFindReplace(text, ID, DoReplace)
-	.foundlist.use(found)
+function perryide.UpdateFoundHeader
+	|| f = .FoundList
+	|| h = f.Headers
+		|| files = 0
+		|| matches = 0
+		for s.fast in f.ListSource
+			files ++
+			matches += s.SlowCount
+		h.Name = "$matches matches in $files files"
+
+
+function PerryIDE.BatchPhind (|string| text,  |bool| DoReplace, |uint| ID,  |bool|)
+	// The search ID... allows not being wasteful when searching across multiple projects
+	// which may then search the file twice. If something is already missed in one file
+	// theres no point re-searching it. Especially with 10 projects open. Thats 10 misses
+	// on the same damn file.
+	
+	|| f = .FoundList.ListSource
+	f.clear
+	.filelist.BatchFind(text, DoReplace, f, ID)
 	.foundlist.setfocus
-	return found.hasany
+	.UpdateFoundHeader
+	return f.HasAny
 
 
 function PressedLineInfo (GUIaction)
@@ -324,11 +342,19 @@ function PerryIDE.MassSearch (|bool|)
 	opt norefcounts
 	|| t = .MassSearchField.Text
 	.ViewAsProject
+
+	// i forgot what the ID is about.
+	// some clever algorithm something that stops something bad happening
+	// just keep it... till i remmeber what it does.
+	// maybe something to do with searches across multiple projects.
+	// i think thats it. So theres no point finding something in another
+	// project if we already found it in ours.
+	
 	|| ID = (perry.findID+1)&255
 	ID = ID max 1
 	perry.FindID = ID
 	
-	.BatchPhind(t, ID, true)
+	.BatchPhind(t, true, ID)
 	
 	if t and .FoundList.isempty
 		.NoNeed("The search text “${t}” wasn't found", nil)
@@ -560,7 +586,7 @@ function SelectedFile (GuiListevent)
 
 function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 	for w in perry.OpenProj
-		if (w != ignore) and w.BatchPhind(find, FindID, false)
+		if (w != ignore) and w.BatchPhind(find, false, FindID)
 			if "\"$find\" not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
 				w.showide
 				w.ShowFind
