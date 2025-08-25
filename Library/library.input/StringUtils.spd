@@ -119,14 +119,14 @@ function string.OperatorPlus (|cstring| c, |string|)
 	if self
 		|| tmp = c.temp
 		return self + (&tmp)|string|
-	return c.str
+	return c.wrap
 
 
 function cstring.OperatorPlus (|string| s, |string|)
 	if s
 		|| tmp = .temp
 		return (&tmp)|string| + s
-	return .str
+	return .wrap
 
 
 struct FakeJBString

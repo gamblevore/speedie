@@ -21,7 +21,7 @@ struct TemporalGenerator
 				return .list(s.int)
 			for i in 256
 				|| l = .list(i) #require
-				if l.name.str ~= s
+				if l.name.wrap ~= s
 					return l
 			
 		function List (|int| i, |?&TemporalGenerator|)
@@ -32,7 +32,7 @@ struct TemporalGenerator
 		function List (|[string]|)
 			for i in 256
 				|| l = .list(i) #loop
-				rz <~ l.name.Str
+				rz <~ l.name.Wrap
 
 
 
@@ -47,7 +47,7 @@ class SteveMachine
 		.Refresh
 	
 	function Name (|string|)
-		return .Create.name.str
+		return .Create.name.Wrap
 	
 	function Refresh
 		require self

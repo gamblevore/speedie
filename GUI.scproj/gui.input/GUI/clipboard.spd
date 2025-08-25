@@ -8,7 +8,7 @@ module clipboard
 		
 	function Data (|string|)
 		|| cstr = .SDL_GetClipboardText
-		|| s = cstr.str
+		|| s = cstr.Wrap
 			return s
 		return _InternalCopy
 			

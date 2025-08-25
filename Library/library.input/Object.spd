@@ -80,7 +80,7 @@ class Object
 			return .TypeFailed(x, nil)
 	
 	helper TypeFailed (|ClassData| Cls, |message?| where,  |object|)
-		|| name = .Class.name.str
+		|| name = .Class.name.wrap
 		error (where, name + " (object) is not a: " + cls.name )
 		debugger
 

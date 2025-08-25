@@ -245,7 +245,7 @@ render MemoryUsage (|int| Over=0)
 	for cls in classdata.First
 		|| Mem = cls.MemoryUsed
 		if mem > over
-			|| s = message(@str, cls.name.str)
+			|| s = message(@str, cls.name.wrap)
 			s.Position = mem
 			items <~ s
 	

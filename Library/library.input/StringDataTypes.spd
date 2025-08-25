@@ -97,7 +97,7 @@ datatype cstring
 	function PrintLine
 		cpp_wrapper puts // hehe
 	
-	function Str (|string|)
+	function Wrap (|string|)
 		return string.Wrap(self)
 
 	function FileName (|cstring|)

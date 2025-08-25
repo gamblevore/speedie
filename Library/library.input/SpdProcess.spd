@@ -297,7 +297,7 @@ prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |&pico|)
 		description "Just a wrapper around pico.thread" 
 		|| name = (&comms.config.name[0])|cstring|
-		|| pico_out = pico.new(name.str, -1)
+		|| pico_out = pico.new(name.wrap, -1)
 			if BuffBits
 				pico_out.Config.Bits = BuffBits
 			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)
