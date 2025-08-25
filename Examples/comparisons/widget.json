@@ -5,10 +5,10 @@
     {"name":{"":["main window"]}},
     {"width":{"":["500"]}},
     {"height":{"":["500"]}}
-  ]},
+  ]}},
   {"image":{"src":"Images/Sun.png", "name":"sun1", "":[
     {"hOffset":{"":["250",{"unit":{"":["mm"]}}]}},
     {"vOffset":{"":["250"]}},
-    {"alignment":{"":["center"]}}
-  }
-]}
+    {"alignment":{"":["center"]}}]
+  }}
+]}}
