@@ -8,7 +8,7 @@
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
 * `Released`: New Years Eve 2022  (31/12/2022)
 * `Platforms`: MacOSX Intel • Apple Silicon (ARM) • Linux (Ubuntu) • MS Windows (via [WSL](https://learn.microsoft.com/en-us/windows/wsl/install))
-* `Sponsor ❤️`: If you love my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). Donate however much you feel happy giving. Or possibly... just hire me? ❤️
+* `Sponsor ❤️`: If you believe in my vision, [Please Sponsor Speedie](https://github.com/sponsors/gamblevore). Donate however much you feel happy giving. Or possibly... just hire me to make an app in Speedie ❤️
 
 
 # General Features #
