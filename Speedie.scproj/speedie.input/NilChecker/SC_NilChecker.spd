@@ -107,8 +107,8 @@ function Jump (NilTrackerFn)
 
 function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	opt norefcounts
-	// a.b( c )
-	// b(a, c)
+	// a.b
+	// b(a)
 	
 	dot.func = @func
 	dot.ASMType = (@func)|ASMType|

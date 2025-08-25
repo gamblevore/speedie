@@ -621,12 +621,12 @@ function FileViewerCountCode (GuiMenuEvent)
 	|| Size = 0
 	for c.flat in row
 		|| L = c.ReadFrom
-		if l.isspd
+		if l.isspd or !row.hasany
 			|| f = l.file
 				|| p = f.parse
-					FileCount++
-					size += f.size
 					CLOC += p.loc
+				size += f.size
+				FileCount++
 	
 	|| fstr = "file".pluralize(FileCount)
 	|| r = (size|float| / cloc[]|float|).Render

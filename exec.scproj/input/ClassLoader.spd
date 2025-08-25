@@ -43,7 +43,7 @@ class Class
 	function LoadSuper 
 		opt norefcounts
 		|| P = .realclass.Parent
-			|| str = P.name.str
+			|| str = P.name.wrap
 			|| cls = table.valuelower(str)
 				.super = cls
 				return
@@ -122,7 +122,7 @@ class Class
 		function dictionary.SyntaxAccess (|&classdata| c, ||)
 			opt norefcounts
 			|| n = c.name
-				|| s = n.str
+				|| s = n.Wrap
 				rz = self.valuelower(s)
 			
 		syntax access (|message| ch, |class|)

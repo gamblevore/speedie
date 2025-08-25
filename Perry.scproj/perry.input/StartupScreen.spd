@@ -105,6 +105,6 @@ function ClickedCreateFile (GUIaction)
 
 
 function perry.HideStartIfNeeded
-/	if .projects.hasany
+	if .projects.hasany
 		startupwindow.hide
 		
