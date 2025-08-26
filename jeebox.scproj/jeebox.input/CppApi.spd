@@ -340,7 +340,7 @@ module JB_API
 
 	function Parse (|stringthatwasreadsafely?| s, |string| path="", |message|)
 		require s // out of memory
-		|| L = (Message).CreateUseLayer(path, s)
+		|| L = (Message).CreateLayerAndUse(path, s)
 		if (L?)
 			|| Result = s.parse
 			(message).restore

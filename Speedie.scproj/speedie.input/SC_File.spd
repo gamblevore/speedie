@@ -100,7 +100,7 @@ class SCFile (file)
 		FlowControl.DisabledIncr(-1) // also... parse/parseclean will find REAL differences.
 		
 		if str
-			|| Layer = (Message).CreateUseLayer(self, str)
+			|| Layer = (Message).CreateLayerAndUse(self, str)
 			layer.num3 = .filenum
 			.fData = str
 			StdErr.source = .path

@@ -1023,28 +1023,23 @@ int JB_Str_OutByte( JB_String* self, int StartOff, int AfterOff, int SearchChar 
 
 
 byte JB_Str_First(JB_String* self) {
-	if (self) { // remove when we got nil detection ??
-		int n = self->Length;
-		if (n)
-			return self->Addr[0];
-	}
+	int n = self->Length;
+	if (n)
+		return self->Addr[0];
 	return 0;
 }
 
 
 int JB_Str_ByteValue2(JB_String* self, int offset, int Default) {
-    if (self) { // remove when we got nil detection
-        if ((u32)offset < (u32)self->Length) {
-            return (int) (self->Addr[offset]) ;
+	if ((u32)offset < (u32)self->Length) {
+		return (int) (self->Addr[offset]) ;
 
-        } else if (offset < 0) {
-            offset = self->Length + offset;
-            if ((u32)offset < (u32)self->Length) {
-                return (int) (self->Addr[offset]) ;
-            }
-        }
-    }
-
+	} else if (offset < 0) {
+		offset = self->Length + offset;
+		if ((u32)offset < (u32)self->Length) {
+			return (int) (self->Addr[offset]) ;
+		}
+	}
     return Default;
 }
 

@@ -3,6 +3,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+	
 extend String
 	function IsOK (|bool|)
 		opt norefcounts
@@ -13,79 +14,6 @@ extend String
 		|| f = .file
 		if f.MustExist(operation)
 			return f
-			
-	function FileGlob (|[file]|)
-		expect !(self contains "**") ("Can't glob '**' in: " + self)
-		for L.lines in self
-			|| fixed = L.TrimSlashes(true)
-			"".FileGlobSub(fixed / '/', rz)
-
-	helper FileGlobSub (|[string]| parts, |[file]| result, |int| i=0)
-		|| p = parts[i++] ?? ""
-		ifn p contains '*'
-			|| newpath = (.child(p), "/")(self or p) 
-			newpath.fileglobsub2(parts, result, i)
-			return 
-		for ch in .file.list
-			if p globs ch
-				.child(ch).fileglobsub2(parts, result, i)
-	
-	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
-		if parts > i
-			.FileGlobSub(parts, result, i)
-		  else
-			|| f = .file
-			if f.Exists
-				result <~ f
-		//   /abc/def/ghi
-		//   /*/def/ghi
-		//   /abc/def/*
-		//   /abc/d*f/ghi
-		//   /*/d*f/*		
-
-
-	operator globs (|[string]| txt, |bool|)
-		cpp_part GlobManyItems
-		opt norefcounts
-		for s in txt
-			if self globs s
-				return true
-	
-		
-	operator globbed_by (|[string]| globs, |bool|)
-		cpp_part ManyGlobsOnItem
-		opt norefcounts
-		for g in globs
-			if g globs self
-				return true
-
-	
-	operator globs (|string| txt, |bool|)
-		real self
-		|&byte| text_backup
-		|&byte| wild_backup
-		|| text = txt.addr
-		|| textEnd = text + txt.length
-		|| wild = .addr
-		|| wildEnd = wild + .length
-		
-		while text < textEnd
-			|| w = (wild[]).lowercase
-			if w == '*'
-				text_backup = text
-				wild_backup = ++wild
-			  elseif (w == '?' or (text[]).lowercase)
-				text++
-				wild++
-			  else
-				wild = wild_backup
-				text = ++text_backup
-				require wild and text
-		
-		while (wild < wildEnd and wild[] == '*')
-			wild++  // ignore trailing stars
-		return wild == wildEnd
-	
 		
 	function FileExists (|bool|)
 		|| f = .file
@@ -140,27 +68,27 @@ extend String
 		R[num] = With
 		return r.join("/")
 
-	function RemoveExt (|string| suff, |string|)
-		if self isa suff
-			return .trimext
-		return self
+//	function RemoveExt (|string| suff, |string|)
+//		if self isa suff
+//			return .trimext
+//		return self
 	
-	function TrimSlashes (|bool|Pathfix = false, |string|)
-		|| p = (.pathfix, self)(pathfix)
-		ifn p.last == '/' or p contains "//"
-			return p
-		
+	function TrimSlashes (|string|)
+		|| trail = .FindTrailingSlashes
+		if trail >= self
+			return self							// entire path is '/'
+		|| Multi = self contains "//"
+		if !multi
+			return self[0, trail]
+			
 		|| fs = FastString()
 		|| prev = 0
-		for c in self
+		for i in trail
+			|| c = self[i]
 			if (c != '/'  or  prev != '/')
 				fs <~ c // remove multiple "/"
 			prev = c
-		if prev == '/'
-			fs.Length--
-		rz = fs
-		if !rz and self
-			rz = "/"
+		return fs
 			
 	
 	helper FindTrailingSlashes (|int|)
@@ -220,9 +148,13 @@ extend String
 		if self != "/"
 			return .TrimSlashes.BeforeLastByte('/', 1)
 
-	function PathFix (|string|)
-		cpp_wrapper JB_File_PathFix_ // needs a better name
-		// basically just replaces "~/" with the username...
+	function RegularPath (|string|)
+		return .AbsolutePath.TrimSlashes
+	
+	function AbsolutePath (|StringZeroTerminated|)
+		cpp_wrapper JB_File_PathFix
+		description `Replaces "~/" with the username.
+Relative paths take the current working directory.`
 
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
@@ -277,10 +209,6 @@ extend String
 		|| Last  = .TrimLastSub('/')
 		return .AfterByte('/', Last)
 	
-	function FolName (|string|)
-		|| Last  = .TrimLastSub('/')
-		|| before = .find('/', last, 0)+1
-		return self[before...]
 
 	helper String.FindSlash (|int| from, |ind|)
 		if from < .length
@@ -295,7 +223,7 @@ extend String
 // "a/b/c"  becomes "a",  "a/b",  "a/b/c"
 
 	iterator Paths
-		|| P = .TrimSlashes(true)
+		|| P = .regularpath
 		|| i = p.FindSlash(1)
 
 		while i > 0
@@ -327,12 +255,12 @@ extend String
 	
 	target !minilib {
 	function OpenInEditor (|ExitCode|)
-		|| p = .pathfix
+		|| p = .AbsolutePath
 			return "/usr/bin/open".SilentExecute([p], NIL, nil)
 	
 	function Reveal (|bool|)
 		if self and platform.osx
-			|| p = .pathfix
+			|| p = .AbsolutePath
 			require p.fileExists
 			|| R = ["-R", p]
 			if .last == '/'
@@ -380,13 +308,6 @@ extend file
 	function ZipUpload (|string| url, |ExitCode|)
 		return .ZipTmp$.uploadto(url)
 }
-
-
-
-datatype FileResolveMode (bool)
-	constants
-		AllowMissing = true
-
 
 
 role StringThatWasReadSafely (string)

@@ -10,7 +10,7 @@ app.usage = "Usage: size path [...]
 |[message]| Found
 
 
-main (|[file.existing]| FileList)
+main (|[file]| FileList)
 	if !FileList
 		Quit app.Usage
 	
@@ -25,9 +25,11 @@ main (|[file.existing]| FileList)
 function file.CountAll (|int| base, |int64|)
 	if .isdir
 		for c.files in self
-			if !c.IsLink and (ShowInvis or c.Visible)
+			if !c.IsSymLink and (ShowInvis or c.Visible)
 				rz += c.CountAll(base)
 	  else
 		require !types or types[.ext]
 		rz = .size
-	Found <~ message(self[base...], rz)
+	|| m = message(@str, self[base...])
+	m.Position = rz
+	Found <~ m

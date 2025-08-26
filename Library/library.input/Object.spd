@@ -143,7 +143,7 @@ struct ClassData
 	function CreateLayer (|Object| obj, |MemoryLayer!|)
 		cpp_Wrapper JB_Mem_CreateLayer
 
-	function CreateUseLayer (|Object| obj, |object| obj2, |MemoryLayer!|)
+	function CreateLayerAndUse (|Object| obj, |object| obj2, |MemoryLayer!|)
 		rz = .createlayer(obj)
 		rz.use
 		rz.obj2 = obj2

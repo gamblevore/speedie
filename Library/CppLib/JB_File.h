@@ -51,7 +51,7 @@ int JB_File_SizeSet( JB_File* self, IntPtr N );
 void JB_File_Flush( JB_File* self );
 bool JB_File_EOF( JB_File* self );
 JB_String* JB_File_ReadAll( JB_File* self, int lim, bool Ignore );
-JB_String* JB_File_PathFix_(JB_String* S);
+JB_StringC* JB_File_PathFix(JB_String* S);
 JB_String* JB_File__Home();
 JB_String* JB_File_Path(JB_File* S);
 bool JB_File_IsDir (JB_File* self);

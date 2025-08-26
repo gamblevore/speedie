@@ -239,7 +239,7 @@ extend PerryIDE
 		with .UnNeededLabel 
 			.takesfocus 	= 0
 			.ID				= "NoNeed"
-			.size 			= 5~inside  by  17~up to 55~down
+			.size 			= 5~inside  by  100~down back 60
 			isnt editable
 			isnt visible
 			isnt drawsfocus

@@ -20,7 +20,7 @@ function app.TryCompile	(|file| f)
 	require f.IsDir
 
 	for c.files in f
-		if !c.IsLink // avoid loops lol.
+		if !c.IsSymLink // avoid loops lol.
 			.TryCompile(c)
 
 

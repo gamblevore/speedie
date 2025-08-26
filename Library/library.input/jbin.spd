@@ -62,7 +62,7 @@ role JBin (Faststring)
 		return .addmemory(Type, fs.length, into, fs.Resultptr)
 
 
-	function AddComp (|stringreader| str,  |syntax| Type=@bin, |compressionstats| Stats,   |int| strength=mzlab.strongest)
+	function AddComp (|stringreader| str,  |syntax| Type=@bin,  |compressionstats| Stats,  |int| strength=mzlab.strongest)
 		|| Place = .OpenSection		
 		str.compressinto(self, strength, stats)
 		.CloseSection(Place.x, place.y, Type)

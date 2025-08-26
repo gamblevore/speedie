@@ -57,7 +57,7 @@ role config (message)
 		function ConfigPath (|string| path,  |string|)
 			|| f = path[]
 			if f == '~'
-				return path.pathfix
+				return path.AbsolutePath
 			if f == '/'
 				return path
 			if !f

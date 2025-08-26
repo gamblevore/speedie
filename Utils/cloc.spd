@@ -14,7 +14,7 @@ app.usage = "Usage: cloc path [...]
 
 
 
-main  (|[file.existing]| files)
+main  (|[file]| files)
 	if !files
 		Quit app.Usage
 	counts.Init(app["types"])
@@ -137,6 +137,7 @@ function file.CLOC
 
 
 function file.CountAll (|bool| force=false)
+	require .MustExist
 	if .isdir
 		counts.dirs++
 		for c.files in self

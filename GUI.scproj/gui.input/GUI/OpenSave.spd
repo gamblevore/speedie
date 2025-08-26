@@ -3,12 +3,12 @@
 	
 // openfile,  filedialog,  folderdialog,  askfile,  openfolder
 
-function app.AskOpen (|string| types, |string| base="", |string|question="", |string|accept="Open", |string| Restore="", |string|)
+function app.AskOpen (|string| types, |string| base="", |string| question="", |string| accept="Open", |string| Restore="", |string|)
 	require GUI.StartedProperly
 	return OpenSaveRequest(types, base, accept, false, question, restore)
 
 
-function app.AskSave (|string| SingleType, |string| base="", |string|question="", |string|accept="Save", |string| Restore="",   |string|)
+function app.AskSave (|string| SingleType, |string| base="", |string| question="", |string| accept="Save", |string| Restore="",   |string|)
 	require GUI.StartedProperly
 	if SingleType contains ','
 		error "Can't save with multiple extensions"
@@ -210,7 +210,7 @@ class OpenSaveDialog (Window)
 
 
 
-function file.IsDirLike (|bool|)
+helper file.IsntAnOSXBundle (|bool|)
 	require .IsDir
 	|| n	= .Name
 	|| ext	= n.Ext

@@ -129,7 +129,7 @@ class PerryIDE (Window)
 		if !perry.pathdict
 			perry.pathdict = [ "spd"  :  file.speediedir ]
 		rz = path.Path_Expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
-		rz = rz.resolve(FileResolveMode.AllowMissing)
+		rz = rz.resolve(true)
 	
 	
 	function PerryError (|error?|) 

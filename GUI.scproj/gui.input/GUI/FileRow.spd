@@ -137,7 +137,7 @@ class FileRow (ListViewRow)
 			r.location = r.location.pathdir
 			r.dirfile = folfile
 
-		if f.isdirlike and !f.islink
+		if f.IsntAnOSXBundle and !f.issymlink
 			r.asdir = true
 			r.FillFilessub(f, excl, folfile, Count)
 		return true
@@ -361,7 +361,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 		if AllSight or n.PlatformVisible(ATroot)
 			if --max <= 0
 				exit
-			|| isdirlike = f.isdirlike
+			|| isdirlike = f.IsntAnOSXBundle
 			|| ext = n.ext
 			if isdirlike
 				p = p.PathDir

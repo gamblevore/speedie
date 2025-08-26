@@ -1291,7 +1291,7 @@ module GUI
 		beep.OK = 1
 		
 		keys.AddKey(key)
-		if keys.cmd and key != 'v'
+		if keys.cmd and key != 'v' and 'z'
 			key.eat
 
 		if !w.openedmenu and !.AllowKeyDown(kev)

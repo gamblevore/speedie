@@ -625,7 +625,7 @@ static void CaseTest_(JB_String* self) {
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 	// realpath seems to add "/" to paths?
 	// should we add them too? can we compare ignoring final "/"?
-	JB_String* UserPath = JB_File_PathFix_(self);
+	JB_String* UserPath = JB_File_PathFix(self);
 	if (!JB_Str_Length(UserPath))
 		return UserPath;
 		
@@ -801,18 +801,19 @@ JB_String* JB_File__Home() {
 }
 
 JB_String* JB_Str_Preview(JB_String* P, int N);
-JB_String* JB_File_PathFix_(JB_String* P) {
+
+JB_StringC* JB_File_PathFix(JB_String* P) {
 // creates c-strings.
 	int N = JB_Str_Length(P);
-	if (!N) return P;
+	if (!N) return (JB_StringC*)P;
 	if (N >= PATH_MAX) {
 		JB_ErrorHandleFile(JB_Str_Preview(P, 150), nil, ENAMETOOLONG, nil, "fixing-path");
-		return JB_Str__Error(); // hmmm
+		return (JB_StringC*)JB_Str__Error(); // hmmm
 	}
-	// P = JB_File_RemoveDotDot(P); // doesnt do anything
 	byte* s = P->Addr;
 	if (s[0] == '/')
 		return JB_Str_MakeC(P);
+	
 	FastString* fs = JB_FS__FastNew(0);
     if (s[0] == '~') {
 		auto H = JB_File__Home();
@@ -830,7 +831,7 @@ JB_String* JB_File_PathFix_(JB_String* P) {
 		}
 		free((void*)Created);
 	}
-	return JB_FS_GetResult(fs);
+	return (JB_StringC*)JB_FS_GetResult(fs);
 }
 
 
@@ -850,7 +851,7 @@ JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
 		}
 	}
 	
-	Path = JB_File_PathFix_(Path);
+	Path = JB_File_PathFix(Path);
 	self->Addr = Path->Addr;
 	self->Length = Path->Length;
 	self->Parent = JB_Incr(Path);

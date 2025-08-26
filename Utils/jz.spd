@@ -96,7 +96,7 @@ function app.UseAll (|file| start)
 	for c.files in start
 		if !c.isdir
 			.UseOne(c)
-		  elseif c.IsLink
+		  elseif c.IsSymLink
 			printline "Can't recursively enter link: " + c
 		  elseif c.visible
 			.UseAll(c) 

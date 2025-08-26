@@ -11,10 +11,10 @@ function string.Compress (|int| Strength=mzlab.default, |?&compressionstats| st 
 	return fs.GetResult(fs_in)
 	
 
-function string.Decompress (|int|lim=256MB,  |?&compressionstats| st=nil,   |StringThatWasReadSafely|)
+function string.Decompress (|object| Dest=nil, |int|lim=256MB,  |?&compressionstats| st=nil,   |StringThatWasReadSafely|)
 	if !.IsCompressed
 		return self // for string.parse
-	return .stream.decompress(lim, st)
+	return .stream.decompress(dest, lim, st)
 
 
 function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default, |?&compressionstats| st=nil) 

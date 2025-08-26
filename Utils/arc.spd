@@ -23,7 +23,7 @@ function app.Archive (|file| input, |file|)
 
 function jbin.ArchiveSub (|file| Item)
 	for ch.files in item
-		if !ch.islink
+		if !ch.isSymlink
 			if ch.lowercase globbed_by Excludes
 				"!! $ch"
 			  elseif ch.isdir

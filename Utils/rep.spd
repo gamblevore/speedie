@@ -1,5 +1,7 @@
 
-// seems good?
+
+// needs proper-testing
+// better to print the data out
 main (|file.existing| folder, |string| Func, |string| From, |String| To)
 	app.Replace(folder)
 
@@ -13,11 +15,12 @@ function app.Replace (|file| p, |bool|)
 
 
 function file.SyntacticReplace (|bool|)
-	|| str = .Readall	#require
+	|| str = .Readall		#require
 	|| ch = str.Parse		#require
 	|| fs = faststring()
 	rep.ReplaceAll(ch, fs, str)
-	return .Data(fs)
+	printline fs
+	return true //	return .Data(fs) not sure this is safe yet
 		
 
 

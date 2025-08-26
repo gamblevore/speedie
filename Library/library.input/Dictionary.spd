@@ -19,18 +19,18 @@ class Dictionary (saveable)
 	destructor
 		cpp_wrapper
 		
-	syntax Access (|string| Key, assigns:||)
+	syntax Access (|string?| Key, assigns:||)
 		cpp_wrapper JB_Dict_ValueSet
 			
-	syntax Access (|string| Key, ||)
+	syntax Access (|string?| Key, ||)
 		cpp_part Value0
 		return self[key, nil]
 			
-	syntax Access (|string| Key, |...| Default=nil, ||)
+	syntax Access (|string?| Key, |...| Default=nil, ||)
 		nil checker
 		cpp_wrapper JB_Dict_Value
 		
-	function MakePlace (|string| key, |&...|)
+	function MakePlace (|string?| key, |&...|)
 		cpp_wrapper JB_Dict_MakePlace
 		
 	syntax Access (|uint64| Key, assigns:||)
@@ -52,7 +52,7 @@ class Dictionary (saveable)
 	syntax append (|message| m) // don't we normally want to lower-case this?
 		self[m.name] = m
 	
-	function ValueLower (|string| s, ||)
+	function ValueLower (|string?| s, ||)
 		if s.islower
 			return self[s]
 		|| l = s.lowercase

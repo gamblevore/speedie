@@ -93,7 +93,7 @@ datatype Syntax (Byte)
 	module 
 		|int|		CurrFuncID_
 		
-		function Func (|string| name, |message| where=nil, |syntax|)
+		function Func (|string?| name, |message| where=nil, |syntax|)
 			visible
 			|| obj = jeebox._syxdict.valuelower(name) #expect (where, "Unknown syntax " + name)
 			return obj.id

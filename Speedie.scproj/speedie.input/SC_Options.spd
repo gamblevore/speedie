@@ -94,9 +94,9 @@ module Feedback
 		require !options.singlefileinput
 		
 		|| bpp = compiler.BaseProjectPath$
-		|| p = bpp.TrimSlashes(true)
-		|| spd = compiler.speedie.TrimSlashes(true)
-		|| jb = compiler.jeebox.TrimSlashes(true)
+		|| p = bpp.RegularPath
+		|| spd = compiler.speedie.RegularPath
+		|| jb = compiler.jeebox.RegularPath
 		if p ~= spd
 			if Options.SelfReplacement // this check should be done in the caller
 				rz = 0
@@ -155,8 +155,8 @@ module Feedback
 
 	function string.PathFixSpd (|string|)
 		if self[0, "@spd/"]
-			return (file.Speediedir+self[5...]).pathfix
-		return .pathfix
+			return (file.Speediedir+self[5...]).AbsolutePath
+		return .AbsolutePath
 
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
@@ -398,7 +398,7 @@ module Feedback
 				
 		+'output_path'
 			explain(purpose, "Specifies the build product path")$
-			options.output_path = value.pathfix
+			options.output_path = value.AbsolutePath
 			options.output_path.parent.file.mustexist
 			options.ForceRecompile = true // it's what we expect
 		
