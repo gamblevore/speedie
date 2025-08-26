@@ -1375,15 +1375,26 @@ class ListView (GUIControl) {
 		return !rem
 
 
-	function DrawHeaders (|image| where, |ivec4| rect)
+	helper DrawHeaders (|image| where, |ivec4| rect)
 		opt NoRefCounts
-		|| l = .headers
-			rect.y = rect.y2
-			rect.y2 = .lastrect.y2
-			l.ListRowDraw(Where, rect, self, 0)
+		|| l = .headers$
+
+		rect.y = rect.y2
+		rect.y2 = .lastrect.y2
+		l.ListRowDraw(Where, rect, self, 0)
+		
+		require l.Name
+		
+		rect.y2 = rect.y +1
+		|| v = .GNormal.Seps.color
+		v = mix(v, colors.white, 0.2)
+		v.a = 0.5
+		where.DrawRect(Rect, v) 
+
 
 	function ScrollStart (|listviewrow|)
 		return ._ScrollStart
+
 	
 	function ScrollStart (assigns:|listviewrow|)
 		if ._ScrollStart!=value
@@ -1435,8 +1446,6 @@ class ListView (GUIControl) {
 		if ._CanSeeAllLines
 			.NoScroll
 		  else
-//			if self isa menu
-//				.ScrollDrawTimer(true)							// oooop
 			.DrawScroll(.slh, where)
 
 

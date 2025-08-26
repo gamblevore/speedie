@@ -409,8 +409,10 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		if !.isdir
 			return .copyto(dest.file, AttrOnly)
 
-		for f.files in self
-			rz = .child(f).copyall(dest[f]) 
+		for n in self
+			|| s = self[n]
+			|| d = dest[n]
+			rz = s.copyall(d) 
 			if !rz
 				exit
 	

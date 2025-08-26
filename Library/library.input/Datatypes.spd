@@ -257,10 +257,10 @@ datatype uint
 		max = 0xffffFFFF_
 		min = 0
 	
-	function ClearHigh (|int| p8, |uint|)
-		self <<= p8
-		self >>= p8
-		return self
+//	function ClearHigh (|int| p8, |uint|)
+//		self <<= p8
+//		self >>= p8
+//		return self
 		
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)

@@ -160,14 +160,17 @@ function UnMix (|float| X, |float| Y, |float| R, |float|) // inbetweenness
 
 function Mix (|vec4| A, |vec4| B, |float| F, |vec4|)
 	cpp_Part Vec4Mix
+	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
 	return (A*(1.0-F)) + (B*F)
 
 function Mix (|vec3| A, |vec3| B, |float| F, |vec3|)
 	cpp_Part Vec3Mix
+	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
 	return (((A,0.0)*(1.0-F)) + ((B,0.0) * F)).xyz
 
 function Mix (|vec2| A, |float| F, |float|)
 	cpp_Part Vec2Mix
+	description "0.0 means fully .x,   1.0 means fully .y,  0.5 means half-way between .x and .y" 
 	return (A.x1*(1.0-F)) + (a.x2*F)
 
 

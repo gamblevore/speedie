@@ -1142,17 +1142,15 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (AttrOnly)
 		return CopyStats_(self, To);
 	bool WasOpen = self->Descriptor > 2;
-	int output	= JB_File_OpenBlank(To);
+	int output = JB_File_OpenBlank(To);
 	if (output < 0)
 		return -1;
 
 	int result = 0;
 	int input = JB_File_OpenStart( self, false );
 	if (input > 0) {
-		int ChunkSize = 4*1024;
-		u8 TotalBlock[ChunkSize*2];
-		u8* Block = (u8*)(((IntPtr)(TotalBlock + ChunkSize))&~(ChunkSize-1)); 
-		// align to ChunkSize, for speed
+		const int ChunkSize = 64*1024;
+		u8 Block[ChunkSize];
 		while (true) {
 			int Err = 0;
 			result = InterRead(input, Block, ChunkSize, self, Err, 0);
