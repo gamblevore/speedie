@@ -4,17 +4,20 @@
 */
 
 
-
-
 /*
-	There are two separate possible use cases.
-	
-	* We want to test a file-path against many globs. Use globbed_by.
+	There are two separate possible use cases. And they want to work differently:
+		* We want to test a file-path against many globs. Use globbed_by.
+		* A shell-script received a list of unexpanded globs (or perhaps loaded from a conf-file)
 
-	* A shell-script received a list of unexpanded globs (or perhaps loaded from a conf-file)
-	In this case, passing: abc, abc, abc... should collect abc 3x, as it is a valid situation.
-	For example running a subprocess 3x.	
+	The main difference is that for a shell, passing: abc, abc, abc... should collect "abc" 3x
+	For example running a subprocess 3x.
+	
+	In addition, the paths are already inputpaths that want to be expanded.
+	
+	Whereas testing an already existing list, doesn't need expanding.
 */
+
+
 
 function string.OperatorGlobs (|string?| txt, |bool|)
 	nil checker
@@ -52,12 +55,13 @@ function string.OperatorGlobbed_By (|[string]| globs, |bool|)
 			return true
 
 
-function string.GlobPath (|[file]|)
-	return .split.globpaths
-
-
-function array.GlobPaths (|[string]| self, |[file]|)
+function string.GlobExpand (|[file]|)
 	description "Returns a list of files, that match the glob passed. Can send one glob per line."
+	return .split.GlobExpand
+
+
+function array.GlobExpand (|[string]| self, |[file]|)
+	description "Returns a list of files, that match the glob passed, using the input list of files."
 
 	|| base = "/".file
 	for L in self
