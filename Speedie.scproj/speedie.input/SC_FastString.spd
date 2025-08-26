@@ -7,6 +7,17 @@ extend_module scfunction
 
 
 module FastStringOpts {
+// 
+// Next possible optimisation? Allow passing numbers 0 to 255 as low pointer numbers
+// just force type-cast an int to a jb_object. This means something like: x = "a"+str
+// now can compile better.
+
+// I wonder if ints could be done too? Or perhaps... we could pass a format int to the func
+// Seems we really just want varargs (from c)... and boxed objects (from javascript)
+// could pass cstrings even in a boxed-arg! haha.
+//
+
+
 || FSRemoved  = 0
 || StrRemoved = 0
 || InitedOK   = 0
@@ -56,7 +67,6 @@ function message.FirstPrmObj (|object|)
 
 function TryStringAppend (|message| s)
 	opt norefcounts
-	if "ParseOption".trap
 	// 3 to 6 items.
 	// removes faststrings which can be wasteful.
 	
