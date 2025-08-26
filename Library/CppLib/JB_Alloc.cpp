@@ -562,18 +562,19 @@ uint8* JB_ObjClassBehaviours(JB_Object* Obj) {
 }
 
 
-void JB_ObjDestroy( JB_Object* Obj ) {
-	if (Obj) {
-		AllocationBlock* Block = ObjBlock_(Obj);
-		fpDestructor Destructor = GetDestructor_(Block);
-		if (Destructor) {
-			(Destructor)(Obj);
-		}
-		// in theory... I could call the default constructor after? In fact it may be faster than calling memset!
-		JB_Class* Cls = Block->Owner->Class;
-		memzero(4+(char*)Obj, Cls->Size - 4);
-	}
-}
+//void JB_ObjDestroy( JB_Object* Obj ) {
+//  violates the nil-checker.
+//	if (Obj) {
+//		AllocationBlock* Block = ObjBlock_(Obj);
+//		fpDestructor Destructor = GetDestructor_(Block);
+//		if (Destructor) {
+//			(Destructor)(Obj);
+//		}
+//		// in theory... I could call the default constructor after? In fact it may be faster than calling memset!
+//		JB_Class* Cls = Block->Owner->Class;
+//		memzero(4+(char*)Obj, Cls->Size - 4);
+//	}
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

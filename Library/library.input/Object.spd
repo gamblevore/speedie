@@ -29,13 +29,10 @@ class Object
 	helper RefCount (|int|)
 		cpp_Wrapper JB_RefCount
 	
-	helper ObjectID (|int|)			// stable across Runs!
+	helper ObjectID (|int|)
+		description "Returns an object ID, decided by class-type, and order of creation (but not memory-location)."
 		nil checker
-		cpp_wrapper JB_ObjectID		// uses pos within the superblock :)
-	
-	function Dispose				// Safely clears out all the properties...
-		cpp_wrapper JB_ObjDestroy
-
+		cpp_wrapper JB_ObjectID
 
 	operator isa (|ClassData| cls, |bool|)
 		cpp_part Isa

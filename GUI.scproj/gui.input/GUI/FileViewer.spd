@@ -30,8 +30,9 @@ class FileViewer (ListView)
 	
 	
 	destructor
-		.quickopen.disposeall
-		.listopen.disposeall
+		.quickopen.ClearTree
+		.listopen.ClearTree
+		.editme.ClearTree
 
 
 	function Init

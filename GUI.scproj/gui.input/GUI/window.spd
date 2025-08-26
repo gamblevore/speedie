@@ -63,7 +63,7 @@ class Window (GUIControl)
 
 	
 	destructor
-		.disposeall
+		.ClearTree
 
 
 	virtual FrameStep (|bool| GUIActive)
@@ -464,7 +464,8 @@ class Window (GUIControl)
 		if self
 			if reason isnt terminating
 				require !.__CancelClose__(reason)
-			.DisposeAll(true)
+			.ClearTree
+			.remove
 		return reason
 
 	

@@ -275,7 +275,6 @@ JB_Object* JB_Mem_First( JB_MemoryLayer* Mem );
 JB_Object* JB_ObjNext(JB_Object* Obj);
 JB_MemoryLayer* JB_ObjLayer( JB_Object* Obj );
 uint JB_ObjectID( JB_Object* Obj );
-void JB_ObjDestroy( JB_Object* Obj );
 JB_MemoryLayer* JB_Class_DefaultLayer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_Layer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_CurrLayer( JB_Class* Cls );

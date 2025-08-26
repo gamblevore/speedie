@@ -152,13 +152,12 @@ class list (Saveable)
 	function Remove
 		.Parent = nil
 	
-	function DisposeAll (|bool| MeToo=false)
+	function ClearTree
 		opt norefcounts
 		require self
 		while (|| f = .first)
-			f.disposeall(true)
-		if (Metoo)
-			.dispose
+			f.ClearTree
+			f.remove
 				
 
 	function FwdDist (|list!| F, |int|)
