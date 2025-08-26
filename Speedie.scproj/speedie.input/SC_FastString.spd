@@ -1,26 +1,112 @@
 
 
 extend_module scfunction
-	function FastStringOpt (|message| s)
+	function OptMe (|string| t)
 		opt norefcounts
-		|| fn = s.msgfunc
-		|| prms = s.second
-		require  prms  and  fn
-		require fn.ExportName == "JB_FS_AppendString"
-		|| item = prms.last
-		if item.msgfunc == "JB_FS_GetResult"
-			FastStringOpts.FS(s, item)
-		  else
-			FastStringOpts.StringCleanup(item)
+		|| s = "help$t!"
 
 
 module FastStringOpts {
-	|| FSRemoved  = 0
-	|| StrRemoved = 0
-	|scfunction| _ByteFunc 
+|| FSRemoved  = 0
+|| StrRemoved = 0
+|| InitedOK   = 0
+|scfunction| FnByte
+|scfunction| FnGetResult 
+|scfunction| FnAppend 
+|scfunction| FnAppend4
+|scfunction| FnAppend6
+|scfunction| FnPlus 
 
 
-function FS (|Message| exp, |Message| getresult)
+function Init (|message| s, |bool|)
+	require InitedOK == 0
+	|| m = StdErr.Mark
+	fnbyte = compiler.XFunc("JB_FS_AppendByte", s)
+	fnGetResult = compiler.XFunc("JB_FS_GetResult", s)
+	fnAppend = compiler.XFunc("JB_FS_AppendString", s)
+	FnAppend4 = compiler.XFunc("JB_Str_Append4", s)
+	FnAppend6 = compiler.XFunc("JB_Str_Append6", s)
+	fnPlus = compiler.XFunc("JB_Str_OperatorPlus", s)
+	rz = m
+	InitedOK = 2 - rz
+
+
+function Optimise (|message| s)
+	opt norefcounts
+	if InitedOK != 1
+		require .init(s)
+	
+	|| fn = s.MsgFunc
+	|| prms = s.second				#require
+	if fn == FnAppend
+		|| item = prms.last
+		if item.msgfunc == fnGetResult
+			FastStringOpts.FS(s, item)
+		  else
+			FastStringOpts.StringToByte(item)
+	  elseif fn == FnGetResult
+		.TryStringAppend(s)
+
+
+function message.FirstPrmObj (|object|)
+	opt norefcounts
+	|| p = .last.first
+		return p.obj
+
+
+function TryStringAppend (|message| s)
+	opt norefcounts
+	if "ParseOption".trap
+	// 3 to 6 items.
+	// removes faststrings which can be wasteful.
+	
+	|| desiredObj = s.firstprmobj
+	|| s2 = s.uptoarg
+	|| Count = 0
+	|| p = s2
+	while 
+		p = p.prev$
+		|| fn = p.MsgFunc 
+		if fn == .FnAppend or .fnbyte
+			require p.firstprmobj == desiredObj
+			Count++
+			require count <= 6
+		  else
+			require p == @decl and p.obj == desiredObj
+			exit  // some kinda constructor actually just debug it
+	// so... now that we constructed and appended it... now wht do wed o?
+	// OK... so we found a few in row
+	
+	require count >= 2
+	|| prms = s.second!
+	prms.first.remove
+	if count == 2
+		s.become(FnPlus!)
+	  elseif count >= 3 and count <= 4
+		s.become(fnappend4!)
+	  else	
+		s.become(fnappend6!)
+
+	while
+		|| n = p.next
+		p.remove
+		p = n
+		if p==s2
+			exit
+		|| oof = p.last.last
+		if oof == @char // damn! well it was from appendbyte. anyhow. Lets change it back.
+			oof.func = @sstr
+			oof.obj = typestring!.typenormal
+			StrRemoved-- 
+		prms <~ oof
+	
+	if count&1
+		prms.msg(@thg, "nil").obj = TypeNil
+	
+	
+
+
+function FS (|Message| exp, |Message| GetResult)
 	opt norefcounts
 	|| fs2 = getresult.last.first!
 	|| t2 = TypeOfExpr(fs2, nil)
@@ -42,13 +128,12 @@ function FS (|Message| exp, |Message| getresult)
 	.FSRemoved++
 
 
-function StringCleanup (|Message| str)
+function StringToByte (|Message| str)
 	opt norefcounts
 	require (str == @str or @sstr or @back) and (str.name == 1)
 	str.obj = typebyte!.typenormal
 
-	|| B  =  ._bytefunc  init  compiler.XFunc("JB_FS_AppendByte")
-	str.parent!.obj = b
+	str.parent!.obj = .fnbyte
 	str.func = @char
 	TypeOfChar(str, nil)
 	.StrRemoved++

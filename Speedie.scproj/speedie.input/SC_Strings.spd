@@ -67,7 +67,6 @@ function NewRender (CollectFunc)
 
 function ObjectifyString (|Message| func)
 	opt norefcounts
-	//if func.name != 1
 	func.func = @sstr
 
 /*

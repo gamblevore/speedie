@@ -1604,7 +1604,7 @@ static JB_String* Str_Append_(JB_String* Items[], int N, int Bytes) {
 
 
 
-#define Append_(X) if (JB_Str_Length(X)) {Items[i++] = X; N += X->Length;}
+#define Append_(X) if (X) {int L = X->Length; N += L; if (L) {Items[i++] = X;}}
 JB_String* JB_Str_Append4(JB_String* A, JB_String* B, JB_String* C, JB_String* D) {
     JB_String* Items[4];
     int i = 0;

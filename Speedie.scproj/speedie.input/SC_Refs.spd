@@ -487,6 +487,7 @@ function message.Become (|scfunction| func)
 	opt norefcounts
 	//.position = -1
 	// clearing this loses good positions that we set in the refcounter
+	.first!.name = func.ExportName
 	.second!.obj = func
 	.obj = func.ReturnType
 	ifn func is Destructor

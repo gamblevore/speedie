@@ -361,7 +361,7 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 	  elseif !(f == @Thg or @opp or @Item or @prm)
 		TypeOfExpr( s, p )
 		if s == @func
-			.FastStringOpt(s)
+			FastStringOpts.optimise(s)
 			
 	  elseif f == @unit
 		return  // units have internal structure that can be damaged

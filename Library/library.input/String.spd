@@ -404,12 +404,14 @@ class String
 		nil safe
 		cpp_wrapper JB_Str_OperatorPlus
 			
-	helper Append (|string| b, |string| c, |string| d="")
+	helper Append (|string?| b, |string?| c, |string?| d=nil, |string|)
 		cpp_wrapper JB_Str_Append4
-	helper Append (|string| b, |string| c, |string| d, |string| e, |string| f="")
+
+	helper Append (|string?| b, |string?| c, |string?| d, |string?| e, |string?| f=nil, |string|)
 		cpp_wrapper JB_Str_Append6
 		
 	function Insert (|string| s, |int| i, |int| n = 0, |string|)
+		// perry uses this. Useful.
 		if i < 0
 			n += i
 			i = 0
