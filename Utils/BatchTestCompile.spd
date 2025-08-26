@@ -2,26 +2,14 @@
 
 || Fails = faststring()
 
-
 main (|[file]| Files)
-	for f in files
-		if f.MustExist
-			app.TryCompile(f)
+	for f in files.GlobPaths
+		app.TryCompileOne(f)
 	
 	if Fails.length
 		app.say("$fails Failiures")
 	  else
 		app.say("All OK")
-
-
-function app.TryCompile	(|file| f)
-	if f isa "scproj" or "spd"
-		return .TryCompileOne(f)
-	require f.IsDir
-
-	for c.files in f
-		if !c.IsSymLink // avoid loops lol.
-			.TryCompile(c)
 
 
 function app.TryCompileOne (|file| f)

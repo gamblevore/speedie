@@ -4,8 +4,21 @@
 */
 
 
-function string.OperatorGlobs (|string| txt, |bool|)
-	require self
+
+
+/*
+	There are two separate possible use cases.
+	
+	* We want to test a file-path against many globs. Use globbed_by.
+
+	* A shell-script received a list of unexpanded globs (or perhaps loaded from a conf-file)
+	In this case, passing: abc, abc, abc... should collect abc 3x, as it is a valid situation.
+	For example running a subprocess 3x.	
+*/
+
+function string.OperatorGlobs (|string?| txt, |bool|)
+	nil checker
+	require self and txt
 	description "Don't use this on a full-file path, but on path components"
 	|&byte| text_backup
 	|&byte| wild_backup
@@ -36,56 +49,47 @@ function string.OperatorGlobbed_By (|[string]| globs, |bool|)
 	opt norefcounts
 	for g in globs
 		if g globs self
-			return true		
+			return true
 
 
-/*
-	There are two separate possible use cases.
-	So we need two separate functions to do this.
-	
-	1) We want to pass a list of globs to collect them, like to a shell script
-		Passing: abc, abc, abc... should collect abc 3x.
-		
-	2) We want to test a file-path against some globs. Just use globbed_by.
-*/
+function string.GlobPath (|[file]|)
+	return .split.globpaths
 
 
-
-
-function string.GlobPath (|bool| AllowLinks=false, |[file]|)
-	return .split.globpaths(allowlinks)
-
-
-function array.GlobPaths (|[string]| self, |bool| AllowLinks=false, |[file]|)
+function array.GlobPaths (|[string]| self, |[file]|)
 	description "Returns a list of files, that match the glob passed. Can send one glob per line."
 
+	|| base = "/".file
 	for L in self
 		|| fixed = L.RegularPath
 		if Fixed contains "**"
 			error "Can't glob '**' in: " + Fixed
 		  else
-			"".FileGlobSub(AllowLinks, fixed / '/', rz, 0)
+			base.FileGlobSub(fixed / '/', rz, 1)
 
 
-// /usr/local/speedie/abc*
-
-helper string.FileGlobSub (|bool| AllowLinks, |[string]| GlobParts, |[file]| result, |int| i)
-	|string--| p = GlobParts[i++]
-	p ?= ""
-	ifn p contains '*'
-		|| newpath = (.child(p), "/")(self or p) 
-		newpath.FileGlobSub2(AllowLinks, GlobParts, result, i)
-		return
+helper file.FileGlobSub (|[string]| GlobParts, |[file]| result, |int| pi)
+	|string--| p = GlobParts[pi++]$
 	
-	for ch in .file.list // skips invis, and sorts
-		if p globs ch
-			.child(ch).FileGlobSub2(AllowLinks, GlobParts, result, i)
+	|| Names = (.list, nil)(p contains '*')
+	|| n = 0 
+	while
+		|string--| str = p
+		if names!=nil
+/			str = names[n++]
+			loop str!=nil
+			ifn p globs str
+				continue
 
+		|| f = .child(str)
+		if names==nil
+			f.MustExist("globbing")
+		if f.exists
+			if GlobParts > pi
+				f.FileGlobSub(GlobParts, result, pi)
+			  else
+				result <~ f
+		
+		loop names!=nil
+	
 
-helper string.FileGlobSub2 (|bool| AllowLinks, |[string]| parts, |[file]| result, |int| i)
-	if parts > i
-		.FileGlobSub(AllowLinks, parts, result, i)
-	  else
-		|| f = .file
-		if f.Exists
-			result <~ f
