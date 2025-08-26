@@ -85,8 +85,6 @@ typedef int FileDes;
 
 typedef int FileMode;
 
-typedef bool FileResolveMode;
-
 typedef int64 FileSizeInt;
 
 typedef double Float64;
@@ -1593,18 +1591,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2212])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2213])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2213])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2214])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2214])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2215])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2211])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2212])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2214])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2215])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2215])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2216])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1836,7 +1834,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2220])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2221])
 
 extern int SC_CountASMFuncPrint;
 extern Dictionary* SC_CppRefTable;
@@ -1875,7 +1873,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2216])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2217])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1915,7 +1913,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2221])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2222])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2150,12 +2148,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2219])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2220])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2218])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2219])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2217])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2218])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2803,8 +2801,6 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__FileMode_Process ((FileMode)493)
 
-#define kJB__FileResolveMode_AllowMissing ((bool)1)
-
 #define kSC__FunctionType_AlreadyExported ((FunctionType)16384)
 
 #define kSC__FunctionType_API ((FunctionType)8388608)
@@ -3305,7 +3301,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2210])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2211])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3358,6 +3354,12 @@ extern JB_String* App__SwearWord_secondwords;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
 #define JB__File__Speedie JB__.File__Speedie
+#define kJB__File_AllowInvisible ((int)1)
+
+#define kJB__File_AllowMissing ((bool)1)
+
+#define kJB__File_AllowSymLinks ((int)2)
+
 #define kJB__File_AppendMode ((int)8)
 
 #define kJB__File_CreateMode ((int)512)
@@ -3372,6 +3374,8 @@ extern Dictionary* SC__xC2xB5Form_Forms;
 #define kJB__File_ReadWriteMode ((int)2)
 
 #define kJB__File_TruncateMode ((int)1024)
+
+#define kJB__File_WantFileObjects ((int)4)
 
 #define kJB__File_WriteMode ((int)1)
 
@@ -5237,6 +5241,8 @@ JB_String* JB_int_RenderSize(int Self, FastString* Fs_in);
 
 int JB_int_SyntaxAccessSet(int Self, int Bit, bool Value);
 
+int JB_int_SyntaxCompare(int Self, JB_String* S, bool Aware);
+
 int JB_int_TabsWidth(int Self);
 
 ASMReg SC_int_TextASM(int Self);
@@ -5898,9 +5904,6 @@ bool JB_ExitCode_Successful(ExitCode Self);
 
 
 // FileMode
-
-
-// FileResolveMode
 
 
 // FileSizeInt
@@ -6660,7 +6663,7 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* Self, JB_String* Name, Message* 
 
 
 // JB_ClassData
-JB_MemoryLayer* JB_ClassData_CreateUseLayer(JB_Class* Self, JB_Object* Obj, JB_Object* Obj2);
+JB_MemoryLayer* JB_ClassData_CreateLayerAndUse(JB_Class* Self, JB_Object* Obj, JB_Object* Obj2);
 
 void JB_ClassData_Restore(JB_Class* Self);
 
@@ -8444,7 +8447,7 @@ bool JB_Str_CompressTestSub(JB_String* Self, int Strength, bool Report);
 
 JB_String* SC_Str_ContainerName(JB_String* Self, JB_String* Ext);
 
-JB_String* JB_Str_Decompress(JB_String* Self, int Lim, CompressionStats* St);
+JB_String* JB_Str_Decompress(JB_String* Self, JB_Object* Dest, int Lim, CompressionStats* St);
 
 Dictionary* JB_Str_Dict(JB_String* Self, uint /*byte*/ Sep);
 
@@ -8590,6 +8593,8 @@ void JB_Str_PrintlineColor(JB_String* Self, JB_String* Color);
 
 JB_String* JB_Str_ReadFile(JB_String* Self, int Lim, bool AllowMissing);
 
+JB_String* JB_Str_RegularPath(JB_String* Self);
+
 JB_String* JB_Str_ReplacePathComponent(JB_String* Self, int Num, JB_String* With);
 
 void SC_Str_Safe(JB_String* Self, FastString* Fs, bool Local);
@@ -8634,7 +8639,7 @@ JB_String* JB_Str_TrimFirst(JB_String* Self, uint /*byte*/ B);
 
 int JB_Str_TrimLastSub(JB_String* Self, uint /*byte*/ B);
 
-JB_String* JB_Str_TrimSlashes(JB_String* Self, bool Pathfix);
+JB_String* JB_Str_TrimSlashes(JB_String* Self);
 
 bool SC_Str_UnderScoreAtAnyEnd(JB_String* Self);
 
@@ -8876,9 +8881,9 @@ bool JB_File_DirectoryContains(JB_File* Self, JB_String* Path);
 
 ErrorInt JB_File_LinkToSet(JB_File* Self, JB_String* Value);
 
-Array* JB_File_List(JB_File* Self, bool Invis, bool AsFile);
+Array* JB_File_List(JB_File* Self, int Mode);
 
-Array* JB_File_ListFiles(JB_File* Self, bool Invis);
+Array* JB_File_ListFiles(JB_File* Self, int Mode);
 
 bool JB_File_MustExist(JB_File* Self, JB_String* Operation);
 
@@ -11757,12 +11762,12 @@ Message* JB_config__Create(JB_String* Path);
 
 
 // JB_interface
-bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
 
 
 
 // JB_interface
-void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
+bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
 
 
 
