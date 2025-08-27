@@ -270,13 +270,16 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 	
 function ExecuteGCC (|[string]| Commands, |bool|)
-	|| Result = CppCompilerPath.Execute(Commands) 
-	if Result.Successful
-		return true
-	
-	|| Start = "C++ compiler failed to compile source code. Command:\n\n " + CppCompilerPath + " "
-	error (Start + commands.join(" "))
-	CppCompilerPath.Execute(Commands)		
+	|| fserrs = FastString()
+	fserrs <~ "<(`\nC++ compiler failed to compile source code. Command:\n\n $CppCompilerPath \n" // prebuild
+	|| Result = CppCompilerPath.Execute(Commands, nil, fserrs) 
+	rz = Result.Successful
+	if !rz
+		fserrs <~ (Commands, " ")
+		fserrs <~ "`)>"
+		error fserrs
+		target debug
+/			CppCompilerPath.Execute(Commands)		
 	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
@@ -526,10 +529,6 @@ function InstallCompiler
 	if options.Makelib
 		.MakeLib
 }
-
-
-//function String.LastLine (|string|)
-//	return .AfterByte('\n')
 
 
 function file.TestBatch (|bool|)

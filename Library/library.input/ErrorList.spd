@@ -241,14 +241,12 @@ class ErrorReceiver
 extend Object
 	syntax expect
 		cpp_part Fail
-		printline errorreceiver.NonFatal
 		app.CrashPrint
-		target debug
-			|| fs = faststring()
-			app.ObjMemory.strsize(Fs)
-			fs <~ " memory used"
-			printline fs
-		errorreceiver.NewError(nil, errorreceiver.NonFatal)
+		|| fs = FastString()
+		fs <~ errorreceiver.NonFatal
+		fs <~ ": "
+		.render(Fs)
+		fs.SyntaxExpect
 
 
 extend string
@@ -256,6 +254,13 @@ extend string
 		cpp_part Fail
 		visible
 		errorreceiver.NewError(nil, self)
+
+
+extend faststring
+	syntax expect
+		cpp_part Fail
+		visible
+		.GetResult.SyntaxExpect
 
 
 datatype ErrorMarker (int)

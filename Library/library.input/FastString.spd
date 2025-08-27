@@ -105,8 +105,19 @@ class FastString {
 	render
 		fs <~ self
 
-	syntax Append (|Byte| data, |int|count)
+	syntax Append (|Byte| data, |int| count)
 		cpp_wrapper JB_FS_AppendMultiByte
+
+	syntax Append (|[string]| data, |string| sep)
+		cpp_part AppendJoin
+		opt norefcounts
+		self <~ data[]
+		|| i = 0
+		while 
+			|| s = data[++i]
+			loop s != nil
+			self <~ sep
+			self <~ s
 
 	syntax Append (|string| data, |int|count)
 		cpp_part AppendMultiStr

@@ -1782,11 +1782,18 @@ class TextView (GUIControl)
 		|| Remain = .DrawPreparedTextSub(where, false)
 		|| Old = ._RemainingHeight
 		._RemainingHeight = Remain
-		if !._CanSeeAllLines and Old and Remain > Old and Old > 0 // lets try to decrease that remaining height!
+		if !._CanSeeAllLines and Remain > Old and Old > 0 // lets try to decrease that remaining height!
 			|| NO = old / .LineHeight
 			|| NR = Remain / .LineHeight
-			if NR > NO
-				._Start = ._Start.MoveCapped(NO - NR)
+			|| Diff = NO - NR
+			if Diff < 0
+				._RemainingHeight += Diff * .LineHeight
+				._Start = ._Start.MoveCapped(Diff)
+// were losing some remain somehow. not sure why. IDK maths?
+//				|| OldLoss = Old - (NO * .lineheight)
+//				|| NewLoss = Remain - (NR * .lineheight)
+//				._RemainingHeight += NewLoss - OldLoss
+					
 		return .DrawPreparedTextSub(where, true)
 			
 	
