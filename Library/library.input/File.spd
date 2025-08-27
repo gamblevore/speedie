@@ -13,7 +13,8 @@ class File (String)
 	|filedes|		Descriptor
 
 	constants
-		IgnoreErrors = true
+		AllowMissing = true
+		ExpectExists = false
 		CreateMode	 = 0x200			/* create if nonexistant */
 		TruncateMode = 0x400			/* truncate to zero length */
 		ExclusiveMode = 0x800			/* error if already exists */
@@ -21,6 +22,11 @@ class File (String)
 		ReadMode = 0x000				/* open for reading only */
 		WriteMode = 0x001				/* open for writing only */
 		ReadWriteMode = 0x002			/* open for reading and writing */
+
+	flags
+		AllowInvisible
+		AllowSymLinks
+		WantFileObjects
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -441,13 +447,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		rz.sort(&string.sorter)
 		if !flowcontrol.isdisabled
 			flowcontrol.input(rz, self)
-		
-	
-	flags
-		AllowInvisible
-		AllowSymLinks
-		WantFileObjects
-		AllowMissing=true
 		
 	
 	function MoveTo (|string| Path, |ErrorInt|)
