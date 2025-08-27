@@ -300,5 +300,4 @@ function Compiler.GetTypeVoid (|scdecl!|)
 	
 	rz = vc.TypeNormal
 	typevoid = rz
-	vc.LinkedFrom = int.max
 	TypeVoidPtr = rz.GetAddress

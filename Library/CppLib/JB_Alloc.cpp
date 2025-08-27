@@ -149,23 +149,23 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 }
 
 
-JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent) {
-	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
-	if (Cls)
-		JBClassInitReal(*Cls, Name, Size, Parent, 0);
-	return Cls;
-}
-
-
-void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd) {
-	void** A = (void**)(malloc(sizeof(void*) * n));
-	cls->CppTable = (JBObject_Behaviour*)A; // both tables should agree with each other 
-	*Cpp = A;
-
-	void** B = (void**)(malloc(sizeof(void*) * n));
-    cls->SpdTable = B;
-	*Spd = B;
-}
+//JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent) {
+//	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
+//	if (Cls)
+//		JBClassInitReal(*Cls, Name, Size, Parent, 0);
+//	return Cls;
+//}
+//
+//
+//void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd) {
+//	void** A = (void**)(malloc(sizeof(void*) * n));
+//	cls->CppTable = (JBObject_Behaviour*)A; // both tables should agree with each other 
+//	*Cpp = A;
+//
+//	void** B = (void**)(malloc(sizeof(void*) * n));
+//    cls->SpdTable = B;
+//	*Spd = B;
+//}
 
 
 MemStats JB_MemoryStats(JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
@@ -398,16 +398,16 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 	}
 #endif
 
-void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size) {
-    memzero(Cls, sizeof(JB_Class)); // can’t use JB_Zero.
-    Cls->DefaultBlock = (AllocationBlock*)(&Cls->Memory.Dummy);
-    Cls->Size = Size;
-    Cls->Memory.RefCount = 1; // so it never goes away
-    Cls->Memory.CurrBlock = (AllocationBlock*)(&Cls->Memory.Dummy);
-    Cls->Memory.Dummy.Owner = &Cls->Memory;
-    Cls->Memory.World = World;
-    Cls->Memory.Class = Cls;
-}
+//void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size) {
+//    memzero(Cls, sizeof(JB_Class)); // can’t use JB_Zero.
+//    Cls->DefaultBlock = (AllocationBlock*)(&Cls->Memory.Dummy);
+//    Cls->Size = Size;
+//    Cls->Memory.RefCount = 1; // so it never goes away
+//    Cls->Memory.CurrBlock = (AllocationBlock*)(&Cls->Memory.Dummy);
+//    Cls->Memory.Dummy.Owner = &Cls->Memory;
+//    Cls->Memory.World = World;
+//    Cls->Memory.Class = Cls;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -737,6 +737,24 @@ static AllocationBlock* SuperBlockSetup_( SuperBlock* Super, JB_MemoryWorld* Wor
     }
     SetupSuper_( Super, World );
     return LinkInSuper_(World, Super);
+}
+
+
+int FindClassDepth(JB_Class* C) { 
+	int n = 1;
+	while (C) {
+		C = C->Parent;
+		n++;
+	}
+	return n;
+}
+
+void JB_CollectClassDepths () {
+	auto C = AllClasses;
+	while (C) {
+		C->ClassDepth = FindClassDepth(C);
+		C = C->NextClass;
+	}
 }
 
 

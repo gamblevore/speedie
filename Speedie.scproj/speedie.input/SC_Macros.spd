@@ -8,7 +8,7 @@ module Macros {
 
 || InitExpand = "({
 	|| _X = _0
-	if !_X
+	if _X == nil // useful for initing arrays... which could start as nil
 		_X = _1
 		_0 = _X
 	rejoin _X

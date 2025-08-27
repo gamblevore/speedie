@@ -338,12 +338,10 @@ function Message.AOrBExpand (|bool|)
 
 
 function Message.OppExpand (|bool|)
-	if self == @opp
-		if self == "??"
-			return .AOrBExpand
-		if self == "init"
-			return .initexpand
-
+	if self == "??"
+		return .AOrBExpand
+	if self == "init"
+		return .initexpand
 
 function Message.InitExpand (|bool|)
 	opt norefcounts
@@ -366,7 +364,7 @@ function Message.RelFix (|bool| force, |bool|)
 	if force or !plus.obj
 		|| PlusScore = plus.opscore // just do it now
 		|| SubRel = Plus.next
-		if  Plus == ":=" or "?="
+		if  Plus == "?="
 			.FixErl
 		  elseif SubRel == @Rel
 			rz = subrel.relfix(true)

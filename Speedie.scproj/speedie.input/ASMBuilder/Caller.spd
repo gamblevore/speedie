@@ -210,8 +210,6 @@ function InlineParameters (|message| prms, |bool| IsLeaf)
 	opt norefcounts
 	|| p = prms.first!
 
-	target debug
-		if asmtrapper == 921
 	for a in .fn.Args
 		|| V = .InlineVar(prms, p, a)
 		|| R = ASMReg.Discard * (IsLeaf and a isnt altered)

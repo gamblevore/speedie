@@ -67,7 +67,10 @@ function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	fs <~ " "
 	fs <~ self
 	if amount != 1
-		if .Last == 's'
+		|| l = .last
+		|| l2 = .last(1)
+		//	'ch', 'sh', 'x', 's', 'z'
+		if (l == 's' or 'x' or 'z') or (l == 'h'  and  l2 == 'c' or 's')
 			fs <~ "e"
 		fs <~ "s"
 	return fs

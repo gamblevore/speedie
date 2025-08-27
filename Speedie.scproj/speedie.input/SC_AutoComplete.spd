@@ -74,7 +74,7 @@ function EnterAutoComplete (|bool|)
 		"(Noisy)"
 		perry.pico.config.noise = -1
 
-	compiler.InPerry = true
+	compiler.InPerry = 1
 	.PerryTalk(perry)
 	"ExitingCommands"						// this also
 	return true
@@ -89,12 +89,12 @@ function InitedOK (|bool|)
 
 function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
 	.CompiledOK = Compiler.CompileAll >= 1
+	compiler.InPerry = 2
 	.ParserRestore
 	perry <~ .check
 	
 	for cmd in perry
-		if cmd and !.CmdWrap(cmd)
-			exit
+		loop .CmdWrap(cmd)
 
 	"StartExit"
 	perry.Disconnect					// calls close, which uses SO_LINGER, to allow sending.
@@ -144,7 +144,7 @@ function CmdWrap (|Message| arg, |bool|)
 		app.crash
 	
 	|| cmd = .CmdCleanUp(arg)
-	|| response = .cmdresponse(cmd) 
+	|| response = .CmdResponse(cmd) 
 
 	if cmd != response
 		cmd.ReplaceWith(response)
@@ -428,7 +428,7 @@ function MainActAutoComplete (|Message| thg, |string| str, |message| cmd, |messa
 
 
 function MainAct (|Message| cmd, |scfile| my_file, |message|)
-	opt norefcounts
+	opt norefcounts 
 	|| f = cmd[@num, 1].int|int|
 	|| n = cmd[@num, 2].int|int|					#expect "nolen"
 	my_file.use

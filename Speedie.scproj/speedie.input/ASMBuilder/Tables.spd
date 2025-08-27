@@ -161,9 +161,11 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 		  else
 			dest = .µ(f, asmreg.discard)
 	
-	.closevars(.state.ParentVars, exp)
-	if .state.TailInlineable and ReturnOpt(self, dest)
-		return dest
+	if .state.TailInlineable
+		.ClearAllStructs(exp)
+//		.closevars(.state.ParentVars, exp) // bad?
+		if  ReturnOpt(self, dest)
+			return dest
 	
 	|| fat = exp.RET(Dest)
 	fat.µRefCount = 1

@@ -295,7 +295,7 @@ function perryide.UpdateFoundHeader
 		for s.fast in f.ListSource
 			files ++
 			matches += s.SlowCount
-		h.Name = "$matches matches in $files files"
+		h.Name = (matches of "match") + " in " + (files of "file")
 
 
 function PerryIDE.BatchPhind (|string| text,  |bool| DoReplace, |uint| ID,  |bool|)

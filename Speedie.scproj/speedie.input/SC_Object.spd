@@ -7,17 +7,18 @@
 class SCObject
 	|string|					Name
 	|string|					ExportName
-	|[SCNode]?|					LinkFrom
+	|[SCFunction]?|				LinkFrom
 	|message?|					Source
 	|byte|						NoAutoComplete
 	|byte|						AllocSource
-	|int| 						LinkedFrom
+	|uint16|					CurrFuncLink
 	|SCNodeInfo|				NodeInfo
 	
 	constructor
+		.NodeInfo = Compiler.InBuiltType
 		.linkfrom = nil
 	
-	function Name (|string|)
+	function Name (|string|) 
 		nil safe
 		if self
 			return .name
@@ -43,8 +44,8 @@ class SCObject
 	syntax is (|SCNodeInfo| i, |bool|)
 		return .NodeInfo&i
 
-	function TestASM (|SCNodeInfo| i, |bool|)
-		return .NodeInfo[i]
+//	function TestASM (|SCNodeInfo| i, |bool|)
+//		return .NodeInfo[i]
 	
 	syntax is (|SCNodeInfo| i, assigns:|bool|)
 		|| x = .NodeInfo

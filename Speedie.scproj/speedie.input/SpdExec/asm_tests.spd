@@ -521,11 +521,12 @@ function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	|| e = string.char(0xb16b00b5)
 	
 	#!all 4 combos of mem/ptr set
-	e = b
-	m.name = b
+	e = b  
 	b = m.name
+	m.name = b
 	|| f = b
 	m.name = mm.name
+	(e)
 
 
 function Mul (|int| a, |int| b, |int| c, |int| d, |int|)

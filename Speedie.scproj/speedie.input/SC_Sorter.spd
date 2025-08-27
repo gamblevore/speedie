@@ -68,19 +68,6 @@ function SCFunction.FindDepths (|int|)
 
 			  else
 				(rz max= 2)
-				/*
-					function SpdWrapper
-						|| x = spdcaller(2)
-					
-					function SpdCaller (|int| x, |int|)
-						return mycppfunc(x, 123)
-				*/
-				
-				// The question... is should I allocate params as temps, or declarations.
-				// speedie vm temp vars, gets wiped by spd func calls.
-				// cpp funcs also can wipe some vars. Its not an issue for the VM
-				// but for "real code" it is.
-				// for simplicity, lets assume cpp wipes regs, even in the VM.
 
 	.LinkDepth = rz
 

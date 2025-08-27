@@ -1051,11 +1051,12 @@ dispatch ClsCollectTable (CollectFunc)
 
 
 
-datatype SCNodeInfo (int)
-	constants
-		ExplicitExport = 1
-		Visible = 2
-		AllowLinkedLists = 4
+datatype SCNodeInfo (byte)
+	Flags
+		ExplicitExport
+		Visible
+		AllowLinkedLists
+		InBuilt
 		
 
 

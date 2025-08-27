@@ -87,6 +87,18 @@ static void ShrinkCapacity_(Array* self, uint Smaller) {
 }
 
 
+int JB_Array_Find (Array* Self, JB_Object* F) {
+	if (Self) {
+		auto P = Self->_Ptr; 
+		auto A = P + Self->Length; 
+		while (P < A)
+			if (*P++ == F)
+				return (A - P)-1;
+	}
+	return -1;
+}
+
+
 void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 	require0 (self and Value and Count > 0);
 	int n = self->Length; 

@@ -58,8 +58,8 @@ linkage
 |File|						BaseProjectPath  // projectfolder, projfol
 |string|					OriginalInputPath
 |File|						_BuildFolder
-|String|					_Projects
-|String|					_SpeedieProj
+|String?|					_Projects = nil
+|String?|					_SpeedieProj = nil
 |File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
@@ -124,7 +124,8 @@ linkage
 |SCModule|					DisamClasses
 |SCModule|					DisamModules
 
-|bool|						InPerry 
+|byte|						InPerry
+|SCNodeInfo|				InBuiltType
 |bool| 						HasFunny
 |bool|						HasMainFunc
 |byte|						During
@@ -250,6 +251,7 @@ function Reached (|string| s, |bool|)
 
 
 function InitTypes (|bool|)
+	.InBuiltType = SCNodeInfo.InBuilt
 	TypeInt				= compiler["int"]
 	TypeInt16			= compiler["int16"]
 	TypeInt64			= compiler["int64"]
@@ -283,11 +285,13 @@ function InitTypes (|bool|)
 	TypeFastString		= Compiler["faststring"]
 	TypeArray			= Compiler["array"]
 	TypeSaveable		= Compiler["saveable"]
-	require StdErr.ok and .GetTypeVoid
-	TypeStringZero!.DowngradeTo = TypeString
-	(TypeString! is HasSubClass) // compiler doesn't know about internal-subclasses of string.
-	for s in .actualsyxes
-		s.type = typesyntax! // sigh
+	if StdErr.ok and .GetTypeVoid
+		TypeStringZero!.DowngradeTo = TypeString
+		(TypeString! is HasSubClass) // compiler doesn't know about internal-subclasses of string.
+		for s in .actualsyxes
+			s.type = typesyntax! // sigh
+	.InBuiltType = 0
+
 	return StdErr.ok
 
 

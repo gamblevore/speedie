@@ -53,7 +53,7 @@ linkage
 |SCFunction?|				TheBoolFunc
 |SCFunction?|				ConstructorFunc
 |SCFunction?|				DestructorFunc
-|string|					CppClass
+|string?|					CppClass
 |SCDecl?|					ClassType
 |SCDecl|					SelfDecl
 |Message?|					IsModel
@@ -73,7 +73,6 @@ linkage
 |Byte|						Behaviourness
 |byte|						IsWrapper
 
-
 |byte|						IsRole
 |SCNodeType| 				BaseType
 
@@ -83,6 +82,7 @@ constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	
 	node.obj = self			// for autocomplete :)
 	.name = LoadClassName(node)
+	.CppClass = nil
 	.Source = node
 	.Modul = m
 	.IsVisible = SCNode.CurrVisibility

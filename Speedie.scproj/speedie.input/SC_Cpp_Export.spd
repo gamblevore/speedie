@@ -966,6 +966,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			  else
 				require !c.iswrapper
 				c.WriteStructOrUnion(fs)
+			if !c.cstructname // ugh
+				"DAdasdasdpo3kjelq.dk"
 			fs <~ c.CStructName
 		
 		fs <~ ";\n"

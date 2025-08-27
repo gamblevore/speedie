@@ -27,6 +27,7 @@ void JB_Array_SizeSet( Array* self, int NewSize );
 bool JB_Array_FastShrink( Array* self, int NewLength );
 void JB_Array_Append( Array* self, JB_Object* Value );
 void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count );
+int JB_Array_Find (Array* Self, JB_Object* F);
 void JB_Array_Destructor( Array* self );
 int JB_Array_Size( Array* self );
 Array* JB_Array_Copy(Array* self);

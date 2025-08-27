@@ -240,11 +240,11 @@ datatype ErrorSeverity (Byte)
 		OK			= 0
 	
 	module
-		|array of string| _names
+		|[string]| _ErrorNames = nil
 	
 		function InitNames (|[string]|)
 			opt norefcounts
-			return ._names init "OK note warning problem error critical".words
+			return ._ErrorNames init "OK note warning problem error critical".words
 		
 		function Find (|string| name, |message| err=nil, |errorseverity|)
 			opt norefcounts

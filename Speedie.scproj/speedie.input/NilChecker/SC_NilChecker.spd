@@ -109,7 +109,6 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	opt norefcounts
 	// a.b
 	// b(a)
-	
 	dot.func = @func
 	dot.ASMType = (@func)|ASMType|
 	|| upon = dot.First!
@@ -119,6 +118,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	Prms.First = upon
 
 	NewFuncsLoaded = true
+	fn.ReachFunc(scfunction.currfunc!)
 	dot.memorylayer.use
 	|| f = message(@thg, fn.exportname)
 	f.Position = dot.position

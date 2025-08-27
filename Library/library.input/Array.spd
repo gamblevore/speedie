@@ -92,7 +92,7 @@ class Array (saveable)
 	
 //	function Insert (|int| Pos, || Value)
 //		cpp_wrapper JB_Array_Insert
-	
+			
 	function Remove (|int| Pos)
 		cpp_wrapper JB_Array_Remove
 
@@ -154,10 +154,8 @@ class Array (saveable)
 		cpp_wrapper
 	
 	function Find (|| f, |ind|)
-		opt norefcounts
-		for (o in self) (i)
-			if o == f
-				return i
+		nil checker
+		cpp_wrapper JB_Array_Find
 
 
 	syntax Compare (|int| n, |bool|Aware, |int|)
@@ -168,10 +166,8 @@ class Array (saveable)
 		nil self
 		return .length == n
 	
-	operator contains (|object| o, |bool|)
-		return .find(o) >= 0
-
 	function OperatorPlus (|array of ...| other, |array of ...|)
+		opt norefcounts
 		rz = .Copy
 		for s in other
 			rz <~ s 

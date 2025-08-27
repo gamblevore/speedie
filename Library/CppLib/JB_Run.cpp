@@ -189,6 +189,7 @@ void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
 bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
 bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
 void		JB_App__CrashInstall();
+void		JB_CollectClassDepths ();
 int			JB_SP_AppInit();
 void		JB_App__GUIMode(bool GUI) {
 // GUICareTaker seems to cause problems and I'm fed up with it.
@@ -202,6 +203,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
 	Flow_Disabled = 0x7fffFFFF;
+	JB_CollectClassDepths();
 
 	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)

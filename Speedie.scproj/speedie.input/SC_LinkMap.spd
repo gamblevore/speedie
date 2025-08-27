@@ -1,47 +1,47 @@
 
 
 module LinkMap 
-	|int| 			CurrID
-
-	function SCObject.CanLinkTo (|SCObject| To, |bool|)
-		if to.LinkedFrom < LinkMap.CurrID
-			to.LinkedFrom = LinkMap.CurrID
-			return true
-			
-	function SCFunction.DoLinkTo (|SCObject| To)
-		if .canlinkto(to)
-			linkmap.Store(.linkto, To)
 	
-	function scfunction.DoLinkFrom (|SCObject| To)
-		if compiler.InPerry and .CanLinkTo(to)
-			linkmap.Store(To.linkfrom, self)
+	function SCObject.CanLinkFrom (|scfunction| Fn, |bool|)
+		opt norefcounts 
+		if .CurrFuncLink == fn.LinkID
+			return false
+		.CurrFuncLink = fn.LinkID
+		return true
 
-	function scfunction.DoLinkBoth (|SCObject| To)
-		if .canlinkto(to)
-			linkmap.Store(.linkto, to)
-			if compiler.InPerry
-				linkmap.store(To.linkfrom, self)
-	
-	function Store (|&(array? of SCObject)| darr, |SCObject| obj)
+
+	function SCFunction.DoLinkToNode (|SCNode| To)
 		opt norefcounts
-		|| arr = darr[]
-		if arr == nil
-			arr = []
-			darr[] = arr
-		arr <~ obj
+		require to isnt InBuilt
+		require to.CanLinkFrom(self)
+		(.linkto init []) <~ to
+		
+		if Compiler.InPerry
+			(to.linkfrom init []) <~ self
 
+
+	function SCFunction.DoLinkToDecl (|SCDecl| Decl)
+		opt norefcounts
+		.DoLinkToNode(Decl.Type)
+
+		if decl.CanLinkFrom(self)
+			(decl.linkfrom init []) <~ self
+
+	
 
 	function CollectAll
 		opt norefcounts
-		for s in compiler.funclist
-			.collect(s)
+		for (s in compiler.funclist) (i)
+			s.LinkID = i // tableid is set later after sort...
+			.CollectLinksInOne(s)	 // so we use linkid instead
 		scfunction.currfunc = nil
 
 
-	function Collect (|scfunction| self)
+	function CollectLinksInOne (|scfunction| self)
 		opt NoRefCounts
 		scfunction.currfunc = self
-		CurrID++
+		for l in .linkto
+			l.CurrFuncLink = .LinkID
 	
 		for d in .args
 			.CollectLinks( d )
@@ -68,22 +68,14 @@ extend SCFunction {
 function CollectLinks (|object!| obj)
 	opt norefcounts
 	
-	while 
-		if obj isa SCFunction
-			if !Compiler.InPerry
-				return .DoLinkto( obj )
-			return .DoLinkBoth( obj )
+	if obj isa SCBetterNode
+		return .DoLinkToNode(Obj)
 	
-		if obj isa SCClass
-			return .DoLinkTo( obj )
-		
-		if obj isa SCDecl
-			.DoLinkto( obj.type )
-			if compiler.InPerry
-				.DoLinkFrom( obj )
-			obj = obj.IsLookupOnly|SCDecl| #require
-		  else
-			return
+	if obj isa SCDecl
+		.DoLinktoDecl( obj )
+		obj = obj.IsLookupOnly|SCDecl|
+		if obj
+			return .CollectLinks(obj)
 
 
 function Reach
@@ -196,15 +188,15 @@ function compiler.DeadStrip
 	for f in packmaker.PackGlobs
 		f.reach
 
-	if options.MakeInterpreter // must come before the next loop
+	if options.MakeInterpreter		// must come before the next loop
 		for c in .classlist
 			c.reach(Compiler.Interpreter)
 	
 	for c in .classlist
-		if c.MyReacher // shorten-discovery-chains, 
-			c.ReachBehaviours // behaviour chains tend to be long.
+		if c.MyReacher				// shorten-discovery-chains, 
+			c.ReachBehaviours		// behaviour chains tend to be long.
 
-	CodeSorter.LeafsFirst		// super-refcounter wants this
+	CodeSorter.LeafsFirst			// super-refcounter wants this
 	
 
 function scdecl.TypeReach (|SCNode| from, |message| src)

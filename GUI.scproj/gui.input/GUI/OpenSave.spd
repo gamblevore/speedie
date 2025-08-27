@@ -79,6 +79,7 @@ class OpenSaveDialog (Window)
 
     constructor
 		super.constructor
+		.LastGoodPath = "/"
 		.copypaste	   |= copypasteflags.pastefile
 		.onpaste		= DragPathEvent|GUIPasteEvent|
 		.Accept			= buttonview(self, OnAskSaveAnswer)
@@ -206,7 +207,7 @@ class OpenSaveDialog (Window)
 					w.RelistFiles(p.text, false)
 				  else
 					beep
-					p.text = w.LastGoodPath init "/"
+					p.text = w.LastGoodPath
 
 
 

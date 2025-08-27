@@ -8,6 +8,7 @@ Prerelease:
 
 	
 Bugs:
+	* properties declared as ? should get nil even if string/array
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* &uint... allow &int in c++ gen
 	* vector constants

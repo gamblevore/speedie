@@ -130,10 +130,6 @@ struct ClassData
 	|int|					Size
 	|&&nil|					SpdTable
 	
-	function Init (|MemoryWorld| World, |int| Size)
-		// don't call this... unless you create one yourself.
-		cpp_wrapper JB_Class_Init
-	
 	function AllocZeroed (|Object|)
 		cpp_Wrapper JB_Class_AllocZeroed
 		

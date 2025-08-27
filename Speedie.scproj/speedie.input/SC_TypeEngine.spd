@@ -1705,23 +1705,16 @@ function Message.FixErl
 	|| last = opp.Next
 	|| name = opp.Name
 	
-	if name == ":="
-		problem (opp, "Use ?= instead")
-	
-	if (name == ":=" or "?=") and (.niceparent != @arg) 
+	if (name == "?=") and (.niceparent != @arg) 
 		.BecomeMacro(Macros.InitExpand, [ch, .last!])
 	  else
 		using opp
-		
-		//while self in @bra
-		//	.parent!.ReplaceWith( self ) // loses breakpoint info
-		
-		|| IsNilOr = (name == ":=" or "?=")
+				
 		.Func = @rel
 		opp.Name = "="
 
 		ch = ch.copy
-		if IsNilOr
+		if name == "?="
 			|| new_if = @tmp+"if"
 			new_if <~ ch.wrapwith(@brel, "!")
 			.Prev = new_if

@@ -211,7 +211,10 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	iterator
 		while .pico.Canget
-			yield .get(1000.0)
+			|| msg = .get(10.0)
+			if !msg
+				continue
+			yield msg
 
 
 	module

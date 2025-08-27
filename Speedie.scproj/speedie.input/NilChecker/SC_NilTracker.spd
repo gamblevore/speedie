@@ -153,8 +153,8 @@ struct ArchonPurger
 	function FinishNil (|SCFunction| f)
 		opt norefcounts
 		if NewFuncsLoaded
+			linkmap.CollectLinksInOne(f) // more ;|
 			NewFuncsLoaded = false
-			linkmap.Collect(f) // more ;|
 			
 		|| r = f.ReturnType
 			r.nildeclared |= nilstate.stated
