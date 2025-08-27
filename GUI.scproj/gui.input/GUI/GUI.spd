@@ -311,8 +311,13 @@ module GUI
 
 	function SavePrefs
 		if app._prefs
-			app.prefs["screen"] = GUI.Screenraw.List
+			app.prefs["screen"] = GUI.Screenraw.Msg
 			app.PrefsSave
+
+	function ivec4.Msg (|message|)
+		rz = @list.msg
+		for i in 4
+			rz <~ self[i]
 
 
 	function CurrDisplaySize (|ivec2|) // screensize
