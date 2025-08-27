@@ -401,13 +401,15 @@ class String
 			rz.y++
 			
 	operator Plus (|string?| other, |string|)
-		nil safe
+		nil checker
 		cpp_wrapper JB_Str_OperatorPlus
 			
 	helper Append (|string?| b, |string?| c, |string?| d=nil, |string|)
+		nil checker
 		cpp_wrapper JB_Str_Append4
 
 	helper Append (|string?| b, |string?| c, |string?| d, |string?| e, |string?| f=nil, |string|)
+		nil checker
 		cpp_wrapper JB_Str_Append6
 		
 	function Insert (|string| s, |int| i, |int| n = 0, |string|)

@@ -8,8 +8,8 @@ class TextView (GUIControl)
 
 	|bool| 						ShowLineNumbers
 	|bool|						GroupSaveAll
-	|bool|						PreferStayAtEnd
 	|byte|						LineHeight
+	|bool|						PreferStayAtEnd
 	|byte|						ExpectsParse
 	|int8|						YAdjust
 	|MoveCode|					Alignment // centered, left, right
@@ -21,6 +21,7 @@ class TextView (GUIControl)
 	|byte|						_LineNumWidth
 	|byte|						_CodeInsertionState
 	|uint16|					_LastDrawWidth
+	|int|						_RemainingHeight
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
 	|TextViewLine|				_Start
@@ -961,7 +962,6 @@ class TextView (GUIControl)
 		require ._CanAutoComplete == 1
 		|| c2 = ._AutoCompleteString			#require
 		|| trim = c2.InsertTrim
-		|| autostart = c2[0, trim.x]
 		|| ins = .sel0
 		|| old = self[ins - ._autocompleteback, ins]
 		if old != c2
@@ -1776,26 +1776,43 @@ class TextView (GUIControl)
 				.DrawErrorMark(where, s, C)
 			  elseif s is BreakPoint
 				.DrawErrorMark(where, s, colors.purple)
-		
-		
-	helper DrawPreparedText (|image| where)
-		opt norefcounts
-		|| d		= .StartLine
-		|| N		= .MaxVisibleLines
-		|| lc		= .LineNumColor
-		|| y		= (.lineheight|int| - font.height) + .lasttop
-		y -= 2
 
-		|| yend		= .LastBottom
+
+	helper DrawPreparedText (|image| where, |int|)
+		|| Remain = .DrawPreparedTextSub(where, false)
+		|| Old = ._RemainingHeight
+		._RemainingHeight = Remain
+		if !._CanSeeAllLines and Old and Remain > Old and Old > 0 // lets try to decrease that remaining height!
+			|| NO = old / .LineHeight
+			|| NR = Remain / .LineHeight
+			if NR > NO
+				._Start = ._Start.MoveCapped(NO - NR)
+		return .DrawPreparedTextSub(where, true)
+			
+	
+	helper DrawPreparedTextSub (|image| where, |bool| Draw, |int|)
+		opt norefcounts
+		
+		|| d		= .StartLine
+		|| lc		= .LineNumColor
+		|| y		= (.lineheight|int| - font.height) + .LastTop
+		|| yEnd		= .LastBottom
+		|| Remain	= .LastRect.Height
 		|| UseCol	= .UseColorAnyway
+
+		y -= 2
 		y += .YAdjust
 		y -= (.SingleLine and self is Editable)
+		
 		while (y > yend) and (d)
 			y -= .LineHeight
-			.DrawOneLine(where, D, y, usecol, lc)
+			Remain -= .LineHeight
+			if Draw
+				.DrawOneLine(where, D, y, usecol, lc)
 			d++
 
 		._CanSeeAllLines = (.StartLine.position == 0) and (d==nil) // oop
+		return Remain
 
 
 	function MaxWidthInChars (|int|)
@@ -1810,7 +1827,6 @@ class TextView (GUIControl)
 	
 	
 	function MaxVisibleLines (|int|)
-		|| h = .height
 		return .height / .lineheight|int|
 	
 	
@@ -2044,9 +2060,8 @@ class TextView (GUIControl)
 			._start.position = 0
 
 
-	helper EndGap (|bool|)
+	helper ShouldStayAtEnd (|bool|)
 		opt norefcounts
-		require .PreferStayAtEnd
 		// surely this should start from the ._Start?
 		// it woudl be faster?
 		// we go from the end down to the start, right?
@@ -2070,8 +2085,11 @@ class TextView (GUIControl)
 		|| ParsedOK   = (msg!=nil) or (.ExpectsParse <= AllowJeebox)
 		|| Pos	 	  = .StartPos
 		|| d		  = .NeedFirst
-		|| StayAtEnd  = .EndGap
-		._LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
+		|| StayAtEnd  = .PreferStayAtEnd and .ShouldStayAtEnd
+			
+		// could be nice to make it the general case anyway?
+		// like if new lines are added... we just stay at the end.
+		// its useful for typing even. or pasting stuff!
 		
 		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
 		if .SingleLine
@@ -2081,6 +2099,7 @@ class TextView (GUIControl)
 		|| t = d.tline
 		|| p = d.position // surely that is always 0?
 		(._Lines isnt breakpoint)
+		._LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
 		
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
@@ -2093,7 +2112,7 @@ class TextView (GUIControl)
 			|| n = d.next
 				
 			if  true  or  !n  or  n.position < ._reclaim[1]
-				d = .nextvline(d, d, p)
+				d = .NextVline(d, d, p)
 			  elseif p < ARGH
 				d = .NextVline(d, nil, p)
 			  else
