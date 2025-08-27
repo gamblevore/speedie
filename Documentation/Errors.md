@@ -378,6 +378,29 @@ You might be wondering _"Where is all the code?"_ and _"I'll bet the speedie ver
 
 Many of the speedie library equivalent functions are faster than their C++ counterparts. Even my `array.sort` function is faster (and safer when given bad sort comparison functions). Same with file-reading and writing, string-splitting, and much more. 
 
+To help convince you... I'll show you the output given by Speedie's inbuilt ASM-Viewer. The ASM-Viewer also shows you the "C-level" version of the code, so it lets you see the code on 3 levels. Speedie, C, and ASM.
+
+    function JB_Main ()
+        || file = JB_Str_In("untitled.spd", "", 4194304) // 4MB default max. You can pass a different value if you want.
+        JB_Incr(file)
+        if !file {
+            JB_Decr(file)
+            return -1
+        }
+     
+        while (true)
+            || __bf0 = JB_SS_Byte(file)
+            if (__bf0 < 0) {
+                exit
+            }
+ 
+            || b = (__bf0)
+            do_something_with(b)
+        JB_Decr(file)
+        return 0
+
+This isn't "quite C" (missing semi-colons), its just close enough that you can understand it. However "proper C" (With semi-colons, etc) is actually output by Speedie, if you choose to compile to C.
+     
 
 ### Rust's Result Types
 
