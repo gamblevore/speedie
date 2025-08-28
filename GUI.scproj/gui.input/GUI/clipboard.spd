@@ -19,19 +19,17 @@ module clipboard
 		description "Pass valid UTF-8 only" 
 		expect (s) (beep)
 
-
-		if s.FindBadUTF8
-			_InternalCopy = s
-			return .Clear
-
+		_internalcopy = ""
 		|| c = (s.TabsToSpaces, s)(keys.shift)
 		|| z = c.cstr
 		|| err = .SDL_SetClipboardText(z.addr|cstring|)
+		if err!=0 or s.FindBadUTF8		// osx might fail anyhow
+			.clear
+			_internalcopy = s
 		if err!=0
-			Notifications.NotifySDLError
-		  else
-			_InternalCopy = ""
-		
+			Notifications.NotifySDLError		
+	
+	
 	function Clear
 		|byte[1]| null 
 		.SDL_SetClipboardText((&null[0])|cstring|)
@@ -42,8 +40,7 @@ module clipboard
 		if s
 			.text = s
 			Notifications <~ "Copied: " + s
-	
-		
+
 
 function string.FixLineEndings (|string| dest="\n", |String|)
 	|| type = .DetectLineEndings &~ 1
