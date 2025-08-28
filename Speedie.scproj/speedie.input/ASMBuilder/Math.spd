@@ -367,7 +367,6 @@ extend Assembler
 			if l is alternate
 				RR = -RR
 			rr *= lmul
-			if "RefCountTests".trap
 			if .CanAddK(r, RR)									// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest

@@ -549,9 +549,8 @@ extend Assembler
 			if (s is CondAnswer) and !(s isa asm.knst)
 				.JumpFix(s, curr)
 	
-	
 
-function @Assembler.PrintProgress
+function @assembler.PrintProgress
 	cpp_name adb 
 	visible
 	opt norefcounts
@@ -561,9 +560,5 @@ function @Assembler.PrintProgress
 	|| Base = assembler.sh.Start + fn.µStart
 	|| amount = fn.µLength ?? (Assembler.sh.curr - base)
 	for n in amount
-		|| f = base[n]
-		if f is constoutput
-			print "/"
-		print "\t"
-		f.debugprint
+		base[n].debugprint
 

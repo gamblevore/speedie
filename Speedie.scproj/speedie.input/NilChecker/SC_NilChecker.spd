@@ -546,7 +546,7 @@ function Thing (NilTrackerFn)
 		|| nreg = dcl.NilReg
 			t.closers[nreg] = msg.UpToArg
 	
-	msg.Indent = rz				// The msg now knows the current state! Nice!
+	msg.Indent = rz&3				// The msg now knows the current state! Nice!
 	if t.FnAbleToNilCheck and dcl is self
 		rz |= nilstate.FnBecomesNilCh
 

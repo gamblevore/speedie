@@ -11,6 +11,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 
 	if fn == Compiler.RefSetRef
+		debugat 3
 		|| DestMsg = prms.first!
 		|| A = .µGetReal(DestMsg, nil, ASMReg.AddrRequest)
 		|| P = prms.second!
@@ -30,7 +31,8 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 			|| where = .Temponly()
 			where.µtype = datatypecode._voidptr
 			B = .Read(where, P, B, nil, p.ASMDecl) * where		// (mem to reg)?
-
+		
+		if (a.reg == 6) and (b.reg == 2) and "RefCountTests".trap 
 		A = .InlineOffsetOpt(A, 3, offset, 13, glob, p)
 		return exp.RFWR(A, B, 1, offset)						// reg to mem
 
@@ -41,6 +43,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		|| offset = 0
 		A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
 		|| B = .µ(prms.second!)
+		if (a.reg == 6) and (b.reg == 2) and "RefCountTests".trap 
 		target debug: if b is ContainsAddr						// always reg
 		return exp.RFWR(a, b, 0, offset)
 

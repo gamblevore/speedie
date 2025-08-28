@@ -378,7 +378,10 @@ struct FatASM
 		|| M = fs.mark
 		|| op = instruction.typelist[.baseop]!
 		if .baseop != asm.noop
-			fs <~ op.name
+			if self is constoutput
+				fs.appendlower(op.name)
+			  else
+				fs <~ op.name
 			fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""

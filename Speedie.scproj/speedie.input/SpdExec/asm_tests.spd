@@ -7,9 +7,6 @@ class asm_test_obj
 		visible
 		.i = 0
 
-function LoopHow (|stringreader| s)
-	visible
-	for i in s
 	
 
 module ASMExamples {

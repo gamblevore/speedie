@@ -461,6 +461,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| FuncArg = .Args[fi++]!
 		|| PArg_Ch = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
+		if  PArg_Type is Local  and  funcarg is Reference
+			PArg_Type.MarkAsAltered
+			
 		if Base
 			FuncArg = FuncArg.ContainedReplace(base, false)
 
@@ -506,7 +509,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| first = Incoming.FailedAt
 			.DescribeParamFail(incoming, first)
 		  else
-			error (incoming.exp, "Too many params sent to " + .rendertitle)
+			error (incoming.exp, "Too few params sent to " + .rendertitle)
 			problem (self.source,  kusingstr)
 
 
@@ -1379,8 +1382,6 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 		return type.CheckMath(msg)
 
 	check (!Type.IsBool) (msg, "Can't do ++ or -- on bools. (use '!' instead")
-		
-
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1

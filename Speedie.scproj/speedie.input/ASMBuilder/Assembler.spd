@@ -301,9 +301,6 @@ struct Assembler
 		|| o = .OpenVars
 		|| v = .DeclareMe(exp, a)
 		(v as= ModeOnly asnt asmreg.GetReal)
-		if ModeOnly is Discard
-			return .µInto(exp, v)
-
 		|| f = .µGetASM(exp, v)
 		|| roar = f.reg
 		if roar == v.reg
@@ -334,7 +331,7 @@ struct Assembler
 				return .ReDest(f, dest)
 
 		|| dest2 = r.into(dest)
-		if dest is preferequl
+		if dest is PreferEqul
 			return .Exists(dest, r, exp)
 		return .Assign(Dest2, r, exp)
 	

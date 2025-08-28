@@ -81,21 +81,6 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	return dest
 
 
-function CanReuseParam (|message| Prms, |scdecl| A, |asmreg| v, |bool|)
-	opt norefcounts
-
-	if  a is reference  or  a isnt altered
-		return true
-
-	|| vr = v.reg
-	require vr and (.state.return iz vr)
-
-	for p.fast in prms
-		// check for the address of the same var?
-		if .ExistingVar(p) iz vr
-			require !rz
-			rz = true
-
 
 function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
@@ -143,7 +128,7 @@ function PrmPrint (|string| s)
 	print " "
 	printline .fn.exportname
 	
-	for (a in .fn.Args) (i)
+	for a in .fn.Args
 		print a.name
 		print ": "
 		print (a is const).render
@@ -163,7 +148,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|SavedRegisters| regs 
 	regs.Collect(fn.args, self)
 	
-	.InlineParameters(prms, fn.LinkDepth==1)
+	.InlineParameters(prms)
 	|| RealStart = .curr					// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	regs.Restore(fn.args)
@@ -179,42 +164,72 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	regs.Rewind(self)
 
 
-function UpdateInlineReg (|asmreg| V, |scdecl| D, |asmreg|)
+function UpdateInlineReg (|asmreg| V, |scdecl| D)
 	if v is constoutput and d isnt Altered
 		(d is const)
 
 	v.TmpCheck
 	D.AsmReg = v												// update reg!
-	return v
 
 
-function InlineVar (|message| prms, |message| m, |scdecl| a, |asmreg|)
-	opt	norefcounts
-
-	m = m.ASMUnbra
-	|| fn = m.Func
-	require fn == @thg
-	|| d = m.ASMDecl
+function PreInlineOneParam (|message| p, |scdecl| a, |$uint64| RegTracker,  |asmreg|)
+	p = p.ASMUnbra
+	require (p.func == @thg)
+/	|| d = p.ASMDecl
+	if (a isnt reference and altered) and (d is Const) and !d.mu.ExportPosition
+		return asmreg()
 
 	require d is local
 	|| v = .LocalThg(d)
-	if v and .CanReuseParam(prms, a, v)
-		// what about if a gets altered... and then used?
-		// like in some nested opt inline thing?
-		(a is reference) = (d is reference)
-		(a is const) = (d is const)
-		return v	
+	require  a is reference  or  a isnt altered  or  .state.return iz v
+	
+	|uint64| vr = 1<<v.reg
+	if a is Reference or a is Altered
+		vr <<= 32
+	RegTracker |= vr
+	(v is Reference) = (a is reference)
+	return v
 
 
-function InlineParameters (|message| prms, |bool| IsLeaf)
+
+function ClearInlineParamClash (|[scdecl]| args, |&asmreg| Items, |int| NeedsHelp)
 	opt norefcounts
-	|| p = prms.first!
+	
+	|| n = args.Length
+	while n-- > 0
+		|| a = args[n]!
+		|| V = items[n]
+		if NeedsHelp[V.reg]
+			if a isnt Reference
+/				V = nil
+				items[n] = v
+		
+		(a is reference) = (v is reference)
+		(a is const) = (v is ConstOutput)
 
-	for a in .fn.Args
-		|| V = .InlineVar(prms, p, a)
-		|| R = ASMReg.Discard * (IsLeaf and a isnt altered)
-		v ?= .µGetReal(P, a, R as asmreg.set)
-		v = .UpdateInlineReg(V, a)
+
+function InlineParameters (|message| prms)
+	opt norefcounts
+	
+/	|asmreg[10]| Items
+	|uint64|     T
+	|| args = .fn.args
+	|| p = prms.first!
+	for (a in args) (i)
+		Items[i] = .PreInlineOneParam(p!, a, T)
+		p++
+
+	T &= T>>32
+	if T
+		.ClearInlineParamClash(args, Items, T)
+
+	p = prms.first!
+	for (a in args) (i)
+		|| V = Items[i]                           //.InlineOneParam(prms, p, a)
+		if !V
+			v = .DeclareMe(p, a)
+			V = .µInto(p, v)
+		.UpdateInlineReg(V, a)
 		p = p.next!
 
 
@@ -242,8 +257,6 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	if .length < 16K								// Don't risk overflowing max-size
 		AllowedGain += (fn.LinkFrom == 1)<<6		// Allow bigger functions inlined if called once.
 													// (needs marked as removed!!)
-													
-													
 	AllowedGain -= .State.inlinedepth
 	
 	for p.fast in prms

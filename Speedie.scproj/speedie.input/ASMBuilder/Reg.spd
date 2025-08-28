@@ -33,6 +33,7 @@ datatype ASMReg (uint64)
 		CompilerCreated
 		GlobalMemory
 		PreferEqul
+		Reference
 		Inline
 		OK
 		GetReal		= Param ||| Discard
