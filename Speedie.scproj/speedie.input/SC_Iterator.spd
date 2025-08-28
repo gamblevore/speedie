@@ -40,19 +40,20 @@ class SCIterator (SCObject)
 		|| Cond = .WhileLoop.first
 		if (Cond == WhileArg)
 			Cond = @thg + "true"
-		  //elseif cond
-			//Cond = Cond.NeedBra
 		.LoopCond = Cond
 		
 		|message| w
 		if whilearg
 			w = WhileArg.FindNested( @Tmp, "yield" )			#check (WhileArg, "Missing yield statement.")		
 		.yield = w
-		.Value = .yield.first									#check (.yield, "Missing value")
+		|| v = .yield.first										#check (.yield, "Missing value")
+		if v
+			v = v.unbra
+		.value = v
 
 		|| i = .yield.second
 			i.Expect(@bra)
-			i = i.first
+			i = i.unbra
 		.Index = i
 		
 		|| sn = SCNodeRenamer.new
