@@ -125,6 +125,10 @@ struct Assembler
 		if !dest.reg
 			dest = src
 		src = .AddToReg(exp, src, src, value) 
+		return src
+		
+		// why? that violates the entire design?
+		// why did I add this? It adds extra bflgs!
 		if dest.reg==src.reg
 			return src
 		return .Assign(dest, src, exp)
@@ -298,27 +302,60 @@ struct Assembler
 		return .Exists(dest, X, exp)
 	
 	
-	function µGetReal (|message| exp,  |scdecl| A, |asmreg| ModeOnly=nil,  |asmreg|)
+	function message.FoundFunc (|bool|)
+		opt norefcounts
+		
+		while self
+			if (.func == @prm)
+				target debug: ifn .obj isa scfunction // it must be, right?
+				/return ASMReg.temp
+			|| c = .first
+				|| r = c.FoundFunc
+					return r
+			self++
+	
+	
+	function message.SaveForward (|asmreg|)
+		return ASMReg.temp * (!.FoundFunc)
+	
+	
+	function message.ContainsFunc (|bool|)
+		opt norefcounts
+		if .func == @prm // what the?
+		|| f = .first
+			return f.FoundFunc
+			
+		
+	function µGetReal (|message| exp,  |scdecl| A, |asmreg| ModeOnly,  |asmreg|)
 		|| o = .OpenVars
-		|| v = .TempTyped(a, asmreg())
+		|| v = asmreg()
+		
+		if ModeOnly is temp // nothing uses this either. 
+			(ModeOnly isnt temp)
+			v = .TempTyped(a, v)
+		  else
+			v = .DeclareMe(exp, a)
+		
+		if ModeOnly is GetReal or set // never happens? // remove line below.
 		(v as= ModeOnly asnt asmreg.GetReal)
 		rz = .µGetASM(exp, v)
 		
-		if !rz.reg and (modeonly is set) // R0. We might need to actually put it in a reg!
-			return .assign(v, rz, exp)
+		if !rz.reg and (ModeOnly is set) // R0. We might need to actually put it in a reg!
+			return .Assign(v, rz, exp)
 
-		if rz is temp // we can't close temp vars! The entire point was to keep it open!
-			return rz
 		if rz iz v
-/			return rz // shouldn't come here.
+			return rz
+
+		if rz is temp
+			|| f = rz.fat
+/				return .ReDest(f, v)
+
 		
 		.CloseVars(o) // close the var if v is unused.
 	
 	
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		target debug: if !dest.reg
-		// OK... so... we should really do a type-cast, also.
-		
+		target debug: if !dest.reg		
 		|| r = .µ(Exp, dest)		
 		
 		if r iz dest
@@ -353,7 +390,7 @@ struct Assembler
 
 
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
-		rz = asmreg()
+		rz = exp.SaveForward
 		(rz is AddrNeed) = (a is Reference)
 		rz = .µGetReal(exp, nil, rz)
 		if (a is reference  and  rz isnt containsaddr)

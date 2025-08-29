@@ -13,8 +13,8 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 	if fn == Compiler.RefSetRef
 		debugat 3
 		|| DestMsg = prms.first!
-		|| A = .µGetReal(DestMsg, nil, ASMReg.AddrRequest)
 		|| P = prms.second!
+		|| A = .µGetReal(DestMsg, nil, ASMReg.AddrRequest * p)
 		|| B = .µ(P, ASMReg.AddrRequest)
 		if A iz B
 			return nil // wat?

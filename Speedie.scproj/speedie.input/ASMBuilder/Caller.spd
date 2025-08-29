@@ -104,7 +104,7 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	
 	dest = dest.simplify
 	dest.µtype = fn.ASMRegType
-	(dest is Inline)
+//	(dest is Inline)
 	.state.fn = fn
 	.state.Return = dest
 	.state.ParentVars = .openvars
@@ -173,20 +173,21 @@ function UpdateInlineReg (|asmreg| V, |scdecl| D)
 
 
 function PreInlineOneParam (|message| p, |scdecl| a, |$uint64| RegTracker,  |asmreg|)
+	opt norefcounts
 	p = p.ASMUnbra
 	require (p.func == @thg)
-/	|| d = p.ASMDecl
-	if (a isnt reference and altered) and (d is Const) and !d.mu.ExportPosition
+	|| d = p.ASMDecl
+	if (a isnt alteredorref) and (d is Const) and !d.mu.ExportPosition
 		return asmreg()
-
+	
 	require d is local
 	|| v = .LocalThg(d)
 	require  a is reference  or  a isnt altered  or  .state.return iz v
-	
 	|uint64| vr = 1<<v.reg
-	if a is Reference or a is Altered
+	if a is AlteredOrRef
 		vr <<= 32
 	RegTracker |= vr
+	(a is reference) = (d is reference)
 	(v is Reference) = (a is reference)
 	return v
 
@@ -211,7 +212,7 @@ function ClearInlineParamClash (|[scdecl]| args, |&asmreg| Items, |int| NeedsHel
 function InlineParameters (|message| prms)
 	opt norefcounts
 	
-/	|asmreg[10]| Items
+	|asmreg[10]| Items
 	|uint64|     T
 	|| args = .fn.args
 	|| p = prms.first!
@@ -219,16 +220,15 @@ function InlineParameters (|message| prms)
 		Items[i] = .PreInlineOneParam(p!, a, T)
 		p++
 
-	T &= T>>32
-	if T
-		.ClearInlineParamClash(args, Items, T)
+	|| T2 = T&(T>>32)
+		.ClearInlineParamClash(args, Items, T2)
 
 	p = prms.first!
 	for (a in args) (i)
 		|| V = Items[i]                           //.InlineOneParam(prms, p, a)
 		if !V
-			v = .DeclareMe(p, a)
-			V = .µInto(p, v)
+			V = asmreg.set * (A is AlteredOrRef)
+			V = .µgetReal(p, a, V)
 		.UpdateInlineReg(V, a)
 		p = p.next!
 

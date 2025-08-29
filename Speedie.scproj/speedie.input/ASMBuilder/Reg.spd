@@ -1,7 +1,6 @@
 
 
 prototype fn_asm    (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
-prototype fn_fatasm (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest, |&FatASM|)
 
 
 datatype ASMReg (uint64)
@@ -15,11 +14,11 @@ datatype ASMReg (uint64)
 		Temp = 1024 // sigh.
 		(1<<16)		// starting point
 		Negate
+		AlreadyNegated
 		Discard
 		Param
 		FromExistingVar
 		FromZeroMemory
-		AlreadyNegated
 		Alternate
 		Set
 		Declaration
@@ -34,7 +33,7 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		Reference
-		Inline
+		Templike
 		OK
 		GetReal		= Param ||| Discard
 		SetAlways   = Textual ||| Set  // reuse const
@@ -44,7 +43,7 @@ datatype ASMReg (uint64)
 		// don't go above 47
 		RemoveableOutput = ConstOutput ||| Temp
 		Zero	    = RealConst   ||| 56 ||| param		// 56 == datatypecode.uint64
-		ZeroParam   = ConstOutput ||| param
+//		ZeroParam   = ConstOutput ||| param
 		RealDiscard = RealConst   ||| discard
 		NotUnConst  = fromexistingvar ||| ConstInput
 		KnownConst  = NotAlteredInbranch ||| ConstOutput
@@ -143,8 +142,8 @@ datatype ASMReg (uint64)
 	operator iz (|asmreg| M, |bool|)
 		return .reg == M.reg
 
-	operator iz (|int| M, |bool|)
-		return .reg == M
+//	operator iz (|int| M, |bool|)
+//		return .reg == M
 
 	function FourBytes (|bool|)
 		opt inline
@@ -278,6 +277,12 @@ datatype ASMReg (uint64)
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)
 			
+	operator mul (|message| m, |asmreg|)
+		if !m.ContainsFunc
+			is temp
+		return self
+	
+
 	syntax cast (|int|)
 		disabled "use .reg"
 		

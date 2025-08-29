@@ -285,7 +285,7 @@ function SetRel (fn_asm)						// function relset (
 
 	// Probably x.y = z, or x[y] = z 
 
-	|| Src = .µGetReal(B, nil)
+	|| Src = .µGetReal(B, nil, nil|asmreg| * a)
 	(Src is SetAlways)
 	return .µ(A, Src)
 
@@ -370,7 +370,7 @@ function Argument (fn_asm) // argument
 	return .CloseVars(OV, exp, what)
 
 
-function Access (fn_asm)									// a[b], struct.mem[b]
+function Access (fn_asm)										// a[b], struct.mem[b]
 	opt	NoRefCounts
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
@@ -378,8 +378,8 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	|| f = exp.first!
 	|| d = f.asmdecl
 		
-	|| base = .µGetReal(f, nil, ASMReg.AddrRequest)				// x = a.b[0]
 	|| sc = exp.Second.first!
+	|| base = .µGetReal(f, nil, ASMReg.AddrRequest * sc)				// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
@@ -619,6 +619,7 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)				// --a++
 	opt	NoRefCounts
 	
+	if "InlineParam".trap
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)

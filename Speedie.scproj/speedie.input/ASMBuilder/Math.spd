@@ -710,16 +710,17 @@ extend Assembler
 		return exp.BLSH(dest, L, R, l.bitloss).Vectorise(Dest, asm.QLSH)
 
 
-	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)
-		|uint| SrcBits = src.BitCount
+	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+		|| SrcBits = src.BitCount
 		if up > srcbits or down > SrcBits			// wierd?
 			problem (exp, "Shift too far")
 		
-		if !up and !down
-			return .assign(dest, src, exp)
+		if !up and !down and (SrcBits >= dest.BitCount)
+/			return src
+
+		down += 64 - (srcBits+up)
+		up = 64 - SrcBits
 		
-		up = 64 - (SrcBits + up)
-		down += 64 - srcBits
 		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest)
 	

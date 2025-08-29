@@ -144,8 +144,9 @@ function Const_Branching (|int| x, |int|)
 		y = k
 	y++
 	y*=3
+	y >>= 2
 	y^=9
-	y <<= 2
+	y <<= 19
 	return y
 
 

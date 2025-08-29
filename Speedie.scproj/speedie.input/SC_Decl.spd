@@ -74,6 +74,7 @@ datatype SCDeclInfo (uint)
 		Return
 		AlteredCopy = [Altered,AlteredInBranch,AlteredParamObject]
 		Reference
+		AlteredOrRef = Altered ||| Reference
 		Task
 		Self
 		Used = [ReadFrom, SetTo]
