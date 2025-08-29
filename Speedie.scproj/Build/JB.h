@@ -133,7 +133,7 @@ typedef uint SCDeclInfo;
 
 typedef int SCNodeFindMode;
 
-typedef int SCNodeInfo;
+typedef byte SCNodeInfo;
 
 typedef byte SCNodeType;
 
@@ -326,8 +326,6 @@ struct SpeedTester;
 struct StringDigitIterator;
 
 struct StringLengthSplit;
-
-struct StructSaveTest;
 
 struct Assembler;
 
@@ -817,12 +815,6 @@ struct Random {
 	uint64 State;
 };
 
-struct StructSaveTest {
-	Saveable* Sav;
-	int64 Intt;
-	JB_String* Str;
-};
-
 struct Assembler {
 	DataTypeCode ReturnASM;
 	u16 BasicBlock;
@@ -1025,14 +1017,14 @@ struct SCObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCObject , JB_Object , 
-	int LinkedFrom;
-	JB_String* Name;
-	Message* Source;
-	Array* LinkFrom;
-	JB_String* ExportName;
-	SCNodeInfo NodeInfo;
+	u16 CurrFuncLink;
 	byte AllocSource;
 	byte NoAutoComplete;
+	JB_String* ExportName;
+	Array* LinkFrom;
+	Message* Source;
+	JB_String* Name;
+	SCNodeInfo NodeInfo;
 );
 
 struct SCOperator_Behaviour: Object_Behaviour {
@@ -1177,20 +1169,19 @@ struct SCDecl_Behaviour: SCObject_Behaviour {
 
 JBClass ( SCDecl , SCObject , 
 	int C_Array;
-	NilState NilDeclared;
-	byte PointerCount;
-	byte NilReg;
-	byte DepthOfBranch;
-	SCClass* Type;
 	DeclAlterable mu;
-	SCDecl* Contains;
 	SCDecl* LocalVarList;
 	SCDecl* Internal;
 	JB_Object* IsLookupOnly;
 	SCFunction* HiderFunc;
+	SCDecl* Contains;
 	Message* Default;
-	byte ArgDepth;
+	SCClass* Type;
 	bool Suffers;
+	byte DepthOfBranch;
+	byte NilReg;
+	byte PointerCount;
+	NilState NilDeclared;
 );
 
 struct SCIterator_Behaviour: SCObject_Behaviour {
@@ -1295,6 +1286,7 @@ struct SCFile_Behaviour: File_Behaviour {
 };
 
 JBClass ( SCFile , JB_File , 
+	Array* Types;
 	JB_String* ExportName;
 	SCImport* Proj;
 	JB_String* FData;
@@ -1412,15 +1404,15 @@ JBClass ( SCFunction , SCBetterNode ,
 	byte Badness;
 	byte StructReturnPos;
 	byte OptCounts;
+	u16 ReturnCount;
 	u16 LinkDepth;
 	u16 TmpCounter;
-	u16 TableId;
-	u16 ReturnCount;
+	u16 TableID;
+	u16 LinkID;
 	FunctionType FuncInfo;
 	int StackAllocGuess;
 	uint xC2xB5Start;
 	uint xC2xB5Length;
-	SCClass* ProtoType;
 	SCDecl* ReturnType;
 	SCFunction* DepthFinder;
 	Macro* IsMacro;
@@ -1432,6 +1424,7 @@ JBClass ( SCFunction , SCBetterNode ,
 	JB_Object* CounterPart;
 	SCFunction* NextFunc;
 	SCDecl* HasProto;
+	SCClass* ProtoType;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
@@ -1517,10 +1510,11 @@ extern bool SC__Comp_HasMainFunc;
 
 extern Array* SC__Comp_ImportedList;
 extern Dictionary* SC__Comp_ImportedNames;
+extern SCNodeInfo SC__Comp_InBuiltType;
 extern bool SC__Comp_InitedOK;
 #define kSC__Comp_Initialising ((int)20)
 
-extern bool SC__Comp_InPerry;
+extern byte SC__Comp_InPerry;
 extern Dictionary* SC__Comp_InsecureWords;
 extern SCFile* SC__Comp_InternalFile;
 extern SCNode* SC__Comp_Interpreter;
@@ -1604,8 +1598,14 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2216])
 
-extern SCFunction* SC__FastStringOpts__ByteFunc;
+extern SCFunction* SC__FastStringOpts_FnAppend;
+extern SCFunction* SC__FastStringOpts_FnAppend4;
+extern SCFunction* SC__FastStringOpts_FnAppend6;
+extern SCFunction* SC__FastStringOpts_FnByte;
+extern SCFunction* SC__FastStringOpts_FnGetResult;
+extern SCFunction* SC__FastStringOpts_FnPlus;
 extern int SC__FastStringOpts_FSRemoved;
+extern int SC__FastStringOpts_InitedOK;
 extern int SC__FastStringOpts_StrRemoved;
 extern Dictionary* SC__FB_AppOptions;
 extern Macro* SC__AC_all_tmp_src;
@@ -1642,7 +1642,6 @@ extern bool SC__AC_WillExit;
 #define JB__Constants_XML_EscapeStr JB__.Constants_XML_EscapeStr
 #define JB__Constants_XML_UnEscapeStr JB__.Constants_XML_UnEscapeStr
 #define JB__Constants_XMLWordMiddle JB__.Constants_XMLWordMiddle
-extern int SC__LinkMap_CurrID;
 extern Message* SC__Linkage_Flagz;
 extern Message* SC__Linkage_OSXFrameworks;
 #define kJB__MZLab_Default ((int)20)
@@ -2428,11 +2427,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_WR8U ((ASM_Write)108)
 
-#define kSC__Reg_AddrForceRequest ((ASMReg)4398046511104)
+#define kSC__Reg_AddrForceRequest ((ASMReg)8796093022208)
 
-#define kSC__Reg_AddrNeed ((ASMReg)6597069766656)
+#define kSC__Reg_AddrNeed ((ASMReg)13194139533312)
 
-#define kSC__Reg_AddrRequest ((ASMReg)2199023255552)
+#define kSC__Reg_AddrRequest ((ASMReg)4398046511104)
 
 #define kSC__Reg_AlreadyNegated ((ASMReg)2097152)
 
@@ -2444,9 +2443,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_CondRequest ((ASMReg)1073741824)
 
-#define kSC__Reg_ConstInput ((ASMReg)549755813888)
+#define kSC__Reg_ConstInput ((ASMReg)1099511627776)
 
-#define kSC__Reg_ConstOutput ((ASMReg)1099511627776)
+#define kSC__Reg_ConstOutput ((ASMReg)2199023255552)
 
 #define kSC__Reg_ConstRequest ((ASMReg)536870912)
 
@@ -2456,11 +2455,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_Discard ((ASMReg)131072)
 
-#define kSC__Reg_Exit ((ASMReg)412316860416)
+#define kSC__Reg_Exit ((ASMReg)824633720832)
 
-#define kSC__Reg_ExitAtAll ((ASMReg)274877906944)
+#define kSC__Reg_ExitAtAll ((ASMReg)549755813888)
 
-#define kSC__Reg_ExitFunction ((ASMReg)137438953472)
+#define kSC__Reg_ExitFunction ((ASMReg)274877906944)
 
 #define kSC__Reg_FromExistingVar ((ASMReg)524288)
 
@@ -2470,9 +2469,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_GlobalMemory ((ASMReg)8589934592)
 
-#define kSC__Reg_Inline ((ASMReg)34359738368)
+#define kSC__Reg_Inline ((ASMReg)68719476736)
 
-#define kSC__Reg_KnownConst ((ASMReg)1099545182208)
+#define kSC__Reg_KnownConst ((ASMReg)2199056809984)
 
 #define kSC__Reg_Negate ((ASMReg)65536)
 
@@ -2480,19 +2479,21 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_NotAlteredInBranch ((ASMReg)33554432)
 
-#define kSC__Reg_NotUnConst ((ASMReg)549756338176)
+#define kSC__Reg_NotUnConst ((ASMReg)1099512152064)
 
-#define kSC__Reg_OK ((ASMReg)68719476736)
+#define kSC__Reg_OK ((ASMReg)137438953472)
 
 #define kSC__Reg_Param ((ASMReg)262144)
 
 #define kSC__Reg_PreferEqul ((ASMReg)17179869184)
 
-#define kSC__Reg_RealConst ((ASMReg)1649267441664)
+#define kSC__Reg_RealConst ((ASMReg)3298534883328)
 
-#define kSC__Reg_RealDiscard ((ASMReg)1649267572736)
+#define kSC__Reg_RealDiscard ((ASMReg)3298535014400)
 
-#define kSC__Reg_RemoveableOutput ((ASMReg)1099511628800)
+#define kSC__Reg_Reference ((ASMReg)34359738368)
+
+#define kSC__Reg_RemoveableOutput ((ASMReg)2199023256576)
 
 #define kSC__Reg_Set ((ASMReg)8388608)
 
@@ -2504,9 +2505,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_Textual ((ASMReg)268435456)
 
-#define kSC__Reg_Zero ((ASMReg)1649267703864)
+#define kSC__Reg_Zero ((ASMReg)3298535145528)
 
-#define kSC__Reg_ZeroParam ((ASMReg)1099511889920)
+#define kSC__Reg_ZeroParam ((ASMReg)2199023517696)
 
 #define kSC__ASMType_IncrAfter ((int)2)
 
@@ -2569,21 +2570,19 @@ extern ASM_Write SC__ASMType_WriteASM[5];
 
 #define kJB__CharProp_XMLPunct ((CharProp)3)
 
-#define kSC__ClassInfo_ASM ((ClassInfo)2097152)
-
 #define kSC__ClassInfo_AutoGeneratedSavers ((ClassInfo)64)
 
 #define kSC__ClassInfo_Banned ((ClassInfo)512)
 
-#define kSC__ClassInfo_Builtin ((ClassInfo)65536)
+#define kSC__ClassInfo_Builtin ((ClassInfo)16384)
 
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
 
 #define kSC__ClassInfo_DefaultsToReal ((ClassInfo)2048)
 
-#define kSC__ClassInfo_Fixed ((ClassInfo)524288)
+#define kSC__ClassInfo_Fixed ((ClassInfo)131072)
 
-#define kSC__ClassInfo_Flags ((ClassInfo)1048576)
+#define kSC__ClassInfo_Flags ((ClassInfo)262144)
 
 #define kSC__ClassInfo_HasCompareFunc ((ClassInfo)4)
 
@@ -2595,23 +2594,19 @@ extern ASM_Write SC__ASMType_WriteASM[5];
 
 #define kSC__ClassInfo_IgnoreContainedSelf ((ClassInfo)2)
 
-#define kSC__ClassInfo_IsRole ((ClassInfo)4096)
-
-#define kSC__ClassInfo_IsTask ((ClassInfo)8192)
-
 #define kSC__ClassInfo_NoEarlyFree ((ClassInfo)32)
 
-#define kSC__ClassInfo_NumericReduction ((ClassInfo)1835008)
+#define kSC__ClassInfo_NumericReduction ((ClassInfo)458752)
 
 #define kSC__ClassInfo_SavingCanSkip ((ClassInfo)128)
 
-#define kSC__ClassInfo_SortsProperties ((ClassInfo)131072)
+#define kSC__ClassInfo_SortsProperties ((ClassInfo)32768)
 
-#define kSC__ClassInfo_Stateful ((ClassInfo)32768)
+#define kSC__ClassInfo_Stateful ((ClassInfo)8192)
 
-#define kSC__ClassInfo_Stateless ((ClassInfo)16384)
+#define kSC__ClassInfo_Stateless ((ClassInfo)4096)
 
-#define kSC__ClassInfo_Symbol ((ClassInfo)262144)
+#define kSC__ClassInfo_Symbol ((ClassInfo)65536)
 
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)256)
 
@@ -2766,7 +2761,7 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__ErrorFlags_PrintAndRemove ((int)2)
 
-#define JB__ErrorSeverity__names JB__.ErrorSeverity__names
+#define JB__ErrorSeverity__ErrorNames JB__.ErrorSeverity__ErrorNames
 #define kJB__ErrorSeverity_Critical ((ErrorSeverity)5)
 
 #define kJB__ErrorSeverity_Error ((ErrorSeverity)4)
@@ -2801,67 +2796,63 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__FileMode_Process ((FileMode)493)
 
-#define kSC__FunctionType_AlreadyExported ((FunctionType)16384)
+#define kSC__FunctionType_AlreadyExported ((FunctionType)8192)
 
-#define kSC__FunctionType_API ((FunctionType)8388608)
+#define kSC__FunctionType_API ((FunctionType)4194304)
 
-#define kSC__FunctionType_AutoGeneratedSaver ((FunctionType)33554432)
+#define kSC__FunctionType_AutoGeneratedSaver ((FunctionType)16777216)
 
-#define kSC__FunctionType_Behaviour ((FunctionType)2048)
-
-#define kSC__FunctionType_Comparison ((FunctionType)4)
+#define kSC__FunctionType_Behaviour ((FunctionType)1024)
 
 #define kSC__FunctionType_ConOrDes ((FunctionType)3)
 
 #define kSC__FunctionType_Constructor ((FunctionType)1)
 
-#define kSC__FunctionType_Cpp ((FunctionType)536870912)
+#define kSC__FunctionType_Cpp ((FunctionType)134217728)
 
 #define kSC__FunctionType_Destructor ((FunctionType)2)
 
-#define kSC__FunctionType_Disabled ((FunctionType)2097152)
+#define kSC__FunctionType_Disabled ((FunctionType)1048576)
 
-#define kSC__FunctionType_EmptyConstructor ((FunctionType)512)
+#define kSC__FunctionType_EmptyConstructor ((FunctionType)256)
 
-#define kSC__FunctionType_ExpectsRealVars ((FunctionType)8192)
+#define kSC__FunctionType_ExpectsRealVars ((FunctionType)4096)
 
-#define kSC__FunctionType_ExternalLib ((FunctionType)131072)
+#define kSC__FunctionType_ExternalLib ((FunctionType)65536)
 
-#define kSC__FunctionType_FlowDisabled ((FunctionType)65536)
+#define kSC__FunctionType_FlowDisabled ((FunctionType)32768)
 
-#define kSC__FunctionType_HidesProperties ((FunctionType)67108864)
+#define kSC__FunctionType_HidesProperties ((FunctionType)33554432)
 
-#define kSC__FunctionType_InitFunc ((FunctionType)128)
+#define kSC__FunctionType_InitFunc ((FunctionType)64)
 
-#define kSC__FunctionType_Inline ((FunctionType)524288)
+#define kSC__FunctionType_Inline ((FunctionType)262144)
 
-#define kSC__FunctionType_Killer ((FunctionType)1048576)
+#define kSC__FunctionType_Killer ((FunctionType)524288)
 
-#define kSC__FunctionType_NewNew ((FunctionType)4096)
+#define kSC__FunctionType_NewNew ((FunctionType)2048)
 
-#define kSC__FunctionType_NewStruct ((FunctionType)16)
+#define kSC__FunctionType_NewStruct ((FunctionType)8)
 
-#define kSC__FunctionType_NotRefCounted ((FunctionType)4194304)
+#define kSC__FunctionType_NotRefCounted ((FunctionType)2097152)
 
-#define kSC__FunctionType_NumberCreator ((FunctionType)32)
+#define kSC__FunctionType_NumberCreator ((FunctionType)16)
 
-#define kSC__FunctionType_PrintedForDebugViewing ((FunctionType)134217728)
+#define kSC__FunctionType_Recursive ((FunctionType)128)
 
-#define kSC__FunctionType_Recursive ((FunctionType)256)
+#define kSC__FunctionType_Reffer ((FunctionType)4)
 
-#define kSC__FunctionType_Reffer ((FunctionType)8)
+#define kSC__FunctionType_Render ((FunctionType)16384)
 
-#define kSC__FunctionType_Render ((FunctionType)32768)
+#define kSC__FunctionType_ReturnASMFloats ((FunctionType)67108864)
 
-#define kSC__FunctionType_ReturnASMFloats ((FunctionType)268435456)
+#define kSC__FunctionType_Stateless ((FunctionType)8388608)
 
-#define kSC__FunctionType_Stateless ((FunctionType)16777216)
+#define kSC__FunctionType_TypeTest ((FunctionType)32)
 
-#define kSC__FunctionType_TypeTest ((FunctionType)64)
+#define kSC__FunctionType_VirtualCaller ((FunctionType)512)
 
-#define kSC__FunctionType_VirtualCaller ((FunctionType)1024)
-
-#define kSC__FunctionType_Wrapper ((FunctionType)262144)
+#define kSC__FunctionType_Wrapper ((FunctionType)131072)
 
 #define kJB__MaybeBool_False ((MaybeBool)0)
 
@@ -3172,6 +3163,8 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_UpgradeableContained ((SCDeclInfo)32)
 
+#define kSC__SCDeclInfo_Used ((SCDeclInfo)12582912)
+
 #define kSC__SCDeclInfo_VarThatGotReturned ((SCDeclInfo)67108864)
 
 #define kSC__SCDeclInfo_VarType ((SCDeclInfo)30720)
@@ -3187,6 +3180,8 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeInfo_AllowLinkedLists ((int)4)
 
 #define kSC__SCNodeInfo_ExplicitExport ((int)1)
+
+#define kSC__SCNodeInfo_InBuilt ((int)8)
 
 #define kSC__SCNodeInfo_Visible ((int)2)
 
@@ -3367,7 +3362,7 @@ extern Dictionary* SC__xC2xB5Form_Forms;
 #define JB__File_DebugExecute JB__.File_DebugExecute
 #define kJB__File_ExclusiveMode ((int)2048)
 
-#define kJB__File_IgnoreErrors ((bool)1)
+#define kJB__File_ExpectExists ((bool)false)
 
 #define kJB__File_ReadMode ((int)0x000)
 
@@ -3384,19 +3379,13 @@ extern bool SC__Base_ConstantsLoadingOverride;
 extern bool SC__Base_CurrVisibility;
 #define kSC__Base_DontGoUp ((int)2)
 
-#define kSC__Base_kPurposeAddress ((int)0)
+#define kSC__Base_kPurposeDot ((int)1)
 
-#define kSC__Base_kPurposeDot ((int)2)
+#define kSC__Base_kPurposeFunc ((int)0)
 
-#define kSC__Base_kPurposeFunc ((int)1)
+#define kSC__Base_kPurposeVar ((int)2)
 
-#define kSC__Base_kPurposeHider ((int)65536)
-
-#define kSC__Base_kPurposeVar ((int)3)
-
-#define kSC__Base_kPurposeVarDecl ((int)4)
-
-#define kSC__Base_NoErrors ((int)1)
+#define kSC__Base_kPurposeVarDecl ((int)3)
 
 #define kSC__Beh_kBehaviourProto ((int)2)
 
@@ -3404,12 +3393,14 @@ extern bool SC__Base_CurrVisibility;
 
 #define kSC__Beh_kBehaviourTable ((int)1)
 
+extern SCFile* SC__File_Curr;
 #define JB__Proc__Parent JB__.Proc__Parent
 #define JB__Proc_CheckedParent JB__.Proc_CheckedParent
 #define JB__Err_AutoPrint JB__.Err_AutoPrint
 #define JB__Err_CurrSource_ JB__.Err_CurrSource_
 #define JB__Err_KeepStackTrace JB__.Err_KeepStackTrace
 extern SCFunction* SC__Func__CurrFunc;
+extern FunctionType SC__Func__Info;
 extern int SC__Func_DisabledPoints;
 extern int SC__Func_FuncArgAndReturnTypes[8];
 extern int SC__Func_FuncStats[12];
@@ -3459,7 +3450,6 @@ struct JB_Globals {
 	Message* Tk__EndOfLineMarker;
 	Dictionary* Constants_XML_EscapeStr;
 	Message* App__Conf;
-	Array* ErrorSeverity__names;
 	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* LD_ClassList;
 	SaverClassInfo* Saver_SaveableList;
@@ -3479,11 +3469,12 @@ struct JB_Globals {
 	Array* App__OldArgs;
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
+	Array* ErrorSeverity__ErrorNames;
 	FP_fnIDGenerator Tk_Splitter;
 	Random zalgo_R;
 	Random Rnd_Shared;
-	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
+	MessagePosition Tk_Using;
 	uint64 Mrap_MDummy_[2];
 	CharProp CharProp_Item[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -3782,11 +3773,17 @@ int JB_ErrorColors__Init_();
 
 
 // FastStringOpts
-void SC_FastStringOpts__FS(Message* Exp, Message* Getresult);
+void SC_FastStringOpts__FS(Message* Exp, Message* GetResult);
+
+bool SC_FastStringOpts__Init(Message* S);
 
 int SC_FastStringOpts__Init_();
 
-void SC_FastStringOpts__StringCleanup(Message* Str);
+void SC_FastStringOpts__Optimise(Message* S);
+
+void SC_FastStringOpts__StringToByte(Message* Str);
+
+void SC_FastStringOpts__TryStringAppend(Message* S);
 
 
 
@@ -4024,7 +4021,7 @@ Message* SC_AC__RootTmpComplete(Message* Cmd);
 
 Message* SC_AC__TmpAutoComplete(Message* F, JB_String* Name, JB_String* Type);
 
-Message* SC_AC__UnusedFuncs(Message* Cmd);
+Message* SC_AC__UnusedStuff(Message* Cmd);
 
 Message* SC_AC__WriteError(JB_String* Name);
 
@@ -4056,15 +4053,11 @@ JB_String* JB_Constants__TestJB();
 
 
 // LinkMap
-void SC_LinkMap__Collect(SCFunction* Self);
-
 void SC_LinkMap__CollectAll();
 
 void SC_LinkMap__CollectFromSource(SCFunction* Self, Message* Src, bool InBranch);
 
-int SC_LinkMap__Init_();
-
-void SC_LinkMap__Store(Array** Darr, SCObject* Obj);
+void SC_LinkMap__CollectLinksInOne(SCFunction* Self);
 
 
 
@@ -5182,6 +5175,8 @@ byte JB_byte_LowerCase(uint /*byte*/ Self);
 
 JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in);
 
+int64 JB_byte_SuffixSize(uint /*byte*/ Self);
+
 byte JB_byte_UpperCase(uint /*byte*/ Self);
 
 
@@ -5238,6 +5233,8 @@ JB_String* JB_int_RenderFS(int Self, FastString* Fs_in);
 int JB_int_SetSign(int Self, bool IsNeg);
 
 JB_String* JB_int_RenderSize(int Self, FastString* Fs_in);
+
+bool JB_int_SyntaxAccess(int Self, int Bit);
 
 int JB_int_SyntaxAccessSet(int Self, int Bit, bool Value);
 
@@ -5610,8 +5607,6 @@ bool SC_Reg_OperatorIsa(ASMReg Self, uint /*DataTypeCode*/ M);
 
 bool SC_Reg_OperatorIzWithReg(ASMReg Self, ASMReg M);
 
-bool SC_Reg_OperatorIzWithInt(ASMReg Self, int M);
-
 ASMReg SC_Reg_OperatorMul(ASMReg Self, bool B);
 
 ASMReg SC_Reg_OperatorxE2x80xA2(ASMReg Self, ASMReg Dest);
@@ -5884,8 +5879,6 @@ void JB_ErrorSeverity_SyntaxUsingComplete(uint /*ErrorSeverity*/ Self, JB_Object
 
 ErrorSeverity JB_ErrorSeverity__Find(JB_String* Name, Message* Err);
 
-int JB_ErrorSeverity__Init_();
-
 Array* JB_ErrorSeverity__InitNames();
 
 
@@ -5929,6 +5922,8 @@ void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Objec
 
 
 // FunctionType
+bool SC_FunctionType_SyntaxIs(FunctionType Self, FunctionType T);
+
 
 
 // Ind
@@ -6969,8 +6964,6 @@ void JB_LD__LoadOne(JB_Class* Cls, int8* Data);
 // JB_ObjectSaver
 void JB_Saver_AppendInt(ObjectSaver* Self, int64 I);
 
-void JB_Saver_AppendObject(ObjectSaver* Self, JB_Object* O);
-
 void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S);
 
 void JB_Saver_Constructor(ObjectSaver* Self);
@@ -7048,15 +7041,6 @@ int JB_Rnd__InitCode_();
 // JB_StringLengthSplit
 
 
-// JB_StructSaveTest
-void JB_StructSaveTest_Destructor(StructSaveTest* Self);
-
-void JB_StructSaveTest_LoadProperties(StructSaveTest* Self, ObjectLoader* Loader);
-
-void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
-
-
-
 // JB_jb_vm
 
 
@@ -7117,11 +7101,11 @@ ASMReg SC_Pac_CallFunc(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* F
 
 bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T);
 
-bool SC_Pac_CanReuseParam(Assembler* Self, Message* Prms, SCDecl* A, ASMReg V);
-
 void SC_Pac_CapASM(Assembler* Self);
 
 bool SC_Pac_ClearAllStructs(Assembler* Self, Message* Exp);
+
+void SC_Pac_ClearInlineParamClash(Assembler* Self, Array* Args, ASMReg* Items, int NeedsHelp);
 
 bool SC_Pac_ClearStruct(Assembler* Self, Message* Exp, FatASM* Fat, int V);
 
@@ -7225,9 +7209,7 @@ ASMReg SC_Pac_InlineFinishWithConsts(Assembler* Self, FatRange* R);
 
 ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Bytes, int& Index, uint MaxBits, SCDecl* Decl, Message* Exp);
 
-void SC_Pac_InlineParameters(Assembler* Self, Message* Prms, bool IsLeaf);
-
-ASMReg SC_Pac_InlineVar(Assembler* Self, Message* Prms, Message* M, SCDecl* A);
+void SC_Pac_InlineParameters(Assembler* Self, Message* Prms);
 
 ASMReg SC_Pac_IntMul(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -7312,6 +7294,8 @@ void SC_Pac_Optimise(Assembler* Self);
 void SC_Pac_PackMakerInit(Assembler* Self);
 
 ASMReg SC_Pac_Plus(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+
+ASMReg SC_Pac_PreInlineOneParam(Assembler* Self, Message* P, SCDecl* A, uint64& RegTracker);
 
 uint64 SC_Pac_PrmCollect(Assembler* Self, Message* Prms, SCFunction* Fn);
 
@@ -7405,7 +7389,7 @@ bool SC_Pac_Unchanged(Assembler* Self, Message* A, ASMReg Dest, Message* B);
 
 ASMReg SC_Pac_UniqueLocation(Assembler* Self, Message* A, ASMReg Dest, Message* B);
 
-ASMReg SC_Pac_UpdateInlineReg(Assembler* Self, ASMReg V, SCDecl* D);
+void SC_Pac_UpdateInlineReg(Assembler* Self, ASMReg V, SCDecl* D);
 
 ASMReg SC_Pac_VecAccess(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Base, ASMReg Vara);
 
@@ -8031,6 +8015,8 @@ JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in);
 
 void JB_FS_RenderSpeed(FastString* Self, JB_String* Name, int64 BytesIn, JB_Duration Duration, int64 BytesOut);
 
+void JB_FS_AppendJoin(FastString* Self, Array* Data, JB_String* Sep);
+
 void JB_FS_AppendMultiStr(FastString* Self, JB_String* Data, int Count);
 
 void JB_FS_AppendFastString(FastString* Self, FastString* Fs);
@@ -8044,6 +8030,8 @@ void JB_FS_AppendBool(FastString* Self, bool B);
 void JB_FS_AppendBuff(FastString* Self, FastBuff* B);
 
 void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
+
+void JB_FS_Fail(FastString* Self);
 
 FastString* JB_FS__UseAsOutput(JB_Object* Other);
 
@@ -8262,6 +8250,8 @@ void SC_NR_Uniqueify(SCNodeRenamer* Self, SCNode* P);
 // JB_SCObject
 int SC_SCObject_Auto_Type(SCObject* Self);
 
+JB_String* SC_SCObject_AutoCompleteKind(SCObject* Self);
+
 int SC_SCObject_AutoCompleteType(SCObject* Self);
 
 JB_String* SC_SCObject_BaseIcon(SCObject* Self);
@@ -8272,7 +8262,7 @@ JB_String* SC_SCObject_CanAuto(SCObject* Self, JB_String* Search);
 
 JB_String* SC_SCObject_CanAutoSub(SCObject* Self, JB_String* Search);
 
-bool SC_SCObject_CanLinkTo(SCObject* Self, SCObject* To);
+bool SC_SCObject_CanLinkFrom(SCObject* Self, SCFunction* Fn);
 
 SCObject* SC_SCObject_Constructor(SCObject* Self);
 
@@ -8288,6 +8278,8 @@ bool SC_SCObject_IsVisible(SCObject* Self);
 
 void SC_SCObject_IsVisibleSet(SCObject* Self, bool Value);
 
+void SC_SCObject_MarkUnused(SCObject* Self, Message* Feedback, uint /*byte*/ Debug);
+
 void SC_SCObject_NameConflict(SCObject* Self, SCObject* Old, JB_String* Name);
 
 SCObject* SC_SCObject_NextDisplay(SCObject* Self, bool Exact);
@@ -8296,9 +8288,11 @@ JB_String* SC_SCObject_Render(SCObject* Self, FastString* Fs_in);
 
 void SC_SCObject_Fail(SCObject* Self, JB_String* Error);
 
-bool SC_SCObject_SyntaxIs(SCObject* Self, SCNodeInfo I);
+bool SC_SCObject_SyntaxIs(SCObject* Self, uint /*SCNodeInfo*/ I);
 
-void SC_SCObject_SyntaxIsSet(SCObject* Self, SCNodeInfo I, bool Value);
+void SC_SCObject_SyntaxIsSet(SCObject* Self, uint /*SCNodeInfo*/ I, bool Value);
+
+JB_String* SC_SCObject_UnusedStr(SCObject* Self);
 
 
 
@@ -8515,8 +8509,6 @@ int SC_Str_IsSwizzle(JB_String* Self, int Width);
 
 bool SC_Str_IsZero(JB_String* Self);
 
-JB_String* SC_Str_ItsUnused(JB_String* Self);
-
 Ind JB_Str_JBFind(JB_String* Self, uint /*byte*/ Find, int Off, int After);
 
 byte JB_Str_Last(JB_String* Self, int Minus);
@@ -8616,6 +8608,8 @@ Array* JB_Str_Split(JB_String* Self, uint /*byte*/ Sep);
 JB_String* JB_Str_Squeeze(JB_String* Self);
 
 StringReader* JB_Str_Stream(JB_String* Self);
+
+int64 JB_Str_SuffixSize(JB_String* Self);
 
 JB_String* JB_Str_SyntaxAccess(JB_String* Self, JB_String* S);
 
@@ -9020,6 +9014,8 @@ int SC_Decl_CArrayTotal(SCDecl* Self);
 
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp);
 
+void SC_Decl_CheckUnusedDecl(SCDecl* Self, Message* Feedback, uint /*byte*/ Dbg);
+
 bool SC_Decl_CompareUnclear(SCDecl* Self, SCDecl* D, bool MakesSenseVsZero);
 
 int SC_Decl_Complexity(SCDecl* Self);
@@ -9162,8 +9158,6 @@ void SC_Decl_IsTypeImproveSet(SCDecl* Self, bool Value);
 
 bool SC_Decl_IsUintLike(SCDecl* Self);
 
-bool SC_Decl_IsUsed(SCDecl* Self);
-
 bool SC_Decl_IsVoidPtr(SCDecl* Self);
 
 bool SC_Decl_IsZero(SCDecl* Self);
@@ -9171,6 +9165,8 @@ bool SC_Decl_IsZero(SCDecl* Self);
 bool SC_Decl_LoadContained(SCDecl* Self, Message* Contained, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
 
 bool SC_Decl_LoadContainedSub(SCDecl* Self, SCDecl* Cont, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
+
+bool SC_Decl_LocalIsUsed(SCDecl* Self);
 
 Message* SC_Decl_MakeAccess0(SCDecl* Self);
 
@@ -9199,6 +9195,8 @@ SCDecl* SC_Decl_MakeReal(SCDecl* Self);
 SCDecl* SC_Decl_MakeReference(SCDecl* Self);
 
 void SC_Decl_MarkAsAltered(SCDecl* Self);
+
+void SC_Decl_MarkAsUsed(SCDecl* Self, Message* Side, Message* Exp);
 
 bool SC_Decl_MatchC(SCDecl* Self, SCDecl* O);
 
@@ -9324,8 +9322,6 @@ void SC_Decl_TypeReach(SCDecl* Self, SCNode* From, Message* Src);
 
 bool SC_Decl_TypeSuffers(SCDecl* Self);
 
-JB_String* SC_Decl_UnusedStr(SCDecl* Self);
-
 void SC_Decl_WholeTypeSet(SCDecl* Self, ASMReg Value);
 
 ASMReg SC_Decl_WholeType(SCDecl* Self);
@@ -9381,8 +9377,6 @@ SCIterator* SC_Iter__SimpleIter(JB_String* Src);
 void SC_Base_ActualAdd(SCNode* Self, JB_String* Name, SCObject* IncObj);
 
 SCDecl* SC_Base_AddNumericConst(SCNode* Self, JB_String* Name, int64 Value, Message* Where);
-
-JB_String* SC_Base_AutoCompleteKind(SCNode* Self);
 
 uint64 SC_Base_CalculateConst(SCNode* Self, Message* Value);
 
@@ -9443,8 +9437,6 @@ bool SC_Base_IsLibrary(SCNode* Self);
 bool SC_Base_IsModuleFunc(SCNode* Self);
 
 SCClass* SC_Base_IsNormalObject(SCNode* Self);
-
-bool SC_Base_IsReached(SCNode* Self);
 
 JB_String* SC_Base_LateAddTemporary(SCNode* Self, JB_String* Type, JB_String* Name1, Message* Value, Message* Err);
 
@@ -10011,6 +10003,8 @@ Message* SC_Msg_FindShader(Message* Self, JB_String* TypeName);
 Message* JB_Msg_FindTightest(Message* Self, int Pos, bool Named, bool SamePosition);
 
 JB_String* JB_Msg_FirstName(Message* Self);
+
+JB_Object* SC_Msg_FirstPrmObj(Message* Self);
 
 void SC_Msg_FixElseif(Message* Self);
 
@@ -10848,9 +10842,13 @@ Message* SC_File_Orig(SCFile* Self);
 
 Message* SC_File_Start_AST(SCFile* Self);
 
-void SC_File_Stop(SCFile* Self, SCImport* Old);
+void SC_File_Stop(SCFile* Self);
 
-SCImport* SC_File_Use(SCFile* Self);
+void SC_File_SyntaxAppend(SCFile* Self, SCClass* C);
+
+void SC_File_Use(SCFile* Self);
+
+int SC_File__Init_();
 
 
 
@@ -11014,6 +11012,8 @@ void SC_Class_CheckIterator(SCClass* Self);
 
 void SC_Class_CheckStateful(SCClass* Self, Message* Node);
 
+void SC_Class_CheckUnusedClass(SCClass* Self, Message* Feedback);
+
 void SC_Class_ClassCollect(SCClass* Self);
 
 bool SC_Class_CollectProp(SCClass* Self, Message* Msg);
@@ -11023,6 +11023,8 @@ void SC_Class_CollectProperties(SCClass* Self);
 SCFunction* SC_Class_ConOrDesForCall(SCClass* Self, bool IsConstructor, int Task);
 
 SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, bool HasPtrs, SCModule* M);
+
+bool SC_Class_ConstructorUsed(SCClass* Self);
 
 void SC_Class_ContainedTypeLoad(SCClass* Self);
 
@@ -11220,7 +11222,7 @@ void SC_Class_WriteStructOrUnion(SCClass* Self, FastStringCpp* Fs);
 
 SCModule* SC_Class__DataTypeSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, SCNodeType BaseType);
 
-SCNode* SC_Class__ExtendOneFunc(Message* Node, SCNode* Name_space, Message* ErrPlace);
+SCNode* SC_Class__ExtendOneFunc(Message* Node);
 
 SCNode* SC_Class__GetDefault(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -11351,11 +11353,9 @@ void SC_Func_Destructor(SCFunction* Self);
 
 SCFunction* SC_Func_Disambiguate(SCFunction* Self, Message* Src);
 
-void SC_Func_DoLinkBoth(SCFunction* Self, SCObject* To);
+void SC_Func_DoLinkToDecl(SCFunction* Self, SCDecl* Decl);
 
-void SC_Func_DoLinkFrom(SCFunction* Self, SCObject* To);
-
-void SC_Func_DoLinkTo(SCFunction* Self, SCObject* To);
+void SC_Func_DoLinkToNode(SCFunction* Self, SCNode* To);
 
 void SC_Func_DontWantSameReturnType(SCFunction* Self, SCFunction* F);
 
@@ -11493,8 +11493,6 @@ SCDecl* SC_Func_StructReturned(SCFunction* Self);
 
 void SC_Func_SubFuncParamsLoad(SCFunction* Self, Message* P);
 
-bool SC_Func_SyntaxEquals(SCFunction* Self, JB_String* Name, bool Aware);
-
 bool SC_Func_SyntaxIs(SCFunction* Self, FunctionType K);
 
 void SC_Func_SyntaxIsSet(SCFunction* Self, FunctionType K, bool Value);
@@ -11540,8 +11538,6 @@ bool SC_Func__CanKeepAsValue(SCIterator* Iter, Message* Arg, SCDecl* Dcl, Messag
 void SC_Func__CurrFuncSet(SCFunction* Value);
 
 SCFunction* SC_Func__CurrFunc();
-
-void SC_Func__FastStringOpt(Message* S);
 
 Message* SC_Func__GetFileString(Message* Msg, JB_String* Name);
 
@@ -12244,7 +12240,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Msg_AppendSyx(Self, kJB_SyxThg, JB_LUB[520]);
+			JB_Msg_AppendSyx(Self, kJB_SyxThg, JB_LUB[527]);
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -12272,7 +12268,7 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[913]);
+		JB_Msg_Fail(Self, JB_LUB[901]);
 	}
 }
 
@@ -12404,7 +12400,6 @@ struct JB_Globals {
 	JB_Object* Tk__EndOfLineMarker;
 	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* App__Conf;
-	JB_Object* ErrorSeverity__names;
 	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* LD_ClassList;
 	JB_Object* Saver_SaveableList;
@@ -12424,6 +12419,7 @@ struct JB_Globals {
 	JB_Object* App__OldArgs;
 	JB_Object* App__Path;
 	JB_Object* Tk__ErrorNames;
+	JB_Object* ErrorSeverity__ErrorNames;
 };
 extern JB_Globals JB__;
 
