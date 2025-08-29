@@ -331,10 +331,10 @@ class String
 		for c in self
 			rz += (c=='\n' or '\r')
 	
-	function LineAtByte (|int| b, |intrange|)
-		for (L.lines in self) (after)
-			if after >= b
-				return (after-l.length, after)
+//	function LineAtByte (|int| b, |intrange|)
+//		for (L.lines in self) (after)
+//			if after >= b
+//				return (after-l.length, after)
 	
 	function DiffAt (|string| A, |ind|)
 		cpp_wrapper
