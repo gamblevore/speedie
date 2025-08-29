@@ -186,7 +186,7 @@ If copying a file fails, it will return an `ErrorInt` of -1, which evaluates to
 _Conclusion: The official way of detecting **if** an error just occurred in a function-call, is checking if the function returned something that evaluates to false. (Assuming the function does create errors, not all do.)_
 
 ---
-### What to do with the List of Errors?
+### What To Do With The List Of Errors?
 
 OK, so `stderr` collects a list of errors. What do we do with it now we have it? Depends on what you are trying to do.
 
