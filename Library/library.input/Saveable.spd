@@ -305,7 +305,7 @@ class SaverClassInfo (array)
 
 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 
 
-
+target  debug {
 struct StructSaveTest
 	saveas struct
 	|saveable?|	Sav
@@ -320,4 +320,4 @@ struct StructSaveTest
 
 	function Test (|object| s)
 		cpp_part TestObj
-
+}
