@@ -209,7 +209,7 @@ function scdecl.AddToGlobs (|bool|)
 	opt norefcounts
 	is Global
 	
-	|| n = .name
+//	|| n = .name
 //	if ('_' == n[]) ||| ('_' == n.Last)
 //		is hidden
 // maybe just do visibility textually?

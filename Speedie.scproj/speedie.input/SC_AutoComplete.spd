@@ -165,10 +165,11 @@ function ErrorsToPerry (|message|)
 	return .MiniErrors(.errors!)
 
 
-function UnusedFuncs (|message| cmd, |message|)
+function UnusedStuff (|message| cmd, |message|)
 	opt norefcounts
 	|| path = cmd[@str]										#require
 	|| scf = compiler.files.valuelower(path.name)			#expect ("No file at: " + path.name)
+
 	|| unused_libs = path.next
 		for lib in unused_libs
 			if lib.ExpectString
@@ -176,16 +177,36 @@ function UnusedFuncs (|message| cmd, |message|)
 			
 	cmd.Clear
 	
-	if .CompiledOK
-		|| arg = cmd.GiveArg
-		for fn in Compiler.FuncList
-			if fn.File == scf
-				fn.CheckUnused(arg)
+	if !.CompiledOK
+		return cmd
+
+	// what about constants, and globals that are unused?
+	// we have a global list... but constants? I guess theres a module-list?
+	// but we also have the ability to set constant anywhere, right?
+	// they'd need to have an array, per-file, of consts
+	// unused properties too? I think those must be in a class.
+	// we could mark each constant-section in the file?
 	
+	|| arg = cmd.GiveArg
+	for fn in Compiler.FuncList
+		if fn.File == scf
+			fn.CheckUnused(arg)
+
+	for konst in Compiler.DeclConstants
+		if konst.file == scf
+			konst.CheckUnusedDecl(Arg, 'K')
+
+	for glob in PackMaker.PackGlobs
+		if glob.file == scf
+			glob.CheckUnusedDecl(arg, 'G')
+	
+	for c in scf.Types
+		c.CheckUnusedClass(arg)
+
 	return cmd
 
 
-function SCDecl.IsUsed (|bool|)
+function SCDecl.LocalIsUsed (|bool|)
 	if self is CompilerCreated
 		return true // whatever
 	if self is ReadFrom
@@ -194,10 +215,48 @@ function SCDecl.IsUsed (|bool|)
 		return true
 
 
-function string.ItsUnused (|string|)
-	return self + " is unused"
+function SCClass.ConstructorUsed (|bool|)
+	opt norefcounts
+	|| c = .ConstructorFunc
+	while c
+		if c.LinkFrom.Length
+			return true
+		c = c.NextFunc
 
-	
+
+function SCClass.CheckUnusedClass (|message| feedback)
+	opt norefcounts
+	require !.IsLibrary
+	if .IsObject
+		if !.ConstructorUsed
+			.MarkUnused(feedback, 'C')
+	  else
+		if .MyReacher == nil
+			.MarkUnused(feedback, 'S')
+		
+	for p in .Properties
+		p.CheckUnusedDecl(feedback, 'P')
+
+
+function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
+	opt norefcounts
+	require self isnt Library
+	require self isnt ReadFrom
+	require self isnt ClassObj
+	|| fn = .IsLookupOnly
+	if (fn isa SCFunction)
+		require fn isnt Behaviour
+
+	.MarkUnused(feedback, dbg)
+
+
+function SCObject.MarkUnused (|message| feedback, |byte| debug)
+	opt norefcounts
+	(debug) // remove later
+	|| s = .Source
+		feedback.msg(@tmp, .UnusedStr) <~ s.position
+
+
 function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts
 	require self isnt Disabled
@@ -205,7 +264,7 @@ function SCFunction.CheckUnused (|message| feedback)
 
 	if .isunused
 		|| src = .source
-			|| str = "()".ItsUnused
+			|| str = "() is unused."
 			if .linkfrom != nil
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
@@ -216,33 +275,37 @@ function SCFunction.CheckUnused (|message| feedback)
 	require !.HasProto
 	|message| ErrName
 	for arg in .args
-		if !arg.IsUsed
+		if !arg.LocalIsUsed
 			|| Src = arg.source
 			if src and src isnt Inserted
 				if ErrName
 					ErrName.name = ", " + ErrName.name
 					ErrName.name = arg.name + ErrName.name
 				  else
-					feedback.msg(@tmp, arg.name.ItsUnused) <~ src.position
+				    arg.markunused(feedback, 'A')
 	
 	for s.flat in .Source
 		if s == @decl
-			|| o = s.obj
-			if o isa SCDecl
-				if !o.IsUsed
-					feedback.msg(@tmp, o.UnusedStr) <~ s.position
+			|| d = s.obj as scdecl
+				if !d.LocalIsUsed
+					d.MarkUnused(feedback, 'D')
 
-
-
-function scdecl.UnusedStr (|string|)
-	if self is SetTo
-		return .name + " is set to, but never read from."
-	return .name.ItsUnused
+	
+	
+function scobject.UnusedStr (|string|)
+	opt norefcounts
+	|| Reason = " is unused."
+	if self isa SCDecl
+		if self is SetTo
+			reason = " is set to, but never read from."
+		if (self is Const) and (.islookuponly isa SCFunction)
+			reason = "Unnecessary prototype (never gets used as a prototype!)"
+	return "$.AutoCompleteKind $.name$reason"
 	
 
 function Check (|message| cmd=nil, |message|)
 	if cmd
-		return .Checksub(cmd)
+		return .CheckSub(cmd)
 	return .CheckSub(@tmp + "check")
 
 
@@ -272,7 +335,7 @@ function DoCmd (|Message| cmd, |message|)
 	require cmd == @tmp
 	
 	if !.InitedOK:						return cmd.SendPerryErrors
-	if cmd ~= "unused_funcs":			return .UnusedFuncs(cmd)
+	if cmd ~= "unused":					return .UnusedStuff(cmd)
 	if cmd ~= "check":					return .Check(cmd)
 	if cmd ~= "mem":					return .ReportMemory(cmd)
 	if cmd == 1 or cmd.last == @name:	return .autoJump(cmd)
@@ -1377,8 +1440,11 @@ function message.IsModuleType (|bool|)
 function message.FindPos (|int| fr, |int| len, |message|)
 	return  .FindPosSub(fr, len, true)  ??  .FindPossub(fr, len, false)
 
+
 function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
-	opt norefcounts
+	opt norefcounts	
+	if 0	
+
 	|| Strength = 1
 	for ch.flat in self
 		if ch.position == fr
@@ -1389,4 +1455,11 @@ function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 				Strength = CurrStrength
 				rz = ch
 
+
+//function Test
+//	visible
+//	|| x = abcd()
+//	x.AAAAARGH++
+//	x.ada = !x.ada
+//	|| y = x.AAAAARGH
 

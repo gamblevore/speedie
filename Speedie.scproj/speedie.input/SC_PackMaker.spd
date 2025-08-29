@@ -22,9 +22,9 @@ module PackMaker
 	helper AddFunc (|scfunction| f)
 		opt norefcounts
 		if f.IsLibrary
-			if f.isreached or options.MakeInterpreter
+			if f.MyReacher or options.MakeInterpreter
 				.LibFuncs <~ f
-		  elseif f.isreached or (f in "ASMExamples")
+		  elseif f.MyReacher or (f in "ASMExamples")
 			.PackFuncs <~ f
 
 		
@@ -321,7 +321,7 @@ module PackMaker
 	
 	function SCClass.PackExport (|jbin?| j)
 		opt norefcounts
-		|| Output = .IsReached
+		|| Output = .MyReacher
 
 		if j
 			require output or .HasPackChildren
@@ -334,7 +334,7 @@ module PackMaker
 			|| T = .ClassType!
 			if !output
 				0
-			  elseif .islibrary
+			  elseif .IsLibrary
 				packmaker.libglobs <~ T
 				(T is Library)
 			  else

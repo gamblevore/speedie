@@ -20,15 +20,15 @@ datatype ClassInfo (int)
 		Banned
 		HasNilChecker
 		DefaultsToReal
-		IsRole
+//		IsRole
 //		ClassObj
-		IsTask
+//		IsTask
 		Stateless
 		Stateful
 		Builtin
 		SortsProperties
 		NumericReduction = [Symbol, Fixed, Flags]
-		ASM
+//		ASM
 		
 
 class SCClass (SCBetterNode) {
@@ -81,6 +81,8 @@ constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
+	scfile.curr <~ self
+		
 	.name = LoadClassName(node)
 	.CppClass = nil
 	.Source = node
@@ -1180,8 +1182,8 @@ module
 		Return Compiler.program
 
 
-	function ExtendOneFunc (CollectFunc)
-		Compiler.ExtendList <~ node
+	function ExtendOneFunc (|message| node, |scnode|)
+		Compiler.ExtendList <~ node 
 		node.obj = SCImport.curr
 		|| dot = node.first
 		|| name = dot.first

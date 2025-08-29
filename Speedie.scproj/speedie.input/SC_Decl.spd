@@ -76,8 +76,7 @@ datatype SCDeclInfo (uint)
 		Reference
 		Task
 		Self
-		ReadFrom
-		SetTo					// a var sets it... like: rz = obj
+		Used = [ReadFrom, SetTo]
 		Grabbed
 		PostIncremented
 		VarThatGotReturned
@@ -130,7 +129,6 @@ class SCDecl (SCObject) {
 	|byte|				NilReg
 	|byte|				DepthOfBranch // same?
 	|bool|				Suffers
-	|byte|				ArgDepth
 	|DeclAlterable|		mu									// The ASM can alter these, and needs to restore them too.
 
 	
@@ -529,7 +527,7 @@ class SCDecl (SCObject) {
 			return true
 
 		require !.IsBareStruct and !.IsCArray
-		require .type.TypeInfo!=0//DataTypeCode.UnusedType
+		require .type.TypeInfo!=0
 		return true
 
 
@@ -1215,6 +1213,24 @@ class SCDecl (SCObject) {
 		if .IsCArray
 			// not true for carrays of carrays.
 			rz *= .CArrayTotal
+
+
+	function MarkAsUsed (|message| side, |message| exp)
+		opt norefcounts
+		if exp and (SCFunction._Info is ConOrDes) and (self is Property)
+			if exp.func == @dot
+				|| f = exp.first
+				if f isthing "self"
+					return
+//			|| o = .OwningClass
+//			|| c = SCFunction.CurrFunc!.cls
+///				if c.isa(o)
+///					return
+		if side
+			is setto
+		  else
+			is ReadFrom
+	
 }
 
 
@@ -1298,4 +1314,5 @@ function array.CArraySize (|[scdecl]| self, |int| size, |int|)
 		size = size align p.alignment
 		size += p.carraysize
 	return size
+
 

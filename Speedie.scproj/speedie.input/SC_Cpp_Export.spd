@@ -160,7 +160,7 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F) // function func (
 
 
 function SCClass.NeedsExport (|bool|)
-	return super.isreached or .IsBehaviourTable
+	return super.MyReacher or .IsBehaviourTable
 
 
 function Codify (|SCModule| scb, |string| fName)

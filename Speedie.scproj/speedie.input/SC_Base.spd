@@ -23,10 +23,6 @@ function IsLibrary (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .is
 	return .Project.IsSTDLib?
 
 
-function IsReached (|bool|)
-	return .MyReacher
-
-
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 	.Source ?= AST // not good! Considering that one "project" module covers multiple files!
 	|| r = ast.ListAll
@@ -591,13 +587,10 @@ function message.ConstructorAddNil (|bool| isdot)
 
 
 constants (
-	kPurposeAddress
 	kPurposeFunc
 	kPurposeDot
 	kPurposeVar
 	kPurposeVarDecl
-	kPurposeHider=0x10000
-	NoErrors = 1
 	DontGoUp = 2
 )
 
@@ -633,11 +626,11 @@ function ImportFile (|SCFile| file)
 	todo `visibility needs to make a bit more sense than this...
 	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
 	 within modules... it should only apply to global vars`
-	|| Old = file.Use
+	file.Use
 	compiler.project = file.proj 
 	|| v = file.proj.isstdlib and Options.MakeInterpreter
 	compiler.program.CollectFromNode( ast, v )
-	file.Stop(old)
+	file.Stop()
 
 
 function RequireContained (|Message| errplace, |SCDecl|)
@@ -899,20 +892,6 @@ function LoadVisibility (|Message| p, |bool|)
 	scnode.CurrVisibility = rz
 	p.MakeComment
 
-
-function AutoCompleteKind (|string|)
-	if self isa SCModule
-		return "module"
-	if self isa scclass
-		if .FuncProto
-			return "function prototype"
-		if .IsDataTypeOnly
-			return "datatype"
-		if .IsStruct
-			return "struct"
-		if .IsObject
-			return "class"
-	return "unknown"
 
 
 iterator ListLookup

@@ -266,10 +266,7 @@ function TypeOfThg (ExprResolver)
 		expect (false) (exp, "Expected an object here.")
 	
 	  elseif R isa SCDecl
-		if side
-			(r is setto)
-		  else
-			(r is ReadFrom)
+		r.MarkAsUsed(Side, nil)
 		|| O = R.islookuponly
 		if O isa message
 			exp.SafeReplaceWith(o.copy(exp))
@@ -343,17 +340,10 @@ function TypeOfUnit (ExprResolver)
 		it.func = @num
 		return typeofnum(it, name_space, exp)
 
-	|Float64| Mul = 0.0
 	|scclass--| Type = TypeInt!
 	|string--| unit = exp.name
-	if unit == "KB" or "K"
-		Mul = (1<<10)|Float64|
-	  elseif unit == "MB" or "M"
-		Mul = (1<<20)|Float64|
-	  elseif unit == "GB" or "G"
-		Mul = (1<<30)|Float64|
-	  elseif unit == "TB" or "T"
-		Mul = (1|int64|<<40|int64|)|Float64| // goddamn c++ complaining
+	|Float64| Mul = unit.suffixsize|float64|
+		0 //
 	  elseif unit == "th"
 		Mul = 0
 	  else
@@ -1141,6 +1131,7 @@ function TypeOfDot (ExprResolver)
 		return o
 	
 	|| decl = o.BaseAsDecl
+		decl.MarkAsUsed(side, exp)
 		if contains
 			if (DotVar isa scclass) and !exp.IsSettablePlace
 				decl = decl.ContainedReplace( Contains, true )

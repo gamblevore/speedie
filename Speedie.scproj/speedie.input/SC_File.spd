@@ -13,6 +13,7 @@ class SCFile (file)
 	|Message?|		OrigAST
 	|uint16|		FileNum
 	|bool|			IsInternal
+	|[scclass]?|	Types
 
 
 	constructor (|File| f, |scimport| p)
@@ -21,6 +22,7 @@ class SCFile (file)
 		|string--| x = (f.path, string.error)(f != nil) // just feel like doing this.
 		super.constructor(x)
 		.Proj = p
+		.Types = nil
 		.filenum = scimport.AllFiles.length
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
@@ -37,19 +39,25 @@ class SCFile (file)
 			(message).restore
 	
 	
-	function Stop (|scimport| Old)
+	function Stop
+		if curr == self
+			curr = nil
 		scimport.curr = nil // whatever.
 		scimport.CurrIsManuallyImported = 0
 
 
-	function Use (|scimport|)
+	function Use
 		opt norefcounts
-		rz = scimport.curr
+		curr = self
 		scimport.curr = .proj
 		scimport.CurrIsManuallyImported = .Proj.Depth
 		|| l = .LiveAst
 			l.memoryLayer.Use
 	
+	syntax Append (|scclass| C)
+		opt norefcounts
+		if self
+			(.Types init []) <~ c
 	
 	function CollectGlobals (|SCNode| p)
 		.Proj.use // should be inside use?
@@ -121,6 +129,9 @@ class SCFile (file)
 			parser._DotInsertallow = false
 			StdErr.source = ""
 		(Message).restore
+	
+	module
+		|scfile--| Curr
 
 
 
