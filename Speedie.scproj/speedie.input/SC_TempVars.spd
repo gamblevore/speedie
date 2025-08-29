@@ -80,15 +80,12 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 
 
 
-function message.IntoVariable (|SCNode| name_space, |nameandmsg|)
+function message.IntoVariable (|SCNode| name_space, |message|)
 	|| P = .NiceParent
 	|| Place = P.IsInDeclInBlock
 		|| NameMsg = P.first!.usenonrefchangers
 		if (NameMsg == @thg)
-			rz.name = NameMsg.name
-			rz.arg = place.Ancestor(@arg)!
-			rz.msg = place.next // result uses .arg as backup if !.msg
-			return rz
+			return place.Ancestor(@arg)
 	
 	|| Block = .CreateOwnBlock #require
 	|| name = uniquetmpvar(name_space, "_imP")
@@ -107,16 +104,9 @@ function message.IntoVariable (|SCNode| name_space, |nameandmsg|)
 	RetVal.obj = P.obj
 	 
 	block <~ last
-	rz.msg = last
-	rz.arg = block
-	rz.name = name
-
-
-
-struct NameAndMsg
-	|message?|   Msg
-	|string|	 Name
-	|message?|   Arg
+//	rz.msg = last
+	return block
+//	rz.name = name
 
 
 

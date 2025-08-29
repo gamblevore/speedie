@@ -11,7 +11,7 @@
 // I had normal instincts. And super ones too. Now I got less... than normal.
 // 
 
-
+target argh {
 function Message.MarkVarClosed (|message| Closer, |scdecl| D)
 	opt norefcounts
 	|| T = .asmtype
@@ -78,3 +78,4 @@ extend_module ArchonPurger
 			while OrigDepth > 0
 				.UpdateFoundPlace(argument, OrigDepth--)
 		
+}

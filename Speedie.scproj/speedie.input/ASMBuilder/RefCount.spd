@@ -152,11 +152,3 @@ function FinalDecrements (fn_asm)
 // within the same block?
 // then... we can check that reg and use it.
 	
-
-
-class RefTest
-	|string| s
-	Constructor
-		visible
-		.s = "4"
-

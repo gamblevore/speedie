@@ -1,48 +1,32 @@
 
 
 datatype ASM (uint)
-	function BBBB (|int| y)
-		visible
-		|| x = 0
-		if y
-			x = 1
-			y = 2
-			return
-		x++
-		y = 0
-	
 	function Print
 		visible
 		cpp_name PrintASM
 	 
-
-	function Length (|int|)
-		|| op = .DecodeOp
-		if op >= 32
-			return 1
-		return (op&3)+1
-	
-	function DebugPrint 
-		|| op = .decodeop
-		|| ins = instruction.TypeList[op]
-			"$op ${ins.name} (${ins.formname})"
-		  else 
-			"$op ???"
+//	function Length (|int|)
+//		|| op = .DecodeOp
+//		if op >= 32
+//			return 1
+//		return (op&3)+1
+//	
+//	function DebugPrint 
+//		|| op = .decodeop
+//		|| ins = instruction.TypeList[op]
+//			"$op ${ins.name} (${ins.formname})"
+//		  else 
+//			"$op ???"
 		
-	function DecodeOp (|int|)
-		return self >> 24
-	
-	target debug
-		function DecodeBaseOp (|int|)
-			rz = .decodeop
-			if rz < 32
-				rz &= ~3
-		
-	operator • (|bool| b, |asm|)
-		if b
-			return self + (1<<24)
-		return self
-	
+//	function DecodeOp (|int|)
+//		return self >> 24
+//	
+//	target debug
+//		function DecodeBaseOp (|int|)
+//			rz = .decodeop
+//			if rz < 32
+//				rz &= ~3
+			
 	function R1 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 8
 	function R2 (assigns:|uint|, |asm|)

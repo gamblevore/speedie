@@ -48,7 +48,7 @@ datatype NilCheckMode (int)
 		WhilePos = IfPos ||| while
 		WhileNeg = IfNeg ||| while
 		Active  = Positive ||| Negative
-		Basic   = Active ||| Soft
+//		Basic   = Active ||| Soft
 
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other

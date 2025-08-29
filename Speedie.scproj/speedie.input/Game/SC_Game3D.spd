@@ -212,17 +212,3 @@ function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
 		return decl
 
 
-
-model ModelTest
-	|int| x
-	|int| y
-	type points
-	
-
-function Game_FlyingAlloc (|&GameFlyingMem| Mem, |&byte|):
-
-struct GameFlyingMem
-	linkage
-		wrapper
-		cpp_part Mem
-

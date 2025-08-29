@@ -129,8 +129,8 @@ function InitComp (|string| name_)
 module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
-	|scoperator|						And
-	|scoperator|						Or
+//	|scoperator|						And
+//	|scoperator|						Or
 	|scoperator|						Assigns
 	|scoperator| 						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!
 	|scoperator| 						Subtract														// a-b!!
@@ -221,8 +221,8 @@ module {
 		
 	function AddBasic
 		.assigns = SCOperator.new("=", nil, OpMode.assigns)
-		.and = SCOperator.new("and", nil, OpMode.AND)
-		.or = SCOperator.new("or", nil, OpMode.OR)
+		SCOperator.new("and", nil, OpMode.AND)
+		SCOperator.new("or", nil, OpMode.OR)
 
 		
 	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0)
@@ -317,7 +317,6 @@ function Message.AOrBExpand (|bool|)
 
 	using (rel)
 	|| f = rel.first!
-	|| fn = f.func
 	if !f.HasAny
 		|| list = rel.msg(@list)
 		rel <~ self
@@ -410,7 +409,6 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Me
 
 module CustomOps
 	constants
-		NotCustom = 0
 		RecheckType = 4
 		TypeCastFromBool = 16
 		TypeCastToBetter = 32

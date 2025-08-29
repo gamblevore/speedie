@@ -149,7 +149,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	|| Point = msg.UpToArg!
 	using (msg)
 	|| FSName = UniqueTmpVar( fn, "fs" )
-	|| StrName = fsName + "_str"
+//	|| StrName = fsName + "_str"
 	|| Dot = @dot + "new"
 	dot <~ (@Thg, "FastString")
 	dot <~ @emb
@@ -172,12 +172,12 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 		dot2.msg(@prm) <~ item
 		point.Prev = dot2
 
-	|| WeAreAppending = false
-	|| fnc = msg.parent
-	if fnc == @prm
-		fnc = fnc.parent
-		if fnc ~= @dot and "SyntaxAppend"
-			WeAreAppending = true
+//	|| WeAreAppending = false
+//	|| fnc = msg.parent
+//	if fnc == @prm
+//		fnc = fnc.parent
+//		if fnc ~= @dot and "SyntaxAppend"
+//			WeAreAppending = true
 	// wrong approach.
 	msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
 	msg <~ (@thg, fsname)

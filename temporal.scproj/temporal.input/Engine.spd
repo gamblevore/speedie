@@ -40,10 +40,10 @@ class SteveMachine
 	|int| 					Reps
 	|bool|					Feedback
 	|&TemporalGenerator|	Create
-	|byte[]|				Samples
+	|byte[]|				_ByteSamples
 	
 	constructor (|int| reps, |&TemporalGenerator| T, |byte[]| buff)
-		.reps = reps, .create = t, .samples = buff, .Feedback = true
+		.reps = reps, .create = t, ._ByteSamples = buff, .Feedback = true
 		.Refresh
 	
 	function Name (|string|)
@@ -51,68 +51,104 @@ class SteveMachine
 	
 	function Refresh
 		require self
-		|| p = .Samples.ptr
-		|| a = p + .Samples.Size
-		.Samples.Length = 0 // So that .samples.next works properly.
+		|| p = ._ByteSamples.ptr
+		|| a = p + ._ByteSamples.Size
+		._ByteSamples.Length = 0 // So that .samples.next works properly.
 		(.Create.Steve)(p, a, 0, .reps)
 		
-	function Hash
+		
+	helper _Hash
 		|uint64| H
-		|| p = .Samples.ptr
-		|| n = .Samples.Size
+		|| p = ._ByteSamples.ptr
+		|| n = ._ByteSamples.Size
 		for i in n
 			H = (H xor p[i]).Hash
 		
 		for i in n
-			p[i] = H.xorbyte
+			p[i] = H.XorDownTo8Bits
 			H = h.Hash
 		// take all the data and just hash it... ooff...
 
-	function Bit (|bool|)
-		return .BitCount & 1
+
+	function DivineBitPool (|int| bits, |uint64|)
+		description "Returns up to 64 bits of randomness. Each bit of output comes from 12 bits of input, xored down to 1 bit."
+		bits = bits.clamp(0, 64)
+		for i in bits
+			rz |= (.DivineBit<<i)
 	
-	function Byte (|byte|)
-		if !.Samples.HasSpare
+	
+	function DivineBit (|bool|)
+		description "Takes 12 bits of random input, and merges them down into one bit, increasing the randomness."
+		return .Twelve.XorDownToBit
+	
+	
+	function Twelve (|uint|)
+		rz = .EightIsntGreat ||| (.EightIsntGreat<<8)
+		rz &= 12~bits
+	
+	
+	helper EightIsntGreat (|uint|)
+		// lets avoid using the number 8! Its very computery.
+		// 12 is OK... 3 is OK. Maybe 5 even or 7.
+		// the iChing uses 6-bits in fact.
+		
+		// So EightIsntGreat just return 8-bits because its natural. The name reminds us
+		// that its better to combine into more bits, then take 8 directly.
+		
+		if !._ByteSamples.HasSpare
 			.Refresh
-							// OK so... this isn't possible just yet.
+							// OK so... this isn't possible to fully replicate just yet
 							// the original temporal engine did A LOT MORE. Including...
 							// looking for multiples of small numbers (3/5/7)
 							// bitshifting down (multiples of 2/4/8/16)
 							// xoring multiple runs, and von-neuman and other cleanups.
 							// or just initialising a large data-set to use for seeding
 							// but... the chaotic generator is quite good. lets just use that for now :D
-		return .Samples.Next
+		return ._ByteSamples.Next
 		
-	function BitCount (|int|)
-		return .byte|int|.countbits
+
+	function DivineCount (|int| BitCount=12, |int|)
+		description "Takes N bits and counts the number of true bits. Returns a value from 0 to N. Thus, there are N+1 possibilities. When asking for 8, the result '4' is the most common answer."
+		return .DivineBitPool(BitCount).countbits
+
 	
 	function Walk (|int| bits, |int| deviance, |uint64|)
 		for i in bits min 64
 			rz[i] = .step(Deviance)
-		
+	
+	
 	function Step (|int| deviance=141, |bool|)
 		|| n = 0
 		|| TooLate = date.now + 0.1s
 		while
 			for 256
-				n += .BitCount-4 	 // group-walk
+				n += .DivineCount(12)-6 	 // group-walk
 				if (n.abs >= deviance)
 					return n<0
 			if Toolate.fired
 				exit
 		return n < 0
 
+
 	function Majority (|uint| bytes=4K, |bool|)
 		|uint| Total = 0
 		for bytes
-			total += .BitCount
-		return (Total+.Bit)|uint| > (bytes*4)
+			total += .DivineCount
+		return (Total+.DivineBit)|uint| > (bytes*4)
 
 
 	module
-		function Create (|int| reps, |int| Samples=16K, |stevemachine?|)
+		function uint.XorDownToBit (|byte|)
+			self ^= self >> 16
+			self ^= self >> 8
+			self ^= self >> 4
+			self ^= self >> 2
+			self ^= self >> 1
+			return self&1
+	
+		function Create (|int| reps=9, |int| Samples=64K, |stevemachine?|)
 			|| tmp = TemporalGenerator.Find("chaotic")
 			if !tmp
 				tmp = TemporalGenerator.find("1")$
-			return tmp.Create(9, 64K)
+			return tmp.Create(reps, Samples)
 		

@@ -299,6 +299,7 @@ function scobject.UnusedStr (|string|)
 		if self is SetTo
 			reason = " is set to, but never read from."
 		if (self is Const) and (.islookuponly isa SCFunction)
+			// this is better just NOT being a problem. or even a warning. Just "info". sigh.
 			reason = "Unnecessary prototype (never gets used as a prototype!)"
 	return "$.AutoCompleteKind $.name$reason"
 	

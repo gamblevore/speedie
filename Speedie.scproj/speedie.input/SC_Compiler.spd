@@ -5,7 +5,7 @@
 
 |SCClass|	TypeFloat64
 |SCClass|	Typefloat
-|scclass|	TypeFloat16
+//|scclass|	TypeFloat16
 |SCClass|	TypeSaveable
 |SCClass|	TypeInt
 |SCClass|	TypeInt16
@@ -19,7 +19,7 @@
 |SCClass|	TypeStringZero
 |SCClass|	TypeSyntax
 |SCClass|	TypeBool
-|SCClass|	TypeCharSet
+//|SCClass|	TypeCharSet
 |SCClass|	TypeChar
 |SCClass|	TypeByte
 |scclass|	TypeCodePoint
@@ -27,7 +27,7 @@
 |SCClass|	TypeWrapper
 |SCClass|	TypeArray
 |SCClass|	TypeDictionary
-|SCClass|	TypeFastString
+//|SCClass|	TypeFastString
 |SCClass|	TypeJBClass
 |scclass|	TypeTask
 |SCClass|	TypeVec4
@@ -63,7 +63,7 @@ linkage
 |File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
-|string|					ReportedName
+//|string|					ReportedName
 |scimport|					Project
 |scfunction|				MainFunc
 |message|					ConfMsg
@@ -90,7 +90,7 @@ linkage
 |Dictionary of SCNode|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
-|SCFunction|				PrivateProperty
+//|SCFunction|				PrivateProperty
 |SCFunction|				RefIncr
 |SCFunction|				RefIncr2
 |SCFunction|				RefDecr
@@ -100,15 +100,15 @@ linkage
 |SCFunction|				RefSafeDecr
 |SCFunction|				RefSetRef
 
-|SCFunction|				NewFunc
+//|SCFunction|				NewFunc
 |SCFunction|				SwapFunc
 |SCFunction|				TernaryFunc
 |SCFunction|				fnFastIsa
 |SCFunction|				fnFastAs
 |SCFunction|				fnAs
 |SCFunction|				fnIsa
-|SCFunction|				fnMustbe
-|SCFunction|				fnOpMustBe
+//|SCFunction|				fnMustbe
+//|SCFunction|				fnOpMustBe
 
 |[String]|					SyxArray
 |Message|					ExtendList = message()
@@ -127,8 +127,8 @@ linkage
 |byte|						InPerry
 |SCNodeInfo|				InBuiltType
 |bool| 						HasFunny
-|bool|						HasMainFunc
-|byte|						During
+//|bool|					HasMainFunc
+|byte|						During // unused but i don't want to remove. it could be useful?
 |bool| 						InitedOK = true
 |int|						stClasses
 |int|						stFuncs
@@ -143,7 +143,7 @@ linkage
 
 |int|						CurrStage
 |string|					StageName
-|SCFunction|				ClassListInitFunc
+//|SCFunction|				ClassListInitFunc
 
 
 constants
@@ -258,7 +258,7 @@ function InitTypes (|bool|)
 	TypeuInt			= compiler["uint"]
 	TypeuInt16			= compiler["uint16"]
 	TypeuInt64			= compiler["uint64"]
-	Typefloat16			= compiler["float16"]
+	compiler["float16"]
 	Typefloat			= compiler["float"] 
 	Typefloat64			= compiler["float64"]
 	TypeBool			= compiler["bool"]
@@ -267,7 +267,7 @@ function InitTypes (|bool|)
 	TypeByte			= compiler["byte"]
 	TypeChar			= Compiler["int8"] // int8 would be a better name
 	TypeCodePoint		= compiler["codepoint"]
-	TypeCharSet			= compiler["charset"]
+	compiler["charset"]
 	Typevec2			= compiler["vec2"]
 	Typevec3			= compiler["vec3"]
 	Typevec4			= compiler["vec4"]
@@ -282,7 +282,7 @@ function InitTypes (|bool|)
 	TypeSyntax			= Compiler["syntax"]
 	TypeWrapper			= Compiler["dataobject"]
 	TypeDictionary		= Compiler["dictionary"]
-	TypeFastString		= Compiler["faststring"]
+	Compiler["faststring"]
 	TypeArray			= Compiler["array"]
 	TypeSaveable		= Compiler["saveable"]
 	if StdErr.ok and .GetTypeVoid
@@ -340,23 +340,23 @@ function InitBasicFuncs (|bool|)
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	
 	.SwapFunc		= .FindFunction( "JB_Swap" )
-	.NewFunc		= .FindFunction( "JB_New" )
+	.FindFunction( "JB_New" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
 	.fnFastIsa		= .LoadTypeTest( "operatorfast_isa" )
 	.fnIsa			= .LoadTypeTest( "operatorisa" )
-	.fnMustbe		= .LoadTypeTest( "mustbe" )
-	.fnOpMustBe		= .LoadTypeTest( "operatormustbe" )
-	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
+	.LoadTypeTest( "mustbe" )
+	.LoadTypeTest( "operatormustbe" )
+//	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
 	return StdErr.OK
 
 
-function CreateFuncFromSource (|String| Src, |SCFunction|)
-	|| msg = src.ParseClean
-		rz = SCFunction.NewFunc( msg, nil, msg )|SCFunction|
-		if rz
-			rz.IsVisible = false
+//function CreateFuncFromSource (|String| Src, |SCFunction|)
+//	|| msg = src.ParseClean
+//		rz = SCFunction.NewFunc( msg, nil, msg )|SCFunction|
+//		if rz
+//			rz.IsVisible = false
 
 
 function Library (|file|)

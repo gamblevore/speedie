@@ -3,11 +3,11 @@
 	Speedie Internals. By Theodore H. Smith...
 */
 
-datatype DotUseType (int)
-	flags
+datatype DotUseType (int) // replace entire thing with a bool?
+	flags					// sigh. i wish i had made this unused stuff earlier
 		|DotUseType|
 		Property
-		Memory
+//		Memory
 		
 	syntax is (|DotUseType| d, |bool|)
 		return self == d
@@ -63,7 +63,7 @@ linkage
 |SCClass?|				Cls
 |CppRefs?|				Refs
 |error?|				SavedError
-|object?|				CounterPart
+//|object?|				CounterPart
 |SCFunction?|			NextFunc
 |SCDecl?|				HasProto
 |SCClass?|				ProtoType
@@ -83,12 +83,12 @@ linkage
 |Byte|					MaxASM
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
-|byte|					CantBeInlined
+//|byte|					CantBeInlined
 |ErrorSeverity|			BlindCasts
 |byte|					IsNilChecker
 |byte| 					Badness
 |byte|					StructReturnPos
-|byte| 					OptCounts
+//|byte| 					OptCounts
 |uint|					µStart
 |uint|					µLength
 
@@ -306,6 +306,7 @@ function @scfunction.NameList (|string|)
 
 function @scfunction.TransformAll 
 	opt norefcounts
+	Compiler.During = compiler.Transform
 	for f in compiler.FuncList
 		require !stderr.TooMany
 		f.Transform
@@ -2003,7 +2004,7 @@ function NeuMain (CollectFunc)
 		return Compiler.program			// ignore imported mains
 	
 	|| fn_src = node.mainfix
-		Compiler.HasMainFunc = true
+//		Compiler.HasMainFunc = true
 		|| m = compiler.Project!.mod
 		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
 		if rz isa scmodule // sigh. Not ideal.

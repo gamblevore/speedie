@@ -11,8 +11,8 @@ struct FatASM
 	|byte| 				_Outputs
 	|byte|				_Op
 	|byte|				JumpReg
-	|byte| 				BranchDepth
-	|byte| 				LoopDepth
+//	|byte| 				BranchDepth
+//	|byte| 				LoopDepth
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
@@ -37,8 +37,8 @@ struct FatASM
 		.InputRegs = 0
 		.jumpreg = 0
 		._Outputs = 0
-		.BranchDepth = 0
-		.LoopDepth = 0
+//		.BranchDepth = 0
+//		.LoopDepth = 0
 		.info = nil // ??? nothing needs this?
 		// leave msg, and _const. Other things may need them still.
 		for i in –count .prms

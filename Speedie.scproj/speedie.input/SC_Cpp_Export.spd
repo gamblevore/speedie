@@ -737,7 +737,7 @@ extern "C" {
 
 module
 	|bool|						WriteAPI 
-	|bool|						WroteAny
+//	|bool|						WroteAny
 								
 	|[string]|					H_Input
 	|[string]|					H_PostInput
@@ -876,7 +876,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		FlowControl.DisabledIncr // we don't care about previous file contents
 		.cpp_includes <~ s.hash|int64|.render
 		if F and !F.CompareData(S)
-			.wroteAny = true
+//			.wroteAny = true
 			F.Data = S
 		FlowControl.DisabledIncr(-1)
 	
@@ -974,7 +974,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function Init
-		WroteAny = false
+//		WroteAny = false
 		Cpp_Includes = []
 		@Acc.ExportAddr  = C_RenderAcc
 		@Item.ExportAddr = C_RenderItem

@@ -32,14 +32,14 @@ class Instruction
 		fs <~ "\n"
 		.sizes.render(Fs)
 
-	syntax equals (|string| other, |bool| aware, |bool|)
-		return .name.syntaxequals(other, aware)
-	
-	function IsFunc (|bool|)
-		return .atype == kTypeFunc
-
-	syntax access (|int| i, |µParam|)
-		return .sizes.params[i]
+//	syntax equals (|string| other, |bool| aware, |bool|)
+//		return .name.syntaxequals(other, aware)
+//	
+//	function IsFunc (|bool|)
+//		return .atype == kTypeFunc
+//
+//	syntax access (|int| i, |µParam|)
+//		return .sizes.params[i]
 
 	function IsSetConst (|bool|)
 		return .atype == kTypeConst

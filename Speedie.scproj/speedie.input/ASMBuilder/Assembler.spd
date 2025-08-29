@@ -12,16 +12,16 @@ struct ASMState
 
 struct Assembler
 	linkage: cpp_part Pac
-	|DataTypeCode|				ReturnASM
+//	|DataTypeCode|				ReturnASM
 	|uint16| 					BasicBlock
 
 	|ASMState|					State
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
-	|byte|						StackSize
+//	|byte|						StackSize
 	|uint|						VDecls
 	|uint|						VTemps
-	|bool|						IsTextual
+//	|bool|						IsTextual
 	|int|						CurrFuncGrab
 	|bool|						Inited
 	|bool|						NeedsRework
@@ -32,7 +32,7 @@ struct Assembler
 	|uint|						KnownValuesMap
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
-	|&FatASM|					LastDebug
+//	|&FatASM|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					_Curr    
 	|&FatASM|					End    
@@ -468,14 +468,14 @@ struct Assembler
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
 		.state.Return = nil
-		.StackSize = 0
+//		.StackSize = 0
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
 		.state.TailInlineable = true
 		.InlineDepthLimit = 3
 		.BasicBlock = 0
 		.VDecls = 1
-		.IsTextual = false
+//		.IsTextual = false
 		.VTemps = 0
 		.NeedsRework = false
 		.zero = nil
@@ -486,10 +486,10 @@ struct Assembler
 
 		.Guard
 		fn.StartASM
-		.LastDebug = .curr
+//		.LastDebug = .curr
 		.InlineEnd = nil
 		.FuncStart = .curr
-		.ReturnASM = fn.ASMReturn.regtype
+//		.ReturnASM = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
 
 

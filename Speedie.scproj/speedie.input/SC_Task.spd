@@ -125,7 +125,6 @@ function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| 
 function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
 	opt norefcounts
 	|| prm = con.second!
-	|| arg = prm.next!
 	|| name = .VarName
 		if first
 			before.prev = NewEqRel(@sdot + name, @thg + name)
@@ -203,28 +202,4 @@ function Message.BuildTask (|message| fields, |int| level)
 `.macro
 
 }
-
-
-
-function compiler.TestTask
-	|| xxx = task.LessThan3("a", 5, "c")
-	|| z = (xxx)(8)
-
-
-
-
-task Task2 (LessThan3, |vec2| V, |float| Strength)
-	// what if the task had a "run" already?
-	// we may need two sets of params...
-	.Stuff
-
-  with
-	constructor
-		is Animation
-	function Stuff
-
-
-task LessThan3 (|string| a, |int| b, |string| c)
-	run (|int| i, |bool|)
-		return i < .b
 

@@ -31,12 +31,12 @@ extend scclass
 	
 
 	syntax equals (|string| name, |bool| aware, |bool|)
-		cpp_part EqualsName
+		cpp_part EqualsName, (aware)
 		if self
 			return .name ~= name
 
 
 	syntax equals (|SCNodeType| d, |bool| aware, |bool|)
-		cpp_part EqualsType
+		cpp_part EqualsType, (aware)
 		if self and d > SCNodeType.nil
 			return .BaseType == d

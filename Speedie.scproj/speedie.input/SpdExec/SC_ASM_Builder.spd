@@ -26,7 +26,7 @@ datatype µParam (uint16)
 		NonReg = [Jump, Number]
 		Signed
 		NoExpect
-		PositionBits
+//		PositionBits
 		Output
 	
 	function BitSize (|int|)

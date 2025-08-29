@@ -12,16 +12,16 @@ class SCIterator (SCObject)
 	|SCNodeRenamer?|	selfs
 	|SCNodeRenamer?|	ValueRenamer
 	|message?|			Index
-	|message?|			LoopCond
+//	|message?|			LoopCond
 	|message?|			LoopEndCond
 	|message?|			Value
 	|message?|			WhileLoop
 	|message?|			Yield
-	|scclass?|			Parent
+//	|scclass?|			Parent
 	|bool| 				OK
 	
-	constructor (|scclass?| parent, |Message!| msg)
-		.parent = parent
+	constructor (|Message!| msg)
+//		.parent = parent
 		
 		|| thg = msg.first
 		|| x = (thg.name ?? "DefaultIterator")
@@ -40,7 +40,7 @@ class SCIterator (SCObject)
 		|| Cond = .WhileLoop.first
 		if (Cond == WhileArg)
 			Cond = @thg + "true"
-		.LoopCond = Cond
+//		.LoopCond = Cond
 		
 		|message| w
 		if whilearg
@@ -129,13 +129,13 @@ class SCIterator (SCObject)
 		
 		function SimpleIter (|string| src, |sciterator|)
 			|| s = src.parse.first!
-			|| it = SCIterator.new(nil, s)
+			|| it = SCIterator.new(s)
 			if it.OK
 				rz = it
 
 		function NeuIter (CollectFunc)
 			if name_space.mustbe(SCClass, node)
-				|| it = SCIterator.new(name_space, node)
+				|| it = SCIterator.new(node)
 				if it.OK
 					name_space.tryadd(node, it, it.name)
 					Return Compiler.program // OK

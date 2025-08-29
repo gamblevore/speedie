@@ -1,7 +1,7 @@
 
 
 module Options
-	flags: native,pack
+	flags: native, pack
 	
 	||		BannedClasses			= nil|dictionary|
 	||		exe_path				= "" // if not exist, use output_path
@@ -26,7 +26,6 @@ module Options
 	||		GenFlowControlCode		= false
 	||		KeepAllErrors			= false
 	||		Scripting				= false
-	||		CheckMaxVars			= false
 	||		ForceRecompile			= false
 	||		Silent					= false
 	||		IsDirectTest			= false
@@ -35,7 +34,7 @@ module Options
 	||		IgnoreCantSaveErrors	= false
 	||		ArgStats				= false
 	||		PrintCompileString		= false
-	||		PrintFiles				= false
+//	||		PrintFiles				= false
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
@@ -45,7 +44,7 @@ module Options
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|byte|	UseScriptLoc			= 0
-	|byte|  NilStrength				= errorseverity.error
+//	|byte|  NilStrength				= errorseverity.error
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -171,7 +170,7 @@ module Feedback
 		compiler.OriginalInputPath = path // altered below at: F.path = F.path.parent
 		Compiler.BaseProjectPath = F
 		compiler.projectname = f.trimextandpath
-		compiler.reportedname = compiler.projectname
+//		compiler.reportedname = compiler.projectname
 		
 		|| exists	= f.exists
 		|| IsSpd	= f.name.IsSpeedieSrc or IsScript
@@ -377,9 +376,9 @@ module Feedback
 			Explain(Purpose, "Show warnings.")$
 			Options.Warnings = value.optionbool
 
-		+'maxvars'
-			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
-			Options.checkmaxvars = value.optionbool
+//		+'maxvars'
+//			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
+//			Options.checkmaxvars = value.optionbool
 		
 		+'nocolor'
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$

@@ -321,8 +321,8 @@ function TypeOfChar (ExprResolver)
 
 
 
-|| CSHex			= "AFaf09__".charset
-|| CSNum			= "09..".charset
+//|| CSHex			= "AFaf09__".charset
+//|| CSNum			= "09..".charset
 
 
 function message.UnitMatch (|string| a, |string| b, |bool|)
@@ -989,8 +989,7 @@ function TypeOfSwizSub (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 		if (oof == @thg)
 			oof.remove
 		  else
-			|| what = oof.intovariable(name_space)
-			oof = what.arg #require
+			oof = oof.intovariable(name_space) #require
 			oof.parent!.obj = T
 			name_space = oof.asarg
 			exp.become(@bra)

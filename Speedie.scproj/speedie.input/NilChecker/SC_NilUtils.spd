@@ -2,7 +2,7 @@
 struct LoopInfo 
 	|NilRecord| 		ContRecord
 	|NilRecord| 		ExitRecord
-	|byte| 				VarCount
+//	|byte| 				VarCount
 	|byte| 				BranchDepth
 	|bool| 				HasEscape
 	
@@ -13,7 +13,7 @@ struct LoopInfo
 		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
 		.HasEscape = HasExitCond
 		.ContRecord = V								// in case loop fails the first condition
-		.VarCount = V.DepthOfVars
+//		.VarCount = V.DepthOfVars
 		.BranchDepth = ArchonPurger.t.BranchDepth
 	
 	

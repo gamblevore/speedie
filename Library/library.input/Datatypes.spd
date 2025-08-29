@@ -804,7 +804,7 @@ datatype uint64
 		B = 64-B
 		return (self << B) >> B
 
-	function XorByte (|byte|)
+	function XorDownTo8Bits (|byte|)
 		|uint| x = (self >> 32) xor self
 		x = (x >> 16) xor x
 		x = (x >> 8) xor x

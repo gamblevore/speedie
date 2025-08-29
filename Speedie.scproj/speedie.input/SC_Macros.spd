@@ -4,7 +4,7 @@
 */
 
 module Macros {
-|| FS = "|| fs = faststring()".macro
+//|| FS = "|| fs = faststring()".macro
 
 || InitExpand = "({
 	|| _X = _0

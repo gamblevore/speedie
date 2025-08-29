@@ -3,7 +3,7 @@
 module VM_Builder {
 |[message]| 	NameList
 |message|   	ModuleArg
-|file|			vm_file
+//|file|			vm_file
 |faststring|	form_h = faststring()
 |message|		dt_prm
 |string|		parent
@@ -144,7 +144,7 @@ function CppLibFile (|string| ch, |file|)
 
 function VMBox (|message|)
 	|| v = Compiler.InputFile( "vm.box", nil )
-		.vm_file = v
+//		.vm_file = v
 		rz = v.parse
 		if rz
 			rz.TranAllTargets

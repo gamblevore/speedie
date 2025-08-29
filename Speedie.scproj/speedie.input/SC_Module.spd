@@ -16,8 +16,6 @@ linkage
 |string|					CppPart
 |CppRefs|					DefaultRefs
 |message?|					InitAfter
-|string|					SubsFrom
-|bool|						Grabbed
 |bool|						IsImport
 |bool|						Inited
 |bool|						IsRequiredInterface
@@ -133,7 +131,6 @@ function LoadModule (|Message| node)
 		|| sub = namemsg.next
 		arg = sub
 		if (sub == @bra) // module sdlapp (app)
-			.SubsFrom = sub[@thg]$.name
 			arg = sub.next
 
 	arg.expect(@arg)

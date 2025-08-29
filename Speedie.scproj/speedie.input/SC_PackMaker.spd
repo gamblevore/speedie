@@ -7,7 +7,7 @@ module PackMaker
 	|[SCDecl]|				LibGlobs
 	|[SCFunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
-	|int| 					ExportPos
+	|int|					ExportPos
 	
 	|int|					_PackGlobSize
 	|int|					_LibGlobSize

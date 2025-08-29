@@ -95,7 +95,7 @@ extend Assembler
 
 	function TextFuncSub (|message| m)
 		opt NoRefCounts
-		.IsTextual = true
+//		.IsTextual = true
 		.vdecls = -1 // work around
 		for ch in .LoadTitle(m)
 			if ch == @name

@@ -32,8 +32,6 @@ datatype ASMReg (uint64)
 		CompilerCreated
 		GlobalMemory
 		PreferEqul
-		Reference
-		Templike
 		OK
 		GetReal		= Param ||| Discard
 		SetAlways   = Textual ||| Set  // reuse const
@@ -52,17 +50,18 @@ datatype ASMReg (uint64)
 	
 
 	function TestBit
-		|| x = AddrForceRequest
+		|| x = AddrForceRequest, (x)
 
-		
-	render
-		if self is constoutput
-			fs <~ "k"
-		fs <~ ('r' + ((self is temp)<<1))|byte| // r,t
-		fs <~ .reg
-		fs <~ "("
-		.µtype.render(Fs)
-		fs <~ ")"
+	
+	target debug
+		render
+			if self is constoutput
+				fs <~ "k"
+			fs <~ ('r' + ((self is temp)<<1))|byte| // r,t
+			fs <~ .reg
+			fs <~ "("
+			.µtype.render(Fs)
+			fs <~ ")"
 	
 	
 	function F32 (|float|)

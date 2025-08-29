@@ -27,8 +27,8 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		._curr = p + 1
 		P._op = op
 		p.debug = exp
-		p.BranchDepth = .State.BranchDepth
-		p.LoopDepth = .State.LoopDepth
+//		p.BranchDepth = .State.BranchDepth
+//		p.LoopDepth = .State.LoopDepth
 		p.BasicBlock = .BasicBlock
 		return p
 
@@ -138,24 +138,24 @@ function SCFunction.ASMReturn (|scdecl|)
 		return T
 
 
-function SCFunction.RealReturnType (|scdecl|)
-	opt norefcounts
-	|| T = .returntype
-	// if t is returnedstruct: return typevoid // better?
-	if t and t isnt ReturnedStruct
-		return T
-	return TypeVoid
+//function SCFunction.RealReturnType (|scdecl|)
+//	opt norefcounts
+//	|| T = .returntype
+//	// if t is returnedstruct: return typevoid // better?
+//	if t and t isnt ReturnedStruct
+//		return T
+//	return TypeVoid
 
 
 datatype VarUseMode (int)
 	Flags
-		Linkable
+//		Linkable
 		ReturnAble
 		SetAble
 		Return = ReturnAble
 		Set = SetAble
-		ExistingVar
-		ForBools
+//		ExistingVar
+//		ForBools
 	
 	syntax is (|VarUseMode| v, |bool|)
 		return self&v

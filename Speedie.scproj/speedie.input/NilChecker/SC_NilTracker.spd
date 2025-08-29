@@ -21,7 +21,7 @@ struct ArchonPurger
 	|scdecl?|				Return
 	|int| 					InsideBoolLogic
 	|bool|					FnAbleToNilCheck
-	|bool| 					RootReturned	// for recursive funcs
+//	|bool| 					RootReturned	// for recursive funcs
 	|bool|					AnyReturns
 	|NilRecord[64]| 		Rows
 	
@@ -131,7 +131,7 @@ struct ArchonPurger
 		loops = nil
 //		ArgDepth = 1
 		.AnyReturns = false
-		.RootReturned = false
+//		.RootReturned = false
 		.CheckNilCheck(F)
 		
 		for d in f.args
@@ -207,8 +207,8 @@ struct ArchonPurger
 
 		function DeclKill
 			opt inline
-			if !t.BranchDepth
-				t.RootReturned = true
+//			if !t.BranchDepth
+//				t.RootReturned = true
 			t.value = nilstate.Basic
 		
 

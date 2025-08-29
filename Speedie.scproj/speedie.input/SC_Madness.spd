@@ -216,19 +216,3 @@ function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
 */
 
 
-
-struct GUIKeyRecord
-	|date| Date
-	|int| Key
-	|byte| State
-	
-	constants
-		Empty		= 0
-		ToRemove	= 1
-		ToAdd		= 2
-		NewlyAdded	= 3
-		Stable		= 4
-	
-	
-	
-	

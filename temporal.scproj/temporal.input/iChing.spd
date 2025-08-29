@@ -80,8 +80,8 @@ module iChing
 		machine ?= SteveMachine.create(9,64K)
 		if !machine
 			return .ClosedBook
-		machine.Hash
-		|| Coins = machine.Walk(6, 9*9)
+		machine._Hash
+		|| Coins = machine.DivineBitPool(6)
 		|| hex = .Tome[coins]
 		if !hex
 			return .ClosedBook
