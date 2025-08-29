@@ -1110,26 +1110,39 @@ Message is also:
 			return i
 		error (self, "Value out of range")
 	
+	helper string.SuffixSize (|int64|)
+		|| n = .Length
+		if (n == 1) or (n == 2 and self[1] == 'B')
+			return self[].SuffixSize
+
+	helper byte.SuffixSize (|int64|)	
+		if self == 'K'
+			return 1<<10
+		if self == 'M'
+			return 1<<20
+		if self == 'G'
+			return 1<<30
+		if self == 'T'
+			return 1<<40
+		if self == 'P'
+			return 1<<50
+		
 	
 	function Int (|int| StrStart = 0, |int64|)
+		// would be nice if this parseint can handle K, M, G, T also.
+		// perhaps by passing a second string?
 		opt norefcounts
 		if self
 			|| f = .First
-			if !f or self != @unit
+			if !f or .func != @unit
 				return .name.ParseInt(StrStart, self)
+			
 			if self == "x"
 				return F.name.ParseHex(StrStart, F)
-			|| mul = f.name.ParseFloat
-			if self == "K"
-				mul *= 1K|Float64|
-			  elseif self == "M"
-				mul *= 1M|Float64|
-			  elseif self == "G"
-				mul *= 1G|Float64|
-			  else
-				error (self, "Invalid unit")
-				mul = 0.0
-			return mul|int64|
+			
+			|| Value = f.name.ParseFloat // 1.5MB
+			|| Mul = f.Name.SuffixSize						#expect (self, "Invalid unit")
+			return (Value * Mul|float64|)|int64|
 			
 
 	function Float (|Float64|)
