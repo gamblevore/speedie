@@ -22,6 +22,7 @@ You'll see that it looks simple. But underneath that simplicity, is a huge amoun
 * Build and Run programs (can build multiple projects at once)
 * Awesome quick file-finding feature.
 * Inbuilt todo list
+* Finds unused code for you.
 * Text editor is pretty good. I like it about as much as BBEdit.
 * Log area to see your programs text output
 * Multi-root interface, in case your project relies on libs you created, and you want to edit those libs too.
@@ -40,6 +41,8 @@ Each of these features was designed expertly and to a high degree of care. For e
 * The inbuilt todo list, is available by clicking on your current project's tab. Clicking again returns you. I find this invaluable for my project management. This means your todo-list is always at-hand. Really vital.
 
 * The quick file-finding feature, is accessed via Cmd-D (control-D on Linux). This brings up a list of files that contain the name. You can also paste file-paths in there, to see all the files in that folder.
+
+* The unused code finder, will report unused: Functions, Classes, Local variables, Function parameters, properties on objects, global variables... and constants too! You can really get nice clean code like this. Great for large long-lived projects.
 
 
 ![](bananas.mov)
