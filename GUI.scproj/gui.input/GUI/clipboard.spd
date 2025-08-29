@@ -1,6 +1,7 @@
 
 
-module clipboard
+module Clipboard
+	cpp_part Clip
 	|string| _InternalCopy
 
 	cpp_Wrapper SDL_GetClipboardText (|cstring|) 
@@ -23,10 +24,8 @@ module clipboard
 		|| c = (s.TabsToSpaces, s)(keys.shift)
 		|| z = c.cstr
 		|| err = .SDL_SetClipboardText(z.addr|cstring|)
-		if err!=0 or s.FindBadUTF8		// osx might fail anyhow
-			.clear
+		if (err!=0) // or s.FindBadUTF8		// osx might fail anyhow
 			_internalcopy = s
-		if err!=0
 			Notifications.NotifySDLError		
 	
 	
