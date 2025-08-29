@@ -42,7 +42,7 @@ datatype ASMReg (uint64)
 		RealConst   = [ConstInput, ConstOutput]
 		AddrNeed    = [AddrRequest, AddrForceRequest]
 		// don't go above 47
-		RemoveableOutput = ConstOutput|||Temp
+		RemoveableOutput = ConstOutput ||| Temp
 		Zero	    = RealConst   ||| 56 ||| param		// 56 == datatypecode.uint64
 		ZeroParam   = ConstOutput ||| param
 		RealDiscard = RealConst   ||| discard

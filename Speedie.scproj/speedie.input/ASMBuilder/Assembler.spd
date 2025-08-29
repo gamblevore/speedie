@@ -156,7 +156,8 @@ struct Assembler
 
 
 	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
-		t.µtype = type.mu.DataType
+		if type
+			t.µtype = type.mu.DataType
 		return .TempOnly(t)
 	
 	
@@ -299,18 +300,19 @@ struct Assembler
 	
 	function µGetReal (|message| exp,  |scdecl| A, |asmreg| ModeOnly=nil,  |asmreg|)
 		|| o = .OpenVars
-		|| v = .DeclareMe(exp, a)
+		|| v = .TempTyped(a, asmreg())
 		(v as= ModeOnly asnt asmreg.GetReal)
-		|| f = .µGetASM(exp, v)
-		|| roar = f.reg
-		if roar == v.reg
-			return f
+		rz = .µGetASM(exp, v)
 		
-		if !roar and (modeonly is set)
-			return .assign(v, f, exp)	
-		.CloseVars(o) // close the var if v2 is unused.
-		return f
+		if !rz.reg and (modeonly is set) // R0. We might need to actually put it in a reg!
+			return .assign(v, rz, exp)
 
+		if rz is temp // we can't close temp vars! The entire point was to keep it open!
+			return rz
+		if rz iz v
+/			return rz // shouldn't come here.
+		
+		.CloseVars(o) // close the var if v is unused.
 	
 	
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -355,7 +357,7 @@ struct Assembler
 		(rz is AddrNeed) = (a is Reference)
 		rz = .µGetReal(exp, nil, rz)
 		if (a is reference  and  rz isnt containsaddr)
-			error (exp, "Failed to get address of expression. (Compiler *should* have caught this in transform phase)")
+			error (exp|object|)
 		
 		|| f = rz.fat
 			f.µRefCount++
