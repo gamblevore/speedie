@@ -166,8 +166,8 @@ class SCDecl (SCObject) {
 		.mu.info = .mu.info.set(SCDeclInfo.TypeImprove, Value)
 	
 	
-	syntax Compare (|string| s, |bool| aware, |int|)
-		return .name.syntaxcompare(s, aware)
+//	syntax Compare (|string| s, |bool| aware, |int|)
+//		return .name.syntaxcompare(s, aware)
 
 	syntax equals (|string| s, |bool| aware, |bool|)
 		return .name.syntaxequals(s, aware)
