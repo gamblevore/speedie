@@ -62,7 +62,7 @@ extend PerryIDE
 		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
 		.PopupDisplay		= textview(self)
 		.DebugArgsText		= textview(self)
-		.AttachedProgram	= ""
+//		.AttachedProgram	= ""
 		
 		.InitIDE
 		perry.AddRecent(project)

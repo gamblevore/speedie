@@ -74,12 +74,12 @@ class PerryIDE (Window)
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
-	|Process?| 					Talker
+	|Process?|					Talker
 	|message|					RecentFiles
 	|string| 					LastCmdStr
 	|date|						LastSendTime
 	|date|						SectionKeyTime
-	|string|					AttachedProgram
+//	|string|					AttachedProgram
 	|ProgressBar|				Progress
 	|Faststring?|				Stats
 	|ivec2|						PopupDisplayCorner
@@ -720,7 +720,6 @@ class PerryIDE (Window)
 
 
 	module
-		|bool|						DummyTest
 		|byte|						StatsMode
 		
 		function New (|file| path, |perryide!|)

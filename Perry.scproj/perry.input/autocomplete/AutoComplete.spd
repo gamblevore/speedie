@@ -299,7 +299,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
 		  elseif msg starts "display"
 			.DisplayFB(msg)
-		  elseif msg starts "unused_funcs"
+		  elseif msg starts "unused"
 			.UnusedFuncsFB(msg)
 		  elseif msg starts "log"
 			0 //
@@ -314,17 +314,13 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	.DuringMsgFB = false
 
 
-function EditMeKeyDown (guitextevent)
-	opt norefcounts 
-	.ide.EditMeTabRetryThing = 0
-	.ide.ShowStats
-
 
 function EditMeModified (guitextevent)
 	|| i = .ide
 	i.LastSendTime = 0
 	require i.SharedProjectTabSource
-	EditMeKeyDown(self, 0, false)
+	i.EditMeTabRetryThing = 0
+	i.ShowStats
 	
 	if (reason != documentstate.saving) and !i.DuringTempView
 		|| x = .sel1

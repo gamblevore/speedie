@@ -5,7 +5,7 @@ extend PerryIDE
 		if strong or .ModifiedForCompile
 			.ForceRecheck
 		|| p = .path					#debug_require
-		|| unused = @tmp + "unused_funcs"
+		|| unused = @tmp + "unused"
 		unused <~ p
 		|| lf = .LostFunks
 			unused <~ lf.copy
@@ -170,6 +170,7 @@ extend PerryIDE
 		target osx
 			if !.IsFront or GUI.IsBackground
 				.Talker = Process.stream("/usr/bin/say", [.name.trimext + str])
+				(.talker)
 	
 	
 	function CompiledOK

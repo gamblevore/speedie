@@ -385,10 +385,3 @@ function SelectedASM (guilistevent)
 	i.DuringASMEvent = false
 
 
-class asm_test_obj
-	|int| i
-	constructor	
-		.i = 0
-
-
-

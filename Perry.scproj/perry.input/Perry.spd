@@ -1,22 +1,15 @@
 
 
 || Speedie		= "/usr/local/bin/speedie".file
-|| CppCompiler	= "/usr/bin/g++"
 
 
 module Perry
     |ListViewRow|					Projects = Message()
 	|Dictionary of String|			PathDict
 	|listviewrow|					RecentProjects=message()
-    |bool|							Checked	
     |bool|							FinishedStartUp
     |byte|							WindowNumber
-    |byte| 							FindID
-	
-	constants
-		arc_newer	= 2
-		arc_older	= 1
-	
+    |byte| 							FindID	
 	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0
