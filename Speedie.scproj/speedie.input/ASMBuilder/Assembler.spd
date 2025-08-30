@@ -568,6 +568,6 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 			fn.µprint(++CountASMFuncPrint)
 		return true
 
-
-|| CountASMFuncPrint = 0
+target debug
+	|| CountASMFuncPrint = 0
 

@@ -122,7 +122,7 @@ function NoGoodObject ( |string| Cpp,  |File| h,  |File| o,  |int| )
  
 function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	flowcontrol.input(cpp, "objtest")
-	|| aslib = options.makelib or options.projectislibrary
+	|| aslib = options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
 	require ! (!(SC_Targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
 
@@ -239,7 +239,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.appendwords( "-fdata-sections -ffunction-sections")
 	
 	|| opt = options.optimise
-	|| aslib = options.makelib or options.projectislibrary
+	|| aslib = options.projectislibrary
 		rz.appendwords( "-dynamiclib -fPIC")
 		opt = 3
 	if options.selfreplacement or aslib
@@ -363,14 +363,14 @@ function RunCppCompile
 	.TransCompile(		.FoundObjects,			"-o " + P,	"o",  p.file )
 		
 
-function MakeLib
-	|| n = compiler.productpath.sibling("libspeedie.dylib")
-	if !options.silent
-		"Lib at: $n"
-	
-	.CompilingLibFiles++
-	.TransCompile(		.FoundObjects,			"-o " + n,	"o" )
-	.CompilingLibFiles--
+//function MakeLib
+//	|| n = compiler.productpath.sibling("libspeedie.dylib")
+//	if !options.silent
+//		"Lib at: $n"
+//	
+//	.CompilingLibFiles++
+//	.TransCompile(		.FoundObjects,			"-o " + n,	"o" )
+//	.CompilingLibFiles--
 	
 
 
@@ -526,8 +526,8 @@ function InstallCompiler
 	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
 	FlowControl.DisabledIncr(-1)
 	
-	if options.Makelib
-		.MakeLib
+//	if options.Makelib
+//		.MakeLib
 }
 
 

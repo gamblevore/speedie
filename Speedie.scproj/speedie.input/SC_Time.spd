@@ -67,9 +67,6 @@ function compiler.PrintCompileErrors
 	  else
 		require StdErr.HasProblems
 	stderr.PrePrintErrors
-
-	if (SCFunction.DisabledPoints)
-		"Disabled functions called ${scfunction.DisabledPoints}x!".printlinecolor(errorcolors.error)
 	
 	|| MinSev = (ErrorSeverity.warning, ErrorSeverity.problem)(Options.Warnings) 
 	.PrintErrors(MinSev)

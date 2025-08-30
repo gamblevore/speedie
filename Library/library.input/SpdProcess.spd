@@ -149,7 +149,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.pico!.close(Why)
 
 
-	helper StartProcess (|string| path, |[string]| Args=nil, |pico| C = nil, |bool| CaptureStdOut,  |ExitCode|)
+	helper StartProcess (|string| path, |[string]?| Args=nil, |pico| C = nil, |bool| CaptureStdOut,  |ExitCode|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
@@ -253,7 +253,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 					ch.UnRegister
 		
 
-		helper CreateArgs (|string| path, |[string]| Args, |&cstring|)
+		helper CreateArgs (|string| path, |[string]!| Args, |&cstring|)
 			cpp_wrapper
 
 
@@ -285,7 +285,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	
 	prototype ThreadAsProcess (|&pico| Comms, |int64| Data, |&cstring| args, |bool|)
-		function Spawn (|[string]| R = [], |string| ThreadName,  |SpdProcess|)
+		function Spawn (|[string]!| R = [], |string| ThreadName,  |SpdProcess|)
 			description `This is meant to run a "main-function" from a lib, as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
 			|| c_args = SpdProcess.CreateArgs("", r)
 			|| pico_fn = pico.new(threadname)

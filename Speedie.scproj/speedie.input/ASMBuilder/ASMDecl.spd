@@ -5,7 +5,7 @@
 
 	
 struct SavedRegisters 
-	|byte|					Count
+	|byte|					RegCount
 	|uint16|				BasicBlock
 	|uint|					KnownValues
 	|DeclAlterable[32]|		Decls
@@ -22,9 +22,9 @@ struct SavedRegisters
 			|| f = sh.Registers[i]
 			.asm[i] = (f - s, nil)(f)
 		
-		expect args <= 32 - .count
+		expect args <= 32 - .RegCount
 		for p in args
-			.decls[.Count++] = p.mu
+			.decls[.RegCount++] = p.mu
 
 
 	function Rewind	(|assembler| sh)
@@ -39,9 +39,9 @@ struct SavedRegisters
 	function Restore (|[scdecl]| args)
 		opt norefcounts
 
-		expect args >= .count
+		expect args >= .RegCount
 		for p.backwards in args
-			p.mu = .decls[--.Count]
+			p.mu = .decls[--.RegCount]
 
 
 

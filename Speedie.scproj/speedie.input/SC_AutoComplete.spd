@@ -10,7 +10,6 @@ cpp_part AC
 |errorreceiver|		Errors
 |bool|				CompiledOK
 |bool|				Cleaned
-//|bool|				WillExit 
 ||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
  `)>.macro
  
@@ -208,10 +207,10 @@ function UnusedStuff (|message| cmd, |message|)
 
 function SCDecl.LocalIsUsed (|bool|)
 	if self is CompilerCreated
-		return true // whatever
+		return true						// whatever
 	if self is ReadFrom
 		return true
-	if self is Reference and Setto
+	if self is Reference and SetTo
 		return true
 
 
@@ -241,7 +240,7 @@ function SCClass.CheckUnusedClass (|message| feedback)
 function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
 	opt norefcounts
 	require self isnt Library
-	if (self is ReadFrom) and (self is SetTo or const)
+	if (self is ReadFrom) and ((self is SetTo or const) or .IsCarray or .isbarestruct)
 		return
 	require self isnt ClassObj
 	|| fn = .IsLookupOnly
@@ -316,11 +315,12 @@ function scobject.UnusedStr (|string| name, |string|)
 
 function scobject.UnusedReason (|string|)
 	if self isa SCDecl
+		if (self is Const) and (.IsLookupOnly isa SCFunction)
+			return "" // this is better just NOT being a problem.
 		if self is SetTo
 			return "set to, but never read from."
-		if (self is Const) and (.IsLookupOnly isa SCFunction)
-			return ""
-			// this is better just NOT being a problem. or even a warning. Just "info". sigh.
+		if self is ReadFrom
+			return "read from, but never set to."
 	return "unused."
 
 
@@ -1422,7 +1422,7 @@ class AutoItem
 	|string|		Display
 	|bool|			Exact
 	|int|			Type
-	
+		
 	function Depth (|int|)
 		opt norefcounts
 		|| v = .Value
@@ -1467,10 +1467,6 @@ function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 				rz = ch
 
 
-//function Test
-//	visible
-//	|| x = abcd()
-//	x.AAAAARGH++
-//	x.ada = !x.ada
-//	|| y = x.AAAAARGH
+
+
 

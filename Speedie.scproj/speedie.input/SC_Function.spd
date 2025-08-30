@@ -946,6 +946,8 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 		if d isnt PropertyWasConstructed
 			|| Made = .NewDefaultRel( oof, d )
 			root.InsertAfter( made, AfterHere )
+		  else
+			(d is setto) // nice
 	
 	while cls
 		for (d in cls.Properties)
@@ -1208,10 +1210,10 @@ function ASMRegType (|datatypecode|)
 
 
 
-function SCDecl.MarkAsAltered 
+function SCDecl.MarkAsAltered  // markaltered
 	opt norefcounts
+	(self is setto)
 	require self is local
-
 	(self is altered)
 	if SCFunction.InBranch > .DepthOfBranch
 		is AlteredInBranch
@@ -1221,6 +1223,7 @@ function SCDecl.MarkAsAltered
 	require self is TypeImprove
 	|| orig = .IsLookupOnly
 	if orig isa SCDecl
+		(orig is setto)
 		orig.mu.info |= .mu.info & scdeclinfo.AlteredCopy
 
 
@@ -1258,7 +1261,7 @@ iterator asm
 
 
 module {
-||				DisabledPoints = 0
+//||				DisabledPoints = 0
 ||				InBranch = 0
 ||				OnceCount = 0
 |SCFunction|	_CurrFunc
@@ -1369,7 +1372,8 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 										// or else we can't do array.size++
 
 //	Assembler.kcontinue = 1
-	|| Type = TypeOfExpr( exp, name_space )					#require
+	|| Type = TypeOfExpr( exp, name_space )						#require
+	(type is readfrom)
 	check (type isnt const) (msg, "Not assignable.")
 	if type.PointerCount > 0
 		check (!side) (msg, "Not assignable.")

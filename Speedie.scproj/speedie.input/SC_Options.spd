@@ -17,7 +17,7 @@ module Options
 	||		ModeCpp					= true
 	||		ModePack				= false
 	||		MakeInterpreter			= false
-	||		MakeLib					= false
+//	||		MakeLib					= false
 
 	||		Compile					= true
 	||		TargetDebug				= false

@@ -69,8 +69,8 @@ syntax is (|OpMode| x, |opmode|)
 render
 	fs <~ .name
 
-function CaseAwareStr (|String|)
-	return (self is caseaware)|bool|.string
+//function CaseAwareStr (|String|)
+//	return (self is caseaware)|bool|.string
 
 
 function SimpleName (|String|)

@@ -1030,8 +1030,7 @@ class SCDecl (SCObject) {
 		rz = .ExpectMatchSub( O, Cast, exp, ErrNode )
 		
 		if side
-			if (self is local)
-				.MarkAsAltered
+			.MarkAsAltered
 			if (self is self) and (scfunction.currfunc is Destructor) 
 				error (exp, "You can’t modify 'self' in a constructor or destructor.")
 

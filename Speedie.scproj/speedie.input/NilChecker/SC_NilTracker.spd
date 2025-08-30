@@ -236,7 +236,7 @@ struct ArchonPurger
 				rec.LowerErrorsTo = ErrorSeverity.Warning
 
 			using rec
-				for (xoxo in compiler.funclist) (i)
+				for xoxo in compiler.funclist
 					.ExterminateZergBugs(xoxo)
 					rec.ReturnErrors(old)
 

@@ -281,7 +281,7 @@ class SCImport
 		
 		
 		function ImportPath (|string| path, |file!| f, |int| ImportDepth, |bool| Builtin, |scimport?|)
-			|| name = f.name
+//			|| name = f.name
 			require f.MustExist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase
