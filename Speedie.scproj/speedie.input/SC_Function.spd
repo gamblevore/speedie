@@ -63,7 +63,6 @@ linkage
 |SCClass?|				Cls
 |CppRefs?|				Refs
 |error?|				SavedError
-//|object?|				CounterPart
 |SCFunction?|			NextFunc
 |SCDecl?|				HasProto
 |SCClass?|				ProtoType
@@ -83,12 +82,10 @@ linkage
 |Byte|					MaxASM
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
-//|byte|					CantBeInlined
 |ErrorSeverity|			BlindCasts
 |byte|					IsNilChecker
 |byte| 					Badness
 |byte|					StructReturnPos
-//|byte| 					OptCounts
 |uint|					µStart
 |uint|					µLength
 
@@ -96,7 +93,6 @@ linkage
 
 constructor (|Message?| msg = nil)
 	Super.Constructor( msg )
-	.linkto = nil
 	if (msg)
 		Compiler.stFuncs++
 
@@ -1237,10 +1233,17 @@ function Self (|scdecl|)
 function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	opt norefcounts
 	// .bla = X
-	if !d.IsCArray				// carrays get cleared
-		|| def = d.Default
+	require !d.IsCArray				// carrays get cleared
+	|| def = d.Default
+
+	if d.NilDeclared is Nilish
+		def = «thg "nil"»
+		def.obj = TypeNil
+	  else
 		def ?= d.CreateDefault(place)
-		return NewEqRel( d.DeclToDot(.self), def )
+	return NewEqRel( d.DeclToDot(.self), def )
+
+
 
 
 iterator
@@ -2018,4 +2021,6 @@ function NeuLibrary (CollectFunc)
 
 // Did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
 // It should be removed if we find it again!
+
+
 
