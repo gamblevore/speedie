@@ -393,7 +393,6 @@ class GUIControl (list)
 
 	function Height (|int|)
 		return .lastrect.Height
-	// dreams... of dance, fun, youth! healinggggg...
 	setter Height (|controlline|)
 		.sizer.g(1, self) = value[0]|controlpoint|
 		.sizer.g(3, self) = value[1]|controlpoint|
@@ -406,6 +405,7 @@ class GUIControl (list)
 	
 	helper GetCopy (|object?| item=nil, |string|)
 		return (.CopyEvent$)(self, item)
+	
 	
 	syntax equals (|string| s, |bool| aware=false, |bool|)
 		if self
