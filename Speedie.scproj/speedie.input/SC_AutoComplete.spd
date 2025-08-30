@@ -10,7 +10,7 @@ cpp_part AC
 |errorreceiver|		Errors
 |bool|				CompiledOK
 |bool|				Cleaned
-|bool|				WillExit 
+//|bool|				WillExit 
 ||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
  `)>.macro
  
@@ -151,7 +151,7 @@ function CmdWrap (|Message| arg, |bool|)
 	app.parent! <~ arg
 	stderr.clear						// super-important!!!
 	
-	return !.WillExit
+	return true
 
 
 function MiniErrors (|errorreceiver| L, |message|)
@@ -241,7 +241,8 @@ function SCClass.CheckUnusedClass (|message| feedback)
 function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
 	opt norefcounts
 	require self isnt Library
-	require self isnt ReadFrom
+	if (self is ReadFrom) and (self is SetTo or const)
+		return
 	require self isnt ClassObj
 	|| fn = .IsLookupOnly
 	if (fn isa SCFunction)
@@ -250,40 +251,47 @@ function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
 	.MarkUnused(feedback, dbg)
 
 
-function SCObject.MarkUnused (|message| feedback, |byte| debug)
+function SCObject.MarkUnused (|message| feedback, |byte| debug, |string| Name="")
 	opt norefcounts
 	(debug) // remove later
 	|| s = .Source
-		|| name = .UnusedStr
-			feedback.msg(@tmp, name) <~ s.position
+		if !name
+			name = .name
+		|| Str = .UnusedStr(name)
+			feedback.msg(@tmp, Str) <~ s.position
 
 
+function scfunction.CheckUnusedArgs (|message| feedback)
+	|| AllVars = faststring()
+	|scdecl--| Fail
+	for arg in .args
+		if !arg.LocalIsUsed
+			|| Src = arg.source
+			if src and src isnt Inserted
+				Fail = arg
+				if AllVars.Length
+					AllVars <~ ", "
+				AllVars <~ arg.name
+	if fail
+		fail.markunused(feedback, 'A', allvars)
+
+	
 function SCFunction.CheckUnused (|message| feedback)
-	opt norefcounts
+	opt norefcounts 
 	require self isnt Disabled
 	require self isnt InitFunc
 
-	if .isunused
+	if .IsUnused
 		|| src = .source
 			|| str = "() is unused."
 			if .linkfrom != nil
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
 	
-	require self isnt cpp
-	require !.HasProto
-	|message| ErrName
-	for arg in .args
-		if !arg.LocalIsUsed
-			|| Src = arg.source
-			if src and src isnt Inserted
-				if ErrName
-					ErrName.name = ", " + ErrName.name
-					ErrName.name = arg.name + ErrName.name
-				  else
-				    arg.markunused(feedback, 'A')
+	require (self isnt cpp) and !.HasProto
+	.CheckUnusedArgs(feedback)
 	
-	for s.flat in .Source
+	for s.flat in .Sourcearg
 		if s == @decl
 			|| d = s.obj as scdecl
 				if !d.LocalIsUsed
@@ -291,18 +299,30 @@ function SCFunction.CheckUnused (|message| feedback)
 
 	
 	
-function scobject.UnusedStr (|string|)
-	opt norefcounts
-	|| Reason = " is unused."
+function scobject.UnusedStr (|string| name, |string|)
+	|| reason = .UnusedReason$
+	|| fs = FastString()
+	|| plural = name contains ','
+	.AutoCompleteKind.Pluralize(plural, fs)
+	fs <~ " "
+	fs <~ name
+	if plural
+		fs <~ " are "
+	  else
+		fs <~ " is "
+	fs <~ reason
+	return fs
+
+
+function scobject.UnusedReason (|string|)
 	if self isa SCDecl
 		if self is SetTo
-			reason = " is set to, but never read from."
-		if (self is Const) and (.islookuponly isa SCFunction)
+			return "set to, but never read from."
+		if (self is Const) and (.IsLookupOnly isa SCFunction)
 			return ""
 			// this is better just NOT being a problem. or even a warning. Just "info". sigh.
-//			reason = "Unnecessary prototype (never gets used as a prototype!)"
-	return "$.AutoCompleteKind $.name$reason"
-	
+	return "unused."
+
 
 function Check (|message| cmd=nil, |message|)
 	if cmd
@@ -379,12 +399,12 @@ function message.CmdImprove (|message|)
 
 function SCFunction.InsertIn (|SCNode| parent, |string| name, |SCObject|)
 	.name = name
-	if parent isa scclass
+	if parent isa SCClass
 		.cls = parent
 		.parent = parent.modul
 	  else
 		.cls = nil
-		.parent = parent // ooofffff
+		.parent = parent			// ooofffff
 	return parent[name]
 		
 
@@ -399,7 +419,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	opt norefcounts
 	|| src = cmd.last
 	if src != @dot
-		return .getfunc2(myfile, ff, n)
+		return .GetFunc2(myfile, ff, n)
 	|| fn   = .anonfn init scfunction()
 	|| prm  = src.second
 	|| mpos = prm.first
@@ -428,7 +448,6 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 
 
 function SCFunction.Update_Source (|int| start, |string| text, |bool|)
-	scfunction.currfunc = self
 	parser.using.position = -1
 	parser.using.Flags = 0 // oop
 	parser.using.Tag = 0 // right?
@@ -499,6 +518,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	|| fn = .GetFunc(cmd, my_file, f, n)
 	(message).restore
 	require fn
+	SCFunction.CurrFunc = fn
 	
 	|| thg = fn.source!.findpos(f, n)
 	if !thg and cmd == "callfrom" // "calledfrom"
@@ -1401,7 +1421,7 @@ class AutoItem
 	|SCObject|		Value
 	|string|		Display
 	|bool|			Exact
-	|int|			type
+	|int|			Type
 	
 	function Depth (|int|)
 		opt norefcounts
@@ -1436,8 +1456,6 @@ function message.FindPos (|int| fr, |int| len, |message|)
 
 function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
 	opt norefcounts	
-	if 0	
-
 	|| Strength = 1
 	for ch.flat in self
 		if ch.position == fr

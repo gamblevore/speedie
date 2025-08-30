@@ -19,7 +19,6 @@
 |SCClass|	TypeStringZero
 |SCClass|	TypeSyntax
 |SCClass|	TypeBool
-//|SCClass|	TypeCharSet
 |SCClass|	TypeChar
 |SCClass|	TypeByte
 |scclass|	TypeCodePoint
@@ -27,7 +26,6 @@
 |SCClass|	TypeWrapper
 |SCClass|	TypeArray
 |SCClass|	TypeDictionary
-//|SCClass|	TypeFastString
 |SCClass|	TypeJBClass
 |scclass|	TypeTask
 |SCClass|	TypeVec4

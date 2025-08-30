@@ -14,12 +14,25 @@ insertion
 
 
 target Debug
+	function scfunction.syntaxequals (|string| name, |bool|)
+		opt norefcounts
+		require (self)	
+		if .Name.SyntaxEquals( name, true )		// never needs !aware.
+			return true
+		|| x = .ExportName
+		if x.syntaxequals( name, true )
+			return true
+		if x.endswith(name, true) and x[x.length - (name.length+1)] == '_'
+			return true
+
+
 	function string.trap (|message| msg=nil, |bool|)
-		if scfunction.currfunc ~= self
+		if scfunction.currfunc == self
 			if msg
 				printline msg
 			return true
   else
+	function scfunction.syntaxequals (|string| name, |bool|)
+		(name), visible
 	function string.trap (|message| msg=nil, |bool|)
-		(msg)
-		visible
+		(msg), visible

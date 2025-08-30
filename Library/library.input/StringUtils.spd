@@ -49,13 +49,11 @@ function byte.IsVowel (|bool|)
 	return (b == 'a' or 'i' or 'e' or 'o' or 'u') 
 
 
-function int.OperatorPC (|int| x, |string|) 
-	return (self div x).pc
-
 function int.operatorof (|string| type, |string| nothing="", |string|)
 	return type.Pluralize(self, nothing)
 
 function string.Pluralize (|int| amount, |string| nothing="", |string|)
+	cpp_part PluraliseAmount
 	if !amount and nothing
 		return nothing
 		
@@ -65,15 +63,20 @@ function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	  else
 		fs <~ "no"
 	fs <~ " "
-	fs <~ self
-	if amount != 1
-		|| l = .last
-		|| l2 = .last(1)
-		//	'ch', 'sh', 'x', 's', 'z'
-		if (l == 's' or 'x' or 'z') or (l == 'h'  and  l2 == 'c' or 's')
-			fs <~ "e"
-		fs <~ "s"
+	.Pluralize(fs)
 	return fs
+
+
+extend string
+	render Pluralize (|bool| Plural=true)
+		fs <~ self
+		if Plural
+			|| l = .last
+			|| l2 = .last(1)
+			//	'ch', 'sh', 'x', 's', 'z'
+			if (l == 's' or 'x' or 'z') or (l == 'h'  and  l2 == 'c' or 's')
+				fs <~ "e"
+			fs <~ "s"
 
 
 function string.Moat (|string|)

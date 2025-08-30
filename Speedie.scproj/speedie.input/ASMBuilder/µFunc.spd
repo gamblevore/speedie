@@ -55,7 +55,7 @@ extend SCFunction
 		if i 
 			|| n = PackMaker.packfuncs.length
 			fs <~ "("
-			(i|float| / n|float|).pc(fs)
+			(i div n).Percent(fs)
 			fs <~ ") "
 		.µRender(fs)
 		printline fs

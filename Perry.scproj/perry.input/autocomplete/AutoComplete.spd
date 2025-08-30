@@ -9,12 +9,19 @@ helper message.list_desired (|int| common, |string|)
 
 function PerryIDE.CallFromSelect (|listviewrow| list)
 	opt norefcounts
+	|| Count = 0
 	for s in list
 		|| IsCurr = s ~= "curr"
 			(s is Active)
 			(s is selected)
+			Count++
+		  else
+			(s isnt selected)
 		if s.last.int < 0
 			(s is separator)
+	if !count
+		|| f = list.first
+			(f is selected)
 
 
 function PerryIDE.CallFromFB (|message| list, |bool|)

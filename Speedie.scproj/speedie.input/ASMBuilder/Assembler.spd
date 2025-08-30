@@ -18,7 +18,8 @@ struct Assembler
 	|ASMState|					State
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
-//	|byte|						StackSize
+	target debug
+		|byte|						StackSize
 	|uint|						VDecls
 	|uint|						VTemps
 //	|bool|						IsTextual

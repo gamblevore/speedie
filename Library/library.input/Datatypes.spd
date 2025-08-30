@@ -402,7 +402,7 @@ datatype float
 		fs.AppendFloat(self, dp)
 
 
-	render PC // operator percent, operator pc 
+	render Percent // operator percent, operator pc 
 		if !self
 			fs <~ "0"
 		  elseif self < 0.001

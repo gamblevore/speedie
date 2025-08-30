@@ -158,7 +158,7 @@ function Counts.ReportHisto
 				h_done = true
 				"histogram:"
 			curr += histogram[i]
-			|| pc = curr pc total
+			|| pc = (curr div total).Percent
 			"    $i: $pc"
 	if h_done
 		""

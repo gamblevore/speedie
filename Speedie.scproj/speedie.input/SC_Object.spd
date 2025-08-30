@@ -37,6 +37,8 @@ class SCObject
 				return "Global"
 			if self is Property
 				return "Property"
+			if self is Param
+				return "Parameter"
 			return "Variable"
 
 		return "unknown"

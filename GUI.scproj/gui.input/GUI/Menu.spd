@@ -93,7 +93,7 @@ class Menu (ListView)
 		.ShowMenu
 	
 	
-	function ShowMenu
+	function ShowMenu 
 		|| win = .window					#require
 		win.inline.clear
 		win.openedmenu = self

@@ -317,7 +317,7 @@ class list (Saveable)
 
 	function SlowCount (|int|)
 		opt norefcounts
-		for c in self
+		for c.fast in self
 			++rz
 
 
