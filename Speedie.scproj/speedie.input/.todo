@@ -2,14 +2,11 @@
 
 
 Prerelease:
-	* "as" should return nil and make no error
-	* SquaresAtByte for loop seems badly optimised? tran_for failing?
 	* selectors seem broken. just remove them. Sigh. (language2.scproj)
 	* remove game3d stuff (in compiler)
 
 	
 Bugs:
-	* properties declared as ? should get nil even if string/array
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* &uint... allow &int in c++ gen
 	* vector constants
