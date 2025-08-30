@@ -158,7 +158,6 @@ module Conv
 	|type| 			Detected
 	|float| 		Size
 	|message| 		AST
-	|int| 			MaxNodeLength = 128 //int.max
 	|int|			Done
 	|string|		DestPath
 	||				DefaultStrength = mzlab.strong
