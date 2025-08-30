@@ -158,27 +158,18 @@ datatype ASMReg (uint64)
 	function IsVec (|bool|)
 		return self|datatypecode| & 0x03
 	
-	///
 	function Clip (|int|)
-		if .isbool
+		if .isbool or !.reg
 			return 0
 		return 3 + self|datatypecode|._shift
 
 	function bool.EqulMode (|asmreg| L, |asmreg| R, |int|)
 		rz = self|int| xor 1
-		|| CL = l.clip
-		|| CR = R.clip
-		if !L.reg
-			cl = cr
-		if !R.reg
-			cr = cl
-		rz |= CL << 1
-		rz |= CR << 4
+		rz |= l.clip << 1
+		rz |= R.clip << 4
 
-	function uint.ClipsBothToBool (|bool|)
-		return (self >> 1) == 0
-	///
-	
+	function uint.EqulInputsAreBothBool (|bool|)
+		return (self >> 1) == 0	
 	
 	function IsBig (|bool|)
 		opt inline

@@ -269,10 +269,10 @@ struct FatASM
 			debugger
 
 ////////////////////////////////////////////////////////////
-	function r0 (|uint|): return .prms[0]
-	function r1 (|uint|): return .prms[1]
-	function r2 (|uint|): return .prms[2]
-	function r3 (|uint|): return .prms[3]
+	function r0 (|ASMParam|): return .prms[0]
+	function r1 (|ASMParam|): return .prms[1]
+	function r2 (|ASMParam|): return .prms[2]
+	function r3 (|ASMParam|): return .prms[3]
 
 	function r0 (assigns:|uint|): .prms[0] = value
 	function r1 (assigns:|uint|): .prms[1] = value
