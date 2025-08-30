@@ -10,7 +10,7 @@ datatype ClassInfo (int)
 		|ClassInfo|
 		ContainsParentClass
 		IgnoreContainedSelf
-		HasCompareFunc
+//		HasCompareFunc
 		HasEqualsFunc
 		HasSubClass
 		NoEarlyFree
@@ -50,6 +50,7 @@ linkage
 |scdecl?|					_NotConst
 |SCFunction?|				FuncProto
 |SCFunction?|				TheIsFunc
+|SCFunction?|				TheCompareFunc
 |SCFunction?|				TheBoolFunc
 |SCFunction?|				ConstructorFunc
 |SCFunction?|				DestructorFunc
@@ -724,7 +725,7 @@ function FindNilChecker
 function OverrideSyntax
 	require stderr.OK
 	.FindNilChecker
-	(self is HasCompareFunc) = .FindSpecialFunc( "SyntaxCompare", true ) != nil
+	.TheCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
 	(self is HasEqualsFunc) = .FindSpecialFunc( "SyntaxEquals", true ) != nil
 	(.TheIsFunc) = .FindSpecialFunc( "SyntaxIs", true )
 
@@ -836,13 +837,13 @@ function scdecl.CanCompare (|SCDecl| Against, |bool| AsEquals, |bool|)
 	opt norefcounts
 	|| T = .type
 	|| CanUseEquals = AsEquals and (T is hasEqualsFunc)
-	if (T isnt HasCompareFunc)  and  !CanUseEquals
+	if (!T.TheCompareFunc)  and  !CanUseEquals
 		Return false
 
 	if CanUseEquals and T.CanCompareSub( "syntaxequals", against )
 		Return true
 
-	if (T is HasCompareFunc)
+	if (T.TheCompareFunc)
 		Return T.CanCompareSub( "syntaxcompare", Against )
 
 
@@ -946,8 +947,8 @@ function Real_Isa (|SCClass| cls, |bool|)
 
 function AfterAfterFuncs 
 	|| s = .Super
-		if s is HasCompareFunc
-			is HasCompareFunc
+		if s.TheCompareFunc and !.TheCompareFunc
+			.TheCompareFunc = s.TheCompareFunc
 		if s is HasEqualsFunc
 			is HasEqualsFunc
 	
@@ -1097,7 +1098,7 @@ module
 
 	function SCClass.DataTypePostLoad
 		require .IsDataTypeOnly
-		if self ~= "_void"
+		if self == "_void"
 			.typeinfo = 0
 			return
 

@@ -142,11 +142,6 @@ class String
 	function Map (|bytemap| b, |int| clear = -1, |string|)
 		cpp_wrapper JB_Str_MapBytes
 
-
-	function Compare (|string?| other, |bool| Insensitive, |int|)
-		nil checker
-		cpp_wrapper JB_Str_Compare
-
 	function IsInt (|bool|)
 		return .isint(0)
 	
@@ -553,22 +548,19 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_MidEquals
 
-	syntax Compare (|string| Other, |bool| Aware=true, |int|)
-		cpp_part CompareStr
-		return .Compare(other, Aware)
+	syntax Compare (|string| Other, |bool| Aware=false, |int|)
+		cpp_wrapper JB_Str_Compare
 
-	syntax Compare (|int| Other, |bool|Aware, |int|)
+	syntax Compare (|int| Other, |int|)
 		cpp_part CompareInt
-		(aware)
 		return .length - other
 	
-	syntax Equals (|string?| Other, |bool| Aware, |bool|)
+	syntax Equals (|string?| Other, |bool| Aware=false, |bool|)
 		nil self
 		cpp_wrapper JB_Str_Equals
 	
-	syntax Equals (|int| Other, |bool| Aware, |bool|)
+	syntax Equals (|int| Other, |bool|)
 		cpp_part EqualsInt
-		(aware)
 		return .length == other
 	
 	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)

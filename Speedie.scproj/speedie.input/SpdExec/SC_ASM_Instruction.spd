@@ -12,19 +12,19 @@ class Instruction
 	|byte|			aType
 	|byte|			PCount
 	|µForm|			Sizes
-	|string|		FormName
+//	|string|		FormName
 	|string|		Name
 
 	
 	constants
 		kTypeConst		= 2
-		kTypeFunc		= 1
+//		kTypeFunc		= 1
 	
 	constructor (|string| FormName, |string| Name, |int| Pos)
-		.formname = formname
+//		.formname = formname
 		.opcode = pos
 		.name = name
-		.sizes = µform.NeedForm(.FormName, nil)
+		.sizes = µform.NeedForm(FormName, nil)
 		.PCount = .sizes.count
 	
 	render

@@ -1,4 +1,5 @@
 
+
 /*
 	Jeebox internals. By Theodore H. Smith...
 */
@@ -66,15 +67,13 @@ class list (Saveable)
 		while (|| l = src.Last)
 			.First = l
 	
-	syntax Compare (|int| n, |bool| Aware, |int|)
-		(Aware)
+	syntax Compare (|int| n, |int|)
 		return .SlowCount - n
 	
-	syntax Equals (|int| n, |bool| Aware, |bool|)
-		(aware)
+	syntax Equals (|int| n, |bool|)
 		return .HasChildCount( n )
 	
-	syntax Equals (|byte| b, |bool|Aware, |bool|)
+	syntax Equals (|byte| b, |bool|)
 		disabled `Did you mean == int, or == "string"?`
 	
 	

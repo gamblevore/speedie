@@ -51,7 +51,7 @@ datatype ControlRect (ivec4)
 		return self >> 4
 	
 	function IsBasic (|bool|)
-		return .syntaxequals(.BasicSize.Layout, false)
+		return .syntaxequals(.BasicSize.Layout)
 		
 	render
 		self[0]|controlpoint|.AppendInto(fs)

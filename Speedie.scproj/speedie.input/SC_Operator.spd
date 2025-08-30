@@ -23,6 +23,7 @@ datatype OpMode (int)
 		LessOrEqual		// <=
 		NilTest			// not the same as EqualOrNot... because those include customops
 		Multiply
+		SyntaxIs
 		Subtraction = (makessigned + Addition)
 		SameOrLessBits = [NoExtraBits, LoseBits]
 		RightShift = ShiftOnly + NoExtraBits
@@ -70,10 +71,6 @@ render
 
 function CaseAwareStr (|String|)
 	return (self is caseaware)|bool|.string
-
-
-syntax equals (|string| s, |bool| aware, |bool|)
-	return .name.syntaxequals(s, aware)
 
 
 function SimpleName (|String|)
@@ -195,8 +192,8 @@ module {
 		dict["operatorsub"]= dict["operatorminus"]
 		
 		// these two arent bits???
-		.AddBit( "is",		"is", nil, 0 )					// if obj is flag
-		.AddBit( "isnt",	"isnt", nil, 0 )				// if obj isnt flag
+		.AddBit( "is",		"is", nil, opmode.SyntaxIs )					// if obj is flag
+		.AddBit( "isnt",	"isnt", nil, opmode.SyntaxIs )				// if obj isnt flag
 
 		.BuildOrder
 

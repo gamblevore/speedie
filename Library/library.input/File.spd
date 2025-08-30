@@ -76,7 +76,7 @@ class File (String)
 //		cpp_part CastToStream
 //		return .out
 
-	syntax equals (|string?| s, |bool| aware, |bool|)
+	syntax equals (|string?| s, |bool| aware=false, |bool|)
 		return super.syntaxequals(s, aware)
 			
 	function Length (|int|)

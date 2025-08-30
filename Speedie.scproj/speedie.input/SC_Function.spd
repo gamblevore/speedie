@@ -114,19 +114,6 @@ syntax is (|FunctionType| k, assigns:|bool|)
 
  
 
-syntax equals (|string| name, |bool| Aware, |bool|)
-	opt norefcounts
-	(aware) //sigh
-	require (self)	
-	if .Name.SyntaxEquals( name, true )		// never needs !aware.
-		return true
-	|| x = .ExportName
-	if x.syntaxequals( name, true )
-		return true
-	if x.endswith(name, true) and x[x.length - (name.length+1)] == '_'
-		return true
-
-
 function IsReal (|bool|)
 	return (self != nil) and !.isMacro 
 
@@ -1870,7 +1857,7 @@ function message.MainFix2
 
 function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 	opt norefcounts
-	if src ~= @tmp and "main"
+	if src == @tmp and src ~= "main"
 		src.MainFix2
 
 	|| f = src.first$

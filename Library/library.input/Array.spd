@@ -158,11 +158,11 @@ class Array (saveable)
 		cpp_wrapper JB_Array_Find
 
 
-	syntax Compare (|int| n, |bool|Aware, |int|)
+	syntax Compare (|int| n, |int|)
 		nil self
 		return .length - n
 	
-	syntax Equals (|int| n, |bool|Aware, |bool|)
+	syntax Equals (|int| n, |bool|)
 		nil self
 		return .length == n
 	

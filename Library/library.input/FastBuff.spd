@@ -35,7 +35,7 @@ struct FastBuff
 			return s
 		return string.copy(.start, .length)
 	
-	syntax Compare (|int| n, |bool| aware,  |int|)
+	syntax Compare (|int| n,  |int|)
 		return .Length - n
 	
 	syntax Append (|byte| v, |bool|)

@@ -82,8 +82,7 @@ class StringReader
 			return .data.byte
 		return -1
 		
-	syntax Compare (|int| n, |bool| aware, |int|)
-		(aware)
+	syntax Compare (|int| n, |int|)
 		return .length - n
 	
 	function Position (|int64|)

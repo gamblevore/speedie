@@ -116,7 +116,7 @@ module PackMaker
 
 	
 	function scfunction.AMiniTest (|bool|)
-		if .cls ~= "asm_test_obj"
+		if .cls == "asm_test_obj"
 			return true
 		return (self in "ASMExamples")
 	

@@ -300,18 +300,14 @@ class FastString {
 		self <~ b.string
 	
 	function Mark (|int|)
-		description "Returns 'The Mark'. Like a sea-level-marker, this is the amount that something has risen by. This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .mark == .length"
+		description "Returns 'The Mark'. This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .mark == .length"
 		cpp_wrapper
 	
-//	function Grew (|int| m, |bool|)
-//		description "Returns if we grew since the last 'Mark' was read." 
-//		cpp_wrapper
-
 	macro SyntaxAppend
 		_1.render(_0)
 		
 
-	syntax Compare (|int| n, |bool| Aware, |int|)
+	syntax Compare (|int| n, |int|)
 		return .streamlength - n
 }
 

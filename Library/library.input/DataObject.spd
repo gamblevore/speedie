@@ -8,7 +8,6 @@ class DataObject
 	constants
 		kNothing = 0
 		kFree    = 1
-		kDelete  = 2
 	
 	|DataTypeCode|		Kind
 	|byte|				DeathAction

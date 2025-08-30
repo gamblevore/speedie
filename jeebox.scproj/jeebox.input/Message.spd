@@ -1025,13 +1025,12 @@ Message is also:
 			.accesserr(Need, nil, ch)
 
 
-	syntax Equals (|string?| name, |bool|Aware, |bool|)
+	syntax Equals (|string?| name, |bool|Aware=false, |bool|)
 		return self and .name.SyntaxEquals( name, aware )
 
 
-	syntax Equals (|Syntax| X, |bool|Aware, |bool|)
+	syntax Equals (|Syntax| X, |bool|)
 		cpp_part EqualsSyx
-		(Aware)
 		return self and (.Func == X)
 
 //	sadly... this would mess up anything that tests msg == 1

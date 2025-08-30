@@ -407,7 +407,7 @@ class GUIControl (list)
 	helper GetCopy (|object?| item=nil, |string|)
 		return (.CopyEvent$)(self, item)
 	
-	syntax equals (|string| s, |bool| aware, |bool|)
+	syntax equals (|string| s, |bool| aware=false, |bool|)
 		if self
 			return .id.syntaxequals(s, aware)
 

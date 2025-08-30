@@ -254,7 +254,8 @@ function SCObject.MarkUnused (|message| feedback, |byte| debug)
 	opt norefcounts
 	(debug) // remove later
 	|| s = .Source
-		feedback.msg(@tmp, .UnusedStr) <~ s.position
+		|| name = .UnusedStr
+			feedback.msg(@tmp, name) <~ s.position
 
 
 function SCFunction.CheckUnused (|message| feedback)
@@ -270,8 +271,6 @@ function SCFunction.CheckUnused (|message| feedback)
 			feedback.msg(@tmp, .name + str) <~ src.position
 	
 	require self isnt cpp
-	.CheckUnusedCode(feedback)
-
 	require !.HasProto
 	|message| ErrName
 	for arg in .args
@@ -299,8 +298,9 @@ function scobject.UnusedStr (|string|)
 		if self is SetTo
 			reason = " is set to, but never read from."
 		if (self is Const) and (.islookuponly isa SCFunction)
+			return ""
 			// this is better just NOT being a problem. or even a warning. Just "info". sigh.
-			reason = "Unnecessary prototype (never gets used as a prototype!)"
+//			reason = "Unnecessary prototype (never gets used as a prototype!)"
 	return "$.AutoCompleteKind $.name$reason"
 	
 
@@ -1231,14 +1231,6 @@ function CppView (|message| out, |scfunction| fn)
 		if !s
 			s = " "
 		out.msg(@tmp, s)		// C-view
-
-
-function SCFunction.CheckUnusedCode (|message| feedback)
-	opt norefcounts
-	for f.fat in self
-		if f.IsUnused
-			|| m = f.msg
-				feedback.msg(@tmp, "Unused code") <~ m.position
 
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)

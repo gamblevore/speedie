@@ -1273,7 +1273,8 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	dot <~ exp.first
 	|| p = dot.msg(@prm)
 	p <~ exp.last
-	p <~ (@thg, comp.CaseAwareStr)
+	if comp is caseaware
+		p <~ «thg "true"»
 	exp.First = dot
 
 	if (comp Is EqualOrNot)
@@ -1410,16 +1411,16 @@ function TypeOfRel (ExprResolver)
 	|SCOperator--| Comp = SCOperator.Lookup( opch )
 	|| RN = opch.Next								#expect	(exp, "Missing right hand side")
 	|| LN = exp.first!
-	if opch == "is" or "isnt"
+	if comp is SyntaxIs
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
 	
 	side = nil
 	|| P = exp.niceParent
 	|| ParentFunc = P.func
 	|| ShouldBeSet = (ParentFunc == @Arg or @Decl) 
-	if (comp != "=")
+	if (comp isnt Assigns)
 		if (ShouldBeSet)
-			if comp == "=="
+			if comp is ExactlyEquals
 				error (opch, "Did you mean '='?")
 			  else
 				error (opch, "Can't use this operator here.")

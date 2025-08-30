@@ -30,13 +30,13 @@ extend scclass
 		return .BaseType is datatype or ProtoType
 	
 
-	syntax equals (|string| name, |bool| aware, |bool|)
-		cpp_part EqualsName, (aware)
+	syntax equals (|string| name, |bool|)
+		cpp_part EqualsName
 		if self
 			return .name ~= name
 
 
-	syntax equals (|SCNodeType| d, |bool| aware, |bool|)
-		cpp_part EqualsType, (aware)
+	syntax equals (|SCNodeType| d, |bool|)
+		cpp_part EqualsType
 		if self and d > SCNodeType.nil
 			return .BaseType == d

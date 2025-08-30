@@ -9,7 +9,7 @@ datatype vec4
 		cpp_part Shrink
 		return (.x+i, .y+i, .z-i, .w-i)
 	
-	syntax Equals (|vec4| v, |bool|Aware, |bool|)
+	syntax Equals (|vec4| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
 //	function Climp (|float| max=1.0, |vec4|)
@@ -221,7 +221,7 @@ datatype ivec4
 	function MoveTo (|ivec2| XY, |ivec4|)
 		return (XY, XY + .size)
 
-	syntax Equals (|ivec4| v, |bool|Aware, |bool|)
+	syntax Equals (|ivec4| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w)
 	
 	operator ± (|int| i, |ivec4|)
@@ -354,12 +354,12 @@ datatype vec3
 		cpp_part Bool
 		return (self != vec3())
 			
-	syntax Compare (|float| Other, |bool|Aware, |float|)
+	syntax Compare (|float| Other, |float|)
 		|| LSq = .lengthsq
 		|| Osq = other*other
 		return lsq - Osq
 
-	syntax Equals (|vec3| v, |bool|Aware, |bool|)
+	syntax Equals (|vec3| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
 	function Lum (|float|)
@@ -500,7 +500,7 @@ datatype ivec3
 	render
 		fs <~ "(${.x}, ${.y}, ${.z})"
 
-	syntax Equals (|ivec3| v, |bool| Aware, |bool|)
+	syntax Equals (|ivec3| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
 	module
@@ -559,9 +559,6 @@ datatype IntRange (ivec2)
 		cpp_part Contains2
 		return self contains i.x and i.x2
 
-	syntax Equals (|int| i, |bool|)
-		return .x==i and .x2==i
-
 	iterator
 		|| _End = .x2
 		|| _Curr = .x
@@ -588,7 +585,7 @@ datatype ivec2
 	operator Sign (|ivec2| C, |ivec2|)
 		return (.x.copysign(c.x), .y.copysign(c.y))
 
-	syntax Compare (|float| Other, |bool|Aware, |int|)
+	syntax Compare (|float| Other, |int|)
 		|| LSq = .lengthsq
 		|| Osq = other*other
 		if (Lsq > osq)
@@ -673,11 +670,11 @@ datatype ivec2
 		cpp_part Bool
 		return .x or .y
 	
-	syntax Equals (|ivec2| v, |bool|Aware, |bool|)
+	syntax Equals (|ivec2| v, |bool|)
 		cpp_part Equals2
 		return (.x == v.x) and (.y == v.y) 
 
-	syntax Equals (|int| v, |bool|Aware, |bool|)
+	syntax Equals (|int| v, |bool|)
 		return (.x == v) and (.y == v) 
 	
 	function RotateRight (|ivec2|)
@@ -775,7 +772,7 @@ datatype vec2
 		if !.y
 			rz.y -= .y.IntegerToMod2
 	
-	syntax Equals (|vec2| v, |bool| Aware, |bool|)
+	syntax Equals (|vec2| v, |bool|)
 		return (.x == v.x) and (.y == v.y) 
 	
 	operator • (|vec2| other, |float|)
@@ -825,7 +822,7 @@ datatype vec2
 	function CosR (|vec2|)
 		return (self * math.iTau).cos
 
-	syntax Compare (|float| Other, |bool|Aware, |int|)
+	syntax Compare (|float| Other, |int|)
 		|| L = .LengthSq
 		other = other * other
 		if (L > other)

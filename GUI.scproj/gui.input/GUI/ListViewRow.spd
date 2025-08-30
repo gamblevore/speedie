@@ -249,7 +249,7 @@ role ListViewCell (message)
 		cpp_Part StepCol
 		|| c = .row.move(i)
 			return c.cell(col)  
-	syntax equals (|ListViewcell|c, |bool| aware, |bool|)
+	syntax equals (|ListViewcell| c, |bool|)
 		return c.obj == .obj  and  c.position == .position
 	function Value (|string|)
 		require self

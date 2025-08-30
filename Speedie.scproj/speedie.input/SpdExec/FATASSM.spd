@@ -126,8 +126,8 @@ struct FatASM
 		.msg = Value
 	
 
-	syntax equals (|int| ID, |bool| aware, |bool|)
-		(aware), return .id == ID
+	syntax equals (|int| ID, |bool|)
+		return .id == ID
 	
 	function ID (|uint|)
 		return self - Assembler.sh.start
