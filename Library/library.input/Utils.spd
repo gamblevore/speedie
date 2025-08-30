@@ -66,11 +66,10 @@ function @file.Words (|file|)
 
 		
 function string.Dict (|byte| sep='\n', |dictionary of string|)
+	rz = Dictionary()
 	if self
-		rz = Dictionary()
-		if self
-			for l in StringFields( self, sep )
-				rz[l] = "true"
+		for l in StringFields( self, sep )
+			rz[l] = "true"
 
 
 function Message.FindNotInserted (|message|)
