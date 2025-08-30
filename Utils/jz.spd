@@ -1,9 +1,7 @@
 #!/usr/local/bin/speedie
 
 
-// todo: Ideally we should:
-// * change the format to a pure binary... no jbin
-// * decomp should return an int with the number of unread bytes
+// todo: Add archiving of multiple files. Makes sense
 
 
 app.Usage = "Usage: jz File1 [File2...]
