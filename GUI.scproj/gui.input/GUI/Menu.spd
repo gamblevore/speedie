@@ -11,14 +11,10 @@ class Menu (ListView)
 	constructor (|guicontrol| p,  |GUIKeyEvent| keys,  |GUIListEvent| ret)
 		super.constructor(p, nil, ret)
 		isnt visible
-		.Padding = 5
+		.Padding = 8
 		.MultiSelection = false
 		.OnKeyDown = keys
 		.ClipMode = ControlClipMode.SlideBackInWindow
-		.StyleAsMenu
-
-
-	function ListView.StyleAsMenu
 		.gnormal = ¥.Menus 
 		.gRowSel = ¥.MenuRowSel 
 	

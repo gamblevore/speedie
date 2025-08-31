@@ -25,7 +25,8 @@ class AppMenu (Window)
 		it.addsep
 		it <~ ("Help",						AppMenuHelp)
 		it <~ ("Quit",						AppMenuQuit)
-		it.StyleAsMenu
+		it.gnormal = ¥.Menus 
+		it.gRowSel = ¥.MenuRowSel 
 
 
 	behaviour KeyDown

@@ -66,7 +66,7 @@ struct ControlSize
 			return .CalculateBlocks
 //		|| dbg = upon.clipmode is debug
 //			"---------------"
-		parent = parent ± upon.Padding
+		window = window ± upon.Padding
 		|| PS = parent.size
 		for i in 4
 			|| sz = .size(i)
