@@ -630,7 +630,7 @@ extend Assembler
 		return .BitMaker(dest, l, r, exp, asm.band, asm.QAND)
 	
 	
-	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp,   |asmreg|)
+	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp, |asmreg|)
 		if asm.BORK!=asm.borr+4 // what?
 
 		if r.reg and (opp != asm.bnot) and !dest.IsVec
@@ -651,7 +651,7 @@ extend Assembler
 			
 		|| fat = exp.BAND(dest, L, R, Clear)
 		fat._op = opp
-		return fat * Dest
+		return fat.Vectorise(dest, vopp)
 
 
 	function BFLG_RightConst  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| down, |asmreg|)

@@ -11,6 +11,7 @@ module SC_Init
 			.Source <~ ig
 
 
+
 	function Message.SettingToNil (|bool|)
 		opt norefcounts
 		if (self == @Decl)
