@@ -222,10 +222,12 @@ struct FatASM
 
 	function assembler.KnownValues (|int| changed, assigns:|bool|)
 		|| M = sh.knownvaluesmap
-		M |=  value << changed
-		M &=  ~(!value << changed)
+		changed = 1 << changed
+		if Value
+			m|=changed
+		  else
+			m&=~changed
 		sh.knownvaluesmap = M
-		
 			
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
