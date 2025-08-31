@@ -1211,6 +1211,6 @@ markedlines
 
 document
 	source_material: "iChing"
-	original_author: "Richard Wilhelm"
+	author: "Richard Wilhelm"
 	editor: "Theodore H. Smith" // I made this file... copying and fixing and editing.
 
