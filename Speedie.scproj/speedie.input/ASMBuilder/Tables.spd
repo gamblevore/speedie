@@ -281,7 +281,9 @@ function SetRel (fn_asm)						// function relset (
 	|| X = .ExistingVar(A, VarUseMode.set)
 	|| B = exp.last!
 	if X
-		return .µInto(B, X)
+		|| f = .µInto(B, X)
+//		if f is local
+		return f
 
 	// Probably x.y = z, or x[y] = z 
 
@@ -775,8 +777,8 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		|| Closer = .OpenVars
 		|| DiscardMode = dest & AsmReg.Discard
 		|| Mode = discardmode
-		if dest is Declaration
-			mode = mode.ReUseRegInPlace(dest)
+		if dest is Declaration // remove this const?
+/			mode = mode.ReUseRegInPlace(dest)
 		
 		ml = .µGetASM(First, mode)
 	
@@ -811,11 +813,13 @@ function ASMReg.ConstEnough (|bool|)
 	return self|uint64| & asmreg.NotUnConst|uint64|
 
 
-function LocalThg (|scdecl| d, |asmreg|)
+function LocalThg (|scdecl| d, |asmreg|) // asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType as ASMReg.FromExistingVar
-	|| DP = d is param
-	(t is param) = DP
+
+	(t is param) = d is param
+	(t is constoutput) = d is const
+	(t is reference) = d is Reference
 	
 	if  d isnt AlteredInBranch
 		(t is NotAlteredInbranch)
@@ -824,13 +828,10 @@ function LocalThg (|scdecl| d, |asmreg|)
 			if f is ConstOutput
 				(T is ConstOutput)
 	
-	if d is const
-		(t is constoutput)
-	
 	|| rr = T.reg
 		|| Ret = .State.Return
 		if rr == ret.reg
-			(T is temp = ret is temp)
+			(T is temp) = (ret is temp)
 	
 	return T
 }

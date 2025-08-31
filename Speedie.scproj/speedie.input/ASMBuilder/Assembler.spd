@@ -30,7 +30,7 @@ struct Assembler
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
-	|uint|						KnownValuesMap
+	|int|						KnownValuesMap
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
 //	|&FatASM|					LastDebug

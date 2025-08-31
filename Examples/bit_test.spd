@@ -1,0 +1,32 @@
+#!/usr/local/bin/spd
+
+// Lets do a very simple test, to test setting bits onto a value,
+// via a helpful setter function.
+
+module BitTest
+	|| Map = 0
+	Syntax access (|int| i, |bool|)
+		return .map & (1<<i)
+	Syntax access (|int| i, assigns:|bool|)
+		|| M = .Map
+		M |=  value << i
+		M &=  ~(!value << i)
+		.map = M
+
+main
+	for i in 32
+		BitTest[i] = true
+		expect BitTest[i]
+		for j in 32
+			BitTest[j] = true
+			expect BitTest[j]
+			BitTest[j] = false
+			expect !BitTest[j]
+		BitTest[i] = false
+		expect !BitTest[i]
+		for j in 32
+			BitTest[j] = true
+			expect BitTest[j]
+			BitTest[j] = false
+			expect !BitTest[j]
+	"Tests passed ok"

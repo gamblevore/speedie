@@ -59,8 +59,8 @@ struct FatASM
 		|| b = .baseop
 		return b == asm.fncx or asm.fnc
 	
-	function IsUnused (|bool|)
-		return .µRefCount <= 0 and self!=asm.NOOP
+//	function IsUnused (|bool|)
+//		return .µRefCount <= 0 and self!=asm.NOOP
 	
 	function BaseOp (|int|)
 		rz = .op
@@ -125,9 +125,8 @@ struct FatASM
 	setter Debug (|message|)
 		.msg = Value
 	
-
-	syntax equals (|int| ID, |bool|)
-		return .id == ID
+//	syntax equals (|int| ID, |bool|)
+//		return .id == ID
 	
 	function ID (|uint|)
 		return self - Assembler.sh.start
@@ -212,19 +211,34 @@ struct FatASM
 			return .Prms[o]
 
 
+	function RefReplace (|uint| changed, |&assembler| sh)
+		.µRefCount++
+		|| old = sh.Registers[changed]
+		require old and old.BasicBlock == .BasicBlock
+		if old isnt Reference // huh?
+		// must be a reference also by now.
+		sh.softnop(old) // could be a normal nop but lets do it later.
+		
+
+	function assembler.KnownValues (|int| changed, assigns:|bool|)
+		|| M = sh.knownvaluesmap
+		M |=  value << changed
+		M &=  ~(!value << changed)
+		sh.knownvaluesmap = M
+		
+			
+
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		|| changed = info.prm
 		.prms[a] = changed
 		._Outputs |= 1 << a
 		changed &= 31
 		if changed
+			if info is reference
+				.RefReplace(changed, sh)
 			sh.Register(changed) = self
-			|| map = 1 << changed
-			if info is KnownConst		// Lets see
-				sh.KnownValuesMap |= map
-			  else
-				sh.KnownValuesMap &= ~map
-
+			sh.KnownValues(Changed) = info is knownconst
+			
 		|asmreg| x // in case i forget to do it later via: fat * asmreg
 		x.FatIndex = .index
 		x.reg = info.reg
@@ -243,7 +257,7 @@ struct FatASM
 		|| f = .file|file--|
 		|| err = Error(nil, error, ErrorSeverity.Error, f)
 		err.position = .BytePos
-		nil|errorreceiver| <~ err
+		nil|ErrorReceiver| <~ err
 		.DebugPrint
 	
 	function Jump (|int|)
@@ -589,6 +603,13 @@ struct FatASM
 
 
 datatype ASMParam (uint)
+	// this would ahve been better if I had planned this all out ahead of time
+	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits, for 21-bits
+	// after that we have 11 more bits that we could either use or keep empty...
+	// depending on if they confuse the code or not, but at least we have soemthing that
+	// makes sense, easy to convert from one to the other!
+	// at this point... its too late, really.
+	
 	function ASMReg (|asmreg|)
 		(rz is temp) = (self>>31)
 		rz.reg = self&31

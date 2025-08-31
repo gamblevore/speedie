@@ -31,6 +31,7 @@ datatype ASMReg (uint64)
 		CondAnswer
 		CompilerCreated
 		GlobalMemory
+		Reference
 		PreferEqul
 		OK
 		GetReal		= Param ||| Discard

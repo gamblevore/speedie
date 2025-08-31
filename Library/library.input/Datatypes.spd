@@ -60,7 +60,7 @@ datatype int
 		return self&(1<<bit)
 
 	syntax access (|int| bit, assigns:|bool|, |int|)
-		|| mask = 1<<bit
+		|| mask = (1<<bit)
 		return (self &~ mask) ||| (value|int| << bit) 
 
 	function Clz (|int|)
@@ -292,6 +292,7 @@ datatype uint
 	operator Min (|uint| other, |uint|)
 		if self < other: return self
 		return other
+
 
 	
 	render
