@@ -38,7 +38,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	list.first = define
 	.autocomplete.listsource = list!
 	.SetAutoPoint(.editme.sel0)
-	.ShowAuto
+	.ShowAutoComplete
 	(.AutoComplete isnt typethrough)
 	.CallFromSelect(list)
 
@@ -116,14 +116,19 @@ function PerryIDE.ClearAutoComplete
 
 
 function PerryIDE.ShowAutoBeep (|bool| beeps)
-	if !.showauto and beeps
+	if !.ShowAutoComplete and beeps
 		beep
 
 
-function PerryIDE.ShowAuto (|bool|)
+function PerryIDE.ShowAutoComplete (|bool|)
 	|| a = .autocomplete
 	if a.listsource.hasany
 		a.ListSource.obj = .editme.Path
+		
+		// this thing can get too large. So... how to make it smaller.
+		// those job is it to limit the size? us? the cmm itself? a huge menu
+		// doesn't raelly make sense. but how can they know what size it should be?
+		
 		a.ShowCmm(self, .AutoPoint.x, .AutoPoint.y - .lastbottom)
 		(a is typethrough)
 		return true
