@@ -1,14 +1,8 @@
 
 // jbin: streamable, binary jeebox
 
-/* 
-	Future improvement... allocate one block at a time! Can call constructor on each object
-	Just need a Curr+Last pointer.
-*/
-
 
 || _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
-|| _jBinNotJbin    = "Not jbin"
 
 
 extend message
@@ -191,7 +185,7 @@ function StringReader.IsJBin (|bool|)
 function StringReader.ExpectJbin (|bool|)	
 	if .IsJBin
 		return true
-	error (Self, _jBinNotJbin)
+	error (Self, "Not jbin")
 
 
 function StringReader.ParseJbin (|int64| Remain=1G, |MessageRoot|)	
@@ -213,4 +207,22 @@ function string.Digest (|string|)
 	if .IsJbin
 		return self
 	return .parse$.renderjbin
+
+/* 
+	todo: 
+		* Memory improvements: Allocate one block at a time! Call constructors. Just need Curr+Last ptr.
+		* No type+length/updown shall cross a 16MB boundary, Only the name can. Then can always parse, 
+		keeping all the pointers in registers. (This will need work on faststring, I think.)
+		* Allow MessageID during parse. Could save on RAM+CPU, if done properly, say only on @tmp, or
+		  done on a per-document-basis that knows what types to use.
+
+		* A back-ref mode? Some objects can their name+type in a cache for reuse.	
+		  This should need to be a separate project. Revive the HOL format, but simpler. Unless we make
+		  MessageID available by standard, and the renderer use the messageID! Even then its not simple,
+		  messageID is used across documents, or for anything you like. You are also basically just compressing
+		  which means parse gets faster but render gets slower (alot). Probably not worth doing.
+*/
+
+
+
 
