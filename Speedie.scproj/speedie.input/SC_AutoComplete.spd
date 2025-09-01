@@ -242,6 +242,8 @@ function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
 	require self isnt Library
 	if (self is ReadFrom) and ((self is SetTo or const) or .IsCarray or .isbarestruct)
 		return
+	if self is SetTo and Reference
+		return // no problem
 	require self isnt ClassObj
 	|| fn = .IsLookupOnly
 	if (fn isa SCFunction)

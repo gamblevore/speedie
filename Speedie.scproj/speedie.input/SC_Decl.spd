@@ -959,7 +959,7 @@ class SCDecl (SCObject) {
 	function CopyDeclForVar (|scdecl|)
 		opt norefcounts
 		rz = .CopyDecl
-		rz.mu.info |= .mu.info & scdeclinfo.VarType
+		rz.mu.info |= .mu.info & (scdeclinfo.VarType ||| scdeclinfo.reference)
 		
 	
 	function CanNilCheck (|bool|)

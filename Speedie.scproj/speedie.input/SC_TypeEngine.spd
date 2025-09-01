@@ -525,8 +525,14 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		return R.RefineDecl(c.last)
 	
 	if (f == @arel or @brel)
+		// these might work better if theres a standard order.
+		// like ?$ is allowed but not $?
+		// cos I had a bug somewhere, that the $ reference isn't being copied
+		// but if I added reference to scdeclinfo.dclcopy... the compiler breaks.
+		// so I had to special-case it.
+		
 		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
-		if C == "~"
+		if (C == "~")
 			return R.MakeDataObject(name_space, purpose)
 		if (C == "&" and f == @brel)							// pointer
 			return r.GetAddress(purpose)
@@ -1115,6 +1121,7 @@ function TypeOfDot (ExprResolver)
 		expect  (DotVar isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
 	|| o = DotVar.LookUpDot( exp.name, exp, name_Space, contains, side )		#require
+	
 	if (o isa SCModule)
 		// for __modules__.String   // one day namespace.myclass ?
 		|| f = exp.first
@@ -1129,6 +1136,7 @@ function TypeOfDot (ExprResolver)
 		return o
 	
 	|| decl = o.BaseAsDecl
+//		if decl is const
 		decl.MarkAsUsed(side, exp)
 		if contains
 			if (DotVar isa scclass) and !exp.IsSettablePlace
