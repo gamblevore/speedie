@@ -31,7 +31,6 @@ datatype ASMReg (uint64)
 		CondAnswer
 		CompilerCreated
 		GlobalMemory
-		Reference
 		PreferEqul
 		OK
 		GetReal		= Param ||| Discard
@@ -260,7 +259,8 @@ datatype ASMReg (uint64)
 		return self
 
 	function SCDecl.ASMReg (assigns:|asmreg|)
-		if !value.reg // oof?
+		target debug
+			if !value.reg and self is alteredorref
 		value.µType = .mu.DataType
 		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck

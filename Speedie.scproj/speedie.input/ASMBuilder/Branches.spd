@@ -521,7 +521,7 @@ Struct FatRange
 
 
 extend Assembler
-	function InlineFinishWithConsts (|fatrange| R, |ASMReg|)
+	function InlineFinishWithConsts (|fatrange| R,  |ASMReg|)
 		for s in R
 			if s isa asm.ret
 				if rz
@@ -534,8 +534,8 @@ extend Assembler
 				s.SetOp = asm.jump
 				s.JumpReg = 1
 				.JumpFix(s)
-			  elseif s isa asm.KNST
-				Assembler.sh.AskNop(s)
+//			  elseif (s isa asm.KNST) and !refmap[s.Output.reg]
+///				Assembler.sh.AskNop(s) // this causes problems!
 		
 		rz &= ~ASMReg.Exit
 		(rz as= .state.return&asmreg.exit)

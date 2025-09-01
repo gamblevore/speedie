@@ -12,17 +12,15 @@ struct ASMState
 
 struct Assembler
 	linkage: cpp_part Pac
-//	|DataTypeCode|				ReturnASM
 	|uint16| 					BasicBlock
 
 	|ASMState|					State
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
 	target debug
-		|byte|						StackSize
+		|byte|				StackSize
 	|uint|						VDecls
 	|uint|						VTemps
-//	|bool|						IsTextual
 	|int|						CurrFuncGrab
 	|bool|						Inited
 	|bool|						NeedsRework
@@ -31,6 +29,7 @@ struct Assembler
 
 	|?&FatASM|					InlineEnd
 	|int|						KnownValuesMap
+//	|int|						References
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
 //	|&FatASM|					LastDebug
@@ -64,10 +63,12 @@ struct Assembler
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
+//		.References = 0
 		for a in fn.Args
 			.DeclReset(a)
 			.DeclareMe(a.source, a)
-	
+//			.references |= (a is Reference) << (i+1)
+
 	
 	function Index (|int|)
 		return ._curr - .start
@@ -337,7 +338,7 @@ struct Assembler
 		  else
 			v = .DeclareMe(exp, a)
 		
-		if ModeOnly is GetReal or set // never happens? // remove line below.
+		if ModeOnly is GetReal // never happens? // remove line below.
 		(v as= ModeOnly asnt asmreg.GetReal)
 		rz = .µGetASM(exp, v)
 		
@@ -462,21 +463,19 @@ struct Assembler
 		.start = j.ptr
 		._curr = .start + j.Length
 		
-		// after zeroing, we could just set everything normally? It seems ._curr is set from the jsm.
+		// after zeroing, we could just set everything normally? It seems ._curr is set from jsm.
 		HoistSpace.Length = 0
 		
 		.out = fn
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
 		.state.Return = nil
-//		.StackSize = 0
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
 		.state.TailInlineable = true
 		.InlineDepthLimit = 3
 		.BasicBlock = 0
 		.VDecls = 1
-//		.IsTextual = false
 		.VTemps = 0
 		.NeedsRework = false
 		.zero = nil
@@ -487,10 +486,8 @@ struct Assembler
 
 		.Guard
 		fn.StartASM
-//		.LastDebug = .curr
 		.InlineEnd = nil
 		.FuncStart = .curr
-//		.ReturnASM = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
 
 
@@ -567,6 +564,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 		target debug
 			fn.µprint(++CountASMFuncPrint)
 		return true
+
 
 target debug
 	|| CountASMFuncPrint = 0

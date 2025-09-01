@@ -618,10 +618,9 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 	check (src isnt temp) (p, "Can't increment temporary value.")
 
 	
-function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)				// --a++
+function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
 	opt	NoRefCounts
 	
-	if "InlineParam".trap
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
@@ -813,14 +812,12 @@ function ASMReg.ConstEnough (|bool|)
 	return self|uint64| & asmreg.NotUnConst|uint64|
 
 
-function LocalThg (|scdecl| d, |asmreg|) // asmlocal, localasm
+function LocalThg (|scdecl| d, |asmreg| Mode = nil,  |asmreg|) // asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType as ASMReg.FromExistingVar
 
 	(t is param) = d is param
-	(t is constoutput) = d is const
-	(t is reference) = d is Reference
-	
+	(t is constoutput) = d is const	
 	if  d isnt AlteredInBranch
 		(t is NotAlteredInbranch)
 		|| f = .registers[t.reg]

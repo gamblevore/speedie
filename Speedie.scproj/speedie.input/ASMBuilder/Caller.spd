@@ -81,197 +81,6 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	return dest
 
 
-
-function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
-	opt norefcounts
-	|| Start = .curr
-	|| OV = .OpenVars
-	
-	|ASMState| Old = .State				// can't use implicit types for barestructs
-	if dest isnt discard
-		if (!dest.reg or dest is temp)
-			|| type = fn.ASMReturn
-				// lets say it opened something, and then the next thing tried to declare a new var?
-				// lets say for a function call param thing?
-				// but otherwise, its the same.
-				dest = .declareme(prms, type)
-	
-	if dest isnt ExitFunction
-		.state.TailInlineable = false
-	
-	|int| D = ++.state.InlineDepth
-	.DeepestInline = D max .DeepestInline
-	
-	dest = dest.simplify
-	dest.µtype = fn.ASMRegType
-//	(dest is Inline)
-	.state.fn = fn
-	.state.Return = dest
-	.state.ParentVars = .openvars
-	.state.BranchDepth = 0
-	
-	|fatrange| LL
-	rz = .TryInlineSub(prms, fn, AllowedGain, LL)
-	if !rz
-		.SoftNopRange(start, .curr)				// rewind
-	
-	.state = old
-	if .state.InlineDepth == 0
-		.InlineEnd = nil
-	.CloseVars(OV) // should closevars come before restore? sigh. idk.
-
-
-//function PrmPrint (|string| s)
-//	opt norefcounts
-//	
-//	print s
-//	print " "
-//	printline .fn.exportname
-//	
-//	for a in .fn.Args
-//		print a.name
-//		print ": "
-//		print (a is const).render
-//		print ", "
-//		print (a is reference).render
-//		print ", "
-//		printline (a.wholetype.reg).render
-//	printline s
-//	printline
-//	printline
-
-
-function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
-	opt norefcounts
-	LL.Start = .curr
-
-	|SavedRegisters| regs 
-	regs.Collect(fn.args, self)
-	
-	.InlineParameters(prms)
-	|| RealStart = .curr					// Params need to be done anyhow... so don't count them.
-	asmtype.ArgumentSub(self, fn.SourceArg!)
-	regs.Restore(fn.args)
-	
-	ll.after = .curr
-	|| Result = .InlineFinishWithConsts(ll)
-	|| Grown = .CurrGain(RealStart)
-	if Grown <= AllowedGain
-		if !result
-			(result is ConstOutput)			// no longer zero
-		return Result
-	
-	regs.Rewind(self)
-
-
-function UpdateInlineReg (|asmreg| V, |scdecl| D)
-	(d is const) = (v is ConstOutput) and (d isnt Altered)
-	v.TmpCheck
-	D.AsmReg = v												// update reg!
-
-
-function PreInlineOneParam (|message| p, |scdecl| a, |$uint64| RegTracker,  |asmreg|)
-	opt norefcounts
-	p = p.ASMUnbra
-	require (p.func == @thg)
-	|| d = p.ASMDecl
-	if (a isnt alteredorref) and (d is Const) and !d.mu.ExportPosition
-		return asmreg()
-	
-	require d is local
-	|| v = .LocalThg(d)
-	require  a is reference  or  a isnt altered  or  .state.return iz v
-	|uint64| vr = 1<<v.reg
-	if a is AlteredOrRef
-		vr <<= 32
-	RegTracker |= vr
-	(a is reference) = (d is reference)
-	return v
-
-
-
-function ClearInlineParamClash (|[scdecl]| args, |&asmreg| Items, |int| NeedsHelp)
-	opt norefcounts
-	
-	|| n = args.Length
-	while n-- > 0
-		|| a = args[n]!
-		|| V = items[n]
-		if (a isnt Reference) and NeedsHelp[V.reg]
-/			V = nil
-			items[n] = v
-
-
-function InlineParameters (|message| prms)
-	opt norefcounts
-	
-	|asmreg[10]| Items
-	|uint64|     T
-	|| args = .fn.args
-	|| p = prms.first!
-	for (a in args) (i)
-		Items[i] = .PreInlineOneParam(p!, a, T)
-		p++
-
-	|| T2 = T&(T>>32)
-		.ClearInlineParamClash(args, Items, T2)
-
-	p = prms.first!
-	for (a in args) (i)
-		|| V = Items[i]
-		if !V
-			V = asmreg.set * (A is AlteredOrRef)
-			V = .µgetReal(p, a, V)
-		.UpdateInlineReg(V, a)
-		p = p.next!
-
-
-	
-function CurrGain (|&fatasm| Start, |int|)
-	|| C = .curr
-	while Start < C
-		rz += start.GuessSize
-		start++ 
-		
-
-function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
-	opt norefcounts
-	require .state.InlineDepth < .InlineDepthLimit
-	|| N = fn.µlength
-	require N and !fn.HasCVersion
-
-	|| MaxEnd = .InlineEnd
-		|| SubInline = .curr + (N / 3)
-		require SubInline < MaxEnd
-
-	|| AllowedGain = 5 + (fn is inline) * 23		// Assume that functions have 5 instruction overhead.
-	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
-
-	if .length < 16K								// Don't risk overflowing max-size
-		AllowedGain += (fn.LinkFrom == 1)<<6		// Allow bigger functions inlined if called once.
-													// (needs marked as removed!!)
-	AllowedGain -= .State.inlinedepth
-	
-	for p.fast in prms
-		Grace += .IsASMConst(p)<<2
-
-	require (AllowedGain + Grace)|uint| > fn.µlength
-
-	if !.state.InlineDepth
-		.InlineDepthLimit = 3
-		.DeepestInline = 0
-		.InlineEnd = .curr + AllowedGain
-	
-	|| I = .TryInline(prms, dest, fn, AllowedGain)
-		return I
-	
-	// try weaker inline
-	require !.state.InlineDepth and (.DeepestInline > 1)
-
-	.InlineDepthLimit = 1
-	return .TryInline(prms, dest, fn, AllowedGain)
-
-
 function RegClear (|message| exp, |&fatasm| C, |int| i)
 	c.prms[5] = 0
 	|| L = c.Const
@@ -367,3 +176,22 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	.CurrFuncGrab--
 	return fat * dest
 		
+
+//function PrmPrint (|string| s)
+//	opt norefcounts
+//	
+//	print s
+//	print " "
+//	printline .fn.exportname
+//	
+//	for a in .fn.Args
+//		print a.name
+//		print ": "
+//		print (a is const).render
+//		print ", "
+//		print (a is reference).render
+//		print ", "
+//		printline (a.wholetype.reg).render
+//	printline s
+//	printline
+//	printline

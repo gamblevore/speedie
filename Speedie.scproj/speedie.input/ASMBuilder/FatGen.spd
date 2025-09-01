@@ -965,7 +965,6 @@ function message.WR16 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 function message.CNTC (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil, |int| cnst = nil, |int| size = nil, |&fatasm|) {
 	visible
-	if "InlineParam".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.CNTC, self)
 	rz.dest(0, r1, a)

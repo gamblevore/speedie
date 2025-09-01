@@ -11,8 +11,6 @@ struct FatASM
 	|byte| 				_Outputs
 	|byte|				_Op
 	|byte|				JumpReg
-//	|byte| 				BranchDepth
-//	|byte| 				LoopDepth
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
@@ -37,8 +35,6 @@ struct FatASM
 		.InputRegs = 0
 		.jumpreg = 0
 		._Outputs = 0
-//		.BranchDepth = 0
-//		.LoopDepth = 0
 		.info = nil // ??? nothing needs this?
 		// leave msg, and _const. Other things may need them still.
 		for i in –count .prms
@@ -177,8 +173,10 @@ struct FatASM
 		
 		
 	function assembler.ReDest (|fatasm| f, |asmreg| info, |uint| a, |asmreg|)
-		// lets see.
-		|| U = f.info // save old info. probably quite good.
+		// what if the old is a ref and new isnt,  or new is a ref and old isnt?
+		// references need to be incremented, as their output is needed.
+		
+		|| U = f.info
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
 			.RemoveReg(old, f)
 		
@@ -211,23 +209,14 @@ struct FatASM
 			return .Prms[o]
 
 
-	function RefReplace (|uint| changed, |&assembler| sh)
-		.µRefCount++
-		|| old = sh.Registers[changed]
-		require old and old.BasicBlock == .BasicBlock
-		if old isnt Reference // huh?
-		// must be a reference also by now.
-		sh.softnop(old) // could be a normal nop but lets do it later.
-		
-
 	function assembler.KnownValues (|int| changed, assigns:|bool|)
 		|| M = sh.knownvaluesmap
 		changed = 1 << changed
 		if Value
-			m|=changed
+			m |=  changed
 		  else
-			m&=~changed
-		sh.knownvaluesmap = M
+			m &=~ changed
+		sh.KnownValuesMap = M
 			
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
@@ -236,8 +225,9 @@ struct FatASM
 		._Outputs |= 1 << a
 		changed &= 31
 		if changed
-			if info is reference
-				.RefReplace(changed, sh)
+//			if sh.References[Changed]   // Do we need this? local vars are considered altered anyhow
+//				.µRefCount++			// We don't remove useless writes...
+
 			sh.Register(changed) = self
 			sh.KnownValues(Changed) = info is knownconst
 			
