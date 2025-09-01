@@ -1,12 +1,5 @@
  
 
-// use the simplegraph instead...
-// this way... document can have multiple viewers...
-// and viewers can have multiple documents... 
-// for example, a project has a something open.
-// i wonder how do we describe the strength of the link, though?
-
-
 class Document (list)
 	linkage
 		cpp_part Doc
@@ -208,28 +201,41 @@ class Document (list)
 //		|| c = .current
 //			return c.text.length
 
-
+	
+	function DocumentViewer.NextViewer (|?$DocumentViewer| out, |textview|)
+		opt norefcounts
+		|| it = .Viewer
+		out = .next
+		if !it.Window
+			.Remove
+			return nil
+		if it isa TextView
+			return it
+		
 	function ShowParseErrorInViewers
 		opt norefcounts
-		for it in .viewers
-			if it isa textview
+		|| v = .viewers.first
+		while v
+			|| it = v.NextViewer(v)
 				it.parse
-
 
 	function UpdateViewers (|int| Reason)
 		opt norefcounts
 		|| a = .current$
-		for it in .viewers
-			if it isa textview
+		|| v = .viewers.first
+		while v
+			|| it = v.NextViewer(v)
 				it.UseState(a,  self,  a.typingplace, Reason)
 
 
 	function UpdateSavedState 
 		opt norefcounts
-		for it in .viewers
-			if it isa textview
+		|| v = .viewers.first
+		while v
+			|| it = v.Nextviewer(v)
 				(it is modified) = false
 				(it.ontextchanged)(it, documentstate.Saving, false)?
+				
 
 
 	function LoadSub (|bool| ChangedExternal, |bool|)
