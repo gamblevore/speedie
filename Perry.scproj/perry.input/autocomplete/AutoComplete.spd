@@ -329,6 +329,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 
 function EditMeModified (guitextevent)
 	|| i = .ide
+	require i? // somehow we are getting called when we are nil?
 	i.LastSendTime = 0
 	require i.SharedProjectTabSource
 	i.EditMeTabRetryThing = 0
