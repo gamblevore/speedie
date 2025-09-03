@@ -1,19 +1,21 @@
 #!/usr/local/bin/spd
 
-
 // Just an example project!
-|| Excludes = "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal"  /  ','
+
+|| X = (app["exclude"] ?? "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal")
+|| Excludes = (X  /  ',')
 
 main (|file.existing| input)
-	"Excluding: $Excludes\n"
-	
-	|| out = (app.Archive(input), app.Unarchive(input))(input.IsDir)
+	|| out = app.Process(input)
 		"${out.name}: ${out.size.strsize}"
-
-
-function app.Archive (|file| input, |file|)
-	|| out = jbin(@tmp, "archive")
+	
+	
+function app.Process (|file| input, |file|)
+	if !input.IsDir
+		return app.UnArchive(input)
+	
 	rz = input.SetExt("arc").file
+	|| out = jbin(@tmp, "archive")
 	out.file = rz
 	out.AddStr(input.name)
 	out.Enter
@@ -23,16 +25,15 @@ function app.Archive (|file| input, |file|)
 
 function jbin.ArchiveSub (|file| Item)
 	for ch.files in item
-		if !ch.isSymlink
-			if ch.lowercase globbed_by Excludes
-				"!! $ch"
-			  elseif ch.isdir
-				.ArchiveSub(ch)
-			  else
-				.enter(@tmp, ch)
-				.AddStr(ch.readall)
-				.exit
+		if ch.lowercase globbed_by Excludes
+			"!! $ch"
+		  elseif !ch.isdir
+			.enter(@tmp, ch)
+			.Add(@bin, ch.readall) // !>:3
+			.exit
+		  elseif !ch.isSymlink
+			.ArchiveSub(ch)
 	
 
 function app.UnArchive (|file| input, |file|)
-	// not implemented
+	// just an example for now
