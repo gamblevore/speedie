@@ -191,7 +191,7 @@ class FastString {
 		real self
 		data.Render(self)
 
-	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
+	function AppendIntegerAsText (|int64| data, |int| PadTo = 1)
 		cpp_wrapper JB_FS_AppendIntegerAsText
 
 	function AppendInteger (|int64| data, |int|RoundTo=1)
@@ -225,12 +225,8 @@ class FastString {
 		cpp_part AppendInt32
 		.AppendIntegerAsText(data, 1)
 		
-	function AppendFile (|File| f, |bool|)
-		if f.opened
-			return .appendpipe(f.descriptor, 0)
-		
-	helper AppendPipe (|int|fd, |int| mode, |bool|)
-		cpp_wrapper JB_FS_AppendPipe // (FastString* self, int fd, int Mode)
+//	function AppendFile (|File| f, |int64| N=-1, |bool| LeaveOpen=false,  |ErrorInt|)
+//		cpp_wrapper JB_FS_AppendFile
 	
 	syntax cast (|string|)
 		return .getresult

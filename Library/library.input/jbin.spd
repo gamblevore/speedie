@@ -15,7 +15,6 @@ extend message
 		js <~ _JbinHeader
 		.render_jbin_sub(js)
 	
-	
 	helper render_jbin_sub (|jbin| js)
 		opt norefcounts
 		|| ch	 = self
@@ -38,12 +37,35 @@ role JBin (Faststring)
 	constructor (|int| n)
 		cpp_part Constructor0
 		if n // what?
+
 	function Enter		(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
+
+	function Exit
+		cpp_Part Exit0
+		|| n = .indent
+		.Indent = 0
+		.Exit(n)
+	
+	function Exit (|int| amount, |int|)
+		|| add = 239
+		while amount > 0
+			rz++
+			|| B  = (add + amount)  min  (255)
+			self    <~ B|byte|
+			amount  -= (B-add)
+
 	function Tmp		(|string| name, |jbinLeaver|)
 		.Enter(@tmp, name)
 		.Enter(@arg)
 		return 2
+
+	function Sheb		(|string| name)
+		self <~ '#'
+		self <~ '!'
+		self <~ name
+		self <~ '\n' // noice
+	
 			
 	function AddStr		(|string| name)
 		.add(@str, name)
@@ -55,39 +77,11 @@ role JBin (Faststring)
 		cpp_part AddFS
 		return .addmemory(Type, fs.length, into, fs.Resultptr)
 
-
-	function AddComp (|stringreader| str,  |syntax| Type=@bin,  |compressionstats| Stats,  |int| strength=mzlab.strongest)
-		|| Place = .OpenSection		
-		str.compressinto(self, strength, stats)
-		.CloseSection(Place.x, place.y, Type)
-
-		
-	function Sheb		(|string| name)
-		self <~ '#'
-		self <~ '!'
-		self <~ name
-		self <~ '\n' // noice
-
-	function Exit
-		cpp_Part Exit0
-		|| n = .indent
-		.Indent = 0
-		.Exit(n)
-	
-	
-	function Exit (|int| amount, |int|)
-		|| add = 239
-		while amount > 0
-			rz++
-			|| B  = (add + amount)  min  (255)
-			self    <~ B|byte|
-			amount  -= (B-add)
-
 	function AddCstring (|syntax| type=@str, |cstring| name)
 		.AddMemory(type, name.length, false, name|&byte|)
 	
 	function AddMemory (|syntax| type, |uint64| L, |bool| GoIn=false, |?&byte| data=nil, |jbinleaver|)
-		|int| T = (type|int|<<1) ||| (goin)
+		|| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
 		.AppendHInt(L)
 		if data
@@ -96,30 +90,39 @@ role JBin (Faststring)
 		return goin|int|
 
 
-	helper OpenSection  (|ivec2|)							// openstream 
-		++.NoFlush
-		.length += 6
-		return (.length, .reserved)
+//	function AddFile (|syntax| type=@bin, |file| F)
+//		|| T = type|int|<<1
+//		self <~ T|byte|
+//		|| L = f.size
+//		.AppendHInt(L)
+//		if L
+//			.ApendFile(f, L)
 
-	helper CloseSection (|int| c, |int| r, |syntax| Type)	// closestream
-		|| CurrLen = .length
-		expect (CurrLen >= c) (self, "Unable to close section")
-		.length = c - 6
-		|| blen = 5
-		c = CurrLen - c
-		|| Actual = c
-		while {
-			Actual >>= 7
-			--blen
-		} (Actual)
 
-		self <~ (0|byte|, blen) 
-		self <~ (Type|int|<<1)|byte|
-		.AppendHInt(c)
-		.length = CurrLen
-		|| nf = --.NoFlush
-		if !nf and .Length >= r>>1 // 50%
-			.flush
+//	helper OpenSection  (|ivec2|)							// openstream 
+//		++.NoFlush
+//		.length += 6
+//		return (.length, .reserved)
+//
+//	helper CloseSection (|int| c, |int| r, |syntax| Type)	// closestream
+//		|| CurrLen = .length
+//		expect (CurrLen >= c) (self, "Unable to close section")
+//		.length = c - 6
+//		|| blen = 5
+//		c = CurrLen - c
+//		|| Actual = c
+//		while {
+//			Actual >>= 7
+//			--blen
+//		} (Actual)
+//
+//		self <~ (0|byte|, blen) 
+//		self <~ (Type|int|<<1)|byte|
+//		.AppendHInt(c)
+//		.length = CurrLen
+//		|| nf = --.NoFlush
+//		if !nf and .Length >= r>>1 // 50%
+//			.flush
 
 
 

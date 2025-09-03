@@ -266,14 +266,36 @@ int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComm
 }
 
 
-int JB_Sh_UpdatePipes(ShellStream* self) {
+int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, int AsFile, u8* Name);
+
+
+int UpdatePipesSub_(ShellStream* self, FastString* FS, int& fd, int64& N) {
+	if (!FS or fd < 0)
+		return 0;
+	uint8* Buffer = JB_FS_WriteAlloc_(FS, 64 * 1024);
+	if (!Buffer) return -1;
+
+	auto Name = self->Path->Addr;
+	int Error = ReadIfItWasDoneProperly(fd, Buffer, 64 * 1024, N, 0, Name);
+	if (Error == 0)
+		pipe_close(fd);		// close the thing here if its finished? might as well?
+	JB_FS_AdjustLength_(FS, 64 * 1024, (int)N);
+    return Error;
+}
+
+
+bool UpdatePipes_(ShellStream* self, int64& Read) {
 	auto& Sh = *self;
 	CheckStillAlive(self);
-	int ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], 1);
-	// this will only return, once the app has finished... unless we are Streaming.
-	// either way, if both return false, we can finish.
-	int ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], 1);
-	return ContinueOut | ContinueErr;
+	int ContinueOut = UpdatePipesSub_(self, Sh.Output,      Sh.CaptureOut[RD], Read);
+	int ContinueErr = UpdatePipesSub_(self, Sh.ErrorOutput, Sh.CaptureErr[RD], Read);
+	return (ContinueOut > 0) or (ContinueErr > 0);
+}
+
+
+void JB_Sh_UpdatePipes(ShellStream* self) {
+	int64 Read = 0;
+	UpdatePipes_(self, Read);
 }
 
 
@@ -309,12 +331,13 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FS
 		ExitAfter = JB_Date__Now() + TimeOut;
 
 	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
-		bool DidAnything = JB_Sh_UpdatePipes(Sh) & 2;
+		int64 ReadAmount = 0;
+		UpdatePipes_(Sh, ReadAmount);
 		if (JB_PID_Status(Sh) != -1)
 			break;
 		if (TimeOut > 0) {
 			auto Now = JB_Date__Now();
-			if (DidAnything)
+			if (ReadAmount > 0)
 				ExitAfter = Now + TimeOut;
 			  else if (Now >= ExitAfter)
 				break;
@@ -364,7 +387,7 @@ ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
 		self->CaptureOut[i] = -1;
 	
 	self->IsClosed = false;
-	self->Path = JB_Incr(Path);
+	self->Path = JB_Incr(JB_Str_MakeC(Path));
 	return self;
 }
 
@@ -402,7 +425,8 @@ bool JB_Sh_Step(ShellStream* self) {
 	ShellStream& Sh = *self;
 	if (!Sh.IsClosed) {
 		Smooth_(Sh);
-		if (JB_Sh_UpdatePipes(self)&1)
+		int64 ReadAmount = 0;
+		if (UpdatePipes_(self, ReadAmount)>0) // means continue... there is more to get.
 			return true;
 		JB_FEPDWEE_Finish(Sh);
 	}

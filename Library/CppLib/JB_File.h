@@ -38,7 +38,6 @@ void JB_File_ListEnd( JB_DirReader* self );
 //bool JB_File_ListActive( JB_File* self );
 
 JB_Object JB_File__File( JB_File* self );
-int JB_FS_AppendPipe(FastString* self, int fd, int Mode);
 
 int* JB_File__Compar();
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing );
@@ -59,8 +58,7 @@ bool JB_File_IsLink (JB_String* self);
 void JB_munmap (void* mem, int64 n);
 int JB_Str_MakeDir(JB_String* self);
 int JB_File_RelaxPath(JB_File* self, bool NeedsMode);
-JB_String* JB_File_Read(JB_File* self, IntPtr Length, bool Ignore);
-JB_String* JB_File_ReadFD( int* FD, int Length, JB_String* Path );
+JB_String* JB_File_Read(JB_File* self, int Length, bool Ignore);
 bool JB_File_DataSet( JB_File* self, JB_String* Data );
 JB_File* JB_Str_File( JB_String* Path );
 JB_File* JB_File__NewPipe(int Pipe);

@@ -244,6 +244,8 @@ static bool IsLink_(const char* Path) {
 
 
 static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
+	// sometimes doing stuff in sudo leaves "root" owned files all over
+	// which is not what we wanted.
 	require (SudoRelax > 0);
 	static int ChangeOwner;
 	static int GID;
@@ -357,7 +359,7 @@ uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // just use posix func
 }
 
 
-int JB_File_OpenStart( JB_File* f, bool AllowMissing ) {
+int File_GoToStart( JB_File* f, bool AllowMissing ) {
 	int FD = f->Descriptor;
 	if (FD >= 0) {
 		int err = JB_File_OffsetSet(f, 0);
@@ -403,49 +405,30 @@ int JB_Write_(int fd, uint8* buffer, int N) {
 }
 
 
-// does what read() SHOULD do.
-// returns errno, and errno > 0
-// so when we set Error to -1 or -2, its clear that it is not a number from errno. basically, not an error.
-static int InterRead (int fd, unsigned char* buffer, int N, JB_String* ErrorPath, int& Error, int Mode) {
-    int Total = 0;
-	Error = 0;
-    do {
-		// read() has 6 possible cases! i hate read()
-		int nread = (int)read(fd, buffer, N);
-		if (nread > 0) {				// partial
-            Total += nread; buffer += nread; N -= nread;
-			if (N <= 0) {
-				Error = -2;
-				return Total;			// finished
-			}
-			if (Mode == 1) {			// only single step, be responsive
-				Error = -1;
-				return Total;
-			}
-	        continue;
+int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, int AsFile, const char* Path) {	
+    do { // read() forces me to deal with 9 cases. :[
+		int nread = (int)read(fd, Out, Request);
+		if (nread > 0) {
+            Total += nread; Out += nread; Request -= nread;
+			if (AsFile <= 0)									// 1) Let pipe get partial data. More responsive.
+				return 1;										//    (pipes delay stuff?)
+			if (Request <= 0)									// 2) We got the full requested amount.
+				return 1;										
+	        continue;											// 3) keep reading!
 		}
-		if (nread == 0) {
-			Error = 0;
-			return Total;				// finished
-		}
-		Error = errno; // earlier, for debug
-		if (Error == EINTR)
+		if (nread == 0) return 0;								// 4) Pipe is closed, or file EOF.
+		int Error = errno;
+		if (Error == EINTR)										// 5) Retry ;_;
 			continue;
-		if (Error==EWOULDBLOCK  or  Error==EAGAIN) {
-			Error = -1;
-			return Total;
+		if (Error == EWOULDBLOCK  or  Error == EAGAIN) {
+			if (AsFile <= 0)
+				return 1;										// 6) Tell pipe to retry later
+			if (++AsFile < 1024)
+				continue;										// 7) Files need a full read.
+			 													// 8) File failed too many times, give up.
 		}
-		if (!Error)
-			Error = EIO;
-		break;
+		return -JB_ErrorHandleFileC(Path, Error, "reading");	// 9) return error
     } while (true);
-
-    if (!ErrorPath and isatty(fd))
-        JB_ErrorHandleFileC(ttyname(fd), Error, "reading");
-      else
-        ErrorHandle_( -1, ErrorPath, nil, "reading" );
-    
-    return Total;
 }
 
 
@@ -460,7 +443,8 @@ int JB_App__GetChar() {
 
 	tcgetattr(STDIN_FILENO, &tio);	/* get the terminal settings for stdin */
 
-//	/* disable canonical mode (buffered io) and local echo */
+//  Disable canonical mode (buffered io) and local echo
+
 	tcflag_t PrevFlag = tio.c_lflag; 
 	tio.c_lflag &=~ (ICANON|ECHO);
 	tcsetattr(STDIN_FILENO, TCSANOW, &tio);
@@ -473,17 +457,6 @@ int JB_App__GetChar() {
 	tcsetattr(STDIN_FILENO, TCSANOW, &tio);
 	
 	return c;
-}
-
-static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
-	uint8* Buffer = JB_FS_WriteAlloc_(self, Desired);
-	int Error = -1;
-	int N = 0;
-	if (Buffer) { 
-		N = InterRead(fd, Buffer, Desired, 0, Error, Mode);
-		JB_FS_AdjustLength_(self, Desired, N);
-	}
-	return Error;
 }
 
 
@@ -512,44 +485,47 @@ void JB_Rec__CrashLog(const char* c) {
 }
 
 
-int JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
-	if (!self)
-		return 0;
-	int OrigLength = JB_FS_StreamLength(self);
-	int Error = 0;
-    while (fd >= 0) {
-// Error:
-//	0  means finished. we wanna close. Same with errors. So (>= 0) --> close
-//  -1 means  call back later
-//  -2 means we need more buffer
-		Error = InterPipe(self, 64 * 1024, fd, Mode);
-		if (Error >=  -1) break;
-    }
-	int Result = Error == -1;
-	if (OrigLength < JB_FS_StreamLength(self))
-		Result |= 2;
 
-// return codes:
-	//  &1  means call back later.
-	// !&1  means we are finished.
-	//  &2  means we got anything
-	// !&2  means we got nothing
-    return Result;
+int JB_FS_AppendFile(FastString* self, JB_File* F, uint64 L, bool LeaveOpen) {
+	// Pass the exact amount to append, or -1 to append all.
+	debugger;
+	if (!self or !L or !F)
+		return 0;
+	int fd = JB_File_Open(F, 0, false);
+	if (fd < 0)
+		return -1;
+	
+	int Error = 0;
+    while (true) {
+		uint Req = (uint)std::min(L, (uint64)(64*1024));
+		uint8* Buffer = JB_FS_WriteAlloc_(self, Req);
+		int64 N = 0;
+		Error = ReadIfItWasDoneProperly(fd, Buffer, Req, N, true, (const char*)F->Addr);
+		JB_FS_AdjustLength_(self, 64 * 1024, (int)N);
+		if ((int64)L>0)
+			L -= N;
+		if (Error < 0 or L==0) break;
+	}
+	if (!Error and (int64)L > 0)
+		Error = -JB_ErrorHandleFile(F, nil, EIO, nil, "reading"); // File smaller than expected
+	if (!LeaveOpen)
+		JB_File_Close(F);
+	return Error;
 }
 
 
 JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 	JB_String* Result = JB_Str__Error();
 	if (self) {
-		bool WasOpen = HasFD(self);
-		int FD = JB_File_OpenStart(self, AllowMissing);
+		bool WasOpen = self->Descriptor > STDPICO_FILENO;
+		int FD = File_GoToStart(self, AllowMissing);
 		if (FD == -2) { // ignore it
 			Result = JB_Str__Empty();
 		
 		} else if (FD >= 0) {
 			s64 S = JB_File_Size(self); 
 			if (S <= (s64)lim) {
-				Result = JB_File_Read( self, S, AllowMissing );
+				Result = JB_File_Read( self, (int)S, AllowMissing );
 				if (!WasOpen)
 					JB_File_Close(self);
 			} else {
@@ -662,7 +638,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 		return Result;
 	}
 #else
-	int _NSGetExecutablePath(char* buf, u32* length); // oh apple...
+	int _NSGetExecutablePath (char* buf, u32* length); // oh apple...
 	JB_String* JB_App__Path() {
 		static JB_String* Result;
 		if (!Result) {
@@ -677,7 +653,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 #endif
 
 
-int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
+int JB_App__SetEnv (JB_StringC* name, JB_StringC* value) {
 	if (name) {
 		if (value)
 			return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
@@ -687,24 +663,24 @@ int JB_App__SetEnv(JB_StringC* name, JB_StringC* value) {
 }
 
 
-static JB_String* FileAlloc( JB_File* self, IntPtr Length ) {
-    JB_String* Str = JB_Str_New( Length );
-    if (!Str)
-		JB_ErrorHandleFile(self, nil, ENOMEM, nil, "reading");
-    return Str;
-}
-
-
-JB_String* JB_File_Read( JB_File* self, IntPtr Length, bool AllowMissing ) {
+JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
+	if (Length <= 0)
+		return JB_Str__Empty();
     int FD = JB_File_Open( self, O_RDONLY, AllowMissing );
     JB_String* Result = JB_Str__Error();
     if (FD >= 0) {
-		Result = FileAlloc( self, Length );
+		Result = JB_Str_New( Length );
 		if (Result) {
-			int Error = 0;
-			int Mode = (self->MyFlags & 2) != 0;
-			Length = InterRead( FD, Result->Addr, (int)Length, self, Error, Mode );
-			Result = Str_Shrink( Result, (int)Length );
+			int64 Total = 0;
+			int Read = ReadIfItWasDoneProperly( FD, Result->Addr, Length, Total, true, (const char*)(self->Addr) );
+			if (Read < 0) {
+				JB_FreeIfDead(Result);
+				Result = JB_Str__Error();
+			} else {
+				Result = Str_Shrink( Result, (int)Total );
+			}
+		} else {
+			JB_ErrorHandleFile(self, nil, ENOMEM, nil, "reading");
 		}
 	}
 	JB_Flow__Report(Result, self);
@@ -712,7 +688,7 @@ JB_String* JB_File_Read( JB_File* self, IntPtr Length, bool AllowMissing ) {
 }
 
 
-bool JB_File_EOF( JB_File* self ) {
+bool JB_File_EOF ( JB_File* self ) {
     if (HasFD(self)) {
         off_t Cur = JB_File_Offset(self);
         if (Cur >= 0) {
@@ -725,7 +701,7 @@ bool JB_File_EOF( JB_File* self ) {
 }
 
 
-int64 JB_File_WriteRaw_( JB_File* self, uint8* Data, int N ) {
+int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
     N = JB_Write_( self->Descriptor, Data, N );
     return ErrorHandle_(N, self, nil, "write to");
 }
@@ -1010,7 +986,7 @@ int JB_File_SizeSet( JB_File* self, IntPtr N ) {
 	if (fd < 0)
 		return fd;
 	int err = ftruncate(self->Descriptor, N);
-	return ErrorHandle_( err,  self,  nil,  "set size of" );
+	return (int)ErrorHandle_( err,  self,  nil,  "set size of" );
 }
 
 
@@ -1136,26 +1112,26 @@ int CopyStats_(JB_File* self, JB_File* To) {
 	return 0;
 }
 
+
 int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!self or !To)
 		return -1;
 	if (AttrOnly)
 		return CopyStats_(self, To);
-	bool WasOpen = self->Descriptor > 2;
-	int output = JB_File_OpenBlank(To);
-	if (output < 0)
+	bool WasOpen = self->Descriptor > STDPICO_FILENO;
+	int Output = JB_File_OpenBlank(To);
+	if (Output < 0)
 		return -1;
 
-	int result = 0;
-	int input = JB_File_OpenStart( self, false );
-	if (input > 0) {
+	int Read = 1;
+	int Input = File_GoToStart( self, false );
+	if (Input > 0) {
 		const int ChunkSize = 64*1024;
 		u8 Block[ChunkSize];
-		while (true) {
-			int Err = 0;
-			result = InterRead(input, Block, ChunkSize, self, Err, 0);
-			if (result <= 0) break;
-			if (JB_File_WriteRaw_(To, Block, result) <= 0)
+		while (Read > 0) {
+			int64 Total = 0;
+			Read = ReadIfItWasDoneProperly(Input, Block, ChunkSize, Total, true, (const char*)self->Addr);
+			if (JB_File_WriteRaw_(To, Block, (int)Total) <= 0)
 				break;
 		}
 	}
@@ -1164,9 +1140,8 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!WasOpen)
 		JB_File_Close(self);
 	CopyStats_(self, To);
-	if (result)
-		JB_ErrorHandleFile(self, To, errno, nil,  "copying");
-	return result;
+	if (Read == 1) Read = 0;
+	return Read;
 }
 
 
@@ -1208,7 +1183,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 
 
 bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
-	bool WasOpen = HasFD(self);
+	bool WasOpen = self->Descriptor > STDPICO_FILENO;
 	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false) < 0)
 		return false;
 	JB_File_SizeSet(self, 0);
@@ -1290,7 +1265,7 @@ JB_String* JB_File_CurrChild (JB_DirReader* self, int MakeDirsObvious) {
 #if __PLATFORM_CURR__ == __PLATFORM_OSX__
     NameLength = Child->d_namlen;
 #endif
-    if ( ! NameLength ) NameLength = strlen( Child->d_name );
+    if ( ! NameLength ) NameLength = (int)strlen( Child->d_name );
 
 	int IsDir = (MakeDirsObvious!=0) and ChildIsDir(self->File, MakeDirsObvious, Child, NameLength);
 	// what about if its not? we need the full-file-path, then. So we need to concat two strings.

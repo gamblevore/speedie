@@ -19,7 +19,7 @@ JBClass( FastString, JB_Object,
     uint8*			ResultPtr;
     JB_String*      Result;
     JB_File*        File;
-    int             WrittenLength;
+    int64           WrittenLength;
 	int 			Reserved;		// actual size of buffer. here for speeeed.
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
@@ -46,12 +46,6 @@ FastString* JB_FS__FastNew(FastString* Old);
 JB_String* JB_FS_SmartResult(FastString* fs, JB_Object* Orig);
 FastString* JB_FS__FileFlush(JB_File* f);
 JB_String* JB_FS_Return( JB_String* Data, FastString* Orig );
-#ifdef TARGET_WIN32
-	#define JB_FS_AppendFileChar( a, b ) JB_FS_AppendShort( a, b )
-#else
-	#define JB_FS_AppendFileChar( a, b ) JB_FS_AppendByte( a, b )
-#endif 
-
 uint8*  JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
 bool JB_FS_SizeIf_( FastString* fs, int InitLength);
 FastString* JB_FS__New();

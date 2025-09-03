@@ -197,7 +197,7 @@ JB_String* JB_Str_New (int64 Length) {
 
 
 // calls freeifdead
-JB_String* Str_Shrink(JB_String* u, int Length) {
+JB_String* Str_Shrink (JB_String* u, int Length) {
 	if (!u or u->Length == Length) {
 		return u;
 	}

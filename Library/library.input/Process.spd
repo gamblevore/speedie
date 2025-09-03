@@ -29,11 +29,12 @@ class Process (ProcessOwner)
 	function ClosePipes
 		cpp_wrapper JB_Sh_ClosePipes
 
-	function UpdatePipes (|bool|)
+	function UpdatePipes
+		description `Updates .Output and .ErrorOutput`
 		cpp_Wrapper JB_Sh_UpdatePipes
 	
 	function Step (|bool|)
-		description `Returns false if the process has exited.`
+		description `Returns false if the process has exited. Also calls .UpdatePipes interally.`
 		cpp_wrapper JB_Sh_Step
 
 	function ReadStdOut (|string|)
