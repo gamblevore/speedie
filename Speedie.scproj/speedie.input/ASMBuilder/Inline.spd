@@ -14,19 +14,29 @@ struct InlineInfo
 
 		.Cleanup(args)
 
+
+	function NopConsts (|int| n)
+		|| sh = Assembler.sh
+		while  --n >= 0
+			|| r = .Items[n] // now what to do?
+			if r is ConstOutput
+				sh.Decr(r.needfat, false)
+
+	
 	function PreInlineOneParam (|message| p, |scdecl| a, |assembler| sh, |asmreg|)
 		opt norefcounts
 		p = p.ASMUnbra
 		require (p.func == @thg)
 		|| d = p.ASMDecl
-		if (a isnt alteredorref) and (d is Const) and !d.mu.ExportPosition
-			return asmreg()
+		if (d is Const) and !d.mu.ExportPosition
+			if a isnt alteredorref
+				return asmreg()
+			return asmreg.set
 		
 		require d is local
 		|| v = sh.LocalThg(d)
 		require  a is reference  or  a isnt altered  or  sh.state.return iz v
 		|| vr = 1<<v.reg
-		
 		
 		if a is Reference
 			.References |= vr
@@ -53,7 +63,7 @@ struct InlineInfo
 		while n-- > 0
 			|| V = .items[n]
 				|| a = args[n]!
-				|| r = v.reg
+				|| r = 1<<v.reg
 				if (AR & r) and (a isnt reference)
 					.items[n] = asmreg.set				// needs copy to save other regss
 				  elseif (AN & r) and (a is altered)
@@ -103,40 +113,44 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	LL.Start = .curr
 
 	|SavedRegisters| regs 
+	|InlineInfo| Info
+
 	regs.Collect(fn.args, self)
 	
-	.InlineParameters(prms)
+	.InlineParameters(prms, info)
 	|| RealStart = .curr					// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
+	info.NopConsts(fn.args.length)
 	regs.Restore(fn.args)
 	
 	ll.after = .curr
-	|| Result = .InlineFinishWithConsts(ll)
+	rz = .InlineFinish(ll)
 	|| Grown = .CurrGain(RealStart)
 	if Grown <= AllowedGain
-		if !result
-			(result is ConstOutput)			// no longer zero
-		return Result
-	
-	regs.Rewind(self)
+		if !rz
+			(rz is ConstOutput)			// no longer zero
+	  else
+		regs.Rewind(self)
 
 
 function UpdateInlineReg (|asmreg| V, |scdecl| D)
+	if v is constoutput
+		v.incr
 	(d is const) = (v is ConstOutput) and (d isnt Altered)
 	v.TmpCheck
 	D.AsmReg = v												// update reg!
 
 	
-function InlineParameters (|message| prms)
+function InlineParameters (|message| prms, |InlineInfo| Info)
 	opt norefcounts
 	|| p = prms.first$
-	|InlineInfo| Info
+
 	info.Fix(p, .fn.args)
 
 	for (a in .fn.args) (i)
 		|| V = info.Items[i]
-		if !(V asnt asmreg.set)
-			V = .µgetReal(p, a, V)
+		if !(V asnt asmreg.set) // its nil or set
+			V = .µGetReal(p, a, V)
 		.UpdateInlineReg(V, a)
 		p = p.next!
 

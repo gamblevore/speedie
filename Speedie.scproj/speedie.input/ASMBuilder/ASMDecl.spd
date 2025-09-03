@@ -39,7 +39,7 @@ struct SavedRegisters
 	function Restore (|[scdecl]| args)
 		opt norefcounts
 
-		expect args >= .RegCount
+		if args < .RegCount
 		for p.backwards in args
 			p.mu = .decls[--.RegCount]
 

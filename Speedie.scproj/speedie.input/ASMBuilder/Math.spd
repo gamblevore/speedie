@@ -634,6 +634,7 @@ extend Assembler
 		if asm.BORK!=asm.borr+4 // what?
 
 		if r.reg and (opp != asm.bnot) and !dest.IsVec
+			if "BecomeReal".trap
 			|| k = .Const(R, 14, true)
 				if 0:  exp.BORK,  exp.BXRK
 				|| fat = exp.BANK(dest, L, K) 
@@ -715,10 +716,11 @@ extend Assembler
 		if up > srcbits or down > SrcBits			// wierd?
 			problem (exp, "Shift too far")
 		
-		if !up and !down and (SrcBits >= dest.BitCount)
-/			return src
+		if !up and !down
+			if (SrcBits > dest.BitCount)
+			return src
 
-		down += 64 - (srcBits+up)
+		down += 64 - (SrcBits+up)
 		up = 64 - SrcBits
 		
 		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
@@ -730,7 +732,6 @@ extend Assembler
 
 	function Zeros (|asmreg| dest, |asmreg|)
 		rz = asmreg()
-		(rz is constinput) = (dest is ConstInput)
 		rz.µtype = dest.µtype
 	
 	
@@ -753,13 +754,13 @@ extend Assembler
 	
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
-		|| sr = src.reg
-		|| dr = dest.reg
-		if !sr										// must be assigning zero
-			return .LoadNumber(exp, 0, dest)		// More readable ASM.
-
-		if sr == dr
+		if src iz dest
 			return dest
+		
+		if !src.reg or src is constoutput			// must be assigning zero
+			return .LoadNumber(exp, src.Const, dest)		// More readable ASM.
+
+		if src is ConstOutput
 		
 		target debug: if (dest.IsVec != src.IsVec) and src.reg
 		
@@ -770,8 +771,8 @@ extend Assembler
 			return improve
 		
 		// BFLG is VERY optimisable :]  Prefered op for most things.
+		// but consts are even more optimisable
 		
-		dest = dest.CopyConst(Src)
 		|| sh = src.BitCount - dest.BitCount
 		if sh >= 0
 			// leave as is

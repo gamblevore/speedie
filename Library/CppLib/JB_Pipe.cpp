@@ -290,6 +290,13 @@ int UpdatePipesSub_(ShellStream* self, FastString* FS, int& fd, int& Total) {
 bool UpdatePipes_(ShellStream* self, int& Read) {
 	auto& Sh = *self;
 	CheckStillAlive(self);
+	// a better way, would be that each faststring, can contain a "message" that we send
+	// via another thread. Basically a block of memory we are allowed to write to
+	// Like u8* StreamBlock, int StreamBlockLength
+	// FastString should be allowed to lower the length
+	// how to syncronise it? Thats always fun. Use two lengths, as a ringbuffer?
+	// one writes, one reads.
+	 
 	int ContinueOut = UpdatePipesSub_(self, Sh.Output,      Sh.CaptureOut[RD], Read);
 	int ContinueErr = UpdatePipesSub_(self, Sh.ErrorOutput, Sh.CaptureErr[RD], Read);
 	return (ContinueOut > 0) or (ContinueErr > 0);

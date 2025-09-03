@@ -278,7 +278,7 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
 	|| A = exp.first!.asmunbra
-	|| X = .ExistingVar(A, VarUseMode.set)
+	|| X = .ExistingVar(A)
 	|| B = exp.last!
 	if X
 		|| f = .µInto(B, X)
@@ -338,9 +338,7 @@ function Decl (fn_asm) // declaresub declare
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	if ty isnt local								// A carray or somthing?? idk
-	rz = .µInto(rel.Last!, dest)
-	|| f = rz.fat
-		f.µRefCount++ 
+	return .µInto(rel.Last!, dest).incr
 
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
@@ -463,7 +461,9 @@ function Thg (fn_asm)
 	target debug
 		|| reg = thg.reg
 		if (reg-1)|uint| >= 31								// what?
-			check (!reg  and thg is ConstOutput or ok) (exp, "Register out of bounds")
+			if (!reg) and (thg is ConstOutput or ok)
+				return thg
+			error (exp, "Register out of bounds")
 	return thg										// Its still ok.   nil/false
 
 
@@ -725,12 +725,6 @@ function message.ASMUnbra (|message|)
 	return self
 
 
-function ExistingThg (|message| m, |VarUseMode| Mode, |scdecl| d, |asmreg|)
-	require d is local
-	if mode is Return
-		.fn.TrackReturns(d)
-	return .LocalThg(d)
-
 
 function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	opt	norefcounts
@@ -742,7 +736,10 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	
 	|| d = m.ASMDecl
 	if fn == @thg
-		return .ExistingThg(m, mode, D)
+		require d is local
+		if mode is Return
+			.fn.TrackReturns(d)
+		return .LocalThg(d)
 
 	|| H = .MegaNumFinder(d.ExportPosition, d.mu.DataType)
 		return H
@@ -779,10 +776,13 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		if dest is Declaration // remove this const?
 /			mode = mode.ReUseRegInPlace(dest)
 		
+		target debug: || t1 = ++ASMTrapper, if t1==7428
 		ml = .µGetASM(First, mode)
 	
 		mode = DiscardMode.with(dest, ml)
+		target debug: || t2 = ++ASMTrapper, if t2==7435
 		mr = .µ(exp.last!, mode)
+
 		.CloseVars(Closer)
 		if ml.IsVec != mr.IsVec
 			if ml.IsVec
@@ -793,26 +793,16 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
 	
-	|| op = exp.second!
+	|| op = exp.second ?? exp.first!
 	rz = (fn)(self, dest, ml, mr, op)
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
-	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
 
 
-function ASMReg.ConstInputFromMath (|asmreg| L, |asmreg| R, |asmreg|)
-	if self is constoutput
-		(self is constinput) = l.ConstEnough & r.ConstEnough
-	return self
 
-
-function ASMReg.ConstEnough (|bool|)
-	return self|uint64| & asmreg.NotUnConst|uint64|
-
-
-function LocalThg (|scdecl| d, |asmreg| Mode = nil,  |asmreg|) // asmlocal, localasm
+function LocalThg (|scdecl| d,  |asmreg|) // asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType as ASMReg.FromExistingVar
 
@@ -836,7 +826,7 @@ function LocalThg (|scdecl| d, |asmreg| Mode = nil,  |asmreg|) // asmlocal, loca
 
 
 function SCFunction.TrackReturns (|scdecl| D)
-	if d isnt VarThatGotReturned
+/	if d isnt VarThatGotReturned // remove function?
 		.ReturnedVars++
 		(d is VarThatGotReturned)	
 

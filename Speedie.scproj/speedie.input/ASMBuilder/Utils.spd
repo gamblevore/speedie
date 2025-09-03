@@ -21,13 +21,12 @@ function message.ASMDecl (|SCDecl!|)
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
-		// if p ~= 45395
 		if  exp.Position < 0
 		p[0] = nil
 		._curr = p + 1
 		P._op = op
 		p.debug = exp
-//		p.BranchDepth = .State.BranchDepth
+		p.BranchDepth = .State.BranchDepth
 //		p.LoopDepth = .State.LoopDepth
 		p.BasicBlock = .BasicBlock
 		return p
@@ -147,13 +146,22 @@ function SCFunction.ASMReturn (|scdecl|)
 //	return TypeVoid
 
 
-datatype VarUseMode (int)
+function asmreg.incr (|asmreg|)
+	|| f = .fat
+		f.µrefcount++
+		return self
+	target debug
+		if .reg and self is ConstOutput  // sigh
+	return self
+		
+		
+datatype VarUseMode (int) // remove entire thing?
 	Flags
 //		Linkable
 		ReturnAble
-		SetAble
-		Return = ReturnAble
-		Set = SetAble
+//		SetAble
+		Return = ReturnAble // unused?
+//		Set = SetAble
 //		ExistingVar
 //		ForBools
 	

@@ -87,7 +87,7 @@ bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
 
 	auto S = fs->Result;
 	if (!S) {
-		if (fs->ResultPtr) {fs->Failed = true; return 0;}; // direct memory write.
+		if (fs->ResultPtr) return false; // direct memory write.
 		S = JB_Incr(JB_New( JB_String ));
 		S->Addr = 0;
 		S->Length = 0;
@@ -538,7 +538,7 @@ void JB_FS_LengthSet(FastString* fs, int NewLength) {
 
 bool JB_FS_Flush(FastString* fs) {
     JB_File* File = fs->File;
-    if ( File and !fs->NoFlush ) {
+    if ( File ) {
         int N = fs->Length;
         if ( N ) {
             N = (int)JB_File_WriteRaw_( File, fs->ResultPtr, N );

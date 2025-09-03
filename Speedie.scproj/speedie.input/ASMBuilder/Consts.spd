@@ -88,7 +88,7 @@ extend Assembler
 			if f isa asm.KNST and f._const == v
 				|| info = f.info
 				if info.µType.IsIntReg == normal
-					return info asnt asmreg.ConstInput
+					return info
 			
 	
 	function LoadNumber (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)

@@ -28,7 +28,43 @@ function Grab
 	|| b = '1'
 	.grab2(b)
 
+
+function Munt (|uint| x, |uint| y)
+	|| Max = y	
+	if x > Max
+		Max = x
+	if x >= y
+		Max = x
 	
+	|| Min = y	
+	if x < Min
+		Min = x
+	if x <= Max
+		Min = x
+
+
+function Clamp (|int| x, |int| y, |int| z)
+	|| C = y
+	if C < x
+		C = x
+	if C > y
+		C = y
+
+	if C|uint| < x|uint|
+		C = x
+	if C|uint| > y|uint|
+		C = y
+		
+
+function Mint (|int| x, |int| y)
+	|| Max = y	
+	if x > y
+		Max = x
+	|| Min = y	
+	if x < y
+		Min = x
+
+
 function grab2 (|$byte| b, |int|)
 	|| fs = FastString()
 	fs <~ ":"

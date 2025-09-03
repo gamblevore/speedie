@@ -18,7 +18,7 @@ struct Assembler
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
 	target debug
-		|byte|				StackSize
+		|byte|					StackSize
 	|uint|						VDecls
 	|uint|						VTemps
 	|int|						CurrFuncGrab
@@ -29,7 +29,6 @@ struct Assembler
 
 	|?&FatASM|					InlineEnd
 	|int|						KnownValuesMap
-//	|int|						References
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
 //	|&FatASM|					LastDebug
@@ -86,7 +85,7 @@ struct Assembler
 	
 	function IsCurr (|&fatasm| f, |bool|)
 		return .basicblock == f.basicblock
-	
+
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -226,13 +225,16 @@ struct Assembler
 		AnyBlock = 1
 
 	
-	function NopConst (|asmreg| R, |int| NopMode = 0, |bool|)
-		require (r is RemoveableOutput) or (r is RealConst)
-		|| f = r.fat #require
-		require (NopMode&AnyBlock) or .IsCurr(f)
-		require (f.µRefCount <= 0)
-		.Nop(f)
-		return true
+	function NopConst (|asmreg| R, |int| NopMode = 0)
+		require r.reg
+		target debug: if r isnt RealConst //hah
+		|| f = r.NeedFAT
+
+		(NopMode)
+//		if NopMode&AnyBlock
+//			require .IsMostlyCurr(F)
+		if .IsCurr(F)
+			.AskNop(f)
 	
 	
 	function Nop (|FATASM| ToNop)
@@ -274,7 +276,7 @@ struct Assembler
 			return f.const == k
 	
 	
-	function Decr (|?&fatasm| f, |bool| Soft, |int| Depth)
+	function Decr (|?&fatasm| f, |bool| Soft, |int| Depth=0)
 		if f
 			|| C = f.µrefcount
 			C -= (C > 0)
@@ -310,7 +312,7 @@ struct Assembler
 		while self
 			if (.func == @prm)
 				target debug: ifn .obj isa scfunction // it must be, right?
-				/return ASMReg.temp
+				return true
 			|| c = .first
 				|| r = c.FoundFunc
 					return r
@@ -342,16 +344,11 @@ struct Assembler
 		(v as= ModeOnly asnt asmreg.GetReal)
 		rz = .µGetASM(exp, v)
 		
-		if !rz.reg and (ModeOnly is set) // R0. We might need to actually put it in a reg!
-			return .Assign(v, rz, exp)
-
 		if rz iz v
 			return rz
 
-		if rz is temp
-			|| f = rz.fat
-/				return .ReDest(f, v)
-
+		if ModeOnly is set // we really need it in this register
+			return .Assign(v, rz, exp) // assign can improve temp FATs
 		
 		.CloseVars(o) // close the var if v is unused.
 	
@@ -392,14 +389,12 @@ struct Assembler
 
 
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
-		rz = exp.SaveForward
-		(rz is AddrNeed) = (a is Reference)
-		rz = .µGetReal(exp, nil, rz)
-		if (a is reference  and  rz isnt containsaddr)
+		|| Mode = exp.SaveForward
+		(Mode is AddrNeed) = (a is Reference)
+		|| r = .µGetReal(exp, nil, Mode)
+		if (a is reference  and  r isnt containsaddr)
 			error (exp|object|)
-		
-		|| f = rz.fat
-			f.µRefCount++
+		return r.incr
 
 
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)

@@ -36,14 +36,14 @@ datatype ASMReg (uint64)
 		GetReal		= Param ||| Discard
 		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
-		RealConst   = [ConstInput, ConstOutput]
+		RealConst   = [ConstOutput]
 		AddrNeed    = [AddrRequest, AddrForceRequest]
 		// don't go above 47
 		RemoveableOutput = ConstOutput ||| Temp
 		Zero	    = RealConst   ||| 56 ||| param		// 56 == datatypecode.uint64
 //		ZeroParam   = ConstOutput ||| param
 		RealDiscard = RealConst   ||| discard
-		NotUnConst  = fromexistingvar ||| ConstInput
+		NotUnConst  = fromexistingvar // remove?
 		KnownConst  = NotAlteredInbranch ||| ConstOutput
 		Simple		= Temp ||| NotAlteredInbranch
 
@@ -85,8 +85,8 @@ datatype ASMReg (uint64)
 	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|
 	
-	function CopyConst (|asmreg| Src, |asmreg|)
-		return (self &~ realconst) as (src & realconst)
+//	function CopyConst (|asmreg| Src, |asmreg|)
+//		return (self &~ realconst) as (src & realconst)
 	
 	function Const (|int64|)
 		// every single caller must check for constoutput (and does!)
@@ -134,7 +134,7 @@ datatype ASMReg (uint64)
 			return f
 		error "anorexic register"
 		return Assembler.sh.zero
-
+	
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M
 

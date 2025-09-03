@@ -17,9 +17,7 @@ class FastString {
 	|&Byte|			ResultPtr
 	|uint16|		Indent
 	|Byte|			IndentChar
-//	|int|			WrittenLength // invisible
-	|bool|			Failed
-	|int|			NoFlush
+//	|int64|			WrittenLength // invisible
 	
 /////
 
@@ -63,7 +61,7 @@ class FastString {
 		// fastbuff or whatever.
 		cpp_wrapper JB_FS_AppendRange
 
-	helper AppendHex3 (|int|Num)
+	helper AppendHex3 (|int| Num)
 		cpp_wrapper JB_FS_AppendHex3 // not really needed. remove this later. Only my obj-saver needs this.
 	
 	function AppendUTF8 (|codepoint| Num)	{ cpp_wrapper JB_FS_AppendUTF8Char }
@@ -242,7 +240,7 @@ class FastString {
 			.fieldstart(name)
 			.AppendQuotedEscape(data)
 	
-	function PadTo (|int|n, |byte| b=' ')
+	function PadTo (|int| n, |byte| b=' ')
 		self <~ (b, n-.length)
 	
 	function FieldStart (|string| name)
@@ -250,7 +248,6 @@ class FastString {
 		if name
 			self <~ name
 			self <~ ' '
-
 
 	function FieldEnter (|string| name)
 		.fieldstart(name)

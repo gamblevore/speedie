@@ -140,10 +140,6 @@ function FinalDecrements (fn_asm)
 	return exp.RFRT(d0, d1, d2, d3) * asmreg.Exit
 
 
-//	|| fat = exp.RET(dest*!HasK, K * HasK)
-//	fat.µRefCount++
-//	return fat * asmreg.Exit
-
 // OK... lets assume that we got a dest that came from rfap. well... it shouldn't.
 // rfap in fact does not alter anything.
 

@@ -2,14 +2,21 @@
 
 module SC_Init
 	function SCModule.BuildInitArg (|message|)
+		opt norefcounts
+		|| s = .source
+			using s
+				rz = .BuildInitArgSub
+		  else
+			rz = .BuildInitArgSub
+	
+	
+	function SCModule.BuildInitArgSub (|message|)
 		rz = @arg.msg
 		rz <~ @arg
-		if (.Source)
-			|| ig = @tmp + "ignore"
-			ig <~ rz
+		|| src = .source
+			|| ig = src.msg(@tmp, "ignore")
 			ig.Obj = self // ignore in the renderer.
-			.Source <~ ig
-
+			ig <~ rz
 
 
 	function Message.SettingToNil (|bool|)
@@ -92,7 +99,7 @@ extend_module SCModule
 
 function SortInitOrderSub (|array of scmodule| mods, |array of scmodule| out, |bool|)
 	opt norefcounts
-	|scmodule| failed
+	|SCModule| failed
 	|| GotAny = false
 	for m in mods
 		require stderr.ok
