@@ -269,22 +269,25 @@ int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComm
 int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, int AsFile, u8* Name);
 
 
-int UpdatePipesSub_(ShellStream* self, FastString* FS, int& fd, int64& N) {
+int UpdatePipesSub_(ShellStream* self, FastString* FS, int& fd, int& Total) {
 	if (!FS or fd < 0)
 		return 0;
-	uint8* Buffer = JB_FS_WriteAlloc_(FS, 64 * 1024);
+	const int BuffLen = 16*1024; // MacOS default size.
+	uint8* Buffer = JB_FS_WriteAlloc_(FS, BuffLen);
 	if (!Buffer) return -1;
 
 	auto Name = self->Path->Addr;
-	int Error = ReadIfItWasDoneProperly(fd, Buffer, 64 * 1024, N, 0, Name);
+	int64 N = 0;
+	int Error = ReadIfItWasDoneProperly(fd, Buffer, BuffLen, N, 0, Name);
 	if (Error == 0)
 		pipe_close(fd);		// close the thing here if its finished? might as well?
-	JB_FS_AdjustLength_(FS, 64 * 1024, (int)N);
+	Total+=N;
+	JB_FS_AdjustLength_(FS, BuffLen, (int)N);
     return Error;
 }
 
 
-bool UpdatePipes_(ShellStream* self, int64& Read) {
+bool UpdatePipes_(ShellStream* self, int& Read) {
 	auto& Sh = *self;
 	CheckStillAlive(self);
 	int ContinueOut = UpdatePipesSub_(self, Sh.Output,      Sh.CaptureOut[RD], Read);
@@ -294,7 +297,7 @@ bool UpdatePipes_(ShellStream* self, int64& Read) {
 
 
 void JB_Sh_UpdatePipes(ShellStream* self) {
-	int64 Read = 0;
+	int Read = 0;
 	UpdatePipes_(self, Read);
 }
 
@@ -331,7 +334,7 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FS
 		ExitAfter = JB_Date__Now() + TimeOut;
 
 	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
-		int64 ReadAmount = 0;
+		int ReadAmount = 0;
 		UpdatePipes_(Sh, ReadAmount);
 		if (JB_PID_Status(Sh) != -1)
 			break;
@@ -425,7 +428,7 @@ bool JB_Sh_Step(ShellStream* self) {
 	ShellStream& Sh = *self;
 	if (!Sh.IsClosed) {
 		Smooth_(Sh);
-		int64 ReadAmount = 0;
+		int ReadAmount = 0;
 		if (UpdatePipes_(self, ReadAmount)>0) // means continue... there is more to get.
 			return true;
 		JB_FEPDWEE_Finish(Sh);
