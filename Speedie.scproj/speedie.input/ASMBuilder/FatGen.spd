@@ -55,6 +55,7 @@ function message.FNCX3 (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, 
 function message.KNST2 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
+	if self contains "t8"
 	rz = a.RequestOp(asm.KNST2, self)
 	rz.dest(0, r1, a)
 	rz.numinput(1) = Cond

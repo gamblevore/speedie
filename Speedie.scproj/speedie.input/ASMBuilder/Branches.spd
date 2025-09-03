@@ -5,14 +5,9 @@
 
 extend Assembler {
 
-function Else (|message?| other, |asmreg|)
-	rz = .ElseSub(other)
-	.BasicBlock++
-
-
 function ElseSub (|message?| other, |asmreg|)
 	opt norefcounts
-	if !other
+	if !other.HasAsmStuff
 		return asmreg()
 	|| T = other.ASMType
 	if T == ASMType.kif
@@ -21,15 +16,21 @@ function ElseSub (|message?| other, |asmreg|)
 		other = other.first!
 	  else
 		debugger
-	return ASMType.Argument(self, other)
+	rz = ASMType.Argument(self, other)
+	.NextBasicBlock
 
 
 function If (fn_asm)
+	|| Old = .BranchID
+	.branchID = ++.NextBranchID
+
 	.state.BranchDepth++
 	rz = .ifsub(exp, dest)
 	.state.BranchDepth--
 
+	.branchID = Old
 
+	
 function IfSub (fn_asm)
 	opt norefcounts
 	
@@ -39,32 +40,23 @@ function IfSub (fn_asm)
 	
 	|FATRange| B
 	.Branch(cond, B)
-	|| ArgStart = .curr
 	if b.Never
-		return .Else(other)								// if k0 {b()} else {return}
+		return .ElseSub(other)							// if k0 {b()} else {return}
+	if b.Always
+		return ASMType.Argument(self, arg1)				// if k1: return 
 
-	.BasicBlock += b.maybe
+	|| ArgStart = .curr
 	|| Arg1Return = ASMType.Argument(self, arg1)
-	if b.always or !other.HasAsmStuff
-		.AllJumpTo(b)
-		.BasicBlock += b.maybe
-		return Arg1Return * b.always					// if k1: return 
-
-	if ArgStart == .curr								// if x {} else {something()}
-		.SoftNopRange(ifstart, argstart)
-		.Branch(cond, B, true)
-		rz = .Else(other) & Arg1Return
-		.AllJumpTo(b)
-		.BasicBlock++
-		return rz
-	
+	if !other.HasAsmStuff								// if (x): func()
+		.BranchToCurr(b)
+		.NextBasicBlock
+		return Arg1Return
 		
 	if .curr.op != asm.eror
-	|| AfterFirst = other.jump
-	.AllJumpTo(b)
-	rz = .Else(other) & Arg1Return						// if x {return} else {return}
-	AfterFirst.jumpto(.curr, Assembler.sh)
-	.BasicBlock++
+	|| AfterFirst = other.jump // basicblock ++
+	.BranchToCurr(b)
+	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
+	AfterFirst.jumpto(.curr)
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -74,44 +66,42 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		if op >= kContinue
 			C._op = ASM.Jump
 			if op == kContinue			// continue
-				C.JumpTo(S, self)
+				C.JumpTo(S)
 			  else       				// exit
-				C.JumpTo(A, self)
+				C.JumpTo(A)
 		C++
 	
 
 function While (fn_asm)
+	|| Old = .BranchID
+	.branchID = ++.NextBranchID
+	
 	.state.BranchDepth++ // loops are still branches
-	.state.LoopDepth++
 	rz = .WhileSub(exp)
-	.state.LoopDepth--
-	.state.BranchDepth--	
+	.state.BranchDepth--
+	
+	.BranchID = Old
 
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
-	|| InitialJump = exp.JUMP												// test goes after loop
+	|| InitialJump = exp.JUMP // basicblock ++								// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)						// arg
 
 	|FatRange| loop_test
 	// how to step into this? Into the while-true
 	.Branch(exp.first!, loop_test)
 	if loop_test.never
-		.SoftNopRange(InitialJump, loop_Test.start)
 		return ASMReg()
 	
 	if loop_test.always
-		.Nop(InitialJump)
-		if  loop_test.After != loop_Test.Start  //  EH?
-			debugger
-			.SoftNopRange(loop_Test.start, loop_Test.after)
-		
+		.Nop(InitialJump)		
 		// now what?
-		exp.JUMP.JumpTo(initialjump+1, self)
+		exp.JUMP.JumpTo(initialjump+1)
 		loop_test.after++
 	  else
-		InitialJump.JumpTo(loop_test.start, self)
-		.AllJumpTo(loop_test, InitialJump+1)
+		InitialJump.JumpTo(loop_test.start)
+		loop_test.JumpTo(InitialJump+1)
 
 	.loopfill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 	
@@ -183,16 +173,14 @@ function Ternary		(fn_asm)
 
 
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
-	.basicblock++
 	|| µA = .µInto(A, dest)
-	|| Exit = exp.jump
-	.AllJumpTo(Branch)
-	.basicblock++
+	|| Exit = exp.jump // basicblock ++
+	.BranchToCurr(Branch)
 	rz = .µInto(B, dest)
-	.basicblock++
+	.NextBasicBlock
 	
 	rz = .TernRefCount(µa, rz)						
-	Exit.jumpto(.curr, self)
+	Exit.jumpto(.curr)
 
 
 function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
@@ -227,11 +215,10 @@ function MiniTernary (|asmreg| dest, |asmreg| ma, |message| B, |message| cond, |
 	.Assign(dest, ma, b.prev!)
 	|fatrange| Branch
 	.Branch(cond, Branch, true)
-	.basicblock++
 	rz = .µinto(b, dest)
-	.basicblock++
+	.NextBasicBlock
 	rz = .TernRefCount(ma, rz)
-	.AllJumpTo(Branch)
+	.BranchToCurr(Branch)
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
@@ -250,40 +237,6 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 		range.Constness = maybebool.default(false)
 	
 	range.after = .curr
-
-
-//helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
-//	// handles:  a = a and b,  a = a or b
-//	dest = .TempTyped(exp, dest)
-//	if opp is or
-//		rz = .BitOr(dest, ml, mr, exp)
-//	  else
-//		rz = .BitAnd(dest, ml, mr, exp)
-//	
-//	if (dest is negate)
-//		rz = .BitNot(rz, dest, asmreg(), exp)
-//		(rz is AlreadyNegated)
-//
-//
-//function asmreg.IsBoolV (|bool|)
-//	return self.IsBool and (self isnt RealConst)
-
-
-//helper ExistingBool (|message| exp, |asmreg|)
-//	opt norefcounts
-//	|| nega = false
-//	while
-//		|| fn = exp.func
-//		if (fn == @brel) and (exp.name[] == '!')
-//			nega = !nega
-//		  elseif (fn == @type) and exp.TypeCastDoesnothing
-//			0 // do nothing
-//		  elseif fn != @bra
-//			exit
-//		exp = exp.first
-//	
-//	return .ExistingVar(exp).negate(nega)
-
 
 
 // this was crazy complex before. We simplified it!
@@ -374,9 +327,10 @@ function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |A
 			A.parent!.BNOT(dest, nil, dest, 63)
 		return start.info
 	
-	//  do later:
-	//  int1 or int2       -->  (int1|int2) != 0 
-	//  (bool1 and !bool2) -->  tmp = BNOT(Bool2),  BAND(tmp, bool1)
+	// do later:
+	// if a and !a --> false
+	// if a or !a  --> true
+	
 	return bowl
 	
 
@@ -398,7 +352,7 @@ function BoolAndOrValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, 
 	if Second is ConstOutput
 		return .BoolConst2(first, second, opp, jump).boolanswer
 	
-	JUMP.JumpTo(.curr, self)
+	JUMP.JumpTo(.curr)
 	
 	if first.IsBool and Second.IsBool
 		return dest.boolanswer
@@ -473,7 +427,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	
 	|fatrange| Br2
 	|| second = .Branch(B, Br2, dest is negate)
-	.AllJumpTo(OrTest)
+	.BranchToCurr(OrTest)
 
 	if Br2.always
 		// a or 1
@@ -489,6 +443,15 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	// a or b
 	
 	return first
+	
+	
+function NextBasicBlock
+	// remove stuff in .register thats from a diff block as us? MAN i need to sleep first!
+	.BasicBlock++
+	// CloseOneVar does the closing right now. Which... isn't very good, because the var may still
+	// be part of the same basic block, and therefor still exist!
+	
+	// or else redest is failing!
 }
 
 
@@ -533,23 +496,25 @@ extend Assembler
 						rz = s.prms[0]|int|.asm
 				s.SetOp = asm.jump
 				s.JumpReg = 1
-				.JumpFix(s)
+				s.JumpFix(.curr)
 		
 		rz &= ~ASMReg.Exit
 		(rz as= .state.return&asmreg.exit)
 	
 	
-	function JumpFix (|fatasm| s, |?&fatasm| curr=nil)
-		(s isnt CondAnswer)
-		if !curr
-			curr = .curr
-		s.JumpTo(curr, self)
+	function fatasm.JumpFix (|&fatasm| curr)
+		isnt CondAnswer
+		.JumpTo(curr) // shouldn't (s isnt CondAnswer) go inside .jumpto?
 	
 	
-	function AllJumpTo (|FatRange| range, |?&FatAsm| curr = nil)
-		for s in range
+	function BranchToCurr (|FatRange| range)
+		return range.JumpTo(.curr)
+	
+	
+	function FatRange.JumpTo (|&FatAsm| curr)
+		for s in self
 			if (s is CondAnswer) and !(s isa asm.knst)
-				.JumpFix(s, curr)
+				s.JumpFix(curr)
 	
 
 function @assembler.PrintProgress

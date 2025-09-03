@@ -4,8 +4,9 @@ struct ASMState
 	|scfunction!--|	Fn    
 	|asmreg|		Return
 	|uint64|		ParentVars
+//	|uint16|		BranchID
 	|byte|			BranchDepth
-	|byte|			LoopDepth
+//	|byte|			LoopDepth // unused. remove?
 	|byte|			InlineDepth
 	|bool|			TailInlineable
 
@@ -22,6 +23,8 @@ struct Assembler
 	|uint|						VDecls
 	|uint|						VTemps
 	|int|						CurrFuncGrab
+    |uint16|                    BranchID
+    |uint16|                    NextBranchID
 	|bool|						Inited
 	|bool|						NeedsRework
 
@@ -291,6 +294,7 @@ struct Assembler
 	
 	
 	function SoftNopRange (|fatasm| Start, |fatasm| After)
+		// todo: should this not be merged with rewind?
 		while start < After
 			.SoftNop(--after)
 	
@@ -472,6 +476,8 @@ struct Assembler
 		.BasicBlock = 0
 		.VDecls = 1
 		.VTemps = 0
+		.BranchID = 0
+		.NextBranchID = 0
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()

@@ -337,8 +337,10 @@ function Decl (fn_asm) // declaresub declare
 	if ty.IsBareStruct
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
+	target debug: || t = ++asmtrapper, if t == 178
 	if ty isnt local								// A carray or somthing?? idk
-	return .µInto(rel.Last!, dest).incr
+	|| r = .µInto(rel.Last!, dest)
+	return r.incr
 
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)

@@ -11,7 +11,7 @@ struct FatASM
 	|byte| 				_Outputs
 	|byte|				_Op
 	|byte|				JumpReg
-	|byte|				BranchDepth
+	|byte|				BranchID  // could be used to check if a const earlier in the same branch, but a different block
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
@@ -132,12 +132,6 @@ struct FatASM
 		if self
 			return Assembler.sh.funcstart + (self - 1)
 	
-	function FileNum (|int|)
-		return .msg.filenum & 0x4095
-	
-	function BytePos (|int|)
-		return .msg.position
-	
 	operator isa (|asm| m, |bool|)
 		nil checker
 		if self
@@ -232,18 +226,10 @@ struct FatASM
 		return info
 
 	
-	function File (|string|)
-		opt norefcounts
-		|| s = SCImport.AllFiles[.filenum]
-			return s
-	
-	
 	Syntax Expect (|string| Error)
-		|| f = .file|file--|
-		|| err = Error(nil, error, ErrorSeverity.Error, f)
-		err.position = .BytePos
-		nil|ErrorReceiver| <~ err
+		error (.msg, error)
 		.DebugPrint
+
 	
 	function Jump (|int|)
 		|| j = .JumpReg
@@ -255,14 +241,14 @@ struct FatASM
 			return self + 1 + .prms[j-1]|int|
 	
 	
-	function JumpTo (|&fatasm| value, |&Assembler| A)
+	function JumpTo (|&fatasm| value)
 		cpp_Part JumpToSet
 		|| j = .jumpreg
 			|| D = (value - self) - 1
 			check (D != -1) (self, "bad jump")
 			.prms[j-1] = D
 			if d == 0
-				a.nop(self)
+				assembler.sh.nop(self)
 		  else
 			j = .id
 			debugger
@@ -316,7 +302,7 @@ struct FatASM
 		.prms[a] = v
 		.JumpReg = a + 1
 		.µRefCount = 1 max .µRefCount // control flow is always used?
-		Assembler.sh.BasicBlock++
+		Assembler.sh.NextBasicBlock
 		
 
 
@@ -421,6 +407,16 @@ struct FatASM
 			.RendaMsg(fs, n)
 	
 
+	function ConditionDoesAnything (|int| Vdecl, |bool|)
+		// to help remove branches!
+		for o.RegOutputs in self
+			|| r = o.Reg
+			if r > 0 and r <= Vdecl
+				return true
+		expect (!.IsFinisher) ("You can't return in the middle of a condition!")
+				
+
+
 	function GuessSize (|int|)
 		// don't really know the size, as consts are awkward to guess
 		// and long-jumps might require more awkward encoding.
@@ -516,7 +512,7 @@ struct FatASM
 		
 		|asm| m = .op
 		if  m == asm.jump
-			if  d isa asm.ret  or  d isa asm.tail  
+			if  d.IsFinisher
 				return .CopyFrom(d)		// jumping to a function-exit.
 
 		  elseif (d == self + 2) and (m != asm.LUPU and asm.LUPD)
@@ -525,7 +521,7 @@ struct FatASM
 				return .JumpNegate(sh, mid)
 		
 		if n > 0
-			.JumpTo(D, sh)
+			.JumpTo(D)
 			return true
 	
 
