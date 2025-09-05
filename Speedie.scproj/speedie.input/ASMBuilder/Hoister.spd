@@ -25,7 +25,7 @@ function message.Declable (|message!|)
 
 extend Assembler {
 
-function FatASM.CanGlobGrab (|uint64| find, |uint64| range, |uint64| BS, |asmreg|)
+function FatASM.CanGlobalGrab (|uint64| find, |uint64| range, |uint64| BS, |asmreg|)
 	opt inline
 	|uint64| Addr = .prms[2]
 	require Addr <= find
@@ -48,7 +48,7 @@ function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
 	
 	for old in Assembler.sh
 		if old isa asm.gtab
-			|| OK = old.CanGlobGrab(find, range, B)
+			|| OK = old.CanGlobalGrab(find, range, B)
 				return OK
 
 

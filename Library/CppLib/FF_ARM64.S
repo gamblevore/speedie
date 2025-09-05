@@ -4,8 +4,6 @@
 #ifdef _M_ARM64
 	#define __realarm64__
 #endif
-// todo: Experiment with saving dest/lr instead of fp/lr
-// I think fp is unused?
 
 #ifdef __realarm64__
 	/*** Nativeize(u64 DATA, void* FN, Register* R, int n) ***/

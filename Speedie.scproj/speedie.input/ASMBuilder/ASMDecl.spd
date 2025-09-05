@@ -17,7 +17,7 @@ struct SavedRegisters
 
 		.BasicBlock = sh.BasicBlock
 		.KnownValues = sh.KnownValuesMap
-		|| S = sh.FuncStart
+		|| S = sh.FuncStart - 1
 		for i in 32
 			|| f = sh.Registers[i]
 			.asm[i] = (f - s, nil)(f)

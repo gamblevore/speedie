@@ -10,6 +10,8 @@ class asm_test_obj
 	
 
 module ASMExamples {
+target pack { 
+
 |int| Glob
 |int| Bolg
 
@@ -20,8 +22,6 @@ function SwapTest
 	|| y = 2
 	swap (x) (y)
 
-
-target pack { 
 
 
 function Grab

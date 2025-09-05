@@ -232,7 +232,7 @@ function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| 
 	if NewType is bool
 		if (OldType is bool) and (dest isnt negate)				// x = true|bool| // why?
 			return from
-		return .NotEq(dest, asmreg(), from, exp)
+		return .NotEq(exp, dest, asmreg(), from)
 
 	if  (NewType.BitCount == OldType.BitCount)  and  NewType.IsFloat == oldtype.isfloat
 		from.µtype = newtype
@@ -271,7 +271,7 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 		K = (oof|int64| >> sh, oof|uint64| >> sh)(dest.Signed) // shift up and down
 
 	.NopConst(from)
-	return .NumToReg(exp, K, dest, new)
+	return .NumToReg(exp, dest, K, new)
 
 
 
@@ -279,15 +279,11 @@ function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
 	|| A = exp.first!.asmunbra
 	|| X = .ExistingVar(A)
-	|| B = exp.last!
-	if X
-		|| f = .µInto(B, X)
-//		if f is local
-		return f
+		return .µInto(exp.last!, X)
 
 	// Probably x.y = z, or x[y] = z 
 
-	|| Src = .µGetReal(B, nil, nil|asmreg| * a)
+	|| Src = .µGetReal(exp.last!, nil, nil|asmreg| * a)
 	(Src is SetAlways)
 	return .µ(A, Src)
 
@@ -318,12 +314,12 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 
 
 
-
 function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |asmreg|)
 	size = (size+15)>>4
 	|| fat = exp.ALLO(dest, size*dir)
 	fat.µRefCount++ // makes sense it is always reffed
 	return fat * dest
+
 
 
 function Decl (fn_asm) // declaresub declare 
@@ -337,10 +333,13 @@ function Decl (fn_asm) // declaresub declare
 	if ty.IsBareStruct
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
-	target debug: || t = ++asmtrapper, if t == 178
-	if ty isnt local								// A carray or somthing?? idk
-	|| r = .µInto(rel.Last!, dest)
-	return r.incr
+	target debug: if ty isnt local								// A carray or somthing?? idk
+	
+	(dest as= asmreg.Declaration)
+	(dest as= asmreg.into)
+	rel = rel.last!
+	return .µInto(rel, dest).incr
+
 
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
@@ -350,7 +349,7 @@ function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 		|| x = .µArg(ch)
 		if x & asmreg.exit
 			return x
-	.restorevars(v)			// causes errors???
+	.RestoreVars(v)			// causes errors???
 
 
 function ArgumentThatIsAroundWhile (fn_asm)
@@ -381,7 +380,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| d = f.asmdecl
 		
 	|| sc = exp.Second.first!
-	|| base = .µGetReal(f, nil, ASMReg.AddrRequest * sc)				// x = a.b[0]
+	|| base = .µGetReal(f, nil, ASMReg.AddrRequest * sc)		// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
@@ -400,11 +399,11 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 
 	  elseif dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.mu.DataType
-		if !d.iscarray									 // so its a pointer? what if its a carray to a pointer?
+		if !d.IsCarray									 		// what if its a carray to a pointer?
 			d = d.internal!		
-		return .ReadOrWrite(Dest, exp, base, vara, d, 0) // readorwrite can convert vara to a const
+		return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
 	
-	return .incrpointerbyvar(dest, base, vara, exp)
+	return .IncrPointerByVar(dest, base, vara, exp)
 
 
 function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
@@ -454,8 +453,8 @@ function Num (fn_asm)
 	|| d = exp.ASMDecl
 	|| T = d.typeonly
 	dest.µtype = T
-	(dest is RealConst)
-	return .NumToReg(exp, d.ExportPosition, dest, T)
+	(dest is ConstOutput)
+	return .NumToReg(exp, dest, d.ExportPosition, T)
 
 
 function Thg (fn_asm)
@@ -470,10 +469,10 @@ function Thg (fn_asm)
 
 
 function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
-	(dest is RealConst)
+	(dest is ConstOutput)
 	if dest isnt ConstRequest
 		dest.µtype = d.mu.DataType
-		return .NumToReg(exp, d.ExportPosition, dest, dest.µtype)
+		return .NumToReg(exp, dest, d.ExportPosition, dest.µtype)
 	return dest
 
 
@@ -502,7 +501,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			
 		|| T = .LocalThg(d)
 		if dest isnt AddrNeed
-			return T
+			return .Into(exp, dest, t)
 			
 		if d.IsBareStruct					// it already has the address
 			return T.haveaddr
@@ -683,13 +682,11 @@ function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 function DoMath (fn_asm)
 	opt norefcounts
 	|| op = exp.second!
-	|| scop = op.obj|scoperator|
-		if scop is AndOr
-			return .ASMBoolMaker(exp, dest, scop.Kind)
-		|| fn = scop.OpASM
-			return .DoMathSub(exp, dest, fn)
-	error (op, "No ASM for this operator?")
-	debugger // what?
+	|| scop = op.obj|scoperator|!
+	if scop is AndOr
+		return .ASMBoolMaker(exp, dest, scop.Kind)
+	|| fn = scop.OpASM!
+	return .DoMathSub(exp, dest, fn)
 
 
 
@@ -748,7 +745,7 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 
 	// reg0. shouldn't this be part of the meganumfinder?
 	if (d is const) and !d.ExportPosition // reg0
-		return .NumToReg(m, 0, asmreg(), d.mu.DataType)
+		return .NumToReg(m, asmreg(), 0, d.mu.DataType)
 
 
 function Str (fn_asm)
@@ -764,39 +761,35 @@ helper Vectorise (|asmreg| Src, |message| exp,  |asmreg|)
 	return exp.VSWZ(T, src, 0) * T
 
 
-helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
+helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| ml = ASMReg()
 	|| mr = ASMReg()
 	|| First = exp.first!
+	|| dest = mode asnt asmreg.into
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else
-		|| Closer = .OpenVars
-		|| DiscardMode = dest & AsmReg.Discard
-		|| Mode = discardmode
-		if dest is Declaration // remove this const?
-/			mode = mode.ReUseRegInPlace(dest)
-		
-		target debug: || t1 = ++ASMTrapper, if t1==7428
-		ml = .µGetASM(First, mode)
-	
-		mode = DiscardMode.with(dest, ml)
-		target debug: || t2 = ++ASMTrapper, if t2==7435
-		mr = .µ(exp.last!, mode)
+		ml = .µGetReal(First, nil, dest)
+		if (dest is declaration) and !(ml iz dest)
+			mr = dest
 
-		.CloseVars(Closer)
+		mr = .µ(exp.last!, mr)
 		if ml.IsVec != mr.IsVec
 			if ml.IsVec
 				mr = .Vectorise(mr, exp)
 			  else
 				ml = .Vectorise(ml, exp)
 	
+	if dest is Discard
+/		return dest // returning from inline, into func that discards result.
+	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
+	(dest as= asmreg.into&mode)	
 	
 	|| op = exp.second ?? exp.first!
-	rz = (fn)(self, dest, ml, mr, op)
+	rz = (fn)(self, op, dest, ml, mr)
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
@@ -806,7 +799,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 
 function LocalThg (|scdecl| d,  |asmreg|) // asmlocal, localasm
 	opt norefcounts
-	|| T = d.WholeType as ASMReg.FromExistingVar
+	|| T = d.WholeType //as ASMReg.FromExistingVar
 
 	(t is param) = d is param
 	(t is constoutput) = d is const	

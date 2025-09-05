@@ -27,7 +27,6 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		P._op = op
 		p.debug = exp
 		p.BranchID = .BranchID
-//		p.LoopDepth = .State.LoopDepth
 		p.BasicBlock = .BasicBlock
 		return p
 
@@ -103,14 +102,12 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |b
 
 	|| fat = .Registers[v]
 	if !fat: return true
-	.registers[v] = nil // shouldn't close this here! only at the end of a block!
+	.Registers[v] = nil // shouldn't close this here! only at the end of a block!
 	// .nextbasicblock should do this?
 	
-	if fat.µrefcount <= 0 and fat is NotAlteredInbranch		
-		ifn (Orig&1)  and  !.state.inlinedepth  and  options.optimise < 4
-			.Nop(fat) 
-	
-	if fat is CompilerCreated							/// NOP UNUSED VARS ///
+	if (fat.µrefcount <= 0) and .state.inlinedepth	//  and  options.optimise < 4
+/		.Nop(fat) // not sure what this does.
+	  elseif fat is CompilerCreated									/// NOP UNUSED VARS ///
 		.AskNop(fat)
 
 	return .ClearStruct(exp, fat, v)

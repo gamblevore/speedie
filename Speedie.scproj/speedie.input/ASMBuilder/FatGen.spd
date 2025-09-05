@@ -368,6 +368,7 @@ function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 
 function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
+	if "andorrest".trap
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BFLG, self)

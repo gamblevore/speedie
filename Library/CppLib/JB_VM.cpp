@@ -5,8 +5,6 @@
 
 
 /*
-todo:
-	* FFI
 Design:
 	* 256 OpCodes, including a few variable length opcodes
 	* r0 = 0

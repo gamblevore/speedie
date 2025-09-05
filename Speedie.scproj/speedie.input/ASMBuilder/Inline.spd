@@ -19,7 +19,7 @@ struct InlineInfo
 		|| sh = Assembler.sh
 		while  --n >= 0
 			|| r = .Items[n] // now what to do?
-			if r is ConstOutput
+			if r.reg and r is ConstOutput 
 				sh.Decr(r.needfat, false)
 
 	
@@ -31,7 +31,7 @@ struct InlineInfo
 		if (d is Const) and !d.mu.ExportPosition
 			if a isnt alteredorref
 				return asmreg()
-			return asmreg.set
+			return asmreg.into
 		
 		require d is local
 		|| v = sh.LocalThg(d)
@@ -65,9 +65,9 @@ struct InlineInfo
 				|| a = args[n]!
 				|| r = 1<<v.reg
 				if (AR & r) and (a isnt reference)
-					.items[n] = asmreg.set				// needs copy to save other regss
+					.items[n] = asmreg.into				// needs copy to save other regss
 				  elseif (AN & r) and (a is altered)
-					.Items[n] = asmreg.set				
+					.Items[n] = asmreg.into				
 	
 
 
@@ -149,8 +149,9 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 
 	for (a in .fn.args) (i)
 		|| V = info.Items[i]
-		if !(V asnt asmreg.set) // its nil or set
+		if !(V asnt ASMReg.into) // its nil or into
 			V = .µGetReal(p, a, V)
+			info.items[i] = V
 		.UpdateInlineReg(V, a)
 		p = p.next!
 

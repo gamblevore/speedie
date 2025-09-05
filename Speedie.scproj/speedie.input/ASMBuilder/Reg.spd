@@ -17,12 +17,12 @@ datatype ASMReg (uint64)
 		AlreadyNegated
 		Discard
 		Param
-		FromExistingVar
 		FromZeroMemory
 		Alternate
+		Subtract = Alternate
 		Set
 		Declaration
-		NotAlteredInBranch
+		Into
 		NoScale
 		ContainsAddr
 		Textual
@@ -33,18 +33,13 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		OK
-		GetReal		= Param ||| Discard
-		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
-		RealConst   = [ConstOutput]
 		AddrNeed    = [AddrRequest, AddrForceRequest]
+		KnownConst  = [ConstOutput, NotAlteredInbranch]
+		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
-		RemoveableOutput = ConstOutput ||| Temp
-		Zero	    = RealConst   ||| 56 ||| param		// 56 == datatypecode.uint64
-//		ZeroParam   = ConstOutput ||| param
-		RealDiscard = RealConst   ||| discard
-		NotUnConst  = fromexistingvar // remove?
-		KnownConst  = NotAlteredInbranch ||| ConstOutput
+		Zero	    = ConstOutput   ||| 56 ||| param		// 56 == datatypecode.uint64
+		RealDiscard = ConstOutput   ||| discard
 		Simple		= Temp ||| NotAlteredInbranch
 
 	
@@ -86,7 +81,7 @@ datatype ASMReg (uint64)
 		return self|uint16||asmreg|
 	
 //	function CopyConst (|asmreg| Src, |asmreg|)
-//		return (self &~ realconst) as (src & realconst)
+//		return (self &~ ConstOutput) as (src & ConstOutput)
 	
 	function Const (|int64|)
 		// every single caller must check for constoutput (and does!)
@@ -217,7 +212,7 @@ datatype ASMReg (uint64)
 			return self asnt r
 		
 	function datatypecode.zero (|asmreg|)
-		|| K = asmreg.RealConst
+		|| K = asmreg.ConstOutput
 		K.µtype = self
 		return K
 	
@@ -293,10 +288,6 @@ datatype ASMReg (uint64)
 		if .reg == dest.reg
 			return dest.µtype.zero
 		return dest
-
-	function ReUseRegInPlace (|asmreg| dest, |asmreg|)
-		isnt notalteredinbranch
-		return .reg(dest)
 	
 	function TryReg (assigns:|asmreg| dest, |asmreg|)
 		if .reg or dest isnt temp
@@ -310,7 +301,8 @@ datatype ASMReg (uint64)
 			isnt temp
 			return self
 												// dest is free!
-		return .ReUseRegInPlace(dest)
+		isnt notalteredinbranch
+		return .reg(dest)
 	
 
 	

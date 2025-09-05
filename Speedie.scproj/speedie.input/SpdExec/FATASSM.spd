@@ -170,9 +170,7 @@ struct FatASM
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
 			.RemoveReg(old, f)
 		
-		U.Reg = f.Dest(a, info, self)						// Then we set it to the new value
-		f.info = u // update reg here.
-		return u
+		return f.Dest(a, info, self)						// Then we set it to the new value
 	
 	
 	function assembler.RemoveReg (|int| i, |fatasm| fat)
@@ -216,13 +214,10 @@ struct FatASM
 		changed &= 31
 		if changed
 			sh.Register(changed) = self
-			sh.KnownValues(Changed) = info is knownconst
-			
-		|asmreg| x // in case i forget to do it later via: fat * asmreg
-		x.FatIndex = .index
-		x.reg = info.reg
-		.info = x
+			sh.KnownValues(Changed) = info is knownconst // NotAlteredInbranch + ConstOutput
 		
+		info.FatIndex = .index
+		.info = info
 		return info
 
 	
@@ -413,6 +408,7 @@ struct FatASM
 			|| r = o.Reg
 			if r > 0 and r <= Vdecl
 				return true
+		
 		expect (!.IsFinisher) ("You can't return in the middle of a condition!")
 				
 

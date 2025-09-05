@@ -4,9 +4,7 @@ struct ASMState
 	|scfunction!--|	Fn    
 	|asmreg|		Return
 	|uint64|		ParentVars
-//	|uint16|		BranchID
 	|byte|			BranchDepth
-//	|byte|			LoopDepth // unused. remove?
 	|byte|			InlineDepth
 	|bool|			TailInlineable
 
@@ -34,7 +32,6 @@ struct Assembler
 	|int|						KnownValuesMap
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
-//	|&FatASM|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					_Curr    
 	|&FatASM|					End    
@@ -105,12 +102,11 @@ struct Assembler
 				return 0
 			return v.Log2+1
 
-	
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		if togrow.isint and value.CanStoreAsAddK and !dest.IsVec
 			return exp.ADAK(dest, ToGrow, Value) * Dest
-		.Assign(dest, ToGrow, exp)
+		.Assign(exp, dest, ToGrow)
 		rz = .IncrPre(exp, togrow, ToGrow, value)
 
 
@@ -119,9 +115,9 @@ struct Assembler
 			dest.µtype = orig.µtype
 		dest = .TempOnly(dest)
 		|| Where = orig • dest
-		(where is realconst)
-		|| K = .NumToReg(exp, amount, where, orig.µtype)
-		return .Plus(dest, Orig, K, exp)
+		(where is ConstOutput)
+		|| K = .NumToReg(exp, where, amount, orig.µtype)
+		return .Plus(exp, dest, Orig, K)
 	
 	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
@@ -192,7 +188,7 @@ struct Assembler
 		r |= 1<<Free
 		t.reg = Free
 		.VTemps = r
-		(t isnt realconst) // why would it be?
+		(t isnt ConstOutput) // why would it be?
 		(t is temp)
 		check (!(.vdecls & .VTemps)) (.fn.sourcearg, "No free local variables.")	// entirely full
 		return t
@@ -230,7 +226,7 @@ struct Assembler
 	
 	function NopConst (|asmreg| R, |int| NopMode = 0)
 		require r.reg
-		target debug: if r isnt RealConst //hah
+		target debug: if r isnt ConstOutput //hah
 		|| f = r.NeedFAT
 
 		(NopMode)
@@ -303,10 +299,10 @@ struct Assembler
 	
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		dest.µType = DataTypeCode.bool
-		|| x = .µInto(exp, dest as asmreg.PreferEqul) // easier to optimise.
+		(dest as= asmreg.PreferEqul)						// easier to optimise.
+		|| x = .µ(exp, dest)
 		if x.IsBool
-			return x
-		(dest as= X bitand ASMReg.FromExistingVar)
+			return .Into(exp, dest, x)
 		return .Exists(dest, X, exp)
 	
 	
@@ -315,7 +311,7 @@ struct Assembler
 		
 		while self
 			if (.func == @prm)
-				target debug: ifn .obj isa scfunction // it must be, right?
+				target debug: ifn .obj isa scfunction		// it must be, right?
 				return true
 			|| c = .first
 				|| r = c.FoundFunc
@@ -334,62 +330,56 @@ struct Assembler
 			return f.FoundFunc
 			
 		
-	function µGetReal (|message| exp,  |scdecl| A, |asmreg| ModeOnly,  |asmreg|)
-		|| o = .OpenVars
-		|| v = asmreg()
-		
-		if ModeOnly is temp // nothing uses this either. 
-			(ModeOnly isnt temp)
-			v = .TempTyped(a, v)
-		  else
-			v = .DeclareMe(exp, a)
-		
-		if ModeOnly is GetReal // never happens? // remove line below.
-		(v as= ModeOnly asnt asmreg.GetReal)
-		rz = .µGetASM(exp, v)
-		
-		if rz iz v
-			return rz
+	function GetRealDest (|message| exp,  |scdecl| A,  |asmreg| dest,  |asmreg|)
+		if dest is Declaration							// || x = (y + 1) + (z + 1)
+			return dest asnt asmreg.Declaration
+		if dest is temp									//    x = (y + 1) + (z + 1)
+			return .TempTyped(a, dest asnt asmreg.temp)
+		return .DeclareMe(exp, a)
 
-		if ModeOnly is set // we really need it in this register
-			return .Assign(v, rz, exp) // assign can improve temp FATs
+
+	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Mode,  |asmreg|)
+		if mode is into
+			|| Dest = .getrealdest(exp, a, mode)
+			return .µgetasm(Exp, dest)
 		
-		.CloseVars(o) // close the var if v is unused.
+		|| OV = .OpenVars
+		|| Dest = .getrealdest(exp, a, mode)
+		(dest as= mode & asmreg.into)
+		rz = .µgetasm(Exp, dest)
+		if rz iz Dest
+			return rz
+		.CloseVars(ov)
+		
 	
 	
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		target debug: if !dest.reg		
-		|| r = .µ(Exp, dest)		
-		
-		if r iz dest
-			if dest.bitcount == r.bitcount
-				return r
-			|| f = r.fat
-			if f and .iscurr(F)	and f.IsRead
-				return dest
-		
-		if r is temp
-			|| f = r.fat
-				return .ReDest(f, dest)
+		target debug: if dest is discard, if !dest.reg, || t = ++asmtrapper, if t == 0
 
-		|| dest2 = r.into(dest)
-		if dest is PreferEqul
-			return .Exists(dest, r, exp)
-		return .Assign(Dest2, r, exp)
+		return .µ(Exp, dest as asmreg.Into)
+		
+	
+	function Into (|message| exp, |asmreg| dest, |asmreg| t, |asmreg|)
+		if  dest isnt into  or  t iz dest
+			return t
+		return .Assign(exp, dest, t)
+		
 	
 	
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		description "Same as µGetASM, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars
 		|| v = .µGetASM(exp, dest)
+		if "Incr".trap
 		return .CloseVars(Closer, nil, v)
 
 
 	function µArg (|message| exp, |asmreg|)
-		// we want to close it... unless it is a decl.
 		if exp.func == @decl
-			return ASMType.Decl(self, exp, AsmReg.RealDiscard)
-		return .µ(exp, asmreg.realdiscard)
+			return ASMType.Decl(self, exp, AsmReg.RealDiscard) 
+		return .µ(exp, asmreg.realdiscard)	// closes vars, but decls don't want close.
+											// we'd have to return a flag from .decl to tell
+											// .µ to not close it.
 
 
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
@@ -418,6 +408,9 @@ struct Assembler
 
 		target debug
 			.StackSize--
+			if ((dest is into) and !(ss iz dest)) or (ss is into)
+				if (ss is into) { "into" } else {"wrong dest"}
+/				(fn)(self, exp, dest)
 			if (ss is constoutput) and (ss.reg and !ss.fatindex) // huh?
 				debugger
 				PrintProgress()

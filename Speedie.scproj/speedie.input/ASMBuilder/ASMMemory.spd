@@ -19,7 +19,7 @@ function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message
 		dest.TryReg = Vara
 		dest.TryReg = Base
 		dest = .TempOnly(dest)
-	return .Plus(dest, base, vara, exp)
+	return .Plus(exp, dest, base, vara)
 
 
 function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |asmreg| vara, |scdecl| D, |!&fatasm|)
