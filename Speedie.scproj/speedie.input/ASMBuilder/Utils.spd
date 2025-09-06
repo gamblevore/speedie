@@ -104,11 +104,14 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |b
 	if !fat: return true
 	.Registers[v] = nil // shouldn't close this here! only at the end of a block!
 	// .nextbasicblock should do this?
+
+	// don't nop (most?) unused stuff here... as temps can be used after deallocating.
+	// What about the code below? could it suffer the same? We had this bug in "incr".
+	// the best this place could do... is warn (ME) that a function should be nopping something
+	// but isn't.
 	
-	if (fat.µrefcount <= 0) and .state.inlinedepth	//  and  options.optimise < 4
-/		.Nop(fat) // not sure what this does.
-	  elseif fat is CompilerCreated									/// NOP UNUSED VARS ///
-		.AskNop(fat)
+	if fat is CompilerCreated									/// NOP UNUSED VARS ///
+/		.AskNop(fat) // not sure this should be kept.
 
 	return .ClearStruct(exp, fat, v)
 

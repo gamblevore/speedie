@@ -49,7 +49,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		error (exp)
 		dest = asmreg()
 
-	(dest asnt= asmreg.AddrRequest)
+	(dest isnt AddrRequest)
 	|| T = dest.µtype
 	|| bytes = t.ByteCount
 	if decl

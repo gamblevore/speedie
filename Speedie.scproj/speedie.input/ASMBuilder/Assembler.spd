@@ -238,6 +238,10 @@ struct Assembler
 	
 	function Nop (|FATASM| ToNop)
 		opt inline
+/*		if "Incr".trap
+			tonop.debugprint
+			debugger
+*/
 		return .nopsub(ToNop, false, 0)
 	
 	
@@ -334,18 +338,17 @@ struct Assembler
 		if dest is Declaration							// || x = (y + 1) + (z + 1)
 			return dest asnt asmreg.Declaration
 		if dest is temp									//    x = (y + 1) + (z + 1)
-			return .TempTyped(a, dest asnt asmreg.temp)
+			return .TempTyped(a, dest)
 		return .DeclareMe(exp, a)
 
 
 	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Mode,  |asmreg|)
 		if mode is into
-			|| Dest = .getrealdest(exp, a, mode)
+			|| Dest = .GetRealDest(exp, a, mode)
 			return .µgetasm(Exp, dest)
 		
 		|| OV = .OpenVars
-		|| Dest = .getrealdest(exp, a, mode)
-		(dest as= mode & asmreg.into)
+		|| Dest = .GetRealDest(exp, a, mode)
 		rz = .µgetasm(Exp, dest)
 		if rz iz Dest
 			return rz
@@ -370,7 +373,6 @@ struct Assembler
 		description "Same as µGetASM, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars
 		|| v = .µGetASM(exp, dest)
-		if "Incr".trap
 		return .CloseVars(Closer, nil, v)
 
 

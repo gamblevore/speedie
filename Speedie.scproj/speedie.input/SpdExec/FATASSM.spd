@@ -70,7 +70,9 @@ struct FatASM
 
 
 	function Vectorise (|asmreg| Dest, |asm| VOpp,  |asmreg|)
+		(dest isnt into)
 		dest.FatIndex = .index
+		
 		.info = dest
 		if dest.IsVec
 			._op = VOpp
@@ -88,14 +90,15 @@ struct FatASM
 		return dest
 	
 
-	operator mul (|asmreg| info, |asmreg|)
+	operator mul (|asmreg| flags, |asmreg|)
 		cpp_part AsReg
 		
-		|| info2 = info.FatIndex(.index)
-		.info = info2
-		if info
-			return info2
-		return info
+		(flags isnt into)
+		|| flags2 = flags.FatIndex(.index)
+		.info = flags2
+		if flags
+			return flags2
+		return flags
 	
 	function Const (|int64|)
 		opt norefcounts
@@ -146,7 +149,7 @@ struct FatASM
 		if value
 			(.info as= flags)
 		  else
-			(.info asnt= flags)
+			(.info &= ~flags)
 
 
 	function CopyFrom (|fatasm| D, |bool|)

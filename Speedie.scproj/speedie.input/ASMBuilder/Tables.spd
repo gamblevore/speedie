@@ -756,7 +756,7 @@ function Str (fn_asm)
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
 
 
-helper Vectorise (|asmreg| Src, |message| exp,  |asmreg|)
+helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 	|| T = .TempOnly(src.BasicVec)
 	return exp.VSWZ(T, src, 0) * T
 
@@ -777,12 +777,13 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 		mr = .µ(exp.last!, mr)
 		if ml.IsVec != mr.IsVec
 			if ml.IsVec
-				mr = .Vectorise(mr, exp)
+				mr = .VectorUpgrade(mr, exp)
 			  else
-				ml = .Vectorise(ml, exp)
+				ml = .VectorUpgrade(ml, exp)
 	
 	if dest is Discard
 /		return dest // returning from inline, into func that discards result.
+					// maybe better that the arg itself softnops stuff? again... do later!
 	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
