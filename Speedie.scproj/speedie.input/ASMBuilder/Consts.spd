@@ -70,6 +70,7 @@ extend Assembler
 	
 	
 	function SetConst (|message| exp, |int64| value, |asmreg| ml, |asmreg| Dest, |asmreg|)
+		// only boolconst1 uses this. can be simplified.
 		|| f = ml.fat
 			f.const = value
 			return ml
@@ -105,10 +106,8 @@ extend Assembler
 				if (k.r0 == dest.reg) and (k is temp)
 					.nop(k)
 		
-		(dest is ConstOutput)
 		|| fat = exp.KNST(dest, 0, 0, 0)
-		fat.Const = v
-		return fat*dest
+		return fat.ConstFinish(dest, v)
 		
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)

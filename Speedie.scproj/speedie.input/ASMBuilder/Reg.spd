@@ -17,7 +17,7 @@ datatype ASMReg (uint64)
 		AlreadyNegated
 		Discard
 		Param
-		FromZeroMemory
+		FromZeroMemory  // kludge to remove
 		Alternate
 		Subtract = Alternate
 		Set
@@ -32,15 +32,15 @@ datatype ASMReg (uint64)
 		CompilerCreated
 		GlobalMemory
 		PreferEqul
-		OK
+		ConstOutput
+		AsRegClear  = Into|||ConstOutput
 		Exit        = [ExitFunction, ExitAtAll]
 		AddrNeed    = [AddrRequest, AddrForceRequest]
-		KnownConst  = [ConstOutput, NotAlteredInbranch]
 		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
 		Zero	    = ConstOutput   ||| 56 ||| param		// 56 == datatypecode.uint64
 		RealDiscard = ConstOutput   ||| discard
-		Simple		= Temp ||| NotAlteredInbranch
+		Simple		= Temp
 
 	
 
@@ -301,7 +301,6 @@ datatype ASMReg (uint64)
 			isnt temp
 			return self
 												// dest is free!
-		isnt notalteredinbranch
 		return .reg(dest)
 	
 

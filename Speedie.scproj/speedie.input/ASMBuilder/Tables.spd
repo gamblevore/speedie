@@ -173,13 +173,13 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	return fat * Dest
 
 
-function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
-	opt norefcounts
-	(self)
-	|| inner = exp.first
-	expect ((inner == @arg) and !inner.hasany) (exp) // nil
-	|| Zzeerrooo = asmreg() as asmreg.FromZeroMemory
-	return zzeerrooo.reg(dest)
+//function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
+//	opt norefcounts
+//	(self)
+//	|| inner = exp.first
+//	expect ((inner == @arg) and !inner.hasany) (exp) // nil
+//	|| Zzeerrooo = asmreg() as asmreg.FromZeroMemory
+//	return zzeerrooo.reg(dest)
 
 
 function Return (fn_asm)
@@ -210,19 +210,15 @@ function Return (fn_asm)
 function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
-	dest.µtype = exp.asmdecl.mu.DataType
-	|| fReg = .µGetASM(F, dest)
-	if fReg.µtype == dest.µtype
-		return fReg // already done!
-	return TypeCastSub(self, exp, dest, freg)
-
-
-function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| from, |ASMReg|)
-	opt norefcounts
 	|| NewDecl = exp.ASMDecl
 	if newdecl.isbarestruct
-		return NilStructBuild(self, exp, dest)
-		
+		return asmreg()
+
+	dest.µtype = newdecl.mu.DataType
+	|| From = .µGetASM(F, dest)
+	if From.µtype == dest.µtype
+		return From // already done!
+
 	|| NewType = NewDecl.regtype
 	if !from.Reg												// x = 0|float|
 		from.µtype = NewType
@@ -285,7 +281,8 @@ function SetRel (fn_asm)						// function relset (
 
 	|| Src = .µGetReal(exp.last!, nil, nil|asmreg| * a)
 	(Src is SetAlways)
-	return .µ(A, Src)
+	.µ(A, Src)
+	return asmreg.discard
 
 
 
@@ -336,7 +333,6 @@ function Decl (fn_asm) // declaresub declare
 	target debug: if ty isnt local								// A carray or somthing?? idk
 	
 	(dest as= asmreg.Declaration)
-	(dest as= asmreg.into)
 	rel = rel.last!
 	return .µInto(rel, dest).incr
 
@@ -393,9 +389,8 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	// sure. but surely... its just a pointer anyhow.
 	// so... what should the set do? lets just assume it works. for now.
 	
-	if !d.CanCopyNormally
-		if dest is set
-			return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()
+	if (dest is set) and !d.CanCopyNormally
+		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()
 
 	  elseif dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.mu.DataType
@@ -462,7 +457,7 @@ function Thg (fn_asm)
 	target debug
 		|| reg = thg.reg
 		if (reg-1)|uint| >= 31								// what?
-			if (!reg) and (thg is ConstOutput or ok)
+			if (!reg) and (thg is ConstOutput)
 				return thg
 			error (exp, "Register out of bounds")
 	return thg										// Its still ok.   nil/false
@@ -501,7 +496,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			
 		|| T = .LocalThg(d)
 		if dest isnt AddrNeed
-			return .Into(exp, dest, t)
+			return t
 			
 		if d.IsBareStruct					// it already has the address
 			return T.haveaddr
@@ -767,6 +762,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	|| mr = ASMReg()
 	|| First = exp.first!
 	|| dest = mode asnt asmreg.into
+	target debug: || trap = ++asmtrapper, if trap == 0
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else
@@ -803,13 +799,13 @@ function LocalThg (|scdecl| d,  |asmreg|) // asmlocal, localasm
 	|| T = d.WholeType //as ASMReg.FromExistingVar
 
 	(t is param) = d is param
-	(t is constoutput) = d is const	
-	if  d isnt AlteredInBranch
-		(t is NotAlteredInbranch)
-		|| f = .registers[t.reg]
-			t.FatIndex = f.index
-			if f is ConstOutput
-				(T is ConstOutput)
+	(t is constoutput) = d is const
+	|| f = .registers[t.reg]
+	 // we don't need to worry about alteredinbranch! Just check the basicblock!
+	if f and .iscurr(f)
+		t.FatIndex = f.index
+		if f is ConstOutput
+			(T is ConstOutput)
 	
 	|| rr = T.reg
 		|| Ret = .State.Return

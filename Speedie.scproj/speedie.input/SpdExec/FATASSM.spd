@@ -89,11 +89,19 @@ struct FatASM
 			._op = sopp
 		return dest
 	
-
+	
+	function ConstFinish (|asmreg| dest, |int64| K, |asmreg|)
+		(dest isnt into)
+		(dest is ConstOutput)
+		dest = dest.FatIndex(.index)
+		.Const = K
+		.info = dest
+		return dest
+	
 	operator mul (|asmreg| flags, |asmreg|)
 		cpp_part AsReg
 		
-		(flags isnt into)
+		(flags isnt AsRegClear)
 		|| flags2 = flags.FatIndex(.index)
 		.info = flags2
 		if flags
@@ -217,7 +225,7 @@ struct FatASM
 		changed &= 31
 		if changed
 			sh.Register(changed) = self
-			sh.KnownValues(Changed) = info is knownconst // NotAlteredInbranch + ConstOutput
+			sh.KnownValues(Changed) = info is constoutput
 		
 		info.FatIndex = .index
 		.info = info

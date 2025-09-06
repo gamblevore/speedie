@@ -299,7 +299,6 @@ extend Assembler
 	
 	
 	function asmreg.PointerMul (|message| exp, |bool| swapped, |int|)
-		debugat
 		opt norefcounts
 		|| d = .PointerMulSub(exp, swapped)
 			return d.CArraySize
@@ -410,10 +409,6 @@ extend Assembler
 		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
 
 
-	function asmreg.CanReuse (|asmreg| other, |bool|)
-		return (self isnt into) or (other iz self)
-	
-	
 	function Plus (fn_opasm) // add (
 		rz = .Plussub(exp, dest, l, r)
 		rz = rz asnt (asmreg.into as asmreg.subtract)
@@ -421,12 +416,12 @@ extend Assembler
 
 	function PlusSub (fn_opasm) // add (
 		|| rr = r.reg
-		if !rr and dest.CanReuse(l)			// allow a = a ± 0
+		if !rr					// allow a = a ± 0
 			return l
 			
 		|| ll = l.reg
-		if l isnt Subtract  // 0 + a
-			if !ll and dest.CanReuse(r)
+		if l isnt Subtract			// 0 + a
+			if !ll
 				return r
 		  else
 			if (rr == ll)
@@ -763,7 +758,7 @@ extend Assembler
 	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)
 		opt inline
 		|| f = src.fat$
-		if .IsTempable(src,dest) and .IsCurr(f)
+		if .IsCurr(f) and .IsTempable(src,dest)
 			return .redest(f, dest)
 	
 	

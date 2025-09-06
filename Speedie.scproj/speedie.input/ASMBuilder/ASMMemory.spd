@@ -43,7 +43,8 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		#!wait?? this is meant to be an AddrRequest? not a response.
 		debugger
 	
-	if dest is FromZeroMemory
+	if dest is FromZeroMemory // kludge to remove
+		debugger 
 		if Decl
 			return .CopyMemory(index, exp, asmreg(), base, varadd, Decl)
 		error (exp)
@@ -166,14 +167,14 @@ function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scd
 function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0, |&fatasm|)
 	opt inline
 	(dest is set)
-	(dest is ok)
+	(dest is discard)
 	return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestDecl, index)
 
 
 function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
 	opt inline
-	if dest is set or FromZeroMemory
-		(dest is OK)					// make compiler happy
+	if dest is set or FromZeroMemory  // kludge to remove
+		(dest is discard)			  // make compiler happy
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
 	(dest isnt constoutput)

@@ -5,7 +5,7 @@ struct InlineInfo
 	|uint|			References
 	|uint|			Normal
 	
-	function Fix (|?message| p, |[scdecl]| args)
+	function DoImmediates (|?message| p, |[scdecl]| args)
 		opt norefcounts
 		|| sh = Assembler.sh
 		for (a in args) (i)
@@ -133,26 +133,24 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		regs.Rewind(self)
 
 
-function UpdateInlineReg (|asmreg| V, |scdecl| D)
-	if v is constoutput
-		v.incr
-	(d is const) = (v is ConstOutput) and (d isnt Altered)
-	v.TmpCheck
-	D.AsmReg = v												// update reg!
-
 	
 function InlineParameters (|message| prms, |InlineInfo| Info)
 	opt norefcounts
 	|| p = prms.first$
 
-	info.Fix(p, .fn.args)
+	info.DoImmediates(p, .fn.args)
 
 	for (a in .fn.args) (i)
 		|| V = info.Items[i]
 		if !(V asnt ASMReg.into) // its nil or into
 			V = .µGetReal(p, a, V)
 			info.items[i] = V
-		.UpdateInlineReg(V, a)
+		
+		if v is constoutput
+			v.incr
+		(a is const) = (v is ConstOutput) and (a isnt Altered)
+		v.TmpCheck
+		a.AsmReg = v												// update reg!
 		p = p.next!
 
 

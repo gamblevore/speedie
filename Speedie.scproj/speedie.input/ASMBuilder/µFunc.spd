@@ -37,7 +37,7 @@ extend SCFunction
 				|| r = fat.JumpReg
 					fat.FillLabelRequest(where, rz, r-1)
 
-	render µRender
+	render µRender 
 		fs <~ "asm ${.name}\n"
 		|| bb = 0
 		for µ.fat in self

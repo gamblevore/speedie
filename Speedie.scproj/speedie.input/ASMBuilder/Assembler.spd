@@ -153,7 +153,6 @@ struct Assembler
 		if type
 			Type.WholeType = rz
 			target debug: Type.ASMSanity
-			(rz is notalteredinbranch) = (type isnt alteredinbranch)
 
 		.Vdecls = d
 		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
@@ -238,10 +237,6 @@ struct Assembler
 	
 	function Nop (|FATASM| ToNop)
 		opt inline
-/*		if "Incr".trap
-			tonop.debugprint
-			debugger
-*/
 		return .nopsub(ToNop, false, 0)
 	
 	
@@ -306,7 +301,7 @@ struct Assembler
 		(dest as= asmreg.PreferEqul)						// easier to optimise.
 		|| x = .µ(exp, dest)
 		if x.IsBool
-			return .Into(exp, dest, x)
+			return x
 		return .Exists(dest, X, exp)
 	
 	
@@ -345,7 +340,7 @@ struct Assembler
 	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Mode,  |asmreg|)
 		if mode is into
 			|| Dest = .GetRealDest(exp, a, mode)
-			return .µgetasm(Exp, dest)
+			return .µGetASMInto(Exp, dest)
 		
 		|| OV = .OpenVars
 		|| Dest = .GetRealDest(exp, a, mode)
@@ -354,21 +349,7 @@ struct Assembler
 			return rz
 		.CloseVars(ov)
 		
-	
-	
-	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		target debug: if dest is discard, if !dest.reg, || t = ++asmtrapper, if t == 0
-
-		return .µ(Exp, dest as asmreg.Into)
 		
-	
-	function Into (|message| exp, |asmreg| dest, |asmreg| t, |asmreg|)
-		if  dest isnt into  or  t iz dest
-			return t
-		return .Assign(exp, dest, t)
-		
-	
-	
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		description "Same as µGetASM, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars
@@ -393,6 +374,32 @@ struct Assembler
 		return r.incr
 
 
+	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		|| Closer = .OpenVars
+		|| v = .µGetASMInto(exp, dest)
+		return .CloseVars(Closer, nil, v)
+		
+	
+	function µGetASMInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		|| m = .µGetASM(Exp, dest asnt asmreg.into)
+		if m is into: .µDebug(exp, dest)
+		(m isnt into)
+		if m iz dest
+			return m
+		return .Assign(exp, dest, m)
+		
+	
+	function µDebug (|message| exp, |asmreg| dest)
+		target debug
+			|| fn = fn_asm_table[exp.ASMType]!
+			dest.debugprint
+			PrintProgress()
+			debugger
+			|| m = (fn)(self, exp, dest)
+			m.debugprint
+			debugger
+
+		
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM 
@@ -400,6 +407,7 @@ struct Assembler
 		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
 			dest.TmpCheck
+			if dest is into
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
@@ -410,22 +418,19 @@ struct Assembler
 
 		target debug
 			.StackSize--
-			if ((dest is into) and !(ss iz dest)) or (ss is into)
-				if (ss is into) { "into" } else {"wrong dest"}
-/				(fn)(self, exp, dest)
 			if (ss is constoutput) and (ss.reg and !ss.fatindex) // huh?
-				debugger
-				PrintProgress()
-				(fn)(self, exp, dest)
+				"!Const has no fat!"
+				.µdebug(exp, dest)
 			if !ss.tmpcheck
-				(fn)(self, exp, dest)
-			if !ss  or  (dest is set)  or  (ss is set or ok)
+				.µdebug(exp, dest)
+			// dest discard means "we are telling you that we don't need the result"
+			// return discard means "the result is unused, so reg0 isn't actually being set to"
+			if !ss  or  (dest is set)  or  (ss is set or discard)
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
 				if !(ss & asmreg.exit) and (ss isnt constoutput)
-					debugger
-					PrintProgress()
-					(fn)(self, exp, dest)
+					"!Zero Reg!"
+					.µdebug(exp, dest)
 		return ss
 	
 	
@@ -468,11 +473,11 @@ struct Assembler
 		.state.BranchDepth = 0
 		.state.TailInlineable = true
 		.InlineDepthLimit = 3
-		.BasicBlock = 0
+		.BasicBlock = 1 // good to start these at 1.
+		.BranchID = 1
+		.NextBranchID = 1
 		.VDecls = 1
 		.VTemps = 0
-		.BranchID = 0
-		.NextBranchID = 0
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()
