@@ -2,9 +2,6 @@
 // jbin: streamable, binary jeebox
 
 
-|| _JbinHeader     = "\01\10\EA\E2"     /// can't put a constant in a role? 
-
-
 extend message
 	render RenderJbin (|string| shell_path = "")
 		opt norefcounts
@@ -12,7 +9,7 @@ extend message
 		|| js = fs|jbin|
 		if shell_path
 			js.sheb(shell_path)
-		js <~ _JbinHeader
+		js <~ Jbin.Header
 		.render_jbin_sub(js)
 	
 	helper render_jbin_sub (|jbin| js)
@@ -29,10 +26,14 @@ extend message
 
 
 role JBin (Faststring)
+	module
+		|| Header     = "\01\10\EA\E2"
+
 	linkage: cpp_part bin
+
 	constructor         (|syntax| type=@arg, |string| name="")
 		cpp_part Constructor
-		self <~ _JbinHeader
+		self <~ Jbin.Header
 		.enter(type, name)
 	constructor (|int| n)
 		cpp_part Constructor0
@@ -97,33 +98,6 @@ role JBin (Faststring)
 //		.AppendHInt(L)
 //		if L
 //			.ApendFile(f, L)
-
-
-//	helper OpenSection  (|ivec2|)							// openstream 
-//		++.NoFlush
-//		.length += 6
-//		return (.length, .reserved)
-//
-//	helper CloseSection (|int| c, |int| r, |syntax| Type)	// closestream
-//		|| CurrLen = .length
-//		expect (CurrLen >= c) (self, "Unable to close section")
-//		.length = c - 6
-//		|| blen = 5
-//		c = CurrLen - c
-//		|| Actual = c
-//		while {
-//			Actual >>= 7
-//			--blen
-//		} (Actual)
-//
-//		self <~ (0|byte|, blen) 
-//		self <~ (Type|int|<<1)|byte|
-//		.AppendHInt(c)
-//		.length = CurrLen
-//		|| nf = --.NoFlush
-//		if !nf and .Length >= r>>1 // 50%
-//			.flush
-
 
 
 datatype jbinLeaver (int)
@@ -211,19 +185,26 @@ function string.Digest (|string|)
 		return self
 	return .parse$.renderjbin
 
+
 /* 
-	todo: 
-		* Memory improvements: Allocate one block at a time! Call constructors. Just need Curr+Last ptr.
-		* No type+length/updown shall cross a 16MB boundary, Only the name can. Then can always parse, 
-		keeping all the pointers in registers. (This will need work on faststring, I think.)
+	Ideas
+	
+	Rework (good):
+		* Length high-bit means 31-bits remain. If false, next bit means 14 or 6 bits remain.
+			* More reliable! matches speedie's string max length!! 
+	
+	Speedups (annoying):
+		* Node-info can't cross 16MB boundary (name can tho). Then can keep ptrs in regs.
+		  (will need work on faststring, I think.)  Needs end with three zeros, also.
+		* Allocate one block at a time! Call constructors. Just need Curr+Last ptr.
+
+	Language level additions (meh):
 		* Allow MessageID during parse. Could save on RAM+CPU, if done properly, say only on @tmp, or
 		  done on a per-document-basis that knows what types to use.
 
-		* A back-ref mode? Some objects can their name+type in a cache for reuse.	
-		  This should need to be a separate project. Revive the HOL format, but simpler. Unless we make
-		  MessageID available by standard, and the renderer use the messageID! Even then its not simple,
-		  messageID is used across documents, or for anything you like. You are also basically just compressing
-		  which means parse gets faster but render gets slower (alot). Probably not worth doing.
+	Jbin level additions: (probably bad)
+		* A back-ref mode? Some objects can store their name+type in a cache for reuse.	
+			* Some unused @syx could represent backrefs.
 */
 
 

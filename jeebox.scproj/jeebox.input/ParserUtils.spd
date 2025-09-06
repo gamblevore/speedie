@@ -50,9 +50,9 @@ helper String.IsJbin (|ind|)
 	if  self[] == '#'  and  self[1] == '!' // shebang
 		|| nl = .find('\n')
 			nl++
-			if self[nl, _JbinHeader]
+			if self[nl, Jbin.Header]
 				return nl
-	  elseif self[0, _JbinHeader]
+	  elseif self[0, Jbin.Header]
 		return 0
 	return -1
 

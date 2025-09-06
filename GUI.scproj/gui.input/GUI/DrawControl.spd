@@ -70,7 +70,7 @@ class GraphicsEditor (GuiControl)
 		oof (#data#)*/
 		|| b = .backing		#expect ("This image has no file to save to.")
 		|jbin| j = b.out	#require
-		j <~ _JbinHeader
+		j <~ jbin.header
 		j.enter @arg
 		j.enter(@tmp, "jdraw")
 		j.addint 1
