@@ -8,28 +8,36 @@ app.usage = "Usage: size path [...]
 |bool|		ShowInvis = app.yes("v")
 ||			Types = app["types"].trim.dict('/')
 |[message]| Found
+||			cwd = app.cwd
 
 
 main (|[file]| FileList)
 	if !FileList
 		Quit app.Usage
-	
+	if cwd == "/": cwd = ""
+
 	for F in FileList
-		F.CountAll(f.path.length)
+		F.CountAll
 	
-	found.sort(MessagePositionSorter)		
+	found.sort(MessagePositionSorter)
+	|int64| Total
 	for m in found
-		"${m.name}: ${m.position.strsize}"
+		|| sz = m.position
+		|| n = m.name.TrimStart(cwd)
+			
+		"$n: ${sz.strsize}"
+		total += sz
+	"\nTotal: ${Total.strsize}"
 
 
-function file.CountAll (|int| base, |int64|)
+function file.CountAll (|int64|)
 	if .isdir
 		for c.files in self
 			if !c.IsSymLink and (ShowInvis or c.Visible)
-				rz += c.CountAll(base)
+				rz += c.CountAll
 	  else
 		require !types or types[.ext]
 		rz = .size
-	|| m = message(@str, self[base...])
+	|| m = message(@str, self)
 	m.Position = rz
 	Found <~ m

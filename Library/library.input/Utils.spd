@@ -66,8 +66,10 @@ function @file.Words (|file|)
 
 		
 function string.Dict (|byte| sep='\n', |dictionary of string|)
-	rz = Dictionary()
 	if self
+		// many speedie example projects rely on nil meaning "wildcard"
+		// so we have to return nil if self==""
+		rz = Dictionary()
 		for l in StringFields( self, sep )
 			rz[l] = "true"
 

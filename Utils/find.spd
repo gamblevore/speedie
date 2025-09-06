@@ -6,14 +6,14 @@
 
 main (|file.existing| FindPath, |string| Search)
 	expect (Search) ("Requires a search string")
-	types["spd"] = "x"
-	types["md"] = "x"
-	types["txt"] = "x"
-	|| t = app["types"]
-		types = t.Dict('/')
+	|| t = types!
+	t["spd"] = "x"
+	t["md"] = "x"
+	t["txt"] = "x"
+	|| ty = app["types"]
+		types = ty.Dict('/')!
 	
-	|| found = app.Collect(FindPath, Search)
-	if !found
+	if !app.Collect(FindPath, Search)
 		"No files contain: $search"
 
 
