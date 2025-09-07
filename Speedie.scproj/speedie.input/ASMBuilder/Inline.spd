@@ -12,14 +12,14 @@ struct InlineInfo
 			.Items[i] = .PreInlineOneParam(p!, a, sh)
 			p++
 
-		.Cleanup(args)
+		.CleanupClash(args)
 
 
 	function NopConsts (|int| n)
 		|| sh = Assembler.sh
 		while  --n >= 0
 			|| r = .Items[n] // now what to do?
-			if r.reg and r is ConstOutput 
+			if r.reg and r is Const 
 				sh.Decr(r.needfat, false)
 
 	
@@ -28,16 +28,9 @@ struct InlineInfo
 		p = p.ASMUnbra
 		require (p.func == @thg)
 		|| d = p.ASMDecl
-		if (d is Const) and !d.mu.ExportPosition
-			if a isnt alteredorref
-				return asmreg()
-			return asmreg.into
-		
 		require d is local
 		|| v = sh.LocalThg(d)
-		require  a is reference  or  a isnt altered  or  sh.state.return iz v
 		|| vr = 1<<v.reg
-		
 		if a is Reference
 			.References |= vr
 		  elseif a is Altered
@@ -46,11 +39,12 @@ struct InlineInfo
 			.Altered |= vr
 		  else
 			.Normal |= vr
+
 		(a is reference) = (d is reference)
 		return v	
 	
 	
-	function Cleanup (|[scdecl]| args)
+	function CleanupClash (|[scdecl]| args)
 		|| AR = .References & .Altered
 		|| AN = .Normal & .Altered
 		if AR ||| AN
@@ -65,9 +59,9 @@ struct InlineInfo
 				|| a = args[n]!
 				|| r = 1<<v.reg
 				if (AR & r) and (a isnt reference)
-					.items[n] = asmreg.into				// needs copy to save other regss
+					.items[n] = asmreg.into2				// needs copy to save other regss
 				  elseif (AN & r) and (a is altered)
-					.Items[n] = asmreg.into				
+					.Items[n] = asmreg.into2
 	
 
 
@@ -128,7 +122,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|| Grown = .CurrGain(RealStart)
 	if Grown <= AllowedGain
 		if !rz
-			(rz is ConstOutput)			// no longer zero
+			(rz is Const)			// no longer zero
 	  else
 		regs.Rewind(self)
 
@@ -138,20 +132,18 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 	opt norefcounts
 	|| p = prms.first$
 
-	info.DoImmediates(p, .fn.args)
-
-	for (a in .fn.args) (i)
+	|| args = .fn.args
+	target debug: if asmtrapper == 0
+	info.DoImmediates(p, args)
+	
+	for (a in args) (i)
 		|| V = info.Items[i]
-		if !(V asnt ASMReg.into) // its nil or into
-			V = .µGetReal(p, a, V)
-			info.items[i] = V
-		
-		if v is constoutput
-			v.incr
-		(a is const) = (v is ConstOutput) and (a isnt Altered)
-		v.TmpCheck
-		a.AsmReg = v												// update reg!
+		if !(V asnt ASMReg.into2) // its nil or into
+			info.items[i] = .µInlineParam(p, a, V)
 		p = p.next!
+
+	for (a in args) (i)
+		a.AsmReg = info.Items[i]									// update reg!
 
 
 	

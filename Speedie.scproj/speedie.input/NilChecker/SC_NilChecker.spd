@@ -209,7 +209,7 @@ function Access (NilTrackerFn)
 function Property (NilTrackerFn)
 	opt norefcounts
 	|| second = msg.second
-		second.func = @list // clean up for ASM
+		second.func = @emb // clean up for ASM
 	return .UseChildAsReal(msg, test, nilreason.property)
 
 

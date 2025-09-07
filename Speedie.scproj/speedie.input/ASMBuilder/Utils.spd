@@ -54,10 +54,6 @@ function Assembler.OpenVars (|uint64|)
 	return (.VDecls|uint64| << 0) ||| (.VTemps|uint64| << 32)
 
 
-function Assembler.RestoreVars (|uint64| Old)
-	.VDecls = Old 
-	.VTemps = Old >> 32
-
 
 function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Return=nil, |asmreg|)
 	opt NoRefCounts
@@ -65,10 +61,10 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	|| OrigTemps = Orig >> 32
 	|| OrigDecls = (orig << 32) >> 32
 
-	while .CloseOneVar(exp, origtemps, .vtemps)
+	while .CloseOneVar(exp, origtemps, false)
 		0
 	
-	while .CloseOneVar(exp, OrigDecls, .vdecls)
+	while .CloseOneVar(exp, OrigDecls, true)
 		0
 
 	return Return
@@ -88,16 +84,20 @@ function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|
 	return true
 
 
-function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |bool|)
+function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |bool|)
 	opt norefcounts										/// READ TABLE ///
-	target debug
-		|| C0 = Curr
+	|uint| Curr = (.vdecls, .vtemps)(isreal) 
 	|| Extra = Curr &~ Orig
 	if Extra == -1 // huh?
 	require Extra
 	
 	|| v = extra.log2
 	Curr &=~ (1<<v)
+	if isreal
+		.vdecls = curr
+	  else
+		.vtemps = curr
+	
 	.KnownValuesMap &=~ (1<<v)
 
 	|| fat = .Registers[v]
@@ -153,7 +153,7 @@ function asmreg.incr (|asmreg|)
 		f.µrefcount++
 		return self
 	target debug
-		if .reg and self is ConstOutput  // sigh
+		if .reg and self is Const  // sigh
 	return self
 		
 		

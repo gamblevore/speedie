@@ -22,7 +22,7 @@ extend Assembler
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
-		if  L is ConstOutput  and  R is ConstOutput
+		if  L is Const  and  R is Const
 			.Nop2Consts(r, l)
 			|| num = ((l.const==r.const)!=negate)|int|
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
@@ -31,12 +31,12 @@ extend Assembler
 			dest = .TempTyped(TypeBool!.TypeNormal, dest)
 			return exp.EQUL(dest, L, R, negate.equlmode(l,r)) * dest
 
-		if  r is ConstOutput  and  l isnt ConstOutput
+		if  r is Const  and  l isnt Const
 			swap (l) (r)
 		
 		|| RS = r.small
 		|&fatasm| fat
-		if l.reg
+		if !l.IsZero
 			|| LS = L.Small
 			if RS
 				|| K = .Const(L, 9, L.signed)
@@ -68,7 +68,7 @@ extend Assembler
 		|| rr = r.reg,  || ll = l.reg
 		if !rr  and  ll
 			swap (l) (r) // put reg 0 into the left... more convenient.
-		(Dest  as=  l & r & asmreg.ConstOutput)
+		(Dest  as=  l & r & asmreg.Const)
 		
 		if rr == ll
 			return .EqualsSame(exp, dest, l, r)
@@ -86,8 +86,8 @@ extend Assembler
 
 
 	function KompareIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
-		require  l is ConstOutput  or  r is ConstOutput
-		|| swapped = l is ConstOutput
+		require  l is Const  or  r is Const
+		|| swapped = l is Const
 			swap (l) (r)					// 10 > x   -->  x <  10  -->  x <= 9
 			mode ^= 1						// 10 <= x  -->  x >= 10  -->  x >  9
 		|| f = r.fat$
@@ -112,7 +112,7 @@ extend Assembler
 		mode ^= dest is Negate
 		dest = dest.BoolAnswer // strips negate off dest
 
-		if l is ConstOutput and r is ConstOutput
+		if l is Const and r is Const
 			return .ConstCompareInt(dest, L, R, exp, Mode)
 
 		mode |= l.small << 2
@@ -182,7 +182,7 @@ extend Assembler
 		// if dest is negate
 		mode ^= dest is Negate
 		dest = dest.BoolAnswer
-		if (l is constoutput and r is constoutput) // needs to handle this!
+		if (l is Const and r is Const) // needs to handle this!
 			return .ConstCompareFloat(dest, L, R, exp, Mode)
 		if dest isnt Condanswer
 			return exp.CMPF(dest, L, R, Mode) * dest
@@ -211,10 +211,10 @@ extend Assembler
 
 	// MATH 
 	function QuickFloat32Plus    (fn_OpASM)
-		if  r is constoutput // a + 1,   a - 1
+		if  r is Const // a + 1,   a - 1
 			|| QQ = .QuickFloatPlusConstSub(exp, dest, l, r)
 				return qq
-		if  l is constoutput  and  l isnt Alternate   // 1 + a --> a + 1
+		if  l is Const  and  l isnt Alternate   // 1 + a --> a + 1
 			return .QuickFloatPlusConstSub(exp, dest, r asnt asmreg.alternate, l)
 	
 			
@@ -232,7 +232,7 @@ extend Assembler
 
 
 	function QuickFloatDiv    (fn_OpASM)
-		require r is ConstOutput
+		require r is Const
 		|| v = r.float
 		|| v2 = v.abs
 		// could use exp.FEXK to do powers of 2
@@ -253,7 +253,7 @@ extend Assembler
 
 
 	function QuickIntMul    (fn_OpASM)
-		require r is constoutput
+		require r is Const
 		|| Pow2 = .IntPowerOfTwo(r)
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
@@ -270,7 +270,7 @@ extend Assembler
 
 
 	function QuickFloatMul    (fn_OpASM)
-		require r is constoutput	
+		require r is Const	
 		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0
 			.nopconst(r)
@@ -294,7 +294,7 @@ extend Assembler
 
 	function ASMReg.LeftScore (|int|) // we want pointers on the left, and consts on the right
 		rz += .somepointer << 2				// pointers on left
-		rz += (self isnt ConstOutput) << 1	// consts on right
+		rz += (self isnt Const) << 1	// consts on right
 		rz += self isnt temp				// temps on right
 	
 	
@@ -350,19 +350,19 @@ extend Assembler
 		
 		
 	function IntPlus     (fn_opasm)
-		if dest is ConstOutput									// perhaps we can do this in domathsub?
+		if dest is Const									// perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntPlus)
 		
 		|| swapped =  l isnt alternate  and  l.LeftScore < r.LeftScore
 			swap (l) (r) // a+b == b+a
 	
-		if !r.reg // add or subtract zero
-			return .Assign(exp, dest, l)
+		if r.iszero // add or subtract zero
+			return l//.Assign(exp, dest, l)
 
 		|| LMul = 1
 		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
-		if r is ConstOutput
+		if r is Const
 			|| RR = r.const
 			if l is Subtract
 				RR = -RR
@@ -396,7 +396,7 @@ extend Assembler
 		
 
 	function FloatPlus (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
@@ -410,21 +410,22 @@ extend Assembler
 
 
 	function Plus (fn_opasm) // add (
-		rz = .Plussub(exp, dest, l, r)
-		rz = rz asnt (asmreg.into as asmreg.subtract)
+//		(dest is Const) = (l&r) is Const
+		rz = .Plussub(exp, dest, l, r) // into won't be passed in anymore. So just remove the clear?
+		rz = rz asnt asmreg.subtract
 
 
 	function PlusSub (fn_opasm) // add (
-		|| rr = r.reg
-		if !rr					// allow a = a ± 0
+		if r.iszero					// allow a = a ± 0
 			return l
-			
-		|| ll = l.reg
+		
+//		|| x = 0
+//		|| ll = l.reg
 		if l isnt Subtract			// 0 + a
-			if !ll
+			if l.iszero
 				return r
 		  else
-			if (rr == ll)
+			if (r iz l)
 				return .zeros(exp, dest)
 		
 		if l.IsFloat
@@ -433,7 +434,7 @@ extend Assembler
 
 
 	function Subtract (fn_opasm)				// x = a - b
-		(l is Subtract)						// the logic ismostly shared...
+		(l is Subtract)							// the logic ismostly shared...
 		return .Plus(exp, dest, l, r)
 
 
@@ -445,7 +446,7 @@ extend Assembler
 
 
 	function FloatMul (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatMul)
 		rz = .QuickFloatMul(exp, dest, R, L)
 		if rz == nil
@@ -456,7 +457,7 @@ extend Assembler
 
 
 	function IntMul (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntMul)
 		rz = .QuickIntMul(exp, dest, R, L)
 		if rz == nil
@@ -467,7 +468,7 @@ extend Assembler
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(exp, dest, Bule, V)
 		if !rz
@@ -480,7 +481,7 @@ extend Assembler
 		if r isa DataTypeCode.bool
 			return .BoolMul(dest, r, l, exp)
 
-		if l is ConstOutput
+		if l is Const
 			swap (l) (r)
 		if l.isint
 			return .IntMul(exp, dest, r, l)
@@ -496,7 +497,7 @@ extend Assembler
 
 
 	function DivFloat    (fn_opasm)
-		if (dest is ConstOutput) and (l isnt alternate)
+		if (dest is Const) and (l isnt alternate)
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatDiv)
 		rz = .QuickFloatDiv(exp, dest, L, R)
 		if rz == nil
@@ -513,7 +514,7 @@ extend Assembler
 
 
 	function QuickIntDiv    (fn_opasm)
-		require r is ConstOutput
+		require r is Const
 		|| PToi = .IntPowerOftwo(r)$
 		if ptoi <= 1																//   x/1  x/0  x/-1
 			if ptoi == 0
@@ -525,7 +526,7 @@ extend Assembler
 
 
 	function DivInt    (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntDiv)
 		|| q = .QuickIntDiv(exp, dest, l, r)
 			return q
@@ -545,7 +546,7 @@ extend Assembler
 
 
 	function ModInt    (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntMod)
 		|| fat = exp.DIV(asmreg(), dest, L, R, dest.signed|int|)
 		fat._Outputs &= ~1 // clear unused output 
@@ -553,7 +554,7 @@ extend Assembler
 
 
 	function ModFloat    (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, L, R, exp, Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, L, R, asmreg(), big).Vectorise(dest, asm.VDIV)
@@ -570,22 +571,22 @@ extend Assembler
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, asmreg(), exp, ConstifyBitNot)
 		if 0: exp.BNOT, exp.qnot
 		return .BitMaker(dest, l, asmreg(), exp, asm.bnot, asm.qnot)
 
 
 	function BitXor (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitXor)
 		if (l iz r)
 			return .Zeros(exp, dest)
-		if !l.reg
+		if l.iszero
 			return r
-		if !r.reg
+		if r.iszero
 			return l
-		if (l is ConstOutput)
+		if (l is Const)
 			swap (l) (r)
 		if 0: exp.BXOR, exp.qxor
 		return .BitMaker(dest, l, r, exp, asm.bxor, asm.qxor)
@@ -594,45 +595,49 @@ extend Assembler
 	function BitOr (fn_opasm)
 		if !dest.reg
 		
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitOr)
-		
-		|| ll = l.reg
-		|| rr = r.reg
 
 		if dest isnt Textual
-			if (ll == rr)
+			if (l iz r)
 				return l
-			if l is constoutput
-				if !l.reg
+			if l is Const
+				|| K = l.const
+				if k == 0
 					return r
-				if l.isconst(-1)
+				if k == -1
 					return l
-			if r is constoutput
-				if !r.reg
+			if r is Const
+				|| K = r.const
+				if k == 0
 					return l
-				if r.isconst(-1)
+				if k == -1
 					return r
-		if (l is ConstOutput)
+		if (l is Const)
 			swap (l) (r)
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
 
-			
-	function BitAnd (fn_opasm)		
-		if dest is ConstOutput
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitAnd)
-		|| ll = l.reg
-		|| rr = r.reg
-		if (ll == rr)
-			return l
-		if !ll or !rr
-			return .Zeros(exp, dest)
-		if .NopMinusOne(l)
+	
+	function AndNop (|assembler| self, |message| exp, |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
+		require l is Const
+		|| k = l.const
+		if .nopconst(l, -1)
 			return r
-		if .NopMinusOne(r)
+		if k == 0
+			return .zeros(exp, dest)
+
+	function BitAnd (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitAnd)
+		if (l iz r)
 			return l
-		if (l is ConstOutput)
+		|| k = .AndNop(exp, dest, l, r)
+			return k
+		k = .AndNop(exp, dest, r, l)
+		if k
+			return k
+		if (l is Const)
 			swap (l) (r)
 		if 0: exp.qand
 		return .BitMaker(dest, l, r, exp, asm.band, asm.QAND)
@@ -642,7 +647,6 @@ extend Assembler
 		if asm.BORK!=asm.borr+4 // what?
 
 		if r.reg and (opp != asm.bnot) and !dest.IsVec
-			if "BecomeReal".trap
 			|| k = .Const(R, 14, true)
 				if 0:  exp.BORK,  exp.BXRK
 				|| fat = exp.BANK(dest, L, K) 
@@ -654,7 +658,7 @@ extend Assembler
 			swap (l) (r)
 			clear = -clear
 		
-		if Clear and r.signed and l.reg
+		if Clear and r.signed and !l.iszero
 			r = exp.ExpandBits(r, l.µtype) // wat a shame.
 			clear = 0
 			
@@ -692,7 +696,7 @@ extend Assembler
 		
 		
 	function SHR  (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
 		|| K = .const(R, 6, false)
 			if k == 0
@@ -710,7 +714,7 @@ extend Assembler
 
 
 	function SHL  (fn_opasm)
-		if dest is ConstOutput
+		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitSHL)
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
@@ -731,7 +735,7 @@ extend Assembler
 		down += 64 - (SrcBits+up)
 		up = 64 - SrcBits
 		
-		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
+		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(exp, dest)
 	
 		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
@@ -742,42 +746,41 @@ extend Assembler
 
 	function Zeros (|message| exp, |asmreg| dest, |asmreg|)
 		return .NumToReg(exp, dest, 0, dest.µtype)
-	
-	
-	function IsTempable (|asmreg| Src, |asmreg| Dest, |bool|)
-		if src is temp
-			return true
-			
-		if (dest is exitatall)
-			|| vdecls = .state.parentvars|uint|
-			|| find = 1<<src.reg
-			return !(vdecls & find) // the decl is out of range! IE... it won't be missed.
-									// we can fuck around with it as much as we like >:3
-			
+				
 	
 	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)
 		opt inline
 		|| f = src.fat$
-		if .IsCurr(f) and .IsTempable(src,dest)
-			return .redest(f, dest)
+		
+		if src isnt temp
+			require .iscurr(f) and (dest is exitatall)
+			|| vdecls = .state.parentvars|uint|
+			|| find = 1<<src.reg
+			require (vdecls & find) // the decl is out of range! IE... it won't be missed.
+									// we can fuck around with it as much as we like >:3
+		
+		return .redest(f, dest)
 	
 	
 	function Assign (|message| exp, |asmreg| dest, |asmreg| src, |asmreg|)  // assigns (
-		(Dest isnt into)
 		if src iz dest
 			return dest
 		
-		if !src.reg or src is constoutput					// setting a const
-			return .LoadNumber(exp, src.Const, dest)		// Consts are the most optimisable thing we have
+		if !src.reg and (src isnt const)
+			debugger
+			(src is const)
+		
+		|| improve = .ImproveAssign(dest, src)
+			return improve
+
+		if src is Const										// setting a const
+			|| K = src.const
+			return .LoadNumber(exp, K, dest)				// Consts are the most optimisable thing we have
 		
 		target debug: if (dest.IsVec != src.IsVec) and src.reg
-		
 		if dest.IsVec
 			return exp.VMOV(dest, src, asmreg(), asmreg()) * dest
 
-		|| improve = .ImproveAssign(dest, src)
-			return improve
-		
 		// BFLG is VERY optimisable :] (but consts are even more)
 		
 		|| sh = src.BitCount - dest.BitCount
@@ -788,14 +791,14 @@ extend Assembler
 		  else
 			sh = 0 // no point otherwise. just make the asm simpler.
 				
-		(dest isnt constoutput)
+		(dest isnt Const)
 		return exp.BFLG(dest, src, sh, sh, src.signed|int|) * Dest
 
 
-	function NopMinusOne (|asmreg| r, |bool|)
-		if r.IsConst(-1)
-			.nopconst(r)
-			return true
+//	function NopMinusOne (|asmreg| r, |bool|)
+//		if r.IsConst(-1)
+//			.nopconst(r)
+//			return true
 	
 	
 function int64.Fits (|int| amount, |bool| signed=true,  |bool|)

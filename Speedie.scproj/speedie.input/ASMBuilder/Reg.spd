@@ -22,7 +22,7 @@ datatype ASMReg (uint64)
 		Subtract = Alternate
 		Set
 		Declaration
-		Into
+		Into2
 		NoScale
 		ContainsAddr
 		Textual
@@ -32,14 +32,14 @@ datatype ASMReg (uint64)
 		CompilerCreated
 		GlobalMemory
 		PreferEqul
-		ConstOutput
-		AsRegClear  = Into|||ConstOutput
+		Const
+		AsRegClear  = Const
 		Exit        = [ExitFunction, ExitAtAll]
 		AddrNeed    = [AddrRequest, AddrForceRequest]
 		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
-		Zero	    = ConstOutput   ||| 56 ||| param		// 56 == datatypecode.uint64
-		RealDiscard = ConstOutput   ||| discard
+		Zero	    = Const   ||| 56 ||| param		// 56 == datatypecode.uint64
+		RealDiscard = Const   ||| discard
 		Simple		= Temp
 
 	
@@ -50,7 +50,7 @@ datatype ASMReg (uint64)
 	
 	target debug
 		render
-			if self is constoutput
+			if self is Const
 				fs <~ "k"
 			fs <~ ('r' + ((self is temp)<<1))|byte| // r,t
 			fs <~ .reg
@@ -81,15 +81,15 @@ datatype ASMReg (uint64)
 		return self|uint16||asmreg|
 	
 //	function CopyConst (|asmreg| Src, |asmreg|)
-//		return (self &~ ConstOutput) as (src & ConstOutput)
+//		return (self &~ Const) as (src & Const)
 	
 	function Const (|int64|)
-		// every single caller must check for constoutput (and does!)
+		// every single caller must check for Const (and does!)
 		|| F = .FAT
 			return f.const
 		if .reg == 0
 			return 0
-		if self is constoutput // WHA DA FA!
+		if self is Const // WHA DA FA!
 		if self isnt param
 			.NeedFAT
 		
@@ -97,10 +97,13 @@ datatype ASMReg (uint64)
 //		.needfat.const = value
 //
 //	function CanBeKnownValue (|bool|)
-//		 return self is NotAlteredInbranch and constoutput
+//		 return self is NotAlteredInbranch and Const
 
-	function IsConst (|int64| val, |bool|)
-		return  (self is ConstOutput) and (.const == val)
+	function IsZero (|bool|)
+		return  (self is Const) and (.const == 0)
+		
+//	function IsConst (|int64| val, |bool|)
+//		return  (self is Const) and (.const == val)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
@@ -160,7 +163,7 @@ datatype ASMReg (uint64)
 
 	function bool.EqulMode (|asmreg| L, |asmreg| R, |int|)
 		rz = self|int| xor 1
-		rz |= l.clip << 1
+		rz |= L.clip << 1
 		rz |= R.clip << 4
 
 	function uint.EqulInputsAreBothBool (|bool|)
@@ -203,6 +206,9 @@ datatype ASMReg (uint64)
 		return ((self|uint64| & ~Mask) ||| (value&Mask))|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
+		// seems we only test one bit at a time...
+		// but argumentsub wants to test two... so it can't use this.
+		
 		return (self & R) == r
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
@@ -212,7 +218,7 @@ datatype ASMReg (uint64)
 			return self asnt r
 		
 	function datatypecode.zero (|asmreg|)
-		|| K = asmreg.ConstOutput
+		|| K = asmreg.Const
 		K.µtype = self
 		return K
 	
@@ -226,10 +232,10 @@ datatype ASMReg (uint64)
 		return (self|uint64| >> 11)&31
 	
 	
-	function Into (|asmreg| dest, |asmreg|)
-		rz = .reg(dest)
-		rz.µtype = dest.µtype			// I guess we copy some wierd flags... sigh.
-		(rz is exitatall) = (dest is ExitAtAll)
+//	function Into (|asmreg| dest, |asmreg|)
+//		rz = .reg(dest)
+//		rz.µtype = dest.µtype			// I guess we copy some wierd flags... sigh.
+//		(rz is exitatall) = (dest is ExitAtAll)
 		
 		
 	function Reg (assigns:|int|, |AsmReg|)
@@ -256,6 +262,14 @@ datatype ASMReg (uint64)
 	function SCDecl.ASMReg (assigns:|asmreg|)
 		target debug
 			if !value.reg and self is alteredorref
+		
+		isnt const
+		.ExportPosition = 0
+		if value is Const
+			value.incr
+			if self isnt Altered
+				is const
+				.ExportPosition = value.Const
 		value.µType = .mu.DataType
 		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck
@@ -263,7 +277,11 @@ datatype ASMReg (uint64)
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)
 			
+
 	operator mul (|message| m, |asmreg|)
+		disabled "use temp"
+	
+	operator temp (|message| m, |asmreg|)
 		if !m.ContainsFunc
 			is temp
 		return self
@@ -295,14 +313,14 @@ datatype ASMReg (uint64)
 		.reg = dest 
 		return self
 	
-	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
-		if InUse.reg == dest.reg				// dest is in use!
-			.reg = 0
-			isnt temp
-			return self
-												// dest is free!
-		return .reg(dest)
-	
+//	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
+//		if InUse.reg == dest.reg				// dest is in use!
+//			.reg = 0
+//			isnt temp
+//			return self
+//												// dest is free!
+//		return .reg(dest)
+//	
 
 	
 	target debug {

@@ -18,7 +18,7 @@ struct Assembler
 	|byte|						InlineDepthLimit
 	target debug
 		|byte|					StackSize
-	|uint|						VDecls
+	|uint|						VDecls_
 	|uint|						VTemps
 	|int|						CurrFuncGrab
     |uint16|                    BranchID
@@ -115,7 +115,7 @@ struct Assembler
 			dest.µtype = orig.µtype
 		dest = .TempOnly(dest)
 		|| Where = orig • dest
-		(where is ConstOutput)
+		(where is Const)
 		|| K = .NumToReg(exp, where, amount, orig.µtype)
 		return .Plus(exp, dest, Orig, K)
 	
@@ -158,6 +158,15 @@ struct Assembler
 		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
 
 
+	function vdecls (|uint|)
+		return .vdecls_
+
+
+	setter vdecls (|uint|)
+//		if "foreignfuncs".trap	
+		.vdecls_ = value
+
+	
 	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
 		if type
 			t.µtype = type.mu.DataType
@@ -187,7 +196,7 @@ struct Assembler
 		r |= 1<<Free
 		t.reg = Free
 		.VTemps = r
-		(t isnt ConstOutput) // why would it be?
+		(t isnt Const) // why would it be?
 		(t is temp)
 		check (!(.vdecls & .VTemps)) (.fn.sourcearg, "No free local variables.")	// entirely full
 		return t
@@ -212,27 +221,25 @@ struct Assembler
 		if r.reg == 0
 			return 0 // sigh. I DIE.
 		
-		if R is ConstOutput
+		if R is Const
 			|| k = R.const
 			if k.fits(bits, signed)
-				.NopConst(R, AnyBlock)
+				.NopConst(R)
 				return k|uint64|.trim(bits)
-
-
-	constants
-		AnyBlock = 1
-
 	
-	function NopConst (|asmreg| R, |int| NopMode = 0)
+	function NopConst (|asmreg| R, |int64| K, |bool|)
+		if r.Const == K
+			.NopConst(R)
+			return true
+		
+	function NopConst (|asmreg| R)
 		require r.reg
-		target debug: if r isnt ConstOutput //hah
-		|| f = r.NeedFAT
+		target debug: if r isnt Const //hah
 
-		(NopMode)
 //		if NopMode&AnyBlock
 //			require .IsMostlyCurr(F)
-		if .IsCurr(F)
-			.AskNop(f)
+		if R is temp				// don't think we can do better.
+			.AskNop(r.NeedFAT)		// not easily. for example .iscurr(f) gets params used by future stuff
 	
 	
 	function Nop (|FATASM| ToNop)
@@ -270,7 +277,7 @@ struct Assembler
 
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
 		|| f = .registers[r.reg]
-		if f is constoutput
+		if f is Const
 			return f.const == k
 	
 	
@@ -332,18 +339,47 @@ struct Assembler
 	function GetRealDest (|message| exp,  |scdecl| A,  |asmreg| dest,  |asmreg|)
 		if dest is Declaration							// || x = (y + 1) + (z + 1)
 			return dest asnt asmreg.Declaration
+		
+		// todo: should make these as declarations too?? I mean... they are.
+		// what about doing all .declaremes/.temps?
 		if dest is temp									//    x = (y + 1) + (z + 1)
 			return .TempTyped(a, dest)
-		return .DeclareMe(exp, a)
+		return .DeclareMe(exp, a) as dest
 
 
-	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Mode,  |asmreg|)
-		if mode is into
-			|| Dest = .GetRealDest(exp, a, mode)
-			return .µGetASMInto(Exp, dest)
+	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+	/*
+		possible inline param cases. int A is a normal reg. int B is altered
+		theres also references...
 		
+		A+B: nil
+		A:   reg1
+		B:	 asmreg.into // can't pass B, so pass a copy?
+		0:   asmreg.into // if altered or ref
+		0:   nil         // otherwise
+	*/
+
 		|| OV = .OpenVars
-		|| Dest = .GetRealDest(exp, a, mode)
+		Dest = .DeclareMe(exp, a) as dest
+		|| r = .µGetASM(Exp, dest)
+		if r iz dest
+			return r
+		if (dest isnt into2) and !(a is alteredorref and r.reg == 0)
+			.CloseVars(ov)
+			return r
+		return .Assign(exp, dest, r)
+
+
+	function µGetRealOffer (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+		|| c = .curr
+		return .µGetReal(exp, a, dest)
+		// todo: check if we can re-write the output to dest
+		// however its more tricky than I thought. Do later. 
+
+
+	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+		|| OV = .OpenVars
+		Dest = .GetRealDest(exp, a, dest)
 		rz = .µgetasm(Exp, dest)
 		if rz iz Dest
 			return rz
@@ -358,11 +394,10 @@ struct Assembler
 
 
 	function µArg (|message| exp, |asmreg|)
-		if exp.func == @decl
-			return ASMType.Decl(self, exp, AsmReg.RealDiscard) 
-		return .µ(exp, asmreg.realdiscard)	// closes vars, but decls don't want close.
-											// we'd have to return a flag from .decl to tell
-											// .µ to not close it.
+		|| Closer = .OpenVars
+		rz = .µGetASM(exp, asmreg.discard)
+		if exp.func != @decl
+			rz = .CloseVars(Closer, nil, rz)
 
 
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
@@ -381,9 +416,7 @@ struct Assembler
 		
 	
 	function µGetASMInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		|| m = .µGetASM(Exp, dest asnt asmreg.into)
-		if m is into: .µDebug(exp, dest)
-		(m isnt into)
+		|| m = .µGetASM(Exp, dest)
 		if m iz dest
 			return m
 		return .Assign(exp, dest, m)
@@ -407,10 +440,8 @@ struct Assembler
 		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
 			dest.TmpCheck
-			if dest is into
-			|| StartStackSize = ++.stacksize
-			if StartStackSize > 20 // ugh
-			|| trap = ++ASMTrapper
+			if ++.stacksize > 20 // ugh
+			|| trap = ++ASMTrapper, // if trap == 0
 		  else
 			opt inline
 		
@@ -418,7 +449,7 @@ struct Assembler
 
 		target debug
 			.StackSize--
-			if (ss is constoutput) and (ss.reg and !ss.fatindex) // huh?
+			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
 				"!Const has no fat!"
 				.µdebug(exp, dest)
 			if !ss.tmpcheck
@@ -428,7 +459,7 @@ struct Assembler
 			if !ss  or  (dest is set)  or  (ss is set or discard)
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
-				if !(ss & asmreg.exit) and (ss isnt constoutput)
+				if !(ss & asmreg.exit) and (ss isnt Const)
 					"!Zero Reg!"
 					.µdebug(exp, dest)
 		return ss

@@ -177,7 +177,7 @@ function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarA
 		(dest is discard)			  // make compiler happy
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
-	(dest isnt constoutput)
+	(dest isnt Const)
 	return .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index) * dest
 
 

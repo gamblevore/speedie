@@ -70,7 +70,6 @@ struct FatASM
 
 
 	function Vectorise (|asmreg| Dest, |asm| VOpp,  |asmreg|)
-		(dest isnt into)
 		dest.FatIndex = .index
 		
 		.info = dest
@@ -91,8 +90,7 @@ struct FatASM
 	
 	
 	function ConstFinish (|asmreg| dest, |int64| K, |asmreg|)
-		(dest isnt into)
-		(dest is ConstOutput)
+		(dest is Const)
 		dest = dest.FatIndex(.index)
 		.Const = K
 		.info = dest
@@ -225,7 +223,7 @@ struct FatASM
 		changed &= 31
 		if changed
 			sh.Register(changed) = self
-			sh.KnownValues(Changed) = info is constoutput
+			sh.KnownValues(Changed) = info is Const
 		
 		info.FatIndex = .index
 		.info = info
@@ -369,7 +367,7 @@ struct FatASM
 		|| M = fs.mark
 		|| op = instruction.typelist[.baseop]!
 		if .baseop != asm.noop
-			if self is constoutput
+			if self is Const
 				fs.appendlower(op.name)
 			  else
 				fs <~ op.name
@@ -591,13 +589,16 @@ struct FatASM
 
 
 datatype ASMParam (uint)
-	// this would ahve been better if I had planned this all out ahead of time
+	// this would have been better if I had planned this all out ahead of time
 	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits, for 21-bits
 	// after that we have 11 more bits that we could either use or keep empty...
 	// depending on if they confuse the code or not, but at least we have soemthing that
 	// makes sense, easy to convert from one to the other!
 	// at this point... its too late, really.
 	
+	function ASMMiniReg (|asmreg|)
+		(rz is temp) = (self>>31)
+		rz.reg = self&31
 	function ASMReg (|asmreg|)
 		(rz is temp) = (self>>31)
 		rz.reg = self&31

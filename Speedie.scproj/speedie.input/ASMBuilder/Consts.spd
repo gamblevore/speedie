@@ -96,7 +96,7 @@ extend Assembler
 			
 	
 	function LoadNumber (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)
-		if !Dest.reg and dest isnt into
+		if !Dest.reg
 			|| Found = .MegaNumFinder(v, dest.µtype)
 				return Found
 		
@@ -111,13 +111,12 @@ extend Assembler
 		
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
-		if K or reg is into
-			(reg isnt into)
+		if K  // didn't we remove into as a param?
 			return .LoadNumber(exp, K, reg)
 		
 		reg.reg = 0
 		(reg isnt temp)
-		(reg is ConstOutput)
+		(reg is Const)
 		reg.µType = SrcType
 		return reg
 	
@@ -164,10 +163,10 @@ function int64.CanStoreAsAddK (|bool|)
 
 
 function Assembler.CanAddK (|asmreg| R, |int64| T, |bool|) // used to be used from .plus()... works now from render
-	require (r is constoutput) and R.isint
+	require (r is Const) and R.isint
 	require t.CanStoreAsAddK
  
-	if r is ConstOutput
+	if r is Const
 		.nopconst(r)
 	return true
 

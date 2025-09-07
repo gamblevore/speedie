@@ -140,7 +140,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 
 	dest = .CallFunc(exp, dest, fn)
 	if !fn.ASMReturn
-		(dest is constoutput)
+		(dest is Const)
 	
 	|| Start = .curr
 	++.CurrFuncGrab
@@ -153,7 +153,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		TableID = fn.tableid ?? 0xFFFF // 0xffff means unknown?
 		TableID += 31
 	|| PExt = P >> 32
-	(dest isnt constoutput) // why would it be?
+	(dest isnt Const) // why would it be?
 	|| fat = prms.FNC(dest, TableID, P,  PExt) // prms.fncx
 	if fn.HasCVersion
 		fat._op = asm.FNCX

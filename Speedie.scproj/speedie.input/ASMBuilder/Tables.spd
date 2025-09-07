@@ -87,13 +87,6 @@ function Swap (fn_asm)
 	return exp.swap(A, B, asmreg(), asmreg())*A
 
 
-function StatExpr (fn_asm)
-	opt norefcounts
-	for ch.fast in exp.first
-		if ch.islast
-			return .µGetASM(ch, dest)
-		.µarg(ch)
-
 	
 function First (fn_asm)
 	opt norefcounts
@@ -129,6 +122,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 		|| fn = l-1
 		|| fnout = fn.asmreg(0) // fn.output
 		if .iscurr(fn) and (fnout.reg == input)
+			if ret is Const != fnout is Const // sigh.
 			ret.reg = fnout
 			ret_ = ret
 			.softnop(l)
@@ -153,23 +147,26 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)
 	opt norefcounts
 	// What about getting the address of registers?
-	dest = dest as asmreg.ExitFunction * .state.TailInlineable
-	dest = dest as asmreg.ExitAtAll
+	|| extras = asmreg.ExitAtAll
+	if .state.TailInlineable
+		(extras is exitfunction)
+
+	(dest as= extras)
 	|| f = exp.first
 		if dest.reg
 			dest = .µinto(f, dest)
 		  else
 			dest = .µ(f, asmreg.discard)
 	
+	(dest as= extras) // it can get lost... sadly.
 	if .state.TailInlineable
 		.ClearAllStructs(exp)
-//		.closevars(.state.ParentVars, exp) // bad?
 		if  ReturnOpt(self, dest)
 			return dest
 	
 	|| fat = exp.RET(Dest)
 	fat.µRefCount = 1
-	(dest is CondAnswer)
+	(dest is CondAnswer) // discard surely?
 	return fat * Dest
 
 
@@ -212,7 +209,7 @@ function TypeCast (fn_asm)
 	|| f = exp.first!
 	|| NewDecl = exp.ASMDecl
 	if newdecl.isbarestruct
-		return asmreg()
+		return asmreg() as asmreg.discard
 
 	dest.µtype = newdecl.mu.DataType
 	|| From = .µGetASM(F, dest)
@@ -236,7 +233,7 @@ function TypeCast (fn_asm)
 	
 	dest = .TempOnly(dest)
 	dest.µType = NewType
-	if from is ConstOutput
+	if from is Const
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
 		
 	if oldtype.isfloat or newtype.isfloat
@@ -279,7 +276,7 @@ function SetRel (fn_asm)						// function relset (
 
 	// Probably x.y = z, or x[y] = z 
 
-	|| Src = .µGetReal(exp.last!, nil, nil|asmreg| * a)
+	|| Src = .µGetReal(exp.last!, nil, nil|asmreg| temp a)
 	(Src is SetAlways)
 	.µ(A, Src)
 	return asmreg.discard
@@ -319,6 +316,7 @@ function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |
 
 
 
+
 function Decl (fn_asm) // declaresub declare 
 	opt norefcounts
 	
@@ -337,15 +335,28 @@ function Decl (fn_asm) // declaresub declare
 	return .µInto(rel, dest).incr
 
 
+function StatExpr (fn_asm)
+	opt norefcounts
+	return ArgumentSub(self, exp.first!)
+
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 	opt NoRefCounts
 	|| v = .OpenVars
+	
 	for ch.fast in exp
-		|| x = .µArg(ch)
-		if x & asmreg.exit
-			return x
-	.RestoreVars(v)			// causes errors???
+		if ch.func != @decl
+			rz = .µ(ch, asmreg.discard)
+		  else
+			rz = .µGetASM(ch, asmreg.discard)
+		if rz & asmreg.exit 	// test two bits at once. I prefer: if rz is exit
+			exit				// first need to check that no code is actually testing two bits for real.
+								// by putting a check in syntaxis
+
+	.VDecls = v|uint| // remove new decls
+	target debug
+		if .VTemps != (v>>32) // hmmm
+	.VTemps = v >> 32
 
 
 function ArgumentThatIsAroundWhile (fn_asm)
@@ -359,7 +370,7 @@ function Argument (fn_asm) // argument
 	// and that ArgumentThatIsAroundWhile is just the same?
 	
 	|| OV = .OpenVars
-	|| what = ArgumentSub(self, exp)
+	|| what = ArgumentSub(self, exp) & asmreg.exit
 
 	// should be able to "reopen" vars that were closed early...
 	// due to a decr+return.
@@ -376,7 +387,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| d = f.asmdecl
 		
 	|| sc = exp.Second.first!
-	|| base = .µGetReal(f, nil, ASMReg.AddrRequest * sc)		// x = a.b[0]
+	|| base = .µGetReal(f, nil, ASMReg.AddrRequest temp sc)		// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
@@ -389,6 +400,18 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	// sure. but surely... its just a pointer anyhow.
 	// so... what should the set do? lets just assume it works. for now.
 	
+	if d.cancopynormally
+		if dest isnt AddrRequest
+			dest.µType = exp.ASMDecl.mu.DataType
+			if !d.IsCarray									 		// what if its a carray to a pointer?
+				d = d.internal!		
+			return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
+	  elseif dest is set
+		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()	
+		
+	return .IncrPointerByVar(dest, base, vara, exp)
+	
+	/*
 	if (dest is set) and !d.CanCopyNormally
 		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()
 
@@ -399,7 +422,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 		return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
 	
 	return .IncrPointerByVar(dest, base, vara, exp)
-
+	*/
 
 function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
@@ -411,6 +434,7 @@ function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Pro
 
 function Dot (fn_asm)										// a.b
 	opt	NoRefCounts
+//	debugat 450
 	|| prop = exp.ASMDecl
 	if prop is const
 		return DotConst(self, dest, exp, prop)
@@ -429,7 +453,8 @@ function Dot (fn_asm)										// a.b
 		prop.typeinfo
 		
 	if (dest isnt set) and !dest.reg and (obj is temp)
-		dest.reg = obj
+		dest.reg = obj // keeps the const. not what we want
+		(dest isnt Const)
 	
 	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
 		return .DotAddr(exp, dest, Index, prop, obj)
@@ -448,7 +473,7 @@ function Num (fn_asm)
 	|| d = exp.ASMDecl
 	|| T = d.typeonly
 	dest.µtype = T
-	(dest is ConstOutput)
+	(dest is Const)
 	return .NumToReg(exp, dest, d.ExportPosition, T)
 
 
@@ -457,14 +482,14 @@ function Thg (fn_asm)
 	target debug
 		|| reg = thg.reg
 		if (reg-1)|uint| >= 31								// what?
-			if (!reg) and (thg is ConstOutput)
+			if (!reg) and (thg is Const or discard)
 				return thg
 			error (exp, "Register out of bounds")
 	return thg										// Its still ok.   nil/false
 
 
 function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
-	(dest is ConstOutput)
+	(dest is Const)
 	if dest isnt ConstRequest
 		dest.µtype = d.mu.DataType
 		return .NumToReg(exp, dest, d.ExportPosition, dest.µtype)
@@ -627,6 +652,7 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		if (mode & IncrAfter) // or (src isnt temp) // why? Why was this added? it messes things up?
 			dest = .TempTyped(exp, dest)
 		  else
+			if dest is Const != src is Const // sigh.
 			dest.reg = src
 
 	src = src as asmreg.noscale
@@ -761,12 +787,12 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	|| ml = ASMReg()
 	|| mr = ASMReg()
 	|| First = exp.first!
-	|| dest = mode asnt asmreg.into
+	|| dest = mode
 	target debug: || trap = ++asmtrapper, if trap == 0
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else
-		ml = .µGetReal(First, nil, dest)
+		ml = .µGetRealOffer(First, nil, dest)
 		if (dest is declaration) and !(ml iz dest)
 			mr = dest
 
@@ -782,8 +808,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 					// maybe better that the arg itself softnops stuff? again... do later!
 	
 	dest = .TempTyped(exp, dest)
-	(dest is constoutput) = (ml&mr is constoutput)
-	(dest as= asmreg.into&mode)	
+	(dest is Const) = (ml&mr is Const)
 	
 	|| op = exp.second ?? exp.first!
 	rz = (fn)(self, op, dest, ml, mr)
@@ -796,21 +821,32 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 
 function LocalThg (|scdecl| d,  |asmreg|) // asmlocal, localasm
 	opt norefcounts
-	|| T = d.WholeType //as ASMReg.FromExistingVar
+	|| T = d.WholeType
 
 	(t is param) = d is param
-	(t is constoutput) = d is const
 	|| f = .registers[t.reg]
-	 // we don't need to worry about alteredinbranch! Just check the basicblock!
-	if f and .iscurr(f)
-		t.FatIndex = f.index
-		if f is ConstOutput
-			(T is ConstOutput)
-	
+	// .iscurr isnt as reliable as I hoped
+	// || x = 1, if y {y++}, // now x isn't in the same branch! is it a const or not?
+
+	// consts must have fats! both in and out. unless r0.
+	if f
+		if (.iscurr(f) or (d isnt AlteredInBranch))
+			t.FatIndex = f.index
+			(T is Const) = (f is Const)
+	  elseif d is const
+		if t.reg // bad
+		
 	|| rr = T.reg
 		|| Ret = .State.Return
 		if rr == ret.reg
 			(T is temp) = (ret is temp)
+	  else
+		(t is const)
+	
+	if d is const and t isnt Const // oof. lost somehow?
+		debugger
+		if f and (.iscurr(f) or (d isnt AlteredInBranch))
+			t.FatIndex = f.index
 	
 	return T
 }

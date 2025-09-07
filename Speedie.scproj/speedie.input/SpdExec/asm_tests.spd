@@ -154,12 +154,6 @@ function gggFunc (|int| A, |int|)
 	return compiler.ConfMsg.SlowCount
 
 
-function gggTest1 (|int| X, |int| Y, |int|)
-	if X > 0
-		return Y+1
-	return Y-1
-
-
 function gggAlter (|int| QA, |int| B, |int|)
 	QA ++
 	if QA > 0
@@ -259,6 +253,12 @@ function Inline_LLL
 	v = lll3(-1)
 
 
+function gggTest1 (|int| X, |int| Y, |int|)
+	if X > 0
+		return Y+1
+	return Y-1
+
+
 function Inline_Consts (|int| A)
 	#!BBB
 	|| B = gggTest1(1, 2)
@@ -271,9 +271,15 @@ function Inline_Consts (|int| A)
 	#!FFF
 	|| F = gggTest1(-1, A)
 	#!GGG
-	|| G = gggTest1(A, 0)
+	|| G = gggTest2(A, 0)
 	#!HHH
 	|| H = gggTest1(A, A)
+
+
+function gggTest2 (|int| X, |int| Y, |int|)
+	if X > 0
+		return Y+1
+	return Y-1
 
 	
 function AskConst (|int| x)
@@ -505,7 +511,7 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	|| x4 = x.Length
 	|| x5 = x._Addr
 	|| x6 = x! + y!
-	|| x7 = string.char(0xb16b00b5)
+	|| x7 = string.char(0xb16b00b5) // JB_Str_ChrUTF8
 	|| x8 = Message()
 	if x8.parent
 	x8.parent

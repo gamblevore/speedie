@@ -485,7 +485,10 @@ function Tran_ForSub (TranFunc)					// :3
 	if (list == @rel and scnd isopp "in")
 		value = list.First
 		list = scnd.next(@nil)
-		bad +=! list
+		if list
+			list = list.unbra
+		  else
+			bad++
 		if value == @Dot
 			IterName = value.Name
 			value = value[@thg]
@@ -512,7 +515,7 @@ function Tran_ForSub (TranFunc)					// :3
 
 	if index // remove nodes AFTER the error tests
 		index.Remove
-		index = index.first
+		index = index.first // why not .unbra? do we even
 	node.first.remove
 	
 	

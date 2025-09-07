@@ -292,7 +292,7 @@ module PackMaker
 	
 	function GlobLink (|jbin| j)
 		opt norefcounts
-		j.tmp("blnk")
+		j.tmp("glnk")
 /		for linked in .LibGlobs
 			j.add(@thg, linked.ExportName)
 		j.exit(2)
