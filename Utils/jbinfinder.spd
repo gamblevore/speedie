@@ -1,0 +1,18 @@
+#!/usr/local/bin/spd
+
+
+main (|file| Folder)
+	"Searching for jbin in $Folder"
+	Folder.search
+
+
+function file.Search
+	|| L = .ListFiles(0)
+	for ch in L
+		if ch.IsDir
+			ch.search
+		  else
+			|| s = ch.Read(64)
+			if s.isjbin
+				"$ch"
+			ch.close
