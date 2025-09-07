@@ -432,7 +432,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		
 		for name in self
 			if (Mode&AllowInvisible) or (name[] != '.')
-				|file| ch // = self[name]
+				|file| ch
 				ifn mode&AllowSymLinks
 					ch = self[name]
 					if ch.IsSymLink
