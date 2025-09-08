@@ -716,10 +716,10 @@ function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Small = nil, 
 }
 
 
-function message.RFAP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
+function message.RFUN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.RFAP, self)
+	rz = a.RequestOp(asm.RFUN, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3

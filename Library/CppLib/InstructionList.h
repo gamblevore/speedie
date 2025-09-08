@@ -86,7 +86,7 @@
 &&JBAN,
 &&LUPU,
 &&LUPD,
-&&RFAP,
+&&RFUN,
 &&RFST,
 &&RFWR,
 &&RFRD,

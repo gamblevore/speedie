@@ -91,14 +91,14 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	.state.BranchDepth = 0
 	
 	|fatrange| LL
-	rz = .TryInlineSub(prms, fn, AllowedGain, LL)
-	if !rz
+	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
+	if !r
 		.SoftNopRange(start, .curr)				// rewind
 	
 	.state = old
 	if .state.InlineDepth == 0
 		.InlineEnd = nil
-	.CloseVars(OV) // should closevars come before restore? sigh. idk.
+	return .CloseVars(OV, nil, r) // should closevars come before restore? sigh. idk.
 
 
 
@@ -109,10 +109,6 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|SavedRegisters| regs 
 	|InlineInfo| Info
 	
-	debugat 444
-	target debug
-		|| vdecls_debug = .vdecls.log2
-
 	regs.Collect(fn.args, self)
 	
 	.InlineParameters(prms, info)
@@ -129,6 +125,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 			(rz is Const)			// no longer zero
 	  else
 		regs.Rewind(self)
+		rz = nil
 
 
 	

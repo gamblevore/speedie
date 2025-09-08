@@ -316,7 +316,6 @@ function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |
 
 
 
-
 function Decl (fn_asm) // declaresub declare 
 	opt norefcounts
 	
@@ -337,10 +336,16 @@ function Decl (fn_asm) // declaresub declare
 
 function StatExpr (fn_asm)
 	opt norefcounts
-	return ArgumentSub(self, exp.first!)
+	return ArgumentSub(self, exp.first!, -1|asmreg|)
 
 
-function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
+function ArgumentSub (|&Assembler| self, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
+	// merge into argument!
+	// also... i think we should store the old regs... in a regmap.
+	// the regfile can now be uint16.
+	// we just copy the entire dump in one go!
+	// and restore! and the register saver elsewhre can do the same!
+	
 	opt NoRefCounts
 	|| v = .OpenVars
 	
@@ -352,26 +357,20 @@ function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 		if rz & asmreg.exit 	// Test two bits at once. I prefer: if rz is exit
 			exit				// first need to check that no code is actually testing two bits for real.
 								// by putting a check in syntaxis
-	.CloseVars(v)
+	// should be able to "reopen" vars that were closed early...
+	// due to a decr+return.
+	// just scan backwards?
+	if !Mask
+		exp = nil		
+	rz = .CloseVars(v, exp, rz & Mask)
 
 
 function ArgumentThatIsAroundWhile (fn_asm)
-	|| OV = .OpenVars
-	|| what = ArgumentSub(self, exp)
-	return .CloseVars(OV, exp, what)
+	return ArgumentSub(self, exp)
 
-
+// merge?
 function Argument (fn_asm) // argument 
-	// seems like ArgumentSub should be merged into here?
-	// and that ArgumentThatIsAroundWhile is just the same?
-	
-	|| OV = .OpenVars
-	|| what = ArgumentSub(self, exp) & asmreg.exit
-
-	// should be able to "reopen" vars that were closed early...
-	// due to a decr+return.
-
-	return .CloseVars(OV, exp, what)
+	return ArgumentSub(self, exp)
 
 
 function Access (fn_asm)										// a[b], struct.mem[b]
@@ -495,7 +494,7 @@ function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scd
 function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
 	opt norefcounts
 	dest = .TempTyped(d, dest)
-
+	
 	|| fat = exp.GRAB(dest, t)
 	if d.IsInt and !d.IsBool
 		|| L = t.BitLoss
@@ -590,8 +589,8 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 	|| fat = .write(dest, f, NewValue, addr, glob)			// WRITE BACK
 
 	// the new value should exist! now lets close
-	.CloseVars(TmpCloser)
-	return fat * Dest
+	return .CloseVars(TmpCloser, nil, fat*dest)
+
 
 
 
@@ -647,9 +646,10 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	  elseif !dest.reg
 		if (mode & IncrAfter) // or (src isnt temp) // why? Why was this added? it messes things up?
 			dest = .TempTyped(exp, dest)
+			if (dest is const)
 		  else
-			if dest is Const != src is Const // sigh.
 			dest.reg = src
+		(dest isnt const)
 
 	src = src as asmreg.noscale
 	|| p = exp.parent! // better positions

@@ -240,12 +240,6 @@ datatype ASMReg (uint64)
 	function Reg (|int|)
 		return (self|uint64| >> 11)&31
 	
-	
-//	function Into (|asmreg| dest, |asmreg|)
-//		rz = .reg(dest)
-//		rz.µtype = dest.µtype			// I guess we copy some wierd flags... sigh.
-//		(rz is exitatall) = (dest is ExitAtAll)
-		
 		
 	function Reg (assigns:|int|, |AsmReg|)
 		|| Bugged = value&31
@@ -254,12 +248,6 @@ datatype ASMReg (uint64)
 		(self is temp) = (value >> 31)
 		target debug: if .reg != Bugged // what?
 		return self
-
-
-//	function RegWithIndex (assigns:|uint|, |asmreg|)
-//		// maybe better to just get fatasm.RegInput(|asmreg|) and use the function below?
-//		.reg = value
-//		.fatindex = (value<<1)>>16 // seems ok?
 
 	
 	function Reg (assigns:|asmreg|, |asmreg|)

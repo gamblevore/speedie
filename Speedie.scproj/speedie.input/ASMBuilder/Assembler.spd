@@ -167,7 +167,7 @@ struct Assembler
 
 
 	setter vdecls (|uint|)
-//		if "foreignfuncs".trap	
+//		if "CollectionPlace".trap	
 		.vdecls_ = value
 
 	
@@ -303,7 +303,6 @@ struct Assembler
 	
 	
 	function SoftNopRange (|fatasm| Start, |fatasm| After)
-		// todo: should this not be merged with rewind?
 		while start < After
 			.SoftNop(--after)
 	
@@ -347,7 +346,7 @@ struct Assembler
 		if dest is Declaration							// || x = (y + 1) + (z + 1)
 			return dest asnt asmreg.Declaration
 		
-		// todo: should make these as declarations too?? I mean... they are.
+		// asmtodo: should make these as declarations too?? I mean... they are.
 		// what about doing all .declaremes/.temps?
 		if dest is temp									//    x = (y + 1) + (z + 1)
 			return .TempTyped(a, dest)
@@ -372,25 +371,24 @@ struct Assembler
 		if r iz dest
 			return r
 		if (dest isnt into2) and !(a is alteredorref and r.reg == 0)
-			.CloseVars(ov)
-			return r
+			return .CloseVars(ov, nil, r)
 		return .Assign(exp, dest, r)
 
 
 	function µGetRealOffer (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		|| c = .curr
 		return .µGetReal(exp, a, dest)
-		// todo: check if we can re-write the output to dest
+		// asmtodo: check if we can re-write the output to dest
 		// however its more tricky than I thought. Do later. 
 
 
 	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		|| OV = .OpenVars
 		Dest = .GetRealDest(exp, a, dest)
-		rz = .µgetasm(Exp, dest)
-		if rz iz Dest
-			return rz
-		.CloseVars(ov)
+		|| r = .µgetasm(Exp, dest)
+		if r iz Dest
+			return r
+		return .CloseVars(ov, nil, r)
 		
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
@@ -401,6 +399,11 @@ struct Assembler
 
 
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
+		// asmtodo: if this gets nopped... we need to decr all the params!
+		// but we don't have the fats. Could we make an extended fat?
+		// like a fat that... holds params just for storing? and then
+		// we refer to that fatter fat?
+		
 		|| Mode = exp.SaveForward
 		(Mode is AddrNeed) = (a is Reference)
 		|| r = .µGetReal(exp, nil, Mode)
@@ -411,15 +414,10 @@ struct Assembler
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| Closer = .OpenVars
-		|| v = .µGetASMInto(exp, dest)
+		|| v = .µGetASM(Exp, dest)
+		ifn v iz dest
+			v = .Assign(exp, dest, v)
 		return .CloseVars(Closer, nil, v)
-		
-	
-	function µGetASMInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		|| m = .µGetASM(Exp, dest)
-		if m iz dest
-			return m
-		return .Assign(exp, dest, m)
 		
 	
 	function µDebug (|message| exp, |asmreg| dest)
@@ -507,8 +505,6 @@ struct Assembler
 		.BasicBlock = 1 // good to start these at 1.
 		.BranchID = 1
 		.NextBranchID = 1
-		.VDecls = 1
-		.VTemps = 0
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()
@@ -520,6 +516,8 @@ struct Assembler
 		fn.StartASM
 		.InlineEnd = nil
 		.FuncStart = .curr
+		.VTemps = 0
+		.VDecls = 1 // set after .FuncStart
 		.AddFuncParams(fn)
 
 
@@ -569,12 +567,17 @@ target debug
 	
 
 
+function assembler.RootGen (|scfunction| fn)
+	opt norefcounts
+	asmtype.ArgumentSub(self, fn.SourceArg!, nil)
+
+
 function Assembler.Rework (|SCFunction| fn,  |bool|)
 	HoistSpace.NeedSpare(.Length)
 	HoistSpace.CopyFrom(.FuncStart, .Length)
 	.Orig = .FuncStart
 	.InitAndStartFunc(fn)
-	asmtype.ArgumentSub(self, fn.SourceArg!)
+	.RootGen(fn)
 	.FinishASM
 	.Orig = nil
 
@@ -583,7 +586,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)
-	asmtype.ArgumentSub(self, fn.SourceArg!)
+	.RootGen(fn)
 	.FinishASM
 	if .NeedsRework
 		.Rework(fn)

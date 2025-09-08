@@ -158,7 +158,7 @@
 	if (ii1-- > ii2)
 	Code += Loop_Jmpi
 ;
-ı RFAP: _
+ı RFUN: _
 	SetRefApart(r, Op);
 ı RFST: _
 	SetRefBasic(r, Op);

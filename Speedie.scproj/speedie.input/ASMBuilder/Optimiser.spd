@@ -8,8 +8,3 @@ function Assembler.Optimise
 			s.JumpImprove(self)
 		S++
 	
-
-function uint.OperatorSameReg (|uint| R, |bool|)
-	return self&31 == R&31
-
-

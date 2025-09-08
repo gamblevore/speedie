@@ -224,7 +224,7 @@ AlwaysInline void SetRefBasic(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void SetRefApart(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefApart (VMRegister* r, ASM Op) {
 	JB_Incr(o3);
 	JB_SafeDecr(o2);
 	JB_FreeIfDead(o1);

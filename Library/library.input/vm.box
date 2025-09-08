@@ -570,8 +570,8 @@ POS 5
 
 
 #!						 (((((Refs)))))
-/**/ RFAP  (RefSetApart)
-		SetRefApart(r, Op)
+/**/ RFUN  (RefSetApart)
+		SetRefApart(r, Op) // freeifdead, safedecr, incr
 
 /**/ RFST  (RefSet1)
 		SetRefBasic(r, Op)		
@@ -583,7 +583,7 @@ POS 5
 		SetRefMemToReg(r, Op)
 
 /**/ RFDC  (RefDecrMem)							// for destructors/closers.
-		SetRefDecrMem(r, Op)					// unused rn 😭 *sadface*
+		SetRefDecrMem(r, Op)					// unused rn. maybe rfrd is better?
 
 /**/ RALO  (U2)
 		o1 = alloc(o2)
@@ -646,6 +646,7 @@ POS 5
 /**/ CNTD  (CNTC)
 		IncrementAddr(r, Op, 0)
 
+// rename to WRCP // write copy
 /**/ RDWR  (MemoryCopy) // can zero memory, if we pass r0 as src.
 		MemCopyRDWR(r, Op)
 

@@ -313,6 +313,12 @@ struct FatASM
 ////////////////////////////////////////////////////////////
 
 
+	syntax call (|uint| i, |asmreg|)
+		|| p = .Prms[i]
+		if p.reg
+			return p.ASMReg
+		
+		
 	function CheckHasOutput 
 		opt inline
 		target debug {
@@ -590,15 +596,15 @@ struct FatASM
 
 datatype ASMParam (uint)
 	// this would have been better if I had planned this all out ahead of time
-	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits, for 21-bits
-	// after that we have 11 more bits that we could either use or keep empty...
+	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits,
+	// for 21-bits after that we have 11 more bits that we could either use or keep empty...
 	// depending on if they confuse the code or not, but at least we have soemthing that
 	// makes sense, easy to convert from one to the other!
 	// at this point... its too late, really.
 	
-	function ASMMiniReg (|asmreg|)
-		(rz is temp) = (self>>31)
-		rz.reg = self&31
+//	function ASMMiniReg (|asmreg|)
+//		(rz is temp) = (self>>31)
+//		rz.reg = self&31
 	function ASMReg (|asmreg|)
 		(rz is temp) = (self>>31)
 		rz.reg = self&31
@@ -606,6 +612,8 @@ datatype ASMParam (uint)
 		rz = rz as (fatindex << 48)|asmreg|
 	function Reg (|int|)
 		return self&31
+	operator iz (|asmreg| M, |bool|)
+		return .reg == M.reg
 
 
 function asmreg.Prm	(|asmparam|)

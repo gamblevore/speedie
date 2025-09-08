@@ -50,10 +50,10 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 	if fn == Compiler.RefIncr
 		|| P = .last(asm.gstr)
-			if (p.r0 samereg a.reg) and p.r1 == 0
+			if (p.r0 iz a) and p.r1 == 0
 				p.r1 = 1
 				return p
-		|| fat = exp.rfst(asmreg(), a)
+		|| fat = exp.rfap(asmreg(), asmreg(), a)
 		Fat._Outputs = 0
 		return fat
 
@@ -63,20 +63,19 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		if (p isa asm.rfst)
 			|| dblinput = p.InputFat(1)
 				if dblinput.isread and (dblinput.basicblock == p.basicblock)
-					.SoftNop(p)
+/					.SoftNop(p) // what is this even
 					return nil
-					// in fact... we don't need this at all.
-			if (p.r1 samereg a.reg) and (p.r0 == 0)
-				p._op = asm.RFAP
+			if (p.r1 iz a) and (p.r0 == 0)
+/				p._op = asm.RFUN
 				p.r0 = p.prms[1]
 				p.r1 = 0
 				return p
 		  elseif (p isa asm.gstr)
-			if p.r0 samereg a.reg and p.r1 == 1
+			if  p.r0 iz a  and  p.r1 == 1
 				return nil
 		if "TestExportName".trap
-		.ClearVarEarly(a)
-		return exp.RFST(a, asmreg())
+		.CloseOneEarly(a)
+		return exp.RFAP(a, a, asmreg())
 
 	if fn == Compiler.RefSafeDecr
 		return exp.RFAP(asmreg(), a, asmreg())
@@ -104,28 +103,27 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 
 
 function Assembler.DecrObj (|asmreg|)
-	|| fat = .last(asm.rfst)
-		|| upon = fat.prms[0]
-		if upon.reg and !fat.prms[1].reg
-			.nop(fat)
-			return upon.ASMReg
+	|| fat = .last(asm.RFUN)
+		|| upon = (fat)(0)
+			if ((fat)(1) == upon) and !(fat)(2)
+				.nop(fat)
+				return upon
 
 
 function Assembler.SafeDecr (|asmreg|)
-	|| fat = .last(asm.rfap)
-		|| upon = fat.prms[1]
-		if upon.reg and !fat.prms[0].reg
-			.softnop(fat)
-			return upon.ASMReg
+	|| fat = .last(asm.RFUN)
+		|| upon = (fat)(1)
+			if !(fat)(0) and !(fat)(2)
+				.softnop(fat)
+				return upon
 
 
 
-function assembler.ClearVarEarly (|asmreg| a)
+function assembler.CloseOneEarly (|asmreg| a)
 	require a isnt temp
 	|| d = .VDecls
-	|| r = a.reg
-	d &=~ (1<<r) // i don't know. Is this good enough? i hope so?
-	.VDecls = d
+	d &=~ (1<<a.reg) // Clear
+	.CloseOneVar(nil, d, true)
 
 
 

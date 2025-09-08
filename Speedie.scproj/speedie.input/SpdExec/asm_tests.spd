@@ -235,6 +235,10 @@ function LLL (|int| Y, |int|)
 		Y++
 	return Y
 
+function istmp (|message| s, |bool|)
+	if s istmp "no"
+		return true
+	
 function LLL2 (|int| Y, |int|)
 	return Y*2				// return can handle this.
 
