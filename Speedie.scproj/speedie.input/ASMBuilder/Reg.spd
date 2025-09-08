@@ -214,11 +214,9 @@ datatype ASMReg (uint64)
 		return ((self|uint64| & ~Mask) ||| (value&Mask))|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
-		// seems we only test one bit at a time...
-		// but argumentsub wants to test two... so it can't use this.
-		// AddrNeed is tested for! but maybe better to do it the nice way.
-		if !r|int64|.IsPow2
-		return (self & R) == r
+		target debug
+			if !r|int64|.ispow2 and r != asmreg.exit // ooof?
+		return self & R
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)

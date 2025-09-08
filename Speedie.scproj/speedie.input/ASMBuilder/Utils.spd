@@ -66,6 +66,8 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	while .CloseOneVar(exp, OrigDecls, true)
 		0
 
+
+	// remove these?
 	|| Missing = OrigDecls &~ .VDecls
 	if !exp or !missing
 		return return
@@ -78,17 +80,8 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	// which branch something came from!
 	
 	.VDecls |= Missing
-	if missing&1 //what?
-	|| c = .curr
-	|| s = .FuncStart
-	while --c >= s
-		|| r = c.output.reg
-		|| mask = 1 << r
-		if mask & missing
-			missing &=~ mask
-			.Registers_[r] = c
-			.KnownValues(r) = c is Const
-			
+	// argh
+	
 	return return
 
 

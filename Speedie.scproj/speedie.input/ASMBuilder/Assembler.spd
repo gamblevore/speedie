@@ -9,6 +9,10 @@ struct ASMState
 	|bool|			TailInlineable
 
 
+struct RegFile
+	|uint16[32]|				OOF
+
+
 struct Assembler
 	linkage: cpp_part Pac
 	|uint16| 					BasicBlock
@@ -36,7 +40,7 @@ struct Assembler
 	|&FatASM|					Curr_
 	|&FatASM|					End    
 
-	|(?&FATASM)[32]|			Registers_
+	|RegFile|					Regs
 	|FatASM| 					Zero
 
 	constants
@@ -192,8 +196,7 @@ struct Assembler
 			return t
 
 		|| r = .VTemps
-		if r&1 // how?
-/			r&=~1
+		target debug: if r&1: r&=~1 // how?
 		
 		
 		|| Free = (~r).Log2		// Find lowest free bit.
@@ -275,11 +278,19 @@ struct Assembler
 
 
 	function Register (|int| i, assigns:|?&FATASM|)
-		if value isa asm.WR8U or asm.WR4U or asm.WR2U or asm.WR1U
-		.Registers_[i] = value
+		// would be better to use 0 as a base.   -1 can mean unset.
+		
+		target debug
+			if value isa asm.WR8U or asm.WR4U or asm.WR2U or asm.WR1U
+		|| n = 0
+		if value
+			n = value.Index
+		.Regs.OOF[i] = n
+			
 		
 	function Register (|int| i, |?&FATASM|)
-		return .Registers_[i] 
+		|| r = .Regs.OOF[i]
+			return Assembler.sh.funcstart + (r - 1)
 
 
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
@@ -502,22 +513,20 @@ struct Assembler
 		.state.BranchDepth = 0
 		.state.TailInlineable = true
 		.InlineDepthLimit = 3
-		.BasicBlock = 1 // good to start these at 1.
+		.BasicBlock = 1						// good to start these at 1.
 		.BranchID = 1
 		.NextBranchID = 1
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()
 		.KnownValuesMap = nil
-		for i in 32
-			.registers_[i] = nil
-
+		.regs = nil							// asmtodo: better to set to -1
 		.Guard
 		fn.StartASM
 		.InlineEnd = nil
 		.FuncStart = .curr
 		.VTemps = 0
-		.VDecls = 1 // set after .FuncStart
+		.VDecls = 1							// set after .FuncStart
 		.AddFuncParams(fn)
 
 

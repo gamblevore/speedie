@@ -9,7 +9,7 @@ struct SavedRegisters
 	|uint16|				BasicBlock
 	|uint|					KnownValues
 	|DeclAlterable[32]|		Decls
-	|uint16[32]|			ASM
+	|RegFile|				Regs
 
 
 	function Collect (|[scdecl]| args, |assembler| sh)
@@ -17,11 +17,7 @@ struct SavedRegisters
 
 		.BasicBlock = sh.BasicBlock
 		.KnownValues = sh.KnownValuesMap
-		|| S = sh.FuncStart - 1
-		for i in 32
-			|| f = sh.Register(i)
-			.asm[i] = (f - s, nil)(f)
-		
+		.regs = sh.regs
 		expect args <= 32 - .RegCount
 		for p in args
 			.decls[.RegCount++] = p.mu
@@ -30,10 +26,7 @@ struct SavedRegisters
 	function Rewind	(|assembler| sh)
 		sh.KnownValuesMap = .KnownValues
 		sh.BasicBlock = .BasicBlock
-		|| S = sh.FuncStart - 1
-		for i in 32
-			|| r = .asm[i]
-			sh.Register(i) = (s + r, nil)(r)
+		sh.regs = .regs
 
 
 	function Restore (|[scdecl]| args)

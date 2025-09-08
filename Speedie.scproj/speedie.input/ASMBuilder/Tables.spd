@@ -3,7 +3,7 @@
 
 dispatch fn_asm_table (fn_asm)
 	@arg:					ASMType.Argument
-	@tril:					ASMType.ArgumentThatIsAroundWhile
+	@tril:					ASMType.Argument
 	@decl:					ASMType.decl
 	@num:					ASMType.num
 	@char:					ASMType.char
@@ -341,32 +341,26 @@ function StatExpr (fn_asm)
 
 function ArgumentSub (|&Assembler| self, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
 	// merge into argument!
-	// also... i think we should store the old regs... in a regmap.
-	// the regfile can now be uint16.
-	// we just copy the entire dump in one go!
-	// and restore! and the register saver elsewhre can do the same!
 	
 	opt NoRefCounts
 	|| v = .OpenVars
-	
+	|regfile| f = .Regs // use to reopen vars.
+
 	for ch.fast in exp
 		if ch.func == @decl
 			rz = decl(self, ch)
 		  else
 			rz = .µ(ch, asmreg.discard)
-		if rz & asmreg.exit 	// Test two bits at once. I prefer: if rz is exit
-			exit				// first need to check that no code is actually testing two bits for real.
-								// by putting a check in syntaxis
-	// should be able to "reopen" vars that were closed early...
-	// due to a decr+return.
-	// just scan backwards?
+		loop rz isnt exit
+	
 	if !Mask
 		exp = nil		
 	rz = .CloseVars(v, exp, rz & Mask)
-
-
-function ArgumentThatIsAroundWhile (fn_asm)
-	return ArgumentSub(self, exp)
+//	
+//	// restore closed vars.
+//	// what about... if we return? does it make a difference?
+//	.VDecls = v
+//	.regs = f
 
 // merge?
 function Argument (fn_asm) // argument 
