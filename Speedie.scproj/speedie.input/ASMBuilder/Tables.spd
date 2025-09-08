@@ -820,8 +820,8 @@ function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
 	|| T = d.WholeType
 
 	(t is param) = d is param
-	if d isnt AlteredInBranch
-		(t is BlockSafe)
+	(t is BlockMostlySafe) = d isnt AlteredInBranch
+	(t is BlockSafe) = d isnt AlteredBranchLike
 	|| f = .Register(t.reg)
 	// .iscurr isnt as reliable as I hoped
 	// || x = 1, if y {y++}, // now x isn't in the same branch! is it a const or not?

@@ -25,6 +25,7 @@ function SwapTest
 
 
 function Grab
+	cpp_part greb
 	|| b = '1'
 	.grab2(b)
 

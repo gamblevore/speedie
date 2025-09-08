@@ -245,22 +245,25 @@ function Tran_If (TranFunc)
 	node.ASMType = ASMType.kIf // for the ASM
 	SCFunction.InBranch++
 	Tran_IfSub(node, name_space)
-	Tran_All_Final(fn, node, name_space, @arg)
+	Tran_All_Final(fn, node, name_space, @arg) // also for the ASM
 	SCFunction.InBranch--
 	return true // Stop caller redoing Tran_All_Final!
 
 
 function Tran_While (TranFunc)
 	SCFunction.InBranch++
-	Tran_WhileSub(fn, node, name_space)
-	Tran_All_Final(fn, node, name_space, @arg)
+	SCFunction.InLoop++
+	Tran_WhileSub(name_space, node)
+	if fn
+		Tran_All_Final(fn, node, name_space, @arg) // ASM needs this to collect DepthOfBranch
+	SCFunction.InLoop--
 	SCFunction.InBranch--
-	return true // Stop caller redoing Tran_All_Final!
+	return true
 
 
-function Tran_WhileSub (TranFunc)
+function Tran_WhileSub (|SCNode| name_space, |Message| node)
 	if node.ASMType == ASMType.kwhile
-		return false
+		return
 
 	node.name = "while"
 	node.ASMType = ASMType.kWhile
@@ -454,8 +457,12 @@ function CanKeepAsValue (|sciterator| iter, |Message| arg, |scdecl| dcl, |Messag
 function Tran_For (TranFunc)
 	using (node)
 		name_space = node.scarg( name_space )!
+		SCFunction.InBranch++
+		SCFunction.InLoop++
 		tran_ForSub(fn, node, name_space)
 		Tran_All_Final(fn, node, name_space, @arg)
+		SCFunction.InBranch--
+		SCFunction.InLoop--
 	return true // Stop caller redoing Tran_All_Final!
 
 
@@ -547,7 +554,6 @@ function Tran_ForSub (TranFunc)					// :3
 	
 				////////  CONSTRUCT "WHILE" STRUCTURE
 	|| PostCond = AlterPostCond( arg.Next, iter.LoopEndCond, node )
-//		postcond = postcond.needbra
 	|| node2 = iter.MakeWhile(arg, PostCond)				#require // sigh
 	node <~ node2
 	
@@ -634,9 +640,7 @@ function Tran_ForSub (TranFunc)					// :3
 		// what if we just collect only the decls we added?
 	
 		EndLoopMarker.Remove
-		SCFunction.InBranch++
-		rz = Tran_WhileSub( fn, node2, p2 )
-		SCFunction.InBranch--
+		rz = Tran_While( nil, node2, p2 )
 
 
 function Tran_Sdt (|Message| exp)

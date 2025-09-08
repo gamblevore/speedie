@@ -30,6 +30,7 @@ datatype ASMReg (uint64)
 		CondRequest
 		CondAnswer
 		BlockSafe
+		BlockMostlySafe
 //		CompilerCreated
 		GlobalMemory
 		PreferEqul

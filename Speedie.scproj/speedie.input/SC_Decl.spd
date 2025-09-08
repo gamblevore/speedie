@@ -72,7 +72,8 @@ datatype SCDeclInfo (uint)
 		///
 		
 		Return
-		AlteredCopy = [Altered,AlteredInBranch,AlteredParamObject]
+		AlteredCopy = [Altered,AlteredInBranch,AlteredInLoop,AlteredParamObject]
+		AlteredBranchLike = AlteredInBranch|||AlteredInLoop
 		Reference
 		AlteredOrRef = Altered ||| Reference
 		Task
@@ -112,14 +113,14 @@ class SCDecl (SCObject) {
 	linkage
 		cpp_part			Decl
 
-	//|SCDecl|			NextContains // for multiple contains
+	//|SCDecl|			NextContains				// for multiple contains
 
 	|int|				C_Array
 	
 	|SCFunction--?|		HiderFunc
 	|Object?|			IsLookupOnly
 
-	|SCDecl?|			Internal		// pointers
+	|SCDecl?|			Internal					// pointers
 	|scdecl?|			LocalVarList
 	|SCDecl?|			Contains
 
@@ -128,9 +129,10 @@ class SCDecl (SCObject) {
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
 	|byte|				NilReg
-	|byte|				DepthOfBranch // same?
+	|byte|				DepthOfBranch
+	|byte|				DepthOfLoop
 	|bool|				Suffers
-	|DeclAlterable|		mu									// The ASM can alter these, and needs to restore them too.
+	|DeclAlterable|		mu							// The ASM can alter these, and needs to restore them too.
 
 	
 	constructor (|scclass| type)

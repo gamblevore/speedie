@@ -235,6 +235,7 @@ function scdecl.AsBody
 	isnt altered
 	isnt NumberConst
 	.DepthOfBranch = SCFunction.InBranch
+	.DepthOfLoop = SCFunction.InLoop
 
 
 function Message.CollectFromBody (|SCNode| Name_space)
