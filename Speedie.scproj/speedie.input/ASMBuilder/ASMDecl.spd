@@ -19,7 +19,7 @@ struct SavedRegisters
 		.KnownValues = sh.KnownValuesMap
 		|| S = sh.FuncStart - 1
 		for i in 32
-			|| f = sh.Registers[i]
+			|| f = sh.Register(i)
 			.asm[i] = (f - s, nil)(f)
 		
 		expect args <= 32 - .RegCount
@@ -30,7 +30,7 @@ struct SavedRegisters
 	function Rewind	(|assembler| sh)
 		sh.KnownValuesMap = .KnownValues
 		sh.BasicBlock = .BasicBlock
-		|| S = sh.FuncStart
+		|| S = sh.FuncStart - 1
 		for i in 32
 			|| r = .asm[i]
 			sh.Register(i) = (s + r, nil)(r)

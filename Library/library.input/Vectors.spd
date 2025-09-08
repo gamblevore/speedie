@@ -715,6 +715,7 @@ datatype vec2
 
 	function iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
+		
 
 	function Reflect (|vec2| plane, |vec2|)
 		return self - (2.0 * (self • plane) * plane)

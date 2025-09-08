@@ -33,10 +33,10 @@ struct Assembler
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
 	|&FatASM|					Start		// a "slice" feature would be nice    
-	|&FatASM|					_Curr    
+	|&FatASM|					Curr_
 	|&FatASM|					End    
 
-	|(?&FATASM)[32]|			Registers
+	|(?&FATASM)[32]|			Registers_
 	|FatASM| 					Zero
 
 	constants
@@ -55,10 +55,10 @@ struct Assembler
 	
 
     function Curr (|&fatasm|)
-        return ._curr
+        return .curr_
 
 	function Length (|int|)
-		return .curr - .funcstart
+		return .curr_ - .funcstart
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
@@ -70,20 +70,24 @@ struct Assembler
 
 	
 	function Index (|int|)
-		return ._curr - .start
+		return .curr_ - .start
 	
 	
 	function Last (|&FatASM|)
-		return ._curr - 1
+		return .curr_ - 1
 
 
 	function Last (|asm| type, |&FatASM|)
-		|| L = ._curr - 1
+		|| L = .curr_ - 1
 		if (l isa type) and .IsCurr(L)
 			return L
 	
 	
 	function IsCurr (|&fatasm| f, |bool|)
+		// needs to take loops into account
+		// also, perhaps BlockIDs instead.
+		// this could be nicer. Assuming its not altered in a branch... the blockID could work.
+		
 		return .basicblock == f.basicblock
 
 	
@@ -255,7 +259,7 @@ struct Assembler
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
 		|| C = .curr - 1
 		if fat == C
-			._curr = C // do it before both kinds of nop...
+			.curr_ = C // do it before both kinds of nop...
 
 		depth++
 		if depth > 7
@@ -266,17 +270,20 @@ struct Assembler
 		for v.regoutputs in fat
 			v &= 31
 			.RemoveReg(v, fat)
-		|| Type = asm.noop * (fat < ._curr)
+		|| Type = asm.noop * (fat < .curr_)
 		fat.setop = Type
 
 
 	function Register (|int| i, assigns:|?&FATASM|)
 		if value isa asm.WR8U or asm.WR4U or asm.WR2U or asm.WR1U
-		.Registers[i] = value
+		.Registers_[i] = value
+		
+	function Register (|int| i, |?&FATASM|)
+		return .Registers_[i] 
 
 
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
-		|| f = .registers[r.reg]
+		|| f = .register(r.reg)
 		if f is Const
 			return f.const == k
 	
@@ -393,13 +400,6 @@ struct Assembler
 		return .CloseVars(Closer, nil, v)
 
 
-	function µArg (|message| exp, |asmreg|)
-		|| Closer = .OpenVars
-		rz = .µGetASM(exp, asmreg.discard)
-		if exp.func != @decl
-			rz = .CloseVars(Closer, nil, rz)
-
-
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
 		|| Mode = exp.SaveForward
 		(Mode is AddrNeed) = (a is Reference)
@@ -491,7 +491,7 @@ struct Assembler
 		|| j = jsm
 		.end = j.NeedSpare(256K, j.Size)
 		.start = j.ptr
-		._curr = .start + j.Length
+		.curr_ = .start + j.Length
 		
 		// after zeroing, we could just set everything normally? It seems ._curr is set from jsm.
 		HoistSpace.Length = 0
@@ -514,7 +514,7 @@ struct Assembler
 		.zero.info = AsmReg()
 		.KnownValuesMap = nil
 		for i in 32
-			.registers[i] = nil
+			.registers_[i] = nil
 
 		.Guard
 		fn.StartASM
@@ -557,7 +557,7 @@ struct Assembler
 		|| h = .KnownValuesMap
 		while h
 			|| h2 = h.LowestBit
-			yield .Registers[h2.log2]!
+			yield .Register(h2.log2)!
 			h &= ~h2
 
 
@@ -590,7 +590,8 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	.CapASM
 	compiler.stASMTotalOps += fn.GuessLength
 
-	if StdErr.ok
+	|| err = stderr // for debug via xcode, which won't give me stderr unless its in a local
+	if err.ok
 		|| max = fn.maxasm
 			check (fn.µlength <= max) (fn.sourcearg, "ASM too large")
 		target debug

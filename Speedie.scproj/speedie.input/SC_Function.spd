@@ -1266,6 +1266,7 @@ iterator asm
 module {
 //||				DisabledPoints = 0
 ||				InBranch = 0
+||				InLoop = 0
 ||				OnceCount = 0
 |SCFunction|	_CurrFunc
 |FunctionType|  _Info

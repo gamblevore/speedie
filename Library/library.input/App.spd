@@ -238,6 +238,10 @@ helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
+target debug
+	helper SetASMBreak (|bool| b)
+		cpp_wrapper JB_App__SetASMBreak
+
 
 render MemoryUsage (|int| Over=0)
 	|[message]| items

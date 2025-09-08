@@ -21,7 +21,6 @@ struct ArchonPurger
 	|scdecl?|				Return
 	|int| 					InsideBoolLogic
 	|bool|					FnAbleToNilCheck
-//	|bool| 					RootReturned	// for recursive funcs
 	|bool|					AnyReturns
 	|NilRecord[64]| 		Rows
 	
@@ -129,9 +128,7 @@ struct ArchonPurger
 		.rowend = .Neel + 63
 		.Realnesses = -1
 		loops = nil
-//		ArgDepth = 1
 		.AnyReturns = false
-//		.RootReturned = false
 		.CheckNilCheck(F)
 		
 		for d in f.args
@@ -189,16 +186,17 @@ struct ArchonPurger
 
 	module
 		|LoopInfo| 				Loops
-//		|int|					ArgDepth
 		|ArchonPurger|			T
 		|byte|					OldPrint
 		|bool|					NewFuncsLoaded
 
+		function BeginLoop (|bool| HasExitCond, |Loopinfo|)
+			rz = .loops
+			.Loops.BeginLoop(hasexitcond)
 
 		function Value (|NilRecord|)
 			opt inline
 			return t.value
-
 
 		function EndBlock (|nilrecord|)
 			opt inline
@@ -207,10 +205,7 @@ struct ArchonPurger
 
 		function DeclKill
 			opt inline
-//			if !t.BranchDepth
-//				t.RootReturned = true
 			t.value = nilstate.Basic
-		
 
 		function ExterminateZergBugs (|SCFunction| f)
 			opt norefcounts

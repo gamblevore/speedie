@@ -23,7 +23,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	if p < .End
 		if  exp.Position < 0
 		p[0] = nil
-		._curr = p + 1
+		.curr_ = p + 1
 		P._op = op
 		p.debug = exp
 		p.BranchID = .BranchID
@@ -73,7 +73,7 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 
 function Assembler.ClearAllStructs (|message!| exp,  |bool|)
 	for i in 32
-		|| fat = .Registers[i]
+		|| fat = .Register(i)
 			.ClearStruct(exp, fat, i)
 
 
@@ -94,15 +94,15 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |
 	|| v = extra.log2
 	Curr &=~ (1<<v)
 	if isreal
-		.vdecls = curr
+		.vdecls = curr // easier to debug >:O 
 	  else
-		.vtemps = curr
+		.vtemps = curr // 🔥🔥🔥🔥🔥
 	
 	.KnownValuesMap &=~ (1<<v)
 
-	|| fat = .Registers[v]
+	|| fat = .Register(v)
 	if !fat: return true
-	.Registers[v] = nil // shouldn't close this here! only at the end of a block!
+	.Register(v) = nil // shouldn't close this here! only at the end of a block!
 	// .nextbasicblock should do this?
 
 	// don't nop (most?) unused stuff here... as temps can be used after deallocating.
@@ -110,9 +110,6 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |
 	// the best this place could do... is warn (ME) that a function should be nopping something
 	// but isn't.
 	
-	if fat is CompilerCreated									/// NOP UNUSED VARS ///
-/		.AskNop(fat) // not sure this should be kept.
-
 	return .ClearStruct(exp, fat, v)
 
 

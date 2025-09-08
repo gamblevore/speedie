@@ -108,6 +108,10 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 	|SavedRegisters| regs 
 	|InlineInfo| Info
+	
+	debugat 444
+	target debug
+		|| vdecls_debug = .vdecls.log2
 
 	regs.Collect(fn.args, self)
 	
@@ -141,9 +145,8 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 		if !(V asnt ASMReg.into2) // its nil or into
 			info.items[i] = .µInlineParam(p, a, V)
 		p = p.next!
-
-	for (a in args) (i)
-		a.AsmReg = info.Items[i]									// update reg!
+		
+		a.AsmReg = info.Items[i] // a is the output, nt the input decls.
 
 
 	

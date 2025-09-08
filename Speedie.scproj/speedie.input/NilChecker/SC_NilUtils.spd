@@ -4,10 +4,10 @@ struct LoopInfo
 	|NilRecord| 		ExitRecord
 //	|byte| 				VarCount
 	|byte| 				BranchDepth
+//	|byte|				LoopDepth
 	|bool| 				HasEscape
 	
-	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
-		rz = self[0]
+	function BeginLoop (|bool| HasExitCond)
 		|| v = ArchonPurger.value
 		
 		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
@@ -15,6 +15,7 @@ struct LoopInfo
 		.ContRecord = V								// in case loop fails the first condition
 //		.VarCount = V.DepthOfVars
 		.BranchDepth = ArchonPurger.t.BranchDepth
+//		.LoopDepth++
 	
 	
 	function FinishLoop (|message| msg)

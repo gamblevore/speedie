@@ -385,7 +385,7 @@ function While (NilTrackerFn)
 
 	require !CondTest.KnownFalse and T.BranchEnter(msg)
 
-	|| W = .loops.BeginLoop(!condtest.KnownTrue)
+	|| W = .BeginLoop(!condtest.KnownTrue)
 	for i in 3 
 		.SyncJump(cond, NilCheckMode.whilepos)
 		.Argument(cond.next!)

@@ -70,6 +70,7 @@ int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
 int JB_Signal(int pid, int sig);
 void JB_App__CrashOnInterupt (bool b);
+void JB_App__SetASMBreak(bool b);
 void JB_SigChild (int signum);
 void JB_SigMsgReceived(int signum);
 void JB_SigChildLock ();
@@ -89,7 +90,6 @@ void JB__DefaultCrashHandler(int Signal);
 void JB_Rec__CrashLog(const char* c);
 struct SpdProcess;
 void JB_App__SetThreadName(JB_String* name);
-int JB_Pipe__IgnoreBreakPoints ();
 void JB_Pipe__StdErrorSet(int F);
 void JB_Pipe__StdOutSet(int F);
     

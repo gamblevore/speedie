@@ -320,9 +320,9 @@ function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |
 function Decl (fn_asm) // declaresub declare 
 	opt norefcounts
 	
-	|| rel = exp.last!
 	|| ty = exp.fastdecl
 	.DeclReset(ty)
+	|| rel = exp.last!
 	dest = .DeclareMe(rel, ty)
 
 	if ty.IsBareStruct
@@ -345,18 +345,14 @@ function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 	|| v = .OpenVars
 	
 	for ch.fast in exp
-		if ch.func != @decl
-			rz = .µ(ch, asmreg.discard)
+		if ch.func == @decl
+			rz = decl(self, ch)
 		  else
-			rz = .µGetASM(ch, asmreg.discard)
-		if rz & asmreg.exit 	// test two bits at once. I prefer: if rz is exit
+			rz = .µ(ch, asmreg.discard)
+		if rz & asmreg.exit 	// Test two bits at once. I prefer: if rz is exit
 			exit				// first need to check that no code is actually testing two bits for real.
 								// by putting a check in syntaxis
-
-	.VDecls = v|uint| // remove new decls
-	target debug
-		if .VTemps != (v>>32) // hmmm
-	.VTemps = v >> 32
+	.CloseVars(v)
 
 
 function ArgumentThatIsAroundWhile (fn_asm)
@@ -520,7 +516,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return ThgReference(self, exp, dest, d)
 			
 		|| T = .LocalThg(d)
-		if dest isnt AddrNeed
+		if dest & asmreg.AddrNeed != asmreg.AddrNeed
 			return t
 			
 		if d.IsBareStruct					// it already has the address
@@ -819,23 +815,25 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 
 
 
-function LocalThg (|scdecl| d,  |asmreg|) // asmlocal, localasm
+function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
 
 	(t is param) = d is param
-	|| f = .registers[t.reg]
+	if d isnt AlteredInBranch
+		(t is BlockSafe)
+	|| f = .Register(t.reg)
 	// .iscurr isnt as reliable as I hoped
 	// || x = 1, if y {y++}, // now x isn't in the same branch! is it a const or not?
 
 	// consts must have fats! both in and out. unless r0.
 	if f
-		if (.iscurr(f) or (d isnt AlteredInBranch))
+		if (.iscurr(f) or (t is BlockSafe))
 			t.FatIndex = f.index
 			(T is Const) = (f is Const)
 	  elseif d is const
 		if t.reg // bad
-		
+	
 	|| rr = T.reg
 		|| Ret = .State.Return
 		if rr == ret.reg
@@ -845,8 +843,6 @@ function LocalThg (|scdecl| d,  |asmreg|) // asmlocal, localasm
 	
 	if d is const and t isnt Const // oof. lost somehow?
 		debugger
-		if f and (.iscurr(f) or (d isnt AlteredInBranch))
-			t.FatIndex = f.index
 	
 	return T
 }

@@ -7,7 +7,7 @@ module PackMaker
 	|[SCDecl]|				LibGlobs
 	|[SCFunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
-	|int|					ExportPos
+//	|int|					ExportPos
 	
 	|int|					_PackGlobSize
 	|int|					_LibGlobSize
@@ -95,11 +95,7 @@ module PackMaker
 
 		|| ID = 0
 		while (|| f = list[id])
-			f.TableID = ++id
-//			|| proto = f.hasproto
-//				if proto.name contains "LeafFunctionsSorter"
-//				proto.au.ExportPosition = id
-			
+			f.TableID = ++id			
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)
@@ -144,7 +140,6 @@ module PackMaker
 	
 
 	
-	target debug {
 	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
 		|| mod = compiler.program.FindModule("ASMExamples")
@@ -152,11 +147,9 @@ module PackMaker
 			rz = mod.Findfunction(s)
 			scfunction.currfunc = rz 
 			
-	}	
-		
-		
+	
 	function RunAFewTests 
-		target debug {
+		if platform.isdebug {
 		|scfunction--| fn
 		fn = .testfn("SemiConst")
 		if fn
@@ -214,10 +207,9 @@ module PackMaker
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		.SortFuncsAndBuildGlobs
-		target debug {
-		if .ActualASMCompile and Options.pack
-			.WritePackToDisk
-		}
+		if platform.isdebug
+			if .ActualASMCompile and Options.pack
+				.WritePackToDisk
 		compiler.During = 0
 	
 	
@@ -313,7 +305,9 @@ module PackMaker
 			require .HasPackChildren
 			j.enter
 		for c in .children
-			if !c.isrole
+			if c.isrole
+				c.PackClassChildren(j)
+			  else
 				c.packexport(j)
 		if j
 			j.exit
@@ -321,10 +315,8 @@ module PackMaker
 	
 	function SCClass.PackExport (|jbin?| j)
 		opt norefcounts
-		|| Output = .MyReacher
-
 		if j
-			require output or .HasPackChildren
+			require .MyReacher or .IsLibrary or .HasPackChildren
 			j.enter(@tmp, .name)
 			if !.IsLibrary
 				.DescribeInPack(j)
@@ -332,12 +324,10 @@ module PackMaker
 			j.exit
 		  else
 			|| T = .ClassType!
-			if !output
-				0
-			  elseif .IsLibrary
+			if .IsLibrary
 				packmaker.libglobs <~ T
 				(T is Library)
-			  else
+			  elseif .MyReacher
 				packmaker.packglobs <~ T
 			.PackClassChildren(j)
 		
@@ -347,7 +337,7 @@ module PackMaker
 		|| sz = (0, .size)(.iswrapper)
 		j.addint(sz)
 		
-		|| fn_list = .behaviour!.WrapperFuncs
+//		|| fn_list = .behaviour!.WrapperFuncs
 		j.enter(@list)
 	
 		|| name = "0"

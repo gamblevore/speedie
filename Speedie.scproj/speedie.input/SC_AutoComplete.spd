@@ -289,8 +289,9 @@ function SCFunction.CheckUnused (|message| feedback)
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
 	
-	require (self isnt cpp) and !.HasProto
-	.CheckUnusedArgs(feedback)
+	require (self isnt cpp)
+	if !.HasProto
+		.CheckUnusedArgs(feedback)
 	
 	for s.flat in .Sourcearg
 		if s == @decl
@@ -496,12 +497,12 @@ function AutoJump (|message| cmd, |message|)
 	|| c = cmd.last
 	if c == @name
 		if cmd starts "autocomplete"
-			return .AutoComplete(c.first, c.name, cmd.name)  
-		  else
-			return .DefineOrCall(c, cmd.name)
+			return .AutoComplete(c.first, c.name, cmd.name)
+		return .DefineOrCall(c, cmd.name)
 			
 	if cmd starts "autocomplete"
 		return .RootTmpComplete(cmd)
+	
 	if c ~= "import"
 		return .JumpImport(cmd)
 
@@ -522,14 +523,16 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	require fn
 	SCFunction.CurrFunc = fn
 	
-	|| thg = fn.source!.findpos(f, n)
-	if !thg and cmd == "callfrom" // "calledfrom"
-		thg = fn.source
-	if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
-		return .define_behaviour(fn, cmd.name)
+	if cmd contains "__CopyID__"
+	|| thg = fn.source!.FindPos(f, n)
 	if cmd starts "asm" or "cpp"
 		return .CppASM(cmd, fn)
-	if cmd starts "define" or "display" or "callfrom"
+	
+	if cmd starts  "define" or "display" or "callfrom"
+		if !thg and cmd == "callfrom" // "calledfrom"
+			thg = fn.source
+		if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
+			return .define_behaviour(fn, cmd.name)
 		return .Define_Something(my_file, f, thg, cmd.name)
 
 	expect (thg)                       ("nomsg")

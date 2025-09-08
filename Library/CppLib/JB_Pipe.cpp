@@ -96,14 +96,9 @@ void JB_App__SetThreadName(JB_String* self) {
 //
 
 bool CanASMBKPT = true;
-int JB_Pipe__IgnoreBreakPoints() {
-	CanASMBKPT = false;
-	int rz = sigignore(SIGINT);
-	if (rz)
-		rz = errno;
-	return rz;
+void JB_App__SetASMBreak(bool b) {
+	CanASMBKPT = b;
 }
-
 
 bool JB_Str__Terminate(Array* strs) {
 	int n = JB_Array_Size(strs);

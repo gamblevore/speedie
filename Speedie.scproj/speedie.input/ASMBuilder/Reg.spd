@@ -29,17 +29,17 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-		CompilerCreated
+		BlockSafe
+//		CompilerCreated
 		GlobalMemory
 		PreferEqul
 		Const
-		AsRegClear  = Const
 		Exit        = [ExitFunction, ExitAtAll]
 		AddrNeed    = [AddrRequest, AddrForceRequest]
 		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
 		Zero	    = Const   ||| 56 ||| param		// 56 == datatypecode.uint64
-		RealDiscard = Const   ||| discard
+//		RealDiscard = Const   ||| discard
 		Simple		= Temp
 
 	
@@ -83,6 +83,13 @@ datatype ASMReg (uint64)
 //	function CopyConst (|asmreg| Src, |asmreg|)
 //		return (self &~ Const) as (src & Const)
 	
+	function ConstCheck
+		|| v = .reg$
+		|| k = .const
+		|| g = Assembler.sh.Register(v) #debug_require
+		|| k2 = g.const
+		if k2 != k // well fuck
+		
 	function Const (|int64|)
 		// every single caller must check for Const (and does!)
 		|| F = .FAT
@@ -208,7 +215,8 @@ datatype ASMReg (uint64)
 	syntax is (|AsmReg| R, |bool|)
 		// seems we only test one bit at a time...
 		// but argumentsub wants to test two... so it can't use this.
-		
+		// AddrNeed is tested for! but maybe better to do it the nice way.
+		if !r|int64|.IsPow2
 		return (self & R) == r
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
@@ -264,15 +272,17 @@ datatype ASMReg (uint64)
 			if !value.reg and self is alteredorref
 		
 		isnt const
-		.ExportPosition = 0
+		.ExportPosition = 0 // this is for a local. locals store their consts in fats...
 		if value is Const
 			value.incr
+			value.ConstCheck
 			if self isnt Altered
 				is const
-				.ExportPosition = value.Const
+//				.ExportPosition = value.Const
 		value.µType = .mu.DataType
 		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck
+	
 	
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)

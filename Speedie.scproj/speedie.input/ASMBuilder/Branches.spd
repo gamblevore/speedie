@@ -30,7 +30,7 @@ function If (fn_asm)
 
 	.branchID = Old
 
-	
+
 function IfSub (fn_asm)
 	opt norefcounts
 
@@ -471,10 +471,6 @@ Struct FatRange
 	function Always (|bool|)
 		opt inline
 		return .Constness.KnownTrue
-
-	function Maybe (|bool|)
-		opt inline
-		return !.Constness.IsKnown
 	
 	
 	function Never (|bool|)

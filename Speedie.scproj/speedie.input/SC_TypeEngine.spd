@@ -311,7 +311,7 @@ function TypeOfChar (ExprResolver)
 		char_decl = type.typenormal.CopyDecl
 		place[] = char_decl
 		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
-		char_decl.ExportPosition = cp	// nice!
+		char_decl.ExportPosition = cp	//  nice!
 	if !IsByte
 		exp.Func = @num
 		exp.name = str	

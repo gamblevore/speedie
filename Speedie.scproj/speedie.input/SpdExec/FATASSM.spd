@@ -99,7 +99,7 @@ struct FatASM
 	operator mul (|asmreg| flags, |asmreg|)
 		cpp_part AsReg
 		
-		(flags isnt AsRegClear)
+		(flags isnt const)
 		|| flags2 = flags.FatIndex(.index)
 		.info = flags2
 		if flags
@@ -183,7 +183,7 @@ struct FatASM
 	
 	
 	function assembler.RemoveReg (|int| i, |fatasm| fat)
-		require .Registers[i] == fat
+		require .Register(i) == fat
 		|| NewFat = fat.FindOlder
 		.KnownValuesMap &=~ (1<<i)
 		.Register(i) = NewFat
