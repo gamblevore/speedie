@@ -811,10 +811,10 @@ function AutoSub2 (|SCNode| scope, |string| name, |[autoitem]| found, |int| Type
 
 function AutoCompleteSorter (sortercomparer of autoitem)
 	|| type = .type - b.type 
-		return type < 0
+		return type
 	|| depth = .depth - b.depth // doesnt seem to work just yet?
-		return depth < 0
-	return .sort < b.sort
+		return depth
+	return .sort - b.sort
 
 
 function FuncTmps (|message|)
