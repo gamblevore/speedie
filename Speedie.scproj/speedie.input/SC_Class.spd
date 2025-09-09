@@ -293,7 +293,6 @@ function AlignProperties
 // Want things tight:       (usually biggest first)
 // Want RD1U accessibility: (smallest first)
 // Not so simple! If class <= 128, make it tight.
-
 	.properties.sort(SmallestAlignedFirst)			// Smallest first, structs last though
 	|| ParentSize = 4
 	|| sp = .super
@@ -309,15 +308,12 @@ function AlignProperties
 	|[scdecl]| Sorted
 	.AlignTo(sorted, 3)
 	.AlignTo(sorted, 4)
-	.GrabRemaining(sorted)
-	.properties = sorted
 
-
-function GrabRemaining (|[scdecl]| dest)
-	opt norefcounts
-	for s.backwards in .properties
+	for s in .properties
 		if s isnt grabbed
-			.alignsub(dest, s)
+			.alignsub(sorted, s)
+	
+	.properties = sorted
 
 
 function FindPropAlignedTo (|int| align, |scdecl|)
@@ -339,6 +335,7 @@ function AlignSub (|[scdecl]| dest, |scdecl| D, |bool|)
 
 
 function AlignTo (|[scdecl]| dest, |int| Bits)
+	opt norefcounts
 	|| AlignBits = (1<<Bits)-1
 	require .sizeraw & Alignbits
 	

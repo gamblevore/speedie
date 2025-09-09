@@ -85,13 +85,19 @@ struct Assembler
 		|| L = .curr_ - 1
 		if (l isa type) and .IsCurr(L)
 			return L
+
+	function Last (|asm| type, |asm| type2, |&FatASM|)
+		|| L = .curr_ - 1
+		if (l isa type or type2) and .IsCurr(L)
+			return L
 	
 	
 	function IsCurr (|&fatasm| f, |bool|)
 		// needs to take loops into account
 		// also, perhaps BlockIDs instead.
+		// Assembler.RefCountSub doesn't seem to need that complexity and literally just wants the basicblock?
 		// this could be nicer. Assuming its not altered in a branch... the blockID could work.
-		
+			
 		return .basicblock == f.basicblock
 
 	
@@ -342,7 +348,7 @@ struct Assembler
 			self++
 	
 	
-	function message.SaveForward (|asmreg|)
+	function message.AllowsTemp (|asmreg|)
 		return ASMReg.temp * (!.FoundFunc)
 	
 	
@@ -353,15 +359,14 @@ struct Assembler
 			return f.FoundFunc
 			
 		
-	function GetRealDest (|message| exp,  |scdecl| A,  |asmreg| dest,  |asmreg|)
-		if dest is Declaration							// || x = (y + 1) + (z + 1)
-			return dest asnt asmreg.Declaration
+	function GetRealDest (|message| exp,  |scdecl| A,  |asmreg| ModeOnly,  |asmreg|)
+		if ModeOnly is Declaration							// || x = (y + 1) + (z + 1)
+			return ModeOnly asnt asmreg.Declaration
 		
-		// asmtodo: should make these as declarations too?? I mean... they are.
-		// what about doing all .declaremes/.temps?
-		if dest is temp									//    x = (y + 1) + (z + 1)
-			return .TempTyped(a, dest)
-		return .DeclareMe(exp, a) as dest
+		// asmtodo: what about doing all .declareme? simpler?
+		if ModeOnly is temp									//    x = (y + 1) + (z + 1)
+			return .TempTyped(a, ModeOnly) // why not as ModeOnly here too?
+		return .DeclareMe(exp, a) as ModeOnly
 
 
 	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
@@ -388,6 +393,8 @@ struct Assembler
 
 	function µGetRealOffer (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		|| c = .curr
+		if dest isnt Declaration
+			dest = nil // clear for .GetRealDest
 		return .µGetReal(exp, a, dest)
 		// asmtodo: check if we can re-write the output to dest
 		// however its more tricky than I thought. Do later. 
@@ -396,7 +403,7 @@ struct Assembler
 	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		|| OV = .OpenVars
 		Dest = .GetRealDest(exp, a, dest)
-		|| r = .µgetasm(Exp, dest)
+		|| r = .µGetASM(Exp, dest)
 		if r iz Dest
 			return r
 		return .CloseVars(ov, nil, r)
@@ -415,7 +422,7 @@ struct Assembler
 		// like a fat that... holds params just for storing? and then
 		// we refer to that fatter fat?
 		
-		|| Mode = exp.SaveForward
+		|| Mode = exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
 		|| r = .µGetReal(exp, nil, Mode)
 		if (a is reference  and  r isnt containsaddr)

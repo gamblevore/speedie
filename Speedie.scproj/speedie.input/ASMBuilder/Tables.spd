@@ -344,7 +344,7 @@ function ArgumentSub (|&Assembler| self, |message| exp, |asmreg| Mask=asmreg.exi
 	
 	opt NoRefCounts
 	|| v = .OpenVars
-	|regfile| f = .Regs // use to reopen vars.
+	|regfile| Restore = .Regs
 
 	for ch.fast in exp
 		if ch.func == @decl
@@ -354,13 +354,12 @@ function ArgumentSub (|&Assembler| self, |message| exp, |asmreg| Mask=asmreg.exi
 		loop rz isnt exit
 	
 	if !Mask
-		exp = nil		
+		exp = nil
+	if rz isnt ExitFunction
+		return .CloseVars(v, exp, rz & Mask)
 	rz = .CloseVars(v, exp, rz & Mask)
-//	
-//	// restore closed vars.
-//	// what about... if we return? does it make a difference?
-//	.VDecls = v
-//	.regs = f
+	.regs = Restore
+
 
 // merge?
 function Argument (fn_asm) // argument 
@@ -811,6 +810,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 
 function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
 	opt norefcounts
+	// debugat 6335
 	|| T = d.WholeType
 
 	(t is param) = d is param
@@ -835,8 +835,14 @@ function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
 	  else
 		(t is const)
 	
-	if d is const and t isnt Const // oof. lost somehow?
-		debugger
+	// ASMReg() calling SC_Reg_SyntaxIsSet() triggers this.
+	//if d is const and t isnt Const // oof. lost somehow?
+	//	debugger
+	// this is possible. Using inlines. We can write to a "const register"... but only in the return value.
+	// if there are multiple branches, then they'll see the previous branch's write. Which is fine...
+	// we just lose the const value, thats all. The arg can't restore this either. It would need to be
+	// "unrestored" after the else condition is done. And then merged. What a mess. Nil-checker complexity.
+	// leave this as it is!
 	
 	return T
 }
