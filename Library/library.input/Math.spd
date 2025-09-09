@@ -234,11 +234,11 @@ extend float
 
 	
 	function RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
-		|| fr = hfrom - lfrom
+		|| range = hfrom - lfrom
 		// if its lfrom, return lto
 		// if its hfrom, return hto
-		|| inbetweenfromness = (self - lfrom) / fr
-		return mix(lto, hto, inbetweenfromness) 
+		|| inbetweenfromness = (self - lfrom) / range
+		return lto + (inbetweenfromness * (hto - lto))
 	
 	
 	function RangeConvertClamped (|float| lfrom, |float| lto, |float| hfrom, |float| hto, |float| )
