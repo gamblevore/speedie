@@ -152,6 +152,11 @@ class Memory
 		.dump(fs)
 		printline fs
 	
+	
+	function String (|string|)
+		return string.Copy(._ptr, .ByteLength)
+	
+	
 	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
 		|| p = ._ptr
 		|| p2 = p + .ByteCapacity 
