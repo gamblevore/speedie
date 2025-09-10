@@ -490,12 +490,33 @@ class SCDecl (SCObject) {
 		return (!.PointerCount) and (!.IsNil) and .IsObject
 
 
+	function IsReallyNumeric (|bool|)
+		require .IsNormal
+		
+		|| t = .HigherNumber
+			return true
+
+
+	function HigherNumber (|scclass|)
+		opt norefcounts
+		|| t = .type
+		while t
+			if t.IsDataTypeOnly
+				return t
+			t = t.Super
+		
+		
 	function IsNormalNumber (|bool|)
+		opt norefcounts
 		require (!.IsCArray) and (!.PointerCount)
 		if (.Type.NumericCount == 1)
 			return true
-		if scnode.ConstantsLoadingOverride and (self is const) and .typeinfo.VecCount == 1 
-			return true
+		
+		if scnode.ConstantsLoadingOverride
+			|| t = .HigherNumber
+				if t.typeinfo.VecCount == 1 
+					return true
+
 
 	function IsNearlyNormalNumber (|bool|)
 		require (!.IsCArray) and (!.PointerCount)

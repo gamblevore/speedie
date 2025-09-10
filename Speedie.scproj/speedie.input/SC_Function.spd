@@ -88,6 +88,7 @@ linkage
 |byte|					StructReturnPos
 |uint|					µStart
 |uint|					µLength
+|uint|					µLengthReal
 
 
 
@@ -482,7 +483,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			|| prms = Incoming.exp.last!
 			|| def = FuncArg.Default!.Copy(prms)
 			prms.InsertBefore( def, PArg_Ch )
-			TypeOfExpr( def, Name_Space )
+			|| ty = TypeOfExpr( def, Name_Space )
+				if ty.isbarestruct // oof
+					TypeOfExpr( def.wrapwith(@brel + "&"), name_space )
 
 		  else
 			Incoming.FailedAt ?= fi		

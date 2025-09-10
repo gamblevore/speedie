@@ -12,9 +12,11 @@ function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
 
 
 function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message| exp, |asmreg|)
+	base = base.HaveAddr
+	if !vara.reg
+		return base
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
-	base = base.HaveAddr
 	if !dest.reg
 		dest.TryReg = Vara
 		dest.TryReg = Base
@@ -131,7 +133,7 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 		if (glob isnt global) and (glob is property)		// a property on a global struct
 			0 //  
 		  else
-			|| bs = base.fat!
+/			|| bs = base.fat!
 			LostBytes = glob.ExportPosition
 			|| K = bs.const
 			LostBytes -= K
@@ -189,8 +191,8 @@ function Dummy (|message| exp)
 
 function scdecl.CanCopyNormally (|bool|)
 	opt norefcounts
-	|| i = .Internal!
-	if i.IsBareStruct
+	|| i = .Internal
+	if i and i.IsBareStruct
 		return false
 // seems simpler to use a memory copy instruction.
 // why not?

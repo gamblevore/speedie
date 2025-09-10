@@ -84,13 +84,6 @@ function SimpleName (|String|)
 function SetFuncName (assigns:|string| s)
 	.funcname = "Operator" + s.UpperFirst
 	dict[ s.Lowercase ] = self
-	
-
-function IsCompOrSet (|bool|)
-	return self is CompOrSet
-//	|| new = (.kind & OpMode.CompSet) == OpMode.CompSet
-//	if old and !new
-//	return old
 
 
 function InitComp (|string| name_)
@@ -437,9 +430,14 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if (comp is Custom or CaseAware)
 		return CustomOps.Needed
 	
-	|| CompOrSet= comp.IsCompOrSet
 	|| LNT		= LC.TypeInfo
 	|| RNT		= RC.TypeInfo
+	if scnode.ConstantsLoadingOverride
+		if lc.IsReallyNumeric
+			(lnt is numeric)
+		if rc.isreallyNumeric
+			(rnt is numeric)
+
 	|| LN		= LNT.NumericCountBoolsToo(lc)
 	|| RN		= RNT.NumericCountBoolsToo(Rc)
 
@@ -463,7 +461,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 	ifn LN and LN == RN	   		// not both same numbers
 		if ln and rn and (ln == 1 or rn == 1)
-			if (CompOrSet)
+			if (comp is CompOrSet)
 				return CustomOps.Needed
 			if (comp is Multiply)
 				|| B = TypeBool!
@@ -500,7 +498,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 	if (!SCNode.ConstantsLoadingOverride and LC.Type is TreatAsBaseType)
 		return CustomOps.Needed ||| extra
-	if (LN > 1) and CompOrSet									// can't compare vectors directly in C++
+	if (LN > 1) and (comp is CompOrSet)									// can't compare vectors directly in C++
 		return CustomOps.Needed ||| extra
 
 	if !extra

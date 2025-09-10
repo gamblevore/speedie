@@ -61,15 +61,18 @@ struct Assembler
     function Curr (|&fatasm|)
         return .curr_
 
-	function Length (|int|)
+	function FnLength (|int|)
 		return .curr_ - .funcstart
+	
+	function Totalµ (|int|)
+		return .curr_ - .Start
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 //		.References = 0
 		for a in fn.Args
 			.DeclReset(a)
-			.DeclareMe(a.source, a)
+			.DeclareVar(a.source, a)
 //			.references |= (a is Reference) << (i+1)
 
 	
@@ -149,7 +152,7 @@ struct Assembler
 
 
 	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
-		// could be a param, or a decl that we are returning.
+		// A param/body var, that we return.
 		// .DeclareMe is also called from inlines. What does it do there, then?
 		// does it still make sense?
 		
@@ -160,25 +163,30 @@ struct Assembler
 			return ret
 
 	
-	function DeclareMe (|Message| where,  |scdecl?| Type,  |asmreg|)
-		if type // Getreal can't come here, passes nil.
-			rz = Type.CalculateASMType
-			|| ret = .IsOnlyVarThatWeReturn(type)
-				return ret
-		
+	function DeclareBody (|Message| where,  |scdecl| Type,  |asmreg|)
+		return .DeclareVar(where, type) // as asmreg.Declaration	// this makes AddAK_K and others bigger?
+		// Generally this uses less registers tho! Needs marked as temp+decl sometimes!
+
+							
+	function DeclareMe (|Message| where, |asmreg| V=nil, |asmreg|)
 		|| d = .VDecls
-		check (d != -1) (where, "No free local variables.")
-		
 		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
 		d |= FreeBit
-		rz.reg = freeBit.log2
-
-		if type
-			Type.WholeType = rz
-			target debug: Type.ASMSanity
+		v.reg = freeBit.log2
 
 		.Vdecls = d
-		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
+		check (freebit and !(d & .VTemps)) (where, "No free local variables.")	// entirely full
+		return v
+	
+
+	function DeclareVar (|Message| where,  |scdecl| Type,  |asmreg|)
+		rz = Type.CalculateASMType
+		|| ret = .IsOnlyVarThatWeReturn(type)
+			return ret
+		
+		rz = .DeclareMe(where, rz)
+		Type.WholeType = rz
+		target debug: Type.ASMSanity
 
 
 	function vdecls (|uint|)
@@ -365,16 +373,6 @@ struct Assembler
 		|| f = .first
 			return f.FoundFunc
 			
-		
-	function GetRealDest (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
-		if ModeOnly is Declaration							// || x = (y + 1) + (z + 1)
-			return ModeOnly asnt asmreg.Declaration
-		
-		// asmtodo: what about doing all .declareme? simpler?
-		if ModeOnly is temp									//    x = (y + 1) + (z + 1)
-			return .TempOnly(ModeOnly) // passes in modeonly...
-		return .DeclareMe(exp, nil) as ModeOnly
-
 
 	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 	/*
@@ -389,7 +387,7 @@ struct Assembler
 	*/
 
 		|| OV = .OpenVars
-		Dest = .DeclareMe(exp, a) as dest
+		Dest = .DeclareBody(exp, a) as dest
 		|| r = .µGetASM(Exp, dest)
 		if r iz dest
 			return r
@@ -401,21 +399,29 @@ struct Assembler
 	function µGetRealOffer (|message| exp, |asmreg| Dest,  |asmreg|)
 		|| c = .curr
 		if dest isnt Declaration
-			dest = nil // clear for .GetRealDest
+			dest = nil // clear for .GetReal
 		return .µGetReal(exp, dest)
 		// asmtodo: check if we can re-write the output to dest
 		// however its more tricky than I thought. Do later. 
 
 
-	function µGetReal (|message| exp,  |asmreg| Dest,  |asmreg|)
+	function µGetReal (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
 		// the result should be considered "temp-like"?
 		// that means... it can be optimised away. maybe just allow temps on normal vars?
 		// like have another bit that says "its allowed"... but everything just checks
 		// "is temp" like normal.
+		
 		|| OV = .OpenVars
-		Dest = .GetRealDest(exp, dest)
-		|| r = .µGetASM(Exp, dest)
-		if r iz Dest
+		if ModeOnly is Declaration									// || x = (y + 1) + (z + 1)
+			ModeOnly = ModeOnly asnt asmreg.Declaration
+		  elseif ModeOnly is temp									//    x = (y + 1) + (z + 1)
+			ModeOnly = .TempOnly(ModeOnly)
+			// asmtodo: what about doing all .declareme? simpler?
+		  else
+			ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
+		
+		|| r = .µGetASM(Exp, ModeOnly)
+		if r iz ModeOnly
 			return r
 		return .CloseVars(ov, nil, r)
 		
@@ -549,7 +555,8 @@ struct Assembler
 
 
 	function CapASM
-		.out.µlength = .length
+		.out.µlength = .fnlength
+		.out.µLengthReal = .out.GuessLength
 		jsm!.length = .curr - .start 
 
 		
@@ -600,8 +607,8 @@ function assembler.RootGen (|scfunction| fn)
 
 
 function Assembler.Rework (|SCFunction| fn,  |bool|)
-	HoistSpace.NeedSpare(.Length)
-	HoistSpace.CopyFrom(.FuncStart, .Length)
+	HoistSpace.NeedSpare(.FnLength)
+	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 	.Orig = .FuncStart
 	.InitAndStartFunc(fn)
 	.RootGen(fn)
@@ -623,7 +630,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	|| err = stderr // for debug via xcode, which won't give me stderr unless its in a local
 	if err.ok
 		|| max = fn.maxasm
-			check (fn.µlength <= max) (fn.sourcearg, "ASM too large")
+			check (fn.µlengthreal <= max) (fn.sourcearg, "ASM too large")
 		target debug
 			fn.µprint(++CountASMFuncPrint)
 		return true

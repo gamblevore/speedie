@@ -104,6 +104,12 @@ datatype DataTypeCode (uint16)
 		opt inline
 		return self&PossibleBits == M&PossibleBits
 	
+	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)
+		opt inline
+		if value
+			return self|||m
+		return self&~M
+	
 	function Floatness (|int|)
 		if .isint
 			return 0

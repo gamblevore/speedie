@@ -322,7 +322,7 @@ function Decl (fn_asm) // declaresub declare
 	|| ty = exp.fastdecl
 	.DeclReset(ty)
 	|| rel = exp.last!
-	dest = .DeclareMe(rel, ty)
+	dest = .DeclareBody(rel, ty)
 
 	if ty.IsBareStruct
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
@@ -336,12 +336,7 @@ function Decl (fn_asm) // declaresub declare
 
 function StatExpr (fn_asm)
 	opt norefcounts
-	return ArgumentSub(self, exp.first!, -1|asmreg|)
-
-
-//function StructBug (fn_asm)
-//	visible
-//	return ArgumentSub(exp.first!, -1|asmreg|)
+	return ArgumentSub(exp.first!, -1|asmreg|) // test default struct-passing (speedie adds a &)
 
 
 function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
@@ -371,6 +366,7 @@ function Argument (fn_asm) // argument
 	return ArgumentSub(self, exp)
 
 
+
 function Access (fn_asm)										// a[b], struct.mem[b]
 	opt	NoRefCounts
 	if dest isnt set
@@ -380,20 +376,23 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| d = f.asmdecl
 		
 	|| sc = exp.Second.first!
-	|| base = .µGetReal(f, ASMReg.AddrRequest temp sc)		// x = a.b[0]
+	|| mode = ASMReg.AddrRequest temp sc
+	// we can't do addrneed... because thgsub assumes we want &local... not just local but no fiddling.
+	
+	if !d.CanCopyNormally or dest is AddrRequest
+		(mode as= asmreg.AddrNeed)						// inlineoffsetopt can't get at the glob buried in here.
+														// So we need to simplify things.
+
+	if "InstructionInit".trap
+	|| base = .µGetReal(f, Mode)						// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
 		return .VecAccess(exp, dest, base, vara)
 
-	target debug
-		if !d.PointerCount and !d.IsCarray
-		
-	// if its just getting the address its ok...
-	// sure. but surely... its just a pointer anyhow.
-	// so... what should the set do? lets just assume it works. for now.
+	target debug: if !d.PointerCount and !d.IsCarray
 	
-	if d.cancopynormally
+	if d.CanCopyNormally
 		if dest isnt AddrRequest
 			dest.µType = exp.ASMDecl.mu.DataType
 			if !d.IsCarray									 		// what if its a carray to a pointer?
@@ -404,18 +403,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 		
 	return .IncrPointerByVar(dest, base, vara, exp)
 	
-	/*
-	if (dest is set) and !d.CanCopyNormally
-		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()
 
-	  elseif dest isnt AddrRequest
-		dest.µType = exp.ASMDecl.mu.DataType
-		if !d.IsCarray									 		// what if its a carray to a pointer?
-			d = d.internal!		
-		return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
-	
-	return .IncrPointerByVar(dest, base, vara, exp)
-	*/
 
 function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
@@ -512,17 +500,17 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		if d is reference
 			return ThgReference(self, exp, dest, d)
 			
-		|| T = .LocalThg(d)
-		if dest & asmreg.AddrNeed != asmreg.AddrNeed
-			return t
+		if dest isnt AddrForceRequest
+			return .LocalThg(d)
 			
+		|| T = .LocalThg(d)
 		if d.IsBareStruct					// it already has the address
 			return T.haveaddr
 		return GrabAddr(self, exp, dest, d, T)
 	
 	if d is global
 		if d is classobj
-			(dest is AddrForceRequest)
+			(dest is AddrNeed)
 			
 		if (dest is ConstRequest)
 			return nil
@@ -562,7 +550,6 @@ function AddressOf (fn_asm)
 	if (rz is ContainsAddr)
 		return rz &~ asmreg.ContainsAddr
 	error (exp, "ASM fail")
-	.µGetASM(exp, dest as asmreg.addrneed)
 
 
 

@@ -1469,7 +1469,7 @@ function TypeOfRel (ExprResolver)
 	|| Custom = UseCustomOperators(LC, RC, comp, exp) 
 
 	if Custom == CustomOps.needed
-		if !comp.IsCompOrset
+		if (comp isnt CompOrSet)
 			return CustomFuncOp( exp, comp, name_space, RN )
 		if RC != TypeNil
 			if (comp is caseaware) or comp.CanOpCompare(lc, rc, exp)

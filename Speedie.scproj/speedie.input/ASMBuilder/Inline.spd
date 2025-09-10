@@ -75,7 +75,7 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	if dest isnt discard
 		if (!dest.reg or dest is temp)
 			|| type = fn.ASMReturn
-				dest = .declareme(prms, type) // asmtodo: mark this as a declaration?
+				dest = .declarebody(prms, type) // asmtodo: mark this as a declaration?
 											  // (shouldn't all declaremes be like that?)
 	
 	if dest isnt ExitFunction
@@ -157,9 +157,9 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
+	|| N = fn.µlength//real
+	require N and (N < 128) and !fn.HasCVersion
 	require .state.InlineDepth < .InlineDepthLimit
-	|| N = fn.µlength
-	require N and !fn.HasCVersion
 
 	|| MaxEnd = .InlineEnd
 		|| SubInline = .curr + (N / 3)
@@ -168,15 +168,12 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	|| AllowedGain = 5 + (fn is inline) * 23		// Assume that functions have 5 instruction overhead.
 	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
 
-	if .length < 16K								// Don't risk overflowing max-size
-		AllowedGain += (fn.LinkFrom == 1)<<6		// Allow bigger functions inlined if called once.
-													// (needs marked as removed!!)
 	AllowedGain -= .State.inlinedepth
 	
 	for p.fast in prms
 		Grace += .IsASMConst(p)<<2
 
-	require (AllowedGain + Grace)|uint| > fn.µlength
+	require (AllowedGain + Grace)|uint| > N
 
 	if !.state.InlineDepth
 		.InlineDepthLimit = 3
