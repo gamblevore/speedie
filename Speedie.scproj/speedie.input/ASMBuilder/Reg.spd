@@ -36,8 +36,7 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		Const
-		AddrNeed    = [AddrRequest, AddrForceRequest]
-		AddrNoFiddle
+		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit        = [ExitFunction, ExitAtAll]
 		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
@@ -233,7 +232,8 @@ datatype ASMReg (uint64)
 	
 		
 	function HaveAddr (|asmreg|)
-		rz = self asnt AddrNeed
+		rz = self asnt AddrRequest
+		rz = self asnt AddrForceRequest
 		rz = rz as ContainsAddr
 	
 	

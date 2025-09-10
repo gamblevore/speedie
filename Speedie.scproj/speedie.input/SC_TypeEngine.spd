@@ -676,11 +676,6 @@ function Message.File (|SCFile|)
 		require S != @arg
 
 
-function Message.FileNum (|int|)
-	opt norefcounts
-	return .memoryLayer.num3
-
-
 
 function scclass.IsMArray (|message| arr, |bool|)
 	// || X = MyStruct[N]
@@ -1352,7 +1347,7 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex)
 		if rn.isint 
 			n = rn.int
 	
-	  elseif (rn == @thg) and (rt is NumberConst) and rt.isnormalnumber and rt.isinteger
+	  elseif (rn == @thg) and (rt is NumberConst) and rt.IsNormalNumber and rt.isinteger
 		n = rt.ExportPosition
 		
 	if n

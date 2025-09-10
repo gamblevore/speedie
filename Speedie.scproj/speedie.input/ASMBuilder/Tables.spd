@@ -377,14 +377,12 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 		
 	|| sc = exp.Second.first!
 	|| mode = ASMReg.AddrRequest temp sc
-	// we can't do addrneed... because thgsub assumes we want &local... not just local but no fiddling.
 	
-	if !d.CanCopyNormally or dest is AddrRequest
-		(mode as= asmreg.AddrNeed)						// inlineoffsetopt can't get at the glob buried in here.
-														// So we need to simplify things.
+	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
+		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
+															// So we simplify
 
-	if "InstructionInit".trap
-	|| base = .µGetReal(f, Mode)						// x = a.b[0]
+	|| base = .µGetReal(f, Mode)							// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1

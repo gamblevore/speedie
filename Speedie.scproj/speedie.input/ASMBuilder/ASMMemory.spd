@@ -122,6 +122,8 @@ function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |u
 
 function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, |asmreg|)
 	opt norefcounts
+	if base is addrnofiddle
+		return base asnt asmreg.addrnofiddle
 	|uint| maximum = (1 << maxbits) - 1
 	|int64| LostBytes = 0
 	
@@ -133,7 +135,7 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 		if (glob isnt global) and (glob is property)		// a property on a global struct
 			0 //  
 		  else
-/			|| bs = base.fat!
+			|| bs = base.fat!
 			LostBytes = glob.ExportPosition
 			|| K = bs.const
 			LostBytes -= K
