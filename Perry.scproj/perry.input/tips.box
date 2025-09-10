@@ -13,6 +13,8 @@
 
 "Press the section-key (underneath esc) to open a CMM!"
 
+"\1F0-\1F9 can show or hide, various IDE sections. \1F0 can expand the text-editor to full-size."
+
 "Press your project button, to flip between a todo-list and your current file."
 
 "\1FD opens the quick file-finder! Just type a file name!"
@@ -24,3 +26,5 @@
 "Use perry from the terminal! Just type: perry <path to file> (needs link to perry in /usr/local/bin)"
 
 "\1FK can clear your build-log, or other logs in the log-area."
+
+//"Want more tips? Suggest some and I might add them!"
