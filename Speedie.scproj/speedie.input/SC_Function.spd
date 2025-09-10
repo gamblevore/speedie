@@ -1875,6 +1875,7 @@ function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 	|| StillOK = StdErr.Mark
 	.FuncInfo = 0
 	.TmpCounter = 0
+	.Description = ""
 	.Init_Sub(src, nil)
 	require StillOK
 
@@ -1883,7 +1884,7 @@ function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 	.Transform
 	archonpurger.ExterminateZergBugs(self)
 	.AnalyseRefs(list)
-//	stderr.clear // causes problems?
+//	stderr.clear // causes problems...
 	return true
 
 

@@ -148,13 +148,22 @@ struct Assembler
 		return .Assign(dest, src, exp)
 
 
-	function DeclareMe (|Message| where,  |scdecl?| Type=nil,  |asmreg|)
-		if type
+	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
+		// could be a param, or a decl that we are returning.
+		// .DeclareMe is also called from inlines. What does it do there, then?
+		// does it still make sense?
+		
+		|| ret = .state.return
+		if  ret.reg  and  (D is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
+/			ret.µtype = rz|DataTypeCode|
+			D.wholetype = ret
+			return ret
+
+	
+	function DeclareMe (|Message| where,  |scdecl?| Type,  |asmreg|)
+		if type // Getreal can't come here, passes nil.
 			rz = Type.CalculateASMType
-			|| ret = .state.return
-			if  ret.reg  and  (type is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
-				ret.µtype = rz|DataTypeCode|
-				Type.wholetype = ret
+			|| ret = .IsOnlyVarThatWeReturn(type)
 				return ret
 		
 		|| d = .VDecls
@@ -249,8 +258,6 @@ struct Assembler
 		require r.reg
 		target debug: if r isnt Const //hah
 
-//		if NopMode&AnyBlock
-//			require .IsMostlyCurr(F)
 		if R is temp				// don't think we can do better.
 			.AskNop(r.NeedFAT)		// not easily. for example .iscurr(f) gets params used by future stuff
 	
@@ -359,14 +366,14 @@ struct Assembler
 			return f.FoundFunc
 			
 		
-	function GetRealDest (|message| exp,  |scdecl| A,  |asmreg| ModeOnly,  |asmreg|)
+	function GetRealDest (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
 		if ModeOnly is Declaration							// || x = (y + 1) + (z + 1)
 			return ModeOnly asnt asmreg.Declaration
 		
 		// asmtodo: what about doing all .declareme? simpler?
 		if ModeOnly is temp									//    x = (y + 1) + (z + 1)
-			return .TempTyped(a, ModeOnly) // why not as ModeOnly here too?
-		return .DeclareMe(exp, a) as ModeOnly
+			return .TempOnly(ModeOnly) // passes in modeonly...
+		return .DeclareMe(exp, nil) as ModeOnly
 
 
 	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
@@ -391,18 +398,22 @@ struct Assembler
 		return .Assign(exp, dest, r)
 
 
-	function µGetRealOffer (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+	function µGetRealOffer (|message| exp, |asmreg| Dest,  |asmreg|)
 		|| c = .curr
 		if dest isnt Declaration
 			dest = nil // clear for .GetRealDest
-		return .µGetReal(exp, a, dest)
+		return .µGetReal(exp, dest)
 		// asmtodo: check if we can re-write the output to dest
 		// however its more tricky than I thought. Do later. 
 
 
-	function µGetReal (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+	function µGetReal (|message| exp,  |asmreg| Dest,  |asmreg|)
+		// the result should be considered "temp-like"?
+		// that means... it can be optimised away. maybe just allow temps on normal vars?
+		// like have another bit that says "its allowed"... but everything just checks
+		// "is temp" like normal.
 		|| OV = .OpenVars
-		Dest = .GetRealDest(exp, a, dest)
+		Dest = .GetRealDest(exp, dest)
 		|| r = .µGetASM(Exp, dest)
 		if r iz Dest
 			return r
@@ -424,7 +435,7 @@ struct Assembler
 		
 		|| Mode = exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
-		|| r = .µGetReal(exp, nil, Mode)
+		|| r = .µGetReal(exp, Mode) // why not passing A here?
 		if (a is reference  and  r isnt containsaddr)
 			error (exp|object|)
 		return r.incr

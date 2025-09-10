@@ -276,7 +276,7 @@ function SetRel (fn_asm)						// function relset (
 
 	// Probably x.y = z, or x[y] = z 
 
-	|| Src = .µGetReal(exp.last!, nil, nil|asmreg| temp a)
+	|| Src = .µGetReal(exp.last!,  nil|asmreg| temp a)
 	(Src is SetAlways)
 	.µ(A, Src)
 	return asmreg.discard
@@ -339,7 +339,12 @@ function StatExpr (fn_asm)
 	return ArgumentSub(self, exp.first!, -1|asmreg|)
 
 
-function ArgumentSub (|&Assembler| self, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
+//function StructBug (fn_asm)
+//	visible
+//	return ArgumentSub(exp.first!, -1|asmreg|)
+
+
+function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
 	// merge into argument!
 	
 	opt NoRefCounts
@@ -375,7 +380,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| d = f.asmdecl
 		
 	|| sc = exp.Second.first!
-	|| base = .µGetReal(f, nil, ASMReg.AddrRequest temp sc)		// x = a.b[0]
+	|| base = .µGetReal(f, ASMReg.AddrRequest temp sc)		// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
@@ -781,7 +786,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else
-		ml = .µGetRealOffer(First, nil, dest)
+		ml = .µGetRealOffer(First, dest)
 		if (dest is declaration) and !(ml iz dest)
 			mr = dest
 

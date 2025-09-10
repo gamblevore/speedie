@@ -243,6 +243,12 @@ function LLL2 (|int| Y, |int|)
 	return Y*2				// return can handle this.
 
 function LLL3 (|int| Y, |int|)
+	// unecesary extra const here in r2.
+	// could do the same solution as in inline_consts?
+	// OR... put temps in temps always unless we are unable to.
+	// or at least mark those things as "temp-like" once we are done with them!
+	// i mean... getreal... should return something "temp-like"? it is used
+	// in that way!
 	|| X = 9 + Y
 	return X
 
@@ -272,6 +278,10 @@ function Inline_Consts (|int| A)
 	#!DDD
 	|| D = gggTest1(-1, 0)
 	#!EEE
+	// unnecessary temp-var created here in E.
+	// best idea is to say that because we had something in r5
+	// and we just set over it... and its unused, to remove it.
+	// maybe just for inlines?
 	|| E = A+gggTest1(-1, 0)
 	#!FFF
 	|| F = gggTest1(-1, A)

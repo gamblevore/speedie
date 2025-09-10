@@ -75,7 +75,8 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	if dest isnt discard
 		if (!dest.reg or dest is temp)
 			|| type = fn.ASMReturn
-				dest = .declareme(prms, type)
+				dest = .declareme(prms, type) // asmtodo: mark this as a declaration?
+											  // (shouldn't all declaremes be like that?)
 	
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
