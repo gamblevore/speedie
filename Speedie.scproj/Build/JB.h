@@ -2381,8 +2381,6 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_ContainsAddr ((ASMReg)67108864)
 
-#define kSC__Reg_Declaration ((ASMReg)8388608)
-
 #define kSC__Reg_Discard ((ASMReg)262144)
 
 #define kSC__Reg_Exit ((ASMReg)3298534883328)
@@ -2418,6 +2416,8 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__Reg_Temp ((ASMReg)1024)
 
 #define kSC__Reg_Textual ((ASMReg)134217728)
+
+#define kSC__Reg_UnusedSoFar ((ASMReg)8388608)
 
 #define kSC__Reg_Zero ((ASMReg)68720001080)
 
@@ -11762,9 +11762,9 @@ inline void SC_Pac_Nop(Assembler* Self, FatASM* ToNop);
 
 inline void SC_Pac_SoftNop(Assembler* Self, FatASM* Fat);
 
-inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
-
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self);
+
+inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
 
 inline bool SC_Pac_ConstCompareFloatSub(Assembler* Self, ASMReg L, ASMReg R, int Mode);
 
@@ -12111,6 +12111,12 @@ inline void SC_Pac_SoftNop(Assembler* Self, FatASM* Fat) {
 	return SC_Pac_NopSub(Self, Fat, true, 0);
 }
 
+inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
+	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc))) {
+		JB_Msg_Fail(Self, JB_LUB[896]);
+	}
+}
+
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 	FatASM* F = SC_Reg_FAT(Src);
 	if (!F) {
@@ -12127,12 +12133,6 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 		}
 	}
 	return SC_Pac_ReDestWithFatReg(Self, F, Dest);
-}
-
-inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
-	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc))) {
-		JB_Msg_Fail(Self, JB_LUB[896]);
-	}
 }
 
 inline bool SC_Pac_ConstCompareFloatSub(Assembler* Self, ASMReg L, ASMReg R, int Mode) {
