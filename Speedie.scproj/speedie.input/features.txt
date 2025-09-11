@@ -10,87 +10,25 @@
 	* disturber implementation. No need to do most refcounts.
 	* just create a "Refcount2" system? Dont delete the old refcounter. Just compare the differences.
 	* Unified destructor? Subclass by "wrap", all objects go before refcount. Or 64-bit position marker?
+	* It can get bogged down... needing to handle all sorts of wierd issues
 
 
-* the question is... whether I should do this... or not.
-	* I feel like its a good idea? No idea though?
-		* It can get bogged down... needing to handle all sorts of wierd issues
-		* A good time to do nil-object checking?
-			* They would combine by using faster or (no refcounting) if we know an obj is nil or not.
-		* We could (should) combine these into my generic "problem solver"!!!! It will be amazing!			
-
-
-* Nil checking... would eliminate many bugs from my game... like that language "Nice".
-	* func abc (|obj| a),		if (a), or || x = a?.b	// a can be nil, cos it's tested
-	* func abc (|obj| a),		|| x = a.b				// a cant be nil, untested
-	* func abc (|obj?| a),		|| x = a.b				// silently --> || x = a?.b
-	* func abc (|message| m),	|| o = m.obj?.oof		// no choice, gotta test it.
-														// should we insert tests automatically?
-	It will make my VM much easier to debug! Literally 99% of my crash bugs are nil-objs.
-	Almost never anything else except "invalid pointer"... from a compiler error... thats fixed.
-
-* Object Type conversion should check the type is correct...
-
-
-* Better expect syntax! explained in expect.txt
-* remove arrays/linkedlists. Use FixedDict+list.
 * Static vars?
-* struct/array unpacking too.
-	* var = {a,b,c}|nameandmsg| // a struct... or even a class? why not?
+
 * ability to create functions that own copies of vars from owning space.
 	* fn = % func (value, expr) // or fn = ∆ func val exp
-	* rz <~ all~files --> "appends each file into rz"
 
 * auto-create float/int funcs for vecs? (on demand or explicit?)
 
 * vec/array param split?
 	* obj.func(P) --> obj.func(p.x, p.y, p.z)
-
-* bit fields?
-	* or at least some sytnax to "get inside in a defined bit-ops way"... with names too.
-	class whatever
-		|u32| Abc bits {
-			a : 3
-			b : 20
-			c : 9
-		}
-
-* Replace with string param adder if so few into faststring
 * Allow constants for array sizes!
-* "||" parsing... requries an "inside |" boolean. What if... instead we use the same func that parses stuff inside of strings? Like... distance based :)
 
 *		expect (obj isa SCDecl) // ideally the test below should be unnecessary
 		if (obj isa SCDecl) { use obj as a decl... }
-	
-	
-................................................................................
-
-DESIGN FLAWS JUST LEAVE FOR NOW
-
-*		|[int]| S,		.Starts = S
-        class X {|[int]| Ints}
-                                // Ordering issue...
-
- .............................................................................. 
-
-							Awkwards
-
-* Why does the compiler make bigger files outside of xcode?
-* Restrict default params to being named? like python.
-* AddressOf is a bit inconsistant... just make it do whatever it does in C++
-* Allows multiple variables of same name!!!! (at different levels) SHOULD NOT!
-* Disable require/expect on statements with no effect...	
-*        if (a mod b) --> if (a.mod(b))
-         if (a in (b, c)) --> if (a.in(b,c))
-    without creating new scoperators!
 
 ................................................................................
 
-Do when it's fun...
-
-* markdown
- 
-................................................................................
 
 
 							Actually already good:
