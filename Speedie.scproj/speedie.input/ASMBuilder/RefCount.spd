@@ -53,7 +53,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 			if (Last.r0 iz Obj) and !Last.r1
 				Last.r1 = 1							// incring a gstr. Lets do it internally!
 				return Last
-		|| fat = exp.rfap(asmreg(), asmreg(), Obj)
+		|| fat = exp.rfun(asmreg(), asmreg(), Obj)
 		Fat._Outputs = 0
 		return fat
 
@@ -69,10 +69,10 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 				last.r1 = 0							// decring a global mem obj. Lets just NOT incr!
 				return nil
 
-		return exp.RFAP(Obj, Obj)
+		return exp.rfun(Obj, Obj)
 
 	if fn == Compiler.RefSafeDecr
-		return exp.RFAP(asmreg(), Obj)
+		return exp.rfun(asmreg(), Obj)
 
 	debugger 
 
@@ -105,7 +105,7 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 	if fn != Compiler.RefFreeIfDead
 		|| fat = .RefCountSub(exp, prms, fn)
 			fat.µrefcount++
-			return fat * nil
+			return (fat * asmreg()) as asmreg()
 		return nil
 	|| A = .µ(prms.first!)
 
@@ -113,7 +113,7 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 	#! Then we will never freeifdead within if-branch or other tests.
 	#! needs understanding of disowners!
 	
-	exp.RFAP(A)
+	exp.rfun(A)
 	return a
 
 

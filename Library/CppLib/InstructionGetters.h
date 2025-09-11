@@ -236,8 +236,6 @@
 #define   VecGet_Li       ((( int)((Op)<<25))>>25)
 #define   VecGet_Lu       (((uint)((Op)<<25))>>25)
 
-#define   VecBuild_r5i       ((( int)((Op)<<28))>>28)
-#define   VecBuild_r5u       (((uint)((Op)<<28))>>28)
 
 #define   VecSwizzle_Fieldsi       ((( int)((Op)<<18))>>20)
 #define   VecSwizzle_Fieldsu       (((uint)((Op)<<18))>>20)

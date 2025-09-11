@@ -182,7 +182,10 @@ function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarA
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
 	(dest isnt Const)
-	return .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index) * dest
+	|| fat = .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index)
+	if dest is set
+		dest.reg = 0
+	return fat*dest
 
 
 function Dummy (|message| exp)

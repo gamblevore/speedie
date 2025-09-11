@@ -33,9 +33,8 @@
 	i1 = FuncAddr(vm, Op);
 ı ALLO: _
 	AllocStack(vm, r, Op);
-ı SWAP: _
-	JB_Swap(r[n1], r[n2]);
-	JB_Swap(r[n3], r[n4]);
+ı DUMI: _
+	0;
 ı RARE: _
 	Rare_(r, Op);
 ı CONV: _
@@ -166,8 +165,6 @@
 	SetRefRegToMem(r, Op);
 ı RFRD: _
 	SetRefMemToReg(r, Op);
-ı RFDC: _
-	SetRefDecrMem(r, Op);
 ı RALO: _
 	o1 = alloc(o2);
 	// should call constructor too.

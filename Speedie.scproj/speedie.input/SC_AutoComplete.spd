@@ -814,7 +814,7 @@ function AutoCompleteSorter (sortercomparer of autoitem)
 		return type
 	|| depth = .depth - b.depth // doesnt seem to work just yet?
 		return depth
-	return .sort - b.sort
+	return .sort.syntaxcompare(b.sort, true)
 
 
 function FuncTmps (|message|)
@@ -1210,7 +1210,7 @@ function message.AsmIndent (|message| top, |int|)
 		self = .parent
 
 
-function ASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool|)
+function ASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
 	opt norefcounts
 //	out.msg(@tmp, "")			// separator. perry gets messed up
 								// need to do this more cleanly
@@ -1228,7 +1228,7 @@ function ASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool|)
 		count += hisss > 0
 		size += hisss
 		
-		if options.ASMRenderBlocks and (fat.BasicBlock != bb)
+		if RenderBlocks and (fat.BasicBlock != bb)
 			bb = fat.BasicBlock
 			out <~ bb
 		fs <~ (' ', fat.msg.asmindent(top)*2)

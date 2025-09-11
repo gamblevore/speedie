@@ -35,6 +35,8 @@ datatype ASM (uint)
 		return self ||| (value << 27) >> 18
 	function R4 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 23
+	function R5 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 28
 
 	module
 		|byte|					NoisyASM = 1

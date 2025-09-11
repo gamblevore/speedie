@@ -83,8 +83,13 @@ function Swap (fn_asm)
 	|| prms = exp.last
 	|| A = .existingvar(prms.first!)
 	|| B = .existingvar(prms.second!)
-	expect (A.reg and B.reg) (exp)
-	return exp.swap(A, B)*A
+	expect (A.reg and B.reg) (Exp, "Can only swap registers")
+
+	|| tmp = .TempOnly(A)
+	.assign(exp, tmp, A)
+	.assign(exp, A, B)
+	.assign(exp, B, tmp)
+	return asmreg()
 
 
 	
@@ -142,6 +147,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 	l.prms[2] = 0
 	l._op = asm.tail
 	(l.info as= ASMReg.exit)
+	if 0: nil|message|!.TAIL
 
 	
 function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)

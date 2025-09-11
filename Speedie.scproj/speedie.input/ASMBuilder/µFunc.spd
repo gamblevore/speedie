@@ -37,11 +37,12 @@ extend SCFunction
 				|| r = fat.JumpReg
 					fat.FillLabelRequest(where, rz, r-1)
 
-	render µRender 
+	
+	render µRender (|bool|RenderBlocks=false)
 		fs <~ "asm ${.name} ${compiler.stASMTotalOps}\n"
 		|| bb = 0
 		for µ.fat in self
-			if options.ASMRenderBlocks and µ.BasicBlock != bb
+			if RenderBlocks and µ.BasicBlock != bb
 				bb = µ.BasicBlock
 				fs <~ "//$bb\n"
 			µ.RenderFat(fs)

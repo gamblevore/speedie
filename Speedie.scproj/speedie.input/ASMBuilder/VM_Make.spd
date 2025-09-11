@@ -3,7 +3,7 @@
 module VM_Builder {
 |[message]| 	NameList
 |message|   	ModuleArg
-//|file|			vm_file
+|message|		TempDests = message()
 |faststring|	form_h = faststring()
 |message|		dt_prm
 |string|		parent
@@ -383,6 +383,7 @@ function MakeFatCreator (|string| name, |µform| form)
 		fs <~ "\n"
 
 
+
 function FatCreatorSub (|string| name, |µform| form, |message|)
 	opt norefcounts
 	|| fn = IceCream.run(@thg+name)
@@ -392,13 +393,7 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 	|| f = form.src.first.first
 	if rdz == 0
 		rdz <~ (arg, 2)
-	
-	// theres 12 temps here.
-	// a lot. Can we reduce this? At least in the ASM?
-	// if we decr something, we can mark it as "removed"
-	// and if its the last... we can go all the way down.
-	// of course... this is "per-branch". So it would need a stack of these... 
-	
+		
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = f.VMMsgArgName(i)
@@ -407,24 +402,32 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 		fatdecl.prev = dcl
 		rdz[0] = i.msg
 		rdz[1] = @thg + pname
-		arg <~ p.which.run(rdz)
+
+
+		|| Mac = vm_builder.skibidy
+		if p is output
+			TempDests <~ mac.run(rdz)
+		  else
+			if p is jump
+				Mac = vm_Builder.gyatt
+			  elseif p is number
+				mac = VM_Builder.legs
+			  else
+				mac = vm_builder.arms
+			arg <~ mac.run(rdz) // AppendMacro is better?
+		
 		if p is jump
 			rdz[0] = @thg+pname
 			|| size = 32 - p.bitsize
 			rdz[1] = @num+size
-			arg <~ ohio.run(rdz)
+			arg <~ ohio.run(rdz) // AppendMacro is better?
 		f++
-	return fn
-		
 
-function µparam.Which (|macro!--|)
-	if self is jump
-		return vm_Builder.gyatt
-	if self is number
-		return VM_Builder.legs
-	if self is output
-		return vm_builder.skibidy
-	return vm_builder.arms
+	while (|| dest = tempdests.first)
+		arg <~ dest // dest goes last...
+	
+	return fn
+
 
 
 function AddµOp (|string| name, |int| id) 

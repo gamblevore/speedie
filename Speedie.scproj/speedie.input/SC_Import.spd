@@ -233,7 +233,6 @@ class SCImport
 		|bool|				STDLibTime
 		|byte|				CurrIsManuallyImported
 		
-
 		
 		function DoImport (CollectFunc)
 			|| C = .curr

@@ -100,11 +100,10 @@ struct FatASM
 		cpp_part AsReg
 		
 		(flags isnt const)
-		|| flags2 = flags.FatIndex(.index)
-		.info = flags2
-		if flags
-			return flags2
+		flags = flags.FatIndex(.index)
+		.info = flags
 		return flags
+
 	
 	function Const (|int64|)
 		opt norefcounts
@@ -125,21 +124,15 @@ struct FatASM
 		
 	setter Debug (|message|)
 		.msg = Value
-	
-//	syntax equals (|int| ID, |bool|)
-//		return .id == ID
-	
-	function ID (|uint|)
-		return self - Assembler.sh.start
 
 	function Index (|uint|)
 		opt inline
-		return 1 + self - Assembler.sh.funcstart
+		return self - Assembler.sh.funcstart_
 
 	function uint.FAT (|&FATASM|)
 		opt inline
 		if self
-			return Assembler.sh.funcstart + (self - 1)
+			return Assembler.sh.funcstart_ + self
 	
 	operator isa (|asm| m, |bool|)
 		nil checker
@@ -175,7 +168,6 @@ struct FatASM
 		// what if the old is a ref and new isnt,  or new is a ref and old isnt?
 		// references need to be incremented, as their output is needed.
 		
-		|| U = f.info
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
 			.RemoveReg(old, f)
 		
@@ -183,10 +175,11 @@ struct FatASM
 	
 	
 	function assembler.RemoveReg (|int| i, |fatasm| fat)
-		require .Register(i) == fat
-		|| NewFat = fat.FindOlder
-		.KnownValuesMap &=~ (1<<i)
-		.Register(i) = NewFat
+		if .Register(i) == fat
+			|| Old = fat.FindOlder
+			if old isnt Const
+				.KnownValuesMap &=~ (1<<i)
+			.Register(i) = old
 	
 
 	function FindOlder (|&fatasm|)
@@ -215,6 +208,18 @@ struct FatASM
 			m &=~ changed
 		sh.KnownValuesMap = M
 			
+
+	function fatasm.OverwriteReg (|asmreg| r, |asmreg|)
+/		|| sh = Assembler.sh
+		|| x = sh.funcstart_
+		|| where = &sh.regs.OOF[r.reg]
+		|| oldi = where[]
+/			|| old = x + oldi
+			if (old.BasicBlock == .BasicBlock) and (old.µRefCount <= 0)
+/				sh.nop(old)
+			
+		where[] = self - x
+		return r
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		|| changed = info.prm
@@ -254,8 +259,9 @@ struct FatASM
 			if d == 0
 				assembler.sh.nop(self)
 		  else
-			j = .id
-			debugger
+			target debug
+				|| ID = .Index
+				debugger
 
 ////////////////////////////////////////////////////////////
 	function r0 (|ASMParam|): return .prms[0]
@@ -263,7 +269,6 @@ struct FatASM
 	function r2 (|ASMParam|): return .prms[2]
 	function r3 (|ASMParam|): return .prms[3]
 
-	function r0 (assigns:|uint|): .prms[0] = value
 	function r1 (assigns:|uint|): .prms[1] = value
 	function r2 (assigns:|uint|): .prms[2] = value
 	function r3 (assigns:|uint|): .prms[3] = value
@@ -602,9 +607,6 @@ datatype ASMParam (uint)
 	// makes sense, easy to convert from one to the other!
 	// at this point... its too late, really.
 	
-//	function ASMMiniReg (|asmreg|)
-//		(rz is temp) = (self>>31)
-//		rz.reg = self&31
 	function ASMReg (|asmreg|)
 		(rz is temp) = (self>>31)
 		rz.reg = self&31

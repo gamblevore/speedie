@@ -38,7 +38,6 @@ module Options
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
-	||		ASMRenderBlocks			= false
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
@@ -110,16 +109,20 @@ module Feedback
 
 
 	function StopStripping
+		|message| m = nil|message|!
 		target debug
 			if ""
 				"".debugprint // stop from being stripped
 				Assembler.PrintProgress
-				nil|message|.jdb2
+				m.PrintLocate
+				m.jdb2
 				nil|asmreg|.DebugPrint
-				nil|message|.PrintLocate
-//				fdb(nil|[scfunction]|)
 				|fatasm| X
 				X.DebugPrint
+		if 0
+			m.DUMI
+			m.FEAT
+		
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

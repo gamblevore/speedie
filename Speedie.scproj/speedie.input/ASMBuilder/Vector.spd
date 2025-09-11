@@ -44,13 +44,10 @@ extend Assembler
 		.CloseVars(Closer)
 		dest = .TempOnly(dest)
 		
-		if 0: exp.VBLD
-		|| fat = .RequestOp(asm.VBLD, exp)
-		fat.dest(0, dest, self)
-		fat.RegInput(1) = vv[0]
-		fat.RegInput(2) = vv[1]
-		fat.RegInput(3) = vv[2]
 		|| v3 = vv[3]
+		if v3.reg >= 16
+			v3 = nil
+		|| fat = exp.VBLD(dest, vv[0], vv[1], vv[2], v3)
 		if v3.reg >= 16 // move missing thing in
 			exp.VSET(dest, v3, asmreg(), 3)
 

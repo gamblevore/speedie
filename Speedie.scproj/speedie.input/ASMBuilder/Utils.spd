@@ -18,6 +18,7 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
+
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End

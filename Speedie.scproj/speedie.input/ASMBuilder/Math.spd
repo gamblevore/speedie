@@ -51,6 +51,7 @@ extend Assembler
 			fat = exp.JBAN(r, RS, 0)
 			if !negate
 				fat._op = asm.jbor
+		if 0: exp.JMKN, exp.JMPE, exp.JBOR
 		return fat * res
 	
 	

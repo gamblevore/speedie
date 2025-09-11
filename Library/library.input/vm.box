@@ -297,7 +297,7 @@ forms
 		r2		r
 		r3		r
 		r4		r
-		r5		4
+		r5		r
 
 	VecSwizzle
 		r1		R
@@ -379,9 +379,8 @@ AFNC (FuncAddr)
 
 #!						 (((((Utils)))))
 
-/**/ SWAP (Swap)
-		JB_Swap(r[n1], r[n2])
-		JB_Swap(r[n3], r[n4])
+/**/ DUMI (U2)
+		0 // Can be added or removed... just to align the jumps really!
 ///**/ PRNT (U1)
 //		printf("%lli\n", i1)
 //		#!better to print this also as float/double/signed/unsigned...
@@ -581,9 +580,6 @@ POS 5
 
 /**/ RFRD  (RefSet3)							// RefCount reg <-- mem
 		SetRefMemToReg(r, Op)
-
-/**/ RFDC  (RefDecrMem)							// for destructors/closers.
-		SetRefDecrMem(r, Op)					// unused rn. maybe rfrd is better?
 
 /**/ RALO  (U2)
 		o1 = alloc(o2)

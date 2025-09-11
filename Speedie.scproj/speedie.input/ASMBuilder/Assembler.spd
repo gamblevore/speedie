@@ -35,7 +35,7 @@ struct Assembler
 	|?&FatASM|					InlineEnd
 	|int|						KnownValuesMap
 	|?&FatASM|					Orig
-	|&FatASM|					FuncStart
+	|&FatASM|					FuncStart_
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr_
 	|&FatASM|					End    
@@ -61,11 +61,11 @@ struct Assembler
     function Curr (|&fatasm|)
         return .curr_
 
+	function FuncStart (|&fatasm|)
+		return .FuncStart_ + 1
+		
 	function FnLength (|int|)
 		return .curr_ - .funcstart
-	
-	function Totalµ (|int|)
-		return .curr_ - .Start
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
@@ -297,21 +297,17 @@ struct Assembler
 		|| Type = asm.noop * (fat < .curr_)
 		fat.setop = Type
 
-
-	function Register (|int| i, assigns:|?&FATASM|)
-		// would be better to use 0 as a base.   -1 can mean unset.
 		
-		target debug
-			if value isa asm.WR8U or asm.WR4U or asm.WR2U or asm.WR1U
+	function Register (|int| i, assigns:|?&FATASM|)
 		|| n = 0
 		if value
-			n = value.Index
-		.Regs.OOF[i] = n
+			n = value - .FuncStart_
+		.regs.OOF[i] = n
 			
 		
 	function Register (|int| i, |?&FATASM|)
 		|| r = .Regs.OOF[i]
-			return Assembler.sh.funcstart + (r - 1)
+			return .funcstart_ + r
 
 
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
@@ -548,7 +544,7 @@ struct Assembler
 		.Guard
 		fn.StartASM
 		.InlineEnd = nil
-		.FuncStart = .curr
+		.FuncStart_ = .curr - 1
 		.VTemps = 0
 		.VDecls = 1							// set after .FuncStart
 		.AddFuncParams(fn)
