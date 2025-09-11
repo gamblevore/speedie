@@ -770,16 +770,16 @@ extend Assembler
 			debugger
 			(src is const)
 		
+		target debug: if (dest.IsVec != src.IsVec) and src.reg
 		|| improve = .ImproveAssign(dest, src)
 			return improve
+		
+		if dest.IsVec
+			return exp.VMOV(dest, src) * dest
 
 		if src is Const										// setting a const
 			|| K = src.const
 			return .LoadNumber(exp, K, dest)				// Consts are the most optimisable thing we have
-		
-		target debug: if (dest.IsVec != src.IsVec) and src.reg
-		if dest.IsVec
-			return exp.VMOV(dest, src, asmreg(), asmreg()) * dest
 
 		// BFLG is VERY optimisable :] (but consts are even more)
 		

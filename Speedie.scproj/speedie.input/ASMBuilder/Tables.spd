@@ -84,7 +84,7 @@ function Swap (fn_asm)
 	|| A = .existingvar(prms.first!)
 	|| B = .existingvar(prms.second!)
 	expect (A.reg and B.reg) (exp)
-	return exp.swap(A, B, asmreg(), asmreg())*A
+	return exp.swap(A, B)*A
 
 
 	
@@ -168,15 +168,6 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	fat.µRefCount = 1
 	(dest is CondAnswer) // discard surely?
 	return fat * Dest
-
-
-//function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
-//	opt norefcounts
-//	(self)
-//	|| inner = exp.first
-//	expect ((inner == @arg) and !inner.hasany) (exp) // nil
-//	|| Zzeerrooo = asmreg() as asmreg.FromZeroMemory
-//	return zzeerrooo.reg(dest)
 
 
 function Return (fn_asm)
@@ -308,12 +299,11 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 
 
 
-function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |asmreg|)
+function AllocBearStruct (|int| Dir, |message| Exp, |asmreg| Dest, |int| Size, |asmreg|)
 	size = (size+15)>>4
 	|| fat = exp.ALLO(dest, size*dir)
 	fat.µRefCount++ // makes sense it is always reffed
 	return fat * dest
-
 
 
 function Decl (fn_asm) // declaresub declare 
@@ -324,12 +314,10 @@ function Decl (fn_asm) // declaresub declare
 	|| rel = exp.last!
 	dest = .DeclareBody(rel, ty)
 
-	if ty.IsBareStruct
+	(dest as= asmreg.Declaration)
+	if ty.IsBareStruct or ty.IsCarray
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
-	target debug: if ty isnt local								// A carray or somthing?? idk
-	
-	(dest as= asmreg.Declaration)
 	rel = rel.last!
 	return .µInto(rel, dest).incr
 
@@ -341,17 +329,20 @@ function StatExpr (fn_asm)
 
 function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
 	// merge into argument!
-	
 	opt NoRefCounts
+	|| ch = exp.first
+	if !ch
+		return asmreg()
 	|| v = .OpenVars
 	|regfile| Restore = .Regs
 
-	for ch.fast in exp
+	while
 		if ch.func == @decl
 			rz = decl(self, ch)
 		  else
 			rz = .µ(ch, asmreg.discard)
-		loop rz isnt exit
+		ch++
+		loop ch and rz isnt exit
 	
 	if !Mask
 		exp = nil
@@ -907,5 +898,3 @@ function Message.TypeCastDoesNothing (|bool|)
 	require  Output.IsFloat  == Input.isfloat			// Floatness
 	if (Output is bool) == (Input is bool)				// Boolness
 		return Input.ByteCount == Output.ByteCount
-
-

@@ -201,15 +201,10 @@ function SafeWrite (|String| name, |FastString| data)
 	.CppLibFile(name)!.SmartData = data
 
 
-function UseASM
-	opt norefcounts
-	require 0
-	|| m = Message()
-	m.RARE(asmreg(), asmreg())
-		
 function MakeTheVM (|bool|)
 	compiler.Project.use
-	.UseASM
+	if 0
+		nil|message|!.RARE // stop strip
 	if .BuildFiles	
 		asm.TestASM
 	return stderr.ok
