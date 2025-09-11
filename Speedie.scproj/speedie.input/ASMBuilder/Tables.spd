@@ -320,7 +320,7 @@ function Decl (fn_asm) // declaresub declare
 	|| rel = exp.last!
 	dest = .DeclareBody(rel, ty)
 
-	(dest as= asmreg.Declaration)
+	(dest is unusedsofar)
 	if ty.IsBareStruct or ty.IsCarray
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
@@ -769,7 +769,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 		ml = .µGetASM(first, dest)
 	  else
 		ml = .µGetRealOffer(First, dest)
-		if (dest is declaration) and !(ml iz dest)
+		if (dest is UnusedSoFar) and !(ml iz dest)
 			mr = dest
 
 		mr = .µ(exp.last!, mr)

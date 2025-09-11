@@ -39,7 +39,7 @@ extend SCFunction
 
 	
 	render µRender (|bool|RenderBlocks=false)
-		fs <~ "asm ${.name} ${compiler.stASMTotalOps}\n"
+		fs <~ "asm ${.name} ${compiler.stASMTotalOps}\n" // " asm " "asm"
 		|| bb = 0
 		for µ.fat in self
 			if RenderBlocks and µ.BasicBlock != bb

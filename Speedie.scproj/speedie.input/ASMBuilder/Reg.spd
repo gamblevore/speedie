@@ -22,7 +22,7 @@ datatype ASMReg (uint64)
 		Alternate
 		Subtract = Alternate
 		Set
-		Declaration
+		UnusedSoFar
 		Into2
 		NoScale
 		ContainsAddr

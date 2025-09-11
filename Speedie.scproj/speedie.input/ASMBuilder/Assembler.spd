@@ -394,7 +394,7 @@ struct Assembler
 
 	function µGetRealOffer (|message| exp, |asmreg| Dest,  |asmreg|)
 		|| c = .curr
-		if dest isnt Declaration
+		if dest isnt UnusedSoFar
 			dest = nil // clear for .GetReal
 		return .µGetReal(exp, dest)
 		// asmtodo: check if we can re-write the output to dest
@@ -408,8 +408,8 @@ struct Assembler
 		// "is temp" like normal.
 		
 		|| OV = .OpenVars
-		if ModeOnly is Declaration									// || x = (y + 1) + (z + 1)
-			ModeOnly = ModeOnly asnt asmreg.Declaration
+		if ModeOnly is UnusedSoFar									// || x = (y + 1) + (z + 1)
+			ModeOnly = ModeOnly asnt asmreg.UnusedSoFar
 		  elseif ModeOnly is temp									//    x = (y + 1) + (z + 1)
 			ModeOnly = .TempOnly(ModeOnly)
 			// asmtodo: what about doing all .declareme? simpler?
@@ -623,7 +623,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	.CapASM
 	compiler.stASMTotalOps += fn.GuessLength
 
-	|| err = stderr // for debug via xcode, which won't give me stderr unless its in a local
+	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
 		|| max = fn.maxasm
 			check (fn.µlengthreal <= max) (fn.sourcearg, "ASM too large")

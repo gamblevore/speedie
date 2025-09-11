@@ -209,29 +209,27 @@ struct FatASM
 		sh.KnownValuesMap = M
 			
 
-	function fatasm.OverwriteReg (|asmreg| r, |asmreg|)
-/		|| sh = Assembler.sh
-		|| x = sh.funcstart_
-		|| where = &sh.regs.OOF[r.reg]
-		|| oldi = where[]
-/			|| old = x + oldi
-			if (old.BasicBlock == .BasicBlock) and (old.µRefCount <= 0)
-/				sh.nop(old)
-			
-		where[] = self - x
-		return r
-
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		|| changed = info.prm
 		.prms[a] = changed
 		._Outputs |= 1 << a
 		changed &= 31
-		if changed
-			sh.Register(changed) = self
-			sh.KnownValues(Changed) = info is Const
-		
-		info.FatIndex = .index
+		|| Start = sh.funcstart_
+		|| i = self - start
+		info.FatIndex = i
 		.info = info
+		if !changed
+			return info
+
+		sh.KnownValues(Changed) = info is Const
+		|| where = &sh.regs.OOF[changed]
+		|| oldi = where[]
+		where[] = i
+		if oldi
+			|| old = start + oldi
+			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
+				sh.nop(old)
+		
 		return info
 
 	
