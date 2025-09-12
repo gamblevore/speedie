@@ -59,9 +59,9 @@ struct InlineInfo
 				|| a = args[n]!
 				|| r = 1<<v.reg
 				if (AR & r) and (a isnt reference)
-					.items[n] = asmreg.into2				// needs copy to save other regss
+					.items[n] = asmreg.ForceInto				// needs copy to save other regss
 				  elseif (AN & r) and (a is altered)
-					.Items[n] = asmreg.into2
+					.Items[n] = asmreg.ForceInto
 	
 
 
@@ -97,7 +97,7 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 		.SoftNopRange(start, .curr)				// rewind
 	
 	.state = old
-	if .state.InlineDepth == 0
+	if old.InlineDepth == 0
 		.InlineEnd = nil
 	return .CloseVars(OV, nil, r) // should closevars come before restore? sigh. idk.
 
@@ -109,9 +109,9 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 	|SavedRegisters| regs 
 	|InlineInfo| Info
-	
+
+	debugat 4268
 	regs.Collect(fn.args, self)
-	
 	.InlineParameters(prms, info)
 	|| RealStart = .curr					// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
@@ -140,7 +140,7 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 	
 	for (a in args) (i)
 		|| V = info.Items[i]
-		if !(V asnt ASMReg.into2) // its nil or into
+		if !(V asnt ASMReg.ForceInto) // its nil or into
 			info.items[i] = .µInlineParam(p, a, V)
 		p = p.next!
 		

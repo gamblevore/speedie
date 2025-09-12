@@ -311,10 +311,7 @@ function Transform ()
 	|| Space = n.SCArg( self )				#require
 
 	space.ProcessLinkage( n, FuncLinkageTable, self is wrapper )
-	if (self Is Wrapper)
-		0
-	  else
-	//	space.ProcessLinkage( n, FuncLinkageTable, false )
+	if self Isnt Wrapper
 		|| r_z = Tran_Result( self )
 		Tran_All( self, n, space )
 		if r_z
@@ -367,6 +364,7 @@ function message.FailOrCopy (|message| p, |message|)
 
 
 function message.AssignsFix (|scfunction| f)
+	opt norefcounts
 	|| RP   = .NiceParent
 	|| RightSide = rp.Last!
 	|| List = .last!
@@ -376,16 +374,19 @@ function message.AssignsFix (|scfunction| f)
 
 	list.func = @prm
 	
-	// what if... its a datatype? vec.width = 1 --> vec = vec.width(1)
 	|| L = rp.last!
-	L.remove
 	|| c = f.cls
 	if f.returntype and c and c.IsDataTypeOrFP
 		using (self)
 		rp.first = L // put it back
-		rp.first = upon.FailOrCopy(rp)
+		upon = upon.FailOrCopy(rp)
+		if upon
+			rp.first = upon
+			|| d = upon.obj|scdecl|
+				d.MarkAsAltered
 	  else
 		rp.SpdFunc = @Bra
+		L.remove
 
 
 function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Failed=0, |SCFunction|)
@@ -588,6 +589,7 @@ function TryKeepBetter (|int|OldMatch, |SCFunction| f, |int| Match, |SCFunction|
 
 
 function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCParamArray| Incoming, |SCFunction|)
+	opt norefcounts
 	|| NeedsAlter = false
 	|| OldMatch = 0
 	|| Result

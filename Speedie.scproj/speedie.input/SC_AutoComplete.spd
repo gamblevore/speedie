@@ -823,7 +823,7 @@ function FuncTmps (|message|)
 	.func_tmp_src.cleaned = true
 	rz = .func_tmp_src.Source
 	
-	for ch in rz
+	for ch.fast in rz
 		if ch != @dot
 			ch <~ (@str, ch.name)
 		if ch != @str
@@ -834,6 +834,7 @@ function FuncTmps (|message|)
 
 
 function message.Autocomplete_State (|int|)
+	opt norefcounts
 	|| s = .name
 	rz += (s contains 'R')<<0
 	rz += (s contains 'M')<<1

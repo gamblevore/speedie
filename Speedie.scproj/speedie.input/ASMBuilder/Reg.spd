@@ -12,18 +12,18 @@ datatype ASMReg (uint64)
 	
 	Flags
 		|asmreg|
-		Temp = 1024 // sigh.
-		(1<<16)		// starting point
+		Temp = 1024			// Sigh.
+		(1<<16)				// Starting point
 		Negate
 		AlreadyNegated
 		Discard
 		Param
-		FromZeroMemory  // kludge to remove
+		FromZeroMemory  	// kludge to remove
 		Alternate
 		Subtract = Alternate
 		Set
 		UnusedSoFar
-		Into2
+		ForceInto
 		NoScale
 		ContainsAddr
 		Textual
@@ -42,7 +42,6 @@ datatype ASMReg (uint64)
 		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
 		Zero	    = Const   ||| 56 ||| param		// 56 == datatypecode.uint64
-//		RealDiscard = Const   ||| discard
 		Simple		= Temp
 
 	

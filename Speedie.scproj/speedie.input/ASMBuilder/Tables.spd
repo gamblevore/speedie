@@ -325,6 +325,8 @@ function Decl (fn_asm) // declaresub declare
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	rel = rel.last!
+	if .State.InlineDepth > 0
+		return .µInto(rel, dest) // tail.
 	return .µInto(rel, dest).incr
 
 

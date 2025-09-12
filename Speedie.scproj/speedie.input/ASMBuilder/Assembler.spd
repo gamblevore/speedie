@@ -194,7 +194,7 @@ struct Assembler
 
 
 	setter vdecls (|uint|)
-//		if "CollectionPlace".trap	
+//		if "whatever".trap	
 		.vdecls_ = value
 
 	
@@ -387,7 +387,7 @@ struct Assembler
 		|| r = .µGetASM(Exp, dest)
 		if r iz dest
 			return r
-		if (dest isnt into2) and !(a is alteredorref and r.reg == 0)
+		if (dest isnt ForceInto) and !(a is alteredorref and r.reg == 0)
 			return .CloseVars(ov, nil, r)
 		return .Assign(exp, dest, r)
 
@@ -470,7 +470,7 @@ struct Assembler
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			|| trap = ++ASMTrapper, // if trap == 0
+			|| trap = ++ASMTrapper, if trap == 129393
 		  else
 			opt inline
 		
