@@ -4,7 +4,7 @@ extend SCFunction
 		.µstart = Assembler.sh.Index
 
 	function GuessLength (|int|)
-		for s.asm in self
+		for s.ListASM in self
 			rz += s.GuessSize		
 		
 	function µTest (|memory of asm|)

@@ -1258,10 +1258,10 @@ iterator
 		yield F
 		F = F.NextFunc
 
-iterator asm
+iterator ListASM
 	|| s = assembler.sh.start + .µStart
 	|| n = .µlength
-	|uint| i = 0
+	|uint| i = 1
 	while i < n
 		|| op = s[i++]
 		yield (op) (i)
