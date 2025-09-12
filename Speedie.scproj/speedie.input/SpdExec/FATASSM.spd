@@ -170,7 +170,7 @@ struct FatASM
 		
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
 			if .Register(old) == f
-				.Register(old) = f.FindOlder 
+				.SetRegister(old, nil, f.FindOlder )
 		
 		return f.Dest(a, info, self)						// Then we set it to the new value
 	
@@ -178,14 +178,17 @@ struct FatASM
 	function FindOlder (|&fatasm|)
 		|| reg = .Output.reg$
 		|| b = .BasicBlock
-// asmtodo: finding older... can't go past funcs that wipe stuff!
 
+		
+		|| f = self
 		while
-			self--
-			require .BasicBlock == b
-
-			if .Output.reg == reg
-				return self
+			f--
+			require f.BasicBlock == b // asmtodo: use blockid
+			|| d = f.Output.reg
+			if d == reg
+				return f
+			if f.IsFunc and d < reg
+				return nil // can't go past funcs that wipe stuff!
 		
 		
 	function Output (|asmparam|)

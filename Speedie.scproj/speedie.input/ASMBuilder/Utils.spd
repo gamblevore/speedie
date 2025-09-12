@@ -119,7 +119,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |
 	|| fat = .regs.Setters[v]
 	if !fat: return true
 	if exp
-		.Register(v) = nil // closes at end of block only
+		.SetRegister(v, asmreg.AllowNopDest, nil) // closes at end of block only
 	// .nextbasicblock should do this?
 
 	// don't nop (most?) unused stuff here... as temps can be used after deallocating.

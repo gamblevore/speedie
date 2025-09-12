@@ -294,14 +294,13 @@ struct Assembler
 		for v.regoutputs in fat
 			v &= 31
 			if .Register(v) == fat
-				.Register(v) = fat.FindOlder 
+				.SetRegister(v, nil, fat.FindOlder)
 		|| Type = asm.noop * (fat < .curr_)
 		fat.setop = Type
 			
 		
 	function Register (|int| i, |?&FATASM|)
-// if a var is altered in a loop, and we're in a loop, its not a knownvalue.
-
+// If a var is altered in a loop, and we're in a loop, its not a known value.
 		|| r = .Regs.Setters[i]
 			return .funcstart_ + r
 
@@ -316,40 +315,36 @@ struct Assembler
 		.regs.KnownMap = M
 			
 
-	function Register (|int| changed, assigns:|?&FATASM|)
+	function SetRegister (|int| changed, |asmreg| info, |?&FATASM| Value, |asmreg|)
 		|| n = 0
+		|| start = .FuncStart_
 		if value
-			n = value - .FuncStart_
-		if (changed == 1) and "Main".trap
-		.regs.Setters[changed] = n
+			n = value - start
+		
 		.KnownValues(changed) = value is Const
-		// setting a var is the same as redesting something.
-		// we can still nop the thing. at least from closeonevar.
+		|| where = &sh.regs.Setters[changed]
+		|| oldi = where[]
+		where[] = n // set value
+		
+		if oldi and (info is AllowNopDest)
+			|| old = start + oldi
+			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
+				sh.nop(old)
+		(info isnt AllowNopDest)
+		return info
 
 
-	function fatasm.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
+	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		|| changed = info.prm
 		.prms[a] = changed
 		._Outputs |= 1 << a
 		changed &= 31
-		|| Start = sh.funcstart_
-		|| i = self - start
-		info.FatIndex = i
+		info.FatIndex = self - sh.funcstart_
 		.info = info
 		if !changed
-			return info
-
-		if (changed == 1) and "Main".trap
-		sh.KnownValues(Changed) = info is Const
-		|| where = &sh.regs.Setters[changed]
-		|| oldi = where[]
-		where[] = i
-		if oldi
-			|| old = start + oldi
-			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
-				sh.nop(old)
-		
-		return info
+			return info		
+		(info is AllowNopDest)
+		return sh.SetRegister(changed, info, self)
 	
 	
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)

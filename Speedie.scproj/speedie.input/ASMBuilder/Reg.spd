@@ -33,6 +33,7 @@ datatype ASMReg (uint64)
 		BlockSafe
 		BlockMostlySafe
 		OKAsTemp
+		AllowNopDest
 //		CompilerCreated
 		GlobalMemory
 		PreferEqul
