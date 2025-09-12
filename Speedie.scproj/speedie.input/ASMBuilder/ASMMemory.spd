@@ -76,14 +76,19 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	
 	|| pinc = .MemOpt(base, index, bytes)
 	
+	|| op = ASMType.WriteASM[bytes]
 	if dest is set
 		// avoid setting ._output
 		rz = exp.WR4U(dest, base, VarAdd, index, pinc)
-		rz._op = ASMType.WriteASM[bytes]
 	  else
 		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
-		|| B = (bytes<<1) + t.issigned
-		rz._op = ASMType.ReadASM[b]
+		bytes = (bytes<<1) + t.issigned
+		op = ASMType.ReadASM[bytes]
+	
+	rz._op = op
+	if pinc     // like:   || y = (x++)[]
+		rz.µrefcount++ // we can't NOP this FAT.  Shouldn't we also mark r4 as dest?
+	
 
 
 function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)

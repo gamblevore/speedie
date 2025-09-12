@@ -919,7 +919,6 @@ function message.WR2U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 function message.WR4U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
-	if "FastMemory".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.WR4U, self)
 	rz.reginput(0) = r1
