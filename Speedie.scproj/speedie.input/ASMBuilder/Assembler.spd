@@ -10,7 +10,8 @@ struct ASMState
 
 
 struct RegFile
-	|uint16[32]|				OOF
+	|uint16[32]|				Setters
+	|int|						KnownMap
 
 
 struct Assembler
@@ -33,7 +34,6 @@ struct Assembler
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
-	|int|						KnownValuesMap
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart_
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -293,23 +293,65 @@ struct Assembler
 		
 		for v.regoutputs in fat
 			v &= 31
-			.RemoveReg(v, fat)
+			if .Register(v) == fat
+				.Register(v) = fat.FindOlder 
 		|| Type = asm.noop * (fat < .curr_)
 		fat.setop = Type
-
-		
-	function Register (|int| i, assigns:|?&FATASM|)
-		|| n = 0
-		if value
-			n = value - .FuncStart_
-		.regs.OOF[i] = n
 			
 		
 	function Register (|int| i, |?&FATASM|)
-		|| r = .Regs.OOF[i]
+// if a var is altered in a loop, and we're in a loop, its not a knownvalue.
+
+		|| r = .Regs.Setters[i]
 			return .funcstart_ + r
 
+	
+	function KnownValues (|int| changed, assigns:|bool|)
+		|| M = .regs.KnownMap
+		changed = 1 << changed
+		if Value
+			m |=  changed
+		  else
+			m &=~ changed
+		.regs.KnownMap = M
+			
 
+	function Register (|int| changed, assigns:|?&FATASM|)
+		|| n = 0
+		if value
+			n = value - .FuncStart_
+		if (changed == 1) and "Main".trap
+		.regs.Setters[changed] = n
+		.KnownValues(changed) = value is Const
+		// setting a var is the same as redesting something.
+		// we can still nop the thing. at least from closeonevar.
+
+
+	function fatasm.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
+		|| changed = info.prm
+		.prms[a] = changed
+		._Outputs |= 1 << a
+		changed &= 31
+		|| Start = sh.funcstart_
+		|| i = self - start
+		info.FatIndex = i
+		.info = info
+		if !changed
+			return info
+
+		if (changed == 1) and "Main".trap
+		sh.KnownValues(Changed) = info is Const
+		|| where = &sh.regs.Setters[changed]
+		|| oldi = where[]
+		where[] = i
+		if oldi
+			|| old = start + oldi
+			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
+				sh.nop(old)
+		
+		return info
+	
+	
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
 		|| f = .register(r.reg)
 		if f is Const
@@ -470,7 +512,7 @@ struct Assembler
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			|| trap = ++ASMTrapper, if trap == 129393
+			|| trap = ++ASMTrapper //, if trap == 129393
 		  else
 			opt inline
 		
@@ -539,8 +581,7 @@ struct Assembler
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()
-		.KnownValuesMap = nil
-		.regs = nil							// asmtodo: better to set to -1
+		.regs = nil
 		.Guard
 		fn.StartASM
 		.InlineEnd = nil
@@ -552,7 +593,7 @@ struct Assembler
 
 	function CapASM
 		.out.µlength = .fnlength
-		.out.µLengthReal = .out.GuessLength
+		.out.µLengthGuess = .out.GuessLength
 		jsm!.length = .curr - .start 
 
 		
@@ -581,8 +622,8 @@ struct Assembler
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 
 
-	iterator
-		|| h = .KnownValuesMap
+	iterator Known
+		|| h = .regs.KnownMap
 		while h
 			|| h2 = h.LowestBit
 			yield .Register(h2.log2)!
@@ -625,8 +666,8 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 
 	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
-		|| max = fn.maxasm
-			check (fn.µlengthreal <= max) (fn.sourcearg, "ASM too large")
+		|| max = fn.MaxASM
+			check (fn.µlength <= max) (fn.sourcearg, "ASM too large")
 		target debug
 			fn.µprint(++CountASMFuncPrint)
 		return true

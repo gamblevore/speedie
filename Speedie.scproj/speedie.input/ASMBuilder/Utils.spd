@@ -114,9 +114,9 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 	
-	.KnownValuesMap &=~ (1<<v)
+	.Regs.KnownMap &=~ (1<<v)
 
-	|| fat = .Register(v)
+	|| fat = .regs.Setters[v]
 	if !fat: return true
 	if exp
 		.Register(v) = nil // closes at end of block only
@@ -126,8 +126,9 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |
 	// What about the code below? could it suffer the same? We had this bug in "incr".
 	// the best this place could do... is warn (ME) that a function should be nopping something
 	// but isn't.
-	
-	return .ClearStruct(exp, fat, v)
+
+		
+	return .ClearStruct(exp, .funcstart + fat, v)
 
 
 

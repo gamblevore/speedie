@@ -61,7 +61,6 @@ linkage
 |File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
-//|string|					ReportedName
 |scimport|					Project
 |scfunction|				MainFunc
 |message|					ConfMsg
@@ -76,8 +75,8 @@ linkage
 
 |SCModule|					program = InternalFile.Proj.Mod
 
-|Message|					AppInitCode = `{cpp_name JB_SP_AppInit, return InitAppGlobals_()}`~parse
-|Message|					AppInitGlobals = `{cpp_name JB_SP_AppInitSub_}`~parse
+|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, return InitAppGlobals_()}`~parse).WipePos
+|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_}`~parse).WipePos
 
 |[SCClass]|					ClassList
 |[SCModule]|				ModuleList
@@ -875,11 +874,11 @@ function MakeMainFunc (|message|)
 
 
 function AddMain (|int| mark, |bool|)
-	|| m = .MakeMainFunc()
 	|| b = (Truebool!, falsebool!)(Options.ProjectisLibrary) 
-	
-	if m and .ConfMsg
-		m.first = "app.configure = __AppConfString"~parse
+	|| m = .MakeMainFunc
+		|| conf = .ConfMsg
+			using conf
+			m.first = "app.configure = __AppConfString"~parse
 	
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 

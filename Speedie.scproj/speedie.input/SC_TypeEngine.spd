@@ -470,7 +470,7 @@ function scdecl.ExtractAmount (|Message| Prms, |scdecl|)
 function scdecl.ExtractAmountSub (|Message| Prms, |scdecl|)
 	|| num = prms.first
 	if num == @unit
-		typeofunit(Num, nil, nil)
+		TypeOfUnit(Num, nil, nil)
 	if num.expect(@num) and num.ExpectLast
 		rz = .CopyDecl
 		rz.IsCArray(Num.Int, self)
@@ -482,7 +482,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 	|| f = c.func
 	if (f == @Thg)		// usual case
 		if c == "nil"	// nice
-			return typevoid
+			return TypeVoid
 		return Compiler.FindClassType( c )
 	
 	depth++

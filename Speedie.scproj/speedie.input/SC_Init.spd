@@ -122,6 +122,9 @@ function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
 function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_name)
 	opt norefcounts
 	if src and .HasActualCode(src) and (self != Compiler.program)
+		for s.flat in src
+			if s.position < 0
+				s.position = 0
 		using src
 		dest.AlmostAppend  @sheb + ("// " + .Name)
 		|| dot = @dot + fn_name

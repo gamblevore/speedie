@@ -230,10 +230,11 @@ module PackMaker
 	
 	function SCFunction.TestObesity (|?&ivec4|)
 		opt norefcounts
-		|| mu = .µLength
-			|| mu2 = .µTest
-			.µprint(0)
-			return jb_vm.Run(mu2.ptr, mu2.length)
+		target debug
+			|| mu = .µLength
+				|| mu2 = .µTest
+				.µprint(0)
+				return jb_vm.Run(mu2.ptr, mu2.length)
 	
 	
 	syntax access (|int| v, assigns:|int64|)

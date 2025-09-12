@@ -76,9 +76,7 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 			v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
 	dest.reg = v
 	dest.µtype = fn.ASMRegType
-	dest = dest.ReallySimplify
-	(dest is alternate) = diff
-	return dest
+	return dest.ReallySimplify
 
 
 function RegClear (|message| exp, |&fatasm| C, |int| i)
@@ -89,7 +87,9 @@ function RegClear (|message| exp, |&fatasm| C, |int| i)
 	exp.BFLG(i.asm, i.asm, L, L, signed|int|)
 
 
-function RegsBitClear (|message| exp, |&fatasm| Start)
+function ClearGRABbedAndTrampled (|message| exp,  |asmreg| Dest,  |&fatasm| Start)
+	// asmtodo: unnecessary? Values are always 32 or 64-bit. everthing else should be
+	// set correctly, right? remove later?
 	opt norefcounts
 	|| c = .Last-1
 	while C >= Start
@@ -98,7 +98,12 @@ function RegsBitClear (|message| exp, |&fatasm| Start)
 			if id == .CurrFuncGrab
 				.RegClear(exp, c, c.RegOnly(0))
 		c--
-
+	return
+	// still need this tho.	
+	|| i = dest.reg
+	while ++i <= 31
+		.Register(i) = nil
+		
 }
 
 
@@ -158,12 +163,8 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if fn.HasCVersion
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
-	if dest is Alternate
-		|| v = dest.reg
-		.register(v) = fat
-		(dest isnt alternate)
 
-	.RegsBitClear(exp, Start)
+	.ClearGRABbedAndTrampled(exp, dest, Start) // comment out? once tests work?
 	
 	if 0: prms.FNC3, prms.FNCX, prms.FNCX3 // MARK USED
 

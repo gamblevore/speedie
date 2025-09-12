@@ -177,7 +177,9 @@ function StringReader.ParseJbin (|int64| Remain=1G, |MessageRoot|)
 	
 
 function string.ParseJbin (|int64| max=1G, |messageroot|)
-	return .Stream.ParseJbin(max)
+	|| s = .stream
+	|messageroot--| msg = s.ParseJbin(max)
+	return msg
 
 
 function string.Digest (|string|)

@@ -342,7 +342,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	if !ch
 		return asmreg()
 	|| v = .OpenVars
-	|regfile| Restore = .Regs
+	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
 
 	while
 		if ch.func == @decl
@@ -355,7 +355,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	if !Mask
 		exp = nil
 	if rz isnt ExitFunction
-		return .CloseVars(v, exp, rz & Mask)
+		return .CloseVars(v, exp, rz & Mask) // tail
 	rz = .CloseVars(v, exp, rz & Mask)
 	.regs = Restore
 

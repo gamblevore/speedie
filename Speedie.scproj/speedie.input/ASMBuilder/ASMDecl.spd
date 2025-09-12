@@ -7,7 +7,6 @@
 struct SavedRegisters 
 	|byte|					RegCount
 	|uint16|				BasicBlock
-	|uint|					KnownValues
 	|DeclAlterable[32]|		Decls
 	|RegFile|				Regs
 
@@ -16,7 +15,6 @@ struct SavedRegisters
 		opt norefcounts
 
 		.BasicBlock = sh.BasicBlock
-		.KnownValues = sh.KnownValuesMap
 		.regs = sh.regs
 		expect args <= 32 - .RegCount
 		for p in args
@@ -24,7 +22,6 @@ struct SavedRegisters
 
 
 	function Rewind	(|assembler| sh)
-		sh.KnownValuesMap = .KnownValues
 		sh.BasicBlock = .BasicBlock
 		sh.regs = .regs
 

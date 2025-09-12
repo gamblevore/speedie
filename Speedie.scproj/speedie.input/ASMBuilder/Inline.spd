@@ -110,7 +110,6 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|SavedRegisters| regs 
 	|InlineInfo| Info
 
-	debugat 4268
 	regs.Collect(fn.args, self)
 	.InlineParameters(prms, info)
 	|| RealStart = .curr					// Params need to be done anyhow... so don't count them.

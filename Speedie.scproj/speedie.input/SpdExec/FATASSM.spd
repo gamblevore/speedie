@@ -165,27 +165,22 @@ struct FatASM
 		
 		
 	function assembler.ReDest (|fatasm| f, |asmreg| info, |uint| a, |asmreg|)
-		// what if the old is a ref and new isnt,  or new is a ref and old isnt?
+		// asmtodo: what if the old is a ref and new isnt,  or new is a ref and old isnt?
 		// references need to be incremented, as their output is needed.
 		
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
-			.RemoveReg(old, f)
+			if .Register(old) == f
+				.Register(old) = f.FindOlder 
 		
 		return f.Dest(a, info, self)						// Then we set it to the new value
-	
-	
-	function assembler.RemoveReg (|int| i, |fatasm| fat)
-		if .Register(i) == fat
-			|| Old = fat.FindOlder
-			if old isnt Const
-				.KnownValuesMap &=~ (1<<i)
-			.Register(i) = old
 	
 
 	function FindOlder (|&fatasm|)
 		|| reg = .Output.reg$
 		|| b = .BasicBlock
-		while 
+// asmtodo: finding older... can't go past funcs that wipe stuff!
+
+		while
 			self--
 			require .BasicBlock == b
 
@@ -197,40 +192,6 @@ struct FatASM
 		|| o = ._Outputs|uint|
 			o = o.log2
 			return .Prms[o]
-
-
-	function assembler.KnownValues (|int| changed, assigns:|bool|)
-		|| M = sh.knownvaluesmap
-		changed = 1 << changed
-		if Value
-			m |=  changed
-		  else
-			m &=~ changed
-		sh.KnownValuesMap = M
-			
-
-	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
-		|| changed = info.prm
-		.prms[a] = changed
-		._Outputs |= 1 << a
-		changed &= 31
-		|| Start = sh.funcstart_
-		|| i = self - start
-		info.FatIndex = i
-		.info = info
-		if !changed
-			return info
-
-		sh.KnownValues(Changed) = info is Const
-		|| where = &sh.regs.OOF[changed]
-		|| oldi = where[]
-		where[] = i
-		if oldi
-			|| old = start + oldi
-			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
-				sh.nop(old)
-		
-		return info
 
 	
 	Syntax Expect (|string| Error)

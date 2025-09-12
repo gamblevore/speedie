@@ -88,7 +88,7 @@ extend Assembler
 		|| bi = .BranchID
 		// shouldn't the BranchID shift with the basicblock Or not? IDK?
 		|| cc = .curr
-		for f in self
+		for f.Known in self
 			if (f.BranchID == bi) and (f < cc) and (f isa asm.KNST) and (f._const == v)
 				|| info = f.info
 				if info.µType.IsIntReg == normal

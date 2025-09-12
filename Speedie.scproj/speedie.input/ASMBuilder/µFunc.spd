@@ -38,28 +38,30 @@ extend SCFunction
 					fat.FillLabelRequest(where, rz, r-1)
 
 	
-	render µRender (|bool|RenderBlocks=false)
-		fs <~ "asm ${.name} ${compiler.stASMTotalOps}\n" // " asm " "asm"
-		|| bb = 0
-		for µ.fat in self
-			if RenderBlocks and µ.BasicBlock != bb
-				bb = µ.BasicBlock
-				fs <~ "//$bb\n"
-			µ.RenderFat(fs)
-			fs <~ '\n'
+	target debug
+		render µRender (|bool|RenderBlocks=false)
+			fs <~ "asm ${.name}   ${.µLengthguess*4} / ${compiler.stASMTotalOps}\n" // " asm " "asm"
+			|| bb = 0
+			for µ.fat in self
+				if RenderBlocks and µ.BasicBlock != bb
+					bb = µ.BasicBlock
+					fs <~ "//$bb\n"
+				µ.RenderFat(fs)
+				fs <~ '\n'
 
 
 /// TEXTUAL STUFF		
 	function µPrint (|int| i)
-		printline self
-		|| fs = faststring()
-		if i 
-			|| n = PackMaker.packfuncs.length
-			fs <~ "("
-			(i div n).Percent(fs)
-			fs <~ ") "
-		.µRender(fs)
-		printline fs
+		target debug
+			printline self
+			|| fs = faststring()
+			if i 
+				|| n = PackMaker.packfuncs.length
+				fs <~ "("
+				(i div n).Percent(fs)
+				fs <~ ") "
+			.µRender(fs)
+			printline fs
 
 
 	iterator fat

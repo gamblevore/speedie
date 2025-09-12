@@ -46,7 +46,7 @@ function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
 	if mode is AddrNoFiddle or d is library // need exact match.
 		range = 1
 	
-	for old in Assembler.sh
+	for old.Known in Assembler.sh
 		if old isa asm.gtab
 			|| OK = old.CanGlobalGrab(find, range, B)
 				return OK

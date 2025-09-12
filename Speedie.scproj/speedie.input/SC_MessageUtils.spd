@@ -490,8 +490,8 @@ function message.IsAlwaysFalse (|bool|)
 function Message.StartUsingAfter // for "return" debugging.
 	opt norefcounts
 	|| biggest = -1
-	|| L = .memorylayer
-	|| d = .originalparsedata
+	|| L = .MemoryLayer
+	|| d = .OriginalParseData
 		for s.flat in self
 			if s.position >= 0 and s.memorylayer == l 
 				(biggest max= s.after)
@@ -503,10 +503,17 @@ function Message.StartUsingAfter // for "return" debugging.
 	.MemoryLayer.use
 
 
+function message.WipePos (|int| v=0, |message|)
+	opt norefcounts
+	for s.flat in self
+		s.Position = v
+	return self
+	
+	
 function Message.PrmFunc (|scfunction|)
 	opt norefcounts
 	if self
-		|| s = .second
+		|| s = .Second
 			return s.obj as scfunction
 		
 
@@ -514,3 +521,4 @@ function Message.PrmFuncStructMsg (|message|)
 	opt norefcounts
 	|| list_fn = .PrmFunc
 		return .last[list_fn.structreturnpos-1]
+
