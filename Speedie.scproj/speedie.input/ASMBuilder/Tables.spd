@@ -273,7 +273,9 @@ function SetRel (fn_asm)						// function relset (
 
 	// Probably x.y = z, or x[y] = z 
 
-	|| Src = .µGetReal(exp.last!,  nil|asmreg| temp a)
+	exp = exp.last!
+	dest = nil|asmreg| temp a
+	|| Src = .µGetReal(exp, dest)
 	(Src is SetAlways)
 	.µ(A, Src)
 	return asmreg.discard
@@ -532,9 +534,10 @@ function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, 
 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
-	if (rz is ContainsAddr)
-		return rz &~ asmreg.ContainsAddr
-	error (exp, "ASM fail")
+	target debug: if (rz isnt ContainsAddr)
+	(rz isnt ContainsAddr)
+	(rz isnt AddrRequest)
+	(rz isnt AddrForceRequest)
 
 
 

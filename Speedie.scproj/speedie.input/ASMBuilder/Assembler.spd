@@ -501,7 +501,7 @@ struct Assembler
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			|| trap = ++ASMTrapper //, if trap == 129393
+			|| trap = ++ASMTrapper//, if trap == 177072
 		  else
 			opt inline
 		
