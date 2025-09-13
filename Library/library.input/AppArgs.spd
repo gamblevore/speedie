@@ -76,17 +76,6 @@ helper @float.MainArg       (|int| Pos, |string| name, |Float64|)
 helper @file.MainArg		(|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.file
 
-//extend_module File
-// should be possible.
-//	module Existing
-//		helper MainArg (|int| Pos, |string| name, |file|)
-//			return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
-//	module Jeebox
-//		helper MainArg (|int| Pos, |string| name, |messageroot|)
-//			return File.existing.MainArg(pos, name)$.parse
-//	module Output
-//		helper MainArg   (|int| Pos, |string| name, |faststring|)
-//			return file.MainArg(pos, name)$.Out
 
 helper @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
