@@ -62,8 +62,9 @@ function Mint (|int| x, |int| y)
 
 
 function grab2 (|$byte| b, |int|)
-	b++
-	return b
+//	|| x = b++
+	b = b / 4
+	return b + b
 
 class LargeClass2 {
 	|byte[100]|   a
