@@ -1188,8 +1188,6 @@ function Nothing (|message| out,  |SCFunction| fn)
 		out <~ "This is a cpp_wrapper function"
 	  elseif fn is disabled
 		out <~ "This function is disabled"
-//	  elseif fn.TargettedOut
-//		out <~ "Function was targgeted out"
 	  else
 		out <~ "Could not compile this function."
 

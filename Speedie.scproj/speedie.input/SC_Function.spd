@@ -46,6 +46,7 @@ datatype FunctionType (int)
 //		PrintedForDebugViewing // can print a function only once for debug
 		ReturnASMFloats
 		Cpp
+		UsedByASM
 		
 		ConOrDes = Constructor + Destructor
 		

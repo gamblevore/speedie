@@ -194,35 +194,6 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	expect (prms == 4) (prms)
 	arg.AppendMacro(macros.MainArgDefault.clean, prms)
 	return 4
-	
-	
-
-function message.CollectUsage (|string|)
-	|| fs = FastString()
-	fs <~ "Usage: \$app "
-	for ch in self
-		if ch.expect(@decl)
-			if !ch.IsFirst
-				fs <~ "   "
-			|| name = ch.DeclName
-			|| optional = (ch.first == @rel)
-				fs <~ "["
-			|| ty = ch.first!
-			fs <~ name
-			|| tyfn = ty.func
-			if tyfn == @arr
-				ty = ty.first
-			|| type = ty.name
-			if type contains "file"
-				type = "file-path" // clean up messy stuff like "filedata"
-			  elseif type ~!= "string"
-				fs <~ " ($type)"
-			if optional
-				fs <~ "]"
-			if tyfn == @arr
-				fs <~ " [...]"				// def (string),  abc (int)...
-	return fs
-
 
 
 function message.MainArgsCanBeZero (|bool|)
@@ -234,7 +205,7 @@ function message.MainArgsCanBeZero (|bool|)
 		
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
-	|| usage = prms.CollectUsage
+	|| usage = "Usage: \$app " + .Render
 	|| FirstArg = `
 
 if !app.usage

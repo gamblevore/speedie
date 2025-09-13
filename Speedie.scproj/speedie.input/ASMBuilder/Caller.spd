@@ -62,6 +62,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
+	.ASMReach(fn)
 	|| vd = .VDecls
 	|| v = vd.log2
 	|| diff = (!v or dest.reg != v)
@@ -87,22 +88,25 @@ function RegClear (|message| exp, |&fatasm| C, |int| i)
 	exp.BFLG(i.asm, i.asm, L, L, signed|int|)
 
 
-function ClearGRABbedAndTrampled (|message| exp,  |asmreg| Dest,  |&fatasm| Start)
+function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Start)
 	// asmtodo: unnecessary? Values are always 32 or 64-bit. everthing else should be
 	// set correctly, right? remove later?
 	opt norefcounts
-	|| c = .Last-1
+	if 0: prms.FNC3, prms.FNCX, prms.FNCX3			// MARK USED
+
+	|| c = .Last - 1
 	while C >= Start
 		if (c isa asm.GRAB)
 			|| id = c.Prms[5]
 			if id == .CurrFuncGrab
-				.RegClear(exp, c, c.RegOnly(0))
+				.RegClear(prms, c, c.RegOnly(0))
 		c--
-	return
-	// still need this tho.	
+	if 1
+		return
+	// still need this tho.	caused an error tho?
 	|| i = dest.reg
 	while ++i <= 31
-		.Register(i) = nil
+		.setRegister(i, nil, nil)
 		
 }
 
@@ -129,19 +133,22 @@ function SCFunction.HasCVersion (|bool|)
 	return true
 
 
-function @ASMType.ASMFunction (fn_asm) // dofunction function
+function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
 	|| fn = prms.AsFunc
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest
+		TableID = fn.tableid ?? 0xFFFF				// 0xffff means unknown?
+		TableID += 31
 	  else
+		// we never get here?? hmmm. that can't be right? need an asm_test for that!
 		|| f = exp.first!
 		TableID = .µ(f).Reg
 		|| dcl = f.ASMDecl
 		// need to execute exp.first
-/		fn = dcl.Type.FuncProto			#expect (exp)
+/		fn = dcl.Type.FuncProto						#expect (exp)
 
 	dest = .CallFunc(exp, dest, fn)
 	if !fn.ASMReturn
@@ -154,29 +161,30 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| P = .PrmCollect(prms, fn)
 	.CloseVars(Closer)
 	
-	if !TableID
-		TableID = fn.tableid ?? 0xFFFF // 0xffff means unknown?
-		TableID += 31
 	|| PExt = P >> 32
 	(dest isnt Const) // why would it be?
-	|| fat = prms.FNC(dest, TableID, P,  PExt) // prms.fncx
+	|| fat = prms.FNC(dest, TableID, P,  PExt)		// prms.fncx
 	if fn.HasCVersion
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
 
-	.ClearGRABbedAndTrampled(exp, dest, Start) // comment out? once tests work?
+	.ClearGRABbedAndTrampled(exp, dest, Start)		// comment out? once tests work?
 	
-	if 0: prms.FNC3, prms.FNCX, prms.FNCX3 // MARK USED
-
-	fat.µRefCount += fn isnt stateless
-	if fn is Killer // return just to be safe
+	fat.µRefCount += fn isnt STATELESS				// NOICE!
+	if fn is Killer									// return just to be safe
 		fat = exp.RET()
 		fat.µRefCount++
 		dest = asmreg.exit
 	
 	.CurrFuncGrab--
 	return fat * dest
-		
+
+
+
+function assembler.ASMReach (|scfunction| fn)
+	if .out.MyReacher
+		(fn is usedbyasm)
+
 
 //function PrmPrint (|string| s)
 //	opt norefcounts

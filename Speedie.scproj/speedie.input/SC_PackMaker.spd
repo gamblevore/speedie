@@ -124,6 +124,19 @@ module PackMaker
 		
 		if minitest
 			.RunAFewTests
+			return true
+		
+		|| main = Compiler.MainFunc
+			(main is usedbyasm)
+		
+		target debug
+			|| subtract = 0
+			for fn in .PackFuncs
+				if fn.myreacher and (fn isnt UsedByASM)
+					subtract += fn.µLengthGuess
+					printline "-" + fn.exportname
+			if subtract
+				"$subtract µ gain"
 		return true
 
 	
@@ -201,6 +214,7 @@ module PackMaker
 	
 	
 	function MakePack 
+		opt norefcounts
 		compiler.During = compiler.Packing
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll

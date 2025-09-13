@@ -581,8 +581,12 @@ struct Assembler
 
 
 	function CapASM
-		.out.µlength = .fnlength
-		.out.µLengthGuess = .out.GuessLength
+		opt norefcounts
+		|| fn = .out
+		fn.µlength = .fnlength
+		|| L = fn.GuessLength
+		fn.µLengthGuess = L
+		compiler.stASMTotalOps += L
 		jsm!.length = .curr - .start 
 
 		
@@ -651,7 +655,6 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	if .NeedsRework
 		.Rework(fn)
 	.CapASM
-	compiler.stASMTotalOps += fn.GuessLength
 
 	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
