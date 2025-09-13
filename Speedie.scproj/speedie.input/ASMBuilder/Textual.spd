@@ -59,9 +59,9 @@ extend Assembler
 		|| x = .info
 		x.reg = pos
 		.info = x
-		|| j = .form.RegForJump // remove jumpreg and use forms count
+		|| j = .form.RegForJump // remove JumpPrm and use forms count
 			if j != pos + 1 // what?
-		.jumpreg = j
+		.JumpPrm = j
 		
 
 
@@ -75,7 +75,7 @@ extend Assembler
 	function textassembler.GetLabel (|&FatASM| Jumper, |bool|)
 		opt norefcounts
 
-		|| i = jumper.JumpReg
+		|| i = jumper.JumpPrm
 		if !i
 			return true
 		i--

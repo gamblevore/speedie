@@ -11,7 +11,7 @@ class µForm
 	|int|			TotalBits
 	|int| 			RegsAltered
 	|int|			Index
-	|int|			RegForJump // remove jumpreg and use forms count
+	|int|			RegForJump // remove RegForJump and use forms count
 	
 	
 	render

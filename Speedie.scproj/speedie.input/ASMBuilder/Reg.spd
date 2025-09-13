@@ -18,7 +18,6 @@ datatype ASMReg (uint64)
 		AlreadyNegated
 		Discard
 		Param
-		FromZeroMemory  	// kludge to remove
 		Alternate
 		Subtract = Alternate
 		Set

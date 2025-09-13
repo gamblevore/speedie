@@ -43,14 +43,15 @@ module SC_API
 
 
 	function NewExportAPISub (|message| node, |SCObject| parent)
+		opt norefcounts
 		|| name = node[@thg]										#require
-		|| arg = name.Next(@arg)								#require
+		|| arg = name.Next(@arg)									#require
 		
-		|| lib_tmp = arg.find(@tmp, "libraryname", true)		#require
+		|| lib_tmp = arg.find(@tmp, "libraryname", true)			#require
 		|| lib_name = lib_tmp[@str]									#require
 		require (lib_name ~= compiler.projectname)
 		
-		for (C in arg)
+		for (C.fast in arg)
 			if (C== "api" or "class_api")
 				C.obj = parent
 				compiler.api_list <~ C
@@ -73,7 +74,7 @@ module SC_API
 		|| cls		= compiler[name]					#require
 
 		partname.parent.remove
-		for ch in arg
+		for ch.fast in arg
 			require ch.expect(@tmp, "api")
 			.NewAPI(ch, partname.name, cls, proj)
 

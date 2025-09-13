@@ -24,7 +24,7 @@ extend SCFunction
 		|uint64| HasLabel
 		rz = where
 		for (fat.fat in self) (i)
-			haslabel |= fat.jumpreg << (i&63)
+			haslabel |= fat.JumpPrm << (i&63)
 			|| n = rz - where
 			if n >= 64K
 				error (.source, "Function too large (>= 256K compiled)")
@@ -34,7 +34,7 @@ extend SCFunction
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
-				|| r = fat.JumpReg
+				|| r = fat.JumpPrm
 					fat.FillLabelRequest(where, rz, r-1)
 
 	

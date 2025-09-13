@@ -171,7 +171,7 @@
 
 ı RFRT: _
 	Code = DeRefRegs(vm, r, Op);
-ı GSTR: _
+ı GOBJ: _
 	o1 = strs(vm, Op);
 ı GTAB: _
 	u1 = table(vm, Op);
@@ -220,7 +220,7 @@
 	IncrementAddr(r, Op, 1);
 ı CNTD: _
 	IncrementAddr(r, Op, 0);
-ı RDWR: _
+ı COPY: _
 	MemCopyRDWR(r, Op);
 ı FADD: _
 	if (Float_Du)

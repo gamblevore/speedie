@@ -133,7 +133,7 @@ linkage
 |int|						stReachedFunc
 |int|						stReachedClass
 |int|						stParseTime
-|int|						stTotalSourceSize
+|int64|						stTotalSourceSize
 |int|						stTotalFileCount
 |int|						stParseTimeTotal
 |int|						stASMTotalOps

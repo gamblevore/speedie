@@ -1,17 +1,9 @@
 
 
 
-class asm_test_obj
-	|int| i
-	constructor
-		visible
-		.i = 0
-
-	
 
 module ASMExamples {
 target pack { 
-
 |int| Glob
 |int| Bolg
 
@@ -22,6 +14,10 @@ function SwapTest
 	|| y = 2
 	swap (x) (y)
 
+function GlobRead  
+	|| s = Compiler.OriginalInputPath
+	|| m = typefloat64
+	|| I = compiler.stTotalSourceSize
 
 
 function Grab
@@ -67,14 +63,8 @@ function Mint (|int| x, |int| y)
 
 
 function grab2 (|$byte| b, |int|)
-	|| fs = FastString()
-	fs <~ ":"
-	|| x = asm_test_obj()
-	x.i++
-	(fs)
-	x.i++
-	return (x.i + 10)*10
-
+	b++
+	return b
 
 class LargeClass2 {
 	|byte[100]|   a

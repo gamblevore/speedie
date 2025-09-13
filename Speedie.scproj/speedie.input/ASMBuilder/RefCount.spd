@@ -49,7 +49,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 	target debug: if Obj is ContainsAddr							// always a reg!
 
 	if fn == Compiler.RefIncr
-		|| Last = .last(asm.gstr)
+		|| Last = .last(asm.GOBJ)
 			if (Last.r0 iz Obj) and !Last.r1
 				Last.r1 = 1							// incring a gstr. Lets do it internally!
 				return Last
@@ -59,13 +59,13 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 	if fn == Compiler.RefDecr
 		.CloseOneEarly(Obj)
-		|| Last = .last(asm.rfun, asm.gstr)
+		|| Last = .last(asm.rfun, asm.GOBJ)
 			|| Ret = .CanOptDecr(obj, last)
 				if ret != last
 					return nil
 				return ret
 
-			if (Last isa asm.gstr) and (Last.r0 iz Obj)  and  Last.r1
+			if (Last isa asm.GOBJ) and (Last.r0 iz Obj)  and  Last.r1
 				last.r1 = 0							// decring a global mem obj. Lets just NOT incr!
 				return nil
 

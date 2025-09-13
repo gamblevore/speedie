@@ -37,34 +37,21 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 		dest = .AddConst(index*amount, exp, dest)
 	
 	check (Amount <= 1<<14) (exp, "Object too large memory-copy requested. Copy this manually.")
-	return exp.RDWR(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
+	return exp.COPY(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
-	if dest is ContainsAddr
-		#!wait?? this is meant to be an AddrRequest? not a response.
-		debugger
-	
-	if dest is FromZeroMemory // kludge to remove
-		debugger 
-		if Decl
-			return .CopyMemory(index, exp, asmreg(), base, varadd, Decl)
-		error (exp)
-		dest = asmreg()
-
 	(dest isnt AddrRequest)
 	|| T = dest.µtype
-	|| bytes = t.ByteCount
-	if decl
-		|| curr = Decl.CalculateSize
-		if curr != bytes // just check.
-		bytes = curr.clamp(1, 16)
-	bytes = bytes.log2
+	|| byte_shift = t.ByteCount
+	target debug
+		if decl and (byte_shift < 1 or byte_shift > 16)
+		
+	byte_shift = byte_shift.log2
 	
-	
-	if  (bytes|uint| > 4)
+	if  (byte_shift|uint| > 4)
 		error (exp, "Object to large to access")				// can we do struct-mem-copy?
-		bytes = 0
+		byte_shift = 0
 	
 	index++
 	|| VInd = .Const(varadd, 7, false)
@@ -72,22 +59,30 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		VarAdd = ASMReg()
 	
 	if decl isnt ClassObj
-		base = .MemOffsetFix(Base, bytes, index, 7, Decl, exp)
+		base = .MemOffsetFix(Base, byte_shift, index, 7, Decl, exp)
 	
-	|| pinc = .MemOpt(base, index, bytes)
+	|| pinc = .MemOpt(base, index, byte_shift)
 	
-	|| op = ASMType.WriteASM[bytes]
+	if !pinc and (dest isnt set) and (Byte_Shift == 3) and !varadd.reg
+		|| bs = base.fat
+		if (bs isa asm.gtab)
+			|| K = bs.Const + ((index-1) << Byte_Shift)
+			if K <= 18~bits
+				return exp.GOBJ(dest, 0, K)
+
+	|| op = ASMType.WriteASM[byte_shift]
 	if dest is set
 		// avoid setting ._output
 		rz = exp.WR4U(dest, base, VarAdd, index, pinc)
 	  else
 		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
-		bytes = (bytes<<1) + t.issigned
-		op = ASMType.ReadASM[bytes]
+		byte_shift = (byte_shift<<1) + t.issigned
+		op = ASMType.ReadASM[byte_shift]
 	
 	rz._op = op
-	if pinc     // like:   || y = (x++)[]
-		rz.µrefcount++ // we can't NOP this FAT.  Shouldn't we also mark r4 as dest?
+	if pinc     // || y = (x++)[]
+		rz.µrefcount++
+		rz.Dest(4, nil, self) // its a dest, but its also an input
 	
 
 
@@ -106,12 +101,8 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 		i += rz
 		require i|uint| <= 127 // could go out of range!
 	
-	// this logic is so strange. I wonder if any (real) cases exist where this can fail.
-	// (not cases that don't get generated). I can't think of how to fix this, though.
-	// this is a case of something I can't solve without examples.
-	
 	if before and (bs is temp)
-		rz = 0 // rz... does it still matter?
+		rz = 0 // rz becomes unneeded?
 	  else
 		require rz >= -1 and rz <= 1
 
@@ -132,23 +123,11 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 	|uint| maximum = (1 << maxbits) - 1
 	|int64| LostBytes = 0
 	
-	// So... lib globals? that have indexes set at load time? what do we do with that?
 	if base is GlobalMemory
 		expect (glob)
-		
-		// perhaps... the "dot" function should remove the globalmemory flag?
-		if (glob isnt global) and (glob is property)		// a property on a global struct
-			0 //  
-		  else
-			|| bs = base.fat!
-			LostBytes = glob.ExportPosition
-			|| K = bs.const
-			LostBytes -= K
+		ifn (glob isnt global) and (glob is property)		// not a property on a global struct
+			LostBytes = glob.ExportPosition - base.fat!.const
 			expect LostBytes >= 0
-		
-	if LostBytes & (pow2)~bits
-		#!not good. We'd need to use an addk. but should never happen
-		debugger
 
 	|| i = index 
 	i += (LostBytes >> pow2) 
@@ -156,12 +135,10 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 		index = i
 		return base
 
-													// Unstorable. increase externally				
+													// Too large to inline. increase via addtoreg				
 	i = (index << pow2) + lostbytes
 	index = 0
 	return .AddToReg(exp, base, base as asmreg.noscale, i)
-
-
 
 
 
@@ -182,9 +159,9 @@ function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |sc
 
 function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
 	opt inline
-	if dest is set or FromZeroMemory  // kludge to remove
+	if dest is set					  // kludge to remove
 		(dest is discard)			  // make compiler happy
-	if dest isnt set
+	  else
 		dest = .TempTyped(exp, dest)
 	(dest isnt Const)
 	|| fat = .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index)

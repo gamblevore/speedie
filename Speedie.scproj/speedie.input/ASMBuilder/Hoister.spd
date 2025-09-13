@@ -58,27 +58,6 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	dest = .temptyped(d, dest)
 	|| Glob = .TryGetGlob(D, dest)
 		return Glob
-
-/*
-	Reading of libglobs
-	
-	Lets say... that we have to read a lib glob.
-	
-	That libglob info... MUST be stored... somewhere. About the actual location of it. It can be
-	in a different order. So thats just how it is.
-	
-	We access them, by name. Then... that name gets linked up, to our GTAB... which gets the actual
-	thing. But we need a table of gtabs to libglobs.
-	
-	The "lets store things close to each other" thing doesn't work for libglobs. They might not be!!
-	
-	If we want to do this faster, we'd need a libglob reading instruction, at least for pointers.
-	(not a bad idea).
-	
-	For now...
-	
-	Lets remove the opts around libglob reading.
-*/	
 	
 	|int64| Original = d.ExportPosition
 	check (Original <= 32~bits)				(exp, "Too much global data used: " + original.strsize)

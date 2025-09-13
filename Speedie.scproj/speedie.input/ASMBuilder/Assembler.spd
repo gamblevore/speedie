@@ -36,7 +36,7 @@ struct Assembler
 	|?&FatASM|					InlineEnd
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart_
-	|&FatASM|					Start		// a "slice" feature would be nice    
+	|&FatASM|					Start
 	|&FatASM|					Curr_
 	|&FatASM|					End    
 
@@ -138,17 +138,9 @@ struct Assembler
 	
 	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-		if !src.reg // what?
 		if !dest.reg
 			dest = src
-		src = .AddToReg(exp, src, src, value) 
-		return src
-		
-		// why? that violates the entire design?
-		// why did I add this? It adds extra bflgs!
-		if dest.reg==src.reg
-			return src
-		return .Assign(dest, src, exp)
+		return .AddToReg(exp, src, src, value) 
 
 
 	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
@@ -340,10 +332,12 @@ struct Assembler
 		._Outputs |= 1 << a
 		changed &= 31
 		info.FatIndex = self - sh.funcstart_
-		.info = info
+		if info
+			.info = info
 		if !changed
-			return info		
-		(info is AllowNopDest)
+			return info
+		if info
+			(info is AllowNopDest)
 		return sh.SetRegister(changed, info, self)
 	
 	

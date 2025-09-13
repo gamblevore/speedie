@@ -497,7 +497,7 @@ extend Assembler
 					  else
 						rz = s.prms[0]|int|.asm
 				s.SetOp = asm.jump
-				s.JumpReg = 1
+				s.JumpPrm = 1
 				s.JumpFix(.curr)
 		
 		rz &= ~ASMReg.Exit

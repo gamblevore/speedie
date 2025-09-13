@@ -777,10 +777,10 @@ function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.GSTR (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
+function message.GOBJ (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.GSTR, self)
+	rz = a.RequestOp(asm.GOBJ, self)
 	rz.numinput(1) = Mode
 	rz.numinput(2) = Add
 	rz.dest(0, r1, a)
@@ -977,10 +977,10 @@ function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 }
 
 
-function message.RDWR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Length = nil, |&fatasm|) {
+function message.COPY (|asmreg| r1, |asmreg| r2, |int| Length, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.RDWR, self)
+	rz = a.RequestOp(asm.COPY, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = Length

@@ -519,25 +519,13 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
-	target debug
-		|| d2 = exp.asmdecl
-		if !d.minimatch(d2) // Remove d2. it the same as D.
-		// i think i got something else in the code somewhere thats doing wasteful check.
-		// its in readorwritesub, right?
-
-	if dest isnt set
-		dest = .TempTyped(exp, dest)
-	
 	|| addr = .GlobAddr(d, exp, dest)
-		if !addr.reg
-			debugger
-			.GlobAddr(d, exp, dest)
 		if (dest is AddrRequest) or d.isbarestruct or d.iscarray
 			addr.µtype = d.mu.DataType
 			return addr.HaveAddr
 		
 		dest.µtype = d.mu.DataType
-		dest = dest asnt ASMReg.ContainsAddr
+		(dest isnt ContainsAddr)
 		return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
 
@@ -739,12 +727,7 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 			.fn.TrackReturns(d)
 		return .LocalThg(d)
 
-	|| H = .MegaNumFinder(d.ExportPosition, d.mu.DataType)
-		return H
-
-	// reg0. shouldn't this be part of the meganumfinder?
-	if (d is const) and !d.ExportPosition // reg0
-		return .NumToReg(m, asmreg(), 0, d.mu.DataType)
+	return .MegaNumFinder(d.ExportPosition, d.mu.DataType)
 
 
 function Str (fn_asm)
@@ -752,7 +735,7 @@ function Str (fn_asm)
 	dest = .TempOnly(dest)
 	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
-	return exp.gstr(dest, 0, real.ID) * dest // seems good!
+	return exp.GOBJ(dest, 0, real.ID) * dest // seems good!
 
 
 helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)

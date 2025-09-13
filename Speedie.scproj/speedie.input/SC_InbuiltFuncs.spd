@@ -7,10 +7,7 @@
 
 function scclass.Falsify (|message| ques, |message|)
 	opt norefcounts
-	|| f = .false
-	if !f
-		debugger
-		return nil
+	|| f = .false #debug_require
 	if f.hasany
 		return f.copy
 	ques.func = f.func
@@ -94,20 +91,20 @@ function Message.InBuiltContained (|scdecl| dcl, |message|)
 function Message.InBuiltTypeOf (|scdecl| dcl, |message|)
 	opt norefcounts
 	return @thg + dcl.type.Name
-		
-		
+
 
 
 function Message.InBuiltSizeOf (|scdecl| sulf, |message|)
+	opt norefcounts
 	return NewDeclNum(SCDecl(TypeInt!), sulf.SizeOfQuery)
 
 
 function TypeOfQues (ExprResolver)
 	opt norefcounts
-	|| type
 	|| prm = exp.first
 	if !exp.name
 		prm++
+	|| type
 	if prm
 		// replacing with TypeOfExpr, requires being able to return a "Typeinfo" object
 		// which isn't even a class. like:   x = –sizeof MyStruct

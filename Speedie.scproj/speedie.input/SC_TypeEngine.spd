@@ -778,6 +778,7 @@ function TypeOfAccess (ExprResolver)
 
 
 function TypeOfFuncPointer (|Message| Exp, |SCNode| name_space, |message| side, |SCObject|)
+	opt norefcounts
 	|| ch = exp.unbra
 	if ch == @dot
 		rz = TypeOfDot( ch, name_space, side )

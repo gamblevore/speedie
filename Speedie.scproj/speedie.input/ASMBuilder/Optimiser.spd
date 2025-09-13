@@ -4,7 +4,7 @@ function Assembler.Optimise
 	|| A = .Curr
 	|| S = .FuncStart
 	while A > S
-		if S.JumpReg
+		if S.JumpPrm
 			s.JumpImprove(self)
 		S++
 	

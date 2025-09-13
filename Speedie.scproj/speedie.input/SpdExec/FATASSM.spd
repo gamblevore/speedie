@@ -5,19 +5,19 @@ struct FatASM
 		cpp_part FAT
 		sort_properties true
 	
-	// phi-nodes can actually be done simply by linking one fat to the prev
-	|byte|				InputFats
-	|byte|				InputRegs
-	|byte| 				_Outputs
-	|byte|				_Op
-	|byte|				JumpReg
-	|byte|				BranchID  // could be used to check if a const earlier in the same branch, but a different block
+	// phi-nodes are basically just the prms which have .fatindexes
+	|ASMParam[6]|		Prms
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
-	|ASMParam[6]|		Prms
+	|int16|				µRefCount
 	|uint16| 			BasicBlock
-	|int16|				µRefCount		// could make this a byte and stick at 255.
+	|byte|				BranchID  // could be used to check if a const earlier in the same branch, but a different block
+	|byte|				InputFats
+	|byte|				InputPrms
+	|byte| 				_Outputs
+	|byte|				_Op
+	|byte|				JumpPrm
 	
 
 	function ASMIndex (|uint16|)
@@ -179,16 +179,20 @@ struct FatASM
 		|| reg = .Output.reg$
 		|| b = .BasicBlock
 
+		// maybe better if each fat refers to the prev setter
+		// then we get a linked-list back.
 		
-		|| f = self
-		while
-			f--
-			require f.BasicBlock == b // asmtodo: use blockid
+		
+		|| f = self-1
+		while f.BasicBlock == b // asmtodo: use blockid
 			|| d = f.Output.reg
 			if d == reg
 				return f
+			// Also this todo: if the function returns or exits past some code... it can't affect those regs
+			// or if its in a branch that couldn't have reached us.
 			if f.IsFunc and d < reg
 				return nil // can't go past funcs that wipe stuff!
+			f--
 		
 		
 	function Output (|asmparam|)
@@ -203,18 +207,18 @@ struct FatASM
 
 	
 	function Jump (|int|)
-		|| j = .JumpReg
+		|| j = .JumpPrm
 			return .prms[j-1]
 
 
 	function JumpTo (|&fatasm|)
-		|| j = .JumpReg
+		|| j = .JumpPrm
 			return self + 1 + .prms[j-1]|int|
 	
 	
 	function JumpTo (|&fatasm| value)
 		cpp_Part JumpToSet
-		|| j = .jumpreg
+		|| j = .JumpPrm
 			|| D = (value - self) - 1
 			check (D != -1) (self, "bad jump")
 			.prms[j-1] = D
@@ -254,7 +258,7 @@ struct FatASM
 		
 		|| i = input.FatIndex
 		.prms[a] = input.Prm
-		.InputRegs |= 1<<a
+		.InputPrms |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
 			if src < self
@@ -271,7 +275,7 @@ struct FatASM
 
 	function JumpInput (|int| a, assigns:|int| v)
 		.prms[a] = v
-		.JumpReg = a + 1
+		.JumpPrm = a + 1
 		.µRefCount = 1 max .µRefCount // control flow is always used?
 		Assembler.sh.NextBasicBlock
 		
@@ -384,11 +388,10 @@ struct FatASM
 			.RendaMsg(fs, n)
 	
 
-	function ConditionDoesAnything (|int| Vdecl, |bool|)
+	function ConditionDoesAnything (|bool|)
 		// to help remove branches!
 		for o.RegOutputs in self
 			|| r = o.Reg
-			if r > 0 and r <= Vdecl
 				return true
 		
 		expect (!.IsFinisher) ("You can't return in the middle of a condition!")
@@ -474,7 +477,7 @@ struct FatASM
 			.prms[2] xor= 1
 		  else
 			._op = m xor 1
-		|| j = .jumpreg - 1
+		|| j = .JumpPrm - 1
 		.prms[j] += mid.Jump
 		sh.nop(mid)
 		return true
@@ -524,7 +527,7 @@ struct FatASM
 
 
 	iterator RegInputs
-		|| ir = .InputRegs
+		|| ir = .InputPrms
 		|| i = 0
 		while (i < –count .prms)
 			ifn ir & (1 << i)
