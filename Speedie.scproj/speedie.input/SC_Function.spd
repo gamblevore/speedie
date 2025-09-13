@@ -941,10 +941,11 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 	opt norefcounts
 	|| cls = .cls$
 	|| oof = .ConstructorLinePlace$
-	using (oof)
 	
 	for (d.backwards in cls.Properties)
 		if d isnt PropertyWasConstructed
+			|| src = d.source ?? oof
+			using src
 			|| Made = .NewDefaultRel( oof, d )
 			root.InsertAfter( made, AfterHere )
 		  else

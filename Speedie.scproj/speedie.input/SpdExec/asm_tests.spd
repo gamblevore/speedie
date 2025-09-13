@@ -1,7 +1,6 @@
 
 
 
-
 module ASMExamples {
 target pack { 
 |int| Glob

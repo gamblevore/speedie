@@ -289,21 +289,20 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 		return reff.haveaddr	
 	
 	if dr == d.WholeType.reg
-		if !dr // how?
 /		return dest
 
 	if !dr
-		if dest is set // what?
 		dest.µType = Reff.µType
-		dest = .TempOnly(dest)
 	
 	if dest isnt set
+		dest = .TempOnly(dest)
 		if dest is ContainsAddr // how?
 		// dest = reff --> dest = *reff
 		return .Read(dest, exp, Reff, nil, nil) * dest
 
 	// reff = dest --> *reff = dest
-/	return .write(Reff, exp, dest, nil, nil) * dest
+	(dest is discard)
+	return .write(Reff, exp, dest, nil, nil) * dest
 
 
 
@@ -495,7 +494,6 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if d is local
 		if dest is ConstRequest
 			return nil
-		
 		if d is reference
 			return ThgReference(self, exp, dest, d)
 			
@@ -503,19 +501,19 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return .LocalThg(d)
 			
 		|| T = .LocalThg(d)
-		if d.IsBareStruct					// it already has the address
+		if d.IsBareStruct or d.iscarray					// it already has the address 
 			return T.haveaddr
 		return GrabAddr(self, exp, dest, d, T)
 	
-	if d is global
-		if d is classobj
-			(dest is AddrNeed)
-			
-		if (dest is ConstRequest)
-			return nil
-		return DoGlobal(self, dest, exp, d)
+	if d isnt global
+		return ConstFromThgName(self, exp, dest, d)
+
+	if d is classobj
+		(dest is AddrNeed)
+	if (dest is ConstRequest)
+		return nil
+	return DoGlobal(self, dest, exp, d)
 		
-	return ConstFromThgName(self, exp, dest, d)
 
 
 
@@ -715,7 +713,7 @@ function message.ASMUnbra (|message|)
 
 
 
-function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
+function ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 
 	m = m.ASMUnbra
@@ -725,9 +723,7 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	
 	|| d = m.ASMDecl
 	if fn == @thg
-		require d is local
-		if mode is Return
-			.fn.TrackReturns(d)
+		require d is local and d isnt Reference
 		return .LocalThg(d)
 
 	return .MegaNumFinder(d.ExportPosition, d.mu.DataType)
@@ -785,23 +781,17 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 
 function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
 	opt norefcounts
-	// debugat 6335
 	|| T = d.WholeType
 
 	(t is param) = d is param
 	(t is BlockMostlySafe) = d isnt AlteredInBranch
 	(t is BlockSafe) = d isnt AlteredBranchLike
 	|| f = .Register(t.reg)
-	// .iscurr isnt as reliable as I hoped
-	// || x = 1, if y {y++}, // now x isn't in the same branch! is it a const or not?
 
 	// consts must have fats! both in and out. unless r0.
-	if f
-		if (.iscurr(f) or (t is BlockSafe))
-			t.FatIndex = f.index
-			(T is Const) = (f is Const)
-	  elseif d is const
-		if t.reg // bad
+	if f and (.iscurr(f) or (t is BlockSafe))
+		t.FatIndex = f.index
+		(T is Const) = (f is Const)
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
