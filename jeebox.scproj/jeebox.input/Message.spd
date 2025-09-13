@@ -669,6 +669,7 @@ Message is also:
 	
 	render RenderAST (|int| flags=1)
 		opt norefcounts
+//		use @msg instead?
 		if (self == @arg) and (.isroot)
 			for ch.fast in self
 				ch.jdb2_(flags, fs)
