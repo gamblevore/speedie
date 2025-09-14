@@ -291,8 +291,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 	if dr == d.WholeType.reg
 /		return dest
 
-	if !dr
-		dest.µType = Reff.µType
+	dest.µType = Reff.µType
 	
 	if dest isnt set
 		dest = .TempOnly(dest)
@@ -302,7 +301,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 
 	// reff = dest --> *reff = dest
 	(dest is discard)
-	return .write(Reff, exp, dest, nil, nil) * dest
+	return .write(dest, exp, reff, nil, nil) * dest
 
 
 
