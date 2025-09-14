@@ -46,6 +46,7 @@ extend_module Error
 		visible // for lib
 		|| str = "Numeric overflow parsing number" 
 		if !Overflow
-			Str = "Can’t parse number. Found: " + num[pos].render
+			Str = "Can’t parse number. Found: '" + num[pos].render + "' in: " + num.Preview(32)
 		nil|errorreceiver| <~ error(where, str)
+
 
