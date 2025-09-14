@@ -48,7 +48,7 @@ function message.BecomeAppend (|string| s)
 		if b == @msg
 			b.MsgFix // «
 	if n == @list // fs <~ (' ', 1)
-		.replacewith(n)
+		.ReplaceWith(n)
 		n.func = @prm
 	  else
 		.last = n
@@ -63,8 +63,6 @@ function message.MsgFix (|message| parent=nil, |message!|) // «
 	.func = @list
 	.first = @name + .name
 	.name = ""
-
-//	.SyntaxSendTo( ((@prm, <(`:)`)>).SyntaxSendTo(@num, <(`4`)>)) )
 
 	while n
 		|| n2 = n.next
@@ -205,7 +203,7 @@ function message.MainArgsCanBeZero (|bool|)
 		
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
-	|| usage = "Usage: \$app " + .Render
+	|| usage = "Usage: \$app " + prms.Render
 	|| FirstArg = `
 
 if !app.usage

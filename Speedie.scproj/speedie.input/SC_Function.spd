@@ -1988,7 +1988,7 @@ function message.MainFix (|message|)
 		inc_arg = self[@arg]
 
 	if inc_arg
-		if fn == @prm
+		if (fn == @prm) and prms.HasAny
 			src_arg.InsertMainArgs(prms)
 
 		fn_src <~ inc_arg
