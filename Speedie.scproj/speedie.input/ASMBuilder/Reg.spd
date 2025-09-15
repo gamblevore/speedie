@@ -148,8 +148,8 @@ datatype ASMReg (uint64)
 	operator iz (|asmreg| M, |bool|)
 		return .reg == M.reg
 
-//	operator iz (|int| M, |bool|)
-//		return .reg == M
+	operator iz (|int| M, |bool|)
+		return .reg == M
 
 	function FourBytes (|bool|)
 		opt inline

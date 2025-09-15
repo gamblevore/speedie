@@ -29,6 +29,7 @@ function If (fn_asm)
 	.state.BranchDepth--
 
 	.branchID = Old
+  
 
 
 function IfSub (fn_asm)
@@ -36,23 +37,20 @@ function IfSub (fn_asm)
 
 	|| cond = exp.first!,  || arg1 = cond.next!
 	|| Other = arg1.next
-//	|| IfStart = .curr
 	
 	|FATRange| B
 	.Branch(cond, B)
 	if b.Never
-		return .ElseSub(other)							// if k0 {b()} else {return}
+		return .ElseSub(other)								// if k0 {b()} else {return}
 	if b.Always
-		return ASMType.Argument(self, arg1)				// if k1: return 
+		return ASMType.Argument(self, arg1)					// if k1: return 
 
-//	|| ArgStart = .curr
 	|| Arg1Return = ASMType.Argument(self, arg1)
-	if !other.HasAsmStuff								// if (x): func()
+	if !other.HasAsmStuff									// if (x): func()
 		.BranchToCurr(b)
 		.NextBasicBlock
 		return asmreg()
-		
-	if .curr.op != asm.eror
+	
 	|| AfterFirst = other.jump // basicblock ++
 	.BranchToCurr(b)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
@@ -428,7 +426,6 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		first.fatindex = fake.index
 		return first.boolanswer						// only way around this. Cos we got asm-reg(0)
 
-	
 	|fatrange| Br2
 	|| second = .Branch(B, Br2, dest is negate)
 	.BranchToCurr(OrTest)

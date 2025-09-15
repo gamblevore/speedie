@@ -86,7 +86,7 @@ function Swap (fn_asm)
 	expect (A.reg and B.reg) (Exp, "Can only swap registers")
 
 	|| tmp = .TempOnly(A)
-	.assign(exp, tmp, A)
+/	.assign(exp, tmp, A)
 	.assign(exp, A, B)
 	.assign(exp, B, tmp)
 	return asmreg()

@@ -25,18 +25,13 @@ function Grab
 	.grab2(b)
 
 
-function Munt (|uint| x, |uint| y)
-	|| Max = y	
-	if x > Max
-		Max = x
-	if x >= y
-		Max = x
-	
-	|| Min = y	
-	if x < Min
-		Min = x
-	if x <= Max
-		Min = x
+function Munt (|uint| Y, |uint| X)
+	if x > y		// y = max(y,x)
+		y = x
+	if x >= y		// y = max(y,x)
+		y = x
+	if y >= x		// y = min(y,x)
+		y = x
 
 
 function Clamp (|int| x, |int| y, |int| z)
