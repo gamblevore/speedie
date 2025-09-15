@@ -84,9 +84,9 @@ function Swap (fn_asm)
 	|| A = .existingvar(prms.first!)
 	|| B = .existingvar(prms.second!)
 	expect (A.reg and B.reg) (Exp, "Can only swap registers")
-
-	|| tmp = .TempOnly(A)
-/	.assign(exp, tmp, A)
+	
+	|| tmp = .DeclareMe(exp, A)
+	tmp = .assign(exp, tmp, A)
 	.assign(exp, A, B)
 	.assign(exp, B, tmp)
 	return asmreg()
@@ -767,8 +767,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 				ml = .VectorUpgrade(ml, exp)
 	
 	if dest is Discard
-/		return dest // returning from inline, into func that discards result.
-					// maybe better that the arg itself softnops stuff? again... do later!
+		return dest // returning from inline, into func that discards result.
 	
 	dest = .TempTyped(exp, dest)
 	(dest is Const) = (ml&mr is Const)

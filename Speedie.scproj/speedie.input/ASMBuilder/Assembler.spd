@@ -213,13 +213,13 @@ struct Assembler
 		|| r = .VTemps
 		target debug: if r&1: r&=~1 // how?
 		
-		
 		|| Free = (~r).Log2		// Find lowest free bit.
 		r |= 1<<Free
 		t.reg = Free
 		.VTemps = r
 		(t isnt Const) // why would it be?
 		(t is temp)
+		t.fatindex = 0
 		check (!(.vdecls & .VTemps)) (.fn.sourcearg, "No free local variables.")	// entirely full
 		return t
 	

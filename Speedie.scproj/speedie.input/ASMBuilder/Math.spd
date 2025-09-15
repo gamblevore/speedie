@@ -794,12 +794,6 @@ extend Assembler
 				
 		(dest isnt Const)
 		return exp.BFLG(dest, src, sh, sh, src.signed|int|) * Dest
-
-
-//	function NopMinusOne (|asmreg| r, |bool|)
-//		if r.IsConst(-1)
-//			.nopconst(r)
-//			return true
 	
 	
 function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
