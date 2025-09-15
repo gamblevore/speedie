@@ -1,7 +1,7 @@
 
 
 
-Prerelease:
+Pre-release:
 	* selectors seem broken. just remove them. Sigh. (language2.scproj)
 	* remove game3d stuff (in compiler)
 
