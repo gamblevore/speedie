@@ -446,14 +446,6 @@ POS 5
 		else
 			i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 
-/**/ CLAMI (Compare4)
-		i1 = std_min(std_max(btc(i2), btc(i3)), btc(i4))
-/*			min(y,H) --> clamp(y, y, H)
-			max(y,L) --> clamp(y, L, L)			*/
-/**/ CLAMU (Compare4)
-		u1 = std_min(std_max(btc(u2), btc(u3)), btc(u4))
-
-
 
 #!					((((((((32-bit math))))))))
 // Need signed/unsigned versions...        0xFFFFffff != -1|int64|

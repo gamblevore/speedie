@@ -69,10 +69,6 @@
 	else
 	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
-ı CLAMI: _
-	i1 = std_min(std_max(btc(i2), btc(i3)), btc(i4));
-ı CLAMU: _
-	u1 = std_min(std_max(btc(u2), btc(u3)), btc(u4));
 ı ADDM: _
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
 ı SUBM: _
