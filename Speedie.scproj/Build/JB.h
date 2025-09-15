@@ -2746,6 +2746,8 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kSC__FunctionType_TypeTest ((FunctionType)32)
 
+#define kSC__FunctionType_UsedByASM ((FunctionType)268435456)
+
 #define kSC__FunctionType_VirtualCaller ((FunctionType)512)
 
 #define kSC__FunctionType_Wrapper ((FunctionType)131072)
@@ -5470,7 +5472,7 @@ ASMReg SC_Reg_OperatorBitand(ASMReg Self, ASMReg A);
 
 bool SC_Reg_OperatorIsa(ASMReg Self, uint /*DataTypeCode*/ M);
 
-bool SC_Reg_OperatorIz(ASMReg Self, ASMReg M);
+bool SC_Reg_OperatorIzWithReg(ASMReg Self, ASMReg M);
 
 ASMReg SC_Reg_OperatorMul(ASMReg Self, bool B);
 
@@ -5951,8 +5953,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // VarUseMode
-bool SC_VarUseMode_SyntaxIs(VarUseMode Self, VarUseMode V);
-
 
 
 // jbinLeaver
@@ -6910,7 +6910,11 @@ ASMReg SC_Pac_AskForInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFuncti
 
 void SC_Pac_AskNop(Assembler* Self, FatASM* ToNop);
 
+void SC_Pac_AskNopTemp(Assembler* Self, ASMReg R);
+
 ASMReg SC_Pac_ASMBoolMaker(Assembler* Self, Message* Exp, ASMReg Dest, OpMode Opp);
+
+void SC_Pac_ASMReach(Assembler* Self, SCFunction* Fn);
 
 ASMReg SC_Pac_Assign(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src);
 
@@ -6962,7 +6966,7 @@ void SC_Pac_CapASM(Assembler* Self);
 
 bool SC_Pac_ClearAllStructs(Assembler* Self, Message* Exp);
 
-void SC_Pac_ClearGRABbedAndTrampled(Assembler* Self, Message* Exp, ASMReg Dest, FatASM* Start);
+void SC_Pac_ClearGRABbedAndTrampled(Assembler* Self, Message* Prms, ASMReg Dest, FatASM* Start);
 
 bool SC_Pac_ClearStruct(Assembler* Self, Message* Exp, FatASM* Fat, int V);
 
@@ -7024,11 +7028,13 @@ ASMReg SC_Pac_EqualsInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, AS
 
 ASMReg SC_Pac_EqualsSame(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M, VarUseMode Mode);
+ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M);
 
 ASMReg SC_Pac_Exit(Assembler* Self, Message* Exp, ASMReg Dest);
 
 void SC_Pac_FinishASM(Assembler* Self);
+
+ASMReg SC_Pac_FinishSingleIf(Assembler* Self, FatRange* B);
 
 ASMReg SC_Pac_FloatMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -7115,6 +7121,8 @@ ASMReg SC_Pac_MegaNumFinder(Assembler* Self, int64 V, uint /*DataTypeCode*/ Type
 ASMReg SC_Pac_MemOffsetFix(Assembler* Self, ASMReg Base, int Pow2, int& Index, uint MaxBits, SCDecl* Glob, Message* Exp);
 
 int SC_Pac_MemOpt(Assembler* Self, ASMReg& Base, int& Index, int Bytes);
+
+ASMReg SC_Pac_MiniClampOpt(Assembler* Self, Message* Exp, FatASM* Jmpi);
 
 ASMReg SC_Pac_Minus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -9654,8 +9662,6 @@ Message* SC_Msg_CollectionPlace(Message* Self);
 
 bool SC_Msg_CollectOneParam(Message* Self, SCFunction* Func, SCNode* Recv, SCClass* Cls);
 
-JB_String* SC_Msg_CollectUsage(Message* Self);
-
 Message* JB_Msg_ConfArg(Message* Self);
 
 void SC_Msg_ConfTake(Message* Self, Message* Dest, JB_String* Name);
@@ -11340,8 +11346,6 @@ void SC_Func_SyntaxIsSet(SCFunction* Self, FunctionType K, bool Value);
 
 ivec4* SC_Func_TestObesity(SCFunction* Self);
 
-void SC_Func_TrackReturns(SCFunction* Self, SCDecl* D);
-
 void SC_Func_Transform(SCFunction* Self);
 
 void SC_Func_TranStrings(SCFunction* Self);
@@ -12103,7 +12107,7 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc))) {
-		JB_Msg_Fail(Self, JB_LUB[894]);
+		JB_Msg_Fail(Self, JB_LUB[895]);
 	}
 }
 
