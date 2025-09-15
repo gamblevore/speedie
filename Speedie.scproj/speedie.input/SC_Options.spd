@@ -120,8 +120,7 @@ module Feedback
 				|fatasm| X
 				X.DebugPrint
 		if 0
-			m.DUMI
-			m.FEAT
+			m.DUMB, m.FEET // for when you can't dance
 		
 	
 	

@@ -311,7 +311,7 @@ function LinkagePlace (|message|)
 	return Link[@arg] ?? Place
 
 
-function message.Cpp_Wrapper (|string|)
+function message.WrapperCpp (|string|)
 	opt norefcounts
 	if self
 		if self == @bra
@@ -425,7 +425,7 @@ function LoadExportName
 	if self isa SCFunction
 		.IsCppInBuilt ?= (cw == @bra)|int|
 		(self is cpp) = cw
-		|| CppWrapper = cw.cpp_Wrapper
+		|| CppWrapper = cw.WrapperCpp
 			.MakeParamsReal
 		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and (self isnt disabled)
 

@@ -247,4 +247,9 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |f
 		.DrawSoftCircle(Circle, C)
 
 
+function float.SPow2 (|float|)
+	return (self*self).CopySign(self)
+
+
 // copy your favourite arkanoid examples. (any on sega megadrive?)
+

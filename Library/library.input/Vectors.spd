@@ -62,7 +62,7 @@ datatype vec4
 		return v.x+v.y+v.z
 	
 	operator absmax (|vec4| M, |vec4|)
-		return (.x absmax m.x, .y absmax m.y, .z absmax m.z, .w absmax m.w)
+		return (.x longer m.x, .y longer m.y, .z longer m.z, .w longer m.w)
 
 	operator max (|vec4| M, |vec4|)
 		return (.x max m.x, .y max m.y, .z max m.z, .w max m.w)

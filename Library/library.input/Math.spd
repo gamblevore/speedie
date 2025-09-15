@@ -18,7 +18,7 @@ module Math
 	function Cos (|float| f, |float|)
 		return .cospi(f*2.0)
 		
-	function ACosBad (|float| f, |float|)
+	helper ACosBad (|float| f, |float|)
 		cpp_wrapper (acosf)
 	
 	function Tan (|float| f, |float|)
@@ -107,11 +107,18 @@ module Math
 
 	function int.Clamp (|int| low, |int| high, |int|)
 		cpp_part ClampRange
-		|| result = low max self
-		return high min result
+		if self < low
+			self = low
+		  elseif self > high
+			self = high
+		return self
 
 	function int.Clamp (|int| high, |int|)
-		return high min (self max 0)
+		if self < 0
+			self = 0
+		  elseif self > high
+			self = high
+		return self
 
 	function int.SetSign (|bool| IsNeg, |int|)
 		// bool.dir is beter
@@ -277,9 +284,6 @@ extend float
 	function Pow2 (|float|)
 		return self*self
 
-	function SPow2 (|float|)
-		return (self*self).CopySign(self)
-
 	function Pow3 (|float|)
 		return self*self*self
 
@@ -341,14 +345,15 @@ function int.Towards (|int| Dest, |int| N, |int|)
 	return self
 
 	
-function float.Mul (|float| by, |bool| Cond, |float|)
-	if cond
-		return self * by
-	return self
-
-
-function float.Plus (|bool|b, |float| add=1.0, |float|)
-	if b
-		return self + add
-	return self
-
+//function float.Mul (|float| by, |bool| Cond, |float|)
+//	if cond
+//		return self * by
+//	return self
+//
+//
+//function float.Plus (|bool|b, |float| add=1.0, |float|)
+//	if b
+//		return self + add
+//	return self
+//
+//

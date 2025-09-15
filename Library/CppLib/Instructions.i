@@ -33,13 +33,13 @@
 	i1 = FuncAddr(vm, Op);
 ı ALLO: _
 	AllocStack(vm, r, Op);
-ı DUMI: _
+ı DUMB: _
 	0;
 ı RARE: _
 	Rare_(r, Op);
 ı CONV: _
 	RegConv(r, Op);
-ı FEAT: _
+ı FEET: _
 	u1 = 0;
 ı KNSR: _
 	RotateConst(r, Op);
@@ -69,9 +69,9 @@
 	else
 	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
-ı CLAMI: _
+ı CLMI: _
 	i1 = std_clamp(btc(i2), btc(i3), btc(i4));
-ı CLAMU: _
+ı CLMU: _
 	u1 = std_clamp(btc(u2), btc(u3), btc(u4));
 ı ADDM: _
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
@@ -222,6 +222,16 @@
 	IncrementAddr(r, Op, 0);
 ı COPY: _
 	MemCopyRDWR(r, Op);
+ı FOP1: _
+	0;
+ı FOP2: _
+	0;
+ı FOP3: _
+	0;
+ı IOP1: _
+	0;
+ı IOP2: _
+	0;
 ı FADD: _
 	if (Float_Du)
 	d1 = d2 + d3 - d4
@@ -285,7 +295,7 @@
 ı VFRC: _
 	v1 = (v2 - VFloor(v2)) * v3;
 ı VCLM: _
-	v1 = VMin(VMax(v2, v3), v4);
+	v1 = std_clamp(v2, v3, v4);
 ı QADD: _
 	iv1 = iv2 + (iv3 << Shift_Shu);
 ı QSUB: _
@@ -295,7 +305,7 @@
 ı QDIV: _
 	iv1 = iv2 / iv3;
 ı QCLM: _
-	iv1 = QMin(QMax(iv2, iv3), iv4);
+	iv1 = std_clamp(iv2, iv3, iv4);
 ı QADK: _
 	iv1 = iv2 + U2_Li;
 ı QFLG: _

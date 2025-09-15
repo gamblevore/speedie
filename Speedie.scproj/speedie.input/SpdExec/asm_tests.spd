@@ -27,7 +27,7 @@ function Grab
 
 
 function grab2 (|$byte| b, |int|)
-//	|| x = b++
+	|| x = b++
 	b = b / 4
 	return b + b
 
@@ -42,29 +42,32 @@ function Munt (|uint| Y, |uint| X)
 	if y >= x		// y = min(x,y)
 		y = x
 
-function Clamp (|int| x, |int| y, |int| z, |uint64| u1, |uint64| u2, |uint64| u3)
-	|| C = y
-	if C < x
-		C = x
-	if C < x
-		x = C
-	if C > y
-		C = y
-	
+
+function ForTest (|int| x)
+// if a var is altered in a loop, and were in a loop
+// don't rely on it to access as a knownvalue.
+// seems to just work?
+
+	|| y = 0
+	|| v = 0
+	for i in 10
+		if v == 0
+			x++
+
+		v = 5
+		if i == 7
+			x <<= 1
+		if v == 5
+			x--
+		y++
+			
+		
+		
+function Clamp (|uint64| u1, |uint64| u2)
 	if u2 > u1
 		u1 = u2
-	if C < x
-		C = x
-	if C|uint| > y|uint|
-		C = y
-
-function Mint (|int| x, |int| y)
-	|| Max = y	
-	if x > y
-		Max = x
-	|| Min = y	
-	if x < y
-		Min = x
+	if u2 >= u1
+		u2 = u1
 
 
 class LargeClass2 {

@@ -479,7 +479,7 @@ datatype float
 	function CosR (|float|)
 		return (self * math.iTau).cos
 
-	function Length (|float|) // for consistancy
+	function Length (|float|) // for consistancy with length of vectors
 		return .abs
 
 	function Abs (|float|)
@@ -550,8 +550,8 @@ datatype float
 	operator max (|float| other, |float|)
 		cpp_wrapper (fmaxf)
 
-	operator absmax (|float| other, |float|)
-		if .abs > other.abs
+	operator longer (|float| other, |float|)
+		if .length > other.length
 			return self
 		return other
 

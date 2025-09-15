@@ -140,10 +140,10 @@ function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 }
 
 
-function message.DUMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
+function message.DUMB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.DUMI, self)
+	rz = a.RequestOp(asm.DUMB, self)
 	rz.reginput(1) = r2
 	rz.dest(0, r1, a)
 }
@@ -168,10 +168,10 @@ function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |
 }
 
 
-function message.FEAT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.FEET (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.FEAT, self)
+	rz = a.RequestOp(asm.FEET, self)
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
 	rz.dest(0, r1, a)
@@ -295,10 +295,10 @@ function message.DIV2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Sh = nil, |in
 }
 
 
-function message.CLAMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
+function message.CLMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.CLAMI, self)
+	rz = a.RequestOp(asm.CLMI, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
@@ -307,10 +307,10 @@ function message.CLAMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil,
 }
 
 
-function message.CLAMU (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
+function message.CLMU (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.CLAMU, self)
+	rz = a.RequestOp(asm.CLMU, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
@@ -984,6 +984,61 @@ function message.COPY (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Length = nil,
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = Length
+}
+
+
+function message.FOP1 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FOP1, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+	rz.dest(0, r1, a)
+}
+
+
+function message.FOP2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FOP2, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+	rz.dest(0, r1, a)
+}
+
+
+function message.FOP3 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FOP3, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+	rz.dest(0, r1, a)
+}
+
+
+function message.IOP1 (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.IOP1, self)
+	rz.reginput(1) = r2
+	rz.dest(0, r1, a)
+}
+
+
+function message.IOP2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.IOP2, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.dest(0, r1, a)
 }
 
 

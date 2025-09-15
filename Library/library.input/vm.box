@@ -379,11 +379,8 @@ AFNC (FuncAddr)
 
 #!						 (((((Utils)))))
 
-/**/ DUMI (U2)
+/**/ DUMB (U2)
 		0 // Can be added or removed... just to align the jumps really!
-///**/ PRNT (U1)
-//		printf("%lli\n", i1)
-//		#!better to print this also as float/double/signed/unsigned...
 /**/ RARE (U2)
 		Rare_(r, Op)
 /**/ CONV (Convert)
@@ -393,7 +390,7 @@ AFNC (FuncAddr)
 					//					int64  from int64  --> F64Reg = int64
 					// floats or other size ints shouldn't be affected.
 
-/**/ FEAT (AddK)	// Request available features. do nothing for now
+/**/ FEET (AddK)	// Request available features. do nothing for now
 		u1 = 0		// allows doing stuff like initing hardware.
 
 
@@ -407,9 +404,7 @@ AFNC (FuncAddr)
 
 POS 4
 	KNST2 (ConstStretchy)
-		LoadConst(r, Op, *Code++)   // would be better to do:   ((uint64)(*Code++) << 17) >> 17
-									// thats 49 bits at least!
-									// LoadConst(r, Op, ConstStretchy_Valueu) --> LoadConst(r, Op, 0)
+		LoadConst(r, Op, *Code++)
 POS 5
 	KNST3 (ConstStretchy)			// this would lose 17 bits? but they are already lost...
 									// more like 17 bits become spare and more easy to reuse.
@@ -439,21 +434,19 @@ POS 5
 /**/ DIV (Div)
 		DivMath(r, Op)
 /**/ DIV2 (Div2)
-	// we could remove clearu?
-	// numbers are now... bituncorrect?
 		if (i2 < 0)	// quick divide by power of 2 on a signed int
 			i1 = (((i2+((1<<Div2_Shu)-1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 		else
 			i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 
-/**/ CLAMI (Compare4)
+/**/ CLMI (Compare4)
 		i1 = std_clamp(btc(i2), btc(i3), btc(i4))
-/**/ CLAMU (Compare4)
+/**/ CLMU (Compare4)
 		u1 = std_clamp(btc(u2), btc(u3), btc(u4))
 
 
 #!					((((((((32-bit math))))))))
-// Need signed/unsigned versions...        0xFFFFffff != -1|int64|
+// Need signed/unsigned versions?        0xFFFFffff != -1|int64|
 /**/ ADDM (AddOrSubM) // mixed math
 		i1 = i2 + (ii3 << AddOrSubM_Shu)
 /**/ SUBM (AddOrSubM)
@@ -645,6 +638,32 @@ POS 5
 
 
 
+#!						(((((Intrinsics!)))))
+
+// how to do instrinsics?
+// shouldn't these all go into the same thing?
+/**/ FOP1  (Float)
+		0
+/**/ FOP2  (Float)
+		0
+/**/ FOP3  (Float)
+		0
+/**/ IOP1  (u2)
+		0
+/**/ IOP2  (u3)
+		0
+//	function IsInf (|bool|) // these need... to be warned about if hit in ASM and we don't have an intrinsic available
+//		cpp_wrapper (__isinff)
+
+// FuncLinkageTable and funcprereader could be where we put our stuff
+//	function Length (|int|)
+//		cpp_wrapper JB_Str_Length
+//			if self
+//				return self|&int|[1]
+
+
+
+
 #!						(((((Float)))))
 
 /**/ FADD  (Float)
@@ -716,7 +735,7 @@ POS 5
 /**/ VFRC  (Float)
 		v1 = (v2 - VFloor(v2)) * v3
 /**/ VCLM (Float)
-		v1 = VMin(VMax(v2,v3),v4)
+		v1 = std_clamp(v2,v3,v4)
 
 
 
@@ -730,7 +749,7 @@ POS 5
 /**/ QDIV (Div)
 		iv1 = iv2 / iv3
 /**/ QCLM (U4)
-		iv1 = QMin(QMax(iv2,iv3),iv4)
+		iv1 = std_clamp(iv2,iv3,iv4)
 /**/ QADK (AddK)
 		iv1 = iv2 + U2_Li
 
