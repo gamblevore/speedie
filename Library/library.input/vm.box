@@ -446,6 +446,11 @@ POS 5
 		else
 			i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 
+/**/ CLAMI (Compare4)
+		i1 = std_clamp(btc(i2), btc(i3), btc(i4))
+/**/ CLAMU (Compare4)
+		u1 = std_clamp(btc(u2), btc(u3), btc(u4))
+
 
 #!					((((((((32-bit math))))))))
 // Need signed/unsigned versions...        0xFFFFffff != -1|int64|
@@ -675,9 +680,9 @@ POS 5
 
 /**/ FCLM (Float)
 		if (Float_Du)
-			d1 = std_min(std_max(d2,d3),d4)
+			d1 = std_clamp(d2,d3,d4)
 		else
-			f1 = std_min(std_max(f2,f3),f4)
+			f1 = std_clamp(f2,f3,f4)
 
 
 

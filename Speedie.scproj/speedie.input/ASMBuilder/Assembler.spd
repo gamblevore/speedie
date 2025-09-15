@@ -224,11 +224,18 @@ struct Assembler
 		return t
 	
 	
+	function AskNopTemp (|asmreg| R)
+		if R is temp
+			|| f = r.fat
+				return .AskNop(f)
+	
+
 	function NopReg (|asmreg| R)
 		|| f = r.fat
 			return .Nop(f)
-		if r.reg and r isnt param
-			debugat // we don't know what made it, but we should!!
+		target debug
+			if r.reg and r isnt param
+				debugat // we don't know what made it, but we should!!
 	
 	
 	function Nop2Consts (|asmreg| A, |asmreg| B)
@@ -249,11 +256,13 @@ struct Assembler
 				.NopConst(R)
 				return k|uint64|.trim(bits)
 	
+	
 	function NopConst (|asmreg| R, |int64| K, |bool|)
 		if r.Const == K
 			.NopConst(R)
 			return true
-		
+	
+	
 	function NopConst (|asmreg| R)
 		require r.reg
 		target debug: if r isnt Const //hah
@@ -264,12 +273,12 @@ struct Assembler
 	
 	function Nop (|FATASM| ToNop)
 		opt inline
-		return .nopsub(ToNop, false, 0)
+		return .NopSub(ToNop, false, 0)
 	
 	
 	function SoftNop (|FATASM| Fat)
 		opt inline
-		return .nopsub(fat, true, 0)
+		return .NopSub(fat, true, 0)
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
@@ -659,7 +668,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
 		|| max = fn.MaxASM
-			check (fn.µlength <= max) (fn.sourcearg, "ASM too large")
+			check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
 		target debug
 			fn.µprint(++CountASMFuncPrint)
 		return true

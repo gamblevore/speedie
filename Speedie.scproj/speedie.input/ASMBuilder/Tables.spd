@@ -81,14 +81,17 @@ function Debugger (fn_asm)
 function Swap (fn_asm)
 	opt norefcounts
 	|| prms = exp.last
-	|| A = .existingvar(prms.first!)
-	|| B = .existingvar(prms.second!)
+	|| A = .ExistingVar(prms.first!)
+	|| B = .ExistingVar(prms.second!)
 	expect (A.reg and B.reg) (Exp, "Can only swap registers")
 	
-	|| tmp = .DeclareMe(exp, A)
-	tmp = .assign(exp, tmp, A)
+	|| T = .DeclareMe(exp, A)
+	T = .assign(exp, T, A)
 	.assign(exp, A, B)
-	.assign(exp, B, tmp)
+	.assign(exp, B, T)
+	|| f = T.fat
+	if f and f.µrefcount <= 0
+		.SoftNop(F)
 	return asmreg()
 
 
@@ -130,7 +133,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 			if ret is Const != fnout is Const // sigh.
 			ret.reg = fnout
 			ret_ = ret
-			.softnop(l)
+			.SoftNop(l)
 			l = fn
 			rr = ret.reg
 	
@@ -751,7 +754,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	|| mr = ASMReg()
 	|| First = exp.first!
 	|| dest = mode
-	target debug: || trap = ++asmtrapper, if trap == 0
+	target debug: || trap = ++ASMTrapper, if trap == 0
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else
@@ -767,6 +770,8 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 				ml = .VectorUpgrade(ml, exp)
 	
 	if dest is Discard
+		.AskNopTemp(ml)
+		.AskNopTemp(mr)
 		return dest // returning from inline, into func that discards result.
 	
 	dest = .TempTyped(exp, dest)
@@ -816,10 +821,10 @@ function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
 
 
 
-function SCFunction.TrackReturns (|scdecl| D)
-/	if d isnt VarThatGotReturned // remove function?
-		.ReturnedVars++
-		(d is VarThatGotReturned)	
+//function SCFunction.TrackReturns (|scdecl| D)
+///	if d isnt VarThatGotReturned // remove function?
+//		.ReturnedVars++
+//		(d is VarThatGotReturned)	
 
 
 function message.HasAsmStuff (|bool|)
@@ -884,3 +889,4 @@ function Message.TypeCastDoesNothing (|bool|)
 	require  Output.IsFloat  == Input.isfloat			// Floatness
 	if (Output is bool) == (Input is bool)				// Boolness
 		return Input.ByteCount == Output.ByteCount
+

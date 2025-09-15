@@ -47,14 +47,14 @@ function IfSub (fn_asm)
 
 	|| Arg1Return = ASMType.Argument(self, arg1)
 	if !other.HasAsmStuff									// if (x): func()
-		.BranchToCurr(b)
-		.NextBasicBlock
-		return asmreg()
+		|| Clamped = .MiniClampOpt(exp, b.start)
+			return Clamped
+		return .FinishSingleIf(b)
 	
 	|| AfterFirst = other.jump // basicblock ++
 	.BranchToCurr(b)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
-	AfterFirst.jumpto(.curr)
+	AfterFirst.JumpTo(.curr)
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -454,7 +454,48 @@ function NextBasicBlock
 
 	// shouldn't the BranchID shift with the basicblock Or not? IDK? For MegaNumFinder
 	
-	// or else redest is failing!
+	// or else ReDest is failing!
+
+	
+	
+function MiniClampOpt (|message| exp,  |&FatAsm| jmpi,  |asmreg|)
+	// Clamp for ints isn't used so much...
+	// its actually very good for floats and vectors
+	// and someday we'll have our own hardware... Might as well do this now then.
+	
+	|| bflg = .last(asm.bflg)!
+	require (bflg - 1) == jmpi
+	require (jmpi isa asm.jmpi)
+
+	|| mode = jmpi.prms[2]
+	|| Small = (mode>>2)&1
+	require (mode>>3) & 1 == Small
+
+	|| X = jmpi.ASMReg(0)
+	|| Y = jmpi.ASMReg(1)
+	|| IsMax = mode & 1
+		swap (x) (y)
+	|| A = bflg.asmreg(0)
+	|| B = bflg.asmreg(1)
+	if x iz b and y iz a
+		ismax ^= 1
+	  else
+		require x iz a and y iz b
+		swap (x) (y)
+	.softnop(bflg)
+	.softnop(jmpi)
+	|| input = (y,x)(ismax)
+	|| f = exp.clami(a, x, input, y, small)
+	if mode & 2
+		f._op = asm.clamu
+	return f * a
+
+
+function FinishSingleIf (|fatrange| B, |asmreg|)
+	.BranchToCurr(b)
+	.NextBasicBlock
+	return asmreg()
+
 }
 
 

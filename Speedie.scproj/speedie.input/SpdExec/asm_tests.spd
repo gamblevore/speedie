@@ -13,6 +13,7 @@ function SwapTest
 	|| y = 2
 	swap (x) (y)
 
+
 function GlobRead  
 	|| s = Compiler.OriginalInputPath
 	|| m = typefloat64
@@ -29,6 +30,42 @@ function grab2 (|$byte| b, |int|)
 //	|| x = b++
 	b = b / 4
 	return b + b
+
+
+function Munt (|uint| Y, |uint| X)
+	if x > y		// y = max(y,x)
+		y = x
+	if x > y		// x = min(y,x)
+		x = y
+	if x >= y		// y = max(y,x)
+		y = x
+	if y >= x		// y = min(x,y)
+		y = x
+
+function Clamp (|int| x, |int| y, |int| z, |uint64| u1, |uint64| u2, |uint64| u3)
+	|| C = y
+	if C < x
+		C = x
+	if C < x
+		x = C
+	if C > y
+		C = y
+	
+	if u2 > u1
+		u1 = u2
+	if C < x
+		C = x
+	if C|uint| > y|uint|
+		C = y
+
+function Mint (|int| x, |int| y)
+	|| Max = y	
+	if x > y
+		Max = x
+	|| Min = y	
+	if x < y
+		Min = x
+
 
 class LargeClass2 {
 	|byte[100]|   a
@@ -49,8 +86,7 @@ function StructInner (|scdecl| d)
 	|| x = d.mu.info
 	d.mu.info = x
 	y[] = 1
-	
-	
+
 	
 function AddStuff (|int64| A, |int| B, |int64|)
 	|| X = A-B // shouldn't rely on B being bit-correct.

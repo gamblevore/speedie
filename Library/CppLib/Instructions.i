@@ -69,6 +69,10 @@
 	else
 	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
+ı CLAMI: _
+	i1 = std_clamp(btc(i2), btc(i3), btc(i4));
+ı CLAMU: _
+	u1 = std_clamp(btc(u2), btc(u3), btc(u4));
 ı ADDM: _
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
 ı SUBM: _
@@ -252,10 +256,10 @@
 ;
 ı FCLM: _
 	if (Float_Du)
-	d1 = std_min(std_max(d2, d3), d4)
+	d1 = std_clamp(d2, d3, d4)
 ;
 	else
-	f1 = std_min(std_max(f2, f3), f4)
+	f1 = std_clamp(f2, f3, f4)
 ;
 ı VGET: _
 	i1 = iv2[n3 + u4];
