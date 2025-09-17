@@ -32,9 +32,6 @@ module Math
 
 
 
-function vec2.Rotation (|float|)
-	return .y.atan2(.x)
-
 function int64.Hash (|uint64|)
 	return self|uint64|.hash 
 

@@ -29,8 +29,9 @@ extend_module ASM
 		require options.dev > 0
 
 		using ErrorSeverity.Warning
-		|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
-			.TestASMSub(T)
+		target debug
+			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
+				.TestASMSub(T)
 	
 
 function message.GetASMFunc (|message|)

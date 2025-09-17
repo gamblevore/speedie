@@ -14,39 +14,3 @@ tests oofit
 		LUPD  (r4, r0, 0, @test)
 		HALT  (r0,r0,r0,r0,1)
 
-
-
-/*
-/* func find (str, b) {
-    end = str.length
-    if (end) {
-        curr = str.addr
-        end += curr
-        loop:;
-        if (*curr == b) {
-            return curr - str.addr
-        }
-        if (++curr < end) {
-            goto loop
-        }
-    }
-    return -1
-} */
-
-    ASM program[] = {
-		0,
-        RD4,  // length
-        BRA,  // if length
-        RD4,  // curr
-        ADD,  // end-ptr
-		RD4,  // read-byte
-		CMPN, // compare
-		RD4,  // addr
-		SUB,  // subtract
-		RET,  // return
-		LUPU, // (++curr < end)... go back
-		SET1, // -1
-		RET,  // return -1
-		0, 
-    };
-*/

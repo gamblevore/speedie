@@ -716,11 +716,13 @@ datatype vec2
 
 	function iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
-		
-
+	
 	function Reflect (|vec2| plane, |vec2|)
 		return self - (2.0 * (self • plane) * plane)
 		
+	function Rotation (|float|)
+		return .y.atan2(.x)
+
 	function RotateAroundY (|mat4|)
 		description "Assumes normalised vec2" 
 		rz.reset
@@ -946,7 +948,6 @@ datatype Plane3D (vec4)
 
 		function Normals (|vec3| D1, |vec3| D2, |vec3| Start, |vec4|)
 			|| N = D1 x D2
-//			n = n|vec4|.climp(0.000001)|vec3|
 			n = n.normal
 			return (N, -(N • Start))
 
