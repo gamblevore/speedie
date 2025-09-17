@@ -193,11 +193,12 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin,   |ASMReg|)
 	// so what about this, then?
 	opt norefcounts
-/	|| name = trin[@thg]$
+	|| name = trin[@thg]
 	trin = name.next(@prm)$
-	|| op = instruction[name]$
+	|| op = instruction[name!]$
+	
 	|| form = op.Sizes
-	expect (trin.HasChildCount(form.Count)) (trin, "Expected paramcount: " + form.Count.render)
+	expect (trin.HasChildCount(form.Count))    (trin, "Expected paramcount: " + form.Count.render)
 	|| fat = .RequestOp(op.OpCode, where)
 		
 	.Trintrin(trin, nil, fat)
@@ -215,10 +216,10 @@ function Trintrin (|message| out, |asmreg| dest, |fatasm| fat)
 		|| n = s.name
 		if (n ~= "rz") == (dest != nil)
 			if dest
-/				fat.Dest(i, dest, self)
+				fat.Dest(i, dest, self)
 			  else
 				|uint| l = n[].lowercase 
-				if s.func != @num
+				if l == 'r'
 					l = s.Int(1, 0, 31)
 					fat.RegInput(i) = .ASMRegister(l)
 				  else

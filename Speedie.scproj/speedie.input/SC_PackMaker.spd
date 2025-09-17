@@ -226,7 +226,11 @@ module PackMaker
 	
 	
 	function WritePackToDisk
+		|| F = Compiler.ProductPath.SetExt("xpd").file
+		require f.OpenEmpty
+		
 		|| j = jbin(@tmp, "xpd")
+		j.file = f
 		j.enter
 		j.enter(@tmp, "app")
 		j.addint(.PackGlobSize + 16)
@@ -236,8 +240,6 @@ module PackMaker
 		.PackClasses(j)
 		.FuncLink(j)
 		.GlobLink(j)
-
-		Compiler.ProductFile.SmartData = j
 
 	
 	function SCFunction.TestObesity (|?&ivec4|)
@@ -268,9 +270,9 @@ module PackMaker
 					j.Add(@tmp, f.ExportName, true)
 					j.add(f)
 					j.exit
-					"OK: ${f.name}"
 				  else
-					error (f, "no asm generated for: " + f.name)
+					target debug
+						debugat // hmmm
 					
 		j.Exit(2)
 		
