@@ -119,15 +119,14 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |
 	|| fat = .regs.Setters[v]
 	if !fat: return true
 	if exp
-		.SetRegister(v, asmreg.AllowNopDest, nil) // closes at end of block only
+		.SetRegister(v, nil/*asmreg.AllowNopDest*/, nil) // why would I ever want to nop here?
 	// .nextbasicblock should do this?
 
 	// don't nop (most?) unused stuff here... as temps can be used after deallocating.
 	// What about the code below? could it suffer the same? We had this bug in "incr".
-	// the best this place could do... is warn (ME) that a function should be nopping something
+	// The best this place could do... is warn (ME) that a function should be nopping something
 	// but isn't.
-
-		
+	
 	return .ClearStruct(exp, .funcstart + fat, v)
 
 

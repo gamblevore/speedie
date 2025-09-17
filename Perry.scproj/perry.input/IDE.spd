@@ -785,7 +785,7 @@ class PerryIDE (Window)
 				if err.severity >= ErrorSeverity.Error
 					ActualErrors++
 				if err.path ~= path
-					if txt.LineErrorAdd(err) == sel
+					if txt.AddErrorToLine(err) == sel
 						txt.TryShowLineError(sel)
 					if jump and (!jumpto or err == lst.FirstSelected)
 						jumpto = err

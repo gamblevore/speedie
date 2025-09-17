@@ -295,10 +295,10 @@ function message.DIV2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Sh = nil, |in
 }
 
 
-function message.CLMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
+function message.ICLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.CLMI, self)
+	rz = a.RequestOp(asm.ICLM, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
@@ -307,10 +307,10 @@ function message.CLMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.CLMU (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
+function message.UCLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.CLMU, self)
+	rz = a.RequestOp(asm.UCLM, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4

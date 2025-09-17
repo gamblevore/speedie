@@ -36,8 +36,10 @@ dispatch TemporalStatements (TranFunc)
 	printerror				(Tran_Print)
 	log						(Tran_Log)
 	beep					(Tran_Beep)
-	
-	ignore					{(node.remove)}
+
+	ignore					(Tran_Remove)
+	cpp_name				(Tran_Remove)
+	cpp_part				(Tran_Remove)
 
 	alert					{ error (node, "I think you mean 'beep'?") }
 	break					{ error (node, "'break' not allowed. Either 'exit' or 'debugger'?") }
@@ -309,6 +311,10 @@ function Tran_WhileSub (|SCNode| name_space, |Message| node)
 	
 function Tran_Beep (TranFunc)
 	node.MiniTran(name_space, "app")
+
+
+function Tran_Remove (TranFunc)
+	node.remove
 
 
 function Tran_Quit (TranFunc)  // exitter

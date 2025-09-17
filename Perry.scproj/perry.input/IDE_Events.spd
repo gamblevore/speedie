@@ -21,7 +21,7 @@ function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)
 	
 	|| err = error(nil, tmp.name, level, where)
 	err.position = tmp.first.int
-	.editme.LineErrorAdd(err)
+	.editme.AddErrorToLine(err)
 
 
 function perry.IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initide

@@ -327,6 +327,13 @@ function perryide.GotASM (|message| asm)
 	.GotASMSub(asm)
 	.ReselectASM
 	.DuringASMEvent = false
+	
+
+function perryide.GotASMError (|message| Error)
+	|| name = error.name
+	if name and name ~!= "error"
+		// || err = error(nil, name) // we need a position...
+		notifications <~ name
 
 
 function perryide.GotASMSub (|message| asm)
@@ -355,14 +362,13 @@ function perryide.GotASMSub (|message| asm)
 			cpy.obj = file.name
 
 	|| fs = FastString()
-//	fs <~ "function "
 	fs <~ name.name
 	file = arg.first
 	fs <~ ": "
 	fs <~ file[1].int
 	fs <~ " / "
 	file[2].int.strsize(Fs)
-	name.name = fs//.GetResult
+	name.name = fs
 	
 
 

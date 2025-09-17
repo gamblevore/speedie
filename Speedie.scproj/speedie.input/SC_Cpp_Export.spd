@@ -859,10 +859,12 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function SmartWrite (|string| S, |File| F)
 		flow off
+		if s ~= "/usr/local/speedie/Terminal/Speedie"
+			app.crash("Fuck")
+
 		FlowControl.DisabledIncr // we don't care about previous file contents
 		.cpp_includes <~ s.hash|int64|.render
 		if F and !F.CompareData(S)
-//			.wroteAny = true
 			F.Data = S
 		FlowControl.DisabledIncr(-1)
 	

@@ -12,19 +12,20 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
-//	function Climp (|float| max=1.0, |vec4|)
-//		return (.x.climp(max), .y.climp(max), .z.climp(max), .w.climp(max))
 	
 	function Clamp (|float| max=1.0, |vec4|)
-		cpp_Part MiniClamp
+		cpp_part MiniClamp
 		return .clamp(0, max)
 	
-	function Clamp (|vec4| A, |vec4| B, |vec4|)
-		cpp_Part ClampVec
-		return (self min B) max A
+
+	+"f\75nction" Clamp (|vec4| A, |vec4| B, |vec4|)
+		cpp_wrapper JB_Vec4_ClampVec
+		asm vclm(rz, r1, r2, r3)
+
 	
 	function Clamp (|float| A, |float| B, |vec4|)
-		return (self min vec4(B)) max vec4(A)
+		cpp_wrapper JB_Vec4_Clamp
+	
 	
 	function abs (|vec4|)
 		return (.x.abs, .y.abs, .z.abs, .w.abs)

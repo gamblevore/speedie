@@ -458,7 +458,7 @@ function NextBasicBlock
 
 	
 	
-function MiniClampOpt (|message| exp,  |&FatAsm| compare, |float| D1=2, |float| D2=1,   |asmreg|)
+function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 	// Clamp for ints isn't used so much...
 	// its actually very good for floats and vectors
 	// and someday we'll have our own hardware... Might as well do this now then.
@@ -469,33 +469,35 @@ function MiniClampOpt (|message| exp,  |&FatAsm| compare, |float| D1=2, |float| 
 	
 	|| mode = compare.prms[2]
 	|| Small = (mode>>2)&1
-	// pretty sure this test needs fix for floats
-	require (mode>>3) & 1 == Small
+	|| IsFloat = compare isa asm.jmpf
+	if !IsFloat
+		require (mode>>3) & 1 == Small
 
-	if d1 > d2
-		d1 = d2
 	|| X = compare.ASMReg(0)
 	|| Y = compare.ASMReg(1)
 	|| IsMax = mode & 1
 		swap (x) (y)
 	|| A = bflg.ASMReg(0)
 	|| B = bflg.ASMReg(1)
+		
 	if x iz b and y iz a
 		ismax ^= 1
 	  else
 		require x iz a and y iz b
 		swap (x) (y)
+	
 	.SoftNop(bflg)
 	.SoftNop(compare)
 	|| input = (y,x)(ismax)
-	|| f = exp.clmi(a, x, input, y, small)
-	if compare isa asm.jmpf // float
+	|| f = exp.iclm(a, x, input, y, small)
+	if IsFloat
+		f.prms[4] = small^1						// other way around, wew.
 		f._op = asm.FCLM
 		if 0: exp.FCLM
 	  else
 		if mode & 2
-			f._op = asm.clmu
-			if 0: exp.clmu
+			f._op = asm.uclm
+			if 0: exp.uclm
 	return f * a
 
 

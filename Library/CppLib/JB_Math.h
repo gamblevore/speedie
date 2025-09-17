@@ -8,6 +8,10 @@
 extern "C" {
     int    JB_Math_Rnd32();
     float  JB_f_Clamp      (float d, float min, float max);
+	vec4   JB_Vec4_ClampVec (vec4 Self, vec4 A, vec4 B);
+	vec4   JB_Vec4_Clamp (vec4 Self, float A, float B);
+	vec4 JB_ivec4_ClampVec (ivec4 Self, ivec4 A, ivec4 B);
+	vec4 JB_ivec4_Clamp (ivec4 Self, int A, int B);
     float  JB_f_Cluster    (float x);
     u32    JB_uint_hash    (u32 x);
     double JB_Pow10        (double rz, int x);

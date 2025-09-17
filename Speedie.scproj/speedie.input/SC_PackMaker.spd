@@ -160,7 +160,7 @@ module PackMaker
 			
 	
 	function RunAFewTests 
-		if platform.isdebug {
+		target debug {
 		|scfunction--| fn
 		fn = .testfn("SemiConst")
 		if fn

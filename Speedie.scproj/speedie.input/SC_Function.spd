@@ -64,6 +64,7 @@ linkage
 |SCClass?|				Cls
 |CppRefs?|				Refs
 |error?|				SavedError
+|Message?|				Intrinsic
 |SCFunction?|			NextFunc
 |SCDecl?|				HasProto
 |SCClass?|				ProtoType

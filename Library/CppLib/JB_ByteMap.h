@@ -17,7 +17,7 @@ JBClass( ByteMap, JB_Object,
 JBClass( CharSet, JB_Object,
 	uint8			Cache[256];
 );
-//#define BM_Out_( cache, charr ) ( cache[charr] == charr )
+
 
 
         // function Declarations

@@ -136,14 +136,17 @@ function SCFunction.HasCVersion (|bool|)
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
-	|| TableID = 0
 	|| fn = prms.AsFunc
+	|| TableID = 0
+	if fn
+		|| intrin = fn.Intrinsic
+			return .DoIntrinsic(exp, dest, intrin)
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest
 		TableID = fn.tableid ?? 0xFFFF				// 0xffff means unknown?
 		TableID += 31
 	  else
-		// we never get here?? hmmm. that can't be right? need an asm_test for that!
+		// asmtodo: we never get here?? hmmm. that can't be right? need an asm_test for that!
 		|| f = exp.first!
 		TableID = .µ(f).Reg
 		|| dcl = f.ASMDecl

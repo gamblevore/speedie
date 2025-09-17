@@ -14,12 +14,17 @@ Design:
 
 #include "JB_Umbrella.hpp"
 
+
+// remove std_clamp and use std_vclamp always?
+#define std_clamp(L,M,H) ({auto x = M; auto y = L; auto z = H; if (y < x) {y = x;} else if (y > z) {y = z;}; (y); })
+
+
 extern "C" {
 #include "BitFields.h"
 #include "JB_VM.h"
 
 
-ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
+ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 	if (!V)
 		return 0;
 	auto Ret = V->Registers;

@@ -26,6 +26,11 @@ function SCFunction.PreRead (|message| Arg)
 
 
 dispatch FuncPreReader (fnPreReader)
+	+'asm'
+		opt norefcounts
+		.intrinsic = msg[@func]
+		.intrinsic.expectlast
+		
 	+'disabled'
 		opt norefcounts
 		is disabled

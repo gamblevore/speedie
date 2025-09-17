@@ -305,6 +305,13 @@ struct Assembler
 		|| r = .Regs.Setters[i]
 			return .funcstart_ + r
 
+
+	function ASMRegister (|int| i, |asmreg|)
+		|| f = .Register(i)
+			if .IsCurr(f)
+				return f.info
+		return i.asm
+
 	
 	function KnownValues (|int| changed, assigns:|bool|)
 		|| M = .regs.KnownMap

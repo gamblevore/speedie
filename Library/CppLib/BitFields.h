@@ -58,5 +58,7 @@
 #define uv3     (r[n3].Uvec)
 #define uv4     (r[n4].Uvec)
 
-#define std_clamp(L,M,H) ({auto x = M; auto y = L; auto z = H; if (y < x) {y = x;} else if (y > z) {y = z;}; (y); })
+
 #define btc(x)  ((x)<<(Compare4_Smallu<<5))
+
+

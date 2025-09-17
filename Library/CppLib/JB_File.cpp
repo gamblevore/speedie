@@ -369,10 +369,18 @@ int File_GoToStart( JB_File* f, bool AllowMissing ) {
 	return JB_File_Open( f, O_RDONLY, AllowMissing );
 }
 
+//bool Fucked(JB_File* F, const char* S) {
+//	JB_String FUCK = {};
+//	FUCK.Addr = (u8*)S;
+//	FUCK.Length = (int)strlen(S);
+//	bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
+//	return JB_Str_ContainsString(F, &FUCK); 
+//}
 
 int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 	if (!f)
 		return -1;
+	bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
 	if (HasFD(f)  and  (OpenFlags & O_RDWR)  and  !(f->OpenMode & O_RDWR)) {
 		JB_File_Close(f); // sigh
 	}

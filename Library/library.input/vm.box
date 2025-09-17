@@ -439,9 +439,9 @@ POS 5
 		else
 			i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 
-/**/ CLMI (Compare4)
+/**/ ICLM (Compare4)
 		i1 = std_clamp(btc(i2), btc(i3), btc(i4))
-/**/ CLMU (Compare4)
+/**/ UCLM (Compare4)
 		u1 = std_clamp(btc(u2), btc(u3), btc(u4))
 
 
@@ -642,13 +642,7 @@ POS 5
 
 // how to do instrinsics?
 // shouldn't these all go into the same thing?
-/**/ FOP1  (Float)
-		0
-/**/ FOP2  (Float)
-		0
-/**/ FOP3  (Float)
-		0
-/**/ IOP1  (u2)
+/**/ FOPP  (Float)
 		0
 /**/ IOP2  (u3)
 		0
@@ -734,8 +728,8 @@ POS 5
 		v1 = v2 / v3
 /**/ VFRC  (Float)
 		v1 = (v2 - VFloor(v2)) * v3
-/**/ VCLM (Float)
-		v1 = std_clamp(v2,v3,v4)
+/**/ VCLM (U4)
+		v1 = JB_Vec4_ClampVec(v2,v3,v4)
 
 
 
@@ -744,14 +738,14 @@ POS 5
 		iv1 = iv2 + (iv3 << Shift_Shu)
 /**/ QSUB  (Shift)              						// must come after ADD
 		iv1 = (iv2 - iv3) >> Shift_Shu
+/**/ QADK (AddK)
+		iv1 = iv2 + U2_Li
 /**/ QMUL  (U4)
 		iv1 = (iv2 * iv3) + iv4
 /**/ QDIV (Div)
 		iv1 = iv2 / iv3
 /**/ QCLM (U4)
-		iv1 = std_clamp(iv2,iv3,iv4)
-/**/ QADK (AddK)
-		iv1 = iv2 + U2_Li
+		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
 
 
 

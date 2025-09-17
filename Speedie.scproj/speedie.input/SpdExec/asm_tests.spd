@@ -70,6 +70,26 @@ function Clamp (|uint64| u1, |uint64| u2)
 		u2 = u1
 
 
+function ClampVec (|vec4| a, |vec4| b, |vec4| c)
+	cpp_part CV
+	|| d = a.clamp(b, c) 
+	b = b + 1.0
+	0
+		
+		
+function ClampFloat (|float| f1, |float| f2, |f64| d1, |f64| d2)
+	if f2 > f1
+		f1 = f2
+	if f2 >= f1
+		f2 = f1
+	if d2 > d1
+		d1 = d2
+	if d2 >= d1
+		d2 = d1
+	|| v = vec4(f1)
+	v = v.clamp(v,v)
+
+
 class LargeClass2 {
 	|byte[100]|   a
 	|uint16[100]| b

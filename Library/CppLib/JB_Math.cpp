@@ -21,10 +21,51 @@ extern "C" {
 		return std::isinf(x);
 	}
 	
+	
     float JB_f_Clamp (float d, float min, float max) {
-        const float t = d < min ? min : d;
-        return t > max ? max : t;
+		if (d < min)
+			return min;
+		if (d > max)
+			return max;
+		return d;
     }
+    
+	vec4 JB_Vec4_ClampVec (vec4 Self, vec4 A, vec4 B) {
+		// we can't rely on std::clamp... it seems to give bad results sometimes.
+		// thats aside from reuseing clamp as a min/max func by passing (self, A, self)!!
+		Self[0] = JB_f_Clamp(Self[0], A[0], B[0]);
+		Self[1] = JB_f_Clamp(Self[1], A[1], B[1]);
+		Self[2] = JB_f_Clamp(Self[2], A[2], B[2]);
+		Self[3] = JB_f_Clamp(Self[3], A[3], B[3]);
+		return Self;
+	}
+	
+	vec4 JB_Vec4_Clamp (vec4 Self, float A, float B) {
+		return JB_Vec4_ClampVec(Self, (vec4){A,A,A,A}, (vec4){B,B,B,B});
+	}
+    
+    static int Clamp_ (int d, int min, int max) {
+		if (d < min)
+			return min;
+		if (d > max)
+			return max;
+		return d;
+    }
+    
+	vec4 JB_ivec4_ClampVec (ivec4 Self, ivec4 A, ivec4 B) {
+		// we can't rely on std::clamp... it seems to give bad results sometimes.
+		// thats without even reuseing clamp as min/max by passing (self, A, self)!!
+		Self[0] = Clamp_(Self[0], A[0], B[0]);
+		Self[1] = Clamp_(Self[1], A[1], B[1]);
+		Self[2] = Clamp_(Self[2], A[2], B[2]);
+		Self[3] = Clamp_(Self[3], A[3], B[3]);
+		return Self;
+	}
+	
+	vec4 JB_ivec4_Clamp (ivec4 Self, int A, int B) {
+		return JB_ivec4_ClampVec(Self, (ivec4){A,A,A,A}, (ivec4){B,B,B,B});
+	}
+	    
 
     float JB_f_Cluster (float x) {
         float im = 2.0*x-1.0; // y = (2x-1)^3+0.5

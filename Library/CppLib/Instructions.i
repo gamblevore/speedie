@@ -69,9 +69,9 @@
 	else
 	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
-ı CLMI: _
+ı ICLM: _
 	i1 = std_clamp(btc(i2), btc(i3), btc(i4));
-ı CLMU: _
+ı UCLM: _
 	u1 = std_clamp(btc(u2), btc(u3), btc(u4));
 ı ADDM: _
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
@@ -222,13 +222,7 @@
 	IncrementAddr(r, Op, 0);
 ı COPY: _
 	MemCopyRDWR(r, Op);
-ı FOP1: _
-	0;
-ı FOP2: _
-	0;
-ı FOP3: _
-	0;
-ı IOP1: _
+ı FOPP: _
 	0;
 ı IOP2: _
 	0;
@@ -295,19 +289,19 @@
 ı VFRC: _
 	v1 = (v2 - VFloor(v2)) * v3;
 ı VCLM: _
-	v1 = std_clamp(v2, v3, v4);
+	v1 = JB_Vec4_ClampVec(v2, v3, v4);
 ı QADD: _
 	iv1 = iv2 + (iv3 << Shift_Shu);
 ı QSUB: _
 	iv1 = (iv2 - iv3) >> Shift_Shu;
+ı QADK: _
+	iv1 = iv2 + U2_Li;
 ı QMUL: _
 	iv1 = (iv2 * iv3) + iv4;
 ı QDIV: _
 	iv1 = iv2 / iv3;
 ı QCLM: _
-	iv1 = std_clamp(iv2, iv3, iv4);
-ı QADK: _
-	iv1 = iv2 + U2_Li;
+	iv1 = JB_ivec4_ClampVec(iv2, iv3, iv4);
 ı QFLG: _
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
 ı QRSS: _

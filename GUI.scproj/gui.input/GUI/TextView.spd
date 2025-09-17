@@ -1055,7 +1055,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		if err
 			.ErrorJump(err.position)
-			.LineErrorAdd( err, true )
+			.AddErrorToLine( err, true )
 	
 
 	function ClearErrors
@@ -1069,7 +1069,7 @@ class TextView (GUIControl)
 				d.LineError = nil
 
 
-	helper LineErrorAdd (|error| e, |bool| ForceParse=true, |textviewline|)
+	helper AddErrorToLine (|error| e, |bool| ForceParse=true, |textviewline|)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
 		|| p = .clamp(e.position)

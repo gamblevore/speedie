@@ -12,7 +12,6 @@ class Instruction
 	|byte|			aType
 	|byte|			PCount
 	|µForm|			Sizes
-//	|string|		FormName
 	|string|		Name
 
 	
