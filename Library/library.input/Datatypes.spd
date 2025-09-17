@@ -413,7 +413,7 @@ datatype float
 		fs <~ "%"
 
 	function cos (|float|)
-		return math.cos(self)
+		return math.cospi(self*2.0)
 		
 	function exp2 (|float|)
 		return 2.0 pow self
@@ -422,10 +422,10 @@ datatype float
 		return math.acosbad(self) * math.iTau
 		
 	function Sin (|float|)
-		return math.sin(self) //sigh
+		return math.sinpi(self*2.0)
 
 	function tan (|float|)
-		return math.tan(self) //sigh
+		return math.TanPi(self*2.0)
 
 	helper __sincospi (|$float| A, |$float| B)
 		cpp_wrapper (__sincospif)

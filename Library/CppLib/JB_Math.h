@@ -96,5 +96,14 @@ extern "C" {
 
 }
 
+#include <algorithm>
+template <typename T>
+constexpr T std_clamp(T v, T lo, T hi) {
+	v = std::max(v, lo);
+	hi = std::max(hi, lo); // need second max! VM uses "creative ranges".
+	return std::min(v, hi);
+}
+
+
 #endif
 

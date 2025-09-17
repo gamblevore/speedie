@@ -8,188 +8,65 @@ module Math
 	constants
 		E = 2.7182818284590452353602874713526
 		iTau = 0.15915494309
+		// seems maths is just a place to put constants on...
+		// I wonder. Could it be removed? Well... its kinda nice
+		// to have autocomplete show you constants.
 	
 	function Pi (|float|)
 		disabled "Use π for pi, or 2π for PI*2"
-	
-	function Sin (|float| f, |float|)
-		return .sinpi(f*2.0)
 
-	function Cos (|float| f, |float|)
-		return .cospi(f*2.0)
-		
 	helper ACosBad (|float| f, |float|)
 		cpp_wrapper (acosf)
+
+	helper ATan2Bad (|float| f1, |float| f2, |float|)
+		cpp_wrapper (atan2f)
 	
-	function Tan (|float| f, |float|)
-		return .TanPi(f*2.0)
-	
-	function CosPi (|float| f, |float|)
+	helper CosPi (|float| f, |float|)
 		cpp_wrapper (__cospif)
 
-	function Saw (|float| f, |float|)		 // just a saw-func
-		//   0-->0,  0.25-->1,  0.5-->0,  0.75--> -1,  1-->0
-		f = f.fract
-		f = f * 4.0
-		f = f - f.minus0(1.0)
-		return f
-	
-	function TanPi (|float| f, |float|)
+	helper TanPi (|float| f, |float|)
 		cpp_wrapper (__tanpif)
 	
-	function SinPi (|float| f, |float|)
+	helper SinPi (|float| f, |float|)
 		cpp_wrapper (__sinpif)
 
-	function float.ATan2Bad (|float| f2, |float|)
-		cpp_wrapper (atan2f)
 
-	function float.ATan2 (|float| y, |float|)
-		rz = -.ATan2Bad(y)				   // our result is +-pi, but we want 0-1...
-		rz *= math.iTau
-		if rz < 0.0
-			rz ++
 
-	function vec2.Rotation (|float|)
-		return .y.atan2(.x)
+function vec2.Rotation (|float|)
+	return .y.atan2(.x)
+
+function int64.Hash (|uint64|)
+	return self|uint64|.hash 
+
+function int.Hash (|uint|)
+	return self|uint|.hash 
+
+function uint64.Hash (|uint64|)
+	cpp_wrapper JB_uint64_hash
 	
-	function int.Abs (|int|)
-		cpp_wrapper (abs)
-	
-	function int.Sqrt (|int|)
-		return (self|Float64|.sqrt)|int|
-	
-	function f64.Sqrt (|Float64|)
-		cpp_wrapper (sqrt)
-	
-	function float.Gaussian (|float| v, |float|)
-		|| exp = self*self / v
-		|| factor = math.e pow -exp
-		|| mul = π|float| * v
-		|| sq = mul.Sqrt
-		return factor / sq
-	
-	function float.Clamp (|float|L, |float|H, |float|)
-		cpp_wrapper JB_f_Clamp
-	
-	function float.Clamp (|float|H=1.0, |float|)
-		return .clamp(0,h)
-		
-//	function float.climp (|float| X, |float|)
-//		if .abs < x
-//			return 0
-//		return self
-		
-	function float.Cluster (|float|)
-		cpp_Wrapper JB_f_Cluster
+function uint64.LowestBit (|uint64|)
+	return self & -self 
 
-	function int64.Hash (|uint64|)
-		return self|uint64|.hash 
+function uint.LowestBit (|uint|)
+	return self & -self 
 
-	function int.Hash (|uint|)
-		return self|uint|.hash 
+function uint64.RemoveOneBit (|uint64|)
+	return self & (self-1)
 
-	function uint64.Hash (|uint64|)
-		cpp_wrapper JB_uint64_hash
-	
-	function int.LowestBit (|int|)
-		return self & -self 
-
-	function int.RemoveOneBit (|int|)
-		return self & (self-1)
-
-	function int.GetSign (|int|)
-		if self > 0
-			return 1
-		return -(self|uint|>>31)
-
-	function int.Sign (|int|)
-		disabled "Do you mean setsign or getsign?"
-
-	function int.Clamp (|int| low, |int| high, |int|)
-		cpp_part ClampRange
-		if self < low
-			self = low
-		  elseif self > high
-			self = high
-		return self
-
-	function int.Clamp (|int| high, |int|)
-		if self < 0
-			self = 0
-		  elseif self > high
-			self = high
-		return self
-
-	function int.SetSign (|bool| IsNeg, |int|)
-		// bool.dir is beter
-		if (IsNeg)
-			return -self
-		return self
-	
-	function int.SignBit (|int|)
-		return self|uint| >> 31
-		
-	function int.Reduce1 (|int|)
-		disabled "seems buggy, doesnt work for 0"
-		return self + (.signbit << 1) - 1
-	
-	function int.Reduce (|int| d=1, |int|)
-		if (self > d)
-			return self - d
-		  elseif (self < -d)
-			return self + d
-		
-//	function int.Reduce2 (|int| d, |&int| Zeros, |int|)
-//		opt inline
-//		if ( self > d )
-//			return self - d
-//		  elseif (self < -d)
-//			return self + d
-//		Zeros[0] = Zeros[0] + 1
-	
-	function uint64.LowestBit (|uint64|)
-		return self & -self 
-
-	function uint.LowestBit (|uint|)
-		return self & -self 
-
-	function uint64.RemoveOneBit (|uint64|)
-		return self & (self-1)
-
-
-
-function Mix (|float| X, |float| Y, |float| Mix, |float|)
-	cpp_Part FloatMix
-	return X + (Mix * (Y - X))
-
-function UnMix (|float| X, |float| Y, |float| R, |float|) // inbetweenness
-	return (R - x)/(Y - X)
-
-function Mix (|vec4| A, |vec4| B, |float| F, |vec4|)
-	cpp_Part Vec4Mix
-	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
-	return (A*(1.0-F)) + (B*F)
-
-function Mix (|vec3| A, |vec3| B, |float| F, |vec3|)
-	cpp_Part Vec3Mix
-	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
-	return (((A,0.0)*(1.0-F)) + ((B,0.0) * F)).xyz
-
-function Mix (|vec2| A, |float| F, |float|)
-	cpp_Part Vec2Mix
-	description "0.0 means fully .x,   1.0 means fully .y,  0.5 means half-way between .x and .y" 
-	return (A.x1*(1.0-F)) + (a.x2*F)
-
-
-
-function int.CopySign (|int| From, |int|)
-	self = .abs
-	if from < 0
-		return -self
-	return self
 
 
 extend int
+	function CopySign (|int| From, |int|)
+		if (From xor Self)|uint| >> 31
+			return -self
+		return self
+	
+	function Abs (|int|)
+		cpp_wrapper (abs)
+	
+	function Sqrt (|int|)
+		return (self|Float64|.sqrt)|int|
+	
 	operator pow (|int| a, |int|)
 		if (a==2)
 			return self*self
@@ -203,9 +80,76 @@ extend int
 		if r >= 0
 			return r
 			
+	function LowestBit (|int|)
+		return self & -self 
+	
+	function RemoveOneBit (|int|)
+		return self & (self-1)
+	
+	function GetSign (|int|)
+		if self > 0
+			return 1
+		return -(self|uint|>>31)
+	
+	function Sign (|int|)
+		disabled "Do you mean setsign or getsign?"
+	
+	function Clamp (|int| low, |int| high, |int|)
+		cpp_part ClampRange
+		if self < low
+			self = low
+		  elseif self > high
+			self = high
+		return self
+	
+	function Clamp (|int| high, |int|)
+		if self < 0
+			self = 0
+		  elseif self > high
+			self = high
+		return self
+	
+	function SetSign (|bool| IsNeg, |int|)
+		description "bool.dir is better. Try that?"
+		if (IsNeg)
+			return -self
+		return self
+	
+	function SignBit (|int|)
+		return self|uint| >> 31
+		
+	function Reduce1 (|int|)
+		disabled "seems buggy, doesnt work for 0"
+		return self + (.signbit << 1) - 1
+	
+	function Reduce (|int| d=1, |int|)
+		// what if this goes past 0?
+		// why not use .towards(0)?
+		
+		if (self > d)
+			return self - d
+		  elseif (self < -d)
+			return self + d
+
+	
+	function Towards (|int| Dest, |int| N, |int|)
+		if (self >= dest)
+			self -= N
+			if (self <= dest)
+				return dest 
+		  else
+			self += N
+			if (self >= dest)
+				return dest
+		return self	
+
+
+
+			
 extend ivec2
 	operator minus0 (|ivec2| a, |ivec2|)
 		return (.x minus0 a.x, .y minus0 a.y)
+
 
 
 extend f64
@@ -213,9 +157,43 @@ extend f64
 		if (b)
 			return -self
 		return self
+	
+	function Sqrt (|Float64|)
+		cpp_wrapper (sqrt)
 
 
-extend float
+
+
+extend float	
+	function Saw (|float|)		 // just a saw-func
+		//   0-->0,  0.25-->1,  0.5-->0,  0.75--> -1,  1-->0
+		rz = .fract
+		rz *= 4
+		rz -= rz.minus0(1.0)
+
+		
+	function ATan2 (|float| y, |float|)
+		rz = -math.ATan2Bad(self, y)				   // our result is +-pi, but we want 0-1...
+		rz *= math.iTau
+		if rz < 0.0
+			rz ++
+	
+	function Gaussian (|float| v, |float|)
+		|| exp = self*self / v
+		|| factor = math.e pow -exp
+		|| mul = π|float| * v
+		|| sq = mul.Sqrt
+		return factor / sq
+	
+	function Clamp (|float|L, |float|H, |float|)
+		cpp_wrapper JB_f_Clamp
+	
+	function Clamp (|float|H=1.0, |float|)
+		return .clamp(0,h)
+		
+	function Cluster (|float|)
+		cpp_Wrapper JB_f_Cluster	
+
 	function Negate (|bool| b, |float|)
 		if (b)
 			return -self
@@ -238,20 +216,6 @@ extend float
 	
 	function IsNormal (|bool|)
 		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
-
-	
-	function RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
-		|| range = hfrom - lfrom
-		// if its lfrom, return lto
-		// if its hfrom, return hto
-		|| inbetweenfromness = (self - lfrom) / range
-		return lto + (inbetweenfromness * (hto - lto))
-	
-	
-	function RangeConvertClamped (|float| lfrom, |float| lto, |float| hfrom, |float| hto, |float| )
-		self = .RangeConvert(lfrom, hfrom, lto, hto)
-		return .clamp(lto, hto)
-		
 		
 	function Sanity (|bool|)
 		if .IsSane
@@ -313,6 +277,44 @@ extend float
 		rz *= rz
 		rz *= rz
 
+
+
+function Mix (|float| X, |float| Y, |float| Mix, |float|)
+	cpp_Part FloatMix
+	return X + (Mix * (Y - X))
+
+function UnMix (|float| X, |float| Y, |float| R, |float|) // inbetweenness
+	return (R - x)/(Y - X)
+
+function Mix (|vec4| A, |vec4| B, |float| F, |vec4|)
+	cpp_Part Vec4Mix
+	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
+	return (A*(1.0-F)) + (B*F)
+
+function Mix (|vec3| A, |vec3| B, |float| F, |vec3|)
+	cpp_Part Vec3Mix
+	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
+	return (((A,0.0)*(1.0-F)) + ((B,0.0) * F)).xyz
+
+function Mix (|vec2| A, |float| F, |float|)
+	cpp_Part Vec2Mix
+	description "0.0 means fully .x,   1.0 means fully .y,  0.5 means half-way between .x and .y" 
+	return (A.x1*(1.0-F)) + (a.x2*F)
+
+
+
+
+function float.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
+	|| range = hfrom - lfrom
+	// if its lfrom, return lto
+	// if its hfrom, return hto
+	|| inbetweenfromness = (self - lfrom) / range
+	return lto + (inbetweenfromness * (hto - lto))
+
+function float.RangeConvertClamped (|float| lfrom, |float| lto, |float| hfrom, |float| hto, |float| )
+	self = .RangeConvert(lfrom, hfrom, lto, hto)
+	return .clamp(lto, hto)
+
 function math.RangeConvert (|float| low_from, |float| high_from, |float| low_to, |float| high_to, |FloatRangeConverter|)
 	description "Converts numbers from one range, to another range. Turns something awkward into something simple" 
 	cpp_part RangeConv4
@@ -332,28 +334,3 @@ datatype FloatRangeConverterBasic (vec2)
 		return (x + .x) * .y
 
 
-
-function int.Towards (|int| Dest, |int| N, |int|)
-	if (self >= dest)
-		self -= N
-		if (self <= dest)
-			return dest 
-	  else
-		self += N
-		if (self >= dest)
-			return dest
-	return self
-
-	
-//function float.Mul (|float| by, |bool| Cond, |float|)
-//	if cond
-//		return self * by
-//	return self
-//
-//
-//function float.Plus (|bool|b, |float| add=1.0, |float|)
-//	if b
-//		return self + add
-//	return self
-//
-//
