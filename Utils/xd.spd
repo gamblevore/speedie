@@ -13,7 +13,7 @@ helper string.ColumnFinish (|int| lastout, |int| i, |faststring| fs, |int|)
 	return lastout
 
 
-function string.ColumnHex (|int| linelen = 16, |int| chunklen = 2, |string|)
+function string.ColumnHex (|int| linelen, |int| chunklen, |string|)
 	|| chunkpos = 0
 	|| linepos = 0
 	|| lastout = 0
@@ -42,7 +42,7 @@ function string.ColumnHex (|int| linelen = 16, |int| chunklen = 2, |string|)
 	return fs
 
 
-main (|file.existing| file)
+main (|file.existing| file, |int| linelen = 16, |int| chunklen = 2)
 	|| data = file.ReadAll
-		printline data.ColumnHex
+		printline data.ColumnHex( linelen, chunklen )
 	

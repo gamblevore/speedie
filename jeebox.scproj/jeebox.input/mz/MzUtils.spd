@@ -30,16 +30,13 @@ Module MZLab
 	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
 		|compressionstats| stats
 		|| c = .compress(Strength, stats)
-		if report
-			stats.Print(true)
-		stats = nil
-		|| decomp = c.Decompress(int.max, stats)
+		if report // remove? compression is good for now.
+			stats.Print
+		|| decomp = c.Decompress(int.max, nil)
 		rz = self == decomp
 		if !rz
 			error "Decompression failed on: " + self
 			decomp = c.Decompress(int.max)
-		  elseif report
-			stats.Print(false)
 		
 	
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
@@ -63,7 +60,7 @@ Module MZLab
 		return true
 
 
-	target debugcompressrion
+	target DebugCompressrion
 		function TestCompression
 			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 			require f.exists
@@ -92,18 +89,33 @@ Module MZLab
 
 
 
-target minilib {
 struct CompressionStats 
 	|duration| Duration
 	|int|  In
 	|int|  Out
+	|byte| Purpose
 	|bool| Live
-	linkage:cpp_part MzSt
-	function Start (|&compressionstats|)
+	linkage:cpp_part MzSt	
+	flags
+		Compression
+		Decompression
+
+
+	function Start (|int| Purpose, |&CompressionStats|)
 		nil self
-		if !self
-			return all
+		self ?= CompressionStats.all
+		.purpose|=purpose
+		.Duration -= date.now
 		return self
+
+	module
+		|CompressionStats| All
+		function New (|compressionstats|)
+
+
+		
+	target minilib {
+	
 	function End
 	function Len (|int| n)
 	function LiveUpdate (|int| s, |int| outt, |bool| compress=true)
@@ -111,55 +123,39 @@ struct CompressionStats
 	render Report (|bool| Compression)
 	function Clear
 	function Print (|bool| Compress=true)
-	module
-		|CompressionStats| All
-		function New (|compressionstats|)
+	
+	} else {
 
-} else {
-struct CompressionStats
-	linkage:cpp_part MzSt
-	|duration| Duration
-	|int|  In
-	|int|  Out
-	|bool| Live
-	
-	constructor
-//		.live = true
-	
 	function Clear
 		.Duration = nil
 		.in = nil
 		.out = nil
-
-	function Start (|&CompressionStats|)
-		nil self
-		self ?= CompressionStats.all
-		.Duration -= date.now
-		return self
+		.Purpose = nil
 	
 	function End
 		.Duration += date.now
 
-	function Print (|bool| Compression)
-		printline .Report(Compression)
+	function Print
+		printline .Report
 		
-	function LiveUpdate (|int| in, |int| out, |bool| Compress)
+	function LiveUpdate (|int| in, |int| out)
 		.in += in
 		.out += out
 		if .live
-			.print(compress)
+			.print
 	
 	function Durr (|duration|)
 		rz = .duration
 		if rz < 0
 			rz += date.now
 	
-	render Report (|bool| Compression)
-		|| a = (.in, .out)(Compression)
-		|| b = (.in, .out)(!Compression)
+	render Report
+		|| a = .in
+		|| b = .out
+		if .Purpose & Decompression
+			swap (a) (b)
 		fs.RenderSpeed("", A, .durr, B)
-	
-	module
-		|CompressionStats| All // noice
+
 }
+
 

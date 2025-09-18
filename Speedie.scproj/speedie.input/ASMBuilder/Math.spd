@@ -294,7 +294,7 @@ extend Assembler
 
 
 	function ASMReg.LeftScore (|int|) // we want pointers on the left, and consts on the right
-		rz += .somepointer << 2				// pointers on left
+		rz += .SomePointer << 2				// pointers on left
 		rz += (self isnt Const) << 1	// consts on right
 		rz += self isnt temp				// temps on right
 	
@@ -405,7 +405,6 @@ extend Assembler
 				return qq
 
 		|| ss = (l is Subtract)
-		|| rr = r.reg
 		if 0: exp.VADD
 		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
 
@@ -726,11 +725,11 @@ extend Assembler
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
 		|| SrcBits = src.BitCount
-		if up > srcbits or down > SrcBits			// wierd?
+		if (up > srcbits or down > SrcBits)	 and !src.IsBool
 			problem (exp, "Shift too far")
 		
 		if !up and !down
-			if (SrcBits > dest.BitCount)
+//			if (SrcBits > dest.BitCount)
 			return src
 
 		down += 64 - (SrcBits+up)
@@ -742,8 +741,6 @@ extend Assembler
 		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
 		return fat.Vectorise(dest, asm.QFLG)
 
-
-//	function NumToReg (|message| exp, |asmreg| dest, |int64| K, |datatypecode| SrcType, |asmreg|)
 
 	function Zeros (|message| exp, |asmreg| dest, |asmreg|)
 		return .NumToReg(exp, dest, 0, dest.µtype)

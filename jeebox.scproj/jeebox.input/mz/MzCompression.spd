@@ -19,7 +19,7 @@ function string.Decompress (|object| Dest=nil, |int|lim=256MB,  |?&compressionst
 
 function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default, |?&compressionstats| st=nil) 
 	|| fs = faststring.UseAsOutput(dest)				#require
-	st = st.start
+	st = st.start(compressionstats.compression)
 	fs <~ "mz\n\02"
 	fs.AppendInt(.length)
 	st.Out += 8
@@ -27,7 +27,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 		|| str = .str(4MB)
 		|| O = fs.CompressChunk(str, strength)
 		|| N = str.length
-		st.LiveUpdate(N, O, true)
+		st.LiveUpdate(N, O)
 		fs.flush
 	st.end
 
@@ -40,7 +40,7 @@ function StringReader.Decompress (|object| dest=nil,  |uint| Limit=256MB,  |&com
 	
 	|| fs = FastString.UseAsOutput(dest)			#require
 	|| d = string.error
-	if .DecompressSub(fs, st.start, Remain)
+	if .DecompressSub(fs, st.start(compressionstats.decompression), Remain)
 		d = fs.GetResult(dest)
 	return d
 
@@ -62,7 +62,7 @@ helper StringReader.DecompressSub (|faststring| fs,  |&compressionstats| st,  |i
 		// "|uint| Remain" in caller func, did not add up to the sizes found here!
 		
 		fs.Flush
-		st.LiveUpdate(InSize + 4, OutSize, false)
+		st.LiveUpdate(InSize + 4, OutSize)
 
 	st.end
 	return true

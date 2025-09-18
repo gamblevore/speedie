@@ -60,7 +60,7 @@ extern "C" {
         return y;
     }
 
-    float JB_f_IntPow(float x, u32 n) {
+    float JB_f_IntPow (float x, u32 n) {
         float z = 1;
         float base = x;
 
@@ -107,7 +107,6 @@ extern "C" {
 //	}
 
 	double JB_Pow10(double rz, int x) {
-		atan2f;
 		x = Min(x, 350);
 		x = Max(x,-350);
 		if (x < 0) {
@@ -120,23 +119,23 @@ extern "C" {
 		return rz;
 	}
     
-	ivec2 JB_f_Exponent(float f) {
+	ivec2 JB_f_Exponent (float f) {
 		uint i = reinterpret_cast<uint&>(f);
 		uint x = (i<<1) >> 24;
 		int x2 = x - 127;
 		return (ivec2){ x2, JB_uint_IsPow2(i<<9) };
 	}
     
-	float JB_f_Log(float f) {
+	float JB_f_Log (float f) {
 		return std::log(f);
 	}
 	
-	double JB_dbl_Log(double f) {
+	double JB_dbl_Log (double f) {
 		return std::log(f);
 	}
 	
 
-	ivec2 JB_F64_Exponent(double d) {
+	ivec2 JB_F64_Exponent (double d) {
 		uint64 i = reinterpret_cast<uint64&>(d);
 		uint64 x = (i<<1) >> 53;
 		int x2 = (int)x - 1023;
@@ -169,7 +168,7 @@ extern "C" {
     }
 
     #ifndef AS_LIBRARY
-    int JB_Math_Rnd32() { //overkill for jeebox
+    int JB_Math_Rnd32 () { //overkill for jeebox
         return rand();
     }
     #endif

@@ -41,6 +41,3 @@ function message.GetASMFunc (|message|)
 		return adj[@func]
 
 
-function FatASM.Encode (|ASM|)
-	//return (ASM.encoders[.op]!)(self)		
-

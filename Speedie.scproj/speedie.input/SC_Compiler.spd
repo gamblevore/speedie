@@ -193,7 +193,7 @@ function CompileAll (|int|)
 		if Compiler.InPerry: app.SetASMBreak(false)
 	
 	if (compiler.InPerry or Options.ModePack)
-		.Timer( "Export Pack" )
+		.Timer( "Assemble" )
 		PackMaker.MakePack	
 
 	target debug

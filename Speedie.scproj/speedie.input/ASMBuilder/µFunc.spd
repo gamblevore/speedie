@@ -30,7 +30,7 @@ extend SCFunction
 				error (.source, "Function too large (>= 256K compiled)")
 			fat.ASMIndex = n
 			fat.CheckHasOutput
-			rz = fat.µrenderinto(rz, after)
+			rz = fat.µRenderInto(rz, after)
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
@@ -102,9 +102,14 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 //	return jb_vm.Run(.ptr, .length)|&int64|[]
 
 
-function JBin.Add (|SCFunction| fn)
-	.AddMemory(@bin, fn.µlength*4)
-	for i.fat in fn
-		.AppendInt(i.Encode)
+function JBin.AddFunction (|SCFunction| fn, |int| Missed)
+	// need aligning each.
+	if missed
+		self.AddInt(missed)
+	|| n = fn.µlengthguess*4
+/	|| M = .ReserveMemory(@bin, n)
+	for i in n
+		M[i] = 'A' + i
+	// MuRender
 
 

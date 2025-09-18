@@ -170,9 +170,9 @@ struct FastBuff
 
 
 
-function jbin.Add		(|syntax| type, |&FastBuff| data, |bool| into = false)
-	cpp_part AddBuff
-	|| L = data.length
-	|| addr = (data.start, nil)(L)
-	.addmemory(type, L, into, addr)
+//function jbin.Add		(|syntax| type, |&FastBuff| data, |bool| into = false)
+//	cpp_part AddBuff
+//	|| L = data.length
+//	|| addr = (data.start, nil)(L)
+//	.addmemory(type, L, into, addr)
 

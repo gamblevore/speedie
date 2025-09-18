@@ -143,7 +143,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 			return .DoIntrinsic(exp, dest, intrin)
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest
-		TableID = fn.tableid ?? 0xFFFF				// 0xffff means unknown?
+		TableID = fn.PackID ?? 0xFFFF				// 0xffff means unknown?
 		TableID += 31
 	  else
 		// asmtodo: we never get here?? hmmm. that can't be right? need an asm_test for that!

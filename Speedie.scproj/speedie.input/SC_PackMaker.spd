@@ -7,8 +7,6 @@ module PackMaker
 	|[SCDecl]|				LibGlobs
 	|[SCFunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
-//	|int|					ExportPos
-	
 	|int|					_PackGlobSize
 	|int|					_LibGlobSize
 
@@ -69,8 +67,8 @@ module PackMaker
 		|| FnMain = compiler.xfunc("JB_Main")
 		require fninit and fnmain
 		
-		fninit.TableId = 1 // put init and main first!
-		fnmain.TableId = 2
+		fninit.PackID = 1 // put init and main first!
+		fnmain.PackID = 2
 
 		.SortASMFuncs(.PackFuncs, nil)
 		TypeObject!.PackClassChildren(nil)
@@ -95,7 +93,7 @@ module PackMaker
 
 		|| ID = 0
 		while (|| f = list[id])
-			f.TableID = ++id			
+			f.PackID = ++id			
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)
@@ -111,10 +109,6 @@ module PackMaker
 		j.Exit
 
 	
-	function scfunction.AMiniTest (|bool|)
-		return (self in "ASMExamples")
-	
-	
 	function CompileSomeFunctions (|bool| MiniTest, |bool|)
 		opt norefcounts
 		for fn in .Packfuncs
@@ -128,15 +122,6 @@ module PackMaker
 		
 		|| main = Compiler.MainFunc
 			(main is usedbyasm)
-		
-		target debug
-			|| subtract = 0
-			for fn in .PackFuncs
-				if fn.myreacher and (fn isnt UsedByASM)
-					subtract += fn.µLengthGuess
-					printline "-" + fn.exportname
-			if subtract
-				"$subtract µ gain"
 		return true
 
 	
@@ -149,69 +134,6 @@ module PackMaker
 			require .CompileSomeFunctions(true)
 		return .CompileSomeFunctions(false)
 	
-
-	
-	function TestFn (|string| s, |scfunction--|)
-		opt norefcounts
-		|| mod = compiler.program.FindModule("ASMExamples")
-			|| regs = jb_vm.vm.registers(true) // clears
-			rz = mod.Findfunction(s)
-			scfunction.currfunc = rz 
-			
-	
-	function RunAFewTests 
-		target debug {
-		|scfunction--| fn
-		fn = .testfn("SemiConst")
-		if fn
-			for i in 2
-				self[0] = i*16K
-				|| found = fn.TestObesity|&int|[]
-		
-		fn = .testfn("AndOrConsts")
-		if fn
-			|| Andor = fn.TestObesity|&int64|[]
-		
-		fn = .testfn("Consts")
-		if fn
-			|| D = fn.TestObesity|&f64|[]
-		
-		fn = .testfn("ForeignFuncs")
-		if fn
-			self[0] = "hello", self[1] = "abc"
-			|| str = fn.TestObesity|&string|[]
-			printline str
-			
-		fn = .testfn("Math2")
-		if fn
-			for i in 5
-				self[0] = 12+i, self[1] = 6+i
-				|| num = fn.TestObesity|&int64|[]
-				
-		fn = .testfn("Mul")
-		if fn
-			self[0] = 8725, self[1] = 275, self[2] = 4, self[3] = 2	
-			|| num = fn.TestObesity|&int64|[]
-			if num != 18000
-			
-		fn = .testfn("AndOr")
-		if fn
-			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
-			|| Andor = fn.TestObesity|&int64|[]
-			if andor != 3
-			
-		fn = .testfn("AndOr2")
-		if fn
-			for i in 4
-				self[0] = i&1,   self[1] = (i&2)>>1
-				|| AndOr2 = fn.TestObesity|&int64|[]
-			
-		fn = .testfn("TestAtomic")
-		if fn
-			|| atomic = fn.TestObesity|&int|[]
-			printline atomic
-		}
-	
 	
 	function MakePack 
 		opt norefcounts
@@ -219,9 +141,8 @@ module PackMaker
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		.SortFuncsAndBuildGlobs
-		if platform.isdebug
-			if .ActualASMCompile and Options.pack
-				.WritePackToDisk
+		if .ActualASMCompile
+			.WritePackToDisk
 		compiler.During = 0
 	
 	
@@ -235,59 +156,67 @@ module PackMaker
 		j.enter(@tmp, "app")
 		j.addint(.PackGlobSize + 16)
 		j.enter
-		.ListPackFuncs(j)
+		
+		|| stack_trace = FastString()
+		.ListPackFuncs(j, stack_trace)
 		.DumpStrings(j)
 		.PackClasses(j)
 		.FuncLink(j)
-		.GlobLink(j)
+/		.GlobLink(j)
+		.AddDebugStuff(j, stack_trace)
+		j.ExitAll
+	
+	
+	function AddDebugStuff (|jbin| j, |string| func_names)
+		j.tmp("debug")
+		j.Enter(@tmp, "func")
+		|compressionstats| st
+		|| f2 = func_names.compress(st)
+		print "Stack-trace Compression: "
+		st.print
+		j.AddStr(f2)
+		j.exit(3)
+
 
 	
-	function SCFunction.TestObesity (|?&ivec4|)
+	function ListPackFuncs (|jbin| j, |faststring| func_names)
 		opt norefcounts
-		target debug
-			|| mu = .µLength
-				|| mu2 = .µTest
-				.µprint(0)
-				return jb_vm.Run(mu2.ptr, mu2.length)
-	
-	
-	syntax access (|int| v, assigns:|int64|)
-		|| r = jb_vm.vm.Registers(false)+v
-		r|&int64|[] = Value
-	
-	
-	syntax access (|int| v, assigns:|object|)
-		|| r = jb_vm.vm.Registers(false)+v
-		r|&object--|[] = value
-	
-
-	function ListPackFuncs (|jbin| j)
-		opt norefcounts
-		j.tmp("fncs")
-		for f in compiler.funclist
-			if f.tableid
-				|| asm = f.µLength
-					j.Add(@tmp, f.ExportName, true)
-					j.add(f)
-					j.exit
-				  else
-					target debug
-						debugat // hmmm
-					
-		j.Exit(2)
+		j.enter(@tmp, "code")
+		|| Missed = 0
+		for f in .PackFuncs
+			if f is UsedByASM
+				j.AddFunction(f, Missed)
+				func_names <~ f.exportname
+				func_names <~ '\n'
+				Missed = 0
+			  else
+				Missed++
+		j.Exit
 		
-	
+		
 	function DumpStrings (|jbin| j)
-		j.tmp("strs")
+		|| strs = FastString()
+		.DumpStringsSub(strs)
+		strs <~ 0|byte|			// they are all cstrings... but we'll actually just overwrite it to make them
+		j.enter(@tmp, "strs")	// cstrings, during load.
+		j.Add(@sstr, strs)
+		j.exit
+	
+	
+	helper DumpStringsSub (|faststring| strs)
+		opt norefcounts
 		for s in StringCorrector.list
-			j.add(@str, s)
-		j.exit(2)
+			|| n = s.length * s.Frequency
+			strs.AppendHInt(n)
+			if n
+				strs <~ s
 
 
 	function PackClasses (|jbin| j)
 		j.enter(@tmp, "clss")
 		typeobject!.PackClassChildren(j)
 		j.exit
+	
 	
 	function FuncLink (|jbin| j)
 		opt norefcounts
@@ -351,8 +280,6 @@ module PackMaker
 		opt norefcounts
 		|| sz = (0, .size)(.iswrapper)
 		j.addint(sz)
-		
-//		|| fn_list = .behaviour!.WrapperFuncs
 		j.enter(@list)
 	
 		|| name = "0"
@@ -403,11 +330,6 @@ then we just return a LibPack* from C++.
 
 Then exec can just... use the table directly, as it is already sorted. :)
 */
-
-
-function SCFunction.operatorin (|string| s, |bool|)
-	opt norefcounts
-	return .parent.name ~= s
 
 
 //|| LIBGC = 0 // not used much... but definitly is needed

@@ -183,6 +183,5 @@ function Counts.Report
 		"Total jbin: ${.totaljbin.strsize}"
 	
 	if CompressionStats.All.Out
-		CompressionStats.all.report(true, app.stdout.out)
-		printline
+		printline CompressionStats.all.report
 		

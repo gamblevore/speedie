@@ -740,6 +740,7 @@ function Str (fn_asm)
 	dest = .TempOnly(dest)
 	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
+	real.Frequency=1
 	return exp.GOBJ(dest, 0, real.ID) * dest // seems good!
 
 

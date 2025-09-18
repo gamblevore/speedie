@@ -31,73 +31,77 @@ role JBin (Faststring)
 
 	linkage: cpp_part bin
 
-	constructor         (|syntax| type=@arg, |string| name="")
+	constructor         	(|syntax| type=@arg, |string| name="")
 		cpp_part Constructor
 		self <~ Jbin.Header
 		.enter(type, name)
+	
 	constructor (|int| n)
 		cpp_part Constructor0
 		if n // what?
 
-	function Enter		(|syntax| type=@arg, |string| name="", |jbinleaver|)
+	function Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
 
-	function Exit
+	function ExitAll
 		cpp_Part Exit0
-		|| n = .indent
-		.Indent = 0
-		.Exit(n)
+		.Exit(.indent)
 	
-	function Exit (|int| amount, |int|)
-		|| add = 239
+	function Exit			(|int| Amount=1, |int|)
+		.Indent = (.Indent - amount) max 0
+		|| Add = 239
 		while amount > 0
 			rz++
 			|| B  = (add + amount)  min  (255)
 			self    <~ B|byte|
 			amount  -= (B-add)
 
-	function Tmp		(|string| name, |jbinLeaver|)
+	function Tmp			(|string| name, |jbinLeaver|)
 		.Enter(@tmp, name)
 		.Enter(@arg)
 		return 2
 
-	function Sheb		(|string| name)
+	function Sheb			(|string| name)
 		self <~ '#'
 		self <~ '!'
 		self <~ name
 		self <~ '\n' // noice
 	
 			
-	function AddStr		(|string| name)
+	function AddStr			(|string| name)
 		.add(@str, name)
-	function AddInt		(|int64| name)
-		.add(@num, name.render)
-	function Add		(|syntax| type, |string| name="", |bool|into = false, |jbinleaver|)
-		return .addmemory(type, name.length, into, name.addr)
-	function Add		(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
-		cpp_part AddFS
-		return .addmemory(Type, fs.length, into, fs.Resultptr)
-
-	function AddCstring (|syntax| type=@str, |cstring| name)
-		.AddMemory(type, name.length, false, name|&byte|)
 	
-	function AddMemory (|syntax| type, |uint64| L, |bool| GoIn=false, |?&byte| data=nil, |jbinleaver|)
+	function AddInt			(|int64| name)
+		.add(@num, name.render)
+	
+	function Add			(|syntax| type, |string| name="", |bool|into = false, |jbinleaver|)
+		return .AddMemory(type, name.length, into, name.addr)
+	
+	function Add			(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
+		cpp_part AddFS
+		return .AddMemory(Type, fs.length, into, fs.Resultptr)
+
+	function AddCString		(|syntax| type=@str, |cstring| name)
+		.AddMemory(type, name.length, false, name|&byte|)
+
+	function AddMemory		(|syntax| type, |int| L, |bool| GoIn, |&byte| data, |jbinleaver|)
 		|| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
 		.AppendHInt(L)
-		if data
-			.AppendMemory(data, L|int|)
-		.Indent += GoIn|int|
-		return goin|int|
+		.AppendMemory(data, L)
+		if goin
+			.Indent++
+			return 1
+
+	function ReserveMemory	(|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
+		|| T = (type|int|<<1) ||| (goin)
+		self <~ T|byte|
+		.AppendHInt(L)
+		.Indent += goin
+		return .Reserve(L)
+		
 
 
-//	function AddFile (|syntax| type=@bin, |file| F)
-//		|| T = type|int|<<1
-//		self <~ T|byte|
-//		|| L = f.size
-//		.AppendHInt(L)
-//		if L
-//			.ApendFile(f, L)
 
 
 datatype jbinLeaver (int)
@@ -108,7 +112,7 @@ datatype jbinLeaver (int)
 		StdErr.LowerErrorsTo = self
 		
 	module
-		function test
+		function Test
 			|| j = jbin()
 			j.Enter	// Sigh... syntaxusing is called upon the leaver, and not the jbin!
 					// how to make it work on j rather than on j.enter?

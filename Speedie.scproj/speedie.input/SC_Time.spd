@@ -6,7 +6,6 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Stages",		fs <~ Compiler.CurrStage
 	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
 	fs.normal  "Funcs",			fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
-//	fs.Normal  "Nodes",         fs <~ "${parser.CountStats}"
 	fs.normal  "Strings"
 
 	|| avg = StringCorrector.TotalSize div StringCorrector.list.length
@@ -24,8 +23,12 @@ function compiler.PrintCompileTime (|date| durr)
 		packmaker.PackGlobSize.strsize(fs)
 
 	
-	if VM_Builder.Total
-		fs.normal  "µCodes",    fs <~ VM_Builder.Total
+	|| vm_ops = VM_Builder.Total
+		fs.normal  "vm_ops",    fs <~ vm_ops
+	
+	|| ASM_Ops = compiler.stASMTotalOps
+		fs.normal  "ASM",    (ASM_Ops*4).strsize(fs)
+
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
 	if options.color
