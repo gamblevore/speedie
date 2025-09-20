@@ -132,7 +132,12 @@ class Error (Message)
 		fs <~ '^'
 
 
-	function LineIdentifiers (|faststring|fs, |string|path, |bool|)
+	function WorseThan (|error| Other, |bool|)
+		if !other
+			return true
+		return .severity > other.severity
+	
+	function LineIdentifiers (|faststring| fs, |string| path, |bool|)
 		require (.HasPosition)
 		|| d = .OriginalData #require
 

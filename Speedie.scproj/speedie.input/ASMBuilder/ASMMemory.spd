@@ -28,16 +28,16 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 	if vara.reg
 		dest = .IncrPointerByVar(nil, dest, vara, exp)
 
-	|| Amount = D.SizeOfQuery			#check exp
+	|| Amount = D.SizeOfQuery max 1
 	// what about structs like 53 bytes long? What is their alignment?
 	
 	if index
-		if d isnt property							// Sigh. now what? the size isnt right?
-		if amount > 16								// previous version did "min 16". why? thats wrong?
+//		if d isnt property							// Sigh. now what? the size isnt right?
+//		if amount > 16								// previous version did "min 16". why? thats wrong?
 		dest = .AddConst(index*amount, exp, dest)
 	
 	check (Amount <= 1<<14) (exp, "Object too large memory-copy requested. Copy this manually.")
-	return exp.COPY(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
+	return exp.WCPY(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)

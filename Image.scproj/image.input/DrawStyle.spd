@@ -25,10 +25,10 @@ class DrawStyle
 
 	constructor (|DrawStyle| c)
 		cpp_part ConstructorCopy
-		.text = c.text
 		.bg = c.bg
 		.edge = c.edge
 		.seps = c.seps
+		.text = c.text
 		.CornerSize = c.CornerSize
 		.CornersCut = c.CornersCut
 	

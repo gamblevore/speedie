@@ -86,13 +86,6 @@ function message.EROR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.NOOP (|&fatasm|, ) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.NOOP, self)
-}
-
-
 function message.TRAP (|asmreg| r1 = nil, |int| Mode = nil, |int| Signal = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -100,6 +93,51 @@ function message.TRAP (|asmreg| r1 = nil, |int| Mode = nil, |int| Signal = nil, 
 	rz.reginput(0) = r1
 	rz.numinput(1) = Mode
 	rz.numinput(2) = Signal
+}
+
+
+function message.NOOP (|&fatasm|, ) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.NOOP, self)
+}
+
+
+function message.DUMB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.DUMB, self)
+	rz.reginput(1) = r2
+	rz.dest(0, r1, a)
+}
+
+
+function message.TIME (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.TIME, self)
+	rz.reginput(1) = r2
+	rz.dest(0, r1, a)
+}
+
+
+function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.CONV, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.FEET (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FEET, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -136,44 +174,6 @@ function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ALLO, self)
 	rz.numinput(1) = Amount
-	rz.dest(0, r1, a)
-}
-
-
-function message.DUMB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.DUMB, self)
-	rz.reginput(1) = r2
-	rz.dest(0, r1, a)
-}
-
-
-function message.RARE (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.RARE, self)
-	rz.reginput(1) = r2
-	rz.dest(0, r1, a)
-}
-
-
-function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.CONV, self)
-	rz.reginput(1) = r2
-	rz.numinput(2) = Mode
-	rz.dest(0, r1, a)
-}
-
-
-function message.FEET (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.FEET, self)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
 	rz.dest(0, r1, a)
 }
 
@@ -376,6 +376,18 @@ function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 }
 
 
+function message.BFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.BFLS, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = up
+	rz.numinput(3) = down
+	rz.numinput(4) = sign
+	rz.dest(0, r1, a)
+}
+
+
 function message.BRSS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -405,17 +417,6 @@ function message.BLSH (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
-	rz.dest(0, r1, a)
-}
-
-
-function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.BSTT, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
 	rz.dest(0, r1, a)
 }
 
@@ -977,35 +978,13 @@ function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 }
 
 
-function message.COPY (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Length = nil, |&fatasm|) {
+function message.WCPY (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Length = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.COPY, self)
+	rz = a.RequestOp(asm.WCPY, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = Length
-}
-
-
-function message.FOPP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.FOPP, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
-	rz.dest(0, r1, a)
-}
-
-
-function message.IOP2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.IOP2, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.dest(0, r1, a)
 }
 
 
@@ -1301,6 +1280,18 @@ function message.QFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 }
 
 
+function message.QFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.QFLS, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = up
+	rz.numinput(3) = down
+	rz.numinput(4) = sign
+	rz.dest(0, r1, a)
+}
+
+
 function message.QRSS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -1374,6 +1365,39 @@ function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
+	rz.dest(0, r1, a)
+}
+
+
+function message.FOPP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FOPP, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+	rz.dest(0, r1, a)
+}
+
+
+function message.IOP2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.IOP2, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.dest(0, r1, a)
+}
+
+
+function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.BSTT, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
 	rz.dest(0, r1, a)
 }
 

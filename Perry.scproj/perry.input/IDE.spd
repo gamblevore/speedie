@@ -773,7 +773,7 @@ class PerryIDE (Window)
 		|| doc = txt.document
 		|| path = (doc.location, "")(doc)
 		|| lst = .errorlist
-		txt.clearerrors
+		txt.ClearErrors
 		.filelist.ClearErrors
 
 		|error| jumpto 

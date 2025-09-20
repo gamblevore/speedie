@@ -151,7 +151,7 @@ datatype vec4
 	module
 		function New (|vec4|)
 			cpp_part New0
-			return (0.0,0.0,0.0,0.0)
+			return nil
 		function New (|vec3| a, |float| b, |vec4|)
 			cpp_part New31
 			numeric
@@ -923,7 +923,7 @@ function ivec2.Abs (|ivec2|)
 	return (.x.abs, .y.abs)
 
 function ivec4.Clamp (|int| L, |int| H, |ivec4|)
-	return .max(L).min(H)
+	cpp_wrapper
 
 function ivec4.Max (|int| L, |ivec4|)
 	return (.x max L, .y max L, .z max L, .w max L )

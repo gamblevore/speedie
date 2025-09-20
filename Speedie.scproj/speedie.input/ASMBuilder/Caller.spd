@@ -26,6 +26,14 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 	rz |= i
 
 
+
+function QuickPrmBuild (|$int| j, |int64| P, |asmreg| Dest, |int64|)
+	|int64| v = Dest.reg
+	|| i = ++j
+	P  |=  v << (64-(i*5))
+	return P
+
+
 function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	// We want a simple param order for speedie. Only sensible way to do things.
 	// So we can't share the prmcollector.
@@ -43,7 +51,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		|| i = 0
 		for p.fast in prms
 			|| ty = p.ASMDecl
-			if ty.SpecialRegs|int| != Ints		// should get .SpecialRegs from message somehow?
+			if ty.SpecialRegs|int| != Ints
 				|int64| v = .µReffed(p!, args[i]!).reg
 				sh -= 5
 				rz  |=  v << sh
@@ -59,7 +67,13 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		rz |= (8-ic) << 0
 	  else
 		rz |= (17-ic) << 6
-		
+			
+
+function QuickPrmFinish (|int| i, |int64| P, |int64|)
+	P >>= 64-((i*5)+12)
+	P |= (17-i) << 6
+	return P
+
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	.ASMReach(fn)
@@ -92,7 +106,7 @@ function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Sta
 	// asmtodo: unnecessary? Values are always 32 or 64-bit. everthing else should be
 	// set correctly, right? remove later?
 	opt norefcounts
-	if 0: prms.FNC3, prms.FNCX, prms.FNCX3			// MARK USED
+	if 0: prms.FNC3, prms.FNCX3			// MARK USED
 
 	|| c = .Last - 1
 	while C >= Start

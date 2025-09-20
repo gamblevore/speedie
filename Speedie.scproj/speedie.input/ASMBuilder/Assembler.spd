@@ -551,7 +551,7 @@ struct Assembler
 		Instruction[asm.KNSR].Const
 		Instruction[asm.KNST].Const
 		asm.encoders[asm.KNST] = fatasm.KNST_Encoder
-		asm.encoders[asm.noop] = fatasm.NOOP_Encoder
+//		asm.encoders[asm.noop] = fatasm.NOOP_Encoder
 		return 
 		TextAssembler.Requests		?= dictionary()
 		TextAssembler.RequestTable	?= array()
@@ -588,8 +588,8 @@ struct Assembler
 		.zero.info = AsmReg()
 		.regs = nil
 		.Guard
-		fn.StartASM
 		.InlineEnd = nil
+		fn.µstart = .Index
 		.FuncStart_ = .curr - 1
 		.VTemps = 0
 		.VDecls = 1							// set after .FuncStart
@@ -600,9 +600,6 @@ struct Assembler
 		opt norefcounts
 		|| fn = .out
 		fn.µlength = .fnlength
-		|| L = fn.GuessLength
-		fn.µLengthGuess = L
-		compiler.stASMTotalOps += L
 		jsm!.length = .curr - .start 
 
 		
@@ -612,7 +609,7 @@ struct Assembler
 		|| l = .last
 		if !l.IsFinisher
 			debugger !.fn.ASMReturn
-			|| dl = .fn.Source!.DeepLast
+			|| dl = .fn.Source!.FlatLast
 			.closevars(1, dl)
 			|asmreg| dest = nil
 			if !ASMType.ReturnOpt(self, dest)

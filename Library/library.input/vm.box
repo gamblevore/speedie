@@ -211,7 +211,10 @@ forms
 	MemoryCopy
 		r1		r		// dest
 		r2		r		// src
-		Length	14
+		Length  14
+//		Index	8
+//		Length	6       // do this later... too fiddly right now
+						// its nicer on a low-level, I guess?
 		
 	AddB
 		r1		R
@@ -221,7 +224,7 @@ forms
 		r1		R
 		r2		r
 		K		l
-	
+		
 	AddAK
 		r1		R
 		r2		R
@@ -322,16 +325,32 @@ forms
 		if (u2 == u1 and u3 == u4)
 			VMFinish
 
-/**/ NOOP (U0)	// does nothing // (could be replaced with bitor 0?)
-		i1 = i1
-		#!NOOP
-
 /**/ TRAP (Trap)
 		JB_App__SelfSignal(Trap_Signalu)
 
 
 
-// needs ASM-text: rare, MEMM
+#!						 (((((UTIL)))))
+
+/**/ NOOP (U0)	// does nothing // (could be replaced with bitor 0?)
+		i1 = i1
+		#!NOOP
+/**/ DUMB (U2)
+		0 // Can be added or removed... just to align the jumps really!
+/**/ TIME (U2)
+		Time_(r, Op)
+/**/ CONV (Convert)
+		RegConv(r, Op)
+					// for SPD~>ARM conversion
+					// we can just do:	double from double --> int64reg = F64reg 
+					//					int64  from int64  --> F64Reg = int64
+					// floats or other size ints shouldn't be affected.
+
+/**/ FEET (AddK)	// Request available features. do nothing for now
+		u1 = 0		// allows doing stuff like initing hardware.
+
+
+
 #!						 (((((FUNC)))))
 /**/ GRAB (U2) 
 		u1 = (uint64)(&u2)
@@ -374,24 +393,6 @@ AFNC (FuncAddr)
 
 /**/ ALLO (Alloc)
 		AllocStack(vm, r, Op)
-
-
-
-#!						 (((((Utils)))))
-
-/**/ DUMB (U2)
-		0 // Can be added or removed... just to align the jumps really!
-/**/ RARE (U2)
-		Rare_(r, Op)
-/**/ CONV (Convert)
-		RegConv(r, Op)
-					// for SPD~>ARM conversion
-					// we can just do:	double from double --> int64reg = F64reg 
-					//					int64  from int64  --> F64Reg = int64
-					// floats or other size ints shouldn't be affected.
-
-/**/ FEET (AddK)	// Request available features. do nothing for now
-		u1 = 0		// allows doing stuff like initing hardware.
 
 
 
@@ -459,11 +460,13 @@ POS 5
 
 
 #!						 (((((Bitshifts)))))
-/**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
+/**/ BFLG  (BFLD)
 		if (BFLD_signu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
+/**/ BFLS  (BFLD)
+		u1 |= (u2 << BFLD_upu) >> BFLD_downu
 /**/ BRSS  (Shift)
 		i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3
 /**/ BRSH  (Shift)
@@ -474,9 +477,6 @@ POS 5
 
 
 #!						 (((((BitOps)))))
-/**/ BSTT  (U4)
-		i1 = 0 // bitstats(u2, u3, u4)
-
 /**/ BAND  (Shift)
 		u1 = u2  &  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BORR  (Shift)
@@ -633,19 +633,10 @@ POS 5
 		IncrementAddr(r, Op, 0)
 
 // rename to WRCP // write copy
-/**/ COPY  (MemoryCopy) // can zero memory, if we pass r0 as src.
+/**/ WCPY  (MemoryCopy) // can zero memory, if we pass r0 as src.
 		MemCopyRDWR(r, Op)
 
 
-
-#!						(((((Intrinsics!)))))
-
-// how to do instrinsics?
-// shouldn't these all go into the same thing?
-/**/ FOPP  (Float)
-		0
-/**/ IOP2  (u3)
-		0
 //	function IsInf (|bool|) // these need... to be warned about if hit in ASM and we don't have an intrinsic available
 //		cpp_wrapper (__isinff)
 
@@ -752,6 +743,8 @@ POS 5
 #!						 (((((Vector Bitshifts)))))
 /**/ QFLG  (BFLD)
 		iv1 = ((iv2 << BFLD_upu) >> BFLD_downu)
+/**/ QFLS  (BFLD)
+		iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu)
 /**/ QRSS  (Shift)
 		iv1 = (iv2 >> Shift_Shu) >> iv3
 /**/ QRSH  (Shift)
@@ -770,4 +763,18 @@ POS 5
 		uv1 = uv2 ||| (uv3 ||| Shift_Shu)
 /**/ QNOT  (Shift)
 		uv1 = ~uv2 & ~(uv3 ||| Shift_Shu)
+
+
+
+
+#!						(((((Intrinsics!)))))
+
+// how to do instrinsics?
+// shouldn't these all go into the same thing?
+/**/ FOPP  (Float)
+		0
+/**/ IOP2  (u3)
+		0
+/**/ BSTT  (U4)
+		i1 = 0 // bitstats(u2, u3, u4)
 

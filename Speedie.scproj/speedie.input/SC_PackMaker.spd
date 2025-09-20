@@ -69,7 +69,7 @@ module PackMaker
 		
 		fninit.PackID = 1 // put init and main first!
 		fnmain.PackID = 2
-
+		
 		.SortASMFuncs(.PackFuncs, nil)
 		TypeObject!.PackClassChildren(nil)
 		
@@ -141,28 +141,28 @@ module PackMaker
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		.SortFuncsAndBuildGlobs
-		if .ActualASMCompile
+		if .ActualASMCompile and options.ModePack // options.ModePack can be false, if compiler.InPerry = true
 			.WritePackToDisk
 		compiler.During = 0
 	
 	
 	function WritePackToDisk
-		|| F = Compiler.ProductPath.SetExt("xpd").file
+		|| F = Compiler.ProductPath.SetExt("zpd").file
 		require f.OpenEmpty
 		
-		|| j = jbin(@tmp, "xpd")
+		|| j = jbin(@tmp, "zpd")
 		j.file = f
 		j.enter
-		j.enter(@tmp, "app")
-		j.addint(.PackGlobSize + 16)
+		j.Enter(@tmp, "app")
+		j.AddInt(.PackGlobSize + 16)
 		j.enter
 		
-		|| stack_trace = FastString()
+		|| Stack_Trace = FastString()
 		.ListPackFuncs(j, stack_trace)
 		.DumpStrings(j)
 		.PackClasses(j)
 		.FuncLink(j)
-/		.GlobLink(j)
+		.GlobLink(j)
 		.AddDebugStuff(j, stack_trace)
 		j.ExitAll
 	
@@ -191,6 +191,7 @@ module PackMaker
 				Missed = 0
 			  else
 				Missed++
+		"Fully inlined $Missed out of ${.PackFuncs.length}"
 		j.Exit
 		
 		
@@ -203,11 +204,11 @@ module PackMaker
 		j.exit
 	
 	
-	helper DumpStringsSub (|faststring| strs)
+	helper DumpStringsSub (|jbin| strs)
 		opt norefcounts
 		for s in StringCorrector.list
 			|| n = s.length * s.Frequency
-			strs.AppendHInt(n)
+			strs.AppendStrLength(n)
 			if n
 				strs <~ s
 
@@ -229,7 +230,7 @@ module PackMaker
 	function GlobLink (|jbin| j)
 		opt norefcounts
 		j.tmp("glnk")
-/		for linked in .LibGlobs
+		for linked in .LibGlobs
 			j.add(@thg, linked.ExportName)
 		j.exit(2)
 

@@ -1060,7 +1060,7 @@ class TextView (GUIControl)
 
 	function ClearErrors
 		opt norefcounts
-		.myerror = nil
+		.MyError = nil
 		|| s = .Selectedline
 		for d in ._lines
 			if d.LineError
@@ -1075,10 +1075,14 @@ class TextView (GUIControl)
 		|| p = .clamp(e.position)
 		|| r = .FindDrawInfo(p)
 
-		if r.TrySetError(e) or !.MyError
-			.MyError ?= e
+		|| old = .myerror
+		if r.TrySetError(e) or !old
+			if e.WorseThan(old)
+				.MyError = e
 			GUI.touch(Self)
 			return r
+		return nil
+		
 
 
 	function DoExplode (|textviewline| D)

@@ -379,7 +379,7 @@ function Destructable (|Message| Blocker, |Message?| arg, |Message| name)
 	opt norefcounts	
 	|| type = TypeOfExpr(name, nil, nil)
 		(type is Readfrom)
-		|| src = blocker ?? arg!.DeepLast
+		|| src = blocker ?? arg!.FlatLast
 		using src
 		|| fn		= type.type.destructorfunc!
 		|| FnMsg	= RefMsg0(fn.exportname, fn)

@@ -1,33 +1,28 @@
 
-extend SCFunction
-	function StartASM
-		.µstart = Assembler.sh.Index
 
-	function GuessLength (|int|)
-		for s.ListASM in self
-			rz += s.GuessSize		
-		
+extend SCFunction
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
 		rz = asm[.µlength|int|*3]!
 		|| p = rz.ptr
-		|| after = .MuRender(P, P+rz.Size)
+		|| after = .FinalPass(P, P+rz.Size)
 		rz.Size = after-p
 		rz.length = rz.Size
 		
 	// cosmic lore unfold... into tales untold
 
-	function IR (|&fatasm|)
+	function FatFirst (|&fatasm|)
 		return Assembler.sh.start + .µstart
 	
-	function MuRender (|!&ASM| Where, |!&asm| After, |!&asm|)
+	
+	function FinalPass (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
 			|| n = rz - where
 			if n >= 64K
-				error (.source, "Function too large (>= 256K compiled)")
+				error (.source, "Function too large (over 256K)")
 			fat.ASMIndex = n
 			fat.CheckHasOutput
 			rz = fat.µRenderInto(rz, after)
@@ -40,7 +35,7 @@ extend SCFunction
 	
 	target debug
 		render µRender (|bool|RenderBlocks=false)
-			fs <~ "asm ${.exportname}   ${.µLengthguess*4} / ${compiler.stASMTotalOps}\n" // " asm " "asm"
+			fs <~ "asm ${.exportname}   ${.µLengthguess*4}\n" // " asm " "asm"
 			|| bb = 0
 			for µ.fat in self
 				if RenderBlocks and µ.BasicBlock != bb
@@ -65,12 +60,13 @@ extend SCFunction
 
 
 	iterator fat
-		|| FirstInst = .IR
+		|| FirstInst = .FatFirst
 		|| CurrInst = FirstInst
 		|| AfterInst = Currinst + .µlength
 		while currinst < Afterinst
 			yield currinst (CurrInst - FirstInst)
 			++currinst
+	
 
 
 function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
@@ -85,31 +81,56 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 
 	target debug: debug_require dest >= start and dest <= after
 	|| J2 = (dest - SelfOut) -1
-	check (J2 != -1) (self, "Invalid ASM generated (infinite loop)")
+	check (J2 != -1) (self, "Infinite loop")
 	.prms[reg] = J2
-	.µRenderInto(SelfOut, SelfOut+1) // rerender
-	.prms[reg] = J						 // restore!
+	.µRenderInto(SelfOut, SelfOut+1)		// rerender
+	.prms[reg] = J							// restore!
 
 
-//function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
-//	disabled
-//	cpp_part RunArgs
-//	|| r = jb_vm.vm.Registers(true)
-//	if args
-//		for i in argcount
-//			r[i] = args[i] 
-//	
-//	return jb_vm.Run(.ptr, .length)|&int64|[]
+
+function fatasm.TryRotateConst
+	|| v = .const|uint64|
+	|| OtherInv = (~v, v)(v>>63)
+	require otherinv >> 17
+	
+	|| Inv = V.CountBits > 32 
+		V = ~V
+	|| LBS = (~V).LongestBitStretch			// longest false-stretch
+	require LBS.x >= (64-12)				// can only store 12-bits
+	
+	|| ramount = 63-LBS.y 
+	V = V rotl ramount
+	._op = asm.knsr							// easier to debug
+	.r1 = ramount
+	.r2 = inv|int|
+	.r3 = v|uint|
+	target debug
+		|| back = .prms[3]|uint64| rotr .prms[1]|uint64|
+		if .prms[2]
+			back = ~back
+		if back!=.const // oof
+
 
 
 function JBin.AddFunction (|SCFunction| fn, |int| Missed)
 	// need aligning each.
 	if missed
 		self.AddInt(missed)
-	|| n = fn.µlengthguess*4
-/	|| M = .ReserveMemory(@bin, n)
-	for i in n
-		M[i] = 'A' + i
-	// MuRender
+//	|| M = .ReserveMemory(@bin, n)
+	|| f = fn.FatFirst
+	|| t = 0
+	for i in fn.µLength
+		t += f[i].GuessSize
+
+	// Call .MuRender? wouldn't it be better to pre-figure out where things are meant to go?
+	// Like the sizes of things. I mean... it would make it easier? i think its just constants?
+	// knst, knst2, knst3, knsr// how to know if its 1 2 or 3?
+	// fat.KNST_Encoder could be re-written to just figure out the consts... 
+	// from there, we know it's size.
+	// we still need a special const encoder, of course!
+	
+	self <~ (0, t*4)
+	fn.µLengthGuess = t
+	Compiler.stTotalASMOps += t
 
 

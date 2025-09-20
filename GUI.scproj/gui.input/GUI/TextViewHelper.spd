@@ -257,7 +257,7 @@ class TextViewLine (list)
 			e.when = old.when
 		.LineError = e
 		e.Obj = self
-		return e == old
+		return e != old
 
 
 	function InitDefaults (|textview| parent, |int| t, |int|)

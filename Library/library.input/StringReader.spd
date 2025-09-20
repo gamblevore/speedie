@@ -89,18 +89,22 @@ class StringReader
 		return .data.position + .StartFrom
 	setter Position (|int64|)
 		.data.position = value - .StartFrom
-			
-	function hInt (|int64|)
-		|| sh = 0
-		|| v  = 0
+
+	function StrLength (|int|)
+		|uint| v = .byte
+		if v <= 127
+			return v
+		v = v & 127
+		|| sh = 7
 		while
-			|| b = .byte
-			loop b >= 0
+			|uint| b = .byte
 			v |= (b&127) << sh
 			if b <= 127
 				return v
+			// should really cap this to 31-bits.
 			sh += 7
-			expect (sh <= 57) (self, "Corrupted hInt")
+			expect (sh <= 28) (self, "Bad Length")
+
 	
 	function DelimitedString (|byte| split, |string|)
 		// this function doesn't work with streaming...

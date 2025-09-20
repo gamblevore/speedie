@@ -35,10 +35,9 @@ module SC_Init
 		
 		expect c.AllowedMoveToInit (c)
 		
-		if c == @Decl
-			require !c.SettingToNil
-		
 		if c == @decl
+			require !c.SettingToNil
+			if c contains "Stderr"
 			.InitVarsArg ?= .BuildInitArg
 			.InitVarsArg.first <~ c
 		  else
@@ -121,16 +120,24 @@ function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
 	
 function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_name)
 	opt norefcounts
-	if src and .HasActualCode(src) and (self != Compiler.program)
-		for s.flat in src
-			if s.position < 0
-				s.position = 0
-		using src
-		dest.AlmostAppend  @sheb + ("// " + .Name)
-		|| dot = @dot + fn_name
-		dot <~ (@thg, .name)
-		dot <~ @prm
-		dest.almostappend  dot
+	require src and .HasActualCode(src) and (self != Compiler.program)
+	for s.flat in src
+		if s.position < 0
+			s.position = 0
+	using src
+	dest.AlmostAppend  @sheb + ("// " + .Name)
+
+	|| dot2 = «dot fn_name
+«thg .name »
+«prm »
+	»
+	
+	dest.almostappend  dot2
+
+//	|| dot = @dot + fn_name
+//	dot <~ (@thg, .name)
+//	dot <~ @prm
+//	dest.almostappend  dot
 
 
 
@@ -143,15 +150,21 @@ function message.AlmostAppend (|message| v)
 		self <~ v
 	
 
+function message.InitTrap (|bool|)
+	if self contains "StdErr"
+		return true
+
 
 function SCModule.DelayedInitFuncTransform
 	opt norefcounts
 	|| v = .InitVarsArg
 	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.IsLibrary)
 	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.IsLibrary)
-	
+
+	// need to separate lib and not lib out.
 	|| it = v.first
 		for (msg in it)
+			if msg.InitTrap
 			if (msg == @Decl)
 				|| name = msg.GetDclName
 					if name.InitRootDecl( msg, self )

@@ -291,8 +291,8 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		if date.int == .sectionkeytime
 			.sectionkeytime = 0
 			.editme.insertautocomplete
-		if msg.second == "asm"
-			.GotASMError(msg.first!)
+		if msg.first == "asm"
+			.GotASMError(msg.second)
 		return false
 
 	.DuringMsgFB = true

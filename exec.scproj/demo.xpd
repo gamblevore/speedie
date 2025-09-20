@@ -1,6 +1,6 @@
 //jb
 
-pack "xpd"
+pack "zpd"
 	debug:
 	meta
 		conf  // auto-generated

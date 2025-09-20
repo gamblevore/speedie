@@ -26,7 +26,7 @@ function compiler.PrintCompileTime (|date| durr)
 	|| vm_ops = VM_Builder.Total
 		fs.normal  "vm_ops",    fs <~ vm_ops
 	
-	|| ASM_Ops = compiler.stASMTotalOps
+	|| ASM_Ops = compiler.stTotalASMOps
 		fs.normal  "ASM",    (ASM_Ops*4).strsize(fs)
 
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"

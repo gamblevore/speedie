@@ -285,7 +285,7 @@ AlwaysInline void RegConv (VMRegister* r, ASM Op) {
     s = s;
 }
 
-AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
+AlwaysInline void Time_ (VMRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = n2;
 	if (r2 == 1) {		// time

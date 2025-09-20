@@ -19,12 +19,20 @@
 ı FNCX3: _
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
+ı TRAP: _
+	JB_App__SelfSignal(Trap_Signalu);
 ı NOOP: _
 	i1 = i1;
 	// NOOP
 
-ı TRAP: _
-	JB_App__SelfSignal(Trap_Signalu);
+ı DUMB: _
+	0;
+ı TIME: _
+	Time_(r, Op);
+ı CONV: _
+	RegConv(r, Op);
+ı FEET: _
+	u1 = 0;
 ı GRAB: _
 	u1 = (uint64)(&u2);
 ı RET: _
@@ -33,14 +41,6 @@
 	i1 = FuncAddr(vm, Op);
 ı ALLO: _
 	AllocStack(vm, r, Op);
-ı DUMB: _
-	0;
-ı RARE: _
-	Rare_(r, Op);
-ı CONV: _
-	RegConv(r, Op);
-ı FEET: _
-	u1 = 0;
 ı KNSR: _
 	RotateConst(r, Op);
 ı KNST: _
@@ -88,14 +88,14 @@
 	else
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
+ı BFLS: _
+	u1 |= (u2 << BFLD_upu) >> BFLD_downu;
 ı BRSS: _
 	i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3;
 ı BRSH: _
 	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
 ı BLSH: _
 	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
-ı BSTT: _
-	i1 = 0;
 ı BAND: _
 	u1 = u2 & ((u3 << Shift_Shu) >> Shift_Shu);
 ı BORR: _
@@ -220,12 +220,8 @@
 	IncrementAddr(r, Op, 1);
 ı CNTD: _
 	IncrementAddr(r, Op, 0);
-ı COPY: _
+ı WCPY: _
 	MemCopyRDWR(r, Op);
-ı FOPP: _
-	0;
-ı IOP2: _
-	0;
 ı FADD: _
 	if (Float_Du)
 	d1 = d2 + d3 - d4
@@ -304,6 +300,8 @@
 	iv1 = JB_ivec4_ClampVec(iv2, iv3, iv4);
 ı QFLG: _
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
+ı QFLS: _
+	iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu);
 ı QRSS: _
 	iv1 = (iv2 >> Shift_Shu) >> iv3;
 ı QRSH: _
@@ -318,5 +316,11 @@
 	uv1 = uv2 | (uv3 | Shift_Shu);
 ı QNOT: _
 	uv1 = ~uv2 & ~(uv3 | Shift_Shu);
+ı FOPP: _
+	0;
+ı IOP2: _
+	0;
+ı BSTT: _
+	i1 = 0;
 ı 
 

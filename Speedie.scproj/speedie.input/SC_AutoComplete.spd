@@ -101,11 +101,11 @@ function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
 
 function WriteError (|string| name, |message|)
 	rz = @tmp + "error"
-	|| err = StdErr.pop
-		rz <~ err.name
-	  else
-		rz <~ "error"
 	rz <~ name
+	if stderr.ok
+		rz <~ "error" // unknown error?
+	  else
+		rz <~ .MiniErrors(stderr, errorseverity.problem)
 
 
 function CmdResponse (|Message| cmd, |message|)
@@ -121,11 +121,13 @@ function CmdCleanUp (|Message| arg, |message|)
 		|| tmp = @arg + "Perry"
 		tmp <~ arg 
 		arg = tmp
+	
 	|| date = arg.first
 	if date != @num
 		"missing date in @arg"
 		date = @num + 0
 		arg.first = date
+	
 	|| Cmd = arg.second
 	if Cmd != @tmp
 		"missing cmd in @arg"
@@ -153,11 +155,11 @@ function CmdWrap (|Message| arg, |bool|)
 	return true
 
 
-function MiniErrors (|errorreceiver| L, |message|)
-	return compiler.RenderErrors(L, errorseverity.warning).parse
+function MiniErrors (|errorreceiver| L, |errorseverity| sev = errorseverity.warning, |message|)
+	return compiler.RenderErrors(L, sev).parse
 
 
-function ErrorsToPerry (|message|)
+function ErrorsInAWayThatPerryLikes (|message|)
 	if !.Cleaned
 		.errors!.PrePrintErrors
 		.Cleaned = true
@@ -343,7 +345,7 @@ function CheckSub (|message| cmd, |message|)
 
 function Message.SendPerryErrors (|message|)
 	.clear
-	self <~ Interact.ErrorsToPerry
+	self <~ Interact.ErrorsInAWayThatPerryLikes
 	return self
 	
 
@@ -523,7 +525,6 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	require fn
 	SCFunction.CurrFunc = fn
 	
-	if cmd contains "__CopyID__"
 	|| thg = fn.source!.FindPos(f, n)
 	if cmd starts "asm" or "cpp"
 		return .CppASM(cmd, fn)
@@ -1125,7 +1126,10 @@ function ASMFail (|scfunction| fn, |message?| ret,  |message|)
 
 function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
-	require stderr.ok and !fn.SavedError
+	// Not safe to continue (At least in ASM) if theres an error
+	|| err = fn.savederror
+		StdErr <~ err
+		return nil
 	
 	|| src = fn.source				#expect (fn)
 	|| path = src.File				#expect (src)
@@ -1133,16 +1137,11 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	rz = @tmp.msg(msg.name)
 	rz.msg(@thg, fn.name)
 	|| rzarg = rz.msg(@arg)
-	if !fn.HasProperSpeedieCode
-		.Nothing(rzarg, fn)
-		if fn.SavedError
-			return .ASMFail(fn, rz)
-	  elseif msg ~= "cpp"
+	if msg ~= "cpp"
 		.Cpp(rzarg, fn)
-	  else
-		if !.ASM(rzarg, fn)
-			rz = nil
-			.ASMFail(fn, rz)
+	  elseif !.ASM(rzarg, fn)
+		rz = nil
+		.ASMFail(fn, rz)
 
 
 

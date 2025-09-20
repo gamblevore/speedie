@@ -149,10 +149,10 @@ function message.DUMB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.RARE (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
+function message.TIME (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.RARE, self)
+	rz = a.RequestOp(asm.TIME, self)
 	rz.reginput(1) = r2
 	rz.dest(0, r1, a)
 }
@@ -409,15 +409,15 @@ function message.BLSH (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.BSTT, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.dest(0, r1, a)
-}
+//function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+//	visible
+//	|| a = assembler.sh
+//	rz = a.RequestOp(asm.BSTT, self)
+//	rz.reginput(1) = r2
+//	rz.reginput(2) = r3
+//	rz.reginput(3) = r4
+//	rz.dest(0, r1, a)
+//}
 
 
 function message.BAND (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
@@ -977,10 +977,10 @@ function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 }
 
 
-function message.COPY (|asmreg| r1, |asmreg| r2, |int| Length, |&fatasm|) {
+function message.WCPY (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Length = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.COPY, self)
+	rz = a.RequestOp(asm.WCPY, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = Length

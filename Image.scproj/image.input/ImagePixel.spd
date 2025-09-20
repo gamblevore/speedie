@@ -11,17 +11,18 @@ struct ImagePixelStruct
 	helper AppendVec4 (|vec4| V)
 		v = (v * 255.0) + 0.5
 		|| iv = v.iVec4
-		.r = iv.r._CB2
-		.g = iv.g._CB2
-		.b = iv.b._CB2
-		.a = iv.a._CB2
+		iv = iv.clamp(0,255)
+		.r = iv.r
+		.g = iv.g
+		.b = iv.b
+		.a = iv.a
 
 	helper AppendVec3 (|vec3| V)
 		v = (v * 255.0) + 0.5
-		|| iv = v.iVec3
-		.r = iv.r._CB2
-		.g = iv.g._CB2
-		.b = iv.b._CB2
+		|| iv = v|vec4|.iVec4.clamp(0,255)
+		.r = iv.r
+		.g = iv.g
+		.b = iv.b
 	
 	function Px (|ImagePixel|)
 		return self|&ImagePixel|[]
@@ -34,13 +35,6 @@ struct ImagePixelStruct
 //	    self &= L-1			// clamp < 0
 //	    self |= -H			// clamp > 255
 //	    return self
-	
-	helper int._CB2 (|byte|)
-		description "A secret ClampByte"
-	    self &= (self<0)-1	// clamp < 0
-	    self |= -(self>255)	// clamp > 255
-	    return self
-
 
 
 datatype ImagePixel (uint)

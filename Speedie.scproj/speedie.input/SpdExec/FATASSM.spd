@@ -220,7 +220,7 @@ struct FatASM
 		cpp_Part JumpToSet
 		|| j = .JumpPrm
 			|| D = (value - self) - 1
-			check (D != -1) (self, "bad jump")
+			check (D != -1) (self, "Infinite loop")
 			.prms[j-1] = D
 			if d == 0
 				assembler.sh.nop(self)
@@ -305,31 +305,48 @@ struct FatASM
 
 
 	function FuncPrms (|scfunction| fn, |uint64|)
+		|| A = .r2|uint64|
+		|| B = 0|uint64|
 		if self isa asm.tail
-			return .r1 >> 5
-
-		|| R = .r2|uint64| ||| (.r3|uint64| << 32)
-		if !fn.hascversion
+			B = A
+			A = .r1
+		  else
+			B = .r3
+			
+		|| R = A ||| (B << 32)
+		|| op = ._op
+		ifn op == asm.fncx or asm.fncx3
 			return R >> 5
 		return R >> 12
 
 	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
-		|| fn = .msg.Obj as SCFunction 		#require		
+		|| fn = .msg.Obj|scfunction|
+		ifn fn isa scfunction
+			fn = nil
 		|| regs = .FuncPrms(fn)
-		|| n = fn.Args.Length
-
+		|int64| n = regs.log2/5
+		if fn
+			n = fn.Args.Length
 		fs <~ "("
+		
+		if n > 10
+/			n = 10 // sigh
 
-		while n
+		|| IsC = (self isa asm.fncx or asm.fncx3)
+
+		while (n>0)
+			n--
 			fs <~ 'r'
-			if fn.HasCVersion
-				fs <~ (regs>>((--n)*5))&31
+			|| r = regs
+			if isc
+				r = regs >> (n*5)
 			  else
-				fs <~ regs & 31
 				regs >>= 5
-				n--
+			
+			fs <~ r&31
+			
 			if n > 0
 				fs <~ ", "		
 		fs <~ ")"

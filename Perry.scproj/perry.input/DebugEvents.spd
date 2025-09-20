@@ -109,11 +109,13 @@ function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststrin
 
 function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
 	|| out = .DebugAppCallArgsDisplay(F, args)
-	.LogOneAction(@emb + out.Copy)
+	|| str = out.GetResult
+	.ProductOut.Log(str, 256K)
+	.LogOneAction(@emb + str)
 	out <~ ("\n", 2)
 	|| r = Process.stream(f, args, out, faststring(), ProcessOwnerMode.OwnGroup)
-	.RunCompiledApp = r
 	if r and r.PID
+		.RunCompiledApp = r
 		.ShowProductIfMoreOutput = out.Length
 		.RunButton.text = "\07"
 
@@ -324,20 +326,41 @@ function ListView.AddFail (|string| s)
 
 function perryide.GotASM (|message| asm)
 	.DuringASMEvent = true
+	.ClearOldASMErrors
 	.GotASMSub(asm)
 	.ReselectASM
 	.DuringASMEvent = false
 	
 
-function perryide.GotASMError (|message| Error)
-	|| name = error.name
-	if name and name ~!= "error"
-		// || err = error(nil, name) // we need a position...
-		notifications <~ name
+function perryide.ClearOldASMErrors
+	opt	norefcounts
+	|| err = .Editme.MyError$
+	.editme.MyError = nil
+	|| msg = .editme.MessageAt(err.Position)$
+	|| fn = msg.owningfunc$
+	|| After = fn.FlatLast.After
+	|| Start = fn.Position
+	// how to clear lines in this range.
+	|| s = .EditMe.findDrawInfo(Start)
+	while s and (s.Position <= after)
+		err = s.LineError
+		if err and err.tag == 8888
+			s.LineError = nil
+		s++
+		
+
+
+function perryide.GotASMError (|message| Error_List)
+	opt norefcounts
+	.ClearOldASMErrors
+	for s in Error_List
+		|| err = error.from(s)
+			s.Tag = 8888
+			.editme.addErrorToLine(err, false)
 
 
 function perryide.GotASMSub (|message| asm)
-	|listviewrow| name = asm.first$
+	|ListViewRow| name = asm.first$
 	|| l = .ASMView
 	l.clear
 	|| src = l.ListSource

@@ -538,7 +538,7 @@ function SCFunction.AddConstructorReturn2
 			args.first = macros.ConstructorNewTask.run(type)
 		  else
 			args.first = macros.ConstructorNew.run(type)
-		parser.using.position = args.deeplast.position
+		parser.using.position = args.FlatLast.position
 		args.msg(@tmp, "return") <~ (@thg, "self")
 	  else
 		|| ret = .args.first

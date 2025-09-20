@@ -75,21 +75,13 @@ class FastString {
 	function GetResult (|object?| other, |string|)
 		nil self
 		cpp_wrapper JB_FS_SmartResult
-	function Copy (|string|)
-		cpp_wrapper JB_FS_Copy
+	
+//	function Copy (|string|)
+//		cpp_wrapper JB_FS_Copy
 	
 	function Reserve (|int| N, |&byte|)
 		cpp_wrapper JB_FS_WriteAlloc_
-	
-	function AppendHInt (|uint64| n)
-		while
-			if n <= 127
-				self <~ (n)|byte|
-				exit
-			self <~ (n ||| 128)|byte|
-			n >>= 7
 			
-		
 	function AppendLInt (|uint64| n)
 		while n
 			self <~ N|byte|
@@ -177,8 +169,12 @@ class FastString {
 		cpp_part AppendFastString
 		.AppendMemory(fs.resultptr, fs.length)
 		
-	syntax Append (|Byte| data)
+	function AppendByte (|Byte| data)
 		cpp_wrapper JB_FS_AppendByte
+	
+	syntax Append (|Byte| data)
+		cpp_part AppendByte2
+		.appendbyte(data)
 		
 	syntax Append (|vec3| data)
 		cpp_part AppendVec3 // shouldn't be necessay, .render(fs) should be called

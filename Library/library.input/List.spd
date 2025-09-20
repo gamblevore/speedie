@@ -101,12 +101,17 @@ class list (Saveable)
 		return .parent.next.first
 
 			
-	function FlatLast (|...!|) // deepest
+	function DeepLast (|...!|)
+		disabled "Use .flatlast"
+
+	
+	function FlatLast (|...!|)
 		opt norefcounts
 		real self
-		rz = self
 		while
-			rz = rz.last	#loop
+			|| l = .last #loop
+			self = l
+		return self
 
 
 	function FlatNext  (||)	

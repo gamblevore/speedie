@@ -5,7 +5,6 @@
 
 |SCClass|	TypeFloat64
 |SCClass|	Typefloat
-//|scclass|	TypeFloat16
 |SCClass|	TypeSaveable
 |SCClass|	TypeInt
 |SCClass|	TypeInt16
@@ -120,6 +119,7 @@ linkage
 
 |SCModule|					DisamClasses
 |SCModule|					DisamModules
+|SCModule|					LibInit
 
 |byte|						InPerry
 |SCNodeInfo|				InBuiltType
@@ -136,7 +136,7 @@ linkage
 |int64|						stTotalSourceSize
 |int|						stTotalFileCount
 |int|						stParseTimeTotal
-|int|						stASMTotalOps
+|int|						stTotalASMOps
 
 |int|						CurrStage
 |string|					StageName
@@ -670,11 +670,13 @@ function CreateDisambiguation
 	// make a module...
 
 	.DisamClasses = SCModule.NewContainer("__classes__")
-	.DisamModules = SCModule.newContainer("__modules__")
+	.DisamModules = SCModule.NewContainer("__modules__")
+	.LibInit = SCModule.NewContainer("__libinit__")
 
 
 function SoftClass (|string| name, |scclass|)
 	return compiler[name, SCNodeFindMode.NoErrors]
+
 
 syntax access (|string| name, |SCNodeFindMode| Mode=0, |SCClass|)
 	cpp_part FindClassName

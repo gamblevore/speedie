@@ -2,6 +2,7 @@
 
 
 module ASMExamples {
+
 target pack { 
 |int| Glob
 |int| Bolg
@@ -20,6 +21,11 @@ function GlobRead
 	|| I = compiler.stTotalSourceSize
 
 
+function Copy (|&fatasm| A, |&fatasm| b)
+	Memory.Copy(a, b, 64)
+	a.info = b.info
+	a[0] = b[0]
+	
 function Grab
 	cpp_part greb
 	|| b = '1'

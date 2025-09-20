@@ -87,16 +87,23 @@ role JBin (Faststring)
 	function AddMemory		(|syntax| type, |int| L, |bool| GoIn, |&byte| data, |jbinleaver|)
 		|| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
-		.AppendHInt(L)
+		.AppendStrLength(L)
 		.AppendMemory(data, L)
 		if goin
 			.Indent++
 			return 1
+		
+	helper AppendStrLength (|int| n)
+		while n >= 128
+			.appendbyte(n ||| 128)
+			n >>= 7
+		.AppendByte(n)
+			
 
 	function ReserveMemory	(|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
 		|| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
-		.AppendHInt(L)
+		.AppendStrLength(L)
 		.Indent += goin
 		return .Reserve(L)
 		
@@ -146,7 +153,7 @@ helper StringReader.NextMsgInfo (|uint64|)
 
 	|| T = (info >> 1)|syntax|
 	if (t < @max and T > @nil) // 01 --> T=@nil
-		msg = msg.msg(t, .str(.hInt))			
+		msg = msg.msg(t, .str(.strlength))			
 		if info & 1
 			._Object = msg
 		|| cb = .CallBack

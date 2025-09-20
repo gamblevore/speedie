@@ -1,8 +1,8 @@
 
 
-function fatasm.NOOP_Encoder (Asm_encoder)
-	curr[] = asm.noop << 24
-	return curr
+//function fatasm.NOOP_Encoder (Asm_encoder)
+//	curr[] = asm.noop << 24
+//	return curr
 
 
 function fatasm.KNST_Encoder (Asm_encoder)
@@ -44,30 +44,6 @@ extend Assembler
 		|| K = (fn)(l, r)
 		.Nop2Consts(r, l)
 		return .NumToReg(exp, dest, k, dest.µtype)
-
-
-	function fatasm.TryRotateConst
-		|| v = .const|uint64|
-		|| OtherInv = (~v, v)(v>>63)
-		require otherinv >> 17
-		
-		|| Inv = V.CountBits > 32 
-			V = ~V
-		|| LBS = (~V).LongestBitStretch			// longest false-stretch
-		require LBS.x >= (64-12)				// can only store 12-bits
-		
-		|| ramount = 63-LBS.y 
-		V = V rotl ramount
-		._op = asm.knsr							// easier to debug
-		.r1 = ramount
-		.r2 = inv|int|
-		.r3 = v|uint|
-		target debug
-			|| back = .prms[3]|uint64| rotr .prms[1]|uint64|
-			if .prms[2]
-				back = ~back
-			if back!=.const // oof
-	
 	
 	function SetConst (|message| exp, |int64| value, |asmreg| ml, |asmreg| Dest, |asmreg|)
 		// only boolconst1 uses this. can be simplified.
@@ -95,7 +71,7 @@ extend Assembler
 					return info
 			
 	
-	function LoadNumber (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)
+	function LoadNumber (|message| exp, |int64| V, |asmreg| Dest=nil, |asmreg|)
 		if !Dest.reg
 			|| Found = .MegaNumFinder(v, dest.µtype)
 				return Found

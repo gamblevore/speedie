@@ -39,7 +39,7 @@ extern "C" {
 		return JB_Vec4_ClampVec(Self, (vec4){A,A,A,A}, (vec4){B,B,B,B});
 	}
     
-	vec4 JB_ivec4_ClampVec (ivec4 Self, ivec4 A, ivec4 B) {
+	ivec4 JB_ivec4_ClampVec (ivec4 Self, ivec4 A, ivec4 B) {
 		// we can't rely on std::clamp... it seems to give bad results sometimes.
 		// thats without even reuseing clamp as min/max by passing (self, A, self)!!
 		Self[0] = std_clamp(Self[0], A[0], B[0]);
@@ -49,7 +49,7 @@ extern "C" {
 		return Self;
 	}
 	
-	vec4 JB_ivec4_Clamp (ivec4 Self, int A, int B) {
+	ivec4 JB_ivec4_Clamp (ivec4 Self, int A, int B) {
 		return JB_ivec4_ClampVec(Self, (ivec4){A,A,A,A}, (ivec4){B,B,B,B});
 	}
 	    
