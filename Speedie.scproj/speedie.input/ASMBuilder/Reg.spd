@@ -82,15 +82,14 @@ datatype ASMReg (uint64)
 	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|
 	
-//	function CopyConst (|asmreg| Src, |asmreg|)
-//		return (self &~ Const) as (src & Const)
 	
 	function ConstCheck
-		|| v = .reg$
-		|| k = .const
-		|| g = Assembler.sh.Register(v) #debug_require
-		|| k2 = g.const
-		if k2 != k // well fuck
+		target debug
+			|| v = .reg$
+			|| k = .const
+			|| g = Assembler.sh.Register(v) #debug_require
+			|| k2 = g.const
+			if k2 != k // well fuck
 		
 	function Const (|int64|)
 		// every single caller must check for Const (and does!)
@@ -102,17 +101,9 @@ datatype ASMReg (uint64)
 		if self isnt param
 			.NeedFAT
 		
-//	function Const (assigns:|int64|)
-//		.needfat.const = value
-//
-//	function CanBeKnownValue (|bool|)
-//		 return self is NotAlteredInbranch and Const
 
 	function IsZero (|bool|)
 		return  (self is Const) and (.const == 0)
-		
-//	function IsConst (|int64| val, |bool|)
-//		return  (self is Const) and (.const == val)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
@@ -312,16 +303,6 @@ datatype ASMReg (uint64)
 		.reg = dest 
 		return self
 	
-//	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
-//		if InUse.reg == dest.reg				// dest is in use!
-//			.reg = 0
-//			isnt temp
-//			return self
-//												// dest is free!
-//		return .reg(dest)
-//	
-
-	
 	target debug {
 	function DebugPrint 
 		target debug
@@ -359,6 +340,7 @@ datatype ASMReg (uint64)
 function int.asm (|asmreg|)
 	cpp_part ToASM
 	rz.reg = self // (self - 1)&31 // would be better?
+
 
 function int.TextASM (|asmreg|)
 	rz.reg = self // (self - 1)&31 // would be better?

@@ -56,7 +56,7 @@ Module Jeebox
 	|| CSLine			= "\n\r".charset(false)
 	|| CSAfterDot		= " ,:\t\n\r\\".charset(false)
 	|| CSAfterStatement	= " ,:\t\n\r\\'`\"{#\$%".charset(false)
-	|| CSLineBlack		= "\n\r,".charset(false)
+//	|| CSLineBlack		= "\n\r,".charset(false)
 	|| CSWrapSplit		= " \t\n\r\f-^+/\\*:;<>=,".charset(false)
 
 	.InitConstants

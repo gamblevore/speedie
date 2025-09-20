@@ -283,11 +283,6 @@ module Feedback
 			Options.Compile = false
 			Options.ModeCpp = false
 		
-		+'errortest' 
-			explain(purpose, "Tests if error handling works OK.")$
-			PrintError "Errors print successefully\n"
-			return true // does something, counts towards operationCount
-		
 		+'flowmode'
 			0 // placeholder
 			

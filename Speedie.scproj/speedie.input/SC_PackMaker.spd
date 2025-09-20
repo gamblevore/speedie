@@ -181,16 +181,13 @@ module PackMaker
 	function ListPackFuncs (|jbin| j, |faststring| func_names)
 		opt norefcounts
 		j.enter(@tmp, "code")
-		|| Missed = 0
+		|HairyMan| Slapped 
 		for f in .PackFuncs
-			if f is UsedByASM
-				j.AddFunction(f, Missed)
+			|| berries = (Slapped)(f is UsedByASM)
+				j.AddFunction(f, berries)
 				func_names <~ f.exportname
 				func_names <~ '\n'
-				Missed = 0
-			  else
-				Missed++
-		"Fully inlined $Missed out of ${.PackFuncs.length}"
+		Slapped.Churn("Proj: ", .packfuncs.length)
 		j.Exit
 		
 		
@@ -221,16 +218,26 @@ module PackMaker
 	function FuncLink (|jbin| j)
 		opt norefcounts
 		j.tmp("flnk")
+		
+		|hairyman| Slapped
 		for linked in .libfuncs
-			j.add(@thg, linked.ExportName)
+			|| PurpleDoors = (slapped)(linked is UsedByASM)
+				if PurpleDoors > 0
+					j.addint(PurpleDoors)
+				j.add(@thg, linked.ExportName)
+		Slapped.Churn("LibFuncs", .libfuncs.length)
+
 		j.exit(2)
+
 	
 	
 	function GlobLink (|jbin| j)
 		opt norefcounts
 		j.tmp("glnk")
+//		|HairyMan| WildMan 
 		for linked in .LibGlobs
-			j.add(@thg, linked.ExportName)
+			if linked is UsedByASM
+				j.add(@thg, linked.ExportName)
 		j.exit(2)
 
 
@@ -351,4 +358,20 @@ function SCFunction.CanLibLoad (|bool|)
 	
 	0 down and 0 up means... skip! for placeholders
 */
+
+
+struct HairyMan
+	|int| Total
+	|int| Curr
+	syntax Call (|bool| b, |ind|)
+		if b
+			|| c = .curr
+			.curr = 0
+			return c
+		.curr++
+		.total++
+		return -1
+			
+	function Churn (|string| s, |int| n)
+		"$s$.Total / $n"
 

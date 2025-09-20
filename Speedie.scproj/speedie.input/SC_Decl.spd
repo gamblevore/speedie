@@ -78,13 +78,15 @@ datatype SCDeclInfo (uint)
 		AlteredOrRef = Altered ||| Reference
 		Task
 		Self
-		Used = [ReadFrom, SetTo]
+		ReadFrom
+		SetTo
 		Grabbed
 		PostIncremented
 		VarThatGotReturned
 		ReturnedStruct
-		IntendedAsReturn
 		Library
+		UsedByASM
+		IntendedAsReturn
 		
 		Temp			= body ||| CompilerCreated
 		VarType			= Param ||| Body ||| Global ||| Property

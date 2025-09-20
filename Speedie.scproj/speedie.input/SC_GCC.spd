@@ -198,9 +198,6 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 	
 	rz.AppendWords( cmode )
-
-//	if options.Compile32Bit.IsKnown
-//		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
 	
 	|| spdroot = file.Speediedir
 	rz.appendwords("-L$spdroot/Library")
@@ -361,17 +358,6 @@ function RunCppCompile
 	.UseAndCompile(		Cpp_Export.Cpp_input,			.ProjTmpPath )$
 	|| P = compiler.ProductPath
 	.TransCompile(		.FoundObjects,			"-o " + P,	"o",  p.file )
-		
-
-//function MakeLib
-//	|| n = compiler.productpath.sibling("libspeedie.dylib")
-//	if !options.silent
-//		"Lib at: $n"
-//	
-//	.CompilingLibFiles++
-//	.TransCompile(		.FoundObjects,			"-o " + n,	"o" )
-//	.CompilingLibFiles--
-	
 
 
 function LinkOK (|file| p, |file|) // or just not a link

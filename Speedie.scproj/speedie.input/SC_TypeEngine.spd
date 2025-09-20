@@ -319,11 +319,6 @@ function TypeOfChar (ExprResolver)
 	return char_decl
 
 
-
-//|| CSHex			= "AFaf09__".charset
-//|| CSNum			= "09..".charset
-
-
 function message.UnitMatch (|string| a, |string| b, |bool|)
 	opt norefcounts
 	|| unit = .name
