@@ -221,7 +221,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		rz.appendwords( " -lrt" )
 	
 	// Gaming64Bit
-	rz.AppendWords("-ffast-math -fno-math-errno")
+	rz.AppendWords("-ffast-math -fno-math-errno -fwrapv")
 	
 	if options.arch ~= "intel"
 		rz.appendwords( "-arch x86_64" )
@@ -586,7 +586,7 @@ function array.AddCStr (|array of string| self, |string| s)
 		self <~ s.cstr
 
 
-function array.AppendWords (|array of string| self, |string| R)
+function array.AppendWords (|array of string| self, |string| R) // appendoptions, addoptions
 	for S in R / ' '
 		.AddCStr(s)
 
