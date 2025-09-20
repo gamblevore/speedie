@@ -391,10 +391,10 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 			while .text.CharMode(fwd) == ' '
 				fwd++
 			
-			s = (fwd, fwd)
-			// we wanna sel the actual text
-			while .text.CharMode(s.x2) == '_'
-				s.x2++
+			s = (fwd, 0)
+			while .text.CharMode(fwd) == '_'
+				fwd++
+			s.x2 = fwd
 			.Selrange = s
 			return 1
 	

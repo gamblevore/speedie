@@ -22,7 +22,7 @@ module PackMaker
 		if f.IsLibrary
 			if f.MyReacher or options.MakeInterpreter
 				.LibFuncs <~ f
-		  elseif f.MyReacher or (f in "ASMExamples")
+		  elseif f.MyReacher
 			.PackFuncs <~ f
 
 		
@@ -84,6 +84,13 @@ module PackMaker
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.ExportPosition = i + 1
+
+		for c in Compiler.ClassList
+			if c.IsRole
+				|| t = c.ClassType!
+				|| t2 = c.RealClass.ClassType!
+				t.ExportPosition = t2.ExportPosition
+				
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
@@ -108,31 +115,23 @@ module PackMaker
 			j.Add(@thg, f.exportname)
 		j.Exit
 
-	
-	function CompileSomeFunctions (|bool| MiniTest, |bool|)
-		opt norefcounts
-		for fn in .Packfuncs
-			if fn.AMiniTest == MiniTest
-				require Assembler.sh.GenerateASM(fn)
-		Assembler.sh.Guard
-		
-		if minitest
-			.RunAFewTests
-			return true
-		
-		|| main = Compiler.MainFunc
-			(main is usedbyasm)
-		return true
 
 	
-	function ActualASMCompile (|bool|)
+	function FATCompile (|bool|)
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
 		Assembler.jsm.length = 0
 		
-		if !compiler.InPerry
-			require .CompileSomeFunctions(true)
-		return .CompileSomeFunctions(false)
+		for fn in .Packfuncs
+			require Assembler.sh.GenerateASM(fn)
+		Assembler.sh.Guard
+		
+		if !Compiler.InPerry
+			.RunAFewTests
+		
+		|| main = Compiler.MainFunc
+			(main is usedbyasm)
+		return true
 	
 	
 	function MakePack 
@@ -141,7 +140,7 @@ module PackMaker
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		.SortFuncsAndBuildGlobs
-		if .ActualASMCompile and options.ModePack // options.ModePack can be false, if compiler.InPerry = true
+		if .FATCompile and options.ModePack // options.ModePack can be false, if compiler.InPerry = true
 			.WritePackToDisk
 		compiler.During = 0
 	
