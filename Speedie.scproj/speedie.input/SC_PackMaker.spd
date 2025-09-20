@@ -316,36 +316,10 @@ function SCFunction.CanLibLoad (|bool|)
 		return true
 
 
-/* Instead of this... SortAndPackFuncs could create some cpp... like
-struct LibPack
-	|int|			FuncCount
-	|int|			GlobCount
-	|LibEntry[1]|	Item
-
-struct LibEntry
-	|&nil|		Where
-	|cstring|	Name
-
-then we just return a LibPack* from C++.
-
-Then exec can just... use the table directly, as it is already sorted. :)
-*/
-
-
-//|| LIBGC = 0 // not used much... but definitly is needed
-//function scdecl.CheckLibGlob 
-//	if (self isnt marked) and self.IsLib and (self is Global) and (self isnt const)
-//		|| c = SCFunction.CurrFunc
-//			if !c.IsSTDLib
-//				is Marked
-//				LIBGC++
-//				"\n/*\n$self($LIBGC) --> ${c.exportname}\n*/\n"
-
-
 /*
 	Globals used by speedie: (legit, not removeable)
 	|Array of Message!| TmpPrms_(1) --> VM_Builder__FinishAcc
-	|Random| Shared(2)				--> SCGame3D__Love
+	|Random| Shared(2)				--> SCGame3D__Love // remove!
 	|ErrorReceiver!| StdErr(3)		--> nil__LaunchMothership
 	|MessagePosition| Using(4)		--> AC__ParserRestore
 	|SpdProcess| Parent(5)			--> AC__EnterAutoComplete
@@ -357,6 +331,24 @@ Then exec can just... use the table directly, as it is already sorted. :)
 	|byte| AutoPrint(11)			--> FB__AppOptions_breakonerr
 	|bool| DebugExecute(12)			--> FB__AppOptions_noisy
 	|Charset!| CSWordStart(13)		--> Str_IsOKForImport
+	
+	The self-compile seems to be filled with littered with wasteful globals? WHY? all sorts of functions called from glnk
 */
 
+
+
+
+/*
+	We can make a link-compression scheme!
+	JB_File__Prefs
+	JB_File__SpeedieDir -->
+	JB_File__Prefs
+	xxxxxxxxxSpeedieDir -->
+	
+	just mark how many bytes backwards and forwards. Can do in 1 byte. 4 bits for down 4 bits for up.
+	
+	If we go 0 up... it means a special code. For extra-long stuff.
+	
+	0 down and 0 up means... skip! for placeholders
+*/
 

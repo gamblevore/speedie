@@ -79,12 +79,15 @@ function SCFunction.operatorin (|string| s, |bool|)
 	return .parent.name ~= s
 
 
-function SCFunction.TestObesity (|?&ivec4|)
+|ivec4| Butter 
+function SCFunction.TestObesity (|!&ivec4|)
 	opt norefcounts
 	target debug
 		|| mu = .µLength
 			|| mu2 = .µTest
 			.µprint(0)
-			return jb_vm.Run(mu2.ptr, mu2.length)
+			rz = jb_vm.Run(mu2.ptr, mu2.length)
+	if !rz?
+/		rz = butter
 
 	

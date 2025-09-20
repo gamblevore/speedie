@@ -207,6 +207,7 @@ class FlowControl
 
 
 datatype FlowControlStopper (int)
+	linkage: cpp_part flow
 	syntax UsingComplete (|object| dummy=nil)
 		flow off
 		flowcontrol.stop
