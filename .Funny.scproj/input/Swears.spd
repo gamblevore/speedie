@@ -9,6 +9,10 @@ class SwearWord
 			s = s[1...]
 			.Adjective = true
 		.name = s
+		
+	constants
+		Letters = "@*%^|&$?"				// swearing increases code quality :D
+	
 
 
 extend_module swearword
