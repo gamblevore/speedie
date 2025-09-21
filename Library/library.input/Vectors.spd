@@ -169,7 +169,7 @@ datatype vec4
 			numeric
 			return (a,b,c,d)
 		function Load (|&byte| B, |vec4|)
-			cpp_inbuilt JB_vec4_Load
+			cpp_wrapper JB_vec4_Load
 
 
 datatype ivec4
@@ -323,7 +323,7 @@ datatype ivec4
 	
 	module
 		function Load (|&byte| B, |ivec4|)
-			cpp_inbuilt JB_ivec4_Load
+			cpp_wrapper JB_ivec4_Load
 
 		function New (|ivec4|)
 			cpp_part New0

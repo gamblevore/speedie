@@ -63,9 +63,6 @@ datatype int
 		|| mask = (1<<bit)
 		return (self &~ mask) ||| (value|int| << bit) 
 
-	function Clz (|int|)
-		cpp_inbuilt __builtin_clz
-
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
 
@@ -264,9 +261,6 @@ datatype uint
 		
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
-
-//	function Crc (|byte| b, |uint|)
-//		cpp_inbuilt __builtin_ia32_crc32qi // not on arm?
 		
 	operator rotl (|int| Amount, |uint64|)
 		cpp_wrapper JB_u32_RotL
