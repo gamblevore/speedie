@@ -244,3 +244,8 @@
 
 #define   VecConst_K1i       ((( int)((Op)<<13))>>13)
 #define   VecConst_K1u       (((uint)((Op)<<13))>>13)
+
+#define   VecInc_parti       ((( int)((Op)<<18))>>30)
+#define   VecInc_partu       (((uint)((Op)<<18))>>30)
+#define   VecInc_Amounti       ((( int)((Op)<<20))>>20)
+#define   VecInc_Amountu       (((uint)((Op)<<20))>>20)

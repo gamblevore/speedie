@@ -86,7 +86,6 @@ linkage
 |Dictionary of SCNode|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
-//|SCFunction|				PrivateProperty
 |SCFunction|				RefIncr
 |SCFunction|				RefIncr2
 |SCFunction|				RefDecr
@@ -95,6 +94,7 @@ linkage
 |SCFunction|				RefFreeIfDead
 |SCFunction|				RefSafeDecr
 |SCFunction|				RefSetRef
+|SCFunction|				RefNew
 
 //|SCFunction|				NewFunc
 |SCFunction|				SwapFunc
@@ -337,9 +337,9 @@ function InitBasicFuncs (|bool|)
 	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
+	.RefNew			= .LoadRefFunc( "JB_NewClass" )
 	
 	.SwapFunc		= .FindFunction( "JB_Swap" )
-	.FindFunction( "JB_New" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.fnAs			= .LoadTypeTest( "operatoras" )
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )

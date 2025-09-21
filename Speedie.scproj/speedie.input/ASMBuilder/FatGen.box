@@ -1268,6 +1268,17 @@ function message.QCLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
+function message.QINC (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| part = nil, |int| Amount = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.QINC, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = part
+	rz.numinput(3) = Amount
+	rz.dest(0, r1, a)
+}
+
+
 function message.QFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh

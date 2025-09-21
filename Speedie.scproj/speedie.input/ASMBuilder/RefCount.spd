@@ -70,6 +70,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 				return nil
 
 		return exp.rfun(Obj, Obj)
+	
 
 	if fn == Compiler.RefSafeDecr
 		return exp.rfun(asmreg(), Obj)
@@ -102,19 +103,22 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.obj|SCFunction|!
-	if fn != Compiler.RefFreeIfDead
-		|| fat = .RefCountSub(exp, prms, fn)
-			fat.µrefcount++
-			return (fat * asmreg()) as asmreg()
-		return nil
-	|| A = .µ(prms.first!)
+	|| pf = prms.first
+	if fn == compiler.RefNew
+		|| A = .µ(pf!) // merge gtab into ralo?
+		return exp.RALO(dest, A) * Dest
 
-	#! Disallow: if obj.X(),   when obj.X() is a disowner
-	#! Then we will never freeifdead within if-branch or other tests.
-	#! needs understanding of disowners!
-	
-	exp.rfun(A)
-	return a
+	if fn == Compiler.RefFreeIfDead
+		|| A = .µ(pf!)
+		#! Disallow: if obj.X(),   when obj.X() is a disowner
+		#! Then we will never freeifdead within if-branch or other tests.
+		#! needs understanding of disowners!
+		exp.rfun(A)
+		return a
+
+	|| fat = .RefCountSub(exp, prms, fn)
+		fat.µrefcount++
+		return (fat * asmreg()) as asmreg()
 
 
 

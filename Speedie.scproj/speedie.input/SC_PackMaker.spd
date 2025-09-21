@@ -85,13 +85,51 @@ module PackMaker
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.ExportPosition = i + 1
 
+	
+	
+	function FinalPrepare
+		Assembler.jsm.length = 0
+
 		for c in Compiler.ClassList
 			if c.IsRole
 				|| t = c.ClassType!
 				|| t2 = c.RealClass.ClassType!
 				t.ExportPosition = t2.ExportPosition
-				
-	
+		
+
+		for fn in .LibFuncs
+			if fn.CanPrepareInline
+				require Assembler.sh.GenerateASM(fn, false)
+				Assembler.jsm.length = 0
+			
+
+	function SCFunction.CanPrepareInline (|bool|)
+		opt norefcounts
+		require (self isnt cpp) and .HasProperSpeedieCode
+		|| Allowed = 15 + (self is inline)<<4
+		|| count = .SourceArg!.InlineCount(Allowed)
+		if count <= Allowed
+			return true
+
+
+	function message.InlineCount (|int| Remain, |int|)
+		opt norefcounts
+		|| fn = .func
+		require fn != @thg and @char
+		if fn == @num
+			return 1 - .iszero
+			
+		if fn == @bra
+			return .first!.InlineCount(Remain)
+
+		|| Count = (fn != @list and @emb and @decl and @arg)|int|
+		for s in self
+			|| Found = s.InlineCount(Remain)
+			Count += Found
+			Remain -= Found
+			loop Remain > 0
+		return count
+		
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
 		opt norefcounts
@@ -120,10 +158,9 @@ module PackMaker
 	function FATCompile (|bool|)
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
-		Assembler.jsm.length = 0
 		
 		for fn in .Packfuncs
-			require Assembler.sh.GenerateASM(fn)
+			require Assembler.sh.GenerateASM(fn, true)
 		Assembler.sh.Guard
 		
 		if !Compiler.InPerry
@@ -140,6 +177,7 @@ module PackMaker
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		.SortFuncsAndBuildGlobs
+		.FinalPrepare
 		if .FATCompile and options.ModePack // options.ModePack can be false, if compiler.InPerry = true
 			.WritePackToDisk
 		compiler.During = 0
@@ -374,4 +412,5 @@ struct HairyMan
 			
 	function Churn (|string| s, |int| n)
 		"$s$.Total / $n"
+
 

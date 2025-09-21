@@ -634,7 +634,11 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		dest.µType = src.µType
 		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
+	|| fat = src.fat
+	if fat isa asm.VGET
+		return .IncrVectorPart(p, dest, src, amount, mode, fat)
 	NotTemp(self, src, p)
+		
 	if mode & IncrAfter
 		return .IncrPost(p, dest, src, amount)				// x++,	 y = x++
 	return .IncrPre(p, dest, src, Amount)					// ++x,	 y = ++x

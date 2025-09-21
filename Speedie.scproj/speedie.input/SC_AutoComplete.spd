@@ -1196,7 +1196,7 @@ function ASM (|message| msg,  |SCFunction| fn, |bool|)
 	Assembler.JSM.zero
 	Assembler.JSM.Length = 0
 
-	if Assembler.sh.GenerateASM(fn)
+	if Assembler.sh.GenerateASM(fn, false)
 		|| fs = FastString()
 		rz = .ASMSub(msg, fn, fs)
 

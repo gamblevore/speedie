@@ -116,6 +116,8 @@ function TypeOfFunc (ExprResolver)
 		|| obj = fn.ReturnType
 		if !obj
 			exp.obj = typevoid
+		if fn is Reffer
+			exp.ASMType = ASMType.kRefCount
 		if fn Is Killer
 			exp.LastInBlock(SCBlockage.Quit)
 		return obj // voids are so annoying.
@@ -1749,7 +1751,7 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 		return fn
 	|| ch = exp.first
 	|| params = ch.next
-
+	
 	|scdecl| thgdecl 
 	if ch == @Thg
 		thgdecl = name_space.LookUpFunc( ch.name, exp )|scdecl|

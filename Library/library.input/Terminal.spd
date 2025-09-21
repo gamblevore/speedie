@@ -99,7 +99,7 @@ module Terminal
 				row[i.x] = terminalcell(0," ")
 		for l.lines in s
 			self <~ (l, p, textcol)
-			++p.y
+			p.y = p.y+1
 		.DrawRect(frame, FrameCol)
 	
 

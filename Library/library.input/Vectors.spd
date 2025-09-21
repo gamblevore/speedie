@@ -342,7 +342,7 @@ datatype ivec4
 		while (curr.y < .y2) // just changed this ooofff
 			while (curr.x < .x2)
 				yield curr
-				++curr.x
+				curr.x = curr.x + 1
 			curr = (.x1, curr.y+1)
 
 

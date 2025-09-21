@@ -167,8 +167,6 @@
 	SetRefMemToReg(r, Op);
 ı RALO: _
 	o1 = alloc(o2);
-	// should call constructor too.
-
 ı RFRT: _
 	Code = DeRefRegs(vm, r, Op);
 ı GOBJ: _
@@ -298,6 +296,8 @@
 	iv1 = iv2 / iv3;
 ı QCLM: _
 	iv1 = JB_ivec4_ClampVec(iv2, iv3, iv4);
+ı QINC: _
+	iv1 = iv2 + (iv3 << Shift_Shu);
 ı QFLG: _
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
 ı QFLS: _

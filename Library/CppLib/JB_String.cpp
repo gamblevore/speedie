@@ -605,16 +605,16 @@ int JB_Str_WhiteSpace( JB_String* self, int StartOff, int AfterOff, bool IsIn ) 
          //  Main subroutines. These are generalised, and need interfacing routines.
 
 extern JB_StringC* EmptyString_;
-int JB_Str_CharSet( JB_String* self, int StartOff, int AfterOff, CharSet* cs, bool IsIn ) {
-	if (!self or !cs)
+int JB_Str_CharSet( JB_String* Self, int StartOff, int AfterOff, CharSet* cs, bool IsIn ) {
+	if (!Self or !cs)
 		return -1;
-    MiniStr S = ReadAddrs_(self, StartOff, AfterOff);
+    MiniStr S = ReadAddrs_(Self, StartOff, AfterOff);
 	int Dir = S.Dir();
 		
 	while (S) {
 		uint8 C = S.Move(Dir);
 		if ( (cs->Cache[C]!=0) == IsIn ) {
-			return ResultFix_(S, self, Dir);
+			return ResultFix_(S, Self, Dir);
 		}
 	}
 

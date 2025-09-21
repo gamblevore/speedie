@@ -128,27 +128,19 @@ function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Sta
 
 
 function SCFunction.HasCVersion (|bool|)
+	if .IsCppInBuilt == 2	// cpp_nothing: For JB_Decr, JB_Ternary, etc
+		debugat
+		return false
+
 	if .IsLibrary
 		return true
-	require self is wrapper
 
-	if .IsCppInBuilt == 1	// cpp_inbuilt. These normally have no address? but perhaps we made a wrapper for it in the exec? we should check if it still exists.
-		debugat
-		return true
-
-	if .IsCppInBuilt == 2	// cpp_nothing: cpp_spd might sound better?
-		debugat
-		return false // need to be replaced with ASM intrinsics.
-
-	if self Is ExternalLib	// cpp_libwrapper ?   // Speedie_Main in perry, counts as one!
-		debugat
-		return false  // i think only perry used this and only in debug mode within Xcode
-
-	return true
+	return self is wrapper
 
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
+	debugat 0
 	|| prms = exp.last!
 	|| fn = prms.AsFunc
 	|| TableID = 0
@@ -160,12 +152,11 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		TableID = fn.PackID ?? 0xFFFF				// 0xffff means unknown?
 		TableID += 31
 	  else
-		// asmtodo: we never get here?? hmmm. that can't be right? need an asm_test for that!
 		|| f = exp.first!
 		TableID = .µ(f).Reg
 		|| dcl = f.ASMDecl
 		// need to execute exp.first
-/		fn = dcl.Type.FuncProto						#expect (exp)
+		fn = dcl.Type.FuncProto						#expect (exp)
 
 	dest = .CallFunc(exp, dest, fn)
 	if !fn.ASMReturn
@@ -200,6 +191,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 
 function assembler.ASMReach (|scfunction| fn)
 	if .out.MyReacher
+		if fn == "JB_TC_IsFloat"
 		(fn is usedbyasm)
 
 

@@ -396,11 +396,7 @@ function SCFunction.FindCppWrapperFunc (|message| place, |message|)
 function SCFunction.FoundOneCpp (|string| n, |bool|)
 	if n == "cpp_nothing"
 		.noautocomplete = 1
-		.IsCppInBuilt = 2 // speedie will turn these into ASM isntructions
-		return true
-	if n == "cpp_inbuilt"
-		.noautocomplete = 1
-		.IsCppInBuilt = 1
+		.IsCppInBuilt() = 2 // speedie will turn these into ASM isntructions
 		return true
 	if n == "cpp_libwrapper"
 		.noautocomplete = 1
@@ -948,7 +944,6 @@ dispatch RootCollectTable (CollectFunc)
 	+'api'					SCFunction.NewFunc
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
-	+'cpp_inbuilt'			SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
 	+'macro'				SCFunction.NewMacro

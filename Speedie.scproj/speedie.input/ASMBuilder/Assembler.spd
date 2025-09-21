@@ -120,12 +120,6 @@ struct Assembler
 			return v.Log2+1
 
 
-	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		if togrow.isint and value.CanStoreAsAddK and !dest.IsVec
-			return exp.ADAK(dest, ToGrow, Value) * Dest
-		.Assign(exp, dest, ToGrow)
-		rz = .IncrPre(exp, togrow, ToGrow, value)
-
 
 	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|) // addnum
 		if !dest or dest == asmreg()
@@ -138,9 +132,14 @@ struct Assembler
 	
 	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-		if !dest.reg
-			dest = src
-		return .AddToReg(exp, src, src, value) 
+		return .AddToReg(exp, dest, src, value) 
+
+
+	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
+			return exp.ADAK(dest, Src, Value) * Dest
+		.Assign(exp, dest, Src)
+		rz = .IncrPre(exp, Src, Src, value)
 
 
 	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
@@ -661,7 +660,7 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 	.Orig = nil
 
 
-function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
+function Assembler.GenerateASM (|scfunction| fn, |bool| Debug, |bool|) // AsmGenerate
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)
@@ -673,10 +672,11 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 
 	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
-		|| max = fn.MaxASM
-			check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
-		target debug
-			fn.µprint(++CountASMFuncPrint)
+		if debug
+			|| max = fn.MaxASM
+				check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
+			target debug
+				fn.µprint(++CountASMFuncPrint)
 		return true
 
 

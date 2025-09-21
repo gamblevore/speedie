@@ -34,7 +34,6 @@ datatype FunctionType (int)
 		Render
 		FlowDisabled
 		ExternalLib
-		Wrapper
 		Inline
 		Killer
 		Disabled
@@ -45,6 +44,8 @@ datatype FunctionType (int)
 		HidesProperties
 //		PrintedForDebugViewing // can print a function only once for debug
 		ReturnASMFloats
+
+		Wrapper // isn't this the same as cpp?
 		Cpp
 		UsedByASM
 		
@@ -1728,8 +1729,6 @@ function NewCppWrapper (CollectFunc)
 	
 	using name
 	|| thg = @thg + name.name
-	if node == "cpp_inbuilt"
-		thg = thg.WrapWith(@bra)
 	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
 	node.name = "function"
@@ -1740,8 +1739,6 @@ function NewCppWrapper (CollectFunc)
 		rz.noautocomplete = 1
 		if isnothing
 			rz.IsCppInBuilt = 2
-		  elseif node == "cpp_inbuilt"
-			rz.IsCppInBuilt = 1
 		(rz Is ExternalLib) = islib
 		rz.MakeParamsReal
 

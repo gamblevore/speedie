@@ -173,6 +173,8 @@ function scdecl.NilStated (|bool|)
 
 
 function SCFunction.HasProperSpeedieCode (|bool|)
+	if self is Wrapper != self is cpp // hmmm.
+		debugat 
 	if .badness != 0 and .badness != 128
 		return false
 	return !.IsMacro and (self Isnt Wrapper) and (self isnt disabled)

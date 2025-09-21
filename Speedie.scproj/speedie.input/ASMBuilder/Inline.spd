@@ -156,8 +156,17 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-	|| N = fn.µlength//real
-	require N and (N < 128) and !fn.HasCVersion
+	|| N = fn.µlength
+	// Lib funcs don't get pack generated
+	// So we don't know their instruction count.
+	// we could try it once... and just "assume" its close to that value?
+	// of course, it depends on the number of consts passed. So... theres that.
+	// maybe just do it for small funcs?
+	// but how do we know its small? just go through the msg count?
+	// maybe just do all the lib funcs... then undo them but store the µcount... assuming theeres
+	// not too much msgs anyhow
+	
+	require N and (N < 128) and (fn isnt cpp)
 	require .state.InlineDepth < .InlineDepthLimit
 
 	|| MaxEnd = .InlineEnd

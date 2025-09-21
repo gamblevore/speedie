@@ -37,7 +37,7 @@ module SC_Init
 		
 		if c == @decl
 			require !c.SettingToNil
-			if c contains "Stderr"
+			// if c contains "Stderr" // module glob fix
 			.InitVarsArg ?= .BuildInitArg
 			.InitVarsArg.first <~ c
 		  else
@@ -164,7 +164,7 @@ function SCModule.DelayedInitFuncTransform
 	// need to separate lib and not lib out.
 	|| it = v.first
 		for (msg in it)
-			if msg.InitTrap
+			//if msg.InitTrap // module glob fix
 			if (msg == @Decl)
 				|| name = msg.GetDclName
 					if name.InitRootDecl( msg, self )

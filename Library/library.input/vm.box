@@ -312,6 +312,12 @@ forms
 		K1		l
 		K2		x
 		
+	VecInc
+		r1		R
+		r2		r
+		part	2
+		Amount	l
+		
 	
 // this file:
 // 1) builds the c++ codes, and the jump-table, and the ASM accessor functions
@@ -571,9 +577,8 @@ POS 5
 /**/ RFRD  (RefSet3)							// RefCount reg <-- mem
 		SetRefMemToReg(r, Op)
 
-/**/ RALO  (U2)
-		o1 = alloc(o2)
-		#!should call constructor too.
+/**/ RALO  (U2)	// could be nicer to use a gtab const directly.
+		o1 = alloc(o2) // 1 less instruction... gtabs suck anyway.
 	
 /**/ RFRT  (RefReturn)							// this should be a return...
 		Code = DeRefRegs(vm, r, Op)				// its ONLY used for returns...
@@ -737,6 +742,8 @@ POS 5
 		iv1 = iv2 / iv3
 /**/ QCLM (U4)
 		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
+/**/ QINC  (VecInc)
+		iv1 = iv2 + (iv3 << Shift_Shu)
 
 
 

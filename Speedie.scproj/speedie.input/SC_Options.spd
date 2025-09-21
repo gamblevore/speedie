@@ -14,8 +14,8 @@ module Options
 	|| 		Beep					= false
 	|| 		Dev						= 0
 
-	||		ModeCpp					= true
-	||		ModePack				= false
+	|byte|	ModeCpp					= 1
+	|byte|	ModePack				= 0
 	||		MakeInterpreter			= false
 //	||		MakeLib					= false
 
@@ -280,8 +280,8 @@ module Feedback
 
 		+'check'
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
-			Options.Compile = false
-			Options.ModeCpp = false
+			Options.Compile = 0
+			Options.ModeCpp = 0
 		
 		+'flowmode'
 			0 // placeholder
@@ -354,10 +354,10 @@ module Feedback
 			app.crash
 		
 		+'pack'
-			options.ModePack = value.optionbool
-			if options.modepack
-				options.modecpp = false
-			SC_Targets["pack"] = options.ModePack
+			options.ModePack = value.optionbool<<1
+			if options.modepack and options.modecpp==1
+				options.modecpp = 0 // would be better to allow both... but only if both are specified.
+			SC_Targets["pack"] = options.ModePack > 0
 		
 		+'targetdebug' // basically
 			Explain(Purpose, "")$
@@ -387,9 +387,9 @@ module Feedback
 
 		+'cpp'
 			explain(purpose, "Compiles to cpp. Default true")$
-			options.ModeCpp = value.optionbool
-			if options.ModeCpp
-				options.modepack = false
+			options.ModeCpp = value.optionbool<<1
+			if options.ModeCpp and options.modepack == 1
+				options.modepack = 0
 				SC_Targets["pack"] = false
 				
 		+'output_path'

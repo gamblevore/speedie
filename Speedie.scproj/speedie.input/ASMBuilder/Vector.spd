@@ -19,10 +19,25 @@ extend Assembler
 			k = 0
 
 		if dest isnt set
-			if !dest.reg // dest should be already set
 			return exp.VGET(dest, base, vara, k) * dest
 
 		return exp.VSET(base, dest, vara, k) * dest
+
+
+	function IncrVectorPart (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |int| mode,  |fatasm| vget, |asmreg|)
+		// what about float vecs?
+		if mode & ASMType.IncrAfter
+			.Assign(exp, dest, Src)
+		
+/		|| add = exp.QINC(dest, src, vget.prms[2])
+		// maybe better to just access it twice?
+		// we have to get vara, k, and then the const. its a lot.
+		// although its just 1 more. but its still alot. to be able to do both x[3]++ but also x[n]++
+		// i think x[3]++ is acceptable but x[n]++ isnt...
+		// leave for now... I guess
+		
+		// which part was it, though?
+//		return .AddToReg(exp, dest, src, value) 
 		
 
 	function VectorLoad (fn_asm)
