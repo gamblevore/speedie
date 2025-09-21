@@ -78,11 +78,6 @@ extend Message {
 		Return (self) and (.func == @dot) and (.name ~= name)
 
 	
-//	syntax access (|message|)
-//		if (self)
-//			return .Parent
-
-	
 	function TrueOrFalse (|bool|)
 		if self ~= "true"
 			return true
@@ -122,14 +117,6 @@ function ListFunctionsSub (|object!| o, |[SCFunction]| out)
 	if o isa SCFunction
 		for f in o
 			out <~ f
-		
-
-
-//function ListModules (|Dictionary| access, |[SCModule]|)
-//	opt norefcounts
-//	for o in access
-//		if o isa SCModule
-//			rz <~ o
 
 
 function message.IsReffer (|bool|)
@@ -147,39 +134,3 @@ module SCGlobals
 	|int| UniqueNum
 
 
-//function message.OperatorInFunc (|string| s, |bool|)
-//	return .msgowningfunc ~= s
-//
-//
-//function Message.Op (|message|)
-//	if self == @rel
-//		return .Second
-
-
-
-// Was only used for a short time
-//class FileComparer
-//	|?faststring| 			out
-//	|?stringreader| 		in
-//	constructor (|string| s)
-//		|| f = s.file
-//		|| x = f.exists
-//		.in = (f.in, nil)(x)
-//		.out = (nil, f.out)(x)
-//		
-//	function close
-//		.out = nil
-//		.in = nil
-//		
-//	function check (|int| v)
-//		|| i = .in
-//		|| o = .out
-//			o <~ v
-//			o <~ '\n'
-//		  elseif i != nil
-//			|| str = i.DString('\n')
-//			if str.int != v
-//				"found $v expected $str"
-//				debugger
-//
-//

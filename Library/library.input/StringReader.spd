@@ -1,6 +1,6 @@
 
 
-class StringReader 
+class InputStream 
 	|int|						Length
 	|FastBuff|					Data
 	|file?|						File
@@ -201,19 +201,19 @@ class StringReader
 		errorreceiver.NewError(nil, error, .file)
 
 
-	task ParserCallBack (|stringreader| Upon)
+	task ParserCallBack (|InputStream| Upon)
 		run (|message| msg)
 
 
 
 	
-function string.Stream (|string| Header, |stringreader|)
+function string.Stream (|string| Header, |InputStream|)
 	cpp_part StreamWithHeader
-	rz = StringReader(self)
+	rz = InputStream(self)
 	if !rz.HasHeader(Header)
 		rz = nil
 
 	
-function string.Stream (|StringReader|)
-	return StringReader(self)
+function string.Stream (|InputStream|)
+	return InputStream(self)
 

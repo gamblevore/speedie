@@ -130,18 +130,18 @@ datatype jbinLeaver (int)
 						  
 	
 
-function StringReader.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string| name=nil,  |Message|)
+function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string| name=nil,  |Message|)
 	cpp_part NextMsgExpect
 	opt norefcounts
 	rz = .NextMsg #require
 	expect (rz.expect(fn, name) and (rz in parent)) (rz)
 
 
-helper StringReader.NextMsg (|message|)
+helper InputStream.NextMsg (|message|)
 	return .nextmsginfo|message|
 
 
-helper StringReader.NextMsgInfo (|uint64|)
+helper InputStream.NextMsgInfo (|uint64|)
 	opt norefcounts
 	|| Msg = ._Object|message|
 	|int| info
@@ -162,21 +162,21 @@ helper StringReader.NextMsgInfo (|uint64|)
 
 	._Object = nil
 	if info >= 0
-		expect (T > @nil) (self, "StringReader.IsJBin was not called.")
+		expect (T > @nil) (self, "InputStream.IsJBin was not called.")
 		error (self, "Corrupted jbin")
 
 
-function StringReader.IsJBin (|bool|)
+function InputStream.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
-function StringReader.ExpectJbin (|bool|)	
+function InputStream.ExpectJbin (|bool|)	
 	if .IsJBin
 		return true
 	error (Self, "Not jbin")
 
 
-function StringReader.ParseJbin (|int64| Remain=1G, |MessageRoot|)	
+function InputStream.ParseJbin (|int64| Remain=1G, |MessageRoot|)	
 	require .ExpectJbin
 	._Object = nil
 	rz = .NextMsg

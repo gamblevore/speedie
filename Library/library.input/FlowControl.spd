@@ -10,7 +10,7 @@
 class FlowControl 
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
-	|StringReader?|			ReadInput
+	|InputStream?|			ReadInput
 	|faststring?| 			Write
 	|bool| 					CanDoErrors
 
@@ -21,7 +21,7 @@ class FlowControl
 		.write = outpath.out
 		print "Logging flow to "
 		printline OutPath
-		|stringreader| s
+		|InputStream| s
 		if inpath
 			print "Validating flow against "
 			printline InPath
@@ -162,7 +162,7 @@ class FlowControl
 
 			.disabled = 1
 			|flowcontrol--| f = .flow!
-			|StringReader--| r = f.ReadInput
+			|InputStream--| r = f.ReadInput
 			if r != nil
 				|| str = r.str(data.length)
 				if str != data

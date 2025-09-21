@@ -397,11 +397,11 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		rz = FastString()
 		rz.file = f
 
-	function string.In (|string| Header="", |int| ChunkSize=4MB, |StringReader|)
-		description "Reads from a file, via a StringReader object. Useful because StringReader can read from files, strings, and more. Write code once and use it on multiple input-sources." 
+	function string.In (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
+		description "Reads from a file, via a InputStream object. Useful because InputStream can read from files, strings, and more. Write code once and use it on multiple input-sources." 
 		|| f = .file
 		if f.mustexist("stream")
-			rz = StringReader(f, chunkSize)
+			rz = InputStream(f, chunkSize)
 			if !rz.HasHeader(Header)
 				rz = nil
 	
