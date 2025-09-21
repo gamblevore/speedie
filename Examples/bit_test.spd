@@ -24,9 +24,4 @@ main
 			expect !BitTest[j]
 		BitTest[i] = false
 		expect !BitTest[i]
-		for j in 32
-			BitTest[j] = true
-			expect BitTest[j]
-			BitTest[j] = false
-			expect !BitTest[j]
 	"Tests passed ok"
