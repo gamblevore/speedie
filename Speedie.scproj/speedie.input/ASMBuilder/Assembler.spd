@@ -567,7 +567,7 @@ struct Assembler
 			asm.noisyasm = 3
 
 		|| j = jsm
-/		.end = j.NeedSpare(64K, 64K)
+		.end = j.NeedSpare(64K, 64K)
 		.start = j.ptr
 		.curr_ = .start + j.Length
 		

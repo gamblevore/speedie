@@ -252,8 +252,8 @@ function Message.Clean (|bool| erl = false)
 				continue_with curr.flatnext
 
 		  elseif (f == @brel)
-			if curr == "$"
-				Compiler.AddFunny(self)
+			if (curr == "$") and !(curr in @decl)
+				/Compiler.AddFunny(self)
 			
 		  elseif (f == @decl)
 			|| l = curr.last
