@@ -82,7 +82,7 @@ datatype SCDeclInfo (uint)
 		SetTo
 		Grabbed
 		PostIncremented
-		VarThatGotReturned
+		VarThatGotReturned // unused? but it should be?
 		ReturnedStruct
 		Library
 		UsedByASM

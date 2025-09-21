@@ -148,6 +148,8 @@ struct Assembler
 		// .DeclareMe is also called from inlines. What does it do there, then?
 		// does it still make sense?
 		
+		// VarThatGotReturned isnt set anywhere?
+		// remove this?
 		|| ret = .state.return
 		if  ret.reg  and  (D is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
 /			ret.µtype = rz|DataTypeCode|
