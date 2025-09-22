@@ -167,7 +167,7 @@ struct ClassData
 			curr = curr.nextclass
 
 
-function DebugAt (|int| i=1)
+function JB_DebugAt (|int| i=1)
 	cpp_nothing JB_DoAt
 
 

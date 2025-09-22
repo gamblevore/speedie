@@ -443,7 +443,7 @@ struct Assembler
 
 
 	function µGetRealOffer (|message| exp, |asmreg| Dest,  |asmreg|)
-		|| c = .curr
+//		|| c = .curr
 		if dest isnt UnusedSoFar
 			dest = nil // clear for .GetReal
 		return .µGetReal(exp, dest)
@@ -663,7 +663,7 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 	.Orig = nil
 
 
-function Assembler.GenerateASM (|scfunction| fn, |bool| Debug, |bool|) // AsmGenerate
+function Assembler.GenerateASM (|SCFunction| fn, |bool|) // AsmGenerate
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)
@@ -673,7 +673,7 @@ function Assembler.GenerateASM (|scfunction| fn, |bool| Debug, |bool|) // AsmGen
 		.Rework(fn)
 	.CapASM
 
-	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
+	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
 		|| max = fn.MaxASM
 			check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")

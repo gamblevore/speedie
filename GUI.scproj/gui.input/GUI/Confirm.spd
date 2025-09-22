@@ -2,7 +2,7 @@
 // confirm, ask, confirmit, beep, alert
 module beep
 	|date| OK = 1
-	syntax expect (|string| s=nil)
+	syntax expect (|string?| s=nil)
 		app.beep(s)
 
 

@@ -1180,15 +1180,15 @@ function Cpp (|message| out,  |SCFunction| found)
 	msg.AddLinePositions
 	
 	
-function Nothing (|message| out,  |SCFunction| fn)
-	if fn.IsMacro
-		out <~ "This is a macro, and has no real code"
-	  elseif fn Is Wrapper
-		out <~ "This is a cpp_wrapper function"
-	  elseif fn is disabled
-		out <~ "This function is disabled"
-	  else
-		out <~ "Could not compile this function."
+//function Nothing (|message| out,  |SCFunction| fn)
+//	if fn.IsMacro
+//		out <~ "This is a macro, and has no real code"
+//	  elseif fn Is Wrapper
+//		out <~ "This is a cpp_wrapper function"
+//	  elseif fn is disabled
+//		out <~ "This function is disabled"
+//	  else
+//		out <~ "Could not compile this function."
 
 
 function ASM (|message| msg,  |SCFunction| fn, |bool|)
@@ -1196,7 +1196,7 @@ function ASM (|message| msg,  |SCFunction| fn, |bool|)
 	Assembler.JSM.zero
 	Assembler.JSM.Length = 0
 
-	if Assembler.sh.GenerateASM(fn, false)
+	if Assembler.sh.GenerateASM(fn)
 		|| fs = FastString()
 		rz = .ASMSub(msg, fn, fs)
 

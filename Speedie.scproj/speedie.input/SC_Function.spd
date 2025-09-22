@@ -1526,14 +1526,14 @@ function Tran_DebugAt (TranFunc)
 	|| ch = node.first
 	using (node)
 		node.become(@func)
-		node.msg(@thg, "JB_DoAt")
+		node.msg(@thg, "JB_DebugAt")
 		|| prm = node.msg(@prm)
 		if !ch
 			ch = 1.msg
-		TypeOfExpr(ch, name_Space)
 		prm <~ ch
+	TypeOfExpr(node, name_Space)
 	node.asmtype = asmtype.kdebugger
-	node.obj = TypeVoid_
+
 
 
 function Tran_Ifn (TranFunc)

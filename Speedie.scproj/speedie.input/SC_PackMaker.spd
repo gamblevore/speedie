@@ -90,18 +90,17 @@ module PackMaker
 	function FinalPrepare
 		opt norefcounts
 		Assembler.jsm.length = 0
-//		.UsedByASM = 0
-//
-//		for c in Compiler.ClassList
-//			if c.IsRole
-//				|| t = c.ClassType!
-//				|| t2 = c.RealClass.ClassType!
-//				t.ExportPosition = t2.ExportPosition
-//				
-//		for fn in .LibFuncs
-//			if fn.CanPrepareInline
-//				require Assembler.sh.GenerateASM(fn, false)
-//				Assembler.jsm.length = 0
+
+		for c in Compiler.ClassList
+			if c.IsRole
+				|| t = c.ClassType!
+				|| t2 = c.RealClass.ClassType!
+				t.ExportPosition = t2.ExportPosition
+				
+		for fn in .LibFuncs
+			if fn.CanPrepareInline
+				require Assembler.sh.GenerateASM(fn)
+				Assembler.jsm.length = 0
 
 
 			
@@ -164,7 +163,7 @@ module PackMaker
 		
 		(Compiler is Hungry)
 		for fn in .Packfuncs
-			require Assembler.sh.GenerateASM(fn, true)
+			require Assembler.sh.GenerateASM(fn)
 		Assembler.sh.Guard
 		
 		if !Compiler.InPerry
@@ -211,13 +210,13 @@ module PackMaker
 	function AddDebugStuff (|jbin| j, |string| func_names)
 		j.tmp("debug")
 		j.Enter(@tmp, "func")
-		|compressionstats| st
-		|| f2 = func_names.compress(st)
-		print "Stack-trace Compression: "
-		st.print
+//		|compressionstats| st
+//		|| f2 = func_names.compress(st)
+//		print "Stack-trace Compression: "
+//		st.print
+		|| f2 = func_names
 		j.AddStr(f2)
 		j.exit(3)
-
 
 	
 	function ListPackFuncs (|jbin| j, |faststring| func_names)
