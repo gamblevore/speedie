@@ -149,7 +149,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.pico!.close(Why)
 
 
-	helper StartProcess (|string| path, |[string]?| Args=nil, |pico| C = nil, |bool| CaptureStdOut,  |ExitCode|)
+	helper StartProcess (|string| path, |[string]?| Args=nil, |&pico?| C = nil, |bool| CaptureStdOut,  |ExitCode|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	

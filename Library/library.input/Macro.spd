@@ -96,7 +96,7 @@ extend message
 			.appendmacro(m, prms)
 	
 		
-	function AppendMacro (|Macro| M,  |array of message| prms=nil)
+	function AppendMacro (|Macro| M,  |array? of message| prms=nil)
 		using self,  opt norefcounts
 		for r in prms
 			(r isnt MacroMade) // in case it was passed in

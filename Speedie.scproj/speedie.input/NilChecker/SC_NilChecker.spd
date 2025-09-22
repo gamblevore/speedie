@@ -1,17 +1,4 @@
 
-#! So... the nil checker could be used to improve refcounting and ASM
-#! We can keep track of where the "last used place" for each var is.
-#! This can be done by an array of 32 decls... So anytime we hit a decl
-#! we can keep track of it. If/while can store the info directly on the node
-#! others (funcs) maybe? most will need a node after it... to say that "this is the last place"
-#! Hopefully we don't spam everything with it.
-#! We can just insert them when a block closes... unless its a sub if/while that closed
-
-#! As for reg-allocation, when a var is closed, we can remove it from the table
-#! We'll need a Decl-table and a tmp-table, each are 32-bits. We always allocate
-#! into the lowest/highest free bit.
-#! seems simple!
-
 
 extend_module ArchonPurger {
 	dispatch NilTable (NilTrackerFn)
@@ -782,7 +769,7 @@ function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |
 
 
 function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nilstate| state, |nilstate|)
-	|| fs = faststring()					// "Passing optional: S.pop to RefCount"
+	|| fs = faststring()
 	fs <~ nilreason.values[reason]!
 	|| raw = state.RawName
 	ifn where isthing raw
@@ -867,4 +854,8 @@ function message.DenyPreviousUse (|message| msg)
 		if ch.obj == decl
 			error (ch, "Unsafe var passing. (Altered later in expression)")
 	
+
+function whatisthis (|object| x = nil)
+	if x
+		""
 

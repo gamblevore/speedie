@@ -130,7 +130,7 @@ datatype jbinLeaver (int)
 						  
 	
 
-function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string| name=nil,  |Message|)
+function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| name=nil,  |Message|)
 	cpp_part NextMsgExpect
 	opt norefcounts
 	rz = .NextMsg #require

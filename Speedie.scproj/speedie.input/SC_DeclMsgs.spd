@@ -120,12 +120,14 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 
 	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func)		#require
 	if dcl.default isthing "nil"
+		if dcl.TypeSuffers
+			// seems to be taking the default type... for string/array, making it "real"
+			// for example function abc (|object|A=nil, |string|B=nil)
+			// it complains about B, but not A!
+			
+			check (!dcl.StatedReal) (self, "Can't be both real and nil!")
 		dcl.NilDeclared = nilstate.optional
-	
-// we can no longer get pointers to registers!
-//	if dcl.PointerCount
-//		|| n = (func.args.length+(func is constructor)) // hehe 😛 👻
-//		func.altersparams |= 1<<n
+
 
 	func.args <~ dcl
 	check (func.args <= 8)    (self, "Too many parameters defined. (8 max)")

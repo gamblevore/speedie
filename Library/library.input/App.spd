@@ -75,7 +75,7 @@ syntax access (|string| name, |string|)
 			exit
 
 
-syntax expect (|string| s=nil)
+syntax expect (|string?| s=nil)
 	.quit(s, -1)
 
 
