@@ -66,7 +66,8 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	if !pinc and (dest isnt set) and (Byte_Shift == 3) and !varadd.reg
 		|| bs = base.fat
 		if (bs isa asm.gtab)
-			(decl!.mu.info |= packmaker.UsedByASM)
+			if Compiler is Hungry
+				(decl! is UsedByASM)
 			|| K = bs.Const + ((index-1) << Byte_Shift)
 			if K <= 18~bits
 				return exp.GOBJ(dest, 0, K)

@@ -531,14 +531,19 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
-	|| addr = .GlobAddr(d, exp, dest)
-		if (dest is AddrRequest) or d.isbarestruct or d.iscarray
-			addr.µtype = d.mu.DataType
-			return addr.HaveAddr
-		
-		dest.µtype = d.mu.DataType
-		(dest isnt ContainsAddr)
-		return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
+
+	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
+		|| addr = .GlobAddr(d, exp, dest)$ 
+		addr.µtype = d.mu.DataType
+		return addr.HaveAddr
+
+	//  Don't pass dest, if we are setting.  It would overwrite the input.
+	// what about reading? well... it should go away by the end anyhow? its just a temp?
+	|| addr = dest * (dest isnt set)	
+	addr = .GlobAddr(d, exp, nil)$ 
+	dest.µtype = d.mu.DataType
+	(dest isnt ContainsAddr)
+	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
 
 
@@ -750,9 +755,10 @@ function Str (fn_asm)
 	dest = .TempOnly(dest)
 	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
-	(exp.asmdecl is usedbyasm)					// can we use usedbyasm? instead of real.frequency?
-	real.Frequency=1
-	return exp.GOBJ(dest, 0, real.ID) * dest	// seems good!
+	if Compiler is Hungry
+		(exp.asmdecl is usedbyasm)					// can we use usedbyasm? instead of real.frequency?
+/		real.Frequency=1
+	return exp.GOBJ(dest, 0, real.ID) * dest		// seems good!
 
 
 helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)

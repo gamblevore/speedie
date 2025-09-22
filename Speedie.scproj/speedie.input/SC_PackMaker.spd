@@ -9,7 +9,6 @@ module PackMaker
 	|[SCDecl]|				PackGlobs
 	|int|					_PackGlobSize
 	|int|					_LibGlobSize
-	|scdeclinfo|			UsedByASM
 
 
 	function PackGlobSize (|int|)
@@ -104,7 +103,6 @@ module PackMaker
 //				require Assembler.sh.GenerateASM(fn, false)
 //				Assembler.jsm.length = 0
 
-		.UsedByASM = SCDeclInfo.UsedByASM
 
 			
 
@@ -164,6 +162,7 @@ module PackMaker
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
 		
+		(Compiler is Hungry)
 		for fn in .Packfuncs
 			require Assembler.sh.GenerateASM(fn, true)
 		Assembler.sh.Guard
@@ -178,7 +177,7 @@ module PackMaker
 	
 	function MakePack 
 		opt norefcounts
-		compiler.During = compiler.Packing
+		compiler.During = compilerstage.Packing
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		.SortFuncsAndBuildGlobs

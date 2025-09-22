@@ -71,12 +71,10 @@ linkage
 |[SCImport]|				ImportedList
 |Dictionary of SCImport|	ImportedNames = Dictionary.new
 
-
-|SCModule|					program = InternalFile.Proj.Mod
-
 |Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, return InitAppGlobals_()}`~parse).WipePos
 |Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_}`~parse).WipePos
 
+|SCModule|					program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
 |[SCModule]|				ModuleList
 |[SCFunction]|				FuncList
@@ -96,15 +94,12 @@ linkage
 |SCFunction|				RefSetRef
 |SCFunction|				RefNew
 
-//|SCFunction|				NewFunc
 |SCFunction|				SwapFunc
 |SCFunction|				TernaryFunc
 |SCFunction|				fnFastIsa
 |SCFunction|				fnFastAs
 |SCFunction|				fnAs
 |SCFunction|				fnIsa
-//|SCFunction|				fnMustbe
-//|SCFunction|				fnOpMustBe
 
 |[String]|					SyxArray
 |Message|					ExtendList = message()
@@ -124,7 +119,6 @@ linkage
 |byte|						InPerry
 |SCNodeInfo|				InBuiltType
 |bool| 						HasFunny
-//|bool|					HasMainFunc
 |byte|						During // unused but i don't want to remove. it could be useful?
 |bool| 						InitedOK = true
 |int|						stClasses
@@ -140,20 +134,14 @@ linkage
 
 |int|						CurrStage
 |string|					StageName
-//|SCFunction|				ClassListInitFunc
 
 
-constants
-	kTimeWidth = 19
-	Initialising
-	Import
-	Transform
-	NilChecking
-	RefCounts
-	ASMTestLoading
-	Packing
-	CppExport
+constants: 	kTimeWidth = 19
 
+syntax is (|CompilerStage| Type, |bool|)
+	return type == .During
+syntax is (|CompilerStage| Type, assigns:|bool|)
+	.During = type
 
 function BuildFolder (|file|)
 	opt norefcounts
@@ -161,8 +149,6 @@ function BuildFolder (|file|)
 	if !B.Exists
 		B.MakeDir
 	return B!
-
-
 
 
 function CompileAll (|int|)
@@ -202,7 +188,7 @@ function CompileAll (|int|)
 	
 	if !compiler.inperry
 		if Options.ModeCpp
-			compiler.during = compiler.CppExport
+			compiler.during = compilerstage.CppExport
 			.Timer( "Export Cpp" )
 			Cpp_Export.ExportAllSource
 
@@ -402,7 +388,7 @@ function PrepareAST
 
 
 function ImportAll 
-	compiler.during = compiler.Import
+	compiler.during = compilerstage.Import
 	.Timer( "Read" )
 	require .Stage( "Finding Files" )
 	
@@ -615,7 +601,7 @@ function PostInitCodeCall
 
 
 function InitCompiler
-	compiler.During = Compiler.Initialising
+	compiler.During = compilerstage.Initialising
 	require (.Projects.fileCH("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
@@ -747,7 +733,7 @@ function NewConst (|scdecl| d)
 
 function DoRefAnalysis
 	opt norefcounts
-	compiler.during = compiler.RefCounts
+	compiler.during = compilerstage.RefCounts
 	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
 		if f.IsARealSpdFunc
@@ -999,3 +985,17 @@ helper FindProjectSub (|string| base, |string| Path, |File|)
 		rz = nil
 }
 
+
+datatype CompilerStage (int)
+	constants
+		|CompilerStage|
+		Initialising
+		Import
+		Transform
+		NilChecking
+		RefCounts
+		Hungry
+		Packing
+		CppExport
+	
+	

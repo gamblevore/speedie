@@ -218,7 +218,7 @@ struct ArchonPurger
 
 		
 		function LaunchMothership
-			compiler.during = compiler.NilChecking
+			compiler.during = compilerstage.NilChecking
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
 			.LaunchMothershipSub(old, rec)

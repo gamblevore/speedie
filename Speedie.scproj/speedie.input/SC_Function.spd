@@ -293,7 +293,7 @@ function @scfunction.NameList (|string|)
 
 function @scfunction.TransformAll 
 	opt norefcounts
-	Compiler.During = compiler.Transform
+	Compiler.During = compilerstage.Transform
 	for f in compiler.FuncList
 		require !stderr.TooMany
 		f.Transform

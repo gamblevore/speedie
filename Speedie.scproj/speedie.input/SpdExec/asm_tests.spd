@@ -3,9 +3,16 @@
 
 module ASMExamples {
 
-target pack { 
 |int| Glob
 |int| Bolg
+target pack { 
+
+function BitTest (|int| i, |bool| Value)
+	visible
+	|| M = .glob
+	M |=  value << i
+	M &=  ~(!value << i)
+	.glob = M 
 
 
 function SwapTest

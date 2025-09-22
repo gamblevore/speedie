@@ -85,14 +85,19 @@ function FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.Wan
 			error (where, "Expected a class but found module.")
 
 
-function FindFunction (|string| Name, |SCFunction|)
+function FindFunction (|message| Name, |SCFunction|)
+	opt norefcounts
+	return .FindFunction(name.name, name)
+
+
+function FindFunction (|string| Name, |message| Where=nil, |SCFunction|)
 	opt norefcounts
 	|| o = self[ name ]
 	if o isa SCFunction
 		o.Reach
 		Return o
 	
-	error ( nil, "Can’t find function: " + name )
+	error ( Where, "Can’t find function: " + name )
 	
 
 function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,  |SCClass|)

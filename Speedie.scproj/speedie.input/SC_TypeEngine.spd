@@ -254,9 +254,12 @@ function TypeOfBlock (ExprResolver)
 function TypeOfThg (ExprResolver)
 	opt norefcounts
 	|| R = name_space.LookUpvar( exp.name, exp, side )
-	
+
 	if R isa SCModule
-		|| Cls = R.Cls								#expect (Exp, "Can’t refer to a module like that.")
+		|| Cls = R.Cls							// #expect (Exp, "Can't refer to a module like that.")
+		if !cls
+			return R // hmmm. Will the code survive this?
+
 		if Cls.IsModel
 			return Cls.GetFlyingMemory(exp)
 		if cls.isobject
@@ -1173,14 +1176,23 @@ function message.BecomeSetRel
 	.asmtype = ASMType.kSetRel
 
 
-function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
-	|| cls = typeofexpr(self, name_space) #require
-	expect (cls.ismostlynormal) (self, "Can't use 'is' on this type.")
+function scobject.TheIsFunc2 (|message| err, |scfunction|)
+	opt norefcounts
+	if self isa scdecl
+		expect (.IsMostlyNormal) (err, "Can't use 'is' on this type.")
+		rz = .type.theisfunc
+		if !rz
+			error (err, .name + " doesn‘t have 'syntax is' specified.")
+	  elseif self isa scmodule
+		rz = .FindFunction("syntaxis")
+		
 
-	|| ty = cls.type
-	|| fn = ty.TheIsFunc			#expect (opch, "${ty.name} doesn‘t have 'syntax is' specified.")
-	|| arg1 = fn.args[1]			#expect (fn.source, "This func needs a parameter!")
-	|| LookupType = arg1.type			// OK so... we have the arg. it's a decl, with a type
+function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
+	|| upon = typeofexprmodulesok(self, name_space)		#require
+	|| fn = upon.TheIsFunc2(opch)						#require
+	|| ParamIndex = (fn.cls!=nil)|int|
+	|| arg1 = fn.args[ParamIndex]						#expect (fn.source, "This func needs a parameter!")
+	|| LookupType = arg1.type							// OK so... we have the arg. it's a decl, with a type
 	require rn.expect(@thg)
 	
 		// (a is b) --> (a is b) = true
