@@ -132,6 +132,8 @@ struct Assembler
 	
 	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+		if !dest.reg // more about keeping the type, I guess.
+			dest = src
 		return .AddToReg(exp, dest, src, value) 
 
 
@@ -600,7 +602,8 @@ struct Assembler
 	function CapASM
 		opt norefcounts
 		|| fn = .out
-		fn.µlength = .fnlength
+		|| n = .fnlength
+		fn.µlength = n
 		jsm!.length = .curr - .start 
 
 		
@@ -672,14 +675,14 @@ function Assembler.GenerateASM (|scfunction| fn, |bool| Debug, |bool|) // AsmGen
 
 	|| err = stderr // debug in perry via xcode, which won't give me stderr unless in local
 	if err.ok
-		if debug
-			|| max = fn.MaxASM
-				check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
-			target debug
-				fn.µprint(++CountASMFuncPrint)
+		|| max = fn.MaxASM
+			check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
+//			target debug
+// 				if debug
+//					fn.µprint(++CountASMFuncPrint)
 		return true
 
 
-target debug
-	|| CountASMFuncPrint = 0
+//target debug
+//	|| CountASMFuncPrint = 0
 

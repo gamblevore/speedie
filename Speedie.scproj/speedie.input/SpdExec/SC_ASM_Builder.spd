@@ -27,7 +27,8 @@ datatype µParam (uint16)
 		Signed
 		NoExpect
 //		PositionBits
-		Output
+		Input
+		Output // we need something thats both output and input?
 	
 	function BitSize (|int|)
 		return (self & 31) + 1

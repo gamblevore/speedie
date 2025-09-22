@@ -112,10 +112,8 @@ function fatasm.TryRotateConst
 
 
 
-function JBin.AddFunction (|SCFunction| fn, |int| Missed)
+function JBin.AddFunction (|SCFunction| fn)
 	// need aligning each.
-	if missed
-		self.AddInt(missed)
 //	|| M = .ReserveMemory(@bin, n)
 	|| f = fn.FatFirst
 	|| t = 0

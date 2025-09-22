@@ -24,20 +24,21 @@ extend Assembler
 		return exp.VSET(base, dest, vara, k) * dest
 
 
-	function IncrVectorPart (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |int| mode,  |fatasm| vget, |asmreg|)
-		// what about float vecs?
+	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |fatasm| vget, |asmreg|)
+		|| v = (1,1,1,1)
+		v.x++
 		if mode & ASMType.IncrAfter
 			.Assign(exp, dest, Src)
 		
-/		|| add = exp.QINC(dest, src, vget.prms[2])
-		// maybe better to just access it twice?
-		// we have to get vara, k, and then the const. its a lot.
-		// although its just 1 more. but its still alot. to be able to do both x[3]++ but also x[n]++
-		// i think x[3]++ is acceptable but x[n]++ isnt...
-		// leave for now... I guess
+		if src.isfloat or vget.RegOnly(2)
+			|| tmp = .AddToReg(exp, nil, src, value)			// f[1]++ --> x = f[1], x++, f[1] = x
+/			exp.VSET(src, tmp, vget.asmreg(2), vget.prms[3])
+			return dest
 		
-		// which part was it, though?
-//		return .AddToReg(exp, dest, src, value) 
+		|| v2 = vget.prms[2]
+		src = vget.asmreg(1)
+		.softnop(vget)
+		return exp.QINC(dest, src, v2, value) * dest
 		
 
 	function VectorLoad (fn_asm)
@@ -63,8 +64,10 @@ extend Assembler
 		if v3.reg >= 16
 			v3 = nil
 		|| fat = exp.VBLD(dest, vv[0], vv[1], vv[2], v3)
+		dest = fat * Dest // for vset
+		v3 = vv[3]
 		if v3.reg >= 16 // move missing thing in
 			exp.VSET(dest, v3, asmreg(), 3)
 
-		return fat * dest
+		return dest
 

@@ -1,5 +1,7 @@
 
 
+// remove textual?
+// seems unnecessary.
 extend Assembler
 	function LoadTitle (|message| m, |message|)
 		// asm oof (9)

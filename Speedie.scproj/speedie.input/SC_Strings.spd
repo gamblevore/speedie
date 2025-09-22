@@ -253,7 +253,7 @@ function Message.Clean (|bool| erl = false)
 
 		  elseif (f == @brel)
 			if (curr == "$") and !(curr in @decl)
-				/Compiler.AddFunny(self)
+				/Compiler.AddFunny(self, curr)
 			
 		  elseif (f == @decl)
 			|| l = curr.last

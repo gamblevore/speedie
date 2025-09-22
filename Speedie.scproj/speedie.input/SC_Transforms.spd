@@ -322,9 +322,10 @@ function Tran_Quit (TranFunc)  // exitter
 
 
 function Tran_PrintSub (TranFunc)
+	opt norefcounts
 	using (node)
 		|| prm = @prm.msg
-		prm.takeallfrom(node)
+		prm.TakeAllFrom(node)
 		node <~ prm
 		node.first = @Thg + node.Name
 		node.become(@Func)

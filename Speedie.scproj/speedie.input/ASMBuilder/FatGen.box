@@ -86,13 +86,12 @@ function message.EROR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.TRAP (|asmreg| r1 = nil, |int| Mode = nil, |int| Signal = nil, |&fatasm|) {
+function message.TRAP (|asmreg| r1 = nil, |int| Upon = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.TRAP, self)
 	rz.reginput(0) = r1
-	rz.numinput(1) = Mode
-	rz.numinput(2) = Signal
+	rz.numinput(1) = Upon
 }
 
 
@@ -380,6 +379,7 @@ function message.BFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BFLS, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = up
 	rz.numinput(3) = down
@@ -1083,6 +1083,7 @@ function message.VSET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.VSET, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Ind
@@ -1276,6 +1277,7 @@ function message.QINC (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| part = nil, |
 	rz.numinput(2) = part
 	rz.numinput(3) = Amount
 	rz.dest(0, r1, a)
+	rz.dest(1, r2, a)
 }
 
 
@@ -1295,6 +1297,7 @@ function message.QFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QFLS, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = up
 	rz.numinput(3) = down

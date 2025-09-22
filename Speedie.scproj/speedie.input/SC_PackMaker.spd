@@ -9,6 +9,7 @@ module PackMaker
 	|[SCDecl]|				PackGlobs
 	|int|					_PackGlobSize
 	|int|					_LibGlobSize
+	|scdeclinfo|			UsedByASM
 
 
 	function PackGlobSize (|int|)
@@ -88,19 +89,23 @@ module PackMaker
 	
 	
 	function FinalPrepare
+		opt norefcounts
 		Assembler.jsm.length = 0
+//		.UsedByASM = 0
+//
+//		for c in Compiler.ClassList
+//			if c.IsRole
+//				|| t = c.ClassType!
+//				|| t2 = c.RealClass.ClassType!
+//				t.ExportPosition = t2.ExportPosition
+//				
+//		for fn in .LibFuncs
+//			if fn.CanPrepareInline
+//				require Assembler.sh.GenerateASM(fn, false)
+//				Assembler.jsm.length = 0
 
-		for c in Compiler.ClassList
-			if c.IsRole
-				|| t = c.ClassType!
-				|| t2 = c.RealClass.ClassType!
-				t.ExportPosition = t2.ExportPosition
-		
+		.UsedByASM = SCDeclInfo.UsedByASM
 
-		for fn in .LibFuncs
-			if fn.CanPrepareInline
-				require Assembler.sh.GenerateASM(fn, false)
-				Assembler.jsm.length = 0
 			
 
 	function SCFunction.CanPrepareInline (|bool|)
@@ -221,8 +226,8 @@ module PackMaker
 		j.enter(@tmp, "code")
 		|HairyMan| Slapped 
 		for f in .PackFuncs
-			|| berries = (Slapped)(f is UsedByASM)
-				j.AddFunction(f, berries)
+			if (Slapped)(j, f is UsedByASM)
+				j.AddFunction(f)
 				func_names <~ f.exportname
 				func_names <~ '\n'
 		Slapped.Churn("Proj: ", .packfuncs.length)
@@ -259,9 +264,7 @@ module PackMaker
 		
 		|hairyman| Slapped
 		for linked in .libfuncs
-			|| PurpleDoors = (slapped)(linked is UsedByASM)
-				if PurpleDoors > 0
-					j.addint(PurpleDoors)
+			if (slapped)(j, linked is UsedByASM)
 				j.add(@thg, linked.ExportName)
 		Slapped.Churn("LibFuncs", .libfuncs.length)
 
@@ -272,9 +275,9 @@ module PackMaker
 	function GlobLink (|jbin| j)
 		opt norefcounts
 		j.tmp("glnk")
-//		|HairyMan| WildMan 
+		|HairyMan| WildMan 
 		for linked in .LibGlobs
-			if linked is UsedByASM
+			if (wildman)(j, linked is usedbyasm)
 				j.add(@thg, linked.ExportName)
 		j.exit(2)
 
@@ -398,17 +401,18 @@ function SCFunction.CanLibLoad (|bool|)
 */
 
 
-struct HairyMan
+struct HairyMan 
 	|int| Total
 	|int| Curr
-	syntax Call (|bool| b, |ind|)
+	syntax Call (|jbin| j, |bool| b, |bool|)
 		if b
 			|| c = .curr
+				j.addint(c)
 			.curr = 0
-			return c
+			return true
 		.curr++
 		.total++
-		return -1
+		return false
 			
 	function Churn (|string| s, |int| n)
 		"$s$.Total / $n"

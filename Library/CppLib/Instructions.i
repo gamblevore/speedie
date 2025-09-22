@@ -20,7 +20,7 @@
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
 ı TRAP: _
-	JB_App__SelfSignal(Trap_Signalu);
+	0;
 ı NOOP: _
 	i1 = i1;
 	// NOOP
@@ -297,7 +297,8 @@
 ı QCLM: _
 	iv1 = JB_ivec4_ClampVec(iv2, iv3, iv4);
 ı QINC: _
-	iv1 = iv2 + (iv3 << Shift_Shu);
+	i1 = iv2[VecInc_partu] + VecInc_Amounti;
+	iv2[VecInc_partu] = i1;
 ı QFLG: _
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
 ı QFLS: _

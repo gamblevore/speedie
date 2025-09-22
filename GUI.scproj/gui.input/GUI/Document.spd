@@ -202,7 +202,7 @@ class Document (list)
 //			return c.text.length
 
 	
-	function DocumentViewer.NextViewer (|?$DocumentViewer| out, |textview|)
+	function DocumentViewer.NextViewer (|$?DocumentViewer| out, |textview|)
 		opt norefcounts
 		|| it = .Viewer
 		out = .next

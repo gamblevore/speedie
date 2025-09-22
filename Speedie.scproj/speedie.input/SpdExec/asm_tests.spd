@@ -352,6 +352,7 @@ function VarConst (|int| a)
 
 
 function SemiConst (|int| f1, |int|)
+	visible
 	|| y6  =  1  or  f1
 	y6  =  true  or  f1
 
@@ -541,6 +542,7 @@ function Incr (|int| x, |int| y, |int|)
 
 
 function ForeignFuncs (|string?| x, |string?| y, |string|)
+	visible
 	|| x3 = x._white(12345, 98765, true)
 	|| x4 = x.Length
 	|| x5 = x._Addr
@@ -572,6 +574,7 @@ function TestGlob (|int|)
 
 
 function TestAtomic (|int|)
+	visible
 	for i in 100
 		Glob++
 		Glob += i&1
@@ -621,11 +624,13 @@ function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 
 
 function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
+	visible
 	|| x = 12 * 10
 	return ((a + b) * c) / d
 
 
 function Math2 (|int| a, |int| b, |int|)
+	visible
 	return ((a + b) / 2) - ((a / b) * 2)
 
 

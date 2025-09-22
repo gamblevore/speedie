@@ -137,6 +137,15 @@
 #define   BFLD_Li       ((( int)((Op)<<31))>>31)
 #define   BFLD_Lu       (((uint)((Op)<<31))>>31)
 
+#define   BFLS_upi       ((( int)((Op)<<18))>>26)
+#define   BFLS_upu       (((uint)((Op)<<18))>>26)
+#define   BFLS_downi       ((( int)((Op)<<24))>>26)
+#define   BFLS_downu       (((uint)((Op)<<24))>>26)
+#define   BFLS_signi       ((( int)((Op)<<30))>>31)
+#define   BFLS_signu       (((uint)((Op)<<30))>>31)
+#define   BFLS_Li       ((( int)((Op)<<31))>>31)
+#define   BFLS_Lu       (((uint)((Op)<<31))>>31)
+
 #define   Convert_Modei       ((( int)((Op)<<18))>>28)
 #define   Convert_Modeu       (((uint)((Op)<<18))>>28)
 #define   Convert_Li       ((( int)((Op)<<22))>>22)
@@ -155,12 +164,8 @@
 #define   Div_Li       ((( int)((Op)<<30))>>30)
 #define   Div_Lu       (((uint)((Op)<<30))>>30)
 
-#define   Trap_Modei       ((( int)((Op)<<13))>>30)
-#define   Trap_Modeu       (((uint)((Op)<<13))>>30)
-#define   Trap_Signali       ((( int)((Op)<<15))>>26)
-#define   Trap_Signalu       (((uint)((Op)<<15))>>26)
-#define   Trap_Li       ((( int)((Op)<<21))>>21)
-#define   Trap_Lu       (((uint)((Op)<<21))>>21)
+#define   Trap_Uponi       ((( int)((Op)<<13))>>13)
+#define   Trap_Uponu       (((uint)((Op)<<13))>>13)
 
 #define   Float_Di       ((( int)((Op)<<28))>>31)
 #define   Float_Du       (((uint)((Op)<<28))>>31)
@@ -235,6 +240,11 @@
 #define   VecGet_Indu       (((uint)((Op)<<23))>>30)
 #define   VecGet_Li       ((( int)((Op)<<25))>>25)
 #define   VecGet_Lu       (((uint)((Op)<<25))>>25)
+
+#define   VecSet_Indi       ((( int)((Op)<<23))>>30)
+#define   VecSet_Indu       (((uint)((Op)<<23))>>30)
+#define   VecSet_Li       ((( int)((Op)<<25))>>25)
+#define   VecSet_Lu       (((uint)((Op)<<25))>>25)
 
 
 #define   VecSwizzle_Fieldsi       ((( int)((Op)<<18))>>20)

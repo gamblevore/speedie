@@ -73,9 +73,15 @@ function InitAccess
 
 
 function Debugger (fn_asm)
-	if Options.TargetDebug
-		return exp.TRAP(asmreg(), 0, 2) * ASMReg() // 2 == sigint
-	return asmreg()
+	opt norefcounts
+	if !Options.TargetDebug
+		return asmreg()
+	|| num = 0
+	|| ch = exp.first
+		num = ch.int - 1
+		if num < 0 // oof
+			return asmreg()
+	return exp.TRAP(asmreg(), num) * ASMReg()
 
 
 function Swap (fn_asm)
@@ -629,9 +635,9 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		(dest isnt const)
 
 	src = src as asmreg.noscale
-	|| p = exp.parent! // better positions
+	dest.µType = src.µType				// right? it can't be different.
+	|| p = exp.parent!					// better positions
 	if src is ContainsAddr
-		dest.µType = src.µType
 		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
 	|| fat = src.fat
@@ -744,9 +750,9 @@ function Str (fn_asm)
 	dest = .TempOnly(dest)
 	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
-	(exp.asmdecl is usedbyasm) // can we use usedbyasm? instead of real.frequency?
+	(exp.asmdecl is usedbyasm)					// can we use usedbyasm? instead of real.frequency?
 	real.Frequency=1
-	return exp.GOBJ(dest, 0, real.ID) * dest // seems good!
+	return exp.GOBJ(dest, 0, real.ID) * dest	// seems good!
 
 
 helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)

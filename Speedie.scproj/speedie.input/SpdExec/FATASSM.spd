@@ -240,9 +240,6 @@ struct FatASM
 	function r3 (assigns:|uint|): .prms[3] = value
 	
 	
-	function RegInput (|int| a, assigns:|asmreg|)
-		.ASMReg(a, value)
-	
 	
 	function RegOnly (|int| i=0, |int|)
 		return .prms[i] & 31 // remove tmpbit + fatindex		
@@ -250,23 +247,6 @@ struct FatASM
 
 	function ASMReg (|int| a=0, |asmreg|)
 		return .prms[a].ASMReg
-	
-	
-	function ASMReg (|int| a, assigns:|asmreg| Input)		// prm (
-		cpp_part Prm
-		opt inline
-		
-		|| i = input.FatIndex
-		.prms[a] = input.Prm
-		.InputPrms |= 1<<a
-		if i
-			|| src = i.fat // we refcount dests too. shouldn't!
-			if src < self
-				.InputFats |= 1<<a
-				if src
-					src.µRefCount++
-			  else
-				debugger // what?
 
 
 	function NumInput (|int| a, assigns:|int| v)
@@ -278,8 +258,24 @@ struct FatASM
 		.JumpPrm = a + 1
 		.µRefCount = 1 max .µRefCount // control flow is always used?
 		Assembler.sh.NextBasicBlock
+	
+	
+	function RegInput (|int| a, assigns:|asmreg|)
+		cpp_part Prm
+		opt inline
 		
-
+		|| i = value.FatIndex
+		.prms[a] = value.Prm
+		.InputPrms |= 1<<a
+		if i
+			|| src = i.fat // we refcount dests too. shouldn't!
+			if src < self
+				.InputFats |= 1<<a
+				if src
+					src.µRefCount++
+			  else
+				debugger // what?
+	
 
 ////////////////////////////////////////////////////////////
 

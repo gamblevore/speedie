@@ -5,6 +5,7 @@
 // need to allow vectorcall on windows. to allow vectors to be passed
 // using the SIMD registers.
 typedef void (*FFI_Fn)(void);
+extern "C" pid_t getpid(void);
 
 
 // find app's own functions within itself...
@@ -586,7 +587,8 @@ AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, in
 }
 
 
-#define VMFinish {if (!U4_Lu) JB_App__SelfSignal(SIGINT); goto EXIT;}
+
+#define VMFinish {if (!U4_Lu) kill(getpid(), SIGINT); goto EXIT;}
 
 
 AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) { // jumpstack

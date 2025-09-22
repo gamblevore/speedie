@@ -173,6 +173,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	(dest isnt Const) // why would it be?
 	|| fat = prms.FNC(dest, TableID, P,  PExt)		// prms.fncx
 	if fn.HasCVersion
+		if 0: exp.fncx
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
 
@@ -190,8 +191,9 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 
 
 function assembler.ASMReach (|scfunction| fn)
-	if .out.MyReacher
-		if fn == "JB_TC_IsFloat"
+	opt norefcounts
+	|| orig = .out
+	if Orig.MyReacher and !orig.IsLibrary
 		(fn is usedbyasm)
 
 

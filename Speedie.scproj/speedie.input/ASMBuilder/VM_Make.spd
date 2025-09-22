@@ -58,7 +58,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		if f0 == 'x' and bit_pos == 32 // x means an extra 4 bytes of values. like 8-byte ASM.
 			.XType = pname
 			return int.max
-		if f0 == 'r' or 'R'
+		if f0 == 'r' or 'R' or 'P'
 			.FillTypePrm(line.name, pname)
 			return 5+bit_pos
 		if f0.isint
@@ -393,7 +393,7 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 	|| f = form.src.first.first
 	if rdz == 0
 		rdz <~ (arg, 2)
-		
+	
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = f.VMMsgArgName(i)
@@ -407,7 +407,12 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 		|| Mac = vm_builder.skibidy
 		if p is output
 			TempDests <~ mac.run(rdz)
-		  else
+			if p is input
+				rdz[0] = i.msg // oof
+				rdz[1] = @thg + pname
+				
+		
+		if p isnt output or p is input
 			if p is jump
 				Mac = vm_Builder.gyatt
 			  elseif p is number

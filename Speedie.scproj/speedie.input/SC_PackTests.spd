@@ -1,7 +1,6 @@
 	
 	
 extend_module PackMaker	
-	
 	syntax access (|int| v, assigns:|int64|)
 		|| r = jb_vm.vm.Registers(false)+v
 		r|&int64|[] = Value

@@ -170,8 +170,8 @@ Message is also:
 	syx Tmp (Statement)
 		Opt NoRefCounts
 		|| n = .name
-		if (jeebox.CSWordMiddle contains n) and !(n[].IsInt)
-			fs <~ n
+		if n and (jeebox.CSWordMiddle contains n) and !(n[].IsInt)
+			fs <~ n // a lot of fuss for one tmp.
 		  else
 			fs <~ '+'
 			fs.AppendQuotedEscape(.name, '\'')

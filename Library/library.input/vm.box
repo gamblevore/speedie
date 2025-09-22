@@ -162,6 +162,13 @@ forms
 		down	6
 		sign	1
 
+	BFLS
+		r1		P
+		r2		r
+		up		6
+		down	6
+		sign	1
+
 	Convert
 		r1		R
 		r2		r
@@ -187,8 +194,7 @@ forms
 	
 	Trap
 		r1		r
-		Mode	2		// 1 = trap on function-count,  2 = trap-always
-		Signal	6
+		Upon	l
 
 	Float
 		r1		R
@@ -293,6 +299,12 @@ forms
 		r2		r
 		r3		r
 		Ind		2
+
+	VecSet
+		r1		P
+		r2		r
+		r3		r
+		Ind		2
 	
 	
 	VecBuild
@@ -314,7 +326,7 @@ forms
 		
 	VecInc
 		r1		R
-		r2		r
+		r2		P
 		part	2
 		Amount	l
 		
@@ -332,8 +344,8 @@ forms
 			VMFinish
 
 /**/ TRAP (Trap)
-		JB_App__SelfSignal(Trap_Signalu)
-
+		// actually a noop. the debugger itself will put this in the shadow
+		0
 
 
 #!						 (((((UTIL)))))
@@ -360,7 +372,6 @@ forms
 #!						 (((((FUNC)))))
 /**/ GRAB (U2) 
 		u1 = (uint64)(&u2)
-//		u3 = (uint64)(&u4)
 
 /**/ RET (Ret)				// ret: 
 		Code = ReturnFromFunc(vm, r, Op)
@@ -394,7 +405,7 @@ POS 27
 // as globals.
 
 AFNC (FuncAddr)
-	i1 = FuncAddr(vm, Op)
+		i1 = FuncAddr(vm, Op)
 
 
 /**/ ALLO (Alloc)
@@ -471,7 +482,7 @@ POS 5
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
-/**/ BFLS  (BFLD)
+/**/ BFLS  (BFLS)
 		u1 |= (u2 << BFLD_upu) >> BFLD_downu
 /**/ BRSS  (Shift)
 		i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3
@@ -642,17 +653,6 @@ POS 5
 		MemCopyRDWR(r, Op)
 
 
-//	function IsInf (|bool|) // these need... to be warned about if hit in ASM and we don't have an intrinsic available
-//		cpp_wrapper (__isinff)
-
-// FuncLinkageTable and funcprereader could be where we put our stuff
-//	function Length (|int|)
-//		cpp_wrapper JB_Str_Length
-//			if self
-//				return self|&int|[1]
-
-
-
 
 #!						(((((Float)))))
 
@@ -696,10 +696,9 @@ POS 5
 
 
 #!						(((((Vectors)))))
-
 /**/ VGET (VecGet)
 		i1 = iv2[n3+u4]
-/**/ VSET (VecGet)
+/**/ VSET (VecSet)
 		iv1[n3+u4] = i2
 /**/ VBLD (VecBuild)
 		v1 = VBuild(r, Op)
@@ -743,14 +742,15 @@ POS 5
 /**/ QCLM (U4)
 		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
 /**/ QINC  (VecInc)
-		iv1 = iv2 + (iv3 << Shift_Shu)
+		i1 = iv2[VecInc_partu] + VecInc_Amounti
+		iv2[VecInc_partu] = i1
 
 
 
 #!						 (((((Vector Bitshifts)))))
 /**/ QFLG  (BFLD)
 		iv1 = ((iv2 << BFLD_upu) >> BFLD_downu)
-/**/ QFLS  (BFLD)
+/**/ QFLS  (BFLS)
 		iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu)
 /**/ QRSS  (Shift)
 		iv1 = (iv2 >> Shift_Shu) >> iv3

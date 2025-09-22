@@ -150,6 +150,7 @@ constants
 	Transform
 	NilChecking
 	RefCounts
+	ASMTestLoading
 	Packing
 	CppExport
 

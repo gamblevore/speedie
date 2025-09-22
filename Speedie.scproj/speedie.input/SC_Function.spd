@@ -1516,26 +1516,28 @@ function Tran_Debugger (TranFunc)
 function Tran_BreakPoint (|scfunction| fn, |scnode| p, |message| ch)
 	opt norefcounts
 	using ch
-		|| dbg = @tmp + "DebugAt"
+		|| dbg = @tmp.msg
 		ch.prev = dbg
 		Tran_DebugAt( fn, dbg, p )
 
 
 function Tran_DebugAt (TranFunc)
+	opt norefcounts
 	|| ch = node.first
 	using (node)
 		node.become(@func)
-		node.msg(@thg, "DebugAt")
-		node.msg(@prm) <~ ch
-	TypeOfExpr(node, name_Space)
-
- 
-//function message.Tran_FS
-//	macros.fs.clean
-//	.BecomeMacro(macros.FS)
+		node.msg(@thg, "JB_DoAt")
+		|| prm = node.msg(@prm)
+		if !ch
+			ch = 1.msg
+		TypeOfExpr(ch, name_Space)
+		prm <~ ch
+	node.asmtype = asmtype.kdebugger
+	node.obj = TypeVoid_
 
 
 function Tran_Ifn (TranFunc)
+	opt norefcounts
 	|| f = node.NeedFirst
 		node.name = "if"
 		f.Negate
@@ -1568,6 +1570,7 @@ function scdecl.IsConstOf (|scdecl| b, |bool|)
 
 function Tran_Once (TranFunc)
 	// once: "abc" --> if !globaltmp: "abc"
+	opt norefcounts
 	|| arg = node[@arg]$ // needs arg... don't embed statements! cozz it sucksssss
 	require arg.expectlast
 	

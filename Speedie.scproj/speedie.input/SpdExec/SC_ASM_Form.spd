@@ -75,22 +75,17 @@ class µForm
 		expect (pl == 1) (self)
 		|| p = pl[]
 		if  p == 'r'
-			.AddP(5)
+			.AddP(5, µParam.Input)
 		  elseif p == 'R'
 			.AddP(5, µparam.Output)
 			.RegsAltered++
+		  elseif p == 'P'
+			.addP(5, µparam.Output + µParam.input)
+			.RegsAltered++
 		  elseif p == 'x' // for 64/96/128 sized instructions
 			.AddP(32, µparam.Number)
-		  elseif p == 'n'
-			.AddP(5, µparam.Number)
 		  elseif p == 'l'
 			.addremainder(0)
-		  elseif p == 'L'
-			.addremainder( µparam.NoExpect )
-		  elseif p == 's'
-			.addremainder( µparam.signed )
-		  elseif p == 'S'
-			.addremainder( µparam.signed + µparam.NoExpect )
 		  elseif p == 'j'
 			.addremainder( µparam.signed + µparam.jump )
 		  elseif place

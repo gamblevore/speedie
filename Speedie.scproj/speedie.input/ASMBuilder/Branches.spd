@@ -188,7 +188,7 @@ function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
 	rz = B
 	|| fa = A.fat
 	|| fb = B.fat		
-		fb.ASMReg(5, A)			// refcount A, save from disposal
+		fb.reginput(5) = A			// refcount A, save from disposal
 	  elseif fa
 		rz = A
 
