@@ -5,7 +5,7 @@
 main (|[string]| Files)
 	for f in files.GlobExpand
 		app.TryCompileOne(f)
-
+ 
 	if Fails.length
 		app.say("$fails Failiures")
 	  else

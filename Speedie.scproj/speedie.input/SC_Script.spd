@@ -6,8 +6,9 @@ function Compiler.ScriptLoc (|string| f, |file|)
 
 
 function compiler.UsingScript (|file| f, |file|)
-	require options.compile and !f.isdir
-	require (Options.ModePack|||Options.modecpp) > 2
+	|| both = Options.ModePack|||Options.modecpp
+	require (both < 2) and options.compile
+	require !f.isdir
 	require f.Read(16) starts "#!"
 	
 	rz = .ScriptLoc(f)

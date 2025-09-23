@@ -201,11 +201,11 @@ module Feedback
 			|| opt = AppOptions[name]
 				options.OperationCount += ((opt[])(name, value, nil))
 			  else
-				app.quit("Unknown switch '$Name'\n")
+				app.quit("Unknown switch: " + Name)
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
 		  elseif (options.OperationCount == 1)
-			error ("Can't compile multiple projects: " + value)
+			error ("Can't compile multiple projects. Input params: " + app.rawargs.render)
 		  else
 			.TryUseProject(Value)
 			options.OperationCount++
