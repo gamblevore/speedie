@@ -5,6 +5,7 @@
 
 
 main 
+	printline "Args: " + app.rawargs.render
 	app.gen("osx", platform.OSX)
 	app.gen("linux", platform.lin)
 
@@ -62,7 +63,6 @@ module Vars
 	|string| PerryPreReqs
 	|string| LibName
 	|string| LibFlags
-	|file|   BuildFol
 	|file|   CppLib
 	|string| SpdSrc
 	|string| SpdTerm
@@ -94,14 +94,13 @@ sudo apt install gedit
 		LibName  = "libjeebox.$ext" 
 		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
 		ExecFlags   = "$CFlags -g -ljeebox"
-		BuildFol = "$Speedie/jeebox.scproj/Examples/Build".file
 		CppLib   = "$Speedie/Library/CppLib".file
 		SpdSrc   = "$Speedie/Speedie.scproj/Build"
 		SpdTerm  = "$Speedie/Terminal/Speedie"
 		LibPath  = "/usr/local/lib/$LibName"
 
 
-	function ScriptOut (|string| list, |string|)
+	function CreateScriptOut (|string| list, |string|)
 		return "#!/bin/bash
 echo \"Starting Speedie Build\"
 set -e
@@ -183,7 +182,7 @@ echo "Prebuild .cpp files"
 `
 if IsCurrentPlatform
 	printline "cwd: " + app.cwd
-	PrepareCpp.Execute
+	PrepareCpp.Execute									/* <----- ACTUAL CALL POINT -----> */
 
 
 ////////////////////////////
@@ -192,13 +191,13 @@ if IsCurrentPlatform
 require StdErr.ok
 
 printline "Creating $scriptout"
-scriptout.data = vars.scriptout(list)
+scriptout.data = vars.CreateScriptOut(list)
 
 require StdErr.ok
 "Script generated at: $scriptout"
 if IsCurrentPlatform
 	"Running Script: $scriptout ($Count+ .cpp files)\n\n"
-	scriptout.Execute
+	scriptout.Execute									/* <----- ACTUAL CALL POINT -----> */
 
 }
 
@@ -206,9 +205,8 @@ if IsCurrentPlatform
 // ANTI-MAKE THEORY:
 	// NO:    unix 'make' or cmake
 	// MOVE:  All possible control-flow + vars out of bash, and into your favourite language.
-	// DO:    Create the command-lines from your fav language!
+	// DO:    Call g++ (and friends), from your favourite language!
 
 // TODO:
 	// Make this NOT alter the creator of /usr/local/include or /usr/local/bin
 	// at least if they already exist!
-	// what should they be owned by then?
