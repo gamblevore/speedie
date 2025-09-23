@@ -359,7 +359,7 @@ class Tetris (GridSection)
 				.PullDown(y+1)
 				y--
 		
-		|| X = .LinesRemaining - rows.Tri
+		|| X = .LinesRemaining|int| - rows.Tri
 		|| LevelChange = X <= 0
 		while X <= 0
 			.level++

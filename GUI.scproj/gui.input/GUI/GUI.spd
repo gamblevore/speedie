@@ -693,7 +693,7 @@ module GUI
 	helper window.AnyFrameStepsNeeded (|ind|)
 		|| Time = gui.FrameStart
 		|| Within = Time & 0xFFFF
-		|| Remain = ._FrameNext - Within
+		|| Remain = ._FrameNext|int| - Within
 		if Remain <= 0
 			if remain < -0.5s
 				return -1
@@ -813,7 +813,7 @@ module GUI
 		// perhaps 1-frame faster reaction on screen?
 		|| d = date.now
 		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
-		rz = .DrawFrameLength - ago
+		rz = .DrawFrameLength|int64| - ago
 		require rz < 128							// 512th of a second
 		.DrawState &= ~2
 		.DrawFinish = d
@@ -822,7 +822,7 @@ module GUI
 
 	helper DelayEvents (|bool|)
 		|| CanSleep = !SDL_Event.HasAny
-		|| L = 256										// 256th of a second
+		|int64| L = 256										// 256th of a second
 		if .IsBackground and !.DroppingInto
 			l = .DrawFrameLength*9
 

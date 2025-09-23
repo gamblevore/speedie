@@ -355,7 +355,7 @@ helper textview.DrawLighter (|image| Where, |int| y)
 helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
 	opt norefcounts
 	|| x = .DrawOneStartLine(d.text) 
-	|| big		    = ._LineNumWidth
+	|int| big		    = ._LineNumWidth
 		|| P		= (x-3, y)
 		|| shift	= big - d.tline.LineNumWidth
 		|byte[8]|   buff

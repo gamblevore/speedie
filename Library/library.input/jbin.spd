@@ -48,7 +48,7 @@ role JBin (Faststring)
 		.Exit(.indent)
 	
 	function Exit			(|int| Amount=1, |int|)
-		.Indent = (.Indent - amount) max 0
+		.Indent = (.Indent|int| - amount) max 0
 		|| Add = 239
 		while amount > 0
 			rz++

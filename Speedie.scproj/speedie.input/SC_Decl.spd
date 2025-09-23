@@ -308,14 +308,17 @@ class SCDecl (SCObject) {
 		|| bme = s.ItemBitCount
 		|| bt = t.ItemBitCount
 		|| bits	= bme max bt		// what about a float + an int? f64 right?
+
 		if Op
 			if Op is MakesSigned				// -
-				if bme == 32 and bt == 32		// int - uint should stay as int. Or else its surprising! 
+				if bme == 32 and bt == 32		// int-uint, or uint-int stays as int. Or else its surprising! 
 					return typeint
 				|| bits2 = (bme + !s.IsSigned) max (bt + !t.IsSigned)
+				check (bt <= bme or ot is directnumber) (Right, "Can't subtract a bigger type from a smaller one.")
 				if bits2 > 32
 					return TypeInt64
 				return TypeInt
+				
 			if Op is LoseBits					// &
 				bits = bme min bt
 			  elseif Op is ShiftOnly			// >>, <<

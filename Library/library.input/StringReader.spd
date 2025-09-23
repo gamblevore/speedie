@@ -85,9 +85,9 @@ class InputStream
 	syntax Compare (|int| n, |int|)
 		return .length - n
 	
-	function Position (|int64|)
-		return .data.position + .StartFrom
-	setter Position (|int64|)
+	function Position (|int|)				// can't make this int64 without making remaining/length/startfrom also.
+		return .data.position + .StartFrom	// and data.position
+	setter Position (|int|)
 		.data.position = value - .StartFrom
 
 	function StrLength (|int|)
