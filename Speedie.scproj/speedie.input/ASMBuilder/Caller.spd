@@ -140,22 +140,22 @@ function SCFunction.HasCVersion (|bool|)
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
-	debugat 0
+	debugat 567
 	|| prms = exp.last!
-	|| fn = prms.AsFunc
 	|| TableID = 0
-	if fn
+	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, intrin)
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest
-		TableID = fn.PackID ?? 0xFFFF				// 0xffff means unknown?
-		TableID += 31
+		TableID = fn.PackID + 31
+		if tableid <= 31
+			check (compiler.inperry) (exp, "Missing PackID")
+			tableid = 0xFFFF
 	  else
 		|| f = exp.first!
 		TableID = .µ(f).Reg
 		|| dcl = f.ASMDecl
-		// need to execute exp.first
 		fn = dcl.Type.FuncProto						#expect (exp)
 
 	dest = .CallFunc(exp, dest, fn)

@@ -967,21 +967,49 @@ function StructName (|String|)
 	return .SubProjName + "_" + .name
 
 
+//function MakeClassType (|scdecl| d, |scdecl|)
+//	opt norefcounts
+//
+//	|| c = scdecl(TypeJBClass!)
+//	|| i = scdecl(TypeJBClass!)
+//
+//	c.Internal = i
+//	c.name = .name.lowercase
+//	i.name = c.name
+//
+//	c.source = .source
+//	i.source = c.source
+//	C.pointercount = 1
+//	C.nildeclared = nilstate.real
+//	i.nildeclared = nilstate.real
+//	C.Contains = d
+//	(c is ClassObj)
+//	(c is global)
+//
+//
+//	return c
+
+
 function MakeClassType (|scdecl| d, |scdecl|)
 	opt norefcounts
+	|| IsLib = .islibrary
 	|| c = scdecl(TypeJBClass!)
 	|| i = scdecl(TypeJBClass!)
+	|| name = .name.lowercase
 	c.Internal = i
-	c.name = .name.lowercase
-	i.name = c.name
+	i.name = name
+	i.source = .source
+	(i is library) = islib
+	i.nildeclared = nilstate.real
+
+	c.name = name
 	c.source = .source
-	i.source = c.source
 	C.pointercount = 1
 	C.nildeclared = nilstate.real
-	i.nildeclared = nilstate.real
 	C.Contains = d
 	(c is ClassObj)
 	(c is global)
+	(c is library) = islib
 
 	return c
 

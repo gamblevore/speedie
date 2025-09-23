@@ -799,7 +799,15 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
-	rz.µtype = dest.µtype
+	|| rt = rz.µType
+	|| dt = dest.µType
+	if rt != dt
+		target debug: if (dt.IsInt != rt.IsInt) or (dt is bool != rt is bool) // should never happen
+		if rt.ByteCount < dt.ByteCount
+			debugger 
+			return exp.expandbits(rz, dt)
+		// so... now what?
+		rz.µtype = dt
 
 
 

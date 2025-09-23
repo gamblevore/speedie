@@ -112,7 +112,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 	regs.Collect(fn.args, self)
 	.InlineParameters(prms, info)
-	|| RealStart = .curr					// Params need to be done anyhow... so don't count them.
+	|| RealStart = .curr						// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	info.NopConsts(fn.args.length)
 	regs.Restore(fn.args)
@@ -122,7 +122,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|| Grown = .CurrGain(RealStart)
 	if Grown <= AllowedGain
 		if !rz
-			(rz is Const)			// no longer zero
+			(rz is Const)						// no longer zero
 	  else
 		regs.Rewind(self)
 		rz = nil
@@ -156,16 +156,7 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-	|| N = fn.µlength
-	// Lib funcs don't get pack generated
-	// So we don't know their instruction count.
-	// we could try it once... and just "assume" its close to that value?
-	// of course, it depends on the number of consts passed. So... theres that.
-	// maybe just do it for small funcs?
-	// but how do we know its small? just go through the msg count?
-	// maybe just do all the lib funcs... then undo them but store the µcount... assuming theeres
-	// not too much msgs anyhow
-	
+	|| N = fn.µlength	
 	require N and (N < 128) and (fn isnt cpp)
 	require .state.InlineDepth < .InlineDepthLimit
 
@@ -175,6 +166,8 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 	|| AllowedGain = 5 + (fn is inline) * 23		// Assume that functions have 5 instruction overhead.
 	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
+	if fn.IsLibrary
+		AllowedGain -= 1 + (fn is inline)<<2
 
 	AllowedGain -= .State.inlinedepth
 	
@@ -215,6 +208,29 @@ function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin,   |ASMReg|
 	return fat*dest
 
 
+function InlineFinish (|fatrange| R, |ASMReg|)
+	for s in R
+		if s isa asm.ret
+			if rz
+				rz = rz.simplify
+			  else
+				|| dest = s.inputfat(0)
+					rz = dest.info 
+				  else
+					rz = s.prms[0]|int|.asm
+			s.SetOp = asm.jump
+			s.JumpPrm = 1
+			s.JumpFix(.curr)
+	
+	rz &= ~ASMReg.Exit
+	|| dest = .state.return
+	(rz as= dest&asmreg.exit)
+	|| rt = rz.µtype
+	|| dt = dest.µtype
+	if rt and rt != dt // huh?
+	rz.µtype = dt
+
+
 function Trintrin (|message| out, |asmreg| dest, |fatasm| fat)
 	opt norefcounts
 	// (rz, r1, r2, r3)
@@ -235,6 +251,7 @@ function Trintrin (|message| out, |asmreg| dest, |fatasm| fat)
 					fat.numinput(i) = s.int
 			
 		i++
+
 
 }
 

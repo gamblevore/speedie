@@ -534,24 +534,6 @@ Struct FatRange
 
 
 extend Assembler
-	function InlineFinish (|fatrange| R, |ASMReg|)
-		for s in R
-			if s isa asm.ret
-				if rz
-					rz = rz.simplify
-				  else
-					|| dest = s.inputfat(0)
-						rz = dest.info 
-					  else
-						rz = s.prms[0]|int|.asm
-				s.SetOp = asm.jump
-				s.JumpPrm = 1
-				s.JumpFix(.curr)
-		
-		rz &= ~ASMReg.Exit
-		(rz as= .state.return&asmreg.exit)
-	
-	
 	function fatasm.JumpFix (|&fatasm| curr)
 		isnt CondAnswer
 		.JumpTo(curr) // shouldn't (s isnt CondAnswer) go inside .jumpto?

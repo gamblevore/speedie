@@ -3,14 +3,6 @@
 
 ///// LEAF SORTING
 
-helper SCFuncSorter (sortercomparer of scfunction)
-	// just to help compression
-	|| fA = .PackID|int|
-	|| fB = b.PackID|int|
-	|| d = fb - fa  // we need init and main first
-		return d
-	
-	return .ExportName < b.ExportName
 
 
 
@@ -19,10 +11,18 @@ module CodeSorter
 		opt norefcounts
 		for f in compiler.FuncList
 			f.FindDepths
-		compiler.FuncList.sort(LeafFunctionsSorter)
+		compiler.FuncList.sort(Leafness)
 
+	helper ExportNames (sortercomparer of scfunction)
+		// just to help compression
+		|| fA = .PackID|int|
+		|| fB = b.PackID|int|
+		|| d = fb - fa  // we need init and main first
+			return d
+		
+		return .ExportName < b.ExportName
 
-	function LeafFunctionsSorter (sortercomparer of scfunction)
+	function Leafness (sortercomparer of scfunction)
 		opt norefcounts
 		|| x = .LinkDepth|int| - b.LinkDepth|int|
 		if x < 0

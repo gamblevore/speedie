@@ -10,8 +10,9 @@ function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
 	
 	
 function message.AddOrSub (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+	|| Subtract = l is subtract
 	if dest.IsVec							// Extra bits get clipped if we do:    ivec4 + big
-		if l is Subtract
+		if Subtract
 			return .QSUB(dest, l, r, sh)
 		return .QADD(dest, l, r, sh)
 			
@@ -24,9 +25,9 @@ function message.AddOrSub (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fa
 			if l isnt Alternate
 				return .ADDM(dest, L, R, sh)
 			return .SUBM(dest, L, R, sh)
-/		l = .ExpandBits(L, r.µtype)
+		l = .ExpandBits(L, r.µtype)
 	
-	if L is Subtract
+	if Subtract
 		return .SUB(dest, L, R, sh)		
 
 	if (r is temp)

@@ -13,7 +13,7 @@ datatype OpMode (int)
 		MathLike = [Bit, Math]
 		Addition
 		ShiftOnly
-		MakesSigned
+		MakesSigned		// -
 		ExactlyEquals
 		EqualOrNot
 		Comparison  	// >  >=  <  <=
@@ -455,10 +455,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 				always = (comp is MoreOrEqual) - (comp is less)
 			if always
 				error (MsgRel, "Unchanging unsigned comparison vs zero.")
-				
-
-			
-
+	
 	ifn LN and LN == RN	   		// not both same numbers
 		if ln and rn and (ln == 1 or rn == 1)
 			if (comp is CompOrSet)

@@ -14,8 +14,10 @@ module Options
 	|| 		Beep					= false
 	|| 		Dev						= 0
 
+	|bool|	InlineLib				= true
 	|byte|	ModeCpp					= 1
 	|byte|	ModePack				= 0
+//	|bool|	PrintPackStrings		= false
 	||		MakeInterpreter			= false
 //	||		MakeLib					= false
 
@@ -34,7 +36,6 @@ module Options
 	||		IgnoreCantSaveErrors	= false
 	||		ArgStats				= false
 	||		PrintCompileString		= false
-//	||		PrintFiles				= false
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
@@ -43,7 +44,6 @@ module Options
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|byte|	UseScriptLoc			= 0
-//	|byte|  NilStrength				= errorseverity.error
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -353,11 +353,24 @@ module Feedback
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
 			app.crash
 		
+		+'cpp'
+			explain(purpose, "Compiles to cpp. Default true")$
+			options.ModeCpp = value.optionbool<<1
+			if options.ModeCpp and options.modepack == 1
+				options.modepack = 0
+				SC_Targets["pack"] = false
+				
 		+'pack'
 			options.ModePack = value.optionbool<<1
 			if options.modepack and options.modecpp==1
 				options.modecpp = 0 // would be better to allow both... but only if both are specified.
 			SC_Targets["pack"] = options.ModePack > 0
+		
+		+'inlinelib'
+			options.InlineLib = value.optionbool
+		
+//		+'strs'
+//			options.PrintPackStrings = value.optionbool
 		
 		+'targetdebug' // basically
 			Explain(Purpose, "")$
@@ -385,13 +398,6 @@ module Feedback
 			Explain(Purpose, "Optimisation level. (0 to 3... EG: '--Optimise=1')")$
 			Options.Optimise = Value.parseint
 
-		+'cpp'
-			explain(purpose, "Compiles to cpp. Default true")$
-			options.ModeCpp = value.optionbool<<1
-			if options.ModeCpp and options.modepack == 1
-				options.modepack = 0
-				SC_Targets["pack"] = false
-				
 		+'output_path'
 			explain(purpose, "Specifies the build product path")$
 			options.output_path = value.AbsolutePath

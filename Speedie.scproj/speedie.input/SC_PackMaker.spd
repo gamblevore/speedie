@@ -9,6 +9,9 @@ module PackMaker
 	|[SCDecl]|				PackGlobs
 	|int|					_PackGlobSize
 	|int|					_LibGlobSize
+	|HairyMan|				PackSaved
+	|hairyman|				LibSaved
+	|HairyMan|				LibGlobSaved
 
 
 	function PackGlobSize (|int|)
@@ -61,7 +64,7 @@ module PackMaker
 			rz += s
 	
 
-	function SortFuncsAndBuildGlobs
+	function BuildGlobs
 		opt norefcounts
 		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
@@ -70,50 +73,24 @@ module PackMaker
 		fninit.PackID = 1 // put init and main first!
 		fnmain.PackID = 2
 		
-		.SortASMFuncs(.PackFuncs, nil)
+		|| Obj = TypeObject!.ClassType!
+		packmaker.libglobs <~ Obj
 		TypeObject!.PackClassChildren(nil)
-		
-		.PackGlobs.sort(GlobalsSorter)
 
 		|&&nil| Table
 		|| frogs = .PackGlobSize
 		if platform.isdebug
 			Table = jb_vm.vm.InitTable(.libfuncs.length+31, frogs)
+		
 		.SortASMFuncs(.LibFuncs, Table)
+		.SortASMFuncs(.PackFuncs, nil)
+		.PackGlobs.sort(GlobalsSorter)
 		.LibGlobs.sort(GlobalsSorter)
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.ExportPosition = i + 1
-
 	
 	
-	function FinalPrepare
-		opt norefcounts
-		Assembler.jsm.length = 0
-
-		for c in Compiler.ClassList
-			if c.IsRole
-				|| t = c.ClassType!
-				|| t2 = c.RealClass.ClassType!
-				t.ExportPosition = t2.ExportPosition
-				
-		for fn in .LibFuncs
-			if fn.CanPrepareInline
-				require Assembler.sh.GenerateASM(fn)
-				Assembler.jsm.length = 0
-
-
-			
-
-	function SCFunction.CanPrepareInline (|bool|)
-		opt norefcounts
-		require (self isnt cpp) and .HasProperSpeedieCode
-		|| Allowed = 15 + (self is inline)<<4
-		|| count = .SourceArg!.InlineCount(Allowed)
-		if count <= Allowed
-			return true
-
-
 	function message.InlineCount (|int| Remain, |int|)
 		opt norefcounts
 		|| fn = .func
@@ -136,7 +113,7 @@ module PackMaker
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
 		opt norefcounts
 		(table)
-		list.sort(SCFuncSorter)
+		list.sort(&CodeSorter.ExportNames)
 
 		|| ID = 0
 		while (|| f = list[id])
@@ -155,16 +132,16 @@ module PackMaker
 			j.Add(@thg, f.exportname)
 		j.Exit
 
-
 	
 	function FATCompile (|bool|)
 		opt norefcounts
-		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
-		
 		(Compiler is Hungry)
+		.Packfuncs.sort(&CodeSorter.Leafness)
+		
 		for fn in .Packfuncs
 			require Assembler.sh.GenerateASM(fn)
-		Assembler.sh.Guard
+
+		.Packfuncs.sort(&CodeSorter.ExportNames)
 		
 		if !Compiler.InPerry
 			.RunAFewTests
@@ -177,11 +154,11 @@ module PackMaker
 	function MakePack 
 		opt norefcounts
 		compiler.During = compilerstage.Packing
-		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
+		Assembler.Sh.PackMakerInit
 		PackMaker.AddAll
-		.SortFuncsAndBuildGlobs
+		.BuildGlobs // Sorts too
 		.FinalPrepare
-		if .FATCompile and options.ModePack // options.ModePack can be false, if compiler.InPerry = true
+		if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry = true
 			.WritePackToDisk
 		compiler.During = 0
 	
@@ -198,7 +175,7 @@ module PackMaker
 		j.enter
 		
 		|| Stack_Trace = FastString()
-		.ListPackFuncs(j, stack_trace)
+		.RenderASM(j, stack_trace)
 		.DumpStrings(j)
 		.PackClasses(j)
 		.FuncLink(j)
@@ -210,25 +187,22 @@ module PackMaker
 	function AddDebugStuff (|jbin| j, |string| func_names)
 		j.tmp("debug")
 		j.Enter(@tmp, "func")
-//		|compressionstats| st
-//		|| f2 = func_names.compress(st)
-//		print "Stack-trace Compression: "
-//		st.print
-		|| f2 = func_names
-		j.AddStr(f2)
+		|CompressionStats| st
+		|| f3 = func_names.compress(st)
+		print "Stack-trace Compression: "
+		st.print
+		j.AddStr(f3)
 		j.exit(3)
 
 	
-	function ListPackFuncs (|jbin| j, |faststring| func_names)
+	function RenderASM (|jbin| j, |faststring| func_names)
 		opt norefcounts
 		j.enter(@tmp, "code")
-		|HairyMan| Slapped 
 		for f in .PackFuncs
-			if (Slapped)(j, f is UsedByASM)
+			if (PackSaved)(j, f is UsedByASM)
 				j.AddFunction(f)
 				func_names <~ f.exportname
 				func_names <~ '\n'
-		Slapped.Churn("Proj: ", .packfuncs.length)
 		j.Exit
 		
 		
@@ -237,7 +211,7 @@ module PackMaker
 		.DumpStringsSub(strs)
 		strs <~ 0|byte|			// they are all cstrings... but we'll actually just overwrite it to make them
 		j.enter(@tmp, "strs")	// cstrings, during load.
-		j.Add(@sstr, strs)
+		j.Add(@str, strs)
 		j.exit
 	
 	
@@ -260,12 +234,9 @@ module PackMaker
 		opt norefcounts
 		j.tmp("flnk")
 		
-		|hairyman| Slapped
 		for linked in .libfuncs
-			if (slapped)(j, linked is UsedByASM)
+			if (LibSaved)(j, linked is UsedByASM)
 				j.add(@thg, linked.ExportName)
-		Slapped.Churn("LibFuncs", .libfuncs.length)
-
 		j.exit(2)
 
 	
@@ -273,9 +244,8 @@ module PackMaker
 	function GlobLink (|jbin| j)
 		opt norefcounts
 		j.tmp("glnk")
-		|HairyMan| WildMan 
 		for linked in .LibGlobs
-			if (wildman)(j, linked is usedbyasm)
+			if (LibGlobSaved)(j, linked is usedbyasm)
 				j.add(@thg, linked.ExportName)
 		j.exit(2)
 
@@ -316,6 +286,8 @@ module PackMaker
 			|| T = .ClassType!
 			if .IsLibrary
 				packmaker.libglobs <~ T
+				if t isnt Library// what?
+					/0
 				(T is Library)
 			  elseif .MyReacher
 				packmaker.packglobs <~ T
@@ -381,9 +353,6 @@ function SCFunction.CanLibLoad (|bool|)
 	The self-compile seems to be filled with littered with wasteful globals? WHY? all sorts of functions called from glnk
 */
 
-
-
-
 /*
 	We can make a link-compression scheme!
 	JB_File__Prefs
@@ -399,20 +368,53 @@ function SCFunction.CanLibLoad (|bool|)
 */
 
 
+
+function SCFunction.CanPrepareInline (|bool|)
+	opt norefcounts
+	require (self isnt cpp) and .HasProperSpeedieCode
+	|| Allowed = 15 + (self is inline)<<4
+	|| Count = .SourceArg!.InlineCount(Allowed)
+	if Count <= Allowed
+		return true
+
+
+function packmaker.FinalPrepare
+	opt norefcounts
+	Assembler.jsm.length = 0
+
+	for c in Compiler.ClassList
+		if c.IsRole
+			|| t = c.ClassType!
+			|| t2 = c.RealClass.ClassType!
+			t.ExportPosition = t2.ExportPosition
+	// the file-size goes up if we enable this. More inlining?
+	// we need to find out why.
+
+	require Options.InlineLib
+
+	for fn in .LibFuncs
+		if fn.CanPrepareInline
+			require Assembler.sh.GenerateASM(fn)
+			Assembler.jsm.length = 0
+
+
 struct HairyMan 
-	|int| Total
-	|int| Curr
+	|uint16| Savings
+	|uint16| Curr
+	|uint|	 Total
+
 	syntax Call (|jbin| j, |bool| b, |bool|)
+		.Total++
 		if b
 			|| c = .curr
 				j.addint(c)
 			.curr = 0
 			return true
 		.curr++
-		.total++
+		.Savings++
 		return false
 			
-	function Churn (|string| s, |int| n)
-		"$s$.Total / $n"
+	function Churn (|faststring| fs)
+		fs <~ "$.Savings / $.Total"
 
 

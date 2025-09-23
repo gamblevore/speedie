@@ -940,7 +940,6 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 function message.ObjCls (|scclass|)
 	opt norefcounts
 	|| o = .obj as scdecl
-		// if (o is classobj) != (o.type == TypeJBClass)
 		if o is ClassObj
 			return o.contains!.type
 
