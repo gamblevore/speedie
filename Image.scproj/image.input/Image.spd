@@ -1,6 +1,5 @@
 
 
-
 class Image (memory)
 	linkage
 		cpp_part Img

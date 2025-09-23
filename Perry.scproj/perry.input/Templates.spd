@@ -1,6 +1,6 @@
 
-module Templates	
-	
+
+module Templates
 	|| Todo = "
 		 			*** Todo file ***
 
@@ -16,6 +16,15 @@ roots 	// Extra roots for the IDE to display. This doesn't affect compilation.
 
 `
 
+
+	|| DebugArgs = `args {
+	// "arg1", "arg2" // uncomment to activate
+}
+pwd '.'
+env
+	key="value"
+`
+
 	function EmptyMainFile (|string| name, |string|) // replace with "newprojects" folder
 		return "#!/usr/local/bin/spd
 
@@ -24,13 +33,5 @@ main
 	\"Hello $name!\"
 
 "
-
-	|| DebugArgs = `args {
-	// "arg1", "arg2" // uncomment to activate
-}
-pwd '.'
-env
-	setting="value"
-`
 		
 
