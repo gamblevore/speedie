@@ -4,10 +4,15 @@
 // sudo /usr/local/speedie/Terminal/make.spd
 
 
-main 
-	printline "Args: " + app.rawargs.render
-	app.gen("osx", platform.OSX)
-	app.gen("linux", platform.lin)
+main {
+//	printline "Args: " + app.rawargs.render
+	|| R = app.args
+	ifn R.Last isa "git"
+		expect (!R.length) ("This script takes no arguments.")
+	
+	app.Gen("osx", platform.OSX)
+	app.Gen("linux", platform.lin)
+}
 
 
 || Speedie = "/usr/local/speedie"
@@ -148,13 +153,8 @@ $SpdTerm $Speedie/Perry.scproj
 
 
 
-function app.gen (|string| plat, |bool| IsCurrentPlatform) {
-|| IsGit = app.args.Last isa "git"
-if !IsGit
-	expect !.args (.args, "This script takes no arguments: " + .args.render)
+function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
 vars.initvars(plat)
-
-
 || tocompile = FastString()
 || Count = 2 //jb.cpp and jb_globals.cpp
 for ch in vars.CppLib!
@@ -182,24 +182,27 @@ echo "Prebuild .cpp files"
 `
 if IsCurrentPlatform
 	printline "cwd: " + app.cwd
-	PrepareCpp.Execute									/* <----- ACTUAL CALL POINT -----> */
+	require PrepareCpp.NeedExecute								/* <----- ACTUAL CALL POINT -----> */
 
 
 ////////////////////////////
 <(`    (((generating script)))    `)>
 ////////////////////////////
-require StdErr.ok
 
 printline "Creating $scriptout"
 scriptout.data = vars.CreateScriptOut(list)
 
-require StdErr.ok
 "Script generated at: $scriptout"
 if IsCurrentPlatform
 	"Running Script: $scriptout ($Count+ .cpp files)\n\n"
-	scriptout.Execute									/* <----- ACTUAL CALL POINT -----> */
-
+	scriptout.NeedExecute										/* <----- ACTUAL CALL POINT -----> */
 }
+
+
+function file.NeedExecute (|bool|)
+	|| Exit = .Execute
+	if exit.Successful: return true
+	error ("Failed to execute script: $self ($exit) ${exit.name}")
 
 
 // ANTI-MAKE THEORY:
