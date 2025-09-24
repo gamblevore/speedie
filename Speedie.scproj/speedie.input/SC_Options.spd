@@ -112,6 +112,7 @@ module Feedback
 		|message| m = nil|message|!
 		target debug
 			if ""
+				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
 				Assembler.PrintProgress
 				m.PrintLocate

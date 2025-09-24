@@ -499,17 +499,16 @@ class SCDecl (SCObject) {
 	function IsReallyNumeric (|bool|)
 		require .IsNormal
 		
-		|| t = .HigherNumber
+		|| t = .type.HigherNumber
 			return true
 
 
-	function HigherNumber (|scclass|)
+	function scclass.HigherNumber (|scclass|)
 		opt norefcounts
-		|| t = .type
-		while t
-			if t.IsDataTypeOnly
-				return t
-			t = t.Super
+		while self
+			if .IsDataTypeOnly
+				return self
+			self = .Super
 		
 		
 	function IsNormalNumber (|bool|)
@@ -519,7 +518,7 @@ class SCDecl (SCObject) {
 			return true
 		
 		if scnode.ConstantsLoadingOverride
-			|| t = .HigherNumber
+			|| t = .type.HigherNumber
 				if t.typeinfo.VecCount == 1 
 					return true
 
@@ -533,7 +532,7 @@ class SCDecl (SCObject) {
 		return (!.IsCArray) and (!.PointerCount) and (.Type == typebool) 
 
 
-	function IsNumeric (|int|)
+	function Inumeric (|int|)
 		opt norefcounts
 		if (!.IsCArray) and (!.PointerCount)
 			return .Type.NumericCount
@@ -823,7 +822,7 @@ class SCDecl (SCObject) {
 
 	function CantBeNilInCpp (|bool|)
 		require !.pointercount
-		return (.IsCArray) or (.type.IsStruct) or (.isnumeric > 1) 
+		return (.IsCArray) or (.type.IsStruct) or (.inumeric > 1) 
 
 
 	function CreateStructNil (|message| where, |Message!|)
@@ -1214,17 +1213,23 @@ class SCDecl (SCObject) {
 		return t.size
 	
 
-	function RegType (|datatypecode|)
+	function ASMRegType (|datatypecode|)
 		opt norefcounts
-		if !self
-			return 0//datatypecode._void
-		
-		|| Ty = .type
-		if ty.IsObject
-			return datatypecode.cstring
-		rz = ty.typeinfo
-		if .pointercount
-			rz = datatypecode._voidptr // what about carrays?
+		if self
+			|| Ty = .type
+			|| BT = ty.BaseType
+			if bt is object
+				return datatypecode.cstring
+			if .pointercount
+				return datatypecode._voidptr // what about carrays?
+			rz = ty.typeinfo
+			if rz != datatypecode.bool
+				if bt is DataType and rz isnt numeric // fuck
+					ty = ty.HigherNumber!
+					rz = ty.TypeInfo // sigh
+					// perhaps types should have two types? One for the ASM type and one
+					// for syntactic types?
+			
 		
 		
 	function PointerIncrement (|int|)
@@ -1260,9 +1265,9 @@ class SCDecl (SCObject) {
 function IsPointerMath (|SCDecl| L, |SCDecl| R, |SCOperator| opp, |Message| exp, |SCDecl|)
 	require (opp isnt custom)
 	if (opp is addition)  
-		if (L.PointerCount) and (R.IsNumeric == 1) // ptr - a,  ptr + a
+		if (L.PointerCount) and (R.Inumeric == 1) // ptr - a,  ptr + a
 			return L
-		if (R.PointerCount) and (L.IsNumeric == 1) // a - ptr,  a + ptr
+		if (R.PointerCount) and (L.Inumeric == 1) // a - ptr,  a + ptr
 			expect (opp isnt MakesSigned) (exp, "Can't subtract a pointer from a number.")
 			return R
 		if (R.PointerCount) and (L.PointerCount) and (opp == scoperator.subtract)

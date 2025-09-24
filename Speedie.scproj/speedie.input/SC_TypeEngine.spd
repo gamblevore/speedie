@@ -130,7 +130,7 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	if (curr == @acc)
 		|| f = curr.first
 		|| T = TypeOfExpr(f, name_space)		#require
-		return (T.IsNumeric <= 1)				#expect (curr, "Can't get address within vector (c++ limitation).")
+		return (T.Inumeric <= 1)				#expect (curr, "Can't get address within vector (c++ limitation).")
 	
 	|| T2 = TypeOfExpr(curr, name_space)		#require // might transform it
 	expect (curr == @thg or @dot)				(curr, "Can't get the address of this.")
@@ -733,7 +733,7 @@ function Message.ExpectInt (|scdecl| type, |bool|)
 
 function scdecl.AccessType (|scdecl| access, |message| ch, |int|)
 	opt norefcounts
-	|| W = .isnumeric
+	|| W = .inumeric
 	if W > 1
 		return 1
 	if .IsCArray
@@ -768,7 +768,7 @@ function TypeOfAccess (ExprResolver)
 			
 			if access and Index.ExpectInt(Access)
 				if oof == 1
-					return TypeOfVecAccess(index, ty0, ty0.isnumeric)
+					return TypeOfVecAccess(index, ty0, ty0.inumeric)
 				return ty0.MemAccess(exp, side)
 
 	arr.Func = @prm
@@ -1282,7 +1282,6 @@ function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |b
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|)
 	using (exp)
-	debugat 476
 	|| dot = @dot.msg
 	dot <~ exp.first
 	|| p = dot.msg(@prm)
@@ -1589,7 +1588,7 @@ function message.IsZero (|bool|)
 
 
 function message.WrapFloatOrInt (|datatypecode| T, |int| N, |scdecl| D)
-	require T isnt float and int
+	require T != datatypecode.float and datatypecode.int
 	|| V = VecType(T.isfloat, N)
 	ifn d exact_isa v
 		using (self)
@@ -1609,7 +1608,7 @@ function TypeOfList (ExprResolver)
 	
 	for (s in exp)
 		|| typ = TypeOfExpr(s, name_space) #require
-		|| N = typ.IsNumeric
+		|| N = typ.Inumeric
 		if !n
 			// (s is inserted) checks to make sure that the user didn't type this.
 			// this is to minimise bad user-habits.

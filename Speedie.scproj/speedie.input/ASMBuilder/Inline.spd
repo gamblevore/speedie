@@ -70,7 +70,6 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	opt norefcounts
 	|| Start = .curr
 	|| OV = .OpenVars
-	
 	|ASMState| Old = .State				// can't use implicit types for barestructs
 	if dest isnt discard
 		if (!dest.reg or dest is temp)
@@ -85,7 +84,8 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	.DeepestInline = D max .DeepestInline
 	
 	dest = dest.simplify
-	dest.µtype = fn.ASMRegType
+	debugat 351
+	dest.µtype = fn.ASMReturn.ASMRegType
 	.state.fn = fn
 	.state.Return = dest
 	.state.ParentVars = .openvars
@@ -209,15 +209,18 @@ function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin,   |ASMReg|
 
 
 function InlineFinish (|fatrange| R, |ASMReg|)
+	target debug: || trap = ++asmtrapper, if trap == 2923
 	for s in R
 		if s isa asm.ret
 			if rz
 				rz = rz.simplify
 			  else
+//				rz = s.asmreg(0) // better if asmreg contains type. Requires asmreg be supetset of asmparam
 				|| dest = s.inputfat(0)
 					rz = dest.info 
 				  else
 					rz = s.prms[0]|int|.asm
+					rz.µType = .state.Return.µType
 			s.SetOp = asm.jump
 			s.JumpPrm = 1
 			s.JumpFix(.curr)
@@ -225,10 +228,7 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 	rz &= ~ASMReg.Exit
 	|| dest = .state.return
 	(rz as= dest&asmreg.exit)
-	|| rt = rz.µtype
-	|| dt = dest.µtype
-	if rt and rt != dt // huh?
-	rz.µtype = dt
+	rz = rz.ExpectSameType(dest)
 
 
 function Trintrin (|message| out, |asmreg| dest, |fatasm| fat)

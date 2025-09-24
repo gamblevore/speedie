@@ -90,7 +90,7 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 		if .state.return
 			v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
 	dest.reg = v
-	dest.µtype = fn.ASMRegType
+	dest.µtype = fn.ASMReturn.ASMRegType
 	return dest.ReallySimplify
 
 

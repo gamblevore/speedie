@@ -1425,7 +1425,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function SCClass.SimplerDataTypes (|faststring| fs, |scdecl| d)
 		if .IsDataTypeOnly
 			|| t = .TypeInfo
-			if (t.VecCount <= 1) and (t.isnumeric) and (t.bytecount < 4)
+			if (t.VecCount <= 1) and (t is numeric) and (t.bytecount < 4)
 				if t.isfloat // what?
 				if t.IsSigned
 					fs <~ "int"

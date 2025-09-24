@@ -1208,13 +1208,6 @@ function FixCnjSub (|Message| exp)
 	RemoveMe.Remove
 
 
-	
-function ASMRegType (|datatypecode|)
-	opt norefcounts
-	if self
-		return .ASMReturn.regtype
-
-
 
 function SCDecl.MarkAsAltered  // markaltered
 	opt norefcounts

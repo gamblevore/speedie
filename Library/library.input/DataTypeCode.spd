@@ -7,8 +7,9 @@ datatype DataTypeCode (uint16)
 	default 0	
 	constants Types
 		|DataTypeCode|
-	// 8 = "is a number" bit...
+		numeric = 8
 		unsigned = 64
+		Floating = 128
 		byte    = 0 + 0  + 64 + 0   + 8
 		char	= 0 + 0  + 0  + 0   + 8
 		Byte2   = 1 + 0  + 64 + 0   + 8
@@ -53,17 +54,22 @@ datatype DataTypeCode (uint16)
 		_voidptr = 112 // unsigned 64-bit non-numeric value.
 		cstring = 112 // same
 		Failed = 512
+		// we really need a pointer-bit...
+		// not just "not numeric" cos we say "bools are kinda numeric"
+		// but what about a non-numeric asmreg or non-numeric @syntax?
+		// are they pointers?
+		// Also... perhaps having a bit-count instead of byte-count is better
+		// then we can represent bools.
 		PossibleBits = 1023
-		Numeric = 8
 	
 	
-//	function DebugPrint
-//		printline .Render
+	function DebugPrint
+		printline .Render
 	
 	
 	render
 		self = self&PossibleBits
-		if !.IsNumeric
+		if self isnt numeric
 			if self is bool
 				fs <~ "bool"
 			  else
@@ -83,26 +89,29 @@ datatype DataTypeCode (uint16)
 					fs <~ "int"
 				  elseif b == 8
 					fs <~ "int64"
+				  elseif b == 16
+					if .issigned
+						fs <~ "i"
+					fs <~ "vec4"
 			  else
 				fs <~ "float"
 				if b != 4
-					fs <~ b*8
+					if b == 16
+						fs <~ "vec4"
+					  else
+						fs <~ b*8
 					
 		
-	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "isnumericness"
+	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "inumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 	
 	function OK (|bool|)
 		return !(self&failed)
-	
-//	function Has (|datatypecode| M, |bool|)
-//		opt inline
-//		return self&PossibleBits&M
-	
 		
 	syntax is (|datatypecode| M, |bool|)
 		opt inline
-		return self&PossibleBits == M&PossibleBits
+		target debug: if M&~PossibleBits
+		return self&M == M
 	
 	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)
 		opt inline
@@ -119,7 +128,7 @@ datatype DataTypeCode (uint16)
 		return (self >> 7) & 1
 	
 	function IsPointer (|bool|)
-		return !.isnumeric and (self isnt bool)
+		return (self isnt numeric) and (self isnt bool)
 		
 	function IsIntReg (|bool|)
 		if .IsPointer // pointers, bascially, are ints
@@ -139,11 +148,8 @@ datatype DataTypeCode (uint16)
 			return self  &~ unsigned
 		return self ||| unsigned
 	
-	function IsNumeric (|bool|)
-		return self & numeric
-	
 	function NumericCount (|int|)
-		if (self & numeric)
+		if (self is numeric)
 			return .VecCount
 	
 	function ItemBitCount (|int|)

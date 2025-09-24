@@ -172,7 +172,7 @@ extend SCDecl
 
 		|| T = .type
 		|| ti = t.typeinfo
-		check (ti.isnumeric) ( .source, "Unrecognised type '${T.Name}'." )
+		check (ti is numeric) ( .source, "Unrecognised type '${T.Name}'." )
 		return ti
 
 

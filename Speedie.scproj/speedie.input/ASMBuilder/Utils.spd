@@ -35,18 +35,30 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	return .start
 
 
+function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
+	|| rt = .µType
+	|| dt = dest.µType
+	target debug
+		if (dt is Floating != rt Is Floating) or (dt is bool != rt is bool) // should never happen
+		if rt&~datatypecode.unsigned != dt&~DataTypeCode.unsigned
+			if rt.ByteCount < dt.ByteCount
+				debugger 
+	//			return exp.expandbits(rz, dt) // necessary?
+	.µtype = dt
+	return self
 
 target debug
 	function scdecl.ASMSanity 
 		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
 			|| size = .type.Size
 			|| T = .TypeOnly
-			if T is Vec3 or ivec3
+			if T == datatypecode.Vec3 or datatypecode.ivec3
 				size = 12
 			if size != T.bytecount // sigh. what?
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
 				#!"We could change it if it is only 112."
 				debugger
+				t.debugprint
 
 
 

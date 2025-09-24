@@ -58,7 +58,7 @@ class DataObject
 			fs <~ .FloatValue
 		  elseif .Kind == datatypecode.bool	
 			.privvalue|bool|.render(fs)
-		  elseif !.Kind.isnumeric // oop
+		  elseif .Kind isnt numeric // oop
 			fs <~ "0x"
 			fs.appendhex(.privvalue)
 		  else

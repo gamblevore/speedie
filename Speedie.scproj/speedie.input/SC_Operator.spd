@@ -441,7 +441,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	|| LN		= LNT.NumericCountBoolsToo(lc)
 	|| RN		= RNT.NumericCountBoolsToo(Rc)
 
-	if lnt.isnumeric and rnt.isnumeric
+	if lnt is numeric and rnt is numeric
 		if (comp is Comparison) and (lnt.issigned != rnt.issigned)
 			// What are we comparing?   byte vs int is ok.   uint vs int NOT OK
 			if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)

@@ -22,7 +22,7 @@ function SCNode.CalculateConstRel (|message!| value, |$datatypecode| Ty, |uint64
 	|| B = A.next!
 	|| C = b.next!
 	if value == @brel
-		expect (ty is int) (value, "Not an integer")
+		expect (ty == datatypecode.int) (value, "Not an integer")
 		return ~L
 		
 	|| op = scoperator.lookup(B)
@@ -348,7 +348,7 @@ function compiler.CollectConstants
 
 function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
 	// use NumericCountWithBools instead
-	if Self & numeric
+	if Self is numeric
 		return .VecCount
 	if self & bool
 		return 1

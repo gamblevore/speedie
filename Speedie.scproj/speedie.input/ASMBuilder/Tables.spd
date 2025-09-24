@@ -222,7 +222,7 @@ function TypeCast (fn_asm)
 	if From.µtype == dest.µtype
 		return From // already done!
 
-	|| NewType = NewDecl.regtype
+	|| NewType = NewDecl.ASMRegType
 	if !from.Reg												// x = 0|float|
 		from.µtype = NewType
 		return from
@@ -771,7 +771,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	|| mr = ASMReg()
 	|| First = exp.first!
 	|| dest = mode
-	target debug: || trap = ++ASMTrapper, if trap == 5541
+	target debug: || trap = ++ASMTrapper, if trap == -1
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else
@@ -795,19 +795,12 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	(dest is Const) = (ml&mr is Const)
 	
 	|| op = exp.second ?? exp.first!
+	target debug: || trap2 = ++asmtrapper, if trap2 == -1
 	rz = (fn)(self, op, dest, ml, mr)
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
-	|| rt = rz.µType
-	|| dt = dest.µType
-	if rt != dt
-		target debug: if (dt.IsInt != rt.IsInt) or (dt is bool != rt is bool) // should never happen
-		if rt.ByteCount < dt.ByteCount
-			debugger 
-			return exp.expandbits(rz, dt)
-		// so... now what?
-		rz.µtype = dt
+	rz = rz.ExpectSameType(dest)
 
 
 

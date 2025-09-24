@@ -59,7 +59,7 @@ function SCDecl.IntsOnly (|Message| exp, |bool|)
 	if (.isnormalnumber and t.isint)
 		return true // for constants... isreallynumeric allows constants a bit better.
 	
-	expect (T.isnumeric or t is bool)			(exp, "Can’t do bit ops on this")
+	expect (T is numeric or t is bool)			(exp, "Can’t do bit ops on this")
 	expect (!T.isfloat)							(exp, "Can’t do bit ops on floats")
 	return true
 

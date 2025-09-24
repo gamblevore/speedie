@@ -417,13 +417,11 @@ extend Assembler
 
 	function PlusSub (fn_opasm) // add (
 		if r.iszero					// allow a = a ± 0
-			return l
+			return l.µtype(dest.µtype)
 		
-//		|| x = 0
-//		|| ll = l.reg
 		if l isnt Subtract			// 0 + a
 			if l.iszero
-				return r
+				return r.µtype(Dest.µtype)
 		  else
 			if (r iz l)
 				return .zeros(exp, dest)
