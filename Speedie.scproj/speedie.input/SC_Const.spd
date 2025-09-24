@@ -17,7 +17,7 @@ function SCNode.CalculateConstRel (|message!| value, |$datatypecode| Ty, |uint64
 	opt norefcounts
 	|| A = value.first!
 	|| L = .CalculateConstSub(A, Ty)
-	require ty.ok
+	require ty!=DataTypeCode.Failed
 	
 	|| B = A.next!
 	|| C = b.next!
@@ -83,7 +83,7 @@ function SCNode.CalculateConst (|message!| value, |uint64|)
 
 function message.TypeExpect (|$datatypecode| Ty, |datatypecode| In)
 	|| v = ty
-		if  (v != in)  and  v.ok
+		if  (v != in)  and  v != DataTypeCode.Failed
 			ty = datatypecode.failed
 			error (self, "Can't mix floats/ints here.")
 	  else
