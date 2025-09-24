@@ -82,6 +82,8 @@ jbmessage* jb_msg_flatafter(jbmessage* Self); /* If you want to loop over all th
 jbmessage* jb_msg_root(jbmessage* Self); /* Finds the top-most parent. */
 void jb_msg_remove(jbmessage* Self); /* Removes the node from the tree. */
 jbstring* jb_msg_render(jbmessage* Self, int Mode); /* Renders the tree as a string! */
+jbstring* jb_msg_ast(jbmessage* Self); /* Renders the structure of the tree in a human-readable format. Useful to understand the parse-tree. This gives you an idea of how to move across the tree using jb_msg_child/prev/parent/etc! */
+jbmessage* jb_msg_parseast(jbmessage* Self); /* Does the opposite of jb_msg_ast, almost. You'll need to parse the string first, then call jb_msg_parseast */
 jbmessage* jb_msg_copy(jbmessage* Self, jbmessage* Layer); /* Copies the node's entire tree structure, positions, names and all. */
 jbmessage* jb_msg_create(jbmessage* Self, jbsyntax Type, jbstring* Name); /* Creates a new node with the type and name provided.
 

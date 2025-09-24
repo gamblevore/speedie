@@ -144,15 +144,15 @@ __nodebug Message item_(const Syntax& Type, const String& Name=(const char*)0) c
 __nodebug Message match(const Syntax& Type, const String& Name=(const char*)0) const    {return jb_msg_expect(_self, Type, Name, nullptr);}
 	__nodebug void error(const String& Msg) const {return jb_msg_error(_self, Msg);}
 
-    __nodebug Message flatnext() const {return jb_msg_flatnext(_self);}
-    __nodebug Message flatafter() const{return jb_msg_flatafter(_self);}
-    __nodebug Message copy(const Message& l) const     {return jb_msg_copy(_self, l);}
-    __nodebug Message copy() const     {return jb_msg_copy(_self, 0);}
-    __nodebug String  render(int Mode = 0) const   {return jb_msg_render(_self, Mode);}
-    __nodebug String  render_jbin() const   {return jb_msg_render(_self, 1);}
-    __nodebug Message root() const     {return jb_msg_root(_self);}
-__nodebug String  ast()const {return jb_msg_ast(_self);}
-__nodebug Message parseast()const{return jb_msg_parseast(_self);}
+    __nodebug Message flatnext() const			{return jb_msg_flatnext(_self);}
+    __nodebug Message flatafter() const			{return jb_msg_flatafter(_self);}
+    __nodebug Message copy(const Message& l) const {return jb_msg_copy(_self, l);}
+    __nodebug Message copy() const				{return jb_msg_copy(_self, 0);}
+    __nodebug String  render(int Mode = 0) const {return jb_msg_render(_self, Mode);}
+    __nodebug String  render_jbin() const		{return jb_msg_render(_self, 1);}
+    __nodebug Message root() const				{return jb_msg_root(_self);}
+	__nodebug String  ast() const				{return jb_msg_ast(_self);}
+	__nodebug Message parseast() const			{return jb_msg_parseast(_self);}
 
     __nodebug void    remove()    {return jb_msg_remove(_self);}
     
