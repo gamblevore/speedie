@@ -592,7 +592,7 @@ module GUI
 	function DialogSorter (SorterComparerWindow)
 		opt norefcounts
 		if a and b
-			return a.isdialog|int| - b.isdialog|int|
+			return a.isdialog - b.isdialog
 
 
 	function DrawWinFrom (|window|)

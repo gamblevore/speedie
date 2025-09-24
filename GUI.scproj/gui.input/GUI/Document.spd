@@ -277,7 +277,7 @@ class Document (list)
 		|| L = .last$
 		|| F = .first
 		require L != F
-		|| n = .maxundos|int| - 2
+		|| n = .maxundos - 2
 		for (n)
 			l--
 			require L != F

@@ -17,7 +17,7 @@ helper StrPrintLine (|string?| data)	// ideally move this to string._printline
 function Print (|string?| data)
 	_strprint(data)
 
-function PrintLine (|string| data="")
+function PrintLine (|string?| data="")
 	strprintline(Data)							// to disambiguate vs macro
 
 

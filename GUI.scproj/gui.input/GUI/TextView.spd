@@ -1806,7 +1806,7 @@ class TextView (GUIControl)
 		
 		|| d		= .StartLine
 		|| lc		= .LineNumColor
-		|| y		= (.lineheight|int| - font.height) + .LastTop
+		|| y		= (.lineheight - font.height) + .LastTop
 		|| yEnd		= .LastBottom
 		|| Remain	= .LastRect.Height
 		|| UseCol	= .UseColorAnyway

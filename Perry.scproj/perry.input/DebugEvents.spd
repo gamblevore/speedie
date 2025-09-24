@@ -212,7 +212,7 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 		.ProductOut.log("\n(--Process Killed--)")
 	  elseif !x.IsRunning
 		|| exitcode = "\n(--Exit OK--)"
-		if x > 0
+		if x!=0
 			exitcode = "\n(--Exit Error: ${x}--)"
 			.addProductErr(exitcode)
 		.ProductOut.log(exitcode)

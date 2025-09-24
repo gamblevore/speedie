@@ -262,25 +262,6 @@ struct MessagePosition
 	function SyntaxUsingComplete (|object| idk=nil)
 
 
-helper list.JDB2
-	description "For internal compiler-use only... don't use this"
-	cpp_name jdb2
-	visible
-	if (Self)
-		printline self|message|.jdb_
-	  else
-	    "(nil)"
-
-
-helper list.JDB3
-	description "For internal compiler-use only... don't use this"
-	cpp_name jdb3
-	visible
-	if (Self)
-		printline self|message|.jdb_(3)
-	  else
-		"(nil)"
-
 
 function byte.CanPrintAsNormalChar (|bool|)
 	return (self < 127 and self >= 32)

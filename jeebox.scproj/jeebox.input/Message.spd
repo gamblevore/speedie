@@ -580,10 +580,13 @@ Message is also:
 			fs <~ ('"', 2)
 		
 		|| ch = .first
-		if ch and !ch.next and ch != @msg
+		if !ch
+			fs <~ " "
+		  elseif !ch.next and ch != @msg
 			fs <~ " "
 			fs <~ ch
-			fs <~ " "
+			if !ch.IsString // should always be.
+				fs <~ " "
 		  else
 			fs.indent += 1
 			while ch
@@ -642,56 +645,52 @@ Message is also:
 		opt norefcounts
 		fs <~ self
 
-	
-	function JDB_  (|faststring|fs_in=nil, |int| flags=1, |string|)
-		return .jdb2_(flags, fs_in)
 
-
-	render JDB2_  (|int| Flags = 1)			//  function ast,  message.ast
-		opt norefcounts
-		if flags&1
-			fs <~ "«"
-		fs <~ .Func.name
-		fs <~ ' '
-		if (.name)
-			fs.AppendQuotedEscape(( .name[0,32] , .name )(flags & 2))
-		if .hasany
-			fs.indent++
-			for ch.fast in self
-				fs.IndentLine
-				ch.jdb2_(flags, fs)
-			fs.indent--
-			if flags&1
-				fs.IndentLine
-		if flags&1
-			fs <~ "»"
-	
-	
-	render RenderAST (|int| flags=1)
-		opt norefcounts
-//		use @msg instead?
-		if (self == @arg) and (.isroot)
-			for ch.fast in self
-				ch.jdb2_(flags, fs)
-				fs <~ '\n'
+	helper list.JDB2
+		description "For internal compiler-use only... don't use this"
+		cpp_name jdb2
+		visible
+		if (Self)
+			printline self|message|.RenderAST
 		  else
-			.jdb2_(flags, fs)
+			"(nil)"
 	
 	
-	function ParseAST (|message?|)
-		// parse and render AST could use the new «» syntax?
+	render RenderAST			//  function ast,  message.ast
+		opt norefcounts
+		|| AvoidSelf  =  (.func == @arg) and (.parent == nil) and !.name
+		if !AvoidSelf
+			fs <~ "«"
+			fs <~ .Func.name
+			fs <~ ' '
+			fs.indent++
+		|| name = .name
+			fs.AppendQuotedEscape(name)
+		if .HasAny
+			for ch.fast in self
+				fs.IndentLine
+				ch.RenderAST(fs)
+			fs.indent--
+			fs.IndentLine
+		  else
+			fs.indent--
+		if !AvoidSelf
+			fs <~ "»"
+		
+	
+	function ParseAST (|message| into=nil, |message?|)
+		opt norefcounts
+		|| Curr = .first
 		if self == @arg
-			|| f = .first$
-			f.ExpectLast
-			return f.ParseAST
-		|| fn = Syntax.Func(.name, self)		#require
-		|| name = .first
-			|| isStr = name==@str
-			rz = Message(fn, (name.name, "")(isstr))
-			|| arg = (name.next, name)(isstr)
-			if arg == @arg
-				for ch in arg
-					rz <~ ch.ParseAST
+			rz = Message(into, @arg, .name)
+		  else
+			require .Expect(@msg)
+			|| fn = Syntax.Func(.name, self)
+			rz = Message(into, fn, curr.name)
+			curr++
+		while curr
+			curr.ParseAST(rz)
+			curr++
 	
 	
 	function UnEmbedStr

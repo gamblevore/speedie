@@ -279,7 +279,7 @@ function PerryIDE.UpdateJeeboxField (|bool|)
 	
 	|| str = ""
 	|| msg = txt.Parse
-		str = msg.RenderAST(0)
+		str = msg.RenderAST
 	  else
 		str = stderr.pop!.render
 	.ShowText(.JeeboxText, str, true)	// OK... so... what about resel from drag?

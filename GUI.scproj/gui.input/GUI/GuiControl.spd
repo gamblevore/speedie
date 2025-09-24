@@ -173,7 +173,7 @@ class GUIControl (list)
 
 
 	helper Tabbability (|guicontrol| c, |int|)
-		return  c.tabindex|int|  -  .tabindex|int|
+		return  c.tabindex  -  .tabindex
 		
 	
 	helper IsBetterFocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)

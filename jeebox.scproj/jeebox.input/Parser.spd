@@ -1120,7 +1120,7 @@ ive been~running #since morning
 	function AddToOutput (|Message!| Output,  |message| Curr,  |message| Prev,  |int| Pos,  |message|)
 		Opt NoRefCounts
 		|| f = Output.func
-		if (prev and !f.IsList)          // and (f==@arg or f==@tmp))
+		if (prev and !f.IsList and f!=@msg)
 			|| Extra = curr.PrevIndentCheck(prev)
 			if Extra < 0
 				return parser.LoweredIndent(output, curr)
