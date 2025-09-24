@@ -314,7 +314,8 @@ class SCDecl (SCObject) {
 				if bme == 32 and bt == 32		// int-uint, or uint-int stays as int. Or else its surprising! 
 					return typeint
 				|| bits2 = (bme + !s.IsSigned) max (bt + !t.IsSigned)
-				check (bt <= bme or ot is directnumber) (Right, "Can't subtract a bigger type from a smaller one.")
+				ifn self is Property or Global
+					check (bt <= bme or ot is directnumber) (Right, "Subtraction upon smaller type, by a bigger one.")
 				if bits2 > 32
 					return TypeInt64
 				return TypeInt

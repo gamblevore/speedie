@@ -25,7 +25,9 @@ function message.AddOrSub (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fa
 			if l isnt Alternate
 				return .ADDM(dest, L, R, sh)
 			return .SUBM(dest, L, R, sh)
-		l = .ExpandBits(L, r.µtype)
+		if !l.IsRead
+			l = .ExpandBits(L, r.µtype)
+			problem (self, "Subtraction upon smaller type, by a bigger one.")
 	
 	if Subtract
 		return .SUB(dest, L, R, sh)		
