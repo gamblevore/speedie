@@ -87,7 +87,6 @@ class String
 	function Last (|int| minus = 0, |Byte|)
 		return self[.length-(1+minus)]
 	
-		
 	syntax access (|byte|)
 		cpp_wrapper JB_Str_First
 		
