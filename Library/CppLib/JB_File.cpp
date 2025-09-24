@@ -786,7 +786,26 @@ JB_String* JB_File__Home() {
 
 JB_String* JB_Str_Preview(JB_String* P, int N);
 
-JB_StringC* JB_File_PathFix(JB_String* P) {
+	
+void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
+	int i = 0;
+	int LastSlash = 0;
+	while (i <= n) {
+		if (i == n or PS[i] == '/') { // output remaining stuff
+			int Missing = i-LastSlash;
+			if (Missing > 1 or (Missing>0 and PS[i-1] != '.')) {
+				if (JB_FS_Last(FS, 0) != '/')
+					JB_FS_AppendByte(FS, '/');
+				JB_FS_AppendMem_(FS, PS + i - Missing, Missing);
+			}
+			LastSlash = i+1;
+		}
+		i++;
+	}
+}
+
+
+JB_StringC* JB_File_PathFix (JB_String* P) {
 // creates c-strings.
 	int N = JB_Str_Length(P);
 	if (!N) return (JB_StringC*)P;
@@ -794,28 +813,22 @@ JB_StringC* JB_File_PathFix(JB_String* P) {
 		JB_ErrorHandleFile(JB_Str_Preview(P, 150), nil, ENAMETOOLONG, nil, "fixing-path");
 		return (JB_StringC*)JB_Str__Error(); // hmmm
 	}
-	byte* s = P->Addr;
-	if (s[0] == '/')
-		return JB_Str_MakeC(P);
-	
-	FastString* fs = JB_FS__FastNew(0);
-    if (s[0] == '~') {
-		auto H = JB_File__Home();
-		JB_FS_AppendString(fs, H);
-		JB_FS_AppendRange(fs, P, 1, kMaxint);
-	} else {
+
+	FastString* FS = JB_FS__FastNew(0);
+	byte* PS = P->Addr;
+    if (PS[0] == '~') {
+		JB_FS_AppendString(FS, JB_File__Home());
+		PS++; N--;
+	} else if (PS[0] == '/') {
+		JB_FS_AppendByte(FS, '/');
+		PS++; N--;
+	} else { 
 		const char* Created = getcwd( 0, 0 );
-		JB_FS_AppendCString(fs, Created);
-		if (JB_FS_Last(fs, 0) != '/')
-			JB_FS_AppendByte(fs, '/');
-		if (s[0] == '.' and P->Length >= 2  and  s[1] == '/') {
-			JB_FS_AppendRange(fs, P, 2, kMaxint);
-		} else {
-			JB_FS_AppendString(fs, P);
-		}
+		JB_FS_AppendCString(FS, Created);
 		free((void*)Created);
 	}
-	return (JB_StringC*)JB_FS_GetResult(fs);
+	RemovePathGarbage_(FS, PS, N);
+	return (JB_StringC*)JB_FS_GetResult(FS);
 }
 
 
