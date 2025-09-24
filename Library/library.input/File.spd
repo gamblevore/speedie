@@ -452,10 +452,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function MoveTo (|string| Path, |ErrorInt|)
 		cpp_wrapper JB_File_MoveTo
 		
-	operator inside (|file|f, |bool|)
-		|| fp = f.pathdir
-		return super[0, fp.length] == fp
-			
 	function Read (|int| Length, |bool| AllowMissing=true, |string|)
 		cpp_wrapper JB_File_Read
 
