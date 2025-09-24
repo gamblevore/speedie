@@ -149,15 +149,15 @@ class_api Message (msg)
 
 	
 	
-//	api ast (|string|)
-//		.nil$
-//		return .renderast
-//		description "Renders the structure of the tree in a human-readable format. Useful to understand the parse-tree. This gives you an idea of how to move across the tree using jb_msg_child/prev/parent/etc!"
-//			
-//	api parseast (|message|)
-//		.nil$
-//		return .parseast
-//		description "Does the opposite of jb_msg_ast, almost. You'll need to parse the string first, then call jb_msg_parseast"
+	api ast (|string|)
+		.nil$
+		return .renderast
+		description "Renders the structure of the tree in a human-readable format. Useful to understand the parse-tree. This gives you an idea of how to move across the tree using jb_msg_child/prev/parent/etc!"
+			
+	api parseast (|message|)
+		.nil$
+		return .parseast
+		description "Does the opposite of jb_msg_ast, almost. You'll need to parse the string first, then call jb_msg_parseast"
 	
 	api copy (|message|layer, |message|)
 		.nil$
