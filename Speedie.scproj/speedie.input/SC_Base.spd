@@ -781,8 +781,6 @@ function CollectOne (|Message| c, |bool| Visible=false, |bool|)
 		c.remove
 		Return visible
 	
-	// SHOULDN'T DO .MoveToInitFunc FOR GLOBALS
-	// better to collect immediately. lose visibility, and other issues
 	c.Visible = Visible // save lost visibility
 	
 	if !.CollectSub( C ) and (self isa SCModule)

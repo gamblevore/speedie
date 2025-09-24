@@ -134,6 +134,7 @@ linkage
 
 |int|						CurrStage
 |string|					StageName
+|file|						JeeboxProj_
 
 
 constants: 	kTimeWidth = 19
@@ -345,22 +346,18 @@ function InitBasicFuncs (|bool|)
 //			rz.IsVisible = false
 
 
-function Library (|file|)
-	return .projects.filech("Library")
-
-
 function Jeebox (|file|)
-	return .Projects.FileCh("jeebox.scproj")
-
-
-function Speedie (|file|)
-	return .Projects.FileCh("Speedie.scproj")
+	opt norefcounts
+	return .jeeboxproj_ init .Projects.FileCh("jeebox.scproj")
 
 
 function ImportLibs
-	SCImport.STDLibTime = true
-	SCImport.Importpath( "Library",  .Library,	1,  true )
-	SCImport.Importpath( "jeebox",   .Jeebox,	1,  true )
+	opt norefcounts
+	SCImport.STDLibTime = true	
+	|| Library = .projects.filech("Library")
+	|| Jeebox = .Jeebox	
+	SCImport.Importpath( "Library",  Library,	1,  true )
+	SCImport.Importpath( "jeebox",   Jeebox,	1,  true )
 	
 	compiler.program.LoadInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
 	compiler.program.LoadInitFuncSub(.AppInitCode,    "InitAppCode_")
@@ -370,11 +367,11 @@ function ImportProj
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
 	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
-	expect compiler.Project ("No user-project found.")
+	|| proj = compiler.Project									#expect ("No user-project found.")
 	if !compiler.ConfMsg										// we need a conf, for prefs to work
 		|| conf = @tmp+"conf"
 		conf["prefs"] = Compiler.ProjectName + ".box.pref"
-		.SetConf(conf)
+		.SetConf(proj, conf)
 
 
 function ConfBool (|string| name, |bool| Default=true, |bool|)

@@ -164,7 +164,7 @@ function SCModule.DelayedInitFuncTransform
 	// need to separate lib and not lib out.
 	|| it = v.first
 		for (msg in it)
-			//if msg.InitTrap // module glob fix
+			// if msg.InitTrap // module glob fix
 			if (msg == @Decl)
 				|| name = msg.GetDclName
 					if name.InitRootDecl( msg, self )

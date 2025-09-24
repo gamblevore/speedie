@@ -59,7 +59,7 @@ class Error (Message)
 		opt norefcounts
 		|| node = .node
 		if ! node
-			node = currsource_.last  #require
+/			node = currsource_.last  #require
 			.node = node
 		.position = node.position
 

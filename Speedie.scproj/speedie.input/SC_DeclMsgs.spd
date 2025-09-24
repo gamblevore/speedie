@@ -216,8 +216,7 @@ function scdecl.AddToGlobs (|bool|)
 //		is hidden
 // maybe just do visibility textually?
 	
-	if .ProjectIsLib
-		is Library
+	if self is Library
 		PackMaker.LibGlobs <~ self
 	  else
 		packmaker.PackGlobs <~ self

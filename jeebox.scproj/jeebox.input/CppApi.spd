@@ -148,21 +148,23 @@ class_api Message (msg)
 		description "Renders the tree as a string!"
 
 	
-	
 	api ast (|string|)
 		.nil$
 		return .renderast
 		description "Renders the structure of the tree in a human-readable format. Useful to understand the parse-tree. This gives you an idea of how to move across the tree using jb_msg_child/prev/parent/etc!"
-			
+	
+	
 	api parseast (|message|)
 		.nil$
 		return .parseast
 		description "Does the opposite of jb_msg_ast, almost. You'll need to parse the string first, then call jb_msg_parseast"
 	
+	
 	api copy (|message|layer, |message|)
 		.nil$
 		return .copy(layer)
 		description "Copies the node's entire tree structure, positions, names and all."
+	
 	
 	api create (|Syntax| Type, |string| Name, |message|)
 		type.nil$

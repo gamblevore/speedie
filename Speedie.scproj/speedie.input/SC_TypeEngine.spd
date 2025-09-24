@@ -649,6 +649,7 @@ function TypeOfExprSub (|Message| Exp, |SCNode| name_space, |Message?| side = ni
 
 	if name_space
 		|| f = ExprFuncs[Exp.func|int|]					#expect ( exp )
+		// debugat 61977
 		|| obj = (f)(Exp, name_space, side)
 			exp.obj = obj
 		return obj|SCObject|
@@ -1281,6 +1282,7 @@ function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |b
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|)
 	using (exp)
+	debugat 476
 	|| dot = @dot.msg
 	dot <~ exp.first
 	|| p = dot.msg(@prm)
@@ -1302,7 +1304,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 		exp.Last!.name = comp.compOp
 		exp <~ (@num, comp.compparam)
 
-	rz = TypeOfExpr( dot, name_space )
+	rz = TypeOfExpr( dot, name_space ) // testing exp corrupts this. Shouldn't!
 	if !rz
 		if StdErr.LastError.FromSamePlace(exp)
 			stderr.pop
@@ -1310,6 +1312,8 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 			error (exp, "Perhaps use == instead of ~= ?")
 		  else
 			lc.ExpectFail(rc, exp, nil)
+	rz = TypeBool!.TypeNormal
+				
 
 
 function error.FromSamePlace (|message| s, |bool|)
@@ -1793,7 +1797,7 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 function NewDeclNum (|SCDecl?| D, |int64| N, |string| VarName="", |bool| Shifts=false, |Message!|)
 	opt norefcounts
 	if !D
-		d = scdecl.new(typeint!)
+		d = scdecl(typeint!)
 	rz = n.MsgForConst(Shifts)
 	rz.obj = d
 	if  n < int.min  or  n > int.max

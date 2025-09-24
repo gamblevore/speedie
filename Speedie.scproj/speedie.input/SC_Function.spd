@@ -771,6 +771,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
 	dcl.AddToGlobs
+
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
 	.HasProto = dcl
 	(Dcl is compilercreated)

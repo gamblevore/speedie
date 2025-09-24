@@ -14,7 +14,6 @@ class SCImport
 	|errorseverity|			BlindCast
 	|int|					Depth
 	|file?|					Where
-//	|scfile?|				Conf
 	|[SCFile]|				Files
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
@@ -106,7 +105,7 @@ class SCImport
 			  elseif s ~= "compile_linking"
 				Linkage.CompilerCollect(s)
 			  elseif s ~= "conf"
-				compiler.SetConf(s)
+				compiler.SetConf(self, s)
 			  elseif s ~= "targets"
 				.IndexTargets(s)
 	
@@ -122,7 +121,7 @@ class SCImport
 		tar.remove
 		
 	
-	function compiler.SetConf (|message| conf)
+	function compiler.SetConf (|scimport| Proj, |message| conf)
 		|| arg = conf[@arg]
 			arg.remove
 			compiler.ConfMsg = arg

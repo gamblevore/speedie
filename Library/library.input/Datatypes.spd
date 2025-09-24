@@ -49,7 +49,7 @@ datatype int
 		opt inline
 		return self|float| / d|float|
 		
-	syntax compare (|string|s, |int|)
+	syntax compare (|string| s, |int|)
 		return self - s.length
 
 	syntax access (|bool|) // should be a bool?

@@ -771,7 +771,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 	|| mr = ASMReg()
 	|| First = exp.first!
 	|| dest = mode
-	target debug: || trap = ++ASMTrapper, if trap == 0
+	target debug: || trap = ++ASMTrapper, if trap == 5541
 	if First.islast
 		ml = .µGetASM(first, dest)
 	  else

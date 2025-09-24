@@ -143,6 +143,9 @@ class SCDecl (SCObject) {
 		.NilDeclared = NilState.Either
 		.mu.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
 		.mu.datatype = 0
+		if .project.isstdlib
+			is Library
+
 		|| m = SCModule.curr
 			.mu.ModuleNum = m.ModuleNum
 
@@ -170,8 +173,9 @@ class SCDecl (SCObject) {
 	function IsTypeImprove (assigns:|bool|)
 		.mu.info = .mu.info.set(SCDeclInfo.TypeImprove, Value)
 	
-	syntax equals (|string| s, |bool| aware=false, |bool|)
-		return .name.syntaxequals(s, aware)
+	target debug
+		syntax equals (|string| s, |bool| aware=false, |bool|)
+			return .name.syntaxequals(s, aware)
 		
 		
 	syntax is (|SCDeclInfo| d, |bool|)
@@ -186,10 +190,6 @@ class SCDecl (SCObject) {
 
 	function IsNil (|bool|)
 		return self == typenil
-	
-	function ProjectIsLib (|bool|)
-		opt norefcounts
-		return .project.isstdlib
 
 
 	function Found (|bool|)

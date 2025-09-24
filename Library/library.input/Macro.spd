@@ -100,6 +100,7 @@ extend message
 		using self,  opt norefcounts
 		for r in prms
 			(r isnt MacroMade) // in case it was passed in
+		debugat 0
 		m.Source.MacroCopy(self, prms, self)
 		for r in prms
 			check (r is MacroMade)  (r, "Unused parameter to macro")

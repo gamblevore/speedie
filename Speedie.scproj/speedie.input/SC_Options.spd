@@ -91,10 +91,10 @@ module Feedback
 	function CheckSelfModifying2 (|int|)
 		require !options.singlefileinput
 		
-		|| bpp = compiler.BaseProjectPath$
-		|| p = bpp.RegularPath
-		|| spd = compiler.speedie.RegularPath
-		|| jb = compiler.jeebox.RegularPath
+		|| p = compiler.BaseProjectPath$
+		|| spd = compiler.Projects.FileCh("Speedie.scproj")
+		|| jb = compiler.jeebox
+		
 		if p ~= spd
 			if Options.SelfReplacement // this check should be done in the caller
 				rz = 0
@@ -170,7 +170,7 @@ module Feedback
 		ifn (path contains '/' or '.' or '~')
 			Path = compiler.FindProjNoSuffix(Path)
 		
-		|| path2 = path.PathFixSpd
+		|| path2 = path.PathFixSpd.RegularPath
 		if path2: path = path2
 		|| F = Path.File
 //		expect !(f inside compiler.library or compiler.jeebox) (f, "Don't compile Library files") 
