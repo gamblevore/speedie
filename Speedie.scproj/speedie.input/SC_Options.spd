@@ -159,15 +159,21 @@ module Feedback
 			return (file.Speediedir+self[5...]).AbsolutePath
 		return .AbsolutePath
 
+//	function IsInsidePath (|string| ToFind, |file| Container, |bool|)
+//		|| fp = Container.pathdir
+//		return ToFind[0, fp.length] == fp
+//		not well written. And I don't wanna debug it.
+//		seems to treat compiling jeebox via "." as OK but jeebox.scproj from /usr/local/speedie
+//		as bad. I can't be bothered with this. Just remove it.
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
 		ifn (path contains '/' or '.' or '~')
 			Path = compiler.FindProjNoSuffix(Path)
 		
-		|| path2 = path.PathFixSpd
+/		|| path2 = path.PathFixSpd
 		if path2: path = path2
 		|| F = Path.File
-		expect !(f inside compiler.library or compiler.jeebox) (f, "Don't compile Library files") 
+//		expect !(f inside compiler.library or compiler.jeebox) (f, "Don't compile Library files") 
 			
 		compiler.OriginalInputPath = path // altered below at: F.path = F.path.parent
 		Compiler.BaseProjectPath = F
