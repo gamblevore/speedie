@@ -35,10 +35,10 @@ datatype DataTypeCode (uint16)
 		Vec2	= 1 + 32 + 0  + 128 + 8
 		Vec3    = 2 + 32 + 0  + 128 + 8		// vec3 sucks kinda
 		Vec4	= 3 + 32 + 0  + 128 + 8
-											// Mat4	// make it a struct? mat3 also?
 		Int		= 0 + 32 + 0  + 0   + 8
 		UInt	= 0 + 32 + 64 + 0   + 8
 		bool	= 256
+		Pointer = 512
 		u32	 = uint
 
 		HFloat = Float16
@@ -51,14 +51,14 @@ datatype DataTypeCode (uint16)
 		u16	 = uint16
 		s16	 = int16
 		
-		_voidptr = 112 // unsigned 64-bit non-numeric value.
-		cstring = 112 // same
-		Failed = 512
+		_voidptr = 112 // + 512 // unsigned 64-bit non-numeric value. // need use pointer!
+		cstring = 112 // + 512 // same // need use pointer!
+		Failed = Floating + unsigned
 		// we really need a pointer-bit...
 		// not just "not numeric" cos we say "bools are kinda numeric"
 		// but what about a non-numeric asmreg or non-numeric @syntax?
 		// are they pointers?
-		// Also... perhaps having a bit-count instead of byte-count is better
+		// having a bit-count instead of byte-count is better
 		// then we can represent bools.
 		PossibleBits = 1023
 	
@@ -104,13 +104,9 @@ datatype DataTypeCode (uint16)
 		
 	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "inumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
-	
-	function OK (|bool|)
-		return !(self&failed)
 		
 	syntax is (|datatypecode| M, |bool|)
 		opt inline
-		target debug: if M&~PossibleBits
 		return self&M == M
 	
 	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)
