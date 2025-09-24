@@ -7,7 +7,7 @@ dispatch fn_asm_table (fn_asm)
 	@decl:					ASMType.decl
 	@num:					ASMType.num
 	@char:					ASMType.char
-	@rel:					ASMType.DoMath
+	@rel:					assembler.DoMath
 	@thg:					ASMType.Thg
 	@bra:					ASMType.First
 	@sheb:					ASMType.Sheb
@@ -687,18 +687,6 @@ function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	return Incrementa(self, F, dest, IsPlusPlus|int|)
 
 
-
-function DoMath (fn_asm)
-	opt norefcounts
-	|| op = exp.second!
-	|| scop = op.obj|scoperator|!
-	if scop is AndOr
-		return .ASMBoolMaker(exp, dest, scop.Kind)
-	|| fn = scop.OpASM!
-	return .DoMathSub(exp, dest, fn)
-
-
-
 function Ignore			(fn_asm)
 	return ASMReg()
 
@@ -764,43 +752,6 @@ helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 	|| T = .TempOnly(src.BasicVec)
 	return exp.VSWZ(T, src, 0) * T
 
-
-helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
-	opt norefcounts
-	|| ml = ASMReg()
-	|| mr = ASMReg()
-	|| First = exp.first!
-	|| dest = mode
-	target debug: || trap = ++ASMTrapper, if trap == -1
-	if First.islast
-		ml = .µGetASM(first, dest)
-	  else
-		ml = .µGetRealOffer(First, dest)
-		if (dest is UnusedSoFar) and !(ml iz dest)
-			mr = dest
-
-		mr = .µ(exp.last!, mr)
-		if ml.IsVec != mr.IsVec
-			if ml.IsVec
-				mr = .VectorUpgrade(mr, exp)
-			  else
-				ml = .VectorUpgrade(ml, exp)
-	
-	if dest is Discard
-		.AskNopTemp(ml)
-		.AskNopTemp(mr)
-		return dest // returning from inline, into func that discards result.
-	
-	dest = .TempTyped(exp, dest)
-	(dest is Const) = (ml&mr is Const)
-	
-	|| op = exp.second ?? exp.first!
-	target debug: || trap2 = ++asmtrapper, if trap2 == -1
-	rz = (fn)(self, op, dest, ml, mr)
-	
-	target debug: if rz.IsVec != ml.IsVec			// argh?
-	
-	rz = rz.ExpectSameType(dest)
 
 
 

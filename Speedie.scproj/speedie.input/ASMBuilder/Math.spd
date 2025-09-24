@@ -19,6 +19,54 @@ extend asmreg
 	
 	
 extend Assembler
+	function DoMath (fn_asm)
+		opt norefcounts
+		|| op = exp.second!
+		|| scop = op.obj|scoperator|!
+		if scop is AndOr
+			return .ASMBoolMaker(exp, dest, scop.Kind)
+		|| fn = scop.OpASM!
+		return .DoMathSub(exp, dest, fn)
+
+
+	helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
+		opt norefcounts
+		|| ml = ASMReg()
+		|| mr = ASMReg()
+		|| First = exp.first!
+		|| dest = mode
+		target debug: || trap = ++ASMTrapper, if trap == -1
+		if First.islast
+			ml = .µGetASM(first, dest)
+		  else
+			ml = .µGetRealOffer(First, dest)
+			if (dest is UnusedSoFar) and !(ml iz dest)
+				mr = dest
+	
+			mr = .µ(exp.last!, mr)
+			if ml.IsVec != mr.IsVec
+				if ml.IsVec
+					mr = .VectorUpgrade(mr, exp)
+				  else
+					ml = .VectorUpgrade(ml, exp)
+		
+		if dest is Discard
+			.AskNopTemp(ml)
+			.AskNopTemp(mr)
+			return dest // returning from inline, into func that discards result.
+		
+		dest = .TempTyped(exp, dest)
+		(dest is Const) = (ml&mr is Const)
+		
+		|| op = exp.second ?? exp.first!
+		target debug: || trap2 = ++asmtrapper, if trap2 == -1
+		rz = (fn)(self, op, dest, ml, mr)
+		
+		target debug: if rz.IsVec != ml.IsVec			// argh?
+		
+		rz = rz.ExpectSameType(dest)
+
+
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
@@ -617,7 +665,7 @@ extend Assembler
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
 
 	
-	function AndNop (|assembler| self, |message| exp, |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
+	function BitAndNop (|assembler| self, |message| exp, |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
 		require l is Const
 		|| k = l.const
 		if .nopconst(l, -1)
@@ -630,9 +678,9 @@ extend Assembler
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitAnd)
 		if (l iz r)
 			return l
-		|| k = .AndNop(exp, dest, l, r)
+		|| k = .BitAndNop(exp, dest, l, r)
 			return k
-		k = .AndNop(exp, dest, r, l)
+		k = .BitAndNop(exp, dest, r, l)
 		if k
 			return k
 		if (l is Const)
