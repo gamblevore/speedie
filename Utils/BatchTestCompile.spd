@@ -1,7 +1,8 @@
-
+#!/usr/local/bin/spd
 
 || Fails = faststring()
 
+// To help debug speedie!
 main (|[string]| Files)
 	for f in files.GlobExpand
 		app.TryCompileOne(f)
