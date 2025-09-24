@@ -151,7 +151,7 @@ datatype DataTypeCode (uint16)
 	function ItemBitCount (|int|)
 		return 8 << ._shift
 	
-	function _Shift (|int|)
+	helper _Shift (|uint|)
 		return (self >> 4) & 3
 
 	function ByteCount (|int|)

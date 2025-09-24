@@ -202,7 +202,7 @@ function InbuiltTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond
 	mc = .µ(cond, mc)
 	
 	if mc isnt Const
-		return cond.TERN(dest, mc, ma, mb, mc.small) * dest
+		return cond.TERN(dest, mc, ma, mb, mc.small|int|) * dest
 
 	|| t = (ma, mb)(mc.Const)
 	.NopConst(mc)

@@ -18,14 +18,11 @@ static void AddLostChild_(int PID, int C) {
 	ProcessOwner* F = &PSRoot;
 	while ((F = JB_PID_Next(F))) {
 		if (F->PID == PID) {
-			int Ex = WEXITSTATUS(C);
-			int Sig = WTERMSIG(C);
-			bool Exited = WIFEXITED(C);
-			bool Signalled = WIFSIGNALED(C);
-			if (Signalled)
-				F->_Status = Sig|128;
+//			bool Exited = WIFEXITED(C);
+			if (WIFSIGNALED(C))
+				F->_Status = WTERMSIG(C)|128;
 			  else
-				F->_Status = Ex;
+				F->_Status = WEXITSTATUS(C);
 			return;
 		}
 	}

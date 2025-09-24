@@ -187,7 +187,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 
 function Return (fn_asm)
 	opt norefcounts
-	|| L = .state.return						// can remove constants, so try first
+	|| L = .state.return
 		return InlinedReturn(self, exp, L)
 
 	dest = ASMReg.ExitFunction

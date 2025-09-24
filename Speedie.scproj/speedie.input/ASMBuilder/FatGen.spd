@@ -497,6 +497,8 @@ function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fa
 
 function message.EQUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
 	visible
+	if "SC_FAT_OperatorIsa".trap
+		debugat 2
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.EQUL, self)
 	rz.reginput(1) = r2

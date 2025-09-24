@@ -34,10 +34,10 @@ extend Assembler
 		if  r is Const  and  l isnt Const
 			swap (l) (r)
 		
-		|| RS = r.small
+		|| RS = r.small|int|
 		|&fatasm| fat
 		if !l.IsZero
-			|| LS = L.Small
+			|| LS = L.Small|int|
 			if RS
 				|| K = .Const(L, 9, L.signed)
 					fat = exp.JMKE(R, K, 0)
@@ -470,7 +470,7 @@ extend Assembler
 			return .MakeConstFromTwo(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(exp, dest, Bule, V)
 		if !rz
-			rz = exp.TERN(dest, Bule, V, asmreg(), bule.small) * Dest				// TERN
+			rz = exp.TERN(dest, Bule, V, asmreg(), bule.small|int|) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)

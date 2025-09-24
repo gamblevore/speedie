@@ -41,7 +41,7 @@ function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
 	target debug
 		if (dt is Floating != rt Is Floating) or (dt is bool != rt is bool) // should never happen
 		if rt&~datatypecode.unsigned != dt&~DataTypeCode.unsigned
-			if rt.ByteCount < dt.ByteCount
+			if rt.issigned and rt.ByteCount < dt.ByteCount
 				debugger 
 	//			return exp.expandbits(rz, dt) // necessary?
 	.µtype = dt

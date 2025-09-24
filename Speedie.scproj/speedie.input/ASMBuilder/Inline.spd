@@ -84,7 +84,6 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	.DeepestInline = D max .DeepestInline
 	
 	dest = dest.simplify
-	debugat 351
 	dest.µtype = fn.ASMReturn.ASMRegType
 	.state.fn = fn
 	.state.Return = dest
@@ -209,7 +208,7 @@ function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin,   |ASMReg|
 
 
 function InlineFinish (|fatrange| R, |ASMReg|)
-	target debug: || trap = ++asmtrapper, if trap == 2923
+	target debug: || trap = ++asmtrapper,  if trap == -1
 	for s in R
 		if s isa asm.ret
 			if rz
