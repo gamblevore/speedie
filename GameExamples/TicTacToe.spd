@@ -104,6 +104,6 @@ class StartWindow (window)
 
 
 main
-	|| w = StartWindow()
+	StartWindow()
 	return GUI.Run
 
