@@ -10,6 +10,7 @@ dispatch fn_asm_table (fn_asm)
 	@rel:					assembler.DoMath
 	@thg:					ASMType.Thg
 	@bra:					ASMType.First
+	@item:					ASMType.Second
 	@sheb:					ASMType.Sheb
 	@sstr:					Assembler.Str
 	@list:					Assembler.VectorLoad
@@ -110,6 +111,11 @@ function Rejoin (fn_asm)
 function First (fn_asm)
 	opt norefcounts
 	return .µGetASM(exp.first!, dest)
+
+
+function Second (fn_asm)
+	opt norefcounts
+	return .µGetASM(exp.second!, dest)
 
 
 function Sheb (fn_asm)
@@ -577,17 +583,38 @@ function BoolNot (fn_asm)							// !a
 
 function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
 	opt	NoRefCounts											// *a, x = *(a.b)
+
+	// this is writing ontop of itself.
+	// we are getting a temp Addr... in t31
+	// but its already, closed, so .temponly just puts it back into t31
+	// now, upon read, we overwrite our addr
+	// which we later use for write.
+	
+	
 	|| TmpCloser = .OpenVars
-	dest = .temponly(Dest)
-	.Read(Dest, F, dest, addr, glob)						// READ
+/	dest = .temponly(Dest)
+	dest = .Read(
+		dest: Dest	
+		exp: F
+		Ptr: addr
+		VarAdd: nil
+		ReadDecl: glob)	* Dest												// READ
 
-	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
-	.IncrPre(f, NewValue, dest, amount)						// ADD
+	|| ValueToWrite = dest
+	if mode & IncrAfter
+		ValueToWrite = nil
+	ValueToWrite = .AddToReg(f, ValueToWrite, dest, amount)					// ADD
+	ifn mode & IncrAfter
+		dest = ValueToWrite
+	
+	// IncrAfter is also fucked up
+//	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
+//	.IncrPre(f, NewValue, dest, amount)	
 
-	|| fat = .write(dest, f, NewValue, addr, glob)			// WRITE BACK
+	|| x = .write(ValueToWrite, f, addr, nil, glob) * ValueToWrite				// WRITE BACK
 
 	// the new value should exist! now lets close
-	return .CloseVars(TmpCloser, nil, fat*dest)
+	return .CloseVars(TmpCloser, nil, dest)
 
 
 

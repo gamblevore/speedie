@@ -140,8 +140,8 @@ struct Assembler
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
 			return exp.ADAK(dest, Src, Value) * Dest
-		.Assign(exp, dest, Src)
-		rz = .IncrPre(exp, Src, Src, value)
+		rz = .Assign(exp,  .temponly(dest),  Src)
+		.IncrPre(exp, Src, Src, value)
 
 
 	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)

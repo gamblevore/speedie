@@ -38,15 +38,3 @@ datatype NilState (byte) // Exec.scproj needs this here
 		if self & nilstate.optional == NilState.Real
 			return NilState.real
 
-
-//struct ASMVarType
-//	contains object
-//	|uint16|				Contains // also a class
-//	|uint16|				ClassNum
-//	|int|					C_Array
-//	|byte|					PointerCount
-//	|NilState|				Expected
-//	|NilState|				Found
-
-// OK, so we wanna export this and import it.
-// can we make this all numbers? no pointers.

@@ -808,7 +808,7 @@ extend Assembler
 	
 	function Assign (|message| exp, |asmreg| dest, |asmreg| src, |asmreg|)  // assigns (
 		if src iz dest
-			return dest
+			return dest // return src makes more sense? type-wise?
 		
 		if !src.reg and (src isnt const)
 			debugger

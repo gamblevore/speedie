@@ -28,7 +28,9 @@ extend Assembler
 		|| v = (1,1,1,1)
 		v.x++
 		if mode & ASMType.IncrAfter
-			.Assign(exp, dest, Src)
+			if dest iz src	
+				problem (exp, "Your code is fucked up here")	// x = x++ makes no sense! Ad∂ this check tø slow-add!!
+			rz = .Assign(exp, .temponly(dest), Src)
 		
 		if src.isfloat or vget.RegOnly(2)
 			|| tmp = .AddToReg(exp, nil, src, value)			// f[1]++ --> x = f[1], x++, f[1] = x
@@ -38,7 +40,9 @@ extend Assembler
 		|| v2 = vget.prms[2]
 		src = vget.asmreg(1)
 		.softnop(vget)
-		return exp.QINC(dest, src, v2, value) * dest
+		dest = exp.QINC(dest, src, v2, value) * dest
+		ifn mode & asmtype.incrafter
+			rz = dest
 		
 
 	function VectorLoad (fn_asm)
