@@ -466,24 +466,24 @@ function Create_JeeboxTest (|Message| msg)
 module StringCorrector
 	linkage: cpp_Part Crkt
 	|dictionary of MessageID| 		Table2 = dictionary()
-	|array of messageid|			List
+	|array of messageid|			CppStrings
 	|int| 							TotalSize
 
 	function Count (|int|)
-		return .list.Length
+		return .CppStrings.Length
 	
 	function NewID (|string| name, |messageid|)
 		rz = MessageID(name, @str, .count)
-		.list <~ rz
+		.CppStrings <~ rz
 		.TotalSize += name.Length + 1 // nul terminated
 	
 	function IDSort (|bool| IDOrder)
 		opt norefcounts
 		if idorder
-			(&messageid.byid).sort(.list)
+			(&messageid.byid).sort(.CppStrings)
 		  else
-			.list.sort(&string.sorter)
-			for (s in .list) (i)
+			.CppStrings.sort(&string.sorter)
+			for (s in .CppStrings) (i)
 				s.id = i
 		
 
@@ -508,22 +508,19 @@ module StringCorrector
 
 		// the disk names will be ordered... 1,2,3,4,5,6
 		if disk.hasany
-			for s in .list
+			for s in .CppStrings
 				.UseID(s, d3[s])
 
 		// now like: 1,3,4,6
 
-		for s in .list
+		for s in .CppStrings
 			if (s.func != @num) and !.useid(s, disk.first)
 				// we have more ids than they do!
 				s.id = nextID++
 			
 		
-	function CollectString (|message| m, |bool| StdLib)
+	function CollectString (|message| m)
 		opt norefcounts
-		if options.ModePack and !options.modecpp	// options.modecpp will be false anyhow, but this works
-			require !stdlib							// if we are making a pack... add non-lib strings.
-
 		|| p = Table2.MakePlace(m.name)
 		|| i = (p[])|MessageID|
 		if i == nil
@@ -537,7 +534,7 @@ module StringCorrector
 		for d in compiler.DeclConstants
 			|| def = d.default
 			if def.IsString
-				.CollectString(def, d is library)
+				.CollectString(def)
 	
 	
 	function CorrectStrings
@@ -564,7 +561,7 @@ module StringCorrector
 	
 	function WriteTable (|faststring| fs)
 		opt norefcounts
-		for s in .list
+		for s in .CppStrings
 			fs.AppendQuotedEscape(s)
 			fs <~ '\n'
 		

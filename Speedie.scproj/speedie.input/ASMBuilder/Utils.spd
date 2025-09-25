@@ -1,6 +1,7 @@
 
 
 
+|| ExportPosFails = 0
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
@@ -11,9 +12,10 @@ function message.ASMDecl (|SCDecl!|)
 		if rz.exportposition
 			.parent!.obj = rz // fix it up.
 		  else
-			error (self, "No export position on: " + .locate)				
+			if ++ExportPosFails <= 2
+				error (self, "No export position on: " + .locate)				
 	
-	if rz.typeonly == 0										// Datatypecode.unusedtype
+	if rz.typeonly == 0
 		rz.wholetype = rz.CalculateASMType
 	target debug: rz.ASMSanity
 
@@ -36,14 +38,11 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 
 
 function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
-	|| rt = .µType
 	|| dt = dest.µType
 	target debug
-		if (dt is Floating != rt Is Floating) or (dt is bool != rt is bool) // should never happen
-		if rt&~datatypecode.unsigned != dt&~DataTypeCode.unsigned
-			if rt.issigned and rt.ByteCount < dt.ByteCount
-				debugger 
-	//			return exp.expandbits(rz, dt) // necessary?
+		|| st = .µType
+		if (dt is Floating != st Is Floating) or (dt is bool != st is bool) // should never happen
+		if (st.bytecount > 4)  <  (dt.bytecount > 4)		// doesn't matter unless we cross 64-32 bit anyhow
 	.µtype = dt
 	return self
 
@@ -52,7 +51,7 @@ target debug
 		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
 			|| size = .type.Size
 			|| T = .TypeOnly
-			if T == datatypecode.Vec3 or datatypecode.ivec3
+			if T == DataTypeCode.Vec3 or DataTypeCode.ivec3
 				size = 12
 			if size != T.bytecount // sigh. what?
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
@@ -79,8 +78,6 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	while .CloseOneVar(exp, OrigDecls, true)
 		0
 
-
-	// remove these?
 	|| Missing = OrigDecls &~ .VDecls
 	if !exp or !missing
 		return return
@@ -93,7 +90,6 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	// which branch something came from!
 	
 	.VDecls |= Missing
-	// argh
 	
 	return return
 
@@ -165,15 +161,6 @@ function SCFunction.ASMReturn (|scdecl|)
 		return T
 
 
-//function SCFunction.RealReturnType (|scdecl|)
-//	opt norefcounts
-//	|| T = .returntype
-//	// if t is returnedstruct: return typevoid // better?
-//	if t and t isnt ReturnedStruct
-//		return T
-//	return TypeVoid
-
-
 function asmreg.incr (|asmreg|)
 	|| f = .fat
 		f.µrefcount++
@@ -181,18 +168,5 @@ function asmreg.incr (|asmreg|)
 	target debug
 		if .reg and self is Const  // sigh
 	return self
-		
-		
-datatype VarUseMode (int) // remove entire thing?
-	Flags
-//		Linkable
-		ReturnAble
-//		SetAble
-		Return = ReturnAble // unused?
-//		Set = SetAble
-//		ExistingVar
-//		ForBools
-	
-	syntax is (|VarUseMode| v, |bool|)
-		return self&v
+
 

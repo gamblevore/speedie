@@ -425,17 +425,16 @@ struct FatASM
 
 	
 	function TmpRender (|faststring| fs, |message| msg)
+		opt norefcounts
 		|| arg = msg.Find(@arg)
 		if !arg
 			msg.Render(fs)
 			return 
 		
-		|| c = msg.copy
-		arg = c.find(@arg)!
-		while arg
-			arg.Remove
-			arg = c.find(@arg)
-		fs <~ c.Render.replaceall( "\n", ": " )
+		|| Start = fs.Length
+		arg.Render(Fs)
+		if fs.Length > start + 30
+			fs.Length = start + 30
 			
 	
 	function RendaMsg (|faststring| fs, |int| sofar)

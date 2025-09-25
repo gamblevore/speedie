@@ -87,12 +87,12 @@ datatype DataTypeCode (uint16)
 					fs <~ "short"
 				  elseif b == 4
 					fs <~ "int"
-				  elseif b == 8
+				  elseif b == 8 // what about ivec2?
 					fs <~ "int64"
 				  elseif b == 16
 					if .issigned
 						fs <~ "i"
-					fs <~ "vec4"
+					fs <~ "vec4" // not exactly true...
 			  else
 				fs <~ "float"
 				if b != 4

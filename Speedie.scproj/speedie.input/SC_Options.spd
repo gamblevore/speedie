@@ -17,10 +17,7 @@ module Options
 	|bool|	InlineLib				= true
 	|byte|	ModeCpp					= 1
 	|byte|	ModePack				= 0
-//	|bool|	PrintPackStrings		= false
 	||		MakeInterpreter			= false
-//	||		MakeLib					= false
-
 	||		Compile					= true
 	||		TargetDebug				= false
 	||		PrintMemoryUsage		= false
@@ -376,9 +373,6 @@ module Feedback
 		+'inlinelib'
 			options.InlineLib = value.optionbool
 		
-//		+'strs'
-//			options.PrintPackStrings = value.optionbool
-		
 		+'targetdebug' // basically
 			Explain(Purpose, "")$
 			options.targetdebug = value.optionbool
@@ -498,3 +492,4 @@ module Feedback
 
 
 prototype ShellOption			(|string| Name, |string| Value, |faststring| purpose=nil, |bool|)
+

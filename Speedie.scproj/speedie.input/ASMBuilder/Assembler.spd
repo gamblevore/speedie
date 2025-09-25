@@ -520,7 +520,7 @@ struct Assembler
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			|| trap = ++ASMTrapper, if trap == 79
+			|| trap = ++ASMTrapper, if trap == -1
 		  else
 			opt inline
 		
@@ -663,7 +663,13 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 	.Orig = nil
 
 
-function Assembler.GenerateASM (|SCFunction| fn, |bool|) // AsmGenerate
+function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
+	target debug
+		printline "µFunc: $i", (fn)
+		fn.µprint
+
+
+function Assembler.GenerateASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)
@@ -672,17 +678,12 @@ function Assembler.GenerateASM (|SCFunction| fn, |bool|) // AsmGenerate
 	if .NeedsRework
 		.Rework(fn)
 	.CapASM
-
+	.PrintASM(fn, i)
+	
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
-	if err.ok
-		|| max = fn.MaxASM
-			check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
-//			target debug
-// 				if debug
-//					fn.µprint(++CountASMFuncPrint)
-		return true
+	require err.ok
+	|| max = fn.MaxASM
+		check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
+	return true
 
-
-//target debug
-//	|| CountASMFuncPrint = 0
 

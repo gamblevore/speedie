@@ -8,8 +8,9 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Funcs",			fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
 	fs.normal  "Strings"
 
-	|| avg = StringCorrector.TotalSize div StringCorrector.list.length
-	fs <~ "${StringCorrector.list.length} at "	
+	|| N = StringCorrector.CppStrings.length
+	|| avg = StringCorrector.TotalSize div N
+	fs <~ "$N at "	
 	StringCorrector.TotalSize.strsize(fs)
 	fs <~ " // (avg "
 	fs.appendfloat(avg, 1)

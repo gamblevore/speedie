@@ -757,7 +757,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function GenStrings (|faststring| fs)
 		|| sl2 = FastString()
-		|| blob = .WriteStrings(sl2)
+		|| blob = .WriteCppStrings(sl2)
 		|| lengths = sl2.GetResult
 		.GenLub(fs)
 		
@@ -804,10 +804,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			equality.Export( T )
 
 
-	function WriteStrings (|faststring| Lengths, |string|)
+	function WriteCppStrings (|faststring| Lengths, |string|)
 		opt norefcounts
 		|| fs = FastString()
-		for s in StringCorrector.list
+		for s in StringCorrector.CppStrings
 			.WriteName(s, fs, lengths)
 		return fs
 

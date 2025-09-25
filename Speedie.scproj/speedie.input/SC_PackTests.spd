@@ -84,7 +84,7 @@ function SCFunction.TestObesity (|!&ivec4|)
 	target debug
 		|| mu = .µLength
 			|| mu2 = .µTest
-			.µprint(0)
+			.µprint
 			rz = jb_vm.Run(mu2.ptr, mu2.length)
 	if !rz?
 /		rz = butter

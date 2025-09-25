@@ -215,7 +215,7 @@ function Char (NilTrackerFn)
 
 function String (NilTrackerFn)
 	opt norefcounts
-	StringCorrector.CollectString(msg, scfunction.currfunc!.IsLibrary)
+	StringCorrector.CollectString(msg)
 	return .RealBool(!msg.length)
 
 

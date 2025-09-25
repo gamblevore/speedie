@@ -206,8 +206,11 @@ datatype ASMReg (uint64)
 		return self|DataTypeCode| & DataTypeCode.PossibleBits
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
+		return .µType(value|asmreg|)
+	
+	function µType (assigns:|asmreg|, |asmreg|)
 		|| Mask = DataTypeCode.PossibleBits|uint64| // first 10 bits
-		return ((self|uint64| & ~Mask) ||| (value&Mask))|asmreg|
+		return ((self|uint64| & ~Mask) ||| (value|uint64|&Mask))|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
 		target debug

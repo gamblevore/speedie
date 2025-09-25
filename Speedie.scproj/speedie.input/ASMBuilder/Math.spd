@@ -35,7 +35,7 @@ extend Assembler
 		|| mr = ASMReg()
 		|| First = exp.first!
 		|| dest = mode
-		target debug: || trap = ++ASMTrapper, if trap == -1
+		target debug: || mathtrap = ++ASMTrapper, if mathtrap == -1
 		if First.islast
 			ml = .µGetASM(first, dest)
 		  else
@@ -59,7 +59,7 @@ extend Assembler
 		(dest is Const) = (ml&mr is Const)
 		
 		|| op = exp.second ?? exp.first!
-		target debug: || trap2 = ++asmtrapper, if trap2 == -1
+		target debug: || mathtrap2 = ++asmtrapper, if mathtrap2 == -1
 		rz = (fn)(self, op, dest, ml, mr)
 		
 		target debug: if rz.IsVec != ml.IsVec			// argh?
@@ -297,10 +297,10 @@ extend Assembler
 		if ptoi == -1										//   x * -1  -->  0-x 
 			return .Subtract(exp, dest, ASMReg(), l)
 		if ptoi == 1										//   x * 1   -->  x 
-			return l
+			return l.µtype(dest)
 		return dest.µtype.zero								//   x * 0   -->  0
-
-
+	
+	
 	function QuickIntMul    (fn_OpASM)
 		require r is Const
 		|| Pow2 = .IntPowerOfTwo(r)
@@ -465,11 +465,11 @@ extend Assembler
 
 	function PlusSub (fn_opasm) // add (
 		if r.iszero					// allow a = a ± 0
-			return l.µtype(dest.µtype)
+			return l.µtype(dest)
 		
 		if l isnt Subtract			// 0 + a
 			if l.iszero
-				return r.µtype(Dest.µtype)
+				return r.µtype(Dest)
 		  else
 			if (r iz l)
 				return .zeros(exp, dest)
@@ -776,7 +776,7 @@ extend Assembler
 		
 		if !up and !down
 //			if (SrcBits > dest.BitCount)
-			return src
+			return src.µtype(Dest)
 
 		down += 64 - (SrcBits+up)
 		up = 64 - SrcBits

@@ -607,7 +607,7 @@ function InitCompiler
 	
 	////////////////////////////////////////////////
 	.TimerOutput <~ "\n"
-	StringCorrector.CollectString(@str.msg, true)
+	StringCorrector.CollectString(@str.msg)
 	.CurrStage = 1
 	SCGlobals.UniqueNum = 100
 	////////////////////////////////////////////////

@@ -28,7 +28,7 @@ dispatch fn_asm_table (fn_asm)
 	(ASMType.kExit):		Assembler.Exit
 
 	(ASMType.kDebugger):	ASMType.Debugger
-	(ASMType.krejoin):		ASMType.First
+	(ASMType.krejoin):		ASMType.Rejoin
 	(asmtype.kswap):		ASMType.Swap
 	(ASMType.kreturn):		ASMType.return
 
@@ -101,7 +101,12 @@ function Swap (fn_asm)
 	return asmreg()
 
 
-	
+function Rejoin (fn_asm)
+	opt norefcounts
+	(dest isnt discard)
+	return .µGetASM(exp.first!, dest)
+
+
 function First (fn_asm)
 	opt norefcounts
 	return .µGetASM(exp.first!, dest)
@@ -514,6 +519,8 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return GrabAddr(self, exp, dest, d, T)
 	
 	if d isnt global
+		if dest is Discard
+			return asmreg()	
 		return ConstFromThgName(self, exp, dest, d)
 
 	if d is classobj
@@ -521,9 +528,12 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if (dest is ConstRequest)
 		return nil
 
+	if dest is Discard
+		return asmreg()	
+
 	|| fn = d.IsLookupOnly
 	if fn isa scfunction
-		.ASMreach(fn)
+		.ASMreach(fn)			
 	return DoGlobal(self, dest, exp, d)
 		
 
@@ -625,6 +635,7 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
 	opt	NoRefCounts
 	
+	(dest isnt discard)
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
@@ -741,17 +752,23 @@ function ExistingVar (|message| m, |asmreg|)
 function Str (fn_asm)
 	opt	norefcounts
 	dest = .TempOnly(dest)
-	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
+	
+	|| real = exp.name|MessageID|
 	if Compiler is Hungry
-		real.Frequency = 1
-	return exp.GOBJ(dest, 0, real.ID) * dest		// seems good!
+		target debug
+			ifn real isa messageid // what?
+		if !real.Position
+			PackMaker.PackStrings <~ real
+			real.Position = PackMaker.PackStrings.Length
+	
+	return exp.GOBJ(dest, 0, real.Position) * dest		// seems good!
+
 
 
 helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 	|| T = .TempOnly(src.BasicVec)
 	return exp.VSWZ(T, src, 0) * T
-
 
 
 

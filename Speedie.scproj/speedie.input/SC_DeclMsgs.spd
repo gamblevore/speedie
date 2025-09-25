@@ -148,7 +148,9 @@ function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
 	|| dcl = msg.CollectDecl( .modul, self, DeclMode.properties, self)
 		.properties <~ dcl
+		#!aaaa
 		(dcl is property)
+		#!bbbb
 		dcl.becomereal
 		return true
 
@@ -395,7 +397,7 @@ datatype DeclMode (int)
 		Properties		= 3
 		Globals			= 1
 		FunctionBody	= 8
-		Local			= FuncParam+FunctionBody
+//		Local			= FuncParam+FunctionBody
 		Proto			= 16
 		TypeCast		= 32
 		ProtoParam		= FuncParam + Proto

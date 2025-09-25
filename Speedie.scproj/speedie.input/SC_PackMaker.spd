@@ -3,6 +3,7 @@
 // some kinda function table... saved to a file
 
 module PackMaker
+	|[messageID]|			PackStrings
 	|[SCFunction]|			LibFuncs
 	|[SCDecl]|				LibGlobs
 	|[SCFunction]|			PackFuncs
@@ -36,12 +37,6 @@ module PackMaker
 				.addfunc(f)
 	
 	
-	// we want to always create libglobs?
-	// then... and sort them nicely, by size! not name.
-	// sigh. i guess name is faster for lookup. but 
-	// we can make our own internal tables anyhow.
-	
-	
 	function DoLibGlobs (|jbin| lib) // SortLibGlobs
 		opt norefcounts
 		.LibGlobs.sort(GlobalsSorter)
@@ -50,7 +45,7 @@ module PackMaker
 		for (f in LibGlobs)
 			lib.Add(@thg, f.ExportName)
 		lib.exit
-
+	
 	
 	function GlobalsSize (|[scdecl]| List, |bool| Alter, |int|)     // SortGlobals, GlobalsSort
 		opt norefcounts
@@ -74,7 +69,7 @@ module PackMaker
 		fnmain.PackID = 2
 		
 		|| Obj = TypeObject!.ClassType!
-		packmaker.libglobs <~ Obj
+		packmaker.LibGlobs <~ Obj
 		TypeObject!.PackClassChildren(nil)
 
 		|&&nil| Table
@@ -108,7 +103,7 @@ module PackMaker
 			Remain -= Found
 			loop Remain > 0
 		return count
-		
+	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
 		opt norefcounts
@@ -121,7 +116,7 @@ module PackMaker
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)
-
+	
 	
 	function WriteLibFuncs (|jbin!| j)
 		opt norefcounts
@@ -138,8 +133,8 @@ module PackMaker
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
 		
-		for fn in .Packfuncs
-			require Assembler.sh.GenerateASM(fn)
+		for (fn in .Packfuncs) (i)
+			require Assembler.sh.GenerateASM(fn, i+1)
 
 		.Packfuncs.sort(&CodeSorter.ExportNames)
 		
@@ -209,19 +204,17 @@ module PackMaker
 	function DumpStrings (|jbin| j)
 		|| strs = FastString()
 		.DumpStringsSub(strs)
-		strs <~ 0|byte|			// they are all cstrings... but we'll actually just overwrite it to make them
-		j.enter(@tmp, "strs")	// cstrings, during load.
+		strs <~ 0|byte|			// will all be cstrings... Overwrite lengths during load
+		j.enter(@tmp, "strs")
 		j.Add(@str, strs)
 		j.exit
 	
 	
 	helper DumpStringsSub (|jbin| strs)
 		opt norefcounts
-		for s in StringCorrector.list
-			|| n = s.length * s.Frequency
-			strs.AppendStrLength(n)
-			if n
-				strs <~ s
+		for s in .PackStrings
+			strs.AppendStrLength(s.length)
+			strs <~ s
 
 
 	function PackClasses (|jbin| j)
@@ -392,9 +385,9 @@ function packmaker.FinalPrepare
 
 	require Options.InlineLib
 
-	for fn in .LibFuncs
+	for (fn in .LibFuncs) (i)
 		if fn.CanPrepareInline
-			require Assembler.sh.GenerateASM(fn)
+			require Assembler.sh.GenerateASM(fn, -(i+1))
 			Assembler.jsm.length = 0
 
 

@@ -46,17 +46,10 @@ extend SCFunction
 
 
 /// TEXTUAL STUFF		
-	function µPrint (|int| i)
+	function µPrint 
 		target debug
 			printline self
-			|| fs = faststring()
-			if i 
-				|| n = PackMaker.packfuncs.length
-				fs <~ "("
-				(i div n).Percent(fs)
-				fs <~ ") "
-			.µRender(fs)
-			printline fs
+			printline .µRender
 
 
 	iterator fat
