@@ -607,10 +607,6 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 	ifn mode & IncrAfter
 		dest = ValueToWrite
 	
-	// IncrAfter is also fucked up
-//	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
-//	.IncrPre(f, NewValue, dest, amount)	
-
 	|| x = .write(ValueToWrite, f, addr, nil, glob) * ValueToWrite				// WRITE BACK
 
 	// the new value should exist! now lets close

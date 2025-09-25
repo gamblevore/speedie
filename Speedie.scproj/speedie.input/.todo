@@ -7,12 +7,10 @@ Pre-release:
 
 	
 Bugs:
-	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* &uint... allow &int in c++ gen
 	* vector constants
 	* passing .hfloatvar to  func(float) causes reporting error
 	* render float.fn {code} // won't compile
-	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* carray iterators don't work properly on: byte[10][4]
 		* limit carrays to 2D. 3D is garbage even in C++.
 		* just use ptrs... and increment by inner carray size
@@ -32,6 +30,7 @@ class-changes:
 
 
 Additions:
+	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker	
 	* Rename "flags" to something else. I wanna use "flags" for some kinda default Info and SyntaxIs
 	* AutoComplete use class description 
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
