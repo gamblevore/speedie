@@ -10,7 +10,6 @@ main (|[string]| Files)
 			printline proc.ReadStdOut
 			printline proc.Status
 		return 0
-	"b"
 	
 	for f in files.GlobExpand
 		app.TryCompileOne(f)

@@ -33,6 +33,9 @@ function Option (|string| name, |bool|)
 
 function Yes (|string| name, |bool|)
 	return app[name].yes
+	
+//operator Has (|string| name, |bool|)
+//	return .yes(name)
 
 function No (|string| name, |bool|)
 	return !.yes(name)

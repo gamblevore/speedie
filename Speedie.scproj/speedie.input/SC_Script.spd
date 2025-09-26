@@ -32,7 +32,10 @@ function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 
 function compiler.CanTryModes (|file|)
 	opt norefcounts
-	require !app.parent
+//	require !app.parent // this blocks speedie programs, calling speedie scripts
+						// but I want them to be able to!
+						// So why did I put this?
+						
 	require !app["perry"] and !app["nocompile"]
 	|| p = app.rawargs[0]
 	if p and !p.argname

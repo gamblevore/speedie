@@ -15,9 +15,12 @@ main
 
 
 function Compiler.EnterCompile (|bool|)
-	if !.TryVariousStartModes
-		if FeedBack.ParseArgs
-			return !interact.EnterAutoComplete
+	require !.TryVariousStartModes
+	require FeedBack.ParseArgs
+	if app["perry"] and app.yes("check")
+		if interact.EnterAutoComplete
+			return false
+	return true
 
 
 function Compiler.PrintResults
