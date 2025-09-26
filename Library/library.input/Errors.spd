@@ -58,9 +58,9 @@ class Error (Message)
 	function UpgradeWithNode
 		opt norefcounts
 		|| node = .node
-		if ! node
-/			node = currsource_.last  #require
-			.node = node
+		if !node
+			node = BackupErrorSource
+			require node
 		.position = node.position
 
 		if !.path
@@ -188,12 +188,8 @@ class Error (Message)
 
 
 	module
-		function SourceAdd (|message| m)
-			.currsource_ <~ m
-		function SourceRemove
-			.currsource_.pop
 			
-		|[message]|		CurrSource_
+		|message|		BackupErrorSource
 		|byte|			AutoPrint = 0 // errorflags.PrintAndRemove
 		|bool|			KeepStackTrace = false
 

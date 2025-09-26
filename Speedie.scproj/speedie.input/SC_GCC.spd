@@ -333,6 +333,7 @@ function ExportAndInstall (|date| Elapsed)
 	
 	if stderr.ok and !options.scripting
 		.PrintProduct("Product", ActualCompile or Options.Compile)
+		compiler.Successfulness |= 4
 
 
 function TestNewestLib (|file| cpplib)

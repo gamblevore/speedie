@@ -758,7 +758,7 @@ extend PerryIDE
 	function StartFiles 
 		|| IsDir     = .project.isdir
 		|| ProjConf	 = .perryfile
-		error.SourceAdd(@tmp+projconf)
+		error.BackupErrorSource = @tmp+projconf
 		|message| conf
 		if !isdir
 			.FileList.NoFind = nil
@@ -786,17 +786,16 @@ extend PerryIDE
 			lib.name = .expandstr(lib.name)
 		
 		for ro in conf..roots
-			error.SourceAdd(ro)
+			error.BackupErrorSource = ro
 			if ro.expect(@str)
 				file.OSXMaxCaseWarnings[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
 				|| str = .ExpandStr(ro.name)
 					f.addroot(str.file)
 				  else
 /					error (ro, "Can't find this project root. Please fix this path.")
-			error.SourceRemove
 		
 		f.CheckSize
-		error.SourceRemove
+		error.BackupErrorSource = nil
 
 
 	function DesiredStart (|filerow| projfol, |$int| pos,  |filerow|)

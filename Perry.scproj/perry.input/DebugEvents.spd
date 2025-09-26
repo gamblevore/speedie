@@ -404,11 +404,11 @@ function SelectedASM (guilistevent)
 	require row
 	|| i = .ide
 	require !i.DuringASMEvent
-	|| file = row.obj as string				#require
+/	|| file = row.obj as string				#require
 	|| f = row.first
 	|| n = f.int
 	i.DuringASMEvent = true
-	i.EditPath(file.name, false)
+	i.EditPath(file, false)
 	if f
 		i.editme.ShowAndSel(n, true)
 	i.DuringASMEvent = false

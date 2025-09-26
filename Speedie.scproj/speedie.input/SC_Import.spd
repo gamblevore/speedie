@@ -47,9 +47,9 @@ class SCImport
 		
 		
 	function ImportMsg (|Message| j)
-		error.sourceadd(j)
+//		error.sourceadd(j)
 		.ImportMsgSub(j)
-		error.SourceRemove
+//		error.SourceRemove
 	
 	
 	function ImportMsgSub (|Message| j)

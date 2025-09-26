@@ -153,7 +153,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
-	function SpawnChild (|duration| delay=0, |bool|)
+	function SpawnAsChild (|duration| delay=0, |bool|)
 		if !.pico.isok
 			require pico.replace(.pico)
 		
@@ -206,7 +206,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
-			return .SpawnChild
+			return .SpawnAsChild
 
 
 	iterator
@@ -266,7 +266,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			|| pico = pico.new(app_path)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
 				rz.DebugName = DebugName
-				if !rz.SpawnChild(delay)
+				if !rz.SpawnAsChild(delay)
 					rz = nil
 
 

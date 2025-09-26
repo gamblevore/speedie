@@ -140,7 +140,9 @@ function SCFunction.HasCVersion (|bool|)
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
-	//debugat 567
+	
+	if "CollectProp".trap
+	
 	|| prms = exp.last!
 	|| TableID = 0
 	|| fn = prms.AsFunc

@@ -927,13 +927,14 @@ So anything not 0 means "its OK"`
 	
 	function UpdatePerry (|file| ProjConf)
 		.startuperrors.clear
-		error.SourceAdd(@tmp+projconf)
+		error.BackupErrorSource = @tmp+projconf
 		if projconf.exists
 			|| conf = projconf.parse
 				|| root = .root
 				root.RemoveAfter
 				.LoadConfSub(conf)
 		.LoadStartupErrors
+		error.BackupErrorSource = nil
 	
 	
 	function UpdatePrefs

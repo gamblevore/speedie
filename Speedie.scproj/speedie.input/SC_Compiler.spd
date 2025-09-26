@@ -41,7 +41,6 @@
 |SCDecl|	FalseBool
 
 
-
 function Compiler.SpeedieDir (|string| s, |file|)
 	return file.Speediedir.Child(s).file
 	
@@ -121,6 +120,7 @@ linkage
 |bool| 						HasFunny
 |byte|						During // unused but i don't want to remove. it could be useful?
 |bool| 						InitedOK = true
+|byte|						Successfulness
 |int|						stClasses
 |int|						stFuncs
 |int|						stLibFuncs
@@ -152,7 +152,7 @@ function BuildFolder (|file|)
 	return B!
 
 
-function CompileAll (|int|)
+function CompileAll
 	require .stage("Compilation")
 	.InitCompiler
 	.ImportAll
@@ -176,7 +176,7 @@ function CompileAll (|int|)
 	require .Stage( "String Correction" )
 	StringCorrector.CorrectConsts
 	
-	rz += stderr.ok
+	.Successfulness |= StdErr.ok
 	target debug
 		if Compiler.InPerry: app.SetASMBreak(false)
 	
@@ -198,7 +198,7 @@ function CompileAll (|int|)
 		if .Stage( "Finished" )
 			.TimerSub("Parse", .stParseTimeTotal)
 			.Timer( "" )
-	rz += stderr.ok
+	.Successfulness |= StdErr.ok << 1
 
 
 function Projects (|String|)
@@ -921,13 +921,14 @@ function Stage (|string| name, |bool|)
 	return true
 
 
-function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile)
+function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|)
 	print s
 	print " `"
 	if ActualCompile
-		print compiler.ProductPath
+		rz = compiler.ProductPath
 	  else
-		print cpp_export.CppProduct
+		rz = cpp_export.CppProduct
+	print rz
 	printline "`"
 
 
@@ -994,5 +995,5 @@ datatype CompilerStage (int)
 		Hungry
 		Packing
 		CppExport
-	
+
 	

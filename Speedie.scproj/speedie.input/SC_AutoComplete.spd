@@ -8,7 +8,6 @@ cpp_part AC
 |string|			AnonText
 |SCNode|			AnonParent
 |errorreceiver|		Errors
-|bool|				CompiledOK
 |bool|				Cleaned
 ||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
  `)>.macro
@@ -87,7 +86,7 @@ function InitedOK (|bool|)
 
 
 function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
-	.CompiledOK = Compiler.CompileAll >= 1
+	Compiler.CompileAll
 	compiler.InPerry = 2
 	.ParserRestore
 	perry <~ .check
@@ -178,7 +177,7 @@ function UnusedStuff (|message| cmd, |message|)
 			
 	cmd.Clear
 	
-	if !.CompiledOK
+	if !Compiler.Successfulness
 		return cmd
 
 	// what about constants, and globals that are unused?

@@ -235,7 +235,7 @@ if __ArgCount == 0
 function compiler.AddFunny (|message| msg, |message| curr)	// autoimport
 	require !.HasFunny
 	.HasFunny = true
-	problem (curr, "Undefined behaviour")
+	problem (curr, "Strange behaviour")
 	msg.msg(@tmp, "import") <~ ".Funny" // hehe
 
 

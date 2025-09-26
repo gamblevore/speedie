@@ -5,7 +5,6 @@ https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai
 main (|int| Highest_Number = 100)
 	zalgoline "Finished in ${game(Highest_Number).play}\n\n"
 
-
 class game
 	|int|   answer
 	|int|   last = int.min
@@ -25,9 +24,9 @@ class game
 		
 	function report (|int| guess, |string|)
 		if guess < 1 or guess > .high: return "I said between 1 and $.high!! What would I expect from a ${$1} like you!"
-		if guess == .last:  return "you just said $guess you " + $1
-		if guess < .answer: return "too low you " + $1
-		if guess > .answer: return "you " + $1 + " $guess is way too high"
+		if guess == .last:  return "you just said $guess you ${$1}"
+		if guess < .answer: return "too low you ${$1}"
+		if guess > .answer: return "you ${$1} $guess is way too high"
 		return "correct!"
 
 	function ask (|int|)
@@ -35,6 +34,6 @@ class game
 			|| word = app.input
 			|| result = word.int
 				return result
-			zalgoline "Uhhhh? $word? just what I expect from a " + $1 + "\n\n"
+			zalgoline "Uhhhh? $word? just what I expect from a ${$1}\n\n"
 			StdErr.clear // why not
 

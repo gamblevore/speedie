@@ -81,20 +81,13 @@ function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, 
 		minsev = errorseverity.problem
 	
 	|| Count = 0
+	|| Problems = 0
 	|| msg = faststring()
 	for (err in stderr)
 		if err.severity >= MinSev
 			Count++
-			err.scrender(msg)
-	
-	if !count
-		|| problems = 0
-		for (err in stderr)
-			if (err.severity == errorseverity.problem)
-				if ++problems <= 10
-					err.scrender(msg)
-	  elseif !options.perryoutput
-		msg.problemsfound(count)
+			if (err.severity != errorseverity.problem) or (++problems <= 10)
+				err.scrender(msg)
 	
 	return msg
 
