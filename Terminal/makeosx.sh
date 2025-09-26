@@ -49,7 +49,7 @@ chown $U /usr/local/bin/
 
 
 echo "Cleaning old files"
-rm -rf Build/* 2>/dev/null
+rm -rf Build/* 2>/dev/null || true
 
 echo "Installing headers"
 cp    *.h /usr/local/include/

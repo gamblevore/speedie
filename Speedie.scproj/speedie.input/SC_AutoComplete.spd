@@ -62,6 +62,7 @@ function EnterAutoComplete (|bool|)
 	require perry.isopen
 	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
+	app.PrintStackTrace
 
 	|| Realm = pico.GlobalConfig
 	Realm.TimeOut = 30s

@@ -5,7 +5,6 @@
 
 
 main {
-//	printline "Args: " + app.rawargs.render
 	|| R = app.args
 	ifn R.Last isa "git"
 		expect (!R.length) ("This script takes no arguments.")
@@ -128,7 +127,7 @@ ${mkdir(`/usr/local/include/`)}
 ${mkdir(`/usr/local/bin/`)}
 
 echo \"Cleaning old files\"
-rm -rf Build/* 2>/dev/null
+rm -rf Build/* 2>/dev/null || true
 
 echo \"Installing headers\"
 cp    *.h /usr/local/include/
@@ -207,9 +206,12 @@ function file.NeedExecute (|bool|)
 
 // ANTI-MAKE THEORY:
 	// NO:    unix 'make' or cmake
-	// MOVE:  All possible control-flow + vars out of bash, and into your favourite language.
-	// DO:    Call g++ (and friends), from your favourite language!
+	// DO:    Call g++ (etc), from a bash script that you create via code.
+	// MOVE:  All possible control-flow + vars out of bash, and into speedie (or whatever lang).
 
+	// This basically makes YOU replace cmake with your small program. This 205 lines of code
+	// replaces all of cmake. Meaning I don't need to remember or understand it!
+	
 // TODO:
 	// Make this NOT alter the creator of /usr/local/include or /usr/local/bin
 	// at least if they already exist!
