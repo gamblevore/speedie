@@ -369,13 +369,17 @@ int File_GoToStart( JB_File* f, bool AllowMissing ) {
 	return JB_File_Open( f, O_RDONLY, AllowMissing );
 }
 
-//bool DebugFile(JB_File* F, const char* S) {
-//	JB_String D = {};
-//	D.Addr = (u8*)S;
-//	D.Length = (int)strlen(S);
-//	bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
-//	return JB_Str_ContainsString(F, &D); 
-//}
+bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
+	#if DEBUG
+	JB_String D = {};
+	D.Addr = (u8*)S;
+	D.Length = (int)strlen(S);
+	bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
+	return JB_Str_ContainsString(F, &D);
+	#else
+	return false;
+	#endif
+}
 
 int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 	if (!f)
@@ -853,6 +857,8 @@ JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
 	self->Length = Path->Length;
 	self->Parent = JB_Incr(Path);
 	
+	if (DebugFile(self, "1_Speedie.cpp") or DebugFile(self, "1_Speedie.h"))
+		debugger;
     self->Descriptor = -1;
     self->MyFlags = 0;
     self->OpenMode = 0;
@@ -1061,7 +1067,7 @@ Date JB_File_Created( JB_File* self ) {
 }
 
 
-bool JB_File_Exists( JB_String* self ) {
+bool JB_File_Exists ( JB_String* self ) {
     uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	int err = access(tmp, 0);
@@ -1079,7 +1085,7 @@ bool JB_File_Exists( JB_String* self ) {
 }
 
 
-static uint8* TempBeforeMove(MiniStr& Self, uint8* Buff) {
+static uint8* TempBeforeMove (MiniStr& Self, uint8* Buff) {
 	int N = Self.Length + 8;
 	if (N > PATH_MAX)
 		return Self.Addr;
@@ -1094,7 +1100,7 @@ static uint8* TempBeforeMove(MiniStr& Self, uint8* Buff) {
 }
 
 
-static uint8* MoveWithinSelf(JB_File* Self, JB_String* New, uint8* Buff) {
+static uint8* MoveWithinSelf (JB_File* Self, JB_String* New, uint8* Buff) {
 	auto N = Mini(New);
 	auto S = Mini(Self);
 	if (N.Length > S.Length and N[S.Length] == '/') {
