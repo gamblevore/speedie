@@ -257,7 +257,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			cpp_wrapper
 
 
-		function string.Spawn (|[string]| Params, |spdprocess|)
+		function string.Spawn (|[string]| Params=nil, |spdprocess|)
 			return SpdProcess.Spawn(self, params)		
 		
 		
