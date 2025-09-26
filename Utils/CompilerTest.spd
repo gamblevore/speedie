@@ -2,8 +2,16 @@
 
 || Fails = faststring()
 
-// To help debug speedie!
+
 main (|[string]| Files)
+	if !files
+		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn()
+			app.Sleep(1s)
+			printline proc.ReadStdOut
+			printline proc.Status
+		return 0
+	
+	
 	for f in files.GlobExpand
 		app.TryCompileOne(f)
  
