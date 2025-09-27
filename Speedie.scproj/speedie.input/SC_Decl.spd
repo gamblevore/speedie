@@ -750,7 +750,7 @@ class SCDecl (SCObject) {
 		return .iscarray or .Type.IsStruct
 		
 	function IsNormal (|bool|)
-		return !.PointerCount and !.IsNil and !.IsCArray
+		return !.PointerCount and !.IsNil and !.IsCArray and !.Type.IsStruct
 
 	function IsMostlyNormal (|bool|)
 		require !.IsNil and !.IsCArray

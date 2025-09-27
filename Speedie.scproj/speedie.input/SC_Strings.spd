@@ -149,7 +149,6 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	|| Point = msg.UpToArg!
 	using (msg)
 	|| FSName = UniqueTmpVar( fn, "fs" )
-//	|| StrName = fsName + "_str"
 	|| Dot = @dot + "new"
 	dot <~ (@Thg, "FastString")
 	dot <~ @emb

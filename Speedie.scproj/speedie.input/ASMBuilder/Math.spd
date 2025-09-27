@@ -638,29 +638,49 @@ extend Assembler
 		return .BitMaker(dest, l, r, exp, asm.bxor, asm.qxor)
 
 
+	function MiniBOR (|asmreg| l, |asmreg| r, |asmreg|)
+		if (l iz r)
+			return l
+		if r is Const
+			|| K = r.const
+			if k == 0
+				return l
+			if k == -1
+				return r
+
+
+	function RemoveableInput (|asmreg| dest, |asmreg| OldInput, |asm| Type, |&fatasm|) // canremove, cantemp, caninline, cansquish
+		// I'm sure I did this before but whatever
+		require (oldinput is temp) or (oldinput iz dest)
+		|| f = OldInput.Fat
+		if f and (f.op == type) and .IsCurr(f)
+			return f
+
+
 	function BitOr (fn_opasm)
-		if !dest.reg
-		
 		if dest is Const
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitOr)
 
-		if dest isnt Textual
-			if (l iz r)
-				return l
-			if l is Const
-				|| K = l.const
-				if k == 0
-					return r
-				if k == -1
-					return l
-			if r is Const
-				|| K = r.const
-				if k == 0
-					return l
-				if k == -1
-					return r
 		if (l is Const)
 			swap (l) (r)
+
+		if dest isnt Textual
+			|| done = .MiniBOR(l,r)
+				return done.µtype(Dest)
+
+		|| OldInput = .RemoveableInput(dest, L, asm.bflg)
+		if !OldInput
+			OldInput = .RemoveableInput(dest, R, asm.bflg)
+//		if OldInput
+//			OldInput._op = asm.BFLS
+//			OldInput.Dest(0, dest, self) // wait... which of the inputs do I change?
+			// or is it the dest? cos the dest IS the input in bfls. do later
+			
+//		BFLG: r3, r2, 32, 16, 1
+//		BORR: r3, r3, r1, 0
+//		BFLG: t31, r2, 32, 16, 1
+//		BORR: t31, r1, t31, 0
+
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
 

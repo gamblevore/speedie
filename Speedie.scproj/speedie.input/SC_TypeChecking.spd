@@ -6,7 +6,8 @@ function Message.ExpandToBool (|SCNode| name_space, |Message|)
 	|| decl = TypeOfExpr( self, name_space )
 		if decl.isnormal and !decl.type.theboolfunc
 			return self
-		
+		expect (!decl.isbarestruct) (self, "Can't auto-cast a bare-struct to a bool")
+			
 		|| upon = .unbra
 		rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, upon )
 	
@@ -159,7 +160,8 @@ function scdecl.TryTypeCastDeref (|SCDecl| O, |Message| exp, |int| TypeCast,  |i
 	|| Addr = @acc.msg
 	exp.next = addr
 	Addr <~ exp
-	addr.msg(@arr) <~ 0
+	|| num = addr.msg(@arr).msg(@num, "0")
+	num.obj = typenil
 	Addr.obj = i
 	Return kAddressOfMatch		
 
