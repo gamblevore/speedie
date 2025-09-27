@@ -11,7 +11,7 @@ main (|file.existing| input)
 	
 	
 function app.Process (|file| input, |file|)
-	if !input.IsDir
+	if !input.IsDir and input isa "arc"
 		return app.UnArchive(input)
 	
 	rz = input.SetExt("arc").file
@@ -24,16 +24,20 @@ function app.Process (|file| input, |file|)
 	
 
 function jbin.ArchiveSub (|file| Item)
+	if !item.isdir
+		"$item"
+		.enter(@tmp, item)
+		.Add(@bin, item.readall) // !>:3
+		.exit
+		return
+		
 	for ch.files in item
 		if ch.lowercase globbed_by Excludes
 			"!! $ch"
-		  elseif !ch.isdir
-			.enter(@tmp, ch)
-			.Add(@bin, ch.readall) // !>:3
-			.exit
-		  elseif !ch.isSymlink
+		  elseif !ch.isSymlink or !ch.isdir
 			.ArchiveSub(ch)
 	
 
 function app.UnArchive (|file| input, |file|)
 	// just an example for now
+
