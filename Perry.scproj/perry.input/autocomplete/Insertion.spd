@@ -468,4 +468,5 @@ function string.IsSpd (|bool|)
 
 function guicontrol.IDE (|perryide!|)
 	opt norefcounts
+	if !self // sigh
 	return (.window as perryide)!

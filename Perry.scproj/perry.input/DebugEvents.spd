@@ -71,7 +71,7 @@ function ClickedDebug (GUIAction)
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
 		i.ShowText(i.ProductOut, "", false)
-		|| itm = i.CompileTabs.items[3]
+		|| itm = i.CompileTabs.ButtonSource[3]
 			(itm is hidden)
 		i.ProductErrors.text = ""
 	  elseif .text == "\07" // stop
@@ -170,7 +170,7 @@ function PerryIDE.StartDebugging (|file!| f)
 
 
 function PerryIDE.CompileTab (|int| i, |listviewrow|) // for autocomplete
-	return .CompileTabs.items[i]
+	return .CompileTabs.ButtonSource[i]
 
 
 function PerryIDE.AddProductErr (|string| err)

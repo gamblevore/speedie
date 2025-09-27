@@ -4,10 +4,11 @@
 class StartupWindow (window) // splashscreen, startupscreen, startwindow
 	linkage: cpp_part ttup
 
-	behaviour CancelClose
-		if !perry.Projects.hasany
-			beep
+	behaviour TryClose
+		if perry.Projects.hasany
 			return true
+		Notifications <~ "Open a project or create a new one, to use Perry"
+		beep
 		
 	module
 		|StartupWindow|			_win

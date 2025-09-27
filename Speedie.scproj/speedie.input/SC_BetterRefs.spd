@@ -191,8 +191,6 @@ dispatch ClassLinkageTable (TranFunc)
 			name_space.typeinfo = 0
 			if type == "false" or "symbol"
 				(name_space is symbol)
-			  elseif type == "fixed"
-				(name_space is fixed)
 			  elseif type == "flags"
 				(name_space is flags)
 			  else

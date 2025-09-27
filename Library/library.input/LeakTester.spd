@@ -50,11 +50,16 @@ helper @memory.CollectLeaks_ (|object| self, |[]|)
 	JB_FindLeakedObject(self, rz)
 
 
-helper @memory.PrintLeaks_ (|object| self)
+helper @memory.PrintLeaks (|object| self)
 	description "Finds the object that refers to this leaked object."
 	visible
 	cpp_name jbl
-	for bad in memory.CollectLeaks_(self)
+	|| i = 0
+	|| R = memory.CollectLeaks_(self)
+	while 
+		|object--| bad = r[i++]
+		if !bad
+			exit
 		bad.debugprint
 		debugger
 	

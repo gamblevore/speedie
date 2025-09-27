@@ -27,7 +27,7 @@ datatype ClassInfo (int)
 		Stateful
 		Builtin
 		SortsProperties
-		NumericReduction = [Symbol, Fixed, Flags]
+		NumericReduction = [Symbol, Flags]
 //		ASM
 		
 
@@ -65,6 +65,7 @@ linkage
 |SCDecl?|					DataObject
 |ClassInfo|					Flags
 |DataTypeCode|  			TypeInfo
+|DataTypeCode|  			ASMTypeInfo
 |uint16|					SizeRaw
 |uint16|					Size			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					TaskObjectCount
@@ -90,7 +91,6 @@ constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	.Modul = m
 	.IsVisible = SCNode.CurrVisibility
 	.saveas = ""
-	.TypeInfo = 0
 	(self is Banned) = .TestBanned
 	
 	|| T = SCDecl(self)
@@ -1039,10 +1039,11 @@ module
 		if base is Object
 			(cls is SortsProperties)
 			cls.typeinfo = datatypecode._Voidptr
-		if cls.IsDataTypeOrFP
+		  elseif cls.IsDataTypeOrFP
 			(cls is stateless)
 			if base is prototype
 				cls.Typeinfo = DataTypeCode._voidptr
+		cls.ASMTypeInfo = cls.TypeInfo
 		cls.IsRole = (node ~= "role")|int|
 
 		|| SA = cls.SourceArg
@@ -1114,6 +1115,7 @@ module
 		|| sup = .super
 			.Size = sup.Size
 			.TypeInfo = sup.TypeInfo
+			.ASMTypeInfo = .TypeInfo
 			|| nr = .NumericReduction
 				if nr & classinfo.symbol
 					.typeinfo &= ~datatypecode.numeric
@@ -1128,6 +1130,7 @@ module
 				if t == datatypecode.Vec3 or datatypecode.iVec3
 					.size = 16 // sigh 
 				.TypeInfo = T
+				.ASMTypeInfo = t
 				is Builtin
 				require T.isint and !.Signed
 				|| s2 = t.SignedStuffClass

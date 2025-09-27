@@ -21,12 +21,13 @@ class PerryIDE (Window)
 	|Guicontrol|				rborder
 	|guicontrol| 				CompileArea
 	
+	|listviewrow?|				SharedProjectTabSource
+	|File|						Project // merge this and SharedProjectTabSource?
+
 	|FileRow?|					NotTodo
 	|message?|					CurrASMFunc
-	|listviewrow?|				SharedProjectTabSource
 	|message?| 					LostFunks
 	|[guicontrol]|				Views
-	|File|						Project
 	|ivec2|						AutoPoint
 	|TextView| 					ProductOut
 	|TextView| 					ProductErrors
@@ -107,18 +108,25 @@ class PerryIDE (Window)
 
 	
 	destructor
+		.Closed
+
+
+	function Closed (|bool|)
 		opt norefcounts
-		if !gui.isquitting
-			|| proj = .SharedProjectTabSource
-				proj["pos"] = .editme.sel0
-				Perry.save
-		
-				|| n = proj.parent.slowcount
-				if n >= 2
-					.RemoveProjFromList
-				|| p = .prev
-				if p isa perryide
-					p.showide
+		|| proj = .SharedProjectTabSource
+		if proj and !gui.isquitting
+			proj["pos"] = .editme.sel0
+			Perry.save
+	
+			if proj.parent > 1
+				.RemoveProjFromList
+			|| p = .prev
+			if p isa perryide
+				p.showide
+			.clear
+			if .refcount > 1
+				Memory.PrintLeaks(self)
+		return true
 
 	
 	function UpdateStatusErrors
@@ -166,12 +174,13 @@ class PerryIDE (Window)
 //		.Feedback$.Pico.Tickle
 	
 
-	behaviour CancelClose 
-		GUI.SavePrefs					// seems better
+	behaviour TryClose 
+		GUI.SavePrefs							// seems better
 		if !.filelist.AskSaveall
-			return true					// failed
+			return false						// failed
 		if !ClickedCancel(self) or !.MakeNothingRunning(" for closing the project?")
-			return true
+			return false
+		return .closed
 			
 
 	function LocateProjRoot (|string| path, |filerow|)
@@ -472,6 +481,10 @@ class PerryIDE (Window)
 	
 	
 	behaviour FrameStep // perframe, eachframe, onframe
+		for w in Window.all
+			if w isa PerryIDE
+				if w.ProjectTabs.ButtonSource != Perry.Projects
+					/// hmmm
 		.ProjectTabs.TrimWidth
 		if GUIactive
 			.SaveMemory

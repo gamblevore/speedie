@@ -63,8 +63,7 @@ function Perry.CreateProj (|string| path)
 	
 function ClickedTabs (GUIAction)
 	opt norefcounts
-	|| i = row.ide
-		i.ShowIDE(True)
+	.ide.ShowIDE(True)
 
 
 function ClickedCompileTabs (Guiaction)
@@ -80,7 +79,7 @@ function PerryIDE.ShowCompileTab (|object| tab) // showtab
 
 function PerryIDE.CompileTabSelect (|object| Desired)	
 	opt norefcounts
-	for i in .CompileTabs.Items
+	for i in .CompileTabs.ButtonSource
 		|| obj = i.obj as textview
 			|| vis = (Desired == i or obj)
 			(i is selected)  = vis

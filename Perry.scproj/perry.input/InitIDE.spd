@@ -504,7 +504,7 @@ extend PerryIDE
 			.size = 10~after to the~right  by  3~inside
 			.itemwidth = 84
 			.CanReOrderButtons = true
-			.items = perry.projects
+			.ButtonSource = perry.projects
 			|| pf = perry.projects.first 
 				 (pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
@@ -517,11 +517,11 @@ extend PerryIDE
 			.size = the~width by 18~down
 			.itemwidth = 101
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
-			.items = message()   // ("Jeebox, Speedie, '', Errors"~parse)|listviewrow|
-			self.IDESetNext(self.JeeboxText,  .items)
-			self.IDESetNext(self.SpeedieText, .items)
-			self.IDESetNext(self.ProductOut,  .items)
-			|| c = self.IDESetNext(self.ProductErrors, .items)
+			.ButtonSource = message()   // ("Jeebox, Speedie, '', Errors"~parse)|listviewrow|
+			self.IDESetNext(self.JeeboxText,  .ButtonSource)
+			self.IDESetNext(self.SpeedieText, .ButtonSource)
+			self.IDESetNext(self.ProductOut,  .ButtonSource)
+			|| c = self.IDESetNext(self.ProductErrors, .ButtonSource)
 
 			(c is hidden)
 			(c is Broken)

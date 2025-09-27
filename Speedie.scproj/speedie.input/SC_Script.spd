@@ -1,6 +1,6 @@
 
 
-function Compiler.ScriptLoc (|string| f, |file|)
+function Compiler.ScriptLoc (|string| f, |file|) 
 	rz = feedback.TryUseProject(f, true).ScriptLocation.file
 	options.output_path = rz
 
@@ -61,7 +61,7 @@ function compiler.TryVariousStartModes (|bool|)
 
 
 
-function string.ContainerName (|string|ext, |string|)
+function string.ContainerName (|string| ext, |string|)
 	|| After = .find(ext.PathDir)
 		return self[0, after].name
 

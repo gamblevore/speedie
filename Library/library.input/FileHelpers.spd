@@ -284,30 +284,27 @@ function string.ShellPath (|string|)
 	return .replaceall(" ", `\ `)
 
 
-target !minilib {
-extend file
-	function UploadTo (|string| url, |ExitCode|) // move to the network module
-		return "/usr/bin/curl".silentexecute([
-			"-T"
-			self
-			url
-		])
-	
-	function ZipTo (|string| zip, |errorint|) //zip -r foo.zip foo
-		|| p = .shellpath // sigh. // zip is so bad.
-		|| dir = p.parent
-		|| name = p[dir.length...]
-		rz = "cd $dir; zip  -r  $zip  $name".system
-	
-	function ZipTmp (|file|)
-		require self
-		|| zip = "/tmp/${.name}.zip"
-		if .zipto(zip)
-			return zip.file
-		
-	function ZipUpload (|string| url, |ExitCode|)
-		return .ZipTmp$.uploadto(url)
-}
+//target !minilib {
+//extend file
+//	function UploadTo (|string| url, |ExitCode|) // move to the network module
+//		return "/usr/bin/curl".silentexecute([
+//			"-T"
+//			self
+//			url
+//		])
+//	
+//	function ZipTo (|string| zip, |errorint|) //zip -r foo.zip foo
+//		|| p = .shellpath // sigh. // zip is so bad.
+//		|| dir = p.parent
+//		|| name = p[dir.length...]
+//		rz = "cd $dir; zip  -r  $zip  $name".system
+//		
+//	function ZipUpload (|string| url, |ExitCode|)
+//		require self
+//		|| zip = "/tmp/zipupload/${.name}.zip"
+//		if .zipto(zip)
+//			return zip.file.uploadto(url)
+//}
 
 
 role StringThatWasReadSafely (string)

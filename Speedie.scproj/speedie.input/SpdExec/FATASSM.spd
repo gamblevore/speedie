@@ -318,7 +318,9 @@ struct FatASM
 	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
-		|| fn = .msg.Obj|scfunction|
+		|| exp = .msg
+		if exp != @func
+		|| fn = exp.last!.Obj|scfunction|
 		ifn fn isa scfunction
 			fn = nil
 		|| regs = .FuncPrms(fn)
@@ -332,7 +334,7 @@ struct FatASM
 
 		|| IsC = (self isa asm.fncx or asm.fncx3)
 
-		while (n>0)
+		while (n > 0)
 			n--
 			fs <~ 'r'
 			|| r = regs
@@ -342,9 +344,9 @@ struct FatASM
 				regs >>= 5
 			
 			fs <~ r&31
-			
 			if n > 0
 				fs <~ ", "		
+
 		fs <~ ")"
 	
 	

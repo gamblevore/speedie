@@ -582,36 +582,26 @@ function BoolNot (fn_asm)							// !a
 
 
 function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
-	opt	NoRefCounts											// *a, x = *(a.b)
-
-	// this is writing ontop of itself.
-	// we are getting a temp Addr... in t31
-	// but its already, closed, so .temponly just puts it back into t31
-	// now, upon read, we overwrite our addr
-	// which we later use for write.
-	
-	
+	opt	NoRefCounts
 	|| TmpCloser = .OpenVars
-/	dest = .temponly(Dest)
-	dest = .Read(
-		dest: Dest	
-		exp: F
-		Ptr: addr
-		VarAdd: nil
-		ReadDecl: glob)	* Dest												// READ
+	if dest is Discard
+		dest = .TempOnly(Dest)
+	if Dest iz Addr	// whyyyy
+/		dest = .TempOnly
 
-	|| ValueToWrite = dest
-	if mode & IncrAfter
-		ValueToWrite = nil
-	ValueToWrite = .AddToReg(f, ValueToWrite, dest, amount)					// ADD
-	ifn mode & IncrAfter
-		dest = ValueToWrite
-	
-	|| x = .write(ValueToWrite, f, addr, nil, glob) * ValueToWrite				// WRITE BACK
-
-	// the new value should exist! now lets close
+	(addr is BlockNop)
+	|| value = .Read(Dest, F, addr, nil, glob) * Dest						// READ
+	(value is noscale)
+	if mode & incrafter
+		dest = value
+		Value = .AddToReg(f, nil, value, amount)							// ADD AFTER
+	  else
+		value = .AddToReg(f, value, value, amount)							// ADD BEFORE
+		dest = value
+	(addr isnt BlockNop)
+	(dest isnt noscale)
+	.Write(Value, f, addr, nil, glob).operatormul(Value)					// WRITE BACK
 	return .CloseVars(TmpCloser, nil, dest)
-
 
 
 
@@ -625,6 +615,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob, exp)
 	
 	|| fat = exp.CNTC(dest, Addr, offset, amount, bc)
+	fat.µRefCount++			// memory alteration!
 	if !dest.reg
 		fat._Outputs &= ~1 // clear output
 	
@@ -658,24 +649,26 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
 	opt	NoRefCounts
 	
-	(dest isnt discard)
-	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
+	|| Src = .µGetASM(exp, ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
-
+	
 	if dest is discard
 		mode = IncrBefore
 	  elseif !dest.reg
-		if (mode & IncrAfter) // or (src isnt temp) // why? Why was this added? it messes things up?
+		(dest isnt const)
+		if mode & IncrAfter
 			dest = .TempTyped(exp, dest)
-			if (dest is const)
 		  else
 			dest.reg = src
-		(dest isnt const)
+	  elseif (dest iz src) and (mode & IncrAfter)
+		problem (exp, "Your code is fucked up here")	 // x = x++ makes no sense
+		return src
+	
 
 	src = src as asmreg.noscale
-	dest.µType = src.µType				// right? it can't be different.
-	|| p = exp.parent!					// better positions
+	dest.µType = src.µType							// right? it can't be different.
+	|| p = exp.parent!								// better positions
 	if src is ContainsAddr
 		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
@@ -795,17 +788,17 @@ helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 
 
 
-function LocalThg (|scdecl| d,  |asmreg|)     // asmlocal, localasm
+function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
 
 	(t is param) = d is param
-	(t is BlockMostlySafe) = d isnt AlteredInBranch
-	(t is BlockSafe) = d isnt AlteredBranchLike
+//	(t is BlockMostlySafe) = d isnt AlteredInBranch // unused?
+//	(t is BlockSafe) = d isnt AlteredBranchLike
 	|| f = .Register(t.reg)
 
 	// consts must have fats! both in and out. unless r0.
-	if f and (.iscurr(f) or (t is BlockSafe))
+	if f and (.iscurr(f) or (d isnt AlteredBranchLike))
 		t.FatIndex = f.index
 		(T is Const) = (f is Const)
 	

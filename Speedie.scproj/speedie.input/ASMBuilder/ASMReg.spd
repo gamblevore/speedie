@@ -29,10 +29,11 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-		BlockSafe
-		BlockMostlySafe
+//		BlockSafe
+//		BlockMostlySafe
 		OKAsTemp
 		AllowNopDest
+		BlockNop
 //		CompilerCreated
 		GlobalMemory
 		PreferEqul

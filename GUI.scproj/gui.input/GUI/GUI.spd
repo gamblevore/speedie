@@ -918,7 +918,7 @@ module GUI
 				if w.IsDialog
 					require w.TryCloseDialog
 				  else
-					require !w.__CancelClose__(Reason)
+					require w.__TryClose__(Reason)
 
 		return .terminate
 

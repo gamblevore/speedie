@@ -1217,19 +1217,12 @@ class SCDecl (SCObject) {
 		opt norefcounts
 		if self
 			|| Ty = .type
-			|| BT = ty.BaseType
-			if bt is object
+			if ty.BaseType is object
 				return datatypecode.cstring
-			if .pointercount
-				return datatypecode._voidptr // what about carrays?
-			rz = ty.typeinfo
-			if rz != datatypecode.bool
-				if bt is DataType and rz isnt numeric // fuck
-					ty = ty.HigherNumber!
-					rz = ty.TypeInfo // sigh
-					// perhaps types should have two types? One for the ASM type and one
-					// for syntactic types?
-			
+			if !.pointercount
+//				if ty.BaseType is Struct // structs are always pointers... no need for this test.
+				return ty.asmtypeinfo			
+			return datatypecode._voidptr // what about carrays?
 		
 		
 	function PointerIncrement (|int|)

@@ -170,7 +170,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	
 	|| PExt = P >> 32
 	(dest isnt Const) // why would it be?
-	|| fat = prms.FNC(dest, TableID, P,  PExt)		// prms.fncx
+	|| fat = exp.FNC(dest, TableID, P,  PExt)		// prms.fncx
 	if fn.HasCVersion
 		if 0: exp.fncx
 		fat._op = asm.FNCX

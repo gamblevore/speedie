@@ -9,7 +9,7 @@ class SCParamArray
 		cpp_part		PA
 	contains message
 
-	|Message--?[8]|	Items
+	|Message--?[8]|		Items
 	|Message--?|		Exp
 	|SCClass--?|		Cls
 	|int16|				Size

@@ -119,12 +119,15 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	ll.after = .curr
 	rz = .InlineFinish(ll)
 	|| Grown = .CurrGain(RealStart)
-	if Grown <= AllowedGain
-		if !rz
-			(rz is Const)						// no longer zero
-	  else
+	if Grown > AllowedGain
 		regs.Rewind(self)
-		rz = nil
+		return nil
+	
+	if !rz
+		(rz is Const)							// no longer zero
+	|| last = .last
+	if (last == ll.start) and last.IsFunc
+		last.msg = prms.parent! // cleanup		
 
 
 	

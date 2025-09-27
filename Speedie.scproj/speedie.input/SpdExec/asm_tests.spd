@@ -20,8 +20,7 @@ function SwapTest
 	|| x = 1				// speedie isnt returnign errors properly... via autocompletes
 	|| y = 2
 	swap (x) (y)
-
-
+	
 function GlobRead  
 	|| s = Compiler.OriginalInputPath
 	|| m = typefloat64

@@ -108,9 +108,11 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 	  else
 		require rz >= -1 and rz <= 1
 
+	|| CanNop = base isnt BlockNop
 	index = i
 	base = bs.ASMReg(1)
-	.softnop(bs)
+	if CanNop
+		.SoftNop(bs)
 
 
 function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |uint| MaxBits, |scdecl?| Decl, |message| exp, |asmreg|)
@@ -152,11 +154,11 @@ function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scd
 	return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
 
 
-function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0, |&fatasm|)
+function Write (|asmreg| Value, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0, |&fatasm|)
 	opt inline
-	(dest is set)
-	(dest is discard)
-	return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestDecl, index)
+	(Value is set)
+	(Value is discard)
+	return .ReadOrWriteSub(Value, exp, ptr, VarAdd, DestDecl, index)
 
 
 function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)

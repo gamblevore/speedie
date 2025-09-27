@@ -93,7 +93,7 @@ function WhileSub (|message| exp,  |asmreg|)
 		return ASMReg()
 	
 	if loop_test.always
-		.Nop(InitialJump)		
+		.Nop(InitialJump)	
 		// now what?
 		exp.JUMP.JumpTo(initialjump+1)
 		loop_test.after++

@@ -143,11 +143,12 @@ class TextView (GUIControl)
 			
 	helper string._TextLineClickedBreakpoint (|string|)
 		|| i = ._FindBreakpoint
-		require i < int.max
+		if i == int.max
+			beep
+			return string.Error
 		if i == -1 // ok... this means that the thing isn't found, so we can add it.
 			return "/" + self
 		// are these two branches the same? test later.
-		
 		// we did find one! but it might be in the middle!
 		return .trim(i, i+1)
 
@@ -161,7 +162,9 @@ class TextView (GUIControl)
 		
 		|| Restore = .selrange
 		// so now we are within the area, and have a valid line. we can now alter the text!
-		|| txt = d.Text._TextLineClickedBreakpoint
+/		|| txt = d.Text._TextLineClickedBreakpoint
+		if !txt.isok
+			return true
 		
 		// adjust position first
 		if Restore.x > d.position

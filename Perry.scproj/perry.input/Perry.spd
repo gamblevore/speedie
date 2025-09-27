@@ -15,7 +15,7 @@ module Perry
 		require app.args > 0
 		for arg in app.args // load specified documents
 			|| ide = .LoadAppArg(arg)
-				ide.ProjectTabs.items = .projects
+				ide.ProjectTabs.ButtonSource = .projects
 				rz = true
 	
 	
@@ -124,6 +124,7 @@ module Perry
 		target lin: GUI.removeborder // doesnt seem to work in Windows WSL?
 		GUI.AppDocumentOpen = &PerryIDE.PerryOpenDoc
 		stderr.LogFile = "PerryErrors.txt"
+		|| old = app.prefs["currproj"]
 		app.InitColors
 		¥.LoadDefaults
 		.BuildAppMenu
@@ -135,16 +136,12 @@ module Perry
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
 		
-		if .LoadWindowsFromArgs
-			|| oof = .Projects.First
-				oof.ide.showide
-		  else
+		if !.LoadWindowsFromArgs
 			.Projects = app.prefs["lastproj", @arg]|listviewrow|
 			.LoadWindowsSub
 		
-			|| old = app.prefs["currproj"]
-			|| oof = (.FindProj(old),  .Projects.First)(old)
-				oof.ide.showide
+		|| oof = (.FindProj(old),  .Projects.First)(old)
+			oof.ide.showide
 		
 		perry.FinishedStartUp = true
 			
@@ -190,7 +187,7 @@ function SetTab2Name (|message| old)
 	|| f = old[@nil]
 		f.name = f.name.ProjCleanName
 		.id = "IDE: " + f.name
-		|| ii = .CompileTabs.items[@nil, 2]
+		|| ii = .CompileTabs.ButtonSource[@nil, 2]
 			ii.name = f.name + "[]"
 
 

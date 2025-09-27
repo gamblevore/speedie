@@ -74,31 +74,19 @@ module Feedback
 	
 	
 	function CheckSelfModifying
-		|| t2 = .CheckSelfModifying2
-		if t2 == 1
+		require !options.SingleFileInput
+		require !Options.SelfReplacement
+		
+		|| p = compiler.BaseProjectPath$
+		|| spd = compiler.Projects.FileCh("Speedie.scproj")
+		if p ~= spd
 			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
 			.SetFlow
 			SC_Targets["self"] = true
-		  elseif t2 == 2
+		  elseif p ~= compiler.jeebox
 			Options.ProjectIsMiniLib = true
-
-
-	function CheckSelfModifying2 (|int|)
-		require !options.singlefileinput
-		
-		|| p = compiler.BaseProjectPath$
-		|| spd = compiler.Projects.FileCh("Speedie.scproj")
-		|| jb = compiler.jeebox
-		
-		if p ~= spd
-			if Options.SelfReplacement // this check should be done in the caller
-				rz = 0
-			  else
-				rz = 1
-		  elseif p ~= jb
-			rz = 2
 
 
 	function ParseArgs (|bool|)
@@ -176,7 +164,6 @@ module Feedback
 		compiler.OriginalInputPath = path // altered below at: F.path = F.path.parent
 		Compiler.BaseProjectPath = F
 		compiler.projectname = f.trimextandpath
-//		compiler.reportedname = compiler.projectname
 		
 		|| exists	= f.exists
 		|| IsSpd	= f.name.IsSpeedieSrc or IsScript

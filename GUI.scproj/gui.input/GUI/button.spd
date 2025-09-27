@@ -11,7 +11,7 @@ class ButtonView (GUIControl)
 	|date|						DelayTill
 	|guicontrol?|				SubControl
 	|listviewrow?|				CurrOverItem
-	|listviewrow?|				Items
+	|listviewrow?|				ButtonSource
 	|listviewrow?|				ClickedItem
 	|int|						ItemWidth
 	|int| 						ItemGap
@@ -81,13 +81,13 @@ class ButtonView (GUIControl)
 	
 	setter Selected (|ListViewRow|)
 		opt norefcounts
-		for i in .items
+		for i in .ButtonSource
 			(i is Selected) = (i == value)
 
 
 	function Selected (|listviewrow|)
 		opt norefcounts
-		for i in .items
+		for i in .ButtonSource
 			if i is Selected
 				return i
 
@@ -112,7 +112,7 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		require row and row isnt hidden
 		|| W = .ItemWidth
-		|| r = .items.first
+		|| r = .ButtonSource.first
 		while r
 			if r == row
 				exit
@@ -126,7 +126,7 @@ class ButtonView (GUIControl)
 		|| W = .ItemWidth
 		|| R = .lastrect.horz
 		R.x2 = R.x + W
-		for i in .items
+		for i in .ButtonSource
 			if i isnt hidden
 				if R contains P
 					return i
@@ -180,7 +180,7 @@ class ButtonView (GUIControl)
 			.DoPressing(D)
 			return mousedragging.EvenIfNoMovement
 
-		if !(D or !.items)  or  (.ItemWidth and !D)
+		if !(D or !.ButtonSource)  or  (.ItemWidth and !D)
 			return ret
 		
 		if .MouseDownDoesClick
@@ -314,7 +314,7 @@ class ButtonView (GUIControl)
 		
 		|| rx1 = r.x
 		R.x2 = rx1 + W
-		for i in .items
+		for i in .ButtonSource
 			if i isnt hidden
 				.DrawOneButton(where, R, grow, i)
 				R = R right W + .itemgap
@@ -322,7 +322,7 @@ class ButtonView (GUIControl)
 
 
 	function TrimWidth
-		|| n = .items.slowcount max 1
+		|| n = .ButtonSource.slowcount max 1
 		|| w = n * (.ItemWidth + .ItemGap) - .ItemGap
 		.sizer.g(2, self)	= (w) ~ long
 

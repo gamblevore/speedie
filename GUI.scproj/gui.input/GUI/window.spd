@@ -69,8 +69,8 @@ class Window (GUIControl)
 	virtual FrameStep (|bool| GUIActive)
 		0
 
-	virtual CancelClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
-		return !reason
+	virtual TryClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
+		return reason
 
 
 	virtual DrawBackground (|image| where)
@@ -293,7 +293,7 @@ class Window (GUIControl)
 					(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.ReturnValue and !.__cancelclose__
+			if !.ReturnValue and .__TryClose__
 				.CancelReturn
 			return true
 	
@@ -457,13 +457,13 @@ class Window (GUIControl)
 		opt norefcounts
 		rz = SDLActivity.Exiting
 		for w in Window.all
-			require !w.__CancelClose__(rz)
+			require w.__TryClose__(rz)
 	
 	
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
 		if self
 			if reason isnt terminating
-				require !.__CancelClose__(reason)
+				require .__TryClose__(reason)
 			.ClearTree
 			.remove
 		return reason

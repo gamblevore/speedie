@@ -439,6 +439,7 @@ struct Assembler
 			return r
 		if (dest isnt ForceInto) and !(a is alteredorref and r.reg == 0)
 			return .CloseVars(ov, nil, r)
+		(dest isnt forceinto)
 		return .Assign(exp, dest, r)
 
 

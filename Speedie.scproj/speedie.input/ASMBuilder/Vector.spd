@@ -28,8 +28,6 @@ extend Assembler
 		|| v = (1,1,1,1)
 		v.x++
 		if mode & ASMType.IncrAfter
-			if dest iz src	
-				problem (exp, "Your code is fucked up here")	// x = x++ makes no sense! Ad∂ this check tø slow-add!!
 			rz = .Assign(exp, .temponly(dest), Src)
 		
 		if src.isfloat or vget.RegOnly(2)

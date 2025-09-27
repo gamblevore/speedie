@@ -17,9 +17,12 @@ linkage:cpp_part Ext
 ////////////////////////////////////////////////////////////////////////////////
 
 
-function TmpBase (|string| V, |string|)
+function TmpBase (|string| V, |bool| Lib=false,  |string|)
 	opt norefcounts
+	if !Lib and options.SelfReplacement
+		return "/tmp/SpeedieSelf/" + V
 	return "/tmp/Speedie/" + V
+	
 
 
 function TmpOut (|string| V, |string|)
@@ -79,7 +82,7 @@ function ProjTmpPath (|string|)
 	return .tmpbase(.ProductBaseName)
 
 function LibTmpPath (|string|)
-	return .tmpbase("Lib") + .LibSuff
+	return .tmpbase("Lib", true) + .LibSuff
 
 //function LogName (|string|)
 //	return .ProjTmpPath.child("build.txt")
