@@ -228,7 +228,7 @@ module GUI
 		require .init
 		while .SingleFrame
 			0
-		.Terminate
+		.quit
 		.sdl_quit
 		
 		rz = (!StdErr.OK)|int|
@@ -471,7 +471,7 @@ module GUI
 			.Event.type = 0
 		if .NeedMouseMove
 			.DoFakeMouseMove
-		|| Quitish = .QuitReason &~ SDLActivity.Activity
+		|| Quitish = .QuitReason &~ (SDLActivity.Activity ||| SDLActivity.Questioning)
 			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
 		.QuitReason = 0
 		.StartResize	// don't remove! causes delayed updates! resizes can happen here
@@ -674,10 +674,11 @@ module GUI
 				w1.DrawWindow(.Screen)
 			w1 = w1.next as window // :O
 		
-		notifications.Draw
-		.DoDrawDrag(window.front!)
-		if app.prefs["beep"]
-			beep // debug drawing!
+		|| w = window.front
+			notifications.Draw
+			.DoDrawDrag(w)
+			if app.prefs["beep"]
+				beep // debug drawing!
 
 
 	helper BGBlurAmount (|float|)
@@ -913,24 +914,13 @@ module GUI
 		opt norefcounts
 		reason |= sdlactivity.Exiting
 		
-		if reason isnt terminating
-			for w in window.all
-				if w.IsDialog
-					require w.TryCloseDialog
-				  else
-					require w.__TryClose__(Reason)
-
-		return .terminate
-
-
-	function Terminate (|sdlactivity|)
-		opt norefcounts
 		.SavePrefs // in case we crash during quit
-//		app.say "no"
+
 		SDL_SetRelativeMouseMode(false) // helpful
 		for w in window.all
 			.quitreason = SDLActivity.Terminating // in case of wierd events
 			w.close(SDLActivity.Terminating)
+
 		.SavePrefs
 		return SDLActivity.Terminating
 
@@ -1033,7 +1023,7 @@ module GUI
 
 		|| w = window.front
 			if (reason is exiting) and w.IsMainWindow
-				return GUI.AskQuit
+				return GUI.AskQuitAndThenQuit
 			.quitreason = 0 // i guess?
 			return w.close
 
@@ -1145,15 +1135,20 @@ module GUI
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
 			
 		
-	helper WontCloseMainWindow (|window| w, |bool|)
+	helper QuitBecauseWindowClosed (|window| w, |sdlactivity|)
 		opt norefcounts
 		if !w.ismainwindow
-			return true
+			return nil
+		
 		for ww in window.all
 			if (w != ww) and ww.ismainwindow
-				return true
-		if .AskQuit
+				return nil
+		
+		if .AskQuitAndThenQuit
 			.quitreason |= sdlactivity.exiting
+			return sdlactivity.exiting
+		
+		return SDLActivity.Activity
 			
 		
 		
@@ -1168,8 +1163,8 @@ module GUI
 								// or .front should only return visible windows...
 			if w.isdialog
 /				return 0 // hmmm. now what to do?
-			if !.WontCloseMainWindow(w)
-				return 0
+			|| Activity = .QuitBecauseWindowClosed(w)
+				return Activity
 			.Quitreason |= SDLActivity.activity
 			w.Close(SDLActivity.WindowClose)
 			.Quitreason |= SDLActivity.activity
@@ -1400,6 +1395,7 @@ datatype SDLActivity (byte)
 		|SDLActivity|
 		Nothing = 0
 		Activity
+		Questioning
 		WindowClose
 		ExitOrTerminate = [Exiting, Terminating]
 		StrongWindowClose = WindowClose+Exiting

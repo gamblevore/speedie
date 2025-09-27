@@ -118,17 +118,27 @@ class PerryIDE (Window)
 			proj["pos"] = .editme.sel0
 			Perry.save
 	
-			if proj.parent > 1
-				.RemoveProjFromList
 			|| p = .prev
 			if p isa perryide
 				p.showide
 			.clear
+			if perry.HasOthers(proj)
+				.RemoveProjFromList
+//			  else // the gui doesn't like this. it should be OK but leave it for now.
+//				StartupWindow.Show
+//				besides we would have asked to quit, perhaps.
+			
 			if .refcount > 1
 				Memory.PrintLeaks(self)
 		return true
 
-	
+	function Perry.hasOthers (|listviewrow| F, |bool|)
+		opt norefcounts
+		for w.fast in .Projects
+			if w != f
+				return true
+		
+		
 	function UpdateStatusErrors
 		.EditStatus.text = .PerryStatus
 
@@ -752,8 +762,7 @@ class PerryIDE (Window)
 	
 	
 		function PerryOpenDoc (GUIPasteEvent)
-			|| i = .ide
-			if i?
+			|| i = .ide?
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)

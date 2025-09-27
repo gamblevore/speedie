@@ -293,7 +293,7 @@ class Window (GUIControl)
 					(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.ReturnValue and .__TryClose__
+			if !.ReturnValue and .__TryClose__ // do we mean .TryCloseDialog?
 				.CancelReturn
 			return true
 	
@@ -445,25 +445,26 @@ class Window (GUIControl)
 		GUI.StartResize // sigh
 
 
-	helper GUI.AskQuit (|SDLActivity|)
-		|| Ask = "Quit " + app.AppName + "?"
-		.QuitReason = SDLActivity.Activity
+	helper GUI.AskQuitAndThenQuit (|SDLActivity|)
+/		|| Ask = "Quit " + app.AppName + "?"
+		.QuitReason = SDLActivity.questioning
 		if Ask.confirm
-			rz = .QuitCloseAll
+			rz = .AskQuitSub
 		.QuitReason = rz
 
 	
-	helper gui.QuitCloseAll (|SDLActivity|)
+	helper gui.AskQuitSub (|SDLActivity|)
 		opt norefcounts
-		rz = SDLActivity.Exiting
 		for w in Window.all
-			require w.__TryClose__(rz)
-	
+			require w.__TryClose__(SDLActivity.questioning)
+		for w in Window.all
+			w.Close(SDLActivity.Terminating)
+		return SDLActivity.Terminating
+		
 	
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
 		if self
-			if reason isnt terminating
-				require .__TryClose__(reason)
+			require .__TryClose__(reason) or reason is terminating
 			.ClearTree
 			.remove
 		return reason

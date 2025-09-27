@@ -100,22 +100,22 @@ function PerryIDE.SortedPrevious (|string| StrFilter = "", |message|)
 function PressingTabs (guiaction)
 	if self isa ButtonView
 		|| p = .submenu|listview|
-			|| ide = .ide
-			p.ListSource.clear
-			p <~ ("Copy " + ide.name, MenuCopyProject)
-			|| file = ide.path|string|
-			if file and file != ide.Project|string|
-				p <~ ( "Copy " + file.name, MenuCopyFile)
-			p <~ ("Show In Desktop", MenuShowProject)
-			p <~ ("Close", MenuCloseProject)
-			.OpenMenu(row)
+			|| ide = row.ide
+				p.ListSource.clear
+				p <~ ("Copy " + ide.name, MenuCopyProject, ide)
+				|| file = ide.path|string|
+				if file and file != ide.Project|string|
+					p <~ ( "Copy " + file.name, MenuCopyFile, ide)
+				p <~ ("Show In Desktop", MenuShowProject, ide)
+				p <~ ("Close", MenuCloseProject, ide)
+				.OpenMenu(row)
 
 
 function message.IDE (|perryide|)
 	opt norefcounts
 	if self
-		|| o = .obj as perryide
-/			return o // a leak!
+		|| o = .MenuIDE
+			return o
 		for w in window.all
 			if w isa PerryIDE
 				if .name ~= w.Project
@@ -129,32 +129,45 @@ function ClickedOpenRecent (GUIaction)
 			.OpenMenu
 
 
+function list.MenuIDE (|Perryide|)
+	opt norefcounts
+	|| o = .Obj
+	if o isa GuiControl
+		if o isa PerryIDE // leak!
+		return o.ide
+	
+	
 function MenuCopyProject (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
-	clipboard.notifiedtext = ide.project
+	|| ide = menu.MenuIde
+		clipboard.notifiedtext = ide.project
 
 
 function MenuCopyFile (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
-	clipboard.notifiedtext = ide.Path
+	|| ide = menu.MenuIde
+		clipboard.notifiedtext = ide.Path
 
 
 function MenuCloseProject (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
-	ide.Close
+	|| ide = menu.MenuIde
+		ide.Close
+
+function ClickedTabs (GUIAction)
+	opt norefcounts
+	|| i = row.ide
+		i.ShowIDE(True)
 
 
 function MenuShowProject (guimenuevent)
 	opt norefcounts
-	|| ide = .ide
-	ide.Project.Reveal
+	|| ide = menu.MenuIde
+		ide.Project.Reveal
 	
 
 function RightClickedTabs (GUIAction)
 	if row and self isa ButtonView
-		|| i = .ide
-		.FillMenuPath(i.Project, row)
+		|| i = row.ide
+			.FillMenuPath(i.Project, row)
 

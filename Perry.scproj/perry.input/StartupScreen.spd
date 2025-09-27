@@ -1,7 +1,7 @@
 
 
 
-class StartupWindow (window) // splashscreen, startupscreen, startwindow
+class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 	linkage: cpp_part ttup
 
 	behaviour TryClose
@@ -22,15 +22,13 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 				w.hide
 				w.closedialog
 
-		
 		function Show
 			opt norefcounts
 			|| w = .create
 			if GUI.startedproperly
 				(w)()
 			  else
-				w.show
-
+				w.Show
 
 		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
 			|| b = buttonview(._win,	fnc)
@@ -63,9 +61,9 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 			._win = rz
 			
 			with rz
-				.id				= "startup"
-				.size			= 200 by 140
-				.gnormal        = ¥.SystemStyle.copy
+				.id			   = "startup"
+				.size		   = 200 by 140
+				.gnormal       = ¥.SystemStyle.copy
 				.gnormal.solid = ((0.01, 0.05, 0.01, 0.9))
 				.ClickOutsideCloses = true
 				isnt visible

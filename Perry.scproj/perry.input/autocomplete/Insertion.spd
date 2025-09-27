@@ -369,9 +369,23 @@ helper String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind
 		  else
 			return -1
 		start += fwd.dir
-			
-	
-function textview.PerryInsertSyntax (|keys| Key, |int|)
+
+
+helper message.IsInAProperTmp (|bool|)
+	opt norefcounts
+	real self
+	while
+		self = .parent
+		if !self
+			return false
+		|| fn = .func
+		if fn == @arg
+			return false
+		if fn == @tmp
+			return true
+
+
+function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 	opt norefcounts
 	|| ide = .ide
 	if  key is escape  and  ide.PopupDateOn.ago > 0.5s
@@ -414,7 +428,10 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 		return 1
 	
 	if key == '\n'
-		require state != 10 
+		require state != 10
+		if (origkey < 0) and !(where and where.IsInAProperTmp)
+			return 0 // really... the special behaviour should be in here
+					 // we should just insert the text ourself, then tell the caller to NOT insert it.
 		if !s.width
 			require !self[s.x-1].istextline
 		if (state >= 3)  and  !s.width 
@@ -468,5 +485,5 @@ function string.IsSpd (|bool|)
 
 function guicontrol.IDE (|perryide!|)
 	opt norefcounts
-	if !self // sigh
+	real self
 	return (.window as perryide)!

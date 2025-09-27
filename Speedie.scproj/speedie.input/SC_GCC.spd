@@ -78,15 +78,19 @@ function LibSuff (|string|)
 		return "Mini"
 	return ""
 
+
 function ProjTmpPath (|string|)
-	return .tmpbase(.ProductBaseName)
+	|| t = .tmpbase(.ProductBaseName)
+	if !Options.SelfReplacement
+		|| fs = FastString()
+		fs.AppendHex(compiler.BaseProjectPath!.Hash|uint|)
+		// int64.hex would be nice....
+		t = t.child(fs)
+	return t
+
 
 function LibTmpPath (|string|)
 	return .tmpbase("Lib", true) + .LibSuff
-
-//function LogName (|string|)
-//	return .ProjTmpPath.child("build.txt")
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

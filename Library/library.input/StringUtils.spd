@@ -52,6 +52,7 @@ function byte.IsVowel (|bool|)
 function int.operatorof (|string| type, |string| nothing="", |string|)
 	return type.Pluralize(self, nothing)
 
+
 function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	cpp_part PluraliseAmount
 	if !amount and nothing
@@ -63,7 +64,10 @@ function string.Pluralize (|int| amount, |string| nothing="", |string|)
 	  else
 		fs <~ "no"
 	fs <~ " "
-	.Pluralize(fs)
+	if amount == 1
+		fs <~ self
+	  else
+		.Pluralize(fs)
 	return fs
 
 

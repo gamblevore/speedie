@@ -61,15 +61,9 @@ function Perry.CreateProj (|string| path)
 	IdeAddProj(path)
 
 	
-function ClickedTabs (GUIAction)
-	opt norefcounts
-	.ide.ShowIDE(True)
-
-
 function ClickedCompileTabs (Guiaction)
 	opt norefcounts
 	.ide.CompileTabSelect(row)
-
 
 	
 function PerryIDE.ShowCompileTab (|object| tab) // showtab
@@ -468,10 +462,11 @@ function PressedEditKeys (GUIKeyEvent)
 		if key is Decl
 			return .PerryDeclKey
 		
-		require key == -9 or -10 or 27
-		key = key.abs
 		
-		|| tabkind = .PerryInsertSyntax(key)
+		require key == -9 or -10 or 27
+		|| kabs = key.abs
+		
+		|| tabkind = .PerryInsertSyntax(kabs, key)
 			if tabkind == 1
 				.ide.EditMeTabRetryThing = 0
 			return true
@@ -527,6 +522,7 @@ function PerryIDE.ClickedFind (|error| row)
 
 
 function ErrorListPaste (guipasteevent)
+	require self
 	|| p = data.parse
 		|| errs = error.from(p)
 		|| i = .ide
