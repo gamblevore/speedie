@@ -268,10 +268,10 @@ struct Assembler
 	
 	function NopConst (|asmreg| R)
 		require r.reg
-		target debug: if r isnt Const //hah
+		target debug: if r isnt Const 		// hah
 
-		if R is temp				// don't think we can do better.
-			.AskNop(r.NeedFAT)		// not easily. for example .iscurr(f) gets params used by future stuff
+		if R is temp and r isnt blocknop	// don't think we can do better. not easily. 
+			.AskNop(r.NeedFAT)				// for example .iscurr(f) gets params used by future stuff
 	
 	
 	function Nop (|FATASM| ToNop)
@@ -285,6 +285,7 @@ struct Assembler
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+		// if "bounds".trap
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...

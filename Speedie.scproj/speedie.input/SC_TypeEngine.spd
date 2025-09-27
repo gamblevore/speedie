@@ -1095,7 +1095,8 @@ function TypeOfSwizzle (|message| exp, |SCNode| name_space, |message| side, |scd
 	|| W = Class_Space.type.NumericCount 
 	if (W > 1) and !exp.last.hasany
 		|| swz = exp.name.isSwizzle(W)
-			return TypeOfSwizSub(exp, Class_Space, name_space, side, swz)   // 
+			using exp
+			rz = TypeOfSwizSub(exp, Class_Space, name_space, side, swz)   // 
 
 
 function TypeOfDot (ExprResolver)

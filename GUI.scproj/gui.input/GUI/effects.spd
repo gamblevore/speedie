@@ -95,19 +95,19 @@
 //
 //	function Restore
 //		.tmp.copyto(.dest)
-
-
-
-helper image.OutlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
-    || s1 = .Sqrt(XY - Move * 1.5, scale)
-    || s2 = .Sqrt(XY + Move * 1.5, scale)
-    || s3 = .Sqrt(XY - Move, scale)
-    || s4 = .Sqrt(XY + Move, scale)
-
-    || sx = 4.0 * ((s4 + s3) - (s2 + s1))
-    || sy = 4.0 * ((s2 + s4) - (s1 + s3))
-
-    return sx*sx + sy*sy
+//
+//
+//
+//helper image.OutlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
+//    || s1 = .Sqrt(XY - Move * 1.5, scale)
+//    || s2 = .Sqrt(XY + Move * 1.5, scale)
+//    || s3 = .Sqrt(XY - Move, scale)
+//    || s4 = .Sqrt(XY + Move, scale)
+//
+//    || sx = 4.0 * ((s4 + s3) - (s2 + s1))
+//    || sy = 4.0 * ((s2 + s4) - (s1 + s3))
+//
+//    return sx*sx + sy*sy
 
 
 struct ImageTiler
@@ -164,8 +164,8 @@ struct ImageBlurrer
 		|| wd     = rd.Width
 		|| Start  = rd.Pixels + row*wd
 		|| wrp    = wr.pixels + row
-		|| wrMax  = wr.pixels + wr.size.area
-		|| wrend  = 1 + wrp + (wd-1) * stride
+//		|| wrMax  = wr.pixels + wr.size.area
+//		|| wrend  = 1 + wrp + (wd-1) * stride
 		|| v0 = .Weights[0]
 		|| x0 = .Extent
 		
@@ -189,8 +189,8 @@ struct ImageBlurrer
 
 
 
-function image.Sqrt (|vec2| P, |float| scale, |vec4|)
-	return (.interp(P)*scale).sqrt
+//function image.Sqrt (|vec2| P, |float| scale, |vec4|)
+//	return (.interp(P)*scale).sqrt
 
 
 function image.blur (|float| sigma)

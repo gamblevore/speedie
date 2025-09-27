@@ -119,6 +119,7 @@ class FlowControl
 			cpp_wrapper 
 			
 		function GetActiveFlow
+			opt norefcounts
 			|| str = app["flowmode"]
 			if str ~= "validate"
 				.Active = Validate

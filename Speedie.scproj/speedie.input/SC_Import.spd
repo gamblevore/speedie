@@ -105,6 +105,7 @@ class SCImport
 			  elseif s ~= "compile_linking"
 				Linkage.CompilerCollect(s)
 			  elseif s ~= "conf"
+				using s
 				compiler.SetConf(self, s)
 			  elseif s ~= "targets"
 				.IndexTargets(s)

@@ -1383,6 +1383,16 @@ function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
+function message.QCNV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.QCNV, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Mode
+	rz.dest(0, r1, a)
+}
+
+
 function message.FOPP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh

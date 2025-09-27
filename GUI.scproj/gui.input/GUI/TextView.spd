@@ -1996,13 +1996,16 @@ class TextView (GUIControl)
 		for c in self
 			if c.istextline
 				rz.y++
-				(rz.x max= w) 
+				if rz.x < w
+					rz.x = w
+//				(rz.x max= w) 
 				w = 0
 			  elseif c != '\t'
 				w++
 			  else
 				w += w.tabswidth
-		(rz.x max= w)
+		if rz.x < w
+			rz.x = w
 
 
 	function TextSize (|string| s, |ivec2|)

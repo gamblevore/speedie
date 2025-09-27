@@ -364,12 +364,16 @@ function ImportLibs
 
 
 function ImportProj 
+	opt norefcounts
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
 	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
 	|| proj = compiler.Project									#expect ("No user-project found.")
 	if !compiler.ConfMsg										// we need a conf, for prefs to work
 		|| conf = @tmp+"conf"
+		conf.Position = -2	// make ASM happy. I wonder if theres a way to say that it comes
+							// from an internal file.
+		using conf
 		conf["prefs"] = Compiler.ProjectName + ".box.pref"
 		.SetConf(proj, conf)
 
@@ -594,7 +598,8 @@ function LoadInitsAndMore
 
 
 function PostInitCodeCall
-	.program.initvarsarg <~ "initcode_()"~parse
+	if .program.initcodearg
+		.program.initvarsarg <~ "initcode_()"~parse
 
 
 function InitCompiler

@@ -19,7 +19,7 @@ class Breakout (Window)
 
 	constructor
 		.t = RayTracer(vec3(10, 6.25, -20))!
-		.t.background = &vshapes.Rainbows
+		.t.background = &vshapes.Rainbows()
 		.bar = (&vshapes.box).new(nil, nil)
 		(fpsview(self))
 		.reset

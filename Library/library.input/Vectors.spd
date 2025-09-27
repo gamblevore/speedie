@@ -85,7 +85,7 @@ datatype vec4
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
 
 	function Lum (|float|)
-		return .xyz.lum
+		return self|vec3|.lum
 
 	function Width (|float|)
 		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(

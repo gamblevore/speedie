@@ -258,9 +258,21 @@ JB_Object* strs (jb_vm& vm, ASM Op) {
 	return Str;
 }
 
+AlwaysInline void VecConv (VMRegister* r, ASM Op) {
+	// vec/ivec conversions
+	auto s = r + n2;
+	auto d = r + n1;
+
+    if (Convert_Modeu) {
+        d->Vec  = (vec4)(s->Ivec);
+	} else {
+		d->Ivec   = (ivec4)(s->Vec);
+    }
+}
+
 
 AlwaysInline void RegConv (VMRegister* r, ASM Op) {
-	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
+	// float, double, u64, s64. 12 conversions possible (and 6 pointless ones)
 	auto s = r + n2;
 	auto d = r + n1;
 
@@ -276,14 +288,14 @@ AlwaysInline void RegConv (VMRegister* r, ASM Op) {
 	    case 8 : d->Uint   = s->Float; 		break;
         case 9 : d->Uint   = s->Double;		break;
         case 10: d->Uint   = s->Uint;  		break; // just copies
-/**/    case 11: d->Uint   = s->Int;   		break;
+/**/    case 11: d->Uint   = s->Int;   		break; // actually pointless
         case 12: d->Int    = s->Float; 		break;
         case 13: d->Int    = s->Double;		break;
-        case 14: d->Int    = s->Uint;  		break;
+        case 14: d->Int    = s->Uint;  		break; // actually pointless
 /**/    case 15: d->Int    = s->Int;   		break; // just copies
     }
-    d = d;
-    s = s;
+//    d = d;
+//    s = s;
 }
 
 AlwaysInline void Time_ (VMRegister* r, ASM Op) {

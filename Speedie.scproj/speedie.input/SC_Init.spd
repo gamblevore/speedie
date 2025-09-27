@@ -34,13 +34,14 @@ module SC_Init
 			return
 		
 		expect c.AllowedMoveToInit (c)
-		
 		if c == @decl
 			require !c.SettingToNil
-			// if c contains "Stderr" // module glob fix
 			.InitVarsArg ?= .BuildInitArg
 			.InitVarsArg.first <~ c
 		  else
+//			printline c
+//			if c contains "GetActiveFlow"
+//			if (self == compiler.program) and !(c contains "ASM")
 			.InitCodeArg ?= .BuildInitArg
 			.InitCodeArg <~ c
 

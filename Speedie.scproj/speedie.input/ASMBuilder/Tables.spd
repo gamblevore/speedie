@@ -252,6 +252,18 @@ function TypeCast (fn_asm)
 	dest.µType = NewType
 	if from is Const
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
+	
+	|| OV = OldType.VecCount
+	|| NV = NewType.VecCount
+	if (OV|||NV) > 1
+		if OV>1 != NV>1 // oof?
+		if NewType.IsFloat == oldtype.isfloat
+			if dest iz from or dest is temp
+				return dest
+			return exp.VMOV(dest, from) * dest
+		return exp.QCNV(dest, from, OldType.isfloat|int|) * dest
+		
+		// lets do it
 		
 	if oldtype.isfloat or newtype.isfloat
 		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest

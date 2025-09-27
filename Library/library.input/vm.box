@@ -771,6 +771,9 @@ POS 5
 /**/ QNOT  (Shift)
 		uv1 = ~uv2 & ~(uv3 ||| Shift_Shu)
 
+/**/ QCNV (Convert)
+		VecConv(r, Op)
+
 
 
 

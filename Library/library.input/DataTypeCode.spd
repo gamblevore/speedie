@@ -72,34 +72,35 @@ datatype DataTypeCode (uint16)
 		if self isnt numeric
 			if self is bool
 				fs <~ "bool"
+			  elseif self is Pointer
+				fs <~ "pointer"
 			  else
 				fs <~ "non-numeric"
 		  elseif self == byte
 			fs <~ "byte"
 		  else
-			if !.IsSigned
-				fs <~ "u"
-			|| b = .ByteCount
-			if .IsInt
-				if b == 1
+			|| vc = .veccount
+			if vc > 1
+				if .isint
+					fs <~ "i"
+				fs <~ "vec"
+				fs <~ vc
+			  else
+				if !.IsSigned
+					fs <~ "u"
+				|| b = .ByteCount
+				if !.IsInt
+					fs <~ "float"
+					if b != 4
+						fs <~ b*8
+				  elseif b == 1
 					fs <~ "char"
 				  elseif b == 2
 					fs <~ "short"
 				  elseif b == 4
 					fs <~ "int"
-				  elseif b == 8 // what about ivec2?
+				  elseif b == 8
 					fs <~ "int64"
-				  elseif b == 16
-					if .issigned
-						fs <~ "i"
-					fs <~ "vec4" // not exactly true...
-			  else
-				fs <~ "float"
-				if b != 4
-					if b == 16
-						fs <~ "vec4"
-					  else
-						fs <~ b*8
 					
 		
 	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "inumericness"

@@ -317,6 +317,8 @@
 	uv1 = uv2 | (uv3 | Shift_Shu);
 ı QNOT: _
 	uv1 = ~uv2 & ~(uv3 | Shift_Shu);
+ı QCNV: _
+	VecConv(r, Op);
 ı FOPP: _
 	0;
 ı IOP2: _
