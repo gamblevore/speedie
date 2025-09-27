@@ -87,14 +87,12 @@ function WhileSub (|message| exp,  |asmreg|)
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)						// arg
 
 	|FatRange| loop_test
-	// how to step into this? Into the while-true
 	.Branch(exp.first!, loop_test)
 	if loop_test.never
 		return ASMReg()
 	
 	if loop_test.always
 		.Nop(InitialJump)	
-		// now what?
 		exp.JUMP.JumpTo(initialjump+1)
 		loop_test.after++
 	  else

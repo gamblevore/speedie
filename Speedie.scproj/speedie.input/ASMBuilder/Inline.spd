@@ -70,12 +70,12 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	opt norefcounts
 	|| Start = .curr
 	|| OV = .OpenVars
-	|ASMState| Old = .State				// can't use implicit types for barestructs
+	|ASMState| Old = .State						// can't use implicit types for barestructs
 	if dest isnt discard
 		if (!dest.reg or dest is temp)
 			|| type = fn.ASMReturn
 				dest = .declarebody(prms, type) // asmtodo: mark this as a declaration?
-											  // (shouldn't all declaremes be like that?)
+												// (shouldn't all declaremes be like that?)
 	
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
@@ -86,6 +86,8 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	dest = dest.simplify
 	dest.µtype = fn.ASMReturn.ASMRegType
 	.state.fn = fn
+	if !dest.reg
+		(dest is discard)
 	.state.Return = dest
 	.state.ParentVars = .openvars
 	.state.BranchDepth = 0

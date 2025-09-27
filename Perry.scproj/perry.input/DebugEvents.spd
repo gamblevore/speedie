@@ -278,18 +278,19 @@ function ClickedASMButton (guiaction)
 	|| v = i.ASMView
 	v.clear
 	if i.ASMVis
-		i.hideasm
+		i.HideASM
 		return true
 
 	i.CurrASMFunc = nil
 	expect (i.UpdateASM) (beep)
-	i.asmvis = true
+	i.ASMVis = true
 	v.AddFail "Displaying ASM..."
 
 
 
 function perryide.TryReselectASM (|bool|)
 	require !.DuringASMEvent and (.ASMVis)
+	if keys.option 
 	.DuringASMEvent = true
 	.UpdateASM
 	.ReselectASM
@@ -404,7 +405,8 @@ function SelectedASM (guilistevent)
 	require row
 	|| i = .ide
 	require !i.DuringASMEvent
-/	|| file = row.obj as string				#require
+	|| file = row.obj as string				#require
+	if keys.option 
 	|| f = row.first
 	|| n = f.int
 	i.DuringASMEvent = true
