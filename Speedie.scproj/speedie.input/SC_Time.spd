@@ -10,7 +10,7 @@ function compiler.PrintCompileTime (|date| durr)
 
 	|| N = StringCorrector.CppStrings.length
 	|| avg = StringCorrector.TotalSize div N
-	fs <~ "$N at "	
+	fs <~ "$N from "	
 	StringCorrector.TotalSize.strsize(fs)
 	fs <~ " // (avg "
 	fs.appendfloat(avg, 1)

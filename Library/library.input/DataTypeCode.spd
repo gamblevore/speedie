@@ -69,6 +69,7 @@ datatype DataTypeCode (uint16)
 	
 	
 	render
+		visible
 		self = self&PossibleBits
 		if self isnt numeric
 			if self is bool

@@ -1211,6 +1211,6 @@ markedlines
 
 document
 	source_material: "iChing"
-	author: "Richard Wilhelm"
+	author: "Richard Wilhelm"	// All original words by Richard Wilhelm
 	editor: "Theodore H. Smith" // I made this file... copying and fixing and editing.
 
