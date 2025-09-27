@@ -21,10 +21,6 @@ JBClass( FastString, JB_Object,
     JB_File*        File;
     int64           WrittenLength;
 
-    uint8*			RingBuffer;		// for shell-threads to append into ring-buffer
-	uint			RingRead;		// could make apps much more responsive!
-	uint			RingWrote; 		// main thread doesn't get blocked polling.
-
 	int 			Reserved;		// actual size of buffer. here for speeeed.
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
