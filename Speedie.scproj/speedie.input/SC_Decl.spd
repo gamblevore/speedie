@@ -794,6 +794,7 @@ class SCDecl (SCObject) {
 
 
 	function WriteVerySimpleType (|Message|)
+		opt norefcounts
 		rz = @Thg + .type.Name
 		for (.pointercount|int|)
 			rz = rz.wrapwith(@Brel, "&")
@@ -836,8 +837,10 @@ class SCDecl (SCObject) {
 			return @arg.msg
 		
 		rz = @type + ":)"
-		rz <~ @Arg
+		|| arg = rz.msg(@arg)
 		rz <~ .WriteType
+		arg.obj = self 
+		rz.obj = self // why not?
 	
 
 	function message.CreateNil (|message|)

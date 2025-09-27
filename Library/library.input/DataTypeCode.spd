@@ -63,8 +63,9 @@ datatype DataTypeCode (uint16)
 		PossibleBits = 1023
 	
 	
-	function DebugPrint
-		printline .Render
+	target debug
+		function DebugPrint
+			printline .Render
 	
 	
 	render
