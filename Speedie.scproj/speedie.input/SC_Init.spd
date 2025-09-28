@@ -13,6 +13,7 @@ module SC_Init
 	function SCModule.BuildInitArgSub (|message|)
 		rz = @arg.msg
 		rz <~ @arg
+		rz.msg(@tmp, "opt")<~(@thg, "norefcounts")
 		|| src = .source
 			|| ig = src.msg(@tmp, "ignore")
 			ig.Obj = self // ignore in the renderer.
@@ -27,20 +28,52 @@ module SC_Init
 				Return true
 
 
-	function SCModule.MoveToInitFunc (|Message| c)	
+	function SCModule.AvoidMain (|bool|)	
 		opt norefcounts
+		return (self == compiler.program) and !(compiler.project!.isstdlib)
+
+
+	function SCModule.InitDecls
+		description "Collects global decls from this module." 
+		opt norefcounts
+		|| a = .initvarsarg.First
+		if a.hasany
+			.Project.use
+			CollectDeclsGlobals( a, self )
+		if false and self == compiler.program
+			CollectDeclsGlobals( compiler.AppInitGlobals, self )
+//			SC_CollectDeclsGlobals(SC__Comp_AppInitGlobals, Self)		
+
+
+	function SCModule.MoveToInitFunc (|Message| c)
+		description "Put globally found decls+funcs, into a function that can be called at init-time. Each module will have an init-func... and it will be called if it has any code. We just store the stuff right now, but later, we create them via .CreateInitFunc"
+		
+		// (Why not create the init funcs right away? via .CreateInitFunc. I mean... its less confusing?)
+		
+		opt norefcounts
+
 		if (c == @sheb or @url)
 			c.remove
 			return
-		
 		expect c.AllowedMoveToInit (c)
+
+		if false and .AvoidMain
+/			if c == @decl
+				compiler.AppInitGlobals <~ c
+				return
+			  else
+				compiler.AppInitCode <~ c
+				return
+
+			
 		if c == @decl
 			require !c.SettingToNil
-/			.InitVarsArg ?= .BuildInitArg
-			.InitVarsArg.first <~ c
+			|| dest = .InitVarsArg init .BuildInitArg
+			dest = dest.first
+			dest <~ c
 		  else
-/			.InitCodeArg ?= .BuildInitArg
-			.InitCodeArg <~ c
+			|| dest = .InitCodeArg init .BuildInitArg
+			dest <~ c
 
 
 function Message.AllowedMoveToInit (|bool|)
@@ -48,11 +81,11 @@ function Message.AllowedMoveToInit (|bool|)
 	|| type = .func
 	if (type == @dot or @sdot or @func or @rel or @decl)
 		return true
-	if self istmp "once"
-		return true
+//	if self istmp "once" // inits are always once anyhow
+//		return true
 
 
-function SCModule.LoadInitFuncSub (|message| init, |string| name)
+function SCModule.CreateInitFuncSub (|message| init, |string| name)
 	|| msg = "helper $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
@@ -62,15 +95,15 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 			L.Remove // never called anymore?
 
 
-function SCModule.LoadInitFunc
+function SCModule.CreateInitFunc
 	SCNode.CurrVisibility = true
 	scmodule.Curr = self
 	|| arg = .InitCodeArg
-		.LoadInitFuncSub(arg, "InitCode_")
+		.CreateInitFuncSub(arg, "InitCode_")
 	
 	arg = .InitVarsArg
 	if arg
-		.LoadInitFuncSub(arg, "Init_")
+		.CreateInitFuncSub(arg, "Init_")
 	scmodule.curr = nil
 
 
@@ -116,7 +149,7 @@ function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
 		0 // this is such a wierd loop. But it works well. :)
 
 	
-function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_name)
+function SCModule.CallInit (|message| src, |message| dest, |string| fn_name)
 	opt norefcounts
 	require src and .HasActualCode(src) and (self != Compiler.program)
 	for s.flat in src
@@ -132,11 +165,6 @@ function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_nam
 	
 	dest.almostappend  dot2
 
-//	|| dot = @dot + fn_name
-//	dot <~ (@thg, .name)
-//	dot <~ @prm
-//	dest.almostappend  dot
-
 
 
 function message.AlmostAppend (|message| v)
@@ -148,29 +176,25 @@ function message.AlmostAppend (|message| v)
 		self <~ v
 	
 
-function message.InitTrap (|bool|)
-	if self contains "StdErr"
-		return true
-
-
-function SCModule.DelayedInitFuncTransform
+function SCModule.CallOurInitsByTheBiggerInitFunc
 	opt norefcounts
-/	|| v = .InitVarsArg
+	|| v = .InitVarsArg
 	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.IsLibrary)
 	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.IsLibrary)
+	.CallOurInitsByTheBiggerInitFunc(v, destvars, destcode)
 
-	// need to separate lib and not lib out.
-	|| it = v.first
-		for (msg in it)
-			// if msg.InitTrap // module glob fix
-			if (msg == @Decl)
-				|| name = msg.GetDclName
-					if name.InitRootDecl( msg, self )
-						msg.Remove
-		
-		.AddDelayedInit(v, destvars, "Init_")
 
-	.AddDelayedInit(.InitCodeArg, destcode, "InitCode_")
+function SCModule.CallOurInitsByTheBiggerInitFunc (|message| v, |message| destvars, |message| destcode)
+	opt norefcounts
+	.CallInit(.InitCodeArg, destcode, "InitCode_")
+
+	|| it = v.first									#require
+	for (msg in it)
+		if .InitRootDecl( msg )
+			msg.Remove
+	
+	.CallInit(v, destvars, "Init_")
+
 
 
 function SCModule.HasActualCode (|message|arg, |bool|)
@@ -182,32 +206,34 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 			return true // found something!
 
 
-function Message.InitRootDecl (|Message| DeclMsg, |SCNode| name_space, |bool|) {
+
+function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
 	// have an SCDecl... that should always already have a default! So why we are creating a default?
+
+	require (declmsg.func == @Decl)
+	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
 	
-	require .expect(@thg)
-	
-	|| decl = name_space.LookUpVarRootDecl( .name, self )
+	|| decl = .LookUpVarRootDecl( name.name, name )
 	if decl isa SCDecl
 		if decl.isbarestruct
 			return true
-		using (self)
+		using (name)
 
-		|| P = .parent
+		|| P = name.parent
 		|| NewDefault = (P.last, nil)(P == @Rel)
 			
 		if !NewDefault
 			if !Decl.IsNormal
 				return true
-			NewDefault = Decl.CreateDefault(self)
+			NewDefault = Decl.CreateDefault(name)
 			if (NewDefault and decl.contains)
 				NewDefault = decl.WriteTypeCast(NewDefault)
 				NewDefault.Obj = nil // just keep doing what it used to do
 		
 		if newdefault
 			if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
-				DeclMsg.Prev = NewRel( @thg + .name, NewDefault, "=" )
+				DeclMsg.Prev = NewRel( @thg + name.name, NewDefault, "=" )
 		Return true
 }
 

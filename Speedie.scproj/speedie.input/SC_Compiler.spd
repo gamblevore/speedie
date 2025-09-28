@@ -359,8 +359,8 @@ function ImportLibs
 	SCImport.Importpath( "Library",  Library,	1,  true )
 	SCImport.Importpath( "jeebox",   Jeebox,	1,  true )
 	
-	compiler.program.LoadInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
-	compiler.program.LoadInitFuncSub(.AppInitCode,    "InitAppCode_")
+	compiler.program.CreateInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
+	compiler.program.CreateInitFuncSub(.AppInitCode,    "InitAppCode_")
 
 
 function ImportProj 
@@ -500,7 +500,7 @@ function ImportAll
 
 	
 	require .Stage( "Initialising Modules And More" )
-	.LoadInitsAndMore
+	.CreateInitsAndMore
 
 
 	scimport.noproj
@@ -560,7 +560,7 @@ function ImportAll
 			c.RenameInterfaces
 
 	for m in SortInitOrder(.ModuleList)
-		m.DelayedInitFuncTransform
+		m.CallOurInitsByTheBiggerInitFunc
 	.PostInitCodeCall
 	
 	packmaker.LibGlobs.Sort(SimplestFirst)
@@ -592,12 +592,12 @@ function LoadSuperClasses
 		c.LoadSuperBehaviours
 
 
-function LoadInitsAndMore
+function CreateInitsAndMore
 	opt norefcounts
 	for m in .ModuleList
 		m.Use
 		m.LoadExportName
-		m.LoadInitFunc
+		m.CreateInitFunc
 
 
 function PostInitCodeCall
@@ -607,7 +607,7 @@ function PostInitCodeCall
 
 function InitCompiler
 	compiler.During = compilerstage.Initialising
-	require (.Projects.fileCH("Library").mustexist) and stderr.ok
+	require (.Projects.fileCh("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
 

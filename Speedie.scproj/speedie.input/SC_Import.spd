@@ -124,8 +124,9 @@ class SCImport
 	
 	function compiler.SetConf (|scimport| Proj, |message| conf)
 		|| arg = conf[@arg]
-			arg.remove
 			compiler.ConfMsg = arg
+			arg.remove
+			compiler.project = proj
 			// check Options.SelfReplacement, in case I alter how jbin works 
 			|| str = (arg.Render, arg.RenderJbin)(Options.SelfReplacement)
 			|| x = MakeDecl("", "__AppConfString", @str+str, scdeclinfo.compilercreated)

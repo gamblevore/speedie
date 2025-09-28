@@ -63,14 +63,7 @@ class SCFile (file)
 		.Proj.use // should be inside use?
 		CollectDeclsGlobals( .LiveAST, p )
 	
-	
-	function SCModule.InitDecls					// same as scfile.decls just different
-		|| a = .initvarsarg.First
-/		if a.hasany
-			.Project.use
-			CollectDeclsGlobals( a, self )
-	
-	
+		
 	function GetMsg (|int| pos, |message|)
 		opt norefcounts
 		for f.flat in .orig
