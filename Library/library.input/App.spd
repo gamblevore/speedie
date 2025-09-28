@@ -133,7 +133,8 @@ function Path (|string|)
 function PrintStackTrace
 	visible
 	cpp_name JB_PrintStackTrace
-	print .StackTrace
+	|| str = .StackTrace
+	print str
 
 
 render StackTrace (|int| skip = 2)

@@ -32,7 +32,7 @@ module LinkMap
 	function CollectAll
 		opt norefcounts
 		for (s in compiler.funclist) (i)
-			s.LinkID = i // tableid is set later after sort...
+			s.LinkID = i + 1		 // tableid is set later after sort...
 			.CollectLinksInOne(s)	 // so we use linkid instead
 		scfunction.currfunc = nil
 
@@ -67,7 +67,6 @@ extend SCFunction {
 
 function CollectLinks (|object!| obj)
 	opt norefcounts
-	
 	if obj isa SCBetterNode
 		return .DoLinkToNode(Obj)
 	
@@ -82,7 +81,7 @@ function Reach
 	.ReachFunc(Compiler.VisibleFuncs!)
 
 
-function ReachFunc (|SCNode| from)
+function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach 
 	opt norefcounts
 	flow off // memory order dependant!
 	

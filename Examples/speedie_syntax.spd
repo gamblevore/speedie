@@ -14,14 +14,7 @@ class Person
 		fs <~ "$.name's age is $.age"
 
 
-selector MaterialsLol
-	|string| oof 
-	items (
-		Pellets
-		Wood
-		Iron
-		WierdBlock
-	)
+ 
 
 
 main

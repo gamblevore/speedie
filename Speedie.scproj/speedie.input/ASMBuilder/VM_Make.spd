@@ -407,7 +407,7 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = f.VMMsgArgName(i)
-		|| rel = NewRel(@thg + pname, @thg + "nil", "=")
+		|| rel = NewEqRel(@thg + pname, @thg + "nil")
 		|| dcl = NewDecl(ty, rel)
 		fatdecl.prev = dcl
 		rdz[0] = i.msg

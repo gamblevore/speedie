@@ -28,21 +28,28 @@ module SC_Init
 				Return true
 
 
-	function SCModule.AvoidMain (|bool|)	
+	function SCModule.AvoidMain (|message| c, |bool|)	
 		opt norefcounts
-		return (self == compiler.program) and !(compiler.project!.isstdlib)
+		
+		require (self == compiler.program)
+		|| f = c.file
+			return !f.proj.isstdlib
+/		return !(compiler.project!.isstdlib) // never happens?
 
 
+	function scmodule.H (|bool|)
+		return true
+
+	
 	function SCModule.InitDecls
 		description "Collects global decls from this module." 
 		opt norefcounts
-		|| a = .initvarsarg.First
-		if a.hasany
+		|| a = .InitVarsArg.First
+		if a.HasAny
 			.Project.use
 			CollectDeclsGlobals( a, self )
-		if false and self == compiler.program
+		if .H and self == compiler.program
 			CollectDeclsGlobals( compiler.AppInitGlobals, self )
-//			SC_CollectDeclsGlobals(SC__Comp_AppInitGlobals, Self)		
 
 
 	function SCModule.MoveToInitFunc (|Message| c)
@@ -51,14 +58,15 @@ module SC_Init
 		// (Why not create the init funcs right away? via .CreateInitFunc. I mean... its less confusing?)
 		
 		opt norefcounts
-
+		
+		if c contains "xpi"
 		if (c == @sheb or @url)
 			c.remove
 			return
 		expect c.AllowedMoveToInit (c)
 
-		if false and .AvoidMain
-/			if c == @decl
+		if .H and .AvoidMain(c)
+			if c == @decl
 				compiler.AppInitGlobals <~ c
 				return
 			  else
@@ -179,24 +187,29 @@ function message.AlmostAppend (|message| v)
 function SCModule.CallOurInitsByTheBiggerInitFunc
 	opt norefcounts
 	|| v = .InitVarsArg
+	|| p = Compiler.program
+	if p == self
+		.InitDeclFixer(compiler.appinitglobals)		
 	if .IsLibrary
-		|| p = Compiler.program
 		.CallOurInitsByTheBiggerInitFunc(v, p.InitVarsArg, p.InitCodeArg)
 	  else
 		.CallOurInitsByTheBiggerInitFunc(v, compiler.appinitglobals, compiler.appinitcode)
 	
 
 
+function SCModule.InitDeclFixer (|message| list)
+	opt norefcounts
+	for msg in list
+		if .InitRootDecl( msg )
+			msg.Remove
+
+
 function SCModule.CallOurInitsByTheBiggerInitFunc (|message| v, |message| DestVars, |message| DestCode)
 	opt norefcounts
 	.CallInit(.InitCodeArg, destcode, "InitCode_")
-
-	|| it = v.first											#require
-	for (msg in it)
-		if .InitRootDecl( msg )
-			msg.Remove
-	
-	.CallInit(v, destvars, "Init_")
+	|| list = v.first
+		.InitDeclFixer(list)	
+		.CallInit(v, destvars, "Init_")
 
 
 
@@ -211,9 +224,6 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 
 
 function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
-	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
-	// have an SCDecl... that should always already have a default! So why we are creating a default?
-
 	require (declmsg.func == @Decl)
 	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
 	
@@ -225,8 +235,9 @@ function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 
 		|| P = name.parent
 		|| NewDefault = (P.last, nil)(P == @Rel)
-			
+		
 		if !NewDefault
+// this code seems wrong... these decls always have a default! So why create a default?
 			if !Decl.IsNormal
 				return true
 			NewDefault = Decl.CreateDefault(name)
@@ -236,7 +247,7 @@ function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 		
 		if newdefault
 			if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
-				DeclMsg.Prev = NewRel( @thg + name.name, NewDefault, "=" )
+				DeclMsg.Prev = NeweqRel( @thg + name.name, NewDefault )
 		Return true
 }
 

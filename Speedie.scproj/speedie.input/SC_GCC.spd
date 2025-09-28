@@ -165,6 +165,7 @@ function Clean (|bool|)
 	|| paths = "
 /tmp/Speedie
 /tmp/Speedie64
+/tmp/SpeedieSelf
 /tmp/SpeedieApps
 @spd/Speedie.scproj/BuildTest
 @spd/Speedie.scproj/BuildTest2

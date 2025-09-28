@@ -682,17 +682,18 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 
 || SyxID = 0
 function Tran_Syx (|Message| msg, |Message|)
-	// If the msg is a extend function (delayed processing), then its in the extendlist
-	// which is a message... so when we get "argplace" below, we end up getting the
-	// extendlist, meaning we now put a decl into the extendlist... which isnt what expected
-	// something seems wrong with the design? I guess its fixed by movetoinitfunc...
-	// but seems wrong somehow.
+	// this would be better doing file generation...
+	// perhaps with optional "instant" imports or "fixable" imports
+	// generating code and then instantly using it like this is
+	// so buggy and hard to debug. At least for when you are making
+	// radical compiler-internal changes. If the compiler is stable
+	// its fine.
 	
 	msg.name	= "helper"
 	|| name		= msg[@thg]							#require
 	|| arg		= msg.last(@arg)					#require
 	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )
-	|| Params	= msg.find(@bra).find(@thg)
+	|| Params	= msg.find(@bra)[@thg]
 
 	using (msg)
 	if !Params
@@ -709,12 +710,14 @@ function Tran_Syx (|Message| msg, |Message|)
 
 	|| longname = params.name
 	Params.Name = "fpMsgRender"
-
 	
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
 	Compiler.SyxArray <~ OldName
 
-	if !Options.ModePack // why cant packs use these? should I reenable it?
+	if !Options.ModePack				// why cant packs use these? should I reenable it?
+										// again... with the radical compiler-internal changes
+										// its easier to generate files than insert code.
+
 		|| dotnew = argplace.msg(@dot, "StdNew")
 		dotnew <~ (@thg, "syntax")
 		|| prm = dotnew.msg(@prm)

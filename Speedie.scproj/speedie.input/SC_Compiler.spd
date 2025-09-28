@@ -70,8 +70,8 @@ linkage
 |[SCImport]|				ImportedList
 |Dictionary of SCImport|	ImportedNames = Dictionary.new
 
-|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, return InitAppGlobals_()}`~parse).WipePos
-|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_}`~parse).WipePos
+|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, return InitAppGlobals_()}`~parse).WipePos
+|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
 
 |SCModule|					program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
@@ -796,7 +796,7 @@ function ModulesSorter (SorterComparer of scmodule)
 	return .name < b.name
 
 
-function SCFunction.ReachedDetect
+function SCFunction.ReachedDetect 
 	opt norefcounts
 	|| Base = Compiler.VisibleFuncs!
 	
