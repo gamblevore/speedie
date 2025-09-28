@@ -179,16 +179,19 @@ function message.AlmostAppend (|message| v)
 function SCModule.CallOurInitsByTheBiggerInitFunc
 	opt norefcounts
 	|| v = .InitVarsArg
-	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.IsLibrary)
-	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.IsLibrary)
-	.CallOurInitsByTheBiggerInitFunc(v, destvars, destcode)
+	if .IsLibrary
+		|| p = Compiler.program
+		.CallOurInitsByTheBiggerInitFunc(v, p.InitVarsArg, p.InitCodeArg)
+	  else
+		.CallOurInitsByTheBiggerInitFunc(v, compiler.appinitglobals, compiler.appinitcode)
+	
 
 
-function SCModule.CallOurInitsByTheBiggerInitFunc (|message| v, |message| destvars, |message| destcode)
+function SCModule.CallOurInitsByTheBiggerInitFunc (|message| v, |message| DestVars, |message| DestCode)
 	opt norefcounts
 	.CallInit(.InitCodeArg, destcode, "InitCode_")
 
-	|| it = v.first									#require
+	|| it = v.first											#require
 	for (msg in it)
 		if .InitRootDecl( msg )
 			msg.Remove
