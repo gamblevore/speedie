@@ -36,13 +36,10 @@ module SC_Init
 		expect c.AllowedMoveToInit (c)
 		if c == @decl
 			require !c.SettingToNil
-			.InitVarsArg ?= .BuildInitArg
+/			.InitVarsArg ?= .BuildInitArg
 			.InitVarsArg.first <~ c
 		  else
-//			printline c
-//			if c contains "GetActiveFlow"
-//			if (self == compiler.program) and !(c contains "ASM")
-			.InitCodeArg ?= .BuildInitArg
+/			.InitCodeArg ?= .BuildInitArg
 			.InitCodeArg <~ c
 
 
@@ -158,7 +155,7 @@ function message.InitTrap (|bool|)
 
 function SCModule.DelayedInitFuncTransform
 	opt norefcounts
-	|| v = .InitVarsArg
+/	|| v = .InitVarsArg
 	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.IsLibrary)
 	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.IsLibrary)
 

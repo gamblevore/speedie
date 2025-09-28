@@ -1153,11 +1153,7 @@ function Message.NextPath (|message| Before, |message?| path, |message|)
 	return path
 
 
-function Message.AddLinePositions	/*
-	cpp abc
-		file "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
-		pos 10
-		x++         */
+function Message.AddLinePositions
 	opt norefcounts
 	|message| path
 	for s.flat in self

@@ -49,8 +49,8 @@ constants
 	IncrAfter = 2
 	IncrBefore = 0
 	
-|asm_Read[10]|	ReadASM
-|asm_Write[5]|	WriteASM
+|asm[10]|	ReadASM
+|asm[5]|	WriteASM
 
 function InitAccess
 	|| R = &ASMType.ReadASM[0]

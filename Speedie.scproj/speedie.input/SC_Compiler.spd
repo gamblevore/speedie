@@ -393,12 +393,15 @@ function ImportAll
 	.Timer( "Read" )
 	require .Stage( "Finding Files" )
 	
+	if options.SelfReplacement
+		require VM_Builder.MakeTheVM
+
 	.ImportLibs
 	.ImportProj
 	SCImport.AllFiles.sort(&scimport.sorter) // or else file-dates can mess things up.
 	.PrepareAST
-	if options.SelfReplacement
-		require VM_Builder.MakeTheVM
+//	if options.SelfReplacement
+//		require VM_Builder.MakeTheVM
 
 	require .Stage( "Import" )
 	.Timer( "Import" )

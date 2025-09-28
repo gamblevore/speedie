@@ -64,9 +64,9 @@ class SCFile (file)
 		CollectDeclsGlobals( .LiveAST, p )
 	
 	
-	function scmodule.InitDecls // same as scfile.decls just different
+	function SCModule.InitDecls					// same as scfile.decls just different
 		|| a = .initvarsarg.First
-		if a.hasany
+/		if a.hasany
 			.Project.use
 			CollectDeclsGlobals( a, self )
 	
@@ -79,7 +79,7 @@ class SCFile (file)
 	
 	
 	function Orig (|message|)
-		if !.OrigAST// or .OrigDate < .Modified
+		if !.OrigAST							// or .OrigDate < .Modified
 			.OrigAST = .ASTSub(true)
 		return .OrigAST
 	
