@@ -488,7 +488,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 		|| o = b[ origname ]
 		if (!o)
 			continue
-		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program)
+		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program) and (b!=self)
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl

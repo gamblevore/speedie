@@ -113,7 +113,8 @@ linkage
 
 |SCModule|					DisamClasses
 |SCModule|					DisamModules
-|SCModule|					LibInit
+|SCModule|					DisamGlobals
+//|SCModule|					LibInit
 
 |byte|						InPerry
 |SCNodeInfo|				InBuiltType
@@ -658,12 +659,11 @@ function GeneratedCppsFolder (|File!|)
 
 
 function CreateDisambiguation
-	// classes.string, module.string, globals.whatever, etc.
-	// make a module...
+	// __classes__.string, __module__.string, __globals__.whatever, etc.
 
 	.DisamClasses = SCModule.NewContainer("__classes__")
 	.DisamModules = SCModule.NewContainer("__modules__")
-	.LibInit = SCModule.NewContainer("__libinit__")
+	Compiler.program.TryAdd( nil, Compiler.program, "__globals__" ) // still can't seem to access globals through this?
 
 
 function SoftClass (|string| name, |scclass|)
