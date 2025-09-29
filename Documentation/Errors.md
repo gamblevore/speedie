@@ -92,7 +92,7 @@ Jeebox can parse XML files, and JSON files too. Mostly aimed at importing and co
 
 Error handling is a skill to get right. Lets show some speedie code and then convert it to simpler code, to see how much worse the simple way is.
     
-    main (|File.a| F)
+    main (|File.Existing| F)
         || jobs = f.parse                  #require
         || list = jobs[@tmp, "jobs"][@arg] #require
         for job in list
