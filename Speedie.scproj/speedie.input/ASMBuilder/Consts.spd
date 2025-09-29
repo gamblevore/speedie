@@ -39,7 +39,7 @@ function fatasm.KNST_Encoder (Asm_encoder)
 
 
 extend Assembler
-	function MakeConstFromTwo (|&Assembler| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
+	function MakeConstFromTwo (|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |fn_ASMConstifier| fn,  |asmreg|)
 		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
 		.Nop2Consts(r, l)

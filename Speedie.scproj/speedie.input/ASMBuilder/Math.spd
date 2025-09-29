@@ -400,7 +400,7 @@ extend Assembler
 		
 	function IntPlus     (fn_opasm)
 		if dest is Const									// perhaps we can do this in domathsub?
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntPlus)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntPlus)
 		
 		|| swapped =  l isnt alternate  and  l.LeftScore < r.LeftScore
 			swap (l) (r) // a+b == b+a
@@ -446,7 +446,7 @@ extend Assembler
 
 	function FloatPlus (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatPlus)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
 			|| qq = .QuickFloat32Plus(exp, dest, l, r)
@@ -493,7 +493,7 @@ extend Assembler
 
 	function FloatMul (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatMul)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatMul)
 		rz = .QuickFloatMul(exp, dest, R, L)
 		if rz == nil
 			rz = .QuickFloatMul(exp, dest, L, R)
@@ -504,7 +504,7 @@ extend Assembler
 
 	function IntMul (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntMul)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntMul)
 		rz = .QuickIntMul(exp, dest, R, L)
 		if rz == nil
 			rz = .QuickIntMul(exp, dest, L, R)
@@ -515,7 +515,7 @@ extend Assembler
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
 		if dest is Const
-			return .MakeConstFromTwo(dest, Bule, V, exp, ConstifyBoolMul)
+			return .MakeConstFromTwo(exp, dest, Bule, V, ConstifyBoolMul)
 		rz = .QuickIntMul(exp, dest, Bule, V)
 		if !rz
 			rz = exp.TERN(dest, Bule, V, asmreg(), bule.small|int|) * Dest				// TERN
@@ -544,7 +544,7 @@ extend Assembler
 
 	function DivFloat    (fn_opasm)
 		if (dest is Const) and (l isnt alternate)
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatDiv)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatDiv)
 		rz = .QuickFloatDiv(exp, dest, L, R)
 		if rz == nil
 			if 0: exp.VDIV
@@ -573,7 +573,7 @@ extend Assembler
 
 	function DivInt    (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntDiv)
+			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntDiv)
 		|| q = .QuickIntDiv(exp, dest, l, r)
 			return q
 
@@ -593,7 +593,7 @@ extend Assembler
 
 	function ModInt    (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntMod)
+			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntMod)
 		|| fat = exp.DIV(asmreg(), dest, L, R, dest.signed|int|)
 		fat._Outputs &= ~1 // clear unused output 
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
@@ -601,7 +601,7 @@ extend Assembler
 
 	function ModFloat    (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, L, R, exp, Constifyfloatmod)
+			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, L, R, asmreg(), big).Vectorise(dest, asm.VDIV)
 		if 0: exp.vfrc
@@ -618,14 +618,14 @@ extend Assembler
 	function BitNot (fn_opasm)
 		if r.reg // what?
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, asmreg(), exp, ConstifyBitNot)
+			return .MakeConstFromTwo(exp, dest, l, asmreg(), ConstifyBitNot)
 		if 0: exp.BNOT, exp.qnot
 		return .BitMaker(dest, l, asmreg(), exp, asm.bnot, asm.qnot)
 
 
 	function BitXor (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitXor)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitXor)
 		if (l iz r)
 			return .Zeros(exp, dest)
 		if l.iszero
@@ -656,18 +656,7 @@ extend Assembler
 		if f and (f.op == type) and .IsCurr(f)
 			return f
 
-
-	function BitOr (fn_opasm)
-		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitOr)
-
-		if (l is Const)
-			swap (l) (r)
-
-		if dest isnt Textual
-			|| done = .MiniBOR(l,r)
-				return done.µtype(Dest)
-
+	function MiniBFLS (fn_opasm)
 		|| OldInput = .RemoveableInput(dest, L, asm.bflg)
 		if !OldInput
 			OldInput = .RemoveableInput(dest, R, asm.bflg)
@@ -678,8 +667,24 @@ extend Assembler
 			
 //		BFLG: r3, r2, 32, 16, 1
 //		BORR: r3, r3, r1, 0
+//		BFLS: r3
+
 //		BFLG: t31, r2, 32, 16, 1
 //		BORR: t31, r1, t31, 0
+
+	function BitOr (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r,  ConstifyBitOr)
+
+		if (l is Const)
+			swap (l) (r)
+
+		if dest isnt Textual
+			|| done = .MiniBOR(l,r)
+				return done.µtype(Dest)
+		
+		|| opted = .MiniBFLS(exp, dest, l, r)
+			return opted
 
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
@@ -695,7 +700,7 @@ extend Assembler
 
 	function BitAnd (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitAnd)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitAnd)
 		if (l iz r)
 			return l
 		|| k = .BitAndNop(exp, dest, l, r)
@@ -763,7 +768,7 @@ extend Assembler
 		
 	function SHR  (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
+			return .MakeConstFromTwo(exp, dest, l, r, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
 		|| K = .const(R, 6, false)
 			if k == 0
 				return L
@@ -781,7 +786,7 @@ extend Assembler
 
 	function SHL  (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitSHL)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitSHL)
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
 		
