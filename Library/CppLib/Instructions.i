@@ -89,7 +89,7 @@
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
 ı BFLS: _
-	u1 |= (u2 << BFLD_upu) >> BFLD_downu;
+	u1 = u2 | (u3 << Shift_Shu);
 ı BRSS: _
 	i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3;
 ı BRSH: _

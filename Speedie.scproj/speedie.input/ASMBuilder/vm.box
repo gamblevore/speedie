@@ -482,8 +482,8 @@ POS 5
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
-/**/ BFLS  (BFLS)
-		u1 |= (u2 << BFLD_upu) >> BFLD_downu
+/**/ BFLS  (Shift)
+		u1 = u2 ||| (u3 << Shift_Shu)
 /**/ BRSS  (Shift)
 		i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3
 /**/ BRSH  (Shift)
