@@ -2,12 +2,9 @@
 
 // Just an example project!
 
-|| X = (app["exclude"] ?? "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal")
-|| Excludes = (X  /  ',')
-
 main (|file.existing| input)
 	|| out = app.Process(input)
-		"${out.name}: ${out.size.strsize}"
+		"$out: ${out.size.strsize}"
 	
 	
 function app.Process (|file| input, |file|)
@@ -19,11 +16,12 @@ function app.Process (|file| input, |file|)
 	out.file = rz
 	out.AddStr(input.name)
 	out.Enter
-	out.ArchiveSub(input)
+	|| X = app["exclude"] ?? "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal,*.app,*.note,*.arc,*(experimental)*"
+	out.ArchiveSub(input, X  /  ',')
 	out.Exit(2)
 	
 
-function jbin.ArchiveSub (|file| Item)
+function jbin.ArchiveSub (|file| Item, |[string]| Excludes)
 	if !item.isdir
 		"$item"
 		.enter(@tmp, item)
@@ -33,9 +31,9 @@ function jbin.ArchiveSub (|file| Item)
 		
 	for ch.files in item
 		if ch.lowercase globbed_by Excludes
-			"!! $ch"
+			if app.yes("n"): "!! $ch"
 		  elseif !ch.isSymlink or !ch.isdir
-			.ArchiveSub(ch)
+			.ArchiveSub(ch, excludes)
 	
 
 function app.UnArchive (|file| input, |file|)

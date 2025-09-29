@@ -1998,7 +1998,7 @@ function NeuMain (CollectFunc)
 	
 	|| fn_src = node.MainFix
 		|| app = fn_src.first.first!
-/		|| m = compiler.FindModuleMsg(app)
+		|| m = compiler.FindModuleMsg(app)
 		
 		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
 		if rz isa scmodule // sigh. Not ideal.

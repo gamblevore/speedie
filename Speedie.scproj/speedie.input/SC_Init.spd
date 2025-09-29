@@ -34,7 +34,7 @@ module SC_Init
 		require (self == compiler.program)
 		|| f = c.file
 			return !f.proj.isstdlib
-/		return !(compiler.project!.isstdlib) // never happens?
+		return !(compiler.project!.isstdlib) // never happens?
 
 
 	function SCModule.InitDecls
