@@ -59,8 +59,7 @@ class SCFile (file)
 		if self
 			(.Types init []) <~ c
 	
-	function CollectGlobals (|SCNode| p)
-		.Proj.use // should be inside use?
+	function CollectGlobals (|SCModule| p)
 		CollectDeclsGlobals( .LiveAST, p )
 	
 		

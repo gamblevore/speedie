@@ -156,21 +156,19 @@ function scclass.CollectProp (|Message| msg, |bool|)
 
 
 // remove these... but later.
-function CollectDeclsGlobals (|Message| arg, |SCNode| SCArg)
+function CollectDeclsGlobals (|Message| arg, |SCmodule| Mod)
 	opt norefcounts
-	if scarg isa SCModule
-		SCModule.Curr = SCArg
+	mod.use
+		
 	for item in arg
 		if item == @decl
-			require item.CollectAGlobalDecl(scarg)
+			require item.CollectAGlobalDecl(Mod)
 
 
 function scdecl.ForContained (|scdecl|) // notglobal, noglobal
 	|| Strong = (.NilDeclared isnt nilish) and .typesuffers
 	if (self isnt global) and !.name and !strong 
 		return self
-	// strange that it can have a name and be marked as !
-	// surely... all contained classes can be nil?
 	rz = .copydecl
 	rz.name = ""
 	rz.nildeclared |= nilstate.nilish
@@ -194,18 +192,19 @@ function scdecl.AsLocal (|scdecl|)
 	(rz is local)
 
 
-function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
+function Message.CollectAGlobalDecl (|SCModule| Mod, |bool|)
 	opt norefcounts
 	|| f = .file
 		f.proj.decllayer.use
 	
-	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals)		#require
+	|| dcl = .CollectDecl(Mod, Mod, declmode.Globals)		#require
 	|| def = dcl.Default
 	if def and !dcl.nilstated
 		|| d = def.MsgDecl
 		if d and d.StatedReal
 			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
-
+	
+	(mod.Globals init []) <~ dcl
 	return dcl.AddToGlobs
 
 

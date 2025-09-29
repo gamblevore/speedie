@@ -4,7 +4,7 @@
 */
 
 
-class SCObject
+class SCObject 
 	|string|					Name
 	|string|					ExportName
 	|[SCFunction]?|				LinkFrom

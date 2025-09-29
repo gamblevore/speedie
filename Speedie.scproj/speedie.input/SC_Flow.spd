@@ -14,7 +14,7 @@ insertion
 
 
 target Debug
-	function scfunction.syntaxequals (|string| name, |bool|)
+	function scobject.syntaxequals (|string| name, |bool|)
 		opt norefcounts
 		require (self)	
 		if .Name.SyntaxEquals( name, true )		// never needs !aware.
@@ -32,7 +32,7 @@ target Debug
 				printline msg
 			return true
   else
-	function scfunction.syntaxequals (|string| name, |bool|)
+	function scobject.syntaxequals (|string| name, |bool|)
 		(name), visible
 	function string.trap (|message| msg=nil, |bool|)
 		(msg), visible

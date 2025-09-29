@@ -9,8 +9,6 @@ module SCStrings
 
 
 extend_module SCFunction {
-
-
 SCStrings.RenderInsides = "
 	|| fs = FastString.New(fs_in)
 	finish

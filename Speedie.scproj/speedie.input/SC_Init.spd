@@ -37,18 +37,14 @@ module SC_Init
 /		return !(compiler.project!.isstdlib) // never happens?
 
 
-	function scmodule.H (|bool|)
-		return true
-
-	
 	function SCModule.InitDecls
 		description "Collects global decls from this module." 
 		opt norefcounts
 		|| a = .InitVarsArg.First
+		// would be nicer to use .globals
 		if a.HasAny
-			.Project.use
 			CollectDeclsGlobals( a, self )
-		if .H and self == compiler.program
+		if self == compiler.program
 			CollectDeclsGlobals( compiler.AppInitGlobals, self )
 
 
@@ -57,6 +53,10 @@ module SC_Init
 		
 		// (Why not create the init funcs right away? via .CreateInitFunc. I mean... its less confusing?)
 		
+		// So... we also want a simpler initarg thing. We have a nested arg. Why?
+		// just to separate things into two groups? We can use a marker for that.
+		// even the opt norefcounts could be one.
+		
 		opt norefcounts
 		
 		if (c == @sheb or @url)
@@ -64,23 +64,19 @@ module SC_Init
 			return
 		expect c.AllowedMoveToInit (c)
 
-		if .H and .AvoidMain(c)
-			if c == @decl
-				compiler.AppInitGlobals <~ c
-				return
+		|message| dest 
+		if .AvoidMain(c)
+			if c != @decl
+				dest = compiler.AppInitCode
 			  else
-				compiler.AppInitCode <~ c
-				return
-
-			
-		if c == @decl
+				dest = compiler.AppInitGlobals
+		  elseif c == @decl
 			require !c.SettingToNil
-			|| dest = .InitVarsArg init .BuildInitArg
+			dest = .InitVarsArg init .BuildInitArg
 			dest = dest.first
-			dest <~ c
 		  else
-			|| dest = .InitCodeArg init .BuildInitArg
-			dest <~ c
+			dest = .InitCodeArg init .BuildInitArg
+		dest <~ c
 
 
 function Message.AllowedMoveToInit (|bool|)
@@ -88,8 +84,6 @@ function Message.AllowedMoveToInit (|bool|)
 	|| type = .func
 	if (type == @dot or @sdot or @func or @rel or @decl)
 		return true
-//	if self istmp "once" // inits are always once anyhow
-//		return true
 
 
 function SCModule.CreateInitFuncSub (|message| init, |string| name)
@@ -163,36 +157,21 @@ function SCModule.CallInit (|message| src, |message| dest, |string| fn_name)
 		if s.position < 0
 			s.position = 0
 	using src
-	dest.AlmostAppend  @sheb + ("// " + .Name)
-
-	|| dot2 = «dot fn_name
-«thg .name »
-«prm »
-	»
-	
-	dest.almostappend  dot2
-
-
-
-function message.AlmostAppend (|message| v)
-	opt norefcounts
-	|| s = .last
-	if s == @tmp
-		s.prev = v
-	  else
-		self <~ v
+	dest <~ (@sheb, "// " + .Name)
+	|| dot2 = dest.msg(@dot,  fn_name)
+	dot2 <~ (@thg, .name)
+	dot2 <~ @prm
 	
 
 function SCModule.CallOurInitsByTheBiggerInitFunc
 	opt norefcounts
-	|| v = .InitVarsArg
 	|| p = Compiler.program
 	if p == self
 		.InitDeclFixer(compiler.appinitglobals)		
 	if .IsLibrary
-		.CallOurInitsByTheBiggerInitFunc(v, p.InitVarsArg, p.InitCodeArg)
+		.CallOurInits(p.InitVarsArg, p.InitCodeArg)
 	  else
-		.CallOurInitsByTheBiggerInitFunc(v, compiler.appinitglobals, compiler.appinitcode)
+		.CallOurInits(compiler.appinitglobals, compiler.appinitcode)
 	
 
 
@@ -203,12 +182,12 @@ function SCModule.InitDeclFixer (|message| list)
 			msg.Remove
 
 
-function SCModule.CallOurInitsByTheBiggerInitFunc (|message| v, |message| DestVars, |message| DestCode)
+function SCModule.CallOurInits (|message| DestVars, |message| DestCode)
 	opt norefcounts
 	.CallInit(.InitCodeArg, destcode, "InitCode_")
-	|| list = v.first
+	|| list = .InitVarsArg.first
 		.InitDeclFixer(list)	
-		.CallInit(v, destvars, "Init_")
+		.CallInit(list.parent!, destvars, "Init_")
 
 
 

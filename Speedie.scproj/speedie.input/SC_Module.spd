@@ -11,8 +11,9 @@ linkage
 
 |int|						ModuleNum
 |SCClass?|					Cls
-|Message?|					InitVarsArg
+|Message?|					InitVarsArg // remove this and use .globals?
 |Message?|					InitCodeArg
+|[scdecl]?|					Globals
 |string|					CppPart
 |CppRefs|					DefaultRefs
 |message?|					InitAfter
@@ -22,6 +23,7 @@ linkage
 
 
 constructor
+	.globals = nil
 	.defaultrefs = cpprefs.new
 	|| c = compiler.modulelist
 	if (c? != nil)
@@ -49,6 +51,11 @@ function IsProperModule (|bool|)
 	if (.parent == compiler.program) and (.source == nil)
 		return false
 	return true
+
+
+function Use
+	super.Use
+	scmodule.curr = self
 
 
 function SCDecl.PrefixedName (|faststring| fs, |SCModule| M)
@@ -88,11 +95,6 @@ function DictionaryReader.ValueDecl (|scdecl|)
 			return t
 
 
-//function IsProject (|bool|)
-//	opt norefcounts
-//	return .Project.Mod? == self
-
-
 function NewModuleFunc (|Message| src, |SCFunction|)
 	rz = SCFunction.NewFunc( src, self, src )|SCFunction|
 	if rz
@@ -100,7 +102,6 @@ function NewModuleFunc (|Message| src, |SCFunction|)
 
 
 function BaseDecls 
-	.Use
 	CollectDeclsGlobals( .source, self ) // right?
 
 
