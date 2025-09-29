@@ -70,7 +70,7 @@ linkage
 |[SCImport]|				ImportedList
 |Dictionary of SCImport|	ImportedNames = Dictionary.new
 
-|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts}`~parse).WipePos
+|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, InitAppGlobals_()}`~parse).WipePos
 |Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
 
 |SCModule|					program = InternalFile.Proj.Mod
@@ -687,7 +687,6 @@ function FindClassType (|message| n, |scdecl|)
 		m = compiler.program
 	|| c = m.findclassmsg(n)
 		return c.typenormal
-
 
 function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
 	return compiler.program.FindModulemsg(where, Mode)
