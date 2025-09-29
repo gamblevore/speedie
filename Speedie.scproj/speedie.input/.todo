@@ -19,6 +19,7 @@ Bugs:
 
 
 class-changes:
+	* allow @«11 "str"» for extensible jbin/jeebox parse/render. Future proof for when older parsers get newer data.
 	* FixedDict! Replace dictionary
 	* Saving... should work as ONE stream. Maybe 1 or 2 phases. (Collects objects + write objects, but don't separate into classes.). Allows tighter compression, simpler-saving-code, etc. Makes it easier to work into an archiving system even!!! Faster saving too, just copy entire object. Needs a "SaveProperty true/false" temporal... Just use save-marking to stop saving objects twice. Need one array to clear the save-marks. dicts can use a special value to mark "end"
 		* Actually... speed isn't the issue. SIMPLICITY is. more than fast enough.
