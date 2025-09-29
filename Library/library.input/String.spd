@@ -497,12 +497,11 @@ class String
 //		function Uniqify (|dictionary of string| D)
 //			cpp_wrapper JB_Str__Uniqify
 
-		function Byte (|int| b, |string|)
+		function Byte (|int| b, |string--|)
 			cpp_wrapper JB_Str__Byte
 		
 		syntax Access (|int|b, |string|)
 			disabled ".char or .byte?"
-			return .byte(b)
 
 		function Char (|codepoint| c, |string|)
 			cpp_wrapper JB_Str_ChrUTF8
@@ -717,6 +716,10 @@ function array.Remove (|array of string| self, |string| item, |bool| CaseAware=t
 		if s.SyntaxCompare(item, CaseAware) == 0
 			.remove(ind)
 
+
+function array.join (|array of string| self, |byte| sep = '\n', |string|)
+	cpp_part JoinByte
+	return .join(string.byte(sep))
 
 function array.join (|array of string| self, |string| sep = "", |string|)
 	flow off
