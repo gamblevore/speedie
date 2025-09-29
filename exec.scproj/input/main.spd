@@ -6,7 +6,7 @@
 main
 	opt NoRefCounts
 	
-	return app.DebugProj
+	return .DebugProj
 	
 
 	error.AutoPrint = 1

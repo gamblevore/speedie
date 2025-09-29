@@ -542,7 +542,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 				ifn o isa SCFunction
 					Return o 			// canfunction is false
 				ifn exp in @dot			// x = a.b is still a function call
-					|| err = "Function must have a prototype."		// what about the side thing?
+					|| err = "Can't get the address of a function unless it has a prototype."
 					if side and !paramsarray.MacroSize
 						err = "Not assignable."
 					check (o|scfunction|.HasProto) (exp, err)

@@ -8,12 +8,12 @@ app.usage = "Usage: size path [...]
 |bool|		ShowInvis = app.yes("v")
 ||			Types = app["types"].trim.dict('/')
 |[message]| Found
-||			cwd = app.cwd
 
 
 main (|[file]| FileList)
 	if !FileList
-		Quit app.Usage
+		Quit .Usage
+	|| cwd = .cwd
 	if cwd == "/": cwd = ""
 
 	for F in FileList

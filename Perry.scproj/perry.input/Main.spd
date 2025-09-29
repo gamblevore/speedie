@@ -5,8 +5,8 @@ import "GameExamples/tetris.spd"
 
 
 main
-	if app.Yes("crash")
-		app.Crash
+	if .Yes("crash")
+		.Crash
 	GUI.Init
 	Perry.Startup
 	notifications.ShowTip( file://tips.box )
