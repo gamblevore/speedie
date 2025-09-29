@@ -2,10 +2,9 @@
 
 || Fails = faststring()
 
-
 main (|[string]| Files)
 	if !files
-		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn()
+		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn
 			app.Sleep(1s)
 			printline proc.ReadStdOut
 			printline proc.Status
