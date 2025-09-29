@@ -293,7 +293,7 @@ function @scfunction.NameList (|string|)
 
 function @scfunction.TransformAll 
 	opt norefcounts
-	Compiler.AppInitCode <~ "return InitAppGlobals_()"~parse
+//	Compiler.AppInitCode <~ "return 0"~parse
 	Compiler.During = compilerstage.Transform
 	for f in compiler.FuncList
 		require !stderr.TooMany
@@ -1990,13 +1990,16 @@ function message.MainFix (|message|)
 
 
 function NeuMain (CollectFunc)
+	opt norefcounts
+	
 	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
 	if scimport.CurrIsManuallyImported
 		return Compiler.program			// ignore imported mains
 	
-	|| fn_src = node.mainfix
-//		Compiler.HasMainFunc = true
-		|| m = compiler.Project!.mod
+	|| fn_src = node.MainFix
+		|| app = fn_src.first.first!
+/		|| m = compiler.FindModuleMsg(app)
+		
 		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
 		if rz isa scmodule // sigh. Not ideal.
 			compiler.MainFunc = scclass.ProcessExtend(fn_Src, false, m)
