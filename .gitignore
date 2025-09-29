@@ -47,3 +47,4 @@ jeebox.scproj/Cpp/JB_Globals.cpp
 /Examples/(experimental)
 Examples/books_xml/books.box
 *.zpd
+/Bangle

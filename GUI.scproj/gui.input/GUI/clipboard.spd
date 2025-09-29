@@ -21,11 +21,15 @@ module Clipboard
 		expect (s) (beep)
 
 		_internalcopy = ""
-		|| c = (s.TabsToSpaces, s)(keys.shift)
-		|| z = c.cstr
-		|| err = .SDL_SetClipboardText(z.addr|cstring|)
+		
+		|| c = s
+		if keys.Shift
+			c = c.TabsToSpaces
+			Notifications <~ "Copied (without tabs):\n" + c.Preview(128)		
+		c = c.cstr
+		|| err = .SDL_SetClipboardText(c.addr|cstring|)
 		if (err!=0) // or s.FindBadUTF8		// osx might fail anyhow
-			_internalcopy = s
+			_internalcopy = c
 			Notifications.NotifySDLError		
 	
 	
