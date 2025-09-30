@@ -390,12 +390,10 @@ module JB_API
 
 
 	function message.Nil (|bool|)
-		opt inline
 		cpp_name JB_Msg_NilCheck
 		return self or JB_API.NilHandler
 
 	function syntax.Nil (|bool|)
-		opt inline
 		cpp_name JB_Syx_NilCheck
 		return self or JB_API.NilHandler
 

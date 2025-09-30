@@ -126,11 +126,9 @@ struct FatASM
 		.msg = Value
 
 	function Index (|uint|)
-		opt inline
 		return self - Assembler.sh.funcstart_
 
 	function uint.FAT (|&FATASM|)
-		opt inline
 		if self
 			return Assembler.sh.funcstart_ + self
 	
@@ -261,9 +259,7 @@ struct FatASM
 	
 	
 	function RegInput (|int| a, assigns:|asmreg|)
-		cpp_part Prm
-		opt inline
-		
+		cpp_part Prm		
 		|| i = value.FatIndex
 		.prms[a] = value.Prm
 		.InputPrms |= 1<<a
@@ -287,7 +283,6 @@ struct FatASM
 		
 		
 	function CheckHasOutput 
-		opt inline
 		target debug {
 		opt norefcounts
 		for (b.bits in ._outputs|int|) (i)

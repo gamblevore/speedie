@@ -162,7 +162,6 @@ function Write (|asmreg| Value, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |s
 
 
 function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
-	opt inline
 	if dest is set					  // kludge to remove
 		(dest is discard)			  // make compiler happy
 	  else

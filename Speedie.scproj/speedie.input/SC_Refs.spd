@@ -718,7 +718,7 @@ function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 	if ch.RefDisappears
 		|| fnc = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
 		msg.Prev = fnc
-		msg.CheckFreeIfDeadValid
+//		msg.CheckFreeIfDeadValid
 		fnc.Last <~ msg
 		return
 	
@@ -941,9 +941,9 @@ function scdecl.RefDestructor (|message|)
 	return SCRefs.RefClearMsg( m )
 
 
-function message.CheckFreeIfDeadValid
-	opt inline
-	opt norefcounts
-	check (self == @func) (self, "assumption #749 invalid") // JB_FreeIfDead should exist on function calls.
+//function message.CheckFreeIfDeadValid
+//	opt inline
+//	opt norefcounts
+//	check (self == @func) (self, "assumption #749 invalid") // JB_FreeIfDead should exist on function calls.
 
 

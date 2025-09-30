@@ -516,12 +516,10 @@ Struct FatRange
 	
 	
 	function Always (|bool|)
-		opt inline
 		return .Constness.KnownTrue
 	
 	
 	function Never (|bool|)
-		opt inline
 		return .Constness.KnownFalse
 	
 	iterator

@@ -555,6 +555,14 @@ JB_Object** JB_Dict_MakePlace(Dictionary* self, JB_String* key) {
     return 0;
 }
 
+JB_Object** JB_Dict_GetPlace(Dictionary* self, JB_String* key) {
+    FindResult F;
+    if (CanFind_(self, key, &F)) {
+        return F.Place;
+    }
+    return 0;
+}
+
 
 JB_Object* JB_Dict_Value(Dictionary* self, JB_String* key, JB_Object* Default) {
     FindResult F;

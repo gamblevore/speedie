@@ -33,6 +33,9 @@ class Dictionary (saveable)
 	function MakePlace (|string?| key, |&...|)
 		cpp_wrapper JB_Dict_MakePlace
 		
+	function GetPlace (|string?| key, |?&...|)
+		cpp_wrapper JB_Dict_GetPlace
+		
 	syntax Access (|uint64| Key, assigns:||)
 		opt norefcounts
 		cpp_part SetInt
@@ -43,14 +46,14 @@ class Dictionary (saveable)
 		cpp_part ValueInt
 		return self[key|int64|._DictName]
 	
-	function Longest (|string| key, |&int| LengthFound, ||)
-		cpp_wrapper JB_Dict_Longest
+//	function Longest (|string| key, |&int| LengthFound, ||)
+//		cpp_wrapper JB_Dict_Longest
 
 	function Find (|string| match, |$ivec2| Found, ||)
 		cpp_wrapper JB_Dict_FindStr
 	
-	syntax append (|message| m) // don't we normally want to lower-case this?
-		self[m.name] = m
+//	syntax append (|message| m) // don't we normally want to lower-case this?
+//		self[m.name] = m
 	
 	function ValueLower (|string?| s, ||)
 		if s.islower

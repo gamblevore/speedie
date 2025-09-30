@@ -171,7 +171,6 @@ struct ArchonPurger
 
 
 	function Value (|nilrecord|)
-		opt inline
 		return .Neel[]
 	
 	
@@ -180,7 +179,6 @@ struct ArchonPurger
 
 
 	setter Value (|NilRecord| Dest)
-		opt inline
 		.neel[] = dest & .Realnesses
 
 
@@ -195,16 +193,13 @@ struct ArchonPurger
 			.Loops.BeginLoop(hasexitcond)
 
 		function Value (|NilRecord|)
-			opt inline
 			return t.value
 
 		function EndBlock (|nilrecord|)
-			opt inline
 			rz = .value
 			t.value = nilstate.basic
 
 		function DeclKill
-			opt inline
 			t.value = nilstate.Basic
 
 		function ExterminateZergBugs (|SCFunction| f)

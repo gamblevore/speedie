@@ -21,6 +21,7 @@ void JB_Dict_AddRaw(Dictionary* self, uint8* key, int Length, JB_Object* Object)
 void JB_Dict_IntValueObjSet(Dictionary* self, s64 Key, JB_Object* Value);
 JB_Object* JB_Dict_IntValueObj(Dictionary* self, s64 Key);
 JB_Object** JB_Dict_MakePlace(Dictionary* self, JB_String* key);
+JB_Object** JB_Dict_GetPlace(Dictionary* self, JB_String* key);
 void JB_Dict_ValueSet(Dictionary* self, JB_String* key, JB_Object* val);
 JB_Object* JB_Dict_Value(Dictionary* self, JB_String* key, JB_Object* Default) ;
 JB_Object* JB_Dict_ValueC(Dictionary* self, const char* Addr);

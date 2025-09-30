@@ -73,14 +73,6 @@ function JumpWithinBool (NilTrackerFn)
 	t.InsideBoolLogic--
 
 
-function JumpSub (NilTrackerFn)
-	opt inline
-	|| t = msg.ASMType
-		return (NilTable[t]!)(msg, test)
-	t = msg.func|ASMType|
-	msg.ASMType = t
-	return (NilTable[t]!)(msg, test)
-
 
 function Jump (NilTrackerFn)
 	cpp_part FlowJump
@@ -88,7 +80,11 @@ function Jump (NilTrackerFn)
 		if FlowControl.Active
 			FlowControl <~ msg.func|byte|
 			FlowControl.input("", msg.name)
-	return .JumpSub(msg, test)
+	|| t = msg.ASMType
+		return (NilTable[t]!)(msg, test)
+	t = msg.func|ASMType|
+	msg.ASMType = t
+	return (NilTable[t]!)(msg, test)
 		
 
 
@@ -791,7 +787,6 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 
 
 function scdecl.IsUnknownParam (|bool|)
-	opt inline
 	return (!.nilstated) and (self is param)
 
 

@@ -964,7 +964,30 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	
 
 function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
-	// FillInDefaultConstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
+	// aka: FillInDefaultConstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
+	
+	/*
+		* opt here, or in ASM?
+			* Seems easier here (in general)
+		* Opt all, not just compiler made.
+		* but what about extra sets? its not possible for objects, but it is for other things.
+			
+			.A = 0
+			.b = 0
+			.b = 1
+			use(.b)
+			.b = 0
+		
+		* We can pre-zero everything, but only count its first set to zero.
+		
+		* What about debugging?
+			* We'll need to know what vars can exist?
+			* OR just zero the entire thing
+			* Why not ALWAYS zero the entire thing. (Sigh)
+			* well... only pointers/objects need zeroing...
+				* So should it be done always for release or just for debug?
+	*/
+	
 	opt norefcounts
 	|| cls = .cls$
 	|| oof = .ConstructorLinePlace$

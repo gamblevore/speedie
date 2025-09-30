@@ -1090,7 +1090,6 @@ function message.DotSpace (|SCNode| name_space, |SCObject|)
 
 
 function TypeOfSwizzle (|message| exp, |SCNode| name_space, |message| side, |scdecl| class_Space, |scdecl|)
-	opt inline
 	opt norefcounts
 	|| W = Class_Space.type.NumericCount 
 	if (W > 1) and !exp.last.hasany

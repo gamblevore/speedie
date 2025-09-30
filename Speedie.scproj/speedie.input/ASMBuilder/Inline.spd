@@ -213,7 +213,7 @@ function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin,   |ASMReg|
 
 
 function InlineFinish (|fatrange| R, |ASMReg|)
-	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
+	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == 92770
 	for s in R
 		if s isa asm.ret
 			if rz

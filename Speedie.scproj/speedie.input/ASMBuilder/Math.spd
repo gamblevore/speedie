@@ -183,7 +183,6 @@ extend Assembler
 		
 		
 	function ConstCompareFloatSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
-		opt inline
 		ifn mode & 4
 			|| A = L.f32
 			|| B = R.f32
@@ -214,7 +213,6 @@ extend Assembler
 		
 		
 	function ConstCompareIntSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
-		opt inline
 		|| A = L.Const
 		|| B = R.Const
 		if mode <= 1
@@ -796,25 +794,29 @@ extend Assembler
 
 
 	function MergeBFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |fatasm| bflg,  |asmreg|)
-		return nil
 		require ((src is temp) or ((src iz dest) and .iscurr(bflg)))
-		|| total = up - down
-//		require up <= bflg.prms[3] and down <= bflg.prms[3] // what sort of test is this?
-// we need to get all the cases below correct, and more. What about upgrades as well as adding?
-		if (total > 0)
-			require src.signed  or  !bflg.prms[4]
-			bflg.prms[2] += total
-		  elseif total < 0
-			bflg.prms[3] -= total
-			0
+		// if this test fails... we can STILl opt this! Just take it's input, and make a new µop
+		// in fact, we could make a new op always, if its from a bflg.
+		// allow for the input to be nopped. For example, inline type-casted params, that are now unused.
 		
+		|| oup = bflg.prms[2]
+		|| odw = bflg.prms[3]
+		require oup == odw and oup >= up and oup >= down // sigh... i can't figure out much else right now.
+		if oup
+			// this logic doesn't make perfect sense either. why add only if its not 0?
+			|| total = up - down
+			if total > 0
+				bflg.prms[2] = oup + total
+			  elseif total < 0
+				bflg.prms[3] = odw - total
 		  else
-			0
-		
-		.ReDest(bflg, dest)
+			bflg.prms[2] = up
+			bflg.prms[3] = down
+
+// we need to get all the cases below correct, and more. What about upgrades as well as adding?
+		return .ReDest(bflg, dest)
 		
 		// do this later. its too complex to solve right now.
-		
 		// BFLG: r3,  r1, 56, 56, 0
 		// BFLG: t31, r3, 32, 31, 1 // add to prev up
 
@@ -830,7 +832,6 @@ extend Assembler
 		// BFLG: r3,  r1, 56, 32, 0
 		// BFLG: t31, r3, 32, 56, 1 // upgrade to 56, 56
 									// the bottom left (32) has to fit in the top right (32)
-
 		// BFLG: r3,  r1, 32, 56, 0
 		// BFLG: t31, r3, 56, 32, 1 // can't optimise!
 

@@ -272,8 +272,8 @@ function TypeCast (fn_asm)
 		from.µtype = newtype
 		return from
 
-	|| sh2 = 64 - OldType.BitCount
-	return exp.BFLG(dest, from, sh2, sh2, from.signed|int|) * dest
+	|| sh2 = 64 - NewType.BitCount
+	return exp.BFLG(dest, from, sh2, sh2, dest.signed|int|) * dest
 
 
 
@@ -576,6 +576,7 @@ function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, 
 
 
 function AddressOf (fn_asm)
+	if "NopConsts".trap
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	target debug: if (rz isnt ContainsAddr)
 	(rz isnt ContainsAddr)

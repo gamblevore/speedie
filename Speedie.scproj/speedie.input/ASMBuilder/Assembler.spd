@@ -275,12 +275,10 @@ struct Assembler
 	
 	
 	function Nop (|FATASM| ToNop)
-		opt inline
 		return .NopSub(ToNop, false, 0)
 	
 	
 	function SoftNop (|FATASM| Fat)
-		opt inline
 		return .NopSub(fat, true, 0)
 	
 	

@@ -85,9 +85,9 @@ function FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.Wan
 			error (where, "Expected a class but found module.")
 
 
-function FindFunction (|message| Name, |SCFunction|)
-	opt norefcounts
-	return .FindFunction(name.name, name)
+//function FindFunction (|message| Name, |SCFunction|)
+//	opt norefcounts
+//	return .FindFunction(name.name, name)
 
 
 function FindFunction (|string| Name, |message| Where=nil, |SCFunction|)
@@ -149,7 +149,8 @@ function FindModule (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0
 
 syntax access (|message| s, |SCObject|)
 	opt norefcounts
-	rz = self[s.name]	#expect (s, "Can't find: " + s.name)
+	rz = self[s.name]							#expect (s, "Can't find: " + s.name)
+
 
 
 syntax access (|string| s, |SCObject|)
@@ -161,8 +162,32 @@ syntax access (|string| s, |SCObject|)
 				return v
 			v = v.LocalVarList
 		
+	return .access.valuelower(s)
+
+
+function LookupSub (|string| s, |&SCObject|)
+	disabled
+	opt norefcounts
+//	if self is AllowLinkedLists
+//		|| v = .LocalVarList
+//		while v
+//			if v.Name ~= s
+//				return v // well now what? this won't compile.
+//			v = v.LocalVarList
+						// LookupSub is wanted to find dot and func-calls
+						// not to find local-vars. So... we'd need to call
+						// it differently too!
+	
+	// Would be nice to allow for function-cycling...
+	// basically replace the value here. So we could use .getplace
+	// and set the new value in later.
+	// but many functions use this...
+	// only LookupSub needs to get a &SCObject.
+	// I guess I'll fix that later.
+	
 	|| a = .Access
-		return a.ValueLower(s)
+		return a.GetPlace(s)
+
 
 
 function ActualAdd (|string| name, |scobject| IncObj)
@@ -455,7 +480,7 @@ function TryAddBase (|Message| c, |SCNode| neu)
 
 
 function LookUpFunc (|String| name, |Message| exp, |scobject|)
-	return .LookUpSub( name, exp, self, nil, nil, kPurposeFunc )
+	return .LookUpSubCase( name, exp, self, nil, nil, kPurposeFunc )
 
 
 function ProjectFix (|SCNode|)
@@ -468,7 +493,6 @@ function ProjectFix (|SCNode|)
 
 function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
-	
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	|| paramshere = exp.last
@@ -485,7 +509,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 			AllowSelfToConstructor = ParamsArray.IsSelfCon
 
 	for (b.ListLookup in Curr)
-		|| o = b[ origname ]
+		|| o = b.syntaxaccess(origname)
 		if (!o)
 			continue
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program) and (b!=self)
@@ -598,7 +622,7 @@ constants (
 
 function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)
 	opt norefcounts
-	return .LookUpSub( name, exp, arg_space, contains, side, kPurposeDot )
+	return .LookUpSubCase( name, exp, arg_space, contains, side, kPurposeDot )
 
 
 function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
@@ -606,17 +630,25 @@ function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
 	if name ~= "super"
 		name = "self"
 	
-	return .LookUpSub( name, exp, self, nil, side, kPurposeVar )
+	return .LookUpSubCase( name, exp, self, nil, side, kPurposeVar )
+
+
+function LookUpSubCase (|String| name, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
+	if name.islower
+		return .LookUpSub( name, exp, arg_space, contains, side, Purpose )
+	|| L = name.lowercase
+	|scobject--| R = .LookUpSub( L, exp, arg_space, contains, side, Purpose )
+	return r
 
 
 
 function LookUpVarRootDecl (|String| name, |Message| exp, |SCObject|)
 // misdesigned... but so is initrootdecl :(
-	return .LookUpSub( name, exp, self, nil, nil, kPurposeVarDecl ) 
+	return .LookUpSubCase( name, exp, self, nil, nil, kPurposeVarDecl ) 
 
 
 function LookUpVarDecl (|String| name, |SCDecl|)
-	|| result = .LookUpSub( name, nil, self, nil, nil, kPurposeVarDecl )
+	|| result = .LookUpSubCase( name, nil, self, nil, nil, kPurposeVarDecl )
 	if result isa SCDecl
 		Return result
 

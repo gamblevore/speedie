@@ -77,7 +77,8 @@ datatype DataTypeCode (uint16)
 			  elseif self is Pointer
 				fs <~ "pointer"
 			  else
-				fs <~ "non-numeric"
+				fs <~ "ptr?"
+				fs <~ .bytecount
 		  elseif self == byte
 			fs <~ "byte"
 		  else

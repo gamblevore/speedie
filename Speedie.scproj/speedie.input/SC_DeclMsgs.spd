@@ -383,7 +383,6 @@ function scdecl.DownGrade (|scdecl|)
 	
 function message.AddValue (|scfunction| f)
 	opt norefcounts
-	opt inline
 	if !.HasChildCount(2)
 		using f.source!
 			self <~ (@thg, "Value")

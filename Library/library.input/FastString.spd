@@ -202,12 +202,10 @@ class FastString {
 
 	syntax Append (|int64| data)
 		cpp_part AppendInt64
-		opt inline
 		.AppendIntegerAsText(data, 1)
 	
 	syntax Append (|uint64| data)
 		cpp_part AppendUInt64
-		opt inline
 		.AppendIntegerAsText(data, 1)
 	
 	syntax Append (|uint| data)
