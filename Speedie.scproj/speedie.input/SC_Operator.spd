@@ -466,7 +466,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 					return CustomOps.OnlyRightIsVector
 				if rc exact_isa B
 					return CustomOps.OnlyLeftIsVector
-			expect (LNT.SameBasicType(RNT)) (MsgRel, "Vector type mismatch.")
+			expect (LNT.isfloat == RNT.isfloat) (MsgRel, "Vector type mismatch.")
 			if LN > RN
 				return CustomOps.OnlyLeftIsVector
 			  else

@@ -7,8 +7,8 @@ datatype DataTypeCode (uint16)
 	default 0	
 	constants Types
 		|DataTypeCode|
-		numeric = 8
-		unsigned = 64
+		Numeric = 8
+		Unsigned = 64
 		Floating = 128
 		byte    = 0 + 0  + 64 + 0   + 8
 		char	= 0 + 0  + 0  + 0   + 8
@@ -51,8 +51,8 @@ datatype DataTypeCode (uint16)
 		u16	 = uint16
 		s16	 = int16
 		
-		_voidptr = 112 // + 512 // unsigned 64-bit non-numeric value. // need use pointer!
-		cstring = 112 // + 512 // same // need use pointer!
+		_voidptr = 112		// + 512 // unsigned 64-bit non-numeric value. // need use pointer!
+		cstring = _voidptr	// + 512 // same! // only exists to allow speedie to create a cstring type
 		Failed = Floating + unsigned
 		// we really need a pointer-bit...
 		// not just "not numeric" cos we say "bools are kinda numeric"
@@ -173,7 +173,4 @@ datatype DataTypeCode (uint16)
 	
 	function VecCount (|int|)
 		return (self & 0x03) + 1
-	
-	function SameBasicType (|DataTypeCode| b, |bool|)
-		return (.isfloat == b.isfloat)
 	

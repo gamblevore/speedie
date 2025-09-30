@@ -406,7 +406,11 @@ class SCDecl (SCObject) {
 		.CopyTypeInfoTo(rz)
 		rz.iscarray(amount, self)
 	
+
+	function IsCArray (|bool|)
+		return .c_array > 0 // change this later to allow carrays of 0.
 	
+		
 	function IsCarray (|int| Size, |scdecl| Of)
 		.pointercount = 0
 		.C_Array = size
@@ -1219,13 +1223,13 @@ class SCDecl (SCObject) {
 	function ASMRegType (|datatypecode|)
 		opt norefcounts
 		if self
+			if .IsCArray
+/				return datatypecode._voidptr
 			|| Ty = .type
-			if ty.BaseType is object
-				return datatypecode.cstring
-			if !.pointercount
-//				if ty.BaseType is Struct // structs are always pointers... no need for this test.
-				return ty.asmtypeinfo			
-			return datatypecode._voidptr // what about carrays?
+			if (ty.BaseType.HasASMPointer)
+				return datatypecode._voidptr
+			if .pointercount
+			return ty.asmtypeinfo
 		
 		
 	function PointerIncrement (|int|)

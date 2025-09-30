@@ -416,7 +416,10 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| base = .µGetReal(f, Mode)							// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
-	if d.TypeInfo.VecCount > 1
+	|| TyA = d.ASMRegType
+	|| tyB = d.TypeInfo
+	if tya.bitcount != tyb.bitcount//??
+	if tya.VecCount > 1
 		return .VecAccess(exp, dest, base, vara)
 
 	target debug: if !d.PointerCount and !d.IsCarray
@@ -454,7 +457,10 @@ function Dot (fn_asm)										// a.b
 	
 	|| OV = .OpenVars				// is this safe? Not sure! delete if it causes problems.
 	|| Obj = .µGetASM(exp.first!)
-	dest.µtype = prop.typeinfo
+	|| TyA = prop.ASMRegType
+	|| tyB = prop.TypeInfo
+	if tya.bitcount != tyb.bitcount//??
+	dest.µtype = tya
 	.CloseVars(ov)					// in terms of anything simple... I can't see problems.
 	
 	|| Index = prop.ExportPosition 

@@ -11,7 +11,14 @@ datatype SCNodeType (byte)
 		ProtoType	// hasptr
 		Struct
 		Object		// hasptr
+//		Unused
+//		Carray		// hasptr
+// carrays are on decls, not on types.
 	)
+	
+	function HasASMPointer (|bool|)
+		return self|uint|&1
+	
 	syntax is (|SCNodetype| d, |bool|)
 		return self == d
 	
