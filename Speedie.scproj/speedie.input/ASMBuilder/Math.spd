@@ -649,28 +649,30 @@ extend Assembler
 				return r
 
 
-	function RemoveableInput (|asmreg| dest, |asmreg| OldInput, |asm| Type, |&fatasm|) // canremove, cantemp, caninline, cansquish
-		// I'm sure I did this before but whatever
-		require (oldinput is temp) or (oldinput iz dest)
-		|| f = OldInput.Fat
-		if f and (f.op == type) and .IsCurr(f)
-			return f
+	function RemoveableBFLG (|asmreg| dest, |asmreg| A,  |asmreg| B, |asmreg|) // canremove, cantemp, caninline, CanSquish
+		require (A is temp) or (A iz dest)
+		|| bflg = A.Fat$
+		require (bflg isa asm.bflg) and (bflg.µRefCount <= 1)
+		require (bflg == .Last) and .IsCurr(bflg)
+		|| up = bflg.prms[2]|int|
+		|| down = bflg.prms[3]
+		require (down == 0) or ((64 - A.BitCount) >= up)
+		|| Diff = up - down
+		if Diff > 0
+			bflg.RegInput(2) = bflg.ASMReg(1)
+			bflg.RegInput(1) = B
+			bflg.prms[3] = Diff
+			bflg.prms[4] = 0
+			bflg._op = asm.BFLS
+			return .ReDest(bflg, dest)
 
-	function MiniBFLS (fn_opasm)
-		|| OldInput = .RemoveableInput(dest, L, asm.bflg)
-		if !OldInput
-			OldInput = .RemoveableInput(dest, R, asm.bflg)
-//		if OldInput
-//			OldInput._op = asm.BFLS
-//			OldInput.Dest(0, dest, self) // wait... which of the inputs do I change?
-			// or is it the dest? cos the dest IS the input in bfls. do later
+
+	function MiniBFLS (|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+		|| bl = .RemoveableBFLG(dest, L, R)
+			return bl
+		|| br = .RemoveableBFLG(dest, R, L)
+			return br
 			
-//		BFLG: r3, r2, 32, 16, 1
-//		BORR: r3, r3, r1, 0
-//		BFLS: r3
-
-//		BFLG: t31, r2, 32, 16, 1
-//		BORR: t31, r1, t31, 0
 
 	function BitOr (fn_opasm)
 		if dest is Const
@@ -680,11 +682,10 @@ extend Assembler
 			swap (l) (r)
 
 		if dest isnt Textual
-			|| done = .MiniBOR(l,r)
-				return done.µtype(Dest)
-		
-		|| opted = .MiniBFLS(exp, dest, l, r)
-			return opted
+			|| old = .MiniBOR(l,r)
+				return old.µtype(Dest)
+			|| mini = .MiniBFLS(exp, dest, l, r)
+				return mini
 
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
@@ -738,7 +739,7 @@ extend Assembler
 		return fat.Vectorise(dest, vopp)
 
 
-	function BFLG_RightConst  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| down, |asmreg|)
+	function BFLG_Right  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| down, |asmreg|)
 		// x = y << 1				// doesn't care about sign
 		// x = x >> 1				// does
 		// -->
@@ -772,9 +773,9 @@ extend Assembler
 		|| K = .const(R, 6, false)
 			if k == 0
 				return L
-			|| Opt = .BFLG_RightConst(exp, dest, l, k)
+			|| Opt = .BFLG_Right(exp, dest, l, k)
 				return Opt
-			return .BFLG_Const(exp, dest, l, 0, k)
+			return .BFLG(exp, dest, l, 0, k)
 		
 		|| fat = exp.BRSH(dest, L, R, l.bitloss)
 		fat.Vectorise(dest, asm.QRSS)
@@ -788,27 +789,73 @@ extend Assembler
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitSHL)
 		|| K = .const(R, 6, false)
-			return .BFLG_Const(exp, dest, l,  K, 0)
+			return .BFLG(exp, dest, l,  K, 0)
 		
 		if 0: exp.QLSH
 		return exp.BLSH(dest, L, R, l.bitloss).Vectorise(Dest, asm.QLSH)
 
 
-	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+	function MergeBFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |fatasm| bflg,  |asmreg|)
+		return nil
+		require ((src is temp) or ((src iz dest) and .iscurr(bflg)))
+		|| total = up - down
+//		require up <= bflg.prms[3] and down <= bflg.prms[3] // what sort of test is this?
+// we need to get all the cases below correct, and more. What about upgrades as well as adding?
+		if (total > 0)
+			require src.signed  or  !bflg.prms[4]
+			bflg.prms[2] += total
+		  elseif total < 0
+			bflg.prms[3] -= total
+			0
+		
+		  else
+			0
+		
+		.ReDest(bflg, dest)
+		
+		// do this later. its too complex to solve right now.
+		
+		// BFLG: r3,  r1, 56, 56, 0
+		// BFLG: t31, r3, 32, 31, 1 // add to prev up
+
+		// BFLG: r3,  r1, 56, 56, 0
+		// BFLG: t31, r3, 31, 32, 1 // add to prev down
+
+		// BFLG: r3,  r1, 56, 56, 0
+		// BFLG: t31, r3, 32, 32, 1 // nop. its less.
+
+		// BFLG: r3,  r1, 32, 32, 0
+		// BFLG: t31, r3, 56, 56, 1 // upgrade to 56!
+
+		// BFLG: r3,  r1, 56, 32, 0
+		// BFLG: t31, r3, 32, 56, 1 // upgrade to 56, 56
+									// the bottom left (32) has to fit in the top right (32)
+
+		// BFLG: r3,  r1, 32, 56, 0
+		// BFLG: t31, r3, 56, 32, 1 // can't optimise!
+
+
+
+	function BFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
 		|| SrcBits = src.BitCount
 		if (up > srcbits or down > SrcBits)	 and !src.IsBool
 			problem (exp, "Shift too far")
 		
 		if !up and !down
-//			if (SrcBits > dest.BitCount)
 			return src.µtype(Dest)
-
+		
 		down += 64 - (SrcBits+up)
 		up = 64 - SrcBits
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(exp, dest)
-	
+		
+		
+		|| old = src.fat
+		if (old isa asm.bflg)
+			|| Merge = .MergeBflg(exp, dest, src, up, down, old)
+				return Merge
+			
 		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
 		return fat.Vectorise(dest, asm.QFLG)
 

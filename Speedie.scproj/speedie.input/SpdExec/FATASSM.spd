@@ -158,13 +158,13 @@ struct FatASM
 				i.µRefCount++
 	
 
-	function assembler.ReDest (|fatasm| f, |asmreg| info, |asmreg|)
+	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
 		|int| o = f._Outputs
 		target debug: if !o.IsPow2
-		return .ReDest(f, info, o.log2)
+		return .ReDest(f, dest, o.log2)
 		
 		
-	function assembler.ReDest (|fatasm| f, |asmreg| info, |uint| a, |asmreg|)
+	function assembler.ReDest (|fatasm| f, |asmreg| dest, |uint| a, |asmreg|)
 		// asmtodo: what if the old is a ref and new isnt,  or new is a ref and old isnt?
 		// references need to be incremented, as their output is needed.
 		
@@ -172,7 +172,7 @@ struct FatASM
 			if .Register(old) == f
 				.SetRegister(old, nil, f.FindOlder )
 		
-		return f.Dest(a, info, self)						// Then we set it to the new value
+		return f.Dest(a, dest, self)						// Then we set it to the new value
 	
 
 	function FindOlder (|&fatasm|)

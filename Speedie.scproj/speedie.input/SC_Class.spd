@@ -575,7 +575,7 @@ function CreateConstructors
 		.ConstructorFunc = con
 		
 		if con
-			.modul.tryadd(con.source, con, "new") // maybe?
+			.modul.tryadd(con.source, con, "new")
 			.FillRoleConstructor(con)
 			
 	

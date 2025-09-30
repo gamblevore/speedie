@@ -7,12 +7,20 @@ module ASMExamples {
 |int| Bolg
 target pack { 
 
-function BFLS (|int| A, |int| B, |int|)
+
+function SyntaxShift (|syntax| A, |int| B, |int|)
+	visible
+	return (a|int|<<1)
+
+
+function BFLS_Test (|int| A, |int| B, |int|)
+	visible
 	|| c = b<<16
 	c |= a
 	return a ||| (b << 16)
 //	bflg + bor --> bfls    x = z | (y << 16)
-	
+
+
 function BitTest (|int| i, |bool| Value)
 	visible
 	|| M = .glob

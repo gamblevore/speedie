@@ -14,7 +14,7 @@ datatype ASMReg (uint64)
 		|asmreg|
 		Temp = 1024			// Sigh.
 		(1<<16)				// Starting point
-		Negate
+		Negate				// negate must be at 64K (I forgot why.)
 		AlreadyNegated
 		Discard
 		Param
@@ -43,7 +43,6 @@ datatype ASMReg (uint64)
 		SetAlways   = Textual ||| Set  // reuse const
 		// don't go above 47
 		Zero	    = Const   ||| 56 ||| param		// 56 == datatypecode.uint64
-		Simple		= Temp
 
 	
 
@@ -78,7 +77,7 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function Simplify (|asmreg|)
-		return .ReallySimplify as (self & Simple)
+		return .ReallySimplify as (self & Temp)
 
 	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|
@@ -324,7 +323,7 @@ datatype ASMReg (uint64)
 	
 	function TmpCheck (|bool|)
 		|| R = .reg
-		|| IsTmp = self is temp
+		|| IsTmp = self is temp and self isnt OKAsTemp
 		|| Big = R >= 26
 		if big == IsTmp // bad?
 			return true

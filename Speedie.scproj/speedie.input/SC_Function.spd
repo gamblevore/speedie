@@ -72,7 +72,7 @@ linkage
 |SCDecl?|				ReturnType
 |scfunction--?|			DepthFinder
 |macro?|				IsMacro
-|functiontype|			FuncInfo
+|FunctionType|			FuncInfo
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				PackID
@@ -594,36 +594,58 @@ function TryKeepBetter (|int|OldMatch, |SCFunction| f, |int| Match, |SCFunction|
 
 function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCParamArray| Incoming, |SCFunction|)
 	opt norefcounts
-	|| NeedsAlter = false
-	|| OldMatch = 0
-	|| Result
+	|| BestMatch = 0
 	|| Missing 
-
+	
 	for f in self
 		if f.isMacro
 			Missing = f
 			continue
 		
 		|| Match = f.ArgsMatch3( TypeCast, base, false, name_space, Incoming )
-			if (Result)
-				|| CanKeepBetter = result.TryKeepBetter(OldMatch, f, Match)
-				if (!CanKeepBetter)
-					return incoming.MultipleMatchingFunctions(TypeCast, f, result)
-				Result = CanKeepBetter
-			
-			if  Match  &  (kNeeds|||kUseDefaultParams)
-				NeedsAlter = Match
-			
-			Result ?= f
-			OldMatch = Match
+			|| Better = f 
+			if rz
+				Better = rz.TryKeepBetter(BestMatch, f, Match)
+				if !Better
+					return incoming.MultipleMatchingFunctions(TypeCast, f, rz)
+			if rz != Better
+				rz = Better
+				BestMatch = Match
 
-	if (NeedsAlter)
+	if !rz
+		return missing
+
+	// optimise order... for faststring which has a lot of functions.
+	.AddFuncToList(rz)
+		
+
+	if BestMatch  &  (kNeeds|||kUseDefaultParams)
 		Incoming.Exp.Last!.Func = @prm
-		Result!.Argsmatch3( TypeCast, base, true, name_space, Incoming )
+		rz.Argsmatch3( TypeCast, base, true, name_space, Incoming )
 
-	if Result
-		return Result
-	return missing
+
+function AddFuncToList (|scfunction| Inc)
+	// QQ  WW  EE  RR  TT
+	// QQ  RR  WW  EE  TT
+	// not even worth it. Too much fiddling
+	// A better approach would be to make the entire thing a LOOP.
+	// then... simply change the first position in the loop.
+	// we can save the place by getting .makeplace instead of .value
+	
+	// do later!
+	
+//	require self!=inc
+//	
+//	|scfunction| NPrev
+//	|| BB = inc.BackRef!
+//	|| N = Inc.NextFunc
+//		n.BackRef = BB
+//	bb.NextFunc = N
+//		
+//	NPrev = N.BackRef
+//	Inc.NextFunc = .NextFunc
+//	.NextFunc = Inc
+//	NPrev.NextFunc = n
 
 
 function FLookup (assigns:|SCNode|)
@@ -2021,6 +2043,4 @@ function NeuLibrary (CollectFunc)
 
 // Did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
 // It should be removed if we find it again!
-
-
 

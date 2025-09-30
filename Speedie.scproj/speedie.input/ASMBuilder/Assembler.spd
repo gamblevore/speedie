@@ -285,7 +285,6 @@ struct Assembler
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		// if "bounds".trap
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...
@@ -467,6 +466,8 @@ struct Assembler
 			// asmtodo: what about doing all .declareme? simpler?
 		  else
 			ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
+			(modeonly is OKAsTemp)
+			(modeonly is Temp)
 		
 		|| r = .µGetASM(Exp, ModeOnly)
 		if r iz ModeOnly
