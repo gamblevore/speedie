@@ -86,9 +86,15 @@ function ForTest (|int| x)
 		if v == 5
 			x--
 		y++
-			
-		
-		
+
+
+function asmclip (|ivec2| self, |ivec2| p, |ivec2|)
+	visible
+	p.x = .x.clamp(p.x) 
+	p.y = .y.clamp(p.y)
+	return p
+
+
 function Clamp (|uint64| u1, |uint64| u2)
 	if u2 > u1
 		u1 = u2
@@ -100,9 +106,13 @@ function ClampVec (|vec4| a, |vec4| b, |vec4| c)
 	cpp_part CV
 	|| d = a.clamp(b, c) 
 	b = b + 1.0
-	0
-		
-		
+
+
+function ClampOof (|int| x, |float| f1, |float| f2, |float| f3)
+	visible
+	f1 = f1.Clamp(f3, f2)
+
+
 function ClampFloat (|float| f1, |float| f2, |f64| d1, |f64| d2)
 	if f2 > f1
 		f1 = f2

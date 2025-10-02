@@ -370,7 +370,6 @@ class SCDecl (SCObject) {
 		|| dist = 0
 		for (CurrSuper.Upwards in OType)
 			if (t == CurrSuper)
-				// OK... so what about the distance?
 				if (o.AllocSource or .ContainsMatch(o, TypeCast))
 					if !dist
 						Return kSimpleMatch
@@ -751,8 +750,6 @@ class SCDecl (SCObject) {
 			return false
 		return c.C_array == .C_array
 
-//	function IsVeryNormal (|bool|)
-//		return .IsNormal and !.Type.IsStruct
 	
 	function IsMemoryOnly (|bool|)
 		if .pointercount
@@ -800,7 +797,6 @@ class SCDecl (SCObject) {
 				rz = rz.wrapwith(@brel, "?")
 			  elseif .StatedReal //and platform.isdebug
 				rz = rz.wrapwith(@brel, "!")
-			
 
 
 	function WriteVerySimpleType (|Message|)
@@ -1255,10 +1251,6 @@ class SCDecl (SCObject) {
 				|| f = exp.first
 				if f isthing "self"
 					return
-//			|| o = .OwningClass
-//			|| c = SCFunction.CurrFunc!.cls
-///				if c.isa(o)
-///					return
 		if side
 			is setto
 		  else

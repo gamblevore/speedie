@@ -18,9 +18,9 @@ datatype vec4
 		return .clamp(0, max)
 	
 
-	+"f\75nction" Clamp (|vec4| A, |vec4| B, |vec4|)
+	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|)
 		cpp_wrapper JB_Vec4_ClampVec
-		asm vclm(rz, r1, r2, r3)
+		asm vclm(rz, p1, p2, p3)
 
 	
 	function Clamp (|float| A, |float| B, |vec4|)
@@ -607,7 +607,7 @@ datatype ivec2
 		
 	function Clip (|ivec2| p, |ivec2|)
 		cpp_part Clip2
-		p.x = .x.clamp(p.x)
+		p.x = .x.clamp(p.x) 
 		p.y = .y.clamp(p.y)
 		return p
 			

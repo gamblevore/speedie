@@ -195,25 +195,8 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	return .TryInline(prms, dest, fn, AllowedGain)
 
 
-
-function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin,   |ASMReg|)
-	// so what about this, then?
-	opt norefcounts
-	|| name = trin[@thg]
-	trin = name.next(@prm)$
-	|| op = instruction[name!]$
-	
-	|| form = op.Sizes
-	expect (trin.HasChildCount(form.Count))    (trin, "Expected paramcount: " + form.Count.render)
-	|| fat = .RequestOp(op.OpCode, where)
-		
-	.Trintrin(trin, nil, fat)
-	.Trintrin(trin, dest, fat)
-	return fat*dest
-
-
 function InlineFinish (|fatrange| R, |ASMReg|)
-	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == 92756
+	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
 	for s in R
 		if s isa asm.ret
 			if rz
@@ -237,27 +220,61 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 		(rz is const) // make compiler happy
 
 
-function Trintrin (|message| out, |asmreg| dest, |fatasm| fat)
+function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
+	// so what about this, then?
+	opt norefcounts
+	|| name = trin[@thg]
+	trin = name.next(@prm)$
+	|| op = instruction[name!]$
+	
+	|| form = op.Sizes
+	expect (trin.HasChildCount(form.Count))    (trin, "Expected paramcount: " + form.Count.render)
+	return .TheTrinity(trin, dest, where.last, op.opcode)
+
+
+function TheTrinity (|message| out, |asmreg| dest, |message| Prms, |byte| OpCode, |asmreg|)
 	opt norefcounts
 	// (rz, r1, r2, r3)
-	|| i = 0
-	for s in out
-		if s.func!=@num
-			s.Expect(@thg)
-		|| n = s.name
-		if (n ~= "rz") == (dest != nil)
-			if dest
-				fat.Dest(i, dest, self)
-			  else
-				|uint| l = n[].lowercase 
-				if l == 'r'
-					l = s.Int(1, 0, 31)
-					fat.RegInput(i) = .ASMRegister(l)
-				  else
-					fat.numinput(i) = s.int
-			
+	|| i = -1
+	if "asmclip".trap
+	|| DestPos = -1
+	|asmreg[6]| Collection
+	|byte[6]|   Type
+	for s.fast in out
 		i++
+		|| n = s.name
+		|| n1 = n[].lowercase
+		if n1.IsInt
+			Collection[i] = s.int|asmreg|
+			continue
 
+		s.Expect(@thg)
+		if n ~= "rz" or "dest" // maybe dest is clearer. rz could mean regzero
+			DestPos = i
+			continue
+			
+		Type[i] = 1
+		Collection[i] = ASMReg()
+		|| l = s.Int(1, 0, 31)
+			|| ref = Prms[l-1]								#expect (s, "Can't find this register")
+			|| r = .µTrin(ref)
+			collection[i] = r
+	
+	
+	|| fat = .RequestOp(OpCode, prms.parent!)
+	for j in i
+		if j == DestPos
+			0
+		  elseif type[j]
+			fat.RegInput(j) = Collection[j]
+		  else
+			fat.NumInput(j) = Collection[j]|int|
+	if destpos >= 0
+		fat.Dest(destpos, dest, self)	
+	return fat*dest
+		
+	
+	
 
 }
 

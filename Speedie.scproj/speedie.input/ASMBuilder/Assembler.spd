@@ -488,10 +488,14 @@ struct Assembler
 		
 		|| Mode = exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
-		|| r = .µGetReal(exp, Mode) // why not passing A here?
+		|| r = .µGetReal(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
 			error (exp|object|)
 		return r.incr
+
+	function µTrin (|message| exp, |asmreg|)
+		return .µGetReal(exp, exp.AllowsTemp)
+
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)

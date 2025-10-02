@@ -27,11 +27,11 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 
 
 
-function QuickPrmBuild (|$int| j, |int64| P, |asmreg| Dest, |int64|)
-	|int64| v = Dest.reg
-	|| i = ++j
-	P  |=  v << (64-(i*5))
-	return P
+//function QuickPrmBuild (|$int| j, |int64| P, |asmreg| Dest, |int64|)
+//	|int64| v = Dest.reg
+//	|| i = ++j
+//	P  |=  v << (64-(i*5))
+//	return P
 
 
 function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
@@ -69,10 +69,10 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		rz |= (17-ic) << 6
 			
 
-function QuickPrmFinish (|int| i, |int64| P, |int64|)
-	P >>= 64-((i*5)+12)
-	P |= (17-i) << 6
-	return P
+//function QuickPrmFinish (|int| i, |int64| P, |int64|)
+//	P >>= 64-((i*5)+12)
+//	P |= (17-i) << 6
+//	return P
 
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)

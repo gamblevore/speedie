@@ -93,6 +93,7 @@ extend int
 	
 	function Clamp (|int| low, |int| high, |int|)
 		cpp_part ClampRange
+		asm iclm(rz, p1, p2, p3, 1)
 		if self < low
 			self = low
 		  elseif self > high
@@ -100,6 +101,7 @@ extend int
 		return self
 	
 	function Clamp (|int| high, |int|)
+		asm iclm(rz, p1, p0, p2, 1)
 		if self < 0
 			self = 0
 		  elseif self > high
@@ -150,6 +152,14 @@ extend ivec2
 
 
 extend f64
+	function Clamp (|f64| Low, |f64| High, |f64|)
+		asm fclm(rz, p1, p2, p3, 1)
+		if self < low
+			self = low
+		  elseif self > high
+			self = high
+		return self
+		
 	function Negate (|bool| b, |Float64|)
 		if (b)
 			return -self
@@ -182,8 +192,9 @@ extend float
 		|| sq = mul.Sqrt
 		return factor / sq
 	
-	function Clamp (|float|L, |float|H, |float|)
+	function Clamp (|float| L, |float| H, |float|)
 		cpp_wrapper JB_f_Clamp
+		asm fclm(rz, p1, p2, p3, 0)
 	
 	function Clamp (|float|H=1.0, |float|)
 		return .clamp(0,h)
