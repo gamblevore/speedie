@@ -20,7 +20,7 @@ datatype vec4
 
 	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|)
 		cpp_wrapper JB_Vec4_ClampVec
-		asm vclm(rz, p1, p2, p3)
+		asm vclm(dest, p1, p2, p3)
 
 	
 	function Clamp (|float| A, |float| B, |vec4|)
