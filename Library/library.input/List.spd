@@ -500,7 +500,7 @@ class list (Saveable)
 		|| ch_ = .First
 		while ( ch_ )
 			yield ch_ (ch_)
-			ch_ = ch_.Next|...|
+			ch_ = ch_.Next
 		(self)
 
 	
