@@ -2,8 +2,8 @@
 
 class Macro 
 	|bool|				Cleaned
-	|string|  			Input
 	|message?| 			_Parsed
+	|string|  			Input
 	
 	constructor (|string| s)
 		cpp_part ConstructorStr
