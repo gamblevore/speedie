@@ -36,3 +36,14 @@ helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 //	path = path.AddExt("flowtest")
 //	path <~ str
 //	
+
+target debug 
+	class CArrayTest
+		|int[20]| Items
+		
+		function A (|&int| a)
+			
+		function B
+			visible
+			.a(.items)
+

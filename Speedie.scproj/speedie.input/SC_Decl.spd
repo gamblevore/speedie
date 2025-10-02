@@ -347,10 +347,10 @@ class SCDecl (SCObject) {
 		|| OP = o.PointerCount
 		if (op == .pointercount)
 			return (o.IsCArray == .IsCArray)
-//		if .iscarray
-//			|| c = .CArrayInner
-//			if op == c.PointerCount + 1
-//				return true
+		if .iscarray
+			|| c = .CArrayInner
+			if op == c.PointerCount + 1
+				return true
 
 
 	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |int|)

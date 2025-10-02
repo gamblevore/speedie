@@ -427,7 +427,6 @@ function int.IsNormalMatch (|bool|)
 
 
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
-	debugat 7
 	if  .IsAssigns  and  .ReturnType
 		|| a = .args[0]
 		|| i = typeofexpr(incoming[0], name_space)
