@@ -427,6 +427,7 @@ function int.IsNormalMatch (|bool|)
 
 
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
+	debugat 7
 	if  .IsAssigns  and  .ReturnType
 		|| a = .args[0]
 		|| i = typeofexpr(incoming[0], name_space)
@@ -963,49 +964,87 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 					(t is PropertyWasConstructed)
 	
 
-function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
+function scdecl.IsZeroInConstructor (|bool|)
+	opt norefcounts
+	if .Default // huh? but its never set to?
+	|| d = .type.Defawlt
+		|| d2 = d.obj|scdecl|
+			ifn d2 isa SCDecl// oof
+			if d2 is Const
+				return d2.ExportPosition == 0
+
+
+function SetZeroProperties (|Message| After, |[scdecl]| P)
+	|[scdecl]| sorted
+	.SetZeroPropertiesSub(After, p, sorted)
+//	printline sorted
+	
+
+function scdecl.BiggestType (|[scdecl]| sorted, |int| i, |bool| CanSIMD, |scdecl!|)
+	opt norefcounts
+	if .CArraySize >= 16
+		return self
+	|| x = .ExportPosition|int|
+	CanSIMD *= (x isa 16) 					 // can't do unless we are 16-byte aligned...
+	rz = self
+	while (|| next = sorted[++i])
+		|| Missing = (next.ExportPosition + next.CArraySize) - x
+		if missing <= 2
+			rz = typeint16!.typenormal	
+		  elseif missing <= 4
+			rz = typeint!.typenormal		
+		  elseif missing <= 8
+			rz = TypeInt64!.typenormal
+		  else
+			if (Missing <= 16) and CanSimd
+				return TypeiVec4!.typenormal
+			exit
+
+
+function SetZeroPropertiesSub (|Message| After, |[scdecl]| P, |[scdecl]| sorted)
+	opt norefcounts
+	for (d in P)
+		if (d isnt PropertyWasConstructed) and d.IsZeroInConstructor
+			Sorted <~ d
+
+	require sorted >= 2
+
+	sorted.sort(&codesorter.PropertyOrder)
+
+	|| Length = 0
+	|| CanSIMD = .cls!.size|int| isa 16
+	
+	for (d in sorted) (i)
+		(d is UsedByASM)
+		|| req = d.ExportPosition + d.CArraySize
+		if Length < req
+			|| ty = d.BiggestType(sorted, i, CanSIMD)
+			Length = d.ExportPosition + ty.CArraySize
+			after = .DeclAfter( after, d, ty )
+	
+
+
+function FillInMissingConstructorDefaults (|Message!| After)
 	// aka: FillInDefaultConstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
-	
-	/*
-		* opt here, or in ASM?
-			* Seems easier here (in general)
-		* Opt all, not just compiler made.
-		* but what about extra sets? its not possible for objects, but it is for other things.
-			
-			.A = 0
-			.b = 0
-			.b = 1
-			use(.b)
-			.b = 0
-		
-		* We can pre-zero everything, but only count its first set to zero.
-		
-		* What about debugging?
-			* We'll need to know what vars can exist?
-			* OR just zero the entire thing
-			* Why not ALWAYS zero the entire thing. (Sigh)
-			* well... only pointers/objects need zeroing...
-				* So should it be done always for release or just for debug?
-	*/
-	
 	opt norefcounts
 	|| cls = .cls$
 	|| oof = .ConstructorLinePlace$
+	|| p = cls.Properties
+//	.SetZeroProperties(After, P) // not working yet
 	
-	for (d.backwards in cls.Properties)
-		if d isnt PropertyWasConstructed
-			|| src = d.source ?? oof
-			using src
-			|| Made = .NewDefaultRel( oof, d )
-			root.InsertAfter( made, AfterHere )
-		  else
-			(d is setto) // nice
+	for (d.backwards in P)
+		if d isnt UsedByASM
+			if d isnt PropertyWasConstructed
+				.DeclAfter( after, d, d )
+			  else
+				(d is SetTo) // nice
 	
 	while cls
 		for (d in cls.Properties)
+			(d isnt UsedByASM)
 			(d isnt PropertyWasConstructed)
 		cls = cls.super
-				
+	
 
 
 function ConstructorLinePlace (|message|)
@@ -1278,21 +1317,6 @@ function SCDecl.MarkAsAltered  // markaltered
 function Self (|scdecl|)
 	opt norefcounts
 	return .args[]
-
-
-function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
-	opt norefcounts
-	// .bla = X
-	require !d.IsCArray				// carrays get cleared
-	|| def = d.Default
-
-	if d.NilDeclared is Nilish
-		def = «thg "nil"»
-		def.obj = TypeNil
-	  else
-		def ?= d.CreateDefault(place)
-	return NewEqRel( d.DeclToDot(.self), def )
-
 
 
 
@@ -2066,4 +2090,3 @@ function NeuLibrary (CollectFunc)
 
 // Did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
 // It should be removed if we find it again!
-

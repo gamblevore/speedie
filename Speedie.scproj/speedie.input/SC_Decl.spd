@@ -343,8 +343,14 @@ class SCDecl (SCObject) {
 
 
 	function PointeryMatch (|scdecl| O, |bool|)
-		if (o.PointerCount == .PointerCount)
+		opt norefcounts
+		|| OP = o.PointerCount
+		if (op == .pointercount)
 			return (o.IsCArray == .IsCArray)
+//		if .iscarray
+//			|| c = .CArrayInner
+//			if op == c.PointerCount + 1
+//				return true
 
 
 	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |int|)
@@ -1223,12 +1229,11 @@ class SCDecl (SCObject) {
 	function ASMRegType (|datatypecode|)
 		opt norefcounts
 		if self
-			if .IsCArray
-/				return datatypecode._voidptr
-			|| Ty = .type
-			if (ty.BaseType.HasASMPointer)
+			if .IsCArray or .pointercount
 				return datatypecode._voidptr
-			if .pointercount
+			|| Ty = .type
+			if (ty.BaseType.HasASMPtrs)
+				return datatypecode._voidptr
 			return ty.asmtypeinfo
 		
 		

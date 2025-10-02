@@ -12,6 +12,7 @@ class SCParamArray
 	|Message--?[8]|		Items
 	|Message--?|		Exp
 	|SCClass--?|		Cls
+	|string|			LookupName
 	|int16|				Size
 	|int16|				ErrCount
 	|int8|				FailedAt
@@ -26,8 +27,9 @@ class SCParamArray
 	|bool|				AllowSelfToConstructor
 	
 
-	constructor (|Message?| exp)
+	constructor (|Message?| exp, |string| Name)
 		opt norefcounts
+		.LookupName = name.LowerCase
 		.Exp = exp
 		.IsDot = (exp == @dot)
 		.IsAddress = (exp and exp.niceparent Isbrel "&")

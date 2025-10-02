@@ -299,11 +299,44 @@ function Message.InsertBefore (|Message| j, |Message?| ch)
 		.Last = j
 
 
-function Message.InsertAfter (|Message| ins, |Message| after)
-	if after
-		after.next = ins
+function scfunction.DeclAfter (|message| after, |scdecl| Orig, |scdecl| D, |message|)
+	opt norefcounts
+	|| src = orig.source!
+	using src
+
+	// carrays can't be set normally. We could just memzero it?
+	|| Prop = orig.DeclToDot(.self)
+	if d.IsCArray
+		rz = @dot.msg("zero")
+		rz.msg(@thg, "memory")
+		|| prms = rz.msg(@prm)
+		|| brel = prms.msg(@brel, "&")
+		|| acc = brel.msg(@acc)
+		acc <~ prop
+		|| arr = acc.msg(@arr)
+		arr.msg(@num, "0")
+		prms <~ d.CArraySize
+	  elseif orig != d
+		rz = @rel.msg
+		|| acc = rz.msg(@acc)
+		|| type = acc.msg(@type)
+		|| bra = type.msg(@bra)
+		bra.msg(@brel, "&") <~ prop
+		|| brel = type.msg(@brel, "&")
+		brel <~ d.WriteVerySimpleType
+		|| arr = acc.msg(@arr)
+		arr.msg(@num, "0")
+		rz.msg(@opp, "=")
+		rz <~ src.CreateNil // seems ok?
 	  else
-		.first = ins
+		|| def = d.Default
+		if (d.NilDeclared is Nilish)
+			def = «thg "nil"» // this doesn't quite seem right? why not just use the default?
+			def.obj = TypeNil // i guess lets just comment it out later
+		  else
+			def ?= d.CreateDefault(src)
+		rz = NewEqRel( Prop, def )
+	after.next = rz
 
 
 function Message.Move (|Message| last, |Message| into)

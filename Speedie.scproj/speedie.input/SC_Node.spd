@@ -165,9 +165,17 @@ syntax access (|string| s, |SCObject|)
 	return .access.valuelower(s)
 
 
-function LookupSub (|string| s, |&SCObject|)
-	disabled
+function LookupSub (|string| s, |SCObject|)
 	opt norefcounts
+	if self is AllowLinkedLists
+		|| v = .LocalVarList
+		while v
+			if v.Name ~= s
+				return v
+			v = v.LocalVarList
+	
+	|| a = .Access
+		return a[s]
 //	if self is AllowLinkedLists
 //		|| v = .LocalVarList
 //		while v
@@ -185,8 +193,8 @@ function LookupSub (|string| s, |&SCObject|)
 	// only LookupSub needs to get a &SCObject.
 	// I guess I'll fix that later.
 	
-	|| a = .Access
-		return a.GetPlace(s)
+//	|| a = .Access
+//		return a.GetPlace(s)
 
 
 
@@ -480,7 +488,7 @@ function TryAddBase (|Message| c, |SCNode| neu)
 
 
 function LookUpFunc (|String| name, |Message| exp, |scobject|)
-	return .LookUpSubCase( name, exp, self, nil, nil, kPurposeFunc )
+	return .LookUpSub( name, exp, self, nil, nil, kPurposeFunc )
 
 
 function ProjectFix (|SCNode|)
@@ -493,7 +501,7 @@ function ProjectFix (|SCNode|)
 
 function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
-	|| ParamsArray	= SCParamArray.new(exp)
+	|| ParamsArray	= SCParamArray.new(exp, origname)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
 	|| paramshere = exp.last
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
@@ -509,7 +517,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 			AllowSelfToConstructor = ParamsArray.IsSelfCon
 
 	for (b.ListLookup in Curr)
-		|| o = b.syntaxaccess(origname)
+		|| o = b.syntaxaccess(paramsarray.LookupName)
 		if (!o)
 			continue
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program) and (b!=self)
@@ -622,7 +630,7 @@ constants (
 
 function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)
 	opt norefcounts
-	return .LookUpSubCase( name, exp, arg_space, contains, side, kPurposeDot )
+	return .LookUpSub( name, exp, arg_space, contains, side, kPurposeDot )
 
 
 function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
@@ -630,25 +638,15 @@ function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
 	if name ~= "super"
 		name = "self"
 	
-	return .LookUpSubCase( name, exp, self, nil, side, kPurposeVar )
-
-
-function LookUpSubCase (|String| name, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
-	if name.islower
-		return .LookUpSub( name, exp, arg_space, contains, side, Purpose )
-	|| L = name.lowercase
-	|scobject--| R = .LookUpSub( L, exp, arg_space, contains, side, Purpose )
-	return r
-
-
+	return .LookUpSub( name, exp, self, nil, side, kPurposeVar )
 
 function LookUpVarRootDecl (|String| name, |Message| exp, |SCObject|)
 // misdesigned... but so is initrootdecl :(
-	return .LookUpSubCase( name, exp, self, nil, nil, kPurposeVarDecl ) 
+	return .LookUpSub( name, exp, self, nil, nil, kPurposeVarDecl ) 
 
 
 function LookUpVarDecl (|String| name, |SCDecl|)
-	|| result = .LookUpSubCase( name, nil, self, nil, nil, kPurposeVarDecl )
+	|| result = .LookUpSub( name, nil, self, nil, nil, kPurposeVarDecl )
 	if result isa SCDecl
 		Return result
 

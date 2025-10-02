@@ -417,8 +417,6 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| vara = .µGetASM(sc)
 
 	|| TyA = d.ASMRegType
-	|| tyB = d.TypeInfo
-	if tya.bitcount != tyb.bitcount//??
 	if tya.VecCount > 1
 		return .VecAccess(exp, dest, base, vara)
 
@@ -458,8 +456,6 @@ function Dot (fn_asm)										// a.b
 	|| OV = .OpenVars				// is this safe? Not sure! delete if it causes problems.
 	|| Obj = .µGetASM(exp.first!)
 	|| TyA = prop.ASMRegType
-	|| tyB = prop.TypeInfo
-	if tya.bitcount != tyb.bitcount//??
 	dest.µtype = tya
 	.CloseVars(ov)					// in terms of anything simple... I can't see problems.
 	
@@ -582,7 +578,6 @@ function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, 
 
 
 function AddressOf (fn_asm)
-	if "NopConsts".trap
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	target debug: if (rz isnt ContainsAddr)
 	(rz isnt ContainsAddr)

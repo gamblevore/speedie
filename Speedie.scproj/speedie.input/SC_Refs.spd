@@ -820,6 +820,13 @@ function SCClass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|
 	return .ConstructorFunc
 
 
+function message.MakeAfter (|message|)
+	opt norefcounts
+	|| f = .first
+		return f
+	return .msg(@sheb, "")
+
+
 function SCFunction.BuildConstructorDestructor
 	opt norefcounts
 	require self
@@ -829,9 +836,8 @@ function SCFunction.BuildConstructorDestructor
 	|| root = .SourceArg$
 	.CheckConstructorAndDestructor( root, IsConstructor )
 	if IsConstructor
-		if !thecall
-			thecall = root.first
-		.FillInMissingConstructorDefaults( root, TheCall )
+		thecall ?= root.MakeAfter
+		.FillInMissingConstructorDefaults( TheCall )
 	require StdErr.OK and !IsConstructor
 	
 	|| c = .cls$

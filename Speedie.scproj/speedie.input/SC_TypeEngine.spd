@@ -1767,11 +1767,11 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	|| ch = exp.first
 	|| params = ch.next
 	
-	|scdecl| thgdecl 
+	|scdecl| ThgDecl 
 	if ch == @Thg
-		thgdecl = name_space.LookUpFunc( ch.name, exp )|scdecl|
-		ifn thgdecl isa scdecl
-			return thgdecl
+		ThgDecl = name_space.LookUpFunc( ch.name, exp )|scdecl|
+		ifn ThgDecl isa scdecl
+			return ThgDecl
 	  else
 		ThgDecl = TypeOfExpr( ch, name_space )		   #require
 	
@@ -1782,11 +1782,11 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 			return fn
 		return TypeOfSyntaxCall(exp, name_space, side)
 	
-	|| PList = SCParamArray.new(exp)				// these 3 lines should be 2 lines...
+	|| PList = SCParamArray.new(exp, "")						// these 3 lines should be 2 lines...
 	require PList.PreReadTypes(name_space, params, side)
 	|| fn2 = fn.ArgsMatch( nil, name_space, PList )
 		if !fn2.ReturnType
-			exp.Obj = typevoid // save it being looked up over and over...
+			exp.Obj = TypeVoid									// save it being looked up over and over...
 	  else
 		fn.ArgsMatch( nil, name_space, PList, kTypeCastDescribeErrors )
 		

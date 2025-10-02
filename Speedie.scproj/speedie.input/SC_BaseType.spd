@@ -6,24 +6,20 @@ datatype SCNodeType (byte)
 	constants (
 		|SCNodeType|
 		Module = 0	// not actually a type
-		Nil			// hasptr
 		DataType
+//		Nil			// hasptr
+		Struct		// hasptr
 		ProtoType	// hasptr
-		Struct
 		Object		// hasptr
-//		Unused
-//		Carray		// hasptr
-// carrays are on decls, not on types.
-	)
-	
-	function HasASMPointer (|bool|)
-		return self|uint|&1
+	)   // carrays are on decls, not on types.
 	
 	syntax is (|SCNodetype| d, |bool|)
 		return self == d
 	
 	function HasPtrs (|bool|)
-		return self|int| & 1
+		return self >= ProtoType
+	function HasASMPtrs (|bool|)
+		return self >= Struct
 
 
 extend scclass
@@ -36,14 +32,12 @@ extend scclass
 	function IsDataTypeOrFP (|bool|)
 		return .BaseType is datatype or ProtoType
 	
-
 	syntax equals (|string| name, |bool|)
 		cpp_part EqualsName
 		if self
 			return .name ~= name
 
-
 	syntax equals (|SCNodeType| d, |bool|)
 		cpp_part EqualsType
-		if self and d > SCNodeType.nil
+		if self and d > SCNodeType.Module
 			return .BaseType == d
