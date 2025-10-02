@@ -236,12 +236,17 @@ function TheTrinity (|message| out, |asmreg| dest, |message| Prms, |byte| OpCode
 	opt norefcounts
 	// (rz, r1, r2, r3)
 	|| i = -1
-	if "asmclip".trap
 	|| DestPos = -1
 	|asmreg[6]| Collection
 	|byte[6]|   Type
-	for s.fast in out
+	|message| s
+	while
+		if out
+			s = s.next
+		  else
+			s = out.first
 		i++
+		loop s
 		|| n = s.name
 		|| n1 = n[].lowercase
 		if n1.IsInt

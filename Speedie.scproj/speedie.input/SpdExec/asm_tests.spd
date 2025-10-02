@@ -89,7 +89,6 @@ function ForTest (|int| x)
 
 
 function asmclip (|ivec2| self, |ivec2| p, |ivec2|)
-	visible
 	p.x = .x.clamp(p.x) 
 	p.y = .y.clamp(p.y)
 	return p
