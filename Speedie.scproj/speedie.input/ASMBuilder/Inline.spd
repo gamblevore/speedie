@@ -224,7 +224,6 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 
 
 function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
-	// so what about this, then?
 	opt norefcounts
 	|| name = trin[@thg]
 	trin = name.next(@prm)$
@@ -239,7 +238,7 @@ function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
 function TheTrinity (|message| out, |message| Prms, |asmreg| dest, |byte| OpCode, |asmreg|)
 	opt norefcounts
 	|| n = 0
-	|asmreg[6]| Collection
+	|asmreg[8]| Collection
 	for s.fast in out
 		Collection[n++] = .Trinometer(s, prms)
 
