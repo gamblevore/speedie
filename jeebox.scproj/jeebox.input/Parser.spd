@@ -1001,13 +1001,6 @@ ive been~running #since morning
 
 
 	function NextLineAndIndent (|message| parent, |ParserLineAndIndent|)
-/*
-	ParserLineAndIndent
-		|int|			Lines 
-		|int|			Pos
-		|int|			Indent
-		|bool|			IsDebug
-*/
 		Opt NoRefCounts
 
 		|| first		= .nextstart // should ind??
@@ -1021,36 +1014,36 @@ ive been~running #since morning
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
-				rz.b = (rz.b&~3) + ((!commas)<<2)
-				if ((State&1) and rz.r)
+				rz.Indent = (rz.Indent&~3) + ((!commas)<<2)
+				if ((State&1) and rz.Lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
 			  elseif (c == ',')
 				commas++
 				|| l = parent.last
-					rz.b = l.indent
+					rz.Indent = l.indent
 				  else
-					rz.b = 0									// int.min
+					rz.Indent = 0									// int.min
 				State = 0
 
 			  elseif (c == ' ')
 				State |= 1
-				if rz.a != 3
-					rz.b += !commas
+				if rz.IsDebug != 3
+					rz.Indent += !commas
 				  else
-					if rz.b < 4 // do it anyhow
-						rz.b += !commas
+					if rz.Indent < 4 // do it anyhow
+						rz.Indent += !commas
 						
-					rz.a = 2
+					rz.IsDebug = 2
 
 			  elseif (c == '/')
 				|| c2 = d[n]
 				if (c2 != '/' and '*')
 					if state&2
-						if rz.a > 1
+						if rz.IsDebug > 1
 							.ErrorAdd("Invalid breakpoint", n-1)
-						rz.a = 3
-						rz.b += !commas
+						rz.IsDebug = 3
+						rz.Indent += !commas
 						continue
 					n--
 					exit
@@ -1059,8 +1052,8 @@ ive been~running #since morning
 					n = .GotoEndOfLine(n+1)
 					continue
 
-				rz.r++
-				rz.b = 0
+				rz.Lines++
+				rz.Indent = 0
 				.nextstart = n-1
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
@@ -1071,21 +1064,20 @@ ive been~running #since morning
 				if c != '\n' and '\r' and ';'
 					n--
 					exit
-				rz.r++
-				rz.g = n-1
-				rz.b = 0
-				rz.a = 0
+				rz.Lines++
+				if !rz.FirstLine
+					rz.FirstLine = n-1
+				rz.Position = n-1
+				rz.Indent = 0
+				rz.IsDebug = 0
 				commas = 0
 				State = 2
 				if parent.func == @list
 					(parent is style2)
 
-		rz.r += commas
+		rz.Lines += commas
 		.NextStart = n
 		
-//		rz.b&=~1 // no need for odd indents... or is there?
-//		if (first > 0) and !rz.r
-//			rz.b = -1 // shouldn't it be 0?
 
 
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
@@ -1149,33 +1141,33 @@ ive been~running #since morning
 	function ParseLoop (|Message| Output, |int| TmpoFlags, |int|)
 		Opt NoRefCounts
 		|message| prev
-		|| LC = 0
-		
-		while output
-			|| Info = .NextLineAndIndent(output)
-			LC += info.r
+		|ParserLineAndIndent| Info
+		while
+			Info = .NextLineAndIndent(output)
+			rz += info.Lines
 
 			if .WillEnd
 				|| nxt = .nextstart
 				if !.Running
 					nxt = parser.data.length
-				return .FinishParseLoop(lc, output, nxt)
+				return .FinishParseLoop(rz, output, nxt)
 			
-			if (prev and !info.r)
-				return .finishparseloop(lc, output, .nextstart-1)
+			if (prev and !info.Lines)
+				return .FinishParseLoop(rz, output, .nextstart-1)
 			
-			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.b)
+			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.Indent)
 			if !ch
-				return .FinishParseLoop(lc, output, .nextstart-1)
+				return .FinishParseLoop(rz, output, .nextstart-1)
 			
 			if ch != output // haha
-				LC += (ch == @item)
-				if info.a
+				rz += (ch == @item)
+				if info.IsDebug
 					(ch is breakpoint)
-				output = .AddToOutput(output, ch, prev, info.g)
+				output = .AddToOutput(output, ch, prev, info.ArgPos)
+				if !Output: exit
 				prev = ch
+			Info = nil
 
-		return lc
 
 		
 	

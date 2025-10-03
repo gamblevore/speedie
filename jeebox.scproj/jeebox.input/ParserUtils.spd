@@ -256,8 +256,8 @@ struct MessagePosition
 		parser.using = self[0]
 	    .Layer.use 
 	
-	function CopyFrom (|MessagePosition| x)
-		self[0] = x[0]
+//	function CopyFrom (|MessagePosition| x)
+//		self[0] = x[0]
 	
 	function SyntaxUsingComplete (|object| idk=nil)
 
@@ -274,7 +274,17 @@ prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
 
 
 
-datatype ParserLineAndIndent (ivec4)
+struct ParserLineAndIndent
+	|int| Lines
+	|int| Position
+	|int| Indent
+	|int| IsDebug
+	|int| FirstLine
+	
+	function ArgPos (|Int|)
+		|| p = .FirstLine
+			return p
+		return .Position
 
  
 role MessageRoot (Message)
@@ -282,6 +292,6 @@ role MessageRoot (Message)
 	linkage
 		noauto
 		pragma noearlyfree
-	operator isa (|string| s, |bool|)
-		return .FilePath isa s
+//	operator isa (|string| s, |bool|)
+//		return .FilePath isa s
 
