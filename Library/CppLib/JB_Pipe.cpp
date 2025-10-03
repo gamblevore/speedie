@@ -218,7 +218,6 @@ int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComm
 	int PID = PicoStartFork(C, true);
 	if (PID == 0) { // CHILD
 		if (Mode&2) {
-			//setsid
 			setpgid(getpid(), getpid());
 		}
 		
@@ -228,7 +227,7 @@ int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComm
 			Dup2_( Sh.CaptureOut[WR], STDOUT_FILENO );
 			pipe_close(Sh.CaptureOut[WR]);
 			pipe_close(Sh.CaptureOut[RD]);
-		}
+		} // move these two cases into a subfunction?
 		
 		if (Mode&kStdErrSilence) {
 			close(STDERR_FILENO);
