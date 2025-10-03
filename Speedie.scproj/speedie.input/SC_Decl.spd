@@ -1152,13 +1152,7 @@ class SCDecl (SCObject) {
 
 
 	function SizeOfQuery (|int|)
-		opt norefcounts
-		|| n = Platform.PointerBytes
-		if !.PointerCount
-			n = .type.Size
-		if .IsCArray
-			n *= .CArrayTotal
-		return N
+		return .CArraySize
 
 
 	function CArrayTotal (|int|)

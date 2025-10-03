@@ -238,11 +238,11 @@ function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
 
 function TheTrinity (|message| out, |message| Prms, |asmreg| dest, |byte| OpCode, |asmreg|)
 	opt norefcounts
-	|| n = -1
+	|| n = 0
 	|asmreg[6]| Collection
 	for s.fast in out
 		Collection[n++] = .Trinometer(s, prms)
-	
+
 	|| fat = .RequestOp(OpCode, prms.parent!)
 	|| DestPos = -1
 	for i in n
