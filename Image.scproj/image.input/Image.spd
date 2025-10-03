@@ -171,7 +171,7 @@ class Image (memory)
 		rz.a = a
 	
 	
-	function Colorise (|Memory| data, |float| strength=1)
+	function Colorise (|Memory| data, |float| Strength=1)
 		require strength > 0
 		|| in = data.ptr
 		|| after = data.Next
