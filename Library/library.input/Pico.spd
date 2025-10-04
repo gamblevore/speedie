@@ -46,7 +46,7 @@ struct Pico
 		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)
-		cpp_wrapper PicoCompleteExec
+		cpp_wrapper PicoRestoreSockets
 	
 	syntax append (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
