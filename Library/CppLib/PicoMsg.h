@@ -93,21 +93,13 @@ struct PicoGlobalStats {
 #else
 	#define _pico_code_(x) {x}
 
-	#include <poll.h>
 	#include <fcntl.h>
-	#include <stdio.h>
 	#include <unistd.h>
-	#include <string.h>
 	#include <pthread.h>
-	#include <sched.h>
 	#include <errno.h>
 	#include <sys/socket.h>
 	#include <algorithm>
-	#include <arpa/inet.h>
 	#include <atomic>
-	#include <execinfo.h>
-	#include <charconv>
-	#include <signal.h>
 
 
 extern "C" bool				PicoStart ();
@@ -710,6 +702,7 @@ struct PicoComms {
 			struct linger so_linger = {1, 5};
 			if (setsockopt(Socks[i], SOL_SOCKET, SO_LINGER, &so_linger, sizeof so_linger)) failed();
 		}
+						;;;/*_*/;;;
 		return true;
 	}
 	
@@ -767,6 +760,7 @@ struct PicoComms {
 				SayEvent(pico_fail_actions[Action], strerror(err));
 				if (err == EBADF)
 					SayEvent("Socket", "", Socket);
+												;;;/*_*/;;;
 			}
 		}
 		Status = err;
@@ -782,6 +776,7 @@ struct PicoComms {
 			return (H >= 3) and failed(EPIPE, Half);
 		}
 		int e = errno;
+						;;;/*_*/;;;
 		if (e == EAGAIN) return false;
 		if (e == EINTR)  return true;
 		return failed(e, Half);
@@ -800,6 +795,7 @@ struct PicoComms {
 		if (CanSayDebug()) Say("Closing");
 		Reading->WorkerThread.unlock();
 		return true;
+									;;;/*_*/;;;
 	}
 
 	void cleanup () {
@@ -816,6 +812,7 @@ struct PicoComms {
 		}
 	}
 	
+	;;;/*_*/;;;
 	void io () {
 		if (!Socket or !guard_ok()) return;
 		InUse++;
@@ -841,6 +838,7 @@ static bool pico_try_exit () {
 
 	if (!pico_global_conf.TimeOut)
 		return false;
+	;;;/*_*/;;;
 
 	PicoDate MaxTime = pico_global_conf.TimeOut + pico_last_read;
 	if (MaxTime >= D)
@@ -850,6 +848,7 @@ static bool pico_try_exit () {
 	if (pico_timeout_count++ > 12) {
 		return true; /// only happens if  `pico_global_conf.TimeOut` above is true.
 	}
+	;;;/*_*/;;;
 	
 	pico_last_read = D - (pico_global_conf.TimeOut - 163840); // over 30 seconds
 	return false;
@@ -934,6 +933,7 @@ extern "C" PicoComms* PicoDestroy (PicoComms* M, const char* Why=0) _pico_code_ 
 	if (M) M->Destroy(Why);
 	return nullptr;
 )
+	;// 🕷️_🕷️
 
 extern "C" PicoComms* PicoStartChild (PicoComms* M) _pico_code_ (
 /// Creates a new child comm and links them together, using sockets.
@@ -962,6 +962,7 @@ extern "C" bool PicoStartPipe (PicoComms* M, int Pipe) _pico_code_ (
 /// After using this on one end, the other end must not use `PicoSend()` but simply `write()` to `Pipe`.
 	return M->InitPipe(Pipe);
 )
+	;;;/*_*/;;; // 🕷️_🕷️
 
 
 
@@ -980,6 +981,7 @@ extern "C" void PicoGet (PicoComms* M, PicoMessage* Out, float Time=0) _pico_cod
 /// Gets a message if any exist. You can either return immediately if none are queued up, or wait for one to arrive.
 /// Once it returns a PicoMessage, you must `free()` it's `Data` property, after you are finished with it.
 	*Out = {};
+	;;;/*_*/;;;  // 🕷️_🕷️
 	if (M)
 		*Out = M->Get(Time);
 )
@@ -989,7 +991,7 @@ extern "C" PicoMessage PicoGetCpp (PicoComms* M, float Time=0) _pico_code_ (
 	if (M)
 		return M->Get(Time);
 	return {};
-)
+);;;/*_*/;;;  
 
 
 
@@ -1075,7 +1077,7 @@ extern "C" void PicoStats (PicoGlobalStats* F) _pico_code_ (
 	F->TimeOutCount = pico_timeout_count;
 	F->OpenSockets  = pico_sock_open_count;
 	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 
-)
+);;;/*_*/;;;  //reeeeeeee
 
 #endif
 
