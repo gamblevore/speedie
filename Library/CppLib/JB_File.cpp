@@ -684,8 +684,8 @@ JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 		Result = JB_Str_New( Length );
 		if (Result) {
 			int64 Total = 0;
-			int Read = ReadIfItWasDoneProperly( FD, Result->Addr, Length, Total, true, (const char*)(self->Addr) );
-			if (Read < 0) {
+			int Error = ReadIfItWasDoneProperly( FD, Result->Addr, Length, Total, true, (const char*)(self->Addr) );
+			if (Error < 0) {
 				JB_FreeIfDead(Result);
 				Result = JB_Str__Error();
 			} else {
@@ -1150,14 +1150,14 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (Output < 0)
 		return -1;
 
-	int Read = 1;
+	int Status = 1;
 	int Input = File_GoToStart( self, false );
 	if (Input > 0) {
 		const int ChunkSize = 64*1024;
 		u8 Block[ChunkSize];
-		while (Read > 0) {
+		while (Status > 0) {
 			int64 Total = 0;
-			Read = ReadIfItWasDoneProperly(Input, Block, ChunkSize, Total, true, (const char*)self->Addr);
+			Status = ReadIfItWasDoneProperly(Input, Block, ChunkSize, Total, true, (const char*)self->Addr);
 			if (JB_File_WriteRaw_(To, Block, (int)Total) <= 0)
 				break;
 		}
@@ -1167,8 +1167,8 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!WasOpen)
 		JB_File_Close(self);
 	CopyStats_(self, To);
-	if (Read == 1) Read = 0;
-	return Read;
+	if (Status == 1) Status = 0;
+	return Status;
 }
 
 
