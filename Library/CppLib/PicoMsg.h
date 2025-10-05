@@ -46,7 +46,7 @@ struct 			PicoConfig  {
   PicoDate			LastSend;		/// The date of the last send.
   int 				Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
   float				SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
-  int				SendFailCount;	/// How many time sending failed.
+  int				SendFailCount;	/// How many times sending failed.
   int				ReadFailCount;	/// How many times reading failed.
   int				QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
   int				Bits;			/// The buffer-size in 1<<Bits. Set before calling `PicoStart...()`
@@ -105,7 +105,7 @@ struct PicoGlobalStats {
 extern "C" bool				PicoStart ();
 
 static PicoMessage pico_next_msg (PicoMessage M) {
-	return *((PicoMessage*)(M.Data + M.Length));
+	return *((PicoMessage*)(M.Data + M.Length));            			;;;/*_*/;;;
 }
 
 struct PicoTrousers { // only one person can wear them at a time.
@@ -125,10 +125,10 @@ struct PicoTrousers { // only one person can wear them at a time.
 
 
 PicoDate pico_date_create ( uint64_t S, uint64_t NS ) {
-	auto D = (uint64_t)15259; // for some reason unless we spell this out, xcode will miscompile this.
+	uint64_t D = 15259; // for some reason unless we spell this out, xcode will miscompile this.
 	NS /= D;
 	S <<= 16;
-	return S + NS;
+	return S + NS;         						   ;;;/*_*/;;;
 }
 
 PicoDate PicoGetDate( ) {
@@ -167,7 +167,7 @@ struct PicoCommList {
 		}
 		Lock.unlock();
 		return ID;
-	}
+	}           						 ;;;/*_*/;;;
 	
 	void Remove (int64_t M) {
 		Lock.lock();
@@ -216,9 +216,9 @@ struct PicoBuff {
 	std::atomic_int		RefCount;	
 	PicoTrousers		WorkerThread;
 	PicoComms*			Owner;
-	char				SectionStart[0];
+	char				SectionStart[0];             ;;;/*_*/;;;
 
-	static PicoBuff* New (int bits, const char* name, PicoComms* O) { // 🕷️
+	static PicoBuff* New (int bits, const char* name, PicoComms* O) { // 🕷️vv🕷️
 		PicoBuff* Rz = nullptr; bits++; 
 		while (!Rz) {
 			bits--; 
@@ -238,10 +238,10 @@ struct PicoBuff {
 	PicoMessage AskUsed () {
 		int T = Tail; int H = Head; int S = Size; int B = S - 1;
 		if (T >= H) return {};
-		T &= B; H &= B; // 🕷️ / 🕷️
+		T &= B; H &= B; // 🕷️ _ 🕷️
 		if (T >= H) // tail to head... or to size
 			H = S;
-		return {SectionStart+T, H-T}; // 🕷️  🕷️ 🕷️
+		return {SectionStart+T, H-T}; // 🕷️w🕷️
 	}
 	
 	PicoMessage AskUnused () {
@@ -262,11 +262,11 @@ struct PicoBuff {
 	void gained (int N) { 
 		pico_global_conf.LastActivity = PicoGetDate();
 		Head += N;
-	}
+	} ;;;/*_*/;;;
 	
 	int Length () {
 		return Head - Tail;
-	}; 
+	}  										;;;/*_*/;;;
 
 	bool AppendOutput (const char* Src, int MsgLen) {
 		int NetLen = htonl(MsgLen);
@@ -333,7 +333,7 @@ struct PicoComms {
 		QueueTail = &QueueHead;
 		Conf.Noise = noise;
 		Conf.SendTimeOut = 10.0f;
-		Conf.UserData = nullptr;
+		Conf.UserData = nullptr; // 🕷️_🕷️
 		Conf.UserFlags = 0;
 
 		if (Size<=0)
@@ -348,7 +348,7 @@ struct PicoComms {
 		if (!Name) Name = "";
 		strncpy(Conf.Name, Name, sizeof(Conf.Name)-1);
 		pico_list.AliveComms[ID] = this;
-	}
+	} ;;;/*_*/;;;
 
 	~PicoComms () { // destructor
 		if (!guard_ok()) return;
