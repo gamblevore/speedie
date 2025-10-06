@@ -23,20 +23,16 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	|int|						DiedCount
 	|bool|						AlreadyWarnedDied
 	|bool|						WeAreParent
-	|ProcessMode|				Mode
 	|date|						DelaySpawnTill
 
-	constructor	(|string| path, |?ThreadAsProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
-		super.constructor(path) // <-- mode should be passed here
+	constructor	(|string| path, |?ThreadAsProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
+		super.constructor(path, mode) // <-- mode should be passed here
 		
 		.deathlimit = 12
 		.DebugName = path
 		.WeAreParent = path != "" or fn != nil
 		.args	= params
 		.SubProcess = fn
-		.mode = mode
-		.output = (faststring(), nil)(.Mode is CaptureStdOut)
-		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
 		.pico = pico
 
@@ -80,14 +76,12 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if p.status
 			msg.RenderJbin(.writer)
 			p <~ .writer
-			.UpdatePipes
 
  
 	function Get (|float| T=0, |message|)
 		opt norefcounts
 		if self
 			.TryStart_
-			.UpdatePipes
 			|| str = .pico.get(T)
 				rz = str.parse
 	
@@ -108,9 +102,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	helper HandleDied
 		|| Bad = !.Status.crashed
 		.DiedCount += Bad
-		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
-			|| s = .ErrorOutput.GetResult
-				printline s
+//		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
+//			|| s = .ErrorOutput.GetResult
+//				printline s
 		.Disconnect(.status.name) // removes us from the check-list
 
 
@@ -141,15 +135,14 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	function Disconnect (|stringzeroterminated| Why="")
 		opt norefcounts
 		.DelaySpawnTill = 0
-		.UpdatePipes
-		.UnRegister
+		.remove
 		.ClosePipes
 		if .alive and !why and .CommsOpen
 			why = "UnknownReason"
 		.pico!.close(Why)
 
 
-	helper StartProcess (|string| path, |[string]?| Args=nil, |&pico?| C = nil, |bool| CaptureStdOut,  |ExitCode|)
+	helper StartProcess (|&pico?| C = nil,  |ExitCode|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
@@ -172,7 +165,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	
 	helper Start_ (|bool|)
 		.DelaySpawnTill = 0
-		|| err = .StartProcess(.path, .args, .pico, .output!=nil)
+		|| err = .StartProcess(.pico)
 		return err.successful
 
 	function TimedOut (|date| Durr, |bool|)
@@ -243,7 +236,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 		function CheckAllAlive
 			opt norefcounts
-			|| m = ProcessOwner.First
+			|| m = Process.First
 			while m
 				|| ch = m
 				m++
@@ -279,7 +272,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 			if id == 0 // we are child
 				id = app.parentid
-				mode = 0
+				mode = ProcessMode.PassThru
 			rz = spdprocess(app.path, nil, p, nil, mode)
 			rz.pid = id
 
@@ -306,19 +299,6 @@ prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)
 				return pico_out
 			pico_out.Close("")
-
-
-
-datatype ProcessMode (byte)
-	flags
-		CaptureStdOut
-		CaptureOrPrintErrors = [CaptureErrors, AutoPrintErrors]
-		PassThrough = AutoPrintErrors // idk? why capture errors just to print them? what is it doing?
-		CaptureAll = CaptureStdOut ||| AutoPrintErrors
-
-	syntax is (|ProcessMode| M, |bool|)
-		return self&M
-
 
 
 function app.fork (|PID_Int|)

@@ -3,7 +3,7 @@
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
-// * Use ringtree for world/super/block! makes code simpler!
+// * Use JB_List for world/super/block! makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
 // * also... can put worlds together. Like sound/map/graphics/obj

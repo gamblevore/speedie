@@ -113,10 +113,10 @@ function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	.ProductOut.Log(str, 256K)
 	.LogOneAction(@emb + str)
 	out <~ ("\n", 2)
-	|| r = Process.stream(f, args, out, faststring(), ProcessOwnerMode.OwnGroup)
+	|| r = Process.stream(f, args, ProcessMode.OwnGroup)
 	if r and r.PID
 		.RunCompiledApp = r
-		.ShowProductIfMoreOutput = out.Length
+		.ShowProductIfMoreOutput = 0
 		.RunButton.text = "\07"
 
 
@@ -182,31 +182,29 @@ function PerryIDE.AddProductErr (|string| err)
 		(t isnt hidden)
 
 
-function PerryIDE.UpdateProductText (|process| r)
-	|| rout = r.Output
-	if rout and rout.length
-		.ProductOut.Log(rout, 256K)
-		if !(r.userflags&1)
-			.ShowCompileTab(.productout)
-			r.userflags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
-		if .ShowProductIfMoreOutput < .ProductOut.Length
-			.ShowProductIfMoreOutput = int.max // no more updates
-			.CompileTabSelect(.ProductOut)
-			.ProductSep.Show
+function PerryIDE.UpdateProductText (|process| r, |string| rout)
+	.ProductOut.Log(rout, 256K)
+	if r and !(r.userflags&1)
+		.ShowCompileTab(.productout)
+		r.userflags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
+	if .ShowProductIfMoreOutput < .ProductOut.Length
+		.ShowProductIfMoreOutput = int.max // no more updates
+		.CompileTabSelect(.ProductOut)
+		.ProductSep.Show
 	
 	
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 
-	r.step
-	.UpdateProductText(r)
+	|| rout = r.readstdout
+		.UpdateProductText(r, rout)
 	
 	|| x = r.Status	
 	if kill or !x.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 	
-	.AddProductErr(r.ErrorOutput)
+	.AddProductErr(r.ReadStdErr)
 	
 	if kill
 		.ProductOut.log("\n(--Process Killed--)")

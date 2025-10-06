@@ -12,18 +12,6 @@ extern "C" {
 
 JB_Error* JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, unsigned char level, JB_String* path);
 
-JB_String* JB_Str__Freeable(uint8* p, int n) {
-    JB_String* Str = JB_New( JB_String );
-    Str->Addr = (uint8*)p;
-    Str->Length = n;
-    return Str;
-}
-
-
-JB_String* JB_Str__Freeable0(const char* Msg) {
-	return JB_Str__Freeable((uint8*)Msg, (int)strlen(Msg));
-}
-
 
 JB_String* FreeableStr_(const char* Msg, bool CanFree) {
     // if canfree is true, then... we will call free() on dispose.

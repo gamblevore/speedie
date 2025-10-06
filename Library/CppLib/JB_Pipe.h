@@ -5,64 +5,52 @@
 
 #include "JB_Umbrella.h"
 #include "PicoMsg.h"
+#include "JB_List.h"
 
 #define STDFUN_FILENO 3
 #define STDPICO_FILENO 4
 
 extern "C" {
 
-
-JBClass( ProcessOwner, JB_Object,	// should this be a ringtree isntead?
-	uint				PID;		// we want to remove jb_ringlist. its bad.
-    ProcessOwner*		Next;
-    ProcessOwner*		Prev;
+JBClass( ShellStream, JB_List,
+	uint				PID;
+    ShellStream*		Next;				// should this be a ringtree instead?
+    ShellStream*		Prev;				// Saves us dealing with the next/prev
+	JB_String*			Path;
+	Array*  			Args;
 	volatile int		_Status;
 	bool				KillOnExit;
 	bool				LeaveOrphaned;
+	u8					Mode;
+	PicoComms*			StdOut;
+	PicoComms*			StdErr;
+    int64				UserFlags; // remove these two?
+//    JB_Object*			UserObj; // just like jeebox!
 );
 
-void JB_PID_Start();
-ProcessOwner* JB_PID_Constructor(ProcessOwner* self);
-void JB_PID_UnRegister(ProcessOwner* self);
-void JB_PID_Destructor(ProcessOwner* self);
-void JB_PID_Register(ProcessOwner* self);
-int JB_PID_Kill (ProcessOwner* F, int Code);
+
+
+int JB_Sh_Kill (ShellStream* F, int Code);
 void JB_KillChildrenOnExit();
-//int JB_PID_Exit (ProcessOwner* F);
-int JB_PID_Status (ProcessOwner* F);
+//int JB_Sh_Exit (ShellStream* F);
+int JB_Sh_Status (ShellStream* F);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
-ProcessOwner* JB_PID_Next(ProcessOwner* self);
-ProcessOwner* JB_PID__First();
-
-
-
-
-
-JBClass( ShellStream, ProcessOwner,
-	bool		IsClosed;
-	JB_String*  Path;
-	Array*  	Args;
-	FastString* Output;
-	FastString* ErrorOutput;
-    int			CaptureOut[2];
-    int			CaptureErr[2];
-    Date		LastRead;
-    int64		UserFlags;
-    JB_Object*	UserObj; // just like jeebox!
-);
+ShellStream* JB_Sh_Next(ShellStream* self);
+ShellStream* JB_Sh__First();
 
 
 
 void JB_Sh_Destructor(ShellStream* self);
-ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path);
-ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode);
+ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path, Array* Args, byte Mode);
+ShellStream* JB_Sh__Stream(JB_String* self, Array* R, int Mode);
 bool JB_Sh_Step(ShellStream* self);
 int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, int Mode, Date Timeout);
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R);
-int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode);
-void JB_Sh_UpdatePipes(ShellStream* self);
-void JB_Sh_ClosePipes(ShellStream* self);
+int JB_Sh_StartProcess(ShellStream* self, PicoComms* C);
+void JB_Sh_Close(ShellStream* self);
+JB_String* JB_Sh_ReadStdErr (ShellStream* self);
+JB_String* JB_Sh_ReadStdOut (ShellStream* self);
 bool JB_App__TurnInto(JB_String* self, Array* R); 
 typedef void (*fn_app_deathaction)();
 //void JB_App__AtExit (fn_app_deathaction b);

@@ -105,7 +105,9 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		target notdebug
 			proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
 		if proc
-			|| Mode = ProcessMode.CaptureAll * !noisy
+			|| Mode = ProcessMode.CaptureAll
+			if !noisy
+				mode = ProcessMode.silence
 			|duration| Delay = 0
 			if !Perry.FinishedStartUp
 				Delay = 0.125s * Perry.WindowNumber
@@ -129,7 +131,7 @@ function PerryIDE.ActualCompile (|string| operation)
 		args <~ "--perry=bin"
 
 	.LogOneAction(@emb + speedie + " " + args.render)
-	.compilr = process.Stream(speedie, args, faststring(), faststring())		#require
+	.compilr = process.Stream(speedie, args, processmode.captureall)		#require
 	.SpeedieText.text = ""
 	
 	(.BuildButton isnt enabled)

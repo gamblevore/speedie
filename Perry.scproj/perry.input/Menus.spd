@@ -102,12 +102,13 @@ function PressingTabs (guiaction)
 		|| p = .submenu|listview|
 			|| ide = row.ide
 				p.ListSource.clear
-				p <~ ("Copy " + ide.name, MenuCopyProject, ide)
+				|| ref = ide.first
+				p <~ ("Copy " + ide.name, MenuCopyProject, ref)
 				|| file = ide.path|string|
 				if file and file != ide.Project|string|
-					p <~ ( "Copy " + file.name, MenuCopyFile, ide)
-				p <~ ("Show In Desktop", MenuShowProject, ide)
-				p <~ ("Close", MenuCloseProject, ide)
+					p <~ ( "Copy " + file.name, MenuCopyFile, ref)
+				p <~ ("Show In Desktop", MenuShowProject, ref)
+				p <~ ("Close", MenuCloseProject, ref)
 				.OpenMenu(row)
 
 

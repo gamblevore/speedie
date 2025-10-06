@@ -21,7 +21,7 @@ main (|[string]| Files)
 
 function app.TryCompileOne (|file| f)
 	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
-	|| M = ProcessOwnerMode.StdOutSilence
+	|| M = ProcessMode.StdOutSilence
 	|| Speedie = "/usr/local/bin/spd"
 	
 	if Speedie.Execute(args, M).Successful

@@ -233,7 +233,6 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
     JB_FS__FastNew( 0 );						// Stop leak tests catching this.
     JB_Dict__Init();
     JB_Str__LoadGlobals();
-    JB_PID_Start();
 
     int Err = JB_Init_();
 	if (Err)

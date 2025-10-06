@@ -135,6 +135,17 @@ JB_StringC* JB_StrCN( const void* c, int N ) {
 	return (JB_StringC*)JB_Str__Empty();
 }
 
+JB_String* JB_Str__Freeable(uint8* p, int n) {
+    JB_String* Str = JB_New( JB_String );
+    Str->Addr = (uint8*)p;
+    Str->Length = n;
+    return Str;
+}
+
+JB_String* JB_Str__Freeable0(const char* Msg) {
+	return JB_Str__Freeable((uint8*)Msg, (int)strlen(Msg));
+}
+
 
 		// Utilities
 
@@ -229,8 +240,6 @@ JB_String* Str_Shrink (JB_String* u, int Length) {
 
 
 
-
-
 void JB_Str_Destructor(JB_StringShared* self) {
 	JB_Decr( self->Parent );
 }
@@ -276,7 +285,6 @@ U+E000..U+FFFF		EE..EF		80..BF		80..BF
 U+10000..U+3FFFF	F0			90..BF		80..BF		80..BF
 U+40000..U+FFFFF	F1..F3		80..BF		80..BF		80..BF
 U+100000..U+10FFFF	F4			80..8F		80..BF		80..BF
-
 */
 
 
@@ -310,7 +318,7 @@ static uint8* u8Read( uint8* source, u32* pch ) {
 
 
 
-uint8* u8Write_( uint8* target, u32 ch ) {
+uint8* u8Write_ ( uint8* target, u32 ch ) {
 	if (ch < 0x80) {
 		*target++ = (uint8)ch;
 
@@ -333,8 +341,6 @@ uint8* u8Write_( uint8* target, u32 ch ) {
 
 	return target;
 }
-
-
 
 
 inline u16* u16Read( u16* source, u32* ch ) {
@@ -386,7 +392,6 @@ JB_String* JB_Str_UTF16To8(JB_String* Str, FastString* fs_in, int SrcIsBig) {
 
 
 // kUTF8FirstMin is a special trick to test for a UTF8 starter, in 1 test, instead of 2
-
 
 static int ValidateUTF8 (uint8* p, int Len) {
 	int i = 0;
@@ -456,7 +461,7 @@ int JB_u8p_ByteCount(uint8* a, int Len, int CharCount) {
 	return Len;
 }
 
-int u8Count_(uint8* a, int Len) {
+int u8Count_ (uint8* a, int Len) {
 	char* s = (char*)a;	
 	int cCount = 0;
 	while (Len-- > 0)
@@ -466,7 +471,7 @@ int u8Count_(uint8* a, int Len) {
 }
 
 
-int JB_Str_CharCount(JB_String* self, int s, int s2) {
+int JB_Str_CharCount (JB_String* self, int s, int s2) {
 	int L = JB_Str_Length(self);
 	require(L and s < L);
 	s2 = Min(s2, L);
@@ -482,7 +487,7 @@ u32 JB_u8p_Read ( uint8** source ) {
 }
 
 
-u32 JB_Str_UTF8Size( u32 c ) {
+u32 JB_Str_UTF8Size ( u32 c ) {
 	if (c < 0x80) { // common case first!
 		return 1;
 	} else if (c <= UNI_MAX_2BYTES) {
@@ -501,7 +506,7 @@ u32 JB_Str_UTF8Size( u32 c ) {
 }
 
 
-int JB_Str_UTF8Value(JB_String* self, bool Strict) {
+int JB_Str_UTF8Value (JB_String* self, bool Strict) {
 	int Len = JB_Str_Length(self);
 	if (Len <= 0)
 		return UNI_BADOFFSET;
@@ -521,7 +526,7 @@ int JB_Str_UTF8Value(JB_String* self, bool Strict) {
 }
 
 
-u32 JB_u8_Size( uint8 FirstChar ) {
+u32 JB_u8_Size ( uint8 FirstChar ) {
 	if (FirstChar < 0x80) return 1;
 	if (FirstChar <= 0xC1) return 0;
 	if (FirstChar <= 0xDF) return 2;

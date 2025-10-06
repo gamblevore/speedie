@@ -164,14 +164,15 @@ JB_Class* Str_IsCSub ( JB_String* self ) { // 0 means true
 
 
 bool JB_Str_IsC ( JB_String* self ) {
-	auto C = Str_IsCSub(self);
-	if (!C) return true;
-	if (C == JB_AsClass(JB_StringShared)) {
-		auto P = (JB_String*)(((JB_StringShared*) self)->Parent);
-		if (P->Length+P->Addr == self->Length+self->Addr) // ends at same point.
-			return Str_IsCSub(P)==0;
+	if (self) {
+		auto C = Str_IsCSub(self);
+		if (!C) return true;
+		if (C == JB_AsClass(JB_StringShared)) {
+			auto P = (JB_String*)(((JB_StringShared*) self)->Parent);
+			if (P->Length+P->Addr == self->Length+self->Addr) // ends at same point.
+				return Str_IsCSub(P)==0;
+		}
 	}
-    
 	return false;
 }
 

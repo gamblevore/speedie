@@ -4,44 +4,52 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
-class Process (ProcessOwner)
-// merge this with processowner!
-	|string|				Path
-	|[string]?|				Args
-	|FastString?|			Output
-	|FastString?|			ErrorOutput
-    |Date|					LastRead
-    |int64|					UserFlags
-    |object|				UserObj
-    
+class Process (list)
+	size 64
+	// the list functions mostly shouldn't be used. I should hide them somehow
+	// kinda like I want to do with... roles.
 	linkage
 		wrapper
 		cpp_part Sh
 		cpp_class ShellStream
+	contains Process
 	
-	constructor (|string| path):		cpp_wrapper JB_Sh_Constructor
-	destructor:							cpp_wrapper JB_Sh_Destructor
+	|PID_Int| 				PID
+	|string|				Path
+	|[string]?|				Args
+    |int64|					UserFlags // remoev these two?
+//    |object|				UserObj
+
+	constructor (|string| Path, |[string]| Args=nil, |ProcessMode| Mode)
+		cpp_wrapper
+	destructor:												cpp_wrapper
+	
+	function Status (|ExitCode|)
+		cpp_Wrapper
+
+	function UnRegister
+		description "Removes from the process list. Doesnt change the exit, pid, or status codes" 
+		.remove
+
+	function Kill (|int| ExitCode)
+		cpp_wrapper
+	
+	module
+		function First (|Process|)
+			cpp_wrapper
 
 	render
 		fs <~ "PID: $.pid\n${.path} $.args" // full path makes more sense, really.
 	
 	function ClosePipes
-		cpp_wrapper JB_Sh_ClosePipes
-
-	function UpdatePipes
-		description `Updates .Output and .ErrorOutput`
-		cpp_Wrapper JB_Sh_UpdatePipes
-	
-	function Step (|bool|)
-		description `Returns false if the process has exited. Also calls .UpdatePipes interally.`
-		cpp_wrapper JB_Sh_Step
+		cpp_wrapper JB_Sh_Close
 
 	function ReadStdOut (|string|)
-		if self
-			.UpdatePipes
-			return .Output
+		cpp_wrapper
+
+	function ReadStdErr (|string|)
+		cpp_wrapper
 		
 	module
-		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |processownermode| Mode = nil, |Process?|)
+		function Stream (|String| app, |[string]| R=[], |processmode| Mode = nil, |Process?|)
 			cpp_wrapper JB_Sh__Stream

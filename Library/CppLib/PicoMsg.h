@@ -30,14 +30,15 @@
 
 #include <stdint.h> // for picodate
 
-typedef int64_t	PicoDate;  // Counts in 1/64K of a second. Gives 47-bits max seconds.
+typedef int64_t	PicoDate;  // Counts in 1/64K of a second. Gives ±445M years range.
 
 struct			PicoComms;
 struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;   operator bool () {return Data;}; };
 
 typedef bool	(*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
-typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Passes the time via clock_gettime(CLOCK_REALTIME)
+typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
+typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
 
 
 struct 			PicoConfig  {
@@ -510,6 +511,16 @@ struct PicoComms {
 		Conf.QueueSize  +=  M.Length + sizeof(PicoMessage)*2;
 		return M;
 	}
+	
+	bool Append (PicoAppenderFn Fn, void* Obj) {
+		if (found_incoming()) {
+			int L = Reading->Length();
+			if (char* Dest = (Fn)(Obj, L); Dest)
+				Reading->Get(Dest, L);
+		}
+		return !(HalfClosed&1);
+//		if (found_incoming());
+	}
  
 	void* SayEvent (const char* A, const char* B="", int Iter=0) {
 		if (Conf.Noise & (PicoNoiseEventsChild << IsParent))
@@ -526,6 +537,8 @@ struct PicoComms {
 		const char* P = Conf.Name;
 		if (!P or !strlen(P))
 			P = IsParent ? "Parent" : "Child";
+		if (!B)
+			B = "";
 		if (Iter)
 			printf("%s.%s: %s %s %i\n", S, P, A, B, Iter);
 		  else
@@ -994,10 +1007,19 @@ extern "C" PicoMessage PicoGetCpp (PicoComms* M, float Time=0) _pico_code_ (
 );;;/*_*/;;;  
 
 
+extern "C" bool PicoAppend(PicoComms* M, PicoAppenderFn Fn, void* Obj) _pico_code_ (
+/// Similar to PicoGet, but only used on pipe input, and the data is written to your desired location.
+/// This removes the need for `free()`. Returns true if the PicoComms is still open, allowing for further reads from a pipe.
+	if (M and Obj and Fn)
+		return M->Append(Fn, Obj);
+	return false;
+)
+
+
 
 /// **Utilities** ///
 
-extern "C" void PicoClose (PicoComms* M, const char* Why) _pico_code_ (
+extern "C" void PicoClose (PicoComms* M, const char* Why=nullptr) _pico_code_ (
 /// Closes the comms object. Does not destroy it. Useful if you have many places that might need to close the comms, but only one place that will destroy it. It is acceptable to close a comms twice!
 	if (M) M->AskClose(Why);
 )

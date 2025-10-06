@@ -4,22 +4,27 @@
 
 
 #include "JB_Umbrella.hpp"
+#include <execinfo.h>
+
+extern "C" {
+	JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(JB_List),   0 );
+}
+
+#ifndef AS_LIBRARY
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
-#include <execinfo.h>
 #include <signal.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
 #include <errno.h>
 #include <sys/stat.h>
-
 #include <pwd.h>
 #include <sys/mman.h>
-
+#include <string>
+#include <iostream>
 
 #if __linux__
 	#include <sys/mman.h>
@@ -27,32 +32,98 @@
 	#include <linux/limits.h>
 #endif
 
-
+#define kOwnGroup		2
 #define kStdOutPassThru 4
 #define kStdOutSilence  8
 #define kStdOutNil      12
 #define kStdErrPassThru 16
 #define kStdErrSilence  32
-#define kStdErrSilence  32
 #define kStdErrNil      48
 
 
+
 extern "C" {
-JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),      0 );
+const int RD = 0;   const int WR = 1;
+ShellStream*		PSRoot;
+std::atomic_int		SigChildOutStanding = 0x0000000 + 0000 -1*0; // FUCK UNIX
+bool				CanASMBKPT = true;
+
+
+void JB_App__SetASMBreak (bool b) {
+	CanASMBKPT = b;
 }
 
 
-#ifndef AS_LIBRARY
-#include <string>
-#include <iostream>
+static void AddLostChild_ (int PID, int C) {
+	ShellStream* F = (ShellStream*)JB_Ring_First(PSRoot);
+	while (F) {
+		if (F->PID == PID) {
+			if (WIFSIGNALED(C))
+				F->_Status = WTERMSIG(C)|128;
+			  else
+				F->_Status = WEXITSTATUS(C);
+			return;
+		}
+		F = F->Next;
+	}
+}
 
 
-extern "C" {
-const int RD = 0; const int WR = 1;
-JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
+void JB_SigChild (int signum) {
+	SigChildOutStanding++;
+}
 
 
-void JB_Rec__Latchkum (Message* node, JB_String* Desc, JB_Object* Source);
+int JB_Sh_Status (ShellStream* F) {
+	while (SigChildOutStanding > 0) {
+		while (true) {
+			int ExitCode = 0;
+			int PID = waitpid(-1, &ExitCode, WNOHANG);
+			if (PID > 0) {
+				AddLostChild_(PID, ExitCode);
+				JB_Ring_ParentSet(F, nil);
+			} else if (PID == 0 or errno != EINTR) {
+				break;
+			}
+		}
+		SigChildOutStanding--;
+	}
+	if (SigChildOutStanding < 0) // ?what?
+		SigChildOutStanding = 0;
+	return F->_Status;
+}
+
+
+void JB_KillChildrenOnExit () {
+	ShellStream* F = PSRoot;
+	while (F) {
+		if (F->PID > 0 and F->KillOnExit)	// seems unused?
+			kill(F->PID, SIGKILL);			// leave for now.
+		F = F->Next;
+	}
+}
+ 
+int JB_Sh_Kill (ShellStream* F, int Code) {
+	F->_Status = Code;
+	return JB_Kill(F->PID);
+}
+
+////*&(^!@^*& ^^^^^^^ PiD ^^^^^^^^
+//// BATCHES LOST CONTROL
+
+JB_StringC* JB_Err_SignalName (int Sig) {
+	const char* S = "NormalExit";
+	if (Sig) S = strsignal(Sig);
+	return JB_StrC(S);
+}
+
+JB_StringC* JB_Err_Name (int Err) {
+	return JB_StrC(strerror(Err));
+}
+
+int JB_Signal(int PID, int sig) {
+	return kill(PID, sig);
+}
 
 
 JB_String* JB_App__Readline() {
@@ -61,6 +132,7 @@ JB_String* JB_App__Readline() {
         return JB_Str_CopyFromPtr((uint8*)L.c_str(), (int)L.length());
     return JB_Str__Error();
 }
+
 
 static void pipe_close (int& fd) {
 	if (fd > 0) {
@@ -74,43 +146,11 @@ void JB_App__SetThreadName(JB_String* self) {
 	require0(JB_Str_Length(self));
 	u8 CName[32];
 	auto tmp = (const char*)JB_FastFileString(self, CName);
-	
-	
 #if __APPLE__
 	pthread_setname_np(tmp); // why?
 #else
 	pthread_setname_np(pthread_self(), tmp);
 #endif
-}
-
-
-//typedef void* (*PThread_Function)(void* Param);
-// // just use pico, can get the buffer size down to 256 bytes if I want...
-//int JB_App__Thread(void* Fn, void* Obj, JB_String* Name) {
-//	pthread_t T = 0;
-//	// pthread_setname_np sucks anyway ;-/
-//	if (!pthread_create(&T, nullptr, (PThread_Function)Fn, Obj) and !pthread_detach(T))
-//		return 0;
-//	return JB_ErrorHandleFileC(0, errno, "Starting pthread");
-//}
-//
-
-bool CanASMBKPT = true;
-void JB_App__SetASMBreak(bool b) {
-	CanASMBKPT = b;
-}
-
-bool JB_Str__Terminate(Array* strs) {
-	int n = JB_Array_Size(strs);
-	for_(n) {
-		JB_String* A = (JB_String*)JB_Array_Value(strs, i);
-		auto B = JB_Str_MakeC(A);
-		require (B);
-		if (B != A) {
-			JB_Array_ValueSet(strs, i, B);
-		}
-	};
-	return true;
 }
 
 
@@ -181,77 +221,77 @@ static bool Dup2_(int from, int to) { // so this kinda does what dup2 should do.
 }
 
 
-static void Unblock (int fd) {
-	if (fd < 0) return;
-	int FL = fcntl(fd, F_GETFL, 0);
-	if (FL!=-1)
-		fcntl(fd, F_SETFL, FL | O_NONBLOCK);
+static void StartPico (PicoComms* M, int* Both) {
+	if (M and (pipe(Both) == 0)) {
+		int fd = Both[RD];
+		int FL = fcntl(fd, F_GETFL, 0);
+		if (FL>=0)
+			fcntl(fd, F_SETFL, FL | O_NONBLOCK);
+		PicoStartPipe(M, fd);
+	}
 }
-
 
 
 static void CheckStillAlive (ShellStream* Sh) {
 // kill() function unreliable. UNIX breaking it's own guidelines! As usual!
 	require0 (Sh->_Status == -1  and  kill(Sh->PID, 0) != 0);
-	JB_PID_Status(Sh);
-	if (Sh->_Status < 0) // why?
+	if (JB_Sh_Status(Sh) < 0) // why?
 		Sh->_Status = 0;
-	JB_PID_UnRegister(Sh); // in case JB_PID_Exit can't find this. its possible! with unix.
+	JB_Ring_ParentSet(Sh, 0);
 }
 
 
-int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+static void CloseAndDup (int Mode, int* Capture, int Mask, int Std_FileNo) {
+	if (Mode&Mask) {
+		close(Std_FileNo);
+	} else {
+		Dup2_( Capture[WR], Std_FileNo );
+		pipe_close(Capture[WR]);
+		pipe_close(Capture[RD]);
+	}
+}
+
+
+int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,close,Eintr,_exit // far too much stuff in unix.
-	auto& Sh = *self;
-	auto argv = JB_Proc__CreateArgs(path, Args);
+	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
 	if (!argv) return E2BIG;
 	
-	if (Sh.Output) {
-		pipe(Sh.CaptureOut);
-		Unblock(Sh.CaptureOut[RD]); // should never block
-	}
-	if (Sh.ErrorOutput) {
-		pipe(Sh.CaptureErr);
-		Unblock(Sh.CaptureErr[RD]); // even this blocking at all is kinda sus...
-	}
+	int CaptureOut[2] = {-1,-1};
+	int CaptureErr[2] = {-1,-1};
+	StartPico(S->StdOut, CaptureOut);
+	StartPico(S->StdErr, CaptureErr);
 	
-	int PID = PicoStartFork(C, true);
-	if (PID == 0) { // CHILD
+	int ChildID = PicoStartFork(C, true);
+	if (ChildID == 0) {
+		int Mode = S->Mode; // We are the child!
 		if (Mode&2) {
-			setpgid(getpid(), getpid());
+			int p = getpid();
+			setpgid(p, p);
 		}
 		
-		if (Mode&kStdOutSilence) {
-			close(STDOUT_FILENO);
-		} else {
-			Dup2_( Sh.CaptureOut[WR], STDOUT_FILENO );
-			pipe_close(Sh.CaptureOut[WR]);
-			pipe_close(Sh.CaptureOut[RD]);
-		} // move these two cases into a subfunction?
-		
-		if (Mode&kStdErrSilence) {
-			close(STDERR_FILENO);
-		} else {
-			Dup2_( Sh.CaptureErr[WR], STDERR_FILENO );
-			pipe_close(Sh.CaptureErr[WR]);
-			pipe_close(Sh.CaptureErr[RD]);
-		}
+		CloseAndDup(Mode, CaptureOut, kStdOutSilence, STDOUT_FILENO);
+		CloseAndDup(Mode, CaptureErr, kStdErrSilence, STDERR_FILENO);
 		
 		execvp(argv[0], (char* const*)argv);
-		_exit(errno-!errno); // in case execvp fails
+		_exit(errno); // in case execvp fails
 	}
 
 	byte Result = 0;
-	if (PID > 0) {
-		JB_PID_Register(&Sh);
-		Sh._Status = -1;
-		Sh.PID = PID;
-		pipe_close(Sh.CaptureOut[WR]);
-		pipe_close(Sh.CaptureErr[WR]);
-		CheckStillAlive(&Sh);
+	if (ChildID > 0) {
+		auto X = PSRoot;
+		if (!X) {
+			PSRoot = X = JB_Sh_Constructor(0, JB_Str__Empty(), 0, -1);
+		}
+		JB_Ring_LastSet(X, S);
+		S->_Status = -1;
+		S->PID = ChildID;
+		pipe_close(CaptureOut[WR]);
+		pipe_close(CaptureErr[WR]);
+		CheckStillAlive(S);
 	} else {
 		Result = errno;
-		JB_ErrorHandleFile(path, nil, Result, nil, "run");
+		JB_ErrorHandleFile(S->Path, nil, Result, nil, "run");
 	}
 
 //	JB_FreeIfDead(path);
@@ -260,54 +300,31 @@ int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComm
 }
 
 
-int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, int AsFile, u8* Name);
-
-
-int UpdatePipesSub_(ShellStream* self, FastString* FS, int& fd, int& Total) {
-	if (!FS or fd < 0)
-		return 0;
-	const int BuffLen = 16*1024; // MacOS default size.
-	uint8* Buffer = JB_FS_WriteAlloc_(FS, BuffLen);
-	if (!Buffer) return -1;
-
-	auto Name = self->Path->Addr;
-	int64 N = 0;
-	int Error = ReadIfItWasDoneProperly(fd, Buffer, BuffLen, N, 0, Name);
-	if (Error == 0)
-		pipe_close(fd);		// close the thing here if its finished? might as well?
-	Total+=N;
-	JB_FS_AdjustLength_(FS, BuffLen, (int)N);
-    return Error;
+ShellStream* JB_Sh__First() {
+	return (ShellStream*)JB_Ring_First(PSRoot);
 }
 
 
-bool UpdatePipes_(ShellStream* self, int& Read) {
-	auto& Sh = *self;
-	CheckStillAlive(self);
-	// a better way, would be that each faststring, can contain a "message" that we send
-	// via another thread. Basically a block of memory we are allowed to write to
-	// Like u8* StreamBlock, int StreamBlockLength
-	// FastString should be allowed to lower the length
-	// how to syncronise it? Thats always fun. Use two lengths, as a ringbuffer?
-	// one writes, one reads.
-	 
-	int ContinueOut = UpdatePipesSub_(self, Sh.Output,      Sh.CaptureOut[RD], Read);
-	int ContinueErr = UpdatePipesSub_(self, Sh.ErrorOutput, Sh.CaptureErr[RD], Read);
-	return (ContinueOut > 0) or (ContinueErr > 0);
+void JB_Sh_Close(ShellStream* self) {
+	PicoClose(self->StdErr);
+	PicoClose(self->StdOut);
 }
 
 
-void JB_Sh_UpdatePipes(ShellStream* self) {
-	int Read = 0;
-	UpdatePipes_(self, Read);
-}
-
-
-void JB_Sh_ClosePipes(ShellStream* self) {
-	for (int i = 0; i < 4; i++) {
-		pipe_close(self->CaptureOut[i]);
+static JB_String* ReadPico (PicoComms* C) {
+	PicoMessage M = PicoGetCpp(C);
+	if (M) {
+		return JB_Str__Freeable((uint8*)M.Data, M.Length);
 	}
-	self->IsClosed = true;
+	return JB_Str__Empty();
+}
+
+JB_String* JB_Sh_ReadStdErr (ShellStream* self) {
+	return ReadPico(self->StdErr);
+}
+
+JB_String* JB_Sh_ReadStdOut (ShellStream* self) {
+	return ReadPico(self->StdOut);
 }
 
 
@@ -319,29 +336,37 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 }
 
 
-void JB_FEPDWEE_Finish(ShellStream& Sh) {
-	pipe_close(Sh.CaptureOut[RD]);
-	pipe_close(Sh.CaptureErr[RD]);
-	Sh.IsClosed = true;
+bool JB_FS_AppendPico (FastString* Self, PicoComms* M) {
+	return PicoAppend(M, (PicoAppenderFn)JB_FS_WriteAlloc_, Self);
 }
 
 
-int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
-	auto Sh = JB_Sh__Stream(self, R, FSOut, FSErrIn, Mode);
-	if (!Sh) return errno|!errno;
+int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* ErrsIn, int Mode, Date TimeOut) {
+	if (ErrsIn) Mode&=~kStdErrNil; else if (!(Mode&kStdErrNil)) Mode |= kStdErrPassThru;
+	if (Out)  Mode&=~kStdOutNil; else if (!(Mode&kStdOutNil)) Mode |= kStdOutPassThru;
+	auto Sh = JB_Sh_Constructor(0, self, R, Mode&~kStdErrPassThru);
+	byte Error = JB_Sh_StartProcess(Sh, 0);
+	if (Error) {
+		JB_SetRef(Sh, 0);
+		return Error;
+	}
+	
+	auto Errs = ErrsIn;
+	if (!Errs and ((Mode&kStdErrNil)==kStdErrPassThru))
+		Errs = JB_FS_ConstructorSize(0, 0);
 	
 	Date ExitAfter = 0;
 	if (TimeOut > 0)
 		ExitAfter = JB_Date__Now() + TimeOut;
 
-	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
-		int ReadAmount = 0;
-		UpdatePipes_(Sh, ReadAmount);
-		if (JB_PID_Status(Sh) != -1)
+	while (TimeOut >= 0) {							// allow -1 time out which instantly exits...
+		int ReadAny = JB_FS_AppendPico(Errs, Sh->StdErr);
+		ReadAny |= JB_FS_AppendPico(Out, Sh->StdOut);
+		if (!ReadAny and JB_Sh_Status(Sh) != -1)
 			break;
 		if (TimeOut > 0) {
 			auto Now = JB_Date__Now();
-			if (ReadAmount > 0)
+			if (ReadAny)
 				ExitAfter = Now + TimeOut;
 			  else if (Now >= ExitAfter)
 				break;
@@ -349,31 +374,22 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FS
 		JB_Date__Sleep(1);
 	}
 
-	JB_Sh_UpdatePipes(Sh);
-	JB_FEPDWEE_Finish(*Sh);
-
-	auto ShErr = Sh->ErrorOutput;
-	if (!FSErrIn and JB_FS_Length(ShErr)) {
-		JB_Rec__Latchkum(nil, JB_FS_GetResult(ShErr), nil);
+	if (Errs and (Mode&kStdErrNil)==kStdErrPassThru) {
+		void JB_Rec__Latchkum (Message* node, JB_String* Desc, JB_Object* Source);
+		JB_Rec__Latchkum(nil, JB_FS_GetResult(Errs), nil);
 	}
 	int Exit = Sh->_Status;
-	JB_FreeIfDead(Sh);
-	if (Exit>128)			// died from a signal // usually its what we want, despite being mixed up
+	JB_Delete((FreeObject*)Sh);
+	if (Exit>128)			// died from a signal. Perhaps a SEGFAULT.
 		JB_ErrorHandleFile(self, nil, Exit, "crashed", "running");
 	return Exit;
 }
 
 
-ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, int Mode) {
-	auto rz = JB_Sh_Constructor(0, self);
-	if (FSOut) // cleanup
-		Mode &= ~kStdOutNil;
-	if (FSErrIn)
-		Mode &= ~kStdErrNil;
-	rz->Output = JB_Incr(FSOut);
-	rz->ErrorOutput = JB_Incr(FSErrIn);
-	rz->Args = JB_Incr(Args);
-	byte Error = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
+ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
+// remove this?
+	auto rz = JB_Sh_Constructor(0, self, Args, Mode);
+	byte Error = JB_Sh_StartProcess(rz, 0);
 	if (Error) {
 		JB_SetRef(rz, 0);
 	}
@@ -383,60 +399,32 @@ ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, FastString* FSOut, Fast
 
 ///*(^&£^/ Shellstream vvvvv >>>>>>>
 
-ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path) {
+ShellStream* JB_Sh_Constructor (ShellStream* self, JB_String* Path, Array* Args, byte Mode) {
 	JB_New2(ShellStream);
 	*self = {};
-	JB_PID_Constructor(self);
-	for (int i = 0; i < 4; i++)
-		self->CaptureOut[i] = -1;
-	
-	self->IsClosed = false;
+	self->Args = JB_Incr(Args);
 	self->Path = JB_Incr(JB_Str_MakeC(Path));
+	self->Mode = Mode;
+	if (!(Mode&kStdOutNil))
+		self->StdOut = PicoCreate("StdOut", 256*1024);
+	if (!(Mode&kStdErrNil))
+		self->StdErr = PicoCreate("StdErr", 16*1024);
 	return self;
 }
 
 
-void JB_Sh_Destructor(ShellStream* self) {
+void JB_Sh_Destructor (ShellStream* self) {
 	ShellStream& Sh = *self;
-	JB_FEPDWEE_Finish(Sh);
-	JB_Decr(Sh.ErrorOutput);
+	PicoDestroy(Sh.StdOut);
+	PicoDestroy(Sh.StdErr);
 	JB_Decr(Sh.Path);
-	JB_Decr(Sh.Output);
 	JB_Decr(Sh.Args);
-	JB_PID_Destructor(self);
+	JB_Ring_Destructor(self);
+	if (!self->LeaveOrphaned)
+#ifndef AS_LIBRARY
+		JB_Kill(self->PID);
+#endif
 }
-
-
-static void Smooth_(ShellStream& Sh) {
-// or else certain apps will lock up.
-// funnily enough, sleeping makes these apps run FASTER.
-// probably by triggering the printf statements instead 
-// of collecting them into one giant blob.
-	Date L = Sh.LastRead;
-	Date C = JB_Date__Now();
-	if (L) {
-		Date D = C - L;
-		if (D < 4*1024) {
-			JB_Date__Sleep(4096);
-		}
-	}
-	Sh.LastRead = C;
-}
-
-
-bool JB_Sh_Step(ShellStream* self) {
-	require (self);
-	ShellStream& Sh = *self;
-	if (!Sh.IsClosed) {
-		Smooth_(Sh);
-		int ReadAmount = 0;
-		if (UpdatePipes_(self, ReadAmount)>0) // means continue... there is more to get.
-			return true;
-		JB_FEPDWEE_Finish(Sh);
-	}
-	return false;
-}
-
 
 
 bool JB_App__TurnInto(JB_String* self, Array* R) {
@@ -447,7 +435,6 @@ bool JB_App__TurnInto(JB_String* self, Array* R) {
 	return false;
 	
 }
-
 
 
 bool JB_IsTerminal(int FD) {

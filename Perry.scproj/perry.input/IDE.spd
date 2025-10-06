@@ -463,7 +463,7 @@ class PerryIDE (Window)
 		if exit.Crashed
 			|| fs = faststring()
 			fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
-			fs <~ p.ErrorOutput.getresult.FindStacktrace
+			fs <~ p.ReadStdErr.FindStacktrace
 			.Notify(fs, @emb + what)
 			return .CancelCompile
 

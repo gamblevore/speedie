@@ -1,57 +1,27 @@
 
 
-class ProcessOwner 
-// merge this with process!
-	size 32
-	linkage
-		wrapper
-		cpp_part PID
-	contains ProcessOwner
-	
-	|PID_Int| 			PID
-
-	constructor
-		cpp_wrapper JB_PID_Constructor
-		
-	destructor
-		cpp_Wrapper JB_PID_Destructor
-	
-	function Status (|ExitCode|)
-		cpp_Wrapper JB_PID_Status
-	
-	function Register
-		cpp_wrapper JB_PID_Register
-
-	function UnRegister
-		description "Removes from the list. Doesnt change the exit, pid, or status codes" 
-		cpp_wrapper JB_PID_UnRegister
-
-	function Kill (|int| ExitCode)
-		cpp_wrapper JB_PID_Kill
-	
-	function Next (|ProcessOwner|)
-		cpp_wrapper JB_PID_Next
-	
-	module
-		function First (|ProcessOwner|)
-			cpp_wrapper JB_PID__First
-
-
-datatype ProcessOwnerMode (byte)
+datatype ProcessMode (byte)
 	linkage
 		cpp_part PIDM
 		numeric false // disallow implicit (syntax <--> int) conversion
 	
 	flags
-		|ProcessOwnerMode| 
-		Default=0
+		|ProcessMode| 
+		CaptureAll=0
 		OwnGroup=2
 		StdOutPassThru = 4
 		StdOutSilence = 8
 		StdErrPassThru = 16
 		StdErrSilence = 32
 		Silence = StdOutSilence|||StdErrSilence
-	
-// the signal constants are different per-platform
+		PassThru = StdOutPassThru|||StdErrPassThru
+		// what about merging stderr into stdout, by using dup2?
+
+	syntax is (|ProcessMode| M, |bool|)
+		return self|int|&M|int|
+
+
+
+
 
 
