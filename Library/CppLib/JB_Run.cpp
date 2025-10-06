@@ -168,7 +168,7 @@ void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
-	#ifdef AS_LIBRARY
+	#ifndef AS_LIBRARY
 	JB_KillChildrenOnExit();
 	#endif
 }
