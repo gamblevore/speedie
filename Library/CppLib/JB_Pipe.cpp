@@ -444,7 +444,7 @@ bool JB_IsTerminal(int FD) {
 }
 
 #else
-
+extern "C" void JB_Sh_Destructor (ShellStream* self) {}
 extern "C" void JB_CrashTracer() {}
 
 #endif
