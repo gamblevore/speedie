@@ -4,7 +4,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-class Process (list)
+class Process
 	size 64
 	// the list functions mostly shouldn't be used. I should hide them somehow
 	// kinda like I want to do with... roles.
@@ -26,10 +26,6 @@ class Process (list)
 	
 	function Status (|ExitCode|)
 		cpp_Wrapper
-
-	function UnRegister
-		description "Removes from the process list. Doesnt change the exit, pid, or status codes" 
-		.remove
 
 	function Kill (|int| ExitCode)
 		cpp_wrapper

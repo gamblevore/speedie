@@ -10,16 +10,15 @@ class Message (list)
 		cpp_part Msg
 		visible true
 
-	description "Usage: Parse a string, and receive a tree of nodes.
+	description "Usage: Call string.parse to receive a tree of nodes. Each node is a Message object.
 
-The tree data-structure represents your data. The Message class acts as a super-set of many formats:  XML,  JSON, source-code,  data-files,  network messages,  executable files,  media-wrappers,  etc.
+The tree represents your data, and acts as a super-set of many formats:  XML,  JSON, source-code,  data-files,  network messages,  executable files,  media-wrappers,  etc.
 
 The Message class is versatile enough to good at all of these. Like a universal data-format. Like the UTF-8 of data.
 
 Message is also:
 	* Memory tight (64-bytes per-node, excluding string-name).
 	* More expressive (leading to less nodes needed).
-	* Fast to parse.
 	* Saveable as text (jeebox) or binary (jbin).
 	* Elegant due to a simple model, and many utility functions.
 	* Reliable via it's error-reporting system.

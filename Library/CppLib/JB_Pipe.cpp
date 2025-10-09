@@ -4,13 +4,9 @@
 
 
 #include "JB_Umbrella.hpp"
-#include <execinfo.h>
-
-extern "C" {
-	JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(JB_List),   0 );
-}
 
 #ifndef AS_LIBRARY
+#include <execinfo.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -25,6 +21,7 @@ extern "C" {
 #include <sys/mman.h>
 #include <string>
 #include <iostream>
+#include "PicoMsg.h"
 
 #if __linux__
 	#include <sys/mman.h>
@@ -44,69 +41,29 @@ extern "C" {
 
 extern "C" {
 const int RD = 0;   const int WR = 1;
-ShellStream*		PSRoot;
-std::atomic_int		SigChildOutStanding = 0x0000000 + 0000 -1*0; // FUCK UNIX
 bool				CanASMBKPT = true;
-
+JB_String* JB_Sh_Render(ShellStream* Self, FastString* Fs_in);
+JBClassPlace( ShellStream,     JB_Sh_Destructor,  JB_AsClass(JB_Object),      JB_Sh_Render );
 
 void JB_App__SetASMBreak (bool b) {
 	CanASMBKPT = b;
 }
 
 
-static void AddLostChild_ (int PID, int C) {
-	ShellStream* F = (ShellStream*)JB_Ring_First(PSRoot);
-	while (F) {
-		if (F->PID == PID) {
-			if (WIFSIGNALED(C))
-				F->_Status = WTERMSIG(C)|128;
-			  else
-				F->_Status = WEXITSTATUS(C);
-			return;
-		}
-		F = F->Next;
-	}
-}
 
-
-void JB_SigChild (int signum) {
-	SigChildOutStanding++;
-}
-
+// what if we get rid of the global object list?
+// instead... collect "dead" IDs. So we don't just update things all over.
 
 int JB_Sh_Status (ShellStream* F) {
-	while (SigChildOutStanding > 0) {
-		while (true) {
-			int ExitCode = 0;
-			int PID = waitpid(-1, &ExitCode, WNOHANG);
-			if (PID > 0) {
-				AddLostChild_(PID, ExitCode);
-				JB_Ring_ParentSet(F, nil);
-			} else if (PID == 0 or errno != EINTR) {
-				break;
-			}
-		}
-		SigChildOutStanding--;
-	}
-	if (SigChildOutStanding < 0) // ?what?
-		SigChildOutStanding = 0;
 	return F->_Status;
 }
 
-
-void JB_KillChildrenOnExit () {
-	ShellStream* F = PSRoot;
-	while (F) {
-		if (F->PID > 0 and F->KillOnExit)	// seems unused?
-			kill(F->PID, SIGKILL);			// leave for now.
-		F = F->Next;
-	}
-}
  
 int JB_Sh_Kill (ShellStream* F, int Code) {
 	F->_Status = Code;
 	return JB_Kill(F->PID);
 }
+
 
 ////*&(^!@^*& ^^^^^^^ PiD ^^^^^^^^
 //// BATCHES LOST CONTROL
@@ -232,15 +189,6 @@ static void StartPico (PicoComms* M, int* Both) {
 }
 
 
-static void CheckStillAlive (ShellStream* Sh) {
-// kill() function unreliable. UNIX breaking it's own guidelines! As usual!
-	require0 (Sh->_Status == -1  and  kill(Sh->PID, 0) != 0);
-	if (JB_Sh_Status(Sh) < 0) // why?
-		Sh->_Status = 0;
-	JB_Ring_ParentSet(Sh, 0);
-}
-
-
 static void CloseAndDup (int Mode, int* Capture, int Mask, int Std_FileNo) {
 	if (Mode&Mask) {
 		close(Std_FileNo);
@@ -253,7 +201,7 @@ static void CloseAndDup (int Mode, int* Capture, int Mask, int Std_FileNo) {
 
 
 int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
-// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,close,Eintr,_exit // far too much stuff in unix.
+// fcntl,Fork,execvp,Pipe,Dup2,Waitpid,Errno,close,Eintr,_exit // far too much stuff in unix.
 	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
 	if (!argv) return E2BIG;
 	
@@ -279,16 +227,11 @@ int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
 
 	byte Result = 0;
 	if (ChildID > 0) {
-		auto X = PSRoot;
-		if (!X) {
-			PSRoot = X = JB_Sh_Constructor(0, JB_Str__Empty(), 0, -1);
-		}
-		JB_Ring_LastSet(X, S);
 		S->_Status = -1;
+		printf("Created Process: %i\n", ChildID);
 		S->PID = ChildID;
 		pipe_close(CaptureOut[WR]);
 		pipe_close(CaptureErr[WR]);
-		CheckStillAlive(S);
 	} else {
 		Result = errno;
 		JB_ErrorHandleFile(S->Path, nil, Result, nil, "run");
@@ -297,11 +240,6 @@ int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
 //	JB_FreeIfDead(path);
 	free(argv);
 	return Result;
-}
-
-
-ShellStream* JB_Sh__First() {
-	return (ShellStream*)JB_Ring_First(PSRoot);
 }
 
 
@@ -419,7 +357,6 @@ void JB_Sh_Destructor (ShellStream* self) {
 	PicoDestroy(Sh.StdErr);
 	JB_Decr(Sh.Path);
 	JB_Decr(Sh.Args);
-	JB_Ring_Destructor(self);
 	if (!self->LeaveOrphaned)
 #ifndef AS_LIBRARY
 		JB_Kill(self->PID);
@@ -444,9 +381,7 @@ bool JB_IsTerminal(int FD) {
 }
 
 #else
-extern "C" void JB_Sh_Destructor (ShellStream* self) {}
 extern "C" void JB_CrashTracer() {}
-
 #endif
 
 extern "C" const char** JB_App__BackTrace(void** space, int* size) {

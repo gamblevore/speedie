@@ -92,19 +92,15 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		
 	
 	function TimeWaitingForReply (|date|)
-		|| p = .pico
-		|| c = p.config
+		|| c = .pico.config
 		|| last = c.lastsend
 		if c.lastread < last
 			return last.ago
 
 	
-	helper HandleDied
+	helper HandleDied 
 		|| Bad = !.Status.crashed
 		.DiedCount += Bad
-//		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
-//			|| s = .ErrorOutput.GetResult
-//				printline s
 		.Disconnect(.status.name) // removes us from the check-list
 
 
@@ -119,10 +115,12 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	
 	helper Kill
 		disabled "Explain why"
+
 		
 	helper Kill (|int| ExitCode, |stringzeroterminated| why)
 		super.kill(ExitCode)
 		.Disconnect(why)
+
 
 	syntax expect (|string| err)
 		cpp_part Fail
@@ -134,8 +132,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	function Disconnect (|stringzeroterminated| Why="")
 		opt norefcounts
+		// all this can be moved into pico!!! very easy.
+		// delayspawntill is just a number!
 		.DelaySpawnTill = 0
-		.remove
 		.ClosePipes
 		if .alive and !why and .CommsOpen
 			why = "UnknownReason"
@@ -168,10 +167,12 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		|| err = .StartProcess(.pico)
 		return err.successful
 
+
 	function TimedOut (|date| Durr, |bool|)
 		if (.TimeWaitingForReply > durr)
 			error (self, "child timed out.")
 			return true
+	
 	
 	function IsOpen (|bool|)
 		nil checker // shouldn't be necessary
@@ -182,21 +183,19 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if .WeAreParent
 			return .subprocess or .status.isrunning
 		return app.ParentID > 1
-			
+	
+	
 	function Deactivate (|int| ExitCode)
 		|| running = .status.isrunning
-		if .CommsOpen and !running	// inconsistant...
+			.Kill(ExitCode)			// kill child
+		  elseif .CommsOpen			// inconsistant...
 			.handledied				// disconnect comms
-		if running
-			.Kill(ExitCode)		// kill child
 	
 	
 	function ActivateChild (|bool|)
 		if .isopen
 			return true
-
 		.Deactivate(0)
-		
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .SpawnAsChild
@@ -233,17 +232,17 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				error "Parent lost connection"
 
 
-
 		function CheckAllAlive
-			opt norefcounts
-			|| m = Process.First
-			while m
-				|| ch = m
-				m++
-				if !ch.status.IsRunning
-					if (ch isa SpdProcess)
-						ch.HandleDied
-					ch.UnRegister
+//			opt norefcounts
+//			|| m = Process.First
+//			while m
+//				|| ch = m
+//				m++
+//				if !ch.status.IsRunning
+//					if ch isa SpdProcess
+//						ch.HandleDied
+//					  else
+//						ch.Remove
 		
 
 		helper CreateArgs (|string| path, |[string]!| Args, |&cstring|)
@@ -301,6 +300,7 @@ prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 			pico_out.Close("")
 
 
+
 function app.fork (|PID_Int|)
 	cpp_wrapper fork
 	description "Calls unix's `fork()`. Does nothing else.
@@ -313,3 +313,4 @@ To fork and talk to PicoMsg-based apps that aren't speedie, use pico.spawnfork()
 prototype SpdDeathActionFn
 
 }
+

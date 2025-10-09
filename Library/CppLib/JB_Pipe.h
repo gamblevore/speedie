@@ -12,10 +12,8 @@
 
 extern "C" {
 
-JBClass( ShellStream, JB_List,
+JBClass( ShellStream, JB_Object,
 	uint				PID;
-    ShellStream*		Next;				// should this be a ringtree instead?
-    ShellStream*		Prev;				// Saves us dealing with the next/prev
 	JB_String*			Path;
 	Array*  			Args;
 	volatile int		_Status;
@@ -24,14 +22,14 @@ JBClass( ShellStream, JB_List,
 	u8					Mode;
 	PicoComms*			StdOut;
 	PicoComms*			StdErr;
-    int64				UserFlags; // remove these two?
-//    JB_Object*			UserObj; // just like jeebox!
+    int64				UserFlags;
 );
 
 
 
 int JB_Sh_Kill (ShellStream* F, int Code);
 void JB_KillChildrenOnExit();
+void JB_AddProcess (int PID);
 //int JB_Sh_Exit (ShellStream* F);
 int JB_Sh_Status (ShellStream* F);
 JB_StringC* JB_Err_SignalName (int Sig);

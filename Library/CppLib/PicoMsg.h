@@ -874,7 +874,7 @@ static void pico_work_comms () {
 		M->io();
 	
 	float S = (PicoGetDate() - pico_global_conf.LastActivity) * (0.000015258789f * 0.005f);
-	pico_sleep(std::clamp(S*S, 0.001f, 0.125f));
+	pico_sleep(std::clamp(S*S, 0.001f, 0.5f));
 }
 
 

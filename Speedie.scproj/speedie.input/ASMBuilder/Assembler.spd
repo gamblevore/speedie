@@ -683,7 +683,10 @@ function Assembler.GenerateASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 	if .NeedsRework
 		.Rework(fn)
 	.CapASM
-	.PrintASM(fn, i)
+	
+	target debug
+		if !compiler.InPerry and !options.perryoutput
+			.PrintASM(fn, i)
 	
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	require err.ok

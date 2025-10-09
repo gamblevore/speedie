@@ -512,17 +512,17 @@ module GUI
 				lv.TryDelayedEdit
 
 	
-	function OpenDocument (|string| path, |object|)
+	function OpenDocument (|string| path, |bool| AllowMissing,  |object|)
 		require path
 		|| d = .AppDocumentOpen
-			|| f = path.file
-			if f.exists
-				rz = (d)(nil, nil, f.path, CopyPasteFlags.PasteFile)
+			|| f = path.Resolve
+			if AllowMissing or f.fileexists
+				rz = (d)(nil, nil, f, CopyPasteFlags.PasteFile)
 	
 	
 	function HandleOpenFile
 		|| d = .DocumentOpened$
-		.OpenDocument(d)
+		.OpenDocument(d, false)
 		if .OpenedFirst.guiago < 3s
 			.FixScreenBug = .FrameStart + 1s
 

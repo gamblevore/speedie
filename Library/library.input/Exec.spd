@@ -48,7 +48,7 @@ datatype ExitCode (int)
 	syntax cast (|bool|)
 		disabled "Do you mean self != 0, or .successful"
 
-	function Name (|string|)
+	function Name (|stringzeroterminated|)
 		description "The name of the error (if any)." 
 		if .Crashed
 			return (self|errorint|&~128).SignalName

@@ -22,8 +22,7 @@ module Perry
 	function LoadAppArg (|string| arg, |perryide|)
 		|| line = (0, 0)
 		|| path = arg.ExtractPathAndLine(line)
-		require path.FileExists or path.write("")
-		|| ide = GUI.OpenDocument(path)
+		|| ide = GUI.OpenDocument(path, true)
 		if ide isa PerryIDE
 			ide.editme.ViewLineAndSel(line.x)
 			return ide

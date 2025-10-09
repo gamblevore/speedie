@@ -10,8 +10,8 @@
 
 extern "C" {
 
-// actually this is ALSO a Cstring... just like jbstringc
-// however... we FREE this one... on destructor.
+// Actually this is ALSO a Cstring... just like jbstringc
+// However... we FREE this one... on destructor.
 JBClass( JB_String, JB_Object,
     int            		Length;
     uint8*				Addr;
