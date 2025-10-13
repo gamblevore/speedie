@@ -61,6 +61,12 @@ In Perry, you'll find that finding is fast, text-editing is fast, autocomplete i
 
 I find Perry takes surprisingly little RAM. When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project, and gigabytes to compile.
 
+In Xcode, I found my "derived data" (whatever that is) folder, came to about 6GB of disk space. Thats for 3 projects. Its actually monstrous.
+
+Speedie is smarter. When compiling natively to the Speedie VM, there is no cached data, considering that the compiler is so fast.
+
+But Speedie has a "compile to C++" option... and C++ compiles slow. So speedie caches the .cpp input and .o output files. However that leaves only around 2MB of cached data, per-project. And it is left in the `/tmp/` folder. Your OS will automatically remove it! Somehow Apple can't use their own `/tmp/` folder for Xcode... perhaps they don't know how?
+
 
 ## Inbuilt Godbolt.org (ASM Viewer)
 
