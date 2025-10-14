@@ -30,11 +30,11 @@
 #endif
 
 #define kOwnGroup		2
-#define kStdOutPassThru 4
-#define kStdOutSilence  8
+#define kStdOutSilence  4
+#define kStdOutPassThru 8
 #define kStdOutNil      12
-#define kStdErrPassThru 16
-#define kStdErrSilence  32
+#define kStdErrSilence  16
+#define kStdErrPassThru 32
 #define kStdErrNil      48
 
 
@@ -237,9 +237,21 @@ int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
 		JB_ErrorHandleFile(S->Path, nil, Result, nil, "run");
 	}
 
-//	JB_FreeIfDead(path);
 	free(argv);
 	return Result;
+}
+
+
+int JB_Sh_StartProcess2(ShellStream* S, PicoComms* C) {
+// fcntl,Fork,execvp,Pipe,Dup2,Waitpid,Errno,close,Eintr,_exit // far too much stuff in unix.
+	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
+	if (!argv) return E2BIG;
+	
+	byte Error = PicoStartExec(C, argv, S->Mode);
+	if (Error)
+		JB_ErrorHandleFile(S->Path, nil, Error, nil, "run");
+	free(argv);
+	return Error;
 }
 
 
@@ -369,10 +381,8 @@ bool JB_App__TurnInto(JB_String* self, Array* R) {
 	execvp(argv[0], (char* const*)argv); // may exit here. :)
 	free(argv);
 	JB_ErrorHandleFile(self, nil, errno, nil, "running");
-	return false;
-	
+	return false;	
 }
-
 
 bool JB_IsTerminal(int FD) {
     return isatty(FD);

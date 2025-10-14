@@ -176,7 +176,6 @@ struct PicoGlobalConfig
 	|Date|						LastActivity
 	|Date|						TimeOut
 	|int|						ExitCode
-	|int|						DesiredThreadCount
 	
 
 struct PicoGlobalStats

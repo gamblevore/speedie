@@ -31,6 +31,9 @@ datatype PID_Int (int)
 
 
 datatype ExitCode (int)
+	constants
+		EINPROGRESS = 36
+	
 	description "Can describe both signal errors, and exit codes."
 	
 	function Crashed (|bool|)
@@ -46,16 +49,16 @@ datatype ExitCode (int)
 		return  self == 0
 		
 	syntax cast (|bool|)
-		disabled "Do you mean self != 0, or .successful"
+		disabled "Do you mean self != 0, or .Successful"
 
-	function Name (|stringzeroterminated|)
+	function Name (|StringZeroTerminated|)
 		description "The name of the error (if any)." 
 		if .Crashed
 			return (self|errorint|&~128).SignalName
-		return self|errorint|.name
+		return self|errorint|.Name
 	
 	function IsRunning (|bool|)
-		return self == -1
+		return self == -1 or EINPROGRESS
 
 	function NotStarted (|bool|)
 		return self < -1
@@ -68,10 +71,10 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 	syntax cast (|bool|)
 		return self == 0
 
-	function SignalName (|stringzeroterminated|)
+	function SignalName (|StringZeroTerminated|)
 		cpp_wrapper JB_Err_SignalName
 
-	function Name (|stringzeroterminated|)
+	function Name (|StringZeroTerminated|)
 		cpp_wrapper JB_Err_Name
 
 

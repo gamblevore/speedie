@@ -240,7 +240,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 	if (Err)
 		return Err;
 	
-	PicoStart();
+	PicoInit(0);
     #if DEBUG
 	JB_TotalSanity(true);
 	#endif

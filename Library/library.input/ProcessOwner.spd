@@ -9,10 +9,10 @@ datatype ProcessMode (byte)
 		|ProcessMode| 
 		CaptureAll=0
 		OwnGroup=2
-		StdOutPassThru = 4
-		StdOutSilence = 8
-		StdErrPassThru = 16
-		StdErrSilence = 32
+		StdOutSilence = 4
+		StdOutPassThru = 8
+		StdErrSilence = 16
+		StdErrPassThru = 32
 		Silence = StdOutSilence|||StdErrSilence
 		PassThru = StdOutPassThru|||StdErrPassThru
 		// what about merging stderr into stdout, by using dup2?

@@ -48,16 +48,16 @@ typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
 
 struct 			PicoConfig  {
 	char 			Name[16];		/// Used for reporting events to stdout.
+	void*			UserData;
 	PicoDate		LastRead;		/// The date of the last Read.
 	PicoDate		LastSend;		/// The date of the last send.
-	int				DeathCount;		/// How many times the subprocess died.
-	unsigned int	SendFailCount;	/// How many times sending failed.
-	unsigned int	ReadFailCount;	/// How many times reading failed.
-	unsigned char	Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
-	unsigned char	Bits;			/// The buffer-size in 1<<Bits. Set before calling `PicoStart...()`
-	unsigned char	SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
 	int				QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
-	void*			UserData;
+	unsigned short	DeathCount;		/// How many times the subprocess died.
+	unsigned short	SendFailCount;	/// How many times sending failed.
+	unsigned short	ReadFailCount;	/// How many times reading failed.
+	unsigned char	Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
+	unsigned char	SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
+	int				_reserved;
 };
 
 struct			PicoProcStats {
@@ -109,7 +109,8 @@ struct PicoGlobalStats {
 	#include <atomic>
 
 
-extern "C" int				PicoInit (int DesiredThreadCount);
+extern "C" bool				PicoInit (int DesiredThreadCount);
+struct PicoBuff;
 
 static PicoMessage pico_next_msg (PicoMessage M) {
 	return *((PicoMessage*)(M.Data + M.Length));            			;;;/*_*/;;;
@@ -120,7 +121,7 @@ struct PicoTrousers { // only one person can wear them at a time.
 	PicoTrousers  () {Value = false;}
 	bool enter () {
 		bool Expected = false;
-		return Value.compare_exchange_weak(Expected, true);
+		return Value.compare_exchange_strong(Expected, true);
 	}
 	void unlock () {
 		Value = false;
@@ -133,7 +134,7 @@ static PicoTrousers PicoCommsLocker;
 
 
 PicoDate pico_date_create ( uint64_t S, uint64_t NS ) {
-	uint64_t D = 15259; // for some reason unless we spell this out, xcode will miscompile this.
+	const uint64_t D = 15259; // for some reason unless we spell this out, xcode will miscompile this.
 	NS /= D;
 	S <<= 16;
 	return S + NS;         						   ;;;/*_*/;;;
@@ -154,10 +155,10 @@ inline int pico_log2 (uint64_t X) {
 	return 63-__builtin_clzll(X);
 }
 
+
 struct PicoCommList {
 	std::atomic_uint64_t		Map;
 	PicoTrousers				Lock;
-	PicoComms*					AliveComms[64];
 	
 	int Reserve () {
 		int ID = 0;
@@ -175,7 +176,6 @@ struct PicoCommList {
 	
 	void Remove (int64_t M) {
 		Lock.lock();
-		AliveComms[M] = 0;
 		uint64_t Old = Map;
 		int64_t M2 = 1ULL << M;
 		Map = Old & ~M2;
@@ -184,12 +184,42 @@ struct PicoCommList {
 };
 
 
+
+struct PicoCommsData {
+	PicoConfig					Conf;
+	short						PIDStatus;	  // could be moved to Conf for tightness.
+	unsigned char				SocketStatus; // same
+	bool						IsParent;
+protected:
+	PicoBuff*					Reading;
+	PicoBuff*					Sending;
+	PicoBuff*					StdErr;
+	PicoBuff*					StdOut;
+	PicoMessage*				QueueTail;
+	PicoMessage					QueueHead;
+	int							Socket;
+	int							LengthBuff;
+	int							PID;
+	unsigned char				PartClosed;
+	unsigned char				Bits;
+	PicoTrousers				SendLock;
+	PicoTrousers				ReadLock;
+	PicoTrousers				QueueLock;
+	std::atomic_char			DestroyMe;
+	std::atomic_char			InUse;
+	unsigned char				ID;
+};
+
+
+//static std::atomic_int		DebugCount;
 static	PicoCommList			pico_list;
 static	const char*				pico_fail_actions[4] = {"Failed", "Sending", "Reading", 0};
 static	std::atomic_int			pico_thread_count;
+static	PicoTrousers			pico_inited;
 static	int						pico_timeout_count;
-static  std::atomic_int         pico_sock_open_count;
+static  std::atomic_int         pico_open_sockets;
 static  PicoGlobalConfig		pico_global_conf;
+static	PicoCommsData			pico_all[64];
 
 
 struct PicoLister {
@@ -202,7 +232,8 @@ struct PicoLister {
 			auto Lowest = L & -L;
 			L &= ~Lowest;
 			SavedList = L;
-			if (PicoComms* Found = pico_list.AliveComms[pico_log2(Lowest)]; Found)
+			PicoComms* Found = (PicoComms*)&(pico_all[pico_log2(Lowest)]);
+			if (Found)
 				return Found;
 		}
 		return 0;
@@ -211,11 +242,11 @@ struct PicoLister {
 
 
 
-#ifdef PICO_DEBUG_LOG
-	#include <fcntl.h>
-	#include <sys/stat.h>
-	extern "C" PicoConfig* PicoCommsConf (PicoComms* M);
-#endif
+//#ifdef PICO_DEBUG_LOG
+//	#include <fcntl.h>
+//	#include <sys/stat.h>
+//	extern "C" PicoConfig* PicoCommsConf (PicoComms* M);
+//#endif
 
 
 
@@ -225,9 +256,9 @@ struct PicoBuff {
 	std::atomic_uint	Head;
 	int					Size;
 	int					Pipe;
-	#ifdef PICO_DEBUG_LOG
-	int					FDLog;
-	#endif
+//	#ifdef PICO_DEBUG_LOG
+//	int					FDLog;
+//	#endif
 	std::atomic_short	RefCount;	
 	PicoComms*			Owner;
 	char				Data[0];             ;;;/*_*/;;;
@@ -241,55 +272,55 @@ struct PicoBuff {
 		} while (true);
 		Rz->Tail = 0; Rz->Head = 0; Rz->Owner = O; Rz->RefCount = 1; Rz->Pipe = pipe;
 		Rz->Size = 1<<bits; Rz->Name = name;
-	#ifdef PICO_DEBUG_LOG
-		char Path[128] = {};
-		snprintf(Path, sizeof(Path), "%s/%s/%s%s.txt", PICO_DEBUG_LOG, PicoCommsConf(O)->Name, PicoCommsConf(O)->Name, name);
-		int Sep = (int)(strlen(PICO_DEBUG_LOG) + 1 + strlen(PicoCommsConf(O)->Name));
-		Path[Sep] = 0;	
-		if (mkdir(Path, 0755) < 0 and errno!=EEXIST) {
-			printf("%s creating Path: %s\n", strerror(errno), Path);
-			exit(-1);
-		}
-			
-		Path[Sep] = '/';	
-		Rz->FDLog = open(Path, O_WRONLY|O_CREAT|O_TRUNC|0755);
-		if (Rz->FDLog == -1) {
-			printf("%s opening LOG: %s\n", strerror(errno), Path);
-			exit(-1);
-		}
-			
-	#endif
+//	#ifdef PICO_DEBUG_LOG
+//		char Path[128] = {};
+//		snprintf(Path, sizeof(Path), "%s/%s/%s%s.txt", PICO_DEBUG_LOG, PicoCommsConf(O)->Name, PicoCommsConf(O)->Name, name);
+//		int Sep = (int)(strlen(PICO_DEBUG_LOG) + 1 + strlen(PicoCommsConf(O)->Name));
+//		Path[Sep] = 0;	
+//		if (mkdir(Path, 0755) < 0 and errno!=EEXIST) {
+//			printf("%s creating Path: %s\n", strerror(errno), Path);
+//			exit(-1);
+//		}
+//			
+//		Path[Sep] = '/';	
+//		Rz->FDLog = open(Path, O_WRONLY|O_CREAT|O_TRUNC|0755);
+//		if (Rz->FDLog == -1) {
+//			printf("%s opening LOG: %s\n", strerror(errno), Path);
+//			exit(-1);
+//		}
+//			
+//	#endif
 		return Rz;
 	}
 
 	void Log (const char* Src, int Length) {
-	#ifdef PICO_DEBUG_LOG
-		if (FDLog > 0) {
-			char Tmp[32*1024]; // increase this yourself if using PICO_DEBUG_LOG
-			int N = std::min(Length, (int)sizeof(Tmp)-1);
-			for (int i = 0; i < N; i++) {
-				int c = Src[i];
-				if (c < 32 or c >= 128)
-					c = '?';
-				Tmp[i] = c;
-			}
-			Tmp[N++] = '\n';
-
-			int x = 0;
-			while (x < N) {
-				int err = (int)write(FDLog, Tmp+x, N-x);
-				if (!err) break;
-				if (err < 0) {
-					err = errno;
-					if (err == EINTR or err == EAGAIN)
-						continue;
-					perror("Failed write: ");
-					exit(-1); // sigh
-				}
-				x+=N;
-			}
-		}
-	#endif
+//	#ifdef PICO_DEBUG_LOG
+//		if (FDLog > 0) {
+//			char Tmp[32*1024]; // increase this yourself if using PICO_DEBUG_LOG
+//			int N = std::min(Length, (int)sizeof(Tmp)-1);
+//			for (int i = 0; i < N; i++) {
+//				int c = Src[i];
+//				if (c < 32 or c >= 128)
+//					c = '?';
+//				Tmp[i] = c;
+//			}
+//			Tmp[N++] = '\n';
+//
+//			int x = 0;
+//			while (x < N) {
+//				int err = (int)write(FDLog, Tmp+x, N-x);
+//				if (!err) break;
+//				if (err < 0) {
+//					err = errno;
+//					if (err == EINTR or err == EAGAIN)
+//						continue;
+//					perror("Failed write: ");
+//					exit(-1); // sigh
+//				}
+//				x+=N;
+//			}
+//		}
+//	#endif
 	}
 	
 	void lost (int N) {
@@ -313,12 +344,12 @@ struct PicoBuff {
 	}
 	
 	static void Decr (PicoBuff* self) {
-	#ifdef PICO_DEBUG_LOG
-		if (self->FDLog) {
-			fsync(self->FDLog);
-			close(self->FDLog);
-		}
-	#endif
+//	#ifdef PICO_DEBUG_LOG
+//		if (self->FDLog) {
+//			fsync(self->FDLog);
+//			close(self->FDLog);
+//		}
+//	#endif
 		if (self and --(self->RefCount) == 0)
 			free(self);
 	}
@@ -372,77 +403,55 @@ struct PicoBuff {
 
 
 
-struct PicoComms {
-	int							Guard;
-	int							PID;
-	PicoConfig					Conf;
-	short						PIDStatus;	  // info only
-	unsigned char				SocketStatus; // info only
-	bool						IsParent;
-	private:
-	bool						DestroyMe;
-	unsigned char				PartClosed;
-	unsigned char				ID;
-	PicoTrousers				SendLock;
-	PicoTrousers				ReadLock;
-	std::atomic_char			InUse;
-	int							Socket;
-	PicoTrousers				QueueLocker;
-	int							LengthBuff;
-	PicoMessage					QueueHead;
-	PicoMessage*				QueueTail;
-	PicoBuff*					Reading;
-	PicoBuff*					Sending;
-	PicoBuff*					StdErr;
-	PicoBuff*					StdOut;
-	int							FinalGuard;
-	public:
-	
-	static PicoComms* New (PicoComms* M, int noise, bool isparent, int size, const char* name, int iD) {
-		M = (PicoComms*)calloc(1, sizeof(PicoComms));
-		// could be better to allocate 64*sizeof(PicoComms)?
-		// that way... nothing ever needs to move. Also caches better.
-		return M->Init(noise, isparent, size, name, iD);
+struct PicoComms : PicoCommsData {
+	static PicoComms* New (PicoComms* M, int noise, bool isparent, int size, const char* name, int ID) {
+		M = (PicoComms*)&pico_all[ID-1];
+		return M->Init(noise, isparent, size, name, ID-1);
 	}
 	
-	PicoComms* Init  (int noise, bool isparent, int size, const char* name, int iD) { // constructor
-		ID = iD-1; IsParent = isparent; Socket = -1;
-		Guard = 0xB00BE355;
-		FinalGuard = 0xF00DCA4E;
+	PicoComms* Init (int noise, bool isparent, int size, const char* name, int iD) { // constructor
+		DestroyMe = 0;
+		ID = iD; IsParent = isparent; Socket = -1;
 		PartClosed = 255;
 		SocketStatus = 255;
-		PIDStatus = EINPROGRESS;
+		PIDStatus = -EINPROGRESS;
 		QueueTail = &QueueHead;
 		Conf.Noise = noise;
 		Conf.SendTimeOut = 10.0f; // 🕷️_🕷️
 
-		if (size<=0)
+		if (size <= 0)
 			size = PicoDefaultInitSize;
 		int B = 31 - __builtin_clz(size);
 		if (B < 8) B = 8;
 		if (B > 26) B = 26;
 		B += ((1<<B) < size);
-		Conf.Bits = B;
+		Bits = B;
 		Conf.QueueSize = 1<<(B+3);
-				
+		
 		if (!name) name = "";
 		strncpy(Conf.Name, name, sizeof(Conf.Name)-1);
-		pico_list.AliveComms[ID] = this;
+//		int x = ++DebugCount;
+//		printf("+++++++ %i: %i\n", ID, x);
 		return this;
 	} ;;;/*_*/;;;
-
-	void Destroy () { // destructor
-		if (!guard_ok()) return;
+	
+	void Destroy () {
 		for (auto M = QueueHead; M.Data; M = pico_next_msg(M))
 			free(M.Data);
+		if (Socket > 0) {
+			io_close_for_real(Socket);
+		}
 		PicoBuff::Decr(Sending);
 		PicoBuff::Decr(Reading);
 		PicoBuff::Decr(StdErr );
 		PicoBuff::Decr(StdOut );
 		if (CanSayDebug()) Say("Deleted");
-		Guard = 0;
-		FinalGuard = 0;
-		free(this);
+//		int x = --DebugCount;
+//		printf("------- %i: %i\n", ID, x);
+		int N = (intptr_t)&(((PicoComms*)0)->DestroyMe);
+		memset(this, 0, N);
+		pico_list.Remove(ID);
+		DestroyMe = 2;
 	}
 
 	/// **Class Initialisation Helpers**
@@ -496,7 +505,9 @@ struct PicoComms {
 		if (ChildID < 0)
 			return -errno;
 		
-		if (ChildID == 0) {
+		IsParent = ChildID;
+		if (!IsParent) {
+			pico_thread_count = 0;
 			ChildClosePipes(Out, STDOUT_FILENO);
 			ChildClosePipes(Err, STDERR_FILENO);
 			return 0;
@@ -526,7 +537,7 @@ struct PicoComms {
 		int ChildID = pico_list.Reserve();
 		if (!ChildID) return false;
 		
-		PicoComms* C = PicoComms::New(nullptr, Noise, false, 1<<Conf.Bits, "Thread", ChildID);
+		PicoComms* C = PicoComms::New(nullptr, Noise, false, 1<<Bits, "Thread", ChildID);
 		Sending->RefCount++;     Reading->RefCount++;  Socket = -1; 
 		C->Sending = Reading; C->Reading = Sending; C->Socket = -1;
 		
@@ -542,7 +553,7 @@ struct PicoComms {
 		int PairID = pico_list.Reserve();
 		if (!PairID) {GiveUp(Socks); return nullptr;}
 		
-		PicoComms* Rz = PicoComms::New(nullptr, Noise, false, 1<<Conf.Bits, "Pair", PairID);
+		PicoComms* Rz = PicoComms::New(nullptr, Noise, false, 1<<Bits, "Pair", PairID);
 		add_msg_buffs(Socks[0]);
 		Rz->add_msg_buffs(Socks[1]);
 		return Rz;
@@ -666,12 +677,12 @@ struct PicoComms {
 		if (!can_get(T)) return {};
 		
 		PicoMessage M = QueueHead;
-		QueueLocker.lock();
+		QueueLock.lock();
 		PicoMessage H = pico_next_msg(M);
 		QueueHead = H;
 		if (!H)
 			QueueTail = &QueueHead;
-		QueueLocker.unlock();
+		QueueLock.unlock();
 		Conf.QueueSize  +=  M.Length + sizeof(PicoMessage)*2;
 		return M;
 	}
@@ -716,7 +727,7 @@ struct PicoComms {
 		if (S) {
 			S->Status = T;
 			S->PID = PID;
-			S->StatusName = StatusName(-T);
+			S->StatusName = StatusName(T);
 		}
 		return T;
 	}
@@ -728,23 +739,15 @@ struct PicoComms {
 		if (CanSayDebug()) Say("AskClose", Why);
 	}
 	
-	void Destroy (const char* Why) {
-		if (guard_ok()) {
-			AskClose(Why);
-			DestroyMe = true;
-		}
+	void AskDestroy (const char* Why) {
+		AskClose(Why);
+		//if (!DestroyMe)
+		DestroyMe = 1;
 	}
 
 
 
-//// INTERNALS ////
-	
-	bool guard_ok () {
-		if (Guard == 0xB00BE355 and FinalGuard==0xF00DCA4E) return true;
-		printf("!!!!Pico: Double-Freed!!!!\n"); // very bad
-		return false;
-	}
-
+/// ** INTERNALS **
 	struct PicoThreadData {
 		PicoComms* C; PicoThreadFn fn; void* Self; const char** Args;
 	};
@@ -752,7 +755,7 @@ struct PicoComms {
 	static void* pico_thread_wrapper (void* Args) {
 		PicoThreadData* D = (PicoThreadData*)Args;
 		(D->fn)(D->C, D->Self, D->Args);
-		(D->C)->Destroy("ThreadCompleted");
+		(D->C)->AskDestroy("ThreadCompleted");
 		free(D);
 		return 0;
 	}
@@ -763,7 +766,7 @@ struct PicoComms {
 		D->C = C; D->fn = fn; D->Self = Self; D->Args = Args;
 		if (!pthread_create(&T, nullptr, pico_thread_wrapper, D) and !pthread_detach(T))
 			return true;
-		C->Destroy("ThreadFailed");
+		C->AskDestroy("ThreadFailed");
 		free(D);
 		return false;
 	}
@@ -878,10 +881,10 @@ struct PicoComms {
 			*T = {};
 			LengthBuff = 0;
 			Conf.QueueSize -= QS;
-			QueueLocker.lock();
+			QueueLock.lock();
 			*QueueTail = {Data, L};
 			QueueTail = T;
-			QueueLocker.unlock();
+			QueueLock.unlock();
 			Conf.LastRead = PicoGetDate();
 			return true;
 		}
@@ -889,7 +892,7 @@ struct PicoComms {
 	}
 	
 	bool get_pair_of (int* Socks) {
-		if (pico_sock_open_count > 96 or socketpair(PF_LOCAL, SOCK_STREAM, 0, Socks)) return failed();
+		if (pico_open_sockets > 96 or socketpair(PF_LOCAL, SOCK_STREAM, 0, Socks)) return failed();
 		for (int i = 0; i < 2; i++) {
 			struct linger so_linger = {1, 5};
 			setsockopt(Socks[i], SOL_SOCKET, SO_LINGER, &so_linger, sizeof so_linger);
@@ -898,17 +901,19 @@ struct PicoComms {
 	}
 	
 	bool alloc_msg_buffs () {
-		if (!Sending)
-			Sending = PicoBuff::New(Conf.Bits, "Send", this, -1);
-		if (!Reading)
-			Reading = PicoBuff::New(Conf.Bits, "Read", this, -1);
-
-		if (Reading and Sending and PicoInit(0)) {
-			PartClosed &= (8+4);
-			return true;
+		if (!Sending) {
+			Sending = PicoBuff::New(Bits, "Send", this, -1);
+			if (Sending) PartClosed &= ~1;
 		}
+		if (!Reading) {
+			Reading = PicoBuff::New(Bits, "Read", this, -1);
+			if (Reading) PartClosed &= ~2;
+		}
+		PartClosed &= 15;
+
+		if (!(PartClosed&3) and PicoInit(0))
+			return true;
 		
-		PartClosed |= 3; // No good.
 		return failed(ENOBUFS);
 	}
 
@@ -925,11 +930,11 @@ struct PicoComms {
 		if (int S = Socket; S > 0) { // currently open still.
 			Socket = -1;
 			close(S);
-			pico_sock_open_count--;
+			pico_open_sockets--;
 		}
 		unblock(Sock);
 		Socket = Sock;
-		pico_sock_open_count++;
+		pico_open_sockets++;
 		return alloc_msg_buffs() and mark_started();
 	}
 
@@ -939,16 +944,6 @@ struct PicoComms {
 		return true;
 	}  ;;;/*_*/;;;   // creeping upwards!!
 
-	void report_closed_buffers () {
-		if (CanSayDebug() ) {
-			int SL = Sending->Length();
-			int RL = Reading->Length();
-			if (SL) Say("Sending", "Still Contains", SL);
-			Say("Sent", "", Sending->Tail);
-			if (RL) Say("Reading", "Still Contains", RL);
-			Say("Read", "", Reading->Head);
-		}
-	}
 
 	bool fail_alloc (int N) {
 		perror("picomsg: ");
@@ -986,17 +981,33 @@ struct PicoComms {
 		return failed(e, Part);
 	}
 	
-	bool io_close() {
-		int S = Socket; if (S < 0) return false;
-		if (!ReadLock.enter()) return false;
-
+	void io_close_for_real (int S) {
 		Socket = -1;
 		if (S > 0) {
 			close(S);
-			pico_sock_open_count--;
+			pico_open_sockets--;
 		}
-		report_closed_buffers();
-		if (CanSayDebug()) Say("Closing");
+		if (CanSayDebug()) {
+			int SL = Sending->Length();
+			if (SL) Say("Sending", "Still Contains", SL);
+			SL = Sending->Tail;
+			if (SL)
+				Say("Sent", "", SL);
+
+			int RL = Reading->Length();
+			if (RL) Say("Reading", "Still Contains", RL);
+			RL = Reading->Head;
+			if (RL)
+				Say("Read", "", Reading->Head);
+
+			Say("Closing");
+		}
+	}
+	
+	bool io_close() {
+		int S = Socket; if (S < 0) return false;
+		if (!ReadLock.enter()) return false;
+		io_close_for_real(S);
 		ReadLock.unlock();
 		return true;
 	}								;;;/*_*/;;;
@@ -1006,39 +1017,39 @@ struct PicoComms {
 		if (waitpid(PID, &ExitCode, WNOHANG) <= 0)
 			;
 		  else if (WIFSIGNALED(ExitCode))
-			PIDStatus = -(WTERMSIG(ExitCode)|128);
+			PIDStatus = WTERMSIG(ExitCode)|128;
 		  else if (WIFEXITED(ExitCode))
-			PIDStatus = -(WEXITSTATUS(ExitCode));
+			PIDStatus = WEXITSTATUS(ExitCode);
 	}
 	
 	void cleanup (PicoDate CheckPID) {
-		if (CheckPID and PID)
-			check_exit_code();
+		auto U = InUse++;
+		if (U == 0) {
+			if (CheckPID and PID and PIDStatus < 0)
+			// could we use a PIDStatus of -1 for processes
+			// and a PIDStatus of 0 for same-proc stuff?
+				check_exit_code();
 
-		if (Socket < 0 and !InUse and DestroyMe) {
-			int I = ID;
-			auto Curr = pico_list.AliveComms[I];
-			if (Curr == this) {
+			if (DestroyMe == 1) {
 				if (CanSayDebug()) Say("Bye");
-				pico_list.Remove(I);
 				check_exit_code(); // cleanup process PID list...
 				Destroy();
-			} else if (Curr) {
-				Say("pico_list corrupted"); // this is a big issue.
 			}
 		}
+		InUse--;
 	}
 	
 	;;;/*_*/;;;
 	void io () {
-		if (!guard_ok()) return;
-		InUse++;
-		int P = PartClosed;
-		if ((P&15) != 15) {
-			do_reading();
-			do_sending();
-		} else if (P != 255) {
-			io_close();
+		int i = InUse++;
+		if (i == 0 and !DestroyMe) {
+			int P = PartClosed;			
+			if ((P&15) != 15) {
+				do_reading();
+				do_sending();
+			} else if (P != 255) {
+				io_close();
+			}
 		}
 		InUse--;
 	}
@@ -1084,6 +1095,8 @@ static bool pico_try_exit () {
 
 static void pico_work_comms () {
 	PicoLister Items;
+	// I think we got a comms destroyed and created WHILE the list is happening
+	// AND then... we started reading a not fully-constructed object. 
 	while (auto M = Items.NextComm())
 		M->io();
 	
@@ -1135,21 +1148,26 @@ static void* pico_worker (void* Dummy) {
 }
 
 
-static int pico_init (int D) {
+static bool pico_init (int D) {
 	if (pico_thread_count)
-		return pico_thread_count;
+		return true;
+	
+	if (!pico_inited.enter())
+		return true;
 	
 	atexit(pico_keep_sending);
 
 	D = std::clamp(D, 1, 6);
-	int N = 0;
 	pthread_t T = 0;   ;;;/*_*/;;;   // creeping downwards!!
+	bool OK = false;
 	for (int i = pico_thread_count; i < D; i++) {
-		N += !(pthread_create(&T, nullptr, (void*(*)(void*))pico_worker, nullptr) or pthread_detach(T));
+		if (!(pthread_create(&T, nullptr, (void*(*)(void*))pico_worker, nullptr) or pthread_detach(T)))
+			OK = true;
 	}
 
 	pico_global_conf.LastActivity = PicoGetDate();
-	return N;
+	pico_inited.unlock();
+	return OK;
 }
 
 
@@ -1177,7 +1195,7 @@ extern "C" PicoComms* PicoCreate (const char* Name, int BufferByteSize=0)  _pico
 extern "C" PicoComms* PicoDestroy (PicoComms* M, const char* Why=nullptr) _pico_code_ (
 /// Destroys the PicoComms object, and reclaims memory. Also closes the other side.
 /// Returns null always. The destruction will happen at a later (very short) time, in another thread.
-	if (M) M->Destroy(Why);
+	if (M) M->AskDestroy(Why);
 	return nullptr;
 )
 	;// 🕷️_🕷️
@@ -1259,7 +1277,7 @@ extern "C" PicoMessage PicoGetCpp (PicoComms* M, float Time=0) _pico_code_ (
 	return M->Get(Time);
 );;;/*_*/;;;
 
-extern "C" PicoMessage PicoStdOut (PicoComms* M, PicoAppenderFn Alloc=nullptr, void* Obj=nullptr) {
+extern "C" PicoMessage PicoStdOut (PicoComms* M, PicoAppenderFn Alloc=nullptr, void* Obj=nullptr) _pico_code_ (
 /// Reads the captured output of `stdout` (if any). Assumes you created this `PicoComms` via `PicoStartExec()`.
 /// The data is returned via `malloc()`, unless you pass a non-zero value to `Alloc`.
 /// If you want to choose where the data is written to, then pass a function and object to the `Alloc` and `Obj` params.
@@ -1269,12 +1287,12 @@ extern "C" PicoMessage PicoStdOut (PicoComms* M, PicoAppenderFn Alloc=nullptr, v
 
 /// If you want the same behaviour with your own `PicoAppenderFn`, you have to do that in yourself.
 	return M->ReadStdOut(Alloc, Obj);
-}
+)
 
-extern "C" PicoMessage PicoStdErr (PicoComms* M, PicoAppenderFn Alloc=nullptr, void* Obj=nullptr) {
+extern "C" PicoMessage PicoStdErr (PicoComms* M, PicoAppenderFn Alloc=nullptr, void* Obj=nullptr) _pico_code_ (
 /// Same as `PicoStdOut()`, except it reads from `stdout`.
 	return M->ReadStdErr(Alloc, Obj);
-}
+)
 
 
 ///
@@ -1318,8 +1336,8 @@ extern "C" bool PicoHasParentSocket () _pico_code_ (
 	return getenv("__PicoSock__");
 )
 
-extern "C" int PicoInit (int DesiredThreadCount) _pico_code_ (
-/// Starts the PicoMsg worker threads.  Returns the number of threads created.
+extern "C" bool PicoInit (int DesiredThreadCount) _pico_code_ (
+/// Starts the PicoMsg worker threads.
 	return pico_init(DesiredThreadCount);
 )    ;;;/*_*/;;;  ;;;/*_*/;;;     ;;;/*_*/;;;   // the final spiders
 
@@ -1333,13 +1351,13 @@ extern "C" int PicoInfo (PicoComms* M, PicoProcStats* S=nullptr) _pico_code_ (
 	/// Pico has a unified system for status codes.
 	/// EG: After `PicoShellExec(M)`, then call `PicoInfo(M)` to find `M`'s status.
 	/// Result codes:
-	//  Negative:  A crash, or exited normally but with an error.
-	//  Positive:  The program is still running.
+	//  Positive:  A crash, or exited normally but with an error.
+	//  Negative:  The program is still running.
 	//  Zero	:  The program exited successfully.
 	
-	/// Negative numbers are either from errno, or signal numbers.
-	/// A negative number of -128 or below, is a signal.
-	/// You can check if the process is finished with:  `(PicoInfo(M, nullptr) <= 0)`
+	/// Positive numbers are either from errno, or signal numbers.
+	/// A number of 128 or more, is a signal.
+	/// You can check if the process is finished with:  `(PicoInfo(M, nullptr) >= 0)`
 	/// Get extra info by passing a `PicoProcStats` struct. Contains error names, and the PID. 
 	
 	/// Don't `free()` the `StatusName` field in `PicoProcStats`! Just let it be.
@@ -1363,7 +1381,7 @@ extern "C" PicoGlobalConfig* PicoGlobalConf() _pico_code_ (
 
 extern "C" void PicoGlobalStats (PicoGlobalStats* F) _pico_code_ (
 	F->TimeOutCount = pico_timeout_count;
-	F->OpenSockets  = pico_sock_open_count;
+	F->OpenSockets  = pico_open_sockets;
 	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 
 );;;/*_*/;;;  //reeeeeeee
 
