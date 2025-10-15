@@ -321,6 +321,7 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
     return -1;
 }
 
+
 static bool Stat2_( JB_String* ErrName,  struct _stat* st,  bool normal,  const char* tmp ) {
     int err = normal ? stat( tmp, st ) : lstat( tmp, st );
     if (!err) return true;
@@ -342,7 +343,7 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 }
 
 
-uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // just use posix funcs? fuck windows 16-bit chars.
+uint8* JB_FastFileString( JB_String* Path, uint8* Tmp) { // just use posix funcs? fuck windows 16-bit chars.
     u32 N = JB_Str_Length( Path );
     if ( ! N ) {
         return (uint8*)"";
@@ -351,7 +352,7 @@ uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // just use posix func
 	uint8* Result = Path->Addr;
     if (JB_Str_IsC(Path))
         return Result;
-
+	
     if (N > PATH_MAX)
         N = PATH_MAX;
     Tmp[ N ] = 0;
@@ -368,6 +369,7 @@ int File_GoToStart( JB_File* f, bool AllowMissing ) {
 	}
 	return JB_File_Open( f, O_RDONLY, AllowMissing );
 }
+
 
 bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
 	#if DEBUG

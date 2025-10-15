@@ -55,13 +55,16 @@ void JB_App__SetASMBreak (bool b) {
 // instead... collect "dead" IDs. So we don't just update things all over.
 
 int JB_Sh_Status (ShellStream* F) {
-	return F->_Status;
+	return PicoStatus(F->Pico);
 }
 
  
 int JB_Sh_Kill (ShellStream* F, int Code) {
-	F->_Status = Code;
-	return JB_Kill(F->PID);
+	PicoProcStats S;
+	PicoStatus(F->Pico, &S);
+	PicoConfig* M = (PicoConfig*)F->Pico;
+	M->PIDStatus = Code;
+	return JB_Kill(S.PID);
 }
 
 
@@ -91,18 +94,12 @@ JB_String* JB_App__Readline() {
 }
 
 
-static void pipe_close (int& fd) {
-	if (fd > 0) {
-		close(fd);
-		fd = -1;
-	}
-}
-
 
 void JB_App__SetThreadName(JB_String* self) {
 	require0(JB_Str_Length(self));
-	u8 CName[32];
+	u8 CName[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, CName);
+	CName[16] = 0; // in case its too long.
 #if __APPLE__
 	pthread_setname_np(tmp); // why?
 #else
@@ -154,7 +151,7 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 }
 
 
-int JB_Kill(int PID) {
+int JB_Kill (int PID) {
 	if (PID <= 0)
 		return -1;
 
@@ -168,71 +165,14 @@ int JB_Kill(int PID) {
 }
 
 
-static bool Dup2_(int from, int to) { // so this kinda does what dup2 should do.
-	while (from > 0 and dup2(from, to) == -1) {
-		int err = errno;
-		if (err != EINTR and err != EBUSY)	
-			return false;
-	}
-	return true;
-}
-
-
-static void StartPico (PicoComms* M, int* Both) {
-	if (M and (pipe(Both) == 0)) {
-		int fd = Both[RD];
-		int FL = fcntl(fd, F_GETFL, 0);
-		if (FL>=0)
-			fcntl(fd, F_SETFL, FL | O_NONBLOCK);
-		PicoStartPipe(M, fd);
-	}
-}
-
-
-static void CloseAndDup (int Mode, int* Capture, int Mask, int Std_FileNo) {
-	if (Mode&Mask) {
-		close(Std_FileNo);
-	} else {
-		Dup2_( Capture[WR], Std_FileNo );
-		pipe_close(Capture[WR]);
-		pipe_close(Capture[RD]);
-	}
-}
-
-
-int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
-// fcntl,Fork,execvp,Pipe,Dup2,Waitpid,Errno,close,Eintr,_exit // far too much stuff in unix.
+int JB_Sh_StartProcess (ShellStream* S) {
+// moved all the horrible unix stuff over to pico :)
 	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
 	if (!argv) return E2BIG;
-	
-	int CaptureOut[2] = {-1,-1};
-	int CaptureErr[2] = {-1,-1};
-	StartPico(S->StdOut, CaptureOut);
-	StartPico(S->StdErr, CaptureErr);
-	
-	int ChildID = PicoStartFork(C, true);
-	if (ChildID == 0) {
-		int Mode = S->Mode; // We are the child!
-		if (Mode&2) {
-			int p = getpid();
-			setpgid(p, p);
-		}
-		
-		CloseAndDup(Mode, CaptureOut, kStdOutSilence, STDOUT_FILENO);
-		CloseAndDup(Mode, CaptureErr, kStdErrSilence, STDERR_FILENO);
-		
-		execvp(argv[0], (char* const*)argv);
-		_exit(errno); // in case execvp fails
-	}
-
+	int Mode = S->Mode;
+	int ChildID = PicoExec(S->Pico, 0, argv, true, (Mode>>2)&3, (Mode>>4)&3);
 	byte Result = 0;
-	if (ChildID > 0) {
-		S->_Status = -1;
-		printf("Created Process: %i\n", ChildID);
-		S->PID = ChildID;
-		pipe_close(CaptureOut[WR]);
-		pipe_close(CaptureErr[WR]);
-	} else {
+	if (ChildID < 0) {
 		Result = errno;
 		JB_ErrorHandleFile(S->Path, nil, Result, nil, "run");
 	}
@@ -242,39 +182,24 @@ int JB_Sh_StartProcess(ShellStream* S, PicoComms* C) {
 }
 
 
-int JB_Sh_StartProcess2(ShellStream* S, PicoComms* C) {
-// fcntl,Fork,execvp,Pipe,Dup2,Waitpid,Errno,close,Eintr,_exit // far too much stuff in unix.
-	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
-	if (!argv) return E2BIG;
-	
-	byte Error = PicoStartExec(C, argv, S->Mode);
-	if (Error)
-		JB_ErrorHandleFile(S->Path, nil, Error, nil, "run");
-	free(argv);
-	return Error;
+void JB_Sh_Close (ShellStream* self) {
+//	PicoClose(self->StdErr);
+//	PicoClose(self->StdOut);
 }
 
 
-void JB_Sh_Close(ShellStream* self) {
-	PicoClose(self->StdErr);
-	PicoClose(self->StdOut);
-}
-
-
-static JB_String* ReadPico (PicoComms* C) {
-	PicoMessage M = PicoGetCpp(C);
-	if (M) {
+static JB_String* ReadPico (PicoMessage M) {
+	if (M)
 		return JB_Str__Freeable((uint8*)M.Data, M.Length);
-	}
 	return JB_Str__Empty();
 }
 
 JB_String* JB_Sh_ReadStdErr (ShellStream* self) {
-	return ReadPico(self->StdErr);
+	return ReadPico(PicoStdErr(self->Pico));
 }
 
 JB_String* JB_Sh_ReadStdOut (ShellStream* self) {
-	return ReadPico(self->StdOut);
+	return ReadPico(PicoStdOut(self->Pico));
 }
 
 
@@ -286,16 +211,12 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 }
 
 
-bool JB_FS_AppendPico (FastString* Self, PicoComms* M) {
-	return PicoAppend(M, (PicoAppenderFn)JB_FS_WriteAlloc_, Self);
-}
-
 
 int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* ErrsIn, int Mode, Date TimeOut) {
 	if (ErrsIn) Mode&=~kStdErrNil; else if (!(Mode&kStdErrNil)) Mode |= kStdErrPassThru;
 	if (Out)  Mode&=~kStdOutNil; else if (!(Mode&kStdOutNil)) Mode |= kStdOutPassThru;
 	auto Sh = JB_Sh_Constructor(0, self, R, Mode&~kStdErrPassThru);
-	byte Error = JB_Sh_StartProcess(Sh, 0);
+	byte Error = JB_Sh_StartProcess(Sh);
 	if (Error) {
 		JB_SetRef(Sh, 0);
 		return Error;
@@ -303,16 +224,19 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 	
 	auto Errs = ErrsIn;
 	if (!Errs and ((Mode&kStdErrNil)==kStdErrPassThru))
-		Errs = JB_FS_ConstructorSize(0, 0);
+		Errs = JB_FS_ConstructorSize(0, 0); // we wanna collect errors, even if pass-thru
 	
 	Date ExitAfter = 0;
 	if (TimeOut > 0)
 		ExitAfter = JB_Date__Now() + TimeOut;
 
 	while (TimeOut >= 0) {							// allow -1 time out which instantly exits...
-		int ReadAny = JB_FS_AppendPico(Errs, Sh->StdErr);
-		ReadAny |= JB_FS_AppendPico(Out, Sh->StdOut);
-		if (!ReadAny and JB_Sh_Status(Sh) != -1)
+		int ReadAny = 0;
+		if (Errs)
+			ReadAny = PicoStdErr(Sh->Pico, (PicoAppenderFn)JB_FS_WriteAlloc_, Errs).Length;
+		if (Out)
+			ReadAny += PicoStdOut(Sh->Pico, (PicoAppenderFn)JB_FS_WriteAlloc_, Out).Length;
+		if (!ReadAny and JB_Sh_Status(Sh) >= 0)
 			break;
 		if (TimeOut > 0) {
 			auto Now = JB_Date__Now();
@@ -324,13 +248,18 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 		JB_Date__Sleep(1);
 	}
 
-	if (Errs and (Mode&kStdErrNil)==kStdErrPassThru) {
+	if (JB_FS_Length(Errs) and (Mode&kStdErrNil)==kStdErrPassThru) {
+		// Do we want to pass through, or capture?
+		// capture makes more sense. Leave it like this for now.
 		void JB_Rec__Latchkum (Message* node, JB_String* Desc, JB_Object* Source);
 		JB_Rec__Latchkum(nil, JB_FS_GetResult(Errs), nil);
 	}
-	int Exit = Sh->_Status;
+	if (!ErrsIn and Errs)
+		JB_Delete((FreeObject*)Errs);
+	
+	int Exit = PicoStatus(Sh->Pico);
 	JB_Delete((FreeObject*)Sh);
-	if (Exit>128)			// died from a signal. Perhaps a SEGFAULT.
+	if (Exit > 128)									// died from a signal. Perhaps a SEGFAULT.
 		JB_ErrorHandleFile(self, nil, Exit, "crashed", "running");
 	return Exit;
 }
@@ -339,7 +268,7 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
 // remove this?
 	auto rz = JB_Sh_Constructor(0, self, Args, Mode);
-	byte Error = JB_Sh_StartProcess(rz, 0);
+	byte Error = JB_Sh_StartProcess(rz);
 	if (Error) {
 		JB_SetRef(rz, 0);
 	}
@@ -349,30 +278,38 @@ ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
 
 ///*(^&£^/ Shellstream vvvvv >>>>>>>
 
+static const char* MiniName (JB_String* Path) {
+	int N = Path->Length;
+	auto S = (const char*)Path->Addr;
+	while (--N >= 0) {
+		auto C = S[N];
+		if (C == '/')
+			return S+N+1;
+	}
+	return S;
+}
+
+
 ShellStream* JB_Sh_Constructor (ShellStream* self, JB_String* Path, Array* Args, byte Mode) {
 	JB_New2(ShellStream);
-	*self = {};
 	self->Args = JB_Incr(Args);
 	self->Path = JB_Incr(JB_Str_MakeC(Path));
-	self->Mode = Mode;
-	if (!(Mode&kStdOutNil))
-		self->StdOut = PicoCreate("StdOut", 256*1024);
-	if (!(Mode&kStdErrNil))
-		self->StdErr = PicoCreate("StdErr", 16*1024);
+	self->Mode = Mode; 
+#ifndef AS_LIBRARY
+	self->Pico = PicoCreate(MiniName(Path));
+#endif
+	self->UserFlags = 0;
 	return self;
 }
 
 
 void JB_Sh_Destructor (ShellStream* self) {
-	ShellStream& Sh = *self;
-	PicoDestroy(Sh.StdOut);
-	PicoDestroy(Sh.StdErr);
-	JB_Decr(Sh.Path);
-	JB_Decr(Sh.Args);
-	if (!self->LeaveOrphaned)
+	JB_Decr(self->Path);
+	JB_Decr(self->Args);
 #ifndef AS_LIBRARY
-		JB_Kill(self->PID);
+	PicoKill(self->Pico);
 #endif
+	PicoDestroy(self->Pico);
 }
 
 

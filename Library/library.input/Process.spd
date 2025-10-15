@@ -14,7 +14,7 @@ class Process
 		cpp_class ShellStream
 	contains Process
 	
-	|PID_Int| 				PID
+	|&Pico|					Pico
 	|string|				Path
 	|[string]?|				Args
     |int64|					UserFlags // remoev these two?
@@ -37,6 +37,8 @@ class Process
 	render
 		fs <~ "PID: $.pid\n${.path} $.args" // full path makes more sense, really.
 	
+	function PID (|int|)
+		
 	function ClosePipes
 		cpp_wrapper JB_Sh_Close
 
@@ -49,3 +51,27 @@ class Process
 	module
 		function Stream (|String| app, |[string]| R=[], |processmode| Mode = nil, |Process?|)
 			cpp_wrapper JB_Sh__Stream
+
+
+
+datatype ProcessMode (byte)
+	linkage
+		cpp_part PIDM
+		numeric false // disallow implicit (syntax <--> int) conversion
+	
+	flags
+		|ProcessMode| 
+		CaptureAll=0
+		OwnGroup=2
+		StdOutSilence = 4
+		StdOutPassThru = 8
+		StdErrSilence = 16
+		StdErrPassThru = 32
+		Silence = StdOutSilence|||StdErrSilence
+		PassThru = StdOutPassThru|||StdErrPassThru
+		// what about merging stderr into stdout, by using dup2?
+
+	syntax is (|ProcessMode| M, |bool|)
+		return self|int|&M|int|
+
+

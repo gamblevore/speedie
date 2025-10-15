@@ -51,10 +51,6 @@ int JB_App__ID() {
 	return getpid();
 }
 
-int JB_App__SelfSignal(int Sig) {
-	return kill(getpid(), Sig);
-}
-
 void JB_Wake(int Sig) { ; /* do nothing! This will wake up the process hopefully? */ }
 
 
@@ -119,7 +115,7 @@ void JB_CrashHandler (int Sig) {
 
 						// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);
-	JB_KillChildrenOnExit();
+	PicoKill(0);
 	bool AskExit = (Sig == SIGHUP) or (Sig == SIGQUIT) or (Sig == SIGKILL);
 	if (!JB_NoExitOnCrash or AskExit) {
 		if (AskExit)
@@ -154,8 +150,6 @@ void JB_App__CrashInstall() {
 		if (WakeList & (1<<i))
 			signal(i, JB_Wake);
 	}
-
-	signal(SIGCHLD, JB_SigChild);
 }
 }
 

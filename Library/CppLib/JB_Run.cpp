@@ -169,7 +169,7 @@ void JB_FinalEvents() {
 	JB_LibShutdown();
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
 	#ifndef AS_LIBRARY
-	JB_KillChildrenOnExit();
+	PicoKill(0);
 	#endif
 }
 
@@ -199,6 +199,10 @@ void		JB_App__GUIMode(bool GUI) {
 	JB_NoExitOnCrash = GUI;
 }
 
+
+static void JB_KillChildrenOnExit() {
+	PicoKill(0);
+}
 
 
 int JB_SP_Init (_cstring* R, bool IsThread) {

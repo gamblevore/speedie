@@ -16,7 +16,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 "
 	contains SpdProcess
 	|jbin|						Writer
-	|&pico|						Pico
 	|stringzeroterminated|		DebugName
 	|?ThreadAsProcess|			SubProcess
 	|int| 						DeathLimit
@@ -141,7 +140,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.pico!.close(Why)
 
 
-	helper StartProcess (|&pico?| C = nil,  |ExitCode|)
+	helper StartProcess (|ExitCode|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
@@ -164,7 +163,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	
 	helper Start_ (|bool|)
 		.DelaySpawnTill = 0
-		|| err = .StartProcess(.pico)
+		|| err = .StartProcess()
 		return err.successful
 
 
@@ -263,17 +262,18 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 		function SpawnFork (|ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
-			|| p = pico.new$
-			|| id = p.spawnfork
-			if id < 0
-				pico.destroy(p, "fork failed")
-				return nil
-
-			if id == 0 // we are child
-				id = app.parentid
-				mode = ProcessMode.PassThru
-			rz = spdprocess(app.path, nil, p, nil, mode)
-			rz.pid = id
+			disabled "use pico properly"
+//			|| p = pico.new$
+//			|| id = p.spawnfork
+//			if id < 0
+//				pico.destroy(p, "fork failed")
+//				return nil
+//
+//			if id == 0 // we are child
+//				id = app.parentid
+//				mode = ProcessMode.PassThru
+//			rz = spdprocess(app.path, nil, p, nil, mode)
+//			rz.pid = id
 
 	
 	prototype ThreadAsProcess (|&pico| Comms, |int64| Data, |&cstring| args, |bool|)
@@ -294,7 +294,7 @@ prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 		|| name = (&comms.config.name[0])|cstring|
 		|| pico_out = pico.new(name.wrap, -1)
 			if BuffBits
-				pico_out.Config.Bits = BuffBits
+				pico_out.config.Bits = BuffBits
 			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)
 				return pico_out
 			pico_out.Close("")

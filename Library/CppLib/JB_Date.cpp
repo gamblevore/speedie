@@ -9,18 +9,16 @@
 #include <unistd.h>
 #include <cerrno>
 
-
 extern "C" {
-Date JB_Date__Create( u64 S, u64 NS ) {
-    NS /= (u64)15259;
-    S <<= 16;
-    return S + NS;
+Date JB_Date__Create (u64 S, u64 NS) {
+	u64 NS2 = (NS * 9223372046ULL)>>47ULL; // avoid division :)
+    return (S << 16) + NS2;
 }
 
 // 0xFFFF -> 0.9999
 // 0x8000 -> 0.5...
 
-Date JB_Date__Now( ) {
+Date JB_Date__Now () {
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
 	return JB_Date__Create(ts.tv_sec, ts.tv_nsec);
@@ -43,14 +41,14 @@ Date JB_Date__Now( ) {
 #endif
 
 
-static timespec DateToTimeSpec(Date Durr) {
+static timespec DateToTimeSpec (Date Durr) {
     struct timespec ts;
     ts.tv_sec = Durr>>16;
     ts.tv_nsec = (Durr & ((1<<16)-1)) * 15258.7890625;
     return ts;
 }
 
-void JB_Date__Sleep(Date Durr) {
+void JB_Date__Sleep (Date Durr) {
     auto ts = DateToTimeSpec(Durr);
     while ((nanosleep(&ts, &ts) == -1 and errno == EINTR)) {
 		;

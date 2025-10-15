@@ -538,12 +538,6 @@ function file.TestBatch (|bool|)
 			printed = true
 			print c.Name
 	printline
-	
-	for c in batch.ListFiles
-		if c isa "cpp" or "h" or "s"
-			print "This file should really not be here: "
-			printline c
-			debugger
 	return stderr.ok
 	// we want to test each file... how? we need to call the new speedie!
 	// so we need a folder to test...

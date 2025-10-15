@@ -46,19 +46,71 @@ typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via cl
 typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
 
 
-struct 			PicoConfig  {
-	char 			Name[16];		/// Used for reporting events to stdout.
-	void*			UserData;
-	PicoDate		LastRead;		/// The date of the last Read.
-	PicoDate		LastSend;		/// The date of the last send.
-	int				QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
-	unsigned short	DeathCount;		/// How many times the subprocess died.
-	unsigned short	SendFailCount;	/// How many times sending failed.
-	unsigned short	ReadFailCount;	/// How many times reading failed.
-	unsigned char	Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
-	unsigned char	SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
-	int				_reserved;
+
+#ifdef PICO_IMPLEMENTATION
+
+	#include <fcntl.h>
+	#include <unistd.h>
+	#include <pthread.h>
+	#include <signal.h>
+	#include <errno.h>
+	#include <sys/socket.h>
+	#include <algorithm>
+	#include <atomic>
+
+struct PicoBuff;
+struct PicoTrousers { // only one person can wear them at a time.
+	std::atomic_bool Value;
+	PicoTrousers  () {Value = false;}
+	bool enter () {
+		bool Expected = false;
+		return Value.compare_exchange_strong(Expected, true);
+	}
+	void leave () {
+		Value = false;
+	}
+	void lock () {
+		while (!enter()); // spin
+	}
 };
+#endif
+
+
+struct 			PicoConfig  {
+	char 				Name[16];		/// Used for reporting events to stdout.
+	PicoDate			LastRead;		/// The date of the last Read.
+	PicoDate			LastSend;		/// The date of the last send.
+	int					QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
+	unsigned short		DeathCount;		/// How many times the subprocess died.
+	unsigned short		SendFailCount;	/// How many times sending failed.
+	unsigned short		ReadFailCount;	/// How many times reading failed.
+	short				PIDStatus;		/// The exit-status of the sub-process (if any).
+	unsigned char		Noise;			/// How much information PicoMsg prints. From `PicoSilent` to `PicoNoiseAll`
+	unsigned char		SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
+	bool				LeaveOrphaned;	/// If this is true, the child-process will not be killed by `PicoKill()`
+	unsigned char		Bits; 	
+#ifdef PICO_IMPLEMENTATION
+	unsigned char		SocketStatus;
+	bool				IsParent;
+	unsigned char		PartClosed;
+	PicoTrousers		SendLock;
+	PicoTrousers		ReadLock;
+	PicoTrousers		QueueLock;
+	std::atomic_char	DestroyMe;
+	PicoTrousers		InUse;
+	unsigned char		ID;
+	int					Socket;
+	int					LengthBuff;
+	int					PID;
+	PicoBuff*			Reading;
+	PicoBuff*			Sending;
+	PicoBuff*			StdErr;
+	PicoBuff*			StdOut;
+	PicoMessage*		QueueTail;
+	PicoMessage			QueueHead;
+#endif
+};
+
 
 struct			PicoProcStats {
 	const char*		StatusName;
@@ -100,14 +152,6 @@ struct PicoGlobalStats {
 #else
 	#define _pico_code_(x) {x}
 
-	#include <fcntl.h>
-	#include <unistd.h>
-	#include <pthread.h>
-	#include <errno.h>
-	#include <sys/socket.h>
-	#include <algorithm>
-	#include <atomic>
-
 
 extern "C" bool				PicoInit (int DesiredThreadCount);
 struct PicoBuff;
@@ -116,20 +160,6 @@ static PicoMessage pico_next_msg (PicoMessage M) {
 	return *((PicoMessage*)(M.Data + M.Length));            			;;;/*_*/;;;
 }
 
-struct PicoTrousers { // only one person can wear them at a time.
-	std::atomic_bool Value;
-	PicoTrousers  () {Value = false;}
-	bool enter () {
-		bool Expected = false;
-		return Value.compare_exchange_strong(Expected, true);
-	}
-	void unlock () {
-		Value = false;
-	}
-	void lock () {
-		while (!enter()); // spin
-	}
-};
 static PicoTrousers PicoCommsLocker;
 
 
@@ -145,12 +175,19 @@ PicoDate PicoGetDate( ) {
 	return pico_date_create(ts.tv_sec, ts.tv_nsec);
 }
 
-static void pico_sleep (float S) {
-	S = std::clamp(S, 0.0001f, 0.9999f);
-	timespec ts = {0, (int)(S*1000000000.0)};
-	nanosleep(&ts, 0);
+
+void PicoSleep (float Wait) {
+	if (Wait >= 0) {
+		int Seconds = Wait;
+		float F = Wait - floorf(Wait); 
+		timespec ts = {Seconds, (int)(F*1000000000.0)};
+		while ((nanosleep(&ts, &ts) == -1 and errno == EINTR)) {
+			;
+		}
+    }
 }
-	
+
+
 inline int pico_log2 (uint64_t X) {
 	return 63-__builtin_clzll(X);
 }
@@ -170,7 +207,7 @@ struct PicoCommList {
 			ID = pico_log2(F)+1;
 			Map = F|F0;
 		}
-		Lock.unlock();
+		Lock.leave();
 		return ID;
 	}           						 ;;;/*_*/;;;
 	
@@ -179,47 +216,19 @@ struct PicoCommList {
 		uint64_t Old = Map;
 		int64_t M2 = 1ULL << M;
 		Map = Old & ~M2;
-		Lock.unlock();
+		Lock.leave();
 	}
 };
 
 
 
-struct PicoCommsData {
-	PicoConfig					Conf;
-	short						PIDStatus;	  // could be moved to Conf for tightness.
-	unsigned char				SocketStatus; // same
-	bool						IsParent;
-protected:
-	PicoBuff*					Reading;
-	PicoBuff*					Sending;
-	PicoBuff*					StdErr;
-	PicoBuff*					StdOut;
-	PicoMessage*				QueueTail;
-	PicoMessage					QueueHead;
-	int							Socket;
-	int							LengthBuff;
-	int							PID;
-	unsigned char				PartClosed;
-	unsigned char				Bits;
-	PicoTrousers				SendLock;
-	PicoTrousers				ReadLock;
-	PicoTrousers				QueueLock;
-	std::atomic_char			DestroyMe;
-	std::atomic_char			InUse;
-	unsigned char				ID;
-};
-
-
-//static std::atomic_int		DebugCount;
 static	PicoCommList			pico_list;
-static	const char*				pico_fail_actions[4] = {"Failed", "Sending", "Reading", 0};
 static	std::atomic_int			pico_thread_count;
 static	PicoTrousers			pico_inited;
 static	int						pico_timeout_count;
 static  std::atomic_int         pico_open_sockets;
 static  PicoGlobalConfig		pico_global_conf;
-static	PicoCommsData			pico_all[64];
+static	PicoConfig				pico_all[64];
 
 
 struct PicoLister {
@@ -403,7 +412,7 @@ struct PicoBuff {
 
 
 
-struct PicoComms : PicoCommsData {
+struct PicoComms : PicoConfig {
 	static PicoComms* New (PicoComms* M, int noise, bool isparent, int size, const char* name, int ID) {
 		M = (PicoComms*)&pico_all[ID-1];
 		return M->Init(noise, isparent, size, name, ID-1);
@@ -414,10 +423,10 @@ struct PicoComms : PicoCommsData {
 		ID = iD; IsParent = isparent; Socket = -1;
 		PartClosed = 255;
 		SocketStatus = 255;
-		PIDStatus = -EINPROGRESS;
+		PIDStatus = -1;
 		QueueTail = &QueueHead;
-		Conf.Noise = noise;
-		Conf.SendTimeOut = 10.0f; // 🕷️_🕷️
+		Noise = noise;
+		SendTimeOut = 10.0f; // 🕷️_🕷️
 
 		if (size <= 0)
 			size = PicoDefaultInitSize;
@@ -426,10 +435,10 @@ struct PicoComms : PicoCommsData {
 		if (B > 26) B = 26;
 		B += ((1<<B) < size);
 		Bits = B;
-		Conf.QueueSize = 1<<(B+3);
+		QueueSize = 1<<(B+3);
 		
 		if (!name) name = "";
-		strncpy(Conf.Name, name, sizeof(Conf.Name)-1);
+		strncpy(Name, name, sizeof(Name)-1);
 //		int x = ++DebugCount;
 //		printf("+++++++ %i: %i\n", ID, x);
 		return this;
@@ -456,13 +465,10 @@ struct PicoComms : PicoCommsData {
 
 	/// **Class Initialisation Helpers**
 	bool MiniPipe (int Pipe[2], int Mode, int Std) {
-		if (Mode >= 1) {
-			if (Mode == 1) 
-				close(Std);
+		if (Mode >= 1)
 			return true;
-		}
 
-		if (int P = pipe(Pipe); P)
+		if (pipe(Pipe))
 			return failed();
 		unblock(Pipe[0]);
 		return true;
@@ -507,6 +513,10 @@ struct PicoComms : PicoCommsData {
 		
 		IsParent = ChildID;
 		if (!IsParent) {
+			if (NoStdOut == 1) 
+				close(STDOUT_FILENO);
+			if (NoStdErr == 1) 
+				close(STDERR_FILENO);
 			pico_thread_count = 0;
 			ChildClosePipes(Out, STDOUT_FILENO);
 			ChildClosePipes(Err, STDERR_FILENO);
@@ -516,15 +526,19 @@ struct PicoComms : PicoCommsData {
 		PartClosed &= 15;
 		PicoInit(0);
 		
-		close(Out[1]);
-		StdOut = PicoBuff::New(18, "stdout", this, Out[0]);
-		if (StdOut)
-			PartClosed &=~ 4;
+		if (!NoStdOut) {
+			close(Out[1]);
+			StdOut = PicoBuff::New(18, "stdout", this, Out[0]);
+			if (StdOut)
+				PartClosed &=~ 4;
+		}
 		
-		close(Err[1]);
-		StdErr = PicoBuff::New(16, "stderr", this, Err[0]);
-		if (StdErr)
-			PartClosed &=~ 8;
+		if (!NoStdErr) {
+			close(Err[1]);
+			StdErr = PicoBuff::New(16, "stderr", this, Err[0]);
+			if (StdErr)
+				PartClosed &=~ 8;
+		}
 		
 		PID = ChildID;
 		mark_started();
@@ -579,7 +593,7 @@ struct PicoComms : PicoCommsData {
 		int S = Socks[IsParent];
 		if (!IsParent) {
 			if (ChildName)
-				strncpy(Conf.Name, ChildName, sizeof(Conf.Name));
+				strncpy(Name, ChildName, sizeof(Name));
 			pico_thread_count = 0; // Forked process don't keep threads.
 			if (SaveSocket)
 				return StoreSock(S);
@@ -638,16 +652,16 @@ struct PicoComms : PicoCommsData {
 		if (n+PicoMsgInfo > Sending->Size)
 			return SayEvent("CantSend: Message too large!");
 		if (Policy == PicoSendGiveUp)
-			return (!Conf.SendFailCount++) and SayEvent("CantSend: BufferFull");
+			return (!SendFailCount++) and SayEvent("CantSend: BufferFull");
 		
-		PicoDate Final = PicoGetDate() + (PicoDate)(Conf.SendTimeOut*65536.0f);
+		PicoDate Final = PicoGetDate() + (PicoDate)(SendTimeOut*65536.0f);
 		while (PicoGetDate() < Final) {
 			if (PartClosed&1) return false; // closed!
 			sched_yield();
 			if (queue_sub(msg, n)) return true;
 		}
 		
-		return (!Conf.SendFailCount++) and SayEvent("CantSend: TimedOut");
+		return (!SendFailCount++) and SayEvent("CantSend: TimedOut");
 	}
 	
 	PicoMessage GetStd (PicoAppenderFn Fn, void* Obj, PicoBuff* B) {
@@ -682,24 +696,24 @@ struct PicoComms : PicoCommsData {
 		QueueHead = H;
 		if (!H)
 			QueueTail = &QueueHead;
-		QueueLock.unlock();
-		Conf.QueueSize  +=  M.Length + sizeof(PicoMessage)*2;
+		QueueLock.leave();
+		QueueSize  +=  M.Length + sizeof(PicoMessage)*2;
 		return M;
 	}
 	
 	void* SayEvent (const char* A, const char* B="", int Iter=0) {
-		if (Conf.Noise & (PicoNoiseEventsChild << IsParent))
+		if (Noise & (PicoNoiseEventsChild << IsParent))
 			return Say(A, B, Iter);
 		return nullptr;
 	}
 
 	inline bool CanSayDebug () {
-		return Conf.Noise & (PicoNoiseDebugChild << IsParent);
+		return Noise & (PicoNoiseDebugChild << IsParent);
 	}
 	
 	void* Say (const char* A, const char* B="", int Iter=0) {
 		const char* S = IsParent?"Parent":"Child";
-		const char* P = Conf.Name;
+		const char* P = Name;
 		if (!B)
 			B = "";
 		if (!P or !strlen(P))
@@ -714,12 +728,12 @@ struct PicoComms : PicoCommsData {
 
 	static const char* StatusName (int T) {
 		if (T == 0)
-			return "successful";
+			return "Successful: 0";
+		if (T < 0)
+			return "Running: -1";
 		if (T & 128)
 			return strsignal(T&~128);
-		if (T > 0)
-			return strerror(T);
-		return "running";
+		return strerror(T);
 	}
 	
 	int Status (PicoProcStats* S) {
@@ -775,7 +789,7 @@ struct PicoComms : PicoCommsData {
 		if (!Sending) return false;
 		auto D = Sending->SendOutput(msg, n);
 		if (!D) return false;
-		if (Socket < 0) Conf.LastSend = D; // threaded
+		if (Socket < 0) LastSend = D; // threaded
 		return true;
 	}
 	
@@ -811,7 +825,7 @@ struct PicoComms : PicoCommsData {
 			read_part(StdOut, StdOut->Pipe);
 		if (!(PartClosed&8))
 			read_part(StdErr, StdErr->Pipe);
-		ReadLock.unlock();
+		ReadLock.leave();
 	}
 	
 	bool can_send () {
@@ -826,18 +840,18 @@ struct PicoComms : PicoCommsData {
 			int Amount = (int)send(Socket, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
   			if (Amount > 0) {
 				Sending->lost(Amount);
-				Conf.LastSend = PicoGetDate();
+				LastSend = PicoGetDate();
 				if (CanSayDebug()) Say("|send|", "", Amount);
-			} else if (!io_pass(Amount, 2))
+			} else if (!io_pass(Amount, 1))
 				break;
 		}
-		SendLock.unlock();
+		SendLock.leave();
 	}
 		
 	bool can_get (float T) {
 		if (QueueHead.Length) return true;
  		if (!T) return false;
-		if (T < 0) T = Conf.SendTimeOut;
+		if (T < 0) T = SendTimeOut;
 		T = std::min(T, 543210000.0f); // 17 years?
 		PicoDate Final = PicoGetDate() + (PicoDate)(T*65536.0f);
 		timespec ts = {0, 1000000}; int n = T*16000;
@@ -872,20 +886,20 @@ struct PicoComms : PicoCommsData {
 
 		if (Reading->Length() < L) return false;
 		int QS = L + sizeof(PicoMessage)*2;
-		if (Conf.QueueSize < QS)
-			return (!Conf.ReadFailCount++) and SayEvent("CantRead: BufferFull");
+		if (QueueSize < QS)
+			return (!ReadFailCount++) and SayEvent("CantRead: BufferFull");
 		
 		if (char* Data = palloc(L+sizeof(PicoMessage)); Data) {
 			Reading->ReadInput(Data, L);
 			auto T = (PicoMessage*)(Data + L);
 			*T = {};
 			LengthBuff = 0;
-			Conf.QueueSize -= QS;
+			QueueSize -= QS;
 			QueueLock.lock();
 			*QueueTail = {Data, L};
 			QueueTail = T;
-			QueueLock.unlock();
-			Conf.LastRead = PicoGetDate();
+			QueueLock.leave();
+			LastRead = PicoGetDate();
 			return true;
 		}
 		return fail_alloc(L+sizeof(PicoMessage));
@@ -901,20 +915,13 @@ struct PicoComms : PicoCommsData {
 	}
 	
 	bool alloc_msg_buffs () {
-		if (!Sending) {
-			Sending = PicoBuff::New(Bits, "Send", this, -1);
-			if (Sending) PartClosed &= ~1;
-		}
-		if (!Reading) {
-			Reading = PicoBuff::New(Bits, "Read", this, -1);
-			if (Reading) PartClosed &= ~2;
-		}
-		PartClosed &= 15;
-
-		if (!(PartClosed&3) and PicoInit(0))
-			return true;
-		
-		return failed(ENOBUFS);
+		if (!Sending and !(Sending = PicoBuff::New(Bits, "Send", this, -1)))
+			return failed(ENOBUFS);
+		if (!Reading and !(Reading = PicoBuff::New(Bits, "Read", this, -1)))
+			return failed(ENOBUFS);
+		PartClosed &= ~3; // open up sending and reading. Say they are "not closed".
+		PartClosed &= 15; // Close the other "fake" buffers, so its not 255 anymore.
+		return PicoInit(0);
 	}
 
 	void unblock (int Pipe) {
@@ -956,6 +963,7 @@ struct PicoComms : PicoCommsData {
 				err = ENOTCONN;
 				SayEvent("ClosedGracefully");
 			} else {
+				static const char* pico_fail_actions[3] = {"Failed", "Sending", "Reading"};
 				SayEvent(pico_fail_actions[Action], strerror(err));
 				if (err == EBADF)
 					SayEvent("Socket", "", Socket);
@@ -1008,50 +1016,65 @@ struct PicoComms : PicoCommsData {
 		int S = Socket; if (S < 0) return false;
 		if (!ReadLock.enter()) return false;
 		io_close_for_real(S);
-		ReadLock.unlock();
+		ReadLock.leave();
 		return true;
 	}								;;;/*_*/;;;
 
 	void check_exit_code () {
-		int ExitCode = 0;
+		if (!PID or PIDStatus >= 0)
+			return;
+		
+ 		int ExitCode = 0;
 		if (waitpid(PID, &ExitCode, WNOHANG) <= 0)
-			;
-		  else if (WIFSIGNALED(ExitCode))
+			return;
+		if (WIFSIGNALED(ExitCode))
 			PIDStatus = WTERMSIG(ExitCode)|128;
 		  else if (WIFEXITED(ExitCode))
 			PIDStatus = WEXITSTATUS(ExitCode);
+		if (CanSayDebug())
+			Say("Process", StatusName(PIDStatus), -PID);
+	}
+	
+	bool kill_me () {
+		if (!PID or DestroyMe or LeaveOrphaned or PIDStatus >= 0)
+			return true;
+		if (!InUse.enter())
+			return false;
+		
+		// Don't update PIDStatus here. The kill might not go through! Or be caught and then die differently.
+		kill(PID, SIGKILL);
+		InUse.leave();
+		return true;
 	}
 	
 	void cleanup (PicoDate CheckPID) {
-		auto U = InUse++;
-		if (U == 0) {
-			if (CheckPID and PID and PIDStatus < 0)
-			// could we use a PIDStatus of -1 for processes
-			// and a PIDStatus of 0 for same-proc stuff?
-				check_exit_code();
+		if (!InUse.enter())
+			return;
+		
+		if (CheckPID)
+			check_exit_code();
 
-			if (DestroyMe == 1) {
-				if (CanSayDebug()) Say("Bye");
-				check_exit_code(); // cleanup process PID list...
-				Destroy();
-			}
+		if (DestroyMe == 1) {
+			if (CanSayDebug()) Say("Bye");
+			check_exit_code(); // cleanup process PID list...
+			Destroy();
 		}
-		InUse--;
+		InUse.leave();
 	}
 	
 	;;;/*_*/;;;
 	void io () {
-		int i = InUse++;
-		if (i == 0 and !DestroyMe) {
-			int P = PartClosed;			
-			if ((P&15) != 15) {
-				do_reading();
-				do_sending();
-			} else if (P != 255) {
-				io_close();
-			}
+		if (DestroyMe or !InUse.enter())
+			return;
+		
+		int P = PartClosed;			
+		if ((P&15) != 15) {
+			do_reading();
+			do_sending();
+		} else if (P != 255) {
+			io_close();
 		}
-		InUse--;
+		InUse.leave();
 	}
 };
 
@@ -1095,13 +1118,14 @@ static bool pico_try_exit () {
 
 static void pico_work_comms () {
 	PicoLister Items;
-	// I think we got a comms destroyed and created WHILE the list is happening
-	// AND then... we started reading a not fully-constructed object. 
 	while (auto M = Items.NextComm())
 		M->io();
 	
 	float S = (PicoGetDate() - pico_global_conf.LastActivity) * (0.000015258789f * 0.005f);
-	pico_sleep(std::clamp(S*S, 0.001f, 0.5f));
+
+	S = std::clamp(S*S, 0.001f, 0.5f);
+	timespec ts = {0, (int)(S*1000000000.0)};
+	nanosleep(&ts, 0); // interuptible sleep	
 }
 
 
@@ -1117,8 +1141,8 @@ static int pico_any_still_sending () {
 static void pico_keep_sending () {
 	auto Remain = PicoRemainDefault;
 	while (pico_any_still_sending() and Remain > 0) {
-		pico_sleep(0.001);
-		Remain -= 0.001;
+		PicoSleep(0.01);
+		Remain -= 0.01;
 	};
 }
 
@@ -1166,8 +1190,15 @@ static bool pico_init (int D) {
 	}
 
 	pico_global_conf.LastActivity = PicoGetDate();
-	pico_inited.unlock();
+	pico_inited.leave();
 	return OK;
+}
+
+
+static void pico_kill_all () {
+	PicoLister Items;
+	while (auto M = Items.NextComm())
+		while (!M->kill_me());
 }
 
 
@@ -1212,6 +1243,10 @@ extern "C" bool PicoStartThread (PicoComms* M, PicoThreadFn fn, void* Obj=nullpt
 )
 
 
+
+///
+/// **SubProcesses** ///
+///
 extern "C" int PicoStartFork (PicoComms* M, const char* Name=nullptr) _pico_code_ (
 /// This will fork your app, and then connect the two apps with PicoMsg. Returns the result of `fork()`. So handle it just the same.
 	return M->StartFork(Name, false);
@@ -1246,6 +1281,14 @@ extern "C" int PicoPartialExec (PicoComms* M, const char* DebugName, bool NoMsgs
 
 extern "C" bool PicoRestoreExec (PicoComms* M) _pico_code_ (
 	return M->RestoreExec();
+)
+
+
+extern "C" void PicoKill(PicoComms* M) _pico_code_ (
+	if (M)
+		while (!M->kill_me());
+	  else
+		pico_kill_all();
 )
 
 
@@ -1318,7 +1361,7 @@ extern "C" void PicoSleepForSend (float During, float After) _pico_code_ (
 ///  Sleeps while sends occur. Useful to call last in your app.
 	PicoRemainDefault = During;
 	pico_keep_sending();
-	pico_sleep(After);
+	PicoSleep(After);
 )
 
 extern "C" bool PicoCanGet (PicoComms* M) _pico_code_ (
@@ -1347,7 +1390,7 @@ extern "C" bool PicoInit (int DesiredThreadCount) _pico_code_ (
 /// **Configuration / Statistics / Info ** ///
 ///
 
-extern "C" int PicoInfo (PicoComms* M, PicoProcStats* S=nullptr) _pico_code_ (
+extern "C" int PicoStatus (PicoComms* M, PicoProcStats* S=nullptr) _pico_code_ (
 	/// Pico has a unified system for status codes.
 	/// EG: After `PicoShellExec(M)`, then call `PicoInfo(M)` to find `M`'s status.
 	/// Result codes:
@@ -1369,17 +1412,13 @@ extern "C" int PicoError (PicoComms* M) _pico_code_ (
 	return M->SocketStatus;
 )
 
-extern "C" PicoConfig* PicoCommsConf (PicoComms* M) _pico_code_ (
-/// Gets the config struct. You can configure "noise", "timeout", "name", and the maximum unread-message queue size.
-	return &M->Conf;
-)
 
 extern "C" PicoGlobalConfig* PicoGlobalConf() _pico_code_ (
 // Returns the global conf struct, which allows you to set important values.
 	return &pico_global_conf;
 )
 
-extern "C" void PicoGlobalStats (PicoGlobalStats* F) _pico_code_ (
+extern "C" void PicoGlobals (PicoGlobalStats* F) _pico_code_ (
 	F->TimeOutCount = pico_timeout_count;
 	F->OpenSockets  = pico_open_sockets;
 	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 

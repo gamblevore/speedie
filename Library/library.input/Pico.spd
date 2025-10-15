@@ -28,6 +28,23 @@ function @string.FromPico (|picomessage| M, |string|)
 		return string.own(x, M.length)
 
 
+struct PicoConfig
+	linkage: wrapper, cpp_part PCF
+	|int8[16]| 				Name
+	|Date|					LastRead
+	|Date|					LastSend
+	|int|					QueueSize
+	|uint16|				DeathCount
+	|uint16|				SendFailCount
+	|uint16|				ReadFailCount
+	|byte|					Noise
+	|byte|					SendTimeOut
+	|int16|					PIDStatus
+	|byte|					SocketStatus
+	|bool|					LeaveOrphaned
+	|byte|					Bits
+
+
 struct Pico
 	linkage: wrapper, cpp_part Pico, cpp_class PicoComms
 
@@ -46,7 +63,7 @@ struct Pico
 		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)
-		cpp_wrapper PicoRestoreSockets
+		cpp_wrapper PicoRestoreExec
 	
 	syntax append (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
@@ -69,10 +86,6 @@ struct Pico
 	function Tickle
 		|| msg = PicoMessage.from("")
 		.send(msg)
-
-	function Config (|&PicoConfig|)
-		// this should not allow a nil-self. why does it?
-		cpp_wrapper PicoCommsConf
 	
 	helper __Get (|PicoMessage| Msg, |float| T)
 		nil checker
@@ -99,6 +112,10 @@ struct Pico
 
 	function IsSending (|bool|)
 		cpp_wrapper PicoStillSending
+
+	function Config (|&PicoConfig|)
+		return self|&PicoConfig|
+	
 		
 	
 
@@ -124,7 +141,7 @@ struct Pico
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
 			
-		function Create (|cstring| Name, |?&pico|)
+		function Create (|cstring| Name, |int| ByteBufferSize = 0, |?&pico|)
 			cpp_wrapper PicoCreate
 
 		function Fork (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
@@ -135,10 +152,8 @@ struct Pico
 				p.close(nil)
 		
 		function New (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
-			|| p = pico.Create(name)
-				|| c = p.config
-				c.bits = 16
-				c.Noise = noise
+			|| p = pico.Create(name, 16)
+				p.config.Noise = noise
 				return p
 			|PicoGlobalStats| St
 			St.Read
@@ -156,20 +171,6 @@ module PicoNoise
 		All			= 15
 
 
-struct PicoConfig
-	linkage: wrapper
-	constants
-	|byte[32]|					Name
-	|Date|						LastRead
-	|Date|						LastSend
-	|int|						Noise
-	|float|						SendTimeOut
-	|int|						SendFailCount
-	|int|						ReadFailCount
-	|int|						QueueBytesRemaining
-	|int|						Bits
-	|&PicoGlobalConfig|			Realm
-
 
 struct PicoGlobalConfig
 	linkage: wrapper
@@ -185,7 +186,7 @@ struct PicoGlobalStats
 	|int|						OpenPicos
 
 	helper Read
-		cpp_wrapper PicoStats
+		cpp_wrapper PicoGlobals
 	module
 		function Read (|PicoGlobalStats|)
 			rz.read

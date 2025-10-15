@@ -13,24 +13,17 @@
 extern "C" {
 
 JBClass( ShellStream, JB_Object,
-	uint				PID;
+	u8					Mode;
+	PicoComms*			Pico;
 	JB_String*			Path;
 	Array*  			Args;
-	volatile int		_Status;
-	bool				KillOnExit;
-	bool				LeaveOrphaned;
-	u8					Mode;
-	PicoComms*			StdOut;
-	PicoComms*			StdErr;
     int64				UserFlags;
 );
 
 
 
 int JB_Sh_Kill (ShellStream* F, int Code);
-void JB_KillChildrenOnExit();
 void JB_AddProcess (int PID);
-//int JB_Sh_Exit (ShellStream* F);
 int JB_Sh_Status (ShellStream* F);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
@@ -45,7 +38,7 @@ ShellStream* JB_Sh__Stream(JB_String* self, Array* R, int Mode);
 bool JB_Sh_Step(ShellStream* self);
 int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, int Mode, Date Timeout);
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R);
-int JB_Sh_StartProcess(ShellStream* self, PicoComms* C);
+int JB_Sh_StartProcess(ShellStream* self);
 void JB_Sh_Close(ShellStream* self);
 JB_String* JB_Sh_ReadStdErr (ShellStream* self);
 JB_String* JB_Sh_ReadStdOut (ShellStream* self);
@@ -57,10 +50,7 @@ int JB_Kill(int PID);
 int JB_Signal(int pid, int sig);
 void JB_App__CrashOnInterupt (bool b);
 void JB_App__SetASMBreak(bool b);
-void JB_SigChild (int signum);
 void JB_SigMsgReceived(int signum);
-void JB_SigChildLock ();
-void JB_SigChildUnLock ();
 struct SpdProcess;
 SpdProcess* JB_App__Fork(Array* R);
 //int JB_Str_StartProcess (JB_String* self, Array* Args, JB_File** StdOut);
