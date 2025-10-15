@@ -126,8 +126,8 @@ struct Pico
 		function SleepForSend (|float| During=5.0, |float| After = 0.5)
 			cpp_wrapper PicoSleepForSend
 		
-		function Start
-			cpp_wrapper PicoStart
+		function Start (|int| ThreadCount = 0)
+			cpp_wrapper PicoInit
 
 		function Destroy (|?&pico| Where, |Cstring| Why, |?&pico|)
 			cpp_wrapper PicoDestroy
