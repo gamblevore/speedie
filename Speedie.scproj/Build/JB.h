@@ -121,13 +121,9 @@ typedef int OpMode;
 
 typedef int PID_Int;
 
-typedef ivec4 ParserLineAndIndent;
-
 typedef vec4 Plane3D;
 
 typedef byte ProcessMode;
-
-typedef byte ProcessOwnerMode;
 
 typedef int SCBlockage;
 
@@ -321,6 +317,8 @@ struct ObjectSaver;
 
 struct Object_Behaviour;
 
+struct ParserLineAndIndent;
+
 struct Random;
 
 struct RegFile;
@@ -369,7 +367,7 @@ struct MemoryLayer_Behaviour;
 
 struct Memory_Behaviour;
 
-struct ProcessOwner_Behaviour;
+struct Process_Behaviour;
 
 struct SCImport_Behaviour;
 
@@ -407,8 +405,6 @@ struct FastStringCpp_Behaviour;
 
 struct File_Behaviour;
 
-struct Process_Behaviour;
-
 struct SCDecl_Behaviour;
 
 struct SCIterator_Behaviour;
@@ -416,6 +412,8 @@ struct SCIterator_Behaviour;
 struct SCNode_Behaviour;
 
 struct SavingTest_Behaviour;
+
+struct SpdProcess_Behaviour;
 
 struct StringShared_Behaviour;
 
@@ -436,8 +434,6 @@ struct SCBetterNode_Behaviour;
 struct SCFile_Behaviour;
 
 struct SaverClassInfo_Behaviour;
-
-struct SpdProcess_Behaviour;
 
 struct Task_Behaviour;
 
@@ -509,6 +505,8 @@ struct SCNode;
 
 struct SavingTest;
 
+struct SpdProcess;
+
 struct JB_String;
 
 struct Message;
@@ -526,8 +524,6 @@ struct SCBetterNode;
 struct SCFile;
 
 struct SaverClassInfo;
-
-struct SpdProcess;
 
 struct JB_Task;
 
@@ -796,6 +792,14 @@ struct ObjectSaver {
 	JB_Object* Root;
 };
 
+struct ParserLineAndIndent {
+	int Lines;
+	int Position;
+	int Indent;
+	int IsDebug;
+	int FirstLine;
+};
+
 struct Random {
 	uint64 Store;
 	uint64 State;
@@ -979,7 +983,7 @@ JBClass ( MWrap , JB_Object ,
 struct MemoryLayer_Behaviour: Object_Behaviour {
 };
 
-struct ProcessOwner_Behaviour: Object_Behaviour {
+struct Process_Behaviour: Object_Behaviour {
 };
 
 struct SCImport_Behaviour: Object_Behaviour {
@@ -1133,9 +1137,6 @@ JBClass ( FastStringCpp , FastString ,
 struct File_Behaviour: String_Behaviour {
 };
 
-struct Process_Behaviour: ProcessOwner_Behaviour {
-};
-
 struct SCDecl_Behaviour: SCObject_Behaviour {
 };
 
@@ -1190,6 +1191,20 @@ JBClass ( SavingTest , Saveable ,
 	int Value;
 	int ABC[1];
 	JB_String* Name;
+);
+
+struct SpdProcess_Behaviour: Process_Behaviour {
+};
+
+JBClass ( SpdProcess , ShellStream , 
+	bool AlreadyWarnedDied;
+	bool WeAreParent;
+	int DeathLimit;
+	int DiedCount;
+	SpdProcess_ThreadAsProcess SubProcess;
+	FastString* Writer;
+	JB_StringC* DebugName;
+	Date DelaySpawnTill;
 );
 
 struct StringShared_Behaviour: String_Behaviour {
@@ -1274,22 +1289,6 @@ JBClass ( SaverClassInfo , Array ,
 	JB_Class* Cls;
 	SaverClassInfo* NextInfo;
 	int8* Data;
-);
-
-struct SpdProcess_Behaviour: Process_Behaviour {
-};
-
-JBClass ( SpdProcess , ShellStream , 
-	bool WeAreParent;
-	bool AlreadyWarnedDied;
-	ProcessMode Mode;
-	int DeathLimit;
-	int DiedCount;
-	SpdProcess_ThreadAsProcess SubProcess;
-	FastString* Writer;
-	PicoComms* Pico;
-	JB_StringC* DebugName;
-	Date DelaySpawnTill;
 );
 
 struct Task_Behaviour: list_Behaviour {
@@ -1526,18 +1525,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2192])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2190])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2193])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2191])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2194])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2192])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2191])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2189])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2194])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2192])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2195])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2193])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1768,7 +1767,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2200])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2198])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1805,7 +1804,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2196])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2194])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1845,7 +1844,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2201])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2199])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2077,12 +2076,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2199])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2197])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2198])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2196])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2197])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2195])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2708,6 +2707,8 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__ErrorSeverity_Warning ((ErrorSeverity)2)
 
+#define kJB__ExitCode_EINPROGRESS ((int)36)
+
 #define kJB__FailableInt_Fail ((int)2147483648)
 
 #define kJB__FileDes_StdErr ((FileDes)2)
@@ -2985,31 +2986,21 @@ extern Array* SC__NilReason_values;
 
 #define kSC__OpMode_SyntaxIs ((OpMode)65536)
 
-#define kJB__ProcessMode_AutoPrintErrors ((int)4)
+#define kJB__PIDM_CaptureAll ((ProcessMode)0)
 
-#define kJB__ProcessMode_CaptureAll ((int)5)
+#define kJB__PIDM_OwnGroup ((ProcessMode)2)
 
-#define kJB__ProcessMode_CaptureErrors ((int)2)
+#define kJB__PIDM_PassThru ((ProcessMode)40)
 
-#define kJB__ProcessMode_CaptureOrPrintErrors ((int)6)
+#define kJB__PIDM_Silence ((ProcessMode)20)
 
-#define kJB__ProcessMode_CaptureStdOut ((int)1)
+#define kJB__PIDM_StdErrPassThru ((ProcessMode)32)
 
-#define kJB__ProcessMode_PassThrough ((int)4)
+#define kJB__PIDM_StdErrSilence ((ProcessMode)16)
 
-#define kJB__PIDM_Default ((ProcessOwnerMode)0)
+#define kJB__PIDM_StdOutPassThru ((ProcessMode)8)
 
-#define kJB__PIDM_OwnGroup ((ProcessOwnerMode)2)
-
-#define kJB__PIDM_Silence ((ProcessOwnerMode)40)
-
-#define kJB__PIDM_StdErrPassThru ((ProcessOwnerMode)16)
-
-#define kJB__PIDM_StdErrSilence ((ProcessOwnerMode)32)
-
-#define kJB__PIDM_StdOutPassThru ((ProcessOwnerMode)4)
-
-#define kJB__PIDM_StdOutSilence ((ProcessOwnerMode)8)
+#define kJB__PIDM_StdOutSilence ((ProcessMode)4)
 
 #define kSC__SCBlockage_Bits ((int)480)
 
@@ -3206,7 +3197,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2190])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2188])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3288,6 +3279,8 @@ extern bool SC__Base_CurrVisibility;
 
 #define kSC__Base_kPurposeVarDecl ((int)3)
 
+#define JB__Proc__Parent JB__.Proc__Parent
+#define JB__Proc_CheckedParent JB__.Proc_CheckedParent
 #define kSC__Beh_kBehaviourProto ((int)2)
 
 #define kSC__Beh_kBehaviourProtoRequired ((int)6)
@@ -3295,8 +3288,6 @@ extern bool SC__Base_CurrVisibility;
 #define kSC__Beh_kBehaviourTable ((int)1)
 
 extern SCFile* SC__File_Curr;
-#define JB__Proc__Parent JB__.Proc__Parent
-#define JB__Proc_CheckedParent JB__.Proc_CheckedParent
 #define JB__Err_AutoPrint JB__.Err_AutoPrint
 #define JB__Err_BackupErrorSource JB__.Err_BackupErrorSource
 #define JB__Err_KeepStackTrace JB__.Err_KeepStackTrace
@@ -4968,7 +4959,7 @@ Message* JB_Tk__NewSkip(Message* P, Syntax F, int Start, int NameStart, int Name
 
 Message* JB_Tk__NewWord(Message* P, Syntax F, int Start, int SearchFrom);
 
-ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent);
+void JB_Tk__NextLineAndIndent(Message* Parent, ParserLineAndIndent* Rz);
 
 bool JB_Tk__NoFuncAfter(uint /*byte*/ B);
 
@@ -5895,18 +5886,10 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X);
 // PID_Int
 
 
-// ParserLineAndIndent
-
-
 // Plane3D
 
 
 // ProcessMode
-bool JB_ProcessMode_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M);
-
-
-
-// ProcessOwnerMode
 
 
 // SCBlockage
@@ -6792,7 +6775,14 @@ void JB_Saver__LoadOne(JB_Class* Cls, int8* Data);
 // JB_Object_Behaviour
 
 
+// JB_ParserLineAndIndent
+int JB_ParserLineAndIndent_ArgPos(ParserLineAndIndent* Self);
+
+
+
 // JB_Pico
+PicoConfig* JB_Pico_Config(PicoComms* Self);
+
 JB_String* JB_Pico_Get(PicoComms* Self, float T);
 
 bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait);
@@ -7139,8 +7129,6 @@ ASMReg SC_Pac_Plus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg 
 
 ASMReg SC_Pac_PlusSub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-bool SC_Pac_PrintASM(Assembler* Self, SCFunction* Fn, int I);
-
 uint64 SC_Pac_PrmCollect(Assembler* Self, Message* Prms, SCFunction* Fn);
 
 uint64 SC_Pac_PrmCollectSpd(Assembler* Self, Message* Prms, SCFunction* Fn);
@@ -7219,7 +7207,9 @@ ASMReg SC_Pac_Ternary(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_TernRefCount(Assembler* Self, ASMReg A, ASMReg B);
 
-ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* Out, ASMReg Dest, Message* Prms, uint /*byte*/ OpCode);
+ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* Out, Message* Prms, ASMReg Dest, uint /*byte*/ OpCode);
+
+ASMReg SC_Pac_Trinometer(Assembler* Self, Message* S, Message* Prms);
 
 ASMReg SC_Pac_TryGetGlob(Assembler* Self, SCDecl* D, ASMReg Mode);
 
@@ -7322,7 +7312,7 @@ void adb();
 // JB_Memory_Behaviour
 
 
-// JB_ProcessOwner_Behaviour
+// JB_Process_Behaviour
 
 
 // JB_SCImport_Behaviour
@@ -7385,9 +7375,6 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // JB_File_Behaviour
 
 
-// JB_Process_Behaviour
-
-
 // JB_SCDecl_Behaviour
 
 
@@ -7398,6 +7385,9 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 
 
 // JB_SavingTest_Behaviour
+
+
+// JB_SpdProcess_Behaviour
 
 
 // JB_StringShared_Behaviour
@@ -7428,9 +7418,6 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 
 
 // JB_SaverClassInfo_Behaviour
-
-
-// JB_SpdProcess_Behaviour
 
 
 // JB_Task_Behaviour
@@ -8149,7 +8136,11 @@ byte* JB_Mrap__Zalloc(int N);
 // JB_NameTableConcept
 
 
-// JB_ProcessOwner
+// JB_Process
+int JB_Sh_PID(ShellStream* Self);
+
+JB_String* JB_Sh_Render(ShellStream* Self, FastString* Fs_in);
+
 
 
 // JB_SCImport
@@ -8874,11 +8865,6 @@ int JB_bin__Init_();
 
 
 
-// JB_Process
-JB_String* JB_Sh_Render(ShellStream* Self, FastString* Fs_in);
-
-
-
 // JB_SCDecl
 SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl* Type);
 
@@ -9448,6 +9434,33 @@ void SC_SavingTest_LoadProperties(SavingTest* Self, ObjectLoader* Loader);
 void SC_SavingTest_SaveWrite(SavingTest* Self, ObjectSaver* Saver);
 
 bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
+
+
+
+// JB_SpdProcess
+bool JB_Proc_Alive(SpdProcess* Self);
+
+bool JB_Proc_ChildAlive(SpdProcess* Self);
+
+bool JB_Proc_CommsOpen(SpdProcess* Self);
+
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, ProcessMode Mode);
+
+void JB_Proc_Destructor(SpdProcess* Self);
+
+void JB_Proc_Disconnect(SpdProcess* Self, JB_StringC* Why);
+
+Message* JB_Proc_Get(SpdProcess* Self, float T);
+
+bool JB_Proc_IsOpen(SpdProcess* Self);
+
+bool JB_Proc_ParentAlive(SpdProcess* Self);
+
+bool JB_Proc_Start_(SpdProcess* Self);
+
+bool JB_Proc_Send(SpdProcess* Self, Message* Msg);
+
+int JB_Proc__Init_();
 
 
 
@@ -10788,33 +10801,6 @@ void JB_sci_Destructor(SaverClassInfo* Self);
 bool JB_sci_HasData(SaverClassInfo* Self);
 
 void JB_sci_Output(SaverClassInfo* Self, ObjectSaver* Saver);
-
-
-
-// JB_SpdProcess
-bool JB_Proc_Alive(SpdProcess* Self);
-
-bool JB_Proc_ChildAlive(SpdProcess* Self);
-
-bool JB_Proc_CommsOpen(SpdProcess* Self);
-
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
-
-void JB_Proc_Destructor(SpdProcess* Self);
-
-void JB_Proc_Disconnect(SpdProcess* Self, JB_StringC* Why);
-
-Message* JB_Proc_Get(SpdProcess* Self, float T);
-
-bool JB_Proc_IsOpen(SpdProcess* Self);
-
-bool JB_Proc_ParentAlive(SpdProcess* Self);
-
-bool JB_Proc_Start_(SpdProcess* Self);
-
-bool JB_Proc_Send(SpdProcess* Self, Message* Msg);
-
-int JB_Proc__Init_();
 
 
 
