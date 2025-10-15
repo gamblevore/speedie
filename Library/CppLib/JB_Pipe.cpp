@@ -4,9 +4,9 @@
 
 
 #include "JB_Umbrella.hpp"
+#include <execinfo.h>
 
 #ifndef AS_LIBRARY
-#include <execinfo.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
