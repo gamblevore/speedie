@@ -81,12 +81,9 @@ module Notifications
 				w.remove
 		
 	
-	syntax append (|string| desc, |message| details=@emb.msg)
+	syntax append (|string| desc, |message| details=@emb.msg, |errorseverity| strength=errorseverity.ok)
 		cpp_part Str
-		self <~ error(details, desc)
-
-	function SilentAppend (|string| desc)
-		self <~ error(nil, desc, ErrorSeverity.OK)
+		self <~ error(details, desc, strength)
 
 	syntax append (|error| note)
 		cpp_part Msg
@@ -124,13 +121,13 @@ module Notifications
 	
 	function ShowTip (|string| data, |string| prefix = "Tip:  ")
 		|| p = data.parse.Rand
-			Notifications.SilentAppend(prefix + p.name)
+			Notifications <~ (prefix + p.name)
 
 	cpp_wrapper SDL_GetError (|cstring|)
 		
 	function NotifySDLError
 		opt norefcounts
-		self <~ sdl_geterror().copy		
+		self <~ (sdl_geterror().copy, errorseverity.error)		
 
 
 function error.Useable (|date| ago=8s, |error|)

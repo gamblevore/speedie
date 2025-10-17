@@ -92,6 +92,10 @@ function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
 	perry <~ .check
 	
 	for cmd in perry
+		target debug
+			printline "------------"
+			printline cmd
+		
 		loop .CmdWrap(cmd)
 
 	"StartExit"
@@ -105,13 +109,6 @@ function WriteError (|string| name, |message|)
 		rz <~ "error" // unknown error?
 	  else
 		rz <~ .MiniErrors(stderr, errorseverity.problem)
-
-
-function CmdResponse (|Message| cmd, |message|)
-	if cmd != "error"
-		rz = .docmd(cmd)
-	
-	rz ?= .WriteError(cmd.name)
 
 
 function CmdCleanUp (|Message| arg, |message|) 
@@ -144,7 +141,11 @@ function CmdWrap (|Message| arg, |bool|)
 		app.crash
 	
 	|| cmd = .CmdCleanUp(arg)
-	|| response = .CmdResponse(cmd) 
+	|message| response
+	if cmd != "error"
+		response = .docmd(cmd)
+	response ?= .WriteError(cmd.name)
+
 
 	if cmd != response
 		cmd.ReplaceWith(response)

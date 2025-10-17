@@ -441,17 +441,14 @@ struct PicoComms : PicoConfig {
 
 		if (size <= 0)
 			size = PicoDefaultInitSize;
-		int B = 31 - __builtin_clz(size);
-		if (B < 8) B = 8;
-		if (B > 26) B = 26;
+		int B = std::clamp(pico_log2(size), 14, 30);		// 16KB mins, 1GB max
+
 		B += ((1<<B) < size);
 		Bits = B;
 		QueueSize = 1<<(B+3);
 		
 		if (!name) name = "";
 		strncpy(Name, name, sizeof(Name)-1);
-//		int x = ++DebugCount;
-//		printf("+++++++ %i: %i\n", ID, x);
 		return this;
 	} ;;;/*_*/;;;
 	
@@ -990,7 +987,9 @@ struct PicoComms : PicoConfig {
 			if ( !(P & 3) or !((C&3)==3) )
 				return nullptr;		// messages are still somewhat open.
 			SocketStatus = EPIPE;	// messages are closed now.
-			return SayEvent("ClosedGracefully");
+			if (CanSayDebug())
+				return Say("ClosedGracefully");
+			return nullptr;
 		}
 		
 		static const char* pico_fail_actions[4] = {"Sending", "Reading", "StdOut", "StdErr"};

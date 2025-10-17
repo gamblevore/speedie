@@ -549,6 +549,7 @@ function @assembler.PrintProgress
 	cpp_name adb 
 	visible
 	opt norefcounts
+	require !compiler.inperry
 	"---"
 	|| fn = scfunction.currfunc!
 	printline fn

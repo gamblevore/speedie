@@ -151,15 +151,15 @@ struct Pico
 		function Create (|cstring| Name, |int| ByteBufferSize = 0, |?&pico|)
 			cpp_wrapper PicoCreate
 
-		function Fork (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
+		function Fork (|stringzeroterminated| name="", |int| Noise=piconoise.events,   |&pico|)
 			|| p = .new(name, noise)
 				|| pid = p.spawnfork
 				if pid >= 0
 					return p
 				p.close(nil)
 		
-		function New (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
-			|| p = pico.Create(name, 16)
+		function New (|stringzeroterminated| name="", |int| Noise=piconoise.events,   |&pico|)
+			|| p = pico.Create(name)
 				p.config.Noise = noise
 				return p
 			|PicoGlobalStats| St
