@@ -16,24 +16,17 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 "
 	contains SpdProcess
 	|jbin|						Writer
-	|stringzeroterminated|		DebugName
 	|?ThreadAsProcess|			SubProcess
 	|int| 						DeathLimit
-	|int|						DiedCount
 	|bool|						AlreadyWarnedDied
-	|bool|						WeAreParent
-	|date|						DelaySpawnTill
 
 	constructor	(|string| path, |?ThreadAsProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
-		super.constructor(path, mode) // <-- mode should be passed here
+		super.constructor(path, mode, params, pico)
 		
 		.deathlimit = 12
-		.DebugName = path
-		.WeAreParent = path != "" or fn != nil
-		.args	= params
+		//.IsParent = path != "" or fn != nil
 		.SubProcess = fn
 		.writer = FastString()
-		.pico = pico
 
 			
 	destructor
@@ -41,25 +34,20 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			
 	function CommsOpen (|bool|)
 		if self
-			// platform.log "y1: ${.pico.status.render}"
-			return .pico.status == 0
+			return .pico.MessageStatus == 0
 
 	helper Alive (|bool|)
+		// todo: why isn't this just .CommsOpen? 
 		if self != nil
-			return (.ChildAlive, .ParentAlive)(.WeAreParent)
+			rz = (.ChildAlive, .ParentAlive)(.isParent)
 	
 	helper ParentAlive (|bool|)
-		if app.ParentID > 1
-			return true
+		return app.ParentID > 1
 
 	helper ChildAlive (|bool|)
-		.TryStart_
-		if .DelaySpawnTill
-			return true
 		if .SubProcess
 			return .CommsOpen
-		if .status.isrunning
-			return true
+		return .status.isrunning
 
 
 	syntax append (|string| str, |bool|)
@@ -70,17 +58,18 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	syntax append (|message| msg, |bool|)
 		cpp_part Send 
 		opt norefcounts			
-		.TryStart_
-		|| p = .pico
-		if p.status
+		if .status == -2
+			.start_
+		if .pico.MessageStatus == 0
 			msg.RenderJbin(.writer)
-			p <~ .writer
+			.pico <~ .writer
 
  
 	function Get (|float| T=0, |message|)
 		opt norefcounts
 		if self
-			.TryStart_
+			if .status == -2
+				.start_
 			|| str = .pico.get(T)
 				rz = str.parse
 	
@@ -88,7 +77,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	function LastSend (|date|)
 		|| p = .pico
 		return p.config.lastsend
-		
+	
 	
 	function TimeWaitingForReply (|date|)
 		|| c = .pico.config
@@ -96,15 +85,16 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if c.lastread < last
 			return last.ago
 
-	
+	function process.DiedCount (|int|)
+		return .pico.config.deathcount
+		
 	helper HandleDied 
 		|| Bad = !.Status.crashed
-		.DiedCount += Bad
 		.Disconnect(.status.name) // removes us from the check-list
 
 
 	function CanActivate (|bool|)
-		if .Diedcount < .Deathlimit
+		if !.Deathlimit or .Diedcount < .Deathlimit
 			.alreadywarneddied = false
 			return true
 		if !.AlreadyWarnedDied
@@ -129,15 +119,13 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.Disconnect(err)
 
 
-	function Disconnect (|stringzeroterminated| Why="")
+	function Disconnect (|string| why="")
 		opt norefcounts
 		// all this can be moved into pico!!! very easy.
-		// delayspawntill is just a number!
-		.DelaySpawnTill = 0
 		.ClosePipes
-		if .alive and !why and .CommsOpen
-			why = "UnknownReason"
-		.pico!.close(Why)
+//		if .alive and !why and .CommsOpen
+//			why = "UnknownReason"
+//		.pico!.close(Why)
 
 
 	helper StartProcess (|ExitCode|)
@@ -148,23 +136,14 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if !.pico.isok
 			require pico.replace(.pico)
 		
-		if delay > 0
-			.DelaySpawnTill = date.now + delay
-			return true
+//		if delay > 0
+//			.DelaySpawnTill = date.now + delay
+//			return true
 		return .Start_
-
-
-	helper TryStart_
-		opt inline
-		|| D = .DelaySpawnTill
-			if D < date.now
-				.start_
 	
 	
 	helper Start_ (|bool|)
-		.DelaySpawnTill = 0
-		|| err = .StartProcess()
-		return err.successful
+		return .StartProcess.successful
 
 
 	function TimedOut (|date| Durr, |bool|)
@@ -173,15 +152,13 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			return true
 	
 	
+	function process.IsParent (|bool|)
+		return .pico.config.IsParent
+	
+	
 	function IsOpen (|bool|)
 		nil checker // shouldn't be necessary
-		require .CommsOpen
-		.trystart_
-		if .DelaySpawnTill
-			return true
-		if .WeAreParent
-			return .subprocess or .status.isrunning
-		return app.ParentID > 1
+		return .CommsOpen and .status.isrunning
 	
 	
 	function Deactivate (|int| ExitCode)
@@ -218,7 +195,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				return spdprocess._parent
 			spdprocess.CheckedParent = true
 
-			if pico.HasParentSocket and !comms
+			if !comms and pico.HasParentSocket
 				comms = pico.new
 			if comms
 				if !app.IsThreadedAsLib
@@ -231,19 +208,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				error "Parent lost connection"
 
 
-		function CheckAllAlive
-//			opt norefcounts
-//			|| m = Process.First
-//			while m
-//				|| ch = m
-//				m++
-//				if !ch.status.IsRunning
-//					if ch isa SpdProcess
-//						ch.HandleDied
-//					  else
-//						ch.Remove
-		
-
 		helper CreateArgs (|string| path, |[string]!| Args, |&cstring|)
 			cpp_wrapper
 
@@ -252,11 +216,10 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			return SpdProcess.Spawn(self, params)		
 		
 		
-		function Spawn (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |duration| Delay=0, |SpdProcess|)
+		function Spawn (|string| app_path, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |duration| Delay=0, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
-				rz.DebugName = DebugName
 				if !rz.SpawnAsChild(delay)
 					rz = nil
 

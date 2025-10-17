@@ -215,7 +215,7 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* ErrsIn, int Mode, Date TimeOut) {
 	if (ErrsIn) Mode&=~kStdErrNil; else if (!(Mode&kStdErrNil)) Mode |= kStdErrPassThru;
 	if (Out)  Mode&=~kStdOutNil; else if (!(Mode&kStdOutNil)) Mode |= kStdOutPassThru;
-	auto Sh = JB_Sh_Constructor(0, self, R, Mode&~kStdErrPassThru);
+	auto Sh = JB_Sh_Constructor(0, self, Mode&~kStdErrPassThru, R, nil);
 	byte Error = JB_Sh_StartProcess(Sh);
 	if (Error) {
 		JB_SetRef(Sh, 0);
@@ -267,7 +267,7 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 
 ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
 // remove this?
-	auto rz = JB_Sh_Constructor(0, self, Args, Mode);
+	auto rz = JB_Sh_Constructor(nil, self, Mode, Args, nil);
 	byte Error = JB_Sh_StartProcess(rz);
 	if (Error) {
 		JB_SetRef(rz, 0);
@@ -290,14 +290,16 @@ static const char* MiniName (JB_String* Path) {
 }
 
 
-ShellStream* JB_Sh_Constructor (ShellStream* self, JB_String* Path, Array* Args, byte Mode) {
+ShellStream* JB_Sh_Constructor (ShellStream* self, JB_String* Path, byte Mode, Array* Args, PicoComms* Comms) {
 	JB_New2(ShellStream);
 	self->Args = JB_Incr(Args);
 	self->Path = JB_Incr(JB_Str_MakeC(Path));
 	self->Mode = Mode; 
 #ifndef AS_LIBRARY
-	self->Pico = PicoCreate(MiniName(Path));
+	if (!Comms)
+		Comms = PicoCreate(MiniName(Path));
 #endif
+	self->Pico = Comms;
 	self->UserFlags = 0;
 	return self;
 }

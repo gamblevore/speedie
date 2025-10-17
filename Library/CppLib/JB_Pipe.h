@@ -33,7 +33,7 @@ ShellStream* JB_Sh__First();
 
 
 void JB_Sh_Destructor(ShellStream* self);
-ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path, Array* Args, byte Mode);
+ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path, byte Mode, Array* Args, PicoComms* Comms);
 ShellStream* JB_Sh__Stream(JB_String* self, Array* R, int Mode);
 bool JB_Sh_Step(ShellStream* self);
 int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, int Mode, Date Timeout);

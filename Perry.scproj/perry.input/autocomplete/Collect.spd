@@ -74,8 +74,6 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	if c
 		if !c.subprocess and C.TimedOut(5s)
 			c.Deactivate(32) // epipe
-		if c.IsOpen
-			return c
 		if c.SubProcess
 			return c // can't deactivate it.
 		if c.ActivateChild
@@ -85,7 +83,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	|| f = .SharedProjectTabSource[@nil]$
 	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| Noisy = SpdLibAlreadyInUse
-		"--sending noise--"
+//		"--sending noise--"
 		p <~ "--noisy"
 	p <~ "--check"
 	
@@ -111,7 +109,9 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			|duration| Delay = 0
 			if !Perry.FinishedStartUp
 				Delay = 0.125s * Perry.WindowNumber
-			spd = SpdProcess.spawn(Proc, p, .project.name, mode, delay)
+			spd = SpdProcess.spawn(Proc, p, mode, delay)
+			if spd
+				spd.pico.name = .project.name
 	
 	return spd
 

@@ -33,7 +33,7 @@ extern "C" {
 
 #define x(v) (1<<v) |
 static const unsigned int CrashList = x(SIGTRAP) x(SIGHUP) x(SIGQUIT) x(SIGILL) x(SIGSEGV) x(SIGBUS)  x(SIGFPE) x(SIGSYS) x(SIGTERM) x(SIGEMT) x(SIGABRT) x(SIGXCPU) x(SIGXFSZ) 0;
-static const unsigned int IgnoreList = x(SIGPIPE) x(SIGPROF) x(SIGWINCH) x(SIGINT)   0;
+static const unsigned int IgnoreList = x(SIGPIPE) x(SIGPROF) x(SIGWINCH) x(SIGINT)  0;
 static const unsigned int WakeList = x(SIGURG) x(SIGVTALRM) x(SIGALRM) x(SIGINFO) x(SIGUSR1) x(SIGUSR2) 0;
 #undef x
 

@@ -43,6 +43,7 @@ struct PicoConfig
 	|byte|					SocketStatus
 	|bool|					LeaveOrphaned
 	|byte|					Bits
+	|bool|					IsParent
 
 
 struct Pico
@@ -101,13 +102,13 @@ struct Pico
 	function Close (|cstring| Why)
 		cpp_wrapper PicoClose
 	
-	function Status (|ErrorInt|)
+	function MessageStatus (|ErrorInt|)
 		nil checker
 		cpp_wrapper PicoError
 	
 	function IsOK (|bool|)
 		nil checker
-		|| s = .status
+		|| s = .MessageStatus
 		return s == 0 or 255
 
 	function IsSending (|bool|)
@@ -115,6 +116,12 @@ struct Pico
 
 	function Config (|&PicoConfig|)
 		return self|&PicoConfig|
+	
+	function Name (assigns:|string|)
+		|| x = &.config.name[0]
+		|| n = value.length min 15
+		x[n] = 0
+		memory.copy(x|&nil|, value.addr|&nil|, n)
 	
 		
 	

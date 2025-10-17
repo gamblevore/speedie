@@ -5,23 +5,22 @@
 */
 
 class Process
-	size 64
-	// the list functions mostly shouldn't be used. I should hide them somehow
-	// kinda like I want to do with... roles.
 	linkage
 		wrapper
 		cpp_part Sh
 		cpp_class ShellStream
 	contains Process
 	
+	|byte|					Mode
 	|&Pico|					Pico
 	|string|				Path
 	|[string]?|				Args
-    |int64|					UserFlags // remoev these two?
-//    |object|				UserObj
+    |int64|					UserFlags
 
-	constructor (|string| Path, |[string]| Args=nil, |ProcessMode| Mode)
+
+	constructor (|string| Path, |ProcessMode| Mode, |[string]| Args=nil, |&pico| Pico = nil)
 		cpp_wrapper
+
 	destructor:												cpp_wrapper
 	
 	function Status (|ExitCode|)

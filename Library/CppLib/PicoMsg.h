@@ -89,9 +89,10 @@ struct 			PicoConfig  {
 	unsigned char		SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
 	bool				LeaveOrphaned;	/// If this is true, the child-process will not be killed by `PicoKill()`
 	unsigned char		Bits; 	
-#ifdef PICO_IMPLEMENTATION
-	unsigned char		SocketStatus;
 	bool				IsParent;
+#ifdef PICO_IMPLEMENTATION
+	unsigned char		StateFlags;
+	unsigned char		SocketStatus;
 	unsigned char		PartClosed;
 	PicoTrousers		SendLock;
 	PicoTrousers		ReadLock;
@@ -386,6 +387,16 @@ struct PicoBuff {
 		return Head - Tail;
 	}  										;;;/*_*/;;;
 
+	/*
+		A better way to do this:
+			* Don't write or read badly and split the length.
+			* then we can simply get or read the length! (if we have 4 bytes or more)
+			* Also... use __BYTE_ORDER__  and __ORDER_BIG_ENDIAN__. For network stuff.
+		
+		If I want to save bytes:
+			* save 8*64 bytes. merge all buffs into one. Still need 4 ints.
+	 */
+	 
 	PicoDate SendOutput (const char* Src, int MsgLen) {
 //		this->Log(Src, MsgLen); // So I can search -> Log and get all.
 		int NetLen = htonl(MsgLen);
@@ -423,7 +434,7 @@ struct PicoComms : PicoConfig {
 		ID = iD; IsParent = isparent; Socket = -1;
 		PartClosed = 255;
 		SocketStatus = 255;
-		PIDStatus = -1;
+		PIDStatus = -2;
 		QueueTail = &QueueHead;
 		Noise = noise;
 		SendTimeOut = 10.0f; // 🕷️_🕷️
@@ -447,9 +458,8 @@ struct PicoComms : PicoConfig {
 	void Destroy () {
 		for (auto M = QueueHead; M.Data; M = pico_next_msg(M))
 			free(M.Data);
-		if (Socket > 0) {
-			io_close_for_real(Socket);
-		}
+		if (Socket > 0)
+			msg_close_for_real(Socket);
 		PicoBuff::Decr(Sending);
 		PicoBuff::Decr(Reading);
 		PicoBuff::Decr(StdErr );
@@ -507,12 +517,15 @@ struct PicoComms : PicoConfig {
 		  or (!MiniPipe(Err, NoStdErr, STDERR_FILENO)  and  GiveUp(Out) < 0))
 			return -errno;
 
+		PID = 0;
+		PIDStatus = -2;
 		int ChildID = NoMsgs?fork():StartFork(Name, true);
 		if (ChildID < 0)
 			return -errno;
 		
 		IsParent = ChildID;
 		if (!IsParent) {
+			StateFlags|=1; // a forked child
 			if (NoStdOut == 1) 
 				close(STDOUT_FILENO);
 			if (NoStdErr == 1) 
@@ -528,14 +541,14 @@ struct PicoComms : PicoConfig {
 		
 		if (!NoStdOut) {
 			close(Out[1]);
-			StdOut = PicoBuff::New(18, "stdout", this, Out[0]);
+			StdOut = PicoBuff::New(18, "StdOut", this, Out[0]);
 			if (StdOut)
 				PartClosed &=~ 4;
 		}
 		
 		if (!NoStdErr) {
 			close(Err[1]);
-			StdErr = PicoBuff::New(16, "stderr", this, Err[0]);
+			StdErr = PicoBuff::New(16, "StdErr", this, Err[0]);
 			if (StdErr)
 				PartClosed &=~ 8;
 		}
@@ -554,7 +567,8 @@ struct PicoComms : PicoConfig {
 		PicoComms* C = PicoComms::New(nullptr, Noise, false, 1<<Bits, "Thread", ChildID);
 		Sending->RefCount++;     Reading->RefCount++;  Socket = -1; 
 		C->Sending = Reading; C->Reading = Sending; C->Socket = -1;
-		
+		C->PartClosed = PartClosed;
+
 		mark_started();
 		C->mark_started();
 		return thread_run(C, fn, Self, Args);
@@ -585,13 +599,14 @@ struct PicoComms : PicoConfig {
 	pid_t StartFork (const char* ChildName, bool SaveSocket) {
 		int Socks[2] = {};
 		if (!get_pair_of(Socks)) return -1;
-		pid_t pid = fork();
-		if (pid < 0) return GiveUp(Socks);
+		pid_t childid = fork();
+		if (childid < 0) return GiveUp(Socks);
 
-		IsParent = pid!=0; // 🕷️_🕷️
+		IsParent = childid!=0; // 🕷️_🕷️
 		close(Socks[!IsParent]);
 		int S = Socks[IsParent];
 		if (!IsParent) {
+			StateFlags|=1; // a forked child
 			if (ChildName)
 				strncpy(Name, ChildName, sizeof(Name));
 			pico_thread_count = 0; // Forked process don't keep threads.
@@ -599,9 +614,9 @@ struct PicoComms : PicoConfig {
 				return StoreSock(S);
 		} 
 		
-		PID = pid;
+		PID = childid;
 		add_msg_buffs(S);
-		return pid; 
+		return PID; 
 	}
 	/// **End of  Initialisation**
 	
@@ -742,6 +757,8 @@ struct PicoComms : PicoConfig {
 			S->Status = T;
 			S->PID = PID;
 			S->StatusName = StatusName(T);
+			if (StateFlags&1)
+				S->PID = getppid();
 		}
 		return T;
 	}
@@ -780,6 +797,7 @@ struct PicoComms : PicoConfig {
 		D->C = C; D->fn = fn; D->Self = Self; D->Args = Args;
 		if (!pthread_create(&T, nullptr, pico_thread_wrapper, D) and !pthread_detach(T))
 			return true;
+		
 		C->AskDestroy("ThreadFailed");
 		free(D);
 		return false;
@@ -793,16 +811,16 @@ struct PicoComms : PicoConfig {
 		return true;
 	}
 	
-	void read_part (PicoBuff* B, int S) {
+	void read_part (PicoBuff* B, int S, int Part) {
 		if (S >= 0) while ( auto Msg = B->AskUnused() ) {
 			int Amount = 0;
-			if (S > 0)
+			if (Part > 2)
 				Amount = (int)read(S, Msg.Data, Msg.Length);
 			  else // maybe nicer to avoid sockets and just use pipes. Simpler and more flexible.
 			       // and can still use sockets.
 				Amount = (int)recv(S, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
 			if (Amount <= 0) {
-				if (!io_pass(Amount, 2)) break;
+				if (!io_pass(Amount, Part)) break;
 				continue;
 			}
 //			B->Log(Msg.Data, Amount);
@@ -818,13 +836,13 @@ struct PicoComms : PicoConfig {
 		if (!ReadLock.enter()) return;
 		if (!(PartClosed&2)) {
 			if (Socket > 0)					// else, its memory-only IPC.
-				read_part(Reading, Socket);
+				read_part(Reading, Socket, 2);
 			while (acquire_msg()) {;}
 		}
 		if (!(PartClosed&4))
-			read_part(StdOut, StdOut->Pipe);
+			read_part(StdOut, StdOut->Pipe, 4);
 		if (!(PartClosed&8))
-			read_part(StdErr, StdErr->Pipe);
+			read_part(StdErr, StdErr->Pipe, 8);
 		ReadLock.leave();
 	}
 	
@@ -919,8 +937,8 @@ struct PicoComms : PicoConfig {
 			return failed(ENOBUFS);
 		if (!Reading and !(Reading = PicoBuff::New(Bits, "Read", this, -1)))
 			return failed(ENOBUFS);
-		PartClosed &= ~3; // open up sending and reading. Say they are "not closed".
-		PartClosed &= 15; // Close the other "fake" buffers, so its not 255 anymore.
+		PartClosed &= ~3; // Open up sending and reading. Say they are "not closed".
+		PartClosed &= 15; // Make it not 255 anymore.
 		return PicoInit(0);
 	}
 
@@ -947,6 +965,7 @@ struct PicoComms : PicoConfig {
 
 	bool mark_started () {
 		SocketStatus = 0;
+		PIDStatus = -1;
 		if (CanSayDebug()) Say("Started");
 		return true;
 	}  ;;;/*_*/;;;   // creeping upwards!!
@@ -957,31 +976,36 @@ struct PicoComms : PicoConfig {
 		return failed(ENOBUFS);
 	}
 	
-	void* failed (int err=errno, int Action=0) {
-		if (!SocketStatus or SocketStatus == 255) {
-			if ( (err == EPIPE)  and  ((PartClosed&3) == 3) ) {
-				err = ENOTCONN;
-				SayEvent("ClosedGracefully");
-			} else {
-				static const char* pico_fail_actions[3] = {"Failed", "Sending", "Reading"};
-				SayEvent(pico_fail_actions[Action], strerror(err));
-				if (err == EBADF)
-					SayEvent("Socket", "", Socket);
-												;;;/*_*/;;;
-			}
+	void* failed (int Err = errno, int P = 0) {
+		int C = PartClosed;				
+		if (C&P)					// already closed
+			return nullptr;
+		
+		C |= P;
+		PartClosed = C;
+		if (C == 15) // fully closed! perhaps the process died. Lets find out fast.
+			check_exit_code();
+		
+		if (Err == EPIPE) {			// A normal close.
+			if ( !(P & 3) or !((C&3)==3) )
+				return nullptr;		// messages are still somewhat open.
+			SocketStatus = EPIPE;	// messages are closed now.
+			return SayEvent("ClosedGracefully");
 		}
-		PartClosed |= 3;		// Allow stderr/stdout to remain open!
-		SocketStatus = err;
+		
+		static const char* pico_fail_actions[4] = {"Sending", "Reading", "StdOut", "StdErr"};
+		const char* Name = P ? pico_fail_actions[pico_log2(P)]: "Failed";
+		SayEvent(Name, strerror(Err));
+		if (Err == EBADF)
+			SayEvent("Socket", "", Socket);
+												;;;/*_*/;;;
 		return nullptr;
 	}
 	
 	bool io_pass (int Error, int Part) {
-		int P = PartClosed;
-		if (!Error) {
-			P |= Part;
-			PartClosed = P;
-			return ((P & 15) == 15) and failed(EPIPE, Part);
-		}
+		if (!Error)
+			return failed(EPIPE, Part);
+
 		int e = errno;
 						;;;/*_*/;;;
 		if (e == EAGAIN) return false;
@@ -989,54 +1013,62 @@ struct PicoComms : PicoConfig {
 		return failed(e, Part);
 	}
 	
-	void io_close_for_real (int S) {
+	void io_buff_report(PicoBuff* B) {
+		int SL = Sending->Length();
+		if (SL) Say(B->Name, "Still Contains", SL);
+		SL = Sending->Tail;
+		if (SL)
+			Say(B->Name, "", SL);
+	}
+
+	void msg_close_for_real (int S) {
 		Socket = -1;
 		if (S > 0) {
 			close(S);
 			pico_open_sockets--;
 		}
 		if (CanSayDebug()) {
-			int SL = Sending->Length();
-			if (SL) Say("Sending", "Still Contains", SL);
-			SL = Sending->Tail;
-			if (SL)
-				Say("Sent", "", SL);
-
-			int RL = Reading->Length();
-			if (RL) Say("Reading", "Still Contains", RL);
-			RL = Reading->Head;
-			if (RL)
-				Say("Read", "", Reading->Head);
-
+			io_buff_report(Sending);
+			io_buff_report(Reading);
 			Say("Closing");
 		}
 	}
 	
-	bool io_close() {
+	bool all_closed() {
 		int S = Socket; if (S < 0) return false;
 		if (!ReadLock.enter()) return false;
-		io_close_for_real(S);
+		msg_close_for_real(S);
 		ReadLock.leave();
 		return true;
 	}								;;;/*_*/;;;
 
 	void check_exit_code () {
-		if (!PID or PIDStatus >= 0)
+		if (PIDStatus >= 0)
+			return;
+		if (!PID and !(StateFlags&1))
 			return;
 		
- 		int ExitCode = 0;
-		if (waitpid(PID, &ExitCode, WNOHANG) <= 0)
-			return;
-		if (WIFSIGNALED(ExitCode))
+		int ExitCode = 0;
+		if (!PID) {
+			if (getppid() <= 1)		// parent died.
+				PIDStatus = 0;		// unknown why. So lets say it ended nicely.
+
+		} else if (waitpid(PID, &ExitCode, WNOHANG) <= 0) {
+			if (PartClosed!=15) return;
+			errno = 0;
+			if (kill(PID, 0)>=0) return;
+			PIDStatus = errno;		// Process closed, but we missed it? was SIGCHLD ignored?
+		} else if (WIFSIGNALED(ExitCode)) {
 			PIDStatus = WTERMSIG(ExitCode)|128;
-		  else if (WIFEXITED(ExitCode))
+		} else if (WIFEXITED(ExitCode)) {
 			PIDStatus = WEXITSTATUS(ExitCode);
+		}
 		if (CanSayDebug())
 			Say("Process", StatusName(PIDStatus), -PID);
 	}
 	
 	bool kill_me () {
-		if (!PID or DestroyMe or LeaveOrphaned or PIDStatus >= 0)
+		if (!PID or DestroyMe or LeaveOrphaned or (PIDStatus >= 0) or (StateFlags&1))
 			return true;
 		if (!InUse.enter())
 			return false;
@@ -1051,7 +1083,7 @@ struct PicoComms : PicoConfig {
 		if (!InUse.enter())
 			return;
 		
-		if (CheckPID)
+		if (CheckPID or (PartClosed&15)==15)
 			check_exit_code();
 
 		if (DestroyMe == 1) {
@@ -1072,7 +1104,7 @@ struct PicoComms : PicoConfig {
 			do_reading();
 			do_sending();
 		} else if (P != 255) {
-			io_close();
+			all_closed();
 		}
 		InUse.leave();
 	}
@@ -1362,6 +1394,13 @@ extern "C" void PicoSleepForSend (float During, float After) _pico_code_ (
 	PicoRemainDefault = During;
 	pico_keep_sending();
 	PicoSleep(After);
+)
+
+extern "C" int PicoPartsOpen (PicoComms* M) _pico_code_ (
+/// Flags for open parts of the PicoComms.
+/// 1 = SendMessages, 2 = ReadMessages, 4 = ReadStdOut, 8 = ReadStdErr 
+	if (!M) return 0;
+	return (~(M->PartClosed)) & 15;
 )
 
 extern "C" bool PicoCanGet (PicoComms* M) _pico_code_ (

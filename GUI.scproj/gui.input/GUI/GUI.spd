@@ -842,7 +842,6 @@ module GUI
 	
 	helper HandleEvents (|SDLActivity|)
 		.StartResize
-		SpdProcess.CheckAllAlive
 		rz = .PreFrame
 
 		.ClearAlerts

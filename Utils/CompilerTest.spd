@@ -7,7 +7,8 @@ main (|[string]| Files)
 		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn
 			app.Sleep(1s)
 			printline proc.ReadStdOut
-			printline proc.Status
+			if proc.status != 0
+				printline "arrow.spd status: " + proc.Status.render
 		return 0
 	
 	for f in files.GlobExpand
