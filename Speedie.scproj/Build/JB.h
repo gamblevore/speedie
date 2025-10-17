@@ -1198,13 +1198,9 @@ struct SpdProcess_Behaviour: Process_Behaviour {
 
 JBClass ( SpdProcess , ShellStream , 
 	bool AlreadyWarnedDied;
-	bool WeAreParent;
 	int DeathLimit;
-	int DiedCount;
 	SpdProcess_ThreadAsProcess SubProcess;
 	FastString* Writer;
-	JB_StringC* DebugName;
-	Date DelaySpawnTill;
 );
 
 struct StringShared_Behaviour: String_Behaviour {
@@ -1525,18 +1521,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2190])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2189])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2191])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2190])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2192])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2191])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2189])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2188])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2192])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2191])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2193])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2192])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1767,7 +1763,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2198])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2197])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1804,7 +1800,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2194])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2193])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1844,7 +1840,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2199])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2198])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2076,12 +2072,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2197])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2196])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2196])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2195])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2195])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2194])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3197,7 +3193,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2188])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2187])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3835,8 +3831,6 @@ Message* SC_AC__Check(Message* Cmd);
 Message* SC_AC__CheckSub(Message* Cmd);
 
 Message* SC_AC__CmdCleanUp(Message* Arg);
-
-Message* SC_AC__CmdResponse(Message* Cmd);
 
 bool SC_AC__CmdWrap(Message* Arg);
 
@@ -9438,23 +9432,17 @@ bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
 
 
 // JB_SpdProcess
-bool JB_Proc_Alive(SpdProcess* Self);
-
-bool JB_Proc_ChildAlive(SpdProcess* Self);
-
 bool JB_Proc_CommsOpen(SpdProcess* Self);
 
 SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, ProcessMode Mode);
 
 void JB_Proc_Destructor(SpdProcess* Self);
 
-void JB_Proc_Disconnect(SpdProcess* Self, JB_StringC* Why);
+void JB_Proc_Disconnect(SpdProcess* Self, JB_String* Why);
 
 Message* JB_Proc_Get(SpdProcess* Self, float T);
 
 bool JB_Proc_IsOpen(SpdProcess* Self);
-
-bool JB_Proc_ParentAlive(SpdProcess* Self);
 
 bool JB_Proc_Start_(SpdProcess* Self);
 
@@ -11746,8 +11734,6 @@ inline bool SC_Reg_Small(ASMReg Self);
 
 inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New);
 
-inline void JB_Proc_TryStart_(SpdProcess* Self);
-
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
 inline bool SC_Reg_IsInt(ASMReg Self);
@@ -11948,15 +11934,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 	NilRecorder* P = ((NilRecorder*)(Self->Neel));
 	(SC_NRC_SyntaxCallSet((P), D->NilReg, New));
 	return New;
-}
-
-inline void JB_Proc_TryStart_(SpdProcess* Self) {
-	Date D = Self->DelaySpawnTill;
-	if (D) {
-		if (D < JB_Date__Now()) {
-			JB_Proc_Start_(Self);
-		}
-	}
 }
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self) {
