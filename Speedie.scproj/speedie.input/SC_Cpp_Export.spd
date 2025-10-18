@@ -54,7 +54,10 @@ function PreRun
 const char* JB_CrashLogFileName = "/tmp/logs/`
 	fs <~ compiler.projectname
 	fs <~ `.fail.txt";
-	
+const char* JB_ThreadName = "`
+	fs <~ compiler.projectname
+	fs <~ `";
+
 JB_Globals JB__;
 `
 

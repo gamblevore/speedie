@@ -37,7 +37,8 @@ class Process
 		fs <~ "PID: $.pid\n${.path} $.args" // full path makes more sense, really.
 	
 	function PID (|int|)
-		
+		cpp_wrapper
+	
 	function ClosePipes
 		cpp_wrapper JB_Sh_Close
 

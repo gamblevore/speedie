@@ -1,6 +1,6 @@
 
 
-prototype PicoThreadFn (|pico| Comms, |&nil| Obj, |&cstring| Args=nil, |bool|)
+prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil)
 // todo: pico could use shared memory, instead of pipes. This actually reduces memory use!
 // To under half the memory.
 
@@ -60,7 +60,7 @@ struct Pico
 		nil self
 		cpp_wrapper PicoStartFork
 
-	function SpawnThread (|PicoThreadFn| fn, |&nil| Obj, |?&cstring| Args = nil, |bool|)
+	function SpawnThread (|PicoThreadFn| fn, |uint16| Mode, |?&cstring| Args = nil, |bool|)
 		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)

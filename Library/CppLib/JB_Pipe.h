@@ -23,6 +23,7 @@ JBClass( ShellStream, JB_Object,
 
 
 int JB_Sh_Kill (ShellStream* F, int Code);
+int JB_Sh_PID (ShellStream* F);
 void JB_AddProcess (int PID);
 int JB_Sh_Status (ShellStream* F);
 JB_StringC* JB_Err_SignalName (int Sig);

@@ -246,20 +246,20 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			|| c_args = SpdProcess.CreateArgs("", r)
 			|| pico_fn = pico.new(threadname)
 				|| proc = SpdProcess(threadname, self, pico_fn, r)
-				if proc.pico.SpawnThread(self|picothreadfn|, 7|&nil|, c_args)
+				if proc.pico.SpawnThread(self|picothreadfn|, 7, c_args)
 					return proc
 			memory.free(c_args)
 
 
 
-prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
-	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |&pico|)
+prototype Thread (|pico| Comms, |uint16| Data, |&nil| Argument, |bool|)
+	function Spawn (|pico| Comms, |uint16| Data, |&nil| Argument,  |int| BuffBits=0, |&pico|)
 		description "Just a wrapper around pico.thread" 
 		|| name = (&comms.config.name[0])|cstring|
 		|| pico_out = pico.new(name.wrap, -1)
 			if BuffBits
 				pico_out.config.Bits = BuffBits
-			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)
+			if comms.SpawnThread(self|picothreadfn|, Data, Argument|&cstring|)
 				return pico_out
 			pico_out.Close("")
 

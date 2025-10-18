@@ -141,11 +141,8 @@ function CmdWrap (|Message| arg, |bool|)
 		app.crash
 	
 	|| cmd = .CmdCleanUp(arg)
-	|message| response
-	if cmd != "error"
-		response = .docmd(cmd)
+	|| response = (.docmd(cmd), nil)(cmd != "error")
 	response ?= .WriteError(cmd.name)
-
 
 	if cmd != response
 		cmd.ReplaceWith(response)

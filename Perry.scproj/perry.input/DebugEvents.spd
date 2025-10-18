@@ -187,6 +187,7 @@ function PerryIDE.UpdateProductText (|process| r, |string| rout)
 	if r and !(r.userflags&1)
 		.ShowCompileTab(.productout)
 		r.userflags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
+
 	if .ShowProductIfMoreOutput < .ProductOut.Length
 		.ShowProductIfMoreOutput = int.max // no more updates
 		.CompileTabSelect(.ProductOut)

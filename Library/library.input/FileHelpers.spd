@@ -103,8 +103,7 @@ extend String
 		if self == "/"
 			return true
 		|| p = .parent.pathdir
-		if p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
-			return true
+		rz = p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
 
 	function TrimExt (|string|)
 		return .TrimExtAndPath(false)

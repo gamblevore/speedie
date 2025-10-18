@@ -205,12 +205,19 @@ static void JB_KillChildrenOnExit() {
 }
 
 
+extern const char* JB_ThreadName;
 int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
 	Flow_Disabled = 0x7fffFFFF;
 	JB_CollectClassDepths();
-
+	;
+#if __APPLE__
+	pthread_setname_np(JB_ThreadName); // why?
+#else
+	pthread_setname_np(pthread_self(), JB_ThreadName);
+#endif
+	
 	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)
         return EADDRINUSE;

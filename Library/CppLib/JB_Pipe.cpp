@@ -58,6 +58,12 @@ int JB_Sh_Status (ShellStream* F) {
 	return PicoStatus(F->Pico);
 }
 
+int JB_Sh_PID (ShellStream* F) {
+	PicoProcStats S;
+	PicoStatus(F->Pico, &S);
+	return S.PID;
+}
+
  
 int JB_Sh_Kill (ShellStream* F, int Code) {
 	PicoProcStats S;
