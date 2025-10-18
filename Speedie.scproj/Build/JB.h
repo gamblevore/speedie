@@ -2984,7 +2984,9 @@ extern Array* SC__NilReason_values;
 
 #define kJB__PIDM_CaptureAll ((ProcessMode)0)
 
-#define kJB__PIDM_OwnGroup ((ProcessMode)2)
+#define kJB__PIDM_MsgSilence ((ProcessMode)3)
+
+#define kJB__PIDM_OwnGroup ((ProcessMode)128)
 
 #define kJB__PIDM_PassThru ((ProcessMode)40)
 
