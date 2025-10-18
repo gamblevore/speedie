@@ -96,7 +96,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			if !.UsingSpdLib
 				.UsingSpdLib = true
 				f.name = .name.TrimExt + "()"
-			spd = (Speedie_Main).Spawn(p, f.name)
+			spd = (Speedie_Main).Spawn(f.name, p)
 
 	if !spd?
 		|| proc = speedie.resolve
@@ -109,7 +109,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			|duration| Delay = 0
 			if !Perry.FinishedStartUp
 				Delay = 0.125s * Perry.WindowNumber
-			spd = SpdProcess.spawn(Proc, p, mode, delay)
+			spd = SpdProcess.spawn(Proc, f.name, p, mode, delay)
 			if spd
 				spd.pico.name = .project.name
 	

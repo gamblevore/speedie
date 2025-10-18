@@ -29,13 +29,13 @@
 	#include <linux/limits.h>
 #endif
 
-#define kOwnGroup		2
 #define kStdOutSilence  4
 #define kStdOutPassThru 8
 #define kStdOutNil      12
 #define kStdErrSilence  16
 #define kStdErrPassThru 32
 #define kStdErrNil      48
+#define kOwnGroup		128		// unused right now.
 
 
 
@@ -176,7 +176,7 @@ int JB_Sh_StartProcess (ShellStream* S) {
 	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
 	if (!argv) return E2BIG;
 	int Mode = S->Mode;
-	int ChildID = PicoExec(S->Pico, 0, argv, true, (Mode>>2)&3, (Mode>>4)&3);
+	int ChildID = PicoExec(S->Pico, 0, argv, Mode&3, (Mode>>2)&3, (Mode>>4)&3);
 	byte Result = 0;
 	if (ChildID < 0) {
 		Result = errno;
@@ -273,6 +273,7 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 
 ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
 // remove this?
+	Mode|=3;
 	auto rz = JB_Sh_Constructor(nil, self, Mode, Args, nil);
 	byte Error = JB_Sh_StartProcess(rz);
 	if (Error) {

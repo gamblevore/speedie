@@ -20,7 +20,7 @@ main
 function App.ActAsSpeedie (|ErrorInt|)
 	|| Proj = app.args[0].FileThatExists #require
 	|| SpdArgs = [Proj, "--nocolor", "--usescriptloc", "--perry=bin"]
-	|| c = SpdProcess.Spawn(speedie, SpdArgs, ProcessMode.PassThru)
+	|| c = SpdProcess.Spawn(speedie,  "Speedie", SpdArgs, ProcessMode.PassThru)
 		Compiler = c
 		while c.IsOpen
 			...
@@ -31,7 +31,7 @@ function App.DebugProj (|ErrorInt|)
 	|| ProjArgs = app.args
 	|| Proj = ProjArgs[0].FileThatExists #require
 	ProjArgs.Remove(0)
-	|| proc = SpdProcess.Spawn(Proj, ProjArgs, ProcessMode.PassThru)$
+	|| proc = SpdProcess.Spawn(Proj, proj.name, ProjArgs, ProcessMode.PassThru)$
 	while proc.IsOpen
 		app.RespondToParent
 		...

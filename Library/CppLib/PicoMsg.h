@@ -852,7 +852,7 @@ struct PicoComms : PicoConfig {
 	void do_sending () { 
 		while ( auto Msg = Sending->AskUsed() ) {
 		// send(MSG_DONTWAIT) does nothing on OSX sadly.
-			int Amount = (int)send(Socket, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
+			int Amount = (int) send(Socket, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
   			if (Amount > 0) {
 				Sending->lost(Amount);
 				LastSend = PicoGetDate();

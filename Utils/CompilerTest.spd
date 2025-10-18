@@ -4,14 +4,14 @@
 
 main (|[string]| Files)
 	if !files
-		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn
+		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn("arrow")
 			app.Sleep(1s)
 			printline proc.ReadStdOut
 			if proc.status != 0
 				printline "arrow.spd status: " + proc.Status.render
 		return 0
 	
-	for f in files.GlobExpand
+	for f in files.GlobExpand 
 		app.TryCompileOne(f)
  
 	if Fails.length
