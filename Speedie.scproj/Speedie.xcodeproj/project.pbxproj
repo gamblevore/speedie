@@ -327,6 +327,7 @@
 		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../../lib/libSDL2.dylib; sourceTree = "<group>"; };
 		ACC8F9F22C960FD000A549D7 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd; sourceTree = DEVELOPER_DIR; };
+		ACCA0FFA2EA30E5F005A5600 /* PicoMsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../../include/PicoMsg/PicoMsg.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -402,6 +403,7 @@
 		AC7D3C7829A27BF300148ADB /* cpp */ = {
 			isa = PBXGroup;
 			children = (
+				ACCA0FFA2EA30E5F005A5600 /* PicoMsg.h */,
 				AC7D3CB729A27C9900148ADB /* JB_Globals.cpp */,
 				AC7D3CB829A27C9900148ADB /* JB.cpp */,
 				AC7D3C9429A27C1D00148ADB /* JB_Alloc.cpp */,

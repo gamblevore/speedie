@@ -81,7 +81,7 @@
 "\nunion "
 "\n}"
 "\n}\n"
-".fail.txt\";\n\t\nJB_Globals JB__;\n"
+".fail.txt\";\nconst char* JB_ThreadName = \""
 "\n};\n"
 ", app "
 "point"
@@ -2196,3 +2196,4 @@
 "̴̵̶̡̢̧̨̛̀́̕͘͏̸̷͜͟͢͝͞͠͡҉"
 "̖̗̘̙̜̝̞̟̠̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼͇͈͉͍͎͓͔͕͖͙͚̣ͅ"
 "codesign_osx"
+"\";\n\nJB_Globals JB__;\n"
