@@ -25,9 +25,8 @@ void JB_Str_PrintError(JB_String* s) {
 	int n = JB_Str_Length(s);
     if (n) {
 		MyWrite(s->Addr, n, stderr);
-		if (!JB_ErrorNumber) {
+		if (!JB_ErrorNumber)
 			JB_ErrorNumber = 1; // terminals complain if printerror without return -1;
-		}
 		fflush(stderr);
     }
 }
@@ -35,9 +34,8 @@ void JB_Str_PrintError(JB_String* s) {
 
 void JB_Str_PrintLine(JB_String* s) {
 	int n = JB_Str_Length(s);
-	if (n) {
+	if (n)
 		MyWrite(s->Addr, n, stdout);
-	}
 	putchar(10);
 	fflush(stdout);
 }
@@ -52,10 +50,9 @@ static bool ShouldFlush_ (JB_String* s) {
 		return true;
 	
 	auto c = s->Addr;
-	while (--n >= 0) {
+	while (--n >= 0)
 		if (c[n] == 10)
 			return true;
-	}
 	
 	return false;
 }
@@ -65,9 +62,8 @@ void JB_Str_Print(JB_String* s) {
 	int n = JB_Str_Length(s);
 	if (n) {
 		MyWrite(s->Addr, n, stdout);
-		if (ShouldFlush_(s)) {
+		if (ShouldFlush_(s))
 			fflush(stdout);
-		}
 	}
 }
 
