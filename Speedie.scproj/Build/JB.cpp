@@ -211,14 +211,7 @@ SpdProcess* JB_App__Parent(bool Expect) {
 	if (PicoHasParentSocket()) {
 		PicoComms* Comms = JB_Pico__New(JB_LUB[0], kJB__PicoNoise_Events);
 		if (Comms) {
-			if (!JB_LibIsThreaded()) {
-				if (!PicoRestoreExec(Comms)) {
-					return nil;
-				}
-			}
-			SpdProcess* P = JB_Proc_Constructor(nil, JB_LUB[0], nil, Comms, nil, kJB__PIDM_StdErrPassThru);
-			JB_SetRef(JB__Proc__Parent, P);
-			return P;
+			return JB_App__UsePico(Comms);
 		}
 	}
 	if (Expect) {
@@ -306,6 +299,19 @@ JB_String* JB_App__SyntaxAccess(JB_String* Name) {
 	}
 	;
 	return Rz;
+}
+
+SpdProcess* JB_App__UsePico(PicoComms* Comms) {
+	if (!JB_LibIsThreaded()) {
+		if (!PicoRestoreExec(Comms)) {
+			return nil;
+		}
+	}
+	SpdProcess* P = JB_Proc_Constructor(nil, JB_LUB[0], nil, Comms, nil, kJB__PIDM_StdErrPassThru);
+	JB_Incr(P);
+	JB_SetRef(JB__Proc__Parent, P);
+	JB_SafeDecr(P);
+	return P;
 }
 
 bool JB_App__Yes(JB_String* Name) {
@@ -3603,7 +3609,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[252]);
-	JB_FS_AppendInt32(_fsf0, (2025101922));
+	JB_FS_AppendInt32(_fsf0, (2025101923));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8663,7 +8669,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1224]);
-	JB_FS_AppendInt32(_fsf0, (2025101922));
+	JB_FS_AppendInt32(_fsf0, (2025101923));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -60342,4 +60348,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7266766025454670268 -3624061700426785522
+// -6993611707822751558 -3624061700426785522

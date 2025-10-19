@@ -3419,6 +3419,8 @@ ExitCode JB_App__Say(JB_String* S, bool Print);
 
 JB_String* JB_App__SyntaxAccess(JB_String* Name);
 
+SpdProcess* JB_App__UsePico(PicoComms* Comms);
+
 bool JB_App__Yes(JB_String* Name);
 
 
