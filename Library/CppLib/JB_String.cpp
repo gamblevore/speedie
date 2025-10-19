@@ -1845,13 +1845,14 @@ struct ChrBData {
 };
 static ChrBData StrByteObjs = {};
 
-JB_String* JB_Str__Byte(int i) {
-	JB_String* Result = StrByteObjs.Objects[i&0xFF];
+JB_String* JB_Str__Byte (int i) {
+	i&=0xFF;
+	JB_String* Result = StrByteObjs.Objects[i];
 	if (Result)
 		return Result;
 
     Result = JB_Str_New(1);
-	StrByteObjs.Objects[i&0xFF] = (JB_String*)JB_Incr(Result);
+	StrByteObjs.Objects[i] = (JB_String*)JB_Incr(Result);
     Result->Addr[0] = i;
 	return Result;
 }
