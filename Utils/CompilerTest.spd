@@ -1,5 +1,7 @@
 #!/usr/local/bin/spd
 
+// the new pico system isn't running so fast right now. perhap waitpid delay?
+// it quite a long delay, over a second?  Also... we don't want those products made.
 || Fails = faststring()
 
 main (|[string]| Files)
@@ -11,6 +13,7 @@ main (|[string]| Files)
 				printline "arrow.spd status: " + proc.Status.render
 		return 0
 	
+	""
 	for f in files.GlobExpand 
 		app.TryCompileOne(f)
  
@@ -26,7 +29,8 @@ function app.TryCompileOne (|file| f)
 	|| Speedie = "/usr/local/bin/spd"
 	
 	if Speedie.Execute(args, M).Successful
-		"OK: $f"
+		printline "spd $f --nocompile --silent --check --target=ForBatchTest"
+		// useful for me to run from the command-line to debug Pico
 	  else
 		fails <~ "Fail: $f\n"
 
