@@ -39,7 +39,10 @@ typedef	int64_t	PicoDate;  // Resolution is 1s/64K, at ±445M years range.
 
 struct			PicoComms;
 struct			PicoGlobalConfig;
-struct			PicoMessage { char* Data; int Length;   operator bool () {return Data;}; };
+
+#pragma pack(push, 1)
+struct			PicoMessage { char* Data; int Length;  operator bool () {return Data;}; };
+#pragma pack(pop)
 
 typedef void	(*PicoThreadFn)(PicoComms* M, unsigned int Mode, const char** Args);
 typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
@@ -80,7 +83,6 @@ struct 			PicoConfig  {
 	char 				Name[16];		/// Used for reporting events to stdout.
 	PicoDate			LastRead;		/// The date of the last Read.
 	PicoDate			LastSend;		/// The date of the last send.
-	int					QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
 	unsigned short		DeathCount;		/// How many times the subprocess died.
 	unsigned short		SendFailCount;	/// How many times sending failed.
 	unsigned short		ReadFailCount;	/// How many times reading failed.
@@ -88,27 +90,26 @@ struct 			PicoConfig  {
 	unsigned char		Noise;			/// How much information PicoMsg prints. From `PicoSilent` to `PicoNoiseAll`
 	unsigned char		SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
 	bool				LeaveOrphaned;	/// If this is true, the child-process will not be killed by `PicoKill()`
-	unsigned char		Bits; 	
-	bool				IsParent;
-#ifdef PICO_IMPLEMENTATION
+	unsigned char		Bits; 			/// The size we used to allocate stuff:  1 << Bits
+	bool				IsParent;		/// Are we the parent.
+#if defined(PICO_IMPLEMENTATION) || defined(PICO_SEE_INTERNALS) /// Don't alter the internals. 
 	unsigned char		StateFlags;
 	unsigned char		SocketStatus;
 	unsigned char		PartClosed;
 	PicoTrousers		SendLock;
 	PicoTrousers		ReadLock;
-	PicoTrousers		QueueLock;
-	std::atomic_char	DestroyMe;
+	PicoTrousers		GrabLock;
 	PicoTrousers		InUse;
-	unsigned char		ID;
 	int					Socket;
-	int					LengthBuff;
 	int					PID;
 	PicoBuff*			Reading;
 	PicoBuff*			Sending;
 	PicoBuff*			StdErr;
 	PicoBuff*			StdOut;
-	PicoMessage*		QueueTail;
-	PicoMessage			QueueHead;
+	std::atomic<char*>	PreData;
+	int					PreLength;
+	std::atomic_char	DestroyMe;  // these two must come last. It only memsets up to DestroyMe.
+	unsigned char		ID;			// and we wnat to keep the ID!
 #endif
 };
 
@@ -153,21 +154,22 @@ struct PicoGlobalStats {
 #else
 	#define _pico_code_(x) {x}
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	#define htole(x) __builtin_bswap32(x)
+	#define letoh(x) __builtin_bswap32(x)
+#else
+	#define htole(x) (x)
+	#define letoh(x) (x)
+#endif
 
-extern "C" bool				PicoInit (int DesiredThreadCount);
 
-static PicoMessage pico_next_msg (PicoMessage M) {
-	return *((PicoMessage*)(M.Data + M.Length));            			;;;/*_*/;;;
-}
-
+extern "C" bool	PicoInit (int DesiredThreadCount);
 static PicoTrousers PicoCommsLocker;
 
 
 PicoDate pico_date_create ( uint64_t S, uint64_t NS ) {
-	const uint64_t D = 15259; // for some reason unless we spell this out, xcode will miscompile this.
-	NS /= D;
-	S <<= 16;
-	return S + NS;         						   ;;;/*_*/;;;
+	uint64_t NS2 = (NS * 9223372046ULL)>>47ULL; // avoid division :)
+    return (S << 16) + NS2;
 }
 
 PicoDate PicoGetDate( ) {
@@ -347,7 +349,7 @@ struct PicoBuff {
 		while (auto Dest = AskUnused()) {
 			int Avail = std::min(Need, Dest.Length);
 			memcpy(Dest.Data, Src, Avail);
-			gained(Avail);
+			gained(Avail + (-Avail&3));
 			Need -= Avail;
 			Src += Avail;
 			if (Need <= 0) return;
@@ -387,20 +389,10 @@ struct PicoBuff {
 	int Length () {
 		return Head - Tail;
 	}  										;;;/*_*/;;;
-
-	/*
-		A better way to do this:
-			* Don't write or read badly and split the length.
-			* then we can simply get or read the length! (if we have 4 bytes or more)
-			* Also... use __BYTE_ORDER__  and __ORDER_BIG_ENDIAN__. For network stuff.
-		
-		If I want to save bytes:
-			* save 8*64 bytes. merge all buffs into one. Still need 4 ints.
-	 */
-	 
+	
 	PicoDate SendOutput (const char* Src, int MsgLen) {
 //		this->Log(Src, MsgLen); // So I can search -> Log and get all.
-		int NetLen = htonl(MsgLen);
+		int NetLen = letoh(MsgLen);
 		if (Size - Length() >= MsgLen+PicoMsgInfo) {
 			send_sub((char*)&NetLen, PicoMsgInfo);
 			send_sub(Src, MsgLen);
@@ -409,7 +401,27 @@ struct PicoBuff {
 		return 0;
 	}
 	
-	bool ReadInput (char* Dest, int N) {
+	/*	
+		* Can save 8*64 bytes by merge all buffs into one. Still need 4 ints.
+	*/
+
+	int ReadLength () {
+		int N = Length();
+		if (N >= 4) {
+			int T = Tail&(Size-1);
+			int D = *((int*)(Data+T));
+			lost(4);
+			return D;
+		}
+		return 0;
+	}
+
+	void ReadInput4 (char* Dest, int N) {
+		ReadInput(Dest, N);
+		Tail += (-N&3);
+	}
+	
+	void ReadInput (char* Dest, int N) {
 		while (auto Msg = AskUsed()) {
 			int B = std::min(Msg.Length, N); // 🕷️_🕷️
 			memcpy(Dest, Msg.Data, B);
@@ -418,7 +430,6 @@ struct PicoBuff {
 			lost(B);
 			if (N <= 0) break;
 		}
-		return true;
 	}
 }; 
 
@@ -436,7 +447,7 @@ struct PicoComms : PicoConfig {
 		PartClosed = 255;
 		SocketStatus = 255;
 		PIDStatus = -2;
-		QueueTail = &QueueHead;
+		
 		Noise = noise;
 		SendTimeOut = 10.0f; // 🕷️_🕷️
 
@@ -446,7 +457,6 @@ struct PicoComms : PicoConfig {
 
 		B += ((1<<B) < size);
 		Bits = B;
-		QueueSize = 1<<(B+3);
 		
 		if (!name) name = "";
 		strncpy(Name, name, sizeof(Name)-1);
@@ -454,8 +464,7 @@ struct PicoComms : PicoConfig {
 	} ;;;/*_*/;;;
 	
 	void Destroy () {
-		for (auto M = QueueHead; M.Data; M = pico_next_msg(M))
-			free(M.Data);
+		free(PreData);
 		if (Socket > 0)
 			msg_close_for_real(Socket);
 		PicoBuff::Decr(Sending);
@@ -662,7 +671,7 @@ struct PicoComms : PicoConfig {
 	}
 
 	bool CanGet () {
-		return !(PartClosed & 2) or QueueHead.Length;
+		return !(PartClosed & 2) or PreData;
 	}
 	
 	bool StillSending () {
@@ -696,7 +705,7 @@ struct PicoComms : PicoConfig {
 					B->ReadInput(Dest, L);
 					return {Dest, L};
 				}
-				fail_alloc(L);
+				fail_alloc();
 			}
 		}
 		return {};
@@ -711,18 +720,14 @@ struct PicoComms : PicoConfig {
 	}
 	
 	PicoMessage Get (float T = 0.0) {
-		if (!can_get(T)) return {};
+		if (!PreData and !pre_grab())
+			if (!T or !delay_read(T))
+				return {};
 		
-		PicoMessage M = QueueHead;
-		QueueLock.lock();
-		PicoMessage H = pico_next_msg(M);
-		QueueHead = H;
-		if (!H)
-			QueueTail = &QueueHead;
-		QueueLock.leave();
-		QueueSize  +=  M.Length + sizeof(PicoMessage)*2;
-		M.Data[M.Length] = 0; // the head system overwrites the 0. Fix later.
-		return M;
+		PicoMessage M = {PreData, PreLength};
+		PreLength = 0;	// could this have sync errors?
+		PreData = 0;	// we are setting two values, and we have to assume things can get out of sync.
+		return M;		// but will that cause a problem or not?
 	}
 	
 	void* SayEvent (const char* A, const char* B="", int Iter=0) {
@@ -744,7 +749,7 @@ struct PicoComms : PicoConfig {
 			P = IsParent ? "Parent" : "Child";
 		if (Iter)
 			printf("%s.%s: %s %s %i\n", S, P, A, B, Iter);
-		  else
+		  else // SPAB lol.
 			printf("%s.%s: %s %s\n", S, P, A, B);
 		
 		return nullptr;
@@ -813,10 +818,10 @@ struct PicoComms : PicoConfig {
 		if (S >= 0) while ( auto Msg = B->AskUnused() ) {
 			int Amount = 0;
 			if (Part > 2)
-				Amount = (int)read(S, Msg.Data, Msg.Length);
+				Amount = (int) read(S, Msg.Data, Msg.Length);
 			  else // maybe nicer to avoid sockets and just use pipes. Simpler and more flexible.
 			       // and can still use sockets.
-				Amount = (int)recv(S, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
+				Amount = (int) recv(S, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
 			if (Amount <= 0) {
 				if (!io_pass(Amount, Part)) break;
 				continue;
@@ -840,7 +845,7 @@ struct PicoComms : PicoConfig {
 		if (!(PartClosed&2)) {
 			if (Socket > 0)					// else, its memory-only IPC.
 				read_part(Reading, Socket, 2);
-			while (acquire_msg()) {;}
+			if (!PreData) pre_grab();
 		}
 		if (!(PartClosed&4))
 			read_part(StdOut, StdOut->Pipe, 4);
@@ -867,16 +872,14 @@ struct PicoComms : PicoConfig {
 		return !(PartClosed&1)  and  (Socket > 0)  and  (Sending->Length());
 	}
 
-	bool can_get (float T) {
-		if (QueueHead.Length) return true;
- 		if (!T) return false;
+	bool delay_read (float T) {
 		if (T < 0) T = SendTimeOut;
 		T = std::min(T, 543210000.0f); // 17 years?
 		PicoDate Final = PicoGetDate() + (PicoDate)(T*65536.0f);
 		timespec ts = {0, 1000000}; int n = T*16000;
 		for ( int i = 0;  i < n and !(PartClosed&2);   i++) {
 			nanosleep(&ts, 0);
-			if (QueueHead.Length) return true; 
+			if (PreData) return true; 
 			if (PicoGetDate() > Final) return false;
 		}
 		return false;
@@ -889,47 +892,43 @@ struct PicoComms : PicoConfig {
 		return Result;
 	}
 	
-	bool acquire_msg () {
-		int L = LengthBuff;
+	bool pre_grab () {
+		if (!GrabLock.enter())
+			return false;
+		bool Result = pre_grab_sub();
+		GrabLock.leave();
+		return Result;
+	}
+		
+	bool pre_grab_sub () {
+		int L = PreLength;
 		if (!L) {
-			if (Reading->Length() < PicoMsgInfo) return false;
-			Reading->ReadInput((char*)&LengthBuff, PicoMsgInfo);
-			L = LengthBuff = ntohl(LengthBuff);
-			if ( Reading->Size < L + PicoMsgInfo ) // msg bigger than our buffers
+			PreLength = L = htole(Reading->ReadLength()); 
+			if (L <= 0)
+				return L < 0 and failed(EILSEQ);
+			if (Reading->Size < L + PicoMsgInfo)			// msg bigger than our buffers
 				return failed(EMSGSIZE);
 		}
 		
-		if (L <= 0)
-			return L < 0 and failed(EILSEQ);
-
-		if (Reading->Length() < L) return false;
-		int QS = L + sizeof(PicoMessage)*2;
-		if (QueueSize < QS)
-			return (!ReadFailCount++) and SayEvent("CantRead: BufferFull");
+		if (Reading->Length() < L)
+			return false;
 		
-		if (char* Data = phalloc(L+sizeof(PicoMessage)); Data) {
-			Reading->ReadInput(Data, L);
-			auto T = (PicoMessage*)(Data + L);
-			*T = {};
-			LengthBuff = 0;
-			QueueSize -= QS;
-			QueueLock.lock();
-			*QueueTail = {Data, L};
-			QueueTail = T;
-			QueueLock.leave();
+		if (char* Data = phalloc(L+1); Data) {
+			Reading->ReadInput4(Data, L);
+			PreData = Data;
 			LastRead = PicoGetDate();
 			return true;
 		}
-		return fail_alloc(L+sizeof(PicoMessage));
+
+		return fail_alloc();
 	}
 	
 	bool get_pair_of (int* Socks) {
 		if (pico_open_sockets > 96 or socketpair(PF_LOCAL, SOCK_STREAM, 0, Socks)) return failed();
-		for (int i = 0; i < 2; i++) {
-			struct linger so_linger = {1, 5};
+		struct linger so_linger = {1, 5};
+		for (int i = 0; i < 2; i++)
 			setsockopt(Socks[i], SOL_SOCKET, SO_LINGER, &so_linger, sizeof so_linger);
-		}				;;;/*_*/;;;
-		return true;
+		return true; 				;;;/*_*/;;;
 	}
 	
 	bool alloc_msg_buffs () {
@@ -970,7 +969,7 @@ struct PicoComms : PicoConfig {
 	}  ;;;/*_*/;;;   // creeping upwards!!
 
 
-	bool fail_alloc (int N) {
+	bool fail_alloc () {
 		perror("picomsg: ");
 		return failed(ENOBUFS);
 	}
@@ -1025,8 +1024,8 @@ struct PicoComms : PicoConfig {
 	void msg_close_for_real (int S) {
 		Socket = -1;
 		if (S > 0) {
-			close(S);
 			pico_open_sockets--;
+			close(S);
 		}
 		if (CanSayDebug()) {
 			io_buff_report(Sending);
