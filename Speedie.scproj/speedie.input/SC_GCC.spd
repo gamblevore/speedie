@@ -558,7 +558,10 @@ function File.TestSpeedie (|string| v, |bool|)
 		printline .path
 		printline cmd_args
 	
-	.path.execute(cmd_args, 0)
+	/////	/////	/////	/////
+	.path.execute(cmd_args, 0) // <------ CALL SPEEDIE
+	/////	/////	/////	/////
+
 	|| TestProd = compiler.SpeedieDir("Terminal/SpeedieTest" + v)
 	testprod.mustexist("Compile Speedie")	
 	print TransCompiler.TmpOut(v).ReadFile
