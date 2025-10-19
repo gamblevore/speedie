@@ -76,7 +76,7 @@ target PerryDBG
 		// so any app can be run as a lib? Maybe later!
 		cpp_name Speedie_Main 
 		rz = app.sp_run(args, mode&4)
-		app.parent(comms) // phew
+		app.usepico(comms) // phew
 		if rz == 0
 			rz = app.sp_run(args, mode)
 

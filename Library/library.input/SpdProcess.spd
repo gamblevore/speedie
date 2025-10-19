@@ -189,6 +189,13 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		|bool|		 CheckedParent
 		|SpdProcess| _Parent
 		
+		helper app.UsePico (|&pico| Comms, |spdprocess|)
+			if !app.IsThreadedAsLib
+				require comms.CompleteExec
+			|| p = SpdProcess("", nil, comms)
+			SpdProcess._parent = p
+			return p
+		
 		function app.Parent (|bool| Expect=false, |spdprocess|)
 			opt norefcounts
 			if spdprocess.CheckedParent
@@ -196,12 +203,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			spdprocess.CheckedParent = true
 			if pico.HasParentSocket
 				|| comms = pico.new
-					if !app.IsThreadedAsLib
-						require comms.CompleteExec
-					|| p = SpdProcess("", nil, comms)
-					SpdProcess._parent = p
-					return p
-
+					return .UsePico(comms)
 			if expect
 				error "Parent lost connection"
 
