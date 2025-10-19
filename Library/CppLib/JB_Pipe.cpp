@@ -221,6 +221,7 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* ErrsIn, int Mode, Date TimeOut) {
 	if (ErrsIn) Mode&=~kStdErrNil; else if (!(Mode&kStdErrNil)) Mode |= kStdErrPassThru;
 	if (Out)  Mode&=~kStdOutNil; else if (!(Mode&kStdOutNil)) Mode |= kStdOutPassThru;
+	Mode |= 3; // no need for message-passing here.
 	auto Sh = JB_Sh_Constructor(0, self, Mode&~kStdErrPassThru, R, nil);
 	byte Error = JB_Sh_StartProcess(Sh);
 	if (Error) {
