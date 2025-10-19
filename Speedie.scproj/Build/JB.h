@@ -3403,7 +3403,7 @@ JB_String* JB_App__MemoryUsage(int Over, FastString* Fs_in);
 
 bool JB_App__No(JB_String* Name);
 
-SpdProcess* JB_App__Parent(PicoComms* Comms, bool Expect);
+SpdProcess* JB_App__Parent(bool Expect);
 
 JB_String* JB_App__OrigPath();
 

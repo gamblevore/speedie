@@ -203,23 +203,23 @@ bool JB_App__No(JB_String* Name) {
 	return (!JB_App__Yes(Name));
 }
 
-SpdProcess* JB_App__Parent(PicoComms* Comms, bool Expect) {
+SpdProcess* JB_App__Parent(bool Expect) {
 	if (JB__Proc_CheckedParent) {
 		return JB__Proc__Parent;
 	}
 	JB__Proc_CheckedParent = true;
-	if ((!Comms) and PicoHasParentSocket()) {
-		Comms = JB_Pico__New(JB_LUB[0], kJB__PicoNoise_Events);
-	}
-	if (Comms) {
-		if (!JB_LibIsThreaded()) {
-			if (!PicoRestoreExec(Comms)) {
-				return nil;
+	if (PicoHasParentSocket()) {
+		PicoComms* Comms = JB_Pico__New(JB_LUB[0], kJB__PicoNoise_Events);
+		if (Comms) {
+			if (!JB_LibIsThreaded()) {
+				if (!PicoRestoreExec(Comms)) {
+					return nil;
+				}
 			}
+			SpdProcess* P = JB_Proc_Constructor(nil, JB_LUB[0], nil, Comms, nil, kJB__PIDM_StdErrPassThru);
+			JB_SetRef(JB__Proc__Parent, P);
+			return P;
 		}
-		SpdProcess* P = JB_Proc_Constructor(nil, JB_LUB[0], nil, Comms, nil, kJB__PIDM_StdErrPassThru);
-		JB_SetRef(JB__Proc__Parent, P);
-		return P;
 	}
 	if (Expect) {
 		if (true) {
@@ -1977,7 +1977,7 @@ void SC_Comp__InitCompiler() {
 	SC__Comp_CurrStage = 1;
 	SC__SC_UniqueNum = 100;
 	if (JB_Str_Exists(SC__Options_SingleFileInput)) {
-		if (JB_FreeIfDead(JB_App__Parent(nil, false))) {
+		if (JB_FreeIfDead(JB_App__Parent(false))) {
 			JB_String* _tmPf4 = SC_Str_ScriptContainer(SC__Comp_OriginalInputPath, JB_LUB[1916]);
 			JB_Incr(_tmPf4);
 			JB_SetRef(SC__Comp__BuildFolder, JB_Str_AsFile(_tmPf4));
@@ -2371,7 +2371,7 @@ void SC_Comp__PrintResults() {
 	bool OK = JB_Rec_OK(JB_StdErr);
 	SC_Comp__PrintStats();
 	SC_Comp__PrintCompileErrors();
-	if (JB_FreeIfDead(JB_App__Parent(nil, false)) != nil) {
+	if (JB_FreeIfDead(JB_App__Parent(false)) != nil) {
 		FastString* _fsf0 = JB_FS_Constructor(nil);
 		JB_FS_AppendString(_fsf0, JB_LUB[1857]);
 		JB_FS_AppendInt32(_fsf0, JB_App__ID());
@@ -2598,7 +2598,7 @@ void SC_Comp__SetupEnv() {
 		JB_Object_Fail(nil);
 		return;
 	}
-	JB_FreeIfDead(JB_App__Parent(nil, false));
+	JB_FreeIfDead(JB_App__Parent(false));
 	SC_Comp__ClearEnvs();
 	SC__Options_Dev = JB_Msg_Int(JB_Msg_GetConf(JB_App__Prefs(), JB_LUB[1881], false), 0);
 	if (!JB_App__IsMainThread()) {
@@ -2606,7 +2606,7 @@ void SC_Comp__SetupEnv() {
 	}
 	JB_ErrorColors__DisableIfNoTerminal();
 	JB__Err_AutoPrint = 1;
-	if (JB_App__Parent(nil, false)) {
+	if (JB_App__Parent(false)) {
 		JB__Err_AutoPrint = 0;
 		JB__ErrorColors_Enabled = false;
 	}
@@ -2885,7 +2885,7 @@ JB_String* SC_Comp__VariantSuffix() {
 
 void SC_Comp__VariousSelfTests() {
 	JB_FreeIfDead(JB_Constants__TestJB());
-	if ((SC__Options_PerryOutput < 2) and ((!SC__Options_Scripting) and (!JB_FreeIfDead(JB_App__Parent(nil, false))))) {
+	if ((SC__Options_PerryOutput < 2) and ((!SC__Options_Scripting) and (!JB_FreeIfDead(JB_App__Parent(false))))) {
 		if (SC__Options_PrintLibraries) {
 			JB_String* _tmPf0 = JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12);
 			JB_Incr(_tmPf0);
@@ -3603,7 +3603,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[252]);
-	JB_FS_AppendInt32(_fsf0, (2025101819));
+	JB_FS_AppendInt32(_fsf0, (2025101922));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -4055,7 +4055,7 @@ Message* SC_AC__ASMFail(SCFunction* Fn, Message* Ret) {
 	}
 	Message* Errtmp = JB_Syx_OperatorPlus(kJB_SyxTmp, JB_LUB[278]);
 	JB_Tree_SyntaxAppend(Errtmp, SC_AC__MiniErrors(JB_StdErr, kJB__ErrorSeverity_Warning));
-	JB_Proc_Send(JB_App__Parent(nil, false), Errtmp);
+	JB_Proc_Send(JB_App__Parent(false), Errtmp);
 	return Ret;
 }
 
@@ -4404,7 +4404,7 @@ bool SC_AC__CmdWrap(Message* Arg) {
 	}
 	JB_Decr(Cmd);
 	JB_Decr(Response);
-	SpdProcess* _tmPf0 = JB_App__Parent(nil, false);
+	SpdProcess* _tmPf0 = JB_App__Parent(false);
 	JB_Incr(_tmPf0);
 	JB_Proc_Send(_tmPf0, Arg);
 	JB_Decr(_tmPf0);
@@ -4710,7 +4710,7 @@ Message* SC_AC__DoCmd(Message* Cmd) {
 }
 
 bool SC_AC__EnterAutoComplete() {
-	SpdProcess* Perry = JB_App__Parent(nil, false);
+	SpdProcess* Perry = JB_App__Parent(false);
 	JB_Incr(Perry);
 	if (!JB_Rec_OK(JB_StdErr)) {
 		JB_Decr(Perry);
@@ -8663,7 +8663,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1224]);
-	JB_FS_AppendInt32(_fsf0, (2025101819));
+	JB_FS_AppendInt32(_fsf0, (2025101922));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -12821,7 +12821,7 @@ SCObject* SC_TypeOfExprSub(Message* Exp, SCNode* Name_space, Message* Side) {
 		}
 		return ((SCObject*)Obj);
 	}
-	if (!JB_App__Parent(nil, false)) {
+	if (!JB_App__Parent(false)) {
 		if (true) {
 			JB_Msg_Fail(Exp, JB_LUB[1125]);
 		}
@@ -60342,4 +60342,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -744102955810290823 -3624061700426785522
+// 7266766025454670268 -3624061700426785522
