@@ -52,7 +52,7 @@ function ParserRestore
 	.errors = stderr
 	stderr = ErrorReceiver()
 	(message).Restore
-	parser.using.position = -1 // sigh. I guess something slipped somewhere
+	parser.using.position = -1				// Sigh. I guess something slipped somewhere
 
 
 function EnterAutoComplete (|bool|)
@@ -60,21 +60,21 @@ function EnterAutoComplete (|bool|)
 	
 	require stderr.ok
 	require perry.isopen
-	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
+	app.AllowInteruptCrash = false			// To debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
 
 	|| Realm = pico.GlobalConfig
 	Realm.TimeOut = 30s
 	if !app.IsMainThread
 		"(AsLib)"
-		realm.timeout = 0 // no need timeout
+		realm.timeout = 0					// No need timeout
 	if options.PrintLibraries
 		"(Noisy)"
 		perry.pico.config.noise = -1
 
 	compiler.InPerry = 1
 	.PerryTalk(perry)
-	"ExitingCommands"						// this also
+	"ExitingCommands"						// This also
 	return true
 
 
@@ -85,7 +85,7 @@ function InitedOK (|bool|)
 		error "Compiler did not initialise"
 
 
-function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
+function PerryTalk (|SpdProcess| perry)		// ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	compiler.InPerry = 2
 	.ParserRestore
@@ -99,7 +99,7 @@ function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
 		loop .CmdWrap(cmd)
 
 	"StartExit"
-	perry.Disconnect					// calls close, which uses SO_LINGER, to allow sending.
+	perry.Disconnect						// calls close, which uses SO_LINGER, to allow sending.
 
 
 function WriteError (|string| name, |message|)
