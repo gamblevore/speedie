@@ -173,7 +173,8 @@ function Clean (|bool|)
 ".ReplaceAll("@spd", file.Speediedir)
 	for l.lines in paths
 		if l
-			l.file.deleteall
+			if l.file.deleteall
+				printline l
 	return stderr.ok
 
 
