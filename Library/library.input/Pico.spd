@@ -123,6 +123,10 @@ struct Pico
 		x[n] = 0
 		memory.copy(x|&nil|, value.addr|&nil|, n)
 	
+	function Name (|string|)
+		|| x = &.config.name[0]
+		return string.copy(x|cstring|)
+	
 		
 	
 

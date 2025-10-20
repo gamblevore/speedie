@@ -473,6 +473,8 @@ class String
 		function Wrap (|cstring| Addr, |stringzeroterminated|)
 			return stringzeroterminated(addr)
 
+		function FromC (|cstring| str, |stringzeroterminated|)
+			disabled "use .copy"
 		function Copy (|cstring| str, |stringzeroterminated|)
 			cpp_wrapper JB_Str_CopyFromCString
 

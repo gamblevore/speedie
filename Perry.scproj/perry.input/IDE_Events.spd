@@ -206,7 +206,7 @@ function ClickedProjectInfo (GUIaction)
 function PerryIDE.SaveAndShowErrors (|bool|) // checkerrors recheckforerrors
 	opt norefcounts
 	.SaveEditing(documentstate.ErrorChecking)
-	.Recheck(True)
+	.Recheck(0)
 	|| t = .IsTextMode
 	.ViewAsProject
 	if t and .IsViewing(.errorlist)

@@ -68,9 +68,14 @@ int JB_Sh_PID (ShellStream* F) {
 int JB_Sh_Kill (ShellStream* F, int Code) {
 	PicoProcStats S;
 	PicoStatus(F->Pico, &S);
-	PicoConfig* M = (PicoConfig*)F->Pico;
-	M->PIDStatus = Code;
-	return JB_Kill(S.PID);
+	if (S.Status == -1) {
+		PicoConfig* M = (PicoConfig*)F->Pico;
+		if (Code >= 0)
+			M->PIDStatus = Code;
+		printf("killing: %i\n", S.PID);
+		return JB_Kill(S.PID);
+	}
+	return -1;
 }
 
 

@@ -1,7 +1,7 @@
 
 
 extend PerryIDE
-	function Recheck (|bool| strong=false)
+	function Recheck (|duration| Ago)
 		if strong or .ModifiedForCompile
 			.ForceRecheck
 		|| p = .path					#debug_require
@@ -14,9 +14,11 @@ extend PerryIDE
 	
 	function ForceRecheck
 		.ModifiedForCompile = false
-		if .projIsSpeedieCode and !.UsingSpdLib
-			.Feedback = nil
-			.AskCheck
+		require .projIsSpeedieCode and !.UsingSpdLib
+		|| f = .feedback
+			require !.FeedBackLivedTooLong(f)
+/		.Feedback = nil
+		.AskCheck
 
 
 	function AskCheck

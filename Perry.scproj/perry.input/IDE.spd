@@ -216,7 +216,7 @@ class PerryIDE (Window)
 	behaviour AppForeGroundChange
 		.CheckModified
 		if IsForeGround and .IsFront
-			.Recheck(true)
+			.Recheck(5s)
 		.PopupHide
 		if !.focus
 			.setfocus(.editme)
@@ -363,7 +363,7 @@ class PerryIDE (Window)
 			if .islast
 				.ClickedTodo
 			  else
-				.recheck
+				.recheck(0.5s)
 		if !.isfront
 			.ProjectTabs.selected = .SharedProjectTabSource
 			.editme.SetFocus // make it simple
@@ -479,12 +479,23 @@ class PerryIDE (Window)
 		return self[where, after] 
 		
 
+	function FeedBackLivedTooLong (|spdprocess!| f, |bool|)
+		|| Delay = 30.0
+		target debug
+			delay = 0.5
+		delay += .position|float|
+		|| D = delay.date
+		if (f.lastsend.ago > D)
+			printline f.lastsend.ago.float.render + " ago means death for " + f.pico.name
+			return true
+		
+	
 	function SaveMemory
 		if .IsFront
 			return 
 		require !.UsingSpdLib
 		|| f = .Feedback
-		if f.CommsOpen and f.lastsend.ago > (30.0+.position|float|).date
+		if f.CommsOpen  and  .FeedBackLivedTooLong(f)
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
 			f.Kill(0, "SaveMemory")
@@ -882,7 +893,7 @@ So anything not 0 means "its OK"`
 		.PopupHide
 		.AddToJumpHistory
 		if  !g  and  .IsEditingSource
-			.Recheck
+			.Recheck(5)
 			.TryReselectASM
 		  else
 			.HideASM
@@ -933,7 +944,7 @@ So anything not 0 means "its OK"`
 		// well it depends on if we modified shared files?
 		for i in perry.OpenProj
 			i.ModifiedForCompile = true
-		.recheck				// could be delayed, too.
+		.recheck(0)				// could be delayed, too.
 
 
 	function UpdateActiveFile
