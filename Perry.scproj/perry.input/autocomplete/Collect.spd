@@ -73,7 +73,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
 function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler, initfeedback
 	if c
 		if !c.subprocess and C.TimedOut(5s)
-			c.Deactivate(32) // epipe
+			c.kill(32) // epipe
 		if c.SubProcess
 			return c // can't deactivate it.
 		if c.ActivateChild

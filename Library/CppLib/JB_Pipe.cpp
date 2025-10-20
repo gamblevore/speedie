@@ -70,9 +70,12 @@ int JB_Sh_Kill (ShellStream* F, int Code) {
 	PicoStatus(F->Pico, &S);
 	if (S.Status == -1) {
 		PicoConfig* M = (PicoConfig*)F->Pico;
+//		PicoKill(M); // why not?
 		if (Code >= 0)
 			M->PIDStatus = Code;
+		#if DEBUG
 		printf("killing: %i\n", S.PID);
+		#endif
 		return JB_Kill(S.PID);
 	}
 	return -1;
@@ -166,6 +169,9 @@ int JB_Kill (int PID) {
 	if (PID <= 0)
 		return -1;
 
+	// should this be in pico?
+	// seems like it?
+	
 	int ch_pg = getpgid(PID);
 	int err = 0;
 	if (getpgid(0) == ch_pg) // don't kill self!

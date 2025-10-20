@@ -244,13 +244,11 @@ struct PicoLister {
 	
 	PicoComms* NextComm () {
 		auto L = SavedList;
-		while (L) {
+		if (L) {
 			auto Lowest = L & -L;
 			L &= ~Lowest;
 			SavedList = L;
-			PicoComms* Found = (PicoComms*)&(pico_all[pico_log2(Lowest)]);
-			if (Found)
-				return Found;
+			return (PicoComms*)&(pico_all[pico_log2(Lowest)]);
 		}
 		return 0;
 	}
@@ -1079,8 +1077,8 @@ struct PicoComms : PicoConfig {
 	}
 	
 	void kill_me () {
-		if (PID and (PIDStatus == -1) and ((ExecFlags&3)==PicoExecForked)) {
-			ExecFlags &= ~PicoExecForked;
+		if (PID and (PIDStatus == -1)) {
+			ExecFlags &= ~PicoExecWantDead;
 			kill(PID, SIGKILL);
 		}
 	}
@@ -1456,7 +1454,12 @@ extern "C" int PicoStatus (PicoComms* M, PicoProcStats* S=nullptr) _pico_code_ (
 
 extern "C" int PicoError (PicoComms* M) _pico_code_ (
 /// Returns an error that forced comms to close. If the comms is still open, the error is 0.
-	return M->SocketStatus;
+	int S = M->PIDStatus;
+	if (S == -1)
+		return M->SocketStatus;
+	if (S == 0)
+		return ESHUTDOWN;
+	return S;
 )
 
 

@@ -1,26 +1,32 @@
 
 
 extend PerryIDE
-	function Recheck (|duration| Ago)
-		if strong or .ModifiedForCompile
-			.ForceRecheck
+	function RecheckAfterModify
+		.ModifiedForCompile = true
+		.recheck
+	
+	function Recheck
+		if .ModifiedForCompile
+			.ProjectWasModified
 		|| p = .path					#debug_require
 		|| unused = @tmp + "unused"
 		unused <~ p
 		|| lf = .LostFunks
 			unused <~ lf.copy
+		|| f = .feedback
+			|| c = f.pico.config
+			if c.pidstatus >= 0
+			
 		.SendFeedbackMsg(unused)
 	
 	
-	function ForceRecheck
+	function ProjectWasModified
 		.ModifiedForCompile = false
 		require .projIsSpeedieCode and !.UsingSpdLib
-		|| f = .feedback
-			require !.FeedBackLivedTooLong(f)
 /		.Feedback = nil
 		.AskCheck
-
-
+	
+	
 	function AskCheck
 		.SendFeedbackStr "check"
 		

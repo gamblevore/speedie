@@ -88,10 +88,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	function process.DiedCount (|int|)
 		return .pico.config.deathcount
 		
-	helper HandleDied 
-		|| Bad = !.Status.crashed
-		.Disconnect(.status.name) // removes us from the check-list
-
 
 	function CanActivate (|bool|)
 		if !.Deathlimit or .Diedcount < .Deathlimit
@@ -105,11 +101,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	helper Kill
 		disabled "Explain why"
 
-		
-	helper Kill (|int| ExitCode, |stringzeroterminated| why)
-		super.kill(ExitCode)
-		.Disconnect(why)
-
 
 	syntax expect (|string| err)
 		cpp_part Fail
@@ -120,12 +111,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 	function Disconnect (|string| why="")
-		opt norefcounts
-		// all this can be moved into pico!!! very easy.
-		.ClosePipes
-//		if .alive and !why and .CommsOpen
-//			why = "UnknownReason"
-//		.pico!.close(Why)
+		.pico.close(why.cstr)
 
 
 	helper StartProcess (|ExitCode|)
@@ -161,17 +147,10 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		return .CommsOpen and .status.isrunning
 	
 	
-	function Deactivate (|int| ExitCode)
-		|| running = .status.isrunning
-			.Kill(ExitCode)			// kill child
-		  elseif .CommsOpen			// inconsistant...
-			.handledied				// disconnect comms
-	
-	
 	function ActivateChild (|bool|)
 		if .isopen
 			return true
-		.Deactivate(0)
+		.Kill(0)
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
 			return .SpawnAsChild
