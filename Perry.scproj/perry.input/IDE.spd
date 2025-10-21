@@ -480,7 +480,7 @@ class PerryIDE (Window)
 		
 
 	function FeedBackLivedTooLong (|spdprocess!| f, |bool|)
-		|| Delay = 30.0
+		|| Delay = 20.0
 		target debug
 			delay = 5.0
 		delay += .position|float|
