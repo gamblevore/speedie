@@ -49,15 +49,17 @@ module PackMaker
 	
 	function GlobalsSize (|[scdecl]| List, |bool| Alter, |int|)     // SortGlobals, GlobalsSort
 		opt norefcounts
-		rz = 1				// rz = 1, so if .au.ExportPosition == 0 then something is wrong.
+		|| Globals = 1				// rz = 1, so if .au.ExportPosition == 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
-			rz = rz align s16
+			globals = globals align s16
 			if alter
-				d.ExportPosition = rz
-			rz += s
-	
+				d.ExportPosition = globals
+			globals += s
+
+		return Globals.AlignUp(8) // for strings, which come directly after
+
 
 	function BuildGlobs
 		opt norefcounts

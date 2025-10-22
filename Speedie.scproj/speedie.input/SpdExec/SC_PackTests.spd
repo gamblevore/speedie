@@ -89,4 +89,3 @@ function SCFunction.TestObesity (|!&ivec4|)
 	if !rz?
 /		rz = butter
 
-	
