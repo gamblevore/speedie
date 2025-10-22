@@ -113,8 +113,7 @@ struct 			PicoConfig  {
 	PicoBuff*			StdOut;
 	std::atomic<char*>	PreData;
 	int					PreLength;
-	std::atomic_char	DestroyMe;  // these two must come last. It only memsets up to DestroyMe.
-	unsigned char		ID;			// and we wnat to keep the ID!
+	bool				KeepAlive;
 #endif
 };
 
@@ -177,7 +176,7 @@ PicoDate pico_date_create ( uint64_t S, uint64_t NS ) {
     return (S << 16) + NS2;
 }
 
-PicoDate PicoGetDate( ) {
+PicoDate PicoNow( ) {
 	timespec ts; clock_gettime(CLOCK_REALTIME, &ts);
 	return pico_date_create(ts.tv_sec, ts.tv_nsec);
 }
@@ -202,28 +201,20 @@ inline int pico_log2 (uint64_t X) {
 
 struct PicoCommList {
 	std::atomic_uint64_t		Map;
-	PicoTrousers				Lock;
 	
 	int Reserve () {
-		int ID = 0;
-		Lock.lock();
 		uint64_t F0 = Map;
-		if (F0+1) {
-			auto F = ~F0;
+		while (auto F = ~F0) {
 			F &= -F;
-			ID = pico_log2(F)+1;
-			Map = F|F0;
+			if (Map.compare_exchange_strong(F0, F|F0))
+				return pico_log2(F)+1;
 		}
-		Lock.leave();
-		return ID;
+		return 0;
 	}           						 ;;;/*_*/;;;
 	
-	void Remove (int64_t M) {
-		Lock.lock();
-		uint64_t Old = Map;
-		int64_t M2 = 1ULL << M;
-		Map = Old & ~M2;
-		Lock.leave();
+	void Remove (uint64_t M) {
+		uint64_t Mask = ~(1ULL << M);
+		Map &= Mask;
 	}
 };
 
@@ -340,7 +331,7 @@ struct PicoBuff {
 	}
 	
 	void lost (int N) {
-		pico_global_conf.LastActivity = PicoGetDate();
+		pico_global_conf.LastActivity = PicoNow();
 		Tail += N;
 	}
 
@@ -399,7 +390,7 @@ struct PicoBuff {
 		if (Size - Length() >= MsgLen+PicoMsgInfo) {
 			send_sub((char*)&NetLen, PicoMsgInfo);
 			send_sub(Src, MsgLen);
-			return pico_global_conf.LastActivity = PicoGetDate();
+			return pico_global_conf.LastActivity = PicoNow();
 		}
 		return 0;
 	}
@@ -441,12 +432,12 @@ struct PicoBuff {
 struct PicoComms : PicoConfig {
 	static PicoComms* New (PicoComms* M, int noise, bool isparent, int size, const char* name, int ID) {
 		M = (PicoComms*)&pico_all[--ID];
-		return M->Init(noise, isparent, size, name, ID);
+		return M->Init(noise, isparent, size, name);
 	}
 	
-	PicoComms* Init (int noise, bool isparent, int size, const char* name, int iD) { // constructor
-		DestroyMe = 0;
-		ID = iD; IsParent = isparent; Socket = -1;
+	PicoComms* Init (int noise, bool isparent, int size, const char* name) { // constructor
+		KeepAlive = 1;
+		IsParent = isparent; Socket = -1;
 		PartClosed = 255;
 		SocketStatus = 255;
 		PIDStatus = -2;
@@ -475,12 +466,9 @@ struct PicoComms : PicoConfig {
 		PicoBuff::Decr(StdErr );
 		PicoBuff::Decr(StdOut );
 		if (CanSayDebug()) Say("Deleted");
-//		int x = --DebugCount;
-//		printf("------- %i: %i\n", ID, x);
-		int N = (intptr_t)&(((PicoComms*)0)->DestroyMe);
-		memset(this, 0, N);
+		memset(this, 0, sizeof(PicoComms));
+		int ID = this - (PicoComms*)(&pico_all[0]);
 		pico_list.Remove(ID);
-		DestroyMe = 2;
 	}
 
 	/// **Class Initialisation Helpers**
@@ -694,8 +682,8 @@ struct PicoComms : PicoConfig {
 		if (Policy == PicoSendGiveUp)
 			return (!SendFailCount++) and SayEvent("CantSend: BufferFull");
 		
-		PicoDate Final = PicoGetDate() + (PicoDate)(SendTimeOut*65536.0f);
-		while (PicoGetDate() < Final) {
+		PicoDate Final = PicoNow() + (PicoDate)(SendTimeOut*65536.0f);
+		while (PicoNow() < Final) {
 			if (PartClosed&1) return false; // closed!
 			sched_yield();
 			if (queue_sub(msg, n)) return true;
@@ -795,7 +783,7 @@ struct PicoComms : PicoConfig {
 	void AskDestroy (const char* Why) {
 		AskClose(Why);
 		//if (!DestroyMe)
-		DestroyMe = 1;
+		KeepAlive = false;
 	}
 
 
@@ -838,7 +826,7 @@ struct PicoComms : PicoConfig {
 			pico_timeout_count = 0;			// reset
 			B->gained(Amount);
 			if (CanSayDebug()) Say("|recv|", "", Amount);
-			pico_global_conf.LastActivity = PicoGetDate();
+			pico_global_conf.LastActivity = PicoNow();
 		}
 	}
 	
@@ -868,7 +856,7 @@ struct PicoComms : PicoConfig {
 			int Amount = (int) send(Socket, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
   			if (Amount > 0) {
 				Sending->lost(Amount);
-				LastSend = PicoGetDate();
+				LastSend = PicoNow();
 				if (CanSayDebug()) Say("|send|", "", Amount);
 			} else if (!io_pass(Amount, 1))
 				break;
@@ -883,12 +871,12 @@ struct PicoComms : PicoConfig {
 	bool delay_read (float T) {
 		if (T < 0) T = SendTimeOut;
 		T = std::min(T, 543210000.0f); // 17 years?
-		PicoDate Final = PicoGetDate() + (PicoDate)(T*65536.0f);
+		PicoDate Final = PicoNow() + (PicoDate)(T*65536.0f);
 		timespec ts = {0, 1000000}; int n = T*16000;
 		for ( int i = 0;  i < n and !(PartClosed&2);   i++) {
 			nanosleep(&ts, 0);
 			if (PreData) return true; 
-			if (PicoGetDate() > Final) return false;
+			if (PicoNow() > Final) return false;
 		}
 		return false;
 	}
@@ -924,7 +912,7 @@ struct PicoComms : PicoConfig {
 		if (char* Data = phalloc(L+1); Data) {
 			Reading->ReadInput4(Data, L);
 			PreData = Data;
-			LastRead = PicoGetDate();
+			LastRead = PicoNow();
 			return true;
 		}
 
@@ -1087,7 +1075,7 @@ struct PicoComms : PicoConfig {
 		if (!InUse.enter())
 			return;
 		
-		if (DestroyMe == 1) {
+		if (KeepAlive == 0) {
 			if (CanSayDebug()) Say("Bye");
 			check_exit_code(); // cleanup process PID list...
 			kill_me();
@@ -1102,7 +1090,7 @@ struct PicoComms : PicoConfig {
 	
 	;;;/*_*/;;;
 	void io () {
-		if (DestroyMe or !InUse.enter())
+		if (!KeepAlive or !InUse.enter())
 			return;
 		// lock might be a little too aggressive.
 		// it dissallows two threads to both read/write at the same time
@@ -1119,7 +1107,7 @@ struct PicoComms : PicoConfig {
 
 static void pico_cleanup () {
 	static PicoDate LastCheck = 0;
-	PicoDate Now = PicoGetDate();
+	PicoDate Now = PicoNow();
 	if (abs(Now - LastCheck) > 64*1024*0.25) // 4x a second
 		LastCheck = Now;
 	  else
@@ -1132,7 +1120,7 @@ static void pico_cleanup () {
 
 
 static bool pico_try_exit () {
-	auto D = PicoGetDate();
+	auto D = PicoNow();
 	if (pico_global_conf.Observer and (pico_global_conf.Observer)(D) < 0)
 		return true;
 
@@ -1159,7 +1147,7 @@ static void pico_work_comms () {
 	while (auto M = Items.NextComm())
 		M->io();
 	
-	float S = (PicoGetDate() - pico_global_conf.LastActivity) * (0.000015258789f * 0.005f);
+	float S = (PicoNow() - pico_global_conf.LastActivity) * (0.000015258789f * 0.005f);
 
 	S = std::clamp(S*S, 0.001f, 0.5f);
 	timespec ts = {0, (int)(S*1000000000.0)};
@@ -1227,7 +1215,7 @@ static bool pico_init (int D) {
 			OK = true;
 	}
 
-	pico_global_conf.LastActivity = PicoGetDate();
+	pico_global_conf.LastActivity = PicoNow();
 	pico_inited.leave();
 	return OK;
 }
@@ -1424,7 +1412,7 @@ extern "C" bool PicoHasParentSocket () _pico_code_ (
 	return getenv("__PicoSock__");
 )
 
-extern "C" bool PicoInit (int DesiredThreadCount) _pico_code_ (
+extern "C" bool PicoInit (int DesiredThreadCount=0) _pico_code_ (
 /// Starts the PicoMsg worker threads.
 	return pico_init(DesiredThreadCount);
 )    ;;;/*_*/;;;  ;;;/*_*/;;;     ;;;/*_*/;;;   // the final spiders
