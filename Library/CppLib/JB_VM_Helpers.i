@@ -253,8 +253,11 @@ u64 table (jb_vm& vm, ASM Op) {
 
 
 JB_Object* strs (jb_vm& vm, ASM Op) {
-	auto Str = (JB_Object*)(table(vm, Op));
-	JB_Incr(Str);
+	auto Where = GObj_Modeu?vm.Env.LibGlobs:vm.Env.PackGlobs;
+	Where += GObj_Addu<<3;
+	auto Str = *(JB_Object**)(Where);
+	if (GObj_Refu)
+		JB_Incr(Str);
 	return Str;
 }
 

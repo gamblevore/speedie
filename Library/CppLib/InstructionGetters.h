@@ -106,6 +106,13 @@
 #define   Table_Addi       ((( int)((Op)<<14))>>14)
 #define   Table_Addu       (((uint)((Op)<<14))>>14)
 
+#define   GObj_Modei       ((( int)((Op)<<13))>>31)
+#define   GObj_Modeu       (((uint)((Op)<<13))>>31)
+#define   GObj_Refi       ((( int)((Op)<<14))>>31)
+#define   GObj_Refu       (((uint)((Op)<<14))>>31)
+#define   GObj_Addi       ((( int)((Op)<<15))>>15)
+#define   GObj_Addu       (((uint)((Op)<<15))>>15)
+
 #define   Read_Offseti       ((( int)((Op)<<23))>>25)
 #define   Read_Offsetu       (((uint)((Op)<<23))>>25)
 #define   Read_movei       ((( int)((Op)<<30))>>30)

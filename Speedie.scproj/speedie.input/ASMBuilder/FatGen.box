@@ -776,12 +776,13 @@ function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.GOBJ (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
+function message.GOBJ (|asmreg| r1 = nil, |int| Mode = nil, |int| Ref = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.GOBJ, self)
 	rz.numinput(1) = Mode
-	rz.numinput(2) = Add
+	rz.numinput(2) = Ref
+	rz.numinput(3) = Add
 	rz.dest(0, r1, a)
 }
 

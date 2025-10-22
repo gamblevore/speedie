@@ -52,6 +52,7 @@ struct Assembler
 		|Assembler|					Sh
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
+		|int|						StringsOutOfRange
 
 
 	function fn (|scfunction!--|)

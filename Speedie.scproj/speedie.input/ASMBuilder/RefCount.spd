@@ -46,12 +46,12 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 	|| Obj = .µ(prms.first!)
 	require !.RegIsConst(Obj, 0)
-	target debug: if Obj is ContainsAddr							// always a reg!
+	target debug: if Obj is ContainsAddr						// always a reg!
 
 	if fn == Compiler.RefIncr
 		|| Last = .last(asm.GOBJ)
 			if (Last.r0 iz Obj) and !Last.r1
-				Last.r1 = 1							// incring a gstr. Lets do it internally!
+				Last.r2 = 1										// incring a gobj. Lets do it internally!
 				return Last
 		|| fat = exp.rfun(asmreg(), asmreg(), Obj)
 		Fat._Outputs = 0
@@ -66,7 +66,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 				return ret
 
 			if (Last isa asm.GOBJ) and (Last.r0 iz Obj)  and  Last.r1
-				last.r1 = 0							// decring a global mem obj. Lets just NOT incr!
+				last.r2 = 0							// decring a global mem obj. Lets just NOT incr!
 				return nil
 
 		return exp.rfun(Obj, Obj)

@@ -785,21 +785,26 @@ function Str (fn_asm)
 	dest.µtype = DataTypeCode._voidptr
 	
 	|| real = exp.name|MessageID|
-	if Compiler is Hungry
-		target debug
-			ifn real isa messageid // what?
-		if !real.Position
-			PackMaker.PackStrings <~ real
-			real.Position = PackMaker.PackStrings.Length
+	|| k = real.Position
+	if !k and (Compiler is Hungry)
+		PackMaker.PackStrings <~ real
+		k = PackMaker._PackGlobSize
+		real.Position = k
+		PackMaker._PackGlobSize = k + 8
 	
-	return exp.GOBJ(dest, 0, real.Position) * dest		// seems good!
-
+	if k <= 20~bits
+		return exp.GOBJ(dest, 0, 0, K>>3) * dest		// seems good!
+	
+	if !StringsOutOfRange++
+		problem (exp, "String performance may slow. Large global table pushed a string out of fast-reach.")
+	
+	|| addr = .GlobAddrSub(nil, exp, dest, k)
+	return .Read(dest, exp, addr, nil, exp.obj as scdecl) * dest
 
 
 helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 	|| T = .TempOnly(src.BasicVec)
 	return exp.VSWZ(T, src, 0) * T
-
 
 
 function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm

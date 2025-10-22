@@ -109,7 +109,6 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			|duration| Delay = 0
 			if !Perry.FinishedStartUp
 				Delay = 0.125s * Perry.WindowNumber
-			debugger
 			spd = SpdProcess.spawn(Proc, f.name, p, mode, delay)
 			if spd
 				spd.pico.name = .project.name
@@ -147,5 +146,5 @@ function PerryIDE.ActualCompile (|string| operation)
 
 target debug
 	cpp_libwrapper Speedie_Main (spdprocess.ThreadAsProcess)
-|| SpdLibAlreadyInUse = true
+|| SpdLibAlreadyInUse = false
 

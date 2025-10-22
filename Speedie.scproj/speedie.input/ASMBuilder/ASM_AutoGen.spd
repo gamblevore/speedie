@@ -609,6 +609,25 @@ datatype ASM_Table (ASM) {
 }
 
 ASM.Forms[25] = &ASM_Table.Encode
+datatype ASM_GObj (ASM) {
+	module {
+		function Encode (ASM_Encoder, ) {
+			visible true
+			|asm| rz = .op|asm| << 24
+			rz.r1 = .prms[0]
+			rz.GObj_Mode = .prms[1]
+			rz.GObj_Ref = .prms[2]
+			rz.GObj_Add = .prms[3]
+			if curr < after {
+				curr++[] = rz
+			}
+
+			return curr
+		}
+	}
+}
+
+ASM.Forms[26] = &ASM_GObj.Encode
 datatype ASM_Read (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -628,7 +647,7 @@ datatype ASM_Read (ASM) {
 	}
 }
 
-ASM.Forms[26] = &ASM_Read.Encode
+ASM.Forms[27] = &ASM_Read.Encode
 datatype ASM_Write (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -648,7 +667,7 @@ datatype ASM_Write (ASM) {
 	}
 }
 
-ASM.Forms[27] = &ASM_Write.Encode
+ASM.Forms[28] = &ASM_Write.Encode
 datatype ASM_MemUtil (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -667,7 +686,7 @@ datatype ASM_MemUtil (ASM) {
 	}
 }
 
-ASM.Forms[28] = &ASM_MemUtil.Encode
+ASM.Forms[29] = &ASM_MemUtil.Encode
 datatype ASM_CNTC (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -687,7 +706,7 @@ datatype ASM_CNTC (ASM) {
 	}
 }
 
-ASM.Forms[29] = &ASM_CNTC.Encode
+ASM.Forms[30] = &ASM_CNTC.Encode
 datatype ASM_BFLD (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -708,7 +727,7 @@ datatype ASM_BFLD (ASM) {
 	}
 }
 
-ASM.Forms[30] = &ASM_BFLD.Encode
+ASM.Forms[31] = &ASM_BFLD.Encode
 datatype ASM_BFLS (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -729,7 +748,7 @@ datatype ASM_BFLS (ASM) {
 	}
 }
 
-ASM.Forms[31] = &ASM_BFLS.Encode
+ASM.Forms[32] = &ASM_BFLS.Encode
 datatype ASM_Convert (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -748,7 +767,7 @@ datatype ASM_Convert (ASM) {
 	}
 }
 
-ASM.Forms[32] = &ASM_Convert.Encode
+ASM.Forms[33] = &ASM_Convert.Encode
 datatype ASM_RET (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -765,7 +784,7 @@ datatype ASM_RET (ASM) {
 	}
 }
 
-ASM.Forms[33] = &ASM_RET.Encode
+ASM.Forms[34] = &ASM_RET.Encode
 datatype ASM_REQ (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -784,7 +803,7 @@ datatype ASM_REQ (ASM) {
 	}
 }
 
-ASM.Forms[34] = &ASM_REQ.Encode
+ASM.Forms[35] = &ASM_REQ.Encode
 datatype ASM_Div (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -805,7 +824,7 @@ datatype ASM_Div (ASM) {
 	}
 }
 
-ASM.Forms[35] = &ASM_Div.Encode
+ASM.Forms[36] = &ASM_Div.Encode
 datatype ASM_Trap (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -822,7 +841,7 @@ datatype ASM_Trap (ASM) {
 	}
 }
 
-ASM.Forms[36] = &ASM_Trap.Encode
+ASM.Forms[37] = &ASM_Trap.Encode
 datatype ASM_Float (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -843,7 +862,7 @@ datatype ASM_Float (ASM) {
 	}
 }
 
-ASM.Forms[37] = &ASM_Float.Encode
+ASM.Forms[38] = &ASM_Float.Encode
 datatype ASM_FloatConst (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -861,7 +880,7 @@ datatype ASM_FloatConst (ASM) {
 	}
 }
 
-ASM.Forms[38] = &ASM_FloatConst.Encode
+ASM.Forms[39] = &ASM_FloatConst.Encode
 datatype ASM_ConstStretchy (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -880,7 +899,7 @@ datatype ASM_ConstStretchy (ASM) {
 	}
 }
 
-ASM.Forms[39] = &ASM_ConstStretchy.Encode
+ASM.Forms[40] = &ASM_ConstStretchy.Encode
 datatype ASM_MemoryCopy (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -898,7 +917,7 @@ datatype ASM_MemoryCopy (ASM) {
 	}
 }
 
-ASM.Forms[40] = &ASM_MemoryCopy.Encode
+ASM.Forms[41] = &ASM_MemoryCopy.Encode
 datatype ASM_AddB (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -915,7 +934,7 @@ datatype ASM_AddB (ASM) {
 	}
 }
 
-ASM.Forms[41] = &ASM_AddB.Encode
+ASM.Forms[42] = &ASM_AddB.Encode
 datatype ASM_AddK (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -933,7 +952,7 @@ datatype ASM_AddK (ASM) {
 	}
 }
 
-ASM.Forms[42] = &ASM_AddK.Encode
+ASM.Forms[43] = &ASM_AddK.Encode
 datatype ASM_AddAK (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -951,7 +970,7 @@ datatype ASM_AddAK (ASM) {
 	}
 }
 
-ASM.Forms[43] = &ASM_AddAK.Encode
+ASM.Forms[44] = &ASM_AddAK.Encode
 datatype ASM_Div2 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -971,7 +990,7 @@ datatype ASM_Div2 (ASM) {
 	}
 }
 
-ASM.Forms[44] = &ASM_Div2.Encode
+ASM.Forms[45] = &ASM_Div2.Encode
 datatype ASM_Shift (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -990,7 +1009,7 @@ datatype ASM_Shift (ASM) {
 	}
 }
 
-ASM.Forms[45] = &ASM_Shift.Encode
+ASM.Forms[46] = &ASM_Shift.Encode
 datatype ASM_Swap (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1010,7 +1029,7 @@ datatype ASM_Swap (ASM) {
 	}
 }
 
-ASM.Forms[46] = &ASM_Swap.Encode
+ASM.Forms[47] = &ASM_Swap.Encode
 datatype ASM_RefSet1 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1028,7 +1047,7 @@ datatype ASM_RefSet1 (ASM) {
 	}
 }
 
-ASM.Forms[47] = &ASM_RefSet1.Encode
+ASM.Forms[48] = &ASM_RefSet1.Encode
 datatype ASM_RefReturn (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1048,7 +1067,7 @@ datatype ASM_RefReturn (ASM) {
 	}
 }
 
-ASM.Forms[48] = &ASM_RefReturn.Encode
+ASM.Forms[49] = &ASM_RefReturn.Encode
 datatype ASM_RefSetApart (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1067,7 +1086,7 @@ datatype ASM_RefSetApart (ASM) {
 	}
 }
 
-ASM.Forms[49] = &ASM_RefSetApart.Encode
+ASM.Forms[50] = &ASM_RefSetApart.Encode
 datatype ASM_RefSet2 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1086,7 +1105,7 @@ datatype ASM_RefSet2 (ASM) {
 	}
 }
 
-ASM.Forms[50] = &ASM_RefSet2.Encode
+ASM.Forms[51] = &ASM_RefSet2.Encode
 datatype ASM_RefSet3 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1105,7 +1124,7 @@ datatype ASM_RefSet3 (ASM) {
 	}
 }
 
-ASM.Forms[51] = &ASM_RefSet3.Encode
+ASM.Forms[52] = &ASM_RefSet3.Encode
 datatype ASM_RefDecrMem (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1123,7 +1142,7 @@ datatype ASM_RefDecrMem (ASM) {
 	}
 }
 
-ASM.Forms[52] = &ASM_RefDecrMem.Encode
+ASM.Forms[53] = &ASM_RefDecrMem.Encode
 datatype ASM_VecMix (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1144,7 +1163,7 @@ datatype ASM_VecMix (ASM) {
 	}
 }
 
-ASM.Forms[53] = &ASM_VecMix.Encode
+ASM.Forms[54] = &ASM_VecMix.Encode
 datatype ASM_VecGet (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1164,7 +1183,7 @@ datatype ASM_VecGet (ASM) {
 	}
 }
 
-ASM.Forms[54] = &ASM_VecGet.Encode
+ASM.Forms[55] = &ASM_VecGet.Encode
 datatype ASM_VecSet (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1184,7 +1203,7 @@ datatype ASM_VecSet (ASM) {
 	}
 }
 
-ASM.Forms[55] = &ASM_VecSet.Encode
+ASM.Forms[56] = &ASM_VecSet.Encode
 datatype ASM_VecBuild (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1204,7 +1223,7 @@ datatype ASM_VecBuild (ASM) {
 	}
 }
 
-ASM.Forms[56] = &ASM_VecBuild.Encode
+ASM.Forms[57] = &ASM_VecBuild.Encode
 datatype ASM_VecSwizzle (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1223,7 +1242,7 @@ datatype ASM_VecSwizzle (ASM) {
 	}
 }
 
-ASM.Forms[57] = &ASM_VecSwizzle.Encode
+ASM.Forms[58] = &ASM_VecSwizzle.Encode
 datatype ASM_VecConst (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1245,7 +1264,7 @@ datatype ASM_VecConst (ASM) {
 	}
 }
 
-ASM.Forms[58] = &ASM_VecConst.Encode
+ASM.Forms[59] = &ASM_VecConst.Encode
 datatype ASM_VecInc (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1264,4 +1283,4 @@ datatype ASM_VecInc (ASM) {
 	}
 }
 
-ASM.Forms[59] = &ASM_VecInc.Encode
+ASM.Forms[60] = &ASM_VecInc.Encode

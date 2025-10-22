@@ -375,15 +375,13 @@ function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 }
 
 
-function message.BFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
+function message.BFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BFLS, self)
-	rz.reginput(0) = r1
 	rz.reginput(1) = r2
-	rz.numinput(2) = up
-	rz.numinput(3) = down
-	rz.numinput(4) = sign
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
 	rz.dest(0, r1, a)
 }
 
@@ -778,12 +776,13 @@ function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.GOBJ (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
+function message.GOBJ (|asmreg| r1 = nil, |int| Mode = nil, |int| Ref = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.GOBJ, self)
 	rz.numinput(1) = Mode
-	rz.numinput(2) = Add
+	rz.numinput(2) = Ref
+	rz.numinput(3) = Add
 	rz.dest(0, r1, a)
 }
 

@@ -43,12 +43,7 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
 	(dest isnt AddrRequest)
 	|| T = dest.µtype
-	|| byte_shift = t.ByteCount
-	target debug
-		if decl and (byte_shift < 1 or byte_shift > 16)
-		
-	byte_shift = byte_shift.log2
-	
+	|| byte_shift = t.ByteCount.log2	
 	if  (byte_shift|uint| > 4)
 		error (exp, "Object to large to access")				// can we do struct-mem-copy?
 		byte_shift = 0
@@ -68,9 +63,9 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		if (bs isa asm.gtab)
 			if Compiler is Hungry
 				(decl! is UsedByASM)
-			|| K = bs.Const + ((index-1) << Byte_Shift)
-			if K <= 18~bits
-				return exp.GOBJ(dest, 0, K)
+			|| K = (bs.Const << 6) + ((index-1) << 3) // gtab is in terms of 64-bytes.
+			if K <= 20~bits
+				return exp.GOBJ(dest, decl.islib, 0, K>>3)
 
 	|| op = ASMType.WriteASM[byte_shift]
 	if dest is set
@@ -122,8 +117,8 @@ function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |u
 
 function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, |asmreg|)
 	opt norefcounts
-	if base is addrnofiddle
-		return base asnt asmreg.addrnofiddle
+	if base is AddrNoFiddle
+		return base asnt ASMReg.AddrNoFiddle
 	|uint| maximum = (1 << maxbits) - 1
 	|int64| LostBytes = 0
 	
@@ -138,19 +133,17 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 	if i <= maximum|int|
 		index = i
 		return base
-
-													// Too large to inline. increase via addtoreg				
-	i = (index << pow2) + lostbytes
+															// Too large to inline. increase via addtoreg				
+	i = (index << pow2) + LostBytes
 	index = 0
-	return .AddToReg(exp, base, base as asmreg.noscale, i)
+	return .AddToReg(exp, base, base as ASMReg.NoScale, i)
 
 
 
 function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadDecl, |int| index=0,  |&fatasm|)
 	opt inline
 	(dest isnt set)
-	if (0)
-		.Dummy(exp)
+	if 0: .Dummy(exp)
 	return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
 
 
@@ -184,8 +177,6 @@ function scdecl.CanCopyNormally (|bool|)
 	|| i = .Internal
 	if i and i.IsBareStruct
 		return false
-// seems simpler to use a memory copy instruction.
-// why not?
 //		|| s = i.calculatesize
 //		return (s <= 16) and s.IsPow2
 	return true

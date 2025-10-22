@@ -1,8 +1,7 @@
 
 
 /*	
-Here is the approach we will use:
-	"Pre-compile... analyse, then rewind""
+* Here is the approach we will use: "Pre-compile... analyse, then rewind""
 	* Can be sped up by making it more complex to avoid stuff.
 */
 
@@ -51,17 +50,24 @@ function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
 				return OK
 
 
+function scdecl.IsLib (|int|)
+	return (self Is Library)|int|
+
+
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	
 	dest = .temptyped(d, dest)
 	|| Glob = .TryGetGlob(D, dest)
 		return Glob
+	return .GlobAddrSub(d, exp, dest, d.exportposition)
+
 	
-	|int64| Original = d.ExportPosition
+function GlobAddrSub (|SCDecl?| D2, |message| exp, |AsmReg| Dest, |int64| Original,   |asmreg|)
+	opt norefcounts
 	check (Original <= 32~bits)				(exp, "Too much global data used: " + original.strsize)
 	if !Original							// What?
-	if  dest isnt AddrNoFiddle  and  d isnt ClassObj  and  d isnt Library
+	if  dest isnt AddrNoFiddle  and  d2 isnt ClassObj  and  d2 isnt Library
 		Original &= ~63
 	
 	|| Direct = Original & 18~bits
@@ -69,12 +75,12 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr
 
-	|| fat = exp.GTAB(dest,  (d Is Library)|int|,  Direct)
+	|| fat = exp.GTAB(dest,  d2.islib,  Direct)
 	fat.Const = Direct
 	rz = fat * dest
 	
 	|| Missing = Original - Direct
-		check (d isnt library) (exp, "Lib too big!") // should never happen!
+		check (fat.r1) (exp, "Lib too big!") // should never happen!
 		if missing >= 4096
 			fat = exp.ADDB(dest, missing >> 12)
 			fat.const = Direct + ((missing >> 12) << 12)

@@ -125,6 +125,13 @@ forms
 		r1		R
 		Mode	1
 		Add		l
+
+	
+	GObj
+		r1		R
+		Mode	1
+		Ref		1
+		Add		l
 	
 	Read
 		r1		R	// dest (big r!)
@@ -597,7 +604,7 @@ POS 5
 
 
 #!						(((((Memory)))))
-/**/ GOBJ  (table)
+/**/ GOBJ  (GObj)
 		o1 = strs(vm, Op)
 /**/ GTAB  (table)
 		u1 = table(vm, Op)

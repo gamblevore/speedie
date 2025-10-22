@@ -21,7 +21,7 @@ function compiler.PrintCompileTime (|date| durr)
 	packmaker.LibGlobSize.strsize(fs)
 	if packmaker.PackGlobs
 		fs <~ ", app "
-		packmaker.PackGlobSize.strsize(fs)
+		packmaker.PackGlobSize.StrSize(fs)
 
 	
 	|| vm_ops = VM_Builder.Total
