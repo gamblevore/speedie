@@ -2197,3 +2197,5 @@
 "̖̗̘̙̜̝̞̟̠̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼͇͈͉͍͎͓͔͕͖͙͚̣ͅ"
 "codesign_osx"
 "\";\n\nJB_Globals JB__;\n"
+"gobj"
+"String performance may slow. Large global table pushed a string out of fast-reach."
