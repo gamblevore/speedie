@@ -47,8 +47,6 @@ function TheTrinity (|message| out, |message| Prms, |asmreg| dest, |byte| OpCode
 
 function Trinometer (|message| s, |message| Prms, |&ASMReg| Collection, |int| i, |&uint| Prev)
 	opt norefcounts
-	// how to do this... so that we don't run things twice.
-	// mark the object. How? Or some kind of thing
 	|| n = s.name
 	|| n1 = n[].lowercase
 	if n1.IsInt
