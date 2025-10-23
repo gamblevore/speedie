@@ -630,8 +630,10 @@ struct PicoComms : PicoConfig {
 	
 	void pclose (int S) {
 		if (S <= 2 and !(ExecFlags&PicoExecForked))
-			Say("Closed STD", "", S);
-		close(S);
+			Say("Closed STD", "", S);	// not sure where why or how this is happening ;_; should I log this?
+										// how? 
+		  else
+			close(S);
 	}
 	
 	int GiveUp (int* Socks) {
