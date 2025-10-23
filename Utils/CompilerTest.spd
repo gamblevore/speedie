@@ -1,6 +1,7 @@
 #!/usr/local/bin/spd
 
 || Fails = faststring()
+|| Speedie = "/usr/local/bin/spd"
 
 main (|[string]| Files)
 	if !files
@@ -13,22 +14,20 @@ main (|[string]| Files)
 	
 	""
 	for f in files.GlobExpand 
-		app.TryCompileOne(f)
+		app.TryCompileOne(f, f.TrimStart(app.cwd))
  
 	if Fails.length
 		app.say("$fails Failiures")
 	  else
-		app.say("All OK")
+		app.say("// All OK")
 
 
-function app.TryCompileOne (|file| f)
+function app.TryCompileOne (|file| f, |string| s)
 	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
-	|| M = ProcessMode.StdOutSilence
-	|| Speedie = "/usr/local/bin/spd"
-	
-	if Speedie.Execute(args, M).Successful
-		printline f
-		printline "spd $f --nocompile --silent --check --target=ForBatchTest" // useful for me to run from the command-line to debug Pico
+	if Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
+		fails <~ "Fail: $s\n"
+	  elseif app.yes("q")
+		printline "spd $s --nocompile --silent --check --target=ForBatchTest"
 	  else
-		fails <~ "Fail: $f\n"
+		printline s
 
