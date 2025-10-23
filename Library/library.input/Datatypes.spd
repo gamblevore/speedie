@@ -108,12 +108,14 @@ datatype int
 		return other
 	
 	function CountBits (|int|)
+		asm BSTT(dest, p1, 1)
 		cpp_wrapper JB_Int_CountBits
 
 	function HighestBit (|int|) // highbit 
 		disabled "use .log2"
 
 	function Log2 (|int|)
+		asm BSTT(dest, p1, 3)
 		cpp_wrapper JB_Int_Log2
 
 	function Log2P (|int|)
@@ -279,7 +281,7 @@ datatype uint
 	
 	function SwapEndian (|uint|)
 		cpp_wrapper (__builtin_bswap32)
-		asm BSTT(dest, p1, 0)
+		asm BSTT(dest, p1, 5)
 
 	operator max (|uint| other, |uint|)
 		asm uclm(dest, p1, p2, p1, 1)
@@ -793,12 +795,17 @@ datatype uint64
 		return s
 	
 	function Log2 (|int64|)
+		asm BSTT(dest, p1, 2)
 		cpp_wrapper JB_u64_Log2
 
 	function CountBits (|int|)
+		asm BSTT(dest, p1, 0)
 		cpp_Wrapper (__builtin_popcountll)
-		asm BSTT(dest, p1, 1)
-
+	
+	function ByteSwap (|uint64|)
+		asm BSTT(dest, p1, 4)
+		cpp_wrapper (__builtin_bswap64)
+		
 //	operator rol (|uint| bits, |uint64|)
 //		bits &= 63
 //		return ((self << bits) ||| (self >> (64 - bits)))

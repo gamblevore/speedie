@@ -127,10 +127,16 @@ AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
 		return __builtin_popcountll(R2); 
 	if (Mode == 1)							// popcount
 		return __builtin_popcount((u32)R2); 
+		
 	if (Mode == 2)							// msb
 		return JB_u64_Log2(R2);
 	if (Mode == 3)							// msb
 		return (uint)JB_u32_Log2(R2);
+	
+	if (Mode == 4)							// byte_swap
+		return __builtin_bswap64(R2);
+	if (Mode == 5)							// byte_swap
+		return (uint)__builtin_bswap32(R2);
 	return 0;
 }
 
