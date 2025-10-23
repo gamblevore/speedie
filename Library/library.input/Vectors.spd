@@ -27,7 +27,7 @@ datatype vec4
 		cpp_wrapper JB_Vec4_Clamp
 	
 	
-	function abs (|vec4|)
+	function Abs (|vec4|)
 		return (.x.abs, .y.abs, .z.abs, .w.abs)
 	
 	function IsPositive (|bool|)

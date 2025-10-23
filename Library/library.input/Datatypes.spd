@@ -699,7 +699,9 @@ datatype int64
 		return self
 		
 	function Abs (|int64|)
-		return (-self,self)(self < 0)
+		if self < 0
+			self = -self
+		return self
 
 	operator rotl (|int| Amount, |int64|)
 		return (self|uint64|) rotl amount

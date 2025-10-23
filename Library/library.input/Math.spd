@@ -59,10 +59,9 @@ extend int
 		return self
 	
 	function Abs (|int|)
-		cpp_wrapper (abs)
-//		if self < 0
-//			return -self
-//		return self
+		if self < 0
+			self = -self
+		return self
 	
 	function Sqrt (|int|)
 		return (self|Float64|.sqrt)|int|

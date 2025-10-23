@@ -415,7 +415,9 @@ function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsC
 		if isclass
 			expect (.parent istmp "linkage")   (ch, "Put this inside a 'Linkage' tag.")
 		Return ch
-	place[@thg]
+	|| node = place[@thg, @list]
+	if node == @list
+		intrinsics.codes <~ node
 
 
 function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsClass,  |Message|)

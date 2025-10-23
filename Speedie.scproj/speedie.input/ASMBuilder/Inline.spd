@@ -220,62 +220,6 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 	rz = rz.ExpectSameType(dest)
 	if !rz.reg
 		(rz is const) // make compiler happy
-
-
-
-function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
-	opt norefcounts
-	|| name = trin[@thg]
-	trin = name.next(@prm)$
-	|| op = instruction[name!]$
-	
-	|| form = op.Sizes
-	expect (trin.HasChildCount(form.Count))    				(trin, "Expected paramcount: " + form.Count.render)
-	return .TheTrinity(trin, where.last, dest, op.opcode)
-
-
-
-function TheTrinity (|message| out, |message| Prms, |asmreg| dest, |byte| OpCode, |asmreg|)
-	opt norefcounts
-	|| n = 0
-	|asmreg[8]| Collection
-	for s.fast in out
-		Collection[n++] = .Trinometer(s, prms)
-
-	|| fat = .RequestOp(OpCode, prms.parent!)
-	|| DestPos = -1
-	for i in n
-		|| R = Collection[i]
-		if R is Textual
-			fat.RegInput(i) = R asnt asmreg.Textual
-		  elseif R
-			fat.NumInput(i) = R|int|
-		  else
-			destpos = i
-	if destpos >= 0
-		fat.Dest(destpos, dest, self)	
-	return fat*dest
-		
-	
-
-function Trinometer (|message| s, |message| prms, |asmreg|)
-	opt norefcounts
-	|| n = s.name
-	|| n1 = n[].lowercase
-	if n1.IsInt
-		return s.int|asmreg| as asmreg.const
-
-	s.expect(@thg)
-	require !(n ~= "dest")
-	expect (n1 == 'p') (s)
-	
-	rz = asmreg()
-	|| l = s.Int(1, 0, 31)
-		|| ref = Prms[l-1]						#expect (s, "Can't find this register")
-		rz = .µTrin(ref)
-	rz = rz as asmreg.textual
-	
-
 	
 
 }

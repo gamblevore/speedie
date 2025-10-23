@@ -123,19 +123,22 @@ AlwaysInline void LoadConst (VMRegister* r, ASM Op, uint64 Value) {
 
 
 AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
-	if (Mode == 0)							// popcount
+					// popcount //
+	if (Mode == 0)
 		return __builtin_popcountll(R2); 
-	if (Mode == 1)							// popcount
+	if (Mode == 1)
 		return __builtin_popcount((u32)R2); 
 		
-	if (Mode == 2)							// msb
+					// msb //
+	if (Mode == 2)
 		return JB_u64_Log2(R2);
-	if (Mode == 3)							// msb
+	if (Mode == 3)
 		return (uint)JB_u32_Log2(R2);
 	
-	if (Mode == 4)							// byte_swap
+				// byte_swap //
+	if (Mode == 4)
 		return __builtin_bswap64(R2);
-	if (Mode == 5)							// byte_swap
+	if (Mode == 5)
 		return (uint)__builtin_bswap32(R2);
 	return 0;
 }
