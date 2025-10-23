@@ -664,7 +664,7 @@ POS 5
 #!						(((((Float)))))
 
 /**/ FADD  (Float)
-		if (Float_Du)
+		if (!Float_Du)
 			d1 = d2 + d3 - d4
 		else
 			f1 = f2 + f3 - f4
@@ -674,7 +674,7 @@ POS 5
 		f1 += f2 + FloatIncr1(Op)
 
 /**/ FMUL  (Float)
-		if (Float_Du)
+		if (!Float_Du)
 			d1 = (d2 * d3)+d4
 		else
 			f1 = (f2 * f3)+f4
@@ -683,19 +683,19 @@ POS 5
 		f1 = f2 * FloatIncr1(Op)
 
 /**/ FDIV  (float)
-		if (Float_Du)
+		if (!Float_Du)
 			d1 = d2 / d3
 		else
 			f1 = f2 / f3
 
 /**/ FFRC  (Float)
-		if (Float_Du)
+		if (!Float_Du)
 			d1 = (d2 - floor(d2)) * d3
 		else
 			f1 = (f2 - floor(f2)) * f3
 
 /**/ FCLM (Float)
-		if (Float_Du)
+		if (!Float_Du)
 			d1 = std_clamp(d2,d3,d4)
 		else
 			f1 = std_clamp(f2,f3,f4)
@@ -790,8 +790,6 @@ POS 5
 // shouldn't these all go into the same thing?
 /**/ FOPP  (Float)
 		0
-/**/ IOP2  (u3)
-		0
-/**/ BSTT  (U4)
-		i1 = 0 // bitstats(u2, u3, u4)
+/**/ BSTT  (addk)
+		u1 = bitstats(u2, U2_Li)
 

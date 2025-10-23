@@ -1,0 +1,21 @@
+#!/usr/local/bin/spd
+
+
+// seems to work fine!
+function app.TestUsingClampForMax
+	|int| MaxFail
+	|int| MinFail
+	for i in -1000 to 1000
+		for j in -1000 to 1000
+			|| x = i min (j)
+			|| y = i max (j)
+			if i == 1 and j == 2	// "\n$i vs $j --> ($x,$y)"
+			MinFail += x!=i.clamp(i,j) // min
+			MaxFail += y!=i.clamp(j,i) // max
+	
+	"\nMinFail: $MinFail\nMaxFail: $MaxFail"
+
+
+main
+	.TestUsingClampForMax
+	

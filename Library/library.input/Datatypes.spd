@@ -93,18 +93,19 @@ datatype int
 		cpp_part RenderZeros
 		fs.appendintegerastext(self, zeros)
 	
-	operator Min (|int| other, |int|)
-		if self < other: return self
-		return other
-
 	operator AbsMin (|uint| Limit, |int|)
 		if .abs|uint| < Limit: return self
 		return Limit|int|.setsign(self<0)
 
-	operator Max (|int| other, |int|)
-		if self > other: return self ////
+	operator Min (|int| other, |int|)
+		asm iclm(dest, p1, p1, p2, 1)
+		if self < other: return self
 		return other
 
+	operator Max (|int| other, |int|)
+		asm iclm(dest, p1, p2, p1, 1)
+		if self > other: return self ////
+		return other
 	
 	function CountBits (|int|)
 		cpp_wrapper JB_Int_CountBits
@@ -277,13 +278,16 @@ datatype uint
 		cpp_wrapper JB_uint_unhash 
 	
 	function SwapEndian (|uint|)
-		cpp_Wrapper (__builtin_bswap32)
+		cpp_wrapper (__builtin_bswap32)
+		asm BSTT(dest, p1, 0)
 
 	operator max (|uint| other, |uint|)
+		asm uclm(dest, p1, p2, p1, 1)
 		if (self > other) { return self }
 		return other
 	
 	operator Min (|uint| other, |uint|)
+		asm uclm(dest, p1, p1, p2, 1)
 		if self < other: return self
 		return other
 
@@ -407,19 +411,19 @@ datatype float
 		fs <~ "%"
 
 	function cos (|float|)
-		return math.cospi(self*2.0)
+		return math.cospihalf(self*2.0)
 		
 	function exp2 (|float|)
 		return 2.0 pow self
 
 	function Acos (|float|)
-		return math.acosbad(self) * math.iTau
+		return math.acoshalf(self) * math.iTau
 		
 	function Sin (|float|)
-		return math.sinpi(self*2.0)
+		return math.sinpihalf(self*2.0)
 
 	function tan (|float|)
-		return math.TanPi(self*2.0)
+		return math.TanPihalf(self*2.0)
 
 	helper __sincospi (|$float| A, |$float| B)
 		cpp_wrapper (__sincospif)
@@ -442,7 +446,10 @@ datatype float
 		cpp_wrapper JB_F64_Exponent
 	
 	function Floor (|float|)
-		cpp_wrapper (floorf)
+		target debug2
+			cpp_wrapper (floorf, 1)
+		  else
+			cpp_wrapper (floorf)
 
 	function AsInt (|int|)
 		cpp_wrapper
@@ -542,15 +549,17 @@ datatype float
 		return t * t * (3.0 - 2.0 * t)
 
 	operator max (|float| other, |float|)
+		asm fclm(dest, p1, p2, p1, 1)
 		cpp_wrapper (fmaxf)
+
+	operator min (|float| other, |float|)
+		asm fclm(dest, p1, p1, p2, 1)
+		cpp_wrapper (fminf)
 
 	operator longer (|float| other, |float|)
 		if .length > other.length
 			return self
 		return other
-
-	operator min (|float| other, |float|)
-		cpp_wrapper (fminf)
 
 	operator pow (|float| other, |float|)
 		cpp_wrapper (powf)
@@ -615,9 +624,11 @@ datatype f64
 		cpp_wrapper (fabs)
 
 	operator max (|Float64| other, |Float64|)
+		asm fclm(dest, p1, p2, p1, 0)
 		cpp_wrapper (fmax)
 
 	operator min (|Float64| other, |Float64|)
+		asm fclm(dest, p1, p1, p2, 0)
 		cpp_wrapper (fmin)
 
 	render (|int| dp=6)
@@ -674,10 +685,13 @@ datatype int64
 		return !(self mod n)
 
 	operator max (|int64| d, |int64|)
+		asm iclm(dest, p1, p2, p1, 0)
 		if d > self
 			return d
 		return self
+
 	operator min (|int64| d, |int64|)
+		asm iclm(dest, p1, p1, p2, 0)
 		if d < self
 			return d
 		return self
@@ -767,16 +781,14 @@ datatype uint64
 	
 	function Low (|uint|)
 		return self
-	
-//	syntax cast (|bool|)
-//		return self|bool|
 		
 	operator max (|uint64| s, |uint64|)
+		asm uclm(dest, p1, p2, p1, 0)
 		if self > s: return self
 		return s
-	
 		
 	operator min (|uint64| s, |uint64|)
+		asm uclm(dest, p1, p1, p2, 0)
 		if self < s: return self
 		return s
 	
@@ -785,6 +797,7 @@ datatype uint64
 
 	function CountBits (|int|)
 		cpp_Wrapper (__builtin_popcountll)
+		asm BSTT(dest, p1, 1)
 
 //	operator rol (|uint| bits, |uint64|)
 //		bits &= 63

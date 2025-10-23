@@ -221,7 +221,7 @@
 ı WCPY: _
 	MemCopyRDWR(r, Op);
 ı FADD: _
-	if (Float_Du)
+	if (!Float_Du)
 	d1 = d2 + d3 - d4
 ;
 	else
@@ -230,7 +230,7 @@
 ı FADK: _
 	f1 += f2 + FloatIncr1(Op);
 ı FMUL: _
-	if (Float_Du)
+	if (!Float_Du)
 	d1 = (d2 * d3) + d4
 ;
 	else
@@ -239,21 +239,21 @@
 ı FMLK: _
 	f1 = f2 * FloatIncr1(Op);
 ı FDIV: _
-	if (Float_Du)
+	if (!Float_Du)
 	d1 = d2 / d3
 ;
 	else
 	f1 = f2 / f3
 ;
 ı FFRC: _
-	if (Float_Du)
+	if (!Float_Du)
 	d1 = (d2 - floor(d2)) * d3
 ;
 	else
 	f1 = (f2 - floor(f2)) * f3
 ;
 ı FCLM: _
-	if (Float_Du)
+	if (!Float_Du)
 	d1 = std_clamp(d2, d3, d4)
 ;
 	else
@@ -321,9 +321,7 @@
 	VecConv(r, Op);
 ı FOPP: _
 	0;
-ı IOP2: _
-	0;
 ı BSTT: _
-	i1 = 0;
+	u1 = bitstats(u2, U2_Li);
 ı 
 

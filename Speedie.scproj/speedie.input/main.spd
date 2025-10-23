@@ -3,9 +3,11 @@
 	Speedie. By Theodore H. Smith.  Licence available in licence.txt
 */
 
+import "/usr/local/speedie/Examples/clamp.spd"
 
 
 main // main {
+	.abc
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile

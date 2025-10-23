@@ -1404,23 +1404,12 @@ function message.FOPP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.IOP2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.IOP2, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.dest(0, r1, a)
-}
-
-
-function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BSTT, self)
 	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
+	rz.numinput(2) = K
 	rz.dest(0, r1, a)
 }
 

@@ -126,8 +126,7 @@ extend_module ASM {
 		QNOT = 146
 		QCNV = 147
 		FOPP = 148
-		IOP2 = 149
-		BSTT = 150
+		BSTT = 149
 	}
 }
 

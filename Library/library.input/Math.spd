@@ -15,19 +15,19 @@ module Math
 	function Pi (|float|)
 		disabled "Use π for pi, or 2π for PI*2"
 
-	helper ACosBad (|float| f, |float|)
+	helper ACosHalf (|float| f, |float|)
 		cpp_wrapper (acosf)
 
-	helper ATan2Bad (|float| f1, |float| f2, |float|)
+	helper ATan2Half (|float| f1, |float| f2, |float|)
 		cpp_wrapper (atan2f)
 	
-	helper CosPi (|float| f, |float|)
+	helper CosPiHalf (|float| f, |float|)
 		cpp_wrapper (__cospif)
 
-	helper TanPi (|float| f, |float|)
+	helper TanPiHalf (|float| f, |float|)
 		cpp_wrapper (__tanpif)
 	
-	helper SinPi (|float| f, |float|)
+	helper SinPiHalf (|float| f, |float|)
 		cpp_wrapper (__sinpif)
 
 
@@ -153,7 +153,7 @@ extend ivec2
 
 extend f64
 	function Clamp (|f64| Low, |f64| High, |f64|)
-		asm fclm(dest, p1, p2, p3, 1)
+		asm fclm(dest, p1, p2, p3, 0)
 		if self < low
 			self = low
 		  elseif self > high
@@ -180,7 +180,7 @@ extend float
 
 		
 	function ATan2 (|float| y, |float|)
-		rz = -math.ATan2Bad(self, y)				   // our result is +-pi, but we want 0-1...
+		rz = -math.ATan2Half(self, y)				   // our result is +-pi, but we want 0-1...
 		rz *= math.iTau
 		if rz < 0.0
 			rz ++
@@ -194,7 +194,7 @@ extend float
 	
 	function Clamp (|float| L, |float| H, |float|)
 		cpp_wrapper JB_f_Clamp
-		asm fclm(dest, p1, p2, p3, 0)
+		asm fclm(dest, p1, p2, p3, 1)
 	
 	function Clamp (|float|H=1.0, |float|)
 		return .clamp(0,h)

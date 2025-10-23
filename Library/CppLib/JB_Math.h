@@ -99,10 +99,30 @@ extern "C" {
 #include <algorithm>
 template <typename T>
 constexpr T std_clamp(T v, T lo, T hi) {
-	v = std::max(v, lo);
-	hi = std::max(hi, lo); // need second max! VM uses "creative ranges".
-	return std::min(v, hi);
+	if (v < lo)
+		return lo;
+	if (v > hi)
+		return hi;
+	return v;
 }
+
+/*
+constexpr T std_clamp(T v, T lo, T hi) {
+	if (v == hi)
+		return std::max(v,lo);
+	if (v==lo)
+		return std::min(v,hi);
+		
+		
+	if (v < lo)
+		return lo;
+	if (v > hi)
+		return hi;
+	return v;
+}
+*/
+
+
 
 
 #endif
