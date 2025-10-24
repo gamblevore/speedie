@@ -1416,8 +1416,6 @@ JBClass ( SCModule , SCBetterNode ,
 JBClass ( ParserCallBack , JB_Task , 
 	InputStream* Upon;
 );
-extern int SC__ASMExamples_Bolg;
-extern int SC__ASMExamples_Glob;
 #define JB__App__Conf JB__.App__Conf
 #define JB__App__OldArgs JB__.App__OldArgs
 #define JB__App__Path JB__.App__Path
@@ -1445,7 +1443,6 @@ extern Message* SC__Comp_ConstantsList;
 extern int SC__Comp_CurrStage;
 extern Array* SC__Comp_DeclConstants;
 extern SCModule* SC__Comp_DisamClasses;
-extern SCModule* SC__Comp_DisamGlobals;
 extern SCModule* SC__Comp_DisamModules;
 extern byte SC__Comp_During;
 extern Dictionary* SC__Comp_ExportNames;
@@ -1523,18 +1520,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2192])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2197])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2193])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2198])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2194])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2199])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2191])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2196])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2194])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2199])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2195])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2200])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1557,6 +1554,8 @@ extern int SC__AC_max_total;
 extern SCObject* SC__AC_OrigFn;
 extern JB_String* SC__AC_TestCrash;
 extern int SC__AC_total;
+extern Array* SC__Intrinsics_Floats;
+extern Array* SC__Intrinsics_Vectors;
 #define JB__API_NilHappened_ JB__.API_NilHappened_
 #define JB__Constants__FuncArray JB__.Constants__FuncArray
 #define JB__Constants__SyxDict JB__.Constants__SyxDict
@@ -1765,7 +1764,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2200])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2205])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1802,7 +1801,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2196])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2201])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1842,7 +1841,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2201])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2206])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2074,12 +2073,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2199])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2204])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2198])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2203])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2197])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2202])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2141,7 +2140,7 @@ extern SCClass* SC_TypeWrapper;
 
 #define kSC__ASM_BRSS ((ASM)61)
 
-#define kSC__ASM_BSTT ((ASM)150)
+#define kSC__ASM_BSTT ((ASM)149)
 
 #define kSC__ASM_BXOR ((ASM)66)
 
@@ -2204,8 +2203,6 @@ extern ASM_Encoder SC__ASM_Forms[128];
 #define kSC__ASM_GTAB ((ASM)95)
 
 #define kSC__ASM_ICLM ((ASM)53)
-
-#define kSC__ASM_IOP2 ((ASM)149)
 
 #define kSC__ASM_JBAN ((ASM)85)
 
@@ -3198,7 +3195,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2190])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2195])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3373,11 +3370,6 @@ extern JB_Globals JB__;
 
 
 //// HEADER JB.h
-
-
-
-// ASMExamples
-int SC_ASMExamples__Init_();
 
 
 
@@ -3906,6 +3898,19 @@ Message* SC_AC__TmpAutoComplete(Message* F, JB_String* Name, JB_String* Type);
 Message* SC_AC__UnusedStuff(Message* Cmd);
 
 Message* SC_AC__WriteError(JB_String* Name);
+
+
+
+// Intrinsics
+int SC_Intrinsics__Init_();
+
+void SC_Intrinsics__Process();
+
+int SC_Intrinsics__ProcessTrin(FastString* Fs, Array* Codes);
+
+void SC_Intrinsics__PullOutVecs();
+
+SortComparison SC_Intrinsics__TrinSort(Message* Self, Message* B);
 
 
 
@@ -4573,6 +4578,8 @@ bool SC_FuncPreReader_description(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_disabled(SCFunction* Self, Message* Msg);
 
+bool SC_FuncPreReader_intrinsic(SCFunction* Self, Message* Msg);
+
 bool SC_FuncPreReader_nil(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_numeric(SCFunction* Self, Message* Msg);
@@ -5060,6 +5067,8 @@ bool JB_byte_IsWhite(uint /*byte*/ Self);
 
 byte JB_byte_LowerCase(uint /*byte*/ Self);
 
+bool JB_byte_OperatorEq(uint /*byte*/ Self, uint /*byte*/ B);
+
 JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in);
 
 int64 JB_byte_SuffixSize(uint /*byte*/ Self);
@@ -5140,6 +5149,8 @@ int64 JB_int64_Abs(int64 Self);
 bool SC_int64_CanStoreAsAddK(int64 Self);
 
 bool SC_int64_Fits(int64 Self, int Amount, bool Signed);
+
+bool JB_int64_IsPow2(int64 Self);
 
 int64 JB_int64_Log2(int64 Self);
 
@@ -6301,6 +6312,8 @@ float JB_Duration_Float(JB_Duration Self);
 
 
 // JB_ASMState
+void SC_ASMState_Destructor(ASMState* Self);
+
 
 
 // JB_ArchonPurger
@@ -6552,6 +6565,8 @@ void SC_FAT_DebugSet(FatASM* Self, Message* Value);
 void SC_FAT_DebugPrint(FatASM* Self);
 
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh);
+
+void SC_FAT_Destructor(FatASM* Self);
 
 bool SC_FAT_Exists(FatASM* Self);
 
@@ -6973,6 +6988,8 @@ void SC_Pac_Decr(Assembler* Self, FatASM* F, bool Soft, int Depth);
 
 ASMReg SC_Pac_DecrObj(Assembler* Self);
 
+void SC_Pac_Destructor(Assembler* Self);
+
 ASMReg SC_Pac_DivFloat(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_Divide(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -7001,6 +7018,8 @@ ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M);
 
 ASMReg SC_Pac_Exit(Assembler* Self, Message* Exp, ASMReg Dest);
 
+Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* Prms, int N);
+
 void SC_Pac_FinishASM(Assembler* Self);
 
 ASMReg SC_Pac_FinishSingleIf(Assembler* Self, FatRange* B);
@@ -7014,6 +7033,8 @@ SCFunction* SC_Pac_fn(Assembler* Self);
 int SC_Pac_FnLength(Assembler* Self);
 
 bool SC_Pac_FoundReg(Assembler* Self, Message* All, int R);
+
+void SC_Pac_Fries(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* S, int I, int MaxParam);
 
 FatASM* SC_Pac_FuncStart(Assembler* Self);
 
@@ -7221,9 +7242,7 @@ ASMReg SC_Pac_Ternary(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_TernRefCount(Assembler* Self, ASMReg A, ASMReg B);
 
-ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* Out, Message* Prms, ASMReg Dest, uint /*byte*/ OpCode);
-
-ASMReg SC_Pac_Trinometer(Assembler* Self, Message* S, Message* Prms);
+ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* SrcPrms, Message* ASMPrms, ASMReg Dest, uint /*byte*/ OpCode);
 
 ASMReg SC_Pac_TryGetGlob(Assembler* Self, SCDecl* D, ASMReg Mode);
 
@@ -8529,6 +8548,8 @@ JB_String* JB_Str_OperatorMul(JB_String* Self, int N);
 
 JB_String* JB_Str_OperatorPlusWithCstring(JB_String* Self, _cstring C);
 
+JB_String* JB_Str_OperatorPlusWithInt(JB_String* Self, int I);
+
 bool JB_Str_OperatorStarts(JB_String* Self, JB_String* S);
 
 bool SC_Str_OptionBool(JB_String* Self);
@@ -8710,6 +8731,8 @@ void SC_Array_AppendWords(Array* Self, JB_String* R);
 int SC_Array_CArraySize(Array* Self, int Size);
 
 void JB_Array_Clear(Array* Self);
+
+void JB_Array_FastRemove(Array* Self, int Pos);
 
 JB_Object* JB_Array_First(Array* Self);
 
@@ -9036,8 +9059,6 @@ bool SC_Decl_IntRegs(SCDecl* Self);
 
 bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp);
 
-int SC_Decl_Inumeric(SCDecl* Self);
-
 bool SC_Decl_IsBareStruct(SCDecl* Self);
 
 bool SC_Decl_IsBool(SCDecl* Self);
@@ -9073,6 +9094,8 @@ bool SC_Decl_IsNormalBool(SCDecl* Self);
 bool SC_Decl_IsNormalNumber(SCDecl* Self);
 
 bool SC_Decl_IsNormalObject(SCDecl* Self);
+
+int SC_Decl_IsNumeric(SCDecl* Self);
 
 bool SC_Decl_IsObject(SCDecl* Self);
 
@@ -10051,8 +10074,6 @@ Message* SC_Msg_IntoVariable(Message* Self, SCNode* Name_space);
 
 int SC_Msg_IntSmallness(Message* Self, SCDecl* T);
 
-FatASM* SC_Msg_IOP2(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
-
 bool SC_Msg_IsAddr(Message* Self);
 
 MaybeBool SC_Msg_IsAlwaysBool(Message* Self);
@@ -10578,6 +10599,8 @@ FatASM* SC_Msg_TRAP(Message* Self, ASMReg R1, int Upon);
 void JB_Msg_TRel__(Message* Self, FastString* Fs);
 
 void JB_Msg_Tril__(Message* Self, FastString* Fs);
+
+int SC_Msg_TrinInt(Message* Self);
 
 MaybeBool SC_Msg_Trueness(Message* Self, uint /*NilState*/ Found);
 
@@ -11704,8 +11727,6 @@ inline DataTypeCode JB_TC_SyntaxIsSet(uint /*DataTypeCode*/ Self, uint /*DataTyp
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
-inline bool JB_int64_IsPow2(int64 Self);
-
 inline bool JB_int64_OperatorInRange(int64 Self, int64 Length);
 
 inline bool JB_int_IsPow2(int Self);
@@ -11771,6 +11792,7 @@ inline FatASM* SC_Pac_Write(Assembler* Self, ASMReg Value, Message* Exp, ASMReg 
 
 //// HEADER Inlines.h
 inline bool JB_CP_Bool(Codepoint Self) {
+	//cpp_part;
 	return Self > 0;
 }
 
@@ -11787,6 +11809,7 @@ inline bool JB_FailableInt_SyntaxCast(FailableInt Self) {
 }
 
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V) {
+	//cpp_part;
 	Self->Curr++[0] = V;
 	return Self->Curr >= Self->End;
 }
@@ -11839,10 +11862,6 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (JB__Tk_Splitter)(S, E, F);
 }
 
-inline bool JB_int64_IsPow2(int64 Self) {
-	return (Self & (Self - 1)) == 0;
-}
-
 inline bool JB_int64_OperatorInRange(int64 Self, int64 Length) {
 	if (Length >= 0) {
 		return (((uint64)Self) < ((uint64)Length));
@@ -11885,6 +11904,7 @@ inline bool JB_Array_SyntaxCast(Array* Self) {
 }
 
 inline JB_String* JB_CP_AsString(Codepoint Self) {
+	//cpp_part;
 	return JB_Str_ChrUTF8(Self);
 }
 
@@ -11921,10 +11941,12 @@ inline byte* JB_Str_Addr(JB_String* Self) {
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
+	//cpp_part;
 	return JB_Str_MakeC(Self);
 }
 
 inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest) {
+	//cpp_part;
 	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
 	ASMReg Ss = (Fn)(Self, Exp, Dest);
 	return Ss;
@@ -11965,6 +11987,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 }
 
 inline JB_String* JB_config_AsString(Message* Self) {
+	//cpp_part;
 	if (Self) {
 		return JB_Msg_Value(Self);
 	}
