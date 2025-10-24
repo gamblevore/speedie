@@ -111,7 +111,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |i
 
 function scdecl.SafelyWrappable (|bool|)
 	opt norefcounts
-	|| n = .Inumeric
+	|| n = .IsNumeric
 	if (n <= 1) or (.isbool)
 		return true
 	

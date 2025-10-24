@@ -341,7 +341,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			|| ch = .child(test)
 			if !ch.exists
 				return ch
-			test = name + (0xFFFFFF()).render
+			test = name + (0xFFFFFF())
 		error (self, "Unable to find unique child name.")
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)

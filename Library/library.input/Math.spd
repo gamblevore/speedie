@@ -15,20 +15,23 @@ module Math
 	function Pi (|float|)
 		disabled "Use π for pi, or 2π for PI*2"
 
+	helper ASinHalf (|float| f, |float|)
+		cpp_wrapper (asinf, 12)
+
 	helper ACosHalf (|float| f, |float|)
-		cpp_wrapper (acosf)
+		cpp_wrapper (acosf, 13)
 
 	helper ATan2Half (|float| f1, |float| f2, |float|)
-		cpp_wrapper (atan2f)
+		cpp_wrapper (atan2f, 14)
 	
 	helper CosPiHalf (|float| f, |float|)
-		cpp_wrapper (__cospif)
+		cpp_wrapper (__cospif, 15)
 
 	helper TanPiHalf (|float| f, |float|)
-		cpp_wrapper (__tanpif)
+		cpp_wrapper (__tanpif, 16)
 	
 	helper SinPiHalf (|float| f, |float|)
-		cpp_wrapper (__sinpif)
+		cpp_wrapper (__sinpif, 17)
 
 
 
@@ -103,7 +106,7 @@ extend int
 		return self
 	
 	function Clamp (|int| high, |int|)
-		asm iclm(dest, p1, p0, p2, 1)
+		asm iclm(dest, p1, r0, p2, 1)
 		if self < 0
 			self = 0
 		  elseif self > high
@@ -179,13 +182,6 @@ extend float
 		rz = .fract
 		rz *= 4
 		rz -= rz.minus0(1.0)
-
-		
-	function ATan2 (|float| y, |float|)
-		rz = -math.ATan2Half(self, y)				   // our result is +-pi, but we want 0-1...
-		rz *= math.iTau
-		if rz < 0.0
-			rz ++
 	
 	function Gaussian (|float| v, |float|)
 		|| exp = self*self / v
@@ -198,7 +194,7 @@ extend float
 		cpp_wrapper JB_f_Clamp
 		asm fclm(dest, p1, p2, p3, 1)
 	
-	function Clamp (|float|H=1.0, |float|)
+	function Clamp (|float| H = 1.0, |float|)
 		return .clamp(0,h)
 		
 	function Cluster (|float|)
@@ -209,20 +205,14 @@ extend float
 			return -self
 		return self
 
-	function CopySign (|float| frum, |float|)
-		cpp_Wrapper (copysignf)
-	
-	function Minus0 (|float| B, |float|)
-		cpp_Wrapper (fdimf)
-
 	function Reduce (|float| f, |float|)
-		return .abs.minus0(f).copysign(self)
+		return .length.minus0(f).copysign(self)
 	
 	function Increase (|float| f, |float|)
 		return self + f.copysign(self)
 	
 	function IsNan (|bool|)
-		cpp_wrapper (__isnanf)
+		cpp_wrapper (__isnanf, 18)
 	
 	function IsNormal (|bool|)
 		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
@@ -241,7 +231,7 @@ extend float
 			return self
 	
 	function IsInf (|bool|)
-		cpp_wrapper (__isinff)
+		cpp_wrapper (__isinff, 19)
 	
 	function f64.IsNan (|bool|)
 		cpp_wrapper (__isnand)

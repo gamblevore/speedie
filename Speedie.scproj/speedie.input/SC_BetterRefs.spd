@@ -211,7 +211,8 @@ function SCNode.ProcessLinkage (|message| node,  |dictionary of tranfunc| Table,
 			  elseif strict
 				error ch
 		  elseif strict
-			ch.Expect(@tmp)
+			if ch!=@sheb
+				ch.Expect(@tmp)
 		  else
 			return nil
 

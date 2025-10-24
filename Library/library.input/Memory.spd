@@ -121,7 +121,7 @@ class Memory
 			if New > Old
 				memory.Zero(mem+old, New-Old)
 			return true
-		error (self, "Can't allocate bytes: " + new.render)
+		error (self, "Can't allocate bytes: " + new)
 
 	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
 		|| Q = .length + reqitems

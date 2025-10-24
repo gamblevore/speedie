@@ -1149,7 +1149,8 @@ Message is also:
 
 	function Float32 (|float|)
 		|| d = .float|float|
-		expect (d.abs <= float.max) ("Float64 got clipped in a float32")
+		if d < 0: d = -d
+		expect (d <= float.max) ("Number won't fit in a float32")
 		return d
 
 	function Range (|intrange|)

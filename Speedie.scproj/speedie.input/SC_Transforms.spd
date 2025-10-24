@@ -364,16 +364,16 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 	  elseif (f == @Tmp)
 		if Tran_Temporal( fn, s, p ) or (s == "ignore")
 			return
-		
-//	  elseif (f == @msg)
-//		Tran_Msg(fn, s, p)
+
+	  elseif f == @sheb
+		return
 
 	  elseif !(f == @Thg or @opp or @Item or @prm)
 		TypeOfExpr( s, p )
 		if s == @func
 			FastStringOpts.optimise(s)
 			
-	  elseif f == @unit
+	  elseif f == @unit // wait this never gets called?
 		return  // units have internal structure that can be damaged
 	
 	

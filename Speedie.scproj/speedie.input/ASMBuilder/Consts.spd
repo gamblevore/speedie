@@ -122,13 +122,19 @@ function message.ASMConst (|uint64|)
 	return .int
 
 
+function uint64.rotl (|int| Amount, |uint64|)
+	cpp_wrapper JB_u64_RotL // rarely needed. Speedie needs it tho.
+
+function uint64.rotr (|int| Amount, |uint64|)
+	cpp_wrapper JB_u64_RotR // same
+
 function uint64.LongestBitStretch (|ivec2|)
 	if self == -1
 		return (64,0)
 	|uint64| last
 	while self
 		last = self
-		self &= self rotl 1
+		self &= .rotl(1)
 		rz.x++
 	rz.y = last.log2
 

@@ -16,10 +16,10 @@ function image.RoundRectDrawer (ImageDrawStyleEvent)
     
     rect = .Clip(rect)
     for Y in rect.Vert
-        || Y2 = (Y|float| - center.y).abs.minus0(suby).Pow2
+        || Y2 = (Y|float| - center.y).length.minus0(suby).Pow2
         || W = self[rect.x, Y]
         for X in rect.Horz
-            || X2 = (X|float| - center.x).abs.minus0(subx).pow2
+            || X2 = (X|float| - center.x).length.minus0(subx).pow2
             || D2 = X2 + Y2
             
             if D2 <= lim1

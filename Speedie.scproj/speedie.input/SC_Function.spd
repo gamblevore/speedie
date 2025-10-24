@@ -294,7 +294,6 @@ function @scfunction.NameList (|string|)
 
 function @scfunction.TransformAll 
 	opt norefcounts
-//	Compiler.AppInitCode <~ "return 0"~parse
 	Compiler.During = compilerstage.Transform
 	for f in compiler.FuncList
 		require !stderr.TooMany
@@ -314,7 +313,7 @@ function Transform ()
 
 	|| n = .SourceArg						#require
 	|| Space = n.SCArg( self )				#require
-
+	
 	space.ProcessLinkage( n, FuncLinkageTable, self is wrapper )
 	if self Isnt Wrapper
 		|| r_z = Tran_Result( self )
@@ -1640,7 +1639,7 @@ function Tran_Once (TranFunc)
 	
 	using (node)
 		node.name = "if"
-		|| name = "once"+(++OnceCount).render
+		|| name = "once" + (++OnceCount)
 		|| obj = compiler.program.lateAddTemporary( "bool", name, @thg + "false", node )
 
 		|| rel = @rel+""

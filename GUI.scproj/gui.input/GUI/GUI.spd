@@ -1130,7 +1130,7 @@ module GUI
 		|| rot = f.dTheta
 		|| pinch = f.dDist
 		|| mina = (π/180.0)|float|
-		if rot.abs > mina or pinch.abs > 0.002
+		if rot.length > mina or pinch.length > 0.002
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
 			
 		

@@ -113,7 +113,7 @@ linkage
 
 |SCModule|					DisamClasses
 |SCModule|					DisamModules
-|SCModule|					DisamGlobals
+//|SCModule|					DisamGlobals
 //|SCModule|					LibInit
 
 |byte|						InPerry
@@ -143,7 +143,7 @@ constants: 	kTimeWidth = 19
 syntax is (|CompilerStage| Type, |bool|)
 	return type == .During
 syntax is (|CompilerStage| Type, assigns:|bool|)
-	.During = type
+	.During = type, (value)
 
 function BuildFolder (|file|)
 	opt norefcounts
@@ -189,6 +189,7 @@ function CompileAll
 		if Compiler.InPerry: app.SetASMBreak(true)
 	
 	if !compiler.inperry
+		intrinsics.Process
 		if Options.ModeCpp
 			compiler.during = compilerstage.CppExport
 			.Timer( "Export Cpp" )
@@ -879,8 +880,8 @@ function AddMain (|int| mark, |bool|)
 	return mark == stderr.errorcount
 
 
-syntax append (|message| m)
-	.InternalFile.LiveAST <~ m
+//syntax append (|message| m)
+//	.InternalFile.LiveAST <~ m
 
 
 ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  

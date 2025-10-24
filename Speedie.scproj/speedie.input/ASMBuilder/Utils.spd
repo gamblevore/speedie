@@ -41,10 +41,14 @@ function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
 	|| dt = dest.µType
 	target debug
 		|| st = .µType
-		if (dt is Floating != st Is Floating) or (dt is bool != st is bool) // should never happen
+		if dt isnt floating and st is bool // allow
+			0
+		  else
+			if (dt is Floating != st Is Floating) or (dt is bool != st is bool) // should never happen
 		if (st.bytecount > 4)  <  (dt.bytecount > 4)		// doesn't matter unless we cross 64-32 bit anyhow
 	.µtype = dt
 	return self
+
 
 target debug
 	function scdecl.ASMSanity 

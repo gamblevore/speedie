@@ -110,10 +110,10 @@ class VObject (list)
 		function Size2D (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
 			if Width < 0
 				x += Width
-				Width = Width.abs
+				Width = Width.length
 			if height < 0
 				y += height
-				height = height.abs
+				height = height.length
 			|| V = (x, y, x+width, y+height)*16.0
 			return V.iVec4|controlrect|
 
@@ -178,8 +178,8 @@ extend Window
 		.BlockMode = (.BlockMode &~2) ||| (Middle<<1)
 		
 	setter BlockHeight (|float|)
-		.Blockscale = -Value.abs
+		.Blockscale = -Value.length
 	
 	setter BlockWidth (|float|)
-		.Blockscale = Value.abs
+		.Blockscale = Value.length
 

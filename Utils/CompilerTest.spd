@@ -24,7 +24,7 @@ main (|[string]| Files)
 
 function app.TryCompileOne (|file| f, |string| s)
 	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
-	if Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
+	if !Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
 		fails <~ "Fail: $s\n"
 	  elseif app.yes("q")
 		printline "spd $s --nocompile --silent --check --target=ForBatchTest"

@@ -243,7 +243,9 @@ class String
 
 	function Trim (|int| A, |int| B, |string|)
 		cpp_part TrimMiddle
-		|| fs = FastString(.length - ((B-A) max 0))
+		|| X = .length
+		|| Y = (B-A) max 0
+		|| fs = FastString(X - Y)
 		fs.AppendRange(self, 0, A)
 		fs.AppendRange(self, B, int.max)
 		return fs

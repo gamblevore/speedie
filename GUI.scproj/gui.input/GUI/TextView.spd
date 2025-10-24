@@ -1117,7 +1117,7 @@ class TextView (GUIControl)
 				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s) - 2.5
 				vib += (s+(h.x*3191.23)|int|).ago.cycle(0.27s)
 				vib += s.ago.float
-				|| middleness = 0.5-((h.x-hm).abs)*WH
+				|| middleness = 0.5-((h.x-hm).length)*WH
 				rect = rect.up(vib*LH*0.15 + LH*-0.3 + ago*0.3)
 				|| str = (1.0-ago*0.7th)*0.5 max -0.01
 				color.a = str*middleness*2.5

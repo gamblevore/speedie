@@ -55,7 +55,7 @@ module VShapes
 
 	function OpSmooth (|float| a, |float| b, |float| k=0.125, |float|)
 	    k *= 4.0
-	    || h = ( k-(a-b).abs max 0.0 ) / k
+	    || h = ( k-(a-b).length max 0.0 ) / k
 	    return (a min b) - h*h*k*0.25
 	
 
@@ -76,7 +76,7 @@ module VShapes
 //		L.Z *= 1.01
 //		|| sq = (2.0, 1.0, 1.0)
 		
-		l.x = l.x.abs
+		l.x = l.x.length
 		|| r2 = r * 0.75
 		if l.x < r2 and l.y < 0
 			l.x = 0
@@ -237,8 +237,8 @@ module VShapes
 		
 	function IceFudgeColor (ColorFunction)
 		|| Norm = (P - .Pos).normal
-		|| y = Norm.y.acos
-		|| x = Norm.z.abs.atan2(Norm.x)
+		|| y = Norm.y.uncos
+		|| x = Norm.z.length.untan(Norm.x)
 		|| str = 8.0
 		|| spd = 30s
 		|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875

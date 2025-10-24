@@ -494,9 +494,10 @@ struct Assembler
 			error (exp|object|)
 		return r.incr
 
-	function µTrin (|message| exp, |asmreg|)
-		return .µGetReal(exp, exp.AllowsTemp)
 
+	function µTrin (|message| exp, |asmreg|)
+		opt norefcounts
+		return .µGetReal(exp, exp.AllowsTemp) as asmreg.Textual
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)

@@ -14,7 +14,7 @@ function MainImage (shadertoyfunc)
 	|| itau = 1.0 / (π*2.0)|float|
 	|| T = .Time * 0.2 + vec4(0,11,33,0)
 	|| Mat2 = mat2((T*itau).cos)
-	|| it = (.time*itau).sin*0.1
+	|| it = (.time*itau).sine*0.1
 	|| ip = (2.0*Pos-r.xy, 0.0) / r.y
 	|| p2 = ip • ip
 	
@@ -28,7 +28,7 @@ function MainImage (shadertoyfunc)
 		p = (xz.x, p.y, xz.y)
 		q += p * 0.5
 		
-		|| c = (q*itau).cos • (q.yzx*itau).sin
+		|| c = (q*itau).cos • (q.yzx*itau).sine
 		c = (c * itau * 3.3333).cos * 0.5 + 0.5
 
 		|| s = i*20.0 + vec4(6,5,4,3)

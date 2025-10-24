@@ -65,7 +65,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		if f0.isint
 			n = f.int
 		expect (n >= 1)        (line, "Too many total bits")
-		expect (n <= (Max-8))  (line, "Too large field. Found: " + n.render)
+		expect (n <= (Max-8))  (line, "Too large field. Found: " + n)
 		lname = "_" + line.name 
 	
 	lname = .Parent + lname
@@ -207,8 +207,6 @@ function BuildFiles (|bool|)
 
 
 function SafeWrite (|String| name, |FastString| data)
-	target debug
-		debug_require data.length >= 1K // oof?
 	.CppLibFile(name)!.SmartData = data
 
 

@@ -53,8 +53,8 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 		.become(@bra)
 	
 	  elseif (self == "taskvars")
-		|| cls = scfunction.currfunc!.cls		#expect (self)
-		.become(@num,cls.TaskObjectCount|int|.render)
+		|| cls = scfunction.currfunc!.cls						#expect (self)
+		.become(@num, cls.TaskObjectCount|int|.render)
 		
 	  elseif (self == "sizeof")
 		expect (self_decl) (self, "Unable to get size")

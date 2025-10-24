@@ -541,7 +541,7 @@ class SCDecl (SCObject) {
 		return (!.IsCArray) and (!.PointerCount) and (.Type == typebool) 
 
 
-	function Inumeric (|int|)
+	function IsNumeric (|int|)
 		opt norefcounts
 		if (!.IsCArray) and (!.PointerCount)
 			return .Type.NumericCount
@@ -829,7 +829,7 @@ class SCDecl (SCObject) {
 
 	function CantBeNilInCpp (|bool|)
 		require !.pointercount
-		return (.IsCArray) or (.type.IsStruct) or (.inumeric > 1) 
+		return (.IsCArray) or (.type.IsStruct) or (.IsNumeric > 1) 
 
 
 	function CreateStructNil (|message| where, |Message!|)
@@ -1256,9 +1256,9 @@ class SCDecl (SCObject) {
 function IsPointerMath (|SCDecl| L, |SCDecl| R, |SCOperator| opp, |Message| exp, |SCDecl|)
 	require (opp isnt custom)
 	if (opp is addition)  
-		if (L.PointerCount) and (R.Inumeric == 1) // ptr - a,  ptr + a
+		if (L.PointerCount) and (R.IsNumeric == 1) // ptr - a,  ptr + a
 			return L
-		if (R.PointerCount) and (L.Inumeric == 1) // a - ptr,  a + ptr
+		if (R.PointerCount) and (L.IsNumeric == 1) // a - ptr,  a + ptr
 			expect (opp isnt MakesSigned) (exp, "Can't subtract a pointer from a number.")
 			return R
 		if (R.PointerCount) and (L.PointerCount) and (opp == scoperator.subtract)

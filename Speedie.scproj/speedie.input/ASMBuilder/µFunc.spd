@@ -92,13 +92,13 @@ function fatasm.TryRotateConst
 	require LBS.x >= (64-12)				// can only store 12-bits
 	
 	|| ramount = 63-LBS.y 
-	V = V rotl ramount
+	V = V.rotl(ramount)
 	._op = asm.knsr							// easier to debug
 	.r1 = ramount
 	.r2 = inv|int|
 	.r3 = v|uint|
 	target debug
-		|| back = .prms[3]|uint64| rotr .prms[1]|uint64|
+		|| back = .prms[3]|uint64|.rotr(.prms[1]|uint64|)
 		if .prms[2]
 			back = ~back
 		if back!=.const // oof

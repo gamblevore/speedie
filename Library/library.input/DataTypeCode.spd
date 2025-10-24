@@ -106,7 +106,7 @@ datatype DataTypeCode (uint16)
 					fs <~ "int64"
 					
 		
-	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "inumericness"
+	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "IsNumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 		
 	syntax is (|datatypecode| M, |bool|)

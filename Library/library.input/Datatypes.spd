@@ -265,11 +265,11 @@ datatype uint
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
 		
-	operator rotl (|int| Amount, |uint64|)
-		cpp_wrapper JB_u32_RotL
+//	operator rotl (|int| Amount, |uint64|)
+//		cpp_wrapper JB_u32_RotL
 	
-	operator rotr (|int| Amount, |uint64|)
-		cpp_wrapper JB_u32_RotR
+//	operator rotr (|int| Amount, |uint64|)
+//		cpp_wrapper JB_u32_RotR
 
 	function IsPow2 (|bool|)
 		cpp_wrapper JB_uint_IsPow2		
@@ -387,7 +387,7 @@ datatype float
 		// perhaps just cast this to an ACTUAL duration
 		// AND THEN DO THE CAST!?
 		if self < 0
-			self = .abs
+			self = .length
 			fs <~ '-'
 		|| s = self mod 60.0
 		|| m = (.floor - s) / 60.0
@@ -411,21 +411,39 @@ datatype float
 		  else
 			fs.appendfloat(self*100.0, 1)
 		fs <~ "%"
-
-	function cos (|float|)
-		return math.cospihalf(self*2.0)
 		
 	function exp2 (|float|)
 		return 2.0 pow self
-
-	function Acos (|float|)
-		return math.acoshalf(self) * math.iTau
 		
-	function Sin (|float|)
+	function Sine (|float|)
 		return math.sinpihalf(self*2.0)
 
-	function tan (|float|)
+	function Cos (|float|)
+		return math.cospihalf(self*2.0)
+
+	function Tan (|float|)
 		return math.TanPihalf(self*2.0)
+
+	function Asin (|float|)
+		disabled "use UnSine"
+
+	function Acos (|float|)
+		disabled "use UnCos"
+
+	function ATan2 (|float| y, |float|)
+		disabled "use UnTan"
+
+	function Unsin (|float|)
+		return math.asinhalf(self*2.0) * math.iTau
+
+	function Uncos (|float|)
+		return math.acoshalf(self*2.0) * math.iTau
+
+	function UnTan (|float| y, |float|)
+		rz = -math.ATan2Half(self, y)				   // our result is +-pi, but we want 0-1...
+		rz *= math.iTau
+		if rz < 0.0
+			rz ++
 
 	helper __sincospi (|$float| A, |$float| B)
 		cpp_wrapper (__sincospif)
@@ -446,21 +464,22 @@ datatype float
 			
 	function f64.Exponent (|ivec2|)
 		cpp_wrapper JB_F64_Exponent
-	
+
+	function CopySign (|float| from, |float|)
+		cpp_wrapper (copysignf, 0)
+
 	function Floor (|float|)
-		target debug2
-			cpp_wrapper (floorf, 1)
-		  else
-			cpp_wrapper (floorf)
+		cpp_wrapper (floorf, 1)
 
 	function AsInt (|int|)
 		cpp_wrapper
 	
 	function Round (|float| to, |float|)
+		cpp_part RoundTo
 		return (self / to).round * to
 
 	function Round (|float|)
-		cpp_wrapper (roundf)
+		cpp_wrapper (roundf, 2)
 
 	function Date (|date|)
 		return (self * 64.0K)|date|
@@ -476,23 +495,27 @@ datatype float
 		if self < -sigma
 			return -1
 
-	function SinR (|float|)
-		return (self * math.iTau).sin
+	function SinBad (|float|)
+		return (self * math.iTau).sine
 
-	function CosR (|float|)
+	function CosBad (|float|)
 		return (self * math.iTau).cos
 
 	function Length (|float|) // for consistancy with length of vectors
-		return .abs
+		cpp_wrapper (fabsf, 3)
 
-	function Abs (|float|)
-		cpp_wrapper (fabsf)
-
-	function Sqrt (|float|)
-		cpp_wrapper (sqrtf)
+	function abs (|float|)
+		disabled "Use .length"
+	
+	function Minus0 (|float| B, |float|)
+		cpp_Wrapper (fdimf, 4)
 
 	function InvSqrt (|float|)
+		intrinsic 5					// cpp_wrapper (5)
 		return 1.0 / .Sqrt
+
+	function Sqrt (|float|)
+		cpp_wrapper (sqrtf, 6)
 		
 	function Fract (|float|)
 		return self - .floor
@@ -501,11 +524,11 @@ datatype float
 		return !.log2.Fract
 
 	function Log2 (|float|)
-		cpp_wrapper (log2f)
+		cpp_wrapper (log2f, 7)
 
 	function Exp (|float|)
 		description "Computes e to the power of (x) " 
-		cpp_wrapper (expf)
+		cpp_wrapper (expf, 8)
 
 	function Log (|float|)
 		cpp_wrapper JB_f_Log
@@ -514,9 +537,6 @@ datatype float
 		rz = .floor
 		if rz != self
 			++rz
-
-	helper IntegerToMod2 (|float|)
-		return (self*0.5).Fract*2.0
 
 	operator ± (|float| i, |float|)
 		cpp_part Shrink
@@ -552,11 +572,11 @@ datatype float
 
 	operator max (|float| other, |float|)
 		asm fclm(dest, p1, p2, p1, 1)
-		cpp_wrapper (fmaxf)
+		cpp_wrapper (fmaxf, 9)
 
 	operator min (|float| other, |float|)
 		asm fclm(dest, p1, p1, p2, 1)
-		cpp_wrapper (fminf)
+		cpp_wrapper (fminf, 10)
 
 	operator longer (|float| other, |float|)
 		if .length > other.length
@@ -564,7 +584,7 @@ datatype float
 		return other
 
 	operator pow (|float| other, |float|)
-		cpp_wrapper (powf)
+		cpp_wrapper (powf, 11)
 	
 	operator ShiftLeft (|int| x, |float|)
 		while --x >= 0	// there is a faster way, but this is good enough.
@@ -703,11 +723,11 @@ datatype int64
 			self = -self
 		return self
 
-	operator rotl (|int| Amount, |int64|)
-		return (self|uint64|) rotl amount
-
-	operator rotr (|int| Amount, |int64|)
-		return (self|uint64|) rotr amount
+//	operator rotl (|int| Amount, |int64|)
+//		return (self|uint64|) rotl amount
+//
+//	operator rotr (|int| Amount, |int64|)
+//		return (self|uint64|) rotr amount
 
 	function Log2 (|int64|) // highestbit, highbit
 		return (self|uint64|).log2
@@ -720,13 +740,15 @@ datatype int64
 
 	function LowestBit (|uint64|)
 		return self & -self
+	
+	function IsPow2 (|bool|)
+		return (self & (self - 1)) == 0
 
 	function AsFloat (|Float64|)
 		cpp_wrapper
 	
 	render Hex
 		fs.AppendHex(self)
-
 		
 	render StrSize
 		if self <= 512
@@ -748,10 +770,6 @@ datatype int64
 			fs <~ 'B'
 	
 	
-	function IsPow2 (|bool|)
-		opt inline // as above
-		return (self & (self - 1)) == 0
-	
 
 	iterator
 		|int64| i = 0
@@ -768,11 +786,11 @@ datatype uint64
 		|uint64|
 		max = -1
 	
-	operator rotl (|int| Amount, |uint64|)
-		cpp_wrapper JB_u64_RotL
-	
-	operator rotr (|int| Amount, |uint64|)
-		cpp_wrapper JB_u64_RotR
+//	operator rotl (|int| Amount, |uint64|)
+//		cpp_wrapper JB_u64_RotL
+//	
+//	operator rotr (|int| Amount, |uint64|)
+//		cpp_wrapper JB_u64_RotR
 
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)

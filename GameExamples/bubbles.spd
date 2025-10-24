@@ -32,7 +32,7 @@ class Bubbles (window)
 		|| range = (-L to L)
 		for i in range
 			xx = xx.hash
-			|| sh = (i, 0.0, i.abs)*24.0
+			|| sh = (i, 0.0, i.length)*24.0
 			|| C = CC[(xx&3)]![]
 			.T.shapes <~ C.new(sh+(-1.0, 1.5, 12.0),  2)
 			.T.shapes <~ C.new(sh+( 1.5, 2.5, 18.0),  3)
@@ -77,7 +77,7 @@ class Bubbles (window)
 
 function float.KeyFix (|vec3| V, |float|)
 	if self
-		return ((.abs * v.r + v.g) min v.b).CopySign(self)
+		return ((.length * v.r + v.g) min v.b).CopySign(self)
 
 
 function vec4.KeyFix (|vec3| V, |vec4|)

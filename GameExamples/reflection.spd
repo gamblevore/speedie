@@ -163,7 +163,7 @@ class Breakout (Window)
 		
 		for (b.backwards in .balls) (i)
 			|| y = b.Velocity.y
-			if y.Abs < minsp
+			if y.length < minsp
 				b.Velocity.y = minsp.CopySign(y)
 			b.Step
 			.Bounds(b)
@@ -236,7 +236,7 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |f
 			continue 
 		|| i = j - sub
 		|| R = ((i*0.2123)+angle).SinCos
-		|| closeness = (i - Pulse + 4.0() ).abs
+		|| closeness = (i - Pulse + 4.0() ).length
 		|| strength = (-0.005*closeness.pow2).Exp * 5.0
 
 		|| P = R*(30.0+i+strength) + XY

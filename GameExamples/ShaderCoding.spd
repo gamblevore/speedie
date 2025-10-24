@@ -26,8 +26,8 @@ function MainImage ( ShaderToyFunc )
 		|| d = uv.length * lexp
 		|| col = palette(L + (i+.Time)*0.4)
 
-		d = (d*1.25 + .Time*0.125).sin*0.125
-		d = (0.01 / d.abs) pow 1.2
+		d = (d*1.25 + .Time*0.125).sine*0.125
+		d = (0.01 / d.length) pow 1.2
 
 		rz += (col * d, 0.0)
 

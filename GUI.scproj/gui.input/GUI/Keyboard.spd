@@ -102,7 +102,7 @@ dataType Keys (int)
 		|| G = gui.FrameStart
 		rz = (((1+G)-D)*plus).float
 		if limit and i.State == guikeyrecordinfo.Stable
-			if rz.abs > limit
+			if rz.length > limit
 				i.date = G
 			  else 
 				rz = 0
@@ -186,7 +186,7 @@ dataType Keys (int)
 			if !Limit or (p & 1) // first frame
 				return str
 			
-			if str.abs >= limit
+			if str.length >= limit
 				pa.limit
 				pb.limit
 				ma.limit

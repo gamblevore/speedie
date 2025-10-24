@@ -352,8 +352,8 @@ function LinkagePlace (|message|)
 function message.WrapperCpp (|string|)
 	opt norefcounts
 	if self
-		if self == @bra
-			return .firstname
+		|| ch = .first
+			return ch.name
 		return .name
 
 
@@ -406,18 +406,23 @@ function FindCppWrapper (|message| place, |bool|isclass, |message|)
 
 function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsClass,  |Message|)
 //	opt norefcounts
-	place.remove
+//	place.remove
+	place.func = @sheb
+	place.ASMType = ASMType.kIgnore
+	
 	|| ch = place.first
 	if NothingOK and !ch
 		place.name = ""
 		return place
-	if ch == @thg or @bra
+	
+	if ch == @thg or @bra or @list
+		if ch == @list
+			ch.obj = scfunction.currfunc 
+			intrinsics.floats <~ ch
 		if isclass
 			expect (.parent istmp "linkage")   (ch, "Put this inside a 'Linkage' tag.")
 		Return ch
-	|| node = place[@thg, @list]
-	if node == @list
-		intrinsics.codes <~ node
+		
 
 
 function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsClass,  |Message|)
@@ -459,7 +464,8 @@ function LoadExportName
 
 
 	if self isa SCFunction
-		.IsCppInBuilt ?= (cw == @bra)|int|
+		|| fn = cw.func
+		.IsCppInBuilt ?= (fn == @list or @bra)|int|
 		(self is cpp) = cw
 		|| CppWrapper = cw.WrapperCpp
 			.MakeParamsReal
@@ -731,7 +737,7 @@ function UniquifyExport (|String| s, |string|)
 			return s2
 	
 	|| u = SCGlobals.UniqueNum++
-	|| s3 = s + u.render
+	|| s3 = s + u
 	if !compiler.exportnames[s3]
 		return s3
 

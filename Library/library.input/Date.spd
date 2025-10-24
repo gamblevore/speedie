@@ -113,7 +113,7 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		description "Returns a number between 0 and 1. This number cycles back and forth in a sinusoidal fashion."
 		opt min 3
 		|| P = .loop(length)
-		return (P.sin * 0.5) + 0.5
+		return (P.sine * 0.5) + 0.5
 
 
 	function Loop (|duration| Length, |float|)

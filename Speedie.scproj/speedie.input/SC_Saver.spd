@@ -357,7 +357,7 @@ class SavingTest (saveable)
 	|int[1]|	ABC
 
 	function Constructor  (|int|n)
-		.name = "fred" + n.render
+		.name = "fred" + n
 		.value = 1000 + n
 
 	module

@@ -336,4 +336,7 @@ function string.UnPrintable (|int|)
 function String.Spin (|int| f, |byte|)
 	return `|/-\`[f&3] // useful for printing "processing" spinning line to stdout
 	
+
+function string.OperatorPlus (|int| i, |string|)
+	return self + i.Render
 	

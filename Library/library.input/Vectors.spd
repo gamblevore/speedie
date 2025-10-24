@@ -28,7 +28,7 @@ datatype vec4
 	
 	
 	function Abs (|vec4|)
-		return (.x.abs, .y.abs, .z.abs, .w.abs)
+		return (.x.length, .y.length, .z.length, .w.length)
 	
 	function IsPositive (|bool|)
 		return (.x2 > .x) & (.y2 > .y)
@@ -40,7 +40,7 @@ datatype vec4
 		return (.x.sqrt, .y.sqrt, .z.sqrt, .w.sqrt) // oof
 		
 	function Sin (|vec4|)
-		return (.x.sin, .y.sin, .z.sin, .w.sin)
+		return (.x.sine, .y.sine, .z.sine, .w.sine)
 
 	function Cos (|vec4|)
 		return (.x.cos, .y.cos, .z.cos, .w.cos)
@@ -366,8 +366,8 @@ datatype vec3
 	function Lum (|float|)
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
 
-	function Sin (|vec3|)
-		return (.x.sin, .y.sin, .z.sin)
+	function Sine (|vec3|)
+		return (.x.sine, .y.sine, .z.sine)
 
 	function Cos (|vec3|)
 		return (.x.cos, .y.cos, .z.cos)
@@ -379,7 +379,7 @@ datatype vec3
 		return (.x.ceil, .y.ceil, .z.ceil)	
 
 	function SinR (|vec3|)
-		return (self * math.iTau).sin
+		return (self * math.iTau).sine
 
 	function CosR (|vec3|)
 		return (self * math.iTau).cos
@@ -447,7 +447,7 @@ datatype vec3
 		return (.x*v.x, .y*v.y, .z*v.z)
 	
 	function Abs (|vec3|)
-		return (.x.abs, .y.abs, .z.abs)
+		return (.x.length, .y.length, .z.length)
 	
 	operator • (|vec3| other, |float|)
 		cpp_part Dot
@@ -721,7 +721,7 @@ datatype vec2
 		return self - (2.0 * (self • plane) * plane)
 		
 	function Rotation (|float|)
-		return .y.atan2(.x)
+		return .y.untan(.x)
 
 	function RotateAroundY (|mat4|)
 		description "Assumes normalised vec2" 
@@ -768,13 +768,17 @@ datatype vec2
 		cpp_part Bool
 		return .x or .y
 
+
+	helper float.RoundEvenSub (|float|)
+		return (self*0.5).Fract*2.0
+
 	function RoundEven (|vec2|)
 		self += 0.5
 		rz = self - .Fract
 		if !.x
-			rz.x -= .x.IntegerToMod2
+			rz.x -= .x.RoundEvenSub
 		if !.y
-			rz.y -= .y.IntegerToMod2
+			rz.y -= .y.RoundEvenSub
 	
 	syntax Equals (|vec2| v, |bool|)
 		return (.x == v.x) and (.y == v.y) 
@@ -809,21 +813,21 @@ datatype vec2
 		return (.x.fract, .y.fract)
 		
 	function Abs (|vec2|)
-		return (.x.abs, .y.abs)
+		return (.x.length, .y.length)
 
 	function SinCos (|vec4|)
 		return (.x.sincos, .y.sincos)
 		
-	function Sin (|vec2|)
-		return (.x.sin, .y.sin)
+	function Sine (|vec2|)
+		return (.x.sine, .y.sine)
 
 	function Cos (|vec2|)
 		return (.x.cos, .y.cos)
 
-	function SinR (|vec2|)
-		return (self * math.iTau).sin
+	function SinBad (|vec2|)
+		return (self * math.iTau).sine
 
-	function CosR (|vec2|)
+	function CosBad (|vec2|)
 		return (self * math.iTau).cos
 
 	syntax Compare (|float| Other, |int|)

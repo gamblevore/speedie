@@ -204,7 +204,6 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 			if rz
 				rz = rz.simplify
 			  else
-//				rz = s.asmreg(0) // better if asmreg contains type. Requires asmreg be supetset of asmparam
 				|| dest = s.inputfat(0)
 					rz = dest.info 
 				  else

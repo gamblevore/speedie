@@ -168,7 +168,7 @@ struct Pico
 				return p
 			|PicoGlobalStats| St
 			St.Read
-			error ("Couldn't create a pico object. Too many picos: " + St.OpenPicos.render)
+			error ("Couldn't create a pico object. Too many picos: " + St.OpenPicos)
 	
 
 module PicoNoise

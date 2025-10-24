@@ -2,10 +2,9 @@
 
 
 module ASMExamples {
-
+target pack { 
 |int| Glob
 |int| Bolg
-target pack { 
 
 
 function SyntaxShift (|syntax| A, |int| B, |int|)

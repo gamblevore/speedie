@@ -1,75 +1,122 @@
 
 
-
 module Intrinsics
-	|[message]| Codes
+	|[message]| Floats
+	|[message]| Vectors // both q and v
+
+
+	function PullOutVecs	
+		opt norefcounts
+		require stderr.ok
+		|| f = .floats
+		|| i = f.length
+		while i > 0
+			|| s = f[--i]
+			|| fn = s.MsgOwningFunc!
+			|| input = fn.args[]!
+			if input.IsNumeric > 1
+				.Vectors <~ s
+				f.FastRemove(i+1)
+
+
+	function Process
+		|| fs = FastString()
+		.PullOutVecs
+		.ProcessTrin(fs, .floats)
+		.ProcessTrin(fs, .vectors)
+/		VM_Builder.SafeWrite("intrinsics.i", fs)
+	
+	// 2 params will go onto the END of the array.
+	// vectors go separate
+		
+	
+	function ProcessTrin (|faststring| fs, |[message]| codes, |int|)
+		opt norefcounts
+		codes.sort(TrinSort)
+		
+		for s in codes
+			|| name = ""
+			|| fn = s.msgowningfunc
+				name = fn.exportname
+			if s != @num
+				name = s.firstname
+				s = s.last(@num)
+				if !s: continue
+			
+			|| id = s.int
+			check  !(ID &~ 31) (s, "ID out of range")
+			check  !((1<<ID) & rz) (s, "ID already used")
+			rz |= 1<<id
+			
+			fs <~ "
+	if (Mode == $id)
+		return $name(R2);
+"
+
+
+	function Message.TrinInt (|int|)
+		opt norefcounts
+		if .func == @Num
+			return .int
+		return .last.int
 	
 	
+	function TrinSort (SorterComparer of Message)
+		return  .trinint - b.trinint
 
-extend assembler {
 
-function DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
+function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
 	opt norefcounts
-	|| name = trin[@thg]
+	|| name = Trin[@thg]
 	trin = name.next(@prm)$
 	|| op = instruction[name!]$
 	
 	|| form = op.Sizes
-	expect (trin.HasChildCount(form.Count))    				(trin, "Expected paramcount: " + form.Count.render)
-	return .TheTrinity(trin, where.last, dest, op.opcode)
+	expect (trin.HasChildCount(form.Count))    				(trin, "Expected paramcount: " + form.Count)
+	return .TheTrinity(where.last, trin, dest, op.opcode)
 
 
-
-function TheTrinity (|message| out, |message| Prms, |asmreg| dest, |byte| OpCode, |asmreg|)
+function assembler.TheTrinity (|message| SrcPrms, |message| ASMPrms, |asmreg| dest, |byte| OpCode, |asmreg|)
 	opt norefcounts
 	|| n = 0
-	|asmreg[8]| Collection
-	|uint[6]| AlreadyDone
-	for s.fast in out
-		.Trinometer(s, prms, Collection, n++, AlreadyDone)
-
-	|| fat = .RequestOp(OpCode, prms.parent!)
-	|| DestPos = -1
-	for i in n
-		|| R = Collection[i]
-		if R is Textual
-			fat.RegInput(i) = R asnt asmreg.Textual
-		  elseif R
-			fat.NumInput(i) = R|int|
-		  else
-			DestPos = i
+	|asmreg[6]| Collection
+	for s.fast in SrcPrms
+		Collection[n++] = .µTrin(s)
 	
-	if destpos >= 0
+	|| fat = .RequestOp(OpCode, SrcPrms.parent!)
+	|| DestPos = .FillTheFat(collection, fat, ASMPrms, n)
 		dest = .TempOnly(dest)
 		fat.Dest(destpos, dest, self)	
 	return fat*dest
 	
 
-function Trinometer (|message| s, |message| Prms, |&ASMReg| Collection, |int| i, |&uint| Prev)
+function assembler.FillTheFat (|&asmreg| Collection, |fatasm| fat, |message| Prms, |int| n, |ind|)
 	opt norefcounts
-	|| n = s.name
-	|| n1 = n[].lowercase
-	if n1.IsInt
-		Collection[i] = s.int|asmreg| as ASMReg.Const
-		return
+	|| i = 0
+	for s.fast in prms
+		if s ~= "dest"
+			s.expect(@thg)
+			rz = i
+		  else
+			.Fries(Collection, fat, s, i, n)
+		i++
+	
 
-	s.expect(@thg)
-	if n ~= "dest"
+function assembler.Fries (|&ASMReg| Collection, |fatasm| fat, |message| s, |int| i, |int| MaxParam)
+	opt norefcounts
+	if s.IsInt
+		fat.NumInput(i) = s.int
+		return
+	require s.expect(@thg)
+
+	|| name = s.name
+	if name ~= "r0" // now what?
+		fat.RegInput(i) = asmreg()
 		return
 	
-	expect (n1 == 'p') (s)
+	expect (name[] eq 'p') (s)
 	
-	collection[i] = asmreg() as asmreg.Textual
-	|uint| l = s.Int(1, 0, 31) #require
-	|| Done = Prev[--l]
-		collection[i] = Collection[Done-1]
-		return
-
-	|| ref = Prms[l]								#expect (s, "Can't find this register")
-	Prev[l] = i + 1
-	collection[i] = .µTrin(ref) as asmreg.textual
-	
-}
-
+	|int| l = s.Int(1, 1, MaxParam)
+		fat.RegInput(i) = collection[l-1] asnt asmreg.Textual
 
 

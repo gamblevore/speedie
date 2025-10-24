@@ -31,6 +31,13 @@ dispatch FuncPreReader (fnPreReader)
 		.intrinsic = msg[@func]
 		.intrinsic.expectlast
 		
+	+'intrinsic'
+		opt norefcounts
+		|| L = msg[@num]
+			intrinsics.floats <~ l
+			l.obj = self
+		
+
 	+'disabled'
 		opt norefcounts
 		is disabled
@@ -38,7 +45,7 @@ dispatch FuncPreReader (fnPreReader)
 		|| s = msg.first
 			s.ExpectString
 			.description = s.name
-			
+
 	+'todo'
 		opt norefcounts
 		msg[@nil].expectlast
