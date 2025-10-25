@@ -25,6 +25,7 @@ vec4 JB_vec4_mod		(vec4 x, vec4 y);
 vec4 JB_vec4_CopySign	(vec4 x, vec4 y);
 vec4 JB_vec4_Mix		(vec4 x, vec4 low, vec4 high);
 vec4 JB_vec4_SmoothStep	(vec4 x, vec4 low, vec4 high);
+vec4 JB_Vec4_Clamp		(vec4 Self, float A, float B);
 vec4 JB_Vec4_ClampVec	(vec4 Self, vec4 A, vec4 B);
 }
 
