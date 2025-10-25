@@ -11,8 +11,6 @@
 		AC1050022D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
 		AC1050032D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
 		AC1050042D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
-		AC2829582E89A1110042D3B9 /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC2829552E89A1100042D3B9 /* JB_Globals.cpp */; };
-		AC2829592E89A1110042D3B9 /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC2829562E89A1100042D3B9 /* JB.cpp */; };
 		AC33F7B92B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
 		AC33F7BA2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
 		AC33F7BB2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
@@ -227,10 +225,8 @@
 
 /* Begin PBXFileReference section */
 		AC1050002D61EF6C00BB929B /* FF_Intel.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_Intel.S; path = ../Library/CppLib/FF_Intel.S; sourceTree = "<group>"; };
-		AC2829552E89A1100042D3B9 /* JB_Globals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../BuildTest2/JB_Globals.cpp; sourceTree = "<group>"; };
-		AC2829562E89A1100042D3B9 /* JB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../BuildTest2/JB.cpp; sourceTree = "<group>"; };
-		AC2829572E89A1100042D3B9 /* JB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB.h; path = ../BuildTest2/JB.h; sourceTree = "<group>"; };
 		AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
+		AC4642362EAD26D80079C886 /* FTrin.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = FTrin.i; path = ../Library/CppLib/FTrin.i; sourceTree = "<group>"; };
 		AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
 		AC6AB9262CB1AEB800555461 /* FF_ARM64.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_ARM64.S; path = ../Library/CppLib/FF_ARM64.S; sourceTree = "<group>"; };
 		AC6ADAE729872AA8009CFFBB /* Speedie */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Speedie; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -327,7 +323,6 @@
 		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../../lib/libSDL2.dylib; sourceTree = "<group>"; };
 		ACC8F9F22C960FD000A549D7 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd; sourceTree = DEVELOPER_DIR; };
-		ACCA0FFA2EA30E5F005A5600 /* PicoMsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../../include/PicoMsg/PicoMsg.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -364,20 +359,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AC28295B2E89A1220042D3B9 /* Direct Test */ = {
-			isa = PBXGroup;
-			children = (
-				AC2829552E89A1100042D3B9 /* JB_Globals.cpp */,
-				AC2829562E89A1100042D3B9 /* JB.cpp */,
-				AC2829572E89A1100042D3B9 /* JB.h */,
-			);
-			path = "Direct Test";
-			sourceTree = "<group>";
-		};
 		AC6ADADE29872AA8009CFFBB = {
 			isa = PBXGroup;
 			children = (
-				AC28295B2E89A1220042D3B9 /* Direct Test */,
 				AC7A83122BC297AE00DD6590 /* exec.scproj */,
 				AC7D3E4C29A284EA00148ADB /* library.input */,
 				AC7D3E4B29A284DB00148ADB /* speedie.input */,
@@ -403,7 +387,7 @@
 		AC7D3C7829A27BF300148ADB /* cpp */ = {
 			isa = PBXGroup;
 			children = (
-				ACCA0FFA2EA30E5F005A5600 /* PicoMsg.h */,
+				AC4642362EAD26D80079C886 /* FTrin.i */,
 				AC7D3CB729A27C9900148ADB /* JB_Globals.cpp */,
 				AC7D3CB829A27C9900148ADB /* JB.cpp */,
 				AC7D3C9429A27C1D00148ADB /* JB_Alloc.cpp */,
@@ -727,8 +711,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC2829582E89A1110042D3B9 /* JB_Globals.cpp in Sources */,
-				AC2829592E89A1110042D3B9 /* JB.cpp in Sources */,
 				AC7D3D8529A280A700148ADB /* JB_ByteMap.cpp in Sources */,
 				AC7D3D8629A280A700148ADB /* JB_String.cpp in Sources */,
 				AC7D3D8729A280A700148ADB /* JB_Tokeniser.cpp in Sources */,
