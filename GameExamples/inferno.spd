@@ -32,5 +32,5 @@ function MainImage (shadertoyfunc)
 		c = (c * itau * 3.3333).cos * 0.5 + 0.5
 
 		|| s = i*20.0 + vec4(6,5,4,3)
-		s = i * (s*itau).sin + i
+		s = i * (s*itau).sine + i
 		rz += z.sqrt * (c pow 8.0) * s / 7.0

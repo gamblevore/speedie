@@ -27,6 +27,7 @@
 #include "JB_DictCore.h"
 #include "JB_MSR.h"
 #include "JB_Math.h"
+#include "JB_Vec4.h"
 #include "JB_Tokeniser.h"
 #include "JB_List.h"
 #include "JB_ListOld.h"

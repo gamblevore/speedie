@@ -213,7 +213,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.appendwords("-L/usr/local/lib/")
 	rz.appendwords("-I /usr/local/include")
 	if platform.osx // OSX likes playing hide and seek
-		rz.appendwords("-F/Library/Frameworks  -framework Cocoa  ")
+		rz.appendwords("-F/Library/Frameworks  -framework Cocoa")
 		if SC_Targets..gui or linkage.interpreter
 			rz.appendwords("-rpath @executable_path/../Frameworks")
 		rz.appendwords("-rpath ~/Library/Frameworks  -rpath $spdroot/Library  -rpath /Library/Frameworks")
@@ -221,7 +221,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	// why the fuck? is c++ so bad?
 	rz.AppendWords( "-w  -Wno-return-type-c-linkage")
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
-	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
+	rz.AppendWords( "-fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
 	rz.AppendWords( Linkage.CombineFlags(Platform.name) )
 	if platform.lin
 		rz.appendwords( " -lrt" )
@@ -232,7 +232,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	if options.arch ~= "intel"
 		rz.appendwords( "-arch x86_64" )
 		if options.optimise >= 3 // sigh
-			rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
+			rz.AppendWords( "-march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2" )
 	  elseif platform.CPU_ARM
 		rz.appendwords( "-arch arm64" )
 
