@@ -411,18 +411,14 @@ datatype float
 		  else
 			fs.appendfloat(self*100.0, 1)
 		fs <~ "%"
-		
-	function exp2 (|float|)
-		return 2.0 pow self
-		
-	function Sine (|float|)
-		return math.sinpihalf(self*2.0)
+	
+	operator max (|float| other, |float|)
+		asm fclm(dest, p1, p2, p1, 1)
+		cpp_wrapper (fmaxf)
 
-	function Cos (|float|)
-		return math.cospihalf(self*2.0)
-
-	function Tan (|float|)
-		return math.TanPihalf(self*2.0)
+	operator min (|float| other, |float|)
+		asm fclm(dest, p1, p1, p2, 1)
+		cpp_wrapper (fminf)
 
 	function Asin (|float|)
 		disabled "use UnSine"
@@ -432,18 +428,6 @@ datatype float
 
 	function ATan2 (|float| y, |float|)
 		disabled "use UnTan"
-
-	function Unsin (|float|)
-		return math.asinhalf(self) * math.iTau
-
-	function Uncos (|float|)
-		return math.acoshalf(self) * math.iTau
-
-	function UnTan (|float| y, |float|)
-		rz = -math.ATan2Half(self, y)				   // our result is +-pi, but we want 0-1...
-		rz *= math.iTau
-		if rz < 0.0
-			rz ++
 
 	helper __sincospi (|$float| A, |$float| B)
 		cpp_wrapper (__sincospif)
@@ -465,21 +449,12 @@ datatype float
 	function f64.Exponent (|ivec2|)
 		cpp_wrapper JB_F64_Exponent
 
-	function CopySign (|float| from, |float|)
-		cpp_wrapper (copysignf, 0)
-
-	function Floor (|float|)
-		cpp_wrapper (floorf, 1)
-
 	function AsInt (|int|)
 		cpp_wrapper
 	
 	function Round (|float| to, |float|)
 		cpp_part RoundTo
 		return (self / to).round * to
-
-	function Round (|float|)
-		cpp_wrapper (roundf, 2)
 
 	function Date (|date|)
 		return (self * 64.0K)|date|
@@ -501,34 +476,55 @@ datatype float
 	function CosBad (|float|)
 		return (self * math.iTau).cos
 
-	function Length (|float|) // for consistancy with length of vectors
-		cpp_wrapper (fabsf, 3)
-
 	function abs (|float|)
 		disabled "Use .length"
 	
 	function Minus0 (|float| B, |float|)
-		cpp_Wrapper (fdimf, 4)
-
-	function InvSqrt (|float|)
-		intrinsic 5					// cpp_wrapper (5)
-		return 1.0 / .Sqrt
-
-	function Sqrt (|float|)
-		cpp_wrapper (sqrtf, 6)
-		
-	function Fract (|float|)
-		return self - .floor
+		cpp_Wrapper (fdimf)
 
 	function IsPow2 (|bool|)
 		return !.log2.Fract
 
-	function Log2 (|float|)
-		cpp_wrapper (log2f, 7)
+	function Fract (|float|)
+		trin (0)
+		return self - .floor
+
+	function Floor (|float|)
+		trin (1)
+		cpp_wrapper (floorf)
+
+	function Round (|float|)
+		trin (2)
+		cpp_wrapper (roundf)
+
+	function Length (|float|) // for consistancy with length of vectors
+		trin (3)
+		cpp_wrapper (fabsf)
+
+	function InvSqrt (|float|)
+		trin (5)
+		return 1.0 / .Sqrt
+
+	function Sqrt (|float|)
+		trin (6)
+		cpp_wrapper (sqrtf)
+
+	function Log (|float|)
+		trin (7)
+		cpp_wrapper (logf)
 
 	function Exp (|float|)
 		description "Computes e to the power of (x) " 
-		cpp_wrapper (expf, 8)
+		trin (8)
+		cpp_wrapper (expf)
+
+	function Log2 (|float|)
+		trin (9)
+		cpp_wrapper (log2f)
+	
+	function Exp2 (|float|)
+		trin (10)
+		cpp_wrapper (exp2f)
 
 	function Log (|float|)
 		cpp_wrapper JB_f_Log
@@ -556,23 +552,6 @@ datatype float
 	operator IsNear (|float|other, |bool|)
 		disabled "what uses this even?"
 		return (self - other).abs < 0.0001 // seems close enough?
-	
-	function SmoothStep (|float|)
-		|| x = .clamp// - 0.5
-		return x * x * (3.0 - 2.0 * x)
-	
-	function SmoothStep (|float| low, |float| high, |float|)
-		cpp_part SmoothStep2
-		|| t = ((self - low) / (high - low)).clamp
-		return t * t * (3.0 - 2.0 * t)
-
-	operator max (|float| other, |float|)
-		asm fclm(dest, p1, p2, p1, 1)
-		cpp_wrapper (fmaxf, 9)
-
-	operator min (|float| other, |float|)
-		asm fclm(dest, p1, p1, p2, 1)
-		cpp_wrapper (fminf, 10)
 
 	operator longer (|float| other, |float|)
 		if .length > other.length
@@ -580,7 +559,62 @@ datatype float
 		return other
 
 	operator pow (|float| other, |float|)
-		cpp_wrapper (powf, 11)
+		trin (11)
+		cpp_wrapper (powf)
+	
+	function Unsin (|float|)
+		trin (12)
+		return math.unsinebad(self) * math.iTau
+
+	function Uncos (|float|)
+		trin (13)
+		return math.uncosbad(self) * math.iTau
+
+	function UnTan (|float| y, |float|)
+		trin (14)
+		rz = math.unTan2bad(self, y)			// our result is +-pi, but we want 0-1...
+		rz *= -math.iTau
+		if rz < 0.0
+			rz ++
+
+	function Sine (|float|)
+		trin (15)
+		return math.sinpihalf(self*2.0)
+
+	function Cos (|float|)
+		trin (16)
+		return math.cospihalf(self*2.0)
+
+	function Tan (|float|)
+		trin (17)
+		return math.TanPihalf(self*2.0)
+	
+	function IsNan (|bool|)
+		trin (18)
+		cpp_wrapper (__isnanf)
+	
+	function IsInf (|bool|)
+		trin (19)
+		cpp_wrapper (__isinff)
+
+	operator mod (|float| upon, |float|)
+		trin (24)
+		cpp_wrapper (fmodf)
+
+	function CopySign (|float| from, |float|)
+		trin (25)
+		cpp_wrapper (copysignf)
+
+	function Mix (|float| A, |float| B, |float|)
+		cpp_Part FloatMix
+		trin (30)
+		description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
+		return A + (self * (B - A))
+
+	function SmoothStep (|float| low=0, |float| high=1, |float|)
+		trin (31)
+		|| t = ((self - low) / (high - low)).clamp
+		return t * t * (3.0 - 2.0 * t)
 	
 	operator ShiftLeft (|int| x, |float|)
 		while --x >= 0	// there is a faster way, but this is good enough.

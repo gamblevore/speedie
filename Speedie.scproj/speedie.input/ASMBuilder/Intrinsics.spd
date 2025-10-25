@@ -23,12 +23,10 @@ module Intrinsics
 		|| fs = FastString()
 		.PullOutVecs
 		.ProcessTrin(fs, .floats)
+		VM_Builder.SafeWrite("FTrin.i", fs)
 		.ProcessTrin(fs, .vectors)
-/		VM_Builder.SafeWrite("intrinsics.i", fs)
-	
-	// 2 params will go onto the END of the array.
-	// vectors go separate
-		
+		VM_Builder.SafeWrite("VTrin.i", fs)
+			
 	
 	function ProcessTrin (|faststring| fs, |[message]| codes, |int|)
 		opt norefcounts
@@ -62,7 +60,7 @@ module Intrinsics
 	
 	
 	function TrinSort (SorterComparer of Message)
-		return  .trinint - b.trinint
+		return  b.trinint - .trinint
 
 
 function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)

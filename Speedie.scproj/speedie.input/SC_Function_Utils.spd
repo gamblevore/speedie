@@ -30,13 +30,12 @@ dispatch FuncPreReader (fnPreReader)
 		opt norefcounts
 		.intrinsic = msg[@func]
 		.intrinsic.expectlast
-		
-	+'intrinsic'
+	
+	+'trin'
 		opt norefcounts
-		|| L = msg[@num]
+		|| L = msg[@bra].first
 			intrinsics.floats <~ l
-			l.obj = self
-		
+			l.obj = self		
 
 	+'disabled'
 		opt norefcounts

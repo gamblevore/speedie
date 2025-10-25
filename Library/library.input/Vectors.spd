@@ -544,8 +544,6 @@ datatype IntRange (ivec2)
 		return .x1 min .x2
 	function Mid (|int|)
 		return (.x1 + .x2)/2
-//	function Mix (|float|f, |float|)
-//		return mix(.x1, .x2, f)
 	function LimitTo (|int| i, |ivec2|)
 		if (.x  < 0):		.x  = 0
 		if (.x2 < 0):		.x2 = 0

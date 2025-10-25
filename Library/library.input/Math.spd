@@ -8,32 +8,30 @@ module Math
 	constants
 		E = 2.7182818284590452353602874713526
 		iTau = 0.15915494309
-		// seems maths is just a place to put constants on...
-		// I wonder. Could it be removed? Well... its kinda nice
-		// to have autocomplete show you constants.
+		// Maths is just a place to put constants on...
+		// So autocomplete shows you constants.
 	
 	function Pi (|float|)
 		disabled "Use π for pi, or 2π for PI*2"
 
-	helper ASinHalf (|float| f, |float|)
-		cpp_wrapper (asinf, 12)
+	helper UnSineBad (|float| f, |float|)
+		cpp_wrapper (asinf)
 
-	helper ACosHalf (|float| f, |float|)
-		cpp_wrapper (acosf, 13)
+	helper UnCosBad (|float| f, |float|)
+		cpp_wrapper (acosf) // we don't want the half version!
 
-	helper ATan2Half (|float| f1, |float| f2, |float|)
-		cpp_wrapper (atan2f, 14)
-	
-	helper CosPiHalf (|float| f, |float|)
-		cpp_wrapper (__cospif, 15)
-
-	helper TanPiHalf (|float| f, |float|)
-		cpp_wrapper (__tanpif, 16)
+	helper UnTan2Bad (|float| f1, |float| f2, |float|)
+		cpp_wrapper (atan2f)
 	
 	helper SinPiHalf (|float| f, |float|)
-		cpp_wrapper (__sinpif, 17)
+		cpp_wrapper (__sinpif)
 
+	helper CosPiHalf (|float| f, |float|)
+		cpp_wrapper (__cospif)
 
+	helper TanPiHalf (|float| f, |float|)
+		cpp_wrapper (__tanpif)
+	
 
 function int64.Hash (|uint64|)
 	return self|uint64|.hash 
@@ -211,9 +209,6 @@ extend float
 	function Increase (|float| f, |float|)
 		return self + f.copysign(self)
 	
-	function IsNan (|bool|)
-		cpp_wrapper (__isnanf, 18)
-	
 	function IsNormal (|bool|)
 		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
 		
@@ -229,9 +224,6 @@ extend float
 	function MakeSane (|float|)
 		if .IsSane
 			return self
-	
-	function IsInf (|bool|)
-		cpp_wrapper (__isinff, 19)
 	
 	function f64.IsNan (|bool|)
 		cpp_wrapper (__isnand)
@@ -279,17 +271,12 @@ extend float
 
 
 
-function float.Mix (|float| A, |float| B, |float|)
-	cpp_Part FloatMix
-	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
-	return A + (self * (A - B))
-
 function float.UnMix (|float| X, |float| Y, |float|) // inbetweenness
 	return (self - x)/(Y - X)
 
 function float.Mix (|vec4| A, |vec4| B, |vec4|)
 	cpp_Part Vec4Mix
-	return A + (self * (A - B))
+	return A + (self * (B - A))
 
 function float.Mix (|vec3| A, |vec3| B, |vec3|)
 	cpp_Part Vec3Mix
