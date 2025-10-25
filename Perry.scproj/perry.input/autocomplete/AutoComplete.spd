@@ -222,11 +222,11 @@ function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec
 	|| pg = .PopupDisplay.GNormal
 	|| def = .FileList.GNormal.bg.color
 	if color
-		color = mix(def, color, 0.3)
+		color = 0.3.mix(def, color)
 	  else
 		color = def
 	pg.bg = color.px
-	color = mix(colors.white(0.5), color, 0.8)
+	color = 0.8.mix(colors.white(0.5), color)
 	pg.edge	= color.px
 	.StartPopupVis(instant)
 

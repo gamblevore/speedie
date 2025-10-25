@@ -209,8 +209,8 @@ extend PerryIDE
 			.ID				= "AutoComplete"
 			.takesfocus 	= takesfocusflag.CanFocus
 			|| dark			= self.filelist.GNormal.bg.color
-			.GNormal.bg = mix(  dark, vec4(0.5, 1.0, 0.0, 1.0), 0.05).px  // mostly dark
-			.GNormal.edge = mix(dark, colors.green, 0.1 ).px  // less dark
+			.GNormal.bg		= 0.05.mix(  dark, vec4(0.5, 1.0, 0.0, 1.0)).px	// mostly dark
+			.GNormal.edge	= 0.1.mix(dark, colors.green ).px				// less dark
 			// now what?
 			is TypeThrough
 			isnt visible

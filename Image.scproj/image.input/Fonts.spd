@@ -149,12 +149,12 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 					|| c2 = col
 					if A < 64K									
 						|| f = A|float| * 65536th
-						c2 = mix(dz.color, c2, f)				// transparent pixel
+						c2 = f.mix(dz.color, c2)				// transparent pixel
 					dz <~ c2
 				  elseif drawmode < 0
 					dz <~ sz									// emoji direct
 				  else
-					dz <~ mix(sz.color, col, col.a)				// emoji darkened
+					dz <~ col.a.mix(sz.color, col)				// emoji darkened
 			sz++
 			dz++
 		clip.y++

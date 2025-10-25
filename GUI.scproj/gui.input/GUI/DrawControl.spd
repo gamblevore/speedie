@@ -102,7 +102,7 @@ class GraphicsEditor (GuiControl)
 
 	helper imagepixel.Underlay (|vec4| b, |$imagepixel| Dest)
 		|| Old = .color
-		|| C = mix(b, Old, Old.a)
+		|| C = Old.a.mix(b, Old)
 		C.a = old.a
 		Dest = C.px
 	

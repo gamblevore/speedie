@@ -160,7 +160,7 @@ class RayTracer
 			|| C = .colorsub(b)
 			if c.a >= 0.996
 				return c
-			return mix(.BG, c, c.a)
+			return c.a.mix(.BG, c)
 			// seems very slow. We will need opencl first.
 //			|| b2 = .FindBestObj(S, b)
 //			if !b2

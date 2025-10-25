@@ -145,7 +145,7 @@ class Image (memory)
 		|| Step = 1.0 / (vt[1] - vt[0])|float|
 		|| curr = 0.0
 		for y in vt
-			|| value = mix(b,t,curr).PreMul
+			|| value = curr.mix(b,t).PreMul
 			|| Px = self[hz.x  , y]
 			|| Px2 = self[hz.x2-1, y]
 			while px <= px2

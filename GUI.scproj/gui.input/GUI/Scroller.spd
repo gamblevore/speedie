@@ -128,13 +128,13 @@ helper ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)
 
 	|| si = .lastrect + (0,d,0,-1-d)
 	|| w = 10
-	|| p = mix(si.y1|float|, si.y2|float|, f)|int|
+	|| p = f.mix(si.y1|float|, si.y2|float|)|int|
 	|| y = p - d
 	
 	if shift
 		y += shift
 		p = y + d
-		f = unmix(si.y1|float|, si.y2|float|, p|float|)
+		f = p|float|.unmix(si.y1|float|, si.y2|float|)
 		s = (1.0-f) * l
 		return (s, s, s, s).iVec4
 	

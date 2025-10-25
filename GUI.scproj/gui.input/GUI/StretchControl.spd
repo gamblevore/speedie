@@ -177,13 +177,13 @@ class StretchDivider (GuiControl)
 				|| s = .upon.start.length
 				if s < 10
 					|| d = .upon.d
-					s = mix(pr[d]|float|, pr[d+2]|float|, 0.333)|int|
+					s = 0.333.mix(pr[d]|float|, pr[d+2]|float|)|int|
 				.upon.ActiveEnd = (.s)~up
 
 
 	helper DefaultEnd (|guicontrol| P, |int|)
 		|| pr = p.lastrect
-		return mix(pr[.d]|float|, pr[.d+2]|float|, .DefaultFraction)|int|	
+		return .DefaultFraction.mix(pr[.d]|float|, pr[.d+2]|float|)|int|	
 
 
 	function Show (|bool| anim=false)

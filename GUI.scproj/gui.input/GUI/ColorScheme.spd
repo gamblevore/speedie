@@ -115,9 +115,9 @@ class ColorScheme
 			|| scale = (2.0, 2.0)/(where.size.vec2)		// interpolate these... sigh.
 			for (P in where) (v) 
 				|| vs = v.vec2*scale
-				|| CX1	= mix(C0,	c1, vs.x)
-				|| Cx2	= mix(C2,	c3, vs.x)
-				|| C	= mix(cx2, cx1, vs.y) 
+				|| CX1	= vs.x.mix(C0,	c1)
+				|| Cx2	= vs.x.mix(C2,	c3)
+				|| C	= vs.y.mix(cx2, cx1) 
 				P <~ C 
 
 
@@ -183,7 +183,7 @@ function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagep
 
 function textview.LineNumColor (|imagepixel|)
 	|| c = .gnormal.bg.color
-	c = mix(c, colors.white, 0.35)
+	c = 0.35.mix(c, colors.white)
 	c.a = 1.0
 	return c.px
 

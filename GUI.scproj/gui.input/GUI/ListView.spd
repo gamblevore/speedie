@@ -1306,11 +1306,11 @@ class ListView (GUIControl) {
 		|| focus	= .gRowSel.bg
 		|| focuscol	= focus.color
 		|| bgcol	= bg.color
-		focuscol	= mix(bgcol, focuscol, focuscol.a)
+		focuscol	= focuscol.a.mix(bgcol, focuscol)
 		
 		|| unfoc	= vec4(focuscol.lum)
 		unfoc.a		= focuscol.a
-		unfoc		= mix(focuscol, unfoc, 0.667)
+		unfoc		= 0.667.mix(focuscol, unfoc)
 		unfoc.a += 0.2
 		where.fillmarks(.lastrect ± 1, bgcol.px, .gnormal.seps, focuscol.px, unfoc.px)
 
@@ -1387,7 +1387,7 @@ class ListView (GUIControl) {
 		
 		rect.y2 = rect.y +1
 		|| v = .GNormal.Seps.color
-		v = mix(v, colors.white, 0.2)
+		v = 0.2.mix(v, colors.white)
 		v.a = 0.5
 		where.DrawRect(Rect, v) 
 

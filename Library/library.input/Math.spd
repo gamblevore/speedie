@@ -279,27 +279,25 @@ extend float
 
 
 
-function Mix (|float| X, |float| Y, |float| Mix, |float|)
+function float.Mix (|float| A, |float| B, |float|)
 	cpp_Part FloatMix
-	return X + (Mix * (Y - X))
+	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
+	return A + (self * (A - B))
 
-function UnMix (|float| X, |float| Y, |float| R, |float|) // inbetweenness
-	return (R - x)/(Y - X)
+function float.UnMix (|float| X, |float| Y, |float|) // inbetweenness
+	return (self - x)/(Y - X)
 
-function Mix (|vec4| A, |vec4| B, |float| F, |vec4|)
+function float.Mix (|vec4| A, |vec4| B, |vec4|)
 	cpp_Part Vec4Mix
-	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
-	return (A*(1.0-F)) + (B*F)
+	return A + (self * (A - B))
 
-function Mix (|vec3| A, |vec3| B, |float| F, |vec3|)
+function float.Mix (|vec3| A, |vec3| B, |vec3|)
 	cpp_Part Vec3Mix
-	description "0.0 means fully A,   1.0 means fully B,  0.5 means half-way between A and B." 
-	return (((A,0.0)*(1.0-F)) + ((B,0.0) * F)).xyz
+	return .mix(A|vec4|, B|vec4|)|vec3|
 
-function Mix (|vec2| A, |float| F, |float|)
+function float.Mix (|vec2| A, |float|)
 	cpp_Part Vec2Mix
-	description "0.0 means fully .x,   1.0 means fully .y,  0.5 means half-way between .x and .y" 
-	return (A.x1*(1.0-F)) + (a.x2*F)
+	return .mix(a.x1, a.x2)
 
 
 
@@ -327,7 +325,8 @@ function math.RangeConvert (|float| low, |float| high, |FloatRangeConverterBasic
 
 datatype FloatRangeConverter (vec4)
 	function Convert (|float| x, |float|)
-		return mix(.z, .w, (x + .x) * .y)
+		|| f = (x + .x) * .y
+		return f.mix(.z, .w)
 
 datatype FloatRangeConverterBasic (vec2)
 	function Convert (|float| x, |float|)

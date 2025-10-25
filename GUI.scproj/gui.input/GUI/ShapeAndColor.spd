@@ -192,7 +192,7 @@ module VShapes
 		p.w *= 0.5
 		p.y+=gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if hit
-			return cloudcolor(self, ray, p, hit)
+			return CloudColor(self, ray, p, hit)
 			
 		|| r = .Radius.x * p.w
 		return Sphere(self, ray, p + (0,0,r)) add Sphere(self, ray, p - (0,r,0)) add Sphere(self, ray, p + (r,0,0))

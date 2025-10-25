@@ -95,7 +95,7 @@ class Shape
 			h.Dist = t
 			|| P = orig + dir*t
 			|| Norm = (P - .center).normal
-			|| y = Norm.y.uncos
+			|| y = Norm.y.Uncos
 			|| x = Norm.z.length.untan(Norm.x)
 			|| grid = ((((x+y + gui.Cycle(30s))*10).fract - 0.5)*10).clamp*0.1
 			H.color = (0.6+x+grid, y+grid, 0.3, 1.0)

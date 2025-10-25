@@ -434,10 +434,10 @@ datatype float
 		disabled "use UnTan"
 
 	function Unsin (|float|)
-		return math.asinhalf(self*2.0) * math.iTau
+		return math.asinhalf(self) * math.iTau
 
 	function Uncos (|float|)
-		return math.acoshalf(self*2.0) * math.iTau
+		return math.acoshalf(self) * math.iTau
 
 	function UnTan (|float| y, |float|)
 		rz = -math.ATan2Half(self, y)				   // our result is +-pi, but we want 0-1...
@@ -557,10 +557,6 @@ datatype float
 		disabled "what uses this even?"
 		return (self - other).abs < 0.0001 // seems close enough?
 	
-	function Mix (|float| y, |float| a, |float|)
-		cpp_part FloatMix
-		return self * (1.0 - a) + (y * a)
-
 	function SmoothStep (|float|)
 		|| x = .clamp// - 0.5
 		return x * x * (3.0 - 2.0 * x)
