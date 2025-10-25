@@ -459,11 +459,6 @@ datatype float
 	function Date (|date|)
 		return (self * 64.0K)|date|
 
-//	function DecimalPlaces (|int| to=2, |float|)
-//		cpp_Part RoundTo
-//		|| v = (10 pow to)|float|
-//		return (self * v).Round / v
-
 	function Sign (|float| sigma=0.0, |float|)
 		if self > sigma
 			return 1
@@ -484,50 +479,6 @@ datatype float
 
 	function IsPow2 (|bool|)
 		return !.log2.Fract
-
-	function Fract (|float|)
-		trin (0)
-		return self - .floor
-
-	function Floor (|float|)
-		trin (1)
-		cpp_wrapper (floorf)
-
-	function Round (|float|)
-		trin (2)
-		cpp_wrapper (roundf)
-
-	function Length (|float|) // for consistancy with length of vectors
-		trin (3)
-		cpp_wrapper (fabsf)
-
-	function InvSqrt (|float|)
-		trin (5)
-		return 1.0 / .Sqrt
-
-	function Sqrt (|float|)
-		trin (6)
-		cpp_wrapper (sqrtf)
-
-	function Log (|float|)
-		trin (7)
-		cpp_wrapper (logf)
-
-	function Exp (|float|)
-		description "Computes e to the power of (x) " 
-		trin (8)
-		cpp_wrapper (expf)
-
-	function Log2 (|float|)
-		trin (9)
-		cpp_wrapper (log2f)
-	
-	function Exp2 (|float|)
-		trin (10)
-		cpp_wrapper (exp2f)
-
-	function Log (|float|)
-		cpp_wrapper JB_f_Log
 
 	function Ceil (|float|)
 		rz = .floor
@@ -558,10 +509,47 @@ datatype float
 			return self
 		return other
 
-	operator pow (|float| other, |float|)
-		trin (11)
-		cpp_wrapper (powf)
-	
+	function Fract (|float|)
+		trin (0)
+		return self - .floor
+
+	function Floor (|float|)
+		trin (1)
+		cpp_wrapper (floorf)
+
+	function Round (|float|)
+		trin (2)
+		cpp_wrapper (roundf)
+
+	function Length (|float|) // for consistancy with length of vectors
+		trin (3)
+		cpp_wrapper (fabsf)
+
+	function InvSqrt (|float|)
+		trin (5)
+		return 1.0 / .Sqrt
+
+	function Sqrt (|float|)
+		trin (6)
+		cpp_wrapper (sqrtf)
+
+	function Exp (|float|)
+		description "Computes e to the power of (x)" 
+		trin (7)
+		cpp_wrapper (expf)
+
+	function Log (|float|)
+		trin (8)
+		cpp_wrapper (logf)
+
+	function Exp2 (|float|)
+		trin (9)
+		cpp_wrapper (exp2f)
+
+	function Log2 (|float|)
+		trin (10)
+		cpp_wrapper (log2f)
+
 	function Unsin (|float|)
 		trin (12)
 		return math.unsinebad(self) * math.iTau
@@ -597,12 +585,16 @@ datatype float
 		trin (19)
 		cpp_wrapper (__isinff)
 
+	operator pow (|float| other, |float|)
+		trin (21)
+		cpp_wrapper (powf)
+	
 	operator mod (|float| upon, |float|)
-		trin (24)
+		trin (22)
 		cpp_wrapper (fmodf)
 
 	function CopySign (|float| from, |float|)
-		trin (25)
+		trin (23)
 		cpp_wrapper (copysignf)
 
 	function Mix (|float| A, |float| B, |float|)
@@ -615,7 +607,7 @@ datatype float
 		trin (31)
 		|| t = ((self - low) / (high - low)).clamp
 		return t * t * (3.0 - 2.0 * t)
-	
+
 	operator ShiftLeft (|int| x, |float|)
 		while --x >= 0	// there is a faster way, but this is good enough.
 			self *= 2.0	// mostly people wanna do x << 1 or x << 2

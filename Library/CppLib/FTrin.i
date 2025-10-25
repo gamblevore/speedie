@@ -18,19 +18,16 @@
 		return sqrtf(R2);
 
 	if (Mode == 7)
-		return logf(R2);
-
-	if (Mode == 8)
 		return expf(R2);
 
-	if (Mode == 9)
-		return log2f(R2);
+	if (Mode == 8)
+		return logf(R2);
 
-	if (Mode == 10)
+	if (Mode == 9)
 		return exp2f(R2);
 
-	if (Mode == 11)
-		return powf(R2);
+	if (Mode == 10)
+		return log2f(R2);
 
 	if (Mode == 12)
 		return JB_f_Unsin(R2);
@@ -56,10 +53,13 @@
 	if (Mode == 19)
 		return __isinff(R2);
 
-	if (Mode == 24)
+	if (Mode == 21)
+		return powf(R2);
+
+	if (Mode == 22)
 		return fmodf(R2);
 
-	if (Mode == 25)
+	if (Mode == 23)
 		return copysignf(R2);
 
 	if (Mode == 30)
