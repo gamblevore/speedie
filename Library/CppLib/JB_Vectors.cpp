@@ -42,11 +42,19 @@ vec4 JB_vec4_Round (vec4 x) {
 	#endif
 }
 
+vec4 JB_Vec4_Abs (vec4 x) {
+	#if __has_builtin(__builtin_elementwise_abs)
+		return __builtin_elementwise_abs(x);
+	#else
+		return v2(fabsf, x);
+	#endif
+}
+
 vec4 JB_vec4_Floor (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_floor)
 		return __builtin_elementwise_floor(x);
 	#else
-		return v1(roundf, x);
+		return v1(floorf, x);
 	#endif
 }
 
@@ -202,8 +210,13 @@ float JB_vec4_Length (vec4 x) {
 	return sqrtf(JB_vec4_Dot(x,x));
 }
 
-vec4 JB_vec4_Cross (vec4 x, vec4 low) {
-	return zero;
+vec4 JB_vec4_Cross (vec4 x, vec4 y) {
+	return (vec4){
+		x[1]*y[2]-y[1]*x[2],
+		x[2]*y[0]-y[2]*x[0],
+		x[0]*y[1]-y[0]*x[1],
+		0.0f
+	};
 }
 
 vec4 JB_vec4_Normal (vec4 x) {

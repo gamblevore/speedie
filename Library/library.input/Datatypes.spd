@@ -618,11 +618,6 @@ datatype float
 			self *= 0.5
 		return self
 	
-	operator ↑↑ (|int| n, |float|)
-		rz = self
-		for n
-			rz = self pow rz
-
 	function vec2.operatorby (|float| step,  |FloatRange|)
 		rz.From = .x
 		rz.To = .y

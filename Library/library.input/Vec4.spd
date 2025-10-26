@@ -7,121 +7,109 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 
-	function Floor (|vec4|)
-		trin (1)
-		cpp_wrapper
+	function Floor (|vec4|) {trin (1)
+		cpp_wrapper}
 
-	function Round (|vec4|)
-		trin (2)
-		cpp_wrapper
+	function Round (|vec4|) {trin (2)
+		cpp_wrapper}
 
-	function Length (|float|)
-		trin (3)
-		cpp_wrapper
+	function Length (|float|) {trin (3)
+		cpp_wrapper}
 
-	function InvSqrt (|vec4|)
-		trin (5)
-		cpp_wrapper
+	function InvSqrt (|vec4|) {trin (5)
+		cpp_wrapper}
 
-	function Sqrt (|vec4|)
-		trin (6)
-		cpp_wrapper
+	function Sqrt (|vec4|) {trin (6)
+		cpp_wrapper}
 
-	function Exp (|vec4|)
-		description "Computes e to the power of (x)" 
-		trin (7)
+	function Exp (|vec4|) {trin (7)
 		cpp_wrapper
+		description "Computes e to the power of (x)"} 
 
-	function Log (|vec4|)
-		trin (8)
-		cpp_wrapper
+	function Log (|vec4|) {trin (8)
+		cpp_wrapper}
 
-	function Exp2 (|vec4|)
-		trin (9)
-		cpp_wrapper
+	function Exp2 (|vec4|) {trin (9)
+		cpp_wrapper}
 
-	function Log2 (|vec4|)
-		trin (10)
-		cpp_wrapper
+	function Log2 (|vec4|) {trin (10)
+		cpp_wrapper}
 
-	function Unsin (|vec4|)
-		trin (12)
-		cpp_wrapper
+	function Unsin (|vec4|) {trin (12)
+		cpp_wrapper}
 
-	function Uncos (|vec4|)
-		trin (13)
-		cpp_wrapper
+	function Uncos (|vec4|) {trin (13)
+		cpp_wrapper}
 
-	function UnTan (|vec4| y, |vec4|)
-		trin (14)
-		cpp_wrapper
+	function UnTan (|vec4| y, |vec4|) {trin (14)
+		cpp_wrapper}
 
-	function Sine (|vec4|)
-		trin (15)
-		cpp_wrapper
+	function Sine (|vec4|) {trin (15)
+		cpp_wrapper}
 
-	function Cos (|vec4|)
-		trin (16)
-		cpp_wrapper
+	function Cos (|vec4|) {trin (16)
+		cpp_wrapper}
 
-	function Tan (|vec4|)
-		trin (17)
-		cpp_wrapper
+	function Tan (|vec4|) {trin (17)
+		cpp_wrapper}
+
+	operator pow (|vec4| other, |vec4|) {trin (21)
+		cpp_wrapper}
 	
-	operator pow (|vec4| other, |vec4|)
-		trin (21)
-		cpp_wrapper
+	operator mod (|vec4| upon, |vec4|) {trin (22)
+		cpp_wrapper}
+
+	operator Sign (|vec4| from, |vec4|) {trin (23)
+		cpp_wrapper JB_Vec4_CopySign}
 	
-	operator mod (|vec4| upon, |vec4|)
-		trin (22)
-		cpp_wrapper
+	operator • (|vec4| other, |float|) {trin (24)
+		cpp_wrapper JB_vec4_Dot}
 
-	function CopySign (|vec4| from, |vec4|)
-		trin (23)
-		cpp_wrapper
+	operator Cross (|vec4| other, |float|) {trin (25)
+		cpp_wrapper}
 
-	function Mix (|vec4| A, |vec4| B, |vec4|)
-		cpp_Part FloatMix
-		trin (30)
-		cpp_wrapper
+	function Mix (|vec4| A, |vec4| B, |vec4|) {trin (30)
+		cpp_wrapper}
 
-	function SmoothStep (|vec4| low=0, |vec4| high=1, |vec4|)
-		trin (31)
-		cpp_wrapper	
-	
-	operator ± (|float| i, |vec4|)
-		cpp_part Shrink
-		return (.x+i, .y+i, .z-i, .w-i)
-
-	function Clamp (|float| max=1.0, |vec4|)
-		cpp_part MiniClamp
-		return .clamp(0, max)
+	function SmoothStep (|vec4| low=0, |vec4| high=1, |vec4|) {trin (31)
+		cpp_wrapper	}
 	
 	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|)
 		cpp_wrapper JB_Vec4_Clamp
 		asm vclm(dest, p1, p2, p3)
+	
+	function Abs (|vec4|)
+		cpp_wrapper
+	
+	operator max (|vec4| M, |vec4|)
+		cpp_wrapper JB_Vec4_Max
+	
+	operator min (|vec4| M, |vec4|)
+		cpp_wrapper JB_Vec4_Min
+	
+	function Fract (|vec4|)
+		cpp_wrapper
+
+	function Sum (|float|)
+		cpp_wrapper
+
+	function Clamp (|float| max=1.0, |vec4|)
+		cpp_part MiniClamp
+		return .clamp(0, max)
 
 	function Clamp (|float| A, |float| B, |vec4|)
 		cpp_wrapper JB_Vec4_ClampFloat	
-	
-	function Abs (|vec4|)
-		return (.x.length, .y.length, .z.length, .w.length)
-	
+		
+	operator ± (|float| i, |vec4|)
+		cpp_part Shrink
+		return (.x+i, .y+i, .z-i, .w-i)
+
 	function IsPositive (|bool|)
 		return (.x2 > .x) & (.y2 > .y)
 	
 	function IsNegative (|bool|)
 		return (.x2 < .x) ||| (.y2 < .y)
 
-//	function Sqrt (|vec4|)
-//		return (.x.sqrt, .y.sqrt, .z.sqrt, .w.sqrt) // oof
-		
-//	function Sin (|vec4|)
-//		return (.x.sine, .y.sine, .z.sine, .w.sine)
-
-//	function Cos (|vec4|)
-//		return (.x.cos, .y.cos, .z.cos, .w.cos)
-//	
 	function Size (|vec2|)
 		return (.x2 - .x, .y2 - .y)
 	
@@ -131,9 +119,6 @@ datatype vec4
 	function Right (|float| X, |vec4|)
 		return self + (x,0,x,0)
 
-	operator • (|vec4| other, |float|)
-		cpp_wrapper JB_vec4_Dot
-
 	operator dot3 (|vec4| V, |float|)
 		v[0] = 0
 		return self • V
@@ -141,21 +126,11 @@ datatype vec4
 	operator absmax (|vec4| M, |vec4|)
 		return (.x longer m.x, .y longer m.y, .z longer m.z, .w longer m.w)
 
-	operator max (|vec4| M, |vec4|)
-		return (.x max m.x, .y max m.y, .z max m.z, .w max m.w)
-	
-	operator min (|vec4| M, |vec4|)
-		return (.x min m.x, .y min m.y, .z min m.z, .w min m.w)
-	
 	function CosR (|vec4|)
 		return (self * math.iTau).cos
 
 //	operator Pow (|vec4| p, |vec4|)
 //		return (.x pow p.x, .y.cos pow p.y, .z.cos pow p.z, .w.cos pow p.w)
-
-
-	operator Sign (|vec4| C, |vec4|)
-		return (.x.copysign(c.x), .y.copysign(c.y), .z.copysign(c.z), .w.copysign(c.w))
 
 	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
@@ -174,14 +149,7 @@ datatype vec4
 
 	function Aspect (|float|)
 		return .width / .height
-	
-	function Fract (|vec4|)
-		return (.x.fract, .y.fract, .z.fract, .w.fract)
 		
-	
-	function Sum (|float|)
-		return .x + .y + .z + .w
-	
 	function Overlap (|vec4| R, |vec4|)
 		disabled "Use .clip"
 	

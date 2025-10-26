@@ -13,3 +13,7 @@ main
 				"$sq ↑↑ $i --> ${sq ↑↑ i}"
 
 			
+function float.operator↑↑ (|int| n, |float|)
+	rz = self
+	for n
+		rz = self pow rz
