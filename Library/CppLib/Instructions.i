@@ -281,7 +281,7 @@
 ı VDIV: _
 	v1 = v2 / v3;
 ı VFRC: _
-	v1 = (v2 - VFloor(v2)) * v3;
+	v1 = (v2 - JB_vec4_Floor(v2)) * v3;
 ı VCLM: _
 	v1 = JB_Vec4_Clamp(v2, v3, v4);
 ı QADD: _

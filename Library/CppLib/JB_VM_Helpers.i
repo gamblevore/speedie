@@ -696,37 +696,6 @@ AlwaysInline void ForeignFunc2 (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, 
 }
 
 
-AlwaysInline vec4 VFloor (vec4 A) {
-// remove this
-	return {
-		std::floor(A[0]),
-		std::floor(A[1]),
-		std::floor(A[2]),
-		std::floor(A[3])
-	};
-}
-
-AlwaysInline vec4 VMax (vec4 A, vec4 B) {
-// remove this
-	return {
-		std::max(A[0], B[0]),
-		std::max(A[1], B[1]),
-		std::max(A[2], B[2]),
-		std::max(A[3], B[3])
-	};
-}
-
-AlwaysInline vec4 VMin (vec4 A, vec4 B) {
-// remove this
-	return {
-		std::min(A[0], B[0]),
-		std::min(A[1], B[1]),
-		std::min(A[2], B[2]),
-		std::min(A[3], B[3])
-	};
-}
-
-
 AlwaysInline ivec4 QMax (ivec4 A, ivec4 B) {
 	return {
 		std::max(A[0], B[0]),

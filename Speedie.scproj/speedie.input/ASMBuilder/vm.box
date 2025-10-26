@@ -728,9 +728,9 @@ POS 5
 		v1 = v2 * FloatIncr1(Op)
 /**/ VDIV  (float)
 		v1 = v2 / v3
-/**/ VFRC  (Float)
-		v1 = (v2 - VFloor(v2)) * v3
-/**/ VCLM (U4)
+/**/ VFRC  (Float)							// should be an intrinsic?
+		v1 = (v2 - JB_vec4_Floor(v2)) * v3
+/**/ VCLM (U4)								// also?
 		v1 = JB_Vec4_Clamp(v2,v3,v4)
 
 
@@ -777,7 +777,6 @@ POS 5
 		uv1 = uv2 ||| (uv3 ||| Shift_Shu)
 /**/ QNOT  (Shift)
 		uv1 = ~uv2 & ~(uv3 ||| Shift_Shu)
-
 /**/ QCNV (Convert)
 		VecConv(r, Op)
 
@@ -785,9 +784,6 @@ POS 5
 
 
 #!						(((((Intrinsics!)))))
-
-// how to do instrinsics?
-// shouldn't these all go into the same thing?
 /**/ FOPP  (Float)
 		0
 /**/ BSTT  (addk)
