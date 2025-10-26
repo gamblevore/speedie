@@ -132,12 +132,11 @@ datatype vec4
 		return self + (x,0,x,0)
 
 	operator • (|vec4| other, |float|)
-		cpp_part Dot
-		return (self * other).sum
+		cpp_wrapper JB_vec4_Dot
 
 	operator dot3 (|vec4| V, |float|)
-		V *= self
-		return v.x+v.y+v.z
+		v[0] = 0
+		return self • V
 	
 	operator absmax (|vec4| M, |vec4|)
 		return (.x longer m.x, .y longer m.y, .z longer m.z, .w longer m.w)
