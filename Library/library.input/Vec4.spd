@@ -7,6 +7,9 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 
+	function Fract (|vec4|) {trin (0)
+		cpp_wrapper}
+
 	function Floor (|vec4|) {trin (1)
 		cpp_wrapper}
 
@@ -86,9 +89,6 @@ datatype vec4
 	
 	operator min (|vec4| M, |vec4|)
 		cpp_wrapper JB_Vec4_Min
-	
-	function Fract (|vec4|)
-		cpp_wrapper
 
 	function Sum (|float|)
 		cpp_wrapper

@@ -1,4 +1,7 @@
 
+	if (Mode == 0)
+		return JB_vec4_Fract(R2);
+
 	if (Mode == 1)
 		return JB_vec4_Floor(R2);
 
