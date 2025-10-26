@@ -146,7 +146,7 @@ vec4 JB_vec4_Tan (vec4 x) {
 	#endif
 }
 
-vec4 JB_vec4_pow (vec4 x, vec4 y) {
+vec4 JB_vec4_Pow (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_pow)
 		return __builtin_elementwise_pow(x, y);
 	#else
@@ -154,7 +154,7 @@ vec4 JB_vec4_pow (vec4 x, vec4 y) {
 	#endif
 }
 
-vec4 JB_vec4_mod (vec4 x, vec4 y) {
+vec4 JB_vec4_Mod (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_fmod)
 		return __builtin_elementwise_fmod(x, y);
 	#else

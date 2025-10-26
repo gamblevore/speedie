@@ -54,10 +54,10 @@
 		return JB_vec4_OperatorMod(R2);
 
 	if (Mode == 23)
-		return JB_vec4_OperatorSign(R2);
+		return JB_vec4_CopySign(R2);
 
 	if (Mode == 24)
-		return JB_vec4_OperatorxE2x80xA2(R2);
+		return JB_vec4_Dot(R2);
 
 	if (Mode == 25)
 		return JB_vec4_OperatorCross(R2);

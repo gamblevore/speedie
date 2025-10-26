@@ -1326,7 +1326,7 @@ extend Message
 			if (IndExtra > 0) and (pr == @tmp)
 				return IndExtra
 
-/		parser.ErrorAlwaysAdd( "Indents mismatch ($prin vs $chin spaces)", .position )
+		parser.ErrorAlwaysAdd( "Indents mismatch ($prin vs $chin spaces)", .position )
 
 
 	function Type (|syntax|)
