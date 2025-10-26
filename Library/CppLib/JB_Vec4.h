@@ -8,6 +8,7 @@ extern "C" {
 vec4 JB_vec4_Floor		(vec4 x);
 vec4 JB_vec4_Round		(vec4 x);
 float JB_vec4_Length	(vec4 x);
+float JB_vec4_Dot		(vec4 x, vec4 y);
 vec4 JB_vec4_InvSqrt	(vec4 x);
 vec4 JB_vec4_Sqrt		(vec4 x);
 vec4 JB_vec4_Exp		(vec4 x);
