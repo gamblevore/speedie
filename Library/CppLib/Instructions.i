@@ -283,7 +283,7 @@
 ı VFRC: _
 	v1 = (v2 - VFloor(v2)) * v3;
 ı VCLM: _
-	v1 = JB_Vec4_ClampVec(v2, v3, v4);
+	v1 = JB_Vec4_Clamp(v2, v3, v4);
 ı QADD: _
 	iv1 = iv2 + (iv3 << Shift_Shu);
 ı QSUB: _

@@ -98,11 +98,11 @@ datatype vec4
 		return .clamp(0, max)
 	
 	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|)
-		cpp_wrapper JB_Vec4_ClampVec
+		cpp_wrapper JB_Vec4_Clamp
 		asm vclm(dest, p1, p2, p3)
 
 	function Clamp (|float| A, |float| B, |vec4|)
-		cpp_wrapper JB_Vec4_Clamp	
+		cpp_wrapper JB_Vec4_ClampFloat	
 	
 	function Abs (|vec4|)
 		return (.x.length, .y.length, .z.length, .w.length)
