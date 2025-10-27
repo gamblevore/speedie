@@ -1071,7 +1071,7 @@ ive been~running #since morning
 					(parent is style2)
 
 		rz.Lines += commas
-		if !rz.lines // we can't have an indent if we have no lines
+		if !rz.lines and (parent.func == @arg and parent isnt style2) // we can't have an indent if we have no lines
 			rz.Dentine = 252
 		.NextStart = n
 		
@@ -1305,20 +1305,21 @@ module parser
 
 
 extend Message
-	helper _ParseIndent (|int|)
-		|| i = .indent
-		if i < 252
-			return i&~1
-	
 	function PrevIndentCheck (|message| pr, |int|)
 		Opt NoRefCounts
-		|| prin = pr._parseindent
-		|| chin =   ._parseindent
+		|| chin = .Indent&~1
+		if chin >= 252
+			chin = 0
+		|| prin = pr.indent&~1
+		if prin >= 252
+			pr.indent = .indent
+			prin = chin
+		
 		|| IndExtra = chin - prin				#require
 		if (indExtra isa 2)
 			if indextra == 4
-				return indextra
-			if indextra < 0
+				return IndExtra
+			if IndExtra < 0
 				if (indextra isa 4) or (.indent|int| isa 4) or (.InInvisArg)
 					return indextra
 			if (IndExtra > 0) and (pr == @tmp)
