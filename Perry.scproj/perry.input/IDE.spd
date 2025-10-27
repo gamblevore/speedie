@@ -637,16 +637,16 @@ class PerryIDE (Window)
 		|| NumKey = key.IsNumber
 			ifn keys.Shift or keys.option
 				if NumKey == 9
-					.ASMButton.Click
-					return true
-				if NumKey == 8
 					.flip(.ProductOut)
 					return true
-				if NumKey == 7
+				if NumKey == 8
 					.flip(.SpeedieText)
 					return true
-				if NumKey == 6
+				if NumKey == 7
 					return .FlipJeeboxField			
+				if NumKey == 6
+					.ASMButton.Click
+					return true
 				if NumKey == 5
 					return .StrongView(.ViewLog)
 				if NumKey == 4
