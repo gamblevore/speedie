@@ -9,6 +9,9 @@
 		return roundf(R2);
 
 	if (Mode == 3)
+		return JB_f_Length(R2);
+
+	if (Mode == 4)
 		return fabsf(R2);
 
 	if (Mode == 5)
@@ -61,6 +64,9 @@
 
 	if (Mode == 23)
 		return copysignf(R2);
+
+	if (Mode == 29)
+		return JB_f_Clamp(R2);
 
 	if (Mode == 30)
 		return JB_f_FloatMix(R2);

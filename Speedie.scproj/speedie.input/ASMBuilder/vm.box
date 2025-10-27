@@ -690,9 +690,21 @@ POS 5
 
 /**/ FFRC  (Float)
 		if (!Float_Du)
-			d1 = (d2 - floor(d2)) * d3
+			d1 = d2 - floor(d2)
 		else
-			f1 = (f2 - floor(f2)) * f3
+			f1 = f2 - floor(f2)
+
+/**/ FMAX (Float)
+		if (!Float_Du)
+			d1 = std_max(d2,d3)
+		else
+			f1 = std_max(f2,f3)
+
+/**/ FMIN (Float)
+		if (!Float_Du)
+			d1 = std_min(d2,d3)
+		else
+			f1 = std_min(f2,f3)
 
 /**/ FCLM (Float)
 		if (!Float_Du)
@@ -729,9 +741,11 @@ POS 5
 /**/ VDIV  (float)
 		v1 = v2 / v3
 /**/ VFRC  (Float)							// should be an intrinsic?
-		v1 = (v2 - JB_vec4_Floor(v2)) * v3
-/**/ VCLM (U4)								// also?
-		v1 = JB_Vec4_Clamp(v2,v3,v4)
+		v1 = v2 - JB_vec4_Floor(v2)
+/**/ VMAX (U3)
+		v1 = JB_vec4_Max(v2,v3)
+/**/ VMIN (U3)
+		v1 = JB_vec4_Min(v2,v3)
 
 
 

@@ -53,7 +53,7 @@ function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
 target debug
 	function scdecl.ASMSanity 
 		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
-			|| size = .type.Size
+			|| size = .type.ClsSize
 			|| T = .TypeOnly
 			if T == DataTypeCode.Vec3 or DataTypeCode.ivec3
 				size = 12

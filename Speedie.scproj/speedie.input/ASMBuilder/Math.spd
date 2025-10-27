@@ -598,12 +598,12 @@ extend Assembler
 
 
 	function ModFloat    (fn_opasm)
-		if dest is Const
+/		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, L, R, asmreg(), big).Vectorise(dest, asm.VDIV)
 		if 0: exp.vfrc
-		return exp.FFRC(dest, asmreg(), dest, R, big).Vectorise(dest, asm.VFRC)
+/		return exp.FFRC(dest, asmreg(), dest, R, big).Vectorise(dest, asm.VFRC)
 
 	
 	function Mod    (fn_opasm)

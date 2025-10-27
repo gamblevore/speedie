@@ -1011,7 +1011,7 @@ function SetZeroPropertiesSub (|Message| After, |[scdecl]| P, |[scdecl]| sorted)
 	sorted.sort(&codesorter.PropertyOrder)
 
 	|| Length = 0
-	|| CanSIMD = .cls!.size|int| isa 16
+	|| CanSIMD = .cls!.clssize|int| isa 16
 	
 	for (d in sorted) (i)
 		(d is UsedByASM)
@@ -1405,7 +1405,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 		clss.BaseType = SCNodeType.ProtoType
 		(clss isnt Builtin)		// datatype sets it to true.
 		clss.FuncProto = f
-		clss.size = platform.pointerbytes
+		clss.clssize = platform.pointerbytes
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f
 	

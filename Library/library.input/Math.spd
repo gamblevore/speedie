@@ -188,10 +188,6 @@ extend float
 		|| sq = mul.Sqrt
 		return factor / sq
 	
-	function Clamp (|float| L, |float| H, |float|)
-		cpp_wrapper JB_f_Clamp
-		asm fclm(dest, p1, p2, p3, 1)
-	
 	function Clamp (|float| H = 1.0, |float|)
 		return .clamp(0, h)
 		

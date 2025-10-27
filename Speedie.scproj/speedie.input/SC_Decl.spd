@@ -1180,7 +1180,7 @@ class SCDecl (SCObject) {
 		|| T = .type
 		if T.IsObject or .PointerCount// or t.FuncProto
 			return platform.PointerBytes * mul
-		return T.size * mul
+		return T.clssize * mul
 
 
 	function TypeInfo (|DataTypeCode|)
@@ -1213,7 +1213,7 @@ class SCDecl (SCObject) {
 				return al
 			return 32 // sigh // fallback
 		// CalculateSizeRaw sets function prototype sizes to platform.pointerbytes
-		return t.size
+		return t.clssize
 	
 
 	function ASMRegType (|datatypecode|)
@@ -1232,7 +1232,7 @@ class SCDecl (SCObject) {
 		if .pointercount > 1
 			rz = Platform.PointerBytes
 		  else
-			rz = .type.size
+			rz = .type.clssize
 		if .IsCArray
 			// not true for carrays of carrays.
 			rz *= .CArrayTotal

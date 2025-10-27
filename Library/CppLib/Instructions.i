@@ -247,10 +247,24 @@
 ;
 ı FFRC: _
 	if (!Float_Du)
-	d1 = (d2 - floor(d2)) * d3
+	d1 = d2 - floor(d2)
 ;
 	else
-	f1 = (f2 - floor(f2)) * f3
+	f1 = f2 - floor(f2)
+;
+ı FMAX: _
+	if (!Float_Du)
+	d1 = std_max(d2, d3)
+;
+	else
+	f1 = std_max(f2, f3)
+;
+ı FMIN: _
+	if (!Float_Du)
+	d1 = std_min(d2, d3)
+;
+	else
+	f1 = std_min(f2, f3)
 ;
 ı FCLM: _
 	if (!Float_Du)
@@ -281,9 +295,11 @@
 ı VDIV: _
 	v1 = v2 / v3;
 ı VFRC: _
-	v1 = (v2 - JB_vec4_Floor(v2)) * v3;
-ı VCLM: _
-	v1 = JB_Vec4_Clamp(v2, v3, v4);
+	v1 = v2 - JB_vec4_Floor(v2);
+ı VMAX: _
+	v1 = JB_vec4_Max(v2, v3);
+ı VMIN: _
+	v1 = JB_vec4_Min(v2, v3);
 ı QADD: _
 	iv1 = iv2 + (iv3 << Shift_Shu);
 ı QSUB: _

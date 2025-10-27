@@ -11,6 +11,9 @@
 	if (Mode == 3)
 		return JB_vec4_Length(R2);
 
+	if (Mode == 4)
+		return JB_vec4_Abs(R2);
+
 	if (Mode == 5)
 		return JB_vec4_InvSqrt(R2);
 
@@ -61,6 +64,9 @@
 
 	if (Mode == 25)
 		return JB_vec4_OperatorCross(R2);
+
+	if (Mode == 29)
+		return JB_vec4_Clamp(R2);
 
 	if (Mode == 30)
 		return JB_vec4_Mix(R2);

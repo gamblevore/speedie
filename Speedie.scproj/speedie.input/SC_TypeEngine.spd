@@ -707,7 +707,7 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 
 	prms.Func = @prm
 	using exp
-		prms <~ cls.CalculateSize
+		prms <~ cls.ClsSize
 	
 	|| MemWrapper = TypeOfExpr(exp, compiler.program)
 		MemWrapper = MemWrapper.CopyDecl						// cos we gonna alter it.

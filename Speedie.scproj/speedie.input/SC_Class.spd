@@ -66,8 +66,8 @@ linkage
 |ClassInfo|					Flags
 |DataTypeCode|  			TypeInfo
 |DataTypeCode|  			ASMTypeInfo
-|uint16|					SizeRaw
-|uint16|					Size			// use scdecl.ByteSize to find the size of this in a var.
+|uint16|					ClsSizeRaw
+|uint16|					ClsSize			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					TaskObjectCount
 |byte|						Depth
 |byte|						Alignment
@@ -219,68 +219,68 @@ function GetDepth (|int|)
 			.TypeNormal.NilDeclared = NilState.real
 
 
-function CalculateSize (|int| Depth = 0, |int|)
-	.CalculateSizeRaw(Depth)
-	return .size
-
-
-function scdecl.CalculateSize (|int| depth = 0, |int|)
+function scdecl.CalculateDeclSize (|int| depth = 0, |int|)
 	opt norefcounts
 	if .Type.IsObject or .PointerCount
 		return platform.PointerBytes
 	depth++
 	if .iscarray
 		|| i = .internal
-			return i.calculatesize(depth) // * .c_array // its caller does this
+			return i.CalculateDeclSize(depth) // * .c_array // its caller does this
 		debugger
-	return .type.calculatesize(depth)
+	return .Type.ClsSize
 
 	
-function CalculateSizeRaw (|int| Depth=0, |int|)
+helper MiniSize (|int| B, |int|)
+	.clssize = B
+	.ClsSizeRaw = B
+	.Alignment = B
+	return B
+	
+function CalculateSize (|int| Depth=0, |int|)
 	opt norefcounts
-	|| si = .size
-		return si
-
 	if .IsFunc
-		.size = Platform.PointerBytes
-		.Alignment = Platform.PointerBytes
-		return .size
+		return .minisize(Platform.PointerBytes)
 	
 	if .IsDataTypeOnly
-		.size = .typeinfo.ByteCount
-		.Alignment = .size
-		return .size
+		return .minisize(.typeinfo.ByteCount)
 
-	expect (Depth < 16) (.sourceArg, "Class hierarchy too deep")
-	|| Align = 1
+	expect (Depth < 16) (.SourceArg, "Class hierarchy too deep")
+	|| AlignTo = 1
 	if self == typeobject
-		align = 4
+		AlignTo = 4
 		rz = 4 // refcount
 	
-	|| s = .super
-		rz = s.CalculateSizeRaw								#DEBUG_REQUIRE
-		align = align max s.Alignment
+	|| s = .super  // we can rely on everything being sorted.
+		rz = s.clssize							#expect (self)
+		AlignTo = AlignTo max s.Alignment
 	
 	|| bits = 0
 	for p in .properties
 		if (p is task) and p.isobject
 			bits[(rz+(platform.PointerBytes-1))>>3] = true
 
-		|| curr = P.CalculateSize(depth)
+		|| curr = P.CalculateDeclSize(depth)
 		|| pal = p.alignment
-		align = align max pal
+		AlignTo = AlignTo max pal
 		rz = rz Align pal
 		p.ExportPosition = rz
 		p.sanity
 		|| Mul = P.c_Array ?? 1
 		rz += Curr * Mul 
 
-	.alignment = align
-	.SizeRaw = rz
-	.Size = rz align align
+	.alignment = AlignTo
+
+	|| CppSize = .ClsSize
+		.ClsSizeRaw = CppSize
+		return CppSize
+	
+	.ClsSizeRaw = rz
+	rz = rz align AlignTo
+	.ClsSize = rz
 	if .istask
 		.taskobjectcount = .super!.taskobjectcount ||| bits
-		check (.size <= 128) (.source, "Task size is over 128.") // could make it dynamic. Perhaps just allocate the largest task found? still limit to 256 bytes tho.
+		check (rz <= 128) (.source, "Task size is over 128.") // could make it dynamic. Perhaps just allocate the largest task found? still limit to 256 bytes tho.
 
 
 
@@ -297,14 +297,14 @@ function AlignProperties
 	|| ParentSize = 4
 	|| sp = .super
 	if sp and sp != typeobject
-		ParentSize = sp.SizeRaw
+		ParentSize = sp.clsSizeRaw
 
 	|| LargeSize = .properties.CarraySize(ParentSize)
 	if LargeSize > 128 // if over 128 keep curr sort
-		.sizeraw = LargeSize
+		.clssizeraw = LargeSize
 		return
 
-	.sizeraw = parentsize
+	.clssizeraw = parentsize
 	|[scdecl]| Sorted
 	.AlignTo(sorted, 3)
 	.AlignTo(sorted, 4)
@@ -328,19 +328,19 @@ function AlignSub (|[scdecl]| dest, |scdecl| D, |bool|)
 	opt norefcounts
 	dest <~ d
 	|| al = d.alignment
-	|| size = .SizeRaw|int| align al
+	|| size = .clsSizeRaw|int| align al
 	size += d.carraysize
-	.sizeraw = size
+	.clssizeraw = size
 	return true
 
 
 function AlignTo (|[scdecl]| dest, |int| Bits)
 	opt norefcounts
 	|| AlignBits = (1<<Bits)-1
-	require .sizeraw & Alignbits
+	require .clssizeraw & Alignbits
 	
 	while Bits-- > 0
-		while .sizeraw & AlignBits
+		while .clssizeraw & AlignBits
 			|| d = .FindPropAlignedTo(1<<Bits)
 				.alignsub(dest, d)
 			  else
@@ -405,9 +405,11 @@ function LoadSuperBehaviours
 
 module {
 function SetSize (CollectFunc)
+	opt norefcounts
 	if name_space isa scclass
-		name_space.size = node.first.int
+		name_space.clssize = node.first.int // what about the rawsize? and alignment?
 	return compiler.program
+
 
 function LoadClassName (|message| node, |string|)
 	opt norefcounts
@@ -1113,7 +1115,7 @@ module
 		|| node = .Source!
 		using node
 		|| sup = .super
-			.Size = sup.Size
+			.clsSize = sup.ClsSize
 			.TypeInfo = sup.TypeInfo
 			.ASMTypeInfo = .TypeInfo
 			|| nr = .NumericReduction
@@ -1126,9 +1128,9 @@ module
 		|| Td = DataTypeCode.Types[n]
 			|| t = td[]
 			if T != 255
-				.size = T.ByteCount
+				.clssize = T.ByteCount
 				if t == datatypecode.Vec3 or datatypecode.iVec3
-					.size = 16 // sigh 
+					.clssize = 16 // sigh 
 				.TypeInfo = T
 				.ASMTypeInfo = t
 				is Builtin

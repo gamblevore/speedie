@@ -36,6 +36,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 
 	if fn == Compiler.RefIncr2
+		debugat 8
 		|| A = .µ(prms.first!, asmreg.AddrRequest)
 		target debug: if a isnt ContainsAddr					// always memory
 		|| offset = 0

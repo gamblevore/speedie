@@ -291,7 +291,7 @@ module PackMaker
 		
 	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
-		|| sz = (0, .size)(.iswrapper)
+		|| sz = (0, .clssize)(.iswrapper)
 		j.addint(sz)
 		j.enter(@list)
 	
