@@ -82,10 +82,10 @@ extend Assembler
 		if  r is Const  and  l isnt Const
 			swap (l) (r)
 		
-		|| RS = r.small|int|
+		|| RS = r.issmall|int|
 		|&fatasm| fat
 		if !l.IsZero
-			|| LS = L.Small|int|
+			|| LS = L.isSmall|int|
 			if RS
 				|| K = .Const(L, 9, L.signed)
 					fat = exp.JMKE(R, K, 0)
@@ -142,7 +142,7 @@ extend Assembler
 		|| f = r.fat$
 
 		|| k = f.const - swapped
-		require l.small and k.fits(9, true)	
+		require l.issmall and k.fits(9, true)	
 		.NopConst(R)
 		k = k|uint64|.trim(9)
 		|| J = exp.JMKM(l, k)
@@ -164,8 +164,8 @@ extend Assembler
 		if l is Const and r is Const
 			return .ConstCompareInt(dest, L, R, exp, Mode)
 
-		mode |= l.small << 2
-		mode |= R.small << 3		
+		mode |= l.issmall << 2
+		mode |= R.issmall << 3		
 
 		if Dest isnt CondAnswer
 			return exp.CMPI(dest, L, R, mode) * dest
@@ -421,12 +421,12 @@ extend Assembler
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
 		if LMul.IsPow2			  									// x = int1 + int2
-			return exp.AddOrSub(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
+			return exp.AddOrSubInt(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
 		
 		// L is now a POINTER.
 		|| v = .NumToReg(exp,  ASMReg(),  LMul,  DataTypeCode.uint)
 		if l is Subtract										// x = (lptr - rptr)/12
-			exp.AddOrSub(dest, L, R, 0)!
+			exp.AddOrSubInt(dest, L, R, 0)!
 			debugger
 			return .DivInt(exp, dest, dest, v)
 
@@ -435,7 +435,7 @@ extend Assembler
 	
 	
 	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
-		if src.small and cmp.IsBig
+		if src.issmall and cmp.IsBig
 			cmp.reg = 0
 			|| dest = .TempOnly(cmp)
 			return exp.BFLG(dest, src, 32, 32, 0) * dest
@@ -497,7 +497,7 @@ extend Assembler
 			rz = .QuickFloatMul(exp, dest, L, R)
 			if rz == nil
 				if 0: exp.VMUL
-				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|).Vectorise(dest, asm.vmul)
+				rz = exp.FMUL(dest, L, R, asmreg(), l.IsSmall|int|).Vectorise(dest, asm.vmul)
 
 
 	function IntMul (fn_opasm)
@@ -516,7 +516,7 @@ extend Assembler
 			return .MakeConstFromTwo(exp, dest, Bule, V, ConstifyBoolMul)
 		rz = .QuickIntMul(exp, dest, Bule, V)
 		if !rz
-			rz = exp.TERN(dest, Bule, V, asmreg(), bule.small|int|) * Dest				// TERN
+			rz = exp.TERN(dest, Bule, V, asmreg(), bule.issmall|int|) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)
@@ -546,13 +546,13 @@ extend Assembler
 		rz = .QuickFloatDiv(exp, dest, L, R)
 		if rz == nil
 			if 0: exp.VDIV
-			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|).Vectorise(dest, asm.VDIV)
+			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.issmall|int|).Vectorise(dest, asm.VDIV)
 
 
 	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
 		if dest.IsInt
 			return .NumToReg(exp, dest, 1, datatypecode.int) // x/x=1
-		if dest.small
+		if dest.issmall
 			return .NumToReg(exp, dest, 0x3f800000 /*1.0*/, DataTypeCode.float)
 		return .NumToReg(exp, dest, 0x3ff0000000000000 /*1.0 double*/, DataTypeCode.f64)
 
@@ -577,8 +577,8 @@ extend Assembler
 
 		// Dividing a big one by a small one, then?     bad.   We use 64-bit divide. But the small has garbage
 
-		if l.isbig and dest.small		// what?		
-		if l.IsBig and r.small         // Sigh.  Small has garbage, but were doing a 64-bit divide.
+		if l.isbig and dest.issmall		// what?		
+		if l.IsBig and r.issmall         // Sigh.  Small has garbage, but were doing a 64-bit divide.
 			r = .SmallToBig(r, l, exp)
 		
 		if 0
@@ -600,10 +600,8 @@ extend Assembler
 	function ModFloat    (fn_opasm)
 /		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
-		|| big = dest.IsBig|int|
-		exp.fdiv(dest, L, R, asmreg(), big).Vectorise(dest, asm.VDIV)
-		if 0: exp.vfrc
-/		return exp.FFRC(dest, asmreg(), dest, R, big).Vectorise(dest, asm.VFRC)
+		|| big = dest.IsSmall|int|
+		return exp.fmod(dest, L, R, asmreg(), big).Vectorise(dest, asm.VMOD)
 
 	
 	function Mod    (fn_opasm)

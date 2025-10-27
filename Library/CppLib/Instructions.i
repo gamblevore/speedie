@@ -245,12 +245,12 @@
 	else
 	f1 = f2 / f3
 ;
-ı FFRC: _
+ı FMOD: _
 	if (!Float_Du)
-	d1 = d2 - floor(d2)
+	d1 = fmod(d2, d3)
 ;
 	else
-	f1 = f2 - floor(f2)
+	f1 = fmodf(f2, f3)
 ;
 ı FMAX: _
 	if (!Float_Du)
@@ -294,6 +294,8 @@
 	v1 = v2 * FloatIncr1(Op);
 ı VDIV: _
 	v1 = v2 / v3;
+ı VMOD: _
+	v1 = JB_vec4_Mod(v2, v3);
 ı VFRC: _
 	v1 = v2 - JB_vec4_Floor(v2);
 ı VMAX: _

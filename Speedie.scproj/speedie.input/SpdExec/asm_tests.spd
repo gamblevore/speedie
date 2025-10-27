@@ -1,11 +1,24 @@
 
 
 
+
+
+struct StructWithObj
+	|object| A
+
 module ASMExamples {
 target pack { 
 |int| Glob
 |int| Bolg
 
+function StructWithObj.TestProperty
+	.a = ""
+
+function ModTest (|float| f, |vec4| v, |float| f2, |vec4| v2)
+	visible
+	f = f mod f2
+	v = v mod v2
+	
 
 function SyntaxShift (|syntax| A, |int| B, |int|)
 	visible

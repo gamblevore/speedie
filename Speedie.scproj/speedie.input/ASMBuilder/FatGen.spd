@@ -1043,10 +1043,10 @@ function message.FDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.FFRC (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+function message.FMOD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.FFRC, self)
+	rz = a.RequestOp(asm.FMOD, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
@@ -1195,6 +1195,18 @@ function message.VDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.VDIV, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+	rz.dest(0, r1, a)
+}
+
+
+function message.VMOD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.VMOD, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4

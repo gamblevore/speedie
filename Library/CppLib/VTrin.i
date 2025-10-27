@@ -53,9 +53,6 @@
 	if (Mode == 21)
 		return JB_vec4_OperatorPow(R2);
 
-	if (Mode == 22)
-		return JB_vec4_OperatorMod(R2);
-
 	if (Mode == 23)
 		return JB_vec4_CopySign(R2);
 

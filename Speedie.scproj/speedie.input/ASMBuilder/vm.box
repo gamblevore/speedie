@@ -688,11 +688,11 @@ POS 5
 		else
 			f1 = f2 / f3
 
-/**/ FFRC  (Float)
+/**/ FMOD  (float)
 		if (!Float_Du)
-			d1 = d2 - floor(d2)
+			d1 = fmod(d2, d3)
 		else
-			f1 = f2 - floor(f2)
+			f1 = fmodf(f2, f3)
 
 /**/ FMAX (Float)
 		if (!Float_Du)
@@ -740,6 +740,8 @@ POS 5
 		v1 = v2 * FloatIncr1(Op)
 /**/ VDIV  (float)
 		v1 = v2 / v3
+/**/ VMOD  (float)
+		v1 = JB_vec4_Mod(v2, v3)
 /**/ VFRC  (Float)							// should be an intrinsic?
 		v1 = v2 - JB_vec4_Floor(v2)
 /**/ VMAX (U3)

@@ -506,6 +506,10 @@ datatype float
 			return self
 		return other
 
+	operator mod (|float| upon, |float|)
+		asm fmod(dest, p1, p2, r0, 1)
+		cpp_wrapper (fmodf)
+
 	function Fract (|float|)
 		trin (0)
 		return self - .floor
@@ -590,10 +594,6 @@ datatype float
 		trin (21)
 		cpp_wrapper (powf)
 	
-	operator mod (|float| upon, |float|)
-		trin (22)
-		cpp_wrapper (fmodf)
-
 	function CopySign (|float| from, |float|)
 		trin (23)
 		cpp_wrapper (copysignf)

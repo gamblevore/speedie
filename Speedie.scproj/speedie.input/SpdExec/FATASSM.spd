@@ -84,7 +84,7 @@ struct FatASM
 		if dest.IsVec
 			if !vopp // oof?
 			._op = VOpp
-		  elseif dest.small
+		  elseif dest.issmall
 			._op = sopp
 		return dest
 	

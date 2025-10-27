@@ -177,7 +177,7 @@ datatype ASMReg (uint64)
 		opt inline
 		return self|datatypecode|._shift == 3 // could also be an int?
 
-	function Small (|bool|)
+	function IsSmall (|bool|)
 		opt inline
 		return (self|datatypecode|._shift < 3)
 

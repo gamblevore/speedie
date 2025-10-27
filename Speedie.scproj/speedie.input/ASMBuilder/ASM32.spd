@@ -9,7 +9,7 @@ function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
 	return sh.CloseVars(Closer, dest)
 	
 	
-function message.AddOrSub (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+function message.AddOrSubInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
 	|| Subtract = l is subtract
 	if dest.IsVec							// Extra bits get clipped if we do:    ivec4 + big
 		if Subtract

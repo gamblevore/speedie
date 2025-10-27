@@ -59,9 +59,6 @@
 	if (Mode == 21)
 		return powf(R2);
 
-	if (Mode == 22)
-		return fmodf(R2);
-
 	if (Mode == 23)
 		return copysignf(R2);
 
