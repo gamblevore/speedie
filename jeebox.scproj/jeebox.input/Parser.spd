@@ -54,7 +54,6 @@ extend Parser
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
 
-
 // POSTFIX-PREFIX
 		.Tokenz( "- * ~",		kThingSyx,				fBeforeRelMinus		)
 		.Tokenz( PFix,			kThingSyx,				fBeforeRel			)
@@ -65,7 +64,8 @@ extend Parser
 		.Tokenz( "{",			kThingSyx,              fArgOpen			)
 		.Tokenz( "--> <-- <--> <≈", kTmpOpp,			fTemporalRelSyx		)
 		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
-// i think better syntax that is less confusible with comments is better
+
+// I think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
 		.Tokens( numb,			kThingSyx,              fNumber				)
 		.Tokenz( "#!",			kTemporalSyxNoBar,      fShebang			)
@@ -80,7 +80,6 @@ extend Parser
 		.Tokenz( "`",           kThingSyx,			    fBackTick			)
 		.Tokenz( "<(`",         kThingSyx,			    fSuperStr			)
 		.Tokenz( "#(",			kThingSyx,              fBinary				)
-
 
 // a~(long tailed mouse) ate all~my~cheese
 // a◊long tailed mouse ate all~my~cheese // ◊ could parse like a-b and -b :)
@@ -101,12 +100,10 @@ extend Parser
 		.Tokenz( "∆",			kThingSyx,				fAsk				)
 //		.Tokenz( "‡",			kThingSyx,				fBunchOfThings		)
 
-
 		.tokenz("<",			kTemporalSyx,			fXML				)
 		.tokenz("<?",			kTemporalSyx,			fXML_PI				)
 		.tokenz("<!--",			kTemporalSyx,			fXML_Comment		)
 		.tokenz("<!DOCTYPE",	kTemporalSyx,			fXML_DocType		)
-
 
 // Ender //
 		.Tokenz( "] ) } #/ » ” ?>", kEndContainer,		fEndOfLine			)
@@ -724,10 +721,8 @@ extend Parser
 	
 	
 	function fSyntacticComment (ParseHandler)
-//		rz = parser.new( nil, @SCom, start )
-//		parser.EmbeddedArg( "#/", rz, ktemporalsyx )
 		rz = parser.new(nil, @list, start)
-		|| Lines = parser.ParseLoopFlags( rz, "#/", kTemporalSyxNoBar )
+		parser.ParseLoopFlags( rz, "#/", kTemporalSyxNoBar )
 		rz.Func = @scom
 
 
@@ -1003,36 +998,36 @@ ive been~running #since morning
 	function NextLineAndIndent (|message| parent, |ParserLineAndIndent|)
 		Opt NoRefCounts
 
-		|| first		= .nextstart // should ind??
+		|| first		= .NextStart	// Should ind??
 		|| n			= First
 		|| D			= .data
 		|| end			= D.length
 		|| addr			= D.addr
-		|| State		= 0			// 2 = line, 1 = space, 0 = neither, 3 = both
+		|| State		= 0				// 2 = line, 1 = space, 0 = neither, 3 = both
 		|| Commas		= 0
 
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
-				rz.Indent = (rz.Indent&~3) + ((!commas)<<2)
+				rz.dentine = (rz.dentine&~3) + ((!commas)<<2)
 				if ((State&1) and rz.Lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
 			  elseif (c == ',')
 				commas++
 				|| l = parent.last
-					rz.Indent = l.indent
+					rz.dentine = l.indent
 				  else
-					rz.Indent = 0									// int.min
+					rz.dentine = 0									// int.min
 				State = 0
 
 			  elseif (c == ' ')
 				State |= 1
 				if rz.IsDebug != 3
-					rz.Indent += !commas
+					rz.dentine += !commas
 				  else
-					if rz.Indent < 4 // do it anyhow
-						rz.Indent += !commas
+					if rz.dentine < 4 // do it anyhow
+						rz.dentine += !commas
 						
 					rz.IsDebug = 2
 
@@ -1043,7 +1038,7 @@ ive been~running #since morning
 						if rz.IsDebug > 1
 							.ErrorAdd("Invalid breakpoint", n-1)
 						rz.IsDebug = 3
-						rz.Indent += !commas
+						rz.dentine += !commas
 						continue
 					n--
 					exit
@@ -1053,7 +1048,7 @@ ive been~running #since morning
 					continue
 
 				rz.Lines++
-				rz.Indent = 0
+				rz.dentine = 0
 				.nextstart = n-1
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
@@ -1068,7 +1063,7 @@ ive been~running #since morning
 				if !rz.FirstLine
 					rz.FirstLine = n-1
 				rz.Position = n-1
-				rz.Indent = 0
+				rz.dentine = 0
 				rz.IsDebug = 0
 				commas = 0
 				State = 2
@@ -1076,6 +1071,8 @@ ive been~running #since morning
 					(parent is style2)
 
 		rz.Lines += commas
+		if !rz.lines // we can't have an indent if we have no lines
+			rz.Dentine = 252
 		.NextStart = n
 		
 
@@ -1155,7 +1152,7 @@ ive been~running #since morning
 			if (prev and !info.Lines)
 				return .FinishParseLoop(rz, output, .nextstart-1)
 			
-			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.Indent)
+			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.dentine)
 			if !ch
 				return .FinishParseLoop(rz, output, .nextstart-1)
 			
@@ -1169,8 +1166,6 @@ ive been~running #since morning
 			Info = nil
 
 
-		
-	
 	function DecorateThing (|message!| R, |int| Ops, |Message!|)
 		R = .GetFuncAfter( R )
 		if .WillEnd: Return R
@@ -1181,12 +1176,10 @@ ive been~running #since morning
 		
 		if ops & kOppTemporal
 			|| opp = .Process( kOppTemporal )
-				if opp == "<≈"
-					|| A = .PostInnerAdj( R, opp )
-					if !A
-						return R
+				if opp != "<≈"
+					return .ChainTemporalRels( R, opp )
+				|| A = .PostInnerAdj( R, opp )
 					return .DecorateThing( A, ops ) // recursive? 
-				return .ChainTemporalRels( R, opp )
 		return R
 	
 	
@@ -1312,11 +1305,16 @@ module parser
 
 
 extend Message
+	helper _ParseIndent (|int|)
+		|| i = .indent
+		if i < 252
+			return i&~1
+	
 	function PrevIndentCheck (|message| pr, |int|)
 		Opt NoRefCounts
-		|| prin = pr.indent|int|  &~1
-		|| chin =   .indent|int|  &~ 1
-		|| IndExtra = chin - prin #require
+		|| prin = pr._parseindent
+		|| chin =   ._parseindent
+		|| IndExtra = chin - prin				#require
 		if (indExtra isa 2)
 			if indextra == 4
 				return indextra

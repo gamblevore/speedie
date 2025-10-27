@@ -655,25 +655,27 @@ Message is also:
 			"(nil)"
 	
 	
-	render RenderAST			//  function ast,  message.ast
+	render RenderAST		//  function ast,  message.ast
 		opt norefcounts
-		|| AvoidSelf  =  (.func == @arg) and (.parent == nil) and !.name
-		if !AvoidSelf
+		|| Indent  =  !((.func == @arg) and (.parent == nil) and !.name)
 			fs <~ "«"
 			fs <~ .Func.name
 			fs <~ ' '
-			fs.indent++
+			fs.indent ++
+
 		|| name = .name
 			fs.AppendQuotedEscape(name)
+		
 		if .HasAny
 			for ch.fast in self
 				fs.IndentLine
 				ch.RenderAST(fs)
-			fs.indent--
+			fs.Indent -= Indent
 			fs.IndentLine
 		  else
-			fs.indent--
-		if !AvoidSelf
+			fs.Indent -= Indent
+
+		if Indent
 			fs <~ "»"
 		
 	

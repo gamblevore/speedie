@@ -277,7 +277,7 @@ prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
 struct ParserLineAndIndent
 	|int| Lines
 	|int| Position
-	|int| Indent
+	|int| Dentine
 	|int| IsDebug
 	|int| FirstLine
 	
