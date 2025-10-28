@@ -36,11 +36,9 @@ module Intrinsics
 		// Otherwise impossible compile situations can happen. Very difficult to fix.
 		// a bug exists in the one file, but we can't recompile... due to a bug that needs to be fixed
 		// two recompiles down the road.
-		
 
-	function scfunction.TrinReturn (|byte|)
-		opt norefcounts
-		|| Ty = .ReturnType!.Type.TypeInfo
+	function scdecl.Trin (|byte|)
+		|| Ty = .TypeInfo
 		|| ReturnVec = Ty.NumericCount > 1
 		rz = ('v', 'f')(ReturnVec)
 		if ty is bool
@@ -59,7 +57,7 @@ module Intrinsics
 			|| fn_name = fn.exportname				
 			|| id = num.int
 			|| AsmName = num.next.name
-			|| RetType = fn.TrinReturn
+			|| RetType = fn.ReturnType!.trin
 			
 			check  !(ID &~63)		(num, "ID out of range")
 			check  !((1<<ID) & map)	(num, "ID already used")
@@ -97,8 +95,8 @@ function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, 
 	trin = name.next(@prm)$
 	|| op = instruction[name!]$
 	
-	|| form = op.Sizes
-	expect (trin.HasChildCount(form.Count))    				(trin, "Expected paramcount: " + form.Count)
+//	|| form = op.Sizes
+//	expect (trin.HasChildCount(form.Count))    				(trin, "Expected paramcount: " + form.Count)
 	return .TheTrinity(where.last, trin, dest, op.opcode)
 
 
@@ -158,20 +156,13 @@ function scfunction.AddTrin (|message| msg)
 function scfunction.PostTrin (|message| s)
 	opt norefcounts
 	using s
-	|| fn = "vmod(dest)"~parse
-	.intrinsic = fn
-	|| fn_name = fn.first!
-	|| T = .TrinReturn
+	|| src = "vmod(dest)"~parse
+	.intrinsic = src
+	|| fn_name = src.first!
+	|| T = .args[]!.trin
 	fn_name.name = (T.Render + s.last.name).UpperCase
-	|| list = fn.second
+	|| list = src.second
 
 	for i in .args.Length
 		list <~ @thg + ("p" + (i+1))
 	
-	
-
-
-
-
-
-
