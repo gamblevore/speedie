@@ -260,8 +260,8 @@ datatype vec3
 	function Length (|float|)
 		return .lengthsq.sqrt
 		
-	function Normal (|vec3|) 									// use invsqrt instead?
-		return self * .LengthSq.InvSqrt
+	function Normal (|vec3|)
+		return self / .Length
 
 	function LengthSq (|float|)
 		return (.x*.x + .y*.y + .z*.z)

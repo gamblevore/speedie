@@ -62,10 +62,15 @@ class list (Saveable)
 	function HasChildCount (|int| Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
 		
 
-	function TakeAllFrom (|| src)
+	function PrependAll (|| src)
 		opt norefcounts
 		while (|| l = src.Last)
 			.First = l
+	
+	function AppendAll (|| src)
+		opt norefcounts
+		while (|| l = src.first)
+			.last = l
 	
 	syntax Compare (|int| n, |int|)
 		return .SlowCount - n

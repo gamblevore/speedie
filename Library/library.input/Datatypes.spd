@@ -511,108 +511,104 @@ datatype float
 		cpp_wrapper (fmodf)
 
 	function Fract (|float|)
-		trin (0)
+		trin (0, FRC)
 		return self - .floor
 
 	function Floor (|float|)
-		trin (1)
+		trin (1, FLR)
 		cpp_wrapper (floorf)
 
 	function Round (|float|)
-		trin (2)
+		trin (2, RND)
 		cpp_wrapper (roundf)
 
 	function Length (|float|) // for consistancy with length of vectors
-		trin (3)
+		trin (3, LNG)
 		return .abs
 	
 	function Abs (|float|)
-		trin (4)
+		trin (4, ABS)
 		cpp_wrapper (fabsf)
 
-	function InvSqrt (|float|)
-		trin (5)
-		return 1.0 / .Sqrt
+	operator pow (|float| other, |float|)
+		trin (5, POW)
+		cpp_wrapper (powf)
 
 	function Sqrt (|float|)
-		trin (6)
+		trin (6, SQT)
 		cpp_wrapper (sqrtf)
 
 	function Exp (|float|)
 		description "Computes e to the power of (x)" 
-		trin (7)
+		trin (7, EXP)
 		cpp_wrapper (expf)
 
 	function Log (|float|)
-		trin (8)
+		trin (8, LOG)
 		cpp_wrapper (logf)
 
 	function Exp2 (|float|)
-		trin (9)
+		trin (9, XP2)
 		cpp_wrapper (exp2f)
 
 	function Log2 (|float|)
-		trin (10)
+		trin (10, LG2)
 		cpp_wrapper (log2f)
 
 	function Unsin (|float|)
-		trin (12)
+		trin (12, NIS)
 		return math.unsinebad(self) * math.iTau
 
 	function Uncos (|float|)
-		trin (13)
+		trin (13, SOC)
 		return math.uncosbad(self) * math.iTau
 
 	function UnTan (|float| y, |float|)
-		trin (14)
+		trin (14, NAT)
 		rz = math.unTan2bad(self, y)			// our result is +-pi, but we want 0-1...
 		rz *= -math.iTau
 		if rz < 0.0
 			rz ++
 
 	function Sine (|float|)
-		trin (15)
+		trin (15, SIN)
 		return math.sinpihalf(self*2.0)
 
 	function Cos (|float|)
-		trin (16)
+		trin (16, COS)
 		return math.cospihalf(self*2.0)
 
 	function Tan (|float|)
-		trin (17)
+		trin (17, TAN)
 		return math.TanPihalf(self*2.0)
 	
-	function IsNan (|bool|)
-		trin (18)
-		cpp_wrapper (__isnanf)
-	
-	function IsInf (|bool|)
-		trin (19)
-		cpp_wrapper (__isinff)
-
-	operator pow (|float| other, |float|)
-		trin (21)
-		cpp_wrapper (powf)
-	
 	function CopySign (|float| from, |float|)
-		trin (23)
+		trin (18, SGN)
 		cpp_wrapper (copysignf)
 
 	function Clamp (|float| A, |float| B, |float|)
-		trin (29)
+//		trin (19, CLM)
 		cpp_wrapper JB_f_Clamp
-//		asm fclm(dest, p1, p2, p3, 1)
+		asm fclm(dest, p1, p2, p3, 1)
 
 	function Mix (|float| A, |float| B, |float|)
 		cpp_Part FloatMix
-		trin (30)
+		trin (20, MIX)
 		description "0.0 means fully A,  1.0 means fully B,  0.5 means half-way between A and B." 
 		return A + (self * (B - A))
 
 	function SmoothStep (|float| low=0, |float| high=1, |float|)
-		trin (31)
+		trin (21, SMS)
 		|| t = ((self - low) / (high - low)).clamp
 		return t * t * (3.0 - 2.0 * t)
+	
+	function IsNan (|int|)
+		trin (22, XNN)
+		cpp_wrapper (__isnanf)
+	
+	function IsInf (|int|)
+		trin (23, XNF)
+		cpp_wrapper (__isinff)
 
 	operator ShiftLeft (|int| x, |float|)
 		while --x >= 0	// there is a faster way, but this is good enough.

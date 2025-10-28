@@ -780,7 +780,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
 
 
-	function WriteDecl (|SCDecl| D, |FastStringCpp| T, |Message| equality = nil) 
+	function WriteDecl (|SCDecl| D, |FastString| T, |Message| equality = nil) 
 		opt norefcounts
 		if (!d)
 			t <~ "void"
@@ -842,7 +842,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 					rz = Fol[compiler.ProjectName + "_api.h"]
 	
 	
-	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)
+	function WriteFuncSub (|SCFunction| F, |string| E, |FastString| T)
 		if f.structreturnpos
 			t <~ "void"
 		  else
@@ -1295,7 +1295,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ ')'
 
 
-	function WriteFuncArgs (|SCFunction| F, |FastStringCpp| T, |bool| names_only=false)
+	function WriteFuncArgs (|SCFunction| F, |FastString| T, |bool| names_only=false)
 		// int example(int a, int b)
 		opt norefcounts
 		T <~ '('
@@ -1308,7 +1308,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 				d.exportname.safe(T, true)
 			  else
 				.WriteDecl( D, T )
-		
 		T <~ ')'
 
 
@@ -1409,7 +1408,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		return "))"
 
 
-	function WriteDeclNoName (|SCDecl| D, |FastStringCpp| T)
+	function WriteDeclNoName (|SCDecl| D, |FastString| T)
 		opt norefcounts
 		|| c = d.Type
 		|| ptrs = C.IsObject + D.PointerCount
@@ -1640,9 +1639,9 @@ class FastStringCpp (FastString)
 	constructor (|string| name = "")
 		.cpp_name = name
 
-	function AppendLibGlob (|scdecl| d)
-		|| x = d.ExportName[3]
-		|| i = 3 + (x == '_')
-		.appendrange(d.exportname, i)
-		
+function faststring.AppendLibGlob (|scdecl| d)
+	|| x = d.ExportName[3]
+	|| i = 3 + (x == '_')
+	.appendrange(d.exportname, i)
+	
 

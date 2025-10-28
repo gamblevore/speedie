@@ -13,6 +13,8 @@ Design:
 
 
 #include "JB_Umbrella.hpp"
+#define __H__  inline
+#include "JB_Vectors.cpp"
 
 
 extern "C" {

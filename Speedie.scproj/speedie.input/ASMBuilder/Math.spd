@@ -598,7 +598,7 @@ extend Assembler
 
 
 	function ModFloat    (fn_opasm)
-/		if dest is Const
+		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
 		|| big = dest.IsSmall|int|
 		return exp.fmod(dest, L, R, asmreg(), big).Vectorise(dest, asm.VMOD)

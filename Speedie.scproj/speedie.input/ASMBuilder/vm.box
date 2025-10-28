@@ -742,8 +742,6 @@ POS 5
 		v1 = v2 / v3
 /**/ VMOD  (float)
 		v1 = JB_vec4_Mod(v2, v3)
-/**/ VFRC  (Float)							// should be an intrinsic?
-		v1 = v2 - JB_vec4_Floor(v2)
 /**/ VMAX (U3)
 		v1 = JB_vec4_Max(v2,v3)
 /**/ VMIN (U3)
@@ -800,8 +798,6 @@ POS 5
 
 
 #!						(((((Intrinsics!)))))
-/**/ FOPP  (Float)
-		0
 /**/ BSTT  (addk)
 		u1 = bitstats(u2, U2_Li)
-
+  

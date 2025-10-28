@@ -150,10 +150,17 @@ function CppLibFile (|string| ch, |file|)
 	return TransCompiler.CppLib[ch]
 	
 
+function VMFile (|string| name, |file|)
+	return compiler.SpeedieProj["speedie.input/ASMBuilder/"+name].file
+
+
 function VMBox (|message|)
-	|| v = compiler.SpeedieProj["speedie.input/ASMBuilder/vm.box"].file
+	|| v = .VMFile("vm.box")
 	rz = v.parse
 	if rz
+		v = .VMFile("vmtrin.box")
+		if v.Exists
+			rz.AppendAll(v.parse)
 		rz.TranAllTargets
 
 
@@ -168,8 +175,8 @@ function message.Find (|string| name, |Message|)
 function JustDefineInstructions (|bool|)
 	description "Shorter version that just makes the stuff we need, rather than generate the entire VM."
 	require !ModuleArg
-	|| vmdef = .VMBox
-		|| forms = vmdef.find("forms")
+	|| VMDef = .VMBox
+		|| forms = VMDef.find("forms")
 		.GenerateForms(forms, false)
 		.FillEncoders(vmdef, false)
 

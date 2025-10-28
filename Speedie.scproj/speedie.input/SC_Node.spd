@@ -405,8 +405,7 @@ function FindCppWrapper (|message| place, |bool|isclass, |message|)
 
 
 function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsClass,  |Message|)
-//	opt norefcounts
-//	place.remove
+	opt norefcounts
 	place.func = @sheb
 	place.ASMType = ASMType.kIgnore
 	
@@ -416,9 +415,6 @@ function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsC
 		return place
 	
 	if ch == @thg or @bra or @list
-		if ch == @list
-			ch.obj = scfunction.currfunc 
-			intrinsics.floats <~ ch
 		if isclass
 			expect (.parent istmp "linkage")   (ch, "Put this inside a 'Linkage' tag.")
 		Return ch

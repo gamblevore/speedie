@@ -11,78 +11,102 @@ datatype vec4
 		asm vmod(dest, p1, p2)
 		cpp_wrapper JB_vec4_Mod
 
-	function Fract (|vec4|) {trin (0)
-		cpp_wrapper}
+	function Fract (|vec4|)
+		trin (0, FRC)
+		cpp_wrapper
 
-	function Floor (|vec4|) {trin (1)
-		cpp_wrapper}
+	function Floor (|vec4|)
+		trin (1, FLR)
+		cpp_wrapper
 
-	function Round (|vec4|) {trin (2)
-		cpp_wrapper}
+	function Round (|vec4|)
+		trin (2, RND)
+		cpp_wrapper
 
-	function Length (|float|) { trin (3)
-		cpp_wrapper}
+	function Length (|float|)
+		trin (3, LNG)
+		cpp_wrapper
 
-	function Abs (|vec4|) { trin (4)
-		cpp_wrapper}
+	function Abs (|vec4|) 
+		trin (4, ABS)
+		cpp_wrapper
 
-	function InvSqrt (|vec4|) { trin (5)
-		cpp_wrapper}
+	operator Pow (|vec4| other, |vec4|)
+		trin (5, POW)
+		cpp_wrapper JB_vec4_Pow
 
-	function Sqrt (|vec4|) { trin (6)
-		cpp_wrapper}
+	function Sqrt (|vec4|) 
+		trin (6, SQT)
+		cpp_wrapper
 
-	function Exp (|vec4|) { trin (7)
+	function Exp (|vec4|) 
+		trin (7, EXP)
 		description "Computes e to the power of (x)"
-		cpp_wrapper}
+		cpp_wrapper
 
-	function Log (|vec4|) { trin (8)
-		cpp_wrapper}
+	function Log (|vec4|) 
+		trin (8, LOG)
+		cpp_wrapper
 
-	function Exp2 (|vec4|) { trin (9)
-		cpp_wrapper}
+	function Exp2 (|vec4|) 
+		trin (9, XP2)
+		cpp_wrapper
 
-	function Log2 (|vec4|) { trin (10)
-		cpp_wrapper}
+	function Log2 (|vec4|) 
+		trin (10, LG2)
+		cpp_wrapper
 
-	function Unsin (|vec4|) { trin (12)
-		cpp_wrapper}
+	function Unsin (|vec4|) 
+		trin (12, NIS) // unsin
+		cpp_wrapper
 
-	function Uncos (|vec4|) { trin (13)
-		cpp_wrapper}
+	function Uncos (|vec4|) 
+		trin (13, SOC) // uncos
+		cpp_wrapper
 
-	function UnTan (|vec4| y, |vec4|) { trin (14) // untan
-		cpp_wrapper}
+	function UnTan (|vec4| y, |vec4|)
+		trin (14, NAT) // untan
+		cpp_wrapper
 
-	function Sine (|vec4|) { trin (15)
-		cpp_wrapper}
+	function Sine (|vec4|) 
+		trin (15, SIN)
+		cpp_wrapper
 
-	function Cos (|vec4|) { trin (16)
-		cpp_wrapper}
+	function Cos (|vec4|) 
+		trin (16, COS)
+		cpp_wrapper
 
-	function Tan (|vec4|) { trin (17)
-		cpp_wrapper}
-
-	operator Pow (|vec4| other, |vec4|) { trin (21) // pow
-		cpp_wrapper}
+	function Tan (|vec4|) 
+		trin (17, TAN)
+		cpp_wrapper
 	
-	operator Sign (|vec4| from, |vec4|) { trin (23) // sign
-		cpp_wrapper JB_vec4_CopySign}
+	operator Sign (|vec4| from, |vec4|)
+		trin (18, SGN)
+		cpp_wrapper JB_vec4_CopySign
 	
-	operator • (|vec4| other, |float|) { trin (24) // dot
-		cpp_wrapper JB_vec4_Dot}
+	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|)
+		trin (19, CLM)	// clamp	
+		cpp_wrapper JB_vec4_Clamp
 
-	operator Cross (|vec4| other, |float|) { trin (25) // cross
-		cpp_wrapper}
+	function Mix (|vec4| A, |vec4| B, |vec4|)
+		trin (20, MIX)	// mix
+		cpp_wrapper
 
-	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|) { trin (29) // clamp
-		cpp_wrapper JB_vec4_Clamp}
+	function SmoothStep (|vec4| low=0, |vec4| high=1, |vec4|)
+		trin (21, SMS)	// smoothstep
+		cpp_wrapper
 
-	function Mix (|vec4| A, |vec4| B, |vec4|) { trin (30) // mix
-		cpp_wrapper}
+	operator • (|vec4| other, |float|)
+		trin (22, DOT)	// dot
+		cpp_wrapper JB_vec4_Dot
 
-	function SmoothStep (|vec4| low=0, |vec4| high=1, |vec4|) {trin (31)  // smoothstep
-		cpp_wrapper}
+	operator Cross (|vec4| other, |vec4|)
+		trin (23, CRS)	// cross
+		cpp_wrapper JB_vec4_Cross
+
+	function Reflect (|vec4| plane, |vec4|)
+		trin (24, RFL)	// cross
+		cpp_wrapper JB_vec4_Reflect
 	
 	operator max (|vec4| M, |vec4|)
 		asm vmax(dest, p1, p2)

@@ -296,8 +296,6 @@
 	v1 = v2 / v3;
 ı VMOD: _
 	v1 = JB_vec4_Mod(v2, v3);
-ı VFRC: _
-	v1 = v2 - JB_vec4_Floor(v2);
 ı VMAX: _
 	v1 = JB_vec4_Max(v2, v3);
 ı VMIN: _
@@ -337,9 +335,99 @@
 	uv1 = ~uv2 & ~(uv3 | Shift_Shu);
 ı QCNV: _
 	VecConv(r, Op);
-ı FOPP: _
-	0;
 ı BSTT: _
 	u1 = bitstats(u2, U2_Li);
+ı FFRC: _
+	f1 = JB_f_Fract(f2);
+ı FFLR: _
+	f1 = floorf(f2);
+ı FRND: _
+	f1 = roundf(f2);
+ı FLNG: _
+	f1 = JB_f_Length(f2);
+ı FABS: _
+	f1 = fabsf(f2);
+ı FPOW: _
+	f1 = powf(f2, f3);
+ı FSQT: _
+	f1 = sqrtf(f2);
+ı FEXP: _
+	f1 = expf(f2);
+ı FLOG: _
+	f1 = logf(f2);
+ı FXP2: _
+	f1 = exp2f(f2);
+ı FLG2: _
+	f1 = log2f(f2);
+ı FNIS: _
+	f1 = JB_f_Unsin(f2);
+ı FSOC: _
+	f1 = JB_f_Uncos(f2);
+ı FNAT: _
+	f1 = JB_f_UnTan(f2, f3);
+ı FSIN: _
+	f1 = JB_f_Sine(f2);
+ı FCOS: _
+	f1 = JB_f_Cos(f2);
+ı FTAN: _
+	f1 = JB_f_Tan(f2);
+ı FSGN: _
+	f1 = copysignf(f2, f3);
+ı FMIX: _
+	f1 = JB_f_FloatMix(f2, f3, f4);
+ı FSMS: _
+	f1 = JB_f_SmoothStep(f2, f3, f4);
+ı FXNN: _
+	f1 = __isnanf(f2);
+ı FXNF: _
+	f1 = __isinff(f2);
+ı VFRC: _
+	v1 = JB_vec4_Fract(v2);
+ı VFLR: _
+	v1 = JB_vec4_Floor(v2);
+ı VRND: _
+	v1 = JB_vec4_Round(v2);
+ı VLNG: _
+	f1 = JB_vec4_Length(v2);
+ı VABS: _
+	v1 = JB_vec4_Abs(v2);
+ı VPOW: _
+	v1 = JB_vec4_Pow(v2, v3);
+ı VSQT: _
+	v1 = JB_vec4_Sqrt(v2);
+ı VEXP: _
+	v1 = JB_vec4_Exp(v2);
+ı VLOG: _
+	v1 = JB_vec4_Log(v2);
+ı VXP2: _
+	v1 = JB_vec4_Exp2(v2);
+ı VLG2: _
+	v1 = JB_vec4_Log2(v2);
+ı VNIS: _
+	v1 = JB_vec4_Unsin(v2);
+ı VSOC: _
+	v1 = JB_vec4_Uncos(v2);
+ı VNAT: _
+	v1 = JB_vec4_UnTan(v2, v3);
+ı VSIN: _
+	v1 = JB_vec4_Sine(v2);
+ı VCOS: _
+	v1 = JB_vec4_Cos(v2);
+ı VTAN: _
+	v1 = JB_vec4_Tan(v2);
+ı VSGN: _
+	v1 = JB_vec4_CopySign(v2, v3);
+ı VCLM: _
+	v1 = JB_vec4_Clamp(v2, v3, v4);
+ı VMIX: _
+	v1 = JB_vec4_Mix(v2, v3, v4);
+ı VSMS: _
+	v1 = JB_vec4_SmoothStep(v2, v3, v4);
+ı VDOT: _
+	f1 = JB_vec4_Dot(v2, v3);
+ı VCRS: _
+	v1 = JB_vec4_Cross(v2, v3);
+ı VRFL: _
+	v1 = JB_vec4_Reflect(v2, v3);
 ı 
 

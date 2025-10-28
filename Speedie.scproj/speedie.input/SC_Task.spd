@@ -63,7 +63,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 	  else
 		fields <~ (@sdot, "interface")
 	arg.BuildTask(fields, level)
-	arg.TakeAllFrom(tmp)
+	arg.prependall(tmp)
 	node.name = "role"
 	
 	

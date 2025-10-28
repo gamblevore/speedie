@@ -1215,18 +1215,6 @@ function message.VMOD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.VFRC (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.VFRC, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
-	rz.dest(0, r1, a)
-}
-
-
 function message.VMAX (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -1433,18 +1421,6 @@ function message.QCNV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |
 	rz = a.RequestOp(asm.QCNV, self)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Mode
-	rz.dest(0, r1, a)
-}
-
-
-function message.FOPP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.FOPP, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
 	rz.dest(0, r1, a)
 }
 

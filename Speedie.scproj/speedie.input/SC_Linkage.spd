@@ -34,7 +34,7 @@ module Linkage
 	function message.ConfTake (|message| dest, |string| name)
 		opt norefcounts
 		|| F = self[name]
-			dest.takeallfrom(F)
+			dest.prependall(F) // shouldn't this be appendall?
 			F.parent!.remove
 
 

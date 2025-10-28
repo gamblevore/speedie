@@ -991,7 +991,7 @@ Message is also:
 		.func = src.func
 		.name = src.name
 		.clear
-		.TakeAllFrom(src)
+		.prependall(src)
 	
 
 	function BecomeCopy (|message| src)

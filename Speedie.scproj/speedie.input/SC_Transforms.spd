@@ -325,7 +325,7 @@ function Tran_PrintSub (TranFunc)
 	opt norefcounts
 	using (node)
 		|| prm = @prm.msg
-		prm.TakeAllFrom(node)
+		prm.appendall(node)
 		node <~ prm
 		node.first = @Thg + node.Name
 		node.become(@Func)

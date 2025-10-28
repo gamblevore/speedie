@@ -2051,7 +2051,7 @@ function message.MainFix (|message|)
 		inc_Arg.expectlast
 
 		src_arg.Remove
-		inc_arg.TakeAllFrom( src_arg )
+		inc_arg.prependall( src_arg )
 	  else
 		fn_src = nil
 	return fn_Src

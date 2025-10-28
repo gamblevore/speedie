@@ -5,58 +5,77 @@ module Intrinsics
 	|[message]| Vectors // both q and v
 
 
-	function PullOutVecs	
+	function PullOutVecs (|bool|)
 		opt norefcounts
 		require stderr.ok
 		|| f = .floats
 		|| i = f.length
 		while i > 0
 			|| s = f[--i]
-			|| fn = s.MsgOwningFunc!
+			|| fn = s.MsgOwningFunc #expect (s)
 			|| input = fn.args[]!
 			if input.IsNumeric > 1
 				.Vectors <~ s
 				f.FastRemove(i+1)
+		return true
 
 
 	function Process
-		|| fs = FastString()
-		.PullOutVecs
-		.ProcessTrin(fs, .floats)
-		VM_Builder.SafeWrite("FTrin.i", fs)
-		.ProcessTrin(fs, .vectors)
-		VM_Builder.SafeWrite("VTrin.i", fs)
-			
-	
-	function ProcessTrin (|faststring| fs, |[message]| codes, |int|)
+		require .PullOutVecs
+		|| vm = FastString()
+		|| cpp = FastString()
+		.ProcessTrin(vm, cpp, .Floats,  'F')
+		.ProcessTrin(vm, cpp, .Vectors, 'V')
+		// put into vmtrin_gen.box, despite reading vmtrin.box, so we can manually fix vmtrin.box if needed.
+		// Otherwise impossible compile situations can happen. Very difficult to fix.
+		// a bug exists in the one file, but we can't recompile... due to a bug that needs to be fixed
+		// two recompiles down the road.
+		VM_Builder.VMFile("vmtrin_gen.box").data = vm
+/		VM_Builder.SafeWrite("vmtrin.h", cpp)
+		
+
+	function ProcessTrin (|faststring| vm, |faststring| cpp,  |[message]| codes, |byte| T)
+		// the numbers in the map, mean nothing except for relative ordering.
 		opt norefcounts
+		|uint64| map
 		codes.sort(TrinSort)
 		
-		for s in codes
-			|| name = ""
-			|| fn = s.msgowningfunc
-				name = fn.exportname
-			if s != @num
-				name = s.firstname
-				s = s.last(@num)
-				if !s: continue
+		for list in codes
+			|| fn = list.MsgOwningFunc!
+			|| num = list.first
+			|| fn_name = fn.exportname				
+			|| id = num.int
+			|| AsmName = num.next.name
+			|| Ty = fn.ReturnType!.Type.TypeInfo
+			|| ReturnVec = Ty.NumericCount > 1
+			|| RetType = ('v', 'f')(ReturnVec)
+			if ty is bool
+				RetType = 'u' // isnan
 			
-			|| id = s.int
-			check  !(ID &~ 31) (s, "ID out of range")
-			check  !((1<<ID) & rz) (s, "ID already used")
-			rz |= 1<<id
+			check  !(ID &~63)		(num, "ID out of range")
+			check  !((1<<ID) & map)	(num, "ID already used")
+			map |= 1<<id
+			|| C = fn.Args.Length
+			|| T2 = t.LowerCase
+			vm <~ "
+/**/ $T$AsmName  (U$C)
+	${RetType}1 = $fn_name("
 			
-			fs <~ "
-	if (Mode == $id)
-		return $name(R2);
-"
+			for i in C
+				if i > 0
+					vm <~ ", "
+				vm <~ T2
+				vm <~ (i+2)
+			vm <~ ");\n"
+			
+			if !fn.IsCppInBuilt
+				cpp_Export.WriteFuncSub(fn, fn.exportname, cpp)
+				cpp <~ ";\n\n"
 
 
 	function Message.TrinInt (|int|)
 		opt norefcounts
-		if .func == @Num
-			return .int
-		return .last.int
+		return .first.int
 	
 	
 	function TrinSort (SorterComparer of Message)
