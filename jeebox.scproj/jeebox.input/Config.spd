@@ -97,10 +97,9 @@ extend message
 			if item ~= key
 				|| f = item.first
 					return f
-				error (item, "Value missing in config item")
-/				item.remove // cleaner to just remove it. Must have a value. Its a key/value system!
-							// and the values have types, so we can't just create one, without knowing
-							// what type is needed.
+				if (Err)
+					error (item, "Empty value for row: " + key)
+				// don't remove the item to cleanup. Its possible they are using it for a menu or something.
 				return nil
 		if err
 			error (self, key + " not found.")
