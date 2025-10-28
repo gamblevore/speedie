@@ -55,7 +55,6 @@ typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via cl
 typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
 
 
-
 #ifdef PICO_IMPLEMENTATION
 
 	#include <fcntl.h>
@@ -169,7 +168,7 @@ struct PicoGlobalStats {
 
 extern "C" bool	PicoInit (int DesiredThreadCount);
 static PicoTrousers PicoCommsLocker;
-
+static int PicoDevNull = -1;
 
 PicoDate pico_date_create ( uint64_t S, uint64_t NS ) {
 	uint64_t NS2 = (NS * 9223372046ULL)>>47ULL; // avoid division :)
@@ -354,7 +353,7 @@ struct PicoBuff {
 //	#ifdef PICO_DEBUG_LOG
 //		if (self->FDLog) {
 //			fsync(self->FDLog);
-//			pclose(self->FDLog);
+//			close(self->FDLog);
 //		}
 //	#endif
 		if (self and --(self->RefCount) == 0)
@@ -490,8 +489,8 @@ struct PicoComms : PicoConfig {
 				if (err != EINTR and err != EBUSY)	
 					return failed();
 			}
-			pclose(WR);
-			pclose(Capture[0]);
+			close(WR);
+			close(Capture[0]);
 		}
 		return nullptr;
 	}
@@ -524,9 +523,9 @@ struct PicoComms : PicoConfig {
 		if (!IsParent) {
 			ExecFlags |= PicoExecForked;
 			if (NoStdOut == 1) 
-				close(STDOUT_FILENO);
+				sclose(STDOUT_FILENO);
 			if (NoStdErr == 1) 
-				close(STDERR_FILENO);
+				sclose(STDERR_FILENO);
 			pico_thread_count = 0;
 			ChildClosePipes(Out, STDOUT_FILENO);
 			ChildClosePipes(Err, STDERR_FILENO);
@@ -612,7 +611,7 @@ struct PicoComms : PicoConfig {
 
 		IsParent = childid!=0; // 🕷️_🕷️
 		ExecFlags |= childid==0; // a forked child
-		pclose(Socks[!IsParent]);
+		close(Socks[!IsParent]);
 		int S = Socks[IsParent];
 		if (!IsParent) {
 			if (ChildName)
@@ -628,17 +627,9 @@ struct PicoComms : PicoConfig {
 	}
 	/// **End of  Initialisation**
 	
-	void pclose (int S) {
-		if (S <= 2 and !(ExecFlags&PicoExecForked))
-			Say("Closed STD", "", S);	// not sure where why or how this is happening ;_; should I log this?
-										// how? 
-		  else
-			close(S);
-	}
-	
 	int GiveUp (int* Socks) {
-		pclose(Socks[0]);
-		pclose(Socks[1]);
+		close(Socks[0]);
+		close(Socks[1]);
 		return -errno;
 	}
 	
@@ -950,7 +941,7 @@ struct PicoComms : PicoConfig {
 	bool add_msg_buffs (int Sock) {
 		if (int S = Socket; S > 0) { // currently open still.
 			Socket = -1;
-			pclose(S);
+			close(S);
 			pico_open_sockets--;
 		}
 		unblock(Sock);
@@ -1023,7 +1014,7 @@ struct PicoComms : PicoConfig {
 		Socket = -1;
 		if (S > 0) {
 			pico_open_sockets--;
-			pclose(S);
+			close(S);
 		}
 		if (CanSayDebug()) {
 			io_buff_report(Sending);
@@ -1071,6 +1062,16 @@ struct PicoComms : PicoConfig {
 			ExecFlags &= ~PicoExecWantDead;
 			kill(PID, SIGKILL);
 		}
+	}
+	
+	int sclose (int FD) {
+		int Null = PicoDevNull;
+		if (Null < 0)
+			PicoDevNull = Null = open("/dev/null", O_WRONLY);
+		if (Null >= 0)
+			return dup2(Null, FD);
+		SayEvent("Unable to open /dev/null"); // ARGH!
+		return close(FD);
 	}
 	
 	void cleanup (PicoDate CheckPID) {
