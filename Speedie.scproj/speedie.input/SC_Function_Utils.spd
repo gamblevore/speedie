@@ -32,12 +32,7 @@ dispatch FuncPreReader (fnPreReader)
 		.intrinsic.ExpectLast
 	
 	+'trin'
-		opt norefcounts
-		|| L = msg[@bra, @list]
-			using L
-				msg.next = @tmp + "visible"
-			intrinsics.floats <~ l
-			l.obj = self		
+		.AddTrin(msg)
 
 	+'disabled'
 		opt norefcounts

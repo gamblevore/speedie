@@ -180,6 +180,8 @@ function CompileAll
 	.Successfulness |= StdErr.ok
 	target debug
 		if Compiler.InPerry: app.SetASMBreak(false)
+
+	intrinsics.Process
 	
 	if (compiler.InPerry or Options.ModePack)
 		.Timer( "Assemble" )

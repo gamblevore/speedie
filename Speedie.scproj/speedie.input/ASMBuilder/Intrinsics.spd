@@ -17,40 +17,49 @@ module Intrinsics
 			if input.IsNumeric > 1
 				.Vectors <~ s
 				f.FastRemove(i+1)
+			fn.PostTrin(s!)
 		return true
 
 
 	function Process
 		require .PullOutVecs
+		require !compiler.InPerry
 		|| vm = FastString()
 		|| cpp = FastString()
 		.ProcessTrin(vm, cpp, .Floats,  'F')
 		.ProcessTrin(vm, cpp, .Vectors, 'V')
+
+		VM_Builder.VMFile("vmtrin_gen.box").data = vm
+		VM_Builder.SafeWrite("vmtrin.h", cpp)
+
 		// put into vmtrin_gen.box, despite reading vmtrin.box, so we can manually fix vmtrin.box if needed.
 		// Otherwise impossible compile situations can happen. Very difficult to fix.
 		// a bug exists in the one file, but we can't recompile... due to a bug that needs to be fixed
 		// two recompiles down the road.
-		VM_Builder.VMFile("vmtrin_gen.box").data = vm
-/		VM_Builder.SafeWrite("vmtrin.h", cpp)
 		
 
+	function scfunction.TrinReturn (|byte|)
+		opt norefcounts
+		|| Ty = .ReturnType!.Type.TypeInfo
+		|| ReturnVec = Ty.NumericCount > 1
+		rz = ('v', 'f')(ReturnVec)
+		if ty is bool
+			rz = 'u' // isnan
+	
+	
 	function ProcessTrin (|faststring| vm, |faststring| cpp,  |[message]| codes, |byte| T)
 		// the numbers in the map, mean nothing except for relative ordering.
 		opt norefcounts
-		|uint64| map
 		codes.sort(TrinSort)
 		
+		|uint64| map
 		for list in codes
 			|| fn = list.MsgOwningFunc!
 			|| num = list.first
 			|| fn_name = fn.exportname				
 			|| id = num.int
 			|| AsmName = num.next.name
-			|| Ty = fn.ReturnType!.Type.TypeInfo
-			|| ReturnVec = Ty.NumericCount > 1
-			|| RetType = ('v', 'f')(ReturnVec)
-			if ty is bool
-				RetType = 'u' // isnan
+			|| RetType = fn.TrinReturn
 			
 			check  !(ID &~63)		(num, "ID out of range")
 			check  !((1<<ID) & map)	(num, "ID already used")
@@ -135,5 +144,34 @@ function assembler.Fries (|&ASMReg| Collection, |fatasm| fat, |message| s, |int|
 	
 	|int| l = s.Int(1, 1, MaxParam)
 		fat.RegInput(i) = collection[l-1] asnt asmreg.Textual
+
+
+
+function scfunction.AddTrin (|message| msg)
+	opt norefcounts
+	|| L = msg[@bra, @list]
+		intrinsics.floats <~ l
+		l.obj = self		
+		msg.next = @tmp + "visible"
+
+
+function scfunction.PostTrin (|message| s)
+	opt norefcounts
+	using s
+	|| fn = "vmod(dest)"~parse
+	.intrinsic = fn
+	|| fn_name = fn.first!
+	|| T = .TrinReturn
+	fn_name.name = (T.Render + s.last.name).UpperCase
+	|| list = fn.second
+
+	for i in .args.Length
+		list <~ @thg + ("p" + (i+1))
+	
+	
+
+
+
+
 
 
