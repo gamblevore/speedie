@@ -196,7 +196,7 @@
 &&VDOT,
 &&VCRS,
 &&VRFL,
-&&EROR,
+&&VSUM,
 &&EROR,
 &&EROR,
 &&EROR,
