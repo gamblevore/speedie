@@ -456,9 +456,10 @@ class Window (GUIControl)
 	helper gui.AskQuitSub (|SDLActivity|)
 		opt norefcounts
 		for w in Window.all
-			require w.__TryClose__(SDLActivity.questioning)
+			if !w.IsDialog
+				require w.Close(SDLActivity.questioning)
 		for w in Window.all
-			w.Close(SDLActivity.Terminating)
+			require w.Close(SDLActivity.terminating)
 		return SDLActivity.Terminating
 		
 	

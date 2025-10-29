@@ -4,7 +4,6 @@ module Intrinsics
 	|[message]| Floats
 	|[message]| Vectors // both q and v
 
-
 	function PullOutVecs (|bool|)
 		opt norefcounts
 		require stderr.ok

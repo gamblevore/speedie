@@ -256,12 +256,10 @@ class String
 		cpp_wrapper JB_Str_Trim
 	
 	
-	function TrimStart (|string| s, |bool| All=false,  |string|)
+	function TrimStart (|string| s,  |string|)
 		|| i = 0
-		while self[i, s]
+		if self[i, s]
 			i += s.length
-			if !all
-				exit
 		return self[i, int.max]
 
 

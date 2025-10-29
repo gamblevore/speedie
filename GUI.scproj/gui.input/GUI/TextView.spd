@@ -162,7 +162,7 @@ class TextView (GUIControl)
 		
 		|| Restore = .selrange
 		// so now we are within the area, and have a valid line. we can now alter the text!
-/		|| txt = d.Text._TextLineClickedBreakpoint
+		|| txt = d.Text._TextLineClickedBreakpoint
 		if !txt.isok
 			return true
 		
@@ -1814,11 +1814,13 @@ class TextView (GUIControl)
 		|| Remain	= .LastRect.Height
 		|| UseCol	= .UseColorAnyway
 
-		y -= 2
-		y += .YAdjust
-		y -= (.SingleLine and self is Editable)
+		y += .YAdjust-2
+		if .SingleLine
+			y-=self is Editable
+		  else
+			yend += font.height-2
 		
-		while (y > yend) and (d)
+		while (y > yEnd) and (d)
 			y -= .LineHeight
 			Remain -= .LineHeight
 			if Draw
@@ -2142,7 +2144,7 @@ class TextView (GUIControl)
 
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
-/		opt norefcounts
+		opt norefcounts
 		(pos)
 		d.RemoveAfter
 		._PreferPrevLine = false
@@ -2213,7 +2215,7 @@ class TextView (GUIControl)
 			.UnloadDoc(old)
 		
 		d.SimpleUpdateFromDisk
-		if d.load
+		if d.Load
 			.document = d
 			.MyError = nil
 			if show

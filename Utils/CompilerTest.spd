@@ -4,22 +4,10 @@
 || Speedie = "/usr/local/bin/spd"
 
 main (|[string]| Files)
-	if !files
-		|| proc = "/usr/local/speedie/Examples/arrow.spd".Spawn("arrow")
-			app.Sleep(1s)
-			printline proc.ReadStdOut
-			if proc.status != 0
-				printline "arrow.spd status: " + proc.Status.render
-		return 0
-	
 	""
 	for f in files.GlobExpand 
 		app.TryCompileOne(f, f.TrimStart(app.cwd))
- 
-	if Fails.length
-		app.say("$fails Failiures")
-	  else
-		app.say("// All OK")
+	app.say ("$fails Failiures", "// All OK")(Fails.length)
 
 
 function app.TryCompileOne (|file| f, |string| s)

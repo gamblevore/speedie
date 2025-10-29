@@ -625,7 +625,7 @@ static FreeObject* LinkIn_(JB_MemoryLayer* Mem, AllocationBlock* NewBlock) {
 Sanity(NewBlock);
 // Call this when returning the first item from a newly allocated block.
     SetCurrBlock_( Mem, NewBlock );
-    JB_Incr(Mem);
+    Mem->RefCount+=1<<JB_RefCountShift;
     FreeObject* First = NewBlock->FirstFree;
     NewBlock->FirstFree = First->Next;
     NewBlock->ObjCount++;
