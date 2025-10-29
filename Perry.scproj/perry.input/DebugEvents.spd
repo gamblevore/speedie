@@ -105,6 +105,7 @@ function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststrin
 		start
 		rz <~ " "
 		rz.AppendQuotedEscape(a)
+	rz <~ "\n"
 
 
 function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct

@@ -4,7 +4,6 @@
 || Speedie = "/usr/local/bin/spd"
 
 main (|[string]| Files)
-	""
 	for f in files.GlobExpand 
 		app.TryCompileOne(f, f.TrimStart(app.cwd))
 	app.say ("$fails Failiures", "// All OK")(Fails.length)
