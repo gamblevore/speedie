@@ -3081,7 +3081,7 @@ extern Array* SC__NilReason_values;
 
 #define kJB__PIDM_CaptureAll ((ProcessMode)0)
 
-#define kJB__PIDM_MsgSilence ((ProcessMode)3)
+#define kJB__PIDM_MsgPassing ((ProcessMode)1)
 
 #define kJB__PIDM_OwnGroup ((ProcessMode)128)
 
@@ -9606,7 +9606,7 @@ bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
 // JB_SpdProcess
 bool JB_Proc_CommsOpen(SpdProcess* Self);
 
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, ProcessMode Mode);
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
 
 void JB_Proc_Destructor(SpdProcess* Self);
 
@@ -9615,8 +9615,6 @@ void JB_Proc_Disconnect(SpdProcess* Self, JB_String* Why);
 Message* JB_Proc_Get(SpdProcess* Self, float T);
 
 bool JB_Proc_IsOpen(SpdProcess* Self);
-
-bool JB_Proc_Start_(SpdProcess* Self);
 
 bool JB_Proc_Send(SpdProcess* Self, Message* Msg);
 

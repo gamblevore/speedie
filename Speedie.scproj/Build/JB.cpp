@@ -3608,7 +3608,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[252]);
-	JB_FS_AppendInt32(_fsf0, (2025102823));
+	JB_FS_AppendInt32(_fsf0, (2025102913));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -4412,8 +4412,8 @@ bool SC_AC__CmdWrap(Message* Arg) {
 	SpdProcess* _tmPf0 = JB_App__Parent(false);
 	JB_Incr(_tmPf0);
 	JB_Proc_Send(_tmPf0, Arg);
-	JB_Decr(_tmPf0);
 	JB_Rec_Clear(JB_StdErr);
+	JB_Decr(_tmPf0);
 	return true;
 }
 
@@ -4739,8 +4739,8 @@ bool SC_AC__EnterAutoComplete() {
 	}
 	SC__Comp_InPerry = 1;
 	SC_AC__PerryTalk(Perry);
-	JB_Decr(Perry);
 	JB_PrintLine(JB_LUB[2251]);
+	JB_Decr(Perry);
 	return true;
 }
 
@@ -8792,7 +8792,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1235]);
-	JB_FS_AppendInt32(_fsf0, (2025102823));
+	JB_FS_AppendInt32(_fsf0, (2025102913));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -35366,7 +35366,7 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	}
 	JB_String* _tmPf6 = JB_File_Path(Self);
 	JB_Incr(_tmPf6);
-	JB_Str_Execute(_tmPf6, Cmd_args, nil, nil, kJB__PIDM_StdOutPassThru, 0);
+	JB_Str_Execute(_tmPf6, Cmd_args, nil, nil, 0, 0);
 	JB_Decr(Cmd_args);
 	JB_Decr(_tmPf6);
 	JB_String* _tmPf7 = JB_Str_OperatorPlus(JB_LUB[994], V);
@@ -40588,10 +40588,11 @@ bool JB_Proc_CommsOpen(SpdProcess* Self) {
 	return false;
 }
 
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, ProcessMode Mode) {
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode) {
 	if (Self == nil) {
 		Self = ((SpdProcess*)JB_NewClass(&SpdProcessData));
 	}
+	Mode = (Mode | kJB__PIDM_MsgPassing);
 	JB_Sh_Constructor(Self, Path, Mode, Params, Pico);
 	Self->AlreadyWarnedDied = false;
 	Self->DeathLimit = 12;
@@ -40617,7 +40618,7 @@ Message* JB_Proc_Get(SpdProcess* Self, float T) {
 	Message* Rz = nil;
 	if (Self) {
 		if (JB_Sh_Status(Self) == -2) {
-			JB_Proc_Start_(Self);
+			JB_Sh_StartProcess(Self);
 		}
 		JB_String* Str = JB_Pico_Get(Self->Pico, T);
 		if (JB_Str_Exists(Str)) {
@@ -40631,14 +40632,10 @@ bool JB_Proc_IsOpen(SpdProcess* Self) {
 	return JB_Proc_CommsOpen(Self) and JB_ExitCode_IsRunning(JB_Sh_Status(Self));
 }
 
-bool JB_Proc_Start_(SpdProcess* Self) {
-	return JB_ExitCode_Successful(JB_Sh_StartProcess(Self));
-}
-
 bool JB_Proc_Send(SpdProcess* Self, Message* Msg) {
 	//cpp_part;
 	if (JB_Sh_Status(Self) == -2) {
-		JB_Proc_Start_(Self);
+		JB_Sh_StartProcess(Self);
 	}
 	if (PicoError(Self->Pico) == 0) {
 		JB_FreeIfDead(JB_Msg_RenderJbin(Msg, JB_LUB[0], Self->Writer));
@@ -60929,4 +60926,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6071780062181108150 -8572766087139744131
+// 8978402671219099979 -8572766087139744131
