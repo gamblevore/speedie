@@ -16,6 +16,7 @@ class TextView (GUIControl)
 
 	|byte|						_CanAutoComplete
 	|int|						_AutoCompleteBack
+	|int64|						_LogTrimmed
 	|string|					_AutoCompleteString
 
 	|byte|						_LineNumWidth
@@ -847,10 +848,14 @@ class TextView (GUIControl)
 	function Log (|string| s, |int| Max=128K)
 		require s
 
+		// add to ._LogTrimmed
+		// remove this branch, simplify code.
 		if s >= max
 			.Text = s.right(max)
 			return
 		
+		if ._LogTrimmed
+			|| prefix = "(--Trimmed: " + ._LogTrimmed.strsize + "--)\n"
 		.text = .Text.Right(max - s.Length) + s
 	
 //		|| L = 0
