@@ -100,7 +100,7 @@ datatype vec4
 		trin (22, DOT)	// dot
 		cpp_wrapper JB_vec4_Dot
 
-	operator Cross (|vec4| other, |vec4|)
+	operator Cross (|vec4| other, |vec4|) // move this to vec3?
 		trin (23, CRS)	// cross
 		cpp_wrapper JB_vec4_Cross
 
@@ -117,6 +117,7 @@ datatype vec4
 		cpp_wrapper JB_vec4_Min
 
 	function Sum (|float|)
+		trin (25, SUM)
 		cpp_wrapper
 
 	function Clamp (|float| max=1.0, |vec4|)

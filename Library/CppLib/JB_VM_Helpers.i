@@ -17,12 +17,12 @@ extern "C" void* JB_ASM__Load (JB_StringC* S) {
 		if (!MySelf) return 0;
 	}
 	void* R = dlsym(MySelf, (const char*)(S->Addr));
-	if (!R) {
-//		debugger;
-		printf("// fn! %s\n", S->Addr);
-	} else {
+//	if (!R) {
+//		debugger; // no real reason why one works and the other doesnt
+//		printf("// fn! %s\n", S->Addr);
+//	} else {
 //		printf("// got %s\n", S->Addr);
-	}
+//	}
 	return R;
 }
 
