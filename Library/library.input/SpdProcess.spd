@@ -21,10 +21,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	|bool|						AlreadyWarnedDied
 
 	constructor	(|string| path, |?ThreadAsProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
+		mode |= ProcessMode.MsgPassing
 		super.constructor(path, mode, params, pico)
-		
 		.deathlimit = 12
-		//.IsParent = path != "" or fn != nil
 		.SubProcess = fn
 		.writer = FastString()
 
@@ -59,7 +58,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		cpp_part Send 
 		opt norefcounts			
 		if .status == -2
-			.start_
+			.start
 		if .pico.MessageStatus == 0
 			msg.RenderJbin(.writer)
 			.pico <~ .writer
@@ -69,7 +68,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		opt norefcounts
 		if self
 			if .status == -2
-				.start_
+				.start
 			|| str = .pico.get(T)
 				rz = str.parse
 	
@@ -113,23 +112,11 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	function Disconnect (|string| why="")
 		.pico.close(why.cstr)
 
-
-	helper StartProcess (|ExitCode|)
-		cpp_Wrapper JB_Sh_StartProcess
-
 	
-	function SpawnAsChild (|duration| delay=0, |bool|)
+	function SpawnAsChild (|bool|)
 		if !.pico.isok
 			require pico.replace(.pico)
-		
-//		if delay > 0
-//			.DelaySpawnTill = date.now + delay
-//			return true
-		return .Start_
-	
-	
-	helper Start_ (|bool|)
-		return .StartProcess.successful
+		return .Start.successful
 
 
 	function TimedOut (|date| Durr, |bool|)
@@ -195,11 +182,11 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			return SpdProcess.Spawn(self, name, params)		
 		
 		
-		function Spawn (|string| app_path, |string| Name, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |duration| Delay=0, |SpdProcess|)
+		function Spawn (|string| app_path, |string| Name, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(name)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
-				if !rz.SpawnAsChild(delay)
+				if !rz.SpawnAsChild()
 					rz = nil
 
 

@@ -224,6 +224,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AC0A9ED72EB24D4000F9F1CB /* PicoMsg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../Library/CppLib/PicoMsg.h; sourceTree = "<group>"; };
 		AC1050002D61EF6C00BB929B /* FF_Intel.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_Intel.S; path = ../Library/CppLib/FF_Intel.S; sourceTree = "<group>"; };
 		AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
 		AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
@@ -386,6 +387,7 @@
 		AC7D3C7829A27BF300148ADB /* cpp */ = {
 			isa = PBXGroup;
 			children = (
+				AC0A9ED72EB24D4000F9F1CB /* PicoMsg.h */,
 				AC7D3CB729A27C9900148ADB /* JB_Globals.cpp */,
 				AC7D3CB829A27C9900148ADB /* JB.cpp */,
 				AC7D3C9429A27C1D00148ADB /* JB_Alloc.cpp */,

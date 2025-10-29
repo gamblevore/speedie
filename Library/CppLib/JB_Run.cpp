@@ -164,13 +164,10 @@ void JB_Str__LoadGlobals () {
 }
 
 
-void 	JB_FinalEvents() {
+void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
-	#ifndef AS_LIBRARY
-	PicoKill(0);
-	#endif
 }
 
 
@@ -197,11 +194,6 @@ void		JB_App__GUIMode(bool GUI) {
 // GUICareTaker seems to cause problems and I'm fed up with it.
 	PicoGlobalConf()->Observer = GUI ? JB_GUICareTaker : JB_BasicCareTaker;
 	JB_NoExitOnCrash = GUI;
-}
-
-
-static void JB_KillChildrenOnExit() {
-	PicoKill(0);
 }
 
 
@@ -235,7 +227,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 //				if (getppid() > 1)
 				PicoGlobalConf()->Observer = JB_BasicCareTaker;
 			}
-			atexit(JB_KillChildrenOnExit);
+			atexit(PicoFinish);
 		#endif
 	}
 	

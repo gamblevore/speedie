@@ -115,7 +115,7 @@ void JB_CrashHandler (int Sig) {
 
 						// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);
-	PicoKill(0);
+	PicoFinish();
 	bool AskExit = (Sig == SIGHUP) or (Sig == SIGQUIT) or (Sig == SIGKILL);
 	if (!JB_NoExitOnCrash or AskExit) {
 		if (AskExit)

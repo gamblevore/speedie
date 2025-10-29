@@ -29,6 +29,7 @@
 	#include <linux/limits.h>
 #endif
 
+#define kMsgPassAllow   1
 #define kStdOutSilence  4
 #define kStdOutPassThru 8
 #define kStdOutNil      12
@@ -182,12 +183,15 @@ int JB_Kill (int PID) {
 }
 
 
-int JB_Sh_StartProcess (ShellStream* S) {
 // moved all the horrible unix stuff over to pico :)
+int JB_Sh_StartProcess (ShellStream* S) {
 	auto argv = JB_Proc__CreateArgs(S->Path, S->Args);
 	if (!argv) return E2BIG;
-	int Mode = S->Mode;
-	int ChildID = PicoExec(S->Pico, 0, argv, Mode&3, (Mode>>2)&3, (Mode>>4)&3);
+	int Mode = S->Mode ^ kMsgPassAllow;
+	// its more handy to activate MsgPassing explicitly, than default to true.
+	// however, pico has it default to true.
+
+	int ChildID = PicoExec(S->Pico, 0, argv, Mode&kMsgPassAllow, (Mode>>2)&3, (Mode>>4)&3);
 	byte Result = 0;
 	if (ChildID < 0) {
 		Result = errno;
@@ -232,7 +236,6 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* ErrsIn, int Mode, Date TimeOut) {
 	if (ErrsIn) Mode&=~kStdErrNil; else if (!(Mode&kStdErrNil)) Mode |= kStdErrPassThru;
 	if (Out)  Mode&=~kStdOutNil; else if (!(Mode&kStdOutNil)) Mode |= kStdOutPassThru;
-	Mode |= 3; // no need for message-passing here.
 	auto Sh = JB_Sh_Constructor(0, self, Mode&~kStdErrPassThru, R, nil);
 	byte Error = JB_Sh_StartProcess(Sh);
 	if (Error) {
@@ -285,7 +288,6 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 
 ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
 // remove this?
-	Mode|=3;
 	auto rz = JB_Sh_Constructor(nil, self, Mode, Args, nil);
 	byte Error = JB_Sh_StartProcess(rz);
 	if (Error) {
@@ -313,7 +315,7 @@ ShellStream* JB_Sh_Constructor (ShellStream* self, JB_String* Path, byte Mode, A
 	JB_New2(ShellStream);
 	self->Args = JB_Incr(Args);
 	self->Path = JB_Incr(JB_Str_MakeC(Path));
-	self->Mode = Mode; 
+	self->Mode = Mode;
 #ifndef AS_LIBRARY
 	if (!Comms)
 		Comms = PicoCreate(MiniName(Path));

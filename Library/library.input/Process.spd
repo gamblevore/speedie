@@ -9,6 +9,7 @@ class Process
 		wrapper
 		cpp_part Sh
 		cpp_class ShellStream
+		pragma noearlyfree
 	contains Process
 	
 	|byte|					Mode
@@ -18,16 +19,19 @@ class Process
     |int64|					UserFlags
 
 
-	constructor (|string| Path, |ProcessMode| Mode, |[string]| Args=nil, |&pico| Pico = nil)
+	constructor (|string| Path, |ProcessMode| Mode=processmode.CaptureAll, |[string]| Args=nil, |&pico| Pico = nil)
 		cpp_wrapper
 
 	destructor:												cpp_wrapper
 	
 	function Status (|ExitCode|)
-		cpp_Wrapper
+		cpp_wrapper
 
 	function Kill (|int| ExitCode)
 		cpp_wrapper
+
+	function Start (|ExitCode|)
+		cpp_Wrapper JB_Sh_StartProcess
 	
 	module
 		function First (|Process|)
@@ -57,12 +61,12 @@ class Process
 datatype ProcessMode (byte)
 	linkage
 		cpp_part PIDM
-		numeric false // disallow implicit (syntax <--> int) conversion
+//		numeric false // disallow implicit (syntax <--> int) conversion
 	
 	flags
 		|ProcessMode| 
-		CaptureAll=0
-		MsgSilence = 3
+		CaptureAll = 0
+		MsgPassing = 1
 		StdOutSilence = 4
 		StdOutPassThru = 8
 		StdErrSilence = 16
