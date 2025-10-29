@@ -175,6 +175,7 @@ extend_module ASM {
 		VDOT = 195
 		VCRS = 196
 		VRFL = 197
+		VSUM = 198
 	}
 }
 

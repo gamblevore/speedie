@@ -136,3 +136,6 @@
 
 /**/ VRFL  (U2)
 	v1 = JB_vec4_Reflect(v2, v3);
+
+/**/ VSUM  (U1)
+	f1 = JB_vec4_Sum(v2);

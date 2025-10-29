@@ -285,7 +285,7 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 		fserrs <~ "`)>"
 		error fserrs
 		target debug
-/			CppCompilerPath.Execute(Commands)		
+			CppCompilerPath.Execute(Commands)		
 	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
@@ -341,7 +341,7 @@ function ExportAndInstall (|date| Elapsed)
 			compiler.Bundle
 	
 	if stderr.ok and !options.scripting
-		.PrintProduct("Product", ActualCompile or Options.Compile)
+		.PrintProduct("Product", ActualCompile or Options.Compile, true)
 		compiler.Successfulness |= 4
 
 
@@ -356,7 +356,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		.PrintProduct("\nCompiling c++ to", true)
+		.PrintProduct("\nCompiling c++ to", true, false)
 	
 	|| CppLib = compiler.SpeedieDir("Library/CppLib/")
 	.TestNewestLib(cpplib)

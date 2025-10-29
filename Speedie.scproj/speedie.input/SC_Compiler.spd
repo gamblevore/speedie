@@ -931,7 +931,7 @@ function Stage (|string| name, |bool|)
 	return true
 
 
-function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|)
+function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |bool| PrintSize, |string|)
 	print s
 	print " `"
 	if ActualCompile

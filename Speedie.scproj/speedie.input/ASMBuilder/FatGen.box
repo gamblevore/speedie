@@ -1821,3 +1821,11 @@ function message.VRFL (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	rz.dest(0, r1, a)
 }
 
+
+function message.VSUM (|asmreg| r1 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.VSUM, self)
+	rz.dest(0, r1, a)
+}
+

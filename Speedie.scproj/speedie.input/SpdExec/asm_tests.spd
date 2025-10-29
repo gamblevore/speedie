@@ -16,6 +16,11 @@ function StructWithObj.TestProperty
 
 function VecTest (|vec4| x, |vec4| y)
 	|| z = x • y
+	|| z2 = x cross x
+	|| z3 = x.Sum
+	|| z4 = x.sine
+	|| z5 = x.Length
+	
 	
 function ModTest (|float| f, |vec4| v, |float| f2, |vec4| v2)
 	visible
