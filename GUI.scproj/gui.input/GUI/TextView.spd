@@ -1544,19 +1544,21 @@ class TextView (GUIControl)
 		return .text.find(jeebox.CSLine, start, End )
 
 
-	helper ProperSelectLine (|intrange|)
+	helper SelectToLineStart (|intrange|)
 		|| r = .SelRange
 		|ind| A = .FindLineSeperator(r.x, 0)+1
 		|ind| B = r.x2
 		if (b > a) and self[b-1].istextline
 			b-- 
+		if a != r.x
+			return (a, b+1)
 		|| b2 = .FindLineSeperator(b)
 			return (a, b2+1)
 		return (a, .length+1) 
 	
 	
 	helper DeleteLine (|bool|)
-		|| i = .ProperSelectLine
+		|| i = .SelectToLineStart
 		if i.width <= 1
 			return false
 		if !keys.option
