@@ -14,7 +14,14 @@ target pack {
 function StructWithObj.TestProperty
 	.a = ""
 
+function Float (|float| x, |float| y)
+	visible
+	|| z1 = x mod y
+	|| z4 = x.sine
+	|| z5 = x.Length
+	
 function VecTest (|vec4| x, |vec4| y)
+	visible
 	|| z = x • y
 	|| z2 = x cross x
 	|| z3 = x.Sum

@@ -2,7 +2,7 @@
 
 module Intrinsics
 	|[message]| Floats
-	|[message]| Vectors // both q and v
+	|[message]| Vectors									// both q and v
 
 	function PullOutVecs (|bool|)
 		opt norefcounts
@@ -31,10 +31,9 @@ module Intrinsics
 		VM_Builder.VMFile("vmtrin_gen.box").data = vm
 		VM_Builder.SafeWrite("vmtrin.h", cpp)
 
-		// put into vmtrin_gen.box, despite reading vmtrin.box, so we can manually fix vmtrin.box if needed.
-		// Otherwise impossible compile situations can happen. Very difficult to fix.
-		// a bug exists in the one file, but we can't recompile... due to a bug that needs to be fixed
-		// two recompiles down the road.
+		// put into vmtrin_gen.box, so we can manually fix vmtrin.box if needed.
+		// Otherwise unfixable compile situations can happen, blocking future development.
+	
 
 	function scdecl.Trin (|byte|)
 		|| Ty = .TypeInfo
@@ -64,7 +63,7 @@ module Intrinsics
 			|| C = fn.Args.Length
 			|| T2 = t.LowerCase
 			vm <~ "
-/**/ $T$AsmName  (U$C)
+/**/ $T$AsmName  (U${C+1})
 	${RetType}1 = $fn_name("
 			
 			for i in C
@@ -109,7 +108,7 @@ function assembler.TheTrinity (|message| SrcPrms, |message| ASMPrms, |asmreg| de
 	|| fat = .RequestOp(OpCode, SrcPrms.parent!)
 	|| DestPos = .FillTheFat(collection, fat, ASMPrms, n)
 		dest = .TempOnly(dest)
-		fat.Dest(destpos, dest, self)	
+		fat.Dest(destpos, dest, self)
 	return fat*dest
 	
 
@@ -161,7 +160,9 @@ function scfunction.PostTrin (|message| s)
 	|| T = .args[]!.trin
 	fn_name.name = (T.Render + s.last.name).UpperCase
 	|| list = src.second
-
+	
 	for i in .args.Length
 		list <~ @thg + ("p" + (i+1))
 	
+
+

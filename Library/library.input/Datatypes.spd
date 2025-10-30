@@ -661,6 +661,10 @@ datatype f64
 	operator pow (|Float64| other, |Float64|)
 		cpp_wrapper (pow)
 
+	operator mod (|float64| upon, |float|)
+		asm fmod(dest, p1, p2, r0, 0)
+		cpp_wrapper (fmod)
+
 	function Abs (|Float64|)
 		cpp_wrapper (fabs)
 

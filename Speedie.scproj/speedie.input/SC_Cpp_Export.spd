@@ -1262,26 +1262,13 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderRel (fpMsgRenderCpp)
 		opt norefcounts
-		|| first = .first!
-		|| op = first.next!
-		|| last = op.next!
-		|| scop = op.obj|scoperator| #expect (op, "Missing scop".internal)
-		if scop is NeedsCppFuncOnFloats
-			if first.fastdecl.isfloat
-				fs <~ "std::fmod("
-				first.export(fs)
-				fs <~ ", "
-				last.export(fs)
-				fs <~ ")"
-				return
-		
-		RenderInBracketsIfRel( first, fs )
-
+		|| F = .first!
+		RenderInBracketsIfRel( F, fs )
 		fs <~ ' '
-		op.Export( fs )
+		F++
+		F!.Export( fs )
 		fs <~ ' '
-		
-		RenderInBracketsIfRel( last, fs )
+		RenderInBracketsIfRel( f.next!, fs )
 
 
 	function RenderInBracketsIfRel (fpMsgRenderCpp)

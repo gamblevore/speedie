@@ -30,7 +30,7 @@ datatype OpMode (int)
 		AndOr = [OR, AND]
 		Custom
 		CaseAware
-		NeedsCppFuncOnFloats
+		CustomOnFloat
 		ExactEquals = niltest + exactlyequals + equalornot + compare
 		ExactNotEquals = niltest + equalornot + compare
 		
@@ -119,8 +119,6 @@ function InitComp (|string| name_)
 module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
-//	|scoperator|						And
-//	|scoperator|						Or
 	|scoperator|						Assigns
 	|scoperator| 						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!
 	|scoperator| 						Subtract														// a-b!!
@@ -165,7 +163,7 @@ module {
 
 		.AddBasic
 		
-		.AddMath( "mod",	"mod",		&Assembler.Mod,			/*.Mod*/	opmode.NeedsCppFuncOnFloats)
+		.AddMath( "mod",	"mod",		&Assembler.Mod,			/*.Mod*/	opmode.CustomOnFloat)
 		.AddMath( "+",		"Plus",		&Assembler.Plus,		/*.Add*/	opmode.Addition)
 		.AddMath( "-",		"Minus",	&Assembler.Subtract,	/*.sub*/	opmode.subtraction)
 		.AddMath( "*",		"Mul",		&Assembler.Multiply,	/*.mul*/	opmode.Multiply)
@@ -431,6 +429,9 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		return CustomOps.Needed
 	
 	|| LNT		= LC.TypeInfo
+	if lnt.isfloat and comp is CustomOnFloat
+		return CustomOps.Needed
+		
 	|| RNT		= RC.TypeInfo
 	if scnode.ConstantsLoadingOverride
 		if lc.IsReallyNumeric
