@@ -1522,18 +1522,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2254])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2252])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2255])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2253])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2256])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2254])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2253])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2251])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2256])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2254])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2257])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2255])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1766,7 +1766,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2262])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2260])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1803,7 +1803,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2258])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2256])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1843,7 +1843,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2263])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2261])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2075,12 +2075,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2261])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2259])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2260])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2258])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2259])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2257])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2440,6 +2440,8 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_VSOC ((ASM)186)
 
 #define kSC__ASM_VSQT ((ASM)180)
+
+#define kSC__ASM_VSUM ((ASM)198)
 
 #define kSC__ASM_VSWZ ((ASM)124)
 
@@ -3035,6 +3037,8 @@ extern Array* SC__NilReason_values;
 
 #define kSC__OpMode_Custom ((OpMode)2097152)
 
+#define kSC__OpMode_CustomOnFloat ((OpMode)8388608)
+
 #define kSC__OpMode_EqualOrNot ((OpMode)256)
 
 #define kSC__OpMode_ExactEquals ((OpMode)16769)
@@ -3060,8 +3064,6 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_MoreOrEqual ((OpMode)4096)
 
 #define kSC__OpMode_Multiply ((OpMode)32768)
-
-#define kSC__OpMode_NeedsCppFuncOnFloats ((OpMode)8388608)
 
 #define kSC__OpMode_NilTest ((OpMode)16384)
 
@@ -3293,7 +3295,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2252])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2250])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3931,8 +3933,6 @@ Message* SC_AC__CmdCleanUp(Message* Arg);
 
 bool SC_AC__CmdWrap(Message* Arg);
 
-void SC_AC__Cpp(Message* Out, SCFunction* Found);
-
 Message* SC_AC__CppASM(Message* Msg, SCFunction* Fn);
 
 void SC_AC__CppView(Message* Out, SCFunction* Fn);
@@ -4438,7 +4438,7 @@ int SC_Ext__NeedNewObjForSrc(JB_String* Cpp, JB_File* Objects);
 
 int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* H, JB_File* O);
 
-JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile);
+JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile, bool PrintSize);
 
 JB_String* SC_Ext__ProductBaseName();
 
@@ -9699,8 +9699,6 @@ void SC_Msg_AddBefore(Message* Self, Message* Before, Message* NewItem);
 
 FatASM* SC_Msg_ADDK(Message* Self, ASMReg R1, ASMReg R2, int K);
 
-void SC_Msg_AddLinePositions(Message* Self);
-
 FatASM* SC_Msg_ADDM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
 
 FatASM* SC_Msg_AddOrSubInt(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Sh);
@@ -10037,6 +10035,8 @@ SCFunction* SC_Msg_ExpFunc(Message* Self);
 
 void JB_Msg_Export(Message* Self, FastString* Fs);
 
+FatASM* SC_Msg_FABS(Message* Self, ASMReg R1, ASMReg R2);
+
 FatASM* SC_Msg_FADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
 FatASM* SC_Msg_FADK(Message* Self, ASMReg R1, ASMReg R2, int High);
@@ -10051,9 +10051,17 @@ SCDecl* SC_Msg_FastDeclSafe(Message* Self);
 
 FatASM* SC_Msg_FCLM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
+FatASM* SC_Msg_FCOS(Message* Self, ASMReg R1, ASMReg R2);
+
 FatASM* SC_Msg_FDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
 FatASM* SC_Msg_FEET(Message* Self, ASMReg R1, ASMReg R2, int K);
+
+FatASM* SC_Msg_FEXP(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FFLR(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FFRC(Message* Self, ASMReg R1, ASMReg R2);
 
 SCFile* SC_Msg_File(Message* Self);
 
@@ -10103,17 +10111,27 @@ void SC_Msg_FixErl(Message* Self);
 
 void SC_Msg_FixMultiArr(Message* Self);
 
+FatASM* SC_Msg_FLG2(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FLNG(Message* Self, ASMReg R1, ASMReg R2);
+
 Float64 JB_Msg_Float(Message* Self);
+
+FatASM* SC_Msg_FLOG(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_FMAX(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
 FatASM* SC_Msg_FMIN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
+
+FatASM* SC_Msg_FMIX(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
 FatASM* SC_Msg_FMLK(Message* Self, ASMReg R1, ASMReg R2, int High);
 
 FatASM* SC_Msg_FMOD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
 FatASM* SC_Msg_FMUL(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
+
+FatASM* SC_Msg_FNAT(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
 
 FatASM* SC_Msg_FNC(Message* Self, ASMReg R1, int JUMP, int Prm1, int Prm2);
 
@@ -10123,13 +10141,31 @@ FatASM* SC_Msg_FNCX(Message* Self, ASMReg R1, int Table, int Prm1, int Prm2);
 
 FatASM* SC_Msg_FNCX3(Message* Self, ASMReg R1, int Table, int Prm1, int Prm2);
 
+FatASM* SC_Msg_FNIS(Message* Self, ASMReg R1, ASMReg R2);
+
 bool SC_Msg_FoundFuncWith0(Message* Self);
 
 bool SC_Msg_FoundFuncWithFunc(Message* Self, SCFunction* F);
 
+FatASM* SC_Msg_FPOW(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_FRND(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FSGN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_FSIN(Message* Self, ASMReg R1, ASMReg R2);
+
 void JB_Msg_FSListArg(Message* Self, FastString* Fs, bool AddLine);
 
 void JB_Msg_FSListSep(Message* Self, FastString* Fs, JB_String* Sep);
+
+FatASM* SC_Msg_FSMS(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+
+FatASM* SC_Msg_FSOC(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FSQT(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FTAN(Message* Self, ASMReg R1, ASMReg R2);
 
 Message* SC_Msg_FullAfter(Message* Self);
 
@@ -10140,6 +10176,12 @@ JB_String* JB_Msg_FuncName(Message* Self);
 JB_String* SC_Msg_FuncPos(Message* Self, SCFunction* Fn, int& Pos);
 
 void SC_Msg_FuncWrap(Message* Self, Message* Fnc);
+
+FatASM* SC_Msg_FXNF(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FXNN(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_FXP2(Message* Self, ASMReg R1, ASMReg R2);
 
 Message* SC_Msg_GetAddrButNicer(Message* Self);
 
@@ -10773,6 +10815,8 @@ void JB_Msg_url__(Message* Self, FastString* Fs);
 
 Message* SC_Msg_UseNonRefChangers(Message* Self, bool Parent);
 
+FatASM* SC_Msg_VABS(Message* Self, ASMReg R1, ASMReg R2);
+
 FatASM* SC_Msg_VADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
 FatASM* SC_Msg_VADK(Message* Self, ASMReg R1, ASMReg R2, int High);
@@ -10785,7 +10829,21 @@ JB_String* SC_Msg_VarName(Message* Self);
 
 FatASM* SC_Msg_VBLD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, ASMReg R5);
 
+FatASM* SC_Msg_VCLM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+
+FatASM* SC_Msg_VCOS(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VCRS(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
 FatASM* SC_Msg_VDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
+
+FatASM* SC_Msg_VDOT(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_VEXP(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VFLR(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VFRC(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_VGET(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Ind);
 
@@ -10795,11 +10853,19 @@ void SC_Msg_visibleSet(Message* Self, bool Value);
 
 MaybeBool SC_Msg_visible2(Message* Self);
 
+FatASM* SC_Msg_VLG2(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VLNG(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VLOG(Message* Self, ASMReg R1, ASMReg R2);
+
 FatASM* SC_Msg_VMAX(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
 
 int SC_Msg_VMBits(Message* Self);
 
 FatASM* SC_Msg_VMIN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_VMIX(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
 FatASM* SC_Msg_VMLK(Message* Self, ASMReg R1, ASMReg R2, int High);
 
@@ -10811,9 +10877,35 @@ FatASM* SC_Msg_VMOV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
 FatASM* SC_Msg_VMUL(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
+FatASM* SC_Msg_VNAT(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_VNIS(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VPOW(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_VRFL(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_VRND(Message* Self, ASMReg R1, ASMReg R2);
+
 FatASM* SC_Msg_VSET(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Ind);
 
+FatASM* SC_Msg_VSGN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+
+FatASM* SC_Msg_VSIN(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VSMS(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+
+FatASM* SC_Msg_VSOC(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VSQT(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VSUM(Message* Self, ASMReg R1, ASMReg R2);
+
 FatASM* SC_Msg_VSWZ(Message* Self, ASMReg R1, ASMReg R2, int Fields);
+
+FatASM* SC_Msg_VTAN(Message* Self, ASMReg R1, ASMReg R2);
+
+FatASM* SC_Msg_VXP2(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_WCPY(Message* Self, ASMReg R1, ASMReg R2, int Length);
 
@@ -11536,6 +11628,8 @@ JB_String* SC_Func_RenderName(SCFunction* Self, FastString* Fs_in);
 
 JB_String* SC_Func_RenderParams(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
+JB_String* SC_Func_RenderSheBless(SCFunction* Self);
+
 JB_String* SC_Func_RenderTitle(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
 bool SC_Func_ReturnsObject(SCFunction* Self);
@@ -11545,6 +11639,8 @@ SCDecl* SC_Func_Self(SCFunction* Self);
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
 
 Message* SC_Func_SourceArg(SCFunction* Self);
+
+void SC_Func_SourceArgSet(SCFunction* Self, Message* Value);
 
 void SC_Func_StatelessAccumulate(SCFunction* Self);
 
