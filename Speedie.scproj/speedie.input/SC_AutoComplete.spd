@@ -523,7 +523,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	SCFunction.CurrFunc = fn
 	
 	|| thg = fn.source!.FindPos(f, n)
-	if cmd starts "asm" or "cpp"
+	if cmd starts "asm"
 		return .CppASM(cmd, fn)
 	
 	if cmd starts  "define" or "display" or "callfrom"
@@ -1124,7 +1124,7 @@ function ASMFail (|scfunction| fn, |message?| ret,  |message|)
 function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
 	// Not safe to continue (At least in ASM) if theres an error
-	|| err = fn.savederror
+/	|| err = fn.savederror
 		StdErr <~ err
 		return nil
 	
@@ -1134,9 +1134,7 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	rz = @tmp.msg(msg.name)
 	rz.msg(@thg, fn.name)
 	|| rzarg = rz.msg(@arg)
-	if msg ~= "cpp"
-		.Cpp(rzarg, fn)
-	  elseif !.ASM(rzarg, fn)
+	if !.ASM(rzarg, fn)
 		rz = nil
 		.ASMFail(fn, rz)
 
@@ -1151,26 +1149,11 @@ function Message.NextPath (|message| Before, |message?| path, |message|)
 	return path
 
 
-function Message.AddLinePositions
-	opt norefcounts
-	|message| path
-	for s.flat in self
-		if s in @arg
-			path = s.nextpath(s, path)
-			s.prev = s.Position.msg
-
-
 function message.FileMark (|message|)
 	opt norefcounts
 	|| path = .File
 		rz = .msg(@tmp, "file")
 		rz <~ path
-
-
-function Cpp (|message| out,  |SCFunction| found)
-	|| msg = found.Source!.Copy
-	out <~ msg
-	msg.AddLinePositions
 	
 	
 //function Nothing (|message| out,  |SCFunction| fn)
@@ -1240,13 +1223,23 @@ function ASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| Render
 	return true
 
 
+function scfunction.RenderSheBless (|string|)
+	|| a = .SourceArg
+		|| b = a.copy
+		.SourceArg = b
+		for s.flat in b
+			if s.func == @sheb
+				s.remove
+		rz = .render
+		.SourceArg = b
+
+	
 function CppView (|message| out, |scfunction| fn)
-	out.msg(@tmp, "")			// separator
-	|| view = fn.render
-	for s.lines in view
+	out.msg(@tmp, "")						// separator
+	for s.lines in fn.Rendershebless
 		if !s
 			s = " "
-		out.msg(@tmp, s)		// C-view
+		out.msg(@tmp, s)				// C-view
 
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)

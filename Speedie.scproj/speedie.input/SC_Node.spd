@@ -708,6 +708,12 @@ function SCFunction.SourceArg (|message|)
 	if arg == @arg
 		return arg
 
+function SCFunction.SourceArg (assigns:|message|)
+	opt norefcounts
+	|| arg = .Source.last
+	if arg == @arg
+		arg.ReplaceWith(value)
+
 
 function SCFunction.ParamUniquer (|string| s, |string|)
 	|| fs = faststring.new
