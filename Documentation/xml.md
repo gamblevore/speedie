@@ -91,9 +91,13 @@ I mean it looks good. No close-tags, and using white-space for indentation makes
 #### Simplicity
 Jeebox doesn't have name-spaces, doctypes, dtds or processing-instructions, or file-entities. Neither SOAP, XSLT or XPath.
 
-Jeebox doesn't have and doesn't need something like a DTD. Code is code. The best way to validate a document is with the app that created it. Jeebox works with the philosophy, that what people really want, is code, good simple code. Because all systems seem to emmigrate in that direction anyhow. Schema is a full programming-language, computer-games end up adding scripts, databases end up adding "triggers", and websites added javascript. If we really needed a validation for a Jeebox-based format, it would have to be a program.
+Jeebox doesn't have and doesn't need something like a DTD. Code is code. The best way to validate a document is with the app that created it. Jeebox works with the philosophy, that what people really want, is code, good simple code. Because all systems seem to emmigrate in that direction anyhow.
 
-Jeebox's API has a simple system where the code that validates the code is the same code that reads it.
+Computer-games end up adding scripts, databases end up adding "triggers", websites added javascript, spreadsheets added code, and XML schema is near a programming-language (with elseif/loops/dictionaries).
+
+If we really needed a validation for a Jeebox-based format, it would have to be a program, written in Speedie. A small Speedie script, say 4KB big could easily function as a Jeebox DTD.
+
+Jeebox's API has a simple system where the code that validates the code is the same code that reads it. If Jeebox becomes popular, I could easily add a "validation only" mode for scripts, that don't allow file-access or any other system features. Just [sandbox](https://stackoverflow.com/questions/4249063/) the thing[.](https://www.kernel.org/doc/Documentation/prctl/seccomp_filter.txt?Perhaps-i-can-also-disable-read-write-outside-of-obj/global-space...-and-disable-many-functions...-seccomp_filter-does-this...chroot+setuid-can-help-but-are-not-safe...setrlimit-can-limit-network-and-cpu!--sandbox_init()-on-macosx-works--chromium-stil-uses-it!...codesign()-also-works)
 
 
 #### Regularity
