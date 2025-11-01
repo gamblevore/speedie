@@ -28,9 +28,9 @@ struct Assembler
 	|int|						CurrFuncGrab
     |uint16|                    BranchID
     |uint16|                    NextBranchID
-	|bool|						Inited
 	|bool|						NeedsRework
-
+	|int|						DbgMark
+	|jbin?|						DebugInfo
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
@@ -70,11 +70,15 @@ struct Assembler
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
-//		.References = 0
+		|| dbg = .DebugInfo
+			dbg.Enter(@msg, fn.exportname)
+			.dbgmark = dbg.Length // for .rework
+
 		for a in fn.Args
 			.DeclReset(a)
 			.DeclareVar(a.source, a)
-//			.references |= (a is Reference) << (i+1)
+			if dbg
+				a.DumpDecl(dbg, 0)
 
 	
 	function Index (|int|)
@@ -553,8 +557,9 @@ struct Assembler
 	
 	function PackMakerInit
 		opt norefcounts
-		require !.Inited
-		.inited = true
+		require !.DebugInfo
+		.DebugInfo = jbin()
+		.DebugInfo!.add(@sheb, "dbg")
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit
 		ASMType.InitAccess
@@ -616,16 +621,16 @@ struct Assembler
 		
 	function FinishASM 
 		opt norefcounts
-		if .zero.Const // what?
-		|| l = .last
-		if !l.IsFinisher
+		if !.last.IsFinisher
 			debugger !.fn.ASMReturn
 			|| dl = .fn.Source!.FlatLast
 			.closevars(1, dl)
 			|asmreg| dest = nil
 			if !ASMType.ReturnOpt(self, dest)
 				dl.RET()
-		.Optimise
+		
+		.OptimiseJumps
+		.DebugInfo!.exit
 
 
 	function Guard
@@ -661,6 +666,7 @@ function assembler.RootGen (|scfunction| fn)
 
 
 function Assembler.Rework (|SCFunction| fn,  |bool|)
+	// need to remove the debug info!
 	HoistSpace.NeedSpare(.FnLength)
 	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 	.Orig = .FuncStart

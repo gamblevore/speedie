@@ -1,6 +1,6 @@
 
 
-function Assembler.Optimise 
+function Assembler.OptimiseJumps
 	|| A = .Curr
 	|| S = .FuncStart
 	while A > S

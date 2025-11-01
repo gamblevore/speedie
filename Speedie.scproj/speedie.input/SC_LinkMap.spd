@@ -143,6 +143,8 @@ function scclass.Reach (|SCNode| from, |message| src=nil)
 	require !.MyReacher
 	.MyReacher = from
 	Compiler.stReachedClass++
+	if !.IsDataTypeOnly
+		Compiler.ReachedClassTable <~ self
 	
 	if Options.BannedClasses
 		.BannedCheck(src)
@@ -196,6 +198,10 @@ function compiler.DeadStrip
 			c.ReachBehaviours		// behaviour chains tend to be long.
 
 	CodeSorter.LeafsFirst			// super-refcounter wants this
+
+	ReachedClassTable.sort(ClassSorter)
+	for (c in .ReachedClassTable) (i)
+		c.TableID = i+1
 	
 
 function scdecl.TypeReach (|SCNode| from, |message| src)

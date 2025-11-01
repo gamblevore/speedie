@@ -1566,8 +1566,8 @@ function Tran_Debugger (TranFunc)
 		// why cant I use negate?
 		node.first!.Negate
 		node.Name = "if"
-		|| dbg = node.msg(@arg).msg(@tmp, "debugger")
-		dbg.ASMType = ASMType.kdebugger
+		|| trap = node.msg(@arg).msg(@tmp, "debugger")
+		trap.ASMType = ASMType.kdebugger
 	
 	Tran_If(fn, node, name_space)
 
@@ -1579,9 +1579,9 @@ function Tran_Debugger (TranFunc)
 function Tran_BreakPoint (|scfunction| fn, |scnode| p, |message| ch)
 	opt norefcounts
 	using ch
-		|| dbg = @tmp.msg
-		ch.prev = dbg
-		Tran_DebugAt( fn, dbg, p )
+		|| trap = @tmp.msg
+		ch.prev = trap
+		Tran_DebugAt( fn, trap, p )
 
 
 function Tran_DebugAt (TranFunc)

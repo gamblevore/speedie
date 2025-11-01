@@ -1,1 +1,68 @@
-
+
+
+
+function SCDecl.DumpWrapper (|int| Pos, |syntax|)
+	if pos >= 0 and self is Reference
+		return @tmp
+	if .PointerCount					// @msg, @arg, @tmp, have names and children.
+		return @msg
+	if .C_Array
+		return @arg
+	|| ty = .type
+	if ty.IsObject
+		return @bin
+	if ty.IsStruct
+		return @str
+	return @char						// a plain old data-type
+
+
+function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
+	opt norefcounts
+	
+	|| W = .DumpWrapper(pos)
+	|| Reg = 0
+	|| s = ""
+	if pos >= 0
+		s = .name
+		reg = .mu.DataType|asmreg|.Reg
+	
+	j.add(W, s, true)
+	j.AddDecl(self, Pos, W, reg)
+	
+	if w == @arg						// carray... we need the length of the carray
+		j.AddInt(.c_array)			
+		self = .internal!
+	  elseif w == @msg					// pointer
+		self = .internal!
+	  elseif w!=@tmp					// not a reference
+		j.exit(depth+1)
+		return
+	
+	.DumpDecl(j, -1, depth+1)
+
+
+function jbin.AddDecl (|scdecl| D, |int| Pos, |syntax| W, |int| Reg)
+	opt norefcounts
+	|| t = d.type.debugID(W)
+	|| Alloc = t.hintsize + Pos.hintsize + (reg > 0)
+	.WriteType(@back)
+	.Appendhint(alloc)
+	.AppendHint(t)
+	if pos >= 0
+		.AppendHint(pos)
+		if reg > 0
+			.AppendByte(reg)			
+	
+
+function scclass.DebugID (|syntax| W, |int|)
+	opt norefcounts
+	if w == @bin or @str				// an object or struct
+		return .TableID
+	return .typeinfo.DebugCode
+
+
+function int.hintsize (|int|)
+	if self >= 0
+		return 1 + (.log2/7)
+
+

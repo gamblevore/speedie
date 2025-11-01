@@ -76,18 +76,21 @@ class FastString {
 		nil self
 		cpp_wrapper JB_FS_SmartResult
 	
-//	function Copy (|string|)
-//		cpp_wrapper JB_FS_Copy
-	
 	function Reserve (|int| N, |&byte|)
 		cpp_wrapper JB_FS_WriteAlloc_
-			
-	function AppendLInt (|uint64| n)
+
+	function AppendLInt (|uint64| n)	// remove this, and replace with appendhint
 		while n
 			self <~ N|byte|
 			n >>= 8
 
-	function EncodeLength (|uint64| N)  // maybe hInt is better? like how many speedie-strings are over 128 anyhow?
+	helper AppendHInt (|int| n)
+		while n >= 128
+			.AppendByte(n ||| 128)
+			n >>= 7
+		.AppendByte(n)
+
+	function EncodeLength (|uint64| N)	// maybe hInt is better? like how many speedie-strings are over 128 anyhow?
 		|| L2 = N|byte|					// remove these two funcs? (one below)
 		if N >= 248
 			l2 = 248 + (n|uint|.log2 max 0) >> 3
@@ -145,12 +148,6 @@ class FastString {
 		
 		function New (|file| dest, |FastString|)
 			cpp_wrapper JB_FS__FileFlush
-		
-//		function New (|&byte| b, |int| n, |FastString|)
-//			cpp_part NewDirect
-//			rz = faststring()
-//			rz.ResultPtr = b
-//			rz.Reserved = n
 
 
 	syntax Access (|int| off, |Byte|)

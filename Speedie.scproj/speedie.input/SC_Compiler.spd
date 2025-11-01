@@ -73,8 +73,9 @@ linkage
 |Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, InitAppGlobals_()}`~parse).WipePos
 |Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
 
-|SCModule|					program = InternalFile.Proj.Mod
+|SCModule|					Program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
+|[SCClass]|					ReachedClassTable
 |[SCModule]|				ModuleList
 |[SCFunction]|				FuncList
 |[SCFunction]|				ProtoTypes
@@ -477,7 +478,6 @@ function ImportAll
 
 
 	require .SortModulesAndClasses	// need to re-sort array by depth
-
 
 	for c in .ClassList
 		c.CalculateSize

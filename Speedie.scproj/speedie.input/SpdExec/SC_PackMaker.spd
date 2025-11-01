@@ -183,13 +183,12 @@ module PackMaker
 	
 	function AddDebugStuff (|jbin| j, |string| func_names)
 		j.tmp("debug")
-		j.Enter(@tmp, "func")
-		|CompressionStats| st
-		|| f3 = func_names.compress(st)
-		print "Stack-trace Compression: "
-		st.print
-		j.AddStr(f3)
-		j.exit(3)
+		|| f3 = func_names.compress
+		j.Add(@str, f3)
+		|| dbg = assembler.sh.debuginfo
+			j <~ dbg
+			assembler.sh.debuginfo = nil
+		j.exit(2)
 
 	
 	function RenderASM (|jbin| j, |faststring| func_names)
@@ -215,7 +214,7 @@ module PackMaker
 	helper DumpStringsSub (|jbin| strs)
 		opt norefcounts
 		for s in .PackStrings
-			strs.AppendStrLength(s.length)
+			strs.AppendHInt(s.length)
 			strs <~ s
 
 

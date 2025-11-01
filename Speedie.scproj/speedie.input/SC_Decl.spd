@@ -506,10 +506,8 @@ class SCDecl (SCObject) {
 
 
 	function IsReallyNumeric (|bool|)
-		require .IsNormal
-		
-		|| t = .type.HigherNumber
-			return true
+		if .IsNormal		
+			return .type.HigherNumber
 
 
 	function scclass.HigherNumber (|scclass|)
@@ -1183,11 +1181,23 @@ class SCDecl (SCObject) {
 		return T.clssize * mul
 
 
+	function CArrayDepth (|faststring| fs, |int| Depth=0, |int|)
+		if fs
+			fs.AppendHInt(.c_array)
+		if .IsCArray
+			return .internal!.CarrayDepth(fs, depth+1)
+		if .PointerCount
+			
+		if fs
+			fs <~ .type.typeinfo.DebugCode
+		return Depth
+	
+	
 	function TypeInfo (|DataTypeCode|)
 		opt norefcounts
-		if .pointercount					// what about objects?
-			return datatypecode._voidptr
-		if .iscarray
+		if .PointerCount					// what about objects?
+			return DataTypeCode._voidptr
+		if .IsCArray
 			return .internal!.typeinfo
 		return .Type.typeinfo				// perhaps this is already set correctly.
 	

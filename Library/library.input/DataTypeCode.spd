@@ -104,7 +104,27 @@ datatype DataTypeCode (uint16)
 					fs <~ "int"
 				  elseif b == 8
 					fs <~ "int64"
-					
+	
+	// Can replace datatype code with this, eventually.
+	// this makes more sense, with the bitcount.
+	function DebugCode (|uint|)
+		if self is bool
+			return 64			// bools are unsigned
+		
+		rz = self|int|&48
+		if rz == 48
+			rz = 64
+		if rz == 0
+			rz = 8
+		rz = rz.log2			// 1,2,4	// bits
+		rz |= (self&3)<<3		// 8,16		// vector
+		rz |= (self&128)>>2		// 32		// float
+		rz |= (self&64) 		// 64		// unsigned
+		rz |= (self&pointer)>>2 // 128		// pointer
+		
+			
+		
+		
 		
 	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "IsNumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.

@@ -67,7 +67,6 @@ role JBin (Faststring)
 		self <~ name
 		self <~ '\n' // noice
 	
-			
 	function AddStr			(|string| name)
 		.add(@str, name)
 	
@@ -85,26 +84,19 @@ role JBin (Faststring)
 		.AddMemory(type, name.length, false, name|&byte|)
 
 	function AddMemory		(|syntax| type, |int| L, |bool| GoIn, |&byte| data, |jbinleaver|)
+		.WriteType(type, goin)
+		.AppendHInt(L)
+		.AppendMemory(data, L)
+		return goin|int|
+
+	function WriteType	(|syntax| type, |bool| GoIn=false)
 		|| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
-		.AppendStrLength(L)
-		.AppendMemory(data, L)
-		if goin
-			.Indent++
-			return 1
-		
-	helper AppendStrLength (|int| n)
-		while n >= 128
-			.appendbyte(n ||| 128)
-			n >>= 7
-		.AppendByte(n)
-			
+		.Indent += goin
 
 	function ReserveMemory	(|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
-		|| T = (type|int|<<1) ||| (goin)
-		self <~ T|byte|
-		.AppendStrLength(L)
-		.Indent += goin
+		.WriteType(type, goin)
+		.AppendHInt(L)
 		return .Reserve(L)
 		
 

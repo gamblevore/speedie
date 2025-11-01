@@ -343,7 +343,7 @@ function AllocBearStruct (|int| Dir, |message| Exp, |asmreg| Dest, |int| Size, |
 	fat.µRefCount++ // makes sense it is always reffed
 	return fat * dest
 
-
+	
 function Decl (fn_asm) // declaresub declare 
 	opt norefcounts
 	
@@ -351,7 +351,13 @@ function Decl (fn_asm) // declaresub declare
 	.DeclReset(ty)
 	|| rel = exp.last!
 	dest = .DeclareBody(rel, ty)
-
+	rz = declsub(self, exp, dest, ty, rel)
+	|| dbg = .DebugInfo
+		ty.DumpDecl(dbg, .index) // or .index+1?
+	
+	
+function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
+	opt norefcounts
 	(dest is unusedsofar)
 	if ty.IsBareStruct or ty.IsCarray
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)

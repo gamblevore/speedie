@@ -66,6 +66,7 @@ linkage
 |ClassInfo|					Flags
 |DataTypeCode|  			TypeInfo
 |DataTypeCode|  			ASMTypeInfo
+|uint16|					TableID
 |uint16|					ClsSizeRaw
 |uint16|					ClsSize			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					TaskObjectCount
