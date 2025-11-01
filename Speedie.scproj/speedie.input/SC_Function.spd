@@ -97,8 +97,6 @@ linkage
 
 constructor (|Message?| msg = nil)
 	Super.Constructor( msg )
-	if (msg)
-		Compiler.stFuncs++
 
 
 syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf

@@ -28,9 +28,11 @@ function compiler.PrintCompileTime (|date| durr)
 		fs.normal  "vm_ops",    fs <~ vm_ops
 	
 	|| ASM_Ops = compiler.stTotalASMOps
-		fs.normal  "ASM",    (ASM_Ops*4).strsize(fs)
+		fs.Normal  "ASM",    (ASM_Ops*4).strsize(fs)
 		fs.Normal  "Proj Saved", packmaker.PackSaved.Churn(fs)
 		fs.Normal  "Lib Saved",  packmaker.LibSaved.Churn(fs)
+		fs.normal  "DebugInfo", stdebuginfo.strsize(fs)
+
 
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)

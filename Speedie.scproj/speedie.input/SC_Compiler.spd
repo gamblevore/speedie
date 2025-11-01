@@ -123,8 +123,7 @@ linkage
 |byte|						During // unused but i don't want to remove. it could be useful?
 |bool| 						InitedOK = true
 |byte|						Successfulness
-|int|						stClasses
-|int|						stFuncs
+|int|						stDebugInfo
 |int|						stLibFuncs
 |int|						stReachedFunc
 |int|						stReachedClass

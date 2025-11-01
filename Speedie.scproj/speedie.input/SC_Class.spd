@@ -81,8 +81,6 @@ linkage
 
 
 constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
-	Compiler.stClasses++
-	
 	node.obj = self			// for autocomplete :)
 	scfile.curr <~ self
 		
