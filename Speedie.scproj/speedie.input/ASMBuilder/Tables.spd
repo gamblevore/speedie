@@ -354,6 +354,7 @@ function Decl (fn_asm) // declaresub declare
 	rz = declsub(self, exp, dest, ty, rel)
 	|| dbg = .DebugInfo
 		ty.DumpDecl(dbg, .index) // or .index+1?
+	// we also need to close decls!
 	
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)

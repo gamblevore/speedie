@@ -186,9 +186,10 @@ module PackMaker
 		|| f3 = func_names.compress
 		j.Add(@str, f3)
 		|| dbg = assembler.sh.debuginfo
-			compiler.stDebugInfo = dbg.length
-			j <~ dbg
+			|| str = dbg.GetResult.Compress
 			assembler.sh.debuginfo = nil
+			compiler.stDebugInfo += str.length
+			j <~ str
 		j.exit(2)
 
 	
