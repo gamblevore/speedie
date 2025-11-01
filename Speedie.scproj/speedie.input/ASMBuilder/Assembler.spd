@@ -29,6 +29,7 @@ struct Assembler
     |uint16|                    BranchID
     |uint16|                    NextBranchID
 	|bool|						NeedsRework
+	|bool|						Inited
 	|int|						DbgMark
 	|jbin?|						DebugInfo
 	|scfunction--|				Out
@@ -555,11 +556,47 @@ struct Assembler
 		return ss
 	
 	
+	function scclass.ListLayout (|jbin| j)
+		opt norefcounts
+		|| s = .super
+			s.ListLayout(j)
+		j.PropertyLayout(.Properties)
+
+		
+	function FillLayout (|jbin| j)
+		opt norefcounts
+		for c in Compiler.ReachedClassTable
+			j.Enter(@arg, c.ExportName)
+			c.ListLayout(j)
+			j.exit
+			
+			
+	function jbin.PropertyLayout (|[scdecl]| List)
+		opt norefcounts
+		for p in list
+			p.DumpDecl(self, p.exportposition)
+
+		
+	function FillDebugInfo (|jbin|)
+		rz = jbin()
+		
+		rz.Enter(@msg, "class")
+		.FillLayout(rz)
+		rz.exit
+		
+		rz.Enter(@msg, "glob")
+		rz.PropertyLayout(packmaker.PackGlobs)
+		rz.exit
+		
+		rz.Enter(@msg, "func")
+		
+		
 	function PackMakerInit
 		opt norefcounts
-		require !.DebugInfo
-		.DebugInfo = jbin()
-		.DebugInfo!.add(@sheb, "dbg")
+		require !.Inited
+		.Inited = true
+		if options.TargetDebug
+			.debuginfo = .FillDebugInfo
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit
 		ASMType.InitAccess
@@ -627,10 +664,11 @@ struct Assembler
 			.closevars(1, dl)
 			|asmreg| dest = nil
 			if !ASMType.ReturnOpt(self, dest)
-				dl.RET()
+				dl.RET
 		
 		.OptimiseJumps
-		.DebugInfo!.exit
+		|| dbg = .DebugInfo
+			dbg.exit
 
 
 	function Guard

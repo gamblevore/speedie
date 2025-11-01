@@ -189,7 +189,7 @@ module PackMaker
 			|| str = dbg.GetResult.Compress
 			assembler.sh.debuginfo = nil
 			compiler.stDebugInfo += str.length
-			j <~ str
+			j.AddStr(str)
 		j.exit(2)
 
 	

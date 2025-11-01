@@ -1,7 +1,7 @@
 
 
 
-function SCDecl.DumpWrapper (|int| Pos, |syntax|)
+function SCDecl.DumpCode (|int| Pos, |syntax|)
 	if pos >= 0 and self is Reference
 		return @tmp
 	if .PointerCount					// @msg, @arg, @tmp, have names and children.
@@ -19,7 +19,7 @@ function SCDecl.DumpWrapper (|int| Pos, |syntax|)
 function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 	opt norefcounts
 	
-	|| W = .DumpWrapper(pos)
+	|| W = .DumpCode(pos)
 	|| Reg = 0
 	|| s = ""
 	if pos >= 0
