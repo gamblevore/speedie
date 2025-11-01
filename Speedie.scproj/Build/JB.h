@@ -824,8 +824,9 @@ struct Assembler {
 	int CurrFuncGrab;
 	u16 BranchID;
 	u16 NextBranchID;
-	bool Inited;
 	bool NeedsRework;
+	int DbgMark;
+	FastString* DebugInfo;
 	SCFunction* Out;
 	FatASM* InlineEnd;
 	FatASM* Orig;
@@ -1326,6 +1327,7 @@ JBClass ( SCClass , SCBetterNode ,
 	SCNodeType BaseType;
 	DataTypeCode TypeInfo;
 	DataTypeCode ASMTypeInfo;
+	u16 TableID;
 	u16 ClsSizeRaw;
 	u16 ClsSize;
 	u16 TaskObjectCount;
@@ -1345,12 +1347,12 @@ JBClass ( SCClass , SCBetterNode ,
 	SCFunction* TheCompareFunc;
 	SCFunction* TheIsFunc;
 	SCFunction* FuncProto;
-	SCDecl* _NotConst;
 	SCDecl* TypeReal;
 	Array* Casts;
 	Array* Children;
 	SCDecl* Contained;
 	SCDecl* Signed;
+	SCDecl* _NotConst;
 	SCClass* Super;
 	Message* Defawlt;
 	Message* False;
@@ -1474,10 +1476,11 @@ extern SCFunction* SC__Comp_MainFunc;
 extern Array* SC__Comp_ModuleList;
 extern Dictionary* SC__Comp_Numbers;
 extern JB_String* SC__Comp_OriginalInputPath;
-extern SCModule* SC__Comp_program;
+extern SCModule* SC__Comp_Program;
 extern SCImport* SC__Comp_Project;
 extern JB_String* SC__Comp_ProjectName;
 extern Array* SC__Comp_ProtoTypes;
+extern Array* SC__Comp_ReachedClassTable;
 extern SCFunction* SC__Comp_RefClear;
 extern SCFunction* SC__Comp_RefDecr;
 extern SCFunction* SC__Comp_RefDecrMulti;
@@ -1488,8 +1491,7 @@ extern SCFunction* SC__Comp_RefNew;
 extern SCFunction* SC__Comp_RefSafeDecr;
 extern SCFunction* SC__Comp_RefSetRef;
 extern JB_String* SC__Comp_StageName;
-extern int SC__Comp_stClasses;
-extern int SC__Comp_stFuncs;
+extern int SC__Comp_stDebugInfo;
 extern int SC__Comp_stLibFuncs;
 extern int SC__Comp_stParseTime;
 extern int SC__Comp_stParseTimeTotal;
@@ -1522,18 +1524,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2252])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2253])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2253])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2254])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2254])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2255])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2251])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2252])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2254])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2255])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2255])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2256])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1766,7 +1768,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2260])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2261])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1803,7 +1805,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2256])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2257])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1843,7 +1845,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2261])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2262])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2075,12 +2077,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2259])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2260])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2258])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2259])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2257])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2258])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3295,7 +3297,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2250])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2251])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -5224,6 +5226,8 @@ int JB_int_AlignUp(int Self, int To);
 
 ASMReg SC_int_ToASM(int Self);
 
+int SC_int_hintsize(int Self);
+
 bool SC_int_IsNormalMatch(int Self);
 
 bool SC_int_IsSimpleOrPointerCast(int Self);
@@ -5710,6 +5714,8 @@ ASMReg SC_ASMType__Debugger(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_ASMType__Decl(Assembler* Self, Message* Exp, ASMReg Dest);
 
+ASMReg SC_ASMType__DeclSub(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* Ty, Message* Rel);
+
 ASMReg SC_ASMType__DoGlobal(Assembler* Self, ASMReg Dest, Message* Exp, SCDecl* D);
 
 ASMReg SC_ASMType__Dot(Assembler* Self, Message* Exp, ASMReg Dest);
@@ -5818,6 +5824,8 @@ DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self);
 int JB_TC_BitCount(uint /*DataTypeCode*/ Self);
 
 int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
+
+uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
 
 int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S);
 
@@ -7281,7 +7289,7 @@ ASMReg SC_Pac_NumToReg(Assembler* Self, Message* Exp, ASMReg Reg, int64 K, uint 
 
 uint64 SC_Pac_OpenVars(Assembler* Self);
 
-void SC_Pac_Optimise(Assembler* Self);
+void SC_Pac_OptimiseJumps(Assembler* Self);
 
 void SC_Pac_PackMakerInit(Assembler* Self);
 
@@ -8044,6 +8052,8 @@ void SC_FS_AppendCppAll(FastString* Self, JB_String* S);
 void JB_FS_AppendEscape(FastString* Self, JB_String* S);
 
 void JB_FS_AppendHexStr(FastString* Self, JB_String* Data);
+
+void JB_FS_AppendHInt(FastString* Self, int N);
 
 void SC_FS_AppendLibGlob(FastString* Self, SCDecl* D);
 
@@ -9001,15 +9011,13 @@ jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into)
 
 jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
 
+void SC_bin_AddDecl(FastString* Self, SCDecl* D, int Pos, Syntax W, int Reg);
+
 void SC_bin_AddFunction(FastString* Self, SCFunction* Fn);
 
 void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
-
-void JB_bin_AddStr(FastString* Self, JB_String* Name);
-
-void JB_bin_AppendStrLength(FastString* Self, int N);
 
 FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name);
 
@@ -9022,6 +9030,8 @@ void JB_bin_Exit0(FastString* Self);
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
 jbinLeaver JB_bin_Tmp(FastString* Self, JB_String* Name);
+
+void JB_bin_WriteType(FastString* Self, Syntax Type, bool GoIn);
 
 int JB_bin__Init_();
 
@@ -9135,6 +9145,10 @@ Message* SC_Decl_DeclToDot(SCDecl* Self, SCDecl* P0);
 void SC_Decl_Destructor(SCDecl* Self);
 
 SCDecl* SC_Decl_DownGrade(SCDecl* Self);
+
+void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos, int Depth);
+
+Syntax SC_Decl_DumpWrapper(SCDecl* Self, int Pos);
 
 void SC_Decl_ExpectFail(SCDecl* Self, SCDecl* O, Message* Errnode, Message* Backup);
 
@@ -11198,6 +11212,8 @@ JB_String* SC_Class_CStructNameSub(SCClass* Self);
 JB_String* SC_Class_CSuperStructName(SCClass* Self);
 
 void SC_Class_DataTypePostLoad(SCClass* Self);
+
+int SC_Class_DebugID(SCClass* Self, Syntax W);
 
 void SC_Class_DeclModel(SCClass* Self);
 

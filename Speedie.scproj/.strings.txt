@@ -1714,7 +1714,7 @@
 "curr"
 "Vector cast mismatch"
 "typeof"
-"Stack-trace Compression: "
+"DebugInfo"
 "inlinelib"
 "Missing PackID"
 "/Applications/"
@@ -2259,3 +2259,4 @@
 "vm.box"
 "vmtrin.box"
 "TestProperty"
+"dbg"
