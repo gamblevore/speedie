@@ -167,7 +167,7 @@ function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarA
 
 
 function Dummy (|message| exp)
-	if exp: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16, exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16
+	if exp: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16, exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16, exp.KNSR, exp.KNST2, exp.KNST3
 
 }
 

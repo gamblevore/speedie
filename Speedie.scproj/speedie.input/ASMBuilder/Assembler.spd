@@ -15,6 +15,7 @@ struct RegFile
 
 
 struct Assembler
+	contains asmreg
 	linkage: cpp_part Pac
 	|uint16| 					BasicBlock
 
@@ -603,7 +604,6 @@ struct Assembler
 		Instruction[asm.KNSR].Const
 		Instruction[asm.KNST].Const
 		asm.encoders[asm.KNST] = fatasm.KNST_Encoder
-//		asm.encoders[asm.noop] = fatasm.NOOP_Encoder
 		return 
 		TextAssembler.Requests		?= dictionary()
 		TextAssembler.RequestTable	?= array()
@@ -655,18 +655,21 @@ struct Assembler
 		fn.µlength = n
 		jsm!.length = .curr - .start 
 
-		
+	
+	function FinishReturn
+		debugger !.fn.ASMReturn
+		|| dl = .fn.Source!.FlatLast
+		.closevars(1, dl)
+		|asmreg| dest = nil
+		if !ASMType.ReturnOpt(self, dest)
+			dl.RET
+
+	
 	function FinishASM 
 		opt norefcounts
 		if !.last.IsFinisher
-			debugger !.fn.ASMReturn
-			|| dl = .fn.Source!.FlatLast
-			.closevars(1, dl)
-			|asmreg| dest = nil
-			if !ASMType.ReturnOpt(self, dest)
-				dl.RET
-		
-		.OptimiseJumps
+			.FinishReturn
+		.FinishMost
 		|| dbg = .DebugInfo
 			dbg.exit
 

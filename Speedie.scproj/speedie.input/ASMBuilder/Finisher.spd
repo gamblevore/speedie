@@ -1,0 +1,73 @@
+
+
+function Assembler.FinishMost
+	|| A = .Curr
+	|| S = .FuncStart
+	while A > S
+		if s isa asm.knst
+			S.ConstFinish
+		  elseif S.JumpPrm
+			s.JumpImprove(self)
+		S++
+
+
+
+function fatasm.KNST_Encoder (Asm_encoder)
+	rz = ASM_ConstStretchy.Encode(self, curr, after)
+	|| op = .op
+	if op != asm.knst
+		rz++[] = .prms[4]
+		if op == asm.knst3
+			rz++[] = .prms[5]
+
+
+function fatasm.SimpleConst (|int64| v, |int| Space, |int| Negate=0,  |bool|)
+	if Negate
+		v = ~v
+	|| sh = 64-Space
+	if (v << sh) >> sh == v
+		.prms[2] = negate
+		.prms[3] = v|uint64| & 17~bits
+		.prms[4] = v|uint64| >> 17
+		.prms[5] = v|uint64| >> 39
+		return true
+//		Cond	1		// 0 == always, 1 = only if dest == 0
+//		Inv		1
+//		Value	17
+
+
+function fatasm.ConstFinish
+	|| v = .const|uint64|
+	if .SimpleConst(v, 17) or .SimpleConst(v, 17, 1)
+		._op = asm.KNST // already set, but its for clarity
+		return
+	if .RotateConst(V)
+		._op = asm.KNSR
+		return
+	if .SimpleConst(v, 39) or .SimpleConst(v, 39, 1)
+		._op = asm.KNST2
+		return
+	.SimpleConst(v, 64)
+	._op = asm.KNST3
+
+
+function uint64.rotl1 (|uint64|)
+	return (self << 1) ||| (self >> 63)
+
+
+function fatasm.RotateConst (|uint64| v, |bool|)
+	|| BC = V.CountBits
+	|| inv = 64-BC <= 12
+		V = ~V
+	  else
+		require BC <= 12
+
+	for i in 64
+		if v <= (12~bits)|uint64|
+			.r1 = i
+			.r2 = inv|int|
+			.r3 = v|uint|
+			return true
+		v = v.rotl1
+
+

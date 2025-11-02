@@ -128,7 +128,7 @@ function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Sta
 
 
 function SCFunction.HasCVersion (|bool|)
-	if .IsCppInBuilt == 2	// cpp_nothing: For JB_Decr, JB_Ternary, etc
+	if .IsCppInBuilt == 2						// cpp_nothing: For JB_Decr, JB_Ternary, etc
 		debugat
 		return false
 
@@ -138,7 +138,7 @@ function SCFunction.HasCVersion (|bool|)
 	return self is wrapper
 
 
-function @ASMType.ASMFunction (fn_asm)				// dofunction function
+function @ASMType.ASMFunction (fn_asm)			// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0

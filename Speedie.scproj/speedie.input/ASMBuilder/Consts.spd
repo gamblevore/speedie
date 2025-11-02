@@ -1,49 +1,12 @@
 
 
-//function fatasm.NOOP_Encoder (Asm_encoder)
-//	curr[] = asm.noop << 24
-//	return curr
-
-
-function fatasm.KNST_Encoder (Asm_encoder)
-	if curr >= after-2
-		return curr
-	|| v = .const
-	|| Orig = curr++
-	|| inv = v>>63					// We only need to store 63 bits then? if the top is always false.
-		v = ~v	  					// Opportunity to reclaim the top bit. I'll do it later.
-	|asm| knst
-	|| Mode = asm.knst << 24
-	knst.R1 = .prms[0]
-	knst.ConstStretchy_Inv = inv
-	knst.ConstStretchy_Value = v
-	v >>= 17
-
-	if 0
-		.msg.KNSR(asmreg(), 0,0,0) // mark used
-		.msg.KNST2(asmreg(),0,0,0)
-		.msg.KNST3(asmreg(),0,0,0)
-
-	if v
-		curr++[] = v
-		mode = asm.knst2 << 24
-		v >>= 32
-		if v
-			mode = asm.knst3 << 24
-			curr++[] = v
-
-	orig[] = knst ||| mode
-			
-	return Curr
-
-
-
 extend Assembler
-	function MakeConstFromTwo (|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |fn_ASMConstifier| fn,  |asmreg|)
+	function MakeConstFromTwo (|&Assembler| self,  |message| exp,  || dest,  || L,  || R,  |fn_ASMConstifier| fn,  ||)
 		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
 		.Nop2Consts(r, l)
 		return .NumToReg(exp, dest, k, dest.µtype)
+	
 	
 	function SetConst (|message| exp, |int64| value, |asmreg| ml, |asmreg| Dest, |asmreg|)
 		// only boolconst1 uses this. can be simplified.
@@ -84,7 +47,7 @@ extend Assembler
 					.nop(k)
 		
 		|| fat = exp.KNST(dest, 0, 0, 0)
-		return fat.ConstFinish(dest, v)
+		return fat.ConstFill(dest, v)
 		
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
@@ -121,22 +84,6 @@ function message.ASMConst (|uint64|)
 		return .float32.asint
 	return .int
 
-
-function uint64.rotl (|int| Amount, |uint64|)
-	cpp_wrapper JB_u64_RotL // rarely needed. Speedie needs it tho.
-
-function uint64.rotr (|int| Amount, |uint64|)
-	cpp_wrapper JB_u64_RotR // same
-
-function uint64.LongestBitStretch (|ivec2|)
-	if self == -1
-		return (64,0)
-	|uint64| last
-	while self
-		last = self
-		self &= .rotl(1)
-		rz.x++
-	rz.y = last.log2
 
 
 // needs refcount upgrade.

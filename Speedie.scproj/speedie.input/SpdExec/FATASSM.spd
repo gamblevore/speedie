@@ -89,7 +89,7 @@ struct FatASM
 		return dest
 	
 	
-	function ConstFinish (|asmreg| dest, |int64| K, |asmreg|)
+	function ConstFill (|asmreg| dest, |int64| K, |asmreg|)
 		(dest is Const)
 		dest = dest.FatIndex(.index)
 		.Const = K

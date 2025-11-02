@@ -75,14 +75,13 @@ function InitAccess
 
 function Debugger (fn_asm)
 	opt norefcounts
-	if !Options.TargetDebug
-		return asmreg()
-	|| num = 0
-	|| ch = exp.first
-		num = ch.int - 1
-		if num < 0 // oof
-			return asmreg()
-	return exp.TRAP(asmreg(), num) * ASMReg()
+	if Options.TargetDebug
+		|| num = 0
+		|| ch = exp.first
+			num = ch.int - 1
+			require num >= 0 // oof
+		debugger
+		|| x = exp.TRAP(asmreg(), num) * ASMReg()
 
 
 function Swap (fn_asm)

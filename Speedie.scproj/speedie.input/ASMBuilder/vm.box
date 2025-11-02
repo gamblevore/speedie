@@ -215,7 +215,7 @@ forms
 		r2		r
 		High	14
 
-	ConstStretchy
+	ConstStretchy // rename to just Const
 		r1		R
 		Cond	1		// 0 == always, 1 = only if dest == 0
 		Inv		1
@@ -411,7 +411,7 @@ POS 27
 // It doesn't work for libglobs, though. For now... just do prototypes
 // as globals.
 
-AFNC (FuncAddr)
+/**/ AFNC (FuncAddr)
 		i1 = FuncAddr(vm, Op)
 
 
@@ -431,9 +431,7 @@ POS 4
 	KNST2 (ConstStretchy)
 		LoadConst(r, Op, *Code++)
 POS 5
-	KNST3 (ConstStretchy)			// this would lose 17 bits? but they are already lost...
-									// more like 17 bits become spare and more easy to reuse.
-									// perhaps to set simd values!
+	KNST3 (ConstStretchy)			// this leaves 17 bits unused. Perhaps can be reused for SIMD?
 		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
 

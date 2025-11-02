@@ -8,8 +8,8 @@ extend SCFunction
 		|| after = .FinalPass(P, P+rz.Size)
 		rz.Size = after-p
 		rz.length = rz.Size
-		
 	// cosmic lore unfold... into tales untold
+
 
 	function FatFirst (|&fatasm|)
 		return Assembler.sh.start + .µstart
@@ -31,7 +31,7 @@ extend SCFunction
 			for fat.fat in self
 				|| r = fat.JumpPrm
 					fat.FillLabelRequest(where, rz, r-1)
-
+	
 	
 	target debug
 		render µRender (|bool|RenderBlocks=false)
@@ -80,45 +80,15 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	.prms[reg] = J							// restore!
 
 
-
-function fatasm.TryRotateConst
-	|| v = .const|uint64|
-	|| OtherInv = (~v, v)(v>>63)
-	require otherinv >> 17
-	
-	|| Inv = V.CountBits > 32 
-		V = ~V
-	|| LBS = (~V).LongestBitStretch			// longest false-stretch
-	require LBS.x >= (64-12)				// can only store 12-bits
-	
-	|| ramount = 63-LBS.y 
-	V = V.rotl(ramount)
-	._op = asm.knsr							// easier to debug
-	.r1 = ramount
-	.r2 = inv|int|
-	.r3 = v|uint|
-	target debug
-		|| back = .prms[3]|uint64|.rotr(.prms[1]|uint64|)
-		if .prms[2]
-			back = ~back
-		if back!=.const // oof
-
-
-
 function JBin.AddFunction (|SCFunction| fn)
 	// need aligning each.
 //	|| M = .ReserveMemory(@bin, n)
 	|| f = fn.FatFirst
 	|| t = 0
 	for i in fn.µLength
-		t += f[i].GuessSize
-
-	// Call .MuRender? wouldn't it be better to pre-figure out where things are meant to go?
-	// Like the sizes of things. I mean... it would make it easier? i think its just constants?
-	// knst, knst2, knst3, knsr// how to know if its 1 2 or 3?
-	// fat.KNST_Encoder could be re-written to just figure out the consts... 
-	// from there, we know it's size.
-	// we still need a special const encoder, of course!
+		t += f[i].GuessSize // will the size ever differ? it shouldn't?
+							// consts are fixed now. So... it just jumps?
+							// in fact... jumps will jsut fail to compile if too big.
 	
 	self <~ (0, t*4)
 	fn.µLengthGuess = t

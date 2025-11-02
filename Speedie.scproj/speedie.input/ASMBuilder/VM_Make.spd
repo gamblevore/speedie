@@ -260,7 +260,7 @@ function Clean (|message| msg)
 				ch.name = "|"
 
 
-function BadEncoder (ASM_Encoder)
+function MissingInstruction (ASM_Encoder)
 	debugger
 
 
@@ -294,7 +294,7 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 	.VM_NewInstructions(list, false, R)
 	.VM_NewInstructions(list, true, R)
 	for i in 256
-		asm.encoders[i] ?= badencoder
+		asm.encoders[i] ?= MissingInstruction
 
 	
 function VMCpp (|faststring| vm_code, |faststring| jump)
@@ -375,7 +375,7 @@ function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| Actual
 			done = true
 
 
-function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| formenc,  |array?| R,  |bool|)
+function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| FormEnc,  |array?| R,  |bool|)
 	check (!asm.encoders[x]) (tmp, "ASM clash?") 
 	asm.Encoders[x] = FormEnc
 	if R != nil
