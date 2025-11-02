@@ -808,12 +808,6 @@ datatype uint64
 	constants
 		|uint64|
 		max = -1
-	
-//	operator rotl (|int| Amount, |uint64|)
-//		cpp_wrapper JB_u64_RotL
-//	
-//	operator rotr (|int| Amount, |uint64|)
-//		cpp_wrapper JB_u64_RotR
 
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)

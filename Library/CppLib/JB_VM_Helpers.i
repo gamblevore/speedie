@@ -83,6 +83,9 @@ AlwaysInline void BFLS (VMRegister* r, ASM Op) { // rrxxbbb --> rr00bbb
 	i2 = (o&mask) | i;
 }
 
+inline u64 JB_u64_RotR (u64 x, u64 N) {
+	return (x >> N) | (x << (64-N));
+}
 
 AlwaysInline void RotateConst (VMRegister* r, ASM Op) {
 	auto V = RotateConst_Valueu; auto R = RotateConst_Rotu;
