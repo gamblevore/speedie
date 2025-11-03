@@ -844,14 +844,18 @@ extend Assembler
 		if !up and !down
 			return src.µtype(Dest)
 		
-		down += 64 - (SrcBits+up)
-		up = 64 - SrcBits
+		|| Extra = 64 - SrcBits
+		up += Extra
+		down += Extra
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(exp, dest)
+
+		if down >= 64
+			down = 63
 		
 		|| old = src.fat
-		if (old isa asm.bflg)
+		if old isa asm.bflg
 			|| Merge = .MergeBflg(exp, dest, src, up, down, old)
 				return Merge
 			
