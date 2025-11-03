@@ -825,6 +825,7 @@ struct Assembler {
 	u16 BranchID;
 	u16 NextBranchID;
 	bool NeedsRework;
+	bool Inited;
 	int DbgMark;
 	FastString* DebugInfo;
 	SCFunction* Out;
@@ -4481,8 +4482,6 @@ xC2xB5Form* SC_VM_Builder__AddForm(Message* Form);
 
 void SC_VM_Builder__AddxC2xB5Op(JB_String* Name, int Id);
 
-ASM* SC_VM_Builder__BadEncoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
-
 bool SC_VM_Builder__BuildFiles();
 
 bool SC_VM_Builder__BuildInstructions(SCFunction* Fn, Message* Node, SCNode* Name_space);
@@ -4527,7 +4526,9 @@ bool SC_VM_Builder__MakeTheVM();
 
 void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm);
 
-bool SC_VM_Builder__OKBoomer(Message* Tmp, int X, ASM_Encoder Formenc, Array* R);
+ASM* SC_VM_Builder__MissingInstruction(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+bool SC_VM_Builder__OKBoomer(Message* Tmp, int X, ASM_Encoder FormEnc, Array* R);
 
 void SC_VM_Builder__SafeWrite(JB_String* Name, FastString* Data);
 
@@ -5331,6 +5332,8 @@ uint JB_uint_LowestBit(uint Self);
 
 
 // uint64
+uint64 SC_uint64_rotl1(uint64 Self);
+
 uint64 JB_uint64_Trim(uint64 Self, int B);
 
 
@@ -5637,7 +5640,7 @@ ASMReg SC_Reg_OperatorBitand(ASMReg Self, ASMReg A);
 
 bool SC_Reg_OperatorIsa(ASMReg Self, uint /*DataTypeCode*/ M);
 
-bool SC_Reg_OperatorIzWithReg(ASMReg Self, ASMReg M);
+bool SC_Reg_OperatorIz(ASMReg Self, ASMReg M);
 
 ASMReg SC_Reg_OperatorMul(ASMReg Self, bool B);
 
@@ -6686,7 +6689,9 @@ int64 SC_FAT_Const(FatASM* Self);
 
 void SC_FAT_ConstSet(FatASM* Self, int64 Value);
 
-ASMReg SC_FAT_ConstFinish(FatASM* Self, ASMReg Dest, int64 K);
+ASMReg SC_FAT_ConstFill(FatASM* Self, ASMReg Dest, int64 K);
+
+void SC_FAT_ConstFinish(FatASM* Self);
 
 bool SC_FAT_CopyFrom(FatASM* Self, FatASM* D);
 
@@ -6766,6 +6771,8 @@ void SC_FAT_r2Set(FatASM* Self, uint Value);
 
 ASMParam SC_FAT_r3(FatASM* Self);
 
+void SC_FAT_r3Set(FatASM* Self, uint Value);
+
 void SC_FAT_Prm(FatASM* Self, int A, ASMReg Value);
 
 int SC_FAT_RegOnly(FatASM* Self, int I);
@@ -6776,7 +6783,11 @@ void SC_FAT_RendaMsg(FatASM* Self, FastString* Fs, int Sofar);
 
 void SC_FAT_RenderFat(FatASM* Self, FastString* Fs, bool Simpler);
 
+bool SC_FAT_RotateConst(FatASM* Self, uint64 V);
+
 void SC_FAT_SetOpSet(FatASM* Self, uint /*byte*/ Value);
+
+bool SC_FAT_SimpleConst(FatASM* Self, int64 V, int Space, int Negate);
 
 ASMReg SC_FAT_SyntaxCall(FatASM* Self, uint I);
 
@@ -7151,9 +7162,17 @@ ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M);
 
 ASMReg SC_Pac_Exit(Assembler* Self, Message* Exp, ASMReg Dest);
 
+FastString* SC_Pac_FillDebugInfo(Assembler* Self);
+
+void SC_Pac_FillLayout(Assembler* Self, FastString* J);
+
 Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* Prms, int N);
 
 void SC_Pac_FinishASM(Assembler* Self);
+
+void SC_Pac_FinishMost(Assembler* Self);
+
+void SC_Pac_FinishReturn(Assembler* Self);
 
 ASMReg SC_Pac_FinishSingleIf(Assembler* Self, FatRange* B);
 
@@ -7168,6 +7187,8 @@ int SC_Pac_FnLength(Assembler* Self);
 bool SC_Pac_FoundReg(Assembler* Self, Message* All, int R);
 
 void SC_Pac_Fries(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* S, int I, int MaxParam);
+
+void SC_Pac_FullInit(Assembler* Self);
 
 FatASM* SC_Pac_FuncStart(Assembler* Self);
 
@@ -7289,8 +7310,6 @@ ASMReg SC_Pac_NumToReg(Assembler* Self, Message* Exp, ASMReg Reg, int64 K, uint 
 
 uint64 SC_Pac_OpenVars(Assembler* Self);
 
-void SC_Pac_OptimiseJumps(Assembler* Self);
-
 void SC_Pac_PackMakerInit(Assembler* Self);
 
 ASMReg SC_Pac_Plus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -7343,7 +7362,7 @@ bool SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_RootGen(Assembler* Self, SCFunction* Fn);
 
-ASMReg SC_Pac_SafeDecr(Assembler* Self);
+ASMReg SC_Pac_SafeDecr(Assembler* Self, ASMReg Match);
 
 ASMReg SC_Pac_SelfDivide(Assembler* Self, ASMReg Dest, Message* Exp);
 
@@ -9019,6 +9038,8 @@ void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
 
+void JB_bin_AddStr(FastString* Self, JB_String* Name);
+
 FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name);
 
 jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
@@ -9026,6 +9047,8 @@ jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
 int JB_bin_Exit(FastString* Self, int Amount);
 
 void JB_bin_Exit0(FastString* Self);
+
+void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
@@ -9146,9 +9169,9 @@ void SC_Decl_Destructor(SCDecl* Self);
 
 SCDecl* SC_Decl_DownGrade(SCDecl* Self);
 
-void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos, int Depth);
+Syntax SC_Decl_DumpCode(SCDecl* Self, int Pos);
 
-Syntax SC_Decl_DumpWrapper(SCDecl* Self, int Pos);
+void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos, int Depth);
 
 void SC_Decl_ExpectFail(SCDecl* Self, SCDecl* O, Message* Errnode, Message* Backup);
 
@@ -11300,6 +11323,8 @@ bool SC_Class_IsStruct(SCClass* Self);
 bool SC_Class_IsTask(SCClass* Self);
 
 void SC_Class_Iterfailed(SCClass* Self, JB_String* Name, Message* Node);
+
+void SC_Class_ListLayout(SCClass* Self, FastString* J);
 
 void SC_Class_LoadClassType(SCClass* Self);
 
