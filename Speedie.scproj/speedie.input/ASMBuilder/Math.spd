@@ -452,11 +452,10 @@ extend Assembler
 
 		|| ss = (l is Subtract)
 		if 0: exp.VADD
-		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
+		return exp.FADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
 
 
 	function Plus (fn_opasm) // add (
-//		(dest is Const) = (l&r) is Const
 		rz = .Plussub(exp, dest, l, r) // into won't be passed in anymore. So just remove the clear?
 		rz = rz asnt asmreg.subtract
 
@@ -760,9 +759,8 @@ extend Assembler
 		if src is temp
 			.ReDest(xy1, dest, 0)
 		return dest
-		
-		
-		
+	
+	
 	function SHR  (fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
@@ -814,29 +812,8 @@ extend Assembler
 // we need to get all the cases below correct, and more. What about upgrades as well as adding?
 		return .ReDest(bflg, dest)
 		
-		// do this later. its too complex to solve right now.
-		// BFLG: r3,  r1, 56, 56, 0
-		// BFLG: t31, r3, 32, 31, 1 // add to prev up
-
-		// BFLG: r3,  r1, 56, 56, 0
-		// BFLG: t31, r3, 31, 32, 1 // add to prev down
-
-		// BFLG: r3,  r1, 56, 56, 0
-		// BFLG: t31, r3, 32, 32, 1 // nop. its less.
-
-		// BFLG: r3,  r1, 32, 32, 0
-		// BFLG: t31, r3, 56, 56, 1 // upgrade to 56!
-
-		// BFLG: r3,  r1, 56, 32, 0
-		// BFLG: t31, r3, 32, 56, 1 // upgrade to 56, 56
-									// the bottom left (32) has to fit in the top right (32)
-		// BFLG: r3,  r1, 32, 56, 0
-		// BFLG: t31, r3, 56, 32, 1 // can't optimise!
-
-
 
 	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
-		debugat 129
 		|| SrcBits = src.BitCount
 		if (up > srcbits or down > SrcBits)	 and !src.IsBool
 			problem (exp, "Shift too far")
@@ -856,7 +833,7 @@ extend Assembler
 		
 		|| old = src.fat
 		if old isa asm.bflg
-			|| Merge = .MergeBflg(exp, dest, src, up, down, old)
+			|| Merge = .MergeBFLG(exp, dest, src, up, down, old)
 				return Merge
 			
 		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 

@@ -602,6 +602,7 @@ struct Assembler
 		Instruction[asm.KNSR].Const
 		Instruction[asm.KNST].Const
 		asm.encoders[asm.KNST] = fatasm.KNST_Encoder
+		asm.encoders[asm.noop] = fatasm.Nop_Encoder
 		return 
 		TextAssembler.Requests		?= dictionary()
 		TextAssembler.RequestTable	?= array()

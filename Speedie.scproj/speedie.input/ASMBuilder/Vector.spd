@@ -21,7 +21,7 @@ extend Assembler
 		if dest isnt set
 			return exp.VGET(dest, base, vara, k) * dest
 
-		return exp.VSET(base, dest, vara, k) * dest
+		return exp.VSET(base, dest, vara, k) * base
 
 
 	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |fatasm| vget, |asmreg|)

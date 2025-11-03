@@ -18,6 +18,7 @@ extend SCFunction
 	function FinalPass (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
+		if self == "FloatConsts"
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
 			|| n = rz - where

@@ -12,7 +12,11 @@ function Assembler.FinishMost
 
 
 
+function fatasm.Nop_Encoder (Asm_encoder)
+	return curr
+
 function fatasm.KNST_Encoder (Asm_encoder)
+	if .r0.reg == 3
 	rz = ASM_ConstStretchy.Encode(self, curr, after)
 	|| op = .op
 	if op != asm.knst
@@ -36,7 +40,8 @@ function fatasm.SimpleConst (|int64| v, |int| Space, |int| Negate=0,  |bool|)
 //		Value	17
 
 
-function fatasm.ConstFinish
+function fatasm.ConstFinish 
+	if (.r0.reg == 3) and "FloatConsts".trap
 	|| v = .const|uint64|
 	if .SimpleConst(v, 17) or .SimpleConst(v, 17, 1)
 		._op = asm.KNST // already set, but its for clarity

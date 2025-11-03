@@ -97,6 +97,8 @@ module Feedback
 		|message| m = nil|message|!
 		target debug
 			if ""
+				|| i = 1
+				|| j = i.AsFloat
 				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
 				Assembler.PrintProgress

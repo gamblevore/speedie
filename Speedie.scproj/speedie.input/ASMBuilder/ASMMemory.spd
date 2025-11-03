@@ -115,7 +115,7 @@ function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |u
 	.MemOpt(rz, index, bytes)
 
 
-function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, |asmreg|)
+function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, ||)
 	opt norefcounts
 	if base is AddrNoFiddle
 		return base asnt ASMReg.AddrNoFiddle
@@ -124,12 +124,12 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 	
 	if base is GlobalMemory
 		expect (glob)
-		ifn (glob isnt global) and (glob is property)		// not a property on a global struct
+		if (glob is global) or (glob isnt property)			// not a property on a global struct
 			LostBytes = glob.ExportPosition - base.fat!.const
 			expect LostBytes >= 0
 
 	|| i = index 
-	i += (LostBytes >> pow2) 
+	i += LostBytes >> pow2
 	if i <= maximum|int|
 		index = i
 		return base
@@ -140,21 +140,21 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 
 
 
-function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadDecl, |int| index=0,  |&fatasm|)
+function Read (|| dest,  |message| exp,  || Ptr,  || VarAdd,  |scdecl| ReadDecl,  |int| index=0,  |&fatasm|)
 	opt inline
 	(dest isnt set)
 	if 0: .Dummy(exp)
 	return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
 
 
-function Write (|asmreg| Value, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0, |&fatasm|)
+function Write (|| Value,  |message| exp,  || Ptr,  || VarAdd,  |scdecl| DestDecl,  |int| index=0, |&fatasm|)
 	opt inline
 	(Value is set)
 	(Value is discard)
 	return .ReadOrWriteSub(Value, exp, ptr, VarAdd, DestDecl, index)
 
 
-function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
+function ReadOrWrite (|| dest,  |message| exp,  || base,  || VarAdd,  |scdecl| Ty,  |int| index=0, ||)
 	if dest is set					  // kludge to remove
 		(dest is discard)			  // make compiler happy
 	  else

@@ -32,7 +32,7 @@ extend_module PackMaker
 		if fn
 			|| Andor = fn.TestObesity|&int64|[]
 		
-		fn = .testfn("Consts")
+		fn = .testfn("FloatConsts")
 		if fn
 			|| D = fn.TestObesity|&f64|[]
 		
