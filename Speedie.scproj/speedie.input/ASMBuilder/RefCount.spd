@@ -136,13 +136,15 @@ function Assembler.DecrObj (|asmreg|)
 			return upon
 
 
-function Assembler.SafeDecr (|asmreg|)
-	|| fat = .last(asm.RFUN)
-		|| upon = (fat)(1)
-			if !(fat)(0) and !(fat)(2)
-				.softnop(fat)
-				return upon
+function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
+	|| fat = .last(asm.RFUN)$
+	|| upon = (fat)(1)$
 
+	require !match or upon iz match
+
+	if !(fat)(0) and !(fat)(2)
+		.softnop(fat)
+		return upon
 
 
 function assembler.CloseOneEarly (|asmreg| a)
@@ -154,8 +156,7 @@ function assembler.CloseOneEarly (|asmreg| a)
 
 
 function FinalDecrements (fn_asm)
-	|| D0 = .SafeDecr$
-	if d0.reg != dest.reg					// problem
+	|| D0 = .SafeDecr(dest)$
 	|| D1 = .decrObj
 	|| D2 = .decrObj
 	|| D3 = .decrObj

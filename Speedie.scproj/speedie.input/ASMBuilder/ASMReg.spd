@@ -1,6 +1,6 @@
 
 
-prototype fn_asm    (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
+prototype fn_asm    (|&Assembler| self=Assembler.sh, |message!| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
 
 
 
@@ -142,9 +142,6 @@ datatype ASMReg (uint64)
 
 	operator iz (|asmreg| M, |bool|)
 		return .reg == M.reg
-
-	operator iz (|int| M, |bool|)
-		return .reg == M
 
 	function FourBytes (|bool|)
 		opt inline

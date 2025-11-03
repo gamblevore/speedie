@@ -61,17 +61,16 @@ extend Assembler
 		return reg
 	
 	
-	function SetConst (|Message| List,  |message| Orig,  |bool|)
-		cpp_part TextConst
+	function TextConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
 		|| RegMsg = list[@thg]
-		|| ValMsg = RegMsg.Next				#require
+		|| ValMsg = RegMsg.Next						#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(orig, RegMsg.Reg.textasm, value, datatypecode.uint64)
+		|| src = .NumToReg(orig, RegMsg.Reg.textasm, value, datatypecode.uint64)
+		|| fat = src.fat
+			fat.ConstFinish
 		return true
-	
-
 	
 	
 function message.ASMConst (|uint64|) 

@@ -596,8 +596,6 @@ struct Assembler
 		opt norefcounts
 		require !.Inited
 		.Inited = true
-		if options.TargetDebug
-			.debuginfo = .FillDebugInfo
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit
 		ASMType.InitAccess

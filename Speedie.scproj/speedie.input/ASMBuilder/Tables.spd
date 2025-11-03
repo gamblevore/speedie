@@ -77,11 +77,12 @@ function Debugger (fn_asm)
 	opt norefcounts
 	if Options.TargetDebug
 		|| num = 0
+		if exp == @func
+			exp = exp.last!
 		|| ch = exp.first
-			num = ch.int - 1
-			require num >= 0 // oof
-		debugger
-		|| x = exp.TRAP(asmreg(), num) * ASMReg()
+			num = ch.int
+			require num > 0 // oof
+		exp.TRAP(asmreg(), num)
 
 
 function Swap (fn_asm)

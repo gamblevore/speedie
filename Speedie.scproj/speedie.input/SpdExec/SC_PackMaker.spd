@@ -148,10 +148,16 @@ module PackMaker
 		return true
 	
 	
+	function assembler.FullInit
+		.packmakerinit
+		if options.TargetDebug
+			.debuginfo = .FillDebugInfo
+	
+	
 	function MakePack 
 		opt norefcounts
 		compiler.During = compilerstage.Packing
-		Assembler.Sh.PackMakerInit
+		Assembler.Sh.Fullinit
 		PackMaker.AddAll
 		.BuildGlobs // Sorts too
 		.FinalPrepare

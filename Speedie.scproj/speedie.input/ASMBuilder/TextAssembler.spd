@@ -21,7 +21,7 @@ module TextAssembler
 
 	function Assemble (|message| msg)
 		opt norefcounts
-		for ch in msg
+		for ch.fast in msg
 			if ch istmp "asm"
 				.textfunc(ch)
 			  elseif ch istmp "data"

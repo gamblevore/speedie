@@ -835,7 +835,8 @@ extend Assembler
 
 
 
-	function BFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+		debugat 129
 		|| SrcBits = src.BitCount
 		if (up > srcbits or down > SrcBits)	 and !src.IsBool
 			problem (exp, "Shift too far")
@@ -848,7 +849,6 @@ extend Assembler
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(exp, dest)
-		
 		
 		|| old = src.fat
 		if (old isa asm.bflg)

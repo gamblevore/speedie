@@ -20,28 +20,13 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
-//function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
-//	|| p = .Curr
-//	if p < .End
-//		target debug: if  exp.Position < 0 and exp.Position != -2
-//		.curr_ = p + 1
-//		p[0] = nil
-//		p.info = (p.index|uint64|<<48)|asmreg| // no need to call fat*reg now
-//		p._op = op
-//		p.debug = exp
-//		p.BranchID = .BranchID
-//		p.BasicBlock = .BasicBlock
-//		return p
-//
-//	error (exp, "Function too large (over 64K)")
-//	return .start
-
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
 		target debug: if  exp.Position < 0 and exp.Position != -2
-		p[0] = nil
 		.curr_ = p + 1
+		p[0] = nil
+		p.info = (p.index|uint64|<<48)|asmreg| // no need to call fat*reg now
 		p._op = op
 		p.debug = exp
 		p.BranchID = .BranchID
@@ -51,6 +36,20 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	error (exp, "Function too large (over 64K)")
 	return .start
 
+//function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
+//	|| p = .Curr
+//	if p < .End
+//		target debug: if  exp.Position < 0 and exp.Position != -2
+//		p[0] = nil
+//		.curr_ = p + 1
+//		p._op = op
+//		p.debug = exp
+//		p.BranchID = .BranchID
+//		p.BasicBlock = .BasicBlock
+//		return p
+//
+//	error (exp, "Function too large (over 64K)")
+//	return .start
 
 function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
 	|| dt = dest.µType

@@ -39,7 +39,7 @@ extend Assembler
 		expect (list == nil or @list or @bra) (m)
 
 		if op.IsSetConst
-			return .SetConst(list, m)
+			return .TextConst(list, m)
 		
 		|| A = .Requestop(op.opcode, m)
 		m.RangeLength = a.Index // each message now knows its fat thingy.
