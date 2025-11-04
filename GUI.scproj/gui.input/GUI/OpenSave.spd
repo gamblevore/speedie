@@ -81,7 +81,7 @@ class OpenSaveDialog (Window)
 		super.constructor
 		.LastGoodPath = "/"
 		.copypaste	   |= copypasteflags.pastefile
-		.onpaste		= DragPathEvent|GUIPasteEvent|
+		.onpaste		= PastePathEvent|GUIPasteEvent|
 		.Accept			= buttonview(self, OnAskSaveAnswer)
 		.Cancel			= buttonview(self, OnAskSaveAnswer)
 		.Path			= textview(self, nil)
@@ -110,8 +110,8 @@ class OpenSaveDialog (Window)
 			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
 	
 	
-	function DragPathEvent (GUIPasteEvent)
-		.path.text = data
+	function PastePathEvent (GUIPasteEvent)
+		.path.text = data.Trim
 		relistkey(.path, 0, true)
 		return true
 
