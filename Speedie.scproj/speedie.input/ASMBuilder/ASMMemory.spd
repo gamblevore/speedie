@@ -76,6 +76,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		byte_shift = (byte_shift<<1) + t.issigned
 		op = ASMType.ReadASM[byte_shift]
 	
+	if rz == 199
 	rz._op = op
 	if pinc     // || y = (x++)[]
 		rz.µrefcount++

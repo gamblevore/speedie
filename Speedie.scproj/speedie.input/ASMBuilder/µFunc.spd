@@ -51,7 +51,6 @@ extend SCFunction
 			printline self
 			printline .µRender
 
-
 	iterator fat
 		|| FirstInst = .FatFirst
 		|| CurrInst = FirstInst
@@ -80,18 +79,20 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	.prms[reg] = J							// restore!
 
 
-function JBin.AddFunction (|SCFunction| fn)
-	// need aligning each.
-//	|| M = .ReserveMemory(@bin, n)
-	|| f = fn.FatFirst
-	|| t = 0
-	for i in fn.µLength
-		t += f[i].GuessSize // will the size ever differ? it shouldn't?
-							// consts are fixed now. So... it just jumps?
-							// in fact... jumps will jsut fail to compile if too big.
+function scfunction.GuessASMSize (|int|)
+	|| f = .FatFirst
+	for i in .µLength
+		rz += f[i].GuessSize // will the size ever differ? it shouldn't?
+							 // only for jumps. We should pre-calculate extra-sizes if needed.
 	
-	self <~ (0, t*4)
+
+function JBin.JRenderASM (|SCFunction| fn)
+	|| t = fn.GuessASMSize
 	fn.µLengthGuess = t
 	Compiler.stTotalASMOps += t
+	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
+	|| after = fn.ActualASMRender(Start, Start+t)
+	check (after-start==t) (fn, "ASM length corrupt")
+	
 
 

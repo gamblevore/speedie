@@ -160,7 +160,7 @@ module PackMaker
 		Assembler.Sh.Fullinit
 		PackMaker.AddAll
 		.BuildGlobs // Sorts too
-		.FinalPrepare
+		.FinalPrepare		
 		if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry = true
 			.WritePackToDisk
 		compiler.During = 0
@@ -204,10 +204,12 @@ module PackMaker
 		j.enter(@tmp, "code")
 		for f in .PackFuncs
 			if (PackSaved)(j, f is UsedByASM)
-				j.AddFunction(f)
+				scfunction.currfunc = f
+				j.JRenderASM(f)
 				func_names <~ f.exportname
 				func_names <~ '\n'
 		j.Exit
+		scfunction.currfunc = nil
 		
 		
 	function DumpStrings (|jbin| j)
@@ -394,6 +396,8 @@ function packmaker.FinalPrepare
 
 	require Options.InlineLib
 
+	// These lib funcs are not actually going into the pack.
+	// We just want to see the size of the libfunc, if it were inlined.
 	for (fn in .LibFuncs) (i)
 		if fn.CanPrepareInline
 			require Assembler.sh.GenerateASM(fn, -(i+1))

@@ -165,6 +165,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 	l.prms[0] = l.prms[1]					// We can't skip the ret if its not curr.
 	l.prms[1] = l.prms[2]
 	l.prms[2] = 0
+	l._Outputs = 0
 	l._op = asm.tail
 	(l.info as= ASMReg.exit)
 	if 0: nil|message|!.TAIL

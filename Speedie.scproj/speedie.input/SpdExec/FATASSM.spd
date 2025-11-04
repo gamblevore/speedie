@@ -12,6 +12,7 @@ struct FatASM
 	|uint64| 			_Const
 	|int16|				µRefCount
 	|uint16| 			BasicBlock
+	|uint16| 			ASMIndex
 	|byte|				BranchID  // could be used to check if a const earlier in the same branch, but a different block
 	|byte|				InputFats
 	|byte|				InputPrms
@@ -19,13 +20,6 @@ struct FatASM
 	|byte|				_Op
 	|byte|				JumpPrm
 	
-
-	function ASMIndex (|uint16|)
-		return .basicblock
-
-	setter ASMIndex (|uint16|)
-		.basicblock = value
-		
 	
 	function Op (|byte|)
 		return ._op
@@ -125,7 +119,10 @@ struct FatASM
 	setter Debug (|message|)
 		.msg = Value
 
-	function Index (|uint|)
+	syntax equals (|uint| x, |bool|)
+		return self - Assembler.sh.start == x
+	
+	function Index (|uint|) // for storing in uint16 actually
 		return self - Assembler.sh.funcstart_
 
 	function uint.FAT (|&FATASM|)
@@ -200,8 +197,11 @@ struct FatASM
 
 	
 	Syntax Expect (|string| Error)
+		target debug
+			assembler.PrintProgress
+			"----"
+			.DebugPrint
 		error (.msg, error)
-		.DebugPrint
 
 	
 	function Jump (|int|)

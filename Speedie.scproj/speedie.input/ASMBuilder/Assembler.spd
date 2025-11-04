@@ -629,8 +629,9 @@ struct Assembler
 		.end = j.NeedSpare(64K, 64K)
 		.start = j.ptr
 		.curr_ = .start + j.Length
+		.FuncStart_ = .curr
 		
-		// after zeroing, we could just set everything normally? It seems ._curr is set from jsm.
+		// After zeroing, we could just set everything normally? It seems ._curr is set from jsm.
 		HoistSpace.Length = 0
 		
 		.out = fn
@@ -651,7 +652,6 @@ struct Assembler
 		.Guard
 		.InlineEnd = nil
 		fn.µstart = .Index
-		.FuncStart_ = .curr - 1
 		.VTemps = 0
 		.VDecls = 1							// set after .FuncStart
 		.AddFuncParams(fn)
