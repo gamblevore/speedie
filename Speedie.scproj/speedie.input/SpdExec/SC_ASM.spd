@@ -23,5 +23,5 @@ datatype ASM (uint)
 
 
 
-prototype ASM_Encoder  (|&FatASM| self, |!&asm| Curr, |!&asm| After,  |int64| ExtraInfo=0,  |&asm|)
+prototype ASM_Encoder  (|&FatASM| self, |!&asm| Curr, |!&asm| After,  |&asm|)
 

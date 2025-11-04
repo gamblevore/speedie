@@ -353,13 +353,13 @@ struct Assembler
 	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		|| changed = info.prm
 		.prms[a] = changed
-		._Outputs |= 1 << a
 		changed &= 31
 		info.FatIndex = self - sh.funcstart_
 		if info
 			.info = info
 		if !changed
 			return info
+		._Outputs |= 1 << a
 		if info
 			(info is AllowNopDest)
 		return sh.SetRegister(changed, info, self)

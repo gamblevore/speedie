@@ -76,11 +76,10 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		byte_shift = (byte_shift<<1) + t.issigned
 		op = ASMType.ReadASM[byte_shift]
 	
-	if rz == 199
 	rz._op = op
 	if pinc     // || y = (x++)[]
 		rz.µrefcount++
-		rz.Dest(4, nil, self) // its a dest, but its also an input
+		rz.Dest(1, base, self) // base is being written to, but it is still an input
 	
 
 

@@ -577,7 +577,7 @@ datatype ASMParam (uint)
 	// this would have been better if I had planned this all out ahead of time
 	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits,
 	// for 21-bits after that we have 11 more bits that we could either use or keep empty...
-	// depending on if they confuse the code or not, but at least we have soemthing that
+	// depending on if they confuse the code or not, but at least we have something that
 	// makes sense, easy to convert from one to the other!
 	// at this point... its too late, really.
 	

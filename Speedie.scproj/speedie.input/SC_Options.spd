@@ -361,8 +361,11 @@ module Feedback
 		+'inlinelib'
 			options.InlineLib = value.optionbool
 		
-		+'targetdebug' // basically
-			Explain(Purpose, "")$
+		+'d'
+			options.targetdebug = value.optionbool // no explanation haha.		
+
+		+'targetdebug'
+			Explain(Purpose, "Enables your own debug code in compiled-output.")$
 			options.targetdebug = value.optionbool
 		
 		+'target'
@@ -374,10 +377,6 @@ module Feedback
 		+'warn'
 			Explain(Purpose, "Show warnings.")$
 			Options.Warnings = value.optionbool
-
-//		+'maxvars'
-//			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
-//			Options.checkmaxvars = value.optionbool
 		
 		+'nocolor'
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$

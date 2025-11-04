@@ -5,24 +5,24 @@ extend SCFunction
 		description "Generate some code (only for testing)."
 		rz = asm[.µlength|int|*3]!
 		|| p = rz.ptr
-		|| after = .ActualASMRender(P, P+rz.Size)
+		|| after = .FatToASM(P, P+rz.Size)
 		rz.Size = after-p
 		rz.length = rz.Size
 	// cosmic lore unfold... into tales untold
-
 
 	function FatFirst (|&fatasm|)
 		return Assembler.sh.start + .µstart
 	
 	
-	function ActualASMRender (|!&ASM| Where, |!&asm| After, |!&asm|)
+	function FatToASM (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
+		|| MaxFuncSize = 250K/4
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
 			|| n = rz - where
-			if n >= 64K
-				error (.source, "Function too large (over 256K)")
+			if n > MaxFuncSize
+				error (.source, "Function too large (over 250K)")
 			fat.ASMIndex = n
 			fat.CheckHasOutput
 			rz = fat.µRenderInto(rz, after)
@@ -31,6 +31,7 @@ extend SCFunction
 			for fat.fat in self
 				|| r = fat.JumpPrm
 					fat.FillLabelRequest(where, rz, r-1)
+//		printline .exportname + " defatted"
 	
 	
 	target debug
@@ -45,7 +46,6 @@ extend SCFunction
 				fs <~ '\n'
 
 
-/// TEXTUAL STUFF		
 	function µPrint 
 		target debug
 			printline self
@@ -58,7 +58,7 @@ extend SCFunction
 		while currinst < Afterinst
 			yield currinst (CurrInst - FirstInst)
 			++currinst
-	
+
 
 
 function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
@@ -85,14 +85,12 @@ function scfunction.GuessASMSize (|int|)
 		rz += f[i].GuessSize // will the size ever differ? it shouldn't?
 							 // only for jumps. We should pre-calculate extra-sizes if needed.
 	
-
 function JBin.JRenderASM (|SCFunction| fn)
 	|| t = fn.GuessASMSize
 	fn.µLengthGuess = t
 	Compiler.stTotalASMOps += t
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
-	|| after = fn.ActualASMRender(Start, Start+t)
+	|| after = fn.FatToASM(Start, Start+t)
 	check (after-start==t) (fn, "ASM length corrupt")
 	
-
 
