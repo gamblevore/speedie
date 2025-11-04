@@ -549,7 +549,7 @@ struct JB_Task;
 
 struct ParserCallBack;
 
-typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After);
 
 typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -725,13 +725,14 @@ struct FastBuff {
 struct FatASM {
 	ASMParam Prms[6];
 	s16 xC2xB5RefCount;
-	u16 BasicBlock;
+	u16 ASMIndex;
 	byte BranchID;
 	byte InputFats;
 	byte InputPrms;
 	byte _Outputs;
 	byte _Op;
 	byte JumpPrm;
+	u16 BasicBlock;
 	uint64 _Const;
 	Message* Msg;
 	ASMReg Info;
@@ -1525,18 +1526,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2253])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2256])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2254])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2257])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2255])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2258])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2252])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2255])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2255])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2258])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2256])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2259])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1769,7 +1770,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2261])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2264])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1806,7 +1807,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2257])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2260])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1846,7 +1847,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2262])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2265])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2078,12 +2079,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2260])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2263])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2259])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2262])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2258])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2261])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3298,7 +3299,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2251])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2254])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3790,6 +3791,8 @@ bool SC_FB__AppOptions_codesign(JB_String* Name, JB_String* Value, FastString* P
 bool SC_FB__AppOptions_cpp(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_crash(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_d(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_directtest(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -4526,7 +4529,7 @@ bool SC_VM_Builder__MakeTheVM();
 
 void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm);
 
-ASM* SC_VM_Builder__MissingInstruction(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_VM_Builder__MissingInstruction(FatASM* Self, ASM* Curr, ASM* After);
 
 bool SC_VM_Builder__OKBoomer(Message* Tmp, int X, ASM_Encoder FormEnc, Array* R);
 
@@ -6137,302 +6140,302 @@ bool SC_xC2xB5Param_SyntaxIs(uint /*MuParam*/ Self, uint /*MuParam*/ P);
 
 
 // ASM_AddAK
-ASM* SC_ASM_AddAK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_AddAK__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_AddB
-ASM* SC_ASM_AddB__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_AddB__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_AddK
-ASM* SC_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_AddOrSubM
-ASM* SC_ASM_AddOrSubM__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_AddOrSubM__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Alloc
-ASM* SC_ASM_Alloc__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Alloc__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_BFLD
-ASM* SC_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_BFLS
-ASM* SC_ASM_BFLS__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_BFLS__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Bra
-ASM* SC_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_CNTC
-ASM* SC_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_CmpF
-ASM* SC_ASM_CmpF__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_CmpF__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_CmpI
-ASM* SC_ASM_CmpI__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_CmpI__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Compare4
-ASM* SC_ASM_Compare4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Compare4__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_ConstStretchy
-ASM* SC_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Convert
-ASM* SC_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Div
-ASM* SC_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Div2
-ASM* SC_ASM_Div2__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Div2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Float
-ASM* SC_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_FloatConst
-ASM* SC_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_ForeignFunc
-ASM* SC_ASM_ForeignFunc__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_ForeignFunc__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Func
-ASM* SC_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_FuncAddr
-ASM* SC_ASM_FuncAddr__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_FuncAddr__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_GObj
-ASM* SC_ASM_GObj__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_GObj__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_HALT
-ASM* SC_ASM_HALT__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_HALT__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_JCmpEq
-ASM* SC_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_JCmpF
-ASM* SC_ASM_JCmpF__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_JCmpF__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_JCmpI
-ASM* SC_ASM_JCmpI__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_JCmpI__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_JCmpK
-ASM* SC_ASM_JCmpK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_JCmpK__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Jump
-ASM* SC_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Loop
-ASM* SC_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_MemUtil
-ASM* SC_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_MemoryCopy
-ASM* SC_ASM_MemoryCopy__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_MemoryCopy__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_REQ
-ASM* SC_ASM_REQ__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_REQ__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RET
-ASM* SC_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Read
-ASM* SC_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RefDecrMem
-ASM* SC_ASM_RefDecrMem__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RefDecrMem__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RefReturn
-ASM* SC_ASM_RefReturn__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RefReturn__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RefSet1
-ASM* SC_ASM_RefSet1__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RefSet1__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RefSet2
-ASM* SC_ASM_RefSet2__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RefSet2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RefSet3
-ASM* SC_ASM_RefSet3__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RefSet3__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RefSetApart
-ASM* SC_ASM_RefSetApart__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RefSetApart__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_RotateConst
-ASM* SC_ASM_RotateConst__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_RotateConst__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Shift
-ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Swap
-ASM* SC_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_TERN
-ASM* SC_ASM_TERN__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_TERN__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Table
-ASM* SC_ASM_Table__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Table__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Tail
-ASM* SC_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Trap
-ASM* SC_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_U0
-ASM* SC_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_U1
-ASM* SC_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_U2
-ASM* SC_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_U3
-ASM* SC_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_U4
-ASM* SC_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecBuild
-ASM* SC_ASM_VecBuild__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecBuild__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecConst
-ASM* SC_ASM_VecConst__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecConst__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecGet
-ASM* SC_ASM_VecGet__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecGet__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecInc
-ASM* SC_ASM_VecInc__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecInc__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecMix
-ASM* SC_ASM_VecMix__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecMix__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecSet
-ASM* SC_ASM_VecSet__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecSet__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_VecSwizzle
-ASM* SC_ASM_VecSwizzle__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_VecSwizzle__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
 // ASM_Write
-ASM* SC_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -6685,6 +6688,8 @@ int SC_FAT_BaseOp(FatASM* Self);
 
 ASMReg SC_FAT_CanGlobalGrab(FatASM* Self, uint64 Find, uint64 Range, uint64 BS);
 
+void SC_FAT_CheckHasOutput(FatASM* Self);
+
 int64 SC_FAT_Const(FatASM* Self);
 
 void SC_FAT_ConstSet(FatASM* Self, int64 Value);
@@ -6708,6 +6713,8 @@ bool SC_FAT_Exists(FatASM* Self);
 float SC_FAT_F32(FatASM* Self);
 
 Float64 SC_FAT_F64(FatASM* Self);
+
+void SC_FAT_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 FatASM* SC_FAT_FindOlder(FatASM* Self);
 
@@ -6745,7 +6752,9 @@ FatASM* SC_FAT_JumpTo(FatASM* Self);
 
 void SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
 
-ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After);
+
+ASM* SC_FAT_Nop_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
 void SC_FAT_NumInputSet(FatASM* Self, int A, int V);
 
@@ -6787,7 +6796,7 @@ bool SC_FAT_RotateConst(FatASM* Self, uint64 V);
 
 void SC_FAT_SetOpSet(FatASM* Self, uint /*byte*/ Value);
 
-bool SC_FAT_SimpleConst(FatASM* Self, int64 V, int Space, int Negate);
+bool SC_FAT_SimpleConst(FatASM* Self, uint64 V, int Space);
 
 ASMReg SC_FAT_SyntaxCall(FatASM* Self, uint I);
 
@@ -7239,6 +7248,8 @@ bool SC_Pac_IsCurr(Assembler* Self, FatASM* F);
 ASMReg SC_Pac_IsOnlyVarThatWeReturn(Assembler* Self, SCDecl* D);
 
 void SC_Pac_KnownValuesSet(Assembler* Self, int Changed, bool Value);
+
+void SC_Pac_Knst(Assembler* Self, ASM Op);
 
 ASMReg SC_Pac_KompareIntK(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, uint Mode);
 
@@ -9032,8 +9043,6 @@ jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into
 
 void SC_bin_AddDecl(FastString* Self, SCDecl* D, int Pos, Syntax W, int Reg);
 
-void SC_bin_AddFunction(FastString* Self, SCFunction* Fn);
-
 void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
@@ -9048,7 +9057,11 @@ int JB_bin_Exit(FastString* Self, int Amount);
 
 void JB_bin_Exit0(FastString* Self);
 
+void SC_bin_JRenderASM(FastString* Self, SCFunction* Fn);
+
 void SC_bin_PropertyLayout(FastString* Self, Array* List);
+
+byte* JB_bin_ReserveMemory(FastString* Self, Syntax Type, int L, int AlignTo, bool GoIn);
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
@@ -11571,6 +11584,8 @@ JB_String* SC_Func_ExportNameBuilder(SCFunction* Self, JB_String* CppPart);
 
 FatASM* SC_Func_FatFirst(SCFunction* Self);
 
+ASM* SC_Func_FatToASM(SCFunction* Self, ASM* Where, ASM* After);
+
 void SC_Func_FillInDestructor(SCFunction* Self);
 
 void SC_Func_FillInMissingConstructorDefaults(SCFunction* Self, Message* After);
@@ -11592,6 +11607,8 @@ void SC_Func_FLookupSet(SCFunction* Self, SCNode* Value);
 bool SC_Func_FoundOneCpp(SCFunction* Self, JB_String* N);
 
 void SC_Func_FuncParamsLoad(SCFunction* Self);
+
+int SC_Func_GuessASMSize(SCFunction* Self);
 
 bool SC_Func_HasCVersion(SCFunction* Self);
 
@@ -12035,6 +12052,8 @@ inline byte* JB_Str_Addr(JB_String* Self);
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
+inline ASM* SC_FAT_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
+
 inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest);
 
 inline bool SC_Reg_FourBytes(ASMReg Self);
@@ -12217,6 +12236,10 @@ inline byte* JB_Str_Addr(JB_String* Self) {
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
 	//cpp_part;
 	return JB_Str_MakeC(Self);
+}
+
+inline ASM* SC_FAT_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
+	return (SC__ASM_Encoders[SC_FAT_Op(Self)])(Self, Where, After);
 }
 
 inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest) {
