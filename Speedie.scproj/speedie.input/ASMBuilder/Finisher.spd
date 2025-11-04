@@ -15,8 +15,8 @@ function Assembler.FinishMost
 function fatasm.Nop_Encoder (Asm_encoder)
 	return curr
 
+
 function fatasm.KNST_Encoder (Asm_encoder)
-	if .r0.reg == 3
 	rz = ASM_ConstStretchy.Encode(self, curr, after)
 	|| op = .op
 	if op != asm.knst
@@ -25,15 +25,15 @@ function fatasm.KNST_Encoder (Asm_encoder)
 			rz++[] = .prms[5]
 
 
-function fatasm.SimpleConst (|int64| v, |int| Space, |int| Negate=0,  |bool|)
-	if Negate
+function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)
+	|| negate = v|int64| < 0
 		v = ~v
 	|| sh = 64-Space
 	if (v << sh) >> sh == v
-		.prms[2] = negate
-		.prms[3] = v|uint64| & 17~bits
-		.prms[4] = v|uint64| >> 17
-		.prms[5] = v|uint64| >> 39
+		.prms[2] = negate|int|
+		.prms[3] = v & 17~bits
+		.prms[4] = v >> 17
+		.prms[5] = v >> 49
 		return true
 //		Cond	1		// 0 == always, 1 = only if dest == 0
 //		Inv		1
@@ -41,15 +41,14 @@ function fatasm.SimpleConst (|int64| v, |int| Space, |int| Negate=0,  |bool|)
 
 
 function fatasm.ConstFinish 
-	if (.r0.reg == 3) and "FloatConsts".trap
 	|| v = .const|uint64|
-	if .SimpleConst(v, 17) or .SimpleConst(v, 17, 1)
+	if .SimpleConst(v, 17)
 		._op = asm.KNST // already set, but its for clarity
 		return
 	if .RotateConst(V)
 		._op = asm.KNSR
 		return
-	if .SimpleConst(v, 39) or .SimpleConst(v, 39, 1)
+	if .SimpleConst(v, 49)
 		._op = asm.KNST2
 		return
 	.SimpleConst(v, 64)

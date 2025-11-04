@@ -109,7 +109,6 @@ module Feedback
 				X.DebugPrint
 		if 0
 			m.DUMB, m.FEET // for when you can't dance
-		
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 
@@ -127,7 +126,7 @@ module Feedback
 			  else
 				AskSelf = s
 		
-		if askself
+		if AskSelf
 			.ParseOption(askself) // we want this last.
 		
 		if options.OperationCount <= 0

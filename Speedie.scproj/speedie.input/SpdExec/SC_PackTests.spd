@@ -22,6 +22,12 @@ extend_module PackMaker
 	function RunAFewTests 
 		target debug {
 		|scfunction--| fn
+		
+		fn = .testfn("FloatConsts")
+		if fn
+			|| D = fn.TestObesity|&f64|[]
+			D = D
+
 		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
@@ -31,10 +37,6 @@ extend_module PackMaker
 		fn = .testfn("AndOrConsts")
 		if fn
 			|| Andor = fn.TestObesity|&int64|[]
-		
-		fn = .testfn("FloatConsts")
-		if fn
-			|| D = fn.TestObesity|&f64|[]
 		
 		fn = .testfn("ForeignFuncs")
 		if fn

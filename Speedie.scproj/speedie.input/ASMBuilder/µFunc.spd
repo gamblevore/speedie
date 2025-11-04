@@ -5,7 +5,7 @@ extend SCFunction
 		description "Generate some code (only for testing)."
 		rz = asm[.µlength|int|*3]!
 		|| p = rz.ptr
-		|| after = .FinalPass(P, P+rz.Size)
+		|| after = .ActualASMRender(P, P+rz.Size)
 		rz.Size = after-p
 		rz.length = rz.Size
 	// cosmic lore unfold... into tales untold
@@ -15,10 +15,9 @@ extend SCFunction
 		return Assembler.sh.start + .µstart
 	
 	
-	function FinalPass (|!&ASM| Where, |!&asm| After, |!&asm|)
+	function ActualASMRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
-		if self == "FloatConsts"
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
 			|| n = rz - where
