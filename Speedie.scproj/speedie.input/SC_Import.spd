@@ -138,7 +138,7 @@ class SCImport
 		if link["type"] ~= "library"
 			.IsSTDLib = true
 			.WarnUnusedFuncs = false 
-		if link["apps_folder"].yes
+		if link["apps_folder"].yes and options.modecpp
 			Options.output_path = file.Applications[compiler.Productpath.name]
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])

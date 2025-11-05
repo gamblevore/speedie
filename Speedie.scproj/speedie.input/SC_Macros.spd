@@ -81,6 +81,11 @@ function message.TargetTest (|bool|) // target true, target false,
 		return Platform.lin
 	if self ~= "direct"
 		return options.IsDirectTest
+	if self ~= "pack"
+		return options.mode == options.pack
+	if self ~= "cpp"
+		return options.mode == options.cpp
+		
 	return SC_Targets[.name]
 
 

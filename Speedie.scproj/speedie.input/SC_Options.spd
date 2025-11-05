@@ -1,7 +1,7 @@
 
 
 module Options
-	flags: native, pack
+	flags: cpp, pack
 	
 	||		BannedClasses			= nil|dictionary|
 	||		exe_path				= "" // if not exist, use output_path
@@ -15,8 +15,7 @@ module Options
 	|| 		Dev						= 0
 
 	|bool|	InlineLib				= true
-	|byte|	ModeCpp					= 1
-	|byte|	ModePack				= 0
+	|byte|	Mode					= Cpp
 	||		MakeInterpreter			= false
 	||		Compile					= true
 	||		TargetDebug				= false
@@ -47,6 +46,12 @@ module Options
 
 	function Color (|bool|)
 		return ErrorColors.enabled
+	
+	function ModePack (|bool|)
+		return .mode == pack
+	
+	function ModeCpp (|bool|)
+		return .mode == cpp
 	
 
 
@@ -271,9 +276,9 @@ module Feedback
 			options.UseScriptLoc = maybebool.Known(true)
 
 		+'check'
-			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
+			Explain(Purpose, "Check only. Does not compile")$
 			Options.Compile = 0
-			Options.ModeCpp = 0
+			Options.Mode = 0
 		
 		+'flowmode'
 			0 // placeholder
@@ -346,17 +351,14 @@ module Feedback
 			app.crash
 		
 		+'cpp'
-			explain(purpose, "Compiles to cpp. Default true")$
-			options.ModeCpp = value.optionbool<<1
-			if options.ModeCpp and options.modepack == 1
-				options.modepack = 0
-				SC_Targets["pack"] = false
+			explain(purpose, "Compiles to cpp. Will not compile a pack")$
+			if value.optionbool
+				options.Mode = options.cpp
 				
 		+'pack'
-			options.ModePack = value.optionbool<<1
-			if options.modepack and options.modecpp==1
-				options.modecpp = 0 // would be better to allow both... but only if both are specified.
-			SC_Targets["pack"] = options.ModePack > 0
+			explain(purpose, "Compiles to zpd. Will not compile to cpp")$
+			if value.optionbool
+				options.Mode = options.Pack
 		
 		+'inlinelib'
 			options.InlineLib = value.optionbool
