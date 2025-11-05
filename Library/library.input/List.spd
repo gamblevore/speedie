@@ -242,7 +242,8 @@ class list (Saveable)
 		while m < lim
 			c = c.step(n > 0)
 			if !c
-				exit
+				r = m
+				return nil
 			++m
 
 		r = m

@@ -95,7 +95,7 @@ role JBin (Faststring)
 		.Indent += goin
 
 	function ReserveMemory	(|syntax| type, |int| L, |int| AlignTo=0, |bool| GoIn=false, |&byte|)
-		if (AlignTo)
+		if (AlignTo >= 2)
 			|| Header = (L.Log2/7)+2
 			|| NewStart = Header + .streamlength
 			|| extra = NewStart mod AlignTo

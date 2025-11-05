@@ -499,14 +499,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			if self starts file.HomePath
 				return "~" + self[file.HomePath.length ...]
 
-		function string.IdealApp (|string|)
-			target OSX
-				return ("/Applications/" + .name)
-
-		function file.IdealApp (|file|)
-			return .path.idealapp.file
-
-
 		function NewPipe (|filedes| Pipe, |file|)
 			cpp_wrapper JB_File__NewPipe
 		
