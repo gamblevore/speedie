@@ -31,7 +31,10 @@ class-changes:
 
 
 Additions:
-	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker	
+	* vargs could really shrink faststring compile-size, which expands "abc $d e $f $g h" a lot.
+		* the string could be compiled like "{typ1}{len}{ty2}{ln}{end}stringdata"
+	* refcount opts in general
+		* passing properties as params, SHOULD NOT assume its safe... Refcount optimiser should decide this.
 	* Rename "flags" to something else. I wanna use "flags" for some kinda default Info and SyntaxIs
 	* AutoComplete use class description 
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
