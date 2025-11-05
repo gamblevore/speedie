@@ -332,7 +332,7 @@ function ViewAsVis (|bool| AsProject)
 			AnyViews ?= t is visible 
 	
 	if AsProject and !AnyViews
-		.viewfiles.click(nil)
+		.viewfiles.selected = nil|listviewrow| // typecast shouldn't be necessary
 
 	.FileSep.isCollapsed = !AsProject
 	(.gonext is visible)	= AsProject

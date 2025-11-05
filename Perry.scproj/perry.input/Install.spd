@@ -1,6 +1,6 @@
 
 target false { // remove for simplicity
-
+// "brew install speedie" would be better
 extend_module perry
 ///// abc
 	function Monthly_Name (|date| n, |string|)

@@ -83,7 +83,7 @@ function PerryIDE.CompileTabSelect (|object| Desired)
 function ClickedToolbar (GUIAction)
 	opt norefcounts
 	if self isa ButtonView
-		if (.clickcount == 2)
+		if (._clickcount == 2)
 			.ide.ViewTextModeSwap
 
 

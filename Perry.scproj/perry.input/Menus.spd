@@ -155,6 +155,7 @@ function MenuCloseProject (guimenuevent)
 	|| ide = menu.MenuIde
 		ide.Close
 
+
 function ClickedTabs (GUIAction)
 	opt norefcounts
 	|| i = row.ide

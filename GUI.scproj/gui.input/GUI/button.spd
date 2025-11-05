@@ -15,12 +15,13 @@ class ButtonView (GUIControl)
 	|listviewrow?|				ClickedItem
 	|int|						ItemWidth
 	|int| 						ItemGap
-	|byte|						ClickCount
-	|bool|						PressingDone
+	|byte|						_ClickCount
+	|byte|						_DuringSelectEvent
+	|bool|						_PressingDone
 	|bool|						PressMakesLighter
 	|bool|						CanReOrderButtons
 	|bool|						MouseDownDoesClick
-	|bool| 						NoDrawClicked
+	|bool| 						DontDrawClicked
 	|ListViewState|				Align
 
 	constructor (|guicontrol| p,  |GUIAction| act,  |GUIAction| pressing=nil,  |GUIListEvent| ret=nil, |guiaction| OnRightClick=nil)
@@ -52,7 +53,7 @@ class ButtonView (GUIControl)
 		.click((int.min, int.min))
 	
 	
-	function Click (|ivec2| p, |bool| left=true)
+	function Click (|ivec2| p, |bool| Right=false)
 		cpp_part ClickXY
 		opt norefcounts
 
@@ -61,28 +62,35 @@ class ButtonView (GUIControl)
 				|| m = w.OpenedMenu()
 				require m != sub
 
-		|| Always = (p == (int.min, int.min)) 
+		|| Always = p.x == int.min 
 		require always or .lastrect contains p
 
-		.Touch(2)
-		|| c = (nil, .itemat(p.x))(always)
-		.selected = c
-		|| prev = (nil, c)(always)
-
-		if left
-			(.onclicked)(self, C, prev)?
+		if Always
+			.selected(Right) = nil
 		  else
-			(.onrightclick)(self, C, prev)?
+			.selected(Right) = .itemat(p.x)
+//		.selected(!left) = c
 
 
 	function Select (|listviewrow| r)
 		disabled "just set .selected"
 		
 	
-	setter Selected (|ListViewRow|)
+	function Selected (|bool| RightClick=false, assigns:|ListViewRow?|)
 		opt norefcounts
+		|| prev = .Selected
+		|| changed = 0
 		for i in .ButtonSource
-			(i is Selected) = (i == value)
+			|| x = (i == value)
+			if (i is selected)!=x
+				(i is selected) = x
+				changed++
+		
+		.Touch(2)
+		if !._DuringSelectEvent++
+			|| fn = (.onrightclick, .OnClicked)(RightClick)
+				(fn)(self, value, prev)
+		._DuringSelectEvent--
 
 
 	function Selected (|listviewrow|)
@@ -141,15 +149,15 @@ class ButtonView (GUIControl)
 	behaviour MouseUp
 		opt norefcounts
 		.clearmouse
-		if .PressingDone
-			.PressingDone = false
+		if ._PressingDone
+			._PressingDone = false
 		  else
 			.click(p)
 
 
 	behaviour RightClick
 		opt norefcounts
-		.Click(p, !.onrightclick)
+		.Click(p, .onrightclick!=nil)
 
 		
 	helper DoPressing (|listviewrow| D, |bool|)
@@ -159,7 +167,7 @@ class ButtonView (GUIControl)
 	
 	behaviour MouseDown
 		opt norefcounts
-		.clickcount = clicks
+		._clickcount = clicks
 		|| D = .ItemAt(P.x)
 			if (d isnt active)  and  .Decluttered
 				d = nil
@@ -171,8 +179,8 @@ class ButtonView (GUIControl)
 				if D and D != cl
 					cl.moveto(D)
 					.touch
-					.PressingDone = true
-				if !.pressing or .PressingDone
+					._PressingDone = true
+				if !.pressing or ._PressingDone
 					return mousedragging.beyond
 				ret = mousedragging.EvenIfNoMovement // ?
 		
@@ -184,7 +192,7 @@ class ButtonView (GUIControl)
 			return ret
 		
 		if .MouseDownDoesClick
-			.pressingdone = true
+			._pressingdone = true
 			.click(p)
 			return MouseDragging.handled
 
@@ -199,7 +207,7 @@ class ButtonView (GUIControl)
 			.DelayTill = n + 0.7s
 		  elseif (D == .clickeditem) and (n >= .DelayTill)
 			.DelayTill = n + .StepDuration
-			.PressingDone = true
+			._PressingDone = true
 			if !.DoPressing(D)
 				.delaytill = 0
 				return MouseDragging.handled
@@ -228,7 +236,7 @@ class ButtonView (GUIControl)
 		
 		|| M = GUI.MouseXY
 		|| MouseXInside = R.x1x2 contains M.x
-		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
+		|| clicked = .MouseIsDown and mouseXinside and !.DontDrawClicked
 		|| strength = 1.0
 		
 		|| WillDrawFocus = clicked and i and .ClickedItem
@@ -360,4 +368,8 @@ class ButtonView (GUIControl)
 function Date.GuiAgo (|Duration|)
 	if self
 		return gui.framestart - self
+
+
+
+
 

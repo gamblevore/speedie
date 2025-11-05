@@ -6,7 +6,7 @@ import "Speedie.scproj/speedie.input/AutoCompleteHelpers"
 
 linkage
 	cpp_part Per
-	apps_folder true
+	apps_folder true // install perry into the app's folder... if compiled with C++
 	 
  
 conf

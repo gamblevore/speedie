@@ -107,7 +107,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.align			= ListViewState.aligncenter
 			.gnormal.solid  = vec4(0.125, 0.94) 
-			.NoDrawClicked  = true
+			.DontDrawClicked  = true
 		
 		
 		with .DebugArgsText

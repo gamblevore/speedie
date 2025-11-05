@@ -364,9 +364,9 @@ class PerryIDE (Window)
 				.ClickedTodo
 			  else
 				.recheck
-		if !.isfront
+		if !.IsFront
 			.ProjectTabs.selected = .SharedProjectTabSource
-			.editme.SetFocus // make it simple
+			.editme.SetFocus				// Make it simple
 			super.show
 		.id = .name
 		GUI.Title = .id
@@ -502,10 +502,10 @@ class PerryIDE (Window)
 	
 	
 	behaviour FrameStep // perframe, eachframe, onframe
-		for w in Window.all
-			if w isa PerryIDE
-				if w.ProjectTabs.ButtonSource != Perry.Projects
-					/// hmmm
+//		for w in Window.all
+//			if w isa PerryIDE
+//				if w.ProjectTabs.ButtonSource != Perry.Projects
+/// hmmm
 		.ProjectTabs.TrimWidth
 		if GUIactive
 			.SaveMemory
@@ -635,36 +635,47 @@ class PerryIDE (Window)
 			.SaveEditing(documentstate.saving)
 			return true
 		|| NumKey = key.IsNumber
-			ifn keys.Shift or keys.option
-				if NumKey == 9
-					.flip(.ProductOut)
-					return true
-				if NumKey == 8
-					.flip(.SpeedieText)
-					return true
-				if NumKey == 7
-					return .FlipJeeboxField			
-				if NumKey == 6
-					.ASMButton.Click
-					return true
-				if NumKey == 5
-					return .StrongView(.ViewLog)
-				if NumKey == 4
-					return .StrongView(.ViewDebugger)
-				if NumKey == 3
-					return .SaveAndShowErrors
-				if NumKey == 2
-					return .StrongView(.ViewSearch)
-				if NumKey == 1
-					return .StrongView(.ViewFiles)
-				if NumKey == 0
-					.ViewTextModeSwap
-					return true
+			return .NumberKey(numkey)
 		if key is p or backslash
 			.CommandsMenu.Click
 			return true
-			
+		
+	
+	function OptionCmdNum (|int| Num, |bool|)
+		|| w = perry.projects[num-1]
+			.ProjectTabs.Selected() = w
+		
+		
+	function NumberKey (|int| Num, |bool|)
+		require !keys.shift
+		if keys.Option
+			return .OptionCmdNum(num)
+		if Num == 9
+			.flip(.ProductOut)
+			return true
+		if Num == 8
+			.flip(.SpeedieText)
+			return true
+		if Num == 7
+			return .FlipJeeboxField			
+		if Num == 6
+			.ASMButton.Click
+			return true
+		if Num == 5
+			return .StrongView(.ViewLog)
+		if Num == 4
+			return .StrongView(.ViewDebugger)
+		if Num == 3
+			return .SaveAndShowErrors
+		if Num == 2
+			return .StrongView(.ViewSearch)
+		if Num == 1
+			return .StrongView(.ViewFiles)
+		if Num == 0
+			.ViewTextModeSwap
+			return true		
 
+	
 	function Flip (|textview| s, |bool|)
 		|| Item = .compiletabs.selected
 		if item  and  .ProductSep.isopen  and item.obj == s

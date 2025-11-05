@@ -845,19 +845,21 @@ class TextView (GUIControl)
 		return true
 	
 	
-	function Log (|string| s, |int| Max=128K)
-		require s
-
-		// add to ._LogTrimmed
-		// remove this branch, simplify code.
-		if s >= max
-			.Text = s.right(max)
+	function Log (|string| s, |int| Max=256K)
+		require s and max >= 1
+		|| NewLength = .text.Length + s.Length
+		|| Lost = NewLength - Max
+		if Lost <= 0
+			.text = .text + s
 			return
 		
-		if ._LogTrimmed
-			|| prefix = "(--Trimmed: " + ._LogTrimmed.strsize + "--)\n"
-		.text = .Text.Right(max - s.Length) + s
-	
+		|| NewLog = ._LogTrimmed + Lost
+		if s >= max
+			.text = s.right(max)
+		  else
+			.text = .text.right(max - s.length) + s
+		._LogTrimmed = NewLog
+
 //		|| L = 0
 		// use d.FindWhereLineBreaks(.text,  CharW,  .singleline,  p) isntead
 //		for line.lines in s
@@ -1827,14 +1829,19 @@ class TextView (GUIControl)
 		  else
 			yend += font.height-2
 		
-		while (y > yEnd) and (d)
+		._CanSeeLastLine = false
+		._CanSeeAllLines = false
+		while (y > yEnd)
 			y -= .LineHeight
 			Remain -= .LineHeight
 			if Draw
 				.DrawOneLine(where, D, y, usecol, lc)
 			d++
+			if !d
+				._CanSeeLastLine = true
+				._CanSeeAllLines = !.StartLine.position
+				exit
 
-		._CanSeeAllLines = (.StartLine.position == 0) and (d==nil) // oop
 		return Remain
 
 
@@ -1960,6 +1967,7 @@ class TextView (GUIControl)
 		rz = super.textset(NewText)
 		require rz or !._lines.hasany
 
+		._LogTrimmed = 0
 		|| sel = (.text.length, 0)(.SingleLine) 
 		.TypingPlaceDirect((sel,sel))
 		
@@ -2086,20 +2094,14 @@ class TextView (GUIControl)
 			._start.position = 0
 
 
-	helper ShouldStayAtEnd (|bool|)
+	helper AddLogTrim (|TextViewLine| d, |TextViewLine|)
 		opt norefcounts
-		// surely this should start from the ._Start?
-		// it woudl be faster?
-		// we go from the end down to the start, right?
-		// but the end may be far away.
-		|| curr = ._lines.last
-		|| lim = .MaxVisibleLines
-		|| rz = 0
-		while curr != ._start
-			require curr and rz < lim
-			curr--
-			rz++
-		return true
+		d.position = 0
+		(d isnt last)
+		d.tline = 0
+		d.vline = 0
+		d.Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
+		return .NextVline(d, d, 0)
 
 
 	helper PrepareLinesOfText 
@@ -2110,8 +2112,8 @@ class TextView (GUIControl)
 		|| msg   	  = .Parse(changed >= 2, expect)
 		|| ParsedOK   = (msg!=nil) or (.ExpectsParse <= AllowJeebox)
 		|| Pos	 	  = .StartPos
+		|| StayAtEnd  = .PreferStayAtEnd and ._CanSeeLastLine// and .StartPos > 0
 		|| d		  = .NeedFirst
-		|| StayAtEnd  = .PreferStayAtEnd and .ShouldStayAtEnd
 			
 		// could be nice to make it the general case anyway?
 		// like if new lines are added... we just stay at the end.
@@ -2122,11 +2124,14 @@ class TextView (GUIControl)
 			charw = 4KB
 	
 		|| ARGH = 0 // .ReclaimRestart(d) // disabled for now.
-		|| t = d.tline
-		|| p = d.position // surely that is always 0?
+		|| t = d.tline // always 0?
+		|| p = 0
 		(._Lines isnt breakpoint)
 		._LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
-		
+
+		if ._LogTrimmed
+			d = .AddLogTrim(d)
+
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
@@ -2146,7 +2151,9 @@ class TextView (GUIControl)
 				exit
 
 		.EndPrepare(d, StayAtEnd, pos)
-		if changed == 1 // size changed
+		if changed == 1
+			.ScrollPos = pos
+		  elseif .PreferStayAtEnd and !._CanSeeLastLine
 			.ScrollPos = pos
 
 
