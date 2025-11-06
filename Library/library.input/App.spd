@@ -179,7 +179,7 @@ function Env (|dictionary of string|)
 function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| value, |int|)
 	cpp_wrapper JB_App__SetEnv
 
-function Input (|stringthatwasreadsafely|)
+function Input (|string|)
 	cpp_Wrapper JB_App__Readline
 
 function IsMainThread (|bool|)
