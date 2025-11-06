@@ -4,7 +4,7 @@ module Stability
 	|| LastID = 1
 
 	function Load
-		|| bank = Compiler.InputFileAlways("stable_id_bank.txt")
+		|| bank = Compiler.library["stable_id_bank.txt"]
 		if bank.Open(true)
 			.UseBank(bank)
 			if options.UpdateStability

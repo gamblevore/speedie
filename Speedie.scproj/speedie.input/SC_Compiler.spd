@@ -52,6 +52,7 @@ linkage
 |SCNode|					VisibleFuncs = SCNode("Visible")
 |SCNode|					Interpreter = SCNode("Interpreter")
 |File|						BaseProjectPath  // projectfolder, projfol
+|file|						Library
 |string|					OriginalInputPath
 |File|						_BuildFolder
 |String?|					_Projects = nil
@@ -358,9 +359,9 @@ function Jeebox (|file|)
 function ImportLibs
 	opt norefcounts
 	SCImport.STDLibTime = true	
-	|| Library = .projects.filech("Library")
+	.Library = .projects.filech("Library")
 	|| Jeebox = .Jeebox	
-	SCImport.Importpath( "Library",  Library,	1,  true )
+	SCImport.Importpath( "Library",  Library!,	1,  true )
 	SCImport.Importpath( "jeebox",   Jeebox,	1,  true )
 	
 	compiler.program.CreateInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
