@@ -304,6 +304,9 @@ function Message.Clean (|bool| erl = false)
 						curr.first = @thg + "true"
 					  else
 						curr.name = "ignore"
+				  elseif s == "unfinished"
+					SCFile.curr!.Unfinished = true // for autocomplete
+					curr.remove
 
 
 function message.Tran_Isnt (|string| name)

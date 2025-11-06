@@ -81,7 +81,7 @@ linkage
 |[SCFunction]|				ProtoTypes
 |[scdecl]|					ActualSyxes
 
-|Dictionary of SCNode|		ExportNames = Dictionary()
+|Dictionary of scbetternode|ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
 
 |SCFunction|				RefIncr

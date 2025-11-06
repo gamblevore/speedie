@@ -35,6 +35,7 @@ module Options
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
+	||		UpdateStability			= false
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
@@ -314,6 +315,9 @@ module Feedback
 			Explain(Purpose, "Prints much less")$
 			Options.PrintCompileString = false
 			options.silent = true
+		
+		+'update'
+			options.UpdateStability = true
 		
 		+'stages'
 			Explain(Purpose, "Prints the stages")$

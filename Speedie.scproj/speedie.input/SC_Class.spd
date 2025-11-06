@@ -751,6 +751,9 @@ function LoadConstructors
 
 
 function AfterFuncsDecled 
+	if .NeedID
+		|| s = .TestExportName(.exportname, true)
+			Compiler.ExportNames[s] = self
 	.OverrideSyntax
 		
 	|| c = .ConstructorFunc

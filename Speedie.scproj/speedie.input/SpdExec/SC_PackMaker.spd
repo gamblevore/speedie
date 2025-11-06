@@ -70,17 +70,12 @@ module PackMaker
 		fninit.PackID = 1 // put init and main first!
 		fnmain.PackID = 2
 		
-		|| Obj = TypeObject!.ClassType!
+		|| Obj = TypeObject!.ClassType
 		packmaker.LibGlobs <~ Obj
 		TypeObject!.PackClassChildren(nil)
-
-		|&&nil| Table
-		|| frogs = .PackGlobSize
-		if platform.isdebug
-			Table = jb_vm.vm.InitTable(.libfuncs.length+31, frogs)
 		
-		.SortASMFuncs(.LibFuncs, Table)
-		.SortASMFuncs(.PackFuncs, nil)
+		Stability.load
+		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort(GlobalsSorter)
 		.LibGlobs.sort(GlobalsSorter)
 
@@ -93,7 +88,7 @@ module PackMaker
 		|| fn = .func
 		require fn != @thg and @char
 		if fn == @num
-			return 1 - .iszero
+			return 1 - .IsZero
 			
 		if fn == @bra
 			return .first!.InlineCount(Remain)
@@ -106,23 +101,18 @@ module PackMaker
 			loop Remain > 0
 		return count
 	
-	
-	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
-		opt norefcounts
-		(table)
-		list.sort(&CodeSorter.ExportNames)
 
+	helper PackIDFuncs (|[scfunction]| list)
+		opt norefcounts
+		list.sort(&CodeSorter.ExportNames)
 		|| ID = 0
 		while (|| f = list[id])
 			f.PackID = ++id			
-			target debug
-				if Table
-					Table[id+31] = jb_vm.Load(f.exportname)
 	
 	
 	function WriteLibFuncs (|jbin!| j)
 		opt norefcounts
-		todo "Write the LibFuncs via c++ structs, instead of jbin, like array of name/ptr pairs"
+		// we will remove this.
 		
 		j.Enter(@prm)
 		for f in .libfuncs
@@ -160,7 +150,7 @@ module PackMaker
 		Assembler.Sh.Fullinit
 		PackMaker.AddAll
 		.BuildGlobs // Sorts too
-		.FinalPrepare		
+		.FinalPrepare	
 		if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry = true
 			.WritePackToDisk
 		compiler.During = 0

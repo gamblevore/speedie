@@ -13,6 +13,7 @@ class SCFile (file)
 	|Message?|		OrigAST
 	|uint16|		FileNum
 	|bool|			IsInternal
+	|bool|			Unfinished
 	|[scclass]?|	Types
 
 
@@ -100,6 +101,7 @@ class SCFile (file)
 		FlowControl.DisabledIncr(-1) // also... parse/parseclean will find REAL differences.
 		
 		if str
+			curr = self
 			|| Layer = (Message).CreateLayerAndUse(self, str)
 			layer.num3 = .filenum
 			.fData = str

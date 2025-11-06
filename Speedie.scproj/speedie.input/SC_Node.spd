@@ -436,16 +436,17 @@ function SCFunction.FindCppWrapperFunc (|message| place, |message|)
 
 function SCFunction.FoundOneCpp (|string| n, |bool|)
 	if n == "cpp_nothing"
-		.noautocomplete = 1
-		.IsCppInBuilt() = 2 // speedie will turn these into ASM isntructions
+		.NoAutoComplete = 1
+		.IsCppInBuilt = 2 // speedie will turn these into ASM isntructions
 		return true
+	
 	if n == "cpp_libwrapper"
-		.noautocomplete = 1
+		.NoAutoComplete = 1
 		Is ExternalLib
 		return true
 
 
-function LoadExportName 
+function SCBetterNode.LoadExportName 
 	// Project_Class_Func
 	// Project_Module__Func	
 	require !.ExportName
@@ -468,20 +469,19 @@ function LoadExportName
 		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and (self isnt disabled)
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
-		cppname = .exportnamebuilder(cpppart)
+		cppname = .ExportNameBuilder(cpppart)
 		(self Is Wrapper) = cw!=nil
 	  else
 		CppPart ?= .Name
 		CppName ?= CppPart
 
-		if self isa SCModule
-			.CppPart = CppPart
-
-		  elseif self isa scclass
+		if self isa scclass
 			.Modul.CppPart = CppPart
 			|| e = place.FindAndRemove( "cpp_class", false, true )
 				.CppClass = e.unicodesafename
-			.Modul.SetExportName( CppPart + "_", false ) // remove this? just try... once everything is working.
+			.Modul.SetExportName( CppPart + "_", false )
+		  else // SCBetterNode can only be a class, module, or function.
+			self|scmodule|.CppPart = CppPart
 
 	.SetExportName( CppName, false )
 
@@ -497,7 +497,7 @@ function LookUpFunc (|String| name, |Message| exp, |scobject|)
 
 function ProjectFix (|SCNode|)
 	opt norefcounts
-	if (self == compiler.program)
+	if self == compiler.program
 		|| c = scimport.curr
 			return c.Mod
 	return self
@@ -744,7 +744,7 @@ function UniquifyExport (|String| s, |string|)
 		return s3
 
 
-function RehomeExport (|bool|)
+function SCBetterNode.RehomeExport (|bool|)
 	check (!.IsLibrary) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
 	|| newhome = .UniquifyExport(.exportname)			#require
 	compiler.ExportNames[.exportname] = nil
@@ -783,15 +783,17 @@ function TestExportName (|String| s, |bool| Explicit, |string|) {
 }
 
 
-function SetExportName (|String| s, |bool| Explicit)
+function SCBetterNode.SetExportName (|String| name, |bool| Explicit)
+	|| IsFunc = false
 	if self isa scfunction
 		require !.ismacro
+		isfunc = true
 
-	s = s.UnicodeSafeName
-	ifn (self isa SCModule) or (self isa SCClass)		// modules aren't really accessable like that.
+	|| s = name.UnicodeSafeName
+	if IsFunc											// modules aren't really accessable like that.
 		s = .TestExportName(s, explicit)				#require
 		Compiler.ExportNames[ s ] = self
-
+	
 	(self is ExplicitExport) = Explicit
 	.ExportName = s
 
@@ -963,6 +965,7 @@ module {
 
 class SCBetterNode (SCNode)
 	|string|	Description
+	|uint16|	PackID
 	constructor
 		//
 	constructor (|message| msg)

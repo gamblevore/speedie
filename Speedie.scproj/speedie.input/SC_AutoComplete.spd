@@ -172,10 +172,10 @@ function UnusedStuff (|message| cmd, |message|)
 		for lib in unused_libs
 			if lib.ExpectString
 				lib.HateUnusedFuncs
-			
+	
 	cmd.Clear
 	
-	if !Compiler.Successfulness
+	if !Compiler.Successfulness or scf.Unfinished
 		return cmd
 
 	// what about constants, and globals that are unused?

@@ -1,0 +1,69 @@
+
+
+module Stability
+	|| LastID = 1
+
+	function Load
+		|| bank = Compiler.InputFileAlways("stable_id_bank.txt")
+		if bank.Open(true)
+			.UseBank(bank)
+			if options.UpdateStability
+				|| fs = FastString()
+				.FillMissingLibFuncs(fs)
+				bank <~ fs|string| // hehe
+			  else
+				.FakeMissingLibFuncs
+	
+
+	function FakeMissingLibFuncs // doesnt seem to fix the problem.
+		opt norefcounts
+		for (fn in PackMaker.LibFuncs) (i)
+			if !fn.IsMacro and fn isnt disabled
+				fn.packid = i+1
+		for (cl in Compiler.ClassList) (i)
+			if cl.needid
+				cl.PackID = i+1
+
+
+	function FillMissingLibFuncs (|faststring| fs)
+		opt norefcounts
+		for cl in Compiler.ClassList
+			if cl.NeedID
+				cl.MakeID(fs)
+		
+		|&&nil| Table
+		|| frogs = packmaker.PackGlobSize
+		if platform.isdebug
+			Table = jb_vm.vm.InitTable(packmaker.libfuncs.length+31, frogs)
+
+		for fn in PackMaker.LibFuncs
+			if !fn.IsMacro and fn isnt disabled
+				|| id = fn.MakeID(fs)
+				if table
+					Table[id+31] = jb_vm.Load(fn.exportname) // an actual function pointer for testing
+		
+		
+	function scclass.NeedID (|bool|)
+		return .IsLibrary and (!.isrole and .IsObject)
+	
+	
+	function scbetternode.MakeID (|faststring| fs, |int|)
+		|| id = .packid
+			return id
+		if fs.Length
+			fs <~ "\n"
+		fs <~ .ExportName
+		return Stability.LastID++
+				
+
+	function UseBank (|file| bank)
+		|| data = bank.ReadAll(1MB)
+			|| ID = LastID
+			for str.lines in data
+				id++
+				|| fn = Compiler.ExportNames[str]
+					check (!fn.PackID) (str + " replicated ID.")
+					fn.PackID = id
+			// now we have all the IDs set. But what if we have some not inside? we need to handle those too
+			LastID = ID	
+		

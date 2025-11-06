@@ -75,7 +75,6 @@ linkage
 |FunctionType|			FuncInfo
 |uint16|				LinkDepth
 |uint16|				TmpCounter
-|uint16|				PackID
 |uint16|				LinkID
 |uint16|				ReturnCount
 |int|					StackAllocGuess

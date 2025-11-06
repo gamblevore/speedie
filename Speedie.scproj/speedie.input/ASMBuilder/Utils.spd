@@ -13,7 +13,7 @@ function message.ASMDecl (|SCDecl!|)
 			.parent!.obj = rz // fix it up.
 		  else
 			if ++ExportPosFails <= 2
-				error (self, "No export position on: " + .locate)				
+				error (self, "ASM Glob lacks pos: " + .locate + " Maybe use spd --update")
 	
 	if rz.typeonly == 0
 		rz.wholetype = rz.CalculateASMType
