@@ -1269,6 +1269,7 @@ struct SCBetterNode_Behaviour: SCNode_Behaviour {
 
 JBClass ( SCBetterNode , SCNode , 
 	JB_String* Description;
+	u16 PackID;
 );
 
 struct SCFile_Behaviour: File_Behaviour {
@@ -1276,12 +1277,13 @@ struct SCFile_Behaviour: File_Behaviour {
 
 JBClass ( SCFile , JB_File , 
 	bool IsInternal;
+	bool Unfinished;
 	u16 FileNum;
 	Message* OrigAST;
 	Message* LiveAST;
 	JB_String* FData;
-	SCImport* Proj;
 	JB_String* ExportName;
+	SCImport* Proj;
 	Array* Types;
 );
 
@@ -1378,16 +1380,16 @@ JBClass ( SCFunction , SCBetterNode ,
 	byte IsNilChecker;
 	byte Badness;
 	byte StructReturnPos;
-	u16 PackID;
-	u16 LinkID;
 	u16 ReturnCount;
 	u16 LinkDepth;
 	u16 TmpCounter;
-	FunctionType FuncInfo;
+	u16 LinkID;
 	int StackAllocGuess;
+	FunctionType FuncInfo;
 	uint xC2xB5Start;
 	uint xC2xB5LengthGuess;
 	uint xC2xB5Length;
+	SCDecl* HasProto;
 	SCClass* ProtoType;
 	SCDecl* ReturnType;
 	SCFunction* DepthFinder;
@@ -1399,7 +1401,6 @@ JBClass ( SCFunction , SCBetterNode ,
 	JB_Error* SavedError;
 	Message* Intrinsic;
 	SCFunction* NextFunc;
-	SCDecl* HasProto;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
@@ -1474,6 +1475,7 @@ extern JB_File* SC__Comp_JeeboxProj_;
 
 extern Date SC__Comp_LastTime;
 extern JB_String* SC__Comp_LastTimeName;
+extern JB_File* SC__Comp_Library;
 extern SCFunction* SC__Comp_MainFunc;
 extern Array* SC__Comp_ModuleList;
 extern Dictionary* SC__Comp_Numbers;
@@ -1526,18 +1528,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2256])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2261])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2257])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2262])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2258])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2263])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2255])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2260])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2258])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2263])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2259])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2264])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1612,6 +1614,8 @@ extern bool SC__Options_ArgStats;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 extern bool SC__Options_Compile;
+#define kSC__Options_cpp ((int)1)
+
 extern int SC__Options_Dev;
 extern JB_String* SC__Options_exe_path;
 extern bool SC__Options_ExternalCompile;
@@ -1622,10 +1626,7 @@ extern bool SC__Options_InlineLib;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
 extern bool SC__Options_MakeInterpreter;
-extern byte SC__Options_ModeCpp;
-extern byte SC__Options_ModePack;
-#define kSC__Options_native ((int)1)
-
+extern byte SC__Options_Mode;
 extern bool SC__Options_NilTestAllocNeverFails;
 extern byte SC__Options_OperationCount;
 extern int8 SC__Options_Optimise;
@@ -1645,6 +1646,7 @@ extern bool SC__Options_Silent;
 extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
 extern bool SC__Options_TargetDebug;
+extern bool SC__Options_UpdateStability;
 extern byte SC__Options_UseScriptLoc;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
@@ -1707,6 +1709,7 @@ extern Macro* SC__SCTasks_TaskMacro;
 extern Message* SC__SCTasks_tmp;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
+extern int SC__Stability_LastID;
 extern Array* SC__Crkt_CppStrings;
 extern Dictionary* SC__Crkt_Table2;
 extern int SC__Crkt_TotalSize;
@@ -1770,7 +1773,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2264])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2269])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1807,7 +1810,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2260])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2265])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1847,7 +1850,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2265])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2270])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2079,12 +2082,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2263])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2268])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2262])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2267])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2261])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2266])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3299,7 +3302,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2254])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2259])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3852,6 +3855,8 @@ bool SC_FB__AppOptions_target(JB_String* Name, JB_String* Value, FastString* Pur
 
 bool SC_FB__AppOptions_targetdebug(JB_String* Name, JB_String* Value, FastString* Purpose);
 
+bool SC_FB__AppOptions_update(JB_String* Name, JB_String* Value, FastString* Purpose);
+
 bool SC_FB__AppOptions_usescriptloc(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_variant(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -4089,6 +4094,10 @@ bool SC_Options__Color();
 
 int SC_Options__Init_();
 
+bool SC_Options__ModeCpp();
+
+bool SC_Options__ModePack();
+
 
 
 // Output
@@ -4131,11 +4140,11 @@ void SC_PackMaker__PackClasses(FastString* J);
 
 int SC_PackMaker__PackGlobSize();
 
+void SC_PackMaker__PackIDFuncs(Array* List);
+
 void SC_PackMaker__RenderASM(FastString* J, FastString* Func_names);
 
 void SC_PackMaker__RunAFewTests();
-
-void SC_PackMaker__SortASMFuncs(Array* List, void** Table);
 
 void SC_PackMaker__WriteLibFuncs(FastString* J);
 
@@ -4334,6 +4343,17 @@ int SC_SC_Targets__Init_();
 bool SC_SC_Targets__SyntaxAccess(JB_String* Name);
 
 void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
+
+
+
+// Stability
+void SC_Stability__FillMissingLibFuncs(FastString* Fs, int Frogs);
+
+int SC_Stability__Init_();
+
+void SC_Stability__Load();
+
+void SC_Stability__UseBank(JB_File* Bank);
 
 
 
@@ -9574,8 +9594,6 @@ Message* SC_Base_LinkagePlace(SCNode* Self);
 
 Array* SC_Base_ListFunctions(SCNode* Self);
 
-void SC_Base_LoadExportName(SCNode* Self);
-
 bool SC_Base_LoadVisibility(SCNode* Self, Message* P);
 
 JB_Object* SC_Base_LookUpDot(SCNode* Self, JB_String* Name, Message* Exp, SCNode* Arg_space, SCDecl* Contains, Message* Side);
@@ -9598,13 +9616,9 @@ SCNode* SC_Base_ProjectFix(SCNode* Self);
 
 JB_String* SC_Base_ReachedName(SCNode* Self);
 
-bool SC_Base_RehomeExport(SCNode* Self);
-
 SCDecl* SC_Base_RequireContained(SCNode* Self, Message* Errplace);
 
 Message* SC_Base_Route(SCNode* Self, JB_String* Name);
-
-void SC_Base_SetExportName(SCNode* Self, JB_String* S, bool Explicit);
 
 SCClass* SC_Base_ShouldBeClass(SCNode* Self, Message* Errplace);
 
@@ -11064,7 +11078,15 @@ SCBetterNode* SC_SCBetterNode_ConstructorWithMsg(SCBetterNode* Self, Message* Ms
 
 void SC_SCBetterNode_Destructor(SCBetterNode* Self);
 
+void SC_SCBetterNode_LoadExportName(SCBetterNode* Self);
+
+int SC_SCBetterNode_MakeID(SCBetterNode* Self, FastString* Fs);
+
 void SC_SCBetterNode_ReadDescription(SCBetterNode* Self, Message* Msg);
+
+bool SC_SCBetterNode_RehomeExport(SCBetterNode* Self);
+
+void SC_SCBetterNode_SetExportName(SCBetterNode* Self, JB_String* Name, bool Explicit);
 
 
 
@@ -11360,6 +11382,8 @@ SCDecl* SC_Class_MakeClassType(SCClass* Self, SCDecl* D);
 int SC_Class_MiniSize(SCClass* Self, int B);
 
 void SC_Class_ModelDecls(SCClass* Self);
+
+bool SC_Class_NeedID(SCClass* Self);
 
 void SC_Class_NeedsDefaultValue(SCClass* Self, Message* Def, Message** Place, JB_String* Name);
 
