@@ -9,7 +9,7 @@ class TextView (GUIControl)
 	|bool| 						ShowLineNumbers
 	|bool|						GroupSaveAll
 	|byte|						LineHeight
-	|bool|						PreferStayAtEnd
+	|bool|						IsALogTextView // Is this textview used for displaying a Log.
 	|byte|						ExpectsParse
 	|int8|						YAdjust
 	|MoveCode|					Alignment // centered, left, right
@@ -46,12 +46,12 @@ class TextView (GUIControl)
 		._reclaim = (0, 1GB, 0)
 		|| TV = TextViewLine()
 		._Lines = TV
-		._Start = TV					// make nilchecker happy
+		._Start = TV							// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
 		._CanAutoComplete = 2
-		.LineHeight = font.Height + 4	// whatever
+		.LineHeight = font.Height + 4			// Whatever
 		.ExpectsParse = TextView.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
@@ -1804,7 +1804,7 @@ class TextView (GUIControl)
 			|| Diff = NO - NR
 			if Diff < 0
 				._RemainingHeight += Diff * .LineHeight
-				._Start = ._Start.MoveCapped(Diff)
+				.reallysetstart( ._Start.MoveCapped(Diff))
 // were losing some remain somehow. not sure why. IDK maths?
 //				|| OldLoss = Old - (NO * .lineheight)
 //				|| NewLoss = Remain - (NR * .lineheight)
@@ -1941,7 +1941,7 @@ class TextView (GUIControl)
 	
 	helper StartWithoutScrollDraw (|TextViewJumpMode| mode=0, assigns:|TextViewLine!| d)
 		opt norefcounts
-		if mode is slowscroll
+		if mode is SlowScroll
 			d = d.SlowMove(._Start, 2)
 
 		|| n = 3 - .MaxVisibleLines
@@ -1955,12 +1955,14 @@ class TextView (GUIControl)
 	
 	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
-		if ._Start != d
-			._Start = d
+		require ._Start != d
+		._Start = d
+		|| p = d.Position
+			._lines.Position = p
 			|| doc = .document
-				doc.scrollpos = d.position
-			.ShowExtraInfo(GUI.mousexy, false)
-			GUI.touch(self)
+				doc.scrollpos = p
+		.ShowExtraInfo(GUI.mousexy, false)
+		GUI.touch(self)
 			
 	
 	helper Clear (|string| NewText, |bool|)
@@ -1973,8 +1975,7 @@ class TextView (GUIControl)
 		
 		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
-
-		._Start = ._lines
+//		._Start = ._lines
 		._lines.clear
 
 		|| d = textviewline()
@@ -2055,7 +2056,7 @@ class TextView (GUIControl)
 	helper Parse (|bool| Changed, |int| expect, |message|)
 		cpp_Part ViewParseSub
 		if !.WillAttemptParse(expect)
-			.myerror = nil // more reliable
+			.MyError = nil // more reliable
 			return nil
 		
 		|| p = .ParsedMessage
@@ -2088,10 +2089,9 @@ class TextView (GUIControl)
 
 	helper StartPos (|int|)
 		opt norefcounts
-		rz = ._start.position
-		if rz < 0
-			rz = 0
+		if ._start.position < 0
 			._start.position = 0
+		return ._lines.position
 
 
 	helper AddLogTrim (|TextViewLine| d, |TextViewLine|)
@@ -2112,7 +2112,7 @@ class TextView (GUIControl)
 		|| msg   	  = .Parse(changed >= 2, expect)
 		|| ParsedOK   = (msg!=nil) or (.ExpectsParse <= AllowJeebox)
 		|| Pos	 	  = .StartPos
-		|| StayAtEnd  = .PreferStayAtEnd and ._CanSeeLastLine// and .StartPos > 0
+		|| StayAtEnd  = .IsALogTextView and ._CanSeeLastLine// and .StartPos > 0
 		|| d		  = .NeedFirst
 			
 		// could be nice to make it the general case anyway?
@@ -2127,7 +2127,9 @@ class TextView (GUIControl)
 		|| t = d.tline // always 0?
 		|| p = 0
 		(._Lines isnt breakpoint)
-		._LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
+		._LineNumWidth = 0
+		if .ShowLineNumbers or Expect >= 3
+			._LineNumWidth = .text.TextLineCount.LineNumWidth
 
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
@@ -2150,24 +2152,16 @@ class TextView (GUIControl)
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit
 
-		.EndPrepare(d, StayAtEnd, pos)
-		if changed == 1
-			.ScrollPos = pos
-		  elseif .PreferStayAtEnd and !._CanSeeLastLine
-			.ScrollPos = pos
-
-
-	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
-		opt norefcounts
-		(pos)
 		d.RemoveAfter
 		._PreferPrevLine = false
 		if StayAtEnd
 			|| n = 1 - .MaxVisibleLines
-			|| D2 = d.movecapped(n)
-			.StartWithoutScrollDraw(D2)
+			d = d.MoveCapped(n)
+		  elseif (changed == 1) or .IsALogTextView
+			d = .FindScroll(pos)
 		  else
-			.StartWithoutScrollDraw(._Lines.first!)
+			d = ._Lines.first!
+		.StartWithoutScrollDraw(d)
 		.ClearReclaim	
 	
 	
@@ -2211,6 +2205,14 @@ class TextView (GUIControl)
 //		return ._Start.position
 
 
+	helper FindScroll (|int| Value, |textviewline!|)
+		opt norefcounts
+		for s in ._Lines
+			if s.Position >= Value
+				return s
+		return ._lines.first!
+		
+		
 	helper UnloadDoc (|document| old)
 		opt norefcounts
 		old.ScrollPos = .scrollpos
@@ -2337,7 +2339,7 @@ helper string.InsertTrim (|ivec2|)
 
 
 helper string.DeleteTwoBytes (|ivec2|r, |string|)
-	|| fs = faststring()
+	|| fs = faststring(.length-2)
 	fs <~ self[0,       r.x]
 	fs <~ self[r.x+1,   r.x2+1]
 	fs <~ self[r.x2+2,  int.max]
@@ -2364,13 +2366,4 @@ datatype TextViewJumpMode (int)
 		WantAGoodView
 	syntax is (|TextViewJumpMode| m, |bool|)
 		return self|int| & m|int|
-
-
-	
-//		Arrow		// arrow
-//		IBeam		// i-beam
-//		SizeWE		// double arrow west and east
-//		SizeNS		// double arrow north and south
-//		No			// slashed circle or crossbones
-//		Hand		// hand
 

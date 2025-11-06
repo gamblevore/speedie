@@ -612,10 +612,9 @@ extend PerryIDE
 		isnt drawsfocus
 		.ID				= name
 		.size 			= the~width by the~bottom to 0~under
-//		.takesfocus		= takesfocusflag.On
 		.gnormal.solid	= vec4(0.077, 0.95)
 		.expectsparse	= Parse
-		.PreferStayAtEnd= true
+		.IsALogTextView = true
 		.ide.productsep.addleft(self)
 		
 		

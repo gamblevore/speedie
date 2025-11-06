@@ -22,7 +22,7 @@ class FastString {
 /////
 
 	constructor							{ cpp_wrapper JB_FS_Constructor }
-	constructor (|int|size)				{ cpp_wrapper JB_FS_ConstructorSize }
+	constructor (|int| BufferSize)		{ cpp_wrapper JB_FS_ConstructorSize }
 	destructor							{ cpp_wrapper JB_FS_Destructor }
 
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
