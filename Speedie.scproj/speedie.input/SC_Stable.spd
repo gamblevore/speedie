@@ -8,9 +8,11 @@ module Stability
 		|| bank = Compiler.library["stable_id_bank.txt"]
 		if bank.Open(true)
 			.UseBank(bank)
-			if options.UpdateStability()
+			if options.UpdateStability
 				|| fs = FastString()
 				.FillMissingLibFuncs(fs, frogs)
+				if bank.size > 0
+					bank <~ "\n"
 				bank <~ fs|string| // hehe
 
 	
@@ -37,12 +39,14 @@ module Stability
 	
 	
 	function scbetternode.MakeID (|faststring| fs, |int|)
-		|| id = .packid
+		|| id = .PackID
 			return id
 		if fs.Length
 			fs <~ "\n"
 		fs <~ .ExportName
-		return Stability.LastID++
+		id = Stability.LastID++
+		.PackID = id
+		return id
 				
 
 	function UseBank (|file| bank)
