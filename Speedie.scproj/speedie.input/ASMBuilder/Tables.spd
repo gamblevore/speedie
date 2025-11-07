@@ -433,8 +433,10 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	if d.CanCopyNormally
 		if dest isnt AddrRequest
 			dest.µType = exp.ASMDecl.mu.DataType
-			if !d.IsCarray									 		// what if its a carray to a pointer?
-				d = d.internal!		
+// not sure why this was needed?
+//			if !d.IsCarray									 		// what if its a carray to a pointer?
+//				debugat 10
+//				d = d.internal!
 			return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
 	  elseif dest is set
 		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()	

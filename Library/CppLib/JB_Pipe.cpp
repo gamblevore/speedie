@@ -203,12 +203,6 @@ int JB_Sh_StartProcess (ShellStream* S) {
 }
 
 
-void JB_Sh_Close (ShellStream* self) {
-//	PicoClose(self->StdErr);
-//	PicoClose(self->StdOut);
-}
-
-
 static JB_String* ReadPico (PicoMessage M) {
 	if (M)
 		return JB_Str__Freeable((uint8*)M.Data, M.Length);

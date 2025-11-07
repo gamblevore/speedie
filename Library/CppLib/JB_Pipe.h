@@ -40,7 +40,6 @@ bool JB_Sh_Step(ShellStream* self);
 int JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, int Mode, Date Timeout);
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R);
 int JB_Sh_StartProcess(ShellStream* self);
-void JB_Sh_Close(ShellStream* self);
 JB_String* JB_Sh_ReadStdErr (ShellStream* self);
 JB_String* JB_Sh_ReadStdOut (ShellStream* self);
 bool JB_App__TurnInto(JB_String* self, Array* R); 

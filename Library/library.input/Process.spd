@@ -42,9 +42,6 @@ class Process
 	
 	function PID (|int|)
 		cpp_wrapper
-	
-	function ClosePipes
-		cpp_wrapper JB_Sh_Close
 
 	function ReadStdOut (|string|)
 		cpp_wrapper

@@ -11,9 +11,10 @@ module Stability
 			if options.UpdateStability
 				|| fs = FastString()
 				.FillMissingLibFuncs(fs, frogs)
-				if bank.size > 0
-					bank <~ "\n"
-				bank <~ fs|string| // hehe
+				if fs.Length
+					if bank.size > 0
+						bank <~ "\n"
+					bank <~ fs|string| // hehe
 
 	
 
