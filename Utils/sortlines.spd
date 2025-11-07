@@ -1,0 +1,6 @@
+#!/usr/local/bin/speedie
+
+main (|file.existing| TextFile)
+	|| d = TextFile.ReadAll
+		d = d.Sort
+		TextFile.Data = d
