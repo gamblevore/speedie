@@ -209,7 +209,7 @@ Relative paths take the current working directory.`
 		return .AfterByte('/', Last)
 	
 
-	helper String.FindSlash (|int| from, |ind|)
+	autogen String.FindSlash (|int| from, |ind|)
 		if from < .length
 			rz = .find('/', from)
 			if !rz

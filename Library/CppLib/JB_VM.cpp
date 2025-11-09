@@ -26,9 +26,8 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 	if (!V)
 		return 0;
 	auto Ret = V->Registers;
-	if (Clear) {
+	if (Clear)
 		memset(Ret, 0xFE, sizeof(VMRegister)*35);
-	}
 	return (ivec4*)(Ret+3);
 }
 
@@ -81,12 +80,18 @@ ivec4* RunVM (jb_vm& pvm) {				// vm_run, vm__run, vmrun, run_vm
 
 
 void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
-	free(vm->Env.Cpp);
-	auto Result = (byte*)calloc(n*sizeof(void*) + g, 1);
-	bool OK = Result!=0;
-	vm->Env.Cpp = (Fn0*)(Result+g*OK);
-	vm->Env.PackGlobs = Result;
-	return (void**)(vm->Env.Cpp);
+	free(vm->Env.CppFuncs);
+	vm->Env.PackGlobs = 0;
+	vm->Env.CppFuncs = 0;
+	// some sentinel space would be nice.
+	auto Result = (byte*)calloc(n*sizeof(void*) + g + 8, 1);
+	if (Result) {
+		((int64*)(Result + g))[0] = 0x12345789ABCDEFED;
+		vm->Env.PackGlobs = Result;
+		vm->Env.CppFuncs = (Fn0*)(Result + g + 8);
+		return (void**)(vm->Env.CppFuncs);
+	}
+	return 0;
 }
 
 

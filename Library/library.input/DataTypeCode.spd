@@ -173,20 +173,20 @@ datatype DataTypeCode (uint16)
 			return .VecCount
 	
 	function ItemBitCount (|int|)
-		return 8 << ._shift
+		return 8 << .ByteShift
 	
-	helper _Shift (|uint|)
+	function ByteShift (|uint|)
 		return (self >> 4) & 3
 
 	function ByteCount (|int|)
-		return .VecCount << ._Shift
+		return .VecCount << .ByteShift
 
 	function BitCount (|int|)
 		// not sure I actually WANT VecCount for most things?
 		// we don't have boolvecs anyhow :)
 		if self is bool
 			return 1
-		return (.VecCount << ._Shift) << 3
+		return (.VecCount << .ByteShift) << 3
 
 	function VecCount (assigns:|int|, |datatypecode|)
 		return (self &~ 3) ||| (Value-1)

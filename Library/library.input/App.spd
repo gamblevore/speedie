@@ -72,7 +72,7 @@ function CrashLog (|cstring| value)
 
 syntax access (|string| name, |string|)
 	opt norefcounts
-	for R in .rawargs
+	for R in ._rawargs
 		if R.argname ~= name
 			rz = R.argvalue
 			exit
@@ -88,13 +88,13 @@ function Options (|[string]|)
 
 function Switches (|[string]|)
 	opt norefcounts
-	for R in .RawArgs
+	for R in ._RawArgs
 		if R.ArgName
 			rz <~ R
 	
 
 helper args_ (|[string]|)
-	for R in .rawargs
+	for R in ._rawargs
 		if R.ArgName ~= ""
 			rz <~ r
 
@@ -142,7 +142,7 @@ render StackTrace (|int| skip = 2)
 
 
 function Restart
-	.turninto(.path, .rawargs)
+	.turninto(.path, ._rawargs)
 
 function ThreadName (assigns:|string|)
 	cpp_Wrapper JB_App__SetThreadName
@@ -188,17 +188,17 @@ function IsMainThread (|bool|)
 helper IsThreadedAsLib (|bool|)
 	cpp_wrapper JB_LibIsThreaded
 	
-helper ParentID (|pid_int|)
+function ParentID (|pid_int|)
 	cpp_wrapper JB_App__ParentID
 	
-helper ID (|pid_int|)
+function ID (|pid_int|)
 	cpp_wrapper JB_App__ID
 
 
 function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
 	cpp_Wrapper JB_SP_Run
 
-helper rawargs  (|array of string|)
+function _RawArgs  (|array of string|)
 	cpp_wrapper JB_App__Args
 
 function exit (|int| Code=0)
@@ -243,7 +243,7 @@ helper _chdir (|string| path, |ErrorInt|)
 
 
 target debug
-	helper SetASMBreak (|bool| b)
+	function SetASMBreak (|bool| b)
 		cpp_wrapper JB_App__SetASMBreak
 
 
@@ -289,8 +289,7 @@ helper LeakUnMarkMemory
 helper IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
 
-
-helper Configure (assigns:|string|)
+autogen Configure (assigns:|string|)
 	._conf  = Value.Parse
 	if !._conf
 		printline stderr.pop!.render
@@ -309,7 +308,6 @@ function PrefsPath (|string|)
 function PrefsSave
 	opt norefcounts
 	._Prefs.save?
-
 
 
 
@@ -340,6 +338,7 @@ function ShowURL (|string| path)
 function ShowURLC (|cstring| path)
 	cpp_wrapper JB_App__ShowURL
 }
+
 
 }
 

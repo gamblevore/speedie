@@ -130,7 +130,7 @@ module Perry
 		.LoadRecents
 	
 		if app.CWD == "/"
-			app.args.remove("YES", true)	// MacOSX work around bug
+			app.RemoveArg("YES")
 
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever

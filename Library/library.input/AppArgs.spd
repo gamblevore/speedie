@@ -58,7 +58,7 @@ helper @int.MainArg         (|int| Pos, |string| name, |int|)
 	expect (big <= int.max and big >= int.min) ("Int out of range")
 	return big
 
-helper @int64.MainArg         (|int| Pos, |string| name,  |int64|)
+helper @int64.MainArg       (|int| Pos, |string| name,  |int64|)
 	return string.MainArgSub(Pos, name, "integer")$.int
 
 helper @bool.MainArg        (|int| Pos, |string| name,  |bool|)

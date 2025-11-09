@@ -87,7 +87,7 @@ class FastString {
 			self <~ N|byte|
 			n >>= 8
 
-	helper AppendHInt (|int| n)
+	function AppendHInt (|int| n)
 		while n >= 128
 			.AppendByte(n ||| 128)
 			n >>= 7

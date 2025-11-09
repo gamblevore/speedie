@@ -18,9 +18,11 @@ linkage
 |SCImport--?|						Project
 
 
-function IsLibrary (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
+function IsLibrary (|bool|) // .islib, .isntlib
 	opt norefcounts
-	return .Project.IsSTDLib?
+	|| p = .project
+		if p.Where contains "GUI"
+		return p.IsSTDLib
 
 
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
@@ -992,6 +994,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
+	+'autogen'				SCFunction.NewHelper
 	+'macro'				SCFunction.NewMacro
 	+'insertion'			SCThe.NewInsertion
 	+'conf'					compiler.WrongConf
@@ -1034,6 +1037,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+'api'					SCFunction.NewFunc
 	+'macro'				SCFunction.NewMacro
 	+'helper'				SCFunction.NewHelper
+	+'autogen'				SCFunction.NewHelper
 	+'behaviour'			SCBehaviour.NewActual
 	+'actual'				SCBehaviour.NewActual
 	+'virtual'				SCBehaviour.NewVirtual
@@ -1077,6 +1081,7 @@ datatype SCNodeInfo (byte)
 		Visible
 		AllowLinkedLists
 		InBuilt
+		Private
 		
 
 

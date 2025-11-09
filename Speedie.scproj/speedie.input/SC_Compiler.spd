@@ -364,6 +364,11 @@ function ImportLibs
 	SCImport.Importpath( "Library",  Library!,	1,  true )
 	SCImport.Importpath( "jeebox",   Jeebox,	1,  true )
 	
+	scimport.STDLibTime = false
+	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
+	compiler.Project = SCImport(ToUse, false)
+
+	scimport.curr = compiler.project // perhaps I should put it into there instead of compiler.program anyhow.
 	compiler.program.CreateInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
 	compiler.program.CreateInitFuncSub(.AppInitCode,    "InitAppCode_")
 
@@ -371,13 +376,16 @@ function ImportLibs
 function ImportProj 
 	opt norefcounts
 	SCImport.STDLibTime = false
-	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
-	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
-	|| proj = compiler.Project									#expect ("No user-project found.")
-	if !compiler.ConfMsg										// we need a conf, for prefs to work
+	|| proj = compiler.Project!
+	|| F = proj.Where!
+	if F.path ~!= .jeebox
+		require scimport.ImportPathSub("", F, proj, F.path.lowercase)
+
+
+	if !compiler.ConfMsg			// Need a conf, for prefs to work.
 		|| conf = @tmp+"conf"
-		conf.Position = -2	// make ASM happy. I wonder if theres a way to say that it comes
-							// from an internal file.
+		conf.Position = -2			// make ASM happy. I wonder if theres a way to say that it comes
+									// from an internal file.
 		using conf
 		conf["prefs"] = Compiler.ProjectName + ".box.pref"
 		.SetConf(proj, conf)

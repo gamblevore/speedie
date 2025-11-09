@@ -204,7 +204,7 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 	opt norefcounts
 	if parser.using.position < 0
 	rz = SCRefs.RefMsg0(name, func)
-	rz.Last! <~ msg.CopySub(rz)
+	rz.Last! <~ msg.CopyWithoutUsing(rz)
 	rz.obj = func.returntype ?? typevoid
 
 

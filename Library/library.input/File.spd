@@ -281,7 +281,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	syntax access (|string| name, |File!|)
 		return .Child(name)
 
-	helper ListStart (|DirectoryReader|)
+	autogen ListStart (|DirectoryReader|)
 		cpp_wrapper
 
 //	function ListActive (|bool|)
@@ -580,13 +580,13 @@ struct DirectoryReader
 		cpp_class JB_DirReader
 	size 24
 
-	helper ListEnd
+	autogen ListEnd
 		cpp_wrapper JB_File_ListEnd
 
-	helper MoveNext (|bool|)
+	autogen MoveNext (|bool|)
 		cpp_wrapper JB_File_MoveNext
 
-	helper CurrChild (|int| MakeDirsObvious=0, |String|)
+	autogen CurrChild (|int| MakeDirsObvious=0, |String|)
 		cpp_wrapper JB_File_CurrChild
 	
 

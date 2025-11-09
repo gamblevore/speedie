@@ -344,7 +344,7 @@ class TextView (GUIControl)
 	helper SelDirect (|IntRange| value, |TextViewLine| d)
 		.TypingPlaceTry(value, false, d)
 
-	helper SelectedLine (|textviewline|)
+	autogen SelectedLine (|textviewline|)
 		return .FindDrawInfo(.sel0)
 
 	helper TypingPlaceReal (assigns:|intrange| result)
@@ -1057,14 +1057,14 @@ class TextView (GUIControl)
 			.ErrorAt(e)
 	
 	
-	helper ErrorJump (|int| pos)
+	function JumpToError (|int| pos)
 		.MoveSelection(pos, .MaxVisibleLines/2)
 	
 	
 	function ErrorAt (|error| err)
 		opt norefcounts
 		if err
-			.ErrorJump(err.position)
+			.JumpToError(err.position)
 			.AddErrorToLine( err, true )
 	
 
@@ -1079,7 +1079,7 @@ class TextView (GUIControl)
 				d.LineError = nil
 
 
-	helper AddErrorToLine (|error| e, |bool| ForceParse=true, |textviewline|)
+	function AddErrorToLine (|error| e, |bool| ForceParse=true, |textviewline|)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
 		|| p = .clamp(e.position)
@@ -1512,14 +1512,14 @@ class TextView (GUIControl)
 			w._FlashSelf |= 2
 
 	
-	helper WasEverAltered (|bool|)
+	function WasEverAltered (|bool|)
 		opt norefcounts
 		with .document
 			return .current != .original
 		return self is modified
 
 
-	helper Save (|bool|)
+	function Save (|bool|)
 		opt norefcounts
 		if .undoer.save(DocumentState.saving)?
 			.AlphaFade
@@ -2050,7 +2050,7 @@ class TextView (GUIControl)
 						
 
 	function Parse (|message|)
-		return .Parse(false, .FindExpectsParse)
+		return .Parse(false, .ShouldDisplayJeebox)
 	
 	
 	helper Parse (|bool| Changed, |int| expect, |message|)
@@ -2108,7 +2108,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| Changed    = .NeedsPrepare						#require
 		.TextAlteredForDraw = 0
-		|| expect	  = .FindExpectsParse
+		|| expect	  = .ShouldDisplayJeebox
 		|| msg   	  = .Parse(changed >= 2, expect)
 		|| ParsedOK   = (msg!=nil) or (.ExpectsParse <= AllowJeebox)
 		|| Pos	 	  = .StartPos
@@ -2258,7 +2258,7 @@ class TextView (GUIControl)
 			return true
 
 
-	helper FindExpectsParse (|int|)
+	function ShouldDisplayJeebox (|int|)
 		opt norefcounts
 		|| t = .text
 		if t.HasWord("//lineson")
@@ -2275,7 +2275,7 @@ class TextView (GUIControl)
 
 
 	helper IsJeeboxMode (|bool|)
-		return .FindExpectsParse >= ProbablyJeebox
+		return .ShouldDisplayJeebox >= ProbablyJeebox
 	
 	
 	function GuessExpectsParse

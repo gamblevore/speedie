@@ -16,7 +16,7 @@ class LeakTester
 		.Name = name
 		app.LeakMarkMemory
 	
-	helper FinalTest
+	function FinalTest
 		.Test2
 		.MemUsedStart = nil
 		app.LeakUnMarkMemory
@@ -50,7 +50,7 @@ helper @memory.CollectLeaks_ (|object| self, |[]|)
 	JB_FindLeakedObject(self, rz)
 
 
-helper @memory.PrintLeaks (|object| self)
+function @memory.PrintLeaks (|object| self)
 	description "Finds the object that refers to this leaked object."
 	visible
 	cpp_name jbl

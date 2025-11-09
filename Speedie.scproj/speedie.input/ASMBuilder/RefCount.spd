@@ -148,6 +148,8 @@ function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
 
 
 function assembler.CloseOneEarly (|asmreg| a)
+	if a is temp
+		// surely we want to do this anyhow?
 	require a isnt temp
 	|| d = .VDecls
 	d &=~ (1<<a.reg) // Clear

@@ -61,7 +61,7 @@ module PackMaker
 		return Globals.AlignUp(8) // for strings, which come directly after
 
 
-	function BuildGlobs
+	function BuildGlobs (|bool|)
 		opt norefcounts
 		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
@@ -74,13 +74,16 @@ module PackMaker
 		packmaker.LibGlobs <~ Obj
 		TypeObject!.PackClassChildren(nil)
 		
-		Stability.load
+		require Stability.load
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
 		.LibGlobs.sort
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.ExportPosition = i + 1
+
+		.FinalPrepare
+		return true
 	
 	
 	function message.InlineCount (|int| Remain, |int|)
@@ -149,9 +152,7 @@ module PackMaker
 		compiler.During = compilerstage.Packing
 		Assembler.Sh.Fullinit
 		PackMaker.AddAll
-		.BuildGlobs // Sorts too
-		.FinalPrepare	
-		if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry = true
+		if .BuildGlobs and .FATCompile and options.ModePack	// options.ModePack can be false, if compiler.InPerry
 			.WritePackToDisk
 		compiler.During = 0
 	

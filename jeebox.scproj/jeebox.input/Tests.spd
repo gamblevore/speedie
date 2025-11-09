@@ -159,7 +159,7 @@ helper string.EscapeTest (|bool|)
 	return (back == self)
 
 
-helper Jeebox.Test (|string|)
+function Jeebox.Test (|string|)
 	cpp_Part TestJB
 	|| fs = FastString.new
 	for (c in 256)

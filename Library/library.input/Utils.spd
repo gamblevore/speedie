@@ -11,7 +11,7 @@ function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 function string.Sort (|byte| sep = '\n', |string|)
 	|| x = .split(sep)
 	x.Sort
-	return x.Join(string.byte(sep))
+	return x.join_sub(string.byte(sep), .length)
 
 
 
@@ -32,12 +32,10 @@ role MessageTable (Dictionary)
 		super.valuelower(msg.name) = msg
 	
 
-
 function message.List (|[Message]|)
 	opt norefcounts
 	for s in self
 		rz <~ s
-
 
 
 function @message.Sorter (SorterComparer of list)
@@ -105,7 +103,7 @@ function Message.At (|int| pos, |message|)
 	return .FindTightest(pos, false, false)
 
 
-helper message.FindTightest (|int| pos, |bool| named=false, |bool| SamePosition=false,  |message|) // findpos, findat
+function message.FindTightest (|int| pos, |bool| Named=false, |bool| SamePosition=false, |message|) // findpos, findat
 	opt norefcounts
 	nil checker
 	|| size = int.max

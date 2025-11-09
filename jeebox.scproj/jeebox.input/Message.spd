@@ -100,10 +100,10 @@ Message is also:
 		opt norefcounts
 		rz = pos_msg ?? self
 		using rz
-			rz = .CopySub(pos_msg)
+			rz = .CopyWithoutUsing(pos_msg)
 	
 	
-	helper CopySub (|message?| P = nil, |Message!|)
+	function CopyWithoutUsing (|message?| P = nil, |Message!|)
 		description "Same as message.copy, except that it doesn't use self's position as the default one." 
 		opt norefcounts
 		rz = message(self)
@@ -111,7 +111,7 @@ Message is also:
 			rz.position = P.position
 			rz.rangelength = P.rangelength
 		for v.fast in self
-			rz <~ v.CopySub(P)
+			rz <~ v.CopyWithoutUsing(P)
 
 
 	operator Starts (|string| s, |bool|)
@@ -1110,7 +1110,7 @@ Message is also:
 			return i
 		error (self, "Value out of range")
 	
-	helper string.SuffixSize (|int64|)
+	function string.SuffixSize (|int64|)
 		|| n = .Length
 		if (n == 1) or (n == 2 and self[1] == 'B')
 			return self[].SuffixSize

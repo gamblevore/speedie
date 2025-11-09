@@ -13,23 +13,23 @@ class Object
 		nil self
 		cpp_wrapper JB_ObjRender
 
-	helper GenericRender (|FastString| fs_in=nil)
-		cpp_wrapper JB_Obj_GenericRender
+//	helper GenericRender (|FastString| fs_in=nil)
+//		cpp_wrapper JB_Obj_GenericRender
 
 	function Class (|&ClassData|)
 		nil checker
 		cpp_wrapper JB_ObjClass
 
-	helper ClassBehaviours (|&byte|)
+	autogen ClassBehaviours (|&byte|)
 		cpp_wrapper JB_ObjClassBehaviours
 
-	helper MemoryLayer (|MemoryLayer|)
+	function MemoryLayer (|MemoryLayer|)
 		cpp_wrapper JB_ObjLayer
 	
-	helper RefCount (|int|)
+	function RefCount (|int|)
 		cpp_Wrapper JB_RefCount
 	
-	helper ObjectID (|int|)
+	function ObjectID (|int|)
 		description "Returns an object ID, decided by class-type, and order of creation (but not memory-location)."
 		nil checker
 		cpp_wrapper JB_ObjectID
@@ -48,7 +48,8 @@ class Object
 		nil checker
 		return self.mustbe(x)
 	
-	helper MustBe (|ClassData| x, |Message|ErrNode=nil, |bool|)
+
+	autogen MustBe (|ClassData| x, |Message| ErrNode=nil, |bool|)
 		nil checker
 		if self isa x
 			return true
@@ -90,7 +91,7 @@ class Object
 		printline .render
 
 		
-	helper SyntaxExpect ( |string| Error )
+	autogen SyntaxExpect ( |string| Error )
 		visible
 		cpp_part FailStr
 		
@@ -100,15 +101,11 @@ class Object
 			errorreceiver.NewError( Error )
 
 
-	helper string.SyntaxWarn
+	autogen string.SyntaxWarn
 		cpp_part Warn
 		errorreceiver.Newwarning( self )
 	
 	
-	helper MemorySanity
-		|| r = .refcount
-		if r < 0 or r > 100000 // sigh
-		
 	module
 		function DebugAllMemory (assigns:|bool|)
 			cpp_wrapper JB_DebugAllMemory
@@ -157,8 +154,8 @@ struct ClassData
 		helper First (|&classdata|)
 			cpp_wrapper JB_AllClasses
 		
-		helper New (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
-			cpp_wrapper JBClassNew
+//		helper New (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
+//			cpp_wrapper JBClassNew
 	
 	iterator
 		|| curr = self

@@ -3,26 +3,28 @@
 module Stability
 	|| LastID = 1
 
-	function Load
+	function Load (|bool|)
 		|| frogs = packmaker.PackGlobSize
 		|| bank = Compiler.library["stable_id_bank.txt"]
 		if bank.Open(true)
 			.UseBank(bank)
+			|faststring| fs
 			if options.UpdateStability
-				|| fs = FastString()
-				.FillMissingLibFuncs(fs, frogs)
-				if fs.Length
-					if bank.size > 0
-						bank <~ "\n"
-					bank <~ fs|string| // hehe
+				fs = faststring()
+			.FillMissingLibFuncs(fs, frogs)
+			if fs and fs.Length
+				if bank.size > 0
+					bank <~ "\n"
+				bank <~ fs|string| // hehe
+			rz = true
 
 	
 
-	function FillMissingLibFuncs (|faststring| fs, |int| frogs)
+	function FillMissingLibFuncs (|faststring?| fs, |int| frogs)
 		opt norefcounts
 		for cl in Compiler.ClassList
 			if cl.NeedID
-				cl.MakeID(fs)
+				cl.MakeID(fs, nil)
 		
 		|&&nil| Table
 		if platform.isdebug
@@ -30,24 +32,26 @@ module Stability
 
 		for fn in PackMaker.LibFuncs
 			if !fn.IsMacro and fn isnt disabled
-				|| id = fn.MakeID(fs)
-				if table
-					Table[id+31] = jb_vm.Load(fn.exportname) // an actual function pointer for testing
+				fn.MakeID(fs, table)
 		
 		
 	function scclass.NeedID (|bool|)
 		return .IsLibrary and (!.isrole and .IsObject)
 	
 	
-	function scbetternode.MakeID (|faststring| fs, |int|)
+	function scbetternode.MakeID (|faststring| fs, |?&&nil| table)
 		|| id = .PackID
-			return id
-		if fs.Length
-			fs <~ "\n"
-		fs <~ .ExportName
-		id = Stability.LastID++
-		.PackID = id
-		return id
+		if !id
+			if fs
+				if fs.Length
+					fs <~ "\n"
+				fs <~ .ExportName
+			id = Stability.LastID++
+			.PackID = id
+		if table
+			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
+				Table[id+31] = fn
+				"id: ${id}(${id+31}) = $.exportname"
 				
 
 	function UseBank (|file| bank)

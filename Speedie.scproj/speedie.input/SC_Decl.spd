@@ -1181,16 +1181,15 @@ class SCDecl (SCObject) {
 		return T.clssize * mul
 
 
-	function CArrayDepth (|faststring| fs, |int| Depth=0, |int|)
-		if fs
-			fs.AppendHInt(.c_array)
-		if .IsCArray
-			return .internal!.CarrayDepth(fs, depth+1)
-		if .PointerCount
-			
-		if fs
-			fs <~ .type.typeinfo.DebugCode
-		return Depth
+//	function CArrayDepth (|faststring| fs, |int| Depth=0, |int|)
+//		if fs
+//			fs.AppendHInt(.c_array)
+//		if .IsCArray
+//			return .internal!.CarrayDepth(fs, depth+1)
+//			
+//		if fs
+//			fs <~ .type.typeinfo.DebugCode
+//		return Depth
 	
 	
 	function TypeInfo (|DataTypeCode|)

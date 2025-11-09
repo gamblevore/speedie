@@ -16,10 +16,10 @@ Module MZLab
 	function TestMz (|string| path, |bool|)
 		if path
 			|| f = path.ReadFile.decompress(int.max)
-			return f.CompressTest(true) and .ManyTests
+			return f.CompressTest_(true) and .ManyTests
 	
 	
-	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
+	function string.CompressTest_ (|bool| report, |int| which=3, |bool|)
 		if which & 1
 			require .CompressTestSub(mzlab.strong, report)
 		if which & 2
@@ -55,7 +55,7 @@ Module MZLab
 			for sh in 0 to 4
 				.TestSub(items, fs, i>>(sh*4))
 			|| str = fs.getresult
-			require str.CompressTest(false, (i&1)+1)
+			require str.CompressTest_(false, (i&1)+1)
 		"Compression Test: OK"
 		return true
 

@@ -834,7 +834,7 @@ class ListView (GUIControl) {
 			while rz and rz is UnSelectable
 				rz = rz.step(i <= 0)
 		
-	helper Start (|ListViewrow|)
+	autogen Start (|ListViewrow|)
 		return .listsource.first
 	
 	helper SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)

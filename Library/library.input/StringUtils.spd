@@ -11,7 +11,7 @@ macro PrintLine
 helper _StrPrint (|string?| data)
 	cpp_wrapper JB_Str_Print
 
-helper StrPrintLine (|string?| data)	// ideally move this to string._printline
+autogen StrPrintLine (|string?| data)	// ideally move this to string._printline
 	cpp_wrapper JB_Str_PrintLine		// AND... make printline x use this.
 
 function Print (|string?| data)

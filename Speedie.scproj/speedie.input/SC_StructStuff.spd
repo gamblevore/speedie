@@ -54,13 +54,19 @@ function Tran_Rejoin (TranFunc)  // exitter
 	
 
 
-function SCFunction.StructImprove (|scfunction| fn, |scparamarray| incoming, |scfunction|)
+function SCFunction.StructImprove (|scparamarray| incoming, |scfunction|)
 	opt norefcounts
-	|| ft = fn.StructReturned
+	if compiler.inperry
+		|| curr = scfunction.currfunc
+			if !curr.IsLibrary and (self|scnode| is Private) and (.project != curr.project)
+				error (incoming.exp, "Accessed private function, beyond scope")
+				error (.source, "Called function")
+			
+	|| ft = .StructReturned
 		incoming.StructReturner(ft.AsLocal, self)
-	  elseif fn.returntype is returnedstruct // remove this? its always the prev?
-		incoming.StructExtract(fn.ReturnType)
-	return fn
+	  elseif .returntype is ReturnedStruct			// remove this? its always the prev?
+		incoming.StructExtract(.ReturnType)
+	return self
 
 
 function SCFunction.StructReturned (|scdecl|)

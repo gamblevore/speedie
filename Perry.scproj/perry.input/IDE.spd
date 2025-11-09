@@ -115,7 +115,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| proj = .SharedProjectTabSource
 		if proj and !gui.isquitting
-			proj["pos"] = .editme.sel0
+			proj["pos"] = .editme.SelRange.x
 			Perry.save
 	
 			|| p = .prev
@@ -315,7 +315,7 @@ class PerryIDE (Window)
 		(.lineinfo is visible)
 		|| fs = FastString()
 		|| t = .Editme.Text
-		|| sel0 = .editme.sel0
+		|| sel0 = .editme.SelRange.x
 		|| sel = .EditMe.SelText
 		|| sel2 = sel
 		if sel2.last.IsTextLine
@@ -553,7 +553,7 @@ class PerryIDE (Window)
 
 
 	function CheckModified 
-		.EditMe.document.HandleExternalModified?
+		.EditMe.document.CheckModified?
 		
 
 	function ProjClosed (|bool|)
@@ -838,7 +838,7 @@ class PerryIDE (Window)
 				.filelist.ErrorAt(err)
 				
 		if jumpto
-			txt.ErrorJump(jumpto.position)
+			txt.JumpToError(jumpto.position)
 		  elseif jump and actual_compile
 			if .DuringMsgFB
 				.DuringMsgFB = false
@@ -898,7 +898,7 @@ So anything not 0 means "its OK"`
 		
 		if !g
 			.LoadErrors(true, false)
-			if .editme.FindExpectsParse < 2
+			if .editme.ShouldDisplayJeebox < textview.ProbablyJeebox
 				.ProductSep.Collapse
 		
 		.PopupHide

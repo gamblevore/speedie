@@ -96,20 +96,20 @@ module Feedback
 
 
 	function ParseArgs (|bool|)
-		return ParseArgsSub(app.rawargs)
+		return ParseArgsSub(app._rawargs)
 
 
 	function StopStripping
 		|message| m = nil|message|!
 		target debug
-			if ""
+			if 0==1
+				m.jdb2
 				|| i = 1
 				|| j = i.AsFloat
 				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
 				Assembler.PrintProgress
 				m.PrintLocate
-				m.jdb2
 				nil|asmreg|.DebugPrint
 				|fatasm| X
 				X.DebugPrint
@@ -203,7 +203,7 @@ module Feedback
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
 		  elseif (options.OperationCount == 1)
-			error ("Can't compile multiple projects. Input params: " + app.rawargs.render)
+			error ("Can't compile multiple projects. Input params: " + app._rawargs.render)
 		  else
 			.TryUseProject(Value)
 			options.OperationCount++

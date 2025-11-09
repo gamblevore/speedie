@@ -338,10 +338,10 @@ function EditMeModified (guitextevent)
 	i.ShowStats
 	
 	if (reason != documentstate.saving) and !i.DuringTempView
-		|| x = .sel1
+		|| x = .SelRange.x2
 		if !GUI.IsTyping
 			i.InteractUpdate
-		  elseif !i.DuringLoad and (.sel0 == x)
+		  elseif !i.DuringLoad and (.selrange.x1 == x)
 			|| b = self[x]
 			if !b or b.istextline or i.autocomplete.isopenedmenu
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)

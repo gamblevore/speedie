@@ -184,7 +184,7 @@ class Document (list)
 		return .load(true)		// Reload!
 
 	
-	helper HandleExternalModified (|bool|)
+	function CheckModified (|bool|)
 		if .SimpleUpdateFromDisk
 			return true
 

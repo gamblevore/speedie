@@ -176,8 +176,8 @@ extend Error
 
 
 	function SCLineCount (|int|)
-		|| f = .SCOriginalData	#require
-		return .LinePos( f )
+		|| f = .SCOriginalData
+			rz = .LinePos( f )
 	
 	
 	function SCLineIdentifiers (|faststring| fs, |string| Data)

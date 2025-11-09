@@ -293,6 +293,8 @@ struct Assembler
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...
+//		if fat is temp
+//			.CloseOneEarly(.info)
 
 		depth++
 		if depth > 7
@@ -304,6 +306,7 @@ struct Assembler
 			v &= 31
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
+			
 		|| Type = asm.noop * (fat < .curr_)
 		fat.setop = Type
 			
@@ -314,11 +317,11 @@ struct Assembler
 			return .funcstart_ + r
 
 
-	function ASMRegister (|int| i, |asmreg|)
-		|| f = .Register(i)
-			if .IsCurr(f)
-				return f.info
-		return i.asm
+//	function ASMRegister (|int| i, |asmreg|)
+//		|| f = .Register(i)
+//			if .IsCurr(f)
+//				return f.info
+//		return i.asm
 
 	
 	function KnownValues (|int| changed, assigns:|bool|)
@@ -463,6 +466,9 @@ struct Assembler
 		// like have another bit that says "its allowed"... but everything just checks
 		// "is temp" like normal.
 		
+		target debug
+			|| trap = ++ASMTrapper
+			// if trap == 5704
 		|| OV = .OpenVars
 		if ModeOnly is UnusedSoFar									// || x = (y + 1) + (z + 1)
 			ModeOnly = ModeOnly asnt asmreg.UnusedSoFar
@@ -474,6 +480,8 @@ struct Assembler
 			(modeonly is OKAsTemp)
 			(modeonly is Temp)
 		
+		target debug
+			ModeOnly.TmpCheck
 		|| r = .µGetASM(Exp, ModeOnly)
 		if r iz ModeOnly
 			return r
@@ -514,8 +522,8 @@ struct Assembler
 		return .CloseVars(Closer, nil, v)
 		
 	
-	function µDebug (|message| exp, |asmreg| dest)
-		target debug
+	target debug
+		function µDebug (|message| exp, |asmreg| dest)
 			|| fn = fn_asm_table[exp.ASMType]!
 			dest.debugprint
 			PrintProgress()
@@ -529,7 +537,6 @@ struct Assembler
 		opt norefcounts
 		cpp_part GetASM 
 		
-		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
@@ -537,6 +544,7 @@ struct Assembler
 		  else
 			opt inline
 		
+		|| fn = fn_asm_table[exp.ASMType]!
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
@@ -726,8 +734,8 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 	.Orig = nil
 
 
-function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
-	target debug
+target debug
+	function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 		printline "µFunc: $i", (fn)
 		fn.µprint
 
@@ -745,6 +753,8 @@ function Assembler.GenerateASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 	target debug
 		if !compiler.InPerry and !options.perryoutput
 			.PrintASM(fn, i)
+	  else
+		(i)
 	
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	require err.ok

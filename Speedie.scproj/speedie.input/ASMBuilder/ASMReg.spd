@@ -145,7 +145,7 @@ datatype ASMReg (uint64)
 
 	function FourBytes (|bool|)
 		opt inline
-		return self|datatypecode|._shift == 2
+		return self|datatypecode|.ByteShift == 2
 
 	function BasicVec (|asmreg|)
 		if .IsFloat
@@ -160,7 +160,7 @@ datatype ASMReg (uint64)
 	function Clip (|int|)
 		if .isbool or !.reg
 			return 0
-		return 3 + self|datatypecode|._shift
+		return 3 + self|datatypecode|.ByteShift
 
 	function bool.EqulMode (|asmreg| L, |asmreg| R, |int|)
 		rz = self|int| xor 1
@@ -172,11 +172,11 @@ datatype ASMReg (uint64)
 	
 	function IsBig (|bool|)
 		opt inline
-		return self|datatypecode|._shift == 3 // could also be an int?
+		return self|datatypecode|.ByteShift == 3 // could also be an int?
 
 	function IsSmall (|bool|)
 		opt inline
-		return (self|datatypecode|._shift < 3)
+		return (self|datatypecode|.ByteShift < 3)
 
 	function IsFloat (|bool|)
 		opt inline

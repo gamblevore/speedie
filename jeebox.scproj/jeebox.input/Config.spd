@@ -49,7 +49,7 @@ role config (message)
 	function Path (|file|)
 		return .obj as file
 	
-	helper ConfFirst (||)
+	function ConfFirst (||)
 		|| l = .confarg
 			return l|message|.first
 			

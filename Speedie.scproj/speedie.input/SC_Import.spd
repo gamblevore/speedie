@@ -274,7 +274,6 @@ class SCImport
 		
 		
 		function ImportPath (|string| path, |file!| f, |int| ImportDepth, |bool| Builtin, |scimport?|)
-//			|| name = f.name
 			require f.MustExist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase
@@ -282,30 +281,34 @@ class SCImport
 				return old
 			
 			rz = SCImport(f, builtin)
-			Compiler.ImportedList <~ rz
-			
 			rz.Depth = ImportDepth
-			Compiler.ImportedNames[fpl] = rz
+			.ImportPathSub(path, f, rz, fpl)
+			
+			
+		function ImportPathSub (|string| path, |file!| f, |SCImport| upon, |string| fpl, |bool|)
+			Compiler.ImportedList <~ upon
+			Compiler.ImportedNames[fpl] = upon
 			|| subname = fpl.TrimExtAndPath
 			SC_Targets["__IMPORT_" + subname + "__"] = true
 			
 			|SCFile| conf
 			if (options.SingleFileInput and !path)
-				conf = rz.ImportSpd( options.SingleFileInput.file )
+				conf = upon.ImportSpd( options.SingleFileInput.file )
 			  elseif !f.isdir
-				conf = rz.ImportSpd( f )
+				conf = upon.ImportSpd( f )
 			  else
 				ifn (path contains "/") and (path[0] != '/')   // import "lib/items"
 					f = FindInputFolder(f)
 					require f and f.MustExist
-				conf = rz.ImportDir( f )
+				conf = upon.ImportDir( f )
 			
-			rz.LoadConf(conf)
-			rz.IncludeCHeaders( f["c_includes"]!,	  Cpp_Export.H_Input )
-			rz.IncludeCHeaders( f["c_postincludes"]!, Cpp_Export.H_PostInput )
+			upon.LoadConf(conf)
+			upon.IncludeCHeaders( f["c_includes"]!,	  Cpp_Export.H_Input )
+			upon.IncludeCHeaders( f["c_postincludes"]!, Cpp_Export.H_PostInput )
 						
 			if conf
-				rz.ReloadImports(conf)
+				upon.ReloadImports(conf)
+			return true
 
 // desired
 // per proj

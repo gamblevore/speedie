@@ -170,7 +170,7 @@ class GraphicsEditor (GuiControl)
 		dest <~ .Merged.WriteQOI
 		
 		
-	helper LoadFile (|string| path, |bool|)
+	function LoadFile (|string| path, |bool|)
 		|| data = path.ReadFile								#require
 		if path isa "png"
 			data = imagehelper.ConvertPNGToVOI(data)		#require

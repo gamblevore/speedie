@@ -675,7 +675,8 @@ AlwaysInline int64 FuncAddr (jb_vm& vv, ASM Op) {
 
 AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
-	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
+//	printf("T: %i\n", T);
+	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
 	if (fn)
 		return Nativeize(funcdata, fn, r, n1);
 	
@@ -686,7 +687,7 @@ AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u
 
 AlwaysInline void ForeignFunc2 (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
-	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
+	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
 	if (fn) {
 		Nativeize(funcdata, fn, r, n1);
 		JB_Incr(r[n1].Obj);

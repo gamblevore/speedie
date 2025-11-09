@@ -1,12 +1,22 @@
 
+
+function App.RemoveArg (|string| Name)
+	opt norefcounts
+	for (s.backwards in .args) (ind)
+		if s ~= name
+			.args.remove(ind)
+
+
 function ClickedEditPrefs (GUIMenuEvent)
 	PerryIDE.New(app.prefspath.file)
+
 
 function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"
 
+
 function string.PathIsCode (|bool|)
-	return .isproj or .isspd
+	return .IsProj or .IsSpd
 
 
 function @string.ASCII_Chart (|int| StartAt=32, |string|)
@@ -43,7 +53,6 @@ function @string.ASCII_Chart (|int| StartAt=32, |string|)
 		fs <~ '\n'
 	return fs
 
-
 	
 function message.DebugArgNames (|[string]|)
 	opt norefcounts
@@ -56,7 +65,7 @@ function message.DebugArgNames (|[string]|)
 function message.GoodArgName (|bool| NeedName=false, |string|)
 	|| name = .GoodArgNameSub
 		return name
-	if name.isok and needname
+	if name.IsOK and needname
 		error (self, "No name found")
 		return string.Error
 	return name

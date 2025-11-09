@@ -427,23 +427,22 @@ class list (Saveable)
 			.Last = item
 
 
-	helper SortAfter (|SorterComparer| fnc, |list|)
-		opt norefcounts			// find the first obj that we are "more than"
-		|| p = .prev
-		while p
-			if (fnc)(self, p)
-				return p
-			p--
+//	helper SortAfter (|SorterComparer| fnc, |list|)
+//		opt norefcounts			// find the first obj that we are "more than"
+//		|| p = .prev
+//		while p
+//			if (fnc)(self, p)
+//				return p
+//			p--
 
 
-	function Sort (|SorterComparer| fnc)
-		cpp_part Sort2
+	function Sort (|SorterComparer| fnc=&(...).Sorter)
 		opt NoRefCounts
 		for f in self
-			f.SortAfter2(self, fnc)
+			f.SortAfterSub(self, fnc)
 
 
-	helper SortAfter2 (|list| parent, |SorterComparer| fnc)
+	helper SortAfterSub (|list| parent, |SorterComparer| fnc)
 		opt norefcounts
 		|| p = .prev
 		// Find the first thing that we are larger than. end there.

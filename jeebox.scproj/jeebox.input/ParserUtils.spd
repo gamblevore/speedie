@@ -46,7 +46,7 @@ function String.ParseJSON (|Messageroot|)
 	rz.ConvertJSONToJB?
 	
 
-helper String.IsJbin (|ind|)
+function String.IsJbin (|ind|)
 	if  self[] == '#'  and  self[1] == '!' // shebang
 		|| nl = .find('\n')
 			nl++

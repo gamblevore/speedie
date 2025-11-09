@@ -236,7 +236,7 @@ struct FloatRange   /// :3
 	|Float| To
 	|float| Step
 	
-	helper float.LoopOK (|float| Final, |float| Step, |bool|)
+	autogen float.LoopOK (|float| Final, |float| Step, |bool|)
 		opt inline
 		if Step >= 0.0
 			return self <= final

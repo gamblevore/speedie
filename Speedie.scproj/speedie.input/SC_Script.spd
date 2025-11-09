@@ -19,7 +19,7 @@ function compiler.UsingScript (|file| f, |file|)
 	options.silent = true
 	options.PrintCompileString = false
 	options.OperationCount++
-	app.rawargs.remove(0)
+	app._rawargs.remove(0)
 
 
 function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
@@ -36,7 +36,7 @@ function compiler.CanTryModes (|file|)
 						// So why did I put this?
 						
 	require !app["perry"] and !app["nocompile"]
-	|| p = app.rawargs[0]
+	|| p = app._rawargs[0]
 	if p and !p.argname
 		rz = p.file
 
@@ -55,7 +55,7 @@ function compiler.TryVariousStartModes (|bool|)
 		if stderr.ok
 			app.cwd = cwd
 			app.ChildEnv("OrigScriptPath") = f
-			app.turninto(.exe, app.rawargs)
+			app.turninto(.exe, app._rawargs)
 		rz = true
 
 

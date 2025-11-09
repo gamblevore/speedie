@@ -51,7 +51,7 @@ module SC_Saver {
 			fs <~ "\n\t"
 			|| Count = item.c_Array
 			|| T = item.type.TypeInfo
-			|| AppendAsData = (T._shift and T.isfloat)  // not sure what this is meant to do....
+			|| AppendAsData = (T.ByteShift and T.isfloat)  // not sure what this is meant to do....
 			if (!AppendAsData and Count)
 				fs <~ "for (i in $Count) {\n"
 			if (AppendAsData)

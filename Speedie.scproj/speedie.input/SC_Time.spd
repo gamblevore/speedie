@@ -15,9 +15,9 @@ function compiler.PrintCompileTime (|date| durr)
 	fs <~ " // (avg "
 	fs.appendfloat(avg, 1)
 	fs <~ ")"
-
 	fs.Normal  "Globals"
 	fs <~ "lib "
+	
 	packmaker.LibGlobSize.strsize(fs)
 	if packmaker.PackGlobs
 		fs <~ ", app "
@@ -87,7 +87,7 @@ function compiler.VariousSelfTests
 	Jeebox.test // bug if put into compiler.run!. Wierd!
 	if (options.perryoutput < 2) and !options.scripting and !app.Parent
 		if options.PrintLibraries
-			if (Cpp_Export.FindGlobalsCpp*12).CompressTest(false)
+			if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
 				"Compression: OK"
 	mzlab.FreeNow
 

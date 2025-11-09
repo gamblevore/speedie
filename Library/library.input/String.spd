@@ -22,7 +22,6 @@ class String
 	|&byte|		Addr
 
 
-
 // accessing
 	function Length (|int|)
 		nil checker
@@ -383,7 +382,7 @@ class String
 	function IsText (|float| f = 512.0, |bool|)
 		return !.IsBinary(f)
 	
-	helper UTF8Badness (|ivec2|)
+	function UTF8Badness (|ivec2|)
 		description "Returns the validness of UTF-8 text, as: (FirstBadPosition, NumberOfBadBytesFound) as an ivec2" 
 		|| pos = 0
 		while
@@ -709,23 +708,9 @@ class String
 			yield (c) (pos)
 
 
-function array.Remove (|array of string| self, |string| item, |bool| CaseAware=true,  |string|)
-	opt norefcounts
-	for (s.backwards in self) (ind)
-		if s.SyntaxCompare(item, CaseAware) == 0
-			.remove(ind)
 
-
-function array.join (|array of string| self, |byte| sep = '\n', |string|)
-	cpp_part JoinByte
-	return .join(string.byte(sep))
-
-function array.join (|array of string| self, |string| sep = "", |string|)
+helper array.join_sub (|array of string| self, |string| sep, |int| n, |string|)
 	flow off
-	|| sl = sep.Length
-	|| n = -sl
-	for s in self
-		n += s.length + sl
 	|| fs = FastString(n)
 
 	for s in self
@@ -734,6 +719,21 @@ function array.join (|array of string| self, |string| sep = "", |string|)
 		fs <~ s
 
 	return fs
+	
+
+//function array.join (|array of string| self, |byte| sep = '\n', |string|)
+//	cpp_part JoinByte
+//	return .join(string.byte(sep))
+
+
+function array.join (|array of string| self, |string| sep = "", |string|)
+	opt norefcounts
+	flow off
+	|| sl = sep.Length
+	|| n = -sl
+	for s in self
+		n += s.length + sl
+	return .join_sub(sep, n)
 
 	
 
@@ -751,4 +751,5 @@ struct StringLengthSplit
 		opt norefcounts
 		for s in self
 			rz <~ s
+
 

@@ -88,7 +88,7 @@ class Image (memory)
 		return .size.y
 	
 	
-	helper AreaInfo (assigns:|ivec2| wh)
+	function AreaInfo (assigns:|ivec2| wh)
 		.area = wh
 		.ResetBoundsToSize
 

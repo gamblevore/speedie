@@ -91,16 +91,16 @@ class Window (GUIControl)
 		description "Called when an mouse or keyboard event arrives. Can be used to wakeup sleeping threads for greater responsivity." 
 	
 
-	helper RealFocus (|guicontrol?|)
+	function RealFocus (|guicontrol?|)
 		opt norefcounts
 		return .innerfocus ?? .focus
 
 
-	helper OpenedMenu (assigns:|menu|)
+	function OpenedMenu (assigns:|menu|)
 		.SetInnerFocus(value)
 
 
-	helper OpenedMenu (|menu|)
+	function OpenedMenu (|menu|)
 		opt norefcounts
 		|| f = .InnerFocus
 		if f isa menu
@@ -167,7 +167,7 @@ class Window (GUIControl)
 		GUI.touch(Self)
 
 
-	helper SetFocus (|guicontrol| Focus)
+	function SetFocus (|guicontrol| Focus)
 		._FocusAttempt = Focus
 		if focus
 			require focus.Takesfocus.able	// and (focus is visible) // fixfocus will fix it.

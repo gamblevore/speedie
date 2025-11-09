@@ -195,6 +195,9 @@ function ParseName (|Message| node, |bool|)
 	
 	if ftype == "helper"
 		.NoAutoComplete = 2
+		(self|scnode| is Private)					// limited to internal within a project
+	  elseif ftype == "autogen"
+		.NoAutoComplete = 2
 	  elseif fType == "api"
 		is api
 	  elseif fType == "setter"
@@ -394,11 +397,11 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 	opt norefcounts
 	rz = .argsmatch1(base, name_Space, incoming, Failed)
 	rz ?= .argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Failed)
-
+	
 	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
-		return .StructImprove(rz, incoming)
+		return rz.StructImprove(incoming)
 
 
 function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)
