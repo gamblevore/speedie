@@ -1307,7 +1307,7 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	rz <~ NewDeclNum(nil, .Log2)
 
 
-function GlobalsSorter (SorterComparer of scdecl)
+function @scdecl.Sorter (SorterComparer of scdecl)
 	opt norefcounts
 	rz = b.carraysize - .carraysize
 	if !rz

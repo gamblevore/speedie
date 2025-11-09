@@ -10,12 +10,9 @@ function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 
 function string.Sort (|byte| sep = '\n', |string|)
 	|| x = .split(sep)
-	x.Sort(&String.Sorter)
+	x.Sort
 	return x.Join(string.byte(sep))
 
-
-helper MessagePositionSorter (SorterComparer of message)
-	return .position < b.position
 
 
 role MessageTable (Dictionary)
@@ -41,6 +38,10 @@ function message.List (|[Message]|)
 	for s in self
 		rz <~ s
 
+
+
+function @message.Sorter (SorterComparer of list)
+	return .position < b.position
 
 	
 function message.Dict (|bool| DoLower=false, |bool| DoCount=false,   |dictionary of message|)

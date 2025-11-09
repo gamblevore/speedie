@@ -241,14 +241,7 @@ class SCImport
 			  else
 				error (node, "No current import")
 			return compiler.program
-		
-		
-		function Sorter (SorterComparer of scfile)
-			opt norefcounts
-			|| lib = .Proj.IsSTDLib - b.Proj.IsSTDLib
-				return lib
-			return self < b
-		
+				
 		
 		function FindImport (|string| s, |scimport|)
 			opt norefcounts

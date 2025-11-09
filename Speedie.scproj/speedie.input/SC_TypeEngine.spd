@@ -499,7 +499,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 	if (f == @Bra)
 		return extractdecl(c.first!, name_space, purpose, depth)
 		
-	if (f == @sthg) and (c == "...")
+	if (f == @sthg)
 		return name_space.RequireContained( c )
 		
 	if (f == @list) and !c.hasany

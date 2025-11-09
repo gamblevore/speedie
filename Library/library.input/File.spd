@@ -444,7 +444,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				  else
 					rz <~ name
 		
-		rz.sort(&string.sorter)
+		rz.sort
 		if !flowcontrol.isdisabled
 			flowcontrol.input(rz, self)
 		

@@ -252,7 +252,7 @@ function Message.CollectFromBody (|SCNode| Name_space)
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
 		.TryAddBareStruct(name_space, dcl)
 
-
+	
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
 	|message--| Type = .first!
 	|message--| Name = type.Next
@@ -284,7 +284,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if !Sdcl
 		NoOriginalDcl = true
 		if (cls) and (cls.Contained)
-			sdcl = cls.Contained! // (|| x = Y), (|object| x = Y)
+			sdcl = cls.Contained!			// (|| x = Y), (|object| x = Y)
 		  else
 			expect (!FuncPrmz and defaultdcl) (self, ("Missing type", "Missing type, or default value.")(!FuncPrmz))
 			sdcl = DefaultDcl
@@ -298,17 +298,16 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		check (.islast) ( self, "Parameter is missing a name." )
 		if !FuncPrmz
 			return nil
-		if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
+		if FuncPrmz.CollectReturnAsReal		// allocs dont fail (assumed so)
 			dcl.nildeclared = nilstate.real
 			
 
 		check !dcl.IsCArray (self, "Can't return c-arrays")
-		FuncPrmz.ReturnType = dcl // we need the copy
+		FuncPrmz.ReturnType = dcl			// we need the copy
 		if !dcl.isbarestruct or funcprmz is constructor
 			funcprmz.AddTypeInfo(dcl)
 			(dcl is return)
 			return nil
-
 
 		(dcl is ReturnedStruct)
 		dcl = dcl.getaddress
@@ -320,10 +319,10 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if !Default
 		name.ExpectLast
 	
-	if mode isnt Properties // the old .obj is needed
+	if mode isnt Properties					// the old .obj is needed
 		nameitm.obj = dcl
 	
-	if (Mode & 8) and NoOriginalDcl // functionbody
+	if (Mode & 8) and NoOriginalDcl 		// functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
 		dcl.nildeclared = NilState.real >> dcl.TypeSuffers 
@@ -332,15 +331,15 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		nameitm.Parent!.obj = dcl
 	
 	.obj = dcl
-	type.obj = dcl // might as well set it everywhere.
+	type.obj = dcl							// might as well set it everywhere.
 	dcl.Default = Default
 	dcl.Name = nameitm.name
-	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
+	(dcl Isnt Const)						// on "|| bla = true", make "bla" editable.
 
 	if default and defaultdcl
 		dcl.AssignabilityCheck(nil, default, DefaultDcl)
 
-	if Recv // nil for prototypes
+	if Recv									// nil for prototypes
 		Recv.TryAdd( self, dcl, dcl.Name )
 	
 	return dcl

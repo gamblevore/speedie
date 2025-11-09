@@ -508,9 +508,6 @@ class String
 		function Char (|codepoint| c, |string|)
 			cpp_wrapper JB_Str_ChrUTF8
 		
-		function Sort (|[array of string]| s)
-			s.sort(&.sorter)
-
 
 	syntax cast ( |bool| )
 		cpp_wrapper JB_Str_Exists

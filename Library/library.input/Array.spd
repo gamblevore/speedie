@@ -15,10 +15,9 @@ class Array (saveable)
 	|int|		Marker
 
 ////////////////////////////////////////////////////////////////////////////
-// we are using the faststring system... (make it standard if possible)
+// We use the general naming convention that faststring, and others use.
 // length = "items in use"
 // size   = "buffer size"
-// count  = Like counting birds. it takes effort. (but array doesnt have it)
 ////////////////////////////////////////////////////////////////////////////
 	
 	constructor
@@ -105,7 +104,7 @@ class Array (saveable)
 //	// need a better macro? or alternative? to allow array.sort
 //		{|| tmp = _0, (tmp.sort(&–contained(tmp).__sorter__)), rejoin 0}
 	
-	function Sort (|SorterComparer| Compare)
+	function Sort (|SorterComparer| Compare=&(...).Sorter)
 		cpp_wrapper JB_Array_Sort
 	
 	function Count (|int|)
@@ -192,11 +191,9 @@ class Array (saveable)
 
 prototype SorterComparer (|...| self , |...| b, |SortComparison|)
 	contains Object
-	function Sort (|array of ...| items)
-		items.sort(self)
 
 
-datatype SortComparison (int) // 
+datatype SortComparison (int)
 	function bool.syntaxcast (|SortComparison|)
 		return self|SortComparison|
 	function int.syntaxcast (|SortComparison|)

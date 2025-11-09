@@ -257,7 +257,7 @@ render MemoryUsage (|int| Over=0)
 			s.Position = mem
 			items <~ s
 	
-	items.sort(MessagePositionSorter)
+	items.sort
 
 	fs <~ "\n"
 	for I in items

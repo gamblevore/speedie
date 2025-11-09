@@ -807,7 +807,7 @@ function AutoSub2 (|SCNode| scope, |string| name, |[autoitem]| found, |int| Type
 			value = value.LocalVarList
 
 
-function AutoCompleteSorter (sortercomparer of autoitem)
+function @AutoItem.Sorter (sortercomparer of autoitem)
 	|| type = .type - b.type 
 		return type
 	|| depth = .depth - b.depth // doesnt seem to work just yet?
@@ -938,7 +938,7 @@ function AutoCompleteSub (|message| ff, |string| name, |message| into)
 				exit
 			scope = scope.upclass(ff)
 			
-		arr.sort(AutoCompleteSorter)
+		arr.sort
 		|autoitem| Prev
 		for i in arr
 			if i.OKby(prev)

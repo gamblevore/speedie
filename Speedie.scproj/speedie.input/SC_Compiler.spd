@@ -403,7 +403,7 @@ function ImportAll
 
 	.ImportLibs
 	.ImportProj
-	SCImport.AllFiles.sort(&scimport.sorter) // or else file-dates can mess things up.
+	SCImport.AllFiles.sort // or else file-dates can mess things up.
 	.PrepareAST
 //	if options.SelfReplacement
 //		require VM_Builder.MakeTheVM
@@ -767,18 +767,18 @@ function SortModulesAndClasses (|bool|)
 	for c in .ClassList
 		c.GetDepth
 	
-	.ModuleList.sort(ModulesSorter)
+	.ModuleList.sort
 	for (m in .modulelist) (i)
 		m.ModuleNum = i+1
-	.ClassList.sort(ClassSorter)
+	.ClassList.sort
 	return stderr.ok
 	
 
-function ClassSorter (SorterComparer of scclass)
-	return ModulesSorter(.modul, b.modul)
+function @SCClass.Sorter (SorterComparer of scclass)
+	return scmodule.Sorter(.modul, b.modul)
 
 
-function ModulesSorter (SorterComparer of scmodule)
+function @scmodule.Sorter (SorterComparer of scmodule)
 	opt norefcounts
 	|| ca = .cls
 	|| cb = b.cls

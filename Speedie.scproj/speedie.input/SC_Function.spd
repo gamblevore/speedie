@@ -335,7 +335,7 @@ function Transform ()
 function message.MacroFixSub (|SCDecl?| contains)
 	opt norefcounts
 	for s.flat in self
-		if (s == @sthg and "...") and s.WithinType
+		if (s == @sthg) and s.WithinType
 			expect (contains) (self, "Container type needed for macro")
 			s.replacewith(contains.writetype)			// cast to contained type!
 
@@ -475,6 +475,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 				// don't replace better matches with worse ones.
 			pos++
 			Incoming.FailedAt = 0
+			
 		  elseif (!FuncArg.Default)
 			if TypeCast & kTypeCastDescribeErrors
 				.DescribeParamFail(incoming, fi)			
@@ -484,9 +485,10 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		  elseif (ThisAlter)	// we need to put something in exp
 			|| prms = Incoming.exp.last!
 			|| def = FuncArg.Default!.Copy(prms)
+			def.DefaultPrmFix(base)
 			prms.InsertBefore( def, PArg_Ch )
 			|| ty = TypeOfExpr( def, Name_Space )
-				if ty.isbarestruct // oof
+				if ty.IsBareStruct // oof
 					TypeOfExpr( def.wrapwith(@brel + "&"), name_space )
 
 		  else
@@ -501,9 +503,29 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| first = Incoming.FailedAt
 			.DescribeParamFail(incoming, first)
 		  else
-			error (incoming.exp, "Too many params sent to " + .rendertitle)
+			error (incoming.exp, "Too many params sent to " + .RenderTitle)
 			problem (self.source,  kusingstr)
 
+
+
+function message.DefaultPrmFix (|scdecl?| Base)
+	opt norefcounts
+	for s.flat in self
+		if (s.func == @sthg) and (s in @bra)
+			expect (base) (s, "Can't use this here.")
+			s = s.parent!
+			s.func = @thg
+			s.name = base.type.Name
+			s.clear
+			
+
+// 
+function SCFunction.DefaultTest
+//	.ffff
+
+	
+function scfunction.ffff (|int| i=(...).InBranch)
+			
 
 
 function message.IntSmallness (|scdecl| T, |int|)
@@ -960,64 +982,6 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 					(t is PropertyWasConstructed)
 	
 
-function scdecl.IsZeroInConstructor (|bool|)
-	opt norefcounts
-	if .Default // huh? but its never set to?
-	|| d = .type.Defawlt
-		|| d2 = d.obj|scdecl|
-			ifn d2 isa SCDecl// oof
-			if d2 is Const
-				return d2.ExportPosition == 0
-
-
-function SetZeroProperties (|Message| After, |[scdecl]| P)
-	|[scdecl]| sorted
-	.SetZeroPropertiesSub(After, p, sorted)
-//	printline sorted
-	
-
-function scdecl.BiggestType (|[scdecl]| sorted, |int| i, |bool| CanSIMD, |scdecl!|)
-	opt norefcounts
-	if .CArraySize >= 16
-		return self
-	|| x = .ExportPosition|int|
-	CanSIMD *= (x isa 16) 					 // can't do unless we are 16-byte aligned...
-	rz = self
-	while (|| next = sorted[++i])
-		|| Missing = (next.ExportPosition + next.CArraySize) - x
-		if missing <= 2
-			rz = typeint16!.typenormal	
-		  elseif missing <= 4
-			rz = typeint!.typenormal		
-		  elseif missing <= 8
-			rz = TypeInt64!.typenormal
-		  else
-			if (Missing <= 16) and CanSimd
-				return TypeiVec4!.typenormal
-			exit
-
-
-function SetZeroPropertiesSub (|Message| After, |[scdecl]| P, |[scdecl]| sorted)
-	opt norefcounts
-	for (d in P)
-		if (d isnt PropertyWasConstructed) and d.IsZeroInConstructor
-			Sorted <~ d
-
-	require sorted >= 2
-
-	sorted.sort(&codesorter.PropertyOrder)
-
-	|| Length = 0
-	|| CanSIMD = .cls!.clssize|int| isa 16
-	
-	for (d in sorted) (i)
-		(d is UsedByASM)
-		|| req = d.ExportPosition + d.CArraySize
-		if Length < req
-			|| ty = d.BiggestType(sorted, i, CanSIMD)
-			Length = d.ExportPosition + ty.CArraySize
-			after = .DeclAfter( after, d, ty )
-	
 
 
 function FillInMissingConstructorDefaults (|Message!| After)

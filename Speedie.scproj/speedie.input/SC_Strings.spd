@@ -480,7 +480,7 @@ module StringCorrector
 	function IDSort (|bool| IDOrder)
 		opt norefcounts
 		if idorder
-			(&messageid.byid).sort(.CppStrings)
+			.CppStrings.sort(&messageid.byid)
 		  else
 			.CppStrings.sort(&string.sorter)
 			for (s in .CppStrings) (i)

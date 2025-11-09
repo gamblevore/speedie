@@ -1,6 +1,6 @@
 #!/usr/local/bin/speedie
 
+app.usage = "Takes a text file of lines, and sorts it, then replaces the original."
 main (|file.existing| TextFile)
 	|| d = TextFile.ReadAll
-		d = d.Sort
-		TextFile.Data = d
+		TextFile.Data = d.Sort

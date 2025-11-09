@@ -199,7 +199,7 @@ function compiler.DeadStrip
 
 	CodeSorter.LeafsFirst			// super-refcounter wants this
 
-	ReachedClassTable.sort(ClassSorter)
+	ReachedClassTable.sort
 	for (c in .ReachedClassTable) (i)
 		c.TableID = i+1
 	

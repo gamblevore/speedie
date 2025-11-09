@@ -39,7 +39,7 @@ module PackMaker
 	
 	function DoLibGlobs (|jbin| lib) // SortLibGlobs
 		opt norefcounts
-		.LibGlobs.sort(GlobalsSorter)
+		.LibGlobs.sort
 		
 		lib.enter(@arr)
 		for (f in LibGlobs)
@@ -76,8 +76,8 @@ module PackMaker
 		
 		Stability.load
 		.PackIDFuncs(.PackFuncs)
-		.PackGlobs.sort(GlobalsSorter)
-		.LibGlobs.sort(GlobalsSorter)
+		.PackGlobs.sort
+		.LibGlobs.sort
 
 		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.ExportPosition = i + 1

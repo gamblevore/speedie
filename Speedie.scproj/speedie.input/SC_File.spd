@@ -126,6 +126,12 @@ class SCFile (file)
 	
 	module
 		|scfile--| Curr
+		
+		function Sorter (SorterComparer of scfile)
+			opt norefcounts
+			|| lib = .Proj.IsSTDLib - b.Proj.IsSTDLib
+				return lib
+			return self < b
 
 
 

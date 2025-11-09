@@ -541,6 +541,9 @@ class list (Saveable)
 			rz = list(parent)
 			rz.Position = Position
 
+		function Sorter (SorterComparer of list)
+			return .position < b.position
+
 
 
 //module RingTree

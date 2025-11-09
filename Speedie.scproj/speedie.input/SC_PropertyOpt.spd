@@ -1,0 +1,64 @@
+
+
+// the idea is to optimise how properties are cleared.
+// not working yet.
+
+function scdecl.IsZeroInConstructor (|bool|)
+	opt norefcounts
+	if .Default // huh? but its never set to?
+	|| d = .type.Defawlt
+		|| d2 = d.obj|scdecl|
+			ifn d2 isa SCDecl// oof
+			if d2 is Const
+				return d2.ExportPosition == 0
+
+
+function scfunction.SetZeroProperties (|Message| After, |[scdecl]| P)
+	|[scdecl]| sorted
+	.SetZeroPropertiesSub(After, p, sorted)
+//	printline sorted
+	
+
+function scdecl.BiggestType (|[scdecl]| sorted, |int| i, |bool| CanSIMD, |scdecl!|)
+	opt norefcounts
+	if .CArraySize >= 16
+		return self
+	|| x = .ExportPosition|int|
+	CanSIMD *= (x isa 16) 					 // can't do unless we are 16-byte aligned...
+	rz = self
+	while (|| next = sorted[++i])
+		|| Missing = (next.ExportPosition + next.CArraySize) - x
+		if missing <= 2
+			rz = typeint16!.typenormal	
+		  elseif missing <= 4
+			rz = typeint!.typenormal		
+		  elseif missing <= 8
+			rz = TypeInt64!.typenormal
+		  else
+			if (Missing <= 16) and CanSimd
+				return TypeiVec4!.typenormal
+			exit
+
+
+function scfunction.SetZeroPropertiesSub (|Message| After, |[scdecl]| P, |[scdecl]| sorted)
+	opt norefcounts
+	for (d in P)
+		if (d isnt PropertyWasConstructed) and d.IsZeroInConstructor
+			Sorted <~ d
+
+	require sorted >= 2
+
+	sorted.sort(&codesorter.PropertyOrder)
+
+	|| Length = 0
+	|| CanSIMD = .cls!.clssize|int| isa 16
+	
+	for (d in sorted) (i)
+		(d is UsedByASM)
+		|| req = d.ExportPosition + d.CArraySize
+		if Length < req
+			|| ty = d.BiggestType(sorted, i, CanSIMD)
+			Length = d.ExportPosition + ty.CArraySize
+			after = .DeclAfter( after, d, ty )
+	
+	
