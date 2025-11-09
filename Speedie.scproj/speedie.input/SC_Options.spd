@@ -294,7 +294,6 @@ module Feedback
 			Explain(Purpose, "Prints more stuff.")$
 			"NoiseActivated"
 			Options.PrintCompileString = true
-			file.DebugExecute = true
 			options.PrintLibraries = true
 			options.argstats = true
 		

@@ -313,7 +313,7 @@ module PackMaker
 	function BuildInterpreter (|string|)
 		|| pack = jbin()
 		.WriteLibFuncs(pack)
-/		.DoLibGlobs(pack)
+		.DoLibGlobs(pack)
 		return pack
 
 
@@ -326,41 +326,6 @@ function SCFunction.WrappedName (|string|)
 function SCFunction.CanLibLoad (|bool|)
 	if !.ismacro and (self isnt disabled) and (.iscppinbuilt != 2)
 		return true
-
-
-/*
-	Globals used by speedie: (legit, not removeable)
-	|Array of Message!| TmpPrms_(1) --> VM_Builder__FinishAcc
-	|Random| Shared(2)				--> SCGame3D__Love // remove!
-	|ErrorReceiver!| StdErr(3)		--> nil__LaunchMothership
-	|MessagePosition| Using(4)		--> AC__ParserRestore
-	|SpdProcess| Parent(5)			--> AC__EnterAutoComplete
-	|bool| _DotInsertAllow(6)		--> AC__GetFunc
-	|Dict of SyntaxObj| _SyxDict(7) --> Cpp_WriteAPIHeader
-	|byte| Active(8)				--> Func__CurrFuncSet
-	|Charset!| CSLine(9)			--> Ext__Clean
-	|bool| Enabled(10)				--> Options__ColorSet
-	|byte| AutoPrint(11)			--> FB__AppOptions_breakonerr
-	|bool| DebugExecute(12)			--> FB__AppOptions_noisy
-	|Charset!| CSWordStart(13)		--> Str_IsOKForImport
-	
-	The self-compile seems to be filled with littered with wasteful globals? WHY? all sorts of functions called from glnk
-*/
-
-/*
-	We can make a link-compression scheme!
-	JB_File__Prefs
-	JB_File__SpeedieDir -->
-	JB_File__Prefs
-	xxxxxxxxxSpeedieDir -->
-	
-	just mark how many bytes backwards and forwards. Can do in 1 byte. 4 bits for down 4 bits for up.
-	
-	If we go 0 up... it means a special code. For extra-long stuff.
-	
-	0 down and 0 up means... skip! for placeholders
-*/
-
 
 
 function SCFunction.CanPrepareInline (|bool|)
