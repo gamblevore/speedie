@@ -6,7 +6,7 @@
 main (|[string]| Files)
 	for f in files.GlobExpand 
 		app.TryCompileOne(f, f.TrimStart(app.cwd))
-	app.say ("$fails Failiures", "// All OK")(Fails.length)
+	app.say (fails.getresult, "// All OK")(Fails.length)
 
 
 function app.TryCompileOne (|file| f, |string| s)
