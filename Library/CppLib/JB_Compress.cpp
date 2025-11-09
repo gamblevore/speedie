@@ -1,12 +1,11 @@
 
 #include "JB_Compress.h"
-// #include "divsufsort.h"
 // this still seems a lot SLOWER than the original! Despite all my opts!
 // could it be because the original perhaps used... registers? and mine isn't?
 // sigh. That will suck, to change.
 // it could be the myscore operation, though.
 // either way, this could get a lot faster.
-// if it gets faster without registers, then so will my original mz too.
+
 
 
 struct DateLocker {
@@ -35,9 +34,12 @@ struct DateLocker {
 	}
 };
 
-
+static PicoDate			JB_LastFlush;
 static DateLocker		Allocator;
 static u8*				Space;
+static int				TotalEscaped;
+
+
 
 extern "C" int CompressionFree(int X) {
 	if (Allocator.start_clear(X)) {
@@ -52,7 +54,6 @@ extern "C" void JB_CompFreeNow() {
 	Allocator.NoLongerNeeded = true;
 }
 
-PicoDate JB_LastFlush;
 extern "C" int JB_BasicCareTaker(PicoDate D) {
 	if (D - JB_LastFlush >= 64*1024) { // one second.
 		JB_LastFlush = D;
@@ -279,6 +280,7 @@ struct Compression {
 		// I think the only way to improve this, is to do rolz.
 		
 		PutOffset(0);
+		TotalEscaped += p - LastOut;
 		PutLength(p - LastOut);
 		PutBits(1, 1); // aligner. Can be byte-aligned for speed. Optional.
 		while (LastOut < p)
