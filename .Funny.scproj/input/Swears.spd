@@ -12,7 +12,10 @@ class SwearWord
 		
 	constants
 		Letters = "@*%^|&$?"				// swearing increases code quality :D
-	
+		
+	module
+		function Sorter (SorterComparer of swearword)
+			return .name.SyntaxCompare(b.name)
 
 
 extend_module swearword
@@ -25,7 +28,7 @@ extend_module swearword
 		for w in s.unbleep.Split
 			if w
 				list <~ SwearWord(w, nil|error|)
-		string.sort(list)
+		list.sort
 	
 	helper Accept (|SwearWord| a, |SwearWord| b, |bool|)
 		require a != b

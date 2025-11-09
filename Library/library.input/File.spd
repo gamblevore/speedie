@@ -477,7 +477,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		errorreceiver.NewError( nil, Error, (.path, "")(self) )
 
 	module
-		|| DebugExecute = false
 		|string| _Speedie
 				
 		function SpeedieDir (|string|)
@@ -490,7 +489,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 					_speedie = "/usr/local/speedie/"
 			return _speedie
 		
-		function SizeSorter (SorterComparer of file)
+		function Sorter (SorterComparer of file)
 			|| aa = .size
 			|| bb = b.size
 			return bb - aa

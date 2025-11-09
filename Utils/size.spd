@@ -19,7 +19,7 @@ main (|[file]| FileList)
 	for F in FileList
 		F.CountAll
 	
-	found.sort(MessagePositionSorter)
+	found.sort
 	|int64| Total
 	for m in found
 		|| sz = m.position
