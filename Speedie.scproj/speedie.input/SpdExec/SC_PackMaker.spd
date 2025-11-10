@@ -158,7 +158,7 @@ module PackMaker
 	
 	
 	function WritePackToDisk
-		|| F = Compiler.ProductPath.SetExt("zpd").file
+		|| F = Compiler.ProductPath.SetExt("zpd").file // what about .app instead of .zpd?
 		require f.OpenEmpty
 		
 		|| j = jbin(@tmp, "zpd")
@@ -172,8 +172,9 @@ module PackMaker
 		.RenderASM(j, stack_trace)
 		.DumpStrings(j)
 		.PackClasses(j)
-		.FuncLink(j)
-		.GlobLink(j)
+		if options.UpdateStability // remove! just for size-testing
+			.FuncLink(j)
+			.GlobLink(j)
 		.AddDebugStuff(j, stack_trace)
 		j.ExitAll
 	

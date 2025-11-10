@@ -24,7 +24,7 @@ datatype Tetronimo (uint64)
 		Dropper
 		Pivot
 		Real
-		Destroying
+//		Destroying
 		Proper = Dropper + pivot
 
 	syntax is (|Tetronimo| V, |bool|)
