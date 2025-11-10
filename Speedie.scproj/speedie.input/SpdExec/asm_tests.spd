@@ -597,7 +597,7 @@ function Incr (|int| x, |int| y, |int|)
 
 function ForeignFuncs (|string?| x, |string?| y, |string|)
 	visible
-	|| x3 = x._white(12345, 98765, true)
+	|| x3 = x.inwhite(12345, 98765)
 	|| x4 = x.Length
 	|| x5 = x._Addr
 	|| x6 = x! + y!

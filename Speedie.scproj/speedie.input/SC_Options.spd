@@ -315,9 +315,6 @@ module Feedback
 			Options.PrintCompileString = false
 			options.silent = true
 		
-		+'update'
-			options.UpdateStability = true
-		
 		+'stages'
 			Explain(Purpose, "Prints the stages")$
 			options.printstages = value.optionbool
@@ -358,6 +355,10 @@ module Feedback
 			if value.optionbool
 				options.Mode = options.cpp
 				
+		+'update'
+			options.Mode = options.Pack
+			options.UpdateStability = true
+
 		+'pack'
 			explain(purpose, "Compiles to zpd. Will not compile to cpp")$
 			if value.optionbool

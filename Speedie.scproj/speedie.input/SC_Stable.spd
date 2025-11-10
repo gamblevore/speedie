@@ -6,7 +6,7 @@ module Stability
 	function Load (|bool|)
 		|| frogs = packmaker.PackGlobSize
 		|| bank = Compiler.library["stable_id_bank.txt"]
-		if bank.Open(true)
+/		if bank.Open(true)
 			.UseBank(bank)
 			|faststring| fs
 			if options.UpdateStability
