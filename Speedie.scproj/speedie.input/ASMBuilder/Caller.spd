@@ -138,18 +138,24 @@ function SCFunction.HasCVersion (|bool|)
 	return self is wrapper
 
 
-function @ASMType.ASMFunction (fn_asm)			// dofunction function
+function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, intrin)
-		|| MiniDest = .AskForInline(prms, dest, fn)
-			return MiniDest
+		if fn == "JB_Str_InWhite"
+		if fn isnt CantInline
+			|| MiniDest = .AskForInline(prms, dest, fn)
+				return MiniDest
 		TableID = fn.PackID + 31
-		if tableid <= 31
-			check (compiler.inperry) (exp, "Missing PackID")
+
+		if tableid <= 31							// failed!
+			if !fn.islibrary or !.state.fn.islibrary
+				error (exp, "Missing PackID")
+			  else
+				debugat								// shouldn't come here.
 			tableid = 0xFFFF
 	  else
 		|| f = exp.first!

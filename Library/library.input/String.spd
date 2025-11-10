@@ -95,8 +95,8 @@ class String
 	operator minus (|string|s, |int|)
 		return .length - s.length
 	
-	operator isna (|string| s, |bool|)
-		return !(self isa s)
+//	operator isna (|string| s, |bool|)
+//		return !(self isa s)
 	
 	function Widen (|int| Width, |int| Mode=1, |byte| Char=' ', |string|)
 		if self >= Width
@@ -123,20 +123,6 @@ class String
 			require !s.islower
 		return true
 
-	function Group (|int| i, |int|) // replace this with charprops.spd?
-		|| b = self[i]
-		if b.IsUpper
-			return 1
-		if b.IsLower or b == '_'
-			return 2
-		if b.IsInt
-			return 3
-		if b.iswhite
-			return 4
-		if b >= 128
-			return 5
-
-
 	function Map (|bytemap| b, |int| clear = -1, |string|)
 		cpp_wrapper JB_Str_MapBytes
 
@@ -150,7 +136,7 @@ class String
 			require self[i++].IsInt
 		return true
 	
-	function Owner		(|object|)					{ cpp_wrapper }
+//	function Owner		(|object|)					{ cpp_wrapper }
 	function Unshare	(|string|)					{ cpp_wrapper }
 	function Copy		(|string|)					{ cpp_wrapper }
 
@@ -300,10 +286,10 @@ class String
 			rz <~ field
 
 
-	function Split (|int| n, |StringLengthSplit|)
-		cpp_part SplitChunks
-		rz.name = self
-		rz.size = n
+//	function Split (|int| n, |StringLengthSplit|)
+//		cpp_part SplitChunks
+//		rz.name = self
+//		rz.size = n
 
 
 	function FirstLine (|string|)
@@ -398,11 +384,11 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_OperatorPlus
 			
-	helper Append (|string?| b, |string?| c, |string?| d=nil, |string|)
+	autogen Append (|string?| b, |string?| c, |string?| d=nil, |string|)
 		nil checker
 		cpp_wrapper JB_Str_Append4
 
-	helper Append (|string?| b, |string?| c, |string?| d, |string?| e, |string?| f=nil, |string|)
+	autogen Append (|string?| b, |string?| c, |string?| d, |string?| e, |string?| f=nil, |string|)
 		nil checker
 		cpp_wrapper JB_Str_Append6
 		
@@ -428,13 +414,13 @@ class String
 			if item == self
 				return i
 	
-	operator in (|string| s, |bool|)
-		cpp_part OpInStr
-		return s contains self
+//	operator in (|string| s, |bool|)
+//		cpp_part OpInStr
+//		return s contains self
 			
-	operator in (|dictionary| d, |bool|)
-		cpp_part OpInDict
-		return d[self]
+//	operator in (|dictionary| d, |bool|)
+//		cpp_part OpInDict
+//		return d[self]
 	
 	operator in (|byte| d, |bool|)
 		cpp_part OpInByte
@@ -599,12 +585,12 @@ class String
 		return true
 
 
-	function HasMoat (|bool|)
-		|| n = .length-2
-		require n>2
-		|| u = '_'
-		|| d = .addr
-		return u == d[0] and d[1] and d[n] and d[n+1]
+//	function HasMoat (|bool|)
+//		|| n = .length-2
+//		require n>2
+//		|| u = '_'
+//		|| d = .addr
+//		return u == d[0] and d[1] and d[n] and d[n+1]
 
 
 	function IsURL (|string|)
@@ -737,19 +723,19 @@ function array.join (|array of string| self, |string| sep = "", |string|)
 
 	
 
-struct StringLengthSplit
-	|int|		Size
-	|string|	Name
-	
-	iterator
-		|| spos = 0
-		while spos < .name.length
-			yield .name[spos, spos+.size]
-			spos += .size
-	
-	function List (|array of string|)
-		opt norefcounts
-		for s in self
-			rz <~ s
+//struct StringLengthSplit
+//	|int|		Size
+//	|string|	Name
+//	
+//	iterator
+//		|| spos = 0
+//		while spos < .name.length
+//			yield .name[spos, spos+.size]
+//			spos += .size
+//	
+//	function List (|array of string|)
+//		opt norefcounts
+//		for s in self
+//			rz <~ s
 
 

@@ -3,10 +3,10 @@
 module Stability
 	|| LastID = 1
 
-	function Load (|bool|)
+	function StableLoad (|bool|)
 		|| frogs = packmaker.PackGlobSize
 		|| bank = Compiler.library["stable_id_bank.txt"]
-/		if bank.Open(true)
+		if bank.Open(true)
 			.UseBank(bank)
 			|faststring| fs
 			if options.UpdateStability
@@ -39,7 +39,10 @@ module Stability
 		
 	
 	function scfunction.LibNeedsID (|bool|)
-		return .IsMacro  and  self isnt disabled  and  self|scnode| isnt private
+		require !.IsMacro
+		require self isnt disabled
+		require self|scnode| isnt private
+		return true
 		
 	function scclass.NeedID (|bool|)
 		return .IsLibrary and (!.isrole and .IsObject)

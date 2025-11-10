@@ -461,7 +461,21 @@ class TextView (GUIControl)
 			if pos <= 0 or pos >= s.length
 				exit
 		return pos
-				
+	
+
+	function string.Group (|int| i, |int|) // replace this with charprops.spd?
+		|| b = self[i]
+		if b.IsUpper
+			return 1
+		if b.IsLower or b == '_'
+			return 2
+		if b.IsInt
+			return 3
+		if b.iswhite
+			return 4
+		if b >= 128
+			return 5
+
 			
 	helper WordMoveSub (|ind| pos, |int| dir, |ind|)
 		opt norefcounts

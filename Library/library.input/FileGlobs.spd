@@ -61,7 +61,7 @@ function string.GlobExpand (|[file]|)
 
 
 function array.GlobExpand (|[string]| self, |[file]|)
-	description "Returns a list of files, that match the glob passed, using the input list of files."
+	description "Returns files existing on the file-system, matching any of the globs passed."
 
 	|| base = "/".file
 	for L in self

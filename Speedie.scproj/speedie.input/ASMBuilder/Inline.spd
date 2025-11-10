@@ -121,7 +121,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	ll.after = .curr
 	rz = .InlineFinish(ll)
 	|| Grown = .CurrGain(RealStart)
-	if Grown > AllowedGain
+	if (Grown > AllowedGain)
 		regs.Rewind(self)
 		return nil
 	
@@ -162,7 +162,8 @@ function CurrGain (|&fatasm| Start, |int|)
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
 	|| N = fn.µlength	
-	require N and (N < 128) and (fn isnt cpp)
+	require N and (N < 64) and (fn isnt cpp)
+	
 	require .state.InlineDepth < .InlineDepthLimit
 
 	|| MaxEnd = .InlineEnd
@@ -188,7 +189,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	
 	|| I = .TryInline(prms, dest, fn, AllowedGain)
 		return I
-	
+
 	// try weaker inline
 	require !.state.InlineDepth and (.DeepestInline > 1)
 

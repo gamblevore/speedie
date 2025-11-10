@@ -64,7 +64,7 @@ class FastString {
 	function AppendSection
 		disabled "use .AppendRange"
 
-	helper AppendHex3 (|int| Num)
+	autogen AppendHex3 (|int| Num)
 		cpp_wrapper JB_FS_AppendHex3 // not really needed. remove this later. Only my obj-saver needs this.
 	
 	function AppendUTF8 (|codepoint| Num)	{ cpp_wrapper JB_FS_AppendUTF8Char }

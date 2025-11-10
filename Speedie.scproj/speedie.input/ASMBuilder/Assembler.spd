@@ -740,7 +740,7 @@ target debug
 		fn.µprint
 
 
-function Assembler.GenerateASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
+function Assembler.ASMCompile (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)

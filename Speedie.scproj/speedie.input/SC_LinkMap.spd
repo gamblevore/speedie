@@ -1,7 +1,6 @@
 
 
-module LinkMap 
-	
+module LinkMap	
 	function SCObject.CanLinkFrom (|scfunction| Fn, |bool|)
 		opt norefcounts 
 		if .CurrFuncLink == fn.LinkID
@@ -14,6 +13,10 @@ module LinkMap
 		opt norefcounts
 		require to isnt InBuilt
 		require to.CanLinkFrom(self)
+
+		if to.IsLibrary and (to is private) and .IsLibrary
+			(self is CantInline) // can't inline this
+
 		(.linkto init []) <~ to
 		
 		if Compiler.InPerry

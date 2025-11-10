@@ -86,13 +86,6 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	|| Missing = OrigDecls &~ .VDecls
 	if !exp or !missing
 		return return
-
-	// asmtodo: what if the var came from a closed branch?
-	// can we write that somewhere?
-	// perhaps?
-	// perhaps the remover can set this... so it never goes to nil
-	// unless it was already nil? The remover still has to know
-	// which branch something came from!
 	
 	.VDecls |= Missing
 	
