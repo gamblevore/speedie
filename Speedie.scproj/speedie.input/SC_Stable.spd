@@ -33,13 +33,13 @@ module Stability
 			// or just pass 4096
 			Table = jb_vm.vm.InitTable(4096, frogs)
 
-		for fn in PackMaker.LibFuncs
-			if fn.LibNeedsID
+		for fn in Compiler.FuncList
+			if fn.NeedsID
 				fn.MakeID(fs, table)
 		
 	
-	function scfunction.LibNeedsID (|bool|)
-		require !.IsMacro
+	function scfunction.NeedsID (|bool|)
+		require !.IsMacro and .IsLibrary
 		require self isnt disabled
 		require self|scnode| isnt private
 		return true

@@ -4,3 +4,5 @@ app.usage = "Takes a text file of lines, and sorts it, then replaces the origina
 main (|file.existing| TextFile)
 	|| d = TextFile.ReadAll
 		TextFile.Data = d.Sort
+		if StdErr.ok
+			"sorted: ${d.length.strsize}"
