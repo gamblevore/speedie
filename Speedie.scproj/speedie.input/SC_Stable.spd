@@ -11,10 +11,11 @@ module Stability
 			|faststring| fs
 			if options.UpdateStability
 				fs = faststring()
+				if !bank.Size
+					bank <~ "// This file is not stable till 'release'. Libfuncs will get removed."
 			.FillMissingLibFuncs(fs, frogs)
 			if fs and fs.Length
-				if bank.size > 0
-					bank <~ "\n"
+				bank <~ "\n"
 				bank <~ fs|string| // hehe
 			rz = true
 
