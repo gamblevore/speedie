@@ -151,11 +151,11 @@ struct ClassData
 		.DefaultLayer.Use
 		
 	module 
-		helper First (|&classdata|)
+		function First_ (|&classdata|)
 			cpp_wrapper JB_AllClasses
 		
-//		helper New (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
-//			cpp_wrapper JBClassNew
+		function New_ (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
+			cpp_wrapper JBClassNew
 	
 	iterator
 		|| curr = self

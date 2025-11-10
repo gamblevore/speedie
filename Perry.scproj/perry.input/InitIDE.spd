@@ -787,7 +787,7 @@ extend PerryIDE
 		for ro in conf..roots
 			error.BackupErrorSource = ro
 			if ro.expect(@str)
-				file.OSXMaxCaseWarnings[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
+				file.OSXMaxCaseWarnings_[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
 				|| str = .ExpandStr(ro.name)
 					f.addroot(str.file)
 				  else
@@ -817,7 +817,7 @@ extend PerryIDE
 			|| pos = 0
 			|| file = .DesiredStart(projfol, pos)
 				.EditRow(file)
-				.EditMe.showandsel(pos)
+				.EditMe.ShowAndSelect(pos)
 			return true
 		return .EditRow(.filelist.start)
 

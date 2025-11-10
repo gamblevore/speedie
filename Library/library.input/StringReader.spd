@@ -49,7 +49,7 @@ class InputStream
 			.position += p
 	
 		
-	helper Remaining (|int|)
+	function Remaining (|int|)
 		return .length - .position
 
 

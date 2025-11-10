@@ -923,7 +923,7 @@ So anything not 0 means "its OK"`
 		run
 			|| e = .upon.editme 
 			if e.myerror
-				e.BumpScroll
+				e.TouchScrollBar
 			
 	
 	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen

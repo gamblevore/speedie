@@ -182,7 +182,7 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 		if !OK and reason ~= PerryAutoCompleteReason.escape or PerryAutoCompleteReason.sel
 			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
 	
-	if (reason ~!= "Sel") and (type ~= "autocomplete") and (.FakeAutoComplete >= 1)
+	if (reason ~!= "Sel") and (type ~= "autocomplete") and (.AutoCompleteShowingDots_ >= 1)
 		.ide.ShowAutoBeep(true)
 		return true
 	
@@ -258,7 +258,7 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 	
 function PerryInsert7 (|textview| self, |int| A, |bool|)
 	.undochecker = -1
-	.insertsub("||", (A,A))
+	.InsertText("||", (A,A))
 	.selrange = A+1
 	return true								// fn X () --> fn X (|*|) 
 function PerryInsert6 (|textview| self, |intrange| a, |bool|)
@@ -273,18 +273,18 @@ function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 	if self[a.x2] != ')'
 		toInsert += ", "
 		
-	.InsertSub(toinsert , a)
+	.InsertText(toinsert , a)
 	.selrange = sel
 	return true								// f* --> fn *
 
 function PerryInsert5 (|textview| self, |intrange| A, |bool|)
 	.undochecker = -1
-	.insertsub(", ||", A)
+	.InsertText(", ||", A)
 	.selrange = A.x+3
 	return true								// fn X (|type| name*) --> fn X (|type| name, |*|) 
 function PerryInsert34 (|textview| self, |intrange| A, |bool|)
 	.UndoChecker = -1
-	.InsertSub(" ", A)
+	.InsertText(" ", A)
 	.Insert("...", true)
 	return true								// fn X (|T*|) -->fn X (|T| *)
 function PerryInsert2 (|textview| self, |intrange| A, |bool|)
@@ -294,12 +294,12 @@ function PerryInsert2 (|textview| self, |intrange| A, |bool|)
 		decl = decl[1...]
 		A += (1,1)
 		
-	.insertsub(decl, A)
-	.selrange = .sel0-2
+	.InsertText(decl, A)
+	.selrange = .selrange.x-2
 	return true								// fn X* --> fn X (|*|)
 function PerryInsert1 (|textview| self, |intrange| a, |bool|)
 	.undochecker = -1
-	.InsertSub(" name ", a)
+	.InsertText(" name ", a)
 	.selrange = (a.x2+1, a.x2+5)
 	return true								// f* --> fn *
 
@@ -336,13 +336,13 @@ function textview.PerryDeclKey (|bool|)
 	// ASSUME by here, that this line parses properly.
 	
 	|| clearback = .IsClearBackLine(s.x-1)
-	|| endofline = .FindEndOfLineIgnoringWhite(s.x)
+	|| endofline = .SyntacticEndOfLine_(s.x)
 	|| inclass = .IsInClass(d) 
 	if clearback and !inclass
 		return .insert("|| ")
 	
 	if endofline or inclass
-		|| Before = .BackHasIgnoringSpaces("||", s.x)
+		|| Before = .FindBackwardsIgnoringSpaces("||", s.x)
 			if before == '\n' or '\r' 
 				.insert(" ")
 			  else
@@ -355,7 +355,7 @@ function textview.PerryDeclKey (|bool|)
 				return true
 
 		.insert("||")
-		.selrange = .sel0-1 // :)
+		.selrange = .selrange.x-1 // :)
 		return true
 
 
@@ -466,7 +466,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 	if  !s.width  and  (key is tab)  and  self[s.x].istextline
 		|| C = .ide.autocomplete.listsource.slowcount
 		if C > 0 
-			if c == 1 and .FakeAutoComplete == -1
+			if c == 1 and .AutoCompleteShowingDots_ == -1
 				return 0 // what?
 			if .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.tab)
 				ide.EditmeTabRetryThing = 1

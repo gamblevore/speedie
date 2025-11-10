@@ -38,7 +38,7 @@ function message.FuncAtPos (|int| n, |message|)
 function PerryIDE.FindSelectedMenuItem (|message| result)
 	opt norefcounts
 	require result.hasany
-	|| fn = result.FuncAtPos(.editme.sel0 )
+	|| fn = result.FuncAtPos(.editme.selrange.x)
 	.FunctionMenu.SubMenu!.select(result)
 
 
@@ -81,7 +81,7 @@ function PerrySuperAutoComplete (guilistevent)
 	opt norefcounts
 	|| i = .ide
 	|| fn = i.CurrSelFunc
-		i.editme.ShowAndSel(fn.Position, true)
+		i.editme.ShowAndSelect(fn.Position, true)
 		i.SectionKeyTime = i.MaybeSendMessage("callfrom", fn)
 	return true
 
@@ -99,19 +99,18 @@ function PerryAutoCompleteSelected (GUIListEvent)
 		p = .ListSource.obj as string
 	if p and i.EditPath2(p)
 		|| rl = row[2]
-			e.ShowAndSel(rl.int, true)
+			e.ShowAndSelect(rl.int, true)
 	i.DuringTempView--
 
 	
-
 function PerryFuncMenuSelected (GUIListEvent)
 	opt norefcounts
 	|| e = .ide.EditMe
 	if row
-		e.ShowAndSel(row.position)
+		e.ShowAndSelect(row.position)
 		return false
 	|| obj = .ListSource.obj as TextViewLine
-		e.ReallySetStart(obj)
+		e.start = obj
 
 
 function FuncListSorter (SorterComparer of message)

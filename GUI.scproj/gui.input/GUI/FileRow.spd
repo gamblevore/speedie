@@ -365,7 +365,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 			|| ext = n.ext
 			if isdirlike
 				p = p.PathDir
-			|| icon = filerow.icon(p, types).Render
+			|| icon = filerow.FileIcon(p, types).Render
 			n = icon + " " + n
 			|| r = filerow(p, n, (".nothing", "")(isdirlike))
 			self <~ r

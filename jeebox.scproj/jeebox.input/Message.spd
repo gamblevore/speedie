@@ -803,17 +803,17 @@ Message is also:
 				return ch
 
 		if Err
-			.AccessErr(s, name, nil)
+			.ReportFailiure(s, name, nil)
 	
 
-	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err=false, |Message|)
+	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err = false, |Message|)
 		Opt NoRefCounts
 		nil self
 		for curr.flat in self
 			if curr == fn or fn == nil
 				if name == nil  or  curr ~= name: Return curr
 		if err
-			.AccessErr(fn, name, nil)
+			.ReportFailiure(fn, name, nil)
 	
 	
 	function FastString.MsgErrorName (|string?| name)
@@ -823,7 +823,7 @@ Message is also:
 			self <~ "' "
 
 
-	helper AccessErr (|syntax|s, |string?| name=nil, |message?| found=nil)
+	function ReportFailiure (|syntax| s, |string?| name = nil, |message?| found = nil)
 		cpp_part CantFind
 		if !self
 			jb_api.NilHandler
@@ -916,7 +916,7 @@ Message is also:
 				if found == OK or found == need or (OK == @nil)
 					return found
 			if OK!=@nil
-				.accesserr(need, nil, found)
+				.ReportFailiure(need, nil, found)
 	
 	
 	function NeedFirst (|message|)
@@ -930,7 +930,7 @@ Message is also:
 			if s == nil or found.func == s
 				return found
 		if self
-			.accesserr(s, "", found)
+			.ReportFailiure(s, "", found)
 
 
 	Syntax Access (|syntax| s, |int| n, |message|)
@@ -939,7 +939,7 @@ Message is also:
 		|| Ch = self[n]
 			if !s or ch.func==s
 				return ch
-		.accesserr(s, Nil, ch)
+		.ReportFailiure(s, Nil, ch)
 	
 	
 	Syntax Access (|Syntax| s, |string| name, |Message|)
@@ -1012,7 +1012,7 @@ Message is also:
 		|| ch = .last
 		if ch and (!need or ch==Need)
 			return ch
-		.accesserr(Need, nil, ch)
+		.ReportFailiure(Need, nil, ch)
 
 	
 	function Next (|syntax| Need, |string?| name=nil,  |Message|)
@@ -1023,7 +1023,7 @@ Message is also:
 			|| ch = .next
 				if (!need or ch.func==Need)  and  (name == nil or ch.name ~= name)
 					return ch
-			.accesserr(Need, nil, ch)
+			.ReportFailiure(Need, nil, ch)
 
 
 	syntax Equals (|string?| name, |bool|Aware=false, |bool|)

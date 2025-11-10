@@ -80,7 +80,7 @@ function InScrollArea (|ivec2| p, |bool|)
 helper MouseMoveInScrollArea (|ivec2| p, |bool|)
 	if .HasFocus or !GUI.MouseButtons
 		if .InScrollArea(p)
-			return .bumpscroll
+			return .TouchScrollBar
 
 
 helper ScrollBarMove (|vec3| slh, |int| shift)
@@ -109,7 +109,7 @@ helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 			ScrollInfo.indrag_ = -1
 			return false
 	
-	return .BumpScroll
+	return .TouchScrollBar
 
 
 helper ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)

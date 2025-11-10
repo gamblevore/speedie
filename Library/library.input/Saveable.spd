@@ -211,7 +211,7 @@ constants
 /// or ARE "saveas nil"
 
 
-helper Object.SaveTryCollect (|&ObjectSaver| Saver)
+autogen Object.SaveTryCollect (|&ObjectSaver| Saver)
 	opt norefcounts
 	if (self isa Saveable)
 		require .SaveMark

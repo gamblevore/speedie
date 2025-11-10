@@ -47,7 +47,7 @@ class TextViewLine (list)
 		.lineerror = nil
 		.text = ""
 
-	helper textview.BackHasIgnoringSpaces (|string| name, |int| pos, |codepoint|)
+	function textview.FindBackwardsIgnoringSpaces (|string| name, |int| pos, |codepoint|)
 		while --pos >= 0
 			|| t = .text[pos]
 			if t != ' ' and '\t'
@@ -443,7 +443,7 @@ helper TextView.AutoLim (|textviewline| d, |bool|)
 			return true
 
 
-helper TextView.FakeAutoComplete (|int|)
+function TextView.AutoCompleteShowingDots_ (|int|)
 	|| n = ._autocompleteback
 	if ._AutoCompleteString=="" or ._AutoCompleteString.length == n
 		return -1
@@ -451,7 +451,7 @@ helper TextView.FakeAutoComplete (|int|)
 
 
 helper TextView.DrawAuto (|image| where, |int| x, |int| y)
-	|| n = .FakeAutoComplete
+	|| n = .AutoCompleteShowingDots_
 	|| str = (._autocompletestring[n, int.max], "...")(n>=0)
 	where.drawtext(str, (x,y), colors.white(0.3))
 	

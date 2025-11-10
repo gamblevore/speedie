@@ -215,7 +215,7 @@ module GUI
 		.Touch(modified)
 
 	
-	helper IsTyping (|bool|)
+	function IsTyping (|bool|)
 		return .event is TEXTINPUT or KEYDOWN
 	
 	
@@ -304,7 +304,7 @@ module GUI
 		.SetHint("SDL_RENDER_VSYNC".cstr, v.cstr)
 	
 	
-	helper RemoveBorder
+	function RemoveBorder
 		|| n = .NativeWindow
 			JB_SDL_RemoveWindowBorder(n)
 
@@ -609,28 +609,28 @@ module GUI
 		.acontrolwasresized = false
 		.Touch
 		for w.fast in window.all
-			w.CalculateWindowSize(force, true)
+			.CalculateWindowSize(w, force, true)
 		for w.fast in notifications.Alerts
-			w.CalculateWindowSize(force, false)
+			.CalculateWindowSize(w, force, false)
 
 
-	helper Window.CalculateWindowSize (|bool| Force, |bool| UsePrev)
+	function CalculateWindowSize (|window| W, |bool| Force, |bool| UsePrev)
 		opt norefcounts
-		require ._NeedsResize or force
-		._NeedsResize = false
+		require w._NeedsResize or force
+		w._NeedsResize = false
 
 		|ivec4| OldSize
 		|| Sexy = .MouSexy
-		|| Curr = .ControlOrMenuAt(Sexy)
+		|| Curr = w.ControlOrMenuAt(Sexy)
 			oldsize = curr.lastrect
-		|| p = .parent ?? window.all
+		|| p = w.parent ?? window.all
 		|| D = GUI.Screen
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
 		if UsePrev
-			|| b = .prev
+			|| b = w.prev
 				rect = b.lastrect
-		.CalculateSize(BigRect, rect, BigRect)
+		w.CalculateSize(BigRect, rect, BigRect)
 		
 		if curr and curr.lastrect != OldSize
 			curr.__MouseMove__(Sexy, Sexy - gui.CurrMouseXY, SDL_WindowEventID.moved)
@@ -930,7 +930,7 @@ module GUI
 		Drop.file = nil
 		|| p = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)
 		|| c = w[.MouseXY] ?? w
-		c.DoPaste(path, p)
+		c.PasteFromClipboard(path, p)
 		w.DroppingInto = nil
 		return SDLActivity.activity
 
@@ -1006,10 +1006,10 @@ module GUI
 		if (key is copy) or (cmd and key is c)
 			|| wf = w._FocusAttempt
 			if !rf and wf isa textview
-				return wf.docopy
-			return gw.DoCopy
+				return wf.CopyToClipboard
+			return gw.CopyToClipboard
 		if (key is paste) or (cmd and key is v)
-			return gw.DoPaste(clipboard.text)
+			return gw.PasteFromClipboard(clipboard.text)
 
 
 	helper StrongClose (|sdlactivity| Reason, |SDLActivity|)
@@ -1185,7 +1185,7 @@ module GUI
 		|| dd   = .drawdrag 
 		|| di	= w.DroppingInto
 			for c in dd
-				di.dopaste(c, copypasteflags.pastefile)
+				di.PasteFromClipboard(c, copypasteflags.pastefile)
 		
 		|| dow	= w.CurrMouseDown
 		|| F	= w.openedmenu
@@ -1323,7 +1323,7 @@ module GUI
 		|| InsideWin = w.lastrect.soothe contains xy
 		if !InsideWin and (w == .FrontDialog)
 			if w.ClickOutsideCloses
-				w.CloseDialog
+				w.Close
 				return SDLActivity.activity
 			w.GetUserAttention
 			return SDLActivity.nothing

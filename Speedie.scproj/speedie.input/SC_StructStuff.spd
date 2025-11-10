@@ -50,17 +50,16 @@ function Tran_Rejoin (TranFunc)  // exitter
 		|| n = p.next
 		expect !n (node, "Blocks should end with 'rejoin'")
 //	node.LastInBlock(0) // makes no sense
-	
-	
+
 
 
 function SCFunction.StructImprove (|scparamarray| incoming, |scfunction|)
 	opt norefcounts
-	if compiler.inperry
+	if self|scnode| is Private
 		|| curr = scfunction.currfunc
-			if !curr.IsLibrary and (self|scnode| is Private) and (.project != curr.project)
-				error (incoming.exp, "Accessed private function, beyond scope")
-				error (.source, "Called function")
+		if curr and !curr.IsLibrary and (.project != curr.project)
+			error (incoming.exp, .name + " used beyond private scope" )
+			error (.source, "   Original:")
 			
 	|| ft = .StructReturned
 		incoming.StructReturner(ft.AsLocal, self)

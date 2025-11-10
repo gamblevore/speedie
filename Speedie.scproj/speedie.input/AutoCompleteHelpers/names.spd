@@ -1,8 +1,8 @@
 
 module AutoComplete
 	// used by perry
-	|| Owner			= "module/extend_module/class/struct/role/task/datatype/extend/linkage/selector".dict('/')
-	|| function_names	= "main/prototype/function/helper/task/api/syx/syntax/setter/operator/render/behaviour/virtual/constructor/destructor/cpp_wrapper/cpp_nothing"
+	|| Owner			= "module/extend_module/class/struct/role/task/datatype/extend/linkage".dict('/')
+	|| function_names	= "main/prototype/function/helper/autogen/task/api/syx/syntax/setter/operator/render/behaviour/virtual/constructor/destructor/cpp_wrapper/cpp_nothing"
 	|| Functions		= function_names.dict('/')
 	
 	function IsAFunc (|string| s, |bool|)

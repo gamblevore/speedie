@@ -31,7 +31,7 @@ class Class
 		.src = Ch
 		.super = parent
 		
-		.RealClass = classdata.new(.name.cstring, sz.int, parent.realclass)
+		.RealClass = classdata.new_(.name.cstring, sz.int, parent.realclass)
 		.LoadBehaviours(beh)
 		addclass(self)
 
@@ -110,7 +110,7 @@ class Class
 
 		function LoadInbuiltClasses (|bool|)
 			opt norefcounts
-			for cd in ClassData.first
+			for cd in ClassData.First_
 				|| c = class.new(cd)
 				if c.name ~= "object"
 					.obj = c

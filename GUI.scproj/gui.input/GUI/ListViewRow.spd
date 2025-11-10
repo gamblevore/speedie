@@ -76,7 +76,7 @@ role ListViewRow (message)
 		// 0-100 --> 30, 60
 		// if x < a number, we are in that thing.
 		|| col = 0
-		for i in (1 to .DrawCols-1)
+		for i in (1 to .ColumnsToDraw-1)
 			if .columns(i) >= x
 				exit
 			col++
@@ -133,7 +133,7 @@ role ListViewRow (message)
 		|| str = p.Declutterer.Strength
 		where.controlclip = rect.clip(p.lastrect)
 		
-		for i in p.DrawCols
+		for i in p.ColumnsToDraw
 			rect.horz	= p.ColBounds(i, z2, self)
 			rect.x	   += depth*font.width*2
 			.DrawRowColumn(rect, where,  p, depth, i, str) 
@@ -258,7 +258,7 @@ role ListViewCell (message)
 	
 	function Tab (|bool| dir, |ListView| lv, |ListViewcell|)
 		|| n    = .column + (1, -1)(dir)
-		|| cols = lv.DrawCols
+		|| cols = lv.ColumnsToDraw
 		if n >= cols
 			return .step( 1, 0)
 		if n < 0

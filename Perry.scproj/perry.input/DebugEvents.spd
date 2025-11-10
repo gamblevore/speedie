@@ -226,7 +226,7 @@ function ClickedStack (GUIListEvent)
 	|| i = .ide	
 
 	i.EditPath(path, false)
-	i.editme.ShowAndSel(row.last.int, true)
+	i.editme.ShowAndSelect(row.last.int, true)
 	return true
 
 
@@ -412,7 +412,7 @@ function SelectedASM (guilistevent)
 	i.DuringASMEvent = true
 	i.EditPath(file, false)
 	if f
-		i.editme.ShowAndSel(n, true)
+		i.editme.ShowAndSelect(n, true)
 	i.DuringASMEvent = false
 
 

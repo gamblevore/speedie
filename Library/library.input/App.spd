@@ -250,7 +250,7 @@ target debug
 render MemoryUsage (|int| Over=0)
 	|[message]| items
 	
-	for cls in classdata.First
+	for cls in classdata.First_
 		|| Mem = cls.MemoryUsed
 		if mem > over
 			|| s = message(@str, cls.name.wrap)

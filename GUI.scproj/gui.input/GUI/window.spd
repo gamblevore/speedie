@@ -57,7 +57,7 @@ class Window (GUIControl)
 		if .CreatedDate < 16
 			.CreatedDate = date.now
 		.InlineEditorPlace.Init(self)
-		.CalculateWindowSize(true, true)
+		gui.CalculateWindowSize(self, true, true)
 		if show
 			.show
 
@@ -119,7 +119,7 @@ class Window (GUIControl)
 		if gui.init(scaling)
 			gui.CenterCursor
 			.BlockScale ?= 20
-			.CalculateWindowSize(true, true)
+			gui.CalculateWindowSize(self, true, true)
 			if !gui.singleframenest
 				gui.NukeCursor
 				return GUI.run
@@ -136,7 +136,7 @@ class Window (GUIControl)
 		.ReturnValue = nil
 		if rz == self
 			rz = nil
-		.CloseDialog
+		.Close
 
 
 //	setter Focus (|guicontrol|)
@@ -464,18 +464,19 @@ class Window (GUIControl)
 		
 	
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
-		if self
-			require .__TryClose__(reason) or reason is terminating
-			.ClearTree
+		if !self
+			return 0
+			
+		if .IsDialog
+			isnt visible
+			.ReturnValue ?= self
 			.remove
-		return reason
-
-	
-	helper CloseDialog
-		opt norefcounts
-		isnt visible
-		.ReturnValue ?= self
+			return reason
+		
+		require .__TryClose__(reason) or reason is terminating
+		.ClearTree
 		.remove
+		return reason
 	
 	
 	helper DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)

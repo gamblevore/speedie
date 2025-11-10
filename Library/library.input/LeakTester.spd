@@ -30,11 +30,11 @@ class LeakTester
 			"Leaked $Diff bytes in ${.Name}. New Count $NewAmount."
 
 	
-	helper SyntaxUsingComplete (|object| idk=nil)
+	autogen SyntaxUsingComplete (|object| idk=nil)
 		.finaltest
 
 	
-	helper SyntaxUsing (|LeakTester|)
+	autogen SyntaxUsing (|LeakTester|)
 		return self
 
 	
@@ -86,7 +86,7 @@ struct SpeedTester
 	|Date|				Start
 	|string|			Name
 		
-	helper SyntaxUsingComplete (|object| idk=nil)
+	autogen SyntaxUsingComplete (|object| idk=nil)
 		|| µs = date.now - .start
 		SpeedTester.log( .Name + ": " + µs.renderdurr + "s" )
 			

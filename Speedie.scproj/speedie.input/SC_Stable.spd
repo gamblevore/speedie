@@ -28,12 +28,18 @@ module Stability
 		
 		|&&nil| Table
 		if platform.isdebug
-			Table = jb_vm.vm.InitTable(packmaker.libfuncs.length+31, frogs)
+			// I could just figure out the correct size, using the highest-number found in the table
+			// plus space for all missing items, plus 31, plus perhaps some sentinel space. And hope its right
+			// or just pass 4096
+			Table = jb_vm.vm.InitTable(4096, frogs)
 
 		for fn in PackMaker.LibFuncs
-			if !fn.IsMacro and fn isnt disabled
+			if fn.LibNeedsID
 				fn.MakeID(fs, table)
 		
+	
+	function scfunction.LibNeedsID (|bool|)
+		return .IsMacro  and  self isnt disabled  and  self|scnode| isnt private
 		
 	function scclass.NeedID (|bool|)
 		return .IsLibrary and (!.isrole and .IsObject)

@@ -101,7 +101,7 @@ class RayTracer
 			._StillGood = 0
 	
 	
-	helper ViewMat (|&mat4|)
+	function ViewMat (|&mat4|)
 		ifn ._StillGood & 2
 			._StillGood |= 2
 			._LookAt = .Rotation.y.SinCos.RotateAroundY

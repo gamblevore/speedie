@@ -275,7 +275,7 @@ Relative paths take the current working directory.`
 
 
 		
-helper @file.OSXMaxCaseWarnings (|&int|)
+function @file.OSXMaxCaseWarnings_ (|&int|)
 	cpp_Wrapper JB_File__Compar
 
 

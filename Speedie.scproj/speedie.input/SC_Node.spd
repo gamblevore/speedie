@@ -21,7 +21,6 @@ linkage
 function IsLibrary (|bool|) // .islib, .isntlib
 	opt norefcounts
 	|| p = .project
-		if p.Where contains "GUI"
 		return p.IsSTDLib
 
 

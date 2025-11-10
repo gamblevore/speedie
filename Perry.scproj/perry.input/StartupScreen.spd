@@ -19,8 +19,7 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 		function Hide
 			opt norefcounts
 			|| w = ._win
-				w.hide
-				w.closedialog
+				w.close
 
 		function Show
 			opt norefcounts

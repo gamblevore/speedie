@@ -36,9 +36,10 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			return .pico.MessageStatus == 0
 
 	helper Alive (|bool|)
+		disabled "use .CommsOpen"
 		// todo: why isn't this just .CommsOpen? 
-		if self != nil
-			rz = (.ChildAlive, .ParentAlive)(.isParent)
+//		if self != nil
+//			rz = (.ChildAlive, .ParentAlive)(.isParent)
 	
 	helper ParentAlive (|bool|)
 		return app.ParentID > 1

@@ -444,7 +444,7 @@ class FileViewer (ListView)
 		if LineByte.x1
 			.editme.ViewLineAndSel(LineByte.x1)
 		if LineByte.x2
-			.editme.ShowAndSel(LineByte.x2, true)
+			.editme.ShowAndSelect(LineByte.x2, true)
 
 
 	function AddExtra (|string| path, |filerow|)
@@ -555,11 +555,11 @@ helper string.PlatformVisible (|bool| AtRoot, |bool|)
 function FileRow.Modifier (|byte|)
 	if .DoesntExist
 		return '?'
-	return icon(.location, "", self is expanded, !.asdir)
+	return FileIcon(.location, "", self is expanded, !.asdir)
 
 
 extend_module filerow
-	helper icon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |byte|)
+	function FileIcon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |CodePoint|)
 		|| n = .name
 		|| ext = n.ext
 		if (.last == '/') and !notdir

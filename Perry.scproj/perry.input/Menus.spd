@@ -5,7 +5,7 @@ function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
 	|| orig = l
 	p.listsource.clear
 	while l
-		|| S = filerow.icon(l, "").render + " " + l.NameOrRoot
+		|| S = filerow.FileIcon(l, "").render + " " + l.NameOrRoot
 		|| dirfile = (".nothing", "")(l != orig)
 		|| row = filerow(l, s, dirfile)
 		(row isnt editable)

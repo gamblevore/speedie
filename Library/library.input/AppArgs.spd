@@ -53,31 +53,30 @@ function Message.ArgValue (|string|)
 
 
 
-helper @int.MainArg         (|int| Pos, |string| name, |int|)
+autogen @int.MainArg         (|int| Pos, |string| name, |int|)
 	|| big = int64.mainarg(pos, name)
 	expect (big <= int.max and big >= int.min) ("Int out of range")
 	return big
 
-helper @int64.MainArg       (|int| Pos, |string| name,  |int64|)
+autogen @int64.MainArg       (|int| Pos, |string| name,  |int64|)
 	return string.MainArgSub(Pos, name, "integer")$.int
 
-helper @bool.MainArg        (|int| Pos, |string| name,  |bool|)
+autogen @bool.MainArg        (|int| Pos, |string| name,  |bool|)
 	return string.MainArgSub(Pos, name, "boolean")$.Yes
 
-helper @string.MainArg      (|int| Pos, |string| name, |string|)
+autogen @string.MainArg      (|int| Pos, |string| name, |string|)
 	return string.MainArgSub(Pos, name, "string")
 
-helper @message.MainArg     (|int| Pos, |string| name, |message|)
+autogen @message.MainArg     (|int| Pos, |string| name, |message|)
 	return string.MainArgSub(Pos, name, "jeebox")$.parse
 
-helper @float.MainArg       (|int| Pos, |string| name, |Float64|)
+autogen @float.MainArg       (|int| Pos, |string| name, |Float64|)
 	return string.MainArgSub(Pos, name, "float")$.float
 
-helper @file.MainArg		(|int| Pos, |string| name, |file|)
+autogen @file.MainArg		(|int| Pos, |string| name, |file|)
 	return string.MainArgSub(Pos, name, "file-path")$.file
 
-
-helper @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
+autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
 	opt norefcounts
 	|| str = app.args[pos.abs-1]
@@ -89,7 +88,7 @@ helper @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringth
 	return string.Error
 
 
-helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
+autogen @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
 	|| size = string.MainArgSub(Pos, name, "file-size")$
 	|Float64| Mul = 1.0
 	|| T = size.length-2

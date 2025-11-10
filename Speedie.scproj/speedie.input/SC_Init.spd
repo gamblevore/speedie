@@ -87,7 +87,7 @@ function Message.AllowedMoveToInit (|bool|)
 
 
 function SCModule.CreateInitFuncSub (|message| init, |string| name)
-	|| msg = "helper $Name (|int|)".ParseClean
+	|| msg = "autogen $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)

@@ -37,7 +37,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	list.first = listviewrow.NewSeparator(1)
 	list.first = define
 	.autocomplete.listsource = list!
-	.SetAutoPoint(.editme.sel0)
+	.SetAutoPoint(.editme.selrange.x)
 	.ShowAutoComplete
 	(.AutoComplete isnt typethrough)
 	.CallFromSelect(list)
@@ -174,7 +174,7 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 		
 	using self
 		if .EditPath(path, false)
-			.editme.ShowAndSel(l, true)
+			.editme.ShowAndSelect(l, true)
 	.popuphide
 
 
@@ -275,7 +275,7 @@ function PerryIDE.PopupHide
 // SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
 function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	debug_require c
-	if (c == .compilr) and !c.alive
+	if (c == .compilr) and !c.CommsOpen
 		isnt active
 
 	|| msg = C.Get 		#require

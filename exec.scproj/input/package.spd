@@ -17,13 +17,13 @@ module package
 		cpp_wrapper JB_App__LibClasses
 
 
-	function message.Arg (|string| name, |bool| Err=false, |message|)
+	function message.Arg (|string| name, |bool| Err = false, |message|)
 		opt norefcounts
 		|| Ch = self[name]
 			return ch
 		if !err
 			return message()
-		.AccessErr(@tmp, name)
+		.ReportFailiure(@tmp, name)
 	
 	
 	function LoadPack (|bool|)

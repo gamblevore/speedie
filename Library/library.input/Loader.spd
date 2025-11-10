@@ -211,7 +211,7 @@ function string.RestoreLoad (|object|)
 	return .parse.restoreload
 
 
-helper File.RestoreLoad (|object|)
+autogen File.RestoreLoad (|object|)
 	return .parse$.restoreload
 
 

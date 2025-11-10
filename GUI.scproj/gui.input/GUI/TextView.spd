@@ -172,7 +172,7 @@ class TextView (GUIControl)
 			Restore += txt.length - d.text.length
 		
 		// now insert it		
-		.InsertSub(txt, d.Range, false)
+		.InsertText(txt, d.Range, false)
 
 		.selrange = Restore
 		return true	
@@ -561,16 +561,16 @@ class TextView (GUIControl)
 	
 	function ViewLineAndSel (|int| L)
 		|| d = .DrawInfoAtLine(L)
-			.ShowAndSel(d.position)
+			.ShowAndSelect(d.position)
 
 	
 	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
 		return .ViewPos(x, .MaxVisibleLines/3, mode)
 	
 
-	helper ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
+	function ShowAndSelect (|int| P, |int| Length=0, |bool| Explode=false, |textviewline|)
 		opt NoRefCounts
-		rz = .show(P)
+		rz = .Show(P)
 		.SelDirect((P, P + length), rz)
 
 		if explode
@@ -581,7 +581,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| d = ._Start
 		require pos >= d.Position
-		|| d2 = d.movecapped(.MaxPartialVisibleLines)
+		|| d2 = d.MoveCapped(.MaxPartialVisibleLines)
 		return pos <= d2.After
 	
 	
@@ -613,7 +613,7 @@ class TextView (GUIControl)
 				d2 = d2.MoveCapped(2) // looks lil nicer
 			if ._Start != d2
 				.StartLine = d2
-				.bumpscroll
+				.TouchScrollBar
 		
 		
 	function MoveSelection (|int| x, |int| Before=0, |bool|)
@@ -745,7 +745,7 @@ class TextView (GUIControl)
 		if key is end:				return .MoveSelection(.text.length)
 
 		if (key iscmd keys.c or keys.x) or (key is copy or cut)		// copy
-			return .DoCopy
+			return .CopyToClipboard
 		if (key iscmd keys.a) or (key is select)					// select all
 			return .DoSelectAll
 	
@@ -760,7 +760,7 @@ class TextView (GUIControl)
 	
 		
 	helper DoCut (|bool|)
-		.docopy
+		.CopyToClipboard
 		.Insert("")
 		return true
 
@@ -829,7 +829,7 @@ class TextView (GUIControl)
 		
 		|| s1 = self[ i2 ]
 		|| s2 = self[ i2.x2,  i0 ]
-		.InsertSub(s2+s1, (i2.x, i0)) 
+		.InsertText(s2+s1, (i2.x, i0)) 
 			
 		return true
 	
@@ -895,7 +895,7 @@ class TextView (GUIControl)
 			r = r + (-2, 2)
 		  else
 			return false
-		.insertsub(s, r, true)
+		.InsertText(s, r, true)
 		return true
 
 
@@ -923,7 +923,7 @@ class TextView (GUIControl)
 			if p
 				fs <~ t[p] // match line-ending
 		.TypingPlaceReal = r
-		.InsertSub(fs, r, true)
+		.InsertText(fs, r, true)
 		return true		
 		
 	
@@ -968,7 +968,7 @@ class TextView (GUIControl)
 			._AutoCompleteBack = value
 			.touch
 
-	helper InsertAutoComplete (|bool|)
+	function InsertAutoComplete (|bool|)
 		require ._CanAutoComplete == 1
 		|| c2 = ._AutoCompleteString			#require
 		|| trim = c2.InsertTrim
@@ -980,7 +980,7 @@ class TextView (GUIControl)
 			if (c2 endswith "()") and self[r.x2] == '('
 				c2 = c2[0, c2.length-2]
 			.undochecker = -1
-			.insertsub(c2, r, false)
+			.InsertText(c2, r, false)
 			.selrange += (trim - c2.length)
 			rz = true
 
@@ -1212,7 +1212,7 @@ class TextView (GUIControl)
 		
 		|| s = .sel0
 		.TypingPlaceReal = t
-		.InsertSub(Tabbed, t, !IsTypingLike)
+		.InsertText(Tabbed, t, !IsTypingLike)
 		if istypinglike
 			.selrange = s + (dir > 0)
 		return true
@@ -1296,7 +1296,7 @@ class TextView (GUIControl)
 			if focus and c and lv isa listview // try next tab
 				c = c.tab(!keys.shift, lv)
 				if c
-					lv.startRenameCell(c)
+					lv.EditCell(c)
 					
 		return true
 	
@@ -1332,7 +1332,7 @@ class TextView (GUIControl)
 	
 	helper SelMsgValid (|ivec2| sel, |bool|)
 		opt norefcounts
-		require  sel.width or .FindEndOfLineIgnoringWhite(sel.x)
+		require  sel.width or .SyntacticEndOfLine_(sel.x)
 
 		if .expectsparse
 			|| d = .finddrawinfo(sel.x)
@@ -1342,7 +1342,7 @@ class TextView (GUIControl)
 		return true
 
 
-	helper FindEndOfLineIgnoringWhite (|int| p, |ind|) // .endofline
+	function SyntacticEndOfLine_ (|int| p, |ind|) // .endofline
 		opt norefcounts
 		|| n = .length
 		|| s = .text
@@ -1350,7 +1350,7 @@ class TextView (GUIControl)
 			|| c = s[p]
 			if c.IsTextLine
 				return p
-			if '/' == c and s[p+1]
+			if '/' == c and '/' == s[p+1]
 				return p
 			require c.IsWhite
 			p++
@@ -1434,7 +1434,7 @@ class TextView (GUIControl)
 
 	
 	function Insert (|string| s, |bool| selnew = false, |int|)
-		return .InsertSub(s, .selrange, selnew)
+		return .InsertText(s, .selrange, selnew)
 
 
 	helper ValidateNewText (|message|)
@@ -1465,7 +1465,7 @@ class TextView (GUIControl)
 //		// good for now!
 
 	
-	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |bool|show=true, |int|)
+	function InsertText (|string| s, |intrange| p, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
@@ -1475,7 +1475,7 @@ class TextView (GUIControl)
 		if !same
 			i = p.x + s.length
 		|| UpdatedSel = (i,i)
-		if (SelNew)
+		if (SelectText)
 			UpdatedSel.x = p.x
 				
 		if Same
@@ -1570,7 +1570,7 @@ class TextView (GUIControl)
 			return false
 		if !keys.option
 			i -= (0, 1)
-		.InsertSub("", i, false)
+		.InsertText("", i, false)
 		return true
 		
 		
@@ -1600,7 +1600,7 @@ class TextView (GUIControl)
 			
 		|| r = .DeleteKeySel(d)
 		if r.width
-			.InsertSub("", r)
+			.InsertText("", r)
 			return true
 
 
@@ -1675,17 +1675,13 @@ class TextView (GUIControl)
 			return true
 
 	
-	helper FindDrawInfo (|int| Char, |TextViewLine!|)
+	function FindDrawInfo (|int| Char, |TextViewLine!|)
 		|| vline = 0
 		return .FindDrawInfoSub(char, vline)
 	
-	
-	helper FindDrawInfoSub (|int| Char, |$int| VLine, |TextViewLine!|)
-		.PrepareLinesOfText
-		return .FindDrawInfoSub2(char, vline)
 
-		
-	helper FindDrawInfoSub2 (|int| Char,  |$int| VLine,  |TextViewLine!|)
+	helper FindDrawInfoSub (|int| Char,  |$int| VLine,  |TextViewLine!|)
+		.PrepareLinesOfText
 		opt norefcounts
 		char = .clamp(char)
 		|| c = -int.max
@@ -1707,7 +1703,7 @@ class TextView (GUIControl)
 		rz = .lasttop - (D.vline - (._Start.vline-1)) * .lineheight|int|
 
 	
-	helper XYOfChar (|ind| pos, |ivec2|)
+	function XYOfChar (|ind| pos, |ivec2|)
 		opt norefcounts
 		|| VLine = 0
 		|| d = .FindDrawInfoSub(pos, VLine)
@@ -1804,7 +1800,7 @@ class TextView (GUIControl)
 			|| Diff = NO - NR
 			if Diff < 0
 				._RemainingHeight += Diff * .LineHeight
-				.reallysetstart( ._Start.MoveCapped(Diff))
+				.start = ._Start.MoveCapped(Diff)
 // were losing some remain somehow. not sure why. IDK maths?
 //				|| OldLoss = Old - (NO * .lineheight)
 //				|| NewLoss = Remain - (NR * .lineheight)
@@ -1897,7 +1893,7 @@ class TextView (GUIControl)
 				
 	
 	
-	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
+	function ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
 		opt NoRefCounts
 		|| fp = .OnShowExtraInfo
 			|| xy = (0, 0)
@@ -1913,7 +1909,7 @@ class TextView (GUIControl)
 	helper StartLine (|TextViewJumpMode| mode=0, assigns:|TextViewLine| d)
 		cpp_part StartAtLine
 		.StartWithoutScrollDraw(mode) = d
-		.bumpscroll
+		.TouchScrollBar
 	
 	
 	function StartLine (assigns:|int| v)
@@ -1950,10 +1946,10 @@ class TextView (GUIControl)
 		
 		if d.position > last.position
 			d = last
-		.ReallySetStart(d)
+		.Start = d
 	
 	
-	helper ReallySetStart (|textviewline!| d)
+	function Start (assigns:|textviewline!| d)
 		opt norefcounts
 		require ._Start != d
 		._Start = d
@@ -1983,7 +1979,7 @@ class TextView (GUIControl)
 		.ClearReclaim
 		d.tline = 1
 		d.position = -1
-		.ReallySetStart(D)
+		.start = D
 
 
 	helper NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
@@ -2201,9 +2197,8 @@ class TextView (GUIControl)
 		opt norefcounts
 		for s in ._Lines
 			if s.Position >= Value
-				return .ReallySetStart(s)
-//		return ._Start.position
-
+				.start = s
+				return
 
 	helper FindScroll (|int| Value, |textviewline!|)
 		opt norefcounts
@@ -2238,7 +2233,7 @@ class TextView (GUIControl)
 				.SelDirect(d.TypingPlace, nil)
 				.scrollpos = d.scrollpos
 				// 
-				// .ShowAndSel(s.x, s.width)
+				// .ShowAndSelect(s.x, s.width)
 			return true
 		
 		.Clear("")

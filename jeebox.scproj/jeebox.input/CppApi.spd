@@ -184,7 +184,7 @@ class_api Message (msg)
 			if .Expect(type, name)
 				return self
 		  elseif (Errplace)
-			errplace.AccessErr(type, name, nil)
+			errplace.ReportFailiure(type, name, nil)
 		
 		description "Test the name and type, (or existance) of a message node."
 

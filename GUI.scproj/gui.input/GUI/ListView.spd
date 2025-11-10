@@ -128,7 +128,7 @@ class ListView (GUIControl) {
 			m.ShowCmm(self, -1, y)
 
 
-	helper DesiredHeight (|int|)
+	function DesiredHeight (|int|)
 		opt norefcounts
 		rz = 2 + ((.ListSource.SlowCount max 2) * .RowHeight)
 		|| t = .typingfilter
@@ -148,7 +148,7 @@ class ListView (GUIControl) {
 		require i > 0
 
 		|| w = .width
-		if .DrawCols == 3
+		if .ColumnsToDraw == 3
 			if i == 1
 				return (w/2)
 			if i == 2
@@ -156,7 +156,7 @@ class ListView (GUIControl) {
 		return w
 	
 	
-	helper DrawCols (|int|)
+	function ColumnsToDraw (|int|)
 		if .width < 150
 			return 1
 		return .ColumnCount
@@ -304,19 +304,19 @@ class ListView (GUIControl) {
 		
 	function Rename (|bool|)
 		cpp_part RenameCurr
-		return .startRenameCell(.LastSelected.cell)
+		return .EditCell(.LastSelected.cell)
 	
 	
 	function Rename (|ListViewRow| r, |bool|) 
 		cpp_part RenameRow
-		return .startRenameCell(r.cell)
+		return .EditCell(r.cell)
 	
 	
 	function RenameCol (|ListViewRow| r, |int| col, |bool|)
-		return .StartRenameCell( r.cell(col) )
+		return .EditCell( r.cell(col) )
 	
 		
-	helper StartRenameCell (|ListViewcell!| rc, |bool|)  //  .editcell
+	function EditCell (|ListViewcell!| rc, |bool|)  //  .editcell
 		opt norefcounts
 		|| r = rc.row
 		.SelectAdd(r)
@@ -657,7 +657,7 @@ class ListView (GUIControl) {
 			  elseif before
 				before.prev = p
 		
-		return .bumpscroll
+		return .TouchScrollBar
 	
 	
 	helper ClearInternalDrops
@@ -717,7 +717,7 @@ class ListView (GUIControl) {
 		if self contains p
 			|| R = .FindClickedCell(p)
 			if r and (R == i)
-				.startRenameCell(r)
+				.EditCell(r)
 	
 	
 	helper CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
@@ -882,7 +882,7 @@ class ListView (GUIControl) {
 		return curr
 	
 	
-	helper ClearSearch (|bool|)
+	function ClearSearch (|bool|)
 		opt norefcounts
 		for s.all in self
 			if s is found
@@ -1071,7 +1071,7 @@ class ListView (GUIControl) {
 	function ScrollByRows (|int| Rows)
 		|| s = .scrollstart
 			.scrollset( .bmove(s, rows) )
-			.bumpscroll
+			.TouchScrollBar
 
 	
 	function ScrollMoveTo (|int| v)
@@ -1121,7 +1121,7 @@ class ListView (GUIControl) {
 			.SelectFirst
 		  else
 			.SelectNone
-		.bumpscroll
+		.TouchScrollBar
 		._BlockedDuringUse = false
 
 	
@@ -1282,7 +1282,7 @@ class ListView (GUIControl) {
 		
 		if !.DontDrawSeparators and .gnormal.seps.a
 			for r.visible in self
-				|| n = .drawcols
+				|| n = .ColumnsToDraw
 				for i in n
 					z2.horz = .ColBounds(i, rect, r)
 					r.DrawDividerH(z2, where, i)
@@ -1347,7 +1347,7 @@ class ListView (GUIControl) {
 	function ScrollPixels (|int| rem)
 		if rem
 			.ScrollPixelsSub(rem)
-			.bumpscroll
+			.TouchScrollBar
 			._ScrollRealigner = (48, 0)(.scrollshift)
 			GUI.touch(self)
 
@@ -1480,7 +1480,7 @@ class ListView (GUIControl) {
 			.select(r)
 	
 	
-	helper AddSep
+	function AddSep
 		self <~ menuitem("", nil)
 
 
