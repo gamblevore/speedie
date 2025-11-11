@@ -32,8 +32,14 @@ extern "C" {
 #endif
 
 #define x(v) (1<<v) |
-static const unsigned int CrashList = x(SIGTRAP) x(SIGHUP) x(SIGQUIT) x(SIGILL) x(SIGSEGV) x(SIGBUS)  x(SIGFPE) x(SIGSYS) x(SIGTERM) x(SIGEMT) x(SIGABRT) x(SIGXCPU) x(SIGXFSZ) 0;
-static const unsigned int IgnoreList = x(SIGPIPE) x(SIGPROF) x(SIGWINCH) x(SIGINT)  0;
+#if DEBUG
+	#define x_release(v) 
+#else  // its nicer to ignore SIGTRAP. Xcode is wierd sometimes in running subprocesses.
+	#define x_release(v) (1<<v) |
+#endif
+
+static const unsigned int CrashList = x(SIGHUP) x(SIGQUIT) x(SIGILL) x(SIGSEGV) x(SIGBUS)  x(SIGFPE) x(SIGSYS) x(SIGTERM) x(SIGEMT) x(SIGABRT) x(SIGXCPU) x(SIGXFSZ) 0;
+static const unsigned int IgnoreList = x_release(SIGTRAP) x(SIGPIPE) x(SIGPROF) x(SIGWINCH) x(SIGINT)  0;
 static const unsigned int WakeList = x(SIGURG) x(SIGVTALRM) x(SIGALRM) x(SIGINFO) x(SIGUSR1) x(SIGUSR2) 0;
 #undef x
 
