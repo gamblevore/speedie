@@ -3611,7 +3611,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[259]);
-	JB_FS_AppendInt32(_fsf0, (2025111119));
+	JB_FS_AppendInt32(_fsf0, (2025111122));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8879,7 +8879,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1248]);
-	JB_FS_AppendInt32(_fsf0, (2025111119));
+	JB_FS_AppendInt32(_fsf0, (2025111122));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -11558,6 +11558,7 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1060], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[66], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1008], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)))));
+	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1006], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1009], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1959], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewMacro)))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[2250], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCThe__NewInsertion)))));
@@ -11592,11 +11593,12 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[918], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewConstructor)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[24], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewDestructor)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[970], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewRender)))));
+	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1011], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHider)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[506], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewFunc)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2249], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewFunc)))));
-	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1011], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHider)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1010], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewFunc)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1959], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewMacro)))));
+	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1006], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1008], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1009], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[81], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Beh__NewActual)))));
