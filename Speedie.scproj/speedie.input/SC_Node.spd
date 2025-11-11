@@ -992,6 +992,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
+	+'inline'				SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
 	+'macro'				SCFunction.NewMacro
 	+'insertion'			SCThe.NewInsertion
@@ -1029,11 +1030,12 @@ dispatch ClsCollectTable (CollectFunc)
 	+'constructor'			SCFunction.NewConstructor		// ??
 	+'destructor'			SCFunction.NewDestructor		// ??
 	+'render'				SCFunction.NewRender			// ??
+	+'setter'				SCFunction.NewHider
 	+'function'				SCFunction.NewFunc
 	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
-	+'setter'				SCFunction.NewHider
 	+'api'					SCFunction.NewFunc
 	+'macro'				SCFunction.NewMacro
+	+'inline'				SCFunction.NewHelper
 	+'helper'				SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
 	+'behaviour'			SCBehaviour.NewActual
