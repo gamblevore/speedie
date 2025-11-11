@@ -650,10 +650,10 @@ datatype vec2
 	function Cos (|vec2|)
 		return (.x.cos, .y.cos)
 
-	function SinBad (|vec2|)
+	inline SinBad (|vec2|)
 		return (self * math.iTau).sine
 
-	function CosBad (|vec2|)
+	inline CosBad (|vec2|)
 		return (self * math.iTau).cos
 
 	syntax Compare (|float| Other, |int|)

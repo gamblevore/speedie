@@ -465,11 +465,14 @@ datatype float
 		if self < -sigma
 			return -1
 
-	function SinBad (|float|)
+	inline SinBad (|float|)
 		return (self * math.iTau).sine
 
-	function CosBad (|float|)
+	inline CosBad (|float|)
 		return (self * math.iTau).cos
+
+	inline TanBad (|float|)
+		return (self * math.iTau).tan
 	
 	function Minus0 (|float| B, |float|)
 		cpp_Wrapper (fdimf)
