@@ -554,7 +554,7 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 
 function FillInterpreter
-	|| lib_pack = PackMaker.BuildInterpreter
+	|| lib_pack = jbin()
 	.ListAllFuncs(.ModuleProperties, lib_pack)
 
 
@@ -1627,8 +1627,14 @@ class FastStringCpp (FastString)
 		.cpp_name = name
 
 function faststring.AppendLibGlob (|scdecl| d)
-	|| x = d.ExportName[3]
-	|| i = 3 + (x == '_')
-	.appendrange(d.exportname, i)
+	opt norefcounts
+	|| n = d.ExportName
+	|| skip = 0
+	if n[0, "JB_"]
+		skip = 3
+		skip += n[skip] == '_'
+	  elseif n[] == '&'
+		skip = 1
+	.appendrange(n, skip)
 	
 

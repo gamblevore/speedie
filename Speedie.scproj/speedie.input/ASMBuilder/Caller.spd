@@ -145,7 +145,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, intrin)
-		if fn == "JB_Str_InWhite"
 		if fn isnt CantInline
 			|| MiniDest = .AskForInline(prms, dest, fn)
 				return MiniDest
@@ -154,8 +153,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		if tableid <= 31							// failed!
 			if !fn.islibrary or !.state.fn.islibrary
 				error (exp, "Missing PackID")
-			  else
-				debugat								// shouldn't come here.
 			tableid = 0xFFFF
 	  else
 		|| f = exp.first!

@@ -2,36 +2,66 @@
 
 module Stability
 	|| LastID = 1
+	
+	function StableStart (|File| f, |faststring|)
+		if options.UpdateStability
+			rz = faststring()
+			if !f.Size
+				rz <~ "// This file is not stable till 'release'."
+			rz <~ "\n"
+			rz.file = f
 
-	function StableLoad (|bool|)
+
+	function StableEnd (|faststring| fs)
+		if fs and fs.Length > 1
+			fs <~ "\n"
+			fs.flush
+
+
+	function StabliseFuncs (|bool|)
 		|| frogs = packmaker.PackGlobSize
-		|| bank = Compiler.library["stable_id_bank.txt"]
-		if bank.Open(true)
-			.UseBank(bank)
-			|faststring| fs
-			if options.UpdateStability
-				fs = faststring()
-				if !bank.Size
-					bank <~ "// This file is not stable till 'release'. Libfuncs will get removed."
-			.FillMissingLibFuncs(fs, frogs)
-			if fs and fs.Length
-				bank <~ "\n"
-				bank <~ fs|string| // hehe
+		|| funcs = Compiler.library["stable_id_bank.txt"]
+		if funcs.Open(true)
+			.UseFuncBank(funcs)
+			|| fs_fn = .StableStart(funcs)
+			.FillMissingLibFuncs(fs_fn, frogs)
+			.StableEnd(fs_fn)
 			rz = true
 
+
+	// todo:	(classes only needed for ISA testing.)
+		// builtins, cpp_nothing, don't put in funcs
+		// jeebox text for stuff.
+		// special sorter
+		// special builder
+		// ignore roles for pack-gen
 	
+	
+	function StabliseGlobs
+		|| globs = Compiler.library["stable_glob_bank.txt"]
+		require globs.Open(true)
+
+		for s in globs.parse(64K)
+			if s.expect(@tmp)
+				.FindOneClass(s)
+
+		|| fs_glob = .StableStart(globs)
+//		.DoGlobs(fs_glob)
+		.StableEnd(fs_glob)
+		packmaker.LibGlobs.Sort(SimplestFirst)
+	
+	
+	function FindOneClass (|message| row)
+		opt norefcounts
+		|| cls = Compiler[row]
+			|| pos = row[@num]
+				cls.TypeNormal.ExportPosition = pos.int
+
 
 	function FillMissingLibFuncs (|faststring?| fs, |int| frogs)
-		opt norefcounts
-		for cl in Compiler.ClassList
-			if cl.NeedID
-				cl.MakeID(fs, nil)
-		
-		|&&nil| Table
+		opt norefcounts		
+		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
 		if platform.isdebug
-			// I could just figure out the correct size, using the highest-number found in the table
-			// plus space for all missing items, plus 31, plus perhaps some sentinel space. And hope its right
-			// or just pass 4096
 			Table = jb_vm.vm.InitTable(4096, frogs)
 
 		for fn in Compiler.FuncList
@@ -41,15 +71,12 @@ module Stability
 	
 	function scfunction.NeedsID (|bool|)
 		require !.IsMacro and .IsLibrary
-		require self isnt disabled
+		require self isnt disabled and AlwaysInline
 		require self|scnode| isnt private
 		return true
+	
 		
-	function scclass.NeedID (|bool|)
-		return .IsLibrary and (!.isrole and .IsObject)
-	
-	
-	function scbetternode.MakeID (|faststring| fs, |?&&nil| table)
+	function scfunction.MakeID (|faststring| fs, |?&&nil| table)
 		|| id = .PackID
 		if !id
 			if fs
@@ -58,20 +85,20 @@ module Stability
 				fs <~ .ExportName
 			id = Stability.LastID++
 			.PackID = id
+		
 		if table
 			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
 				Table[id+31] = fn
-				"id: ${id}(${id+31}) = $.exportname"
-				
-
-	function UseBank (|file| bank)
+//				"id: ${id}(${id+31}) = $.exportname"
+	
+	function UseFuncBank (|file| bank)
 		|| data = bank.ReadAll(1MB)
 			|| ID = LastID
 			for str.lines in data
 				id++
 				|| fn = Compiler.ExportNames[str]
+				if fn isa SCFunction
 					check (!fn.PackID) (str + " replicated ID.")
 					fn.PackID = id
-			// now we have all the IDs set. But what if we have some not inside? we need to handle those too
 			LastID = ID	
 		

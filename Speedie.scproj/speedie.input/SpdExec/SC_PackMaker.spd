@@ -21,15 +21,21 @@ module PackMaker
 	function LibGlobSize (|int|)
 		return ._LibGlobSize init .GlobalsSize(.libGlobs, false)
 		
+	helper scfunction.NeedsLibExport (|bool|)
+		require (.MyReacher or options.MakeInterpreter)
+		require self isnt NoExport
+		require self|scnode| isnt Private
+		return (.IsCppInBuilt < 2)
+	
 	helper AddFunc (|scfunction| f)
 		opt norefcounts
 		if f.IsLibrary
-			if f.MyReacher or options.MakeInterpreter
+			if f.NeedsLibExport
 				.LibFuncs <~ f
-		  elseif f.MyReacher
-			.PackFuncs <~ f
-
-		
+		  else
+			if f.MyReacher
+				.PackFuncs <~ f
+	
 	function AddAll (|int|)
 		opt norefcounts
 		for f in Compiler.FuncList
@@ -37,19 +43,9 @@ module PackMaker
 				.addfunc(f)
 	
 	
-	function DoLibGlobs (|jbin| lib) // SortLibGlobs
-		opt norefcounts
-		.LibGlobs.sort
-		
-		lib.enter(@arr)
-		for (f in LibGlobs)
-			lib.Add(@thg, f.ExportName)
-		lib.exit
-	
-	
 	function GlobalsSize (|[scdecl]| List, |bool| Alter, |int|)     // SortGlobals, GlobalsSort
 		opt norefcounts
-		|| Globals = 1				// rz = 1, so if .au.ExportPosition == 0 then something is wrong.
+		|| Globals = 1				// rz = 1, so if .au.ExportPosition== 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
@@ -69,18 +65,10 @@ module PackMaker
 		
 		fninit.PackID = 1 // put init and main first!
 		fnmain.PackID = 2
-		
-		|| Obj = TypeObject!.ClassType
-		packmaker.LibGlobs <~ Obj
-		TypeObject!.PackClassChildren(nil)
-		
-		require Stability.StableLoad
+				
+		require Stability.StabliseFuncs
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
-		.LibGlobs.sort
-
-		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
-			g.ExportPosition = i + 1
 
 		.FinalPrepare
 		return true
@@ -110,17 +98,7 @@ module PackMaker
 		list.sort(&CodeSorter.ExportNames)
 		|| ID = 0
 		while (|| f = list[id])
-			f.PackID = ++id			
-	
-	
-	function WriteLibFuncs (|jbin!| j)
-		opt norefcounts
-		// we will remove this.
-		
-		j.Enter(@prm)
-		for f in .libfuncs
-			j.Add(@thg, f.exportname)
-		j.Exit
+			f.PackID = ++id
 
 	
 	function FATCompile (|bool|)
@@ -195,7 +173,7 @@ module PackMaker
 		opt norefcounts
 		j.enter(@tmp, "code")
 		for f in .PackFuncs
-			if (PackSaved)(j, f is UsedByASM)
+			if PackSaved.AddOrShrink(j, f is UsedByASM)
 				scfunction.currfunc = f
 				j.JRenderASM(f)
 				func_names <~ f.exportname
@@ -231,7 +209,7 @@ module PackMaker
 		j.tmp("flnk")
 		
 		for linked in .libfuncs
-			if (LibSaved)(j, linked is UsedByASM)
+			if LibSaved.AddOrShrink(j, linked is UsedByASM)
 				j.add(@thg, linked.ExportName)
 		j.exit(2)
 
@@ -241,7 +219,7 @@ module PackMaker
 		opt norefcounts
 		j.tmp("glnk")
 		for linked in .LibGlobs
-			if (LibGlobSaved)(j, linked is usedbyasm)
+			if LibGlobSaved.AddOrShrink(j, linked is usedbyasm)
 				j.add(@thg, linked.ExportName)
 		j.exit(2)
 
@@ -255,39 +233,26 @@ module PackMaker
 				return true
 	
 	
-	function SCClass.PackClassChildren (|jbin?| j)
+	function SCClass.PackClassChildren (|jbin!| j)
 		opt norefcounts
-		if j
-			require .HasPackChildren
-			j.enter
+		require .HasPackChildren
+		j.enter
 		for c in .children
 			if c.isrole
 				c.PackClassChildren(j)
 			  else
 				c.packexport(j)
-		if j
-			j.exit
+		j.exit
 	
 	
-	function SCClass.PackExport (|jbin?| j)
+	function SCClass.PackExport (|jbin| j)
 		opt norefcounts
-		if j
-			require .MyReacher or .IsLibrary or .HasPackChildren
-			j.enter(@tmp, .name)
-			if !.IsLibrary
-				.DescribeInPack(j)
-			.PackClassChildren(j)
-			j.exit
-		  else
-			|| T = .ClassType!
-			if .IsLibrary
-				packmaker.libglobs <~ T
-				if t isnt Library// what?
-					/0
-				(T is Library)
-			  elseif .MyReacher
-				packmaker.packglobs <~ T
-			.PackClassChildren(j)
+		require .MyReacher or .IsLibrary or .HasPackChildren
+		j.enter(@tmp, .name)
+		if !.IsLibrary
+			.DescribeInPack(j)
+		.PackClassChildren(j)
+		j.exit
 		
 		
 	function SCClass.DescribeInPack (|jbin| j)
@@ -311,13 +276,7 @@ module PackMaker
 		
 		j.exit
 
-		
-	function BuildInterpreter (|string|)
-		|| pack = jbin()
-		.WriteLibFuncs(pack)
-		.DoLibGlobs(pack)
-		return pack
-
+	
 
 function SCFunction.WrappedName (|string|)
 	if !.iscppinbuilt
@@ -366,7 +325,7 @@ struct HairyMan
 	|uint16| Curr
 	|uint|	 Total
 
-	syntax Call (|jbin| j, |bool| b, |bool|)
+	function AddOrShrink (|jbin| j, |bool| b, |bool|)
 		.Total++
 		if b
 			|| c = .curr

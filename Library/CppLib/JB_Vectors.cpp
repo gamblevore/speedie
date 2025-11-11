@@ -22,7 +22,7 @@ extern "C" {
 #define one		vec4{1.0f,1.0f,1.0f,1.0f}
 #define zero	vec4{}
 
-#define v1(name, x)					\
+#define vf1(name, x)					\
   (vec4) {  						\
 	std::name(x[0]),				\
 	std::name(x[1]),				\
@@ -30,7 +30,7 @@ extern "C" {
 	std::name(x[3]) 				\
 }
 
-#define v2(name, x, y)				\
+#define vf2(name, x, y)				\
   (vec4) {  						\
 	std::name(x[0], y[0]),			\
 	std::name(x[1], y[1]),			\
@@ -44,7 +44,7 @@ __H__ vec4 JB_vec4_Round (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_roundeven)
 		return __builtin_elementwise_roundeven(x);
 	#else
-		return v1(roundf, x);
+		return vf1(roundf, x);
 	#endif
 }
 
@@ -52,7 +52,7 @@ __H__ vec4 JB_vec4_Abs (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_abs)
 		return __builtin_elementwise_abs(x);
 	#else
-		return v2(fabsf, x);
+		return vf2(fabsf, x);
 	#endif
 }
 
@@ -60,7 +60,7 @@ __H__ vec4 JB_vec4_Floor (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_floor)
 		return __builtin_elementwise_floor(x);
 	#else
-		return v1(floorf, x);
+		return vf1(floorf, x);
 	#endif
 }
 
@@ -68,7 +68,7 @@ __H__ vec4 JB_vec4_Sqrt (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_sqrt)
 		return __builtin_elementwise_sqrt(x);
 	#else
-		return v1(sqrtf, x);
+		return vf1(sqrtf, x);
 	#endif
 }
 
@@ -76,7 +76,7 @@ __H__ vec4 JB_vec4_Exp (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_exp)
 		return __builtin_elementwise_exp(x);
 	#else
-		return v1(expf, x);
+		return vf1(expf, x);
 	#endif
 }
 
@@ -84,7 +84,7 @@ __H__ vec4 JB_vec4_Log (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_log)
 		return __builtin_elementwise_log(x);
 	#else
-		return v1(logf, x);
+		return vf1(logf, x);
 	#endif
 }
 
@@ -92,7 +92,7 @@ __H__ vec4 JB_vec4_Exp2 (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_exp2)
 		return __builtin_elementwise_exp2(x);
 	#else
-		return v1(exp2f, x);
+		return vf1(exp2f, x);
 	#endif
 }
 
@@ -100,7 +100,7 @@ __H__ vec4 JB_vec4_Log2 (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_log2)
 		return __builtin_elementwise_log2(x);
 	#else
-		return v1(log2f, x);
+		return vf1(log2f, x);
 	#endif
 }
 
@@ -108,7 +108,7 @@ __H__ vec4 JB_vec4_Unsin (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_asin)
 		return __builtin_elementwise_asin(x) * iTau;
 	#else
-		return v1(asinf, x) * iTau;
+		return vf1(asinf, x) * iTau;
 	#endif
 }
 
@@ -116,7 +116,7 @@ __H__ vec4 JB_vec4_Uncos (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_acos)
 		return __builtin_elementwise_acos(x) * iTau;
 	#else
-		return v1(acosf, x) * iTau;
+		return vf1(acosf, x) * iTau;
 	#endif
 }
 
@@ -124,7 +124,7 @@ __H__ vec4 JB_vec4_UnTan (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_atan2)
 		return __builtin_elementwise_atan2(x, y) * iTau;
 	#else
-		return v2(atan2f, x, y) * iTau;
+		return vf2(atan2f, x, y) * iTau;
 	#endif
 }
 
@@ -132,7 +132,7 @@ __H__ vec4 JB_vec4_Sine (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_sin)
 		return __builtin_elementwise_sin(x) * Tau;
 	#else
-		return v1(sinf, x) * Tau;
+		return vf1(sinf, x) * Tau;
 	#endif
 }
 
@@ -140,7 +140,7 @@ __H__ vec4 JB_vec4_Cos (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_cos)
 		return __builtin_elementwise_cos(x) * Tau;
 	#else
-		return v1(cosf, x) * Tau;
+		return vf1(cosf, x) * Tau;
 	#endif
 }
 
@@ -148,7 +148,7 @@ __H__ vec4 JB_vec4_Tan (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_tan)
 		return __builtin_elementwise_tan(x) * Tau;
 	#else
-		return v1(tanf, x) * Tau;
+		return vf1(tanf, x) * Tau;
 	#endif
 }
 
@@ -156,7 +156,7 @@ __H__ vec4 JB_vec4_Pow (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_pow)
 		return __builtin_elementwise_pow(x, y);
 	#else
-		return v2(powf, x, y);
+		return vf2(powf, x, y);
 	#endif
 }
 
@@ -164,7 +164,7 @@ __H__ vec4 JB_vec4_Mod (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_fmod)
 		return __builtin_elementwise_fmod(x, y);
 	#else
-		return v2(fmodf, x, y);
+		return vf2(fmodf, x, y);
 	#endif
 }
 
@@ -172,7 +172,7 @@ __H__ vec4 JB_vec4_CopySign (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_copysign)
 		return __builtin_elementwise_copysign(x, y);
 	#else
-		return v2(copysignf, x, y);
+		return vf2(copysignf, x, y);
 	#endif
 }
 
@@ -180,7 +180,7 @@ __H__ vec4 JB_vec4_Max (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_max)
 		return __builtin_elementwise_max(x, y);
 	#else
-		return v2(fmaxf, x, y);
+		return vf2(fmaxf, x, y);
 	#endif
 }
 
@@ -188,7 +188,7 @@ __H__ vec4 JB_vec4_Min (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_min)
 		return __builtin_elementwise_min(x, y);
 	#else
-		return v2(fminf, x, y);
+		return vf2(fminf, x, y);
 	#endif
 }
 

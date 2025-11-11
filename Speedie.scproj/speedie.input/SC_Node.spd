@@ -966,7 +966,6 @@ module {
 
 class SCBetterNode (SCNode)
 	|string|	Description
-	|uint16|	PackID
 	constructor
 		//
 	constructor (|message| msg)

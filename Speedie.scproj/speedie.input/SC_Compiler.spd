@@ -575,7 +575,7 @@ function ImportAll
 		m.CallOurInitsByTheBiggerInitFunc
 	.PostInitCodeCall
 	
-	packmaker.LibGlobs.Sort(SimplestFirst)
+	stability.StabliseGlobs
 
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
@@ -686,7 +686,10 @@ syntax access (|string| name, |SCNodeFindMode| Mode=0, |SCClass|)
 	return compiler.program.FindClass(name, mode)
 
 
-syntax access (|Message| name, |SCClass|)
+function FindClass (|scclass|)
+	Disabled "Use syntax access"
+
+syntax access (|Message| name, |SCClass|) // find class
 	if name
 		return compiler.program.FindClassMsg( name, 0 )
 

@@ -751,9 +751,6 @@ function LoadConstructors
 
 
 function AfterFuncsDecled 
-	if .NeedID
-		|| s = .TestExportName(.exportname, true)
-			Compiler.ExportNames[s] = self
 	.OverrideSyntax
 		
 	|| c = .ConstructorFunc
@@ -867,14 +864,10 @@ function FirstDestructor (|SCFunction|)
 	opt norefcounts
 	for p.Upwards in self
 		|| fn = p.DestructorFunc
-		
-		if !fn
-			0
-		  elseif (p.IsWrapper and p.super)	// don't count "object" as having properties!
-			Return fn
-			
-		  elseif (p.HasStuffToHandleInDestructor or fn.SourceArg.Hasany)
-			return fn
+			if (p.IsWrapper and p.super)	// don't count "object" as having properties!
+				Return fn
+			  elseif (p.HasStuffToHandleInDestructor or fn.SourceArg.Hasany)
+				return fn
 	
 
 function SCFunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
@@ -971,8 +964,7 @@ function StructName (|String|)
 	return .SubProjName + "_" + .name
 
 
-
-function MakeClassType (|scdecl| d, |scdecl|)
+function MakeClassType (|scdecl| TypeNormal, |scdecl|)
 	opt norefcounts
 	|| IsLib = .islibrary
 	|| c = scdecl(TypeJBClass!)
@@ -988,7 +980,9 @@ function MakeClassType (|scdecl| d, |scdecl|)
 	c.source = .source
 	C.pointercount = 1
 	C.nildeclared = nilstate.real
-	C.Contains = d
+	C.Contains = typenormal
+	if !.IsRole
+		c.AddToGlobs
 	(c is ClassObj)
 	(c is global)
 	(c is library) = islib
@@ -999,7 +993,6 @@ function MakeClassType (|scdecl| d, |scdecl|)
 function LoadClassType
 	if .isobject
 		.ClassType = .MakeClassType(.typenormal)
-		
 
 
 function TryAddToProject 
@@ -1007,12 +1000,11 @@ function TryAddToProject
 	require !.FuncProto
 	|| NameNode = .Source.first!
 	|| mod = Compiler.DisamClasses!
-	if NameNode == @dot		// load the modules first.
+	if NameNode == @dot									// load the modules first.
 		mod = compiler.findmodulemsg(namenode.first!)	#require
 	  else
 		if .name == "interface" and self isa scclass
 			require .isrole != 1
-
 	
 	mod.TryAdd( .SourceArg, .Modul, .Name )
 
@@ -1168,20 +1160,19 @@ module
 		
 	function LoadSyntax (CollectFunc)
 		|| name = node.name.UpperFirst
-		|| AlreadyName = node[@thg] 		#require
+		|| AlreadyName = node[@thg] 					#require
 
 		node.name = "function"
 		if alreadyname ~= "sort"
 			node.SortImprove(name_space)
 		AlreadyName.name = name + AlreadyName.name.UpperFirst
-			
-
 		Return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 	
 	function NewInnerClass (CollectFunc)
 		if name_space isa scclass
 			return scclass.neuclass(node, name_Space.modul, errplace)
+	
 	
 	function StoreExtend (CollectFunc)
 		opt norefcounts

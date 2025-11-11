@@ -36,6 +36,7 @@ datatype FunctionType (int)
 		ExternalLib
 		CantInline
 		Inline
+		AlwaysInline
 		Killer
 		Disabled
 		NotRefCounted
@@ -50,6 +51,7 @@ datatype FunctionType (int)
 		Cpp
 		UsedByASM
 		
+		NoExport = AlwaysInline + Disabled + InitFunc
 		ConOrDes = Constructor + Destructor
 		
 	syntax is (|functiontype| t, |bool|)
@@ -77,6 +79,7 @@ linkage
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				LinkID
+|uint16|				PackID
 |uint16|				ReturnCount
 |int|					StackAllocGuess
 |nilstate|				NilSelf
@@ -199,6 +202,9 @@ function ParseName (|Message| node, |bool|)
 		(self|scnode| is Private)					// limited to internal within a project
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2
+	  elseif ftype == "inline"
+		is inline
+		is alwaysinline
 	  elseif fType == "api"
 		is api
 	  elseif fType == "setter"

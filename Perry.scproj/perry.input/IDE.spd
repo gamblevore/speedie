@@ -634,6 +634,10 @@ class PerryIDE (Window)
 		if  key is s  and  .editme is visible
 			.SaveEditing(documentstate.saving)
 			return true
+
+		if key is NUM3 // e for error
+			return .SaveAndShowErrors
+			
 		|| NumKey = key.IsNumber
 			return .NumberKey(numkey)
 		if key is p or backslash
