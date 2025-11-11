@@ -1626,15 +1626,16 @@ class FastStringCpp (FastString)
 	constructor (|string| name = "")
 		.cpp_name = name
 
+
 function faststring.AppendLibGlob (|scdecl| d)
 	opt norefcounts
 	|| n = d.ExportName
-	|| skip = 0
-	if n[0, "JB_"]
-		skip = 3
-		skip += n[skip] == '_'
+	|| skip = n.Find('_', 0, 4)
+		while (n[++skip]) == '_'
+			0
 	  elseif n[] == '&'
 		skip = 1
+	
 	.appendrange(n, skip)
 	
 
