@@ -233,7 +233,7 @@
 "#pragma GCC visibility push(default)\n"
 "Can only swap registers"
 "funcaddr"
-"JB_"
+"autogen "
 "uint"
 "AFNC"
 "module of "
@@ -2272,4 +2272,3 @@
 "   Original:"
 "main/prototype/function/helper/autogen/inline/task/api/syx/syntax/setter/operator/render/behaviour/virtual/constructor/destructor/cpp_wrapper/cpp_nothing"
 "stable_glob_bank.txt"
-"autogen "
