@@ -981,11 +981,11 @@ function MakeClassType (|scdecl| TypeNormal, |scdecl|)
 	C.pointercount = 1
 	C.nildeclared = nilstate.real
 	C.Contains = typenormal
-	if !.IsRole
-		c.AddToGlobs
 	(c is ClassObj)
 	(c is global)
 	(c is library) = islib
+	if !.IsRole
+		c.AddToGlobs
 
 	return c
 
