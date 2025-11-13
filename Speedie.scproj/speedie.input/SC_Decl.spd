@@ -1327,7 +1327,11 @@ function scdecl.Complexity (|int|)
 
 
 function SimplestFirst (SorterComparer of scdecl)
-	|| Exp = b.exportposition - .exportposition
+	|| BX = b.ExportPosition
+	|| SX =  .ExportPosition
+	|| Exp = BX - SX
+		if !BX != !SX
+			return BX > 0
 		return exp
 	|| BComp = b.Complexity - .Complexity
 		return BComp

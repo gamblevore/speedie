@@ -689,7 +689,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	// radical compiler-internal changes. If the compiler is stable
 	// its fine.
 	
-	msg.name	= "autogen"
+	msg.name	= "helper"
 	|| name		= msg[@thg]							#require
 	|| arg		= msg.last(@arg)					#require
 	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )

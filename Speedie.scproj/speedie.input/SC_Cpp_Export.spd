@@ -1587,6 +1587,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ ')'
 
 		  else
+			if d is classobj
+				fs <~ '&'
 			d.exportname.safe(fs, d is local)
 
 		// plink plink plonk
@@ -1633,9 +1635,6 @@ function faststring.AppendLibGlob (|scdecl| d)
 	|| skip = n.Find('_', 0, 4)
 		while (n[++skip]) == '_'
 			0
-	  elseif n[] == '&'
-		skip = 1
-	
 	.appendrange(n, skip)
 	
 

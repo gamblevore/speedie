@@ -190,6 +190,11 @@ function Message.TestFuncName (|bool|)
 	return true
 
 
+function MakeHelper
+	.NoAutoComplete = 2
+	(self|scnode| is Private)					// limited to internal within a project
+
+	
 function ParseName (|Message| node, |bool|)
 	opt norefcounts
 	|| fType = node.name
@@ -198,8 +203,7 @@ function ParseName (|Message| node, |bool|)
 	.Name = cname.name
 	
 	if ftype == "helper"
-		.NoAutoComplete = 2
-		(self|scnode| is Private)					// limited to internal within a project
+		.MakeHelper
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2
 	  elseif ftype == "inline"
@@ -644,37 +648,9 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 	if !rz
 		return missing
 
-	// optimise order... for faststring which has a lot of functions.
-	.AddFuncToList(rz)
-		
-
 	if BestMatch  &  (kNeeds|||kUseDefaultParams)
 		Incoming.Exp.Last!.Func = @prm
 		rz.Argsmatch3( TypeCast, base, true, name_space, Incoming )
-
-
-function AddFuncToList (|scfunction| Inc)
-	// QQ  WW  EE  RR  TT
-	// QQ  RR  WW  EE  TT
-	// not even worth it. Too much fiddling
-	// A better approach would be to make the entire thing a LOOP.
-	// then... simply change the first position in the loop.
-	// we can save the place by getting .makeplace instead of .value
-	
-	// do later!
-	
-//	require self!=inc
-//	
-//	|scfunction| NPrev
-//	|| BB = inc.BackRef!
-//	|| N = Inc.NextFunc
-//		n.BackRef = BB
-//	bb.NextFunc = N
-//		
-//	NPrev = N.BackRef
-//	Inc.NextFunc = .NextFunc
-//	.NextFunc = Inc
-//	NPrev.NextFunc = n
 
 
 function FLookup (assigns:|SCNode|)
@@ -822,7 +798,9 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	dcl.source = .source
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
-	dcl.AddToGlobs
+	// dcl.AddToGlobs // behaviours should be in the funclist?
+					  // I guess we'll need a separate instruction
+					  // to get function addresses. Shouldn't be hard.
 
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
 	.HasProto = dcl
@@ -1937,12 +1915,15 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 
 	node.obj = self
 	if name_space
+		SCFunction.currfunc = self
 		if node != "iterator"
 			Compiler.FuncList <~ self
 		.FLookup = name_space  // sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
-		SCFunction.currfunc = self
-	
+		if name_space isa SCClass
+			if name_space is HelpersAll
+				.MakeHelper
+
 	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 
 		.PreProcessExpects

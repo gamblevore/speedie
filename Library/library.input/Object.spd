@@ -11,7 +11,7 @@ class Object
 	
 	virtual Render (|FastString|fs_in=nil, |string|)
 		nil self
-		cpp_wrapper JB_ObjRender
+		cpp_wrapper JB_Obj_Render
 
 //	helper GenericRender (|FastString| fs_in=nil)
 //		cpp_wrapper JB_Obj_GenericRender

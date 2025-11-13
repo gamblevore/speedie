@@ -20,6 +20,7 @@ datatype ClassInfo (int)
 		Banned
 		HasNilChecker
 		DefaultsToReal
+		HelpersAll
 //		IsRole
 //		ClassObj
 //		IsTask
@@ -763,7 +764,7 @@ function AfterFuncsDecled
 		.CheckAllocVsWrapper( d, false )
 	
 	|| cls = .ClassType
-		cls.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
+		cls.Name = .CStructName + "Data" // sigh. Not pleasant.
 		
 
 

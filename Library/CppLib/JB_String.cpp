@@ -1908,7 +1908,7 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
 }
 
 
-JB_String* JB_ObjRender(JB_Object* self, FastString* fs_in) {
+JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in) {
     // OK so first we want the class...
     if (!self) {
         return JB_CStr_Render("(nil)", fs_in);
@@ -1917,7 +1917,7 @@ JB_String* JB_ObjRender(JB_Object* self, FastString* fs_in) {
     JB_Class* Cls = JB_ObjClass(self);
     auto R = Cls->CppTable->render;
     fpRenderer FN = (fpRenderer)R;
-    if (!FN or (FN == JB_ObjRender)) {
+    if (!FN or (FN == JB_Obj_Render)) {
         return JB_Obj_GenericRender(self, fs_in);
     }
     

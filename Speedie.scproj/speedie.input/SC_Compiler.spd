@@ -575,12 +575,11 @@ function ImportAll
 		m.CallOurInitsByTheBiggerInitFunc
 	.PostInitCodeCall
 	
-	stability.StabliseGlobs
-
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
 		f.BeforeTransform
-//		f.CheckStuff
+
+	stability.StabliseGlobs
 	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList

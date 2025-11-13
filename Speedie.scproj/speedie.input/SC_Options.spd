@@ -356,7 +356,7 @@ module Feedback
 				options.Mode = options.cpp
 				
 		+'update'
-			options.Mode = options.Pack
+			// options.Mode = options.Pack
 			options.UpdateStability = true
 
 		+'pack'

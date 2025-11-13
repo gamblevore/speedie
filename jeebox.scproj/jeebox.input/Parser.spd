@@ -1262,7 +1262,7 @@ ive been~running #since morning
 module parser
 	linkage
 		visible false
-		cpp_Part Tk
+		cpp_part Tk
 
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData

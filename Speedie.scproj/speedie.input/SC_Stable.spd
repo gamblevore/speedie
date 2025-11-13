@@ -29,33 +29,36 @@ module Stability
 			rz = true
 
 
-	// todo:	(classes only needed for ISA testing.)
-		// builtins, cpp_nothing, don't put in funcs
-		// jeebox text for stuff.
-		// special sorter
-		// special builder
+	// todo:
 		// ignore roles for pack-gen
+	
+	
+	function BuildLibGlobTable (|message| T, |dictionary of scdecl| table = dictionary())
+		opt norefcounts
+		for d in PackMaker.LibGlobs
+			table[d.ExportName] = d
+			if d.ExportPosition // hmmm... shouldn't happen
+
+		for row in T
+			|| d = table[row.name]
+				|| pos = row[@num]
+					d.ExportPosition = pos.int	
+	
+	
+	function DumpGlobs (|file| f, |faststring| fs)
+		opt norefcounts
+		for d in PackMaker.LibGlobs
+			fs <~ "${d.exportname} ${D.exportposition}\n"
+		f.SmartData = fs
 	
 	
 	function StabliseGlobs
 		|| globs = Compiler.library["stable_glob_bank.txt"]
-		require globs.Open(true)
-
-		for s in globs.parse(64K)
-			if s.expect(@tmp)
-				.FindOneClass(s)
-
-		|| fs_glob = .StableStart(globs)
-//		.DoGlobs(fs_glob)
-		.StableEnd(fs_glob)
-		packmaker.LibGlobs.Sort(SimplestFirst)
-	
-	
-	function FindOneClass (|message| row)
-		opt norefcounts
-		|| cls = Compiler[row]
-			|| pos = row[@num]
-				cls.TypeNormal.ExportPosition = pos.int
+		|| str = globs.readall(64K)
+/		.BuildLibGlobTable(str.parse)			// fill table with old values
+/		packmaker.LibGlobs.Sort(SimplestFirst)	// sort them so empty values come after
+/		packmaker._LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) // rebuild size
+		.DumpGlobs(globs, FastString())
 
 
 	function FillMissingLibFuncs (|faststring?| fs, |int| frogs)

@@ -141,6 +141,10 @@ dispatch ClassLinkageTable (TranFunc)
 	+'visible'				{} // (SCFunction.Tran_Visible)
 	+'ignore'				{}
 	+'noearlyfree'			{}
+	+'helper'
+		if name_space isa scclass 
+			(name_space is HelpersAll)
+
 	+'sort_properties'      {
 		if name_space isa scclass
 			(name_Space is SortsProperties) = node.first.yes(true)

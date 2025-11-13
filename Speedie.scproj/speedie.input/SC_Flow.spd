@@ -36,3 +36,5 @@ target Debug
 		(name), visible
 	function string.trap (|message| msg=nil, |bool|)
 		(msg), visible
+function scobject.syntaxequals (|string| name, |bool| Aware,  |bool|)
+	disabled "Just use =="

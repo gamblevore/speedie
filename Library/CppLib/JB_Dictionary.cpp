@@ -713,7 +713,7 @@ JB_String* JB_Dict_Render(Dictionary* self, FastString* fs_in) {
         JB_FS_AppendByte(fs, '"');
         JB_FreeIfDead(S);
         JB_FS_AppendByte(fs, ':');
-        JB_ObjRender(JB_Nav_Value(Nav), fs);
+        JB_Obj_Render(JB_Nav_Value(Nav), fs);
     };
 	JB_FS_AppendByte(fs, '}');
     JB_FreeIfDead(Nav);

@@ -16,10 +16,10 @@ module PackMaker
 
 
 	function PackGlobSize (|int|)
-		return ._PackGlobSize init .GlobalsSize(.PackGlobs, true)
+		return ._PackGlobSize init .GlobalsSize(.PackGlobs)
 	
 	function LibGlobSize (|int|)
-		return ._LibGlobSize init .GlobalsSize(.libGlobs, false)
+/		return ._LibGlobSize
 		
 	helper scfunction.NeedsLibExport (|bool|)
 		require (.MyReacher or options.MakeInterpreter)
@@ -43,15 +43,15 @@ module PackMaker
 				.addfunc(f)
 	
 	
-	function GlobalsSize (|[scdecl]| List, |bool| Alter, |int|)     // SortGlobals, GlobalsSort
+	function GlobalsSize (|[scdecl]| List, |int|)     // SortGlobals, GlobalsSort
 		opt norefcounts
 		|| Globals = 1				// rz = 1, so if .au.ExportPosition== 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
-			if alter
-				d.ExportPosition = globals
+			if d.ExportPosition and d.ExportPosition!= globals // hmmmm
+			d.ExportPosition = globals
 			globals += s
 
 		return Globals.AlignUp(8) // for strings, which come directly after
@@ -307,8 +307,6 @@ function packmaker.FinalPrepare
 			|| t = c.ClassType!
 			|| t2 = c.RealClass.ClassType!
 			t.ExportPosition = t2.ExportPosition
-	// the file-size goes up if we enable this. More inlining?
-	// we need to find out why.
 
 	require Options.InlineLib
 

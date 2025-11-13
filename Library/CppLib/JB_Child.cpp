@@ -34,7 +34,7 @@ extern "C" {
 #define x(v) (1<<v) |
 #if DEBUG
 	#define x_release(v) 
-#else  // its nicer to ignore SIGTRAP. Xcode is wierd sometimes in running subprocesses.
+#else  // ignore SIGTRAP, to stop Xcode crashing subprocesses, if speedie is run from xcode
 	#define x_release(v) (1<<v) |
 #endif
 

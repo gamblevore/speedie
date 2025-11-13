@@ -153,7 +153,7 @@ JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 			JB_Object* obj = JB_Array_Value(self, i);
 			if (i)
 				JB_FS_AppendCString(fs, ", ");
-			JB_ObjRender(obj, fs);
+			JB_Obj_Render(obj, fs);
 		}
 		JB_FS_AppendByte(fs, ']');
 	}
