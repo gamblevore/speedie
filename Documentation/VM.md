@@ -17,11 +17,11 @@ The VM will enable these possibilites:
 * Compile Speedie without needing a C compiler.
 
 
-### Small and fast
+### Small and Fast
 
-Speedie ASM is around 2-3x smaller than ARM. In addition, compiles will link against SpeedieLib, cutting down compile size dramatically. My entire IDE Perry compiles down to 80KB! And its a good IDE! It is featureful.
+Speedie ASM is around 2-3x smaller than ARM. In addition, compiles will link against SpeedieLib, cutting down compile size dramatically. My entire IDE Perry compiles down to 80KB! And its a good IDE! It is featureful. (The same app compiled in C++, takes 900KB. Most of the saving is due to SpeedieLib.)
 
-*If I say (2 v 13), that means Speedie takes 2 instructions to do something, and ARM would take 13 to do the same.*
+Comparison notes: *If I say (2 vs 13), that means Speedie takes 2 instructions to do something, and ARM would take 13 to do the same.*
 
 * RefCounting instructions (1-2 vs 16-32).
 * Function-calls are expressed cleanly. Tighter, smaller, faster. Far superior design. (2 vs 2-20, typically 2 vs 10)
