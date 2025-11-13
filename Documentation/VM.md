@@ -34,7 +34,7 @@ Comparison notes: *If I say (2 vs 13), that means Speedie takes 2 instructions t
 * Branching (1 vs 2)
 * Loop specific instructions do in (1 vs 3-4).
 
-The current instruction count is around 190. I'll probably add a few more before release, but not many. This includes all the SIMD instructions for faster graphics, replicating the functions of OpenGL/GLSL.
+The current instruction count is around 190. This includes all the SIMD instructions for faster graphics, replicating the functions of OpenGL/GLSL. (I'll probably add a few more before release, but not many.)
 
 Also simple to decode. Instructions are 4-bytes each, except for instructions from 0 to 31. In this range, they take either 8 or 12 bytes, depending on if the instruction index is odd or even. (This should help make it faster if ever turned into physical hardware.)
 
