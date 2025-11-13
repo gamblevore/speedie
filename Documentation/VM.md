@@ -18,7 +18,8 @@ The VM will enable these possibilites:
 
 
 ### Small and fast
-Speedie ASM should be 2x smaller than ARM, on average. <small>(This is just a wild guess, as its not finished yet! But this is my hope!)</small> In addition, compiles will link against SpeedieLib, cutting down compile size dramatically.
+
+Speedie ASM is around 2-3x smaller than ARM. In addition, compiles will link against SpeedieLib, cutting down compile size dramatically. My entire IDE Perry compiles down to 80KB! And its a good IDE! It is featureful.
 
 *If I say (2 v 13), that means Speedie takes 2 instructions to do something, and ARM would take 13 to do the same.*
 
