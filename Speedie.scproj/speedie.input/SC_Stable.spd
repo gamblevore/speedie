@@ -1,36 +1,20 @@
 
-
 module Stability
 	|| LastID = 1
 	
-	function StableStart (|File| f, |faststring|)
+	// todo: empty spots need to be replaced with dummy decls
+	function StabliseFuncs (|file| funcs)
+		|faststring| fs
 		if options.UpdateStability
-			rz = faststring()
-			if !f.Size
-				rz <~ "// This file is not stable till 'release'."
-			rz <~ "\n"
-			rz.file = f
-
-
-	function StableEnd (|faststring| fs)
+			fs = faststring()
+			if !funcs.Size
+				fs <~ "// This file is not stable till 'release'."
+			fs <~ "\n"
+			fs.file = funcs
+		.FillMissingLibFuncs(fs, packmaker.PackGlobSize)
 		if fs and fs.Length > 1
 			fs <~ "\n"
 			fs.flush
-
-
-	function StabliseFuncs (|bool|)
-		|| frogs = packmaker.PackGlobSize
-		|| funcs = Compiler.library["stable_id_bank.txt"]
-		if funcs.Open(true)
-			.UseFuncBank(funcs)
-			|| fs_fn = .StableStart(funcs)
-			.FillMissingLibFuncs(fs_fn, frogs)
-			.StableEnd(fs_fn)
-			rz = true
-
-
-	// todo:
-		// ignore roles for pack-gen
 	
 	
 	function BuildLibGlobTable (|message| T, |dictionary of scdecl| table = dictionary())
@@ -45,20 +29,42 @@ module Stability
 					d.ExportPosition = pos.int	
 	
 	
-	function DumpGlobs (|file| f, |faststring| fs)
+	function DumpGlobs (|faststring| fs=faststring(), |file| f=nil)
 		opt norefcounts
 		for d in PackMaker.LibGlobs
 			fs <~ "${d.exportname} ${D.exportposition}\n"
-		f.SmartData = fs
+		if f
+			f.SmartData = fs
+		  else
+			printline fs
 	
 	
+	function packmaker.OrderLibGlobs
+		opt norefcounts
+/		stability.DumpGlobs
+		.LibGlobs.Sort(SimplestFirst)	// sort them so empty values come after
+/		stability.DumpGlobs
+
+		target debug
+			|| EmptyFound = false
+			for d in .libglobs
+				if !EmptyFound and !d.exportposition
+					EmptyFound = true
+				  elseif emptyfound and d.exportposition
+					debugger // argh?
+		
+/		._LibGlobSize = .GlobalsSize(.libglobs) // rebuild size
+
+
 	function StabliseGlobs
 		|| globs = Compiler.library["stable_glob_bank.txt"]
 		|| str = globs.readall(64K)
-/		.BuildLibGlobTable(str.parse)			// fill table with old values
-/		packmaker.LibGlobs.Sort(SimplestFirst)	// sort them so empty values come after
-/		packmaker._LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) // rebuild size
-		.DumpGlobs(globs, FastString())
+		// need to NOT remove unfound items
+		// so now we know the order is OK... now what?
+		.BuildLibGlobTable(str.parse)			// fill table with old values
+		packmaker.OrderLibGlobs
+		if options.updatestability
+/			.DumpGlobs(	globs)
 
 
 	function FillMissingLibFuncs (|faststring?| fs, |int| frogs)
@@ -92,7 +98,7 @@ module Stability
 		if table
 			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
 				Table[id+31] = fn
-//				"id: ${id}(${id+31}) = $.exportname"
+
 	
 	function UseFuncBank (|file| bank)
 		|| data = bank.ReadAll(1MB)

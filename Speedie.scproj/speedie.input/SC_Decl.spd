@@ -1327,15 +1327,21 @@ function scdecl.Complexity (|int|)
 
 
 function SimplestFirst (SorterComparer of scdecl)
+	opt norefcounts
 	|| BX = b.ExportPosition
 	|| SX =  .ExportPosition
 	|| Exp = BX - SX
 		if !BX != !SX
-			return BX > 0
+			return BX <= 0
 		return exp
 	|| BComp = b.Complexity - .Complexity
 		return BComp
-	return b.carraysize - .carraysize
+	rz = b.carraysize - .carraysize
+	if !rz
+		|| bi = b.internal
+		|| bs =  .internal
+		if bi and bs
+			rz = bi.complexity - bs.complexity
 
 
 function SmallestAlignedFirst (SorterComparer of scdecl)
