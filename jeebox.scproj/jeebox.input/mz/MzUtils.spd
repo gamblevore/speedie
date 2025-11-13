@@ -11,13 +11,7 @@ Module MZLab
 	
 	function FreeNow
 		cpp_wrapper JB_CompFreeNow
-	
-	
-	function TestMz (|string| path, |bool|)
-		if path
-			|| f = path.ReadFile.decompress(int.max)
-			return f.CompressTest_(true) and .ManyTests
-	
+		
 	
 	function string.CompressTest_ (|bool| report, |int| which=3, |bool|)
 		if which & 1
@@ -43,22 +37,6 @@ Module MZLab
 		for j in 4 
 			if i & (1<<j)
 				fs <~ items[j]!
-
-
-	helper ManyTests (|bool|) // mztest
-		|| Items = "abcd efgh ijkl mnop".words
-		|| fs = faststring()
-		
-		for i in 1024*64
-			if i  and  i isa 16K
-				printline i.render
-			for sh in 0 to 4
-				.TestSub(items, fs, i>>(sh*4))
-			|| str = fs.getresult
-			require str.CompressTest_(false, (i&1)+1)
-		"Compression Test: OK"
-		return true
-
 
 	target DebugCompressrion
 		function TestCompression

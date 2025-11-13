@@ -312,12 +312,12 @@ struct StructSaveTest
 	|int64|		Intt
 	|string|	Str
 	
-	function RunTest
+	helper RunTest
 		.test("")
 		
-	function Test (|string| s)
+	helper Test (|string| s)
 		cpp_part TestStr
 
-	function Test (|object| s)
+	helper Test (|object| s)
 		cpp_part TestObj
 }

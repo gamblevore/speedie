@@ -2,7 +2,7 @@
 module Stability
 	|| LastID = 1
 	
-	// todo: empty spots need to be replaced with dummy decls
+	// todo: cpp_renderer needs to put dummy fields for empty spots
 	function StabliseFuncs (|file| funcs)
 		|faststring| fs
 		if options.UpdateStability
@@ -21,7 +21,7 @@ module Stability
 		opt norefcounts
 		for d in PackMaker.LibGlobs
 			table[d.ExportName] = d
-			if d.ExportPosition // hmmm... shouldn't happen
+			if d.ExportPosition					// hmmm... shouldn't happen
 
 		for row in T
 			|| d = table[row.name]
@@ -38,30 +38,17 @@ module Stability
 	
 	function packmaker.OrderLibGlobs
 		opt norefcounts
-//		stability.DumpGlobs
-		.LibGlobs.Sort(SimplestFirst)	// sort them so empty values come after
-//		stability.DumpGlobs
-
-		target debug
-			|| EmptyFound = false
-			for d in .libglobs
-				if !EmptyFound and !d.exportposition
-					EmptyFound = true
-				  elseif emptyfound and d.exportposition
-					debugger // argh?
-		
-/		._LibGlobSize = .GlobalsSize(.libglobs) // rebuild size
+		.LibGlobs.Sort(SimplestFirst)			// sort them so empty values come after
+		._LibGlobSize = .GlobalsSize(.libglobs) // rebuild size
 
 
 	function StabliseGlobs
 		|| globs = Compiler.library["stable_glob_bank.txt"]
 		|| str = globs.readall(64K)
-		// need to NOT remove unfound items
-		// so now we know the order is OK... now what?
 		.BuildLibGlobTable(str.parse)			// fill table with old values
 		packmaker.OrderLibGlobs
 		if options.updatestability
-/			.DumpGlobs(	globs)
+			.DumpGlobs(globs)
 
 
 	function FillMissingLibFuncs (|faststring?| fs, |int| frogs)

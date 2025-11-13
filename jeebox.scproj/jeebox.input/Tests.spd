@@ -5,7 +5,7 @@
 
 
 extend_module Message
-	function TreeComparePrint (|message| orig)
+	helper TreeComparePrint (|message| orig)
 		"Trees ${orig.MiniName} are identical."
 		
 	function TreeCompare (|message| orig, |Message| reparse, |bool| PrintIfSame=false, |bool|)

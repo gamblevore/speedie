@@ -140,7 +140,7 @@ class FixedDict
 
 
 	module
-		function TimeTest (|[string]| items)
+		helper TimeTest (|[string]| items)
 			|fixeddict of string|  fd = fixeddict()
 			|dictionary of string| ed = dictionary()
 			|| n = 4
