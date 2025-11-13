@@ -2593,13 +2593,13 @@ extern ASM SC__ASMType_WriteASM[5];
 
 #define kSC__ClassInfo_Banned ((ClassInfo)256)
 
-#define kSC__ClassInfo_Builtin ((ClassInfo)8192)
+#define kSC__ClassInfo_Builtin ((ClassInfo)16384)
 
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
 
 #define kSC__ClassInfo_DefaultsToReal ((ClassInfo)1024)
 
-#define kSC__ClassInfo_Flags ((ClassInfo)65536)
+#define kSC__ClassInfo_Flags ((ClassInfo)131072)
 
 #define kSC__ClassInfo_HasEqualsFunc ((ClassInfo)4)
 
@@ -2607,21 +2607,23 @@ extern ASM SC__ASMType_WriteASM[5];
 
 #define kSC__ClassInfo_HasSubClass ((ClassInfo)8)
 
+#define kSC__ClassInfo_HelpersAll ((ClassInfo)2048)
+
 #define kSC__ClassInfo_IgnoreContainedSelf ((ClassInfo)2)
 
 #define kSC__ClassInfo_NoEarlyFree ((ClassInfo)16)
 
-#define kSC__ClassInfo_NumericReduction ((ClassInfo)98304)
+#define kSC__ClassInfo_NumericReduction ((ClassInfo)196608)
 
 #define kSC__ClassInfo_SavingCanSkip ((ClassInfo)64)
 
-#define kSC__ClassInfo_SortsProperties ((ClassInfo)16384)
+#define kSC__ClassInfo_SortsProperties ((ClassInfo)32768)
 
-#define kSC__ClassInfo_Stateful ((ClassInfo)4096)
+#define kSC__ClassInfo_Stateful ((ClassInfo)8192)
 
-#define kSC__ClassInfo_Stateless ((ClassInfo)2048)
+#define kSC__ClassInfo_Stateless ((ClassInfo)4096)
 
-#define kSC__ClassInfo_Symbol ((ClassInfo)32768)
+#define kSC__ClassInfo_Symbol ((ClassInfo)65536)
 
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)128)
 
@@ -3424,63 +3426,59 @@ struct JB_Globals {
 	bool Proc_CheckedParent;
 	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
-	u16 Tk__StopBars;
 	u16 API_NilHappened_;
+	u16 Tk__StopBars;
 	int Syx_CurrFuncID_;
 	Date Terminal_LastDisplay;
 	Float64 Rec_Progress;
+	Dictionary* Constants__SyxDict;
+	Message* App__Conf;
+	JB_String* App_Usage;
+	Message* Tk__EndOfLineMarker;
+	JB_ErrorReceiver* StdErr;
+	JB_File* App__stdin;
+	JB_File* App__StdOut;
+	FastString* Terminal_fs;
+	Array* Terminal_TermScreen;
+	Message* App__Prefs;
+	JB_File* Platform_Logger_;
+	CharSet* Constants_CSWrapSplit;
+	Dictionary* Constants_EscapeStr;
+	Dictionary* LD_ClassList;
+	SaverClassInfo* Saver_SaveableList;
+	Dictionary* Constants_XML_EscapeStr;
+	FlowControl* Flow_Flow;
+	Dictionary* Constants_JS_EscapeStr;
+	Dictionary* Constants_UnEscapeStr;
+	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_XML_UnEscapeStr;
+	Array* Macro_TmpPrms_;
 	Dictionary* Constants_EscapeChr;
+	JB_String* File__Speedie;
+	JB_String* bin_Header;
 	CharSet* Constants_CSWordMiddle;
+	SpdProcess* Proc__Parent;
 	CharSet* Constants_CSLettersOnly;
 	CharSet* Constants_CSWordStart;
 	CharSet* Constants_XMLWordMiddle;
 	CharSet* Constants_CSNum;
+	Message* Err_BackupErrorSource;
 	CharSet* Constants_CSLine;
 	CharSet* Constants_CSAfterDot;
 	CharSet* Constants_CSAfterStatement;
-	CharSet* Constants_CSWrapSplit;
-	JB_File* Platform_Logger_;
-	Array* Terminal_TermScreen;
-	FastString* Terminal_fs;
-	Dictionary* Constants_JS_EscapeStr;
-	JB_ErrorReceiver* StdErr;
-	Message* Tk__EndOfLineMarker;
-	Dictionary* Constants_EscapeStr;
-	Message* App__Conf;
-	Dictionary* Constants_UnEscapeStr;
-	Dictionary* LD_ClassList;
-	SaverClassInfo* Saver_SaveableList;
-	Dictionary* Constants_JS_UnEscapeStr;
-	FlowControl* Flow_Flow;
-	Message* App__Prefs;
-	JB_File* App__StdOut;
-	JB_File* App__stdin;
-	Array* Macro_TmpPrms_;
-	JB_String* File__Speedie;
-	JB_String* bin_Header;
-	JB_String* App_Usage;
-	SpdProcess* Proc__Parent;
-	Message* Err_BackupErrorSource;
-	Dictionary* Constants_XML_EscapeStr;
-	Dictionary* Constants__SyxDict;
 	Array* App__OldArgs;
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
 	FP_fnIDGenerator Tk_Splitter;
-	JB_Class* MessageIDData;
-	JB_Class* SaverClassInfoData;
-	JB_Class* TaskData;
 	JB_Class* ErrorData;
-	JB_Class* ListData;
 	JB_Class* ObjectData;
 	JB_Class* ByteMapData;
 	JB_Class* CharSetData;
 	JB_Class* DTWrapData;
 	JB_Class* DictionaryReaderData;
 	JB_Class* ErrorReceiverData;
-	JB_Class* MessageData;
+	JB_Class* TaskData;
 	JB_Class* FastStringData;
 	JB_Class* FixedDictData;
 	JB_Class* FlowControlData;
@@ -3503,10 +3501,14 @@ struct JB_Globals {
 	JB_Class* SpdProcessData;
 	JB_Class* StringSharedData;
 	JB_Class* StringCData;
+	JB_Class* ListData;
+	JB_Class* MessageData;
+	JB_Class* MessageIDData;
+	JB_Class* SaverClassInfoData;
 	Random zalgo_R;
 	Random Rnd_Shared;
-	CompressionStats MzSt_All;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mrap_MDummy_[2];
 	CharProp CharProp_Item[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -4154,7 +4156,7 @@ void SC_PackMaker__FinalPrepare();
 
 void SC_PackMaker__FuncLink(FastString* J);
 
-int SC_PackMaker__GlobalsSize(Array* List, bool Alter);
+int SC_PackMaker__GlobalsSize(Array* List);
 
 void SC_PackMaker__GlobLink(FastString* J);
 
@@ -4163,6 +4165,8 @@ int SC_PackMaker__Init_();
 int SC_PackMaker__LibGlobSize();
 
 void SC_PackMaker__MakePack();
+
+void SC_PackMaker__OrderLibGlobs();
 
 void SC_PackMaker__PackClasses(FastString* J);
 
@@ -4373,17 +4377,15 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // Stability
-void SC_Stability__FillMissingLibFuncs(FastString* Fs, int Frogs);
+void SC_Stability__BuildLibGlobTable(Message* T, Dictionary* Table);
 
-void SC_Stability__FindOneClass(Message* Row);
+void SC_Stability__DumpGlobs(FastString* Fs, JB_File* F);
+
+void SC_Stability__FillMissingLibFuncs(FastString* Fs, int Frogs);
 
 int SC_Stability__Init_();
 
-void SC_Stability__StableEnd(FastString* Fs);
-
-FastString* SC_Stability__StableStart(JB_File* F);
-
-bool SC_Stability__StabliseFuncs();
+void SC_Stability__StabliseFuncs(JB_File* Funcs);
 
 void SC_Stability__StabliseGlobs();
 
@@ -4627,6 +4629,8 @@ bool SC_ClassLinkageTable_cpp_part(SCFunction* Fn, Message* Node, SCNode* Name_s
 bool SC_ClassLinkageTable_cpp_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 bool SC_ClassLinkageTable_datatype(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassLinkageTable_helper(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 bool SC_ClassLinkageTable_ignore(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -8948,6 +8952,8 @@ int SC_Array_CArraySize(Array* Self, int Size);
 
 void JB_Array_Clear(Array* Self);
 
+Array* JB_Array_CopySort(Array* Self, FP_SorterComparer Fn);
+
 void JB_Array_FastRemove(Array* Self, int Pos);
 
 JB_Object* JB_Array_First(Array* Self);
@@ -11527,8 +11533,6 @@ void SC_Func_AddConstructorReturn(SCFunction* Self, Message* Prms);
 
 void SC_Func_AddConstructorReturn2(SCFunction* Self);
 
-void SC_Func_AddFuncToList(SCFunction* Self, SCFunction* Inc);
-
 void SC_Func_AddSelfPrm(SCFunction* Self, SCClass* Cls);
 
 void SC_Func_AddSelfToFunc(SCFunction* Self, SCClass* Cls, SCNode* Space);
@@ -11696,6 +11700,8 @@ bool SC_Func_IsUnused(SCFunction* Self);
 SCFunction* SC_Func_Last(SCFunction* Self);
 
 SCDecl* SC_Func_MacroFix(SCFunction* Self, SCDecl* Contains, SCNode* Name_space, SCParamArray* Incoming);
+
+void SC_Func_MakeHelper(SCFunction* Self);
 
 void SC_Func_MakeID(SCFunction* Self, FastString* Fs, void** Table);
 
@@ -12406,46 +12412,46 @@ struct JB_Globals {
 	bool Proc_CheckedParent;
 	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
-	u16 Tk__StopBars;
 	u16 API_NilHappened_;
+	u16 Tk__StopBars;
 	int Syx_CurrFuncID_;
 	Date Terminal_LastDisplay;
 	Float64 Rec_Progress;
+	JB_Object* Constants__SyxDict;
+	JB_Object* App__Conf;
+	JB_Object* App_Usage;
+	JB_Object* Tk__EndOfLineMarker;
+	JB_Object* StdErr;
+	JB_Object* App__stdin;
+	JB_Object* App__StdOut;
+	JB_Object* Terminal_fs;
+	JB_Object* Terminal_TermScreen;
+	JB_Object* App__Prefs;
+	JB_Object* Platform_Logger_;
+	JB_Object* Constants_CSWrapSplit;
+	JB_Object* Constants_EscapeStr;
+	JB_Object* LD_ClassList;
+	JB_Object* Saver_SaveableList;
+	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* Flow_Flow;
+	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Constants_UnEscapeStr;
+	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_XML_UnEscapeStr;
+	JB_Object* Macro_TmpPrms_;
 	JB_Object* Constants_EscapeChr;
+	JB_Object* File__Speedie;
+	JB_Object* bin_Header;
 	JB_Object* Constants_CSWordMiddle;
+	JB_Object* Proc__Parent;
 	JB_Object* Constants_CSLettersOnly;
 	JB_Object* Constants_CSWordStart;
 	JB_Object* Constants_XMLWordMiddle;
 	JB_Object* Constants_CSNum;
+	JB_Object* Err_BackupErrorSource;
 	JB_Object* Constants_CSLine;
 	JB_Object* Constants_CSAfterDot;
 	JB_Object* Constants_CSAfterStatement;
-	JB_Object* Constants_CSWrapSplit;
-	JB_Object* Platform_Logger_;
-	JB_Object* Terminal_TermScreen;
-	JB_Object* Terminal_fs;
-	JB_Object* Constants_JS_EscapeStr;
-	JB_Object* StdErr;
-	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Constants_EscapeStr;
-	JB_Object* App__Conf;
-	JB_Object* Constants_UnEscapeStr;
-	JB_Object* LD_ClassList;
-	JB_Object* Saver_SaveableList;
-	JB_Object* Constants_JS_UnEscapeStr;
-	JB_Object* Flow_Flow;
-	JB_Object* App__Prefs;
-	JB_Object* App__StdOut;
-	JB_Object* App__stdin;
-	JB_Object* Macro_TmpPrms_;
-	JB_Object* File__Speedie;
-	JB_Object* bin_Header;
-	JB_Object* App_Usage;
-	JB_Object* Proc__Parent;
-	JB_Object* Err_BackupErrorSource;
-	JB_Object* Constants_XML_EscapeStr;
-	JB_Object* Constants__SyxDict;
 	JB_Object* App__OldArgs;
 	JB_Object* App__Path;
 	JB_Object* Tk__ErrorNames;
