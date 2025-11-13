@@ -120,6 +120,10 @@ class Array (saveable)
 	function Copy (|[...]|)
 		cpp_wrapper JB_Array_Copy
 	
+	function CopySort (|sortercomparer| fn, |[...]|)
+		rz = .copy
+		rz.sort(fn)
+	
 	function Swap (|int| i, |int| j)
 		cpp_wrapper JB_Array_Swap
 	
@@ -191,7 +195,9 @@ class Array (saveable)
 
 prototype SorterComparer (|...| self , |...| b, |SortComparison|)
 	contains Object
-
+	syntax append (|array| x)
+		x.sort(self)
+	
 
 datatype SortComparison (int)
 	function bool.syntaxcast (|SortComparison|)

@@ -49,3 +49,4 @@ Examples/books_xml/books.box
 *.zpd
 /Bangle
 Utils/CompilerTest
+Speedie.scproj/.strings.txt

@@ -29,21 +29,18 @@ module Stability
 					d.ExportPosition = pos.int	
 	
 	
-	function DumpGlobs (|faststring| fs=faststring(), |file| f=nil)
+	function DumpGlobs (|faststring| fs=faststring(), |file| f)
 		opt norefcounts
 		for d in PackMaker.LibGlobs
 			fs <~ "${d.exportname} ${D.exportposition}\n"
-		if f
-			f.SmartData = fs
-		  else
-			printline fs
+		f.SmartData = fs
 	
 	
 	function packmaker.OrderLibGlobs
 		opt norefcounts
-/		stability.DumpGlobs
+//		stability.DumpGlobs
 		.LibGlobs.Sort(SimplestFirst)	// sort them so empty values come after
-/		stability.DumpGlobs
+//		stability.DumpGlobs
 
 		target debug
 			|| EmptyFound = false
@@ -73,7 +70,8 @@ module Stability
 		if platform.isdebug
 			Table = jb_vm.vm.InitTable(4096, frogs)
 
-		for fn in Compiler.FuncList
+		|| lst = Compiler.FuncList.CopySort(&CodeSorter.exportnames)
+		for fn in lst
 			if fn.NeedsID
 				fn.MakeID(fs, table)
 		

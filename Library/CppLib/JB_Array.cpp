@@ -201,7 +201,7 @@ Array* JB_Array_Copy(Array* self) {
 	Array* Result = JB_Array_Constructor0(nil);
 	int n = self->Length;
 	if (!GrowToLength_(Result, n)) {
-		JB_Decr(Result);
+		JB_Delete((FreeObject*)Result);
 		return 0;
 	}
 
