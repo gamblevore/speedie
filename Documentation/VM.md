@@ -34,7 +34,7 @@ Speedie ASM is around 2-3x smaller than ARM. In addition, compiles will link aga
 * Branching (1 vs 2)
 * Loop specific instructions do in (1 vs 3-4).
 
-**Only 122 different instructions so far. Hopefully won't increase much. ARM has over 1000!**
+The current instruction count is around 190. I'll probably add a few more before release, but not many. This includes all the SIMD instructions for faster graphics, replicating the functions of OpenGL/GLSL.
 
 Also simple to decode. Instructions are 4-bytes each, except for instructions from 0 to 31. In this range, they take either 8 or 12 bytes, depending on if the instruction index is odd or even. (This should help make it faster if ever turned into physical hardware.)
 
