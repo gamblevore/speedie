@@ -3,6 +3,7 @@ roots
 	"@spd/Library/library.input/"
 	"@spd/jeebox.scproj/jeebox.input/"
 	"@spd/Image.scproj/image.input/"
+	"@spd/Library/stable_id_bank.txt"
 
 excludes 
 	"hidden"
