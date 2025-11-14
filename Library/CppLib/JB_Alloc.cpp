@@ -149,23 +149,24 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 }
 
 
-//JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent) {
-//	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
-//	if (Cls)
-//		JBClassInitReal(*Cls, Name, Size, Parent, 0);
-//	return Cls;
-//}
-//
-//
-//void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd) {
-//	void** A = (void**)(malloc(sizeof(void*) * n));
-//	cls->CppTable = (JBObject_Behaviour*)A; // both tables should agree with each other 
-//	*Cpp = A;
-//
-//	void** B = (void**)(malloc(sizeof(void*) * n));
-//    cls->SpdTable = B;
-//	*Spd = B;
-//}
+// interpreter uses these two
+JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent) {
+	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
+	if (Cls)
+		JBClassInitReal(*Cls, Name, Size, Parent, 0);
+	return Cls;
+}
+
+
+void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd) {
+	void** A = (void**)(malloc(sizeof(void*) * n));
+	cls->CppTable = (JBObject_Behaviour*)A; // both tables should agree with each other 
+	*Cpp = A;
+
+	void** B = (void**)(malloc(sizeof(void*) * n));
+    cls->SpdTable = B;
+	*Spd = B;
+}
 
 
 MemStats JB_MemoryStats(JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
