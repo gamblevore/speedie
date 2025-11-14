@@ -3302,3 +3302,4 @@ roundf
 sqrt
 sqrtf
 strlen
+JB_InitCode_
