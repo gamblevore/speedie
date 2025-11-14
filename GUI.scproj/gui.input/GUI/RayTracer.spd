@@ -60,7 +60,6 @@ class RayTracer
 	|?&pico[4]|			Workers //!!nice I guess we can send messages? or not?
 								// maybe easier to start/stop? or just spin on a value?
 								// we could reduce pico to "just a place to store a few data pointers"
-	//
 	visible true
 	|[vobject]|			Shapes
 	
