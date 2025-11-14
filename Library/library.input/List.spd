@@ -302,26 +302,6 @@ class list (Saveable)
 			|| f = .first$
 			f.remove
 
-
-	target debug {
-	function Clear (|bool| ExpectDestroy)
-		opt norefcounts
-		cpp_part ClearAndLeakTest
-		while
-			|| f = .first$
-			if f.RefCountMark
-				f.markrefcount(false)
-				|| rc = f.refcount
-				|| Leaked = Rc != 1
-				f.remove
-				if leaked
-					#! Damn... What?
-					f.FindReferences
-			  else
-				f.remove
-	}
-
-
 	function Count (|int|)
 		disabled "This function is slow. Use .HasChildCount or .SlowCount (a more honestly named version of .count... there is no fast way to do this.)"
 

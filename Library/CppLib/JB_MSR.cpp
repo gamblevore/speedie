@@ -103,7 +103,7 @@ JB_String* JB_MSR_ReplaceAll( Dictionary* Dict, JB_String* Data, FastString* fs_
             if ( !Found ) {
                 return Data;
             }
-            fs = JB_FS__InternalNew();
+            fs = JB_FS_Constructor(0);
         }
 
 		JB_FS_AppendMem_( fs, SearchStart, (int)(FoundStr.Addr - SearchStart) );

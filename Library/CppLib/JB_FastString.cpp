@@ -565,14 +565,6 @@ void JB_FS_FileSet(FastString* fs, JB_File* F) {
 
             /* Constructors */
 
-FastString* JB_FS_ConstructorSize(FastString* self, int Size) {
-	JB_New2(FastString);
-    JB_FS_Constructor(self);
-	if ( Size ) {
-		JB_FS_SizeSet( self, Size );
-	}
-	return self;
-}
 
 FastString* JB_FS_Constructor(FastString* self) {
 	JB_New2(FastString);
@@ -580,6 +572,15 @@ FastString* JB_FS_Constructor(FastString* self) {
     self->IndentChar = '\t';
 	return self;
 }
+
+
+FastString* JB_FS_ConstructorSize(FastString* Self, int Size) {
+	Self = JB_FS_Constructor(Self);
+	if ( Size )
+		JB_FS_SizeSet( Self, Size );
+	return Self;
+}
+
 
 void JB_FS_Destructor(FastString* self) {
 	// .dispose can call this.
@@ -606,17 +607,6 @@ JB_String* JB_FS_GetResult(FastString* self) {
 }
 
 
-FastString* JB_FS__InternalNew() {
-    return JB_FS_Constructor( 0 );
-}
-
-FastString* JB_FS__FileFlush(JB_File* f) {
-	FastString* fs = JB_FS__InternalNew();
-	fs->File = JB_Incr(f);
-	return fs;
-}
-
-
 FastString* TheSharedFastString;
 FastString* JB_FS__FastNew(FastString* other) {
     if (other) {
@@ -628,7 +618,7 @@ FastString* JB_FS__FastNew(FastString* other) {
 
 
 	if ( !fs or (JB_RefCount(fs) > 1)) {
-        JB_SetRef(fs, JB_FS__InternalNew());
+        JB_SetRef(fs, JB_FS_Constructor(0));
 		TheSharedFastString=fs;
     } else {
         fs->Length = 0;

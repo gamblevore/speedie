@@ -68,18 +68,14 @@ module PackMaker
 
 	function BuildGlobs (|bool|)
 		opt norefcounts
-		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
+/		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
 		require fninit and fnmain
 		
 		fninit.PackID = 1 // put init and main first!
 		fnmain.PackID = 2
-				
-		|| funcs = Compiler.library["stable_id_bank.txt"]
-		if funcs.Open(true)
-			stability.UseFuncBank(funcs)
-			Stability.StabliseFuncs(funcs)
-		
+
+		stability.Stabilise				
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
 

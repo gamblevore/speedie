@@ -132,10 +132,10 @@ int CrashLogFile = 0;
 extern const char* JB_CrashLogFileName;
 
 
-int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
+int JB_ErrorHandleFileC (const char* Path, int err, const char* Operation);
 extern uint Flow_Disabled;
 
-void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
+void JB_Flow__ReportStringData (u8* Addr, int Length, u8* Name, int NameLen) {
 #ifndef AS_LIBRARY
 	if (!Flow_Disabled) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
@@ -158,7 +158,7 @@ void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
 #endif
 }
 
-inline void JB_Flow__Report(JB_String* data, JB_String* name) {
+inline void JB_Flow__Report (JB_String* data, JB_String* name) {
 #ifndef AS_LIBRARY
 	if (!Flow_Disabled)
 		JB_Flow__ReportStringData(data->Addr, data->Length, name->Addr, name->Length);
@@ -170,11 +170,11 @@ bool HasFD (JB_File*f) {
     return (f and f->Descriptor >= 0);
 }
 
-inline uint8* JB_FastFileThing(JB_File* S) {
+inline uint8* JB_FastFileThing (JB_File* S) {
 	return S->Addr;
 }
 
-int64 ErrorHandle_(int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
+int64 ErrorHandle_ (int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
     if (MaybeErr >= 0) {
         return MaybeErr;
     }
@@ -183,7 +183,7 @@ int64 ErrorHandle_(int64 MaybeErr, JB_String* self, JB_String* other, const char
 }
 
 
-int JB_File__RelaxSudo(int Active) {
+int JB_File__RelaxSudo (int Active) {
 	SudoRelax += Active;
 	return SudoRelax;
 }
@@ -200,7 +200,7 @@ static bool IsRootOrBad_ (const char* C) {
 }
 
 
-static const char* GetRealUser_() {
+static const char* GetRealUser_ () {
 	auto C = getenv("SUDO_USER");
 	if (IsRootOrBad_(C)) {
 		C = getenv("LOGNAME");
@@ -236,14 +236,14 @@ static int SmartGetUID (int &G, int &U, JB_String* ErrPath) {
 }
 
 
-static bool IsLink_(const char* Path) {
+static bool IsLink_ (const char* Path) {
 	struct _stat st;
 	auto s = lstat( Path, &st );
 	return (s == 0) and S_ISLNK(st.st_mode);
 }
 
 
-static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
+static int RelaxPath_ (const char* Path, bool NeedsMode, JB_String* ErrPath) {
 	// sometimes doing stuff in sudo leaves "root" owned files all over
 	// which is not what we wanted.
 	require (SudoRelax > 0);
@@ -279,14 +279,14 @@ static int RelaxPath_(const char* Path, bool NeedsMode, JB_String* ErrPath) {
 }
 
 
-int JB_File_RelaxPath(JB_File* self, bool NeedsMode) {
+int JB_File_RelaxPath (JB_File* self, bool NeedsMode) {
 	require (self); 
 	return RelaxPath_((const char*)self->Addr, NeedsMode, self);
 }
 
 
 
-int JB_Str_MakeEntirePath(JB_String* self, bool Last);
+int JB_Str_MakeEntirePath (JB_String* self, bool Last);
 bool RetryMakePath (JB_String* s) {
 	int Err = errno;
 	if (Err != ENOENT)
@@ -296,7 +296,7 @@ bool RetryMakePath (JB_String* s) {
 }
 
 
-int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
+int StrOpen_ (JB_File* Path, int Flags, bool AllowMissing) {
 	if (!JB_Str_Length(Path)) {
 		errno = ENOENT;
 	} else {
@@ -322,7 +322,7 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
 }
 
 
-static bool Stat2_( JB_String* ErrName,  struct _stat* st,  bool normal,  const char* tmp ) {
+static bool Stat2_ ( JB_String* ErrName,  struct _stat* st,  bool normal,  const char* tmp ) {
     int err = normal ? stat( tmp, st ) : lstat( tmp, st );
     if (!err) return true;
 	if (errno != ENOENT  and access(tmp, 0)) {
@@ -335,7 +335,7 @@ static bool Stat2_( JB_String* ErrName,  struct _stat* st,  bool normal,  const 
 }
 
 
-bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
+bool Stat_ ( JB_String* self, struct _stat* st, bool normal=true ) {
     if (!self) return false;
     uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
@@ -343,7 +343,7 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 }
 
 
-uint8* JB_FastFileString( JB_String* Path, uint8* Tmp) { // just use posix funcs? fuck windows 16-bit chars.
+uint8* JB_FastFileString ( JB_String* Path, uint8* Tmp) { // just use posix funcs? fuck windows 16-bit chars.
     u32 N = JB_Str_Length( Path );
     if ( ! N ) {
         return (uint8*)"";
@@ -360,7 +360,7 @@ uint8* JB_FastFileString( JB_String* Path, uint8* Tmp) { // just use posix funcs
 }
 
 
-int File_GoToStart( JB_File* f, bool AllowMissing ) {
+int File_GoToStart ( JB_File* f, bool AllowMissing ) {
 	int FD = f->Descriptor;
 	if (FD >= 0) {
 		int err = JB_File_OffsetSet(f, 0);
@@ -383,10 +383,9 @@ bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
 	#endif
 }
 
-int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
+int JB_File_Open (JB_File* f, int OpenFlags, bool AllowMissing) {
 	if (!f)
 		return -1;
-	bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
 	if (HasFD(f)  and  (OpenFlags & O_RDWR)  and  !(f->OpenMode & O_RDWR)) {
 		JB_File_Close(f); // sigh
 	}
@@ -404,7 +403,7 @@ int JB_File_Open( JB_File* f, int OpenFlags, bool AllowMissing ) {
 
 // does what write() should do.
 // well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
-int JB_Write_(int fd, uint8* buffer, int N) {
+int JB_Write_ (int fd, uint8* buffer, int N) {
     int TotalCount = 0;
 
     while (N > TotalCount) {
@@ -452,7 +451,7 @@ int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Tot
 // perhaps into a FastString? THEN we should... split it into glyphs.
 // on the other side... that is. not within here. Could just use u8Count_
 // to find a codepoint... maybe just ungetc. Do it later.
-int JB_App__GetChar() {
+int JB_App__GetChar () {
 	struct termios tio;
 
 	tcgetattr(STDIN_FILENO, &tio);	/* get the terminal settings for stdin */
@@ -474,7 +473,7 @@ int JB_App__GetChar() {
 }
 
 
-static bool CrashLogSub(const char* c) {
+static bool CrashLogSub (const char* c) {
 	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
@@ -492,7 +491,7 @@ static bool CrashLogSub(const char* c) {
 }
 
 
-void JB_Rec__CrashLog(const char* c) {
+void JB_Rec__CrashLog (const char* c) {
 	if (c and CrashLogSub(c))
 		JB_Write_( CrashLogFile, (u8*)"\n", 1 );
 	fputc('\n', stderr);
@@ -500,7 +499,7 @@ void JB_Rec__CrashLog(const char* c) {
 
 
 
-int JB_FS_AppendFile(FastString* self, JB_File* F, uint64 L, bool LeaveOpen) {
+int JB_FS_AppendFile (FastString* self, JB_File* F, uint64 L, bool LeaveOpen) {
 	// Pass the exact amount to append, or -1 to append all.
 	debugger;
 	if (!self or !L or !F)
@@ -553,11 +552,11 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 
 
 static int CaseComparisonsAllowed = 1024*2;
-int* JB_File__Compar() {
+int* JB_File__Compar () {
 	return &CaseComparisonsAllowed;
 }
 
-inline bool WorthTestingCase() {
+inline bool WorthTestingCase () {
 #if __PLATFORM_CURR__ == __PLATFORM_LINUX__
 	return false;
 #else
@@ -569,7 +568,7 @@ inline bool WorthTestingCase() {
 #endif
 }
 
-static void CaseFail_(JB_String* Orig, const char* Actual, bool Owned) {
+static void CaseFail_ (JB_String* Orig, const char* Actual, bool Owned) {
 	CaseComparisonsAllowed -= 64;
 	JB_String* Ugh = Owned ? JB_Str__Freeable0(Actual) : JB_Str_CopyFromCString(Actual);
 	JB_ErrorHandleFile(Orig, Ugh, -1, "case-differs", "finding path", 3, "found");
@@ -581,7 +580,7 @@ static void TrimSlash (MiniStr& A) {
 	}
 }
 
-static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
+static int CaseCompare_ (JB_String* self, const char* Resolved, bool Owned) {
 	auto A = Mini(self);
 	auto B = Mini2(Resolved);
 	TrimSlash(A);
@@ -601,8 +600,7 @@ static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 }
 
 
-
-static void CaseTest_(JB_String* self) {
+static void CaseTest_ (JB_String* self) {
 	require0 (JB_Str_Length(self));
 	char Resolved[PATH_MAX];
 	const char* s = (const char*)(self->Addr);
@@ -612,7 +610,7 @@ static void CaseTest_(JB_String* self) {
 }
 
 
-JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
+JB_String* JB_Str_ResolvePath ( JB_String* self, bool AllowMissing ) {
 	// realpath seems to add "/" to paths?
 	// should we add them too? can we compare ignoring final "/"?
 	JB_String* UserPath = JB_File_PathFix(self);
@@ -641,7 +639,7 @@ JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing ) {
 
 
 #if __linux__
-	JB_String* JB_App__Path() {
+	JB_String* JB_App__Path () {
 		static JB_String* Result;
 		if (!Result) {
 			char Path[ PATH_MAX ];
@@ -721,7 +719,7 @@ int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
 }
 
 
-int JB_File_Write( JB_File* self, JB_String* Data ) {
+int JB_File_Write ( JB_File* self, JB_String* Data ) {
     if (!JB_Str_Length(Data))
 		return 0;
 	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 ) {
@@ -731,7 +729,16 @@ int JB_File_Write( JB_File* self, JB_String* Data ) {
 }
 
 
-void JB_File_Flush(JB_File* self) {
+FastString* JB_FS__FileAppend (JB_File* f) {
+	if (JB_File_Open( f, O_RDWR | O_CREAT, true ) < 0)
+		return 0;
+	FastString* fs = JB_FS_Constructor(0);
+	fs->File = JB_Incr(f);
+	return fs;
+}
+
+
+void JB_File_Flush (JB_File* self) {
     if ( HasFD(self) ) {
 		int err = 0;
 //		err = fflush(self->Descriptor);
@@ -742,11 +749,11 @@ void JB_File_Flush(JB_File* self) {
 }
 
 
-bool JB_File_OpenBlank( JB_File* self ) {
+bool JB_File_OpenBlank ( JB_File* self ) {
 	return JB_File_Open( self, O_RDWR | O_CREAT | O_TRUNC, false ) >= 0;
 }
 
-int JB_Str_MakeDir(JB_String* self) {
+int JB_Str_MakeDir (JB_String* self) {
     uint8 Buffer[PATH_MAX];
     NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( self, Buffer );
 	struct _stat st;
@@ -775,22 +782,22 @@ int JB_File_Delete (JB_String* self) {
 }
 
 
-JB_String* JB_File_Path(JB_File* P) {
+JB_String* JB_File_Path (JB_File* P) {
 	if (P) 
 		return (JB_String*)(P->Parent); // hmmmm
 	return JB_Str__Empty();
 }
 
-JB_String* Home;
 
-JB_String* JB_File__Home() {
+JB_String* Home;
+JB_String* JB_File__Home () {
 	if (Home)
 		return Home;
 	Home = JB_Incr(JB_StrC(getenv("HOME")));
 	return Home;
 }
 
-JB_String* JB_Str_Preview(JB_String* P, int N);
+JB_String* JB_Str_Preview (JB_String* P, int N);
 
 	
 void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
@@ -838,7 +845,7 @@ JB_StringC* JB_File_PathFix (JB_String* P) {
 }
 
 
-JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
+JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 	JB_New2(JB_File);
 	if (!JB_Str_Length(Path)) {
 		auto Err = JB_Str__Error();
@@ -870,8 +877,7 @@ JB_File* JB_File_Constructor( JB_File* self, JB_String* Path ) {
 	return self;
 }
 
-
-JB_String* JB_File_Render(JB_File* self, FastString* fs_in) {
+JB_String* JB_File_Render (JB_File* self, FastString* fs_in) {
     if (fs_in) {
         JB_FS_AppendString(fs_in, self);
         return 0;
@@ -928,13 +934,13 @@ void JB_File_Close ( JB_File* self ) {
 	JB_File_CloseSub(self);
 }
 
-int JB_File_Mode( JB_File* self ) {
+int JB_File_Mode ( JB_File* self ) {
 	struct _stat st;
     require (Stat_(self, &st));
 	return st.st_mode&(7+(7<<3)+(7<<6));
 }
 
-int JB_File_ModeSet( JB_File* self, int Mode ) {
+int JB_File_ModeSet ( JB_File* self, int Mode ) {
     require (self);
 	auto C = (const char*)JB_FastFileThing(self);
 	int Err = chmod(C, Mode);
@@ -942,7 +948,7 @@ int JB_File_ModeSet( JB_File* self, int Mode ) {
 }
 
 
-int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
+int JB_Str_SymLink ( JB_StringC* Existing, JB_String* ToCreate ) {
 	int Err = 0;
 	struct _stat st;
 	if (Stat_(ToCreate, &st, false)) {
@@ -967,7 +973,7 @@ int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 }
 
 
-bool JB_File_HardLinkTo( JB_File* self, JB_StringC* Link ) {
+bool JB_File_HardLinkTo ( JB_File* self, JB_StringC* Link ) {
 	auto C	= ((const char*)JB_FastFileThing(self));
     int Err	= link(C, (const char*)(Link->Addr));
     if (Err and RetryMakePath(Link))
@@ -977,7 +983,7 @@ bool JB_File_HardLinkTo( JB_File* self, JB_StringC* Link ) {
 }
 
 
-JB_String* JB_File_LinkToGet( JB_File* self ) {
+JB_String* JB_File_LinkToGet ( JB_File* self ) {
 	// symlink
 	auto C = (const char*)JB_FastFileThing(self);
 	char Found[PATH_MAX];
@@ -986,7 +992,7 @@ JB_String* JB_File_LinkToGet( JB_File* self ) {
 }
 
 
-int JB_File_OffsetSet( JB_File* self, int64 NewValue ) {
+int JB_File_OffsetSet ( JB_File* self, int64 NewValue ) {
     // no need to check for -1 FileDes if lseek handles it?
 	int err = -1;
     if (HasFD(self)) {
@@ -1002,7 +1008,7 @@ int JB_File_OffsetSet( JB_File* self, int64 NewValue ) {
 }
 
 
-int64 JB_File_Offset( JB_File* self ) {
+int64 JB_File_Offset ( JB_File* self ) {
     // no need to check for -1 FileDes if lseek handles it?
     int64 N = lseek( self->Descriptor, 0, SEEK_CUR );
     ErrorHandle_(N, self, nil, "get offset of");
@@ -1010,7 +1016,7 @@ int64 JB_File_Offset( JB_File* self ) {
 }
 
 
-int JB_File_SizeSet( JB_File* self, IntPtr N ) {
+int JB_File_SizeSet ( JB_File* self, IntPtr N ) {
 	int fd = JB_File_Open( self, O_RDWR, false );
 	if (fd < 0)
 		return fd;
@@ -1019,13 +1025,13 @@ int JB_File_SizeSet( JB_File* self, IntPtr N ) {
 }
 
 
-s64 JB_File_Size( JB_File* self ) {
+s64 JB_File_Size ( JB_File* self ) {
 	struct _stat st;
 	return Stat_(self, &st) * (u64)st.st_size;
 }
 
 
-Date JB_File_Accessed( JB_File* self ) {
+Date JB_File_Accessed ( JB_File* self ) {
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
@@ -1036,7 +1042,7 @@ Date JB_File_Accessed( JB_File* self ) {
 }
 
 
-Date JB_File_Modified( JB_File* self ) {
+Date JB_File_Modified ( JB_File* self ) {
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
@@ -1047,7 +1053,7 @@ Date JB_File_Modified( JB_File* self ) {
 }
 
 
-void JB_File_ModifiedSet( JB_File* self, Date when ) {
+void JB_File_ModifiedSet ( JB_File* self, Date when ) {
 	auto path = (const char*)(self->Addr);
 	struct timeval times[2] = {};
 	times[0].tv_sec = when>>16;
@@ -1058,7 +1064,7 @@ void JB_File_ModifiedSet( JB_File* self, Date when ) {
 
 
 
-Date JB_File_Created( JB_File* self ) {
+Date JB_File_Created ( JB_File* self ) {
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
@@ -1114,7 +1120,7 @@ static uint8* MoveWithinSelf (JB_File* Self, JB_String* New, uint8* Buff) {
 }
 
 
-int JB_File_MoveTo(JB_File* Self, JB_String* New) {
+int JB_File_MoveTo (JB_File* Self, JB_String* New) {
     uint8 Buffer2[PATH_MAX];
     uint8* SelfPath = Self->Addr;
     uint8* NewPath  = JB_FastFileString(New,        Buffer2);
@@ -1134,7 +1140,7 @@ int JB_File_MoveTo(JB_File* Self, JB_String* New) {
 
 
 // copy file properly!! keeps attrs!! :)
-int CopyStats_(JB_File* self, JB_File* To) {
+int CopyStats_ (JB_File* self, JB_File* To) {
 	struct stat st;
 	if (Stat_(self, &st))
 		return JB_File_ModeSet(To, st.st_mode);
@@ -1142,7 +1148,7 @@ int CopyStats_(JB_File* self, JB_File* To) {
 }
 
 
-int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
+int JB_File_Copy (JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!self or !To)
 		return -1;
 	if (AttrOnly)
@@ -1177,7 +1183,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 
 
 #ifndef TARGET_WINDOWS
-	JB_String* JB_File__CWD( ) {
+	JB_String* JB_File__CWD ( ) {
 		char* path = getcwd( 0, 0 );
 		if (!path) {
 			JB_ErrorHandleFile(nil, nil, errno, strerror(errno),  "calling-getcwd");
@@ -1211,7 +1217,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 
 
 
-bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
+bool JB_File_DataSet ( JB_File* self, JB_String* Data ) {
 	bool WasOpen = self->Descriptor > STDPICO_FILENO;
 	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false) < 0)
 		return false;
@@ -1224,7 +1230,7 @@ bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 }
 
 
-JB_File* JB_File__NewPipe(int Pipe) {
+JB_File* JB_File__NewPipe (int Pipe) {
 	if (Pipe < 0)
 		return nil;
 	JB_File* F = JB_File_Constructor( 0, 0 );
@@ -1234,16 +1240,16 @@ JB_File* JB_File__NewPipe(int Pipe) {
 }
 
 
-bool JB_File_IsPipe(JB_File* f) {
+bool JB_File_IsPipe (JB_File* f) {
 	return f->MyFlags & 2;
 }
 
-JB_File* JB_Str_File( JB_String* Path ) {
+JB_File* JB_Str_File ( JB_String* Path ) {
 	return JB_File_Constructor( 0, Path );
 }
 
 
-int JB_File__chdir( JB_String* Path ) {
+int JB_File__chdir ( JB_String* Path ) {
     uint8 Buffer1[PATH_MAX];
 	int err = trchdir( (NativeFileChar2*)JB_FastFileString( Path, Buffer1 ) );
 	return (int)ErrorHandle_(err, Path, nil, "calling chdir"); 
@@ -1251,7 +1257,7 @@ int JB_File__chdir( JB_String* Path ) {
 
 
 
-bool JB_File_MoveNext(JB_DirReader* self) {
+bool JB_File_MoveNext (JB_DirReader* self) {
     DirReader* D = (DirReader*) (&self->Dir);
     self->Item = (int*)ReadDir_(D);
     return self->Item;

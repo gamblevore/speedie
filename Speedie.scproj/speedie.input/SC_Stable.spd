@@ -4,11 +4,18 @@ module Stability
 	
 	// todo: cpp_renderer needs to put dummy fields for empty spots
 
-	function StabliseFuncs (|file| funcs, |faststring|)
-		|| fs = (faststring(funcs),nil)(options.MakeInterpreter)
-		if !funcs.size
-			funcs <~ "// beta-file. Unstable."
-		.StabliseFuncsSub(fs, packmaker.PackGlobSize)
+	function Stabilise
+		|| funcs = Compiler.library["stable_id_bank.txt"]
+		|| Data = funcs.ReadAll.trim
+		stability.UseFuncBank(data)
+		|| g = packmaker.PackGlobSize
+		if !options.MakeInterpreter
+			.StabliseFuncsSub(nil, g)
+		  else
+			|| fs = faststring()
+			fs <~ data ?? "// beta-file. Unstable."
+			.StabliseFuncsSub(fs, g)
+			funcs.smartdata = fs|string|
 	
 	
 	function StabliseFuncsSub (|faststring| fs, |int| frogs)
@@ -78,14 +85,13 @@ module Stability
 				Table[id+31] = fn
 
 	
-	function UseFuncBank (|file| bank)
-		|| data = bank.ReadAll(1MB)
-			|| ID = LastID
-			for str.lines in data
-				id++
-				|| fn = Compiler.ExportNames[str]
-				if fn isa SCFunction
-					check (!fn.PackID) (str + " replicated ID.")
-					fn.PackID = id
-			LastID = ID	
-		
+	function UseFuncBank (|string| Data)
+		|| ID = LastID
+		for str.lines in data
+			id++
+			|scbetternode--| fn = Compiler.ExportNames[str]
+			if fn isa SCFunction
+				check (!fn.PackID) (str + " replicated ID.")
+				fn.PackID = id
+		LastID = ID	
+	

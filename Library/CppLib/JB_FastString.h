@@ -40,10 +40,9 @@ uint8* JB_FS_NeedSpare(FastString* fs, int Extra);
 void JB_FS_RemoveByte(FastString* self, byte B);
 
     
-FastString* JB_FS__InternalNew();
 FastString* JB_FS__FastNew(FastString* Old);
 JB_String* JB_FS_SmartResult(FastString* fs, JB_Object* Orig);
-FastString* JB_FS__FileFlush(JB_File* f);
+FastString* JB_FS__FileAppend(JB_File* f);
 JB_String* JB_FS_Return( JB_String* Data, FastString* Orig );
 uint8*  JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
 bool JB_FS_SizeIf_( FastString* fs, int InitLength);

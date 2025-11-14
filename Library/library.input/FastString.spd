@@ -145,12 +145,11 @@ class FastString {
 				return other.out
 			error (other, "FastString can't use this object.")
 		
-		
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 		
-		function New (|file| dest, |FastString|)
-			cpp_wrapper JB_FS__FileFlush
+//		function Append (|file| dest, |FastString|)
+//			cpp_wrapper JB_FS__FileAppend
 
 
 	syntax Access (|int| off, |Byte|)
