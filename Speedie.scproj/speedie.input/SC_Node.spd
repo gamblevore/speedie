@@ -162,41 +162,7 @@ syntax access (|string| s, |SCObject|)
 			if v.Name ~= s
 				return v
 			v = v.LocalVarList
-		
 	return .access.valuelower(s)
-
-
-function LookupSub (|string| s, |SCObject|)
-	opt norefcounts
-	if self is AllowLinkedLists
-		|| v = .LocalVarList
-		while v
-			if v.Name ~= s
-				return v
-			v = v.LocalVarList
-	
-	|| a = .Access
-		return a[s]
-//	if self is AllowLinkedLists
-//		|| v = .LocalVarList
-//		while v
-//			if v.Name ~= s
-//				return v // well now what? this won't compile.
-//			v = v.LocalVarList
-						// LookupSub is wanted to find dot and func-calls
-						// not to find local-vars. So... we'd need to call
-						// it differently too!
-	
-	// Would be nice to allow for function-cycling...
-	// basically replace the value here. So we could use .getplace
-	// and set the new value in later.
-	// but many functions use this...
-	// only LookupSub needs to get a &SCObject.
-	// I guess I'll fix that later.
-	
-//	|| a = .Access
-//		return a.GetPlace(s)
-
 
 
 function ActualAdd (|string| name, |scobject| IncObj)
@@ -642,8 +608,8 @@ function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
 	opt norefcounts
 	if name ~= "super"
 		name = "self"
-	
 	return .LookUpSub( name, exp, self, nil, side, kPurposeVar )
+
 
 function LookUpVarRootDecl (|String| name, |Message| exp, |SCObject|)
 // misdesigned... but so is initrootdecl :(
@@ -662,9 +628,10 @@ function ImportFile (|SCFile| file)
 	todo `visibility needs to make a bit more sense than this...
 	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
 	 within modules... it should only apply to global vars`
+	
 	file.Use
 	compiler.project = file.proj 
-	|| v = file.proj.isstdlib and Options.MakeInterpreter
+	|| v = file.proj.IsSTDLib and Options.MakeInterpreter
 	compiler.program.CollectFromNode( ast, v )
 	file.Stop()
 

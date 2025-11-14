@@ -35,7 +35,7 @@ module Options
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
-	||		UpdateStability			= false
+//	||		UpdateStability			= false
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
@@ -355,9 +355,9 @@ module Feedback
 			if value.optionbool
 				options.Mode = options.cpp
 				
-		+'update'
+//		+'update'
 			// options.Mode = options.Pack
-			options.UpdateStability = true
+//			options.UpdateStability = true
 
 		+'pack'
 			explain(purpose, "Compiles to zpd. Will not compile to cpp")$

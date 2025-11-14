@@ -181,10 +181,10 @@ function SCDecl.Reach
 
 function compiler.DeadStrip
 	opt norefcounts
-	compiler.MainFunc.ReachedDetect?
+	compiler.MainFunc.DetectIfReached?
 	
 	for f in .FuncList
-		f.ReachedDetect
+		f.DetectIfReached
 		
 	for f in packmaker.libglobs
 		f.reach

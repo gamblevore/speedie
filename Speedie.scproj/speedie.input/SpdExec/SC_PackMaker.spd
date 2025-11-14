@@ -45,12 +45,13 @@ module PackMaker
 	
 	function GlobalsSize (|[scdecl]| List, |int|)     // SortGlobals, GlobalsSort
 		opt norefcounts
-		|| Globals = 1				// rz = 1, so if .au.ExportPosition== 0 then something is wrong.
+		|| Globals = 1 // exportposition is always positive.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
-			if d.ExportPosition and d.ExportPosition!= globals // hmmmm
+			if d.ExportPosition and d.ExportPosition != globals // hmmmm
+				error (d.source, "ExportPosition doesn't match. Please revert the export table. To remove an item, replace it with a carray of bytes of same size.")
 			d.ExportPosition = globals
 			globals += s
 
@@ -140,7 +141,7 @@ module PackMaker
 	
 	
 	function WritePackToDisk
-		|| F = Compiler.ProductPath.SetExt("zpd").file // what about .app instead of .zpd?
+		|| F = Compiler.ProductPath.SetExt("cake").file // what about .app instead of .zpd?
 		require f.OpenEmpty
 		
 		|| j = jbin(@tmp, "zpd")
@@ -154,9 +155,6 @@ module PackMaker
 		.RenderASM(j, stack_trace)
 		.DumpStrings(j)
 		.PackClasses(j)
-		if options.UpdateStability // remove! just for size-testing
-			.FuncLink(j)
-			.GlobLink(j)
 		.AddDebugStuff(j, stack_trace)
 		j.ExitAll
 	
@@ -240,7 +238,7 @@ module PackMaker
 	function SCClass.PackClassChildren (|jbin!| j)
 		opt norefcounts
 		require .HasPackChildren
-		j.enter
+/		j.enter
 		for c in .children
 			if c.isrole
 				c.PackClassChildren(j)

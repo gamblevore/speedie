@@ -5,7 +5,7 @@ module Stability
 	// todo: cpp_renderer needs to put dummy fields for empty spots
 	function StabliseFuncs (|file| funcs)
 		|faststring| fs
-		if options.UpdateStability
+		if options.MakeInterpreter
 			fs = faststring()
 			if !funcs.Size
 				fs <~ "// This file is not stable till 'release'."
@@ -47,7 +47,7 @@ module Stability
 		|| str = globs.readall(64K)
 		.BuildLibGlobTable(str.parse)			// fill table with old values
 		packmaker.OrderLibGlobs
-		if options.updatestability
+		if options.MakeInterpreter
 			.DumpGlobs(globs)
 
 

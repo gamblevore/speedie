@@ -3,9 +3,9 @@
 function compiler.PrintCompileTime (|date| durr) 	
 	require StdErr.OK and !options.silent
 	|| fs = faststring()
-	fs.normal  "Stages",		fs <~ Compiler.CurrStage
-	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
-	fs.normal  "Funcs",			fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
+	fs.normal  "Stages",	fs <~ Compiler.CurrStage
+	fs.normal  "Classes",	fs <~ compiler.ReachedClassCount
+	fs.normal  "Funcs",		fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
 	fs.normal  "Strings"
 
 	|| N = StringCorrector.CppStrings.length
@@ -22,7 +22,6 @@ function compiler.PrintCompileTime (|date| durr)
 	if packmaker.PackGlobs
 		fs <~ ", app "
 		packmaker.PackGlobSize.StrSize(fs)
-
 	
 	|| vm_ops = VM_Builder.Total
 		fs.normal  "vm_ops",    fs <~ vm_ops
@@ -31,7 +30,7 @@ function compiler.PrintCompileTime (|date| durr)
 		fs.Normal  "ASM",    (ASM_Ops*4).strsize(fs)
 		fs.Normal  "Proj Saved", packmaker.PackSaved.Churn(fs)
 		fs.Normal  "Lib Saved",  packmaker.LibSaved.Churn(fs)
-		fs.normal  "DebugInfo", stdebuginfo.strsize(fs)
+		fs.normal  "DebugInfo",  stdebuginfo.strsize(fs)
 
 
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
@@ -94,13 +93,14 @@ function compiler.VariousSelfTests
 
 function compiler.TimeTest (|date| elapsed, |bool|)
 	flow off
-	//
+
 	|| CanInstall = true
 	FlowControl.DisabledIncr
 	if (Options.SelfReplacement) and (Options.Variant ~= "Test") and (platform.release)
 		|| ReliableTime = (64.0*1024.0*2.5)|int| // in case my date creation code has a bug... which did happen a few times
 		CanInstall = elapsed < ReliableTime
 		check (CanInstall) ("Not installing as compile duration was over 2.5s. Perhaps this speedie has a bug leading to excessively slow compiles?")
+	
 	FlowControl.DisabledIncr(-1)
 	return CanInstall
 
@@ -110,9 +110,9 @@ function compiler.CompileTime
 		.ScriptLoc(compiler.originalinputpath)		
 	
 	if !options.scripting
-		if options.SelfReplacement // avoid failing needlessly
-			.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
-							 // xcode gives lower perms to it's builder scripts, strangely.
+		if options.SelfReplacement	// avoid failing needlessly
+			.FileSanityTests		// sometimes this fails due to lack of permissions in xcode...
+									// xcode gives lower perms to it's builder scripts, strangely.
 		.VariousSelfTests
 		SC_Saver.TestSaver~quietly
 
@@ -121,7 +121,7 @@ function compiler.CompileTime
 
 	if stderr.ok
 		TransCompiler.ExportAndInstall(elapsed)
-		if !options.scripting and stderr.ok
+		if !options.Scripting and stderr.ok
 			stringcorrector.CorrectStrings
 
 

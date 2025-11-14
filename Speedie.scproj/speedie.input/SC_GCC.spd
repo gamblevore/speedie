@@ -47,8 +47,8 @@ function ProductNameFull (|string|)
 function ProductSuffix (|String|)
 	if options.modepack
 		if options.targetdebug
-			return ".dbg.zpd"
-		return ".zpd"
+			return ".dbg.cake"
+		return ".cake"
 	require Options.ProjectIsLibrary
 	if platform.osx
 		return ".dylib"
@@ -343,7 +343,7 @@ function ExportAndInstall (|date| Elapsed)
 			compiler.Bundle
 	
 	if stderr.ok and !options.scripting
-		.PrintProduct("Product", ActualCompile or Options.Compile, true)
+		.PrintProduct("Product", ActualCompile or Options.Compile)
 		compiler.Successfulness |= 4
 
 
@@ -358,7 +358,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		.PrintProduct("\nCompiling c++ to", true, false)
+		.PrintProduct("\nCompiling c++ to", true)
 	
 	|| CppLib = compiler.SpeedieDir("Library/CppLib/")
 	.TestNewestLib(cpplib)

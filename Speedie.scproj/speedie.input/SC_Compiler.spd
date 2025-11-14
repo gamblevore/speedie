@@ -808,7 +808,7 @@ function @scmodule.Sorter (SorterComparer of scmodule)
 	return .name < b.name
 
 
-function SCFunction.ReachedDetect 
+function SCFunction.DetectIfReached 
 	opt norefcounts
 	|| Base = Compiler.VisibleFuncs!
 	
@@ -941,7 +941,7 @@ function Stage (|string| name, |bool|)
 	return true
 
 
-function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |bool| PrintSize, |string|)
+function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|)
 	print s
 	print " `"
 	if ActualCompile
@@ -950,6 +950,7 @@ function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |bool| P
 		rz = cpp_export.CppProduct
 	print rz
 	print "`"
+	
 	|| sz = rz.filesize
 		print " // "
 		print sz.strsize
