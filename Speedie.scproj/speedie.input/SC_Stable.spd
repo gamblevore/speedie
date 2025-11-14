@@ -3,18 +3,25 @@ module Stability
 	|| LastID = 1
 	
 	// todo: cpp_renderer needs to put dummy fields for empty spots
-	function StabliseFuncs (|file| funcs)
-		|faststring| fs
-		if options.MakeInterpreter
-			fs = faststring()
-			if !funcs.Size
-				fs <~ "// This file is not stable till 'release'."
-			fs <~ "\n"
-			fs.file = funcs
-		.FillMissingLibFuncs(fs, packmaker.PackGlobSize)
-		if fs and fs.Length > 1
-			fs <~ "\n"
-			fs.flush
+
+	function StabliseFuncs (|file| funcs, |faststring|)
+		|| fs = (faststring(funcs),nil)(options.MakeInterpreter)
+		if !funcs.size
+			funcs <~ "// beta-file. Unstable."
+		.StabliseFuncsSub(fs, packmaker.PackGlobSize)
+	
+	
+	function StabliseFuncsSub (|faststring| fs, |int| frogs)
+		opt norefcounts
+		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
+		if platform.isdebug
+			Table = jb_vm.vm.InitTable(4096, frogs)
+
+		|| lst = Compiler.FuncList.CopySort(&CodeSorter.exportnames)
+
+		for fn in lst
+			if fn.NeedsID
+				fn.MakeID(fs, table)
 	
 	
 	function BuildLibGlobTable (|message| T, |dictionary of scdecl| table = dictionary())
@@ -49,18 +56,6 @@ module Stability
 		packmaker.OrderLibGlobs
 		if options.MakeInterpreter
 			.DumpGlobs(globs)
-
-
-	function FillMissingLibFuncs (|faststring?| fs, |int| frogs)
-		opt norefcounts		
-		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
-		if platform.isdebug
-			Table = jb_vm.vm.InitTable(4096, frogs)
-
-		|| lst = Compiler.FuncList.CopySort(&CodeSorter.exportnames)
-		for fn in lst
-			if fn.NeedsID
-				fn.MakeID(fs, table)
 		
 	
 	function scfunction.NeedsID (|bool|)
@@ -74,9 +69,7 @@ module Stability
 		|| id = .PackID
 		if !id
 			if fs
-				if fs.Length
-					fs <~ "\n"
-				fs <~ .ExportName
+				fs <~ "\n$.ExportName"
 			id = Stability.LastID++
 			.PackID = id
 		
