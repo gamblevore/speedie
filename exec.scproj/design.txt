@@ -1,8 +1,0 @@
-
-* try design it for multiple uses?
-	* loadable libs
-	* loadable apps?
-	* calling apps like .execute()
-	* multiple processes, message-passing, async, shared nothing
-	* ability to just run a func as a new process? Assuming it uses a prototype
-
