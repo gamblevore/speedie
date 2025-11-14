@@ -23,7 +23,7 @@
     * Expressive: When making tools with few lines of code
     * Cross Platform: Deploy GUI or shell apps on major platforms
 * Works natively with Jeebox... Learn how to use Jeebox!
-* Compiles via C++ for full-speed, or VM byte-code for portability. _(The VM is unfinished but is the main current focus of work.)_
+* Compiles via C++ for full-speed, or to it's VM 🍰 "`Cake`" 🍰. _(`Cake` is unfinished but is the main current focus of work.)_
 * Not controlled by big-tech.
 
 Speedie has been written as a passion project with a large amount of hacker mentality. And we are proud of this. Just love it or leave it.
@@ -43,7 +43,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * [Perry](Documentation/Perry.md) (_An IDE made specially for Speedie)_
 * [Safety in Speedie](Documentation/Safety.md) _(What Speedie does for you)_
 * [Speedie Is Fast](Documentation/Speed.md) _(Why use a lang if its not fast?)_
-* [The VM](Documentation/VM.md) _(Not finished but will be amazing!)_
+* [Cake VM 🍰](Documentation/VM.md) _(Not finished but will be tasty!)_
 
 
 # Power Features #
@@ -58,7 +58,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 
 That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
 
-* Adding a good debugger, VM and executable-format!
+* Finishing [`Cake`](Documentation/cake.md)
 * GPU acceleration. (OpenCL perhaps?)
 
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
