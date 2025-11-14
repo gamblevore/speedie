@@ -56,7 +56,7 @@ struct Pico
 		nil self
 		cpp_wrapper PicoCanGet
 		
-	helper SpawnFork (|bool| Exec=false, |PID_Int|)
+	helper SpawnFork (|cstring| Name=nil, |PID_Int|)
 		nil self
 		cpp_wrapper PicoStartFork
 
