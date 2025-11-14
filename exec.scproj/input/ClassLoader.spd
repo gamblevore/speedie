@@ -1,17 +1,17 @@
 
 
 
-class Type (Class)  
+class XType (XClass)  
 	|datatypecode|			DataType
 	|BaseType|				BaseType
 
 
-class Class 
+class XClass 
 	linkage
 		cpp_class ClsInfo
 	|stringzeroterminated|				Name
 	|?Message|							Src
-	|?class|							Super
+	|?xclass|							Super
 	|&classdata|						RealClass
 	
 	
@@ -22,7 +22,7 @@ class Class
 		addclass(self)
 	
 
-	constructor (|message!| Ch, |class| parent)
+	constructor (|message!| Ch, |xclass| parent)
 		opt norefcounts
 		|| sz = ch[@num]
 		|| beh = sz.next(@list)
@@ -72,7 +72,7 @@ class Class
 		.realclass.AllocateBehaviour(bc, cpp, spd)
 		
 		for ch in list
-			|| fn = function[ch]
+			|| fn = xfunction[ch]
 				cpp![i] = fn.CFunc
 				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
 				// the spd version should call the c++ version...
@@ -80,28 +80,28 @@ class Class
 		
 				
 	module
-		function AddClass (|class| c)
+		function AddClass (|xclass| c)
 			.list <~ c
 			.table.ValueLower(c.name) = c
 		
 
 		function LoadPackClasses (|bool|)
 			opt norefcounts
-			return .LoadAppClassSub(package.ProjClasses, class.obj!)
+			return .LoadAppClassSub(package.ProjClasses, xclass.obj!)
 		
 		
-		helper Give (|message| ch, |class!| parent, |class|)
+		helper Give (|message| ch, |xclass!| parent, |xclass|)
 			opt norefcounts
 			|| f = ch.first
 			if f == @arg
-				return class[ch]
-			return class.new(ch, parent)
+				return xclass[ch]
+			return xclass.new(ch, parent)
 		
 		
-		helper LoadAppClassSub (|message| arg, |class| parent, |bool|)
+		helper LoadAppClassSub (|message| arg, |xclass| parent, |bool|)
 			opt norefcounts
 			for ch in arg
-				|| c = Class.give(ch, parent)	#require
+				|| c = xClass.give(ch, parent)	#require
 				|| arg2 = ch.last
 				if arg2 == @arg
 					.LoadAppClassSub(arg2, c)
@@ -111,7 +111,7 @@ class Class
 		function LoadInbuiltClasses (|bool|)
 			opt norefcounts
 			for cd in ClassData.First_
-				|| c = class.new(cd)
+				|| c = xclass.new(cd)
 				if c.name ~= "object"
 					.obj = c
 			for c in .list
@@ -125,14 +125,14 @@ class Class
 				|| s = n.Wrap
 				rz = self.valuelower(s)
 			
-		syntax access (|message| ch, |class|)
+		syntax access (|message| ch, |xclass|)
 			opt norefcounts
 			return .Table.valuelower(ch.name) #expect (ch, "Linked to missing class")		
 		
 	
-		|class|					Obj
-		|[class]|				List
-		|dictionary of class|	Table = dictionary.new
+		|xclass|				Obj
+		|[xclass]|				List
+		|dictionary of xclass|	Table = dictionary.new
 
 
 

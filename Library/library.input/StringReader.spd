@@ -10,7 +10,8 @@ class InputStream
 	|int| 						StartFrom
 	|bool| 						_NoMoreChunks
 
-	linkage:cpp_Part SS
+	linkage
+		cpp_part SS
 	
 	constructor (|string| Data)
 		.reset(Data)
@@ -68,27 +69,29 @@ class InputStream
 			if .ReadChunk(f)
 				return true
 			.file = nil // why not
-		
-		
+	
+	
 	function NonZeroByte (|int|)
 		while 
 			|| b = .byte
 				return b
+
 	
 	function Byte (|int|)
-		if .data.HasAny()
-			return .data.byte
-		if .NextChunk
+		if .data.HasAny or .NextChunk
 			return .data.byte
 		return -1
-		
+	
+	
 	syntax Compare (|int| n, |int|)
 		return .length - n
+	
 	
 	function Position (|int|)				// can't make this int64 without making remaining/length/startfrom also.
 		return .data.position + .StartFrom	// and data.position
 	setter Position (|int|)
 		.data.position = value - .StartFrom
+
 
 	function StrLength (|int|)
 		|uint| v = .byte
@@ -207,13 +210,14 @@ class InputStream
 
 
 	
-function string.Stream (|string| Header, |InputStream|)
+function string.Stream (|string| Header, |InputStream?|)
 	cpp_part StreamWithHeader
 	rz = InputStream(self)
-	if !rz.HasHeader(Header)
+	if header and !rz.HasHeader(Header)
 		rz = nil
 
-	
-function string.Stream (|InputStream|)
+// can't be unified with above.	The above returns optional.
+function string.Stream (|InputStream!|)
 	return InputStream(self)
+
 

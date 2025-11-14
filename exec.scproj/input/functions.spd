@@ -1,6 +1,6 @@
 
 
-class function
+class XFunction
 	|int|				Index
 	|int|				Length
 	|string|			Name
@@ -62,12 +62,12 @@ class function
 		bear = 0xB0B0BA14
 
 	module
-		syntax access (|message| s, |function|)
+		syntax access (|message| s, |xfunction|)
 			if s == @num
 				return .int(s)
 			return Linker[s]
 		
-		function int (|message| s, |function|)
+		function int (|message| s, |xfunction|)
 			opt norefcounts
 			|| i = s.int
 			|| i2 = i >> 1
@@ -83,12 +83,12 @@ class function
 	
 	
 module Linker
-	|dictionary of function|	AllFuncs = dictionary()		// this is for the entire app...  inbuilt,  and pack combined
+	|dictionary of xfunction|	AllFuncs = dictionary()		// this is for the entire app...  inbuilt,  and pack combined
 
-	syntax append (|function| fn)
+	syntax append (|xfunction| fn)
 		AllFuncs.ValueLower(fn.name) = fn
 		
-	syntax access (|message| s, |function|)
+	syntax access (|message| s, |xfunction|)
 		opt norefcounts
 		|| fn = .AllFuncs.ValueLower(s.name)
 			return fn
@@ -98,11 +98,11 @@ module Linker
 
 
 module Lib	
-	|[function]|				Funcs
+	|[xfunction]|				Funcs
 	|dictionary of &nil|		Globals = dictionary()
 	|int|						GlobalCount
 
-	function AddLibFunc (|function| fn, |bool|)
+	function AddLibFunc (|xfunction| fn, |bool|)
 		expect (.Funcs < 16K) ("Too many functions")			// for detecting corrupt lib
 		fn.index = .Funcs.length
 		.Funcs <~ fn
@@ -117,7 +117,7 @@ module Lib
 		return true
 	
 	
-	syntax access (|int| i, |function|)
+	syntax access (|int| i, |xfunction|)
 		return .Funcs[i]
 
 
@@ -127,7 +127,7 @@ module Lib
 		|| globs = .LoadLibFuncs(spd, funcs!)
 			.LoadLibGlobs(spd, globs)
 		if stderr.ok
-			return class.LoadInbuiltClasses
+			return xclass.LoadInbuiltClasses
 
 	
 	function LoadLibFuncs (|message| spd, |&&nil| Internals, |&&nil|)
@@ -135,7 +135,7 @@ module Lib
 		for ch in spd[@prm]
 			|| fn = Internals++[]  #expect  (ch, "Missing lib function")
 				
-			require .AddLibFunc( function(fn, ch.name) )
+			require .AddLibFunc( xfunction(fn, ch.name) )
 					
 		check (!Internals[]) ("Extra InternalFunction")
 		return internals+1
@@ -155,10 +155,10 @@ module Lib
 module AppTable 
 	|int|			FnLim = 64K // allow configure? its more about corrupted files,
 								// Not "we can't handle more"!
-	|[function]|	Funcs
-	|[function]|	LinkOrder 
+	|[xfunction]|	Funcs
+	|[xfunction]|	LinkOrder 
 
-	syntax append (|function| fn, |bool|)
+	syntax append (|xfunction| fn, |bool|)
 		if (.Funcs < FnLim)
 			fn.index = .Funcs.length
 			.Funcs <~ fn
@@ -166,7 +166,7 @@ module AppTable
 		error (package.funcs, "Too many functions")
 	
 	
-	syntax access (|int| i, |function|)
+	syntax access (|int| i, |xfunction|)
 		return .Funcs[i]
 	
 

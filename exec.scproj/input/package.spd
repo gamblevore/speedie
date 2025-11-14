@@ -28,7 +28,7 @@ module package
 	
 	function LoadPack (|bool|)
 		if .getstructure and .Loadfuncs
-			if class.LoadPackClasses
+			if xclass.LoadPackClasses
 				return apptable.LinkEmUp‼
 	
 	function GetStructure (|bool|)
@@ -64,7 +64,7 @@ module package
 		expect (package.funcs.hasany)      ("No functions found!")
 
 		for spd in package.funcs
-			|| fn = function(spd)
+			|| fn = xfunction(spd)
 			linker <~ fn
 			if apptable <~ fn
 				fn.LinkCpp
