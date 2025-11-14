@@ -262,7 +262,6 @@ datatype ASMReg (uint64)
 			value.ConstCheck
 			if self isnt Altered
 				is const
-//				.ExportPosition = value.Const
 		value.µType = .mu.DataType
 		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck

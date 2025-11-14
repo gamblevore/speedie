@@ -43,16 +43,24 @@ module PackMaker
 				.addfunc(f)
 	
 	
-	function GlobalsSize (|[scdecl]| List, |int|)     // SortGlobals, GlobalsSort
+	function GlobalsSize (|[scdecl]| List, |int|)	// SortGlobals, GlobalsSort
 		opt norefcounts
-		|| Globals = 1 // exportposition is always positive.
+		|| Globals = 1								// always positive.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
-			if d.ExportPosition and d.ExportPosition != globals // hmmmm
-				error (d.source, "ExportPosition doesn't match. Please revert the export table. To remove an item, replace it with a carray of bytes of same size.")
-			d.ExportPosition = globals
+			|| X = d.ExportPosition
+			if !X or X == globals
+				d.ExportPosition = globals			// its ok
+			  elseif (options.makeinterpreter)
+				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes of same size.")
+			  else
+				|| Backwards = x - globals
+				if backwards > 0					
+					0 // keep old value				// Something missing. EG: Compiling non-gui app.
+				  else
+					error (d.source, d.name + " exportposition seems inserted? Regen export-table?")
 			globals += s
 
 		return Globals.AlignUp(8) // for strings, which come directly after
