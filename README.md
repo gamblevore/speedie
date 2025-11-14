@@ -43,7 +43,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * [Perry](Documentation/Perry.md) (_An IDE made specially for Speedie)_
 * [Safety in Speedie](Documentation/Safety.md) _(What Speedie does for you)_
 * [Speedie Is Fast](Documentation/Speed.md) _(Why use a lang if its not fast?)_
-* [Cake VM 🍰](Documentation/VM.md) _(Not finished but will be tasty!)_
+* [Cake VM 🍰](Documentation/Cake.md) _(Not finished but will be tasty!)_
 
 
 # Power Features #
@@ -58,7 +58,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 
 That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
 
-* Finishing [`Cake`](Documentation/cake.md)
+* Finishing [`Cake`](Documentation/Cake.md)
 * GPU acceleration. (OpenCL perhaps?)
 
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
