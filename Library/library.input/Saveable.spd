@@ -1,7 +1,8 @@
 
 
-// all objects should be saveable unless the class sas its not.
+// all objects should be saveable unless the class says its not.
 // makes more sense. we messed up the language otherwise!
+// also... we should use jbin
 
 struct ObjectSaver
 	linkage
@@ -43,7 +44,6 @@ class Saveable
 		wrapper
 		cpp_part Sav
 
-	
 	constructor
 		cpp_wrapper
 
@@ -138,7 +138,7 @@ extend ObjectSaver
 	function AppendInt (|int64| i)
 		.dest! <~ i
 		.dest! <~ ','
-	function AppendRaw (|&byte| f, |int| n)
+	function AppendRaw (|&byte| f, |int| n) // no need... we can just use jbin.
 		.dest!.AppendHexData(f, n)
 		.dest! <~ ','
 	function AppendObject (|object| o)
@@ -305,7 +305,7 @@ class SaverClassInfo (array)
 
 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 /////	 
 
-target  debug {
+target  StructDebug {
 struct StructSaveTest
 	saveas struct
 	|saveable?|	Sav
@@ -321,3 +321,4 @@ struct StructSaveTest
 	helper Test (|object| s)
 		cpp_part TestObj
 }
+
