@@ -1,5 +1,4 @@
 // This file is not stable till 'release'.
-
 GUI_AM_Constructor
 GUI_AM_Destructor
 GUI_AM_Init
