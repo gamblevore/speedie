@@ -25,7 +25,7 @@ struct Assembler
 	target debug
 		|byte|					StackSize
 	|uint|						VDecls_
-	|uint|						VTemps
+	|uint|						VTemps_
 	|int|						CurrFuncGrab
     |uint16|                    BranchID
     |uint16|                    NextBranchID
@@ -194,10 +194,19 @@ struct Assembler
 	function vdecls (|uint|)
 		return .vdecls_
 
+	function vtemps (|uint|)
+		return .vtemps_
+
 
 	setter vdecls (|uint|)
-//		if "whatever".trap	
+//		if "whatever".trap
+		if value & .vtemps_ // huh?
 		.vdecls_ = value
+
+
+	setter vtemps (|uint|)
+		if value & .vdecls_ // huh?
+		.vtemps_ = value
 
 	
 	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
@@ -290,11 +299,12 @@ struct Assembler
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+		if "GUI_Sch_BGSet".trap
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...
 //		if fat is temp
-//			.CloseOneEarly(.info)
+//			.CloseOneEarly(.info) // why did I comment this out? // testin speedie first?
 
 		depth++
 		if depth > 7

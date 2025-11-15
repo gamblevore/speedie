@@ -68,7 +68,7 @@ module PackMaker
 
 	function BuildGlobs (|bool|)
 		opt norefcounts
-/		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
+		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
 		require fninit and fnmain
 		

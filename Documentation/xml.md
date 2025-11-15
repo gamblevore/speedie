@@ -81,8 +81,10 @@ Jeebox is really a very pure and true format that has almost no downsides... apa
 
 Lets go through all the problems with XML or JSON.
 
+
 #### Verbosity
 Jeebox is compact! Probably the most compact language out there.
+
 
 ### Easy to scan for humans
 I mean it looks good. No close-tags, and using white-space for indentation makes the language lighter, and removes all the `"":[],{},` things that JSON clutters the space with.
@@ -93,7 +95,7 @@ Jeebox doesn't have name-spaces, doctypes, dtds or processing-instructions, or f
 
 Jeebox doesn't have and doesn't need something like a DTD. Code is code. The best way to validate a document is with the app that created it. Jeebox works with the philosophy, that what people really want, is code, good simple code. Because all systems seem to emmigrate in that direction anyhow.
 
-Computer-games end up adding scripts, databases end up adding "triggers", websites added javascript, spreadsheets added code, and XML schema is near a programming-language (with elseif/loops/dictionaries).
+Computer-games end up adding scripts, databases end up adding "triggers", websites added javascript, spreadsheets added code, and [XML](https://www.researchgate.net/publication/221568016_XSLT_Version_20_Is_Turing-Complete_A_Purely_Transformation_Based_Proof) [schema](https://www.academia.edu/48721461/XSLT_Version_2_0_Is_Turing_Complete_A_Purely_Transformation_Based_Proof) is turing complete!
 
 If we really needed a validation for a Jeebox-based format, it would have to be a program, written in Speedie. A small Speedie script, say 4KB big could easily function as a Jeebox DTD.
 

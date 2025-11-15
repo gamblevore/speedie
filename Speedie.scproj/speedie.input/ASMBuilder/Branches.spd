@@ -549,12 +549,43 @@ function @assembler.PrintProgress
 	cpp_name adb 
 	visible
 	opt norefcounts
-	require !compiler.inperry
-	"---"
-	|| fn = scfunction.currfunc!
-	printline fn
-	|| Base = assembler.sh.Start + fn.µStart
-	|| amount = fn.µLength ?? (Assembler.sh.curr - base)
-	for n in amount
-		base[n].debugprint
+	target debug
+		require !compiler.inperry
+		"---"
+		|| fn = scfunction.currfunc!
+		printline fn
+		|| Base = assembler.sh.Start + fn.µStart
+		|| amount = fn.µLength ?? (Assembler.sh.curr - base)
+		for n in amount
+			base[n].debugprint
+		
+		.PrintRegs
+
+function @assembler.PrintRegs
+	target debug
+		|| i = 0
+		|| D = sh.vdecls_
+		|| T = sh.vtemps
+		|| X = D|||T
+		|| Prev = false
+		while ++i <= 31
+			|| test = 1<<i
+			if X&Test
+				if Prev
+					print ", "
+				  else
+					Prev = true
+				
+				print i 
+				ifn D&Test
+					print ": T"
+				  elseif T&Test
+					print ": X"
+				  else
+					print ": D"
+		printline
+				
+			
+			  
+			
 
