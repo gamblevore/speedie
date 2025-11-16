@@ -242,7 +242,7 @@ module PackMaker
 	function SCClass.PackClassChildren (|jbin!| j)
 		opt norefcounts
 		require .HasPackChildren
-/		j.enter
+		j.enter
 		for c in .children
 			if c.isrole
 				c.PackClassChildren(j)

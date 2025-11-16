@@ -3,7 +3,7 @@
 
 function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
 	opt	NoRefCounts
-	if "TestProperty".trap
+	
 	if fn == compiler.RefClear
 		|| offset = 0
 		|| A = .µ(prms.first!, ASMReg.AddrRequest)

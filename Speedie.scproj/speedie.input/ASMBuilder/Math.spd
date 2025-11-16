@@ -455,18 +455,20 @@ extend Assembler
 		return exp.FADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
 
 
-	function Plus (fn_opasm) // add (
-		rz = .Plussub(exp, dest, l, r) // into won't be passed in anymore. So just remove the clear?
+	function Plus (fn_opasm)
+		rz = .Plussub(exp, dest, l, r)
 		rz = rz asnt asmreg.subtract
 
 
-	function PlusSub (fn_opasm) // add (
-		if r.iszero					// allow a = a ± 0
-			return l.µtype(dest)
+	function PlusSub (fn_opasm)
+		if r.iszero								// allow a = a ± 0
+			dest.reg = l
+			return dest
 		
-		if l isnt Subtract			// 0 + a
+		if l isnt Subtract						// 0 + a
 			if l.iszero
-				return r.µtype(Dest)
+				dest.reg = r
+				return dest
 		  else
 			if (r iz l)
 				return .zeros(exp, dest)

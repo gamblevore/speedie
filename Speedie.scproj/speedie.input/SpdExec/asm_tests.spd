@@ -1,19 +1,22 @@
 
 
 
-
-
 struct StructWithObj
 	|object| A
+	|object| B
 
+
+function StructWithObj.TestProperty
+	visible
+	.a = ""
+	.b = ""
+
+	
 module ASMExamples {
 target cake { 
 |int| Glob
 |int| Bolg
 
-function StructWithObj.TestProperty
-	.a = ""
-	
 function Intrinsics (|vec4| x, |vec4| y, |float| a, |float| b)
 	visible
 	|| z = x • y
@@ -948,7 +951,6 @@ helper asm_test_func (|int| a, |int| b, |int|)
 	cpp_name asm_test
 	visible
 	return asm_test_add(b*b, a*a)
-
 
 
 helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)

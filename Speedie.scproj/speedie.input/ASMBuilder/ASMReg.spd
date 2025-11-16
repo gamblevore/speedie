@@ -248,6 +248,7 @@ datatype ASMReg (uint64)
 	function Reg (assigns:|asmreg|, |asmreg|)
 		.reg = value.reg
 		(self is temp) = (value is temp)
+		(self is OKAsTemp) = (value is OKAsTemp)
 		.fatindex = value.fatindex
 		return self
 
