@@ -216,7 +216,6 @@ function scdecl.AddToGlobs (|bool|)
 //	if ('_' == n[]) ||| ('_' == n.Last)
 //		is hidden
 // maybe just do visibility textually?
-	if .name ~= "Render"
 	if self is Library
 		PackMaker.LibGlobs <~ self
 	  else

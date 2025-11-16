@@ -608,7 +608,7 @@ Message is also:
 		.FSListSep(fs, " ")
 
 	
-	syx url (URL)
+	syx URL (URL)
 		opt norefcounts
 		fs <~ .Name
 		fs <~ "://"

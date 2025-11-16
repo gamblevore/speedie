@@ -723,7 +723,12 @@ function DeclsPrototypeClass (|Message!| ch0)
 			fptype = task_proto
 	
 	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
-	.DeclsProtoTypeAdd(fpType)
+	|| dcl = .DeclsProtoTypeAdd(fpType)
+	if (!.islibrary) or (self|scnode| isnt Private)
+		dcl.AddToGlobs
+	// behaviours should be in the funclist?
+	// I guess we'll need a separate instruction
+	// to get function addresses. Shouldn't be hard.
 
 
 function scnode.Route (|string| name, |message|)
@@ -793,15 +798,11 @@ function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
 		.DeclsProtoTypeAdd(fpType)
 
 
-function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
+function DeclsProtoTypeAdd (|SCClass| fpType,  |scdecl|)
 	|| Dcl = SCDecl(fpType)
 	dcl.source = .source
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
-	// dcl.AddToGlobs // behaviours should be in the funclist?
-					  // I guess we'll need a separate instruction
-					  // to get function addresses. Shouldn't be hard.
-
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
 	.HasProto = dcl
 	(Dcl is compilercreated)

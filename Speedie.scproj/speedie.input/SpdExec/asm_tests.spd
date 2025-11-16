@@ -7,7 +7,7 @@ struct StructWithObj
 	|object| A
 
 module ASMExamples {
-target pack { 
+target cake { 
 |int| Glob
 |int| Bolg
 

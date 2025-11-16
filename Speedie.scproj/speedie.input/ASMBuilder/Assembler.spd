@@ -199,7 +199,6 @@ struct Assembler
 
 
 	setter vdecls (|uint|)
-//		if "whatever".trap
 		if value & .vtemps_ // huh?
 		.vdecls_ = value
 
