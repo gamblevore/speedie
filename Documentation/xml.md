@@ -95,7 +95,7 @@ Jeebox doesn't have name-spaces, doctypes, dtds or processing-instructions, or f
 
 Jeebox doesn't have and doesn't need something like a DTD. Code is code. The best way to validate a document is with the app that created it. Jeebox works with the philosophy, that what people really want, is code, good simple code. Because all systems seem to emmigrate in that direction anyhow.
 
-Computer-games end up adding scripts, databases end up adding "triggers", websites added javascript, spreadsheets added code, and [XML](https://www.researchgate.net/publication/221568016_XSLT_Version_20_Is_Turing-Complete_A_Purely_Transformation_Based_Proof) [schema](https://www.academia.edu/48721461/XSLT_Version_2_0_Is_Turing_Complete_A_Purely_Transformation_Based_Proof) is turing complete!
+Computer-games end up adding scripts, databases end up adding "triggers", websites added javascript, spreadsheets added code, make-files became programs with CMake, and [XML](https://www.researchgate.net/publication/221568016_XSLT_Version_20_Is_Turing-Complete_A_Purely_Transformation_Based_Proof) [schema](https://www.academia.edu/48721461/XSLT_Version_2_0_Is_Turing_Complete_A_Purely_Transformation_Based_Proof) is turing complete!
 
 If we really needed a validation for a Jeebox-based format, it would have to be a program, written in Speedie. A small Speedie script, say 4KB big could easily function as a Jeebox DTD.
 

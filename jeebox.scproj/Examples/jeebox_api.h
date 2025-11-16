@@ -233,7 +233,7 @@ jbstring* jb_readfile(_cstring Path, bool AllowMissingFile); /* Reads entire fil
 #define $msg 46
 #define JB_SyxTodo 47;
 #define $todo 47
-#define JB_Syxurl 48;
+#define JB_SyxURL 48;
 #define $url 48
 #define JB_SyxXAtt 49;
 #define $xatt 49
