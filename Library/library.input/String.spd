@@ -95,9 +95,6 @@ class String
 	operator minus (|string|s, |int|)
 		return .length - s.length
 	
-//	operator isna (|string| s, |bool|)
-//		return !(self isa s)
-	
 	function Widen (|int| Width, |int| Mode=1, |byte| Char=' ', |string|)
 		if self >= Width
 			return  self
