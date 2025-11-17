@@ -610,8 +610,8 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 	|| TmpCloser = .OpenVars
 	if dest is Discard
 		dest = .TempOnly(Dest)
-	if Dest iz Addr	// whyyyy
-/		dest = .TempOnly
+	if Dest iz Addr
+		dest = .TempOnly
 
 	(addr is BlockNop)
 	|| value = .Read(Dest, F, addr, nil, glob) * Dest						// READ

@@ -298,12 +298,11 @@ struct Assembler
 	
 	
 	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		if "GUI_Sch_BGSet".trap
+		if fat is temp
+			.CloseOneEarly(fat.info) // why did I comment this out? // testin speedie first?
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...
-//		if fat is temp
-//			.CloseOneEarly(.info) // why did I comment this out? // testin speedie first?
 
 		depth++
 		if depth > 7
@@ -745,7 +744,7 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 
 target debug
 	function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
-		printline "µFunc: $i", (fn)
+		// printline "µFunc: $i", (fn)
 		fn.µprint
 
 

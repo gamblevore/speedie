@@ -120,8 +120,9 @@ module PackMaker
 
 		.Packfuncs.sort(&CodeSorter.ExportNames)
 		
-		if !Compiler.InPerry
-			.RunAFewTests
+		target debug
+			if !Compiler.InPerry
+				.RunAFewTests
 		
 		|| main = Compiler.MainFunc
 			(main is usedbyasm)

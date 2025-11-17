@@ -23,8 +23,6 @@ function message.ASMDecl (|SCDecl!|)
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
-//		if p == 199
-//		target debug: if  exp.Position < 0 and exp.Position != -2
 		.curr_ = p + 1
 		p[0] = nil
 		p.info = (p.index|uint64|<<48)|asmreg| // no need to call fat*reg now
@@ -65,8 +63,6 @@ target debug
 				t.debugprint
 
 
-
-
 function Assembler.OpenVars (|uint64|)
 	return (.VDecls|uint64| << 0) ||| (.VTemps|uint64| << 32)
 
@@ -76,18 +72,26 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	
 	|| OrigTemps = (Orig >> 32)
 	|| OrigDecls = (Orig << 32) >> 32
+	|| Missing = ~(OrigTemps ||| OrigDecls)
 
-	while .CloseOneVar(exp, origtemps, false)
-		0
-	
-	while .CloseOneVar(exp, OrigDecls, true)
+	while .CloseOneVar(exp, Missing)
 		0
 
-	|| Missing = OrigDecls &~ .VDecls
+	Missing = OrigDecls &~ .VDecls
 	if !exp or !missing
 		return return
 	
-	.VDecls |= Missing
+	/*
+		if value == nil {
+			JB_Decr(value) // the decl is closed early
+			exit
+		}
+		value.x++
+		// then it is "missing" after the arg closes. So this will reopen it.
+		// We assume that temps are never used in such a way and don't need reopening.
+	*/
+	
+	.VDecls |= Missing	
 	
 	return return
 
@@ -106,35 +110,32 @@ function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|
 	return true
 
 
-function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |bool| IsReal,  |bool|)
-	opt norefcounts										/// READ TABLE ///
-	|uint| Curr = (.vdecls, .vtemps)(isreal) 
-	|| Extra = Curr &~ Orig
-	if Extra == -1 // huh?
-	require Extra
-	
+function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
+	opt norefcounts
+	// we have a missing value. but is it missing from one, or the other? lets do it on that basis.
+	|uint| Curr = .vdecls
+	|uint| T = .vtemps
+	|| Extra = Curr & Missing
+	|| IsReal = true
+	if !Extra
+		Curr = T
+		Extra = Curr & Missing #require
+		IsReal = false
+
 	|| v = extra.log2
 	|| Result = Curr &~ (1<<v)
-	if isreal
+	.Regs.KnownMap &=~ (1<<v)
+	if IsReal
 		.vdecls = Result // easier to debug >:O 
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
-	
-	.Regs.KnownMap &=~ (1<<v)
 
 	|| fat = .regs.Setters[v]
-	if !fat: return true
-	if exp
-		.SetRegister(v, nil/*asmreg.AllowNopDest*/, nil) // why would I ever want to nop here?
-	// .nextbasicblock should do this?
-
-	// don't nop (most?) unused stuff here... as temps can be used after deallocating.
-	// What about the code below? could it suffer the same? We had this bug in "incr".
-	// The best this place could do... is warn (ME) that a function should be nopping something
-	// but isn't.
-	
-	return .ClearStruct(exp, .funcstart + fat, v)
-
+		if exp
+			.SetRegister(v, nil, nil) // no reason to want to nop anything here.
+		// Does code below suffer from unallocating something that is used later?
+		return .ClearStruct(exp, .funcstart + fat, v)
+	return true
 
 
 function scdecl.CalculateASMType (|asmreg|)

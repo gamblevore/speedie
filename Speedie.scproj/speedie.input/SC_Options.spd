@@ -354,12 +354,8 @@ module Feedback
 			explain(purpose, "Compiles to cpp. Will not compile cake")$
 			if value.optionbool
 				options.Mode = options.cpp
-				
-//		+'update'
-			// options.Mode = options.Pack
-//			options.UpdateStability = true
 
-		+'cake'
+		+'bake'
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$
 			if value.optionbool
 				options.Mode = options.cake
