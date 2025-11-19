@@ -20,7 +20,7 @@ datatype ClassInfo (int)
 		Banned
 		HasNilChecker
 		DefaultsToReal
-		HelpersAll
+//		HelpersAll
 //		IsRole
 //		ClassObj
 //		IsTask

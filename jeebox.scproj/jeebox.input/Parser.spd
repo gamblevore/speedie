@@ -1276,6 +1276,7 @@ module parser
 	linkage
 		visible false
 		cpp_part Tk
+		helper
 
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData

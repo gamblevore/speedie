@@ -1927,9 +1927,8 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 			Compiler.FuncList <~ self
 		.FLookup = name_space  // sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
-		if name_space isa SCClass
-			if name_space is HelpersAll
-				.MakeHelper
+		if name_space is PrivateAll
+			.MakeHelper
 
 	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 
