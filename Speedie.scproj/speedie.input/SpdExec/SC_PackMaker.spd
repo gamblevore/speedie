@@ -12,7 +12,6 @@ module PackMaker
 	|int|					_LibGlobSize
 	|HairyMan|				PackSaved
 	|hairyman|				LibSaved
-	|HairyMan|				LibGlobSaved
 
 
 	function PackGlobSize (|int|)
@@ -213,9 +212,10 @@ module PackMaker
 	function PackClasses (|jbin| j)
 		opt norefcounts
 		j.tmp("clss")
+		|[scfunction]| r = array()
 		for c in Compiler.ClassList
 			if c.NeedsPackExport
-				C.DescribeInPack(j)
+				C.DescribeInPack(j, r)
 		j.exit(2)
 	
 	
@@ -278,8 +278,22 @@ module PackMaker
 			return df.exportname
 		return "0"		
 	
+	function scclass.CollectBehaviours (|[scfunction]| list)
+		opt norefcounts
+		|| b = .behaviour
+		while (b)
+			for (M in b.interfaces)
+				|| s = m.name.InterfaceToBehaviour
+				|| fn = .BestBehaviourFor(s)
+					|| BaseClass = .InterfaceForBehaviour(fn)
+						list <~ fn
+						fn = nil
+				if fn: .missingbehaviour(s)
+
+			b = b.upwards
+
 	
-	function SCClass.DescribeInPack (|jbin| j)
+	function SCClass.DescribeInPack (|jbin| j, |[scfunction]| list)
 		opt norefcounts
 		|| sz = .clssize
 		j.enter(@tmp, .name)
@@ -292,21 +306,17 @@ module PackMaker
 		
 		j.enter(@list)     //////     //////     //////
 		j.add(@thg, .DestructorFuncName)
-	
-		|| b = .behaviour
-		while (b)
-			for (M in b.interfaces)
-				|| s = m.name.InterfaceToBehaviour
-				|| fn = .BestBehaviourFor(s)
-					|| BaseClass = .InterfaceForBehaviour(fn)
-						j.add(@thg, fn.exportname)
-						fn = nil
-				if fn: .missingbehaviour(s)
-
-			b = b.upwards
+		.CollectBehaviours(list)
+		for fn in list
+			j.Enter(@unit, fn.name)
+			|| id = fn.PackID
+			if fn.IsLibrary
+				id = 123 // wheres the exportposition?? hmmmm
+			j.AddInt(id)
+			j.exit
+		list.Clear
 		
 		j.exit    		   ///
-		
 		j.exit
 	
 
