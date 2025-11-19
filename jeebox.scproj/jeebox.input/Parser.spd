@@ -75,6 +75,7 @@ extend Parser
 		.Tokenz( op_math,		kOppSNB,				fOppSyx				)
 		.Tokenz( "|",			kOppBar,				fOppSyx				)
 		.Tokenz( "...",			kThingSyx,              fThingSyx			)
+//		.Tokenz("\\",			kThingSyx,				fBinaryThing		) // not sure of this
 		.Tokenz( `"`,			kThingSyx,              fString				)
 		.Tokenz( "'",			kThingSyx,              fChar				)
 		.Tokenz( "`",           kThingSyx,			    fBackTick			)
@@ -90,8 +91,6 @@ extend Parser
 // ◊ˆ˜¯˘„’‹›·
 		.Token( "≈" )  = .Handler( kFuncAfterNormal, fBAdjectiveThing ).Link( kAdjectiveOp, fBAdjectiveOp )
 		.Token( "#" )  = .handler( kTmpOpp, fTemporalRel ).Link( kTemporalSyxNoBar, fTemporalHashThing )
-
-//		.Token( "[" )  = .Handler( kFuncAfterNoSpace, fAccess ).Link( kThingSyx, fArray )
 
 		.Tokenz( ">~",			kthingsyx,				fInnerNiceAdj		)		// >~ quickly he ran home
 		.Tokenz( "¬",			kThingSyx,				fYoda				)		// ¬ powerful you have~become
@@ -519,6 +518,20 @@ extend Parser
 		return .Numbersub(start, start)
 
 
+//	function fBinaryThing (ParseHandler)
+		// so we need to turn \123 into an integer
+		// this needs to be expressed as binary. otherwise... we can't call .int on it properly
+		// as .int on @bnum will just return the integer value.
+		// so... this is doing a lot of work... that is not efficient for binary documents
+		// this makes a format that sucks as jeebox but works well as jbin.
+		// I'm not sure the idea is worth it. What if the file is usually binary?
+		// just use a bin?
+		// what about a parseflag affecting the meaning? TERRIBLE.
+		// its either slow, or it does not exist.
+		
+//		return .Numbersub(start, start+1)
+
+
 	function NumberSub (|int| Start, |int| RealStart, |Message|)
 		Opt NoRefCounts
 		
@@ -838,7 +851,7 @@ ive been~running #since morning
 ///////////////////////////////////////////////////////////////////////////
 
 	function NoFuncAfter ( |Byte| b, |bool| )
-		return  b  ==  '\t' or ' ' or '\\'
+		return  b  ==  '\t' or ' '// or '\\'
 
 
 	function GetFuncAfter (|Message!| result, |Message!|)

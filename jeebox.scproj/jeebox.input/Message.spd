@@ -1050,6 +1050,7 @@ Message is also:
 		require self
 		return "$prefix$.FuncName “${.name[0,64].UnicodeSync}”"
 
+	// would be nicer if SyntaxExpect becomes a function named "fail"
 	Syntax Expect (|string?| Error = nil)
 		cpp_part Fail
 		errorreceiver.NewError( self, Error )
