@@ -90,7 +90,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 
 	|SpdProcess| spd 
 	
-	target debug
+	target debug and !cake
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
@@ -99,10 +99,8 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			spd = (Speedie_Main).Spawn(f.name, p)
 
 	if !spd?
+//		|| proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
 		|| proc = speedie.resolve
-		target notdebug
-			proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
-		if proc
 			|| Mode = ProcessMode.CaptureAll
 			if !noisy
 				mode = ProcessMode.silence
@@ -143,6 +141,10 @@ function PerryIDE.ActualCompile (|string| operation)
 	.ShowCompileTab(.SpeedieText)
 	.ViewAsCurr
 
+
+// how should a lib-wrapper be called by a cake file?
+// hmmmm. well... basically we don't have access to that
+// so it shouldn't be compilable.
 
 target debug
 	cpp_libwrapper Speedie_Main (spdprocess.ThreadAsProcess)
