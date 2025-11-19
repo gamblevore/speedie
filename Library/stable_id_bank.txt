@@ -1669,6 +1669,7 @@ JB_Incr
 JB_Incr2
 JB_Ind_SyntaxCast
 JB_InitClassList
+JB_InitCode_
 JB_IntDownRange_Constructor
 JB_Int_CTZ
 JB_Int_CountBits
@@ -3105,8 +3106,10 @@ JB_vec3_Bool
 JB_vec3_Ceil
 JB_vec3_Clamp
 JB_vec3_ClampVec
+JB_vec3_CompareVec3
 JB_vec3_Cos
-JB_vec3_CosR
+JB_vec3_CosBad
+JB_vec3_Cross
 JB_vec3_Dot
 JB_vec3_Fract
 JB_vec3_Length
@@ -3127,7 +3130,7 @@ JB_vec3_OperatorX
 JB_vec3_Reflect
 JB_vec3_Render
 JB_vec3_Round
-JB_vec3_SinR
+JB_vec3_SinBad
 JB_vec3_Sine
 JB_vec3_Sum
 JB_vec3_SyntaxCompare
@@ -3144,10 +3147,12 @@ JB_vec4_Abs
 JB_vec4_Area
 JB_vec4_Aspect
 JB_vec4_Bool
+JB_vec4_Ceil
 JB_vec4_Center
 JB_vec4_Clamp
 JB_vec4_ClampFloat
 JB_vec4_Clip
+JB_vec4_CompareVec4
 JB_vec4_CopySign
 JB_vec4_Cos
 JB_vec4_CosR
@@ -3162,6 +3167,7 @@ JB_vec4_Height
 JB_vec4_IsNegative
 JB_vec4_IsPositive
 JB_vec4_Length
+JB_vec4_LengthSq
 JB_vec4_Load
 JB_vec4_Log
 JB_vec4_Log2
@@ -3188,6 +3194,7 @@ JB_vec4_Size
 JB_vec4_SmoothStep
 JB_vec4_Sqrt
 JB_vec4_Sum
+JB_vec4_SyntaxCompare
 JB_vec4_SyntaxEquals
 JB_vec4_Tan
 JB_vec4_UnTan
@@ -3302,4 +3309,3 @@ roundf
 sqrt
 sqrtf
 strlen
-JB_InitCode_
