@@ -342,7 +342,7 @@ function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Op
 	opt norefcounts
 	
 	target debug
-		if asmtrapper == 211
+		if asmtrapper == -1
 	|| first = .µBoolInto(A, dest)
 	if first is Const
 		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()

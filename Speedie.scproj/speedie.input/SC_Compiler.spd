@@ -243,7 +243,7 @@ function Reached (|string| s, |bool|)
 
 
 function InitTypes (|bool|)
-	.InBuiltType = SCNodeInfo.InBuilt
+	.InBuiltType = SCNodeInfo.InBuiltDataType
 	TypeInt				= compiler["int"]
 	TypeInt16			= compiler["int16"]
 	TypeInt64			= compiler["int64"]

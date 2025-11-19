@@ -11,9 +11,9 @@ module LinkMap
 
 	function SCFunction.DoLinkToNode (|SCNode| To)
 		opt norefcounts
-		require to isnt InBuilt
+		require to isnt InBuiltDataType // int, bool, etc
 		require to.CanLinkFrom(self)
-
+		
 		if to.IsLibrary and (to is private) and .IsLibrary
 			(self is CantInline) // can't inline this
 
@@ -84,6 +84,10 @@ function Reach
 	.ReachFunc(Compiler.VisibleFuncs!)
 
 
+function ReachFuncFromFunc (|SCFunction| from)
+	.reachfunc(From) // whatever just leave this for now.
+	
+
 function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach 
 	opt norefcounts
 	flow off // memory order dependant!
@@ -107,7 +111,7 @@ function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach
 		
 	for o in .LinkTo
 		if (o isa SCFunction)
-			o.ReachFunc(self)
+			o.ReachFuncFromFunc(self)
 		  elseif (o isa SCClass)
 			o.Reach(self)
 	

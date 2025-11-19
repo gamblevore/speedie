@@ -160,6 +160,12 @@ function SCFunction.ASMReturn (|scdecl|)
 		return T
 
 
+function SCFunction.ASMReturn (|ASMReg| Dest, |asmreg|)
+	opt norefcounts
+	dest.µtype = .ASMReturn.ASMRegType
+	return dest
+
+
 function asmreg.incr (|asmreg|)
 	|| f = .fat
 		f.µrefcount++

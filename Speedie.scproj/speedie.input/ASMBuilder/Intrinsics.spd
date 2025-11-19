@@ -87,14 +87,13 @@ module Intrinsics
 		return  b.trinint - .trinint
 
 
-function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |message| trin, |ASMReg|)
+function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |scfunction| fn, |message| trin,  |ASMReg|)
 	opt norefcounts
 	|| name = Trin[@thg]
 	trin = name.next(@prm)$
 	|| op = instruction[name!]$
 	
-//	|| form = op.Sizes
-//	expect (trin.HasChildCount(form.Count))    				(trin, "Expected paramcount: " + form.Count)
+	dest = fn.ASMReturn(dest) // .ReallySimplify // not sure I should do simplify? hmmm. unclear.
 	return .TheTrinity(where.last, trin, dest, op.opcode)
 
 

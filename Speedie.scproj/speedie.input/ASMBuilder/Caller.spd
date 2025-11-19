@@ -90,8 +90,7 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 		if .state.return
 			v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
 	dest.reg = v
-	dest.µtype = fn.ASMReturn.ASMRegType
-	return dest.ReallySimplify
+	return fn.ASMReturn(dest).ReallySimplify
 
 
 function RegClear (|message| exp, |&fatasm| C, |int| i)
@@ -144,7 +143,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	|| TableID = 0
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
-			return .DoIntrinsic(exp, dest, intrin)
+			return .DoIntrinsic(exp, dest, fn, intrin)
 		if fn isnt CantInline
 			|| MiniDest = .AskForInline(prms, dest, fn)
 				return MiniDest

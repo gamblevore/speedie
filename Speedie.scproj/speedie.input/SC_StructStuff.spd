@@ -53,14 +53,15 @@ function Tran_Rejoin (TranFunc)  // exitter
 
 
 
-function SCFunction.StructImprove (|scparamarray| incoming, |scfunction|)
+function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
 	opt norefcounts
-	if self|scnode| is Private
+	if self == "Speedie_Main"
+	if (self|scnode| is Private)  or  ((self is ExternalLib) and options.modepack)
 		|| curr = scfunction.currfunc
 		if curr and !curr.IsLibrary and (.project != curr.project)
 			error (incoming.exp, .name + " used beyond private scope" )
-			error (.source, "   Original:")
-			
+			error (.source, "   Original:")	
+
 	|| ft = .StructReturned
 		incoming.StructReturner(ft.AsLocal, self)
 	  elseif .returntype is ReturnedStruct			// remove this? its always the prev?

@@ -7,7 +7,6 @@ datatype DotUseType (int) // replace entire thing with a bool?
 	flags					// sigh. i wish i had made this unused stuff earlier
 		|DotUseType|
 		Property
-//		Memory
 		
 	syntax is (|DotUseType| d, |bool|)
 		return self == d
@@ -18,7 +17,6 @@ datatype FunctionType (int)
 		|FunctionType|
 		Constructor
 		Destructor
-//		Comparison
 		Reffer
 		NewStruct
 		NumberCreator
@@ -412,7 +410,7 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
-		return rz.StructImprove(incoming)
+		return rz.MatchImprove(incoming)
 
 
 function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)
@@ -724,11 +722,19 @@ function DeclsPrototypeClass (|Message!| ch0)
 	
 	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
 	|| dcl = .DeclsProtoTypeAdd(fpType)
+
+	// OK... so... BasicRowDrag isnt getting in here. its a lib func.
+	// but its not private? how can it be private?
+	// OK... so it is marked as a helper. Well... thats not very useful.
+	// that would mean it CAN'T be accessed externally. but it can?
+	// OK... so its not right now. either way...
+	// so... basically... it ok that its at 0? should we give a dummy address?
+	
+	(dcl is Global) // in case we don't do the below branch
 	if (!.islibrary) or (self|scnode| isnt Private)
 		dcl.AddToGlobs
-	// behaviours should be in the funclist?
-	// I guess we'll need a separate instruction
-	// to get function addresses. Shouldn't be hard.
+	  else
+		dcl.exportposition = 64K-8 // sigh. just mark it somehow.
 
 
 function scnode.Route (|string| name, |message|)
@@ -780,7 +786,7 @@ function CollectReturnAsReal (|bool|)
 
 function AddTypeInfo (|scdecl| dcl)
 	if dcl.IntRegs
-		0//.IntPrmCount += dcl isnt return
+		0 //.IntPrmCount += dcl isnt return
 	  elseif dcl is Return
 		is ReturnASMFloats
 
@@ -806,7 +812,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType,  |scdecl|)
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
 	.HasProto = dcl
 	(Dcl is compilercreated)
-	if (.Cls)
+	if .Cls
 		.parent!.TryAdd( .Source, Dcl, .Name )
 	return dcl
 
@@ -830,7 +836,7 @@ function DeclsProtoCleanUpContainedness (|message| P, |message| ch0, |scclass!| 
 
 function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late, |message| Route=nil)
 	|| Proto = fpType.FuncProto									#expect (ch0, "This isn't a prototype!")
-	|| fParams = Proto.Source[ @prm, 1 ]					#require
+	|| fParams = Proto.Source[ @prm, 1 ]						#require
 	|| p = ch0.Parent!
 	p.Func = @prm
 
@@ -845,7 +851,7 @@ function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, 
 	
 	.DeclsProtoCleanUpContainedness(p, ch0, fptype)
 	
-	|| c = .cls														#require
+	|| c = .cls													#require
 	if late
 		p.first.remove // ooof
 	
@@ -2031,7 +2037,6 @@ function NeuLibrary (CollectFunc)
 	error (node, "Can’t use this")
 	Options.ProjectisLibrary = true // better than omitting main. more... specific.
 									// but what if someone includes a library?
-//	SC_Targets["library"] = true // "minilib" already exists
 	return NeuMain(node, name_space, errplace)
 	// library {} -->
 

@@ -201,8 +201,8 @@ datatype vec3
 		return (.x.cos, .y.cos, .z.cos)
 
 	function Fract (|vec3|)
-		return (.x.fract, .y.fract, .z.fract)
-	
+		return self|vec4|.fract|vec3|
+
 	function Ceil (|vec3|)
 		return (.x.ceil, .y.ceil, .z.ceil)	
 

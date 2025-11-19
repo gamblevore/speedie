@@ -1047,7 +1047,7 @@ datatype SCNodeInfo (byte)
 		ExplicitExport
 		Visible
 		AllowLinkedLists
-		InBuilt
+		InBuiltDataType
 		Private
 		
 

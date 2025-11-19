@@ -20,12 +20,14 @@ module PackMaker
 	
 	function LibGlobSize (|int|)
 		return ._LibGlobSize
-		
+	
+	
 	helper scfunction.NeedsLibExport (|bool|)
 		require (.MyReacher or options.MakeInterpreter)
 		require self isnt NoExport
 		require self|scnode| isnt Private
 		return (.IsCppInBuilt < 2)
+	
 	
 	helper AddFunc (|scfunction| f)
 		opt norefcounts
@@ -33,8 +35,10 @@ module PackMaker
 			if f.NeedsLibExport
 				.LibFuncs <~ f
 		  else
-			if f.MyReacher
+			|| R = f.MyReacher
+				check (f isnt externallib) (R.Source, "External library functions can't yet be used in cake files.")
 				.PackFuncs <~ f
+	
 	
 	function AddAll (|int|)
 		opt norefcounts
@@ -140,8 +144,9 @@ module PackMaker
 		compiler.During = compilerstage.Packing
 		Assembler.Sh.Fullinit
 		PackMaker.AddAll
-		if .BuildGlobs and .FATCompile and options.ModePack	// options.ModePack can be false, if compiler.InPerry
-			.WritePackToDisk
+		if stderr.ok and .BuildGlobs 
+			if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry
+				.WritePackToDisk
 		compiler.During = 0
 	
 	
