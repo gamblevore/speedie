@@ -621,7 +621,7 @@ Message is also:
 		fs <~ b2
 
 
-	function Dummy (fpMsgRender)
+	helper Dummy (fpMsgRender)
 		// Dummy function used by .ExportAddr. Stops crashes if someone calls export but hasn't set his own function yet.
 
 	

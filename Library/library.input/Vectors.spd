@@ -184,9 +184,16 @@ datatype vec3
 		return (self != vec3())
 			
 	syntax Compare (|float| Other, |float|)
+		// this function is sooo nice. avoids doing a sqrt on both sides!
 		|| LSq = .lengthsq
 		|| Osq = other*other
 		return lsq - Osq
+			
+	syntax Compare (|vec3| Other, |float|)
+		cpp_Part CompareVec3
+		.w = 0
+		other.w = 0
+		return self|vec4|.Syntaxcompare(other|vec4|)
 
 	syntax Equals (|vec3| v, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
@@ -195,45 +202,36 @@ datatype vec3
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
 
 	function Sine (|vec3|)
-		return (.x.sine, .y.sine, .z.sine)
+		return self|vec4|.sine|vec3|
 
 	function Cos (|vec3|)
-		return (.x.cos, .y.cos, .z.cos)
+		return self|vec4|.cos|vec3|
 
 	function Fract (|vec3|)
 		return self|vec4|.fract|vec3|
 
 	function Ceil (|vec3|)
-		return (.x.ceil, .y.ceil, .z.ceil)	
+		return self|vec4|.ceil|vec3|
 
-	function SinR (|vec3|)
+	function SinBad (|vec3|)
 		return (self * math.iTau).sine
 
-	function CosR (|vec3|)
+	function CosBad (|vec3|)
 		return (self * math.iTau).cos
 
 	operator Pow (|vec3| p, |vec3|)
-		return (.x pow p.x, .y.cos pow p.y, .z.cos pow p.z)
+		return self|vec4|.Operatorpow(p|vec4|)|vec3|
 
 	operator min (|vec3| s, |vec3|)
 		cpp_part Min3
-		(s.x min= .x)
-		(s.y min= .y)
-		(s.z min= .z)
-		return s
+		return self|vec4|.Operatormin(s|vec4|)|vec3|
 
 	operator max (|vec3| s, |vec3|)
 		cpp_part Max3
-		(s.x max= .x)
-		(s.y max= .y)
-		(s.z max= .z)
-		return s
+		return self|vec4|.Operatormax(s|vec4|)|vec3|
 
 	operator max (|float| s, |vec3|)
-		(.x max= s)
-		(.y max= s)
-		(.z max= s)
-		return self
+		return self|vec4|.Operatormin(vec4(s))|vec3|
 	
 	function Max (|float|)
 		return .x max .y max .z
@@ -255,16 +253,18 @@ datatype vec3
 		return self|vec4|.clamp(min|vec4|, max|vec4|)|vec3|
 	
 	function Round (|vec3|)
-		return (.x.round, .y.round, .z.round)
+		return self|vec4|.round|vec3|
 
 	function Length (|float|)
-		return .lengthsq.sqrt
+		.w = 0
+		return self|vec4|.length
 		
 	function Normal (|vec3|)
 		return self / .Length
 
 	function LengthSq (|float|)
-		return (.x*.x + .y*.y + .z*.z)
+		.w = 0
+		return self|vec4| • self|vec4|
 
 	operator mul (|float| x, |vec3|)
 		cpp_part MulF
@@ -275,7 +275,7 @@ datatype vec3
 		return (.x*v.x, .y*v.y, .z*v.z)
 	
 	function Abs (|vec3|)
-		return (.x.length, .y.length, .z.length)
+		return self|vec4|.abs|vec3|
 	
 	operator • (|vec3| other, |float|)
 		cpp_part Dot
@@ -288,10 +288,9 @@ datatype vec3
 		return .x + .y + .z
 
 	operator x (|vec3| V, |vec3|)
-		description "Gives something at right angles. IDK its just maths dont ask me." 
-	    rz.x = .y * v.z - .z * v.y
-	    rz.y = .z * v.x - .x * v.z
-	    rz.z = .x * v.y - .y * v.x
+		cpp_part Cross
+		description "Cross Product: Gives something at right angles. IDK its just maths dont ask me." 
+		return self|vec4|.OperatorCross(v|vec4|)|vec3|
 
 	render
 		fs <~ "(${.x}, ${.y}, ${.z})"

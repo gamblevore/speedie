@@ -240,26 +240,33 @@ function TypeCast (fn_asm)
 		return from
 
 	|| OldType = from.µtype	
+	if oldtype is bool // bools are normally considered bitcorrect. it would be impossible to do jbor otherwise.
+		from.µtype = newtype
+		return from
+
 	if NewType is bool
 		if (OldType is bool) and (dest isnt negate)				// x = true|bool| // why?
 			return from
 		return .NotEq(exp, dest, asmreg(), from)
 
-	if  (NewType.BitCount == OldType.BitCount)  and  NewType.IsFloat == oldtype.isfloat
-		from.µtype = newtype
-		return from
-	
-	dest = .TempOnly(dest)
 	dest.µType = NewType
 	if from is Const
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
-	
+
 	|| OV = OldType.VecCount
 	|| NV = NewType.VecCount
+	if (OV|||NV) <= 1
+		if  (NewType.BitCount == OldType.BitCount)  and  NewType.IsFloat == oldtype.isfloat
+			from.µtype = newtype
+			return from
+	
+	dest = .TempOnly(dest)
+	
 	if (OV|||NV) > 1
-		if OV>1 != NV>1 // oof?
 		if NewType.IsFloat == oldtype.isfloat
-			if dest iz from or dest is temp
+			if (ov == 3 and nv == 4) or (nv == 3 and ov == 4)
+				return from
+			if dest iz from
 				return dest
 			return exp.VMOV(dest, from) * dest
 		return exp.QCNV(dest, from, OldType.isfloat|int|) * dest
@@ -269,9 +276,6 @@ function TypeCast (fn_asm)
 	if oldtype.isfloat or newtype.isfloat
 		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest
 	
-	if oldtype is bool // bools are normally considered bitcorrect. it would be impossible to do jbor otherwise.
-		from.µtype = newtype
-		return from
 
 	|| sh2 = 64 - NewType.BitCount
 	return exp.BFLG(dest, from, sh2, sh2, dest.signed|int|) * dest
