@@ -1531,18 +1531,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2263])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2264])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2264])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2265])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2265])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2266])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2262])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2263])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2265])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2266])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2266])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2267])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1772,10 +1772,10 @@ extern byte SC__VM_Builder_XType;
 extern JB_String* SC___AppConfString;
 extern ivec4 SC_Butter;
 extern CharSet* SC_C_Letters;
-extern Dictionary* SC_ClassLinkageTable;
+extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2271])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2272])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1812,7 +1812,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2267])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2268])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1852,7 +1852,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2272])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2273])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2084,12 +2084,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2270])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2271])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2269])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2270])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2268])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2269])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2597,13 +2597,13 @@ extern ASM SC__ASMType_WriteASM[5];
 
 #define kSC__ClassInfo_Banned ((ClassInfo)256)
 
-#define kSC__ClassInfo_Builtin ((ClassInfo)16384)
+#define kSC__ClassInfo_Builtin ((ClassInfo)8192)
 
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
 
 #define kSC__ClassInfo_DefaultsToReal ((ClassInfo)1024)
 
-#define kSC__ClassInfo_Flags ((ClassInfo)131072)
+#define kSC__ClassInfo_Flags ((ClassInfo)65536)
 
 #define kSC__ClassInfo_HasEqualsFunc ((ClassInfo)4)
 
@@ -2611,23 +2611,21 @@ extern ASM SC__ASMType_WriteASM[5];
 
 #define kSC__ClassInfo_HasSubClass ((ClassInfo)8)
 
-#define kSC__ClassInfo_HelpersAll ((ClassInfo)2048)
-
 #define kSC__ClassInfo_IgnoreContainedSelf ((ClassInfo)2)
 
 #define kSC__ClassInfo_NoEarlyFree ((ClassInfo)16)
 
-#define kSC__ClassInfo_NumericReduction ((ClassInfo)196608)
+#define kSC__ClassInfo_NumericReduction ((ClassInfo)98304)
 
 #define kSC__ClassInfo_SavingCanSkip ((ClassInfo)64)
 
-#define kSC__ClassInfo_SortsProperties ((ClassInfo)32768)
+#define kSC__ClassInfo_SortsProperties ((ClassInfo)16384)
 
-#define kSC__ClassInfo_Stateful ((ClassInfo)8192)
+#define kSC__ClassInfo_Stateful ((ClassInfo)4096)
 
-#define kSC__ClassInfo_Stateless ((ClassInfo)4096)
+#define kSC__ClassInfo_Stateless ((ClassInfo)2048)
 
-#define kSC__ClassInfo_Symbol ((ClassInfo)65536)
+#define kSC__ClassInfo_Symbol ((ClassInfo)32768)
 
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)128)
 
@@ -3224,9 +3222,11 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCNodeInfo_ExplicitExport ((int)1)
 
-#define kSC__SCNodeInfo_InBuilt ((int)8)
+#define kSC__SCNodeInfo_InBuiltDataType ((int)8)
 
 #define kSC__SCNodeInfo_Private ((int)16)
+
+#define kSC__SCNodeInfo_PrivateAll ((int)32)
 
 #define kSC__SCNodeInfo_Visible ((int)2)
 
@@ -3314,7 +3314,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2261])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2262])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -4618,35 +4618,35 @@ void SC_AddToStaticSection(Message* Arg, Message* ToAdd);
 
 int SC_ArrayInOrderCheck(int InOrder, Message* Msg);
 
-bool SC_ClassLinkageTable_cpp_class(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_cpp_part(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_cpp_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_datatype(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_helper(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_ignore(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_noearlyfree(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_numeric(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_sort_properties(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_stateful(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_stateless(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_tighten(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_visible(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassLinkageTable_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
 SCClass* SC_ClassOfObjForC(Message* Curr);
+
+bool SC_ClassOrModuleLinkage_cpp_class(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_cpp_part(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_cpp_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_datatype(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_helper(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_ignore(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_noearlyfree(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_numeric(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_sort_properties(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_stateful(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_stateless(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_tighten(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_visible(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_ClassOrModuleLinkage_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 SCNode* SC_ClsCollectTable_description(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -7202,7 +7202,7 @@ ASMReg SC_Pac_Divide(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 
 ASMReg SC_Pac_DivInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-ASMReg SC_Pac_DoIntrinsic(Assembler* Self, Message* Where, ASMReg Dest, Message* Trin);
+ASMReg SC_Pac_DoIntrinsic(Assembler* Self, Message* Where, ASMReg Dest, SCFunction* Fn, Message* Trin);
 
 ASMReg SC_Pac_DoMath(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -10830,6 +10830,10 @@ FatASM* SC_Msg_TAIL(Message* Self, int JUMP, int Prm1);
 
 bool SC_Msg_TargetTest(Message* Self);
 
+int SC_Msg_TargetTestOp(Message* Self, Message* C);
+
+bool SC_Msg_TargetThg(Message* Self);
+
 Message* SC_Msg_TaskConBefore(Message* Self);
 
 Message* SC_Msg_TempIntoBlock(Message* Self, Message* ParentPlace);
@@ -11557,7 +11561,9 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 
 int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAlter, SCNode* Name_space, SCParamArray* Incoming);
 
-SCDecl* SC_Func_ASMReturn(SCFunction* Self);
+SCDecl* SC_Func_ASMReturnWith0(SCFunction* Self);
+
+ASMReg SC_Func_ASMReturnWithReg(SCFunction* Self, ASMReg Dest);
 
 void SC_Func_BeforeTransform(SCFunction* Self);
 
@@ -11721,6 +11727,8 @@ JB_String* SC_Func_MakeProtoClassName(SCFunction* Self, JB_String* Start);
 
 void SC_Func_MarkRecursive(SCFunction* Self, SCFunction* EndAt);
 
+SCFunction* SC_Func_MatchImprove(SCFunction* Self, SCParamArray* Incoming);
+
 bool SC_Func_NeedsID(SCFunction* Self);
 
 bool SC_Func_NeedsLibExport(SCFunction* Self);
@@ -11749,6 +11757,8 @@ void SC_Func_Reach(SCFunction* Self);
 
 void SC_Func_ReachFunc(SCFunction* Self, SCNode* From);
 
+void SC_Func_ReachFuncFromFunc(SCFunction* Self, SCFunction* From);
+
 void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
 
 JB_String* SC_Func_Render(SCFunction* Self, FastString* Fs_in);
@@ -11772,8 +11782,6 @@ Message* SC_Func_SourceArg(SCFunction* Self);
 void SC_Func_SourceArgSet(SCFunction* Self, Message* Value);
 
 void SC_Func_StatelessAccumulate(SCFunction* Self);
-
-SCFunction* SC_Func_StructImprove(SCFunction* Self, SCParamArray* Incoming);
 
 SCDecl* SC_Func_StructReturned(SCFunction* Self);
 
