@@ -301,13 +301,8 @@ module Feedback
 		
 		+'quiet' 
 			Explain(Purpose, "Prints less stuff")$
-			Options.PrintCompileString = false
+			Options.Silent = true
 
-		+'silent'
-			Explain(Purpose, "Prints much less")$
-			Options.PrintCompileString = false
-			options.silent = true
-		
 		+'stages'
 			Explain(Purpose, "Prints the stages")$
 			options.printstages = value.optionbool

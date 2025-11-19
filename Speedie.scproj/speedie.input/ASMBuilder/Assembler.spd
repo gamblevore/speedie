@@ -759,7 +759,7 @@ function Assembler.ASMCompile (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 	.CapASM
 	
 	target debug
-		if !compiler.InPerry and !options.perryoutput
+		ifn options.silent or compiler.InPerry or options.perryoutput
 			.PrintASM(fn, i)
 	  else
 		(i)

@@ -916,7 +916,8 @@ function TimerSub (|string| s, |int| Durr)
 	Durr -= .stParseTime
 	.stParseTimeTotal += .stParseTime
 	.stParseTime = 0
-	.AppendCompilerTime(s, durr)
+	if !options.silent
+		.AppendCompilerTime(s, durr)
 
 
 function Timer (|string| name)
@@ -942,19 +943,22 @@ function Stage (|string| name, |bool|)
 
 
 function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|)
-	print s
-	print " `"
 	if ActualCompile
 		rz = compiler.ProductPath
 	  else
 		rz = cpp_export.CppProduct
-	print rz
-	print "`"
-	
-	|| sz = rz.filesize
-		print " // "
-		print sz.strsize
-	printline
+	if options.silent
+		printline rz
+	  else
+		print s
+		print " `"
+		print rz
+		print "`"
+		
+		|| sz = rz.filesize
+			print " // "
+			print sz.strsize
+		printline
 
 
 function IsTest (|bool|)
