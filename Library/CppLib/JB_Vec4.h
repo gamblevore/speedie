@@ -12,6 +12,7 @@ float	JB_vec4_Length		(vec4 x);
 float	JB_vec4_Dot			(vec4 x, vec4 y);
 vec4	JB_vec4_Cross		(vec4 x, vec4 y);
 vec4	JB_vec4_InvSqrt		(vec4 x);
+vec4	JB_vec4_Fract		(vec4 x);
 vec4	JB_vec4_Sqrt		(vec4 x);
 vec4	JB_vec4_Exp			(vec4 x);
 vec4	JB_vec4_Log			(vec4 x);
