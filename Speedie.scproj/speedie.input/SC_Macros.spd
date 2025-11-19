@@ -53,26 +53,54 @@ function macro.clean (|macro|)
 
 
 
-function message.TargetTest (|bool|) // target true, target false, 
-	.expect(@thg)
+function message.TargetTestOp (|message| C, |int|)
+	opt norefcounts
+	if C
+		|| n = .name
+		if n == "or"
+			return 1
+		if n == "and"
+			return 2
+	.SyntaxExpect // failed
+
+	
+function message.TargetTest (|bool|) // target true, target false,
+	opt norefcounts
+	real self
+	while .func == @bra
+		self = .first!
+
+	|| fn = .func
+	if fn == @rel
+		|| C = .last
+		|| op = .second!.TargetTestOp(C)$
+		|| AOK = .first!.TargetTest
+		if (op == 1) == AOK
+			return AOK
+		return C!.TargetTest		
+	
+	if (fn == @brel) and (self == "!")
+		return !.first!.TargetThg
+	
+	if .expect(@thg)
+		return .TargetThg
+
+
+function message.TargetThg (|bool|) // target true, target false,
 	expect (self ~!= "mac" or "macos")     (self, "Use OSX")
 	expect (self ~!= "linux")   (self, "Use lin")
 	expect (self ~!= "windows") (self, "Use win")
 	expect (self ~!= "import")  (self, "Use imported")
+	if self ~= "cake"
+		return options.mode == options.cake
+	if self ~= "cpp"
+		return options.mode == options.cpp
 	if self ~= "debug"
 		return options.TargetDebug
-	if self ~= "release"
-		return !options.TargetDebug
 	if self ~= "perry"
 		return options.perryoutput
-	if self ~= "minilib"
-		return options.ProjectIsMiniLib
 	if self ~= "imported"
 		return scimport.CurrIsManuallyImported
-	if self ~= "true"
-		return true
-	if self ~= "false"
-		return false
 	if self ~= "osx"
 		return Platform.osx
 	if self ~= "win"
@@ -81,12 +109,15 @@ function message.TargetTest (|bool|) // target true, target false,
 		return Platform.lin
 	if self ~= "direct"
 		return options.IsDirectTest
-	if self ~= "cake"
-		return options.mode == options.cake
-	if self ~= "cpp"
-		return options.mode == options.cpp
+	if self ~= "true"
+		return true
+	if self ~= "library"
+		return Options.ProjectisLibrary
+	if self ~= "minilib"
+		return options.ProjectIsMiniLib
 		
 	return SC_Targets[.name]
+
 
 
 function message.Tran_Target (|message|)
@@ -106,12 +137,8 @@ function message.TranAllTargets
 function message.Tran_TargetSub
 	opt norefcounts
 	|| value = self.needfirst					#require
-	|| IsFalse = (value == @brel and "!")
-		value = value.first!
-	
 	|| arg = self[@arg, 1]						#require
-	
-	if value.TargetTest == IsFalse
+	if !value.TargetTest
 		arg = self[2][@arg]
 
 // can't handle target false
@@ -125,7 +152,5 @@ function message.BecomeTarget
 	|| b = s.TargetTest.string
 	.become(@thg, b)
 		
-	
-	
 	
 	
