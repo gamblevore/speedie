@@ -212,11 +212,11 @@ module PackMaker
 
 	function PackClasses (|jbin| j)
 		opt norefcounts
-		j.enter(@tmp, "clss")
+		j.tmp("clss")
 		for c in Compiler.ClassList
 			if c.NeedsPackExport
 				C.DescribeInPack(j)
-		j.exit
+		j.exit(2)
 	
 	
 //	function FuncLink (|jbin| j)
