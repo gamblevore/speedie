@@ -211,83 +211,103 @@ module PackMaker
 
 
 	function PackClasses (|jbin| j)
+		opt norefcounts
 		j.enter(@tmp, "clss")
-		typeobject!.PackClassChildren(j)
+		for c in Compiler.ClassList
+			if c.NeedsPackExport
+				C.DescribeInPack(j)
 		j.exit
 	
 	
-	function FuncLink (|jbin| j)
-		opt norefcounts
-		j.tmp("flnk")
-		
-		for linked in .libfuncs
-			if LibSaved.AddOrShrink(j, linked is UsedByASM)
-				j.add(@thg, linked.ExportName)
-		j.exit(2)
+//	function FuncLink (|jbin| j)
+//		opt norefcounts
+//		j.tmp("flnk")
+//		
+//		for linked in .libfuncs
+//			if LibSaved.AddOrShrink(j, linked is UsedByASM)
+//				j.add(@thg, linked.ExportName)
+//		j.exit(2)
+//
+//	
+//	
+//	function GlobLink (|jbin| j)
+//		opt norefcounts
+//		j.tmp("glnk")
+//		for linked in .LibGlobs
+//			if LibGlobSaved.AddOrShrink(j, linked is usedbyasm)
+//				j.add(@thg, linked.ExportName)
+//		j.exit(2)
 
-	
-	
-	function GlobLink (|jbin| j)
-		opt norefcounts
-		j.tmp("glnk")
-		for linked in .LibGlobs
-			if LibGlobSaved.AddOrShrink(j, linked is usedbyasm)
-				j.add(@thg, linked.ExportName)
-		j.exit(2)
 
+//	function SCClass.HasPackChildren (|bool|)
+//		opt norefcounts
+//		for c in .children
+//			if !c.isrole and !c.IsLibrary
+//				return true
+//			if c.HasPackChildren
+//				return true
+	
+	
+	function SCClass.NeedsPackExport (|bool|)
+		return .isobject and !.IsLibrary and !.IsRole and .MyReacher
 
-	function SCClass.HasPackChildren (|bool|)
-		opt norefcounts
-		for c in .children
-			if !c.isrole and !c.IsLibrary
-				return true
-			if c.HasPackChildren
-				return true
-	
-	
-	function SCClass.PackClassChildren (|jbin!| j)
-		opt norefcounts
-		require .HasPackChildren
-		j.enter
-		for c in .children
-			if c.isrole
-				c.PackClassChildren(j)
-			  else
-				c.packexport(j)
-		j.exit
-	
-	
-	function SCClass.PackExport (|jbin| j)
-		opt norefcounts
-		require .MyReacher or .IsLibrary or .HasPackChildren
-		j.enter(@tmp, .name)
-		if !.IsLibrary
-			.DescribeInPack(j)
-		.PackClassChildren(j)
-		j.exit
+//	function SCClass.PackClassChildren (|jbin!| j)
+//		opt norefcounts
+//		require .HasPackChildren
+//		j.enter
+//		for c in .children
+//			if c.isrole
+//				c.PackClassChildren(j)
+//			  else
+//				c.packexport(j)
+//		j.exit
+//	
+//	
+//	function SCClass.PackExport (|jbin| j)
+//		opt norefcounts
+//		require .MyReacher or .IsLibrary or .HasPackChildren
+//		j.enter(@tmp, .name)
+//		if !.IsLibrary
+//			.DescribeInPack(j)
+//		.PackClassChildren(j)
+//		j.exit
 		
-		
+	function SCClass.DestructorFuncName (|string|)
+		opt norefcounts
+		|| df = .DestructorFunc
+			return df.exportname
+		return "0"		
+	
+	
 	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
-		|| sz = (0, .clssize)(.iswrapper)
+		|| sz = .clssize
+		j.enter(@tmp, .name)
+		
+		j.Enter(@list)     //////     //////     //////
+		j.Addstr(.super!.name)
 		j.addint(sz)
-		j.enter(@list)
-	
-		|| name = "0"
-		|| df = .DestructorFunc
-			name = df.exportname
-		j.add(@thg, name)
+		j.AddInt(.TypeNormal.ExportPosition)
+		j.exit     		   ///
+		
+		j.enter(@list)     //////     //////     //////
+		j.add(@thg, .DestructorFuncName)
 	
 		|| b = .behaviour
 		while (b)
 			for (M in b.interfaces)
-				|| fn = .BestBehaviourFor(m.name.InterfaceToBehaviour)
+				|| s = m.name.InterfaceToBehaviour
+				|| fn = .BestBehaviourFor(s)
 					|| BaseClass = .InterfaceForBehaviour(fn)
 						j.add(@thg, fn.exportname)
+						fn = nil
+				if fn: .missingbehaviour(s)
+
 			b = b.upwards
 		
+		j.exit    		   ///
+		
 		j.exit
-
 	
 
 function SCFunction.WrappedName (|string|)

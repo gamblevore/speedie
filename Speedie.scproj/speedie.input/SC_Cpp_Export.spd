@@ -462,6 +462,10 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 	self <~ ";\n"
 
 
+function SCClass.MissingBehaviour (|string| s)
+	error (.source, "Missing behaviour: " + s)
+
+
 function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 	|| b		= cls.behaviour									#require
 	|| TableCls = b.FuncTable!.cls
@@ -475,7 +479,7 @@ function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 	fs <~ N
 	fs <~ " Result;\n"
 	
-	// behaviours are exported here! 679
+	// behaviours are exported here!
 	fs.AppendBehaviour("", cls.destructorfunc, nil)
 	
 	while (b)
@@ -483,13 +487,12 @@ function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 			|| s = m.name.InterfaceToBehaviour
 			|| fn = cls.BestBehaviourFor(s)
 				|| BaseClass = cls.InterfaceForBehaviour(fn)
-					if (M.IsRequiredInterface and !cls.Behaviour![s])
-						|| msg = "Missing behaviour on class: " + cls.name
-						error (cls.source, msg)
-						error (baseclass.funcproto!.source, msg)
-					fs.AppendBehaviour(s, fn, Baseclass)
-			  else
-				error (cls.source, "Missing behaviour on class: " + s)
+					ifn (M.IsRequiredInterface and !cls.Behaviour![s])
+						fs.AppendBehaviour(s, fn, Baseclass)
+						fn = nil
+			
+			if fn
+				cls.MissingBehaviour(s)
 		b = b.upwards
 	
 	fs <~ "\treturn Result;\n}\n\n"

@@ -19,7 +19,7 @@ linkage
 |message?|					InitAfter
 |bool|						IsImport
 |bool|						Inited
-|bool|						IsRequiredInterface
+|bool|						IsRequiredInterface // perhaps remove this. or at least test BEFORE doing a c++ compile!
 
 
 constructor
