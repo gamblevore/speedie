@@ -3606,7 +3606,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[258]);
-	JB_FS_AppendInt32(_fsf0, (2025111914));
+	JB_FS_AppendInt32(_fsf0, (2025111916));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8857,7 +8857,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1249]);
-	JB_FS_AppendInt32(_fsf0, (2025111914));
+	JB_FS_AppendInt32(_fsf0, (2025111916));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -18483,28 +18483,35 @@ ASMReg SC_ASMType__TypeCast(Assembler* Self, Message* Exp, ASMReg Dest) {
 		return From;
 	}
 	uint OldType = SC_Reg_xC2xB5Type(From);
+	if (JB_TC_SyntaxIs(OldType, kJB__TC_bool)) {
+		From = SC_Reg_xC2xB5TypeSetWithTc(From, NewType);
+		return From;
+	}
 	if (JB_TC_SyntaxIs(NewType, kJB__TC_bool)) {
 		if ((JB_TC_SyntaxIs(OldType, kJB__TC_bool)) and ((!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)))) {
 			return From;
 		}
 		return SC_Pac_NotEq(Self, Exp, Dest, SC_Reg__New(), From);
 	}
-	if ((JB_TC_BitCount(NewType) == JB_TC_BitCount(OldType)) and (JB_TC_IsFloat(NewType) == JB_TC_IsFloat(OldType))) {
-		From = SC_Reg_xC2xB5TypeSetWithTc(From, NewType);
-		return From;
-	}
-	Dest = SC_Pac_TempOnly(Self, Dest);
 	Dest = SC_Reg_xC2xB5TypeSetWithTc(Dest, NewType);
 	if (SC_Reg_SyntaxIs(From, kSC__Reg_Const)) {
 		return SC_ASMType__ConstConvert(Self, Exp, Dest, From, OldType, NewType);
 	}
 	int OV = JB_TC_VecCount(OldType);
 	int NV = JB_TC_VecCount(NewType);
-	if ((OV | NV) > 1) {
-		if ((OV > 1) != (NV > 1)) {
+	if ((OV | NV) <= 1) {
+		if ((JB_TC_BitCount(NewType) == JB_TC_BitCount(OldType)) and (JB_TC_IsFloat(NewType) == JB_TC_IsFloat(OldType))) {
+			From = SC_Reg_xC2xB5TypeSetWithTc(From, NewType);
+			return From;
 		}
+	}
+	Dest = SC_Pac_TempOnly(Self, Dest);
+	if ((OV | NV) > 1) {
 		if (JB_TC_IsFloat(NewType) == JB_TC_IsFloat(OldType)) {
-			if (SC_Reg_OperatorIz(Dest, From) or SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp)) {
+			if (((OV == 3) and (NV == 4)) or ((NV == 3) and (OV == 4))) {
+				return From;
+			}
+			if (SC_Reg_OperatorIz(Dest, From)) {
 				return Dest;
 			}
 			return SC_FAT_AsReg(SC_Msg_VMOV(Exp, Dest, From, nil, nil), Dest);
@@ -18513,10 +18520,6 @@ ASMReg SC_ASMType__TypeCast(Assembler* Self, Message* Exp, ASMReg Dest) {
 	}
 	if (JB_TC_IsFloat(OldType) or JB_TC_IsFloat(NewType)) {
 		return SC_FAT_AsReg(SC_Msg_CONV(Exp, Dest, From, SC_TC_ASMConv(OldType, NewType)), Dest);
-	}
-	if (JB_TC_SyntaxIs(OldType, kJB__TC_bool)) {
-		From = SC_Reg_xC2xB5TypeSetWithTc(From, NewType);
-		return From;
 	}
 	int Sh2 = 64 - JB_TC_BitCount(NewType);
 	return SC_FAT_AsReg(SC_Msg_BFLG(Exp, Dest, From, Sh2, Sh2, ((int)SC_Reg_Signed(Dest))), Dest);
