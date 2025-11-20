@@ -46,7 +46,7 @@ function ProductNameFull (|string|)
 
 function ProductSuffix (|String|)
 	if options.modepack
-		if options.targetdebug
+		if options.targetdebug and options.CompileDebugSeparately
 			return ".dbg.cake"
 		return ".cake"
 	require Options.ProjectIsLibrary

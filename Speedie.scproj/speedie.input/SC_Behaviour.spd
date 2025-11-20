@@ -155,20 +155,16 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCClass.ProcessBehavioursSub
-		dbg_decl_layer()
 		|| B = .behaviour										#require
 		|| Table = b.FuncTable									#require
 		|| TableCls = Table.cls									#require
 		
-		dbg_decl_layer()
 		for (fn in B)
 			.FillInterFaceIn(fn, false)
 		
-		dbg_decl_layer()
 		for (W in b.Wrapperfuncs)
 			.FillInterfaceWrapper(w)
 
-		dbg_decl_layer()
 		for (interface in B.interfaces)
 			interface.AddInterfaceToTable(TableCls)
 	
@@ -350,8 +346,3 @@ function SCClass.RenameInterfaces
 	for (f in b.interfaces)
 		|| it = f.cls
 			it.name = it.CppClass + it.name
-
-
-function dbg_decl_layer // sigh
-	ifn (scdecl).layer.obj
-		if scimport.curr

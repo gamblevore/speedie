@@ -19,6 +19,7 @@ module Options
 	||		MakeInterpreter			= false
 	||		Compile					= true
 	||		TargetDebug				= false
+	||		CompileDebugSeparately  = false // for now
 	||		PrintMemoryUsage		= false
 	||		PrintLibraries			= false
 	||		GenFlowControlCode		= false

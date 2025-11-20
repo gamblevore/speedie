@@ -212,110 +212,60 @@ module PackMaker
 	function PackClasses (|jbin| j)
 		opt norefcounts
 		j.tmp("clss")
-		|[scfunction]| r = array()
 		for c in Compiler.ClassList
 			if c.NeedsPackExport
-				C.DescribeInPack(j, r)
+				C.DescribeInPack(j)
 		j.exit(2)
-	
-	
-//	function FuncLink (|jbin| j)
-//		opt norefcounts
-//		j.tmp("flnk")
-//		
-//		for linked in .libfuncs
-//			if LibSaved.AddOrShrink(j, linked is UsedByASM)
-//				j.add(@thg, linked.ExportName)
-//		j.exit(2)
-//
-//	
-//	
-//	function GlobLink (|jbin| j)
-//		opt norefcounts
-//		j.tmp("glnk")
-//		for linked in .LibGlobs
-//			if LibGlobSaved.AddOrShrink(j, linked is usedbyasm)
-//				j.add(@thg, linked.ExportName)
-//		j.exit(2)
-
-
-//	function SCClass.HasPackChildren (|bool|)
-//		opt norefcounts
-//		for c in .children
-//			if !c.isrole and !c.IsLibrary
-//				return true
-//			if c.HasPackChildren
-//				return true
 	
 	
 	function SCClass.NeedsPackExport (|bool|)
 		return .isobject and !.IsLibrary and !.IsRole and .MyReacher
 
-//	function SCClass.PackClassChildren (|jbin!| j)
-//		opt norefcounts
-//		require .HasPackChildren
-//		j.enter
-//		for c in .children
-//			if c.isrole
-//				c.PackClassChildren(j)
-//			  else
-//				c.packexport(j)
-//		j.exit
-//	
-//	
-//	function SCClass.PackExport (|jbin| j)
-//		opt norefcounts
-//		require .MyReacher or .IsLibrary or .HasPackChildren
-//		j.enter(@tmp, .name)
-//		if !.IsLibrary
-//			.DescribeInPack(j)
-//		.PackClassChildren(j)
-//		j.exit
-		
-	function SCClass.DestructorFuncName (|string|)
-		opt norefcounts
-		|| df = .DestructorFunc
-			return df.exportname
-		return "0"		
 	
-	function scclass.CollectBehaviours (|[scfunction]| list)
+	function scclass.CollectBehaviours (|jbin| j, |scbehaviour!| B)
 		opt norefcounts
-		|| b = .behaviour
-		while (b)
-			for (M in b.interfaces)
-				|| s = m.name.InterfaceToBehaviour
-				|| fn = .BestBehaviourFor(s)
-					|| BaseClass = .InterfaceForBehaviour(fn)
-						list <~ fn
-						fn = nil
-				if fn: .missingbehaviour(s)
+		|| up = b.upwards
+			.CollectBehaviours(j, up)
 
-			b = b.upwards
+		|| ft = b.functable$
+		|| ftc = ft.cls!
+		for (M in ftc.properties) // could I change the cpp exporter to use this same approach?
+			|| fn = .BestBehaviourFor(m.name) // might as well?
+				|| BaseClass = .InterfaceForBehaviour(fn)
+					j.Cakeify(fn)
+					continue
+			.missingbehaviour(m.name)
 
 	
-	function SCClass.DescribeInPack (|jbin| j, |[scfunction]| list)
+	function jbin.Cakeify (|scfunction| fn)
+		if !fn
+			.addint 0
+			return
+		if 1 or Options.TargetDebug // seems better to always get names, for debugging!
+			.Enter(@unit, fn.name)
+		|| id = fn.PackID						#check (fn.source, "Missing PackID")
+		id = (id << 1) + fn.IsLibrary
+		.AddInt(id)
+		if 1 or Options.TargetDebug
+			.exit
+
+	
+	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
+		|| B = .behaviour							#expect (.source, "Missing behaviour: " + .name)
 		|| sz = .clssize
 		j.enter(@tmp, .name)
 		
 		j.Enter(@list)     //////     //////     //////
-		j.Addstr(.super!.name)
+		j.Add(@thg, .super!.name)
 		j.addint(sz)
-		j.AddInt(.TypeNormal.ExportPosition)
+		// hmmmmm.... class?
+		j.AddInt(.classtype!.ExportPosition)
 		j.exit     		   ///
 		
 		j.enter(@list)     //////     //////     //////
-		j.add(@thg, .DestructorFuncName)
-		.CollectBehaviours(list)
-		for fn in list
-			j.Enter(@unit, fn.name)
-			|| id = fn.PackID
-			if fn.IsLibrary
-				id = 123 // wheres the exportposition?? hmmmm
-			j.AddInt(id)
-			j.exit
-		list.Clear
-		
+		j.Cakeify(.destructorfunc)
+		.CollectBehaviours(j, B)
 		j.exit    		   ///
 		j.exit
 	

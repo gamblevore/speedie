@@ -390,12 +390,14 @@ function AppendCppField (|string| prop, |FastStringCpp| fs)
 
 
 function ExportProperties (|SCClass| cls, |FastStringCpp|fs, |string?| Ignore=nil)
+	opt norefcounts
 	for prop in cls.Properties
 		if prop.name != Ignore
 			.AppendPropField(prop, fs)
 
 
 function ExportOneProperty (|SCClass| cls, |FastStringCpp|fs, |string| Only, |bool|)
+	opt norefcounts
 	for prop in cls.Properties
 		if prop.name == Only
 			.AppendPropField(prop, fs)
@@ -413,7 +415,7 @@ function scclass.WriteStructOrUnion (|faststringcpp| fs)
 function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
 	|| fs = .TypesProj
 	cls.WriteStructOrUnion(fs)
-	if Cls.IsModel
+	if Cls.IsModel // should remove this
 		fs <~ "__attribute__((__packed__)) "
 	
 	fs <~ cls.cstructname
