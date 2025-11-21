@@ -69,8 +69,10 @@ autogen @string.MainArg      (|int| Pos, |string| name, |string|)
 
 autogen @message.MainArg     (|int| Pos, |string| name, |message|)
 	|| str = string.MainArgSub(Pos, name, "jeebox")
-	if (str[] == '/') and !(str contains '\n') // a file-path?
-		return str.file.parse
+	ifn str contains '\n' // a file-path?
+		|| s0 = str[]
+		if (s0 == '/') or (s0 == '.' and str[1] == '/')
+			return str.file.parse
 	return str.parse
 
 autogen @float.MainArg       (|int| Pos, |string| name, |Float64|)

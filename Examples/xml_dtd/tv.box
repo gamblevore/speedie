@@ -1,8 +1,5 @@
 #!/usr/local/speedie/Examples/xml_dtd/tv.val.spd
 
-// Replaces XML file with an improve jeebox version
-// Also: This file can self-validate via the shell.
-
 // Loosely modelled after the xmltv format, but
 // shrunk and simplified to make for a good demo.
 
@@ -28,4 +25,7 @@ tv (generator_name: "my listings generator")
 				aspect "16/9"
 			star_rating
 				value "3/3"
+
+// Replaces XML file with an improve jeebox version
+// Also: This file can self-validate via the shell.
 
