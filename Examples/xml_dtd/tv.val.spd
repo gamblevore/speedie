@@ -5,7 +5,7 @@
 
 function validator.NameAndLang
 	.GetRealName
-	.Allow(@bra).end[@thg]			// does not make error if @bra missing :]
+	.Allow(@bra).end[@thg]					// does not make error if @bra missing :]
 
 
 function validator.CheckTime
@@ -19,12 +19,10 @@ function Validator.StrList (|string| name)
 
 
 function Validator.GetRealName (|validator|)
-	nil self
-	|| str = self[@str]
-		expect (str.name) (self, "Empty name")
-		if noisy
-			printline str // just make output more interesting
-		return str
+	rz = self[@str]$
+	expect (rz.name) (rz, "Empty name")
+	if noisy
+		printline rz						// just make output more interesting
 
 
 || Noisy = app.yes("noisy")
