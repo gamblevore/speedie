@@ -51,7 +51,7 @@ main (|Message| TV_Guide)
 
 
 function validator.ProcessProgram
-	self[@tmp, "start"].CheckTime				// how to say that its last and has no children... or that it has no children?
+	self[@tmp, "start"].CheckTime
 	.allow(@tmp, "stop").CheckTime
 	
 	for title in .Some("title"):  title.NameAndLang
