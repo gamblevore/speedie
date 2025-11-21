@@ -186,13 +186,13 @@ class String
 		cpp_Wrapper JB_Str_TextIntegerValid
 	
 	function Int (|int64|)
-		return .parseint
+		return .parseint(nil)
 	
-	function Float (|Float64|)
+	function Float (|bool| Suffixes = false, |Float64|)
 		nil checker
 		return .parsefloat(nil)
 	
-	function ParseFloat (|Message| Where=nil, |Float64|)
+	function ParseFloat (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
 		nil checker
 		cpp_Wrapper JB_Str_TextDouble
 	
@@ -502,11 +502,12 @@ class String
 		cpp_part CastZero
 		return .cstr
 
-	function Byte (|int| index, |Byte| Default, |int|)
+	function Byte (|int| index, |int| Default, |int|)
 		cpp_wrapper JB_Str_ByteValue2
 		
 	syntax Access (|int| index, |Byte|)
 		nil checker
+		description "Returns 0 if the value can't be found. If you want a different number, call .byte(|int| index, |int| default)" 
 		cpp_wrapper JB_Str_ByteValue
 		
 	syntax Access (|int| start, |int| after, |string|)
@@ -516,7 +517,7 @@ class String
 		|| L = .length
 		return self[L-N, L]
 	
-	function Codepoint (|bool| Strict=true, |codepoint|)
+	function Codepoint (|bool| Strict=true, |CodePoint|)
 		cpp_wrapper JB_Str_UTF8Value
 		
 	syntax Access (|ivec2| r, |string|)
@@ -541,6 +542,11 @@ class String
 	syntax Equals (|int| Other, |bool|)
 		cpp_part EqualsInt
 		return .length == other
+	
+//	syntax Equals (|byte| Other, |bool|)
+//		cpp_part Equalsbyte
+//		disabled "huh?"
+
 	
 	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
 		|| n	= .length

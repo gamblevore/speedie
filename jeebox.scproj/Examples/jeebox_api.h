@@ -247,8 +247,10 @@ jbstring* jb_readfile(_cstring Path, bool AllowMissingFile); /* Reads entire fil
 #define $xcdt 53
 #define JB_SyxXTxt 54;
 #define $xtxt 54
-#define JB_Syxmax 55;
-#define $max 55
+#define JB_SyxXDTD 55;
+#define $xdtd 55
+#define JB_Syxmax 56;
+#define $max 56
 
 
 #ifdef __nodebug

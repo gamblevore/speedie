@@ -826,7 +826,7 @@ Message is also:
 
 	function ReportFailiure (|syntax| s, |string?| name = nil, |message?| found = nil)
 		cpp_part CantFind
-		if !self
+		if !self and !found
 			jb_api.NilHandler
 			return
 		
@@ -943,10 +943,10 @@ Message is also:
 		.ReportFailiure(s, Nil, ch)
 	
 	
-	Syntax Access (|Syntax| s, |string| name, |Message|)
+	Syntax Access (|Syntax| s, |string?| name, |Message|)
 		cpp_Part NeedSyxName
 		Opt NoRefCounts
-		|| f = self[s] // why @nil?
+		|| f = self[s]
 		if f.expect(@nil, name)
 			return f
 	
@@ -1117,17 +1117,8 @@ Message is also:
 		if (n == 1) or (n == 2 and self[1] == 'B')
 			return self[].SuffixSize
 
-	helper byte.SuffixSize (|int64|)	
-		if self == 'K'
-			return 1<<10
-		if self == 'M'
-			return 1<<20
-		if self == 'G'
-			return 1<<30
-		if self == 'T'
-			return 1<<40
-		if self == 'P'
-			return 1<<50
+	helper byte.SuffixSize (|int64|)
+		cpp_wrapper
 		
 	
 	function Int (|int| StrStart = 0, |int64|)

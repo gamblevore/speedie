@@ -1,0 +1,73 @@
+#!/usr/local/bin/spd
+
+// modelled after https://sources.debian.org/src/xmltv/1.0.0-1/xmltv.dtd/
+// but shrunk and simplified to make a good demo! :)
+
+function validator.NameAndLang
+	.GetRealName
+	.Allow(@bra).end[@thg]			// does not make error if @bra missing :]
+
+
+function validator.CheckTime
+	|| num = self[@num]
+		expect (num.msg.int > 0) (num, "Bad time")
+	
+
+function Validator.StrList (|string| name)
+	for Item in .Any(name)
+		item.GetRealName.end
+
+
+function Validator.GetRealName (|validator|)
+	nil self
+	|| str = self[@str]
+		expect (str.name) (self, "Empty name")
+		if noisy
+			printline str // just make output more interesting
+		return str
+
+
+|| Noisy = app.yes("noisy")
+main (|Message| TV_Guide)
+	|| tv = tv_guide.StartValidate(@tmp, "tv")					#require
+	
+	for item in tv.allow(@list).All(@item)
+		|| n = item[@thg]
+			check (n ~= "generator_name" or "generator_url" or "source_name" or "source_url" or "source_data") (n)
+			item.GetRealName
+	
+	for Chan in tv.Arg.All("channel")
+		Chan.GetRealName
+		|| Arg = chan.arg
+		for D in arg.Some("display_name")
+			D.NameAndLang
+
+		for prog in Arg.Any("programme")
+			|| A = prog.arg
+				A.ProcessProgram
+	
+	if StdErr.OK
+		"\nTV Guide seems fine!"
+
+
+function validator.ProcessProgram
+	self[@tmp, "start"].CheckTime				// how to say that its last and has no children... or that it has no children?
+	.allow(@tmp, "stop").CheckTime
+	
+	for title in .Some("title"):  title.NameAndLang
+	for desc in .Any("desc"):     desc.NameAndLang
+	
+	|| credits = .Allow("credits").arg
+		credits.StrList("director")
+		credits.StrList("actor")
+		
+	.Allow("date")[@num].End
+	.StrList("country")
+	.StrList("episode_num")
+	
+	|| Video = .Allow("video").arg
+		video["aspect"].GetRealName
+	|| star_rating = .Allow("star_rating").arg
+		star_rating["value"].GetRealName
+	.ChildEnd
+

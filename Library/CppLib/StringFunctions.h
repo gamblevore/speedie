@@ -158,7 +158,7 @@ struct Message;
 JB_String* JB_Str_UnicodeSync(JB_String* Str);
 int JB_Str_EncodingXMLGuess(JB_String* Data);
 JB_String* JB_Str_BOM(int Encoding, bool IsBigEndian);
-double JB_Str_TextDouble(JB_String* self, Message* Where);
+double JB_Str_TextDouble(JB_String* self, Message* Where, bool Suffixes);
 int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b );
 int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b );
 s64 JB_Str_HexInteger(JB_String* self, Message* b);
@@ -196,6 +196,9 @@ JB_String* JB_Str__Byte(int i);
 void JB_Str__LoadGlobals2();
 bool JB_Str_UniValid(u32 c);
 JB_String* JB_Str_FromInt( int L, int R );
+int64 JB_byte_SuffixSize (byte self);
+
+
 
 }
 

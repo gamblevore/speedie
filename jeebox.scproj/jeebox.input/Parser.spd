@@ -102,7 +102,7 @@ extend Parser
 		.tokenz("<",			kTemporalSyx,			fXML				)
 		.tokenz("<?",			kTemporalSyx,			fXML_PI				)
 		.tokenz("<!--",			kTemporalSyx,			fXML_Comment		)
-		.tokenz("<!DOCTYPE",	kTemporalSyx,			fXML_DocType		)
+		.tokenz("<!",			kTemporalSyx,			fXML_DTD			)
 
 // Ender //
 		.Tokenz( "] ) } #/ » ” ?>", kEndContainer,		fEndOfLine			)

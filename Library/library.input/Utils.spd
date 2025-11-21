@@ -32,7 +32,7 @@ role MessageTable (Dictionary)
 		super.valuelower(msg.name) = msg
 	
 
-function message.List (|[Message]|)
+function message.Array (|[Message]|)
 	opt norefcounts
 	for s in self
 		rz <~ s

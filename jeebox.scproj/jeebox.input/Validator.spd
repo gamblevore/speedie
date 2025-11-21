@@ -1,0 +1,118 @@
+class Validator
+	|Message|	Msg_
+	|Syntax|	TestFunc = @nil
+	|String?|	TestName = nil
+	|Message?|	Curr = nil
+	
+	iterator
+		while (|| Curr = .Allow)
+			yield Curr
+	
+	render
+		return .msg_.Render(fs_in)
+	
+	function Msg (|Message?|)
+		if self
+			return .msg_
+	
+	function Name (|string|)
+		if self
+			return .msg_.name
+	
+	function All (|syntax| Fn=@tmp, |string?| name=nil, |ValidatorSome|)
+		description "At least one must be found, and none after us."
+		return .any(fn, name)
+	
+	function Some (|syntax| Fn=@tmp, |string?| name=nil, |ValidatorSome|)
+		description "At least one must be found"
+		return .any(fn, name)
+		
+	function Any (|syntax| Fn=@tmp, |string?| name=nil, |Validator|)
+		nil checker
+		if self
+			.TestFunc = fn
+			.TestName = name
+			return self
+	
+	function End (|Validator|)
+		nil checker
+		if self
+			.msg_.ExpectLast
+		return self
+
+
+	function Upon (|message|)
+		opt norefcounts
+		|| upon = .curr
+			return upon.next
+		return .msg_.first
+	
+	
+	function Allow (|Validator|)
+		cpp_part Allow0
+		nil checker
+		if self
+			return .allow(.Testfunc, .Testname)
+
+	function Allow (|syntax| Fn=@tmp, |string?| name=nil,  |Validator|)
+		opt norefcounts
+		|| after = .Upon
+		if (After == fn) and (name == nil or After.name ~= name)
+			.curr = after
+			return validator(After)
+
+	syntax Access (|syntax| Fn=@tmp, |string?| name=nil,  |Validator|)
+		nil checker
+		opt norefcounts
+		if self
+			|| n = .allow(Fn, name)
+				return n
+			.msg_.ReportFailiure(Fn, name, .upon)
+	
+	function Arg (|validator|)
+		return self[@arg].end
+	
+	function ChildEnd
+		if self
+			.curr.ExpectLast
+	
+	autogen ReportMissing
+		if self
+			.msg_.parent.ReportFailiure(.testfunc, .testname)
+	
+	syntax Equals (|string?| s, |bool| Aware=false, |bool|)
+		cpp_part AllowStr
+		return .msg_.SyntaxEquals(s, aware)
+			
+	syntax Equals (|syntax| fn, |bool|)
+		return .msg_.func == fn
+			
+	syntax Expect (|string?| Description=nil)
+		.msg.SyntaxExpect(description)
+
+
+
+role ValidatorSome (Validator)
+	iterator
+		|| Count = 0
+		while (|| Curr = .Allow)
+			Count++
+			yield Curr
+		if !Count
+			.ReportMissing
+
+
+
+
+function Message.StartValidate (|syntax| func=nil, |string?| name=nil, |Validator|)
+	real self
+	opt norefcounts
+	if self == @arg
+		|| inner = .first
+		if inner == @sheb
+			inner++
+		if inner
+			inner.ExpectLast
+			self = inner
+	if .Expect(func, name)
+		return Validator(self)

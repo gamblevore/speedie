@@ -7,10 +7,8 @@ role YingYang (message)
 	module
 		|[yingyang]| _Items = nil
 		function States (|[yingyang]|)
-			if ._Items!=nil: return ._Items
-			|| databank = –digest file://yingyang.jb
-			._Items = DataBank.parse.list
-			return ._Items	
+			opt norefcounts
+			return ._items init (–digest file://yingyang.jb ).parse.array
 
 
 

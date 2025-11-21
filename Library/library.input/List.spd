@@ -324,7 +324,7 @@ class list (Saveable)
 
 
 	syntax access (||)
-//		disabled // do you mean .rand or self[0]
+		description "Returns the first item. Consistant with ptr[] == ptr[0]" 
 		return .first
 
 

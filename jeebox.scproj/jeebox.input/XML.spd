@@ -123,16 +123,27 @@ function parser.fXML_Comment (ParseHandler)
 	return parser.XMLWhatever(Start, 4, "-->", @xcom)
 
 
-function parser.fXML_DocType (ParseHandler)
-	for (i in .nextstart to .data.length-1)
-		|| c = .data[i]		// need to search for '[' just in case...
+function parser.fXML_DTD (ParseHandler)
+	opt norefcounts
+	|| d = .data
+/	|| i = .nextstart
+	
+	while (|| c = d[i++])
+		if c == '>'
+			.nextstart = i
+			return .newskip(nil, @xdtd, start, start+2, i-1)
 		if c == '['
-			i = .data.find(']', i)
-			ifn i
-				return .erroradd("Bad Doctype", start)
-		  elseif c == '>'
-			.nextstart = i + 1
-			return .new(nil, @xcom, start, .data[start+9, i])
+			|| after = d.find(']', i)
+			if after < 0 // not found	
+				exit
+			i = after+1
+	return .erroradd("Bad DTD Element", start)
+
+	// the internals COULD be structured.
+	// however... that will require a lot of effort.
+	// and I don't need to parse dtds. this is not an XML parser or a validating XML parser!
+	// simple things like abc-def would parse wrong
+
 
 
 extend message
@@ -193,6 +204,12 @@ extend message
 
 	syx XTxt (XML_Text)
 		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
+
+		
+	syx XDTD (XML_Comment)
+		fs <~ "<!"
+		fs <~ .name
+		fs <~ ">"
 
 	syx max (EndMarker)
 		0

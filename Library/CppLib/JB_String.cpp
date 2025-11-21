@@ -59,7 +59,9 @@ enum {
 
 
 
-bool JB_Byte_IsWhite(byte b);
+bool JB_Byte_IsWhite (byte self) {
+	return (self == 32) or (self == 10) or (self == 13) or (self == 9);
+}
 
 
 bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
@@ -1113,7 +1115,23 @@ static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd,
 }
 
 
-double JB_Str_TextDouble(JB_String* self, Message* Where) {
+int64 JB_byte_SuffixSize (byte self) {
+	if (self == 'K')
+		return 1ull<<10ull;
+	if (self == 'M')
+		return 1ull<<20ull;
+	if (self == 'G')
+		return 1ull<<30ull;
+	if (self == 'T')
+		return 1ull<<40ull;
+	if (self == 'P')
+		return 1ull<<50ull;
+	return 0;
+}
+
+
+
+double JB_Str_TextDouble (JB_String* self, Message* Where, bool Suffixes) {
 	if (!self) return 0;
 	int Length = JB_Str_Length(self);
 	uint8* ReadPlace = self->Addr;
@@ -1128,9 +1146,23 @@ double JB_Str_TextDouble(JB_String* self, Message* Where) {
 		  else
 			break;
 	}
-	bool IsMinus = (ReadPlace[0] == '-');
-	if (IsMinus and ++ReadPlace >= ReadEnd)
-		return 0;
+	
+	double Suffix = 1.0;
+	if (ReadEnd[-1] == 'B') {
+		ReadEnd--;
+		if (ReadPlace >= ReadEnd) { // "B" is the entire string!
+			ParseNumErr_( self, ReadPlace, Where, false );
+			return 0;
+		}
+		ReadEnd--;
+		Suffix = (double)JB_byte_SuffixSize(ReadEnd[0]);
+	}
+
+	if (ReadPlace[0] == '-') {
+		if (++ReadPlace >= ReadEnd)
+			return 0;
+		Suffix = -Suffix;
+	}
 
 	double Value = ParseDouble_( self, &ReadPlace, ReadEnd, false, Where, kParseEnd_Both );
 
@@ -1145,8 +1177,7 @@ double JB_Str_TextDouble(JB_String* self, Message* Where) {
 		Value = Value * pow(10, Exp);
 	}
 	
-	if (IsMinus) { Value = -Value; }
-	return Value;
+	return Value*Suffix;
 }
 
 
@@ -1451,10 +1482,6 @@ bool JB_Str_IsAsciiName(JB_String* self) {
 	return true;
 }
 
-
-bool JB_Byte_IsWhite(byte self) {
-	return (self == 32) or (self == 10) or (self == 13) or (self == 9);
-}
 
 
 CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);

@@ -1,0 +1,31 @@
+#!/usr/local/speedie/Examples/xml_dtd/tv.val.spd
+
+// Replaces XML file with an improve jeebox version
+// Also: This file can self-validate via the shell.
+
+// Loosely modelled after the xmltv format, but
+// shrunk and simplified to make for a good demo.
+
+tv (generator_name: "my listings generator")
+	channel "das-erste.de"
+		display_name "ARD" (nl)
+		display_name "Das Erste" (de)
+	channel "3sat.de"
+		display_name "3SAT" (de)
+		programme
+			start 200006031633
+			title "blah" (de)
+			title "blah" (en) 
+			desc "Blah Blah Blah." (de) 
+			credits 
+				director "James Blond"
+				actor "Snoopy"
+				actor "Woodstock"
+			date 1990_10_11
+			country "ES"
+			episode_num "2 . 9 . 0/1"
+			video
+				aspect "16/9"
+			star_rating
+				value "3/3"
+
