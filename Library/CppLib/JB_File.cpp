@@ -158,7 +158,7 @@ void JB_Flow__ReportStringData (u8* Addr, int Length, u8* Name, int NameLen) {
 #endif
 }
 
-inline void JB_Flow__Report (JB_String* data, JB_String* name) {
+void JB_Flow__Report (JB_String* data, JB_String* name) {
 #ifndef AS_LIBRARY
 	if (!Flow_Disabled)
 		JB_Flow__ReportStringData(data->Addr, data->Length, name->Addr, name->Length);

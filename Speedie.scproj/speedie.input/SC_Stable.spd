@@ -24,7 +24,7 @@ module Stability
 		if !rz.length
 			PackMaker.AddAll
 		rz.Sort(&CodeSorter.PackIDAndExportName)
-//		.Debug
+		.Debug
 	
 	
 	function Debug 

@@ -119,6 +119,10 @@ datatype vec4
 	function Reflect (|vec4| plane, |vec4|)
 		trin (24, RFL)	// cross
 		cpp_wrapper JB_vec4_Reflect
+
+	function Sum (|float|)
+		trin (25, SUM)
+		cpp_wrapper
 	
 	operator max (|vec4| M, |vec4|)
 		asm vmax(dest, p1, p2)
@@ -128,10 +132,6 @@ datatype vec4
 		asm vmin(dest, p1, p2)
 		cpp_wrapper JB_vec4_Min
 
-	function Sum (|float|)
-		trin (25, SUM)
-		cpp_wrapper
-	
 	function LengthSq (|float|)
 		return self • self
 

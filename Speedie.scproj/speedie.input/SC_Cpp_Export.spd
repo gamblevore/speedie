@@ -612,10 +612,19 @@ function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
 	fs.AppendCpp(lib_pack)
 	fs <~ ";
 
-extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) { // rename this to libpack
+extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) {
 	*Funcs = JB_PackPtrs;
 	return JB_StrCN(JB_LibFuncInfo, ${lib_pack.length});
 }
+
+extern \"C\" void** JB_App__LibFuncs() {
+	return &(JB_PackPtrs[0]);
+}
+
+extern \"C\" void** JB_App__LibGlobs() {
+	return (void**)(&JB__);
+}
+
 "
 
 

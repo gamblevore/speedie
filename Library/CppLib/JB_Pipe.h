@@ -28,8 +28,6 @@ void JB_AddProcess (int PID);
 int JB_Sh_Status (ShellStream* F);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
-ShellStream* JB_Sh_Next(ShellStream* self);
-ShellStream* JB_Sh__First();
 
 
 

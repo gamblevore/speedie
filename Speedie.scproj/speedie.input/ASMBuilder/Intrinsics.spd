@@ -25,10 +25,15 @@ module Intrinsics
 		require !compiler.InPerry
 		|| vm = FastString()
 		|| cpp = FastString()
+		cpp <~ `extern "C" {
+
+`
 		.ProcessTrin(vm, cpp, .Floats,  'F')
 		.ProcessTrin(vm, cpp, .Vectors, 'V')
 
 		VM_Builder.VMFile("vmtrin_gen.box").data = vm
+
+		cpp <~ `}`
 		VM_Builder.SafeWrite("vmtrin.h", cpp)
 
 		// put into vmtrin_gen.box, so we can manually fix vmtrin.box if needed.

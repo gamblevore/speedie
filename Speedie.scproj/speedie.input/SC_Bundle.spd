@@ -54,7 +54,7 @@ function compiler.AppleBuildApp (|file| product, |file| project)
 		expect (!dest) (dest, "This should not be a link")
 		
 		Compiler.stage("Create MacOSX Package")
-/		|| name			= .idealname
+		|| name			= .idealname
 		|| prefered_name=name + ".app"
 		|| final_app	= product.sibling(prefered_name)
 		|| copy_from	= project.child("OSX/"+prefered_name)

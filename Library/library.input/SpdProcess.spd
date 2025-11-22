@@ -233,16 +233,6 @@ prototype Thread (|pico| Comms, |uint16| Data, |&nil| Argument, |bool|)
 			pico_out.Close("")
 
 
-
-function app.fork (|PID_Int|)
-	cpp_wrapper fork
-	description "Calls unix's `fork()`. Does nothing else.
-
-To fork and communicate with speedie apps using messages, use spdprocess.spawnfork()
-
-To fork and talk to PicoMsg-based apps that aren't speedie, use pico.spawnfork()"
-
-
 prototype SpdDeathActionFn
 
 }

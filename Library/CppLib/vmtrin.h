@@ -1,3 +1,5 @@
+extern "C" {
+
 float JB_f_Fract(float Self);
 
 float JB_f_Length(float Self);
@@ -68,3 +70,4 @@ vec4 JB_vec4_Reflect(vec4 Self, vec4 Plane);
 
 float JB_vec4_Sum(vec4 Self);
 
+}

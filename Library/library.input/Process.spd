@@ -33,10 +33,6 @@ class Process
 	function Start (|ExitCode|)
 		cpp_Wrapper JB_Sh_StartProcess
 	
-	module
-		function First (|Process|)
-			cpp_wrapper
-
 	render
 		fs <~ "PID: $.pid\n${.path} $.args" // full path makes more sense, really.
 	
