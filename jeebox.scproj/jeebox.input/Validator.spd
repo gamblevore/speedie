@@ -14,6 +14,10 @@ class Validator
 	function Msg (|Message?|)
 		if self
 			return .msg_
+		
+	function Int (|int64| Low = int64.min, |int64| High = int64.max, |int64|)
+		if self
+			return .msg_.Int(0, low, high)
 	
 	function Name (|string|)
 		if self
