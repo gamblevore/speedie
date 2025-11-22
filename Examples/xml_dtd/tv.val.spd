@@ -25,6 +25,13 @@ function Validator.GetRealName (|validator|)
 		printline rz						// just make output more interesting
 
 
+function Validator.GetRatio (|int| Max, |validator|)
+	|| R = self[@Rel]$ // try doing this in XML! You can't!
+	R[@num].int(0,max)
+	R[@opp, "/"]
+	R[@num].int(0,max)
+
+
 || Noisy = app.yes("noisy")
 main (|Message| TV_Guide)
 	|| tv = tv_guide.StartValidate(@tmp, "tv")					#require
@@ -63,7 +70,7 @@ function validator.ProcessProgram
 	.StrList("country")
 	.StrList("episode_num")
 	
-	.Allow("video").arg["aspect"].GetRealName
-	.Allow("star_rating").arg["value"].GetRealName
+	.Allow("video").arg["aspect"].GetRatio(20)
+	.Allow("star_rating").arg["value"].GetRatio(100)
 	.ChildEnd
 

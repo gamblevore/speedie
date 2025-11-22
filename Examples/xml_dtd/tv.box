@@ -22,9 +22,9 @@ tv (generator_name: "my listings generator")
 			country "ES"
 			episode_num "2 . 9 . 0/1"
 			video
-				aspect "16/9"
+				aspect 16/9
 			star_rating
-				value "3/3"
+				value 3/3
 
 // Replaces XML file with an improve jeebox version
 // Also: This file can self-validate via the shell.
