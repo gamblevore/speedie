@@ -559,12 +559,16 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 
 function FillInterpreter
-	|| lib_pack = jbin()
-	.ListAllFuncs(.ModuleProperties, lib_pack)
+	stability.StabiliseFuncs
+	|| lib_pack = jbin() // fill in later! classes I guess?
+	|| str = lib_pack.getresult.compress
+	if str.parse								#check ("Invalid libpack")
+		.ListAllFuncs(.ModuleProperties, str)
 
 
 
 function faststring.appendvoid (|string| s, |byte| extra=0)
+	opt norefcounts
 	self <~ "\t(void*)"
 	if extra
 		self <~ extra
@@ -572,37 +576,45 @@ function faststring.appendvoid (|string| s, |byte| extra=0)
 	self <~ ",\n"
 
 
+function faststring.AppendWrap (|scfunction| f)
+	if (f.iscppinbuilt == 1) 
+		.appendvoid(f.ExportName + "Wrap")
+	  else
+		.appendvoid(f.ExportName)
+
+
 function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
-	fs <~ "// entire_function_list\n\n"
-	for f in PackMaker.libFuncs
-		if (f.iscppinbuilt == 1)
+	opt norefcounts
+	fs <~ "// entire_function_list!\n\n"
+	for f in packmaker.libfuncs
+		if (f.iscppinbuilt == 1) 
 			.MakeWrapperFor(fs, f)
 	
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
 
-	for f in PackMaker.libFuncs
-		fs.appendvoid(f.wrappedname)
+	|| Position = 0
+	for f in packmaker.libfuncs
+		if f.islibrary and f.NeedsLibExport
+			|| id = f.packid|int|
+			|| Missing = id - position
+			check (Missing > 0) (f, "Bad PackID?")
+			
+			while --missing >= 1
+				fs.appendvoid("(int64)(-1)")
+			fs.appendwrap(f)
+			position = id
 	
-	fs.appendvoid("0")
-	
-	for g in packmaker.LibGlobs
-		if g.exportglob
-			fs.appendvoid(g.exportname, '&')
-
 	fs.appendvoid("0")
 	fs <~ "};\n"
 
-	|| pack_str = lib_pack.compress
-	check (pack_str.parse) ("Invalid libpack")
 	
 	fs <~ `__lib__ const char* JB_LibFuncInfo = `
-	fs.AppendCpp(pack_str)
-	
+	fs.AppendCpp(lib_pack)
 	fs <~ ";
 
 extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) { // rename this to libpack
 	*Funcs = JB_PackPtrs;
-	return JB_StrCN(JB_LibFuncInfo, ${pack_str.length});
+	return JB_StrCN(JB_LibFuncInfo, ${lib_pack.length});
 }
 "
 
@@ -896,7 +908,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		exp.FillLibGlobs(exp.GlobsInLib)
 		exp.run
 		exp.WriteHeader
-		if Options.MakeInterpreter
+		if Options.MakeExec
 			exp.FillInterpreter
 		exp.FinalMergeOutputIntoACpp
 	

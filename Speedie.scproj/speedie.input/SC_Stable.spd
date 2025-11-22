@@ -1,15 +1,15 @@
 
 module Stability
-	|| LastID = 1
+	|| LastLibFuncID = 0 
 	
 	// todo: cpp_renderer needs to put dummy fields for empty spots
 
-	function Stabilise
+	function StabiliseFuncs
 		|| funcs = Compiler.library["stable_id_bank.txt"]
 		|| Data = funcs.ReadAll.trim
 		stability.UseFuncBank(data)
 		|| g = packmaker.PackGlobSize
-		if !options.MakeInterpreter
+		if !options.MakeExec
 			.StabliseFuncsSub(nil, g)
 		  else
 			|| fs = faststring()
@@ -17,19 +17,38 @@ module Stability
 			.StabliseFuncsSub(fs, g)
 			funcs.smartdata = fs|string|
 	
+
+	function SortExports (|[scfunction]|)
+		opt norefcounts
+		rz = packmaker.libfuncs
+		if !rz.length
+			PackMaker.AddAll
+		rz.Sort(&CodeSorter.PackIDAndExportName)
+//		.Debug
+	
+	
+	function Debug 
+		for f in packmaker.libfuncs
+			print f.packid|int|
+			print " "
+			printline f.exportname
+
 	
 	function StabliseFuncsSub (|faststring| fs, |int| frogs)
 		opt norefcounts
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
-		if platform.isdebug
-			Table = jb_vm.vm.InitTable(4096, frogs)
+		target debug
+			if !options.MakeExec
+				Table = jb_vm.vm.InitTable(4096, frogs)
 
-		|| lst = Compiler.FuncList.CopySort(&CodeSorter.exportnames)
+		// why this rather than the libfuncs?
+		// of course, if something isn't in the libfuncs, thats an issue.
+		// but it should be... by now?
 
-		for fn in lst
+		for fn in .sortexports
 			if fn.NeedsID
 				fn.MakeID(fs, table)
-	
+			
 	
 	function BuildLibGlobTable (|message| T, |dictionary of scdecl| table = dictionary())
 		opt norefcounts
@@ -61,7 +80,7 @@ module Stability
 		|| str = globs.readall(64K)
 		.BuildLibGlobTable(str.parse)			// fill table with old values
 		packmaker.OrderLibGlobs
-		if options.MakeInterpreter
+		if options.MakeExec
 			.DumpGlobs(globs)
 		
 	
@@ -77,7 +96,7 @@ module Stability
 		if !id
 			if fs
 				fs <~ "\n$.ExportName"
-			id = Stability.LastID++
+			id = Stability.LastLibFuncID++
 			.PackID = id
 		
 		if table
@@ -86,12 +105,14 @@ module Stability
 
 	
 	function UseFuncBank (|string| Data)
-		|| ID = LastID
+		|| ID = .LastLibFuncID
 		for str.lines in data
 			id++
 			|scbetternode--| fn = Compiler.ExportNames[str]
 			if fn isa SCFunction
+				if !fn.islibrary // huh? 
+				
 				check (!fn.PackID) (str + " replicated ID.")
 				fn.PackID = id
-		LastID = ID	
+		.LastLibFuncID = ID	
 	

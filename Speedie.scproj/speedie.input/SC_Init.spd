@@ -87,7 +87,10 @@ function Message.AllowedMoveToInit (|bool|)
 
 
 function SCModule.CreateInitFuncSub (|message| init, |string| name)
-	|| msg = "autogen $Name (|int|)".ParseClean
+	|| type = "helper"
+	if !.islibrary
+		type = "autogen"
+	|| msg = "$type $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)
@@ -102,9 +105,8 @@ function SCModule.CreateInitFunc
 	|| arg = .InitCodeArg
 		.CreateInitFuncSub(arg, "InitCode_")
 	
-	arg = .InitVarsArg
-	if arg
-		.CreateInitFuncSub(arg, "Init_")
+	|| arg2 = .InitVarsArg
+		.CreateInitFuncSub(arg2, "Init_")
 	scmodule.curr = nil
 
 

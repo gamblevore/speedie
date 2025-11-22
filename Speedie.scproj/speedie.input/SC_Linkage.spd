@@ -41,7 +41,7 @@ module Linkage
 	function CompilerCollect (|message| s)
 		opt norefcounts
 		Linkage.LinkCollect(s, Compiler.Program, nil)
-		options.MakeInterpreter = linkage.interpreter
+		options.MakeExec = linkage.interpreter
 		s.remove
 	
 

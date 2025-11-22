@@ -196,7 +196,7 @@ function compiler.DeadStrip
 	for f in packmaker.PackGlobs
 		f.reach
 
-	if options.MakeInterpreter		// must come before the next loop
+	if options.MakeExec		// must come before the next loop
 		for c in .classlist
 			c.reach(Compiler.Interpreter)
 	

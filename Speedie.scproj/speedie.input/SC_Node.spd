@@ -631,7 +631,7 @@ function ImportFile (|SCFile| file)
 	
 	file.Use
 	compiler.project = file.proj 
-	|| v = file.proj.IsSTDLib and Options.MakeInterpreter
+	|| v = file.proj.IsSTDLib and Options.MakeExec
 	compiler.program.CollectFromNode( ast, v )
 	file.Stop()
 

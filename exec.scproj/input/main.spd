@@ -5,10 +5,7 @@
 
 main
 	opt NoRefCounts
-	
-	return .DebugProj
-	
-
+	debugger
 	error.AutoPrint = 1
 	require Lib.LoadLib
 	require package.LoadPack
@@ -25,23 +22,6 @@ function App.ActAsSpeedie (|ErrorInt|)
 		while c.IsOpen
 			...
 		return c.Status
-
-
-function App.DebugProj (|ErrorInt|)
-	|| ProjArgs = app.args
-	|| Proj = ProjArgs[0].FileThatExists #require
-	ProjArgs.Remove(0)
-	|| proc = SpdProcess.Spawn(Proj, proj.name, ProjArgs, ProcessMode.PassThru)$
-	while proc.IsOpen
-		app.RespondToParent
-		...
-	return proc.Status
-	
-	// exec abc.spd p1 p2 p3
-	
-	// Lets try simply launching the fucker.
-	// Later, we can actually run the thing in a VM, no spawning
-
 
 
 function App.RespondToParent

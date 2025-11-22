@@ -99,7 +99,7 @@ module Linker
 
 module Lib	
 	|[xfunction]|				Funcs
-	|dictionary of &nil|		Globals = dictionary()
+//	|dictionary of &nil|		Globals = dictionary()
 	|int|						GlobalCount
 
 	function AddLibFunc (|xfunction| fn, |bool|)
@@ -123,7 +123,7 @@ module Lib
 
 	function LoadLib (|bool|)
 		|&&nil| Funcs 
-		|| spd = package.LibFuncLayout(funcs).parse
+/		|| spd = package.LibFuncLayout(funcs).parse
 		|| globs = .LoadLibFuncs(spd, funcs!)
 			.LoadLibGlobs(spd, globs)
 		if stderr.ok

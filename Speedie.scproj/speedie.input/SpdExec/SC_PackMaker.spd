@@ -22,13 +22,13 @@ module PackMaker
 	
 	
 	helper scfunction.NeedsLibExport (|bool|)
-		require (.MyReacher or options.MakeInterpreter)
-		require self isnt NoExport
+		require (.MyReacher or options.MakeExec)
+		require (self isnt NoExport) and !.ismacro
 		require self|scnode| isnt Private
 		return (.IsCppInBuilt < 2)
 	
 	
-	helper AddFunc (|scfunction| f)
+	helper AddFunc (|SCFunction| f)
 		opt norefcounts
 		if f.IsLibrary
 			if f.NeedsLibExport
@@ -39,7 +39,7 @@ module PackMaker
 				.PackFuncs <~ f
 	
 	
-	function AddAll (|int|)
+	function AddAll
 		opt norefcounts
 		for f in Compiler.FuncList
 			if f.CanLibLoad
@@ -56,7 +56,7 @@ module PackMaker
 			|| X = d.ExportPosition
 			if !X or X == globals
 				d.ExportPosition = globals			// its ok
-			  elseif (options.makeinterpreter)
+			  elseif (options.MakeExec)
 				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes of same size.")
 			  else
 				|| Backwards = x - globals
@@ -66,23 +66,22 @@ module PackMaker
 					error (d.source, d.name + " exportposition seems inserted? Regen export-table?")
 			globals += s
 
-		return Globals.AlignUp(8) // for strings, which come directly after
+		return Globals.AlignUp(8)					// for strings, which come directly after
 
 
 	function BuildGlobs (|bool|)
 		opt norefcounts
-		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
-		|| FnMain = compiler.xfunc("JB_Main")
-		require fninit and fnmain
+		|| PackInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
+		|| PackMain = compiler.xfunc("JB_Main")
+		require PackInit and PackMain
 		
-		fninit.PackID = 1 // put init and main first!
-		fnmain.PackID = 2
+		PackInit.PackID = 1 // put init and main first!
+		PackMain.PackID = 2
 
-		stability.Stabilise				
+		stability.StabiliseFuncs	
+					
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
-
-		.FinalPrepare
 		return true
 	
 	
@@ -107,7 +106,7 @@ module PackMaker
 
 	helper PackIDFuncs (|[scfunction]| list)
 		opt norefcounts
-		list.sort(&CodeSorter.ExportNames)
+		list.sort(&CodeSorter.PackIDAndExportName)
 		|| ID = 0
 		while (|| f = list[id])
 			f.PackID = ++id
@@ -115,13 +114,14 @@ module PackMaker
 	
 	function FATCompile (|bool|)
 		opt norefcounts
+		.FinalPrepare
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
 		
 		for (fn in .Packfuncs) (i)
 			require Assembler.sh.ASMCompile(fn, i+1)
 
-		.Packfuncs.sort(&CodeSorter.ExportNames)
+		.Packfuncs.sort(&CodeSorter.PackIDAndExportName)
 		
 		target debug
 			if !Compiler.InPerry

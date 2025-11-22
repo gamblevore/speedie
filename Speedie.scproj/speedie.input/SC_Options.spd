@@ -16,7 +16,7 @@ module Options
 
 	|bool|	InlineLib				= true
 	|byte|	Mode					= Cpp
-	||		MakeInterpreter			= false
+	||		MakeExec			= false
 	||		Compile					= true
 	||		TargetDebug				= false
 	||		CompileDebugSeparately  = false // for now

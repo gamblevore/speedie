@@ -813,7 +813,7 @@ function SCFunction.DetectIfReached
 	|| Base = Compiler.VisibleFuncs!
 	
 	if !.IsVisible	
-		require options.MakeInterpreter and (self Isnt Disabled)
+		require options.MakeExec and (self Isnt Disabled)
 		base = Compiler.Interpreter!
 	
 	.ReachFunc(base)

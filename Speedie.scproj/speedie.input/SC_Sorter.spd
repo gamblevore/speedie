@@ -13,17 +13,21 @@ module CodeSorter
 			f.FindDepths
 		compiler.FuncList.sort(Leafness)
 
+
 	helper PropertyOrder (sortercomparer of scdecl)
 		return .exportposition < b.exportposition
 	
-	helper ExportNames (sortercomparer of scfunction)
-		// just to help compression
+	
+	helper PackIDAndExportName (sortercomparer of scfunction)
 		|| fA = .PackID|int|
 		|| fB = b.PackID|int|
-		|| d = fb - fa  // we need init and main first
-			return d
+		if !fa or !fb
+			if !fa and !fb
+				return .ExportName < b.ExportName // just to help compression
+			return !fa
 		
-		return .ExportName < b.ExportName
+		return fb - fa	  // we need init and main first
+
 
 	function Leafness (sortercomparer of scfunction)
 		opt norefcounts
