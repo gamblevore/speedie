@@ -63,9 +63,7 @@ function validator.ProcessProgram
 	.StrList("country")
 	.StrList("episode_num")
 	
-	|| Video = .Allow("video").arg
-		video["aspect"].GetRealName
-	|| star_rating = .Allow("star_rating").arg
-		star_rating["value"].GetRealName
+	.Allow("video").arg["aspect"].GetRealName
+	.Allow("star_rating").arg["value"].GetRealName
 	.ChildEnd
 
