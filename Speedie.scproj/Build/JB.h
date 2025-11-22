@@ -397,6 +397,8 @@ struct TerminalCell_Behaviour;
 
 struct TokenHandler_Behaviour;
 
+struct Validator_Behaviour;
+
 struct xC2xB5Form_Behaviour;
 
 struct Array_Behaviour;
@@ -493,6 +495,8 @@ struct SyntaxObj;
 
 struct TerminalCell;
 
+struct Validator;
+
 struct xC2xB5Form;
 
 struct FastStringCpp;
@@ -510,6 +514,8 @@ struct SavingTest;
 struct SpdProcess;
 
 struct JB_String;
+
+struct Validator;
 
 struct Message;
 
@@ -657,7 +663,8 @@ typedef void (*InputStream_ParserCallBack_interface_prototype)(JB_Task* Self, Me
 #define kSyxXCom 52
 #define kSyxXCDT 53
 #define kSyxXTxt 54
-#define kSyxmax 55
+#define kSyxXDTD 55
+#define kSyxmax 56
 
 //// HEADER Proj.h
 
@@ -1531,18 +1538,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2260])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2259])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2261])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2260])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2262])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2261])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2259])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2258])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2262])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2261])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2263])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2262])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1619,6 +1626,7 @@ extern bool SC__Options_Beep;
 #define kSC__Options_cake ((int)2)
 
 extern bool SC__Options_Compile;
+extern bool SC__Options_CompileDebugSeparately;
 #define kSC__Options_cpp ((int)1)
 
 extern int SC__Options_Dev;
@@ -1630,7 +1638,7 @@ extern bool SC__Options_IgnoreCantSaveErrors;
 extern bool SC__Options_InlineLib;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
-extern bool SC__Options_MakeInterpreter;
+extern bool SC__Options_MakeExec;
 extern byte SC__Options_Mode;
 extern bool SC__Options_NilTestAllocNeverFails;
 extern byte SC__Options_OperationCount;
@@ -1656,7 +1664,6 @@ extern int SC__PackMaker__LibGlobSize;
 extern int SC__PackMaker__PackGlobSize;
 extern Array* SC__PackMaker_LibFuncs;
 extern Array* SC__PackMaker_LibGlobs;
-extern HairyMan SC__PackMaker_LibGlobSaved;
 extern HairyMan SC__PackMaker_LibSaved;
 extern Array* SC__PackMaker_PackFuncs;
 extern Array* SC__PackMaker_PackGlobs;
@@ -1711,7 +1718,7 @@ extern Macro* SC__SCTasks_TaskMacro;
 extern Message* SC__SCTasks_tmp;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
-extern int SC__Stability_LastID;
+extern int SC__Stability_LastLibFuncID;
 extern Array* SC__Crkt_CppStrings;
 extern Dictionary* SC__Crkt_Table2;
 extern int SC__Crkt_TotalSize;
@@ -1775,7 +1782,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2268])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2267])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1812,7 +1819,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2264])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2263])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1852,7 +1859,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2269])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2268])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -1903,7 +1910,7 @@ extern Dictionary* SC_RootCollectTable;
 
 #define kJB_SyxList ((Syntax)32)
 
-#define kJB_Syxmax ((Syntax)55)
+#define kJB_Syxmax ((Syntax)56)
 
 #define kJB_SyxMsg ((Syntax)46)
 
@@ -1962,6 +1969,8 @@ extern Dictionary* SC_RootCollectTable;
 #define kJB_SyxXCDT ((Syntax)53)
 
 #define kJB_SyxXCom ((Syntax)52)
+
+#define kJB_SyxXDTD ((Syntax)55)
 
 #define kJB_SyxXML ((Syntax)50)
 
@@ -2084,12 +2093,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2267])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2266])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2266])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2265])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2265])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2264])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3314,7 +3323,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2258])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2257])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3516,6 +3525,7 @@ struct JB_Globals {
 	uint64 Mrap_MDummy_[2];
 	CharProp CharProp_Item[256];
 	SyntaxObj* Constants__FuncArray[64];
+	JB_Class* ValidatorData;
 };
 extern JB_Globals JB__;
 
@@ -3565,8 +3575,6 @@ ExitCode JB_App__Say(JB_String* S, bool Print);
 
 JB_String* JB_App__SyntaxAccess(JB_String* Name);
 
-SpdProcess* JB_App__UsePico(PicoComms* Comms);
-
 bool JB_App__Yes(JB_String* Name);
 
 
@@ -3579,11 +3587,11 @@ bool SC_AutoComplete__IsAFunc(JB_String* S);
 
 
 // CodeSorter
-SortComparison SC_CodeSorter__ExportNames(SCFunction* Self, SCFunction* B);
-
 SortComparison SC_CodeSorter__Leafness(SCFunction* Self, SCFunction* B);
 
 void SC_CodeSorter__LeafsFirst();
+
+SortComparison SC_CodeSorter__PackIDAndExportName(SCFunction* Self, SCFunction* B);
 
 
 
@@ -4138,7 +4146,7 @@ bool SC_Options__ModePack();
 
 
 // PackMaker
-int SC_PackMaker__AddAll();
+void SC_PackMaker__AddAll();
 
 void SC_PackMaker__AddDebugStuff(FastString* J, JB_String* Func_names);
 
@@ -4377,7 +4385,9 @@ void SC_Stability__DumpGlobs(FastString* Fs, JB_File* F);
 
 int SC_Stability__Init_();
 
-void SC_Stability__Stabilise();
+Array* SC_Stability__SortExports();
+
+void SC_Stability__StabiliseFuncs();
 
 void SC_Stability__StabliseFuncsSub(FastString* Fs, int Frogs);
 
@@ -4693,8 +4703,6 @@ bool SC_CppRefTable_disturbs(SCFunction* Fn, Message* Node, SCNode* Name_space);
 void SC_Create_JeeboxTest(Message* Msg);
 
 SCDecl* SC_CustomFuncOp(Message* Exp, SCOperator* Comp, SCNode* Name_space, Message* RN);
-
-void SC_dbg_decl_layer();
 
 SCDecl* SC_DeclOfObjForC(Message* Curr);
 
@@ -5083,7 +5091,7 @@ Message* JB_Tk__fXML(int Start, Message* Parent);
 
 Message* JB_Tk__fXML_Comment(int Start, Message* Parent);
 
-Message* JB_Tk__fXML_DocType(int Start, Message* Parent);
+Message* JB_Tk__fXML_DTD(int Start, Message* Parent);
 
 Message* JB_Tk__fXML_PI(int Start, Message* Parent);
 
@@ -5224,8 +5232,6 @@ byte JB_byte_LowerCase(uint /*byte*/ Self);
 bool JB_byte_OperatorEq(uint /*byte*/ Self, uint /*byte*/ B);
 
 JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in);
-
-int64 JB_byte_SuffixSize(uint /*byte*/ Self);
 
 byte JB_byte_UpperCase(uint /*byte*/ Self);
 
@@ -7014,6 +7020,8 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait);
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait);
 
+SpdProcess* JB_Pico_UseAsParent(PicoComms* Self);
+
 PicoComms* JB_Pico__New(JB_StringC* Name, int Noise);
 
 
@@ -7609,6 +7617,9 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // JB_TokenHandler_Behaviour
 
 
+// JB_Validator_Behaviour
+
+
 // JB_µForm_Behaviour
 
 
@@ -8151,6 +8162,8 @@ void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S, uint /*byte*/ Quot
 void SC_FS_appendvoid(FastString* Self, JB_String* S, uint /*byte*/ Extra);
 
 void SC_FS_AppendWidth(FastString* Self, JB_String* S, int Width);
+
+void SC_FS_AppendWrap(FastString* Self, SCFunction* F);
 
 void SC_FS_CArrayAdd(FastString* Self, JB_String* S);
 
@@ -8696,7 +8709,7 @@ Ind JB_Str_FindSlash(JB_String* Self, int From);
 
 int JB_Str_FindTrailingSlashes(JB_String* Self);
 
-Float64 JB_Str_Float(JB_String* Self);
+Float64 JB_Str_Float(JB_String* Self, bool Suffixes);
 
 int64 JB_Str_Int(JB_String* Self);
 
@@ -8924,6 +8937,9 @@ void JB_TerminalCell_Destructor(TerminalCell* Self);
 // JB_TokenHandler
 
 
+// JB_Validator
+
+
 // JB_µForm
 void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, uint /*MuParam*/ P);
 
@@ -8953,8 +8969,6 @@ void SC_Array_AppendWords(Array* Self, JB_String* R);
 int SC_Array_CArraySize(Array* Self, int Size);
 
 void JB_Array_Clear(Array* Self);
-
-Array* JB_Array_CopySort(Array* Self, FP_SorterComparer Fn);
 
 void JB_Array_FastRemove(Array* Self, int Pos);
 
@@ -9105,6 +9119,8 @@ void JB_bin_AddInt(FastString* Self, int64 Name);
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
 
 void JB_bin_AddStr(FastString* Self, JB_String* Name);
+
+void SC_bin_Cakeify(FastString* Self, SCFunction* Fn);
 
 FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name);
 
@@ -9732,6 +9748,9 @@ int JB_Proc__Init_();
 
 
 // JB_StringZeroTerminated
+
+
+// JB_ValidatorSome
 
 
 // JB_list
@@ -11046,6 +11065,8 @@ void JB_Msg_XCDT__(Message* Self, FastString* Fs);
 
 void JB_Msg_XCom__(Message* Self, FastString* Fs);
 
+void JB_Msg_XDTD__(Message* Self, FastString* Fs);
+
 void JB_Msg_XML__(Message* Self, FastString* Fs);
 
 void JB_Msg_XPI__(Message* Self, FastString* Fs);
@@ -11284,6 +11305,8 @@ void SC_Class_CheckUnusedClass(SCClass* Self, Message* Feedback);
 
 void SC_Class_ClassCollect(SCClass* Self);
 
+void SC_Class_CollectBehaviours(SCClass* Self, FastString* J, SCBehaviour* B);
+
 bool SC_Class_CollectProp(SCClass* Self, Message* Msg);
 
 void SC_Class_CollectProperties(SCClass* Self);
@@ -11321,8 +11344,6 @@ void SC_Class_DeclModel(SCClass* Self);
 void SC_Class_DescribeInPack(SCClass* Self, FastString* J);
 
 void SC_Class_Destructor(SCClass* Self);
-
-JB_String* SC_Class_DestructorFuncName(SCClass* Self);
 
 SCFunction* SC_Class_DoSaver(SCClass* Self, JB_String* Name, int Stage);
 
@@ -12268,7 +12289,7 @@ inline JB_String* SC_SCObject_Name(SCObject* Self) {
 	if (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[13];
+	return JB_LUB[12];
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
