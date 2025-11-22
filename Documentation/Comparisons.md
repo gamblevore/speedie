@@ -143,6 +143,10 @@ Nope!
 
 Speedie realises that `F` might not exist. And so this code won't compile. Speedie is very intelligent around figuring out what vars can be `nil` or not. So you literally get all the safety with none of the nightmare overhead of Rust.
 
+_On November 18 2025, Cloudflare, which runs 20% of websites, and has micro-services used by many other websites such as Twitter, and ChatGPT, went down. It went down because.... Rust sucks. Specifically because of calling `.unwrap()`, which will crash your app sometimes. All because this is considered "memory safe"._
+
+This is how terrible Rust's idea of safety is. You can take down around 1/3rd of the internet and it is still considered "Safe". Imagine it had been worse, perhaps `.unwrap()` was used on a cruise-ship or an airplane. Now people are dying. I'd rather have a language that BLOCKS nil-object errors from even compiling (Speedie) than one that hides but allows them then covers it up with the illusion of "safety".
+
 
 ## C Comparison
 
