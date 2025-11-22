@@ -617,6 +617,10 @@ extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) {
 	return JB_StrCN(JB_LibFuncInfo, ${lib_pack.length});
 }
 
+extern \"C\" JB_String* JB_App__LibInfo() {
+	return JB_StrCN(JB_LibFuncInfo, ${lib_pack.length});
+}
+
 extern \"C\" void** JB_App__LibFuncs() {
 	return &(JB_PackPtrs[0]);
 }

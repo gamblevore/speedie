@@ -24,7 +24,9 @@ bool JB_Flow__IsDisabled();
 JB_String* JB_App__Path();
 int JB_App__SetEnv(JB_StringC* name, JB_StringC* value);
 int JB_Rec__PrintErrors();
-JB_String* JB_App__LibPack(void*** Funcs);   
+JB_String* JB_App__LibInfo();   
+void** JB_App__LibFuncs();
+void** JB_App__LibGlobs();
 JB_String* JB_App__LibClasses(); 
 
 // startup

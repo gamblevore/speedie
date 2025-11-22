@@ -64,19 +64,19 @@ class XClass
 
 
 	function LoadBehaviours	(|message| list)
-		opt norefcounts
-		|| i = 0
-		|| bc = list.SlowCount max 2
-		|&?&nil| Cpp,  |&?&nil| Spd 
-		
-		.realclass.AllocateBehaviour(bc, cpp, spd)
-		
-		for ch in list
-			|| fn = xfunction[ch]
-				cpp![i] = fn.CFunc
-				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
-				// the spd version should call the c++ version...
-			i++
+//		opt norefcounts
+//		|| i = 0
+//		|| bc = list.SlowCount max 2
+//		|&?&nil| Cpp,  |&?&nil| Spd 
+//		
+//		.realclass.AllocateBehaviour(bc, cpp, spd)
+//		
+//		for ch in list
+//			|| fn = xfunction[ch]
+//				cpp![i] = fn.CFunc
+//				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
+//				// the spd version should call the c++ version...
+//			i++
 		
 				
 	module

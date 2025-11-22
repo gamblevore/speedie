@@ -1,0 +1,80 @@
+
+
+module Lib	
+	|[xfunction]|				Funcs
+	|&&nil|						Globs
+	|&&nil|						RawFuncs
+	|string|					Info
+//	|dictionary of &nil|		Globals = dictionary()
+	|int|						GlobalCount
+
+//	function AddLibFunc (|xfunction| fn, |bool|)
+//		expect (.Funcs < 16K) ("Too many functions")			// for detecting corrupt lib
+//		fn.index = .Funcs.length
+//		.Funcs <~ fn
+//		linker <~ fn
+//		return true
+	
+	function AddLibGlob (|?&nil| where, |string| name, |bool|)
+		opt norefcounts
+		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
+		// wait we can't store ptrs in a dict? was this a wrapper obj?
+//		.Globals.valuelower(name) = where!
+		return true
+	
+	
+	syntax access (|int| i, |xfunction|)
+		return .Funcs[i]
+
+
+	function LoadLib (|bool|)
+		.rawFuncs = package.LibFuncs
+		.Globs = package.LibGlobs
+		.Info = package.LibInfo
+/		|| spd = .info.parse
+		if stderr.ok
+			return xclass.LoadInbuiltClasses
+
+	
+//	function LoadLibFuncs (|message| spd, |&&nil| Internals)
+//		opt norefcounts
+//		for ch in spd[@prm]
+//			|| fn = Internals++[]  #expect  (ch, "Missing lib function")
+//				
+//			require .AddLibFunc( xfunction(fn, ch.name) )
+//					
+//		check (!Internals[]) ("Extra InternalFunction")
+//
+//
+//	function LoadLibGlobs (|message| spd, |&&nil| Internals)
+//		opt norefcounts
+//		for ch in spd[@arr, 1]
+//			|| G = Internals++[]  #expect  (ch, "Missing lib global")
+//				
+//			require .AddLibGlob( G, ch.name )
+//
+//		check (!Internals[]) ("Extra global") 
+		
+
+
+module AppTable 
+	|int|			FnLim = 64K // allow configure? its more about corrupted files,
+								// Not "we can't handle more"!
+	|[xfunction]|	Funcs
+
+	syntax append (|xfunction| fn, |bool|)
+		if (.Funcs < FnLim)
+			fn.index = .Funcs.length
+			.Funcs <~ fn
+			return true
+		error (package.funcs, "Too many functions")
+	
+	
+	syntax access (|int| i, |xfunction|)
+		return .Funcs[i]
+	
+	function RunMain (|int|)
+		opt norefcounts
+		|| main = .funcs[1]					#expect ("Missing main")
+		rz  = .funcs[0]!.Run|&int64|[]
+		rz ?= main.Run|&int64|[]

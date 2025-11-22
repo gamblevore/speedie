@@ -208,8 +208,10 @@ __H__ vec4 JB_vec4_Mix (vec4 x, vec4 low, vec4 high) {
 	return low + (x * (high - low));
 }
 
-__H__ float JB_vec4_Sum (vec4 x) {
-	return x[0] + x[1] + x[2] + x[3];
+__H__ float JB_vec4_Sum (vec4 x, int Which) { // perhaps this would be better...
+	float r = x[0]*!(Which&1) + x[1]*!(Which&2);
+	r += x[2]*!(Which&4) + x[3]*!(Which&8);
+	return r;
 }
 
 __H__ float JB_vec4_Dot (vec4 x, vec4 y) {

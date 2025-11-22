@@ -9,13 +9,17 @@ module package
 	|config|		strings
 	
 	
-	function LibFuncLayout (|$?&&nil| funcs, |string|)
-		cpp_wrapper JB_App__LibPack
+	function LibGlobs (|&&nil|)
+		cpp_wrapper JB_App__LibGlobs
 
+	function LibInfo (|string|)
+		cpp_wrapper JB_App__LibInfo
+	
+	function LibFuncs (|&&nil|)
+		cpp_wrapper JB_App__LibFuncs
 
 	function LibClassLayout (|string|)
 		cpp_wrapper JB_App__LibClasses
-
 
 	function message.Arg (|string| name, |bool| Err = false, |message|)
 		opt norefcounts
@@ -29,7 +33,7 @@ module package
 	function LoadPack (|bool|)
 		if .getstructure and .Loadfuncs
 			if xclass.LoadPackClasses
-				return apptable.LinkEmUp‼
+				return true
 	
 	function GetStructure (|bool|)
 		opt norefcounts
@@ -65,7 +69,7 @@ module package
 
 		for spd in package.funcs
 			|| fn = xfunction(spd)
-			linker <~ fn
+//			linker <~ fn
 			if apptable <~ fn
 				fn.LinkCpp
 				fn.LinkSpd

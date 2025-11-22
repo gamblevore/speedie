@@ -348,7 +348,11 @@ module Feedback
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$
 			if value.optionbool
 				options.Mode = options.cake
-		
+
+		+'cake'
+			error "Do you mean bake?"
+			return true
+			
 		+'inlinelib'
 			options.InlineLib = value.optionbool
 		

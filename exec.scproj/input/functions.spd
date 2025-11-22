@@ -61,134 +61,22 @@ class XFunction
 		|int| 
 		bear = 0xB0B0BA14
 
-	module
-		syntax access (|message| s, |xfunction|)
-			if s == @num
-				return .int(s)
-			return Linker[s]
-		
-		function int (|message| s, |xfunction|)
-			opt norefcounts
-			|| i = s.int
-			|| i2 = i >> 1
-			if i & 1
-				|| fn = AppTable[i2]
-					return fn
-			  else
-				|| fn = Lib[i2]
-					return fn
-			s.CantFindFunc
-
-	
-	
-	
-module Linker
-	|dictionary of xfunction|	AllFuncs = dictionary()		// this is for the entire app...  inbuilt,  and pack combined
-
-	syntax append (|xfunction| fn)
-		AllFuncs.ValueLower(fn.name) = fn
-		
-	syntax access (|message| s, |xfunction|)
-		opt norefcounts
-		|| fn = .AllFuncs.ValueLower(s.name)
-			return fn
-		s.cantfindfunc
+	module		
+//		function int (|message| s, |xfunction|)
+//			opt norefcounts
+//			|| i = s.int
+//			|| i2 = i >> 1
+//			if i & 1
+//				|| fn = AppTable[i2]
+//					return fn
+//			  else
+//				|| fn = Lib[i2]
+//					return fn
+//			s.CantFindFunc
 
 
-
-
-module Lib	
-	|[xfunction]|				Funcs
-//	|dictionary of &nil|		Globals = dictionary()
-	|int|						GlobalCount
-
-	function AddLibFunc (|xfunction| fn, |bool|)
-		expect (.Funcs < 16K) ("Too many functions")			// for detecting corrupt lib
-		fn.index = .Funcs.length
-		.Funcs <~ fn
-		linker <~ fn
-		return true
-	
-	function AddLibGlob (|?&nil| where, |string| name, |bool|)
-		opt norefcounts
-		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
-		// wait we can't store ptrs in a dict? was this a wrapper obj?
-//		.Globals.valuelower(name) = where!
-		return true
-	
-	
-	syntax access (|int| i, |xfunction|)
-		return .Funcs[i]
-
-
-	function LoadLib (|bool|)
-		|&&nil| Funcs 
-/		|| spd = package.LibFuncLayout(funcs).parse
-		|| globs = .LoadLibFuncs(spd, funcs!)
-			.LoadLibGlobs(spd, globs)
-		if stderr.ok
-			return xclass.LoadInbuiltClasses
-
-	
-	function LoadLibFuncs (|message| spd, |&&nil| Internals, |&&nil|)
-		opt norefcounts
-		for ch in spd[@prm]
-			|| fn = Internals++[]  #expect  (ch, "Missing lib function")
-				
-			require .AddLibFunc( xfunction(fn, ch.name) )
-					
-		check (!Internals[]) ("Extra InternalFunction")
-		return internals+1
-
-
-	function LoadLibGlobs (|message| spd, |&&nil| Internals)
-		opt norefcounts
-		for ch in spd[@arr, 1]
-			|| G = Internals++[]  #expect  (ch, "Missing lib global")
-				
-			require .AddLibGlob( G, ch.name )
-
-		check (!Internals[]) ("Extra global") 
-		
-
-
-module AppTable 
-	|int|			FnLim = 64K // allow configure? its more about corrupted files,
-								// Not "we can't handle more"!
-	|[xfunction]|	Funcs
-	|[xfunction]|	LinkOrder 
-
-	syntax append (|xfunction| fn, |bool|)
-		if (.Funcs < FnLim)
-			fn.index = .Funcs.length
-			.Funcs <~ fn
-			return true
-		error (package.funcs, "Too many functions")
-	
-	
-	syntax access (|int| i, |xfunction|)
-		return .Funcs[i]
-	
-
-	function LinkEmUp‼ (|bool|)
-		opt norefcounts
-		Description "Checks that stdlib has all needed functions... and gets a reference to them."
-		
-		for name in package.linkage
-			|| fn = Linker[name]
-				AppTable.LinkOrder <~ fn
-		return stderr.ok
-
-
-	function RunMain (|int|)
-		opt norefcounts
-		|| main = .funcs[1]					#expect ("Missing main")
-		rz  = .funcs[0]!.Run|&int64|[]
-		rz ?= main.Run|&int64|[]
-
-
-function message.CantFindFunc
-	error (self, "Can't find function: " + .name)
+//function message.CantFindFunc
+//	error (self, "Can't find function: " + .name)
 
 
 //////////          //////////            //////////

@@ -68,6 +68,6 @@ vec4 JB_vec4_Cross(vec4 Self, vec4 Other);
 
 vec4 JB_vec4_Reflect(vec4 Self, vec4 Plane);
 
-float JB_vec4_Sum(vec4 Self);
+float JB_vec4_Sum(vec4 Self, int Which);
 
 }

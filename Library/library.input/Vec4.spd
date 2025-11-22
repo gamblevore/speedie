@@ -120,7 +120,7 @@ datatype vec4
 		trin (24, RFL)	// cross
 		cpp_wrapper JB_vec4_Reflect
 
-	function Sum (|float|)
+	function Sum (|int| Which=0, |float|)
 		trin (25, SUM)
 		cpp_wrapper
 	
