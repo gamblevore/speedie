@@ -1,6 +1,6 @@
 
 conf
-	name	pack
+	name	cake_run
 	creator	jeebox
 	prefs	"pack.prefs"
 	targets nothing
