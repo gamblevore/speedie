@@ -5,11 +5,9 @@
 
 main
 	opt NoRefCounts
-	debugger
 	error.AutoPrint = 1
 	require Lib.LoadLib
 	require package.LoadPack
-	
 	debugger.load
 	return apptable.RunMain
 
