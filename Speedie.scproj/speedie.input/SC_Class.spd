@@ -64,6 +64,7 @@ linkage
 |SCClass?|					ProcessAs
 |SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
+|(&ClassData)?|				InbuiltClass
 |ClassInfo|					Flags
 |DataTypeCode|  			TypeInfo
 |DataTypeCode|  			ASMTypeInfo
@@ -219,10 +220,20 @@ function GetDepth (|int|)
 			.TypeNormal.NilDeclared = NilState.real
 
 
+
+function compiler.CollectInbuiltSizes
+	for cd in ClassData.First_
+		|| name = cd.Name.Wrap
+		if 0
+			|| cls = Compiler[name]
+				cls.InbuiltClass = cd
+
+
 function scdecl.CalculateDeclSize (|int| depth = 0, |int|)
 	opt norefcounts
 	if .Type.IsObject or .PointerCount
 		return platform.PointerBytes
+	
 	depth++
 	if .iscarray
 		|| i = .internal
@@ -236,11 +247,12 @@ helper MiniSize (|int| B, |int|)
 	.ClsSizeRaw = B
 	.Alignment = B
 	return B
-	
+
+
 function CalculateSize (|int| Depth=0, |int|)
 	opt norefcounts
 	if .IsFunc
-		return .minisize(Platform.PointerBytes)
+		return .MiniSize(Platform.PointerBytes)
 	
 	if .IsDataTypeOnly
 		return .minisize(.typeinfo.ByteCount)
@@ -263,7 +275,7 @@ function CalculateSize (|int| Depth=0, |int|)
 		|| curr = P.CalculateDeclSize(depth)
 		|| pal = p.alignment
 		AlignTo = AlignTo max pal
-		rz = rz Align pal
+		rz = rz Align pal					// .alignup
 		p.ExportPosition = rz
 		p.sanity
 		|| Mul = P.c_Array ?? 1

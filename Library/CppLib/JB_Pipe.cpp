@@ -43,8 +43,23 @@
 extern "C" {
 const int RD = 0;   const int WR = 1;
 bool				CanASMBKPT = true;
-JB_String* JB_Sh_Render(ShellStream* Self, FastString* Fs_in);
-JBClassPlace( ShellStream,     JB_Sh_Destructor,  JB_AsClass(JB_Object),      JB_Sh_Render );
+
+
+
+JBClassPlace( ShellStream,	JB_Object,	"Process",	JB_Sh_Destructor,	JB_Sh_Render );
+
+
+JB_String* JB_Sh_Render (ShellStream* Self, FastString* Fs_in) {
+	FastString* Fs = JB_FS__FastNew(Fs_in);
+	JB_FS_AppendCString(Fs, "PID: ");
+	JB_FS_AppendIntegerAsText(Fs, JB_Sh_PID(Self), 1);
+	JB_FS_AppendByte(Fs, '\n');
+	JB_FS_AppendString(Fs, Self->Path);
+	JB_FS_AppendByte(Fs, ' ');
+	JB_Array_Render(Self->Args, Fs);
+	return JB_FS_SmartResult(Fs, Fs_in);
+}
+
 
 void JB_App__SetASMBreak (bool b) {
 	CanASMBKPT = b;

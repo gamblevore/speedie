@@ -26,6 +26,7 @@ int JB_Sh_Kill (ShellStream* F, int Code);
 int JB_Sh_PID (ShellStream* F);
 void JB_AddProcess (int PID);
 int JB_Sh_Status (ShellStream* F);
+JB_String* JB_Sh_Render (ShellStream* Self, FastString* Fs_in);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
 

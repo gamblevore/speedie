@@ -124,7 +124,7 @@ extern "C" {
 
 extern "C" {
 
-JBClassPlace( JB_File,          JB_File_Destructor,    JB_AsClass(JB_StringShared),      JB_File_Render );
+JBClassPlace( JB_File,	JB_StringShared,	"File",	JB_File_Destructor,	JB_File_Render );
 
 
 int SudoRelax = 1;		// seems actually preferable for MOST tools. To NOT write root files.

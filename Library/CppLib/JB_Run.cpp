@@ -40,29 +40,32 @@ void JB_Sav_SaveWrite(Saveable* self, void* Saver);
 void JB_Sav_LoadProperties(Saveable* self, void* Other);
 void JB_Dict__Init();
 
-JBClassPlace( JB_String,		JB_BA_Destructor, 		JB_AsClass(JB_Object),		JB_Str_Render );
-JBClassPlace( JB_StringC,		0,                		JB_AsClass(JB_String),		JB_Str_Render );
-JBClassPlace( JB_StringShared,	JB_Str_Destructor,		JB_AsClass(JB_String),		JB_Str_Render );
-JBClassPlace( JB_StringExternal,JB_XStr_Destructor,		JB_AsClass(JB_String),		JB_Str_Render );
-JBClassPlace( JB_String4,		0,						JB_AsClass(JB_String),		JB_Str_Render );
-JBClassPlace( JB_String20,		0,						JB_AsClass(JB_String),		JB_Str_Render );
 
-JBClassPlace( Dictionary1,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
-JBClassPlace( Dictionary2,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
-JBClassPlace( Dictionary3,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
-JBClassPlace( Dictionary4,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
-JBClassPlace( DictionaryLeaf,	JB_Leaf_Destructor,		JB_AsClass(JB_Object),		0 );
-JBClassPlace( DictionaryReader, JB_Nav_Destructor,		JB_AsClass(JB_Object),		0 );
+// what do we do with the name->class thing?
+// im pretty sure the only thing we subclass is stringshared?
+JBClassPlace( JB_String,		JB_Object,	"String",	JB_BA_Destructor,	JB_Str_Render );
+JBClassPlace( JB_StringC,		JB_String,	"String",	0,					JB_Str_Render );
+JBClassPlace( JB_StringShared,	JB_String,	"String",	JB_Str_Destructor,	JB_Str_Render );
+JBClassPlace( JB_StringExternal,JB_String,	"String",	JB_XStr_Destructor,	JB_Str_Render );
+JBClassPlace( JB_String4,		JB_String,	"String",	0,					JB_Str_Render );
+JBClassPlace( JB_String20,		JB_String,	"String",	0,					JB_Str_Render );
+
+JBClassPlace( Dictionary1,		JB_Object,	"",			JB_Dict_Destructor,	0 );
+JBClassPlace( Dictionary2,		JB_Object,	"",			JB_Dict_Destructor,	0 );
+JBClassPlace( Dictionary3,		JB_Object,	"",			JB_Dict_Destructor,	0 );
+JBClassPlace( Dictionary4,		JB_Object,	"",			JB_Dict_Destructor,	0 );
+JBClassPlace( DictionaryLeaf,	JB_Object,	"",			JB_Leaf_Destructor,	0 );
+JBClassPlace( DictionaryReader, JB_Object,	"",			JB_Nav_Destructor,	0 );
 
 JBClassPlaceSaver( Dictionary,	JB_Dict_Destructor,		JB_AsClass(Saveable),		JB_Dict_Render,  JB_Dict_LoadProperties,		JB_Dict_SaveCollect,	JB_Dict_SaveWrite );
 JBClassPlaceSaver( Array,       JB_Array_Destructor,   	JB_AsClass(Saveable),		JB_Array_Render, JB_Array_LoadProperties,	JB_Array_SaveCollect,	JB_Array_SaveWrite );
 JBClassPlaceSaver( Saveable,	0,                     	0,                         0,               JB_Sav_LoadProperties,      JB_Sav_SaveCollect,		JB_Sav_SaveWrite );
 
-JBClassPlace( FastString,		JB_FS_Destructor,		JB_AsClass(JB_Object),		JB_FS_Render );
-JBClassPlace( ByteMap,			0,						JB_AsClass(JB_Object),		0 );
-JBClassPlace( CharSet,			0,						JB_AsClass(JB_Object),		JB_CS_Render );
-JBClassPlace( JB_List,			JB_Ring_Destructor,		JB_AsClass(Saveable),		JB_List_Render );
-JBClassPlace( TokHan,			0,						JB_AsClass(JB_Object),		0 );
+JBClassPlace( FastString,		JB_Object,	"FastString", JB_FS_Destructor,		JB_FS_Render );
+JBClassPlace( ByteMap,			JB_Object,	"ByteMap", 0,						0 );
+JBClassPlace( CharSet,			JB_Object,	"CharSet", 0,						JB_CS_Render );
+JBClassPlace( JB_List,			Saveable,	"List",		JB_Ring_Destructor,		JB_List_Render );
+JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );
 
 extern JB_Class JB_TaskData;
 extern bool JB_NoExitOnCrash;

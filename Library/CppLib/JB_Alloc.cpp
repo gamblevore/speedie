@@ -1285,8 +1285,10 @@ void JB_MemFree(JB_MemoryWorld* World) {
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-JBClassPlace( JB_Object,       0,                  0,							  0 );
-JBClassPlace( JB_MemoryLayer,     JB_Mem_Destructor,  JB_AsClass(JB_Object),      0 );
+
+JBObject_Behaviour Obj_FuncTable = {};
+JBClassPlace5( JB_Object,		0,			"Object",		Obj_FuncTable );
+JBClassPlace( JB_MemoryLayer,	JB_Object,	"MemoryLayer",	JB_Mem_Destructor,	0 );
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

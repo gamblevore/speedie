@@ -148,9 +148,7 @@ function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
 	|| dcl = msg.CollectDecl( .modul, self, DeclMode.properties, self)
 		.properties <~ dcl
-		#!aaaa
 		(dcl is property)
-		#!bbbb
 		dcl.becomereal
 		return true
 

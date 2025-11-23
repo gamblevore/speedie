@@ -100,7 +100,7 @@ struct JBObject_Behaviour;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define kObjMinSize 16 // safer.
+#define kObjMinSize				16 // safer.
 #define JB_MArray(type, num)    ((type*)(JB_MArray_(sizeof(type),num)))
 #define JB_NewClass(Cls)        (JB_Object*)(JB_AllocNew((Cls)->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
@@ -112,18 +112,12 @@ struct JBObject_Behaviour;
 #define JB_AsClass(Name)        (&(Name ## Data))
 
 
+#define JBClassPlace(Ty, Sup, Name, Des, Rend)									\
+JBObject_Behaviour Ty##_FuncTable = {(void*)Des,(void*)Rend};					\
+JB_Class Ty##Data = JBClassInit(Ty##Data, Name ,sizeof(Ty),JB_AsClass(Sup),(JBObject_Behaviour*)&(Ty##_FuncTable));
 
-#define JBClassPlace0(a, b, c, d)                                           	\
-JBObject_Behaviour a ## _FuncTable = {(void*)b,(void*)d};                   	\
-JB_Class a ## Data = JBClassInit(a##Data, (#a), sizeof(a), c, (JBObject_Behaviour*)&(a##_FuncTable));
-
-#define JBClassPlace(a, b, c, d)												\
-JBObject_Behaviour a ## _FuncTable = {(void*)b,(void*)d};                   	\
-JB_Class a ## Data = JBClassInit(a##Data, (#a), sizeof(a), c, (JBObject_Behaviour*)&(a##_FuncTable));
-
-#define JBClassPlace4(a, b, c)													\
-JB_Class a ## Data = JBClassInit(a##Data, (#a), sizeof(a), b, (JBObject_Behaviour*)&(c));
-
+#define JBClassPlace5(Ty, Sup, Name, Beh)										\
+JB_Class Ty##Data = JBClassInit(Ty##Data, Name, sizeof(Ty), Sup, (JBObject_Behaviour*)&(Beh));
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef void (*fpDestructor)(JB_Object* self);

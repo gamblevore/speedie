@@ -487,6 +487,7 @@ function ImportAll
 
 	require .SortModulesAndClasses	// need to re-sort array by depth
 
+	.CollectInbuiltSizes
 	for c in .ClassList
 		c.CalculateSize
 		c.LoadConstructors
