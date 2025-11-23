@@ -45,7 +45,7 @@ void JB_Dict__Init();
 // im pretty sure the only thing we subclass is stringshared?
 JBClassPlace( JB_String,		JB_Object,	"String",	JB_BA_Destructor,	JB_Str_Render );
 JBClassPlace( JB_StringC,		JB_String,	"String",	0,					JB_Str_Render );
-JBClassPlace( JB_StringShared,	JB_String,	"String",	JB_Str_Destructor,	JB_Str_Render );
+JBClassPlace( JB_StringShared,	JB_String,	"StringShared",	JB_Str_Destructor,	JB_Str_Render );
 JBClassPlace( JB_StringExternal,JB_String,	"String",	JB_XStr_Destructor,	JB_Str_Render );
 JBClassPlace( JB_String4,		JB_String,	"String",	0,					JB_Str_Render );
 JBClassPlace( JB_String20,		JB_String,	"String",	0,					JB_Str_Render );

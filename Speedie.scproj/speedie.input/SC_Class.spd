@@ -220,15 +220,6 @@ function GetDepth (|int|)
 			.TypeNormal.NilDeclared = NilState.real
 
 
-
-function compiler.CollectInbuiltSizes
-	for cd in ClassData.First_
-		|| name = cd.Name.Wrap
-		if 0
-			|| cls = Compiler[name]
-				cls.InbuiltClass = cd
-
-
 function scdecl.CalculateDeclSize (|int| depth = 0, |int|)
 	opt norefcounts
 	if .Type.IsObject or .PointerCount
@@ -247,6 +238,18 @@ helper MiniSize (|int| B, |int|)
 	.ClsSizeRaw = B
 	.Alignment = B
 	return B
+
+
+function compiler.CollectInbuiltSizes
+	for cd in ClassData.First_
+		|| name = cd.Name.Wrap
+			|| P = cd.Parent
+			if p and p.Parent and (name ~= "String")
+				continue
+			|| cls = Compiler[name, SCNodeFindMode.NoErrors]|scclass--|
+				cls.InbuiltClass = cd
+				if cls != typetask
+					cls.clssize = cd.size
 
 
 function CalculateSize (|int| Depth=0, |int|)
