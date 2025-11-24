@@ -1,275 +1,206 @@
-JB__ErrorColors_Enabled 1
-GUI__App_DrawState 2
-GUI__App_MouseMoveInited 3
-GUI__App_StartedProperly 4
-GUI__App_FlashSelector 5
-GUI__App_QuitReason 6
-GUI__App_NeedMouseMove 7
-GUI__App_AControlWasResized 8
-GUI__App_TextInputEnabled 9
-GUI__App_TextInputEnabledAtStart 10
-GUI__App_TouchCount 11
-GUI__App_SingleFrameNest 12
-GUI__App_TouchFingersDown 13
-GUI__App_CanDrag 14
-GUI__App_ResizedCounter 15
-GUI__ScrollInfo_JustClicked_ 16
-JB__Tk__DotInsertAllow 17
-GUI__Key_Debug 18
-JB__Flow_AlwaysMove 19
-JB__Flow_BreakOnFail 20
-JB__Flow_Active 21
-JB__Proc_CheckedParent 22
-GUI__dcs_UseCompression 23
-JB__Err_AutoPrint 24
-JB__Err_KeepStackTrace 25
-JB__API_NilHappened_ 26
-GUI__App_DrawFrameLength 28
-JB__Tk__StopBars 30
-GUI__App_Scale 32
-GUI__ScrollInfo_InDrag_ 36
-GUI__App_EventCount 40
-GUI__Pxl_Bad 44
-GUI__Pxl_White 48
-GUI__Pxl_Clear 52
-JB__Syx_CurrFuncID_ 56
-GUI__Ray_AdjustmentFinder 60
-GUI__VObject_DrawScale 64
-GUI__VObject_ObjID 68
-GUI__App_ForeGroundTime 72
-JB__Terminal_LastDisplay 80
-GUI__App_TryResizeLater 88
-GUI__MB_DownAt 96
-GUI__beep_OK 104
-JB__Rec_Progress 112
-GUI__App_FixScreenBug 120
-GUI__App_FastToolTipDate 128
-GUI__App_ChangeSelFlash 136
-GUI__GridSection_Dummy 144
-GUI__App_BlurBackgroundStart 152
-GUI__App_DrawFinish 160
-GUI__App_FrameStart 168
-GUI__App_CurrMouseXY 176
-GUI__VObject_DrawMovement 184
-GUI__App_NewSize 192
-GUI__App_FrameLastDelay 200
-GUI__App_OpenedFirst 208
-GUI__LV_DelayEditTill_ 216
-GUI__RayInfo_Miss 224
-JB__Constants__SyxDict 240
-GUI__App_LastSearch 248
-JB__App__Conf 256
-GUI__App_ToolTip 264
-GUI__App_Screen 272
-JB__App_Usage 280
-GUI__Clip__InternalCopy 288
-JB__Tk__EndOfLineMarker 296
-JB_StdErr 304
-GUI_xC2xA5 312
-GUI__font_small_ 320
-JB__App__stdin 328
-JB__App__StdOut 336
-JB__Terminal_fs 344
-JB__Terminal_TermScreen 352
-GUI__App_PendingAlerts 360
-JB__App__Prefs 368
-JB__Platform_Logger_ 376
-GUI__Note_Alerts 384
-JB__Constants_CSWrapSplit 392
-JB__Constants_EscapeStr 400
-JB__LD_ClassList 408
-JB__Saver_SaveableList 416
-GUI__Sch_DefaultColors 424
-JB__Constants_XML_EscapeStr 432
-JB__Flow_Flow 440
-JB__Constants_JS_EscapeStr 448
-JB__Constants_UnEscapeStr 456
-JB__Constants_JS_UnEscapeStr 464
-JB__Constants_XML_UnEscapeStr 472
-JB__Macro_TmpPrms_ 480
-JB__Constants_EscapeChr 488
-JB__File__Speedie 496
-GUI__Img_CurlieQue_ 504
-JB__bin_Header 512
-JB__Constants_CSWordMiddle 520
-JB__Proc__Parent 528
-GUI__Doc_Cache_ 536
-JB__Constants_CSLettersOnly 544
-GUI__SpaceTree_Holders 552
-GUI__VObject__Particles 560
-JB__Constants_CSWordStart 568
-JB__Constants_XMLWordMiddle 576
-JB__Constants_CSNum 584
-JB__Err_BackupErrorSource 592
-JB__Constants_CSLine 600
-JB__Constants_CSAfterDot 608
-JB__Constants_CSAfterStatement 616
-GUI__Bar_RandomData 624
-GUI__Text_csAntiWords 632
-GUI__Text_CounterParts 640
-GUI__Text_CounterParts2 648
-GUI__Win_LeakedTestObj 656
-GUI__Win_ActiveControl 664
-GUI__Win_All 672
-GUI__AM_Menu 680
-GUI__cwin__asker 688
-GUI__Open__Asker 696
-JB__App__OldArgs 704
-JB__App__Path 712
-GUI__App_DrawDrag 720
-JB__Tk__ErrorNames 728
-JB__ErrorSeverity__ErrorNames 736
-JB_ID__ByFreq 744
-GUI_ctrl_ScrollEvent_run 752
-GUI_ctrl_SlideOpen_run 760
-GUI_ctrl_TaskGUI_run 768
-GUI_Div_SlowShow_run 776
-GUI_Text_DelayedShowError_run 784
-GUI_Text_LineAttention_run 792
-JB_SS_ParserCallBack_run 800
-GUI_Img_RoundRectDrawer 808
-GUI_Img_ClippedRectDrawer 816
-GUI_Img_CurlieQueDrawer 824
-GUI_FV_ReturnFileList 832
-GUI_FV_RightClickFileList 840
-GUI_Ray__DistanceSorter 848
-JB_Str__Sorter 856
-JB_Msg__Sorter 864
-GUI__App_AppDocumentOpen 872
-JB__Tk_Splitter 880
-GUI_OnConfirmAnswer 888
-GUI_FR__BatchFindSorter 896
-GUI_FV__FileRowRenamer 904
-GUI_FV__FileRowScoreSorter 912
-GUI_FV__FileRowNameSorter 920
-GUI_FV__QuickOpenModified 928
-GUI_FV__QuickOpenKey 936
-GUI_FV__QuickOpenFocus 944
-GUI_FV__ClickedOpenList 952
-GUI_FV__InsideFileViewRowDraw 960
-GUI_FileViewerCMMShow 968
-GUI_FileViewerRenameFile 976
-GUI_FileViewerCreateFile 984
-GUI_FileViewerCopyPath 992
-GUI_FileViewerTrash 1000
-GUI_FileViewerRemove 1008
-GUI_FileViewerSearchWithin 1016
-GUI_App__DialogSorter 1024
-GUI_JBV__JeeboxViewRenamer 1032
-GUI_JBV__RightClickJeeboxView 1040
-GUI_JBV__InsideJeeboxViewRowDraw 1048
-GUI_LV_DefaultCopy 1056
-GUI_Open__RelistKey 1064
-GUI_Open_PastePathEvent 1072
-GUI_OnAskSaveAnswer 1080
-GUI_OnAskSaveName 1088
-GUI_OnAskSaveReveal 1096
-GUI_OnAskSaveEntered 1104
-GUI_VShapes__Heart 1112
-GUI_VShapes__Sphere 1120
-GUI_VShapes__Debug 1128
-GUI_VShapes__PlasticBall 1136
-GUI_VShapes__PlasticColor 1144
-GUI_VShapes__CloudColor 1152
-GUI_VShapes__CloudBubble 1160
-GUI_VShapes__Box 1168
-GUI_VShapes__NormalColor 1176
-GUI_VShapes__FudgeBlock 1184
-GUI_VShapes__IceFudgeColor 1192
-GUI_VShapes__Black 1200
-GUI_VShapes__Rainbows 1208
-GUI_Div__DrawDash 1216
-GUI_AppMenuHelp 1224
-GUI_AppMenuQuit 1232
-GUI_AppMenuAbout 1240
-GUI_AppMenuReturnkey 1248
-JB_File__Sorter 1256
-JB_Tree__Sorter 1264
-JB_LD__LoadOne 1272
-JB_Saver__LoadOne 1280
-JB_ID__ByID 1288
-TextViewLineData 1296
-VObjectData 1304
-ButtonViewData 1312
-DrawToolBarData 1320
-JB_ErrorData 1328
-FPSViewData 1336
-GraphicsEditorData 1344
-ListViewData 1352
-ProgressBarData 1360
-SliderData 1368
-StretchControlData 1376
-StretchDividerData 1384
-TextViewData 1392
-WindowData 1400
-AppMenuData 1408
-ConfirmationDialogData 1416
-FileRowData 1424
-FileViewerData 1432
-MenuData 1440
-MenuItemData 1448
-MessageViewData 1456
-OpenSaveDialogData 1464
-ShaderToyData 1472
-ByteMapData 1480
-CachedPathData 1488
-CharSetData 1496
-ColorSchemeData 1504
-ConfirmCancellerData 1512
-DTWrapData 1520
-DictionaryReaderData 1528
-DrawStyleData 1536
-JB_ErrorReceiverData 1544
-JB_ObjectData 1552
-FastStringData 1560
-FixedDictData 1568
-GUI__SDL_Cursor__Empty 1576
-GUI__App_Event 1584
-FlowControlData 1592
-GUI__App_ScreenWindow 1600
-GUI__App_Renderer 1608
-GUI__App_Raw 1616
-GridSectionData 1624
-InputStreamData 1632
-LeakTesterData 1640
-MacroData 1648
-MWrapData 1656
-JB_MemoryLayerData 1664
-ShellStreamData 1672
-RayTracerData 1680
-SaveableData 1688
-SelectorData 1696
-JB_StringData 1704
-StringFieldsData 1712
-SyntaxObjData 1720
-TerminalCellData 1728
-TokHanData 1736
-ArrayData 1744
-DictionaryData 1752
-JB_FileData 1760
-ImageData 1768
-SpaceMapData 1776
-SpdProcessData 1784
-JB_StringSharedData 1792
-JB_StringCData 1800
-JB_ListData 1808
-DocumentData 1816
-DocumentStateData 1824
-DocumentViewerData 1832
-GUIControlData 1840
-MessageData 1848
-MessageIDData 1856
-SaverClassInfoData 1864
-SpaceChunkData 1872
-SpaceTreeData 1880
-JB_TaskData 1888
-JB__zalgo_R 1904
-JB__Rnd_Shared 1920
-JB__Tk_Using 1936
-JB__MzSt_All 1968
-GUI__SDL_Cursor_nothing 1992
-JB__Mrap_MDummy_ 2000
-JB__CharProp_Item 2016
-JB__Constants__FuncArray 2272
-GUI__SystemCursor__Cursors 2784
-GUI__Key_Record 2880
+// beta-file. Unstable.
+JB__ErrorColors_Enabled
+GUI__App_DrawState
+GUI__App_MouseMoveInited
+GUI__App_StartedProperly
+GUI__App_FlashSelector
+GUI__App_QuitReason
+GUI__App_NeedMouseMove
+GUI__App_AControlWasResized
+GUI__App_TextInputEnabled
+GUI__App_TextInputEnabledAtStart
+GUI__App_TouchCount
+GUI__App_SingleFrameNest
+GUI__App_TouchFingersDown
+GUI__App_CanDrag
+GUI__App_ResizedCounter
+GUI__ScrollInfo_JustClicked_
+JB__Tk__DotInsertAllow
+GUI__Key_Debug
+JB__Flow_AlwaysMove
+JB__Flow_BreakOnFail
+JB__Flow_Active
+JB__Proc_CheckedParent
+GUI__dcs_UseCompression
+JB__Err_AutoPrint
+JB__Err_KeepStackTrace
+JB__API_NilHappened_
+GUI__App_DrawFrameLength
+JB__Tk__StopBars
+GUI__App_Scale
+GUI__ScrollInfo_InDrag_
+GUI__App_EventCount
+GUI__Pxl_Bad
+GUI__Pxl_White
+GUI__Pxl_Clear
+JB__Syx_CurrFuncID_
+GUI__Ray_AdjustmentFinder
+GUI__VObject_DrawScale
+GUI__VObject_ObjID
+GUI__App_ForeGroundTime
+JB__Terminal_LastDisplay
+GUI__App_TryResizeLater
+GUI__MB_DownAt
+GUI__beep_OK
+JB__Rec_Progress
+GUI__App_FixScreenBug
+GUI__App_FastToolTipDate
+GUI__App_ChangeSelFlash
+GUI__GridSection_Dummy
+GUI__App_BlurBackgroundStart
+GUI__App_DrawFinish
+GUI__App_FrameStart
+GUI__App_CurrMouseXY
+GUI__VObject_DrawMovement
+GUI__App_NewSize
+GUI__App_FrameLastDelay
+GUI__App_OpenedFirst
+GUI__LV_DelayEditTill_
+GUI__RayInfo_Miss
+JB__Constants__SyxDict
+GUI__App_LastSearch
+JB__App__Conf
+GUI__App_ToolTip
+GUI__App_Screen
+JB__App_Usage
+GUI__Clip__InternalCopy
+JB__Tk__EndOfLineMarker
+JB_StdErr
+GUI_xC2xA5
+GUI__font_small_
+JB__App__stdin
+JB__App__StdOut
+JB__Terminal_fs
+JB__Terminal_TermScreen
+GUI__App_PendingAlerts
+JB__App__Prefs
+JB__Platform_Logger_
+GUI__Note_Alerts
+JB__Constants_CSWrapSplit
+JB__Constants_EscapeStr
+JB__LD_ClassList
+JB__Saver_SaveableList
+GUI__Sch_DefaultColors
+JB__Constants_XML_EscapeStr
+JB__Flow_Flow
+JB__Constants_JS_EscapeStr
+JB__Constants_UnEscapeStr
+JB__Constants_JS_UnEscapeStr
+JB__Constants_XML_UnEscapeStr
+JB__Macro_TmpPrms_
+JB__Constants_EscapeChr
+JB__File__Speedie
+GUI__Img_CurlieQue_
+JB__bin_Header
+JB__Constants_CSWordMiddle
+JB__Proc__Parent
+GUI__Doc_Cache_
+JB__Constants_CSLettersOnly
+GUI__SpaceTree_Holders
+GUI__VObject__Particles
+JB__Constants_CSWordStart
+JB__Constants_XMLWordMiddle
+JB__Constants_CSNum
+JB__Err_BackupErrorSource
+JB__Constants_CSLine
+JB__Constants_CSAfterDot
+JB__Constants_CSAfterStatement
+GUI__Bar_RandomBank
+GUI__Text_csAntiWords
+GUI__Text_CounterParts
+GUI__Text_CounterParts2
+GUI__Win_LeakedTestObj
+GUI__Win_ActiveControl
+GUI__Win_All
+GUI__AM_Menu
+GUI__cwin__asker
+GUI__Open__Asker
+JB__App__OldArgs
+JB__App__Path
+GUI__App_DrawDrag
+JB__Tk__ErrorNames
+JB__ErrorSeverity__ErrorNames
+JB_LD__LoadOne
+JB_Saver__LoadOne
+JB_ID__ByID
+JB_ID__ByFreq
+GUI_ctrl_ScrollEvent_run
+GUI_ctrl_SlideOpen_run
+GUI_ctrl_TaskGUI_run
+GUI_Div_SlowShow_run
+GUI_Text_DelayedShowError_run
+GUI_Text_LineAttention_run
+JB_SS_ParserCallBack_run
+GUI_Img_RoundRectDrawer
+GUI_Img_ClippedRectDrawer
+GUI_Img_CurlieQueDrawer
+GUI_FV_ReturnFileList
+GUI_FV_RightClickFileList
+GUI_Ray__DistanceSorter
+JB_Str__Sorter
+JB_Msg__Sorter
+GUI_OnConfirmAnswer
+GUI_FR__BatchFindSorter
+GUI_FV__FileRowRenamer
+JB__Tk_Splitter
+GUI_FV__FileRowScoreSorter
+GUI_FV__FileRowNameSorter
+GUI_FV__QuickOpenModified
+GUI_FV__QuickOpenKey
+GUI_FV__QuickOpenFocus
+GUI_FV__ClickedOpenList
+GUI_FV__InsideFileViewRowDraw
+GUI__App_AppDocumentOpen
+GUI_FileViewerCMMShow
+GUI_FileViewerRenameFile
+GUI_FileViewerCreateFile
+GUI_FileViewerCopyPath
+GUI_FileViewerTrash
+GUI_FileViewerRemove
+GUI_FileViewerSearchWithin
+GUI_App__DialogSorter
+GUI_JBV__JeeboxViewRenamer
+GUI_JBV__RightClickJeeboxView
+GUI_JBV__InsideJeeboxViewRowDraw
+GUI_LV_DefaultCopy
+GUI_Open__RelistKey
+GUI_Open_PastePathEvent
+GUI_OnAskSaveAnswer
+GUI_OnAskSaveName
+GUI_OnAskSaveReveal
+GUI_OnAskSaveEntered
+GUI_VShapes__Heart
+GUI_VShapes__Sphere
+GUI_VShapes__Debug
+GUI_VShapes__PlasticBall
+GUI_VShapes__PlasticColor
+GUI_VShapes__CloudColor
+GUI_VShapes__CloudBubble
+GUI_VShapes__Box
+GUI_VShapes__NormalColor
+GUI_VShapes__FudgeBlock
+GUI_VShapes__IceFudgeColor
+GUI_VShapes__Black
+GUI_VShapes__Rainbows
+GUI_Div__DrawDash
+GUI_AppMenuHelp
+GUI_AppMenuQuit
+GUI_AppMenuAbout
+GUI_AppMenuReturnkey
+JB_File__Sorter
+JB_Tree__Sorter
+GUI__SDL_Cursor__Empty
+GUI__App_ScreenWindow
+GUI__App_Renderer
+GUI__App_Raw
+GUI__App_Event
+JB__zalgo_R
+JB__Rnd_Shared
+JB__MzSt_All
+JB__Tk_Using
+GUI__SDL_Cursor_nothing
+JB__Mrap_MDummy_
+JB__CharProp_Item
+JB__Constants__FuncArray
+GUI__Key_Record
+GUI__SystemCursor__Cursors
