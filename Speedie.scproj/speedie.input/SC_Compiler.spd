@@ -600,7 +600,7 @@ function LoadSuperClasses
 	opt norefcounts
 	for c in .ClassList
 		c.LoadSuperclass
-	for c in .classlist
+	for c in .Classlist
 		c.LoadSuperBehaviours
 
 

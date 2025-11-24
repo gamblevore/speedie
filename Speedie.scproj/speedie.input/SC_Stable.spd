@@ -9,8 +9,8 @@ module Stability
 		.StabiliseSub("stable_id_bank.txt", packmaker.libfuncs)
 		.Debug
 	
+	
 	function StabiliseGlobs 
-//		packmaker.OrderLibGlobs // already done before?
 /		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs)
 	
 	
@@ -23,7 +23,7 @@ module Stability
 			fs <~ data ?? "// beta-file. Unstable."
 		.StabliseFuncsSub(fs, list)
 		if fs
-			funcs.smartdata = fs|string|
+			funcs.SmartData = fs|string|
 		
 	
 	function scobject.NeedsID (|bool|)
