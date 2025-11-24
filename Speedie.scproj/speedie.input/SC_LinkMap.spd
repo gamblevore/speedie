@@ -92,11 +92,7 @@ function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach
 	opt norefcounts
 	flow off // memory order dependant!
 	
-	|| MR = .MyReacher
-		if mr == Compiler.VisibleFuncs
-			.MyReacher = from
-		return
-
+	require .UnReached(from)
 	if .borked
 		error (.source,    "Borked function reached!")
 		error (from.source, from.ReachedName)
@@ -144,10 +140,20 @@ function message.HateUnusedFuncs
 		.expect(.func, "Can't find project")
 
 
+function scnode.UnReached (|scnode| from, |bool|)
+	opt norefcounts
+	|| MR = .MyReacher
+	if !MR
+		return true
+	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
+		.MyReacher = from
+
+
 function scclass.Reach (|SCNode| from, |message| src=nil)
 	opt norefcounts
 	flow off
-	require !.MyReacher
+	require .UnReached(from)
+	
 	.MyReacher = from
 	Compiler.stReachedClass++
 	if !.IsDataTypeOnly

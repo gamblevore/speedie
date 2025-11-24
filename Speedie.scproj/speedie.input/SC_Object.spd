@@ -11,8 +11,9 @@ class SCObject
 	|message?|					Source
 	|byte|						NoAutoComplete
 	|byte|						AllocSource
-	|uint16|					CurrFuncLink
 	|SCNodeInfo|				NodeInfo
+	|uint16|					CurrFuncLink
+	|uint16|					PackID
 	
 	constructor
 		.NodeInfo = Compiler.InBuiltType

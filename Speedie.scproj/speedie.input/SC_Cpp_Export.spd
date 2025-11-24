@@ -560,10 +560,8 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 function FillInterpreter
 	stability.StabiliseFuncs
-	|| lib_pack = jbin() // fill in later! classes I guess?
-	|| str = lib_pack.getresult.compress
-	if str.parse								#check ("Invalid libpack")
-		.ListAllFuncs(.ModuleProperties, str)
+	stability.StabiliseGlobs
+	.WriteVMGlobsAndPtrs(.ModuleProperties)
 
 
 
@@ -583,10 +581,10 @@ function faststring.AppendWrap (|scfunction| f)
 		.appendvoid(f.ExportName)
 
 
-function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
+function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	opt norefcounts
 	fs <~ "// entire_function_list!\n\n"
-	for f in packmaker.libfuncs
+	for f in packmaker.LibFuncs
 		if (f.iscppinbuilt == 1) 
 			.MakeWrapperFor(fs, f)
 	
@@ -605,21 +603,7 @@ function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
 			position = id
 	
 	fs.appendvoid("0")
-	fs <~ "};\n"
-
-	
-	fs <~ `__lib__ const char* JB_LibFuncInfo = `
-	fs.AppendCpp(lib_pack)
-	fs <~ ";
-
-extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) {
-	*Funcs = JB_PackPtrs;
-	return JB_StrCN(JB_LibFuncInfo, ${lib_pack.length});
-}
-
-extern \"C\" JB_String* JB_App__LibInfo() {
-	return JB_StrCN(JB_LibFuncInfo, ${lib_pack.length});
-}
+	fs <~ "};
 
 extern \"C\" void** JB_App__LibFuncs() {
 	return &(JB_PackPtrs[0]);
@@ -630,6 +614,7 @@ extern \"C\" void** JB_App__LibGlobs() {
 }
 
 "
+	// we need to create some kind of libglob table
 
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)

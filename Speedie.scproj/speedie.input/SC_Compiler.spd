@@ -580,7 +580,7 @@ function ImportAll
 	for f in .FuncList
 		f.BeforeTransform
 
-	stability.StabliseGlobs
+	packmaker.OrderLibGlobs // why here? Why not... in the pack?
 	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList

@@ -35,7 +35,7 @@ module PackMaker
 				.LibFuncs <~ f
 		  else
 			|| R = f.MyReacher
-				check (f isnt externallib) (R.Source, "External library functions can't yet be used in cake files.")
+				check (f isnt ExternalLib) (R.Source, "External library functions can't yet be used in cake files.")
 				.PackFuncs <~ f
 	
 	
@@ -163,7 +163,7 @@ module PackMaker
 		|| Stack_Trace = FastString()
 		.RenderASM(j, stack_trace)
 		.DumpStrings(j)
-		.PackClasses(j)
+		.PackAllClasses(j)
 		.AddDebugStuff(j, stack_trace)
 		j.ExitAll
 	
@@ -209,17 +209,25 @@ module PackMaker
 			strs <~ s
 
 
-	function PackClasses (|jbin| j)
+	function PackClasses (|jbin| j, |bool| Pack)
 		opt norefcounts
-		j.tmp("clss")
 		for c in Compiler.ClassList
-			if c.NeedsPackExport
+			if (c.islibrary != pack) and c.NeedsPackExport
 				C.DescribeInPack(j)
+
+
+	function PackAllClasses (|jbin| j)
+		j.tmp("clss")
+		.PackClasses(j, false)
+		.PackClasses(j, true)
 		j.exit(2)
 	
 	
 	function SCClass.NeedsPackExport (|bool|)
-		return .isobject and !.IsLibrary and !.IsRole and .MyReacher
+		opt norefcounts
+		require .isobject and !.IsRole
+		|| R = .MyReacher
+			return !r.IsLibrary
 
 	
 	function scclass.CollectBehaviours (|jbin| j, |scbehaviour!| B)
@@ -243,7 +251,7 @@ module PackMaker
 			return
 		if 1 or Options.TargetDebug // seems better to always get names, for debugging!
 			.Enter(@unit, fn.name)
-		|| id = fn.PackID						#check (fn.source, "Missing PackID")
+		|| id = fn.PackID							#check (fn.source, "Missing PackID")
 		id = (id << 1) + fn.IsLibrary
 		.AddInt(id)
 		if 1 or Options.TargetDebug
@@ -257,16 +265,17 @@ module PackMaker
 		j.enter(@tmp, .name)
 		
 		j.Enter(@list)     //////     //////     //////
-		j.Add(@thg, .super!.name)
-		j.addint(sz)
-		// hmmmmm.... class?
 		j.AddInt(.classtype!.ExportPosition)
+		if !.IsLibrary
+			j.Add(@thg, .super!.name)
+			j.addint(sz)
 		j.exit     		   ///
 		
-		j.enter(@list)     //////     //////     //////
-		j.Cakeify(.destructorfunc)
-		.CollectBehaviours(j, B)
-		j.exit    		   ///
+		if !.IsLibrary     //////     //////     //////
+			j.enter(@list)
+			j.Cakeify(.destructorfunc)
+			.CollectBehaviours(j, B)
+			j.exit    	  ///
 		j.exit
 	
 

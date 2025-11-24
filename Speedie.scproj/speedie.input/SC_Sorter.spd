@@ -18,11 +18,13 @@ module CodeSorter
 		return .exportposition < b.exportposition
 	
 	
-	helper PackIDAndExportName (sortercomparer of scfunction)
+	helper PackIDAndExportName (sortercomparer of scobject)
 		|| fA = .PackID|int|
 		|| fB = b.PackID|int|
 		if !fa or !fb
 			if !fa and !fb
+				if self isa scdecl
+					return .exportposition < b|scdecl|.ExportPosition
 				return .ExportName < b.ExportName // just to help compression
 			return !fa
 		

@@ -1,51 +1,61 @@
 
+
 module Stability
-	|| LastLibFuncID = 0 
-	
-	// todo: cpp_renderer needs to put dummy fields for empty spots
+	|| LastLibID = 0
 
 	function StabiliseFuncs
-		|| funcs = Compiler.library["stable_id_bank.txt"]
+		if !packmaker.libfuncs
+			PackMaker.AddAll
+		.StabiliseSub("stable_id_bank.txt", packmaker.libfuncs)
+		.Debug
+	
+	function StabiliseGlobs 
+//		packmaker.OrderLibGlobs // already done before?
+/		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs)
+	
+	
+	function StabiliseSub (|string| name, |[scobject]| list)
+		.LastLibID = 0
+		|| funcs = Compiler.library[name]
 		|| Data = funcs.ReadAll.trim
 		stability.UseFuncBank(data)
-		|| g = packmaker.PackGlobSize
-		if !options.MakeExec
-			.StabliseFuncsSub(nil, g)
-		  else
-			|| fs = faststring()
+		|| fs = (faststring(), nil)(options.MakeExec)
 			fs <~ data ?? "// beta-file. Unstable."
-			.StabliseFuncsSub(fs, g)
+		.StabliseFuncsSub(fs, list)
+		if fs
 			funcs.smartdata = fs|string|
+		
 	
-
-	function SortExports (|[scfunction]|)
-		opt norefcounts
-		rz = packmaker.libfuncs
-		if !rz.length
-			PackMaker.AddAll
-		rz.Sort(&CodeSorter.PackIDAndExportName)
-		.Debug
+	function scobject.NeedsID (|bool|)
+		require self isnt private
+		if self isa SCFunction
+			if !.IsLibrary// huh?
+				"ooof"
+				debugger 
+			require !.IsMacro and .IsLibrary
+			require self isnt disabled and AlwaysInline
+		return true
 	
 	
 	function Debug 
-		for f in packmaker.libfuncs
-			print f.packid|int|
-			print " "
-			printline f.exportname
+		target debug
+			for f in packmaker.libfuncs
+				print f.packid|int|
+				print " "
+				printline f.exportname
 
 	
-	function StabliseFuncsSub (|faststring| fs, |int| frogs)
+	function StabliseFuncsSub (|faststring| fs, |[scobject]| list)
 		opt norefcounts
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
+		|| frogs = packmaker.PackGlobSize, (frogs)
 		target debug
-			if !options.MakeExec
+			if frogs and !options.MakeExec
 				Table = jb_vm.vm.InitTable(4096, frogs)
 
-		// why this rather than the libfuncs?
-		// of course, if something isn't in the libfuncs, thats an issue.
-		// but it should be... by now?
-
-		for fn in .sortexports
+		list.Sort(&CodeSorter.PackIDAndExportName)
+		
+		for fn in list
 			if fn.NeedsID
 				fn.MakeID(fs, table)
 			
@@ -69,34 +79,18 @@ module Stability
 		f.SmartData = fs
 	
 	
-	function packmaker.OrderLibGlobs
+	function packmaker.OrderLibGlobs // why is it done from the main compile func and not in the execmaker?
 		opt norefcounts
 		.LibGlobs.Sort(SimplestFirst)			// sort them so empty values come after
 		._LibGlobSize = .GlobalsSize(.libglobs) // rebuild size
-
-
-	function StabliseGlobs
-		|| globs = Compiler.library["stable_glob_bank.txt"]
-		|| str = globs.readall(64K)
-		.BuildLibGlobTable(str.parse)			// fill table with old values
-		packmaker.OrderLibGlobs
-		if options.MakeExec
-			.DumpGlobs(globs)
-		
-	
-	function scfunction.NeedsID (|bool|)
-		require !.IsMacro and .IsLibrary
-		require self isnt disabled and AlwaysInline
-		require self|scnode| isnt private
-		return true
 	
 		
-	function scfunction.MakeID (|faststring| fs, |?&&nil| table)
+	function scobject.MakeID (|faststring| fs, |?&&nil| table)
 		|| id = .PackID
 		if !id
 			if fs
 				fs <~ "\n$.ExportName"
-			id = Stability.LastLibFuncID++
+			id = Stability.LastLibID++
 			.PackID = id
 		
 		if table
@@ -105,7 +99,8 @@ module Stability
 
 	
 	function UseFuncBank (|string| Data)
-		|| ID = .LastLibFuncID
+		// what about globs?
+		|| ID = .LastLibID
 		for str.lines in data
 			id++
 			|scbetternode--| fn = Compiler.ExportNames[str]
@@ -114,5 +109,5 @@ module Stability
 				
 				check (!fn.PackID) (str + " replicated ID.")
 				fn.PackID = id
-		.LastLibFuncID = ID	
+		.LastLibID = ID	
 	

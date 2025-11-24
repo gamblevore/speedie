@@ -77,7 +77,6 @@ linkage
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				LinkID
-|uint16|				PackID
 |uint16|				ReturnCount
 |int|					StackAllocGuess
 |nilstate|				NilSelf
