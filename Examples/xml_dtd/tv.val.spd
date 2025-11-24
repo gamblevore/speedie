@@ -29,7 +29,7 @@ function Validator.GetRatio (|int| Max, |validator|)
 	|| R = self[@Rel]$ // try doing this in XML! You can't!
 	R[@num].int(0,max)
 	R[@opp, "/"]
-	R[@num].int(0,max)
+	R[@num].int(1,max) // can't divide by 0, right?
 
 
 || Noisy = app.yes("noisy")
