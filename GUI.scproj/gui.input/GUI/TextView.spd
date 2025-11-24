@@ -614,20 +614,6 @@ class TextView (GUIControl)
 			
 		.StartLine(mode) = d.MoveCapped(-before) 
 		return d
-
-
-	// whats the difference even???? view/goto??? ooofff
-	// seem almost the same!
-	function Goto (|int| x)
-		disabled "unused?"
-		|| vis = .MaxVisibleLines
-		|| d   = .FindDrawInfo(x)
-			|| d2 = d.MoveCapped(vis).MoveCapped(-vis) // not too far
-			if d2 != d
-				d2 = d2.MoveCapped(2) // looks lil nicer
-			if ._Start != d2
-				.StartLine = d2
-				.TouchScrollBar
 		
 		
 	function MoveSelection (|int| x, |int| Before=0, |bool|)

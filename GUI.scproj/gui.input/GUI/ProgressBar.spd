@@ -17,8 +17,8 @@ class ProgressBar (GUIControl)
 		if gui.FrameStart >= .NextUpdate
 			.NextUpdate = gui.FrameStart + 1s/16
 			GUI.touch
-			RandomData.Temporal
-		return RandomData
+			RandomBank.Temporal
+		return RandomBank
 		
 	behaviour Draw
 		|| s = .Declutterer.Strength
@@ -49,7 +49,7 @@ class ProgressBar (GUIControl)
 			(.onclicked)(self)?
 	
 	module
-		|| RandomData = byte[128]!
+		|| RandomBank = byte[128]!
 	
 	function StripeDark (|ivec2| v, |bool|)
 		if .RandomStyle
