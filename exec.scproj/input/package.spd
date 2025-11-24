@@ -12,8 +12,8 @@ module package
 	function LibGlobs (|&&nil|)
 		cpp_wrapper JB_App__LibGlobs
 
-	function LibInfo (|string|)
-		cpp_wrapper JB_App__LibInfo
+//	function LibInfo (|string|)
+//		cpp_wrapper JB_App__LibInfo
 	
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs

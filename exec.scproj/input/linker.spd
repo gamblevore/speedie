@@ -4,7 +4,7 @@ module Lib
 	|[xfunction]|				Funcs
 	|&&nil|						Globs
 	|&&nil|						RawFuncs
-	|string|					Info
+//	|string|					Info
 //	|dictionary of &nil|		Globals = dictionary()
 	|int|						GlobalCount
 
@@ -30,10 +30,10 @@ module Lib
 	function LoadLib (|bool|)
 		.rawFuncs = package.LibFuncs
 		.Globs = package.LibGlobs
-		.Info = package.LibInfo
-/		|| spd = .info.parse
-		if stderr.ok
-			return xclass.LoadInbuiltClasses
+//		.Info = package.LibInfo
+///		|| spd = .info.parse
+//		if stderr.ok
+		return xclass.LoadInbuiltClasses
 
 	
 //	function LoadLibFuncs (|message| spd, |&&nil| Internals)

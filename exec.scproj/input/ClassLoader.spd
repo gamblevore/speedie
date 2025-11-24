@@ -109,6 +109,14 @@ class XClass
 
 
 		function LoadInbuiltClasses (|bool|)
+			// so what do we want to do?
+			// do we even need classes?
+			// we can make the project load the globs into itself.
+			// we'll need to load the globs...
+			// how? The class info has all the info we need, right? in "clss"
+			// we have a name...
+			// can put the classdata into the packglobs?
+			
 			opt norefcounts
 			for cd in ClassData.First_
 				|| c = xclass.new(cd)
