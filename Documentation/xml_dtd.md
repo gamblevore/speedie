@@ -124,7 +124,7 @@ Now lets validate it.
 			arg.ChildEnd // remove this line if you want
         
 
-Honestly, it doesn't look so much more complex than the DTD is. And you don't need to learn a new language to do it. This validator is just as strict as the DTD. And run faster. Its also "embeddable" within a speedie program! After all, its just code. This makes things even smaller faster and ligher. I could add more syntactic sugar to make it smaller even, but I think its tight enough for now.
+Honestly, it doesn't look so much more complex than the DTD is. And you don't need to learn a new language to do it. This validator is just as strict as the DTD. And runs faster. Its also "embeddable" within a speedie program! After all, its just code. This makes things even smaller and lighter, no need for external validation libs or source-files. I could add more syntactic sugar to make it smaller even, but I think its tight enough for now.
 
 Lets say we want our validator to do a little more. Actually print output. We can do that! Why not?
 
