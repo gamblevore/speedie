@@ -517,6 +517,8 @@ struct JB_String;
 
 struct Validator;
 
+struct Validator;
+
 struct Message;
 
 struct MessageID;
@@ -1031,14 +1033,15 @@ struct SCObject_Behaviour: Object_Behaviour {
 
 JBClass ( SCObject , JB_Object , 
 	u16 CurrFuncLink;
-	u16 PackID;
-	JB_String* ExportName;
+	u16 GPackID;
+	Array* LinkFrom;
 	byte NoAutoComplete;
 	byte AllocSource;
 	SCNodeInfo NodeInfo;
-	Array* LinkFrom;
+	u16 FPackID;
 	Message* Source;
 	JB_String* Name;
+	JB_String* ExportName;
 );
 
 struct SCOperator_Behaviour: Object_Behaviour {
@@ -1463,6 +1466,7 @@ extern Array* SC__Comp_DeclConstants;
 extern SCModule* SC__Comp_DisamClasses;
 extern SCModule* SC__Comp_DisamModules;
 extern byte SC__Comp_During;
+extern Dictionary* SC__Comp_ExportGlobs;
 extern Dictionary* SC__Comp_ExportNames;
 extern Message* SC__Comp_ExtendList;
 extern Array* SC__Comp_ExtendModuleList;
@@ -1539,18 +1543,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2258])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2262])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2259])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2263])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2260])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2264])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2257])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2261])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2260])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2264])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2261])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2265])
 
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
@@ -1783,7 +1787,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2266])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2270])
 
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1820,7 +1824,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2262])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2266])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1860,7 +1864,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2267])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2271])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2094,12 +2098,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2265])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2269])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2264])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2268])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2263])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2267])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3324,7 +3328,7 @@ extern bool SC__Cpp_WriteAPI;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2256])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2260])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3553,11 +3557,15 @@ bool SC_AutoComplete__IsAFunc(JB_String* S);
 
 
 // CodeSorter
+SortComparison SC_CodeSorter__FPackID(SCObject* Self, SCObject* B);
+
+SortComparison SC_CodeSorter__GPackID(SCObject* Self, SCObject* B);
+
 SortComparison SC_CodeSorter__Leafness(SCFunction* Self, SCFunction* B);
 
 void SC_CodeSorter__LeafsFirst();
 
-SortComparison SC_CodeSorter__PackIDAndExportName(SCObject* Self, SCObject* B);
+FP_SorterComparer SC_CodeSorter__PackID(bool IsFunc);
 
 
 
@@ -4353,17 +4361,19 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 // Stability
 void SC_Stability__Debug();
 
+SCObject* SC_Stability__Find(JB_String* Str, bool Funcs);
+
 int SC_Stability__Init_();
 
 void SC_Stability__StabiliseFuncs();
 
 void SC_Stability__StabiliseGlobs();
 
-void SC_Stability__StabiliseSub(JB_String* Name, Array* List);
+void SC_Stability__StabiliseSub(JB_String* Name, Array* List, bool IsFuncs);
 
-void SC_Stability__StabliseFuncsSub(FastString* Fs, Array* List);
+void SC_Stability__StabliseSub2(FastString* Fs, Array* List, bool IsFunc);
 
-void SC_Stability__UseFuncBank(JB_String* Data);
+void SC_Stability__UseBank(JB_String* Data, bool Funcs);
 
 
 
@@ -5340,8 +5350,6 @@ bool JB_ivec2_OperatorInrange(ivec2 Self, ivec2 P);
 // ivec4
 ivec4 JB_ivec4_Shrink(ivec4 Self, int I);
 
-int JB_ivec4_Width(ivec4 Self);
-
 
 
 // uint
@@ -5992,8 +6000,6 @@ bool SC_FunctionType_SyntaxIs(FunctionType Self, FunctionType T);
 
 // IntRange
 bool JB_Rg_Contains1(IntRange Self, int I);
-
-int JB_Rg_Width(IntRange Self);
 
 
 
@@ -8354,13 +8360,13 @@ bool JB_Mrap_SetSize(MWrap* Self, int ItemCount);
 
 void JB_Mrap_Zero(MWrap* Self);
 
-Array* JB_Mrap__CollectLeaks_(JB_Object* Self);
+Array* SC_Mrap__CollectLeaks_(JB_Object* Self);
 
 int JB_Mrap__Init_();
 
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
-void jbl(JB_Object* Self);
+void SC_Mrap__PrintLeaks(JB_Object* Self);
 
 byte* JB_Mrap__Zalloc(int N);
 
@@ -8476,15 +8482,19 @@ bool SC_SCObject_IsVisible(SCObject* Self);
 
 void SC_SCObject_IsVisibleSet(SCObject* Self, bool Value);
 
-void SC_SCObject_MakeID(SCObject* Self, FastString* Fs, void** Table);
+void SC_SCObject_MakeID(SCObject* Self, FastString* Fs, void** Table, bool IsFunc);
 
 void SC_SCObject_MarkUnused(SCObject* Self, Message* Feedback, uint /*byte*/ Debug, JB_String* Name);
 
 void SC_SCObject_NameConflict(SCObject* Self, SCObject* Old, JB_String* Name);
 
-bool SC_SCObject_NeedsID(SCObject* Self);
-
 SCObject* SC_SCObject_NextDisplay(SCObject* Self, bool Exact);
+
+int SC_SCObject_PackID(SCObject* Self, bool isFunc);
+
+void SC_SCObject_PackIDSet(SCObject* Self, bool isFunc, int Value);
+
+bool SC_SCObject_RehomeExport(SCObject* Self);
 
 JB_String* SC_SCObject_Render(SCObject* Self, FastString* Fs_in);
 
@@ -8497,6 +8507,8 @@ bool SC_SCObject_SyntaxIs(SCObject* Self, uint /*SCNodeInfo*/ I);
 void SC_SCObject_SyntaxIsSet(SCObject* Self, uint /*SCNodeInfo*/ I, bool Value);
 
 SCFunction* SC_SCObject_TheIsFunc2(SCObject* Self, Message* Err);
+
+JB_String* SC_SCObject_UniquifyExport(SCObject* Self, JB_String* S);
 
 JB_String* SC_SCObject_UnusedReason(SCObject* Self);
 
@@ -9467,6 +9479,8 @@ NilState SC_Decl_StatedOptional(SCDecl* Self);
 
 NilState SC_Decl_StatedReal(SCDecl* Self);
 
+void SC_Decl_StoreExport(SCDecl* Self);
+
 void SC_Decl_SyntaxAppend(SCDecl* Self, SCDeclInfo D);
 
 bool SC_Decl_SyntaxIs(SCDecl* Self, SCDeclInfo D);
@@ -9667,8 +9681,6 @@ void SC_Base_TryAdd(SCNode* Self, Message* ErrPlace, SCObject* IncObj, JB_String
 
 void SC_Base_TryAddBase(SCNode* Self, Message* C, SCNode* Neu);
 
-JB_String* SC_Base_UniquifyExport(SCNode* Self, JB_String* S);
-
 bool SC_Base_UnReached(SCNode* Self, SCNode* From);
 
 SCObject* SC_Base_UpCheck(SCNode* Self, JB_String* Name, bool LookUp);
@@ -9722,6 +9734,9 @@ int JB_Proc__Init_();
 
 
 // JB_StringZeroTerminated
+
+
+// JB_ValidatorAll
 
 
 // JB_ValidatorSome
@@ -10531,8 +10546,6 @@ void JB_Msg_Name__(Message* Self, FastString* Fs);
 
 Message* SC_Msg_NeedBra(Message* Self);
 
-Message* JB_Msg_NeedFirst(Message* Self);
-
 Message* SC_Msg_NeedMarker(Message* Self, JB_String* S, bool B);
 
 bool SC_Msg_NeedsPreprocess(Message* Self);
@@ -11119,8 +11132,6 @@ void SC_SCBetterNode_Destructor(SCBetterNode* Self);
 void SC_SCBetterNode_LoadExportName(SCBetterNode* Self);
 
 void SC_SCBetterNode_ReadDescription(SCBetterNode* Self, Message* Msg);
-
-bool SC_SCBetterNode_RehomeExport(SCBetterNode* Self);
 
 void SC_SCBetterNode_SetExportName(SCBetterNode* Self, JB_String* Name, bool Explicit);
 
@@ -11720,6 +11731,8 @@ void SC_Func_MarkRecursive(SCFunction* Self, SCFunction* EndAt);
 
 SCFunction* SC_Func_MatchImprove(SCFunction* Self, SCParamArray* Incoming);
 
+bool SC_Func_NeedsID(SCFunction* Self);
+
 bool SC_Func_NeedsLibExport(SCFunction* Self);
 
 void SC_Func_NilSelff(SCFunction* Self, Message* Where, uint /*NilState*/ V);
@@ -11771,6 +11784,8 @@ Message* SC_Func_SourceArg(SCFunction* Self);
 void SC_Func_SourceArgSet(SCFunction* Self, Message* Value);
 
 void SC_Func_StatelessAccumulate(SCFunction* Self);
+
+void SC_Func_StoreExport(SCFunction* Self);
 
 SCDecl* SC_Func_StructReturned(SCFunction* Self);
 
@@ -12078,6 +12093,8 @@ inline Syntax JB_Msg_Func(Message* Self);
 
 inline JB_String* JB_Msg_Name(Message* Self);
 
+inline int JB_Rg_Width(IntRange Self);
+
 inline int JB_Sel_ID(Selector* Self);
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* Self);
@@ -12095,6 +12112,8 @@ inline bool JB_int_IsPow2(int Self);
 inline float JB_int_OperatorDiv(int Self, int D);
 
 inline bool JB_int_OperatorInRange(int Self, int Length);
+
+inline int JB_ivec4_Width(ivec4 Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
@@ -12143,6 +12162,8 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Reg_IsInt(ASMReg Self);
 
 inline JB_String* JB_config_AsString(Message* Self);
+
+inline Message* JB_Msg_NeedFirst(Message* Self);
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
 
@@ -12199,6 +12220,10 @@ inline JB_String* JB_Msg_Name(Message* Self) {
 	return JB_LUB[0];
 }
 
+inline int JB_Rg_Width(IntRange Self) {
+	return Self[1] - Self[0];
+}
+
 inline int JB_Sel_ID(Selector* Self) {
 	if (Self) {
 		return Self->ID;
@@ -12245,6 +12270,10 @@ inline bool JB_int_OperatorInRange(int Self, int Length) {
 		return (((uint)Self) < ((uint)Length));
 	}
 	return false;
+}
+
+inline int JB_ivec4_Width(ivec4 Self) {
+	return Self[2] - Self[0];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
@@ -12359,6 +12388,10 @@ inline JB_String* JB_config_AsString(Message* Self) {
 		return JB_Msg_Value(Self);
 	}
 	return JB_LUB[0];
+}
+
+inline Message* JB_Msg_NeedFirst(Message* Self) {
+	return JB_Msg_NeedSyx(Self, kJB_SyxNil);
 }
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
