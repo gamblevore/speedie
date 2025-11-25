@@ -11,7 +11,7 @@ As I've [said elsewhere](xml.md) all limited languages end up migrating towards 
 
 _Computer-games end up adding scripts, databases end up adding "triggers", websites added javascript, spreadsheets added code, fixed-pipeline graphics became GLSL, make-files became programs with CMake, and [XML](https://www.researchgate.net/publication/221568016_XSLT_Version_20_Is_Turing-Complete_A_Purely_Transformation_Based_Proof) [schema](https://www.academia.edu/48721461/XSLT_Version_2_0_Is_Turing_Complete_A_Purely_Transformation_Based_Proof) is turing complete!_
 
-But there are additional drawbacks! To DTD/Schemas:
+And DTDs / schemas have additional drawbacks!:
 
 (_Text is copied from various websites, then re-worded shorter/clearer._) 
 
