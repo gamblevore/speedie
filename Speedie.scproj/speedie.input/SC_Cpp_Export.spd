@@ -591,15 +591,15 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
 
 	|| Position = 0
-	for f in packmaker.libfuncs
-		if f.islibrary and f.NeedsLibExport
-			|| id = f.packid|int|
+	for fn in packmaker.libfuncs
+		if fn.IsLibrary and fn.NeedsLibExport
+			|| id = fn.fpackid|int|
 			|| Missing = id - position
-			check (Missing > 0) (f, "Bad PackID?")
+			check (Missing > 0) (fn, "Bad PackID?")
 			
 			while --missing >= 1
 				fs.appendvoid("(int64)(-1)")
-			fs.appendwrap(f)
+			fs.appendwrap(fn)
 			position = id
 	
 	fs.appendvoid("0")

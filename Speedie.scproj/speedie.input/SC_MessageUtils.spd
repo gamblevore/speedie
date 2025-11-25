@@ -547,7 +547,7 @@ function Message.PrmFunc (|scfunction|)
 	opt norefcounts
 	if self
 		|| s = .Second
-			return s.obj as scfunction
+			return s.obj as SCFunction
 		
 
 function Message.PrmFuncStructMsg (|message|)

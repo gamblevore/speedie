@@ -1,6 +1,6 @@
 
 datatype vec4 
-	syntax cast (|bool|)
+	inline syntaxcast (|bool|)
 		cpp_part Bool
 		return self != vec4()	
 	
@@ -183,16 +183,16 @@ datatype vec4
 	function Lum (|float|)
 		return self|vec3|.lum
 
-	function Width (|float|)
-		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
+	inline  Width (|float|)
+		return .x2 - .x1			// not quite true but the GUI uses it this way :(
 
-	function Height (|float|)
-		return .y2 - .y1			// not quite true but SubliminalApp uses it this way :(
+	inline  Height (|float|)
+		return .y2 - .y1			// same
 
-	function Area (|float|)
+	inline  Area (|float|)
 		return .width*.Height
 
-	function Aspect (|float|)
+	inline  Aspect (|float|)
 		return .width / .height
 		
 	function Overlap (|vec4| R, |vec4|)
@@ -235,22 +235,22 @@ datatype vec4
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
 	
 	module
-		function New (|vec4|)
+		inline  New (|vec4|)
 			cpp_part New0
 			return nil
-		function New (|vec3| a, |float| b, |vec4|)
+		inline  New (|vec3| a, |float| b, |vec4|)
 			cpp_part New31
 			numeric
 			return (a, b)
-		function New (|float| f, |vec4|)
+		inline  New (|float| f, |vec4|)
 			cpp_part New1
 			numeric
 			return (f,f,f,f)
-		function New (|float| g, |float| a, |vec4|)
+		inline  New (|float| g, |float| a, |vec4|)
 			cpp_part Gray
 			numeric
 			return (g,g,g,a)
-		function New (|float| a, |float| b, |float| c, |float| d, |vec4|)
+		inline  New (|float| a, |float| b, |float| c, |float| d, |vec4|)
 			cpp_part New4
 			numeric
 			return (a,b,c,d)

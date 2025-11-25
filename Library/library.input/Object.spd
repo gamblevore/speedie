@@ -82,14 +82,6 @@ class Object
 		error (where, name + " (object) is not a: " + cls.name )
 		debugger
 
-	api DebugPrint  // more for use in XCode, than anything else.
-		cpp_name jdb
-		visible true
-		if self
-			print string.Wrap(.class.name)
-			print ": "
-		printline .render
-
 		
 	autogen SyntaxExpect ( |string| Error )
 		visible

@@ -6,46 +6,41 @@ module Stability
 	function StabiliseFuncs
 		if !packmaker.libfuncs
 			PackMaker.AddAll
-		.StabiliseSub("stable_id_bank.txt", packmaker.libfuncs)
+		.StabiliseSub("stable_id_bank.txt", packmaker.libfuncs, true)
 		.Debug
 	
 	
 	function StabiliseGlobs 
-/		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs)
+/		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs, false)
 	
 	
-	function StabiliseSub (|string| name, |[scobject]| list)
+	function StabiliseSub (|string| name, |[scobject]| list, |bool| IsFuncs)
 		.LastLibID = 0
 		|| funcs = Compiler.library[name]
 		|| Data = funcs.ReadAll.trim
-		stability.UseFuncBank(data)
+		stability.UseBank(data, IsFuncs)
 		|| fs = (faststring(), nil)(options.MakeExec)
 			fs <~ data ?? "// beta-file. Unstable."
-		.StabliseFuncsSub(fs, list)
+		.StabliseSub2(fs, list, isfuncs)
 		if fs
 			funcs.SmartData = fs|string|
 		
 	
-	function scobject.NeedsID (|bool|)
-		require self isnt private
-		if self isa SCFunction
-			if !.IsLibrary// huh?
-				"ooof"
-				debugger 
-			require !.IsMacro and .IsLibrary
-			require self isnt disabled and AlwaysInline
+	function scfunction.NeedsID (|bool|)
+		require !.IsMacro
+		require self isnt disabled and AlwaysInline
 		return true
 	
 	
 	function Debug 
-		target debug
-			for f in packmaker.libfuncs
-				print f.packid|int|
-				print " "
-				printline f.exportname
+//		target debug
+//			for f in packmaker.libfuncs
+//				print f.packid(true)|int|
+//				print " "
+//				printline f.exportname
 
 	
-	function StabliseFuncsSub (|faststring| fs, |[scobject]| list)
+	function StabliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
 		opt norefcounts
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
 		|| frogs = packmaker.PackGlobSize, (frogs)
@@ -53,57 +48,71 @@ module Stability
 			if frogs and !options.MakeExec
 				Table = jb_vm.vm.InitTable(4096, frogs)
 
-		list.Sort(&CodeSorter.PackIDAndExportName)
+		|| sorter = codesorter.packid(isfunc)
+		list.Sort(sorter)
 		
-		for fn in list
-			if fn.NeedsID
-				fn.MakeID(fs, table)
+		for obj in list
+			if (obj isnt private) and (!isfunc or obj|scfunction|.needsID)
+				obj.MakeID(fs, table, isFunc)
 			
-	
-	function BuildLibGlobTable (|message| T, |dictionary of scdecl| table = dictionary())
-		opt norefcounts
-		for d in PackMaker.LibGlobs
-			table[d.ExportName] = d
-			if d.ExportPosition					// hmmm... shouldn't happen
-
-		for row in T
-			|| d = table[row.name]
-				|| pos = row[@num]
-					d.ExportPosition = pos.int	
-	
-	
-	function DumpGlobs (|faststring| fs=faststring(), |file| f)
-		opt norefcounts
-		for d in PackMaker.LibGlobs
-			fs <~ "${d.exportname} ${D.exportposition}\n"
-		f.SmartData = fs
-	
-	
+		
 	function packmaker.OrderLibGlobs // why is it done from the main compile func and not in the execmaker?
 		opt norefcounts
 		.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after
 		._LibGlobSize = .GlobalsSize(.libglobs) 	// rebuild size
 	
-		
-	function scobject.MakeID (|faststring| fs, |?&&nil| table)
-		|| id = .PackID
+	
+	function SCObject.PackID (|bool| isFunc, |int|)
+		if IsFunc
+			return .FPackID
+		return .GPackID
+	
+	function SCObject.PackID (|bool| isFunc, assigns:|int|)
+		if IsFunc
+			.FPackID = value
+		  else
+			.GPackID = value
+	
+	function scobject.MakeID (|faststring| fs, |?&&nil| table, |bool| IsFunc)
+		|| id = .packid(isfunc)
 		if !id
 			if fs
 				fs <~ "\n$.ExportName"
 			id = Stability.LastLibID++
-			.PackID = id
+			
+			.PackID(isfunc) = id
 		
 		if table
 			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
 				Table[id+31] = fn
 
 	
-	function UseFuncBank (|string| Data)
+	function UseBank (|string| Data, |bool| Funcs)
 		|| ID = .LastLibID
 		for str.lines in data
+			// so what happens when a func is in two places?
+			// if this is a prototype... its both a func and a global?
+			// how is it a global, though?
+			// well.. like x = fn, (x)()
+			// or fn()
+			// so it is both ways.
+			// if so... we need it both ways... in order to actually...
+			// write the correct numbers into the ASM.
+			// what about using the exportposition?
+			// if its a global, it should have an exportposition, right?
+			
+			// the thing is... we don't USE the exportpositions. only the pack uses them.
+			// for pack-globs.
+			
+			// so we need the packid in two ways... thats all.
+			
 			id++
 			|SCObject--| fn = Compiler.ExportNames[str]
-				check (!fn.PackID) (str + " replicated ID.")
-				fn.PackID = id
+				check (!fn.PackID(funcs)) (str + " replicated ID.")
+				fn.PackID(funcs) = id
+				if !funcs
+					"glob got a packid $id on $str"
+			  elseif !funcs
+				"glob missed a packid $id on $str"
 		.LastLibID = ID	
 	

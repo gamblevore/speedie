@@ -38,6 +38,55 @@ function Message.ListAll (|[Message]|)
 
 
 
+//  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
+
+
+helper @memory.CollectLeaks_ (|object| self, |[]|)
+	JB_FindLeakedObject(self, rz)
+
+
+function @memory.PrintLeaks (|object| self)
+	description "Finds the object that refers to this leaked object."
+	visible
+	|| i = 0
+	|| R = memory.CollectLeaks_(self)
+	while 
+		|object--| bad = r[i++]
+		if !bad
+			exit
+		bad.debugprint
+		debugger
+	
+
+
+function object.DebugPrint  // more for use in XCode, than anything else.
+	cpp_name jdb
+	visible true
+	if self
+		print string.Wrap(.class.name)
+		print ": "
+	printline .render
+
+
+target debug and !cake
+	function list.JDB2
+		description "For internal compiler-use only... don't use this"
+		cpp_name jdb2
+		visible
+		if (Self)
+			printline self|message|.RenderAST
+		  else
+			"(nil)"
+
+	function list.PrintLocate
+		visible
+		cpp_name jdbloc
+		if !self or self isa message
+			printline self|message|.locate
+
+
+
+
 
 //  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
 
@@ -132,5 +181,6 @@ module SCGlobals
 	linkage
 		cpp_part		SC
 	|int| UniqueNum
+
 
 

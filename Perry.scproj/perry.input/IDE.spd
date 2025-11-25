@@ -128,8 +128,8 @@ class PerryIDE (Window)
 //				StartupWindow.Show
 //				besides we would have asked to quit, perhaps.
 			
-			if .refcount > 1
-				Memory.PrintLeaks(self)
+//			if .refcount > 1
+//				Memory.PrintLeaks(self)
 		return true
 
 	function Perry.hasOthers (|listviewrow| F, |bool|)

@@ -557,8 +557,7 @@ Message is also:
 		|| ch = .first
 		if !ch
 			fs <~ " /# "
-			return 
-		
+			return
 
 		fs <~ ch.next
 		fs <~ " /# "
@@ -643,17 +642,6 @@ Message is also:
 	render
 		opt norefcounts
 		fs <~ self
-
-
-	target debug
-		function list.JDB2
-			description "For internal compiler-use only... don't use this"
-			cpp_name jdb2
-			visible
-			if (Self)
-				printline self|message|.RenderAST
-			  else
-				"(nil)"
 	
 	
 	render RenderAST		//  function ast,  message.ast
@@ -920,7 +908,7 @@ Message is also:
 				.ReportFailiure(need, nil, found)
 	
 	
-	function NeedFirst (|message|)
+	inline NeedFirst (|message|)
 		return self[@nil]
 
 
@@ -992,7 +980,7 @@ Message is also:
 		.func = src.func
 		.name = src.name
 		.clear
-		.prependall(src)
+		.PrependAll(src)
 	
 
 	function BecomeCopy (|message| src)

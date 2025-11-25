@@ -27,14 +27,6 @@ extend_module Message
 		return true
 
 
-target debug
-	function list.PrintLocate
-		visible
-		cpp_name jdbloc
-		if !self or self isa message
-			printline self|message|.locate
-
-
 function Message.Locate (|string|)
 	if (!self)
 		return "(nil)"

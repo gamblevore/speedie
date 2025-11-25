@@ -13,7 +13,8 @@ class SCObject
 	|byte|						AllocSource
 	|SCNodeInfo|				NodeInfo
 	|uint16|					CurrFuncLink
-	|uint16|					PackID
+	|uint16|					GPackID
+	|uint16|					FPackID
 	
 	constructor
 		.NodeInfo = Compiler.InBuiltType

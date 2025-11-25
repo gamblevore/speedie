@@ -43,26 +43,7 @@ class LeakTester
 			return leaktester.new("")
 		
 		helper TestClasses
-			
 
-
-helper @memory.CollectLeaks_ (|object| self, |[]|)
-	JB_FindLeakedObject(self, rz)
-
-
-function @memory.PrintLeaks (|object| self)
-	description "Finds the object that refers to this leaked object."
-	visible
-	cpp_name jbl
-	|| i = 0
-	|| R = memory.CollectLeaks_(self)
-	while 
-		|object--| bad = r[i++]
-		if !bad
-			exit
-		bad.debugprint
-		debugger
-	
 
 	
 helper object.FindReferences

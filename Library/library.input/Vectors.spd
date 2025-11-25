@@ -57,7 +57,7 @@ datatype ivec4
 		cpp_part Shrink
 		return (.x+i, .y+i, .z-i, .w-i)
 	
-	function Width (|int|)
+	inline Width (|int|)
 		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
 	
 	function Width (assigns:|int|, |ivec4|)
@@ -71,12 +71,13 @@ datatype ivec4
 	function Length (|bool|d, |int|)
 		return self[2+d|int|] - self[0+d|int|]
 	
-	function H (|ivec2|)
+	inline H (|ivec2|)
 		return .x1x2
-	function V (|ivec2|)
+	
+	inline V (|ivec2|)
 		return .y1y2
 		
-	function Height (|int|)
+	inline Height (|int|)
 		return .y2 - .y1
 		
 	function Area (|int|)
@@ -153,14 +154,14 @@ datatype ivec4
 		function Load (|&byte| B, |ivec4|)
 			cpp_wrapper JB_ivec4_Load
 
-		function New (|ivec4|)
+		inline New (|ivec4|)
 			cpp_part New0
 			return (0, 0, 0, 0)
-		function New (|int| x, |ivec4|)
+		inline New (|int| x, |ivec4|)
 			cpp_part New1
 			numeric
 			return (x,x,x,x)
-		function New (|int| x, |int| y, |int| z, |int| w, |ivec4|)
+		inline New (|int| x, |int| y, |int| z, |int| w, |ivec4|)
 			cpp_part New4
 			numeric
 			return (x,y,w,z)
@@ -252,17 +253,17 @@ datatype vec3
 		cpp_part ClampVec
 		return self|vec4|.clamp(min|vec4|, max|vec4|)|vec3|
 	
-	function Round (|vec3|)
+	inline Round (|vec3|)
 		return self|vec4|.round|vec3|
 
-	function Length (|float|)
+	inline Length (|float|)
 		.w = 0
 		return self|vec4|.length
 		
 	function Normal (|vec3|)
 		return self / .Length
 
-	function LengthSq (|float|)
+	inline LengthSq (|float|)
 		.w = 0
 		return self|vec4| • self|vec4|
 
@@ -274,7 +275,7 @@ datatype vec3
 		cpp_part Mul3
 		return (.x*v.x, .y*v.y, .z*v.z)
 	
-	function Abs (|vec3|)
+	inline Abs (|vec3|)
 		return self|vec4|.abs|vec3|
 	
 	operator • (|vec3| other, |float|)
@@ -296,31 +297,31 @@ datatype vec3
 		fs <~ "(${.x}, ${.y}, ${.z})"
 	
 	module
-		function New (|vec3|)
+		inline New (|vec3|)
 			cpp_part zero
 			return (0.0, 0.0, 0.0)
-		function New (|float| x, |float| y, |float| z, |vec3|)
+		inline New (|float| x, |float| y, |float| z, |vec3|)
 			numeric
 			return (x,y,z)
-		function New (|vec2| xy, |float| z, |vec3|)
+		inline New (|vec2| xy, |float| z, |vec3|)
 			cpp_part New21
 			numeric
 			return (xy,z)
-		function New (|float| x, |vec3|)
+		inline New (|float| x, |vec3|)
 			cpp_part New1
 			numeric
 			return (x,x,x)
-		function Up   (|vec3|)
+		inline Up   (|vec3|)
 			return (0.0,  1.0, 0.0)
-		function Down (|vec3|)
+		inline Down (|vec3|)
 			return (0.0, -1.0, 0.0)
 
 
 
 datatype ivec3
-	syntax cast (|bool|)
+	inline syntaxcast (|bool|)
 		cpp_part Bool
-		return .x or .y or .z
+		return self != ivec3()
 
 	function Vec3 (|vec3|)
 		return (.x|float|, .y|float|, .z|float|)	
@@ -332,7 +333,7 @@ datatype ivec3
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
 	module
-		function New (|ivec3|)
+		inline New (|ivec3|)
 			return (0, 0, 0)
 
 
@@ -343,7 +344,7 @@ datatype ivec3
 datatype IntRange (ivec2)
 	linkage
 		cpp_part Rg
-	function Width (|int|)
+	inline Width (|int|)
 		return .x2 - .x
 	operator Inside (|ivec4| R, |bool|)
 		return R.Contains(.x, .y)
@@ -357,19 +358,18 @@ datatype IntRange (ivec2)
 		cpp_part Shrink
 		return (.x+i, .x2-i)
 	
-	
 	operator dtd  (|intrange| R, |bool|)
 		if (r.x2 <= .x) or (r.x >= .x2)
 			return false
 		return true
 		
-	function Resolve (|intrange|)
+	inline Resolve (|intrange|)
 		return (.lower, .higher)
-	function Higher (|int|)
+	inline Higher (|int|)
 		return .x1 max .x2
-	function Lower (|int|)
+	inline Lower (|int|)
 		return .x1 min .x2
-	function Mid (|int|)
+	inline Mid (|int|)
 		return (.x1 + .x2)/2
 	function LimitTo (|int| i, |ivec2|)
 		if (.x  < 0):		.x  = 0
@@ -381,6 +381,7 @@ datatype IntRange (ivec2)
 	operator Contains (|int| i, |bool|)
 		cpp_part Contains1
 		return (i >= .x) and (i < .x2)
+	
 	operator Contains (|ivec2| i, |bool|)
 		cpp_part Contains2
 		return self contains i.x and i.x2
@@ -405,7 +406,7 @@ datatype ivec2
 	function Hash (|ivec2|)
 		return (.x.hash, .y.hash)
 		
-	function Width (|int|)
+	inline Width (|int|)
 		return .x2 - .x
 	
 	operator Sign (|ivec2| C, |ivec2|)
@@ -419,10 +420,10 @@ datatype ivec2
 		if (Lsq < osq)
 			return -1
 
-	syntax cast (|intrange|)
+	inline syntaxcast (|intrange|)
 		return self|intrange|
 
-	function Grow (|ivec2|g, |ivec4|)
+	inline Grow (|ivec2|g, |ivec4|)
 		return (self-g, self+g)
 		
 	function Clip (|int| p, |int|)
@@ -436,7 +437,7 @@ datatype ivec2
 		p.y = .y.clamp(p.y)
 		return p
 			
-	function Mid (|int|)
+	inline Mid (|int|)
 		return (.x1+.x2)/2
 		
 	operator contains (|int| x, |bool|)
@@ -474,10 +475,10 @@ datatype ivec2
 	operator inrange (|ivec2| p, |bool|)
 		return .x inrange p.x  and  .y inrange p.y
 
-	function Sum (|int|)
+	inline Sum (|int|)
 		return .x + .y
 
-	function Area (|int|)
+	inline Area (|int|)
 		return .x * .y
 
 	function Inside (|ivec4| R, |bool|)
@@ -486,28 +487,28 @@ datatype ivec2
 	function Vec2 (|vec2|)
 		return (.x|float|, .y|float|)
 	
-	function Rect (|ivec4|)
+	inline Rect (|ivec4|)
 		return (0, 0, .x, .y)
 
 	function Point (|ivec4|) 
 		return .xyxy + (0,0,1,1)
 	
-	syntax cast (|bool|)
+	inline syntaxcast (|bool|)
 		cpp_part Bool
-		return .x or .y
+		return self != ivec2()
 	
 	syntax Equals (|ivec2| v, |bool|)
 		cpp_part Equals2
 		return (.x == v.x) and (.y == v.y) 
 
 	syntax Equals (|int| v, |bool|)
-		return (.x == v) and (.y == v) 
+		return self == (v,v) 
 	
-	function RotateRight (|ivec2|)
+	inline RotateRight (|ivec2|)
 		description "Rotates like a steering wheel, so turning the top to the right" 
 		return (.y, -.x)
 	
-	function RotateLeft (|ivec2|)
+	inline RotateLeft (|ivec2|)
 		description "Rotates like a steering wheel, so turning the top to the left" 
 		return (-.y, .x)
 		
@@ -524,11 +525,11 @@ datatype ivec2
 			curr = (0,curr.y+1)
 			
 	module
-		function New (|int| x, |ivec2|)
+		inline New (|int| x=0, |ivec2|)
 			cpp_Part New1
 			numeric
 			return (x, x)
-		function New (|int| x, |int| y, |ivec2|)
+		inline New (|int| x, |int| y, |ivec2|)
 			cpp_Part New2
 			numeric
 			return (x, y)
@@ -539,7 +540,7 @@ datatype vec2
 	render
 		fs <~ "(${.x}, ${.y})"
 
-	function iVec2 (|ivec2|)
+	inline iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
 	
 	function Reflect (|vec2| plane, |vec2|)
@@ -569,7 +570,7 @@ datatype vec2
 		return self / .Length
 	
 	function Box (|float| x, |vec4|)
-		return (self - x, self+x)
+		return (self-x, self+x)
 
 	function IFloor (|ivec2|)
 		return .floor.ivec2
@@ -586,13 +587,12 @@ datatype vec2
 	operator Pow (|vec2| v, |vec2|)
 		return (.x pow v.x, .y pow v.y)
 		
-	function Max (|float|)
+	inline Max (|float|)
 		return .x max .y
 
-	syntax cast (|bool|)
+	inline syntaxcast (|bool|)
 		cpp_part Bool
-		return .x or .y
-
+		return self != vec2()
 
 	helper float.RoundEvenSub (|float|)
 		return (self*0.5).Fract*2.0
@@ -622,13 +622,13 @@ datatype vec2
 		(s.y max= .y)
 		return s	
 
-	function Sum (|float|)
+	inline Sum (|float|)
 		return .x + .y
 
 	function LengthSq (|float|)
 		return (.x * .x)  +  (.y * .y)
 
-	function Width (|float|)
+	inline Width (|float|)
 		return .x2 - .x1
 	
 	function Length (|float|)
@@ -664,13 +664,13 @@ datatype vec2
 			return -1
 	
 	module
-		function New (|vec2|)
+		inline New (|vec2|)
 			cpp_part New0
-		function New (|float| a, |vec2|)
+		inline New (|float| a, |vec2|)
 			cpp_part New1
 			numeric
 			return (a, a)
-		function New (|float| a, |float| b,  |vec2|)
+		inline New (|float| a, |float| b,  |vec2|)
 			cpp_part New2
 			numeric
 			return (a, b)
@@ -685,65 +685,65 @@ datatype mat2 (vec4)
 		XZ = (m.xy • xz, m.zw • xz)
 		return (xz.x, .y, xz.y)
 	module
-		function New (|vec4| x, |mat2|)
+		inline New (|vec4| x, |mat2|)
 			numeric
 			return x|mat2|
-		function New (|float| a, |float| b, |float| c, |float| d,  |mat2|)
+		inline New (|float| a, |float| b, |float| c, |float| d,  |mat2|)
 			cpp_part New4
 			numeric
 			return (a,b,c,d)|mat2|
-		function New (|mat2|)
+		inline New (|mat2|)
 			cpp_part Identity
 			return (1.0, 0.0, 0.0, 1.0)|mat2|
 
 
 
-function vecmix (|vec2|a, |vec2|b, |vec4|)
+inline vecmix (|vec2|a, |vec2|b, |vec4|)
 	cpp_part mix22
 	return (a.x, a.y, b.x, b.y)
-function vecmix (|float|a, |float|b, |vec2|c, |vec4|)
+inline vecmix (|float|a, |float|b, |vec2|c, |vec4|)
 	cpp_part mix112
 	return (a, b, c.x, c.y)
-function vecmix (|vec2|a, |float|b, |float|c, |vec4|)
+inline vecmix (|vec2|a, |float|b, |float|c, |vec4|)
 	cpp_part mix211
 	return (a.x, a.y, b, c)
-function vecmix (|float|a, |vec2|b, |float|c, |vec4|)
+inline vecmix (|float|a, |vec2|b, |float|c, |vec4|)
 	cpp_part mix121
 	return (a, b.x, b.y, c)
-function vecmix (|vec3|a, |float|b, |vec4|)
+inline vecmix (|vec3|a, |float|b, |vec4|)
 	cpp_part mix31
 	return (a.x, a.y, a.z, b)
-function vecmix (|float|a, |vec3|b, |vec4|)
+inline vecmix (|float|a, |vec3|b, |vec4|)
 	cpp_part mix13
 	return (a, b.x, b.y, b.z)
-function vecmix (|vec2|a, |float|b, |vec3|)
+inline vecmix (|vec2|a, |float|b, |vec3|)
 	cpp_part mix21
 	return (a.x, a.y, b)
-function vecmix (|float|a, |vec2|b, |vec3|)
+inline vecmix (|float|a, |vec2|b, |vec3|)
 	cpp_part mix12
 	return (a, b.x, b.y)
-function ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
+inline ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
 	cpp_part imix22
 	return (a.x, a.y, b.x, b.y)
-function ivecmix (|ivec2|a, |int|b,|int|c, |ivec4|)
+inline ivecmix (|ivec2|a, |int|b,|int|c, |ivec4|)
 	cpp_part imix211
 	return (a.x, a.y, b, c)
-function ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
+inline ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
 	cpp_part imix112
 	return (a, b, c.x, c.y)
-function ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
+inline ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
 	cpp_part imix121
 	return (a, b.x, b.y, c)
-function ivecmix (|ivec3|a, |int|b, |ivec4|)
+inline ivecmix (|ivec3|a, |int|b, |ivec4|)
 	cpp_part imix31
 	return (a.x, a.y, a.z, b)
-function ivecmix (|int|a, |ivec3|b, |ivec4|)
+inline ivecmix (|int|a, |ivec3|b, |ivec4|)
 	cpp_part imix13
 	return (a, b.x, b.y, b.z)
-function ivecmix (|ivec2|a, |int|b, |ivec3|)
+inline ivecmix (|ivec2|a, |int|b, |ivec3|)
 	cpp_part imix21
 	return (a.x, a.y, b)
-function ivecmix (|int|a, |ivec2|b, |ivec3|)
+inline ivecmix (|int|a, |ivec2|b, |ivec3|)
 	cpp_part imix12
 	return (a, b.x, b.y)
 

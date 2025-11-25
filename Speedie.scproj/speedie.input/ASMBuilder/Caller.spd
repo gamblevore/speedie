@@ -147,7 +147,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		if fn isnt CantInline
 			|| MiniDest = .AskForInline(prms, dest, fn)
 				return MiniDest
-		TableID = fn.PackID + 31
+		TableID = fn.fPackID + 31
 
 		if tableid <= 31							// failed!
 			if !fn.islibrary or !.state.fn.islibrary

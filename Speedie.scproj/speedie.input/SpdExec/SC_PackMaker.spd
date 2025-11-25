@@ -75,8 +75,8 @@ module PackMaker
 		|| PackMain = compiler.xfunc("JB_Main")
 		require PackInit and PackMain
 		
-		PackInit.PackID = 1 // put init and main first!
-		PackMain.PackID = 2
+		PackInit.fPackID = 1 // put init and main first!
+		PackMain.fPackID = 2
 
 		stability.StabiliseFuncs	
 					
@@ -106,10 +106,10 @@ module PackMaker
 
 	helper PackIDFuncs (|[scfunction]| list)
 		opt norefcounts
-		list.sort(&CodeSorter.PackIDAndExportName)
+		list.sort(&CodeSorter.fPackID)
 		|| ID = 0
 		while (|| f = list[id])
-			f.PackID = ++id
+			f.fPackID = ++id
 
 	
 	function FATCompile (|bool|)
@@ -121,7 +121,7 @@ module PackMaker
 		for (fn in .Packfuncs) (i)
 			require Assembler.sh.ASMCompile(fn, i+1)
 
-		.Packfuncs.sort(&CodeSorter.PackIDAndExportName)
+		.Packfuncs.sort(&CodeSorter.fPackID)
 		
 		target debug
 			if !Compiler.InPerry
@@ -249,13 +249,13 @@ module PackMaker
 		if !fn
 			.addint 0
 			return
-		if 1 or Options.TargetDebug // seems better to always get names, for debugging!
-			.Enter(@unit, fn.name)
-		|| id = fn.PackID							#check (fn.source, "Missing PackID")
+//		if 1 or Options.TargetDebug // seems better to always get names, for debugging!
+		.Enter(@unit, fn.name)
+		|| id = fn.fPackID							#check (fn.source, "Missing PackID")
 		id = (id << 1) + fn.IsLibrary
 		.AddInt(id)
-		if 1 or Options.TargetDebug
-			.exit
+//		if 1 or Options.TargetDebug
+		.exit
 
 	
 	function SCClass.DescribeInPack (|jbin| j)
