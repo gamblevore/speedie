@@ -1,7 +1,7 @@
-## "Why use DTDs for XML? Replacing it with Speedie and Jeebox"
+## An alternative to XML DTD.
 
 
-Instead of using a DTD tovaldiate XML, why not use Speedie to validate Jeebox? Well... I think its actually the correct choice.
+Instead of using a DTD to validate XML, why not use Speedie to validate Jeebox? Well... I think its actually the correct choice.
 
 Lets start with the main point, then list some side points.
 
