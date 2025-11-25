@@ -81,8 +81,8 @@ module Stability
 	
 	function packmaker.OrderLibGlobs // why is it done from the main compile func and not in the execmaker?
 		opt norefcounts
-		.LibGlobs.Sort(SimplestFirst)			// sort them so empty values come after
-		._LibGlobSize = .GlobalsSize(.libglobs) // rebuild size
+		.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after
+		._LibGlobSize = .GlobalsSize(.libglobs) 	// rebuild size
 	
 		
 	function scobject.MakeID (|faststring| fs, |?&&nil| table)
@@ -99,14 +99,10 @@ module Stability
 
 	
 	function UseFuncBank (|string| Data)
-		// what about globs?
 		|| ID = .LastLibID
 		for str.lines in data
 			id++
-			|scbetternode--| fn = Compiler.ExportNames[str]
-			if fn isa SCFunction
-				if !fn.islibrary // huh? 
-				
+			|SCObject--| fn = Compiler.ExportNames[str]
 				check (!fn.PackID) (str + " replicated ID.")
 				fn.PackID = id
 		.LastLibID = ID	

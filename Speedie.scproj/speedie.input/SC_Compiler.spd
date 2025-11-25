@@ -82,8 +82,8 @@ linkage
 |[SCFunction]|				ProtoTypes
 |[scdecl]|					ActualSyxes
 
-|Dictionary of scbetternode|ExportNames = Dictionary()
-|dictionary of dictionary of macro|	AdjDicts = dictionary()
+|Dictionary of scobject|	ExportNames = Dictionary()
+|dictionary of dictionary of macro|	AdjDicts = Dictionary()
 
 |SCFunction|				RefIncr
 |SCFunction|				RefIncr2
@@ -536,6 +536,7 @@ function ImportAll
 	for f in .FuncList
 		f.FuncParamsLoad
 		f.LoadExportName
+		f.StoreExport
 		f.StatelessAccumulate
 		require !stderr.TooMany
 	scfunction.currfunc = nil

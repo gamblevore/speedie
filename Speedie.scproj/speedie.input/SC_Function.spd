@@ -247,15 +247,13 @@ function CollectStats
 //		FuncArgAndReturnTypes[4]++
 	
 
-function FuncParamsLoad
+function FuncParamsLoad 
 	opt norefcounts
 	scfunction.CurrFunc = self // perhaps this should set the curr proj along with it.
 	|| old = scimport.curr
 	.project.use
 	.returntype = nil
 	.args.clear
-//	if InBranch // oof?
-//	InBranch = 0 // remove this?
 	|| P = .Source.second
 		.SubFuncParamsLoad(P)
 	scimport.curr = old

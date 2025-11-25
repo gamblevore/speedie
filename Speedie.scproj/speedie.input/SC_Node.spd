@@ -324,7 +324,7 @@ function message.WrapperCpp (|string|)
 		return .name
 
 
-function SCFunction.ExportNameBuilder (|string|CppPart="", |string| )
+function SCFunction.ExportNameBuilder (|string|CppPart="", |string|)
 	if !CppPart
 		CppPart = .Name
 		if .IsAssigns and !(cpppart endswith "Hider")
@@ -700,7 +700,12 @@ function SCFunction.ParamUniquer (|string| s, |string|)
 	return fs
 
 
-function UniquifyExport (|String| s, |string|)
+function scfunction.StoreExport
+	opt norefcounts
+	compiler.exportnames[.exportname] = self
+
+
+function SCObject.UniquifyExport (|String| s, |string|)
 	if (self isa scfunction)
 		|| s2 = .ParamUniquer(s)
 		if !compiler.ExportNames[s2]
@@ -712,8 +717,9 @@ function UniquifyExport (|String| s, |string|)
 		return s3
 
 
-function SCBetterNode.RehomeExport (|bool|)
-	check (!.IsLibrary) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
+function SCObject.RehomeExport (|bool|)
+	if self isa SCBetterNode
+		check (!.IsLibrary) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
 	|| newhome = .UniquifyExport(.exportname)			#require
 	compiler.ExportNames[.exportname] = nil
 	compiler.ExportNames[newhome] = self
