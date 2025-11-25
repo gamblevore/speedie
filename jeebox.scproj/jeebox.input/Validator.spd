@@ -15,7 +15,8 @@ class Validator
 			yield Curr
 	
 	render
-		return .msg_.Render(fs_in)
+		if self
+			return .msg_.Render(fs_in)
 	
 	function Msg (|Message?|)
 		if self
@@ -25,11 +26,14 @@ class Validator
 		if self
 			return .msg_.Int(0, low, high)
 	
+	function Str (|validator|)
+		return self[@str].end
+	
 	function Name (|string|)
 		if self
 			return .msg_.name
 	
-	function All (|syntax| Fn=@tmp, |string?| name=nil, |ValidatorSome|)
+	function All (|syntax| Fn=@tmp, |string?| name=nil, |ValidatorAll|)
 		description "At least one must be found, and none after us."
 		return .any(fn, name)
 	
@@ -38,18 +42,12 @@ class Validator
 		return .any(fn, name)
 		
 	function Any (|syntax| Fn=@tmp, |string?| name=nil, |Validator|)
+		description "Zero or more may be found"
 		nil checker
 		if self
 			.TestFunc = fn
 			.TestName = name
 			return self
-	
-	function End (|Validator|)
-		nil checker
-		if self
-			.msg_.ExpectLast
-		return self
-
 
 	function Upon (|message|)
 		opt norefcounts
@@ -85,10 +83,21 @@ class Validator
 	function ChildEnd
 		if self
 			.curr.ExpectLast
-	
+		
+	function End (|Validator|)
+		nil checker
+		if self
+			.msg_.ExpectLast
+		return self
+
 	autogen ReportMissing
 		if self
-			.msg_.parent.ReportFailiure(.testfunc, .testname)
+			"!!!!"
+			printline .msg_
+			"----"
+			printline .curr
+			"????"
+			.msg_.ReportFailiure(.testfunc, .testname, .upon)
 	
 	syntax Equals (|string?| s, |bool| Aware=false, |bool|)
 		cpp_part AllowStr
@@ -101,7 +110,6 @@ class Validator
 		.msg.SyntaxExpect(description)
 
 
-
 role ValidatorSome (Validator)
 	iterator
 		|| Count = 0
@@ -112,11 +120,18 @@ role ValidatorSome (Validator)
 			.ReportMissing
 
 
+role ValidatorAll (Validator)
+	iterator
+		while (|| Curr = .Allow)
+			yield Curr
+		.childend
 
-function Message.StartValidate (|syntax| func=nil, |string?| name=nil, |Validator|)
+
+
+function Message.Validate (|syntax| func=nil, |string?| name=nil, |Validator|)
 	real self
 	opt norefcounts
-	if self == @arg
+	if self == @arg and func != @arg
 		|| inner = .first
 		if inner == @sheb
 			inner++

@@ -34,7 +34,7 @@ function Validator.GetRatio (|int| Max, |validator|)
 
 || Noisy = app.yes("noisy")
 main (|Message| TV_Guide)
-	|| tv = tv_guide.StartValidate(@tmp, "tv")					#require
+	|| tv = tv_guide.Validate(@tmp, "tv")					#require
 	
 	for item in tv.allow(@list).All(@item)
 		|| n = item[@thg]

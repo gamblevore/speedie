@@ -206,7 +206,7 @@ extend message
 		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
 
 		
-	syx XDTD (XML_Comment)
+	syx XDTD (XML_DTD)
 		fs <~ "<!"
 		fs <~ .name
 		fs <~ ">"

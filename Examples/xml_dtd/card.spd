@@ -1,0 +1,17 @@
+
+
+    main (|message| AddressBook)
+        || AB = AddressBook.Validate(@tmp, "addressBook")
+        for Card in AB.arg.All("card")
+            || arg = card.arg.end       #loop
+            || name = arg.allow("name").str
+                printline name.name
+              else
+                || F = arg["givenName"].str
+                || L = arg["familyName"].str
+                if F and L
+                    printline F.name + " " + L.name
+            arg["email"].str
+            arg.allow("note").str
+            arg.ChildEnd // remove this line if you want
+
