@@ -97,6 +97,7 @@ extend String
 			rz--
 
 	function Resolve (|bool| AllowMissing = false, |string|) 
+		description "Calls the unix realpath() function, and also fixes filepaths a little. Returns an empty string if not found. If AllowMissing is true, then this will never return an empty string."
 		cpp_wrapper JB_Str_ResolvePath
 
 	function IsVolume (|bool|)

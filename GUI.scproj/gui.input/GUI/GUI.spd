@@ -515,9 +515,10 @@ module GUI
 	function OpenDocument (|string| path, |bool| AllowMissing,  |object|)
 		require path
 		|| d = .AppDocumentOpen
-			|| f = path.Resolve
-			if AllowMissing or f.fileexists
-				rz = (d)(nil, nil, f, CopyPasteFlags.PasteFile)
+			|| f = path.Resolve(Allowmissing)
+			if !f.FileExists
+				require f and f.file.open
+			rz = (d)(nil, nil, f, CopyPasteFlags.PasteFile)
 	
 	
 	function HandleOpenFile

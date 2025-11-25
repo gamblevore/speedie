@@ -627,12 +627,15 @@ JB_String* JB_Str_ResolvePath ( JB_String* self, bool AllowMissing ) {
 		} else {
 			Result = JB_Str__Freeable0( Resolved );
 		}
-	} else if (!(errno == ENOENT and AllowMissing)) {
+	} else if (errno == ENOENT) {
+		if (AllowMissing)
+			return UserPath;
+	} else {
 		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
 	}
 	
-	if (UserPath != self)
-		JB_FreeIfDead(UserPath);
+	if (UserPath != self) // because userpath is not returned below.
+		JB_FreeIfDead(UserPath); // we return a string from JB_Str__Freeable0
 	
 	return Result;
 }

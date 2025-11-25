@@ -76,10 +76,6 @@ module Perry
 				return f
 				
 
-/*
-	+'/usr/local/speedie/Speedie.scproj' "Speedie"
-*/
-
 	helper FindStartingExample (|message|)
 		rz  = .StartFile("Examples", "banana_count.spd")
 		rz ?= .StartFile("Examples", "")

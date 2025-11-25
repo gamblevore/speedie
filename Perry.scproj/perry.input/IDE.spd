@@ -807,7 +807,7 @@ class PerryIDE (Window)
 		if .GotoIncludedFile(p)
 			//
 		  elseif f.NeedsOwnWindow
-			ide = perry.IdeAddProj(p)							// add as project
+			ide = perry.IdeAddProj(p)					// add as project
 		  else
 			.filelist.addextra(p)						// add root
 		startupwindow.hide
