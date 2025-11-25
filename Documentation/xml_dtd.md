@@ -63,16 +63,12 @@ You can see the validator class here: [Validator class](../jeebox.scproj/jeebox.
 
 You might be thinking "Thats all? 100 lines of code?"
 
-Well... yeah. thats the point. To make the thing simple. Using this, we can make very simple validation code! Theres an example here: [tv.val.spd](../Examples/xml_dtd/tv.val.spd)
-
-This way, you don't need to learn an entire new language just to validate your data, like you do with XML/DTD. You just keep using your knowledge of Speedie.
+Well... yeah. thats the point. To make the thing simple. This way, you don't need to learn an entire new language just to validate your data, like you do with XML/DTD. You just keep using your knowledge of Speedie.
 
 
 ### Porting XML/DTD to Jeebox/Speedie
 
-Heres a simple example
-
-
+Heres a simple example:
 
     <addressBook>
       <card>
@@ -109,8 +105,8 @@ Here, the intention is that the name could be the full name, or broken down into
     		name "Fred Bloggs"
     		email "fb@example.net"
 
-Now lets validate it.
 
+Now lets validate it:
 
 	main (|message| AddressBook)
 		|| AB = AddressBook.Validate(@tmp, "addressBook")
@@ -142,8 +138,12 @@ Lets say we want our validator to do a little more. Actually print output. We ca
             arg["email"].str
             arg.allow("note").str
             arg.ChildEnd // remove this line if you want
-    		
+
 Getting back to one of the points earlier about how DTDs are used to reject, rather than allow. Well... we are doing that here too. But we can make this extensible, by removing one statement! Delete the `arg.ChildEnd` line. Now your document can have extra fields added. They will be ignored by this version of the validator, but future validators could do extra checks on them.
+
+A larger example can be found here: [tv.val.spd](../Examples/xml_dtd/tv.val.spd)
+
+### End Note
 
 An interesting thing, is that you can actually make self-validating documents. Try doing that in XML! Using the unix "shebang" (`#!`) feature, at the start of a document, makes it executable. We'll probably have to sort out some security issues around that first, but if you are in a trusted environment, running your own programs, its just fine.
     
@@ -156,5 +156,4 @@ An interesting thing, is that you can actually make self-validating documents. T
     	card 
     		name "Fred Bloggs"
     		email "fb@example.net"
-
 
