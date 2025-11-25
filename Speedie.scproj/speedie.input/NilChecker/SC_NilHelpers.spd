@@ -50,7 +50,10 @@ function FastDecl (|SCDecl!|)
 		if l isa scdecl
 			return l
 		return obj
-	error (self, "No decl found on: " + .locate)
+	if obj isa scmodule
+		error (self, "This module is not an object: " + obj.name)
+	  else
+		error (self, "No decl found on: " + .locate)
 	return Compiler.GetTypeVoid
 
 

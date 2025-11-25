@@ -705,6 +705,10 @@ function scfunction.StoreExport
 	compiler.exportnames[.exportname] = self
 
 
+function scdecl.StoreExport
+	compiler.ExportGlobs[.exportname] = self
+
+
 function SCObject.UniquifyExport (|String| s, |string|)
 	if (self isa scfunction)
 		|| s2 = .ParamUniquer(s)

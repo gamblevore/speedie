@@ -197,6 +197,7 @@ function compiler.DeadStrip
 		f.DetectIfReached
 		
 	for f in packmaker.libglobs
+		f.StoreExport
 		f.reach
 	
 	for f in packmaker.PackGlobs

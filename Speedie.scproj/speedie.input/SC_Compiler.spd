@@ -83,6 +83,7 @@ linkage
 |[scdecl]|					ActualSyxes
 
 |Dictionary of scobject|	ExportNames = Dictionary()
+|Dictionary of scdecl|		ExportGlobs = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = Dictionary()
 
 |SCFunction|				RefIncr

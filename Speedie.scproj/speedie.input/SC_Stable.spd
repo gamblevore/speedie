@@ -11,7 +11,7 @@ module Stability
 	
 	
 	function StabiliseGlobs 
-/		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs, false)
+		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs, false)
 	
 	
 	function StabiliseSub (|string| name, |[scobject]| list, |bool| IsFuncs)
@@ -27,17 +27,15 @@ module Stability
 		
 	
 	function scfunction.NeedsID (|bool|)
-		require !.IsMacro
-		require self isnt disabled and AlwaysInline
-		return true
+		return (!.IsMacro) and (self isnt disabled and AlwaysInline)
 	
 	
 	function Debug 
-//		target debug
-//			for f in packmaker.libfuncs
-//				print f.packid(true)|int|
-//				print " "
-//				printline f.exportname
+		target debug
+			for f in packmaker.libfuncs
+				print f.packid(true)|int|
+				print " "
+				printline f.exportname
 
 	
 	function StabliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
@@ -79,40 +77,23 @@ module Stability
 			if fs
 				fs <~ "\n$.ExportName"
 			id = Stability.LastLibID++
-			
 			.PackID(isfunc) = id
 		
 		if table
 			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
 				Table[id+31] = fn
 
+	function Find (|string| str, |bool| Funcs, |scobject|)
+		if funcs
+			return Compiler.ExportNames[str]
+		return compiler.ExportGlobs[str]
 	
 	function UseBank (|string| Data, |bool| Funcs)
 		|| ID = .LastLibID
 		for str.lines in data
-			// so what happens when a func is in two places?
-			// if this is a prototype... its both a func and a global?
-			// how is it a global, though?
-			// well.. like x = fn, (x)()
-			// or fn()
-			// so it is both ways.
-			// if so... we need it both ways... in order to actually...
-			// write the correct numbers into the ASM.
-			// what about using the exportposition?
-			// if its a global, it should have an exportposition, right?
-			
-			// the thing is... we don't USE the exportpositions. only the pack uses them.
-			// for pack-globs.
-			
-			// so we need the packid in two ways... thats all.
-			
 			id++
-			|SCObject--| fn = Compiler.ExportNames[str]
+			|SCObject--| fn = .Find(Str, Funcs)
 				check (!fn.PackID(funcs)) (str + " replicated ID.")
 				fn.PackID(funcs) = id
-				if !funcs
-					"glob got a packid $id on $str"
-			  elseif !funcs
-				"glob missed a packid $id on $str"
 		.LastLibID = ID	
 	
