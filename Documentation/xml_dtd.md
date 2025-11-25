@@ -1,11 +1,11 @@
-## An alternative to XML DTD.
+## An Alternative to XML-DTD.
 
 
 Instead of using a DTD to validate XML, why not use Speedie to validate Jeebox? Well... I think its actually the correct choice.
 
 Lets start with the main point, then list some side points.
 
-**DTDs do not actually validate things very well! Too inflexible. Lets say I had a file that must have an odd number of lines. Is that possible? Nope. A silly example, but the point is, its trivial to do with code! What about dates? Or numerical-range validation? Or checking files against other files.**
+**DTDs do not actually validate things very well! Too inflexible. Lets say I wanted to check each item in the file against a database. Is that possible? Nope. What about validating dates? Or numerical-range validation? Or checking files against other files.**
 
 As I've [said elsewhere](xml.md) all limited languages end up migrating towards being full programming languages anyhow. So you might as well start off with it.
 
