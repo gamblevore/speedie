@@ -533,7 +533,7 @@ struct Assembler
 	target debug
 		function µDebug (|message| exp, |asmreg| dest)
 			|| fn = fn_asm_table[exp.ASMType]!
-			dest.debugprint
+			dest.DebugPrint
 			PrintProgress()
 			debugger
 			|| m = (fn)(self, exp, dest)

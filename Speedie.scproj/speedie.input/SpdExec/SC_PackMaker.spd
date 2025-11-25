@@ -8,17 +8,10 @@ module PackMaker
 	|[SCDecl]|				LibGlobs
 	|[SCFunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
-	|int|					_PackGlobSize
-	|int|					_LibGlobSize
+	|int|					PackGlobSize
+	|int|					LibGlobSize
 	|HairyMan|				PackSaved
 	|hairyman|				LibSaved
-
-
-	function PackGlobSize (|int|)
-		return ._PackGlobSize init .GlobalsSize(.PackGlobs)
-	
-	function LibGlobSize (|int|)
-		return ._LibGlobSize
 	
 	
 	helper scfunction.NeedsLibExport (|bool|)
@@ -82,6 +75,8 @@ module PackMaker
 					
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
+		.PackGlobSize = .GlobalsSize(.PackGlobs)
+	
 		return true
 	
 	

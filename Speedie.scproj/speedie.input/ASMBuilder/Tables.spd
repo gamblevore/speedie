@@ -802,9 +802,9 @@ function Str (fn_asm)
 	|| k = real.Position
 	if !k and (Compiler is Hungry)
 		PackMaker.PackStrings <~ real
-		k = PackMaker._PackGlobSize
+		k = PackMaker.PackGlobSize
 		real.Position = k
-		PackMaker._PackGlobSize = k + 8
+		PackMaker.PackGlobSize = k.alignup(8) + 8
 	
 	if k <= 20~bits
 		return exp.GOBJ(dest, 0, 0, K>>3) * dest		// seems good!

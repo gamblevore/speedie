@@ -60,7 +60,7 @@ target debug
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
 				#!"We could change it if it is only 112."
 				debugger
-				t.debugprint
+				t.DebugPrint
 
 
 function Assembler.OpenVars (|uint64|)

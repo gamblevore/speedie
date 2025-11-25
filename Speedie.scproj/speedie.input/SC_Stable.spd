@@ -41,12 +41,11 @@ module Stability
 	function StabliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
 		opt norefcounts
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
-		|| frogs = packmaker.PackGlobSize, (frogs)
 		target debug
-			if frogs and !options.MakeExec
-				Table = jb_vm.vm.InitTable(4096, frogs)
+			if !options.MakeExec
+				Table = jb_vm.vm.InitTable(4096, 64K)
 
-		|| sorter = codesorter.packid(isfunc)
+		|| sorter = codesorter.PackID(isfunc)
 		list.Sort(sorter)
 		
 		for obj in list
@@ -57,7 +56,7 @@ module Stability
 	function packmaker.OrderLibGlobs // why is it done from the main compile func and not in the execmaker?
 		opt norefcounts
 		.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after
-		._LibGlobSize = .GlobalsSize(.libglobs) 	// rebuild size
+		.LibGlobSize = .GlobalsSize(.libglobs) 		// rebuild size
 	
 	
 	function SCObject.PackID (|bool| isFunc, |int|)
