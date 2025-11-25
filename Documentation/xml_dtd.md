@@ -37,7 +37,7 @@ And DTDs / schemas have additional drawbacks!:
 >*Judging from the response to our 503 errors, much of the software requesting DTDs and schemata from our site doesn't even need them in the first place, so requesting them just wastes bandwidth and slows down the application. If you don't need it, don't fetch it!*
 
 
-Well... thats an awful state of affairs. However, its quite predictable: XML is complicated, external entities exist in DTD, XML relies on DTD, and people use libraries to handle the XML stuff... and the libs "just want to do the correct thing" and not worry about efficiencies. Too many different groups of people making decisions that do not work together.
+Well... thats an awful state of affairs. However, its quite predictable: XML is complicated, external resources exist in XML-DTD, XML relies on DTD, and people use libraries to handle the XML stuff... and the libs "just want to do the correct thing" and not worry about efficiencies. Too many different groups of people making decisions that do not work together.
 
 
 ### Back to the Main Point
