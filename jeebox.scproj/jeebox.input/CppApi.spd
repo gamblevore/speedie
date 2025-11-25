@@ -298,7 +298,10 @@ api ok (|bool|)
 
 api debug (|object|o)
 	Opt NoRefCounts
-	o.debugprint
+	if self
+		print string.Wrap(.class.name)
+		print ": "
+	printline .render
 	description "Prints a description of this object, useful for debugging."
 
 
