@@ -60,7 +60,7 @@ function @file.Dictionary (|file|)
 	disabled "Use .words"
 
 	
-function @file.Words (|file|)
+inline @file.Words (|file|)
 	return "/usr/share/dict/words".file
 
 		
@@ -99,7 +99,7 @@ function message.WithinType (|int| Allowed=3, |bool|)
 		p = p.parent	
 
 
-function Message.At (|int| pos, |message|)
+inline Message.At (|int| pos, |message|)
 	return .FindTightest(pos, false, false)
 
 
@@ -130,49 +130,54 @@ function message.LOC (|ivec2|)
 			rz[0] += (pf == @arg) or (pf == @tmp  and  s == @tmp)
 
 
-struct StringDigitIterator
-	description `Provides integers from a string. For example the string "123" will provide (1, 2, 3)`
-	|string| S
-	|int|    i
-	
-	iterator
-		while .i < .s.length
-			yield (.s[.i]|int| - '0') (.i)
-			++.i
+// maybe the compiler should have some kind of "Cleanlyness" feature.
+// that marks certain functions as "not worth" being in the lib. Inline is better.
+
+//struct StringDigitIterator
+//	linkage
+//		cpp_part SDI
+//	description `Provides integers from a string. For example the string "123" will provide (1, 2, 3)`
+//	|string| S
+//	|int|    i
+//	
+//	iterator
+//		while .i < .s.length
+//			yield (.s[.i]|int| - '0') (.i)
+//			++.i
+//
+//
+//function String.Digits (|StringDigitIterator|)
+//	rz.S = self	
+//
+//
+//function int.Digits (|StringDigitIterator|)
+//	return .Render.digits
 
 
-function String.Digits (|StringDigitIterator|)
-	rz.S = self	
-
-
-function int.Digits (|StringDigitIterator|)
-	return .Render.digits
-
-
-function int.Msg (|message|)
+inline int.Msg (|message|)
 	return @num + .render
 
-function string.Msg (|message|)
+inline string.Msg (|message|)
 	return @str + self
 	
-function int64.Msg (|message|)
+inline int64.Msg (|message|)
 	return @num + .Render
 
-function bool.Msg (|message|)
+inline bool.Msg (|message|)
 	return @thg + .string
 
 
 datatype HumanDate (date)
-	render
+	inline Render (|faststring| fs_in, |string|)
+		|| fs = FastString(fs_in)
 		fs.AppendLocalTime(self)
+		return fs.GetResult(fs)
 
-
-function Faststring.syntaxappend (|humandate| d)
-	.appendlocaltime(d)
-
-
-function message.date (|humanDate|)
-	return .int
+	inline Faststring.syntaxappend (|humandate| d)
+		.appendlocaltime(d)
+	
+	inline message.date (|humanDate|)
+		return .int
 
 
 insertion
