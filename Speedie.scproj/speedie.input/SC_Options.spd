@@ -225,11 +225,11 @@ module Feedback
 			Options.Compile = false
 			
 		+'breakonerr' 
-			Explain(Purpose, "")$
+			Explain(Purpose)$
 			error.AutoPrint = value.optionint
 		
 		+'path'
-			Explain(Purpose, "")$
+			Explain(Purpose)$
 			printline app.exepath
 			
 		+'beep'
@@ -260,14 +260,14 @@ module Feedback
 			TransCompiler.CppCompilerPath=value
 				
 		+'perry'
-			Explain(Purpose, "")$
+			Explain(Purpose)$
 			options.perryoutput = 1
 			|| RealPerry = value~="bin"
 			options.perryoutput += RealPerry // argvalue not needed? just value, right?
 			compiler.insecurewords = file.Prefs("klinkerhoppen.banned").readall.dict
 
 		+'usescriptloc'
-			Explain(Purpose, "")$
+			Explain(Purpose)$
 			options.UseScriptLoc = maybebool.Known(true)
 
 		+'check'
@@ -319,7 +319,7 @@ module Feedback
 			SC_Targets["direct"] = options.isdirecttest
 		
 		+'single' 
-			Explain(Purpose, "")$
+			Explain(Purpose)$
 			options.SingleCppOutput = value.optionbool
 		
 		+'elf'
@@ -350,13 +350,16 @@ module Feedback
 				options.Mode = options.cake
 
 		+'cake'
+			Explain(Purpose)$
 			error "Do you mean bake?"
 			return true
 			
 		+'inlinelib'
+			Explain(Purpose)$
 			options.InlineLib = value.optionbool
 		
 		+'d'
+			Explain(Purpose)$
 			options.targetdebug = value.optionbool // no explanation haha.		
 
 		+'targetdebug'
