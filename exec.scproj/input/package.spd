@@ -1,25 +1,40 @@
 
  
-module package
+module CakeRun
 	linkage: cpp_part Pack
-	|memory|		globals
-	|config|		funcs
-	|config|		linkage
-	|config|		ProjClasses
-	|config|		strings
-	
+	|memory|				Globals
+	|config|				Cfuncs
+	|config|				Clss
+	|config|				strings
+	|[xfunction]|			Funcs
+	|&&nil|					GlobBase
+	|&uint16|				GlobLink
+	|&&nil|					RawFuncs
+	|int|					GlobalCount
+	|dictionary of &classdata| ClassTable = dictionary()
+	|&classdata|			Obj
 	
 	function LibGlobs (|&&nil|)
 		cpp_wrapper JB_App__LibGlobs
 
-//	function LibInfo (|string|)
-//		cpp_wrapper JB_App__LibInfo
+	function GlobTable (|&uint16|)
+		cpp_wrapper JB_App__GlobTable
 	
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs
 
 	function LibClassLayout (|string|)
 		cpp_wrapper JB_App__LibClasses
+
+	function AddLibGlob (|?&nil| where, |string| name, |bool|)
+		opt norefcounts
+		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
+		// wait we can't store ptrs in a dict? was this a wrapper obj?
+//		.Globals.valuelower(name) = where!
+		return true
+		
+	syntax access (|int| i, |xfunction|)
+		return .Funcs[i]
 
 	function message.Arg (|string| name, |bool| Err = false, |message|)
 		opt norefcounts
@@ -31,45 +46,55 @@ module package
 	
 	
 	function LoadPack (|bool|)
-		if .getstructure and .Loadfuncs
-			if xclass.LoadPackClasses
-				return true
+		.rawFuncs = .LibFuncs
+		.GlobBase = .LibGlobs
+		.GlobLink = .GlobTable
+		require .getstructure
+		require .LoadClasses
+		require .Loadfuncs
+//		require xclass.LoadPackClasses
+		return true
+	
 	
 	function GetStructure (|bool|)
 		opt norefcounts
 		|| pk			= .InputPack
 		|| app			= pk.arg("app", true)
+		.glob(app.int(0, 1, 256MB)$)
 
 		debugger.root	= pk.arg("debug")
 		debugger.meta	= pk.arg("meta")
 		
 		.strings		= app.arg("strs")
-		.projclasses	= app.arg("clss")
-		.funcs			= app.arg("fncs", true)
-		.linkage		= app.arg("link", true)
-
-		|| g = app.int
-		check (G > 0 and g <= 256MB) ("Globals must be between 1 byte and 256MB")
-		.glob(g)
+		.clss			= app.arg("clss")
+		.cfuncs			= app.arg("fncs", true)
 		
 		return stderr.ok
 		
 
+	function file.Compile (|file|)
+		|| args = [self, "--bake", "--quiet"]
+		|| Answer = speedie.ExecuteStr(args)		// now what? now what? now what
+			rz = Answer.file
+			if !rz.Exists
+				rz = nil
+		
+		
 	function InputPack (|messageroot|)
-		opt norefcounts
-		|| x = app.args[0]
-		x ?= "~/Speedie/exec.scproj/demo.xpd"
+		|string--| x = app.args[0]
 		|| fl = x.FileThatExists("load executable")
-			return fl.parse[@tmp, "pack"]
+			if fl isa "spd" or "scproj" or "uwu" or "uwuz"
+				fl = fl.Compile
+		if fl
+			rz = fl.parse[@tmp, "cake"]
 
 
 	function LoadFuncs (|bool|)
 		opt norefcounts
-		expect (package.funcs.hasany)      ("No functions found!")
+		expect (CakeRun.cfuncs.hasany)      ("No functions found!")
 
-		for spd in package.funcs
+		for spd in CakeRun.cfuncs
 			|| fn = xfunction(spd)
-//			linker <~ fn
 			if apptable <~ fn
 				fn.LinkCpp
 				fn.LinkSpd

@@ -1,10 +1,10 @@
 
 
 
-function package.Glob (|int| size)
+function CakeRun.Glob (|int| size)
 	opt norefcounts
 	|| ptr_size		= platform.PointerBytes
-	|| n_strs		= package.strings.slowcount
+	|| n_strs		= CakeRun.strings.slowcount
 	expect (n_strs <= 1000_000) ("Too many strings in pack: " + n_strs.render)
 	size		   += (n_strs+1)*ptr_size
 	.globals = byte[size]	#require

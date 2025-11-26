@@ -1,148 +1,167 @@
 
 
 
-class XType (XClass)  
-	|datatypecode|			DataType
-	|BaseType|				BaseType
+function CakeRun.LoadClasses (|bool|)
+	opt norefcounts
+	#!Inbuilts first
+	for cd in ClassData.First_
+		.StoreClass(cd)
+
+	#!Now cake classes
+/	for c in .Clss
+		c.LoadSuper
+	return StdErr.ok
 
 
-class XClass 
-	linkage
-		cpp_class ClsInfo
-	|stringzeroterminated|				Name
-	|?Message|							Src
-	|?xclass|							Super
-	|&classdata|						RealClass
-	
-	
-	constructor (|!&classdata| Cls)
-		opt norefcounts
-		.realclass = cls
-		.name = string.Wrap(cls.name)
-		addclass(self)
+function CakeRun.StoreClass (|ClassData| cd)
+	|| name = cd.Name.wrap
+	.ClassTable.ValueLower(name) = cd
+	if name ~= "object"
+		.obj = cd
 	
 
-	constructor (|message!| Ch, |xclass| parent)
-		opt norefcounts
-		|| sz = ch[@num]
-		|| beh = sz.next(@list)
-		
-		.name = ch.name.cstr
-		.src = Ch
-		.super = parent
-		
-		.RealClass = classdata.new_(.name.cstring, sz.int, parent.realclass)
-		.LoadBehaviours(beh)
-		addclass(self)
-
-
-	function Size (|int|)
-		return .realclass.size
+function message.LoadSuper
+	opt norefcounts
 	
 	
-	function LoadSuper 
-		opt norefcounts
-		|| P = .realclass.Parent
-			|| str = P.name.wrap
-			|| cls = table.valuelower(str)
-				.super = cls
-				return
-		.super = Obj
-	
-	
-	syntax equals (|string| s, |bool| aware, |bool|)
-		return .name ~= s
-	
-	
-	render
-		|| sup = .super.name?
-		fs <~ "Class: $.name ($.size, $sup)"
 
-
-	function ClassData.AllocateBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
-		cpp_Wrapper JBClassAllocBehaviour
-
-
-	function LoadBehaviours	(|message| list)
+//class XClass 
+//	linkage
+//		cpp_class ClsInfo
+//	|stringzeroterminated|				Name
+//	|?Message|							Src
+//	|?xclass|							Super
+//	|&classdata|						RealClass
+//	
+//	
+//	constructor (|!&classdata| Cls)
 //		opt norefcounts
-//		|| i = 0
-//		|| bc = list.SlowCount max 2
-//		|&?&nil| Cpp,  |&?&nil| Spd 
+//		.realclass = cls
+//		.name = string.Wrap(cls.name)
+//		addclass(self)
+//	
+//
+//	constructor (|message!| Ch, |xclass| parent)
+//		opt norefcounts
+//		|| sz = ch[@num]
+//		|| beh = sz.next(@list)
 //		
-//		.realclass.AllocateBehaviour(bc, cpp, spd)
+//		.name = ch.name.cstr
+//		.src = Ch
+//		.super = parent
 //		
-//		for ch in list
-//			|| fn = xfunction[ch]
-//				cpp![i] = fn.CFunc
-//				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
-//				// the spd version should call the c++ version...
-//			i++
-		
-				
-	module
-		function AddClass (|xclass| c)
-			.list <~ c
-			.table.ValueLower(c.name) = c
-		
-
-		function LoadPackClasses (|bool|)
-			opt norefcounts
-			return .LoadAppClassSub(package.ProjClasses, xclass.obj!)
-		
-		
-		helper Give (|message| ch, |xclass!| parent, |xclass|)
-			opt norefcounts
-			|| f = ch.first
-			if f == @arg
-				return xclass[ch]
-			return xclass.new(ch, parent)
-		
-		
-		helper LoadAppClassSub (|message| arg, |xclass| parent, |bool|)
-			opt norefcounts
-			for ch in arg
-				|| c = xClass.give(ch, parent)	#require
-				|| arg2 = ch.last
-				if arg2 == @arg
-					.LoadAppClassSub(arg2, c)
-			return stderr.ok
-
-
-		function LoadInbuiltClasses (|bool|)
-			// so what do we want to do?
-			// do we even need classes?
-			// we can make the project load the globs into itself.
-			// we'll need to load the globs...
-			// how? The class info has all the info we need, right? in "clss"
-			// we have a name...
-			// can put the classdata into the packglobs?
-			
-			opt norefcounts
-			for cd in ClassData.First_
-				|| c = xclass.new(cd)
-				if c.name ~= "object"
-					.obj = c
-			for c in .list
-				c.LoadSuper
-			return stderr.ok
-		
-		
-		function dictionary.SyntaxAccess (|&classdata| c, ||)
-			opt norefcounts
-			|| n = c.name
-				|| s = n.Wrap
-				rz = self.valuelower(s)
-			
-		syntax access (|message| ch, |xclass|)
-			opt norefcounts
-			return .Table.valuelower(ch.name) #expect (ch, "Linked to missing class")		
-		
-	
-		|xclass|				Obj
-		|[xclass]|				List
-		|dictionary of xclass|	Table = dictionary.new
-
-
+//		.RealClass = classdata.new_(.name.cstring, sz.int, parent.realclass)
+//		.LoadBehaviours(beh)
+//		addclass(self)
+//
+//
+//	function Size (|int|)
+//		return .realclass.size
+//	
+//	
+//	function LoadSuper 
+//		opt norefcounts
+//		|| P = .realclass.Parent
+//			|| str = P.name.wrap
+//			|| cls = table.valuelower(str)
+//				.super = cls
+//				return
+//		.super = Obj
+//	
+//	
+//	syntax equals (|string| s, |bool| aware, |bool|)
+//		return .name ~= s
+//	
+//	
+//	render
+//		|| sup = .super.name?
+//		fs <~ "Class: $.name ($.size, $sup)"
+//
+//
+//	function ClassData.AllocateBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
+//		cpp_Wrapper JBClassAllocBehaviour
+//
+//
+//	function LoadBehaviours	(|message| list)
+////		opt norefcounts
+////		|| i = 0
+////		|| bc = list.SlowCount max 2
+////		|&?&nil| Cpp,  |&?&nil| Spd 
+////		
+////		.realclass.AllocateBehaviour(bc, cpp, spd)
+////		
+////		for ch in list
+////			|| fn = xfunction[ch]
+////				cpp![i] = fn.CFunc
+////				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
+////				// the spd version should call the c++ version...
+////			i++
+//		
+//				
+//	module
+//		function AddClass (|xclass| c)
+//			.list <~ c
+//			.table.ValueLower(c.name) = c
+//		
+//
+//		function LoadPackClasses (|bool|)
+//			opt norefcounts
+//			return .LoadAppClassSub(CakeRun.Clss, XClass.obj!)
+//		
+//		
+//		helper Give (|message| ch, |xclass!| parent, |xclass|)
+//			opt norefcounts
+//			|| f = ch.first
+//			if f == @arg
+//				return xclass[ch]
+//			return xclass.new(ch, parent)
+//		
+//		
+//		helper LoadAppClassSub (|message| arg, |xclass| parent, |bool|)
+//			opt norefcounts
+//			for ch in arg
+//				|| c = xClass.give(ch, parent)	#require
+//				|| arg2 = ch.last
+//				if arg2 == @arg
+//					.LoadAppClassSub(arg2, c)
+//			return stderr.ok
+//
+//
+//		function LoadInbuiltClasses (|bool|)
+//			// so what do we want to do?
+//			// do we even need classes?
+//			// we can make the project load the globs into itself.
+//			// we'll need to load the globs...
+//			// how? The class info has all the info we need, right? in "clss"
+//			// we have a name...
+//			// can put the classdata into the packglobs?
+//			
+//			opt norefcounts
+//			for cd in ClassData.First_
+//				|| c = xclass.new(cd)
+//				if c.name ~= "object"
+//					.obj = c
+///			for c in .list
+//				c.LoadSuper
+//			return stderr.ok
+//		
+//		
+//		function dictionary.SyntaxAccess (|&classdata| c, ||)
+//			opt norefcounts
+//			|| n = c.name
+//				|| s = n.Wrap
+//				rz = self.valuelower(s)
+//			
+//		syntax access (|message| ch, |xclass|)
+//			opt norefcounts
+//			return .Table.valuelower(ch.name) #expect (ch, "Linked to missing class")		
+//		
+//	
+//		|xclass|				Obj
+////		|[xclass]|				List
+//		|dictionary of xclass|	Table = dictionary.new
+//
+//
 
 
 datatype BaseType (int)
@@ -158,3 +177,11 @@ datatype BaseType (int)
 	syntax is (|BaseType| d, |bool|)
 		return self == d
 
+
+
+//class XType (XClass)  
+//	|datatypecode|			DataType
+//	|BaseType|				BaseType
+//
+//
+//
