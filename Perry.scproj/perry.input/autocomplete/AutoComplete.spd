@@ -629,6 +629,8 @@ function message.OwningFullName (|syntax| prm, |message|)
  
 
 datatype AutoCompleteMode (int)
+	linkage
+		helper
 	constants
 		Sel		= -1
 		Default = 0
