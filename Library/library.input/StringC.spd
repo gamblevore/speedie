@@ -21,8 +21,8 @@ class StringZeroTerminated (string)
 	syntax cast (|cstring|)
 		return .addr|cstring|
 
-	module
-		function New (|cstring| s, |StringZeroTerminated|)
-			cpp_Wrapper JB_StrC
-		function New (|cstring| s, |int|n, |StringZeroTerminated|)
-			cpp_Wrapper JB_StrCN
+//	module
+//		function New (|cstring| s, |StringZeroTerminated|)
+//			cpp_Wrapper JB_StrC
+//		function New (|cstring| s, |int| n, |StringZeroTerminated|)
+//			cpp_Wrapper JB_StrCN

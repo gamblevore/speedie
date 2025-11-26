@@ -816,7 +816,17 @@ JB_StringC* JB_File_PathFix (JB_String* P) {
 	}
 
 	FastString* FS = JB_FS__FastNew(0);
+	
+	// newlines in paths make no sense. if we copy/paste "/a/b/c\n"... speedie should understand it means /a/b/c
 	byte* PS = P->Addr;
+	while (N>0 and PS[N-1] == '\n') {
+		N--;
+	}
+	while (N>0 and PS[0] == '\n') {
+		PS++;
+		N--;
+	}
+	
     if (PS[0] == '~') {
 		JB_FS_AppendString(FS, JB_File__Home());
 		PS++; N--;
@@ -835,6 +845,9 @@ JB_StringC* JB_File_PathFix (JB_String* P) {
 
 JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 	JB_New2(JB_File);
+	if (JB_Str_Length(Path))
+		Path = JB_File_PathFix(Path);
+	
 	if (!JB_Str_Length(Path)) {
 		auto Err = JB_Str__Error();
 		if (Path == Err) {
@@ -848,8 +861,7 @@ JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 			}
 		}
 	}
-	
-	Path = JB_File_PathFix(Path);
+
 	self->Addr = Path->Addr;
 	self->Length = Path->Length;
 	self->Parent = JB_Incr(Path);

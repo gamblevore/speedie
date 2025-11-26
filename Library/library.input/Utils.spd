@@ -163,17 +163,22 @@ insertion
 	parse (–digest _0).ParseJbin! // could possibly compress large files too?
 
 
-// seems not worth it
-// we'd want a sum(_0, _1*2) macro!
-// we'd need to be able to pass types
-//insertion
-//	sum	({
-//		|| Src = _0
-//		|| V = Src.ZeroValue
-//		for (c in Src)
-//			V += c
-//		rejoin (V)
-//	})
+target debug and !cake
+	function list.JDB2 // makes it easier to debug from xcode
+		cpp_name jdb2
+		visible
+		if Self
+			printline self|message|.RenderAST
+		  else
+			"(nil)"
+  else
+	function message.JDB2
+		cpp_name jdb2
+		visible
+		if Self
+			printline .RenderAST
+		  else
+			"(nil)"
 
 
 datatype FailableInt (int) // useful when you want most numbers, even negatives, and zero but still want AN error code

@@ -93,7 +93,7 @@ class InputStream
 		.data.position = value - .StartFrom
 
 
-	function StrLength (|int|)
+	function HInt (|int|)
 		|uint| v = .byte
 		if v <= 127
 			return v

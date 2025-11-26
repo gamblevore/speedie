@@ -31,8 +31,11 @@ void JB_Str_PrintError(JB_String* s) {
     }
 }
 
+void JB_PrintCString (const char* c) {
+	printf("%s", c);
+}
 
-void JB_Str_PrintLine(JB_String* s) {
+void JB_Str_PrintLine (JB_String* s) {
 	int n = JB_Str_Length(s);
 	if (n)
 		MyWrite(s->Addr, n, stdout);

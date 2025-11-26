@@ -17,7 +17,11 @@ autogen StrPrintLine (|string?| data)	// ideally move this to string._printline
 function Print (|string?| data)
 	_strprint(data)
 
-function PrintLine (|string?| data="")
+inline Print (|cstring?| data)
+	cpp_part PrintCString
+	data.print
+
+inline PrintLine (|string?| data="")
 	strprintline(Data)							// to disambiguate vs macro
 
 

@@ -1,10 +1,14 @@
 
+
 datatype CopyPasteFlags (Byte)
+	// how to totally inline this class?
 	linkage
 		cpp_part CPF
+		helper
 	Flags
 		|CopyPasteFlags| 
-		/// hmmmm.... could remeove file/text/image/node and separate copy/paste?
+		// Important to have copyfile and pastefile being separate.
+		// We might want to copy a file but not being able to paste a file
 		Copy  = [CopyFile,  CopyText,  CopyImage,  CopyNode]
 		Paste = [PasteFile, PasteText, PasteImage, PasteNode]
 		PasteTextLike = (PasteText|||PasteFile)
@@ -29,7 +33,7 @@ datatype TakesFocusFlag (byte)
 		None = 0
 		On = CanTabInto ||| CanFocus 
 
-	function Able (|bool|)
+	inline Able (|bool|)
 		return (self&canfocus) != 0
 	
 	syntax cast (|bool|)

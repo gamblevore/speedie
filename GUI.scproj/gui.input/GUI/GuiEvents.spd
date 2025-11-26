@@ -72,12 +72,10 @@ struct SDL_TextEditingEvent
     |uint|			length								// The length of selected editing text
     
     function Str (|string|)
-		|| b = (&.text[0])|cstring|
-		return string.wrap(b).copy
+		return string.copy(&.text[0], .length)
 	
 	render
-		|| b = (&.text[0])|cstring|
-		fs <~ string.wrap(b)
+		fs.appendmemory((&.text[0])|&byte|, .length)
 
 
 

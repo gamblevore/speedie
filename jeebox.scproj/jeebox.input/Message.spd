@@ -723,7 +723,7 @@ Message is also:
 	function FuncName (|string|)
 		return .Func.LongName.lowercase
 		
-	function Length (|int|)
+	inline Length (|int|)
 		return .name.length
 	
 	function ShallowEquals (|message| B, |bool| Aware=false, |bool|)
@@ -748,13 +748,13 @@ Message is also:
 			b = b.flatnext
 
 	
-	function Name (|string|)
+	inline Name (|string|)
 		nil safe
 		if self
 			return .Name
 
 
-	function Func (|Syntax|)
+	inline Func (|Syntax|)
 		nil safe
 		if self
 			return .func
@@ -885,7 +885,7 @@ Message is also:
 		self <~ (@str, key)
 
 
-	function Arg (|message|)
+	inline Arg (|message|)
 		return .last(@arg)
 
 
@@ -969,7 +969,7 @@ Message is also:
 		return l.msg(@tmp, key)
 
 	
-	function Become (|syntax| fn, |string| name="")
+	inline Become (|syntax| fn, |string| name="")
 		cpp_part BecomeStr
 		.func = fn
 		.name = name
@@ -1015,7 +1015,7 @@ Message is also:
 			.ReportFailiure(Need, nil, ch)
 
 
-	syntax Equals (|string?| name, |bool|Aware=false, |bool|)
+	syntax Equals (|string?| name, |bool| Aware=false, |bool|)
 		return self and .name.SyntaxEquals( name, aware )
 
 
@@ -1052,7 +1052,7 @@ Message is also:
 	Syntax Warn ( |string?| Error = nil )
 		errorreceiver.NewWarning( self, Error )
 	
-	Syntax Append (|syntax| Fn, |string| name="")
+	inline SyntaxAppend (|syntax| Fn, |string| name="")
 		opt norefcounts
 		cpp_part AppendSyx
 		.msg(fn, name)
@@ -1063,13 +1063,13 @@ Message is also:
 		.msg(fn, name)
 		return self
 
-	Syntax SendTo (|syntax| Fn, |int64| name, |message|)
+	inline SyntaxSendTo (|syntax| Fn, |int64| name, |message|)
 		cpp_part SendSyxNum
 		opt norefcounts
 		.msg(fn, name.render)
 		return self
 
-	Syntax SendTo (|message| msg, |message|)
+	inline SyntaxSendTo (|message| msg, |message|)
 		cpp_part SendMsg
 		opt norefcounts
 		self <~ msg
@@ -1149,10 +1149,10 @@ Message is also:
 		return Default
 			
 
-	function After (|int|)
+	inline After (|int|)
 		return .position + .RangeLength
 
-	function After (assigns:|int|)
+	inline After (assigns:|int|)
 		.RangeLength = Value - .position
 
 	
@@ -1167,7 +1167,6 @@ Message is also:
 		opt norefcounts // we want to put textview's insertion after a name and still find it
 					    // like: abc      // abc is found still.   
 					    //			^
-		
 		return .position <= p and (.after+AllowJustAfter) > p 
 		
 	operator In (|syntax| f, |bool|)
@@ -1179,7 +1178,7 @@ Message is also:
 		|| f = .func
 		return f == @arg or @list or @prm or @arr or @bra or @msg
 
-	function IsString (|bool|) // use .expectstring if you need this to be a string
+	inline IsString (|bool|) // use .expectstring if you need this to be a string
 		if self
 			return .func.isstring
 

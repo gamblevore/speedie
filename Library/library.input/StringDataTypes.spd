@@ -48,15 +48,15 @@ datatype byte
 		b = b.lowercase
 		return self == b
 		
-	function IsLetter (|bool|)
+	inline IsLetter (|bool|)
 		return self|codepoint|.isletter
-	function IsAlphaNum (|bool|)
+	inline IsAlphaNum (|bool|)
 		return self|codepoint|.isalphanum
-	function IsWhite (|bool|)
+	inline IsWhite (|bool|)
 		return self|codepoint|.iswhite 
-	function IsUpper (|bool|)
+	inline IsUpper (|bool|)
 		return self|codepoint|.isupper
-	function IsLower (|bool|)
+	inline IsLower (|bool|)
 		return self|codepoint|.islower
 	
 	operator in (|charset| cs, |bool|)
@@ -97,8 +97,11 @@ datatype cstring
 	function PrintLine
 		cpp_wrapper puts // hehe
 	
-	function Wrap (|string|)
-		return string.Wrap(self)
+	function Print
+		cpp_wrapper JB_PrintCString
+	
+	inline Wrap (|string|)
+		return string.new(self)
 
 	function FileName (|cstring|)
 		|| c = self|&byte|
@@ -116,3 +119,8 @@ datatype cstring
 		if !fs_in
 			return .copy
 		fs_in <~ self
+	
+	iterator
+		|| addr = self|&byte|
+		while (|| c = addr++[])
+			yield c

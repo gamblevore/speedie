@@ -272,13 +272,14 @@ class SaverClassInfo (array)
 			obj.SaveUnMark // make debugging easier...
 		super.clear
 
-	
+		
 	function Output (|&ObjectSaver| Saver)
 		opt norefcounts		
 		|| D = saver.dest
 		require d and self
 		D <~ '\n'
-		D <~ string.Wrap(.cls!.name).lowercase // lol.
+		for c in .cls.name
+			d.AppendByte(c.lowercase)
 		D <~ ' '
 		
 		if (.HasData)

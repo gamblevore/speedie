@@ -34,6 +34,7 @@ void JB_XStr_Destructor(JB_StringExternal* self);
 //JB_String* JB_Str_Constructor( JB_String* self );
 void JB_Str_Print( JB_String* s );
 void JB_Str_PrintLine( JB_String* s );
+void JB_PrintCString (const char* c);
 FastString** JB_Str_PrintCapturer();
 void JB_Str_PrintError(JB_String* s);
 void JB_Str_PrintConsole(JB_String* s);

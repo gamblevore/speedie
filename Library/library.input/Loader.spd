@@ -164,7 +164,7 @@ struct ObjectLoader {
 		|dictionary of int64| ClassList
 		
 		function LoadOne (SaverLoadClass)
-			|| name = string.Wrap(cls.name).lowercase
+			|| name = string.new(cls.name).lowercase
 			objectloader.classlist![name] = cls|int64|
 
 		function Init

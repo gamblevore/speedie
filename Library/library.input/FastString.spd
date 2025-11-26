@@ -92,14 +92,6 @@ class FastString {
 			.AppendByte(n ||| 128)
 			n >>= 7
 		.AppendByte(n)
-
-	function EncodeLength (|uint64| N)	// maybe hInt is better? like how many speedie-strings are over 128 anyhow?
-		|| L2 = N|byte|					// remove these two funcs? (one below)
-		if N >= 248
-			l2 = 248 + (n|uint|.log2 max 0) >> 3
-		self <~ L2|byte|
-		if N >= 248
-			.AppendLInt(N)
 		
 	render
 		fs <~ self
