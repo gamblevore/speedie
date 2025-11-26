@@ -148,7 +148,7 @@ module PackMaker
 		|| F = Compiler.ProductPath.SetExt("cake").file // what about .app instead of .zpd?
 		require f.OpenEmpty
 		
-		|| j = jbin(@tmp, "zpd")
+		|| j = jbin(@tmp, "cake")
 		j.file = f
 		j.enter
 		j.Enter(@tmp, "app")

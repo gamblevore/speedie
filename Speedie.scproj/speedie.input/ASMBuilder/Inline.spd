@@ -161,14 +161,15 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-	|| N = fn.µlength	
-	require N and (N < 64) and (fn isnt cpp)
-	
-	require .state.InlineDepth < .InlineDepthLimit
+	require fn isnt cpp
 
-	|| MaxEnd = .InlineEnd
-		|| SubInline = .curr + (N / 3)
-		require SubInline < MaxEnd
+	|| N = fn.µlength
+	if fn isnt alwaysinline
+		require N and (N < 64)
+		require .state.InlineDepth < .InlineDepthLimit
+		|| MaxEnd = .InlineEnd
+			|| SubInline = .curr + (N / 3)
+			require SubInline < MaxEnd
 
 	|| AllowedGain = 5 + (fn is inline) * 23		// Assume that functions have 5 instruction overhead.
 	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
