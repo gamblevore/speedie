@@ -5,6 +5,10 @@
 
 main
 	opt NoRefCounts
+//	|| j = jbin(@tmp, "hello")
+///	|| p = j.GetResult.parse
+//		p.jdb2
+	
 	error.AutoPrint = 1
 	require CakeRun.LoadPack
 	debugger.load

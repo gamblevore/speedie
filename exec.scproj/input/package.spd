@@ -3,9 +3,9 @@
 module CakeRun
 	linkage: cpp_part Pack
 	|memory|				Globals
-	|config|				Cfuncs
-	|config|				Clss
-	|config|				strings
+	|message|				Code
+	|message|				Clss
+	|String|				Strings
 	|[xfunction]|			Funcs
 	|&&nil|					GlobBase
 	|&uint16|				GlobLink
@@ -49,7 +49,7 @@ module CakeRun
 		.rawFuncs = .LibFuncs
 		.GlobBase = .LibGlobs
 		.GlobLink = .GlobTable
-		require .getstructure
+		require .GetStructure
 		require .LoadClasses
 		require .Loadfuncs
 //		require xclass.LoadPackClasses
@@ -58,18 +58,17 @@ module CakeRun
 	
 	function GetStructure (|bool|)
 		opt norefcounts
-		|| pk			= .InputPack
-		|| app			= pk.arg("app", true)
-		.glob(app.int(0, 1, 256MB)$)
-
-		debugger.root	= pk.arg("debug")
-		debugger.meta	= pk.arg("meta")
-		
-		.strings		= app.arg("strs")
-		.clss			= app.arg("clss")
-		.cfuncs			= app.arg("fncs", true)
-		
-		return stderr.ok
+		|| pk = .InputPack
+		|| app = pk.last(@arg)[@tmp, "app"]
+		|| sz = app[@num]
+		|| arg = sz.next(@arg)
+			arg.ExpectLast
+			.code = arg[@tmp, "code"][@arg]
+			check (.code.hasany)      ("No functions found!")
+			.strings = arg["strs"].name
+			.clss = arg["clss"]
+			debugger.root = arg["debug"]
+		return .glob(sz)
 		
 
 	function file.Compile (|file|)
@@ -86,14 +85,15 @@ module CakeRun
 			if fl isa "spd" or "scproj" or "uwu" or "uwuz"
 				fl = fl.Compile
 		if fl
-			rz = fl.parse[@tmp, "cake"]
+			rz = fl.parse
+			if !rz.expect(@tmp, "cake")
+				rz = nil
 
 
 	function LoadFuncs (|bool|)
 		opt norefcounts
-		expect (CakeRun.cfuncs.hasany)      ("No functions found!")
 
-		for spd in CakeRun.cfuncs
+		for spd in CakeRun.code
 			|| fn = xfunction(spd)
 			if apptable <~ fn
 				fn.LinkCpp

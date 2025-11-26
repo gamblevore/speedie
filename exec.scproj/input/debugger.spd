@@ -1,7 +1,6 @@
 
 module debugger
 	|message| root
-	|message| meta
 	function Load (|bool|)
 		ifn debugger.root
 		return true
