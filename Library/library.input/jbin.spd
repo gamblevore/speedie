@@ -37,8 +37,8 @@ role JBin (Faststring)
 		.enter(type, name)
 	
 	constructor (|int| n)
+		disabled `Use jbin(@syx, "name")`
 		cpp_part Constructor0
-		if n // what?
 
 	function Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
@@ -115,14 +115,15 @@ datatype jbinLeaver (int)
 		StdErr.LowerErrorsTo = self
 		
 	module
-		function Test
-			|| j = jbin()
-			j.Enter	// Sigh... syntaxusing is called upon the leaver, and not the jbin!
-					// how to make it work on j rather than on j.enter?
-					// we could do it.
-					// so... we call j.enter
-					// i mean we can just make it work on the thing inside the dot instead of the overall
-					// but that affects a lot of things. its not very reliable.
+		target debug
+			function Test
+				|| j = jbin()
+				j.Enter	// Sigh... syntaxusing is called upon the leaver, and not the jbin!
+						// how to make it work on j rather than on j.enter?
+						// we could do it.
+						// so... we call j.enter
+						// i mean we can just make it work on the thing inside the dot instead of the overall
+						// but that affects a lot of things. its not very reliable.
 						  
 	
 
@@ -153,7 +154,9 @@ helper InputStream.NextMsgInfo (|uint64|)
 		if info & 1
 			._Object = msg
 		|| cb = .CallBack
-			(cb)(msg)
+		if !cb // common case
+			return msg|uint64|
+		(cb)(msg)
 		return msg|uint64|
 
 	._Object = nil
@@ -162,7 +165,7 @@ helper InputStream.NextMsgInfo (|uint64|)
 		error (self, "Corrupted jbin")
 
 
-function InputStream.IsJBin (|bool|)
+inline InputStream.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
