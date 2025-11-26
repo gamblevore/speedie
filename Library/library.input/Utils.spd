@@ -131,28 +131,7 @@ function message.LOC (|ivec2|)
 
 
 // maybe the compiler should have some kind of "Cleanlyness" feature.
-// that marks certain functions as "not worth" being in the lib. Inline is better.
-
-//struct StringDigitIterator
-//	linkage
-//		cpp_part SDI
-//	description `Provides integers from a string. For example the string "123" will provide (1, 2, 3)`
-//	|string| S
-//	|int|    i
-//	
-//	iterator
-//		while .i < .s.length
-//			yield (.s[.i]|int| - '0') (.i)
-//			++.i
-//
-//
-//function String.Digits (|StringDigitIterator|)
-//	rz.S = self	
-//
-//
-//function int.Digits (|StringDigitIterator|)
-//	return .Render.digits
-
+// that marks certain functions as "not worth" being in the lib... that inlining is better.
 
 inline int.Msg (|message|)
 	return @num + .render

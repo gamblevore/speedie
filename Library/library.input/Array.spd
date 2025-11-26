@@ -120,10 +120,6 @@ class Array (saveable)
 	function Copy (|[...]|)
 		cpp_wrapper JB_Array_Copy
 	
-	function CopySort (|sortercomparer| fn, |[...]|)
-		rz = .copy
-		rz.sort(fn)
-	
 	function Swap (|int| i, |int| j)
 		cpp_wrapper JB_Array_Swap
 	

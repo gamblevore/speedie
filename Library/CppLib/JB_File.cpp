@@ -445,7 +445,7 @@ int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Tot
 }
 
 
-// getting a string makes more sense, cos what about Unicode? And glyphs?
+// Getting a string makes more sense, cos what about Unicode? And glyphs?
 // HOWEVER, whabout someone copy/pasting an entire thing in? then what?
 // ideally... we should just get the whole thing
 // perhaps into a FastString? THEN we should... split it into glyphs.

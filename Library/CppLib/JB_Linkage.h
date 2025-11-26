@@ -27,6 +27,7 @@ int JB_Rec__PrintErrors();
 JB_String* JB_App__LibInfo();   
 void** JB_App__LibFuncs();
 void** JB_App__LibGlobs();
+u16* JB_App__GlobTable();
 JB_String* JB_App__LibClasses(); 
 
 // startup
