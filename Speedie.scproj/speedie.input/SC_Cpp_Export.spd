@@ -71,22 +71,14 @@ function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
 	for prop in PackMaker.LibGlobs
 		if simple and prop.Complexity > 1
 			exit
-		if prop.exportglob
-			if simple and prop.IsObject
-				fs <~ "JB_Object* "
-				fs.Appendlibglob(prop)
-			  else
-				WriteDecl( prop, fs, nil )
-			fs <~ ";\n\t"
+		if simple and prop.IsObject
+			fs <~ "JB_Object* "
+			fs.Appendlibglob(prop)
+		  else
+			WriteDecl( prop, fs, nil )
+		fs <~ ";\n\t"
 	fs.Length--
 	fs <~ "};\nextern JB_Globals JB__;\n\n"
-
-
-function scdecl.ExportGlob (|bool|)
-	if self is Library and CompilerCreated
-		if .type.IsFunc
-			return false
-	return true
 
 
 function CanOpt (|bool| force, |bool|)
@@ -565,7 +557,7 @@ function FillInterpreter
 
 
 
-function faststring.appendvoid (|string| s, |byte| extra=0)
+function faststring.AppendVoid (|string| s, |byte| extra=0)
 	opt norefcounts
 	self <~ "\t(void*)"
 	if extra
@@ -581,15 +573,8 @@ function faststring.AppendWrap (|scfunction| f)
 		.appendvoid(f.ExportName)
 
 
-function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
+function WriteVMFuncs (|faststringcpp| fs)
 	opt norefcounts
-	fs <~ "// entire_function_list!\n\n"
-	for f in packmaker.LibFuncs
-		if (f.iscppinbuilt == 1) 
-			.MakeWrapperFor(fs, f)
-	
-	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
-
 	|| Position = 0
 	for fn in packmaker.libfuncs
 		if fn.IsLibrary and fn.NeedsLibExport
@@ -601,8 +586,52 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 				fs.appendvoid("(int64)(-1)")
 			fs.appendwrap(fn)
 			position = id
-	
 	fs.appendvoid("0")
+
+
+function WriteVMGlobs (|faststringcpp| fs)
+	opt norefcounts
+	|| Position = 0
+	// so... what should I do?
+	// make a instruction to get the address of a func? or read it from a glob?
+	// you can't get the address of a libfunc. It needs to be in the libglobs.
+	// libfuncs are stored all over the place.
+	// so why isnt it in the libglobs?
+	// it seems to be? or else... it wouldbe be here.
+	// OK... what about jb_globals ?
+	
+	fs <~ "#define JB_GlobOffset(g) ((unsigned short)(int64)(  &(((JB_Globals*)0)->g)  )) //
+
+__lib__ unsigned short JB_GlobTable[] = {
+"
+	for g in packmaker.LibGlobs
+		|| id = g.gpackid|int|
+		|| Missing = id - position
+		check (Missing > 0) (g.source!, "Bad PackID?")
+		
+		while --missing >= 1
+			fs <~ "\t65535,\n"
+		fs <~ "\tJB_GlobOffset("
+		fs.AppendLibGlob(g)
+		fs <~ "),\n"
+		position = id
+	fs <~ "0 \n};\n"
+
+	
+function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
+	opt norefcounts
+	fs <~ "// glob list\n"
+	.WriteVMGlobs(fs)
+	
+	debugger 
+
+	fs <~ "// entire_function_list!\n\n"
+	for f in packmaker.LibFuncs
+		if (f.iscppinbuilt == 1) 
+			.MakeWrapperFor(fs, f)
+	
+	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
+	.WriteVMFuncs(fs)
 	fs <~ "};
 
 extern \"C\" void** JB_App__LibFuncs() {
@@ -613,8 +642,11 @@ extern \"C\" void** JB_App__LibGlobs() {
 	return (void**)(&JB__);
 }
 
+extern \"C\" unsigned short* JB_App__GlobTable() {
+	return &JB_GlobTable[0];
+}
+
 "
-	// we need to create some kind of libglob table
 
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
@@ -623,16 +655,17 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
 
 	for prop.vars in modl
 		if prop
-			fs.AddProperty(prop, intomodule!=nil)
-			fs <~ "\n"
+			if fs.AddProperty(prop, intomodule!=nil)
+				fs <~ "\n"
 
 
-function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
+function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 	opt norefcounts
 	if prop is Const
 		if !IntoModule
 			Cpp_Export.WriteConst( prop, self )
-			self <~ '\n'
+			return true
+//			self <~ '\n'
 
 	  elseif prop.TypeIsReached
 		if prop is library and prop is Global
@@ -641,7 +674,8 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
 				self <~ prop.exportName		// 
 				self <~ " JB__."
 				.Appendlibglob(prop)
-				return 
+				return true
+			return false
 		  else
 			if !IntoModule
 				self <~ "extern "
@@ -654,6 +688,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
 			  else
 				Cpp_Export.WriteDecl( prop, self, nil )
 		self <~ ";"
+		return true
 
 
 

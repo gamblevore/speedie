@@ -14,6 +14,7 @@ main // main {
 
 
 function Compiler.EnterCompile (|bool|)
+	opt norefcounts
 	require !.TryVariousStartModes
 	require FeedBack.ParseArgs
 	if app["perry"] and app.yes("check")

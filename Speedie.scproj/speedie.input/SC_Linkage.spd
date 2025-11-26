@@ -42,6 +42,8 @@ module Linkage
 		opt norefcounts
 		Linkage.LinkCollect(s, Compiler.Program, nil)
 		options.MakeExec = linkage.interpreter
+		|| Combo = options.MakeExec + options.modepack
+		check (Combo <= 1) ("Can't bake exec/cake_run!")
 		s.remove
 	
 

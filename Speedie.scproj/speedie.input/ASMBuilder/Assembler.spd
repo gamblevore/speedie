@@ -681,10 +681,11 @@ struct Assembler
 		jsm!.length = .curr - .start 
 
 	
-	function FinishReturn
+	function FinishReturn 
+		opt norefcounts
 		debugger !.fn.ASMReturn
 		|| dl = .fn.Source!.FlatLast
-		.closevars(1, dl)
+		.CloseVars(1, dl)
 		|asmreg| dest = nil
 		if !ASMType.ReturnOpt(self, dest)
 			dl.RET

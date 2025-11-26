@@ -32,6 +32,7 @@ module Stability
 	
 	function Debug 
 		target debug
+			return
 			for f in packmaker.libfuncs
 				print f.packid(true)|int|
 				print " "
