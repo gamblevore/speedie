@@ -4,9 +4,11 @@ datatype CopyPasteFlags (Byte)
 		cpp_part CPF
 	Flags
 		|CopyPasteFlags| 
+		/// hmmmm.... could remeove file/text/image/node and separate copy/paste?
 		Copy  = [CopyFile,  CopyText,  CopyImage,  CopyNode]
 		Paste = [PasteFile, PasteText, PasteImage, PasteNode]
 		PasteTextLike = (PasteText|||PasteFile)
+		CreateFile
 	function CanCopy (|CopyPasteFlags|)
 		return self&Copy
 	function CanPaste (|CopyPasteFlags|)

@@ -306,11 +306,11 @@ class Window (GUIControl)
 		window.all <~ self // why not?
 
 
-	function IsFront (|bool|)
+	inline IsFront (|bool|)
 		return .islast
 
 
-	function IsFullScreen (|bool|)
+	inline IsFullScreen (|bool|)
 		return .LastRect == All.lastrect
 
 

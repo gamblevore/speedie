@@ -109,12 +109,11 @@ module GUI
 		cpp_Part GetScreen
 		return (.Screenraw.vec4 / .scale).iVec4
 
-	function NativeWindow (|&nil|)
+	helper NativeWindow (|&nil|)
 		|SDL_SysWMinfo| data
 		|| s = .ScreenWindow
 			s.SDL_GetWindowWMInfo(data)
 			return data.window|&nil|
-
 
 	function Alert (|string| msg, |string| title="")
 		cpp_part MsgBox
@@ -122,7 +121,7 @@ module GUI
 		SDL_ShowSimpleMessageBox(0, title.cstr, msg.cstr, nil)
 
 	
-	function SelChanged
+	helper SelChanged
 		.FlashSelector = true
 		.ChangeSelFlash = 1
 
@@ -173,11 +172,11 @@ module GUI
 		.ShowCursor(false)
 						
 
-	function ShowCursor (|bool| v = true)
+	inline ShowCursor (|bool| v = true)
 		sdl_cursor.Show(v|int|)
 
 
-	function CursorVisible (|bool|)
+	inline CursorVisible (|bool|)
 		return sdl_cursor.Show()
 
 
@@ -203,7 +202,7 @@ module GUI
 		return true
 		
 	
-	function Touch (|guicontrol| modified=nil)
+	inline Touch (|guicontrol| modified=nil)
 		modified.touch
 
 	
@@ -215,7 +214,7 @@ module GUI
 		.Touch(modified)
 
 	
-	function IsTyping (|bool|)
+	inline IsTyping (|bool|)
 		return .event is TEXTINPUT or KEYDOWN
 	
 	
@@ -253,7 +252,7 @@ module GUI
 
 	function MouseXY (|ivec2|)
 		|| x = -1,  || y = -1
-		|| err = SDL_GetMouseState(x, y)
+		SDL_GetMouseState(x, y)
 		return (x,  y).sdlxy
 		
 		
@@ -370,7 +369,7 @@ module GUI
 			window.all.lastrect = bigPx.rect
 		
 
-	function GUICheck
+	helper GUICheck
 		if app.yes("version")
 			printline app.BuildConfig("version")
 			app.quit
@@ -378,7 +377,7 @@ module GUI
 			printline __now__|date|.LocalTime
 			app.quit
 	
-	function NiceAppName (|string|)
+	helper NiceAppName (|string|)
 		opt norefcounts
 		with app.BuildConfig("selfname")
 			return it
@@ -426,7 +425,7 @@ module GUI
 	helper SetHint (|cstring| name, |cstring| value)
 		cpp_wrapper SDL_SetHint
 	
-	function IsBackground (|bool|)
+	inline IsBackground (|bool|)
 		return !.ForeGroundTime
 	
 	helper TrySelectorFlash
@@ -438,14 +437,14 @@ module GUI
 			GUI.ChangeSelFlash = .FrameStart + 1s
 
 
-	function ClearAlerts
+	helper ClearAlerts
 		|| it = .PendingAlerts
 			.PendingAlerts = []
 			for s in it
 				app.alert(s)
 
 
-	function DialogIsOpen (|bool|)
+	inline DialogIsOpen (|bool|)
 		opt norefcounts
 		return .FrontDialog
 
@@ -480,12 +479,12 @@ module GUI
 			.TouchCount ?= 1
 	
 	
-	function DroppingInto (|guicontrol|)
+	helper DroppingInto (|guicontrol|)
 		opt norefcounts
 		return window.front.droppinginto?
 
 
-	function UpdateTextFocus (|window| w)
+	helper UpdateTextFocus (|window| w)
 		opt norefcounts
 		|| f = w.realfocus
 		|| AllowTyping = f and ((f is editable) or (f isa menu) or (f isa textview))
@@ -503,7 +502,7 @@ module GUI
 			.sdl_stoptextinput
 		
 			
-	function PreframeText (|window| W)
+	helper PreframeText (|window| W)
 		.TextInputEnabledAtStart = .TextInputEnabled		
 		if ListView.delayedItTill_.fired
 			ListView.delayedItTill_ = 0
@@ -514,21 +513,24 @@ module GUI
 	
 	function OpenDocument (|string| path, |bool| AllowMissing,  |object|)
 		require path
+		// shouldn't 
 		|| d = .AppDocumentOpen
 			|| f = path.Resolve(Allowmissing)
-			if !f.FileExists
-				require f and f.file.open
-			rz = (d)(nil, nil, f, CopyPasteFlags.PasteFile)
+				// if its not existing, the called-func can create it, or not.
+				|| flags = CopyPasteFlags.PasteFile 
+				if allowmissing
+					flags |= copypasteflags.CreateFile
+				rz = (d)(nil, nil, f, flags)
 	
 	
-	function HandleOpenFile
+	helper HandleOpenFile
 		|| d = .DocumentOpened$
 		.OpenDocument(d, false)
 		if .OpenedFirst.guiago < 3s
 			.FixScreenBug = .FrameStart + 1s
 
 
-	function OrderWindows (|window|)
+	helper OrderWindows (|window|)
 		opt norefcounts
 		|| i = 0
 		for w in window.all
@@ -571,7 +573,7 @@ module GUI
 				rz = SDLActivity.activity
 	
 	
-	function DoDrawDrag (|window| w)
+	helper DoDrawDrag (|window| w)
 		|| s = .drawdrag
 		|| d = w.DroppingInto
 		require s and d and d != w.currmousedown
@@ -590,13 +592,13 @@ module GUI
 		img.drawtext(t, P-P2, true)
 
 
-	function DialogSorter (SorterComparerWindow)
+	helper DialogSorter (SorterComparerWindow)
 		opt norefcounts
 		if a and b
 			return a.isdialog - b.isdialog
 
 
-	function DrawWinFrom (|window|)
+	helper DrawWinFrom (|window|)
 		opt norefcounts
 		for w.reverse in window.all
 			if w.isviewable and w.isfullscreen
@@ -604,7 +606,7 @@ module GUI
 		return window.all.first
 
 
-	function StartResize (|bool| Force=false)
+	helper StartResize (|bool| Force=false)
 		opt norefcounts
 		require .acontrolwasresized
 		.acontrolwasresized = false
@@ -615,7 +617,12 @@ module GUI
 			.CalculateWindowSize(w, force, false)
 
 
-	function CalculateWindowSize (|window| W, |bool| Force, |bool| UsePrev)
+	function Window.CalculateSize
+		gui.CalculateWindowSize(self, true, true)
+	
+	
+	helper CalculateWindowSize (|window| W, |bool| Force, |bool| NotAlert)
+		cpp_Part CalcWinSize
 		opt norefcounts
 		require w._NeedsResize or force
 		w._NeedsResize = false
@@ -628,7 +635,7 @@ module GUI
 		|| D = GUI.Screen
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
-		if UsePrev
+		if NotAlert
 			|| b = w.prev
 				rect = b.lastrect
 		w.CalculateSize(BigRect, rect, BigRect)
@@ -885,7 +892,7 @@ module GUI
 		.StartResize(true)
 
 
-	function StartFrame (|&SDL_Texture| T)
+	helper StartFrame (|&SDL_Texture| T)
 		opt norefcounts
 		|| stride = 0
 		|&nil| SDLBuff
@@ -897,7 +904,7 @@ module GUI
 			.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
 		
 	
-	function EndFrame (|&SDL_Texture| T)
+	helper EndFrame (|&SDL_Texture| T)
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow!,  &dstrect.w,  &dstrect.h )
 		t.UnlockThatCopiesEvenThoughItShouldnt
@@ -906,7 +913,7 @@ module GUI
 		SDL_RenderPresent(.renderer!)
 
 
-	function IsQuitting (|bool|)
+	inline IsQuitting (|bool|)
 		return .quitreason is ExitOrTerminate
 
 
@@ -949,19 +956,19 @@ module GUI
 			return true
 
 
-	function AllowTyping (|bool|)
+	inline AllowTyping (|bool|)
 		opt norefcounts
 		return .TextInputEnabledAtStart and !keys.cmd
 	
 	
-	function Window.MenuAt (|ivec2| xy, |bool| Test, |guicontrol|)
+	helper Window.MenuAt (|ivec2| xy, |bool| Test, |guicontrol|)
 		opt norefcounts
 		|| F = .openedmenu$
 		if (!test) or (f.lastrect.horz contains xy.x)
 			return f
 	
 	
-	function Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
+	helper Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
 		opt norefcounts
 		return .MenuAt(xy, test) ?? self[xy]
 
@@ -1273,7 +1280,7 @@ module GUI
 		|| kev = ev.keysym
 		|| key = kev.sym
 		
-		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
+//		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
 
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return SDLActivity.nothing
@@ -1357,7 +1364,7 @@ module GUI
 		return clicked
 
 
-	function GuiControl.ContainedName (|string|)
+	helper GuiControl.ContainedName (|string|)
 		|| fs = FastString()
 		fs <~ "Name: "
 		while
@@ -1368,7 +1375,7 @@ module GUI
 		return fs
 	
 	
-	function SetToolTips (|guicontrol?| r)
+	helper SetToolTips (|guicontrol?| r)
 		opt norefcounts
 		|| w = r.window
 		require w and r and w.ToolTipControl != r
@@ -1386,7 +1393,7 @@ module GUI
 		t.name = info
 
 
-function guicontrol.Description (|string|)
+inline guicontrol.Description (|string|)
 	return .tooltip // :)
 	
 
@@ -1401,13 +1408,9 @@ datatype SDLActivity (byte)
 		StrongWindowClose = WindowClose+Exiting
 	syntax is (|SDLActivity| act, |bool|)
 		return self & act
-	syntax is (|SDLActivity| act, assigns:|bool| value, |SDLActivity|)
-		if value
-			return self ||| act
-		return self &~ act
 
 
-function Duration.syntaxcall (|float|)
+inline Duration.syntaxcall (|float|)
 	return gui.loop(self)
 
 // CVDisplayLink could be used to make vsyncing possible? Its a lot of per-platform work though.

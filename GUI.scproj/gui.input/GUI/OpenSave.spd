@@ -98,7 +98,7 @@ class OpenSaveDialog (Window)
 		.init
 	
 	
-	function InitField (|textview| f, |string| id)
+	helper InitField (|textview| f, |string| id)
 		with f
 			isnt AlwaysScrollable
 			is   enabled
@@ -110,13 +110,13 @@ class OpenSaveDialog (Window)
 			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
 	
 	
-	function PastePathEvent (GUIPasteEvent)
+	helper PastePathEvent (GUIPasteEvent)
 		.path.text = data.Trim
 		relistkey(.path, 0, true)
 		return true
 
 	
-	function Init
+	helper Init
 		.path.id = "opensave"
 		.path.OnTextChanged= relistkey
 		
@@ -175,18 +175,48 @@ class OpenSaveDialog (Window)
 		return super.keydown(key)
  
 
-	function AddButton (|ButtonView| BTN,  |string| Name)
+	helper AddButton (|ButtonView| BTN,  |string| Name)
 		btn.ExpandOnMouseOver = 2
 		btn.size = (44~long to 4~before) by (4~up for 16)
 		btn.Text = Name
 		btn.ID = Name
 		btn.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
 	
+
+	helper RelistFiles (|string| path, |bool| AlwaysUse=true)
+		|| pf = path.file
+		if !pf.exists and !AlwaysUse
+			return
+	
+		if path[0] == '~'
+			path = path.Resolve
+		if path
+			.LastGoodPath = path
+			.files.ListFilesUp(path, .types, (.name is visible))
+	
+	
+	helper GoIntoFolder (|bool|)
+		|| f = .files.FirstSelected as filerow #expect beep
+		|| Acceptable = (f isnt disabled) #expect beep
+		if f.asdir
+			if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")
+				.path.text = f.location
+				.RelistFiles(f.location)
+				return true
+		if (f.name != "..")
+			if .Name is visible
+				beep
+			  else
+				.ReturnValue = f.Location
+			return true
+	
+	
+		
 	
 	module
 		|OpenSaveDialog|				_Asker
 		
-		function LastDir (|message|)
+		helper LastDir (|message|)
 			rz = app.prefs()("opensave")
 			rz.trim(20)
 			for f in rz
@@ -194,7 +224,7 @@ class OpenSaveDialog (Window)
 					f.remove
 			
 
-		function RelistKey (guitextevent)
+		helper RelistKey (guitextevent)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog
 				|| p = w.path
@@ -210,75 +240,47 @@ class OpenSaveDialog (Window)
 					p.text = w.LastGoodPath
 
 
+		helper OnAskSaveAnswer (GUIAction)
+			opt NoRefCounts
+			|| w = .window as OpenSaveDialog #require
+			if self != w.accept
+				w.cancelreturn
+				return nil
+		
+			if w.name is visible and editable
+				OnAskSaveName(w.name, keys.return)
+			  else
+				w.GoIntoFolder
+		
+		
+		helper OnAskSaveName (GUIKeyEvent)
+			opt norefcounts
+			if key.isaccept
+				|| w = .window as OpenSaveDialog		#require
+				|| s = .text							#expect Beep
+				w.ReturnValue = w.path.text.child(s)
+				return true
+		
+		
+		helper OnAskSaveReveal (GUIAction)
+			opt NoRefCounts
+			|| w = .window as OpenSaveDialog			#require
+			|| f = w.files.FirstSelected
+			if f isa filerow
+				|| p = (w.path.text, f.location)(f.name == "..")
+				p.reveal
+		
+		
+		helper OnAskSaveEntered (GuiListEvent)
+			return (.parent as OpenSaveDialog)!.GoIntoFolder
+
+
 
 helper file.IsntAnOSXBundle (|bool|)
 	require .IsDir
 	|| n	= .Name
 	|| ext	= n.Ext
 	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM" and "scproj") // mostly osx
-
-
-function OpenSaveDialog.RelistFiles (|string| path, |bool| AlwaysUse=true)
-	|| pf = path.file
-	if !pf.exists and !AlwaysUse
-		return
-
-	if path[0] == '~'
-		path = path.Resolve
-	if path
-		.LastGoodPath = path
-		.files.ListFilesUp(path, .types, (.name is visible))
-
-
-function OnAskSaveAnswer (GUIAction)
-	opt NoRefCounts
-	|| w = .window as OpenSaveDialog #require
-	if self != w.accept
-		w.cancelreturn
-		return nil
-
-	if w.name is visible and editable
-		OnAskSaveName(w.name, keys.return)
-	  else
-		w.GoIntoFolder
-
-
-function OpenSaveDialog.GoIntoFolder (|bool|)
-	|| f = .files.FirstSelected as filerow #expect beep
-	|| Acceptable = (f isnt disabled) #expect beep
-	if f.asdir
-		if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")
-			.path.text = f.location
-			.RelistFiles(f.location)
-			return true
-	if (f.name != "..")
-		if .Name is visible
-			beep
-		  else
-			.ReturnValue = f.Location
-		return true
-
-
-function OnAskSaveName (GUIKeyEvent)
-	opt norefcounts
-	if key.isaccept
-		|| w = .window as OpenSaveDialog		#require
-		|| s = .text							#expect Beep
-		w.ReturnValue = w.path.text.child(s)
-		return true
-
-
-function OnAskSaveReveal (GUIAction)
-	opt NoRefCounts
-	|| w = .window as OpenSaveDialog			#require
-	|| f = w.files.FirstSelected
-	if f isa filerow
-		|| p = (w.path.text, f.location)(f.name == "..")
-		p.reveal
-
-
-function OnAskSaveEntered (GuiListEvent)
-	return (.parent as OpenSaveDialog)!.GoIntoFolder
 
 
 function window.CancelReturn

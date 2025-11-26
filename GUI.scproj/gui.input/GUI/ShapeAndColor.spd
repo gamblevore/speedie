@@ -189,6 +189,8 @@ module VShapes
 
 
 	function CloudBubble (DistanceFunction)
+		// don't want these in the libs... but not really inline either.
+		// perhaps this entire thing should be consdired... project only.
 		p.w *= 0.5
 		p.y+=gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if hit
