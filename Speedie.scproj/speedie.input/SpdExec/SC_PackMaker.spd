@@ -178,12 +178,14 @@ module PackMaker
 	function RenderASM (|jbin| j, |faststring| func_names)
 		opt norefcounts
 		j.enter(@tmp, "code")
+		j.Enter
 		for f in .PackFuncs
 			if PackSaved.AddOrShrink(j, f is UsedByASM)
 				scfunction.currfunc = f
 				j.JRenderASM(f)
 				func_names <~ f.exportname
 				func_names <~ '\n'
+		j.exit
 		j.Exit
 		scfunction.currfunc = nil
 		
@@ -199,6 +201,7 @@ module PackMaker
 	
 	helper DumpStringsSub (|jbin| strs)
 		opt norefcounts
+		strs.AppendHInt(.packstrings.length)
 		for s in .PackStrings
 			strs.AppendHInt(s.length)
 			strs <~ s

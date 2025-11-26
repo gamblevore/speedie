@@ -67,7 +67,7 @@ JB_Globals JB__;
 
 function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
 	opt norefcounts
-	fs <~ "\nstruct JB_Globals {\n\t"
+	fs <~ "\nstruct JB_Globals {\n\tbyte __Dummy__;\n\t"
 	for prop in PackMaker.LibGlobs
 		if simple and prop.Complexity > 1
 			exit
@@ -1687,4 +1687,13 @@ function faststring.AppendLibGlob (|scdecl| d)
 			0
 	.appendrange(n, skip)
 	
+
+// remove this!
+function faststring.EncodeLength (|uint64| N)	// maybe hInt is better? like how many speedie-strings are over 128 anyhow?
+	|| L2 = N|byte|					// remove these two funcs? (one below)
+	if N >= 248
+		l2 = 248 + (n|uint|.log2 max 0) >> 3
+	self <~ L2|byte|
+	if N >= 248
+		.AppendLInt(N)
 

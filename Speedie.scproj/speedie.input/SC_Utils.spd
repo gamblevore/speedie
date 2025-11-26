@@ -63,21 +63,12 @@ function object.DebugPrint  // more for use in XCode, than anything else.
 	cpp_name jdb
 	visible true
 	if self
-		print string.Wrap(.class.name)
+		print string.new(.class.name)
 		print ": "
 	printline .render
 
 
 target debug and !cake
-	function list.JDB2
-		description "For internal compiler-use only... don't use this"
-		cpp_name jdb2
-		visible
-		if (Self)
-			printline self|message|.RenderAST
-		  else
-			"(nil)"
-
 	function list.PrintLocate
 		visible
 		cpp_name jdbloc
