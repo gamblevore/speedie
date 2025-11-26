@@ -604,7 +604,6 @@ static void CaseTest_ (JB_String* self) {
 	require0 (JB_Str_Length(self));
 	char Resolved[PATH_MAX];
 	const char* s = (const char*)(self->Addr);
-//	LogPut(s);
 	if (realpath(s, Resolved))
 		CaseCompare_(self, Resolved, false);
 }
@@ -634,8 +633,8 @@ JB_String* JB_Str_ResolvePath ( JB_String* self, bool AllowMissing ) {
 		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
 	}
 	
-	if (UserPath != self) // because userpath is not returned below.
-		JB_FreeIfDead(UserPath); // we return a string from JB_Str__Freeable0
+	if (UserPath != self)			// because userpath is not returned below.
+		JB_FreeIfDead(UserPath);	// we return a string from JB_Str__Freeable0
 	
 	return Result;
 }
@@ -703,19 +702,6 @@ JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 }
 
 
-bool JB_File_EOF ( JB_File* self ) {
-    if (HasFD(self)) {
-        off_t Cur = JB_File_Offset(self);
-        if (Cur >= 0) {
-            off_t End = lseek( self->Descriptor, 0, SEEK_END );
-            ErrorHandle_((int)End, self, nil, "find length of");
-            return Cur == End;
-        }
-    }
-    return true;
-}
-
-
 int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
     N = JB_Write_( self->Descriptor, Data, N );
     return ErrorHandle_(N, self, nil, "write to");
@@ -725,9 +711,8 @@ int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
 int JB_File_Write ( JB_File* self, JB_String* Data ) {
     if (!JB_Str_Length(Data))
 		return 0;
-	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 ) {
+	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 )
 		return (int)JB_File_WriteRaw_(self, Data->Addr, Data->Length );
-	}
     return -1;
 }
 

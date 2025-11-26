@@ -304,9 +304,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		nil checker
 		cpp_wrapper JB_File_OpenBlank
 	
-	function EOF (|bool|)
-		cpp_wrapper JB_File_EOF
-	
 	function IsDir (|bool|)
 		cpp_wrapper JB_File_IsDir
 
