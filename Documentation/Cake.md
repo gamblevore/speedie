@@ -13,7 +13,7 @@ Speedie doesn't require `Cake` to run it's programs. Speedie can output C++ and 
 * Compiles without needing gcc/clang
 
 
-### Cake is Fast, Small and Tasty
+### Nutritrious Small Cakes Baked Quickly
 
 `Cake` is a low-calorie platform, at around 2-3x smaller than ARM. `Cake` also links against SpeedieLib, drastically reducing size. The (very featureful) IDE [`Perry`](Perry.md) compiles to 80KB in Cake! _(For ARM-C++ it takes 900KB.)_
 
@@ -50,7 +50,7 @@ Perry's inbuilt ASM-viewer... has an extra advantage, it is instant! (Unlike god
 
 ### Other Nice Things To Know:
 
-• Within 1.5 years of community acceptance, a `Cake` JIT will be created for ARM, running `Cake` apps on ARM at native speed.
+• Within 1.5 years of having successfully built a community, a `Cake` JIT will be created for ARM, running `Cake` apps on ARM at native speed.
 
 • `Cake` allows to hand-writen ASM that runs on any platform. It will be a great way to learn ASM!
 
