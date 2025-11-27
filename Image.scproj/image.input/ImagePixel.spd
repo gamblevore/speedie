@@ -24,7 +24,7 @@ struct ImagePixelStruct
 		.g = iv.g
 		.b = iv.b
 	
-	function Px (|ImagePixel|)
+	inline Px (|ImagePixel|)
 		return self|&ImagePixel|[]
 				
 //	helper ivec4._CB (|ivec4|)
@@ -49,31 +49,29 @@ datatype ImagePixel (uint)
 		cpp_part Pxl
 		opt min 3
 
-	function a (|int|):							return (self >> 24)
+	inline a (|int|):							return (self >> 24)
 	function a (assigns:|int|, |imagepixel|): 	return ((self << 8) >> 8) ||| (value << 24)
-	function a (|&imagepixel| self, assigns:|int|)
+	inline a (|&imagepixel| self, assigns:|int|)
 		cpp_part A2
 		self|&ImagePixelStruct|.a = value
 
-	function b (|int|):							return (self >> 16) & 255
+	inline b (|int|):							return (self >> 16) & 255
 	function b (assigns:|int|, |imagepixel|):	return (self &~ 0x00FF0000) ||| ((value&255) << 16)
-	function b (|&imagepixel| self, assigns:|int|)
+	inline b (|&imagepixel| self, assigns:|int|)
 		cpp_part B2
 		self|&ImagePixelStruct|.b = value
 		
-	function g (|int|):							return (self >> 8) & 255
+	inline g (|int|):							return (self >> 8) & 255
 	function g (assigns:|int|, |imagepixel|):	return (self &~ 0x0000FF00) ||| ((value&255) << 8)
-	function g (|&imagepixel| self, assigns:|int|)
+	inline g (|&imagepixel| self, assigns:|int|)
 		cpp_part G2
 		self|&ImagePixelStruct|.g = value
 	
-	function r (|int|):							return (self >> 0) & 255
+	inline r (|int|):							return (self >> 0) & 255
 	function r (assigns:|int|, |imagepixel|): 	return (self &~ 0x000000ff) ||| ((value&255) << 0)
-	function r (|&imagepixel| self, assigns:|int|)
+	inline r (|&imagepixel| self, assigns:|int|)
 		cpp_part R2
-		inline
 		self|&ImagePixelStruct|.r = value
-		
 		
 	function Alpha (|&imagepixel| self, assigns:|float| a)
 		cpp_part Alpha2
@@ -85,7 +83,7 @@ datatype ImagePixel (uint)
 		.a = a.clamp(255.0)|int|
 		return self
 		
-	function Alpha (|float|)
+	inline Alpha (|float|)
 		return .a|float| * 255th
 	
 	render
@@ -118,6 +116,7 @@ datatype ImagePixel (uint)
 //		return .color.lum
 	
 	function HasColor (|bool|)
+		inline
 		return (self << 8) != 0
 
 	function HasAny (|bool|)
@@ -160,29 +159,12 @@ datatype ImagePixel (uint)
 		.b = b.clamp(255)
 		.a = a.clamp(255)
 	
-	function CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N, |&imagepixel|)
-		if (src != self)
-			Memory.Copy(self, src, N*4)
-		return self - N
-		
-	syntax append (|float| v)
-		disabled "Use a vector instead."
-	
-	syntax append (|&imagepixel| self, |float| r, |float| g, |float| b, |float| a=255)
-		cpp_part AppendFloats
-		disabled "Just make a vector instead."
+	function CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N)
+		Memory.Copy(self, src, N*4)
 		
 	function Add (|&imagepixel| self, |vec4| c)
 		cpp_part AddVec
 		self <~ (c + .Color)
-		
-	function Overlay (|&imagepixel| self, |vec4| T)
-		disabled "Call .Premul on this first for great speed boost!"
-
-//	helper FastMix (|&imagepixel| self, |vec4| C)
-//		if C.a < 0.996 
-//			C = mix(.color, C, C.a) // maybe better to do this with shift math. IDK.
-//		self <~ C 
 		
 	function Overlay (|&imagepixel| self, |PreMultipliedColor| T)
 		|| R = .raw
@@ -209,6 +191,17 @@ datatype ImagePixel (uint)
 		.a = value.a
 			
 	
+	syntax append (|float| v)
+		disabled "Use a vector instead."
+	
+	syntax append (|&imagepixel| self, |float| r, |float| g, |float| b, |float| a=255)
+		cpp_part AppendFloats
+		disabled "Just make a vector instead."
+		
+	function Overlay (|&imagepixel| self, |vec4| T)
+		disabled "Call .Premul on this first for great speed boost!"
+
+
 	module 
 		function New (|imagepixel|)
 			rz = 255
@@ -217,18 +210,6 @@ datatype ImagePixel (uint)
 		|ImagePixel| White
 		|ImagePixel| Clear
 
-//		function CheckPixel (|string| extra=nil)
-/*			|| W = .white
-			if  .White != -1  or  .Clear != 0
-/				.white = -1
-				.Clear = 0
-				|| s = "Corrupted pixel found via:\n\n" + app.StackTrace
-				if extra
-					s = extra + "\n" + s
-				printline s
-				beep s
-*/			
-			
 		init()
 		
 		helper Init

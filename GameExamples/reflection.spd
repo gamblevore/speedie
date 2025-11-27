@@ -192,7 +192,8 @@ class Breakout (Window)
 		src = where[0,0]
 		|| dest = src
 		for h in where.Height
-			Dest = dest.CopyFrom(src, w)
+			dest.CopyFrom(src, w)
+			dest = dest - w
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
