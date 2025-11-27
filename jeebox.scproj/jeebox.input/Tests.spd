@@ -176,7 +176,7 @@ function Jeebox.Test (|string|)
 	if (jbin_input)
 		message.TreeCompare( root, root.copy ) // make sure compare works
 		message.TreeCompare( root, jbin_input.parse )
-		root.Test( root.Render,			"normal" )
+		root.Test( root.Render,		"normal" )
 		root.Test( root.renderjbin,	"jbin" )
 	
 	require StdErr.ok
