@@ -162,7 +162,6 @@ class SCDecl (SCObject) {
 	
 	setter WholeType (|asmreg|)
 		value.tmpcheck
-		if self == typebool!.typenormal
 		.mu.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)

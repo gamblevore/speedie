@@ -141,7 +141,7 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 	|| p = prms.first$
 
 	|| args = .fn.args
-	target debug: if asmtrapper == 0
+	target debug: if asmtrapper == -1
 	info.DoImmediates(p, args)
 	
 	for (a in args) (i)

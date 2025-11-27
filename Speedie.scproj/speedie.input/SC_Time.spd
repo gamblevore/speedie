@@ -1,6 +1,6 @@
 
 
-function compiler.PrintCompileTime (|date| durr) 	
+function compiler.PrintCompileTime (|date| durr) 
 	require StdErr.OK and !options.silent
 	|| fs = faststring()
 	fs.normal  "Stages",	fs <~ Compiler.CurrStage

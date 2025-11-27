@@ -128,7 +128,7 @@ class SCImport
 			arg.remove
 			compiler.project = proj
 			// check Options.SelfReplacement, in case I alter how jbin works 
-			|| str = (arg.Render, arg.RenderJbin)(Options.SelfReplacement)
+			|| str = arg.RenderJbin
 			|| x = MakeDecl("", "__AppConfString", @str+str, scdeclinfo.compilercreated)
 			conf.become(x)
 			compiler.program.MoveToInitFunc(conf)
