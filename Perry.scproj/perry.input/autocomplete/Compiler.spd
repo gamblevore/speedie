@@ -23,7 +23,7 @@ extend PerryIDE
 	function ProjectWasModified
 		.ModifiedForCompile = false
 		require .projIsSpeedieCode and !.UsingSpdLib
-/		.Feedback = nil
+		.Feedback = nil
 		.AskCheck
 	
 	
