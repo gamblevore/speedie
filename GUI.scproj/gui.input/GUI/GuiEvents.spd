@@ -72,7 +72,10 @@ struct SDL_TextEditingEvent
     |uint|			length								// The length of selected editing text
     
     function Str (|string|)
-		return string.copy(&.text[0], .length)
+		|| n = 0
+		while n < 32
+			loop .text[n++] // sigh why is the length wrong? we have to do this instead.
+		return string.copy(&.text[0], n-1)
 	
 	render
 		fs.appendmemory((&.text[0])|&byte|, .length)
