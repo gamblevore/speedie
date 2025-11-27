@@ -285,7 +285,7 @@ class PerryIDE (Window)
 		
 		  elseif i == 3
 			|| img = GUI.screen.size.area*4*2
-			|| PS = PicoGlobalStats.Read 
+			|| PS = PicoGlobalStats()
 			fs <~ "Obj ${app.ObjMemory.strsize}"
 			fs <~ "   Str ${app.stringmemory.strsize}"
 			fs <~ "   Img ${(app.OtherMemory+img).strsize}"
