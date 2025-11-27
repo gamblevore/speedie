@@ -7,7 +7,7 @@ Ideally we want everything to be fast! Fast to compile, fast to run, fast to deb
 
 There is a certain beauty in optimising code to run fast. When you remove all bloat, what remains can be a thing of beauty. So while I often mention speed, behind that is a deeper thing. Which is beauty, and efficiency. And behind that is a very spiritual goal, of not wasting the life energy of the planet, that humans are greedily destroying at this moment. _(With the electricity power grid.)_
 
-Another nice thing about making code faster by making it smaller, is that becomes "prettier on the inside". Speedie also has a very attractive syntax. So it could be said that Speedie is only fast, because I make things of beauty.
+Another nice thing about making code faster by making it smaller, is that becomes "prettier on the inside". Speedie also has a very attractive syntax. So it could be said that I only try to make Speedie fast, because I appreciate things of beauty.
 
 #### How can a language be faster than C++?
 
@@ -27,16 +27,18 @@ However, if you use `C++` like `C++`, that is, you use `new`/`delete`, use it's 
 
 Things get even better	for speedie when you compare it's memory management to `C++`'s shared_pointers, which are quite slow. Shared pointers are "the new thing" in `C++` and help make it more reliable. Sadly, you lose even more speed.
 
-With speedie, you keep the reliability and gain speed.
+With Speedie, you keep the reliability and gain speed.
 
 
 #### The Cake VM
 
 So... in Speedie there will be a virtual machine, as an optional target. You can target `C++` (Speedie compiles to `C` which `gcc`/`clang` will compile), or target `cake` which is Speedie's VM.
 
-A `cake` compile will in the worst-case, run much slower than a `C++` compile. Not sure how much just yet. But you don't need to compile to `cake` if you don't want to. The main purpose of `cake` is to make debugging fast and easy. So you can debug via the VM, then run the `C++` code for release.
+A `cake` compile will (in the worst-case) run much slower than a `C++` compile. Not sure how much just yet. In the best case, it will run almost as fast, assuming you are mostly "leveraging" complex lib funcs. (`string.parse` is one of them.)
 
-Also... Speedie will (before it's release) have an `OpenCL` feature, which can compile certain GPU-friendly code and run it... even within `cake`! So you could make fast graphics apps, and use `cake` more like a scripting system for the graphics. Given a little help from Speedie's libs, like a good hit-detection-system compiled (in `C++`) as part of Speedie's standard-lib, you could even make games run fast even within `cake`, relying on `C++` compiled code to do the heavy lifting.
+But you don't need to compile to `cake` if you don't want to. The main purpose of `cake` is to make debugging fast and easy. So you can debug via the VM, then use the `C++` target for release.
+
+Also... Speedie will (before it's release) have an `OpenCL` feature, which can compile certain GPU-friendly code and run it... even within `cake`! So you could make fast graphics apps, and use `cake` more like a scripting system for the graphics. Given a little help from Speedie's libs, like a good hit-detection-system compiled (in `C++`) as part of Speedie's standard-lib, you could even make games run fast even within `cake`, relying on the standard-libs to do the heavy lifting.
 
 Once Speedie has built a successful community... I'll be able to start work on a JIT. The `cake-JIT` will run `cake` apps at close to native `C++` speed. The timing on that obviously isn't up to me, it will be mostly due to the choices of a wider community.
 
