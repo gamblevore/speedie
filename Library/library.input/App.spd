@@ -79,6 +79,7 @@ syntax access (|string| name, |string|)
 
 
 syntax expect (|string?| s=nil)
+	inline
 	.quit(s, -1)
 
 

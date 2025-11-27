@@ -43,6 +43,7 @@ You can also count the number of times that this messageID was applied, via the 
 		fs.AppendQuotedEscape(self)
 			
 	syntax cast (|bool|)
+		inline
 		return self!=nil
 	
 	constructor (|string| Name, |Syntax| Fn=@str, |uint64| ID=0)

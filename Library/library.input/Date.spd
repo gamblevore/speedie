@@ -50,9 +50,11 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 //		return 1.0 / .Seconds 
 
 	operator Minus (|date| D, |duration|)
+		inline
 		return self|int64| - D|int64|
 
 	operator Mod (|duration| D, |duration|)
+		inline
 		return self|int64| mod D|int64|
 
 	function ReportAgo (|string|)
@@ -163,6 +165,7 @@ datatype Duration (date)
 	
 	syntax cast (|float|)
 		// are these bad? remove them??
+		inline
 		cpp_Part CastFloat
 		return .Float	
 		

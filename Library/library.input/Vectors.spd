@@ -30,28 +30,34 @@ datatype ivec4
 		return (.x|float|, .y|float|, .z|float|, .w|float|)
 
 	operator minus (|ivec2| D, |ivec4|)
+		inline
 		return self - (D,D)
 
 	operator plus (|ivec2| D, |ivec4|)
+		inline
 		return self + (D,D)
 
 	operator right (|int|x, |ivec4|)
+		inline
 		return self + (x,0,x,0)
 	
 	operator up (|int|x, |ivec4|)
+		inline
 		return self + (0,x,0,x)
 
 	operator left (|int|x, |ivec4|)
+		inline
 		return self - (x,0,x,0)
 		
 	operator down (|int|x, |ivec4|)
+		inline
 		return self - (0,x,0,x)
 		
 	function MoveTo (|ivec2| XY, |ivec4|)
 		return (XY, XY + .size)
 
 	syntax Equals (|ivec4| v, |bool|)
-		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w)
+		return ((.x == v.x) & (.y == v.y)) & ((.z == v.z) & (.w == v.w))
 	
 	operator ± (|int| i, |ivec4|)
 		cpp_part Shrink
@@ -129,6 +135,7 @@ datatype ivec4
 		return true 
 	
 	operator contains (|ivec2| v, |bool|)
+		inline
 		return .contains(v)
 	
 	function IsPositive (|bool|)
@@ -139,6 +146,7 @@ datatype ivec4
 		
 	syntax cast (|bool|)
 		cpp_part Bool
+		inline
 		return self!=ivec4()	
 
 	function Soothe (|ivec4|)
@@ -182,6 +190,7 @@ datatype vec3
 	size 16 // We are using vec4 for vec3 :)
 	syntax cast (|bool|)
 		cpp_part Bool
+		inline
 		return (self != vec3())
 			
 	syntax Compare (|float| Other, |float|)
@@ -197,7 +206,7 @@ datatype vec3
 		return self|vec4|.Syntaxcompare(other|vec4|)
 
 	syntax Equals (|vec3| v, |bool|)
-		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
+		return (.x == v.x) & (.y == v.y) & (.z == v.z)
 	
 	function Lum (|float|)
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
@@ -330,7 +339,7 @@ datatype ivec3
 		fs <~ "(${.x}, ${.y}, ${.z})"
 
 	syntax Equals (|ivec3| v, |bool|)
-		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
+		return (.x == v.x) & (.y == v.y) & (.z == v.z)
 	
 	module
 		inline New (|ivec3|)
@@ -347,6 +356,7 @@ datatype IntRange (ivec2)
 	inline Width (|int|)
 		return .x2 - .x
 	operator Inside (|ivec4| R, |bool|)
+		inline
 		return R.Contains(.x, .y)
 
 	operator overlaps (|intrange| r, |bool|)
@@ -470,6 +480,7 @@ datatype ivec2
 		return (o min .x, o min .y)
 		
 	operator fma (|int| w, |int|)
+		inline
 		return .x + .y*w
 
 	operator inrange (|ivec2| p, |bool|)
@@ -499,9 +510,10 @@ datatype ivec2
 	
 	syntax Equals (|ivec2| v, |bool|)
 		cpp_part Equals2
-		return (.x == v.x) and (.y == v.y) 
+		return (.x == v.x) & (.y == v.y)
 
 	syntax Equals (|int| v, |bool|)
+		inline
 		return self == (v,v) 
 	
 	inline RotateRight (|ivec2|)
@@ -606,7 +618,7 @@ datatype vec2
 			rz.y -= .y.RoundEvenSub
 	
 	syntax Equals (|vec2| v, |bool|)
-		return (.x == v.x) and (.y == v.y) 
+		return (.x == v.x) & (.y == v.y)
 	
 	operator • (|vec2| other, |float|)
 		cpp_part Dot

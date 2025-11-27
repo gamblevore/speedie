@@ -5,7 +5,7 @@ datatype vec4
 		return self != vec4()	
 	
 	syntax Equals (|vec4| v, |bool|)
-		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
+		return ((.x == v.x) & (.y == v.y)) & ((.z == v.z) & (.w == v.w))
 
 	syntax Compare (|float| Other, |float|)
 		// this function is sooo nice. avoids doing a sqrt on both sides!

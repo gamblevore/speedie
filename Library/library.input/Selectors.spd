@@ -14,6 +14,7 @@ class Selector
 	
 	syntax cast (|int|)
 		cpp_part Cast
+		inline
 		return .ID
 	function ID (|int|)
 		nil safe

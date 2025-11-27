@@ -13,8 +13,10 @@ datatype int
 
 	module
 		function Max (|int|)
+			inline
 			return 0x7FFFffff_
 		function Min (|int|)
+			inline
 			return 0x80000000_
 
 	operator Avg (|int| n, |int|)
@@ -47,9 +49,11 @@ datatype int
 	
 	operator Div (|int| D, |float|)
 		opt inline
+		inline
 		return self|float| / d|float|
-		
+		 
 	syntax compare (|string| s, |int|)
+		inline
 		return self - s.length
 
 	syntax access (|bool|) // should be a bool?
@@ -64,6 +68,7 @@ datatype int
 		return (self &~ mask) ||| (value|int| << bit) 
 
 	operator isa (|uint| n, |bool|)
+		inline
 		return !(self mod n)
 
 	function Wrap (|int| N, |int|)
@@ -184,6 +189,7 @@ datatype int
 
 datatype SizeInt (int)
 	syntax cast (|string|)
+		inline
 		return .strsize
 
 
@@ -191,6 +197,7 @@ datatype Ind (int) // an INDex. And an INT.
 	default -1
 	false -1
 	syntax cast (|bool|)
+		inline
 		return self >= 0
 //	function Exists (|bool|)
 //		return self >= 0
@@ -263,6 +270,7 @@ datatype uint
 //		return self
 		
 	operator isa (|uint| n, |bool|)
+		inline
 		return !(self mod n)
 		
 //	operator rotl (|int| Amount, |uint64|)
@@ -492,6 +500,7 @@ datatype float
 		return self - i
 
 	operator avg (|float| f, |float|)
+		inline
 		return (f + self) * 0.5
 	
 	function Bounce (|float|)
@@ -727,9 +736,11 @@ datatype int64
 			return (self|uint64| < Length|uint64|)
 
 	operator Div (|int64| D, |float64|)
+		inline
 		return self|float64| / d|float64|
 
 	operator isa (|uint| n, |bool|)
+		inline
 		return !(self mod n)
 
 	operator max (|int64| d, |int64|)
@@ -813,6 +824,7 @@ datatype uint64
 		max = -1
 
 	operator isa (|uint| n, |bool|)
+		inline
 		return !(self mod n)
 	
 	function Exists (|int|)
@@ -939,6 +951,7 @@ datatype bool
 	default false
 	
 	operator sign (|int| i, |int|)
+		inline
 		return (i, -i)(self)
 	function Bool (|int| i, |int|)
 		disabled "use operator sign"
@@ -955,6 +968,7 @@ datatype bool
 		return old &~ flag
 		
 	function Dir (|int|)
+		inline
 		return (self|int|<<1)-1
 	
 	function String (|string|)
@@ -963,6 +977,7 @@ datatype bool
 
 	function Render (|string|)
 		opt norefcounts
+		inline
 		return .string
 	
 	function Render (|faststring!| fs_in)
@@ -1009,6 +1024,7 @@ datatype MoveCode (byte)
 			rz |= movecode.Up << (y < 0)
 			
 	syntax is (|movecode| m, |bool|)
+		inline
 		return (self & m) == m
 
 	function field (|int|)

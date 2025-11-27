@@ -84,6 +84,7 @@ datatype ControlLine (ivec2)
 		return self by b.expand
 	operator by (|intrange| B,    |ControlRect|)
 		cpp_part ByRange
+		inline
 		return self by (b<<4)|controlline|
 
 
@@ -98,18 +99,22 @@ datatype ControlPoint (int)
 	operator plus (|int| n, |ControlPoint|)
 		return ((self|int|&15) ||| ( (.length+n) << 4))|controlpoint|
 	operator minus (|int| n, |ControlPoint|)
+		inline
 		return .operatorplus(-n)
 	operator to (|ControlPoint| High, |ControlLine|)
+		inline
 		return (self|int|, high|int|)|ControlLine|
 	operator for (|int| n, |controlline|)
 		return (self|int|, ((n)~long)|int|)|ControlLine|
 	operator for (|controlpoint| pc, |controlline|)
 		cpp_Part ForPoint
+		inline
 		return (self|int|, pc|int|)|ControlLine|
 	operator back (|int| n, |controlline|)
 		return (((n)~long)|int|, self|int|)|ControlLine|
 	operator back (|controlpoint| cp, |controlline|)
 		cpp_Part BackPoint
+		inline
 		return (cp|int|, self|int|)|ControlLine|
 	operator by (|ControlPoint| B, |controlRect|)
 		cpp_part ByPoint

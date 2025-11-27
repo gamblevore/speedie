@@ -27,9 +27,11 @@ class Image (memory)
 		fs <~ "image${.size}:${.name}"
 	
 	setter Size (|ivec2|)
+		inline
 		.ResizeTo(value)
 	
 	function Size (|ivec2|)
+		inline
 		return .area
 	
 	function NeedTemp (|image|)
@@ -67,6 +69,7 @@ class Image (memory)
 		
 	
 	function ControlClip (|ivec4|)
+		inline
 		return ._ControlClip
 		
 	
@@ -77,14 +80,17 @@ class Image (memory)
 			rz.bounds = ._Controlclip
 	
 	function Rect (|ivec4|)
+		inline
 		return .size.rect
 	
 	
 	function Width (|int|)
+		inline
 		return .size.x
 	
 	
 	function Height (|int|)
+		inline
 		return .size.y
 	
 	
@@ -124,6 +130,7 @@ class Image (memory)
 		return R
 
 	syntax cast (|ivec4|)
+		inline
 		return ._controlclip
 	
 	function ResizeTo (|ivec2| value, |bool|)
@@ -159,6 +166,7 @@ class Image (memory)
 	
 	
 	function Pixels (|&imagepixel|)
+		inline
 		return .ptr|&imagepixel|
 	
 	
@@ -436,8 +444,7 @@ class Image (memory)
 
 		if dest == self
 			into.CopyTo(self)
-			
-				
+					
 		
 	function DrawRect (|ivec4| Rect, |vec4| Color=colors.white)
 		cpp_part SimpleRectSub

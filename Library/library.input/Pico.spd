@@ -11,6 +11,7 @@ struct PicoMessage
 	|?&int8|		Data
 	
 	syntax cast (|bool|)
+		inline
 		if self
 			return .data
 	
@@ -196,9 +197,10 @@ struct PicoGlobalStats
 	|int|						OpenSockets
 	|int|						OpenPicos
 
-	helper Read
+	autogen Read
 		cpp_wrapper PicoGlobals
 	module
-		function Read (|PicoGlobalStats|)
+		function New (|PicoGlobalStats|)
+			inline
 			rz.read
 

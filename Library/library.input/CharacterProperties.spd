@@ -19,9 +19,11 @@ datatype CharProp (byte)
 		Unicode
 	
 	function byte.SyntaxIs (|CharProp| s, |bool|)
+		inline
 		return .Property == s
 	
 	operator contains (|byte| b, |bool|)
+		inline
 		return b.Property >= self
 
 	module

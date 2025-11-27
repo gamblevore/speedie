@@ -51,6 +51,7 @@ class Array (saveable)
 		return .marker < .length
 
 	function Reset
+		inline
 		.marker = 0
 	
 	function Trim
@@ -134,6 +135,7 @@ class Array (saveable)
 		return self[.length.now]
 	
 	syntax cast (|bool|)
+		inline
 		return .length > 0
 	
 	syntax Append (|...?| item)
@@ -159,10 +161,12 @@ class Array (saveable)
 
 	syntax Compare (|int| n, |int|)
 		nil self
+		inline
 		return .length - n
 	
 	syntax Equals (|int| n, |bool|)
 		nil self
+		inline
 		return .length == n
 	
 	function OperatorPlus (|array of ...| other, |array of ...|)

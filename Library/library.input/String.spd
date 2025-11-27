@@ -27,7 +27,7 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_Length
 
-	function Addr (|&byte|)
+	inline Addr (|&byte|)
 		nil safe	 // never returns nil, even for a nil-self
 		return ._Addr
 
@@ -40,26 +40,26 @@ class String
 		cpp_wrapper JB_Str_LengthUTF8
 
 // (need to reorder these func params to put find first)
-	helper _InByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+	autogen _InByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		nil checker
 		cpp_wrapper JB_Str_InByte
 
-	function _OutByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+	autogen _OutByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		nil checker
 		cpp_wrapper JB_Str_OutByte
 
-	helper _CharSet (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
+	autogen _CharSet (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
 		nil checker
 		cpp_wrapper JB_Str_CharSet
 
-	helper _White (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
+	autogen _White (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
 		nil checker
 		cpp_wrapper JB_Str_WhiteSpace
 	
-	function InWhite (|int|Start=0, |int|After=int.max, |ind|)
+	inline InWhite (|int|Start=0, |int|After=int.max, |ind|)
 		return ._white(Start, After, true)
 
-	function OutWhite (|int|Start=0, |int|After=int.max, |ind|)
+	inline OutWhite (|int|Start=0, |int|After=int.max, |ind|)
 		return ._white(Start, After, false)
 	
 
@@ -69,17 +69,17 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_InStr
 
-	function Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
+	inline Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
 		cpp_part FindByte
 		return ._inbyte(start, after, find)
 
-	function Find (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
+	inline Find (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
 		return ._CharSet(Start, After, cs, true)
 
-	function OutByte (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
+	inline OutByte (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
 		return ._outbyte(Start, after, find)
 
-	function OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
+	inline OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
 		return ._CharSet(Start, After, cs, false)
 	
 // comparing / analysing
@@ -90,9 +90,11 @@ class String
 		cpp_wrapper JB_Str_First
 		
 	operator divide (|byte| sep, |[string]|)
+		inline
 		return .split(sep)
 	
 	operator minus (|string|s, |int|)
+		inline
 		return .length - s.length
 	
 	function Widen (|int| Width, |int| Mode=1, |byte| Char=' ', |string|)
@@ -123,7 +125,7 @@ class String
 	function Map (|bytemap| b, |int| clear = -1, |string|)
 		cpp_wrapper JB_Str_MapBytes
 
-	function IsInt (|bool|)
+	inline IsInt (|bool|)
 		return .isint(0)
 	
 	function IsInt (|int|i, |bool|)
@@ -185,12 +187,12 @@ class String
 		nil checker
 		cpp_Wrapper JB_Str_TextIntegerValid
 	
-	function Int (|int64|)
+	inline Int (|int64|)
 		return .parseint(nil)
 	
-	function Float (|bool| Suffixes = false, |Float64|)
+	inline Float (|bool| Suffixes = false, |Float64|)
 		nil checker
-		return .parsefloat(nil)
+		return .parsefloat(nil, suffixes)
 	
 	function ParseFloat (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
 		nil checker
@@ -270,11 +272,11 @@ class String
 		error (where, "Not a boolean value: '" + self + "'")
 
 
-	function CharSet (|bool| Range = true, |!CharSet|)
+	inline CharSet (|bool| Range = true, |!CharSet|)
 		return CharSet.new(self, range)
 
 
-	function Words (|[String]|)
+	inline Words (|[String]|)
 		return .Split(' ')
 
 
@@ -289,7 +291,7 @@ class String
 //		rz.size = n
 
 
-	function FirstLine (|string|)
+	inline FirstLine (|string|)
 		return .Before("\n")
 		
 	function Before (|string| s, |string|)
@@ -321,17 +323,21 @@ class String
 	
 	operator Contains (|charset| s, |bool|)
 		cpp_part ContainsAny
+		inline
 		return .find(s)
 	
 	operator Contains (|Byte| b, |bool|)
 		cpp_part ContainsByte
+		inline
 		return .find(b)
 	
 	operator EndsWith (|string| s, |bool|)
+		inline
 		return .endswith(s, true)
 	
 	operator mul (|bool| b, |string|)
 		cpp_part MulBool
+		inline
 		return (self,"")(b)
 	
 	operator Mul (|int| n, |string|)
@@ -362,7 +368,7 @@ class String
 		|| badness = .UTF8Badness
 		return  (badness.y)|float|*f  >=  .length|float|
 	
-	function IsText (|float| f = 512.0, |bool|)
+	inline IsText (|float| f = 512.0, |bool|)
 		return !.IsBinary(f)
 	
 	function UTF8Badness (|ivec2|)
@@ -430,7 +436,7 @@ class String
 	function CStr (|stringZeroTerminated|)
 		cpp_Wrapper JB_Str_MakeC
 	
-	function CopyTo (|&byte| Where, |bool|)
+	inline CopyTo (|&byte| Where, |bool|)
 		cpp_Part CopyToHopeful
 		return .copyto(where, .length+1)
 		
@@ -469,7 +475,7 @@ class String
 		function FromC (|cstring| str, |stringzeroterminated|)
 			disabled "use .copy"
 
-		function Hex (|int64| i, |string|)
+		inline Hex (|int64| i, |string|)
 			return i.hex!
 		
 		function FromPtr (|&nil| Addr,  |int| N,  |&nil| free = nil,  |&nil| obj = nil,  |string|)
@@ -505,10 +511,12 @@ class String
 
 	syntax cast ( |&byte| )
 		cpp_part CastByte
+		inline
 		return ._addr|&byte|
 	
 	syntax cast (|StringZeroTerminated|)
 		cpp_part CastZero
+		inline
 		return .cstr
 
 	function Byte (|int| index, |int| Default, |int|)
@@ -542,6 +550,7 @@ class String
 
 	syntax Compare (|int| Other, |int|)
 		cpp_part CompareInt
+		inline
 		return .length - other
 	
 	syntax Equals (|string?| Other, |bool| Aware=false, |bool|)
@@ -550,6 +559,7 @@ class String
 	
 	syntax Equals (|int| Other, |bool|)
 		cpp_part EqualsInt
+		inline
 		return .length == other
 	
 //	syntax Equals (|byte| Other, |bool|)
@@ -582,6 +592,7 @@ class String
 			return 1
 
 	operator starts (|string| s, |bool|)
+		inline
 		return self[0, s, true]
 		
 	function EndsWith (|string| s, |bool| aware=false, |bool|)
@@ -715,13 +726,8 @@ helper array.join_sub (|array of string| self, |string| sep, |int| n, |string|)
 		fs <~ sep
 		start
 		fs <~ s
-
 	return fs
-	
 
-//function array.join (|array of string| self, |byte| sep = '\n', |string|)
-//	cpp_part JoinByte
-//	return .join(string.byte(sep))
 
 
 function array.join (|array of string| self, |string| sep = "", |string|)
@@ -732,22 +738,4 @@ function array.join (|array of string| self, |string| sep = "", |string|)
 	for s in self
 		n += s.length + sl
 	return .join_sub(sep, n)
-
-	
-
-//struct StringLengthSplit
-//	|int|		Size
-//	|string|	Name
-//	
-//	iterator
-//		|| spos = 0
-//		while spos < .name.length
-//			yield .name[spos, spos+.size]
-//			spos += .size
-//	
-//	function List (|array of string|)
-//		opt norefcounts
-//		for s in self
-//			rz <~ s
-
 

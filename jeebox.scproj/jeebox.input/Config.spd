@@ -24,19 +24,23 @@ role config (message)
 
 	syntax cast (|string|)
 		cpp_part AsString
+		inline
 		if self
 			return .Value
 			
 	syntax cast (|int64|)
 		cpp_part AsInt
+		inline
 		return .int
 			
 	syntax cast (|f64|)
 		cpp_part AsFloat
+		inline
 		return .float
 	
 	syntax cast (|MessageTable|)
 		cpp_part AsTable
+		inline
 		return .Dict(true)
 	
 	function Save (|bool|)

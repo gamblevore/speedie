@@ -63,6 +63,7 @@ class File (String)
 		disabled "use .opened"
 	
 	function Opened (|bool|) // isopen
+		inline
 		return .descriptor >= 0
 
 	function Name (assigns:|string|Name, |errorint|)
@@ -70,13 +71,15 @@ class File (String)
 	
 	syntax cast (|bool|)
 		opt norefcounts // what? why is this necessary?
-		RETURN self|bool|
+		inline
+		return self|bool|
 
 //	syntax cast (|faststring|)
 //		cpp_part CastToStream
 //		return .out
 
 	syntax equals (|string?| s, |bool| aware=false, |bool|)
+		inline
 		return super.syntaxequals(s, aware)
 			
 	function Length (|int|)
@@ -99,6 +102,7 @@ class File (String)
 		cpp_wrapper JB_File_Close
 	
 	Syntax Append (|string| data)
+		inline
 		.write(Data)
 
 	Syntax Append (|message| msg)
@@ -111,6 +115,7 @@ class File (String)
 		return .name[] != '.'
 		
 	function Hidden (|bool|)
+		inline
 		return !.visible
 
 	function SmartData (assigns:|String| nieu, |bool|)
@@ -279,6 +284,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		cpp_wrapper JB_File_Exists
 	
 	syntax access (|string| name, |File!|)
+		inline
 		return .Child(name)
 
 	autogen ListStart (|DirectoryReader|)
@@ -291,9 +297,11 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		cpp_wrapper
 
 	function OpenForRead (|bool| AllowMissing = false, |filedes|)
+		inline
 		return .open(0, AllowMissing)
 	
 	function OpenDes (|filedes|)
+		inline
 		.openempty
 		return .descriptor
 	
@@ -373,9 +381,11 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		return self isnewerthan f.modified
 	
 	operator IsNewerThan (|date| F, |bool|)
+		inline
 		return (.Modified > F)
 	
 	operator IsOlderThan (|File| F, |bool|)
+		inline
 		return (.Modified < F.Modified)
 	
 	function Writer (|FastString|) // streamout
@@ -500,6 +510,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		
 // can rename these from path into files :)
 		function TrashPath (|string|)
+			inline
 			target OSX
 				return "~/.Trash/"
 			target win
@@ -508,12 +519,14 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				return "~/.local/share/Trash"
 		
 		function SystemDrive (|string|)
+			inline
 			target win
 				return getenv("%ProgramFiles%")
 			  else
 				return "/"
 		
 		function Applications (|string|)
+			inline
 			target OSX
 				return "/Applications/"
 			target win
@@ -533,12 +546,15 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			cpp_wrapper JB_CPath_ReadAll
 
 		function Documents (|file|)
+			inline
 			return "~/Documents/".file			// .file calls pathfix already
  
 		function Desktop (|file|)
+			inline
 			return "~/Desktop/".file
 
 		function Logs (|file|)
+			inline
 			return "/tmp/logs/".file
 
 		function Prefs (|string|name, |file|)
@@ -548,6 +564,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			return .PrefPath.file 
 		
 		helper PrefPath (|string|)
+			inline
 			target osx
 				return "~/Library/Preferences"
 			target win

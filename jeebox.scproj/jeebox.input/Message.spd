@@ -1041,6 +1041,7 @@ Message is also:
 	// would be nicer if SyntaxExpect becomes a function named "fail"
 	Syntax Expect (|string?| Error = nil)
 		cpp_part Fail
+		inline
 		errorreceiver.NewError( self, Error )
 
 //	Syntax Deprecate ( |string| Error = "Deprecated." )
@@ -1159,6 +1160,7 @@ Message is also:
 	operator Contains (|string| s, |bool|)
 		opt norefcounts
 		cpp_part ContainsStr
+		inline
 		return .FindNested(@nil, s, false)
 
 

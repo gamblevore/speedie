@@ -32,6 +32,7 @@ class Charset
 			rz <~ b.render
 
 	operator contains (|string| Data, |bool|)
+		inline
 		return !Data.OutCharSet(self)
 		
 	syntax Access (|int| c, assigns:|bool|)

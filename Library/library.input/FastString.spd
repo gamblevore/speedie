@@ -215,6 +215,7 @@ class FastString {
 //		cpp_wrapper JB_FS_AppendFile
 	
 	syntax cast (|string|)
+		inline
 		return .getresult
 
 	
@@ -289,6 +290,7 @@ class FastString {
 		
 
 	syntax Compare (|int| n, |int|)
+		inline
 		return .streamlength - n
 }
 

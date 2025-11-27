@@ -2,6 +2,8 @@
 
 class Validator
 	description "This is a replacement for XML-DTD. You can validate a Jeebox document using the validator, as if you were using a DTD to validate XML. Instead of writing a DTD to validate Jeebox, you write validator code to validate Jeebox. The validator class gives lots of useful functions to make this expressive, and simple to write. It probably runs faster than a DTD anyhow, as its more direct. And you can do far more... Look in /usr/local/speedie/Examples/xml_dtd/tv.val.spd for an example"
+	// linkage: inline
+
 	// can we make this class "cake-only?"
 	// like as if it were created within the project
 				
@@ -107,6 +109,7 @@ class Validator
 		return .msg_.func == fn
 			
 	syntax Expect (|string?| Description=nil)
+		inline
 		.msg.SyntaxExpect(description)
 
 

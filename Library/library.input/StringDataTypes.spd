@@ -60,8 +60,10 @@ datatype byte
 		return self|codepoint|.islower
 	
 	operator in (|charset| cs, |bool|)
+		inline
 		return cs[self]
 	operator out (|charset| cs, |bool|)
+		inline
 		return !(cs[self])
 	function In (|uint| a, |uint| b, |bool|)
 		return  self >= a  and  self <= b
@@ -113,6 +115,7 @@ datatype cstring
 		return b|cstring|
 	
 	syntax cast (|&byte|)
+		inline
 		return self|&byte|
 	
 	render

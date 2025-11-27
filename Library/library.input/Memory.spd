@@ -204,6 +204,7 @@ class Memory
 		(_0.appendplace|&...|)[0] = _1
 
 	syntax cast (|&...|)
+		inline
 		return .ptr
 
 	module

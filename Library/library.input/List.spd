@@ -73,9 +73,11 @@ class list (Saveable)
 			.last = l
 	
 	syntax Compare (|int| n, |int|)
+		inline
 		return .SlowCount - n
 	
 	syntax Equals (|int| n, |bool|)
+		inline
 		return .HasChildCount( n )
 	
 	syntax Equals (|byte| b, |bool|)
@@ -145,6 +147,7 @@ class list (Saveable)
 
 
 	operator inside (|| s, |bool|)
+		inline
 		return s contains self
 
 
@@ -156,6 +159,7 @@ class list (Saveable)
 
 	operator In (|list| f, |bool|)
 		opt norefcounts
+		inline
 		return .parent == f
 		
 	function Remove
@@ -179,6 +183,7 @@ class list (Saveable)
 			++C
 					
 	operator gt (|list| rt, |bool|)
+		inline
 		return .fwddist(rt)
 
 	operator plus (|int| n, ||)
