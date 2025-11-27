@@ -13,7 +13,7 @@ module App {
 |file?|						_StdOut
 |file?|						_stdin
 
-function Sleep (|float| Duration)
+inline Sleep (|float| Duration)
 	.sleep(duration.date)
 
 function Sleep (|Date| Duration=1s)
@@ -22,7 +22,7 @@ function Sleep (|Date| Duration=1s)
 function TrySleep (|date| Duration=1s, |bool|)
 	cpp_wrapper JB_Date__TrySleep
 	
-function TrySleep (|float| Duration, |bool|)
+inline TrySleep (|float| Duration, |bool|)
 	return .TrySleep(duration.date)
 	
 syntax access (|int| i, |string|)
@@ -32,12 +32,13 @@ function Option (|string| name, |bool|)
 	disabled "Use app.yes()"
 
 function Yes (|string| name, |bool|)
+	opt norefcounts
 	return app[name].yes
 	
 //operator Has (|string| name, |bool|)
 //	return .yes(name)
 
-function No (|string| name, |bool|)
+inline No (|string| name, |bool|)
 	return !.yes(name)
 
 function BuildConfig (|string| name, |string|)
@@ -148,7 +149,7 @@ function Restart
 function ThreadName (assigns:|string|)
 	cpp_Wrapper JB_App__SetThreadName
 
-function AppName (|string|)
+inline AppName (|string|)
 	return .apppath.name
 
 function AppPath (|string|)
@@ -195,7 +196,6 @@ function ParentID (|pid_int|)
 function ID (|pid_int|)
 	cpp_wrapper JB_App__ID
 
-
 function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
 	cpp_Wrapper JB_SP_Run
 
@@ -217,7 +217,7 @@ function Name (|string|)
 	disabled ".Filename (terminal) or .appname (gui package osx)"
 
 
-function FileName (|string|)
+inline FileName (|string|)
 	return .Path.Name
 
 
@@ -290,10 +290,9 @@ helper LeakUnMarkMemory
 helper IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
 
+
 autogen Configure (assigns:|string|)
-	._conf  = Value.Parse
-	if !._conf
-		printline stderr.pop!.render
+	._conf  = Value.Parsejbin
 	._conf ?= message()
 
 
