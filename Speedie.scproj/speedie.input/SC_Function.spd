@@ -33,8 +33,8 @@ datatype FunctionType (int)
 		FlowDisabled
 		ExternalLib
 		CantInline
-		Inline
-		AlwaysInline
+		OptInline
+		LinkInline
 		Killer
 		Disabled
 		NotRefCounted
@@ -49,7 +49,7 @@ datatype FunctionType (int)
 		Cpp
 		UsedByASM
 		
-		NoExport = AlwaysInline + Disabled + InitFunc
+		NoExport = LinkInline + Disabled + InitFunc
 		ConOrDes = Constructor + Destructor
 		
 	syntax is (|functiontype| t, |bool|)
@@ -204,8 +204,8 @@ function ParseName (|Message| node, |bool|)
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2
 	  elseif ftype == "inline"
-		is inline
-		is alwaysinline
+		is OptInline
+		is LinkInline
 	  elseif fType == "api"
 		is api
 	  elseif fType == "setter"

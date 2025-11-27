@@ -82,7 +82,6 @@ dispatch FuncLinkageTable (TranFunc)
 	+'cpp_refs'				SCFunction.tran_cpprefs //(fn, node, name_space), return true}
 	+'visible'				{} // (SCFunction.Tran_Visible)
 	+'ignore'				{}
-	+'inline'				{}
 
 	+'maxasm'
 		opt norefcounts

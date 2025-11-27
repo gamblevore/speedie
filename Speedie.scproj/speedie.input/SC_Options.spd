@@ -110,7 +110,8 @@ module Feedback
 				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
 				Assembler.PrintProgress
-				m.PrintLocate
+				target !cake
+					m.PrintLocate
 				nil|asmreg|.DebugPrint
 				|fatasm| X
 				X.DebugPrint

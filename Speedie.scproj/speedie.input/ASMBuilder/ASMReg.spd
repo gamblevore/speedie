@@ -256,6 +256,7 @@ datatype ASMReg (uint64)
 		target debug
 			if !value.reg and self is alteredorref
 		
+		if self == typebool!.typenormal
 		isnt const
 		.ExportPosition = 0 // this is for a local. locals store their consts in fats...
 		if value is Const
@@ -263,6 +264,7 @@ datatype ASMReg (uint64)
 			value.ConstCheck
 			if self isnt Altered
 				is const
+		
 		value.µType = .mu.DataType
 		.mu.DataType = value|datatypecode|
 		.WholeType.tmpcheck

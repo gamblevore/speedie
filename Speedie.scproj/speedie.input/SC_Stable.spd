@@ -27,7 +27,7 @@ module Stability
 		
 	
 	function scfunction.NeedsID (|bool|)
-		return (!.IsMacro) and (self isnt disabled and AlwaysInline)
+		return (!.IsMacro) and (self isnt disabled and LinkInline)
 	
 	
 	function Debug 

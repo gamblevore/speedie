@@ -72,7 +72,7 @@ extend Assembler
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
 		if  L is Const  and  R is Const
 			.Nop2Consts(r, l)
-			|| num = ((l.const==r.const)!=negate)|int|
+			|| num = ((l.const==r.const) != negate)|int|
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
 		
 		if dest isnt CondRequest
@@ -275,7 +275,7 @@ extend Assembler
 
 
 	function message.DivByZero
-		problem (self, "Divide by zero???")	
+		.CallChainError("Divide by zero???")
 
 
 	function QuickFloatDiv    (fn_OpASM)

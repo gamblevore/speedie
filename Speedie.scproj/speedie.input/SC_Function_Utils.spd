@@ -53,7 +53,12 @@ dispatch FuncPreReader (fnPreReader)
 		|| f = msg.first
 			error f
 		(self is numbercreator)
-	
+		
+	+'inline'
+		opt norefcounts
+		msg.expectempty
+		(self is LinkInline)
+		
 	
 	+'opt'
 		opt norefcounts
@@ -66,7 +71,7 @@ dispatch FuncPreReader (fnPreReader)
 				if f ~= "NoRefCounts"
 					is NotRefCounted
 				  elseif f ~= "inline"
-					is inline
+					is OptInline
 				  else
 					error f
 	
@@ -81,7 +86,7 @@ dispatch FuncPreReader (fnPreReader)
 		  elseif f ~= "safe"
 			.MakeNilChecker(msg)
 			is HidesProperties
-			is inline
+			is OptInline
 			.isvisible = true
 			
 		  else

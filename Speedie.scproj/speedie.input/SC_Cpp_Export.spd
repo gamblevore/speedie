@@ -195,7 +195,7 @@ function SetupFlow (|SCFunction| f)
 function CodifyInlines
 	opt norefcounts
 	for (f in compiler.funclist)
-		if (f is inline) and .CanExportFunc(f)
+		if (f is OptInline) and .CanExportFunc(f)
 			.cppfunc( .Inlines, f )
 	scfunction.CurrFunc = nil
 
@@ -203,7 +203,7 @@ function CodifyInlines
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if (f isnt inline) and .CanExportFunc(f)
+		if (f isnt OptInline) and .CanExportFunc(f)
 			.cppfunc( file, f )
 	scfunction.CurrFunc = nil
 
@@ -904,7 +904,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 	function WriteFunctionHeader (|SCFunction| F, |FastStringCpp| T)
 		// int example(int a, int b)
-		if f Is Inline
+		if f Is OptInline
 			t <~ "inline "
 		
 		.WriteFuncSub(F, f.exportname, t)

@@ -70,35 +70,38 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	opt norefcounts
 	|| Start = .curr
 	|| OV = .OpenVars
-	|ASMState| Old = .State						// can't use implicit types for barestructs
+	|int| ID = .inlinedepth
+	|| st = .inlinestate[ID+1]
+	st[0] = .inlinestate[ID]
 	if dest isnt discard
 		if (!dest.reg or dest is temp)
 			|| type = fn.ASMReturn
 				dest = .declarebody(prms, type) // asmtodo: mark this as a declaration?
 												// (shouldn't all declaremes be like that?)
-	
+
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
 	
-	|int| D = ++.state.InlineDepth
-	.DeepestInline = D max .DeepestInline
+	.InlineDepth = ++ID
+	.DeepestInline = ID max .DeepestInline
 	
 	dest = dest.simplify
 	dest.µtype = fn.ASMReturn.ASMRegType
-	.state.fn = fn
 	if !dest.reg
 		(dest is discard)
-	.state.Return = dest
-	.state.ParentVars = .openvars
-	.state.BranchDepth = 0
+	st.fn = fn
+	st.Return = dest
+	st.ParentVars = .openvars
+	st.BranchDepth = 0
 	
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 	if !r
 		.SoftNopRange(start, .curr)				// rewind
 	
-	.state = old
-	if old.InlineDepth == 0
+	.inlinestate[ID] = nil
+	.inlinedepth = --ID
+	if !ID
 		.InlineEnd = nil
 	return .CloseVars(OV, nil, r) // should closevars come before restore? sigh. idk.
 
@@ -163,27 +166,32 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
 	require fn isnt cpp
 
+	require .InlineDepth < 7 // for LinkInline funcs
 	|| N = fn.µlength
-	if fn isnt alwaysinline
+	if fn isnt LinkInline
 		require N and (N < 64)
-		require .state.InlineDepth < .InlineDepthLimit
+		require .InlineDepth < .InlineDepthLimit
 		|| MaxEnd = .InlineEnd
 			|| SubInline = .curr + (N / 3)
 			require SubInline < MaxEnd
-
-	|| AllowedGain = 5 + (fn is inline) * 23		// Assume that functions have 5 instruction overhead.
+	
+	|| AllowedGain = 5 + (fn is OptInline) * 23		// Assume that functions have 5 instruction overhead.
 	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
-	if fn.IsLibrary
-		AllowedGain -= 1 + (fn is inline)<<2
+	if fn is LinkInline
+		allowedgain += 5
+	  elseif fn.IsLibrary
+		AllowedGain -= 1 + (fn is OptInline)<<2
 
-	AllowedGain -= .State.inlinedepth
+	AllowedGain -= .inlinedepth
 	
 	for p.fast in prms
 		Grace += .IsASMConst(p)<<2
 
-	require (AllowedGain + Grace)|uint| > N
+	if (AllowedGain + Grace)|uint| <= N
+		require fn is linkinline
+		problem (prms, "Inline function oversized")
 
-	if !.state.InlineDepth
+	if !.InlineDepth
 		.InlineDepthLimit = 3
 		.DeepestInline = 0
 		.InlineEnd = .curr + AllowedGain
@@ -192,7 +200,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		return I
 
 	// try weaker inline
-	require !.state.InlineDepth and (.DeepestInline > 1)
+	require !.InlineDepth and (.DeepestInline > 1)
 
 	.InlineDepthLimit = 1
 	return .TryInline(prms, dest, fn, AllowedGain)

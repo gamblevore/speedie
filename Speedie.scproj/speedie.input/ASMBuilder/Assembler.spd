@@ -5,7 +5,6 @@ struct ASMState
 	|asmreg|		Return
 	|uint64|		ParentVars
 	|byte|			BranchDepth
-	|byte|			InlineDepth
 	|bool|			TailInlineable
 
 
@@ -19,7 +18,8 @@ struct Assembler
 	linkage: cpp_part Pac
 	|uint16| 					BasicBlock
 
-	|ASMState|					State
+	|ASMState[8]|				InlineState
+	|byte|						InlineDepth
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
 	target debug
@@ -57,6 +57,10 @@ struct Assembler
 		|int|						StringsOutOfRange
 
 
+	
+	function State (|&ASMState|)
+		return .inlinestate[.inlinedepth]
+	
 	function fn (|scfunction!--|)
 		return .state.fn
 	
@@ -158,8 +162,9 @@ struct Assembler
 		
 		// VarThatGotReturned isnt set anywhere?
 		// remove this?
-		|| ret = .state.return
-		if  ret.reg  and  (D is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
+		|| st = .state
+		|| ret = st.return
+		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
 /			ret.µtype = rz|DataTypeCode|
 			D.wholetype = ret
 			return ret
@@ -652,14 +657,12 @@ struct Assembler
 		// After zeroing, we could just set everything normally? It seems ._curr is set from jsm.
 		HoistSpace.Length = 0
 		
+		.inlinestate[0] = nil // the rest get auto-cleared
 		.out = fn
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
-		.state.Return = nil
-		.state.inlinedepth = 0
-		.state.BranchDepth = 0
-		.state.TailInlineable = true
 		.InlineDepthLimit = 3
+		.inlinedepth = 0
 		.BasicBlock = 1						// good to start these at 1.
 		.BranchID = 1
 		.NextBranchID = 1

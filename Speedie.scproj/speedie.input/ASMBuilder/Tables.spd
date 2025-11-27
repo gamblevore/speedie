@@ -369,7 +369,7 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	rel = rel.last!
-	if .State.InlineDepth > 0
+	if .InlineDepth > 0
 		return .µInto(rel, dest) // tail.
 	return .µInto(rel, dest).incr
 

@@ -175,3 +175,12 @@ function asmreg.incr (|asmreg|)
 	return self
 
 
+function message.CallChainError (|string| name)
+	problem (self, name)
+	|| sh = assembler.sh
+	|| i = sh.inlinedepth|int|
+	while --i >= 0
+		|| st = sh.inlinestate[i]
+		|| fn = st.fn
+		|| src = fn.source
+			problem (src, "\tInlined from here.")

@@ -723,7 +723,7 @@ function FindNilChecker
 		.casts = array()
 
 	for f in cast
-		(f Is Inline)
+		(f Is OptInline)
 		check  (f.args == 1)		  (f.Source, "No params allowed." )
 		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
@@ -1117,6 +1117,7 @@ module
 	
 
 	function SCClass.DataTypePostLoad
+		opt norefcounts
 		require .IsDataTypeOnly
 		if self == "_void"
 			.typeinfo = 0
@@ -1137,19 +1138,17 @@ module
 		|| N = .name.lowercase
 		|| Td = DataTypeCode.Types[n]
 			|| t = td[]
-			if T != 255
-				.clssize = T.ByteCount
-				if t == datatypecode.Vec3 or datatypecode.iVec3
-					.clssize = 16 // sigh 
-				.TypeInfo = T
-				.ASMTypeInfo = t
-				is Builtin
-				require T.isint and !.Signed
-				|| s2 = t.SignedStuffClass
-					.Signed = s2.typenormal
-					s2.Signed = .typenormal
-			  else
-				debugger // what?
+			.clssize = T.ByteCount
+			if  t == datatypecode.Vec3  or  datatypecode.iVec3
+				.clssize = 16 // sigh 
+			.TypeInfo = T
+			.ASMTypeInfo = t
+			is Builtin
+			.TypeNormal.mu.DataType = t
+			require T.isint and !.Signed
+			|| s2 = t.SignedStuffClass
+				.Signed = s2.typenormal
+				s2.Signed = .typenormal
 		  else
 			check  (sup)  (node, "Datatypes must subclass off another type")
 	
