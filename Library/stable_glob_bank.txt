@@ -200,7 +200,7 @@ JB__MzSt_All
 JB__Tk_Using
 GUI__SDL_Cursor_nothing
 JB__Mrap_MDummy_
-JB__CharProp_Item
+JB__CharProp_Props
 JB__Constants__FuncArray
 GUI__Key_Record
 GUI__SystemCursor__Cursors
