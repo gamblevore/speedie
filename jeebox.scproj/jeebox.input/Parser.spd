@@ -541,6 +541,7 @@ extend Parser
 		|ind| UnitPos2
 		if StartAt == 0
 			UnitPos2 = .Data.OutCharSet( Jeebox.CSLettersOnly, After, Start + StartAt )
+//			UnitPos2 = .Data.OutChar( charprop.Letters, After, Start + StartAt ) // different somehow.
 			
 		ifn UnitPos2
 			UnitPos2 = After - 1
