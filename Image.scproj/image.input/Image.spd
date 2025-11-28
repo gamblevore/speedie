@@ -455,16 +455,12 @@ class Image (memory)
 		if color.a != 255
 			|| c = color.PreMul
 			for (sigh in range) (v)
-				if sigh == imagepixel.white or imagepixel.clear or imagepixel.bad
-				ifn self contains sigh
 				sigh.Overlay(C)
 				i++
 		  elseif Rect == .rect
 			memory.fillint(.ptr|&int|, .length, px)
 		  else
 			for (sigh in range) (v)
-				if sigh == imagepixel.white or imagepixel.clear or imagepixel.bad
-				ifn self contains sigh
 				sigh[0] = px
 				i++
 
