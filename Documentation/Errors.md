@@ -288,10 +288,11 @@ Python overall is a minimal language, much like speedie in that way. But Speedie
 In Speedie:
 
     || filename = "/"
-    || contents = filename.readfile #require
+    || contents = filename.readfile      #require   // worth 6 lines of python
     print contents.lowercase
 
-    // or this one liner...
+**Or** this one liner!
+    
     print ("/".readfile #require).lowercase
             
 
