@@ -204,8 +204,7 @@ function ParseName (|Message| node, |bool|)
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2
 	  elseif ftype == "inline"
-		is OptInline
-		is LinkInline
+		.MakeLinkInline
 	  elseif fType == "api"
 		is api
 	  elseif fType == "setter"

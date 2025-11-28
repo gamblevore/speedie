@@ -152,7 +152,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		TableID = fn.fPackID + 31
 		if tableid <= 31							// failed!
 			if !fn.islibrary or !.state.fn.islibrary
-				error (exp, "Missing PackID")
+				error (exp, "Missing PackID[1]")
 			tableid = 0xFFFF
 	  else
 		|| f = exp.first!

@@ -247,18 +247,16 @@ module PackMaker
 		if !fn
 			.addint 0
 			return
-//		if 1 or Options.TargetDebug // seems better to always get names, for debugging!
 		.Enter(@unit, fn.name)
-		|| id = fn.fPackID							#check (fn.source, "Missing PackID")
+		|| id = fn.fPackID							#check ( fn.source,  "Missing PackID[2]" )
 		id = (id << 1) + fn.IsLibrary
 		.AddInt(id)
-//		if 1 or Options.TargetDebug
 		.exit
 
 	
 	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
-		|| B = .behaviour							#expect (.source, "Missing behaviour: " + .name)
+		|| B = .behaviour							#expect ( .source,  "Missing behaviour: " + .name )
 		|| sz = .clssize
 		j.enter(@tmp, .name)
 		

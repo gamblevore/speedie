@@ -751,7 +751,7 @@ function OverrideSyntax
 function HasObjectProperties (|bool|)
 	opt norefcounts
 	for p in .properties
-		if p.isnormalobject
+		if p.isnormalobject and (p isnt borrowed)
 			return true
 
 

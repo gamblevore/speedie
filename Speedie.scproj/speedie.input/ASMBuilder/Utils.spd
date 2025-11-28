@@ -178,6 +178,7 @@ function asmreg.incr (|asmreg|)
 
 
 function message.CallChainError (|string| name)
+	opt norefcounts
 	problem (self, name)
 	|| sh = assembler.sh
 	|| i = sh.inlinedepth|int|

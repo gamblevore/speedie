@@ -879,6 +879,8 @@ extend Assembler
 			|| K = src.const
 			return .LoadNumber(exp, K, dest)				// Consts are the most optimisable thing we have
 
+		if src.IsFloat
+			return exp.FADD(dest, src, asmreg(), asmreg(), 1-src.fourbytes) * dest
 		// BFLG is VERY optimisable :] (but consts are even more)
 		
 		|| sh = src.BitCount - dest.BitCount
