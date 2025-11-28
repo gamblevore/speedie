@@ -76,7 +76,7 @@ module Stability
 		if !id
 			if fs
 				fs <~ "\n$.ExportName"
-			id = Stability.LastLibID++
+			id = ++Stability.LastLibID
 			.PackID(isfunc) = id
 		
 		if table

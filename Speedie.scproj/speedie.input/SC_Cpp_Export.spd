@@ -623,8 +623,6 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	fs <~ "// glob list\n"
 	.WriteVMGlobs(fs)
 	
-	debugger 
-
 	fs <~ "// entire_function_list!\n\n"
 	for f in packmaker.LibFuncs
 		if (f.iscppinbuilt == 1) 

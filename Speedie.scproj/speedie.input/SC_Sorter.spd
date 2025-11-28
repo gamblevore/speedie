@@ -29,7 +29,7 @@ module CodeSorter
 		if !fa or !fb
 			if !fa and !fb
 				return .ExportName < b.ExportName // just to help compression
-			return !fa
+			return !fb
 		
 		return fb - fa	  // we need init and main first
 	
