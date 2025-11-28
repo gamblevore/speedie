@@ -7,7 +7,7 @@ module CakeRun
 	|message|				Clss
 	|String|				Strings
 	|[xfunction]|			Funcs
-	|&&nil|					GlobBase
+	|&byte|					GlobBase
 	|&uint16|				GlobLink
 	|&&nil|					RawFuncs
 	|int|					GlobalCount
@@ -22,9 +22,6 @@ module CakeRun
 	
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs
-
-	function LibClassLayout (|string|)
-		cpp_wrapper JB_App__LibClasses
 
 	function AddLibGlob (|?&nil| where, |string| name, |bool|)
 		opt norefcounts
@@ -46,14 +43,10 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		.rawFuncs = .LibFuncs
-		.GlobBase = .LibGlobs
+		.RawFuncs = .LibFuncs
+		.GlobBase = .LibGlobs|&byte|
 		.GlobLink = .GlobTable
-		require .GetStructure
-		require .LoadClasses
-		require .Loadfuncs
-//		require xclass.LoadPackClasses
-		return true
+		return .GetStructure and  .LoadClasses  and  .Loadfuncs
 	
 	
 	function GetStructure (|bool|)

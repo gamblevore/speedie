@@ -13,6 +13,14 @@ function CakeRun.LoadClasses (|bool|)
 	return StdErr.ok
 
 
+function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
+	opt norefcounts
+	if m
+		|| obj = .classtable[m.name]
+			return (obj.PrivValue)|&Classdata|
+		error (m, "Can't find class: + m.name" )
+
+
 function CakeRun.StoreClass (|ClassData| cd)
 	|| name = cd.Name.wrap
 	.ClassTable.ValueLower(name) = cd
@@ -20,8 +28,79 @@ function CakeRun.StoreClass (|ClassData| cd)
 		.obj = cd
 	
 
+function cakerun.NewBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
+	cpp_Wrapper JBClassAllocBehaviour
+
+
+// maybe should allocate behaviour too. Assume all spd funcs.
+function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
+	cpp_wrapper JBClassNew
+
+	
 function message.LoadSuper
 	opt norefcounts
+	|| c = self[@list]
+	|| Num = c[@num]
+	|| I = Num.int									#require
+	
+	|| Where = (CakeRun.GlobBase)|&byte| + I
+	|| PackClass = c.next
+	if !PackClass			// a native class. lets store in globs
+		(where|&classdata|)[0] = cakerun[self]!
+		return
+
+	// we need to call a func!
+
+	|| sz = self[2].int
+	|| P = cakerun[self[@thg, 1]]
+
+	// can probably edit the file... to make a cstring here. and then crash for some odd reason but whatever.
+	// we should expect writeable file-data...!!!
+	|| Name = .Name
+/	|| L = name.Length
+	Name.Addr[L] = 0 // :]
+	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, p)
+	(where|&classdata|)[0] = ClsData
+	cakerun.ClassTable[name] = ClsData
+
+	// just behaviours left!
+/*
+	«tmp "Tetris"
+		«list 
+			«num "1440"»
+			«thg "GridSection"»
+			«num "80"»
+		»
+		«list 
+			«unit "Destructor"
+				«num "64"»
+			»
+			«unit "Render"
+				«num "3455"»
+			»
+		»
+	»
+	«tmp "Breakout"
+		«list 
+			«num "912"»
+			«thg "Window"»
+			«num "448"»
+		»
+		«list 
+			«unit "Destructor"
+				«num "14"»
+			»
+			«unit "Render"
+				«num "1815"»
+			»
+			«unit "LoadProperties"
+				«num "3843"»
+			»
+		»
+	»
+*/
+	
+	// So... now what?
 	
 	
 
@@ -77,9 +156,6 @@ function message.LoadSuper
 //		|| sup = .super.name?
 //		fs <~ "Class: $.name ($.size, $sup)"
 //
-//
-//	function ClassData.AllocateBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
-//		cpp_Wrapper JBClassAllocBehaviour
 //
 //
 //	function LoadBehaviours	(|message| list)
