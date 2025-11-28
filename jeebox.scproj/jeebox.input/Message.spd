@@ -1048,9 +1048,11 @@ Message is also:
 //		.SyntaxProblem(error)
 
 	Syntax Problem ( |string?| Error = nil )
+		inline
 		errorreceiver.NewProblem( self, Error )
 	
 	Syntax Warn ( |string?| Error = nil )
+		inline
 		errorreceiver.NewWarning( self, Error )
 	
 	inline SyntaxAppend (|syntax| Fn, |string| name="")
@@ -1059,6 +1061,7 @@ Message is also:
 		.msg(fn, name)
 
 	Syntax SendTo (|syntax| Fn, |string| name="", |message|)
+		inline
 		cpp_part SendSyx
 		opt norefcounts
 		.msg(fn, name)

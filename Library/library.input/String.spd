@@ -122,8 +122,8 @@ class String
 			require !s.islower
 		return true
 
-	function Map (|bytemap| b, |int| clear = -1, |string|)
-		cpp_wrapper JB_Str_MapBytes
+//	function Map (|bytemap| b, |int| clear = -1, |string|)
+//		cpp_wrapper JB_Str_MapBytes
 
 	inline IsInt (|bool|)
 		return .isint(0)
@@ -224,6 +224,8 @@ class String
 	
 	function Shorten (|int| n, |string|)
 		return self[0, .length-n]
+	function rtrim (|int| n, |string|)
+		disabled "Use .shorten"
 
 	function Trim (|int| A, |int| B, |string|)
 		cpp_part TrimMiddle

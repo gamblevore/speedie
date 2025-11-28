@@ -1,79 +1,146 @@
 
 
+// remove charset...?
+// could just try replacing one or two calls with this... see how we get on
+// if it works... then replace more.
+datatype CharPropList (uint)
+	linkage
+		numeric false
+	operator contains (|byte| b, |bool|)
+		inline
+		return (1<<b.Property) & self|uint|
+	operator contains (|charprop| b, |bool|)
+		inline
+		cpp_part ContainsProp
+		return (1<<b) & self|uint|
+		
+	operator Plus (|charproplist| p, |charproplist|)
+		inline
+		return (self|uint| ||| p|uint|)|charproplist|
 
-// could be better than charset?  probably faster... 
-// could remove charset...? we'd still need bytemap though.
+	operator Plus (|charprop| p, |charproplist|)
+		inline
+		cpp_Part Add1
+		return (self|uint| ||| (1<<p))|charproplist|
+
+
+function byte.SyntaxIs (|CharProp| s, |bool|)
+	inline
+	return .Property == s
+
+
+function Byte.Property (|CharProp|)
+	inline
+	return CharProp.Props[self]
+
+	
+function string.InChar (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+	|| p = &CharProp.Props[0]
+	from = from max 0
+	After = After min .Length
+	|| addr = .addr
+	while From < After
+		if find contains p[addr[from++]]
+			return from-1
+
+
+function string.OutChar (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+	|| p = &CharProp.Props[0]
+	from = from max 0
+	After = After min .Length
+	|| addr = .addr
+	while From < After
+		ifn find contains p[addr[from++]]
+			return from-1
+
+
+//function string.Get (|CharPropList| Start, |CharPropList| Continue,  |int| From=0, |int| After=int.max, |ivec2|)
+//	|| A = .InChar(Start, from, after)
+//		|| B = .OutChar(Continue, A+1, after)
+//			return (A,B+1)
+		
+	
+
 datatype CharProp (byte)
 	constants
 		|CharProp| 
-		Nothing
-		White
-		Punct
-		XMLPunct
-		VarNames
-		Number
-		AlmostLetter
-		Letters
-		Upper
-		Lower
-		Unicode
-	
-	function byte.SyntaxIs (|CharProp| s, |bool|)
-		inline
-		return .Property == s
-	
-	operator contains (|byte| b, |bool|)
-		inline
-		return b.Property >= self
+		Invalid
+		Null				// 0
+		Unprintable 		// 1-8, 11, 12, 14-30
+		Line				// nl, rt
+		HSpace				// space, tab
+		Punct1				// +/*&%|~^$=@!()[]{}<>?/\`"';
+		Punct2				// .-:
+		Number				// 0123456789
+		Underscore			// _
+		Upper				// A-Z
+		Lower				// a-z
+		UnicodeMost			// 128+
+		UnicodeCombining	// 128+ also
 
-	module
-		|CharProp[256]| Item
+		|CharPropList| 
+		Unicode			= (1<<UnicodeMost) + (1<<UnicodeCombining)
+		Letters 		= (1<<Underscore) + (1<<Upper) + (1<<Lower) + Unicode
+		XMLName			= Letters + (1<<Punct2)
+		NameMid			= Letters + (1<<Number)
+		White			= (1<<Line) + (1<<HSpace)
+		Punct			= (1<<Punct1) + (1<<Punct2)
+
+	operator Plus (|charprop| p, |charproplist|)
+		inline
+		cpp_part Add1
+		return ((1<<self) ||| (1<<p))|charproplist|
+
+	operator Plus (|charproplist| p, |charproplist|)
+		inline
+		return ((1<<self) ||| p|uint|)|charproplist|
 		
-		function Byte.Property (|CharProp|)
-			// disabled
-//			return CharProp.default.item[self]
-//		|CharProps| default
-//		.default.MakeDefault
-
-		function Test
-			expect 'a' is lower
-			expect 'b' is lower
-			expect 'C' is upper
-			expect 'D' is upper
-			expect Letters contains 'C' and 'c'
-			expect '5' is number
-			|| fs = FastString()
-			for c in "We ate some cheese for 5£."
-				if VarNames contains c
-					fs <~ c
-			printline fs
+	inline List (|charproplist|)
+		return (1<<self)|charproplist|
+		
+	module
+		|CharProp[256]| Props
+		charprop.MakeDefault
+//		charprop.test
+//		
+//	
+//		function Test
+//			expect 'a' is lower and 'b' is lower and 'C' is upper and 'D' is upper and '5' is number
+//			expect Letters contains 'C' and 'c'
+//			|| fs = FastString()
+//			for c in "We ate some cheese for 5£."
+//				|| p = lower+Number
+//				if p contains c 
+//					fs <~ c
+//			printline fs
 
 	
 		function MakeDefault
-			|| item = &.item[0]
-			for s in 0 to 32
-				if s|byte|.iswhite					
-					item[s] = charprop.white
+			|| item = &.Props[0]
+			for s in 32
+				item[s] = Unprintable
+			item[0] = null
+			item[9] = HSpace
+			item[10] = line
+			item[13] = line
+			item[32] = HSpace
 			for s in 33 to 126
-				item[s] = charprop.punct
+				item[s] = punct1
 
-			item['-'] = CharProp.xmlpunct
-			item[':'] = CharProp.xmlpunct
-			item['.'] = CharProp.xmlpunct
+			item['-'] = punct2
+			item[':'] = punct2
+			item['.'] = punct2
 
-			|| no = charprop.nothing
-			item[0x7f] = no
-			item[0xC0] = no
-			item[0xFF] = no
-			item[0xFE] = no
+			item[0x7f] = Invalid
+			item[0xC0] = Invalid
+			item[0xFE] = Invalid
+			item[0xFF] = Invalid
 			
 			for s in 'A'|int| to 'Z'|int|
 				item[s] = charprop.upper
 				item[s+32] = charprop.lower
-			
-			item['_'] = charprop.almostletter
+			item['_'] = charprop.Underscore
 			for s in '0'|int| to '9'|int|
 				item[s] = charprop.number
-	
 	
 

@@ -1331,6 +1331,7 @@ JB_String* JB_Str_Hex(JB_String* s, int Spaces, FastString* fs_in) {
 }
 
 
+// bytemap should be removed. Just... do upper/lower manually!
 static int BM_Affects_(ByteMap* BM, JB_String* s) {
 	if (s and BM) {
 		uint8* map = BM->Cache;
@@ -1451,7 +1452,7 @@ ByteMap* JB_BM__Lower() {
 JB_String* JB_Str_LowerCase(JB_String* self) {
 	return JB_Str_MapBytes( self, JB_BM__Lower(), -1 );
 }
-
+// bytemap should be removed!
 JB_String* JB_Str_UpperCase(JB_String* self) {
     static ByteMap* UpperMap_ = 0;
     if (!UpperMap_) {

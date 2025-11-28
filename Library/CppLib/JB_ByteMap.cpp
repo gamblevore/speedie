@@ -7,7 +7,14 @@
 
  
 extern "C" {
-
+// bytemap should be removed!
+// bytemap should be removed!
+// bytemap should be removed!
+// bytemap should be removed!
+// bytemap should be removed!
+// hahahah
+// i need a freaking holiday
+// and a dimensional spceship out of this reality.
 inline void InitCharset_(CharSet* cs, uint8* SelfPos, u32 Len, bool Ranges) {
 	uint8* Cache = cs->Cache;
     uint8* ReadEnd = SelfPos + Len;

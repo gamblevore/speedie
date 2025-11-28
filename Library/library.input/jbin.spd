@@ -24,7 +24,6 @@ extend message
 			js.exit(-depth)
 
 
-
 role JBin (Faststring)
 	module
 		|| Header     = "\01\10\EA\E2"
