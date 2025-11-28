@@ -33,7 +33,7 @@ For example this:
     || b = myarray.pop
     || c = myarray.pop // returns nil!
 
-That won't crash. It just returns `nil`. Which is totally valid. Same with accessing `myarray[-1]`. It just returns `nil`.
+That won't crash. It just returns `nil`. Which is totally valid. Same with accessing `myarray[-1]`. `C` just becomes `nil`.
     
 
 
@@ -43,10 +43,10 @@ Speedie recognises a basic infinite loop. Not all but a basic one. It also recog
 
     function A
         while
-            "hello" // speedie does not allow this
+            printline "infinite loop?" // speedie does not allow this
     
     function B
-        "oh no!"
+        printline "recursion!!"
         B() // speedie doesn't allow this either
 
 Not a common bug, but nice that speedie saves you from it!
@@ -75,10 +75,10 @@ Also speedie doesn't allow comparing signed and unsigned numbers in an "unclear"
         if x > y        // speedie complains here! Rightfully so!
             DoSomething()
     
-    function unclear2 (|uint| y)
+    function never_true (|uint| y)
         if y < 0  // never true
     
-    function unclear3 (|uint| y)
+    function always_Ttrue (|uint| y)
         if y >= 0 // always true
     
     function silly (|uint| y)
@@ -89,7 +89,6 @@ This is OK though!
 
     function testOK (|uint| y,  |byte| b,  |int| c)
         if y > 0  // just fine!
-        
         if b > c  // bytes fit in ints easily.
         if b < c  // also ok
 
@@ -110,9 +109,9 @@ Speedie is type-safe... this works like you'd expect in most languages. We have 
 The `as` operator:
 
     function def (|object| o)
-        || m = o as message #require
-        // Total effect: Just returns, if o isnt a message.
-        printline m.name
+        || m = o as message
+            printline m.name
+        // only prints m.name if 'o' is not nil and is a message
 
 And the `mustbe` operator.
 
@@ -175,7 +174,7 @@ Local variables include function parameters, params can be declared as optional 
 
 You can also specify parameters as "real", or "optional" by putting ! or ? before or after the type.
 
-    function def (|message!| real, |message?| optional)
+    function abc2 (|message!| real, |message?| optional)
         "real is not nil"
         if optional
             "optional is not nil"
@@ -184,7 +183,7 @@ You can also specify parameters as "real", or "optional" by putting ! or ? befor
 
 Param realness can be inferred also:
 
-    function def (|message| A, |message| B)
+    function abc3 (|message| A, |message| B)
         if (A)
             "A is not nil"
           else
@@ -215,13 +214,13 @@ This works fine now! Because the nil-checker understands how loops work.
 
 The infererencer only works on local vars, not on object properties or global vars, sadly. But you can copy them to a local var and then let the inferencer do its work.
 
-You can also override the nil-checker using the `!` symbol.
+You can also override the nil-checker using the `!` suffix. This can be pronounced as "bang"... which is what will happen if you get it wrong.
 
     // parsing this particular string, should never return nil, but speedie doesnt know this.
     || msg = "abc, def".parse
     msg!.position = 30
 
-Obviously, if you get this wrong, your program crashes. The "!" symbol is better avoided, but you will have to decide for yourself. Its not such a problem to do this instead:
+Obviously, if you get this wrong, your program crashes. The "!" suffix is better avoided, but you will have to decide for yourself. **_You won't ever kick yourself for siding with caution._** This is the safe approach and its not such a problem!:
 
     || msg = "abc, def".parse
     if msg
