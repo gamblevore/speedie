@@ -29,6 +29,15 @@ class DataObject
 		.Kind = datatypecode.bool
 		.PrivValue = b|int|
 
+	constructor (|float64| v)
+		cpp_part ConstructorF64
+		.Kind = datatypecode.f64
+		.PrivValue = v.AsInt
+
+	constructor (|float| v)
+		cpp_part ConstructorF32
+		.Kind = datatypecode.float
+		.PrivValue = v.AsInt
 	
 	constructor (|?&nil| p)
 		cpp_part ConstructorVoidPtr
@@ -37,37 +46,66 @@ class DataObject
 
 
 	syntax access (||) // for floats... perhaps use this?    macro first: .privvalue|...(samebits)|
-		return .privvalue
+		inline
+		if self
+			return .PrivValue
 
 	
 	function Value (|int64|)
-		if (self) {return .privvalue}
+		inline
+		if self
+			return .privvalue
 	
 	
 	function FloatValue (|Float64|)
-		if (self) {return .privvalue.asfloat}
+		if self
+			return .privvalue.AsFloat
 
 
 	function Value (assigns:|int64|)
 		disabled "This property is immutable"
 
-
 	render
 		visible // hmmm
-		if .Kind.isfloat
-			fs <~ .FloatValue
-		  elseif .Kind == datatypecode.bool	
-			.privvalue|bool|.render(fs)
-		  elseif .Kind isnt numeric // oop
-			fs <~ "0x"
-			fs.appendhex(.privvalue)
+		|| k = .kind
+		if k.isfloat
+			fs <~ .privvalue.AsFloat
 		  else
-			fs <~ .PrivValue
+			|| v = .PrivValue
+			if k == datatypecode.bool	
+				v|bool|.render(fs)
+			  elseif k isnt numeric // oop
+				fs <~ "0x"
+				fs.appendhex(v)
+			  else
+				fs <~ .privvalue.AsFloat
 
 	module
-		function NewFloat (|Float64| v, |Dataobject|)
-			rz = DataObject(true) 
-			rz.Kind = datatypecode.f64
-			rz.PrivValue = v.AsInt
+		inline NewFloat (|Float64| v, |DataobjectFloat64|)
+			cpp_Part F64
+			return DataObject(v) 
+		inline NewFloat (|Float| v, |DataObjectFloat32|)
+			cpp_Part F32
+			return DataObject(v) 
+
+
+
+role DataObjectFloat64 (DataObject)
+	syntax access (|float64|)
+		if self
+			return .PrivValue.AsFloat
+	
+	inline Value (|float64|)
+		return self[]
+
+
+
+role DataObjectFloat32 (DataObject)
+	syntax access (|float|)
+		if self
+			return .PrivValue|int|.AsFloat
+	
+	inline Value (|float|)
+		return self[]
 
 
