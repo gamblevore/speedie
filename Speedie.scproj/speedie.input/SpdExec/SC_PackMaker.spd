@@ -12,6 +12,12 @@ module PackMaker
 	|int|					LibGlobSize
 	|HairyMan|				PackSaved
 	|hairyman|				LibSaved
+	|string|				LName
+	
+	
+	function scclass.LName (|string|)
+		PackMaker.lname = .name.lowercase
+		return PackMaker.lname
 	
 	
 	helper scfunction.NeedsLibExport (|bool|)
@@ -258,12 +264,12 @@ module PackMaker
 		opt norefcounts
 		|| B = .behaviour							#expect ( .source,  "Missing behaviour: " + .name )
 		|| sz = .clssize
-		j.enter(@tmp, .name)
+		j.enter(@tmp, .lname)
 		
 		j.Enter(@list)     //////     //////     //////
 		j.AddInt(.classtype!.ExportPosition)
 		if !.IsLibrary
-			j.Add(@thg, .super!.name)
+			j.Add(@thg, .super!.lname)
 			j.addint(sz)
 		j.exit     		   ///
 		
@@ -273,7 +279,7 @@ module PackMaker
 			.CollectBehaviours(j, B)
 			j.exit    	  ///
 		j.exit
-	
+
 
 function SCFunction.WrappedName (|string|)
 	if !.iscppinbuilt
