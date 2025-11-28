@@ -91,6 +91,8 @@ class DataObject
 
 
 role DataObjectFloat64 (DataObject)
+	linkage
+		cpp_part WRF64
 	syntax access (|float64|)
 		if self
 			return .PrivValue.AsFloat
@@ -101,6 +103,8 @@ role DataObjectFloat64 (DataObject)
 
 
 role DataObjectFloat32 (DataObject)
+	linkage
+		cpp_part WRF32
 	syntax access (|float|)
 		if self
 			return .PrivValue|int|.AsFloat
