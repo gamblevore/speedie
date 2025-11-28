@@ -221,7 +221,7 @@ Running this you should see:
     hello: 1.3 * 1 = 1.3
     hello: 1.3 * 2 = 2.6
 
-You might wonder: _"Is it even worth adding this feature?"_ Well... its great for demos! Short simple demos to demonstrate how to use speedie! It just cuts out all the clutter. And for more professional use, it standardises input and how things work. It also gives useful error messages:
+You might wonder: _"Was it even worth adding this feature?"_ Well... its great for demos! Short simple demos to demonstrate how to use speedie! It just cuts out all the clutter. And for more professional use, it standardises input and how things work. It also gives useful error messages:
 
     /usr/local/speedie/Examples/main2.spd 3 "hello"    
     error: Missing Fraction (float).
@@ -275,6 +275,7 @@ function string.CountLines (|int|)
     for c in self
         rz += (c == '\n')
 ````
+This will return the value of `rz`.
 
 ---
 
@@ -302,8 +303,9 @@ Well, you might **want** that to compile, but speedie won't do it, because its a
 
 Sometimes you just want a random number. Perhaps for a test or demo project. If thats all you want, try this:
 
-    || x = 6()        // Returns an int from 0 to 5.
-    || y = (x+6)()    // Returns a number from 6 to 11.
+    || x = 6() + 1        // Returns an int from 1 to 6.
+    || y = (x+6)() + 1    // Returns a number from 1 to 12, weighted towards
+                          // zero, due to reusing x.
 
 Quite handy, and cute for little demos. As for generating booleans, you can do this:
 
