@@ -2688,7 +2688,6 @@ JB_vec4_Up
 JB_vec4_iVec4
 JB_zalgo__Rand
 JB_zalgo__Render
-PicoCanGet
 PicoClose
 PicoCreate
 PicoDestroy
