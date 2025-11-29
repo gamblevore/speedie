@@ -8,17 +8,17 @@ function CakeRun.LoadClasses (|bool|)
 		.StoreClass(cd)
 
 	#!Now cake classes
-/	for c in .Clss
-		c.LoadSuper
+/	for c.fast in .Clss
+		.LoadOneClass(C)
 	return StdErr.ok
 
 
 function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
 	opt norefcounts
 	if m
-		|| obj = .classtable[m.name]
+		|| obj = .ClassTable[m.name]
 			return (obj.PrivValue)|&Classdata|
-		error (m, "Can't find class: + m.name" )
+		error (m, "Can't find class: " + m.name )
 
 
 function CakeRun.StoreClass (|ClassData| cd)
@@ -27,6 +27,61 @@ function CakeRun.StoreClass (|ClassData| cd)
 	if name ~= "object"
 		.obj = cd
 	
+
+function Cakerun.LoadOneClass (|message| s)
+	opt norefcounts
+	|| c = S[@list]
+	|| Num = c[@num]
+	|| I = Num.int									#require
+	
+	|| Where = ((CakeRun.GlobBase!)|&byte| + I)|&?&classdata|
+	|| PackClass = c.next
+	if !PackClass			// a native class. lets store in globs
+		where[0] = cakerun[s]
+		return
+
+	|| sz = c[2].int
+	|| P = cakerun[c[@thg, 1]]
+
+	|| Name = s.Name
+	Name.Addr[name.Length] = 0 // :]
+	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, p)
+	where[0] = ClsData
+	cakerun.ClassTable[name] = ClsData
+
+	for V in C.next(@list)
+		// what do these numbers represent? it has to be from the func-table, right?
+		// shouldn't we process them after processing the func-table?
+		// lets do the func-table first!
+
+/*
+How to cross-call? Single-table, and branch
+
+* From Cpp using branch. (GOOD! HAPPY WITH THIS)
+	* Cpp is easy
+	* finds SPD
+		* LongJump
+		* Run VM
+	* wrap SPD in a C-func
+		* awkward and not fun
+
+* From SPD using branch (EASY BUT IM NOT HAPPY WITH IT. WHY?)
+	* spd is easy
+	* cpp is easy
+	* SPeedie is not virtual obsessed
+		* Just make it work!
+		* Speedie is all about direct calls... or function pointers.
+		* virtuals are just to get things working. just deal with it!
+
+tmp tetris
+	list ...
+	list
+		unit "Destructor"
+			num "64"
+		unit "Render"
+			num "3455"
+*/
+
 
 function cakerun.NewBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
 	cpp_Wrapper JBClassAllocBehaviour
@@ -37,207 +92,6 @@ function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, 
 	cpp_wrapper JBClassNew
 
 	
-function message.LoadSuper
-	opt norefcounts
-	|| c = self[@list]
-	|| Num = c[@num]
-	|| I = Num.int									#require
-	
-	|| Where = (CakeRun.GlobBase)|&byte| + I
-	|| PackClass = c.next
-	if !PackClass			// a native class. lets store in globs
-		(where|&classdata|)[0] = cakerun[self]!
-		return
-
-	// we need to call a func!
-
-	|| sz = self[2].int
-	|| P = cakerun[self[@thg, 1]]
-
-	// can probably edit the file... to make a cstring here. and then crash for some odd reason but whatever.
-	// we should expect writeable file-data...!!!
-	|| Name = .Name
-/	|| L = name.Length
-	Name.Addr[L] = 0 // :]
-	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, p)
-	(where|&classdata|)[0] = ClsData
-	cakerun.ClassTable[name] = ClsData
-
-	// just behaviours left!
-/*
-	«tmp "Tetris"
-		«list 
-			«num "1440"»
-			«thg "GridSection"»
-			«num "80"»
-		»
-		«list 
-			«unit "Destructor"
-				«num "64"»
-			»
-			«unit "Render"
-				«num "3455"»
-			»
-		»
-	»
-	«tmp "Breakout"
-		«list 
-			«num "912"»
-			«thg "Window"»
-			«num "448"»
-		»
-		«list 
-			«unit "Destructor"
-				«num "14"»
-			»
-			«unit "Render"
-				«num "1815"»
-			»
-			«unit "LoadProperties"
-				«num "3843"»
-			»
-		»
-	»
-*/
-	
-	// So... now what?
-	
-	
-
-//class XClass 
-//	linkage
-//		cpp_class ClsInfo
-//	|stringzeroterminated|				Name
-//	|?Message|							Src
-//	|?xclass|							Super
-//	|&classdata|						RealClass
-//	
-//	
-//	constructor (|!&classdata| Cls)
-//		opt norefcounts
-//		.realclass = cls
-//		.name = string.Wrap(cls.name)
-//		addclass(self)
-//	
-//
-//	constructor (|message!| Ch, |xclass| parent)
-//		opt norefcounts
-//		|| sz = ch[@num]
-//		|| beh = sz.next(@list)
-//		
-//		.name = ch.name.cstr
-//		.src = Ch
-//		.super = parent
-//		
-//		.RealClass = classdata.new_(.name.cstring, sz.int, parent.realclass)
-//		.LoadBehaviours(beh)
-//		addclass(self)
-//
-//
-//	function Size (|int|)
-//		return .realclass.size
-//	
-//	
-//	function LoadSuper 
-//		opt norefcounts
-//		|| P = .realclass.Parent
-//			|| str = P.name.wrap
-//			|| cls = table.valuelower(str)
-//				.super = cls
-//				return
-//		.super = Obj
-//	
-//	
-//	syntax equals (|string| s, |bool| aware, |bool|)
-//		return .name ~= s
-//	
-//	
-//	render
-//		|| sup = .super.name?
-//		fs <~ "Class: $.name ($.size, $sup)"
-//
-//
-//
-//	function LoadBehaviours	(|message| list)
-////		opt norefcounts
-////		|| i = 0
-////		|| bc = list.SlowCount max 2
-////		|&?&nil| Cpp,  |&?&nil| Spd 
-////		
-////		.realclass.AllocateBehaviour(bc, cpp, spd)
-////		
-////		for ch in list
-////			|| fn = xfunction[ch]
-////				cpp![i] = fn.CFunc
-////				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
-////				// the spd version should call the c++ version...
-////			i++
-//		
-//				
-//	module
-//		function AddClass (|xclass| c)
-//			.list <~ c
-//			.table.ValueLower(c.name) = c
-//		
-//
-//		function LoadPackClasses (|bool|)
-//			opt norefcounts
-//			return .LoadAppClassSub(CakeRun.Clss, XClass.obj!)
-//		
-//		
-//		helper Give (|message| ch, |xclass!| parent, |xclass|)
-//			opt norefcounts
-//			|| f = ch.first
-//			if f == @arg
-//				return xclass[ch]
-//			return xclass.new(ch, parent)
-//		
-//		
-//		helper LoadAppClassSub (|message| arg, |xclass| parent, |bool|)
-//			opt norefcounts
-//			for ch in arg
-//				|| c = xClass.give(ch, parent)	#require
-//				|| arg2 = ch.last
-//				if arg2 == @arg
-//					.LoadAppClassSub(arg2, c)
-//			return stderr.ok
-//
-//
-//		function LoadInbuiltClasses (|bool|)
-//			// so what do we want to do?
-//			// do we even need classes?
-//			// we can make the project load the globs into itself.
-//			// we'll need to load the globs...
-//			// how? The class info has all the info we need, right? in "clss"
-//			// we have a name...
-//			// can put the classdata into the packglobs?
-//			
-//			opt norefcounts
-//			for cd in ClassData.First_
-//				|| c = xclass.new(cd)
-//				if c.name ~= "object"
-//					.obj = c
-///			for c in .list
-//				c.LoadSuper
-//			return stderr.ok
-//		
-//		
-//		function dictionary.SyntaxAccess (|&classdata| c, ||)
-//			opt norefcounts
-//			|| n = c.name
-//				|| s = n.Wrap
-//				rz = self.valuelower(s)
-//			
-//		syntax access (|message| ch, |xclass|)
-//			opt norefcounts
-//			return .Table.valuelower(ch.name) #expect (ch, "Linked to missing class")		
-//		
-//	
-//		|xclass|				Obj
-////		|[xclass]|				List
-//		|dictionary of xclass|	Table = dictionary.new
-//
-//
 
 
 datatype BaseType (int)
@@ -253,11 +107,3 @@ datatype BaseType (int)
 	syntax is (|BaseType| d, |bool|)
 		return self == d
 
-
-
-//class XType (XClass)  
-//	|datatypecode|			DataType
-//	|BaseType|				BaseType
-//
-//
-//

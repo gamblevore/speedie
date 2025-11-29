@@ -7,9 +7,9 @@ module CakeRun
 	|message|				Clss
 	|String|				Strings
 	|[xfunction]|			Funcs
-	|&byte|					GlobBase
-	|&uint16|				GlobLink
-	|&&nil|					RawFuncs
+	|&byte|					GlobBase = CakeRun.LibGlobs|&byte|
+	|&uint16|				GlobLink = cakerun.GlobTable
+	|&&nil|					RawFuncs = cakerun.LibFuncs
 	|int|					GlobalCount
 	|dictionary of &classdata| ClassTable = dictionary()
 	|&classdata|			Obj
@@ -43,9 +43,6 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		.RawFuncs = .LibFuncs
-		.GlobBase = .LibGlobs|&byte|
-		.GlobLink = .GlobTable
 		return .GetStructure and  .LoadClasses  and  .Loadfuncs
 	
 	

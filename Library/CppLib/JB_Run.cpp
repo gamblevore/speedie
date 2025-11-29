@@ -44,8 +44,8 @@ void JB_Dict__Init();
 // what do we do with the name->class thing?
 // im pretty sure the only thing we subclass is stringshared?
 JBClassPlace( JB_String,		JB_Object,	"String",	JB_BA_Destructor,	JB_Str_Render );
-JBClassPlace( JB_StringC,		JB_String,	"String",	0,					JB_Str_Render );
-JBClassPlace( JB_StringShared,	JB_String,	"StringShared",	JB_Str_Destructor,	JB_Str_Render );
+JBClassPlace( JB_StringC,		JB_String,	"StringZeroTerminated",	0,		JB_Str_Render );
+JBClassPlace( JB_StringShared,	JB_String,	"StringShared",JB_Str_Destructor,JB_Str_Render );
 JBClassPlace( JB_StringExternal,JB_String,	"String",	JB_XStr_Destructor,	JB_Str_Render );
 JBClassPlace( JB_String4,		JB_String,	"String",	0,					JB_Str_Render );
 JBClassPlace( JB_String20,		JB_String,	"String",	0,					JB_Str_Render );
@@ -55,7 +55,7 @@ JBClassPlace( Dictionary2,		JB_Object,	"",			JB_Dict_Destructor,	0 );
 JBClassPlace( Dictionary3,		JB_Object,	"",			JB_Dict_Destructor,	0 );
 JBClassPlace( Dictionary4,		JB_Object,	"",			JB_Dict_Destructor,	0 );
 JBClassPlace( DictionaryLeaf,	JB_Object,	"",			JB_Leaf_Destructor,	0 );
-JBClassPlace( DictionaryReader, JB_Object,	"",			JB_Nav_Destructor,	0 );
+JBClassPlace( DictionaryReader, JB_Object,	"DictionaryReader", JB_Nav_Destructor,	0 );
 
 JBClassPlaceSaver( Dictionary,	JB_Dict_Destructor,		JB_AsClass(Saveable),		JB_Dict_Render,  JB_Dict_LoadProperties,		JB_Dict_SaveCollect,	JB_Dict_SaveWrite );
 JBClassPlaceSaver( Array,       JB_Array_Destructor,   	JB_AsClass(Saveable),		JB_Array_Render, JB_Array_LoadProperties,	JB_Array_SaveCollect,	JB_Array_SaveWrite );

@@ -142,6 +142,7 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
     Cls.Size = Max(Size, sizeof(FreeObject));
     if (Parent) {
         Parent->HasSubclasses = true;
+		Cls.ClassDepth = Parent->ClassDepth + 1; 
     }
     
     Cls.NextClass = AllClasses;

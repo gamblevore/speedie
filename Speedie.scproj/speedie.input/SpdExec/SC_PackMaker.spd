@@ -261,15 +261,14 @@ module PackMaker
 
 	
 	function SCClass.DescribeInPack (|jbin| j)
-		opt norefcounts
-		|| B = .behaviour							#expect ( .source,  "Missing behaviour: " + .name )
+		|scbehaviour--| B = .behaviour				#expect ( .source,  "Missing behaviour" )
 		|| sz = .clssize
-		j.enter(@tmp, .lname)
+		j.enter(@tmp, .name.lowercase)
 		
 		j.Enter(@list)     //////     //////     //////
 		j.AddInt(.classtype!.ExportPosition)
 		if !.IsLibrary
-			j.Add(@thg, .super!.lname)
+			j.Add(@thg, .super!.name.lowercase)
 			j.addint(sz)
 		j.exit     		   ///
 		
