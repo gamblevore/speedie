@@ -46,7 +46,7 @@ class Memory
 		._ptr = P|&byte|
 	
 	
-	function Ptr (|&...|)
+	inline Ptr (|&...|)
 		return ._ptr|&...|
 		
 	function Next (|&...|)
@@ -129,15 +129,14 @@ class Memory
 			require .SetSize(Q+Extra)
 		return (.ptr + .size*.itemsize)|&...|
 
-	function HasSpare (|bool|)
+	inline HasSpare (|bool|)
 		return .Length < .size
 	
-	function ByteCapacity (|int|)
+	inline ByteCapacity (|int|)
 		return .ItemSize|int|*.size|int|
 	
-	function ByteLength (|int|)
+	inline ByteLength (|int|)
 		return .ItemSize|int|*.Length|int|
-	
 	
 	function Clear
 		disabled "Do you mean .Free or .Zero?"
@@ -153,7 +152,7 @@ class Memory
 		printline fs
 	
 	
-	function String (|string|)
+	inline String (|string|)
 		return string.Copy(._ptr, .ByteLength)
 	
 	
@@ -224,11 +223,11 @@ class Memory
 		function Fill	 (|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function Unmap	 (|&nil| p, |int| n):							cpp_wrapper JB_munmap
-		function Zalloc  (|int| n, |?&byte|):							return realloc(nil, n)
+		inline   Zalloc  (|int| n, |?&byte|):							return realloc(nil, n)
 		function Realloc (|?&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_Realloc
 		function Zero	 (|&nil| addr, |int| n):						cpp_wrapper memzero
 		function Copy	 (|&nil| dest, |&nil| src, |int| N):			cpp_wrapper memcpy
-		function Free	 (|?&nil| b):									cpp_wrapper JB_Free
+		function Free	 (|?&nil| b):									cpp_wrapper JB_Free, description "same as free() but also decreases the reported used-memory count." 
 
 		helper _Free	 (|?&nil| b):									cpp_wrapper free
 

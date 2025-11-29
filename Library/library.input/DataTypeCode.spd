@@ -64,7 +64,7 @@ datatype DataTypeCode (uint16)
 	
 	
 	target debug
-		function DebugPrint
+		inline DebugPrint
 			printline .Render
 	
 	
@@ -107,7 +107,7 @@ datatype DataTypeCode (uint16)
 	
 	// Can replace datatype code with this, eventually.
 	// this makes more sense, with the bitcount.
-	function DebugCode (|uint|)
+	inline DebugCode (|uint|)
 		if self is bool
 			return 64			// bools are unsigned
 		
@@ -126,11 +126,11 @@ datatype DataTypeCode (uint16)
 		
 		
 		
-	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "IsNumericness"
+	inline Basictype (|DataTypeCode|) // compares floatness, vector-size, and "IsNumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 		
 	syntax is (|datatypecode| M, |bool|)
-		opt inline
+		inline
 		return self&M == M
 	
 	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)
@@ -139,15 +139,13 @@ datatype DataTypeCode (uint16)
 			return self|||m
 		return self&~M
 	
-	function Floatness (|int|)
-		if .isint
-			return 0
-		return .bytecount // makes sense
+	inline Floatness (|int|)
+		return .isfloat*.bytecount // makes sense
 
-	function IsFloat (|bool|) // turn this into floatness?
+	inline IsFloat (|bool|) // turn this into floatness?
 		return (self >> 7) & 1
 	
-	function IsPointer (|bool|)
+	inline IsPointer (|bool|)
 		return (self isnt numeric) and (self isnt bool)
 		
 	function IsIntReg (|bool|)
@@ -156,11 +154,10 @@ datatype DataTypeCode (uint16)
 		if .isint and .VecCount <= 1
 			return true
 
-	
-	function IsInt (|bool|)
+	inline IsInt (|bool|)
 		return !.IsFloat
 	
-	function IsSigned (|bool|)
+	inline IsSigned (|bool|)
 		return !(self & unsigned)
 	
 	function SetSigned (|bool| HasSign, |DataTypeCode|)
@@ -172,13 +169,13 @@ datatype DataTypeCode (uint16)
 		if (self is numeric)
 			return .VecCount
 	
-	function ItemBitCount (|int|)
+	inline ItemBitCount (|int|)
 		return 8 << .ByteShift
 	
-	function ByteShift (|uint|)
+	inline ByteShift (|uint|)
 		return (self >> 4) & 3
 
-	function ByteCount (|int|)
+	inline ByteCount (|int|)
 		return .VecCount << .ByteShift
 
 	function BitCount (|int|)
@@ -188,9 +185,9 @@ datatype DataTypeCode (uint16)
 			return 1
 		return (.VecCount << .ByteShift) << 3
 
-	function VecCount (assigns:|int|, |datatypecode|)
+	inline VecCount (assigns:|int|, |datatypecode|)
 		return (self &~ 3) ||| (Value-1)
 	
-	function VecCount (|int|)
+	inline VecCount (|int|)
 		return (self & 0x03) + 1
 	
