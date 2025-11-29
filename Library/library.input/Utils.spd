@@ -14,7 +14,6 @@ function string.Sort (|byte| sep = '\n', |string|)
 	return x.join_sub(string.byte(sep), .length)
 
 
-
 role MessageTable (Dictionary)
 	contains Message
 	syntax Access (|string| Key, assigns:||)

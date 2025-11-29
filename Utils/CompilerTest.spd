@@ -3,9 +3,10 @@
 || Fails = faststring()
 || Speedie = "/usr/local/bin/spd"
 
+
 main (|[string]| Files)
 	for f in files.GlobExpand 
-		app.TryCompileOne(f, f.TrimStart(app.cwd))
+		app.TryCompileOne(f)
 	if fails.Length	
 		printline fails
 		app.say("Failed")
@@ -13,12 +14,10 @@ main (|[string]| Files)
 		app.say("// All OK")
 
 
-function app.TryCompileOne (|file| f, |string| s)
+function app.TryCompileOne (|file| f)
 	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
-	if !Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
-		fails <~ "Fail: $f\n"
-	  elseif app.yes("q")
-		printline "spd $s --nocompile --silent --check --target=ForBatchTest"
+	if Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
+		printline f.TrimStart(app.cwd)
 	  else
-		printline s
+		fails <~ "Fail: $f\n"
 

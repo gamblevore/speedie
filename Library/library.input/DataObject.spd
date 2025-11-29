@@ -22,7 +22,6 @@ class DataObject
 		cpp_part ConstructorInt
 		.Kind = datatypecode.s64
 		.PrivValue = v
-
 	
 	constructor (|bool| b)  // could be an issue as most things convert to a bool...
 		cpp_part ConstructorBool
@@ -44,23 +43,15 @@ class DataObject
 		.Kind = datatypecode._voidptr
 		.PrivValue = p|int64|
 
-
-	syntax access (||) // for floats... perhaps use this?    macro first: .privvalue|...(samebits)|
+	syntax access (||) // for floats... use DataObjectFloat
 		inline
 		if self
 			return .PrivValue
-
 	
 	function Value (|int64|)
 		inline
 		if self
 			return .privvalue
-	
-	
-	function FloatValue (|Float64|)
-		if self
-			return .privvalue.AsFloat
-
 
 	function Value (assigns:|int64|)
 		disabled "This property is immutable"

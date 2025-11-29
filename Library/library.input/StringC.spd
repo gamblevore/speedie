@@ -6,6 +6,7 @@
 
 // quite useful for calling unix functions...
 class StringZeroTerminated (string)
+	description "This is basically a normal Speedie string. So don't think about it or treat it differently than a normal speedie string. The only reason this class was made, is so that Speedie can avoid some automatic-conversions, and save a little speed."
 	linkage
 		wrapper
 		cpp_class JB_StringC
