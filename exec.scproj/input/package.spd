@@ -6,7 +6,8 @@ module CakeRun
 	|message|				Code
 	|message|				Clss
 	|String|				Strings
-	|[xfunction]|			Funcs
+	|String|				FileSrc
+	|[SpdFunc]|				Funcs
 	|&byte|					GlobBase = CakeRun.LibGlobs|&byte|
 	|&uint16|				GlobLink = cakerun.GlobTable
 	|&&nil|					RawFuncs = cakerun.LibFuncs
@@ -30,7 +31,7 @@ module CakeRun
 //		.Globals.valuelower(name) = where!
 		return true
 		
-	syntax access (|int| i, |xfunction|)
+	syntax access (|int| i, |SpdFunc|)
 		return .Funcs[i]
 
 	function message.Arg (|string| name, |bool| Err = false, |message|)
@@ -43,7 +44,7 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		return .GetStructure and  .LoadClasses  and  .Loadfuncs
+		return .GetStructure   and  .Loadfuncs  and  .LoadClasses
 	
 	
 	function GetStructure (|bool|)
@@ -76,6 +77,7 @@ module CakeRun
 				fl = fl.Compile
 		if fl
 			rz = fl.parse
+			.FileSrc = rz.OriginalParseData
 			if !rz.expect(@tmp, "cake")
 				rz = nil
 
@@ -84,11 +86,9 @@ module CakeRun
 		opt norefcounts
 
 		for spd in CakeRun.code
-			|| fn = xfunction(spd)
-			if apptable <~ fn
-				fn.LinkCpp
-				fn.LinkSpd
+			expect (CakeRun.funcs < SpdFnTable.FnLim)	(spd, "Too many functions")
+			SpdFnTable.Funcs <~ SpdFunc(spd)
 
-		check  (AppTable.Funcs >= 2) ("Missing 'main'")
+		check  (SpdFnTable.Funcs >= 2)					(cakerun.code, "Missing 'main'")
 		return stderr.ok
 		

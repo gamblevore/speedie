@@ -36,9 +36,10 @@ function Message.FilePath (|string|)
 
 function Message.OriginalParseData (|string|)
 	Opt NoRefCounts
-	|| D = .memorylayer.obj2
-	if D isa string
-		return D
+	if self
+		|| D = .memorylayer.obj2
+		if D isa string
+			return D
 
 
 extend_module Error

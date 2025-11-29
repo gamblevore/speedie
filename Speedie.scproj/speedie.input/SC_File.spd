@@ -103,7 +103,7 @@ class SCFile (file)
 		if str
 			curr = self
 			|| Layer = (Message).CreateLayerAndUse(self, str)
-			layer.num3 = .filenum
+//			layer.num3 = .filenum // unused?
 			.fData = str
 			StdErr.source = .path
 			parser._DotInsertallow = true	// more consistant with IDE

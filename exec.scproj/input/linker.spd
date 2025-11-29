@@ -1,19 +1,12 @@
 
 
-module AppTable 
-	|int|			FnLim = 64K // allow configure? its more about corrupted files,
-								// Not "we can't handle more"!
-	|[xfunction]|	Funcs
+module SpdFnTable 
+	constants	
+		FnLim = 10K // its about corrupted files, not "we can't handle more"!
+	
+	|[SpdFunc]|	Funcs
 
-	syntax append (|xfunction| fn, |bool|)
-		if (.Funcs < FnLim)
-			fn.index = .Funcs.length
-			.Funcs <~ fn
-			return true
-		error (CakeRun.funcs, "Too many functions")
-	
-	
-	syntax access (|int| i, |xfunction|)
+	syntax access (|int| i, |SpdFunc|)
 		return .Funcs[i]
 	
 	function RunMain (|int|)

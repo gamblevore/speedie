@@ -120,11 +120,7 @@ datatype DataTypeCode (uint16)
 		rz |= (self&3)<<3		// 8,16		// vector
 		rz |= (self&128)>>2		// 32		// float
 		rz |= (self&64) 		// 64		// unsigned
-		rz |= (self&pointer)>>2 // 128		// pointer
-		
-			
-		
-		
+		rz |= (self&pointer)>>2 // 128		// pointer		
 		
 	inline Basictype (|DataTypeCode|) // compares floatness, vector-size, and "IsNumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.

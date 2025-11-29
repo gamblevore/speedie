@@ -1,83 +1,36 @@
 
 
-class XFunction
-	|int|				Index
+class SpdFunc
+	|int|				ASMPos
 	|int|				Length
 	|string|			Name
-	|Message?|			Src
 	|?&ASMblob|			SpeedieFunc
-	|?&nil|				CFunc
-	
 
 	constructor (|message| spd)
 		opt norefcounts
-		.name = spd.name
-		.speediefunc = nil
-		|| ASM = spd.first
-		if asm.IsString
-			.LoadCode(asm)
-		  else
-			asm.Expect(@bin)
-
-	
-	constructor (|?&nil| fn, |string| name)
-		.name = name
-		.CFunc = fn
-	
-		
-	function LoadCode (|message| ASM)
-		opt norefcounts
-		|| s    = asm.name
+		.name = ""
+		|| code = spd[@bin]
+		|| s    = Code.name
 		|| blob = s.addr|&ASMBlob|
-		|| n    = (s.length/4) - 2
-		// we actually aren't allowed to write to string addresses!!
-		// right? I mean... internal ones anyhow?
-		.length = n
-		check (n > 0) ("Missing asm for: " + .name)
-		check (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
-		blob.guard = bear|int| // bobobear
+		|| orig_str = CakeRun.FileSrc
+		|| orig_addr = orig_str.addr
+		|| orig_after = orig_addr + orig_str.Length
+		|| n    = (s.length>>2) - 1
+
+		check  (blob|&byte| >= orig_addr and blob|&byte| < orig_After)	(Code, "ASM escaped.")
+		check !(blob|int64|&3)											(Code, "ASM unaligned.")
+		check  (n > 0)													(Code, "ASM missing.")
+		check  (n < 64K-1)												(Code, "ASM oversized.")
+
 		blob.callcount = 0
-		.speediefunc = blob
-	
+		.ASMPos = ((blob|&byte|) - (orig_addr)) >> 2
+		.length = n
+		.SpeedieFunc = blob
 	
 	function Run (|&ivec4|)
 		jb_vm.vm.Registers 
 		return jb_vm.Run(.speediefunc!.ASM[0], .length)
 	
-	
-	function LinkCpp
-	
-		
 	function LinkSpd
-		// app-funcs are already linked
-		// lib-funcs no...
-		// I guess we can do it like func-num + SmallOffset?
-		// We might want a small offset, say 256 instructions inside.
-		// small offsets can't work with cpp lol.
-
-	render:					fs <~ .name
-
-	constants
-		|int| 
-		bear = 0xB0B0BA14
-
-	module		
-//		function int (|message| s, |xfunction|)
-//			opt norefcounts
-//			|| i = s.int
-//			|| i2 = i >> 1
-//			if i & 1
-//				|| fn = AppTable[i2]
-//					return fn
-//			  else
-//				|| fn = Lib[i2]
-//					return fn
-//			s.CantFindFunc
 
 
-//function message.CantFindFunc
-//	error (self, "Can't find function: " + .name)
-
-
-//////////          //////////            //////////
-//////////          //////////            //////////

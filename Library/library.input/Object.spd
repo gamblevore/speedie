@@ -199,7 +199,7 @@ class MemoryLayer
 
 	|Object?|		Obj
 	|Object?|		Obj2
-	|uint64|		Num3
+	|uint64|		Num3 // unused?
 	
 	constructor (|&ClassData| Cls)
 		cpp_wrapper JB_Mem_Constructor

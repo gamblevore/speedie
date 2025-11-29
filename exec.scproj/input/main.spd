@@ -12,7 +12,7 @@ main
 	error.AutoPrint = 1
 	require CakeRun.LoadPack
 	debugger.load
-	return apptable.RunMain
+	return SpdFnTable.RunMain
 
 
 function App.ActAsSpeedie (|ErrorInt|)

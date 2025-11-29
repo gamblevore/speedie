@@ -3,11 +3,9 @@
 
 function CakeRun.LoadClasses (|bool|)
 	opt norefcounts
-	#!Inbuilts first
 	for cd in ClassData.First_
 		.StoreClass(cd)
 
-	#!Now cake classes
 /	for c.fast in .Clss
 		.LoadOneClass(C)
 	return StdErr.ok

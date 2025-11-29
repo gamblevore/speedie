@@ -2,7 +2,6 @@
 datatype ASM (uint)
 	
 struct ASMBlob
-	|int|			Guard
 	|int|			CallCount		
 	|ASM[1]|		ASM
 
