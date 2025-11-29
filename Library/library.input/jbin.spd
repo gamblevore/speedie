@@ -115,7 +115,7 @@ datatype jbinLeaver (int)
 		
 	module
 		target debug
-			function Test
+			inline Test
 				|| j = jbin()
 				j.Enter	// Sigh... syntaxusing is called upon the leaver, and not the jbin!
 						// how to make it work on j rather than on j.enter?

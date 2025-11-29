@@ -104,7 +104,7 @@ datatype CharProp (byte)
 //		charprop.test
 //		
 //	
-//		function Test
+//		inline Test
 //			expect 'a' is lower and 'b' is lower and 'C' is upper and 'D' is upper and '5' is number
 //			expect Letters contains 'C' and 'c'
 //			|| fs = FastString()

@@ -13,15 +13,15 @@ Module MZLab
 		cpp_wrapper JB_CompFreeNow
 		
 	
-	function string.CompressTest_ (|bool| report, |int| which=3, |bool|)
+	inline string.CompressTest_ (|bool| report, |int| which=3, |bool|)
 		if which & 1
-			require .CompressTestSub(mzlab.strong, report)
+			require .CompressTestSub_(mzlab.strong, report)
 		if which & 2
-			require .CompressTestSub(mzlab.strongest, report)
+			require .CompressTestSub_(mzlab.strongest, report)
 		return true
 	
 	
-	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
+	inline string.CompressTestSub_ (|int| Strength, |bool| report, |bool|)
 		|compressionstats| stats
 		|| c = .compress(Strength, stats)
 		if report // remove? compression is good for now.
@@ -39,7 +39,7 @@ Module MZLab
 				fs <~ items[j]!
 
 	target DebugCompressrion
-		function TestCompression
+		inline TestCompression
 			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 			require f.exists
 			for ch in f.ListFiles
@@ -52,7 +52,7 @@ Module MZLab
 			"TestCompression passed."
 		
 	
-		function TestChunkedCompression
+		inline TestChunkedCompression
 			// useful for jbin and exec.
 			|| fs = FastString()
 			"abcabc".compress(fs)

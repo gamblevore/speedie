@@ -140,7 +140,7 @@ class FixedDict
 
 
 	module
-		helper TimeTest (|[string]| items)
+		inline TimeTest (|[string]| items)
 			|fixeddict of string|  fd = fixeddict()
 			|dictionary of string| ed = dictionary()
 			|| n = 4
@@ -178,7 +178,7 @@ class FixedDict
 			}
 		
 		
-		function Test
+		inline Test
 			|[string]| items	= []
 			|| fs				= faststring.new
 
@@ -281,20 +281,3 @@ role NameTableConcept (object)
 			if .name == name
 				return self
 			
-				
-//class Example
-//	|?NameTableConcept| Table
-//	
-//	constructor
-//	function Test
-//		|| list = "'a', 'b', 'c'" ~ parse
-//		for s in list
-//			.Table.add(s)
-//			for s2 in list
-//				|| x = .table.get(s2.name)
-//				"$s2 --> $x"
-//
-//main
-//	|| x = Example()
-//	x.Test
-//
