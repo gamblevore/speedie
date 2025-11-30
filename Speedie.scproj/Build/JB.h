@@ -497,6 +497,10 @@ struct Validator;
 
 struct xC2xB5Form;
 
+struct DTWrap;
+
+struct DTWrap;
+
 struct FastStringCpp;
 
 struct FastString;
@@ -951,10 +955,11 @@ JBClass ( InputStream , JB_Object ,
 	int StartFrom;
 	JB_File* File;
 	bool _NoMoreChunks;
+	bool TryRecoverBadData;
 	int ChunkSize;
 	int Length;
-	JB_Object* _Object;
 	ParserCallBack* CallBack;
+	JB_Object* _Object;
 	FastBuff Data;
 );
 
@@ -1533,13 +1538,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2273])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2274])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2274])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2275])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2272])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2275])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2276])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2275])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2276])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2273])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2276])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2277])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1644,6 +1649,7 @@ extern Array* SC__PackMaker_LibFuncs;
 extern Array* SC__PackMaker_LibGlobs;
 extern int SC__PackMaker_LibGlobSize;
 extern HairyMan SC__PackMaker_LibSaved;
+extern JB_String* SC__PackMaker_LName;
 extern Array* SC__PackMaker_PackFuncs;
 extern Array* SC__PackMaker_PackGlobs;
 extern int SC__PackMaker_PackGlobSize;
@@ -1729,12 +1735,11 @@ extern int SC__VM_Builder_Total;
 extern Macro* SC__VM_Builder_Ugh;
 extern byte SC__VM_Builder_XType;
 extern JB_String* SC___AppConfString;
-extern ivec4 SC_Butter;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2281])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2282])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1757,7 +1762,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2277])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2278])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1777,7 +1782,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2282])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2283])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
@@ -1916,10 +1921,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2280])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2279])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2281])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2280])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2278])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2279])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2557,7 +2562,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2271])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2272])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3330,7 +3335,7 @@ bool SC_Options__ModePack();
 // PackMaker
 void SC_PackMaker__AddAll();
 
-void SC_PackMaker__AddDebugStuff(FastString* J, JB_String* Func_names);
+void SC_PackMaker__AddDebugStuff(FastString* J);
 
 void SC_PackMaker__AddFunc(SCFunction* F);
 
@@ -3358,7 +3363,7 @@ void SC_PackMaker__PackClasses(FastString* J, bool Pack);
 
 void SC_PackMaker__PackIDFuncs(Array* List);
 
-void SC_PackMaker__RenderASM(FastString* J, FastString* Func_names);
+void SC_PackMaker__RenderASM(FastString* J);
 
 void SC_PackMaker__WritePackToDisk();
 
@@ -3544,8 +3549,6 @@ int SC_Errors__Init_();
 
 // Sav
 void SC_Sav__BugWorkAround();
-
-void SC_Sav__TestSaver();
 
 
 
@@ -5036,31 +5039,11 @@ int SC_TC_ASMConv(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ To);
 
 int SC_TC_ASMPart(uint /*DataTypeCode*/ Self);
 
-DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self);
-
 int JB_TC_BitCount(uint /*DataTypeCode*/ Self);
-
-int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
-
-uint JB_TC_ByteShift(uint /*DataTypeCode*/ Self);
-
-uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
 
 int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S);
 
-int JB_TC_Floatness(uint /*DataTypeCode*/ Self);
-
-bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self);
-
-bool JB_TC_IsInt(uint /*DataTypeCode*/ Self);
-
 bool JB_TC_IsIntReg(uint /*DataTypeCode*/ Self);
-
-bool JB_TC_IsPointer(uint /*DataTypeCode*/ Self);
-
-bool JB_TC_IsSigned(uint /*DataTypeCode*/ Self);
-
-int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self);
 
 int JB_TC_NumericCount(uint /*DataTypeCode*/ Self);
 
@@ -5071,10 +5054,6 @@ JB_String* JB_TC_Render(uint /*DataTypeCode*/ Self, FastString* Fs_in);
 DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool HasSign);
 
 SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self);
-
-DataTypeCode JB_TC_VecCountSet(uint /*DataTypeCode*/ Self, int Value);
-
-int JB_TC_VecCount(uint /*DataTypeCode*/ Self);
 
 ASMReg SC_TC_zero(uint /*DataTypeCode*/ Self);
 
@@ -5818,8 +5797,6 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* Self, JB_String* Name, Message* 
 // JB_ClassData
 JB_MemoryLayer* JB_ClassData_CreateLayerAndUse(JB_Class* Self, JB_Object* Obj, JB_Object* Obj2);
 
-void JB_ClassData_Restore(JB_Class* Self);
-
 
 
 // JB_CompressionStats
@@ -6079,10 +6056,6 @@ void SC_NRC_SyntaxCallSet(NilRecorder* Self, uint64 Item, uint64 Value);
 // JB_ObjectLoader
 void JB_LD_Destructor(ObjectLoader* Self);
 
-void JB_LD_Finish(ObjectLoader* Self);
-
-JB_Class* JB_LD_GetClassOf(ObjectLoader* Self, Message* Msg);
-
 bool JB_LD_HasItem(ObjectLoader* Self);
 
 int64 JB_LD_Int(ObjectLoader* Self);
@@ -6095,29 +6068,15 @@ JB_String* JB_LD_ItemName(ObjectLoader* Self);
 
 JB_Object* JB_LD_ItemObject(ObjectLoader* Self);
 
-void JB_LD_LoadClass(ObjectLoader* Self, Message* Msg, Dictionary* Dict);
-
-void JB_LD_LoadForReal(ObjectLoader* Self, Message* Root, Dictionary* D);
-
-void JB_LD_LoadObject(ObjectLoader* Self, Message* Msg, Dictionary* Dict, JB_Class* Cls);
-
 Message* JB_LD_Next(ObjectLoader* Self);
 
 JB_Object* JB_LD_Object(ObjectLoader* Self);
 
 JB_Object* JB_LD_ObjectSub(ObjectLoader* Self, Message* C);
 
-void JB_LD_Preload(ObjectLoader* Self, Message* Root, Dictionary* Dict);
-
 JB_String* JB_LD_String(ObjectLoader* Self);
 
-bool JB_LD_VerifyFormat(ObjectLoader* Self, Message* Root);
-
-void JB_LD__Init();
-
 int JB_LD__Init_();
-
-void JB_LD__LoadOne(JB_Class* Cls, int8* Data);
 
 
 
@@ -6126,17 +6085,9 @@ void JB_Saver_AppendInt(ObjectSaver* Self, int64 I);
 
 void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S);
 
-void JB_Saver_Constructor(ObjectSaver* Self);
-
 void JB_Saver_Destructor(ObjectSaver* Self);
 
-void JB_Saver_Finish(ObjectSaver* Self, Saveable* First);
-
-void JB_Saver__Init();
-
 int JB_Saver__Init_();
-
-void JB_Saver__LoadOne(JB_Class* Cls, int8* Data);
 
 
 
@@ -7192,13 +7143,7 @@ DTWrap* JB_Wrap_ConstructorVoidPtr(DTWrap* Self, void* P);
 
 void JB_Wrap_Destructor(DTWrap* Self);
 
-Float64 JB_Wrap_FloatValue(DTWrap* Self);
-
 JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in);
-
-int64 JB_Wrap_SyntaxAccess(DTWrap* Self);
-
-int64 JB_Wrap_Value(DTWrap* Self);
 
 
 
@@ -7404,9 +7349,13 @@ bool JB_SS_DecompressSub(InputStream* Self, FastString* Fs, CompressionStats* St
 
 void JB_SS_Destructor(InputStream* Self);
 
-bool JB_SS_ExpectJbin(InputStream* Self);
+int JB_SS_Eat(InputStream* Self, JB_String* S);
+
+int JB_SS_Find(InputStream* Self, uint /*byte*/ C);
 
 bool JB_SS_HasAny(InputStream* Self);
+
+bool JB_SS_HasHeader(InputStream* Self, JB_String* Header);
 
 int JB_SS_HInt(InputStream* Self);
 
@@ -7420,11 +7369,11 @@ bool JB_SS_NoMoreChunksToRead(InputStream* Self);
 
 int JB_SS_NonZeroByte(InputStream* Self);
 
-Message* JB_SS_ParseJbin(InputStream* Self, int64 Remain);
-
 ParserCallBack* JB_SS_ParserCallBack_Constructor(ParserCallBack* Self, InputStream* Upon);
 
 int JB_SS_Position(InputStream* Self);
+
+void JB_SS_PositionSet(InputStream* Self, int Value);
 
 bool JB_SS_ReadChunk(InputStream* Self, JB_File* F);
 
@@ -7433,6 +7382,8 @@ int JB_SS_Remaining(InputStream* Self);
 void JB_SS_Reset(InputStream* Self, JB_String* Data);
 
 JB_String* JB_SS_Str(InputStream* Self, int N, int Skip);
+
+Message* JB_SS_StreamJbin(InputStream* Self, int64 Remain);
 
 void JB_SS_Fail(InputStream* Self, JB_String* Error);
 
@@ -7492,8 +7443,6 @@ int JB_Macro__Init_();
 
 
 // JB_Memory
-int JB_Mrap_ByteCapacity(MWrap* Self);
-
 MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
 
 int JB_Mrap_CopyFrom(MWrap* Self, void* Src, int Length);
@@ -7503,8 +7452,6 @@ void JB_Mrap_Destructor(MWrap* Self);
 void JB_Mrap_LengthSet(MWrap* Self, int Value);
 
 byte* JB_Mrap_NeedSpare(MWrap* Self, int ReqItems, int Extra);
-
-byte* JB_Mrap_Ptr(MWrap* Self);
 
 bool JB_Mrap_SetSize(MWrap* Self, int ItemCount);
 
@@ -7517,8 +7464,6 @@ int JB_Mrap__Init_();
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void SC_Mrap__PrintLeaks(JB_Object* Self);
-
-byte* JB_Mrap__Zalloc(int N);
 
 
 
@@ -7761,12 +7706,6 @@ bool JB_Sav_SaveMark(Saveable* Self);
 
 SaverClassInfo* JB_Sav_SaverInfo(Saveable* Self);
 
-void JB_Sav_SaveToFile(Saveable* Self, JB_File* F);
-
-JB_String* JB_Sav_SaveTo(Saveable* Self, FastString* Fs_in);
-
-void JB_Sav_SaveUnMark(Saveable* Self);
-
 void JB_Sav_SaveWrite(Saveable* Self, ObjectSaver* Saver);
 
 
@@ -7800,10 +7739,6 @@ JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname);
 Array* JB_Str_Components(JB_String* Self);
 
 JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St, FastString* Fs_in);
-
-bool JB_Str_CompressTest_(JB_String* Self, bool Report, int Which);
-
-bool JB_Str_CompressTestSub(JB_String* Self, int Strength, bool Report);
 
 JB_String* SC_Str_ContainerName(JB_String* Self, JB_String* Ext);
 
@@ -8078,6 +8013,12 @@ void JB_Array_SaveWrite(Array* Self, ObjectSaver* Saver);
 
 void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item);
 
+
+
+// JB_DataObjectFloat32
+
+
+// JB_DataObjectFloat64
 
 
 // JB_Dictionary
@@ -8782,15 +8723,11 @@ SCNode* SC_Base__LoadCppPart(Message* Node, SCNode* Name_space, Message* ErrPlac
 
 
 // JB_SavingTest
-SavingTest* SC_SavingTest_Constructor(SavingTest* Self, int N);
-
 void SC_SavingTest_Destructor(SavingTest* Self);
 
 void SC_SavingTest_LoadProperties(SavingTest* Self, ObjectLoader* Loader);
 
 void SC_SavingTest_SaveWrite(SavingTest* Self, ObjectSaver* Saver);
-
-bool SC_SavingTest__IsEqual(JB_Object* A, JB_Object* B);
 
 
 
@@ -9802,8 +9739,6 @@ Message* SC_Msg_ReplaceWithChild(Message* Self);
 
 void JB_Msg_CantFind(Message* Self, Syntax S, JB_String* Name, Message* Found);
 
-JB_Object* JB_Msg_RestoreLoad(Message* Self);
-
 Message* SC_Msg_Resync(Message* Self, Message* Parent);
 
 FatASM* SC_Msg_RET(Message* Self, ASMReg R1, int Value);
@@ -10235,15 +10170,7 @@ SortComparison SC_File__Sorter(SCFile* Self, SCFile* B);
 
 
 // JB_SaverClassInfo
-void JB_sci_Clear(SaverClassInfo* Self);
-
-SaverClassInfo* JB_sci_Constructor(SaverClassInfo* Self, JB_Class* Cls, int8* Data);
-
 void JB_sci_Destructor(SaverClassInfo* Self);
-
-bool JB_sci_HasData(SaverClassInfo* Self);
-
-void JB_sci_Output(SaverClassInfo* Self, ObjectSaver* Saver);
 
 
 
@@ -10496,7 +10423,7 @@ SCDecl* SC_Class_MakeClassType(SCClass* Self, SCDecl* TypeNormal);
 
 int SC_Class_MiniSize(SCClass* Self, int B);
 
-void SC_Class_MissingBehaviour(SCClass* Self, JB_String* S);
+void SC_Class_MissingVirtual(SCClass* Self, JB_String* S);
 
 void SC_Class_ModelDecls(SCClass* Self);
 
@@ -11177,6 +11104,10 @@ inline JB_String* JB_File__PrefPath();
 
 inline bool JB_Ind_SyntaxCast(Ind Self);
 
+inline int JB_Mrap_ByteCapacity(MWrap* Self);
+
+inline byte* JB_Mrap_Ptr(MWrap* Self);
+
 inline int JB_Msg_After(Message* Self);
 
 inline void JB_Msg_AfterSet(Message* Self, int Value);
@@ -11199,11 +11130,27 @@ inline JB_String* JB_Str_MulBool(JB_String* Self, bool B);
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* Self);
 
+inline DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self);
+
+inline uint JB_TC_ByteShift(uint /*DataTypeCode*/ Self);
+
+inline bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self);
+
+inline bool JB_TC_IsSigned(uint /*DataTypeCode*/ Self);
+
 inline bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
 
 inline DataTypeCode JB_TC_SyntaxIsSet(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M, bool Value);
 
+inline int JB_TC_VecCount(uint /*DataTypeCode*/ Self);
+
+inline DataTypeCode JB_TC_VecCountSet(uint /*DataTypeCode*/ Self, int Value);
+
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
+
+inline int64 JB_Wrap_SyntaxAccess(DTWrap* Self);
+
+inline int64 JB_Wrap_Value(DTWrap* Self);
 
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D);
 
@@ -11237,6 +11184,8 @@ inline bool JB_Array_SyntaxEquals(Array* Self, int N);
 
 inline JB_String* JB_CP_AsString(Codepoint Self);
 
+inline void JB_ClassData_Restore(JB_Class* Self);
+
 inline void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp);
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self);
@@ -11247,6 +11196,8 @@ inline void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data);
 
 inline bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware);
 
+inline byte* JB_Mrap__Zalloc(int N);
+
 inline bool JB_Msg_IsString(Message* Self);
 
 inline int JB_Msg_Length(Message* Self);
@@ -11255,11 +11206,7 @@ inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in);
 
 inline void JB_PrintLine(JB_String* Data);
 
-inline void JB_Sav___LoadProperties__(Saveable* Self, ObjectLoader* Loader);
-
 inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver);
-
-inline void JB_Sav___SaveWrite__(Saveable* Self, ObjectSaver* Saver);
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
@@ -11288,6 +11235,14 @@ inline Ind JB_Str_OutByteWithByteIntInt(JB_String* Self, uint /*byte*/ Find, int
 inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet* Cs, int Start, int After);
 
 inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
+
+inline int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
+
+inline bool JB_TC_IsInt(uint /*DataTypeCode*/ Self);
+
+inline bool JB_TC_IsPointer(uint /*DataTypeCode*/ Self);
+
+inline int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self);
 
 inline bool JB_Tree_OperatorIn(JB_List* Self, JB_List* F);
 
@@ -11322,6 +11277,10 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool JB_Str_ContainsByte(JB_String* Self, uint /*byte*/ B);
 
 inline bool JB_Str_IsInt(JB_String* Self);
+
+inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
+
+inline int JB_TC_Floatness(uint /*DataTypeCode*/ Self);
 
 inline bool JB_byte_IsLower(uint /*byte*/ Self);
 
@@ -11371,9 +11330,11 @@ inline Message* JB_Msg_NeedFirst(Message* Self);
 
 inline bool JB_App__No(JB_String* Name);
 
-inline bool JB_SS_IsJBin(InputStream* Self);
-
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
+
+inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report);
+
+inline bool JB_Str_CompressTest_(JB_String* Self, bool Report, int Which);
 
 inline ASMReg SC_Pac_Exists(Assembler* Self, ASMReg Dest, ASMReg L, Message* Exp);
 
@@ -11455,6 +11416,14 @@ inline bool JB_Ind_SyntaxCast(Ind Self) {
 	return Self >= 0;
 }
 
+inline int JB_Mrap_ByteCapacity(MWrap* Self) {
+	return ((int)Self->ItemSize) * ((int)Self->Size);
+}
+
+inline byte* JB_Mrap_Ptr(MWrap* Self) {
+	return ((byte*)Self->_Ptr);
+}
+
 inline int JB_Msg_After(Message* Self) {
 	return Self->Position + Self->RangeLength;
 }
@@ -11512,6 +11481,22 @@ inline _cstring JB_Str_SyntaxCast(JB_StringC* Self) {
 	return ((_cstring)Self->Addr);
 }
 
+inline DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self) {
+	return Self & (128 + (8 + 3));
+}
+
+inline uint JB_TC_ByteShift(uint /*DataTypeCode*/ Self) {
+	return (Self >> 4) & 3;
+}
+
+inline bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self) {
+	return ((bool)((Self >> 7) & 1));
+}
+
+inline bool JB_TC_IsSigned(uint /*DataTypeCode*/ Self) {
+	return (!(Self & kJB__TC_Unsigned));
+}
+
 inline bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M) {
 	return (Self & M) == M;
 }
@@ -11523,8 +11508,30 @@ inline DataTypeCode JB_TC_SyntaxIsSet(uint /*DataTypeCode*/ Self, uint /*DataTyp
 	return Self & (~M);
 }
 
+inline int JB_TC_VecCount(uint /*DataTypeCode*/ Self) {
+	return (Self & 3) + 1;
+}
+
+inline DataTypeCode JB_TC_VecCountSet(uint /*DataTypeCode*/ Self, int Value) {
+	return (Self & (~3)) | (Value - 1);
+}
+
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (JB__Tk_Splitter)(S, E, F);
+}
+
+inline int64 JB_Wrap_SyntaxAccess(DTWrap* Self) {
+	if (Self) {
+		return Self->PrivValue;
+	}
+	return 0;
+}
+
+inline int64 JB_Wrap_Value(DTWrap* Self) {
+	if (Self) {
+		return Self->PrivValue;
+	}
+	return 0;
 }
 
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D) {
@@ -11601,6 +11608,10 @@ inline JB_String* JB_CP_AsString(Codepoint Self) {
 	return JB_Str_ChrUTF8(Self);
 }
 
+inline void JB_ClassData_Restore(JB_Class* Self) {
+	JB_Mem_Use(JB_Class_DefaultLayer(Self));
+}
+
 inline void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp) {
 	JB_FS_AppendDoubleAsText(Self, ((Float64)D), Dp, CanExp);
 }
@@ -11619,6 +11630,10 @@ inline void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data) {
 
 inline bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware) {
 	return JB_Str_Equals(Self, S, Aware);
+}
+
+inline byte* JB_Mrap__Zalloc(int N) {
+	return JB_Realloc(nil, N);
 }
 
 inline bool JB_Msg_IsString(Message* Self) {
@@ -11641,19 +11656,9 @@ inline void JB_PrintLine(JB_String* Data) {
 	JB_Str_PrintLine(Data);
 }
 
-inline void JB_Sav___LoadProperties__(Saveable* Self, ObjectLoader* Loader) {
-	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (((__Saveable_LoadProperties__)(Table->loadproperties)))(Self, Loader);
-}
-
 inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver) {
 	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
 	return (((__Saveable_SaveCollect__)(Table->savecollect)))(Self, Saver);
-}
-
-inline void JB_Sav___SaveWrite__(Saveable* Self, ObjectSaver* Saver) {
-	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (((__Saveable_SaveWrite__)(Table->savewrite)))(Self, Saver);
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
@@ -11714,6 +11719,22 @@ inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet* Cs, int Start, int After)
 
 inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
 	return JB_Str_WhiteSpace(Self, Start, After, false);
+}
+
+inline int JB_TC_ByteCount(uint /*DataTypeCode*/ Self) {
+	return JB_TC_VecCount(Self) << JB_TC_ByteShift(Self);
+}
+
+inline bool JB_TC_IsInt(uint /*DataTypeCode*/ Self) {
+	return (!JB_TC_IsFloat(Self));
+}
+
+inline bool JB_TC_IsPointer(uint /*DataTypeCode*/ Self) {
+	return ((!JB_TC_SyntaxIs(Self, kJB__TC_Numeric))) and ((!JB_TC_SyntaxIs(Self, kJB__TC_bool)));
+}
+
+inline int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self) {
+	return 8 << JB_TC_ByteShift(Self);
 }
 
 inline bool JB_Tree_OperatorIn(JB_List* Self, JB_List* F) {
@@ -11790,6 +11811,30 @@ inline bool JB_Str_IsInt(JB_String* Self) {
 	return JB_Str_IsIntFrom(Self, 0);
 }
 
+inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self) {
+	uint Rz = 0;
+	if (JB_TC_SyntaxIs(Self, kJB__TC_bool)) {
+		return 64;
+	}
+	Rz = (((int)Self) & 48);
+	if (Rz == 48) {
+		Rz = 64;
+	}
+	if (Rz == 0) {
+		Rz = 8;
+	}
+	Rz = JB_uint_Log2(Rz);
+	Rz = (Rz | ((Self & 3) << 3));
+	Rz = (Rz | ((Self & 128) >> 2));
+	Rz = (Rz | (Self & 64));
+	Rz = (Rz | ((Self & kJB__TC_Pointer) >> 2));
+	return Rz;
+}
+
+inline int JB_TC_Floatness(uint /*DataTypeCode*/ Self) {
+	return JB_TC_IsFloat(Self) * JB_TC_ByteCount(Self);
+}
+
 inline bool JB_byte_IsLower(uint /*byte*/ Self) {
 	return JB_CP_IsLower(((Codepoint)Self));
 }
@@ -11803,7 +11848,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 }
 
 inline JB_File* JB_File__Logs() {
-	return JB_Str_AsFile(JB_LUB[392]);
+	return JB_Str_AsFile(JB_LUB[393]);
 }
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
@@ -11917,14 +11962,6 @@ inline bool JB_App__No(JB_String* Name) {
 	return (!JB_App__Yes(Name));
 }
 
-inline bool JB_SS_IsJBin(InputStream* Self) {
-	JB_String* _tmPf0 = JB_SS_Str(Self, 4, 0);
-	JB_Incr(_tmPf0);
-	bool _tmPf1 = JB_Ind_SyntaxCast(JB_Str_IsJbin(_tmPf0));
-	JB_Decr(_tmPf0);
-	return _tmPf1;
-}
-
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 	FatASM* F = SC_Reg_FAT(Src);
 	if (!F) {
@@ -11941,6 +11978,45 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 		}
 	}
 	return SC_Pac_ReDestWithFatReg(Self, F, Dest);
+}
+
+inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) {
+	bool Rz = false;
+	CompressionStats Stats = ((CompressionStats){});
+	JB_String* C = JB_Str_Compress(Self, Strength, (&Stats), nil);
+	JB_Incr(C);
+	if (Report) {
+		JB_MzSt_Print((&Stats));
+	}
+	JB_String* Decomp = JB_Str_Decompress(C, nil, JB_int__Max(), nil);
+	JB_Incr(Decomp);
+	Rz = (JB_Str_Equals(Self, Decomp, false));
+	if (!Rz) {
+		if (true) {
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1360], Self);
+			JB_Incr(_tmPf0);
+			JB_Str_Fail(_tmPf0);
+			JB_Decr(_tmPf0);
+		}
+		JB_SetRef(Decomp, JB_Str_Decompress(C, nil, JB_int__Max(), nil));
+	}
+	JB_Decr(C);
+	JB_Decr(Decomp);
+	return Rz;
+}
+
+inline bool JB_Str_CompressTest_(JB_String* Self, bool Report, int Which) {
+	if (Which & 1) {
+		if (!JB_Str_CompressTestSub_(Self, kJB__MZLab_Strong, Report)) {
+			return nil;
+		}
+	}
+	if (Which & 2) {
+		if (!JB_Str_CompressTestSub_(Self, kJB__MZLab_Strongest, Report)) {
+			return nil;
+		}
+	}
+	return true;
 }
 
 inline ASMReg SC_Pac_Exists(Assembler* Self, ASMReg Dest, ASMReg L, Message* Exp) {
