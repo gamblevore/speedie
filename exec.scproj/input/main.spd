@@ -4,15 +4,12 @@
 
 
 main
-	opt NoRefCounts
-//	|| j = jbin(@tmp, "hello")
-///	|| p = j.GetResult.parse
-//		p.jdb2
-	
+	opt NoRefCounts	
 	error.AutoPrint = 1
-	require CakeRun.LoadPack
-	debugger.load
-	return SpdFnTable.RunMain
+	if CakeRun.LoadPack
+		debugger.load
+		return SpdTable.RunMain
+	return 1
 
 
 function App.ActAsSpeedie (|ErrorInt|)

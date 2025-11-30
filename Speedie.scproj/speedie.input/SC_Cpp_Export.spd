@@ -456,7 +456,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 	self <~ ";\n"
 
 
-function SCClass.MissingBehaviour (|string| s)
+function SCClass.MissingVirtual (|string| s)
 	error (.source, "Missing behaviour: " + s)
 
 
@@ -486,7 +486,7 @@ function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 						fn = nil
 			
 			if fn
-				cls.MissingBehaviour(s)
+				cls.MissingVirtual(s)
 		b = b.upwards
 	
 	fs <~ "\treturn Result;\n}\n\n"

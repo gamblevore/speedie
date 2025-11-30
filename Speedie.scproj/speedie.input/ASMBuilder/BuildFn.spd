@@ -22,14 +22,10 @@ extend_module ASM
 
 
 	function TestASM 
-		require options.ModePack
-		//if options.dev >= 2
-		asm.noisyasm = 3
-
-		require options.dev > 0
-
-		using ErrorSeverity.Warning
 		target debug
+			require options.ModePack and options.dev > 0
+			asm.noisyasm = 3		
+			using ErrorSeverity.Warning
 			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
 				.TestASMSub(T)
 	

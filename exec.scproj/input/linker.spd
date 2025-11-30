@@ -1,10 +1,11 @@
 
 
-module SpdFnTable 
+module SpdTable 
 	constants	
 		FnLim = 10K // its about corrupted files, not "we can't handle more"!
 	
 	|[SpdFunc]|	Funcs
+	|&uint16|	GlobLink = cakerun.GlobTable
 
 	syntax access (|int| i, |SpdFunc|)
 		return .Funcs[i]
@@ -14,3 +15,24 @@ module SpdFnTable
 		|| main = .funcs[1]					#expect ("Missing main")
 		rz  = .funcs[0]!.Run|&int64|[]
 		rz ?= main.Run|&int64|[]
+
+	syntax Append (|message| spd)
+		opt norefcounts
+		expect (.Funcs < .FnLim)					(spd, "Too many functions")
+		if spd.IsString
+			.Funcs <~ SpdFunc(spd)
+		  else
+			for spd.int
+				.Funcs <~ SpdFunc() // placeholder				
+		
+	function LoadFuncs (|bool|)
+		opt norefcounts
+		for spd in CakeRun.code
+			self <~ spd
+		
+		check  (.Funcs >= 2)						(cakerun.code, "Missing 'main'")
+		.Funcs.Shrink
+		return stderr.ok
+
+
+

@@ -10,7 +10,7 @@ function compiler.PrintCompileTime (|date| durr)
 
 	|| N = StringCorrector.CppStrings.length
 	|| avg = StringCorrector.TotalSize div N
-	fs <~ "$N from "	
+	fs <~ "$N from "
 	StringCorrector.TotalSize.strsize(fs)
 	fs <~ " // (avg "
 	fs.appendfloat(avg, 1)
@@ -29,9 +29,10 @@ function compiler.PrintCompileTime (|date| durr)
 	|| ASM_Ops = compiler.stTotalASMOps
 		fs.Normal  "ASM",    (ASM_Ops*4).strsize(fs)
 		fs.Normal  "Proj Saved", packmaker.PackSaved.Churn(fs)
-		fs.Normal  "Lib Saved",  packmaker.LibSaved.Churn(fs)
-		fs.normal  "DebugInfo",  stdebuginfo.strsize(fs)
-
+		if packmaker.LibSaved.Total
+			fs.Normal  "Lib Saved",  packmaker.LibSaved.Churn(fs)
+		if stdebuginfo
+			fs.normal  "DebugInfo",  stdebuginfo.strsize(fs)
 
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
@@ -46,10 +47,7 @@ function compiler.PrintCompileTime (|date| durr)
 
 function faststring.PrintStatType (|string| name, |int| count)
 	if count
-		self <~ '\n'
-		self <~ name
-		self <~ ' '
-		self <~ count
+		self <~ "$\n$name $count"
 
 
 function compiler.PrintStats 
@@ -120,9 +118,9 @@ function compiler.CompileTime
 	|| elapsed = .CompileAll~timeit
 	.PrintCompileTime(elapsed)
 
-	if stderr.ok
-		TransCompiler.ExportAndInstall(elapsed)
-		if !options.Scripting and stderr.ok
-			stringcorrector.CorrectStrings
+	require stderr.ok
+	TransCompiler.ExportAndInstall(elapsed)
+	if !options.Scripting and stderr.ok
+		stringcorrector.CorrectStrings
 
 

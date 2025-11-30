@@ -6,13 +6,13 @@ class SpdFunc
 	|?&ASMblob|			SpeedieFunc
 
 	constructor
-/		.Length = -1
+		.Length = -1
 		.name = "(unused code)"
 		.SpeedieFunc = nil
 	
 	constructor (|message| code)
 		opt norefcounts
-/		.name = ""
+		.name = ""
 		|| s    = Code.name
 		|| blob = (s.addr-4)|&ASMBlob|
 		|| orig_str = CakeRun.FileSrc
@@ -37,6 +37,13 @@ class SpdFunc
 		jb_vm.vm.Registers 
 		|| spd = .SpeedieFunc
 			return jb_vm.Run(spd.ASM[0], .length)
+		
+	render
+		if .name
+			fs <~ .name
+		  else
+			fs <~ "0x"
+			fs.AppendHex(.asmpos, 6)
 	
 	function Link❗
 

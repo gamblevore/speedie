@@ -612,8 +612,6 @@ struct Assembler
 		rz.PropertyLayout(packmaker.PackGlobs)
 		rz.exit
 		
-		rz.Enter(@msg, "func")
-		
 		
 	function PackMakerInit
 		opt norefcounts

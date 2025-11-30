@@ -78,8 +78,6 @@ void JB_Flow__PrintStats();
 #endif
 
 
-//#define IsKnown(x) (((x) & ((x) - 1)) == 0)
-//#define AlwaysInline inline __attribute__((__always_inline__))
 #define require(test)   if  (!(test)) {return {};}
 #define require0(test)  if  (!(test)) {return;}
 #define for_(count) for (int i = 0; i < (count); i++)
@@ -169,8 +167,7 @@ struct AllocationBlock {
 
     FreeObject*             FirstFree;
 
-    JBObject_Behaviour*     CppTable;		// speed things up a bit.
-	void** 					SpdTable;
+    JBObject_Behaviour*     Virtuals;		// speed things up a bit.
 };
 
 
@@ -202,8 +199,7 @@ struct JB_Class : JB_Object { // JB_ClassData
     int					LeakCounter;
     JB_MemoryLayer      Memory;
     const char*         Name;
-    JBObject_Behaviour* CppTable; // both tables should agree with each other 
-    void**				SpdTable;
+    JBObject_Behaviour* Virtuals; 
     uint8*              SaveInfo;
 };
 
@@ -238,10 +234,12 @@ struct JBSaver_Behaviour {
 };
 
 
+bool		JB_Cake__Prepare (int N, int B);
+JB_Class*	JB_Cake__Class (const char* Name, int Size, JB_Class* Parent, int VCount);
+void**		JB_Cake_Virtuals(JB_Class* C);
+
 
 void JBClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
-JB_Class* JBClassNew (const char* Name, int Size, JB_Class* Parent);
-void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd);
 inline JB_Class JBClassInit (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
 	JBClassInitReal(Cls, Name, Size, Parent, b);
 	return Cls;

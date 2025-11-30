@@ -7,8 +7,8 @@ extend SCFunction
 		|| p = rz.ptr
 		|| after = .FatToASM(P, P+rz.Size)
 		rz.Size = after-p
-		rz.length = rz.Size
-	// cosmic lore unfold... into tales untold
+		rz.length = rz.Size   //   ::::::]]]]]]]
+
 
 	function FatFirst (|&fatasm|)
 		return Assembler.sh.start + .µstart
@@ -30,9 +30,7 @@ extend SCFunction
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
 				|| r = fat.JumpPrm
-					fat.FillLabelRequest(where, rz, r-1)
-//		printline .exportname + " defatted"
-	
+					fat.FillLabelRequest(where, rz, r-1)	
 	
 	target debug
 		render µRender (|bool|RenderBlocks=false)
@@ -50,6 +48,7 @@ extend SCFunction
 		target debug
 			printline self
 			printline .µRender
+
 
 	iterator fat
 		|| FirstInst = .FatFirst
@@ -89,8 +88,10 @@ function JBin.JRenderASM (|SCFunction| fn)
 	|| t = fn.GuessASMSize
 	fn.µLengthGuess = t
 	Compiler.stTotalASMOps += t
+	|| tmp = Options.TargetDebug
+		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
 	|| after = fn.FatToASM(Start, Start+t)
 	check (after-start==t) (fn, "ASM length corrupt")
-	
-
+	if tmp
+		.exit

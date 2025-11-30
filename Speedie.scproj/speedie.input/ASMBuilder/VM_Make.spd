@@ -219,8 +219,6 @@ function SafeWrite (|String| name, |FastString| data)
 
 function MakeTheVM (|bool|)
 	compiler.Project.use
-	if 0
-		nil|message|!.TIME // stop strip
 	if .BuildFiles	
 		asm.TestASM
 	return stderr.ok

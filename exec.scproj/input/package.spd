@@ -7,12 +7,14 @@ module CakeRun
 	|message|				Clss
 	|String|				Strings
 	|String|				FileSrc
-	|[SpdFunc]|				Funcs
+//	|[SpdFunc]|				Funcs
 	|&byte|					GlobBase = CakeRun.LibGlobs|&byte|
-	|&uint16|				GlobLink = cakerun.GlobTable
 	|&&nil|					RawFuncs = cakerun.LibFuncs
 	|int|					GlobalCount
 	|dictionary of &classdata| ClassTable = dictionary()
+	
+	constants
+		FuncIsLib = 1
 	
 	function LibGlobs (|&&nil|)
 		cpp_wrapper JB_App__LibGlobs
@@ -31,7 +33,7 @@ module CakeRun
 		return true
 		
 	syntax access (|int| i, |SpdFunc|)
-		return .Funcs[i]
+		return SpdTable.Funcs[i]
 
 	function message.Arg (|string| name, |bool| Err = false, |message|)
 		opt norefcounts
@@ -43,7 +45,7 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		return  .GetStructure  and  .LoadFuncs  and  .LoadClasses
+		return  .GetStructure  and  spdtable.LoadFuncs  and  .LoadClasses
 	
 	
 	function GetStructure (|bool|)
@@ -79,22 +81,3 @@ module CakeRun
 			.FileSrc = rz.OriginalParseData
 			if !rz.expect(@tmp, "cake")
 				rz = nil
-
-
-	function LoadFuncs (|bool|)
-		opt norefcounts
-
-		for spd in CakeRun.code
-			expect (CakeRun.funcs < SpdFnTable.FnLim)	(spd, "Too many functions")
-			if spd.IsString
-				SpdFnTable.Funcs <~ SpdFunc(spd)
-			  else
-				for spd.int
-					SpdFnTable.Funcs <~ SpdFunc() // placeholder				
-		
-		check  (SpdFnTable.Funcs >= 2)					(cakerun.code, "Missing 'main'")
-		SpdFnTable.Funcs.Shrink
-		return stderr.ok
-
-
-

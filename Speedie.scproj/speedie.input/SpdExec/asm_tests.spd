@@ -227,7 +227,7 @@ function Inline_Branch2 (|scdecl| D)
 function gggFunc (|int| A, |int|)
 	if A > 1
 		return 5
-	return compiler.ConfMsg.SlowCount
+	return compiler.ConfMsg.Count
 
 
 function gggAlter (|int| QA, |int| B, |int|)

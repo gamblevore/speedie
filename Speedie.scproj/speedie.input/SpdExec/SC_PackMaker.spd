@@ -161,27 +161,25 @@ module PackMaker
 		j.AddInt(.PackGlobSize + 16)
 		j.enter
 		
-		|| Stack_Trace = FastString()
-		.RenderASM(j, stack_trace)
+		.RenderASM(j)
 		.DumpStrings(j)
 		.PackAllClasses(j)
-		.AddDebugStuff(j, stack_trace)
+		.AddDebugStuff(j)
 		j.ExitAll
 	
 	
-	function AddDebugStuff (|jbin| j, |string| func_names)
+	function AddDebugStuff (|jbin| j)
+		|| dbg = assembler.sh.debuginfo			#require
+
 		j.tmp("debug")
-		|| f3 = func_names.compress
-		j.Add(@str, f3)
-		|| dbg = assembler.sh.debuginfo
-			|| str = dbg.GetResult.Compress
-			assembler.sh.debuginfo = nil
-			compiler.stDebugInfo += str.length
-			j.AddStr(str)
+		|| str = dbg.GetResult.Compress
+		assembler.sh.debuginfo = nil
+		compiler.stDebugInfo += str.length
+		j.AddStr(str)
 		j.exit(2)
 
 	
-	function RenderASM (|jbin| j, |faststring| func_names)
+	function RenderASM (|jbin| j)
 		opt norefcounts
 		j.enter(@tmp, "code")
 		j.Enter
@@ -189,10 +187,7 @@ module PackMaker
 			if PackSaved.AddOrShrink(j, f is UsedByASM)
 				scfunction.currfunc = f
 				j.JRenderASM(f)
-				func_names <~ f.exportname
-				func_names <~ '\n'
-		j.exit
-		j.Exit
+		j.exit(2)
 		scfunction.currfunc = nil
 		
 		
@@ -246,7 +241,7 @@ module PackMaker
 				|| BaseClass = .InterfaceForBehaviour(fn)
 					j.Cakeify(fn)
 					continue
-			.missingbehaviour(m.name)
+			.missingvirtual(m.name)
 
 	
 	function jbin.Cakeify (|scfunction| fn)

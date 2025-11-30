@@ -85,7 +85,7 @@ static bool IsDummy( const AllocationBlock* Block ) {
     return OwnersDummy == Block;
 }
 static fpDestructor GetDestructor_(AllocationBlock* B) {
-	return (fpDestructor)(B->CppTable->__destructor__);
+	return (fpDestructor)(B->Virtuals->__destructor__);
 }
 
 
@@ -131,7 +131,7 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
     Cls.Parent = Parent;
     if (!Table) //
 		Table = &DummyFuncTable;
-    Cls.CppTable = Table;
+    Cls.Virtuals = Table;
     Cls.DefaultBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
     Cls.Memory.RefCount = 1024;
     Cls.Memory.Class = &Cls;
@@ -150,24 +150,32 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 }
 
 
-// interpreter uses these two
-JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent) {
-	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
-	if (Cls)
-		JBClassInitReal(*Cls, Name, Size, Parent, 0);
+// interpreter
+JB_Class* CakeClass;
+void** CakeVirtuals;
+bool JB_Cake__Prepare (int N, int B) {
+	N*=sizeof(JB_Class);
+	B*=sizeof(void*);
+	byte* Data = (byte*)calloc(N + B + 8, 1);
+	if (!Data) return false;
+	CakeClass = (JB_Class*)Data;
+	CakeVirtuals = (void**)(Data + N + 8);
+	return true;
+}
+
+void** JB_Cake_Virtuals(JB_Class* C) {
+	return (void**)C->Virtuals;
+}
+
+JB_Class* JB_Cake__Class(const char* Name, int Size, JB_Class* Parent, int VCount) {
+	auto Cls = CakeClass;
+	CakeClass = Cls + 1;
+	auto V = CakeVirtuals;
+	CakeVirtuals = V + VCount;
+	JBClassInitReal(*Cls, Name, Size, Parent, (JBObject_Behaviour*)V);
 	return Cls;
 }
 
-
-void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd) {
-	void** A = (void**)(malloc(sizeof(void*) * n));
-	cls->CppTable = (JBObject_Behaviour*)A; // both tables should agree with each other 
-	*Cpp = A;
-
-	void** B = (void**)(malloc(sizeof(void*) * n));
-    cls->SpdTable = B;
-	*Spd = B;
-}
 
 
 MemStats JB_MemoryStats(JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
@@ -560,7 +568,7 @@ JB_Class* JB_ObjClass(JB_Object* Obj) {
 uint8* JB_ObjClassBehaviours(JB_Object* Obj) {
     // assume exists.
     auto Block = ObjBlock_(Obj);
-    return (uint8*)(Block->CppTable);
+    return (uint8*)(Block->Virtuals);
 }
 
 
@@ -664,7 +672,7 @@ static inline void SetupSuper_(SuperBlock* Super, JB_MemoryWorld* W) {
     while (Curr < End) {
         AllocationBlock* Next = JBShift(Curr, Size);
         Curr->Super = Super;
-        Curr->CppTable = &SuperSanityTable;
+        Curr->Virtuals = &SuperSanityTable;
         Curr->Owner = 0; // for clearing
         Curr->Next = Next;
         Curr = Next;
@@ -768,8 +776,7 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
 	NewBlock->DebugMark = ++DM;
     Sanity(NewBlock);
     JB_Class* Class = Mem->Class;
-    NewBlock->CppTable = Class->CppTable; // faster vfuncs
-    NewBlock->SpdTable = Class->SpdTable;
+    NewBlock->Virtuals = Class->Virtuals; // faster vfuncs
     NewBlock->Owner = Mem;
 
 	int Size = Class->Size;
@@ -1058,7 +1065,7 @@ static void BlockFree_( AllocationBlock* FreeBlock ) {
         // return block to superblock
 
         FreeBlock->Prev = 0;
-        FreeBlock->CppTable = &SuperSanityTable;
+        FreeBlock->Virtuals = &SuperSanityTable;
         FreeBlock->Next = Super->FirstBlock;
         Super->FirstBlock = FreeBlock;
         Sanity(FreeBlock->Next, false); // this might not even be a real block?

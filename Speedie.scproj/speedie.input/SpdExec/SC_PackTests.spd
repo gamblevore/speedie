@@ -1,5 +1,6 @@
 	
 	
+target debug {
 extend_module PackMaker	
 	syntax access (|int| v, assigns:|int64|)
 		|| r = jb_vm.vm.Registers(false)+v
@@ -19,75 +20,68 @@ extend_module PackMaker
 			scfunction.currfunc = rz 
 			
 	
-	function RunAFewTests 
-		target debug {
-		|scfunction--| fn
-		
-		fn = .testfn("FloatConsts")
-		if fn
-			|| D = fn.TestObesity|&f64|[]
-			D = D
+function PackMaker.RunAFewTests 
+	|scfunction--| fn
+	
+	fn = .testfn("FloatConsts")
+	if fn
+		|| D = fn.TestObesity|&f64|[]
+		D = D
 
-		fn = .testfn("SemiConst")
-		if fn
-			for i in 2
-				self[0] = i*16K
-				|| found = fn.TestObesity|&int|[]
+	fn = .testfn("SemiConst")
+	if fn
+		for i in 2
+			self[0] = i*16K
+			|| found = fn.TestObesity|&int|[]
+	
+	fn = .testfn("AndOrConsts")
+	if fn
+		|| Andor = fn.TestObesity|&int64|[]
+	
+	fn = .testfn("ForeignFuncs")
+	if fn
+		self[0] = "hello", self[1] = "abc"
+		|| str = fn.TestObesity|&string|[]
+		printline str
 		
-		fn = .testfn("AndOrConsts")
-		if fn
-			|| Andor = fn.TestObesity|&int64|[]
-		
-		fn = .testfn("ForeignFuncs")
-		if fn
-			self[0] = "hello", self[1] = "abc"
-			|| str = fn.TestObesity|&string|[]
-			printline str
-			
-		fn = .testfn("Math2")
-		if fn
-			for i in 5
-				self[0] = 12+i, self[1] = 6+i
-				|| num = fn.TestObesity|&int64|[]
-				
-		fn = .testfn("Mul")
-		if fn
-			self[0] = 8725, self[1] = 275, self[2] = 4, self[3] = 2	
+	fn = .testfn("Math2")
+	if fn
+		for i in 5
+			self[0] = 12+i, self[1] = 6+i
 			|| num = fn.TestObesity|&int64|[]
-			if num != 18000
 			
-		fn = .testfn("AndOr")
-		if fn
-			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
-			|| Andor = fn.TestObesity|&int64|[]
-			if andor != 3
-			
-		fn = .testfn("AndOr2")
-		if fn
-			for i in 4
-				self[0] = i&1,   self[1] = (i&2)>>1
-				|| AndOr2 = fn.TestObesity|&int64|[]
-			
-		fn = .testfn("TestAtomic")
-		if fn
-			|| atomic = fn.TestObesity|&int|[]
-			printline atomic
-		}
-
-
-function SCFunction.operatorin (|string| s, |bool|)
-	opt norefcounts
-	return .parent.name ~= s
+	fn = .testfn("Mul")
+	if fn
+		self[0] = 8725, self[1] = 275, self[2] = 4, self[3] = 2	
+		|| num = fn.TestObesity|&int64|[]
+		if num != 18000
+		
+	fn = .testfn("AndOr")
+	if fn
+		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
+		|| Andor = fn.TestObesity|&int64|[]
+		if andor != 3
+		
+	fn = .testfn("AndOr2")
+	if fn
+		for i in 4
+			self[0] = i&1,   self[1] = (i&2)>>1
+			|| AndOr2 = fn.TestObesity|&int64|[]
+		
+	fn = .testfn("TestAtomic")
+	if fn
+		|| atomic = fn.TestObesity|&int|[]
+		printline atomic
 
 
 |ivec4| Butter 
 function SCFunction.TestObesity (|!&ivec4|)
-	opt norefcounts
 	target debug
 		|| mu = .µLength
-			|| mu2 = .µTest
+			|(memory of asm)--| mu2 = .µTest
 			.µprint
-			rz = jb_vm.Run(mu2.ptr, mu2.length)
-	if !rz?
-/		rz = butter
+			return jb_vm.Run(mu2.ptr, mu2.length)
+	return butter
+
+}
 

@@ -1,14 +1,70 @@
 
 
 
+function CakeRun.CountClasses (|message| list)
+	opt norefcounts
+	|| N = 0
+	|| B = 0
+	for c.fast in list
+		|| PK = c[1]
+			N++
+			|| PB = pk.Count
+			B += PB
+			pk.RangeLength = PB
+	Classdata.cakeprepare(N, B)
+		
+	
 function CakeRun.LoadClasses (|bool|)
 	opt norefcounts
 	for cd in ClassData.First_
 		.StoreClass(cd)
 
-/	for c.fast in .Clss
+	.CountClasses(.clss)
+	for c.fast in .Clss
 		.LoadOneClass(C)
 	return StdErr.ok
+
+
+function Cakerun.Func (|message| V, |uint64|)
+	opt norefcounts
+	|| Info = V.int(0, 1, 64K)$
+	|| Index = Info >> 1
+	|| Spd = 1|uint64|<<63
+	if Info&FuncIsLib
+		return ((RawFuncs+Index)|int64|) &~ Spd
+
+	|| Fn = SpdTable.Funcs[Index]					#expect (V, "Virtual out of bounds")
+	|| spdfn = fn.SpeedieFunc						#expect (V, "Virtual is missing")
+	return spdfn|int64| ||| Spd
+	
+	
+function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |message| PK)
+	opt norefcounts
+	|| sz = c[2].int
+	|| Parent = cakerun[c[@thg, 1]]$
+
+	|| Name = s.Name
+	Name.Addr[name.Length] = 0 // :]
+	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, Parent, PK.rangelength)
+	where[0] = ClsData
+	cakerun.ClassTable[name] = ClsData
+
+	|| V = ClsData.Virtuals
+	for VFn.fast in PK
+		V++[] = .Func(Vfn[@num])|&nil|
+
+
+function Cakerun.LoadOneClass (|message| s)
+	opt norefcounts
+	|| c = S[@list]!
+	|| Num = c[@num]
+	|| I = Num.int									#require
+	
+	|| Where = ((CakeRun.GlobBase!)|&byte| + I)|&?&classdata|
+	|| PK = c.next
+		PK.Expect(@list)
+		return .UnpackClass(s, c, where, pk)
+	where[0] = cakerun[s]
 
 
 function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
@@ -22,33 +78,7 @@ function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
 function CakeRun.StoreClass (|ClassData| cd)
 	|| name = cd.Name.wrap
 	.ClassTable.ValueLower(name) = cd
-	
 
-function Cakerun.LoadOneClass (|message| s)
-	opt norefcounts
-	|| c = S[@list]
-	|| Num = c[@num]
-	|| I = Num.int									#require
-	
-	|| Where = ((CakeRun.GlobBase!)|&byte| + I)|&?&classdata|
-	|| PackClass = c.next
-	if !PackClass			// a native class. lets store in globs
-		where[0] = cakerun[s]
-		return
-
-	|| sz = c[2].int
-	|| P = cakerun[c[@thg, 1]]
-
-	|| Name = s.Name
-	Name.Addr[name.Length] = 0 // :]
-	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, p)
-	where[0] = ClsData
-	cakerun.ClassTable[name] = ClsData
-
-	for V in C.next(@list)
-		// what do these numbers represent? it has to be from the func-table, right?
-		// shouldn't we process them after processing the func-table?
-		// lets do the func-table first!
 
 /*
 How to cross-call? Single-table, and branch
@@ -79,13 +109,17 @@ tmp tetris
 */
 
 
-function cakerun.NewBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
-	cpp_Wrapper JBClassAllocBehaviour
+function cakerun.Virtuals (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
+	cpp_Wrapper JB_Cake__Virtuals
 
+function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, |int| Virtuals,  |&ClassData|)
+	cpp_wrapper JB_Cake__Class
 
-// maybe should allocate behaviour too. Assume all spd funcs.
-function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
-	cpp_wrapper JBClassNew
+function @ClassData.CakePrepare  (|int| ClassCount, |int| VCount, |bool|)
+	cpp_wrapper JB_Cake__Prepare
+
+function ClassData.Virtuals  (|&&nil|)
+	cpp_wrapper JB_Cake_Virtuals
 
 	
 

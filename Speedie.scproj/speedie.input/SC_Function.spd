@@ -1530,6 +1530,7 @@ function Tran_Debugger (TranFunc)
 
 function Tran_BreakPoint (|scfunction| fn, |scnode| p, |message| ch)
 	opt norefcounts
+	(ch isnt BreakPoint)
 	using ch
 		|| trap = @tmp.msg
 		ch.prev = trap

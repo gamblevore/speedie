@@ -198,22 +198,3 @@ function assembler.ASMReach (|scfunction| fn)
 	if Orig.MyReacher and !orig.IsLibrary
 		(fn is usedbyasm)
 
-
-//function PrmPrint (|string| s)
-//	opt norefcounts
-//	
-//	print s
-//	print " "
-//	printline .fn.exportname
-//	
-//	for a in .fn.Args
-//		print a.name
-//		print ": "
-//		print (a is const).render
-//		print ", "
-//		print (a is reference).render
-//		print ", "
-//		printline (a.wholetype.reg).render
-//	printline s
-//	printline
-//	printline

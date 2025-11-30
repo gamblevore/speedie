@@ -113,6 +113,7 @@ module Feedback
 				target !cake
 					m.PrintLocate
 				nil|asmreg|.DebugPrint
+				nil|message|!.TIME // stop strip
 				|fatasm| X
 				X.DebugPrint
 		if 0
