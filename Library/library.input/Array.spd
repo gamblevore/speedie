@@ -84,9 +84,6 @@ class Array (saveable)
 		nil checker
 		cpp_wrapper JB_Array_Size
 	
-	function FastShrink (|int| to=0)
-		cpp_Wrapper JB_Array_FastShrink
-	
 	function Reverse
 		cpp_wrapper JB_Array_Reverse
 	
@@ -110,7 +107,11 @@ class Array (saveable)
 	
 	function Count (|int|)
 		disabled "Use .length instead"
-		
+	
+	function Shrink
+		description "Makes the array minimise space used. (Removes spare-unused space)" 
+		cpp_wrapper  JB_Array_Shrink
+	
 	function Length (assigns:|int|)
 		cpp_wrapper JB_Array_SizeSet
 
@@ -157,7 +158,6 @@ class Array (saveable)
 	function Find (|| f, |ind|)
 		nil checker
 		cpp_wrapper JB_Array_Find
-
 
 	syntax Compare (|int| n, |int|)
 		nil self

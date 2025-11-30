@@ -248,7 +248,7 @@ static void RangeFix_(Dictionary0* D) {
 }
 
 
-JB_String20*  TheDictName; // don't use this for set!
+JB_String16*  TheDictName; // don't use this for set!
 static JB_String* NotSharedDict_(JB_String* Key) {
     if (Key != TheDictName) {
         return Key;
@@ -834,11 +834,9 @@ bool JB_Nav_MoveNext(DictionaryReader* self) {
     if (!self) {return false;}
     FindResult& State = self->State;
     
-    while (MoveNext_(State)) {
-        if (State.Obj) {
+    while (MoveNext_(State))
+        if (State.Obj)
             return true;
-        }
-    }
     
     return false;
 }
@@ -904,13 +902,13 @@ DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict )
 
 
 void JB_Dict__Init() {
-    TheDictName = (JB_String20*)JB_Str_New(20);
+    TheDictName = (JB_String16*)JB_Str_New(16);
     JB_SetRefCount(TheDictName, 10000);
     TheDictName->Addr = TheDictName->Data;
 }
 
 
-JB_String* JB_DictName_Trim (JB_String20* D, int N) {
+JB_String* JB_DictName_Trim (JB_String16* D, int N) {
     uint8* Addr = D->Data;
     while (!Addr[N-1] and --N>1) {};
     D->Length = N;
@@ -918,13 +916,13 @@ JB_String* JB_DictName_Trim (JB_String20* D, int N) {
 }
 
 JB_String* JB_Obj_DictName (JB_Object* obj) {
-    JB_String20* D = TheDictName;
+    JB_String16* D = TheDictName;
     *((JB_Object**)D->Data) = obj;
     return JB_DictName_Trim(D, sizeof(obj));
 }
 
 JB_String* JB_int64_DictName (int64 obj) {
-    JB_String20* D = TheDictName;
+    JB_String16* D = TheDictName;
     *((int64*)D->Data) = obj;
     return JB_DictName_Trim(D, sizeof(obj));
 }

@@ -168,7 +168,7 @@ JB_String* JB_Str_NewInlined(int Length, JB_Class* Cls) {
     if (!Length)
         return JB_Str__Empty();
     
-    JB_String20* Result = (JB_String20*)(JB_NewClass(Cls));
+    JB_String16* Result = (JB_String16*)(JB_NewClass(Cls));
     Result->Data[Length]=0; // zero term
     Result->Addr = (Result->Data);
     Result->Length = Length;
@@ -177,7 +177,7 @@ JB_String* JB_Str_NewInlined(int Length, JB_Class* Cls) {
 
  
 JB_String* JB_Str_NewCStr (int64 N) {
-	int Extra = (N == 4 or N == 20);
+	int Extra = (N == 4 or N == 16);
 	JB_String* Rz = JB_Str_New(N + Extra);
 	if (Rz and Extra) {
         Rz->Addr[N] = 0; // ooof.
@@ -188,13 +188,13 @@ JB_String* JB_Str_NewCStr (int64 N) {
 
 JB_String* JB_Str_New (int64 Length) {
 	// only allows huge values to "Catch" file-errors... otherwise limited to int-length.
-	if (Length <= 20) {
-        if (Length <= 4) {
+	if (Length < 16) {
+        if (Length < 8) {
             if (Length < 0)
 				return 0;	// error
-			return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String4) );
+			return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String8) );
         }
-        return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String20) );
+        return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String16) );
     }
     
     require (Length <= kStrLengthMax);
@@ -226,11 +226,11 @@ JB_String* Str_Shrink (JB_String* u, int Length) {
 	// keep the class unless it's resizeable... otherwise just copy...
 	
 	JB_Class* Cls = JB_ObjClass(u);
-	if ( Cls == JB_AsClass(JB_String4)  or  Cls == JB_AsClass(JB_String20) ) {
+	if ( Cls == JB_AsClass(JB_String8)  or  Cls == JB_AsClass(JB_String16) ) {
 	   u->Length = Length; // just keep it.
 	   return u;
 	}
-	if ( Cls == JB_AsClass(JB_String) and Length > 20 ) {
+	if ( Cls == JB_AsClass(JB_String) and Length >= 16 ) {
 		JB_BA_Realloc_(u, Length);
 		return u;
 	}

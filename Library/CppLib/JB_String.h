@@ -52,12 +52,12 @@ JBClass( JB_StringC, JB_String,
 
 );
 
-JBClass( JB_String4, JB_String,
-        uint8  Data[4];
+JBClass( JB_String8, JB_String,
+        uint8  Data[8];
 );
 
-JBClass( JB_String20, JB_String,
-        uint8  Data[20];
+JBClass( JB_String16, JB_String,
+        uint8  Data[16];
 );
 
 

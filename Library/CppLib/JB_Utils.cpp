@@ -143,10 +143,10 @@ JB_String* JB_Platform() {
 
 
 bool HasCStringSpace_(JB_Class* Cls, int N) {
-	if (Cls==JB_AsClass(JB_String4))
-		return 4 > N;
-	if (Cls==JB_AsClass(JB_String20))
-		return 20 > N;
+	if (Cls==JB_AsClass(JB_String8))
+		return 8 > N;
+	if (Cls==JB_AsClass(JB_String16))
+		return 16 > N;
 	return false;
 }
 
