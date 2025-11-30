@@ -2,7 +2,7 @@
 
 Speedie's Virtual Machine, "`Cake`", is a perfect match for Speedie. It compiles 2-3x smaller than ARM on average, improving VM speed.
 
-Speedie doesn't require `Cake` to run it's programs. Speedie can output C++ and compile that.
+Speedie doesn't require `Cake` to run it's programs. Speedie can output C++ and compile that. Because `cake` is a VM... programs run within it will run  slower than natively compiled code. But thats not the issue. The issue is to allow debugging to be possible, easy and fun! Not possible without a proper VM. However, this VM has many more advantages than just debugging...
 
 `Cake` makes new things possible!
 
