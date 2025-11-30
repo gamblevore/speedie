@@ -12,7 +12,9 @@ class SpdFunc
 	
 	constructor (|message| code)
 		opt norefcounts
-		.name = ""
+		.name = (code.name, "")(code.func==@tmp)
+		if code.func == @tmp
+			code = code.first!
 		|| s    = Code.name
 		|| blob = (s.addr-4)|&ASMBlob|
 		|| orig_str = CakeRun.FileSrc
