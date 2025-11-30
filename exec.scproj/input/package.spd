@@ -13,7 +13,6 @@ module CakeRun
 	|&&nil|					RawFuncs = cakerun.LibFuncs
 	|int|					GlobalCount
 	|dictionary of &classdata| ClassTable = dictionary()
-	|&classdata|			Obj
 	
 	function LibGlobs (|&&nil|)
 		cpp_wrapper JB_App__LibGlobs
@@ -44,7 +43,7 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		return .GetStructure   and  .Loadfuncs  and  .LoadClasses
+		return  .GetStructure  and  .LoadFuncs  and  .LoadClasses
 	
 	
 	function GetStructure (|bool|)
@@ -87,8 +86,15 @@ module CakeRun
 
 		for spd in CakeRun.code
 			expect (CakeRun.funcs < SpdFnTable.FnLim)	(spd, "Too many functions")
-			SpdFnTable.Funcs <~ SpdFunc(spd)
-
-		check  (SpdFnTable.Funcs >= 2)					(cakerun.code, "Missing 'main'")
-		return stderr.ok
+			if spd.IsString
+				SpdFnTable.Funcs <~ SpdFunc(spd)
+			  else
+				for spd.int
+					SpdFnTable.Funcs <~ SpdFunc() // placeholder				
 		
+		check  (SpdFnTable.Funcs >= 2)					(cakerun.code, "Missing 'main'")
+		SpdFnTable.Funcs.Shrink
+		return stderr.ok
+
+
+

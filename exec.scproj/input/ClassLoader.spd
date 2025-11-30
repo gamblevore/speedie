@@ -22,8 +22,6 @@ function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
 function CakeRun.StoreClass (|ClassData| cd)
 	|| name = cd.Name.wrap
 	.ClassTable.ValueLower(name) = cd
-	if name ~= "object"
-		.obj = cd
 	
 
 function Cakerun.LoadOneClass (|message| s)
