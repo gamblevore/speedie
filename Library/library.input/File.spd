@@ -138,7 +138,8 @@ class File (String)
 		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
 		|| S = .ReadAll(lim, allowmissing)
-		s = s.Decompress(lim, nil)
+		if s.iscompressed
+			s = s.Decompress(lim, nil)
 		if s
 			(Message).CreateLayerAndUse(self, s) 
 			rz = S.parse(owner, false) // already decompressed.
