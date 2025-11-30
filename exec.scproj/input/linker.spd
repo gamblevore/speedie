@@ -19,11 +19,11 @@ module SpdTable
 	syntax Append (|message| spd)
 		opt norefcounts
 		expect (.Funcs < .FnLim)					(spd, "Too many functions")
-		if spd.IsString
-			.Funcs <~ SpdFunc(spd)
-		  else
+		if spd == @num
 			for spd.int
-				.Funcs <~ SpdFunc() // placeholder				
+				.Funcs <~ SpdFunc() // placeholder
+		  else
+			.Funcs <~ SpdFunc(spd)
 		
 	function LoadFuncs (|bool|)
 		opt norefcounts
