@@ -80,15 +80,17 @@ However, this doesn't work so well for user-facing data, like config-files. In t
 
 To get around this, just do:  x = str.parse(@arg)
 `
-	|| data = self[.isjbin max 0, int.max]
-
+	|| J1 = .IsJbin
+	|| data = self[J1 max 0, int.max]
 	if AllowDecomp and data.iscompressed
 		data = data.decompress(int.max)
-	|| j2 = data.isjbin
-		data = data[j2, int.max]
-		rz = data.ParseJbin
+		J1 = data.IsJbin
+	|MessageRoot--| Doc
+	if J1
+		doc = data.ParseJbin
 	  else
-		rz = data.ParseSub(owner)
+		doc = data.ParseSub(owner)
+	return doc
 		
 
 
