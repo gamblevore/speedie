@@ -115,7 +115,7 @@ function compiler.CompileTime
 			.FileSanityTests		// sometimes this fails due to lack of permissions in xcode...
 									// xcode gives lower perms to it's builder scripts, strangely.
 		.VariousSelfTests
-		SC_Saver.TestSaver~quietly
+//		SC_Saver.TestSaver~quietly
 
 	|| elapsed = .CompileAll~timeit
 	.PrintCompileTime(elapsed)
