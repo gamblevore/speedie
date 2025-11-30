@@ -287,7 +287,7 @@ function perryide.UpdateFoundHeader
 		|| matches = 0
 		for s.fast in f.ListSource
 			files ++
-			matches += s.SlowCount
+			matches += s.Count
 		h.Name = (matches of "match") + " in " + (files of "file")
 
 
@@ -381,7 +381,7 @@ function PerryIDE.DidReplace (|int| n, |string| dest)
 function PerryIDE.CanReplace (|string| r,  |listviewrow| root,  |string| src,  |bool|)
 	|| n = 0
 	for f in root
-		n += f.SlowCount
+		n += f.Count
 	return "Replace $n matches of: \"$src\"\n\nWith: \"$r\" ?".Confirm
 
 
@@ -554,7 +554,7 @@ function LogAreaKeys (GuiKeyEvent)
 
 	|| s1 = .ide.LogComms!
 	|| s2 = .ide.LogActions!
-	|| c = s1.SlowCount + s2.SlowCount
+	|| c = s1.Count + s2.Count
 		if "Clear log?\n\nContains $c items.".confirm
 			s1.clear
 			s2.clear

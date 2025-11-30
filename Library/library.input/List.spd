@@ -74,7 +74,7 @@ class list (Saveable)
 	
 	syntax Compare (|int| n, |int|)
 		inline
-		return .SlowCount - n
+		return .Count - n
 	
 	syntax Equals (|int| n, |bool|)
 		inline
@@ -284,7 +284,7 @@ class list (Saveable)
 
 	function ShuffleNow
 		opt norefcounts
-		|| n = .slowcount
+		|| n = .count
 		for n
 			.first = .last!.move(-n.now)
 
@@ -308,10 +308,7 @@ class list (Saveable)
 			f.remove
 
 	function Count (|int|)
-		disabled "This function is slow. Use .HasChildCount or .SlowCount (a more honestly named version of .count... there is no fast way to do this.)"
-
-
-	function SlowCount (|int|)
+		description "This will loop over the list and count them."
 		opt norefcounts
 		for c.fast in self
 			++rz
@@ -347,7 +344,7 @@ class list (Saveable)
 					rz--
 	
 	function Rand (||)
-		return self[.slowcount()()]
+		return self[.Count()()]
 
 	render
 		cpp_name JB_List_Render

@@ -1573,7 +1573,7 @@ extern "C" void JB_Str_Clone(JB_StringShared* self, JB_String* orig) {
 }
 
 
-JB_String* JB_Str_Range(JB_String* self, int StartOff, int AfterOff) {
+JB_String* JB_Str_Range(JB_String* self, int StartOff, int AfterOff, bool ShareAlways) {
 	if_rare ( !self ) {
 		debugger;
 		return 0;
@@ -1590,7 +1590,7 @@ JB_String* JB_Str_Range(JB_String* self, int StartOff, int AfterOff) {
         return self;
 
 	if ( Length > 1 ) {
-        if (Length <= 4)
+        if (Length <= 7 and ShareAlways == false)
             return JB_Str_CopyFromPtr( (uint8*)self->Addr + StartOff, Length);
         
         JB_StringShared* u = JB_New( JB_StringShared );
@@ -1768,8 +1768,8 @@ int JB_Str_LengthUTF8(JB_String* self) {
 }
 
 
-////////////    #include "StringProperties.i"
 
+////////////    #include "StringProperties.i"
 
 bool JB_Str_IsASCII(JB_String* self) {
 	return IsAsciiSub_( self->Addr, self->Length );
@@ -1903,7 +1903,6 @@ JB_String* JB_Str_Render(JB_String* self, FastString* fs_in) {
 JB_String* JB_CStr_Render(const char* Name, FastString* fs_in) {
     if (!fs_in)
         return JB_StrC(Name); 
-    
     JB_FS_AppendCString(fs_in, Name);
     return 0;
 }
@@ -1914,7 +1913,6 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
     // well... let's see? something that parses OK in jeebox and we can understand OK?
     // ["abc"] // array of string
     // [1234]  // array of int-object
-    // [(1,2,3)] // array of set
     // [JB_List(741)] // seems to make sense?
     FastString* fs = JB_FS__FastNew(fs_in);
 
@@ -1935,7 +1933,7 @@ JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in) {
     }
     
     JB_Class* Cls = JB_ObjClass(self);
-    auto R = Cls->CppTable->render;
+    auto R = Cls->Virtuals->render;
     fpRenderer FN = (fpRenderer)R;
     if (!FN or (FN == JB_Obj_Render)) {
         return JB_Obj_GenericRender(self, fs_in);

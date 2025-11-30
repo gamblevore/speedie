@@ -103,7 +103,7 @@ extend PerryIDE
 		opt norefcounts
 		|| h = .errorlist.headers
 			h.name = ""
-			|| n = .errorlist.listsource.slowcount
+			|| n = .errorlist.listsource.Count
 				h.name = n of "issue"
 
 	function ExpandCompileSep (|bool|)

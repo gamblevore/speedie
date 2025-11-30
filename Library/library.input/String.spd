@@ -39,7 +39,6 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_LengthUTF8
 
-// (need to reorder these func params to put find first)
 	autogen _InByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		nil checker
 		cpp_wrapper JB_Str_InByte
@@ -528,8 +527,8 @@ class String
 		nil checker
 		description "Returns 0 if the value can't be found. If you want a different number, call .byte(|int| index, |int| default)" 
 		cpp_wrapper JB_Str_ByteValue
-		
-	syntax Access (|int| start, |int| after, |string|)
+	
+	syntax Access (|int| start, |int| after, |bool| ShareAlways=false, |string|)
 		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
 		
 	function Right (|int| N, |string|)

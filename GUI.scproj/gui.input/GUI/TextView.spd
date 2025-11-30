@@ -2255,18 +2255,22 @@ class TextView (GUIControl)
 
 	function ShouldDisplayJeebox (|int|)
 		opt norefcounts
+		|| d = .Document
+			if d.WasJbin
+				.ShowLineNumbers = true
 		|| t = .text
 		if t.HasWord("//lineson")
 			.ShowLineNumbers = true
 		if t.HasWord("//linesoff")
 			.ShowLineNumbers = false
-		|| dj = .document.ExpectJeebox?
-		|| x = .ExpectsParse
-			if x >= AlwaysJeebox
-				return x
+		rz = .ExpectsParse
+		if rz
+			if rz >= AlwaysJeebox
+				return rz
 			if t.HasWord("<?jb?>") or t.hasword("//jb")
-				x = CurrentlyJeebox
-		return x|int| max dj
+				rz = CurrentlyJeebox
+		if d
+			(rz max= d.ExpectJeebox)
 
 
 	helper IsJeeboxMode (|bool|)

@@ -41,6 +41,52 @@ void JB_FS_AppendMini(FastString* fs, MiniStr S) {
 }
 
 
+// oofington
+void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...) {
+    va_list Vargs; va_start(Vargs, Fmt);
+    u8* Addr = Fmt->Addr;
+    int Length = Fmt->Length;
+    for (int i = 0; i < Length; i++) {
+		int Ty = Addr[i];
+        switch (Ty) {
+            case 0: {
+                JB_String* s = va_arg(Vargs, JB_String*);
+                JB_FS_AppendString(fs, s);
+                break;
+            } case 1: {
+                const char* c = va_arg(Vargs, const char*);
+                JB_FS_AppendCString(fs, c);
+                break;
+            } case 2: {
+                int b = va_arg(Vargs, int);
+                JB_FS_AppendByte(fs, b);
+                break;
+            } case 3: {
+                int64 hex = va_arg(Vargs, int64);
+                JB_FS_AppendHex(fs, hex, 2);
+                break;
+            } case 4: {
+                int64 i = va_arg(Vargs, int64);
+                JB_FS_AppendIntegerAsText(fs, i, 1);
+                break;
+            } case 5: {
+                Date d = va_arg(Vargs, Date);
+                JB_FS_AppendLocalTime(fs, d);
+                break;
+            } case 6: {
+                double d = va_arg(Vargs, double);
+                JB_FS_AppendDoubleAsText(fs, d, 7, 0);
+                break;
+            } default: {
+                JB_FS_AppendMem_(fs, Addr+i+1, Ty-6);
+			}
+		}
+	}
+    
+    va_end(Vargs);
+}
+
+
 void JB_FS_AppendMem_(FastString* fs, const uint8* s0, int Length) {
     MiniStr S = {Length, (uint8*)s0};
 	JB_FS_AppendMini(fs, S);
@@ -296,7 +342,6 @@ void JB_FS_AppendReplaceB(FastString* self, JB_String* Data, int From, int To) {
 uint8* JB__WriteIntToBuffer (uint8* wp, int64 LeftOver) {
     do {
 		auto Div = std::div(LeftOver, (int64)10);
-
         *--wp = (uint8)(Div.rem + '0');
         LeftOver = Div.quot;
     } while (LeftOver);
@@ -370,7 +415,7 @@ bool HasDot (uint8* self, int Used) {
 
 
 
-static bool DoubleIsNormal (double D){
+static bool DoubleIsNormal (double D) {
 	return  D <= DBL_MAX  &&  D >= -DBL_MAX;
 }
 
@@ -455,15 +500,6 @@ void JB_FS_AppendShort(FastString* self, int s) {
 }
 
 
-// can’t share Appendint, due to float passing conventions :o(   )
-void JB_FS_AppendSingle(FastString* self, float f) {
-	float* fp = (float*)JB_FS_WriteAlloc_( self, 4 );
-	if (fp)
-		*fp = f;
-	FS_SanityCheck_(self);
-}
-
-
 void JB_FS_AppendInteger(FastString* self, int l) {
 	int* wp = (int*)JB_FS_WriteAlloc_Inline_( self, 4 );
 	if (wp) {
@@ -483,7 +519,7 @@ void JB_FS_AppendDouble(FastString* self, double d) {
 
 
                /* Utilities */
-int JB_FS_Mark(FastString* self) {
+int64 JB_FS_Mark(FastString* self) {
 	return self->WrittenLength + self->Length;
 }
 
@@ -529,7 +565,7 @@ int JB_FS_Length(FastString* self) {
 	return 0;
 }
 
-int JB_FS_StreamLength(FastString* self) {
+int64 JB_FS_StreamLength(FastString* self) {
 	if (self)
 		return self->Length + self->WrittenLength;
 	return 0;

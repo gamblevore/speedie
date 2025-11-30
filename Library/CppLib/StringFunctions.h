@@ -139,7 +139,7 @@ void JB_CompFreeNow();
 // StringSplitters
 
 //JB_String* JB_Str_Mid(JB_String* self, int Start, int Count);
-JB_String* JB_Str_Range(JB_String* self, int Start, int Finish);
+JB_String* JB_Str_Range(JB_String* self, int Start, int After, bool ShareAlways=false);
 //void JB_Str__Uniqify(Dictionary* D);
 JB_String* JB_Str_Left(JB_String* self, int Count);
 JB_String* JB_Str_Right(JB_String* self, int Count);

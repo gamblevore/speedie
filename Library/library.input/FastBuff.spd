@@ -67,7 +67,7 @@ struct FastBuff
 		cpp_part AccessStr
 		|| r = .ReadFrom
 		if r != nil
-			return r[pos, after] // better
+			return r[pos, after, true] // better
 		|| A = .clip(pos)
 		|| B = .clip(after, 0)
 		if B >= A

@@ -130,7 +130,7 @@ class ListView (GUIControl) {
 
 	function DesiredHeight (|int|)
 		opt norefcounts
-		rz = 2 + ((.ListSource.SlowCount max 2) * .RowHeight)
+		rz = 2 + ((.ListSource.Count max 2) * .RowHeight)
 		|| t = .typingfilter
 			rz += t.height - 1 
 

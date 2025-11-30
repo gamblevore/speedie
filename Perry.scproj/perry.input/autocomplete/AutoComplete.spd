@@ -30,7 +30,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	|| define = list.first
 	require define and list
 	define.remove
-	define.DefineToLine(list.SlowCount)
+	define.DefineToLine(list.Count)
 	define.name = "line"
 	
 	list.sort(CallFromSorter)

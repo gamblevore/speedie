@@ -23,7 +23,7 @@ function PerryIDE.ListAllFuncs (|bool| Sel = false, |string| Filter = "")
 	result.obj = (.editme._Start, nil)(sel)
 	result.Sort(FuncListSorter)
 	(.FunctionMenu is visible) = filter or result.HasAny
-	.FunctionMenu.text = "(" + result.SlowCount.Render + ")"
+	.FunctionMenu.text = "(" + result.Count.Render + ")"
 	.ImproveFuncList(Result)
 
 

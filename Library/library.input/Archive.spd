@@ -51,7 +51,7 @@ role FileArchive (message)
 
 
 	function FileCount (|int|)
-		return .last.slowcount
+		return .last.Count
 
 	
 	function SaveTo (|file| dest)

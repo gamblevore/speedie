@@ -330,7 +330,7 @@ class ButtonView (GUIControl)
 
 
 	function TrimWidth
-		|| n = .ButtonSource.slowcount max 1
+		|| n = .ButtonSource.Count max 1
 		|| w = n * (.ItemWidth + .ItemGap) - .ItemGap
 		.sizer.g(2, self)	= (w) ~ long
 

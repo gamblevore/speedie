@@ -38,7 +38,7 @@ class AppMenu (Window)
 
 
 	function ShowAsDialog
-		|| n	= .Choices.listsource.slowcount
+		|| n	= .Choices.listsource.Count
 		|| mh	= n * .Choices.rowheight + 4
 		.size	= 160~wide by (mh)~high
 		.Choices.size = the~area

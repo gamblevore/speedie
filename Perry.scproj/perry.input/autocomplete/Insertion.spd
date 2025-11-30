@@ -464,7 +464,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 	if ide.EditMeTabRetryThing
 		return 0
 	if  !s.width  and  (key is tab)  and  self[s.x].istextline
-		|| C = .ide.autocomplete.listsource.slowcount
+		|| C = .ide.autocomplete.listsource.Count
 		if C > 0 
 			if c == 1 and .AutoCompleteShowingDots_ == -1
 				return 0 // what?
