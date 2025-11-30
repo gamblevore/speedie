@@ -1332,41 +1332,41 @@ JB_String* JB_Str_Hex(JB_String* s, int Spaces, FastString* fs_in) {
 
 
 // bytemap should be removed. Just... do upper/lower manually!
-static int BM_Affects_(ByteMap* BM, JB_String* s) {
-	if (s and BM) {
-		uint8* map = BM->Cache;
-		uint8* a = s->Addr;
-		int n = s->Length;
-		for_(n) {
-			uint8 c = a[i];
-			if (map[c] != c) {
-				return i;
-			}
-		}
-	}
-	return -1;
-}
+//static int BM_Affects_(ByteMap* BM, JB_String* s) {
+//	if (s and BM) {
+//		uint8* map = BM->Cache;
+//		uint8* a = s->Addr;
+//		int n = s->Length;
+//		for_(n) {
+//			uint8 c = a[i];
+//			if (map[c] != c) {
+//				return i;
+//			}
+//		}
+//	}
+//	return -1;
+//}
 
-JB_String* JB_Str_MapBytes(JB_String* s, ByteMap* BM, int Clear) {
-	if ( BM_Affects_( BM, s ) == -1 ) return s;
-
-	JB_String* r = JB_Str_New( s->Length );
-
-	uint8* map = BM->Cache;
-	uint8* SelfPos = s->Addr;
-	uint8* OutPos = r->Addr;
-	int SelfLen = s->Length;
-
-	while ( SelfLen-- > 0 ) {
-		uint8 C = map[ *SelfPos++ ];
-		if (C!=Clear)
-			*OutPos++ = C;
-	}
-	r->Length = (int)(OutPos - r->Addr);
-
-	return r;
-}
-
+//JB_String* JB_Str_MapBytes(JB_String* s, ByteMap* BM, int Clear) {
+//	if ( BM_Affects_( BM, s ) == -1 ) return s;
+//
+//	JB_String* r = JB_Str_New( s->Length );
+//
+//	uint8* map = BM->Cache;
+//	uint8* SelfPos = s->Addr;
+//	uint8* OutPos = r->Addr;
+//	int SelfLen = s->Length;
+//
+//	while ( SelfLen-- > 0 ) {
+//		uint8 C = map[ *SelfPos++ ];
+//		if (C!=Clear)
+//			*OutPos++ = C;
+//	}
+//	r->Length = (int)(OutPos - r->Addr);
+//
+//	return r;
+//}
+//
 
 JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
 	int SelfLen = JB_Str_Length(self);
@@ -1404,7 +1404,7 @@ JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
 }
 
 
-JB_String* JB_ASCII() {
+JB_String* JB_ASCII () {
     static JB_String* ASCII = 0;
     if (!ASCII) {
         static const char kASCII[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 0};
@@ -1416,50 +1416,42 @@ JB_String* JB_ASCII() {
     return ASCII;
 }
 
-JB_String* JB_Upper() {
+JB_String* JB_Upper () {
     return JB_Str_Range( JB_ASCII(), 'A', 'Z' + 1 );
 }
 
-JB_String* JB_Lower() {
+JB_String* JB_Lower () {
     return JB_Str_Range( JB_ASCII(), 'a', 'z' + 1 );
 }
 
-
-
-JB_String* JB_Str_FastLower (JB_String* self) {
-    int N = self->Length;    
-    uint8* A = self->Addr;
-    for_(N) {
-		uint8 C = *A++;
-		if (C >= 'A' and C <= 'Z') {	// need lower-casing
-			return JB_Str_LowerCase(self);
-		}
+void JB_WriteCase_ (u8* Src, u8* Dest, int N, bool Upper);
+int FindRange_ (JB_String* Self, int A, int B) {
+	int N = Self->Length;
+	u8* S = Self->Addr;
+	for (int i = 0; i < N; i++) {
+		u8 C = S[i];
+		if (C >= A and C <= B)
+			return i;
 	}
-
-    return self;
+	return -1;
 }
 
-
-ByteMap* JB_BM__Lower() {
-    static ByteMap* LowerMap_ = 0;
-    if (!LowerMap_) {
-        LowerMap_ = JB_BM_Constructor( 0, JB_Upper(), JB_Lower() );
-        JB_Incr(LowerMap_);
-    }
-    return LowerMap_;
+JB_String* CaseStr_ (JB_String* Self, int A, int B, bool Upper) {
+	int N = FindRange_(Self, A, B);
+	if (N < 0)
+		return Self;
+	JB_String* Result = JB_Str_New(Self->Length);
+	if (Result)
+		JB_WriteCase_(Self->Addr, Result->Addr, Self->Length, Upper);
+	return Result;
 }
 
-JB_String* JB_Str_LowerCase(JB_String* self) {
-	return JB_Str_MapBytes( self, JB_BM__Lower(), -1 );
+JB_String* JB_Str_LowerCase (JB_String* Self) {
+	return CaseStr_(Self, 'A', 'Z', false);
 }
-// bytemap should be removed!
-JB_String* JB_Str_UpperCase(JB_String* self) {
-    static ByteMap* UpperMap_ = 0;
-    if (!UpperMap_) {
-        UpperMap_ = JB_BM_Constructor( 0, JB_Lower(), JB_Upper() );
-        JB_Incr(UpperMap_);
-    }
-	return JB_Str_MapBytes( self, UpperMap_, -1 );
+
+JB_String* JB_Str_UpperCase (JB_String* Self) {
+	return CaseStr_(Self, 'a', 'z', true);
 }
 
 

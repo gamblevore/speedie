@@ -260,22 +260,29 @@ void JB_FS_AppendMultiReplace(FastString* self, JB_String* Data, Dictionary* MSR
 }
 
 
-void JB_FS_AppendLower(FastString* fs, JB_String* Data) {
-    JB_FS_AppendByteMap(fs, Data, JB_BM__Lower());
+void JB_WriteCase_ (u8* Src, u8* Dest, int N, bool Upper) {
+	while ( N-- > 0 ) {
+		auto C = *Src++;
+		if (Upper)
+			C -= (C>='a' and C <= 'z')<<5;
+		  else
+			C += (C>='A' and C <= 'Z')<<5;
+		*Dest++ = C;
+	}
 }
 
 
-void JB_FS_AppendByteMap(FastString* fs, JB_String* Data, ByteMap* BM) {
-	require0 ( BM and Data );	
+void JB_FS_AppendCase(FastString* fs, JB_String* Data, bool Upper) {
+	require0 ( Data );	
 	int Length = Data->Length;
 	uint8* wp = JB_FS_WriteAlloc_(fs, Length);
-	require0 (wp);
-	
-	uint8* SelfPos = Data->Addr;
-	uint8* map = BM->Cache;
+	if (wp)
+		JB_WriteCase_(Data->Addr, wp, Length, Upper);
+}
 
-	while ( Length-- > 0 )
-		*wp++ = map[ *SelfPos++ ];
+
+void JB_FS_AppendLower(FastString* fs, JB_String* Data) {
+    JB_FS_AppendCase(fs, Data, false);
 }
 
 

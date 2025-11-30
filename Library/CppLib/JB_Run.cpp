@@ -62,7 +62,7 @@ JBClassPlaceSaver( Array,       JB_Array_Destructor,   	JB_AsClass(Saveable),		J
 JBClassPlaceSaver( Saveable,	0,                     	0,                         0,               JB_Sav_LoadProperties,      JB_Sav_SaveCollect,		JB_Sav_SaveWrite );
 
 JBClassPlace( FastString,		JB_Object,	"FastString", JB_FS_Destructor,		JB_FS_Render );
-JBClassPlace( ByteMap,			JB_Object,	"ByteMap", 0,						0 );
+//JBClassPlace( ByteMap,			JB_Object,	"ByteMap", 0,						0 );
 JBClassPlace( CharSet,			JB_Object,	"CharSet", 0,						JB_CS_Render );
 JBClassPlace( JB_List,			Saveable,	"List",		JB_Ring_Destructor,		JB_List_Render );
 JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );

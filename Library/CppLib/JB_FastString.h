@@ -90,7 +90,7 @@ int JB_FS_StreamLength(FastString* self);
 void JB_FS_LengthSet(FastString* self, int newLength);
 void JB_FS_AppendReplaceB(FastString* self, JB_String* Data, int From, int To);
 void JB_FS_AppendMultiReplace(FastString* self, JB_String* Data, Dictionary* MSR, JB_ErrorReceiver* Rec);
-void JB_FS_AppendByteMap(FastString* self, JB_String* Data, ByteMap* MSR);
+//void JB_FS_AppendByteMap(FastString* self, JB_String* Data, ByteMap* MSR);
 void JB_FS_AppendLower(FastString* fs, JB_String* Data);
 bool JB_FS_Flush(FastString* self);
 JB_File* JB_FS_File(FastString* fs);
