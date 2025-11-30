@@ -148,7 +148,7 @@ helper InputStream.NextMsgInfo (|uint64|)
 		._Object = msg, require msg
 
 	|| T = (info >> 1)|syntax|
-	if (t < @max and T > @nil) // 01 --> T=@nil
+	if (t < @max  and  T > @nil)					// 01 --> T=@nil
 		msg = msg.msg(t, .str(.HInt))			
 		if info & 1
 			._Object = msg
@@ -164,30 +164,24 @@ helper InputStream.NextMsgInfo (|uint64|)
 		error (self, "Corrupted jbin")
 
 
-inline InputStream.IsJBin (|bool|)
-	return .str(4).IsJbin
-	
-	
-function InputStream.ExpectJbin (|bool|)	
-	if .IsJBin
-		return true
-	error (Self, "Not jbin")
+function InputStream.StreamJbin (|int64| Remain=1G, |MessageRoot|)	
+	if .eat("#!") == 2				 // shebang
+		.find('\n')
+	expect (.HasHeader(Jbin.Header))  (Self, "Not jbin")
 
-
-function InputStream.ParseJbin (|int64| Remain=1G, |MessageRoot|)	
-	require .ExpectJbin
 	._Object = nil
-	rz = .NextMsg
+	|| Root = .NextMsg
 	while --Remain > 0
 		loop .NextMsginfo
 	
-	if .Data.WentBad
-		rz = nil // be consistant with .parse!
+	if .Data.WentBad and !.TryRecoverBadData
+		Root = nil // be consistant with .parse!
+	return Root
 	
 
 function string.ParseJbin (|int64| max=1G, |messageroot|)
 	|| s = .stream
-	|messageroot--| msg = s.ParseJbin(max)
+	|messageroot--| msg = s.StreamJbin(max)
 	return msg
 
 

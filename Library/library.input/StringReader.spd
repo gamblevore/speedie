@@ -9,6 +9,7 @@ class InputStream
 	|int|						ChunkSize
 	|int| 						StartFrom
 	|bool| 						_NoMoreChunks
+	|bool|						TryRecoverBadData
 
 	linkage
 		cpp_part SS
@@ -76,6 +77,15 @@ class InputStream
 			|| b = .byte
 				return b
 
+	function Find (|byte| c, |int|)
+		|| n = 0
+		while 
+			|| b = .byte
+			if b < 0
+				return -1
+			n++
+			if b == c
+				return n
 	
 	function Byte (|int|)
 		if .data.HasAny or .NextChunk
@@ -140,6 +150,14 @@ class InputStream
 	
 	function Trim (|int| n, |string|)
 		return .str(n).Trim
+	
+	function Eat (|string| s, |int|)
+		for c in s
+			|| p = .Position
+			if .Byte != c
+				.Position = p
+				exit
+			rz++
 		
 	function StrNoAdvance (|int| n, |string|)
 		|| p = .Position
@@ -158,12 +176,16 @@ class InputStream
 	function Str (|int| n, |int| skip = 0, |string|)
 		ifn n > 0 and skip < n
 			return ""
+		
+		// Normal path
 		if (.data.has(n)) or (.NoMoreChunksToRead)
 			(n min= .remaining)
 			|| pos = .data.position		// no need use the .startfrom
-			.data.position = n + pos
-			return .data.syntaxaccess(pos + skip, .data.position)
+			n += pos
+			.data.position = n
+			return .data.syntaxaccess(pos + skip, n)
 
+		// Failed, lets try to stitch new data together
 		|| Remaining = n - skip
 		|| r = string(Remaining) #require
 		|| Dest = r.addr
