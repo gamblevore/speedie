@@ -127,10 +127,10 @@ function file.CLOC
 		if counts.maxnodelength
 			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
-		msg.RenderAST(app.stdout.out)
+		msg.RenderAST(app.stdout.outputstream)
 		printline
 	  elseif counts.ParseSpeed
-		app.stdout.out!.RenderSpeed("Parsed", data.length, durr)
+		app.stdout.outputstream!.RenderSpeed("Parsed", data.length, durr)
 		printline
 	(msg)
 	

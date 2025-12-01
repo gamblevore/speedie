@@ -3,7 +3,7 @@
 
 main (|FileSizeInt| Amount) {
 	|| name = amount.strsize
-	|| xml = "${name}.xml".out							#require
+	|| xml = "${name}.xml".outputstream							#require
 	using name + ".xml"
 	xml <~ `<?xml version="1.0" encoding="utf-8"?>
 <Catalog>`

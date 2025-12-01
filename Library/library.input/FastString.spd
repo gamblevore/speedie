@@ -110,7 +110,7 @@ class FastString {
 			self <~ sep
 			self <~ s
 
-	syntax Append (|string| data, |int|count)
+	syntax Append (|string| data, |int| count)
 		cpp_part AppendMultiStr
 		|| needed = data.Length*count
 		if .FreeSize < needed
@@ -134,7 +134,7 @@ class FastString {
 			if other isa FastString
 				return other
 			if other isa string
-				return other.out
+				return other.OutputStream
 			error (other, "FastString can't use this object.")
 		
 		function New (|FastString?| other, |FastString|)

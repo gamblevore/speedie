@@ -78,7 +78,7 @@ class Saveable
 	
 	function SaveTo (|File| f)
 		cpp_part SaveToFile
-		|| it = f.out
+		|| it = f.OutputStream
 			.SaveTo(it)
 	
 	function ObjectSaver.Finish (|saveable| first)

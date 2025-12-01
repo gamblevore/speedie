@@ -234,8 +234,8 @@ module Conv
 		
 	function CompressOnly (|bool| Decomp)
 		printline .out!|string|
-		|| d = .RealOut!.out
-		|| src = .in!.in
+		|| d = .RealOut!.outputstream
+		|| src = .in!.inputstream
 		require src!=nil and d != nil
 		.start = date.now 
 		if Decomp
@@ -339,7 +339,7 @@ module Conv
 			"Nothing to do for: $.out"
 			return
 		
-		|| fs = .realout!.Out							#require
+		|| fs = .realout!.Outputstream					#require
 		if dest isnt compressed 
 			.ConvertDataFormat(fs)
 		  else

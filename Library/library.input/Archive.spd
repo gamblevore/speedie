@@ -56,7 +56,7 @@ role FileArchive (message)
 	
 	function SaveTo (|file| dest)
 		require self
-		.renderjbin.stream.compressInto(dest.out)
+		.renderjbin.stream.compressInto(dest.outputstream)
 	
 	
 	function StripFileContents (|FileArchive|)

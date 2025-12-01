@@ -81,8 +81,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 
 
 syntax Append (|message| M)
-//	Compiler <~ m
-	Appended <~ m
+	.Appended <~ m
 	m.remove
 
 
@@ -184,7 +183,7 @@ function JustDefineInstructions (|bool|)
 function BuildFiles (|bool|)
 	|| VMDef = .VMBox							#require
 
-	FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box").out
+	FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box").OutputStream
 	
 	|| Forms = VMDef.find("forms")
 	forms.remove
@@ -204,8 +203,8 @@ function BuildFiles (|bool|)
 	.SafeWrite("Instructions.i",       code)
 	.SafeWrite("InstructionList.h",    jump)
 	
-	|| ASM_Gen = Compiler.InputFileAlways( "speedie.input/ASMBuilder/ASM_AutoGen.spd").out
-		for s in Appended
+	|| ASM_Gen = Compiler.InputFileAlways( "speedie.input/ASMBuilder/ASM_AutoGen.spd").OutputStream
+		for s in .Appended
 			s.render(ASM_Gen)
 			ASM_Gen <~ "\n"
 	
@@ -351,8 +350,6 @@ function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| Actual
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
 	using tmp
-//	if ActuallyMakeTheVM != nil			// otherwise speedie is just using the encoders.
-//		.ModuleArg <~ NewDecl(name)
 	++.Total
 	
 	.MakeFatCreator(tmp.name, form)

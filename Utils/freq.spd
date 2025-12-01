@@ -22,7 +22,7 @@ class ByteFrequency
 
 |int64[256]| Freq
 main (|file.existing| input, |int| Limit = 100MB)
-	|| s = input.in$
+	|| s = input.inputstream$
 	
 	"Counting bytes in file $input (${input.size.strsize})"
 	for (ch in s) (n)

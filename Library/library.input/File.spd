@@ -388,11 +388,13 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	operator IsOlderThan (|File| F, |bool|)
 		inline
 		return (.Modified < F.Modified)
-	
-	function Writer (|FastString|) // streamout
-		disabled "Use .out"
 
 	function string.Out (|bool| Clear=true, |Faststring|)
+		disabled "Use .outputstream"
+	function string.In (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
+		disabled "Use .inputstream"
+		
+	function string.OutputStream (|bool| Clear=true, |Faststring|)
 		description "Lets you write to a file, via a faststring object." 
 		|| f = .file
 		if Clear
@@ -405,7 +407,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		rz = FastString()
 		rz.file = f
 
-	function string.In (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
+	function string.InputStream (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
 		description "Reads from a file, via a InputStream object. Useful because InputStream can read from files, strings, and more. Write code once and use it on multiple input-sources." 
 		|| f = .file
 		if f.mustexist("stream")
@@ -581,7 +583,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				return File.existing.MainArg(pos, name)$.parse
 		module Output
 			autogen MainArg   (|int| Pos, |string| name, |faststring|)
-				return file.MainArg(pos, name)$.Out
+				return file.MainArg(pos, name)$.Outputstream
 
 
 	function AnyDate (|date|)

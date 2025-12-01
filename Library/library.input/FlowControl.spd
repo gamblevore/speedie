@@ -18,14 +18,14 @@ class FlowControl
 		flow off
 		.CanDoErrors = true
 		.buff.needAlloc(1MB)
-		.write = outpath.out
+		.write = outpath.OutputStream
 		print "Logging flow to "
 		printline OutPath
 		|InputStream| s
 		if inpath
 			print "Validating flow against "
 			printline InPath
-			s = inpath.in
+			s = inpath.InputStream
 		.ReadInput = s
 		flowcontrol.disabled = 0
 

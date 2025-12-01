@@ -47,7 +47,7 @@ extend String
 
 	Syntax Append (|messageroot!| msg, |bool|)
 		cpp_Part WriteMsg
-		msg.render(.out)
+		msg.render(.outputstream)
 		return true
 
 
