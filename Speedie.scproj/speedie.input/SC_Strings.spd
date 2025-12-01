@@ -555,7 +555,7 @@ module StringCorrector
 		.IDsort(HasAnything)
 		
 		target !debug
-			|| fs = where.Out
+			|| fs = where.OutputStream
 				.WriteTable(fs)
 
 	
