@@ -42,10 +42,11 @@ void JB_FS_AppendMini(FastString* fs, MiniStr S) {
 
 
 // oofington
-void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...) {
+JB_String* JB_FS_AppendVArg (FastString* fs_in, JB_String* Fmt, ...) {
 // awesome new system to make appending to a faststring use less code
 // or else string formatting code can tend to become quite... bloated.
-
+// can replace jb_str_append6 also...
+	FastString* fs = JB_FS__FastNew(fs_in);
     va_list Vargs; va_start(Vargs, Fmt);
     u8* Addr = Fmt->Addr;
     int Length = Fmt->Length;
@@ -95,6 +96,9 @@ void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...) {
 	}
     
     va_end(Vargs);
+    if (fs_in)
+		return nil;
+	return JB_FS_GetResult(fs);
 }
 
 

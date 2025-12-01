@@ -34,7 +34,7 @@ JBClass( FastString, JB_Object,
 void JB_FS_AppendMini(FastString* fs, MiniStr S);
 void JB_FS_AppendMem_(FastString* fs, const uint8* s0, int len);
 void JB_FS_AppendCString(FastString* self, const char* c);
-void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...);
+JB_String* JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...);
 bool JB_FS_ResizeTo_(FastString* fs, int NewLength);
 uint8* JB_FS_NeedSpare(FastString* fs, int Extra);
 void JB_FS_RemoveByte(FastString* self, byte B);
