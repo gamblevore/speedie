@@ -204,3 +204,35 @@ struct PicoGlobalStats
 			inline
 			rz.read
 
+
+
+// could be useful for threads :]
+struct AtomicLock
+	linkage
+		cpp_part LOK
+	
+	|bool| Locked
+	function Lock
+		cpp_wrapper PicoLock
+
+	function Enter (|bool|)
+		cpp_wrapper PicoEnter
+	
+	function Leave
+		.Locked = false
+
+	syntax Using (|&AtomicLock|) // I don't like how this works... I wnt to return nothing.
+		.Enter
+		return self
+
+	syntax UsingComplete (|&AtomicLock| idk=nil)
+		// param order should be reversed! sigh...
+		.locked = false
+
+	module
+		function Test
+			visible
+			|AtomicLock| Lock
+			using Lock
+				"hello"
+			

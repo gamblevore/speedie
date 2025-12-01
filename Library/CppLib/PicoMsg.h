@@ -1466,5 +1466,17 @@ extern "C" void PicoGlobals (PicoGlobalStats* F) _pico_code_ (
 	F->OpenPicos    = __builtin_popcountll(pico_list.Map); 
 );;;/*_*/;;;  //reeeeeeee
 
+///
+/// **Atomic utilities ** ///
+///
+
+extern "C" void PicoLock (void* B) _pico_code_ (
+	((PicoTrousers*)B)->lock();
+)
+
+extern "C" bool PicoEnter (void* B) _pico_code_ (
+	return ((PicoTrousers*)B)->enter();
+)
+
 #endif
 
