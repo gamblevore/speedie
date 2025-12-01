@@ -1,4 +1,4 @@
-## The 🍰 Cake 🍰 VM (unfinished but getting closer)
+## The 🍰 Cake 🍰 VM (Unfinished But Getting Closer)
 
 Speedie's Virtual Machine, "`Cake`", is a perfect match for Speedie. It compiles 2-3x smaller than ARM on average, improving VM speed.
 
