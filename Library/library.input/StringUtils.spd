@@ -2,34 +2,32 @@
 
 
 macro Print
-	_strprint(_0.render)
+	StrPrint_(_0.render)
 
 macro PrintLine
-	StrPrintline(_0.render) // not self-referential anymore.
+	StrPrintLine_(_0.render) // not self-referential anymore.
 
-
-helper _StrPrint (|string?| data)
+autogen StrPrint_ (|string?| data)
 	cpp_wrapper JB_Str_Print
 
-autogen StrPrintLine (|string?| data)	// ideally move this to string._printline
+autogen StrPrintLine_ (|string?| data)	// ideally move this to string._printline
 	cpp_wrapper JB_Str_PrintLine		// AND... make printline x use this.
 
-function Print (|string?| data)
-	_strprint(data)
-
-inline Print (|cstring?| data)
-	cpp_part PrintCString
-	data.print
+inline Print (|string?| data)
+	StrPrint_(data)
 
 inline PrintLine (|string?| data="")
-	strprintline(Data)							// to disambiguate vs macro
+	StrPrintLine_(Data)							// to disambiguate vs macro
+
+function Print (|cstring?| data)
+	cpp_wrapper JB_PrintCString
+
 
 
 
 
 function ZalgoLine (|string| data)
 	printline data.zalgo
-
 
 macro ZalgoLine
 	Printline _0.render.zalgo
