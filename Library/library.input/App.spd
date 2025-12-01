@@ -96,6 +96,7 @@ function Switches (|[string]|)
 	
 
 helper args_ (|[string]|)
+	opt norefcounts
 	for R in ._rawargs
 		if R.ArgName ~= ""
 			rz <~ r

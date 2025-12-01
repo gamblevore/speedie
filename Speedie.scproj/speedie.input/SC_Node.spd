@@ -825,6 +825,7 @@ function scnode.Module (|scmodule|)
 		return .modul
 /	return compiler.program // never happens?
 
+
 function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 	expect (FuncName == @thg) ( FuncName, "Need a name." )
 	
@@ -845,7 +846,7 @@ function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 
 	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
 	|| DclMsg = DclSrc.ParseClean
-/		DclMsg.CollectAGlobalDecl(.module)
+		DclMsg.CollectAGlobalDecl(.module)
 
 	|| fs = FastString.new
 
@@ -873,11 +874,12 @@ function $name (|dictionary of $AllSameType|)
 
 	|| FuncSrc = fs.GetResult
 	|| msg = FuncSrc.ParseClean[0]
-/		.CollectSub( msg )
+		.CollectSub( msg )
 }
 
 
 function Message.ConstantExpandSub (|Message|)
+	opt norefcounts
 	using (self)
 	for item in self
 		if rz
@@ -887,6 +889,7 @@ function Message.ConstantExpandSub (|Message|)
 
 
 function ConstantExpand (|Message| ch)
+	opt norefcounts
 	|| L = ch.first!
 	|| op = L.Next!
 	|| R = op.Next!

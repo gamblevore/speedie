@@ -204,7 +204,7 @@ module Feedback
 			.TryUseProject(Value)
 			options.OperationCount++
 
-		
+	
 	function Explain (|faststring| Purpose, |string| name="", |bool|) 
 		ifn purpose: return true
 		purpose <~ name

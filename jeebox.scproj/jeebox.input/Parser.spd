@@ -1290,7 +1290,7 @@ module parser
 	|uint16|                _StopBars
 	|bool|					_DotInsertAllow
 
-	using.Position = -1
+	.using.Position = -1
 
 
 	flags

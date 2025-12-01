@@ -11,7 +11,7 @@ module Clipboard
 		|| cstr = .SDL_GetClipboardText
 		|| s = cstr.Wrap
 			return s
-		return _InternalCopy
+		return ._InternalCopy
 			
 	function Text (|string|)
 		return .data.FixLineEndings
@@ -20,7 +20,7 @@ module Clipboard
 		description "Pass valid UTF-8 only" 
 		expect (s) (beep)
 
-		_internalcopy = ""
+		._internalcopy = ""
 		
 		|| c = s
 		if keys.Shift
@@ -29,7 +29,7 @@ module Clipboard
 		c = c.cstr
 		|| err = .SDL_SetClipboardText(c.addr|cstring|)
 		if (err!=0) // or s.FindBadUTF8		// osx might fail anyhow
-			_internalcopy = c
+			._internalcopy = c
 			Notifications.NotifySDLError		
 	
 	

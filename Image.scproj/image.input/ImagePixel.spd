@@ -213,7 +213,7 @@ datatype ImagePixel (uint)
 		init()
 		
 		helper Init
-			white <~ vec4(1.0)
+			.white <~ vec4(1.0)
 		
 		function Char (|codepoint| c, |&imagepixel|)
 			if (c&1)!=0

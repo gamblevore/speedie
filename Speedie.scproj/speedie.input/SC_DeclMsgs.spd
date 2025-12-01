@@ -69,7 +69,11 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	opt norefcounts
 	using (dcl)
 	rz = dcl.msg(@rel)
-	rz <~ dcl.second
+	|| first = dcl.second
+//	if (mode is globals) and first == @thg
+//		first.func = @sdot
+		// now what?
+	rz <~ first
 	rz <~ (@Opp, "=")
 	rz <~ Default
 

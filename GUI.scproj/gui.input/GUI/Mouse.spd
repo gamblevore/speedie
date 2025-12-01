@@ -60,4 +60,4 @@ struct SDL_Cursor
 			cpp_wrapper SDL_CreateCursor
 
 		function Empty (|!&SDL_Cursor|)
-			return ._empty  init  Create(&nothing, &nothing, 1, 1, 0, 0)
+			return ._empty  init  Create(&.nothing, &.nothing, 1, 1, 0, 0)

@@ -206,6 +206,8 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 	require (declmsg.func == @Decl)
 	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
+	if name == @thg
+		name.func = @sdot
 	
 	|| decl = .LookUpVarRootDecl( name.name, name )
 	if decl isa SCDecl
