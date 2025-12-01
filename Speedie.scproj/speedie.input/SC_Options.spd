@@ -346,6 +346,11 @@ module Feedback
 			if value.optionbool
 				options.Mode = options.cpp
 
+		+'b'
+			Explain(Purpose, "Silent bake")$
+			Options.Silent = true
+			options.Mode = options.cake
+
 		+'bake'
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$
 			if value.optionbool

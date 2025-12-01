@@ -1065,7 +1065,7 @@ class SCDecl (SCObject) {
 		if side
 			.MarkAsAltered
 			if (self is self) and (scfunction.currfunc is Destructor) 
-				error (exp, "You can’t modify 'self' in a constructor or destructor.")
+				error (exp, "You can’t modify 'self' in a destructor.")
 
 
 	function WriteNilRel (|Message|)

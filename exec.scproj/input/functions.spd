@@ -13,23 +13,26 @@ class SpdFunc
 	constructor (|message| code)
 		opt norefcounts
 		.name = (code.name, "")(code.func==@tmp)
+		.SpeedieFunc = nil
+		.Length = -1
 		if code.func == @tmp
-			code = code.first!
-		|| s    = Code.name
-		|| blob = (s.addr-4)|&ASMBlob|
-		|| orig_str = CakeRun.FileSrc
-		|| orig_addr = orig_str.addr
-		|| orig_after = orig_addr + orig_str.Length
-		|| n    = s.length>>2
-
-		check  (blob|&byte| >= orig_addr and blob|&byte| < orig_After)	(Code, "ASM escaped.")
-		check !(blob|int64|&3)											(Code, "ASM unaligned.")
-		check  (n > 0)													(Code, "ASM missing.")
-		check  (n < 64K-1)												(Code, "ASM oversized.")
-
-		blob.CallCount = 0
-		.length = n
-		.SpeedieFunc = blob
+			code = code.first // might not exist!
+		if code				
+			|| s    = Code.name
+			|| blob = (s.addr-4)|&ASMBlob|
+			|| orig_str = CakeRun.FileSrc
+			|| orig_addr = orig_str.addr
+			|| orig_after = orig_addr + orig_str.Length
+			|| n    = s.length>>2
+	
+			check  (blob|&byte| >= orig_addr and blob|&byte| < orig_After)	(Code, "ASM escaped.")
+			check !(blob|int64|&3)											(Code, "ASM unaligned.")
+			check  (n > 0)													(Code, "ASM missing.")
+			check  (n < 64K-1)												(Code, "ASM oversized.")
+	
+			blob.CallCount = 0
+			.length = n
+			.SpeedieFunc = blob
 
 	function ASMPos	(|int|)
 		|| SPD = .SpeedieFunc|&byte| 

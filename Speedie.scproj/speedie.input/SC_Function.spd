@@ -216,11 +216,17 @@ function ParseName (|Message| node, |bool|)
 	if !.cls
 		0	
 	  elseif cname ~= "constructor"
-		is Constructor
+		.makeconstructor
 	  elseif cname ~= "destructor"
 		is Destructor
 	
 	Return cname.TestFuncName
+
+
+function MakeConstructor
+	is Constructor
+	if .islibrary
+		is CantInline
 
 
 function ApparantArgCount (|int|)

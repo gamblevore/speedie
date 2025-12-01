@@ -195,6 +195,13 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 function assembler.ASMReach (|scfunction| fn)
 	opt norefcounts
 	|| orig = .out
+	if fn is constructor
+		if fn.cls == "StartupWindow"
 	if Orig.MyReacher and !orig.IsLibrary
 		(fn is usedbyasm)
+		if fn is Constructor // gotta reach the destructor also
+			fn = fn.cls!.DestructorFunc
+			if fn
+				(fn is usedbyasm)
+
 

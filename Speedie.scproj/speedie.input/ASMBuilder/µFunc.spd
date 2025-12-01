@@ -83,8 +83,26 @@ function scfunction.GuessASMSize (|int|)
 	for i in .µLength
 		rz += f[i].GuessSize // will the size ever differ? it shouldn't?
 							 // only for jumps. We should pre-calculate extra-sizes if needed.
-	
+
+function packmaker.PackAllFuncs (|jbin| j)
+	opt norefcounts
+	for f in .PackFuncs
+		if PackSaved.AddOrShrink(j, f is UsedByASM)
+			j.JRenderASM(f)
+
+
 function JBin.JRenderASM (|SCFunction| fn)
+	// if its a behaviour... we probably want to output it.
+	// after all... it came from the usercode, right?
+	// otherwise, we need to check that the caller (Which seems to have lost track of by now)
+	// is reached.
+	
+	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
+		.add(@tmp, fn.exportname)
+		return
+	
+	scfunction.currfunc = fn
+
 	|| t = fn.GuessASMSize
 	fn.µLengthGuess = t
 	Compiler.stTotalASMOps += t
@@ -92,6 +110,6 @@ function JBin.JRenderASM (|SCFunction| fn)
 		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
 	|| after = fn.FatToASM(Start, Start+t)
-	check (after-start==t) (fn, "ASM length corrupt")
+	check (after-start == T)			(fn, "ASM length corrupt")
 	if tmp
 		.exit

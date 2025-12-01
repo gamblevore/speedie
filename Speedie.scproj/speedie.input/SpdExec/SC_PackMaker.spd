@@ -183,10 +183,7 @@ module PackMaker
 		opt norefcounts
 		j.enter(@tmp, "code")
 		j.Enter
-		for f in .PackFuncs
-			if PackSaved.AddOrShrink(j, f is UsedByASM)
-				scfunction.currfunc = f
-				j.JRenderASM(f)
+		.PackAllFuncs(j)
 		j.exit(2)
 		scfunction.currfunc = nil
 		
@@ -236,8 +233,8 @@ module PackMaker
 
 		|| ft = b.functable$
 		|| ftc = ft.cls!
-		for (M in ftc.properties) // could I change the cpp exporter to use this same approach?
-			|| fn = .BestBehaviourFor(m.name) // might as well?
+		for (M in ftc.properties)				// could I change the cpp exporter to use this same approach?
+			|| fn = .BestBehaviourFor(m.name)	// might as well?
 				|| BaseClass = .InterfaceForBehaviour(fn)
 					j.Cakeify(fn)
 					continue
@@ -322,7 +319,7 @@ struct HairyMan
 
 	function AddOrShrink (|jbin| j, |bool| b, |bool|)
 		.Total++
-		if b
+		if b or Options.TargetDebug
 			|| c = .curr
 				j.addint(c)
 			.curr = 0

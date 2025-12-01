@@ -595,7 +595,6 @@ function CreateConstructors
 			.modul.tryadd(con.source, con, "new")
 			.FillRoleConstructor(con)
 			
-	
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
@@ -607,7 +606,7 @@ function CreateConstructors
 function scclass.FillRoleConstructor (|scfunction| con)
 	opt norefcounts
 	for f in con
-		(f is constructor)
+		f.MakeConstructor				// in case the lib gets updated?
 		if .istask
 			.FillTaskConstructor(f)
 

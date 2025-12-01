@@ -453,7 +453,7 @@ function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Pro
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
 	|| fn = prop.islookuponly
 	if fn isa scfunction
-		.ASMreach(fn)
+		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
 		return DoGlobal(self, dest, exp, prop)
 	return ConstFromThgName(self, exp, dest, prop)
 
@@ -567,7 +567,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 	|| fn = d.IsLookupOnly
 	if fn isa scfunction
-		.ASMreach(fn)			
+		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
 	return DoGlobal(self, dest, exp, d)
 		
 

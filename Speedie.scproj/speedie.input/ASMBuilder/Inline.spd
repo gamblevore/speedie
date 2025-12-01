@@ -66,7 +66,7 @@ struct InlineInfo
 
 
 extend assembler {
-function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
+function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
 	|| Start = .curr
 	|| OV = .OpenVars
@@ -78,7 +78,6 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 			|| type = fn.ASMReturn
 				dest = .declarebody(prms, type) // asmtodo: mark this as a declaration?
 												// (shouldn't all declaremes be like that?)
-
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
 	
@@ -96,6 +95,9 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
+		if fn is constructor
+			.asmreach(fn.cls!.DestructorFunc!)
+	
 	if !r
 		.SoftNopRange(start, .curr)				// rewind
 	
@@ -103,7 +105,7 @@ function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| Allowe
 	.inlinedepth = --ID
 	if !ID
 		.InlineEnd = nil
-	return .CloseVars(OV, nil, r) // should closevars come before restore? sigh. idk.
+	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
 
 
 

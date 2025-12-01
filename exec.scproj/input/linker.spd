@@ -27,6 +27,7 @@ module SpdTable
 		
 	function LoadFuncs (|bool|)
 		opt norefcounts
+		.funcs <~ SpdFunc() // null func
 		for spd in CakeRun.code
 			self <~ spd
 		
