@@ -3,6 +3,7 @@
 module VM_Builder {
 |[message]| 	NameList
 |message|		ModuleArg
+|message|		ASMFile
 |[message]|		Appended
 |message|		TempDests = message()
 |faststring|	form_h = faststring()
@@ -87,9 +88,9 @@ syntax Append (|message| M)
 
 function DataTypeModule 
 	opt norefcounts
-	|| ASM = "extend_module ASM:constants:|asm|" ~ parse
-	self <~ ASM
-	.modulearg = ASM.last.last.last
+	.ASMFile = "extend_module ASM:constants:|asm|" ~ parse
+//	self <~ .ASMFile
+	.modulearg = .ASMFile.last.last.last
 
 
 
@@ -183,7 +184,7 @@ function JustDefineInstructions (|bool|)
 function BuildFiles (|bool|)
 	|| VMDef = .VMBox							#require
 
-	FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box").OutputStream
+	FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box" ).OutputStream
 	
 	|| Forms = VMDef.find("forms")
 	forms.remove
@@ -203,10 +204,11 @@ function BuildFiles (|bool|)
 	.SafeWrite("Instructions.i",       code)
 	.SafeWrite("InstructionList.h",    jump)
 	
-	|| ASM_Gen = Compiler.InputFileAlways( "speedie.input/ASMBuilder/ASM_AutoGen.spd").OutputStream
+	|| ASM_Gen = Compiler.InputFileAlways( "speedie.input/ASMBuilder/ASM_AutoGen.spd" ).OutputStream
 		for s in .Appended
 			s.render(ASM_Gen)
 			ASM_Gen <~ "\n"
+	Compiler.InputFileAlways( "speedie.input/ASMBuilder/ASMTypes.spd" )[] = .ASMFile.Render
 	
 	.form_h.size = 0
 	return true
