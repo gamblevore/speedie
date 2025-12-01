@@ -9,25 +9,29 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 			return true
 		Notifications <~ "Open a project or create a new one, to use Perry"
 		beep
-		
+	
+	
 	module
 		|StartupWindow|			_win
 
 		function Open (guiaction)
 			startupwindow.Show
 
+
 		function Hide
 			opt norefcounts
 			|| w = ._win
 				w.close
 
+
 		function Show
 			opt norefcounts
-			|| w = .create
+			|| w = .CreateStartup
 			if GUI.startedproperly
 				(w)()
 			  else
 				w.Show
+
 
 		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
 			|| b = buttonview(._win,	fnc)
@@ -49,9 +53,9 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 			b.size 		= 4~right for 30 by 4~after for 30 
 			t.size 		= 6~after to 6~left  by  the~same
 			t.align		= ListViewState.aligncenter
+			
 
-
-		function Create (|startupwindow|)
+		function CreateStartup (|startupwindow|)
 			opt norefcounts
 			rz = ._win
 			if rz
