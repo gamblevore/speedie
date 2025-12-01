@@ -1,4 +1,4 @@
-## Comparisons with Other Languages
+## Comparisons With Other Languages
 
 Lets compare Speedie vs a few other languages. Many languages seem good when viewing simple examples, but break down once you try anything slightly significant.
 
@@ -80,6 +80,7 @@ All those wierd things like `box`, `mut`, `&`, `&'` make the code hard to unders
     
 Now lets look at a Speedie version!!
 
+
 #### **Speedie List Search**
 
     // We'll just use the inbuilt list class. You would be mad not to.
@@ -125,7 +126,7 @@ For example, if you alter the line, to replace `2` with `5`:
       // *List::find_inner_mut(&mut list, 2).unwrap() = 42;
       *List::find_inner_mut(&mut list, 5).unwrap() = 42;
 
-You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos you used `unwrap`. How terrible. (Apparantly, Rust considers crashing via `unwrap` to be "safe". 🤦‍♂️ 🤦🏽 🤦‍♀️. Well they might consider it "safe" but it didn't help find the crash bug in that Rust code did it!)
+    You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos you used `unwrap`. How terrible. (Apparantly, Rust considers crashing via `unwrap` to be "safe". 🤦‍♂️ 🤦🏽 🤦‍♀️.)
 
 The speedie code above WON'T crash if the item can't be found! Or the same alteration is made!
 
@@ -143,14 +144,15 @@ Nope!
 
 Speedie realises that `F` might not exist. And so this code won't compile. Speedie is very intelligent around figuring out what vars can be `nil` or not. So you literally get all the safety with none of the nightmare overhead of Rust.
 
-_On November 18 2025, Cloudflare, which runs 20% of websites, and has micro-services used by many other websites such as Twitter, and ChatGPT, went down. It went down because.... Rust sucks. Specifically because of calling `.unwrap()`, which will crash your app sometimes. All because this is considered "memory safe"._
+_On November 18 2025, Cloudflare, which runs 20% of websites, and has micro-services used by many other websites such as Twitter, and ChatGPT, went down. Specifically their code used `.unwrap()`, which can crash your app._
 
-This is how terrible Rust's idea of safety is. You can take down around 1/3rd of the internet and it is still considered "Safe". Imagine it had been worse, perhaps `.unwrap()` was used on a cruise-ship or an airplane. Now people are dying. I'd rather have a language that BLOCKS nil-object errors from even compiling (Speedie) than one that hides but allows them then covers it up with the illusion of "safety".
+Rust can take down around 1/3rd of the internet and still be considered "Safe". Yeah its not safe. It could be more dangerous if a Rust program crashed on software running an airplane, or hospital or industrial machinery.
+
 
 
 ## C Comparison
 
-#### **Student passcode checking Assignment**
+#### **Student Passcode Checking Assignment**
 
 Sometimes as a student, you are asked to do simple things, like perform some IO. Basically ask for something via stdin and print something into stdout.
 
@@ -217,6 +219,7 @@ Often speedie is faster than C code, because it has better libraries that look a
 The fact that there are no wierd issues by including the "\n" in the string via `app.input`... helps demonstrate this.
 
 
+
 ## Go Comparison
 
 Of all the languages, Go is one of them.
@@ -258,15 +261,13 @@ Heres an example of error-handling with files in Go:
     	fmt.Println(f)
     }
 
-Heres the same in speedie:
 
-    
+Heres the same in speedie:
 
     function ReadFileExample (|string| path, |StringThatWasReadSafely|)
         || f = path.file
         return f.ReadAll(File.ExpectExists) // Reports errors upon any failiure.
         // f.ReadAll will open the file (if not already open). Also reports errors upon failiure.
-            
     
     main
         || f = ReadFileExample("file.txt")
@@ -280,7 +281,7 @@ Using ReadAll will not create an empty file. So it does the same as the Go code.
 Or we can just this:
 
     main
-        || f = "file.txt".ReadFile(false) // builtin function
+        || f = "file.txt".ReadFile(File.ExpectExists) // builtin function
             printline f
 
 We can use be standard builtin `string.ReadFile` function. We pass `false` to disable ignoring of missing-files. Errors are created successfully if any happen.
