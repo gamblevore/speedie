@@ -47,6 +47,18 @@ module SpdTable
 			f.Link❗
 	
 	
+	function asm.GlobLink (|asm|)
+		// tonooodododo
+		
+	function asm.FuncLink (|asm|)
+		// todo
+	
+	function asm.Size (|int|)
+		self>>=24
+		if self >= 32
+			return 1 
+		return 1+(self&1)
+		
 	function spdfunc.Link❗
 		// this could easily be multi-threaded... but no need for now.
 		// it doesn't allocate anything... or alter pointers of any kind.
@@ -54,11 +66,13 @@ module SpdTable
 		|| Base = &Blob.ASM[0]
 		|| N = .Length
 		for i in n
-			|| asm = base[i] // now... we need to get it's op.
+			|| asm = base[] // now... we need to get it's op.
 							 // we need to link globs, and funcs, right?
-			|| op = asm>>24
-			// now how do we tell what op is func or not?
-			// speedie needs to dump that info somewhere!
+			if asm.IsFunc
+				base[] = asm.FuncLink
+			  elseif asm.IsGlob
+				base[] = asm.GlobLink
+			base+=asm.size
 		
 		
 		

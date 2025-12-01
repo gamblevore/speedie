@@ -1,6 +1,17 @@
 
 datatype ASM (uint)
+	operator isa (|asm| Kind, |bool|)
+		return self>>24 == Kind
 	
+	function IsFunc (|bool|)
+		self >>= 24
+		return ((self == asm.FNCX3) ||| (self == asm.FNCX)) ||| ((self == asm.FNC) ||| (self == asm.fnc3))
+
+	function IsGlob (|bool|)
+		self >>= 24
+		return (self == asm.GOBJ) ||| (self == asm.GTAB)
+		
+		
 struct ASMBlob
 	|int|			CallCount		
 	|ASM[1]|		ASM

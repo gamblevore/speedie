@@ -2,19 +2,17 @@
 conf
 	name	cake_run
 	creator	jeebox
-	prefs	"pack.prefs"
+	prefs	"cake_run.prefs"
 	targets nothing
 
 
-target !fast
-	import "GUI"
-//	import "network"
-//import "Speedie.scproj/speedie.input/SpdExec"
 //import "temporal"
+import "GUI"
+import "Speedie.scproj/speedie.input/ASMBuilder/ASMTypes.spd"
 
 
 linkage
-	cpp_part Pack
+	cpp_part Cake
 
 
 compile_linking
