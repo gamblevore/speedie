@@ -521,7 +521,7 @@ module StringCorrector
 		
 	function CollectString (|message| m)
 		opt norefcounts
-		|| p = Table2.MakePlace(m.name)
+		|| p = .Table2.MakePlace(m.name)
 		|| i = (p[])|MessageID|
 		if i == nil
 			i = .newID(m.name)

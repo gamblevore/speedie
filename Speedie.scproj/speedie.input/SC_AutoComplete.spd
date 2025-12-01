@@ -137,7 +137,7 @@ function CmdCleanUp (|Message| arg, |message|)
 || TestCrash = "__CrashSpd_" + "_"		// for crash-testing
 
 function CmdWrap (|Message| arg, |bool|)
-	if arg contains TestCrash
+	if arg contains .TestCrash
 		app.crash
 	
 	|| cmd = .CmdCleanUp(arg)
@@ -440,7 +440,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		return nil
 	if parent == .AnonParent and str == .anontext
 		return fn
-	OrigFn = fn.InsertIn(parent, src.name)
+	.OrigFn = fn.InsertIn(parent, src.name)
 	|| pos = mpos.int
 	parser._dotinsertallow = true
 	if fn.update_source(pos, str.name)
@@ -1067,7 +1067,7 @@ function CallFromSub (|message| arg, |scfunction| fn)
 			item <~ (@sstr, f)
 			item <~ call_point.CallFromName
 			item <~ pos
-			if call_point == OrigFn
+			if call_point == .OrigFn
 				item.name = "curr"
 			
 

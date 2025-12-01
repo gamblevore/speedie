@@ -114,7 +114,7 @@ class File (String)
 			f.Close
 
 	Syntax Append (|string| data)
-		disabled "Use file[] = data"
+		disabled "Use file[] = data, to set the entire file's data."
 
 	Syntax Append (|message| msg)
 		// note to self in case I ever re-add this.	
@@ -132,6 +132,7 @@ class File (String)
 			return .data(Nieu)
 	
 	operator plus (|string| s, |file|)
+		opt norefcounts
 		return (super+S).file
 	
 	function File (|file|)
@@ -205,6 +206,7 @@ class File (String)
 	
 	
 	function Parent (|File|)
+		opt norefcounts
 		return File.new( super.Parent )
 	
 	target !minilib {
@@ -300,20 +302,12 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	autogen ListStart (|DirectoryReader|)
 		cpp_wrapper
 
-//	function ListActive (|bool|)
-//		cpp_wrapper
-
 	function Open (|int| Flags = File.ReadWriteMode ||| File.CreateMode, |bool|AllowMissing=false, |filedes|)
 		cpp_wrapper
 
 	function OpenForRead (|bool| AllowMissing = false, |filedes|)
 		inline
 		return .open(0, AllowMissing)
-	
-//	function OpenDes (|filedes|)
-//		inline
-//		.openempty
-//		return .descriptor
 	
 	function OpenEmpty (|ErrorInt|)
 		nil checker
@@ -496,14 +490,14 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		|string| _Speedie
 				
 		function SpeedieDir (|string|)
-			if !_speedie
+			if !._speedie
 				|| paths = app.exepath.parent
 				|| srch = "/speedie/"
 				|| found = paths.find(srch, 0, int.max, true)
-					_speedie = paths[0, found + srch.length]
+					._speedie = paths[0, found + srch.length]
 				  else
-					_speedie = "/usr/local/speedie/"
-			return _speedie
+					._speedie = "/usr/local/speedie/"
+			return ._speedie
 		
 		function Sorter (SorterComparer of file)
 			|| aa = .size

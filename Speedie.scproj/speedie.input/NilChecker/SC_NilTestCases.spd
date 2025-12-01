@@ -4,7 +4,7 @@ target debug
 	function @ArchonPurger.ndb4
 		cpp_name ndb4
 		visible
-		(t.Neel[]).ndb5()
+		(.t.Neel[]).ndb5()
 
 	function NilRecord.ndb5 
 		cpp_name ndb5

@@ -82,7 +82,7 @@ module Terminal
 	function Display
 		|| now = date.now
 		if .LastDisplay
-			app.Sleep((LastDisplay + 1s/60) - now)
+			app.Sleep((.LastDisplay + 1s/60) - now)
 		  else
 			"\1b[2J"			// clear
 		.LastDisplay = now

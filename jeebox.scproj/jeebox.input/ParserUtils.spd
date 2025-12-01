@@ -202,7 +202,7 @@ extend Parser
 
 	function FindError (|int| num, |int|)
 		if num == kThing: return kThing
-		for (_ErrorNames) (Key)
+		for (._ErrorNames) (Key)
 	        || i = key.parseint|int|
 			if (num & i) == i
 				return i

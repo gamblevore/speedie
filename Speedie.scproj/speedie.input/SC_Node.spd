@@ -473,22 +473,23 @@ function ProjectFix (|SCNode|)
 function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 	|| ParamsArray	= SCParamArray.new(exp, origname)
-	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
-	|| paramshere = exp.last
+	|scnode--| Curr = ParamsArray.DetectDotSuper(self, arg_space)
+	|message--| paramshere = exp.last
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
-	|SCFunction| Missing
-	|SCFunction| f
-	|scclass|    owning_cls
+	|SCFunction--| Missing
+	|SCFunction--| f
+	|scclass--|    Owning_Cls
 	|| AllowSelfToConstructor = false
-
-	if scfunction.currfunc
-		owning_cls = scfunction.currfunc!.cls
+	
+	// early var-reuse of fn
+	|scfunction--| CurrFunc = scfunction.currfunc
+		owning_cls = CurrFunc.cls
 		if owning_cls
 			AllowSelfToConstructor = ParamsArray.IsSelfCon
 
 	for (b.ListLookup in Curr)
-		|| o = b.syntaxaccess(paramsarray.LookupName)
+		|scobject--| o = b.syntaxaccess(paramsarray.LookupName)
 		if (!o)
 			continue
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program) and (b!=self)
@@ -503,8 +504,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					Return o
 
 				if (!side and paramsarray.isdot and o.type.processas)
-					if !exp
-						debugger, return nil
+					expect (exp) // hmmm... should never happen
 					return o.ProcessAs(exp)
 
 		
@@ -524,7 +524,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					Missing = o
 				o = nil
 			  else
-				if  o is disabled  and  scfunction.currfunc isnt disabled
+				if  o is disabled  and  CurrFunc isnt disabled
 					error (exp,     o.description)
 					error (o.source, "Disabled here.")
 
@@ -542,10 +542,14 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					Return o
 				///////
 				
-				ifn o isa SCFunction
-					Return o 			// canfunction is false
+				ifn o isa SCFunction					// can it be anything other than a decl?
+					if exp and !ParamsArray.IsDot and CurrFunc and !CurrFunc.Cls
+						if o isa scdecl					// O could be a module!
+							if (o isnt const) and (b!=compiler.program) and (b isa scmodule)  // bad?
+								/problem (exp, "Put a dot before this expression.")
+					return o
 				ifn exp in @dot			// x = a.b is still a function call
-					|| err = "Can't get the address of a function unless it has a prototype."
+					|string--| err = "Can't get the address of a function unless it has a prototype."
 					if side and !paramsarray.MacroSize
 						err = "Not assignable."
 					check (o|scfunction|.HasProto) (exp, err)
@@ -814,6 +818,13 @@ function CollectStr (|string| s, |message|)
 	.CollectFromNode( rz, false )
 
 
+function scnode.Module (|scmodule|)
+	if self isa scmodule
+		return self
+	if self isa scclass
+		return .modul
+/	return compiler.program // never happens?
+
 function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 	expect (FuncName == @thg) ( FuncName, "Need a name." )
 	
@@ -831,21 +842,27 @@ function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 	AllSameType ?= "object"
 
 	|| Name = FuncName.Name
+
+	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
+	|| DclMsg = DclSrc.ParseClean
+/		DclMsg.CollectAGlobalDecl(.module)
+
 	|| fs = FastString.new
 
 	fs <~ "
 function $name (|dictionary of $AllSameType|)
 	visible false
-	|| _T = ${name}_Dict 
+	opt norefcounts
+	|| _T = .${name}_Dict 
 	if _T
 		return _T
 	_T = dictionary.new
-	${name}_Dict = _T
+	.${name}_Dict = _T
 "
 
 	for s in NameList
 		fs <~ `	_T.Set("`
-		fs <~ s.name.Lowercase
+		fs.appendlower(s.name)
 		fs <~ `", `
 		fs <~ s
 		fs <~ ")\n"
@@ -856,11 +873,7 @@ function $name (|dictionary of $AllSameType|)
 
 	|| FuncSrc = fs.GetResult
 	|| msg = FuncSrc.ParseClean[0]
-	.CollectSub( msg #expect )
-
-	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
-	|| DclMsg = DclSrc.ParseClean
-		DclMsg.CollectFromBody(self)
+/		.CollectSub( msg )
 }
 
 
@@ -914,7 +927,7 @@ function LoadVisibility (|Message| p, |bool|)
 
 
 iterator ListLookup
-	|| Curr = self
+	|scnode--| Curr = self
 	while (Curr)
 		yield Curr
 		Curr = Curr.parent
@@ -1072,4 +1085,8 @@ datatype SCNodeFindMode (int)
 		ForClass
 	syntax is (|SCNodeFindMode| m, |bool|)
 		return self & m
+	module
+		|int| aaa
+		function argh
+			.aaa = 1
 

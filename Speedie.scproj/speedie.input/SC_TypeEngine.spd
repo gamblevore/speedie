@@ -1829,6 +1829,7 @@ function SCFunction.DotFuncToNormalFunc (|Message| dot)
 
 
 function SCDecl.ProcessAs (|Message!| msg, |SCDecl|)
+	opt norefcounts
 	|| P = msg.parent!.unbra
 	if (P isBrel "&")					 // :)
 		return self

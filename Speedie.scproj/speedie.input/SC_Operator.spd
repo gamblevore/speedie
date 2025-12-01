@@ -134,7 +134,7 @@ module {
 			return result
 		
 		|| op = opch.name
-		Result = dict[ op ]
+		Result = .dict[ op ]
 		
 		if (!Result)
 			result = AddCustom( op )
@@ -148,8 +148,8 @@ module {
 
 	function Init 
 		opt norefcounts
-		Negative.name = "-"
-		Bnot.name = "~"
+		.Negative.name = "-"
+		.Bnot.name = "~"
 
 		.AddComp("==",					&Assembler.Equals,		OpMode.ExactEquals)
 		.AddComp("<",					&Assembler.Less,		opmode.Comparison + opmode.less)
@@ -170,17 +170,17 @@ module {
 		.AddMath( "/",		"Divide",	&Assembler.Divide,		/*.div*/)
 
 		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,			/*.shru*/	opmode.Rightshift)
-		LeftShift = .addbit( "<<",	"ShiftLeft",	&Assembler.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
+		.LeftShift = .addbit( "<<",	"ShiftLeft",	&Assembler.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&Assembler.BitOr,		/*.bor*/)
 		.AddBit( "&",	"BitAnd",		&Assembler.BitAnd,		/*.ban*/	opmode.SameOrLessBits)
 		.AddBit( "^",	"Xor",			&Assembler.bitxor,		/*.xor*/	opmode.noextrabits)
 
-		Subtract = dict["-"]
+		.Subtract = .dict["-"]
 
-		|| BitOr = dict[ "(|)" ]
-		dict["|"] = bitor // for: a |= b
-		dict["|||"] = bitor
-		dict["operatorsub"]= dict["operatorminus"]
+		|| BitOr = .dict[ "(|)" ]
+		.dict["|"] = bitor // for: a |= b
+		.dict["|||"] = bitor
+		.dict["operatorsub"]= .dict["operatorminus"]
 		
 		// these two arent bits???
 		.AddBit( "is",		"is", nil, opmode.SyntaxIs )					// if obj is flag
@@ -191,8 +191,8 @@ module {
 
 	function OppositeComp (|string| A, |string| B)
 		opt norefcounts
-		|| pA = dict[A]
-		|| pB = dict[B]
+		|| pA = .dict[A]
+		|| pB = .dict[B]
 		if pa and pb
 			pa.Opposite = pB
 			pb.Opposite = pa
@@ -220,7 +220,7 @@ module {
 
 	function AddCustom (|string| s, |SCOperator|)
 		|| opp = SCOperator.new(s, nil, OpMode.custom)
-		opp.score = CustomOperatorScore
+		opp.score = .CustomOperatorScore
 		opp.SetFuncName = s
 		return opp
 
@@ -267,8 +267,8 @@ or
 					fake.name = s2
 					.lookup(fake).score = i
 
-		dict["="]!.score = 100
-		CustomOperatorScore = dict["custom"]!.score
+		.dict["="]!.score = 100
+		.CustomOperatorScore = .dict["custom"]!.score
 
 }
 

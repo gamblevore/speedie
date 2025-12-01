@@ -36,6 +36,14 @@ class SCParamArray
 		.ErrCount = stderr.errorcount
 
 
+	function CheckDot (|scobject| D, |scobject|)
+		if d isa SCDecl
+			|| d2 = d|scdecl|
+			d2 = d2
+			// how to tell that this shouldn't happen? the current function is not a class.
+			// so... where did we find this thign?
+		return d
+	
 	function AddSub (|| m)
 		require .size < 8
 		|| i = .size++

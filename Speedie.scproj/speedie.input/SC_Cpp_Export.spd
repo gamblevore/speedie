@@ -1008,7 +1008,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function Init
-		Cpp_Includes = []
+		.Cpp_Includes = []
 		@Acc.ExportAddr  = C_RenderAcc
 		@Item.ExportAddr = C_RenderItem
 

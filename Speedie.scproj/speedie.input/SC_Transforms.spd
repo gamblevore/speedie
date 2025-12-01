@@ -97,7 +97,7 @@ function Tran_Expect (TranFunc)
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space, |bool|)
 	opt norefcounts
-	|| TmpInt = TemporalStatements[s.name]
+	|| TmpInt = .TemporalStatements[s.name]
 		return (TmpInt[])( FN, s, name_space )
 	error s
 
@@ -726,12 +726,12 @@ function Tran_Syx (|Message| msg, |Message|)
 		dot2 <~ @emb
 		prm <~ OldName.lowercase
 		prm <~ longname
-		prm <~ SyxID
+		prm <~ .SyxID
 		Compiler.program.CollectOne( dotnew, true )
 
-	compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, syxid, msg)
+	compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
 
-	SyxID++
+	.SyxID++
 	Return msg
 
 
@@ -902,8 +902,8 @@ struct IsaTester // annoyed at creating arrays all over.
 	module
 		|IsaTester| T
 		syntax append (|message| o)
-			if t.count < 4
-				t.items[t.count++] = o
+			if .t.count < 4
+				.t.items[.t.count++] = o
 
 
 function compiler.CollectIsaTests (|Message| s, |bool|)

@@ -30,13 +30,13 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |message|)
 	arr <~ @thg + fname
 	arr <~ up.msg
 	arr <~ down.msg
-	return Ugh.run(arr)
+	return .Ugh.run(arr)
 
 
 // we need to create an array of forms...
 function FillTypePrm (|string| fname, |int| pname)
 	|| prop = @thg + fname
-	.dt_prm <~ Ooof.run(prop, pname.msg)
+	.dt_prm <~ .Ooof.run(prop, pname.msg)
 
 
 function FinishAcc 
@@ -174,7 +174,7 @@ function message.Find (|string| name, |Message|)
 
 function JustDefineInstructions (|bool|)
 	description "Shorter version that just makes the stuff we need, rather than generate the entire VM."
-	require !ModuleArg
+	require !.ModuleArg
 	|| VMDef = .VMBox
 		|| forms = VMDef.find("forms")
 		.GenerateForms(forms, false)
@@ -184,7 +184,7 @@ function JustDefineInstructions (|bool|)
 function BuildFiles (|bool|)
 	|| VMDef = .VMBox							#require
 
-	FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box" ).OutputStream
+	.FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box" ).OutputStream
 	
 	|| Forms = VMDef.find("forms")
 	forms.remove
@@ -198,9 +198,9 @@ function BuildFiles (|bool|)
 	.FillEncoders(VMDef)
 	.VMCpp(code, jump)
 	
-	|| fs = FatFile
+	|| fs = .FatFile
 		fs.Flush
-	.SafeWrite("InstructionGetters.h", form_h)
+	.SafeWrite("InstructionGetters.h", .form_h)
 	.SafeWrite("Instructions.i",       code)
 	.SafeWrite("InstructionList.h",    jump)
 	
@@ -398,13 +398,13 @@ function MakeFatCreator (|string| name, |µform| form)
 
 function FatCreatorSub (|string| name, |µform| form, |message|)
 	opt norefcounts
-	|| fn = IceCream.run(@thg+name)
+	|| fn = .IceCream.run(@thg+name)
 	|| arg = fn.Last!
 	|| prm = arg.prev!
 	|| FatDecl = prm.last!
 	|| f = form.src.first.first
-	if rdz == 0
-		rdz <~ (arg, 2)
+	if .rdz == 0
+		.rdz <~ (arg, 2)
 	
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
@@ -412,16 +412,16 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 		|| rel = NewEqRel(@thg + pname, @thg + "nil")
 		|| dcl = NewDecl(ty, rel)
 		fatdecl.prev = dcl
-		rdz[0] = i.msg
-		rdz[1] = @thg + pname
+		.rdz[0] = i.msg
+		.rdz[1] = @thg + pname
 
 
 		|| Mac = vm_builder.skibidy
 		if p is output
-			TempDests <~ mac.run(rdz)
+			.TempDests <~ mac.run(.rdz)
 			if p is input
-				rdz[0] = i.msg // oof
-				rdz[1] = @thg + pname
+				.rdz[0] = i.msg // oof
+				.rdz[1] = @thg + pname
 				
 		
 		if p isnt output or p is input
@@ -431,16 +431,16 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 				mac = VM_Builder.legs
 			  else
 				mac = vm_builder.arms
-			arg <~ mac.run(rdz) // AppendMacro is better?
+			arg <~ mac.run(.rdz) // AppendMacro is better?
 		
 		if p is jump
-			rdz[0] = @thg+pname
+			.rdz[0] = @thg+pname
 			|| size = 32 - p.bitsize
-			rdz[1] = @num+size
-			arg <~ ohio.run(rdz) // AppendMacro is better?
+			.rdz[1] = @num+size
+			arg <~ .ohio.run(.rdz) // AppendMacro is better?
 		f++
 
-	while (|| dest = tempdests.first)
+	while (|| dest = .tempdests.first)
 		arg <~ dest // dest goes last...
 	
 	return fn

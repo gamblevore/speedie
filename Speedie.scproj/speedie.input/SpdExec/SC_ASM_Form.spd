@@ -97,7 +97,7 @@ class µForm
 		|int| Count
 		function NeedForm (|string| Form, |message| m=nil, |µform|)
 			opt norefcounts
-			rz = forms.valuelower(form)
+			rz = .forms.valuelower(form)
 			if !rz
 				error (m, "Missing form: " + form)
 				rz = µform(@arg.msg)

@@ -195,13 +195,13 @@ datatype SCBlockage (int)
 //		printline f.Exportname
 
 
-function @scfunction.PrintStats (|faststring| fs)
-	fs.PrintStatType("int",				FuncArgAndReturnTypes[1] + FuncArgAndReturnTypes[0])
-	fs.PrintStatType("float",			FuncArgAndReturnTypes[2])
-	fs.PrintStatType("float/int",		FuncArgAndReturnTypes[3])
-	fs.PrintStatType("vector",			FuncArgAndReturnTypes[4])
-	fs.PrintStatType("vector/int",      FuncArgAndReturnTypes[5])
-	fs.PrintStatType("vector/float",    FuncArgAndReturnTypes[6])
-	fs.PrintStatType("vector/float/int",FuncArgAndReturnTypes[7])
+//function @scfunction.PrintStats (|faststring| fs)
+//	fs.PrintStatType("int",				.FuncArgAndReturnTypes[1] + .FuncArgAndReturnTypes[0])
+//	fs.PrintStatType("float",			.FuncArgAndReturnTypes[2])
+//	fs.PrintStatType("float/int",		.FuncArgAndReturnTypes[3])
+//	fs.PrintStatType("vector",			.FuncArgAndReturnTypes[4])
+//	fs.PrintStatType("vector/int",      .FuncArgAndReturnTypes[5])
+//	fs.PrintStatType("vector/float",    .FuncArgAndReturnTypes[6])
+//	fs.PrintStatType("vector/float/int",.FuncArgAndReturnTypes[7])
 
 

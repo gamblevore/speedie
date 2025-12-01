@@ -262,7 +262,7 @@ module SC_Saver {
 	
 	function Compiler.DoSavers (|int| Stage)
 		opt norefcounts
-		for c in classlist
+		for c in .classlist
 			if c.IsSaveableObject or c.issaveablestruct
 				|| First = c.DoSaver("SaveWrite", stage)
 				|| Second = c.DoSaver("LoadProperties", stage)

@@ -129,7 +129,7 @@ extend Parser
 	
 	function BarThings (|int| Start, |syntax| Syx, |Message|)
 		require (.nextbyte != '=')
-		_StopBars = kTemporalSyx (|) kFuncAfterBar
+		._StopBars = kTemporalSyx (|) kFuncAfterBar
 		|| item = .ProcessThingNoBar // maybe we can remove stopbars? we'll see...
 									 // can't just comment out above line, but maybe use
 									 // ProcessThingNoBar in more places?
@@ -138,7 +138,7 @@ extend Parser
 		  else
 			item = parser.newempty(nil, @Emb, start, start)
 
-		_StopBars = 0
+		._StopBars = 0
 		require .ExpectEndChar(parser.nextstart, "|")
 
 		rz = parser.new(nil, Syx, start)
@@ -857,7 +857,7 @@ ive been~running #since morning
 
 	function GetFuncAfter (|Message!| result, |Message!|)
 		while
-			|| ThisAfter = kFuncAfterAny &~ _StopBars
+			|| ThisAfter = kFuncAfterAny &~ ._StopBars
 			if NoFuncAfter(.NextByte)
 				ThisAfter &= ~kFuncAfterNoSpace
 			

@@ -362,8 +362,8 @@ function ImportLibs
 	SCImport.STDLibTime = true	
 	.Library = .projects.filech("Library")
 	|| Jeebox = .Jeebox	
-	SCImport.Importpath( "Library",  Library!,	1,  true )
-	SCImport.Importpath( "jeebox",   Jeebox,	1,  true )
+	SCImport.Importpath( "Library",  .Library!,	1,  true )
+	SCImport.Importpath( "jeebox",   .Jeebox,	1,  true )
 	
 	scimport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)

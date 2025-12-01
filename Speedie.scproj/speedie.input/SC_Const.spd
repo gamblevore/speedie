@@ -150,6 +150,7 @@ function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64
 
 
 function SCNode.CollectConstantsSub (|Message| ch)
+	opt norefcounts
 	|| FuncName = ch.first									#require
 	|| arg = ch[-1]
 	|| vs = funcname
@@ -167,16 +168,16 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	
 	|[SCDecl]|	FixLater
 	|[message]|	NameList
-	|SCDecl|	CurrType
+	|SCDecl--|	CurrType
 
-	for (line in arg)
-		|| LF = line.first.func
-		|| LL = line.Last.func
-		if (line == @rel) and (LF == @arr) or (LL == @arr)
-			.ConstantExpand( line )
-		  elseif (line == @tmp)
-			expect !line.hasany (line)
-			line.Func = @thg
+	for line1 in arg
+		|| LF = line1.first.func
+		|| LL = line1.Last.func
+		if (line1 == @rel) and (LF == @arr) or (LL == @arr)
+			.ConstantExpand( line1 )
+		  elseif (line1 == @tmp)
+			expect !line1.hasany (line1)
+			line1.Func = @thg
 
 
 	for (Line in arg)
@@ -248,6 +249,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 
 	if (FuncName)
 		.CreateNameDict( FuncName, NameList )
+		scfunction.currfunc = nil
 
 
 
@@ -341,6 +343,7 @@ function @scmodule.ConstantCollector (collectfunc)
 
 function compiler.CollectConstants
 	opt norefcounts
+	scfunction.currfunc = nil
 	for ch in .constantslist
 		|| b = ch.obj as SCNode
 			b.CollectOneConstants(ch)

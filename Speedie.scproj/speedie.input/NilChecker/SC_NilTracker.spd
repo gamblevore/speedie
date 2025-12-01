@@ -193,23 +193,23 @@ struct ArchonPurger
 			.Loops.BeginLoop(hasexitcond)
 
 		function Value (|NilRecord|)
-			return t.value
+			return .t.value
 
 		function EndBlock (|nilrecord|)
 			rz = .value
-			t.value = nilstate.basic
+			.t.value = nilstate.basic
 
 		function DeclKill
-			t.value = nilstate.Basic
+			.t.value = nilstate.Basic
 
 		function ExterminateZergBugs (|SCFunction| f)
 			opt norefcounts
 			
-			|| arg = t.Startnil(f)
+			|| arg = .t.Startnil(f)
 				Argument(arg)
-				if t.FnAbleToNilCheck and !f.isnilchecker
+				if .t.FnAbleToNilCheck and !f.isnilchecker
 					f.isnilchecker = 1
-			t.FinishNil(f)
+			.t.FinishNil(f)
 
 		
 		function LaunchMothership

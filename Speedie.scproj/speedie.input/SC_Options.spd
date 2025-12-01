@@ -192,7 +192,7 @@ module Feedback
 		|| Value = obj.Value
 
 		if Name
-			|| opt = AppOptions[name]
+			|| opt = .AppOptions[name]
 				options.OperationCount += ((opt[])(name, value, nil))
 			  else
 				app.quit("Unknown switch: " + Name)
@@ -471,7 +471,7 @@ module Feedback
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ${target~flow}"
 		fs <~ "  @Syx: ${@max|int|}"
-		for (v in AppOptions) (k) 
+		for (v in .AppOptions) (k) 
 			(v[])("", "", fs_tester)
 			|| val = v.Value|shelloption|
 			if (val and fs_tester.length) 

@@ -564,8 +564,8 @@ function @assembler.PrintProgress
 function @assembler.PrintRegs
 	target debug
 		|| i = 0
-		|| D = sh.vdecls_
-		|| T = sh.vtemps
+		|| D = .sh.vdecls_
+		|| T = .sh.vtemps
 		|| X = D|||T
 		|| Prev = false
 		while ++i <= 31

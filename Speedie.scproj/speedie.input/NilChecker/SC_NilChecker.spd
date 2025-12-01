@@ -68,9 +68,9 @@ function SyncJump (NilTrackerFn)
 
 
 function JumpWithinBool (NilTrackerFn)
-	t.InsideBoolLogic++
+	.t.InsideBoolLogic++
 	rz = .jump(msg, test ||| nilcheckmode.ForBools)
-	t.InsideBoolLogic--
+	.t.InsideBoolLogic--
 
 
 
@@ -100,7 +100,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	Prms.Func = @prm
 	Prms.First = upon
 
-	NewFuncsLoaded = true
+	.NewFuncsLoaded = true
 	fn.ReachFuncFromFunc(scfunction.currfunc!)
 	dot.memorylayer.use
 	|| f = message(@thg, fn.exportname)
@@ -238,14 +238,14 @@ function NilFunction (NilTrackerFn)
 		fp = fp.unbra
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
-	ifn ((fn != scfunction.currfunc) or t.anyreturns or t.BranchDepth > 0)
+	ifn ((fn != scfunction.currfunc) or .t.anyreturns or .t.BranchDepth > 0)
 		ErrorReceiver.NewCriticalError(msg, "Recursion fail: This would freeze.")
 			
 	
 	if (Test is Active) and fn.IsNilChecker
 		if fn.isnilchecker != 3
 			Test |= NilCheckMode.Soft
-		if t.FnAbleToNilCheck
+		if .t.FnAbleToNilCheck
 			rz = nilstate.FnBecomesNilCh
 	  else
 		Test = 0
@@ -294,7 +294,7 @@ function NilFunction (NilTrackerFn)
 
 	if fn Is Killer
 		.DeclKill
-		if (t.BranchDepth == 0)  and  !t.AnyReturns // also if no returns happened...
+		if (.t.BranchDepth == 0)  and  !.t.AnyReturns // also if no returns happened...
 			(scfunction.currfunc! is killer)
 		msg.LastInBlock(SCBlockage.Quit) // may happen later than expected
 		return nilstate.Killer
@@ -314,19 +314,19 @@ function Rejoin (NilTrackerFn)
 function DetectStillChecks (|message| first, |nilstate|)
 	require first
 	rz = .jump(first)
-	if !t.FnAbleToNilCheck or (rz is FnBecomesNilCh)
+	if !.t.FnAbleToNilCheck or (rz is FnBecomesNilCh)
 		return rz
 
 	|| F = first.TrueNess(rz)
-	|| SelfNil = t.self is nilish 
+	|| SelfNil = .t.self is nilish 
 	if f.Knownfalse
 		if !SelfNil
-			t.FnAbleToNilCheck = false		// also require that false returns ALWAYS have self nil!
+			.t.FnAbleToNilCheck = false		// also require that false returns ALWAYS have self nil!
 		// optional is allowed to return false
 	  elseif rz is FnBecomesNilCh			// its ok
 		0
 	  elseif SelfNil
-		t.FnAbleToNilCheck = false			// Nilcheckers require only return true if self is not nil!
+		.t.FnAbleToNilCheck = false			// Nilcheckers require only return true if self is not nil!
 
 
 
@@ -336,8 +336,8 @@ function Return (NilTrackerFn)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 //	.CloseVars(msg)
 	.DeclKill
-	t.anyreturns = true
-	|| ret = t.return
+	.t.anyreturns = true
+	|| ret = .t.return
 	require ret and ret.typesuffers
 
 	if ret.StatedReal
@@ -366,7 +366,7 @@ function While (NilTrackerFn)
 	|| cond = msg.first!
 	|| CondTest = cond.IsAlwaysBool
 
-	require !CondTest.KnownFalse and T.BranchEnter(msg)
+	require !CondTest.KnownFalse and .T.BranchEnter(msg)
 
 	|| W = .BeginLoop(!condtest.KnownTrue)
 	for i in 3 
@@ -381,7 +381,7 @@ function While (NilTrackerFn)
 	.loops.FinishLoop(msg)
 	ArchonPurger.loops = W
 
-	return t.BranchExit(0)
+	return .t.BranchExit(0)
 	
 
 
@@ -397,12 +397,12 @@ function If (NilTrackerFn)
 		ElseIfCond = arg2
 		arg2 = arg2.next
 
-	|| Orig = T.BranchEnter(msg) #require
+	|| Orig = .T.BranchEnter(msg) #require
 	#!"First Branch"
 	.SyncJump(Cond, NilCheckMode.Ifpos)
 	.Argument(arg1)
 	
-	|| First = T.BranchSwap(Orig)
+	|| First = .T.BranchSwap(Orig)
 
 	#!"Second Branch"
 	.SyncJump(cond, NilCheckMode.ifneg) // we need the negative, for the merging.
@@ -410,7 +410,7 @@ function If (NilTrackerFn)
 		.if(Else)
 	  elseif arg2.HasAny
 		.Argument(arg2)
-	return t.BranchExit(First)
+	return .t.BranchExit(First)
 
 
 
@@ -419,18 +419,18 @@ function Tern (NilTrackerFn)
 	test &=~ NilCheckMode.Disappears
 	msg = msg.second!
 
-	|| Orig = T.BranchEnter(msg)	#require
+	|| Orig = .T.BranchEnter(msg)	#require
 	|| tC = msg.first!,  || tA = tC.next!,  || tB = tA.next!
 
 	#!"First Branch"
 	.jump(tC, NilCheckMode.positive)
 	rz = .JumpWithinBool(tA, test)
-	|| First = T.BranchSwap(Orig)
+	|| First = .T.BranchSwap(Orig)
 
 	#!"Second Branch"
 	.JumpWithinBool(tC, nilcheckmode.negative)
 	rz |= .JumpWithinBool(tB, test)
-	t.BranchExitBool(First, test, orig)
+	.t.BranchExitBool(First, test, orig)
 	rz &= ~nilstate.FnBecomesNilCh	// in theory if BOTH were nil-testers... its OK
 									// but thats sooo awkward to even think of a real-case
 									// where I want this! Just don't do it!
@@ -443,22 +443,22 @@ function BooleanLogic (NilTrackerFn)
 	|| IsAnd = test is AND
 	(test is AND) = false 
 
-	|| Orig = T.BranchEnter(AA)	#require
+	|| Orig = .T.BranchEnter(AA)	#require
 	if IsAnd == (test is positive)
 		|| NC = .Jump(AA, test ||| nilcheckmode.ForBools)				// x = (!a or !a.y)
 		NC   |= .JumpWithinBool(BB, test)
-		t.BranchExitBool(.value, test, orig)
+		.t.BranchExitBool(.value, test, orig)
 		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
 	
 	#!"test A+"
 	.Jump(AA, test)
-	|| First = T.BranchSwap(Orig)
+	|| First = .T.BranchSwap(Orig)
 
 	#!"test A-B+"
 	.Jump(AA, test.negate ||| nilcheckmode.ForBools)
 	.JumpWithinBool(BB, test)
 
-	return t.BranchExitBool(First, test, orig)
+	return .t.BranchExitBool(First, test, orig)
 
 
 
@@ -480,10 +480,10 @@ function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test
 			|| rdl = rd is Local
 			if ldl or rdl
 				if rdl and ld.NilCurr == NilState.Realish
-					T.SetNilness(rd, NilState.real)
+					.T.SetNilness(rd, NilState.real)
 					todo &= ~2
 				if ldl and rd.NilCurr == NilState.Realish
-					T.SetNilness(ld, NilState.real)
+					.T.SetNilness(ld, NilState.real)
 					todo &= ~1
 	
 	if todo & 1
@@ -530,10 +530,10 @@ function Thing (NilTrackerFn)
 	
 	if dcl is NeedsClose and dcl isnt Grabbed
 		|| nreg = dcl.NilReg
-			t.closers[nreg] = msg.UpToArg
+			.t.closers[nreg] = msg.UpToArg
 	
 	msg.Indent = rz&3				// The msg now knows the current state! Nice!
-	if t.FnAbleToNilCheck and dcl is self
+	if .t.FnAbleToNilCheck and dcl is self
 		rz |= nilstate.FnBecomesNilCh
 
 
@@ -554,7 +554,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 		return Y
 
 	if Unknown or (Y==nilstate.either) or (Y != (test&nilstate.Either))
-		return T.SetNilness(dcl, Test)
+		return .T.SetNilness(dcl, Test)
 
 	return msg.Redundantvar(dcl, test)
 
@@ -585,7 +585,7 @@ function Argument (NilTrackerFn)
 //	--ArgDepth
 	|| FinalVars = ArchonPurger.value
 	|| Allowed = (1|uint64| << ((vardepth+1)<<1)) - 1|uint64|
-	t.value = FinalVars & Allowed
+	.t.value = FinalVars & Allowed
 	
 //	.MergeVars(msg, finalvars, vardepth)
 
@@ -649,7 +649,7 @@ function Arel (NilTrackerFn)
 		  else
 			if PostIncrementNil.Sync
 				PostIncrementNil.Check(ch)
-			if t.InsideBoolLogic
+			if .t.InsideBoolLogic
 				error (ch, "Can't post-increment within boolean-logic")
 
 
@@ -660,12 +660,12 @@ function Declaration (NilTrackerFn) // function decl
 		|| d = thg.FastDecl
 		|| J = .Jump(rel.last!)
 		if d.IsReg
-			return T.Declare(D, J, msg)
+			return .T.Declare(D, J, msg)
 	  else
 		// carrays declared like: |int[1]| LocalVar
 		|| d = rel.FastDecl // hmmm. a carray?
 		if d.IsReg
-			return T.Declare(D, nilstate.real, msg)
+			return .T.Declare(D, nilstate.real, msg)
 	
 
 
@@ -741,7 +741,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		return nilstate.real
 		
 	if recv.Suffers
-		return T.SetNilness(recv, SentState)
+		return .T.SetNilness(recv, SentState)
 
 
 function BecomeReal (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv = nil,  |scfunction?| To = nil, |nilstate|)
@@ -755,8 +755,8 @@ function BecomeReal (|scdecl| sent,  |message| where,  |nilreason| reason,  |scd
 
 function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv,  |scfunction?| To, |nilstate| curr, |nilstate|)
 	if (Curr == nilstate.either) and sent.IsUnknownParam
-		T.BecomeRealSub(sent)
-		return T.SetNilness(sent, NilState.real)
+		.T.BecomeRealSub(sent)
+		return .T.SetNilness(sent, NilState.real)
 
 	if recv and !recv.TypeSuffers		// passing nil to int
 		return NilState.Real

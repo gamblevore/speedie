@@ -51,7 +51,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 	|| Supper = fields.first
 	while (|| L = fields.Last)
 		(l.RangeLength = AlreadyDone)
-		tmp.First = L
+		.tmp.First = L
 	
 	
 	|| level = 2
@@ -63,7 +63,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 	  else
 		fields <~ (@sdot, "interface")
 	arg.BuildTask(fields, level)
-	arg.prependall(tmp)
+	arg.prependall(.tmp)
 	node.name = "role"
 	
 	

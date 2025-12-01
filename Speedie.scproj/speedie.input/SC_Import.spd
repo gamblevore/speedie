@@ -322,7 +322,7 @@ class SCImport
 
 
 		function ExportShaders
-			require shaders
+			require .shaders
 			
 			Compiler.stage( "Copying Shaders" )
 			compiler.Timer( "Copying Shaders" )
@@ -330,7 +330,7 @@ class SCImport
 			|| P = compiler.BuildFolder["Resources/Shaders"]
 			P.MakeAndGoInto
 			
-			for (f in shaders) (sh_name)
+			for (f in .shaders) (sh_name)
 				if (f isa File)
 					|| name = f.name
 					|| Dest = P[name]!

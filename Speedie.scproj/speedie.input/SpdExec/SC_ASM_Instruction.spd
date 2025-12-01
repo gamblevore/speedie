@@ -54,7 +54,7 @@ class Instruction
 
 		syntax access (|message| m, |instruction|)
 			opt norefcounts
-			return OpDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
+			return .OpDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
 
 		syntax Access (|int| pos, |instruction|)
 			return .TypeList[pos]!

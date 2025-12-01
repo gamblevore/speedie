@@ -1306,7 +1306,7 @@ function CurrFunc (assigns:|scfunction?|)
 		FlowControl.inputline("stage: ", compiler.stagename)
 	
 function CurrFunc (|scfunction|)
-	return _currfunc
+	return ._currfunc
 
 
 function NewMacro (CollectFunc)
@@ -1598,7 +1598,7 @@ function Tran_Once (TranFunc)
 	
 	using (node)
 		node.name = "if"
-		|| name = "once" + (++OnceCount)
+		|| name = "once" + (++.OnceCount)
 		|| obj = compiler.program.lateAddTemporary( "bool", name, @thg + "false", node )
 
 		|| rel = @rel+""

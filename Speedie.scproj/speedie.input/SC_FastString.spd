@@ -30,32 +30,32 @@ module FastStringOpts {
 
 
 function Init (|message| s, |bool|)
-	require InitedOK == 0
+	require .InitedOK == 0
 	|| m = StdErr.Mark
-	fnbyte = compiler.XFunc("JB_FS_AppendByte", s)
-	fnGetResult = compiler.XFunc("JB_FS_GetResult", s)
-	fnAppend = compiler.XFunc("JB_FS_AppendString", s)
-	FnAppend4 = compiler.XFunc("JB_Str_Append4", s)
-	FnAppend6 = compiler.XFunc("JB_Str_Append6", s)
-	fnPlus = compiler.XFunc("JB_Str_OperatorPlus", s)
+	.fnbyte = compiler.XFunc("JB_FS_AppendByte", s)
+	.fnGetResult = compiler.XFunc("JB_FS_GetResult", s)
+	.fnAppend = compiler.XFunc("JB_FS_AppendString", s)
+	.FnAppend4 = compiler.XFunc("JB_Str_Append4", s)
+	.FnAppend6 = compiler.XFunc("JB_Str_Append6", s)
+	.fnPlus = compiler.XFunc("JB_Str_OperatorPlus", s)
 	rz = m
-	InitedOK = 2 - rz
+	.InitedOK = 2 - rz
 
 
 function Optimise (|message| s)
 	opt norefcounts
-	if InitedOK != 1
+	if .InitedOK != 1
 		require .init(s)
 	
 	|| fn = s.MsgFunc
 	|| prms = s.second				#require
-	if fn == FnAppend
+	if fn == .FnAppend
 		|| item = prms.last
-		if item.msgfunc == fnGetResult
+		if item.msgfunc == .fnGetResult
 			FastStringOpts.FS(s, item)
 		  else
 			FastStringOpts.StringToByte(item)
-	  elseif fn == FnGetResult
+	  elseif fn == .FnGetResult
 		.TryStringAppend(s)
 
 
@@ -91,11 +91,11 @@ function TryStringAppend (|message| s)
 	|| prms = s.second!
 	prms.first.remove
 	if count == 2
-		s.become(FnPlus!)
+		s.become(.FnPlus!)
 	  elseif count >= 3 and count <= 4
-		s.become(fnappend4!)
+		s.become(.fnappend4!)
 	  else	
-		s.become(fnappend6!)
+		s.become(.fnappend6!)
 
 	while
 		|| n = p.next
@@ -107,7 +107,7 @@ function TryStringAppend (|message| s)
 		if oof == @char // damn! well it was from appendbyte. anyhow. Lets change it back.
 			oof.func = @sstr
 			oof.obj = typestring!.typenormal
-			StrRemoved-- 
+			.StrRemoved-- 
 		prms <~ oof
 	
 	if count&1

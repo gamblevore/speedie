@@ -31,8 +31,8 @@ function compiler.PrintCompileTime (|date| durr)
 		fs.Normal  "Proj Saved", packmaker.PackSaved.Churn(fs)
 		if packmaker.LibSaved.Total
 			fs.Normal  "Lib Saved",  packmaker.LibSaved.Churn(fs)
-		if stdebuginfo
-			fs.normal  "DebugInfo",  stdebuginfo.strsize(fs)
+		if .stdebuginfo
+			fs.normal  "DebugInfo",  .stdebuginfo.strsize(fs)
 
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
@@ -62,7 +62,7 @@ function compiler.PrintStats
 			fs <~ ":"
 			fs <~ c
 	
-	SCFunction.PrintStats(fs)
+//	SCFunction.PrintStats(fs)
 	printline fs
 
 
