@@ -34,7 +34,7 @@ JBClass( FastString, JB_Object,
 void JB_FS_AppendMini(FastString* fs, MiniStr S);
 void JB_FS_AppendMem_(FastString* fs, const uint8* s0, int len);
 void JB_FS_AppendCString(FastString* self, const char* c);
-void JB_FS_AppendCString2(FastString* self, uint8* c);
+void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...);
 bool JB_FS_ResizeTo_(FastString* fs, int NewLength);
 uint8* JB_FS_NeedSpare(FastString* fs, int Extra);
 void JB_FS_RemoveByte(FastString* self, byte B);
@@ -50,7 +50,6 @@ void JB_FS_ByteSet(FastString* self, int offset, byte Val);
 uint8*  JB_FS_WriteAlloc_(FastString* fs, int GrowBy);
 void JB_FS_AppendString(FastString* self, JB_String* u);
 int JB_FS_AppendURL(FastString* self, JB_StringC* URL, uint64 TimeoutSeconds, JB_StringC* Cookie );
-void JB_FS_AppendLine(FastString* self, JB_String* s);
 void JB_FS_AppendRange(FastString* self, JB_String* u, int Start, int After);
 void JB_FS_AppendFastString(FastString* self, FastString* po);
 void JB_FS_AppendSectFastString(FastString* self, FastString* po, int srStart, int srLength);

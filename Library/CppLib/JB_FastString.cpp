@@ -43,6 +43,9 @@ void JB_FS_AppendMini(FastString* fs, MiniStr S) {
 
 // oofington
 void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...) {
+// awesome new system to make appending to a faststring use less code
+// or else string formatting code can tend to become quite... bloated.
+
     va_list Vargs; va_start(Vargs, Fmt);
     u8* Addr = Fmt->Addr;
     int Length = Fmt->Length;
@@ -50,15 +53,15 @@ void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...) {
 		int Ty = Addr[i];
         switch (Ty) {
             case 0: {
-                JB_String* s = va_arg(Vargs, JB_String*);
-                JB_FS_AppendString(fs, s);
+                Date d = va_arg(Vargs, Date);
+                JB_FS_AppendLocalTime(fs, d);
                 break;
             } case 1: {
                 const char* c = va_arg(Vargs, const char*);
                 JB_FS_AppendCString(fs, c);
                 break;
             } case 2: {
-                int b = va_arg(Vargs, int);
+                int b = va_arg(Vargs, int); // byte
                 JB_FS_AppendByte(fs, b);
                 break;
             } case 3: {
@@ -70,15 +73,23 @@ void JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...) {
                 JB_FS_AppendIntegerAsText(fs, i, 1);
                 break;
             } case 5: {
-                Date d = va_arg(Vargs, Date);
-                JB_FS_AppendLocalTime(fs, d);
+                JB_String* s = va_arg(Vargs, JB_String*);
+                JB_FS_AppendString(fs, s);
                 break;
             } case 6: {
+                int s = va_arg(Vargs, int);
+                JB_FS_AppendUTF8Char(fs, s);
+                break;
+            } case 7: {
                 double d = va_arg(Vargs, double);
                 JB_FS_AppendDoubleAsText(fs, d, 7, 0);
                 break;
             } default: {
-                JB_FS_AppendMem_(fs, Addr+i+1, Ty-6);
+				Ty -= 7;
+				if (i+Ty > Length)
+					Ty = Length - i;
+                JB_FS_AppendMem_(fs, Addr+i+1, Ty);
+                i += Ty;
 			}
 		}
 	}
@@ -100,7 +111,7 @@ int JB_FS_FreeSize(FastString* fs) {
 	return fs->Reserved - fs->Length;
 }
 
-uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { //JB_FS_FreeSizeSet
+uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { // JB_FS_FreeSizeSet
     int Spare = JB_FS_FreeSize(fs);
     if (Spare < Extra)
         if (!JB_FS_ResizeTo_(fs, fs->Reserved + Extra))
@@ -185,12 +196,6 @@ void JB_FS_AppendString( FastString* self, JB_String* u ) {
 	}
 }
 
-void JB_FS_AppendLine( FastString* self, JB_String* u ) {
-	JB_FS_AppendString(self, u);
-	JB_FS_AppendByte(self, 10);
-}
-
-
 void JB_FS_AppendRange(FastString* self, JB_String* Data, int Start, int After) {
 	if (Data) {
 		if (Start < 0)
@@ -200,10 +205,6 @@ void JB_FS_AppendRange(FastString* self, JB_String* Data, int Start, int After) 
 		if (After > Start)
 			JB_FS_AppendMem_(self, Data->Addr + Start, After - Start );
 	}
-}
-
-void JB_FS_AppendCString2(FastString* self, uint8* c) {
-    JB_FS_AppendCString(self, (const char*)c);
 }
 
 void JB_FS_AppendCString(FastString* self, const char* c) {
@@ -353,6 +354,7 @@ int JB_int_Render(int self, byte* Addr, int N) {
 	return snprintf((char*)Addr, N, "%i", self);
 }
 
+
 void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 	if (RoundTo <= 0) {RoundTo = 1;} else if (RoundTo > 16) {RoundTo = 16;}
      
@@ -399,11 +401,9 @@ void JB_FS_AppendDurr(FastString* self, Date D) {
 		JB_FS_AppendIntegerAsText(self, Amount, 1);
 }
 
-
 void JB_FS_AppendDoubleAsText0(FastString* self, double D) {
     JB_FS_AppendDoubleAsText(self, D, 9, true);
 }
-
 
 bool HasDot (uint8* self, int Used) {
 	for_ (Used) {
@@ -412,8 +412,6 @@ bool HasDot (uint8* self, int Used) {
 	}
 	return false;
 }
-
-
 
 static bool DoubleIsNormal (double D) {
 	return  D <= DBL_MAX  &&  D >= -DBL_MAX;
@@ -519,6 +517,7 @@ void JB_FS_AppendDouble(FastString* self, double d) {
 
 
                /* Utilities */
+
 int64 JB_FS_Mark(FastString* self) {
 	return self->WrittenLength + self->Length;
 }
@@ -527,7 +526,6 @@ int64 JB_FS_Mark(FastString* self) {
 bool JB_FS_Grew(FastString* self, int Old) {
 	return (Old < JB_FS_Mark(self)); 
 }
-
 
 
 int JB_FS_Byte(FastString* fs, int offset) {
@@ -550,14 +548,12 @@ int JB_FS_Size(FastString* fs) {
 	return fs->Reserved;
 }
 
-
 void JB_FS_SizeSet(FastString* fs, int NewSize) {
 	if (NewSize < 1)
 		JB_FS_Destructor( fs );
 	  else
 		JB_FS_ResizeTo_( fs, NewSize );
 }
-
 
 int JB_FS_Length(FastString* self) {
 	if (self) 
@@ -577,7 +573,6 @@ void JB_FS_LengthSet(FastString* fs, int NewLength) {
     }
 	FS_SanityCheck_(fs);
 }
-
 
 bool JB_FS_Flush(FastString* fs) {
     JB_File* File = fs->File;
@@ -606,8 +601,8 @@ void JB_FS_FileSet(FastString* fs, JB_File* F) {
 }
 
 
-            /* Constructors */
 
+            /* Constructors */
 
 FastString* JB_FS_Constructor(FastString* self) {
 	JB_New2(FastString);

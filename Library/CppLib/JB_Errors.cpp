@@ -96,10 +96,16 @@ static JB_String* Path_(JB_String* self) {
     }
     FastString* FS = JB_FS__FastNew(0);
     char* cwd = getcwd( 0, 0 );
+    
+//    JB_String Fmt;
+//    Fmt.Addr = (u8*)"\x0CHello\x01\x0DMyName\x02\x09Is\x05\x0BCool";
+//    Fmt.Length = strlen((const char*)Fmt.Addr);
+//    JB_FS_AppendVArg(FS, &Fmt, cwd, '/', self);
+    
     JB_FS_AppendCString(FS, cwd);
-    free( cwd );
     JB_FS_AppendByte(FS, '/');
     JB_FS_AppendString(FS, self);
+    free( cwd );
     return JB_FS_GetResult(FS);
 }
 

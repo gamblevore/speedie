@@ -100,7 +100,7 @@ datatype cstring
 		cpp_wrapper puts // hehe
 	
 	function Print
-		cpp_wrapper JB_PrintCString
+		print self
 	
 	inline Wrap (|string|)
 		return string.new(self)
