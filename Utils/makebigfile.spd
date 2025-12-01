@@ -4,7 +4,7 @@ main (|file| output, |int| reps, |file| input) // useful for testing speed of pa
 	require output.OpenEmpty
 	|| data = input.ReadAll$
 	for reps
-		output <~ data
+		output.write(data)
 	output.Close
 	
 	"$output is ${output.Size.strsize}"

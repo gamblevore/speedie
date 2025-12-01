@@ -39,16 +39,6 @@ extend String
 		if self and .last != '/'
 			return self + "/"
 		return self
-	
-	
-	function SyntaxAppend (|string| s, |bool|)
-		return .write(s)
-
-
-	Syntax Append (|messageroot!| msg, |bool|)
-		cpp_Part WriteMsg
-		msg.render(.outputstream)
-		return true
 
 
 	function Sibling (|string| name, |string|)
@@ -67,11 +57,6 @@ extend String
 		
 		R[num] = With
 		return r.join("/")
-
-//	function RemoveExt (|string| suff, |string|)
-//		if self isa suff
-//			return .trimext
-//		return self
 	
 	function TrimSlashes (|string|)
 		|| trail = .FindTrailingSlashes

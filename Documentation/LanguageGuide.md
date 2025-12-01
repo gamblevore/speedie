@@ -112,8 +112,8 @@ Looking through Speedie code, you may see a lot of strangely defined functions, 
             if !.file
                 || L = file.logs.child(app.AppName+".log")
                 .OpenLog(L)
-            .File <~ s
-            .file <~ "\n"
+            .File.write(s)
+            .file.write("\n")
         
         function openlog (|string| path)
             .FILE = path.file

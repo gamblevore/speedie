@@ -129,6 +129,7 @@ struct ClassData
 		cpp_Wrapper JB_Mem_CreateLayer
 
 	function CreateLayerAndUse (|Object| obj, |object| obj2, |MemoryLayer!|)
+		opt norefcounts
 		rz = .createlayer(obj)
 		rz.use
 		rz.obj2 = obj2

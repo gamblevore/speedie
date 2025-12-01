@@ -22,7 +22,7 @@ helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 	
 	// So we have a few paths... and they don't exist, lets create them.
 	Src.linkto(Dest)
-	A <~ q
+	A.setdata(q)
 
 	|| ReadBack = B.file.ReadAll
 	check (ReadBack == q) ("Testing link+write failed. Read: " + Readback)

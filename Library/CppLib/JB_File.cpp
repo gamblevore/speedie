@@ -737,8 +737,11 @@ void JB_File_Flush (JB_File* self) {
 }
 
 
-bool JB_File_OpenBlank ( JB_File* self ) {
-	return JB_File_Open( self, O_RDWR | O_CREAT | O_TRUNC, false ) >= 0;
+int JB_File_OpenEmpty ( JB_File* self ) {
+	int Err = JB_File_Open( self, O_RDWR | O_CREAT | O_TRUNC, false );
+	if (Err > 0) // its OK
+		Err = 0;
+	return Err;
 }
 
 int JB_Str_MakeDir (JB_String* self) {
@@ -1154,7 +1157,7 @@ int JB_File_Copy (JB_File* self, JB_File* To, bool AttrOnly) {
 	if (AttrOnly)
 		return CopyStats_(self, To);
 	bool WasOpen = self->Descriptor > STDPICO_FILENO;
-	int Output = JB_File_OpenBlank(To);
+	int Output = JB_File_OpenEmpty(To);
 	if (Output < 0)
 		return -1;
 

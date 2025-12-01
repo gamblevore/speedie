@@ -167,7 +167,7 @@ class GraphicsEditor (GuiControl)
 	
 	function Export (|file| dest)
 		.Domerge(false)
-		dest <~ .Merged.WriteQOI
+		dest[] = .Merged.WriteQOI
 		
 		
 	function LoadFile (|string| path, |bool|)

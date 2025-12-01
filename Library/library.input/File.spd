@@ -101,15 +101,24 @@ class File (String)
 	function Close
 		cpp_wrapper JB_File_Close
 	
+	Syntax Access (assigns:|string| data, |ErrorInt|)
+		description "Writes to the file. Clears old data."
+		return .setdata(data)
+	
+	function String.SetData (|string| Data, |ErrorInt|)
+		description "Writes to the file. Clears old data."
+		|| f = .file
+		rz = f.OpenEmpty
+		if rz
+			rz = f.write(Data)
+			f.Close
+
 	Syntax Append (|string| data)
-		inline
-		.write(Data)
+		disabled "Use file[] = data"
 
 	Syntax Append (|message| msg)
 		// note to self in case I ever re-add this.	
 		disabled "You can't just append messages blindly. how do they get separated? lines, spaces, commas? nothing?"
-//		cpp_Part WriteMsg
-//		msg.render(.out(false))
 	
 	function string.Visible (|bool|)
 		return .name[] != '.'
@@ -301,17 +310,14 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		inline
 		return .open(0, AllowMissing)
 	
-	function OpenDes (|filedes|)
-		inline
-		.openempty
-		return .descriptor
+//	function OpenDes (|filedes|)
+//		inline
+//		.openempty
+//		return .descriptor
 	
-	function OpenBlank (|filedes|)
-		disabled "Use OpenEmpty instead"
-
-	function OpenEmpty (|bool|)
+	function OpenEmpty (|ErrorInt|)
 		nil checker
-		cpp_wrapper JB_File_OpenBlank
+		cpp_wrapper JB_File_OpenEmpty
 	
 	function IsDir (|bool|)
 		cpp_wrapper JB_File_IsDir

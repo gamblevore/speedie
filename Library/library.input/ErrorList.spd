@@ -106,7 +106,7 @@ class ErrorReceiver
 		if f isa file
 			if !f.Opened
 				f.OpenEmpty
-			f <~ data
+			f.write(data)
 			
 
 	function Incr (|error| err, |bool| add=true)

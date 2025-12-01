@@ -107,7 +107,7 @@ Altogether that makes this:
         if file isa "xml"
             jb.XMLToJeebox
             || boxfile = File.SetExt("box")
-            if boxfile <~ jb.render // write file to disk
+            if boxfile[] = jb.render // write file to disk
                 "Converted XML to Jeebox: $boxfile"
         printline jb
 
@@ -222,7 +222,7 @@ I'll also clean up the code a little... just use the final code. Here is the fin
         if file isa "xml"
             jb.XMLToJeebox
             || boxfile = File.SetExt("box")
-            if boxfile <~ jb.render // write file to disk
+            if boxfile[] = jb.render // write file to disk
                 "Converted XML to Jeebox: $boxfile"
     
         || Found = BookSearch(jb, app.switches) #expect  "Can't find any books using: ${app.Switches}"
@@ -266,7 +266,7 @@ We further filter it down to only one book. Perfect.
 
 If you want to go even more advanced, you could do things like compress the jeebox file or store it as `jbin`, or even a compressed `jbin`! Lets try that now...
 
-    boxfile <~ jb.render_jbin // write file to disk as jbin
+    boxfile[] = jb.render_jbin // write file to disk as jbin
 
 `Jbin` is just jeebox, but in a binary form. `jbin` is approximately the same size as jeebox, except when it comes to storing binary data, when it is far smaller. `Jbin` can store everything jeebox can. Best of all... jeebox transparently parses it. Also, the code for `jbin` is very small, you could parse it in about 35 lines of C++.
 
