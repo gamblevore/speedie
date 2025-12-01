@@ -7,6 +7,7 @@ main
 	opt NoRefCounts	
 	error.AutoPrint = 1
 	if CakeRun.LoadPack
+		SpdTable.Link
 		debugger.load
 		return SpdTable.RunMain
 	return 1

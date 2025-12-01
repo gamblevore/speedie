@@ -7,9 +7,7 @@ module CakeRun
 	|message|				Clss
 	|String|				Strings
 	|String|				FileSrc
-//	|[SpdFunc]|				Funcs
 	|&byte|					GlobBase = CakeRun.LibGlobs|&byte|
-	|&&nil|					RawFuncs = cakerun.LibFuncs
 	|int|					GlobalCount
 	|dictionary of &classdata| ClassTable = dictionary()
 	

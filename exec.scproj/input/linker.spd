@@ -6,15 +6,19 @@ module SpdTable
 	
 	|[SpdFunc]|	Funcs
 	|&uint16|	GlobLink = cakerun.GlobTable
+	|&&nil|		RawFuncs = cakerun.LibFuncs
+
 
 	syntax access (|int| i, |SpdFunc|)
 		return .Funcs[i]
+	
 	
 	function RunMain (|int|)
 		opt norefcounts
 		|| main = .funcs[1]					#expect ("Missing main")
 		rz  = .funcs[0]!.Run|&int64|[]
 		rz ?= main.Run|&int64|[]
+
 
 	syntax Append (|message| spd)
 		opt norefcounts
@@ -24,7 +28,8 @@ module SpdTable
 				.Funcs <~ SpdFunc() // placeholder
 		  else
 			.Funcs <~ SpdFunc(spd)
-		
+	
+	
 	function LoadFuncs (|bool|)
 		opt norefcounts
 		.funcs <~ SpdFunc() // null func
@@ -34,6 +39,28 @@ module SpdTable
 		check  (.Funcs >= 2)						(cakerun.code, "Missing 'main'")
 		.Funcs.Shrink
 		return stderr.ok
-
-
+	
+	
+	function Link
+		opt norefcounts
+		for f in .funcs
+			f.Link❗
+	
+	
+	function spdfunc.Link❗
+		// this could easily be multi-threaded... but no need for now.
+		// it doesn't allocate anything... or alter pointers of any kind.
+		|| Blob = .SpeedieFunc$
+		|| Base = &Blob.ASM[0]
+		|| N = .Length
+		for i in n
+			|| asm = base[i] // now... we need to get it's op.
+							 // we need to link globs, and funcs, right?
+			|| op = asm>>24
+			// now how do we tell what op is func or not?
+			// speedie needs to dump that info somewhere!
+		
+		
+		
+		
 

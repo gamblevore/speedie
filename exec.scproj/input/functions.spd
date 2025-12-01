@@ -50,5 +50,4 @@ class SpdFunc
 			fs <~ "0x"
 			fs.AppendHex(.asmpos, 6)
 	
-	function Link❗
 

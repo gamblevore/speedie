@@ -108,6 +108,7 @@ function JBin.JRenderASM (|SCFunction| fn)
 	Compiler.stTotalASMOps += t
 	|| tmp = Options.TargetDebug
 		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
+		.syntaxappend(0, 2)
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
 	|| after = fn.FatToASM(Start, Start+t)
 	check (after-start == T)			(fn, "ASM length corrupt")
