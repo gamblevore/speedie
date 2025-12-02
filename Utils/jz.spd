@@ -224,8 +224,8 @@ module Conv
 		conv.speed <~ (' ', 4)
 		if !compress
 			if .data
-				size = .data.Length|float|
-			conv.speed.RenderSpeed( name, size|int|, .Start.ago)
+				.size = .data.Length|float|
+			conv.speed.RenderSpeed( name, .size|int|, .Start.ago)
 		  else
 			CompressionStats.all.report(conv.speed)
 			CompressionStats.all.Clear
@@ -244,9 +244,9 @@ module Conv
 			.Time("Decompress", true)
 		  else 
 			.size = .in!.size|float|
-			src.CompressInto(d, DefaultStrength) 
+			src.CompressInto(d, .DefaultStrength) 
 			.time("Compress", true)
-		if dest is selfreplace
+		if .dest is selfreplace
 			.RealOut!.MoveTo(.out!)
 	
 
@@ -254,14 +254,14 @@ module Conv
 		|| OrigSize = 0
 		|| CmpFormat = .FormatInfo(OrigSize)
 		
-		ifn Dest&type.Actions
-			if (CmpFormat.length > 0) != (dest is compressed)
+		ifn .Dest&type.Actions
+			if (CmpFormat.length > 0) != (.dest is compressed)
 				.done++
 				.CompressOnly(CmpFormat!="")
 			return 0
 		.done++
 		
-		if (Dest is report) and CmpFormat
+		if (.Dest is report) and CmpFormat
 			"$.in! is: ${OrigSize.strsize} compressed to ${.in!.size.strsize} ($CmpFormat)"
 			return 0
 				
@@ -269,7 +269,7 @@ module Conv
 		.data = .in!.ReadAll(int.max, false)
 		if .data != string.error
 			.Detected |= type.ReadOK
-		if (Dest is report) and (.data == "")
+		if (.Dest is report) and (.data == "")
 			if StdErr.OK
 				"$.in is empty"
 			return 0
@@ -280,7 +280,7 @@ module Conv
 			.data = .data.Decompress(int.max)
 			.time("Decompress", true)
 		
-		if Dest is report
+		if .Dest is report
 			"$.in is: ${.Detected.render}"
 			return 0
 		return true
@@ -293,7 +293,7 @@ module Conv
 		.AST = .data.Parse
 		if .AST
 			.time("Parse")
-		  elseif (dest is box or jbin) or .data.IsJbin
+		  elseif (.dest is box or jbin) or .data.IsJbin
 			|| err = StdErr.Errors.Last
 				err.name += "\nUnable to parse input file for conversion to jeebox"
 		  else
@@ -306,13 +306,13 @@ module Conv
 			.detected |= type.jbin
 		  elseif .in isa "json"
 			.detected |= type.json
-			if dest isnt report
+			if .dest isnt report
 				.start = date.now
 				.AST.ConvertJSONToJB
 				.time("Convert JSON")
 		  elseif .AST.Find(@xml)
 			.detected |= type.xml
-			if dest isnt report
+			if .dest isnt report
 				.start = date.now
 				require .AST.XMLToJeebox
 				.time("Convert XML")
@@ -325,7 +325,7 @@ module Conv
 	function ConvertDataFormat (|faststring| fs)
 		if .AST
 			.Start = date.now
-			if dest is jbin
+			if .dest is jbin
 				.data = .AST.renderjbin(fs)
 			  else
 				.data = .AST.Render(fs)
@@ -333,14 +333,14 @@ module Conv
 
 		
 	function Transform
-		|| FmtSame  = Detected.format == Dest.format
+		|| FmtSame  = .Detected.format == .Dest.format
 		|| PathSame = .in.path == .out.path
 		if (FmtSame and PathSame)
 			"Nothing to do for: $.out"
 			return
 		
 		|| fs = .realout!.Outputstream					#require
-		if dest isnt compressed 
+		if .dest isnt compressed 
 			.ConvertDataFormat(fs)
 		  else
 			.start = date.now
@@ -350,7 +350,7 @@ module Conv
 		
 		fs = nil
 		
-		if dest is selfreplace
+		if .dest is selfreplace
 			.RealOut!.moveto(.out!)
 		
 		if .dest isnt stdout
@@ -365,18 +365,18 @@ module Conv
 
 
 	function Ext (|string|)
-		if dest is box
+		if .dest is box
 			return "box"
-		if dest is jbin
+		if .dest is jbin
 			return "jbn"
 	
 	
 	function OutPath (|file|)
-		if dest is stdout
+		if .dest is stdout
 			return app.StdOut
-		if DestPath
-			return destpath.file
-		if dest is SelfReplace
+		if .DestPath
+			return .destpath.file
+		if .dest is SelfReplace
 			return .in!
 		|| str = .in!.path
 		if str isa "mz"
@@ -387,7 +387,7 @@ module Conv
 				str = str.SetExt(x)
 			  else
 				str = str.AddExt(x) 
-		if dest is compressed
+		if .dest is compressed
 			str = str.AddExt("mz")
 		  elseif ((.in isa "mz") and str.FileExists) or (str == .in)
 			str += ".back"

@@ -546,7 +546,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					if exp and !ParamsArray.IsDot and CurrFunc and !CurrFunc.Cls
 						if o isa scdecl					// O could be a module!
 							if (o isnt const) and (b!=compiler.program) and (b isa scmodule)  // bad?
-								/problem (exp, "Put a dot before this expression.")
+								error (exp, "Put a dot before this expression.")
 					return o
 				ifn exp in @dot			// x = a.b is still a function call
 					|string--| err = "Can't get the address of a function unless it has a prototype."

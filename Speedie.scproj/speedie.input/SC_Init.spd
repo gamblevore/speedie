@@ -204,10 +204,9 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 
 
 function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
+	opt norefcounts
 	require (declmsg.func == @Decl)
 	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
-	if name == @thg
-		name.func = @sdot
 	
 	|| decl = .LookUpVarRootDecl( name.name, name )
 	if decl isa SCDecl
@@ -229,7 +228,10 @@ function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 		
 		if newdefault
 			if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
-				DeclMsg.Prev = NeweqRel( @thg + name.name, NewDefault )
+				|| fn = @sdot
+				if self == compiler.program
+					fn = @thg
+				DeclMsg.Prev = NeweqRel( fn + name.name, NewDefault )
 		Return true
 }
 

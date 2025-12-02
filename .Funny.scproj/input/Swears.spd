@@ -47,9 +47,9 @@ extend_module swearword
 		if !n
 			return upon
 		if !.first
-			.loadto(.First, firstwords)
+			.loadto(.First, .firstwords)
 		if !.second
-			.loadto(.second, secondwords)
+			.loadto(.second, .secondwords)
 		|| fs = FastString()
 		if upon
 			fs <~ upon

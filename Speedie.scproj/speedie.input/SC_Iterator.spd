@@ -141,7 +141,7 @@ class SCIterator (SCObject)
 					Return Compiler.program // OK
 
 		
-		carray = SimpleIter(
+		.carray = SimpleIter(
 "iterator	// eyyy mammi, i aint doin this
 	|| first = &self[0]
 	|| i = 0
@@ -149,14 +149,6 @@ class SCIterator (SCObject)
 		yield first[i] (i)
 		i++"
 )
-
-//		pointer = SimpleIter(
-//"iterator
-//	|| curr = self
-//	while self[0]
-//		yield self[0] (self)
-//		self++"
-//)
 		
 
 

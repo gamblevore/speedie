@@ -48,13 +48,13 @@ module Counts
 	
 	function Init (|string| ss)
 		|| pt = app["p"]
-			PrintTree = true
+			.PrintTree = true
 			if pt != "true"
-				MaxNodeLength = pt.int
+				.MaxNodeLength = pt.int
 		ss = ss.trim 
-		ss ?= DefaultExt
+		ss ?= .DefaultExt
 		for s in (ss / '/') 
-			exts[s] = s
+			.exts[s] = s
 
 	function Count (|message| Msg)
 		opt norefcounts
@@ -65,7 +65,7 @@ module Counts
 			|| len = s.name.Length
 			names += (len>0)
 			|| n = len min 64
-			Histogram[n]++
+			.Histogram[n]++
 			nodes++
 		.Names += names
 		.Nodes += Nodes
@@ -151,13 +151,13 @@ function Counts.ReportHisto
 	require app.Yes("h")
 	|| h_done = false
 	|| curr = 0
-	|| total = .names + Histogram[0]
+	|| total = .names + .Histogram[0]
 	for i in 65
-		if histogram[i]
+		if .histogram[i]
 			if !h_done
 				h_done = true
 				"histogram:"
-			curr += histogram[i]
+			curr += .histogram[i]
 			|| pc = (curr div total).Percent
 			"    $i: $pc"
 	if h_done
