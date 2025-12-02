@@ -80,13 +80,13 @@ function app.UseOne (|file| f)
 	conv.RealOut = op
 	if conv.Dest is selfreplace
 		conv.realout = op.AddExt("jztmp").file
-	if conv.in!.IsDir
+	if f.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
 	  elseif (conv.dest is TestComp)
 		conv.TestOne
 	  else 
-		conv.Process
+		conv.Process(f)
 	conv.End
 
 
@@ -357,8 +357,8 @@ module Conv
 			printline .out.path
 
 
-	function Process
-		.in!.MustExist$
+	function Process (|file| f)
+		f.MustExist$
 		.Read$
 		.Detect$
 		.Transform
