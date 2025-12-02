@@ -107,10 +107,7 @@ class String
 		if Mode >= 0
 			fs <~ (char, width-fs.length)
 		return fs
-	
-	function Wipe_ // used by GameSound...
-		disabled "not sure what this did?" 
-	
+		
 	function IsLower (|bool|)
 		for s in self
 			require !s.isupper
