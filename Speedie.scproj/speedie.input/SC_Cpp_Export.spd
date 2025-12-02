@@ -678,7 +678,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 			if !IntoModule
 				self <~ "extern "
 			  elseif prop is api
-				self <~ "__lib__ " // not sure how this works with the new struct lib globs
+				self <~ "__lib__ "
 	
 			if 0 // IntoModule and prop is GameFlyingMem
 				// sigh
@@ -1680,7 +1680,7 @@ class FastStringCpp (FastString)
 function faststring.AppendLibGlob (|scdecl| d)
 	opt norefcounts
 	|| n = d.ExportName
-	|| skip = n.Find('_', 0, 4)
+	|| skip = n.Find('_', 0, 6)
 		while (n[++skip]) == '_'
 			0
 	.appendrange(n, skip)

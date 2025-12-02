@@ -64,7 +64,7 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	|| Blocker = arg.CausesUnReachable( arg, dcl, LastPlace )
 	
 	if (Basis == kBasisObj)								// we want == not & here
-		if IsJustAnArg // not sure what this does?
+		if IsJustAnArg
 			RefIncr( name, dcl, IsJustAnArg )
 		  else
 			RealRefIncr(name, dcl)

@@ -469,51 +469,6 @@ function CanHaveEmptyConstructor (|bool|)
 			require p.type is DefaultsToReal
 	return true
 
-/*
-	Possible optimisation:
-	
-//  if x.StatedReal
-//      y++
-
-//  COMBINED WITH:
-
-//  function StatedReal (|nilstate|)
-//		if self & nilstate.optional == NilState.Real
-//			return NilState.real
-	
-/// COULD BECOME:
-
-	if self & nilstate.optional == NilState.Real
-		y++
-
-/////	
-	HOW should it do that?
-	
-	I guess... we need to ask for a branch. So asmreg.CondRequest
-	needs to be in the state.return or something like that.
-	
-	Now... after that.
-	
-	what happens here in the if?
-	
-	One branch evaluates to true, and The other branch is false.
-	
-	So we'd need to be able to tell... that one branch would be true, and the other false.
-	
-	Only then, we can say that we can simply use the test.	
-
-	I think... lets optimise this later!
-	
-	IDK if theres another way around this. I don't see any? A branch is a branch.
-
-	Unless theres like a "mid-level" of optimisations that can turn into the full... somehow?
-	
-	After each return... the value returned... can only either evaluate to true or false
-	
-	So each return of a const... will either be true or false. That might help?
-*/
-
-
 
 function CreateEmptyConstructors (|scfunction|)
 	if .CanHaveEmptyConstructor

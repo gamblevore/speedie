@@ -41,7 +41,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	|| FuncMsg = .parent!
 	ifn (funcmsg == @dot) and (funcmsg.first == self)
 		if FuncMsg!=@prm
-			.RefDisappears // still not sure what this is doing
+			.RefDisappears
 			return nil
 		FuncMsg = FuncMsg.parent
 

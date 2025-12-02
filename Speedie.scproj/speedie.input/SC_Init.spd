@@ -13,7 +13,7 @@ module SC_Init
 	function SCModule.BuildInitArgSub (|message|)
 		rz = @arg.msg
 		rz <~ @arg
-		rz.msg(@tmp, "opt")<~(@thg, "norefcounts")
+		rz.msg(@tmp, "opt") <~ (@thg, "norefcounts")
 		|| src = .source
 			|| ig = src.msg(@tmp, "ignore")
 			ig.Obj = self // ignore in the renderer.

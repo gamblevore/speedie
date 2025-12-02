@@ -25,16 +25,16 @@ function IsLibrary (|bool|) // .islib, .isntlib
 
 
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
-	.Source ?= AST // not good! Considering that one "project" module covers multiple files!
+	.Source ?= AST					// not good! Considering that one "project" module covers multiple files!
 	|| r = ast.ListAll
 	
 	|| Old = scnode.CurrVisibility
 	scnode.CurrVisibility = Visible
 	for c in r
 		visible = .CollectOne( C, Visible )
-	scnode.CurrVisibility = old // restore
+	scnode.CurrVisibility = old		// restore
 
-	require dest // sigh
+	require dest					// sigh
 	for c in r
 		if c in ast
 			dest <~ c
@@ -57,7 +57,7 @@ function CollectSub (|Message| c, |SCNode|)
 	
 	|| FnObj = T[c.name]									#expect c
 	|| base = (FnObj[])( c, self, c )						#require
-	if (base != Compiler.program) // OK
+	if (base != Compiler.program)			// OK
 		.TryAdd( c, base, base.Name )
 	
 	Return base
@@ -141,17 +141,14 @@ function FindModule (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0
 			exit
 		upon = upon.FindModuleParent(mode)
 		
-	if where and (Mode isnt noerrors)
-		if mode is ForClass
-			error (where, "Can’t find class: " + name)
-		  else
-			error (where, "Can’t find module: " + name)
+	if where and (Mode isnt NoErrors)
+		|| err = ("Can’t find class: ", "Can’t find module: ")(mode is ForClass)
+		error (where, err + name)
 
 
 syntax access (|message| s, |SCObject|)
 	opt norefcounts
 	rz = self[s.name]							#expect (s, "Can't find: " + s.name)
-
 
 
 syntax access (|string| s, |SCObject|)
@@ -169,13 +166,11 @@ function ActualAdd (|string| name, |scobject| IncObj)
 	opt norefcounts
 	// could we use scdecl linked-lists... at least for scargs?
 	// we'd have to modify upcheck, I assume? to read from linked-lists?
-	
 	if  self is AllowLinkedLists  and  incobj isa SCDecl
 		IncObj.LocalVarList = .LocalVarList
 		.LocalVarList = IncObj
 		return 
-		
-		
+	
 	|| m = .access ?= Dictionary.new
 	m.valuelower( name ) = IncObj
 
@@ -387,12 +382,10 @@ function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsC
 		Return ch
 		
 
-
 function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsClass,  |Message|)
 	|| place = .find( @Tmp, name )
 		return .FindAndRemove2(place, NothingOK, isclass)
 	
-
 
 function SCFunction.FindCppWrapperFunc (|message| place, |message|)
 	opt NoRefCounts
