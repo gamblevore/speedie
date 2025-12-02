@@ -1,7 +1,7 @@
 
-target !imported {
-
-main
-	printline iChing().Describe
-	
-}
+target !imported
+	main (|String| Question="")
+		if Question and !question.IsInt
+			printline "$Question?\nAnswer: ${EightBall.Ask(Question)}"
+		  else
+			printline iChing().Describe

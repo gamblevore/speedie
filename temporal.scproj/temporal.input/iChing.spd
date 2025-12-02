@@ -78,7 +78,7 @@ module iChing
 		machine ?= SteveMachine.create(9,64K)
 		if !machine
 			return .ClosedBook
-		machine._Hash
+		machine.Hash_
 		|| Coins = machine.DivineBitPool(6)
 		|| hex = .Tome[coins]
 		if !hex
@@ -97,3 +97,4 @@ module iChing
 	
 	function New (|stevemachine| machine=nil, |Hexagram|)
 		return .Divination(machine)
+

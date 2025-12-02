@@ -57,7 +57,7 @@ class SteveMachine
 		(.Create.Steve)(p, a, 0, .reps)
 		
 		
-	helper _Hash
+	helper Hash_
 		|uint64| H
 		|| p = ._ByteSamples.ptr
 		|| n = ._ByteSamples.Size
@@ -69,7 +69,9 @@ class SteveMachine
 			H = h.Hash
 		// take all the data and just hash it... ooff...
 
-
+	syntax Access (|int| bits=64, |uint64|)
+		return .DivineBitPool(bits)
+	
 	function DivineBitPool (|int| bits, |uint64|)
 		description "Returns up to 64 bits of randomness. Each bit of output comes from 12 bits of input, xored down to 1 bit."
 		bits = bits.clamp(0, 64)

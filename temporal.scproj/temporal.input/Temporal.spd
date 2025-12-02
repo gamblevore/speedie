@@ -5,7 +5,7 @@ module Temporal
 	|temporal.EngineState|	Desired
 	|SteveMachine|			Generator
 	
-	function Start (|&temporalgenerator| T, |int| size=16KB)
+	function Start (|&TemporalGenerator| T, |int| size=16KB)
 		.generator = T.Create(5, size)
 		// needs a thread... just look at whatever jb_pipe.cpp does
 		// i think it just... doesnt need to do memory management
@@ -17,7 +17,7 @@ module Temporal
 	
 	datatype EngineState (int)
 		constants
-			|temporal.EngineState| 
+			|Temporal.EngineState| 
 			Stopped = 0
 			Active = 1
 			Paused = 2

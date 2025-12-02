@@ -1,0 +1,39 @@
+
+
+module EightBall
+// Default answers are weighted towards positive answers
+	|| Positive = `It is certain
+It is decidedly so
+Without a doubt
+Yes definitely
+You may rely on it
+As I see it, yes
+Most likely
+Outlook good
+Yes
+Signs point to Yes`
+
+	|| Neutral = `Reply Hazy, try again
+Ask again later
+Better not tell you now
+Cannot predict now
+Concentrate and try gain`
+
+	|| Negative = `Dont count on it
+My reply is no
+My sources say no
+Outlook so good
+Very doubtful`
+	
+	|| Answers = (positive / '\n') + (neutral / '\n') + (negative / '\n')
+	function Ask (|String| Question, |string|)
+		|| Q = Question.Hash
+		for 100
+			app.Sleep(1)
+			(Q xor= date.Now)
+		Q = (Q << 1) >> 1
+		|| n = Q mod .answers.Length
+		return .answers[n] ?? ""
+			
+
+
