@@ -39,25 +39,36 @@ module Stability
 				printline f.exportname
 
 	
+	function Fuck (|[scobject]| list)
+		for (l in list) (i)
+			printline "${(i+1)}: ${l.gpackid}: ${l.exportname}"
+	
 	function StabliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
 		opt norefcounts
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
 		target debug
 			if !options.MakeExec
 				Table = jb_vm.vm.InitTable(4096, 64K)
-
+		if !isfunc
+/			.fuck(list)
+			
 		|| sorter = codesorter.PackID(isfunc)
 		list.Sort(sorter)
+
+		if !isfunc
+			.fuck(list)
 		
 		for obj in list
+			if obj.exportname == "JB__TC_Types_Dict"
 			if (obj isnt private) and (!isfunc or obj|scfunction|.needsID)
 				obj.MakeID(fs, table, isFunc)
 			
 		
 	function packmaker.OrderLibGlobs // why is it done from the main compile func and not in the execmaker?
 		opt norefcounts
-		.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after
-		.LibGlobSize = .GlobalsSize(.libglobs) 		// rebuild size
+		if !.LibGlobSize
+			.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after
+			.LibGlobSize = .GlobalsSize(.libglobs) 		// rebuild size
 	
 	
 	function SCObject.PackID (|bool| isFunc, |int|)

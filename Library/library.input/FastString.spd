@@ -94,6 +94,7 @@ class FastString {
 		.AppendByte(n)
 		
 	render
+		opt norefcounts
 		fs <~ self
 
 	syntax Append (|Byte| data, |int| count)
@@ -158,25 +159,29 @@ class FastString {
 	
 	syntax Append (|FastString| fs)
 		cpp_part AppendFastString
-		.AppendMemory(fs.resultptr, fs.length)
+		inline
+		.Syntaxappend(fs|string|)
 		
 	function AppendByte (|Byte| data)
 		cpp_wrapper JB_FS_AppendByte
 	
 	syntax Append (|Byte| data)
 		cpp_part AppendByte2
+		inline
 		.appendbyte(data)
 		
 	syntax Append (|vec3| data)
 		cpp_part AppendVec3 // shouldn't be necessay, .render(fs) should be called
 		opt norefcounts
 		real self
+		inline
 		data.Render(self)
 		
 	syntax Append (|vec4| data) // same
 		cpp_part AppendVec4
 		opt norefcounts
 		real self
+		inline
 		data.Render(self)
 
 	function AppendIntegerAsText (|int64| data, |int| PadTo = 1)
@@ -192,22 +197,27 @@ class FastString {
 		cpp_wrapper JB_FS_AppendShort
 
 	syntax Append (|int64| data)
+		inline // disambiguation
 		cpp_part AppendInt64
 		.AppendIntegerAsText(data, 1)
 	
 	syntax Append (|uint64| data)
+		inline // disambiguation
 		cpp_part AppendUInt64
 		.AppendIntegerAsText(data, 1)
 	
 	syntax Append (|uint| data)
+		inline // disambiguation
 		cpp_part AppendUint
 		.AppendIntegerAsText(data, 1)
 
 	syntax Append (|uint16| data)
+		inline // disambiguation
 		cpp_part AppendUint16
 		.AppendIntegerAsText(data, 1)
 
 	syntax Append (|int| data)
+		inline // disambiguation
 		cpp_part AppendInt32
 		.AppendIntegerAsText(data, 1)
 		
@@ -265,6 +275,7 @@ class FastString {
 
 	syntax Append (|Float| F)
 		cpp_name JB_FS_AppendFloatAsText
+		inline
 		self <~ F|Float64|
 
 	syntax Append (|Float64| D)
@@ -274,11 +285,13 @@ class FastString {
 		cpp_wrapper JB_FS_AppendDoubleAsText
 	
 	function AppendFloat (|float| D, |int| dp=1, |bool| CanExp=false)
-		opt inline
+		inline
 		.AppendDouble(D|Float64|, dp, canexp)
 	
 	syntax Append (|bool| B)
 		cpp_name JB_FS_AppendBool
+		inline
+		opt norefcounts
 		self <~ b.string
 	
 	function Mark (|int|)

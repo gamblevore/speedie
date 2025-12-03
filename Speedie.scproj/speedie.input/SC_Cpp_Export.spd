@@ -550,9 +550,13 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 	fs <~ ";\n}\n\n"
 
 
-function FillInterpreter
+function FillInterpreter 
 	stability.StabiliseFuncs
 	stability.StabiliseGlobs
+
+	|| Sorter = CodeSorter.PackID(false)
+	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) 		// rebuild size
+
 	.WriteVMGlobsAndPtrs(.ModuleProperties)
 
 
@@ -608,6 +612,7 @@ __lib__ unsigned short JB_GlobTable[] = {
 		|| id = g.gpackid|int|
 		|| Missing = id - position
 		check (Missing > 0) (g.source!, "Bad PackID?")
+		expect (Missing < 1000) // what?
 		
 		while --missing >= 1
 			fs <~ "\t65535,\n"
@@ -690,7 +695,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 
 
 
-function ExportSyx
+function ExportSyx 
 	require Compiler.SyxArray
 	|| fs = .Syxes
 	for (syx in Compiler.SyxArray) (i)
@@ -936,11 +941,13 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| exp = Cpp_Export()
 		exp.PreRun
 		exp.ExportSyx
+		if options.makeexec
+			exp.FillInterpreter
+		  else
+			packmaker.OrderLibGlobs
 		exp.FillLibGlobs(exp.GlobsInLib)
 		exp.run
 		exp.WriteHeader
-		if Options.MakeExec
-			exp.FillInterpreter
 		exp.FinalMergeOutputIntoACpp
 	
 

@@ -581,8 +581,6 @@ function ImportAll
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
 		f.BeforeTransform
-
-	packmaker.OrderLibGlobs // why here? Why not... in the pack?
 	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList

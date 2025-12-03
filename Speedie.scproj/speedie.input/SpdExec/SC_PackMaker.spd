@@ -48,7 +48,7 @@ module PackMaker
 	function GlobalsSize (|[scdecl]| List, |int|)	// SortGlobals, GlobalsSort
 		opt norefcounts
 		|| Globals = 1								// always positive.
-		for (d in list)
+		for (d in list) (i)
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
@@ -84,6 +84,11 @@ module PackMaker
 		.PackGlobSize = .GlobalsSize(.PackGlobs)
 	
 		return true
+
+
+	function SortAndSizeGlobs
+		.PackGlobs.sort
+		.PackGlobSize = .GlobalsSize(.PackGlobs)
 	
 	
 	function message.InlineCount (|int| Remain, |int|)
@@ -142,6 +147,7 @@ module PackMaker
 	function MakePack 
 		opt norefcounts
 		compiler.During = compilerstage.Packing
+		.OrderLibGlobs
 		Assembler.Sh.Fullinit
 		PackMaker.AddAll
 		if stderr.ok and .BuildGlobs 
