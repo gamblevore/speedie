@@ -1933,7 +1933,6 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
 
 
 JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in) {
-    // OK so first we want the class...
     if (!self) {
         return JB_CStr_Render("(nil)", fs_in);
     }

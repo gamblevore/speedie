@@ -85,8 +85,13 @@ JB_String* JB_FS_AppendVArg (FastString* fs_in, JB_String* Fmt, ...) {
                 double d = va_arg(Vargs, double);
                 JB_FS_AppendDoubleAsText(fs, d, 7, 0);
                 break;
+			} case 8: {
+                JB_Object* Obj = va_arg(Vargs, JB_Object*);
+                JB_Obj_Render(Obj, fs);
+                break;
+				
             } default: {
-				Ty -= 7;
+				Ty -= 32; // space for up to 32 cases.
 				if (i+Ty > Length)
 					Ty = Length - i;
                 JB_FS_AppendMem_(fs, Addr+i+1, Ty);
