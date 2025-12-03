@@ -77,10 +77,10 @@ linkage
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				LinkID
-|uint16|				ReturnCount
 |int|					StackAllocGuess
 |nilstate|				NilSelf
 |byte|					ReturnedVars
+|byte|					FSOpt
 |Byte|					MinOpt
 |Byte|					MaxASM
 |Byte|					IsAssigns
@@ -897,7 +897,6 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 
 
 function CheckReturnValue (|Message| msg, |scnode| name_space)
-	.ReturnCount++
 	|| c = msg.first
 	
 	if (!c)

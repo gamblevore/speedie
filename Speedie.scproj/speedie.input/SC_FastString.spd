@@ -7,37 +7,47 @@ extend_module scfunction
 
 
 module FastStringOpts {
-// 
-// Next possible optimisation? Allow passing numbers 0 to 255 as low pointer numbers
-// just force type-cast an int to a jb_object. This means something like: x = "a"+str
-// now can compile better.
-
-// I wonder if ints could be done too? Or perhaps... we could pass a format int to the func
-// Seems we really just want varargs (from c)... and boxed objects (from javascript)
-// could pass cstrings even in a boxed-arg! haha.
-//
-
 
 || FSRemoved  = 0
 || StrRemoved = 0
 || InitedOK   = 0
-|scfunction| FnByte
-|scfunction| FnGetResult 
-|scfunction| FnAppend 
-|scfunction| FnAppend4
-|scfunction| FnAppend6
-|scfunction| FnPlus 
+|| VargCount  = 0
+
+|SCFunction| FnByte
+|SCFunction| FnGetResult 
+|SCFunction| FnAppend 
+|SCFunction| FnAppend4
+|SCFunction| FnAppend6
+|SCFunction| FnPlus 
 
 
+function FSOptInit (|string| name, |message| s)
+	opt norefcounts
+	|| fn = Compiler.XFunc(name, s)
+		fn.FSOpt = ++.VargCount
+		
+	
 function Init (|message| s, |bool|)
 	require .InitedOK == 0
 	|| m = StdErr.Mark
-	.fnbyte = compiler.XFunc("JB_FS_AppendByte", s)
-	.fnGetResult = compiler.XFunc("JB_FS_GetResult", s)
-	.fnAppend = compiler.XFunc("JB_FS_AppendString", s)
+	
+	.FnByte = compiler.XFunc("JB_FS_AppendByte", s)
+	.FnGetResult = compiler.XFunc("JB_FS_GetResult", s)
+	.FnAppend = compiler.XFunc("JB_FS_AppendString", s)
 	.FnAppend4 = compiler.XFunc("JB_Str_Append4", s)
 	.FnAppend6 = compiler.XFunc("JB_Str_Append6", s)
-	.fnPlus = compiler.XFunc("JB_Str_OperatorPlus", s)
+	.FnPlus = compiler.XFunc("JB_Str_OperatorPlus", s)
+
+	.FSOptInit("JB_FS_AppendLocalTime", s)			// 0
+	.FSOptInit("JB_FS_AppendCString", s)			// 1
+	.FSOptInit("JB_FS_AppendByte", s)				// 2
+	.FSOptInit("JB_FS_AppendHex", s)				// 3
+	.FSOptInit("JB_FS_AppendIntegerAsText", s)		// 4
+	.FSOptInit("JB_FS_AppendString", s)				// 5
+	.FSOptInit("JB_FS_AppendUTF8Char", s)			// 6
+	.FSOptInit("JB_FS_AppendDoubleAsText", s)		// 7
+	.FSOptInit("JB_Obj_Render", s)					// 8
+	
 	rz = m
 	.InitedOK = 2 - rz
 
@@ -48,7 +58,7 @@ function Optimise (|message| s)
 		require .init(s)
 	
 	|| fn = s.MsgFunc
-	|| prms = s.second				#require
+	|| prms = s.second							#require
 	if fn == .FnAppend
 		|| item = prms.last
 		if item.msgfunc == .fnGetResult
@@ -68,7 +78,7 @@ function message.FirstPrmObj (|object|)
 function TryStringAppend (|message| s)
 	opt norefcounts
 	// 3 to 6 items.
-	// removes faststrings which can be wasteful.
+	// Removes faststrings which can be wasteful.
 	
 	|| desiredObj = s.firstprmobj
 	|| s2 = s.uptoarg
@@ -112,8 +122,7 @@ function TryStringAppend (|message| s)
 	
 	if count&1
 		prms.msg(@thg, "nil").obj = TypeNil
-	
-	
+
 
 
 function FS (|Message| exp, |Message| GetResult)
