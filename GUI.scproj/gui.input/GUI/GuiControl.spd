@@ -1,11 +1,9 @@
 
 
 class GUIControl (list)
-	linkage: cpp_part ctrl
-	
+	linkage: cpp_part ctrl	
 	contains GuiControl
-	
-	
+
 	|GUIAction?|				OnClicked
 	|GUIAction?|				OnFocus
 	|GUIPasteEvent?|			OnPaste
@@ -110,6 +108,7 @@ class GUIControl (list)
 		0
 
 	function Size (|ivec2|)
+		inline
 		return .lastrect.size
 
 	setter Size (|ivec2|)
@@ -200,9 +199,11 @@ class GUIControl (list)
 		return .text.bounds.x * font.width
 
 	syntax cast (|ivec4|)
+		inline
 		return .lastrect
 	
 	syntax append (|guicontrol| g)
+		inline
 		super <~ g
 		
 	syntax is (|guicontrolflags| F, |bool|)
@@ -226,6 +227,7 @@ class GUIControl (list)
 			
 
 	function Decluttering (|bool|)
+		inline
 		return .Declutterer.final
 	
 	setter Declutter (|bool|) 
@@ -293,6 +295,7 @@ class GUIControl (list)
 	
 	
 	setter Visible (|bool|)
+		inline
 		(self is visible) = value
 
 	
@@ -396,12 +399,14 @@ class GUIControl (list)
 
 
 	function Width (|int|)
+		inline
 		return .lastrect.width
 	setter Width (|controlline|)
 		.sizer.g(0, self) = value[0]|controlpoint|
 		.sizer.g(2, self) = value[1]|controlpoint|
 
 	function Height (|int|)
+		inline
 		return .lastrect.Height
 	setter Height (|controlline|)
 		.sizer.g(1, self) = value[0]|controlpoint|
@@ -416,6 +421,7 @@ class GUIControl (list)
 			return .id.syntaxequals(s, aware)
 
 	operator Contains (|ivec2| p, |bool|)
+		inline
 		return .lastrect.contains(p)
 	
 	function Window (|Window|)
@@ -430,34 +436,39 @@ class GUIControl (list)
 		.sizer.g(i, self) = value
 	
 	function Right (|int|)			// these are not synced but i dont know what to do.....
+		inline
 		return .lastrect.x2			// set a controlpoint, but get a lastrect int?
 	setter Left (|ControlPoint|)
+		inline
 		.size(0) = value
 	setter Bottom (|ControlPoint|)
+		inline
 		.size(1) = value
 	setter Right (|ControlPoint|)
+		inline
 		.size(2) = value
 	setter Top (|ControlPoint|)
+		inline
 		.size(3) = value
 		
-	function LastBottom (|int|)
+	inline LastBottom (|int|)
 		return .lastrect.y
-	function LastLeft (|int|)
+	inline LastLeft (|int|)
 		return .lastrect.x
-	function LastRight (|int|)
+	inline LastRight (|int|)
 		return .lastrect.x2
-	function LastTop (|int|)
+	inline LastTop (|int|)
 		return .lastrect.y2
 
-	function Left (|controlpoint|)
+	inline Left (|controlpoint|)
 		return .sizer.GSize[0]|controlpoint|
-	function Bottom (|controlpoint|)
+	inline Bottom (|controlpoint|)
 		return .sizer.GSize[1]|controlpoint|
 
-	function Horz (|intrange|)
+	inline Horz (|intrange|)
 		return .lastrect.x1x2
 
-	function Vert (|intrange|)
+	inline Vert (|intrange|)
 		return .lastrect.x1x2
 
 	function OuterFocus (|guicontrol|)
@@ -565,7 +576,7 @@ class GUIControl (list)
 		return true	
 	
 	
-	function Hide
+	inline Hide
 		isnt visible
 
 	
@@ -616,9 +627,11 @@ class GUIControl (list)
 			return 1.0
 				
 		run (|window| window, |float| progress, |ErrorInt|)
+			inline
 			return -1
 		
 		function Remove
+			inline
 			gui.touch
 			super.remove
 			
