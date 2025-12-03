@@ -39,9 +39,9 @@ module Stability
 				printline f.exportname
 
 	
-	function Fuck (|[scobject]| list)
-		for (l in list) (i)
-			printline "${(i+1)}: ${l.gpackid}: ${l.exportname}"
+//	function DebugList (|[scobject]| list)
+//		for (l in list) (i)
+//			printline "${(i+1)}: ${l.packid(l isa scfunction)}: ${l.exportname}"
 	
 	function StabliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
 		opt norefcounts
@@ -49,14 +49,14 @@ module Stability
 		target debug
 			if !options.MakeExec
 				Table = jb_vm.vm.InitTable(4096, 64K)
-		if !isfunc
-/			.fuck(list)
+//		if !isfunc
+///			.DebugList(list)
 			
 		|| sorter = codesorter.PackID(isfunc)
 		list.Sort(sorter)
 
-		if !isfunc
-			.fuck(list)
+//		if !isfunc
+//			.DebugList(list)
 		
 		for obj in list
 			if obj.exportname == "JB__TC_Types_Dict"

@@ -135,6 +135,15 @@ function SCFunction.HasCVersion (|bool|)
 	return self is wrapper
 
 
+function scfunction.ASMFuncID (|int|)
+	opt norefcounts
+	|| f = .fpackid
+//	target debug
+//		|| fn = (packmaker.libfuncs[f], packmaker.packfuncs[f])(.islibrary)
+//		expect (fn == self) (self, "Function mismatch")
+	return f
+
+
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
@@ -146,8 +155,8 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 			|| MiniDest = .AskForInline(prms, dest, fn)
 				return MiniDest
 		check (fn isnt LinkInline) (exp, "Unable to inline function")
-
-		TableID = fn.fPackID + 31
+		
+		TableID = fn.ASMFuncID + 31
 		if tableid <= 31							// failed!
 			if !fn.islibrary or !.state.fn.islibrary
 				error (exp, "Missing PackID[1]")
@@ -193,8 +202,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 function assembler.ASMReach (|scfunction| fn)
 	opt norefcounts
 	|| orig = .out
-	if fn is constructor
-		if fn.cls == "StartupWindow"
 	if Orig.MyReacher and !orig.IsLibrary
 		(fn is usedbyasm)
 		if fn is Constructor // gotta reach the destructor also

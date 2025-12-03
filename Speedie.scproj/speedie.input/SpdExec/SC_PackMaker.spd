@@ -68,14 +68,15 @@ module PackMaker
 		return Globals.AlignUp(8)					// for strings, which come directly after
 
 
+	function UseMain (|string| Name, |int| id, |bool|)
+		opt norefcounts
+		|| Fn = compiler.xfunc(name)				// we need app and pack inits separately
+			fn.fpackid = id
+			(fn is usedbyasm)
+
 	function BuildGlobs (|bool|)
 		opt norefcounts
-		|| PackInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
-		|| PackMain = compiler.xfunc("JB_Main")
-		require PackInit and PackMain
-		
-		PackInit.fPackID = 1 // put init and main first!
-		PackMain.fPackID = 2
+		require .UseMain("JB_SP_AppInit", 1) and  .UseMain("JB_Main", 2)
 
 		stability.StabiliseFuncs	
 					
@@ -132,9 +133,6 @@ module PackMaker
 		target debug
 			if !Compiler.InPerry
 				.RunAFewTests
-		
-		|| main = Compiler.MainFunc
-			(main is usedbyasm)
 		return true
 	
 	

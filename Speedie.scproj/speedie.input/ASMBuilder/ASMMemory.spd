@@ -65,12 +65,8 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 				(decl! is UsedByASM)
 			|| K = (bs.Const << 6) + ((index-1) << 3) // gtab is in terms of 64-bytes.
 			if K <= 20~bits
-//				assembler.PrintProgress
 				.AskNop(bs) // assume this works for now
-				|| x = exp.GOBJ(dest, decl.islib, 0, K>>3)
-//				assembler.PrintProgress
-//				debugger
-				return x
+				return exp.GOBJ(dest, decl.islib, 0, K>>3)
 
 	|| op = ASMType.WriteASM[byte_shift]
 	if dest is set
