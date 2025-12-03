@@ -45,17 +45,19 @@ module SpdTable
 	
 	function Link
 		opt norefcounts
-		for (f in .funcs) (i)
+		for f in .funcs
 			.currFunc = f
 			f.Link❗
 
+	/// we seem to be linking to totally the wrong things somehow. Not sure why. We need to sort this out... sigh.
+	
 	function SPDFunc.DebugSuccess
 		spdtable.LinksOK++
 		printline spdtable.LinksOK.render + ": " + SpdTable.CurrFunc!.Name + " linked to " + .name 
-		
+	
+	
 	function asm.SPDLink (|&asm| self, |asm| Old)
 		opt norefcounts
-		|| x = 403177925
 /		|| ID = (Old << 13) >> 13
 		|| fn = SpdTable.Funcs[id]
 			|| Pos = fn.SpeedieFunc						// Fast-branch for speed.
