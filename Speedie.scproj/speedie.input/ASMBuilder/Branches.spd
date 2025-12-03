@@ -561,6 +561,7 @@ function @assembler.PrintProgress
 		
 		.PrintRegs
 
+
 function @assembler.PrintRegs
 	target debug
 		|| i = 0

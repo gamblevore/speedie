@@ -1174,7 +1174,7 @@ function ASM (|message| msg,  |SCFunction| fn, |bool|)
 
 	if Assembler.sh.ASMCompile(fn, 0)
 		|| fs = FastString()
-		rz = .ASMSub(msg, fn, fs)
+		rz = .FeedBackViewASMSub(msg, fn, fs)
 
 
 function message.AsmIndent (|message| top, |int|)
@@ -1184,7 +1184,7 @@ function message.AsmIndent (|message| top, |int|)
 		self = .parent
 
 
-function ASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
+function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
 	opt norefcounts
 //	out.msg(@tmp, "")			// separator. perry gets messed up
 								// need to do this more cleanly

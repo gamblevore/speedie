@@ -412,7 +412,7 @@ module Feedback
 		+'codesign'
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
 			if value ~= "" or "true"
-				printline "Codesign: " + app.prefs[codesign_native]
+				printline "Codesign: " + app.prefs[codesign_native].render
 				return true
 			
 			if value == "none" or "nil" or "-"

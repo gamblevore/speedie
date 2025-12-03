@@ -348,7 +348,8 @@ struct FatASM
 	function RenderFat (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts		
 		if (!.exists)  and  (.msg.func == @sheb)
-			.RendaMsg(fs, 0)
+			target debug
+				.RendaMsg(fs, 0)
 			return 
 		
 		|| M = fs.mark
@@ -394,8 +395,10 @@ struct FatASM
 			fs.length--
 			fs <~ "..."
 			n += 2
-		if !Simpler
-			.RendaMsg(fs, n)
+
+		target debug
+			if !Simpler
+				.RendaMsg(fs, n)
 	
 
 	function ConditionDoesAnything (|bool|)
@@ -433,7 +436,7 @@ struct FatASM
 		if fs.Length > start + 30
 			fs.Length = start + 30
 			
-	
+	target debug {
 	function RendaMsg (|faststring| fs, |int| sofar)
 		opt norefcounts
 		|| msg = .msg
@@ -443,8 +446,10 @@ struct FatASM
 		fs <~ (' ', 47-sofar)
 		require msg != @arg
 
-		fs <~ "/*" // reuse /* string lol.
+		fs <~ "/*"						// reuse /* string lol.
 		fs <~ " "
+
+		|| Start = fs.length
 		if msg == @prm
 			msg = msg.parent
 		  else
@@ -456,9 +461,21 @@ struct FatASM
 		  else
 			msg.render(fs)
 		
-		fs <~ " " // reuse "*/" string
+		|| After = fs.length
+		|| OrigAfter = After
+		if after - Start > 40
+			after = start + 40
+			fs.length = After
+
+		After = fs|string|.find('\n', Start, After)
+		if After > Start
+			fs.length = after
+		if OrigAfter < OrigAfter
+			fs <~ "..."
+		
+		fs <~ " "						// reuse "*/" string
 		fs <~ "*/"
-	
+	}
 	
 	function RendaKnst (|faststring| fs, |int| sofar)
 		|| ty = .info.µType

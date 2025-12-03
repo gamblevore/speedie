@@ -73,6 +73,7 @@ module PackMaker
 		|| Fn = compiler.xfunc(name)				// we need app and pack inits separately
 			fn.fpackid = id
 			(fn is usedbyasm)
+			return true
 
 	function BuildGlobs (|bool|)
 		opt norefcounts

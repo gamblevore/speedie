@@ -4,7 +4,9 @@ module SpdTable
 	constants	
 		FnLim = 10K // its about corrupted files, not "we can't handle more"!
 	
+	|int|		LinksOK
 	|[SpdFunc]|	Funcs
+	|spdfunc--|	CurrFunc
 	|&uint16|	GlobLink = cakerun.GlobTable
 	|&&nil|		RawFuncs = cakerun.LibFuncs
 
@@ -44,10 +46,13 @@ module SpdTable
 	function Link
 		opt norefcounts
 		for (f in .funcs) (i)
-			FuncID.curr = i + 1
+			.currFunc = f
 			f.Link❗
 
-//	403177925
+	function SPDFunc.DebugSuccess
+		spdtable.LinksOK++
+		printline spdtable.LinksOK.render + ": " + SpdTable.CurrFunc!.Name + " linked to " + .name 
+		
 	function asm.SPDLink (|&asm| self, |asm| Old)
 		opt norefcounts
 		|| x = 403177925
@@ -60,10 +65,11 @@ module SpdTable
 					|| Final = (Jump|uint| << 13) >> 13
 					Final |= (Old>>24) << 24
 					self[] = Final
+					fn.DebugSuccess
 					return
-				expect (false) (FuncID.Curr, "Executable too large to link")
-			expect (false) (FuncID.Curr, "Function was trimmed")
-		error (FuncID.curr, "Bad function ID")
+				expect (false) (spdtable.Currfunc, "Executable too large to link: " + fn.name )
+			expect (false) (spdtable.Currfunc, "Function was trimmed: " + fn.name )
+		error (spdtable.Currfunc, "Bad function ID: "  + id )
 
 
 	function asm.Size (|int|)
@@ -85,13 +91,3 @@ module SpdTable
 			base += asm.size
 	
 	
-
-datatype FuncID (int)
-	syntax expect (|string| str)
-		opt norefcounts
-		|| msg = CakeRun.code[Curr]
-			msg.SyntaxExpect(str)
-
-	module
-		|FuncID| Curr
-
