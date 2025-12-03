@@ -57,7 +57,7 @@ module SpdTable
 	
 	function asm.PutStickersOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction, 
 		opt norefcounts
-/		|| ID = (Old << 13) >> 13
+		|| ID = (Old << 13) >> 13
 		if ID <= 31 // a register!
 			return
 		

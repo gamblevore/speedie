@@ -137,10 +137,10 @@ function SCFunction.HasCVersion (|bool|)
 
 function scfunction.ASMFuncID (|int|)
 	|| ID = .FPackID
-	target PrintFuncTable
-		if Options.TargetDebug or Options.dev
-			|| p = packmaker.PackFuncIndex
-				"$p: ${scfunction.CurrFunc!.exportname} linked to $.ExportName ($ID)"
+//	target PrintFuncTable
+	if !.islibrary and (Options.WhateverDebug)
+		|| p = packmaker.PackFuncIndex
+			"$p: ${scfunction.CurrFunc!.exportname} linked to $.ExportName ($ID)"
 	return ID
 
 
