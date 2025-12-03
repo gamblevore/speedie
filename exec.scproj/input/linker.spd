@@ -38,7 +38,7 @@ module SpdTable
 		for spd in CakeRun.code
 			self <~ spd
 		
-		check  (.Funcs >= 2)						(cakerun.code, "Missing 'main'")
+		check  (.Funcs >= 2)						(CakeRun.code, "Missing 'main'")
 		.Funcs.Shrink
 		return stderr.ok
 	
@@ -49,16 +49,19 @@ module SpdTable
 			.currFunc = f
 			f.Link❗
 
-	/// we seem to be linking to totally the wrong things somehow. Not sure why. We need to sort this out... sigh.
 	
-	function SPDFunc.DebugSuccess
-		spdtable.LinksOK++
-		printline spdtable.LinksOK.render + ": " + SpdTable.CurrFunc!.Name + " linked to " + .name 
+	function SPDFunc.DebugSuccess (|int| id)
+		SpdTable.LinksOK++
+		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
 	
 	
-	function asm.SPDLink (|&asm| self, |asm| Old)
+	function asm.PutStickersOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction, 
 		opt norefcounts
 /		|| ID = (Old << 13) >> 13
+		if ID <= 31 // a register!
+			return
+		
+		ID -= 31
 		|| fn = SpdTable.Funcs[id]
 			|| Pos = fn.SpeedieFunc						// Fast-branch for speed.
 				|| Jump = self - &Pos.ASM[0]
@@ -67,7 +70,7 @@ module SpdTable
 					|| Final = (Jump|uint| << 13) >> 13
 					Final |= (Old>>24) << 24
 					self[] = Final
-					fn.DebugSuccess
+					fn.DebugSuccess(id)
 					return
 				expect (false) (spdtable.Currfunc, "Executable too large to link: " + fn.name )
 			expect (false) (spdtable.Currfunc, "Function was trimmed: " + fn.name )
@@ -89,7 +92,7 @@ module SpdTable
 		while base < after
 			|| asm = base[]
 			if asm.IsSPDFunc // seems everything else is prelinked
-				base.SPDLink(asm)
+				base.PutStickersOnCake(asm)
 			base += asm.size
 	
 	

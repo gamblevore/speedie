@@ -8,6 +8,7 @@ module PackMaker
 	|[SCDecl]|				LibGlobs
 	|[SCFunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
+	|int|					PackFuncIndex
 	|int|					PackGlobSize
 	|int|					LibGlobSize
 	|HairyMan|				PackSaved
@@ -126,8 +127,10 @@ module PackMaker
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
 		
-		for (fn in .Packfuncs) (i)
-			require Assembler.sh.ASMCompile(fn, i+1)
+		.PackFuncIndex = 0
+		while (|| fn = .packfuncs[.PackFuncIndex])
+			.PackFuncIndex++
+			require Assembler.sh.ASMCompile(fn)
 
 		.Packfuncs.sort(&CodeSorter.fPackID)
 		
@@ -313,7 +316,7 @@ function packmaker.FinalPrepare
 	// We just want to see the size of the libfunc, if it were inlined.
 	for (fn in .LibFuncs) (i)
 		if fn.CanPrepareInline
-			require Assembler.sh.ASMCompile(fn, -(i+1))
+			require Assembler.sh.ASMCompile(fn)
 			Assembler.jsm.length = 0
 
 

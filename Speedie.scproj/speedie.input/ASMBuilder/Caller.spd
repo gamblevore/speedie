@@ -136,16 +136,17 @@ function SCFunction.HasCVersion (|bool|)
 
 
 function scfunction.ASMFuncID (|int|)
-	opt norefcounts
-	|| f = .fpackid
-//	target debug
-//		|| fn = (packmaker.libfuncs[f], packmaker.packfuncs[f])(.islibrary)
-//		expect (fn == self) (self, "Function mismatch")
-	return f
+	|| ID = .FPackID
+	target PrintFuncTable
+		if Options.TargetDebug or Options.dev
+			|| p = packmaker.PackFuncIndex
+				"$p: ${scfunction.CurrFunc!.exportname} linked to $.ExportName ($ID)"
+	return ID
 
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
+	if "jb_main".trap
 	|| prms = exp.last!
 	|| TableID = 0
 	|| fn = prms.AsFunc

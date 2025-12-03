@@ -747,12 +747,12 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 
 
 target debug
-	function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
+	function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|)
 		// printline "µFunc: $i", (fn)
 		fn.µprint
 
 
-function Assembler.ASMCompile (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
+function Assembler.ASMCompile (|SCFunction| fn, |bool|) // AsmGenerate, ASMRender, GenerateASM
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)
@@ -764,9 +764,7 @@ function Assembler.ASMCompile (|SCFunction| fn, |int| i, |bool|) // AsmGenerate
 	
 	target debug
 		ifn options.silent or compiler.InPerry or options.perryoutput
-			.PrintASM(fn, i)
-	  else
-		(i)
+			.PrintASM(fn, packmaker.PackFuncIndex)
 	
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	require err.ok
