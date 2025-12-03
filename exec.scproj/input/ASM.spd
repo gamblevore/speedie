@@ -1,4 +1,5 @@
 
+
 datatype ASM (uint)
 	operator isa (|asm| Kind, |bool|)
 		return self>>24 == Kind
@@ -14,7 +15,23 @@ datatype ASM (uint)
 	function IsGlob (|bool|)
 		self >>= 24
 		return (self == asm.GOBJ) ||| (self == asm.GTAB)
+	
+	target debug
+		function PrintType
+			|| T = argh[self>>24]
+				printline T
+			  else
+				"Can't find OP for: ${self>>24}"
 		
+		module
+			|| Argh = asm.types.ListASM
+			
+		function dictionary.ListASM (|[string]|)
+			rz <~ ("", 256)
+			for (num in self) (name)
+				if num isa DataObject
+					rz[num.PrivValue] = name
+			
 		
 struct ASMBlob
 	|int|			CallCount		

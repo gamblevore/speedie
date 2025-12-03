@@ -69,7 +69,7 @@ class DataObject
 				fs <~ "0x"
 				fs.appendhex(v)
 			  else
-				fs <~ .privvalue.AsFloat
+				fs <~ v
 
 	module
 		inline NewFloat (|Float64| v, |DataobjectFloat64|)

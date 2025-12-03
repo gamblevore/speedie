@@ -135,10 +135,10 @@ function SCFunction.HasCVersion (|bool|)
 	return self is wrapper
 
 
-function scfunction.ASMFuncID (|int|)
+function SCFunction.ASMFuncID (|int|)
 	|| ID = .FPackID
 //	target PrintFuncTable
-	if !.islibrary and (Options.WhateverDebug)
+	if  !.islibrary  and  Options.WhateverDebug
 		|| p = packmaker.PackFuncIndex
 			"$p: ${scfunction.CurrFunc!.exportname} linked to $.ExportName ($ID)"
 	return ID
@@ -146,7 +146,6 @@ function scfunction.ASMFuncID (|int|)
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
-	if "jb_main".trap
 	|| prms = exp.last!
 	|| TableID = 0
 	|| fn = prms.AsFunc

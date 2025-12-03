@@ -88,7 +88,7 @@ syntax Append (|message| M)
 
 function DataTypeModule 
 	opt norefcounts
-	.ASMFile = "extend_module ASM:constants:|asm|" ~ parse
+	.ASMFile = "extend_module ASM:constants Types:|asm|" ~ parse
 //	self <~ .ASMFile
 	.modulearg = .ASMFile.last.last.last
 

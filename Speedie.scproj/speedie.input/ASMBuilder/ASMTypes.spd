@@ -1,5 +1,5 @@
 extend_module ASM {
-	constants {
+	constants Types {
 		|asm|
 		TAIL = 2
 		FNC = 24

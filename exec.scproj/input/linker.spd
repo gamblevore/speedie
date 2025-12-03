@@ -10,7 +10,6 @@ module SpdTable
 	|&uint16|	GlobLink = cakerun.GlobTable
 	|&&nil|		RawFuncs = cakerun.LibFuncs
 
-
 	syntax access (|int| i, |SpdFunc|)
 		return .Funcs[i]
 	
@@ -57,11 +56,9 @@ module SpdTable
 	
 	function asm.PutStickersOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction, 
 		opt norefcounts
-		|| ID = (Old << 13) >> 13
-		if ID <= 31 // a register!
-			return
+		|| ID = ((Old << 13) >> 13) - 31
+		require ID > 0 // not a register!
 		
-		ID -= 31
 		|| fn = SpdTable.Funcs[id]
 			|| Pos = fn.SpeedieFunc						// Fast-branch for speed.
 				|| Jump = self - &Pos.ASM[0]
@@ -70,7 +67,7 @@ module SpdTable
 					|| Final = (Jump|uint| << 13) >> 13
 					Final |= (Old>>24) << 24
 					self[] = Final
-					fn.DebugSuccess(id)
+//					fn.DebugSuccess(id)
 					return
 				expect (false) (spdtable.Currfunc, "Executable too large to link: " + fn.name )
 			expect (false) (spdtable.Currfunc, "Function was trimmed: " + fn.name )
@@ -81,7 +78,7 @@ module SpdTable
 		self >>= 24
 		if self >= 32
 			return 1 
-		return 1+(self&1)
+		return 2+(self&1)
 	
 	
 	function spdfunc.Link❗
@@ -89,8 +86,10 @@ module SpdTable
 		|| Blob = .SpeedieFunc$
 		|| Base = &Blob.ASM[0]
 		|| after = base + .Length
+//		"-----$.name-----"
 		while base < after
 			|| asm = base[]
+//			asm.PrintType
 			if asm.IsSPDFunc // seems everything else is prelinked
 				base.PutStickersOnCake(asm)
 			base += asm.size
