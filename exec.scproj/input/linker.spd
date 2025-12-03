@@ -43,38 +43,53 @@ module SpdTable
 	
 	function Link
 		opt norefcounts
-		for f in .funcs
+		for (f in .funcs) (i)
+			FuncID.curr = i + 1
 			f.Link❗
+
 	
-	
-	function asm.GlobLink (|asm|)
-		// tonooodododo
-		
-	function asm.FuncLink (|asm|)
-		// todo
-	
+	function asm.SPDLink (|&asm| self, |asm| Old)
+/		|| ID = (Old << 8) >> 8
+		|| fn = SpdTable.Funcs[id]					#expect (FuncID.curr, "Bad function ID")
+		|| Pos = fn.SpeedieFunc						#expect (FuncID.Curr, "Function was trimmed")
+		|| Jump = self - &Pos.ASM[0]
+
+		// for now, do it as 19-bit. later we can upgrade to 21-bit
+		expect (jump == ((Jump << 13) >> 13))				(FuncID.Curr, "Executable too large to link")
+		|| Final = (Jump|uint| << 13) >> 13
+		Final |= (Old>>24)<<24
+		self[] = Final		
+
+
 	function asm.Size (|int|)
-		self>>=24
+		self >>= 24
 		if self >= 32
 			return 1 
 		return 1+(self&1)
-		
+	
+	
 	function spdfunc.Link❗
 		// this could easily be multi-threaded... but no need for now.
 		// it doesn't allocate anything... or alter pointers of any kind.
 		|| Blob = .SpeedieFunc$
 		|| Base = &Blob.ASM[0]
-		|| N = .Length
-		for i in n
-			|| asm = base[] // now... we need to get it's op.
-							 // we need to link globs, and funcs, right?
-			if asm.IsFunc
-				base[] = asm.FuncLink
-			  elseif asm.IsGlob
-				base[] = asm.GlobLink
-			base+=asm.size
-		
-		
-		
-		
+		|| after = base + .Length
+		while base < after
+			|| asm = base[]
+			if asm.IsSPDFunc // seems everything else is prelinked
+				base.SPDLink(asm)
+			base += asm.size
+	
+	
+
+datatype FuncID (int)
+	syntax expect (|string| str)
+		opt norefcounts
+		|| msg = CakeRun.code[Curr]
+			msg.SyntaxExpect(str)
+
+	module
+		|FuncID| Curr
+
+
 

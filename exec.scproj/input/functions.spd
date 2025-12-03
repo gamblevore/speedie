@@ -34,9 +34,11 @@ class SpdFunc
 			.length = n
 			.SpeedieFunc = blob
 
+
 	function ASMPos	(|int|)
 		|| SPD = .SpeedieFunc|&byte| 
 		return SPD - CakeRun.FileSrc.addr
+	
 	
 	function Run (|&ivec4|)
 		jb_vm.vm.Registers 
