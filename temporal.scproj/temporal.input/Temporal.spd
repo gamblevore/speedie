@@ -1,6 +1,8 @@
 
 
 
+// goddamn this thing isnt working right right now..... !!! ;_; :O : O  D: 
+// maybe a simpler approach? put all the code in speedie?
 module Temporal	
 	|temporal.EngineState|	Desired
 	|SteveMachine|			Generator
