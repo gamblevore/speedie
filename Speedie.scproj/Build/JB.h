@@ -575,7 +575,7 @@ typedef bool (*FP_ShellOption)(JB_String* Name, JB_String* Value, FastString* Pu
 
 typedef SortComparison (*FP_SorterComparer)(JB_Object* Self, JB_Object* B);
 
-typedef bool (*SpdProcess_ThreadAsProcess)(SpdProcess* Self, PicoComms* Comms, int64 Data, _cstring* Args);
+typedef bool (*SpdProcess_Thread)(SpdProcess* Self, PicoComms* Comms, int64 Data, _cstring* Args);
 
 typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
 
@@ -1229,7 +1229,7 @@ struct SpdProcess_Behaviour: Process_Behaviour {
 JBClass ( SpdProcess , ShellStream , 
 	bool AlreadyWarnedDied;
 	int DeathLimit;
-	SpdProcess_ThreadAsProcess SubProcess;
+	SpdProcess_Thread SubProcess;
 	FastString* Writer;
 );
 
@@ -1544,13 +1544,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2281])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2441])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2282])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2283])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2280])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2283])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2284])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2442])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2443])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2440])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2443])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2444])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1652,11 +1652,13 @@ extern bool SC__Options_TargetDebug;
 extern byte SC__Options_UseScriptLoc;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
+extern bool SC__Options_WhateverDebug;
 extern Array* SC__PackMaker_LibFuncs;
 extern Array* SC__PackMaker_LibGlobs;
 extern int SC__PackMaker_LibGlobSize;
 extern HairyMan SC__PackMaker_LibSaved;
 extern JB_String* SC__PackMaker_LName;
+extern int SC__PackMaker_PackFuncIndex;
 extern Array* SC__PackMaker_PackFuncs;
 extern Array* SC__PackMaker_PackGlobs;
 extern int SC__PackMaker_PackGlobSize;
@@ -1747,7 +1749,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2289])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2449])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1770,7 +1772,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2285])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2445])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1790,7 +1792,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2290])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2450])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
@@ -1929,10 +1931,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2288])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2287])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2448])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2447])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2286])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2446])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2079,6 +2081,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_TERN ((ASM)72)
 #define kSC__ASM_TIME ((ASM)35)
 #define kSC__ASM_TRAP ((ASM)32)
+extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__ASM_UCLM ((ASM)54)
 #define kSC__ASM_VABS ((ASM)178)
 #define kSC__ASM_VADD ((ASM)126)
@@ -2571,7 +2574,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2279])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2439])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3069,6 +3072,8 @@ bool SC_FB__AppOptions_help(JB_String* Name, JB_String* Value, FastString* Purpo
 bool SC_FB__AppOptions_ignorecantsave(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_inlinelib(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_k(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_keepallerrors(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -6206,7 +6211,7 @@ void SC_Pac_AskNopTemp(Assembler* Self, ASMReg R);
 
 ASMReg SC_Pac_ASMBoolMaker(Assembler* Self, Message* Exp, ASMReg Dest, OpMode Opp);
 
-bool SC_Pac_ASMCompile(Assembler* Self, SCFunction* Fn, int I);
+bool SC_Pac_ASMCompile(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_ASMReach(Assembler* Self, SCFunction* Fn);
 
@@ -6835,7 +6840,7 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // Thread
 
 
-// ThreadAsProcess
+// Thread
 
 
 // TokenHandler_fp
@@ -8743,7 +8748,7 @@ void SC_SavingTest_SaveWrite(SavingTest* Self, ObjectSaver* Saver);
 // JB_SpdProcess
 bool JB_Proc_CommsOpen(SpdProcess* Self);
 
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_Thread Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
 
 void JB_Proc_Destructor(SpdProcess* Self);
 
@@ -11908,7 +11913,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 }
 
 inline JB_File* JB_File__Logs() {
-	return JB_Str_AsFile(JB_LUB[396]);
+	return JB_Str_AsFile(JB_LUB[572]);
 }
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
@@ -12053,7 +12058,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1363], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1538], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
