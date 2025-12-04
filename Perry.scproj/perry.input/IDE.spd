@@ -709,7 +709,7 @@ class PerryIDE (Window)
 			
 	
 	behaviour KeyDown
-		if keys.cmd and .cmdkey(key)
+		if keys.cmd and !keys.option and .cmdkey(key)
 			return true
 		if (key is tab) and .OpenedMenu == .autocomplete
 			return .autocomplete.doreturn

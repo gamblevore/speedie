@@ -199,7 +199,9 @@ class SCImport
 			  elseif (c.IsDir)
 				.ImportDir( c )
 			
-			  elseif (cname.IsSpeedieSrc)
+			  elseif cname ~= "app.conf"
+				rz = .ImportSpd(c)
+			  elseif cname.IsSpeedieSrc
 				|| B = .ImportSpd(c)
 				if cName ~= "index.spd"
 					rz = B

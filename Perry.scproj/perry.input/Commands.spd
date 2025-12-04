@@ -33,6 +33,10 @@ dispatch PerryCommands (|perryide| self, |string| s)
 	
 	+'breakout'
 		Breakout().RunAsMain(60)
+	
+	+'8ball'
+		|| Q = ("Ask the magic 8-ball a question!").ask
+			beep "You: \"" + Q + "\"\n\n8-Ball: " + eightball.ask(Q)
 
 	+'bubbles'
 		bubbles().RunAsMain(60)

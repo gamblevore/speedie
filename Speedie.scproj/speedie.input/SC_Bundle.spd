@@ -14,7 +14,7 @@ function compiler.Bundle
 	
 function compiler.WrongConf (CollectFunc)
 	expect (!.ConfMsg) (node, "Conf already exists!") 
-	error (node, "Conf must be in the index.spd file") 
+	error (node, "Conf must be in the app.conf file") 
 
 
 function compiler.IdealName (|string|)

@@ -103,8 +103,9 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		|duration| Delay = 0
 		if !Perry.FinishedStartUp
 			Delay = 0.125s * Perry.WindowNumber
-		|SpdProcess| spd = SpdProcess.spawn(Proc, f.name, p, mode)
+		|| spd = SpdProcess.spawn(Proc, f.name, p, mode)
 			spd.pico.name = .project.name
+			return spd
 	
 
 
