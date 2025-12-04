@@ -1,34 +1,18 @@
 
- 
+
 module CakeRun
 	linkage: cpp_part Pack
-	|memory|				Globals
 	|message|				Code
 	|message|				Clss
 	|String|				Strings
 	|String|				FileSrc
-	|&byte|					GlobBase = CakeRun.LibGlobs|&byte|
-	|int|					GlobalCount
 	|dictionary of &classdata| ClassTable = dictionary()
 	
 	constants
 		FuncIsLib = 1
 	
-	function LibGlobs (|&&nil|)
-		cpp_wrapper JB_App__LibGlobs
-
-	function GlobTable (|&uint16|)
-		cpp_wrapper JB_App__GlobTable
-	
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs
-
-	function AddLibGlob (|?&nil| where, |string| name, |bool|)
-		opt norefcounts
-		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
-		// wait we can't store ptrs in a dict? was this a wrapper obj?
-//		.Globals.valuelower(name) = where!
-		return true
 		
 	syntax access (|int| i, |SpdFunc|)
 		return SpdTable.Funcs[i]
@@ -43,8 +27,8 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		return  .GetStructure  and  spdtable.LoadFuncs  and  .LoadClasses
-	
+		return  globals.CheckLib  and  .GetStructure  and  SpdTable.LoadFuncs  and  .LoadClasses
+		
 	
 	function GetStructure (|bool|)
 		opt norefcounts
@@ -58,7 +42,7 @@ module CakeRun
 			.strings = arg["strs"].name
 			.clss = arg["clss"]
 			debugger.root = arg["debug"]
-		return .glob(sz)
+		return globals.collectpackglobs(sz)
 		
 
 	function file.Compile (|file|)
@@ -79,3 +63,4 @@ module CakeRun
 			.FileSrc = rz.OriginalParseData
 			if !rz.expect(@tmp, "cake")
 				rz = nil
+

@@ -1,28 +1,48 @@
 
 
+module Globals
+	|memory|				PackGlobs
+	|&byte|					GlobBase = Globals.LibGlobs|&byte|
+	|&uint16|				LibLink = Globals.GlobTable
+	|uint|					LibMax
 
-function CakeRun.Glob (|message| size_msg, |bool|)
-	opt norefcounts
-	|int| glob_size = size_msg.int(0, 1, 256MB)$
+
+	function GlobTable (|&uint16|)
+		cpp_wrapper JB_App__GlobTable
+
+	function LibGlobs (|&&nil|)
+		cpp_wrapper JB_App__LibGlobs
 	
-	|| input		= InputStream(.strings)
-	|| n_strs		= input.HInt
-	expect (n_strs <= 1000_000) ("Too many strings in pack: " + n_strs)
-	|| alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
-	|| g = byte[alloc_Size]	#require
-	.globals = g
-
-	|| StringTable = (g.Ptr + glob_size)|&string|
-	|string| Last = nil
-	for i in n_strs
-		|| n = input.hint
-		if last
-			Last.Addr[last.length] = 0 // c-string! :]
-		Last = string.new((input.Data.Curr)|cstring|, n)
-		StringTable[i] = Last
-	return true
-
-
-// globals
-	// vars (ints/object)
-	// strings
+	
+	function CollectPackGlobs (|message| size_msg, |bool|)
+		opt norefcounts
+		|int| glob_size = size_msg.int(0, 1, 256MB)$
+		
+		|| input		= InputStream(cakerun.strings)
+		|| n_strs		= input.HInt
+		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
+		|| alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
+		|| g = byte[alloc_Size]							#require
+		.PackGlobs = g
+	
+		|| StringTable = (g.Ptr + glob_size)|&string|
+		|string| Last = nil
+		for i in n_strs
+			|| n = input.hint
+			if last
+				Last.Addr[last.length] = 0 // c-string! :]
+			Last = string.new((input.Data.Curr)|cstring|, n)
+			StringTable[i] = Last
+		return true
+	
+	
+	function CheckLib (|bool|)
+		opt norefcounts
+		|| T = .LibLink!
+		for i in 4K
+			|| G = T[i]
+			if !G
+				.LibMax = i
+				return true
+			expect (G == 64K-1) or (G < 16K) ("LibGlobs item too far: " + i)
+		error "Too many LibGlobs?"

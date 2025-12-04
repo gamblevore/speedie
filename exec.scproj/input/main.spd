@@ -8,8 +8,8 @@ main
 	error.AutoPrint = 1
 	if CakeRun.LoadPack
 		SpdTable.Link
-		debugger.load
-		return SpdTable.RunMain
+		if debugger.StartDebug
+			return SpdTable.RunMain
 	return 1
 
 

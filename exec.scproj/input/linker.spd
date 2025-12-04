@@ -1,18 +1,10 @@
 
 
 module SpdTable 
-	constants	
-		FnLim = 10K // its about corrupted files, not "we can't handle more"!
-	
 	|int|		LinksOK
 	|[SpdFunc]|	Funcs
 	|spdfunc--|	CurrFunc
-	|&uint16|	GlobLink = cakerun.GlobTable
 	|&&nil|		RawFuncs = cakerun.LibFuncs
-
-	syntax access (|int| i, |SpdFunc|)
-		return .Funcs[i]
-	
 	
 	function RunMain (|int|)
 		opt norefcounts
@@ -22,76 +14,85 @@ module SpdTable
 
 
 	syntax Append (|message| spd)
-		opt norefcounts
-		expect (.Funcs < .FnLim)					(spd, "Too many functions")
+		opt norefcounts // the limit is just to detect corrupted files.
+		expect (.funcs.Length < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
 		if spd == @num
 			for spd.int
-				.Funcs <~ SpdFunc() // placeholder
+				.Funcs <~ SpdFunc()			// placeholder
 		  else
 			.Funcs <~ SpdFunc(spd)
 	
 	
 	function LoadFuncs (|bool|)
 		opt norefcounts
-		.funcs <~ SpdFunc() // null func
+		.funcs <~ SpdFunc()					// null func
 		for spd in CakeRun.code
 			self <~ spd
 		
-		check  (.Funcs >= 2)						(CakeRun.code, "Missing 'main'")
+		check  (.Funcs >= 2)				(CakeRun.code, "Missing 'main'")
 		.Funcs.Shrink
 		return stderr.ok
+		
 	
-	
-	function Link
+	function Link (|&asm|)
 		opt norefcounts
 		for f in .funcs
 			.currFunc = f
 			f.Link❗
 
-	
-	function SPDFunc.DebugSuccess (|int| id)
-		SpdTable.LinksOK++
-		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
-	
-	
-	function asm.PutStickersOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction, 
-		opt norefcounts
-		|| ID = ((Old << 13) >> 13) - 31
-		require ID > 0 // not a register!
-		
-		|| fn = SpdTable.Funcs[id]
-			|| Pos = fn.SpeedieFunc						// Fast-branch for speed.
-				|| Jump = self - &Pos.ASM[0]
-				// for now, do it as 19-bit. later we can upgrade to 21-bit
-				if  Jump  ==  (Jump << 13) >> 13
-					|| Final = (Jump|uint| << 13) >> 13
-					Final |= (Old>>24) << 24
-					self[] = Final
-//					fn.DebugSuccess(id)
-					return
-				expect (false) (spdtable.Currfunc, "Executable too large to link: " + fn.name )
-			expect (false) (spdtable.Currfunc, "Function was trimmed: " + fn.name )
-		error (spdtable.Currfunc, "Bad function ID: "  + id )
-
-
-	function asm.Size (|int|)
-		self >>= 24
-		if self >= 32
-			return 1 
-		return 2+(self&1)
-	
-	
 	function spdfunc.Link❗
-		// this could easily be multi-threaded... but no need for now. doesn't allocate / alter ptrs
-		|| Blob = .SpeedieFunc$
-		|| Base = &Blob.ASM[0]
+		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now. 
+		|| Base = .start$
 		|| after = base + .Length
-//		"-----$.name-----"
 		while base < after
 			|| asm = base[]
-//			asm.PrintType
-			if asm.IsSPDFunc // seems everything else is prelinked
-				base.PutStickersOnCake(asm)
+			|| Op = asm.op
+			if op.IsSPDFunc
+				base.PutCandlesOnCake(asm)
+			  elseif op.IsGlob and asm.IsLibGlob
+				base.LibGlob(asm)
 			base += asm.size
+
+
+function asm.PutCandlesOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction, linkall
+	opt norefcounts
+	|| ID = ((Old << 13) >> 13) - 31
+	require ID > 0 // not a register!
 	
+	|| fn = SpdTable.Funcs[id]
+		|| Pos = fn.SpeedieFunc						// Fast-branch for speed.
+			|| Jump = self - &Pos.ASM[0]			// 19-bits // later we can upgrade to 21-bit
+			if  Jump  ==  (Jump << 13) >> 13
+				|| Final = (Jump|uint| << 13) >> 13
+				Final |= (Old>>24) << 24
+				self[] = Final
+//				fn.DebugSuccess(id)
+				return
+			expect (false) (spdtable.Currfunc, "Executable too large to link: " + fn.name )
+		expect (false) (spdtable.Currfunc, "Function was trimmed: " + fn.name )
+	error (spdtable.Currfunc, "Bad function ID: "  + id )
+
+
+function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs
+	opt norefcounts
+	|| ID = (Old << 15) >> 15
+	expect (ID > 0 and ID < globals.LibMax)					(spdtable.Currfunc, "Bad LibGlob ID: " + ID )
 	
+	ID = globals.LibLink![ID]
+	if (old.op == asm.GOBJ)
+		old = (Old >> 17) << 17
+		old |= ID >> 3
+	  else			//GTAB
+		old = (Old >> 18) << 18
+		old |= ID
+	self[] = old
+		
+//	GObj		  //  8
+//		r1		R // 13
+//		Mode	1 // 14
+//		Ref		1 // 15
+				  // 17 remain
+//	Table		  //  8
+//		r1		R // 13
+//		Mode	1 // 14
+				  // 18 remain

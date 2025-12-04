@@ -16,11 +16,11 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 "
 	contains SpdProcess
 	|jbin|						Writer
-	|?ThreadAsProcess|			SubProcess
+	|?spdprocess.Thread|		SubProcess
 	|int| 						DeathLimit
 	|bool|						AlreadyWarnedDied
 
-	constructor	(|string| path, |?ThreadAsProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
+	constructor	(|string| path, |?spdprocess.Thread| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
 		mode |= ProcessMode.MsgPassing
 		super.constructor(path, mode, params, pico)
 		.deathlimit = 12
@@ -206,7 +206,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 //			rz.pid = id
 
 	
-	prototype ThreadAsProcess (|&pico| Comms, |int64| Data, |&cstring| args, |bool|)
+	prototype Thread (|&pico| Comms, |int64| Data, |&cstring| args, |bool|)
 		function Spawn (|string| ThreadName,  |[string]!| R = [],  |SpdProcess|)
 			description `This is meant to run a "main-function" from a lib, as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
 			
@@ -219,18 +219,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			// at least we don't crash this way.
 			memory.free(c_args)
 
-
-
-prototype Thread (|pico| Comms, |uint16| Data, |&nil| Argument, |bool|)
-	function Spawn (|pico| Comms, |uint16| Data, |&nil| Argument,  |int| BuffBits=0, |&pico|)
-		description "Just a wrapper around pico.thread" 
-		|| name = (&comms.config.name[0])|cstring|
-		|| pico_out = pico.new(name.wrap, -1)
-			if BuffBits
-				pico_out.config.Bits = BuffBits
-			if comms.SpawnThread(self|picothreadfn|, Data, Argument|&cstring|)
-				return pico_out
-			pico_out.Close("")
 
 
 prototype SpdDeathActionFn

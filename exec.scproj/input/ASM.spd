@@ -1,27 +1,40 @@
 
+		
+struct ASMBlob
+	|int|			CallCount		
+	|ASM[1]|		ASM
+
+
+datatype ASMOp (uint)
+	function IsSPDFunc (|bool|)
+		return (self == asm.FNC or asm.fnc3)
+	
+	function IsGlob (|bool|)
+		return (self == asm.GOBJ or asm.GTAB)
+	
 
 datatype ASM (uint)
-	operator isa (|asm| Kind, |bool|)
-		return self>>24 == Kind
-	
-	function IsSPDFunc (|bool|)
-		self >>= 24
-		return  (self == asm.FNC) ||| (self == asm.fnc3)
-	
-	function IsCppFunc (|bool|)
-		self >>= 24
-		return (self == asm.FNCX3) ||| (self == asm.FNCX)
+	function Op (|asmOp|)
+		return self >> 24
 
-	function IsGlob (|bool|)
+	operator isa (|asm| Kind, |bool|)
+		return .op == Kind
+	
+	function Size (|int|)
 		self >>= 24
-		return (self == asm.GOBJ) ||| (self == asm.GTAB)
+		if self >= 32
+			return 1 
+		return 2 + (self&1)
+	
+	function IsLibGlob (|bool|)
+		return (Self >> 18) & 1
 	
 	target debug
 		function PrintType
-			|| T = argh[self>>24]
+			|| T = argh[.op]
 				printline T
 			  else
-				"Can't find OP for: ${self>>24}"
+				"Can't find OP for: ${.op}"
 		
 		module
 			|| Argh = asm.types.ListASM
@@ -32,8 +45,3 @@ datatype ASM (uint)
 				if num isa DataObject
 					rz[num.PrivValue] = name
 			
-		
-struct ASMBlob
-	|int|			CallCount		
-	|ASM[1]|		ASM
-

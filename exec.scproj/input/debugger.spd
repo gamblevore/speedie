@@ -1,46 +1,39 @@
 
+
 module debugger
-	|message| root
-	function Load (|bool|)
-		ifn debugger.root
+	|message|		Root
+	|&uint|			Shadow
+	|SPDFunc--|		First
+	|SPDFunc--|		Last
+	
+	function StartDebug (|bool|)
+		opt norefcounts		
+		|| Length = (.Last!.after - .First!.Start)*4
+		.Shadow = memory.zalloc(Length)|&uint|		#require
 		return true
-		
-		// if we fail... but don't NEED a debugger... we just still return true
 
-/*
-The debug-info... I guess is another issue.
-We'll need to describe the type per-var.
+// what to do about empty funcs? if they have no length, surely they don't contain anything?
+// seems easy?
 
-But also where each var opens and closes. And vars can close in multiple places!
+function spdtable.Find (|uint| ToFind,  |spdfunc|)
+	return .find(debugger.first!.start! + tofind)
 
-Opening a var over another var can be considered... closing the original. Its OK to leave vars lingering... as long as they ACTUALLY were defined... not in an if-block for example.
+function spdtable.Find (|&ASM| ToFind, |spdfunc|)
+	opt norefcounts // I could make a binary func. but I don't want to. maybe later?
+					// besides, its better to make a generic binary finder? but what would the param be?
+					// an object? a struct? a voidptr? no good!
+	for s in .funcs
+		if s.SpeedieFunc
+			if s.Contains(ToFind) == 0
+				return s
 
-The debug-info must be variable-length. We can just interpret it each time... we want to search for info, I don't care. Or restructure it into something faster to use.
 
-So its not one debug-info per ASM instruction.
+function spdfunc.Contains (|&ASM| ToFind, |int|)
+	|| s = .Start
+	if ToFind < s
+		return -1
+	if ToFind < s + .Length
+		return 0
+	return 1
 
-(What about jumps? how do we know what debug-info to do after we jump? If not looking it up per ASM-instruction?)
-
-If we assume that at each point in the ASM... what we have, represents a tree... then at each ASM-instruction's debug info... it can somehow point to some kind of tree that links back to all the vars declared at that point. I guess. So a linked-list, basically. Where multiple items can point to one. So its a tree-like linked list.
-
-struct TreeDebugInfo
-	|uint16|		StepBack
-//	|DataTypeCode|	TypeInfo // actually no.
-
-We won't need close-info. To see if anything open/closed, just compare the current-traceback to the old-traceback... See whats missing or new.
-
-...
-
-Names... So, each function will have an array of names. So these are vars (name+type) declared at any point. So one instruction or other is assumed to have created it. (We can search through the names using the same approach in table.spd, for ASM-func-starts.)
-
-We actually don't need the type-info per ASM! Only the stepback. And how it links to our var-table.
-
-We can double-compress the debug-info. After all... its rarely used. THAT or do my file in chunks! That is... one compressed string directly appended after the other. Chunks sounds better. Or else our 256K file becomes 400K.
-
-Wouldn't that make it harder to access? And also... get lost by perry? Perry won't know what to do about multi-chunk files...
-
-Perhaps some kind of "string" that will separate it? but that makes no sense, as every string is OK to compress. the only way to do it, is for perry to actually support multiple "pages" in the GUI.
-
-We could kind of "hack it" by making our own string, and just use it in perry. Something not-jeebox.
-*/
 

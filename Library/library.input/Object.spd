@@ -187,7 +187,6 @@ struct MemoryWorld
 	|&Byte|		 	Name
 	|Byte|			SuperSize
 	|Byte|			BlockSize
-	|Byte|			ShadowSize
 	|Byte|			Alignment
 
 
