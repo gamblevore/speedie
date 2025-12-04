@@ -83,35 +83,29 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	|| f = .SharedProjectTabSource[@nil]$
 	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| Noisy = SpdLibAlreadyInUse
-//		"--sending noise--"
 		p <~ "--noisy"
 	p <~ "--check"
 	
-
-	|SpdProcess| spd 
-	
-	target debug and !cake
+	target debug and !cake and !exec
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
 				.UsingSpdLib = true
 				f.name = .name.TrimExt + "()"
-			spd = (Speedie_Main).Spawn(f.name, p)
+			|| spd = (Speedie_Main).Spawn(f.name, p)
+				return spd
 
-	if !spd?
-//		|| proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
-		|| proc = speedie.resolve
-			|| Mode = ProcessMode.CaptureAll
-			if !noisy
-				mode = ProcessMode.silence
-			|duration| Delay = 0
-			if !Perry.FinishedStartUp
-				Delay = 0.125s * Perry.WindowNumber
-			spd = SpdProcess.spawn(Proc, f.name, p, mode)
-			if spd
-				spd.pico.name = .project.name
+//	|| proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
+	|| proc = speedie.resolve
+		|| Mode = ProcessMode.CaptureAll
+		if !noisy
+			mode = ProcessMode.silence
+		|duration| Delay = 0
+		if !Perry.FinishedStartUp
+			Delay = 0.125s * Perry.WindowNumber
+		|SpdProcess| spd = SpdProcess.spawn(Proc, f.name, p, mode)
+			spd.pico.name = .project.name
 	
-	return spd
 
 
 function PerryIDE.ActualCompile (|string| operation)
@@ -147,6 +141,9 @@ function PerryIDE.ActualCompile (|string| operation)
 // so it shouldn't be compilable.
 
 target debug
-	cpp_libwrapper Speedie_Main (spdprocess.ThreadAsProcess)
+	target exec
+		cpp_libwrapper Exec_Main (spdprocess.Thread)
+	  else
+		cpp_libwrapper Speedie_Main (spdprocess.Thread)
 || SpdLibAlreadyInUse = false
 
