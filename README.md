@@ -11,6 +11,19 @@
 * `Sponsor ❤️`: If you believe in my vision, [you can sponsor me to support future growth](https://github.com/sponsors/gamblevore). It would help.
 
 
+# Example Speedie Code: #
+
+    function string.CountLines (|int|)
+        || n = .Length > 0
+        for c in self
+            if c == '\n'
+                n++
+        return n
+    
+    main (|string| input)
+        printline "${input.countlines} lines in input"
+
+
 # General Features #
 * Modern object-oriented language, slightly more expressive than Python.
 * Runs faster than idiomatic C++
