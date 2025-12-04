@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AC61010D2798768C00278BEF"
-               BuildableName = "libSpeedie.dylib"
-               BlueprintName = "Speedie"
+               BuildableName = "libSpeedieLib.dylib"
+               BlueprintName = "SpeedieLib"
                ReferencedContainer = "container:Perry.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -51,8 +51,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AC61010D2798768C00278BEF"
-            BuildableName = "libSpeedie.dylib"
-            BlueprintName = "Speedie"
+            BuildableName = "libSpeedieLib.dylib"
+            BlueprintName = "SpeedieLib"
             ReferencedContainer = "container:Perry.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
