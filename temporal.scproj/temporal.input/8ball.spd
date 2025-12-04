@@ -26,7 +26,7 @@ Outlook not so good
 Very doubtful`
 	
 	|| Answers = (positive / '\n') + (neutral / '\n') + (negative / '\n')
-	function Temporal.SleepAndAsk (|uint64| Question, |uint64|)
+	function SleepAndAsk (|uint64| Question, |uint64|)
 		for 1000
 			app.Sleep(1 + (Question&3))
 			(Question xor= date.Now)
@@ -35,7 +35,7 @@ Very doubtful`
 		
 	function Ask (|String| Question, |string|)
 		if .Answers
-			|| Q = temporal.SleepAndAsk(Question.hash)
+			|| Q = .SleepAndAsk(Question.hash)
 			|| n = Q mod .answers.Length
 			return .answers[n]!
 			
