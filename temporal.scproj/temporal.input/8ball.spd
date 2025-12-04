@@ -11,29 +11,33 @@ As I see it, yes
 Most likely
 Outlook good
 Yes
-Signs point to Yes`
+Signs point to yes`
 
-	|| Neutral = `Reply Hazy, try again
+	|| Neutral = `Reply hazy, try again
 Ask again later
 Better not tell you now
 Cannot predict now
-Concentrate and try gain`
+Concentrate and try again`
 
 	|| Negative = `Dont count on it
 My reply is no
 My sources say no
-Outlook so good
+Outlook not so good
 Very doubtful`
 	
 	|| Answers = (positive / '\n') + (neutral / '\n') + (negative / '\n')
+	function Temporal.SleepAndAsk (|uint64| Question, |uint64|)
+		for 1000
+			app.Sleep(1 + (Question&3))
+			(Question xor= date.Now)
+		return Question
+	
+		
 	function Ask (|String| Question, |string|)
-		|| Q = Question.Hash
-		for 100
-			app.Sleep(1)
-			(Q xor= date.Now)
-		Q = (Q << 1) >> 1
-		|| n = Q mod .answers.Length
-		return .answers[n] ?? ""
+		if .Answers
+			|| Q = temporal.SleepAndAsk(Question.hash)
+			|| n = Q mod .answers.Length
+			return .answers[n]!
 			
 
 
