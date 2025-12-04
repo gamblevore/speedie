@@ -6,7 +6,6 @@ module Globals
 	|&uint16|				LibLink = Globals.GlobTable
 	|uint|					LibMax
 
-
 	function GlobTable (|&uint16|)
 		cpp_wrapper JB_App__GlobTable
 
