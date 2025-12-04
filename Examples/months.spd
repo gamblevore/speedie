@@ -9,7 +9,7 @@ datatype AnyMonth (uint16)
     
     render
         || NeedSep = false
-        for i in 16
+        for i in 12
             if self & (1<<i)
                 if NeedSep
                     fs <~ "/"

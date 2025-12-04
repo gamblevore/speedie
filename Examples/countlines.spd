@@ -1,10 +1,10 @@
 #!/usr/local/bin/spd
 
 function string.CountLines (|int|)
-	rz += .Length>0
+	rz += .Length > 0
 	for c in self
 		if c == '\n'
 			rz++
 
 main (|string| input)
-	printline input.countlines
+	printline "${input.countlines} lines in input"
