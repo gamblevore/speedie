@@ -14,7 +14,8 @@
 # Example Speedie Code: #
 
     function string.CountLines (|int|)
-        || n = .Length > 0
+        || n = 0
+        n += .Length > 0
         for c in self
             if c == '\n'
                 n++
