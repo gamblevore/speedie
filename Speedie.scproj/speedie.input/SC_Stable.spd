@@ -1,6 +1,6 @@
 
 
-module Stability
+module LibStability
 	|| LastLibID = 0
 
 	function StabiliseFuncs
@@ -18,7 +18,7 @@ module Stability
 		.LastLibID = 0
 		|| funcs = Compiler.library[name]
 		|| Data = funcs.ReadAll.trim
-		stability.UseBank(data, IsFuncs)
+		.UseBank(data, IsFuncs)
 		|| fs = (faststring(), nil)(options.MakeExec)
 			fs <~ data ?? "// beta-file. Unstable."
 		.StabliseSub2(fs, list, isfuncs)
@@ -49,17 +49,11 @@ module Stability
 		target debug
 			if !options.MakeExec
 				Table = jb_vm.vm.InitTable(4096, 64K)
-//		if !isfunc
-///			.DebugList(list)
 			
 		|| sorter = codesorter.PackID(isfunc)
 		list.Sort(sorter)
-
-//		if !isfunc
-//			.DebugList(list)
 		
 		for obj in list
-			if obj.exportname == "JB__TC_Types_Dict"
 			if (obj isnt private) and (!isfunc or obj|scfunction|.needsID)
 				obj.MakeID(fs, table, isFunc)
 			
@@ -87,7 +81,7 @@ module Stability
 		if !id
 			if fs
 				fs <~ "\n$.ExportName"
-			id = ++Stability.LastLibID
+			id = ++LibStability.LastLibID
 			.PackID(isfunc) = id
 		
 		if table
@@ -102,9 +96,10 @@ module Stability
 	function UseBank (|string| Data, |bool| Funcs)
 		|| ID = .LastLibID
 		for str.lines in data
-			id++
-			|SCObject--| fn = .Find(Str, Funcs)
-				check (!fn.PackID(funcs)) (str + " replicated ID.")
-				fn.PackID(funcs) = id
+			if str[0] != '/'
+				id++
+				|SCObject--| fn = .Find(Str, Funcs)
+					check (!fn.PackID(funcs)) (str + " replicated ID.")
+					fn.PackID(funcs) = id
 		.LastLibID = ID	
 	

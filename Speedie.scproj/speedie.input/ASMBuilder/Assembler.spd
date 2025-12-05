@@ -754,6 +754,7 @@ target debug
 
 function Assembler.ASMCompile (|SCFunction| fn, |bool|) // AsmGenerate, ASMRender, GenerateASM
 	opt norefcounts
+	scfunction.currfunc = fn
 	
 	.InitAndStartFunc(fn)
 	.RootGen(fn)

@@ -551,8 +551,8 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 
 function FillInterpreter 
-	stability.StabiliseFuncs
-	stability.StabiliseGlobs
+	LibStability.StabiliseFuncs
+	LibStability.StabiliseGlobs
 
 	|| Sorter = CodeSorter.PackID(false)
 	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) 		// rebuild size

@@ -458,14 +458,14 @@ datatype ASM_Loop (ASM) {
 }
 
 ASM.Forms[24] = &ASM_Loop.Encode
-datatype ASM_Table (ASM) {
+datatype ASM_GTable (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
 			visible true
 			|asm| rz = .op|asm| << 24
 			rz.r1 = .prms[0]
-			rz.Table_Mode = .prms[1]
-			rz.Table_Add = .prms[2]
+			rz.GTable_Mode = .prms[1]
+			rz.GTable_Add = .prms[2]
 			if curr < after {
 				curr++[] = rz
 			}
@@ -475,7 +475,7 @@ datatype ASM_Table (ASM) {
 	}
 }
 
-ASM.Forms[25] = &ASM_Table.Encode
+ASM.Forms[25] = &ASM_GTable.Encode
 datatype ASM_GObj (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {

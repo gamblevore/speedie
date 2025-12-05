@@ -56,30 +56,34 @@ function scdecl.IsLib (|int|)
 
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
-	
 	dest = .temptyped(d, dest)
 	|| Glob = .TryGetGlob(D, dest)
 		return Glob
-	return .GlobAddrSub(d, exp, dest, d.exportposition)
 
-	
-function GlobAddrSub (|SCDecl?| D2, |message| exp, |AsmReg| Dest, |int64| Original,   |asmreg|)
-	opt norefcounts
-	check (Original <= 32~bits)				(exp, "Too much global data used: " + original.strsize)
-	if !Original							// What?
-	if  dest isnt AddrNoFiddle  and  d2 isnt ClassObj  and  d2 isnt Library
-		Original &= ~63
-	
-	|| Direct = Original & 18~bits
 	(Dest is GlobalMemory)
 	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr
+	if !d.isLib
+		return .GlobAddrSub(d, exp, dest, d.exportposition)
+	
+	|| fat = exp.GTAB(dest,  1,  d.gpackid)
+	fat.Const = d.exportposition
+	rz = fat * dest
+	
 
-	|| fat = exp.GTAB(dest,  d2.islib,  Direct)
+	
+function GlobAddrSub (|SCDecl?| D, |message| exp, |AsmReg| Dest, |int64| ExportPos, |asmreg|)
+	opt norefcounts
+	check (ExportPos <= 32~bits)			(exp, "Too much global data used: " + ExportPos.strsize)
+	if  dest isnt AddrNoFiddle  and  d isnt ClassObj  and  d isnt Library
+		ExportPos &= ~63
+	
+	|| Direct = ExportPos & 18~bits	
+	|| fat = exp.GTAB(dest,  d.islib,  Direct)
 	fat.Const = Direct
 	rz = fat * dest
 	
-	|| Missing = Original - Direct
+	|| Missing = ExportPos - Direct
 		check (fat.r1) (exp, "Lib too big!") // should never happen!
 		if missing >= 4096
 			fat = exp.ADDB(dest, missing >> 12)

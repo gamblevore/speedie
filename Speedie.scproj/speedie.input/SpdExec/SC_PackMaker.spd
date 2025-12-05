@@ -80,18 +80,14 @@ module PackMaker
 		opt norefcounts
 		require .UseMain("JB_SP_AppInit", 1) and  .UseMain("JB_Main", 2)
 
-		stability.StabiliseFuncs	
-					
+		LibStability.StabiliseFuncs	
+		LibStability.StabiliseGlobs
+		
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
 		.PackGlobSize = .GlobalsSize(.PackGlobs)
 	
 		return true
-
-
-	function SortAndSizeGlobs
-		.PackGlobs.sort
-		.PackGlobSize = .GlobalsSize(.PackGlobs)
 	
 	
 	function message.InlineCount (|int| Remain, |int|)
