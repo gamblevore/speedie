@@ -121,7 +121,7 @@ forms
 		Small	1
 		Jmp		j
 	
-	Table
+	GTable
 		r1		R
 		Mode	1
 		Add		l
@@ -604,7 +604,7 @@ POS 5
 #!						(((((Memory)))))
 /**/ GOBJ  (GObj)
 		o1 = strs(vm, Op)
-/**/ GTAB  (table)
+/**/ GTAB  (gtable)
 		u1 = table(vm, Op)
 /**/ RD1U  (Read)
 		u1 = mem1(uint8)

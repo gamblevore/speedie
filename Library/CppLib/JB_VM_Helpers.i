@@ -253,8 +253,8 @@ AlwaysInline JB_Object* alloc(void* o) {
 }
 
 u64 table (jb_vm& vm, ASM Op) {
-	auto Add = Table_Addu<<6;
-	if (Table_Modeu)
+	auto Add = GTable_Addu<<6;
+	if (GTable_Modeu)
 		return (u64)(vm.Env.LibGlobs+Add);
 	return (u64)(vm.Env.PackGlobs+Add);
 }

@@ -101,10 +101,10 @@
 #define   Loop_Jmpi       ((( int)((Op)<<19))>>19)
 #define   Loop_Jmpu       (((uint)((Op)<<19))>>19)
 
-#define   Table_Modei       ((( int)((Op)<<13))>>31)
-#define   Table_Modeu       (((uint)((Op)<<13))>>31)
-#define   Table_Addi       ((( int)((Op)<<14))>>14)
-#define   Table_Addu       (((uint)((Op)<<14))>>14)
+#define   GTable_Modei       ((( int)((Op)<<13))>>31)
+#define   GTable_Modeu       (((uint)((Op)<<13))>>31)
+#define   GTable_Addi       ((( int)((Op)<<14))>>14)
+#define   GTable_Addu       (((uint)((Op)<<14))>>14)
 
 #define   GObj_Modei       ((( int)((Op)<<13))>>31)
 #define   GObj_Modeu       (((uint)((Op)<<13))>>31)

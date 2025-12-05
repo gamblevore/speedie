@@ -80,9 +80,9 @@ ivec4* RunVM (jb_vm& pvm) {				// vm_run, vm__run, vmrun, run_vm
 
 
 void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
-	free(vm->Env.CppFuncs);
+	if (vm->Env.CppFuncs)
+		return (void**)(vm->Env.CppFuncs);
 	vm->Env.PackGlobs = 0;
-	vm->Env.CppFuncs = 0;
 	// some sentinel space would be nice.
 	auto Result = (byte*)calloc(n*sizeof(void*) + g + 8, 1);
 	if (Result) {
