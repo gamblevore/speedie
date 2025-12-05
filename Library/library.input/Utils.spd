@@ -31,6 +31,9 @@ role MessageTable (Dictionary)
 		super.valuelower(msg.name) = msg
 	
 
+function message.List (|[Message]|)
+	disabled "Use .array if you want an array of all the children. Message is already a 'list'."
+
 function message.Array (|[Message]|)
 	opt norefcounts
 	for s in self
