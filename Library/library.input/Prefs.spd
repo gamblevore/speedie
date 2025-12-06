@@ -19,6 +19,8 @@ extend_module App
 			|| Path = .conf("prefs")
 			if !path
 				path = .FileName.lowercase + ".box.pref"
+			if path[] != '/'
+				path = file.Prefs(path)
 			P = config.Create(path)
 			._Prefs = P
 		return P

@@ -560,20 +560,17 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			inline
 			return "/tmp/logs/".file
 
-		function Prefs (|string|name, |file|)
-			return .prefpath.child(name).file
-
-		function Preferences (|file|)
-			return .PrefPath.file 
-		
-		helper PrefPath (|string|)
-			inline
+		function Prefs (|string?| name=nil, |file|)
+			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."
 			target osx
-				return "~/Library/Preferences"
-			target win
-				return "~\AppData\Roaming" // whatever
-			target lin
-				return "~/.config"
+				|| P = "~/Library/Preferences"
+			  elseif win
+				|| P = "~\AppData\Roaming" // whatever
+			  else
+				|| P = "~/.config"
+			if name
+				return P.child(Name).file
+			return P.file
 		
 		module Existing
 			autogen MainArg (|int| Pos, |string| name, |file|)

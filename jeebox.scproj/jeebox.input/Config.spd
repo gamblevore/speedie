@@ -2,17 +2,6 @@
 
 // Use message... as a config-file!
 
-
-
-function file.Config (|int| lim = 1MB, |config|)
-// why would a conf-file be so big?
-	opt NoRefCounts
-	if .Exists
-		rz = .Parse(lim, @arg)|config|
-	rz ?= message()
-	rz.obj = self
-
-
 role config (message)
 	linkage
 		pragma noearlyfree
@@ -63,6 +52,16 @@ role config (message)
 			return path.Resolve(true).file.Config
 
 
+
+function file.Config (|int| lim = 1MB, |config|)
+// why would a conf-file be so big?
+	opt NoRefCounts
+	if .Exists
+		rz = .Parse(lim, @arg)|config|
+	rz ?= message()
+	rz.obj = self
+
+
 extend message
 	function ConfArg (|config|)
 		opt norefcounts
@@ -98,7 +97,6 @@ extend message
 				return nil
 		if err
 			error (self, key + " not found.")
-	
 	
 	function Value (|string|)
 		if self
