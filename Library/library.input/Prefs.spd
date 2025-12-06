@@ -5,14 +5,14 @@
 
 
 extend_module App
-	// quite a small module!
-	// ._conf is auto-filled, but only if you have specified a conf (in app.conf)
+	// ._conf is auto-filled, but only if you have a config file in your project.
+	// the config file should be named "app.conf" and be within the main source input folder
+	// For example see: /usr/local/speedie/Perry.scproj/Perry.input/app.conf
 	
 	function Conf (|string| name, |string|)
 		opt norefcounts
 		return ._conf[name].value
 	
-	// just a simple accessor to Config class
 	function Prefs (|config|)
 		opt norefcounts
 		|| P = ._prefs
