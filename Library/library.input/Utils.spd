@@ -75,7 +75,7 @@ function string.Dict (|byte| sep='\n', |dictionary of string|)
 			rz[l] = "true"
 
 
-function Message.FindNotInserted (|message|)
+autogen Message.FindNotInserted (|message|)
 	opt norefcounts
 	nil self
 	for c.up in self

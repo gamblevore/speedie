@@ -1,10 +1,10 @@
 
 
-// use a message... as a dictionary!!
+// Use message... as a config-file!
 
 
 
-function file.Config (|int| lim = 1MB,  |config|)
+function file.Config (|int| lim = 1MB, |config|)
 // why would a conf-file be so big?
 	opt NoRefCounts
 	if .Exists
@@ -44,32 +44,23 @@ role config (message)
 		return .Dict(true)
 	
 	function Save (|bool|)
-		|| f = .path
+		|file--| f = .path
 			|| r = .render
 			|| p = r.parse
-				return f.smartdata(r)
-			StdErr.pop
+				rz = f.smartdata(r)
 	
 	function Path (|file|)
 		return .obj as file
 	
 	function ConfFirst (||)
+		opt norefcounts
 		|| l = .confarg
 			return l|message|.first
 			
 	module
-		function ConfigPath (|string| path,  |string|)
-			|| f = path[]
-			if f == '~'
-				return path.AbsolutePath
-			if f == '/'
-				return path
-			if !f
-				return app.FileName.lowercase + ".box.pref"	
-			return file.Prefs(path)
-
-		function Create (|string| path,  |config|)
-			return .ConfigPath(path).file.config
+		function Create (|string| path,  |config!|)
+			opt norefcounts
+			return path.Resolve(true).file.Config
 
 
 extend message

@@ -41,13 +41,6 @@ function Yes (|string| name, |bool|)
 inline No (|string| name, |bool|)
 	return !.yes(name)
 
-function BuildConfig (|string| name, |string|)
-	opt norefcounts
-	return ._conf[name].value
-
-function BuildConfig (|string| name, assigns:|string|)
-	disabled "Set conf values in the original app.configure..."
-
 function Created (|date|)
 	return __now__|date|
 	
@@ -278,9 +271,6 @@ helper FastString.MemoryReport (|string| name, |int64| Amount)
 		amount.strsize(self)
 		self <~ "\n"
 	
-	
-	
-
 
 helper LeakMarkMemory
 	cpp_wrapper JB_Mem_Mark
@@ -290,25 +280,6 @@ helper LeakUnMarkMemory
 	
 helper IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
-
-
-autogen Configure (assigns:|string|)
-	._conf  = Value.Parsejbin
-	._conf ?= message()
-
-
-// just a simple accessor to Config class
-function Prefs (|config|)
-	opt norefcounts
-	return ._Prefs init config.Create(.PrefsPath)
-
-function PrefsPath (|string|)
-	opt norefcounts
-	return config.ConfigPath(app.BuildConfig("prefs"))
-
-function PrefsSave
-	opt norefcounts
-	._Prefs.save?
 
 
 

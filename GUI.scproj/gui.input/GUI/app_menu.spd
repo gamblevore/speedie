@@ -74,7 +74,7 @@ class AppMenu (Window)
 
 
 function AppMenuHelp (GuiMenuEvent)
-	|| it = app.BuildConfig("HelpURL")
+	|| it = app.Conf("HelpURL")
 		app.showurl(it)
 		return 
 	if self isa listview
@@ -87,7 +87,7 @@ function AppMenuQuit (GuiMenuEvent)
 
 
 function AppMenuAbout (GuiMenuEvent)
-	|| aboutstr = app.BuildConfig("about")
+	|| aboutstr = app.Conf("about")
 	if !aboutstr
 		aboutstr = `$appname v$version $apptime.
 
@@ -95,8 +95,8 @@ By '$creator'.`
 	aboutstr = aboutstr.ReplaceAll(`$appname`, app.filename)
 	aboutstr = aboutstr.ReplaceAll(`$apptime`, app.TimeID|int64|.render)
 	aboutstr = aboutstr.ReplaceAll(`$appdate`, app.Created.localtime)
-	aboutstr = aboutstr.ReplaceAll(`$version`, app.BuildConfig("version"))
-	aboutstr = aboutstr.ReplaceAll(`$creator`, app.BuildConfig("creator"))
+	aboutstr = aboutstr.ReplaceAll(`$version`, app.Conf("version"))
+	aboutstr = aboutstr.ReplaceAll(`$creator`, app.Conf("creator"))
 	app.alert aboutstr
 
 

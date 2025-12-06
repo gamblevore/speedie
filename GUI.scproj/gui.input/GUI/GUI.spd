@@ -311,7 +311,7 @@ module GUI
 	function SavePrefs
 		if app._prefs
 			app.prefs["screen"] = GUI.Screenraw.Msg
-			app.PrefsSave
+			app.Prefs.save
 
 	function ivec4.Msg (|message|)
 		rz = @list.msg
@@ -368,10 +368,9 @@ module GUI
 			.scale = Scale
 			window.all.lastrect = bigPx.rect
 		
-
 	helper GUICheck
 		if app.yes("version")
-			printline app.BuildConfig("version")
+			printline app.Conf("version")
 			app.quit
 		if app.yes("created")
 			printline __now__|date|.LocalTime
@@ -379,9 +378,9 @@ module GUI
 	
 	helper NiceAppName (|string|)
 		opt norefcounts
-		with app.BuildConfig("selfname")
+		with app.Conf("selfname")
 			return it
-		with app.BuildConfig("name")
+		with app.Conf("name")
 			return it
 		return app.appname
 	

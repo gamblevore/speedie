@@ -169,7 +169,7 @@ cpp_nothing JB_Clear				(|Object?| Obj)
 cpp_nothing JB_DecrMulti			(|Object| Obj,			|int| n)
 cpp_nothing JB_Ternary				(|Object| Obj,			|int|) // weird, only 1 param?
 cpp_nothing JB_Swap					(|Object| A,			|Object| B)
-cpp_nothing JB_New				(|ClassData|  Class,	|Object|)
+cpp_nothing JB_New					(|ClassData|  Class,	|Object|)
 cpp_nothing JB_NewClass				(|ClassData|  Class,	|Object|)
 
 

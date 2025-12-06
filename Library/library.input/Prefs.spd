@@ -1,0 +1,26 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+extend_module App
+	// quite a small module!
+	// ._conf is auto-filled, but only if you have specified a conf (in app.conf)
+	
+	function Conf (|string| name, |string|)
+		return ._conf[name].value
+	
+	// just a simple accessor to Config class
+	function Prefs (|config|)
+		opt norefcounts
+		|| P = ._prefs
+		if !P
+			|| Path = .conf("prefs")
+			if !path
+				path = .FileName.lowercase + ".box.pref"
+			P = config.Create(path)
+			._Prefs = P
+		return P
+
+

@@ -8,7 +8,9 @@ function App.RemoveArg (|string| Name)
 
 
 function ClickedEditPrefs (GUIMenuEvent)
-	PerryIDE.New(app.prefspath.file)
+	|| p = app._prefs
+		|| F = p.path
+			PerryIDE.New(F)
 
 
 function string.IsProj (|bool|)

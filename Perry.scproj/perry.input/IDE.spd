@@ -965,7 +965,7 @@ So anything not 0 means "its OK"`
 	function UpdateActiveFile
 		|| d = .editme.Document
 			|| l = d.Location.Resolve(true)
-			if l ~= app.PrefsPath.resolve
+			if l ~= app.prefs.path
 				.UpdatePrefs
 			  else
 				|| p = .PerryFile
