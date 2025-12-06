@@ -279,8 +279,12 @@ class String
 
 
 	function Split (|Byte|sep = '\n', |[String]|)
-		for field in StringFields( self, sep )
-			rz <~ field
+		|| Last = 0
+		while
+			|| Word = .NextField(sep, Last)
+			if Word == nil
+				exit
+			rz <~ Word
 
 
 //	function Split (|int| n, |StringLengthSplit|)

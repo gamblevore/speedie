@@ -344,6 +344,17 @@ helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int|
 	return path
 			
 
+function string.TypeContains (|string| s, |bool|)
+	// maybe neater to do this with string matching.
+	// its usally used for things ending with '/' anyhow
+	|| Last = 0
+	while
+		|| Word = .NextField(',', Last)
+		if Word == nil
+			exit
+		if word ~= s
+			return true
+
 
 function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int| max = 256, |bool|)
 	|| s = .listsource

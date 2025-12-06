@@ -254,11 +254,6 @@ Relative paths take the current working directory.`
 			return true
 	}
 
-	function TypeContains (|string| s, |bool|)
-		for field in StringFields( self, ',' )
-			if field ~= s
-				return true
-
 
 		
 function @file.OSXMaxCaseWarnings_ (|&int|)

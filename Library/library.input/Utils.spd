@@ -59,20 +59,38 @@ function message.Dict (|bool| DoLower=false, |bool| DoCount=false,   |dictionary
 
 
 function @file.Dictionary (|file|)
-	disabled "Use .words"
+	disabled "Use File.Words() instead"
 
 	
 inline @file.Words (|file|)
 	return "/usr/share/dict/words".file
 
-		
+
+autogen String.NextField (|byte| Sep, |$int| Begin, |string?|)
+	opt norefcounts
+	|| B = begin
+	|| N = .Length
+	if B >= N
+		return nil
+	|| After = .find(Sep, B)
+	if After < 0
+		after = N
+	rz = self[B, After]
+	Begin = After + 1
+	
+	
 function string.Dict (|byte| sep='\n', |dictionary of string|)
+	opt norefcounts
 	if self
 		// many speedie example projects rely on nil meaning "wildcard"
 		// so we have to return nil if self==""
-		rz = Dictionary()
-		for l in StringFields( self, sep )
-			rz[l] = "true"
+/		rz = Dictionary()
+		|| Last = 0
+		while
+			|| Word = .NextField(sep, Last)
+			if Word == nil
+				exit
+			rz[Word] = "true"
 
 
 autogen Message.FindNotInserted (|message|)
