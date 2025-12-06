@@ -345,13 +345,6 @@ function InitBasicFuncs (|bool|)
 	return StdErr.OK
 
 
-//function CreateFuncFromSource (|String| Src, |SCFunction|)
-//	|| msg = src.ParseClean
-//		rz = SCFunction.NewFunc( msg, nil, msg )|SCFunction|
-//		if rz
-//			rz.IsVisible = false
-
-
 function Jeebox (|file|)
 	opt norefcounts
 	return .jeeboxproj_ init .Projects.FileCh("jeebox.scproj")
@@ -359,18 +352,20 @@ function Jeebox (|file|)
 
 function ImportLibs
 	opt norefcounts
-	SCImport.STDLibTime = true	
+	SCImport.STDLibTime = true
 	.Library = .projects.filech("Library")
-	|| Jeebox = .Jeebox	
-	SCImport.Importpath( "Library",  .Library!,	1,  true )
+	|| Lib = SCImport.Importpath( "Library",  .Library!,	1,  true )
 	SCImport.Importpath( "jeebox",   .Jeebox,	1,  true )
+	.VisibleFuncs.project = Lib // visible-only funcs must be considered lib
 	
 	scimport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
 	compiler.Project = SCImport(ToUse, false)
 
 	scimport.curr = compiler.project // perhaps I should put it into there instead of compiler.program anyhow.
+	scnode.currvisibility = false
 	compiler.program.CreateInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
+	scnode.currvisibility = true
 	compiler.program.CreateInitFuncSub(.AppInitCode,    "InitAppCode_")
 
 
@@ -381,15 +376,6 @@ function ImportProj
 	|| F = proj.Where!
 	if F.path ~!= .jeebox
 		require scimport.ImportPathSub("", F, proj, F.path.lowercase)
-
-
-	if !compiler.ConfMsg			// Need a conf, for prefs to work.
-		|| conf = @tmp+"conf"
-		conf.Position = -2			// make ASM happy. I wonder if theres a way to say that it comes
-									// from an internal file.
-		using conf
-		conf["prefs"] = Compiler.ProjectName + ".box.pref"
-		.SetConf(proj, conf)
 
 
 function ConfBool (|string| name, |bool| Default=true, |bool|)
@@ -414,8 +400,6 @@ function ImportAll
 	.ImportProj
 	SCImport.AllFiles.sort // or else file-dates can mess things up.
 	.PrepareAST
-//	if options.SelfReplacement
-//		require VM_Builder.MakeTheVM
 
 	require .Stage( "Import" )
 	.Timer( "Import" )
@@ -871,30 +855,29 @@ function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.r
 	Return d
 
 
-function MakeMainFunc (|message|)
+function AddMain (|int| mark, |bool|)
+	opt norefcounts
+
 	|| f = compiler.MainFunc 
 		f.blindcasts = errorseverity.error
-		return f.sourcearg
-	"Compiling as library!"
-	Options.ProjectisLibrary = true
-	return .program.CollectStr( "main:\n" ).last				// mainproj.collect
-
-
-function AddMain (|int| mark, |bool|)
-	|| b = (Truebool!, falsebool!)(Options.ProjectisLibrary) 
-	|| m = .MakeMainFunc
-		|| conf = .ConfMsg
-			using conf
-			m.first = "app.configure = __AppConfString"~parse
+	  else
+		"Compiling as library!"
+		Options.ProjectisLibrary = true
+		.program.CollectStr( "main:\n" )
 	
+	|| conf = .ConfMsg
+		using conf
+		|| P = `app._conf = "abc".parsejbin` ~ parse
+		|| abc = P.FindNested(@str, "abc")
+			abc.name = compiler.ConfMsg.RenderJbin
+		Compiler.AppInitCode.first = P
+	
+	|| b = (Truebool!, falsebool!)(Options.ProjectisLibrary) 
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 
 	stderr.LowerErrorsTo = 0
 	return mark == stderr.errorcount
 
-
-//syntax append (|message| m)
-//	.InternalFile.LiveAST <~ m
 
 
 ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  ////  

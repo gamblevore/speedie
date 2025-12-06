@@ -70,7 +70,7 @@ module Feedback
 			if app.prefs["self_flow"] != v
 				// update current self_flow pref
 				app.prefs["self_flow"] = v
-				app.PrefsSave
+				app.Prefs.Save
 		  else
 			// load from prefs unless overwritten by --flow
 			Options.GenFlowControlCode = app.prefs["self_flow"].yes
@@ -423,7 +423,7 @@ module Feedback
 			if value == "none" or "nil" or "-"
 				value = ""
 			app.prefs[codesign_native] = value
-			app.prefssave
+			app.prefs.save
 			printline "Codesign set to " + value
 			return true
 		

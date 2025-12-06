@@ -123,15 +123,10 @@ class SCImport
 		
 	
 	function compiler.SetConf (|scimport| Proj, |message| conf)
+		opt norefcounts
 		|| arg = conf[@arg]
 			compiler.ConfMsg = arg
-			arg.remove
-			compiler.project = proj
-			// check Options.SelfReplacement, in case I alter how jbin works 
-			|| str = arg.RenderJbin
-			|| x = MakeDecl("", "__AppConfString", @str+str, scdeclinfo.compilercreated)
-			conf.become(x)
-			compiler.program.MoveToInitFunc(conf)
+			conf.MakeComment
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)

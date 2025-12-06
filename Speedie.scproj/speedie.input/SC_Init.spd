@@ -154,7 +154,7 @@ function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
 	
 function SCModule.CallInit (|message| src, |message| dest, |string| fn_name)
 	opt norefcounts
-	require src and .HasActualCode(src) and (self != Compiler.program)
+	require src and src.HasActualCode and (self != Compiler.program)
 	for s.flat in src
 		if s.position < 0
 			s.position = 0
@@ -193,12 +193,13 @@ function SCModule.CallOurInits (|message| DestVars, |message| DestCode)
 
 
 
-function SCModule.HasActualCode (|message|arg, |bool|)
+function message.HasActualCode (|bool|)
 	opt norefcounts
-	for curr.flat in arg
-		if (curr == @Decl)
+	nil self
+	for curr.flat in self
+		if (curr == @Decl or @sheb)
 			continue_with curr.FlatAfter
-		  elseif (curr != @arg)
+		  elseif (curr != @arg) 
 			return true // found something!
 
 

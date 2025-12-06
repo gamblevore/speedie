@@ -304,6 +304,10 @@ function @scfunction.NameList (|string|)
 
 function @scfunction.TransformAll 
 	opt norefcounts
+	|| globinits = compiler.AppInitGlobals
+	if !globinits.HasActualCode 
+		|| fn = compiler.AppInitCode.find(@func, @thg, "InitAppGlobals_")
+			fn.parent.remove
 	Compiler.During = compilerstage.Transform
 	for f in compiler.FuncList
 		require !stderr.TooMany
@@ -988,7 +992,7 @@ function FillInMissingConstructorDefaults (|Message!| After)
 //	.SetZeroProperties(After, P) // not working yet
 	
 	for (d.backwards in P)
-		if d isnt UsedByASM
+		if d isnt ASMReached
 			if d isnt PropertyWasConstructed
 				.DeclAfter( after, d, d )
 			  else
@@ -996,7 +1000,7 @@ function FillInMissingConstructorDefaults (|Message!| After)
 	
 	while cls
 		for (d in cls.Properties)
-			(d isnt UsedByASM)
+			(d isnt ASMReached)
 			(d isnt PropertyWasConstructed)
 		cls = cls.super
 	
@@ -1772,6 +1776,7 @@ function NewHider (CollectFunc)
 
 
 function NewHelper (CollectFunc)
+	opt norefcounts
 	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
 	if rz
 		(rz isnt visible)
@@ -1879,6 +1884,7 @@ function SCFunction.Cleanupfunc (|message| s)
 
 
 function message.MainFix2
+	opt norefcounts
 	|| m = .MainFix
 		.become(m)
 
@@ -1954,12 +1960,14 @@ function SCFunction.MakeMacro (|message| arg)
 
 
 function NewFuncSub (|message| node, |SCNode| name_space, |scfunction|)
+	opt norefcounts
 	|| fn = SCFunction(node)
 	fn.init_sub(node, name_space)
 	return fn
 
 
 function NewFunc (CollectFunc)
+	opt norefcounts
 	require node
 	|| name = node.first			   #expect (node, "No function name found.")
 	if name == @Dot

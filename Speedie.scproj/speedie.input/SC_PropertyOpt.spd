@@ -54,7 +54,7 @@ function scfunction.SetZeroPropertiesSub (|Message| After, |[scdecl]| P, |[scdec
 	|| CanSIMD = .cls!.clssize|int| isa 16
 	
 	for (d in sorted) (i)
-		(d is UsedByASM)
+		(d is ASMReached)
 		|| req = d.ExportPosition + d.CArraySize
 		if Length < req
 			|| ty = d.BiggestType(sorted, i, CanSIMD)

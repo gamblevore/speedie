@@ -554,7 +554,6 @@ function FillInterpreter
 	LibStability.StabiliseFuncs
 	LibStability.StabiliseGlobs
 
-	|| Sorter = CodeSorter.PackID(false)
 	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) 		// rebuild size
 
 	.WriteVMGlobsAndPtrs(.ModuleProperties)

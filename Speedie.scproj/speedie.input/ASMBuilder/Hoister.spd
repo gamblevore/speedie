@@ -56,6 +56,8 @@ function scdecl.IsLib (|int|)
 
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
+	if compiler is hungry
+		(d is asmreached)
 	dest = .temptyped(d, dest)
 	|| Glob = .TryGetGlob(D, dest)
 		return Glob

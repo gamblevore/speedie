@@ -555,3 +555,12 @@ function Message.PrmFuncStructMsg (|message|)
 	|| list_fn = .PrmFunc
 		return .last[list_fn.structreturnpos-1]
 
+
+function Message.find (|syntax| P, |syntax| Ch, |string| name, |message|)
+	opt norefcounts
+	for s in self
+		if s.func == P
+			|| f = s.first
+				if f.func == ch and f.name ~= name
+					return f
+					

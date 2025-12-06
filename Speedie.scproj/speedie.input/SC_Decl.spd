@@ -85,7 +85,7 @@ datatype SCDeclInfo (uint)
 		VarThatGotReturned // unused? but it should be?
 		ReturnedStruct
 		Library
-		UsedByASM
+		ASMReached
 		IntendedAsReturn
 		
 		Temp			= body ||| CompilerCreated

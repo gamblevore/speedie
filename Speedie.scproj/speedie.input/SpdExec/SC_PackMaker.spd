@@ -49,7 +49,7 @@ module PackMaker
 	function GlobalsSize (|[scdecl]| List, |int|)	// SortGlobals, GlobalsSort
 		opt norefcounts
 		|| Globals = 1								// always positive.
-		for (d in list) (i)
+		for d in list
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
@@ -57,7 +57,7 @@ module PackMaker
 			if !X or X == globals
 				d.ExportPosition = globals			// its ok
 			  elseif (options.MakeExec)
-				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes of same size.")
+				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes.")
 			  else
 				|| Backwards = x - globals
 				if backwards > 0					
@@ -225,9 +225,27 @@ module PackMaker
 	
 	function SCClass.NeedsPackExport (|bool|)
 		opt norefcounts
+		//  "stringzeroterminated" is being reached
+		// for what reason could we want it?
+		// if we reach it's decl.
+		// how does the decl know that it was reached?
+		// well... if it got added to the packglobs??
+		// or is it always there?
+		// its always there. Well... we could check for reachedness?
+		// and manually mark it?
+		// how do we check for reachedness?
+		
+		// ASMReached
+		
 		require .isobject and !.IsRole
 		|| R = .MyReacher
-			return !r.IsLibrary
+		require r and !r.IsLibrary
+		
+		if .IsLibrary
+/			|| T = .ClassType
+			require T is ASMReached
+			
+		return true
 
 	
 	function scclass.CollectBehaviours (|jbin| j, |scbehaviour!| B)
