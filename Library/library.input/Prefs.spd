@@ -9,6 +9,7 @@ extend_module App
 	// ._conf is auto-filled, but only if you have specified a conf (in app.conf)
 	
 	function Conf (|string| name, |string|)
+		opt norefcounts
 		return ._conf[name].value
 	
 	// just a simple accessor to Config class
