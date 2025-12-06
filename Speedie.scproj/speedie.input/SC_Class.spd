@@ -949,7 +949,7 @@ function MakeClassType (|scdecl| TypeNormal, |scdecl|)
 	c.source = .source
 	C.pointercount = 1
 	C.nildeclared = nilstate.real
-	C.Contains = typenormal
+	C.Contains = typenormal // also used by CollectLinks to get the SCClass
 	(c is ClassObj)
 	(c is global)
 	(c is library) = false

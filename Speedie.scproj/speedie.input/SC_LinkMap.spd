@@ -26,10 +26,15 @@ module LinkMap
 
 	function SCFunction.DoLinkToDecl (|SCDecl| Decl)
 		opt norefcounts
+		if decl is classobj // also need to collect the class.
+			|| C = decl.contains
+				.DoLinkToNode(C.Type) // right?
+
 		.DoLinkToNode(Decl.Type)
 
-		if decl.CanLinkFrom(self)
-			(decl.linkfrom init []) <~ self
+		if Compiler.InPerry
+			if decl.CanLinkFrom(self)
+				(decl.linkfrom init []) <~ self
 
 	
 
@@ -56,7 +61,7 @@ module LinkMap
 	
 	function CollectFromSource (|scfunction| self, |message| src, |bool| InBranch)
 		opt norefcounts
-		for msg in src
+		for msg.fast in src
 			|| o = msg.obj
 				.CollectLinks( o )
 			if msg.HasAny

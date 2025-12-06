@@ -223,26 +223,14 @@ module PackMaker
 		j.exit(2)
 	
 	
-	function SCClass.NeedsPackExport (|bool|)
+	function SCClass.NeedsPackExport (|bool|) // needsexport, needexport, PackneedsExport
 		opt norefcounts
-		//  "stringzeroterminated" is being reached
-		// for what reason could we want it?
-		// if we reach it's decl.
-		// how does the decl know that it was reached?
-		// well... if it got added to the packglobs??
-		// or is it always there?
-		// its always there. Well... we could check for reachedness?
-		// and manually mark it?
-		// how do we check for reachedness?
-		
-		// ASMReached
-		
 		require .isobject and !.IsRole
 		|| R = .MyReacher
 		require r and !r.IsLibrary
 		
 		if .IsLibrary
-/			|| T = .ClassType
+			|| T = .ClassType
 			require T is ASMReached
 			
 		return true

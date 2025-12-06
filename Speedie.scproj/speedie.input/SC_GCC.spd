@@ -332,7 +332,7 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|date| Elapsed)
-	|| ActualCompile = .ShouldTransComp and options.ModeCpp
+	|| ActualCompile = .ShouldTransComp 
 		if Options.ModeCpp
 			.RunCppCompile~quietly
 			|| CanInstall = compiler.TimeTest(elapsed)
@@ -388,7 +388,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 function ShouldTransComp (|bool|)
 	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
-	require Options.Compile
+	require Options.Compile and options.ModeCpp
 
 	if options.ForceRecompile
 		return true
