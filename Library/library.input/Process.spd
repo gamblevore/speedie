@@ -4,13 +4,12 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-class Process
+class UnixProcess
 	linkage
 		wrapper
 		cpp_part Sh
 		cpp_class ShellStream
 		pragma noearlyfree
-	contains Process
 	
 	|byte|					Mode
 	|&Pico|					Pico
@@ -24,6 +23,12 @@ class Process
 
 	destructor:												cpp_wrapper
 	
+	function IsParent (|bool|)
+		return .pico.config.IsParent
+	
+	function DiedCount (|int|)
+		return .pico.config.deathcount
+		
 	function Status (|ExitCode|)
 		cpp_wrapper
 
@@ -46,7 +51,7 @@ class Process
 		cpp_wrapper
 		
 	module
-		function Stream (|String| app, |[string]| R=[], |processmode| Mode = nil, |Process?|)
+		function Stream (|String| app, |[string]| R=[], |processmode| Mode = nil, |UnixProcess?|)
 			cpp_wrapper JB_Sh__Stream
 
 
@@ -66,7 +71,6 @@ datatype ProcessMode (byte)
 		StdErrPassThru = 32
 		Silence = StdOutSilence|||StdErrSilence
 		PassThru = StdOutPassThru|||StdErrPassThru
-
 		OwnGroup = 128
 
 

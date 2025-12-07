@@ -1,7 +1,7 @@
 
 target !minilib {
 
-class SpdProcess (Process)
+class SpdProcess (UnixProcess)
 	linkage
 		cpp_part Proc
 	description "SpdProcess is a process, that happens to be made by Speedie. Speedie processes come with a pico (message-passer), so they can be talked to, if you want.
@@ -85,9 +85,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if c.lastread < last
 			return last.ago
 
-	function process.DiedCount (|int|)
-		return .pico.config.deathcount
-		
 
 	function CanActivate (|bool|)
 		if !.Deathlimit or .Diedcount < .Deathlimit
@@ -125,11 +122,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			error (self, "child timed out.")
 			return true
 	
-	
-	function process.IsParent (|bool|)
-		return .pico.config.IsParent
-	
-	
+		
 	function IsOpen (|bool|)
 		nil checker // shouldn't be necessary
 		return .CommsOpen and .status.isrunning
