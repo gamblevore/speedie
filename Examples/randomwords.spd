@@ -1,0 +1,15 @@
+#!/usr/local/bin/spd
+
+
+main (|File| File, |int| N)
+	|| fs = file.OutputStream$
+	for i in n
+		fs.AppendRandomWord(5, 12)
+		fs <~ "\n"
+	fs.flush
+	"Created ${File.size.strsize} at $File"
+
+
+function faststring.AppendRandomWord (|int| Min, |int| Max)
+	|| n = Random.Shared.IntRange(Min, Max)
+	Random.Shared.Text(self, n, 'a', 'z')

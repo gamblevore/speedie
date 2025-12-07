@@ -1,0 +1,15 @@
+#!/usr/local/bin/spd
+
+
+main (|file| Path)
+	|| T = date.now
+	|| Data = path.ReadAll
+	T = T.Report("ReadFile", data.length)
+	|| Lines = data.Split
+	T = T.Report("Split")
+	lines.sort
+	t = T.report("Sort")
+	lines = nil
+	t.report("Cleanup")
+	
+
