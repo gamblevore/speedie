@@ -2052,6 +2052,3 @@ function NeuLibrary (CollectFunc)
 
 }
 
-
-// Did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
-// It should be removed if we find it again!

@@ -1,5 +1,8 @@
 
 
+// this could just be... a message role?
+// _parsed can be the child, then reuse the rest.
+
 class Macro 
 	|bool|				Cleaned
 	|message?| 			_Parsed

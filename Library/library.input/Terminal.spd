@@ -2,15 +2,29 @@
 target !minilib {
 
 datatype TerminalColor (int)
-	
+
+// cleanup:
+	// would be nice if	we can remove this class...
+	// perhaps do it differently. Also remove Dictionry and just have FixedDict
+	// don't dump ALL the string classes, just the base
+	// Saveable stuff needs to go. Or just be internal.
+	// TokHan should be internal.
+	// validator should be embedded (if used)
+	// Charset should be replaced with charprops
+	// flowcontrol can be deleted... i don't know if we need it. Perhaps after getting speedie working.
+	// macro can be embedded.
+	// perhaps terminalcell can just be a struct, IDK.
+	// process should be renamed to UnixProcess (haha)
+// a lot of things to cleanup!
+
 class TerminalCell
-	|int| 		Color
-	|string| 	Text
+	|TerminalColor| 		Color
+	|string| 				Text
 
 
 module Terminal
 	visible false
-	|array of array|	TermScreen
+	|array of array of TerminalCell|	TermScreen
 	|faststring| 		fs
 	|date| 				LastDisplay
 	visible true
@@ -25,7 +39,7 @@ module Terminal
 	helper init
 		require !.TermScreen
 		for h
-			|| s = []
+			|[TerminalCell]| s
 			.TermScreen <~ s
 			for w
 				s <~ TerminalCell(0, " ")
@@ -114,6 +128,5 @@ module Terminal
 
 	syntax access (|ind|)
 		cpp_wrapper JB_App__GetChar
-
 }
 

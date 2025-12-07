@@ -213,11 +213,19 @@ module PackMaker
 				C.DescribeInPack(j)
 
 
+	function AnyClassesNeeded (|bool|)
+		opt norefcounts
+		for c in Compiler.ClassList
+			if c.NeedsPackExport
+				return true
+
+
 	function PackAllClasses (|jbin| j)
-		j.tmp("clss")
-		.PackClasses(j, false)
-		.PackClasses(j, true)
-		j.exit(2)
+		if .AnyClassesNeeded
+			j.tmp("clss")
+			.PackClasses(j, false)
+			.PackClasses(j, true)
+			j.exit(2)
 	
 	
 	function SCClass.NeedsPackExport (|bool|) // needsexport, needexport, PackneedsExport

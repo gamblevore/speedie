@@ -4,46 +4,27 @@
 */
 
 
-class LeakTester
+struct LeakTester
 	linkage
 		cpp_part		Lk
 
 	|int|		MemUsedStart
 	|string|	Name
 
-	constructor (|string| name)
-		.MemUsedStart = app.objmemory
-		.Name = name
-		app.LeakMarkMemory
-	
-	function FinalTest
-		.Test2
-		.MemUsedStart = nil
+	function Test
+		if .MemUsedStart
+			|int| NewAmount = app.objmemory
+			|| Diff = NewAmount - .MemUsedStart
+			if Diff > 0
+				"Leaked $Diff bytes in ${.Name}. New Count $NewAmount."
+			.MemUsedStart = 0
 		app.LeakUnMarkMemory
 	
-	helper Test2
-		require .MemUsedStart
-		|int| NewAmount = app.objmemory
-		|| Diff = NewAmount - .MemUsedStart
-		if Diff > 0
-			debugger
-			"Leaked $Diff bytes in ${.Name}. New Count $NewAmount."
-
-	
-	autogen SyntaxUsingComplete (|object| idk=nil)
-		.finaltest
-
-	
-	autogen SyntaxUsing (|LeakTester|)
-		return self
-
-	
 	module
-		helper SyntaxUsing (|LeakTester|)
-			return leaktester.new("")
-		
-		helper TestClasses
-
+		function New (|string| name, |Leaktester|)
+			rz.MemUsedStart = app.objmemory
+			rz.Name = name
+			app.LeakMarkMemory
 
 	
 helper object.FindReferences

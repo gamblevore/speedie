@@ -225,7 +225,7 @@ module Conv
 		if !compress
 			if .data
 				.size = .data.Length|float|
-			conv.speed.RenderSpeed( name, .size|int|, .Start.ago)
+			name.RenderSpeed( conv.speed, .size|int|, .Start.ago)
 		  else
 			CompressionStats.all.report(conv.speed)
 			CompressionStats.all.Clear

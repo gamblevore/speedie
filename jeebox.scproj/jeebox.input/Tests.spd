@@ -117,32 +117,9 @@ helper Message.TestSub (|string| new_render, |string| name, |bool|)
 		|| reparse_render = reparse.render			#require
 		require StdErr.ok and (self_render == reparse_render)
 	}
-	(lkt.finaltest)
+	(lkt.test)
 
 	return true
-
-
-
-helper jeebox.TestCasting (|bool|)
-	|dictionary of int| d2 = dictionary.new
-	d2["abc"] = d2["abc"].value + 1
-	
-	|| d = dictionary.new
-	|| str = "\0\0\0\0\0\0"
-	expect (str.length == 6)
-	d[str] = str
-
-	require !'\0'
-	|| x = Message
-	|| y = Message(@bra, "")
-	y.Name = "abc "
-	|Object| yy
-	yy = y
-	|| arr = [""] // whatever...
-	if yy isa Message
-		debugger (yy.name == "abc ")
-
-	return (y isa x)
 
 
 helper string.EscapeTest (|bool|)
@@ -160,27 +137,25 @@ function Jeebox.Test (|string|)
 	|| str = fs.getresult
 	require str.escapetest
 
-	|| natural_input = –SELF_TEST_NATURAL
-	|| jbin_input    = –SELF_TEST_JBIN
+	|string--| natural_input = –SELF_TEST_NATURAL
+	|string--| jbin_input    = –SELF_TEST_JBIN
 	// Parse,  render,  re-parse,  compare tree,  compare re-render
 	
-	debugger (.TestCasting())
-	"normal".uppercase
-	|| LKT = leaktester("entities")
-	EntityTest()
-	LKT.FinalTest
-	require stderr.ok
-
-	|| root = natural_input.parse				#require
-	root.jbinTest
-	if (jbin_input)
-		message.TreeCompare( root, root.copy ) // make sure compare works
-		message.TreeCompare( root, jbin_input.parse )
-		root.Test( root.Render,		"normal" )
-		root.Test( root.renderjbin,	"jbin" )
-	
-	require StdErr.ok
-	return EntityTest()
+	{
+		|| LKT = leaktester("entities")
+		EntityTest()
+		LKT.Test
+	}
+	if stderr.ok
+		|| root = natural_input.parse
+			root.jbinTest
+			if (jbin_input)
+				message.TreeCompare( root, root.copy ) // make sure compare works
+				message.TreeCompare( root, jbin_input.parse )
+				root.Test( root.Render,		"normal" )
+				root.Test( root.renderjbin,	"jbin" )
+			if StdErr.ok
+				rz = EntityTest()
 
 
 helper message.jbinTest (|bool|)

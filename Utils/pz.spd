@@ -18,7 +18,7 @@ main (|[file]| files)
 
 	expect (data) ("No readable files found.")
 		
-	fs.RenderSpeed("Read", n, date.now-Start)
+	"Read".RenderSpeed(fs, n, date.now-Start)
 	|[message]| msgs
 
 	Start = date.now
@@ -26,12 +26,12 @@ main (|[file]| files)
 		msgs <~ d.parse
 	StdErr.clear
 	fs <~ "\n"
-	fs.RenderSpeed("Parse", n, date.now-Start)
+	"Parse".RenderSpeed(fs, n, date.now-Start)
 	fs <~ "\n"
 
 	Start = date.now
 	msgs.clear
-	fs.RenderSpeed("Dispose", n, date.now-Start)
+	"Dispose".RenderSpeed(fs, n, date.now-Start)
 	
 	printline fs
 

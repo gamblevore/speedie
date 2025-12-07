@@ -196,11 +196,12 @@ class FixedDict
 					items <~ t
 					prefill[t] = t
 			prefill.clear
-
-			using (leaktester.new("oof2"))
-				|| f = fixeddict()
-				for t in items
-					f[t] = t
+		
+			|| LK = leaktester.new("oof2")
+			|| f = fixeddict()
+			for t in items
+				f[t] = t
+			LK.test
 			
 			(prefill)
 			|fixeddict of string| dict	= FixedDict.new

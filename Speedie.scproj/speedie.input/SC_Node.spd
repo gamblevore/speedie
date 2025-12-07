@@ -986,7 +986,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'crash'				{app.crash(node.firstname)}
 	+'module'				SCModule.NeuModule
 	+'static'				{error (node, "static is called 'module' in speedie.")}
-	+'selector'				SCSelector.neu
+//	+'selector'				SCSelector.neu
 	+'class'				SCClass.neuClass
 	+'task'					sctasks.NewTask
 	+'role'					SCClass.neuRole

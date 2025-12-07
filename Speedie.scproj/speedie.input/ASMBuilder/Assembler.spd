@@ -77,8 +77,8 @@ struct Assembler
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		|| dbg = .DebugInfo
-			dbg.Enter(@msg, fn.exportname)
 			.dbgmark = dbg.Length // for .rework
+/			dbg.Enter(@msg, fn.exportname)
 
 		for a in fn.Args
 			.DeclReset(a)
@@ -590,9 +590,10 @@ struct Assembler
 	function FillLayout (|jbin| j)
 		opt norefcounts
 		for c in Compiler.ReachedClassTable
-			j.Enter(@arg, c.ExportName)
-			c.ListLayout(j)
-			j.exit
+			if c.IsLibrary == options.MakeExec
+				j.Enter(@msg, c.ExportName)
+				c.ListLayout(j)
+				j.exit
 			
 			
 	function jbin.PropertyLayout (|[scdecl]| List)
@@ -602,6 +603,7 @@ struct Assembler
 
 		
 	function FillDebugInfo
+		opt norefcounts
 		require options.TargetDebug and !.debuginfo
 		|| j = jbin()
 		.debuginfo = j
@@ -609,9 +611,10 @@ struct Assembler
 		j.Enter(@msg, "class")
 		.FillLayout(j)
 		j.exit
-		
+
+		|| Globs = (packmaker.libglobs, packmaker.PackGlobs)(options.MakeExec)
 		j.Enter(@msg, "glob")
-		j.PropertyLayout(packmaker.PackGlobs)
+		j.PropertyLayout(Globs)
 		j.exit
 	
 	
