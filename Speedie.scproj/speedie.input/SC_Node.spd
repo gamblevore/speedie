@@ -578,7 +578,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 	error ( exp, ErrMsg )
 
 
-function message.ConstructorAddNil (|bool| isdot)
+helper message.ConstructorAddNil (|bool| isdot)
 	opt norefcounts
 	if isdot
 		|| p = .parent

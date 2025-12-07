@@ -33,7 +33,7 @@ module SCThe
 			|| old = d[line.name] // old is a dict...
 				error (line, "Macro name conflict")
 			  else
-				d[line.name] = macro(value) 
+				d[line.name] = macro.build(value) 
 		node.remove
 		return compiler.program
 

@@ -1336,7 +1336,7 @@ function FindAdj (|message| msg, |message|)
 		adj = msg.parent
 	ifn adj in @decl
 		|| found = compiler.FindAdj(adj)
-			return found._parsed // why not .source?
+			return found.first // why not .source?
 	 
 
 function LocateDefinition (|message| msg, |SCObject| already_defined, |bool| DisplayOnly, |message|)

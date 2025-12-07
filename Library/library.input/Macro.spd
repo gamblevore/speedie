@@ -1,32 +1,30 @@
 
 
-// this could just be... a message role?
-// _parsed can be the child, then reuse the rest.
-
-class Macro 
-	|bool|				Cleaned
-	|message?| 			_Parsed
-	|string|  			Input
-	
-	constructor (|string| s)
-		cpp_part ConstructorStr
-		.input = s
-		
+role Macro (Message)
+	// made into a role... one less class bloating Speedie up!
 	constructor (|message| s)
-		cpp_part ConstructorMsg
-		._parsed = s
+		disabled "Use Macro.build"
+		super.constructor
+	
+	function Cleaned (|bool|)
+		inline
+		return self is MacroMade
+	
+	function Cleaned (assigns:|bool|)
+		inline
+		(self is MacroMade) = value
 		
 	function Source (|message|) // can't I use a getter?
 		opt norefcounts
-		rz = ._parsed
+		rz = .first
 		if !rz
-			rz = .input.parse
+			rz = .name.parse
 			if rz
 				for v.flat in rz
 					v.position = -1
-				._parsed = rz
+				.first = rz
 	
-	function Run (|[message]| prms=nil, |message|)
+	inline Run (|[message]| prms=nil, |message|)
 		rz = message()
 		rz.BecomeMacro(self, prms)
 	
@@ -39,11 +37,16 @@ class Macro
 		TmpPrms_.clear
 	
 	module
-		|array of message| TmpPrms_
+		|[message]| TmpPrms_
+		// can't call this "New" for some reason?
+		function Build (|message| s, |Macro!|)
+			rz = Message()
+			rz <~ s
+		
 
 
 macro string.Macro
-	macro(–digest "_0")
+	macro.build((–digest "_0").parsejbin)
 	
 
 extend message
@@ -103,7 +106,7 @@ extend message
 		using self,  opt norefcounts
 		for r in prms
 			(r isnt MacroMade) // in case it was passed in
-		debugat 0
+//		debugat 0
 		m.Source.MacroCopy(self, prms, self)
 		for r in prms
 			check (r is MacroMade)  (r, "Unused parameter to macro")

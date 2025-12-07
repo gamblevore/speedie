@@ -1955,7 +1955,7 @@ function SCFunction.MakeMacro (|message| arg)
 	|| prm = arg.prev
 	check (C and !C.next) (self, "Macros must be one line!")
 	check !(prm.HasAny)   ("Macros don't directly state arguments.")
-	.ismacro = macro(C)
+	.ismacro = macro.build(C)
 
 
 
