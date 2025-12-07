@@ -114,7 +114,7 @@ function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	.ProductOut.Log(str, 256K)
 	.LogOneAction(@emb + str)
 	out <~ ("\n", 2)
-	|| r = Process.stream(f, args, ProcessMode.OwnGroup)
+	|| r = UnixProcess.stream(f, args, ProcessMode.OwnGroup)
 	if r and r.PID
 		.RunCompiledApp = r
 		.ShowProductIfMoreOutput = 0
@@ -183,7 +183,7 @@ function PerryIDE.AddProductErr (|string| err)
 		(t isnt hidden)
 
 
-function PerryIDE.UpdateProductText (|process| r, |string| rout)
+function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 	.ProductOut.Log(rout, 256K)
 	if r and !(r.userflags&1)
 		.ShowCompileTab(.productout)

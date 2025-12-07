@@ -5,8 +5,8 @@ class PerryIDE (Window)
 	linkage: cpp_part IDE
 
 	|SpdProcess?|				Feedback
-	|Process?|					compilr
-	|Process?|					RunCompiledApp
+	|UnixProcess?|				compilr
+	|UnixProcess?|				RunCompiledApp
 	|string|					CompileOKString
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
@@ -75,7 +75,7 @@ class PerryIDE (Window)
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
-	|Process?|					Talker
+	|UnixProcess?|				Talker
 	|message|					RecentFiles
 	|string| 					LastCmdStr
 	|date|						LastSendTime
@@ -457,7 +457,7 @@ class PerryIDE (Window)
 //		.CancelCompile
 
 
-	function CheckCrashed (|Process| p, |string| what, |bool|)
+	function CheckCrashed (|UnixProcess| p, |string| what, |bool|)
 		require p
 		|| Exit = p.Status
 		if exit.Crashed

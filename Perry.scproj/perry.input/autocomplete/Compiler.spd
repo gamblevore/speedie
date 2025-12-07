@@ -177,7 +177,7 @@ extend PerryIDE
 	function Say (|string| str)
 		target osx
 			if !.IsFront or GUI.IsBackground
-				.Talker = Process.stream("/usr/bin/say", [.name.trimext + str])
+				.Talker = unixProcess.stream("/usr/bin/say", [.name.trimext + str])
 				(.talker)
 	
 	
