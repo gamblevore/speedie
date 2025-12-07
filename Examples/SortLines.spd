@@ -1,9 +1,8 @@
 #!/usr/local/bin/spd
 
-
 main (|file| Path)
 	|| T = date.now
-	|| Data = path.ReadAll
+	|| Data = path.ReadAll$
 	T = T.Report("ReadFile", data.length)
 	|| Lines = data.Split
 	T = T.Report("Split")
@@ -12,4 +11,3 @@ main (|file| Path)
 	lines = nil
 	t.report("Cleanup")
 	
-

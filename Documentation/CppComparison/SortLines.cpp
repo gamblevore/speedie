@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  CppComparison
+//  SortLines comparison vs Speedie. 
 //
 //  Created by theodore on 07/12/2025.
 //
@@ -23,10 +23,6 @@ using std::chrono::milliseconds;
 
 
 std::string get_file_contents (const char* filename) {
-// you can't just rely on using standard C++ read because its slow
-// and awkward to write
-// and its only one of about 10 different approaches all with different issues.
-// I included get_file_contents2 for speed comparison.
 	std::ifstream in(filename, std::ios::in | std::ios::binary);
 	if (in) {
 		std::string contents;
@@ -40,7 +36,7 @@ std::string get_file_contents (const char* filename) {
 	throw(errno);
 }
 
-#if USE_STRING_VIEW
+#if !USE_STRING_VIEW
 string* NextField (string* Self, byte Sep, int& Begin) {
 	int B = Begin;
 	int N = (int)Self->length();

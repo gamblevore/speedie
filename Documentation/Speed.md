@@ -43,3 +43,50 @@ Also... Speedie will (before it's release) have an `OpenCL` feature, which can c
 Once Speedie has built a successful community... I'll be able to start work on a JIT. The `cake-JIT` will run `cake` apps at close to native `C++` speed. The timing on that obviously isn't up to me, it will be mostly due to the choices of a wider community.
 
 The point isn't so much about what `cake` can do today, but what it's potential is. It definitely is the right way forward, even if right now it's not as fast as a proper `C++` compile. Either way, you can just limit `cake` to debugging if you need more speed.
+
+
+### C++ Comparison Example
+
+This is not an exhaustive comparison of Speedie to C++, but it seems a fair comparison, and covers a lot of areas.
+
+It covers:
+
+* Object creation
+* Basic logic of splitting a string
+* Object destruction
+* Sorting
+* Reading files
+* Demonstrating how complex one language is to the other
+    
+The C++ version is at: [Documentation/CppComparison/SortLines.cpp](CppComparison/SortLines.cpp) (3,976 Bytes)
+
+The Speedie version is at: [Examples/SortLines.spd](../Examples/SortLines.spd) (237 bytes)
+
+The Speedie version is **11.5x smaller** (this was *after* I deleted some #ifdef'd code and comments from the C++ version).
+
+The Speedie version also has much good error-checking on the file, and on app parameter handling. The C++ overhead is because C++ doesn't come with basic functions like "reading a file", which forces you to google or use stackoverflow to find answers to do basic things. Usually the simple answers are the wrong one. In this case, there is a 3-line C++ version of reading files, but it is very slow. Not good for a speed test!
+
+Now, I created a file with 100,000 lines, using this program [Examples/randomwords.spd](../Examples/randomwords.spd) (Again, a small program that does a lot)
+
+The first challenge I found in C++, was getting anything to work. For example, the splitter makes more sense when you return a c++ vector of `string*`, rather than string. This will sort faster. However, theres no obvious way to do it. Eventually I discovered that you can create a new `string*`, taking an existing `string`. (I'm assuming this is well optimised, because it is almost the same speed as splitting using `string_view` without any intermediate objects.)
+
+There were other obstacles, but after I cleared them, I ran the test. Here are the times I got. **Speedie was faster in every area.** (I did not do anything special to optimise the Speedie version!! Speedie is just fast.)
+
+* File Read (6.5x faster)
+    * Speedie 0.14ms
+    * C++ 0.90ms
+* Line Split (2.27x faster)
+    * Speedie 2.96ms
+    * C++ 6.73ms // (quite variable. I took the average. but speedie was at least 1.9x faster)
+* Line Sort (1.13x faster)
+    * Speedie 14.91ms
+    * C++ 16.91ms
+* Cleanup (1.84x faster)
+    * Speedie 0.75ms
+    * C++ 1.38ms
+
+**Overall, Speedie was 38% faster.**
+
+Additionally, the Speedie version is a lot nicer to look at. It reads like poetry. The C++ version forces you to write a lot of boiler plate code. Many includes, a lot of name-spaces imports,  and very awkward names like `std::chrono::steady_clock::time_point` instead of Speedie's `date`.
+
+
