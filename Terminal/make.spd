@@ -59,19 +59,19 @@ ${unmod(dest)}
 "
 
 
+|string| CFlags
+|string| shared
+|string| LinkLibFlags
+|string| ext
+|string| PerryPreReqs
+|string| LibName
+|string| LibFlags
+|file|   CppLib
+|string| SpdSrc
+|string| SpdTerm
+|string| LibPath
+
 module Vars
-	|string| CFlags
-	|string| shared
-	|string| LinkLibFlags
-	|string| ext
-	|string| PerryPreReqs
-	|string| LibName
-	|string| LibFlags
-	|file|   CppLib
-	|string| SpdSrc
-	|string| SpdTerm
-	|string| LibPath
-	
 	function InitVars (|string| plat)
 		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
@@ -108,7 +108,7 @@ sudo apt install gedit
 		return "#!/bin/bash
 echo \"Starting Speedie Build\"
 set -e
-cd ${vars.CppLib}
+cd ${CppLib}
 
 $GetUserName
 echo \"Compiling $LibPath for user '\$U'\"
@@ -156,7 +156,7 @@ function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
 vars.initvars(plat)
 || tocompile = FastString()
 || Count = 2 //jb.cpp and jb_globals.cpp
-for ch in vars.CppLib!
+for ch in CppLib!
 	if ch isa "cpp"
 		tocompile <~ ch
 		tocompile <~ ' '
