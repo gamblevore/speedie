@@ -1168,7 +1168,7 @@ function message.FileMark (|message|)
 
 
 function ASM (|message| msg,  |SCFunction| fn, |bool|)
-	Assembler.Sh.PackMakerInit
+	Assembler.Sh.ASMInit
 	Assembler.JSM.zero
 	Assembler.JSM.Length = 0
 

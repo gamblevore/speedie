@@ -601,19 +601,21 @@ struct Assembler
 			p.DumpDecl(self, p.exportposition)
 
 		
-	function FillDebugInfo (|jbin|)
-		rz = jbin()
+	function FillDebugInfo
+		require options.TargetDebug and !.debuginfo
+		|| j = jbin()
+		.debuginfo = j
 		
-		rz.Enter(@msg, "class")
-		.FillLayout(rz)
-		rz.exit
+		j.Enter(@msg, "class")
+		.FillLayout(j)
+		j.exit
 		
-		rz.Enter(@msg, "glob")
-		rz.PropertyLayout(packmaker.PackGlobs)
-		rz.exit
-		
-		
-	function PackMakerInit
+		j.Enter(@msg, "glob")
+		j.PropertyLayout(packmaker.PackGlobs)
+		j.exit
+	
+	
+	function ASMInit
 		opt norefcounts
 		require !.Inited
 		.Inited = true

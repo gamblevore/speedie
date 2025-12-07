@@ -120,11 +120,14 @@ module PackMaker
 	function FATCompile (|bool|)
 		opt norefcounts
 		.FinalPrepare
+
+		assembler.sh.FillDebugInfo
+
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
 		
 		.PackFuncIndex = 0
-		while (|| fn = .packfuncs[.PackFuncIndex])
+		for fn in .packfuncs
 			.PackFuncIndex++
 			require Assembler.sh.ASMCompile(fn)
 
@@ -135,18 +138,12 @@ module PackMaker
 				.RunAFewTests
 		return true
 	
-	
-	function assembler.FullInit
-		.packmakerinit
-		if options.TargetDebug
-			.debuginfo = .FillDebugInfo
-	
-	
+		
 	function MakePack 
 		opt norefcounts
 		compiler.During = compilerstage.Packing
 		.OrderLibGlobs
-		Assembler.Sh.Fullinit
+		assembler.sh.ASMInit
 		PackMaker.AddAll
 		if stderr.ok and .BuildGlobs 
 			if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry
