@@ -151,6 +151,10 @@ int main (int argc, const char * argv[]) {
 		T = high_resolution_clock::now();
 		Sort(Lines);
 		ReportTime("Sort Lines", T);
+
+		T = high_resolution_clock::now();
+		Sort(Lines);
+		ReportTime("Second Sort", T); // sorting already-sorted data is actually very common.
 		
 		const char* Print = argv[2];
 		if (Print and strcmp(Print, "-p")==0)

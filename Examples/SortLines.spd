@@ -8,6 +8,8 @@ main (|file.existing| Path)
 	T = T.Report("Split")
 	lines.sort
 	t = T.report("Sort")
-	lines = nil
+	lines.sort
+	t = T.report("Second Sort") // sorting already sorted data is very common!
+	lines = nil					// especially if you just added/changed a few items
 	t.report("Cleanup")
 	
