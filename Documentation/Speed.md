@@ -89,4 +89,13 @@ There were other obstacles, but after I cleared them, I ran the test. Here are t
 
 Additionally, the Speedie version is a lot nicer to look at. It reads like poetry. The C++ version forces you to write a lot of boiler plate code. Many includes, a lot of name-spaces imports,  and very awkward names like `std::chrono::steady_clock::time_point` instead of Speedie's `date`.
 
+#### Sort Safety
+
+Speedie is not just faster. But safer! And handles errors better. And smaller code. And easier to write.
+
+The safety issue here in C++, is that if you pass a sort-comparison function that is invalid (say just returns a random number), C++'s sort actually just crashes. C++'s sort will crash if your code decides that: A > B,  B > C,  and C > A
+
+This is just not fun. Imagine some kid writing a sorter to sort zombies in a list of "something" (aggression?), writes the sort function wrong, and his game crashes. Even worse if it crashes "sometimes" like not during testing, but on release.
+
+Speedie's sorter will just result in badly sorted data, given a bad sorting function. No crash. Valid data. Just sorted equally badly to your comparison func.
 
