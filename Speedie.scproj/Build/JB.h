@@ -7272,8 +7272,6 @@ void JB_FS_ProblemsFound(FastString* Self, int Count);
 
 JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in);
 
-void JB_FS_RenderSpeed(FastString* Self, JB_String* Name, int64 BytesIn, JB_Duration Duration, int64 BytesOut);
-
 void JB_FS_AppendJoin(FastString* Self, Array* Data, JB_String* Sep);
 
 void JB_FS_AppendMultiStr(FastString* Self, JB_String* Data, int Count);
@@ -7851,6 +7849,8 @@ JB_String* JB_Str_Preview(JB_String* Self, int N);
 JB_String* JB_Str_ReadFile(JB_String* Self, int Lim, bool AllowMissing);
 
 JB_String* JB_Str_RegularPath(JB_String* Self);
+
+JB_String* JB_Str_RenderSpeed(JB_String* Self, FastString* Fs_in, int64 BytesIn, JB_Duration Duration, int64 BytesOut);
 
 JB_String* JB_Str_ReplacePathComponent(JB_String* Self, int Num, JB_String* With);
 
@@ -11876,7 +11876,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 }
 
 inline JB_File* JB_File__Logs() {
-	return JB_Str_AsFile(JB_LUB[571]);
+	return JB_Str_AsFile(JB_LUB[568]);
 }
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
