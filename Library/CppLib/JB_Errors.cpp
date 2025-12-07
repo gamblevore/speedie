@@ -31,7 +31,10 @@ void JB_ErrorHandle2C(const char* Desc, bool CanFreeDesc, const char* Path, bool
 
 
 
-int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation) {
+// this could be used as a void*... with the high-bit set, so it can be either a string
+// or a char*. Seems like a good idea?
+// perhaps not... if its a file, we could block the destructor.
+int JB_ErrorHandleFileC (const char* Path, int err, const char* Operation) {
 	return JB_ErrorHandleFile(JB_Str_CopyFromCString(Path), nil, err, nil, Operation);
 }
 
