@@ -64,7 +64,7 @@ The Speedie version is at: [Examples/SortLines.spd](../Examples/SortLines.spd) (
 
 The Speedie version is **11.5x smaller** (this was *after* I deleted some #ifdef'd code and comments from the C++ version).
 
-The Speedie version also has much good error-checking on the file, and on app parameter handling. The C++ overhead is because C++ doesn't come with basic functions like "reading a file", which forces you to google or use stackoverflow to find answers to do basic things. Usually the simple answers are the wrong one. In this case, there is a 3-line C++ version of reading files, but it is very slow. Not good for a speed test!
+The Speedie version has good error-checking on the file, and on app parameter handling. The C++ overhead is because C++ doesn't come with basic functions like "reading a file", which forces you to google or use stackoverflow to find answers to do basic things. Usually the simple answers are the wrong one. In this case, there is a 3-line C++ version of reading files, but it is very slow. Not good for a speed test!
 
 Now, I created a file with 100,000 lines, using this program [Examples/randomwords.spd](../Examples/randomwords.spd) (Again, a small program that does a lot)
 
@@ -85,13 +85,30 @@ There were other obstacles, but after I cleared them, I ran the test. Here are t
     * Speedie 0.75ms
     * C++ 1.38ms
 
+#### Summary (Speedie Wins! 🏆)
 **Overall, Speedie was 38% faster.**
 
 Additionally, the Speedie version is a lot nicer to look at. It reads like poetry. The C++ version forces you to write a lot of boiler plate code. Many includes, a lot of name-spaces imports,  and very awkward names like `std::chrono::steady_clock::time_point` instead of Speedie's `date`.
 
-#### Sort Safety
-
 Speedie is not just faster. But safer! And handles errors better. And smaller code. And easier to write.
+
+
+#### Error Handling
+
+Speedie handles errors better too. Try passing an invalid file-path to the C++ version. I got this:
+
+    libc++abi: terminating due to uncaught exception of type int
+    zsh: abort      /usr/local/speedie/Documentation/CppComparison/SortLines
+
+Yeah not very fun. It crashes and doesn't even tell me what the error is! Try this in speedie!
+
+    error occurred (-1)
+    /usr/local/speedie/Examples/CppComparison/words.txt: error: File does not exist, trying to access /usr/local/speedie/Examples/CppComparison/words.txt
+
+Perfect! No crashes. And nicely reports the error into stderr. Speedie also handles other errors, like passing a folder path instead of a file-path, and many more. The C++ version just reads the folder! Which on unix... contains a small (<100) bytes of data that has no real meaning.
+
+
+#### Sort Safety
 
 The safety issue here in C++, is that if you pass a sort-comparison function that is invalid (say just returns a random number), C++'s sort actually just crashes. C++'s sort will crash if your code decides that: A > B,  B > C,  and C > A
 
