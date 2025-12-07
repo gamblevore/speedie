@@ -137,7 +137,6 @@ This is just not fun. Imagine some kid writing a sorter to sort zombies in a lis
 
 Speedie's sorter will just result in badly sorted data, given a bad sorting function. No crash. Valid data. Just sorted equally badly to your comparison func.
 
-
 #### Overview
 
-In fact
+Overall Speedie as a language is in a good place with it's overall features. Fast yet simple. Its a good place to be.
