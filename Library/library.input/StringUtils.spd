@@ -276,53 +276,6 @@ function String.SpacesToTabs (|string|)
 	if rz == self // nice opt
 		rz = self
 
-
-		
-
-function faststring.RenderSpeed (|string| Name, |int64| BytesIn, |duration| Duration, |int64| BytesOut=0)
-	if name
-		self <~ Name
-		self <~ ": "
-		
-	BytesIn.StrSize(self)
-	if BytesOut 
-		self <~ " to "
-		Bytesout.strsize(self)
-		self <~ " ("
-		|| ratio = ((Bytesout div Bytesin)|float|*100.0)
-		self.appendfloat(ratio)
-		self <~ "%)"
-
-	self <~ " in "
-
-	|| seconds = duration.float
-	|| small = seconds < 0.01
-		seconds *= 1000.0
-
-	.AppendFloat(seconds, 2)
-	if small
-		self <~ 'm'
-	self <~ 's'
-	
-	// could move unit-conversion out into its own thingy. like fs.AppendSize
-	require seconds
-	|| scale = 1.0MB
-	|| unit = 'M'
-	|| rate = BytesIn|float| / (scale*seconds)
-	if rate >= 1.0K
-		rate /= 1.0K
-		unit = 'G'
-	  elseif rate <= 1.0
-		rate *= 1.0K
-		unit = 'K'
-	|| dp = (5,2)(rate <= 0.01)
-	self <~ "  ("
-	self.appendfloat(rate, dp)
-	self <~ unit
-	self <~ 'B'
-	self <~ "/s)"
-
-
 	
 function string.UnPrintable (|int|)
 	if .FindBadUTF8

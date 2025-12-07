@@ -43,7 +43,7 @@ function message.Array (|[Message]|)
 function @message.Sorter (SorterComparer of list)
 	return .position < b.position
 
-	
+
 function message.Dict (|bool| DoLower=false, |bool| DoCount=false,   |dictionary of message|)
 	// cheese.spd uses this
 	opt norefcounts
@@ -84,7 +84,7 @@ function string.Dict (|byte| sep='\n', |dictionary of string|)
 	if self
 		// many speedie example projects rely on nil meaning "wildcard"
 		// so we have to return nil if self==""
-/		rz = Dictionary()
+		rz = Dictionary()
 		|| Last = 0
 		while
 			|| Word = .NextField(sep, Last)

@@ -127,12 +127,12 @@ struct CompressionStats
 		if rz < 0
 			rz += date.now
 	
-	render Report
+	function Report (|faststring| fs_in=nil, |string|)
 		|| a = .in
 		|| b = .out
 		if .Purpose & Decompression
 			swap (a) (b)
-		fs.RenderSpeed("", A, .durr, B)
+		return "".RenderSpeed(fs_in, A, .durr, B)
 
 }
 

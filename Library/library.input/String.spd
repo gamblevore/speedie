@@ -278,7 +278,7 @@ class String
 		return .Split(' ')
 
 
-	function Split (|Byte|sep = '\n', |[String]|)
+	function Split (|Byte| sep = '\n', |[String]|)
 		|| Last = 0
 		while
 			|| Word = .NextField(sep, Last)

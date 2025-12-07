@@ -23,9 +23,6 @@ datatype byte
 			return string.byte(self)
 		fs_in <~ self|Byte|
 		return ""
-
-	function UTF8Size (|int|)
-		cpp_wrapper JB_u8_Size
 	
 	function LowerCase (|Byte|)
 		if .isupper

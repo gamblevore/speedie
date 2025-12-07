@@ -15,16 +15,7 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		kSecondsPerMonthApprox = 2628000
 		|float64|
 		kOneStep = 0.000015258789 // 1.0 / 64.0K
-	
-//	syntax cast (|float|)
-//		// are these bad? remove them??
-//		cpp_Part CastFloat
-//		return .Float
-// 
-//	syntax cast (|Float64|)
-//		cpp_Part CastDouble
-//		return .Float64
-	
+		
 	function Seconds (|float|)
 		disabled "Use .float or .float64"
 	

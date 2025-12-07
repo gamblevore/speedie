@@ -62,25 +62,5 @@ helper object.RefCountMark (|int|)
 	return S[] & 1
 
 
-
-struct SpeedTester
-	|Date|				Start
-	|string|			Name
-		
-	autogen SyntaxUsingComplete (|object| idk=nil)
-		|| µs = date.now - .start
-		SpeedTester.log( .Name + ": " + µs.renderdurr + "s" )
-			
-	module
-		function Log (|string| s)
-			printline s
-
-
-function string.SyntaxUsing (|SpeedTester|)
-	SpeedTester.log( "Starting: " + self )
-	rz.name = self
-	rz.start = date.now
-
-
 cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
 cpp_wrapper JB_Mem_ClassLeakCounter ()

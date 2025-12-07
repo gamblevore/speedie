@@ -12,13 +12,13 @@ struct Random
 	
 	saveas struct
 
-	function Int (|int64| b, |int64|)
+	function Int (|int64| Limit, |int64|)
 		cpp_part IntTo
-		return .int(0, b)
+		return .IntRange(0, Limit-1)
 	
-	function Int (|int64| a, |int64| b, |int64|)
+	function IntRange (|int64| Smallest, |int64| Largest, |int64|)
 		cpp_part IntRange
-		return (.Float64 * ((b-a)|float64|) + a|float64|)|int64|
+		return (.Float64 * ((Largest-(Smallest-1))|float64|) + Smallest|float64|)|int64|
 
 	function Int (|int64|)
 		cpp_part RndInt
@@ -33,13 +33,15 @@ struct Random
 	function TimeSeed
 		.seed = date.now
 	
-	function Text (|int| n, |codepoint| a, |codepoint| b, |string|)
-		|| fs = FastString()
-		if a.isascii and b.isascii
-			fs.size = n
+	function Text (|faststring| fs_in=nil, |int| n, |codepoint| a, |codepoint| b, |string|)
+		opt norefcounts
+		|| fs = FastString(fs_in)
+		|| fa = a|float|
+		|| fb = b|float|
 		for i in n
-			fs.AppendUTF8(self[a|float|, b|float|]|codepoint|)
-		return fs
+			|| Cp = self[fa, fb]|codepoint|
+			fs.AppendUTF8(Cp)
+		return fs.GetResult(fs_in)
 	
 	
 	function Texts (|int| array_len, |int| item_len, |[string]|)
@@ -106,7 +108,7 @@ struct Random
 		
 	syntax access (|int| To, |int|) 
 		cpp_part AccessTo
-		return .int(0, to)
+		return .IntRange(0, to-1)
 		
 	syntax access (|float| To, |float|) 
 		cpp_part AccessScale
@@ -181,8 +183,8 @@ function int.SyntaxCall (|int|)
 function int.Rand (|int|)
 	disabled "use 'num()'"
 
-function byte.SyntaxCall (|byte| to, |byte|) 
-	return random.shared.int(self, to) // these random funcs need unifying their purpose / names
+//function byte.SyntaxCall (|byte| to, |byte|) 
+//	return random.shared.IntRange(self, to) // these random funcs need unifying their purpose / names
 
 function ivec2.SyntaxCall (|ivec2|) // speedrogue uses this
 	|| cw = random[0.0, .x|float|, 1.0]
