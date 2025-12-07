@@ -32,7 +32,7 @@ void JB_ErrorHandle2C(const char* Desc, bool CanFreeDesc, const char* Path, bool
 
 
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation) {
-	return JB_ErrorHandleFile(JB_StrC(Path), nil, err, nil, Operation);
+	return JB_ErrorHandleFile(JB_Str_CopyFromCString(Path), nil, err, nil, Operation);
 }
 
 JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in) {
