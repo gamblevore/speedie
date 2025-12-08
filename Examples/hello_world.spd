@@ -1,6 +1,4 @@
 #!/usr/local/bin/spd
 
-// Basic empty file
 main
 	"Hello hello_world!"
-
