@@ -18,7 +18,7 @@ datatype TerminalColor (int)
 	// Remove Dictionary and just have FixedDict
 	// don't dump ALL the string classes, just the base
 	// TokHan should be internal.
-	// validator should be embedded (if used)
+	// Validator should be embedded (if used)
 	// Charset should be replaced with charprops
 	// flowcontrol can be deleted... i don't know if we need it. Perhaps after getting speedie working.
 // a lot of things to cleanup!
@@ -123,12 +123,7 @@ struct TerminalDisplay
 			++p.y
 		.DrawRect(frame, FrameCol)
 	
-	
-	syntax Expect (|string| msg="")
-		description "Prints a bell-character, causing a beep-noise" 
-		cpp_part Fail
-		"\07"
-		if msg
-			printline msg
+	function Beep
+		"\07" // bell character
 }
 
