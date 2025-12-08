@@ -8,11 +8,11 @@ datatype CharPropList (uint)
 		numeric false
 	operator contains (|byte| b, |bool|)
 		inline
-		return (1<<b.Property) & self|uint|
+		return (1<<b.Property|uint|) & self|uint|
 	operator contains (|charprop| b, |bool|)
 		inline
 		cpp_part ContainsProp
-		return (1<<b) & self|uint|
+		return (1<<b|uint|) & self|uint|
 		
 	operator Plus (|charproplist| p, |charproplist|)
 		inline
@@ -21,7 +21,11 @@ datatype CharPropList (uint)
 	operator Plus (|charprop| p, |charproplist|)
 		inline
 		cpp_Part Add1
-		return (self|uint| ||| (1<<p))|charproplist|
+		return (self|uint| ||| (1<<p|uint|))|charproplist|
+
+	syntax Access (|byte| b, |bool|)
+		inline
+		return self contains b
 
 
 function byte.SyntaxIs (|CharProp| s, |bool|)
@@ -34,7 +38,12 @@ function Byte.Property (|CharProp|)
 	return CharProp.Props[self]
 
 	
-function string.InChar (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+function string.Find (|CharProp| Find, |int| From=0, |int| After=int.max, |ind|)
+	cpp_part FindProp
+	return .find(find.list, from, after)
+	
+function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+	cpp_part FindPropList
 	|| p = &CharProp.Props[0]
 	from = from max 0
 	After = After min .Length
@@ -44,7 +53,8 @@ function string.InChar (|CharPropList| Find, |int| From=0, |int| After=int.max, 
 			return from-1
 
 
-function string.OutChar (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+function string.OutCharSet (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+	cpp_part OutPropList
 	|| p = &CharProp.Props[0]
 	from = from max 0
 	After = After min .Length
@@ -52,16 +62,11 @@ function string.OutChar (|CharPropList| Find, |int| From=0, |int| After=int.max,
 	while From < After
 		ifn find contains p[addr[from++]]
 			return from-1
-
-
-//function string.Get (|CharPropList| Start, |CharPropList| Continue,  |int| From=0, |int| After=int.max, |ivec2|)
-//	|| A = .InChar(Start, from, after)
-//		|| B = .OutChar(Continue, A+1, after)
-//			return (A,B+1)
-		
 	
 
-datatype CharProp (byte)
+datatype CharProp (uint16)
+	linkage
+		numeric false
 	constants
 		|CharProp| 
 		Invalid
@@ -79,6 +84,7 @@ datatype CharProp (byte)
 		UnicodeCombining	// 128+ also
 
 		|CharPropList| 
+		NumMid			= (1<<Upper) + (1<<Lower) + (1<<UnderScore) + (1<<Number)
 		Unicode			= (1<<UnicodeMost) + (1<<UnicodeCombining)
 		Letters 		= (1<<Underscore) + (1<<Upper) + (1<<Lower) + Unicode
 		XMLName			= Letters + (1<<Punct2)
@@ -89,14 +95,18 @@ datatype CharProp (byte)
 	operator Plus (|charprop| p, |charproplist|)
 		inline
 		cpp_part Add1
-		return ((1<<self) ||| (1<<p))|charproplist|
+		return ((1<<self|uint|) ||| (1<<p|uint|))|charproplist|
 
 	operator Plus (|charproplist| p, |charproplist|)
 		inline
-		return ((1<<self) ||| p|uint|)|charproplist|
+		return ((1<<self|uint|) ||| p|uint|)|charproplist|
 		
 	inline List (|charproplist|)
-		return (1<<self)|charproplist|
+		return (1<<self|uint|)|charproplist|
+	
+	syntax cast (|charproplist|)
+		inline
+		return (1<<self|uint|)|charproplist|
 		
 	module
 		|CharProp[256]| Props
