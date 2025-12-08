@@ -1245,7 +1245,7 @@ ive been~running #since morning
 	
 	function WordAfter (|int| Start, |int|)
 		Opt NoRefCounts
-		return .WordAfterSub(start, Jeebox.CSWordMiddle)
+		return .WordAfterSub(start, Jeebox.CSWordMiddle2)
 	
 	
 	helper WordAfterSub (|int| Start, |charset| cs, |int|)

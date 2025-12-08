@@ -48,15 +48,24 @@ Module Jeebox
 	|dictionary of string| XML_UnEscapeStr
 	|dictionary of string| EscapeChr
 	
-	|| CSWordMiddle		= "AZaz09__".UniCS
+//	|| CSWordMiddle2	= "AZaz09__".UniCS
+//	|| CSWordMiddle		= charprop.NameMid
+//	|| CSNum			= jeebox.CSWordMiddle
+//	|| CSLettersOnly    = "AZaz".UniCS
+//	|| CSWordStart		= charprop.Letters
+//	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
+//	|| CSLine			= charprop.Line
+
+	|| CSWordMiddle2	= "AZaz09__".UniCS
+	|| CSWordMiddle		= charprop.NameMid
+	|| CSNum			= jeebox.CSWordMiddle
 	|| CSLettersOnly    = "AZaz".UniCS
 	|| CSWordStart		= "AZaz__".UniCS
 	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
-	|| CSNum			= jeebox.CSWordMiddle
+//	|| CSNum			= jeebox.CSWordMiddle
 	|| CSLine			= "\n\r".charset(false)
 	|| CSAfterDot		= " ,:\t\n\r\\".charset(false)
 	|| CSAfterStatement	= " ,:\t\n\r\\'`\"{#\$%".charset(false)
-//	|| CSLineBlack		= "\n\r,".charset(false)
 	|| CSWrapSplit		= " \t\n\r\f-^+/\\*:;<>=,".charset(false)
 
 	.InitConstants
