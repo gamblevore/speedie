@@ -155,7 +155,7 @@ class String
 		while
 			|| i = p
 			p = .WrapSub(MaxWidth, false, p)
-			fs <~ self[i,p-1]
+			fs <~ self[i,p]
 			if self <= p
 				exit
 			fs <~ '\n'

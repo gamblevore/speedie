@@ -136,6 +136,8 @@ function FS (|Message| exp, |Message| GetResult)
 	require arg.expect(@arg)
 	
 	|| fs1 = getresult.prev!
+	require fs1.func == @thg
+	
 	|| name2 = fs2.name
 	for ch.flat in arg
 		if ch isthing name2

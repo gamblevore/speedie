@@ -1,0 +1,35 @@
+#!/usr/local/bin/spd
+
+|ivec2| Pos = (0,0)
+
+main
+	|| base = 0
+	|| term = TerminalDisplay()
+	while 1
+		|| c = Term[]
+			c = c.lowercase
+			pos.y += c == 's'
+			pos.y -= c == 'w'
+			pos.x += c == 'd'
+			pos.x -= c == 'a'
+		term.Draw(base++)
+
+// just a simple demo of drawing ASCII terminal graphics
+// unicode would work too but I don't wanna do that now.
+ 
+function terminaldisplay.Draw (|int| xb)
+	xb = xb / 2
+	xb = xb mod 40
+	if xb > 20
+		xb = 40-xb
+	for y in 10
+		for x in 20
+			|| c = TerminalColor.red
+			|| s = "x"
+			ifn x == 0 or x == 19 or y == 0 or y == 9
+				c = TerminalColor.Yellow
+				s = "o"
+			|| V = (x+10+xb,y+10)
+			self <~ (s, V+Pos, c)
+	.FrameText("hello world", (10, 2, 25, 5))
+	.Display

@@ -2,29 +2,33 @@
 target !minilib {
 
 datatype TerminalColor (int)
+	constants
+		|TerminalColor|
+		Black = 30, Red,Green,Yellow,Blue,Magenta,Cyan,White
 
+	function Colorise (|string| s, |string|)
+		|int64| C = (self-Black)&7
+		|| addr = (s|int64|<<3)>>3
+		return (addr|||(C<<60))|string|
+	
+	inline string.TerminalColor (|terminalcolor|)
+		return (self|int64| >> 60) + TerminalColor.black
+			
 // cleanup:
-	// would be nice if	we can remove this class...
-	// perhaps do it differently. Also remove Dictionary and just have FixedDict
+	// Remove Dictionary and just have FixedDict
 	// don't dump ALL the string classes, just the base
 	// Saveable stuff needs to go. Or just be internal.
 	// TokHan should be internal.
 	// validator should be embedded (if used)
 	// Charset should be replaced with charprops
 	// flowcontrol can be deleted... i don't know if we need it. Perhaps after getting speedie working.
-	// perhaps terminalcell can just be a struct, IDK.
 // a lot of things to cleanup!
 
-class TerminalCell
-	|TerminalColor| 		Color
-	|string| 				Text
-	// could use high-bit tweaking on the string address?
-	// or... perhaps just use a codepoint? then we reduce it down to a number.
 
-
-module Terminal
+// fix later
+struct TerminalDisplay
 	visible false
-	|array of array of TerminalCell|	TermScreen
+	|[[string]]|		Screen
 	|faststring| 		fs
 	|date| 				LastDisplay
 	visible true
@@ -32,21 +36,28 @@ module Terminal
 	constants
 		w = 80
 		h = 35 // too many lines will break the clearscreen/reset function!
-		|TerminalColor|
-		Black = 30, Red,Green,Yellow,Blue,Magenta,Cyan,White
 	
+	inline Size (|ivec2|)
+		return (w, h)
 	
-	helper init
-		require !.TermScreen
-		for h
-			|[TerminalCell]| s
-			.TermScreen <~ s
-			for w
-				s <~ TerminalCell(0, " ")
+	module
+		function New (|TerminalDisplay|)
+			rz.Screen = []
+			rz.fs = FastString()
+			for h
+				|[string]| s
+				s <~ (" ", w)
+				rz.Screen <~ s
+		
+		function GetChar (|CodePoint|)
+			cpp_wrapper JB_App__GetChar
 	
+	syntax access (|CodePoint|)
+		inline
+		return TerminalDisplay.getchar
+		
 	
 	syntax append (|string| text, |ivec2| V, |TerminalColor| Colors = 0)
-		.init
 		|| x0 = v.x
 		for c.codepoints in text
 			if c == 10 or 13
@@ -57,8 +68,8 @@ module Terminal
 			  elseif v inrange .size  and  c != ' '
 				if c == 127
 					c = ' ' // lol
-				|| row = .TermScreen[v.y]
-					row[v.x] = TerminalCell(colors, c)
+				|| row = .Screen[v.y]
+					row[v.x] = colors.colorise(c)
 				++v.x
 	
 	
@@ -74,23 +85,22 @@ module Terminal
 				c = "|"
 			  elseif !y and x
 				c = "-"
-			self <~ (c, s)
+			self <~ (c, s, colors)
 
 
 	function Flat (|string|)
 		opt norefcounts
-		|| f = .fs init FastString()
 		|| PrevCol = 0
-		for line in .TermScreen
-			for cell in line|array of terminalcell|
-				|| CCol = cell.color
+		for line in .Screen
+			for (cell in line) (i)
+				|| CCol = cell.terminalcolor
 				if PrevCol != CCol
 					PrevCol = CCol
-					f <~ "\1b[1;${CCol}m"
-				f <~ cell.Text
-				cell.text = " "
-			f <~ '\n'
-		return f.GetResult
+					.fs <~ "\1b[1;${CCol}m"
+				.fs <~ cell
+				line[i] = " "
+			.fs <~ '\n'
+		return .fs.GetResult
 
 
 	function Display
@@ -104,29 +114,22 @@ module Terminal
 		print .flat
 	
 	
-	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminal.white, |terminalcolor| TextCol=0)
-		.init
-		s = s.wrap(frame.width-2)
-		|| p = frame.xy+1
+	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminalcolor.white, |terminalcolor| TextCol=0)
+		|| p = frame.xy + 1
 		for i.rect in frame ± 1
-			|| row = .TermScreen[i.y]
-				row[i.x] = terminalcell(0," ")
+			|| row = .Screen[i.y]
+				row[i.x] = " "
 		for l.lines in s
 			self <~ (l, p, textcol)
 			++p.y
 		.DrawRect(frame, FrameCol)
 	
-
-	function Size (|ivec2|)
-		return (w, h)
 	
 	syntax Expect (|string| msg="")
+		description "Prints a bell-character, causing a beep-noise" 
 		cpp_part Fail
 		"\07"
 		if msg
 			printline msg
-
-	syntax access (|ind|)
-		cpp_wrapper JB_App__GetChar
 }
 
