@@ -40,7 +40,7 @@ extend Parser
 		
 		|| H = .Handler( kThingWord, fThingWord ).Link( kTemporalWord, fStatement ).Link( kTemporalWordColon, fStatementColon ).Link( kOppWord, fOppWord )
 		
-		.Tokens( Jeebox.CSWordStart.Bytes, H )
+		.Tokens( "AZaz__".UniCS.Bytes, H )
 		.Token( "(" )  = .Handler( kFuncAfterNoSpace, fFuncCall ).link( kThingSyx, fBracket ).Link( kOppBra, fOppBracket )
 		.Token( "[" )  = .Handler( kFuncAfterNoSpace, fAccess ).Link( kThingSyx, fArray )
 		.Token( "«" )  = .Handler( kThingSyx, fMsgList )
@@ -541,7 +541,10 @@ extend Parser
 		|ind| UnitPos2
 		if StartAt == 0
 			UnitPos2 = .Data.OutCharSet( Jeebox.CSLettersOnly, After, Start + StartAt )
-//			UnitPos2 = .Data.OutChar( charprop.Letters, After, Start + StartAt ) // different somehow.
+//			|| UnitPos3 = .Data.OutCharSet( charprop.lettersonly, After, Start + StartAt )
+//			if UnitPos2 != UnitPos3
+///				UnitPos2 = .Data.OutCharSet( Jeebox.CSLettersOnly, After, Start + StartAt )
+//				.Data.OutCharSet( charprop.lettersonly, After, Start + StartAt )
 			
 		ifn UnitPos2
 			UnitPos2 = After - 1

@@ -41,7 +41,8 @@ function Byte.Property (|CharProp|)
 function string.Find (|CharProp| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindProp
 	return .find(find.list, from, after)
-	
+
+// needs to be able to go backwards... to replace charset
 function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindPropList
 	|| p = &CharProp.Props[0]
@@ -80,15 +81,15 @@ datatype CharProp (uint16)
 		Underscore			// _
 		Upper				// A-Z
 		Lower				// a-z
-		UnicodeMost			// 128+
-		UnicodeCombining	// 128+ also
+		UnicodeByte			// 128+
 
 		|CharPropList| 
 		NumMid			= (1<<Upper) + (1<<Lower) + (1<<UnderScore) + (1<<Number)
-		Unicode			= (1<<UnicodeMost) + (1<<UnicodeCombining)
-		Letters 		= (1<<Underscore) + (1<<Upper) + (1<<Lower) + Unicode
-		XMLName			= Letters + (1<<Punct2)
-		NameMid			= Letters + (1<<Number)
+		Unicode			= (1<<UnicodeByte)
+		LettersOnly 	= (1<<Upper) + (1<<Lower) + Unicode
+		LettersUnderScore= (1<<Underscore) + LettersOnly
+		XMLName			= LettersUnderScore + (1<<Punct2)
+		NameMid			= LettersUnderScore + (1<<Number)
 		White			= (1<<Line) + (1<<HSpace)
 		Punct			= (1<<Punct1) + (1<<Punct2)
 
@@ -129,28 +130,31 @@ datatype CharProp (uint16)
 			|| item = &.Props[0]
 			for s in 32
 				item[s] = Unprintable
+			for s in 33 to 126
+				item[s] = punct1
+			for s in 128 to 253
+				item[s] = UnicodeByte
+			for s in '0'|int| to '9'|int|
+				item[s] = charprop.number
+			for s in 'A'|int| to 'Z'|int|
+				item[s] = charprop.upper
+				item[s+32] = charprop.lower
+
 			item[0] = null
 			item[9] = HSpace
 			item[10] = line
 			item[13] = line
 			item[32] = HSpace
-			for s in 33 to 126
-				item[s] = punct1
 
+			item['_'] = charprop.Underscore
 			item['-'] = punct2
 			item[':'] = punct2
 			item['.'] = punct2
 
-			item[0x7f] = Invalid
+///			item[0x7f] = Invalid // not set above
 			item[0xC0] = Invalid
-			item[0xFE] = Invalid
-			item[0xFF] = Invalid
+//			item[0xFE] = Invalid // also
+//			item[0xFF] = Invalid
 			
-			for s in 'A'|int| to 'Z'|int|
-				item[s] = charprop.upper
-				item[s+32] = charprop.lower
-			item['_'] = charprop.Underscore
-			for s in '0'|int| to '9'|int|
-				item[s] = charprop.number
 	
 

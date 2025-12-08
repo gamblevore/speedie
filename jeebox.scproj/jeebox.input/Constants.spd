@@ -49,14 +49,14 @@ Module Jeebox
 	|dictionary of string| EscapeChr
 	
 //	|| CSLettersOnly    = "AZaz".UniCS
-//	|| CSWordStart		= charprop.Letters
 //	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
 
 	|| CSWordMiddle2	= "AZaz09__".UniCS
 	|| CSWordMiddle		= charprop.NameMid
 	|| CSNum			= jeebox.CSWordMiddle
 	|| CSLettersOnly    = "AZaz".UniCS
-	|| CSWordStart		= "AZaz__".UniCS
+//	|| CSLettersOnly    = charprop.LettersOnly
+	|| CSWordStart		= charprop.LettersUnderScore
 	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
 	|| CSLine			= charprop.Line
 	|| CSAfterDot		= " ,:\t\n\r\\".charset(false)
