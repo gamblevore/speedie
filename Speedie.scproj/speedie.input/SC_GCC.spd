@@ -174,8 +174,8 @@ function Clean (|bool|)
 @spd/Speedie.scproj/BuildTest3
 ".ReplaceAll("@spd", file.Speediedir)
 	for l.lines in paths
-		if l
-			if l.file.deleteall
+		if l and l.file.deleteall
+			if !options.Silent
 				printline l
 	return stderr.ok
 
