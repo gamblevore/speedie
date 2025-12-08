@@ -78,7 +78,7 @@ struct Assembler
 		opt NoRefCounts
 		|| dbg = .DebugInfo
 			.dbgmark = dbg.Length // for .rework
-/			dbg.Enter(@msg, fn.exportname)
+			dbg.Enter(@msg, fn.exportname)
 
 		for a in fn.Args
 			.DeclReset(a)
