@@ -14,28 +14,30 @@ datatype Codepoint (int)
 		cpp_part CP
 	function UTF8Size (|int|)	
 		cpp_wrapper JB_Str_UTF8Size
-	function IsAscii (|bool|)
+	inline IsAscii (|bool|)
 		inline
 		return self <= 127
-	function IsLower (|bool|)
+	inline IsLower (|bool|)
 		return .in('a', 'z')
-	function IsUpper (|bool|)
+	inline IsUpper (|bool|)
 		return .in('A', 'Z')
-	function IsInt (|bool|)
+	inline IsInt (|bool|)
 		return .in('0', '9')
 	function IsLetter (|bool|)
 		return .isupper or .islower or .ishigher
-	function IsHigher (|bool|)
+	inline IsHigher (|bool|)
 		return .in(128, 1114111)
 	function IsAlphaNum (|bool|)
-		inline
 		return .isletter or .IsInt
+	function LowerCase (|codepoint|)
+		if .IsUpper
+			self += 32
+		return self
 	function IsWhite (|bool|)
 		return self == ' ' or '\n' or '\r' or '\t' 
-	function In (|int| a, |int| b, |bool|)
+	inline In (|int| a, |int| b, |bool|)
 		return  (self - a)|uint| <= (b-a)|uint|
-	function Str (|string|)
-		inline
+	inline Str (|string|)
 		return string.char(self)
 	syntax cast (|string|)
 		cpp_part AsString
