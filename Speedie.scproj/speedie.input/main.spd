@@ -40,6 +40,8 @@ function Compiler.PrintResults
 
 
 function Compiler.MiniTests
+	target debug
+		jeebox.Test
 	.TestDate
 
 
