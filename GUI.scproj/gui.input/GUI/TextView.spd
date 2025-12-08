@@ -1001,7 +1001,7 @@ class TextView (GUIControl)
 	helper TryTab (|bool|)
 		require .CanTypeTab
 		|| sh = keys.shift
-		ifn .seltext contains jeebox.CSLine
+		ifn .seltext.find(jeebox.CSLine)
 			if .InsertAutoComplete
 				return true
 			if (.onkeydown)(self, -9)?
@@ -2305,7 +2305,7 @@ class TextView (GUIControl)
 		SingleLineWithTabs = 2
 	
 	module
-		|| csAntiWords		= jeebox.CSWordMiddle.Invert
+		|| csAntiWords		= ~jeebox.CSWordMiddle
 		|| CounterParts		= <(`{[(`'"|`)>
 		|| CounterParts2	= <(`}])`'"|`)>
 		

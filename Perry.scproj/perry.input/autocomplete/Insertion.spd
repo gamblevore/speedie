@@ -177,8 +177,8 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 	|| after	= self[x]
 	|| IsDot	= (before == '.') 
 	if !keys.option
-		|| OK = IsDot  or  (before in jeebox.CSWordmiddle) // or (before.iswhite and after.istextline)
-			OK = after out jeebox.CSWordStart
+		|| OK = IsDot  or  (jeebox.CSWordmiddle[before]) // or (before.iswhite and after.istextline)
+			OK = !jeebox.CSWordStart[after]
 		if !OK and reason ~= PerryAutoCompleteReason.escape or PerryAutoCompleteReason.sel
 			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
 	
