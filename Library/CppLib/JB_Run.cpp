@@ -27,22 +27,11 @@ JB_Class a ## Data = JBClassInit(a##Data, (#a), sizeof(a), c, (JBObject_Behaviou
 #define AddError(Result, name) {int abc = Result; if (abc and !JB_ErrorNumber) {JB_ErrorNumber = abc; fprintf(stderr, "error %s (%i)\n", name, abc); };} 
 
 
-void JB_Array_SaveWrite(Array* self, void* Other);
-void JB_Dict_SaveWrite(Dictionary* self, void* Other);
-void JB_Array_SaveCollect(Array* self, void* Other);
-void JB_Dict_SaveCollect(Dictionary* self, void* Other);
-void JB_Dict_LoadProperties(Dictionary* self, void* Other);
-void JB_Array_LoadProperties(Array* self, void* Other);
 int  JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
-
-void JB_Sav_SaveCollect(Saveable* self, void* Saver);
-void JB_Sav_SaveWrite(Saveable* self, void* Saver);
-void JB_Sav_LoadProperties(Saveable* self, void* Other);
 void JB_Dict__Init();
 
 
-// what do we do with the name->class thing?
-// im pretty sure the only thing we subclass is stringshared?
+// im pretty sure the only string we subclass is stringshared?
 JBClassPlace( JB_String,		JB_Object,	"String",	JB_BA_Destructor,	JB_Str_Render );
 JBClassPlace( JB_StringC,		JB_String,	"StringZeroTerminated",	0,		JB_Str_Render );
 JBClassPlace( JB_StringShared,	JB_String,	"StringShared",JB_Str_Destructor,JB_Str_Render );
@@ -57,14 +46,12 @@ JBClassPlace( Dictionary4,		JB_Object,	"",			JB_Dict_Destructor,	0 );
 JBClassPlace( DictionaryLeaf,	JB_Object,	"",			JB_Leaf_Destructor,	0 );
 JBClassPlace( DictionaryReader, JB_Object,	"DictionaryReader", JB_Nav_Destructor,	0 );
 
-JBClassPlaceSaver( Dictionary,	JB_Dict_Destructor,		JB_AsClass(Saveable),		JB_Dict_Render,  JB_Dict_LoadProperties,		JB_Dict_SaveCollect,	JB_Dict_SaveWrite );
-JBClassPlaceSaver( Array,       JB_Array_Destructor,   	JB_AsClass(Saveable),		JB_Array_Render, JB_Array_LoadProperties,	JB_Array_SaveCollect,	JB_Array_SaveWrite );
-JBClassPlaceSaver( Saveable,	0,                     	0,                         0,               JB_Sav_LoadProperties,      JB_Sav_SaveCollect,		JB_Sav_SaveWrite );
+JBClassPlace(Dictionary,		JB_Object,	"Dictionary",JB_Dict_Destructor, JB_Dict_Render );
+JBClassPlace(Array,				JB_Object,	"Array",	JB_Array_Destructor, JB_Array_Render );
 
 JBClassPlace( FastString,		JB_Object,	"FastString", JB_FS_Destructor,		JB_FS_Render );
-//JBClassPlace( ByteMap,			JB_Object,	"ByteMap", 0,						0 );
 JBClassPlace( CharSet,			JB_Object,	"CharSet", 0,						JB_CS_Render );
-JBClassPlace( JB_List,			Saveable,	"List",		JB_Ring_Destructor,		JB_List_Render );
+JBClassPlace( JB_List,			JB_Object,	"List",		JB_Ring_Destructor,		JB_List_Render );
 JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );
 
 extern JB_Class JB_TaskData;

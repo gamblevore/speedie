@@ -966,13 +966,13 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| fs = FastStringCpp.new
 		.CreateClassListHeader(fs, " {\n")
 
-		for ( c in compiler.ClassList )
-			if (c.IsSaveableObject and c.MyReacher)
-				fs <~ "\tfn(&"
-				fs <~ c.CStructName
-				fs <~ "Data, (char*)" 
-				c.RenderSaveable(fs)
-				fs <~ ");\n"
+//		for ( c in compiler.ClassList )
+//			if (c.IsSaveableObject and c.MyReacher)
+//				fs <~ "\tfn(&"
+//				fs <~ c.CStructName
+//				fs <~ "Data, (char*)" 
+//				c.RenderSaveable(fs)
+//				fs <~ ");\n"
 		
 		fs <~ "}\n"
 		dest <~ .splitCpp(fs, "saver_funcs")

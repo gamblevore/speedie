@@ -4,7 +4,7 @@
 */
 
 
-class Array (saveable)
+class Array
 	size 24
 	linkage
 		wrapper

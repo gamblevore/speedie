@@ -12,7 +12,7 @@
 
 extern "C" {
 
-JBClass( JB_List, Saveable,
+JBClass( JB_List, JB_Object,
 	int				Position;
 	JB_Object*		Obj;
 	JB_List*		Parent;

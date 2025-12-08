@@ -7,7 +7,7 @@
 
 //// Advice: Avoid using dictname within anything fast unless wrapped with norefcounts
 
-class Dictionary (saveable)
+class Dictionary
 	size 2080 // wow. would be great to use fixeddict instead.
 	linkage
 		wrapper

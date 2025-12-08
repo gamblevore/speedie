@@ -3,7 +3,7 @@
 
 // bugs:
 
-
+/*
 extend ObjectLoader {
 	linkage
 		cpp_Part Loader
@@ -175,6 +175,7 @@ struct ObjectLoader {
 
 
 
+/*
 extend Array
 	behaviour LoadProperties
 		opt norefcounts
@@ -191,6 +192,7 @@ extend Dictionary
 				self[name] = loader.ItemInt
 			  else
 				self[name] = loader.ItemObject
+*/
 
 
 
@@ -214,4 +216,6 @@ function string.RestoreLoad (|object|)
 autogen File.RestoreLoad (|object|)
 	return .parse$.restoreload
 
+
+*/
 

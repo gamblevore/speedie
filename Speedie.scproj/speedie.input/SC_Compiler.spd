@@ -5,7 +5,7 @@
 
 |SCClass|	TypeFloat64
 |SCClass|	Typefloat
-|SCClass|	TypeSaveable
+//|SCClass|	TypeSaveable
 |SCClass|	TypeInt
 |SCClass|	TypeInt16
 |SCClass|	TypeDate
@@ -277,7 +277,7 @@ function InitTypes (|bool|)
 	TypeDictionary		= Compiler["dictionary"]
 	Compiler["faststring"]
 	TypeArray			= Compiler["array"]
-	TypeSaveable		= Compiler["saveable"]
+//	TypeSaveable		= Compiler["saveable"]
 	if StdErr.ok and .GetTypeVoid
 		TypeStringZero!.DowngradeTo = TypeString
 		(TypeString! is HasSubClass) // compiler doesn't know about internal-subclasses of string.
@@ -445,10 +445,10 @@ function ImportAll
 		c.DataTypePostLoad
 	
 	require .Stage( "Savers and behaviours" )
-	for c in .ClassList
-		c.LoadSaver
-
-	.DoSavers(0)
+//	for c in .ClassList
+//		c.LoadSaver
+//
+//	.DoSavers(0)
 
 	for c in .ClassList
 		c.ProcessBehaviours
@@ -490,7 +490,7 @@ function ImportAll
 			for m in .api_list
 				sc_api.DelayedClassAPI(m, proj.name)
 
-	.DoSavers(1)
+//	.DoSavers(1)
 
 
 	require .Stage( "Creating Class Exportnames" )
@@ -514,7 +514,7 @@ function ImportAll
 	require StdErr.OK
 	
 
-	.DoSavers(2)
+//	.DoSavers(2)
 
 	
 	require .Stage( "Parsing Function Parameters" )

@@ -4,7 +4,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-class list (Saveable)
+class list
 	size 48
 	|ind|			Position
 	|object?|		Obj

@@ -17,7 +17,6 @@ datatype TerminalColor (int)
 // cleanup:
 	// Remove Dictionary and just have FixedDict
 	// don't dump ALL the string classes, just the base
-	// Saveable stuff needs to go. Or just be internal.
 	// TokHan should be internal.
 	// validator should be embedded (if used)
 	// Charset should be replaced with charprops

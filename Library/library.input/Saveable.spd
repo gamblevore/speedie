@@ -3,7 +3,7 @@
 // all objects should be saveable unless the class says its not.
 // makes more sense. we messed up the language otherwise!
 // also... we should use jbin
-
+/*
 struct ObjectSaver
 	linkage
 		cpp_Part Saver
@@ -36,7 +36,7 @@ struct ObjectSaver
 
 
 
-
+/*
 class Saveable
 // probably should be called LOADABLE too... :)
 	linkage
@@ -166,7 +166,7 @@ helper FastString.AppendObjectOrNil (|object| o)
 		self <~ "nil"
 
 
-extend Array
+/*extend Array
 	Behaviour SaveCollect
 		// put all in, for now.   // opt later. :)
 		for (v in self)
@@ -198,6 +198,7 @@ extend Dictionary
 			D <~ ": "
 			D.AppendObjectOrNil(l.value)
 			D <~ ','
+*/
 
 
 
@@ -323,3 +324,5 @@ struct StructSaveTest
 		cpp_part TestObj
 }
 
+*/
+*/

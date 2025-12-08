@@ -22,14 +22,14 @@ struct FindResult {
 };
 
 
-JBClass( Dictionary0, Saveable,
-    Dictionary*     Parent;
-    uint8              Letter;
-    uint8              Start;
-    uint8              UserFlags; // not used by the dict itself.
-    uint8              Width;
-    uint             Depth; 
-    JB_Object*      InPlaceValue;
+JBClass( Dictionary0, JB_Object,
+    Dictionary*	Parent;
+    uint8			Letter;
+    uint8			Start;
+    uint8			UserFlags; // not used by the dict itself.
+    uint8			Width;
+    uint			Depth; 
+    JB_Object*		InPlaceValue;
 );
 
 JBClass( Dictionary1,    Dictionary0,

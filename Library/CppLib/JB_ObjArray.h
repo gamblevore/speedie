@@ -10,7 +10,7 @@
 
 extern "C" {
 
-JBClass( Array, Saveable,
+JBClass( Array, JB_Object,
 	int					Marker;
 	JB_Object**			_Ptr;
 	int					Capacity;

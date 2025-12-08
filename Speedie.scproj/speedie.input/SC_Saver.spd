@@ -7,7 +7,7 @@
 	u32 bitfield for the object positions, that need fixups?
 */
 
-
+/*
 module SC_Saver {
 
 	function Message.CheckSuperDotSave (|string|name, |bool| ShouldBe=true)
@@ -316,7 +316,6 @@ module SC_Saver {
 			// printline "SaveTests Complete!"
 		  else
 			error "SaveTest failed."
-
 	linkage
 		cpp_part Sav
 }
@@ -369,5 +368,5 @@ class SavingTest (saveable)
 					return (A.value == B.value) and (A.name == B.name)
 	
 	// write/load are auto-generated... and collect doesn't need over-riding :)
-
+*/
 
