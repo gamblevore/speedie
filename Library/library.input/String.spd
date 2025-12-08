@@ -150,6 +150,14 @@ class String
 			  elseif to >= 0
 				fs <~ to|byte|
 
+	render Remove (|charproplist| remove, |int| to=-1)
+		cpp_part RemoveProp
+		for c in self
+			if !remove[c]
+				fs <~ c
+			  elseif to >= 0
+				fs <~ to|byte|
+
 	render Wrap (|int| MaxWidth)
 		|| p = 0
 		while
