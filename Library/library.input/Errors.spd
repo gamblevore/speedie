@@ -116,7 +116,7 @@ class Error (Message)
 		require d and .HasPosition
 
 		fs <~ "\n"
-		|| Start  = d.find( jeebox.csline, .Position, 0		) + 1
+		|| Start  = d.find( jeebox.csline, .Position, 0  ) + 1
 		|| Finish = d.find( jeebox.csline, .Position...  )
 		if (Finish == -1)
 			Finish = D.Length + 1
