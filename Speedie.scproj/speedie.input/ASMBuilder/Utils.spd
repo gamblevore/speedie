@@ -137,6 +137,8 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 			.SetRegister(v, nil, nil) // no reason to want to nop anything here.
 		// Does code below suffer from unallocating something that is used later?
 		return .ClearStruct(exp, .funcstart + fat, v)
+	|| j = debuginfo
+		j.DebugCloseVar(.index, v)
 	return true
 
 

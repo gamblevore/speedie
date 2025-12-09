@@ -2,6 +2,7 @@
 
 
 function SCDecl.DumpCode (|int| Pos, |syntax|)
+	opt norefcounts
 	if pos >= 0 and self is Reference
 		return @tmp
 	if .PointerCount					// @msg, @arg, @tmp, have names and children.
@@ -16,25 +17,34 @@ function SCDecl.DumpCode (|int| Pos, |syntax|)
 	return @char						// a plain old data-type
 
 
+function jbin.DebugCloseVar (|int| Pos, |int| Reg)
+	.WriteType(@back)				// type
+	.Appendhint(1 + pos.hintsize)	// size
+	.AppendHint(pos)				// data
+	.AppendByte(reg)
+
+
 function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 	opt norefcounts
 	
-	|| W = .DumpCode(pos)
+/	|| W = .DumpCode(pos)
 	|| Reg = 0
 	|| s = ""
 	if pos >= 0
-		s = .name
-		reg = .mu.DataType|asmreg|.Reg
+		if self isnt classobj
+			s = .name
+		if self is local
+			reg = .mu.DataType|asmreg|.Reg
 	
 	j.add(W, s, true)
-	j.AddDecl(self, Pos, W, reg)
+	j.AddDecl(self, Pos, W, Reg)
 	
-	if w == @arg						// carray... we need the length of the carray
-		j.AddInt(.c_array)			
+	|| C = .C_Array						// carray... we need the length of the carray
+		j.AddInt(C)
 		self = .internal!
 	  elseif w == @msg					// pointer
 		self = .internal!
-	  elseif w!=@tmp					// not a reference
+	  elseif w != @tmp					// not a reference
 		j.exit(depth+1)
 		return
 	
@@ -44,10 +54,12 @@ function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 function jbin.AddDecl (|scdecl| D, |int| Pos, |syntax| W, |int| Reg)
 	opt norefcounts
 	|| t = d.type.debugID(W)
-	|| Alloc = t.hintsize + Pos.hintsize + (reg > 0)
-	.WriteType(@back)
-	.Appendhint(alloc)
-	.AppendHint(t)
+	|| Alloc = t.HIntsize + (reg > 0)
+	if pos >= 0
+		alloc += pos.hintsize
+	.WriteType(@back)	// type
+	.Appendhint(alloc)	// size
+	.AppendHint(t)		// data
 	if pos >= 0
 		.AppendHint(pos)
 		if reg > 0

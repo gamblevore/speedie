@@ -55,7 +55,7 @@ role JBin (Faststring)
 			self    <~ B|byte|
 			amount  -= (B-add)
 
-	function Tmp			(|string| name, |jbinLeaver|)
+	function TmpArg			(|string| name, |jbinLeaver|)
 		.Enter(@tmp, name)
 		.Enter(@arg)
 		return 2

@@ -165,19 +165,17 @@ module PackMaker
 		.RenderASM(j)
 		.DumpStrings(j)
 		.PackAllClasses(j)
-		.AddDebugStuff(j)
+		.StoreDebug(j)
 		j.ExitAll
 	
 	
-	function AddDebugStuff (|jbin| j)
-		|| dbg = assembler.debuginfo			#require
+	function StoreDebug (|jbin| j)
+		|| dbg = assembler.SafeDebugInfo			#require
+		compiler.stDebugInfo += dbg.length
 
-		j.tmp("debug")
-		|| str = dbg.GetResult.Compress
-		assembler.debuginfo = nil
-		compiler.stDebugInfo += str.length
-		j.AddStr(str)
-		j.exit(2)
+		j.enter(@tmp, "debug")
+		j.AddStr(dbg.Compress)
+		j.exit
 
 	
 	function RenderASM (|jbin| j)
@@ -222,7 +220,7 @@ module PackMaker
 
 	function PackAllClasses (|jbin| j)
 		if .AnyClassesNeeded
-			j.tmp("clss")
+			j.TmpArg("clss")
 			.PackClasses(j, false)
 			.PackClasses(j, true)
 			j.exit(2)

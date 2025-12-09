@@ -639,15 +639,17 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 			.MakeWrapperFor(fs, f)
 	
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
+
 	.WriteVMFuncs(fs)
+	|| Dbg = Assembler.SafeDebugInfo
+
 	fs <~ "};
 
-
 extern \"C\" JB_StringC* JB_App__LibDebug() {
-	int n = ${assembler.debuginfo|string|.length};
+	int n = ${Dbg.length};
 	const char* Data = "
 
-	fs.AppendCppAll(assembler.debuginfo|string|)
+	fs.AppendCppAll(Dbg)
 	
 	fs <~ ";
 	return JB_StrCN(Data, n);

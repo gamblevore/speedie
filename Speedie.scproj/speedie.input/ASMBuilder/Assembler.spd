@@ -56,6 +56,11 @@ struct Assembler
 		|int|						StringsOutOfRange
 		|jbin?|						DebugInfo
 
+		function SafeDebugInfo (|string|)
+			rz = .debuginfo.GetResult
+			if !rz.ParseJbin
+				rz = ""
+				
 
 	
 	function State (|&ASMState|)
@@ -76,15 +81,15 @@ struct Assembler
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
-		|| dbg = DebugInfo
-			.dbgmark = dbg.Length // for .rework
-			dbg.Enter(@msg, fn.exportname)
+		|| j = DebugInfo
+			.dbgmark = j.Length // for .rework
+			j.Enter(@msg, fn.exportname) // AddDbg
 
 		for a in fn.Args
 			.DeclReset(a)
 			.DeclareVar(a.source, a)
-			if dbg
-				a.DumpDecl(dbg, 0)
+			if j
+				a.DumpDecl(j, 0) // AddDbg
 
 	
 	function Index (|int|)
@@ -607,7 +612,6 @@ struct Assembler
 		if !options.makeexec
 			require options.TargetDebug and !debuginfo
 		|| j = jbin()
-		debuginfo = j
 		
 		j.Enter(@msg, "class")
 		.FillLayout(j)
@@ -617,6 +621,7 @@ struct Assembler
 		j.Enter(@msg, "glob")
 		j.PropertyLayout(Globs)
 		j.exit
+		debuginfo = j // AddDbg
 	
 	
 	function ASMInit
