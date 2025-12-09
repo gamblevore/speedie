@@ -15,9 +15,6 @@ unused_lib_funcs // This also does not affect compiliation! It tells the IDE not
 /*
 Bloat fix plan:
 	* remove dictionary, use fixeddict (needs leaf/stems)
-	* some unnecessary visible funcs (JB_MzSt_Render)
-	* objectloader, and saveable stuff (JB_StructSaveTest_destructor is unused?)
-		* clean up and remove the special-rules around it? it was kinda ugly...
 	* whole program ref analysis for remove refcounts.
 	* remove dict.reverse in constants.spd
 */

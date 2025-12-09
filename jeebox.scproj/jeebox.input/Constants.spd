@@ -47,9 +47,6 @@ Module Jeebox
 	|dictionary of string| JS_UnEscapeStr
 	|dictionary of string| XML_UnEscapeStr
 	|dictionary of string| EscapeChr
-	
-//	|| CSLettersOnly    = "AZaz".UniCS
-//	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
 
 	|| CSWordMiddle2	= "AZaz09__".UniCS
 	|| CSWordMiddle		= charprop.NameMid

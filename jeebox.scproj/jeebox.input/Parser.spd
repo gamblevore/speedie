@@ -32,16 +32,14 @@ extend Parser
 
 		._EndOfLineMarker = message(@nil, "\n")
 
-
-		|| numb     =   "0123456789".bytesplit
 		|| op_comp  =   "= == === < > <= <== >= >== != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ?? ?="
 		|| op_math  =   "* / + - ^ & >> << >>> <<< (|) |||"
 		|| PFix		=	"++ -- $ ! ? ..."
 		
 		|| H = .Handler( kThingWord, fThingWord ).Link( kTemporalWord, fStatement ).Link( kTemporalWordColon, fStatementColon ).Link( kOppWord, fOppWord )
 		
-		.Tokens( "AZaz__".UniCS.Bytes, H )
-		.Token( "(" )  = .Handler( kFuncAfterNoSpace, fFuncCall ).link( kThingSyx, fBracket ).Link( kOppBra, fOppBracket )
+		.TokenRange( "AZaz__\80\FF", H )
+		.Token( "(" )  = .Handler( kFuncAfterNoSpace,fFuncCall ).link( kThingSyx,fBracket ).Link( kOppBra,fOppBracket )
 		.Token( "[" )  = .Handler( kFuncAfterNoSpace, fAccess ).Link( kThingSyx, fArray )
 		.Token( "«" )  = .Handler( kThingSyx, fMsgList )
 		.Token( "." )  = .Handler( kFuncAfterNoSpace, fDot ).Link( kThingSyx, fSDot )
@@ -67,7 +65,7 @@ extend Parser
 
 // I think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
-		.Tokens( numb,			kThingSyx,              fNumber				)
+		.TokenRange( "09", 		.Handler(kThingSyx, fNumber)				)
 		.Tokenz( "#!",			kTemporalSyxNoBar,      fShebang			)
 		.Tokenz( "//",			kEndOfLine,				fCommentLine		)
 		.Tokenz( "/*",			kEndOfLine,				fComment			)
@@ -75,7 +73,6 @@ extend Parser
 		.Tokenz( op_math,		kOppSNB,				fOppSyx				)
 		.Tokenz( "|",			kOppBar,				fOppSyx				)
 		.Tokenz( "...",			kThingSyx,              fThingSyx			)
-//		.Tokenz("\\",			kThingSyx,				fBinaryThing		) // not sure of this
 		.Tokenz( `"`,			kThingSyx,              fString				)
 		.Tokenz( "'",			kThingSyx,              fChar				)
 		.Tokenz( "`",           kThingSyx,			    fBackTick			)
@@ -1228,6 +1225,16 @@ ive been~running #since morning
 		cpp_part TokensHan
 		for s in arr
 			.Token( s ) = H
+
+
+	function TokenRange (|string| Range, |tokenhandler|H)
+		cpp_part TokensChar
+		|| i = 0
+		while i < Range
+			|| A = range[i++]
+			|| B = range[i++]
+			while A <= B
+				.token(string.byte(A++)) = H
 
 
 	function Tokenz (|string| s, |int|bits, |ParseHandler| func = nil)

@@ -88,19 +88,18 @@ struct CompressionStats
 
 	module
 		|CompressionStats| All
-		function New (|compressionstats|)
-
-
+		inline New (|compressionstats|)
 		
 	target minilib {
 	
-	function End
-	function Len (|int| n)
-	function LiveUpdate (|int| s, |int| outt, |bool| compress=true)
-	function Durr (|float|)
+	inline End
+	inline Len (|int| n)
+	inline LiveUpdate (|int| s, |int| outt, |bool| compress=true)
+	inline Durr (|float|)
 	render Report (|bool| Compression)
-	function Clear
-	function Print (|bool| Compress=true)
+		inline
+	inline Clear
+	inline Print (|bool| Compress=true)
 	
 	} else {
 
@@ -110,10 +109,10 @@ struct CompressionStats
 		.out = nil
 		.Purpose = nil
 	
-	function End
+	inline End
 		.Duration += date.now
 
-	function Print
+	inline Print
 		printline .Report
 		
 	function LiveUpdate (|int| in, |int| out)

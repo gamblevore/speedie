@@ -45,24 +45,60 @@ function string.Find (|CharProp| Find, |int| From=0, |int| After=int.max, |ind|)
 // needs to be able to go backwards... to replace charset
 function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindPropList
+	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
+							 // makes for confusing code. it WOULD have been good... if this were 1-based
+							 // because -1 is also the return value of a missing value.
+							 // nicer to make an explicit function that to handle end-relative searches
 	|| p = &CharProp.Props[0]
-	from = from max 0
-	After = After min .Length
 	|| addr = .addr
-	while From < After
-		if find contains p[addr[from++]]
-			return from-1
+	if from < After
+		from = from max 0
+		After = After min .Length
+		while From < After
+			if find contains p[addr[from++]]
+				return from-1
+	  else // oof
+		from = from min .length
+		After = After max 0
+		while From > After
+			if find contains p[addr[--from]]
+				return from
 
+/*
+    || SelfAfter = self->Length
+    if (StartOff < 0)
+        StartOff = SelfAfter + 1 + StartOff
+      else if (StartOff > SelfAfter)
+        StartOff = SelfAfter
+
+    if (AfterOff > SelfAfter)
+        AfterOff = SelfAfter
+      else if (AfterOff < 0)
+        AfterOff = SelfAfter + 1 + AfterOff
+
+    return {AfterOff - StartOff, self->Addr + StartOff}  
+*/
 
 function string.OutCharSet (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part OutPropList
+	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
+							 // makes for confusing code. it WOULD have been good... if this were 1-based
+							 // because -1 is also the return value of a missing value.
+							 // nicer to make an explicit function that to handle end-relative searches
 	|| p = &CharProp.Props[0]
-	from = from max 0
-	After = After min .Length
 	|| addr = .addr
-	while From < After
-		ifn find contains p[addr[from++]]
-			return from-1
+	if from < After
+		from = from max 0
+		After = After min .Length
+		while From < After
+			ifn find contains p[addr[from++]]
+				return from-1
+	  else // oof
+		from = from min .length
+		After = After max 0
+		while From > After
+			ifn find contains p[addr[--from]]
+				return from
 	
 
 datatype CharProp (uint16)
