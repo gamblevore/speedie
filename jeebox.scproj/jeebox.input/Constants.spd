@@ -49,13 +49,15 @@ Module Jeebox
 	|dictionary of string| EscapeChr
 
 	|| CSWordMiddle2	= "AZaz09__".UniCS
+	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
+/// OOOFF
 	|| CSWordMiddle		= charprop.NameMid
 	|| CSNum			= jeebox.CSWordMiddle
-	|| CSLettersOnly    = "AZaz".UniCS
-//	|| CSLettersOnly    = charprop.LettersOnly
+	|| CSLettersOnly    = charprop.LettersOnly
 	|| CSWordStart		= charprop.LettersUnderScore
-	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
 	|| CSLine			= charprop.Line
+	
+// Is there any pattern here? can we subdivide these into simple overlapping groups?
 	|| CSAfterDot		= " ,:\t\n\r\\".charset(false)
 	|| CSAfterStatement	= " ,:\t\n\r\\'`\"{#\$%".charset(false)
 	|| CSWrapSplit		= " \t\n\r\f-^+/\\*:;<>=,".charset(false)
@@ -63,12 +65,12 @@ Module Jeebox
 	.InitConstants
 
 
-	function string.UniCS (|charset!|)
+	helper string.UniCS (|charset!|)
 		// all valid unicode-ranges
 		return (self + #(80BFC2F4)#).charset 	
 
 
-	function AddEscape (|byte| i, |faststring| fs)
+	helper AddEscape (|byte| i, |faststring| fs)
 		opt norefcounts
 		|| f = string.byte(i)
 		require  !.EscapeStr![f]  or  !.EscapeChr![f]
@@ -79,7 +81,7 @@ Module Jeebox
 		.Escapechr![f] ?= t
 
 
-	function InitConstants
+	helper InitConstants
 		array.new // needed by argv
 
 		.EscapeChr = dictionary.Copy(.EscapeStr!)
@@ -91,7 +93,6 @@ Module Jeebox
 		.EscapeChr![`$`] 	= nil|string|
 
 		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
-		//.JS_UnEscapeStr[`\n`]	= ""						// c/js compat
 		.Unescapestr![`\`]	= ""
 		.EscapeStr!["'"]		= nil|stringzeroterminated|
 		
@@ -112,7 +113,7 @@ Module Jeebox
 //		return .replaceall("``", "`")
 
 
-	function string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
+	helper string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
 		after = after min .length
 		while (off < after)
 			|| c = self[off++]
@@ -127,22 +128,22 @@ Module Jeebox
 				return off - 1
 	
 
-	function ASCII (|string|)
-		cpp_wrapper JB_ASCII
-	
-	function Upper (|string|)
-		cpp_wrapper JB_Upper
-	
-	function Lower (|string|)
-		cpp_wrapper JB_Lower
-
-
-function String.Unescape (|string|)
+//	function ASCII (|string|)
+//		cpp_wrapper JB_ASCII
+//	
+//	function Upper (|string|)
+//		cpp_wrapper JB_Upper
+//	
+//	function Lower (|string|)
+//		cpp_wrapper JB_Lower
+//
+//
+inline String.Unescape (|string|)
 	return .ReplaceAll( Jeebox.UnEscapeStr! )
 
-function String.Escape (|string|)
+inline String.Escape (|string|)
 	return .ReplaceAll( jeebox.EscapeStr! )
 
-function String.EscapeChr (|string|)
+inline String.EscapeChr (|string|)
 	return .ReplaceAll( jeebox.EscapeChr! )
 

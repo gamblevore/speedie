@@ -20,8 +20,8 @@ class Charset
 	constructor (|string| Chars, |bool| UseRange = false)
 		cpp_wrapper JB_CS_Constructor
 	
-	function Invert (|charset|)
-		cpp_wrapper JB_CS_Invert
+//	function Invert (|charset|)
+//		cpp_wrapper JB_CS_Invert
 	
 	function Reverse
 		disabled "use invert"

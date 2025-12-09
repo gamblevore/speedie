@@ -3,16 +3,23 @@
 // remove charset...?
 // could just try replacing one or two calls with this... see how we get on
 // if it works... then replace more.
+
 datatype CharPropList (uint)
 	linkage
 		numeric false
+	
 	operator contains (|byte| b, |bool|)
 		inline
 		return (1<<b.Property|uint|) & self|uint|
+		
 	operator contains (|charprop| b, |bool|)
 		inline
 		cpp_part ContainsProp
 		return (1<<b|uint|) & self|uint|
+		
+	operator contains (|string| s, |bool|)
+		cpp_Part ContainsStr
+		return s.OutCharSet(self) == -1
 		
 	operator Plus (|charproplist| p, |charproplist|)
 		inline
