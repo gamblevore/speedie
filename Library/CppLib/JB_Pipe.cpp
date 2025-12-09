@@ -41,7 +41,7 @@
 
 
 extern "C" {
-const int RD = 0;   const int WR = 1;
+//const int RD = 0;   const int WR = 1;
 bool				CanASMBKPT = true;
 
 

@@ -1030,7 +1030,10 @@ int JB_File_SizeSet ( JB_File* self, IntPtr N ) {
 
 s64 JB_File_Size ( JB_File* self ) {
 	struct _stat st;
-	return Stat_(self, &st) * (u64)st.st_size;
+	if (Stat_(self, &st))
+		if (S_ISDIR(st.st_mode))
+			return st.st_size;
+	return 0;
 }
 
 
