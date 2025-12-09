@@ -420,7 +420,7 @@ extend Parser
 	
 	
 	function fCommentLine (ParseHandler)
-		.gotoendofline(parser.Nextstart)
+		.GotoEndOfLine(parser.Nextstart)
 		return parser._EndOfLineMarker
 
 
@@ -1293,10 +1293,11 @@ module parser
 		cpp_wrapper JB_Tk__GetData
 
 //	|uint|					CountStats  // better to put in the memory manager itself!
+	|MessagePosition|		Using
+	|fnIDGenerator|			Splitter = &parser.range
+	visible false
 	|message|				_EndOfLineMarker
 	|dictionary of string|  _ErrorNames = nil
-	|fnIDGenerator|			Splitter = &parser.range
-	|MessagePosition|		Using
 	|uint16|                _StopBars
 	|bool|					_DotInsertAllow
 
