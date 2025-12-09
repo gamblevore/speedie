@@ -32,7 +32,7 @@ module CakeRun
 	
 	function GetStructure (|bool|)
 		opt norefcounts
-		|| pk = .InputPack
+		|| pk = .InputPack$
 		|| app = pk.last(@arg)[@tmp, "app"]
 		|| sz = app[@num]
 		|| arg = sz.next(@arg)
@@ -46,7 +46,7 @@ module CakeRun
 		
 
 	function file.Compile (|file|)
-		|| args = [self, "--bake", "--quiet"]
+		|| args = ["--bake", "--quiet", self]
 		|| Answer = speedie.ExecuteStr(args)		// now what? now what? now what
 			rz = Answer.file
 			if !rz.Exists
@@ -54,13 +54,15 @@ module CakeRun
 		
 		
 	function InputPack (|messageroot|)
-		|string--| x = app.args[0]
+		|string--| x = app[0]
+		|| pz
 		|| fl = x.FileThatExists("load executable")
 			if fl isa "spd" or "scproj" or "uwu" or "uwuz"
-				fl = fl.Compile
-		if fl
-			rz = fl.parse
-			.FileSrc = rz.OriginalParseData
-			if !rz.expect(@tmp, "cake")
-				rz = nil
+/				fl = fl.Compile
+				if fl
+					pz = fl.parse
+					.FileSrc = pz.OriginalParseData
+					if !pz.expect(@tmp, "cake")
+						pz = nil
+		return pz
 

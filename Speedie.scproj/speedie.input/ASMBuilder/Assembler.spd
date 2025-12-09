@@ -59,6 +59,7 @@ struct Assembler
 		function SafeDebugInfo (|string|)
 			rz = .debuginfo.GetResult
 			if !rz.ParseJbin
+				error "Generated invalid debug info (jbin)"
 				rz = ""
 				
 

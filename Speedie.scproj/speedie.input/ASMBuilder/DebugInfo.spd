@@ -27,7 +27,7 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 	opt norefcounts
 	
-/	|| W = .DumpCode(pos)
+	|| W = .DumpCode(pos)
 	|| Reg = 0
 	|| s = ""
 	if pos >= 0

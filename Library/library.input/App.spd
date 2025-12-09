@@ -25,8 +25,17 @@ function TrySleep (|date| Duration=1s, |bool|)
 inline TrySleep (|float| Duration, |bool|)
 	return .TrySleep(duration.date)
 	
-syntax access (|int| i, |string|)
-	disabled "use app.args[i]"
+syntax access (|int| i, |string?|)
+	opt norefcounts
+	return app.args[i]
+
+syntax access (|string| name, |string|)
+	cpp_part ArgValue
+	opt norefcounts
+	for R in ._rawargs
+		if R.argname ~= name
+			rz = R.argvalue
+			exit
 
 function Option (|string| name, |bool|)
 	disabled "Use app.yes()"
@@ -62,15 +71,6 @@ function Crash (|string| reason="")
 
 function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog
-
-
-syntax access (|string| name, |string|)
-	opt norefcounts
-	for R in ._rawargs
-		if R.argname ~= name
-			rz = R.argvalue
-			exit
-
 
 syntax expect (|string?| s=nil)
 	inline
