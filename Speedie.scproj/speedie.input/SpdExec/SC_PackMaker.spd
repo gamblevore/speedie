@@ -29,7 +29,7 @@ module PackMaker
 	
 	
 	helper AddFunc (|SCFunction| f)
-		opt norefcounts
+/		opt norefcounts
 		if f.IsLibrary
 			if f.NeedsLibExport
 				.LibFuncs <~ f
@@ -170,11 +170,11 @@ module PackMaker
 	
 	
 	function AddDebugStuff (|jbin| j)
-		|| dbg = assembler.sh.debuginfo			#require
+		|| dbg = assembler.debuginfo			#require
 
 		j.tmp("debug")
 		|| str = dbg.GetResult.Compress
-		assembler.sh.debuginfo = nil
+		assembler.debuginfo = nil
 		compiler.stDebugInfo += str.length
 		j.AddStr(str)
 		j.exit(2)

@@ -32,7 +32,6 @@ struct Assembler
 	|bool|						NeedsRework
 	|bool|						Inited
 	|int|						DbgMark
-	|jbin?|						DebugInfo
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
@@ -55,6 +54,7 @@ struct Assembler
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|int|						StringsOutOfRange
+		|jbin?|						DebugInfo
 
 
 	
@@ -76,7 +76,7 @@ struct Assembler
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
-		|| dbg = .DebugInfo
+		|| dbg = DebugInfo
 			.dbgmark = dbg.Length // for .rework
 			dbg.Enter(@msg, fn.exportname)
 
@@ -604,9 +604,10 @@ struct Assembler
 		
 	function FillDebugInfo
 		opt norefcounts
-		require options.TargetDebug and !.debuginfo
+		if !options.makeexec
+			require options.TargetDebug and !debuginfo
 		|| j = jbin()
-		.debuginfo = j
+		debuginfo = j
 		
 		j.Enter(@msg, "class")
 		.FillLayout(j)
@@ -704,7 +705,7 @@ struct Assembler
 		if !.last.IsFinisher
 			.FinishReturn
 		.FinishMost
-		|| dbg = .DebugInfo
+		|| dbg = DebugInfo
 			dbg.exit
 
 

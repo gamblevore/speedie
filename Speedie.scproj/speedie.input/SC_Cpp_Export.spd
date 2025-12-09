@@ -555,6 +555,7 @@ function FillInterpreter
 	LibStability.StabiliseGlobs
 
 	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) 		// rebuild size
+	assembler.sh.FillDebugInfo
 
 	.WriteVMGlobsAndPtrs(.ModuleProperties)
 
@@ -592,7 +593,7 @@ function WriteVMFuncs (|faststringcpp| fs)
 	fs.appendvoid("0")
 
 
-function WriteVMGlobs (|faststringcpp| fs)
+function WriteLibGlobLookup (|faststringcpp| fs)
 	opt norefcounts
 	|| Position = 0
 	// so... what should I do?
@@ -619,13 +620,18 @@ __lib__ unsigned short JB_GlobTable[] = {
 		fs.AppendLibGlob(g)
 		fs <~ "),\n"
 		position = id
-	fs <~ "0 \n};\n"
+	fs <~ "0 \n};
+
+extern \"C\" unsigned short* JB_App__GlobTable() {
+	return &JB_GlobTable[0];
+}
+"
 
 	
 function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	opt norefcounts
 	fs <~ "// glob list\n"
-	.WriteVMGlobs(fs)
+	.WriteLibGlobLookup(fs)
 	
 	fs <~ "// entire_function_list!\n\n"
 	for f in packmaker.LibFuncs
@@ -636,16 +642,23 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	.WriteVMFuncs(fs)
 	fs <~ "};
 
+
+extern \"C\" JB_StringC* JB_App__LibDebug() {
+	int n = ${assembler.debuginfo|string|.length};
+	const char* Data = "
+
+	fs.AppendCppAll(assembler.debuginfo|string|)
+	
+	fs <~ ";
+	return JB_StrCN(Data, n);
+}
+
 extern \"C\" void** JB_App__LibFuncs() {
 	return &(JB_PackPtrs[0]);
 }
 
 extern \"C\" void** JB_App__LibGlobs() {
 	return (void**)(&JB__);
-}
-
-extern \"C\" unsigned short* JB_App__GlobTable() {
-	return &JB_GlobTable[0];
 }
 
 "
@@ -1580,7 +1593,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs.AppendCpp(.name)
 
 	
-	function Faststring.AppendCppAll (|string| s)
+	function Faststring.AppendCppAll (|string?| s)
 		self <~ '"'
 		for c in s
 			self <~ `\x`

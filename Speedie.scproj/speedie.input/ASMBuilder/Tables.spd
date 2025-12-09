@@ -357,7 +357,7 @@ function Decl (fn_asm) // declaresub declare
 	|| rel = exp.last!
 	dest = .DeclareBody(rel, ty)
 	rz = declsub(self, exp, dest, ty, rel)
-	|| dbg = .DebugInfo
+	|| dbg = assembler.DebugInfo
 /		ty.DumpDecl(dbg, .index) // or .index+1?
 	// we also need to close decls!
 	
