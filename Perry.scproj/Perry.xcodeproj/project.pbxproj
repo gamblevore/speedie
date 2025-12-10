@@ -75,6 +75,10 @@
 		AC13B2A22EE1E78E00BF1567 /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528E922961F99F005EFB9D /* JB_Main.cpp */; };
 		AC13B2AA2EE1E7B600BF1567 /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D1592ED1D6DA00EDFB82 /* JB.cpp */; };
 		AC13B2AB2EE1E7BC00BF1567 /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */; };
+		AC2218C42EE9A6DC004D73E0 /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */; };
+		AC2218C62EE9A6DC004D73E0 /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */; };
+		AC2218C72EE9A6DC004D73E0 /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */; };
+		AC2218C92EE9A6DC004D73E0 /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */; };
 		AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C12B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
@@ -154,7 +158,6 @@
 		AC66D1302ED1D54C00EDFB82 /* JB_Saveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED62961F9B4005EFB9D /* JB_Saveable.cpp */; };
 		AC66D1312ED1D54C00EDFB82 /* JB_Errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED42961F9B3005EFB9D /* JB_Errors.cpp */; };
 		AC66D1322ED1D54C00EDFB82 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */; };
-		AC66D1332ED1D54C00EDFB82 /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC12961F9B2005EFB9D /* JB_Main.cpp */; };
 		AC66D1342ED1D54C00EDFB82 /* JB_VM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC62961F9B2005EFB9D /* JB_VM.cpp */; };
 		AC66D1352ED1D54C00EDFB82 /* JB_Pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED02961F9B3005EFB9D /* JB_Pipe.cpp */; };
 		AC66D1362ED1D54C00EDFB82 /* JB_Child.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECD2961F9B3005EFB9D /* JB_Child.cpp */; };
@@ -171,11 +174,8 @@
 		AC66D1412ED1D54C00EDFB82 /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECC2961F9B3005EFB9D /* JB_FastString.cpp */; };
 		AC66D1422ED1D54C00EDFB82 /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC82961F9B3005EFB9D /* JB_String.cpp */; };
 		AC66D1432ED1D54C00EDFB82 /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECF2961F9B3005EFB9D /* JB_Dictionary.cpp */; };
-		AC66D1452ED1D54C00EDFB82 /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */; };
 		AC66D1462ED1D54C00EDFB82 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
 		AC66D1472ED1D54C00EDFB82 /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
-		AC66D15C2ED1D6DA00EDFB82 /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D1592ED1D6DA00EDFB82 /* JB.cpp */; };
-		AC66D15D2ED1D6DA00EDFB82 /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */; };
 		AC8EA6B92D726C6F00158029 /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */; };
 		ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EBF2961F9B2005EFB9D /* JB_Vectors.cpp */; };
 		ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528E7D2961F946005EFB9D /* JB_Globals.cpp */; };
@@ -208,6 +208,9 @@
 		ACB2D26E29BCCAB70070E60F /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC82961F9B3005EFB9D /* JB_String.cpp */; };
 		ACB2D26F29BCCAB70070E60F /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECF2961F9B3005EFB9D /* JB_Dictionary.cpp */; };
 		ACB2D27129BCCAB70070E60F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
+		ACB529BC2EE9E6C700D6524D /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */; };
+		ACB529BD2EE9E6CA00D6524D /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D1592ED1D6DA00EDFB82 /* JB.cpp */; };
+		ACB529C02EE9EFF100D6524D /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC12961F9B2005EFB9D /* JB_Main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -260,12 +263,19 @@
 			remoteGlobalIDString = AC9220A22857A127002F3F97;
 			remoteInfo = DebugBuilder;
 		};
-		ACBA49F427AAB4B9009C2631 /* PBXContainerItemProxy */ = {
+		ACB529B82EE9E44100D6524D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AC9E1719233A859B003B433F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = ACBA49F027AAB490009C2631;
-			remoteInfo = speediebuilder;
+			remoteGlobalIDString = AC61010D2798768C00278BEF;
+			remoteInfo = SpeedieLib;
+		};
+		ACB529BA2EE9E5E900D6524D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AC9E1719233A859B003B433F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC66D1522ED1D58700EDFB82;
+			remoteInfo = ExecBuilder;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -319,6 +329,8 @@
 		AC1050122D6205EC00BB929B /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../Library/libSDL2.dylib; sourceTree = "<group>"; };
 		AC13B27E2EE1E77300BF1567 /* PerryExec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryExec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC13B2A72EE1E78E00BF1567 /* libExecLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libExecLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_Intel.S; path = ../Library/CppLib/FF_Intel.S; sourceTree = "<group>"; };
+		AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_ARM64.S; path = ../Library/CppLib/FF_ARM64.S; sourceTree = "<group>"; };
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
@@ -389,7 +401,7 @@
 		AC528F132961F9F0005EFB9D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
 		AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
-		AC61010E2798768C00278BEF /* libSpeedieLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedieLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC61010E2798768C00278BEF /* libSpeedie.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedie.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC66D14D2ED1D54C00EDFB82 /* Exec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Exec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC66D1592ED1D6DA00EDFB82 /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../exec.scproj/Cpp/JB.cpp; sourceTree = "<group>"; };
 		AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../exec.scproj/Cpp/JB_Globals.cpp; sourceTree = "<group>"; };
@@ -429,7 +441,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC66D1452ED1D54C00EDFB82 /* libSpeedie.dylib in Frameworks */,
 				AC66D1462ED1D54C00EDFB82 /* AVFoundation.framework in Frameworks */,
 				AC66D1472ED1D54C00EDFB82 /* libSDL2.dylib in Frameworks */,
 			);
@@ -546,6 +557,8 @@
 			children = (
 				AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */,
 				AC66D1592ED1D6DA00EDFB82 /* JB.cpp */,
+				AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */,
+				AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */,
 				AC66D15B2ED1D6DA00EDFB82 /* JB.h */,
 			);
 			name = "Compiled Src Exec";
@@ -579,7 +592,7 @@
 			isa = PBXGroup;
 			children = (
 				ACB86AF9260BB58900555758 /* Perry.app */,
-				AC61010E2798768C00278BEF /* libSpeedieLib.dylib */,
+				AC61010E2798768C00278BEF /* libSpeedie.dylib */,
 				ACB2D27929BCCAB70070E60F /* PerryDebug.app */,
 				AC66D14D2ED1D54C00EDFB82 /* Exec.app */,
 				AC13B27E2EE1E77300BF1567 /* PerryExec.app */,
@@ -661,6 +674,7 @@
 			buildToolPath = /usr/local/bin/speedie;
 			buildWorkingDirectory = "";
 			dependencies = (
+				ACB529B92EE9E44100D6524D /* PBXTargetDependency */,
 			);
 			name = SpeedieBuilder;
 			passBuildSettingsInEnvironment = 0;
@@ -682,6 +696,7 @@
 			);
 			dependencies = (
 				AC13B2502EE1E77300BF1567 /* PBXTargetDependency */,
+				ACB529BB2EE9E5E900D6524D /* PBXTargetDependency */,
 			);
 			name = PerryExec;
 			productName = Multiplay;
@@ -717,11 +732,10 @@
 			buildRules = (
 			);
 			dependencies = (
-				ACBA49F527AAB4B9009C2631 /* PBXTargetDependency */,
 			);
 			name = SpeedieLib;
 			productName = SpeedieLib;
-			productReference = AC61010E2798768C00278BEF /* libSpeedieLib.dylib */;
+			productReference = AC61010E2798768C00278BEF /* libSpeedie.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		AC66D11E2ED1D54C00EDFB82 /* Exec */ = {
@@ -909,7 +923,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC2218C92EE9A6DC004D73E0 /* FF_ARM64.S in Sources */,
 				AC13B2AA2EE1E7B600BF1567 /* JB.cpp in Sources */,
+				AC2218C62EE9A6DC004D73E0 /* FF_Intel.S in Sources */,
 				AC13B2AB2EE1E7BC00BF1567 /* JB_Globals.cpp in Sources */,
 				AC13B2852EE1E78E00BF1567 /* JB_Errors.cpp in Sources */,
 				AC13B2862EE1E78E00BF1567 /* JB_Compress.cpp in Sources */,
@@ -985,7 +1001,9 @@
 			files = (
 				AC66D1242ED1D54C00EDFB82 /* JB_Vectors.cpp in Sources */,
 				AC66D1262ED1D54C00EDFB82 /* JB_OSX.m in Sources */,
+				ACB529C02EE9EFF100D6524D /* JB_Main.cpp in Sources */,
 				AC66D1272ED1D54C00EDFB82 /* JB_Tokeniser.cpp in Sources */,
+				AC2218C42EE9A6DC004D73E0 /* FF_Intel.S in Sources */,
 				AC66D1282ED1D54C00EDFB82 /* JB_Date.cpp in Sources */,
 				AC66D12A2ED1D54C00EDFB82 /* JB_MSR.cpp in Sources */,
 				AC66D12B2ED1D54C00EDFB82 /* JB_BasicIO.cpp in Sources */,
@@ -996,8 +1014,7 @@
 				AC66D1302ED1D54C00EDFB82 /* JB_Saveable.cpp in Sources */,
 				AC66D1312ED1D54C00EDFB82 /* JB_Errors.cpp in Sources */,
 				AC66D1322ED1D54C00EDFB82 /* JB_Temporal.cpp in Sources */,
-				AC66D1332ED1D54C00EDFB82 /* JB_Main.cpp in Sources */,
-				AC66D15D2ED1D6DA00EDFB82 /* JB_Globals.cpp in Sources */,
+				ACB529BC2EE9E6C700D6524D /* JB_Globals.cpp in Sources */,
 				AC66D1342ED1D54C00EDFB82 /* JB_VM.cpp in Sources */,
 				AC66D1352ED1D54C00EDFB82 /* JB_Pipe.cpp in Sources */,
 				AC66D1362ED1D54C00EDFB82 /* JB_Child.cpp in Sources */,
@@ -1010,10 +1027,11 @@
 				AC66D13D2ED1D54C00EDFB82 /* JB_ByteMap.cpp in Sources */,
 				AC66D13E2ED1D54C00EDFB82 /* JB_DirReaderWin32.cpp in Sources */,
 				AC66D13F2ED1D54C00EDFB82 /* JB_File.cpp in Sources */,
+				ACB529BD2EE9E6CA00D6524D /* JB.cpp in Sources */,
 				AC66D1402ED1D54C00EDFB82 /* JB_Array.cpp in Sources */,
 				AC66D1412ED1D54C00EDFB82 /* JB_FastString.cpp in Sources */,
+				AC2218C72EE9A6DC004D73E0 /* FF_ARM64.S in Sources */,
 				AC66D1422ED1D54C00EDFB82 /* JB_String.cpp in Sources */,
-				AC66D15C2ED1D6DA00EDFB82 /* JB.cpp in Sources */,
 				AC66D1432ED1D54C00EDFB82 /* JB_Dictionary.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1134,10 +1152,15 @@
 			target = AC9220A22857A127002F3F97 /* DebugBuilder */;
 			targetProxy = ACB2D27B29BCCB9D0070E60F /* PBXContainerItemProxy */;
 		};
-		ACBA49F527AAB4B9009C2631 /* PBXTargetDependency */ = {
+		ACB529B92EE9E44100D6524D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = ACBA49F027AAB490009C2631 /* SpeedieBuilder */;
-			targetProxy = ACBA49F427AAB4B9009C2631 /* PBXContainerItemProxy */;
+			target = AC61010D2798768C00278BEF /* SpeedieLib */;
+			targetProxy = ACB529B82EE9E44100D6524D /* PBXContainerItemProxy */;
+		};
+		ACB529BB2EE9E5E900D6524D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC66D1522ED1D58700EDFB82 /* ExecBuilder */;
+			targetProxy = ACB529BA2EE9E5E900D6524D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1180,6 +1203,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__VM__",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1226,6 +1250,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__VM__",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1259,6 +1284,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__VM__",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1290,6 +1316,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__VM__",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1323,7 +1350,7 @@
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Speedie;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -1354,7 +1381,7 @@
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Speedie;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -1397,6 +1424,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__VM__",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1443,6 +1471,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__VM__",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
