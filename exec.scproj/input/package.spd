@@ -55,7 +55,8 @@ module CakeRun
 		
 	function InputPackFile (|File|)
 		opt norefcounts
-		|| fl = app[0].FileThatExists("load executable")
+		|| path = app[0] #expect ("No path specified")
+		|| fl = path.FileThatExists("load executable")
 			if fl isa "spd" or "scproj" or "uwu" or "uwuz"
 				fl = fl.Compile
 		return fl
