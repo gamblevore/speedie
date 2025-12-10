@@ -42,11 +42,6 @@ mkdir -p "/usr/local/include/"
 chmod 775 /usr/local/include/
 chown $U /usr/local/include/
 
-echo "Creating dir /usr/local/bin/"
-mkdir -p "/usr/local/bin/"
-chmod 775 /usr/local/bin/
-chown $U /usr/local/bin/
-
 
 echo "Cleaning old files"
 rm -rf Build/* 2>/dev/null || true
@@ -77,7 +72,7 @@ chmod 775 Build/users
 chown $U Build/users
 
 
-echo "Creating Links"
+echo "Linking Speedie"
 
 ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/spd
 chmod 775 /usr/local/bin/spd
@@ -87,6 +82,14 @@ chown $U /usr/local/bin/spd
 ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/speedie
 chmod 775 /usr/local/bin/speedie
 chown $U /usr/local/bin/speedie
+
+/usr/local/speedie/Terminal/Speedie /usr/local/speedie/exec.scproj --output_path=/usr/local/speedie/Terminal/Cake
+
+echo "Linking Speedie"
+
+ln -sf /usr/local/speedie/Terminal/Cake /usr/local/bin/cake
+chmod 775 /usr/local/bin/cake
+chown $U /usr/local/bin/cake
 
 
 echo ""

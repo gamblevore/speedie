@@ -69,6 +69,7 @@ ${unmod(dest)}
 |file|   CppLib
 |string| SpdSrc
 |string| SpdTerm
+|string| ExecTerm
 |string| LibPath
 
 module Vars
@@ -97,10 +98,11 @@ sudo apt install gedit
 		
 		LibName  = "libjeebox.$ext" 
 		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
-		ExecFlags   = "$CFlags -g -ljeebox"
+		ExecFlags= "$CFlags -g -ljeebox"
 		CppLib   = "$Speedie/Library/CppLib".file
 		SpdSrc   = "$Speedie/Speedie.scproj/Build"
 		SpdTerm  = "$Speedie/Terminal/Speedie"
+		ExecTerm = "$Speedie/Terminal/Cake"
 		LibPath  = "/usr/local/lib/$LibName"
 
 
@@ -124,7 +126,6 @@ cd $Speedie/jeebox.scproj/Examples
 echo \"Creating directories\"
 ${mkdir(`Build`)}
 ${mkdir(`/usr/local/include/`)}
-${mkdir(`/usr/local/bin/`)}
 
 echo \"Cleaning old files\"
 rm -rf Build/* 2>/dev/null || true
@@ -138,9 +139,13 @@ ${comp(`xml`)}
 ${comp(`test`)}
 ${comp(`users`)}
 
-echo \"Creating Links\"
+echo \"Linking Speedie\"
 ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
+$SpdTerm $Speedie/exec.scproj --output_path=$Speedie/Terminal/Cake
+
+echo \"Linking Speedie\"
+${link(ExecTerm, `/usr/local/bin/cake`)}
 
 echo \"\"
 echo \"Build Complete.\"

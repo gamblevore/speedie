@@ -52,3 +52,4 @@ Utils/CompilerTest
 Speedie.scproj/.strings.txt
 *.cake
 /Documentation/CppComparison/*
+Terminal/Cake
