@@ -1,4 +1,4 @@
 #!/usr/local/bin/spd
 
 main
-	"Hello hello_world!"
+	"Hello world!"
