@@ -948,7 +948,7 @@ function AutoCompleteSub (|message| ff, |string| name, |message| into)
 
 
 function ActualDefine (|message| m, |message| s)
-	|| f = s.filepath			#expect "nopath"
+	|| f = s.originalfilepath			#expect "nopath"
 	m <~ (@sstr, f)
 	m <~ s.position
 
@@ -1082,10 +1082,10 @@ function message.FoundFunc (|scfunction| f, |bool|)
 
 helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
 	opt norefcounts
-	rz = .filepath
+	rz = .originalfilepath
 	for ss.flat in self
 		if ss.foundfunc(fn)
-			rz ?= ss.FilePath
+			rz ?= ss.originalfilepath
 			self = ss
 			exit
 	if rz

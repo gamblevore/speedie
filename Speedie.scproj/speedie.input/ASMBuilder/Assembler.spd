@@ -60,11 +60,13 @@ struct Assembler
 			require .debuginfo|string|.length
 			rz = .debuginfo.GetResult
 			|| tmp = rz.ParseJbin 
-				target debug
+				0
+/*				target debug
 					printline tmp
 					if debug
 						.debuginfo! <~ rz
 						rz = ""
+*/
 			  else
 				error "Generated invalid debug info (jbin)"
 				rz = ""

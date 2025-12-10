@@ -64,7 +64,7 @@ class Error (Message)
 		.position = node.position
 
 		if !.path
-			.path = node.filepath
+			.path = node.originalfilepath
 		.OriginalData = node.OriginalParseData
 		
 		

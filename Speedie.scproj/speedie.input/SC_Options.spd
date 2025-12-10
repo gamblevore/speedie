@@ -146,6 +146,14 @@ module Feedback
 
 		return StdErr.OK and Compiler.BaseProjectPath.Exists
 
+	
+	function SetOutputPath (|string| path)
+		|| value = path.PathFixSpd
+		if options.output_path != value
+			check (!options.output_path) ("output_path already specified: " + options.output_path)
+			options.output_path = value 
+			options.ForceRecompile = true // it's what we expect
+		
 
 	function string.IsSpeedieSrc (|bool|)
 		return (self isa "spd")
@@ -398,9 +406,7 @@ module Feedback
 
 		+'output_path'
 			explain(purpose, "Specifies the build product path")$
-			options.output_path = value.AbsolutePath
-			options.output_path.parent.file.mustexist
-			options.ForceRecompile = true // it's what we expect
+			.setoutputpath value
 		
 		+'force'
 			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$
