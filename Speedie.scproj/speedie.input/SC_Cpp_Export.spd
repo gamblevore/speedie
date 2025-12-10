@@ -579,6 +579,9 @@ function faststring.AppendWrap (|scfunction| f)
 
 function WriteVMFuncs (|faststringcpp| fs)
 	opt norefcounts
+	for 32
+		fs.appendvoid("(int64)(-1)") // ooof
+	
 	|| Position = 0
 	for fn in packmaker.libfuncs
 		if fn.IsLibrary and fn.NeedsLibExport

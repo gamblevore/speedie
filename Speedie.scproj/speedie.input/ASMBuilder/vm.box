@@ -412,7 +412,7 @@ POS 27
 // as globals.
 
 /**/ AFNC (FuncAddr)
-		i1 = FuncAddr(vm, Op)
+		i1 = FuncAddr(vm, Op, Code)
 
 
 /**/ ALLO (Alloc)

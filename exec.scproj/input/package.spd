@@ -53,16 +53,18 @@ module CakeRun
 				rz = nil
 		
 		
-	function InputPack (|messageroot|)
-		|string--| x = app[0]
-		|| pz
-		|| fl = x.FileThatExists("load executable")
+	function InputPackFile (|File|)
+		opt norefcounts
+		|| fl = app[0].FileThatExists("load executable")
 			if fl isa "spd" or "scproj" or "uwu" or "uwuz"
-/				fl = fl.Compile
-				if fl
-					pz = fl.parse
-					.FileSrc = pz.OriginalParseData
-					if !pz.expect(@tmp, "cake")
-						pz = nil
-		return pz
+				fl = fl.Compile
+		return fl
+
+	function InputPack (|messageroot|)
+		|| fi = .InputPackFile
+			rz = fi.Parse
+			if rz
+				.FileSrc = rz.OriginalParseData
+				if !rz.expect(@tmp, "cake")
+					rz = nil
 

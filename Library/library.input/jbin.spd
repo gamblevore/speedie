@@ -167,7 +167,7 @@ helper InputStream.NextMsgInfo (|uint64|)
 function InputStream.StreamJbin (|int64| Remain=1G, |MessageRoot|)	
 	if .eat("#!") == 2				 // shebang
 		.find('\n')
-	expect (.HasHeader(Jbin.Header))  (Self, "Not jbin")
+	expect (.HasHeader(Jbin.Header))  (Self, "Parsed data lacks jbin header.	")
 
 	._Object = nil
 	|| Root = .NextMsg

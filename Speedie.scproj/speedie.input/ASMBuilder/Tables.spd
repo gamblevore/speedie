@@ -801,10 +801,9 @@ function Str (fn_asm)
 	|| real = exp.name|MessageID|
 	|| k = real.Position
 	if !k and (Compiler is Hungry)
-		PackMaker.PackStrings <~ real
-		k = PackMaker.PackGlobSize
+/		PackMaker.PackStrings <~ real
+		k = PackMaker.PackGlobSize + (PackMaker.PackStrings.length<<3)
 		real.Position = k
-		PackMaker.PackGlobSize = k.alignup(8) + 8
 	
 	if k <= 20~bits
 		return exp.GOBJ(dest, 0, 0, K>>3) * dest		// seems good!
@@ -854,12 +853,6 @@ function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
 	return T
 }
 
-
-
-//function SCFunction.TrackReturns (|scdecl| D)
-///	if d isnt VarThatGotReturned // remove function?
-//		.ReturnedVars++
-//		(d is VarThatGotReturned)	
 
 
 function message.HasAsmStuff (|bool|)

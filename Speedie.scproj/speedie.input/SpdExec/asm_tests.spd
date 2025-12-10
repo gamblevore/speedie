@@ -626,17 +626,17 @@ function ConstRemovals (|message| AAA, |string|)
 
 
 function TestGlob (|int|)
-	|| g = &Glob // sigh
+	|| g = &.Glob // sigh
 	g[]++
 
 
 function TestAtomic (|int|)
 	visible
 	for i in 100
-		Glob++
-		Glob += i&1
-		bolg--
-	return Glob - bolg*10
+		.Glob++
+		.Glob += i&1
+		.bolg--
+	return .Glob - .bolg*10
 
 
 function ConstRemovals2 (|message| a, |string|)

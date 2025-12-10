@@ -83,6 +83,7 @@ void	JB_InitClassList(SaverLoadClass fn);
 
 struct	jb_vm;
 jb_vm*	JB_ASM__VM();
+void	JB_ASM_FillTable	(jb_vm* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*	JB_ASM__Run			(u32* Code, u32 CodeSize);
 void*	JB_ASM__Load		(JB_StringC* S);
 void**	JB_ASM_InitTable	(jb_vm* V, int n, int g);

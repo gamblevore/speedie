@@ -6,6 +6,7 @@ module Linkage
 	|| Flagz = message()		// for the linker i guess...
 	
 	syntax access (|string| name, |bool|)
+		opt norefcounts
 		return linkage.GetFlag(name).yes
 	
 	function Interpreter (|bool|)
@@ -43,7 +44,7 @@ module Linkage
 		Linkage.LinkCollect(s, Compiler.Program, nil)
 		options.MakeExec = linkage.interpreter
 		|| Combo = options.MakeExec + options.modepack
-		check (Combo <= 1) ("Can't bake exec/cake_run!")
+		check (Combo <= 1) ("Can't bake exec!")
 		s.remove
 	
 
@@ -53,8 +54,7 @@ module Linkage
 		|| arg = node[@arg]
 			arg.ConfTake(.Flagz, "flags")
 			arg.ConfTake(.osxframeworks, "frameworks")
-			for ch in arg
-				error (ch)
+			arg.expectempty
 			return Compiler.program
 
 		error (ErrPlace, `Supposed to be like: linkage { osx = "linker flags", win = "linker flags2" }` )

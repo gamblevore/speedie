@@ -31,7 +31,7 @@ struct Assembler
     |uint16|                    NextBranchID
 	|bool|						NeedsRework
 	|bool|						Inited
-	|int|						DbgMark
+	|int|						DebugMark
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
@@ -56,9 +56,16 @@ struct Assembler
 		|int|						StringsOutOfRange
 		|jbin?|						DebugInfo
 
-		function SafeDebugInfo (|string|)
+		function SafeDebugInfo (|bool|debug = false, |string|)
+			require .debuginfo|string|.length
 			rz = .debuginfo.GetResult
-			if !rz.ParseJbin
+			|| tmp = rz.ParseJbin 
+				target debug
+					printline tmp
+					if debug
+						.debuginfo! <~ rz
+						rz = ""
+			  else
 				error "Generated invalid debug info (jbin)"
 				rz = ""
 				
@@ -83,7 +90,7 @@ struct Assembler
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		|| j = DebugInfo
-			.dbgmark = j.Length // for .rework
+			.DebugMark = j.Length // for .rework
 			j.Enter(@msg, fn.exportname) // AddDbg
 
 		for a in fn.Args
@@ -688,7 +695,7 @@ struct Assembler
 		.AddFuncParams(fn)
 
 
-	function CapASM
+	function CapASM 
 		opt norefcounts
 		|| fn = .out
 		|| n = .fnlength
@@ -748,9 +755,12 @@ function assembler.RootGen (|scfunction| fn)
 
 
 function Assembler.Rework (|SCFunction| fn,  |bool|)
-	// need to remove the debug info!
+	|| j = debuginfo
+		j.length = .debugmark
+
 	HoistSpace.NeedSpare(.FnLength)
 	HoistSpace.CopyFrom(.FuncStart, .FnLength)
+
 	.Orig = .FuncStart
 	.InitAndStartFunc(fn)
 	.RootGen(fn)

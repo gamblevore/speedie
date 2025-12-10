@@ -604,7 +604,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
-					"-D__vm__",
+					"-D__VM__",
 					"-fexperimental-library",
 				);
 				SDKROOT = macosx;
@@ -663,7 +663,7 @@
 				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
-					"-D__vm__",
+					"-D__VM__",
 					"-fexperimental-library",
 				);
 				SDKROOT = macosx;

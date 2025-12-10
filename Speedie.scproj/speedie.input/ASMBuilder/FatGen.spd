@@ -158,16 +158,6 @@ function message.RET (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 }
 
 
-function message.AFNC (|asmreg| r1 = nil, |int| Library = nil, |int| Index = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.AFNC, self)
-	rz.numinput(1) = Library
-	rz.numinput(2) = Index
-	rz.dest(0, r1, a)
-}
-
-
 function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh

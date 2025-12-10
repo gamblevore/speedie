@@ -51,9 +51,11 @@ class SpdFunc
 		return SPD - debugger.first!.SpeedieFunc
 	
 	function Run (|&ivec4|)
-/		jb_vm.vm.Registers 
 		|| spd = .Start
+			jb_vm.vm.Registers 
 			return jb_vm.Run(Spd, .length)
+		error (self, "Can't Run")
+		return Dummy
 		
 	render
 		fs <~ "0x"
@@ -65,5 +67,6 @@ class SpdFunc
 		SpdTable.LinksOK++
 		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
 	
-	
+	module
+		|ivec4| Dummy
 

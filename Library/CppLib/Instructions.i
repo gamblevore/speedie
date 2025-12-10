@@ -38,7 +38,7 @@
 ı RET: _
 	Code = ReturnFromFunc(vm, r, Op);
 ı AFNC: _
-	i1 = FuncAddr(vm, Op);
+	i1 = FuncAddr(vm, Op, Code);
 ı ALLO: _
 	AllocStack(vm, r, Op);
 ı KNSR: _

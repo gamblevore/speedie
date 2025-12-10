@@ -666,10 +666,10 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
 
-AlwaysInline int64 FuncAddr (jb_vm& vv, ASM Op) {
+AlwaysInline int64 FuncAddr (jb_vm& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
-		return (int64)(vv.Env.LibCallbacks[FuncAddr_Indexu].Code);
-	return (int64)(vv.Env.PackCallbacks[FuncAddr_Indexu].Code);
+		return (int64)(vv.Env.CppFuncs[FuncAddr_Indexu]);
+	return (int64)(Code+FuncAddr_Indexi);
 }
 
 

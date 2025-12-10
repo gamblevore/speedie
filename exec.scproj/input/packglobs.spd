@@ -1,8 +1,8 @@
 
 
 module Globals
-	|memory|				PackGlobs
-	|&byte|					GlobBase = Globals.LibGlobs|&byte|
+//	|memory|				PackGlobs
+	|&byte|					LibBase = Globals.LibGlobs|&byte|
 	|&uint16|				LibLink = Globals.GlobTable
 	|uint|					LibMax
 
@@ -15,23 +15,27 @@ module Globals
 	
 	function CollectPackGlobs (|message| size_msg, |bool|)
 		opt norefcounts
-		|int| glob_size = size_msg.int(0, 1, 256MB)$
+		|int| glob_size = size_msg.int(0, 1, 216MB)$ // 144*
 		
 		|| input		= InputStream(cakerun.strings)
-		|| n_strs		= input.HInt
+/		|| n_strs		= input.HInt
 		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
 		|| alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
-		|| g = byte[alloc_Size]							#require
-		.PackGlobs = g
+		|| g = Memory.Zalloc(alloc_size)									#require
+//		.PackGlobs = g
 	
-		|| StringTable = (g.Ptr + glob_size)|&string|
+		|| StringTable = (g + glob_size + 8)|&string|
 		|string| Last = nil
 		for i in n_strs
 			|| n = input.hint
 			if last
 				Last.Addr[last.length] = 0 // c-string! :]
 			Last = string.new((input.Data.Curr)|cstring|, n)
+			jb_incr(last) // oof
 			StringTable[i] = Last
+		
+		jb_vm.vm.FillTable(.LibBase!, g, spdtable.LibFuncs!)
+		
 		return true
 	
 	

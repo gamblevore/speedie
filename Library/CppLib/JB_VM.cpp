@@ -31,7 +31,7 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 	return (ivec4*)(Ret+3);
 }
 
-#ifdef __vm__
+#ifdef __VM__
 jb_vm* vm;
 
 
@@ -79,16 +79,22 @@ ivec4* RunVM (jb_vm& pvm) {				// vm_run, vm__run, vmrun, run_vm
 }
 
 
-void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
+void JB_ASM_FillTable (jb_vm* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
+	vm->Env.LibGlobs = LibGlobs;
+	vm->Env.PackGlobs = PackGlobs;
+	vm->Env.CppFuncs = (Fn0*)CppFuncs;
+}
+
+
+void** JB_ASM_InitTable(jb_vm* vm, int FuncCount, int GlobBytes) {
 	if (vm->Env.CppFuncs)
 		return (void**)(vm->Env.CppFuncs);
-	vm->Env.PackGlobs = 0;
-	// some sentinel space would be nice.
-	auto Result = (byte*)calloc(n*sizeof(void*) + g + 8, 1);
+	int FuncBytes = sizeof(void*) * FuncCount;
+	auto Result = (byte*)calloc(FuncBytes + GlobBytes + 8, 1);
 	if (Result) {
-		((int64*)(Result + g))[0] = 0x12345789ABCDEFED;
+		((int64*)(Result + GlobBytes))[0] = 0x12345789ABCDEFED; // sentinel
 		vm->Env.PackGlobs = Result;
-		vm->Env.CppFuncs = (Fn0*)(Result + g + 8);
+		vm->Env.CppFuncs = (Fn0*)(Result + GlobBytes + 8);
 		return (void**)(vm->Env.CppFuncs);
 	}
 	return 0;
@@ -114,7 +120,7 @@ ivec4* JB_ASM__Run(u32* Code, u32 CodeLength) {
 	auto V = JB_ASM__VM();
 	if (V) {
 		V->Env.CodeBase = (ASM*)Code;
-		V->Env.CodeLength = CodeLength;
+//		V->Env.CodeLength = CodeLength;
 		return RunVM(*V);
 	}
 

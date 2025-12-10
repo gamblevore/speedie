@@ -6,7 +6,8 @@
 function compiler.Bundle 
 	target osx
 		require !Compiler.IsTest and !Options.ExternalCompile
-		require SC_Targets..gui
+		require SC_Targets..gui // what about exec? or other that want to be cmd-line?
+		require !linkage["nobundle"]
 		|| Pd = .productfile
 		|| Pj = .BaseProjectPath 
 			.AppleBuildApp(pd, pj)

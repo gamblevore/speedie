@@ -40,12 +40,10 @@ struct vm_globs {
     byte*			LibGlobs;
     byte*			PackGlobs;
     Fn0*			CppFuncs;
-    Function*		PackCallbacks;	// should remove these two.        1)
-    Function*		LibCallbacks; 	// just use the main global table  2)
     byte*			AllocBase;
     int				AllocCurr;
     ASM* 			CodeBase;
-    int				CodeLength;
+//    int			CodeLength;
 };
 
 
@@ -56,6 +54,7 @@ struct jb_vm {
     ASM				EXIT[2];
 	VMRegister		Registers[];
 };
+
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

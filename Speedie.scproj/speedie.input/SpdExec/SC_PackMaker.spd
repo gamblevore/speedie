@@ -49,6 +49,7 @@ module PackMaker
 	function GlobalsSize (|[scdecl]| List, |int|)	// SortGlobals, GlobalsSort
 		opt norefcounts
 		|| Globals = 1								// always positive.
+		
 		for d in list
 			|| s = d.CarraySize
 			|| s16 = s min 16
@@ -58,15 +59,12 @@ module PackMaker
 				d.ExportPosition = globals			// its ok
 			  elseif (options.MakeExec)
 				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes.")
-			  else
-				|| Backwards = x - globals
-				if backwards > 0					
-					0 // keep old value				// Something missing. EG: Compiling non-gui app.
-				  else
-					error (d.source, d.name + " exportposition seems inserted? Regen export-table?")
+			  elseif (x <= globals)
+				error (d.source, d.name + " exportposition seems inserted? Regen export-table?")
+			
 			globals += s
 
-		return Globals.AlignUp(8)					// for strings, which come directly after
+		return (Globals+7).AlignUp(8)				// add sentinel.
 
 
 	function UseMain (|string| Name, |int| id, |bool|)
@@ -75,6 +73,7 @@ module PackMaker
 			fn.fpackid = id
 			(fn is usedbyasm)
 			return true
+
 
 	function BuildGlobs (|bool|)
 		opt norefcounts
@@ -151,31 +150,29 @@ module PackMaker
 		compiler.During = 0
 	
 	
-	function WritePackToDisk
+	function WritePackToDisk 
 		|| F = Compiler.ProductPath.SetExt("cake").file // what about .app instead of .zpd?
-		require f.OpenEmpty
-		
-		|| j = jbin(@tmp, "cake")
-		j.file = f
-		j.enter
-		j.Enter(@tmp, "app")
-		j.AddInt(.PackGlobSize + 16)
-		j.enter
-		
-		.RenderASM(j)
-		.DumpStrings(j)
-		.PackAllClasses(j)
-		.StoreDebug(j)
-		j.ExitAll
+		if f.OpenEmpty
+			|| j = jbin(@tmp, "cake")
+			j.file = f
+			j.enter
+			j.Enter(@tmp, "app")
+			j.AddInt(.PackGlobSize.alignup(8))
+			j.enter
+			
+			.RenderASM(j)
+			.DumpStrings(j)
+			.PackAllClasses(j)
+			.StoreDebug(j)
+			j.ExitAll
 	
 	
 	function StoreDebug (|jbin| j)
-		|| dbg = assembler.SafeDebugInfo			#require
-		compiler.stDebugInfo += dbg.length
-
-		j.enter(@tmp, "debug")
-		j.AddStr(dbg.Compress)
-		j.exit
+		|| dbg = assembler.SafeDebugInfo
+			compiler.stDebugInfo += dbg.length
+			j.enter(@tmp, "debug")
+			j.AddStr(dbg.Compress)
+			j.exit
 
 	
 	function RenderASM (|jbin| j)

@@ -7,13 +7,14 @@
 struct SavedRegisters 
 	|byte|					RegCount
 	|uint16|				BasicBlock
+	|int|					DebugMark
 	|DeclAlterable[32]|		Decls
 	|RegFile|				Regs
-
 
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
 
+		.DebugMark = sh.DebugMark
 		.BasicBlock = sh.BasicBlock
 		.regs = sh.regs
 		expect args <= 32 - .RegCount
@@ -22,6 +23,7 @@ struct SavedRegisters
 
 
 	function Rewind	(|assembler| sh)
+		sh.DebugMark = .DebugMark
 		sh.BasicBlock = .BasicBlock
 		sh.regs = .regs
 
@@ -40,7 +42,6 @@ struct DeclAlterable
 	|SCDeclInfo|		Info
 	|DataTypeCode|		DataType
 	|uint16| 			ModuleNum
-
 
 
 function assembler.DeclReset (|scdecl| D)

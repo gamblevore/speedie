@@ -30,7 +30,7 @@ function Cakerun.Func (|message| V, |uint64|)
 	|| Index = Info >> 1
 	|| Spd = 1|uint64|<<63
 	if Info&FuncIsLib
-		return ((spdtable.RawFuncs+Index)|int64|) &~ Spd
+		return ((spdtable.LibFuncs+Index)|int64|) &~ Spd
 
 	|| Fn = SpdTable.Funcs[Index]					#expect (V, "Virtual out of bounds")
 	|| spdfn = fn.SpeedieFunc						#expect (V, "Virtual is missing")
@@ -59,7 +59,7 @@ function Cakerun.LoadOneClass (|message| s)
 	|| Num = c[@num]
 	|| I = Num.int									#require
 	
-	|| Where = ((globals.GlobBase!)|&byte| + I)|&?&classdata|
+	|| Where = ((globals.LibBase!)|&byte| + I)|&?&classdata|
 	|| PK = c.next
 		PK.Expect(@list)
 		return .UnpackClass(s, c, where, pk)

@@ -4,13 +4,14 @@ module SpdTable
 	|int|		LinksOK
 	|[SpdFunc]|	Funcs
 	|spdfunc--|	CurrFunc
-	|&&nil|		RawFuncs = cakerun.LibFuncs
+	|&&nil|		LibFuncs = cakerun.LibFuncs
 	
 	function RunMain (|int|)
 		opt norefcounts
-		|| main = .funcs[1]					#expect ("Missing main")
-		rz  = .funcs[0]!.Run|&int64|[]
-		rz ?= main.Run|&int64|[]
+		|| init = .funcs[1]!
+		|| main = .funcs[2]					#expect ("Missing main")
+		expect (init.Run|&int64|[] == 0)	("Init failed")
+		return main.Run|&int64|[]
 
 
 	syntax Append (|message| spd)
@@ -86,7 +87,7 @@ function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs
 		old = (Old >> 18) << 18
 		old |= ID
 	self[] = old
-		
+
 //	GObj		  //  8
 //		r1		R // 13
 //		Mode	1 // 14
