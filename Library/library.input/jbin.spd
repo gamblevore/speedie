@@ -7,9 +7,7 @@ extend message
 		opt norefcounts
 		require self
 		|| js = fs|jbin|
-		if shell_path
-			js.sheb(shell_path)
-		js <~ Jbin.Header
+		js.RunHeader(shell_path)
 		.render_jbin_sub(js)
 	
 	helper render_jbin_sub (|jbin| js)
@@ -60,11 +58,13 @@ role JBin (Faststring)
 		.Enter(@arg)
 		return 2
 
-	function Sheb			(|string| name)
-		self <~ '#'
-		self <~ '!'
-		self <~ name
-		self <~ '\n' // noice
+	function RunHeader     (|string| name)
+		if name
+			self <~ '#'
+			self <~ '!'
+			self <~ name
+			self <~ '\n' // noice
+		self <~ Jbin.Header
 	
 	function AddStr			(|string| name)
 		.add(@str, name)

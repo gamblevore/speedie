@@ -152,11 +152,9 @@ module PackMaker
 	
 	function WritePackToDisk 
 		|| F = Compiler.ProductPath.SetExt("cake").file // what about .app instead of .zpd?
-		if f.OpenEmpty
-			|| j = jbin(@tmp, "cake")
-			j.file = f
-			j.enter
-			j.Enter(@tmp, "app")
+		|jbin| j = f.OutputStream
+			j.RunHeader("/usr/local/bin/cake")
+			j.Enter(@tmp, "cake")
 			j.AddInt(.PackGlobSize.alignup(8))
 			j.enter
 			

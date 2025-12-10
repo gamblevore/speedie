@@ -801,7 +801,7 @@ function Str (fn_asm)
 	|| real = exp.name|MessageID|
 	|| k = real.Position
 	if !k and (Compiler is Hungry)
-/		PackMaker.PackStrings <~ real
+		PackMaker.PackStrings <~ real
 		k = PackMaker.PackGlobSize + (PackMaker.PackStrings.length<<3)
 		real.Position = k
 	

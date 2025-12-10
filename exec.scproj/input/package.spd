@@ -32,8 +32,7 @@ module CakeRun
 	
 	function GetStructure (|bool|)
 		opt norefcounts
-		|| pk = .InputPack$
-		|| app = pk.last(@arg)[@tmp, "app"]
+		|| app = .InputPack$
 		|| sz = app[@num]
 		|| arg = sz.next(@arg)
 			arg.ExpectLast
@@ -66,6 +65,8 @@ module CakeRun
 			rz = fi.Parse
 			if rz
 				.FileSrc = rz.OriginalParseData
+				if rz == @arg
+					rz = rz.first // sigh
 				if !rz.expect(@tmp, "cake")
 					rz = nil
 

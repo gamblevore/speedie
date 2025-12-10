@@ -1,4 +1,4 @@
-#!/usr/local/bin/spd
+#!/usr/local/bin/cake
 
 main
 	"Hello world!"

@@ -11,6 +11,7 @@ main
 (You can also pass .spd or .scproj files. They will be compiled, then run.)
 "
 		return 0
+	
 	error.AutoPrint = 1
 	if CakeRun.LoadPack
 		SpdTable.Link
