@@ -48,9 +48,10 @@ Module Jeebox
 	|dictionary of string| XML_UnEscapeStr
 	|dictionary of string| EscapeChr
 
+// try removing these two first.
 	|| CSWordMiddle2	= "AZaz09__".UniCS
 	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
-/// OOOFF
+
 	|| CSWordMiddle		= charprop.NameMid
 	|| CSNum			= jeebox.CSWordMiddle
 	|| CSLettersOnly    = charprop.LettersOnly
@@ -59,8 +60,12 @@ Module Jeebox
 	
 // Is there any pattern here? can we subdivide these into simple overlapping groups?
 	|| CSAfterDot		= " ,:\t\n\r\\".charset(false)
+	
+// remove this last
 	|| CSAfterStatement	= " ,:\t\n\r\\'`\"{#\$%".charset(false)
-	|| CSWrapSplit		= " \t\n\r\f-^+/\\*:;<>=,".charset(false)
+
+// this isn't even in jeebox. Just take it out... anyway possible!
+	|| EditorWrapSplit	= " ,:\t\n\r\\\f-^+/*;<>=".charset(false) // not actually speedie
 
 	.InitConstants
 

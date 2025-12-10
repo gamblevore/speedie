@@ -206,11 +206,11 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			maxwidth -= (Orig-MaxWidth).TabsWidth
 		  elseif isinline
 			i++
-		  elseif jeebox.CSWrapSplit[c]
+		  elseif jeebox.EditorWrapSplit[c]
 			i++
 			MaxWidth--
 		  else									 // so where does the word end?
-			|| WordEnd = .find(jeebox.CSWrapSplit, i, ParaMax)
+			|| WordEnd = .find(jeebox.EditorWrapSplit, i, ParaMax)
 				WordEnd += (self[WordEnd] > 32)
 			  else
 				WordEnd = .length min paramax
