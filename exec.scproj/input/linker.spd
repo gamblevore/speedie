@@ -24,15 +24,15 @@ module SpdTable
 			.Funcs <~ SpdFunc(spd)
 	
 	
-	function LoadFuncs (|bool|)
+	function LoadFuncs (|message| arg)
 		opt norefcounts
+		|| code = arg[@tmp, "code"][@arg]
 		.funcs <~ SpdFunc()					// null func
-		for spd in CakeRun.code
+		for spd.fast in code
 			self <~ spd
 		
-		check  (.Funcs >= 2)				(CakeRun.code, "Missing 'main'")
+		check  (.Funcs >= 3)				(code, "Missing 'main'")
 		.Funcs.Shrink
-		return stderr.ok
 		
 	
 	function Link (|&asm|)
@@ -88,12 +88,3 @@ function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs
 		old |= ID
 	self[] = old
 
-//	GObj		  //  8
-//		r1		R // 13
-//		Mode	1 // 14
-//		Ref		1 // 15
-				  // 17 remain
-//	Table		  //  8
-//		r1		R // 13
-//		Mode	1 // 14
-				  // 18 remain

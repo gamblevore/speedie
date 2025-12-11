@@ -2,8 +2,6 @@
 
 module CakeRun
 	linkage: cpp_part Pack
-	|message|				Code
-	|message|				Clss
 	|String|				Strings
 	|String|				FileSrc
 	|dictionary of &classdata| ClassTable = dictionary()
@@ -27,20 +25,20 @@ module CakeRun
 	
 	
 	function LoadPack (|bool|)
-		return  globals.CheckLib  and  .GetStructure  and  SpdTable.LoadFuncs  and  .LoadClasses
+		return  globals.CheckLib  and  .GetStructure
 		
 	
 	function GetStructure (|bool|)
 		opt norefcounts
 		|| app = .InputPack$
 		|| sz = app[@num]
-		|| arg = sz.next(@arg)
-			arg.ExpectLast
-			.code = arg[@tmp, "code"][@arg]
-			check (.code.hasany)      ("No functions found!")
-			.strings = arg["strs"].name
-			.clss = arg["clss"]
-			debugger.root = arg["debug"]
+		|| arg = sz.next(@arg)$
+		arg.ExpectLast
+		
+		SpdTable.LoadFuncs(arg)
+		.strings = arg["strs"].name
+		.LoadClasses(arg["clss"])
+		debugger.root = arg["debug"]
 		return globals.collectpackglobs(sz)
 		
 
@@ -67,6 +65,6 @@ module CakeRun
 				.FileSrc = rz.OriginalParseData
 				if rz == @arg
 					rz = rz.first // sigh
-				if !rz.expect(@tmp, "cake")
+				if !rz.expect(@tmp)
 					rz = nil
 

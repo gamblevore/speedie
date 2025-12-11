@@ -13,15 +13,14 @@ function CakeRun.CountClasses (|message| list)
 	Classdata.cakeprepare(N, B)
 		
 	
-function CakeRun.LoadClasses (|bool|)
+function CakeRun.LoadClasses (|message| Cls)
 	opt norefcounts
 	for cd in ClassData.First_
 		.StoreClass(cd)
 
-	.CountClasses(.clss)
-	for c.fast in .Clss
+	.CountClasses(cls)
+	for c.fast in Cls
 		.LoadOneClass(C)
-	return StdErr.ok
 
 
 function Cakerun.Func (|message| V, |uint64|)

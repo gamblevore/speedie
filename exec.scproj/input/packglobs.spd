@@ -28,9 +28,10 @@ module Globals
 		|string| Last = nil
 		for i in n_strs
 			|| n = input.hint
-			if last
+			if last != nil
 				Last.Addr[last.length] = 0 // c-string! :]
 			Last = string.new((input.Data.Curr)|cstring|, n)
+			input.data.position += n
 			jb_incr(last) // oof
 			StringTable[i] = Last
 		
