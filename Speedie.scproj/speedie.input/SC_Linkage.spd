@@ -55,7 +55,7 @@ module Linkage
 		
 		|| path = arg["flags"]["output_path"]
 			if !options.silent
-				print "output_path set in conf: "
+				print "output_path here: "
 				printline node.OriginalFilePath
 			feedback.SetOutputPath path
 

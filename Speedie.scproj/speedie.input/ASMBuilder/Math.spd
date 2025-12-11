@@ -147,7 +147,7 @@ extend Assembler
 		k = k|uint64|.trim(9)
 		|| J = exp.JMKM(l, k)
 		if 0: exp.JMKL
-		j._op += !(mode&1)						// .JMPL
+		j._op += (mode&1)						// .JMPL
 		return J * dest
 
 
