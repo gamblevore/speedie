@@ -24,10 +24,6 @@ module LibStability
 		.StabliseSub2(fs, list, isfuncs)
 		if fs
 			funcs.SmartData = fs|string|
-		
-	
-	function scfunction.NeedsID (|bool|)
-		return (!.IsMacro) and (self isnt disabled and LinkInline)
 	
 	
 	function Debug 
@@ -54,7 +50,7 @@ module LibStability
 		list.Sort(sorter)
 		
 		for obj in list
-			if (obj isnt private) and (!isfunc or obj|scfunction|.needsID)
+			if (obj isnt private) and (!isfunc or obj|scfunction|.NeedsStableID)
 				obj.MakeID(fs, table, isFunc)
 			
 		

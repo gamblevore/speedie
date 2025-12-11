@@ -1067,8 +1067,10 @@ datatype SCNodeInfo (byte)
 		Visible
 		AllowLinkedLists
 		InBuiltDataType
-		Private
+		Private // how is this different to internalonly?
 		PrivateAll
+		InternalOnly
+		EmbeddedOnly
 		
 
 

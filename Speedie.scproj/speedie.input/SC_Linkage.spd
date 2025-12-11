@@ -109,6 +109,13 @@ dispatch ClassOrModuleLinkage (TranFunc)
 	+'visible'				{} // (SCFunction.Tran_Visible)
 	+'ignore'				{}
 	+'noearlyfree'			{}
+
+	+'internal'
+		name_Space.setinternal(node, scnodeinfo.internalonly)
+		
+	+'embedded'
+		name_Space.setinternal(node, scnodeinfo.embeddedonly)
+		
 	+'helper'
 		|| v = node.first.yes(true)
 		(name_space is privateall) = v
@@ -193,4 +200,18 @@ function SCNode.ProcessLinkage (|message| node,  |dictionary of tranfunc| Table,
 
 function scclass.CheckStateful (|message| node)
 	expect (self isnt stateful or self isnt stateless) (node, "Can't be both stateful and stateless")
+
+
+function Scnode.SetInternal	(|message| node, |classinfo| info)
+	opt norefcounts
+	|scmodule| M
+	if self isa scclass
+		M = .modul
+	  elseif self isa scmodule
+		M = self
+	  else
+		error node
+		return
+	expect (!(M.nodeinfo&info)) (node, "internal/embedded conflict")
+	M.nodeinfo |= info
 

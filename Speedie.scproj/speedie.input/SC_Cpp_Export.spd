@@ -584,7 +584,7 @@ function WriteVMFuncs (|faststringcpp| fs)
 	
 	|| Position = 0
 	for fn in packmaker.libfuncs
-		if fn.IsLibrary and fn.NeedsLibExport
+		if fn.NeedsLibExport
 			|| id = fn.fpackid|int|
 			|| Missing = id - position
 			check (Missing > 0) (fn, "Bad PackID?")

@@ -13,23 +13,39 @@ module PackMaker
 	|int|					LibGlobSize
 	|HairyMan|				PackSaved
 	|hairyman|				LibSaved
-	|string|				LName
+//	|string|				LName
 	
 	
-	function scclass.LName (|string|)
-		PackMaker.lname = .name.lowercase
-		return PackMaker.lname
+//	function scclass.LName (|string|)
+//		PackMaker.lname = .name.lowercase
+//		return PackMaker.lname
 	
 	
 	helper scfunction.NeedsLibExport (|bool|)
+		opt norefcounts
 		require (.MyReacher or options.MakeExec)
 		require (self isnt NoExport) and !.ismacro
 		require self|scnode| isnt Private
+		|| c = .Parent
+			require c isnt internalonly and embeddedonly
 		return (.IsCppInBuilt < 2)
+			
+	// not sure why I have two versions of the same thing?
+	// one is to allow a stableID generated
+	// but surely... if we have no stable ID, we don't need lib-export?
 	
+	function scfunction.NeedsStableID (|bool|)
+		opt norefcounts
+		|| c = .Parent
+			if .cls
+			require (c isnt InternalOnly and EmbeddedOnly)
+		return (!.IsMacro) and (self isnt disabled and LinkInline)
+	// why not use noexport instead? (NoExport = LinkInline + Disabled + InitFunc)
+											
+
 	
 	helper AddFunc (|SCFunction| f)
-/		opt norefcounts
+		opt norefcounts
 		if f.IsLibrary
 			if f.NeedsLibExport
 				.LibFuncs <~ f
@@ -228,8 +244,10 @@ module PackMaker
 		require r and !r.IsLibrary
 		
 		if .IsLibrary
-			|| T = .ClassType
-			require T is ASMReached
+			// internalonly should allow C++ compiles to reach something...
+			// allow exec to work
+			require self|scnode| isnt EmbeddedOnly and InternalOnly
+			require .ClassType is ASMReached
 			
 		return true
 

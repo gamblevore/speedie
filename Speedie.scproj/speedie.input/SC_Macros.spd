@@ -107,6 +107,10 @@ function message.TargetThg (|bool|) // target true, target false,
 		return Platform.win
 	if self ~= "lin"
 		return Platform.lin
+	if self ~= "vm"
+		return Linkage.vm
+	if self ~= "exec"
+		return Linkage.interpreter
 	if self ~= "direct"
 		return options.IsDirectTest
 	if self ~= "true"
