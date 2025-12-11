@@ -22,14 +22,11 @@ module CakeRun
 		if !err
 			return message()
 		.ReportFailiure(@tmp, name)
-	
-	
-	function LoadPack (|bool|)
-		return  globals.CheckLib  and  .GetStructure
 		
 	
 	function GetStructure (|bool|)
 		opt norefcounts
+		require globals.CheckLib
 		|| app = .InputPack$
 		|| sz = app[@num]
 		|| arg = sz.next(@arg)$

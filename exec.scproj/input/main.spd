@@ -7,13 +7,12 @@ main
 	opt NoRefCounts	
 	if app._rawargs == 0
 		"Usage: ${app.filename} /path/to/spd_proj.cake
-
-(You can also pass .spd or .scproj files. They will be compiled, then run.)
+May also pass .spd or .scproj files. They will be compiled, then run.
 "
 		return 0
 	
 	error.AutoPrint = 1
-	if CakeRun.LoadPack
+	if CakeRun.GetStructure
 		SpdTable.Link
 		if debugger.StartDebug
 			return SpdTable.RunMain
@@ -23,7 +22,7 @@ main
 function App.ActAsSpeedie (|ErrorInt|)
 	|| Proj = app.args[0].FileThatExists #require
 	|| SpdArgs = [Proj, "--nocolor", "--usescriptloc", "--perry=bin"]
-	|| c = SpdProcess.Spawn(speedie,  "Speedie", SpdArgs, ProcessMode.PassThru)
+	|| c = SpdProcess.Spawn(speedie,  "Speedie",  SpdArgs,  ProcessMode.PassThru)
 		Compiler = c
 		while c.IsOpen
 			...

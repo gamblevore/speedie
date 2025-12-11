@@ -15,24 +15,23 @@ module Globals
 	
 	function CollectPackGlobs (|message| size_msg, |bool|)
 		opt norefcounts
-		|int| glob_size = size_msg.int(0, 1, 216MB)$ // 144*
+		|int| glob_size = size_msg.int(0, 1, 216MB)$
 		
 		|| input		= InputStream(cakerun.strings)
-/		|| n_strs		= input.HInt
+		|| n_strs		= input.HInt
 		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
 		|| alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
 		|| g = Memory.Zalloc(alloc_size)									#require
-//		.PackGlobs = g
 	
 		|| StringTable = (g + glob_size + 8)|&string|
 		|string| Last = nil
 		for i in n_strs
 			|| n = input.hint
 			if last != nil
-				Last.Addr[last.length] = 0 // c-string! :]
+				Last.Addr[last.length] = 0					// c-string! :]
 			Last = string.new((input.Data.Curr)|cstring|, n)
 			input.data.position += n
-			jb_incr(last) // oof
+			jb_incr(last)									// oof
 			StringTable[i] = Last
 		
 		jb_vm.vm.FillTable(.LibBase!, g, spdtable.LibFuncs!)

@@ -1,6 +1,7 @@
 #!/usr/local/bin/cake
 
+
 main
-	"Hello world!"
+	for 1000
+		"Hello world!"
 	"bye world!"
-	
