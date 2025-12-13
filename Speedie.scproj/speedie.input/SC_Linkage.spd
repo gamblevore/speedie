@@ -55,8 +55,9 @@ module Linkage
 		
 		|| path = arg["flags"]["output_path"]
 			if !options.silent
-				print "output_path here: "
-				printline node.OriginalFilePath
+				print "output_path here: '"
+				print node.OriginalFilePath
+				printline "'"
 			feedback.SetOutputPath path
 
 		arg.ConfTake(.flagz, "flags")
