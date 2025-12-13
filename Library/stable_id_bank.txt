@@ -978,6 +978,11 @@ JB_API__Init
 JB_API__NilCallBack
 JB_API__NilHandler
 JB_API__Parse
+JB_ASM_FillTable
+JB_ASM_InitTable
+JB_ASM_Registers
+JB_ASM__Run
+JB_ASM__VM
 JB_AllClasses
 JB_AppArgument_Name
 JB_AppArgument_Value
@@ -1341,7 +1346,6 @@ JB_File_Open
 JB_File_OpenEmpty
 JB_File_OperatorIsdir
 JB_File_OperatorIsfile
-JB_File_OperatorPlus
 JB_File_Output__MainArg
 JB_File_Parent
 JB_File_Parse
@@ -1773,7 +1777,6 @@ JB_SS_HInt
 JB_SS_HasAny
 JB_SS_HasHeader
 JB_SS_Int32BE
-JB_SS_NextMsgExpect
 JB_SS_NoMoreChunksToRead
 JB_SS_NonZeroByte
 JB_SS_Parse
@@ -1942,7 +1945,6 @@ JB_Str_Reveal
 JB_Str_Reverse
 JB_Str_Right
 JB_Str_Rotate
-JB_Str_SetData
 JB_Str_SetExt
 JB_Str_ShellPath
 JB_Str_Shorten
@@ -1992,7 +1994,7 @@ JB_Str_Warn
 JB_Str_WhiteSpace
 JB_Str_Widen
 JB_Str_Wrap
-JB_Str_WriteSet
+JB_Str_WriteAll
 JB_Str_Yes
 JB_Str_Zalgo
 JB_Str__Byte
@@ -2170,6 +2172,8 @@ JB_dbl_Fract
 JB_dbl_Negate
 JB_dbl_Render
 JB_dbl_RenderFloat
+JB_dylib_Load
+JB_dylib__New
 JB_f_AsInt
 JB_f_Bounce
 JB_f_Ceil
