@@ -935,7 +935,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		FlowControl.DisabledIncr // we don't care about previous file contents
 		.cpp_includes <~ s.hash|int64|.render
 		if F and !F.CompareData(S)
-			F.Data = S
+			F.writeall(S)
 		FlowControl.DisabledIncr(-1)
 	
 	

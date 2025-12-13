@@ -6,7 +6,7 @@ main (|file.existing| File)
     if file isa "xml"
         jb.XMLToJeebox
         || boxfile = File.SetExt("box")
-        if boxfile.SetData(jb.render) // write file to disk
+        if boxfile.writeall(jb.render) // write file to disk
             "Converted XML to Jeebox: $boxfile"
 
     || Found = BookSearch(jb, app.switches) #expect  "Can't find any books using: ${app.Switches}"

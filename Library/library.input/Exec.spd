@@ -73,11 +73,11 @@ datatype ExitCode (int)
 
 
 datatype ErrorInt (int) // useful for unix-functions which has 0 == success
-	default 0 // defaults to true... unlike everything else?
+	default 0 // defaults to true... unlike everything else.
 	false -1
 	syntax cast (|bool|)
 		inline
-		return self == 0
+		return self >= 0
 
 	function SignalName (|StringZeroTerminated|)
 		cpp_wrapper JB_Err_SignalName

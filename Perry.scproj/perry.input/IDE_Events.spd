@@ -48,16 +48,16 @@ function Perry.CreateProj (|string| path)
 	ifn path isa "scproj"
 		require path.file.CreateEmpty
 		if path isa "spd"
-			proj.data = main
+			proj.writeall(main)
 	  else
 		expect (!path.FileExists) (path, "Can't create over existing project.")
 
-		proj.child("input/main.spd").data(Main) #require
+		require proj.child("input/main.spd").writeall(Main)
 
 		|| R = templates.Roots
 		|| T = templates.Todo
-		proj.child(".perry").data = R
-		proj.child("input/.todo").data = T
+		proj.child(".perry").writeall = R
+		proj.child("input/.todo").writeall = T
 	IdeAddProj(path)
 
 	

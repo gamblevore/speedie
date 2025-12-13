@@ -32,7 +32,7 @@ role FileArchive (message)
 			|| chld = base.child(path)
 			if overwrite and chld.isdir
 				chld.DeleteAll
-			if chld.Data(data)
+			if chld.writeall(data)
 				|| it = item..mode
 					chld.mode = it.int
 				rz = data.length

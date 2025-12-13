@@ -645,7 +645,7 @@ function FileViewer.SomethingChanged (|filerow?| row)
 
 function File.CreateEmpty (|bool|)
 	expect (!.exists) (self, "File already exists, can't create empty file here.")
-	return .data("")
+	return .writeall("")
 
 
 function FileViewerCopyPath (GuiMenuEvent)

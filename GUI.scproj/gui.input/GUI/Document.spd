@@ -149,7 +149,7 @@ class Document (list)
 				rz = -1
 		  else
 			KeepDate = .FindKeepDate(t, f)
-			if !f.data(t)
+			if !f.writeall(t)
 				rz = -1
 		if rz
 			.original = c

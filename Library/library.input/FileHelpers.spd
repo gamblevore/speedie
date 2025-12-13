@@ -108,12 +108,9 @@ extend String
 			slash = 0
 		return self[slash, dot]
 	
-	function ReadFile (|int|lim=16MB, |bool|AllowMissing=true, |stringthatwasreadsafely|)
+	function ReadFile (|int| lim = 16MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
 		return .file.readall(lim, AllowMissing)
 
-	function Write (assigns:|string|, |bool|)
-		return .file.data(Value)
-		
 	function Child (|String| cname, |String|)
 		if !self
 			Return cname

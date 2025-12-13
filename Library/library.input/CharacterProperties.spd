@@ -131,8 +131,8 @@ datatype CharProp (uint16)
 		Unicode			= (1<<UnicodeByte)
 		LettersOnly 	= (1<<Upper) + (1<<Lower) + Unicode
 		LettersUnderScore= (1<<Underscore) + LettersOnly
-		XMLName			= LettersUnderScore + (1<<Punct2)
 		NameMid			= LettersUnderScore + (1<<Number)
+		XMLNameMid		= NameMid + (1<<Punct2)
 		White			= (1<<Line) + (1<<HSpace)
 		Punct			= (1<<Punct1) + (1<<Punct2)
 

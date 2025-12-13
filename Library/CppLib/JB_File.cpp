@@ -713,7 +713,8 @@ int JB_File_Write ( JB_File* self, JB_String* Data ) {
 		return 0;
 	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 )
 		return (int)JB_File_WriteRaw_(self, Data->Addr, Data->Length );
-    return -1;
+	int err = errno;
+    return -(err?err:1);
 }
 
 
@@ -1223,16 +1224,18 @@ int JB_File_Copy (JB_File* self, JB_File* To, bool AttrOnly) {
 
 
 
-bool JB_File_DataSet ( JB_File* self, JB_String* Data ) {
+int JB_File_DataSet ( JB_File* self, JB_String* Data ) {
 	bool WasOpen = self->Descriptor > STDPICO_FILENO;
 	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false) < 0)
-		return false;
-	JB_File_SizeSet(self, 0);
-	JB_File_OffsetSet(self, 0); // necessary as ftruncate doesnt do this.
+		return -errno;
+//	JB_File_SizeSet(self, 0); // O_TRUNC should already do this?
+//	JB_File_OffsetSet(self, 0); // necessary as ftruncate doesnt do this.
 	int N = JB_File_Write(self, Data);
 	if (!WasOpen)
 		JB_File_Close(self);
-	return (N == JB_Str_Length(Data));
+	if (N >= 0 and N != JB_Str_Length(Data))
+		N = -errno;
+	return N;
 }
 
 

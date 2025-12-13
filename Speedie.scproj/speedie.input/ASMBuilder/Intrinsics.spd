@@ -31,7 +31,7 @@ module Intrinsics
 		.ProcessTrin(vm, cpp, .Floats,  'F')
 		.ProcessTrin(vm, cpp, .Vectors, 'V')
 
-		VM_Builder.VMFile("vmtrin_gen.box").data = vm
+		VM_Builder.VMFile("vmtrin_gen.box").writeall(vm)
 
 		cpp <~ `}`
 		VM_Builder.SafeWrite("vmtrin.h", cpp)

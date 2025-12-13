@@ -2,7 +2,7 @@
 
 	
 function parser.ThingXMLAtt (|int|start, |message| Parent, |message|)
-	|| name = parser.WordAfterSub( start, jeebox.XMLWordMiddle )
+	|| name = parser.WordAfterSub( start, charprop.XMLNameMid )
 	return parser.new( parent, @xatt, start, name )
 
 
@@ -98,7 +98,7 @@ function Parser.XMLWordEnd (|int| From, |ind|)
 	if !Jeebox.CSWordStart[b]
 		.erroradd( "Wrong first byte of XML", from)
 	  else
-		rz = .data.OutCharSet(jeebox.XMLwordmiddle, from+1)
+		rz = .data.OutCharSet(charprop.XMLNameMid, from+1)
 		if rz == -1
 			.Erroradd( "XML name does not end" )
 		.NextStart = rz

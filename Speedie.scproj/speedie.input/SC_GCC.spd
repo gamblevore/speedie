@@ -22,7 +22,6 @@ function TmpBase (|string| V, |bool| Lib=false,  |string|)
 	if !Lib and options.SelfReplacement
 		return "/tmp/SpeedieSelf/" + V
 	return "/tmp/Speedie/" + V
-	
 
 
 function TmpOut (|string| V, |string|)
@@ -429,8 +428,8 @@ function SayTest (|string| n)
 function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, testcompiler
 	|| S = compiler.ProductFile
 	|| Test1 = S
-	|| Test2 = S+"2"
-	|| Test3 = S+"3"
+	|| Test2 = (S+"2").file
+	|| Test3 = (S+"3").file
 
 	|| Cpp1 = Cpp_Export.CppProduct
 	|| Cpp2 = Cpp1.Path.ReplacePathComponent(-2, "BuildTest2").File

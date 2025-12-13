@@ -103,15 +103,15 @@ class File (String)
 	
 	Syntax Access (assigns:|string| data, |ErrorInt|)
 		description "Writes to the file. Clears old data."
-		return .setdata(data)
+		return .WriteAll(data)
 	
-	function String.SetData (|string| Data, |ErrorInt|)
+	function String.Data (|string| Data, |ErrorInt|)
+		disabled "use string.WriteAll or string.ReadAll"
+	
+	function String.WriteAll (|string| Data, |ErrorInt|)
 		description "Writes to the file. Clears old data."
-		|| f = .file
-		rz = f.OpenEmpty
-		if rz
-			rz = f.write(Data)
-			f.Close
+		|| f = .file // may be self
+		return f.writeall(data)
 
 	Syntax Append (|string| data)
 		disabled "Use file[] = data, to set the entire file's data."
@@ -129,25 +129,25 @@ class File (String)
 
 	function SmartData (assigns:|String| nieu, |bool|)
 		if (.size != nieu.length) or (.readall(true) != nieu)
-			return .data(Nieu)
+			return .writeall(Nieu)
 	
-	operator plus (|string| s, |file|)
-		opt norefcounts
-		return (super+S).file
+//	operator plus (|string| s, |file|)
+//		opt norefcounts
+//		return (super+S).file
 	
 	function File (|file|)
 		disabled "This is already a file."
 	
-	function Data (assigns:|String|Data, |bool|)
+	function WriteAll (assigns:|String|Data, |ErrorInt|)
 		cpp_wrapper JB_File_DataSet
 
-	function Write (|string| Data, |ind|)
+	function Write (|string| Data, |ErrorInt|)
 		cpp_wrapper JB_File_Write	
 	
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |syntax| Owner=@nil,  |messageroot|)
 		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
-		|| S = .ReadAll(lim, allowmissing)
+		|| S = .readall(lim, allowmissing)
 		if s.iscompressed
 			s = s.Decompress(lim, nil)
 		if s
@@ -262,7 +262,7 @@ class File (String)
 		|| code = 0
 		if (.Size != A.length)
 			code = 1
-		  elseif (.ReadAll(true) != A)
+		  elseif (.readall(true) != A)
 			code = 2
 		return .CompareMsg(code, error)
 

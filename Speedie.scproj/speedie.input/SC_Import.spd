@@ -331,9 +331,9 @@ class SCImport
 				if (f isa File)
 					|| name = f.name
 					|| Dest = P[name]!
-					dest.data = "\n// (Copy of original)\n" + f.readall
+					dest.writeall("\n// (Copy of original)\n" + f.readall)
 				  elseif (f isa string)
 					|| Dest = P[sh_name]!
 					debugger /// what?
-					Dest.Data = f
+					Dest.writeall(f)
 

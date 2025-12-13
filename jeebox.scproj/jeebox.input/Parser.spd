@@ -1251,10 +1251,10 @@ ive been~running #since morning
 	
 	function WordAfter (|int| Start, |int|)
 		Opt NoRefCounts
-		return .WordAfterSub(start, Jeebox.CSWordMiddle2)
+		return .WordAfterSub(start, Jeebox.CSWordMiddle)
 	
-	
-	libinternal WordAfterSub (|int| Start, |charset| cs, |int|)
+		
+	libinternal WordAfterSub (|int| Start, |charproplist| cs, |int|)
 		Opt NoRefCounts
 		|| n = .data.length
 		if (Start < n)

@@ -49,8 +49,7 @@ Module Jeebox
 	|dictionary of string| EscapeChr
 
 // try removing these two first.
-	|| CSWordMiddle2	= "AZaz09__".UniCS
-	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
+//	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
 
 	|| CSWordMiddle		= charprop.NameMid
 	|| CSNum			= jeebox.CSWordMiddle
