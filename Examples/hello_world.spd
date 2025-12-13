@@ -1,7 +1,9 @@
 #!/usr/local/bin/cake
 
-
 main
-	for 1000
-		"Hello world!"
-	"bye world!"
+	for i in 30
+		if i&1
+			"Hello world!"
+		  else
+			"bye world!"
+	"end world"
