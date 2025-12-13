@@ -1686,6 +1686,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
+extern JB_Dylib SC_SelfLib;
 #define JB_StdErr JB__.StdErr
 #define kJB_SyxAcc ((Syntax)29)
 #define kJB_SyxAdj ((Syntax)27)
@@ -2444,6 +2445,12 @@ extern ArchonPurger SC__nil_T;
 #define JB__MzSt_All JB__.MzSt_All
 #define kJB__MzSt_Compression ((int)1)
 #define kJB__MzSt_Decompression ((int)2)
+#define kJB__dylib_Global ((int)8)
+#define kJB__dylib_Lazy ((int)1)
+#define kJB__dylib_Local ((int)4)
+#define kJB__dylib_NoDelete ((int)128)
+#define kJB__dylib_NoLoad ((int)16)
+#define kJB__dylib_Now ((int)2)
 extern IsaTester SC__IsaTester_T;
 #define JB__Rnd_Shared JB__.Rnd_Shared
 #define kJB__TerminalDisplay_h ((int)35)
@@ -3026,11 +3033,6 @@ JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript);
 
 // ImageHelper
 JB_String* JB_ImageHelper__ConvertPNGToVOI(JB_String* P);
-
-
-
-// InbuiltShellArgs
-SCNode* SC_InbuiltShellArgs__Collect(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 
 
@@ -5689,6 +5691,11 @@ int JB_MzSt__Init_();
 
 
 // JB_DirectoryReader
+
+
+// JB_DynamicLibrary
+void JB_dylib__New(JB_String* F, int Mode, JB_Dylib* Rz);
+
 
 
 // JB_FakeJBString
@@ -10845,6 +10852,8 @@ inline int64 JB_Wrap_Value(DTWrap* Self);
 
 inline CharProp JB_byte_Property(uint /*byte*/ Self);
 
+inline bool JB_dylib_IsOpen(JB_Dylib* Self);
+
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D);
 
 inline bool JB_int64_OperatorInRange(int64 Self, int64 Length);
@@ -11278,6 +11287,10 @@ inline int64 JB_Wrap_Value(DTWrap* Self) {
 
 inline CharProp JB_byte_Property(uint /*byte*/ Self) {
 	return JB__CharProp_Props[Self];
+}
+
+inline bool JB_dylib_IsOpen(JB_Dylib* Self) {
+	return Self->handle != nil;
 }
 
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D) {
