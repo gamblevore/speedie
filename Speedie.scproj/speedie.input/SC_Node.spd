@@ -978,6 +978,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
+	+'libinternal'			SCFunction.NewHelper
 	+'inline'				SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
 	+'macro'				SCFunction.NewMacro
@@ -1023,6 +1024,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+'macro'				SCFunction.NewMacro
 	+'inline'				SCFunction.NewHelper
 	+'helper'				SCFunction.NewHelper
+	+'libinternal'			SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
 	+'behaviour'			SCBehaviour.NewActual
 	+'actual'				SCBehaviour.NewActual
@@ -1067,9 +1069,8 @@ datatype SCNodeInfo (byte)
 		Visible
 		AllowLinkedLists
 		InBuiltDataType
-		Private // how is this different to internalonly?
-		PrivateAll
-		InternalOnly
+		LibOnly // how is this different to internalonly?
+		LibOnlyAll
 		EmbeddedOnly
 		
 

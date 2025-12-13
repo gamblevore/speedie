@@ -13,16 +13,9 @@ extern "C" void* JB_ASM__Load (JB_StringC* S) {
     static void* MySelf;
     if (!MySelf) {
 		MySelf = dlopen(0, RTLD_LAZY);
-//		MySelf = dlopen("/usr/local/speedie/Terminal/Speedie", RTLD_LAZY);
 		if (!MySelf) return 0;
 	}
 	void* R = dlsym(MySelf, (const char*)(S->Addr));
-//	if (!R) {
-//		debugger; // no real reason why one works and the other doesnt
-//		printf("// fn! %s\n", S->Addr);
-//	} else {
-//		printf("// got %s\n", S->Addr);
-//	}
 	return R;
 }
 

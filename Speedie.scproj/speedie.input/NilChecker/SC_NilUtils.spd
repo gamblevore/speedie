@@ -2,9 +2,7 @@
 struct LoopInfo 
 	|NilRecord| 		ContRecord
 	|NilRecord| 		ExitRecord
-//	|byte| 				VarCount
 	|byte| 				BranchDepth
-//	|byte|				LoopDepth
 	|bool| 				HasEscape
 	
 	function BeginLoop (|bool| HasExitCond)
@@ -13,21 +11,10 @@ struct LoopInfo
 		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
 		.HasEscape = HasExitCond
 		.ContRecord = V								// in case loop fails the first condition
-//		.VarCount = V.DepthOfVars
 		.BranchDepth = ArchonPurger.t.BranchDepth
-//		.LoopDepth++
 	
 	
 	function FinishLoop (|message| msg)
-		/*
-			|| xx = 1
-			while xx
-				0
-			// we should also check for these kind of loops.
-			// not really a nil-operation though is it?
-			// maybe its ok :) quite rare!
-		*/
-		
 		|| Ex = .ExitRecord
 		ArchonPurger.t.value = Ex
 		if !ex

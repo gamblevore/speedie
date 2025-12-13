@@ -13,21 +13,14 @@ module PackMaker
 	|int|					LibGlobSize
 	|HairyMan|				PackSaved
 	|hairyman|				LibSaved
-//	|string|				LName
-	
-	
-//	function scclass.LName (|string|)
-//		PackMaker.lname = .name.lowercase
-//		return PackMaker.lname
 	
 	
 	helper scfunction.NeedsLibExport (|bool|)
 		opt norefcounts
 		require (.MyReacher or options.MakeExec)
 		require (self isnt NoExport) and !.ismacro
-		require self|scnode| isnt Private
-		|| c = .Parent
-			require c isnt internalonly and embeddedonly
+		require self|scnode| isnt libonly
+		require self|scnode| isnt embeddedonly
 		return (.IsCppInBuilt < 2)
 			
 	// not sure why I have two versions of the same thing?
@@ -37,9 +30,10 @@ module PackMaker
 	function scfunction.NeedsStableID (|bool|)
 		opt norefcounts
 		|| c = .Parent
-			if .cls
-			require (c isnt InternalOnly and EmbeddedOnly)
-		return (!.IsMacro) and (self isnt disabled and LinkInline)
+		require (self|scnode| isnt EmbeddedOnly)
+		if (!.IsMacro) and (self isnt disabled and LinkInline)
+			if self|scnode| is libonly // hmm
+			return true
 	// why not use noexport instead? (NoExport = LinkInline + Disabled + InitFunc)
 											
 
@@ -243,11 +237,10 @@ module PackMaker
 		|| R = .MyReacher
 		require r and !r.IsLibrary
 		
-		if .IsLibrary
-			// internalonly should allow C++ compiles to reach something...
-			// allow exec to work
-			require self|scnode| isnt EmbeddedOnly and InternalOnly
+		if .IsLibrary // what about lib only?
+			require self|scnode| isnt EmbeddedOnly
 			require .ClassType is ASMReached
+			if self|scnode| is libonly // now what?
 			
 		return true
 

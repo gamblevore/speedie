@@ -50,7 +50,7 @@ module LibStability
 		list.Sort(sorter)
 		
 		for obj in list
-			if (obj isnt private) and (!isfunc or obj|scfunction|.NeedsStableID)
+			if (obj isnt libonly) and (!isfunc or obj|scfunction|.NeedsStableID)
 				obj.MakeID(fs, table, isFunc)
 			
 		
@@ -80,6 +80,14 @@ module LibStability
 			id = ++LibStability.LastLibID
 			.PackID(isfunc) = id
 		
+		// OK, so we want to be able to run this via cake.
+		// do we want to be able to load functions via cake, though?
+		// actually, yes. Its probably a very good idea.
+		// being able to load funcs from libs, sound useful.
+		// just with dlopen/dlsym/dlclose
+		// perhaps... I can just make this into a struct
+		// so why did this used to work? what changed?
+		// perhaps I just made some funcs private? i think that is all.
 		if table
 			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
 				Table[id+31] = fn

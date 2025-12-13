@@ -186,9 +186,9 @@ function Message.TestFuncName (|bool|)
 	return true
 
 
-function MakeHelper
+function MakeLibOnly
 	.NoAutoComplete = 2
-	(self|scnode| is Private)					// limited to internal within a project
+	(self|scnode| is libonly)					// limited to internal within a project
 
 	
 function ParseName (|Message| node, |bool|)
@@ -198,8 +198,8 @@ function ParseName (|Message| node, |bool|)
 	cname.func = @thg
 	.Name = cname.name
 	
-	if ftype == "helper"
-		.MakeHelper
+	if ftype == "helper" or "libinternal"
+		.MakeLibOnly
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2
 	  elseif ftype == "inline"
@@ -536,14 +536,6 @@ function message.DefaultPrmFix (|scdecl?| Base)
 			s.clear
 			
 
-// 
-function SCFunction.DefaultTest
-//	.ffff
-
-	
-function scfunction.ffff (|int| i=(...).InBranch)
-			
-
 
 function message.IntSmallness (|scdecl| T, |int|)
 	if self and T and (.func == @num)
@@ -736,7 +728,7 @@ function DeclsPrototypeClass (|Message!| ch0)
 	// so... basically... it ok that its at 0? should we give a dummy address?
 	
 	(dcl is Global) // in case we don't do the below branch
-	if (!.islibrary) or (self|scnode| isnt Private)
+	if (!.islibrary) or (self|scnode| isnt libonly)
 		dcl.AddToGlobs
 	  else
 		dcl.exportposition = 64K-8 // sigh. just mark it somehow.
@@ -1934,8 +1926,10 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 			Compiler.FuncList <~ self
 		.FLookup = name_space  // sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
-		if name_space is PrivateAll
-			.MakeHelper
+		if name_space is libonlyAll
+			.MakeLibOnly
+		if name_space is EmbeddedOnly
+			self|scnode| is EmbeddedOnly
 
 	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 

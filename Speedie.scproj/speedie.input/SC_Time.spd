@@ -19,9 +19,10 @@ function compiler.PrintCompileTime (|date| durr)
 	fs <~ "lib "
 	
 	packmaker.LibGlobSize.strsize(fs)
-	if packmaker.PackGlobs
+	|| G = packmaker.PackGlobs
 		fs <~ ", app "
-		packmaker.PackGlobSize.StrSize(fs)
+		|| gs = packmaker.GlobalsSize(G)
+		gs.StrSize(fs)
 	
 	|| vm_ops = VM_Builder.Total
 		fs.normal  "vm_ops",    fs <~ vm_ops
@@ -44,10 +45,6 @@ function compiler.PrintCompileTime (|date| durr)
 		app.MemoryUsage(32KB, fs)
 	printline fs
 
-
-function faststring.PrintStatType (|string| name, |int| count)
-	if count
-		self <~ "$\n$name $count"
 
 
 function compiler.PrintStats 

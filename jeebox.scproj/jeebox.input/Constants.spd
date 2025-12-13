@@ -72,7 +72,7 @@ Module Jeebox
 
 	helper string.UniCS (|charset!|)
 		// all valid unicode-ranges
-		return (self + #(80BFC2F4)#).charset 	
+		return (self + #(80BFC2F4)#).charset
 
 
 	helper AddEscape (|byte| i, |faststring| fs)

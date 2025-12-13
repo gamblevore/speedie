@@ -20,10 +20,6 @@ datatype ClassInfo (int)
 		Banned
 		HasNilChecker
 		DefaultsToReal
-//		HelpersAll
-//		IsRole
-//		ClassObj
-//		IsTask
 		Stateless
 		Stateful
 		Builtin

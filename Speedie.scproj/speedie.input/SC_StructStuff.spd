@@ -55,8 +55,7 @@ function Tran_Rejoin (TranFunc)  // exitter
 
 function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
 	opt norefcounts
-	if self == "Speedie_Main"
-	if (self|scnode| is Private)  or  ((self is ExternalLib) and options.modepack)
+	if (self|scnode| is libonly)  or  ((self is ExternalLib) and options.modepack)
 		|| curr = scfunction.currfunc
 		if curr and !curr.IsLibrary and (.project != curr.project)
 			error (incoming.exp, .name + " used beyond private scope" )

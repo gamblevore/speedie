@@ -87,7 +87,7 @@ function Message.AllowedMoveToInit (|bool|)
 
 
 function SCModule.CreateInitFuncSub (|message| init, |string| name)
-	|| type = "helper"
+	|| type = "libinternal"
 	if !.islibrary
 		type = "autogen"
 	|| msg = "$type $Name (|int|)".ParseClean
