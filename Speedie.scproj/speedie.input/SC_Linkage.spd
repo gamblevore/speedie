@@ -68,14 +68,14 @@ module Linkage
 
 
 
-module InbuiltShellArgs
-	function Collect (CollectFunc)
-		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
-
-		|| ShellArgs = node[@list].listall
-		feedback.ParseArgsSub(shellargs)
-		
-		return Compiler.program
+//module InbuiltShellArgs
+//	function Collect (CollectFunc)
+//		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
+//
+//		|| ShellArgs = node[@list].listall
+//		feedback.ParseArgsSub(shellargs)
+//		
+//		return Compiler.program
 
 
 

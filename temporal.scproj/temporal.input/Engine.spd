@@ -57,7 +57,7 @@ class SteveMachine
 		(.Create.Steve)(p, a, 0, .reps)
 		
 		
-	helper Hash_
+	libinternal Hash_
 		|uint64| H
 		|| p = ._ByteSamples.ptr
 		|| n = ._ByteSamples.Size
@@ -89,7 +89,7 @@ class SteveMachine
 		rz &= 12~bits
 	
 	
-	helper EightIsntGreat (|uint|)
+	libinternal EightIsntGreat (|uint|)
 		// lets avoid using the number 8! Its very computery.
 		// 12 is OK... 3 is OK. Maybe 5 even or 7.
 		// the iChing uses 6-bits in fact.

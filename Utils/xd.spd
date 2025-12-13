@@ -2,7 +2,7 @@
 https://www.youtube.com/watch?v=pnnx1bkFXng // as you can tell... my version is a lot better than zig version.
 
 
-helper string.ColumnFinish (|int| lastout, |int| i, |faststring| fs, |int|)
+function string.ColumnFinish (|int| lastout, |int| i, |faststring| fs, |int|)
 	fs <~ "      "
 	while lastout <= i
 		|| c2 = self[lastout++]

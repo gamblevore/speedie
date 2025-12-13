@@ -77,7 +77,7 @@ function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |stri
 	|| longest  = 0
 	
 	for ch in list
-		if ch.hasany
+		if ch.HasAny
 			|| chn = ch.name
 			(longest max= chn.length)
 			(shortest min= chn.length)
@@ -625,6 +625,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 	rz.msg(fn, modname)
 	rz <~ prm
  
+
 
 datatype AutoCompleteMode (int)
 	linkage

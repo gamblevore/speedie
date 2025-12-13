@@ -58,7 +58,7 @@ function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
 	if (self|scnode| is libonly)  or  ((self is ExternalLib) and options.modepack)
 		|| curr = scfunction.currfunc
 		if curr and !curr.IsLibrary and (.project != curr.project)
-			error (incoming.exp, .name + " used beyond private scope" )
+			error (incoming.exp, "Library-internal function '" + .name + "' reached by project code." )
 			error (.source, "   Original:")	
 
 	|| ft = .StructReturned

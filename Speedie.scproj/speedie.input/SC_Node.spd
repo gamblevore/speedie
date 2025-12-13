@@ -994,7 +994,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'prototype'			SCFunction.NewProtoType
 	+'render'				SCFunction.NewRender
 	+'import'				(scimport.DoImport)
-	+'shell_args'			InbuiltShellArgs.collect // should remove this?
+//	+'shell_args'			InbuiltShellArgs.collect // should remove this?
 	+'syntax'				SCClass.LoadSyntax
 	+'linkage'				CppRefs.Linkage
 	+'struct'				SCClass.newstruct

@@ -4,6 +4,6 @@
 // lets rename stuff.
 // helpers are lib-only. Lets at least rename it that internally!
 // 
-struct jb_vm	linkage: cpp_class jb_vm, wrapper//, internal	function Registers (|bool| Clear=true, |&ivec4|)		cpp_wrapper JB_ASM_Registers
+struct jb_vm	linkage: cpp_class jb_vm, wrapper//, libinternal	function Registers (|bool| Clear=true, |&ivec4|)		cpp_wrapper JB_ASM_Registers
 // for speedie (internal tests)	function InitTable (|int| n, |int| g, |&&nil|)		cpp_wrapper JB_ASM_InitTable	
 // for exec (actual use)	function FillTable (|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)		cpp_wrapper JB_ASM_FillTable	module		function Load (|stringzeroterminated| S, |?&nil|)			cpp_wrapper JB_ASM__Load				function VM (|&jb_vm|)			cpp_wrapper JB_ASM__VM		function Run (|&uint| Code, |int| CodeLength, |&ivec4|)			cpp_wrapper JB_ASM__Run
