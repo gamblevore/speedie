@@ -35,7 +35,7 @@ struct Assembler
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
-	|?&FatASM|					Orig
+//	|?&FatASM|					Orig
 	|&FatASM|					FuncStart_
 	|&FatASM|					Start
 	|&FatASM|					Curr_
@@ -57,19 +57,12 @@ struct Assembler
 		|jbin?|						DebugInfo
 
 		function SafeDebugInfo (|bool|debug = false, |string|)
-			require .debuginfo|string|.length
-			rz = .debuginfo.GetResult
-			|| tmp = rz.ParseJbin 
-				0
-/*				target debug
-					printline tmp
-					if debug
-						.debuginfo! <~ rz
-						rz = ""
-*/
-			  else
+/			require .debuginfo|string|.length
+			|| info = .debuginfo.GetResult
+			if !info.ParseJbin 
 				error "Generated invalid debug info (jbin)"
-				rz = ""
+				info = ""
+			return info
 				
 
 	
@@ -605,7 +598,7 @@ struct Assembler
 	function FillLayout (|jbin| j)
 		opt norefcounts
 		for c in Compiler.ReachedClassTable
-			if c.IsLibrary == options.MakeExec
+			if !c.isbehaviourtable and (c.IsLibrary == options.MakeExec)
 				j.Enter(@msg, c.ExportName)
 				c.ListLayout(j)
 				j.exit
@@ -763,11 +756,11 @@ function Assembler.Rework (|SCFunction| fn,  |bool|)
 	HoistSpace.NeedSpare(.FnLength)
 	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 
-	.Orig = .FuncStart
+//	.Orig = .FuncStart
 	.InitAndStartFunc(fn)
 	.RootGen(fn)
 	.FinishASM
-	.Orig = nil
+//	.Orig = nil
 
 
 target debug

@@ -46,8 +46,8 @@ module LibStability
 			if !options.MakeExec
 				Table = jb_vm.vm.TestInit(4096, 64K)
 			
-		|| sorter = codesorter.PackID(isfunc)
-		list.Sort(sorter)
+		|| ObjSort = codesorter.PackID(isfunc)
+		list.Sort(ObjSort)
 		
 		for obj in list
 			if (obj isnt libonly) and (!isfunc or obj|scfunction|.NeedsStableID)

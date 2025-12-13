@@ -484,10 +484,10 @@ function CreateEmptyConstructors (|scfunction|)
 			rz ?= f2
 
 
-function scfunction.BeforeTransform
+function scfunction.BeforeTransform 
 	opt norefcounts
 	|| p = .HasProto
-		p.Name = .ExportName
+		 p.exportname = .ExportName
 	  else
 		.AddConstructorReturn2
 
