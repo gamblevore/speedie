@@ -44,7 +44,7 @@ module LibStability
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
 		target debug
 			if !options.MakeExec
-				Table = jb_vm.vm.InitTable(4096, 64K)
+				Table = jb_vm.vm.TestInit(4096, 64K)
 			
 		|| sorter = codesorter.PackID(isfunc)
 		list.Sort(sorter)
@@ -89,7 +89,9 @@ module LibStability
 		// so why did this used to work? what changed?
 		// perhaps I just made some funcs private? i think that is all.
 		if table
-			|| fn = jb_vm.Load(.exportname) // an actual function pointer for testing
+			if !SelfLib.IsOpen
+				selflib = DynamicLibrary.new(nil)
+			|| fn = SelfLib[.exportname] // an actual function pointer for testing
 				Table[id+31] = fn
 
 	function Find (|string| str, |bool| Funcs, |scobject|)
@@ -107,3 +109,5 @@ module LibStability
 					fn.PackID(funcs) = id
 		.LastLibID = ID	
 	
+
+|dynamiclibrary| SelfLib

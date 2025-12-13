@@ -1,23 +1,10 @@
 
 
-#include <dlfcn.h>
 
 // need to allow vectorcall on windows. to allow vectors to be passed
 // using the SIMD registers.
 typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
-
-
-// find app's own functions within itself...
-extern "C" void* JB_ASM__Load (JB_StringC* S) {
-    static void* MySelf;
-    if (!MySelf) {
-		MySelf = dlopen(0, RTLD_LAZY);
-		if (!MySelf) return 0;
-	}
-	void* R = dlsym(MySelf, (const char*)(S->Addr));
-	return R;
-}
 
 
 AlwaysInline void DivMath(VMRegister* r, ASM Op) {

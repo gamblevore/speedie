@@ -71,6 +71,8 @@
 		AC7D3DA029A280A700148ADB /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8C29A27C1D00148ADB /* JB_Vectors.cpp */; };
 		AC7D3DA129A280A700148ADB /* JB_Pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8529A27C1D00148ADB /* JB_Pipe.cpp */; };
 		AC7D3DA329A280A700148ADB /* JB_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8829A27C1D00148ADB /* JB_Utils.cpp */; };
+		ACA86A042EEDC951005EFC36 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA86A032EEDC951005EFC36 /* JB_Dylib.cpp */; };
+		ACA86A052EEDC951005EFC36 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA86A032EEDC951005EFC36 /* JB_Dylib.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -200,6 +202,7 @@
 		AC7D3E4929A2844E00148ADB /* StringSplitters.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringSplitters.i; path = ../Library/CppLib/StringSplitters.i; sourceTree = "<group>"; };
 		AC7D3E4B29A284DB00148ADB /* speedie.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = speedie.input; sourceTree = "<group>"; };
 		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
+		ACA86A032EEDC951005EFC36 /* JB_Dylib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dylib.cpp; path = ../Library/CppLib/JB_Dylib.cpp; sourceTree = "<group>"; };
 		ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../../lib/libSDL2.dylib; sourceTree = "<group>"; };
 		ACC8F9F22C960FD000A549D7 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -264,6 +267,7 @@
 				AC7D3C8F29A27C1D00148ADB /* JB_Dictionary.cpp */,
 				AC7D3C8229A27C1D00148ADB /* JB_DirReaderUnix.cpp */,
 				AC7D3C7E29A27C1D00148ADB /* JB_DirReaderWin32.cpp */,
+				ACA86A032EEDC951005EFC36 /* JB_Dylib.cpp */,
 				AC7D3C9029A27C1D00148ADB /* JB_Errors.cpp */,
 				AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */,
 				AC7D3C9329A27C1D00148ADB /* JB_File.cpp */,
@@ -484,6 +488,7 @@
 				AC7D3CAA29A27C7700148ADB /* JB_Math.cpp in Sources */,
 				AC7D3C9F29A27C7700148ADB /* JB_Run.cpp in Sources */,
 				AC7D3CA029A27C7700148ADB /* JB_LibraryFile.cpp in Sources */,
+				ACA86A042EEDC951005EFC36 /* JB_Dylib.cpp in Sources */,
 				AC7D3CB929A27C9900148ADB /* JB_Globals.cpp in Sources */,
 				AC7D3C9E29A27C7700148ADB /* JB_MSR.cpp in Sources */,
 				AC7D3CAE29A27C7700148ADB /* JB_Dictionary.cpp in Sources */,
@@ -530,6 +535,7 @@
 				AC534D752C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC7D3D9F29A280A700148ADB /* JB_Child.cpp in Sources */,
 				AC6AB92A2CB1AEB800555461 /* FF_ARM64.S in Sources */,
+				ACA86A052EEDC951005EFC36 /* JB_Dylib.cpp in Sources */,
 				AC7D3DA029A280A700148ADB /* JB_Vectors.cpp in Sources */,
 				AC7D3DA129A280A700148ADB /* JB_Pipe.cpp in Sources */,
 				AC7D3DA329A280A700148ADB /* JB_Utils.cpp in Sources */,

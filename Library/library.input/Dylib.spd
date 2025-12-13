@@ -1,0 +1,32 @@
+
+
+struct DynamicLibrary
+	linkage
+		cpp_part dylib
+		cpp_class JB_Dylib
+		wrapper
+
+	|?&nil|		handle
+	
+	flags
+		Lazy
+		Now
+		Local
+		Global
+		NoLoad
+		NoDelete	= 0x80
+	
+	inline IsOpen (|bool|)
+		return .handle != nil
+	
+	syntax access (|string| S, |?&nil|)
+		cpp_wrapper JB_dylib_Load
+		
+	libinternal Open (|string?| F, |int| Mode = 0)
+		cpp_wrapper 
+	
+	module
+		function New (|string?| F, |int| Mode = 0, |DynamicLibrary|)
+			rz.Open(F, mode)
+
+

@@ -50,6 +50,17 @@ int* JB_SP_ErrorNumber ();
 int JB_SP_Run (const char** R, int Mode);
 int JB_SP_Init (const char** R, bool IsThread);
 
+// dylib
+#include <dlfcn.h>
+
+struct JB_Dylib {
+	void* handle;
+};
+
+void* JB_dylib_Load (JB_Dylib* Self, JB_String* Path);
+void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
+
+
 
 
 // VM 
@@ -85,7 +96,6 @@ struct	jb_vm;
 jb_vm*	JB_ASM__VM();
 void	JB_ASM_FillTable	(jb_vm* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*	JB_ASM__Run			(u32* Code, u32 CodeSize);
-void*	JB_ASM__Load		(JB_StringC* S);
 void**	JB_ASM_InitTable	(jb_vm* V, int n, int g);
 ivec4*	JB_ASM_Registers	(jb_vm* V, bool Clear);
 
