@@ -236,7 +236,7 @@ class list
 		return .movesub(n, r)
 
 
-	helper MoveSub (|int| n, |$int| r, |...?|)
+	libinternal MoveSub (|int| n, |$int| r, |...?|)
 		opt NoRefCounts
 		real self
 		if !n
@@ -409,7 +409,7 @@ class list
 			.Last = item
 
 
-//	helper SortAfter (|SorterComparer| fnc, |list|)
+//	libinternal SortAfter (|SorterComparer| fnc, |list|)
 //		opt norefcounts			// find the first obj that we are "more than"
 //		|| p = .prev
 //		while p
@@ -424,7 +424,7 @@ class list
 			f.SortAfterSub(self, fnc)
 
 
-	helper SortAfterSub (|list| parent, |SorterComparer| fnc)
+	libinternal SortAfterSub (|list| parent, |SorterComparer| fnc)
 		opt norefcounts
 		|| p = .prev
 		// Find the first thing that we are larger than. end there.

@@ -11,7 +11,7 @@ class Anagrams
 	|dictionary of string|		out
 	|string|					orig
 		
-	helper Split (|string| v, |string| remain)
+	libinternal Split (|string| v, |string| remain)
 		for i in 1 to remain.Length
 			|| sub = remain[0, i]
 			if Anagrams[sub]
@@ -22,7 +22,7 @@ class Anagrams
 					.out[v] = v2.sort(' ')
 		
 	
-	helper Find (|string| progress, |string| inside, |int| depth)
+	libinternal Find (|string| progress, |string| inside, |int| depth)
 		for i in progress.Length+1
 			|| Variant = progress.insert(inside, i)
 			if depth < .orig

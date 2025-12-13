@@ -606,7 +606,7 @@ datatype vec2
 		cpp_part Bool
 		return self != vec2()
 
-	helper float.RoundEvenSub (|float|)
+	libinternal float.RoundEvenSub (|float|)
 		return (self*0.5).Fract*2.0
 
 	function RoundEven (|vec2|)

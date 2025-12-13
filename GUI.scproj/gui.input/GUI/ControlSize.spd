@@ -7,7 +7,7 @@ struct ControlSize
 		datatype true
 	|controlrect|				GSize
 	
-	helper G (|int| i, |guicontrol| g, assigns:|ControlPoint|)
+	libinternal G (|int| i, |guicontrol| g, assigns:|ControlPoint|)
 		if .gsize[i] != value
 			.GSize[i] = value
 			GUI.resized(g)
@@ -41,7 +41,7 @@ struct ControlSize
 		.sizer.g(3, self) = ((value.y << 4) ||| ControlPoint.length|int|)|controlpoint|
 
 
-	helper guicontrol.CalculateSize (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // ResizeControl, ReCalculateSize
+	libinternal guicontrol.CalculateSize (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // ResizeControl, ReCalculateSize
 		opt norefcounts
 		rz = .sizer.CalculateSize(parent, prev, Hard, self)
 		if .LastRect!=rz

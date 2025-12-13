@@ -95,7 +95,7 @@ class FixedDict
 		return fixeddict(self, part, r, rt)
 	
 
-	helper InlineValue (|int| t, ||)
+	libinternal InlineValue (|int| t, ||)
 		nil self
 		if T == typeobj: return self|...|
 		if T and self and .valuetype
@@ -115,7 +115,7 @@ class FixedDict
 			return .gettype(s.addr, n)|...|
 
 	
-	helper AddType (|&byte| Addr, |int| n, || val, |int| Type)
+	libinternal AddType (|&byte| Addr, |int| n, || val, |int| Type)
 		opt norefcounts
 		|| i = 0
 		while 
@@ -126,7 +126,7 @@ class FixedDict
 			self = .DownPart(B>>4)
 
 
-	helper GetType (|&byte| Addr, |int| n, ||)
+	libinternal GetType (|&byte| Addr, |int| n, ||)
 		opt norefcounts
 		|| i = 0
 		while
@@ -246,7 +246,7 @@ role NameTableConcept (object)
 		d.NameTableAdd(y)
 
 
-	helper fixedDict.NameTableAdd (|message| value)
+	libinternal fixedDict.NameTableAdd (|message| value)
 		opt norefcounts
 		|| l = .Letter
 		.Letter = l+1

@@ -56,7 +56,7 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col
 
 
 
-helper string.FontLoad (|image|)
+libinternal string.FontLoad (|image|)
 	rz = .LoadQOI$
 	|| blank = colors.clear
 	for v in rz

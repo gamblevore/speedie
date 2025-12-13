@@ -14,22 +14,22 @@ module Math
 	function Pi (|float|)
 		disabled "Use π for pi, or 2π for PI*2"
 
-	helper UnSineBad (|float| f, |float|)
+	libinternal UnSineBad (|float| f, |float|)
 		cpp_wrapper (asinf)
 
-	helper UnCosBad (|float| f, |float|)
+	libinternal UnCosBad (|float| f, |float|)
 		cpp_wrapper (acosf) // we don't want the half version!
 
-	helper UnTan2Bad (|float| f1, |float| f2, |float|)
+	libinternal UnTan2Bad (|float| f1, |float| f2, |float|)
 		cpp_wrapper (atan2f)
 	
-	helper SinPiHalf (|float| f, |float|)
+	libinternal SinPiHalf (|float| f, |float|)
 		cpp_wrapper (__sinpif)
 
-	helper CosPiHalf (|float| f, |float|)
+	libinternal CosPiHalf (|float| f, |float|)
 		cpp_wrapper (__cospif)
 
-	helper TanPiHalf (|float| f, |float|)
+	libinternal TanPiHalf (|float| f, |float|)
 		cpp_wrapper (__tanpif)
 	
 

@@ -14,7 +14,7 @@ module CodeSorter
 		compiler.FuncList.sort(Leafness)
 
 
-	helper PropertyOrder (sortercomparer of scdecl)
+	libinternal PropertyOrder (sortercomparer of scdecl)
 		return .exportposition < b.exportposition
 	
 	
@@ -23,7 +23,7 @@ module CodeSorter
 			return (&.fpackid)|sortercomparer|
 		return (&.gpackid)|sortercomparer|
 		
-	helper FPackID (sortercomparer of scobject)
+	libinternal FPackID (sortercomparer of scobject)
 		|| fA = .fPackID|int|
 		|| fB = b.fPackID|int|
 		if !fa or !fb
@@ -34,7 +34,7 @@ module CodeSorter
 		return fb - fa	  // we need init and main first
 	
 	
-	helper GPackID (sortercomparer of scobject)
+	libinternal GPackID (sortercomparer of scobject)
 		|| fA = .gPackID|int|
 		|| fB = b.gPackID|int|
 		if !fa or !fb

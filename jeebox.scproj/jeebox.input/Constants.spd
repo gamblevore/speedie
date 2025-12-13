@@ -70,12 +70,12 @@ Module Jeebox
 	.InitConstants
 
 
-	helper string.UniCS (|charset!|)
+	libinternal string.UniCS (|charset!|)
 		// all valid unicode-ranges
 		return (self + #(80BFC2F4)#).charset
 
 
-	helper AddEscape (|byte| i, |faststring| fs)
+	libinternal AddEscape (|byte| i, |faststring| fs)
 		opt norefcounts
 		|| f = string.byte(i)
 		require  !.EscapeStr![f]  or  !.EscapeChr![f]
@@ -86,7 +86,7 @@ Module Jeebox
 		.Escapechr![f] ?= t
 
 
-	helper InitConstants
+	libinternal InitConstants
 		array.new // needed by argv
 
 		.EscapeChr = dictionary.Copy(.EscapeStr!)
@@ -118,7 +118,7 @@ Module Jeebox
 //		return .replaceall("``", "`")
 
 
-	helper string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
+	libinternal string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
 		after = after min .length
 		while (off < after)
 			|| c = self[off++]

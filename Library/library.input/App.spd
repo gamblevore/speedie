@@ -88,7 +88,7 @@ function Switches (|[string]|)
 			rz <~ R
 	
 
-helper args_ (|[string]|)
+libinternal args_ (|[string]|)
 	opt norefcounts
 	for R in ._rawargs
 		if R.ArgName ~= ""
@@ -181,7 +181,7 @@ function Input (|string|)
 function IsMainThread (|bool|)
 	return !.IsThreadedAsLib
 
-helper IsThreadedAsLib (|bool|)
+libinternal IsThreadedAsLib (|bool|)
 	cpp_wrapper JB_LibIsThreaded
 	
 function ParentID (|pid_int|)
@@ -233,7 +233,7 @@ function CWD (assigns:|string|, |ErrorInt|)
 	return ._chdir(Value.AbsolutePath)
 
 
-helper _chdir (|string| path, |ErrorInt|)
+libinternal _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
@@ -264,7 +264,7 @@ render MemoryUsage (|int| Over=0)
 	fs.memoryreport("arr",	.OtherMemory)	
 	
 	
-helper FastString.MemoryReport (|string| name, |int64| Amount)
+libinternal FastString.MemoryReport (|string| name, |int64| Amount)
 	if amount
 		self <~ name
 		self <~ ": "
@@ -272,13 +272,13 @@ helper FastString.MemoryReport (|string| name, |int64| Amount)
 		self <~ "\n"
 	
 
-helper LeakMarkMemory
+libinternal LeakMarkMemory
 	cpp_wrapper JB_Mem_Mark
 
-helper LeakUnMarkMemory
+libinternal LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
 	
-helper IsQuarantined (|bool|)	
+libinternal IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
 
 

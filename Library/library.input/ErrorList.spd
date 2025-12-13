@@ -99,7 +99,7 @@ class ErrorReceiver
 			._LogFunc = LogFileWriter
 	
 	
-	helper LogFileWriter (fnErrorLogger)
+	libinternal LogFileWriter (fnErrorLogger)
 		opt norefcounts
 		visible class~file
 		|| f = ._LogObj

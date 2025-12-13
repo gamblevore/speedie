@@ -74,7 +74,7 @@ class TextView (GUIControl)
 			value.addviewer(self)
 	
 
-	helper Undoer (|Document?|)
+	libinternal Undoer (|Document?|)
 		opt norefcounts
 		|| v = ._viewing
 		if v or self isnt editable
@@ -126,11 +126,11 @@ class TextView (GUIControl)
 		return MouseDragging.handled
 
 	
-	helper LineNumRight (|int|)
+	libinternal LineNumRight (|int|)
 		return 5 + .lastleft + ._LineNumWidth*font.width
 	
 	
-	helper string._FindBreakpoint (|int|)
+	libinternal string._FindBreakpoint (|int|)
 		for (c in self) (i)
 			if c == '/'
 				c = self[i+1]
@@ -142,7 +142,7 @@ class TextView (GUIControl)
 		return -1
 			
 			
-	helper string._TextLineClickedBreakpoint (|string|)
+	libinternal string._TextLineClickedBreakpoint (|string|)
 		|| i = ._FindBreakpoint
 		if i == int.max
 			beep
@@ -154,7 +154,7 @@ class TextView (GUIControl)
 		return .trim(i, i+1)
 
 		
-	helper ClickedLineNum (|ivec2| P, |bool|)
+	libinternal ClickedLineNum (|ivec2| P, |bool|)
 		require self is editable
 		require p.x < .LineNumRight
 		|| bs = (0, 0)
@@ -178,7 +178,7 @@ class TextView (GUIControl)
 		return true	
 		
 		
-	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
+	libinternal ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
 		return .ClickedScrollbar(P, Clicks, .slh)
 	
 	
@@ -207,7 +207,7 @@ class TextView (GUIControl)
 			return true
 
 
-	helper LineAtY (|int| py, |textviewline|)
+	libinternal LineAtY (|int| py, |textviewline|)
 		opt norefcounts
 		|| y = py max .lastbottom
 		|| Dist = .lasttop - Y
@@ -217,7 +217,7 @@ class TextView (GUIControl)
 		return .StartLine.move(L)
 
 	
-	helper ExpandToAntiWords (|intrange| t, |intrange|)
+	libinternal ExpandToAntiWords (|intrange| t, |intrange|)
 		opt norefcounts
 		|| M = .MessageAt(t.x1)
 		|| M2 = .MessageAt(t.x2)
@@ -238,13 +238,13 @@ class TextView (GUIControl)
 		return t
 
 	
-	helper TextViewLine.ooof (|bool| t, |int|)
+	libinternal TextViewLine.ooof (|bool| t, |int|)
 		if t
 			return .position
 		return .after
 		
 		
-	helper ExpandToVis (|intrange| t, |intrange|)
+	libinternal ExpandToVis (|intrange| t, |intrange|)
 		opt norefcounts
 		|| m = t
 		|| d1 = .FindDrawInfo(m.x1)
@@ -254,7 +254,7 @@ class TextView (GUIControl)
 		return t
 		
 		
-	helper ByteAtXY (|ivec2| p, |$ivec2| v, |textviewline|)
+	libinternal ByteAtXY (|ivec2| p, |$ivec2| v, |textviewline|)
 		opt norefcounts
 		|| D = .LineAtY(p.y)
 			|| x = p.x - .LineNumRight
@@ -265,7 +265,7 @@ class TextView (GUIControl)
 			v = (.text.length, 0)
 
 	
-	helper LastLineFix (|textviewline| d, |int| x, |ivec2|)
+	libinternal LastLineFix (|textviewline| d, |int| x, |ivec2|)
 		x += 2
 		|| t = d.ByteOfX(x)
 		|| PreferFirst = (d.after == t) and (d isnt last)
@@ -275,7 +275,7 @@ class TextView (GUIControl)
 		return (t, PreferFirst|int|)
 		
 	
-	helper ExpandSel (|ivec2| t, |int| C, |ivec2|)
+	libinternal ExpandSel (|ivec2| t, |int| C, |ivec2|)
 		if (C == 2)
 			return .ExpandToAntiWords(t)
 		if (C == 3)
@@ -335,19 +335,19 @@ class TextView (GUIControl)
 	function SelRange (|intrange|)
 		return ._typingplace.resolve
 		
-	helper Sel0 (|int|)
+	libinternal Sel0 (|int|)
 		return .selrange.x
 	
-	helper Sel1 (|int|)
+	libinternal Sel1 (|int|)
 		return .selrange.y
 
-	helper SelDirect (|IntRange| value, |TextViewLine| d)
+	libinternal SelDirect (|IntRange| value, |TextViewLine| d)
 		.TypingPlaceTry(value, false, d)
 
 	autogen SelectedLine (|textviewline|)
 		return .FindDrawInfo(.sel0)
 
-	helper TypingPlaceReal (assigns:|intrange| result)
+	libinternal TypingPlaceReal (assigns:|intrange| result)
 		opt norefcounts
 		._TypingPlace = result
 		|| doc = .document
@@ -355,7 +355,7 @@ class TextView (GUIControl)
 			|| L = doc.current
 				L.typingplace = result
 
-	helper TypingPlaceDirect (|intrange| result, |bool|)
+	libinternal TypingPlaceDirect (|intrange| result, |bool|)
 		opt norefcounts
 		require result != ._TypingPlace
 		.TypingPlaceReal = result
@@ -367,12 +367,12 @@ class TextView (GUIControl)
 		gui.touch
 		return true
 
-	helper TypingPlaceTry (|IntRange| result, |bool| insert, |textviewline| d)
+	libinternal TypingPlaceTry (|IntRange| result, |bool| insert, |textviewline| d)
 		opt norefcounts
 		if .TypingPlaceDirect(result)
 			.TypingPlaceChanged(insert, d)
 
-	helper TypingPlaceChanged (|bool| insert, |textviewline| d)
+	libinternal TypingPlaceChanged (|bool| insert, |textviewline| d)
 		if .hasfocus
 			GUI.selchanged
 		if !.IsCleared
@@ -395,14 +395,14 @@ class TextView (GUIControl)
 				.ShowErrorInfo(d.position, err, false)
 	
 	
-	helper CancelDelayedError
+	libinternal CancelDelayedError
 		opt norefcounts
 		|| dse = ._ErrorDelayer
 			dse.remove
 			._ErrorDelayer = nil
 		
 	
-	helper FindEnd (|ind| x,  |int| i,  |int|)
+	libinternal FindEnd (|ind| x,  |int| i,  |int|)
 		opt norefcounts
 		|| f = csAntiWords!
 		|| avoid = false
@@ -431,7 +431,7 @@ class TextView (GUIControl)
 			return s.length
 	
 	
-	helper WordMove (|ind| pos, |int| dir, |ind|)
+	libinternal WordMove (|ind| pos, |int| dir, |ind|)
 		opt norefcounts
 		|| s = .text
 		|| x = .WordMoveSub(pos, dir)
@@ -477,7 +477,7 @@ class TextView (GUIControl)
 			return 5
 
 			
-	helper WordMoveSub (|ind| pos, |int| dir, |ind|)
+	libinternal WordMoveSub (|ind| pos, |int| dir, |ind|)
 		opt norefcounts
 		|| s = .text
 		|| orig = pos
@@ -499,7 +499,7 @@ class TextView (GUIControl)
 			return pos
 	
 	
-	helper MoveSel (|int| i, |bool|)
+	libinternal MoveSel (|int| i, |bool|)
 		opt norefcounts
 		debug_require i
 		GUI.showcursor(false)
@@ -537,14 +537,14 @@ class TextView (GUIControl)
 		return true
 	
 	target false {
-	helper textviewline.InSane (|textviewline|s, |bool|)
+	libinternal textviewline.InSane (|textviewline|s, |bool|)
 		if (.position < 0)
 			return true
 		if s and (s.position != .after)
 			return true
 
 
-	helper Sanity
+	libinternal Sanity
 		opt norefcounts
 		for p in ._lines
 			|| s = p.next
@@ -554,7 +554,7 @@ class TextView (GUIControl)
 			p = s
 	}
 
-	helper ShowTypingPlace (|ivec2| r)
+	libinternal ShowTypingPlace (|ivec2| r)
 		opt norefcounts
 		|| i = (r.width>0)|int|
 		.ViewPos(r[i], 0)
@@ -564,7 +564,7 @@ class TextView (GUIControl)
 		return .text[0, .sel0].linecount
 	
 	
-	helper DrawInfoAtLine (|int| L, |textviewline|)
+	libinternal DrawInfoAtLine (|int| L, |textviewline|)
 		opt norefcounts
 		.PrepareLinesOfText
 		for r in ._lines
@@ -591,7 +591,7 @@ class TextView (GUIControl)
 			.Doexplode(rz)
 
 
-	helper InRange (|int| pos, |bool|)
+	libinternal InRange (|int| pos, |bool|)
 		opt norefcounts
 		|| d = ._Start
 		require pos >= d.Position
@@ -599,7 +599,7 @@ class TextView (GUIControl)
 		return pos <= d2.After
 	
 	
-	helper ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
+	libinternal ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
 		|| d	= .FindDrawInfoSub(x, i)
@@ -641,7 +641,7 @@ class TextView (GUIControl)
 		return x.clamp(.text.length)
 		
 
-	helper MoveSelLine (|int| i, |int| Page, |bool|)
+	libinternal MoveSelLine (|int| i, |int| Page, |bool|)
 		opt norefcounts
 		debug_require i
 		GUI.showcursor(false)
@@ -711,7 +711,7 @@ class TextView (GUIControl)
 			.ShowExtraInfo(.mousexy)
 	
 
-	helper KeyDownTest (|keys| key, |bool|)
+	libinternal KeyDownTest (|keys| key, |bool|)
 		if self is editable
 			if .IsInline
 				if key.IsCancel:		return .CancelEditing
@@ -750,22 +750,22 @@ class TextView (GUIControl)
 			return .DoSelectAll
 	
 	
-	helper DoSelectAll (|bool|)
+	libinternal DoSelectAll (|bool|)
 		.selrange = (0, .text.length)
 		return true
 	
 	
-	helper SectionKey (|bool|)
+	libinternal SectionKey (|bool|)
 		return (.onclicked)(self, -1)?
 	
 		
-	helper DoCut (|bool|)
+	libinternal DoCut (|bool|)
 		.CopyToClipboard
 		.Insert("")
 		return true
 
 
-	helper IndentCount (|int| x, |int|)
+	libinternal IndentCount (|int| x, |int|)
 		|| l	= .lineexpand((x,x))
 		|| r	= l.x
 		|| allspace = true
@@ -783,7 +783,7 @@ class TextView (GUIControl)
 			rz = -rz
 
 
-	helper ImproveIndent (|int| Curr, |int| extra, |string|)
+	libinternal ImproveIndent (|int| Curr, |int| extra, |string|)
 		|| c = curr
 		if c < 0
 			c = -c
@@ -794,7 +794,7 @@ class TextView (GUIControl)
 		return "\t" * (c/4)
 
 
-	helper NewLineSub (|int|extra, |bool|)
+	libinternal NewLineSub (|int|extra, |bool|)
 		|| sr = .selrange
 		|| ind = 0
 		|| i = 0
@@ -818,7 +818,7 @@ class TextView (GUIControl)
 		return true
 	
 	
-	helper SwapChars (|bool|)
+	libinternal SwapChars (|bool|)
 		|| i  = .selrange
 		|| i0 = i.x1
 		|| i2 = i
@@ -834,7 +834,7 @@ class TextView (GUIControl)
 		return true
 	
 	
-	helper NewLine (|bool|)
+	libinternal NewLine (|bool|)
 		if .SingleLine
 			return true // eat it
 		|| extra = 0
@@ -866,7 +866,7 @@ class TextView (GUIControl)
 //			._AddLine(line, L++)
 	
 	
-//	helper _AddLine (|string| s, |int| i)
+//	libinternal _AddLine (|string| s, |int| i)
 //		|| last = ._lines.Last!
 //		if !last.EndsWithLine
 //			last.Text += s
@@ -884,7 +884,7 @@ class TextView (GUIControl)
 		return .text[i, s]
 	
 		
-	helper DeComment (|bool|)
+	libinternal DeComment (|bool|)
 		require !.singleline
 		|| r = .selrange
 		|| s = ""
@@ -899,21 +899,21 @@ class TextView (GUIControl)
 		return true
 
 
-	helper string.IsSlashComment (|bool|)
+	libinternal string.IsSlashComment (|bool|)
 		for s.lines in self
 			|| i = s.OutWhite
 				require s[i, "//"]
 		return true
 		
 
-	helper string.DeslashComment (|string|)
+	libinternal string.DeslashComment (|string|)
 		|| i = .OutWhite
 			if self[i, "//"]
 				return .insert("", i, 2)
 		return self
 		
 	
-	helper DeslashComment (|bool|)
+	libinternal DeslashComment (|bool|)
 		|| r = .CommentableRange
 		|| t = self[r]
 		require t.IsSlashComment
@@ -927,7 +927,7 @@ class TextView (GUIControl)
 		return true		
 		
 	
-	helper CommentSlash (|bool| star, |bool|)
+	libinternal CommentSlash (|bool| star, |bool|)
 		require !.SingleLine
 		ifn keys.shift or star
 			if !.DeSlashcomment
@@ -985,7 +985,7 @@ class TextView (GUIControl)
 			rz = true
 
 
-	helper TypeTab (|bool|)
+	libinternal TypeTab (|bool|)
 // not sure why I did this?
 //		|| sr = .SelRange
 //		if !sr.width and .IsJeeboxMode
@@ -994,11 +994,11 @@ class TextView (GUIControl)
 		return .typed("\t")
 
 
-	helper CanTypeTab (|bool|)
+	libinternal CanTypeTab (|bool|)
 		return !(.SingleLine & 1)
 	
 	
-	helper TryTab (|bool|)
+	libinternal TryTab (|bool|)
 		require .CanTypeTab
 		|| sh = keys.shift
 		ifn .seltext.find(jeebox.CSLine)
@@ -1022,7 +1022,7 @@ class TextView (GUIControl)
 		return .text[a, b]
 
 
-	helper LineExpand (|IntRange| s, |bool| canback=false, |intrange|)
+	libinternal LineExpand (|IntRange| s, |bool| canback=false, |intrange|)
 		// this thing seems borked.
 		opt norefcounts
 		s = .clamp(s)
@@ -1133,7 +1133,7 @@ class TextView (GUIControl)
 				mush++
 
 
-	helper message.LastAfter (|int| IgnoreAfter, |ind|)
+	libinternal message.LastAfter (|int| IgnoreAfter, |ind|)
 		opt norefcounts
 		nil self
 		for a.flat in self
@@ -1142,7 +1142,7 @@ class TextView (GUIControl)
 				rz = rz max af
 	
 	
-	helper textviewline.after_with_msg (|int|)
+	libinternal textviewline.after_with_msg (|int|)
 		opt norefcounts
 		|| a = .after
 		|| la = .message.LastAfter(a)
@@ -1175,7 +1175,7 @@ class TextView (GUIControl)
 		return found
 
 	
-	helper CommentableRange	(|intrange|)
+	libinternal CommentableRange	(|intrange|)
 		|| sel	= .selrange
 		|| r	= sel.width and self[sel.x2 - 1].istextline
 		|| r2	= (0, r|int|)
@@ -1186,7 +1186,7 @@ class TextView (GUIControl)
 		return  t
 
 	
-	helper PrevIsTabbable (|int| R, |bool|)
+	libinternal PrevIsTabbable (|int| R, |bool|)
 		|| s = .SelRange
 		require !s.Width
 		|| i = s.x
@@ -1197,7 +1197,7 @@ class TextView (GUIControl)
 		return true
 		
 		
-	helper TabIndent (|int| dir, |string| mark, |bool| IsTypingLike=false,  |bool|)
+	libinternal TabIndent (|int| dir, |string| mark, |bool| IsTypingLike=false,  |bool|)
 		|| t = .CommentableRange
 		if Istypinglike and !.PrevIsTabbable(t.x)
 			return false
@@ -1218,7 +1218,7 @@ class TextView (GUIControl)
 		return true
 	
 	
-	helper string.FindTabInfo (|ivec3|)
+	libinternal string.FindTabInfo (|ivec3|)
 		rz.z = .Length
 		for (c in self) (i)
 			if c == '\t'
@@ -1233,7 +1233,7 @@ class TextView (GUIControl)
 				exit
 	
 	
-	helper string.GUITabIndent (|int| n, |string| mark, |faststring| fs)
+	libinternal string.GUITabIndent (|int| n, |string| mark, |faststring| fs)
 		if mark != "\t"
 			if n < 0
 				fs <~ self
@@ -1254,7 +1254,7 @@ class TextView (GUIControl)
 		fs.AppendRange(self, br.z)
 
 	
-	helper TabIndentAll (|int| dir, |string| mark, |string| txt,  |string|)
+	libinternal TabIndentAll (|int| dir, |string| mark, |string| txt,  |string|)
 		|| fs = faststring()
 		|| curr = -1
 		while curr < txt
@@ -1280,7 +1280,7 @@ class TextView (GUIControl)
 		return true
 	
 		
-	helper IsInline (|&InlineEditor|)
+	libinternal IsInline (|&InlineEditor|)
 		opt norefcounts
 		|| w = .window
 			|| t = w.Inline
@@ -1288,7 +1288,7 @@ class TextView (GUIControl)
 				return t
 	
 	
-	helper FinishEditing (|bool| Focus, |bool|)
+	libinternal FinishEditing (|bool| Focus, |bool|)
 		|| it = .isinline
 			|| c = it.cell
 			|| lv = it.editingfor
@@ -1301,14 +1301,14 @@ class TextView (GUIControl)
 		return true
 	
 	
-	helper InlineAcceptSearch (|bool|)
+	libinternal InlineAcceptSearch (|bool|)
 		opt norefcounts
 		|| i = .isinline #debug_require
 		i.AcceptSearch(.text, false)
 		return true
 
 
-	helper InlineAcceptKey (|bool|)
+	libinternal InlineAcceptKey (|bool|)
 		opt norefcounts
 		|| i = .isinline$
 		|| e = i.editingfor
@@ -1324,13 +1324,13 @@ class TextView (GUIControl)
 		.selrange = (0, .text.length)
 			
 
-	helper init
+	libinternal init
 		.gnormal.edge  = (0.5, 0.5, 0.5, 1.0).px
 		.gnormal.Bg    = (0, 0, 0, 0.5).px
 		.clear("")
 	
 	
-	helper SelMsgValid (|ivec2| sel, |bool|)
+	libinternal SelMsgValid (|ivec2| sel, |bool|)
 		opt norefcounts
 		require  sel.width or .SyntacticEndOfLine_(sel.x)
 
@@ -1356,7 +1356,7 @@ class TextView (GUIControl)
 			p++
 
 		
-	helper CounterPartType (|string| s, |bool|)
+	libinternal CounterPartType (|string| s, |bool|)
 		require (!.singleline and s.length == 1)
 		|| sel  = .SelRange
 		|| sel2 = sel.x2
@@ -1423,7 +1423,7 @@ class TextView (GUIControl)
 		return .typed(input)
 	
 
-	helper Typed (|string| s, |int|)
+	libinternal Typed (|string| s, |int|)
 		debug_require self is editable
 		GUI.ShowCursor(false)
 		
@@ -1437,7 +1437,7 @@ class TextView (GUIControl)
 		return .InsertText(s, .selrange, selnew)
 
 
-	helper ValidateNewText (|message|)
+	libinternal ValidateNewText (|message|)
 		|| msg = .text.Parse
 			msg.obj = .path
 			if .MyError is parse
@@ -1455,7 +1455,7 @@ class TextView (GUIControl)
 		return msg
 
 	
-//	helper CanAlterRange (|intrange| r, |bool|)
+//	libinternal CanAlterRange (|intrange| r, |bool|)
 //		disabled "This would be a massive project"
 //		opt norefcounts
 //		|| p = .ParsedMessage
@@ -1504,7 +1504,7 @@ class TextView (GUIControl)
 		return p.x
 
 
-	helper AlphaFade
+	libinternal AlphaFade
 		opt norefcounts
 		require .hasfocus
 		|| w = .Window
@@ -1551,7 +1551,7 @@ class TextView (GUIControl)
 		return .text.find(jeebox.CSLine, start, End )
 
 
-	helper SelectToLineStart (|intrange|)
+	libinternal SelectToLineStart (|intrange|)
 		|| r = .SelRange
 		|ind| A = .FindLineSeperator(r.x, 0)+1
 		|ind| B = r.x2
@@ -1564,7 +1564,7 @@ class TextView (GUIControl)
 		return (a, .length+1) 
 	
 	
-	helper DeleteLine (|bool|)
+	libinternal DeleteLine (|bool|)
 		|| i = .SelectToLineStart
 		if i.width <= 1
 			return false
@@ -1574,7 +1574,7 @@ class TextView (GUIControl)
 		return true
 		
 		
-	helper DeleteKeySel (|int| d, |intrange|)
+	libinternal DeleteKeySel (|int| d, |intrange|)
 		|| r = .selrange
 		if r.width
 			return r
@@ -1593,7 +1593,7 @@ class TextView (GUIControl)
 		return r.resolve
 
 
-	helper DeleteKeySub (|int| d, |bool|)
+	libinternal DeleteKeySub (|int| d, |bool|)
 		if  keys.platCmd  and  !.singleline
 			if .DeleteLine
 				return true
@@ -1604,7 +1604,7 @@ class TextView (GUIControl)
 			return true
 
 
-	helper SelectorRect (|int| pos, |ivec4|)
+	libinternal SelectorRect (|int| pos, |ivec4|)
 		|| i = .XYOfChar(pos) + (-1,1)	
 		|| i2 = (1, .lineheight+1)
 		rz = (i, i+i2)
@@ -1612,7 +1612,7 @@ class TextView (GUIControl)
 			rz.y++
 
 
-	helper DrawSelRange (|image| Where, |intRange| R, |drawstyle| g)
+	libinternal DrawSelRange (|image| Where, |intRange| R, |drawstyle| g)
 		opt norefcounts
 		|| i	= 0
 		|| d	= .StartLine
@@ -1637,7 +1637,7 @@ class TextView (GUIControl)
 		return .lastleft + 2 + ._LineNumWidth*font.width
 
 
-	helper DrawSel (|image| where, |ivec4| c)
+	libinternal DrawSel (|image| where, |ivec4| c)
 		opt norefcounts
 		|| r = .SelRange
 		if R.width
@@ -1652,7 +1652,7 @@ class TextView (GUIControl)
 			Where.DrawRect(.SelectorRect(r.x), Cp)
 	
 	
-	helper ShouldDrawSel (|bool|)
+	libinternal ShouldDrawSel (|bool|)
 		opt norefcounts
 		require GUI.FlashSelector and !.hasinline and .window.islast
 		if .hasfocus
@@ -1662,13 +1662,13 @@ class TextView (GUIControl)
 				return true
 	
 	
-	helper HasInline (|bool|)
+	libinternal HasInline (|bool|)
 		opt norefcounts
 		|| w = .window
 			return w.inline.editingfor == self
 
 
-	helper FoundInfo (|ivec2| m, |int| Pos, |bool|)
+	libinternal FoundInfo (|ivec2| m, |int| Pos, |bool|)
 		if M contains Pos
 			if (m.x2 == Pos) and !._PreferPrevLine
 				return false
@@ -1680,7 +1680,7 @@ class TextView (GUIControl)
 		return .FindDrawInfoSub(char, vline)
 	
 
-	helper FindDrawInfoSub (|int| Char,  |$int| VLine,  |TextViewLine!|)
+	libinternal FindDrawInfoSub (|int| Char,  |$int| VLine,  |TextViewLine!|)
 		.PrepareLinesOfText
 		opt norefcounts
 		char = .clamp(char)
@@ -1699,7 +1699,7 @@ class TextView (GUIControl)
 			c++
 	
 	
-	helper Y (|textviewline| D,  |int|)
+	libinternal Y (|textviewline| D,  |int|)
 		rz = .lasttop - (D.vline - (._Start.vline-1)) * .lineheight|int|
 
 	
@@ -1711,13 +1711,13 @@ class TextView (GUIControl)
 			return .XYOfCharSub(d, vline, pos)
 
 
-	helper XYOfCharSub (|textviewline| D, |ind| vline, |ind| pos, |ivec2|)
+	libinternal XYOfCharSub (|textviewline| D, |ind| vline, |ind| pos, |ivec2|)
 		|| y = .lasttop - (vline+1) * .lineheight|int|
 		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
 		return (x, y) - 2
 	
 
-	helper FindDrawLineEdge (|intrange| t, |int| i, |bool| CanAvoid=true, |int|)
+	libinternal FindDrawLineEdge (|intrange| t, |int| i, |bool| CanAvoid=true, |int|)
 		|| x2 = t.x2
 		if (i > 0) and (keys.shift) and (self[x2].IsTextLine)
 			x2++
@@ -1732,7 +1732,7 @@ class TextView (GUIControl)
 		return (r.x, x2)(i < 0) 
  
 
-	helper FindDrawSelMove (|intrange| t, |int| i, |bool|page, |ivec2|)
+	libinternal FindDrawSelMove (|intrange| t, |int| i, |bool|page, |ivec2|)
 		opt norefcounts		
 		debug_require i.abs == 1
 		|| pos = t.x2
@@ -1776,7 +1776,7 @@ class TextView (GUIControl)
 			.DrawScroll(.slh, where)
 	
 	
-	helper DrawScrollMarks (|image| where)
+	libinternal DrawScrollMarks (|image| where)
 		opt norefcounts
 		require .DrawScrollStrength
 		for s in ._lines
@@ -1790,7 +1790,7 @@ class TextView (GUIControl)
 				.DrawErrorMark(where, s, colors.purple)
 
 
-	helper DrawPreparedText (|image| where, |int|)
+	libinternal DrawPreparedText (|image| where, |int|)
 		|| Remain = .DrawPreparedTextSub(where, false)
 		|| Old = ._RemainingHeight
 		._RemainingHeight = Remain
@@ -1809,7 +1809,7 @@ class TextView (GUIControl)
 		return .DrawPreparedTextSub(where, true)
 			
 	
-	helper DrawPreparedTextSub (|image| where, |bool| Draw, |int|)
+	libinternal DrawPreparedTextSub (|image| where, |bool| Draw, |int|)
 		opt norefcounts
 		
 		|| d		= .StartLine
@@ -1856,11 +1856,11 @@ class TextView (GUIControl)
 		return .height / .lineheight|int|
 	
 	
-	helper ShowNoExtra
+	libinternal ShowNoExtra
 		(.OnShowExtraInfo)(self, (0,0), nil, nil, "", false)?
 	
 
-	helper ShowExtraInfo (|ivec2| P, |bool| MouseMove=false)
+	libinternal ShowExtraInfo (|ivec2| P, |bool| MouseMove=false)
 		opt norefcounts
 		require .OnShowExtraInfo and .isjeeboxmode
 
@@ -1877,7 +1877,7 @@ class TextView (GUIControl)
 			.ShowNoExtra
 		
 
-	helper ShowErrorInfo (|int| B, |error| err, |bool| Later)
+	libinternal ShowErrorInfo (|int| B, |error| err, |bool| Later)
 		opt norefcounts
 		|| P2 = .XYOfChar(B)
 		P2.x = -1
@@ -1902,11 +1902,11 @@ class TextView (GUIControl)
 			(fp)(self, XY, M, err, reason, false)
 	
 	
-	helper StartLine (|TextViewLine|)
+	libinternal StartLine (|TextViewLine|)
 		return ._Start
 	
 	
-	helper StartLine (|TextViewJumpMode| mode=0, assigns:|TextViewLine| d)
+	libinternal StartLine (|TextViewJumpMode| mode=0, assigns:|TextViewLine| d)
 		cpp_part StartAtLine
 		.StartWithoutScrollDraw(mode) = d
 		.TouchScrollBar
@@ -1935,7 +1935,7 @@ class TextView (GUIControl)
 			rz = curr		
 	
 	
-	helper StartWithoutScrollDraw (|TextViewJumpMode| mode=0, assigns:|TextViewLine!| d)
+	libinternal StartWithoutScrollDraw (|TextViewJumpMode| mode=0, assigns:|TextViewLine!| d)
 		opt norefcounts
 		if mode is SlowScroll
 			d = d.SlowMove(._Start, 2)
@@ -1961,7 +1961,7 @@ class TextView (GUIControl)
 		GUI.touch(self)
 			
 	
-	helper Clear (|string| NewText, |bool|)
+	libinternal Clear (|string| NewText, |bool|)
 		rz = super.textset(NewText)
 		require rz or !._lines.hasany
 
@@ -1982,7 +1982,7 @@ class TextView (GUIControl)
 		.start = D
 
 
-	helper NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
+	libinternal NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
 		opt norefcounts
 		
 		rz = curr.next
@@ -1994,7 +1994,7 @@ class TextView (GUIControl)
 		rz.vline = place.vline + 1
 
 
-	helper NeedsPrepare (|int|)
+	libinternal NeedsPrepare (|int|)
 		|| CW	= .MaxWidthInChars
 		|| ldw	= ._LastDrawWidth
 		._LastDrawWidth = CW
@@ -2029,7 +2029,7 @@ class TextView (GUIControl)
 		return bd * mul + add 
 
 
-	helper WillAttemptParse (|int| Expect, |bool|)
+	libinternal WillAttemptParse (|int| Expect, |bool|)
 		require (expect >= ProbablyJeebox)
 		require !.singleline
 		|| L = .text.Length
@@ -2049,7 +2049,7 @@ class TextView (GUIControl)
 		return .Parse(false, .ShouldDisplayJeebox)
 	
 	
-	helper Parse (|bool| Changed, |int| expect, |message|)
+	libinternal Parse (|bool| Changed, |int| expect, |message|)
 		cpp_Part ViewParseSub
 		if !.WillAttemptParse(expect)
 			.MyError = nil // more reliable
@@ -2069,7 +2069,7 @@ class TextView (GUIControl)
 		return p
 
 
-//	helper ColoriseRoot (|message| p)
+//	libinternal ColoriseRoot (|message| p)
 //		opt norefcounts
 //		for m in p	// do this directly in the actual coloriser!!
 //					// uncool to do this here
@@ -2077,20 +2077,20 @@ class TextView (GUIControl)
 //				m.flags |= textview.NotRoot
 
 
-	helper IsCleared (|bool|)
+	libinternal IsCleared (|bool|)
 		opt norefcounts
 		|| d = ._lines.first
 		return !d or d.position < 0
 
 
-	helper StartPos (|int|)
+	libinternal StartPos (|int|)
 		opt norefcounts
 		if ._start.position < 0
 			._start.position = 0
 		return ._lines.position
 
 
-	helper AddLogTrim (|TextViewLine| d, |TextViewLine|)
+	libinternal AddLogTrim (|TextViewLine| d, |TextViewLine|)
 		opt norefcounts
 		d.position = 0
 		(d isnt last)
@@ -2100,7 +2100,7 @@ class TextView (GUIControl)
 		return .NextVline(d, d, 0)
 
 
-	helper PrepareLinesOfText 
+	libinternal PrepareLinesOfText 
 		opt norefcounts
 		|| Changed    = .NeedsPrepare						#require
 		.TextAlteredForDraw = 0
@@ -2161,7 +2161,7 @@ class TextView (GUIControl)
 		.ClearReclaim	
 	
 	
-	helper textview.ClearReclaim
+	libinternal textview.ClearReclaim
 		._reclaim  = (0, 1GB, 0)
 	
 
@@ -2171,7 +2171,7 @@ class TextView (GUIControl)
 		opt norefcounts
 
 	
-	helper MapToOld (|int| P, |int|)
+	libinternal MapToOld (|int| P, |int|)
 		|| add = ._reclaim[2]
 		if p < ._reclaim[0]
 			return p
@@ -2183,7 +2183,7 @@ class TextView (GUIControl)
 	}
 		
 	
-	helper TextCopy (GUICopyEvent)
+	libinternal TextCopy (GUICopyEvent)
 		if .SelRange
 			return .SelText
 		if self isnt editable
@@ -2200,7 +2200,7 @@ class TextView (GUIControl)
 				.start = s
 				return
 
-	helper FindScroll (|int| Value, |textviewline!|)
+	libinternal FindScroll (|int| Value, |textviewline!|)
 		opt norefcounts
 		for s in ._Lines
 			if s.Position >= Value
@@ -2208,7 +2208,7 @@ class TextView (GUIControl)
 		return ._lines.first!
 		
 		
-	helper UnloadDoc (|document| old)
+	libinternal UnloadDoc (|document| old)
 		opt norefcounts
 		old.ScrollPos = .scrollpos
 		old.TypingPlace = .selrange
@@ -2239,7 +2239,7 @@ class TextView (GUIControl)
 		.Clear("")
 
 
-	helper TextPaste (GUIPasteEvent)
+	libinternal TextPaste (GUIPasteEvent)
 		if (self is editable) and (purpose is PasteTextLike)
 			if data > 1
 				.UndoChecker = -1
@@ -2273,7 +2273,7 @@ class TextView (GUIControl)
 			(rz max= d.ExpectJeebox)
 
 
-	helper IsJeeboxMode (|bool|)
+	libinternal IsJeeboxMode (|bool|)
 		return .ShouldDisplayJeebox >= ProbablyJeebox
 	
 	
@@ -2328,7 +2328,7 @@ class TextView (GUIControl)
 
 
 
-helper string.InsertTrim (|ivec2|)
+libinternal string.InsertTrim (|ivec2|)
 	|| i = .find('<')
 		|| i2 = .find('>', i)
 		return (i, i2-1)
@@ -2337,7 +2337,7 @@ helper string.InsertTrim (|ivec2|)
 
 
 
-helper string.DeleteTwoBytes (|ivec2|r, |string|)
+libinternal string.DeleteTwoBytes (|ivec2|r, |string|)
 	|| fs = faststring(.length-2)
 	fs <~ self[0,       r.x]
 	fs <~ self[r.x+1,   r.x2+1]

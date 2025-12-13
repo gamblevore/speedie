@@ -140,7 +140,7 @@ class GUIControl (list)
 				gui.Resized(self)
 
 		
-	helper Reflow (|ivec4| mine, |ivec4| Hard) 
+	libinternal Reflow (|ivec4| mine, |ivec4| Hard) 
 		opt norefcounts
 		|| prev = mine.x2y2x1y1 // noice
 		for R in self
@@ -149,7 +149,7 @@ class GUIControl (list)
 				prev = Curr
 
 
-	helper LoadTabIndex (|uint16|)
+	libinternal LoadTabIndex (|uint16|)
 		opt norefcounts
 		|| w = .window
 			rz = w.tabindex + 1
@@ -158,7 +158,7 @@ class GUIControl (list)
 			w.tabindex = rz
 
 
-	helper NextFocus (|bool| dir, |bool| force, |guicontrol|)
+	libinternal NextFocus (|bool| dir, |bool| force, |guicontrol|)
 		opt NoRefCounts
 		real self
 		|| c = self
@@ -172,11 +172,11 @@ class GUIControl (list)
 				rz = c
 
 
-	helper Tabbability (|guicontrol| c, |int|)
+	libinternal Tabbability (|guicontrol| c, |int|)
 		return  c.tabindex  -  .tabindex
 		
 	
-	helper IsBetterFocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)
+	libinternal IsBetterFocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)
 		require c.isviewable and c is enabled
 		require (c isa ListView or textview)
 		require c.takesfocus.tab(force) or (c is opensmenu)
@@ -254,7 +254,7 @@ class GUIControl (list)
 		run
 			// do nothing
 
-	helper NoScroll
+	libinternal NoScroll
 		opt norefcounts
 		|| scr = .myscroller
 			scr.Remove
@@ -334,7 +334,7 @@ class GUIControl (list)
 			return self contains w.CurrMouseOver
 	
 	
-	helper DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil) // drawcontrols
+	libinternal DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil) // drawcontrols
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
 			if (r!=avoid) and R.IsViewable
@@ -351,7 +351,7 @@ class GUIControl (list)
 		return S
 	
 
-	helper PasteSub (|string| Data, |copypasteflags| Type, |window| w, |bool|)
+	libinternal PasteSub (|string| Data, |copypasteflags| Type, |window| w, |bool|)
 		|| c = self
 		if !c.PasteEvent
 			c = w
@@ -380,17 +380,17 @@ class GUIControl (list)
 			beep
 	
 	
-	helper PasteEvent (|GUIPasteEvent|)
+	libinternal PasteEvent (|GUIPasteEvent|)
 		if self isa textview and self isnt editable
 			return nil
 		return .onpaste
 
 
-	helper CopyEvent (|GUICopyEvent|)
+	libinternal CopyEvent (|GUICopyEvent|)
 		return .OnCopy
 
 	
-	helper CopyList (|array|)
+	libinternal CopyList (|array|)
 		if self isa ListView
 			return .copylist
 		if self isa textview
@@ -412,7 +412,7 @@ class GUIControl (list)
 		.sizer.g(1, self) = value[0]|controlpoint|
 		.sizer.g(3, self) = value[1]|controlpoint|
 	
-	helper GetCopy (|object?| item=nil, |string|)
+	libinternal GetCopy (|object?| item=nil, |string|)
 		return (.CopyEvent$)(self, item)
 	
 	
@@ -489,18 +489,18 @@ class GUIControl (list)
 			return self == w.focus or w.InnerFocus
 
 
-	helper DrawFocus (|image| where, |float| strength=1.0)
+	libinternal DrawFocus (|image| where, |float| strength=1.0)
 		if self
 			.DrawFocusRect(Where, .lastrect, .FaintingEdge*strength)
 
 
-	helper FocusBorderStyle (|drawstyle|)
+	libinternal FocusBorderStyle (|drawstyle|)
 		if (self isnt modified) or (self is NeverDrawModified)
 			return ¥.Border
 		return ¥.ModifiedBorder
 		
 		
-	helper DrawFocusRect (|image| where, |ivec4| R, |float| Strength)
+	libinternal DrawFocusRect (|image| where, |ivec4| R, |float| Strength)
 		opt norefcounts
 		require strength > 0
 		|| oldclip = where._ControlClip // maybe outside
@@ -509,7 +509,7 @@ class GUIControl (list)
 		where.controlclip = oldclip
 
 	
-	helper FindAttachedEdge (|MoveCode|) // .EdgeAllow
+	libinternal FindAttachedEdge (|MoveCode|) // .EdgeAllow
 		opt norefcounts
 		|| a = .AttachedFrom
 			return a
@@ -523,14 +523,14 @@ class GUIControl (list)
 			return MoveCode.top
 		
 	
-	helper FaintingEdge (|float|)
+	libinternal FaintingEdge (|float|)
 		opt norefcounts
 		if self is drawsfocus
 			return 1.0
 		if .HasFocus
 			return .FaintingEdgeSub
 	
-	helper FaintingEdgeSub (|float|)
+	libinternal FaintingEdgeSub (|float|)
 		opt norefcounts
 		|| w = .window!
 		|| f = w._AlphaFader				#require
@@ -559,7 +559,7 @@ class GUIControl (list)
 			.window!.setfocus(nil)
 
 
-	helper MouseIsDown (|bool|)
+	libinternal MouseIsDown (|bool|)
 		opt norefcounts
 		|| w = .window
 			return w.CurrMouseDown == self
@@ -567,7 +567,7 @@ class GUIControl (list)
 	setter Text (|string|)
 		.textset(value)
 	
-	helper TextSet (assigns:|string| text, |bool|)
+	libinternal TextSet (assigns:|string| text, |bool|)
 		cpp_part TextSetter
 		require (self and text != .text)
 		.text = text
@@ -580,7 +580,7 @@ class GUIControl (list)
 		isnt visible
 
 	
-	helper RefSanity
+	libinternal RefSanity
 		visible
 		opt norefcounts
 		|| c	= .class		// Cls->Memory
@@ -603,7 +603,7 @@ class GUIControl (list)
 			.upon.SizeFraction() = progress
 
 
-	helper AddTask (|TaskGUI| t)
+	libinternal AddTask (|TaskGUI| t)
 		opt norefcounts
 		|| w = .window
 			w.tasks <~ t

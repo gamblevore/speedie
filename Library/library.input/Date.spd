@@ -138,7 +138,7 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		function New (|Date|)
 			disabled "Use .now"
 
-		helper TimeStamp  (|uint64|)
+		libinternal TimeStamp  (|uint64|)
 			cpp_Wrapper RDTSC
 			
 		function Hash  (|uint64|)

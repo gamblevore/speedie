@@ -54,7 +54,7 @@ function string.FixLineEndings (|string| dest="\n", |String|)
 	return self
 	
 	
-helper string.DetectLineEndings (|int|)
+libinternal string.DetectLineEndings (|int|)
 	for (c in self) (i)
 		if c == 10
 			rz |= 1

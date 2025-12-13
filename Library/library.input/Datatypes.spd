@@ -437,7 +437,7 @@ datatype float
 	function ATan2 (|float| y, |float|)
 		disabled "use UnTan"
 
-	helper __sincospi (|$float| A, |$float| B)
+	libinternal __sincospi (|$float| A, |$float| B)
 		cpp_wrapper (__sincospif)
 	
 	function Rotation (|mat2|)

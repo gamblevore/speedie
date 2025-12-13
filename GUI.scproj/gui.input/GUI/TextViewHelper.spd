@@ -41,7 +41,7 @@ class TextViewLine (list)
 			fs.appendescape(.text)
 			fs <~ '"'
 
-	helper ClearForPrepare
+	libinternal ClearForPrepare
 		.message = nil
 		.TextState = nil
 		.lineerror = nil
@@ -103,12 +103,12 @@ class TextViewLine (list)
 		return bytes + .position
 	
 
-	helper message.addpos (|int| p)
+	libinternal message.addpos (|int| p)
 		opt norefcounts
 		for ch.flat in self: ch.position += p
 
 
-	helper Colorise (|message| msg, |bool| ParsedOK, |message|)
+	libinternal Colorise (|message| msg, |bool| ParsedOK, |message|)
 		.msgpos = -1
 		.message = nil
 		isnt fakemsg
@@ -133,12 +133,12 @@ class TextViewLine (list)
 		return (P, P+L)
 
 	
-	helper EmptyLine (|bool|)
+	libinternal EmptyLine (|bool|)
 		require self
 		return (.text.length == 1) and .text[0].istextline
 
 
-	helper ColoriseSub (|message| srch, |message|)
+	libinternal ColoriseSub (|message| srch, |message|)
 		opt norefcounts
 		rz = .ColoriseSub2(srch)
 		|| r = rz
@@ -158,7 +158,7 @@ class TextViewLine (list)
 			isnt breakpoint
 			
 		
-	helper ColoriseSub2 (|message| srch, |message|)
+	libinternal ColoriseSub2 (|message| srch, |message|)
 		opt norefcounts
 		|| r	= .range
 		while srch.EndsBefore(r)
@@ -180,7 +180,7 @@ class TextViewLine (list)
 		return srch
 
 
-	helper message.NextColor (|int| s, |message|)
+	libinternal message.NextColor (|int| s, |message|)
 		opt norefcounts
 		|| nxt = self
 		rz = nxt
@@ -298,7 +298,7 @@ class TextViewLine (list)
 		return i
 
 
-helper textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
+libinternal textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
 	|| v = s.vline|float|
 	|float| N = ._lines.last!.vline|float|
 	|| Y = 1.0 - (v/n)
@@ -318,7 +318,7 @@ helper textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
 
 
 
-helper textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine| D)
+libinternal textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine| D)
 	opt norefcounts
 	|| e = d.LineError$
 	if (e is parse) and .ParsedMessage			// obviously it parsed ok.
@@ -344,7 +344,7 @@ helper textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine| D)
 
 
 
-helper textview.DrawLighter (|image| Where, |int| y)
+libinternal textview.DrawLighter (|image| Where, |int| y)
 	|| r	= .lastrect
 	r.y		= y + 1
 	r.y2	= y + .lineheight + 1
@@ -352,7 +352,7 @@ helper textview.DrawLighter (|image| Where, |int| y)
 	where.DrawRect(r, col)
 
 
-helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
+libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
 	opt norefcounts
 	|| x = .DrawOneStartLine(d.text) 
 	|int| big		    = ._LineNumWidth
@@ -381,14 +381,14 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |im
 	return x
 
 
-helper TextView.UseColorAnyway (|int|)
+libinternal TextView.UseColorAnyway (|int|)
 	ifn .isinline
 		if .ParsedMessage // or .myerror
 			return 2
 		return 3
 
 
-helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol, |imagepixel| lc)
+libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol, |imagepixel| lc)
 	opt norefcounts
 	opt min 3
 	if d isnt FakeLine
@@ -434,7 +434,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 			.DrawAuto(Where, x, y)
 
 
-helper TextView.AutoLim (|textviewline| d, |bool|)
+libinternal TextView.AutoLim (|textviewline| d, |bool|)
 	if (._CanAutoComplete >= 1) and ._AutoCompleteString
 		|| after = d.after
 		if d is last
@@ -450,7 +450,7 @@ function TextView.AutoCompleteShowingDots_ (|int|)
 	return n
 
 
-helper TextView.DrawAuto (|image| where, |int| x, |int| y)
+libinternal TextView.DrawAuto (|image| where, |int| x, |int| y)
 	|| n = .AutoCompleteShowingDots_
 	|| str = (._autocompletestring[n, int.max], "...")(n>=0)
 	where.drawtext(str, (x,y), colors.white(0.3))
@@ -490,7 +490,7 @@ struct MsgTextDrawState
 			rz.font = font.small!
 
 
-helper codepoint.ImproveDraw (|string| t, |int| pos, |codepoint|)
+libinternal codepoint.ImproveDraw (|string| t, |int| pos, |codepoint|)
 	if self == '!'
 		if t[pos+1] == '='
 			return 130
@@ -527,7 +527,7 @@ function string.TextLineCount (|int|)
 	return a + b
 
 
-helper string.CountBytesInSquares (|int| Remain, |int|)
+libinternal string.CountBytesInSquares (|int| Remain, |int|)
 	|| n = .length
 	require remain > 0 and n > 0
 	|| i = 0
@@ -553,7 +553,7 @@ function TextView.DrawOneStartLine (|string| txt, |int|)
 	return x
 
 
-helper string.HasWord (|string| s, |ind| i = 0, |bool|)
+libinternal string.HasWord (|string| s, |ind| i = 0, |bool|)
 	return self[i, s]  and  self[s.length].iswhite
 
 
@@ -567,7 +567,7 @@ extend message
 		
 	
 	
-helper Textviewline.ReclaimStart (|int| p, |textviewline|)
+libinternal Textviewline.ReclaimStart (|int| p, |textviewline|)
 	description "Sigh. Just an idea to 'reclaim' existing textviewlines. Will take probably 3 days work to get this reliable. Don't wanna do this right now! Just a placeholder right now. Actual code not here." 
 	opt norefcounts
 	rz = self

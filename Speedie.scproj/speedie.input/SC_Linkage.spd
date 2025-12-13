@@ -116,10 +116,6 @@ dispatch ClassOrModuleLinkage (TranFunc)
 	+'embedded'
 		name_Space.setinternal(node, scnodeinfo.embeddedonly)
 		
-	+'helper'
-		|| v = node.first.yes(true)
-		(name_space is libonlyall) = v
-		
 	+'libinternal'
 		|| v = node.first.yes(true)
 		(name_space is libonlyall) = v

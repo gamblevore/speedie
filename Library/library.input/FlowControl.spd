@@ -30,7 +30,7 @@ class FlowControl
 		flowcontrol.disabled = 0
 
 	
-	helper Flush
+	libinternal Flush
 		flow off
 		|| w = .Write
 			w <~ .buff
@@ -46,12 +46,12 @@ class FlowControl
 			"Flow: Occurred equally."
 
 	
-	helper AddByte (|byte| value)
+	libinternal AddByte (|byte| value)
 		flow off
 		if .buff <~ value
 			.Flush
 		
-	helper TestByte (|byte| value, |bool|)
+	libinternal TestByte (|byte| value, |bool|)
 		flow off, opt norefcounts, visible
 
 		.AddByte(value)
@@ -126,12 +126,12 @@ class FlowControl
 			  elseif str ~= "log"
 				.Active = log
 			
-		helper Bool (|bool| value, |bool|)
+		libinternal Bool (|bool| value, |bool|)
 			cpp_name JB_Flow__Cond,  visible,  flow off
 			self <~ ('A'+value)|byte|
 			return value
 		
-		helper While (|bool| value, |bool|)
+		libinternal While (|bool| value, |bool|)
 			cpp_name JB_Flow__Cond2,  visible,  flow off
 			if value
 				return true
@@ -178,7 +178,7 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 
-		helper AskPath (|string| name, |bool| WantValidate, |string|)
+		libinternal AskPath (|string| name, |bool| WantValidate, |string|)
 			if WantValidate
 				require .Active >= Validate
 				print "validation at: "

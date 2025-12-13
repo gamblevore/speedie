@@ -27,18 +27,18 @@ struct LeakTester
 			app.LeakMarkMemory
 
 	
-helper object.FindReferences
+libinternal object.FindReferences
 	|| r = []
 	JB_FindLeakedObject(self, r)
 	printline r
 	debugger
 
 
-helper object.MarkRefCount (|bool| Active=true)
+libinternal object.MarkRefCount (|bool| Active=true)
 	cpp_wrapper JB_MarkRefCount
 
 
-helper object.RefCountMark (|int|)
+libinternal object.RefCountMark (|int|)
 	|| S = self|&int|
 	return S[] & 1
 

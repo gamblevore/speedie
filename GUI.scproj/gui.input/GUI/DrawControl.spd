@@ -40,7 +40,7 @@ class GraphicsEditor (GuiControl)
 		.merged.DrawCenteredForViewer(where, .gnormal)
 
 
-	helper LoadNative (|string| f, |bool|)
+	libinternal LoadNative (|string| f, |bool|)
 		return false
 		|| root = f.parsejbin
 		|| imgs = root["jdraw"]["layers"]
@@ -95,19 +95,19 @@ class GraphicsEditor (GuiControl)
 		.exit
 		
 		
-	helper image.DrawCenteredForViewer (|image| Where, |drawstyle?| g = nil)
+	libinternal image.DrawCenteredForViewer (|image| Where, |drawstyle?| g = nil)
 		|| Diff = (where.CurrSize - .CurrSize)/2
 		.DrawForViewer(where, diff, g)
 
 
-	helper imagepixel.Underlay (|vec4| b, |$imagepixel| Dest)
+	libinternal imagepixel.Underlay (|vec4| b, |$imagepixel| Dest)
 		|| Old = .color
 		|| C = Old.a.mix(b, Old)
 		C.a = old.a
 		Dest = C.px
 	
 
-	helper image.DrawForViewer (|image| Where, |ivec2| D=(0,0), |drawstyle?| g=nil)
+	libinternal image.DrawForViewer (|image| Where, |ivec2| D=(0,0), |drawstyle?| g=nil)
 		D += where.controlclip.xy
 		|| OurShit = ._Controlclip		// take our shit
 		|| Up = OurShit + D				// move it up
@@ -178,7 +178,7 @@ class GraphicsEditor (GuiControl)
 		
 
 
-	helper LoadImage (|string| data, |string| path, |bool|)
+	libinternal LoadImage (|string| data, |string| path, |bool|)
 		|| p = data.Loadqoi(path)
 			.Merged = p
 			return true

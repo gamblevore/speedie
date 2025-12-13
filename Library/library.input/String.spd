@@ -577,7 +577,7 @@ class String
 //		disabled "huh?"
 
 	
-	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
+	libinternal MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
 		|| n	= .length
 		|| s0	= .addr
 		|| s	= s0 + pos
@@ -636,7 +636,7 @@ class String
 // basically we just want " " to match with multiple spaces or tabs
 // that is all. but also "  " must match with at least two.
 // also allows endofline if the search ends with a " "
-	helper StretchyFindSub (|string| find, |int| from, |int|)
+	libinternal StretchyFindSub (|string| find, |int| from, |int|)
 		|| i = 0
 		|| n = .length
 		while i < find and i+from < n
@@ -728,7 +728,7 @@ class String
 
 
 
-helper array.join_sub (|array of string| self, |string| sep, |int| n, |string|)
+libinternal array.join_sub (|array of string| self, |string| sep, |int| n, |string|)
 	flow off
 	|| fs = FastString(n)
 

@@ -4,7 +4,7 @@ datatype CopyPasteFlags (Byte)
 	// how to totally inline this class?
 	linkage
 		cpp_part CPF
-		helper
+		libinternal
 	Flags
 		|CopyPasteFlags| 
 		// Important to have copyfile and pastefile being separate.

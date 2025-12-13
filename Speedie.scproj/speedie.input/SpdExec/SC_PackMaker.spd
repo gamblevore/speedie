@@ -15,7 +15,7 @@ module PackMaker
 	|hairyman|				LibSaved
 	
 	
-	helper scfunction.NeedsLibExport (|bool|)
+	libinternal scfunction.NeedsLibExport (|bool|)
 		opt norefcounts
 		require (.MyReacher or options.MakeExec)
 		require (self isnt NoExport) and !.ismacro
@@ -38,7 +38,7 @@ module PackMaker
 											
 
 	
-	helper AddFunc (|SCFunction| f)
+	libinternal AddFunc (|SCFunction| f)
 		opt norefcounts
 		if f.IsLibrary
 			if f.NeedsLibExport
@@ -118,7 +118,7 @@ module PackMaker
 		return count
 	
 
-	helper PackIDFuncs (|[scfunction]| list)
+	libinternal PackIDFuncs (|[scfunction]| list)
 		opt norefcounts
 		list.sort(&CodeSorter.fPackID)
 		|| ID = 0
@@ -201,7 +201,7 @@ module PackMaker
 		j.exit
 	
 	
-	helper DumpStringsSub (|jbin| strs)
+	libinternal DumpStringsSub (|jbin| strs)
 		opt norefcounts
 		strs.AppendHInt(.packstrings.length)
 		for s in .PackStrings

@@ -227,7 +227,7 @@ function scdecl.CalculateDeclSize (|int| depth = 0, |int|)
 	return .Type.ClsSize
 
 	
-helper MiniSize (|int| B, |int|)
+libinternal MiniSize (|int| B, |int|)
 	.clssize = B
 	.ClsSizeRaw = B
 	.Alignment = B

@@ -9,7 +9,7 @@ class StretchControl (GuiControl)
 		if Initial
 			.reset
 		
-	helper AddPane (|string| name)
+	libinternal AddPane (|string| name)
 		opt norefcounts
 		|| rz = GUIControl(self)
 		rz.ID = name
@@ -146,7 +146,7 @@ class StretchDivider (GuiControl)
 			.ActiveEnd = ((.min, 0)(soft)) ~ Right
 
 
-	helper SetCollapsed (|bool| Soft, |bool| value)
+	libinternal SetCollapsed (|bool| Soft, |bool| value)
 		if value
 			.collapse(soft)
 		  elseif .collapsed
@@ -181,7 +181,7 @@ class StretchDivider (GuiControl)
 				.upon.ActiveEnd = (.s)~up
 
 
-	helper DefaultEnd (|guicontrol| P, |int|)
+	libinternal DefaultEnd (|guicontrol| P, |int|)
 		|| pr = p.lastrect
 		return .DefaultFraction.mix(pr[.d]|float|, pr[.d+2]|float|)|int|	
 
@@ -238,7 +238,7 @@ class StretchDivider (GuiControl)
 		.ActiveEnd = (x)~up
 
 
-	helper InTest (|ivec2| P, |bool| MightBeOut, |bool|)
+	libinternal InTest (|ivec2| P, |bool| MightBeOut, |bool|)
 		|| Out = MightBeOut and !(.lastrect contains P)
 		|| dateout = !.entered
 		if Out != dateout
@@ -260,7 +260,7 @@ class StretchDivider (GuiControl)
 			return .InTest(P, true)
 
 
-	helper FadeAlpha (|float|)
+	libinternal FadeAlpha (|float|)
 		|| now  = gui.FrameStart
 		|| diff = now - .entered
 		|| f = (diff.float - 0.6)*2.0

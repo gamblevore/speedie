@@ -51,19 +51,19 @@ module Perry
 		app.prefs["colors"] = ¥.savecolors.parse
 
 	
-	helper ClearBadProj
+	libinternal ClearBadProj
 		for proj_item in .projects
 			if !proj_item.name.FileExists
 				proj_item.Remove
 	
 	
-	helper StartFile (|string| Fol, |string| Name, |bool| Force = false, |message|)
+	libinternal StartFile (|string| Fol, |string| Name, |bool| Force = false, |message|)
 		|| path = .StartFileStr(fol, name, force)
 			rz = @tmp + path
 			rz.msg(@str, path.name)
 	
 	
-	helper StartFileStr (|string| Fol, |string| Name, |bool| Force,  |string|)
+	libinternal StartFileStr (|string| Fol, |string| Name, |bool| Force,  |string|)
 		|| s = file.SpeedieDir
 		if fol
 			s = s.Child(Fol)
@@ -76,14 +76,14 @@ module Perry
 				return f
 				
 
-	helper FindStartingExample (|message|)
+	libinternal FindStartingExample (|message|)
 		rz  = .StartFile("Examples", "banana_count.spd")
 		rz ?= .StartFile("Examples", "")
 		rz ?= .StartFile("GameExamples", "")
 		rz ?= .StartFile("", "Perry.scproj")
 		rz  = .StartFile("Examples", "banana_count.spd", true)
 		
-	helper LoadWindowsSub
+	libinternal LoadWindowsSub
 		.clearbadproj
 		
 		if !.Projects.HasAny
@@ -154,7 +154,7 @@ module Perry
 					return w
 
 
-	helper string.ProjCleanName (|string|)
+	libinternal string.ProjCleanName (|string|)
 		rz = .name
 		while rz endswith "()"
 			rz = rz[0, rz.length-2]

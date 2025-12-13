@@ -25,7 +25,7 @@
 //		.cols[7] = (0.15,	0.17,	0.12)
 //
 //
-//	helper MakeSubBoxes (|image| img, |int| Size, |float| opacity=1.0)
+//	libinternal MakeSubBoxes (|image| img, |int| Size, |float| opacity=1.0)
 //		opt norefcounts
 //		|| ccc = .cols[.rnd.int & 7]
 //		|| a = (opacity * 255.0)|int|
@@ -98,7 +98,7 @@
 //
 //
 //
-//helper image.OutlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
+//libinternal image.OutlineSub (|vec2| XY, |float| scale, |vec2| Move, |vec4|)
 //    || s1 = .Sqrt(XY - Move * 1.5, scale)
 //    || s2 = .Sqrt(XY + Move * 1.5, scale)
 //    || s3 = .Sqrt(XY - Move, scale)
@@ -159,7 +159,7 @@ struct ImageBlurrer
 			.weights[i] = (w[i]*64K|float|)|int|
 		
 
-	helper BlurRow (|image| rd, |image| wr, |uint| row)
+	libinternal BlurRow (|image| rd, |image| wr, |uint| row)
 		|| stride = rd.height
 		|| wd     = rd.Width
 		|| Start  = rd.Pixels + row*wd
@@ -198,7 +198,7 @@ function image.blur (|float| sigma)
 		.blur(sigma, tmp)
 
 
-helper image.Blur (|float| sigma, |image| tmp)
+libinternal image.Blur (|float| sigma, |image| tmp)
 	require (sigma > 0) and Tmp.resizeto(.size.yx)
 
 	|ImageBlurrer| blur

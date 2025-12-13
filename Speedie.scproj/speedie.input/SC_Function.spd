@@ -198,7 +198,7 @@ function ParseName (|Message| node, |bool|)
 	cname.func = @thg
 	.Name = cname.name
 	
-	if ftype == "helper" or "libinternal"
+	if ftype == "libinternal"
 		.MakeLibOnly
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2

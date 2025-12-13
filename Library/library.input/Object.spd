@@ -13,7 +13,7 @@ class Object
 		nil self
 		cpp_wrapper JB_Obj_Render
 
-//	helper GenericRender (|FastString| fs_in=nil)
+//	libinternal GenericRender (|FastString| fs_in=nil)
 //		cpp_wrapper JB_Obj_GenericRender
 
 	function Class (|&ClassData|)
@@ -77,7 +77,7 @@ class Object
 				return self
 			return .TypeFailed(x, nil)
 	
-	helper TypeFailed (|ClassData| Cls, |message?| where,  |object|)
+	libinternal TypeFailed (|ClassData| Cls, |message?| where,  |object|)
 		|| name = .Class.name.wrap
 		error (where, name + " (object) is not a: " + cls.name )
 		debugger

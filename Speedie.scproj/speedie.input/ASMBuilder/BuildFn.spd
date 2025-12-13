@@ -1,7 +1,7 @@
 
 
 extend_module ASM
-	helper TestASMSub (|message| tests)
+	libinternal TestASMSub (|message| tests)
 		opt norefcounts
 		Assembler.sh.ASMInit
 		|| list = tests.last(@arg)
@@ -15,7 +15,7 @@ extend_module ASM
 			jb_vm.Run(ff.ptr, ff.length)
 
 
-	helper GetASMFunc (|message| m, |scfunction|)
+	libinternal GetASMFunc (|message| m, |scfunction|)
 		cpp_part AccessStr
 		opt norefcounts
 		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")

@@ -317,7 +317,7 @@ struct Assembler
 		return .NopSub(fat, true, 0)
 	
 	
-	helper NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+	libinternal NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
 		if fat is temp
 			.CloseOneEarly(fat.info) // why did I comment this out? // testin speedie first?
 		|| C = .curr - 1

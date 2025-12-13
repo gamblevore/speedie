@@ -25,14 +25,14 @@ class MessageView (ListView)
 	
 	
 	module
-		helper JeeboxViewRenamer (guilisteditevent)
+		libinternal JeeboxViewRenamer (guilisteditevent)
 			|| o = cell!.row
 			if o isa filerow
 				if o.moveto(value)
 					return true
 
 
-		helper RightClickJeeboxView (GuiListevent)
+		libinternal RightClickJeeboxView (GuiListevent)
 			|| fl = .tag as FileViewer
 			if row and fl
 				|| f = row.obj
@@ -41,7 +41,7 @@ class MessageView (ListView)
 				fl.hideopenlist
 			
 
-		helper InsideJeeboxViewRowDraw (ListViewRowDraw)
+		libinternal InsideJeeboxViewRowDraw (ListViewRowDraw)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect

@@ -1,6 +1,6 @@
 
 
-helper message.list_desired (|int| common, |string|)
+libinternal message.list_desired (|int| common, |string|)
 	rz = .firstname[0, Common]
 	if self == rz
 		rz = "" // oof
@@ -545,8 +545,7 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 		|| imp = .msg(@arg, "import")
 		imp <~ where.firstname
 		return true
-	|| cls = pp.OwningModClass // seems adding this info is bad?
-								// especially if we already filled it in?
+	|| cls = pp.OwningModClass	// seems adding this info is bad? Especially if we already filled it in?
 		|| simple = .msg(@arg, "simple")
 		simple <~ cls.name
 		simple <~ where.name
@@ -589,6 +588,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 		return nil
 	if self == @tmp and self ~= "main"
 		return "@app.main"~parse
+
 	|| f = .first
 	if (f == @dot) and autocomplete.isafunc(self)
 		// OK... so heres the problem... we don't know if we are module or not.
@@ -609,7 +609,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 		name = "Render"
 	|| fn   = @name
 
-	|| mod_class = .owningmodclass(false)
+	|| mod_class = .OwningModclass(false)
 	if mod_class and (mod_class ~!= "module" and "extend_module")
 		fn = @thg 
 		if self ~= "constructor" or "destructor"
@@ -620,8 +620,6 @@ function message.OwningFullName (|syntax| prm, |message|)
 	
 	rz = @dot.msg(name)
 	|| modname = mod_class[0].name
-	
-
 	// ModName needs to be able to handle module.class.func not just class.func
 	modname ?= "main"
 	rz.msg(fn, modname)
@@ -630,7 +628,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 
 datatype AutoCompleteMode (int)
 	linkage
-		helper
+		libinternal
 	constants
 		Sel		= -1
 		Default = 0

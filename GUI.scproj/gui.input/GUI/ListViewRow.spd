@@ -34,13 +34,13 @@ role ListViewRow (message)
 			.tag = t2
 
 
-	helper Vis (|int| i, |bool|)
+	libinternal Vis (|int| i, |bool|)
 		if !self
 			return true
 		return !((.Indent)&(1<<i))
 		
 
-	helper AllExpandState (|int|)
+	libinternal AllExpandState (|int|)
 		opt norefcounts
 		for r in self
 			if (r is expanded) and r.hasany
@@ -71,7 +71,7 @@ role ListViewRow (message)
 		return .next ?? .flatafter
 				
 	
-	helper ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
+	libinternal ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
 		// So... what are columns
 		// 0-100 --> 30, 60
 		// if x < a number, we are in that thing.
@@ -103,7 +103,7 @@ role ListViewRow (message)
 			f = f.next
 
 
-	helper DrawSep (|ivec4| rect, |image| Where, |float| Str=1)
+	libinternal DrawSep (|ivec4| rect, |image| Where, |float| Str=1)
 		opt norefcounts
 		|| y = (rect.y + rect.y2+1)/2
 		rect = (rect.x+1, y, rect.x2, y+1)
@@ -112,19 +112,19 @@ role ListViewRow (message)
 		where.DrawRect(Rect, A) 
 	
 	
-	helper DrawDividerH (|ivec4| z2, |image| Where, |int| i)
+	libinternal DrawDividerH (|ivec4| z2, |image| Where, |int| i)
 		opt NoRefCounts
 		require (self isnt disabled) and (.prev isnt disabled)
 		|| Vis	= .vis(i)
 			Where.MarkLineH(z2.x1y2, z2.width, 1)
 
 
-	helper DrawDividerV (|ivec4| z2, |image| Where)
+	libinternal DrawDividerV (|ivec4| z2, |image| Where)
 		Where.MarkLineV(z2.x1y2, 		z2.height, 1)
 		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
 
 	
-	helper ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth)
+	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth)
 		opt NoRefCounts
 		require self and !p.decluttered
 		|| w	= p.window	
@@ -155,7 +155,7 @@ role ListViewRow (message)
 			where.DrawRect(z2, edge)
 
 
-	helper DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
+	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
 		opt NoRefCounts
 
 		require .vis(column)

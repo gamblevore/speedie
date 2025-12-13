@@ -94,7 +94,7 @@ To get around this, just do:  x = str.parse(@arg)
 		
 
 
-helper String.ParseSub (|syntax| Owner, |MessageRoot|)
+libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 	description "My language-parsing idea uses Owner as @list"
 	if !Parser.CppInited
 	    Parser.Init

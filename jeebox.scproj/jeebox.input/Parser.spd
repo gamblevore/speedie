@@ -932,7 +932,7 @@ ive been~running #since morning
 		return Result
 
 
-	helper Message.GoIntoInvisArg (|message| tmp, |int| pos, |message|)
+	libinternal Message.GoIntoInvisArg (|message| tmp, |int| pos, |message|)
 		Opt NoRefCounts
 		|| i = .indent|int| align 4
 		|| f = tmp.func
@@ -960,13 +960,13 @@ ive been~running #since morning
 		(rz is style2)
 
 
-	helper Message.InInvisArg (|bool|)
+	libinternal Message.InInvisArg (|bool|)
 		Opt NoRefCounts
 		|| p = .parent
 		return (p == @arg) and (p is style2)
 
 
-	helper Message.IndentScore (|int|)
+	libinternal Message.IndentScore (|int|)
 		|| ind = .indent //&~ 1
 		if self == @tmp or @item
 			return ind + 2
@@ -1131,7 +1131,7 @@ ive been~running #since morning
 		return output
 	
 
-	helper FinishParseLoop (|int| lines, |message| output, |int| After, |int|)
+	libinternal FinishParseLoop (|int| lines, |message| output, |int| After, |int|)
 		opt norefcounts
 		if output.func == @arg and output is style2
 			output.after = after
@@ -1254,7 +1254,7 @@ ive been~running #since morning
 		return .WordAfterSub(start, Jeebox.CSWordMiddle2)
 	
 	
-	helper WordAfterSub (|int| Start, |charset| cs, |int|)
+	libinternal WordAfterSub (|int| Start, |charset| cs, |int|)
 		Opt NoRefCounts
 		|| n = .data.length
 		if (Start < n)
@@ -1283,7 +1283,7 @@ module parser
 	linkage
 		visible false
 		cpp_part Tk
-		helper
+		libinternal 
 
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData

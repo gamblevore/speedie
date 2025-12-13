@@ -11,7 +11,7 @@ module Platform
 	function Name (|string|)
 		cpp_wrapper JB_Platform
 
-	helper cpu (|int|)
+	libinternal cpu (|int|)
 		cpp_wrapper JB_Platform__CPU
 	
 	function CPU_Intel (|bool|)
@@ -65,7 +65,7 @@ module Platform
 		L.write(s)
 		L.write("\n")
 	
-	helper OpenLog (|file|)
+	libinternal OpenLog (|file|)
 		rz = file.logs[app.appname + ".log"]!
 		.logger_ = rz
 		rz.OpenEmpty

@@ -147,7 +147,7 @@ struct FakeJBString
 	|&byte| Addr
 
 
-helper cstring.temp (|fakejbstring|)
+libinternal cstring.temp (|fakejbstring|)
 	rz.refcount = 0
 	rz.length = .length
 	rz.addr = self|&byte|
@@ -182,7 +182,7 @@ function String.ExtractPathAndLine (|$ivec2| LineAndByte, |string|)
 		rz = rz.AbsolutePath()
 
 
-helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
+libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 	|| i		= p
 	|| ParaMax	= 1K
 	MaxWidth	= MaxWidth min Paramax
@@ -223,7 +223,7 @@ helper string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			i = WordEnd
 
 
-helper String.UnTabbifySub (|faststring| fs)
+libinternal String.UnTabbifySub (|faststring| fs)
 	|| Tabs = .OutByte('\t') ?? .Length
 	if tabs == 0
 		fs <~ self
@@ -232,7 +232,7 @@ helper String.UnTabbifySub (|faststring| fs)
 		fs.appendRange(self, tabs, int.max)
 
 
-helper String.TabsToSpacesSub (|faststring| fs)
+libinternal String.TabsToSpacesSub (|faststring| fs)
 	|| i = 0 
 	for (c in self)
 		if c == '\t'
@@ -245,7 +245,7 @@ helper String.TabsToSpacesSub (|faststring| fs)
 			i++
 
 
-//helper String.TabbifySub (|faststring| fs)
+//libinternal String.TabbifySub (|faststring| fs)
 //	|| Sp = .OutByte(' ') ?? .length
 //	if Sp == 0
 //		fs <~ self

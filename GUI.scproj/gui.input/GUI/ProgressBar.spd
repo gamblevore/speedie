@@ -13,7 +13,7 @@ class ProgressBar (GUIControl)
 		.onclicked = onclicked
 		.indefinite = true
 
-	helper RandomData (|memory|)
+	libinternal RandomData (|memory|)
 		if gui.FrameStart >= .NextUpdate
 			.NextUpdate = gui.FrameStart + 1s/16
 			GUI.touch

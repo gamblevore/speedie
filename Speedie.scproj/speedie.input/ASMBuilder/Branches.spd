@@ -227,7 +227,7 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 
 
 // this was crazy complex before. We simplified it!
-helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
+libinternal ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫
 	dest.µtype = DataTypeCode.bool
 	

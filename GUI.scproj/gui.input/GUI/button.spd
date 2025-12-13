@@ -34,7 +34,7 @@ class ButtonView (GUIControl)
 		.align = ListViewState.aligncenter 
 		.subcontrol = .InitMenu(ret, pressing)
 
-	helper InitMenu (|GUIListEvent| ret, |guiaction| Pressing,   |menu|)
+	libinternal InitMenu (|GUIListEvent| ret, |guiaction| Pressing,   |menu|)
 		if ret
 			if !pressing
 				.MouseDownDoesClick = true
@@ -141,7 +141,7 @@ class ButtonView (GUIControl)
 				R += W + .itemgap
 
 
-	helper ClearMouse
+	libinternal ClearMouse
 		.DelayTill = nil
 		.ClickedItem = nil
 	
@@ -160,7 +160,7 @@ class ButtonView (GUIControl)
 		.Click(p, .onrightclick!=nil)
 
 		
-	helper DoPressing (|listviewrow| D, |bool|)
+	libinternal DoPressing (|listviewrow| D, |bool|)
 		.ClearMouse
 		return (.Pressing!)(self, 0, D)
 
@@ -228,7 +228,7 @@ class ButtonView (GUIControl)
 			return xy 
 
 
-	helper DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
+	libinternal DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
 		|| disabled = (i and i is disabled) or (self isnt enabled)
 			grow = nil
 		if .MenuIsOpen

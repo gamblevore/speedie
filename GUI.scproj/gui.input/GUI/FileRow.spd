@@ -108,7 +108,7 @@ class FileRow (ListViewRow)
 		return .Location + .dirfile
 
 
-	helper IsAlsoDir (|file| f, |bool|)
+	libinternal IsAlsoDir (|file| f, |bool|)
 		return f.isdir == .asdir
 	
 	
@@ -128,7 +128,7 @@ class FileRow (ListViewRow)
 		.AddFileSub(f,  o.excludes,  o.folfile,  Count)
 
 
-	helper AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |$int| Count, |bool|)
+	libinternal AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |$int| Count, |bool|)
 		|| C = Count--
 		require C > 0
 		|| r = filerow(f.path, f.name)
@@ -174,7 +174,7 @@ class FileRow (ListViewRow)
 		.FileSort
 
 
-	helper FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
+	libinternal FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
 		.DateOfFileAtRead = fol.modified
 		for f.files in fol // merge these two
 			|| name = f.path.name
@@ -274,7 +274,7 @@ class FileRow (ListViewRow)
 		r.inmainproj = .InMainProj
 
 
-	helper Match (|string| path, |bool| NameOnly, |int|)
+	libinternal Match (|string| path, |bool| NameOnly, |int|)
 		rz = .location.name(nameonly).FileViewMatch(path)
 		if .dirfile
 			|| r = .readfrom
@@ -290,7 +290,7 @@ class FileRow (ListViewRow)
 					if r.location.name ~= name
 						return r
 
-		helper error.ViewDate (|date|)
+		libinternal error.ViewDate (|date|)
 			opt norefcounts
 			|| f = .obj as FileRow
 				|| d = f._Document
@@ -317,20 +317,20 @@ class FileRow (ListViewRow)
 				  else
 					rz = an.syntaxcompare(bn)
 
-		helper IsBetter (|string| a, |string| b, |string| ext, |int|)
+		libinternal IsBetter (|string| a, |string| b, |string| ext, |int|)
 			if (b == ext) != (a == ext)
 				return (a==ext)+1
 
 		
 	
 
-helper string.FindExistingPath (|string|)
+libinternal string.FindExistingPath (|string|)
 	while (self > 1) and !.fileexists
 		self = self.parent
 	return self
 
 
-helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K, |string|)
+libinternal ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K, |string|)
 	|| path = InPath.TrimSlashes.FindExistingPath
 	require .listfiles(path, types, save, max) and inpath // also calls clear
 	|| r = filerow(path.parent, "..", ".nothing")

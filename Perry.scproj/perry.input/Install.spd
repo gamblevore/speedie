@@ -192,7 +192,7 @@ extend_module perry
 		expect (.GenerateArchiveSub) (beep)
 			
 	
-	helper ConfirmGen (|[file]| list, |bool|)
+	libinternal ConfirmGen (|[file]| list, |bool|)
 		|| fs = FastString()
 		fs <~ "Include all these files?\n\n"
 		list.sort(&File.SizeSorter)
@@ -203,7 +203,7 @@ extend_module perry
 			fs <~ "\n"
 		return fs.render.confirm
 			
-	helper GenerateArchiveSub (|bool|)
+	libinternal GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
 		|| p = file.speediedir
 		|| f = p.FileThatExists("generate archive")
@@ -234,7 +234,7 @@ extend_module perry
 	function CanGenerate (|file| f, |bool|)
 		return .CanGeneratesub(f, f.name)
 	
-	helper CanGenerateSub (|file| f, |string| n, |bool|)
+	libinternal CanGenerateSub (|file| f, |string| n, |bool|)
 		require !f.linksto
 		require !(f.path contains "/Terminal/Debug" or "/Terminal/Backup")
 		require !n[0, ".git"]

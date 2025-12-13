@@ -222,7 +222,7 @@ function message.XMLToJeebox (|bool|)
 	check rz (self, "No XML found.")
  
 
-helper message.XMLToJeeboxSub
+libinternal message.XMLToJeeboxSub
 	if self == @xpi
 		.remove
 	  elseif self == @xml

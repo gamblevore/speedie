@@ -224,7 +224,7 @@ class File (String)
 		FlowControl.DisabledIncr(-1)
 	
 	
-	helper CompareMsg (|errorint| code, |string| Error, |bool|)
+	libinternal CompareMsg (|errorint| code, |string| Error, |bool|)
 		flow off
 		if (code==0) or !error
 			return code == 0
@@ -238,7 +238,7 @@ class File (String)
 		error msg
 		
 		
-	helper CompareSub (|File| A, |ErrorInt|)
+	libinternal CompareSub (|File| A, |ErrorInt|)
 		cpp_part FileCompareSub
 		flow off
 		if (.Size != A.Size)

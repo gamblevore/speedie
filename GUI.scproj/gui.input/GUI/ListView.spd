@@ -66,13 +66,13 @@ class ListView (GUIControl) {
 		.init
 	
 	
-	helper Init
+	libinternal Init
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
 			
 	
-	helper TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
+	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
 		opt NoRefCounts
 		require .TryRenameCellSub(cell, value)
 		|| o = cell.row
@@ -83,7 +83,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	helper TryRenameCellSub (|listviewcell!| cell, |string| value, |bool|)
+	libinternal TryRenameCellSub (|listviewcell!| cell, |string| value, |bool|)
 		opt norefcounts
 		|| tec = .TryEditCell
 			return (tec)(self, cell, value)
@@ -93,7 +93,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	helper ColorRow (|int| Depth, |int| Column, |int| y, |imagepixel|)
+	libinternal ColorRow (|int| Depth, |int| Column, |int| y, |imagepixel|)
 		(depth), (column) // one day i'll use it?
 		if y
 			return (0.5, 0.5, 0.5, 1.0).px
@@ -102,7 +102,7 @@ class ListView (GUIControl) {
 		return imagepixel.clear
 
 
-	helper DistBetween (|ListViewRow| c, |ListViewRow| b, |int|)
+	libinternal DistBetween (|ListViewRow| c, |ListViewRow| b, |int|)
 		opt norefcounts
 		|| a = c
 		while a
@@ -135,7 +135,7 @@ class ListView (GUIControl) {
 			rz += t.height - 1 
 
 
-	helper ColBounds (|int| col,  |ivec4| z2, |ListViewrow| sc, |intrange|)
+	libinternal ColBounds (|int| col,  |ivec4| z2, |ListViewrow| sc, |intrange|)
 		(sc) // one day I'll use it, I guess
 		|| x1	= .columns(col)
 		|| col1 = col+1
@@ -144,7 +144,7 @@ class ListView (GUIControl) {
 		rz.x2	= rz.x2 min z2.x2
 
 		
-	helper Columns (|int| i, |int|)
+	libinternal Columns (|int| i, |int|)
 		require i > 0
 
 		|| w = .width
@@ -162,7 +162,7 @@ class ListView (GUIControl) {
 		return .ColumnCount
 
 	
-	helper TextWidth (|int|)
+	libinternal TextWidth (|int|)
 		opt norefcounts
 		for row.all in self
 			rz = rz max row.__DisplayName__.bounds.x
@@ -197,7 +197,7 @@ class ListView (GUIControl) {
 				.openmenu(r, y - .lastbottom)
 	
 
-	helper MenuForSelRow
+	libinternal MenuForSelRow
 		|| sels = .FirstSelected$
 		.showfast(sels)
 		|| y = .DrawYRow(sels)
@@ -220,7 +220,7 @@ class ListView (GUIControl) {
 		.touch
 	
 
-	helper InlineCell (|bool| always = false, |&InlineEditor|)
+	libinternal InlineCell (|bool| always = false, |&InlineEditor|)
 		opt norefcounts
 		|| w = .window$
 		|| t = w.inline
@@ -228,29 +228,29 @@ class ListView (GUIControl) {
 			return t
 
 			
-	helper ClearEdits
+	libinternal ClearEdits
 		opt norefcounts
 		.InlineCell.FinishAndClear(false)?
 	
 	
-	helper Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
+	libinternal Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
 		opt norefcounts
 		if orig == gone
 			return .sib(orig)
 		return orig
 	
 	
-	helper Sib (|ListViewrow| r, |ListViewrow|)
+	libinternal Sib (|ListViewrow| r, |ListViewrow|)
 		return .HierNext(r) ?? .hierPrev(r)
 	
 	
-	helper CheckRemoved (|ListViewrow| r)
+	libinternal CheckRemoved (|ListViewrow| r)
 		.ScrollStart	= .replaced(r, ._Scrollstart)
 		._DraggingRowTo	= .replaced(r, ._DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
 	
 
-	helper ChangeSel (|listviewrow| Row, |bool| NewState, |int|)
+	libinternal ChangeSel (|listviewrow| Row, |bool| NewState, |int|)
 		if NewState == (row is selected)
 			return 0
 		if NewState and (row is UnSelectable)
@@ -261,7 +261,7 @@ class ListView (GUIControl) {
 		return 1
 
 
-	helper RowIsViewable (|listviewrow| Row, |bool|)
+	libinternal RowIsViewable (|listviewrow| Row, |bool|)
 		opt NoRefCounts
 		// .isviewable checks the entire draw tree.
 		// can we avoid this? sigh...
@@ -328,20 +328,20 @@ class ListView (GUIControl) {
 		return true
 	
 	
-	helper RefilterKeyDown (GUIKeyEvent)
+	libinternal RefilterKeyDown (GUIKeyEvent)
 		opt norefcounts
 		|| p = .parent as ListView
 			if !key.iscancel
 				return false
 			return p.StopFilter
 
-	helper textview.RefilterTextChange (GUITextEvent)
+	libinternal textview.RefilterTextChange (GUITextEvent)
 		opt norefcounts
 		|| p = .parent as ListView
 			p.UpdateFilter
 
 
-	helper NeedFilter (|textview|)
+	libinternal NeedFilter (|textview|)
 		opt norefcounts
 		rz = .TypingFilter
 		if rz
@@ -368,7 +368,7 @@ class ListView (GUIControl) {
 				return .UpdateFilter
 
 
-	helper UpdateFilter (|bool|)
+	libinternal UpdateFilter (|bool|)
 		opt norefcounts
 		|| t = .OnTypingFilter
 		|| tf = .TypingFilter
@@ -391,7 +391,7 @@ class ListView (GUIControl) {
 			return true
 			
 			
-	helper KeyDownTest (|keys| key, |bool|)
+	libinternal KeyDownTest (|keys| key, |bool|)
 		if (key is INSERT or Enter)
 			.rename
 			return true
@@ -458,7 +458,7 @@ class ListView (GUIControl) {
 		return fs
 
 
-	helper CopyList (|array of string|)
+	libinternal CopyList (|array of string|)
 		opt norefcounts
 		.EditDelayed = nil
 		.clearinternaldrops
@@ -477,7 +477,7 @@ class ListView (GUIControl) {
 			.select(it)
 		
 		
-	helper PartialFind (|string| s, |listviewrow|)
+	libinternal PartialFind (|string| s, |listviewrow|)
 		opt norefcounts
 		for r.toplist in self
 			if listview.pf(r.name)[0, s]
@@ -494,7 +494,7 @@ class ListView (GUIControl) {
 		return .height / .RowHeight
 
 
-	helper VisibleRowsGap (|int|)
+	libinternal VisibleRowsGap (|int|)
 		|| m = .FullyVisibleRows
 		if m == 5
 			return 4
@@ -507,7 +507,7 @@ class ListView (GUIControl) {
 		.OnDragRow = (nil, &BasicRowDrag)(.istree)
 	
 
-	helper CursorForRow (|listviewCell?| c, |systemcursor|)
+	libinternal CursorForRow (|listviewCell?| c, |systemcursor|)
 		opt norefcounts
 		rz = SystemCursor.Arrow
 		if c and self isa menu
@@ -546,7 +546,7 @@ class ListView (GUIControl) {
 					  // in terms of the nodes and mousewheel.
 
 
-	helper ScrollSet (|ListViewrow?| s)
+	libinternal ScrollSet (|ListViewrow?| s)
 		s ?= .start
 		.scrollshift = 0
 		._ScrollRealigner = 0
@@ -573,7 +573,7 @@ class ListView (GUIControl) {
 				return true
 
 
-	helper ScrollProtect
+	libinternal ScrollProtect
 		opt norefcounts
 		|| s	= .scrollstart
 		ifn .listsource contains s
@@ -597,7 +597,7 @@ class ListView (GUIControl) {
 			c = p
 	
 	
-	helper FoundSep (|ListViewrow| m, |ListViewrow| before, |int|dir, |bool|)
+	libinternal FoundSep (|ListViewrow| m, |ListViewrow| before, |int|dir, |bool|)
 		opt norefcounts
 		|| answer = false
 		while
@@ -609,7 +609,7 @@ class ListView (GUIControl) {
 				answer = true
 			
 
-	helper CanBasicRowDragOne (|ListViewrow| s, |ListViewrow| before, |bool|)
+	libinternal CanBasicRowDragOne (|ListViewrow| s, |ListViewrow| before, |bool|)
 		opt norefcounts
 		if before
 			require before isnt UnSelectable
@@ -617,7 +617,7 @@ class ListView (GUIControl) {
 		return .FoundSep(s, before, 1)
 		
 
-	helper HasSeps (|bool|)
+	libinternal HasSeps (|bool|)
 		opt norefcounts
 		|| l = .start
 		while l
@@ -626,7 +626,7 @@ class ListView (GUIControl) {
 			l++
 
 
-	helper CanBasicRowDrag (|ListViewrow| s, |ListViewrow|before, |bool|)
+	libinternal CanBasicRowDrag (|ListViewrow| s, |ListViewrow|before, |bool|)
 		opt norefcounts
 		if !.hasSeps
 			return true
@@ -637,7 +637,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	helper BasicRowDrag (GuiListDragEvent)
+	libinternal BasicRowDrag (GuiListDragEvent)
 		|| s = .FirstSelected
 		if !s or (.Hiernext(s) == before) and !s.nextselected
 			return true // no need
@@ -660,7 +660,7 @@ class ListView (GUIControl) {
 		return .TouchScrollBar
 	
 	
-	helper ClearInternalDrops
+	libinternal ClearInternalDrops
 		._DraggingRowTo = nil
 		.CommandSelectRow = nil
 		._SelJustChanged = false
@@ -705,12 +705,12 @@ class ListView (GUIControl) {
 			rz += f isnt UnSelectable
 
 
-	helper DelayedRename (|ListViewCell| i)
+	libinternal DelayedRename (|ListViewCell| i)
 		.EditDelayed = i
 		delayedittill_ = (gui.FrameStart + 0.5s, nil)(i)
 
 
-	helper TryDelayedEdit
+	libinternal TryDelayedEdit
 		|| i = .EditDelayed$
 		.EditDelayed = nil
 		|| p = .mouseXY
@@ -720,7 +720,7 @@ class ListView (GUIControl) {
 				.EditCell(r)
 	
 	
-	helper CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
+	libinternal CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
 		if ._DraggingRowTo or (.FirstSelected != .lastselected)
 			return true
 		require .draggingrowfrom != WantsBefore
@@ -822,12 +822,12 @@ class ListView (GUIControl) {
 		return .OneAlways
 			
 		
-	helper End (|ListViewrow|)
+	libinternal End (|ListViewrow|)
 		opt norefcounts
 		|| li = .listsource 
 		return (li.hierend(li), li.last)(.IsTree)
 	
-	helper Edge (|int|i, |bool| Selectable=false, |ListViewrow|)
+	libinternal Edge (|int|i, |bool| Selectable=false, |ListViewrow|)
 		opt norefcounts
 		rz = (.end, .start)(i > 0)
 		if selectable
@@ -837,7 +837,7 @@ class ListView (GUIControl) {
 	autogen Start (|ListViewrow|)
 		return .listsource.first
 	
-	helper SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
+	libinternal SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
 		opt norefcounts
 		|| root = .listsource
 		if !fwd
@@ -845,18 +845,18 @@ class ListView (GUIControl) {
 		if l != root // compare to .list? instead?
 			(l is expanded) // might as well
 		return l.hiernext(.listsource) ?? .start
-	helper HierNext (|ListViewrow| l, |ListViewRow|)
+	libinternal HierNext (|ListViewrow| l, |ListViewRow|)
 		if l
 			return (l.hiernext(.listsource), l.next)(.istree)
-	helper HierPrev (|ListViewrow| l, |ListViewrow|)
+	libinternal HierPrev (|ListViewrow| l, |ListViewrow|)
 		if l
 			return (l.hierprev(.listsource), l.prev)(.istree)
-	helper HierStep (|ListViewrow| l, |bool|fwd, |ListViewrow|)
+	libinternal HierStep (|ListViewrow| l, |bool|fwd, |ListViewrow|)
 		if fwd
 			return .Hiernext(l)
 		return .hierprev(l)
 	
-	helper BMove (|ListViewrow| l, |int| Req, |ListViewrow|)
+	libinternal BMove (|ListViewrow| l, |int| Req, |ListViewrow|)
 		opt norefcounts
 		rz = l
 		|| n = req.abs
@@ -899,7 +899,7 @@ class ListView (GUIControl) {
 			rz = true
 
 
-	helper OpenOrClose (|keys| K, |bool|)
+	libinternal OpenOrClose (|keys| K, |bool|)
 		opt norefcounts
 		|| sel		= .LastSelected$
 		|| Expand	= (k is right)
@@ -940,7 +940,7 @@ class ListView (GUIControl) {
 		return .OneAlways
 
 
-	helper OneAlways (|ListViewRow|)
+	libinternal OneAlways (|ListViewRow|)
 		opt norefcounts
 		if .onealwaysselected
 			|| it = .start
@@ -1054,7 +1054,7 @@ class ListView (GUIControl) {
 		.Select(r)
 
 	
-	helper SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
+	libinternal SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
 		opt norefcounts
 		require !._DuringSelect
 		.ClearEdits
@@ -1079,7 +1079,7 @@ class ListView (GUIControl) {
 			.scrollset(.bmove(s, v))
 	
 	
-	helper ShowFast (|ListViewrow| i)
+	libinternal ShowFast (|ListViewrow| i)
 		.show(i)
 
 	
@@ -1125,16 +1125,16 @@ class ListView (GUIControl) {
 		._BlockedDuringUse = false
 
 	
-	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
+	libinternal ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
 		return .ClickedScrollbar(P, Clicks, .slh)
 
 
-	helper FindClicked (|ivec2| Search, |ListViewRow|)
+	libinternal FindClicked (|ivec2| Search, |ListViewRow|)
 		|| c = .FindClickedCell((0, search.y))
 			return c.row
 	
 	
-	helper FindClickedMenu (|int| y, |ListViewRow|)
+	libinternal FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
 		if y <= .lastBottom
 			return .bmove(.LastVisible$, 1)
@@ -1157,7 +1157,7 @@ class ListView (GUIControl) {
 //			rz = t.text
 
 
-	helper ActualRect (|ivec4|)
+	libinternal ActualRect (|ivec4|)
 		opt norefcounts
 		rz = .lastrect
 		|| t = .TypingFilter
@@ -1165,11 +1165,11 @@ class ListView (GUIControl) {
 		if .Headers
 			rz.y2 -= .HeaderHeight
 			
-	helper HeaderHeight (|int|)
+	libinternal HeaderHeight (|int|)
 		return 19
 	
 	
-	helper FindClickedCell (|ivec2| Search, |ListViewCell|)
+	libinternal FindClickedCell (|ivec2| Search, |ListViewCell|)
 		opt NoRefCounts
 		|| r = .ActualRect
 		|| x = search.x - r.x
@@ -1181,7 +1181,7 @@ class ListView (GUIControl) {
 			r.y2 = r.y
 
 
-	helper DrawYRow (|ListViewrow| search, |int|)
+	libinternal DrawYRow (|ListViewrow| search, |int|)
 		opt NoRefCounts
 		|| r = .lastrect
 
@@ -1192,7 +1192,7 @@ class ListView (GUIControl) {
 			r.y2 = r.y
 
 	
-	helper DefaultColumnWidths (GUIListEvent)
+	libinternal DefaultColumnWidths (GUIListEvent)
 		return nil
 		/*
 		|| cw = .ColumnWidths$
@@ -1215,12 +1215,12 @@ class ListView (GUIControl) {
 			rz = r
 
 
-	helper RowBorderDraw (|ListViewrow| curr, |ListViewrow| find, |int| add, |image| where, |drawstyle| g)
+	libinternal RowBorderDraw (|ListViewrow| curr, |ListViewrow| find, |int| add, |image| where, |drawstyle| g)
 		|| r = .RowBounds(curr, find, add)
 			where.DrawRectStyled(r, g)
 	
 	
-	helper ListViewRow.CalculateSkip (|ListViewRow| prev, |int| n, |int|)
+	libinternal ListViewRow.CalculateSkip (|ListViewRow| prev, |int| n, |int|)
 		opt norefcounts
 		require prev
 		for i in 1 to n
@@ -1230,7 +1230,7 @@ class ListView (GUIControl) {
 				rz |= 1<<i
 	
 	
-	helper CalculateSkips
+	libinternal CalculateSkips
 		opt norefcounts
 		|| n = .ColumnCount
 		|ListViewRow| prev
@@ -1240,7 +1240,7 @@ class ListView (GUIControl) {
 			prev = sk
 	
 	
-	helper RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| add, |ivec4|)
+	libinternal RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| add, |ivec4|)
 		opt norefcounts
 		require find
 		
@@ -1254,7 +1254,7 @@ class ListView (GUIControl) {
 		return (s.x, top, s.x2, top + add)
 
 
-	helper SetInlineSize
+	libinternal SetInlineSize
 		opt norefcounts
 		|| inl = .InlineCell								#require
 		|| cell = inl.cell									#require
@@ -1265,7 +1265,7 @@ class ListView (GUIControl) {
 		inl.FinishAndClear
 
 
-	helper CellBounds (|ListViewCell| cell,  |ivec4|)
+	libinternal CellBounds (|ListViewCell| cell,  |ivec4|)
 		opt norefcounts
 		|| sc = cell.row!
 		|| B = .RowBounds(.scrollstart, sc, .rowheight)			#require
@@ -1274,7 +1274,7 @@ class ListView (GUIControl) {
 		return (B down .lastbottom) left .lastleft 
 
 
-	helper DrawBordersSub (|image| Where,  |ivec4| Rect)
+	libinternal DrawBordersSub (|image| Where,  |ivec4| Rect)
 		require !.decluttered
 		|| z2 = rect
 		z2.y2 += .scrollshift
@@ -1321,13 +1321,13 @@ class ListView (GUIControl) {
 		return true
 
 
-	helper RealignScrollshift (|int| shl, |int|)
+	libinternal RealignScrollshift (|int| shl, |int|)
 		if shl >= (.rowheight/2)
 			return shl + 1
 		return shl-1
 
 
-	helper ScrollSlide (|int|)
+	libinternal ScrollSlide (|int|)
 		|| shl	= .scrollshift
 		if !shl or .ScrollPixelsSub(0)
 			return 0
@@ -1359,7 +1359,7 @@ class ListView (GUIControl) {
 			rz = .hierstep(rz, false) #loop
 	
 	
-	helper ScrollPixelsSub (|int| rem, |bool|)
+	libinternal ScrollPixelsSub (|int| rem, |bool|)
 		rem += .scrollShift
 		|| cmp = (.start, .scrollend)(rem < 0) 
 		if cmp == .scrollstart
@@ -1375,7 +1375,7 @@ class ListView (GUIControl) {
 		return !rem
 
 
-	helper DrawHeaders (|image| where, |ivec4| rect)
+	libinternal DrawHeaders (|image| where, |ivec4| rect)
 		opt NoRefCounts
 		|| l = .headers$
 
@@ -1449,7 +1449,7 @@ class ListView (GUIControl) {
 			.DrawScroll(.slh, where)
 
 
-	helper textview.MoveListLine (|int| i, |bool|)
+	libinternal textview.MoveListLine (|int| i, |bool|)
 		opt norefcounts
 		|| inl = .isinline$
 		|| c = inl.cell$ // wat
@@ -1460,7 +1460,7 @@ class ListView (GUIControl) {
 		return true
 
 
-//	helper LastNamed (|string| s, |ListViewrow|)
+//	libinternal LastNamed (|string| s, |ListViewrow|)
 //		opt norefcounts
 //		rz = .listsource.last
 //		while rz
@@ -1530,7 +1530,7 @@ class ListView (GUIControl) {
 		function Init
 	
 	
-		helper pf (|string| s, |string|)
+		libinternal pf (|string| s, |string|)
 			for (c in s) (i)
 				if c.IsAlphaNum
 					return s[i...].lowercase

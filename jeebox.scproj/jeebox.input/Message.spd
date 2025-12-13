@@ -435,7 +435,7 @@ Message is also:
 	
 ////////////////////////////////////////////////////////////////////////////////		
 	
-	helper RenderWithSpaces (|FastString| fs, |Message|ch=nil)
+	libinternal RenderWithSpaces (|FastString| fs, |Message|ch=nil)
 		Opt NoRefCounts
 		ch ?= .First
 
@@ -614,13 +614,13 @@ Message is also:
 		|| f = .first
 			fs <~ f.name
 	
-	helper RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
+	libinternal RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
 		fs <~ b1
 		.FSListSep( fs, ", " )
 		fs <~ b2
 
 
-	helper Dummy (fpMsgRender)
+	libinternal Dummy (fpMsgRender)
 		// Dummy function used by .ExportAddr. Stops crashes if someone calls export but hasn't set his own function yet.
 
 	
@@ -955,7 +955,7 @@ Message is also:
 		.AccessAdd(key) <~ Value		
 	
 	
-	helper AccessAdd (|string| key, |message|)
+	libinternal AccessAdd (|string| key, |message|)
 		opt norefcounts
 		|| l = self
 		if self == @tmp
@@ -1109,7 +1109,7 @@ Message is also:
 		if (n == 1) or (n == 2 and self[1] == 'B')
 			return self[].SuffixSize
 
-	helper byte.SuffixSize (|int64|)
+	libinternal byte.SuffixSize (|int64|)
 		cpp_wrapper
 		
 	

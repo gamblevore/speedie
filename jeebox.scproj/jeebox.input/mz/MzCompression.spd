@@ -48,7 +48,7 @@ function InputStream.Decompress (|object| dest=nil,  |uint| Limit=256MB,  |&comp
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
-helper InputStream.DecompressSub (|faststring| fs,  |&compressionstats| st,  |int| OutRemain,  |bool|)
+libinternal InputStream.DecompressSub (|faststring| fs,  |&compressionstats| st,  |int| OutRemain,  |bool|)
 	while OutRemain > 0
 		|| InSize = .UInt(4) - 4
 		expect (InSize < 16MB) 							(self, "mz chunk too large")
@@ -69,11 +69,11 @@ helper InputStream.DecompressSub (|faststring| fs,  |&compressionstats| st,  |in
 
 
 
-helper faststring.CompressChunk (|string| Input, |int| level, |int|) 
+libinternal faststring.CompressChunk (|string| Input, |int| level, |int|) 
 	cpp_wrapper JB_Str_CompressChunk
 
 
-helper faststring.DecompressChunk (|string| Input, |int|) 
+libinternal faststring.DecompressChunk (|string| Input, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
 
 

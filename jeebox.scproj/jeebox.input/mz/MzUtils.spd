@@ -33,7 +33,7 @@ Module MZLab
 			decomp = c.Decompress(int.max)
 		
 	
-	helper TestSub (|[string]| items, |FastString| FS, |int| i) 
+	libinternal TestSub (|[string]| items, |FastString| FS, |int| i) 
 		for j in 4 
 			if i & (1<<j)
 				fs <~ items[j]!

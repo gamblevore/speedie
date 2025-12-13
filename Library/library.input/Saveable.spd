@@ -60,11 +60,11 @@ class Saveable
 
 	behaviour SaveCollect { /* not all objects need to collect anything... */ }	
 	
-	helper IsSaveMarked (|bool|)
+	libinternal IsSaveMarked (|bool|)
 		|| p = self|&int|
 		return (p[0] & ObjectSaver.RefMark)
 
-	helper SaveMark (|bool|)
+	libinternal SaveMark (|bool|)
 		// pretty brave!!! to try this! Very dangerous
 		|| p = self|&int|
 		|| rc = p[0] 
@@ -72,7 +72,7 @@ class Saveable
 		p[0] = Rc ||| ObjectSaver.RefMark
 		return true
 	
-	helper SaveUnMark
+	libinternal SaveUnMark
 		|| p = self|&int|
 		p[0] &= ~ ObjectSaver.RefMark
 	
@@ -146,11 +146,11 @@ extend ObjectSaver
 		.dest! <~ ','
 
 
-helper FastString.AppendObjectID (|saveable| o)
+libinternal FastString.AppendObjectID (|saveable| o)
 	.Appendhex3( o.ObjectID )
 
 
-helper FastString.AppendObjectOrNil (|object| o)
+libinternal FastString.AppendObjectOrNil (|object| o)
 	if (o isa saveable)
 // For linked lists... if we try to save one object but it has a .next
 // but we don't want to save the .next...
@@ -314,13 +314,13 @@ struct StructSaveTest
 	|int64|		Intt
 	|string|	Str
 	
-	helper RunTest
+	libinternal RunTest
 		.test("")
 		
-	helper Test (|string| s)
+	libinternal Test (|string| s)
 		cpp_part TestStr
 
-	helper Test (|object| s)
+	libinternal Test (|object| s)
 		cpp_part TestObj
 }
 

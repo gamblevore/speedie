@@ -29,7 +29,7 @@ extend Assembler
 		return .DoMathSub(exp, dest, fn)
 
 
-	helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
+	libinternal DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
 		opt norefcounts
 		|| ml = ASMReg()
 		|| mr = ASMReg()

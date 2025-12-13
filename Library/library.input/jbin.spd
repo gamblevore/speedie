@@ -10,7 +10,7 @@ extend message
 		js.RunHeader(shell_path)
 		.render_jbin_sub(js)
 	
-	helper render_jbin_sub (|jbin| js)
+	libinternal render_jbin_sub (|jbin| js)
 		opt norefcounts
 		|| ch	 = self
 		|| after = .FlatAfter
@@ -20,6 +20,7 @@ extend message
 			ch			= curr.FlatNextDepth(depth)
 			js.Add(curr.func, curr.name, depth > 0)
 			js.exit(-depth)
+
 
 
 role JBin (Faststring)
@@ -125,19 +126,16 @@ datatype jbinLeaver (int)
 						// but that affects a lot of things. its not very reliable.
 						  
 	
-
+/*
 function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| name=nil,  |Message|)
 	cpp_part NextMsgExpect
 	opt norefcounts
-	rz = .NextMsg #require
+	rz = .nextmsginfo|message| #require
 	expect (rz.expect(fn, name) and (rz in parent)) (rz)
+	// A good concept, but untested and unused. So its not a real function unless I can see a real use.
+*/
 
-
-helper InputStream.NextMsg (|message|)
-	return .nextmsginfo|message|
-
-
-helper InputStream.NextMsgInfo (|uint64|)
+libinternal InputStream.NextMsgInfo (|uint64|)
 	opt norefcounts
 	|| Msg = ._Object|message|
 	|int| info
@@ -170,7 +168,7 @@ function InputStream.StreamJbin (|int64| Remain=1G, |MessageRoot|)
 	expect (.HasHeader(Jbin.Header))  (Self, "Parsed data lacks jbin header.	")
 
 	._Object = nil
-	|| Root = .NextMsg
+	|| Root = .nextmsginfo|message|
 	while --Remain > 0
 		loop .NextMsginfo
 	

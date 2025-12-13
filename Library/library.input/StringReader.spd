@@ -38,7 +38,7 @@ class InputStream
 		return .ReadAll.parse(owner, allowdecomp)
 
 	
-	helper ReadChunk (|file| f, |bool|)
+	libinternal ReadChunk (|file| f, |bool|)
 		.data.readfrom = f.read(.chunksize)		// for now
 		if .data.readfrom.length < .chunksize
 			._NoMoreChunks = true // not technically true for pipes... but this will do for now!
@@ -63,7 +63,7 @@ class InputStream
 		return .NextChunk
 
 
-	helper NextChunk (|bool|)
+	libinternal NextChunk (|bool|)
 		opt norefcounts
 		|| f = .file
 			.startfrom += .data.size

@@ -76,7 +76,7 @@ extend String
 		return fs
 			
 	
-	helper FindTrailingSlashes (|int|)
+	libinternal FindTrailingSlashes (|int|)
 		rz = .Length
 		while self[rz-1] == '/'
 			rz--
@@ -144,7 +144,7 @@ Relative paths take the current working directory.`
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
 
-	helper TrimLastSub (|Byte| b, |int|)
+	libinternal TrimLastSub (|Byte| b, |int|)
 		// replace with .outbyte(-1,0,b)?
 		|| N = .Length
 		while (self[N - 1] == b)
@@ -230,7 +230,7 @@ Relative paths take the current working directory.`
 			return self
 		return .filesub
 	
-	helper FileSub (|File|)
+	libinternal FileSub (|File|)
 		nil self
 		cpp_Wrapper JB_Str_File
 	

@@ -110,7 +110,7 @@ class RayTracer
 		return ._LookAt
 	
 
-	helper BG (|vec4|)
+	libinternal BG (|vec4|)
 //(|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| D=vec4(), |rayinfo|)		
 		|| P = .Camera
 		p.w = 1.0
@@ -120,7 +120,7 @@ class RayTracer
 		return (.Background)(v|vobject!|, self, P, (D,D))
 	
 	
-	helper AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
+	libinternal AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
 		opt min 3, opt norefcounts
 		|| C = pxl.color
 		for i in 4
@@ -131,7 +131,7 @@ class RayTracer
 		pxl.AppendRGB((C*0.2)|vec3|)
 	
 
-	helper Prepare (|vec2| XY)
+	libinternal Prepare (|vec2| XY)
 		._XY = XY
 		._CamDir = .Dir(xy)
 		._HalfWay = (._camdir - .MainLight).normal
@@ -146,14 +146,14 @@ class RayTracer
 // I think the func should do the coloring too.
 // now, what if we passed the object? we need a maximum distance. like raydist+radius.
 
-	helper ColorSub (|vobject| B, |vec4|)
+	libinternal ColorSub (|vobject| B, |vec4|)
 		|| H = ._RayHit
 		|| P = .Camera + ._CamDir * H.x
 		p.w = 1.0
 		return (B.shape)(B, self, P, H)
 
 
-	helper ObjColor (|vobject?| B, |vobject| S, |vec4|)
+	libinternal ObjColor (|vobject?| B, |vobject| S, |vec4|)
 		opt min 3,   opt norefcounts
 		if B
 			|| C = .colorsub(b)
@@ -173,7 +173,7 @@ class RayTracer
 		return .bg
 
 		
-	helper FindBestObj (|vobject?| sp, |vobject?| ignore=nil,  |vobject|)
+	libinternal FindBestObj (|vobject?| sp, |vobject?| ignore=nil,  |vobject|)
 		opt min 3,   opt norefcounts
 		|| Best = float.max
 		._RayHit = rayinfo.miss
@@ -187,7 +187,7 @@ class RayTracer
 			sp = sp._CellNext
 	
 	
-	helper FindSub (|vobject| sp, |vec4|)
+	libinternal FindSub (|vobject| sp, |vec4|)
 		opt min 3
 		|| P = .Camera, p.w = 1.0
 		|| hit = (sp.Shape)(sp, self, P)
@@ -211,23 +211,23 @@ class RayTracer
 		return rayinfo.miss
 		
 		
-	helper Dir (|vec2| XY, |vec3|)
+	libinternal Dir (|vec2| XY, |vec3|)
 		|| XY2 = (xy + .adjust) * .scale // -0.5 to +0.5
 		rz = (xy2, 1.0).Normal * ._LookAt
 	
 	
-	helper Plane (|vec4| P, |vec4|)
+	libinternal Plane (|vec4| P, |vec4|)
 		|| D1 = .Dir(P.xy)
 		|| D2 = .Dir(p.x2y2)
 		return Plane3D.normals(d1, d2, .Camera)
 
 
-	helper PlaneOK (|vec4| R, |vec4| Pos, |int| i, |bool|)
+	libinternal PlaneOK (|vec4| R, |vec4| Pos, |int| i, |bool|)
 		opt inline
 		return .Planes[i].BoxVsPlane(r, pos) > 0
 
 
-	helper RemakeNodes (|int| S)
+	libinternal RemakeNodes (|int| S)
 		.InitAllCells
 		for C in self
 			C.Node = nil
@@ -241,7 +241,7 @@ class RayTracer
 			.RootNode.Divide(self)
 	
 		
-	helper FindCameraDist (|vobject| obj, |float| Max)
+	libinternal FindCameraDist (|vobject| obj, |float| Max)
 		// lets us find out the max/min SDF distance.
 		|| V = obj.adjustpos(1) - .Camera
 		|| DMin = V.Length
@@ -263,7 +263,7 @@ class RayTracer
 			obj._MaxDist = Dmax
 	
 	
-	helper InPlanes (|VObject| b, |bool|)
+	libinternal InPlanes (|VObject| b, |bool|)
 		opt min 3
 		if b._maxdist
 			|| R = (b.radius, 0.0)
@@ -277,7 +277,7 @@ class RayTracer
 		return b._MinDist  <  ._MinDist // biggest dist first. We also store in reverse. So we store nearest first.
 		
 		
-	helper PlayQuidditch (|int| Stride)
+	libinternal PlayQuidditch (|int| Stride)
 		opt norefcounts
 		.RemakeNodes(stride)
 		for s in .Shapes
@@ -317,7 +317,7 @@ class RayTracer
 			C++
 			
 		
-	helper TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
+	libinternal TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
 		// making it look easy
 		opt min 3, opt norefcounts
 		cell.Link
@@ -356,7 +356,7 @@ class RayTracer
 		cell.node = nil
 	
 	
-	helper InitAllCells (|&RayBoost|)
+	libinternal InitAllCells (|&RayBoost|)
 		|| s2 = (0, 0, gui.Screen.Width, gui.Screen.height)
 		rz = .RootNode
 		if rz.size != s2
@@ -392,12 +392,12 @@ struct RayBoost
 		return .CellsWide|int| * .CellsHigh|int|
 
 
-	helper Init (|raytracer| T)
+	libinternal Init (|raytracer| T)
 		for i in 4
 			.quad[i] = .InitCell(T, i&1, i>>1)|&rayboost|
 			
 	
-	helper InitCell (|raytracer| T, |int| x, |int| y, |&RayTraceCell|)
+	libinternal InitCell (|raytracer| T, |int| x, |int| y, |&RayTraceCell|)
 		|| sz = .size
 		|| CellStart = sz.xy + ((x,y) << .px)
 		|| CellEnd = (CellStart + (1<<.px)) min sz.x2y2
@@ -413,7 +413,7 @@ struct RayBoost
 			rz  +=  .area // fake cell. should never be reached? but might be?
 	
 
-	helper raytracer.Quadditch (|RayBoost| ff, |VObject| v, |int| i=-1)
+	libinternal raytracer.Quadditch (|RayBoost| ff, |VObject| v, |int| i=-1)
 		real self,  opt min 3
 		if i >= 0
 			|| D = ff.depth
@@ -470,7 +470,7 @@ struct RayBoost
 				.quad[i].Divide(t)
 	
 	
-	helper InitialCreation (|!&RayBoost| Last, |int| H, |int| px, |!&RayBoost|)
+	libinternal InitialCreation (|!&RayBoost| Last, |int| H, |int| px, |!&RayBoost|)
 		.depth = H-px
 		.px = px
 
@@ -522,7 +522,7 @@ struct RayTraceCell
 		|| n = .node
 			return n.draw
 			
-	helper Link
+	libinternal Link
 		opt min 3, opt norefcounts
 		|| curr = .Node
 		while curr

@@ -979,7 +979,7 @@ function FindProject (|string| Path, |File|)
 		return A
 
 	
-helper FindProjectSub (|string| base, |string| Path, |File|)
+libinternal FindProjectSub (|string| base, |string| Path, |File|)
 	if (Path[] == '/')
 		return Path.FileThatExists
 	

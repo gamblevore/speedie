@@ -35,16 +35,16 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if self
 			return .pico.MessageStatus == 0
 
-	helper Alive (|bool|)
+	libinternal Alive (|bool|)
 		disabled "use .CommsOpen"
 		// todo: why isn't this just .CommsOpen? 
 //		if self != nil
 //			rz = (.ChildAlive, .ParentAlive)(.isParent)
 	
-	helper ParentAlive (|bool|)
+	libinternal ParentAlive (|bool|)
 		return app.ParentID > 1
 
-	helper ChildAlive (|bool|)
+	libinternal ChildAlive (|bool|)
 		if .SubProcess
 			return .CommsOpen
 		return .status.isrunning
@@ -95,7 +95,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			error (.path, "Too many disconnections, blocking reconnection.")
 	
 	
-	helper Kill
+	libinternal Kill
 		disabled "Explain why"
 
 
@@ -168,7 +168,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				error "Parent lost connection"
 
 
-		helper CreateArgs (|string| path, |[string]!| Args, |&cstring|)
+		libinternal CreateArgs (|string| path, |[string]!| Args, |&cstring|)
 			cpp_wrapper
 
 

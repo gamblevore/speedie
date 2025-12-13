@@ -50,7 +50,7 @@ function string.Ask (|string| response="",  |string| Title="",  |stringthatwasre
 	return String.Error
 
 
-helper window.TryCloseDialog (|bool|)
+libinternal window.TryCloseDialog (|bool|)
 	opt norefcounts
 	.cancelreturn
 	|| count = 0

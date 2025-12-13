@@ -10,7 +10,7 @@ module ScrollInfo
 			.InDrag_ = -1								// So it thinks its indrag when its not.
 
 	
-helper ListView.SLH (|vec3|)
+libinternal ListView.SLH (|vec3|)
 	opt norefcounts
 	|| Total = 0
 	|| Found = 0
@@ -23,7 +23,7 @@ helper ListView.SLH (|vec3|)
 	return (Found,  L,  .rowheight).vec3
 
  
-helper textview.SLH (|vec3|)
+libinternal textview.SLH (|vec3|)
 	opt norefcounts
 	|| s = .StartLine
 	|| ll = ._lines.last!
@@ -33,7 +33,7 @@ helper textview.SLH (|vec3|)
 
 
 extend guicontrol {
-helper MyScroller (|taskgui|)
+libinternal MyScroller (|taskgui|)
 	opt norefcounts
 	|| w = .window
 		|| x = w._Scroller
@@ -41,19 +41,19 @@ helper MyScroller (|taskgui|)
 				return x
 		
 
-helper DrawScrollStrength (|float|)
+libinternal DrawScrollStrength (|float|)
 	opt norefcounts
 	|| Scroll = .MyScroller
 		rz = 1.0 - scroll.TaskProgress
 
 
-helper CanDrawScroll (|window| w, |bool|)
+libinternal CanDrawScroll (|window| w, |bool|)
 	require w and .MouseDownOnSelfOrNil
 	require !._CanSeeAllLines
 	return (self contains .mousexy) or (w.CurrMouseDown==self)
 	
 	
-helper DrawScroll (|vec3| slh, |image| where)
+libinternal DrawScroll (|vec3| slh, |image| where)
 	opt NoRefCounts
 	if !.MouseDownOnSelfOrNil
 		.NoScroll
@@ -77,13 +77,13 @@ function InScrollArea (|ivec2| p, |bool|)
 		return (xr contains p.x) and (self contains p)
 
 
-helper MouseMoveInScrollArea (|ivec2| p, |bool|)
+libinternal MouseMoveInScrollArea (|ivec2| p, |bool|)
 	if .HasFocus or !GUI.MouseButtons
 		if .InScrollArea(p)
 			return .TouchScrollBar
 
 
-helper ScrollBarMove (|vec3| slh, |int| shift)
+libinternal ScrollBarMove (|vec3| slh, |int| shift)
 	if shift
 		|| t = .ScrollRect(slh, shift).x
 		if self isa ListView
@@ -92,7 +92,7 @@ helper ScrollBarMove (|vec3| slh, |int| shift)
 			.StartLine = t
 
 
-helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
+libinternal ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 	opt norefcounts
 	
 	|| r = .ScrollRect(slh)
@@ -112,7 +112,7 @@ helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 	return .TouchScrollBar
 
 
-helper ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)
+libinternal ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)
 	cpp_part ScrollRectSub
 	|| s  = slh[0]
 	|| l  = slh[1]

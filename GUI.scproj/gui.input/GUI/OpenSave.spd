@@ -98,7 +98,7 @@ class OpenSaveDialog (Window)
 		.init
 	
 	
-	helper InitField (|textview| f, |string| id)
+	libinternal InitField (|textview| f, |string| id)
 		with f
 			isnt AlwaysScrollable
 			is   enabled
@@ -110,13 +110,13 @@ class OpenSaveDialog (Window)
 			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
 	
 	
-	helper PastePathEvent (GUIPasteEvent)
+	libinternal PastePathEvent (GUIPasteEvent)
 		.path.text = data.Trim
 		relistkey(.path, 0, true)
 		return true
 
 	
-	helper Init
+	libinternal Init
 		.path.id = "opensave"
 		.path.OnTextChanged= relistkey
 		
@@ -175,7 +175,7 @@ class OpenSaveDialog (Window)
 		return super.keydown(key)
  
 
-	helper AddButton (|ButtonView| BTN,  |string| Name)
+	libinternal AddButton (|ButtonView| BTN,  |string| Name)
 		btn.ExpandOnMouseOver = 2
 		btn.size = (44~long to 4~before) by (4~up for 16)
 		btn.Text = Name
@@ -183,7 +183,7 @@ class OpenSaveDialog (Window)
 		btn.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
 	
 
-	helper RelistFiles (|string| path, |bool| AlwaysUse=true)
+	libinternal RelistFiles (|string| path, |bool| AlwaysUse=true)
 		|| pf = path.file
 		if !pf.exists and !AlwaysUse
 			return
@@ -195,7 +195,7 @@ class OpenSaveDialog (Window)
 			.files.ListFilesUp(path, .types, (.name is visible))
 	
 	
-	helper GoIntoFolder (|bool|)
+	libinternal GoIntoFolder (|bool|)
 		|| f = .files.FirstSelected as filerow #expect beep
 		|| Acceptable = (f isnt disabled) #expect beep
 		if f.asdir
@@ -216,7 +216,7 @@ class OpenSaveDialog (Window)
 	module
 		|OpenSaveDialog|				_Asker
 		
-		helper LastDir (|message|)
+		libinternal LastDir (|message|)
 			rz = app.prefs()("opensave")
 			rz.trim(20)
 			for f in rz
@@ -224,7 +224,7 @@ class OpenSaveDialog (Window)
 					f.remove
 			
 
-		helper RelistKey (guitextevent)
+		libinternal RelistKey (guitextevent)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog
 				|| p = w.path
@@ -240,7 +240,7 @@ class OpenSaveDialog (Window)
 					p.text = w.LastGoodPath
 
 
-		helper OnAskSaveAnswer (GUIAction)
+		libinternal OnAskSaveAnswer (GUIAction)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog #require
 			if self != w.accept
@@ -253,7 +253,7 @@ class OpenSaveDialog (Window)
 				w.GoIntoFolder
 		
 		
-		helper OnAskSaveName (GUIKeyEvent)
+		libinternal OnAskSaveName (GUIKeyEvent)
 			opt norefcounts
 			if key.isaccept
 				|| w = .window as OpenSaveDialog		#require
@@ -262,7 +262,7 @@ class OpenSaveDialog (Window)
 				return true
 		
 		
-		helper OnAskSaveReveal (GUIAction)
+		libinternal OnAskSaveReveal (GUIAction)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog			#require
 			|| f = w.files.FirstSelected
@@ -271,12 +271,12 @@ class OpenSaveDialog (Window)
 				p.reveal
 		
 		
-		helper OnAskSaveEntered (GuiListEvent)
+		libinternal OnAskSaveEntered (GuiListEvent)
 			return (.parent as OpenSaveDialog)!.GoIntoFolder
 
 
 
-helper file.IsntAnOSXBundle (|bool|)
+libinternal file.IsntAnOSXBundle (|bool|)
 	require .IsDir
 	|| n	= .Name
 	|| ext	= n.Ext

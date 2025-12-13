@@ -104,7 +104,7 @@ class Image (memory)
 		.WindowBase   = (0, 0)
 		.noclip
 	
-	helper NoClip
+	libinternal NoClip
 		._ControlClip = (0, 0, .size)
 	
 	function Horz (assigns:|ivec2|r)

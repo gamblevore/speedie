@@ -14,7 +14,7 @@ extend_module ErrorReceiver
 	function NewCriticalError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		.NewErrorSub(node, desc, path, ErrorSeverity.Critical)
 
-	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
+	libinternal NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
 		opt norefcounts
 		|| Lower = stderr.LowerErrorsTo
 			sev = lower|int| min sev

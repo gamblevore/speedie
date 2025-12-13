@@ -3,7 +3,7 @@
 // just test some stuff compiles, really
 
 target debug {
-helper __junktest_1__
+libinternal __junktest_1__
 	visible
 	|| r = [1, 2, 3]
 	|ErrorSeverity| i = 2
@@ -11,13 +11,13 @@ helper __junktest_1__
 
 
 extend ivec4
-	helper __junktest_4__ (assigns:|int|, |ivec4|)
+	libinternal __junktest_4__ (assigns:|int|, |ivec4|)
 		.x2 = Value + .x1
 		return self
 
 
 
-helper __junktest_3__ (|intrange| data, |bool|)
+libinternal __junktest_3__ (|intrange| data, |bool|)
 	visible
 	|ivec4| x
 	x.__junktest_4__ = 1 // x = x.assignstest(1) 
@@ -26,7 +26,7 @@ helper __junktest_3__ (|intrange| data, |bool|)
 			return true
 
 
-helper __junktest_2__
+libinternal __junktest_2__
 	visible
 	|| r1 = list()
 	if (0.5)
@@ -34,7 +34,7 @@ helper __junktest_2__
 	|| r2 = list()
 
 
-helper message.__junktest_18__ (|bool| named=false) // findpos, findat
+libinternal message.__junktest_18__ (|bool| named=false) // findpos, findat
 	opt norefcounts
 	|message| m
 	for ch in self
@@ -43,7 +43,7 @@ helper message.__junktest_18__ (|bool| named=false) // findpos, findat
 
 
 
-helper __junktest_19__
+libinternal __junktest_19__
 	|| w = message()
 	with w
 		.name = ""
@@ -77,14 +77,14 @@ datatype __junktest_7__ (uint64)
 	
 
 
-helper int.__junktest_8__ (|int| Inaaaadex = 0, |bool| Create=false, |int|)
+libinternal int.__junktest_8__ (|int| Inaaaadex = 0, |bool| Create=false, |int|)
 	visible
 	|| doubleJunk2 = 0
 	for 0
 		doubleJunk2 = 1.__junktest_8__		#loop
 
 
-helper int.__junktest_9__ (|int| X, |int| Y, |int| Z=0, |int|)
+libinternal int.__junktest_9__ (|int| X, |int| Y, |int| Z=0, |int|)
 	|int16| oof
 	return .__junktest_8__(oof, false)
 
@@ -99,19 +99,19 @@ function __JunkTest_10__
 	d["abc"] = i
 
 
-helper __junktest_11__
+libinternal __junktest_11__
 	visible
 	|| sss = "abc"
 	|| y = (sss.decompress(int.max), sss)(0.5[]) // make sure .decomp doesnt get extracted
 	printline y
 
 
-helper voidtest  (|&nil| abc, |&nil|)
+libinternal voidtest  (|&nil| abc, |&nil|)
 	visible
 	return abc
 
 
-helper voidtest2 (|&nil| abc, |&nil|)
+libinternal voidtest2 (|&nil| abc, |&nil|)
 	|| abc2 = voidtest(abc)
 	visible
 

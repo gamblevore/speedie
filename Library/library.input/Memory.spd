@@ -106,7 +106,7 @@ class Memory
 	setter Size (|int|)
 		.SetSize(value)
 	
-	helper SetSize (|int| ItemCount, |bool|)
+	libinternal SetSize (|int| ItemCount, |bool|)
 		if ItemCount == .size
 			return true
 		require .DeathAction == DataObject.kfree
@@ -219,7 +219,7 @@ class Memory
 			if rz
 				random.shared.temporal(rz)
 		
-		helper _memset	 (|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
+		libinternal _memset	 (|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
 		function Fill	 (|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function Unmap	 (|&nil| p, |int| n):							cpp_wrapper JB_munmap
@@ -229,5 +229,5 @@ class Memory
 		function Copy	 (|&nil| dest, |&nil| src, |int| N):			cpp_wrapper memcpy
 		function Free	 (|?&nil| b):									cpp_wrapper JB_Free, description "same as free() but also decreases the reported used-memory count." 
 
-		helper _Free	 (|?&nil| b):									cpp_wrapper free
+		libinternal _Free	 (|?&nil| b):									cpp_wrapper free
 

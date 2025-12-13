@@ -544,7 +544,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 
 
 
-helper Message.ACInIsa (|bool|)
+libinternal Message.ACInIsa (|bool|)
 	opt norefcounts
 	require (self == @thg) and .islast
 	|| p = .parent$
@@ -907,7 +907,7 @@ function SCNode.UpClass (|message| f, |SCNode|)
 		require !rz.isimport
 
 
-helper message.GetTypeLimiter (|message|)
+libinternal message.GetTypeLimiter (|message|)
 	opt norefcounts
 	require self
 	|| rel = .parent
@@ -1080,7 +1080,7 @@ function message.FoundFunc (|scfunction| f, |bool|)
 		return o.IsLookupOnly == f
 
 
-helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
+libinternal Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
 	opt norefcounts
 	rz = .originalfilepath
 	for ss.flat in self

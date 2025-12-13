@@ -35,7 +35,7 @@ datatype SystemCursor (int)
 	function Use
 		.get.use
 
-	helper Create (|!&SDL_Cursor|)
+	libinternal Create (|!&SDL_Cursor|)
 		cpp_wrapper JB_CreateSystemCursor
 
 	module

@@ -78,7 +78,7 @@ function message.SmartName (assigns:|string|)
 		.name = value // save memory for often generated strings
 	
 	
-helper message.GoodArgNameSub (|string|)
+libinternal message.GoodArgNameSub (|string|)
 	opt norefcounts
 	|| f = .func
 	if f.IsString or f == @thg or @num

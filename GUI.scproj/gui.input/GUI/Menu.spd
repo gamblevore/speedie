@@ -69,7 +69,7 @@ class Menu (ListView)
 		return moved or ._SelJustChanged 
 	
 		
-	helper CmmWidth (|guicontrol?| owner, |int|)
+	libinternal CmmWidth (|guicontrol?| owner, |int|)
 		|| mw = owner.width? min 140
 		mw = .TextWidth + 14 max mw
 		return mw max 64
@@ -146,7 +146,7 @@ class Menu (ListView)
 				return w.__keydown__(key)
 
 
-	helper FindTypedRow (|string| input, |listviewrow|)
+	libinternal FindTypedRow (|string| input, |listviewrow|)
 		for s.all in self
 			if s.__DisplayName__[0, input, true]
 				return s

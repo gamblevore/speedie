@@ -57,7 +57,7 @@ struct Pico
 		nil self
 		cpp_wrapper PicoCanGet
 		
-	helper SpawnFork (|cstring| Name=nil, |PID_Int|)
+	libinternal SpawnFork (|cstring| Name=nil, |PID_Int|)
 		nil self
 		cpp_wrapper PicoStartFork
 
@@ -78,10 +78,10 @@ struct Pico
 		rz = .send(msg, wait)
 		fs.length = 0
 		
-	helper _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
+	libinternal _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
-	helper Send (|picomessage| A, |bool| Wait=false, |bool|)
+	libinternal Send (|picomessage| A, |bool| Wait=false, |bool|)
 		cpp_Part SendMsg
 		return ._send(A.data, a.length, wait)
 		
@@ -89,7 +89,7 @@ struct Pico
 		|| msg = PicoMessage.from("")
 		.send(msg)
 	
-	helper __Get (|PicoMessage| Msg, |float| T)
+	libinternal __Get (|PicoMessage| Msg, |float| T)
 		nil checker
 		cpp_wrapper PicoGet
 

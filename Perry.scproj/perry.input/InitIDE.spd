@@ -638,7 +638,7 @@ extend PerryIDE
 		(rz is aligncenter)
 
 
-	helper LogOneThing (|message| msg, |string| type, |listviewrow| m)
+	libinternal LogOneThing (|message| msg, |string| type, |listviewrow| m)
 		opt norefcounts
 		m <~ @emb + (type + msg.render)
 		m.position++ 

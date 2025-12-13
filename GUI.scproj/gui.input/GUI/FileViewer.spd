@@ -140,7 +140,7 @@ class FileViewer (ListView)
 		self <~ rz
 
 
-	helper AddRootSub (|file| fol, |bool| IsMainProj, |$int| C, |filerow|)
+	libinternal AddRootSub (|file| fol, |bool| IsMainProj, |$int| C, |filerow|)
 		|| p = fol.path
 		if !fol.isdir
 			return FileRow(p, p.name)
@@ -201,7 +201,7 @@ class FileViewer (ListView)
 		return true
 
 
-	helper CanSave (|int| Purpose, |filerow| f,   |bool|)
+	libinternal CanSave (|int| Purpose, |filerow| f,   |bool|)
 		|| d = f._Document		#require
 		if !d.ShouldntSave
 			return true
@@ -261,14 +261,14 @@ class FileViewer (ListView)
 					return f
 
 
-	helper string.name (|bool| YeahReally, |string|)
+	libinternal string.name (|bool| YeahReally, |string|)
 		cpp_part NameMaybe
 		if YeahReally
 			return .name
 		return self
 
 
-	helper string.FileViewMatch (|string| path, |int|)
+	libinternal string.FileViewMatch (|string| path, |int|)
 		if path[0] == '/'
 			require (self ~= path)
 			return 10
@@ -332,7 +332,7 @@ class FileViewer (ListView)
 	
 
 		
-	helper CanFind (|filerow| f, |uint| id, |bool|)
+	libinternal CanFind (|filerow| f, |uint| id, |bool|)
 		if id
 			require f.findid != id
 		f.findID = ID
@@ -371,7 +371,7 @@ class FileViewer (ListView)
 			path = b
 		.QuickOpen.text = b
 		
-	helper OpenQuickRelistSub (|string| path,  |bool| Improve,  |string|)
+	libinternal OpenQuickRelistSub (|string| path,  |bool| Improve,  |string|)
 		rz = path
 		if path < 2
 			.listopen.clear
@@ -396,7 +396,7 @@ class FileViewer (ListView)
 		.OpenQuickRelistDir(f, filter)
 
 
-	helper ListView.QuickOpenFill (|[filerow]| Items)
+	libinternal ListView.QuickOpenFill (|[filerow]| Items)
 		|| HasSel = .FirstSelected != nil
 		.clear
 		for p in items
@@ -416,7 +416,7 @@ class FileViewer (ListView)
 		.size = the~same by 0~before back d2
 
 
-	helper OpenQuickRelistDir (|file| path, |string| filter)
+	libinternal OpenQuickRelistDir (|file| path, |string| filter)
 		|| invis = filter starts "."
 		|[filerow]| items
 		for ch in path
@@ -543,7 +543,7 @@ class FileViewer (ListView)
 				return (sh, 0)
 
 
-helper string.PlatformVisible (|bool| AtRoot, |bool|)
+libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
 	require self[0] != '.'
 	if !atroot
 		return true

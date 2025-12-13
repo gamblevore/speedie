@@ -50,7 +50,7 @@ class Window (GUIControl)
 		.subconstructor(size, show)
 	
 	
-	helper SubConstructor (|ControlRect| Size, |bool| show)
+	libinternal SubConstructor (|ControlRect| Size, |bool| show)
 		._NeedsResize = true
 		.size = Size
 		.createddate = gui.FrameStart
@@ -143,7 +143,7 @@ class Window (GUIControl)
 //		.SetFocus(value)
 	
 
-	helper SetInnerFocus (|guicontrol| Focus)
+	libinternal SetInnerFocus (|guicontrol| Focus)
 		|| old = .InnerFocus
 		require old != Focus
 		|| menu = .OpenedMenu // shares innerfocus
@@ -156,7 +156,7 @@ class Window (GUIControl)
 //		.InnerLostFocus = old
 
 
-	helper FinishFocus (|guicontrol| focus)
+	libinternal FinishFocus (|guicontrol| focus)
 		if focus and .parent and focus isnt drawsfocus
 			._alphafader = gui.FrameStart
 		  else
@@ -222,7 +222,7 @@ class Window (GUIControl)
 													// probably would make more sense to do it the other way!
 													// missing keydown events send typedstring events
 	
-	helper DoListViewNext (|bool| fwd, |bool|)
+	libinternal DoListViewNext (|bool| fwd, |bool|)
 		opt norefcounts
 		|| l = .MainlistView
 		if !l
@@ -240,7 +240,7 @@ class Window (GUIControl)
 		return L.PressReturnKey
 	
 	
-	helper MainlistView (|listview|)
+	libinternal MainlistView (|listview|)
 		opt norefcounts
 		|| s = .flatnext
 		|| e = .flatafter
@@ -262,7 +262,7 @@ class Window (GUIControl)
 		._BlockRecurseKeyDown = false
 
 
-	helper KeyDownWin (|keys| key, |bool|)
+	libinternal KeyDownWin (|keys| key, |bool|)
 		opt norefcounts
 		
 		|| F = .realfocus
@@ -314,7 +314,7 @@ class Window (GUIControl)
 		return .LastRect == All.lastrect
 
 
-	helper DrawWindow (|image| where)
+	libinternal DrawWindow (|image| where)
 		where.window = self
 		._ReadjustBlock2D
 		.__drawbackground__(where)
@@ -329,7 +329,7 @@ class Window (GUIControl)
 		// do nothing... let children override
 
 
-	helper DrawContents (|image| where)
+	libinternal DrawContents (|image| where)
 		opt norefcounts
 		where.window = self
 		|| inner = .InnerFocus
@@ -350,7 +350,7 @@ class Window (GUIControl)
 			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
 
 
-	helper guicontrol.DrawInner (|image| where, |bool|)
+	libinternal guicontrol.DrawInner (|image| where, |bool|)
 		if .IsViewableMenu
 			where.ControlClip = self
 			.__Draw__(Where)
@@ -360,7 +360,7 @@ class Window (GUIControl)
 			return true
 
 
-	helper FixFocus
+	libinternal FixFocus
 		opt norefcounts
 		|| f = .innerfocus
 			if f isnt visible
@@ -370,7 +370,7 @@ class Window (GUIControl)
 				.SetFocus(nil)
 
 
-	helper guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
+	libinternal guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
 		require dest != nil  and  dest != self
 		require dest is editable and enabled
 		|| copies = .Copypaste.CanCopy
@@ -378,14 +378,14 @@ class Window (GUIControl)
 			return dest
 	
 	
-	helper ClearDrops
+	libinternal ClearDrops
 		GUI.candrag = 0
 		GUI.drawdrag = nil
 		.DroppingInto = nil
 		.currmousedown = nil
 
 
-	helper DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
+	libinternal DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
 		GUI.drawdrag ?= r.CopyList
 		if GUI.drawdrag
 			|| dest = r.CanPasteInto(self[p, true])
@@ -396,7 +396,7 @@ class Window (GUIControl)
 				return true
 
 
-	helper DoMouseDrag (|ivec2| P, |bool| Beyond)
+	libinternal DoMouseDrag (|ivec2| P, |bool| Beyond)
 		opt norefcounts
 		|| r = .CurrMouseDown$
 		require (r is visible) or (r == .openedmenu)
@@ -438,14 +438,14 @@ class Window (GUIControl)
 						return r
 						
 	
-	helper OpenDialog
+	libinternal OpenDialog
 		.isdialog = true
 		window.all <~ self
 		is visible
 		GUI.StartResize // sigh
 
 
-	helper GUI.AskQuitAndThenQuit (|SDLActivity|)
+	libinternal GUI.AskQuitAndThenQuit (|SDLActivity|)
 /		|| Ask = "Quit " + app.AppName + "?"
 		.QuitReason = SDLActivity.questioning
 		if Ask.confirm
@@ -453,7 +453,7 @@ class Window (GUIControl)
 		.QuitReason = rz
 
 	
-	helper gui.AskQuitSub (|SDLActivity|)
+	libinternal gui.AskQuitSub (|SDLActivity|)
 		opt norefcounts
 		for w in Window.all
 			if !w.IsDialog
@@ -479,7 +479,7 @@ class Window (GUIControl)
 		return reason
 	
 	
-	helper DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
+	libinternal DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
 		._SelBeforeMouseDown = .focus
 		|| M = .openedmenu 
 			|| O = .focus
@@ -500,7 +500,7 @@ class Window (GUIControl)
 				return Found
 
 
-	helper RunWindowTasks (|bool| WantAnims)
+	libinternal RunWindowTasks (|bool| WantAnims)
 		opt norefcounts
 		// wait, WantAnims (animated) isnt used? 
 		// does that mean this is being called more than it should?
@@ -511,7 +511,7 @@ class Window (GUIControl)
 					p.Remove
 
 
-	helper SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
+	libinternal SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
 		|| s = p.StartTime
 		|| e = s + p.duration
 		|| now = GUI.FrameStart

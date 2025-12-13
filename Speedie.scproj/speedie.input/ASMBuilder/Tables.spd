@@ -815,7 +815,7 @@ function Str (fn_asm)
 	return .Read(dest, exp, addr, nil, exp.obj as scdecl) * dest
 
 
-helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
+libinternal VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 	|| T = .TempOnly(src.BasicVec)
 	return exp.VSWZ(T, src, 0) * T
 

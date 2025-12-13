@@ -50,20 +50,20 @@ macro string.Macro
 	
 
 extend message
-	helper MacroAvoidCopy (|message|)
+	libinternal MacroAvoidCopy (|message|)
 		if self isnt MacroMade
 			is Macromade
 			return self
 		return  .copy
 
 
-	helper MacroSame (|message| prm, |message|)
+	libinternal MacroSame (|message| prm, |message|)
 		rz = .copy
 		(prm is Macromade)
 		rz.name = prm.name // why?
 	
 	
-	helper MacroPrm (|message| root,  |array? of message| prms,  |message| dest,  |Message|)
+	libinternal MacroPrm (|message| root,  |array? of message| prms,  |message| dest,  |Message|)
 		opt norefcounts
 		|| n = .name
 		|| c = n[]
@@ -87,7 +87,7 @@ extend message
 		.MacroCopy(root, prms, rz)
 
 
-	helper MacroCopy (|Message| root,  |array? of message| prms,  |Message| dest)
+	libinternal MacroCopy (|Message| root,  |array? of message| prms,  |Message| dest)
 		opt norefcounts
 		for v in self
 			dest <~ v.MacroPrm(root, prms, dest)

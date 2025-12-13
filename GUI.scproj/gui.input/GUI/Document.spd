@@ -126,7 +126,7 @@ class Document (list)
 		return answer == 0	// don't
 
 
-	helper SaveText (|documentstate| l, |string|)
+	libinternal SaveText (|documentstate| l, |string|)
 		|| t = l.text
 		if .Wasjbin
 			t = t.digest
@@ -172,7 +172,7 @@ class Document (list)
 				stderr.pop
 
 	
-	helper SimpleUpdateFromDisk (|bool|)
+	libinternal SimpleUpdateFromDisk (|bool|)
 		|| d = .FileDate
 		if !d
 			return true			// unsaved... must be ok.
@@ -331,7 +331,7 @@ extend TextView
 			(.OnTextChanged)(self, reason, true)?
 
 
-	helper TryCaptureUndo (|int| x, |string| nt, |ivec2| ns)
+	libinternal TryCaptureUndo (|int| x, |string| nt, |ivec2| ns)
 		opt NoRefCounts
 		|| u = .undoer
 			if self is editable

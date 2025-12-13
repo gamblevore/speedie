@@ -91,7 +91,7 @@ module GUI
 	cpp_wrapper JB_SDL_FullScreenToggle	(|&nil| w)
 	cpp_Wrapper SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
 
-	helper SDL_FullScreen (|&nil| w, |int| Mode=1)
+	libinternal SDL_FullScreen (|&nil| w, |int| Mode=1)
 		|| full = .isfullscreen
 		if (mode == 0) or (!full and mode>0) or (full and mode<0)
 			.JB_SDL_FullScreenToggle(w) // toggle is just for MacOSX
@@ -101,7 +101,7 @@ module GUI
 		cpp_Wrapper JB_App__DocumentOpened
 		
 
-	helper InitDelegates
+	libinternal InitDelegates
 		cpp_Wrapper JB_App__InitStuff
 
 
@@ -109,7 +109,7 @@ module GUI
 		cpp_Part GetScreen
 		return (.Screenraw.vec4 / .scale).iVec4
 
-	helper NativeWindow (|&nil|)
+	libinternal NativeWindow (|&nil|)
 		|SDL_SysWMinfo| data
 		|| s = .ScreenWindow
 			s.SDL_GetWindowWMInfo(data)
@@ -121,17 +121,17 @@ module GUI
 		SDL_ShowSimpleMessageBox(0, title.cstr, msg.cstr, nil)
 
 	
-	helper SelChanged
+	libinternal SelChanged
 		.FlashSelector = true
 		.ChangeSelFlash = 1
 
 
-	helper ScreenRaw (|ivec4|)
+	libinternal ScreenRaw (|ivec4|)
 		|| P = .ScreenPosRaw
 		return (p, p + .SizeRaw)
 
 
-	helper SizeRaw (|ivec2|)
+	libinternal SizeRaw (|ivec2|)
 		|ivec2[1]| place
 		|| s = .ScreenWindow
 			|| p0 = (&place[0])|&int|
@@ -139,7 +139,7 @@ module GUI
 			return place[0]
 
 
-	helper SizeRaw (assigns:|ivec2|)
+	libinternal SizeRaw (assigns:|ivec2|)
 		|| p = .ScreenPosRaw
 		|| r = (p, p + value)
 		.Screenraw(r)
@@ -155,18 +155,18 @@ module GUI
 			SDL_SetWindowTitle(s, value.cstr)
 
 
-	helper ScreenPosRaw (|ivec2|)
+	libinternal ScreenPosRaw (|ivec2|)
 		|int[2]| place
 		|| s = .ScreenWindow
 			.SDL_GetWindowPosition(s,  place[0],  place[1])
 			return (place[0], place[1])
 
 
-	helper CenterCursor
+	libinternal CenterCursor
 		|| sz = .Sizeraw/2
 		.SDL_WarpMouseInWindow(.screenwindow!, sz.x, sz.y)
 		
-	helper NukeCursor
+	libinternal NukeCursor
 		|| w = .ScreenWindow$
 		SDL_Cursor.Empty.Use
 		.ShowCursor(false)
@@ -180,7 +180,7 @@ module GUI
 		return sdl_cursor.Show()
 
 
-	helper Screenraw (assigns:|ivec4| result, |bool|)
+	libinternal Screenraw (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
 			|| n = .NativeWindow
@@ -238,7 +238,7 @@ module GUI
 			app.quit(rz)
 
 	
-	helper PostLoads
+	libinternal PostLoads
 		opt norefcounts
 		|| s = .TryResizeLater
 			.TryResizeLater = nil // clear... in case of inf loop
@@ -280,7 +280,7 @@ module GUI
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
 
-	helper InitSDL (|&nil|)
+	libinternal InitSDL (|&nil|)
 		expect (font.small) "SmallFont not loaded."
 		// joystick works around a sdl2-bug
 		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC ||| SDL_INIT_JOYSTICK)
@@ -328,7 +328,7 @@ module GUI
 			return (mode.w, mode.h)
 
 
-	helper IsHighDPI (|bool|)
+	libinternal IsHighDPI (|bool|)
 		|int[2]| SmallPx
 		|int[2]| BigPx
 		SDL_GetWindowSize(.ScreenWindow!,  &BigPx[0],  &BigPx[1] )
@@ -347,7 +347,7 @@ module GUI
 		return .CurrDisplaySize.y <= .Screenraw.size.y
 		
 		
-	helper BumpSize
+	libinternal BumpSize
 		description "Fixes a MacOSX bug. Not my fault!" 
 		.FixScreenBug = 0
 		|| n = GUI.NativeWindow
@@ -368,7 +368,7 @@ module GUI
 			.scale = Scale
 			window.all.lastrect = bigPx.rect
 		
-	helper GUICheck
+	libinternal GUICheck
 		if app.yes("version")
 			printline app.Conf("version")
 			app.quit
@@ -376,7 +376,7 @@ module GUI
 			printline __now__|date|.LocalTime
 			app.quit
 	
-	helper NiceAppName (|string|)
+	libinternal NiceAppName (|string|)
 		opt norefcounts
 		with app.Conf("selfname")
 			return it
@@ -421,13 +421,13 @@ module GUI
 		return true
 		
 	
-	helper SetHint (|cstring| name, |cstring| value)
+	libinternal SetHint (|cstring| name, |cstring| value)
 		cpp_wrapper SDL_SetHint
 	
 	inline IsBackground (|bool|)
 		return !.ForeGroundTime
 	
-	helper TrySelectorFlash
+	libinternal TrySelectorFlash
 		if !.IsBackground and (GUI.ChangeSelFlash.fired)
 			.FlashSelector = !.FlashSelector
 			.Touch
@@ -436,7 +436,7 @@ module GUI
 			GUI.ChangeSelFlash = .FrameStart + 1s
 
 
-	helper ClearAlerts
+	libinternal ClearAlerts
 		|| it = .PendingAlerts
 			.PendingAlerts = []
 			for s in it
@@ -455,14 +455,14 @@ module GUI
 				return w
 	
 	
-	helper DoFakeMouseMove
+	libinternal DoFakeMouseMove
 		opt norefcounts
 		.NeedMouseMove = false // noice
 		|| w = .EventWindow
 			.MouseMoveEvent(nil, w, .MouseXY)
 	
 	
-	helper ActualEvents (|SDLActivity|) // frameevents
+	libinternal ActualEvents (|SDLActivity|) // frameevents
 		while (.QuitReason isnt ExitOrTerminate) and .Event.Poll
 			.EventCount++
 			rz |= .CheckEvent(.event)
@@ -478,12 +478,12 @@ module GUI
 			.TouchCount ?= 1
 	
 	
-	helper DroppingInto (|guicontrol|)
+	libinternal DroppingInto (|guicontrol|)
 		opt norefcounts
 		return window.front.droppinginto?
 
 
-	helper UpdateTextFocus (|window| w)
+	libinternal UpdateTextFocus (|window| w)
 		opt norefcounts
 		|| f = w.realfocus
 		|| AllowTyping = f and ((f is editable) or (f isa menu) or (f isa textview))
@@ -501,7 +501,7 @@ module GUI
 			.sdl_stoptextinput
 		
 			
-	helper PreframeText (|window| W)
+	libinternal PreframeText (|window| W)
 		.TextInputEnabledAtStart = .TextInputEnabled		
 		if ListView.delayedItTill_.fired
 			ListView.delayedItTill_ = 0
@@ -522,14 +522,14 @@ module GUI
 				rz = (d)(nil, nil, f, flags)
 	
 	
-	helper HandleOpenFile
+	libinternal HandleOpenFile
 		|| d = .DocumentOpened$
 		.OpenDocument(d, false)
 		if .OpenedFirst.guiago < 3s
 			.FixScreenBug = .FrameStart + 1s
 
 
-	helper OrderWindows (|window|)
+	libinternal OrderWindows (|window|)
 		opt norefcounts
 		|| i = 0
 		for w in window.all
@@ -545,7 +545,7 @@ module GUI
 				window.all.first = w
 
 		
-	helper PreFrame (|sdlactivity|)
+	libinternal PreFrame (|sdlactivity|)
 		opt norefcounts
 		if .FixScreenBug.Fired
 			.BumpSize
@@ -572,7 +572,7 @@ module GUI
 				rz = SDLActivity.activity
 	
 	
-	helper DoDrawDrag (|window| w)
+	libinternal DoDrawDrag (|window| w)
 		|| s = .drawdrag
 		|| d = w.DroppingInto
 		require s and d and d != w.currmousedown
@@ -591,13 +591,13 @@ module GUI
 		img.drawtext(t, P-P2, true)
 
 
-	helper DialogSorter (SorterComparerWindow)
+	libinternal DialogSorter (SorterComparerWindow)
 		opt norefcounts
 		if a and b
 			return a.isdialog - b.isdialog
 
 
-	helper DrawWinFrom (|window|)
+	libinternal DrawWinFrom (|window|)
 		opt norefcounts
 		for w.reverse in window.all
 			if w.isviewable and w.isfullscreen
@@ -605,7 +605,7 @@ module GUI
 		return window.all.first
 
 
-	helper StartResize (|bool| Force=false)
+	libinternal StartResize (|bool| Force=false)
 		opt norefcounts
 		require .acontrolwasresized
 		.acontrolwasresized = false
@@ -620,7 +620,7 @@ module GUI
 		gui.CalculateWindowSize(self, true, true)
 	
 	
-	helper CalculateWindowSize (|window| W, |bool| Force, |bool| NotAlert)
+	libinternal CalculateWindowSize (|window| W, |bool| Force, |bool| NotAlert)
 		cpp_Part CalcWinSize
 		opt norefcounts
 		require w._NeedsResize or force
@@ -644,7 +644,7 @@ module GUI
 		/////
 
 	
-	helper CheckTaskAnimations
+	libinternal CheckTaskAnimations
 		opt norefcounts
 		
 		for w.fast in window.all
@@ -653,7 +653,7 @@ module GUI
 					.animate(t)
 	
 	
-	helper Animate (|guicontrol.taskgui| t)
+	libinternal Animate (|guicontrol.taskgui| t)
 		opt norefcounts
 		|| p = t.taskprogress
 		if p != t.prevprogress
@@ -661,7 +661,7 @@ module GUI
 			t.upon.touch(-1)
 		
 		
-	helper StartDraw
+	libinternal StartDraw
 		opt norefcounts
 		|| CanBlur = !app.prefs["noblur"]
 		
@@ -688,7 +688,7 @@ module GUI
 				beep // debug drawing!
 
 
-	helper BGBlurAmount (|float|)
+	libinternal BGBlurAmount (|float|)
 		.BlurBackgroundStart ?= gui.FrameStart
 		|| Scale = 7.0
 		|| ago = .BlurBackgroundStart.guiago.Float
@@ -698,7 +698,7 @@ module GUI
 		GUI.Touch
 
 
-	helper window.AnyFrameStepsNeeded (|ind|)
+	libinternal window.AnyFrameStepsNeeded (|ind|)
 		|| Time = gui.FrameStart
 		|| Within = Time & 0xFFFF
 		|| Remain = ._FrameNext|int| - Within
@@ -710,7 +710,7 @@ module GUI
 			return Within+1s
 
 
-	helper window.FrameStepsAmount (|int|)
+	libinternal window.FrameStepsAmount (|int|)
 		|| Within = .AnyFrameStepsNeeded()		#require
 
 		|| fps = .SimulationFPS|int|
@@ -740,14 +740,14 @@ module GUI
 		._LastTimeSeen = ST
 		
 
-	helper window.DoFrameStep (|bool| ChangeOK)
+	libinternal window.DoFrameStep (|bool| ChangeOK)
 		.RunWindowTasks(false)
 		.FixFocus
 		.FrameCount++
 		.__FrameStep__(ChangeOK and !.OpenedMenu)
 	
 	
-	helper DoSimulation
+	libinternal DoSimulation
 		opt norefcounts
 		|| wf = Window.front$
 		|| FrontIsDialog = .DialogIsOpen
@@ -784,14 +784,14 @@ module GUI
 		return .FrameStart.loop(length)
 
 	
-	helper SingleFrame (|bool|)
+	libinternal SingleFrame (|bool|)
 		if .SingleFrameNest <= 2
 			.SingleFrameNest++
 			rz = .SingleFrameSub
 			.SingleFrameNest--
 
 
-	helper SingleFrameSub (|bool|)
+	libinternal SingleFrameSub (|bool|)
 		opt norefcounts
 		if .ForeGroundTime.GuiAgo < 0.1s
 			keys.Reset
@@ -816,7 +816,7 @@ module GUI
 		return true
 
 
-	helper EndDraw (|duration|)
+	libinternal EndDraw (|duration|)
 		// we could just draw immediately? but then delay the next drawstart?
 		// perhaps 1-frame faster reaction on screen?
 		|| d = date.now
@@ -828,7 +828,7 @@ module GUI
 		.EndFrame(.Raw!)
 
 
-	helper DelayEvents (|bool|)
+	libinternal DelayEvents (|bool|)
 		|| CanSleep = !SDL_Event.HasAny
 		|int64| L = 256										// 256th of a second
 		if .IsBackground and !.DroppingInto
@@ -847,7 +847,7 @@ module GUI
 			app.Sleep(Remain)
 	
 	
-	helper HandleEvents (|SDLActivity|)
+	libinternal HandleEvents (|SDLActivity|)
 		.StartResize
 		rz = .PreFrame
 
@@ -858,12 +858,12 @@ module GUI
 		rz |= .ActualEvents
 
 
-	helper CheckQuarantine
+	libinternal CheckQuarantine
 		if platform.osx and app.isQuarantined
 			GUI.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
 
 
-	helper ReScale (|float| NewScale, |bool|)
+	libinternal ReScale (|float| NewScale, |bool|)
 		if (NewScale >= 1.0 and NewScale <= 8.0)
 			.scale = NewScale
 			.NewSize = .Sizeraw
@@ -872,7 +872,7 @@ module GUI
 		return true
 	
 	
-	helper HandleAppResize  // handleresized
+	libinternal HandleAppResize  // handleresized
 		if !.NewSize
 			if .ResizedCounter
 				.ResizedCounter--
@@ -891,7 +891,7 @@ module GUI
 		.StartResize(true)
 
 
-	helper StartFrame (|&SDL_Texture| T)
+	libinternal StartFrame (|&SDL_Texture| T)
 		opt norefcounts
 		|| stride = 0
 		|&nil| SDLBuff
@@ -903,7 +903,7 @@ module GUI
 			.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
 		
 	
-	helper EndFrame (|&SDL_Texture| T)
+	libinternal EndFrame (|&SDL_Texture| T)
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow!,  &dstrect.w,  &dstrect.h )
 		t.UnlockThatCopiesEvenThoughItShouldnt
@@ -931,7 +931,7 @@ module GUI
 		return SDLActivity.Terminating
 
 
-	helper FileDroppedIntoApp (|window| w, |SDL_DropEvent| Drop, |SDLEventType| t, |int|)
+	libinternal FileDroppedIntoApp (|window| w, |SDL_DropEvent| Drop, |SDLEventType| t, |int|)
 		|| path = drop.file.copy
 		memory.free((drop.file)|&byte|)
 		Drop.file = nil
@@ -942,7 +942,7 @@ module GUI
 		return SDLActivity.activity
 
 
-	helper AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
+	libinternal AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
 		opt norefcounts
 		if !.TextInputEnabledAtStart or ev.command
 			return true
@@ -960,19 +960,19 @@ module GUI
 		return .TextInputEnabledAtStart and !keys.cmd
 	
 	
-	helper Window.MenuAt (|ivec2| xy, |bool| Test, |guicontrol|)
+	libinternal Window.MenuAt (|ivec2| xy, |bool| Test, |guicontrol|)
 		opt norefcounts
 		|| F = .openedmenu$
 		if (!test) or (f.lastrect.horz contains xy.x)
 			return f
 	
 	
-	helper Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
+	libinternal Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
 		opt norefcounts
 		return .MenuAt(xy, test) ?? self[xy]
 
 
-	helper StandardKeys (|keys| key, |bool|)
+	libinternal StandardKeys (|keys| key, |bool|)
 		opt norefcounts
 		|| w = window.front						#require
 		|| cmd = keys.cmd
@@ -1019,7 +1019,7 @@ module GUI
 			return gw.PasteFromClipboard(clipboard.text)
 
 
-	helper StrongClose (|sdlactivity| Reason, |SDLActivity|)
+	libinternal StrongClose (|sdlactivity| Reason, |SDLActivity|)
 		opt norefcounts
 		if Reason is Terminating
 			return SDLActivity.Terminating // terminate will call windowclose anyhow
@@ -1036,7 +1036,7 @@ module GUI
 		return reason
 	
 	
-	helper BackgroundChanged (|bool| back, |int|)
+	libinternal BackgroundChanged (|bool| back, |int|)
 		keys.Reset
 		|| same = .IsBackground == back
 		
@@ -1056,7 +1056,7 @@ module GUI
 		return SDLActivity.activity
 
 
-	helper EventWindow (|window--|)
+	libinternal EventWindow (|window--|)
 		opt norefcounts
 //		|| window = 0
 //		(window) // just test that __modules__ works
@@ -1064,7 +1064,7 @@ module GUI
 		return .FrontDialog ?? __modules__.window.front
 	
 	
-	helper CheckEvent (|&SDL_Event| ev, |int|)
+	libinternal CheckEvent (|&SDL_Event| ev, |int|)
 		visible, opt norefcounts
 		|| t = ev.type
 		
@@ -1132,7 +1132,7 @@ module GUI
 			return .MouseUpEvent(w, xy, b.button)
 
 	
-	helper GestureEvent (|&SDL_Event| ev, |window| w, |int|)
+	libinternal GestureEvent (|&SDL_Event| ev, |window| w, |int|)
 		|| f = ev.Gesture
 		|| rot = f.dTheta
 		|| pinch = f.dDist
@@ -1141,7 +1141,7 @@ module GUI
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
 			
 		
-	helper QuitBecauseWindowClosed (|window| w, |sdlactivity|)
+	libinternal QuitBecauseWindowClosed (|window| w, |sdlactivity|)
 		opt norefcounts
 		if !w.ismainwindow
 			return nil
@@ -1158,7 +1158,7 @@ module GUI
 			
 		
 		
-	helper WindowEvent (|&SDL_Event| ev, |int|)
+	libinternal WindowEvent (|&SDL_Event| ev, |int|)
 		opt norefcounts
 		|| wev = ev.window
 		|| wt = wev.event
@@ -1187,7 +1187,7 @@ module GUI
 			return .BackgroundChanged(true)
 
 
-	helper MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
+	libinternal MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
 		SDL_CaptureMouse(false)
 		|| dd   = .drawdrag 
 		|| di	= w.DroppingInto
@@ -1205,7 +1205,7 @@ module GUI
 		return SDLActivity.activity
 
 
-	helper MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
+	libinternal MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
 		// shouldn't occur in background... unless we have a DragEvent?
 		|| OldXY = .CurrMouseXY
 		|ivec2| move
@@ -1255,7 +1255,7 @@ module GUI
 					rz = SDLActivity.activity
 
 
-	helper TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
+	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!textinput!
 		if .AllowTyping and .CanDrag <= mousedragging.Handled
 			|| e = ev.Editing.str
@@ -1263,18 +1263,18 @@ module GUI
 				return SDLActivity.activity
 
 
-	helper KeyUpEvent (|&SDL_Event| ev, |int|)
+	libinternal KeyUpEvent (|&SDL_Event| ev, |int|)
 		|| key = ev.key.key
 		keys.Removekey(key)
 		return sdlactivity.activity
 
 
-	helper MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
+	libinternal MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
 		w.__gesture__(ev.wheel.xy*(1,-1), 0, 0)
 		return sdlactivity.Activity
 	
 	
-	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
+	libinternal KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
@@ -1314,14 +1314,14 @@ module GUI
 			return  AppMenu.show
 		
 
-	helper Window.GetUserAttention
+	libinternal Window.GetUserAttention
 		if !.Focus
 			._FlashSelf |= 1
 		._alphafader = gui.FrameStart
 		beep
 	
 	
-	helper MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,   |int|)
+	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,   |int|)
 		|| xy = b.xy
 		beep.OK = 1
 		if notifications.Clickedat(xy)
@@ -1347,7 +1347,7 @@ module GUI
 			return SDLActivity.activity
 		
 	
-	helper Window.MouseDownEvent (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
+	libinternal Window.MouseDownEvent (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
 		target osx
 			|| Ctrl = keys.ctrl // only osx needs this
 		  else
@@ -1363,7 +1363,7 @@ module GUI
 		return clicked
 
 
-	helper GuiControl.ContainedName (|string|)
+	libinternal GuiControl.ContainedName (|string|)
 		|| fs = FastString()
 		fs <~ "Name: "
 		while
@@ -1374,7 +1374,7 @@ module GUI
 		return fs
 	
 	
-	helper SetToolTips (|guicontrol?| r)
+	libinternal SetToolTips (|guicontrol?| r)
 		opt norefcounts
 		|| w = r.window
 		require w and r and w.ToolTipControl != r

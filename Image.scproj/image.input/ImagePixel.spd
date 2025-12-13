@@ -17,7 +17,7 @@ struct ImagePixelStruct
 		.b = iv.b
 		.a = iv.a
 
-	helper AppendVec3 (|vec3| V)
+	libinternal AppendVec3 (|vec3| V)
 		v = (v * 255.0) + 0.5
 		|| iv = v|vec4|.iVec4.clamp(0,255)
 		.r = iv.r
@@ -27,7 +27,7 @@ struct ImagePixelStruct
 	inline Px (|ImagePixel|)
 		return self|&ImagePixel|[]
 				
-//	helper ivec4._CB (|ivec4|)
+//	libinternal ivec4._CB (|ivec4|)
 //		// test if this is faster.
 //		description "A secret ClampByte"
 //		|| L = ivec4((.x<0)|int|,   (.y<0)|int|,   (.z<0)|int|,   (.w<0)|int|)
@@ -212,7 +212,7 @@ datatype ImagePixel (uint)
 
 		init()
 		
-		helper Init
+		libinternal Init
 			.white <~ vec4(1.0)
 		
 		function Char (|codepoint| c, |&imagepixel|)

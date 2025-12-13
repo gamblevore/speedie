@@ -50,7 +50,7 @@ dataType Keys (int)
 		cpp_part Key
 	
 
-	helper Record (|&guikeyrecord|)
+	libinternal Record (|&guikeyrecord|)
 		if self != 0
 			for i in keys.MaxKeyRecord
 				|| g = keys.record[i]
@@ -161,7 +161,7 @@ dataType Keys (int)
 		|GUIKeyRecord[6]|		Record
 
 
-		helper Clear
+		libinternal Clear
 			// .KeyLogSub("Clear")
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
@@ -174,7 +174,7 @@ dataType Keys (int)
 //				if k!=0
 //					"$k ${r.Date.ago.float} ago"
 
-		helper KeysVs (|keys| pa, |keys| pb,  |keys| ma, |keys| mb, |float| Limit,  |float|)
+		libinternal KeysVs (|keys| pa, |keys| pb,  |keys| ma, |keys| mb, |float| Limit,  |float|)
 			|| P = pa._ago(pb)
 			|| M = ma._ago(mb)
 			if P and M
@@ -194,7 +194,7 @@ dataType Keys (int)
 				return str
 			
 		
-		helper keys._ago (|keys| O, |duration|)
+		libinternal keys._ago (|keys| O, |duration|)
 			|| a = .record
 			|| b = o.record
 			if a and b and b.date < a.date
@@ -204,7 +204,7 @@ dataType Keys (int)
 				rz.trip = a is newlyadded
 		
 		
-		helper Date.Trip (assigns:|bool| B, |date|)
+		libinternal Date.Trip (assigns:|bool| B, |date|)
 			return (self &~ 1) ||| B
 		
 		
@@ -225,14 +225,14 @@ dataType Keys (int)
 			cpp_Wrapper SDL_GetKeyboardState
 		
 		
-		helper Count (|int|)
+		libinternal Count (|int|)
 			disabled "Keys can be disparate"
 		
 		function Reset
 			.Clear
 			gui.sdl_Resetkeyboard
 
-		helper EmptySlot (|keys| Key, |&guikeyrecord|)
+		libinternal EmptySlot (|keys| Key, |&guikeyrecord|)
 			if key!=0
 				for i in MaxKeyRecord
 					|| r = .Record[i]
@@ -242,7 +242,7 @@ dataType Keys (int)
 						return r	// let it be-readded.
 
 
-		helper AddKey (|keys| Key)
+		libinternal AddKey (|keys| Key)
 			|| r = .EmptySlot(key)
 			if  !r  or  r.key == key  and  r.state >=  GUIKeyRecordInfo.ToAdd
 				return
@@ -252,13 +252,13 @@ dataType Keys (int)
 			r.state = GUIKeyRecordInfo.ToAdd + (key is escape)		// escape starts as "newly added"
 					
 			
-		helper RemoveKey (|keys| Key)
+		libinternal RemoveKey (|keys| Key)
 			|| r = key.record
 				r.State = guiKeyRecordInfo.ToRemove
 	
 		
 
-		helper FlushKeys
+		libinternal FlushKeys
 			|| m = .MaxKeyRecord
 			for i in m
 				|| r = .record[i]
@@ -269,7 +269,7 @@ dataType Keys (int)
 						r.state = s + 1
 
 
-		helper FindTwoModifiers (|keys| A, |keys| B, |&guikeyrecord|)
+		libinternal FindTwoModifiers (|keys| A, |keys| B, |&guikeyrecord|)
 			for i in MaxKeyRecord
 				|| r = .Record[i]
 				if r.State >= GUIKeyRecordInfo.ToAdd //

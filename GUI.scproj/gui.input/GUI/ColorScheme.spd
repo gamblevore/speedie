@@ -122,7 +122,7 @@ class ColorScheme
 
 
 
-helper message.ColorDeclNicely (|message?|)
+libinternal message.ColorDeclNicely (|message?|)
 	opt norefcounts
 	while self
 		|| p = .parent$
@@ -159,7 +159,7 @@ function FixupColor (|message| self, |ind| pos, |message|)
 	return self
 
 
-helper message.UseRootTmpColor (|bool|)
+libinternal message.UseRootTmpColor (|bool|)
 	require (self == @tmp)
 	require	!(.flags & TextView.NotRoot)
 	|| p = .parent

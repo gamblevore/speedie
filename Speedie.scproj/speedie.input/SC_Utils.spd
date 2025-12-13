@@ -41,7 +41,7 @@ function Message.ListAll (|[Message]|)
 //  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
 
 
-helper @memory.CollectLeaks_ (|object| self, |[]|)
+libinternal @memory.CollectLeaks_ (|object| self, |[]|)
 	JB_FindLeakedObject(self, rz)
 
 

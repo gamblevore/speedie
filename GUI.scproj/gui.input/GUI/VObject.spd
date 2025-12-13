@@ -148,7 +148,7 @@ function vec4.Screen (|ivec4|)
 
 
 extend Window
-	helper _ReadjustBlock2D
+	libinternal _ReadjustBlock2D
 		description "Readjusts current draw-matrix. This converts object coords to screen coords." 
 		|| Sc = .BlockScale$
 		|| LR = .lastrect

@@ -372,7 +372,7 @@ class PerryIDE (Window)
 		GUI.Title = .id
 
 
-	helper UpdateSearchSwap (|textview|)
+	libinternal UpdateSearchSwap (|textview|)
 		opt norefcounts
 		require .isfront
 		|| E = .inline.editor
@@ -578,7 +578,7 @@ class PerryIDE (Window)
 		return true
 
 	
-	helper CmdKey (|keys| key, |bool|)
+	libinternal CmdKey (|keys| key, |bool|)
 		if key is f
 			if .masssearchfield.hasfocus
 				.PrevView.Click?
