@@ -13,6 +13,7 @@ struct RegFile
 	|int|						KnownMap
 
 
+
 struct Assembler
 	contains asmreg
 	linkage: cpp_part Pac
@@ -47,7 +48,6 @@ struct Assembler
 	constants
 		kContinue		= 254
 		kExit			= 255
-	
 
 	module
 		|Assembler|					Sh
@@ -57,7 +57,7 @@ struct Assembler
 		|jbin?|						DebugInfo
 
 		function SafeDebugInfo (|bool|debug = false, |string|)
-/			require .debuginfo|string|.length
+			require .debuginfo|string|.length
 			|| info = .debuginfo.GetResult
 			if !info.ParseJbin 
 				error "Generated invalid debug info (jbin)"
@@ -72,7 +72,6 @@ struct Assembler
 	function fn (|scfunction!--|)
 		return .state.fn
 	
-
     function Curr (|&fatasm|)
         return .curr_
 
@@ -94,14 +93,11 @@ struct Assembler
 			if j
 				a.DumpDecl(j, 0) // AddDbg
 
-	
 	function Index (|int|)
 		return .curr_ - .start
 	
-	
 	function Last (|&FatASM|)
 		return .curr_ - 1
-
 
 	function Last (|asm| type, |&FatASM|)
 		|| L = .curr_ - 1
@@ -137,7 +133,6 @@ struct Assembler
 			if !v
 				return 0
 			return v.Log2+1
-
 
 
 	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|) // addnum
@@ -203,29 +198,24 @@ struct Assembler
 		Type.WholeType = rz
 		target debug: Type.ASMSanity
 
-
 	function vdecls (|uint|)
 		return .vdecls_
 
 	function vtemps (|uint|)
 		return .vtemps_
 
-
 	setter vdecls (|uint|)
 		if value & .vtemps_ // huh?
 		.vdecls_ = value
-
 
 	setter vtemps (|uint|)
 		if value & .vdecls_ // huh?
 		.vtemps_ = value
 
-	
 	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
 		if type
 			t.µtype = type.mu.DataType
 		return .TempOnly(t)
-	
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
@@ -234,7 +224,6 @@ struct Assembler
 			// and if its NEVER different... why add it?
 			t.µtype = where.asmdecl.mu.DataType
 		return .TempOnly(t)
-
 
 	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
@@ -749,18 +738,16 @@ function assembler.RootGen (|scfunction| fn)
 	asmtype.ArgumentSub(self, fn.SourceArg!, nil)
 
 
-function Assembler.Rework (|SCFunction| fn,  |bool|)
+function Assembler.Rework (|SCFunction| fn, |bool|)
 	|| j = debuginfo
 		j.length = .debugmark
 
 	HoistSpace.NeedSpare(.FnLength)
 	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 
-//	.Orig = .FuncStart
 	.InitAndStartFunc(fn)
 	.RootGen(fn)
 	.FinishASM
-//	.Orig = nil
 
 
 target debug
