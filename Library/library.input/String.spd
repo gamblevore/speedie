@@ -48,10 +48,10 @@ class String
 		cpp_wrapper JB_Str_OutByte
 	
 	inline InWhite (|int|Start=0, |int|After=int.max, |ind|)
-		return .find(charprop.white, start, after)
+		return .find(CharSet.white, start, after)
 
 	inline OutWhite (|int|Start=0, |int|After=int.max, |ind|)
-		return .outcharset(charprop.white, start, after)
+		return .outcharset(CharSet.white, start, after)
 	
 
 
@@ -217,7 +217,7 @@ class String
 		return fs
 		
 		
-	function Trim (|CharSet| CS = ~CharProp.Trim, |string|)
+	function Trim (|CharSet| CS = ~CharSet.Trim, |string|)
 		nil self
 		if self
 /			|| First = .find(CS)
@@ -661,7 +661,7 @@ class String
 	iterator Lines
 		|| Prev = 0
 		while (self) {
-			|| Curr_ = .find( charprop.Line, Prev )
+			|| Curr_ = .find( CharSet.Line, Prev )
 			yield  self[prev,curr_] (curr_)
 			Prev = Curr_ + 1
 		} (Curr_)

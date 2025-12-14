@@ -205,11 +205,11 @@ libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			MaxWidth -= (Orig-MaxWidth).TabsWidth
 		  elseif isinline
 			i++
-		  elseif charprop.EditorSplitter[c]
+		  elseif CharSet.EditorSplitter[c]
 			i++
 			MaxWidth--
 		  else									 // so where does the word end?
-			|| WordEnd = .Find(charprop.EditorSplitter, i, ParaMax)
+			|| WordEnd = .Find(CharSet.EditorSplitter, i, ParaMax)
 				WordEnd += (self[WordEnd] > 32)
 			  else
 				WordEnd = .length min paramax

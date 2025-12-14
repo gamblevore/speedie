@@ -2,7 +2,7 @@
 
 	
 function parser.ThingXMLAtt (|int|start, |message| Parent, |message|)
-	|| name = parser.WordAfterSub( start, charprop.XMLNameMid )
+	|| name = parser.WordAfterSub( start, CharSet.XMLNameMid )
 	return parser.new( parent, @xatt, start, name )
 
 
@@ -14,7 +14,7 @@ function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
 		|| c = s[i]
 		if (c == '>') or (c=='/' and s[i+1]=='>')
 			return i
-		loop charprop.LettersUnderScore[c]
+		loop CharSet.LettersUnderScore[c]
 		|| Attr = ThingXMLAtt(i, allatts)
 		require .ExpectEndChar(parser.nextstart, "=")
 		i = .cleanspaces
@@ -95,10 +95,10 @@ function Parser.FillXML (|message| XML, |ind| i, |message|)
 
 function Parser.XMLWordEnd (|int| From, |ind|)
 	|| b = .data[from] 
-	if !charprop.LettersUnderScore[b]
+	if !CharSet.LettersUnderScore[b]
 		.erroradd( "Wrong first byte of XML", from)
 	  else
-		rz = .data.OutCharSet(charprop.XMLNameMid, from+1)
+		rz = .data.OutCharSet(CharSet.XMLNameMid, from+1)
 		if rz == -1
 			.Erroradd( "XML name does not end" )
 		.NextStart = rz
@@ -254,7 +254,7 @@ libinternal message.XMLToJeeboxSub
 			f.func = @str
 			|| s = .name
 			|| fn = @emb
-			ifn s[].IsLetter and (charprop.NameMid contains s)
+			ifn s[].IsLetter and (CharSet.NameMid contains s)
 				fn = @str
 			.first = fn + s
 			.name = ""

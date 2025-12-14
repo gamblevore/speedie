@@ -177,8 +177,8 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 	|| after	= self[x]
 	|| IsDot	= (before == '.') 
 	if !keys.option
-		|| OK = IsDot  or  (charprop.NameMid[before]) // or (before.iswhite and after.istextline)
-			OK = !charprop.LettersUnderScore[after]
+		|| OK = IsDot  or  (charset.NameMid[before]) // or (before.iswhite and after.istextline)
+			OK = !charset.LettersUnderScore[after]
 		if !OK and reason ~= PerryAutoCompleteReason.escape or PerryAutoCompleteReason.sel
 			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
 	
@@ -218,7 +218,7 @@ function string.CharMode (|int| x, |int|)
 		return ','
 	if (c == '|' or ')')
 		return '|'
-	if charprop.NameMid[c]
+	if charset.NameMid[c]
 		return '_'
 	return c
 
@@ -459,7 +459,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 				return PerryInsert5(self, A)|int|
 
 	|| prevchar = self[i2-1]
-	require (prevchar == '.') or charprop.NameMid[prevchar]
+	require (prevchar == '.') or charSet.NameMid[prevchar]
 	
 	if ide.EditMeTabRetryThing
 		return 0

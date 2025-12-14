@@ -116,8 +116,8 @@ class Error (Message)
 		require d and .HasPosition
 
 		fs <~ "\n"
-		|| Start  = d.find( charprop.Line, .Position, 0  ) + 1
-		|| Finish = d.find( charprop.Line, .Position...  )
+		|| Start  = d.find( CharSet.Line, .Position, 0  ) + 1
+		|| Finish = d.find( CharSet.Line, .Position...  )
 		if (Finish == -1)
 			Finish = D.Length + 1
 		
@@ -145,7 +145,7 @@ class Error (Message)
 		fs <~ .LinePos( d )
 		fs <~ ':'
 
-		|| Start = d.find( charprop.Line, .Position, 0 )
+		|| Start = d.find( CharSet.Line, .Position, 0 )
 		fs <~ .Position - Start
 		fs <~ ':'
 		return true

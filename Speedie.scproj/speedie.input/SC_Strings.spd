@@ -274,7 +274,7 @@ function Message.Clean (|bool| erl = false)
 				curr.BecomeAppend("SyntaxSendTo")
 			  elseif (f == @opp) and curr.OppExpand
 				0 // 
-			  elseif charprop.LettersUnderScore[curr.name[]]
+			  elseif CharSet.LettersUnderScore[curr.name[]]
 				curr.name = curr.name.Lowercase
 
 		  elseif (f == @adj)

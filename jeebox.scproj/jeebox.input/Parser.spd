@@ -192,7 +192,7 @@ extend Parser
 		Opt NoRefCounts
 		//	                   x.fn(a)
 		|int| after = parser[++start]
-		if charprop.LettersUnderScore[after]
+		if CharSet.LettersUnderScore[after]
 			after = .WordAfter(start)						#require
 		  elseif parser._DotInsertallow
 			after = start
@@ -265,7 +265,7 @@ extend Parser
 		opt norefcounts
 		|| NameStart = start + 2
 		|int| NameAfter = parser[NameStart]
-		if !charprop.LettersUnderScore[NameAfter]
+		if !CharSet.LettersUnderScore[NameAfter]
 			return .ErrorAdd("Missing name here", start)
 		NameAfter = .WordAfter(NameStart)						#require
 		|| Result = parser.newskip( parent, @msg, Start, namestart, NameAfter )
@@ -415,7 +415,7 @@ extend Parser
 
 
 	function GotoEndOfLine (|int| from, |int|)
-		parser.NextStart = parser.data.find( charprop.Line, from )
+		parser.NextStart = parser.data.find( CharSet.Line, from )
 		return parser.NextStart
 	
 	
@@ -490,7 +490,7 @@ extend Parser
 		// "2.12"			OK
 		// 3.BitCount		"3", not "3."
 
-		|| Dot = NumStr.OutCharSet( charprop.NameMid, Start )
+		|| Dot = NumStr.OutCharSet( CharSet.NameMid, Start )
 		ifn dot
 			return NumStr.length
 		ifn NumStr[Dot] == '.'
@@ -500,7 +500,7 @@ extend Parser
 		ifn AfterDot.IsInt
 			return Dot
 
-		rz = NumStr.OutCharSet( charprop.NameMid, Dot + 1 )
+		rz = NumStr.OutCharSet( CharSet.NameMid, Dot + 1 )
 		rz ?= NumStr.length
 	
 
@@ -537,7 +537,7 @@ extend Parser
 		|| StartAt = .data.IsHexLike( Start )
 		|ind| UnitPos2
 		if StartAt == 0
-			UnitPos2 = .Data.OutCharSet( charprop.LettersOnly, After, Start + StartAt )
+			UnitPos2 = .Data.OutCharSet( CharSet.LettersOnly, After, Start + StartAt )
 			
 		ifn UnitPos2
 			UnitPos2 = After - 1
@@ -642,13 +642,13 @@ extend Parser
 		//							.fn(a)
 		if Start > 0
 			|| c = parser[Start - 1]
-			require !charprop.NameMid[c]
+			require !CharSet.NameMid[c]
 		Return .DotSub( @SDot, start, parent )
 
 
 	function fShebang (ParseHandler)
 		|ind| S = parser.Nextstart
-		|| S2 = parser.data.find( charprop.Line, S )
+		|| S2 = parser.data.find( CharSet.Line, S )
 		parser.NextStart = S2
 		return parser.NewSkip( parent, @Sheb, start, S, S2 )
 
@@ -705,7 +705,7 @@ extend Parser
 				if (c0 == '.')
 					type = @sdot
 					NewStrPos++
-				StrPos = parser.data.OutCharSet( charprop.NameMid, NewStrPos + 1, after )
+				StrPos = parser.data.OutCharSet( CharSet.NameMid, NewStrPos + 1, after )
 				// searching for "$a.b.c"?
 				// I could search for "." + cswordmiddle, and subparse through that...
 				// although my parser isn't really designed for subparsing
@@ -754,11 +754,11 @@ extend Parser
 
 
 	function CanStatement (|bool|)
-		return charprop.AfterStatement[parser.NextByte]
+		return CharSet.AfterStatement[parser.NextByte]
 
 
 	function CanDot (|bool|)
-		return charprop.AfterDot[parser.NextByte]
+		return CharSet.AfterDot[parser.NextByte]
 
 	
 	function fTmpSub (|message!| result, |int| OpFlags, |int| ThingFlags, |message|)
@@ -985,7 +985,7 @@ ive been~running #since morning
 	function LoweredIndent (|message| output, |message| curr, |message|)
 		Opt NoRefCounts
 	
-		|| BackPos = parser.data.find( charprop.Line, curr.position, 0 )
+		|| BackPos = parser.data.find( CharSet.Line, curr.position, 0 )
 		|| chin = curr.indent|int|
 		while output.indentScore > chin
 			if output == @arg
@@ -1253,7 +1253,7 @@ ive been~running #since morning
 	
 	function WordAfter (|int| Start, |int|)
 		Opt NoRefCounts
-		return .WordAfterSub(start, charprop.NameMid)
+		return .WordAfterSub(start, CharSet.NameMid)
 	
 		
 	libinternal WordAfterSub (|int| Start, |CharSet| cs, |int|)

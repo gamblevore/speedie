@@ -73,7 +73,7 @@ function FastString.CArrayAddB (|Byte| B)
 		self <~ '0'
 	  else
 		self <~ '\''
-		if charprop.SafeInC[B]
+		if CharSet.SafeInC[B]
 			self <~ B
 		  else
 			self <~ "\\x"

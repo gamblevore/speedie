@@ -161,7 +161,7 @@ function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
 	
 	|| fs = faststring(fs_in)
 	for s in self
-		if charprop.SafeInC[s]
+		if CharSet.SafeInC[s]
 			fs <~ s
 		  else
 			fs <~ 'x'

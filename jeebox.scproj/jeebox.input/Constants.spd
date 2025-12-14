@@ -104,7 +104,7 @@ Module Jeebox
 				if find == '$'
 					if off >= after: exit
 					|| nxt = self[off]
-					ifn (nxt == '{' or '.') or charprop.LettersUnderScore[nxt]
+					ifn (nxt == '{' or '.') or CharSet.LettersUnderScore[nxt]
 						continue
 				return off - 1
 	

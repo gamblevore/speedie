@@ -1,37 +1,12 @@
 
 
-datatype CharSet (uint)
-	linkage
-		numeric false
-			
-	operator contains (|charprop| b, |bool|)
-		inline
-		cpp_part ContainsProp
-		return (1<<b|uint|) & self|uint|
-		
-	operator contains (|string| s, |bool|)
-		cpp_Part ContainsStr
-		return s.OutCharSet(self) == -1
-		
-	syntax Access (|uint| b, |bool|)
-		if b <= 255
-			|| cp = CharProp.Props[b]|uint|
-			return (1<<cp) & self|uint|
-
-	
-function string.Find (|CharProp| Find, |int| From=0, |int| After=int.max, |ind|)
-	cpp_part FindProp
-	return .find(find.list, from, after)
-
-
-// needs to be able to go backwards... to replace charset
 function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
-	cpp_part FindPropList
+	cpp_part FindCharset
 	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
 							 // makes for confusing code. it WOULD have been good... if this were 1-based
 							 // because -1 is also the return value of a missing value.
 							 // nicer to make an explicit function that to handle end-relative searches
-	|| p = &CharProp.Props[0]
+	|| p = &CharSet.Props[0]
 	|| addr = .addr
 	if from < After
 		from = from max 0
@@ -53,9 +28,30 @@ inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |in
 	return .find(~find, from, after)
 
 
-datatype CharProp (uint16)
+
+datatype CharSet (uint)
 	linkage
 		numeric false
+			
+	operator contains (|charprop| b, |bool|)
+		inline
+		cpp_part ContainsProp
+		return (1<<b|uint|) & self|uint|
+		
+	operator contains (|string| s, |bool|)
+		cpp_Part ContainsStr
+		inline
+		return s.OutCharSet(self) == -1
+		
+	syntax Access (|uint| b, |bool|)
+		if b <= 255
+			|| cp = CharSet.Props[b]|uint|
+			return (1<<cp) & self|uint|
+	
+	operator Plus (|Charset| C, |charset|)
+		inline
+		return (self|uint| ||| c|uint|)|charset|
+
 	
 	constants
 		|CharProp| 
@@ -108,17 +104,9 @@ datatype CharProp (uint16)
 		EditorSplitter  = White + (1<<fColon) + (1<<fCommaSlash) + (1<<fEditorSeparators)
 		Trim			= White + (1<<fNull)
 	
-	
-	inline List (|CharSet|)
-		return (1<<self|uint|)|CharSet|
-	
-	syntax cast (|CharSet|)
-		inline
-		return (1<<self|uint|)|CharSet|
-		
 	module
 		|CharProp[256]| Props
-		charprop.MakeDefault
+		CharSet.MakeDefault
 	
 		function MakeDefault
 			|| item = &.Props[0]
@@ -156,6 +144,11 @@ datatype CharProp (uint16)
 			item[0xC0] = fInvalid
 //			item[0xFE] = Invalid // also
 //			item[0xFF] = Invalid
-			
+				
+
+datatype CharProp (uint16)
+	linkage
+		numeric false
+
 	
 
