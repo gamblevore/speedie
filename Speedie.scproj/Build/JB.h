@@ -341,8 +341,6 @@ struct Assembler;
 
 struct AutoItem_Behaviour;
 
-struct Charset_Behaviour;
-
 struct CppRefs_Behaviour;
 
 struct Cpp_Export_Behaviour;
@@ -849,9 +847,6 @@ JBClass ( AutoItem , JB_Object ,
 	bool Exact;
 	int Type;
 );
-
-struct Charset_Behaviour: Object_Behaviour {
-};
 
 struct CppRefs_Behaviour: Object_Behaviour {
 };
@@ -1449,13 +1444,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2381])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2377])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2382])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2383])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2380])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2383])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2384])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2378])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2379])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2376])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2379])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2380])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1483,14 +1478,6 @@ extern Array* SC__Intrinsics_Vectors;
 #define JB__API_NilHappened_ JB__.API_NilHappened_
 #define JB__Constants__FuncArray JB__.Constants__FuncArray
 #define JB__Constants__SyxDict JB__.Constants__SyxDict
-#define JB__Constants_CSAfterDot JB__.Constants_CSAfterDot
-#define JB__Constants_CSAfterStatement JB__.Constants_CSAfterStatement
-#define JB__Constants_CSLettersOnly JB__.Constants_CSLettersOnly
-#define JB__Constants_CSLine JB__.Constants_CSLine
-#define JB__Constants_CSNum JB__.Constants_CSNum
-#define JB__Constants_CSWordMiddle JB__.Constants_CSWordMiddle
-#define JB__Constants_CSWordStart JB__.Constants_CSWordStart
-#define JB__Constants_EditorWrapSplit JB__.Constants_EditorWrapSplit
 #define JB__Constants_EscapeChr JB__.Constants_EscapeChr
 #define JB__Constants_EscapeStr JB__.Constants_EscapeStr
 #define JB__Constants_JS_EscapeStr JB__.Constants_JS_EscapeStr
@@ -1634,11 +1621,10 @@ extern Message* SC__VM_Builder_TempDests;
 extern int SC__VM_Builder_Total;
 extern Message* SC__VM_Builder_Ugh;
 extern byte SC__VM_Builder_XType;
-extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2388])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2384])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1679,7 +1665,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2389])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2385])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
@@ -1818,10 +1804,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2387])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2386])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2383])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2382])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2385])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2381])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2065,27 +2051,34 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__ASMType_kWhile ((ASMType)51)
 extern ASM SC__ASMType_ReadASM[10];
 extern ASM SC__ASMType_WriteASM[5];
+#define kJB__CharProp_AfterDot ((CharPropList)344)
+#define kJB__CharProp_AfterStatement ((CharPropList)1368)
+#define kJB__CharProp_AfterTmp ((CharProp)10)
+#define kJB__CharProp_Colon ((CharProp)6)
+#define kJB__CharProp_CommaSlash ((CharProp)8)
+#define kJB__CharProp_DotDash ((CharProp)7)
+#define kJB__CharProp_EditorSeparators ((CharProp)11)
+#define kJB__CharProp_EditorSplitter ((CharPropList)2392)
 #define kJB__CharProp_HSpace ((CharProp)4)
 #define kJB__CharProp_Invalid ((CharProp)0)
-#define kJB__CharProp_LettersOnly ((CharPropList)3584)
-#define kJB__CharProp_LettersUnderScore ((CharPropList)3840)
+#define kJB__CharProp_LettersOnly ((CharPropList)57344)
+#define kJB__CharProp_LettersUnderScore ((CharPropList)57376)
 #define kJB__CharProp_Line ((CharProp)3)
-#define kJB__CharProp_Lower ((CharProp)10)
-#define kJB__CharProp_NameMid ((CharPropList)3968)
+#define kJB__CharProp_Lower ((CharProp)14)
+#define kJB__CharProp_NameMid ((CharPropList)61472)
 #define kJB__CharProp_Null ((CharProp)1)
-#define kJB__CharProp_Number ((CharProp)7)
-#define kJB__CharProp_NumMid ((CharPropList)1920)
+#define kJB__CharProp_Number ((CharProp)12)
 #define JB__CharProp_Props JB__.CharProp_Props
-#define kJB__CharProp_Punct ((CharPropList)96)
-#define kJB__CharProp_Punct1 ((CharProp)5)
-#define kJB__CharProp_Punct2 ((CharProp)6)
-#define kJB__CharProp_Underscore ((CharProp)8)
-#define kJB__CharProp_Unicode ((CharPropList)2048)
-#define kJB__CharProp_UnicodeByte ((CharProp)11)
+#define kJB__CharProp_RemainingPunct ((CharProp)9)
+#define kJB__CharProp_SafeInC ((CharPropList)28704)
+#define kJB__CharProp_Trim ((CharPropList)26)
+#define kJB__CharProp_Underscore ((CharProp)5)
+#define kJB__CharProp_Unicode ((CharPropList)32768)
+#define kJB__CharProp_UnicodeByte ((CharProp)15)
 #define kJB__CharProp_Unprintable ((CharProp)2)
-#define kJB__CharProp_Upper ((CharProp)9)
+#define kJB__CharProp_Upper ((CharProp)13)
 #define kJB__CharProp_White ((CharPropList)24)
-#define kJB__CharProp_XMLNameMid ((CharPropList)4032)
+#define kJB__CharProp_XMLNameMid ((CharPropList)61664)
 #define kSC__ClassInfo_Banned ((ClassInfo)64)
 #define kSC__ClassInfo_Builtin ((ClassInfo)2048)
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
@@ -2475,7 +2468,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2379])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2375])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2564,27 +2557,19 @@ struct JB_Globals {
 	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
-	CharProp Constants_CSLine;
 	u16 API_NilHappened_;
-	CharPropList Constants_CSWordMiddle;
-	CharPropList Constants_CSNum;
-	CharPropList Constants_CSLettersOnly;
-	CharPropList Constants_CSWordStart;
 	int Syx_CurrFuncID_;
 	Float64 Rec_Progress;
 	Dictionary* Constants_UnEscapeStr;
 	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_XML_UnEscapeStr;
-	Dictionary* Constants__SyxDict;
-	CharSet* Constants_CSAfterDot;
-	CharSet* Constants_CSAfterStatement;
-	CharSet* Constants_EditorWrapSplit;
+	Dictionary* Constants_EscapeChr;
 	JB_File* Platform_Logger_;
 	JB_ErrorReceiver* StdErr;
 	Message* Tk__EndOfLineMarker;
-	Dictionary* Constants_EscapeStr;
+	Dictionary* Constants__SyxDict;
 	JB_String* App_Usage;
-	Dictionary* Constants_EscapeChr;
+	Dictionary* Constants_XML_EscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
 	FlowControl* Flow_Flow;
 	Message* App__Conf;
@@ -2596,7 +2581,7 @@ struct JB_Globals {
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
 	Dictionary* TC_Types_Dict;
-	Dictionary* Constants_XML_EscapeStr;
+	Dictionary* Constants_EscapeStr;
 	Array* Macro_TmpPrms_;
 	Array* App__OldArgs;
 	JB_String* App__Path;
@@ -4861,6 +4846,8 @@ void JB_CharProp__MakeDefault();
 // CharPropList
 bool JB_CharPropList_ContainsStr(CharPropList Self, JB_String* S);
 
+bool JB_CharPropList_SyntaxAccess(CharPropList Self, uint B);
+
 
 
 // ClassInfo
@@ -6459,9 +6446,6 @@ JB_String* SC_Pac__SafeDebugInfo(bool Debug);
 // JB_AutoItem_Behaviour
 
 
-// JB_Charset_Behaviour
-
-
 // JB_CppRefs_Behaviour
 
 
@@ -6755,9 +6739,6 @@ bool SC_AutoItem_OKBy(AutoItem* Self, AutoItem* Prev);
 
 SortComparison SC_AutoItem__Sorter(AutoItem* Self, AutoItem* B);
 
-
-
-// JB_Charset
 
 
 // JB_CppRefs
@@ -7682,6 +7663,8 @@ void JB_Str_Fail(JB_String* Self);
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
 bool SC_Str_trap(JB_String* Self, Message* Msg);
+
+JB_String* JB_Str_Trim(JB_String* Self, CharPropList CS);
 
 JB_String* JB_Str_TrimExt(JB_String* Self);
 
@@ -10841,8 +10824,6 @@ inline int64 JB_Wrap_SyntaxAccess(DTWrap* Self);
 
 inline int64 JB_Wrap_Value(DTWrap* Self);
 
-inline CharProp JB_byte_Property(uint /*byte*/ Self);
-
 inline bool JB_dylib_IsOpen(JB_Dylib* Self);
 
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D);
@@ -10880,8 +10861,6 @@ inline bool JB_CP_IsHigher(Codepoint Self);
 inline bool JB_CP_IsLower(Codepoint Self);
 
 inline bool JB_CP_IsUpper(Codepoint Self);
-
-inline bool JB_CharPropList_OperatorContains(CharPropList Self, uint /*byte*/ B);
 
 inline void JB_ClassData_Restore(JB_Class* Self);
 
@@ -10927,8 +10906,6 @@ inline void JB_PrintLine(JB_String* Data);
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
-inline CharSet* JB_Str_CharSetWithBool(JB_String* Self, bool Range);
-
 inline int JB_Str_CompareInt(JB_String* Self, int Other);
 
 inline bool JB_Str_EqualsInt(JB_String* Self, int Other);
@@ -10941,8 +10918,6 @@ inline Ind JB_Str_FindByte(JB_String* Self, uint /*byte*/ Find, int Start, int A
 
 inline Float64 JB_Str_Float(JB_String* Self, bool Suffixes);
 
-inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After);
-
 inline int64 JB_Str_Int(JB_String* Self);
 
 inline int JB_Str_OperatorMinus(JB_String* Self, JB_String* S);
@@ -10950,8 +10925,6 @@ inline int JB_Str_OperatorMinus(JB_String* Self, JB_String* S);
 inline bool JB_Str_OperatorStarts(JB_String* Self, JB_String* S);
 
 inline Ind JB_Str_OutByteWithByteIntInt(JB_String* Self, uint /*byte*/ Find, int Start, int After);
-
-inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
 inline JB_String* JB_Str_Unescape(JB_String* Self);
 
@@ -10991,13 +10964,15 @@ inline bool SC_Reg_IsSmall(ASMReg Self);
 
 inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New);
 
-inline bool JB_CharPropList_SyntaxAccess(CharPropList Self, uint /*byte*/ B);
-
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
 inline bool JB_Str_ContainsByte(JB_String* Self, uint /*byte*/ B);
 
+inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After);
+
 inline bool JB_Str_IsInt(JB_String* Self);
+
+inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
 inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
 
@@ -11274,10 +11249,6 @@ inline int64 JB_Wrap_Value(DTWrap* Self) {
 	return 0;
 }
 
-inline CharProp JB_byte_Property(uint /*byte*/ Self) {
-	return JB__CharProp_Props[Self];
-}
-
 inline bool JB_dylib_IsOpen(JB_Dylib* Self) {
 	return Self->handle != nil;
 }
@@ -11362,10 +11333,6 @@ inline bool JB_CP_IsLower(Codepoint Self) {
 
 inline bool JB_CP_IsUpper(Codepoint Self) {
 	return JB_CP_In(Self, 'A', 'Z');
-}
-
-inline bool JB_CharPropList_OperatorContains(CharPropList Self, uint /*byte*/ B) {
-	return ((bool)((1 << ((uint)JB_byte_Property(B))) & ((uint)Self)));
 }
 
 inline void JB_ClassData_Restore(JB_Class* Self) {
@@ -11468,10 +11435,6 @@ inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
 	return JB_Str_MakeC(Self);
 }
 
-inline CharSet* JB_Str_CharSetWithBool(JB_String* Self, bool Range) {
-	return JB_CS_Constructor(nil, Self, Range);
-}
-
 inline int JB_Str_CompareInt(JB_String* Self, int Other) {
 	//cpp_part;
 	return JB_Str_Length(Self) - Other;
@@ -11499,10 +11462,6 @@ inline Float64 JB_Str_Float(JB_String* Self, bool Suffixes) {
 	return JB_Str_TextDouble(Self, nil, Suffixes);
 }
 
-inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After) {
-	return JB_Str_WhiteSpace(Self, Start, After, true);
-}
-
 inline int64 JB_Str_Int(JB_String* Self) {
 	return JB_Str_TextIntegerValid(Self, nil);
 }
@@ -11517,10 +11476,6 @@ inline bool JB_Str_OperatorStarts(JB_String* Self, JB_String* S) {
 
 inline Ind JB_Str_OutByteWithByteIntInt(JB_String* Self, uint /*byte*/ Find, int Start, int After) {
 	return JB_Str_OutByte(Self, Start, After, Find);
-}
-
-inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
-	return JB_Str_WhiteSpace(Self, Start, After, false);
 }
 
 inline JB_String* JB_Str_Unescape(JB_String* Self) {
@@ -11604,10 +11559,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 	return New;
 }
 
-inline bool JB_CharPropList_SyntaxAccess(CharPropList Self, uint /*byte*/ B) {
-	return JB_CharPropList_OperatorContains(Self, B);
-}
-
 inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 	return JB_Str_IsOK(Self);
 }
@@ -11617,8 +11568,16 @@ inline bool JB_Str_ContainsByte(JB_String* Self, uint /*byte*/ B) {
 	return JB_Ind_SyntaxCast(JB_Str_FindByte(Self, B, 0, JB_int__Max()));
 }
 
+inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After) {
+	return JB_Str_FindPropList(Self, kJB__CharProp_White, Start, After);
+}
+
 inline bool JB_Str_IsInt(JB_String* Self) {
 	return JB_Str_IsIntFrom(Self, 0);
+}
+
+inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
+	return JB_Str_OutPropList(Self, kJB__CharProp_White, Start, After);
 }
 
 inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self) {
@@ -11658,7 +11617,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 }
 
 inline JB_File* JB_File__Logs() {
-	return JB_Str_AsFile(JB_LUB[532]);
+	return JB_Str_AsFile(JB_LUB[530]);
 }
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
@@ -11806,7 +11765,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1482], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1480], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
@@ -11877,27 +11836,19 @@ struct JB_Globals {
 	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
-	CharProp Constants_CSLine;
 	u16 API_NilHappened_;
-	CharPropList Constants_CSWordMiddle;
-	CharPropList Constants_CSNum;
-	CharPropList Constants_CSLettersOnly;
-	CharPropList Constants_CSWordStart;
 	int Syx_CurrFuncID_;
 	Float64 Rec_Progress;
 	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_XML_UnEscapeStr;
-	JB_Object* Constants__SyxDict;
-	JB_Object* Constants_CSAfterDot;
-	JB_Object* Constants_CSAfterStatement;
-	JB_Object* Constants_EditorWrapSplit;
+	JB_Object* Constants_EscapeChr;
 	JB_Object* Platform_Logger_;
 	JB_Object* StdErr;
 	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Constants_EscapeStr;
+	JB_Object* Constants__SyxDict;
 	JB_Object* App_Usage;
-	JB_Object* Constants_EscapeChr;
+	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
 	JB_Object* Flow_Flow;
 	JB_Object* App__Conf;
@@ -11909,7 +11860,7 @@ struct JB_Globals {
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
 	JB_Object* TC_Types_Dict;
-	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* Constants_EscapeStr;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__OldArgs;
 	JB_Object* App__Path;

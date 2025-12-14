@@ -1101,11 +1101,8 @@ JB_CP_IsWhite
 JB_CP_LowerCase
 JB_CP_Render
 JB_CPath_ReadAll
-JB_CS_Bytes
-JB_CS_Constructor
-JB_CS_HasChar
-JB_CS_HasCharSet
 JB_CharPropList_ContainsStr
+JB_CharPropList_SyntaxAccess
 JB_CharProp__MakeDefault
 JB_ClassData_CreateLayerAndUse
 JB_Class_AllocZeroed
@@ -1837,7 +1834,6 @@ JB_Str_ByteValue
 JB_Str_ByteValue2
 JB_Str_CRC
 JB_Str_CharCount
-JB_Str_CharSet
 JB_Str_Child
 JB_Str_ChildFile
 JB_Str_ChrUTF8
@@ -1935,7 +1931,6 @@ JB_Str_Range
 JB_Str_RangeVec
 JB_Str_ReadFile
 JB_Str_RegularPath
-JB_Str_Remove
 JB_Str_RemoveProp
 JB_Str_RenderSpeed
 JB_Str_ReplaceAll
@@ -1991,7 +1986,6 @@ JB_Str_UpperCase
 JB_Str_UpperFirst
 JB_Str_Visible
 JB_Str_Warn
-JB_Str_WhiteSpace
 JB_Str_Widen
 JB_Str_Wrap
 JB_Str_WriteAll
