@@ -1101,9 +1101,7 @@ JB_CP_IsWhite
 JB_CP_LowerCase
 JB_CP_Render
 JB_CPath_ReadAll
-JB_CharPropList_ContainsStr
-JB_CharPropList_SyntaxAccess
-JB_CharProp__MakeDefault
+JB_CharSet_SyntaxAccess
 JB_ClassData_CreateLayerAndUse
 JB_Class_AllocZeroed
 JB_Class_DefaultLayer
@@ -1861,8 +1859,7 @@ JB_Str_Fail
 JB_Str_FileExists
 JB_Str_FileSize
 JB_Str_FileThatExists
-JB_Str_FindProp
-JB_Str_FindPropList
+JB_Str_FindCharset
 JB_Str_FindSlash
 JB_Str_First
 JB_Str_GetArchive
@@ -1913,7 +1910,6 @@ JB_Str_OperatorPlus
 JB_Str_OperatorPlusWithCstring
 JB_Str_OperatorPlusWithInt64
 JB_Str_OutByte
-JB_Str_OutPropList
 JB_Str_OutputStream
 JB_Str_Parent
 JB_Str_Parse
@@ -2025,7 +2021,6 @@ JB_TC_Render
 JB_TC_SetSigned
 JB_TC_SyntaxIsSet
 JB_TC__Types
-JB_TH_Link
 JB_TaskState_SyntaxIs
 JB_Task_Constructor
 JB_Task_ConstructorEmpty
