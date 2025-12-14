@@ -19,11 +19,9 @@ extend String
 		|| f = .file
 		return f.exists
 	
-	
 	function FileSize (|int64|)
 		|| f = .file
 		return f.size
-	
 	
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
@@ -32,14 +30,12 @@ extend String
 		for S.Paths in p
 			|| err = S.MakeDir|int|
 				rz = err
-				exit		
-	
+				exit
 	
 	function PathDir (|string|) // asdir, todir
 		if self and .last != '/'
 			return self + "/"
 		return self
-
 
 	function Sibling (|string| name, |string|)
 		return .ReplacePathComponent(-1, Name)

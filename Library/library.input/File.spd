@@ -120,7 +120,7 @@ class File (String)
 		// note to self in case I ever re-add this.	
 		disabled "You can't just append messages blindly. how do they get separated? lines, spaces, commas? nothing?"
 	
-	inline string.Visible (|bool|)
+	function string.Visible (|bool|)
 		return .name[] != '.'
 		
 	inline Hidden (|bool|)
