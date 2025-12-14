@@ -25,7 +25,6 @@
 		AC7D3CA229A27C7700148ADB /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */; };
 		AC7D3CA329A27C7700148ADB /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9129A27C1D00148ADB /* JB_Main.cpp */; };
 		AC7D3CA429A27C7700148ADB /* JB_Errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9029A27C1D00148ADB /* JB_Errors.cpp */; };
-		AC7D3CA529A27C7700148ADB /* JB_ByteMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7C29A27C1D00148ADB /* JB_ByteMap.cpp */; };
 		AC7D3CA629A27C7700148ADB /* JB_Child.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8429A27C1D00148ADB /* JB_Child.cpp */; };
 		AC7D3CA729A27C7700148ADB /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */; };
 		AC7D3CA829A27C7700148ADB /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */; };
@@ -44,7 +43,6 @@
 		AC7D3CB629A27C7700148ADB /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */; };
 		AC7D3CB929A27C9900148ADB /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3CB729A27C9900148ADB /* JB_Globals.cpp */; };
 		AC7D3CBA29A27C9900148ADB /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3CB829A27C9900148ADB /* JB.cpp */; };
-		AC7D3D8529A280A700148ADB /* JB_ByteMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7C29A27C1D00148ADB /* JB_ByteMap.cpp */; };
 		AC7D3D8629A280A700148ADB /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */; };
 		AC7D3D8729A280A700148ADB /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */; };
 		AC7D3D8829A280A700148ADB /* JB_BasicIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */; };
@@ -120,7 +118,6 @@
 		AC7D3C7929A27C1D00148ADB /* JB_List.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_List.cpp; path = ../Library/CppLib/JB_List.cpp; sourceTree = "<group>"; };
 		AC7D3C7A29A27C1D00148ADB /* JB_Umbrella.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
 		AC7D3C7B29A27C1D00148ADB /* JB_Compress.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Compress.cpp; path = ../Library/CppLib/JB_Compress.cpp; sourceTree = "<group>"; };
-		AC7D3C7C29A27C1D00148ADB /* JB_ByteMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ByteMap.cpp; path = ../Library/CppLib/JB_ByteMap.cpp; sourceTree = "<group>"; };
 		AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_BasicIO.cpp; path = ../Library/CppLib/JB_BasicIO.cpp; sourceTree = "<group>"; };
 		AC7D3C7E29A27C1D00148ADB /* JB_DirReaderWin32.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DirReaderWin32.cpp; path = ../Library/CppLib/JB_DirReaderWin32.cpp; sourceTree = "<group>"; };
 		AC7D3C7F29A27C1D00148ADB /* JB_VM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_VM.cpp; path = ../Library/CppLib/JB_VM.cpp; sourceTree = "<group>"; };
@@ -258,7 +255,6 @@
 				AC7D3C8029A27C1D00148ADB /* JB_Array.cpp */,
 				AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */,
 				AC7D3C7D29A27C1D00148ADB /* JB_BasicIO.cpp */,
-				AC7D3C7C29A27C1D00148ADB /* JB_ByteMap.cpp */,
 				AC7D3C8429A27C1D00148ADB /* JB_Child.cpp */,
 				AC7D3C7B29A27C1D00148ADB /* JB_Compress.cpp */,
 				AC6AB9262CB1AEB800555461 /* FF_ARM64.S */,
@@ -466,7 +462,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC7D3CA529A27C7700148ADB /* JB_ByteMap.cpp in Sources */,
 				AC7D3CA129A27C7700148ADB /* JB_String.cpp in Sources */,
 				AC7D3CA229A27C7700148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3CB629A27C7700148ADB /* JB_BasicIO.cpp in Sources */,
@@ -507,7 +502,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC7D3D8529A280A700148ADB /* JB_ByteMap.cpp in Sources */,
 				AC7D3D8629A280A700148ADB /* JB_String.cpp in Sources */,
 				AC7D3D8729A280A700148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3D8829A280A700148ADB /* JB_BasicIO.cpp in Sources */,
