@@ -103,7 +103,7 @@ datatype CharSet (uint)
 		|byte[256]| Props
 		CharSet.MakeDefault
 	
-		function MakeDefault
+		libinternal MakeDefault
 			|| item = &.Props[0]
 			for s in 32
 				item[s] = fUnprintable

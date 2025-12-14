@@ -109,7 +109,7 @@ class File (String)
 		disabled "use string.WriteAll or string.ReadAll"
 	
 	function String.WriteAll (|string| Data, |ErrorInt|)
-		description "Writes to the file. Clears old data."
+		description "Writes to the file. Clears old data. The entire data must be written. Or else the error-system kicks in."
 		|| f = .file // may be self
 		return f.writeall(data)
 
@@ -120,11 +120,10 @@ class File (String)
 		// note to self in case I ever re-add this.	
 		disabled "You can't just append messages blindly. how do they get separated? lines, spaces, commas? nothing?"
 	
-	function string.Visible (|bool|)
+	inline string.Visible (|bool|)
 		return .name[] != '.'
 		
-	function Hidden (|bool|)
-		inline
+	inline Hidden (|bool|)
 		return !.visible
 
 	function SmartData (assigns:|String| nieu, |bool|)
@@ -183,10 +182,6 @@ class File (String)
 			rz = .read(b-a)
 			if WasClosed
 				.close
-		
-//	function IsCompressed (|bool|)
-//		return .section(0, 4).iscompressed
-
 
 	function RelFile (|file|)
 		|| cd = app.cwd.pathdir
@@ -319,7 +314,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function IsSymLink (|bool|)
 		cpp_wrapper JB_File_IsLink
 
-	function IsTerminal (|bool|)
+	inline IsTerminal (|bool|)
 		return .descriptor.IsTerminal
 		
 	function Offset (|int64|)

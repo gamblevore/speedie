@@ -4,26 +4,27 @@ target !minilib {
 datatype TerminalColor (int)
 	constants
 		|TerminalColor|
-		Black = 30, Red,Green,Yellow,Blue,Magenta,Cyan,White
+		Black = 30
+		Red,Green,Yellow,Blue,Magenta,Cyan,White
 
 	function Colorise (|string| s, |string|)
+		// handy trick of using high-bits on objects
 		|int64| C = (self-Black)&7
 		|| addr = (s|int64|<<3)>>3
 		return (addr|||(C<<60))|string|
 	
 	inline string.TerminalColor (|terminalcolor|)
 		return (self|int64| >> 60) + TerminalColor.black
-			
+
+
 // cleanup:
 	// Remove Dictionary and just have FixedDict
 	// don't dump ALL the string classes, just the base
-	// TokHan should be internal.
 	// Validator should be embedded (if used)
 	// flowcontrol can be deleted... i don't know if we need it. Perhaps after getting speedie working.
-// a lot of things to cleanup!
 
 
-// fix later
+
 struct TerminalDisplay
 	visible false
 	|[[string]]|		Screen

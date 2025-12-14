@@ -11,6 +11,7 @@ class TokenHandler
 		wrapper
 		cpp_class TokHan
 		cpp_part TH
+		libinternal
 	
 	function Link (|int| BitTypes, |TokenHandler_fp| Func, |TokenHandler|)
 		cpp_wrapper JB_TH_Link
