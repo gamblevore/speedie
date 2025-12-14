@@ -1,6 +1,6 @@
 
 
-datatype CharPropList (uint)
+datatype CharSet (uint)
 	linkage
 		numeric false
 			
@@ -25,7 +25,7 @@ function string.Find (|CharProp| Find, |int| From=0, |int| After=int.max, |ind|)
 
 
 // needs to be able to go backwards... to replace charset
-function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
+function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindPropList
 	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
 							 // makes for confusing code. it WOULD have been good... if this were 1-based
@@ -49,69 +49,72 @@ function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |i
 				return from
 
 
-// we could... define this as ~Find? like... its awesome.
-function string.OutCharSet (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
-	cpp_part OutPropList
-	if from < 0 or after < 0 // same issue as in .find
-	|| p = &CharProp.Props[0]
-	|| addr = .addr
-	if from < After
-		from = from max 0
-		After = After min .Length
-		while From < After
-			ifn find contains p[addr[from++]]
-				return from-1
-	  else // oof
-		from = from min .length
-		After = After max 0
-		while From > After
-			ifn find contains p[addr[--from]]
-				return from
-	
+inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
+	return .find(~find, from, after)
 
 
 datatype CharProp (uint16)
 	linkage
 		numeric false
+	
 	constants
 		|CharProp| 
-		Invalid
-		Null						// 0
-		Unprintable 				// 1-8, 11, 12, 14-30
-		Line						// nl, rt
-		HSpace						// space, tab
-		Underscore					// _
-		Colon						// :
-		DotDash						// .-
-		CommaSlash					// \,
-		RemainingPunct				// &|~@!()[]}?
-		AfterTmp					// '`"{#$%
-		EditorSeparators			// -^+/*;<>=
-		Number						// 0123456789
-		Upper						// A-Z
-		Lower						// a-z
-		UnicodeByte					// 128+
+		fInvalid
+		fNull					// 0
+		fUnprintable 			// 1-8, 11, 12, 14-30
+		fLine					// nl, rt
+		fHSpace					// space, tab
+		fUnderscore				// _
+		fColon					// :
+		fDotDash				// .-
+		fCommaSlash				// \,
+		fRemainingPunct			// &|~@!()[]}?
+		fAfterTmp				// '`"{#$%
+		fEditorSeparators		// -^+/*;<>=
+		fNumber					// 0123456789
+		fUpper					// A-Z
+		fLower					// a-z
+		fUnicode				// 128+
 
-		|CharPropList| 
-		SafeInC			= (1<<Upper) + (1<<Lower) + (1<<UnderScore) + (1<<Number)
-		Unicode			= (1<<UnicodeByte)
-		LettersOnly 	= (1<<Upper) + (1<<Lower) + Unicode
-		LettersUnderScore= LettersOnly+ (1<<Underscore) 
-		NameMid			= LettersUnderScore + (1<<Number)
-		XMLNameMid		= NameMid + (1<<DotDash) + (1<<Colon)
-		White			= (1<<Line) + (1<<HSpace)
-		AfterDot		= White + (1<<Colon) + (1<<CommaSlash)
-		AfterStatement	= White + (1<<Colon) + (1<<CommaSlash) + (1<<AfterTmp)
-		EditorSplitter  = White + (1<<Colon) + (1<<CommaSlash) + (1<<EditorSeparators)
-		Trim			= White + (1<<Null)
+	flags
+		|CharSet| 
+		Invalid
+		Null
+		Unprintable
+		Line
+		HSpace
+		Underscore
+		Colon
+		DotDash
+		CommaSlash
+		RemainingPunct
+		AfterTmp
+		EditorSeparators
+		Number
+		Upper
+		Lower
+
+	constants
+		|CharSet| 
+		SafeInC			= (1<<fUpper) + (1<<fLower) + (1<<fUnderScore) + (1<<fNumber)
+		Unicode			= (1<<fUnicode)
+		LettersOnly 	= (1<<fUpper) + (1<<fLower) + Unicode
+		LettersUnderScore= LettersOnly+ (1<<fUnderscore) 
+		NameMid			= LettersUnderScore + (1<<fNumber)
+		XMLNameMid		= NameMid + (1<<fDotDash) + (1<<fColon)
+		White			= (1<<fLine) + (1<<fHSpace)
+		AfterDot		= White + (1<<fColon) + (1<<fCommaSlash)
+		AfterStatement	= White + (1<<fColon) + (1<<fCommaSlash) + (1<<fAfterTmp)
+		EditorSplitter  = White + (1<<fColon) + (1<<fCommaSlash) + (1<<fEditorSeparators)
+		Trim			= White + (1<<fNull)
 	
 	
-	inline List (|CharPropList|)
-		return (1<<self|uint|)|charproplist|
+	inline List (|CharSet|)
+		return (1<<self|uint|)|CharSet|
 	
-	syntax cast (|CharPropList|)
+	syntax cast (|CharSet|)
 		inline
-		return (1<<self|uint|)|charproplist|
+		return (1<<self|uint|)|CharSet|
 		
 	module
 		|CharProp[256]| Props
@@ -120,37 +123,37 @@ datatype CharProp (uint16)
 		function MakeDefault
 			|| item = &.Props[0]
 			for s in 32
-				item[s] = Unprintable
+				item[s] = fUnprintable
 			for s in 33 to 126
-				item[s] = RemainingPunct
+				item[s] = fRemainingPunct
 			for s in 128 to 253
-				item[s] = UnicodeByte
+				item[s] = fUnicode
 			for s in '0'|int| to '9'|int|
-				item[s] = charprop.number
+				item[s] = fnumber
 			for s in 'A'|int| to 'Z'|int|
-				item[s] = charprop.upper
-				item[s+32] = charprop.lower
+				item[s] = fupper
+				item[s+32] = flower
 			for s in "'`\"{#$%"
-				item[s] = CharProp.AfterTmp
+				item[s] = fAfterTmp
 			for s in "-^+/*;<>="
-				item[s] = charprop.EditorSeparators
+				item[s] = fEditorSeparators
 
-			item[0] = null
-			item[9] = HSpace
-			item[10] = line
-			item[13] = line
-			item[32] = HSpace
+			item[0] = fnull
+			item[9] = fHSpace
+			item[10] = fline
+			item[13] = fline
+			item[32] = fHSpace
 
-			item['_'] = charprop.Underscore
-			item['-'] = DotDash
-			item[':'] = Colon
-			item['.'] = DotDash
+			item['_'] = fUnderscore
+			item['-'] = fDotDash
+			item[':'] = fColon
+			item['.'] = fDotDash
 
-			item[','] = CommaSlash
-			item['\\'] = CommaSlash
+			item[','] = fCommaSlash
+			item['\\'] = fCommaSlash
 
 ///			item[0x7f] = Invalid // not set above
-			item[0xC0] = Invalid
+			item[0xC0] = fInvalid
 //			item[0xFE] = Invalid // also
 //			item[0xFF] = Invalid
 			

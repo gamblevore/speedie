@@ -1256,7 +1256,7 @@ ive been~running #since morning
 		return .WordAfterSub(start, charprop.NameMid)
 	
 		
-	libinternal WordAfterSub (|int| Start, |charproplist| cs, |int|)
+	libinternal WordAfterSub (|int| Start, |CharSet| cs, |int|)
 		Opt NoRefCounts
 		|| n = .data.length
 		if (Start < n)

@@ -126,7 +126,7 @@ class String
 		fs <~ (self[]).uppercase
 		fs <~ self[1, int.max].lowercase
 
-	render Remove (|charproplist| remove, |int| to=-1)
+	render Remove (|CharSet| remove, |int| to=-1)
 		cpp_part RemoveProp
 		for c in self
 			if !remove[c]
@@ -217,7 +217,7 @@ class String
 		return fs
 		
 		
-	function Trim (|charproplist| CS = ~CharProp.Trim, |string|)
+	function Trim (|CharSet| CS = ~CharProp.Trim, |string|)
 		nil self
 		if self
 /			|| First = .find(CS)
