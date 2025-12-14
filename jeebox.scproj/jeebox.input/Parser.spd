@@ -750,14 +750,16 @@ extend Parser
 		Opt NoRefCounts
 
 		|| Result = .NewWord( parent, @Tmp, start, start )
-		return ftmpsub(result, opflags, thingflags)
+		return fTmpSub(result, opflags, thingflags)
 
 
 	function CanStatement (|bool|)
-		return  Jeebox.CSAfterStatement[parser.NextByte]
+		return charprop.AfterStatement[parser.NextByte]
+
 
 	function CanDot (|bool|)
-		return  Jeebox.CSAfterDot[parser.NextByte]
+		return charprop.AfterDot[parser.NextByte]
+
 	
 	function fTmpSub (|message!| result, |int| OpFlags, |int| ThingFlags, |message|)
 		if .WillEnd

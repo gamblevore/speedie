@@ -151,7 +151,7 @@ class TextView (GUIControl)
 			return "/" + self
 		// are these two branches the same? test later.
 		// we did find one! but it might be in the middle!
-		return .trim(i, i+1)
+		return .trimmiddle(i, i+1)
 
 		
 	libinternal ClickedLineNum (|ivec2| P, |bool|)

@@ -1,17 +1,9 @@
 
 
-// remove charset...?
-// could just try replacing one or two calls with this... see how we get on
-// if it works... then replace more.
-
 datatype CharPropList (uint)
 	linkage
 		numeric false
-	
-	operator contains (|byte| b, |bool|)
-		inline
-		return (1<<b.Property|uint|) & self|uint|
-		
+			
 	operator contains (|charprop| b, |bool|)
 		inline
 		cpp_part ContainsProp
@@ -21,33 +13,16 @@ datatype CharPropList (uint)
 		cpp_Part ContainsStr
 		return s.OutCharSet(self) == -1
 		
-	operator Plus (|charproplist| p, |charproplist|)
-		inline
-		return (self|uint| ||| p|uint|)|charproplist|
-
-	operator Plus (|charprop| p, |charproplist|)
-		inline
-		cpp_Part Add1
-		return (self|uint| ||| (1<<p|uint|))|charproplist|
-
-	syntax Access (|byte| b, |bool|)
-		inline
-		return self contains b
-
-
-function byte.SyntaxIs (|CharProp| s, |bool|)
-	inline
-	return .Property == s
-
-
-function Byte.Property (|CharProp|)
-	inline
-	return CharProp.Props[self]
+	syntax Access (|uint| b, |bool|)
+		if b <= 255
+			|| cp = CharProp.Props[b]|uint|
+			return (1<<cp) & self|uint|
 
 	
 function string.Find (|CharProp| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindProp
 	return .find(find.list, from, after)
+
 
 // needs to be able to go backwards... to replace charset
 function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
@@ -62,36 +37,22 @@ function string.Find (|CharPropList| Find, |int| From=0, |int| After=int.max, |i
 		from = from max 0
 		After = After min .Length
 		while From < After
-			if find contains p[addr[from++]]
+			|| b = addr[from++]
+			if find contains p[b]
 				return from-1
 	  else // oof
 		from = from min .length
 		After = After max 0
 		while From > After
-			if find contains p[addr[--from]]
+			|| b = addr[--from]
+			if find contains p[b]
 				return from
 
-/*
-    || SelfAfter = self->Length
-    if (StartOff < 0)
-        StartOff = SelfAfter + 1 + StartOff
-      else if (StartOff > SelfAfter)
-        StartOff = SelfAfter
 
-    if (AfterOff > SelfAfter)
-        AfterOff = SelfAfter
-      else if (AfterOff < 0)
-        AfterOff = SelfAfter + 1 + AfterOff
-
-    return {AfterOff - StartOff, self->Addr + StartOff}  
-*/
-
+// we could... define this as ~Find? like... its awesome.
 function string.OutCharSet (|CharPropList| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part OutPropList
-	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
-							 // makes for confusing code. it WOULD have been good... if this were 1-based
-							 // because -1 is also the return value of a missing value.
-							 // nicer to make an explicit function that to handle end-relative searches
+	if from < 0 or after < 0 // same issue as in .find
 	|| p = &CharProp.Props[0]
 	|| addr = .addr
 	if from < After
@@ -108,77 +69,60 @@ function string.OutCharSet (|CharPropList| Find, |int| From=0, |int| After=int.m
 				return from
 	
 
+
 datatype CharProp (uint16)
 	linkage
 		numeric false
 	constants
 		|CharProp| 
 		Invalid
-		Null				// 0
-		Unprintable 		// 1-8, 11, 12, 14-30
-		Line				// nl, rt
-		HSpace				// space, tab
-		Punct1				// &|~@!()[]}?\
-		Punct2				// space   '`\"{#\$%		// csafterstatement
-		Punct3				// -^+/*;<>= // 
-		Punct4				// white, "\\,:"			// csafterdot
-		PunctXML			// .-:
-		Number				// 0123456789
-		Underscore			// _
-		Upper				// A-Z
-		Lower				// a-z
-		UnicodeByte			// 128+
-
+		Null						// 0
+		Unprintable 				// 1-8, 11, 12, 14-30
+		Line						// nl, rt
+		HSpace						// space, tab
+		Underscore					// _
+		Colon						// :
+		DotDash						// .-
+		CommaSlash					// \,
+		RemainingPunct				// &|~@!()[]}?
+		AfterTmp					// '`"{#$%
+		EditorSeparators			// -^+/*;<>=
+		Number						// 0123456789
+		Upper						// A-Z
+		Lower						// a-z
+		UnicodeByte					// 128+
 
 		|CharPropList| 
-		NumMid			= (1<<Upper) + (1<<Lower) + (1<<UnderScore) + (1<<Number)
+		SafeInC			= (1<<Upper) + (1<<Lower) + (1<<UnderScore) + (1<<Number)
 		Unicode			= (1<<UnicodeByte)
-		LettersOnly 	= Unicode + (1<<Upper) + (1<<Lower) 
+		LettersOnly 	= (1<<Upper) + (1<<Lower) + Unicode
 		LettersUnderScore= LettersOnly+ (1<<Underscore) 
 		NameMid			= LettersUnderScore + (1<<Number)
-		XMLNameMid		= NameMid + (1<<PunctXML)
+		XMLNameMid		= NameMid + (1<<DotDash) + (1<<Colon)
 		White			= (1<<Line) + (1<<HSpace)
-		Punct			= (1<<Punct1) + (1<<PunctXML)
-
-	operator Plus (|charprop| p, |charproplist|)
-		inline
-		cpp_part Add1
-		return ((1<<self|uint|) ||| (1<<p|uint|))|charproplist|
-
-	operator Plus (|charproplist| p, |charproplist|)
-		inline
-		return ((1<<self|uint|) ||| p|uint|)|charproplist|
-		
-	inline List (|charproplist|)
+		AfterDot		= White + (1<<Colon) + (1<<CommaSlash)
+		AfterStatement	= White + (1<<Colon) + (1<<CommaSlash) + (1<<AfterTmp)
+		EditorSplitter  = White + (1<<Colon) + (1<<CommaSlash) + (1<<EditorSeparators)
+		Trim			= White + (1<<Null)
+	
+	
+	inline List (|CharPropList|)
 		return (1<<self|uint|)|charproplist|
 	
-	syntax cast (|charproplist|)
+	syntax cast (|CharPropList|)
 		inline
 		return (1<<self|uint|)|charproplist|
 		
 	module
 		|CharProp[256]| Props
 		charprop.MakeDefault
-//		charprop.test
-//		
-//	
-//		inline Test
-//			expect 'a' is lower and 'b' is lower and 'C' is upper and 'D' is upper and '5' is number
-//			expect Letters contains 'C' and 'c'
-//			|| fs = FastString()
-//			for c in "We ate some cheese for 5£."
-//				|| p = lower+Number
-//				if p contains c 
-//					fs <~ c
-//			printline fs
-
 	
 		function MakeDefault
 			|| item = &.Props[0]
 			for s in 32
 				item[s] = Unprintable
 			for s in 33 to 126
-				item[s] = punct1
+				item[s] = RemainingPunct
 			for s in 128 to 253
 				item[s] = UnicodeByte
 			for s in '0'|int| to '9'|int|
@@ -186,6 +130,10 @@ datatype CharProp (uint16)
 			for s in 'A'|int| to 'Z'|int|
 				item[s] = charprop.upper
 				item[s+32] = charprop.lower
+			for s in "'`\"{#$%"
+				item[s] = CharProp.AfterTmp
+			for s in "-^+/*;<>="
+				item[s] = charprop.EditorSeparators
 
 			item[0] = null
 			item[9] = HSpace
@@ -194,9 +142,12 @@ datatype CharProp (uint16)
 			item[32] = HSpace
 
 			item['_'] = charprop.Underscore
-			item['-'] = PunctXML
-			item[':'] = PunctXML
-			item['.'] = PunctXML
+			item['-'] = DotDash
+			item[':'] = Colon
+			item['.'] = DotDash
+
+			item[','] = CommaSlash
+			item['\\'] = CommaSlash
 
 ///			item[0x7f] = Invalid // not set above
 			item[0xC0] = Invalid

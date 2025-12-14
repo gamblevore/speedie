@@ -8,10 +8,8 @@ extern "C" {
 
 struct JB_String;
 struct FastString;
-struct CharSet;
 typedef JB_String* (*fpRenderer)(JB_Object* self, FastString* FS);
 
-// obj?
 JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in);
 //JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in);
 
@@ -64,15 +62,9 @@ JB_String* JB_Str_Cleanse(JB_String* self, u32 Code);
 
 // StringCS
 
-int JB_Str_WhiteSpace( JB_String* self, int StartPos, int EndPos, bool IsIn );
-int JB_Str_CharSet( JB_String* self, int BeginPos, int EndPos, CharSet* Find, bool IsIn );
-
-
-
 // StringSearchers
 
 int JB_Str_InStr( JB_String* self, JB_String* Find, int BeginPos, int After, bool CaseAware );
-//int JB_Str_InRevStr( JB_String* self, JB_String* Find, int BeginPos, int EndPos, bool Lexer );
 int JB_Str_InByte( JB_String* self, int StartPos, int After, int SearchChar );
 int JB_Str_OutByte( JB_String* self, int StartPos, int After, int SearchChar );
 bool JB_Str_Equals(JB_String* self, JB_String* Search, bool Lexer);
@@ -116,7 +108,6 @@ JB_String* JB_Str_UpperCase(JB_String* self);
 bool JB_Str_IsAsciiName(JB_String* self);
 JB_String* JB_Str_Reverse(JB_String* self, FastString* fs_in);
 void JB_Str_StretchBack_(JB_String* self, int i);
-JB_String* JB_Str_Trim(JB_String* self, CharSet* CS);
 JB_String* JB_ASCII();
 JB_String* JB_Upper();
 JB_String* JB_Lower();

@@ -20,7 +20,6 @@
 #include "JB_Errors.h"
 #include "JB_Pipe.h"
 #include "JB_FastString.h"
-#include "JB_ByteMap.h"
 #include "JB_Vectors.h"
 #include "JB_Dict.h"
 #include "JB_DictCore.h"

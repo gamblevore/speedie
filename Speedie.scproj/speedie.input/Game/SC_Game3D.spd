@@ -3,8 +3,6 @@
 
 // DEPRECATED
 
-|| C_Letters		= "AZaz__09".charset
-
 module SCGame3D
 	|| Types = [
 		"point"				: "P"
@@ -75,7 +73,7 @@ function FastString.CArrayAddB (|Byte| B)
 		self <~ '0'
 	  else
 		self <~ '\''
-		if C_Letters[B]
+		if charprop.SafeInC[B]
 			self <~ B
 		  else
 			self <~ "\\x"

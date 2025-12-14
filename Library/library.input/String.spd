@@ -46,20 +46,12 @@ class String
 	autogen _OutByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		nil checker
 		cpp_wrapper JB_Str_OutByte
-
-	autogen _CharSet (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
-		nil checker
-		cpp_wrapper JB_Str_CharSet
-
-	autogen _White (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
-		nil checker
-		cpp_wrapper JB_Str_WhiteSpace
 	
 	inline InWhite (|int|Start=0, |int|After=int.max, |ind|)
-		return ._white(Start, After, true)
+		return .find(charprop.white, start, after)
 
 	inline OutWhite (|int|Start=0, |int|After=int.max, |ind|)
-		return ._white(Start, After, false)
+		return .outcharset(charprop.white, start, after)
 	
 
 
@@ -72,14 +64,8 @@ class String
 		cpp_part FindByte
 		return ._inbyte(start, after, find)
 
-	inline Find (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
-		return ._CharSet(Start, After, cs, true)
-
 	inline OutByte (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
 		return ._outbyte(Start, after, find)
-
-	inline OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
-		return ._CharSet(Start, After, cs, false)
 	
 // comparing / analysing
 	function Last (|int| minus = 0, |Byte|)
@@ -118,9 +104,6 @@ class String
 			require !s.islower
 		return true
 
-//	function Map (|bytemap| b, |int| clear = -1, |string|)
-//		cpp_wrapper JB_Str_MapBytes
-
 	inline IsInt (|bool|)
 		return .isint(0)
 	
@@ -142,13 +125,6 @@ class String
 	render TitleCase
 		fs <~ (self[]).uppercase
 		fs <~ self[1, int.max].lowercase
-
-	render Remove (|charset| remove, |int| to=-1)
-		for c in self
-			if !remove[c]
-				fs <~ c
-			  elseif to >= 0
-				fs <~ to|byte|
 
 	render Remove (|charproplist| remove, |int| to=-1)
 		cpp_part RemoveProp
@@ -224,15 +200,15 @@ class String
 	function UpperFirst (|String|)
 		if self[].IsUpper
 			return self
-		Return self[0,1].Uppercase + self[1...]
+		Return self[].Uppercase.render + self[1...]
 	
 	function Shorten (|int| n, |string|)
 		return self[0, .length-n]
 	function rtrim (|int| n, |string|)
 		disabled "Use .shorten"
 
-	function Trim (|int| A, |int| B, |string|)
-		cpp_part TrimMiddle
+	function TrimMiddle (|int| A, |int| B, |string|)
+		// The GUI uses this. Could probably be used more by the text-editor?
 		|| X = .length
 		|| Y = (B-A) max 0
 		|| fs = FastString(X - Y)
@@ -241,10 +217,13 @@ class String
 		return fs
 		
 		
-	function Trim (|charset| cs = nil, |string|)
+	function Trim (|charproplist| CS = ~CharProp.Trim, |string|)
 		nil self
-		cpp_wrapper JB_Str_Trim
-	
+		if self
+/			|| First = .find(CS)
+				|| Second = .find(CS, int.max, 0) // assume it must be found
+				return self[first, second+1]
+
 	
 	function TrimStart (|string| s,  |string|)
 		|| i = 0
@@ -278,10 +257,6 @@ class String
 		error (where, "Not a boolean value: '" + self + "'")
 
 
-	inline CharSet (|bool| Range = true, |!CharSet|)
-		return CharSet.new(self, range)
-
-
 	inline Words (|[String]|)
 		return .Split(' ')
 
@@ -293,12 +268,6 @@ class String
 			if Word == nil
 				exit
 			rz <~ Word
-
-
-//	function Split (|int| n, |StringLengthSplit|)
-//		cpp_part SplitChunks
-//		rz.name = self
-//		rz.size = n
 
 
 	inline FirstLine (|string|)
@@ -330,11 +299,6 @@ class String
 	operator Contains (|string| s, |bool|)
 		cpp_part ContainsString
 		return .find(s, 0, int.max, true)
-	
-	operator Contains (|charset| s, |bool|)
-		cpp_part ContainsAny
-		inline
-		return .find(s)
 	
 	operator Contains (|Byte| b, |bool|)
 		cpp_part ContainsByte
@@ -571,12 +535,7 @@ class String
 		cpp_part EqualsInt
 		inline
 		return .length == other
-	
-//	syntax Equals (|byte| Other, |bool|)
-//		cpp_part Equalsbyte
-//		disabled "huh?"
 
-	
 	libinternal MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
 		|| n	= .length
 		|| s0	= .addr

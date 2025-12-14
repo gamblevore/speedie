@@ -600,36 +600,7 @@ void JB_FS_AppendHex3(FastString* fs, int tVal) {
 
 
 
-////////////    #include "StringCS.i" 
-
-int JB_Str_WhiteSpace( JB_String* self, int StartOff, int AfterOff, bool IsIn ) {
-    extern CharSet* WhiteSpace_;
-	return JB_Str_CharSet( self, StartOff, AfterOff, WhiteSpace_, IsIn );
-}
-
-
-
          //  Main subroutines. These are generalised, and need interfacing routines.
-
-extern JB_StringC* EmptyString_;
-int JB_Str_CharSet( JB_String* Self, int StartOff, int AfterOff, CharSet* cs, bool IsIn ) {
-	if (!Self or !cs)
-		return -1;
-    MiniStr S = ReadAddrs_(Self, StartOff, AfterOff);
-	int Dir = S.Dir();
-		
-	while (S) {
-		uint8 C = S.Move(Dir);
-		if ( (cs->Cache[C]!=0) == IsIn ) {
-			return ResultFix_(S, Self, Dir);
-		}
-	}
-
-	return -1;
-}
-
- //////////   #include "StringSearchers.i"
-
 
 
 
@@ -898,6 +869,9 @@ int OffsetCompareLex( MiniStr S_, MiniStr F_ ) {
 
 	return OffsetCompare_( S_, F_ );
 }
+
+
+extern JB_StringC* EmptyString_;
 
 bool JB_Str_Equals(JB_String* self, JB_String* find, bool Lexer) {
 	if (self != find) {
@@ -1477,33 +1451,33 @@ bool JB_Str_IsAsciiName(JB_String* self) {
 
 
 
-CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
-CharSet* TrimCS_() {
-	static CharSet* cs;
-	if (!cs) {
-		JB_String Dummy;  Dummy.Addr = (uint8*)" \t\n\r\0";  Dummy.Length = 5;
-		cs = JB_CS_Constructor(nil, &Dummy, false);
-	}
-	return cs;
-}
+//CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
+//CharSet* TrimCS_() {
+//	static CharSet* cs;
+//	if (!cs) {
+//		JB_String Dummy;  Dummy.Addr = (uint8*)" \t\n\r\0";  Dummy.Length = 5;
+//		cs = JB_CS_Constructor(nil, &Dummy, false);
+//	}
+//	return cs;
+//}
 
-JB_String* JB_Str_Trim(JB_String* self, CharSet* CS) {
-	int n = JB_Str_Length(self);
-	if (n <= 0)
-		return self;
-	if (!CS) CS = TrimCS_();
-	uint8* CC = CS->Cache;
-	byte* Addr = self->Addr;
-	
-	int i = 0;
-	for (; i < n; i++)
-		if (!CC[Addr[i]])
-			break;
-	for (; i < n; n--)
-		if (!CC[Addr[n-1]])
-			break;
-	return JB_Str_Range(self, i, n);
-}
+//JB_String* JB_Str_Trim(JB_String* self, CharSet* CS) {
+//	int n = JB_Str_Length(self);
+//	if (n <= 0)
+//		return self;
+//	if (!CS) CS = TrimCS_();
+//	uint8* CC = CS->Cache;
+//	byte* Addr = self->Addr;
+//	
+//	int i = 0;
+//	for (; i < n; i++)
+//		if (!CC[Addr[i]])
+//			break;
+//	for (; i < n; n--)
+//		if (!CC[Addr[n-1]])
+//			break;
+//	return JB_Str_Range(self, i, n);
+//}
 
 
 JB_String* JB_Str_ReplaceAllB(JB_String* self, int lFrom, int lTo) {

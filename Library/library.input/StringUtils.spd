@@ -190,7 +190,7 @@ libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 	paramax += p
 
 	while
-		|| c = .byte(i, -1)
+		|| c = .Byte(i, -1)
 		if c < 0
 			return i
 		if c|byte|.IsTextLine
@@ -200,17 +200,16 @@ libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 		if i >= ParaMax or MaxWidth <= 0
 			return i
 
-		
 		if c == '\t'
 			i++
-			maxwidth -= (Orig-MaxWidth).TabsWidth
+			MaxWidth -= (Orig-MaxWidth).TabsWidth
 		  elseif isinline
 			i++
-		  elseif jeebox.EditorWrapSplit[c]
+		  elseif charprop.EditorSplitter[c]
 			i++
 			MaxWidth--
 		  else									 // so where does the word end?
-			|| WordEnd = .find(jeebox.EditorWrapSplit, i, ParaMax)
+			|| WordEnd = .Find(charprop.EditorSplitter, i, ParaMax)
 				WordEnd += (self[WordEnd] > 32)
 			  else
 				WordEnd = .length min paramax
@@ -244,16 +243,6 @@ libinternal String.TabsToSpacesSub (|faststring| fs)
 			fs <~ c
 			i++
 
-
-//libinternal String.TabbifySub (|faststring| fs)
-//	|| Sp = .OutByte(' ') ?? .length
-//	if Sp == 0
-//		fs <~ self
-//	  else
-//		sp = Sp.AlignDown(4)
-//		fs <~ ('\t', Sp>>2)
-//		fs.appendRange(self, sp, int.max)
-	
 
 
 function String.TabsToSpaces (|string|)

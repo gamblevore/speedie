@@ -260,7 +260,6 @@ function InitTypes (|bool|)
 	TypeByte			= compiler["byte"]
 	TypeChar			= Compiler["int8"] // int8 would be a better name
 	TypeCodePoint		= compiler["codepoint"]
-	compiler["charset"]
 	Typevec2			= compiler["vec2"]
 	Typevec3			= compiler["vec3"]
 	Typevec4			= compiler["vec4"]

@@ -50,7 +50,6 @@ JBClassPlace(Dictionary,		JB_Object,	"Dictionary",JB_Dict_Destructor, JB_Dict_Re
 JBClassPlace(Array,				JB_Object,	"Array",	JB_Array_Destructor, JB_Array_Render );
 
 JBClassPlace( FastString,		JB_Object,	"FastString", JB_FS_Destructor,		JB_FS_Render );
-JBClassPlace( CharSet,			JB_Object,	"CharSet", 0,						JB_CS_Render );
 JBClassPlace( JB_List,			JB_Object,	"List",		JB_Ring_Destructor,		JB_List_Render );
 JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );
 
@@ -59,7 +58,6 @@ extern bool JB_NoExitOnCrash;
 
 
 
-CharSet*            WhiteSpace_;
 JB_StringC*         EmptyString_;
 JB_StringC*         ErrorString_;
 JBObject_Behaviour  JB_Object_FuncTable_;
@@ -93,7 +91,6 @@ static JB_StringC* emptystr() {
 }
 
 
-CharSet*	JB_CS_Constructor	(CharSet* self, JB_String* Source, bool Ranges);
 JB_String** JB_Str__FindGlobals	(u8** src, uint64* Hash);
 void		JB_RemoveHandlers	();
 
@@ -224,7 +221,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 	App_Args = JB_Incr(JB_Str_ArgV(R));			// Allow caller to remove their c-string data.
     
     ErrorString_ = emptystr();
-    WhiteSpace_ = JB_CS_Constructor( nil, JB_StrC("\x9\xA\xD\x20"), false );
+//    WhiteSpace_ = JB_CS_Constructor( nil, JB_StrC("\x9\xA\xD\x20"), false );
     JB_FS__FastNew( 0 );						// Stop leak tests catching this.
     JB_Dict__Init();
     JB_Str__LoadGlobals();

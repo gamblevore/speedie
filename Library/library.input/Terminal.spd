@@ -19,7 +19,6 @@ datatype TerminalColor (int)
 	// don't dump ALL the string classes, just the base
 	// TokHan should be internal.
 	// Validator should be embedded (if used)
-	// Charset should be replaced with charprops
 	// flowcontrol can be deleted... i don't know if we need it. Perhaps after getting speedie working.
 // a lot of things to cleanup!
 
