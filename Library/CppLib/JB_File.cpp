@@ -1228,13 +1228,11 @@ int JB_File_DataSet ( JB_File* self, JB_String* Data ) {
 	bool WasOpen = self->Descriptor > STDPICO_FILENO;
 	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false) < 0)
 		return -errno;
-//	JB_File_SizeSet(self, 0); // O_TRUNC should already do this?
-//	JB_File_OffsetSet(self, 0); // necessary as ftruncate doesnt do this.
 	int N = JB_File_Write(self, Data);
-	if (!WasOpen)
-		JB_File_Close(self);
 	if (N >= 0 and N != JB_Str_Length(Data))
 		N = -errno;
+	if (!WasOpen)
+		JB_File_Close(self);
 	return N;
 }
 
