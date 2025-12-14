@@ -12,15 +12,15 @@ function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
 		from = from max 0
 		After = After min .Length
 		while From < After
-			|| b = addr[from++]
-			if find contains p[b]
+			|| pb = p[addr[from++]]|uint|
+			if (1<<pb) & Find|uint|
 				return from-1
 	  else // oof
 		from = from min .length
 		After = After max 0
 		while From > After
-			|| b = addr[--from]
-			if find contains p[b]
+			|| pb = p[addr[--from]]|uint|
+			if (1<<pb) & Find|uint|
 				return from
 
 
@@ -32,16 +32,11 @@ inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |in
 datatype CharSet (uint)
 	linkage
 		numeric false
-			
-	operator contains (|charprop| b, |bool|)
-		inline
-		cpp_part ContainsProp
-		return (1<<b|uint|) & self|uint|
 		
 	operator contains (|string| s, |bool|)
 		cpp_Part ContainsStr
 		inline
-		return s.OutCharSet(self) == -1
+		return s.OutCharSet(self) < 0
 		
 	syntax Access (|uint| b, |bool|)
 		if b <= 255
@@ -49,12 +44,12 @@ datatype CharSet (uint)
 			return (1<<cp) & self|uint|
 	
 	operator Plus (|Charset| C, |charset|)
-		inline
+		inline // selftool uses this
 		return (self|uint| ||| c|uint|)|charset|
 
 	
 	constants
-		|CharProp| 
+		|int| 
 		fInvalid
 		fNull					// 0
 		fUnprintable 			// 1-8, 11, 12, 14-30
@@ -105,7 +100,7 @@ datatype CharSet (uint)
 		Trim			= White + (1<<fNull)
 	
 	module
-		|CharProp[256]| Props
+		|byte[256]| Props
 		CharSet.MakeDefault
 	
 		function MakeDefault
@@ -144,11 +139,4 @@ datatype CharSet (uint)
 			item[0xC0] = fInvalid
 //			item[0xFE] = Invalid // also
 //			item[0xFF] = Invalid
-				
-
-datatype CharProp (uint16)
-	linkage
-		numeric false
-
-	
 
