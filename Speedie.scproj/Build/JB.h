@@ -47,9 +47,7 @@ typedef uint64 ASMReg;
 
 typedef u16 ASMType;
 
-typedef u16 CharProp;
-
-typedef uint CharPropList;
+typedef uint CharSet;
 
 typedef int ClassInfo;
 
@@ -2051,34 +2049,49 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__ASMType_kWhile ((ASMType)51)
 extern ASM SC__ASMType_ReadASM[10];
 extern ASM SC__ASMType_WriteASM[5];
-#define kJB__CharProp_AfterDot ((CharPropList)344)
-#define kJB__CharProp_AfterStatement ((CharPropList)1368)
-#define kJB__CharProp_AfterTmp ((CharProp)10)
-#define kJB__CharProp_Colon ((CharProp)6)
-#define kJB__CharProp_CommaSlash ((CharProp)8)
-#define kJB__CharProp_DotDash ((CharProp)7)
-#define kJB__CharProp_EditorSeparators ((CharProp)11)
-#define kJB__CharProp_EditorSplitter ((CharPropList)2392)
-#define kJB__CharProp_HSpace ((CharProp)4)
-#define kJB__CharProp_Invalid ((CharProp)0)
-#define kJB__CharProp_LettersOnly ((CharPropList)57344)
-#define kJB__CharProp_LettersUnderScore ((CharPropList)57376)
-#define kJB__CharProp_Line ((CharProp)3)
-#define kJB__CharProp_Lower ((CharProp)14)
-#define kJB__CharProp_NameMid ((CharPropList)61472)
-#define kJB__CharProp_Null ((CharProp)1)
-#define kJB__CharProp_Number ((CharProp)12)
-#define JB__CharProp_Props JB__.CharProp_Props
-#define kJB__CharProp_RemainingPunct ((CharProp)9)
-#define kJB__CharProp_SafeInC ((CharPropList)28704)
-#define kJB__CharProp_Trim ((CharPropList)26)
-#define kJB__CharProp_Underscore ((CharProp)5)
-#define kJB__CharProp_Unicode ((CharPropList)32768)
-#define kJB__CharProp_UnicodeByte ((CharProp)15)
-#define kJB__CharProp_Unprintable ((CharProp)2)
-#define kJB__CharProp_Upper ((CharProp)13)
-#define kJB__CharProp_White ((CharPropList)24)
-#define kJB__CharProp_XMLNameMid ((CharPropList)61664)
+#define kJB__CharSet_AfterDot ((CharSet)344)
+#define kJB__CharSet_AfterStatement ((CharSet)1368)
+#define kJB__CharSet_AfterTmp ((CharSet)1024)
+#define kJB__CharSet_Colon ((CharSet)64)
+#define kJB__CharSet_CommaSlash ((CharSet)256)
+#define kJB__CharSet_DotDash ((CharSet)128)
+#define kJB__CharSet_EditorSeparators ((CharSet)2048)
+#define kJB__CharSet_EditorSplitter ((CharSet)2392)
+#define kJB__CharSet_fAfterTmp ((int)10)
+#define kJB__CharSet_fColon ((int)6)
+#define kJB__CharSet_fCommaSlash ((int)8)
+#define kJB__CharSet_fDotDash ((int)7)
+#define kJB__CharSet_fEditorSeparators ((int)11)
+#define kJB__CharSet_fHSpace ((int)4)
+#define kJB__CharSet_fInvalid ((int)0)
+#define kJB__CharSet_fLine ((int)3)
+#define kJB__CharSet_fLower ((int)14)
+#define kJB__CharSet_fNull ((int)1)
+#define kJB__CharSet_fNumber ((int)12)
+#define kJB__CharSet_fRemainingPunct ((int)9)
+#define kJB__CharSet_fUnderscore ((int)5)
+#define kJB__CharSet_fUnicode ((int)15)
+#define kJB__CharSet_fUnprintable ((int)2)
+#define kJB__CharSet_fUpper ((int)13)
+#define kJB__CharSet_HSpace ((CharSet)16)
+#define kJB__CharSet_Invalid ((CharSet)1)
+#define kJB__CharSet_LettersOnly ((CharSet)57344)
+#define kJB__CharSet_LettersUnderScore ((CharSet)57376)
+#define kJB__CharSet_Line ((CharSet)8)
+#define kJB__CharSet_Lower ((CharSet)16384)
+#define kJB__CharSet_NameMid ((CharSet)61472)
+#define kJB__CharSet_Null ((CharSet)2)
+#define kJB__CharSet_Number ((CharSet)4096)
+#define JB__CharSet_Props JB__.CharSet_Props
+#define kJB__CharSet_RemainingPunct ((CharSet)512)
+#define kJB__CharSet_SafeInC ((CharSet)28704)
+#define kJB__CharSet_Trim ((CharSet)26)
+#define kJB__CharSet_Underscore ((CharSet)32)
+#define kJB__CharSet_Unicode ((CharSet)32768)
+#define kJB__CharSet_Unprintable ((CharSet)4)
+#define kJB__CharSet_Upper ((CharSet)8192)
+#define kJB__CharSet_White ((CharSet)24)
+#define kJB__CharSet_XMLNameMid ((CharSet)61664)
 #define kSC__ClassInfo_Banned ((ClassInfo)64)
 #define kSC__ClassInfo_Builtin ((ClassInfo)2048)
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
@@ -2600,7 +2613,7 @@ struct JB_Globals {
 	CompressionStats MzSt_All;
 	MessagePosition Tk_Using;
 	uint64 Mrap_MDummy_[2];
-	CharProp CharProp_Props[256];
+	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
 };
 extern JB_Globals JB__;
@@ -4209,7 +4222,7 @@ bool JB_Tk__WillEnd();
 
 int JB_Tk__WordAfter(int Start);
 
-int JB_Tk__WordAfterSub(int Start, CharPropList Cs);
+int JB_Tk__WordAfterSub(int Start, CharSet Cs);
 
 int JB_Tk__XMLAttribs(Message* XML, int Start);
 
@@ -4834,19 +4847,14 @@ ASMReg SC_ASMType__Unexpected(Assembler* Self, Message* Exp, ASMReg Dest);
 
 
 
-// CharProp
-int JB_CharProp__Init_();
+// CharSet
+bool JB_CharSet_SyntaxAccess(CharSet Self, uint B);
 
-int JB_CharProp__InitCode_();
+int JB_CharSet__Init_();
 
-void JB_CharProp__MakeDefault();
+int JB_CharSet__InitCode_();
 
-
-
-// CharPropList
-bool JB_CharPropList_ContainsStr(CharPropList Self, JB_String* S);
-
-bool JB_CharPropList_SyntaxAccess(CharPropList Self, uint B);
+void JB_CharSet__MakeDefault();
 
 
 
@@ -7528,9 +7536,7 @@ int64 JB_Str_FileSize(JB_String* Self);
 
 JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
-Ind JB_Str_FindProp(JB_String* Self, CharProp Find, int From, int After);
-
-Ind JB_Str_FindPropList(JB_String* Self, CharPropList Find, int From, int After);
+Ind JB_Str_FindCharset(JB_String* Self, CharSet Find, int From, int After);
 
 Ind JB_Str_FindSlash(JB_String* Self, int From);
 
@@ -7598,8 +7604,6 @@ bool SC_Str_OptionBool(JB_String* Self);
 
 int SC_Str_OptionInt(JB_String* Self);
 
-Ind JB_Str_OutPropList(JB_String* Self, CharPropList Find, int From, int After);
-
 FastString* JB_Str_OutputStream(JB_String* Self, bool Clear);
 
 JB_String* JB_Str_Parent(JB_String* Self);
@@ -7664,7 +7668,7 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
 bool SC_Str_trap(JB_String* Self, Message* Msg);
 
-JB_String* JB_Str_Trim(JB_String* Self, CharPropList CS);
+JB_String* JB_Str_Trim(JB_String* Self, CharSet CS);
 
 JB_String* JB_Str_TrimExt(JB_String* Self);
 
@@ -10738,10 +10742,6 @@ inline bool JB_CP_Bool(Codepoint Self);
 
 inline bool JB_CP_In(Codepoint Self, int A, int B);
 
-inline bool JB_CharPropList_ContainsProp(CharPropList Self, CharProp B);
-
-inline CharPropList JB_CharProp_List(CharProp Self);
-
 inline JB_Duration JB_Date_OperatorMinus(Date Self, Date D);
 
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt Self);
@@ -10972,7 +10972,7 @@ inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After);
 
 inline bool JB_Str_IsInt(JB_String* Self);
 
-inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
+inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet Find, int From, int After);
 
 inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
 
@@ -10984,9 +10984,13 @@ inline bool JB_byte_IsUpper(uint /*byte*/ Self);
 
 inline bool SC_Reg_IsInt(ASMReg Self);
 
+inline bool JB_CharSet_ContainsStr(CharSet Self, JB_String* S);
+
 inline JB_File* JB_File__Logs();
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name);
+
+inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
 inline Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M);
 
@@ -11049,15 +11053,6 @@ inline bool JB_CP_Bool(Codepoint Self) {
 
 inline bool JB_CP_In(Codepoint Self, int A, int B) {
 	return ((uint)(Self - A)) <= ((uint)(B - A));
-}
-
-inline bool JB_CharPropList_ContainsProp(CharPropList Self, CharProp B) {
-	//cpp_part;
-	return ((bool)((1 << ((uint)B)) & ((uint)Self)));
-}
-
-inline CharPropList JB_CharProp_List(CharProp Self) {
-	return ((CharPropList)(1 << ((uint)Self)));
 }
 
 inline JB_Duration JB_Date_OperatorMinus(Date Self, Date D) {
@@ -11569,15 +11564,15 @@ inline bool JB_Str_ContainsByte(JB_String* Self, uint /*byte*/ B) {
 }
 
 inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After) {
-	return JB_Str_FindPropList(Self, kJB__CharProp_White, Start, After);
+	return JB_Str_FindCharset(Self, kJB__CharSet_White, Start, After);
 }
 
 inline bool JB_Str_IsInt(JB_String* Self) {
 	return JB_Str_IsIntFrom(Self, 0);
 }
 
-inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
-	return JB_Str_OutPropList(Self, kJB__CharProp_White, Start, After);
+inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet Find, int From, int After) {
+	return JB_Str_FindCharset(Self, (~Find), From, After);
 }
 
 inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self) {
@@ -11616,6 +11611,11 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 	return JB_TC_IsInt(((DataTypeCode)Self));
 }
 
+inline bool JB_CharSet_ContainsStr(CharSet Self, JB_String* S) {
+	//cpp_part;
+	return JB_Str_OutCharSet(S, Self, 0, JB_int__Max()) < 0;
+}
+
 inline JB_File* JB_File__Logs() {
 	return JB_Str_AsFile(JB_LUB[530]);
 }
@@ -11623,6 +11623,10 @@ inline JB_File* JB_File__Logs() {
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
 	//cpp_part;
 	JB_FreeIfDead(JB_Msg_Msg(Self, Fn, Name));
+}
+
+inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
+	return JB_Str_OutCharSet(Self, kJB__CharSet_White, Start, After);
 }
 
 inline Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M) {

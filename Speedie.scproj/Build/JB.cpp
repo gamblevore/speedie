@@ -4341,7 +4341,7 @@ void SC_AC__CppView(Message* Out, SCFunction* Fn) {
 		JB_Incr(_LoopSrcf2);
 		int _Prevf0 = 0;
 		while (((JB_String*)JB_Str_Exists((_LoopSrcf2)))) {
-			Ind _Curr_f1 = JB_Str_FindProp(_LoopSrcf2, kJB__CharProp_Line, _Prevf0, JB_int__Max());
+			Ind _Curr_f1 = JB_Str_FindCharset(_LoopSrcf2, kJB__CharSet_Line, _Prevf0, JB_int__Max());
 			JB_String* S = JB_Str_Range(_LoopSrcf2, _Prevf0, _Curr_f1, false);
 			JB_Incr(S);
 			if (!JB_Str_Exists(S)) {
@@ -5635,7 +5635,7 @@ void SC_LibStability__StabiliseSub(JB_String* Name, Array* List, bool IsFuncs) {
 	JB_Incr(Funcs);
 	JB_String* _tmPf0 = JB_File_ReadAll(Funcs, 134217728, true);
 	JB_Incr(_tmPf0);
-	JB_String* Data = JB_Str_Trim(_tmPf0, (~kJB__CharProp_Trim));
+	JB_String* Data = JB_Str_Trim(_tmPf0, (~kJB__CharSet_Trim));
 	JB_Incr(Data);
 	JB_Decr(_tmPf0);
 	SC_LibStability__UseBank(Data, IsFuncs);
@@ -5680,7 +5680,7 @@ void SC_LibStability__UseBank(JB_String* Data, bool Funcs) {
 	{
 		int _Prevf0 = 0;
 		while (((JB_String*)JB_Str_Exists((Data)))) {
-			Ind _Curr_f1 = JB_Str_FindProp(Data, kJB__CharProp_Line, _Prevf0, JB_int__Max());
+			Ind _Curr_f1 = JB_Str_FindCharset(Data, kJB__CharSet_Line, _Prevf0, JB_int__Max());
 			JB_String* Str = JB_Str_Range(Data, _Prevf0, _Curr_f1, false);
 			JB_Incr(Str);
 			if (JB_Str_ByteValue(Str, 0) != '/') {
@@ -7824,7 +7824,7 @@ bool SC_Ext__Clean() {
 	{
 		int _Prevf0 = 0;
 		while (((JB_String*)JB_Str_Exists((Paths)))) {
-			Ind _Curr_f1 = JB_Str_FindProp(Paths, kJB__CharProp_Line, _Prevf0, JB_int__Max());
+			Ind _Curr_f1 = JB_Str_FindCharset(Paths, kJB__CharSet_Line, _Prevf0, JB_int__Max());
 			JB_String* L = JB_Str_Range(Paths, _Prevf0, _Curr_f1, false);
 			JB_Incr(L);
 			if (JB_Str_Exists(L) and JB_ErrorInt_SyntaxCast(({
@@ -11127,8 +11127,8 @@ int JB_InitCode_() {
 	JB_Constants__InitCode_();
 	//// parser;
 	JB_Tk__InitCode_();
-	//// CharProp;
-	JB_CharProp__InitCode_();
+	//// CharSet;
+	JB_CharSet__InitCode_();
 	//// Random;
 	JB_Rnd__InitCode_();
 	//// FlowControl;
@@ -13513,7 +13513,7 @@ void JB_Tk__AddXMLText(Message* XML, JB_String* S, int Start, int I) {
 	}
 	JB_String* Str = JB_Str_Range(S, Start, I, false);
 	JB_Incr(Str);
-	JB_String* Str2 = JB_Str_Trim(Str, (~kJB__CharProp_Trim));
+	JB_String* Str2 = JB_Str_Trim(Str, (~kJB__CharSet_Trim));
 	JB_Incr(Str2);
 	JB_Decr(Str);
 	JB_String* Str3 = JB_Str_MultiReplaceAll(Str2, JB__Constants_XML_UnEscapeStr, JB_StdErr);
@@ -13570,11 +13570,11 @@ Message* JB_Tk__BeforeRelSub(int Start, bool Mode) {
 }
 
 bool JB_Tk__CanDot() {
-	return JB_CharPropList_SyntaxAccess(kJB__CharProp_AfterDot, JB_Tk__NextByte());
+	return JB_CharSet_SyntaxAccess(kJB__CharSet_AfterDot, JB_Tk__NextByte());
 }
 
 bool JB_Tk__CanStatement() {
-	return JB_CharPropList_SyntaxAccess(kJB__CharProp_AfterStatement, JB_Tk__NextByte());
+	return JB_CharSet_SyntaxAccess(kJB__CharSet_AfterStatement, JB_Tk__NextByte());
 }
 
 Message* JB_Tk__ChainTemporalRels(Message* FirstThing, Message* Opp) {
@@ -13689,7 +13689,7 @@ Message* JB_Tk__DecorateThing(Message* R, int Ops) {
 Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent) {
 	Message* Rz = nil;
 	int After = JB_Tk__Byte((++Start));
-	if (JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, After)) {
+	if (JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, After)) {
 		After = JB_Tk__WordAfter(Start);
 		if (!After) {
 			return nil;
@@ -14357,7 +14357,7 @@ Message* JB_Tk__FixTRels(Message* Self, Message* Last) {
 Message* JB_Tk__fMsgList(int Start, Message* Parent) {
 	int NameStart = Start + 2;
 	int NameAfter = JB_Tk__Byte(NameStart);
-	if (!JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, NameAfter)) {
+	if (!JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, NameAfter)) {
 		return JB_Tk__ErrorAdd(JB_LUB[1833], Start);
 	}
 	NameAfter = JB_Tk__WordAfter(NameStart);
@@ -14474,7 +14474,7 @@ Message* JB_Tk__fQuoteLang(int Start, Message* Parent) {
 Message* JB_Tk__fSDot(int Start, Message* Parent) {
 	if (Start > 0) {
 		uint C = JB_Tk__Byte(Start - 1);
-		if (JB_CharPropList_SyntaxAccess(kJB__CharProp_NameMid, C)) {
+		if (JB_CharSet_SyntaxAccess(kJB__CharSet_NameMid, C)) {
 			return nil;
 		}
 	}
@@ -14484,7 +14484,7 @@ Message* JB_Tk__fSDot(int Start, Message* Parent) {
 Message* JB_Tk__fShebang(int Start, Message* Parent) {
 	Ind S = JB_Tk__NextStart();
 	JB_String* _tmPf0 = JB_Tk__GetData();
-	Ind S2 = JB_Str_FindProp(_tmPf0, kJB__CharProp_Line, S, JB_int__Max());
+	Ind S2 = JB_Str_FindCharset(_tmPf0, kJB__CharSet_Line, S, JB_int__Max());
 	(JB_Tk__NextStartSet(S2));
 	return JB_Tk__NewSkip(Parent, kJB_SyxSheb, Start, S, S2);
 }
@@ -14544,7 +14544,7 @@ Message* JB_Tk__fString(int Start, Message* Parent) {
 				(++NewStrPos);
 			}
 			JB_String* _tmPf2 = JB_Tk__GetData();
-			StrPos = JB_Str_OutPropList(_tmPf2, kJB__CharProp_NameMid, NewStrPos + 1, After);
+			StrPos = JB_Str_OutCharSet(_tmPf2, kJB__CharSet_NameMid, NewStrPos + 1, After);
 			if (!JB_Ind_SyntaxCast(StrPos)) {
 				StrPos = After;
 			}
@@ -14844,7 +14844,7 @@ Message* JB_Tk__GetFuncAfter(Message* Result) {
 
 int JB_Tk__GotoEndOfLine(int From) {
 	JB_String* _tmPf0 = JB_Tk__GetData();
-	(JB_Tk__NextStartSet(JB_Str_FindProp(_tmPf0, kJB__CharProp_Line, From, JB_int__Max())));
+	(JB_Tk__NextStartSet(JB_Str_FindCharset(_tmPf0, kJB__CharSet_Line, From, JB_int__Max())));
 	return JB_Tk__NextStart();
 }
 
@@ -15041,7 +15041,7 @@ int JB_Tk__InitCode_() {
 }
 
 Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr) {
-	Ind BackPos = JB_Str_FindProp(JB_Tk__GetData(), kJB__CharProp_Line, Curr->Position, 0);
+	Ind BackPos = JB_Str_FindCharset(JB_Tk__GetData(), kJB__CharSet_Line, Curr->Position, 0);
 	int Chin = ((int)Curr->Indent);
 	while (JB_Msg_IndentScore(Output) > Chin) {
 		if (JB_Msg_EqualsSyx(Output, kJB_SyxArg)) {
@@ -15299,7 +15299,7 @@ Message* JB_Tk__NumberSub(int Start, int RealStart) {
 	int StartAt = JB_Str_IsHexLike(JB_Tk__GetData(), Start);
 	Ind UnitPos2 = -1;
 	if (StartAt == 0) {
-		UnitPos2 = JB_Str_OutPropList(JB_Tk__GetData(), kJB__CharProp_LettersOnly, After, Start + StartAt);
+		UnitPos2 = JB_Str_OutCharSet(JB_Tk__GetData(), kJB__CharSet_LettersOnly, After, Start + StartAt);
 	}
 	if (!JB_Ind_SyntaxCast(UnitPos2)) {
 		UnitPos2 = (After - 1);
@@ -15316,7 +15316,7 @@ Message* JB_Tk__NumberSub(int Start, int RealStart) {
 
 int JB_Tk__NumEnd(JB_String* NumStr, int Start) {
 	int Rz = 0;
-	Ind Dot = JB_Str_OutPropList(NumStr, kJB__CharProp_NameMid, Start, JB_int__Max());
+	Ind Dot = JB_Str_OutCharSet(NumStr, kJB__CharSet_NameMid, Start, JB_int__Max());
 	if (!JB_Ind_SyntaxCast(Dot)) {
 		return JB_Str_Length(NumStr);
 	}
@@ -15327,7 +15327,7 @@ int JB_Tk__NumEnd(JB_String* NumStr, int Start) {
 	if (!JB_byte_IsInt(AfterDot)) {
 		return Dot;
 	}
-	Rz = JB_Str_OutPropList(NumStr, kJB__CharProp_NameMid, Dot + 1, JB_int__Max());
+	Rz = JB_Str_OutCharSet(NumStr, kJB__CharSet_NameMid, Dot + 1, JB_int__Max());
 	if (!Rz) {
 		Rz = JB_Str_Length(NumStr);
 	}
@@ -15561,7 +15561,7 @@ Message* JB_Tk__ReRoute(Message* Output, Message* Cnj, Message* F) {
 }
 
 Message* JB_Tk__ThingXMLAtt(int Start, Message* Parent) {
-	int Name = JB_Tk__WordAfterSub(Start, kJB__CharProp_XMLNameMid);
+	int Name = JB_Tk__WordAfterSub(Start, kJB__CharSet_XMLNameMid);
 	return JB_Tk__NewParent(Parent, kJB_SyxXAtt, Start, Name);
 }
 
@@ -15634,13 +15634,13 @@ bool JB_Tk__WillEnd() {
 }
 
 int JB_Tk__WordAfter(int Start) {
-	return JB_Tk__WordAfterSub(Start, kJB__CharProp_NameMid);
+	return JB_Tk__WordAfterSub(Start, kJB__CharSet_NameMid);
 }
 
-int JB_Tk__WordAfterSub(int Start, CharPropList Cs) {
+int JB_Tk__WordAfterSub(int Start, CharSet Cs) {
 	int N = JB_Str_Length(JB_Tk__GetData());
 	if (Start < N) {
-		Ind After = JB_Str_OutPropList(JB_Tk__GetData(), Cs, Start, JB_int__Max());
+		Ind After = JB_Str_OutCharSet(JB_Tk__GetData(), Cs, Start, JB_int__Max());
 		if (!JB_Ind_SyntaxCast(After)) {
 			After = N;
 		}
@@ -15669,7 +15669,7 @@ int JB_Tk__XMLAttribs(Message* XML, int Start) {
 			JB_Decr(AllAtts);
 			return I;
 		}
-		if (!JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, C)) {
+		if (!JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, C)) {
 			break;
 		}
 		Message* Attr = JB_Tk__ThingXMLAtt(I, AllAtts);
@@ -15734,12 +15734,12 @@ Ind JB_Tk__XMLWordEnd(int From) {
 	Ind Rz = -1;
 	JB_String* _tmPf0 = JB_Tk__GetData();
 	uint B = JB_Str_ByteValue(_tmPf0, From);
-	if (!JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, B)) {
+	if (!JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, B)) {
 		JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[847], From));
 	}
 	 else {
 		JB_String* _tmPf1 = JB_Tk__GetData();
-		Rz = JB_Str_OutPropList(_tmPf1, kJB__CharProp_XMLNameMid, From + 1, JB_int__Max());
+		Rz = JB_Str_OutCharSet(_tmPf1, kJB__CharSet_XMLNameMid, From + 1, JB_int__Max());
 		if (Rz == -1) {
 			JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[848], JB_Tk__NextStart()));
 		}
@@ -17787,27 +17787,35 @@ ASMReg SC_ASMType__Unexpected(Assembler* Self, Message* Exp, ASMReg Dest) {
 }
 
 
-int JB_CharProp__Init_() {
+bool JB_CharSet_SyntaxAccess(CharSet Self, uint B) {
+	if (B <= 255) {
+		uint Cp = ((uint)JB__CharSet_Props[B]);
+		return ((bool)((1 << Cp) & ((uint)Self)));
+	}
+	return false;
+}
+
+int JB_CharSet__Init_() {
 	{
 	}
 	;
 	return 0;
 }
 
-int JB_CharProp__InitCode_() {
+int JB_CharSet__InitCode_() {
 	{
 	}
 	;
-	JB_CharProp__MakeDefault();
+	JB_CharSet__MakeDefault();
 	return 0;
 }
 
-void JB_CharProp__MakeDefault() {
-	CharProp* Item = (&JB__CharProp_Props[0]);
+void JB_CharSet__MakeDefault() {
+	byte* Item = (&JB__CharSet_Props[0]);
 	{
 		int S = 0;
 		while (S < 32) {
-			Item[S] = kJB__CharProp_Unprintable;
+			Item[S] = kJB__CharSet_fUnprintable;
 			(++S);
 		};
 	}
@@ -17817,7 +17825,7 @@ void JB_CharProp__MakeDefault() {
 		int __Endf1 = _LoopSrcf3[1];
 		int S = _LoopSrcf3[0];
 		while (S < __Endf1) {
-			Item[S] = kJB__CharProp_RemainingPunct;
+			Item[S] = kJB__CharSet_fRemainingPunct;
 			(++S);
 		};
 	}
@@ -17827,7 +17835,7 @@ void JB_CharProp__MakeDefault() {
 		int __Endf4 = _LoopSrcf6[1];
 		int S = _LoopSrcf6[0];
 		while (S < __Endf4) {
-			Item[S] = kJB__CharProp_UnicodeByte;
+			Item[S] = kJB__CharSet_fUnicode;
 			(++S);
 		};
 	}
@@ -17837,7 +17845,7 @@ void JB_CharProp__MakeDefault() {
 		int __Endf7 = _LoopSrcf9[1];
 		int S = _LoopSrcf9[0];
 		while (S < __Endf7) {
-			Item[S] = kJB__CharProp_Number;
+			Item[S] = kJB__CharSet_fNumber;
 			(++S);
 		};
 	}
@@ -17847,8 +17855,8 @@ void JB_CharProp__MakeDefault() {
 		int __Endf10 = _LoopSrcf12[1];
 		int S = _LoopSrcf12[0];
 		while (S < __Endf10) {
-			Item[S] = kJB__CharProp_Upper;
-			Item[S + 32] = kJB__CharProp_Lower;
+			Item[S] = kJB__CharSet_fUpper;
+			Item[S + 32] = kJB__CharSet_fLower;
 			(++S);
 		};
 	}
@@ -17861,7 +17869,7 @@ void JB_CharProp__MakeDefault() {
 		JB_Decr(_LoopSrcf15);
 		while (_Startf13 < _Endf14) {
 			uint S = _Startf13[0];
-			Item[S] = kJB__CharProp_AfterTmp;
+			Item[S] = kJB__CharSet_fAfterTmp;
 			(++_Startf13);
 		};
 	}
@@ -17874,37 +17882,23 @@ void JB_CharProp__MakeDefault() {
 		JB_Decr(_LoopSrcf19);
 		while (_Startf17 < _Endf18) {
 			uint S = _Startf17[0];
-			Item[S] = kJB__CharProp_EditorSeparators;
+			Item[S] = kJB__CharSet_fEditorSeparators;
 			(++_Startf17);
 		};
 	}
 	;
-	Item[0] = kJB__CharProp_Null;
-	Item[9] = kJB__CharProp_HSpace;
-	Item[10] = kJB__CharProp_Line;
-	Item[13] = kJB__CharProp_Line;
-	Item[32] = kJB__CharProp_HSpace;
-	Item['_'] = kJB__CharProp_Underscore;
-	Item['-'] = kJB__CharProp_DotDash;
-	Item[':'] = kJB__CharProp_Colon;
-	Item['.'] = kJB__CharProp_DotDash;
-	Item[','] = kJB__CharProp_CommaSlash;
-	Item['\\'] = kJB__CharProp_CommaSlash;
-	Item[192] = kJB__CharProp_Invalid;
-}
-
-
-bool JB_CharPropList_ContainsStr(CharPropList Self, JB_String* S) {
-	//cpp_part;
-	return JB_Str_OutPropList(S, Self, 0, JB_int__Max()) == -1;
-}
-
-bool JB_CharPropList_SyntaxAccess(CharPropList Self, uint B) {
-	if (B <= 255) {
-		uint Cp = ((uint)JB__CharProp_Props[B]);
-		return ((bool)((1 << Cp) & ((uint)Self)));
-	}
-	return false;
+	Item[0] = kJB__CharSet_fNull;
+	Item[9] = kJB__CharSet_fHSpace;
+	Item[10] = kJB__CharSet_fLine;
+	Item[13] = kJB__CharSet_fLine;
+	Item[32] = kJB__CharSet_fHSpace;
+	Item['_'] = kJB__CharSet_fUnderscore;
+	Item['-'] = kJB__CharSet_fDotDash;
+	Item[':'] = kJB__CharSet_fColon;
+	Item['.'] = kJB__CharSet_fDotDash;
+	Item[','] = kJB__CharSet_fCommaSlash;
+	Item['\\'] = kJB__CharSet_fCommaSlash;
+	Item[192] = kJB__CharSet_fInvalid;
 }
 
 
@@ -22036,7 +22030,7 @@ void JB_TerminalDisplay_FrameText(TerminalDisplay* Self, JB_String* S, ivec4 Fra
 	{
 		int _Prevf2 = 0;
 		while (((JB_String*)JB_Str_Exists((S)))) {
-			Ind _Curr_f3 = JB_Str_FindProp(S, kJB__CharProp_Line, _Prevf2, JB_int__Max());
+			Ind _Curr_f3 = JB_Str_FindCharset(S, kJB__CharSet_Line, _Prevf2, JB_int__Max());
 			JB_String* L = JB_Str_Range(S, _Prevf2, _Curr_f3, false);
 			JB_Incr(L);
 			JB_TerminalDisplay_SyntaxAppend(Self, L, P, TextCol);
@@ -28979,7 +28973,7 @@ void SC_FS_CArrayAddB(FastString* Self, uint /*byte*/ B) {
 	}
 	 else {
 		JB_FS_AppendByte2(Self, '\'');
-		if (JB_CharPropList_SyntaxAccess(kJB__CharProp_SafeInC, B)) {
+		if (JB_CharSet_SyntaxAccess(kJB__CharSet_SafeInC, B)) {
 			JB_FS_AppendByte2(Self, B);
 		}
 		 else {
@@ -32276,23 +32270,18 @@ JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation) {
 	return nil;
 }
 
-Ind JB_Str_FindProp(JB_String* Self, CharProp Find, int From, int After) {
-	//cpp_part;
-	return JB_Str_FindPropList(Self, JB_CharProp_List(Find), From, After);
-}
-
-Ind JB_Str_FindPropList(JB_String* Self, CharPropList Find, int From, int After) {
+Ind JB_Str_FindCharset(JB_String* Self, CharSet Find, int From, int After) {
 	//cpp_part;
 	if ((From < 0) or (After < 0)) {
 	}
-	CharProp* P = (&JB__CharProp_Props[0]);
+	byte* P = (&JB__CharSet_Props[0]);
 	byte* Addr = Self->Addr;
 	if (From < After) {
 		From = JB_int_OperatorMax(From, 0);
 		After = JB_int_OperatorMin(After, JB_Str_Length(Self));
 		while (From < After) {
-			uint B = Addr[From++];
-			if (JB_CharPropList_ContainsProp(Find, P[B])) {
+			uint Pb = ((uint)P[Addr[From++]]);
+			if ((1 << Pb) & ((uint)Find)) {
 				return From - 1;
 			}
 		};
@@ -32301,8 +32290,8 @@ Ind JB_Str_FindPropList(JB_String* Self, CharPropList Find, int From, int After)
 		From = JB_int_OperatorMin(From, JB_Str_Length(Self));
 		After = JB_int_OperatorMax(After, 0);
 		while (From > After) {
-			uint B = Addr[(--From)];
-			if (JB_CharPropList_ContainsProp(Find, P[B])) {
+			uint Pb = ((uint)P[Addr[(--From)]]);
+			if ((1 << Pb) & ((uint)Find)) {
 				return From;
 			}
 		};
@@ -32441,7 +32430,7 @@ bool SC_Str_IsOKForImport(JB_String* Self) {
 		JB_SetRef(X, JB_Str_Range(X, (1), JB_int__Max(), false));
 	};
 	uint X0 = JB_Str_First(X);
-	if ((X0 == 0) or ((X0 == '.') or JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, X0))) {
+	if ((X0 == 0) or ((X0 == '.') or JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, X0))) {
 		Rz = true;
 	}
 	 else {
@@ -32554,7 +32543,7 @@ Ind JB_Str_JBFind(JB_String* Self, uint /*byte*/ Find, int Off, int After) {
 					break;
 				}
 				uint Nxt = JB_Str_ByteValue(Self, Off);
-				if (!(((Nxt == '{') or (Nxt == '.')) or JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, Nxt))) {
+				if (!(((Nxt == '{') or (Nxt == '.')) or JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, Nxt))) {
 					continue;
 				}
 			}
@@ -32742,33 +32731,6 @@ int SC_Str_OptionInt(JB_String* Self) {
 		return 1;
 	}
 	return JB_Str_Int(Self);
-}
-
-Ind JB_Str_OutPropList(JB_String* Self, CharPropList Find, int From, int After) {
-	//cpp_part;
-	if ((From < 0) or (After < 0)) {
-	}
-	CharProp* P = (&JB__CharProp_Props[0]);
-	byte* Addr = Self->Addr;
-	if (From < After) {
-		From = JB_int_OperatorMax(From, 0);
-		After = JB_int_OperatorMin(After, JB_Str_Length(Self));
-		while (From < After) {
-			if (!JB_CharPropList_ContainsProp(Find, P[Addr[From++]])) {
-				return From - 1;
-			}
-		};
-	}
-	 else {
-		From = JB_int_OperatorMin(From, JB_Str_Length(Self));
-		After = JB_int_OperatorMax(After, 0);
-		while (From > After) {
-			if (!JB_CharPropList_ContainsProp(Find, P[Addr[(--From)]])) {
-				return From;
-			}
-		};
-	}
-	return -1;
 }
 
 FastString* JB_Str_OutputStream(JB_String* Self, bool Clear) {
@@ -33282,12 +33244,12 @@ bool SC_Str_trap(JB_String* Self, Message* Msg) {
 	return false;
 }
 
-JB_String* JB_Str_Trim(JB_String* Self, CharPropList CS) {
+JB_String* JB_Str_Trim(JB_String* Self, CharSet CS) {
 	if (JB_Str_Exists(Self)) {
 		JB_DoAt(1);
-		Ind First = JB_Str_FindPropList(Self, CS, 0, JB_int__Max());
+		Ind First = JB_Str_FindCharset(Self, CS, 0, JB_int__Max());
 		if (JB_Ind_SyntaxCast(First)) {
-			Ind Second = JB_Str_FindPropList(Self, CS, JB_int__Max(), 0);
+			Ind Second = JB_Str_FindCharset(Self, CS, JB_int__Max(), 0);
 			return JB_Str_Range(Self, First, Second + 1, false);
 		}
 	}
@@ -33373,7 +33335,7 @@ JB_String* SC_Str_UnicodeSafeName(JB_String* Self, FastString* Fs_in) {
 		byte* _Endf1 = _Startf0 + JB_Str_Length(Self);
 		while (_Startf0 < _Endf1) {
 			uint S = _Startf0[0];
-			if (JB_CharPropList_SyntaxAccess(kJB__CharProp_SafeInC, S)) {
+			if (JB_CharSet_SyntaxAccess(kJB__CharSet_SafeInC, S)) {
 				JB_FS_AppendByte2(Fs, S);
 			}
 			 else {
@@ -36118,7 +36080,7 @@ void SC_Msg_Clean(Message* Self, bool Erl) {
 				 else if ((F == kJB_SyxOpp) and SC_Msg_OppExpand(Curr)) {
 					0;
 				}
-				 else if (JB_CharPropList_SyntaxAccess(kJB__CharProp_LettersUnderScore, JB_Str_First(Curr->Name))) {
+				 else if (JB_CharSet_SyntaxAccess(kJB__CharSet_LettersUnderScore, JB_Str_First(Curr->Name))) {
 					JB_SetRef(Curr->Name, JB_Str_LowerCase(Curr->Name));
 				}
 			}
@@ -42844,7 +42806,7 @@ FatASM* SC_Msg_TIME(Message* Self, ASMReg R1, ASMReg R2) {
 
 void JB_Msg_Tmp__(Message* Self, FastString* Fs) {
 	JB_String* N = Self->Name;
-	if (JB_Str_Exists(N) and ((JB_CharPropList_ContainsStr(kJB__CharProp_NameMid, N)) and (!(JB_byte_IsInt(JB_Str_First(N)))))) {
+	if (JB_Str_Exists(N) and ((JB_CharSet_ContainsStr(kJB__CharSet_NameMid, N)) and (!(JB_byte_IsInt(JB_Str_First(N)))))) {
 		JB_FS_AppendString(Fs, N);
 	}
 	 else {
@@ -49227,8 +49189,8 @@ void JB_Err_GrabLine(JB_Error* Self, FastString* Fs, bool Usecolor) {
 		return;
 	}
 	JB_FS_AppendByte(Fs, '\n');
-	Ind Start = JB_Str_FindProp(D, kJB__CharProp_Line, Self->Position, 0) + 1;
-	Ind Finish = JB_Str_FindProp(D, kJB__CharProp_Line, (Self->Position), JB_int__Max());
+	Ind Start = JB_Str_FindCharset(D, kJB__CharSet_Line, Self->Position, 0) + 1;
+	Ind Finish = JB_Str_FindCharset(D, kJB__CharSet_Line, (Self->Position), JB_int__Max());
 	if (Finish == -1) {
 		Finish = (JB_Str_Length(D) + 1);
 	}
@@ -49305,7 +49267,7 @@ bool JB_Err_LineIdentifiers(JB_Error* Self, FastString* Fs, JB_String* Path) {
 	}
 	JB_FS_AppendInt32(Fs, JB_Err_LinePos(Self, D));
 	JB_FS_AppendByte2(Fs, ':');
-	Ind Start = JB_Str_FindProp(D, kJB__CharProp_Line, Self->Position, 0);
+	Ind Start = JB_Str_FindCharset(D, kJB__CharSet_Line, Self->Position, 0);
 	JB_Decr(D);
 	JB_FS_AppendInt32(Fs, Self->Position - Start);
 	JB_FS_AppendByte2(Fs, ':');
@@ -49342,7 +49304,7 @@ JB_String* JB_Err_Render(JB_Error* Self, FastString* Fs_in) {
 			JB_Incr(_LoopSrcf2);
 			int _Prevf0 = 0;
 			while (((JB_String*)JB_Str_Exists((_LoopSrcf2)))) {
-				Ind _Curr_f1 = JB_Str_FindProp(_LoopSrcf2, kJB__CharProp_Line, _Prevf0, JB_int__Max());
+				Ind _Curr_f1 = JB_Str_FindCharset(_LoopSrcf2, kJB__CharSet_Line, _Prevf0, JB_int__Max());
 				JB_String* Fn = JB_Str_Range(_LoopSrcf2, _Prevf0, _Curr_f1, false);
 				JB_Incr(Fn);
 				JB_FS_AppendInfo(Fs, JB_LUB[608], Fn);
@@ -49476,8 +49438,8 @@ void SC_Err_SCGrabLine(JB_Error* Self, FastString* Fs, bool Usecolor) {
 		JB_Decr(D);
 		return;
 	}
-	Ind Start = JB_Str_FindProp(D, kJB__CharProp_Line, Self->Position, 0) + 1;
-	Ind Finish = JB_Str_FindProp(D, kJB__CharProp_Line, (Self->Position), JB_int__Max());
+	Ind Start = JB_Str_FindCharset(D, kJB__CharSet_Line, Self->Position, 0) + 1;
+	Ind Finish = JB_Str_FindCharset(D, kJB__CharSet_Line, (Self->Position), JB_int__Max());
 	if (Finish == -1) {
 		Finish = (JB_Str_Length(D) + 1);
 	}
@@ -49525,7 +49487,7 @@ void SC_Err_SCLineIdentifiers(JB_Error* Self, FastString* Fs, JB_String* Data) {
 		}
 		JB_FS_AppendInt32(Fs, (_tmPf0));
 		JB_FS_AppendByte(Fs, ':');
-		Ind Start = JB_Str_FindProp(Data, kJB__CharProp_Line, Self->Position, 0);
+		Ind Start = JB_Str_FindCharset(Data, kJB__CharSet_Line, Self->Position, 0);
 		JB_FS_AppendInt32(Fs, Self->Position - Start);
 		JB_FS_AppendByte(Fs, ':');
 	}
@@ -59744,4 +59706,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 344690230565174638 -4011421123150902962
+// 6615743330854194446 -4011421123150902962
