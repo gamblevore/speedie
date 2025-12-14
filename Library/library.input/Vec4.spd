@@ -96,7 +96,7 @@ datatype vec4
 		trin (18, SGN)
 		cpp_wrapper JB_vec4_CopySign
 	
-	+"f\75nction" Clamp (|vec4| Low, |vec4| High, |vec4|)
+	+'f\75nction' Clamp (|vec4| Low, |vec4| High, |vec4|)
 		trin (19, CLM)	// clamp	
 		cpp_wrapper JB_vec4_Clamp
 

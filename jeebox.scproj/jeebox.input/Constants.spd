@@ -47,15 +47,6 @@ Module Jeebox
 	|dictionary of string| JS_UnEscapeStr
 	|dictionary of string| XML_UnEscapeStr
 	|dictionary of string| EscapeChr
-
-// try removing these two first.
-//	|| XMLWordMiddle	= "AZaz09__::..--".UniCS
-
-	|| CSWordMiddle		= charprop.NameMid
-	|| CSNum			= jeebox.CSWordMiddle
-	|| CSLettersOnly    = charprop.LettersOnly
-	|| CSWordStart		= charprop.LettersUnderScore
-	|| CSLine			= charprop.Line
 	
 // Is there any pattern here? can we subdivide these into simple overlapping groups?
 	|| CSAfterDot		= " ,:\t\n\r\\".charset(false)
@@ -64,14 +55,9 @@ Module Jeebox
 	|| CSAfterStatement	= " ,:\t\n\r\\'`\"{#\$%".charset(false)
 
 // this isn't even in jeebox. Just take it out... anyway possible!
-	|| EditorWrapSplit	= " ,:\t\n\r\\\f-^+/*;<>=".charset(false) // not actually speedie
+	|| EditorWrapSplit	= " ,:\t\n\r\-^+/*;<>=".charset(false) // not actually speedie
 
 	.InitConstants
-
-
-	libinternal string.UniCS (|charset!|)
-		// all valid unicode-ranges
-		return (self + #(80BFC2F4)#).charset
 
 
 	libinternal AddEscape (|byte| i, |faststring| fs)
@@ -127,7 +113,7 @@ Module Jeebox
 				if find == '$'
 					if off >= after: exit
 					|| nxt = self[off]
-					ifn (nxt == '{' or '.') or jeebox.CSWordStart[nxt]
+					ifn (nxt == '{' or '.') or charprop.LettersUnderScore[nxt]
 						continue
 				return off - 1
 	

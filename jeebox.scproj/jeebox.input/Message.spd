@@ -169,7 +169,7 @@ Message is also:
 	syx Tmp (Statement)
 		Opt NoRefCounts
 		|| n = .name
-		if n and (jeebox.CSWordMiddle contains n) and !(n[].IsInt)
+		if n and (charprop.NameMid contains n) and !(n[].IsInt)
 			fs <~ n // a lot of fuss for one tmp.
 		  else
 			fs <~ '+'

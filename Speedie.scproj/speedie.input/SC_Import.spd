@@ -217,7 +217,7 @@ class SCImport
 			X = X[1...]
 		
 		|| x0 = x[]
-		if (X0 == 0) or (x0 == '.') or Jeebox.CSWordStart[x0]
+		if (X0 == 0) or (x0 == '.') or charprop.LettersUnderScore[x0]
 			rz = true
 		  else
 			error  (x, "Invalid path")

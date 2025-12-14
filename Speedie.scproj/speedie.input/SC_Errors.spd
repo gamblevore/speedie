@@ -143,8 +143,8 @@ extend Error
 		|| d = .SCOriginalData	#require
 		require .HasPosition
 
-		|| Start  = d.find( jeebox.csline, .Position, 0	) + 1
-		|| Finish = d.find( jeebox.csline, .Position... )
+		|| Start  = d.find( charprop.Line, .Position, 0	) + 1
+		|| Finish = d.find( charprop.Line, .Position... )
 		if (Finish == -1)
 			Finish = D.Length + 1
 		
@@ -188,7 +188,7 @@ extend Error
 			fs <~ (.SCLineCount	 #require)
 			fs <~ ":"
 
-			|| Start = Data.find( jeebox.csline, .Position, 0 )
+			|| Start = Data.find( charprop.Line, .Position, 0 )
 			fs <~ .Position - Start
 			fs <~ ":"
 

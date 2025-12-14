@@ -248,14 +248,14 @@ class FileRow (ListViewRow)
 			if p < 0
 				exit
 			i = r.x2
-			|| after  = t.find(Jeebox.CSLine, i, i+30)   ??  (i+30)
-			|| before = t.find(Jeebox.CSLine, p, p-30 max 0)   ??  (p-10)
+			|| after  = t.find(charprop.Line, i, i+30)   ??  (i+30)
+			|| before = t.find(charprop.Line, p, p-30 max 0)   ??  (p-10)
 			|| s = t[before, after]
 			if DoRepl or (lastbefore != before)
 				LastBefore = before
 				
 				if !text[0].iswhite
-					s = s.trim.remove(jeebox.csline)
+					s = s.trim.remove(charprop.Line)
 				|| result = error(nil, ErrorSeverity.OK)
 				parent ?= .FindAllParent(FoundList)
 				parent <~ result

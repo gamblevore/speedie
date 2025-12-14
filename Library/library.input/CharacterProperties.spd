@@ -118,23 +118,27 @@ datatype CharProp (uint16)
 		Unprintable 		// 1-8, 11, 12, 14-30
 		Line				// nl, rt
 		HSpace				// space, tab
-		Punct1				// +/*&%|~^$=@!()[]{}<>?/\`"';
-		Punct2				// .-:
+		Punct1				// &|~@!()[]}?\
+		Punct2				// space   '`\"{#\$%		// csafterstatement
+		Punct3				// -^+/*;<>= // 
+		Punct4				// white, "\\,:"			// csafterdot
+		PunctXML			// .-:
 		Number				// 0123456789
 		Underscore			// _
 		Upper				// A-Z
 		Lower				// a-z
 		UnicodeByte			// 128+
 
+
 		|CharPropList| 
 		NumMid			= (1<<Upper) + (1<<Lower) + (1<<UnderScore) + (1<<Number)
 		Unicode			= (1<<UnicodeByte)
-		LettersOnly 	= (1<<Upper) + (1<<Lower) + Unicode
-		LettersUnderScore= (1<<Underscore) + LettersOnly
+		LettersOnly 	= Unicode + (1<<Upper) + (1<<Lower) 
+		LettersUnderScore= LettersOnly+ (1<<Underscore) 
 		NameMid			= LettersUnderScore + (1<<Number)
-		XMLNameMid		= NameMid + (1<<Punct2)
+		XMLNameMid		= NameMid + (1<<PunctXML)
 		White			= (1<<Line) + (1<<HSpace)
-		Punct			= (1<<Punct1) + (1<<Punct2)
+		Punct			= (1<<Punct1) + (1<<PunctXML)
 
 	operator Plus (|charprop| p, |charproplist|)
 		inline
@@ -190,9 +194,9 @@ datatype CharProp (uint16)
 			item[32] = HSpace
 
 			item['_'] = charprop.Underscore
-			item['-'] = punct2
-			item[':'] = punct2
-			item['.'] = punct2
+			item['-'] = PunctXML
+			item[':'] = PunctXML
+			item['.'] = PunctXML
 
 ///			item[0x7f] = Invalid // not set above
 			item[0xC0] = Invalid

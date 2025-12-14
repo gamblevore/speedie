@@ -31,7 +31,7 @@ class Anagrams
 			return s == "i" or "a"
 			
 		function Find (|string| s, |dictionary of string|)
-			s = s.Remove(~jeebox.CSLettersOnly)
+			s = s.Remove(~charprop.LettersOnly)
 			if !.d
 				|| data = ""
 				using "read":  data = file.words.ReadAll
