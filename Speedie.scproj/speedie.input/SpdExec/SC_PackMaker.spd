@@ -12,7 +12,7 @@ module PackMaker
 	|int|					PackGlobSize
 	|int|					LibGlobSize
 	|HairyMan|				PackSaved
-	|hairyman|				LibSaved
+//	|hairyman|				LibSaved
 	
 	
 	libinternal scfunction.NeedsLibExport (|bool|)
