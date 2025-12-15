@@ -1124,7 +1124,7 @@ function ASMFail (|scfunction| fn, |message?| ret,  |message|)
 function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
 	// Not safe to continue (At least in ASM) if theres an error
-/	|| err = fn.savederror
+	|| err = fn.savederror
 		StdErr <~ err
 		return nil
 	
@@ -1440,6 +1440,7 @@ function message.IsModuleType (|bool|)
 
 	
 function message.FindPos (|int| fr, |int| len, |message|)
+	opt norefcounts
 	return  .FindPosSub(fr, len, true)  ??  .FindPossub(fr, len, false)
 
 

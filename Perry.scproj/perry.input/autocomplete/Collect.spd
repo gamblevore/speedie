@@ -1,6 +1,6 @@
 
 
-function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |date|)
+function PerryIDE.MaybeSendMessage (|string| cmd, |message| where,  |string| name="", |string| reason="", |date|)
 	#!sendmsg, msgsend, sendcmd, cmdsend
 	|| fn = where.Func
 	.SectionKeyTime = nil
