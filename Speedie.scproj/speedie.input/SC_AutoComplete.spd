@@ -1231,7 +1231,7 @@ function scfunction.RenderSheBless (|string|)
 			if s.func == @sheb
 				s.remove
 		rz = .render
-		.SourceArg = b
+		.SourceArg = a
 
 	
 function CppView (|message| out, |scfunction| fn)
