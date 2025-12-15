@@ -277,13 +277,12 @@ Heres the same in speedie:
 
 Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors. Also, we pass `File.ExpectExists` (an integer constant containing bit-flags) to tell Speedie to create an error if the file does not.
 
-Or we can just do this:
+Or we can just do this (use the function `string.ReadFile`):
 
     main
         || f = "file.txt".ReadFile(File.ExpectExists)
             printline f
 
-We can use be standard builtin `string.ReadFile` function.
 
 Neat huh?
 
