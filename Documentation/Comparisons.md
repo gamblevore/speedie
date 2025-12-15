@@ -274,7 +274,7 @@ Heres the same in speedie:
             printline f
 
 
-Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors. Also, we pass `File.ExpectExists` to tell Speedie to create an error if the file does not.
+Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors. Also, we pass `File.ExpectExists` (an integer constant containing bit-flags) to tell Speedie to create an error if the file does not.
 
 Using ReadAll will not create an empty file. So it does the same as the Go code. No need to print the error to `stderr`, as Speedie already does that on exit!
 

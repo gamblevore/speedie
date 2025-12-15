@@ -16,11 +16,9 @@ main (|int| amount)
 
 
 
+// This is the config area. Used here just to make the example more fun!
+// Upon pressing command-R in perry, perry will ask the question below:
 
-
-
-// This is the config area. Upon pressing command-R in perry, you will see this question
-// It helps make this example more fun!
 conf
 	perry_args "args\n\t'how many bananas'?"
 
