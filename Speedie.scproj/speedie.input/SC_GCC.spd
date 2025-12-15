@@ -214,8 +214,8 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.appendwords("-L/usr/local/lib/")
 	rz.appendwords("-I /usr/local/include")
 	if platform.osx // OSX likes playing hide and seek
-		rz.appendwords("-F/Library/Frameworks  -framework Cocoa")
 		if SC_Targets..gui or linkage.interpreter
+			rz.appendwords("-F/Library/Frameworks  -framework Cocoa")
 			rz.appendwords("-rpath @executable_path/../Frameworks")
 		rz.appendwords("-rpath ~/Library/Frameworks  -rpath $spdroot/Library  -rpath /Library/Frameworks")
 	// god c++ is so crappy. you gotta do all this shit just to make anything work?
@@ -290,7 +290,8 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
-	|| TmpFol = Output.MakeAndGoInto
+	|| TmpFol = Output.MakeAndGoInto 
+	
 	|| Cpps = .CollectCppsInto( Input, TmpFol )
 	return .TransCompileWrap(cpps)
 
