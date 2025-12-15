@@ -567,8 +567,8 @@ function File.TestSpeedie (|string| v, |bool|)
 
 	|| TestProd = compiler.SpeedieDir("Terminal/SpeedieTest" + v)
 	testprod.mustexist("Compile Speedie")	
-	print TransCompiler.TmpOut(v).ReadFile
-	|| test_err = TransCompiler.TmpErr(v).ReadFile
+	print TransCompiler.TmpOut(v).Readall
+	|| test_err = TransCompiler.TmpErr(v).ReadAll
 	if test_Err.length
 		error test_err // is this even used anymore?
 
