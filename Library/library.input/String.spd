@@ -51,7 +51,7 @@ class String
 		return .find(CharSet.white, start, after)
 
 	inline OutWhite (|int|Start=0, |int|After=int.max, |ind|)
-		return .outcharset(CharSet.white, start, after)
+		return .find(~CharSet.white, start, after)
 	
 
 
@@ -220,12 +220,12 @@ class String
 	function Trim (|CharSet| CS = ~CharSet.Trim, |string|)
 		nil self
 		if self
-/			|| First = .find(CS)
+			|| First = .find(CS)
 				|| Second = .find(CS, int.max, 0) // assume it must be found
 				return self[first, second+1]
 
 	
-	function TrimStart (|string| s,  |string|)
+	function TrimStart (|string| s, |string|)
 		|| i = 0
 		if self[i, s]
 			i += s.length
