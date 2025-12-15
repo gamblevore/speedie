@@ -266,8 +266,9 @@ Heres the same in speedie:
 
     function ReadFileExample (|string| path, |StringThatWasReadSafely|)
         || f = path.file
-        return f.ReadAll(File.ExpectExists) // Reports errors upon any failiure.
-        // f.ReadAll will open the file (if not already open). Also reports errors upon failiure.
+        return f.ReadAll(File.ExpectExists)
+        // File.ExpectExists is a bit flag telling speedie to report missing files as errors.
+        // If we removed this param and left it as its default of 0, upon calling f.Readall, any missing file would create an error, and return "" (non-nil).
     
     main
         || f = ReadFileExample("file.txt")
@@ -276,15 +277,13 @@ Heres the same in speedie:
 
 Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors. Also, we pass `File.ExpectExists` (an integer constant containing bit-flags) to tell Speedie to create an error if the file does not.
 
-Using ReadAll will not create an empty file. So it does the same as the Go code. No need to print the error to `stderr`, as Speedie already does that on exit!
-
-Or we can just this:
+Or we can just do this:
 
     main
-        || f = "file.txt".ReadFile(File.ExpectExists) // builtin function
+        || f = "file.txt".ReadFile(File.ExpectExists)
             printline f
 
-We can use be standard builtin `string.ReadFile` function. We pass `false` to disable ignoring of missing-files. Errors are created successfully if any happen.
+We can use be standard builtin `string.ReadFile` function.
 
 Neat huh?
 
