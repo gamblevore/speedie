@@ -676,8 +676,9 @@ function SCFunction.SourceArg (|message|)
 function SCFunction.SourceArg (assigns:|message|)
 	opt norefcounts
 	|| arg = .Source.last
-	if arg == @arg
-		arg.ReplaceWith(value)
+	if arg != value
+		if arg == @arg
+			arg.ReplaceWith(value)
 
 
 function SCFunction.ParamUniquer (|string| s, |string|)
