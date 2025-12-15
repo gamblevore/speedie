@@ -5,7 +5,6 @@
 
 |SCClass|	TypeFloat64
 |SCClass|	Typefloat
-//|SCClass|	TypeSaveable
 |SCClass|	TypeInt
 |SCClass|	TypeInt16
 |SCClass|	TypeDate
