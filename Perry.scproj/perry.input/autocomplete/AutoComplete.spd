@@ -486,9 +486,11 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |string| 
 		if  (where == @tmp)  and  !(cmd starts "autocomplete")
 			return nil // annoy speedie less. it will only generate errors and slow communication down
 	|| pp = where.parent$
+	if pp != @tmp and where == @tmp
+		pp = where
 	|| ppp = pp.parent
+
 	|| Jump = 0
-		
 	if spd_func and  cmd != "callfrom"
 		if where == @thg
 			if pp == @dot and ppp == spd_func
