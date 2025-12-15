@@ -179,7 +179,7 @@ expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't 
 || PrepareCpp = "$Speedie/Terminal/PrepareSpeedie.sh".file
 
 
-PrepareCpp.data = `#!/bin/bash
+PrepareCpp.writeall `#!/bin/bash
 echo "Prebuild .cpp files"
 /usr/local/bin/speedie   .    --x --nocompile
 /usr/local/bin/speedie --self --x --nocompile
@@ -194,7 +194,7 @@ if IsCurrentPlatform
 ////////////////////////////
 
 printline "Creating $scriptout"
-scriptout.data = vars.CreateScriptOut(list)
+scriptout.writeall vars.CreateScriptOut(list)
 
 "Script generated at: $scriptout"
 if IsCurrentPlatform
