@@ -2,26 +2,28 @@
 
 function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindCharset
+	nil checker
 	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
 							 // makes for confusing code. it WOULD have been good... if this were 1-based
 							 // because -1 is also the return value of a missing value.
 							 // nicer to make an explicit function that to handle end-relative searches
 	|| p = &CharSet.Props[0]
 	|| addr = .addr
-	if from < After
-		from = from max 0
-		After = After min .Length
-		while From < After
-			|| pb = p[addr[from++]]|uint|
-			if (1<<pb) & Find|uint|
-				return from-1
-	  else // oof
-		from = from min .length
-		After = After max 0
-		while From > After
-			|| pb = p[addr[--from]]|uint|
-			if (1<<pb) & Find|uint|
-				return from
+	if self!=nil
+		if from < After
+			from = from max 0
+			After = After min .Length
+			while From < After
+				|| pb = p[addr[from++]]|uint|
+				if (1<<pb) & Find|uint|
+					return from-1
+		  else // oof
+			from = from min .length
+			After = After max 0
+			while From > After
+				|| pb = p[addr[--from]]|uint|
+				if (1<<pb) & Find|uint|
+					return from
 
 
 inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
