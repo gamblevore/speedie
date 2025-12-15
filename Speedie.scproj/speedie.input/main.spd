@@ -72,15 +72,11 @@ function compiler.SetupEnv
 
 
 
-target PerryDBG
-	api Speedie_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
-		// could this be a lib-func thats included with all compiles?
-		// so any app can be run as a lib? Maybe later!
-		cpp_name Speedie_Main 
-		rz = app.sp_run(args, mode&4)
-		comms.UseAsParent // phew
-		if rz == 0
-			rz = app.sp_run(args, mode)
-
-
+api Speedie_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
+// easier if this is always compiled.
+	cpp_name Speedie_Main 
+	rz = app.sp_run(args, mode&4)
+	comms.UseAsParent // phew
+	if rz == 0
+		rz = app.sp_run(args, mode)
 
