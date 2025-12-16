@@ -351,3 +351,25 @@ struct HairyMan
 		fs <~ "$.Savings / $.Total"
 
 
+
+function Message.IsCake (|bool|)
+	opt norefcounts
+	real self
+	if self == @arg
+		self = .first
+	require self == @tmp
+	require .first.IsInt
+	|| s = .second
+	if s == @arg
+		require s.first istmp "code"
+		return true // ooof. its actually a cake file.
+
+
+//cake 232 {
+//	code {
+//		"\00\00\00'"
+//		"\00\00\08+\n\00\00K\01@\F8D\04\00\FCU\1E\00\10^\242\07\18\1A\00\$\00\00\03\00\00K\1F\00\10^\242\07\18\1A\00\$\00\00\01@\08-\F5'\08Q \00\F8^b\08\08\1A\00\364\01\00\00\00\00'"
+//	}
+//
+//	strs "\03\0CHello world!\nbye world!\tend world\00"
+//}

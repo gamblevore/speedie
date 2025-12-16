@@ -619,8 +619,12 @@ function LookUpVarDecl (|String| name, |SCDecl|)
 		Return result
 
 
+
 function ImportFile (|SCFile| file)
+	opt norefcounts
 	|| AST = file.AST								#require
+	expect (!AST.IsCake) (file, "This is a cake file! Run it with cake not speedie.")
+		
 	
 	todo `visibility needs to make a bit more sense than this...
 	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
@@ -630,7 +634,7 @@ function ImportFile (|SCFile| file)
 	compiler.project = file.proj 
 	|| v = file.proj.IsSTDLib and Options.MakeExec
 	compiler.program.CollectFromNode( ast, v )
-	file.Stop()
+	file.Stop
 
 
 function RequireContained (|Message| errplace, |SCDecl|)
