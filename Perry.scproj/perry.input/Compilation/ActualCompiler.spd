@@ -1,8 +1,9 @@
 
 
+
 function PerryIDE.ACTUAL_COMPILE
 	expect !.compilr (beep)  // wah?
-/	require .FileList.SaveAll(DocumentState.saving)
+	require .FileList.SaveAll(DocumentState.saving)
 
 	|| args = ["--nocolor"]
 	if .DebugMode is Debug
@@ -13,7 +14,7 @@ function PerryIDE.ACTUAL_COMPILE
 	  else
 		args <~ "--perry=bin"
 
-	if .DebugMode is Debug or Cake  
+	if .DebugMode is Debug or Cake
 		args <~ "--bake"
 	args <~ .project
 
@@ -22,20 +23,32 @@ function PerryIDE.ACTUAL_COMPILE
 		.GUIIsCompiling(args)
 
 
-
 function PerryIDE.RUN_COMPILE (|file| f, |[string]| args)
-/	|| out = .DebugAppCallArgsDisplay(F, args)
+	|| out = .DebugAppCallArgsDisplay(F, args)
 	|| str = out.GetResult
 	.ProductOut.Log(str, 256K)
 	.LogOneAction(str)
 	out <~ ("\n", 2)
 
-	|unixprocess| r
-	if .DebugMode is debug
-		ifn f isa "cake" // oof?
-		r = SPDProcess.spawn(f, args, ProcessMode.OwnGroup, f.name)
+	if .DebugMode isnt debug
+		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
+		return
+	
+	|message| hoi 
+	|| cake = SPDProcess.spawn(cake, args, ProcessMode.OwnGroup, f.name)
+		.RunCompileSub(cake)
+		hoi = cake.Get(5.0)
+	
+	if hoi
+		cake! <~ "perry ok"
 	  else
-		r = UnixProcess.spawn(f, args, ProcessMode.OwnGroup)
+		.DebugMode = 0
+		Notifications <~ "Connection to cake lost"
+	
+
+
+
+function PerryIDE.RunCompileSub (|unixprocess| r)
 	if r and r.PID
 		.RunCompiledApp = r
 		.ShowProductIfMoreOutput = 0
@@ -51,8 +64,9 @@ function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
 	ArgMsg = ArgMsg.Copy
 	argmsg.Ask
 	
-	|| f = product
-	|| args = ArgMsg.DebugArgNames
+	|| f = Product
+	|| IsDebug = .DebugMode is debug
+	|| args = ArgMsg.DebugArgNames( F * IsDebug )
 	if product.IsDir and Platform.OSX
 		f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
 	

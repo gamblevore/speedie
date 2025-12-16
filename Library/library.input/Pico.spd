@@ -19,9 +19,6 @@ struct PicoMessage
 		function From (|string| s, |PicoMessage|)
 			rz.length = s.length
 			rz.data = s.addr|&int8|
-		function FromFS (|faststring| fs, |PicoMessage|)
-			rz.length = fs.length
-			rz.data = fs.ResultPtr|&int8|
 
 
 function @string.FromPico (|picomessage| M, |string|)
@@ -71,12 +68,6 @@ struct Pico
 		cpp_part SendString
 		|| Msg = picomessage.From(Str)
 		return .send(msg, wait)
-
-	syntax append (|faststring| fs, |bool| Wait=false, |bool|)
-		cpp_part SendFS
-		|| msg = picomessage.Fromfs(fs)
-		rz = .send(msg, wait)
-		fs.length = 0
 		
 	libinternal _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
@@ -116,6 +107,7 @@ struct Pico
 		cpp_wrapper PicoStillSending
 
 	function Config (|&PicoConfig|)
+		inline
 		return self|&PicoConfig|
 	
 	function Name (assigns:|string|)

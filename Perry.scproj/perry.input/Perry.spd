@@ -1,6 +1,7 @@
 
 
 || Speedie		= "/usr/local/bin/speedie".file
+|| Cake			= "/usr/local/bin/cake".file
 
 
 module Perry

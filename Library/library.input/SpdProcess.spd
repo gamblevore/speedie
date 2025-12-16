@@ -58,17 +58,21 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	syntax append (|message| msg, |bool|)
 		cpp_part Send 
 		opt norefcounts			
-		if .status == -2
+		if .status.NotStarted
 			.start
 		if .pico.MessageStatus == 0
 			msg.RenderJbin(.writer)
-			.pico <~ .writer
+			.pico <~ .writer|string|
+			.writer.length = 0
 
  
 	function Get (|float| T=0, |message|)
+		// this should take a Date. seems easier?
+		// pico could use dates internally... at least for this?
+		// that, or we do the conversion in here.
 		opt norefcounts
 		if self
-			if .status == -2
+			if .status.NotStarted
 				.start
 			|| str = .pico.get(T)
 				rz = str.parse
@@ -149,14 +153,14 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		|bool|		 CheckedParent
 		|SpdProcess| _Parent
 		
-		function pico.UseAsParent (|spdprocess|)
+		function pico.UseAsParent (|spdprocess?|)
 			if !app.IsThreadedAsLib
 				require .CompleteExec
 			|| p = SpdProcess("", nil, self)
 			SpdProcess._parent = p
 			return p
 		
-		function app.Parent (|bool| Expect=false, |spdprocess|)
+		function app.Parent (|bool| Expect=false, |spdprocess?|)
 			opt norefcounts
 			if spdprocess.CheckedParent
 				return spdprocess._parent

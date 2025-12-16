@@ -56,8 +56,11 @@ function @string.ASCII_Chart (|int| StartAt=32, |string|)
 	return fs
 
 	
-function message.DebugArgNames (|[string]|)
+function message.DebugArgNames (|string| f, |[string]|)
 	opt norefcounts
+	if f
+		rz <~ f
+	
 	for s in self
 		|| i = s.GoodArgName
 		if i != string.error
