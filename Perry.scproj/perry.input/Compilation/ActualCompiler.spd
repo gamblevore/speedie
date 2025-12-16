@@ -1,12 +1,37 @@
 
 
-function PerryIDE.DebugArgs (|message|)
-	return .DebugArgsText.text.Parse(@arg)	
-
+function PerryIDE.ACTUAL_COMPILE (|CompileMode| Mode)
+	if .compilr: return app.beep // wah?
 	
+	require .FileList.SaveAll(DocumentState.saving)
+	|| args = ["--nocolor"]
+	if .DebugIsWaitingForCompile
+		args <~ "--usescriptloc"
 
-// RUN COMPILE
-function PerryIDE.StartDebugging (|file!| f)
+	if .name ~= "Speedie.scproj"
+		args <~ "--perry"
+	  else
+		args <~ "--perry=bin"
+
+	if Mode is Debug or Cake  
+		args <~ "--bake"
+	args <~ .project
+
+	.LogOneAction(speedie + " " + args.render)
+/	.compilr = UnixProcess.Stream(speedie, args, processmode.captureall)		#require
+	.SpeedieText.text = ""
+	
+	(.BuildButton isnt enabled)
+	(.BuildButton isnt visible)
+	(.RunButton isnt enabled)
+	(.Progress is visible)
+
+	(self is active)
+	.ShowCompileTab(.SpeedieText)
+	.ViewAsCurr
+
+
+function PerryIDE.RUN_COMPILE (|file!| f)
 /	require f.MustExist and StdErr.ok
 
 	.DebugArgsText.InitDebugArgs
@@ -42,68 +67,15 @@ function PerryIDE.StartDebugging (|file!| f)
 
 
 
-
-// when do we call --bake? For now, I guess always? Depends...
-// if I mean are we building or trying to debug?
-
-function PerryIDE.ActualCompile (|CompileMode| Mode)
-	if .compilr: return app.beep // wah?
-	
-	require .FileList.SaveAll(DocumentState.saving)
-	|| args = ["--nocolor"]
-	if .DebugIsWaitingForCompile
-		args <~ "--usescriptloc"
-
-	if .name ~= "Speedie.scproj"
-		args <~ "--perry"
-	  else
-		args <~ "--perry=bin"
-
-	if Mode is Debug or Cake  
-		args <~ "--bake"
-	args <~ .project
-
-	|| Name = speedie + " " + args.render
-	.LogOneAction(@emb + name)
-/	.compilr = UnixProcess.Stream(speedie, args, processmode.captureall)		#require
-	.SpeedieText.text = ""
-	
-	(.BuildButton isnt enabled)
-	(.BuildButton isnt visible)
-	(.RunButton isnt enabled)
-	(.Progress is visible)
-
-	(self is active)
-	.ShowCompileTab(.SpeedieText)
-	.ViewAsCurr
-
-
-
-function ClickedCompile (GUIaction)
-	|| DebugArgs = .ide.DebugArgs	#require
-
-	// what about compiling to cake? we need it in the GUI or conf
-	.ide.compile(CompileMode.compile)
-
-
-function ClickedDebug (GUIAction)
-	|| i = .ide
-	if .text == "\02"		// play
-		require i.MakeNothingRunning(" before debugging?")
-		i.DebugIsWaitingForCompile = true
-		i.compile(compilemode.Debug)
-		i.ShowText(i.ProductOut, "", false)
-		|| itm = i.CompileTabs.ButtonSource[3]
-			(itm is hidden)
-		i.ProductErrors.text = ""
-	  elseif .text == "\07" // stop
-		require i.MakeNothingRunning("?")
-
-
-function PerryIDE.Compile (|int| CompileMode)
-	if !.isBuilding // they pressed it twice
-		.ActualCompile(CompileMode)
-		return 
-	if !.ExpandCompileSep					// appeared to do nothing
-		ClickedCancel(.BuildButton)			// might as well just do the next thing then
+function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
+	|| out = .DebugAppCallArgsDisplay(F, args)
+	|| str = out.GetResult
+	.ProductOut.Log(str, 256K)
+	.LogOneAction(str)
+	out <~ ("\n", 2)
+	|| r = UnixProcess.stream(f, args, ProcessMode.OwnGroup)
+	if r and r.PID
+		.RunCompiledApp = r
+		.ShowProductIfMoreOutput = 0
+		.RunButton.text = "\07"
 

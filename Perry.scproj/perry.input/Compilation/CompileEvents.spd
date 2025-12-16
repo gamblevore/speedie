@@ -1,0 +1,34 @@
+
+function ClickedCompile (GUIaction)
+	|| DebugArgs = .ide.DebugArgs	#require
+
+	// what about compiling to cake? we need it in the GUI or conf
+	.ide.compile(CompileMode.compile)
+
+
+function ClickedDebug (GUIAction)
+	|| i = .ide
+	if .text == "\02"		// play
+		require i.MakeNothingRunning(" before debugging?")
+		i.DebugIsWaitingForCompile = true
+		i.compile(compilemode.Debug)
+		i.ShowText(i.ProductOut, "", false)
+		|| itm = i.CompileTabs.ButtonSource[3]
+			(itm is hidden)
+		i.ProductErrors.text = ""
+	  elseif .text == "\07" // stop
+		require i.MakeNothingRunning("?")
+
+
+function PerryIDE.Compile (|int| CompileMode)
+	if !.isBuilding // they pressed it twice
+		.Actual_Compile(CompileMode)
+		return 
+	if !.ExpandCompileSep					// appeared to do nothing
+		ClickedCancel(.BuildButton)			// might as well just do the next thing then
+
+
+function PerryIDE.DebugArgs (|message|)
+	return .DebugArgsText.text.Parse(@arg)	
+
+	
