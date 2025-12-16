@@ -75,20 +75,6 @@ function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
 
 
 
-	
-function ClickedDebug (GUIAction)
-	|| i = .ide
-	if .text == "\02"		// play
-		require i.MakeNothingRunning(" before debugging?")
-		i.DebugIsWaitingForCompile = true
-		i.compile(compilemode.Debug)
-		i.ShowText(i.ProductOut, "", false)
-		|| itm = i.CompileTabs.ButtonSource[3]
-			(itm is hidden)
-		i.ProductErrors.text = ""
-	  elseif .text == "\07" // stop
-		require i.MakeNothingRunning("?")
-
 
 function PressingDebug (GUIAction)
 	opt norefcounts
@@ -145,41 +131,6 @@ function PerryIDE.DebugPath (|message| conf)
 			app.cwd = path
 
 
-
-// RUN COMPILE
-function PerryIDE.StartDebugging (|file!| f)
-/	require f.MustExist and StdErr.ok
-
-	.DebugArgsText.InitDebugArgs
-	|| DebugArgs = .debugargs						#require
-	|| ArgMsg = DebugArgs["args"]					#require
-	
-	ArgMsg = ArgMsg.Copy
-	for a in ArgMsg
-		if a == @arel
-			expect (a == "?") (a)
-			|| str = a.firstname.Ask				#require
-			a.Become(@str, str)
-			a.clear
-				
-	|| args = ArgMsg.DebugArgNames
-	if DebugArgs["flags"]["open"].yes
-		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
-		args = [f]
-		f = "/usr/bin/open".file
-	  elseif f.IsDir and Platform.OSX
-		f = f.Child("Contents/MacOS/" + f.TrimExtAndPath)!
-	
-	|| old = app.cwd
-	.DebugPath(debugargs)	
-	.DebugEnvs(debugargs["env"])		
-	.DebugActual(f, args)
-
-	if !StdErr.ok
-		.DebugArgsText.FillErrors(StdErr)
-		|| err = StdErr.LastError
-			Notifications <~ err
-	app.cwd = old
 
 
 function PerryIDE.CompileTab (|int| i, |listviewrow|) // for autocomplete

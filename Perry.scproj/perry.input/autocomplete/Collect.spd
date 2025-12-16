@@ -109,40 +109,6 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	
 
 
-// when do we call --bake? For now, I guess always? Depends...
-// if I mean are we building or trying to debug?
-
-function PerryIDE.ActualCompile (|CompileMode| Mode)
-	if .compilr: return app.beep // wah?
-	
-	require .FileList.SaveAll(DocumentState.saving)
-	|| args = ["--nocolor"]
-	if .DebugIsWaitingForCompile
-		args <~ "--usescriptloc"
-
-	if .name ~= "Speedie.scproj"
-		args <~ "--perry"
-	  else
-		args <~ "--perry=bin"
-
-	if Mode is Debug or Cake  
-		args <~ "--bake"
-	args <~ .project
-
-	|| Name = speedie + " " + args.render
-	.LogOneAction(@emb + name)
-/	.compilr = UnixProcess.Stream(speedie, args, processmode.captureall)		#require
-	.SpeedieText.text = ""
-	
-	(.BuildButton isnt enabled)
-	(.BuildButton isnt visible)
-	(.RunButton isnt enabled)
-	(.Progress is visible)
-
-	(self is active)
-	.ShowCompileTab(.SpeedieText)
-	.ViewAsCurr
-
 
 // how should a lib-wrapper be called by a cake file?
 // hmmmm. well... basically we don't have access to that

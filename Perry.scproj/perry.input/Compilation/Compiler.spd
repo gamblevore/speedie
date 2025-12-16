@@ -223,6 +223,10 @@ extend PerryIDE
 		return true
 
 
+	function IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
+		return .buildbutton isnt enabled
+
+
 
 function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
