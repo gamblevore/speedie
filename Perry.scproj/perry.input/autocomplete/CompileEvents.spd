@@ -1,23 +1,8 @@
 
-function fnBuildIsDead (fnConfirmCanceller)
-	if self mustbe perryide
-		if !.IsBuilding
-			return .CancelCompile
-
 
 function PerryIDE.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
 	return .buildbutton isnt enabled
 
-
-function ClickedCancel (GUIAction)
-	|| i = .ide
-	if !i.Isbuilding
-		return true
-	|| can = ConfirmCanceller(i, fnBuildIsDead)
-	|| name = i.project.TrimCodeExt
-	|| q = "Currently building $name... Cancel Build of $name?"
-	if q.confirm(can)
-		return i.CancelCompile
 		
 
 function PerryIDE.DebugArgs (|message|)
@@ -30,3 +15,13 @@ function ClickedCompile (GUIaction)
 	// what about compiling to cake? we need it in the GUI or conf
 	.ide.compile(CompileMode.compile)
 
+
+extend PerryIDE
+	function Compile (|int| CompileMode)
+		if !.isBuilding // they pressed it twice
+			.ActualCompile(CompileMode)
+			return 
+		if !.ExpandCompileSep					// appeared to do nothing
+			ClickedCancel(.BuildButton)			// might as well just do the next thing then
+	
+	

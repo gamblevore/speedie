@@ -2,6 +2,17 @@
 
 
 
+datatype CompileMode (int)
+	constants
+		|CompileMode|
+		Compile = 0
+		Debug = 1
+		Cake = 2
+	syntax is (|CompileMode| M, |bool|)
+		return (self&M) == M
+	
+	
+
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel

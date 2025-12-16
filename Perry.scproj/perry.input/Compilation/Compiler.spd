@@ -1,16 +1,5 @@
 
 
-datatype CompileMode (int)
-	constants
-		|CompileMode|
-		Compile = 0
-		Debug = 1
-		Cake = 2
-	syntax is (|CompileMode| M, |bool|)
-		return (self&M) == M
-	
-	
-
 extend PerryIDE
 	function RecheckAfterModify
 		.ModifiedForCompile = true
@@ -120,14 +109,6 @@ extend PerryIDE
 			return !.ProductSep.divider.Collapsed
 
 
-	function Compile (|int| CompileMode)
-		if !.isBuilding // they pressed it twice
-			.ActualCompile(CompileMode)
-			return 
-		if !.ExpandCompileSep					// appeared to do nothing
-			ClickedCancel(.BuildButton)			// might as well just do the next thing then
-	
-	
 	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
 		if SaveAll
 			require .filelist.SaveAll(documentstate.saving)
@@ -229,6 +210,7 @@ extend PerryIDE
 		return true
 
 
+
 	function RenableAfterCompile (|bool|)
 		.DebugIsWaitingForCompile = false
 		|| code = .ProjIsSpeedieCode
@@ -239,4 +221,22 @@ extend PerryIDE
 		.HideStuff
 		isnt active
 		return true
+
+
+
+function fnBuildIsDead (fnConfirmCanceller)
+	if self mustbe perryide
+		if !.IsBuilding
+			return .CancelCompile
+
+
+function ClickedCancel (GUIAction)
+	|| i = .ide
+	if !i.Isbuilding
+		return true
+	|| can = ConfirmCanceller(i, fnBuildIsDead)
+	|| name = i.project.TrimCodeExt
+	|| q = "Currently building $name... Cancel Build of $name?"
+	if q.confirm(can)
+		return i.CancelCompile
 
