@@ -1516,6 +1516,7 @@ extern JB_String* SC__Options_exe_path;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_ForceRecompile;
 extern bool SC__Options_GenFlowControlCode;
+extern bool SC__Options_HideawayScripts;
 extern bool SC__Options_IgnoreCantSaveErrors;
 extern bool SC__Options_InlineLib;
 extern bool SC__Options_IsDirectTest;
@@ -1539,14 +1540,12 @@ extern bool SC__Options_Silent;
 extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
 extern bool SC__Options_TargetDebug;
-extern byte SC__Options_UseScriptLoc;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
 extern bool SC__Options_WhateverDebug;
 extern Array* SC__PackMaker_LibFuncs;
 extern Array* SC__PackMaker_LibGlobs;
 extern int SC__PackMaker_LibGlobSize;
-extern HairyMan SC__PackMaker_LibSaved;
 extern int SC__PackMaker_PackFuncIndex;
 extern Array* SC__PackMaker_PackFuncs;
 extern Array* SC__PackMaker_PackGlobs;
@@ -2705,6 +2704,8 @@ JB_File* SC_Comp__BuildFolder();
 
 void SC_Comp__Bundle();
 
+JB_String* SC_Comp__CakeExt();
+
 JB_File* SC_Comp__CanTryModes();
 
 void SC_Comp__CheckIsGoodLibrary();
@@ -2824,8 +2825,6 @@ bool SC_Comp__Reached(JB_String* S);
 int SC_Comp__ReachedClassCount();
 
 JB_String* SC_Comp__RenderErrors(JB_ErrorReceiver* Stderr, uint /*ErrorSeverity*/ MinSev);
-
-JB_File* SC_Comp__ScriptLoc(JB_String* F);
 
 bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build);
 
@@ -2950,6 +2949,8 @@ bool SC_FB__AppOptions_gcc(JB_String* Name, JB_String* Value, FastString* Purpos
 
 bool SC_FB__AppOptions_help(JB_String* Name, JB_String* Value, FastString* Purpose);
 
+bool SC_FB__AppOptions_hideaway(JB_String* Name, JB_String* Value, FastString* Purpose);
+
 bool SC_FB__AppOptions_ignorecantsave(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_inlinelib(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -2987,8 +2988,6 @@ bool SC_FB__AppOptions_stages(JB_String* Name, JB_String* Value, FastString* Pur
 bool SC_FB__AppOptions_target(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_targetdebug(JB_String* Name, JB_String* Value, FastString* Purpose);
-
-bool SC_FB__AppOptions_usescriptloc(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_variant(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -3239,9 +3238,9 @@ bool SC_Options__Color();
 
 int SC_Options__Init_();
 
-bool SC_Options__ModeCpp();
+bool SC_Options__ModeCake();
 
-bool SC_Options__ModePack();
+bool SC_Options__ModeCpp();
 
 
 
@@ -3862,6 +3861,8 @@ SortComparison SC_SmallestAlignedFirst(SCDecl* Self, SCDecl* B);
 Array* SC_SortInitOrder(Array* Mods);
 
 bool SC_SortInitOrderSub(Array* Mods, Array* Out);
+
+ErrorInt Speedie_Main(PicoComms* Comms, int64 Mode, _cstring* Args);
 
 bool SC_TemporalStatements_alert(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -5932,13 +5933,11 @@ int JB_ParserLineAndIndent_ArgPos(ParserLineAndIndent* Self);
 
 
 // JB_Pico
-PicoConfig* JB_Pico_Config(PicoComms* Self);
-
 JB_String* JB_Pico_Get(PicoComms* Self, float T);
 
 bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait);
 
-bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait);
+bool JB_Pico_SendString(PicoComms* Self, JB_String* Str, bool Wait);
 
 SpdProcess* JB_Pico_UseAsParent(PicoComms* Self);
 
@@ -5956,7 +5955,7 @@ PicoComms* JB_Pico__New(JB_StringC* Name, int Noise);
 
 
 // JB_PicoMessage
-void JB_Pico__FromFS(FastString* Fs, PicoMessage* Rz);
+void JB_Pico__From(JB_String* S, PicoMessage* Rz);
 
 
 
@@ -7490,8 +7489,6 @@ void JB_Sel_Destructor(Selector* Self);
 
 
 // JB_String
-JB_String* JB_Str_AddExt(JB_String* Self, JB_String* Ext);
-
 JB_String* JB_Str_AfterByte(JB_String* Self, uint /*byte*/ B, int Last);
 
 JB_String* JB_Str_ArgName(JB_String* Self);
@@ -7628,7 +7625,7 @@ JB_String* JB_Str_Pluralize(JB_String* Self, bool Plural, FastString* Fs_in);
 
 JB_String* JB_Str_Preview(JB_String* Self, int N);
 
-JB_String* JB_Str_ReadFile(JB_String* Self, int Lim, bool AllowMissing);
+JB_String* JB_Str_ReadAll(JB_String* Self, int Lim, bool AllowMissing);
 
 JB_String* JB_Str_RegularPath(JB_String* Self);
 
@@ -7641,8 +7638,6 @@ void SC_Str_Safe(JB_String* Self, FastString* Fs, bool Local);
 JB_String* SC_Str_ScriptContainer(JB_String* Self, JB_String* Container);
 
 JB_String* SC_Str_ScriptLocation(JB_String* Self, JB_String* Container);
-
-JB_String* JB_Str_SetExt(JB_String* Self, JB_String* Ext);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
@@ -7669,8 +7664,6 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 bool SC_Str_trap(JB_String* Self, Message* Msg);
 
 JB_String* JB_Str_Trim(JB_String* Self, CharSet CS);
-
-JB_String* JB_Str_TrimExt(JB_String* Self);
 
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool RemovePath);
 
@@ -10750,6 +10743,8 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_ExitCode_IsRunning(ExitCode Self);
 
+inline bool JB_ExitCode_NotStarted(ExitCode Self);
+
 inline bool JB_ExitCode_Successful(ExitCode Self);
 
 inline bool JB_FailableInt_SyntaxCast(FailableInt Self);
@@ -10785,6 +10780,8 @@ inline void JB_Msg_BecomeStr(Message* Self, Syntax Fn, JB_String* Name);
 inline Syntax JB_Msg_Func(Message* Self);
 
 inline JB_String* JB_Msg_Name(Message* Self);
+
+inline PicoConfig* JB_Pico_Config(PicoComms* Self);
 
 inline int JB_Rec_BadCount(JB_ErrorReceiver* Self);
 
@@ -10904,6 +10901,8 @@ inline void JB_Print(JB_String* Data);
 
 inline void JB_PrintLine(JB_String* Data);
 
+inline byte* JB_Str_Addr(JB_String* Self);
+
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
 inline int JB_Str_CompareInt(JB_String* Self, int Other);
@@ -10974,6 +10973,8 @@ inline bool JB_Str_IsInt(JB_String* Self);
 
 inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet Find, int From, int After);
 
+inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
+
 inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
 
 inline int JB_TC_Floatness(uint /*DataTypeCode*/ Self);
@@ -10989,8 +10990,6 @@ inline bool JB_CharSet_ContainsStr(CharSet Self, JB_String* S);
 inline JB_File* JB_File__Logs();
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name);
-
-inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
 inline Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M);
 
@@ -11069,6 +11068,10 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 
 inline bool JB_ExitCode_IsRunning(ExitCode Self) {
 	return (Self == -1) or (Self == kJB__ExitCode_EINPROGRESS);
+}
+
+inline bool JB_ExitCode_NotStarted(ExitCode Self) {
+	return Self < -1;
 }
 
 inline bool JB_ExitCode_Successful(ExitCode Self) {
@@ -11152,6 +11155,10 @@ inline JB_String* JB_Msg_Name(Message* Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
+}
+
+inline PicoConfig* JB_Pico_Config(PicoComms* Self) {
+	return ((PicoConfig*)Self);
 }
 
 inline int JB_Rec_BadCount(JB_ErrorReceiver* Self) {
@@ -11298,7 +11305,7 @@ inline JB_String* SC_SCObject_Name(SCObject* Self) {
 	if (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[11];
+	return JB_LUB[13];
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
@@ -11423,6 +11430,10 @@ inline void JB_Print(JB_String* Data) {
 
 inline void JB_PrintLine(JB_String* Data) {
 	JB_Str_PrintLine(Data);
+}
+
+inline byte* JB_Str_Addr(JB_String* Self) {
+	return JB_Str_Address(Self);
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
@@ -11575,6 +11586,10 @@ inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet Find, int From, int After)
 	return JB_Str_FindCharset(Self, (~Find), From, After);
 }
 
+inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
+	return JB_Str_FindCharset(Self, (~kJB__CharSet_White), Start, After);
+}
+
 inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self) {
 	uint Rz = 0;
 	if (JB_TC_SyntaxIs(Self, kJB__TC_bool)) {
@@ -11617,16 +11632,12 @@ inline bool JB_CharSet_ContainsStr(CharSet Self, JB_String* S) {
 }
 
 inline JB_File* JB_File__Logs() {
-	return JB_Str_AsFile(JB_LUB[530]);
+	return JB_Str_AsFile(JB_LUB[531]);
 }
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
 	//cpp_part;
 	JB_FreeIfDead(JB_Msg_Msg(Self, Fn, Name));
-}
-
-inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
-	return JB_Str_OutCharSet(Self, kJB__CharSet_White, Start, After);
 }
 
 inline Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M) {
