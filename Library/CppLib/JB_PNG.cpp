@@ -50,6 +50,7 @@ uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len) {
 }
 
 // I'd rather strip png support, cos it needs gz.  But I can't for now. Sadly.
+// perhaps I could make gz part of jeebox? I mean... it has good support.
 uint8* JB_Img__LoadPNG(uint8* data, int len, int* x, int* y, int* comp) {
 	uint8* img = stbi_load_from_memory(data, len, x, y, comp, 4);
 	if (img)
