@@ -184,7 +184,7 @@ function CompileAll
 
 	intrinsics.Process
 	
-	if (compiler.InPerry or Options.ModePack)
+	if (compiler.InPerry or Options.ModeCake)
 		.Timer( "Assemble" )
 		PackMaker.MakePack	
 

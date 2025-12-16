@@ -111,3 +111,14 @@ function message.AsError (|error|)
 		rz.name = .name
 		rz.path = ""
 
+
+function message.ask
+	opt norefcounts
+	for a in self
+		if a == @arel
+			expect (a == "?") (a)
+			|| str = a.firstname.Ask				#require
+			a.Become(@str, str)
+			a.clear
+
+

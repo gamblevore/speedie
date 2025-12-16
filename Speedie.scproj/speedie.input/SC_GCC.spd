@@ -44,10 +44,8 @@ function ProductNameFull (|string|)
 
 
 function ProductSuffix (|String|)
-	if options.modepack
-		if options.targetdebug and options.CompileDebugSeparately
-			return ".dbg.cake"
-		return ".cake"
+	if options.modecake
+		return compiler.CakeExt
 	require Options.ProjectIsLibrary
 	if platform.osx
 		return ".dylib"
@@ -60,14 +58,25 @@ function compiler.ProductFile (|File|)
 	return .ProductPath.file
 
 
+
+function Compiler.CakeExt (|string|)
+	if options.targetdebug and options.CompileDebugSeparately
+		return ".dbg.cake"
+	return ".cake"
+
+
+
 function compiler.ProductPath (|string|)
 	if options.output_path
 		return options.output_path
 	
 	|| prod = transcompiler.ProductNameFull
 	if Options.SelfReplacement
-		return Compiler.Projects.child("Terminal/" + prod)
-	return Compiler.BuildFolder.child( prod )
+		|string--| proj = Compiler.Projects
+		return proj.child("Terminal/" + prod)
+	
+	|file--| build = Compiler.BuildFolder 
+	return build.child( prod )
 
 
 function CppLib (|File|)

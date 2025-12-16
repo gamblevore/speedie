@@ -7,8 +7,7 @@ module Perry
     |ListViewRow|					Projects = Message()
 	|Dictionary of String|			PathDict
 	|listviewrow|					RecentProjects=message()
-    |bool|							FinishedStartUp
-    |byte|							WindowNumber
+    |date|							FinishedStartUp
     |byte| 							FindID	
 	
 	function LoadWindowsFromArgs (|bool|)
@@ -138,7 +137,7 @@ module Perry
 		|| oof = (.FindProj(old),  .Projects.First)(old)
 			oof.ide.showide
 		
-		perry.FinishedStartUp = true
+		perry.FinishedStartUp = date.now
 			
 
 

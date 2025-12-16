@@ -155,13 +155,13 @@ module PackMaker
 		assembler.sh.ASMInit
 		PackMaker.AddAll
 		if stderr.ok and .BuildGlobs 
-			if .FATCompile and options.ModePack		// options.ModePack can be false, if compiler.InPerry
+			if .FATCompile and options.ModeCake		// options.ModePack can be false, if compiler.InPerry
 				.WritePackToDisk
 		compiler.During = 0
 	
 	
 	function WritePackToDisk 
-		|| F = Compiler.ProductPath.SetExt("cake").file // what about .app instead of .zpd?
+		|| F = Compiler.ProductPath
 		|jbin| j = f.OutputStream
 			j.RunHeader("/usr/local/bin/cake")
 			j.Enter(@tmp, "cake")

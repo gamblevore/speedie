@@ -101,8 +101,8 @@ function compiler.TimeTest (|date| elapsed, |bool|)
 
 
 function compiler.CompileTime 
-	if !options.output_path and options.UseScriptLoc
-		.ScriptLoc(compiler.originalinputpath)		
+	if !options.output_path and options.HideawayScripts
+		options.output_path = .originalinputpath.ScriptLocation
 	
 	if !options.scripting
 		if options.SelfReplacement	// avoid failing needlessly

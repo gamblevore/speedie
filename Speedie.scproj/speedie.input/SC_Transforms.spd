@@ -714,7 +714,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
 	Compiler.SyxArray <~ OldName
 
-	if !Options.ModePack				// why cant packs use these? should I reenable it?
+	if !Options.ModeCake				// why cant packs use these? should I reenable it?
 										// again... with the radical compiler-internal changes
 										// its easier to generate files than insert code.
 

@@ -23,7 +23,7 @@ extend_module ASM
 
 	function TestASM 
 		target debug
-			require options.ModePack and options.dev > 0
+			require options.Modecake and options.dev > 0
 			asm.noisyasm = 3		
 			using ErrorSeverity.Warning
 			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]

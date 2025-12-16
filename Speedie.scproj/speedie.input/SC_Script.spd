@@ -1,20 +1,16 @@
 
 
-function Compiler.ScriptLoc (|string| f, |file|) 
-	rz = feedback.TryUseProject(f, true).ScriptLocation.file
-	options.output_path = rz
-
-
 function compiler.UsingScript (|file| f, |file|)
 	require (Options.Mode) and options.compile
 	require !f.isdir
 	require f.Read(16) starts "#!"
 	
-	rz = .ScriptLoc(f)
+	rz = feedback.TryUseProject(f, true).ScriptLocation.file
 	
 	if error.autoprint == errorflags.printandkeep
 		error.AutoPrint = 0
 	
+	options.output_path = rz
 	options.scripting = true
 	options.silent = true
 	options.PrintCompileString = false
@@ -31,10 +27,6 @@ function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 
 function compiler.CanTryModes (|file|)
 	opt norefcounts
-//	require !app.parent // this blocks speedie programs, calling speedie scripts
-						// but I want them to be able to!
-						// So why did I put this?
-						
 	require !app["perry"] and !app["nocompile"]
 	|| p = app._rawargs[0]
 	if p and !p.argname
@@ -66,7 +58,7 @@ function string.ContainerName (|string| ext, |string|)
 
 
 function string.SpdScriptName (|string|)
-	// if we are in fizz.scproj... use fizz.
+	// if we are in  'ABC.scproj'  use  'ABC'
 	rz  = .ContainerName(".scproj")
 	rz ?= .ContainerName(".uwu")
 	rz ?= .name.trimextandpath
@@ -79,6 +71,7 @@ function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |str
 function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/",  |string|)
 	|| full = .AbsolutePath ?? self
 	|| dest = full.Scriptcontainer(container)
-	dest.makeentirepath
-	return dest[full.SpdScriptName]
-
+	dest.MakeEntirePath
+	rz = dest[full.SpdScriptName]
+	if options.modecake
+		rz += Compiler.CakeExt

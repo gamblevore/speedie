@@ -1,81 +1,69 @@
 
 
-function PerryIDE.ACTUAL_COMPILE (|CompileMode| Mode)
-	if .compilr: return app.beep // wah?
-	
-	require .FileList.SaveAll(DocumentState.saving)
+function PerryIDE.ACTUAL_COMPILE
+	expect !.compilr (beep)  // wah?
+/	require .FileList.SaveAll(DocumentState.saving)
+
 	|| args = ["--nocolor"]
-	if .DebugIsWaitingForCompile
-		args <~ "--usescriptloc"
+	if .DebugMode is Debug
+		args <~ "--hideaway" // store the scripts in a hidden temp folder
 
 	if .name ~= "Speedie.scproj"
 		args <~ "--perry"
 	  else
 		args <~ "--perry=bin"
 
-	if Mode is Debug or Cake  
+	if .DebugMode is Debug or Cake  
 		args <~ "--bake"
 	args <~ .project
 
-	.LogOneAction(speedie + " " + args.render)
-/	.compilr = UnixProcess.Stream(speedie, args, processmode.captureall)		#require
-	.SpeedieText.text = ""
-	
-	(.BuildButton isnt enabled)
-	(.BuildButton isnt visible)
-	(.RunButton isnt enabled)
-	(.Progress is visible)
-
-	(self is active)
-	.ShowCompileTab(.SpeedieText)
-	.ViewAsCurr
+	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)
+	if .compilr
+		.GUIIsCompiling(args)
 
 
-function PerryIDE.RUN_COMPILE (|file!| f)
-/	require f.MustExist and StdErr.ok
 
+function PerryIDE.RUN_COMPILE (|file| f, |[string]| args)
+/	|| out = .DebugAppCallArgsDisplay(F, args)
+	|| str = out.GetResult
+	.ProductOut.Log(str, 256K)
+	.LogOneAction(str)
+	out <~ ("\n", 2)
+
+	|unixprocess| r
+	if .DebugMode is debug
+		ifn f isa "cake" // oof?
+		r = SPDProcess.spawn(f, args, ProcessMode.OwnGroup, f.name)
+	  else
+		r = UnixProcess.spawn(f, args, ProcessMode.OwnGroup)
+	if r and r.PID
+		.RunCompiledApp = r
+		.ShowProductIfMoreOutput = 0
+		.RunButton.text = "\07"
+
+
+
+function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
 	.DebugArgsText.InitDebugArgs
-	|| DebugArgs = .debugargs						#require
+	|| DebugArgs = .DebugArgs						#require
 	|| ArgMsg = DebugArgs["args"]					#require
 	
 	ArgMsg = ArgMsg.Copy
-	for a in ArgMsg
-		if a == @arel
-			expect (a == "?") (a)
-			|| str = a.firstname.Ask				#require
-			a.Become(@str, str)
-			a.clear
-				
+	argmsg.Ask
+	
+	|| f = product
 	|| args = ArgMsg.DebugArgNames
-	if DebugArgs["flags"]["open"].yes
-		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
-		args = [f]
-		f = "/usr/bin/open".file
-	  elseif f.IsDir and Platform.OSX
-		f = f.Child("Contents/MacOS/" + f.TrimExtAndPath)!
+	if product.IsDir and Platform.OSX
+		f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
 	
 	|| old = app.cwd
 	.DebugPath(debugargs)	
 	.DebugEnvs(debugargs["env"])		
-	.DebugActual(f, args)
+	.RUN_COMPILE(f, args)
 
 	if !StdErr.ok
 		.DebugArgsText.FillErrors(StdErr)
 		|| err = StdErr.LastError
 			Notifications <~ err
 	app.cwd = old
-
-
-
-function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
-	|| out = .DebugAppCallArgsDisplay(F, args)
-	|| str = out.GetResult
-	.ProductOut.Log(str, 256K)
-	.LogOneAction(str)
-	out <~ ("\n", 2)
-	|| r = UnixProcess.stream(f, args, ProcessMode.OwnGroup)
-	if r and r.PID
-		.RunCompiledApp = r
-		.ShowProductIfMoreOutput = 0
-		.RunButton.text = "\07"
 

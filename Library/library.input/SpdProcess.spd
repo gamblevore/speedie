@@ -173,19 +173,19 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 		function string.Spawn (|string| Name, |[string]| Params=nil, |spdprocess|)
-			return SpdProcess.Spawn(self, name, params)		
+			return SpdProcess.Spawn(self, params, name)		
 		
 		
-		function Spawn (|string| app_path, |string| Name, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+		function Spawn (|string| app_path, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |string| Name, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(name)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
-				if !rz.SpawnAsChild()
+				if !rz.SpawnAsChild
 					rz = nil
 
 
 		function SpawnFork (|ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
-			disabled "use pico properly"
+			disabled "This function needs rework. Feel free to fix it"
 //			|| p = pico.new$
 //			|| id = p.spawnfork
 //			if id < 0

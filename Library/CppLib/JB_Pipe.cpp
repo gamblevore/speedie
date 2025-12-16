@@ -295,17 +295,6 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 }
 
 
-ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, int Mode) {
-// remove this?
-	auto rz = JB_Sh_Constructor(nil, self, Mode, Args, nil);
-	byte Error = JB_Sh_StartProcess(rz);
-	if (Error) {
-		JB_SetRef(rz, 0);
-	}
-	return rz;
-}
-
-
 ///*(^&£^/ Shellstream vvvvv >>>>>>>
 
 static const char* MiniName (JB_String* Path) {

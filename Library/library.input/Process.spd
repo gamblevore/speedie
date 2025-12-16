@@ -21,7 +21,8 @@ class UnixProcess
 	constructor (|string| Path, |ProcessMode| Mode=processmode.CaptureAll, |[string]| Args=nil, |&pico| Pico = nil)
 		cpp_wrapper
 
-	destructor:												cpp_wrapper
+	destructor
+		cpp_wrapper
 	
 	function IsParent (|bool|)
 		return .pico.config.IsParent
@@ -51,15 +52,17 @@ class UnixProcess
 		cpp_wrapper
 		
 	module
-		function Stream (|String| app, |[string]| R=[], |processmode| Mode = nil, |UnixProcess?|)
-			cpp_wrapper JB_Sh__Stream
+		function Spawn (|String| app, |[string]| R=[], |processmode| Mode = nil, |UnixProcess?|)
+			opt norefcounts
+			rz = UnixProcess(app, mode, r)
+			if rz.start != 0
+				rz = nil
 
 
 
 datatype ProcessMode (byte)
 	linkage
 		cpp_part PIDM
-//		numeric false // disallow implicit (syntax <--> int) conversion
 	
 	flags
 		|ProcessMode| 
@@ -71,7 +74,7 @@ datatype ProcessMode (byte)
 		StdErrPassThru = 32
 		Silence = StdOutSilence|||StdErrSilence
 		PassThru = StdOutPassThru|||StdErrPassThru
-		OwnGroup = 128
+		OwnGroup = 128 // has no effect right now.
 
 
 	syntax is (|ProcessMode| M, |bool|)

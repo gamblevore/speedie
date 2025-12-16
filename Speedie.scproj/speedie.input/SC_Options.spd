@@ -42,7 +42,7 @@ module Options
 	|bool|	WhateverDebug			= 0 // just remove this whenever.
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
-	|byte|	UseScriptLoc			= 0
+	|bool|	HideawayScripts
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
@@ -50,7 +50,7 @@ module Options
 	function Color (|bool|)
 		return ErrorColors.enabled
 	
-	function ModePack (|bool|)
+	function ModeCake (|bool|)
 		return .mode == cake
 	
 	function ModeCpp (|bool|)
@@ -170,14 +170,15 @@ module Feedback
 			Path = compiler.FindProjNoSuffix(Path)
 		
 		|| path2 = path.PathFixSpd.RegularPath
-		if path2: path = path2
+		if path2 and path2!=path
+			path = path2
 		|| F = Path.File
-			
-		compiler.OriginalInputPath = path // altered below at: F.path = F.path.parent
-		Compiler.BaseProjectPath = F
-		compiler.projectname = f.trimextandpath
 		
-		|| exists	= f.exists
+		compiler.OriginalInputPath = F
+		compiler.BaseProjectPath = F
+		compiler.ProjectName = f.TrimExtAndPath
+		
+		|| Exists	= f.exists
 		|| IsSpd	= f.name.IsSpeedieSrc or IsScript
 		if (exists and !F.isdir) or (!exists and IsSpd)
 			options.SingleFileInput = f.path
@@ -277,9 +278,9 @@ module Feedback
 			options.perryoutput += RealPerry // argvalue not needed? just value, right?
 			compiler.insecurewords = file.Prefs("klinkerhoppen.banned").readall.dict
 
-		+'usescriptloc'
-			Explain(Purpose)$
-			options.UseScriptLoc = maybebool.Known(true)
+		+'hideaway'
+			Explain(Purpose, "Places the compiled results, in a temp folder, only for scripts. Look at the output string to see where it went.")$
+			options.HideawayScripts = true
 
 		+'check'
 			Explain(Purpose, "Check only. Does not compile")$

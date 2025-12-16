@@ -1,16 +1,23 @@
 
 function ClickedCompile (GUIaction)
-	|| DebugArgs = .ide.DebugArgs	#require
-
-	// what about compiling to cake? we need it in the GUI or conf
-	.ide.compile(CompileMode.compile)
+	|| DebugArgs = .ide.DebugArgs
+	if !DebugArgs
+		.ide.DebugArgsText.SetFocus
+		notifications <~ "Please fix the debug args first."
+		return nil
+	
+	|| mode = CompileMode.compile
+	|| compile_mode = DebugArgs["compile"]
+		if compile_mode ~= "cake"
+			mode = CompileMode.Cake
+	
+	.ide.compile(mode)
 
 
 function ClickedDebug (GUIAction)
 	|| i = .ide
 	if .text == "\02"		// play
 		require i.MakeNothingRunning(" before debugging?")
-		i.DebugIsWaitingForCompile = true
 		i.compile(compilemode.Debug)
 		i.ShowText(i.ProductOut, "", false)
 		|| itm = i.CompileTabs.ButtonSource[3]
@@ -20,10 +27,13 @@ function ClickedDebug (GUIAction)
 		require i.MakeNothingRunning("?")
 
 
-function PerryIDE.Compile (|int| CompileMode)
+function PerryIDE.Compile (|CompileMode| Mode)
 	if !.isBuilding // they pressed it twice
-		.Actual_Compile(CompileMode)
+		.DebugMode = mode
+		.Actual_Compile
 		return 
+
+	.DebugMode = 0
 	if !.ExpandCompileSep					// appeared to do nothing
 		ClickedCancel(.BuildButton)			// might as well just do the next thing then
 
@@ -31,4 +41,18 @@ function PerryIDE.Compile (|int| CompileMode)
 function PerryIDE.DebugArgs (|message|)
 	return .DebugArgsText.text.Parse(@arg)	
 
+
+function PerryIDE.GUIIsCompiling (|[string]| args)
+	.LogOneAction(speedie + " " + args.render)
+	.SpeedieText.text = ""
 	
+	(.BuildButton isnt enabled)
+	(.BuildButton isnt visible)
+	(.RunButton isnt enabled)
+	(.Progress is visible)
+
+	(self is active)
+	.ShowCompileTab(.SpeedieText)
+	.ViewAsCurr
+
+

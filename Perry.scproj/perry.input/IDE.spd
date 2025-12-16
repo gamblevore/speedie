@@ -100,7 +100,7 @@ class PerryIDE (Window)
 	|int8|						DuringNextPrev
 	|bool|						IsTextMode
 	|bool|						UsingSpdLib
-	|bool| 						DebugIsWaitingForCompile
+	|CompileMode| 				DebugMode
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool| 						IsGraphics
@@ -774,8 +774,6 @@ class PerryIDE (Window)
 			rz = PerryIDE(path, false)
 			rz.LoadProject
 			rz.EditMe.SetFocus
-			if !Perry.FinishedStartUp
-				Perry.WindowNumber++
 		
 		
 		function EmptyBase (|perryide|)

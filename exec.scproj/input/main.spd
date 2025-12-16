@@ -19,14 +19,14 @@ May also pass .spd or .scproj files. They will be compiled, then run.
 	return 1
 
 
-function App.ActAsSpeedie (|ErrorInt|)
-	|| Proj = app.args[0].FileThatExists #require
-	|| SpdArgs = [Proj, "--nocolor", "--usescriptloc", "--perry=bin"]
-	|| c = SpdProcess.Spawn(speedie,  "Speedie",  SpdArgs,  ProcessMode.PassThru)
-		Compiler = c
-		while c.IsOpen
-			...
-		return c.Status
+//function App.ActAsSpeedie (|ErrorInt|)
+//	|| Proj = app.args[0].FileThatExists #require
+//	|| SpdArgs = [Proj, "--nocolor", "--hideaway", "--perry=bin"]
+//	|| c = SpdProcess.Spawn(speedie,  SpdArgs,  ProcessMode.PassThru,  "Speedie")
+//		Compiler = c
+//		while c.IsOpen
+//			...
+//		return c.Status
 
 
 function App.RespondToParent

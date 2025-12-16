@@ -96,14 +96,11 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 				return spd
 
 //	|| proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
-	|| proc = speedie.resolve
+	|| spd_on_disk = speedie.resolve
 		|| Mode = ProcessMode.CaptureAll
 		if !noisy
 			mode = ProcessMode.silence
-		|duration| Delay = 0
-		if !Perry.FinishedStartUp
-			Delay = 0.125s * Perry.WindowNumber
-		|| spd = SpdProcess.spawn(Proc, f.name, p, mode)
+		|| spd = SpdProcess.spawn(spd_on_disk, p, mode, f.name)
 			spd.pico.name = .project.name
 			return spd
 	

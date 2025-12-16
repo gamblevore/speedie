@@ -9,11 +9,17 @@ extend PerryIDE
 		if .ModifiedForCompile
 			.ProjectWasModified
 		|| p = .path					#debug_require
-		|| unused = @tmp + "unused"
-		unused <~ p
-		|| lf = .LostFunks
-			unused <~ lf.copy
-		.SendFeedbackMsg(unused)
+
+		|| StartAt = Perry.FinishedStartUp #require
+		StartAt += 0.125s * .position
+		|| now = date.now
+		// remove or true later...
+		if (true) or (now >= StartAt) or (now < Perry.FinishedStartUp)
+			|| unused = @tmp + "unused"
+			unused <~ p
+			|| lf = .LostFunks
+				unused <~ lf.copy
+			.SendFeedbackMsg(unused)
 	
 	
 	function ProjectWasModified
@@ -166,14 +172,14 @@ extend PerryIDE
 	function Say (|string| str)
 		target osx
 			if !.IsFront or GUI.IsBackground
-				.Talker = unixProcess.stream("/usr/bin/say", [.name.trimext + str])
+				.Talker = unixProcess.spawn("/usr/bin/say", [.name.trimext + str])
 				(.talker)
 	
 	
 	function CompiledOK
-		|| db = .DebugIsWaitingForCompile
+		|| db = .DebugMode
 		.CheckedOK("compile")
-		|| last = .speedietext.text.parse[@tmp, -1]
+		|| last = .speedietext.text.parse.last
 		if last.expect(@tmp, "Product")
 			|| path = last[@nil]
 			if path.ExpectString
@@ -185,8 +191,9 @@ extend PerryIDE
 					str += " But it doesn't exist :("
 				.notify(.name + str, file)
 				.say(str)
-				if db
-					.run_compile(f)
+				if .DebugMode != db // hmmm why not just get it here?
+				if (db is run or debug) and f.exists and stderr.ok
+					.run_compile_wrap(f)
 
 
 	function Notify (|string| What, |message| response=nil)
@@ -210,7 +217,7 @@ extend PerryIDE
 
 
 	function RenableAfterCompile (|bool|)
-		.DebugIsWaitingForCompile = false
+		.DebugMode = 0
 		|| code = .ProjIsSpeedieCode
 		(.buildbutton is enabled) = code
 		(.runbutton is enabled) = code

@@ -43,7 +43,7 @@ module Linkage
 		opt norefcounts
 		Linkage.LinkCollect(s, Compiler.Program, nil)
 		options.MakeExec = linkage.interpreter
-		|| Combo = options.MakeExec + options.modepack
+		|| Combo = options.MakeExec + options.modecake
 		check (Combo <= 1) ("Can't bake exec!")
 		s.remove
 	
