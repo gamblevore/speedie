@@ -1185,7 +1185,7 @@ function scobject.TheIsFunc2 (|message| err, |scfunction|)
 		if !rz
 			error (err, .name + " doesn‘t have 'syntax is' specified.")
 	  elseif self isa scmodule
-		rz = .FindFunction("syntaxis")
+		rz = .FindFunction("syntaxis", err)
 		
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
