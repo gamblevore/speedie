@@ -115,7 +115,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 function PerryIDE.ActualCompile (|CompileMode| Mode)
 	if .compilr: return app.beep // wah?
 	
-	require .FileList.SaveAll(documentstate.saving)
+	require .FileList.SaveAll(DocumentState.saving)
 	|| args = ["--nocolor"]
 	if .DebugIsWaitingForCompile
 		args <~ "--usescriptloc"
@@ -129,8 +129,9 @@ function PerryIDE.ActualCompile (|CompileMode| Mode)
 		args <~ "--bake"
 	args <~ .project
 
-	.LogOneAction(@emb + speedie + " " + args.render)
-/	.compilr = unixprocess.Stream(speedie, args, processmode.captureall)		#require
+	|| Name = speedie + " " + args.render
+	.LogOneAction(@emb + name)
+/	.compilr = UnixProcess.Stream(speedie, args, processmode.captureall)		#require
 	.SpeedieText.text = ""
 	
 	(.BuildButton isnt enabled)

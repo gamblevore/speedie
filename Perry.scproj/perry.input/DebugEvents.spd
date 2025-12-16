@@ -140,7 +140,7 @@ function PerryIDE.StartDebugging (|file!| f)
 /	require f.MustExist and StdErr.ok
 
 	.DebugArgsText.InitDebugArgs
-	|| DebugArgs = .DebugArgsText.text.Parse(@arg)	#require
+	|| DebugArgs = .debugargs						#require
 	|| ArgMsg = DebugArgs["args"]					#require
 	
 	ArgMsg = ArgMsg.Copy

@@ -163,7 +163,14 @@ function ClickedCancel (GUIAction)
 		return i.CancelCompile
 		
 
+function PerryIDE.DebugArgs (|message|)
+	return .DebugArgsText.text.Parse(@arg)	
+
+
 function ClickedCompile (GUIaction)
+	|| DebugArgs = .ide.DebugArgs	#require
+
+	// what about compiling to cake? we need it in the GUI or conf
 	.ide.compile(CompileMode.compile)
 
 		
