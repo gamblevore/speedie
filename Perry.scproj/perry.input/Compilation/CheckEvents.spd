@@ -173,9 +173,7 @@ extend PerryIDE
 	function CompiledOK
 		|| db = .DebugIsWaitingForCompile
 		.CheckedOK("compile")
-		|| msg = .speedietext.text.parse
-		
-		|| last = msg[@tmp, -1]
+		|| last = .speedietext.text.parse[@tmp, -1]
 		if last.expect(@tmp, "Product")
 			|| path = last[@nil]
 			if path.ExpectString
@@ -188,7 +186,7 @@ extend PerryIDE
 				.notify(.name + str, file)
 				.say(str)
 				if db
-					.StartDebugging(f)
+					.run_compile(f)
 
 
 	function Notify (|string| What, |message| response=nil)
@@ -243,4 +241,5 @@ function ClickedCancel (GUIAction)
 	|| q = "Currently building $name... Cancel Build of $name?"
 	if q.confirm(can)
 		return i.CancelCompile
+
 
