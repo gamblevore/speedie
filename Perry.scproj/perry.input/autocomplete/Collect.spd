@@ -109,19 +109,25 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	
 
 
-function PerryIDE.ActualCompile (|string| operation)
-	(Operation) // i guess we'll use this later. debug vs compile
+// when do we call --bake? For now, I guess always? Depends...
+// if I mean are we building or trying to debug?
+
+function PerryIDE.ActualCompile (|CompileMode| Mode)
 	if .compilr: return app.beep // wah?
 	
 	require .FileList.SaveAll(documentstate.saving)
-	|| IsSCProj = .name ~= "Speedie.scproj"
-	|| args = [.project, "--nocolor"]
+	|| args = ["--nocolor"]
 	if .DebugIsWaitingForCompile
 		args <~ "--usescriptloc"
-	if IsSCProj
+
+	if .name ~= "Speedie.scproj"
 		args <~ "--perry"
 	  else
 		args <~ "--perry=bin"
+
+	if Mode is Debug or Cake  
+		args <~ "--bake"
+	args <~ .project
 
 	.LogOneAction(@emb + speedie + " " + args.render)
 /	.compilr = unixprocess.Stream(speedie, args, processmode.captureall)		#require

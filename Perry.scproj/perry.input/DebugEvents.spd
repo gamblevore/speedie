@@ -64,12 +64,13 @@ function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
 
 
 
+	
 function ClickedDebug (GUIAction)
 	|| i = .ide
 	if .text == "\02"		// play
 		require i.MakeNothingRunning(" before debugging?")
 		i.DebugIsWaitingForCompile = true
-		i.compile("debug")
+		i.compile(compilemode.Debug)
 		i.ShowText(i.ProductOut, "", false)
 		|| itm = i.CompileTabs.ButtonSource[3]
 			(itm is hidden)
@@ -134,13 +135,13 @@ function PerryIDE.DebugPath (|message| conf)
 
 
 
+// RUN COMPILE
 function PerryIDE.StartDebugging (|file!| f)
-	require f.MustExist and StdErr.ok
+/	require f.MustExist and StdErr.ok
 
 	.DebugArgsText.InitDebugArgs
 	|| DebugArgs = .DebugArgsText.text.Parse(@arg)	#require
 	|| ArgMsg = DebugArgs["args"]					#require
-	
 	
 	ArgMsg = ArgMsg.Copy
 	for a in ArgMsg
@@ -151,7 +152,7 @@ function PerryIDE.StartDebugging (|file!| f)
 			a.clear
 				
 	|| args = ArgMsg.DebugArgNames
-	if debugargs["flags"]["open"].yes
+	if DebugArgs["flags"]["open"].yes
 		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
 		args = [f]
 		f = "/usr/bin/open".file

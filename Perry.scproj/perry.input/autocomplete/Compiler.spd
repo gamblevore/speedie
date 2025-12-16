@@ -1,5 +1,16 @@
 
 
+datatype CompileMode (int)
+	constants
+		|CompileMode|
+		Compile = 0
+		Debug = 1
+		Cake = 2
+	syntax is (|CompileMode| M, |bool|)
+		return (self&M) == M
+	
+	
+
 extend PerryIDE
 	function RecheckAfterModify
 		.ModifiedForCompile = true
@@ -13,10 +24,6 @@ extend PerryIDE
 		unused <~ p
 		|| lf = .LostFunks
 			unused <~ lf.copy
-		|| f = .feedback
-			|| c = f.pico.config
-			if c.pidstatus >= 0
-			
 		.SendFeedbackMsg(unused)
 	
 	
@@ -61,6 +68,7 @@ extend PerryIDE
 	function message.ActualReplaceError (|string| src)
 		|| SubError = src.parse.first
 			.ReplaceWith(suberror)
+	
 	
 	function message.CleanErrors
 		opt norefcounts
@@ -112,9 +120,9 @@ extend PerryIDE
 			return !.ProductSep.divider.Collapsed
 
 
-	function Compile (|string| operation)
+	function Compile (|int| CompileMode)
 		if !.isBuilding // they pressed it twice
-			.ActualCompile(operation)
+			.ActualCompile(CompileMode)
 			return 
 		if !.ExpandCompileSep					// appeared to do nothing
 			ClickedCancel(.BuildButton)			// might as well just do the next thing then

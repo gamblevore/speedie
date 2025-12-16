@@ -164,7 +164,7 @@ function ClickedCancel (GUIAction)
 		
 
 function ClickedCompile (GUIaction)
-	.ide.compile("compile")
+	.ide.compile(CompileMode.compile)
 
 		
 function PerryRecheckEvent (guilistevent)
