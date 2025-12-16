@@ -658,6 +658,8 @@ extend PerryIDE
 		opt norefcounts
 		.LogOneThing(msg, type, .LogActions$)
 
+	function LogOneAction (|string| msg, |string| type="")
+		.LogOneAction(@emb + msg)
 
 	function ErrorLogInit (|listview| lv, |string| s)
 		with lv

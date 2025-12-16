@@ -496,8 +496,7 @@ class PerryIDE (Window)
 		require !.UsingSpdLib
 		|| f = .Feedback
 		if f.CommsOpen  and  .FeedBackLivedTooLong(f)
-			|| msg = "Released Speedie: " + .name
-			.LogOneAction(@emb + msg)
+			.LogOneAction("Released Speedie: " + .name)
 			f.Kill(0) // savememory
 	
 	
