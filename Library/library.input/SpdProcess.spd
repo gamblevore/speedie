@@ -222,3 +222,6 @@ prototype SpdDeathActionFn
 
 }
 
+
+// too many "function spawn" things all over the place. 7! Need to reduce them somehow?
+
