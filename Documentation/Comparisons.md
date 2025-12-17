@@ -97,25 +97,12 @@ Now lets look at a Speedie version!!
         L <~ list(1)
         L <~ list(2)
         || F = L.findposition(2)
-            printline f
             F.Position = 42
-        || F2 = L.findposition(2)
-            "wierd it still exists?"
-          else
-            || F3 = l.FindPosition(42)
-                "2 was found and altered successfully"
-              else
-                "where did it go?"
+    	printline L.findposition(2) // prints "(nil)" signifying that
+    	// the item was not found, which is what happens in rust also
     		
 
-Hooray we did it! Far simpler. Totally understandable. As a side-benefit, we also added 7 lines of helpful print-related code to show what is going on. You could strip that out as the original doesn't have that.
-
-You should see this:
-
-    2:()
-    2 was found and altered successfully
-
-Honestly, the difference is shocking and really shows how bad Rust can be.
+Hooray we did it! Far simpler. Totally understandable. Honestly, the difference is shocking and really shows how bad Rust can be.
 
 The funny thing here is that Speedie is *safer* than Rust, builds faster than Rust, and the programs runs faster too! Speedie beats Rust in the things Rust is meant to be good at!
 
@@ -126,20 +113,18 @@ For example, if you alter the line, to replace `2` with `5`:
       // *List::find_inner_mut(&mut list, 2).unwrap() = 42;
       *List::find_inner_mut(&mut list, 5).unwrap() = 42;
 
-    You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos you used `unwrap`. How terrible. (Apparantly, Rust considers crashing via `unwrap` to be "safe". 🤦‍♂️ 🤦🏽 🤦‍♀️.)
+You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos you used `unwrap`. How terrible. (Apparantly, Rust considers crashing via `unwrap` to be "safe". 🤦‍♂️ 🤦🏽 🤦‍♀️.)
 
 The speedie code above WON'T crash if the item can't be found! Or the same alteration is made!
 
     || F = L.findposition(5) // won't run this branch if "5" isn't found.
-        printline f
         F.Position = 42
 
 Guess what else? Wanna try remove that test? Sure? See what happens. You think Speedie will crash like other languages?
 
 Nope!
 
-    || F = L.findposition(2)
-    printline f
+    || F = L.findposition(5)
     F.Position = 42 // ERROR! "Accessing property on optional: F"
 
 Speedie realises that `F` might not exist. And so this code won't compile. Speedie is very intelligent around figuring out what vars can be `nil` or not. So you literally get all the safety with none of the nightmare overhead of Rust.

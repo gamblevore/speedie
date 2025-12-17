@@ -347,16 +347,20 @@ class list
 		return self[.Count()()]
 
 	render
+		nil self
 		cpp_name JB_List_Render
 		visible
-		fs <~ .position
-		fs <~ ":"
-		fs <~ "("
-		for f in self
-			f.__render__(Fs)
-			fs <~ ","
-			fs <~ " "
-		fs <~ ")"
+		if self
+			fs <~ .position
+			fs <~ ":"
+			fs <~ "("
+			for f in self
+				f.__render__(Fs)
+				fs <~ ","
+				fs <~ " "
+			fs <~ ")"
+		  else
+			fs <~ "(nil)"
 
 	syntax Append (|| Last)
 		.Last = Last
