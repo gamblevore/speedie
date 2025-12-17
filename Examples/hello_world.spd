@@ -1,6 +1,7 @@
 #!/usr/local/bin/cake
 
 main
+	zalgoline "start world"
 	for i in 10
 		if i&1
 			"Hello world!"
