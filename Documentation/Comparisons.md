@@ -152,7 +152,7 @@ Youtuber Tsoding had this to say about Rust:
 
 [![Rust Guide for C devs](http://img.youtube.com/vi/Jge1Qry2RRs/0.jpg)](https://www.youtube.com/shorts/Jge1Qry2RRs?feature=share)
 
-> The problem with Rust, is that they **achieved safety by sacrificing sanity of the the programmer**. Thats how they acheived safety, it becomes an absolutely unusable annoying shitty language. "But at least its safe right? Its like F*&^ programmers! F!!$ programmer health. Safety above all else! Think about the children! Think about the children!"
+> The problem with Rust, is that they **achieved safety by sacrificing sanity of the the programmer**. Thats how they acheived safety, it becomes an absolutely unusable annoying shitty language. _"But at least its safe right?"_ Its like: _"F*&^ programmers! F!!$ programmer health. Safety above all else! Think about the children! Think about the children!"_
 > So we gonna try to go in the opposite direction, lets cut out all that bullshit, lets actually for once think about the mental health of the programmer and just let them enjoy. And with the rise of vibe coding, its obvious that no one gives a sh%@ about safety anyway... so why should we?
 
 Wow. Well... he basically expressed my emotional reaction to Rust better than I could.
