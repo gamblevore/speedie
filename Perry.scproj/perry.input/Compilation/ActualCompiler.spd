@@ -13,9 +13,12 @@ function PerryIDE.ACTUAL_COMPILE
 		args <~ "--perry"
 	  else
 		args <~ "--perry=bin"
-
-	if .DebugMode is Debug or Cake
+	
+	if (.DebugMode is Cake) or ((.debugmode is debug) and Platform.IsDebug) // remove platform.isdebug
 		args <~ "--bake"
+	  elseif .DebugMode is debug // remove this also with the platform.debug thing
+		.DebugMode &=~ CompileMode.Debug
+		.DebugMode |=  CompileMode.run
 	args <~ .project
 
 	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)
@@ -23,7 +26,7 @@ function PerryIDE.ACTUAL_COMPILE
 		.GUIIsCompiling(args)
 
 
-function PerryIDE.RUN_COMPILE (|file| f, |[string]| args)
+function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug also. but whatever
 	|| out = .DebugAppCallArgsDisplay(F, args)
 	|| str = out.GetResult
 	.ProductOut.Log(str, 256K)
@@ -73,7 +76,7 @@ function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
 	|| old = app.cwd
 	.DebugPath(debugargs)	
 	.DebugEnvs(debugargs["env"])		
-	.RUN_COMPILE(f, args)
+	.ACTUAL_DEBUG(f, args)
 
 	if !StdErr.ok
 		.DebugArgsText.FillErrors(StdErr)
