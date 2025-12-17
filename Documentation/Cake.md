@@ -43,7 +43,7 @@ Well... Perry has an inbuilt ASM-Viewer! Just press **Command-6** (**Ctrl-6** on
 
 ![Cake View](godbolt.png)
 
-And considering that Speedie only has one compile-target (release builds ARE debug-builds), this means you can easily check the final output of your code.
+Considering that Speedie is always fully optimised even for a debug-build, you can easily check the final ASM output.
 
 Perry's inbuilt ASM-viewer... has an extra advantage, it is instant! (Unlike godbolt.org)
 
