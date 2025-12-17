@@ -623,7 +623,7 @@ function LookUpVarDecl (|String| name, |SCDecl|)
 function ImportFile (|SCFile| file)
 	opt norefcounts
 	|| AST = file.AST								#require
-	expect (!AST.IsCake) (file, "This is a cake file! Run it with cake not speedie.")
+	expect (!AST.IsCake) (file, file.name + " is compiled executable that uses the 'cake' vm, and can be run directly.")
 		
 	
 	todo `visibility needs to make a bit more sense than this...
