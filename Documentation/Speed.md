@@ -107,9 +107,9 @@ For a newcomer begining programming, Speedie's inbuilt extra speed is a nice ben
 
 A beginner to programming, would probably benefit more from Speedie's ease of compiling, readability, and reliability.
 
-Theres no reason to feel that "Speedie has won a contest against C++" for that reason... when an expert could write faster C++ functions than the inbuilt C++ lib funcs. Not everyone wants to spend that time, however... And they might not be allowed to include their favourite libs/funcs in each project they work on, due to different company owners having different requirements.
+Theres no reason to feel that "Speedie has won a contest against C++" for that reason... when an expert could write faster C++ functions than the inbuilt C++ lib funcs. Not everyone wants to spend that time, however... In fact writing a high-quality file-library takes **years** (most likely over 12) because you tend to discover problems or better approaches very slowly. And the programmer might not be allowed to include their favourite libs/funcs in each project they work on, due to different company owners having different requirements.
 
-If 10 different people wrote 10 different "mini-libs" for doing files faster, and all worked together on one project... whose C++ lib-replacement do you use?? All of them? One? None? You see! Having a faster base-lib already helps for that reason.
+If 8 different people wrote 8 different "mini-libs" for doing files faster, and all worked together on one project... whose C++ lib-replacement do you use?? All of them? One? None? You see! Having a faster base-lib already helps for that reason.
 
 A fast-file C++ library like [fast_io](https://github.com/cppfastio/fast_io) is definitely impressive and useful. But it might be that only 0.01% of C++ programmers are using it. And like above, it is one of many options, leading to fragmentation, creating many incompatible code-bases. Meanwhile 100% of speedie developers get the faster file-funcs.
 
