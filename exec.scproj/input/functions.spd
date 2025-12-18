@@ -52,11 +52,11 @@ class SpdFunc
 	
 	function Run (|&ivec4|)
 		|| spd = .Start
-			testvm.Registers  // exec most definitely needs access to this
+			Cake.Registers  // exec most definitely needs access to this
 								// Also, the error is wrong? it says missing packid
 								// but it should complain about accessing a private function.
 			
-			return jb_vm.Run(Spd, .length)
+			return cake.Run(Spd, .length)
 		error (self, "Can't Run")
 		return Dummy
 		

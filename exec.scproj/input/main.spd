@@ -1,7 +1,7 @@
 
-|| speedie = "/usr/local/bin/speedie"
+|string|     Speedie = "/usr/local/bin/speedie"
 |spdprocess| Perry = app.parent
-
+|!&cakevm|   Cake = CakeVM(1MB)
 
 
 main

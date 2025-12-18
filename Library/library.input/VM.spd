@@ -11,7 +11,7 @@ struct CakeVM
 	function ExecInit  (|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 																cpp_wrapper JB_ASM_FillTable
 	module
-		function New   (|int| StackSize=1MB, |&CakeVM|):			cpp_wrapper JB_ASM__VM
+		function New   (|int| StackSize=1MB, |&CakeVM|):		cpp_wrapper JB_ASM__VM
 	} else {
 	function Run       (|&uint| Code, |int| CodeLength, |&ivec4|)
 	function Registers (|bool| Clear=true, |&ivec4|): nil self
