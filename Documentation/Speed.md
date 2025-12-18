@@ -137,6 +137,16 @@ This is just not fun. Imagine some kid writing a sorter to sort zombies in a lis
 
 Speedie's sorter will just result in badly sorted data, given a bad sorting function. No crash. Valid data. Just sorted equally badly to your comparison func.
 
+#### Rust sort_by
+
+By the way, you think your "Safe" language Rust will save you from bad sort functions? No. They still crash! I literally found this comment on Rust's github, posted this month (2025 Dec):
+
+> "Sorry to reopen this thread... but is there a way to avoid panics on sort_by? Or can somebody recommend an alternative crate to use for sorting that does not panic? I maintain the Rhai scripting engine and the comparison function is passed in by users, which may not implement a total order. It is OK for the function to return gibberish... but not OK for the script to panic the host."
+
+Speedie doesn't suffer this, and its still faster.
+
+
+
 #### Overview
 
 Overall Speedie as a language is in a good place with it's overall features. Fast yet simple. Its a good place to be.
