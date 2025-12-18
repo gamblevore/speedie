@@ -358,8 +358,7 @@ function Decl (fn_asm) // declaresub declare
 	dest = .DeclareBody(rel, ty)
 	rz = declsub(self, exp, dest, ty, rel)
 	|| j = assembler.DebugInfo
-/		ty.DumpDecl(j, .index)				// AddDbg
-	// we also need to close decls!
+		ty.DumpDecl(j, .index)				// AddDbg
 	
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)

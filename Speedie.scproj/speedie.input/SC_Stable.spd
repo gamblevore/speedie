@@ -44,7 +44,7 @@ module LibStability
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
 		target debug
 			if !options.MakeExec
-				Table = jb_vm.vm.TestInit(4096, 64K)
+				Table = testvm.TestInit(4096, 64K)
 			
 		|| ObjSort = codesorter.PackID(isfunc)
 		list.Sort(ObjSort)

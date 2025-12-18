@@ -524,7 +524,7 @@ AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
 	r			= R1 - 1;		// NewZero
 	*r			= {};
 	
-	return Code - 1;
+	return Code;
 }
 
 

@@ -3,19 +3,19 @@
 target debug {
 extend_module PackMaker	
 	syntax access (|int| v, assigns:|int64|)
-		|| r = jb_vm.vm.Registers(false)+v
+		|| r = testvm.Registers(false)+v
 		r|&int64|[] = Value
 	
 	
 	syntax access (|int| v, assigns:|object|)
-		|| r = jb_vm.vm.Registers(false)+v
+		|| r = testvm.Registers(false)+v
 		r|&object--|[] = value
 	
 
 	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
 		|| mod = compiler.program.FindModule("ASMExamples")
-			jb_vm.vm.registers(true) // clears
+			testvm.registers(true) // clears
 			rz = mod.Findfunction(s)
 			scfunction.currfunc = rz 
 			
@@ -80,7 +80,7 @@ function SCFunction.TestObesity (|!&ivec4|)
 		|| mu = .µLength
 			|(memory of asm)--| mu2 = .µTest
 			.µprint
-			return jb_vm.Run(mu2.ptr, mu2.length)
+			return testvm.Run(mu2.ptr, mu2.length)
 	return butter
 
 }

@@ -42,15 +42,18 @@ struct vm_globs {
     Fn0*			CppFuncs;
     byte*			AllocBase;
     int				AllocCurr;
-    ASM* 			CodeBase;
-//    int			CodeLength;
+    int				StackSize;
+    void*			JumpTable;	
+    ASM* 			SavedCode;
+    VMRegister*		SavedStack;
+//  int				CodeLength;
 };
 
 
 
 struct jb_vm {
 	vm_globs		Env;
-    int				StackSize;
+    int64			ShadowLocation;
     ASM				EXIT[2];
 	VMRegister		Registers[];
 };

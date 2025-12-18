@@ -89,7 +89,6 @@ syntax Append (|message| M)
 function DataTypeModule 
 	opt norefcounts
 	.ASMFile = "extend_module ASM:constants Types:|asm|" ~ parse
-//	self <~ .ASMFile
 	.modulearg = .ASMFile.last.last.last
 
 
@@ -189,18 +188,19 @@ function BuildFiles (|bool|)
 	|| Forms = VMDef.find("forms")
 	forms.remove
 	
-	|| Code = FastString()
-	|| Jump = FastString()
-
 	.Clean(VMDef)
 	.DataTypeModule
 	.GenerateForms(forms, true)
 	.FillEncoders(VMDef)
-	.VMCpp(code, jump)
 	
 	|| fs = .FatFile
 		fs.Flush
 	.SafeWrite("InstructionGetters.h", .form_h)
+
+	|| Code = FastString()
+	|| Jump = FastString()
+	.VMCpp(code, jump, "")
+	.VMCpp(code, jump, "D")
 	.SafeWrite("Instructions.i",       code)
 	.SafeWrite("InstructionList.h",    jump)
 	
@@ -243,8 +243,8 @@ function BuildInstructions (TranFunc) // __instructionlist__
 	node.SafeRemove
 
 
-function MakeJump   (|message| msg, |FastString| jump)
-	jump <~ "&&${msg.name},\n"
+function MakeJump   (|message| tmp, |FastString| jump, |string| Pre)
+	jump <~ "&&$Pre${tmp.name},\n"
 
  
 function Clean (|message| msg)
@@ -296,27 +296,27 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		asm.encoders[i] ?= MissingInstruction
 
 	
-function VMCpp (|faststring| vm_code, |faststring| jump)
+function VMCpp (|faststring| vm_code, |faststring| jump, |string| Pre)
 	opt norefcounts
 	for tmp in .NameList
-		.MakeVM(tmp, vm_code)
-		.MakeJump(tmp, jump)
+		.MakeVM(tmp, vm_code, pre)
+		.MakeJump(tmp, jump, pre)
 
-	vm_code <~ "ı \n\n"
+	vm_code <~ "${Pre}ı \n\n"
 
 
-function MakeVM (|message| tmp, |faststring| vm)
+function MakeVM (|message| tmp, |faststring| vm, |string| Pre)
 	opt norefcounts
 	require tmp == @tmp
 	|| p = tmp.prev
 	if P == @sheb
 		vm <~ "	// ${P.name}\n"
 	
-	require tmp.RangeLength != sctasks.AlreadyDone
-	tmp.RangeLength = sctasks.AlreadyDone
+//	require tmp.RangeLength != SCTasks.AlreadyDone	
+//	tmp.RangeLength = SCTasks.AlreadyDone
 	|| arg = tmp.last
 
-	vm <~ "ı ${tmp.name}: "
+	vm <~ "${Pre}ı $Pre${tmp.name}: "
 	if !arg.Find(@tmp, "__")
 		vm <~ "_"
 	vm <~ "\n"

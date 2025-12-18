@@ -93,9 +93,9 @@ typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
 void	JB_InitClassList(SaverLoadClass fn);
 
 struct	jb_vm;
-jb_vm*	JB_ASM__VM();
-void	JB_ASM_FillTable	(jb_vm* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
-ivec4*	JB_ASM__Run			(u32* Code, u32 CodeSize);
+jb_vm*	JB_ASM__VM			(int StackSize);
+void	JB_ASM_FillTable	(jb_vm* V,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
+ivec4*	JB_ASM__Run			(jb_vm* V, u32* Code, u32 CodeSize);
 void**	JB_ASM_InitTable	(jb_vm* V, int n, int g);
 ivec4*	JB_ASM_Registers	(jb_vm* V, bool Clear);
 

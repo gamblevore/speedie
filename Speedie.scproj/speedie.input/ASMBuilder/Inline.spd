@@ -96,7 +96,8 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
-			.asmreach(fn.cls!.DestructorFunc!)
+			|| des = fn.cls!.DestructorFunc
+				.asmreach(des)
 	
 	if !r
 		.SoftNopRange(start, .curr)				// rewind

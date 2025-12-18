@@ -1,5 +1,9 @@
 
 
+target debug
+	|!&CakeVM| TestVM = CakeVM(1MB)
+
+  
 extend_module ASM
 	function TestASMSub (|message| tests)
 		opt norefcounts
@@ -9,10 +13,11 @@ extend_module ASM
 		require list and testname
 
 		textassembler.assemble(list)
-		|| fn = .GetASMFunc(testname)
-			|| ff = fn.µTest
-			jb_vm.vm.Registers(true)
-			jb_vm.Run(ff.ptr, ff.length)
+		target debug
+			|| fn = .GetASMFunc(testname)
+				|| ff = fn.µTest
+				testvm.Registers(true)
+				testvm.Run(ff.ptr, ff.length)
 
 
 	function GetASMFunc (|message| m, |scfunction|)

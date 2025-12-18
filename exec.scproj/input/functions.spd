@@ -52,7 +52,7 @@ class SpdFunc
 	
 	function Run (|&ivec4|)
 		|| spd = .Start
-			jb_vm.vm.Registers  // exec most definitely needs access to this
+			testvm.Registers  // exec most definitely needs access to this
 								// Also, the error is wrong? it says missing packid
 								// but it should complain about accessing a private function.
 			
