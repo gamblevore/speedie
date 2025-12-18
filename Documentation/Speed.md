@@ -111,7 +111,7 @@ Theres no reason to feel that "Speedie has won a contest against C++" for that r
 
 If 8 different people wrote 8 different "mini-libs" for doing files faster, and all worked together on one project... whose C++ lib-replacement do you use?? All of them? One? None? You see! Having a faster base-lib already helps for that reason.
 
-A fast-file C++ library like [fast_io](https://github.com/cppfastio/fast_io) is definitely impressive and useful. But it might be that only 0.01% of C++ programmers are using it. And like above, it is one of many options, leading to fragmentation, creating many incompatible code-bases. Meanwhile 100% of speedie developers get the faster file-funcs.
+A fast-file C++ library like [fast_io](https://github.com/cppfastio/fast_io) is definitely impressive and useful. But it might be that only 0.005% of all C++ programmers are using it. And like above, it is one of many options, leading to fragmentation, creating many incompatible code-bases. Meanwhile 100% of speedie developers get the faster file-funcs.
 
 
 #### Error Handling
