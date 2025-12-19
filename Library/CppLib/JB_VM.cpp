@@ -186,7 +186,7 @@ void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
 ivec4* JB_ASM__Registers(jb_vm* V, bool i) {
 	return 0;
 }
-jb_vm* JB_ASM__VM(int StackSize) {
+jb_vm* JB_ASM__VM(int StackSize, int Flags) {
 	return 0;
 }
 ivec4* JB_ASM__Run(jb_vm* VM, u32* Code, int CodeSize) {
