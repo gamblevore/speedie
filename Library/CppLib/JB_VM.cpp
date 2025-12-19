@@ -141,6 +141,11 @@ ivec4* JB_ASM__Resume (jb_vm* V) {
 }
 
 
+ivec4* 	JB_ASM__Debug		(jb_vm* V, u32* Code, int CodeSize) {
+	return JB_ASM__Run(V, Code, CodeSize);
+}
+
+
 ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
 	if (CodeLength <= 0)
 		return &(V->Registers[1].Ivec);
