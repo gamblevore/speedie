@@ -98,6 +98,7 @@ void	JB_ASM_FillTable	(jb_vm* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFu
 ivec4*	JB_ASM__Run			(jb_vm* V, u32* Code, int CodeSize);
 void**	JB_ASM_InitTable	(jb_vm* V, int n, int g);
 ivec4*	JB_ASM_Registers	(jb_vm* V, bool Clear);
+void	JB_ASM_SetDebug		(jb_vm* V, bool Value);
 
 } // ExternCEnd
 

@@ -46,9 +46,10 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 
 
 bool VM_Debug = false;
+bool VM_Prepared = false;
 
 
-void ActivateDebug_ (jb_vm* V, bool Value) {
+void JB_ASM_SetDebug (jb_vm* V, bool Value) {
 	// never allow kJB_VM_DebugCapable to be dropped
 	if (!(V->VFlags&kJB_VM_DebugCapable)) return;
 	if (VM_Debug == Value) return;
@@ -61,11 +62,13 @@ void ActivateDebug_ (jb_vm* V, bool Value) {
 
 
 static ivec4* PrepareJumpTable (jb_vm& vm, void** JumpTable) {
+	if (VM_Prepared) return 0;
 	for (int i = 0; i < 256; i++) {
 		void* Dbg = JumpTable[i+256];
 		int64 diff = (int64)Dbg xor (int64)JumpTable[i];
 		JumpTable[i+256] = (void*)diff; // avoid creating yet ANOTHER table...
 	}
+	VM_Prepared = true;
 	vm.JumpTable = JumpTable;
 	return 0;
 };
@@ -77,7 +80,6 @@ static void* JumpTable[] = {
 	#include "InstructionList.h"
 #endif
 };
-    
     if (Op)
 		return PrepareJumpTable(vm, JumpTable);
     
@@ -128,13 +130,18 @@ void** JB_ASM_InitTable (jb_vm* vm, int FuncCount, int GlobBytes) {
 }
 
 
-jb_vm* JB_ASM__VM (int StackSize, int Flags) { // 1MB is around Around 6400 ~fns deep.
-	if (StackSize < 256*1024)
-		StackSize = 256*1024;
+jb_vm* JB_ASM__VM (int AllocSize, int Flags) { // 1MB is around Around 6400 ~fns deep.
+	if (AllocSize < 256*1024)
+		AllocSize = 256*1024;
 	
-	auto V = (jb_vm*)calloc(StackSize, 1);
+	int ShadowSize = (Flags&kJB_VM_DebugCapable)*(1024*1024); // 4MB
+	auto V = (jb_vm*)calloc(AllocSize+ShadowSize, 1);
 	V->VFlags = Flags;
-	V->StackSize = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
+	if (ShadowSize)
+		V->ShadowAlloc = (u32*)(((byte*)V)+AllocSize);
+	
+	int StackSize = (AllocSize - sizeof(jb_vm))/sizeof(VMRegister);
+	V->StackSize = StackSize;
 	__CAKE_VM__(*V, StackSize);
 	return V;
 }
@@ -157,19 +164,12 @@ ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
 	Stack.Marker2 = 123;
 	V.ShadowLocation = 0;
 	
-	if (V.VFlags & kJB_VM_DebugCapable) {
-		auto Shadow = V.ShadowAlloc;
-		if (JB_msize(Shadow) < CodeLength*4) {
-			Shadow = (ASM*)JB_Realloc(Shadow, CodeLength*4);
-			if (!Shadow)
-				return 0;
-		}
-		V.ShadowAlloc = Shadow;
-		V.ShadowLocation = Code - Shadow;
-	}
+	if (V.ShadowAlloc)
+		V.ShadowLocation = Code - V.ShadowAlloc;
 
 	return __CAKE_VM__(V, 0);
 }
+
 
 ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
 	return VM_Run(*V, Code, CodeLength); // i can't stand pointer syntax.

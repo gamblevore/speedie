@@ -66,8 +66,8 @@ struct jb_vm {
 
 
 #define kJB_VM_TrapTooFar 1
-#define kJB_VM_DebugCapable 2
-#define kJB_VM_DebugIsOn 4
+#define kJB_VM_DebugIsOn 2
+#define kJB_VM_DebugCapable 4
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

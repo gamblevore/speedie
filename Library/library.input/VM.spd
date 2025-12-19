@@ -6,25 +6,26 @@ struct CakeVM {
 linkage: cpp_class jb_vm, wrapper
 
 target cpp or vm {
-	function Run       (|&uint| Code, |int| CodeLength, |&ivec4|): cpp_wrapper JB_ASM__Run
-	function Registers (|bool| Clear=true, |&ivec4|):			cpp_wrapper JB_ASM_Registers
-	function TestInit  (|int| n, |int| g, |&&nil|):				cpp_wrapper JB_ASM_InitTable
-	function ExecInit  (|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
-																cpp_wrapper JB_ASM_FillTable
+	function Run		(|&uint| Code, |int| CodeLength, |&ivec4|): cpp_wrapper JB_ASM__Run
+	function Registers	(|bool| Clear=true, |&ivec4|):				cpp_wrapper JB_ASM_Registers
+	function TestInit	(|int| n, |int| g, |&&nil|):				cpp_wrapper JB_ASM_InitTable
+	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
+																	cpp_wrapper JB_ASM_FillTable
+	function SetDebug	(|bool| Value):								cpp_wrapper JB_ASM_SetDebug
+
 	module
-		function New   (|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
+		function New	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
 
 } else {
-	
-	inline Run      	(|&uint| Code, |int| CodeLength, |&ivec4|)
-	inline Registers	(|bool| Clear=true, |&ivec4|): nil self
-	inline TestInit 	(|int| n, |int| g, |&&nil|)
-	inline ExecInit 	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
+	inline Run			(|&uint| Code, |int| CodeLength, |&ivec4|)
+	inline Registers	(|bool| Clear=true, |&ivec4|)
+	inline TestInit		(|int| n, |int| g, |&&nil|)
+	inline ExecInit		(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
+	inline SetDebug		(|bool| Value)
 
 	module
 		inline New		(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
 
-}
-}
+}}
 
