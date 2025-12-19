@@ -40,24 +40,33 @@ struct vm_globs {
     byte*			LibGlobs;
     byte*			PackGlobs;
     Fn0*			CppFuncs;
-    byte*			AllocBase;
-    int				AllocCurr;
-    int				StackSize;
-    void*			JumpTable;	
-    ASM* 			SavedCode;
-    VMRegister*		SavedStack;
-//  int				CodeLength;
 };
 
 
 
 struct jb_vm {
 	vm_globs		Env;
+    byte*			AllocBase;
+    int				AllocCurr;
+    int				StackSize;
+    void*			JumpTable;
+    ASM*			CodeBase;
+    
+    ASM* 			SavedCode;
+    VMRegister*		SavedStack;
+	
+    ASM*			ShadowAlloc;
     int64			ShadowLocation;
+    
+    int				Flags;
+    
+    ASM				ExitGuard;
     ASM				EXIT[2];
 	VMRegister		Registers[];
 };
 
+
+#define kJB_VM_TrapTooFar 1
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

@@ -32,7 +32,6 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 }
 
 #ifdef __VM__
-jb_vm* Saved_VM;
 
 
 #pragma GCC optimize ("Os")
@@ -43,14 +42,20 @@ jb_vm* Saved_VM;
 #define Dı		JB_VM_DebugTrap(); ı
 #define _		;
 
-
-// what does break do?
-// well! thats very interesting.
-// I'm not sure? long jump? just fireup a callback?
-// can we store the state and simply.... return?
-// saving the state sounds nice. We could pause a VM, execute it a bit, and continue.
-// I like that. So... lets go to a save location. Perhaps just go to the last place?
 #define JB_VM_DebugTrap() if (!vm.ShadowLocation | (Code[vm.ShadowLocation]++)>>31) goto BREAK;
+
+
+// don't we need a shadow?
+void ActivateDebug_ (jb_vm* V, bool Value) {
+//	auto Shadow = V->ShadowLocation;
+//	if (CodeSize <= 0) {
+//		if (!V) return; // already removed
+//	}
+//	
+	int64* J = (int64*)V->JumpTable;
+	for (int i = 0; i < 256; i++)
+		J[i] ^= J[i+256];
+}
 
 
 static ivec4* PrepareJumpTable (jb_vm& vm, void** JumpTable) {
@@ -59,35 +64,42 @@ static ivec4* PrepareJumpTable (jb_vm& vm, void** JumpTable) {
 		int64 diff = (int64)Dbg xor (int64)JumpTable[i];
 		JumpTable[i+256] = (void*)diff; // avoid creating yet ANOTHER table...
 	}
-	vm.Env.JumpTable = JumpTable;
+	vm.JumpTable = JumpTable;
 	return 0;
 };
 
 
 static ivec4* __CAKE_VM__ (jb_vm& vm, uint Op) {				// vm_run, vm__run, vmrun, run_vm
-    static void* JumpTable[] = {
+static void* JumpTable[] = {
 #if __CPU_TYPE__ == __CPU_ARM__
-        #include "InstructionList.h"
+	#include "InstructionList.h"
 #endif
-    };
+};
     
     if (Op)
 		return PrepareJumpTable(vm, JumpTable);
     
-    RegVar(Code,		r20) = vm.Env.SavedCode;
-    RegVar(r,			r21) = vm.Env.SavedStack;
+    RegVar(Code,		r20) = vm.SavedCode;
+    RegVar(r,			r21) = vm.SavedStack;
 
 #if __CPU_TYPE__ == __CPU_ARM__
 	ı;
 	#include "Instructions.i"
-	ı
 #endif
 	EXIT:;
     return &vm.Registers[1].Ivec;
 
+	// very nice simple breakpoint system!
 	BREAK:;
-	vm.Env.SavedCode = Code;
-	vm.Env.SavedStack = r;
+	auto BreakValue = Code[vm.ShadowLocation];
+	if (BreakValue == 0x80000000) {					// Accidental trap from 2GB loop.
+		Code[vm.ShadowLocation] = 1;				// reset 
+		if (!(vm.Flags & kJB_VM_TrapTooFar))
+			ı;										// resume
+	}
+	
+	vm.SavedCode = Code;
+	vm.SavedStack = r;
     return 0;
 }
 
@@ -116,22 +128,27 @@ void** JB_ASM_InitTable (jb_vm* vm, int FuncCount, int GlobBytes) {
 
 jb_vm* JB_ASM__VM (int StackSize) { // 1MB is around Around 6400 ~fns deep.
 	dbgexpect2 (sizeof(ASM)==4);
-	auto V = Saved_VM;
-	if (V) return V;
-	
 	if (StackSize < 256*1024)
 		StackSize = 256*1024;
-	V = (jb_vm*)calloc(StackSize, 1);
-	Saved_VM = V;
-	V->Env.StackSize = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
+	auto V = (jb_vm*)calloc(StackSize, 1);
+	V->StackSize = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
 	__CAKE_VM__(*V, StackSize);
 	return V;
 }
 
+ivec4* JB_ASM__Resume (jb_vm* V) {
+	return __CAKE_VM__(*V, 0);
+}
 
-ivec4* JB_ASM__Run (jb_vm* V, u32* Code, u32 CodeLength) {
-	V->Env.SavedCode = (ASM*)Code;
-	V->Env.SavedStack = V->Registers+2;
+
+ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
+	if (CodeLength <= 0)
+		return &(V->Registers[1].Ivec);
+
+	// we should disable debug-mode.
+	V->SavedCode = Code;
+	V->CodeBase = Code;
+	V->SavedStack = V->Registers+2;
 	V->Registers[2] = {};
 	V->EXIT[0] = 1;
 	auto& Stack = V->Registers[1].Stack;
@@ -141,15 +158,8 @@ ivec4* JB_ASM__Run (jb_vm* V, u32* Code, u32 CodeLength) {
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
 
-	return __CAKE_VM__(*V, 0);
+	return JB_ASM__Resume(V);
 }
-
-
-
-ivec4* JB_ASM__Resume (jb_vm* V) {
-	return __CAKE_VM__(*V, 0);
-}
-
 
 
 #else
@@ -165,7 +175,7 @@ ivec4* JB_ASM__Registers(jb_vm* V, bool i) {
 jb_vm* JB_ASM__VM(int StackSize) {
 	return 0;
 }
-ivec4* JB_ASM__Run(jb_vm* VM, u32* Code, u32 CodeSize) {
+ivec4* JB_ASM__Run(jb_vm* VM, u32* Code, int CodeSize) {
 	return 0;
 }
 

@@ -2,9 +2,10 @@
 // The idea is that this can be used from C++ only.
 // at least for now. I'm not too worried about 6 stable-id exports.
 
-struct CakeVM
-	linkage: cpp_class jb_vm, wrapper
-	target cpp or vm {
+struct CakeVM {
+linkage: cpp_class jb_vm, wrapper
+target cpp or vm {
+	function Debug     (|&uint| Code, |int| CodeLength, |&ivec4|): cpp_wrapper JB_ASM__Debug
 	function Run       (|&uint| Code, |int| CodeLength, |&ivec4|): cpp_wrapper JB_ASM__Run
 	function Registers (|bool| Clear=true, |&ivec4|):			cpp_wrapper JB_ASM_Registers
 	function TestInit  (|int| n, |int| g, |&&nil|):				cpp_wrapper JB_ASM_InitTable
@@ -12,13 +13,16 @@ struct CakeVM
 																cpp_wrapper JB_ASM_FillTable
 	module
 		function New   (|int| StackSize=1MB, |&CakeVM|):		cpp_wrapper JB_ASM__VM
-	} else {
-	function Run       (|&uint| Code, |int| CodeLength, |&ivec4|)
-	function Registers (|bool| Clear=true, |&ivec4|): nil self
-	function TestInit  (|int| n, |int| g, |&&nil|)
-	function ExecInit  (|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
-	module
-		function New   (|int| StackSize=1MB, |&CakeVM|)
-	}
 
+} else {
+	
+	inline Debug     (|&uint| Code, |int| CodeLength, |&ivec4|)
+	inline Run       (|&uint| Code, |int| CodeLength, |&ivec4|)
+	inline Registers (|bool| Clear=true, |&ivec4|): nil self
+	inline TestInit  (|int| n, |int| g, |&&nil|)
+	inline ExecInit  (|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
+	module
+		inline New   (|int| StackSize=1MB, |&CakeVM|)
+	}
+}
 

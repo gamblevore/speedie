@@ -515,7 +515,7 @@ AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
 	auto stck	= r - 1;
 	auto R1		= stck - stck->Stack.SavedReg;
 	auto Code	= stck->Stack.Code;
-	vm.Env.AllocCurr = stck->Stack.Alloc;
+	vm.AllocCurr = stck->Stack.Alloc;
 	auto Imm	= RET_Valuei;	// get before copy!
 	auto Src	= r + n1;
 	
@@ -548,7 +548,7 @@ AlwaysInline ASM* DeRefRegs (jb_vm& vm, VMRegister*& r, ASM Op) {
 AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?
 	int Amount = Alloc_Amounti << 4;
-	auto B = vm.Env.AllocBase;
+	auto B = vm.AllocBase;
 	int n = n1;
 	if (n)
 		r[n].Int = (uint64)(B);
@@ -559,13 +559,13 @@ AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 		debugger;
 		B -= Amount;
 	}
-	vm.Env.AllocBase = B;
+	vm.AllocBase = B;
 }
 
 
 AlwaysInline ASM* TailStack (jb_vm& vm, VMRegister* r, ASM* Code, ASM Op) {
 	VMRegister* stck = r-1;
-	vm.Env.AllocCurr = stck->Stack.Alloc;
+	vm.AllocCurr = stck->Stack.Alloc;
 	ASM Code2 = Code[0];
 	// What if this overwrites params that we mean to read from?
 	
@@ -584,7 +584,7 @@ AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, in
 	VMRegister* Stack = r + Save + 1;
 	Stack->Stack.Code = CodePtr;
 	Stack->Stack.SavedReg = Save;
-	Stack->Stack.Alloc = vm.Env.AllocCurr;
+	Stack->Stack.Alloc = vm.AllocCurr;
 	return Stack+1;
 }
 
