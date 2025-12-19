@@ -601,7 +601,7 @@ function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| c
 	return .LookUpSub( name, exp, arg_space, contains, side, kPurposeDot )
 
 
-function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
+function LookUpVar (|String| name, |Message| exp, |message?| side, |SCObject?|)
 	opt norefcounts
 	if name ~= "super"
 		name = "self"

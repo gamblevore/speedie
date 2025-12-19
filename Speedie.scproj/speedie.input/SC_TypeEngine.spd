@@ -462,22 +462,31 @@ function Message.CollectionPlace (|Message|)
 		msg = p
 
 
-function scdecl.ExtractAmount (|Message| Prms, |scdecl|)
-	rz = .extractamountsub(prms)
-	check (rz) ( prms, "Expected something like: |Type[10]|" )
 
-
-function scdecl.ExtractAmountSub (|Message| Prms, |scdecl|)
-	|| num = prms.first
+function scdecl.ExtractAmount (|Message| Amount, |scnode?| name_space, |scdecl|)
+	opt norefcounts
+	|| num = amount.first
 	if num == @unit
 		TypeOfUnit(Num, nil, nil)
-	if num.expect(@num) and num.ExpectLast
-		rz = .CopyDecl
-		rz.IsCArray(Num.Int, self)
-		rz.Default = @arg.msg
+	
+	if (num == @thg) and name_space									// we want to get the value
+		|| R = name_space.LookUpvar( num.name, Amount, nil )
+		if r isa SCDecl
+			if (r is Const) and r.IsInteger
+				num.func = @num
+				num.name = r.ExportPosition.Render
+			
+	
+	expect ((num==@num) and num.IsLast)   ( Amount, "Expected something like: |Type[10]|" )
+
+	rz = .CopyDecl
+	rz.IsCArray(Num.Int, self)
+	rz.Default = @arg.msg
+
 
 
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth=0, |SCDecl?|)
+	opt norefcounts
 	// a bit recursive!
 	|| f = c.func
 	if (f == @Thg)		// usual case
@@ -506,22 +515,22 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		|| p = c.UpToType    // abc|()--|
 			return typeofexpr(p.first, name_space)				
 			
+	|| fi = c.first!
 	if (c == @acc)		// |Byte[10]| TenBytes
 		|| Prms = c.second
 		if prms.HasAny
-			|| R = ExtractDecl( c.first!, name_space, purpose, depth )			#require
-			return R.ExtractAmount( Prms )
+			|| R = ExtractDecl( fi, name_space, purpose, depth )		#require
+			return R.ExtractAmount( Prms, name_space )
 			
 		f = @rel
 		c.func = f
-		|| fi = c.first
-		c.clear
+		prms.remove
 		c <~ (@thg, "memory")
 		c <~ (@opp, "of")
 		c <~ fi
 	
 	if (f == @func)
-		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
+		|| R = ExtractDecl( fi, name_space, purpose, depth )			#require
 		return R.RefineDecl(c.last)
 	
 	if (f == @arel or @brel)
@@ -531,10 +540,10 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		// but if I added reference to scdeclinfo.dclcopy... the compiler breaks.
 		// so I had to special-case it.
 		
-		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
+		|| R = ExtractDecl( fi, name_space, purpose, depth )			#require
 		if (C == "~")
 			return R.MakeDataObject(name_space, purpose)
-		if (C == "&" and f == @brel)							// pointer
+		if (C == "&" and f == @brel)								// pointer
 			return r.GetAddress(purpose)
 		if (C == "$")
 			return r.MakeReference
@@ -546,7 +555,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 			return R.MakeNewReal
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype != nil)
-		if (C.name)												// emptyname = compiler internal
+		if (C.name)													// emptyname = compiler internal
 			error (c)
 		return r
 
@@ -565,7 +574,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 
 	if (f == @arr)
 		|| ch = c.first
-		if !ch													// |[]|
+		if !ch														// |[]|
 			Return TypeArray!.TypeNormal
 		
 		expect (ch != @Item) (c)
