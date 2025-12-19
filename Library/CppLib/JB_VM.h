@@ -50,7 +50,6 @@ struct jb_vm {
     int				AllocCurr;
     int				StackSize;
     void*			JumpTable;
-    ASM*			CodeBase;
     
     ASM* 			SavedCode;
     VMRegister*		SavedStack;
@@ -58,7 +57,7 @@ struct jb_vm {
     ASM*			ShadowAlloc;
     int64			ShadowLocation;
     
-    int				Flags;
+    int				VFlags;
     
     ASM				ExitGuard;
     ASM				EXIT[2];
@@ -67,6 +66,8 @@ struct jb_vm {
 
 
 #define kJB_VM_TrapTooFar 1
+#define kJB_VM_DebugCapable 2
+#define kJB_VM_DebugIsOn 4
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

@@ -45,13 +45,15 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 #define JB_VM_DebugTrap() if (!vm.ShadowLocation | (Code[vm.ShadowLocation]++)>>31) goto BREAK;
 
 
-// don't we need a shadow?
+bool VM_Debug = false;
+
+
 void ActivateDebug_ (jb_vm* V, bool Value) {
-//	auto Shadow = V->ShadowLocation;
-//	if (CodeSize <= 0) {
-//		if (!V) return; // already removed
-//	}
-//	
+	// never allow kJB_VM_DebugCapable to be dropped
+	if (!(V->VFlags&kJB_VM_DebugCapable)) return;
+	if (VM_Debug == Value) return;
+	VM_Debug = Value;
+	
 	int64* J = (int64*)V->JumpTable;
 	for (int i = 0; i < 256; i++)
 		J[i] ^= J[i+256];
@@ -89,12 +91,12 @@ static void* JumpTable[] = {
 	EXIT:;
     return &vm.Registers[1].Ivec;
 
-	// very nice simple breakpoint system!
+	// we actually need to enter some loop. how though?
 	BREAK:;
 	auto BreakValue = Code[vm.ShadowLocation];
 	if (BreakValue == 0x80000000) {					// Accidental trap from 2GB loop.
 		Code[vm.ShadowLocation] = 1;				// reset 
-		if (!(vm.Flags & kJB_VM_TrapTooFar))
+		if (!(vm.VFlags & kJB_VM_TrapTooFar))
 			ı;										// resume
 	}
 	
@@ -126,44 +128,51 @@ void** JB_ASM_InitTable (jb_vm* vm, int FuncCount, int GlobBytes) {
 }
 
 
-jb_vm* JB_ASM__VM (int StackSize) { // 1MB is around Around 6400 ~fns deep.
-	dbgexpect2 (sizeof(ASM)==4);
+jb_vm* JB_ASM__VM (int StackSize, int Flags) { // 1MB is around Around 6400 ~fns deep.
 	if (StackSize < 256*1024)
 		StackSize = 256*1024;
+	
 	auto V = (jb_vm*)calloc(StackSize, 1);
+	V->VFlags = Flags;
 	V->StackSize = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
 	__CAKE_VM__(*V, StackSize);
 	return V;
 }
 
-ivec4* JB_ASM__Resume (jb_vm* V) {
-	return __CAKE_VM__(*V, 0);
-}
 
-
-ivec4* 	JB_ASM__Debug		(jb_vm* V, u32* Code, int CodeSize) {
-	return JB_ASM__Run(V, Code, CodeSize);
-}
-
-
-ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
+ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
 	if (CodeLength <= 0)
-		return &(V->Registers[1].Ivec);
+		return &(V.Registers[1].Ivec);
 
-	// we should disable debug-mode.
-	V->SavedCode = Code;
-	V->CodeBase = Code;
-	V->SavedStack = V->Registers+2;
-	V->Registers[2] = {};
-	V->EXIT[0] = 1;
-	auto& Stack = V->Registers[1].Stack;
-	Stack.Code = &V->EXIT[0];	
+	// re-entrant code will be called differently.
+	V.SavedCode = Code;
+	V.SavedStack = V.Registers+2;
+	V.Registers[2] = {};
+	V.EXIT[0] = 1;
+	auto& Stack = V.Registers[1].Stack;
+	Stack.Code = &V.EXIT[0];	
 	Stack.SavedReg = 0;
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
+	V.ShadowLocation = 0;
+	
+	if (V.VFlags & kJB_VM_DebugCapable) {
+		auto Shadow = V.ShadowAlloc;
+		if (JB_msize(Shadow) < CodeLength*4) {
+			Shadow = (ASM*)JB_Realloc(Shadow, CodeLength*4);
+			if (!Shadow)
+				return 0;
+		}
+		V.ShadowAlloc = Shadow;
+		V.ShadowLocation = Code - Shadow;
+	}
 
-	return JB_ASM__Resume(V);
+	return __CAKE_VM__(V, 0);
+}
+
+ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
+	return VM_Run(*V, Code, CodeLength); // i can't stand pointer syntax.
 }
 
 
