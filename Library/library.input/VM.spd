@@ -5,6 +5,11 @@
 struct CakeVM {
 linkage: cpp_class jb_vm, wrapper
 
+constants
+	TrapTooFar		= 1
+	DebugIsOn		= 2
+	DebugCapable	= 4
+
 target cpp or vm {
 	function Run		(|&uint| Code, |int| CodeLength, |&ivec4|): cpp_wrapper JB_ASM__Run
 	function Registers	(|bool| Clear=true, |&ivec4|):				cpp_wrapper JB_ASM_Registers
@@ -26,6 +31,10 @@ target cpp or vm {
 
 	module
 		inline New		(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
-
 }}
+
+
+//inline @CakeVM.NewDebug	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
+//	flags |= DebugCapable
+//	return .new(stacksize, flags)
 

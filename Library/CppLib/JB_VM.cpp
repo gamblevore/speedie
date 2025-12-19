@@ -31,9 +31,8 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 	return (ivec4*)(Ret+3);
 }
 
+
 #ifdef __VM__
-
-
 #pragma GCC optimize ("Os")
 #include "JB_VM_Helpers.i"
 
@@ -147,6 +146,8 @@ jb_vm* JB_ASM__VM (int AllocSize, int Flags) { // 1MB is around Around 6400 ~fns
 }
 
 
+// so how to do something... interetsing? breakpoints. So... lets try?
+// what first? init the vm with shadow. so how.
 ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
 	if (CodeLength <= 0)
 		return &(V.Registers[1].Ivec);
