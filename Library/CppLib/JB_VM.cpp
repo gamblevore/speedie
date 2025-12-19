@@ -42,21 +42,47 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 #define _		;
 
 #define JB_VM_DebugTrap() if (!vm.ShadowLocation | (Code[vm.ShadowLocation]++)>>31) goto BREAK;
+// seems easier to NOT have two code-tables. We should just "go to the next thing".
+// the nxt thing will be the break-block. So we'll do a lot of table-alteration. We'll need two tables...
+// but we HAVE two tables right now, and thats WITH an xor trick!
+// we can remove the shadowlocation trick.
+
+// What about breaking on a specific code location? Well... yes. Thats what the shadow is for.
+// we could make a generalised place to jump to, but then I buggered the VM.
+// We'd have to re-write the table each and every instruction. Debugging becomes impossibly slow.
+// madness.
+// I think the current design is better.
+
+// we also need a debug function callback.
+// doing that from within speedie... seems... painful. We'll need to do message-passing, all that crap.
+// or re-write it. I think... lets not for now?
 
 
 bool VM_Debug = false;
 bool VM_Prepared = false;
 
 
-void JB_ASM_SetDebug (jb_vm* V, bool Value) {
-	// never allow kJB_VM_DebugCapable to be dropped
-	if (!(V->VFlags&kJB_VM_DebugCapable)) return;
-	if (VM_Debug == Value) return;
-	VM_Debug = Value;
-	
-	int64* J = (int64*)V->JumpTable;
-	for (int i = 0; i < 256; i++)
-		J[i] ^= J[i+256];
+void JB_ASM_BreakAll (jb_vm* V, bool Value) {
+	if (Value)
+		V->ShadowLocation = 0;
+	  else
+		V->ShadowLocation = V->ShadowAlloc - V->CodeBase;
+}
+
+
+u32* JB_ASM_SetDebug (jb_vm* V, bool Value) {
+	auto Shadow = V->ShadowAlloc;
+	if (!Shadow)
+		return 0;
+
+	if (VM_Debug != Value) {
+		VM_Debug = Value;
+		int64* J = (int64*)V->JumpTable;
+		for (int i = 0; i < 256; i++)
+			J[i] ^= J[i+256];
+	}
+
+	return Shadow;
 }
 
 
@@ -129,7 +155,7 @@ void** JB_ASM_InitTable (jb_vm* vm, int FuncCount, int GlobBytes) {
 }
 
 
-jb_vm* JB_ASM__VM (int AllocSize, int Flags) { // 1MB is around Around 6400 ~fns deep.
+jb_vm* JB_ASM__VM (int AllocSize, int Flags) { // 256K is around 1600 ~fns deep.
 	if (AllocSize < 256*1024)
 		AllocSize = 256*1024;
 	
@@ -139,7 +165,7 @@ jb_vm* JB_ASM__VM (int AllocSize, int Flags) { // 1MB is around Around 6400 ~fns
 	if (ShadowSize)
 		V->ShadowAlloc = (u32*)(((byte*)V)+AllocSize);
 	
-	int StackSize = (AllocSize - sizeof(jb_vm))/sizeof(VMRegister);
+	int StackSize = (AllocSize - sizeof(jb_vm))/sizeof(VMRegister) - 1;
 	V->StackSize = StackSize;
 	__CAKE_VM__(*V, StackSize);
 	return V;
@@ -153,6 +179,7 @@ ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
 		return &(V.Registers[1].Ivec);
 
 	// re-entrant code will be called differently.
+	V.CodeBase = Code;
 	V.SavedCode = Code;
 	V.SavedStack = V.Registers+2;
 	V.Registers[2] = {};
@@ -166,7 +193,7 @@ ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
 	V.ShadowLocation = 0;
 	
 	if (V.ShadowAlloc)
-		V.ShadowLocation = Code - V.ShadowAlloc;
+		V.ShadowLocation = V.ShadowAlloc - Code;
 
 	return __CAKE_VM__(V, 0);
 }

@@ -54,6 +54,7 @@ struct jb_vm {
     ASM* 			SavedCode;
     VMRegister*		SavedStack;
 	
+	ASM*			CodeBase;
     ASM*			ShadowAlloc;
     int64			ShadowLocation;
     
