@@ -98,6 +98,9 @@ class File (String)
 	function Created (|Date|)
 		cpp_wrapper JB_File_Created
 
+	function Flush (|ErrorInt|)
+		cpp_wrapper JB_File_Flush
+		
 	function Close
 		cpp_wrapper JB_File_Close
 	

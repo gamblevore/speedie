@@ -47,7 +47,7 @@ uint8* FastShellPath_( JB_String* Path, uint8* WriteTo );
 int JB_File_Delete (JB_String* self);
 s64 JB_File_Size( JB_File* self );
 int JB_File_SizeSet( JB_File* self, IntPtr N );
-void JB_File_Flush( JB_File* self );
+int JB_File_Flush( JB_File* self );
 JB_String* JB_File_ReadAll( JB_File* self, int lim, bool Ignore );
 JB_StringC* JB_File_PathFix(JB_String* S);
 JB_String* JB_File__Home();

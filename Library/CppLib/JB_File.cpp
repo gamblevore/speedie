@@ -166,8 +166,8 @@ void JB_Flow__Report (JB_String* data, JB_String* name) {
 }
 
 
-bool HasFD (JB_File*f) {
-    return (f and f->Descriptor >= 0);
+bool HasFD (JB_File* f) {
+    return (f->Descriptor >= 0);
 }
 
 inline uint8* JB_FastFileThing (JB_File* S) {
@@ -727,14 +727,15 @@ FastString* JB_FS__FileAppend (JB_File* f) {
 }
 
 
-void JB_File_Flush (JB_File* self) {
-    if ( HasFD(self) ) {
-		int err = 0;
-//		err = fflush(self->Descriptor);
-//		if (!err)
-			err = fsync( self->Descriptor );
-		ErrorHandle_( err, self, nil, "flushing" );
+int JB_File_Flush (JB_File* self) {
+    if ( HasFD(self) and !JB_File_IsPipe(self)) {
+		int Err = 0;
+		while ((Err = fsync( self->Descriptor )) == EINTR) {
+			;
+		}
+		return ErrorHandle_( Err, self, nil, "flushing" );
 	}
+	return 0;
 }
 
 
@@ -1240,7 +1241,7 @@ int JB_File_DataSet ( JB_File* self, JB_String* Data ) {
 JB_File* JB_File__NewPipe (int Pipe) {
 	if (Pipe < 0)
 		return nil;
-	JB_File* F = JB_File_Constructor( 0, 0 );
+	JB_File* F = JB_File_Constructor( 0, JB_Str__Error() );
 	F->Descriptor = Pipe;
 	F->MyFlags |= 2;
 	return F;
