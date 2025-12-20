@@ -1,7 +1,7 @@
 
 
 target debug
-	|!&CakeVM| TestVM = CakeVM(1MB)
+	|!&CakeVM| TestVM = CakeVM(1MB, cakevm.WantProtect)
 
   
 extend_module ASM
@@ -17,10 +17,9 @@ extend_module ASM
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
-/				testvm.setdebug(true)
-				testvm.Load(ff.ptr, ff.length)
-				testvm.Run
-/				testvm.setdebug(false)
+				testvm.setdebug(true)
+				testvm.Run(ff.ptr, ff.length)
+				testvm.setdebug(false)
 
 
 	function GetASMFunc (|message| m, |scfunction|)

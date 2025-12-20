@@ -6,35 +6,40 @@ linkage: cpp_class CakeVM, wrapper
 
 constants
 	TrapTooFar		= 1
-	DebugIsOn		= 2
-	DebugCapable	= 4
+	WantProtect		= 2
 
 target cpp or vm {
-	function Load		(|&uint| Code, |int| CodeLength, |&uint|): 	cpp_wrapper JB_ASM_Code
-	function Run		(|&ivec4|):									cpp_wrapper JB_ASM_Run
-	function Registers	(|bool| Clear=true, |&ivec4|):				cpp_wrapper JB_ASM_Registers
-	function TestInit	(|int| n, |int| g, |&&nil|):				cpp_wrapper JB_ASM_InitTable
+	function Load		(|&uint| Code, |int| CodeLength, |&uint|)
+		cpp_wrapper JB_ASM_Code
+	function Run		(|&ivec4|)
+		cpp_wrapper JB_ASM_Run
+	
+	inline Run		(|&uint| Code, |int| CodeLength, |&ivec4|)
+		.load(code, codelength)
+		return .run
+		
+	function Registers	(|bool| Clear=true, |&ivec4|)
+		cpp_wrapper JB_ASM_Registers
+	function TestInit	(|int| n, |int| g, |&&nil|)
+		cpp_wrapper JB_ASM_InitTable
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
-																	cpp_wrapper JB_ASM_FillTable
-	function SetDebug	(|bool| Value, |&int|):						cpp_wrapper JB_ASM_SetDebug
-	function Pause		():											cpp_wrapper JB_ASM_Pause
+		cpp_wrapper JB_ASM_FillTable
+	function SetDebug	(|bool| Value, |&int|)
+		cpp_wrapper JB_ASM_SetDebug
+	function Pause
+		cpp_wrapper JB_ASM_Pause
 
 	module
 		function New	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
 
-} else {
-	inline Run			(|&uint| Code, |int| CodeLength, |&ivec4|)
-	inline Registers	(|bool| Clear=true, |&ivec4|)
-	inline TestInit		(|int| n, |int| g, |&&nil|)
-	inline ExecInit		(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
-
-	module
-		inline New		(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
+//} else {
+//	inline Run			(|&uint| Code, |int| CodeLength, |&ivec4|)
+//	inline Registers	(|bool| Clear=true, |&ivec4|)
+//	inline TestInit		(|int| n, |int| g, |&&nil|)
+//	inline ExecInit		(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
+//
+//	module
+//		inline New		(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
 }}
-
-
-//inline @CakeVM.NewDebug	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
-//	flags |= DebugCapable
-//	return .new(stacksize, flags)
 

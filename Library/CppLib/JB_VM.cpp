@@ -15,6 +15,7 @@ Design:
 #include "JB_Umbrella.hpp"
 #define __H__  inline
 #include "JB_Vectors.cpp"
+#include <sys/mman.h>
 
 
 extern "C" {
@@ -44,9 +45,9 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 void JB_ASM_Pause (CakeVM* V) {
 	auto J = V->JumpTable;
-	void* Break = J[256];
+	void* Pause = J[513];
 	for (int i = 0; i < 256; i++)
-		J[i] = Break;
+		J[i] = Pause;
 }
 
 
@@ -145,10 +146,20 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
 	if (Length <= (1024*1024)/4) {
 		auto D = (ASM*)(((byte*)V) + V->StackSize);
-		if (Code)
-			return (ASM*)memcpy(D, Code, 4*Length);
+		int F = V->VFlags;
+		if (Code) {
+			if (F&kJB_VM_IsProtected)
+				if (mprotect(D, 1024*1024, PROT_WRITE|PROT_READ)==0) // unprotect
+					F &=~ kJB_VM_IsProtected;
+			memcpy(D, Code, 4*Length);
+		}
+		if (F&kJB_VM_WantProtect and !(F&kJB_VM_IsProtected))
+			if (mprotect(D, 1024*1024, PROT_READ) == 0)				// protect!
+				F |= kJB_VM_IsProtected;
+		V->VFlags = F;
 		return D;
 	}
+
 	return 0;
 }
 
@@ -156,7 +167,9 @@ ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
 CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns deep.
 	const int MB = 1024*1024;
 	const int Page = 16*1024;
+	Flags &=~ kJB_VM_IsProtected;
 	StackSize = StackSize&~(Page-1);						// remove garbage
+	
 	if (StackSize < MB/4)
 		StackSize = MB/4;
 	int AllocSize = StackSize + 2*MB;	

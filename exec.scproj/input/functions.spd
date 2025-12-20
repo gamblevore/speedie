@@ -53,8 +53,7 @@ class SpdFunc
 	function Run (|&ivec4|)
 		|| spd = .Start
 			Cake.Registers
-			cake.load(spd, .length)
-			return cake.Run
+			return cake.Run(spd, .length)
 		error (self, "Can't Run")
 		return Dummy
 		
