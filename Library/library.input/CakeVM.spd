@@ -1,6 +1,5 @@
 
-// The idea is that this can be used from C++ only.
-// at least for now. I'm not too worried about 6 stable-id exports.
+
 
 struct CakeVM {
 linkage: cpp_class CakeVM, wrapper
