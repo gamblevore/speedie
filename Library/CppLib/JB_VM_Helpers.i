@@ -232,7 +232,7 @@ AlwaysInline JB_Object* alloc(void* o) {
 	return JB_AllocNew(((JB_MemoryLayer*)o)->CurrBlock);
 }
 
-u64 table (jb_vm& vm, ASM Op) {
+u64 table (CakeVM& vm, ASM Op) {
 	auto Add = GTable_Addu<<6;
 	if (GTable_Modeu)
 		return (u64)(vm.Env.LibGlobs+Add);
@@ -240,7 +240,7 @@ u64 table (jb_vm& vm, ASM Op) {
 }
 
 
-JB_Object* strs (jb_vm& vm, ASM Op) {
+JB_Object* strs (CakeVM& vm, ASM Op) {
 	auto Where = GObj_Modeu?vm.Env.LibGlobs:vm.Env.PackGlobs;
 	auto Str = ((JB_Object**)(Where))[GObj_Addu];
 	if (GObj_Refu)
@@ -511,7 +511,7 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 
-AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
+AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& r, ASM Op) {
 	auto stck	= r - 1;
 	auto R1		= stck - stck->Stack.SavedReg;
 	auto Code	= stck->Stack.Code;
@@ -528,7 +528,7 @@ AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
 }
 
 
-AlwaysInline ASM* DeRefRegs (jb_vm& vm, VMRegister*& r, ASM Op) {
+AlwaysInline ASM* DeRefRegs (CakeVM& vm, VMRegister*& r, ASM Op) {
 	if (n4)
 		JB_Decr(o4);
 	if (n3)
@@ -545,7 +545,7 @@ AlwaysInline ASM* DeRefRegs (jb_vm& vm, VMRegister*& r, ASM Op) {
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
 
 
-AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
+AlwaysInline void AllocStack (CakeVM& vm, VMRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?
 	int Amount = Alloc_Amounti << 4;
 	auto B = vm.AllocBase;
@@ -563,7 +563,7 @@ AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* TailStack (jb_vm& vm, VMRegister* r, ASM* Code, ASM Op) {
+AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 	VMRegister* stck = r-1;
 	vm.AllocCurr = stck->Stack.Alloc;
 	ASM Code2 = Code[0];
@@ -580,7 +580,7 @@ AlwaysInline ASM* TailStack (jb_vm& vm, VMRegister* r, ASM* Code, ASM Op) {
 }
 
 
-AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
+AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
 	VMRegister* Stack = r + Save + 1;
 	Stack->Stack.Code = CodePtr;
 	Stack->Stack.SavedReg = Save;
@@ -593,7 +593,7 @@ AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, in
 #define VMFinish {if (!U4_Lu) kill(getpid(), SIGINT); goto EXIT;}
 
 
-AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) { // jumpstack
+AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) { // jumpstack
 	auto r = rp;
 	auto Zero = SaveVMState(vm, r, CodePtr, n1);
 	rp = Zero;
@@ -646,14 +646,14 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
 
-AlwaysInline int64 FuncAddr (jb_vm& vv, ASM Op, ASM* Code) {
+AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
 		return (int64)(vv.Env.CppFuncs[FuncAddr_Indexu]);
 	return (int64)(Code+FuncAddr_Indexi);
 }
 
 
-AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
+AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
@@ -665,7 +665,7 @@ AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u
 }
 
 
-AlwaysInline void ForeignFunc2 (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
+AlwaysInline void ForeignFunc2 (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
 	if (fn) {

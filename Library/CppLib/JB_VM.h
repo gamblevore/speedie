@@ -43,21 +43,17 @@ struct vm_globs {
 };
 
 
-
-struct jb_vm {
+struct CakeVM;
+typedef bool (*JB_ASM_Break)(CakeVM* VM, ASM* Code, int BreakValue);
+struct CakeVM {
 	vm_globs		Env;
     byte*			AllocBase;
     int				AllocCurr;
     int				StackSize;
-    void*			JumpTable;
+    JB_ASM_Break	Break;
     
-    ASM* 			SavedCode;
-    VMRegister*		SavedStack;
-	
-	ASM*			CodeBase;
-    ASM*			ShadowAlloc;
-    int64			ShadowLocation;
-    
+	void*const*		OriginalJumpTable;
+	void*			JumpTable[514];
     int				VFlags;
     
     ASM				ExitGuard;

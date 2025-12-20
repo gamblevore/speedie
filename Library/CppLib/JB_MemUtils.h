@@ -33,6 +33,16 @@ void JB_mtest(const void* M);
 u64 JB_MemUsedString();
 u64 JB_MemUsedOther();
 
+#if __linux__
+	#define JB_AlignedAlloc(R, A)	aligned_alloc(A, R) 
+	#define JB_AlignedFree(M)		free(M)
+#else 
+	#define JB_AlignedAlloc(R, A)	malloc_zone_memalign(malloc_default_zone(), A, R)
+	#define JB_AlignedFree(M)		malloc_zone_free(malloc_default_zone(), M);
+#endif
+
+
+
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
 inline void memzero (void* Where, int N) {
     memset(Where, 0, N);

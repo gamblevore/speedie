@@ -821,11 +821,7 @@ static SuperBlock* Super_calloc(JB_MemoryWorld* World) {
     int Align = (1 << World->BlockSize);
 
     while (N >= Align*4) {
-        #if __linux__
-        SuperBlock* bla = (SuperBlock*)aligned_alloc(Align, N);
-        #else 
-        SuperBlock* bla = (SuperBlock*)malloc_zone_memalign(malloc_default_zone(), Align, N);
-        #endif
+		SuperBlock* bla = (SuperBlock*)JB_AlignedAlloc(N, Align);
         if (bla) {
 //            printf("allocating %i (%s): %X\n", N, World->Name, (void*)bla);
             memset(bla, 0, N);
@@ -842,11 +838,7 @@ static SuperBlock* Super_calloc(JB_MemoryWorld* World) {
 
 static void SuperFree_(SuperBlock* Super) {
     Super->World->CountRef--;
-    #if __linux__
-    free(Super);
-    #else 
-    malloc_zone_free(malloc_default_zone(), Super);
-    #endif
+    JB_AlignedFree(Super);
 }
 
 

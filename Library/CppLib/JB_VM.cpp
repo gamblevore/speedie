@@ -22,7 +22,7 @@ extern "C" {
 #include "JB_VM.h"
 
 
-ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
+ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	if (!V)
 		return 0;
 	auto Ret = V->Registers;
@@ -38,78 +38,51 @@ ivec4* JB_ASM_Registers (jb_vm* V, bool Clear) {
 
 
 #define ı		Op = *Code++;   goto *JumpTable[Op>>24];
-#define Dı		JB_VM_DebugTrap(); ı
 #define _		;
 
-#define JB_VM_DebugTrap() if (!vm.ShadowLocation | (Code[vm.ShadowLocation]++)>>31) goto BREAK;
-// seems easier to NOT have two code-tables. We should just "go to the next thing".
-// the nxt thing will be the break-block. So we'll do a lot of table-alteration. We'll need two tables...
-// but we HAVE two tables right now, and thats WITH an xor trick!
-// we can remove the shadowlocation trick.
-
-// What about breaking on a specific code location? Well... yes. Thats what the shadow is for.
-// we could make a generalised place to jump to, but then I buggered the VM.
-// We'd have to re-write the table each and every instruction. Debugging becomes impossibly slow.
-// madness.
-// I think the current design is better.
-
-// we also need a debug function callback.
-// doing that from within speedie... seems... painful. We'll need to do message-passing, all that crap.
-// or re-write it. I think... lets not for now?
 
 
-bool VM_Debug = false;
-bool VM_Prepared = false;
-
-
-void JB_ASM_BreakAll (jb_vm* V, bool Value) {
-	if (Value)
-		V->ShadowLocation = 0;
-	  else
-		V->ShadowLocation = V->ShadowAlloc - V->CodeBase;
+void JB_ASM_Pause (CakeVM* V) {
+	auto J = V->JumpTable;
+	void* Break = J[256];
+	for (int i = 0; i < 256; i++)
+		J[i] = Break;
 }
 
 
-u32* JB_ASM_SetDebug (jb_vm* V, bool Value) {
-	auto Shadow = V->ShadowAlloc;
-	if (!Shadow)
-		return 0;
-
-	if (VM_Debug != Value) {
-		VM_Debug = Value;
-		int64* J = (int64*)V->JumpTable;
-		for (int i = 0; i < 256; i++)
-			J[i] ^= J[i+256];
+int* JB_ASM_SetDebug (CakeVM* V, bool Value) {
+	auto J = V->JumpTable;
+	void* Break = J[512];
+	if (Value != (J[0] == Break)) {
+		int i = 256;
+		if (Value) while (--i >= 0)
+			J[i] = Break;
+		  else
+			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
 	}
-
-	return Shadow;
+	byte* B = (byte*)V;
+	return (int*)(B + (1024*1024) + (V->StackSize));
 }
 
 
-static ivec4* PrepareJumpTable (jb_vm& vm, void** JumpTable) {
-	if (VM_Prepared) return 0;
-	for (int i = 0; i < 256; i++) {
-		void* Dbg = JumpTable[i+256];
-		int64 diff = (int64)Dbg xor (int64)JumpTable[i];
-		JumpTable[i+256] = (void*)diff; // avoid creating yet ANOTHER table...
-	}
-	VM_Prepared = true;
-	vm.JumpTable = JumpTable;
-	return 0;
-};
-
-
-static ivec4* __CAKE_VM__ (jb_vm& vm, uint Op) {				// vm_run, vm__run, vmrun, run_vm
-static void* JumpTable[] = {
+static ivec4* __CAKE_VM__ (CakeVM& vm, uint Op) {
+static void * const GlobalJumpTable[] = {
 #if __CPU_TYPE__ == __CPU_ARM__
 	#include "InstructionList.h"
+	&&TRYBREAK, 									// 512
+	&&PAUSE,										// 513
 #endif
 };
-    if (Op)
-		return PrepareJumpTable(vm, JumpTable);
-    
-    RegVar(Code,		r20) = vm.SavedCode;
-    RegVar(r,			r21) = vm.SavedStack;
+    if (Op) {
+		vm.OriginalJumpTable = &GlobalJumpTable[0];
+		memcpy(vm.JumpTable, GlobalJumpTable, 256*sizeof(void*));
+		memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
+		return 0;
+	}
+  
+    RegVar(Code, r20) = JB_ASM_Code(&vm,0,0);
+    RegVar(r, r21) = vm.Registers+2;
+    RegVar(JumpTable, r22) = &vm.JumpTable[0];
 
 #if __CPU_TYPE__ == __CPU_ARM__
 	ı;
@@ -118,29 +91,43 @@ static void* JumpTable[] = {
 	EXIT:;
     return &vm.Registers[1].Ivec;
 
-	// we actually need to enter some loop. how though?
-	BREAK:;
-	auto BreakValue = Code[vm.ShadowLocation];
-	if (BreakValue == 0x80000000) {					// Accidental trap from 2GB loop.
-		Code[vm.ShadowLocation] = 1;				// reset 
-		if (!(vm.VFlags & kJB_VM_TrapTooFar))
-			ı;										// resume
+	
+	PAUSE:;											// Assume was in debug mode
+	++Code[1024*1024];
+	for (int i = 0; i < 256; i++)
+		JumpTable[i] = &&TRYBREAK;
+	goto BREAK;
+
+	
+	TRYBREAK:; {
+		auto BreakValue = ++Code[1024*1024];
+		if_rare (BreakValue == 0x80000000) {		// Accidental trap from 2GB loop.
+			Code[1024*1024] = 1;					// Reset 
+			if (!(vm.VFlags & kJB_VM_TrapTooFar))
+				goto *JumpTable[256+(Op>>24)];		// Resume
+		}
+		if_usual (BreakValue != 0)
+			goto *JumpTable[256+(Op>>24)];			// Resume
 	}
 	
-	vm.SavedCode = Code;
-	vm.SavedStack = r;
-    return 0;
+	BREAK:;											// the actual breakpoint
+	while (auto B = vm.Break)
+		if (!(B)(&vm, Code-1, Code[1024*1024]))
+			break;
+
+	goto *JumpTable[256+(Op>>24)];					// Resume
 }
 
 
-void JB_ASM_FillTable (jb_vm* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
+
+void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
 	vm->Env.LibGlobs = LibGlobs;
 	vm->Env.PackGlobs = PackGlobs;
 	vm->Env.CppFuncs = (Fn0*)CppFuncs;
 }
 
 
-void** JB_ASM_InitTable (jb_vm* vm, int FuncCount, int GlobBytes) {
+void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 	if (vm->Env.CppFuncs)
 		return (void**)(vm->Env.CppFuncs);
 	int FuncBytes = sizeof(void*) * FuncCount;
@@ -155,33 +142,37 @@ void** JB_ASM_InitTable (jb_vm* vm, int FuncCount, int GlobBytes) {
 }
 
 
-jb_vm* JB_ASM__VM (int AllocSize, int Flags) { // 256K is around 1600 ~fns deep.
-	if (AllocSize < 256*1024)
-		AllocSize = 256*1024;
-	
-	int ShadowSize = (Flags&kJB_VM_DebugCapable)*(1024*1024); // 4MB
-	auto V = (jb_vm*)calloc(AllocSize+ShadowSize, 1);
-	V->VFlags = Flags;
-	if (ShadowSize)
-		V->ShadowAlloc = (u32*)(((byte*)V)+AllocSize);
-	
-	int StackSize = (AllocSize - sizeof(jb_vm))/sizeof(VMRegister) - 1;
-	V->StackSize = StackSize;
-	__CAKE_VM__(*V, StackSize);
+ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
+	if (Length <= (1024*1024)/4) {
+		auto D = (ASM*)(((byte*)V) + V->StackSize);
+		if (Code)
+			return (ASM*)memcpy(D, Code, 4*Length);
+		return D;
+	}
+	return 0;
+}
+
+
+CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns deep.
+	const int MB = 1024*1024;
+	const int Page = 16*1024;
+	StackSize = StackSize&~(Page-1);						// remove garbage
+	if (StackSize < MB/4)
+		StackSize = MB/4;
+	int AllocSize = StackSize + 2*MB;	
+	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);		// page aligned. Can call mprotect later.
+	if (V) {
+		memzero(V, AllocSize);
+		V->VFlags = Flags;
+		V->StackSize = StackSize;
+		__CAKE_VM__(*V, StackSize);
+	}
 	return V;
 }
 
 
-// so how to do something... interetsing? breakpoints. So... lets try?
-// what first? init the vm with shadow. so how.
-ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
-	if (CodeLength <= 0)
-		return &(V.Registers[1].Ivec);
-
+static ivec4* VM_Run (CakeVM& V) {
 	// re-entrant code will be called differently.
-	V.CodeBase = Code;
-	V.SavedCode = Code;
-	V.SavedStack = V.Registers+2;
 	V.Registers[2] = {};
 	V.EXIT[0] = 1;
 	auto& Stack = V.Registers[1].Stack;
@@ -190,17 +181,12 @@ ivec4* VM_Run (jb_vm& V, u32* Code, int CodeLength) {
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
-	V.ShadowLocation = 0;
-	
-	if (V.ShadowAlloc)
-		V.ShadowLocation = V.ShadowAlloc - Code;
-
 	return __CAKE_VM__(V, 0);
 }
 
 
-ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
-	return VM_Run(*V, Code, CodeLength); // i can't stand pointer syntax.
+ivec4* JB_ASM_Run (CakeVM* V) {
+	return VM_Run(*V); // i can't stand pointer syntax.
 }
 
 
@@ -208,16 +194,16 @@ ivec4* JB_ASM__Run (jb_vm* V, u32* Code, int CodeLength) {
 void*	JB_ASM__Load		(JB_StringC* S) {
 	return 0;
 }
-void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
+void** JB_ASM_InitTable(CakeVM* vm, int n, int g) {
 	return 0;
 }
-ivec4* JB_ASM__Registers(jb_vm* V, bool i) {
+ivec4* JB_ASM__Registers(CakeVM* V, bool i) {
 	return 0;
 }
-jb_vm* JB_ASM__VM(int StackSize, int Flags) {
+CakeVM* JB_ASM__VM(int StackSize, int Flags) {
 	return 0;
 }
-ivec4* JB_ASM__Run(jb_vm* VM, u32* Code, int CodeSize) {
+ivec4* JB_ASM__Run(CakeVM* VM, u32* Code, int CodeSize) {
 	return 0;
 }
 

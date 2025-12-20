@@ -5,7 +5,7 @@ target debug
 
   
 extend_module ASM
-	function TestASMSub (|message| tests)
+	function TextASMTestSub (|message| tests)
 		opt norefcounts
 		Assembler.sh.ASMInit
 		|| list = tests.last(@arg)
@@ -17,7 +17,10 @@ extend_module ASM
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
-				testvm.Run(ff.ptr, ff.length)
+/				testvm.setdebug(true)
+				testvm.Load(ff.ptr, ff.length)
+				testvm.Run
+/				testvm.setdebug(false)
 
 
 	function GetASMFunc (|message| m, |scfunction|)
@@ -26,13 +29,13 @@ extend_module ASM
 		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 
 
-	function TestASM 
+	function TextASMTest 
 		target debug
 			require options.Modecake and options.dev > 0
 			asm.noisyasm = 3		
 			using ErrorSeverity.Warning
 			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
-				.TestASMSub(T)
+				.TextASMTestSub(T)
 	
 
 function message.GetASMFunc (|message|)

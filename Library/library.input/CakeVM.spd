@@ -3,7 +3,7 @@
 // at least for now. I'm not too worried about 6 stable-id exports.
 
 struct CakeVM {
-linkage: cpp_class jb_vm, wrapper
+linkage: cpp_class CakeVM, wrapper
 
 constants
 	TrapTooFar		= 1
@@ -11,12 +11,14 @@ constants
 	DebugCapable	= 4
 
 target cpp or vm {
-	function Run		(|&uint| Code, |int| CodeLength, |&ivec4|): cpp_wrapper JB_ASM__Run
+	function Load		(|&ASM| Code, |int| CodeLength, |&ASM|): 	cpp_wrapper JB_ASM_Code
+	function Run		(|&ivec4|):									cpp_wrapper JB_ASM_Run
 	function Registers	(|bool| Clear=true, |&ivec4|):				cpp_wrapper JB_ASM_Registers
 	function TestInit	(|int| n, |int| g, |&&nil|):				cpp_wrapper JB_ASM_InitTable
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 																	cpp_wrapper JB_ASM_FillTable
-	function SetDebug	(|bool| Value):								cpp_wrapper JB_ASM_SetDebug
+	function SetDebug	(|bool| Value, |&int|):						cpp_wrapper JB_ASM_SetDebug
+	function Pause		():											cpp_wrapper JB_ASM_Pause
 
 	module
 		function New	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
@@ -27,7 +29,6 @@ target cpp or vm {
 	inline Registers	(|bool| Clear=true, |&ivec4|)
 	inline TestInit		(|int| n, |int| g, |&&nil|)
 	inline ExecInit		(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
-	inline SetDebug		(|bool| Value)
 
 	module
 		inline New		(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)

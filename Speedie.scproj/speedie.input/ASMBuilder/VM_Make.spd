@@ -199,8 +199,7 @@ function BuildFiles (|bool|)
 
 	|| Code = FastString()
 	|| Jump = FastString()
-	.VMCpp(code, jump, "")
-	.VMCpp(code, jump, "D")
+	.VMCpp(code, jump)
 	.SafeWrite("Instructions.i",       code)
 	.SafeWrite("InstructionList.h",    jump)
 	
@@ -221,7 +220,7 @@ function SafeWrite (|String| name, |FastString| data)
 function MakeTheVM (|bool|)
 	compiler.Project.use
 	if .BuildFiles	
-		asm.TestASM
+		asm.TextASMTest
 	return stderr.ok
 
 
@@ -243,10 +242,6 @@ function BuildInstructions (TranFunc) // __instructionlist__
 	node.SafeRemove
 
 
-function MakeJump   (|message| tmp, |FastString| jump, |string| Pre)
-	jump <~ "&&$Pre${tmp.name},\n"
-
- 
 function Clean (|message| msg)
 	opt norefcounts
 	for ch.flat in msg
@@ -296,16 +291,20 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		asm.encoders[i] ?= MissingInstruction
 
 	
-function VMCpp (|faststring| vm_code, |faststring| jump, |string| Pre)
+function VMCpp (|faststring| vm_code, |faststring| jump)
 	opt norefcounts
 	for tmp in .NameList
-		.MakeVM(tmp, vm_code, pre)
-		.MakeJump(tmp, jump, pre)
+		.MakeVM(tmp, vm_code)
+		.MakeJump(tmp, jump)
 
-	vm_code <~ "${Pre}ı \n\n"
+	vm_code <~ "ı \n\n"
 
 
-function MakeVM (|message| tmp, |faststring| vm, |string| Pre)
+function MakeJump   (|message| tmp, |FastString| jump)
+	jump <~ "&&${tmp.name},\n"
+
+ 
+function MakeVM (|message| tmp, |faststring| vm)
 	opt norefcounts
 	require tmp == @tmp
 	|| p = tmp.prev
@@ -316,7 +315,7 @@ function MakeVM (|message| tmp, |faststring| vm, |string| Pre)
 //	tmp.RangeLength = SCTasks.AlreadyDone
 	|| arg = tmp.last
 
-	vm <~ "${Pre}ı $Pre${tmp.name}: "
+	vm <~ "ı ${tmp.name}: "
 	if !arg.Find(@tmp, "__")
 		vm <~ "_"
 	vm <~ "\n"
