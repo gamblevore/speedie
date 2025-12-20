@@ -19,8 +19,15 @@ Design:
 
 
 extern "C" {
+#ifdef __VM__
+#pragma GCC optimize ("Os")
+
 #include "BitFields.h"
 #include "JB_VM.h"
+#include "JB_VM_Helpers.i"
+
+
+#define ı		Op = *Code++;   goto *JumpTable[Op>>24];
 
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
@@ -31,15 +38,6 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 		memset(Ret, 0xFE, sizeof(VMRegister)*35);
 	return (ivec4*)(Ret+3);
 }
-
-
-#ifdef __VM__
-#pragma GCC optimize ("Os")
-#include "JB_VM_Helpers.i"
-
-
-#define ı		Op = *Code++;   goto *JumpTable[Op>>24];
-
 
 
 void JB_ASM_Pause (CakeVM* V) {
@@ -101,13 +99,13 @@ static void * const GlobalJumpTable[] = {
 	
 	TRYBREAK:; {
 		auto BreakValue = ++Code[1024*1024];
-		if_rare (BreakValue == 0x80000000) {		// Accidental trap from 2GB loop.
-			Code[1024*1024] = 1;					// Reset 
+		if_usual (!(BreakValue & 0x80000000))
+			goto *JumpTable[256+(Op>>24)];			// Resume
+		if_rare (!(BreakValue<<1)) {				// Accidental trap from 2GB loop.
+			Code[1024*1024] = ((~BreakValue>>31)<<31)|0x40000000;// Reset to a big number 
 			if (!(vm.VFlags & kJB_VM_TrapTooFar))
 				goto *JumpTable[256+(Op>>24)];		// Resume
 		}
-		if_usual (BreakValue != 0)
-			goto *JumpTable[256+(Op>>24)];			// Resume
 	}
 	
 	BREAK:;											// the actual breakpoint
@@ -117,7 +115,6 @@ static void * const GlobalJumpTable[] = {
 
 	goto *JumpTable[256+(Op>>24)];					// Resume
 }
-
 
 
 void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
@@ -143,23 +140,21 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 
 
 ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
-	if (Length <= (1024*1024)/4) {
-		auto D = (ASM*)(((byte*)V) + V->StackSize);
-		int F = V->VFlags;
-		if (Code) {
-			if (F&kJB_VM_IsProtected)
-				if (mprotect(D, 1024*1024, PROT_WRITE|PROT_READ)==0) // unprotect
-					F &=~ kJB_VM_IsProtected;
-			memcpy(D, Code, 4*Length);
-		}
-		if (F&kJB_VM_WantProtect and !(F&kJB_VM_IsProtected))
-			if (mprotect(D, 1024*1024, PROT_READ) == 0)				// protect!
-				F |= kJB_VM_IsProtected;
-		V->VFlags = F;
-		return D;
+	if_rare (Length > (1024*1024)/4)
+		return 0;
+	auto D = (ASM*)(((byte*)V) + V->StackSize);
+	int F = V->VFlags;
+	if (Code) {
+		if (F&kJB_VM_IsProtected)
+			if (mprotect(D, 1024*1024, PROT_WRITE|PROT_READ)==0) // unprotect
+				F &=~ kJB_VM_IsProtected;
+		memcpy(D, Code, 4*Length);
 	}
-
-	return 0;
+	if (F&kJB_VM_WantProtect and !(F&kJB_VM_IsProtected))
+		if (mprotect(D, 1024*1024, PROT_READ) == 0)				// protect!
+			F |= kJB_VM_IsProtected;
+	V->VFlags = F;
+	return D;
 }
 
 
@@ -200,25 +195,5 @@ static ivec4* VM_Run (CakeVM& V) {
 ivec4* JB_ASM_Run (CakeVM* V) {
 	return VM_Run(*V); // i can't stand pointer syntax.
 }
-
-
-#else
-void*	JB_ASM__Load		(JB_StringC* S) {
-	return 0;
-}
-void** JB_ASM_InitTable(CakeVM* vm, int n, int g) {
-	return 0;
-}
-ivec4* JB_ASM__Registers(CakeVM* V, bool i) {
-	return 0;
-}
-CakeVM* JB_ASM__VM(int StackSize, int Flags) {
-	return 0;
-}
-ivec4* JB_ASM__Run(CakeVM* VM, u32* Code, int CodeSize) {
-	return 0;
-}
-
-
 #endif
-} //  cextern c
+} // extern c
