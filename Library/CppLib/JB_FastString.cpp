@@ -140,12 +140,12 @@ void JB_FS_AppendLocalTime (FastString* fs, Date self) {
     }
 }
 
-JB_String* JB_FS_Copy(FastString* fs) {
+JB_String* JB_FS_Copy (FastString* fs) {
     FS_SanityCheck_(fs);
     return JB_Str_CopyFromPtr(fs->ResultPtr, fs->Length);
 }
 
-bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
+bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
     FS_SanityCheck_(fs);
     if (NewLength == fs->Reserved) {
         return true;
@@ -171,7 +171,7 @@ bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
 }
 
 
-uint8* JB_FS_GrowBy(FastString* fs, int Needs) {
+uint8* JB_FS_GrowBy (FastString* fs, int Needs) {
     if ( JB_FS_Flush( fs ) and fs->Reserved >= Needs ) {
         fs->Length = Needs;
         return fs->ResultPtr;

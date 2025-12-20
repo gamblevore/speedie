@@ -130,20 +130,26 @@ class FastString {
 
 	module
 		function UseAsOutput (|object| other, |FastString|)
-			if !other
-				return faststring.new
-			if other isa FastString
-				return other
-			if other isa string
-				return other.OutputStream
-			error (other, "FastString can't use this object.")
+			opt norefcounts
+			if other
+				if other isa FastString
+					return other
+				if other isa file
+					return faststring(other)
+				if other isa string
+					return other.OutputStream
+				error (other, "FastString can't use this object.")
+			return faststring.new
 		
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
-		
-//		function Append (|file| dest, |FastString|)
-//			cpp_wrapper JB_FS__FileAppend
 
+		function New (|file!| F, |FastString|)
+			cpp_part NewFile
+			|| fs = FastString()
+			fs.file = F
+			return fs
+		
 
 	syntax Access (|int| off, |Byte|)
 		cpp_wrapper JB_FS_Byte

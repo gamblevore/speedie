@@ -395,15 +395,15 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function string.OutputStream (|bool| Clear=true, |Faststring|)
 		description "Lets you write to a file, via a faststring object." 
 		|| f = .file
-		if Clear
-			if !f.ispipe // we don't close pipes!
-				f.close
-				require f.openempty
+		if f.ispipe
+			0
+		  elseif Clear
+			f.close
+			require f.openempty
 		  elseif !f.opened
 			require f.open
-				
-		rz = FastString()
-		rz.file = f
+		return faststring(f)
+
 
 	function string.InputStream (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
 		description "Reads from a file, via a InputStream object. Useful because InputStream can read from files, strings, and more. Write code once and use it on multiple input-sources." 

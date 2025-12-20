@@ -219,10 +219,14 @@ function StdIn (|File!|)
 	opt norefcounts
 	return ._Stdin init File.newpipe(filedes.stdin)
 
-	
-function StdOut (|File!|)
+
+function StdOut (|file!|)
 	opt norefcounts
-	return ._StdOut init File.NewPipe(filedes.stdout)
+	return ._StdOut init file.NewPipe(filedes.stdout)
+
+//function StdOut (|faststring!|)
+// this wouldn't self-flush. and speedie isnt threaded.
+// Flush on exit... suffers crashes and delays. No, basically.
 
 
 function CWD (|string|)

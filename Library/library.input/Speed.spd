@@ -1,8 +1,8 @@
 
 
-function string.RenderSpeed (|Faststring| fs_in=nil, |int64| BytesIn, |duration| Duration, |int64| BytesOut=0, |string|)
+function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Duration, |int64| BytesOut=0, |string|)
 	opt norefcounts
-	|| fs = FastString(fs_in)
+	|| fs = FastString.useasoutput(fs_in)$
 	if self
 		fs <~ self
 		fs <~ ": "
