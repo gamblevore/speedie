@@ -1,7 +1,7 @@
 
 |string|     Speedie = "/usr/local/bin/speedie"
 |spdprocess| Perry = app.parent
-|!&cakevm|   Cake = CakeVM(1MB)
+|!&cakevm|   Cake = CakeVM(1MB, cakevm.WantProtect)
 
 
 main
@@ -20,16 +20,6 @@ May also pass .spd or .scproj files. They will be compiled, then run.\n"
 		if debugger.StartDebug
 			return SpdTable.RunMain
 	return 1
-
-
-//function App.ActAsSpeedie (|ErrorInt|)
-//	|| Proj = app.args[0].FileThatExists #require
-//	|| SpdArgs = [Proj, "--nocolor", "--hideaway", "--perry=bin"]
-//	|| c = SpdProcess.Spawn(speedie,  SpdArgs,  ProcessMode.PassThru,  "Speedie")
-//		Compiler = c
-//		while c.IsOpen
-//			...
-//		return c.Status
 
 
 function App.RespondToParent
