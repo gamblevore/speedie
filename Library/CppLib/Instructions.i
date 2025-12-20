@@ -1,435 +1,435 @@
-ı EROR: _
+ı EROR:;
 	if (u2 == u1 and u3 == u4)
 	VMFinish
 ;
-ı TAIL: _
+ı TAIL:;
 	TailStack(vm, r, Code, Op);
-ı KNST2: _
+ı KNST2:;
 	LoadConst(r, Op, *Code++);
-ı KNST3: _
+ı KNST3:;
 	LoadConst(r, Op, *((uint64 *)(Code)));
 	Code += 2;
-ı FNC: _
+ı FNC:;
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
-ı FNC3: _
+ı FNC3:;
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
-ı FNCX: _
+ı FNCX:;
 	ForeignFunc(vm, Code, r, Op, *Code);
 	Code++;
-ı FNCX3: _
+ı FNCX3:;
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
-ı TRAP: _
+ı TRAP:;
 	0;
-ı NOOP: _
+ı NOOP:;
 	i1 = i1;
 	// NOOP
 
-ı DUMB: _
+ı DUMB:;
 	0;
-ı TIME: _
+ı TIME:;
 	Time_(r, Op);
-ı CONV: _
+ı CONV:;
 	RegConv(r, Op);
-ı FEET: _
+ı FEET:;
 	u1 = 0;
-ı GRAB: _
+ı GRAB:;
 	u1 = (uint64)(&u2);
-ı RET: _
+ı RET:;
 	Code = ReturnFromFunc(vm, r, Op);
-ı AFNC: _
+ı AFNC:;
 	i1 = FuncAddr(vm, Op, Code);
-ı ALLO: _
+ı ALLO:;
 	AllocStack(vm, r, Op);
-ı KNSR: _
+ı KNSR:;
 	RotateConst(r, Op);
-ı KNST: _
+ı KNST:;
 	LoadConst(r, Op, 0);
-ı ADDB: _
+ı ADDB:;
 	i1 = i1 + (U1_Li << 12);
-ı ADDK: _
+ı ADDK:;
 	i1 = i2 + U2_Li;
-ı ADAK: _
+ı ADAK:;
 	i1 = i2;
 	i2 = i2 + U2_Li;
-ı MULK: _
+ı MULK:;
 	i1 = i2 * U2_Li;
-ı ADD: _
+ı ADD:;
 	i1 = i2 + (i3 << Shift_Shu);
-ı SUB: _
+ı SUB:;
 	i1 = (i2 - i3) >> Shift_Shu;
-ı MUL: _
+ı MUL:;
 	i1 = (i2 * i3) + i4;
-ı DIV: _
+ı DIV:;
 	DivMath(r, Op);
-ı DIV2: _
+ı DIV2:;
 	if (i2 < 0)
 	i1 = (((i2 + ((1 << Div2_Shu) - 1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
 	else
 	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
-ı ICLM: _
+ı ICLM:;
 	i1 = std_clamp(btc(i2), btc(i3), btc(i4));
-ı UCLM: _
+ı UCLM:;
 	u1 = std_clamp(btc(u2), btc(u3), btc(u4));
-ı ADDM: _
+ı ADDM:;
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
-ı SUBM: _
+ı SUBM:;
 	i1 = (i2 - ii3) >> AddOrSubM_Shu;
-ı DIVS: _
+ı DIVS:;
 	DivMath32(r, Op);
-ı MULS: _
+ı MULS:;
 	i1 = (ii2 * ii3) + ii4;
-ı BFLG: _
+ı BFLG:;
 	if (BFLD_signu)
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 ;
 	else
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
-ı BFLS: _
+ı BFLS:;
 	u1 = u2 | (u3 << Shift_Shu);
-ı BRSS: _
+ı BRSS:;
 	i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3;
-ı BRSH: _
+ı BRSH:;
 	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
-ı BLSH: _
+ı BLSH:;
 	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
-ı BAND: _
+ı BAND:;
 	u1 = u2 & ((u3 << Shift_Shu) >> Shift_Shu);
-ı BORR: _
+ı BORR:;
 	u1 = u2 | ((u3 << Shift_Shu) >> Shift_Shu);
-ı BXOR: _
+ı BXOR:;
 	u1 = u2 ^ ((u3 << Shift_Shu) >> Shift_Shu);
-ı BNOT: _
+ı BNOT:;
 	u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu);
-ı BANK: _
+ı BANK:;
 	u1 = u2 & U2_Li;
-ı BORK: _
+ı BORK:;
 	u1 = u2 | U2_Li;
-ı BXRK: _
+ı BXRK:;
 	u1 = u2 ^ U2_Li;
-ı EQUL: _
+ı EQUL:;
 	u1 = BitComp(r, Op);
-ı TERN: _
+ı TERN:;
 	if (u2)
 	r[n1] = r[n3]
 ;
 	else
 	r[n1] = r[n4]
 ;
-ı CMPI: _
+ı CMPI:;
 	CompI(r, Op);
-ı CMPF: _
+ı CMPF:;
 	CompF(r, Op);
-ı JUMP: _
+ı JUMP:;
 	Code += l0;
-ı JMPI: _
+ı JMPI:;
 	Code = JumpI(r, Op, Code);
-ı JMPF: _
+ı JMPF:;
 	Code = JumpF(r, Op, Code);
-ı JMPE: _
+ı JMPE:;
 	Code = JumpEq(r, Op, Code);
-ı JMPN: _
+ı JMPN:;
 	Code = JumpNeq(r, Op, Code);
-ı JMKM: _
+ı JMKM:;
 	Code = JumpK(r, Op, Code);
-ı JMKL: _
+ı JMKL:;
 	Code = JumpKN(r, Op, Code);
-ı JMKE: _
+ı JMKE:;
 	Code = JumpKE(r, Op, Code);
-ı JMKN: _
+ı JMKN:;
 	Code = JumpKNE(r, Op, Code);
-ı JBOR: _
+ı JBOR:;
 	if (u1 << (Bra_Smallu << 5))
 	Code += Bra_Jmpi
 ;
-ı JBAN: _
+ı JBAN:;
 	if (!(u1 << (Bra_Smallu << 5)))
 	Code += Bra_Jmpi
 ;
-ı LUPU: _
+ı LUPU:;
 	if (ii1++ < ii2)
 	Code += Loop_Jmpi
 ;
-ı LUPD: _
+ı LUPD:;
 	if (ii1-- > ii2)
 	Code += Loop_Jmpi
 ;
-ı RFUN: _
+ı RFUN:;
 	SetRefApart(r, Op);
-ı RFST: _
+ı RFST:;
 	SetRefBasic(r, Op);
-ı RFWR: _
+ı RFWR:;
 	SetRefRegToMem(r, Op);
-ı RFRD: _
+ı RFRD:;
 	SetRefMemToReg(r, Op);
-ı RALO: _
+ı RALO:;
 	o1 = alloc(o2);
-ı RFRT: _
+ı RFRT:;
 	Code = DeRefRegs(vm, r, Op);
-ı GOBJ: _
+ı GOBJ:;
 	o1 = strs(vm, Op);
-ı GTAB: _
+ı GTAB:;
 	u1 = table(vm, Op);
-ı RD1U: _
+ı RD1U:;
 	u1 = mem1(uint8);
 	mem2(uint8);
-ı RD1S: _
+ı RD1S:;
 	u1 = mem1(char);
 	mem2(char);
-ı RD2U: _
+ı RD2U:;
 	u1 = mem1(u16);
 	mem2(u16);
-ı RD2S: _
+ı RD2S:;
 	u1 = mem1(s16);
 	mem2(s16);
-ı RD4U: _
+ı RD4U:;
 	u1 = mem1(u32);
 	mem2(u32);
-ı RD4S: _
+ı RD4S:;
 	u1 = mem0(int);
 	mem2(int);
-ı RD8U: _
+ı RD8U:;
 	u1 = mem1(u64);
 	mem2(u64);
-ı RD16: _
+ı RD16:;
 	((ivec4 *) r)[n1] = mem1(ivec4);
 	mem2(ivec4);
-ı WR1U: _
+ı WR1U:;
 	mem1(uint8) = u1;
 	mem2(uint8);
-ı WR2U: _
+ı WR2U:;
 	mem1(u16) = u1;
 	mem2(u16);
-ı WR4U: _
+ı WR4U:;
 	//  xcode only complains about this one? ?
 
 	mem1(u32) = (u32) u1;
 	mem2(u32);
-ı WR8U: _
+ı WR8U:;
 	mem1(u64) = u1;
 	mem2(u64);
-ı WR16: _
+ı WR16:;
 	mem1(ivec4) = (ivec4)(((ivec4 *) r)[n1]);
 	mem2(ivec4);
-ı CNTC: _
+ı CNTC:;
 	IncrementAddr(r, Op, 1);
-ı CNTD: _
+ı CNTD:;
 	IncrementAddr(r, Op, 0);
-ı WCPY: _
+ı WCPY:;
 	MemCopyRDWR(r, Op);
-ı FADD: _
+ı FADD:;
 	if (!Float_Du)
 	d1 = d2 + d3 - d4
 ;
 	else
 	f1 = f2 + f3 - f4
 ;
-ı FADK: _
+ı FADK:;
 	f1 += f2 + FloatIncr1(Op);
-ı FMUL: _
+ı FMUL:;
 	if (!Float_Du)
 	d1 = (d2 * d3) + d4
 ;
 	else
 	f1 = (f2 * f3) + f4
 ;
-ı FMLK: _
+ı FMLK:;
 	f1 = f2 * FloatIncr1(Op);
-ı FDIV: _
+ı FDIV:;
 	if (!Float_Du)
 	d1 = d2 / d3
 ;
 	else
 	f1 = f2 / f3
 ;
-ı FMOD: _
+ı FMOD:;
 	if (!Float_Du)
 	d1 = fmod(d2, d3)
 ;
 	else
 	f1 = fmodf(f2, f3)
 ;
-ı FMAX: _
+ı FMAX:;
 	if (!Float_Du)
 	d1 = std_max(d2, d3)
 ;
 	else
 	f1 = std_max(f2, f3)
 ;
-ı FMIN: _
+ı FMIN:;
 	if (!Float_Du)
 	d1 = std_min(d2, d3)
 ;
 	else
 	f1 = std_min(f2, f3)
 ;
-ı FCLM: _
+ı FCLM:;
 	if (!Float_Du)
 	d1 = std_clamp(d2, d3, d4)
 ;
 	else
 	f1 = std_clamp(f2, f3, f4)
 ;
-ı VGET: _
+ı VGET:;
 	i1 = iv2[n3 + u4];
-ı VSET: _
+ı VSET:;
 	iv1[n3 + u4] = i2;
-ı VBLD: _
+ı VBLD:;
 	v1 = VBuild(r, Op);
-ı VSWZ: _
+ı VSWZ:;
 	v1 = VSwiz(r, Op);
-ı VMOV: _
+ı VMOV:;
 	iv1 = iv2;
 	iv3 = iv4;
-ı VADD: _
+ı VADD:;
 	v1 = v2 + v3 - v4;
-ı VADK: _
+ı VADK:;
 	v1 += v2 + FloatIncr1(Op);
-ı VMUL: _
+ı VMUL:;
 	v1 = (v2 * v3) + v4;
-ı VMLK: _
+ı VMLK:;
 	v1 = v2 * FloatIncr1(Op);
-ı VDIV: _
+ı VDIV:;
 	v1 = v2 / v3;
-ı VMOD: _
+ı VMOD:;
 	v1 = JB_vec4_Mod(v2, v3);
-ı VMAX: _
+ı VMAX:;
 	v1 = JB_vec4_Max(v2, v3);
-ı VMIN: _
+ı VMIN:;
 	v1 = JB_vec4_Min(v2, v3);
-ı QADD: _
+ı QADD:;
 	iv1 = iv2 + (iv3 << Shift_Shu);
-ı QSUB: _
+ı QSUB:;
 	iv1 = (iv2 - iv3) >> Shift_Shu;
-ı QADK: _
+ı QADK:;
 	iv1 = iv2 + U2_Li;
-ı QMUL: _
+ı QMUL:;
 	iv1 = (iv2 * iv3) + iv4;
-ı QDIV: _
+ı QDIV:;
 	iv1 = iv2 / iv3;
-ı QCLM: _
+ı QCLM:;
 	iv1 = JB_ivec4_ClampVec(iv2, iv3, iv4);
-ı QINC: _
+ı QINC:;
 	i1 = iv2[VecInc_partu] + VecInc_Amounti;
 	iv2[VecInc_partu] = i1;
-ı QFLG: _
+ı QFLG:;
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
-ı QFLS: _
+ı QFLS:;
 	iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu);
-ı QRSS: _
+ı QRSS:;
 	iv1 = (iv2 >> Shift_Shu) >> iv3;
-ı QRSH: _
+ı QRSH:;
 	uv1 = (uv2 >> Shift_Shu) >> uv3;
-ı QLSH: _
+ı QLSH:;
 	uv1 = (uv2 << uv3) << Shift_Shu;
-ı QAND: _
+ı QAND:;
 	uv1 = uv2 & (uv3 | Shift_Shu);
-ı QXOR: _
+ı QXOR:;
 	uv1 = uv2 ^ (uv3 | Shift_Shu);
-ı QORR: _
+ı QORR:;
 	uv1 = uv2 | (uv3 | Shift_Shu);
-ı QNOT: _
+ı QNOT:;
 	uv1 = ~uv2 & ~(uv3 | Shift_Shu);
-ı QCNV: _
+ı QCNV:;
 	VecConv(r, Op);
-ı BSTT: _
+ı BSTT:;
 	u1 = bitstats(u2, U2_Li);
-ı FFRC: _
+ı FFRC:;
 	f1 = JB_f_Fract(f2);
-ı FFLR: _
+ı FFLR:;
 	f1 = floorf(f2);
-ı FRND: _
+ı FRND:;
 	f1 = roundf(f2);
-ı FLNG: _
+ı FLNG:;
 	f1 = JB_f_Length(f2);
-ı FABS: _
+ı FABS:;
 	f1 = fabsf(f2);
-ı FPOW: _
+ı FPOW:;
 	f1 = powf(f2, f3);
-ı FSQT: _
+ı FSQT:;
 	f1 = sqrtf(f2);
-ı FEXP: _
+ı FEXP:;
 	f1 = expf(f2);
-ı FLOG: _
+ı FLOG:;
 	f1 = logf(f2);
-ı FXP2: _
+ı FXP2:;
 	f1 = exp2f(f2);
-ı FLG2: _
+ı FLG2:;
 	f1 = log2f(f2);
-ı FNIS: _
+ı FNIS:;
 	f1 = JB_f_Unsin(f2);
-ı FSOC: _
+ı FSOC:;
 	f1 = JB_f_Uncos(f2);
-ı FNAT: _
+ı FNAT:;
 	f1 = JB_f_UnTan(f2, f3);
-ı FSIN: _
+ı FSIN:;
 	f1 = JB_f_Sine(f2);
-ı FCOS: _
+ı FCOS:;
 	f1 = JB_f_Cos(f2);
-ı FTAN: _
+ı FTAN:;
 	f1 = JB_f_Tan(f2);
-ı FSGN: _
+ı FSGN:;
 	f1 = copysignf(f2, f3);
-ı FMIX: _
+ı FMIX:;
 	f1 = JB_f_FloatMix(f2, f3, f4);
-ı FSMS: _
+ı FSMS:;
 	f1 = JB_f_SmoothStep(f2, f3, f4);
-ı FXNN: _
+ı FXNN:;
 	f1 = __isnanf(f2);
-ı FXNF: _
+ı FXNF:;
 	f1 = __isinff(f2);
-ı VFRC: _
+ı VFRC:;
 	v1 = JB_vec4_Fract(v2);
-ı VFLR: _
+ı VFLR:;
 	v1 = JB_vec4_Floor(v2);
-ı VRND: _
+ı VRND:;
 	v1 = JB_vec4_Round(v2);
-ı VLNG: _
+ı VLNG:;
 	f1 = JB_vec4_Length(v2);
-ı VABS: _
+ı VABS:;
 	v1 = JB_vec4_Abs(v2);
-ı VPOW: _
+ı VPOW:;
 	v1 = JB_vec4_Pow(v2, v3);
-ı VSQT: _
+ı VSQT:;
 	v1 = JB_vec4_Sqrt(v2);
-ı VEXP: _
+ı VEXP:;
 	v1 = JB_vec4_Exp(v2);
-ı VLOG: _
+ı VLOG:;
 	v1 = JB_vec4_Log(v2);
-ı VXP2: _
+ı VXP2:;
 	v1 = JB_vec4_Exp2(v2);
-ı VLG2: _
+ı VLG2:;
 	v1 = JB_vec4_Log2(v2);
-ı VNIS: _
+ı VNIS:;
 	v1 = JB_vec4_Unsin(v2);
-ı VSOC: _
+ı VSOC:;
 	v1 = JB_vec4_Uncos(v2);
-ı VNAT: _
+ı VNAT:;
 	v1 = JB_vec4_UnTan(v2, v3);
-ı VSIN: _
+ı VSIN:;
 	v1 = JB_vec4_Sine(v2);
-ı VCOS: _
+ı VCOS:;
 	v1 = JB_vec4_Cos(v2);
-ı VTAN: _
+ı VTAN:;
 	v1 = JB_vec4_Tan(v2);
-ı VSGN: _
+ı VSGN:;
 	v1 = JB_vec4_CopySign(v2, v3);
-ı VCLM: _
+ı VCLM:;
 	v1 = JB_vec4_Clamp(v2, v3, v4);
-ı VMIX: _
+ı VMIX:;
 	v1 = JB_vec4_Mix(v2, v3, v4);
-ı VSMS: _
+ı VSMS:;
 	v1 = JB_vec4_SmoothStep(v2, v3, v4);
-ı VDOT: _
+ı VDOT:;
 	f1 = JB_vec4_Dot(v2, v3);
-ı VCRS: _
+ı VCRS:;
 	v1 = JB_vec4_Cross(v2, v3);
-ı VRFL: _
+ı VRFL:;
 	v1 = JB_vec4_Reflect(v2, v3);
-ı VSUM: _
+ı VSUM:;
 	f1 = JB_vec4_Sum(v2);
 ı 
 

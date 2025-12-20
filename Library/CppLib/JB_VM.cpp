@@ -39,7 +39,6 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 
 #define ı		Op = *Code++;   goto *JumpTable[Op>>24];
-#define _		;
 
 
 
@@ -70,8 +69,8 @@ static ivec4* __CAKE_VM__ (CakeVM& vm, uint Op) {
 static void * const GlobalJumpTable[] = {
 #if __CPU_TYPE__ == __CPU_ARM__
 	#include "InstructionList.h"
-	&&TRYBREAK, 									// 512
-	&&PAUSE,										// 513
+	&&TRYBREAK,
+	&&PAUSE,
 #endif
 };
     if (Op) {

@@ -310,17 +310,8 @@ function MakeVM (|message| tmp, |faststring| vm)
 	|| p = tmp.prev
 	if P == @sheb
 		vm <~ "	// ${P.name}\n"
-	
-//	require tmp.RangeLength != SCTasks.AlreadyDone	
-//	tmp.RangeLength = SCTasks.AlreadyDone
-	|| arg = tmp.last
-
-	vm <~ "ı ${tmp.name}: "
-	if !arg.Find(@tmp, "__")
-		vm <~ "_"
-	vm <~ "\n"
-
-	for line in arg
+	vm <~ "ı ${tmp.name}:;\n"
+	for line in tmp.last
 		.VMLine(line, vm)
 
 
