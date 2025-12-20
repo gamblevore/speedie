@@ -11,7 +11,7 @@ constants
 	DebugCapable	= 4
 
 target cpp or vm {
-	function Load		(|&ASM| Code, |int| CodeLength, |&ASM|): 	cpp_wrapper JB_ASM_Code
+	function Load		(|&uint| Code, |int| CodeLength, |&uint|): 	cpp_wrapper JB_ASM_Code
 	function Run		(|&ivec4|):									cpp_wrapper JB_ASM_Run
 	function Registers	(|bool| Clear=true, |&ivec4|):				cpp_wrapper JB_ASM_Registers
 	function TestInit	(|int| n, |int| g, |&&nil|):				cpp_wrapper JB_ASM_InitTable
