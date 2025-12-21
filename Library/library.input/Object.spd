@@ -13,9 +13,6 @@ class Object
 		nil self
 		cpp_wrapper JB_Obj_Render
 
-//	libinternal GenericRender (|FastString| fs_in=nil)
-//		cpp_wrapper JB_Obj_GenericRender
-
 	function Class (|&ClassData|)
 		nil checker
 		cpp_wrapper JB_ObjClass
@@ -101,6 +98,7 @@ class Object
 	module
 		function DebugAllMemory (assigns:|bool|)
 			cpp_wrapper JB_DebugAllMemory
+		
 		function TotalSanity (|bool| Force=true, |bool|)
 			cpp_wrapper JB_TotalSanity
 			// something like that?
@@ -174,11 +172,6 @@ cpp_nothing JB_NewClass				(|ClassData|  Class,	|Object|)
 
 
 
-/// debugging
-prototype	fpDestructor		(|object| self)
-
-
-
 struct MemoryWorld
 	linkage
 		wrapper
@@ -212,7 +205,6 @@ class MemoryLayer
 	
 //	syntax Using (|memorylayer|) // need the default for this class... sigh
 		
-
 
 
 
