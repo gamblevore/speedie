@@ -602,7 +602,9 @@ struct Assembler
 	function FillDebugInfo
 		opt norefcounts
 		if !options.makeexec
-			require options.TargetDebug and !debuginfo
+			require options.TargetDebug
+			if DebugInfo // how?
+		
 		|| j = jbin()
 		
 		j.Enter(@msg, "class")

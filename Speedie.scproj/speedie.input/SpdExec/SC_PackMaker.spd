@@ -132,6 +132,9 @@ module PackMaker
 
 		assembler.sh.FillDebugInfo
 
+		if Options.TargetDebug
+			SourceMap.Positions = FastString()
+
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
 		
@@ -156,20 +159,19 @@ module PackMaker
 		PackMaker.AddAll
 		if stderr.ok and .BuildGlobs 
 			if .FATCompile and options.ModeCake		// options.ModePack can be false, if compiler.InPerry
-				.WritePackToDisk
+				.BakePackToDisk
 		compiler.During = 0
 	
 	
-	function WritePackToDisk 
-		|| F = Compiler.ProductPath
-		|jbin| j = f.OutputStream
-			j.RunHeader("/usr/local/bin/cake")
-			j.Enter(@tmp, "cake")
-			j.AddInt(.PackGlobSize.alignup(8))
-			j.enter
-			
-			.BakeMap
-			.BakeASM(j)
+	function BakePackToDisk 
+		|jbin| j = Compiler.ProductPath.OutputStream$
+		j.RunHeader("/usr/local/bin/cake")
+		j.Enter(@tmp, "cake")
+		j.AddInt(.PackGlobSize.alignup(8))
+		j.enter
+		
+		.BakeMap
+		if .BakeASM(j)
 			.BakeStrings(j)
 			.BakeClasses(j)
 			.BakeDebug(j)
@@ -189,13 +191,14 @@ module PackMaker
 			j.exit
 
 	
-	function BakeASM (|jbin| j)
+	function BakeASM (|jbin| j, |bool|)
 		opt norefcounts
 		j.enter(@tmp, "code")
 		j.Enter
-		.BakeAllFuncs(j)
+		require .BakeAllFuncs(j)
 		j.exit(2)
 		scfunction.currfunc = nil
+		return true
 		
 		
 	function BakeStrings (|jbin| j)

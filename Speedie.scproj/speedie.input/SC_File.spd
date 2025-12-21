@@ -109,10 +109,7 @@ class SCFile (file)
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.Using.Tag = 0	// I'd rather remove this dumb thing. Each scfunction has a file already
-									// so only macros would need this. Its just used for to make vm-debug positions
-									// well actually not even used for that?
-									// try removing it later.
+			parser.Using.Tag = 0
 			if !orig
 				rz = .fData.ParseClean
 			  else

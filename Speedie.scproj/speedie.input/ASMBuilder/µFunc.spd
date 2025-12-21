@@ -15,16 +15,25 @@ extend SCFunction
 	
 	
 	function FatToASM (|!&ASM| Where, |!&asm| After, |!&asm|)
-		|uint64| HasLabel
+		opt norefcounts
 		rz = where
-		|| MaxFuncSize = 250K/4
+		|| dbg = SourceMap.Positions
+		|memorylayer| FileOwner
+			
+		|uint64| HasLabel
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
 			|| n = rz - where
-			if n > MaxFuncSize
+			if n > 250K/4
 				error (.source, "Function too large (over 250K)")
 			fat.ASMIndex = n
 			fat.CheckHasOutput
+			if dbg
+				// should we use a pointer for the debug?
+				// or just append into a faststring?
+				// we actually compile debug compiles more often than normal ones...
+				// soo... yes?
+				FileOwner = sourcemap.BakePosition(rz, fat.msg, dbg, FileOwner)
 			rz = fat.µRenderInto(rz, after)
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
@@ -33,7 +42,7 @@ extend SCFunction
 					fat.FillLabelRequest(where, rz, r-1)	
 	
 	target debug
-		render µRender (|bool|RenderBlocks=false)
+		render µRender (|bool| RenderBlocks = false)
 			fs <~ "asm ${.exportname}   ${.µLengthguess*4}\n" // " asm " "asm"
 			|| bb = 0
 			for µ.fat in self
@@ -84,22 +93,18 @@ function scfunction.GuessASMSize (|int|)
 		rz += f[i].GuessSize // will the size ever differ? it shouldn't?
 							 // only for jumps. We should pre-calculate extra-sizes if needed.
 
-function packmaker.BakeAllFuncs (|jbin| j)
+function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	opt norefcounts
 	for f in .PackFuncs
 		if .PackSaved.AddOrShrink(j, f is UsedByASM)
-			j.JRenderASM(f)
+			require j.JRenderASM(f)
+	return true
 
 
-function JBin.JRenderASM (|SCFunction| fn)
-	// if its a behaviour... we probably want to output it.
-	// after all... it came from the usercode, right?
-	// otherwise, we need to check that the caller (Which seems to have lost track of by now)
-	// is reached.
-	
+function JBin.JRenderASM (|SCFunction| fn, |bool|)
 	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
 		.add(@tmp, fn.exportname)
-		return
+		return true
 	
 	scfunction.currfunc = fn
 
@@ -108,11 +113,15 @@ function JBin.JRenderASM (|SCFunction| fn)
 	Compiler.stTotalASMOps += t
 	|| tmp = Options.TargetDebug
 		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
-		.syntaxappend(0, 2)
+		.SyntaxAppend(0, 2)
+
+		
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
+	SourceMap.Align(self, t*4)
 	|| after = fn.FatToASM(Start, Start+t)
-	check (after-start == T)			(fn, "ASM length corrupt")
+	expect (after-start == T)			(fn, "ASM length corrupt")
 	if tmp
 		.exit
+	return true
 
 
