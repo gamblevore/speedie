@@ -190,7 +190,6 @@
 		AC7D3E3A29A2844200148ADB /* InstructionList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InstructionList.h; path = ../Library/CppLib/InstructionList.h; sourceTree = "<group>"; };
 		AC7D3E3B29A2844200148ADB /* JB_CompileCpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_CompileCpp.h; path = ../Library/CppLib/JB_CompileCpp.h; sourceTree = "<group>"; };
 		AC7D3E3C29A2844200148ADB /* JB_Date.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Date.h; path = ../Library/CppLib/JB_Date.h; sourceTree = "<group>"; };
-		AC7D3E3D29A2844200148ADB /* JB_ByteMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_ByteMap.h; path = ../Library/CppLib/JB_ByteMap.h; sourceTree = "<group>"; };
 		AC7D3E3E29A2844E00148ADB /* Instructions.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = Instructions.i; path = ../Library/CppLib/Instructions.i; sourceTree = "<group>"; };
 		AC7D3E3F29A2844E00148ADB /* JB_VM_Helpers.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = JB_VM_Helpers.i; path = ../Library/CppLib/JB_VM_Helpers.i; sourceTree = "<group>"; };
 		AC7D3E4129A2844E00148ADB /* StringAlterCopy.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = StringAlterCopy.i; path = ../Library/CppLib/StringAlterCopy.i; sourceTree = "<group>"; };
@@ -315,7 +314,6 @@
 				AC7D3E2B29A2844200148ADB /* JB_Atomic.h */,
 				AC7D3E0E29A2844100148ADB /* JB_BasicTypes.h */,
 				AC7D3E2A29A2844200148ADB /* JB_ByteArray.h */,
-				AC7D3E3D29A2844200148ADB /* JB_ByteMap.h */,
 				AC7D3E3B29A2844200148ADB /* JB_CompileCpp.h */,
 				AC7D3E1A29A2844200148ADB /* JB_CompileUnix.h */,
 				AC7D3E1B29A2844200148ADB /* JB_CompileWin32.h */,
