@@ -168,14 +168,20 @@ module PackMaker
 			j.AddInt(.PackGlobSize.alignup(8))
 			j.enter
 			
-			.RenderASM(j)
-			.DumpStrings(j)
-			.PackAllClasses(j)
-			.StoreDebug(j)
+			.BakeMap
+			.BakeASM(j)
+			.BakeStrings(j)
+			.BakeClasses(j)
+			.BakeDebug(j)
 			j.ExitAll
 	
 	
-	function StoreDebug (|jbin| j)
+	function BakeMap
+		SourceMap.Collect
+		SourceMap.sort
+		SourceMap.dump
+	
+	function BakeDebug (|jbin| j)
 		|| dbg = assembler.SafeDebugInfo
 			compiler.stDebugInfo += dbg.length
 			j.enter(@tmp, "debug")
@@ -183,16 +189,16 @@ module PackMaker
 			j.exit
 
 	
-	function RenderASM (|jbin| j)
+	function BakeASM (|jbin| j)
 		opt norefcounts
 		j.enter(@tmp, "code")
 		j.Enter
-		.PackAllFuncs(j)
+		.BakeAllFuncs(j)
 		j.exit(2)
 		scfunction.currfunc = nil
 		
 		
-	function DumpStrings (|jbin| j)
+	function BakeStrings (|jbin| j)
 		|| strs = FastString()
 		.DumpStringsSub(strs)
 		strs <~ 0|byte|			// will all be cstrings... Overwrite lengths during load
@@ -223,7 +229,7 @@ module PackMaker
 				return true
 
 
-	function PackAllClasses (|jbin| j)
+	function BakeClasses (|jbin| j)
 		if .AnyClassesNeeded
 			j.TmpArg("clss")
 			.PackClasses(j, false)

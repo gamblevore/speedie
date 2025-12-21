@@ -14,6 +14,7 @@ class SCFile (file)
 	|uint16|		FileNum
 	|bool|			IsInternal
 	|bool|			Unfinished
+	|bool|			UsedByASM
 	|[scclass]?|	Types
 
 
@@ -24,7 +25,6 @@ class SCFile (file)
 		super.constructor(x)
 		.Proj = p
 		.Types = nil
-		.filenum = scimport.AllFiles.length
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
@@ -96,22 +96,23 @@ class SCFile (file)
 	function ASTSub (|bool| Orig, |Message|)
 		FlowControl.input(self, "AST")
 		
-		FlowControl.DisabledIncr // i want it a bit less sensitive to random file-cleanups
+		FlowControl.DisabledIncr		// i want it a bit less sensitive to random file-cleanups
 		|| str = .Readall(true).decompress // like: x() --> x() // comment
-		FlowControl.DisabledIncr(-1) // also... parse/parseclean will find REAL differences.
+		FlowControl.DisabledIncr(-1)	// also... parse/parseclean will find REAL differences.
 		
 		if str
 			curr = self
-			|| Layer = (Message).CreateLayerAndUse(self, str)
-//			layer.num3 = .filenum // unused?
+			(Message).CreateLayerAndUse(self, str)
 			.fData = str
 			StdErr.source = .path
 			parser._DotInsertallow = true	// more consistant with IDE
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.Using.Tag = 0  // I'd rather remove this dumb thing. Each scfunction has a file already
-										// so only macros would need this. Its just used for to make vm-debug positions
+			parser.Using.Tag = 0	// I'd rather remove this dumb thing. Each scfunction has a file already
+									// so only macros would need this. Its just used for to make vm-debug positions
+									// well actually not even used for that?
+									// try removing it later.
 			if !orig
 				rz = .fData.ParseClean
 			  else
@@ -131,6 +132,8 @@ class SCFile (file)
 			opt norefcounts
 			|| lib = .Proj.IsSTDLib - b.Proj.IsSTDLib
 				return lib
+			|| asm = .UsedByASM - b.UsedByASM
+				return asm
 			return self < b
 
 

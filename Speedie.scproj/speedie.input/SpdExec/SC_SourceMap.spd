@@ -1,0 +1,35 @@
+
+
+// now what?
+// we don't need to go by line... actually.
+// byteposes are good enough. Perry can store byteposes on the textviewline
+// how does perry get them? Well... it starts off with it? collect before compile.
+
+// so how to actually.... dump the actual byteposes?
+
+module SourceMap
+	|| Positions = faststring()
+	
+	function Dump
+		
+	function Collect
+		opt norefcounts
+		for fn in compiler.funclist
+			if fn is usedbyasm // ok... lets mark it's file.
+				|| src = fn.source
+					|| f = src.file
+						f.UsedByASM = true
+					// so... now what?
+
+	function Sort
+		opt norefcounts
+		for imp in Compiler.ImportedList
+			imp.Files.sort
+
+		|| i = 0
+		for imp in Compiler.ImportedList
+			for f in imp.files
+				if f.UsedByASM
+					f.filenum = ++i
+		
+		

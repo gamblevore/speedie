@@ -115,8 +115,6 @@ linkage
 
 |SCModule|					DisamClasses
 |SCModule|					DisamModules
-//|SCModule|					DisamGlobals
-//|SCModule|					LibInit
 
 |byte|						InPerry
 |SCNodeInfo|				InBuiltType
