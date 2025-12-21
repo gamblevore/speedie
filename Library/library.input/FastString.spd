@@ -82,11 +82,6 @@ class FastString {
 	function Reserve (|int| N, |&byte|)
 		cpp_wrapper JB_FS_WriteAlloc_
 
-	function AppendLInt (|uint64| n)	// remove this, and replace with appendhint
-		while n
-			self <~ N|byte|
-			n >>= 8
-
 	function AppendHInt (|int| n)
 		while n >= 128
 			.AppendByte(n ||| 128)

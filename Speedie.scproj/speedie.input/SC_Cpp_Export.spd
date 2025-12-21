@@ -835,6 +835,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		.GenLub(fs)
 		
 		|| blob2 = FastString()
+		blob2 <~ 2|byte| // version number
 		blob2.EncodeLength(lengths.length)
 		blob2.EncodeLength(blob.length)
 		blob2.EncodeLength(stringcorrector.Count)
@@ -1710,12 +1711,7 @@ function faststring.AppendLibGlob (|scdecl| d)
 	.appendrange(n, skip)
 	
 
-// remove this!
-function faststring.EncodeLength (|uint64| N)	// maybe hInt is better? like how many speedie-strings are over 128 anyhow?
-	|| L2 = N|byte|					// remove these two funcs? (one below)
-	if N >= 248
-		l2 = 248 + (n|uint|.log2 max 0) >> 3
-	self <~ L2|byte|
-	if N >= 248
-		.AppendLInt(N)
+function faststring.EncodeLength (|uint64| N)
+	.AppendHInt(N)
+
 

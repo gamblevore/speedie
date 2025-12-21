@@ -95,7 +95,8 @@ JB_String** JB_Str__FindGlobals	(u8** src, uint64* Hash);
 void		JB_RemoveHandlers	();
 
 
-static uint DecodeLength2 (u8*& p) {
+byte StringVersionNum;
+static uint DecodeLength (u8*& p) {
 	uint v = *p++;
 	if (v <= 127)
 		return v;
@@ -108,22 +109,6 @@ static uint DecodeLength2 (u8*& p) {
 			return v;
 		sh += 7;
 	}
-}
-
-static uint DecodeLength (u8*& p) {
-//	return DecodeLength2(p);
-	int lim = 256-8;
-	uint rz = *p++;
-	if (rz >= lim) {
-		int n = rz - lim;
-		int i = 0;
-		rz = 0;
-		while (i <= n) {
-			rz |= *p++ << (i << 3);
-			i++;
-		};
-	}
-	return rz;
 }
 
 
@@ -141,6 +126,9 @@ void JB_Str__LoadGlobals () {
 	JB_String**			Write = JB_Str__FindGlobals(&Start, &StoredHash);
 	u8*					Lengths = Start;
 	*Write++ = EmptyString_;
+	
+	StringVersionNum = Lengths++[0]; // in case I want to change the format later.
+									 // was vital in changing it in the past.
 
 	auto LengthBytes = DecodeLength(Lengths);
 	auto ReadBytes = DecodeLength(Lengths);
@@ -153,7 +141,7 @@ void JB_Str__LoadGlobals () {
 	S.Addr = (u8*)Start;
 	uint64 DetectedHash = JB_Str_CRC(&S, 0);
 	if (DetectedHash != StoredHash) {
-		JB_Load_StrError(0);
+		JB_Load_StrError(1);
 	}
 
 	while (N --> 0) {
@@ -161,9 +149,9 @@ void JB_Str__LoadGlobals () {
 		auto S = JB_StrCN((void*)Read, L);
 		Read += L + 1;
 		JB_SetRef(*Write++, S);
-		if (Read > ReadEnd) {return JB_Load_StrError(1);}
+		if (Read > ReadEnd) {return JB_Load_StrError(2);}
 	};
-	if (Read != ReadEnd) {JB_Load_StrError(2);}
+	if (Read != ReadEnd) {JB_Load_StrError(3);}
 }
 
 
