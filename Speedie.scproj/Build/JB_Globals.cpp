@@ -187,6 +187,7 @@ Message* SC__SCTasks_TaskMacro;
 Message* SC__SCTasks_tmp;
 Dictionary* SC__Errors_IgnoredBranches;
 Dictionary* SC__SC_Targets_Items;
+int SC__SourceMap_FirstSize;
 FastString* SC__SourceMap_Positions;
 Array* SC__Crkt_CppStrings;
 Dictionary* SC__Crkt_Table2;

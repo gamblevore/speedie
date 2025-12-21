@@ -3532,7 +3532,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[443]);
-	JB_FS_AppendInt32(_fsf0, (2025122114));
+	JB_FS_AppendInt32(_fsf0, (2025122119));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -5982,7 +5982,7 @@ bool SC_PackMaker__AnyClassesNeeded() {
 	return false;
 }
 
-void SC_PackMaker__BakeAllFuncs(FastString* J) {
+bool SC_PackMaker__BakeAllFuncs(FastString* J) {
 	{
 		Array* _LoopSrcf2 = SC__PackMaker_PackFuncs;
 		int _if0 = 0;
@@ -5992,19 +5992,26 @@ void SC_PackMaker__BakeAllFuncs(FastString* J) {
 				break;
 			}
 			if (SC_HairyMan_AddOrShrink((&SC__PackMaker_PackSaved), J, SC_Func_SyntaxIs(F, kSC__FunctionType_UsedByASM))) {
-				SC_bin_JRenderASM(J, F);
+				if (!SC_bin_JRenderASM(J, F)) {
+					return nil;
+				}
 			}
 			(++_if0);
 		};
-	};
+	}
+	;
+	return true;
 }
 
-void SC_PackMaker__BakeASM(FastString* J) {
+bool SC_PackMaker__BakeASM(FastString* J) {
 	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[594]);
 	JB_bin_Enter(J, kJB_SyxArg, JB_LUB[0]);
-	SC_PackMaker__BakeAllFuncs(J);
+	if (!SC_PackMaker__BakeAllFuncs(J)) {
+		return nil;
+	}
 	JB_bin_Exit(J, 2);
 	(SC_Func__CurrFuncSet(nil));
+	return true;
 }
 
 void SC_PackMaker__BakeClasses(FastString* J) {
@@ -6035,6 +6042,30 @@ void SC_PackMaker__BakeMap() {
 	SC_SourceMap__Collect();
 	SC_SourceMap__Sort();
 	SC_SourceMap__Dump();
+}
+
+void SC_PackMaker__BakePackToDisk() {
+	JB_String* _tmPf0 = SC_Comp__ProductPath();
+	JB_Incr(_tmPf0);
+	FastString* J = JB_Str_OutputStream(_tmPf0, true);
+	JB_Incr(J);
+	JB_Decr(_tmPf0);
+	if (!J) {
+		JB_Decr(J);
+		return;
+	}
+	JB_bin_RunHeader(J, JB_LUB[1891]);
+	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[1352]);
+	JB_bin_AddInt(J, JB_int_AlignUp(SC__PackMaker_PackGlobSize, 8));
+	JB_bin_Enter(J, kJB_SyxArg, JB_LUB[0]);
+	SC_PackMaker__BakeMap();
+	if (SC_PackMaker__BakeASM(J)) {
+		SC_PackMaker__BakeStrings(J);
+		SC_PackMaker__BakeClasses(J);
+		SC_PackMaker__BakeDebug(J);
+		JB_bin_Exit0(J);
+	}
+	JB_Decr(J);
 }
 
 void SC_PackMaker__BakeStrings(FastString* J) {
@@ -6080,6 +6111,9 @@ void SC_PackMaker__DumpStringsSub(FastString* Strs) {
 bool SC_PackMaker__FATCompile() {
 	SC_PackMaker__FinalPrepare();
 	SC_Pac_FillDebugInfo((&SC__Pac_Sh));
+	if (SC__Options_TargetDebug) {
+		JB_SetRef(SC__SourceMap_Positions, JB_FS_Constructor(nil));
+	}
 	(SC_Comp__SyntaxIsSet(kSC__CompilerStage_Hungry, true));
 	JB_Array_Sort(SC__PackMaker_PackFuncs, ((FP_SorterComparer)((&SC_CodeSorter__Leafness))));
 	SC__PackMaker_PackFuncIndex = 0;
@@ -6198,7 +6232,7 @@ void SC_PackMaker__MakePack() {
 	SC_PackMaker__AddAll();
 	if (JB_Rec_OK(JB_StdErr) and SC_PackMaker__BuildGlobs()) {
 		if (SC_PackMaker__FATCompile() and SC_Options__ModeCake()) {
-			SC_PackMaker__WritePackToDisk();
+			SC_PackMaker__BakePackToDisk();
 		}
 	}
 	SC__Comp_During = 0;
@@ -6248,27 +6282,6 @@ bool SC_PackMaker__UseMain(JB_String* Name, int Id) {
 		return true;
 	}
 	return false;
-}
-
-void SC_PackMaker__WritePackToDisk() {
-	JB_String* F = SC_Comp__ProductPath();
-	JB_Incr(F);
-	FastString* J = JB_Str_OutputStream(F, true);
-	JB_Incr(J);
-	JB_Decr(F);
-	if (J) {
-		JB_bin_RunHeader(J, JB_LUB[1891]);
-		JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[1352]);
-		JB_bin_AddInt(J, JB_int_AlignUp(SC__PackMaker_PackGlobSize, 8));
-		JB_bin_Enter(J, kJB_SyxArg, JB_LUB[0]);
-		SC_PackMaker__BakeMap();
-		SC_PackMaker__BakeASM(J);
-		SC_PackMaker__BakeStrings(J);
-		SC_PackMaker__BakeClasses(J);
-		SC_PackMaker__BakeDebug(J);
-		JB_bin_Exit0(J);
-	}
-	JB_Decr(J);
 }
 
 
@@ -7514,6 +7527,26 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value) {
 }
 
 
+void SC_SourceMap__Align(FastString* J, int T) {
+	FastString* P = SC__SourceMap_Positions;
+	if (P) {
+		int F = SC__SourceMap_FirstSize;
+		if (!F) {
+			SC__SourceMap_FirstSize = J->Length;
+			return;
+		}
+		int Gain = J->Length - SC__SourceMap_FirstSize;
+		JB_FS_AppendMultiByte(P, ((byte)0), Gain);
+		byte* Start = JB_FS_WriteAlloc_(P, T);
+	}
+}
+
+JB_MemoryLayer* SC_SourceMap__BakePosition(ASM* Where, Message* Msg, FastString* Dbg, JB_MemoryLayer* File) {
+	SCFile* F = SC_Msg_File(Msg);
+	Ind P = Msg->Position;
+	return nil;
+}
+
 void SC_SourceMap__Collect() {
 	{
 		Array* _LoopSrcf2 = SC__Comp_FuncList;
@@ -7542,7 +7575,6 @@ void SC_SourceMap__Dump() {
 
 int SC_SourceMap__Init_() {
 	{
-		JB_SetRef(SC__SourceMap_Positions, JB_FS_Constructor(nil));
 	}
 	;
 	return 0;
@@ -8269,7 +8301,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1384]);
-	JB_FS_AppendInt32(_fsf0, (2025122114));
+	JB_FS_AppendInt32(_fsf0, (2025122119));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10948,8 +10980,6 @@ int JB_SP_AppInitSub_() {
 	SC_Errors__Init_();
 	//// SC_Targets;
 	SC_SC_Targets__Init_();
-	//// SourceMap;
-	SC_SourceMap__Init_();
 	//// StringCorrector;
 	SC_Crkt__Init_();
 	//// StructStuff;
@@ -23226,8 +23256,10 @@ ASMReg SC_Pac_Exit(Assembler* Self, Message* Exp, ASMReg Dest) {
 
 void SC_Pac_FillDebugInfo(Assembler* Self) {
 	if (!SC__Options_MakeExec) {
-		if (!(SC__Options_TargetDebug and (!SC__Pac_DebugInfo))) {
+		if (!SC__Options_TargetDebug) {
 			return;
+		}
+		if (SC__Pac_DebugInfo) {
 		}
 	}
 	FastString* J = JB_bin_Constructor(nil, kJB_SyxArg, JB_LUB[0]);
@@ -34475,10 +34507,10 @@ void JB_bin_Exit0(FastString* Self) {
 	JB_bin_Exit(Self, Self->Indent);
 }
 
-void SC_bin_JRenderASM(FastString* Self, SCFunction* Fn) {
+bool SC_bin_JRenderASM(FastString* Self, SCFunction* Fn) {
 	if ((SC__Options_TargetDebug) and (((!SC_Func_SyntaxIs(Fn, kSC__FunctionType_UsedByASM))) and ((!SC_Func_IsBehaviour(Fn))))) {
 		JB_bin_Add(Self, kJB_SyxTmp, Fn->ExportName, false);
-		return;
+		return true;
 	}
 	(SC_Func__CurrFuncSet(Fn));
 	int T = SC_Func_GuessASMSize(Fn);
@@ -34490,13 +34522,16 @@ void SC_bin_JRenderASM(FastString* Self, SCFunction* Fn) {
 		JB_FS_AppendMultiByte(Self, 0, 2);
 	}
 	ASM* Start = ((ASM*)JB_bin_ReserveMemory(Self, kJB_SyxBin, T * 4, 4, false));
+	SC_SourceMap__Align(Self, T * 4);
 	ASM* After = SC_Func_FatToASM(Fn, Start, Start + T);
 	if ((After - Start) != T) {
 		SC_SCObject_Fail(Fn, JB_LUB[1549]);
+		return nil;
 	}
 	if (Tmp) {
 		JB_bin_Exit(Self, 1);
 	}
+	return true;
 }
 
 void SC_bin_PropertyLayout(FastString* Self, Array* List) {
@@ -54782,9 +54817,10 @@ FatASM* SC_Func_FatFirst(SCFunction* Self) {
 
 ASM* SC_Func_FatToASM(SCFunction* Self, ASM* Where, ASM* After) {
 	ASM* Rz = nil;
-	uint64 HasLabel = 0;
 	Rz = Where;
-	int MaxFuncSize = 256000 / 4;
+	FastString* Dbg = SC__SourceMap_Positions;
+	JB_MemoryLayer* FileOwner = nil;
+	uint64 HasLabel = 0;
 	{
 		FatASM* _FirstInstf0 = SC_Func_FatFirst(Self);
 		FatASM* Fat = _FirstInstf0;
@@ -54793,13 +54829,16 @@ ASM* SC_Func_FatToASM(SCFunction* Self, ASM* Where, ASM* After) {
 			int I = Fat - _FirstInstf0;
 			HasLabel = (HasLabel | (Fat->JumpPrm << (I & 63)));
 			int N = Rz - Where;
-			if (N > MaxFuncSize) {
+			if (N > (256000 / 4)) {
 				if (true) {
 					JB_Msg_Fail(Self->Source, JB_LUB[1234]);
 				}
 			}
 			Fat->ASMIndex = N;
 			SC_FAT_CheckHasOutput(Fat);
+			if (Dbg) {
+				FileOwner = SC_SourceMap__BakePosition(Rz, Fat->Msg, Dbg, FileOwner);
+			}
 			Rz = SC_FAT_xC2xB5RenderInto(Fat, Rz, After);
 			(++Fat);
 		};
@@ -59634,4 +59673,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -8050913428483125527 1675378137144918348
+// 7647066992808999418 -5842679061023673152

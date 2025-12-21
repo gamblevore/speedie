@@ -1584,6 +1584,7 @@ extern Message* SC__SCTasks_TaskMacro;
 extern Message* SC__SCTasks_tmp;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
+extern int SC__SourceMap_FirstSize;
 extern FastString* SC__SourceMap_Positions;
 extern Array* SC__Crkt_CppStrings;
 extern Dictionary* SC__Crkt_Table2;
@@ -3258,15 +3259,17 @@ void SC_PackMaker__AddFunc(SCFunction* F);
 
 bool SC_PackMaker__AnyClassesNeeded();
 
-void SC_PackMaker__BakeAllFuncs(FastString* J);
+bool SC_PackMaker__BakeAllFuncs(FastString* J);
 
-void SC_PackMaker__BakeASM(FastString* J);
+bool SC_PackMaker__BakeASM(FastString* J);
 
 void SC_PackMaker__BakeClasses(FastString* J);
 
 void SC_PackMaker__BakeDebug(FastString* J);
 
 void SC_PackMaker__BakeMap();
+
+void SC_PackMaker__BakePackToDisk();
 
 void SC_PackMaker__BakeStrings(FastString* J);
 
@@ -3291,8 +3294,6 @@ void SC_PackMaker__PackClasses(FastString* J, bool Pack);
 void SC_PackMaker__PackIDFuncs(Array* List);
 
 bool SC_PackMaker__UseMain(JB_String* Name, int Id);
-
-void SC_PackMaker__WritePackToDisk();
 
 
 
@@ -3467,6 +3468,10 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // SourceMap
+void SC_SourceMap__Align(FastString* J, int T);
+
+JB_MemoryLayer* SC_SourceMap__BakePosition(ASM* Where, Message* Msg, FastString* Dbg, JB_MemoryLayer* File);
+
 void SC_SourceMap__Collect();
 
 void SC_SourceMap__Dump();
@@ -7888,7 +7893,7 @@ int JB_bin_Exit(FastString* Self, int Amount);
 
 void JB_bin_Exit0(FastString* Self);
 
-void SC_bin_JRenderASM(FastString* Self, SCFunction* Fn);
+bool SC_bin_JRenderASM(FastString* Self, SCFunction* Fn);
 
 void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
