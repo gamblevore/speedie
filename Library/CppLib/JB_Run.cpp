@@ -95,7 +95,23 @@ JB_String** JB_Str__FindGlobals	(u8** src, uint64* Hash);
 void		JB_RemoveHandlers	();
 
 
+static uint DecodeLength2 (u8*& p) {
+	uint v = *p++;
+	if (v <= 127)
+		return v;
+	v = v & 127;
+	int sh = 7;
+	while (true) {
+		uint b = *p++;
+		v |= (b&127) << sh;
+		if (b <= 127)
+			return v;
+		sh += 7;
+	}
+}
+
 static uint DecodeLength (u8*& p) {
+//	return DecodeLength2(p);
 	int lim = 256-8;
 	uint rz = *p++;
 	if (rz >= lim) {
@@ -221,7 +237,6 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 	App_Args = JB_Incr(JB_Str_ArgV(R));			// Allow caller to remove their c-string data.
     
     ErrorString_ = emptystr();
-//    WhiteSpace_ = JB_CS_Constructor( nil, JB_StrC("\x9\xA\xD\x20"), false );
     JB_FS__FastNew( 0 );						// Stop leak tests catching this.
     JB_Dict__Init();
     JB_Str__LoadGlobals();
