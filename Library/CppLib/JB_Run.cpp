@@ -5,12 +5,10 @@
 
 /*
 Hidden Caches:
-	* .LowerCase / .UpperCase ByteMap
     * EmptyString_
-    * WhiteSpace_
 	* JB_FS__FastNew
     * Dict fast name
-	* 256 byte block! speeds up splitting when the length = 1!! for .Mid
+	* 256 byte block! speeds up splitting when the length = 1
 */
 
 #include "JB_Umbrella.hpp"
