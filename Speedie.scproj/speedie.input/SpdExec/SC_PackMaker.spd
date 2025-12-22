@@ -177,9 +177,8 @@ module PackMaker
 		opt norefcounts
 		|| p = SourceMap.Positions
 			j.TmpArg("map")
-			for f in SCImport.AllFiles
-				j.AddStr(f)
-			j.Add(@bin, p)
+			j.add(@str, SCImport.AllFiles.prefixcompress)
+			j.add(@bin, p)
 			j.exit(2)
 	
 	

@@ -5,13 +5,6 @@
 
 
 main // main {
-	
-	|| data = "/usr/local/speedie/Library/stable_id_bank.txt".ReadAll		
-		|| test = data.PrefixCompress
-		|| back = test.PrefixDecompress
-
-
-
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile

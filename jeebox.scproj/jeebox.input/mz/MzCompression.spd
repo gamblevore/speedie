@@ -78,10 +78,10 @@ libinternal faststring.DecompressChunk (|string| Input, |int|)
 
 
 
-function string.PrefixCompress (|faststring| fs_in=nil, |string|)
-	|| fs = FastString(fs_in)
+function array.PrefixCompress (|[string]| self, |faststring?| fs_in=nil,  |string|)
+	|| fs = faststring(fs_in)
 	|| PrevLine = ""
-	for l.lines in self
+	for l in self
 		|| d = l.DiffAt(prevline)
 		if d < 0
 			d = l.Length
@@ -94,28 +94,14 @@ function string.PrefixCompress (|faststring| fs_in=nil, |string|)
 
 
 
-function string.PrefixDecompress (|faststring| fs_in=nil, |string|)
-	|| fs = faststring(fs_in)
-	.PrefixDecompressSub(fs, nil)
-	return fs.GetResult(fs_in)
-
-
-function string.PrefixDecompressSub (|faststring?| fs, |[string]?| output)
-	require (fs!=nil or output!=nil)
+function string.PrefixDecompress (|[string]| output)
 	|| in = .InputStream
 	|| Prev = ""
-	|byte| Line = 0
 	while in.HasAny
-		if fs and Line
-			fs <~ line
-		line = '\n'
 		|| A = in.HInt
 		|| B = in.HInt
 		Prev = prev[0, A] + in.Str(B)
-		if fs
-			fs <~ Prev
-		  else
-			output! <~ prev
+		output <~ prev
 
 
 

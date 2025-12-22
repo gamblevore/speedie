@@ -78,7 +78,7 @@ role JBin (Faststring)
 	
 	function Add			(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
 		cpp_part AddFS
-		return .AddMemory(Type, fs.length, into, fs.Resultptr)
+		return .add(Type, fs|string|, into)
 
 	function AddCString		(|syntax| type=@str, |cstring| name)
 		.AddMemory(type, name.length, false, name|&byte|)
