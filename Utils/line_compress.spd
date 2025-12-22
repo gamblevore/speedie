@@ -3,7 +3,7 @@
 app.usage = "Simple utility to compress a text-file containing lines"
 
 
-main (|file.existing| Input, |file.output| Output)
+main (|file.existing| Input, |file.output?| Output)
 	|| data = input.ReadAll
 		|| lines = data.Split
 		if app.yes("test")
@@ -13,7 +13,7 @@ main (|file.existing| Input, |file.output| Output)
 			printline back
 		  else
 			lines.PrefixCompress(output)
-			if Output.file!=app.StdOut
+			if Output and Output.file!=app.StdOut
 				|| A = data.length
 				|| B = output.streamlength
 				"Original: ${A.strsize}\nNew: ${B.strsize}\nRatio: ${(b div a).percent}"
