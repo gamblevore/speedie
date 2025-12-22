@@ -97,7 +97,7 @@ function Args (|[string]|)
 	r = []
 	._Args = r
 	for s in ._rawargs
-		if s[] != '-' or r == 1
+		if s[] != '-' or s == 1
 			r <~ s
 	return r
 			
