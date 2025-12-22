@@ -1785,6 +1785,7 @@ Array* JB_Str_ArgV(const char** ArgV) {
 			break;
         if (c[0] == '-' and c[1] == '-' and c[2] == 0)
 			break; // useful to ignore arguments that xcode is spamming us with.
+				   // its also a unix semi-convention
         JB_Array_Append(Result, JB_StrC(c));
     }
     return Result;

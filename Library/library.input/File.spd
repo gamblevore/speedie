@@ -285,7 +285,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			fs <~ operation
 		fs <~ " "
 		fs <~ super
-			
 		error (self, fs)
 
 	
@@ -406,12 +405,14 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 
 
 	function string.InputStream (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
-		description "Reads from a file, via a InputStream object. Useful because InputStream can read from files, strings, and more. Write code once and use it on multiple input-sources." 
-		|| f = .file
-		if f.mustexist("stream")
-			rz = InputStream(f, chunkSize)
-			if !rz.HasHeader(Header)
-				rz = nil
+		description "InputStream can read from files and strings. Write code once and use it on multiple input-sources." 
+		if self isa file
+			if .mustexist("stream")
+				rz = InputStream(self, chunkSize)
+		  else
+			rz = InputStream(self)
+		if rz and !rz.HasHeader(Header)
+			rz = nil
 	
 	function Copy (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		disabled "Use .CopyTo"
@@ -572,7 +573,10 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		
 		module Existing
 			autogen MainArg (|int| Pos, |string| name, |file|)
-				return string.MainArgSub(Pos, name, "file-path")$.FileThatExists
+				|| f = file.MainArg(pos, name)
+				if f and !f.Mustexist
+					f = nil
+				return f
 		module Jeebox
 			autogen MainArg (|int| Pos, |string| name, |messageroot|)
 				return File.existing.MainArg(pos, name)$.parse

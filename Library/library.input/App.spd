@@ -5,7 +5,7 @@
 
 
 module App {
-|[string]?|					_OldArgs = nil
+|[string]?|					_Args = nil
 |string|					Usage
 |message|					_Conf
 |config|					_Prefs
@@ -86,22 +86,21 @@ function Switches (|[string]|)
 	for R in ._RawArgs
 		if R.ArgName
 			rz <~ R
-	
-
-libinternal args_ (|[string]|)
-	opt norefcounts
-	for R in ._rawargs
-		if R.ArgName ~= ""
-			rz <~ r
 
 
 function Args (|[string]|)
 	cpp_part ArgsArray
 	opt norefcounts
-	rz = ._OldArgs
-	if rz == nil // == nil important here
-		rz = .args_
-		._OldArgs = rz
+	|| r = ._Args
+	if r != nil
+		return r
+	r = []
+	._Args = r
+	for s in ._rawargs
+		if s[] != '-' or r == 1
+			r <~ s
+	return r
+			
 
 
 function CrashPrint

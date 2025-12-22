@@ -64,7 +64,7 @@ byte				JB_ErrorNumber;
 thread_local byte	JB_Active = 0;
 extern char**		environ;
 uint				Flow_Disabled;
-static Array*		App_Args;
+static Array*		Raw_Args;
 _cstring			App_CallPath;
 
 
@@ -171,7 +171,7 @@ int JB_GUICareTaker(PicoDate D) {
 
 
 
-Array*		JB_App__Args()					{ return App_Args; }
+Array*		JB_App__Args()					{ return Raw_Args; }
 JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
 void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
 bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
@@ -220,7 +220,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 		#endif
 	}
 	
-	App_Args = JB_Incr(JB_Str_ArgV(R));			// Allow caller to remove their c-string data.
+	Raw_Args = JB_Incr(JB_Str_ArgV(R));			// Allow caller to remove their c-string data.
     
     ErrorString_ = emptystr();
     JB_FS__FastNew( 0 );						// Stop leak tests catching this.
@@ -247,17 +247,17 @@ int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
 	if (JB_LibIsShutdown()) {
 		AddError(EACCES, "jb.shutdown");
 	} else {
-		if (!App_Args and C) {
+		if (!Raw_Args and C) {
 			AddError(JB_SP_Init(C, Mode&4), "jb.initlib");
 			if (JB_ErrorNumber)
 				return JB_ErrorNumber;
 			AddError(JB_SP_AppInit(), "jb.initapp");
 		}
 		
-		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
+		if ((Mode & 1) and Raw_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),	"occurred");
 
-		if ((Mode & 2) and App_Args)
+		if ((Mode & 2) and Raw_Args)
 			JB_FinalEvents();
 	}
 	JB_Active &= ~1;

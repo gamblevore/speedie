@@ -78,6 +78,47 @@ libinternal faststring.DecompressChunk (|string| Input, |int|)
 
 
 
+function string.PrefixCompress (|faststring| fs_in=nil, |string|)
+	|| fs = FastString(fs_in)
+	|| PrevLine = ""
+	for l.lines in self
+		|| d = l.DiffAt(prevline)
+		if d < 0
+			d = l.Length
+		
+		fs.AppendHInt(d)
+		fs.appendhint(l.Length - d)
+		fs.Appendrange(l, d, int.max)
+		PrevLine = l
+	return fs.GetResult(fs_in)
+
+
+
+function string.PrefixDecompress (|faststring| fs_in=nil, |string|)
+	|| fs = faststring(fs_in)
+	.PrefixDecompressSub(fs, nil)
+	return fs.GetResult(fs_in)
+
+
+function string.PrefixDecompressSub (|faststring?| fs, |[string]?| output)
+	require (fs!=nil or output!=nil)
+	|| in = .InputStream
+	|| Prev = ""
+	|byte| Line = 0
+	while in.HasAny
+		if fs and Line
+			fs <~ line
+		line = '\n'
+		|| A = in.HInt
+		|| B = in.HInt
+		Prev = prev[0, A] + in.Str(B)
+		if fs
+			fs <~ Prev
+		  else
+			output! <~ prev
+
+
+
 /*
 		notes:
 
@@ -95,10 +136,6 @@ We might want to save it to disk, and later just... load sections at a time.
 Perhaps the "final bit-dump" could be 0-stripped, and skipped if it is 0"
 
 The length could be shrunk too. And the header even.
-
 */
-
-
-
 
 

@@ -169,23 +169,23 @@ module PackMaker
 		if .BakeASM(j)
 			.BakeStrings(j)
 			.BakeClasses(j)
-			.BakeMap(j)
 			.BakeDebug(j)
 			j.ExitAll
 	
 	
 	function BakeMap (|jbin| j)
 		opt norefcounts
-		// So... when does it end? I guess... just append some shit.
-		j.TmpArg("map")
-		for f in SCImport.AllFiles
-			j.AddStr(f)
-		j.Add(@bin, SourceMap.Positions|string|!)
-		j.exit(2)
+		|| p = SourceMap.Positions
+			j.TmpArg("map")
+			for f in SCImport.AllFiles
+				j.AddStr(f)
+			j.Add(@bin, p)
+			j.exit(2)
 	
 	
 	function BakeDebug (|jbin| j)
 		|| dbg = assembler.SafeDebugInfo
+			.BakeMap(j)
 			compiler.stDebugInfo += dbg.length
 			j.enter(@tmp, "debug")
 			j.AddStr(dbg.Compress)

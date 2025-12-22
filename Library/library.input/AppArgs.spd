@@ -58,14 +58,18 @@ autogen @int.MainArg         (|int| Pos, |string| name, |int|)
 	expect (big <= int.max and big >= int.min) ("Int out of range")
 	return big
 
+
 autogen @int64.MainArg       (|int| Pos, |string| name,  |int64|)
 	return string.MainArgSub(Pos, name, "integer")$.int
+
 
 autogen @bool.MainArg        (|int| Pos, |string| name,  |bool|)
 	return string.MainArgSub(Pos, name, "boolean")$.Yes
 
+
 autogen @string.MainArg      (|int| Pos, |string| name, |string|)
 	return string.MainArgSub(Pos, name, "string")
+
 
 autogen @message.MainArg     (|int| Pos, |string| name, |message|)
 	|| str = string.MainArgSub(Pos, name, "jeebox")
@@ -75,11 +79,19 @@ autogen @message.MainArg     (|int| Pos, |string| name, |message|)
 			return str.file.parse
 	return str.parse
 
+
 autogen @float.MainArg       (|int| Pos, |string| name, |Float64|)
 	return string.MainArgSub(Pos, name, "float")$.float
 
+
 autogen @file.MainArg		(|int| Pos, |string| name, |file|)
-	return string.MainArgSub(Pos, name, "file-path")$.file
+	|| str = string.MainArgSub(Pos, name, "file-path")
+		if str == "-"
+			rz = app.StdOut
+		  else
+			rz = str.file
+	
+
 
 autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
