@@ -1,0 +1,21 @@
+#!/usr/local/bin/spd
+
+app.usage = "Simple utility to compress a text-file containing lines"
+
+
+main (|file.existing| Input, |file.output| Output)
+	|| data = input.ReadAll
+		|| lines = data.Split
+		if app.yes("test")
+			|| test = lines.PrefixCompress
+			|[string]| back 
+			test.PrefixDecompress(back)
+			printline back
+		  else
+			lines.PrefixCompress(output)
+			if Output.file!=app.StdOut
+				|| A = data.length
+				|| B = output.streamlength
+				"Original: ${A.strsize}\nNew: ${B.strsize}\nRatio: ${(b div a).percent}"
+
+
