@@ -78,6 +78,7 @@ libinternal faststring.DecompressChunk (|string| Input, |int|)
 
 
 
+// perhaps normal compression is better...
 function array.PrefixCompress (|[string]| self, |faststring?| fs_in=nil,  |string|)
 	|| fs = faststring(fs_in)
 	|| PrevLine = ""
