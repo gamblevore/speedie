@@ -422,7 +422,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	|| src = cmd.last
 	if src != @dot
 		return .GetFunc2(myfile, ff, n)
-	|| fn   = .anonfn init scfunction()
+	|| fn   = .AnonFn init scfunction()
 	|| prm  = src.second
 	|| mpos = prm.first
 	|| str  = prm.second
@@ -450,12 +450,17 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 
 
 function SCFunction.Update_Source (|int| start, |string| text, |bool|)
-	parser.using.position = -1
-	parser.using.Flags = 0 // oop
-	parser.using.Tag = 0 // right?
-	|| source = text.parseclean
+	parser.using.Position = -1
+	parser.using.Flags = 0
+	parser.using.Tag = 0
+	|| s = .source
+		s.MemoryLayer.use
+		parser.using.Tag = s.tag
+	
+	|| source = text.ParseClean
 	if source and source != @tmp
 		source = source[@tmp]
+	
 	if source
 		source.SlidePositions(start)
 		.source = source
@@ -464,6 +469,8 @@ function SCFunction.Update_Source (|int| start, |string| text, |bool|)
 		|[message]| list
 		rz = .UpdateSourceSub(source, list)
 		source.obj = interact.OrigFn.disambiguate(source)
+
+	(message).Restore
 	parser.using.Flags = 0
 	parser.using.Tag = 0
 
@@ -1172,7 +1179,7 @@ function ASM (|message| msg,  |SCFunction| fn, |bool|)
 	Assembler.JSM.zero
 	Assembler.JSM.Length = 0
 
-	if Assembler.sh.ASMCompile(fn)
+	if Assembler.sh.FatterCompile(fn)
 		|| fs = FastString()
 		rz = .FeedBackViewASMSub(msg, fn, fs)
 

@@ -1,15 +1,20 @@
 
 
+// MiniOptimisations, miniopts, optimize
 function Assembler.FinishMost
 	|| A = .Curr
 	|| S = .FuncStart
+	|| Length = 0
+	
 	while A > S
 		if s isa asm.knst
 			S.ConstFinish
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
+		length += s.GuessSize
 		S++
-
+		
+	.out.µASMLength = Length
 
 
 function fatasm.Nop_Encoder (Asm_encoder)

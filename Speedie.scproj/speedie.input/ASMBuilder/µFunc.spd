@@ -1,11 +1,11 @@
-
+unfinished
 
 extend SCFunction
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
-		rz = asm[.µlength|int|*3]!
+		rz = asm[.µfatlength|int|*3]!
 		|| p = rz.ptr
-		|| after = .FatToASM(P, P+rz.Size)
+		|| after = .ASMBake(P, P+rz.Size, nil)
 		rz.Size = after-p
 		rz.length = rz.Size   //   ::::::]]]]]]]
 
@@ -14,11 +14,13 @@ extend SCFunction
 		return Assembler.sh.start + .µstart
 	
 	
-	function FatToASM (|!&ASM| Where, |!&asm| After, |!&asm|)
+	function Message.SrcMap (|uint|)
+		return (.Position<<11) ||| (.tag >> 8)
+	
+	
+	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| debug,  |!&asm|)
 		opt norefcounts
 		rz = where
-		|| dbg = SourceMap.Positions
-		|memorylayer| FileOwner
 			
 		|uint64| HasLabel
 		for (fat.fat in self) (i)
@@ -28,13 +30,13 @@ extend SCFunction
 				error (.source, "Function too large (over 250K)")
 			fat.ASMIndex = n
 			fat.CheckHasOutput
-			if dbg
-				// should we use a pointer for the debug?
-				// or just append into a faststring?
-				// we actually compile debug compiles more often than normal ones...
-				// soo... yes?
-				FileOwner = sourcemap.BakePosition(rz, fat.msg, dbg, FileOwner)
+
+			|| Curr = rz
 			rz = fat.µRenderInto(rz, after)
+			if debug
+				|| pos = fat.msg.SrcMap
+				while (Curr++ < rz)
+					debug++[] = pos
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
@@ -43,7 +45,7 @@ extend SCFunction
 	
 	target debug
 		render µRender (|bool| RenderBlocks = false)
-			fs <~ "asm ${.exportname}   ${.µLengthguess*4}\n" // " asm " "asm"
+			fs <~ "asm ${.exportname}   ${.µASMLength*4}\n" // " asm " "asm"
 			|| bb = 0
 			for µ.fat in self
 				if RenderBlocks and µ.BasicBlock != bb
@@ -62,7 +64,7 @@ extend SCFunction
 	iterator fat
 		|| FirstInst = .FatFirst
 		|| CurrInst = FirstInst
-		|| AfterInst = Currinst + .µlength
+		|| AfterInst = Currinst + .µfatlength
 		while currinst < Afterinst
 			yield currinst (CurrInst - FirstInst)
 			++currinst
@@ -87,29 +89,22 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	.prms[reg] = J							// restore!
 
 
-function scfunction.GuessASMSize (|int|)
-	|| f = .FatFirst
-	for i in .µLength
-		rz += f[i].GuessSize // will the size ever differ? it shouldn't?
-							 // only for jumps. We should pre-calculate extra-sizes if needed.
-
 function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	opt norefcounts
 	for f in .PackFuncs
 		if .PackSaved.AddOrShrink(j, f is UsedByASM)
-			require j.JRenderASM(f)
+			require j.BakeASM(f)
 	return true
 
 
-function JBin.JRenderASM (|SCFunction| fn, |bool|)
+function JBin.BakeASM (|SCFunction| fn, |bool|)
 	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
 		.add(@tmp, fn.exportname)
 		return true
 	
 	scfunction.currfunc = fn
 
-	|| t = fn.GuessASMSize
-	fn.µLengthGuess = t
+	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
 	|| tmp = Options.TargetDebug
 		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
@@ -117,8 +112,8 @@ function JBin.JRenderASM (|SCFunction| fn, |bool|)
 
 		
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
-	SourceMap.Align(self, t*4)
-	|| after = fn.FatToASM(Start, Start+t)
+	|| dbg = SourceMap.Align(self, t*4)
+	|| after = fn.ASMBake(Start, Start+t, dbg)
 	expect (after-start == T)			(fn, "ASM length corrupt")
 	if tmp
 		.exit

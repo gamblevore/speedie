@@ -173,12 +173,11 @@ function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
 
 datatype SCBlockage (int)
 	flags
-		Bits		= 0b111100000	// reserve 1 more bit
+		Bits		= 0b111
 	
-		Continue	= 0x0040
-		Exit		= 0x0080
-		Return		= 0x00C0
-		Reserved    = 0x0100
+		Continue	= 0b001
+		Exit		= 0b010
+		Return		= 0b100
 	
 		Quit		= Return		// for now
 	
@@ -186,11 +185,3 @@ datatype SCBlockage (int)
 		return self == b
 	
 	
-
-//function fdb (|[scfunction]| r)
-//	opt norefcounts
-//	cpp_name fdb
-//	visible
-//	for f in r
-//		printline f.Exportname
-

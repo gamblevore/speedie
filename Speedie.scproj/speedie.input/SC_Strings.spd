@@ -206,8 +206,6 @@ function String.ParseClean (|Message|)
 
 function Message.Clean (|bool| erl = false)
 	|| pos		= parser.using.position
-	|| Len		= parser.Using.Length
-	|| Tag		= parser.Using.Tag
 
 	|message--| QEscape
 	|message| IgnoreArg 
@@ -217,8 +215,8 @@ function Message.Clean (|bool| erl = false)
 	for (curr.flat in self)
 		if pos >= 0
 			curr.position = pos
-			curr.RangeLength = len
-			curr.Tag = tag
+			curr.RangeLength = parser.Using.Length
+			curr.Tag = parser.Using.Tag
 		
 		if curr == QEscape
 			QEscape = nil

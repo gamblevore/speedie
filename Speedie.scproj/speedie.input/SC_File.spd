@@ -25,6 +25,7 @@ class SCFile (file)
 		super.constructor(x)
 		.Proj = p
 		.Types = nil
+		.FileNum = SCImport.AllFiles.Length
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
@@ -109,7 +110,7 @@ class SCFile (file)
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.Using.Tag = 0
+			parser.Using.Tag = .FileNum << 8
 			if !orig
 				rz = .fData.ParseClean
 			  else

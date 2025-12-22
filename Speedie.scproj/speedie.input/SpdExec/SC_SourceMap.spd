@@ -8,60 +8,13 @@
 // so how to actually.... dump the actual byteposes?
 
 module SourceMap
-	|int|		 FirstSize
+	|int|		 LastLength
 	|faststring| Positions
 
-	function Align (|jbin| j, |int| T)
+	function Align (|jbin| j, |int| T, |&uint|)
 		opt norefcounts
 		|| p = .positions
-			|| f = .FirstSize
-			if !f
-				.FirstSize = j.Length
-				return
-			|| gain = j.Length - .FirstSize
-			p <~ (0|byte|, gain)
-			|| Start = p.Reserve(T)
-	
-	
-	// 20~pos/12~files
-	function BakePosition (|&asm| Where, |message| msg, |faststring| dbg, |memorylayer| File, |memorylayer|)
-		opt norefcounts
-		// now what?
-		// i guess... each message has a file? so we need the file, and the position from the file
-		|| f = msg.file
-//		if !f
-///			return dbg.AppendHInt(0)
-
-		// now what?
-		|| p = msg.Position
-		// ok so we have a position. what is it relative to?
-		// it might be nicer to start each function so we know where it is.
-		
-		
-		// how to dump this?
-		
-
-	function Dump
-
-		
-	function Collect
-		opt norefcounts
-		for fn in compiler.funclist
-			if fn is usedbyasm // ok... lets mark it's file.
-				|| src = fn.source
-					|| f = src.file
-						f.UsedByASM = true
-					// so... now what?
-
-	function Sort
-		opt norefcounts
-		for imp in Compiler.ImportedList
-			imp.Files.sort
-
-		|| i = 0
-		for imp in Compiler.ImportedList
-			for f in imp.files
-				if f.UsedByASM
-					f.filenum = ++i
-		
-		
+			|| L = .LastLength
+				p <~ (0|byte|, j.Length - (L+T))
+/			.LastLength = j.Length
+			return p.Reserve(T)|&uint|

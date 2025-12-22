@@ -555,7 +555,7 @@ function @assembler.PrintProgress
 		|| fn = scfunction.currfunc!
 		printline fn
 		|| Base = assembler.sh.Start + fn.µStart
-		|| amount = fn.µLength ?? (Assembler.sh.curr - base)
+		|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
 		for n in amount
 			base[n].debugprint
 		

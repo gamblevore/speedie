@@ -81,6 +81,15 @@ struct Assembler
 	function FnLength (|int|)
 		return .curr_ - .funcstart
 	
+	function ActualLength (|int|)
+		return .curr_ - .Start
+
+	function Index (|int|)
+		return .curr_ - .start
+	
+	function Last (|&FatASM|)
+		return .curr_ - 1
+
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		|| j = DebugInfo
@@ -92,12 +101,6 @@ struct Assembler
 			.DeclareVar(a.source, a)
 			if j
 				a.DumpDecl(j, 0) // AddDbg
-
-	function Index (|int|)
-		return .curr_ - .start
-	
-	function Last (|&FatASM|)
-		return .curr_ - 1
 
 	function Last (|asm| type, |&FatASM|)
 		|| L = .curr_ - 1
@@ -601,6 +604,8 @@ struct Assembler
 		
 	function FillDebugInfo
 		opt norefcounts
+		if Options.TargetDebug
+			SourceMap.Positions = FastString()
 		if !options.makeexec
 			require options.TargetDebug
 			if DebugInfo // how?
@@ -685,7 +690,7 @@ struct Assembler
 		opt norefcounts
 		|| fn = .out
 		|| n = .fnlength
-		fn.µlength = n
+		fn.µfatlength = n
 		jsm!.length = .curr - .start 
 
 	
@@ -758,7 +763,7 @@ target debug
 		fn.µprint
 
 
-function Assembler.ASMCompile (|SCFunction| fn, |bool|) // AsmGenerate, ASMRender, GenerateASM
+function Assembler.FatterCompile (|SCFunction| fn, |bool|) // AsmGenerate, ASMRender, GenerateASM, ASMCompile
 	opt norefcounts
 	scfunction.currfunc = fn
 	
@@ -776,7 +781,7 @@ function Assembler.ASMCompile (|SCFunction| fn, |bool|) // AsmGenerate, ASMRende
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	require err.ok
 	|| max = fn.MaxASM
-		check (fn.µlengthguess <= max) (fn.sourcearg, "ASM too large")
+		check (fn.µasmlength <= max) (fn.SourceArg, "ASM too large")
 	return true
 
 

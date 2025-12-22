@@ -12,7 +12,6 @@ module PackMaker
 	|int|					PackGlobSize
 	|int|					LibGlobSize
 	|HairyMan|				PackSaved
-//	|hairyman|				LibSaved
 	
 	
 	libinternal scfunction.NeedsLibExport (|bool|)
@@ -29,7 +28,6 @@ module PackMaker
 	
 	function scfunction.NeedsStableID (|bool|)
 		opt norefcounts
-		|| c = .Parent
 		require (self|scnode| isnt EmbeddedOnly)
 		if (!.IsMacro) and (self isnt disabled and LinkInline)
 			if self|scnode| is libonly // hmm
@@ -125,24 +123,22 @@ module PackMaker
 		while (|| f = list[id])
 			f.fPackID = ++id
 
-	
+
+	function ActualCompile
+		opt norefcounts
+		.PackFuncIndex = 0
+		while (|| fn = .packfuncs[.PackFuncIndex++])
+			require Assembler.sh.FatterCompile(fn)
+
+		
 	function FATCompile (|bool|)
 		opt norefcounts
 		.FinalPrepare
-
 		assembler.sh.FillDebugInfo
-
-		if Options.TargetDebug
-			SourceMap.Positions = FastString()
 
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
-		
-		.PackFuncIndex = 0
-		for fn in .packfuncs
-			.PackFuncIndex++
-			require Assembler.sh.ASMCompile(fn)
-
+		.ActualCompile
 		.Packfuncs.sort(&CodeSorter.fPackID)
 		
 		target debug
@@ -157,8 +153,8 @@ module PackMaker
 		.OrderLibGlobs
 		assembler.sh.ASMInit
 		PackMaker.AddAll
-		if stderr.ok and .BuildGlobs 
-			if .FATCompile and options.ModeCake		// options.ModePack can be false, if compiler.InPerry
+		if stderr.OK and .BuildGlobs 
+			if .FATCompile and options.ModeCake		// ModeCake can be false, if compiler.InPerry
 				.BakePackToDisk
 		compiler.During = 0
 	
@@ -167,21 +163,26 @@ module PackMaker
 		|jbin| j = Compiler.ProductPath.OutputStream$
 		j.RunHeader("/usr/local/bin/cake")
 		j.Enter(@tmp, "cake")
-		j.AddInt(.PackGlobSize.alignup(8))
+		j.AddInt(.PackGlobSize.AlignUp(8))
 		j.enter
 		
-		.BakeMap
 		if .BakeASM(j)
 			.BakeStrings(j)
 			.BakeClasses(j)
+			.BakeMap(j)
 			.BakeDebug(j)
 			j.ExitAll
 	
 	
-	function BakeMap
-		SourceMap.Collect
-		SourceMap.sort
-		SourceMap.dump
+	function BakeMap (|jbin| j)
+		opt norefcounts
+		// So... when does it end? I guess... just append some shit.
+		j.TmpArg("map")
+		for f in SCImport.AllFiles
+			j.AddStr(f)
+		j.Add(@bin, SourceMap.Positions|string|!)
+		j.exit(2)
+	
 	
 	function BakeDebug (|jbin| j)
 		|| dbg = assembler.SafeDebugInfo
@@ -334,11 +335,16 @@ function packmaker.FinalPrepare
 
 	// These lib funcs are not actually going into the pack.
 	// We just want to see the size of the libfunc, if it were inlined.
-	for (fn in .LibFuncs) (i)
+	for fn in .LibFuncs
 		if fn.CanPrepareInline
-			require Assembler.sh.ASMCompile(fn)
+			require Assembler.sh.FatterCompile(fn)
 			Assembler.jsm.length = 0
 
+
+
+// i just went a little insane while writing this code.
+// What do you expect writing a compiler on your own?
+// Might have been drunk too.
 
 struct HairyMan 
 	|uint16| Savings

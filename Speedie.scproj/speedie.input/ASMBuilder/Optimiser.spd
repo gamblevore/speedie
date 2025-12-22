@@ -1,10 +1,1 @@
 
-
-function Assembler.OptimiseJumps
-	|| A = .Curr
-	|| S = .FuncStart
-	while A > S
-		if S.JumpPrm
-			s.JumpImprove(self)
-		S++
-	

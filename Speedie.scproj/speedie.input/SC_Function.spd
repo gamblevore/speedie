@@ -80,7 +80,7 @@ linkage
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |byte|					FSOpt
-|Byte|					MinOpt
+|byte|					MinOpt
 |Byte|					MaxASM
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
@@ -88,10 +88,9 @@ linkage
 |byte|					IsNilChecker
 |byte| 					Badness
 |byte|					StructReturnPos
+|uint16|				µASMLength
 |uint|					µStart
-|uint|					µLengthGuess
-|uint|					µLength
-
+|uint|					µFATLength
 
 
 constructor (|Message?| msg = nil)

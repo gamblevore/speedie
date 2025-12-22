@@ -77,7 +77,7 @@ function PackMaker.RunAFewTests
 |ivec4| Butter 
 function SCFunction.TestObesity (|!&ivec4|)
 	target debug
-		|| mu = .µLength
+		|| mu = .µFATLength
 			|(memory of asm)--| mu2 = .µTest
 			.µprint
 			testvm.Load(mu2.ptr, mu2.length)
