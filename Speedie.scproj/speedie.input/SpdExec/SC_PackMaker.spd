@@ -172,22 +172,16 @@ module PackMaker
 			.BakeDebug(j)
 			j.ExitAll
 	
-	
-	function BakeMap (|jbin| j)
-		|faststring--| p = SourceMap.Positions
-			j.TmpArg("map")
-			|| C = SCImport.AllFiles.join("\n").Compress
-			j.add(@str, C)
-			j.add(@bin, p)
-			j.exit(2)
-	
-	
+		
 	function BakeDebug (|jbin| j)
+		|faststring--| p = SourceMap.Positions
 		|| dbg = assembler.SafeDebugInfo
-			.BakeMap(j)
+		if dbg and p
 			compiler.stDebugInfo += dbg.length
 			j.enter(@tmp, "debug")
 			j.AddStr(dbg.Compress)
+			j.add(@bin, p)
+			j.addStr(SCImport.AllFiles.join("\n").Compress)
 			j.exit
 
 	

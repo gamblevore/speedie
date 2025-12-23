@@ -34,7 +34,7 @@ class SpdFunc
 			check !(blob|int64|&3)											(Code, "ASM unaligned.")
 			check  (n > 0)													(Code, "ASM missing.")
 			check  (n < 64K-1)												(Code, "ASM oversized.")
-	
+			
 			blob.CallCount = 0
 			.length = n
 			.SpeedieFunc = blob

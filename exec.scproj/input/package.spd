@@ -35,7 +35,9 @@ module CakeRun
 		SpdTable.LoadFuncs(arg)
 		.strings = arg["strs"].name
 		.LoadClasses(arg["clss"])
-		debugger.root = arg["debug"]
+		|| debug = arg["debug"]
+			require debugger.StartDebug(debug)
+		
 		return globals.collectpackglobs(sz)
 		
 

@@ -2,6 +2,7 @@
 |string|     Speedie = "/usr/local/bin/speedie"
 |spdprocess| Perry = app.parent
 |!&cakevm|   Cake = CakeVM(1MB, cakevm.WantProtect)
+|&int|		 Shadow = cake.SetDebug(True)
 
 
 main
@@ -17,8 +18,7 @@ May also pass .spd or .scproj files. They will be compiled, then run.\n"
 	error.AutoPrint = 1
 	if CakeRun.GetStructure
 		SpdTable.Link
-		if debugger.StartDebug
-			return SpdTable.RunMain
+		return SpdTable.RunMain
 	return 1
 
 

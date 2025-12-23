@@ -29,6 +29,10 @@ target cpp or vm {
 	function Pause
 		cpp_wrapper JB_ASM_Pause
 
+	function Shadow (|&int|)
+		return (self|&byte|+2MB)|&int|
+		
+
 	module
 		function New	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM

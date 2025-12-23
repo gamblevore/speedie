@@ -1,19 +1,20 @@
 
+unfinished
 
 module debugger
 	|message|		Root
-	|&uint|			Shadow
 	|SPDFunc--|		First
 	|SPDFunc--|		Last
+	|[string]|		Files
+	|string|		CodeMap
+	|string|		Vars
 	
-	function StartDebug (|bool|)
-		opt norefcounts		
-		|| Length = (.Last!.after - .First!.Start)*4
-		.Shadow = memory.zalloc(Length)|&uint|		#require
-		return true
-
-// what to do about empty funcs? if they have no length, surely they don't contain anything?
-// seems easy?
+	function StartDebug (|message| R, |bool|)
+		opt norefcounts
+		.vars = R[@nil, 0].name
+		.codemap = R[@nil, 1].name
+		.files = r[@nil, 2].name.Split
+		return stderr.ok
 
 function spdtable.Find (|uint| ToFind,  |spdfunc|)
 	return .find(debugger.first!.start! + tofind)
