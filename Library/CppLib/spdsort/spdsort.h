@@ -1,6 +1,8 @@
 
 // spdsort.h  http://gamblevore.org, by Theodore h. Smith.   Public domain software.
-// Basically... just testing some sorting algorithms...
+// this licence only applies to spdsort.h and no other files in any larger project,
+// which are free to use whatever licence for the rest of their project.
+
 
 // Spdsort is like a normal quicksort, but with better characteristics:
 	// 1) Handles invalid sort functions. You need this if you are making a programming language, cos you don't want some kid making his first game to crash his computer just cos the sort function is a little bit off. Garbage in = garbage out... thats all we want. C++ sorts will actually crash your app with invalid sort functions.
