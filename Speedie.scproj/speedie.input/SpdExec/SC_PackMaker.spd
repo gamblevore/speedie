@@ -174,10 +174,10 @@ module PackMaker
 	
 	
 	function BakeMap (|jbin| j)
-		opt norefcounts
-		|| p = SourceMap.Positions
+		|faststring--| p = SourceMap.Positions
 			j.TmpArg("map")
-			j.add(@str, SCImport.AllFiles.prefixcompress)
+			|| C = SCImport.AllFiles.join("\n").Compress
+			j.add(@str, C)
 			j.add(@bin, p)
 			j.exit(2)
 	

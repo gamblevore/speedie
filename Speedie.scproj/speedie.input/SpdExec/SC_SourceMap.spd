@@ -16,5 +16,5 @@ module SourceMap
 		|| p = .positions
 			|| L = .LastLength
 				p <~ (0|byte|, j.Length - (L+T))
-/			.LastLength = j.Length
+			.LastLength = j.Length
 			return p.Reserve(T)|&uint|
