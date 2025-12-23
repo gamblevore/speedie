@@ -93,13 +93,15 @@ typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
 void	JB_InitClassList	(SaverLoadClass fn);
 
 struct	CakeVM;
+typedef bool (*JB_ASM_Break)(CakeVM* VM, u32* Code, int BreakValue);
 u32*	JB_ASM_Code			(CakeVM* V, u32* Code, int Length);
+int		JB_ASM_Index		(CakeVM* vm, u32* Code);
 CakeVM*	JB_ASM__VM			(int StackSize, int Flags);
 void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*	JB_ASM_Run			(CakeVM* V);
 void**	JB_ASM_InitTable	(CakeVM* V, int n, int g);
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear);
-int*	JB_ASM_SetDebug		(CakeVM* V, bool Value);
+int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value);
 void	JB_ASM_Pause		(CakeVM* V);
 
 } // ExternCEnd

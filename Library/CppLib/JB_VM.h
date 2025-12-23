@@ -1,4 +1,6 @@
 
+#define CakeCodeMax (1024*1024)
+
 #define std_swap std::swap
 #if __CPU_TYPE__ == __CPU_ARM__
 	#define RegVar(x,n) register auto x asm (#n)
@@ -43,8 +45,6 @@ struct vm_globs {
 };
 
 
-struct CakeVM;
-typedef bool (*JB_ASM_Break)(CakeVM* VM, ASM* Code, int BreakValue);
 struct CakeVM {
 	vm_globs		Env;
     byte*			AllocBase;
@@ -64,7 +64,8 @@ struct CakeVM {
 
 #define kJB_VM_TrapTooFar 1
 #define kJB_VM_WantProtect 2
-#define kJB_VM_IsProtected 4
+#define kJB_VM_IsProtected (1<<31)
+#define kJB_VM_CanDebug 4
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

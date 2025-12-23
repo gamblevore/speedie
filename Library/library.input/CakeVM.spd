@@ -7,6 +7,7 @@ linkage: cpp_class CakeVM, wrapper
 constants
 	TrapTooFar		= 1
 	WantProtect		= 2
+	CanDebug		= 4
 
 target cpp or vm {
 	function Load		(|&uint| Code, |int| CodeLength, |&uint|)
@@ -24,26 +25,29 @@ target cpp or vm {
 		cpp_wrapper JB_ASM_InitTable
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 		cpp_wrapper JB_ASM_FillTable
-	function SetDebug	(|bool| Value, |&int|)
+	function IsDebugging (assigns:|CakeChef?| Value, |&int|)
 		cpp_wrapper JB_ASM_SetDebug
 	function Pause
 		cpp_wrapper JB_ASM_Pause
 
 	function Shadow (|&int|)
 		return (self|&byte|+2MB)|&int|
-		
+
+	function IsDebugging (assigns:|bool| Value, |&int|)
+		|| v = (dummychef, nil)(value)
+		return .isdebugging(v)
+
+	function Index (|&uint| Code,  |int|)
+		cpp_wrapper JB_ASM_Index
+	
+	function DummyChef (CakeChef)
 
 	module
-		function New	(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
+		function New	(|int| StackSize = 1MB, |int| Flags = cakevm.WantProtect ||| cakevm.candebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
-
-//} else {
-//	inline Run			(|&uint| Code, |int| CodeLength, |&ivec4|)
-//	inline Registers	(|bool| Clear=true, |&ivec4|)
-//	inline TestInit		(|int| n, |int| g, |&&nil|)
-//	inline ExecInit		(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
-//
-//	module
-//		inline New		(|int| StackSize = 1MB, |int| Flags = 0, |&CakeVM|)
-}}
-
+	
+	prototype CakeChef (|&uint| Code,  |int| BreakValue, |bool|)
+		// returns false to continue breaking back into here.
+		// If you return true, make sure to sleep a little to avoid a hot-loop.
+}
+}

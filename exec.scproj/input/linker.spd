@@ -24,15 +24,16 @@ module SpdTable
 			.Funcs <~ SpdFunc(spd)
 	
 	
-	function LoadFuncs (|message| arg)
+	function LoadFuncs (|message| code)
 		opt norefcounts
-		|| code = arg[@tmp, "code"][@arg]
 		.funcs <~ SpdFunc()					// null func
 		for spd.fast in code
 			self <~ spd
 		
-		check  (.Funcs >= 3)				(code, "Missing 'main'")
 		.Funcs.Shrink
+		|| CodeLength = debugger.CodeLength
+		check  (CodeLength < 1MB)			(code, "Oversized code: " + CodeLength)
+		check  (.Funcs >= 3)				(code, "Missing 'main'")
 		
 	
 	function Link (|&asm|)

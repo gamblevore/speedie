@@ -6,18 +6,54 @@ module debugger
 	|SPDFunc--|		First
 	|SPDFunc--|		Last
 	|[string]|		Files
-	|string|		CodeMap
+	|string|		SrcMap
 	|string|		Vars
+	
+	
+	function __Viewer__ (cakevm.CakeChef)
+		debugger // this is the main function. lets see if it works?
+		// what do I want to do? for now just step in speedie.
+		// perhaps I could look up the source pos... 
+		|| Index = .index(code)
+	
 	
 	function StartDebug (|message| R, |bool|)
 		opt norefcounts
-		.vars = R[@nil, 0].name
-		.codemap = R[@nil, 1].name
-		.files = r[@nil, 2].name.Split
-		return stderr.ok
+/		.Vars = R[@nil, 0].name
+		|| M = R[@nil, 1]
+		.SrcMap = M.name
+		.Files = r[@nil, 2].name.Split
+		
+		|| Maplength = .SrcMap.Length
+		|| CodeLength = .CodeLength
+		expect (MapLength < 1MB) ("Oversized source-map: " + maplength)
+		if CodeLength!=Maplength // Function-header padding? Or off by one?
+			error ("map-length is: " + Maplength) + (" but code-length is: " + CodeLength)
+		
+// For now... lets break on each instruction on the shadow
+		if StdErr.ok
+			.BreakAll
+			return true
+
+
+	function BreakAll
+		|| s = shadow
+		require s
+		|| L = .CodeLength
+			for i in l
+				s[i] = 1
+
+
+	function CodeLength (|int|)
+		|| f = .first
+		|| l = .last
+		if f and l
+			return l.After - f.Start
+
 
 function spdtable.Find (|uint| ToFind,  |spdfunc|)
 	return .find(debugger.first!.start! + tofind)
+
 
 function spdtable.Find (|&ASM| ToFind, |spdfunc|)
 	opt norefcounts // I could make a binary func. but I don't want to. maybe later?

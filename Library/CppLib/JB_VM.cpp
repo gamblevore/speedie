@@ -48,10 +48,11 @@ void JB_ASM_Pause (CakeVM* V) {
 }
 
 
-int* JB_ASM_SetDebug (CakeVM* V, bool Value) {
+int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 	auto J = V->JumpTable;
 	void* Break = J[512];
-	if (Value != (J[0] == Break)) {
+	V->Break = Value;
+	if ((Value != nil) != (J[0] == Break)) {
 		int i = 256;
 		if (Value) while (--i >= 0)
 			J[i] = Break;
@@ -117,6 +118,16 @@ static void * const GlobalJumpTable[] = {
 }
 
 
+int JB_ASM_Index (CakeVM* vm,  ASM* Code) {
+	ASM* Start = (ASM*)(((byte*)vm) + vm->StackSize);
+	if (Code < Start)
+		return -1;
+	if (Code >= Start + CakeCodeMax)
+		return -1;
+	return Code - Start;
+}
+
+
 void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
 	vm->Env.LibGlobs = LibGlobs;
 	vm->Env.PackGlobs = PackGlobs;
@@ -159,14 +170,14 @@ ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
 
 
 CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns deep.
-	const int MB = 1024*1024;
 	const int Page = 16*1024;
 	Flags &=~ kJB_VM_IsProtected;
 	StackSize = StackSize&~(Page-1);						// remove garbage
 	
-	if (StackSize < MB/4)
-		StackSize = MB/4;
-	int AllocSize = StackSize + 2*MB;	
+	StackSize = std::max(StackSize, 256*1024);
+	int AllocSize = StackSize + CakeCodeMax;
+	if (true or (Flags&kJB_VM_CanDebug))
+		AllocSize += CakeCodeMax; // better that we can always debug. but hard without a map? we'll step into bare-ASM...
 	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);		// page aligned. Can call mprotect later.
 	if (V) {
 		memzero(V, AllocSize);

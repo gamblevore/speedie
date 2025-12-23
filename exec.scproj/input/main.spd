@@ -1,8 +1,8 @@
 
 |string|     Speedie = "/usr/local/bin/speedie"
 |spdprocess| Perry = app.parent
-|!&cakevm|   Cake = CakeVM(1MB, cakevm.WantProtect)
-|&int|		 Shadow = cake.SetDebug(True)
+|!&cakevm|   Cake = CakeVM()
+|&int|		 Shadow = cake.IsDebugging(&debugger.__Viewer__)
 
 
 main

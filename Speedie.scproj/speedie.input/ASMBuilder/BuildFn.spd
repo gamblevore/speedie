@@ -17,9 +17,9 @@ extend_module ASM
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
-				testvm.setdebug(true)
+				testvm.IsDebugging = true
 				testvm.Run(ff.ptr, ff.length)
-				testvm.setdebug(false)
+				testvm.IsDebugging = false
 
 
 	function GetASMFunc (|message| m, |scfunction|)
