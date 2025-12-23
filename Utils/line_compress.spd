@@ -1,7 +1,6 @@
 #!/usr/local/bin/spd
 
-app.usage = "Simple utility to compress a text-file containing lines"
-
+app.usage = "Simple utility to compress a text-file containing lines.  Its just a concept.  Compression isn't tight."
 
 main (|file.existing| Input, |file.output?| Output)
 	|| data = input.ReadAll
@@ -18,4 +17,28 @@ main (|file.existing| Input, |file.output?| Output)
 				|| B = output.streamlength
 				"Original: ${A.strsize}\nNew: ${B.strsize}\nRatio: ${(b div a).percent}"
 
+
+function array.PrefixCompress (|[string]| self, |faststring?| fs_in=nil,  |string|)
+	|| fs = faststring(fs_in)
+	|| PrevLine = ""
+	for l in self
+		|| d = l.DiffAt(prevline)
+		if d < 0
+			d = l.Length
+		
+		fs.AppendHInt(d)
+		fs.appendhint(l.Length - d)
+		fs.Appendrange(l, d, int.max)
+		PrevLine = l
+	return fs.GetResult(fs_in)
+
+
+function string.PrefixDecompress (|[string]| output)
+	|| in = .InputStream
+	|| Prev = ""
+	while in.HasAny
+		|| A = in.HInt
+		|| B = in.HInt
+		Prev = prev[0, A] + in.Str(B)
+		output <~ prev
 
