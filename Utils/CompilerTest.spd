@@ -1,6 +1,6 @@
 #!/usr/local/bin/spd
 
-|| Fails = faststring()
+|| Fails = FastString()
 || Speedie = "/usr/local/bin/spd"
 
 
