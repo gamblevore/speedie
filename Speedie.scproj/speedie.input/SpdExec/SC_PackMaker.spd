@@ -139,7 +139,7 @@ module PackMaker
 		.ActualCompile
 		.Packfuncs.sort(&CodeSorter.fPackID)
 		
-		target debug
+		target debug and !perrydbg
 			if !Compiler.InPerry
 				.RunAFewTests
 		return true

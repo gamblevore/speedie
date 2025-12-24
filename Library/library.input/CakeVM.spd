@@ -12,13 +12,9 @@ constants
 target cpp or vm {
 	function Load		(|&uint| Code, |int| CodeLength, |&uint|)
 		cpp_wrapper JB_ASM_Code
-	function Run		(|&ivec4|)
+	function Run		(|?&uint| StartAt=nil, |&ivec4|)
 		cpp_wrapper JB_ASM_Run
-	
-	inline Run		(|&uint| Code, |int| CodeLength, |&ivec4|)
-		.load(code, codelength)
-		return .run
-		
+			
 	function Registers	(|bool| Clear=true, |&ivec4|)
 		cpp_wrapper JB_ASM_Registers
 	function TestInit	(|int| n, |int| g, |&&nil|)
@@ -30,12 +26,9 @@ target cpp or vm {
 	function Pause
 		cpp_wrapper JB_ASM_Pause
 
-	function Shadow (|&int|)
-		return (self|&byte|+2MB)|&int|
-
 	function IsDebugging (assigns:|bool| Value, |&int|)
 		|| v = (dummychef, nil)(value)
-		return .isdebugging(v)
+		return .IsDebugging(v)
 
 	function Index (|&uint| Code,  |int|)
 		cpp_wrapper JB_ASM_Index

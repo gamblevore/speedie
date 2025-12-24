@@ -1,6 +1,6 @@
 	
 	
-target debug {
+target debug and !perrydbg {
 extend_module PackMaker	
 	syntax access (|int| v, assigns:|int64|)
 		|| r = testvm.Registers(false)+v

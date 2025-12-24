@@ -97,26 +97,29 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	return true
 
 
+function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
+	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
+	|| dbg = SourceMap.Align(self, t*4)
+	|| after = fn.ASMBake(Start, Start+t, dbg)
+	return (after-start == T)						#expect (fn, "ASM length corrupt")
+
+
 function JBin.BakeASM (|SCFunction| fn, |bool|)
 	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
 		.add(@tmp, fn.exportname)
 		return true
 	
-	scfunction.currfunc = fn
+	SCFunction.currfunc = fn
 
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
 	|| tmp = Options.TargetDebug
-		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
-		.SyntaxAppend(0, 2)
+	if !tmp
+		return .BakeASMSub(fn, t)
 	
-	
-	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
-	|| dbg = SourceMap.Align(self, t*4)
-	|| after = fn.ASMBake(Start, Start+t, dbg)
-	expect (after-start == T)			(fn, "ASM length corrupt")
-	if tmp
-		.exit
-	return true
+	.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
+	.SyntaxAppend(0, 2)
+	rz = .BakeASMSub(fn, t)
+	.exit
 
 

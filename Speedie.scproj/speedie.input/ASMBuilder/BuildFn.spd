@@ -1,6 +1,6 @@
 
 
-target debug
+target debug and vm
 	|!&CakeVM| TestVM = CakeVM(1MB, cakevm.WantProtect)
 
   
@@ -13,7 +13,7 @@ extend_module ASM
 		require list and testname
 
 		textassembler.assemble(list)
-		target debug
+		target debug and !perrydbg
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
@@ -29,7 +29,7 @@ extend_module ASM
 
 
 	function TextASMTest 
-		target debug
+		target debug and vm
 			require options.Modecake and options.dev > 0
 			asm.noisyasm = 3		
 			using ErrorSeverity.Warning

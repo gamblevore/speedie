@@ -1175,6 +1175,22 @@ function FixCnjSub (|Message| exp)
 	  else
 		pp = ch.NiceParent!
 		|| Done = false
+		
+		// this is actually an error:
+		/*
+			|| GlobalObj = nil
+			function abc
+				|| s = GlobalObj #require
+				|| x = s.RefCount
+		*/
+
+		// we don't know the type of GlobalObj yet.
+		// It could be a global object/pointer.
+		// we'd have to delay until we actually want the type of the cnj.
+		// thats going to be a pain.
+		// we'd need a typeofcnj and do it then.
+		// but I'm assuming some other code will fail...
+		
 		if ((ch.UnBra == @thg)) or ((pp == @arg) and !CreatesError)
 			thg = ch.copy!
 			if (pp == @arg)

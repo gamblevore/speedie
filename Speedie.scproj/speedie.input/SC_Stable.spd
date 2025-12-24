@@ -21,7 +21,7 @@ module LibStability
 		.UseBank(data, IsFuncs)
 		|| fs = (faststring(), nil)(options.MakeExec)
 			fs <~ data ?? "// beta-file. Unstable."
-		.StabliseSub2(fs, list, isfuncs)
+		.StabiliseSub2(fs, list, isfuncs)
 		if fs
 			funcs.SmartData = fs|string|
 	
@@ -39,10 +39,10 @@ module LibStability
 //		for (l in list) (i)
 //			printline "${(i+1)}: ${l.packid(l isa scfunction)}: ${l.exportname}"
 	
-	function StabliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
+	function StabiliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
 		opt norefcounts
 		|&&nil| Table		// just pass 4096. Saves all the fücking around with calculating sizes.
-		target debug
+		target debug and !perrydbg
 			if !options.MakeExec
 				Table = testvm.TestInit(4096, 64K)
 			

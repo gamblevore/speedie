@@ -64,7 +64,7 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 }
 
 
-static ivec4* __CAKE_VM__ (CakeVM& vm, uint Op) {
+static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) {
 static void * const GlobalJumpTable[] = {
 #if __CPU_TYPE__ == __CPU_ARM__
 	#include "InstructionList.h"
@@ -79,7 +79,7 @@ static void * const GlobalJumpTable[] = {
 		return 0;
 	}
   
-    RegVar(Code, r20) = JB_ASM_Code(&vm,0,0);
+	JB_ASM_Code(&vm,0,0);
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
 
@@ -183,13 +183,13 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 		memzero(V, AllocSize);
 		V->VFlags = Flags;
 		V->StackSize = StackSize;
-		__CAKE_VM__(*V, StackSize);
+		__CAKE_VM__(*V, 0, StackSize);
 	}
 	return V;
 }
 
 
-static ivec4* VM_Run (CakeVM& V) {
+static ivec4* VM_Run (CakeVM& V, u32* Code) {
 	// re-entrant code will be called differently.
 	V.Registers[2] = {};
 	V.EXIT[0] = 1;
@@ -199,12 +199,12 @@ static ivec4* VM_Run (CakeVM& V) {
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
-	return __CAKE_VM__(V, 0);
+	return __CAKE_VM__(V, Code, 0);
 }
 
 
-ivec4* JB_ASM_Run (CakeVM* V) {
-	return VM_Run(*V); // i can't stand pointer syntax.
+ivec4* JB_ASM_Run (CakeVM* V, u32* Code) {
+	return VM_Run(*V, Code); // i can't stand pointer syntax.
 }
 #endif
 } // extern c
