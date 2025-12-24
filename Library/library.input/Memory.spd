@@ -98,7 +98,7 @@ class Memory
 	
 	
 	function Temporal
-		random.shared.temporal(self)
+		random.temporal(self)
 	
 	function Count (|int|)
 		disabled "Use .size"
@@ -217,7 +217,7 @@ class Memory
 		function Random  (|int| n, |memory|)
 			rz = byte[n]
 			if rz
-				random.shared.temporal(rz)
+				random.temporal(rz)
 		
 		libinternal _memset	 (|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
 		function Fill	 (|&byte| p, |int| n, |byte| B):				._memset(p, b, n)

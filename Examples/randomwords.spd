@@ -11,5 +11,5 @@ main (|File| File, |int| N)
 
 
 function faststring.AppendRandomWord (|int| Min, |int| Max)
-	|| n = Random.Shared.IntRange(Min, Max)
-	Random.Shared.Text(self, n, 'a', 'z')
+	|| n = random.IntRange(Min, Max)
+	Random.Text(self, n, 'a', 'z')

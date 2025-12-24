@@ -1,10 +1,12 @@
 
 
 module SpdTable 
-	|int|		LinksOK
-	|[SpdFunc]|	Funcs
-	|spdfunc--|	CurrFunc
-	|&&nil|		LibFuncs = cakerun.LibFuncs
+	|int|			LinksOK
+	|[SpdFunc]|		Funcs
+	|spdfunc--|		CurrFunc
+	|SPDFunc--|		First
+	|SPDFunc--|		Last
+	|&&nil|			LibFuncs = cakerun.LibFuncs
 	
 	function RunMain (|int|)
 		opt norefcounts
@@ -31,16 +33,28 @@ module SpdTable
 			self <~ spd
 		
 		.Funcs.Shrink
-		|| CodeLength = debugger.CodeLength
+		|| CodeLength = .CodeLength
 		check  (CodeLength < 1MB)			(code, "Oversized code: " + CodeLength)
 		check  (.Funcs >= 3)				(code, "Missing 'main'")
 		
-	
+
+	function CodeLength (|int|)
+		opt norefcounts
+		|| f = spdtable.first
+		|| l = spdtable.last
+		if f and l
+			return l.After - f.Start
+
+
 	function Link (|&asm|)
 		opt norefcounts
 		for f in .funcs
 			.currFunc = f
 			f.Link❗
+
+		|| f = .first$
+		|| l = .last!
+		cake.load(f.Start!, .codelength)
 
 	function spdfunc.Link❗
 		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now. 

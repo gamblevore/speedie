@@ -4,7 +4,7 @@
 */
 
 
-struct Random
+struct RandomXOR
 	linkage
 		cpp_part Rnd
 	|uint64| Store
@@ -12,6 +12,10 @@ struct Random
 	
 	saveas struct
 
+	constructor
+		.TimeSeed
+	
+	
 	function Int (|int64| Limit, |int64|)
 		cpp_part IntTo
 		return .IntRange(0, Limit-1)
@@ -147,38 +151,33 @@ struct Random
 			.temporal(P, P + mem.ByteCapacity)
 			mem.Length = mem.size
 
+	macro SyntaxCall
+		.float(*_)
 	
-	function Init
-		if !.store
-			.TimeSeed
-	
-	
-	module  // module random
-		|Random| Shared
-		.shared.TimeSeed
+	module
+		random.TimeSeed
 
-		macro SyntaxAccess
-			random.shared.float(*_)
-
+|RandomXOR| RandomShared
+|!&RandomXOR| Random = RandomShared
 
 // these random funcs need unifying their purpose / names
 // do they return the same type of a different?
 // access is nicer for different. fits with float, even int! int[1] == bool
 // doesnt work with ivecs2 for string, but w can just rename it to text.
 function ivec2.Text (|int| n, |string|)
-	return random.shared.Text(n, .x, .y)
+	return random.Text(n, .x, .y)
 	
 function float.SyntaxAccess (|bool|)
-	return random[] < self
+	return random.float < self
 
 function float.SyntaxCall (|float|)		// can this even be accessed anymore? seems no?
-	return random.shared.float * self	// 1.0() doesnt work anymore? neither 1.0[]
+	return random.float * self	// 1.0() doesnt work anymore? neither 1.0[]
 
 function float64.SyntaxCall (|float64|)
-	return random.shared.float64 * self
+	return random.float64 * self
 
 function int.SyntaxCall (|int|)
-	return (random.shared.Float64 * self|Float64|)|int|
+	return (random.Float64 * self|Float64|)|int|
 
 function int.Rand (|int|)
 	disabled "use 'num()'"

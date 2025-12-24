@@ -9,7 +9,7 @@ class SnakeWin (window)
 	|ivec2|						Speed
 	|Piece|						Food
 	|int|						Score
-    |random|					Rng
+    |randomXOR|					Rng
 	constants: GridSize = 16
 	
 	constructor

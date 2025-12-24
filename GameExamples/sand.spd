@@ -65,7 +65,7 @@ class SandSimulator (Window)
 		.reset
 	
 	function Reset
-		|| h = Random.shared.int
+		|| h = Random.int
 		for s in .Particles
 			h = h.hash
 			s[0] = nil

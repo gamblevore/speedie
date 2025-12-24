@@ -21,6 +21,6 @@ module abc
 	task RandomSayer (|string| name)
 		|int| RandomID
 		constructor
-			.randomid = random.shared.int
+			.randomid = random.int
 		run
 			app.say "$.name $.randomid"

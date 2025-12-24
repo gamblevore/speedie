@@ -124,7 +124,7 @@ class Breakout (Window)
 		|| x = .Blocks.Length|float|
 		|| chance = 12.0 / x
 		if chance[]
-			return 1+random.shared.float(n)|int|
+			return 1+random.float(n)|int|
 
 
 	function DoHits (|vobject| ball)

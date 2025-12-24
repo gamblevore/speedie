@@ -20,8 +20,8 @@ class SpdFunc
 			.Length = 0
 			.SpeedieFunc = nil
 		  else
-			debugger.First ?= self
-			debugger.last = self
+			Spdtable.First ?= self // .first = self
+			Spdtable.last = self
 			
 			|| s    = Code.name
 			|| n    = s.length>>2
@@ -48,12 +48,14 @@ class SpdFunc
 	
 	function RelativeStart (|int|)
 		|| SPD = .SpeedieFunc
-		return SPD - debugger.first!.SpeedieFunc
+		return SPD - spdtable.first!.SpeedieFunc
 	
 	function Run (|&ivec4|)
+		// we are passing in alength, but we need to be able to use the entier compile!
+		/// ARGHJHKLAS
 		|| spd = .Start
 			Cake.Registers
-			return cake.Run(spd, .length)
+			return cake.Run(spd)
 		error (self, "Can't Run")
 		return Dummy
 		

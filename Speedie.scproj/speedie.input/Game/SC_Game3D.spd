@@ -27,7 +27,7 @@ module SCGame3D
 
 
 	function Love (CollectFunc)
-		if random.shared[] > (1.0/12.0)
+		if random.float > (1.0/12.0)
 			printline node.render[5...]
 		return compiler.program
 

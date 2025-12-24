@@ -32,13 +32,10 @@ module CakeRun
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
 		
-/		|| Code = arg["code"]
-/		SpdTable.LoadFuncs(arg[@tmp, "code"][@arg])
+		SpdTable.LoadFuncs(arg[@tmp, "code"][@arg])
 		.Strings = arg["strs"].name
 		.LoadClasses(arg["clss"])
-		|| debug = arg["debug"]
-			require debugger.StartDebug(debug)
-		
+		Debugger.Root = arg["debug"].parent
 		return globals.CollectPackGlobs(sz)
 		
 

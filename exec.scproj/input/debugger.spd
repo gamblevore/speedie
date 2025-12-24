@@ -3,8 +3,6 @@ unfinished
 
 module debugger
 	|message|		Root
-	|SPDFunc--|		First
-	|SPDFunc--|		Last
 	|[string]|		Files
 	|string|		Vars
 	|string|		SrcMap
@@ -29,20 +27,20 @@ module debugger
 		return .DebugFoundLocation( Path, Where>>11 )
 	
 	
-	function StartDebug (|message| R, |bool|)
+	function StartDebug (|bool|)
 		opt norefcounts
-/		.Vars = R[@nil, 0].name
+		|| R = .root
+		.Vars = R[@nil, 0].name
 		|| M = R[@nil, 1]
 		.SrcMap = M.name
-		.base = .SrcMap.Addr|&uint|
-		.Length = .SrcMap.Length >> 2
 		.Files = r[@nil, 2].name.decompress.Split
+		.base = .SrcMap.Addr|&uint|
+		|| L = .SrcMap.Length >> 2
+		.Length = L // just for speed
 		
-		|| Maplength = .SrcMap.Length
-		|| CodeLength = .CodeLength
-		expect (MapLength < 1MB) ("Oversized source-map: " + maplength)
-		if CodeLength!=Maplength			// Function-header padding? Or off by one?
-			error ("map-length is: " + Maplength) + (" but code-length is: " + CodeLength)
+		check (L < 1MB)						("Oversized source-map: " + L)
+		|| L2 = spdtable.CodeLength
+		check (L2==L)						("map-length is: " + L) + (" but code-length is: " + L2)
 		
 // For now... lets break on each instruction on the shadow
 		if StdErr.ok
@@ -51,22 +49,13 @@ module debugger
 
 
 	function BreakAll
-		|| s = shadow
-		require s
-		|| L = .CodeLength
-			for i in l
+		|| s = __Globals__.BreakPoints
+			for i in .Length
 				s[i] = 1
 
 
-	function CodeLength (|int|)
-		|| f = .first
-		|| l = .last
-		if f and l
-			return l.After - f.Start
-
-
 function spdtable.Find (|uint| ToFind,  |spdfunc|)
-	return .find(debugger.first!.start! + tofind)
+	return .find(.first!.start! + tofind)
 
 
 function spdtable.Find (|&ASM| ToFind, |spdfunc|)
