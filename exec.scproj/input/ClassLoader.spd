@@ -32,7 +32,7 @@ function Cakerun.Func (|message| V, |uint64|)
 		return ((spdtable.LibFuncs+Index)|int64|) &~ Spd
 
 	|| Fn = SpdTable.Funcs[Index]					#expect (V, "Virtual out of bounds")
-	|| spdfn = fn.SpeedieFunc						#expect (V, "Virtual is missing")
+	|| spdfn = fn.ASMStart							#expect (V, "Virtual is missing")
 	return spdfn|int64| ||| Spd
 	
 	

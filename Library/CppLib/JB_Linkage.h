@@ -98,7 +98,7 @@ u32*	JB_ASM_Code			(CakeVM* V, u32* Code, int Length);
 int		JB_ASM_Index		(CakeVM* vm, u32* Code);
 CakeVM*	JB_ASM__VM			(int StackSize, int Flags);
 void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
-ivec4*	JB_ASM_Run			(CakeVM* V, u32* Code);
+ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex);
 void**	JB_ASM_InitTable	(CakeVM* V, int n, int g);
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear);
 int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value);

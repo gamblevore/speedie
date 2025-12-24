@@ -12,7 +12,7 @@ constants
 target cpp or vm {
 	function Load		(|&uint| Code, |int| CodeLength, |&uint|)
 		cpp_wrapper JB_ASM_Code
-	function Run		(|?&uint| StartAt=nil, |&ivec4|)
+	function Run		(|int| StartAt, |&ivec4|)
 		cpp_wrapper JB_ASM_Run
 			
 	function Registers	(|bool| Clear=true, |&ivec4|)

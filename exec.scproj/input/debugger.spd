@@ -53,7 +53,7 @@ module debugger
 			for i in .Length
 				s[i] = 1
 
-
+/*
 function spdtable.Find (|uint| ToFind,  |spdfunc|)
 	return .find(.first!.start! + tofind)
 
@@ -67,7 +67,6 @@ function spdtable.Find (|&ASM| ToFind, |spdfunc|)
 			if s.Contains(ToFind) == 0
 				return s
 
-
 function spdfunc.Contains (|&ASM| ToFind, |int|)
 	|| s = .Start
 	if ToFind < s
@@ -75,5 +74,6 @@ function spdfunc.Contains (|&ASM| ToFind, |int|)
 	if ToFind < s + .Length
 		return 0
 	return 1
+*/
 
 

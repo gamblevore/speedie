@@ -40,25 +40,26 @@ module SpdTable
 
 	function CodeLength (|int|)
 		opt norefcounts
-		|| f = spdtable.first
 		|| l = spdtable.last
-		if f and l
-			return l.After - f.Start
+			return l.start + l.Length
 
-
+	function SpdFunc.ASMStart (|&ASM|)
+		|| i = .start
+			return BeginCode + i
+	
 	function Link (|&asm|)
 		opt norefcounts
-		for f in .funcs
+		|| code = SpdFunc.BeginCode$
+		for f in .funcs()
 			.currFunc = f
-			f.Link❗
+			f.Link❗(code)
 
-		|| f = .first$
-		|| l = .last!
-		cake.load(f.Start!, .codelength)
+/		cake.load(code, .codelength)
 
-	function spdfunc.Link❗
-		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now. 
-		|| Base = .start$
+	function spdfunc.Link❗ (|&ASM| Begin)
+		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
+		|| Code = .Start$
+		|| Base = Begin + Code
 		|| after = base + .Length
 		while base < after
 			|| asm = base[]
@@ -76,8 +77,8 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction,
 	require ID > 0 // not a register!
 	
 	|| fn = SpdTable.Funcs[id]
-		|| Pos = fn.SpeedieFunc						// Fast-branch for speed.
-			|| Jump = self - &Pos.ASM[0]			// 19-bits // later we can upgrade to 21-bit
+		|| Pos = fn.ASMStart						// Fast-branch for speed.
+			|| Jump = self - Pos					// 19-bits // later we can upgrade to 21-bit
 			if  Jump  ==  (Jump << 13) >> 13
 				|| Final = (Jump|uint| << 13) >> 13
 				Final |= (Old>>24) << 24

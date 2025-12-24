@@ -3,12 +3,13 @@
 class SpdFunc
 	|uint16|			Length
 	|uint16|			Position
+	|ind|				Start
 	|string|			Name
-	|?&ASMblob|			SpeedieFunc
 
 	constructor
 		.Position = spdtable.funcs.Length
 		.name = "(unused code)"
+		.start = -1
 	
 	constructor (|message| code)
 		opt norefcounts
@@ -18,11 +19,8 @@ class SpdFunc
 			code = F
 		if code.func == @tmp
 			.Length = 0
-			.SpeedieFunc = nil
+			.Start = -1
 		  else
-			Spdtable.First ?= self // .first = self
-			Spdtable.last = self
-			
 			|| s    = Code.name
 			|| n    = s.length>>2
 			|| blob = (s.addr-4)|&ASMBlob|
@@ -37,31 +35,29 @@ class SpdFunc
 			
 			blob.CallCount = 0
 			.length = n
-			.SpeedieFunc = blob
+			if !SpdTable.first
+				Spdtable.First = self // .first = self
+				BeginCode = &blob.ASM[0]
+			Spdtable.last = self
+			
 
-	function After	(|&asm|)
-		return .start + .Length
+//	function After	(|&asm|)
+//		return .start + .Length
 		
-	function Start	(|&asm|)
+/*	function Start	(|&asm|)
 		|| mu = .SpeedieFunc
-			return &mu.asm[0]
-	
-	function RelativeStart (|int|)
-		|| SPD = .SpeedieFunc
-		return SPD - spdtable.first!.SpeedieFunc
-	
+			return &mu.asm[0]*/
+		
 	function Run (|&ivec4|)
-		// we are passing in alength, but we need to be able to use the entier compile!
-		/// ARGHJHKLAS
-		|| spd = .Start
-			Cake.Registers
-			return cake.Run(spd)
-		error (self, "Can't Run")
-		return Dummy
+		Cake.Registers
+		|| Code = .start
+		if code >= 0
+			return cake.Run(Code)
+		return Dummy		
 		
 	render
 		fs <~ "0x"
-		fs.AppendHex(.RelativeStart, 6)
+		fs.AppendHex(.start, 6)
 		fs <~ ' '
 		fs <~ .name
 
@@ -70,5 +66,6 @@ class SpdFunc
 		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
 	
 	module
+		|&ASM| BeginCode
 		|ivec4| Dummy
 

@@ -60,7 +60,7 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
 	}
 	byte* B = (byte*)V;
-	return (int*)(B + (1024*1024) + (V->StackSize));
+	return (int*)(B + CakeCodeMax + (V->StackSize));
 }
 
 
@@ -79,7 +79,6 @@ static void * const GlobalJumpTable[] = {
 		return 0;
 	}
   
-	JB_ASM_Code(&vm,0,0);
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
 
@@ -92,18 +91,18 @@ static void * const GlobalJumpTable[] = {
 
 	
 	PAUSE:;											// Assume was in debug mode
-	++Code[1024*1024];
+	++Code[CakeCodeMax];
 	for (int i = 0; i < 256; i++)
 		JumpTable[i] = &&TRYBREAK;
 	goto BREAK;
 
 	
 	TRYBREAK:; {
-		auto BreakValue = ++Code[1024*1024];
+		auto BreakValue = ++Code[CakeCodeMax];
 		if_usual (!(BreakValue & 0x80000000))
 			goto *JumpTable[256+(Op>>24)];			// Resume
 		if_rare (!(BreakValue<<1)) {				// Accidental trap from 2GB loop.
-			Code[1024*1024] = ((~BreakValue>>31)<<31)|0x40000000;// Reset to a big number 
+			Code[CakeCodeMax] = ((~BreakValue>>31)<<31)|0x40000000;// Reset to a big number 
 			if (!(vm.VFlags & kJB_VM_TrapTooFar))
 				goto *JumpTable[256+(Op>>24)];		// Resume
 		}
@@ -111,7 +110,7 @@ static void * const GlobalJumpTable[] = {
 	
 	BREAK:;											// the actual breakpoint
 	while (auto B = vm.Break)
-		if (!(B)(&vm, Code-1, Code[1024*1024]))
+		if (!(B)(&vm, Code-1, Code[CakeCodeMax]))
 			break;
 
 	goto *JumpTable[256+(Op>>24)];					// Resume
@@ -124,7 +123,7 @@ int JB_ASM_Index (CakeVM* vm,  ASM* Code) {
 		return -1;
 	if (Code >= Start + CakeCodeMax)
 		return -1;
-	return Code - Start;
+	return (int)(Code - Start);
 }
 
 
@@ -151,18 +150,18 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 
 
 ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
-	if_rare (Length > (1024*1024)/4)
+	if_rare (Length > CakeCodeMax/4)
 		return 0;
 	auto D = (ASM*)(((byte*)V) + V->StackSize);
 	int F = V->VFlags;
 	if (Code) {
 		if (F&kJB_VM_IsProtected)
-			if (mprotect(D, 1024*1024, PROT_WRITE|PROT_READ)==0) // unprotect
+			if (mprotect(D, CakeCodeMax, PROT_WRITE|PROT_READ)==0) // unprotect
 				F &=~ kJB_VM_IsProtected;
 		memcpy(D, Code, 4*Length);
 	}
 	if (F&kJB_VM_WantProtect and !(F&kJB_VM_IsProtected))
-		if (mprotect(D, 1024*1024, PROT_READ) == 0)				// protect!
+		if (mprotect(D, CakeCodeMax, PROT_READ) == 0)				// protect!
 			F |= kJB_VM_IsProtected;
 	V->VFlags = F;
 	return D;
@@ -189,7 +188,7 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 }
 
 
-static ivec4* VM_Run (CakeVM& V, u32* Code) {
+static ivec4* VM_Run (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
 	V.Registers[2] = {};
 	V.EXIT[0] = 1;
@@ -199,12 +198,27 @@ static ivec4* VM_Run (CakeVM& V, u32* Code) {
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
+	ASM* Code = JB_ASM_Code(&V,0,0) + CodeIndex;
 	return __CAKE_VM__(V, Code, 0);
 }
 
 
-ivec4* JB_ASM_Run (CakeVM* V, u32* Code) {
+ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	return VM_Run(*V, Code); // i can't stand pointer syntax.
 }
+#else
+
+					// Stubs //
+
+ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
+void	JB_ASM_Pause		(CakeVM* V)								{}
+int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value)			{}
+int		JB_ASM_Index		(CakeVM* V, ASM* Code)					{}
+void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
+void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}
+ASM*	JB_ASM_Code			(CakeVM* V, ASM* Code, int Length)		{return 0;}
+CakeVM* JB_ASM__VM			(int StackSize, int Flags)				{return 0;}
+ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex)				{return 0;}
+
 #endif
 } // extern c
