@@ -319,7 +319,7 @@ struct Object_Behaviour;
 
 struct ParserLineAndIndent;
 
-struct Random;
+struct RandomXOR;
 
 struct RegFile;
 
@@ -532,6 +532,8 @@ struct SCFunction;
 struct SCModule;
 
 typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After);
+
+typedef bool (*CakeVM_CakeChef)(CakeVM* Self, uint* Code, int BreakValue);
 
 typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -767,7 +769,7 @@ struct ParserLineAndIndent {
 	int FirstLine;
 };
 
-struct Random {
+struct RandomXOR {
 	uint64 Store;
 	uint64 State;
 };
@@ -1443,13 +1445,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2380])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2379])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2381])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2382])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2379])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2382])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2383])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2380])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2381])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2378])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2381])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2382])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1624,7 +1626,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2387])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2386])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1665,8 +1667,10 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2388])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2387])
 #define kJB_kVoidPtrMatch ((int)20971520)
+#define JB_Random JB__.Random
+#define JB_RandomShared JB__.RandomShared
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
 extern JB_Dylib SC_SelfLib;
@@ -1804,10 +1808,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2386])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2385])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2385])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2384])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2384])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2383])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2446,6 +2450,7 @@ extern bool SC__nil_NewFuncsLoaded;
 extern FP_NilTrackerFn SC__nil_NilTable[64];
 extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
+#define kJB__CakeVM_CanDebug ((int)4)
 #define kJB__CakeVM_TrapTooFar ((int)1)
 #define kJB__CakeVM_WantProtect ((int)2)
 #define JB__MzSt_All JB__.MzSt_All
@@ -2458,7 +2463,6 @@ extern ArchonPurger SC__nil_T;
 #define kJB__dylib_NoLoad ((int)16)
 #define kJB__dylib_Now ((int)2)
 extern IsaTester SC__IsaTester_T;
-#define JB__Rnd_Shared JB__.Rnd_Shared
 #define kJB__TerminalDisplay_h ((int)35)
 #define kJB__TerminalDisplay_w ((int)80)
 extern FastString* SC__Pac_DebugInfo;
@@ -2484,7 +2488,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2378])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2377])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2603,18 +2607,20 @@ struct JB_Globals {
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
-	FP_SorterComparer Tree__Sorter;
-	FP_fnIDGenerator Tk_Splitter;
-	FP_SorterComparer ID__ByID;
-	FP_SorterComparer ID__ByFreq;
 	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
 	FP_SorterComparer Str__Sorter;
 	FP_SorterComparer Msg__Sorter;
+	FP_fnIDGenerator Tk_Splitter;
+	CakeVM_CakeChef CakeVM_DummyChef;
 	FP_SorterComparer File__Sorter;
-	Random Rnd_Shared;
-	Random zalgo_R;
-	CompressionStats MzSt_All;
+	FP_SorterComparer Tree__Sorter;
+	FP_SorterComparer ID__ByID;
+	FP_SorterComparer ID__ByFreq;
+	RandomXOR* Random;
+	RandomXOR RandomShared;
+	RandomXOR zalgo_R;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mrap_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -3190,7 +3196,7 @@ void SC_LibStability__StabiliseGlobs();
 
 void SC_LibStability__StabiliseSub(JB_String* Name, Array* List, bool IsFuncs);
 
-void SC_LibStability__StabliseSub2(FastString* Fs, Array* List, bool IsFunc);
+void SC_LibStability__StabiliseSub2(FastString* Fs, Array* List, bool IsFunc);
 
 void SC_LibStability__UseBank(JB_String* Data, bool Funcs);
 
@@ -3267,8 +3273,6 @@ bool SC_PackMaker__BakeASM(FastString* J);
 void SC_PackMaker__BakeClasses(FastString* J);
 
 void SC_PackMaker__BakeDebug(FastString* J);
-
-void SC_PackMaker__BakeMap(FastString* J);
 
 void SC_PackMaker__BakePackToDisk();
 
@@ -5974,18 +5978,14 @@ void JB_Pico__From(JB_String* S, PicoMessage* Rz);
 
 
 
-// JB_Random
-Float64 JB_Rnd_Float64(Random* Self);
+// JB_RandomXOR
+float JB_Rnd_Float(RandomXOR* Self);
 
-int64 JB_Rnd_RndInt(Random* Self);
+int64 JB_Rnd_RndInt(RandomXOR* Self);
 
-void JB_Rnd_SeedSet(Random* Self, uint64 Value);
+void JB_Rnd_SeedSet(RandomXOR* Self, uint64 Value);
 
-Float64 JB_Rnd_SyntaxAccess(Random* Self);
-
-void JB_Rnd_TimeSeed(Random* Self);
-
-int JB_Rnd__Init_();
+void JB_Rnd_TimeSeed(RandomXOR* Self);
 
 int JB_Rnd__InitCode_();
 
@@ -6615,6 +6615,9 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // ASM_Encoder
 
 
+// CakeChef
+
+
 // CollectFunc
 
 
@@ -6742,8 +6745,6 @@ JB_Object* JB_Array_First(Array* Self);
 JB_String* JB_Array_join(Array* Self, JB_String* Sep);
 
 JB_String* JB_Array_join_sub(Array* Self, JB_String* Sep, int N);
-
-JB_String* JB_Array_PrefixCompress(Array* Self);
 
 void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item);
 
@@ -7877,6 +7878,8 @@ jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byt
 void JB_bin_AddStr(FastString* Self, JB_String* Name);
 
 bool SC_bin_BakeASM(FastString* Self, SCFunction* Fn);
+
+bool SC_bin_BakeASMSub(FastString* Self, SCFunction* Fn, int T);
 
 void SC_bin_Cakeify(FastString* Self, SCFunction* Fn);
 
@@ -11794,7 +11797,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1832], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1831], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
