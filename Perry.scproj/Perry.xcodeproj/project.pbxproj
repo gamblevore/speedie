@@ -638,7 +638,7 @@
 /* Begin PBXLegacyTarget section */
 		AC66D1522ED1D58700EDFB82 /* ExecBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/Exec.scproj";
+			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/exec.scproj";
 			buildConfigurationList = AC66D1532ED1D58700EDFB82 /* Build configuration list for PBXLegacyTarget "ExecBuilder" */;
 			buildPhases = (
 			);
