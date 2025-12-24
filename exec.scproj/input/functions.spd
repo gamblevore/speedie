@@ -16,7 +16,7 @@ class SpdFunc
 		.name = (code.name, "")(code.func == @tmp)
 		|| F = code.first
 			code = F
-		if code.func == @tmp // hmmmm. empty? won't be aligned, then. now what?
+		if code.func == @tmp
 			.Length = 0
 			.SpeedieFunc = nil
 		  else

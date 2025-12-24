@@ -1,11 +1,8 @@
 
 
-// now what?
-// we don't need to go by line... actually.
-// byteposes are good enough. Perry can store byteposes on the textviewline
-// how does perry get them? Well... it starts off with it? collect before compile.
 
-// so how to actually.... dump the actual byteposes?
+// byteposes are good enough. Perry can store byteposes on the textviewline
+// perry can collect the byteposes, before compile and store on the textviewlines...
 
 module SourceMap
 	|int|		 LastLength

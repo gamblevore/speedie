@@ -1168,7 +1168,7 @@ module GUI
 				return sdlactivity.exiting
 								// or .front should only return visible windows...
 			if w.isdialog
-/				return 0 // hmmm. now what to do?
+/				return 0 // hmmm. Can this happen?
 			|| Activity = .QuitBecauseWindowClosed(w)
 				return Activity
 			.Quitreason |= SDLActivity.activity

@@ -109,8 +109,8 @@ function JBin.BakeASM (|SCFunction| fn, |bool|)
 	|| tmp = Options.TargetDebug
 		.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
 		.SyntaxAppend(0, 2)
-
-		
+	
+	
 	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
 	|| dbg = SourceMap.Align(self, t*4)
 	|| after = fn.ASMBake(Start, Start+t, dbg)

@@ -25,7 +25,6 @@ May also pass .spd or .scproj files. They will be compiled, then run.\n"
 function App.RespondToParent
 	opt norefcounts
 	|| p = app.Parent
-	// now what?
 	// we need to respond to a few things:
 		// pause
 		// run

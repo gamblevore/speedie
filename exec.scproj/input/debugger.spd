@@ -6,15 +6,27 @@ module debugger
 	|SPDFunc--|		First
 	|SPDFunc--|		Last
 	|[string]|		Files
-	|string|		SrcMap
 	|string|		Vars
+	|string|		SrcMap
+	|&uint|			Base
+	|int|			Length
 	
 	
+	function cakevm.DebugFoundLocation (|String| FilePath, |uint| Position, |bool|)
+		print filepath
+		print ": "
+		printline Position.Render
+		
+
 	function __Viewer__ (cakevm.CakeChef)
-		debugger // this is the main function. lets see if it works?
-		// what do I want to do? for now just step in speedie.
-		// perhaps I could look up the source pos... 
+		opt norefcounts
+		debugger
 		|| Index = .index(code)
+		expect (index < debugger.Length)							("Code map too short: " + index)
+		|| Where = debugger.Base![index]
+		|| FileNum = where & (11~bits)
+		|| Path = debugger.files[FileNum]				#expect ("Missing file at index: " + filenum)
+		return .DebugFoundLocation( Path, Where>>11 )
 	
 	
 	function StartDebug (|message| R, |bool|)
@@ -22,12 +34,14 @@ module debugger
 /		.Vars = R[@nil, 0].name
 		|| M = R[@nil, 1]
 		.SrcMap = M.name
-		.Files = r[@nil, 2].name.Split
+		.base = .SrcMap.Addr|&uint|
+		.Length = .SrcMap.Length >> 2
+		.Files = r[@nil, 2].name.decompress.Split
 		
 		|| Maplength = .SrcMap.Length
 		|| CodeLength = .CodeLength
 		expect (MapLength < 1MB) ("Oversized source-map: " + maplength)
-		if CodeLength!=Maplength // Function-header padding? Or off by one?
+		if CodeLength!=Maplength			// Function-header padding? Or off by one?
 			error ("map-length is: " + Maplength) + (" but code-length is: " + CodeLength)
 		
 // For now... lets break on each instruction on the shadow

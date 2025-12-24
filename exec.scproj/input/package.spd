@@ -44,7 +44,7 @@ module CakeRun
 
 	function file.Compile (|file|)
 		|| args = ["--bake", "--quiet", self]
-		|| Answer = speedie.ExecuteStr(args)		// now what? now what? now what
+		|| Answer = speedie.ExecuteStr(args)
 			rz = Answer.file
 			if !rz.Exists
 				rz = nil
