@@ -54,10 +54,11 @@ module Linkage
 		|| arg = node[@arg]						#expect (ErrPlace, `Supposed to be like: linkage { osx = "linker flags", win = "linker flags2" }` )
 		
 		|| path = arg["flags"]["output_path"]
-			if !options.silent
-				print "output_path here: '"
+			if !options.silent and Options.PrintCompileString
+				print "output_path was set by: '"
 				print node.OriginalFilePath
-				printline "'"
+				print "' to: "
+				printline path
 			feedback.SetOutputPath path
 
 		arg.ConfTake(.flagz, "flags")
