@@ -632,10 +632,9 @@ function InitCompiler
 
 
 function GeneratedCppsFolder (|File!|)
-	// * For most projects (Galaxxies), we build jb.cpp in the temp folder, when built from terminal.
+	// * For most projects, we build jb.cpp in the tmp folder, when built from terminal.
 	// * For xcode compiles, we use ExternalCompile, which creates a "Cpp" folder for the jb.cpp to be in
 	//   keeping it nice and separate from the builds that we want to use.
-		// * we COULD build straight from the temp-folder? I don't see why not...
 	// * For self-replacement, well... we use the buildfolder, which is versioned: Build, BuildTest, BuildTest2. 
 	
 	// the question is, what happens to compiling speedie from xcode? :D
