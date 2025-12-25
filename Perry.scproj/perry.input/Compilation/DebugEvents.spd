@@ -47,17 +47,18 @@ function DebugArgsGotFocus (guiaction)
 
 function textview.InitDebugArgs
 	|| i = .ide
-	if !.Document
-		|| f = i.DebugArgsFile
-		.LoadDocument(Document(f), true)
-	// we want to read this from the actual file.
-
-	if !.text
-		|| conf = i.FindConfFile
-			|| s = conf.ReadFrom.file.parse
-			|| args = s["conf"]["perry_args"]
-				.text = args.name
-		.text ?= templates.DebugArgs
+	if i.ProjIsSpeedieCode
+		if !.Document
+			|| f = i.DebugArgsFile
+			.LoadDocument(Document(f), true)
+		// we want to read this from the actual file.
+	
+		if !.text
+			|| conf = i.FindConfFile
+				|| s = conf.ReadFrom.file.parse
+				|| args = s["conf"]["perry_args"]
+					.text = args.name
+			.text ?= templates.DebugArgs
 		
 
 function fnStillRunning (fnConfirmCanceller)
