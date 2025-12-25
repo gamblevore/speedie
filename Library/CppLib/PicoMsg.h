@@ -65,6 +65,7 @@ typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
 	#include <sys/socket.h>
 	#include <algorithm>
 	#include <atomic>
+	#include <math.h> // somehow osx intel needs this but osx arm doesn't?
 
 struct PicoBuff;
 struct PicoTrousers { // only one person can wear them at a time.
