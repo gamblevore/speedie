@@ -367,7 +367,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		.PrintProduct("\nCompiling c++ to", true)
+		.PrintProduct("\nCompiling c++ to", false)
 	
 	|| CppLib = compiler.SpeedieDir("Library/CppLib/")
 	.TestNewestLib(cpplib)
