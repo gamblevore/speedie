@@ -231,10 +231,10 @@ struct AtomicLock
 		// param order should be reversed! sigh...
 		.locked = false
 
-	module
-		function Test
-			visible
-			|AtomicLock| Lock
-			using Lock
-				"hello"
-			
+//	module
+//		function Test
+//			visible
+//			|AtomicLock| Lock
+//			using Lock
+//				"hello"
+//			
