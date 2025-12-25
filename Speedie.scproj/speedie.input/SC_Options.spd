@@ -39,7 +39,7 @@ module Options
 //	||		UpdateStability			= false
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
-	|bool|	WhateverDebug			= 0 // just remove this whenever.
+//	|bool|	WhateverDebug			= 0 // just remove this whenever.
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|bool|	HideawayScripts
@@ -388,10 +388,10 @@ module Feedback
 			if value ~= "debug"
 				error "Use 'targetdebug' instead."
 			SC_Targets[value] = true
-	
-		+'k'
-			Explain(purpose)$
-			options.WhateverDebug = true
+//	
+//		+'k'
+//			Explain(purpose)$
+//			options.WhateverDebug = true
 			
 		+'warn'
 			Explain(Purpose, "Show warnings.")$
