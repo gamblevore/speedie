@@ -486,7 +486,8 @@ class PerryIDE (Window)
 		delay += .position|float|
 		|| D = delay.date
 		if (f.lastsend.ago > D)
-			printline f.lastsend.ago.float.render + " ago means death for " + f.pico.name
+			if app.yes("print")
+				printline f.lastsend.ago.float.render + " ago means death for " + f.pico.name
 			return true
 		
 	
