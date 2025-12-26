@@ -1434,6 +1434,7 @@ function TypeOfRel (ExprResolver)
 	|message--| opch = exp.second!
 	|SCOperator--| Comp = SCOperator.Lookup( opch )
 	|| RN = opch.Next								#expect	(exp, "Missing right hand side")
+		
 	|| LN = exp.first!
 	if comp is SyntaxIs
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
@@ -1451,7 +1452,7 @@ function TypeOfRel (ExprResolver)
 	  elseif (ShouldBeSet)
 		side = rn
 		exp.ASMType = ASMType.kSetRel // for the ASM
-	  else
+	  elseif p != @arg
 		error (opch, "Did you mean '=='?")
 
 	

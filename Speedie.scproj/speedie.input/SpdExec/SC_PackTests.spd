@@ -81,7 +81,7 @@ function SCFunction.TestObesity (|!&ivec4|)
 			|(memory of asm)--| mu2 = .µTest
 			.µprint
 			testvm.Load(mu2.ptr, mu2.length)
-			return testvm.Run
+			return testvm.Run(0)
 	return butter
 
 }

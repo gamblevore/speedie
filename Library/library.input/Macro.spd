@@ -1,7 +1,7 @@
 
 
 role Macro (Message)
-	// made into a role... one less class bloating Speedie up!
+	// Its a role. One less class to bloat Speedie.
 	constructor (|message| s)
 		disabled "Use Macro.build"
 		super.constructor

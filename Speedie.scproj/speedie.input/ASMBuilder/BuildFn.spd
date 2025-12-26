@@ -18,7 +18,8 @@ extend_module ASM
 				|| ff = fn.µTest
 				testvm.Registers(true)
 				testvm.IsDebugging = true
-				testvm.Run(ff.ptr, ff.length)
+				testvm.load(ff.ptr, ff.length)
+				testvm.Run(0)
 				testvm.IsDebugging = false
 
 

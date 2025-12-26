@@ -1464,18 +1464,6 @@ function message.FixMultiArr
 			item.remove
 
 
-function Tran_Log (TranFunc)
-	ignore
-		log abc
-		// -->
-		platform.log(abc)
-	using (node)
-		|| f = node.first
-		node <~ (@Thg, "platform")			// this seems better... than tran_print
-		node.msg(@prm) <~ f					// probably tranprint should use this instead.
-		node.func = @dot					// like Platform.print, Platform.printline, Platform.printerror
-	TypeOfExpr( node, name_space )			// Platform.log
-
 
 function AlterPostCond (|Message?| PostCond, |Message?| IterPostCond, |message| NodeSrc, |Message|)
 	opt norefcounts
