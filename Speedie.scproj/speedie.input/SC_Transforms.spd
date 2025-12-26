@@ -16,6 +16,7 @@ dispatch TemporalStatements (TranFunc)
 	while					(Tran_While)
 	description				(Tran_Description)
 	if						(Tran_If)
+	time					(Tran_Time)
 	elseif					(Tran_Else)
 	else					(Tran_Else)
 	once					(Tran_Once)
@@ -381,23 +382,24 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 
 
 function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f) // transform ()
-	if (s == @arg) and (f != @arg)
-		p = s.scarg(p)! // Resync
-	
-	|| ch = s.first
-	while (ch)
-		if ch is BreakPoint and ch in @arg
-			Tran_Breakpoint(fn, p, ch)
-		|| n = ch.next
-		if (ch == @Arg)
-			Tran_All( fn, ch, ch.scarg(p, s)! )
-		  else
-			Tran_All( fn, ch, p )		
-		ch = ch.next
-		if !ch and n and n.parent // in case the next item has been removed...
-			ch = n				  // but why do we want to store it?: "n = ch.next"?
-							      // basially we get a bug on one line. Just fix that and remove this code.
-							      // altering the tree isn't cool really... makes things too tricky. 
+	if s.func != @sheb
+		if (s == @arg) and (f != @arg)
+			p = s.scarg(p)! // Resync
+		
+		|| ch = s.first
+		while (ch)
+			if ch is BreakPoint and ch in @arg
+				Tran_Breakpoint(fn, p, ch)
+			|| n = ch.next
+			if (ch == @Arg)
+				Tran_All( fn, ch, ch.scarg(p, s)! )
+			  else
+				Tran_All( fn, ch, p )		
+			ch = ch.next
+			if !ch and n and n.parent // in case the next item has been removed...
+				ch = n				  // but why do we want to store it?: "n = ch.next"?
+									  // basially we get a bug on one line. Just fix that and remove this code.
+									  // altering the tree isn't cool really... makes things too tricky. 
 
 
 function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
@@ -990,5 +992,45 @@ function scnode.AddNumericConst (|string| name, |int64| value, |message| where, 
 	NewDeclNum( SyxConst, value, name )
 	.TryAdd( where, SyxConst, SyxConst.Name )
 	return syxconst
+
+
+
+function Tran_Log (TranFunc)
+	using (node)
+		|| f = node.first
+		node <~ (@Thg, "platform")			// this seems better... than tran_print
+		node.msg(@prm) <~ f					// probably tranprint should use this instead.
+		node.func = @dot					// like Platform.print, Platform.printline, Platform.printerror
+	TypeOfExpr( node, name_space )			// Platform.log
+
+
+function testmulti
+	target debug2
+		time ("abc", 10)
+			0
+
+function Tran_Time (TranFunc)
+	opt norefcounts							// kinda handy. 
+	|| Name = node[@nil]$
+	|| arg = node[@arg, 1]$
+	using (node)
+	arg.ExpectLast
+	
+	|| Report = `_StartTime.Report()` ~ parse
+	|| dest = report.FlatLast
+	if name == @list
+		name.AppendAllInto(dest)
+	  else
+		dest <~ name
+
+	node.next = report
+	arg.MoveAllAfter(node)
+	node.next = `_StartTime = Date.now`~parse
+	
+	if !name_space.LookUpVar("_StartTime", nil, nil)
+		node.next = `|date| _StartTime` ~ parse
+
+	node.func = @sheb
+
 
 

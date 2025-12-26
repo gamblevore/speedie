@@ -1,15 +1,14 @@
 #!/usr/local/bin/spd
 
 main (|file.existing| Path)
-	|| T = date.now
-	|| Data = path.ReadAll$
-	T = T.Report("ReadFile", data.length)
-	|| Lines = data.Split
-	T = T.Report("Split")
-	lines.sort
-	t = T.report("Sort")
-	lines.sort
-	t = T.report("Second Sort") // sorting already sorted data is very common!
-	lines = nil					// especially if you just added/changed a few items
-	t.report("Cleanup")
-	
+	time ("ReadFile", data.length)
+		|| Data = path.ReadAll$
+	time "Split"
+		|| Lines = data.Split 
+	time "Sort"
+		lines.sort
+	time "Sorted Sort"			// sorting already sorted data is very common!
+		lines.sort
+	time "Cleanup"
+		Lines = nil
+	// needs to create decls if unused.
