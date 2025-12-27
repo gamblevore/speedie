@@ -58,21 +58,4 @@ inline Date.ReportSpeed
 
 inline Date.Report (|string| name, |int| Size=0,  |Date| After=date.now)
 	printline name.RenderSpeed(size, after-self)
-	
 
-// remove this too.
-struct SpeedTester
-	|Date|				Start
-	|string|			Name
-		
-	autogen SyntaxUsingComplete (|object| idk=nil)
-		|| µs = date.now - .start
-		printline .Name.RenderSpeed(0, µs)
-
-
-// remove this
-function string.SyntaxUsing (|SpeedTester|)
-	print "Starting: "
-	printline self
-	rz.name = self
-	rz.start = date.now

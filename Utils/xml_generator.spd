@@ -4,25 +4,25 @@
 main (|FileSizeInt| Amount) {
 	|| name = amount.strsize
 	|| xml = "${name}.xml".outputstream							#require
-	using name + ".xml"
-	xml <~ `<?xml version="1.0" encoding="utf-8"?>
-<Catalog>`
-
-	|| Caps = ('A', 'Z')
-	|| Low  = ('ᐇ', 'ᑈ'+1) // lets create unicode
-
-    while xml < Amount
-		|| alive = ("yes", "no")(0.5[])
-
-	    xml <~ "
-	<Book>
-	    <Title>${caps.text(16)}</Title>
-	    <Author alive=\"${alive}\">${low.text(8)} ${low.text(2)}</Author>
-	</Book>"
+	time name + ".xml"
+		xml <~ `<?xml version="1.0" encoding="utf-8"?>
+	<Catalog>`
 	
-	xml <~ `
-</Catalog>`
-
-	printline xml.file
+		|| Caps = ('A', 'Z')
+		|| Low  = ('ᐇ', 'ᑈ'+1) // lets create unicode
+	
+		while xml < Amount
+			|| alive = ("yes", "no")(0.5[])
+	
+			xml <~ "
+		<Book>
+			<Title>${caps.text(16)}</Title>
+			<Author alive=\"${alive}\">${low.text(8)} ${low.text(2)}</Author>
+		</Book>"
+		
+		xml <~ `
+	</Catalog>`
+	
+		printline xml.file
 }
 

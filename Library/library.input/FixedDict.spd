@@ -146,36 +146,39 @@ class FixedDict
 			|| n = 4
 			
 			printline
-			for (n): fd = fixeddict(), using ("fixed set") {
-				for a in items: fd[a] = a
-			}
+			for (n)
+				fd = fixeddict()
+				time "fixed set"
+					for a in items: fd[a] = a
 
 			printline
-			for (n): using ("fixed set reuse") {
-				for a in items: fd[a] = a
-			}
+			for (n)
+				time "fixed set reuse"
+					for a in items: fd[a] = a
+			
 
 			printline
-			for (n): ed = dictionary(), using ("set") {
-				for a in items: ed[a] = a
-			}
+			for (n)
+				ed = dictionary()
+				time ("set")
+					for a in items: ed[a] = a
 			
 			printline
-			for (n): using ("set reuse") {
-				for a in items: ed[a] = a
-			}
+			for (n)
+				time ("set reuse")
+					for a in items: ed[a] = a
 			
 			printline
-			for (n): using ("fixed get") {
-				for a in items
-					expect (fd[a] == a)
-			}
+			for (n)
+				time ("fixed get")
+					for a in items
+						expect (fd[a] == a)
 
 			printline
-			for (n): using ("get") {
-				for a in items
-					expect (ed[a] == a)
-			}
+			for (n)
+				time ("get")
+					for a in items
+						expect (ed[a] == a)
 		
 		
 		inline Test

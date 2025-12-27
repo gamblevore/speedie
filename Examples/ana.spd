@@ -34,16 +34,16 @@ class Anagrams
 			s = s.Remove(~charset.LettersOnly)
 			if !.d
 				|| data = ""
-				using "read":  data = file.words.ReadAll
-				using "lower": data = data.LowerCase
-				using "dict":    .d = data.dict
+				time "read":  data = file.words.ReadAll
+				time "lower": data = data.LowerCase
+				time "dict":    .d = data.dict
 			rz = Dictionary()
-			using "anagram"
+			time "anagram"
 				Anagrams(rz, s).find("", "", 0)
 
 
 main (|string| word="hedgehog")
-	using "total"
+	time "total"
 		|| d = Anagrams.find(word)
 		for v in d
 			printline v

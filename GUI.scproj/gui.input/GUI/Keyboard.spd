@@ -166,13 +166,6 @@ dataType Keys (int)
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
 				.record[i].Clear
-		
-//		function Print
-//			for i in MaxKeyRecord
-//				|| r = .record[i]
-//				|| k = r.Key
-//				if k!=0
-//					"$k ${r.Date.ago.float} ago"
 
 		libinternal KeysVs (|keys| pa, |keys| pb,  |keys| ma, |keys| mb, |float| Limit,  |float|)
 			|| P = pa._ago(pb)
@@ -255,7 +248,6 @@ dataType Keys (int)
 		libinternal RemoveKey (|keys| Key)
 			|| r = key.record
 				r.State = guiKeyRecordInfo.ToRemove
-	
 		
 
 		libinternal FlushKeys

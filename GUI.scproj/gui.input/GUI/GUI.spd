@@ -1297,8 +1297,9 @@ module GUI
 		beep.OK = 1
 		
 		keys.AddKey(key)
-		if keys.cmd and key != 'v' and 'z'
-			key.eat
+//		if keys.cmd and key != 'v' and 'z'
+//			key.eat // the gui is janky enough as it is. lol.
+// 		yeah it kinda makes sense, but sometimes it feels like we are missing cmd-key-down events
 
 		if !w.openedmenu and !.AllowKeyDown(kev)
 			return SDLActivity.nothing
