@@ -421,6 +421,8 @@ function scdecl.NumberConst (assigns:|uint64| v)
 
 function TypeOfNum (ExprResolver)
 	opt norefcounts
+	if exp.name contains '_'
+		exp.name = exp.name.ReplaceAll("_", "") // sigh
 	|| p = compiler.numbers.makeplace(exp.name)
 	|| y = p[]
 		return y|scdecl|
