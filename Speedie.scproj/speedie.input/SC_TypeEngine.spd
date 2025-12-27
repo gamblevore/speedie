@@ -1154,11 +1154,13 @@ function TypeOfDot (ExprResolver)
 	  else
 		decl = typevoid!
 	
-	|| fn = exp.last!.asfunc
-		exp.obj = decl
-		if exp != @func
-			fn.DotFuncToNormalFunc( exp )
-	
+	L = exp.last // may have changed
+	if L
+		|| fn = L.asfunc
+			exp.obj = decl
+			if exp != @func
+				fn.DotFuncToNormalFunc( exp )
+		
 	return decl
 
 

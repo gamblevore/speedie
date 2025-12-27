@@ -152,7 +152,8 @@ struct RandomXOR
 			mem.Length = mem.size
 
 	macro SyntaxCall
-		.float(*_)
+		description "Returns a bool. To get a float, use [] instead of ()"
+		(_0.float(*_) >= 0.5)
 	
 	module
 		random.TimeSeed
