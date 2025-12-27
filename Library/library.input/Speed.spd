@@ -23,11 +23,14 @@ function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Dur
 		fs <~ " in "
 
 	|| seconds = duration.float.abs
-	if seconds < 1.0
-		fs.AppendFloat(seconds*1000.0, 2)
-		fs <~ 'm'
-	  else
+	if seconds >= 1.0
 		fs.AppendFloat(seconds, 2 + (seconds < 10))
+	  elseif seconds >= 0.001
+		fs.AppendFloat(seconds*1000.0, 2)
+		fs <~ "m"
+	  else
+		fs.AppendFloat(seconds*1000000.0, 2)
+		fs <~ "µ"
 	fs <~ 's'
 	
 	// could move unit-conversion out into its own thingy. like fs.AppendSize
@@ -50,9 +53,11 @@ function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Dur
 	return fs.GetResult(fs_in)
 
 
-inline Date.Report (|string| name, |int| Size=0,  |Date| After=date.now, |date|)
+inline Date.ReportSpeed
+	disabled "Use .Report"
+
+inline Date.Report (|string| name, |int| Size=0,  |Date| After=date.now)
 	printline name.RenderSpeed(size, after-self)
-	return date.now
 	
 
 // remove this too.
