@@ -48,13 +48,13 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		inline
 		return self|int64| mod D|int64|
 
-	function ReportAgo (|string|)
-		|| s = .Float64
-		|| unit = "s"
-		if s < 0.01
-			s *= 1000.0
-			unit = "ms"
-		return s.Render + unit
+//	function ReportAgo (|string|)
+//		|| s = .Float64
+//		|| unit = "s"
+//		if s < 0.01
+//			s *= 1000.0
+//			unit = "ms"
+//		return s.Render + unit
 		
 	function Ago (|Duration|)
 		if self
