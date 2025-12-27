@@ -36,7 +36,8 @@ function PackMaker.RunAFewTests
 	
 	fn = .testfn("AndOrConsts")
 	if fn
-		|| Andor = fn.TestObesity|&int64|[]
+		|| AndOrConst = fn.TestObesity|&int64|[]
+		AndOrConst++
 	
 	fn = .testfn("ForeignFuncs")
 	if fn

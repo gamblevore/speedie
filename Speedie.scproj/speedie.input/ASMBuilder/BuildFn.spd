@@ -29,7 +29,7 @@ extend_module ASM
 		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 
 
-	function TextASMTest 
+	function TestASMText 
 		target debug and vm
 			require options.Modecake and options.dev > 0
 			asm.noisyasm = 3		

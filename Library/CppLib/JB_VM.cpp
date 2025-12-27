@@ -60,19 +60,17 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
 	}
 	byte* B = (byte*)V;
-	return (int*)(B + CakeCodeMax + (V->StackSize));
+	return (int*)(B + (CakeCodeMax*4) + (V->StackSize));
 }
 
 
 static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) {
 static void * const GlobalJumpTable[] = {
-#if __CPU_TYPE__ == __CPU_ARM__
 	#include "InstructionList.h"
 	&&TRYBREAK,
 	&&PAUSE,
-#endif
 };
-    if (Op) {
+    if (Op > 1) {
 		vm.OriginalJumpTable = &GlobalJumpTable[0];
 		memcpy(vm.JumpTable, GlobalJumpTable, 256*sizeof(void*));
 		memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
@@ -81,11 +79,11 @@ static void * const GlobalJumpTable[] = {
   
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
-
-#if __CPU_TYPE__ == __CPU_ARM__
-	ı;
+	if (Op == 1)
+		goto EXIT;
+	Op = *Code++; // spelled out for debug
+	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
-#endif
 	EXIT:;
     return &vm.Registers[1].Ivec;
 
@@ -150,18 +148,18 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 
 
 ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
-	if_rare (Length > CakeCodeMax/4)
+	if_rare (Length > CakeCodeMax)
 		return 0;
 	auto D = (ASM*)(((byte*)V) + V->StackSize);
 	int F = V->VFlags;
 	if (Code) {
 		if (F&kJB_VM_IsProtected)
-			if (mprotect(D, CakeCodeMax, PROT_WRITE|PROT_READ)==0) // unprotect
+			if (mprotect(D, CakeCodeMax*4, PROT_WRITE|PROT_READ)==0) // unprotect
 				F &=~ kJB_VM_IsProtected;
 		memcpy(D, Code, 4*Length);
 	}
 	if (F&kJB_VM_WantProtect and !(F&kJB_VM_IsProtected))
-		if (mprotect(D, CakeCodeMax, PROT_READ) == 0)				// protect!
+		if (mprotect(D, CakeCodeMax*4, PROT_READ) == 0)				// protect!
 			F |= kJB_VM_IsProtected;
 	V->VFlags = F;
 	return D;
@@ -174,9 +172,9 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 	StackSize = StackSize&~(Page-1);						// remove garbage
 	
 	StackSize = std::max(StackSize, 256*1024);
-	int AllocSize = StackSize + CakeCodeMax;
+	int AllocSize = StackSize + CakeCodeMax*4;
 	if (true or (Flags&kJB_VM_CanDebug))
-		AllocSize += CakeCodeMax; // better that we can always debug. but hard without a map? we'll step into bare-ASM...
+		AllocSize += CakeCodeMax*4; // better that we can always debug. but hard without a map? we'll step into bare-ASM...
 	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);		// page aligned. Can call mprotect later.
 	if (V) {
 		memzero(V, AllocSize);

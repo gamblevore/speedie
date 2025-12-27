@@ -220,7 +220,7 @@ function SafeWrite (|String| name, |FastString| data)
 function MakeTheVM (|bool|)
 	compiler.Project.use
 	if .BuildFiles	
-		asm.TextASMTest
+		asm.TestASMText
 	return stderr.ok
 
 
