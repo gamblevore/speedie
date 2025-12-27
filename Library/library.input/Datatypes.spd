@@ -96,6 +96,7 @@ datatype int
 
 	render (|int| zeros)
 		cpp_part RenderZeros
+		opt norefcounts
 		fs.appendintegerastext(self, zeros)
 	
 	operator AbsMin (|uint| Limit, |int|)
@@ -785,9 +786,11 @@ datatype int64
 		cpp_wrapper
 	
 	render Hex
+		opt norefcounts
 		fs.AppendHex(self)
 		
 	render StrSize
+		opt norefcounts
 		if self <= 512
 			fs <~ self
 		  else

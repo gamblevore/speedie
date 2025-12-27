@@ -134,7 +134,7 @@ class FastString {
 				if other isa string
 					return other.OutputStream
 				error (other, "FastString can't use this object.")
-			return faststring.new
+			return faststring.new(nil|faststring|)
 		
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew

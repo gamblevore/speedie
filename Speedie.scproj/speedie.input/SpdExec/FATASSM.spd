@@ -345,9 +345,15 @@ struct FatASM
 		fs <~ ")"
 	
 	
+	function WillRenderFat (|bool|)
+		if (!.exists)  and  (.msg.func == @sheb)
+			return false
+		return true
+	
+	
 	function RenderFat (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts		
-		if (!.exists)  and  (.msg.func == @sheb)
+		if !.WillRenderFat
 			target debug
 				.RendaMsg(fs, 0)
 			return 

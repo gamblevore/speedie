@@ -45,7 +45,7 @@ extend SCFunction
 	
 	target debug
 		render µRender (|bool| RenderBlocks = false)
-			fs <~ "asm ${.exportname}   ${.µASMLength*4}\n" // " asm " "asm"
+			fs <~ "asm ${.exportname}   ${.µASMLength*4}\n"
 			|| bb = 0
 			for µ.fat in self
 				if RenderBlocks and µ.BasicBlock != bb

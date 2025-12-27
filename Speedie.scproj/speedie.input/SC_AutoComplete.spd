@@ -1205,22 +1205,23 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 
 	
 	for fat.fat in fn
-		|| hisss = fat.GuessSize
-		count += hisss > 0
-		size += hisss
-		
-		if RenderBlocks and (fat.BasicBlock != bb)
-			bb = fat.BasicBlock
-			out <~ bb
-		fs <~ (' ', fat.msg.asmindent(top)*2)
-		fat.RenderFat(fs, true)
-		|| tmp = out.msg(@tmp, fs)
-		|| p = fat.msg.Position
-		if p <= 0
-			p = lp
-		tmp <~ p
-		lp = p
-		path = fat.msg.NextPath(tmp, path)
+		if fat.WillRenderFat
+			|| hisss = fat.GuessSize
+			count += hisss > 0
+			size += hisss
+			
+			if RenderBlocks and (fat.BasicBlock != bb)
+				bb = fat.BasicBlock
+				out <~ bb
+			fs <~ (' ', fat.msg.asmindent(top)*2)
+			fat.RenderFat(fs, true)
+			|| tmp = out.msg(@tmp, fs)
+			|| p = fat.msg.Position
+			if p <= 0
+				p = lp
+			tmp <~ p
+			lp = p
+			path = fat.msg.NextPath(tmp, path)
 	
 	|| title = out.first // going into the wrong place :D
 	title <~ count

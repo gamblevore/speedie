@@ -13,10 +13,11 @@ function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Dur
 	if BytesOut 
 		fs <~ " to "
 		Bytesout.strsize(fs)
-		fs <~ " ("
-		|| ratio = ((Bytesout div Bytesin)|float|*100.0)
-		fs.appendfloat(ratio)
-		fs <~ "%)"
+		if BytesIn
+			fs <~ " ("
+			|| ratio = ((Bytesout div Bytesin)|float|*100.0)
+			fs.appendfloat(ratio)
+			fs <~ "%)"
 
 	if bytesin or bytesout
 		fs <~ " in "
@@ -54,6 +55,7 @@ inline Date.Report (|string| name, |int| Size=0,  |Date| After=date.now, |date|)
 	return date.now
 	
 
+// remove this too.
 struct SpeedTester
 	|Date|				Start
 	|string|			Name
@@ -63,6 +65,7 @@ struct SpeedTester
 		printline .Name.RenderSpeed(0, µs)
 
 
+// remove this
 function string.SyntaxUsing (|SpeedTester|)
 	print "Starting: "
 	printline self
