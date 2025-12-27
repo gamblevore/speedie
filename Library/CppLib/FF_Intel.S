@@ -1,3 +1,25 @@
+
+/* jeebox-licence:
+    By Theodore H. Smith, 2025, theo@jeebox.org
+	
+    This software is provided 'as-is', without any warranty.
+    In no event will the author be held liable for any damages
+    arising from the use of this software.
+
+    Permission is granted to anyone to use this software for any purpose,
+    including commercially, and to alter it and redistribute it
+    freely, subject to the following restrictions:
+
+    1. The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software.
+    2. If you use this software or portions of this software in a product, you
+        are required to acknowledge this in at least one of:
+        About-window / launch-screen / help-files / read-me-file
+    3. Altered source vershions must be plainly marked as such, and must not be
+        misrepresented as being the original software.
+    4. Any jeebox-licence note may not be removed/altered from any source distribution.
+*/
+
 #ifdef _M_X86
 	#define __realintel__
 #endif
