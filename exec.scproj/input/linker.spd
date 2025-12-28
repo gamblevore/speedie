@@ -54,7 +54,7 @@ module SpdTable
 	
 	function Link (|&asm|)
 		opt norefcounts
-/		|| code = cake.Load(nil, 0)|&ASM|		#expect ("Can't load the code")
+/		|| code = cake.code|&ASM|		#expect ("Can't load the code")
 		for f in .funcs
 			.currFunc = f
 			f.Link❗(code)

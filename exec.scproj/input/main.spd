@@ -3,7 +3,7 @@
 |spdprocess| Perry = app.parent
 |!&cakevm|   Cake = CakeVM()
 |&int|		 BreakPoints = cake.IsDebugging(&debugger.__Viewer__)
-|!&ASM|		 BeginCode = cake.Load(nil, 0)|&ASM|
+|!&ASM|		 BeginCode = cake.code()|&ASM|
 
 
 main

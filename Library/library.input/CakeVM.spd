@@ -10,13 +10,11 @@ constants
 	CanDebug		= 4
 
 
-function Load (|&uint| ASM, |int| Length)
-	|| Code = .code(Length)
-		memory.copy(code, asm, length<<2)
-
-
 target cpp or vm {
-	function Code		(|int| CodeLength, |?&uint|)
+	function Load (|&uint| ASM, |int| Length)
+		|| Code = .code(Length)
+			memory.copy(code, asm, length<<2)	
+	function Code		(|int| CodeLength=0, |?&uint|)
 		cpp_wrapper JB_ASM_Code
 	function Run		(|int| StartAt, |&ivec4|)
 		cpp_wrapper JB_ASM_Run
