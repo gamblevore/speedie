@@ -644,7 +644,12 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
 
-void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
+extern "C" void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
+extern "C" u64 Nativeize2(u64 data, Fn0 fn, VMRegister* r, int64 n) {
+	if (n*2 == data+1)
+		return r->Uint;
+	return n + (fn!=0);
+}
 
 AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
@@ -657,11 +662,8 @@ AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, 
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
-	if (fn)
-		return Nativeize(funcdata, fn, r, n1);
-	
-	debugger;
-	r[n1] = {}; // ugh
+	auto n = Nativeize;
+	return n(funcdata, fn, r, n1);
 }
 
 

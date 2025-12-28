@@ -33,7 +33,7 @@
 
 #ifdef __realintel__
 
-	/*** Nativeize(u64 DATA, void* FN, Register* R, int n) ***/
+	/*** Nativeize(u64 data10, void* FN, Register* R, int n) ***/
 	.text
 	.global _Nativeize
 	.balign 4
@@ -43,13 +43,14 @@
 		#define inj		%r14
 		#define flj		%r13
 		#define dest	%r12
-		#define fn		%r11
-		#define data	%r10
+		#define fn11	%r11
+		#define data10	%r10
+		
 		#define j9		%r9
 		#define j8		%r8
 		#define x7  	%rsi // hope they don't use 7 int params
 		#define x6  	%rsi // hope they don't use 7 int params
-		#define x5  	%rsi
+		#define x5  	%rsi 
 		#define x4  	%rdi
 		#define x3  	%rdx
 		#define x2  	%rcx
@@ -63,24 +64,28 @@
 		#define q2  	%xmm2
 		#define q1  	%xmm1
 		#define q0  	%xmm0 // edi, esi, edx, ecx, r8d, r9d
+/*
+	Detected order?: For some reason, Xcode isnt generating the call order the order I expected it to be in?
+	r9, r8, rd, rc  
+ */
 #if 1
-		movq		data, %rdi
-		sarq		$12, data					// data = DATA>>12
+		movq		x4,  data10
+		sarq		$12, data10					// data = DATA>>12
 		leaq		.Floats(%rip), flj
 		leaq		.Ints(%rip), inj
 
-		movq		fn,  x1						// fn    = FN
-		movq		r,   x2						// r     = R
+		movq		x5,  fn11					// fn    = FN
+		movq		x3,  r  					// r15     = R
 
-		movq		dest, r						// n <<= 4; dest = r+n
+		movq		r, dest						// n <<= 4; dest = r+n
         salq		$4, x3
         addq		dest, x3
 
-		movq		j8, x4
+		movq		x4, j8
 		sarq		$6, j8
 		andq		j8, 31						// j8    = (DATA>>6)&31
 
-		movq		j9, x4
+		movq		x4, j9
 		andq		j9, 63						// j9    = DATA&63
 
 		leaq		(j8,j8,2), j8				// j8    = j8*3
@@ -111,65 +116,65 @@
 		.long .I1-.Ints
 		.long .I0-.Ints		
 	.F7:								// x7 = (data&31) << 4
-		movq data, x7					// x7 = data
+		movq data10, x7					// x7 = data
 		andq x7, 31						// x7 &= 31
         salq $4, x7						// x7 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,x7), q7				// q7 = r[x7]
 			
 	.F6:								// x6 = (data&31) << 4
-		movq data, x6					// x6 = data
+		movq data10, x6					// x6 = data
 		andq x6, 31						// x6 &= 31
         salq $4, x6						// x6 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,x6), q6				// q6 = r[x6]
 
 	.F5:								// x5 = (data&31) << 4
-		movq data, x5					// x5 = data
+		movq data10, x5					// x5 = data
 		andq x5, 31						// x5 &= 31
         salq $4, x5						// x5 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,x5), q5				// q5 = r[x5]
 
 	.F4:								// x4 = (data&31) << 4
-		movq data, x4					// x4 = data
+		movq data10, x4					// x4 = data
 		andq x4, 31						// x4 &= 31
         salq $4, x4						// x4 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,x4), q4				// q4 = r[x4]
 
 	.F3:								// x3 = (data&31) << 4
-		movq data, x3					// x3 = data
+		movq data10, x3					// x3 = data
 		andq x3, 31						// x3 &= 31
         salq $4, x3						// x3 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,x3), q3				// q3 = r[x3]
 
 	#undef xx
 	#define xx x2
 	.F2:								// x2 = (data&31) << 4
-		movq data, xx					// x2 = data
+		movq data10, xx					// x2 = data
 		andq xx, 31						// x2 &= 31
         salq $4, xx						// x2 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,xx), q2				// q2 = r[x2]
 
 	#undef xx
 	#define xx x1
 	.F1:								// x1 = (data&31) << 4
-		movq data, xx					// x1 = data
+		movq data10, xx					// x1 = data
 		andq xx, 31						// x1 &= 31
         salq $4, xx						// x1 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,xx), q1				// q1 = r[x1]
 
 	#undef xx
 	#define xx x0
 	.F0:								// x0 = (data&31) << 4
-		movq data, xx					// x0 = data
+		movq data10, xx					// x0 = data
 		andq xx, 31						// x0 &= 31
         salq $4, xx						// x0 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movaps (r,xx), q0				// q0 = r[x0]
 	
 
@@ -181,8 +186,8 @@
 		br j9
 */
 
-//	ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
-//	lsr     data, data,  5				// data = data >> 5
+//	ubfiz   x7, data10, 4, 5				// x7 = (data&31) << 4
+//	lsr     data10, data10,  5				// data = data >> 5
 //	ldr     q7,  [r, x7]				// q7 = r[x7]
 			
 	.I6:
@@ -202,24 +207,24 @@
 		cmpq $4, %rcx
 		ja .F7
 	.I2:
-		movq data, x2					// x2 = data
+		movq data10, x2					// x2 = data
 		andq x2, 31						// x2 &= 31
         salq $4, x2						// x2 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movq (r,x2), x2					// x2 = r[x2]
 
 	.I1:								// x1 = (data&31) << 4
-		movq data, x1					// x1 = data
+		movq data10, x1					// x1 = data
 		andq x1, 31						// x1 &= 31
         salq $4, x1						// x1 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movq (r,x1), x1					// x1 = r[x1]
 
 	.I0:								// x0 = (data&31) << 4
-		movq data, x0					// x0 = data
+		movq data10, x0					// x0 = data
 		andq x0, 31						// x0 &= 31
         salq $4, x0						// x0 <<= 4
-        salq $5, data					// data = data >> 5
+        salq $5, data10					// data = data >> 5
         movq (r,x0), x0					// x0 = r[x0]
 
 /*
@@ -230,10 +235,10 @@
 		stp     dest, xzr, [sp, 16]
 
 	// branch
-		tbnz    data, 11, .SIMD_Return
+		tbnz    data10, 11, .SIMD_Return
 	
 	.Int_Return:
-		blr     fn							// call fn... so we can store in x0
+		blr     fn11						// call fn... so we can store in x0
 		ldp     dest, xzr, [sp, 16]
 		ldp     fp, lr, [sp], 32			// restore fp/lr
 
@@ -241,7 +246,7 @@
 		ret
 		
 	.SIMD_Return:
-		blr     fn							// call fn, so we can store in q0
+		blr     fn11						// call fn, so we can store in q0
 		ldp     dest, xzr, [sp, 16]
 		ldp     fp, lr, [sp], 32			// restore fp/lr
 		
