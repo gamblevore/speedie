@@ -75,11 +75,11 @@
 		leaq		.Ints(%rip), inj
 
 		movq		x5,  fn11					// fn    = FN
-		movq		x3,  r  					// r15     = R
+		movq		x3,  r  					// r15   = R
 
-		movq		r, dest						// n <<= 4; dest = r+n
-        salq		$4, x3
-        addq		dest, x3
+		movq		r, dest						// n <<= 4; dest = r+n // dest=r12
+        salq		$4, x2
+        addq		x2, dest
 
 		movq		x4, j8
 		sarq		$6, j8
