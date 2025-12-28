@@ -3,6 +3,7 @@
 |spdprocess| Perry = app.parent
 |!&cakevm|   Cake = CakeVM()
 |&int|		 BreakPoints = cake.IsDebugging(&debugger.__Viewer__)
+|!&ASM|		 BeginCode = cake.Load(nil, 0)|&ASM|
 
 
 main
@@ -22,31 +23,5 @@ May also pass .spd or .scproj files. They will be compiled, then run.\n"
 		return SpdTable.RunMain
 	return 1
 
-
-function App.RespondToParent
-	opt norefcounts
-	|| p = app.Parent
-	// we need to respond to a few things:
-		// pause
-		// run
-		// step over
-		// step in
-		// step out
-		// ask for vars
-		// ask for stack
-		// hit breakpoints and stop!
-		// deal with crashes.
-
-	// of course... we can't actually do these.
-	// not without the xpd file
-	// So... lets say they press pause. what do we do? well... we can't do anything
-	// so what are we doing? Testing?
-	// planning?
-	// preparing?
-	// lets pretend we paused. then send back some messages.
-	// send back... variables, and stack
-	
-	// what about asking for ASM? That goes through speedie.
-	// So might as well do that first?
 
 	

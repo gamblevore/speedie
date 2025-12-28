@@ -1,8 +1,5 @@
 
 		
-struct ASMBlob
-	|int|			CallCount		
-	|ASM[1]|		ASM
 
 
 datatype ASMOp (uint)

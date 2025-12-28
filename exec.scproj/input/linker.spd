@@ -2,63 +2,67 @@
 
 module SpdTable 
 	|int|			LinksOK
+	|int|			CodeLength
 	|[SpdFunc]|		Funcs
 	|spdfunc--|		CurrFunc
-	|SPDFunc--|		First
-	|SPDFunc--|		Last
 	|&&nil|			LibFuncs = cakerun.LibFuncs
+	
 	
 	function RunMain (|int|)
 		opt norefcounts
-		|| init = .funcs[1]!
+/		|| init = .funcs[1]!
 		|| main = .funcs[2]					#expect ("Missing main")
 		expect (init.Run|&int64|[] == 0)	("Init failed")
 		return main.Run|&int64|[]
-
-
-	syntax Append (|message| spd)
-		opt norefcounts // the limit is just to detect corrupted files.
-		expect (.funcs.Length < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
-		if spd == @num
-			for spd.int
-				.Funcs <~ SpdFunc()			// placeholder
-		  else
-			.Funcs <~ SpdFunc(spd)
 	
 	
+	function PreLoad (|message| code)
+		opt norefcounts
+/		.funcs <~ SpdFunc()							// null func
+		|| CodeLength = 0
+				
+		for spd.fast in code
+			if spd == @num
+				for spd.int
+					.funcs <~ .funcs[0]
+			  else
+				spd.tag = .funcs.Length
+				spd.Position = CodeLength
+				.funcs <~ spd
+				CodeLength += spd.Length
+			expect (.funcs < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
+
+		.Funcs.Shrink		
+		check  (CodeLength < 1MB)					(code, "Oversized code: " + CodeLength)
+		check  (.funcs >= 3)						(code, "Missing 'main'")
+		
+		.CodeLength = CodeLength
+
+
 	function LoadFuncs (|message| code)
 		opt norefcounts
-		.funcs <~ SpdFunc()					// null func
+ 
+		.PreLoad(code)
 		for spd.fast in code
-			self <~ spd
-		
-		.Funcs.Shrink
-		|| CodeLength = .CodeLength
-		check  (CodeLength < 1MB)			(code, "Oversized code: " + CodeLength)
-		check  (.Funcs >= 3)				(code, "Missing 'main'")
-		
-
-	function CodeLength (|int|)
-		opt norefcounts
-		|| l = spdtable.last
-			return l.start + l.Length
+/			spd.CopyToVM
+	
 
 	function SpdFunc.ASMStart (|&ASM|)
-		|| i = .start
+		|| i = .Position
 			return BeginCode + i
+	
 	
 	function Link (|&asm|)
 		opt norefcounts
-		|| code = SpdFunc.BeginCode$
-		for f in .funcs()
+/		|| code = cake.Load(nil, 0)|&ASM|		#expect ("Can't load the code")
+		for f in .funcs
 			.currFunc = f
 			f.Link❗(code)
 
-/		cake.load(code, .codelength)
 
 	function spdfunc.Link❗ (|&ASM| Begin)
 		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
-		|| Code = .Start$
+/		|| Code = .position$
 		|| Base = Begin + Code
 		|| after = base + .Length
 		while base < after
@@ -76,7 +80,7 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction,
 	|| ID = ((Old << 13) >> 13) - 31
 	require ID > 0 // not a register!
 	
-	|| fn = SpdTable.Funcs[id]
+/	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart						// Fast-branch for speed.
 			|| Jump = self - Pos					// 19-bits // later we can upgrade to 21-bit
 			if  Jump  ==  (Jump << 13) >> 13
@@ -92,7 +96,7 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction,
 
 function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs
 	opt norefcounts
-	|| ID = (Old << 15) >> 15
+/	|| ID = (Old << 15) >> 15
 	expect (ID > 0 and ID < globals.LibMax)					(spdtable.Currfunc, "Bad LibGlob ID: " + ID )
 	
 	ID = globals.LibLink![ID]

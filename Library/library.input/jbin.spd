@@ -148,6 +148,8 @@ libinternal InputStream.NextMsgInfo (|uint64|)
 	|| T = (info >> 1)|syntax|
 	if (t < @max  and  T > @nil)					// 01 --> T=@nil
 		msg = msg.msg(t, .str(.HInt))			
+		msg.Position = .data.position - msg.name.Length
+				
 		if info & 1
 			._Object = msg
 		|| cb = .CallBack
@@ -163,12 +165,12 @@ libinternal InputStream.NextMsgInfo (|uint64|)
 
 
 function InputStream.StreamJbin (|int64| Remain=1G, |MessageRoot|)	
-	if .eat("#!") == 2				 // shebang
-		.find('\n')
-	expect (.HasHeader(Jbin.Header))  (Self, "Parsed data lacks jbin header.	")
+	if .Eat("#!") == 2				 // shebang
+		.Find('\n')
+	expect (.HasHeader(Jbin.Header))  (Self, "Parsed data lacks jbin header.")
 
 	._Object = nil
-	|| Root = .nextmsginfo|message|
+	|| Root = .NextMsgInfo|message|
 	while --Remain > 0
 		loop .NextMsginfo
 	

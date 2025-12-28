@@ -14,6 +14,29 @@ module debugger
 		print filepath
 		print ": "
 		printline Position.Render
+
+	// we need to respond to a few things:
+		// pause
+		// run
+		// step over
+		// step in
+		// step out
+		// ask for vars
+		// ask for stack
+		// hit breakpoints and stop!
+		// deal with crashes.
+
+	// of course... we can't actually do these.
+	// not without the xpd file
+	// So... lets say they press pause. what do we do? well... we can't do anything
+	// so what are we doing? Testing?
+	// planning?
+	// preparing?
+	// lets pretend we paused. then send back some messages.
+	// send back... variables, and stack
+	
+	// what about asking for ASM? That goes through speedie.
+	// So might as well do that first?
 		
 
 	function __Viewer__ (cakevm.CakeChef)
@@ -52,28 +75,3 @@ module debugger
 		|| s = __Globals__.BreakPoints
 			for i in .Length
 				s[i] = 1
-
-/*
-function spdtable.Find (|uint| ToFind,  |spdfunc|)
-	return .find(.first!.start! + tofind)
-
-
-function spdtable.Find (|&ASM| ToFind, |spdfunc|)
-	opt norefcounts // I could make a binary func. but I don't want to. maybe later?
-					// besides, its better to make a generic binary finder? but what would the param be?
-					// an object? a struct? a voidptr? no good!
-	for s in .funcs
-		if s.SpeedieFunc
-			if s.Contains(ToFind) == 0
-				return s
-
-function spdfunc.Contains (|&ASM| ToFind, |int|)
-	|| s = .Start
-	if ToFind < s
-		return -1
-	if ToFind < s + .Length
-		return 0
-	return 1
-*/
-
-

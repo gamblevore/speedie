@@ -147,21 +147,17 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 }
 
 
-ASM* JB_ASM_Code (CakeVM* V, ASM* Code, int Length) {
-	if_rare (Length > CakeCodeMax)
+ASM* JB_ASM_Code (CakeVM* V, int Length) {
+	if_rare ((uint)Length > CakeCodeMax)
 		return 0;
 	auto D = (ASM*)(((byte*)V) + V->StackSize);
+
 	int F = V->VFlags;
-	if (Code) {
-		if (F&kJB_VM_IsProtected)
-			if (mprotect(D, CakeCodeMax*4, PROT_WRITE|PROT_READ)==0) // unprotect
-				F &=~ kJB_VM_IsProtected;
-		memcpy(D, Code, 4*Length);
+	if (F&kJB_VM_IsProtected) {
+		if (mprotect(D, CakeCodeMax*4, PROT_WRITE|PROT_READ)==0)	// unprotect
+			F &=~ kJB_VM_IsProtected;
+		V->VFlags = F;
 	}
-	if (F&kJB_VM_WantProtect and !(F&kJB_VM_IsProtected))
-		if (mprotect(D, CakeCodeMax*4, PROT_READ) == 0)				// protect!
-			F |= kJB_VM_IsProtected;
-	V->VFlags = F;
 	return D;
 }
 
@@ -196,8 +192,13 @@ static ivec4* VM_Run (CakeVM& V, int CodeIndex) {
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
-	ASM* Code = JB_ASM_Code(&V,0,0) + CodeIndex;
-	return __CAKE_VM__(V, Code, 0);
+	ASM* Code = JB_ASM_Code(&V,0);
+	
+	int F = V.VFlags;
+	if (!(F&kJB_VM_IsProtected) and (F&kJB_VM_WantProtect))
+		if (mprotect(Code, CakeCodeMax*4, PROT_READ) == 0)				// protect!
+			V.VFlags |= kJB_VM_IsProtected;
+	return __CAKE_VM__(V, Code + CodeIndex, 0);
 }
 
 

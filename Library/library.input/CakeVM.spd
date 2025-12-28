@@ -9,8 +9,14 @@ constants
 	WantProtect		= 2
 	CanDebug		= 4
 
+
+function Load (|&uint| ASM, |int| Length)
+	|| Code = .code(Length)
+		memory.copy(code, asm, length<<2)
+
+
 target cpp or vm {
-	function Load		(|&uint| Code, |int| CodeLength, |&uint|)
+	function Code		(|int| CodeLength, |?&uint|)
 		cpp_wrapper JB_ASM_Code
 	function Run		(|int| StartAt, |&ivec4|)
 		cpp_wrapper JB_ASM_Run

@@ -1,71 +1,44 @@
 
 
-class SpdFunc
-	|uint16|			Length
-	|uint16|			Position
-	|ind|				Start
-	|string|			Name
-
+role SpdFunc (message)
 	constructor
-		.Position = spdtable.funcs.Length
+		super.constructor
+		.tag = -1
+		.RangeLength = 0
 		.name = "(unused code)"
-		.start = -1
+		.Position = -1
 	
-	constructor (|message| code)
+	
+	function message.CopyToVM
 		opt norefcounts
-		.Position = spdtable.funcs.Length
-		.name = (code.name, "")(code.func == @tmp)
-		|| F = code.first
-			code = F
-		if code.func == @tmp
-			.Length = 0
-			.Start = -1
+		|| Code = self
+		if .func == @tmp
+			Code = self[@nil]!
 		  else
-			|| s    = Code.name
-			|| n    = s.length>>2
-			|| blob = (s.addr-4)|&ASMBlob|
-			|| orig_str = CakeRun.FileSrc
-			|| orig_addr = orig_str.addr
-			|| orig_after = orig_addr + orig_str.Length
-	
-			check  (blob|&byte| >= orig_addr and blob|&byte| < orig_After)	(Code, "ASM escaped.")
-			check !(blob|int64|&3)											(Code, "ASM unaligned.")
-			check  (n > 0)													(Code, "ASM missing.")
-			check  (n < 64K-1)												(Code, "ASM oversized.")
-			
-			blob.CallCount = 0
-			.length = n
-			if !SpdTable.first
-				Spdtable.First = self // .first = self
-				BeginCode = &blob.ASM[0]
-			Spdtable.last = self
-			
+			.name = "(unnamed)"
 
-//	function After	(|&asm|)
-//		return .start + .Length
+		|| n    = Code.length >> 2
+		.RangeLength = n
+		check  (n > 0)													(Code, "ASM missing.")
+		check  (n < 64K-1)												(Code, "ASM oversized.")
 		
-/*	function Start	(|&asm|)
-		|| mu = .SpeedieFunc
-			return &mu.asm[0]*/
-		
+		|| dest = BeginCode + .Position
+		memory.Copy(dest, Code.name.addr, n<<2)
+	
+
 	function Run (|&ivec4|)
 		Cake.Registers
-		|| Code = .start
+		|| Code = .Position
 		if code >= 0
 			return cake.Run(Code)
 		return Dummy		
-		
-	render
-		fs <~ "0x"
-		fs.AppendHex(.start, 6)
-		fs <~ ' '
-		fs <~ .name
+
 
 	function DebugSuccess (|int| id)
 		SpdTable.LinksOK++
 		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
+
 	
 	module
-		|&ASM| BeginCode
 		|ivec4| Dummy
 

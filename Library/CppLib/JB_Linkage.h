@@ -94,7 +94,7 @@ void	JB_InitClassList	(SaverLoadClass fn);
 
 struct	CakeVM;
 typedef bool (*JB_ASM_Break)(CakeVM* VM, u32* Code, int BreakValue);
-u32*	JB_ASM_Code			(CakeVM* V, u32* Code, int Length);
+u32*	JB_ASM_Code			(CakeVM* V, int Length);
 int		JB_ASM_Index		(CakeVM* vm, u32* Code);
 CakeVM*	JB_ASM__VM			(int StackSize, int Flags);
 void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
