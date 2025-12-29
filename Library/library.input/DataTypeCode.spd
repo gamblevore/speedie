@@ -138,17 +138,15 @@ datatype DataTypeCode (uint16)
 	inline Floatness (|int|)
 		return .isfloat*.bytecount // makes sense
 
-	inline IsFloat (|bool|) // turn this into floatness?
+	inline IsFloat (|bool|)
 		return (self >> 7) & 1
 	
-	inline IsPointer (|bool|)
-		return (self isnt numeric) and (self isnt bool)
-		
-	function IsIntReg (|bool|)
-		if .IsPointer // pointers, bascially, are ints
-			return true
+	function SpecialReg (|bool|)
+		if self is pointer // pointers, bascially, are ints
+			return false
 		if .isint and .VecCount <= 1
-			return true
+			return false
+		return true
 
 	inline IsInt (|bool|)
 		return !.IsFloat

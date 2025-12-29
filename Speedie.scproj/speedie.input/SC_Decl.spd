@@ -208,13 +208,12 @@ class SCDecl (SCObject) {
 	function IsRegister (|bool|)
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
-	function SpecialRegs (|bool|)
-		return self and !.mu.DataType.IsIntReg
+	// T.IsInt and t.veccount <= 1
+	function SpecialReg (|bool|)
+		if self and self isnt reference
+			return .mu.DataType.SpecialReg
 	
-	function IntRegs (|bool|)
-		return !.SpecialRegs 
-		
-
+	
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |message| Type, |SCDecl|)
 		opt norefcounts
 		if mode is funcparam

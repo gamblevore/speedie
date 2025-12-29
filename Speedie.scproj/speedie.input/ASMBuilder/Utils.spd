@@ -142,19 +142,27 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	return true
 
 
-function scdecl.CalculateASMType (|asmreg|)
+function scdecl.CalculateDataType (|datatypecode|)
+	rz = .CalculateDataTypeSub
+	.mu.datatype = rz
+
+
+function scdecl.CalculateDataTypeSub (|datatypecode|)
 	opt norefcounts
 	if .pointercount or .iscarray
 		// carrays must be allocated. So this reg will store a pointer to the carray.
-		return datatypecode._voidptr|ASMReg|
+		return datatypecode._voidptr
 
 	|| t = .type
 	|| b = t.BaseType
 	if b > scnodetype.DataType
-		return datatypecode._voidptr|ASMReg|
+		return datatypecode._voidptr
 	
-	|| I = t.typeinfo
-	return I|asmreg|
+	return t.typeinfo
+
+
+function scdecl.CalculateASMType (|asmreg|)
+	return .CalculateDataTypeSub|asmreg|
 
 
 function SCFunction.ASMReturn (|scdecl|)

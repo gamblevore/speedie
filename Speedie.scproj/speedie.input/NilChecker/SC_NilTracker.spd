@@ -227,10 +227,25 @@ struct ArchonPurger
 
 			using rec
 				for xoxo in compiler.funclist
+					target debug
+						if xoxo.islibrary
+							if xoxo.intprmcount > intmaxffi
+								intmaxffi = xoxo.intprmcount
+								intmaxobj = xoxo
 					.ExterminateZergBugs(xoxo)
 					rec.ReturnErrors(old)
+			
+			target debug
+				"Max FFI Int: $IntMaxFFI, ${intmaxobj!}" 
 
 
+
+target debug
+	|| IntMaxFFI = 0
+	|scfunction| IntMaxObj
+		 
+
+		
 			
 function message.OrigRender	(|faststring| fs_in=nil, |string|)
 	opt norefcounts

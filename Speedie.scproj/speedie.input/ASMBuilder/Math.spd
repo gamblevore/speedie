@@ -336,7 +336,7 @@ extend Assembler
 
 	
 	function ASMReg.SomePointer (|bool|)
-		return (self is containsaddr) or .µtype.ispointer
+		return  (self is containsaddr)  or  (.µtype is pointer)
 
 
 	function ASMReg.LeftScore (|int|) // we want pointers on the left, and consts on the right
@@ -877,7 +877,7 @@ extend Assembler
 
 		if src is Const										// setting a const
 			|| K = src.const
-			return .LoadNumber(exp, K, dest)				// Consts are the most optimisable thing we have
+			return .LoadNumber(exp, K, src.µtype.SpecialReg, dest)				// Consts are the most optimisable thing we have
 
 		if src.IsFloat
 			return exp.FADD(dest, src, asmreg(), asmreg(), 1-src.fourbytes) * dest

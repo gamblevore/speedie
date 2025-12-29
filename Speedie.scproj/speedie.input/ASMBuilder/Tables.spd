@@ -789,7 +789,7 @@ function ExistingVar (|message| m, |asmreg|)
 		require d is local and d isnt Reference
 		return .LocalThg(d)
 
-	return .MegaNumFinder(d.ExportPosition, d.mu.DataType)
+	return .MegaNumFinder(d.ExportPosition, d.SpecialReg, d.mu.DataType)
 
 
 function Str (fn_asm)

@@ -49,7 +49,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		|| i = 0
 		for p.fast in prms
 			|| ty = p.ASMDecl
-			if ty.SpecialRegs|int| != Ints
+			if ty.SpecialReg|int| != Ints
 				|int64| v = .µReffed(p!, args[i]!).reg
 				sh -= 5
 				rz  |=  v << sh
@@ -59,7 +59,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	
 	rz >>= 64-((n*5)+12)
 	if fc>8 or ic>8			// hmmm
-	rz |= fn.ASMReturn.SpecialRegs << 11
+	rz |= fn.ASMReturn.SpecialReg << 11
 	if fc
 		rz |= (8-fc) << 6
 		rz |= (8-ic) << 0

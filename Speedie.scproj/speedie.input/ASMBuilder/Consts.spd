@@ -20,24 +20,23 @@ extend Assembler
 		ml.NeedFAT // sigh
 
 
-	function MegaNumFinder (|int64| V, |DataTypeCode| Type, |ASMReg|)
+	function MegaNumFinder (|int64| V, |bool| Special, |DataTypeCode| Type, |ASMReg|)
 		if v == 0
 			return asmreg.zero.µtype(type)
-		|| normal = Type.IsIntReg
 		|| bi = .BranchID
 		// shouldn't the BranchID shift with the basicblock Or not? IDK?
 		|| cc = .curr
 		for f.Known in self
 			if (f.BranchID == bi) and (f < cc) and (f isa asm.KNST) and (f._const == v)
 				|| info = f.info
-				if info.µType.IsIntReg == normal
+				if info.µType.SpecialReg == Special
 					(info is blocknop) // the value might have not been used yet:   x[1] = 1
 					return info
 			
 	
-	function LoadNumber (|message| exp, |int64| V, |asmreg| Dest=nil, |asmreg|)
+	function LoadNumber (|message| exp, |int64| V, |bool| Special, |asmreg| Dest=nil, |asmreg|)
 		if !Dest.reg
-			|| Found = .MegaNumFinder(v, dest.µtype)
+			|| Found = .MegaNumFinder(v, special, dest.µtype)
 				return Found
 		
 		dest = .TempOnly(dest)		
@@ -52,7 +51,7 @@ extend Assembler
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
 		if K  // didn't we remove into as a param?
-			return .LoadNumber(exp, K, reg)
+			return .LoadNumber(exp, K, srctype.specialreg, Reg)
 		
 		reg.reg = 0
 		(reg isnt temp)
