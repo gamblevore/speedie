@@ -106,35 +106,6 @@ role JBin (Faststring)
 
 
 
-
-datatype jbinLeaver (int)
-	// need some nice syntax so we can do: using j.enter
-	// not finished
-
-	syntax UsingComplete (|jbin| jb)
-		StdErr.LowerErrorsTo = self
-		
-	module
-		target debug
-			inline Test
-				|| j = jbin()
-				j.Enter	// Sigh... syntaxusing is called upon the leaver, and not the jbin!
-						// how to make it work on j rather than on j.enter?
-						// we could do it.
-						// so... we call j.enter
-						// i mean we can just make it work on the thing inside the dot instead of the overall
-						// but that affects a lot of things. its not very reliable.
-						  
-	
-/*
-function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| name=nil,  |Message|)
-	cpp_part NextMsgExpect
-	opt norefcounts
-	rz = .nextmsginfo|message| #require
-	expect (rz.expect(fn, name) and (rz in parent)) (rz)
-	// A good concept, but untested and unused. So its not a real function unless I can see a real use.
-*/
-
 libinternal InputStream.NextMsgInfo (|uint64|)
 	opt norefcounts
 	|| Msg = ._Object|message|
@@ -148,7 +119,6 @@ libinternal InputStream.NextMsgInfo (|uint64|)
 	|| T = (info >> 1)|syntax|
 	if (t < @max  and  T > @nil)					// 01 --> T=@nil
 		msg = msg.msg(t, .str(.HInt))			
-		msg.Position = .data.position - msg.name.Length
 				
 		if info & 1
 			._Object = msg
@@ -189,29 +159,6 @@ function string.Digest (|string|)
 	if .IsJbin
 		return self
 	return .parse$.renderjbin
-
-
-/* 
-	Ideas
-	
-	Rework (good):
-		* Length high-bit means 31-bits remain. If false, next bit means 14 or 6 bits remain.
-			* More reliable! matches speedie's string max length!! 
-	
-	Speedups (annoying):
-		* Node-info can't cross 16MB boundary (name can tho). Then can keep ptrs in regs.
-		  (will need work on faststring, I think.)  Needs end with three zeros, also.
-		* Allocate one block at a time! Call constructors. Just need Curr+Last ptr.
-
-	Language level additions (meh):
-		* Allow MessageID during parse. Could save on RAM+CPU, if done properly, say only on @tmp, or
-		  done on a per-document-basis that knows what types to use.
-
-	Jbin level additions: (probably bad)
-		* A back-ref mode? Some objects can store their name+type in a cache for reuse.	
-			* Some unused @syx could represent backrefs.
-*/
-
 
 
 
