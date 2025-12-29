@@ -644,12 +644,7 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
 
-extern "C" void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
-extern "C" u64 Nativeize2(u64 data, Fn0 fn, VMRegister* r, int64 n) {
-	if (n*2 == data+1)
-		return r->Uint;
-	return n + (fn!=0);
-}
+extern "C"  __attribute__((sysv_abi))   void  Nativeize (u64 data, Fn0 fn, VMRegister* r, int64 n);
 
 AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)

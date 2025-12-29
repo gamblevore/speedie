@@ -233,9 +233,6 @@ struct ArchonPurger
 								intmaxobj = xoxo
 					.ExterminateZergBugs(xoxo)
 					rec.ReturnErrors(old)
-			
-			target debug
-				"Max FFI Int: ${intmaxobj!}" 
 
 
 
