@@ -779,6 +779,7 @@ function CollectReturnAsReal (|bool|)
 	if .IsAllocOrNew and Options.NilTestAllocNeverFails
 		return true
 
+
 function AddTypeInfo (|scdecl| dcl)
 	if dcl isnt return
 		|| T = dcl.CalculateDataType

@@ -306,8 +306,8 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		check !dcl.IsCArray (self, "Can't return c-arrays")
 		FuncPrmz.ReturnType = dcl			// we need the copy
 		if !dcl.isbarestruct or funcprmz is constructor
-			funcprmz.AddTypeInfo(dcl)
 			(dcl is return)
+			funcprmz.AddTypeInfo(dcl)
 			return nil
 
 		(dcl is ReturnedStruct)
