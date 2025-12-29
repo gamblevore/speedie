@@ -40,8 +40,8 @@
 
 	_Nativeize:						
 		#define r   	%r15
-		#define inj		%r14
-		#define flj		%r13
+		#define inj14	%r14
+		#define flj13	%r13
 		#define dest	%r12
 		#define fn11	%r11
 		#define data10	%r10
@@ -72,8 +72,8 @@
 
 		movq		x4,  data10
 		sarq		$12, data10					// data = DATA>>12
-		leaq		.F7(%rip), flj
-		leaq		.I7(%rip), inj
+		leaq		.F7(%rip), flj13
+		leaq		.I7(%rip), inj14
 
 		movq		x5,  fn11					// fn    = FN
 		movq		x3,  r  					// r15   = R
@@ -89,25 +89,17 @@
 		movq		x4, j9
 		andq		$63,j9 						// j9    = DATA&63
 
-		leaq		(j8,j8,2), j8				// j8    = j8*3 // leaq can only multiply by pow2
-		leaq		(j9,j9,2), j9				// j9    = j9*3 // but we get *3 like this.
+		leaq		(j8,j8,4), j8				// j8    = j8*5 // leaq can only multiply by pow2
+		leaq		(j9,j9,4), j9				// j9    = j9*5 // but we get *3 like this.
 
 
-		leaq		(flj,j8,8), j8				// j8 = flj13 + j8*2
-		leaq		(inj,j9,8), j9				// j9 = inj14 + j9*2
+		leaq		(flj13,j8,4), j8			// j8 = flj13 + j8*4
+		leaq		(inj14,j9,4), j9			// j9 = inj14 + j9*4
 
 		jmpq *j8
 
-	// Row syntax wil make debugging harder.
-	// we need to tell how far apart the F's are, and I's are.
-	#define ROW(n)					\
-	.F ## n:						\
-		movq data10, x##n;			\
-		andq x##n, 31;				\
-        salq $4, x##n;				\
-        salq $5, data10;			\
-        movaps (r,x##n), q##n;
-				
+	nop
+	
 	.F7:								// x7 = (data&31) << 4
 		movq data10, x7					// x7 = data
 		andq $31,x7 					// x7 &= 31
@@ -165,13 +157,18 @@
         movaps (r,x0), q0				// q0 = r[x0]
 	
 	jmpq *j9
+	nop;nop;nop;nop
+	nop;nop;nop;nop
+	nop;nop;nop;nop
+	nop;nop;nop;nop
+	nop
 	// INTEGERS //
 	.I7:
 		nop								// 1 byte spacer
 		movq data10, x7					// x7 = data
 		andq $31,x7						// x7 &= 31
         salq $4, x7						// x7 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x7), x7					// x7 = r[x7]
 
 	.I6:
@@ -179,7 +176,7 @@
 		movq data10, x6					// x6 = data
 		andq $31,x6						// x6 &= 31
         salq $4, x6						// x6 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x6), x6					// x6 = r[x6]
 
 	.I5:
@@ -187,7 +184,7 @@
 		movq data10, x5					// x5 = data
 		andq $31,x5						// x5 &= 31
         salq $4, x5						// x5 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x5), x5					// x5 = r[x5]
 
 	.I4:
@@ -195,7 +192,7 @@
 		movq data10, x4					// x4 = data
 		andq $31,x4						// x4 &= 31
         salq $4, x4						// x4 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x4), x4					// x4 = r[x4]
 
 	.I3:
@@ -203,7 +200,7 @@
 		movq data10, x3					// x3 = data
 		andq $31,x3						// x3 &= 31
         salq $4, x3						// x3 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x3), x3					// x3 = r[x3]
 
 	.I2:
@@ -211,7 +208,7 @@
 		movq data10, x2					// x2 = data
 		andq $31,x2						// x2 &= 31
         salq $4, x2						// x2 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x2), x2					// x2 = r[x2]
 
 	.I1:								// x1 = (data&31) << 4
@@ -219,7 +216,7 @@
 		movq data10, x1					// x1 = data
 		andq $31,x1						// x1 &= 31
         salq $4, x1						// x1 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x1), x1					// x1 = r[x1]
 
 	.I0:								// x0 = (data&31) << 4
@@ -227,12 +224,10 @@
 		movq data10, x0					// x0 = data
 		andq $31,x0						// x0 &= 31
         salq $4, x0						// x0 <<= 4
-        salq $5, data10					// data = data >> 5
+        sarq $5, data10					// data = data >> 5
         movq (r,x0), x0					// x0 = r[x0]
 
-/*
-		
-			// **STACK MANAGEMENT HERE**
+/*			// **STACK MANAGEMENT HERE**
 		stp     fp, lr, [sp, -32]!			// save fp and lr 
 		mov     fp, sp						// fp = sp
 		stp     dest, xzr, [sp, 16]
