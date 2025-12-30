@@ -61,7 +61,7 @@
 		#define flo_jmp		x4			// Finishes early
 		
 		#define ji			x3
-		#define jf  		x2			// no!
+		#define jf  		x2
 		
 		movq		x0,  DataPrm				// Data
 		movq		x1,  _FN_					// FN
