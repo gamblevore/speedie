@@ -67,23 +67,6 @@
 		movq		x1,  _FN_					// FN
 		movq		x2,  RegFile				// R
 
-		leaq		.F7(%rip), %rax
-		leaq		.F6(%rip), %rax
-		leaq		.F5(%rip), %rax
-		leaq		.F4(%rip), %rax
-		leaq		.F3(%rip), %rax
-		leaq		.F2(%rip), %rax
-		leaq		.F1(%rip), %rax
-		leaq		.F0(%rip), %rax
-		leaq		.I7(%rip), %rax
-		leaq		.I6(%rip), %rax
-		leaq		.I5(%rip), %rax
-		leaq		.I4(%rip), %rax
-		leaq		.I3(%rip), %rax
-		leaq		.I2(%rip), %rax
-		leaq		.I1(%rip), %rax
-		leaq		.I0(%rip), %rax
-
         salq		$4, x3						// n <<= 4;
 		addq		x2, x3						// dest = r+n
 		push		x3
@@ -188,7 +171,7 @@
 	
 	// INTEGERS //
 	.I5:								// x5 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, xtemp // these 3 x0 instructions could be done with leaq?
+		movq DataPrm, xtemp
 		andq $31, xtemp
         salq $4, xtemp
         sarq $5, DataPrm
@@ -234,36 +217,22 @@
         sarq $5, DataPrm
         movq (RegFile, xtemp), x0
 
-	.ICAP:
 
-
-/*			// **STACK MANAGEMENT HERE**
-		stp     fp, lr, [sp, -32]!			// save fp and lr 
-		mov     fp, sp						// fp = sp
-
-	// branch
-		tbnz    DataPrm, 11, .SIMD_Return
-	
+	.STACK:
+			// **STACK MANAGEMENT HERE**
+	testq    $2048, DataPrm 
+	jne      .SIMD_Return
 	.Int_Return:
-		blr     _FN_						// call fn... so we can store in x0
-*/
-		pop		dest ///
-/*
-		ldp     dest, xzr, [sp, 16]
-		ldp     fp, lr, [sp], 32			// restore fp/lr
+	call     *_FN_							// call fn... so we can store in x0
+	pop		dest ///
+	movq    %rax, (dest)
+	ret
 
-		str     x0, [dest]
-		ret
-		
 	.SIMD_Return:
-		blr     _FN_						// call fn, so we can store in q0
-		pop		dest ///
-		ldp     dest, xzr, [sp, 16]
-		ldp     fp, lr, [sp], 32			// restore fp/lr
-		
-		str     q0, [dest]
-*/
-		ret
+	call     *_FN_							// call fn... so we can store in x0
+	pop		dest ///
+	movaps  q0, (dest)
+	ret
 
 #endif
 
