@@ -107,7 +107,7 @@ Altogether that makes this:
         if file isa "xml"
             jb.XMLToJeebox
             || boxfile = File.SetExt("box")
-            if boxfile[] = jb.render // write file to disk
+            if boxfile.writeall( jb.render )
                 "Converted XML to Jeebox: $boxfile"
         printline jb
 
@@ -222,7 +222,7 @@ I'll also clean up the code a little... just use the final code. Here is the fin
         if file isa "xml"
             jb.XMLToJeebox
             || boxfile = File.SetExt("box")
-            if boxfile[] = jb.render // write file to disk
+            if boxfile.writeall( jb.render ) // write file to disk
                 "Converted XML to Jeebox: $boxfile"
     
         || Found = BookSearch(jb, app.switches) #expect  "Can't find any books using: ${app.Switches}"
@@ -262,11 +262,11 @@ Now, the same search query (`--author=Corets`) will return 3 books! Wonderful! A
 
 We further filter it down to only one book. Perfect.
 
-## Advanced: Compression and jbin ##
+## Advanced: jbin ##
 
-If you want to go even more advanced, you could do things like compress the jeebox file or store it as `jbin`, or even a compressed `jbin`! Lets try that now...
+If you want to go even more advanced, you could do things like compress the jeebox file or store it as `jbin`, or even a compressed `jbin`! Lets try jbin now...
 
-    boxfile[] = jb.render_jbin // write file to disk as jbin
+    boxfile.writeall( jb.render_jbin ) // write file to disk as jbin
 
 `Jbin` is just jeebox, but in a binary form. `jbin` is approximately the same size as jeebox, except when it comes to storing binary data, when it is far smaller. `Jbin` can store everything jeebox can. Best of all... jeebox transparently parses it. Also, the code for `jbin` is very small, you could parse it in about 35 lines of C++.
 
@@ -274,8 +274,6 @@ If you want to go even more advanced, you could do things like compress the jeeb
 
 **What about compression?**
 
-    boxfile <~ jb.render.compress // write file compressed
+Jeebox has inbuilt decompression, of it's own format "mz" that is inbuilt in Speedie. Perry, Speedie and Jeebox all transparently handle compressed files.
 
-this will compress the data then write it to disk. Again, Jeebox is smart enough to be able to parse compressed files, (assuming it was compressed by speedie's `.Compress` function, not .zip or anything.)
-
-Jeebox, Speedie and Perry can  all handle jbin and compressed files...
+However, the compression right now is not finalised, I feel its not good enough yet. (It seems good on large files but not so good on smaller files, which most jeebox files are.) I'll probably add `gz` decompression to Jeebox, as it seems widely used, and gz is good on small files.
