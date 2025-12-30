@@ -657,8 +657,7 @@ AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, 
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
-	auto n = Nativeize;
-	return n(funcdata, fn, r, n1);
+	return Nativeize(funcdata, fn, r, n1);
 }
 
 

@@ -75,7 +75,6 @@ linkage
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				LinkID
-|int|					StackAllocGuess
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |byte|					FSOpt
@@ -781,10 +780,9 @@ function CollectReturnAsReal (|bool|)
 
 
 function AddTypeInfo (|scdecl| dcl)
-	if dcl isnt return
-		|| T = dcl.CalculateDataType
-		if !T.SpecialReg
-			.IntPrmCount++
+	|| T = dcl.CalculateDataType
+	if !T.SpecialReg
+		.IntPrmCount++
 
 
 setter IsCppInBuilt (|int|)

@@ -228,16 +228,15 @@ struct ArchonPurger
 			using rec
 				for xoxo in compiler.funclist
 					target debug
-						if xoxo.islibrary
-							if !IntMaxObj or xoxo.intprmcount > IntMaxObj!.intprmcount
-								intmaxobj = xoxo
+						if (xoxo.islibrary) and (!IntMaxObj or xoxo.intprmcount > IntMaxObj!.intprmcount)
+							IntMaxObj = xoxo
 					.ExterminateZergBugs(xoxo)
 					rec.ReturnErrors(old)
 
 
 
 target debug
-	|scfunction| IntMaxObj
+	|SCFunction| IntMaxObj
 		 
 
 		

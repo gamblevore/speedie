@@ -199,7 +199,6 @@ extend_module scfunction
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			|| Dcl2 = OldDcl.copydecl	// no difference, its a temp
-			if OldDcl.IsBareStruct		// oof? what about scfunction.StackAllocGuess
 			dcl2.AsBody					// can we just use collectfrombody?
 			(dcl2 is compilercreated)
 			

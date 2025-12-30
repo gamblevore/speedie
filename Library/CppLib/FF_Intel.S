@@ -20,20 +20,10 @@
     4. Any jeebox-licence note may not be removed/altered from any source distribution.
 */
 
-#ifdef _M_X86
-	#define __realintel__
-#endif
-#ifdef __i386__
-	#define __realintel__
-#endif
+
 #ifdef __x86_64__
-	#define __realintel__
-#endif
 
-
-#ifdef __realintel__
-
-	/*** Nativeize(u64 Data, void* FN, Register* R, int N) ***/
+	/*** Nativeize (u64 Data, void* FN, Register* R, int N) ***/
 	.text
 	.global _Nativeize
 	.balign 4
@@ -42,200 +32,223 @@
 		// Volatile:  RDI, RSI, RDX, RCX, R8,  R9,    ...  R10, R11, RAX
 		// Saved:     RBX, R12, R13, R14, R15
 		// Stack:	  RBP, RSP
-		#define x5		%r9
-		#define x4		%r8
-		#define x3  	%rcx
-		#define x2  	%rdx
-		#define x1  	%rsi 
-		#define x0  	%rdi
 		
-		#define q7  	%xmm7
-		#define q6  	%xmm6
-		#define q5  	%xmm5
-		#define q4  	%xmm4
-		#define q3  	%xmm3
-		#define q2  	%xmm2
-		#define q1  	%xmm1
-		#define q0  	%xmm0
+		#define q7  		%xmm7
+		#define q6  		%xmm6
+		#define q5  		%xmm5
+		#define q4  		%xmm4
+		#define q3  		%xmm3
+		#define q2  		%xmm2
+		#define q1  		%xmm1
+		#define q0  		%xmm0
+		
+		#define x5			%r9
+		#define x4			%r8
+		#define x3  		%rcx
+		#define x2  		%rdx
+		#define x1  		%rsi 
+		#define x0  		%rdi
+		
 
+		#define dest		%rcx		// needs push/pop
+		
+		#define xtemp		%r11		// temps
+		#define DataPrm		%r10		// Used up till the call
+		#define _FN_		%rax		// Used AT the call.
+		#define RegFile		x0			// Not used after call
+		
+		#define int_jmp 	x5			// Finishes early
+		#define flo_jmp		x4			// Finishes early
+		
+		#define ji			x3
+		#define jf  		x2			// no!
+		
+		movq		x0,  DataPrm				// Data
+		movq		x1,  _FN_					// FN
+		movq		x2,  RegFile				// R
 
-		#define DataPrm	%r10		// Used up till the call
-		#define _FN_	%rax		// Used AT the call.
-		#define RegFile	%r11		// Not used after call
-		#define dest	%r15		// Used after the call // just needs to be saved.
+		leaq		.F7(%rip), %rax
+		leaq		.F6(%rip), %rax
+		leaq		.F5(%rip), %rax
+		leaq		.F4(%rip), %rax
+		leaq		.F3(%rip), %rax
+		leaq		.F2(%rip), %rax
+		leaq		.F1(%rip), %rax
+		leaq		.F0(%rip), %rax
+		leaq		.I7(%rip), %rax
+		leaq		.I6(%rip), %rax
+		leaq		.I5(%rip), %rax
+		leaq		.I4(%rip), %rax
+		leaq		.I3(%rip), %rax
+		leaq		.I2(%rip), %rax
+		leaq		.I1(%rip), %rax
+		leaq		.I0(%rip), %rax
 
-		#define int_jmp x2			// Finishes early
-		#define flo_jmp	x3			// Finishes early
+        salq		$4, x3						// n <<= 4;
+		addq		x2, x3						// dest = r+n
+		push		x3
 
-		#define ji		x1
-		#define jf  	x0
-
-#if 1
-		movq		x0,  DataPrm
-		movq		x1,  _FN_					// fn    = FN
-		movq		x2,  RegFile				// r15   = R
-		movq		x3,  dest  					// dest  = N
+		movq		DataPrm, ji
+		movq		DataPrm, jf
+		
 		sarq		$12, DataPrm				// data = DATA>>12
 		leaq		.F7(%rip), flo_jmp
 		leaq		.I7(%rip), int_jmp
-
-        salq		$4, dest					// n <<= 4;
-		addq		RegFile,dest				// dest = r+n
-
-		movq		x0, ji
+		
 		andq		$63,ji 						// ji = DATA&63
-		// movq		x0, jf						// x0 already is jf
-		sarq		$6, jf						// jf = (DATA>>6)&31
-		andq		$31,jf 
-
-		leaq		(jf,jf,4), jf				// jf    = jf*5 // leaq can only multiply by pow2
-		leaq		(ji,ji,4), ji				// ji    = ji*5 // but we get *3 like this.
-
-		leaq		(flo_jmp,jf,4), jf			// jf = flo_jmp + jf*4
+		leaq		(ji,ji,4), ji				// ji = ji*5
 		leaq		(int_jmp,ji,4), ji			// ji = int_jmp + ji*4
 
-		jmpq *jf
+		sarq		$6, jf						// jf = (DATA>>6)&31
+		andq		$31,jf 
+		leaq		(jf,jf,4), jf				// jf = jf*5 // leaq can only multiply by pow2
+		leaq		(flo_jmp,jf,4), jf			// jf = flo_jmp + jf*4
 
-		nop
+		jmpq		*jf
+
+		.balign 4
 	
-	// floats need different instructions?
 	.F7:								// q7 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q7	
+        movaps (RegFile, xtemp), q7	
 			
 	.F6:								// q6 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q6
+        movaps (RegFile, xtemp), q6
 
 	.F5:								// q5 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q5
+        movaps (RegFile, xtemp), q5
 
 	.F4:								// q4 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q4
+        movaps (RegFile, xtemp), q4
 
 	.F3:								// q3 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q3
+        movaps (RegFile, xtemp), q3
 
 	.F2:								// q2 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q2
+        movaps (RegFile, xtemp), q2
 
 	.F1:								// q1 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q1
+        movaps (RegFile, xtemp), q1
 
 	.F0:								// q0 = r[(data&31) << 4]; data >>= 5;
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movaps (RegFile,x0), q0
+        movaps (RegFile, xtemp), q0
 	
-	jmpq *ji
-	nop;nop;nop;nop
-	nop;nop;nop;nop
-	nop;nop;nop;nop
-	nop;nop;nop;nop
-	nop
+	.FCAP:
+		jmpq *ji
+		.balign 4
+		nop;nop;nop;nop
+		nop;nop;nop;nop
+		nop;nop;nop;nop
+		nop;nop;nop;nop
+
+	.I7:
+		nop;nop;nop;nop					// Speedie disallows over 6 ints/ptrs passed per func
+		nop;nop;nop;nop					// None of the lib funcs needed 7 anyhow.
+		nop;nop;nop;nop					// SystemV (Linux/MacOSX) only allows 6 ints to be passed directly.
+		nop;nop;nop;nop					// Windows would need to use the stack. Sigh. 
+		nop;nop;nop;nop 
+					
+	.I6:
+		nop;nop;nop;nop
+		nop;nop;nop;nop
+		nop;nop;nop;nop
+		nop;nop;nop;nop
+		nop;nop;nop;nop 
+	
 	// INTEGERS //
-	.I7:								// x7 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
-        sarq $5, DataPrm
-        movq (RegFile,x0), x5					// Perhaps we cannop these out...
-
-	.I6:								// x6 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
-        sarq $5, DataPrm
-        movq (RegFile,x0), x5
-
 	.I5:								// x5 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp // these 3 x0 instructions could be done with leaq?
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movq (RegFile,x0), x5
+        movq (RegFile, xtemp), x5
+		.balign 4
 
 	.I4:								// x4 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movq (RegFile,x0), x4
+        movq (RegFile, xtemp), x4
+		.balign 4
 
 	.I3:								// x3 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movq (RegFile,x0), x3
+        movq (RegFile, xtemp), x3
+		.balign 4
 
 	.I2:								// x2 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movq (RegFile,x0), x2
+        movq (RegFile, xtemp), x2
+		.balign 4
 
 	.I1:								// x1 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movq (RegFile,x0), x1
+        movq (RegFile, xtemp), x1
+		.balign 4
 
 	.I0:								// x0 = r[(data&31) << 4]; data >>= 5;
-		nop								// 1 byte spacer
-		movq DataPrm, x0
-		andq $31,x0
-        salq $4, x0
+		movq DataPrm, xtemp
+		andq $31, xtemp
+        salq $4, xtemp
         sarq $5, DataPrm
-        movq (RegFile,x0), x0
+        movq (RegFile, xtemp), x0
+
+	.ICAP:
+
 
 /*			// **STACK MANAGEMENT HERE**
 		stp     fp, lr, [sp, -32]!			// save fp and lr 
 		mov     fp, sp						// fp = sp
-		stp     dest, xzr, [sp, 16]
 
 	// branch
 		tbnz    DataPrm, 11, .SIMD_Return
 	
 	.Int_Return:
 		blr     _FN_						// call fn... so we can store in x0
+*/
+		pop		dest ///
+/*
 		ldp     dest, xzr, [sp, 16]
 		ldp     fp, lr, [sp], 32			// restore fp/lr
 
@@ -244,12 +257,12 @@
 		
 	.SIMD_Return:
 		blr     _FN_						// call fn, so we can store in q0
+		pop		dest ///
 		ldp     dest, xzr, [sp, 16]
 		ldp     fp, lr, [sp], 32			// restore fp/lr
 		
 		str     q0, [dest]
 */
-#endif
 		ret
 
 #endif

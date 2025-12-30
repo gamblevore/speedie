@@ -26,14 +26,6 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 	rz |= i
 
 
-
-//function QuickPrmBuild (|$int| j, |int64| P, |asmreg| Dest, |int64|)
-//	|int64| v = Dest.reg
-//	|| i = ++j
-//	P  |=  v << (64-(i*5))
-//	return P
-
-
 function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	opt norefcounts
 	
@@ -60,6 +52,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	rz >>= 64-((n*5)+12)
 	if fc>8 or ic>8			// hmmm
 	rz |= fn.ASMReturn.SpecialReg << 11
+//	if fn == "JB_Str_FindCharset"
 	if fc
 		rz |= (8-fc) << 6
 		rz |= (8-ic) << 0
@@ -161,6 +154,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 			if !fn.islibrary or !.state.fn.islibrary
 				error (exp, "Missing PackID[1]")
 			tableid = 0xFFFF
+		
 	  else // function pointers
 		|| f = exp.first!
 		TableID = .µ(f).Reg

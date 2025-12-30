@@ -102,6 +102,7 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 		check (r isnt Reference) (r.source, "Only parameters can be references")
 
 
+
 function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls,  |bool|)
 	opt norefcounts
 	real self
@@ -132,18 +133,22 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 			check (!dcl.StatedReal) (self, "Can't be both real and nil!")
 		dcl.NilDeclared = nilstate.optional
 
-
-	func.args <~ dcl
-	check (func.args <= 8)    (self, "Too many parameters defined. (8 max)")
 	if !dcl.type.isstruct
 		check (dcl.name ~!= "rz") (self, "Using reserved name.")
+	
 	if dcl.name
+		func.AddTypeInfo(dcl)
 		(dcl is Param)
 	  else
 		(dcl is return)		// This is for struct returns, right? which are always params.
 	(dcl isnt Altered)		// SCDecl defaults as being altered... not sure why.
 	(dcl isnt NumberConst)
-	func.AddTypeInfo(dcl)
+
+	func.args <~ dcl
+	if func.IsLibrary
+		check (func.IntPrmCount <= 6)    (self, "Too many int/ptr/obj params, 6 max for lib funcs.")
+	check (func.args <= 8)  			 (self, "Too many parameters defined. (8 max)")
+
 	return true
 
 
@@ -251,7 +256,6 @@ function Message.CollectFromBody (|SCNode| Name_space)
 		StructStuff.DelayedFix
 		|| def = dcl.Default
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
-		.TryAddBareStruct(name_space, dcl)
 
 	
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
@@ -307,7 +311,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		FuncPrmz.ReturnType = dcl			// we need the copy
 		if !dcl.isbarestruct or funcprmz is constructor
 			(dcl is return)
-			funcprmz.AddTypeInfo(dcl)
+//			funcprmz.AddTypeInfo(dcl)
 			return nil
 
 		(dcl is ReturnedStruct)

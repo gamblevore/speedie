@@ -1,14 +1,5 @@
 
 
-function scfunction.BumpStruct (|scdecl| D)
-	|| qq = d.SizeOfQuery
-	|| al = d.Alignment
-	|| stack = .StackAllocGuess
-	stack = stack.AlignUp(al)
-	stack += qq
-	.StackAllocGuess = stack
-	
-	
 function scdecl.CanRemoveArgOnReturn (|message| r, |bool|)
 	opt norefcounts
 	if !self: return true
@@ -64,7 +55,8 @@ function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
 	|| ft = .StructReturned
 		incoming.StructReturner(ft.AsLocal, self)
 	  elseif .returntype is ReturnedStruct			// remove this? its always the prev?
-		incoming.StructExtract(.ReturnType)
+		error (self, "StructExtract function is missing")
+		//incoming.StructExtract(.ReturnType)
 	return self
 
 
@@ -88,7 +80,7 @@ function scparamarray.StructExtract (|scdecl| type)
 
 function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 	opt norefcounts
-	|| s = .exp								#require
+	|| s = .exp											#require
 	|| Rel = s.UseNonRefChangers(True)
 	|| f = Rel.func
 
@@ -121,8 +113,7 @@ function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 				dcltype.become(@thg, type.type.name)
 			dcl.next = s
 			|| struct = type.internal!.CreateStructNil(name)
-			|| Rel2 = Neweqrel(name, struct) 
-			dcl <~ rel2
+			dcl <~ NewEqRel(name, struct) 
 		  else
 			op.become(@bra)
 			op.obj = nil
@@ -134,7 +125,7 @@ function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 		if fn.StructReturnPos==1
 			prm.first = Rel
 		  else
-			prm.last = rel
+			prm.last = Rel
 		prm.func = @prm
 		Rel.become(@brel, "&")
 		Rel.obj = type
@@ -167,12 +158,3 @@ module StructStuff
 				s.obj = orig.obj
 		.FixMe.clear
 	
-
-function message.TryAddBareStruct (|scnode| name_space, |scdecl| dcl)
-	opt norefcounts
-	require dcl.IsBareStruct
-	|| fn = name_space.OwningFunc
-//		if ++fn.barestructs > 1
-//			printline self
-		fn.BumpStruct(dcl)
-
