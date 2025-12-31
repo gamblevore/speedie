@@ -991,7 +991,7 @@ function scnode.AddNumericConst (|string| name, |int64| value, |message| where, 
 	opt norefcounts
 	|| SyxConst = SCDecl(TypeSyntax!)
 	Compiler.NewConst(SyxConst)
-	NewDeclNum( SyxConst, value, name )
+	NewDeclNumConst( SyxConst, value, name )
 	.TryAdd( where, SyxConst, SyxConst.Name )
 	return syxconst
 

@@ -1373,10 +1373,11 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex)
 		if rn.isint 
 			n = rn.int
 	
-	  elseif (rn == @thg) and (rt is NumberConst) and rt.IsNormalNumber and rt.isinteger
+	  elseif (rt is NumberConst) and rt.IsNormalNumber and rt.isinteger
 		n = rt.ExportPosition
-		
+	
 	if n
+		WasHex |= rt.WasHex
 		|| Bad = .ConstInRangeSub(n, washex)
 			error (RN, "Loses numeric info: $n is beyond $bad")
 
@@ -1396,10 +1397,10 @@ function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |
 	if rc.isnil
 		return true
 	if  .IsCArray  or  rc.IsCArray
-		expect  (.c_array == rc.c_Array) (rn, "Sizes don't match")
+		expect  (.c_array == rc.c_Array)				 (RN, "Sizes don't match")
 		if rn in @sheb
-			return true						// ignore it:  x = {a,b,c}
-		error (rn, "Not assignable.")
+			return true									 // ignore it:  x = {a,b,c}
+		error											 (RN, "Not assignable.")
 
 	if rc is const
 		.ConstInRange(RN, rc, washex)
@@ -1807,7 +1808,7 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	return fn2
 
 
-function NewDeclNum (|SCDecl?| D, |int64| N, |string| VarName="", |bool| Shifts=false, |Message!|)
+function NewDeclNumConst (|SCDecl?| D, |int64| N, |string| VarName="", |bool| Shifts=false, |Message!|)
 	opt norefcounts
 	if !D
 		d = scdecl(typeint!)

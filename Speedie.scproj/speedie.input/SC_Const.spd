@@ -194,7 +194,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 		if (line == @Thg) // default numeric constant
 			using (line)
 			NewItem = SCDecl(typeint!)
-			|| NewNum = NewDeclNum( NewItem, NextNum, line.name, true )
+			|| NewNum = NewDeclNumConst( NewItem, NextNum, line.name, true )
 			newitem.source = line
 			if (ch == "flags")
 				LastFlag++
@@ -203,8 +203,8 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				NextNum++
 
 			if currtype
-				currtype.AssignabilityCheck(nil, newnum, currtype)
 				currtype.copytypeinfoto(newitem)
+				newitem.AssignabilityCheck(nil, newnum, newitem)
 			
 		  elseif line == @bra
 			nextnum = .CalculateConst(line.first!)
@@ -223,7 +223,8 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				|| WasHex = ValueNode.Name[0, "0x"] or ValueNode.Name[0, "0b"]
-				NewType.AssignabilityCheck(nil, ValueNode, OMGType, WasHex)
+				newitem.washex = washex
+				NewType.AssignabilityCheck(nil, ValueNode, OMGType, washex)
 				nextnum = valuenode.int
 				if WasHex and (nextnum >= 0x8000_0000 and nextnum <= 0xFFFF_FFFF) and !currtype // hmmm lets see.
 					error (ValueNode, "Unclear what type to use here. Use |int| or |int64| to specify")

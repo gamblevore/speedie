@@ -96,7 +96,7 @@ function Message.InBuiltTypeOf (|scdecl| dcl, |message|)
 
 function Message.InBuiltSizeOf (|scdecl| sulf, |message|)
 	opt norefcounts
-	return NewDeclNum(SCDecl(TypeInt!), sulf.SizeOfQuery)
+	return NewDeclNumConst(SCDecl(TypeInt!), sulf.SizeOfQuery)
 
 
 function TypeOfQues (ExprResolver)

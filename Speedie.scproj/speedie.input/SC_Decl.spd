@@ -134,6 +134,7 @@ class SCDecl (SCObject) {
 	|byte|				DepthOfBranch
 	|byte|				DepthOfLoop
 	|bool|				Suffers
+	|bool|				WasHex
 	|DeclAlterable|		mu							// The ASM can alter these, and needs to restore them too.
 
 	
@@ -1288,10 +1289,10 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 		return .msg
 
 	rz = @rel.msg
-	rz <~ newdeclnum(nil, 1)
+	rz <~ NewDeclNumConst(nil, 1)
 	|| op = rz.msg(@opp, "<<")
 	op.obj = SCOperator.lookup(op) 
-	rz <~ NewDeclNum(nil, .Log2)
+	rz <~ NewDeclNumConst(nil, .Log2)
 
 
 function @scdecl.Sorter (SorterComparer of scdecl)
