@@ -1,6 +1,6 @@
 
 
-libinternal textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
+function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
 	|| l = func_name.position
 	|| a = func_name.after 
 	if prms and prms != @arg
@@ -9,7 +9,7 @@ libinternal textview.RangeCheck (|int| r, |message| func_name, |message| prms, |
 	return r in (l, a) // allow a little lee-way
 	
 
-libinternal Message.IsTextFuncLike (|bool|)
+function Message.IsTextFuncLike (|bool|)
 	opt norefcounts
 	|| fn = .owningfunc(true)
 		return false
@@ -360,7 +360,7 @@ function textview.PerryDeclKey (|bool|)
 
 
 
-libinternal String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind|)
+function String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind|)
 	while
 		if .CharMode(start) == ' '
 			0
@@ -371,7 +371,7 @@ libinternal String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true, 
 		start += fwd.dir
 
 
-libinternal message.IsInAProperTmp (|bool|)
+function message.IsInAProperTmp (|bool|)
 	opt norefcounts
 	real self
 	while

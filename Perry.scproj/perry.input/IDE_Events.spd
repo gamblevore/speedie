@@ -24,15 +24,13 @@ function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)
 	.editme.AddErrorToLine(err)
 
 
-function perry.IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initide
+function perry.IdeAddProj (|string| Path, |PerryIDE!|) // initide
 	|| old = perry.FindProj(path)
-		ClickedTabs(nil, old)
 		|| o = old.ide
+			ClickedTabs(nil, old)
 			return o
-	ide ?= PerryIDE.EmptyBase
-	ide ?= PerryIDE(path.file)
-	ide.LoadProject
-	return ide
+//	ide ?= PerryIDE.EmptyBase
+	return PerryIDE(path.file)
 
 
 function string.TrimCodeExt (|string|)

@@ -1,6 +1,6 @@
 
 
-libinternal message.list_desired (|int| common, |string|)
+function message.list_desired (|int| common, |string|)
 	rz = .firstname[0, Common]
 	if self == rz
 		rz = "" // oof

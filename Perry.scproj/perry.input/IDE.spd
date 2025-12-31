@@ -367,7 +367,7 @@ class PerryIDE (Window)
 		GUI.Title = .id
 
 
-	libinternal UpdateSearchSwap (|textview|)
+	function UpdateSearchSwap (|textview|)
 		opt norefcounts
 		require .isfront
 		|| E = .inline.editor
@@ -553,7 +553,7 @@ class PerryIDE (Window)
 		require !f.exists
 		.CanAskingAboutMissing = false
 		
-		if ("Project "+f.name+" can't be found on the file-system anymore.\n\nWould you like to close it?").confirm
+		if ("Project "+f.name+" isn't on the file-system anymore.\n\nWould you like to close it?").confirm
 			.close
 			rz = true
 		  elseif .IsSingleFileProject
@@ -569,7 +569,7 @@ class PerryIDE (Window)
 		return true
 
 	
-	libinternal CmdKey (|keys| key, |bool|)
+	function CmdKey (|keys| key, |bool|)
 		if key is f
 			if .masssearchfield.hasfocus
 				.PrevView.Click?
@@ -767,21 +767,16 @@ class PerryIDE (Window)
 			rz.LoadProject
 			rz.EditMe.SetFocus
 		
-		
-		function EmptyBase (|perryide|)
-			opt norefcounts
-			for w in window.all
-				if w isa perryide
-					if !w.root
-						return w
-	
 	
 		function PerryOpenDoc (GUIPasteEvent)
 			|| i = .ide?
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)
-				i ?= perry.IdeAddProj(data, nil)
+				if !i
+					i = perry.IdeAddProj(data)
+					if purpose is CreateFile
+						i.CanAskingAboutMissing = false
 			return i.OpenDoc(data)
 
 

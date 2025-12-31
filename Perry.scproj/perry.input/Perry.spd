@@ -50,19 +50,23 @@ module Perry
 		app.prefs["colors"] = ¥.savecolors.parse
 
 	
-	libinternal ClearBadProj
-		for proj_item in .projects
+	function CleanProjectList
+		opt norefcounts
+		|| P = .Projects
+		for proj_item in P
 			if !proj_item.name.FileExists
 				proj_item.Remove
+		if !P.HasAny
+			P <~ .FindStartingExample
 	
 	
-	libinternal StartFile (|string| Fol, |string| Name, |bool| Force = false, |message|)
+	function StartFile (|string| Fol, |string| Name, |bool| Force = false, |message|)
 		|| path = .StartFileStr(fol, name, force)
 			rz = @tmp + path
 			rz.msg(@str, path.name)
 	
 	
-	libinternal StartFileStr (|string| Fol, |string| Name, |bool| Force,  |string|)
+	function StartFileStr (|string| Fol, |string| Name, |bool| Force,  |string|)
 		|| s = file.SpeedieDir
 		if fol
 			s = s.Child(Fol)
@@ -75,22 +79,19 @@ module Perry
 				return f
 				
 
-	libinternal FindStartingExample (|message|)
+	function FindStartingExample (|message|)
 		rz  = .StartFile("Examples", "banana_count.spd")
 		rz ?= .StartFile("Examples", "")
 		rz ?= .StartFile("GameExamples", "")
 		rz ?= .StartFile("", "Perry.scproj")
 		rz  = .StartFile("Examples", "banana_count.spd", true)
-		
-	libinternal LoadWindowsSub
-		.clearbadproj
-		
-		if !.Projects.HasAny
-			.Projects <~ .FindStartingExample
+	
+	
+	function LoadWindowsSub
+		.CleanProjectList
 		for proj_item in .projects
 			|| proj = proj_item.name.file
-			|| r2 = PerryIDE(proj)
-			r2.Loadproject
+			PerryIDE(proj)
 			startupwindow.hide
 
 
@@ -130,6 +131,7 @@ module Perry
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
 		
+
 		if !.LoadWindowsFromArgs
 			.Projects = app.prefs["lastproj", @arg]|listviewrow|
 			.LoadWindowsSub
@@ -153,7 +155,7 @@ module Perry
 					return w
 
 
-	libinternal string.ProjCleanName (|string|)
+	function string.ProjCleanName (|string|)
 		rz = .name
 		while rz endswith "()"
 			rz = rz[0, rz.length-2]

@@ -638,7 +638,7 @@ extend PerryIDE
 		(rz is aligncenter)
 
 
-	libinternal LogOneThing (|message| msg, |string| type, |listviewrow| m)
+	function LogOneThing (|message| msg, |string| type, |listviewrow| m)
 		opt norefcounts
 		m <~ @emb + (type + msg.render)
 		m.position++ 
@@ -714,11 +714,11 @@ extend PerryIDE
 		
 		
 	function LoadProject (|bool|)
-		require .project.mustexist("load project")
+//		require .project.mustexist("load project")
 		.DuringLoad++
 		.StartFileList
 		.DuringLoad--
-		require .StartProj
+		.StartProj
 
 		StartupWindow.hide
 		.viewasproject
@@ -810,18 +810,20 @@ extend PerryIDE
 		return projfol
 	
 	
-	function StartProj (|bool|)
+	function StartProj
 		opt norefcounts
 		|| projfol = .MainProjFol
-			projfol.dirfile = ".todo"
-			.findnottodo
-			(projfol is expanded)
-			|| pos = 0
-			|| file = .DesiredStart(projfol, pos)
-				.EditRow(file)
-				.EditMe.ShowAndSelect(pos)
-			return true
-		return .EditRow(.filelist.start)
+		if !projfol
+			.EditRow(.filelist.start)
+			return 
+		
+		projfol.dirfile = ".todo"
+		.findnottodo
+		(projfol is expanded)
+		|| pos = 0
+		|| file = .DesiredStart(projfol, pos)
+			.EditRow(file)
+			.EditMe.ShowAndSelect(pos)
 
 
 	function PerryFile (|file!|)
