@@ -1,10 +1,9 @@
 
 
-datatype CopyPasteFlags (Byte)
+datatype CopyPasteFlags (uint16)
 	// how to totally inline this class?
 	linkage
 		cpp_part CPF
-		libinternal
 	Flags
 		|CopyPasteFlags| 
 		// Important to have copyfile and pastefile being separate.
@@ -13,13 +12,14 @@ datatype CopyPasteFlags (Byte)
 		Paste = [PasteFile, PasteText, PasteImage, PasteNode]
 		PasteTextLike = (PasteText|||PasteFile)
 		CreateFile
-	function CanCopy (|CopyPasteFlags|)
+	inline CanCopy (|CopyPasteFlags|)
 		return self&Copy
-	function CanPaste (|CopyPasteFlags|)
+	inline CanPaste (|CopyPasteFlags|)
 		return self&Paste
-	function CanPasteInto (|CopyPasteFlags| dest, |bool|)
+	inline CanPasteInto (|CopyPasteFlags| dest, |bool|)
 		return (dest >> 4) & (self&copy)
 	syntax is (|CopyPasteFlags| v, |bool|)
+		inline
 		return self & v
 
 
