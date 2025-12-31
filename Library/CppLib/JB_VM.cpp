@@ -211,8 +211,8 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
 void	JB_ASM_Pause		(CakeVM* V)								{}
-int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value)			{}
-int		JB_ASM_Index		(CakeVM* V, u32* Code)					{}
+int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value)			{return 0;}
+int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
 void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}
 u32*	JB_ASM_Code			(CakeVM* V, int Length)					{return 0;}
