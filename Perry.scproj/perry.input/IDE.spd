@@ -113,26 +113,21 @@ class PerryIDE (Window)
 
 	function Closed (|bool|)
 		opt norefcounts
-		|| proj = .SharedProjectTabSource
-		if proj and !gui.isquitting
-			proj["pos"] = .editme.SelRange.x
-			Perry.save
-	
+		if !gui.isquitting
 			|| p = .prev
-			if p isa perryide
-				p.showide
-			.clear
+			while p
+				if p isa perryide
+					p.showide
+					exit
+				p = .prev
+			|| proj = .SharedProjectTabSource
 			if perry.HasOthers(proj)
 				.RemoveProjFromList
-//			  else // the gui doesn't like this. it should be OK but leave it for now.
-//				StartupWindow.Show
-//				besides we would have asked to quit, perhaps.
-			
-//			if .refcount > 1
-//				Memory.PrintLeaks(self)
+		.clear
 		return true
 
-	function Perry.hasOthers (|listviewrow| F, |bool|)
+
+	function Perry.HasOthers (|listviewrow| F, |bool|)
 		opt norefcounts
 		for w.fast in .Projects
 			if w != f
@@ -502,10 +497,6 @@ class PerryIDE (Window)
 	
 	
 	behaviour FrameStep // perframe, eachframe, onframe
-//		for w in Window.all
-//			if w isa PerryIDE
-//				if w.ProjectTabs.ButtonSource != Perry.Projects
-/// hmmm
 		.ProjectTabs.TrimWidth
 		if GUIactive
 			.SaveMemory
@@ -949,6 +940,7 @@ So anything not 0 means "its OK"`
 			if !.DuringLoad
 				it["edit"] = r.location
 			it["pos"] = doc.Position
+			perry.save
 
 		return 1
 

@@ -43,11 +43,10 @@ module Perry
 	
 	
 	function Save
-		visible
-		// huh? delteing the "¥" causes it to not compile.
-		// thats at least two errors
-		// one in perry and one in jeebox.
-		
+		app.prefs.save
+	
+	
+	function UpdateColors
 		app.prefs["colors"] = ¥.savecolors.parse
 
 	

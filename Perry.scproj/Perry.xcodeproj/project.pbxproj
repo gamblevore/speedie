@@ -205,6 +205,8 @@
 		ACB529BC2EE9E6C700D6524D /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */; };
 		ACB529BD2EE9E6CA00D6524D /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC66D1592ED1D6DA00EDFB82 /* JB.cpp */; };
 		ACB529C02EE9EFF100D6524D /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC12961F9B2005EFB9D /* JB_Main.cpp */; };
+		ACC38E772F0580BD00E6BE6C /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */; };
+		ACC38E782F0580C000E6BE6C /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */; };
 		ACE989EC2EF043BF00526C32 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */; };
 		ACE989ED2EF043BF00526C32 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */; };
 		ACE989EE2EF043BF00526C32 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */; };
@@ -906,6 +908,7 @@
 				AC13B25A2EE1E77300BF1567 /* JB.cpp in Sources */,
 				AC13B25B2EE1E77300BF1567 /* JB_MSR.cpp in Sources */,
 				AC13B25C2EE1E77300BF1567 /* JB_BasicIO.cpp in Sources */,
+				ACC38E782F0580C000E6BE6C /* FF_Intel.S in Sources */,
 				AC13B25D2EE1E77300BF1567 /* JB_DirReaderUnix.cpp in Sources */,
 				AC13B25E2EE1E77300BF1567 /* JB_Pico.cpp in Sources */,
 				AC13B25F2EE1E77300BF1567 /* JB_Math.cpp in Sources */,
@@ -924,6 +927,7 @@
 				AC13B26C2EE1E77300BF1567 /* JB_List.cpp in Sources */,
 				AC13B26D2EE1E77300BF1567 /* JB_Run.cpp in Sources */,
 				AC13B26F2EE1E77300BF1567 /* JB_DirReaderWin32.cpp in Sources */,
+				ACC38E772F0580BD00E6BE6C /* FF_ARM64.S in Sources */,
 				AC13B2702EE1E77300BF1567 /* JB_File.cpp in Sources */,
 				AC13B2712EE1E77300BF1567 /* JB_Array.cpp in Sources */,
 				ACE989EE2EF043BF00526C32 /* JB_Dylib.cpp in Sources */,
