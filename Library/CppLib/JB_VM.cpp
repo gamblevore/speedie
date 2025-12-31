@@ -79,8 +79,8 @@ static void * const GlobalJumpTable[] = {
   
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
-	if (Op == 1)
-		goto EXIT;
+//	if (Op == 1)
+//		goto EXIT;
 	Op = *Code++; // spelled out for debug
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
@@ -182,7 +182,7 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 }
 
 
-static ivec4* VM_Run (CakeVM& V, int CodeIndex) {
+AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
 	V.Registers[2] = {};
 	V.EXIT[0] = 1;
@@ -203,7 +203,7 @@ static ivec4* VM_Run (CakeVM& V, int CodeIndex) {
 
 
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
-	return VM_Run(*V, Code); // i can't stand pointer syntax.
+	return JB_ASM_Run_(*V, Code); // i can't stand pointer syntax.
 }
 #else
 

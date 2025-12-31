@@ -845,8 +845,8 @@ datatype ASM_Div2 (ASM) {
 			|asm| rz = .op|asm| << 24
 			rz.r1 = .prms[0]
 			rz.r2 = .prms[1]
-			rz.Div2_Sh = .prms[2]
-			rz.Div2_Clear = .prms[3]
+			rz.Div2_Clear = .prms[2]
+			rz.Div2_Down = .prms[3]
 			rz.Div2_L = .prms[5]
 			if curr < after {
 				curr++[] = rz

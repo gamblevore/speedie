@@ -23,12 +23,12 @@
 
 #ifdef __x86_64__
 
-	/*** Nativeize (u64 Data, void* FN, Register* R, int N) ***/
+	/*** __CAKE_BRIDGE__ (u64 Data, void* FN, Register* R, int N) ***/
 	.text
-	.global _Nativeize
+	.global ___CAKE_BRIDGE__
 	.balign 4
 
-	_Nativeize:
+	___CAKE_BRIDGE__:
 		// Volatile:  RDI, RSI, RDX, RCX, R8,  R9,    ...  R10, R11, RAX
 		// Saved:     RBX, R12, R13, R14, R15
 		// Stack:	  RBP, RSP

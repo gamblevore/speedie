@@ -283,13 +283,13 @@ function message.DIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |
 }
 
 
-function message.DIV2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Sh = nil, |int| Clear = nil, |&fatasm|) {
+function message.DIV2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Clear = nil, |int| Down = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.DIV2, self)
 	rz.reginput(1) = r2
-	rz.numinput(2) = Sh
-	rz.numinput(3) = Clear
+	rz.numinput(2) = Clear
+	rz.numinput(3) = Down
 	rz.dest(0, r1, a)
 }
 

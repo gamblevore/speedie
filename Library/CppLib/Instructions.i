@@ -63,12 +63,7 @@
 ı DIV:;
 	DivMath(r, Op);
 ı DIV2:;
-	if (i2 < 0)
-	i1 = (((i2 + ((1 << Div2_Shu) - 1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
-;
-	else
-	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
-;
+	i1 = Div2(i2, Div2_Clearu, Div2_Downu);
 ı ICLM:;
 	i1 = std_clamp(btc(i2), btc(i3), btc(i4));
 ı UCLM:;

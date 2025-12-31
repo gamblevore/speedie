@@ -7,6 +7,13 @@ typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
 
 
+AlwaysInline int64 Div2 (int64 V, int Clear, int Down) {
+	int64 Sign = V < 0;
+	Sign = (Sign << Down) - Sign;
+	V = (V << Clear) >> Clear;
+	return (V + Sign) >> Down;
+}
+
 AlwaysInline void DivMath(VMRegister* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
@@ -644,7 +651,7 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
 
-extern "C"  __attribute__((sysv_abi))   void  Nativeize (u64 data, Fn0 fn, VMRegister* r, int64 n);
+extern "C"  __attribute__((sysv_abi))   void  __CAKE_BRIDGE__ (u64 data, Fn0 fn, VMRegister* r, int64 n);
 
 AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
@@ -657,21 +664,7 @@ AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, 
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
-	return Nativeize(funcdata, fn, r, n1);
-}
-
-
-AlwaysInline void ForeignFunc2 (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
-	auto T = ForeignFunc_Tableu;
-	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
-	if (fn) {
-		Nativeize(funcdata, fn, r, n1);
-		JB_Incr(r[n1].Obj);
-		return;
-	}
-	
-	debugger;
-	r[n1] = {}; // ugh
+	return __CAKE_BRIDGE__(funcdata, fn, r, n1);
 }
 
 

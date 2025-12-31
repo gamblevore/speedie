@@ -28,12 +28,12 @@
 #endif
 
 #ifdef __realarm64__
-	/*** Nativeize(u64 DATA, void* FN, Register* R, int n) ***/
+	/*** __CAKE_BRIDGE__(u64 DATA, void* FN, Register* R, int n) ***/
 	.text
-	.global _Nativeize
+	.global ___CAKE_BRIDGE__
 	.balign 4
 
-	_Nativeize:								
+	___CAKE_BRIDGE__:								
 		r		.req x15
 		inj		.req x14
 		flj		.req x13

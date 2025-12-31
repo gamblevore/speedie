@@ -201,12 +201,12 @@
 #define   AddAK_Ki       ((( int)((Op)<<18))>>18)
 #define   AddAK_Ku       (((uint)((Op)<<18))>>18)
 
-#define   Div2_Shi       ((( int)((Op)<<18))>>26)
-#define   Div2_Shu       (((uint)((Op)<<18))>>26)
-#define   Div2_Cleari       ((( int)((Op)<<24))>>29)
-#define   Div2_Clearu       (((uint)((Op)<<24))>>29)
-#define   Div2_Li       ((( int)((Op)<<27))>>27)
-#define   Div2_Lu       (((uint)((Op)<<27))>>27)
+#define   Div2_Cleari       ((( int)((Op)<<18))>>26)
+#define   Div2_Clearu       (((uint)((Op)<<18))>>26)
+#define   Div2_Downi       ((( int)((Op)<<24))>>26)
+#define   Div2_Downu       (((uint)((Op)<<24))>>26)
+#define   Div2_Li       ((( int)((Op)<<30))>>30)
+#define   Div2_Lu       (((uint)((Op)<<30))>>30)
 
 #define   Shift_Shi       ((( int)((Op)<<23))>>23)
 #define   Shift_Shu       (((uint)((Op)<<23))>>23)
