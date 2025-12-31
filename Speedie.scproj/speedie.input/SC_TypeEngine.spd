@@ -1880,7 +1880,8 @@ function TypeOfArgArr (ExprResolver)
 				result = SCDecl(contained.type)
 			Count++
 	
-	exp.obj = result						#expect (exp, "Can't get the type of this.")
+	expect result (exp, "Can't get the type of this.")
+	exp.obj = result
 	result = result.GetCArray(Count)
 	Tran_ArgArray(exp, name_space, result)
 	return result

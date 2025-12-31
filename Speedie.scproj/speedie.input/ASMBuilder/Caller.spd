@@ -69,7 +69,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	.ASMReach(fn)
 	|| vd = .VDecls
-	|| v = vd.log2
+	|| v = vd.log2					// we can't use .declareme, .log2 is used to protect the vars. 
 	|| diff = (!v or dest.reg != v)
 	v += diff
 	

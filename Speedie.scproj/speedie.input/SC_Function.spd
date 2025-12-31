@@ -1129,6 +1129,7 @@ function FixCnjSub (|Message| exp)
 	// lets fix it, if its in a rel, (it shouldn't be)
 	// || x = a #require   -->   || x = (a #require)
 	|| nxt = ch.next!
+	
 	if (ch == @Rel) and (exp in @arg or @Decl) and (ch.second!.name == "=")
 		expect  (ch.first!.IsAssignable)   (exp, "Use brackets here, like this: “($ch) #${name}”")
 		
@@ -1174,29 +1175,7 @@ function FixCnjSub (|Message| exp)
 		pp = ch.NiceParent!
 		|| Done = false
 		
-		// this is actually an error:
-		/*
-			|| GlobalObj = nil
-			function abc
-				|| s = GlobalObj #require
-				|| x = s.RefCount
-		*/
-
-		// we don't know the type of GlobalObj yet.
-		// It could be a global object/pointer.
-		// we'd have to delay until we actually want the type of the cnj.
-		// thats going to be a pain.
-		// we'd need a typeofcnj and do it then.
-		// but I'm assuming some other code will fail...
-		
-		if ((ch.UnBra == @thg)) or ((pp == @arg) and !CreatesError)
-			thg = ch.copy!
-			if (pp == @arg)
-				RemoveMe = ch // i think so...
-			pp = ch.UpToArg!
-			UsePrev = true
-			Done = 1
-		  elseif (pp.IsSetRel and pp.first == @thg)			
+		if (pp.IsSetRel and pp.first == @thg)			
 			// || word = (a.b[c] #require)
 			|| IsDecl = (pp in @Decl)
 			if isdecl or (name != "loop")
@@ -1204,6 +1183,13 @@ function FixCnjSub (|Message| exp)
 				Thg = @Thg + pp.first!.name
 				if IsDecl
 					pp = pp.Parent!
+		  elseif ((ch.UnBra == @thg)) or ((pp == @arg) and !CreatesError)
+			thg = ch.copy!
+			if (pp == @arg)
+				RemoveMe = ch // i think so...
+			pp = ch.UpToArg!
+			UsePrev = true
+			Done = 1
 			
 		if !Done
 			// func( item isa SyxItem #require ) -->

@@ -848,12 +848,14 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 				if (item_value != @arg)
 					item_value = item_value.wrapwith(@arg.msg)
 				
-				if item_name #check (I, "Missing name")
+				if item_name
 					// create a function...
 					if !newname
 						NewName = name + "_" + item_name.CollectFuncTableName
 						msg.CollectionPlace <~ ArgToFunc( NewName, @Thg+ protoName, item_value )
 					I.msg(@brel, "&") <~ (@Thg, NewName)
+				  else
+					error (I, "Missing name")
 			
 			|| iname = i.name
 			if  (i == @tmp) and table_name // why would this be nil?

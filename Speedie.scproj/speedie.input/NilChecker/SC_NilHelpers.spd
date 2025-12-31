@@ -1,12 +1,4 @@
-/*
-	OK, how to redesign function pointers
-	
-	So... they should always be pointers, right?
-	
-	even the original? the original just happens to be a "real" pointer, but otherwise they should be
-	declared as optional... at least as a param. Or just be realish like normal pointers... basically.
-	
-*/
+
 
 extend Message {
 
