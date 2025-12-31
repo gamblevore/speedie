@@ -1878,6 +1878,7 @@ function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 		f.func = @thg
 		f.clear
 	|| StillOK = StdErr.Mark
+	.IntPrmCount = 0
 	.FuncInfo = 0
 	.TmpCounter = 0
 	.Description = ""
