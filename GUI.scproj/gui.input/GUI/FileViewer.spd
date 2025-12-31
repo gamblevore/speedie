@@ -279,8 +279,9 @@ class FileViewer (ListView)
 
 		if ToFind.length < 2
 			return 0
-		|| slah = ToFind contains '/'
-		|| which = (self, .name)(slah)
+			
+		|| HasSlash = ToFind contains '/'
+		|| which = (self, .name)(HasSlash)
 		if which contains ToFind
 			rz = 2
 			if .endswith(ToFind) and self[(self-ToFind)-1] == '.'
