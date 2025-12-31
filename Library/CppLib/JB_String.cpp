@@ -721,7 +721,7 @@ uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
 	if (!Lex) {
         do {
             S = Theo2Pos( S, FirstChar, SecondChar );
-            require (S.Length >= F.Length);
+            require (S.Length > F.Length);
             if (OffsetEquals_( S.Addr + 1, F )) {
                 return S.Addr;
             }
@@ -732,7 +732,7 @@ uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
         FirstChar = LowerCaseB(FirstChar);
         do {
             S = Theo2PosLex( S, FirstChar, SecondChar );
-            require (S.Length >= F.Length);
+            require (S.Length > F.Length);
             if (OffsetEqualsLex( S.Addr + 1, F )) {
                 return S.Addr;
             }
