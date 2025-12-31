@@ -434,10 +434,8 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		f.func = @name
 		parent = compiler.FindModuleOrClass(f, true)
 	
-	if !parent
-		debugger
-		error "noparent"
-		return nil
+	expect parent "noparent"
+
 	if parent == .AnonParent and str == .anontext
 		return fn
 	.OrigFn = fn.InsertIn(parent, src.name)

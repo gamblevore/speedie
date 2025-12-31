@@ -141,7 +141,7 @@ class StretchDivider (GuiControl)
 
 	function Collapse (|bool| soft = false)
 		opt norefcounts
-		if !.collapsed
+		if !.Collapsed
 			.start = .ActiveEnd
 			.ActiveEnd = ((.min, 0)(soft)) ~ Right
 
@@ -155,13 +155,15 @@ class StretchDivider (GuiControl)
 
 	function SlowFlip
 		if .Collapsed
-			if .min > 0 // shouldnt be possible
-				(.onshow)(self, 1)?
+			|| onshow = .onshow
+			if onshow and .min > 0 // shouldnt be possible?
+				(onshow)(self, 1)
 			  else
 				.Show
 		  else
-			if .min > 0
-				(.onhide)(self, 0)?
+			|| onhide = .onhide
+			if onhide and .min > 0
+				(onhide)(self, 0)
 			  else
 				.Collapse(true)
 
@@ -208,6 +210,11 @@ class StretchDivider (GuiControl)
 		return .parent.first
 
 	function ActiveEnd (|controlpoint|)
+		// this seems to have some kinda flaw
+		// where collapsing something on the right... expands it instead.
+		// sigh. do we need active start?
+		// i don't wanna do this now.
+		
 		opt NoRefCounts
 		|| l = .low
 			return l.sizer[2+.d]
