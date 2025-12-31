@@ -70,7 +70,7 @@ static void * const GlobalJumpTable[] = {
 	&&TRYBREAK,
 	&&PAUSE,
 };
-    if (Op > 1) {
+    if (Op) {
 		vm.OriginalJumpTable = &GlobalJumpTable[0];
 		memcpy(vm.JumpTable, GlobalJumpTable, 256*sizeof(void*));
 		memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
@@ -79,8 +79,6 @@ static void * const GlobalJumpTable[] = {
   
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
-//	if (Op == 1)
-//		goto EXIT;
 	Op = *Code++; // spelled out for debug
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
