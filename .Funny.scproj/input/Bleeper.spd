@@ -29,8 +29,10 @@ function string.Unbleep (|faststring?| fs_in=nil, |string|)
 	|byte[256]| Ugh 
 	for (c in swearword.Letters) (c2)
 		ugh[c] = c2+1
+	
 	|| i = 0
 	|| o = 0
+	
 	while (i < self) 
 		|| c = self[i++]
 		if c.IsWhite
