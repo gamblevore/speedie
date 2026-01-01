@@ -205,7 +205,10 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| it = .FileList
 		|| r = it[0]
-		return it.FindAPath("./input/", r)  ??  it.findapath("./*.input/", r) 
+		|| row = it.FindAPath("./input/", r)
+		if !row
+			row = it.findapath("./*.input/", r)
+		return row
 
 
 	behaviour AppForeGroundChange
