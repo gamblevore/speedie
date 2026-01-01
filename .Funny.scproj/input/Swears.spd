@@ -24,13 +24,13 @@ extend_module swearword
 	|bool| 							AllowSame
 	|bool| 							Print
 
-	libinternal LoadTo (|[swearword]| list, |string| s)
+	helper LoadTo (|[swearword]| list, |string| s)
 		for w in s.unbleep.Split
 			if w
 				list <~ SwearWord(w, nil|error|)
 		list.sort
 	
-	libinternal Accept (|SwearWord| a, |SwearWord| b, |bool|)
+	helper Accept (|SwearWord| a, |SwearWord| b, |bool|)
 		require a != b
 		if .AllowSame
 			require a.name[] == b.name[]
