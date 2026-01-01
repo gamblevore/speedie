@@ -53,6 +53,11 @@ module debugger
 	function StartDebug (|bool|)
 		opt norefcounts
 		|| R = .root
+		if !R
+			target debug
+				.BreakAll
+			return true
+		
 		.Vars = R[@nil, 0].name
 		|| M = R[@nil, 1]
 		.SrcMap = M.name

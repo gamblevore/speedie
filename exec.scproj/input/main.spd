@@ -8,6 +8,8 @@
 
 main
 	opt NoRefCounts	
+	expect (BeginCode) ("Can't allocate VM")
+	
 	if app._rawargs == 0
 		"Usage: ${app.filename} /path/to/spd_proj.cake
 May also pass .spd or .scproj files. They will be compiled, then run.\n"

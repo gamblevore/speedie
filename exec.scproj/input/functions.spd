@@ -11,11 +11,10 @@ role SpdFunc (message)
 	
 	function message.CopyToVM
 		opt norefcounts
-		|| Code = self
+		|| Code = .name
 		if .func == @tmp
-			Code = self[@nil]!
-		  else
-			.name = "(unnamed)"
+			|| first = self[@nil]$
+			Code = first.name
 
 		|| n    = Code.length >> 2
 		.RangeLength = n
@@ -23,7 +22,9 @@ role SpdFunc (message)
 		check  (n < 64K-1)												(Code, "ASM oversized.")
 		
 		|| dest = BeginCode + .Position
-		memory.Copy(dest, Code.name.addr, n<<2)
+		memory.Copy(dest, Code.addr, n<<2)
+		if .func != @tmp
+			.name = "(unnamed)"
 	
 
 	function Run (|&ivec4|)

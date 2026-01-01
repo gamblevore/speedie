@@ -8,17 +8,18 @@ module SpdTable
 	|&&nil|			LibFuncs = cakerun.LibFuncs
 	
 	
-	function RunMain (|int|)
+	function RunMain (|ind|)
 		opt norefcounts
-/		|| init = .funcs[1]!
 		|| main = .funcs[2]					#expect ("Missing main")
-		expect (init.Run|&int64|[] == 0)	("Init failed")
-		return main.Run|&int64|[]
+		|| init = .funcs[1]!
+		if (init.Run|&int64|[] == 0)
+			return main.Run|&int64|[]
+		error "Init failed"
 	
 	
 	function PreLoad (|message| code)
 		opt norefcounts
-/		.funcs <~ SpdFunc()							// null func
+		.funcs <~ SpdFunc()							// null func
 		|| CodeLength = 0
 				
 		for spd.fast in code
@@ -29,7 +30,7 @@ module SpdTable
 				spd.tag = .funcs.Length
 				spd.Position = CodeLength
 				.funcs <~ spd
-				CodeLength += spd.Length
+				CodeLength += spd.Length>>2
 			expect (.funcs < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
 
 		.Funcs.Shrink		
@@ -44,7 +45,7 @@ module SpdTable
  
 		.PreLoad(code)
 		for spd.fast in code
-/			spd.CopyToVM
+			spd.CopyToVM
 	
 
 	function SpdFunc.ASMStart (|&ASM|)
@@ -54,17 +55,17 @@ module SpdTable
 	
 	function Link (|&asm|)
 		opt norefcounts
-/		|| code = cake.code|&ASM|		#expect ("Can't load the code")
 		for f in .funcs
-			.currFunc = f
-			f.Link❗(code)
+			f.Link❗
 
 
-	function spdfunc.Link❗ (|&ASM| Begin)
+	function spdfunc.Link❗
 		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
-/		|| Code = .position$
-		|| Base = Begin + Code
+		|| Code = .position$
+		spdtable.CurrFunc = self
+		|| Base = BeginCode + Code
 		|| after = base + .Length
+
 		while base < after
 			|| asm = base[]
 			|| Op = asm.op
