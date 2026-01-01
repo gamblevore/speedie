@@ -95,10 +95,6 @@ function SCModule.CreateInitFuncSub (|message| init, |string| name)
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)
-		|| L = init.Last
-		if !L.hasany
-/			L.Remove // never called anymore?
-
 
 function SCModule.CreateInitFunc
 	SCNode.CurrVisibility = true
