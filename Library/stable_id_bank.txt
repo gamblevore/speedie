@@ -2609,3 +2609,5 @@ roundf
 sqrt
 sqrtf
 strlen
+JB_App__SetASMBreak
+jdb
