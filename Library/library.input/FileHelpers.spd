@@ -14,10 +14,10 @@ extend String
 		|| f = .file
 		if f.MustExist(operation)
 			return f
-		
+
 	function FileExists (|bool|)
-		|| f = .file
-		return f.exists
+		nil checker
+		cpp_wrapper JB_File_Exists
 	
 	function FileSize (|int64|)
 		|| f = .file

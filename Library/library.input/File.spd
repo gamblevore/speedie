@@ -288,9 +288,9 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		error (self, fs)
 
 	
-	function Exists (|bool|)
-		nil checker
-		cpp_wrapper JB_File_Exists
+	inline Exists (|bool|)
+		cpp_part FileExistance
+		return self|string|.fileexists
 	
 	syntax access (|string| name, |File!|)
 		inline
