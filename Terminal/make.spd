@@ -113,10 +113,6 @@ set -e
 cd ${CppLib}
 
 $GetUserName
-echo \"Compiling $LibPath for user '\$U'\"
-g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
-${unmod(LibPath)}
-
 echo \"Compiling Speedie to $SpdTerm\"
 g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
 ${unmod(SpdTerm)}
@@ -149,6 +145,16 @@ ${link(ExecTerm, `/usr/local/bin/cake`)}
 
 echo \"\"
 echo \"Build Complete.\"
+
+#better to continue if libjeebox can't be compiled
+set +e
+cd /usr/local/speedie/Library/CppLib                         # allow source to be found!
+/usr/local/bin/speedie /usr/local/speedie/jeebox.scproj -x   # regenerate libjeebox source
+echo \"Compiling $LibPath for user '\$U'\"
+g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+${unmod(LibPath)}
+set -e
+
 
 echo \"Speedie Compiling Perry (Optional Extra)\"
 $PerryPreReqs
