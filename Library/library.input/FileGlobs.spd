@@ -30,7 +30,7 @@ function string.OperatorGlobs (|string?| txt, |bool|)
 	|| textEnd = text + txt.length
 	|| wildEnd = wild + .length
 	
-	while text < textEnd
+	while text < textEnd and wild < wildend
 		|| w = (wild[]).lowercase
 		if w == '*'
 			text_backup = text
@@ -42,9 +42,16 @@ function string.OperatorGlobs (|string?| txt, |bool|)
 			wild = wild_backup
 			text = ++text_backup
 			require wild and text
-	
-	while (wild < wildEnd and wild[] == '*')
-		wild++  // ignore trailing stars
+
+	////    abc***/
+	while (wild < wildEnd)
+		if (wild[] == '*')
+			wild++									// ignore trailing stars
+		  elseif (wildend[-1] == '/')
+			wildend--
+		  else
+			exit
+		
 	return wild == wildEnd
 
 

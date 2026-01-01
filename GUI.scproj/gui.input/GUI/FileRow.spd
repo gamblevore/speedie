@@ -278,9 +278,9 @@ class FileRow (ListViewRow)
 		rz = .location.name(nameonly).FileViewMatch(path)
 		if .dirfile
 			|| r = .readfrom
-			if rz and path.last != '/' and .readfrom.file.size == 0
+			if rz and path.last != '/' and r.filesize == 0
 				rz = 0 // folder matched uselessly
-			  else
+			  elseif rz < 8
 				rz = rz max r.name(nameonly).FileViewMatch(path)
 
 	module
