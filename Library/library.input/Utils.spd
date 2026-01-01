@@ -191,13 +191,6 @@ target debug and !cake
 			printline self|message|.RenderAST
 		  else
 			"(nil)"
-	function object.DebugPrint  // more for use in XCode, than anything else.
-		cpp_name jdb
-		visible true
-		if self
-			print string.new(.class.name)
-			print ": "
-		printline .render
   else
 	function message.JDB2
 		cpp_name jdb2
@@ -206,6 +199,15 @@ target debug and !cake
 			printline .RenderAST
 		  else
 			"(nil)"
+
+
+function object.DebugPrint  // more for use in XCode, than anything else.
+	cpp_name jdb
+	visible true
+	if self
+		print string.new(.class.name)
+		print ": "
+	printline .render
 
 
 datatype FailableInt (int) // useful when you want most numbers, even negatives, and zero but still want AN error code
