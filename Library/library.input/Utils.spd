@@ -191,6 +191,13 @@ target debug and !cake
 			printline self|message|.RenderAST
 		  else
 			"(nil)"
+	function object.DebugPrint  // more for use in XCode, than anything else.
+		cpp_name jdb
+		visible true
+		if self
+			print string.new(.class.name)
+			print ": "
+		printline .render
   else
 	function message.JDB2
 		cpp_name jdb2
