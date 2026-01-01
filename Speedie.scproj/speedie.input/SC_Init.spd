@@ -87,16 +87,17 @@ function Message.AllowedMoveToInit (|bool|)
 
 
 function SCModule.CreateInitFuncSub (|message| init, |string| name)
-	|| type = "libinternal"
-	if !.islibrary
-		type = "autogen"
-	|| msg = "$type $Name (|int|)".ParseClean
+	|| type = "libinternal "
+	|| curr = scimport.curr
+	if !.islibrary or (curr and !curr.isstdlib)
+		type = "autogen "
+	|| msg = "$type$Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)
 		|| L = init.Last
 		if !L.hasany
-			L.Remove // never called anymore?
+/			L.Remove // never called anymore?
 
 
 function SCModule.CreateInitFunc

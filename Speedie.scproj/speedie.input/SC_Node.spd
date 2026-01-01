@@ -578,7 +578,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 	error ( exp, ErrMsg )
 
 
-libinternal message.ConstructorAddNil (|bool| isdot)
+helper message.ConstructorAddNil (|bool| isdot)
 	opt norefcounts
 	if isdot
 		|| p = .parent
@@ -982,6 +982,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
+	+'helper'				SCFunction.NewHelper
 	+'libinternal'			SCFunction.NewHelper
 	+'inline'				SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
@@ -1026,6 +1027,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+'api'					SCFunction.NewFunc
 	+'macro'				SCFunction.NewMacro
 	+'inline'				SCFunction.NewHelper
+	+'helper'				SCFunction.NewHelper
 	+'libinternal'			SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
 	+'behaviour'			SCBehaviour.NewActual

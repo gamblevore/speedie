@@ -14,7 +14,7 @@ function Compiler.FileSanityTests
 	B.DeleteAll
 
 
-libinternal Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
+helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 	Dest.DeleteAll
 	Src.DeleteAll
 	|| q = –SELF_TEST_NATURAL // // //

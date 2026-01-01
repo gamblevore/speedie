@@ -370,7 +370,7 @@ function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| FormEnc,  |array?| R,
 		return true
 
 
-libinternal message.VMMsgArgName (|int| i, |string|)
+helper message.VMMsgArgName (|int| i, |string|)
 	if self
 		return .name
 	return string.byte('a' + i)

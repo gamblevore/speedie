@@ -549,7 +549,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 
 
 
-libinternal Message.ACInIsa (|bool|)
+helper Message.ACInIsa (|bool|)
 	opt norefcounts
 	require (self == @thg) and .islast
 	|| p = .parent$
@@ -621,10 +621,6 @@ function SCObject.CanAutoSub (|string| search, |string|)
 		require !.noautocomplete or (.name ~= search) // is .noautocomplete == 1 allowed?
 		if (.name starts "operator")  and  !(search starts "oper")
 			return ""
-		//require .VisibleArgs // makes no sense... we don't care if the args are visible?
-							 // for some cases... yes, but not for plain autocomplete.
-							 // only for exact match
-							 // i can't remember why i added it, so just remove it :[
 	  elseif self isa scdecl
 		return .realname
 		
@@ -912,7 +908,7 @@ function SCNode.UpClass (|message| f, |SCNode|)
 		require !rz.isimport
 
 
-libinternal message.GetTypeLimiter (|message|)
+helper message.GetTypeLimiter (|message|)
 	opt norefcounts
 	require self
 	|| rel = .parent
@@ -1085,7 +1081,7 @@ function message.FoundFunc (|scfunction| f, |bool|)
 		return o.IsLookupOnly == f
 
 
-libinternal Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
+helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
 	opt norefcounts
 	rz = .originalfilepath
 	for ss.flat in self

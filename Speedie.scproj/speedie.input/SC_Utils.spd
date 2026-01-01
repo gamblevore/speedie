@@ -41,7 +41,7 @@ function Message.ListAll (|[Message]|)
 //  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
 
 
-libinternal @memory.CollectLeaks_ (|object| self, |[]|)
+helper @memory.CollectLeaks_ (|object| self, |[]|)
 	JB_FindLeakedObject(self, rz)
 
 
@@ -58,14 +58,6 @@ function @memory.PrintLeaks (|object| self)
 		debugger
 	
 
-
-function object.DebugPrint  // more for use in XCode, than anything else.
-	cpp_name jdb
-	visible true
-	if self
-		print string.new(.class.name)
-		print ": "
-	printline .render
 
 
 target debug and !cake

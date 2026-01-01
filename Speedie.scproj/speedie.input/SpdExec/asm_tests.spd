@@ -940,20 +940,20 @@ function Func27 (|message?| m)
 		printline s.name
 
 
-libinternal asm_test_add (|int| a, |int| b, |int|)
+helper asm_test_add (|int| a, |int| b, |int|)
 	cpp_name asm_test_sub
 	visible
 	|| y = 2.0
 	return ((a + b) / 2) - ((a / b) * 2)
 
 
-libinternal asm_test_func (|int| a, |int| b, |int|)
+helper asm_test_func (|int| a, |int| b, |int|)
 	cpp_name asm_test
 	visible
 	return asm_test_add(b*b, a*a)
 
 
-libinternal asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
+helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
 	cpp_name asm_test_ptr // many bugs here
 	visible
 	b[] = 0
@@ -968,7 +968,7 @@ libinternal asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
 	a.items[n] = 5|&nil|
 
 
-libinternal asm_test_largeclass (|LargeClass2| L)
+helper asm_test_largeclass (|LargeClass2| L)
 	l.a[3] = 0
 	l.a[3] = 1
 	l.b[4] = 0
@@ -979,7 +979,7 @@ libinternal asm_test_largeclass (|LargeClass2| L)
 	|| z = &l.b[5]
 
 
-libinternal jump_improvements (|int| a, |int|)
+helper jump_improvements (|int| a, |int|)
 	Rz = 1
 	|| m = message()
 	if a
@@ -990,7 +990,7 @@ libinternal jump_improvements (|int| a, |int|)
 	
 
 
-libinternal asm_test_flow (|int| a, |int| b, |int|)
+helper asm_test_flow (|int| a, |int| b, |int|)
 	cpp_name asm_test_flow
 	visible
 	if 3.CountBits == 4.CountBits

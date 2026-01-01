@@ -974,7 +974,7 @@ function FindProject (|string| Path, |File|)
 		return A
 
 	
-libinternal FindProjectSub (|string| base, |string| Path, |File|)
+function FindProjectSub (|string| base, |string| Path, |File|)
 	if (Path[] == '/')
 		return Path.FileThatExists
 	

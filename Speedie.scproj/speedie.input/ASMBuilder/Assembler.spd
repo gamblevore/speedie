@@ -295,14 +295,14 @@ struct Assembler
 	
 	
 	function Nop (|FATASM| ToNop)
-		return .NopSub(ToNop, false, 0)
+		return .nop_sub(ToNop, false, 0)
 	
 	
 	function SoftNop (|FATASM| Fat)
-		return .NopSub(fat, true, 0)
+		return .nop_sub(fat, true, 0)
 	
 	
-	libinternal NopSub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
 		if fat is temp
 			.CloseOneEarly(fat.info) // why did I comment this out? // testin speedie first?
 		|| C = .curr - 1
@@ -393,7 +393,7 @@ struct Assembler
 			C -= (C > 0)
 			f.µrefcount = C
 			if !soft and C <= 0
-				.NopSub(f, soft, depth)
+				.nop_sub(f, soft, depth)
 	
 	
 	function AskNop (|fatasm| ToNop)

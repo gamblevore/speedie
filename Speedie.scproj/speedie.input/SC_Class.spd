@@ -227,7 +227,7 @@ function scdecl.CalculateDeclSize (|int| depth = 0, |int|)
 	return .Type.ClsSize
 
 	
-libinternal MiniSize (|int| B, |int|)
+function mini_size (|int| B, |int|)
 	.clssize = B
 	.ClsSizeRaw = B
 	.Alignment = B
@@ -249,10 +249,10 @@ function compiler.CollectInbuiltSizes
 function CalculateSize (|int| Depth=0, |int|)
 	opt norefcounts
 	if .IsFunc
-		return .MiniSize(Platform.PointerBytes)
+		return .mini_size(Platform.PointerBytes)
 	
 	if .IsDataTypeOnly
-		return .minisize(.typeinfo.ByteCount)
+		return .mini_size(.typeinfo.ByteCount)
 
 	expect (Depth < 16) (.SourceArg, "Class hierarchy too deep")
 	|| AlignTo = 1

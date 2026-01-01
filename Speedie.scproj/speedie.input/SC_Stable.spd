@@ -7,7 +7,6 @@ module LibStability
 		if !packmaker.libfuncs
 			PackMaker.AddAll
 		.StabiliseSub("stable_id_bank.txt", packmaker.libfuncs, true)
-		.Debug
 	
 	
 	function StabiliseGlobs 
@@ -22,22 +21,9 @@ module LibStability
 		|| fs = (faststring(), nil)(options.MakeExec)
 			fs <~ data ?? "// beta-file. Unstable."
 		.StabiliseSub2(fs, list, isfuncs)
-		if fs
+		if fs and !Options.TargetDebug
 			funcs.SmartData = fs|string|
-	
-	
-	function Debug 
-		target debug
-			return
-			for f in packmaker.libfuncs
-				print f.packid(true)|int|
-				print " "
-				printline f.exportname
 
-	
-//	function DebugList (|[scobject]| list)
-//		for (l in list) (i)
-//			printline "${(i+1)}: ${l.packid(l isa scfunction)}: ${l.exportname}"
 	
 	function StabiliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)
 		opt norefcounts
@@ -80,14 +66,6 @@ module LibStability
 			id = ++LibStability.LastLibID
 			.PackID(isfunc) = id
 		
-		// OK, so we want to be able to run this via cake.
-		// do we want to be able to load functions via cake, though?
-		// actually, yes. Its probably a very good idea.
-		// being able to load funcs from libs, sound useful.
-		// just with dlopen/dlsym/dlclose
-		// perhaps... I can just make this into a struct
-		// so why did this used to work? what changed?
-		// perhaps I just made some funcs private? i think that is all.
 		if table
 			if !SelfLib.IsOpen
 				selflib = DynamicLibrary.new(nil)
