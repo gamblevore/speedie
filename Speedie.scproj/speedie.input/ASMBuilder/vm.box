@@ -54,11 +54,10 @@ forms
 		Jmp		j
 
 	HALT
-		r1		r
-		r2		r
-		r3		r
-		r4		r
-		IsOK	4
+		r1			r		// Signal
+		r2			r		// Reserved
+		SigNum		5		// Intrinsic
+		Continue	4
 
 	AddOrSubM
 		r1		R
@@ -225,9 +224,6 @@ forms
 		r1		r		// dest
 		r2		r		// src
 		Length  14
-//		Index	8
-//		Length	6       // do this later... too fiddly right now
-						// its nicer on a low-level, I guess?
 		
 	AddB
 		r1		R
@@ -347,8 +343,8 @@ forms
 
 #!						 (((((STOP)))))
 /**/ EROR (HALT)
-		if (u2 == u1 and u3 == u4)
-			VMFinish
+		if (!VMFinish(r, Op)) goto EXIT;
+
 
 /**/ TRAP (Trap)
 		// actually a noop. the debugger itself will put this in the shadow

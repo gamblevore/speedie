@@ -74,15 +74,14 @@ function message.KNST3 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |i
 }
 
 
-function message.EROR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| IsOK = nil, |&fatasm|) {
+function message.EROR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| SigNum = nil, |int| Continue = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.EROR, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = IsOK
+	rz.numinput(2) = SigNum
+	rz.numinput(3) = Continue
 }
 
 

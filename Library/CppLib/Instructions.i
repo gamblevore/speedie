@@ -1,7 +1,5 @@
 ı EROR:;
-	if (u2 == u1 and u3 == u4)
-	VMFinish
-;
+	if (!VMFinish(r, Op)) goto EXIT;
 ı TAIL:;
 	TailStack(vm, r, Code, Op);
 ı KNST2:;
