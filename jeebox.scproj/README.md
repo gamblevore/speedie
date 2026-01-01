@@ -2,8 +2,6 @@
 
 [http://jeebox.org](http://jeebox.org) \- [theo@jeebox.org](mailto:theo@jeebox.org)
 
-Join the reddit group [http://reddit.com/r/jeebox](http://reddit.com/r/Jeebox)
-
 Compile:
 
     cd </path/to/jeebox-master>
