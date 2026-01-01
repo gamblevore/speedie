@@ -167,15 +167,13 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	
 	for_(N+1) {
 		auto N = (int)JB_Str_Length(self);
-		if (N) {
+		if (i == 0 or N) {
 			auto B = (const char*)JB_Str_Address(self);
 			*PtrSpace++ = ByteSpace;
 			memcpy(ByteSpace, B, N);
 			ByteSpace += N+1;
 		}
-		self = nil;
-		if (R)
-			self = (JB_String*)JB_Array_Value(R, i);
+		self = (JB_String*)JB_Array_Value(R, i);
 	}
 	
 	PtrSpace++;
