@@ -57,7 +57,6 @@ struct CakeVM {
     int				VFlags;
     
     ASM				ExitGuard;
-    ASM				EXIT[2];
 	VMRegister		Registers[];
 };
 

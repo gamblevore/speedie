@@ -31,7 +31,7 @@ extern "C" {
 
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
-	if (!V)
+	if_rare (!V)
 		return 0;
 	auto Ret = V->Registers;
 	if (Clear)
@@ -49,6 +49,8 @@ void JB_ASM_Pause (CakeVM* V) {
 
 
 int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
+	if_rare (!V)
+		return 0;
 	auto J = V->JumpTable;
 	void* Break = J[512];
 	V->Break = Value;
@@ -94,7 +96,12 @@ static void * const GlobalJumpTable[] = {
 
 	
 	TRYBREAK:; {
-		auto BreakValue = ++Code[CakeCodeMax];
+//		uint64 Within = (uint64)((byte*)Code - (byte*)&vm) - (CakeCodeMax*4); 
+//		if_rare (Within >= CakeCodeMax*4) goto *JumpTable[256+(Op>>24)]; // hope that we exit
+		// ideally, we should actually put these codes within the code area of the VM.
+		// lets do that later! Although we could keep this, for security.
+		// we could put the return at the end of the vm... as a sentinel
+		auto BreakValue = ++(Code[CakeCodeMax]);
 		if_usual (!(BreakValue & 0x80000000))
 			goto *JumpTable[256+(Op>>24)];			// Resume
 		if_rare (!(BreakValue<<1)) {				// Accidental trap from 2GB loop.
@@ -146,7 +153,7 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 
 
 ASM* JB_ASM_Code (CakeVM* V, int Length) {
-	if_rare ((uint)Length > CakeCodeMax)
+	if_rare (!V or (uint)Length > CakeCodeMax)
 		return 0;
 	auto D = (ASM*)(((byte*)V) + V->StackSize);
 
@@ -183,17 +190,17 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
 	V.Registers[2] = {};
-	V.EXIT[0] = 1;
 	auto& Stack = V.Registers[1].Stack;
-	Stack.Code = &V.EXIT[0];	
 	Stack.SavedReg = 0;
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
 	ASM* Code = JB_ASM_Code(&V,0);
-	
+	Stack.Code = &Code[CakeCodeMax-1];
+	if (Stack.Code[0]) // failed!
+		return 0;
 	int F = V.VFlags;
-	if (!(F&kJB_VM_IsProtected) and (F&kJB_VM_WantProtect))
+	if (~F&kJB_VM_IsProtected and F&kJB_VM_WantProtect)
 		if (mprotect(Code, CakeCodeMax*4, PROT_READ) == 0)				// protect!
 			V.VFlags |= kJB_VM_IsProtected;
 	return __CAKE_VM__(V, Code + CodeIndex, 0);
