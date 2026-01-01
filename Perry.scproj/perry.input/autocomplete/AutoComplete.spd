@@ -630,8 +630,6 @@ function message.OwningFullName (|syntax| prm, |message|)
 
 
 datatype AutoCompleteMode (int)
-	linkage
-		libinternal
 	constants
 		Sel		= -1
 		Default = 0
