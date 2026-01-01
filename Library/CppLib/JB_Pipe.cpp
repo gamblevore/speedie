@@ -142,12 +142,17 @@ void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen);
 #ifndef ARG_MAX
 	#define ARG_MAX 128 * 1024
 #endif
+
+
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	int N = JB_Array_Size(R);
 	int Strs = JB_Str_Length(self) + 1;
 
-	for_(N) 
-		Strs += JB_Str_Length((JB_String*)JB_Array_Value(R, i)) + 1;
+	for_(N) {
+		int StrSize = JB_Str_Length((JB_String*)JB_Array_Value(R, i));
+		if (StrSize) 
+			Strs += StrSize + 1;
+	}
 
 	if (Strs >= ARG_MAX-1) {
 		JB_ErrorHandleFile(self, nil, E2BIG, "Arguments too long", "Creating shell-arguments");
@@ -161,15 +166,18 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	auto Orig = PtrSpace; char* Orig2 = ByteSpace;
 	
 	for_(N+1) {
-		auto B = (const char*)JB_Str_Address(self);
 		auto N = (int)JB_Str_Length(self);
-		*PtrSpace++ = ByteSpace;
-		memcpy(ByteSpace, B, N);
-		ByteSpace += N+1;
+		if (N) {
+			auto B = (const char*)JB_Str_Address(self);
+			*PtrSpace++ = ByteSpace;
+			memcpy(ByteSpace, B, N);
+			ByteSpace += N+1;
+		}
 		self = nil;
 		if (R)
 			self = (JB_String*)JB_Array_Value(R, i);
 	}
+	
 	PtrSpace++;
 #ifndef AS_LIBRARY
 	JB_Flow__ReportStringData((u8*)Orig2, (int)(ByteSpace-Orig2), (u8*)"pipe", 4);
