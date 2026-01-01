@@ -96,11 +96,6 @@ static void * const GlobalJumpTable[] = {
 
 	
 	TRYBREAK:; {
-//		uint64 Within = (uint64)((byte*)Code - (byte*)&vm) - (CakeCodeMax*4); 
-//		if_rare (Within >= CakeCodeMax*4) goto *JumpTable[256+(Op>>24)]; // hope that we exit
-		// ideally, we should actually put these codes within the code area of the VM.
-		// lets do that later! Although we could keep this, for security.
-		// we could put the return at the end of the vm... as a sentinel
 		auto BreakValue = ++(Code[CakeCodeMax]);
 		if_usual (!(BreakValue & 0x80000000))
 			goto *JumpTable[256+(Op>>24)];			// Resume
