@@ -5,13 +5,18 @@
 // perry can collect the byteposes, before compile and store on the textviewlines...
 
 module SourceMap
-	|int|		 LastLength
-	|faststring| Positions
+	|faststring|	Positions
+	|int|			LastLength
 
-	function Align (|jbin| j, |int| T, |&uint|)
+	function Check (|scfunction| fn, |int| T, |bool|)
 		opt norefcounts
 		|| p = .positions
-			|| L = .LastLength
-				p <~ (0|byte|, j.Length - (L+T))
-			.LastLength = j.Length
+			|| Dbg = p.length - .LastLength
+			expect (dbg == T)								(fn, "Debug length corrupt")
+		return true
+		
+	function Reserve (|int| T, |&uint|)
+		opt norefcounts
+		|| p = .positions
+			.lastlength = p.length
 			return p.Reserve(T)|&uint|

@@ -98,10 +98,13 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 
 
 function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
-	|| Start = .ReserveMemory(@bin, t*4, 4)|&asm|
-	|| dbg = SourceMap.Align(self, t*4)
+	opt norefcounts
+	|| Start = .ReserveMemory(@bin, t*4)|&asm|
+	|| dbg = SourceMap.Reserve(t*4)
 	|| after = fn.ASMBake(Start, Start+t, dbg)
-	return (after-start == T)						#expect (fn, "ASM length corrupt")
+		
+	expect (after-start == T)									(fn, "ASM length corrupt")
+	return sourcemap.check(fn, T*4)
 
 
 function JBin.BakeASM (|SCFunction| fn, |bool|)

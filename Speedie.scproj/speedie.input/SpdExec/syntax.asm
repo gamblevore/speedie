@@ -12,5 +12,5 @@ tests oofit
 		ADD   (r1, r1, r3, 0)
 		TIME  (r1,3)			// -111
 		LUPD  (r4, r0, 0, @test)
-		HALT  (r0,r0,r0,r0,1)
+		HALT  (r0,r0,r0,0)
 

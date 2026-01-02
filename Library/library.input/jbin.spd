@@ -94,12 +94,7 @@ role JBin (Faststring)
 		self <~ T|byte|
 		.Indent += goin
 
-	function ReserveMemory	(|syntax| type, |int| L, |int| AlignTo=0, |bool| GoIn=false, |&byte|)
-		if (AlignTo >= 2)
-			|| Header = (L.Log2/7)+2
-			|| NewStart = Header + .streamlength
-			|| extra = NewStart mod AlignTo
-				self <~ (0, AlignTo-extra)
+	function ReserveMemory (|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
 		.WriteType(type, goin)
 		.AppendHInt(L)
 		return .Reserve(L)	
