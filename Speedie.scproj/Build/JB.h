@@ -1440,13 +1440,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2388])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2390])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2389])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2390])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2387])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2390])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2391])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2391])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2392])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2389])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2392])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2393])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1620,7 +1620,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2395])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2397])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1661,7 +1661,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2396])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2398])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1802,12 +1802,14 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2394])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2393])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2396])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2395])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2392])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2394])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
+#define kJB__int_Max ((int)2147483647)
+#define kJB__int_Min ((int)2147483648)
 #define kJB__int16_max ((s16)32767)
 #define kJB__int16_min ((s16)-32768)
 #define kJB__int64_max ((int64)9223372036854775807)
@@ -2480,7 +2482,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2386])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2388])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3460,9 +3462,11 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // SourceMap
-uint* SC_SourceMap__Align(FastString* J, int T);
+bool SC_SourceMap__Check(SCFunction* Fn, int T);
 
 int SC_SourceMap__Init_();
+
+uint* SC_SourceMap__Reserve(int T);
 
 
 
@@ -4322,11 +4326,9 @@ float JB_f_UnTan(float Self, float Y);
 
 
 // int
-int JB_int_AlignUp(int Self, int To);
-
 ASMReg SC_int_ToASM(int Self);
 
-int SC_int_hintsize(int Self);
+int SC_int_HIntSize(int Self);
 
 bool SC_int_IsNormalMatch(int Self);
 
@@ -4341,8 +4343,6 @@ int JB_int_OperatorMax(int Self, int Other);
 int JB_int_OperatorMin(int Self, int Other);
 
 JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing);
-
-IntRange JB_int_OperatorTo(int Self, int Other);
 
 JB_String* JB_int_RenderFS(int Self, FastString* Fs_in);
 
@@ -4360,13 +4360,11 @@ int JB_int_SyntaxAccessSet(int Self, int Bit, bool Value);
 // int64
 int64 JB_int64_Abs(int64 Self);
 
+int SC_int64_BitsNeeded(int64 Self);
+
 bool SC_int64_CanStoreAsAddK(int64 Self);
 
 bool SC_int64_Fits(int64 Self, int Amount, bool Signed);
-
-bool JB_int64_IsPow2(int64 Self);
-
-int64 JB_int64_Log2(int64 Self);
 
 Message* SC_int64_MsgForConst(int64 Self, bool AllowShift);
 
@@ -4402,8 +4400,6 @@ ivec4 JB_ivec4_Shrink(ivec4 Self, int I);
 bool SC_uint_EqulInputsAreBothBool(uint Self);
 
 FatASM* SC_uint_FAT(uint Self);
-
-int JB_uint_Log2(uint Self);
 
 uint JB_uint_LowestBit(uint Self);
 
@@ -5022,20 +5018,6 @@ bool JB_Rg_Contains1(IntRange Self, int I);
 
 
 // MaybeBool
-bool JB_MaybeBool_Default(MaybeBool Self);
-
-bool JB_MaybeBool_IsKnown(MaybeBool Self);
-
-bool JB_MaybeBool_KnownFalse(MaybeBool Self);
-
-bool JB_MaybeBool_KnownTrue(MaybeBool Self);
-
-MaybeBool JB_MaybeBool_Negate(MaybeBool Self);
-
-MaybeBool JB_MaybeBool__Default(bool Default);
-
-MaybeBool JB_MaybeBool__Known(bool As);
-
 
 
 // MoveCode
@@ -7879,7 +7861,7 @@ void JB_bin_Exit0(FastString* Self);
 
 void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
-byte* JB_bin_ReserveMemory(FastString* Self, Syntax Type, int L, int AlignTo, bool GoIn);
+byte* JB_bin_ReserveMemory(FastString* Self, Syntax Type, int L, bool GoIn);
 
 void JB_bin_RunHeader(FastString* Self, JB_String* Name);
 
@@ -10764,6 +10746,20 @@ inline JB_String* JB_File__Applications();
 
 inline bool JB_Ind_SyntaxCast(Ind Self);
 
+inline bool JB_MaybeBool_Default(MaybeBool Self);
+
+inline bool JB_MaybeBool_IsKnown(MaybeBool Self);
+
+inline bool JB_MaybeBool_KnownFalse(MaybeBool Self);
+
+inline bool JB_MaybeBool_KnownTrue(MaybeBool Self);
+
+inline MaybeBool JB_MaybeBool_Negate(MaybeBool Self);
+
+inline MaybeBool JB_MaybeBool__Default(bool Default);
+
+inline MaybeBool JB_MaybeBool__Known(bool As);
+
 inline int JB_Mrap_ByteCapacity(MWrap* Self);
 
 inline byte* JB_Mrap_Ptr(MWrap* Self);
@@ -10820,9 +10816,13 @@ inline int64 JB_Wrap_Value(DTWrap* Self);
 
 inline bool JB_dylib_IsOpen(JB_Dylib* Self);
 
+inline bool JB_int64_IsPow2(int64 Self);
+
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D);
 
 inline bool JB_int64_OperatorInRange(int64 Self, int64 Length);
+
+inline int JB_int_AlignUp(int Self, int To);
 
 inline bool JB_int_IsPow2(int Self);
 
@@ -10832,9 +10832,7 @@ inline bool JB_int_OperatorInRange(int Self, int Length);
 
 inline bool JB_int_OperatorIsa(int Self, uint N);
 
-inline int JB_int__Max();
-
-inline int JB_int__Min();
+inline IntRange JB_int_OperatorTo(int Self, int Other);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
@@ -10942,7 +10940,11 @@ inline bool JB_byte_IsWhite(uint /*byte*/ Self);
 
 inline JB_String* JB_cstring_Wrap(_cstring Self);
 
+inline int64 JB_int64_Log2(int64 Self);
+
 inline int JB_int_SyntaxCompare(int Self, JB_String* S);
+
+inline int JB_uint_Log2(uint Self);
 
 inline ASM* SC_FAT_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
 
@@ -11118,6 +11120,34 @@ inline bool JB_Ind_SyntaxCast(Ind Self) {
 	return Self >= 0;
 }
 
+inline bool JB_MaybeBool_Default(MaybeBool Self) {
+	return ((bool)(((byte)Self) & 1));
+}
+
+inline bool JB_MaybeBool_IsKnown(MaybeBool Self) {
+	return ((byte)Self) <= 1;
+}
+
+inline bool JB_MaybeBool_KnownFalse(MaybeBool Self) {
+	return ((byte)Self) == 0;
+}
+
+inline bool JB_MaybeBool_KnownTrue(MaybeBool Self) {
+	return ((byte)Self) == 1;
+}
+
+inline MaybeBool JB_MaybeBool_Negate(MaybeBool Self) {
+	return ((MaybeBool)(((byte)Self) ^ 1));
+}
+
+inline MaybeBool JB_MaybeBool__Default(bool Default) {
+	return ((MaybeBool)(8 + Default));
+}
+
+inline MaybeBool JB_MaybeBool__Known(bool As) {
+	return ((MaybeBool)(As));
+}
+
 inline int JB_Mrap_ByteCapacity(MWrap* Self) {
 	return ((int)Self->ItemSize) * ((int)Self->Size);
 }
@@ -11252,6 +11282,10 @@ inline bool JB_dylib_IsOpen(JB_Dylib* Self) {
 	return Self->handle != nil;
 }
 
+inline bool JB_int64_IsPow2(int64 Self) {
+	return ((bool)((Self != 0) & ((Self & (Self - 1)) == 0)));
+}
+
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D) {
 	return ((Float64)Self) / ((Float64)D);
 }
@@ -11263,8 +11297,12 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 Length) {
 	return false;
 }
 
+inline int JB_int_AlignUp(int Self, int To) {
+	return Self + ((-((uint)Self)) % To);
+}
+
 inline bool JB_int_IsPow2(int Self) {
-	return (Self & (Self - 1)) == 0;
+	return ((bool)((Self != 0) & ((Self & (Self - 1)) == 0)));
 }
 
 inline float JB_int_OperatorDiv(int Self, int D) {
@@ -11282,12 +11320,8 @@ inline bool JB_int_OperatorIsa(int Self, uint N) {
 	return (!(Self % N));
 }
 
-inline int JB_int__Max() {
-	return 2147483647;
-}
-
-inline int JB_int__Min() {
-	return 2147483648;
+inline IntRange JB_int_OperatorTo(int Self, int Other) {
+	return ((IntRange)ivec2{Self, Other + 1});
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
@@ -11522,8 +11556,16 @@ inline JB_String* JB_cstring_Wrap(_cstring Self) {
 	return JB_StrC(Self);
 }
 
+inline int64 JB_int64_Log2(int64 Self) {
+	return JB_u64_Log2(((uint64)Self));
+}
+
 inline int JB_int_SyntaxCompare(int Self, JB_String* S) {
 	return Self - JB_Str_Length(S);
+}
+
+inline int JB_uint_Log2(uint Self) {
+	return JB_Int_Log2(((int)Self));
 }
 
 inline ASM* SC_FAT_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
@@ -11569,7 +11611,7 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 
 inline bool JB_Str_ContainsByte(JB_String* Self, uint /*byte*/ B) {
 	//cpp_part;
-	return JB_Ind_SyntaxCast(JB_Str_FindByte(Self, B, 0, JB_int__Max()));
+	return JB_Ind_SyntaxCast(JB_Str_FindByte(Self, B, 0, kJB__int_Max));
 }
 
 inline Ind JB_Str_InWhite(JB_String* Self, int Start, int After) {
@@ -11626,7 +11668,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 
 inline bool JB_CharSet_ContainsStr(CharSet Self, JB_String* S) {
 	//cpp_part;
-	return JB_Str_OutCharSet(S, Self, 0, JB_int__Max()) < 0;
+	return JB_Str_OutCharSet(S, Self, 0, kJB__int_Max) < 0;
 }
 
 inline JB_File* JB_File__Logs() {
@@ -11773,17 +11815,17 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	if (Report) {
 		JB_MzSt_Print((&Stats));
 	}
-	JB_String* Decomp = JB_Str_Decompress(C, nil, JB_int__Max(), nil);
+	JB_String* Decomp = JB_Str_Decompress(C, nil, kJB__int_Max, nil);
 	JB_Incr(Decomp);
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1833], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1835], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
 		}
-		JB_SetRef(Decomp, JB_Str_Decompress(C, nil, JB_int__Max(), nil));
+		JB_SetRef(Decomp, JB_Str_Decompress(C, nil, kJB__int_Max, nil));
 	}
 	JB_Decr(C);
 	JB_Decr(Decomp);
