@@ -90,7 +90,7 @@ function GetFileString (|Message| msg, |string| name, |message|)
 	|| f = compiler.InputFile(name, msg)
 		data = f.readall
 		if msg ~= "img"
-			data = ImageHelper.ConvertPNGToVOI(data)
+			data = ImageHelper.ConvertPNGToVOI(data, msg)
 		OK = data
 
 	if OK

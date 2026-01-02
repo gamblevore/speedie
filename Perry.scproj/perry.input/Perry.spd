@@ -33,14 +33,6 @@ module Perry
 		for w in window.all
 			if w isa PerryIDE
 				rz <~ w
-
-
-//	function IDE (|PerryIDE|) // frontide, frontperry, firstperry
-//		opt norefcounts
-//		for w in window.all
-//			if w isa PerryIDE
-//				return w
-	
 	
 	function Save
 		app.prefs.save
