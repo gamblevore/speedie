@@ -26,7 +26,6 @@ module CakeRun
 	
 	function GetStructure (|bool|)
 		opt norefcounts
-		require globals.CheckLib
 		|| app = .InputPack$
 		|| sz = app[@num]
 		|| arg = sz.next(@arg)$
@@ -45,19 +44,14 @@ module CakeRun
 			rz = Answer.file
 			if !rz.Exists
 				rz = nil
-		
-		
-	function InputPackFile (|File|)
-		opt norefcounts
-		|| path = app[0] #expect ("No path specified")
-		|| fl = path.FileThatExists("load executable")
-			if fl isa "spd" or "scproj" or "uwu" or "uwuz"
-				fl = fl.Compile
-		return fl
+	
 
 	function InputPack (|messageroot|)
-		|| fi = .InputPackFile
-			rz = fi.Parse
+		|| F = InputFile
+		if F isa "spd" or "scproj" or "uwu" or "uwuz"
+			F = F.Compile
+		if f
+			rz = F.Parse
 			if rz
 				.FileSrc = rz.OriginalParseData
 				if rz == @arg

@@ -10,7 +10,7 @@ module debugger
 	|int|			Length
 	
 	
-	function cakevm.DebugFoundLocation (|String| FilePath, |uint| Position, |bool|)
+	function CakeVM.DebugFoundLocation (|String| FilePath, |uint| Position, |bool|)
 		print filepath
 		print ": "
 		printline Position.Render
@@ -37,16 +37,26 @@ module debugger
 	
 	// what about asking for ASM? That goes through speedie.
 	// So might as well do that first?
-		
-
+	
+	function StartUp (|&int|)
+		|| V = &__Viewer__
+		if !CakeArgs.WantDebug and !perry
+			V = nil
+		return cake.IsDebugging(V)
+	
+	
 	function __Viewer__ (cakevm.CakeChef)
 		opt norefcounts
 		debugger
 		|| Index = .index(code)
-		expect (index < debugger.Length)							("Code map too short: " + index)
+		if (index >= debugger.Length)
+			if StdErr.ok
+				error ("Code map too short: " + index)
+			return nil
+		
 		|| Where = debugger.Base![index]
 		|| FileNum = where & (11~bits)
-		|| Path = debugger.files[FileNum]				#expect ("Missing file at index: " + filenum)
+		|| Path = debugger.files[FileNum]					#expect ("Missing file at index: " + filenum)
 		return .DebugFoundLocation( Path, Where>>11 )
 	
 	
@@ -58,7 +68,7 @@ module debugger
 				.BreakAll
 			return true
 		
-		.Vars = R[@nil, 0].name
+		.Vars = R[@nil, 0].name.Decompress
 		|| M = R[@nil, 1]
 		.SrcMap = M.name
 		.Files = r[@nil, 2].name.decompress.Split
@@ -78,5 +88,7 @@ module debugger
 
 	function BreakAll
 		|| s = __Globals__.BreakPoints
-			for i in .Length
-				s[i] = 1
+			for i in spdtable.CodeLength
+				s[i] = 1<<31
+
+

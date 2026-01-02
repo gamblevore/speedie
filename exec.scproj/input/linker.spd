@@ -17,6 +17,13 @@ module SpdTable
 		error "Init failed"
 	
 	
+	function Message.CodeLength (|int|)
+		opt norefcounts
+		if .func != @tmp
+			return .Length
+		|| f = .first
+			return f.Length
+		
 	function PreLoad (|message| code)
 		opt norefcounts
 		.funcs <~ SpdFunc()							// null func
@@ -30,7 +37,7 @@ module SpdTable
 				spd.tag = .funcs.Length
 				spd.Position = CodeLength
 				.funcs <~ spd
-				CodeLength += spd.Length>>2
+				CodeLength += spd.CodeLength>>2
 			expect (.funcs < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
 
 		.Funcs.Shrink		

@@ -16,7 +16,7 @@ role SpdFunc (message)
 			|| first = self[@nil]$
 			Code = first.name
 
-		|| n    = Code.length >> 2
+		|| n = Code.length >> 2
 		.RangeLength = n
 		check  (n > 0)													(Code, "ASM missing.")
 		check  (n < 64K-1)												(Code, "ASM oversized.")
@@ -24,6 +24,7 @@ role SpdFunc (message)
 		|| dest = BeginCode + .Position
 		memory.Copy(dest, Code.addr, n<<2)
 		if .func != @tmp
+			.func = @tmp
 			.name = "(unnamed)"
 	
 

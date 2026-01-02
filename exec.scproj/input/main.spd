@@ -2,28 +2,23 @@
 |string|     Speedie = "/usr/local/bin/speedie"
 |spdprocess| Perry = app.parent
 |!&cakevm|   Cake = CakeVM()
-|&int|		 BreakPoints = cake.IsDebugging(&debugger.__Viewer__)
+|File|		 InputFile = CakeArgs.Collect
+|&int|		 BreakPoints = debugger.Startup
 |!&ASM|		 BeginCode = cake.code()|&ASM|
 
 
 main
 	opt NoRefCounts	
+	error.AutoPrint = 1
 	expect (BeginCode) ("Can't allocate VM")
-	
-	if app._rawargs == 0
-		"Usage: ${app.filename} /path/to/spd_proj.cake
-May also pass .spd or .scproj files. They will be compiled, then run.\n"
-		return 0
+	require InputFile
 	
 	|| p = perry
 		p <~ "hoi :3"
 	
-	error.AutoPrint = 1
 	if CakeRun.GetStructure
 		SpdTable.Link
 		require debugger.StartDebug
 		return SpdTable.RunMain
 	return 1
 
-
-	
