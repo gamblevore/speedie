@@ -81,7 +81,7 @@ static void * const GlobalJumpTable[] = {
   
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
-	Op = *Code++; // spelled out for debug
+	Op = *Code++;									// spelled out for debug
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
 	EXIT:;
@@ -89,18 +89,18 @@ static void * const GlobalJumpTable[] = {
 
 	
 	PAUSE:;											// Assume was in debug mode
-	++Code[CakeCodeMax];
+	++(Code[CakeCodeMax-1]);
 	for (int i = 0; i < 256; i++)
 		JumpTable[i] = &&TRYBREAK;
 	goto BREAK;
 
 	
 	TRYBREAK:; {
-		auto BreakValue = ++(Code[CakeCodeMax]);
+		auto BreakValue = ++(Code[CakeCodeMax-1]);
 		if_usual (!(BreakValue & 0x80000000))
 			goto *JumpTable[256+(Op>>24)];			// Resume
 		if_rare (!(BreakValue<<1)) {				// Accidental trap from 2GB loop.
-			Code[CakeCodeMax] = ((~BreakValue>>31)<<31)|0x40000000;// Reset to a big number 
+			Code[CakeCodeMax-1] = ((~BreakValue>>31)<<31)|0x40000000;// Reset to a big number 
 			if (!(vm.VFlags & kJB_VM_TrapTooFar))
 				goto *JumpTable[256+(Op>>24)];		// Resume
 		}
@@ -108,7 +108,7 @@ static void * const GlobalJumpTable[] = {
 	
 	BREAK:;											// the actual breakpoint
 	while (auto B = vm.Break)
-		if (!(B)(&vm, Code-1, Code[CakeCodeMax]))
+		if (!(B)(&vm, Code-1, (Code[CakeCodeMax-1]<<1)>>1))
 			break;
 
 	goto *JumpTable[256+(Op>>24)];					// Resume
@@ -191,7 +191,7 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
 	ASM* Code = JB_ASM_Code(&V,0);
-	Stack.Code = &Code[CakeCodeMax-1];
+	Stack.Code = Code + CakeCodeMax-1;
 	if (Stack.Code[0]) // failed!
 		return 0;
 	int F = V.VFlags;
