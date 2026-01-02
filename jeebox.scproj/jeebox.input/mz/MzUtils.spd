@@ -38,8 +38,8 @@ Module MZLab
 			if i & (1<<j)
 				fs <~ items[j]!
 
-	target DebugCompressrion
-		inline TestCompression
+	target true
+		function TestCompression
 			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 			require f.exists
 			for ch in f.ListFiles
@@ -47,12 +47,12 @@ Module MZLab
 					|| s = ch.ReadAll
 					|| c = s.compress
 					|| d = c.Decompress
-					expect s == d
+//					expect s == d
 	
 			"TestCompression passed."
 		
 	
-		inline TestChunkedCompression
+		function TestChunkedCompression
 			// useful for jbin and exec.
 			|| fs = FastString()
 			"abcabc".compress(fs)

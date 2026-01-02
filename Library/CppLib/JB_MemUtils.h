@@ -11,6 +11,44 @@
     #include <malloc.h>
 #endif
 
+
+#ifdef JB_DEBUG_ON
+    #define JBSanity( a ) // nothing for now
+    #define JB_DEBUG(x) x
+    #define JB_NOTDEBUG( a )
+    #include <assert.h>
+#else
+    #define JBSanity( a )
+    #define JB_NOTDEBUG( a ) a
+    #define JB_DEBUG(x)
+#endif
+
+
+#ifdef DEBUG
+	extern "C" bool CanASMBKPT;
+	#if __has_builtin(__builtin_debugtrap)
+		#define debugger if (CanASMBKPT) __builtin_debugtrap()
+	#else
+		#if __CPU_TYPE__ == __CPU_INT__
+			#define debugger if (CanASMBKPT) __asm__("int3")
+		#else
+			#define debugger if (CanASMBKPT) std::raise(SIGINT)
+		#endif
+	#endif
+    #define dbgexpect(test)  if  (!(test)) {debugger; return;} // int3 works in xcode but not in releasebuilds!
+    #define dbgexpect2(test) if  (!(test)) {debugger; return 0;}
+    #define JB_DoAt(count) {static int jDB = 0; if (++jDB == count) debugger;}
+    #define JB_FuncCallCount(count) static int _fnCallCount_ = 0; _fnCallCount_++;
+    #define DEBUGONLY(x) x
+#else
+    #define debugger// would crash...
+    #define dbgexpect(test)
+    #define dbgexpect2(test)
+    #define JB_DoAt(count)
+    #define JB_FuncCallCount(count)
+    #define DEBUGONLY(x)
+#endif
+
 extern "C" {
 #define CopyBytes(s0, d, Length) memcpy((void*)(d), (void*)(s0), (unsigned int)(Length))
 
@@ -42,6 +80,27 @@ u64 JB_MemUsedOther();
 #endif
 
 
+inline int JB_Int_Log2 (int X) {
+#if DEBUG
+	if (!X) debugger;
+#endif
+    return 31- __builtin_clz(X);
+}
+
+inline uint64 JB_u64_Log2 (u64 X) {
+#if DEBUG
+	if (!X) debugger;
+#endif
+    return 63-__builtin_clzll(X);
+}
+
+inline uint64 JB_u32_Log2 (u64 X) { // fix this... we mean the other two!
+#if DEBUG
+	if (!X) debugger;
+#endif
+    return 31-__builtin_clzl(X);
+}
+
 
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
 inline void memzero (void* Where, int N) {
@@ -52,20 +111,8 @@ inline int JB_Int_CountBits (int X) {
     return __builtin_popcount(X);
 }
 
-inline int JB_Int_Log2 (int X) {
-    return 31- __builtin_clz(X);
-}
-
 inline int JB_Int_CTZ (int X) {
 	return __builtin_ctz(X);
-}
-
-inline uint64 JB_u64_Log2 (u64 X) {
-    return 63-__builtin_clzll(X);
-}
-
-inline uint64 JB_u32_Log2 (u64 X) { // fix this... we mean the other two!
-    return 31-__builtin_clzl(X);
 }
 
 inline int JB_Int_BiggestBit (int X) {

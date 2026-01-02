@@ -40,42 +40,6 @@ bool JB_Flow__Cond2(bool b);
 bool JB_Plat__HasFlow();
 void JB_Flow__PrintStats();
 
-#ifdef JB_DEBUG_ON
-    #define JBSanity( a ) // nothing for now
-    #define JB_DEBUG(x) x
-    #define JB_NOTDEBUG( a )
-    #include <assert.h>
-#else
-    #define JBSanity( a )
-    #define JB_NOTDEBUG( a ) a
-    #define JB_DEBUG(x)
-#endif
-
-
-#ifdef DEBUG
-	extern bool CanASMBKPT;
-	#if __has_builtin(__builtin_debugtrap)
-		#define debugger if (CanASMBKPT) __builtin_debugtrap()
-	#else
-		#if __CPU_TYPE__ == __CPU_INT__
-			#define debugger if (CanASMBKPT) __asm__("int3")
-		#else
-			#define debugger if (CanASMBKPT) std::raise(SIGINT)
-		#endif
-	#endif
-    #define dbgexpect(test)  if  (!(test)) {debugger; return;} // int3 works in xcode but not in releasebuilds!
-    #define dbgexpect2(test) if  (!(test)) {debugger; return 0;}
-    #define JB_DoAt(count) {static int jDB = 0; if (++jDB == count) debugger;}
-    #define JB_FuncCallCount(count) static int _fnCallCount_ = 0; _fnCallCount_++;
-    #define DEBUGONLY(x) x
-#else
-    #define debugger// would crash...
-    #define dbgexpect(test)
-    #define dbgexpect2(test)
-    #define JB_DoAt(count)
-    #define JB_FuncCallCount(count)
-    #define DEBUGONLY(x)
-#endif
 
 
 #define require(test)   if  (!(test)) {return {};}

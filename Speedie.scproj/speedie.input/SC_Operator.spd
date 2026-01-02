@@ -531,7 +531,11 @@ function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
 		
 	
 
-	
+function int64.BitsNeeded (|int|)
+	if self
+		return .log2 + 1
+
+
 function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	opt norefcounts
 	|| lk = lc.ExportPosition
@@ -539,11 +543,11 @@ function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	|| rk = rc.ExportPosition
 	require (lk ||| rk) or uk
 	|| nk = lk << rk
-	|| size = nk.log2|int|
-	require uk or size >= lc.typeinfo.bitcount
+	|| size = nk.BitsNeeded
+	require uk or size > lc.typeinfo.bitcount
 
-	|| ty = (typeint64!, typeint!)(size >= 32)
-	if uk and rk >= 32
+	|| ty = (typeint64!, typeint!)(size > 32)
+	if uk and rk > 32
 		ty = typeint64!
 	|| ty2 = ty.typenormal.copydecl
 	.obj = ty2

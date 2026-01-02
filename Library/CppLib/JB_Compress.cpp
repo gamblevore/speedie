@@ -121,6 +121,9 @@ static inline int update_hash2 (int h, int c) {
 
 
 extern "C" inline int MyScore (uint len, uint offset) {
+#if DEBUG
+	if (offset == 0) debugger;
+#endif
     uint offbits = std::max(SLOT_BITS+31-__builtin_clz(offset), W_MINUS+1+SLOT_BITS);
 	// could simplify. longer lengths are always better?
     uint l = len - MIN_MATCH;
@@ -256,7 +259,7 @@ struct Compression {
 		}
 		B <<= 32+Missing;
 		if (B) {
-			int Zeros = __builtin_clzll(B);
+			int Zeros = __builtin_clzll(B); // log2-safe
 			BitCount = Missing + (Zeros + 1);
 			return Zeros;
 		}
@@ -293,7 +296,12 @@ struct Compression {
 	}
 	
 	inline void PutOffset (uint offset) {
-		int log = std::max(31-__builtin_clz(offset), W_MINUS);
+//#if DEBUG
+//	if (offset == 0) debugger;
+//#endif
+		int log = 0;
+		if (offset)
+			log = std::max(31-__builtin_clz(offset), W_MINUS);
 		PutBits(SLOT_BITS, log-W_MINUS);
 		if (log > W_MINUS)
 			PutBits(log, offset-(1<<log));		// removes the highest bit only. Neatly stores the rest.
@@ -503,7 +511,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 		return JB_ErrorHandleC("Size field corrupt", 0, false);
 	
 	Cmp.BitBuff = In.Read4();	
-	for (int p = 0; p < Size; ) {
+	for (int p = 0; p < Size;) {
 		int ago = Cmp.GetOffset(In);
 		int s = p - ago;
 		if (!ago) {

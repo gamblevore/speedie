@@ -318,10 +318,18 @@ struct FatASM
 		|| fn = exp.last!.Obj|scfunction|
 		ifn fn isa scfunction
 			fn = nil
+			|| obj = exp.first!.obj
+			if obj isa scfunction
+				fn = obj
+			  elseif obj isa scdecl
+				fn = obj.type.funcproto
+			  else
+				debugger
+			if !fn
+/				fs <~ "(unknown)"
+				return
 		|| regs = .FuncPrms(fn)
-		|int64| n = regs.log2/5
-		if fn
-			n = fn.Args.Length
+		|int64| n  = fn.Args.Length
 		fs <~ "("
 		
 		if n > 10

@@ -195,6 +195,7 @@ void PicoSleep (float Wait) {
 
 
 inline int pico_log2 (uint64_t X) {
+// don't pass 0!
 	return 63-__builtin_clzll(X);
 }
 
@@ -205,7 +206,7 @@ struct PicoCommList {
 	int Reserve () {
 		uint64_t F0 = Map;
 		while (auto F = ~F0) {
-			F &= -F;
+			F &= -F; // log2-safe, F always has at least 1 bit
 			if (Map.compare_exchange_strong(F0, F|F0))
 				return pico_log2(F)+1;
 		}
@@ -236,7 +237,7 @@ struct PicoLister {
 	PicoComms* NextComm () {
 		auto L = SavedList;
 		if (L) {
-			auto Lowest = L & -L;
+			auto Lowest = L & -L; // log2-safe, L will always have 1 bit.
 			L &= ~Lowest;
 			SavedList = L;
 			return (PicoComms*)&(pico_all[pico_log2(Lowest)]);
@@ -446,7 +447,7 @@ struct PicoComms : PicoConfig {
 		SendTimeOut = 10.0f; // 🕷️_🕷️
 
 		if (size <= 0)
-			size = PicoDefaultInitSize;
+			size = PicoDefaultInitSize; // log2-safe
 		int B = std::clamp(pico_log2(size), 14, 30);		// 16KB mins, 1GB max
 
 		B += ((1<<B) < size);
@@ -984,6 +985,7 @@ struct PicoComms : PicoConfig {
 		}
 		
 		static const char* pico_fail_actions[4] = {"Sending", "Reading", "StdOut", "StdErr"};
+		// log2-safe: if p == 0, we don't call pico_log2
 		const char* Name = P ? pico_fail_actions[pico_log2(P)]: "Failed";
 		SayEvent(Name, strerror(Err));
 		if (Err == EBADF)
