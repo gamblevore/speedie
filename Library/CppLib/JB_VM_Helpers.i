@@ -123,7 +123,7 @@ AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
 	if (Mode == 2)
 		return JB_u64_Log2(R2);
 	if (Mode == 3)
-		return (uint)JB_u32_Log2(R2);
+		return (uint)JB_Int_Log2(R2);
 	
 				// byte_swap //
 	if (Mode == 4)

@@ -94,13 +94,6 @@ inline uint64 JB_u64_Log2 (u64 X) {
     return 63-__builtin_clzll(X);
 }
 
-inline uint64 JB_u32_Log2 (u64 X) { // fix this... we mean the other two!
-#if DEBUG
-	if (!X) debugger;
-#endif
-    return 31-__builtin_clzl(X);
-}
-
 
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
 inline void memzero (void* Where, int N) {

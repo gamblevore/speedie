@@ -73,8 +73,10 @@ function scclass.DebugID (|syntax| W, |int|)
 	return .typeinfo.DebugCode
 
 
-function int.hintsize (|int|)
+function int.HIntSize (|int|)
 	if self >= 0
-		return 1 + (.log2/7)
+		if self > 0
+			self = .log2/7
+		return 1 + self
 
 
