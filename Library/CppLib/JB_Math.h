@@ -22,11 +22,11 @@ extern "C" {
 	
 	
 	inline bool JB_u64_IsPow2 (uint64 Self) {
-		return (Self & (Self - 1)) == 0;
+		return (Self!=0) & ((Self & (Self - 1)) == 0);
 	}
 
 	inline bool JB_uint_IsPow2 (uint Self) {
-		return (Self & (Self - 1)) == 0;
+		return (Self!=0) & ((Self & (Self - 1)) == 0);
 	}
 
 	inline double JB_int64_AsFloat (int64 Self) {

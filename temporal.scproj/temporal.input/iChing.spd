@@ -86,7 +86,7 @@ module iChing
 		rz = hex.clean
 		|| Marks = machine.Walk(6, 9*9)
 		|| lines = rz["markedlines"]
-		for (i.highbits in marks) (x)
+		for (i.bits in marks) (x)
 			lines[x].Remove
 
 	function New (|int| num, |Hexagram|)

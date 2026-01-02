@@ -342,6 +342,10 @@ class Tetris (GridSection)
 			c[] = b & 16~bits // flush
 
 	
+	function int.Tri (|int|)
+		return (self*(self+1))/2
+
+	
 	function MakeReal
 		for (b in self) (c)
 			if b is Dropper

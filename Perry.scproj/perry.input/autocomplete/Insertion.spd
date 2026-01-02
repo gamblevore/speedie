@@ -6,7 +6,7 @@ function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |boo
 	if prms and prms != @arg
 		a  = prms.after
 		a += !self[a].IsTextLine
-	return r in (l, a) // allow a little lee-way
+	return r >= l and r <= a // allow a little lee-way
 	
 
 function Message.IsTextFuncLike (|bool|)

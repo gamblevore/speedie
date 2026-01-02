@@ -38,7 +38,7 @@ Module MZLab
 			if i & (1<<j)
 				fs <~ items[j]!
 
-	target true
+	target false
 		function TestCompression
 			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 			require f.exists

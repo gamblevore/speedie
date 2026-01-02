@@ -5,7 +5,6 @@
 
 
 main // main {
-	mzlab.TestCompression
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile

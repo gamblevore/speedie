@@ -11,40 +11,21 @@ insertion
 datatype int
 	default 0
 
-	module
-		function Max (|int|)
-			inline
-			return 0x7FFFffff_
-		function Min (|int|)
-			inline
-			return 0x80000000_
-
-	operator Avg (|int| n, |int|)
-		return (self+n)/2
-
-	operator In (|ivec2| i, |bool|)
-		return self >= i.x and self <= i.y
-
-//	operator Bits (|int| n, |int|)
-//		return self & n.bits
-
-	operator DTF (|int| belf, |bool|)
-		return self and ((self&belf) == belf)
-
-	operator FTD (|int| belf, |bool|)
-		return self and ((self&belf) == self)
+	constants
+		|int| 
+		Max = 0x7FFFffff
+		Min = 0x80000000
 
 	function AsFloat (|float|)
 		cpp_wrapper
 
-	function IsPow2 (|bool|)
-		opt inline
-		return (self & (self - 1)) == 0
+	inline IsPow2 (|bool|)
+		return (self!=0) & ((self & (self - 1)) == 0)
 
-	function AlignUp (|int| To, |int|)
+	inline AlignUp (|int| To, |int|)
 		return self + (-self|uint| mod to)
 
-	function AlignDown (|int| To, |int64|)
+	inline AlignDown (|int| To, |int64|)
 		return self - (self mod to)
 	
 	operator Div (|int| D, |float|)
@@ -61,6 +42,7 @@ datatype int
 		disabled "use intnum() for a random int, or floatnum[] for a chance at getting true"
 
 	syntax access (|int| bit, |bool|)
+		inline
 		return self&(1<<bit)
 
 	syntax access (|int| bit, assigns:|bool|, |int|)
@@ -117,25 +99,11 @@ datatype int
 		asm BSTT(dest, p1, 1)
 		cpp_wrapper JB_Int_CountBits
 
-	function HighestBit (|int|) // highbit 
-		disabled "use .log2"
-
 	function Log2 (|int|)
 		asm BSTT(dest, p1, 3)
 		cpp_wrapper JB_Int_Log2
-
-	function Log2P (|int|)
-		description "Same as log2, except it rounds up.  So (17).log2p == 5, because 4 won't be enough but 5 will!"
-		|| p = .log2
-		return p + (self!=1<<p)
-
-	function Ctz (|int|)
-		cpp_wrapper JB_Int_CTZ
-		
-	function Tri (|int|)
-		return (self*(self+1))/2
-
-	operator ± (|int|i, |int|)
+	
+	operator ± (|int| i, |int|)
 		cpp_part Shrink
 		if self > 0
 			return (self-i) max 0
@@ -180,6 +148,7 @@ datatype int
 	
 	operator to (|int| other, |IntRange|)
 		// for 5 to 10 // this should be inclusive
+		inline
 		return (self, other+1)
 
 	
@@ -200,8 +169,6 @@ datatype Ind (int) // an INDex. And an INT.
 	syntax cast (|bool|)
 		inline
 		return self >= 0
-//	function Exists (|bool|)
-//		return self >= 0
 
 
 struct RetroFloat
@@ -210,6 +177,7 @@ struct RetroFloat
 	|float|		Remain
 	
 	syntax Append (|float| n)
+		inline
 		.Amount += n
 	
 	syntax Access (|int|)
@@ -264,24 +232,13 @@ datatype uint
 		|uint|
 		max = 0xffffFFFF_
 		min = 0
-	
-//	function ClearHigh (|int| p8, |uint|)
-//		self <<= p8
-//		self >>= p8
-//		return self
-		
+
 	operator isa (|uint| n, |bool|)
 		inline
 		return !(self mod n)
-		
-//	operator rotl (|int| Amount, |uint64|)
-//		cpp_wrapper JB_u32_RotL
-	
-//	operator rotr (|int| Amount, |uint64|)
-//		cpp_wrapper JB_u32_RotR
 
-	function IsPow2 (|bool|)
-		cpp_wrapper JB_uint_IsPow2		
+	inline IsPow2 (|bool|)
+		return (self!=0) & ((self & (self - 1)) == 0)
 		
 	function Hash (|uint|)
 		cpp_wrapper JB_uint_hash
@@ -306,19 +263,8 @@ datatype uint
 	
 	render
 		fs <~ self|int64|
-
-//	syntax cast (|bool|)
-//		return self|bool|
-
-	operator rol (|uint| bits, |uint|)
-		bits &= 31
-		return ((self << bits) ||| (self >> (32 - bits)))
-
-	operator ror (|uint| bits, |uint|)
-		bits &= 31
-		return ((self >> bits) ||| (self << (32 - bits)))
 	
-	function Log2 (|int|)
+	inline Log2 (|int|)
 		return self|int|.log2
 		
 		
@@ -384,7 +330,7 @@ datatype float
 	module
 		function Max (|float|)
 			cpp_wrapper JB_f__max
-		function Min (|float|)
+		inline Min (|float|)
 			return -.max
 		function Nan (|float|)
 			cpp_wrapper JB_f__nan
@@ -465,7 +411,7 @@ datatype float
 		cpp_part RoundTo
 		return (self / to).round * to
 
-	function Date (|date|)
+	inline Date (|date|)
 		return (self * 64.0K)|date|
 
 	function Sign (|float| sigma=0.0, |float|)
@@ -486,7 +432,7 @@ datatype float
 	function Minus0 (|float| B, |float|)
 		cpp_Wrapper (fdimf)
 
-	function IsPow2 (|bool|)
+	inline IsPow2 (|bool|)
 		return !.log2.Fract
 
 	function Ceil (|float|)
@@ -668,7 +614,7 @@ datatype f64
 	function Floor (|Float64|)
 		cpp_wrapper (floor)
 	
-	function Fract (|Float64|)
+	inline Fract (|Float64|)
 		return self - .floor
 	
 	operator pow (|Float64| other, |Float64|)
@@ -695,7 +641,7 @@ datatype f64
 	render RenderFloat
 		fs.appenddouble(self, 6, false)
 
-	function Date (|date|)
+	inline Date (|date|)
 		return (self * 64.0K)|date|
 
 
@@ -728,7 +674,7 @@ datatype int64
 	render
 		fs <~ self
 
-	function AlignUp (|int64| To, |int64|)
+	inline AlignUp (|int64| To, |int64|)
 		return self + (-self|uint64| mod to) // ???
 
 	operator InRange (|int64| Length, |bool|)
@@ -749,38 +695,32 @@ datatype int64
 		if d > self
 			return d
 		return self
-
+	
 	operator min (|int64| d, |int64|)
 		asm iclm(dest, p1, p1, p2, 0)
 		if d < self
 			return d
 		return self
-		
+	
 	function Abs (|int64|)
 		if self < 0
 			self = -self
 		return self
 
-//	operator rotl (|int| Amount, |int64|)
-//		return (self|uint64|) rotl amount
+	inline Log2 (|int64|) // highestbit, highbit
+		return (self|uint64|).log2
+	
+//	inline Lowest (|int|)
+//		return .lowestbit.log2
+//		
+//	inline Highest (|int|)
+//		return (self|uint64|).log2
 //
-//	operator rotr (|int| Amount, |int64|)
-//		return (self|uint64|) rotr amount
-
-	function Log2 (|int64|) // highestbit, highbit
-		return (self|uint64|).log2
+//	inline LowestBit (|uint64|)
+//		return self & -self
 	
-	function Lowest (|int|)
-		return .lowestbit.log2
-		
-	function Highest (|int|)
-		return (self|uint64|).log2
-
-	function LowestBit (|uint64|)
-		return self & -self
-	
-	function IsPow2 (|bool|)
-		return (self & (self - 1)) == 0
+	inline IsPow2 (|bool|)
+		return (self!=0) & ((self & (self - 1)) == 0)
 
 	function AsFloat (|Float64|)
 		cpp_wrapper
@@ -830,15 +770,9 @@ datatype uint64
 		inline
 		return !(self mod n)
 	
-	function Exists (|int|)
-		return (self|bool|)|int|
+//	function Exists (|int|)
+//		return (self|bool|)|int|
 	
-	function High (|uint|)
-		return self >> 32
-	
-	function Low (|uint|)
-		return self
-		
 	operator max (|uint64| s, |uint64|)
 		asm uclm(dest, p1, p2, p1, 0)
 		if self > s: return self
@@ -861,15 +795,6 @@ datatype uint64
 		asm BSTT(dest, p1, 4)
 		cpp_wrapper (__builtin_bswap64)
 		
-//	operator rol (|uint| bits, |uint64|)
-//		bits &= 63
-//		return ((self << bits) ||| (self >> (64 - bits)))
-//
-//	operator ror (|uint| bits, |uint64|)
-//		bits &= 63
-//		return ((self >> bits) ||| (self << (64 - bits)))
-
-
 	function Trim (|int| B, |uint64|)
 		B = 64-B
 		return (self << B) >> B
@@ -880,15 +805,11 @@ datatype uint64
 		x = (x >> 8) xor x
 		return x
 
-	function IsPow2 (|bool|)
-		cpp_wrapper JB_u64_IsPow2
-
-	function HighestBit (|uint64|)
-		|| l = .log2
-		if l >= 0
-			return 1<<l
+	inline IsPow2 (|bool|)
+		return self|int64|.IsPow2
 		
 	syntax access (|int| bit, |bool|)
+		inline
 		return self&(1<<bit)
 
 	syntax access (|int| bit, assigns:|bool|, |uint64|)
@@ -902,13 +823,6 @@ datatype uint64
 			|uint64| Lowest = curr.lowestbit
 			yield Lowest (lowest.log2)
 			curr = curr &~ Lowest
-	
-	iterator highbits
-		|| curr = self|uint64|
-		while curr
-			|| value = curr.highestbit
-			yield value (value.log2)
-			curr = curr &~ value
 
 	iterator
 		|uint64| i = 0
@@ -929,22 +843,22 @@ datatype MaybeBool (byte) // could just put these on int? do we need a whole new
 		MaybeTrue = 9  // unknown but will default to true
 		
 	default 8|MaybeBool|
-	function Default (|bool|)
+	inline Default (|bool|)
 		return self|byte|&1
-	function IsKnown (|bool|)
+	inline IsKnown (|bool|)
 		return self|byte| <= 1
-	function KnownTrue (|bool|)
+	inline KnownTrue (|bool|)
 		return self|byte| == 1
-	function KnownFalse (|bool|)
+	inline KnownFalse (|bool|)
 		return self|byte| == 0
-	function Negate (|maybebool|)
+	inline Negate (|maybebool|)
 		return (self|byte| xor 1)|maybebool|
 	syntax cast (|bool|)
 		disabled "Do you mean .istrue? Maybebools can have an unknown state."
 	module
-		function Default (|bool| Default, |Maybebool|)
+		inline Default (|bool| Default, |Maybebool|)
 			return (8+default)|Maybebool|
-		function Known (|bool| As, |Maybebool|)
+		inline Known (|bool| As, |Maybebool|)
 			return (as)|Maybebool|
 	
 
@@ -953,9 +867,6 @@ datatype bool
 	size 1
 	default false
 	
-	operator sign (|int| i, |int|)
-		inline
-		return (i, -i)(self)
 	function Bool (|int| i, |int|)
 		disabled "use operator sign"
 	function Sign
@@ -963,12 +874,6 @@ datatype bool
 	
 //	syntax cast (|maybebool|) // bad. Many types seem to cast via this unintentionally.
 //		return self|maybebool|
-
-	function Set (|int| old, |int| flag, |int|)
-		cpp_part setflag
-		if self
-			return old ||| flag
-		return old &~ flag
 		
 	function Dir (|int|)
 		inline
@@ -1030,13 +935,13 @@ datatype MoveCode (byte)
 		inline
 		return (self & m) == m
 
-	function field (|int|)
+	function Field (|int|)
 		if self & Vertical
 			rz = 1
 		if self & Positive
 			rz |= 2
 	
-	function flip (|bool| same=false, |movecode|)
+	function Flip (|bool| same=false, |movecode|)
 		if !same
 			|| m = 0b01010101
 			|| m2 = m << 1

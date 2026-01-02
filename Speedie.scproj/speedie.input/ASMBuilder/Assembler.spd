@@ -131,7 +131,7 @@ struct Assembler
 			.NopConst(r)
 			return v
 		v -= Sub
-		if v.IsPow2
+		if !v or v.IsPow2
 			.NopConst(r)
 			if !v
 				return 0

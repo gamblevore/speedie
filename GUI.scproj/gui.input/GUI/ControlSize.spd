@@ -95,7 +95,7 @@ struct ControlSize
 				|| sz = .size(i)
 				
 				sz = upon.Transition(sz, i, e)
-				rz[i] = ro + ((i>=2) sign sz)
+				rz[i] = ro + (sz * (i>=2).dir)
 //				if dbg
 //					.PrintExplain(i, ro, rz)
 
