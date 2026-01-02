@@ -272,7 +272,7 @@ class FileViewer (ListView)
 		if ToFind[0] == '/'
 			require (self ~= ToFind)
 			return 10
-//		if self contains "input" and tofind contains "input"
+
 		if Tofind globs self
 			return 8
 		if (ToFind[0] == '.' and ToFind[1] != '/') and .endswith(ToFind, true)
