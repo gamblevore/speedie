@@ -192,7 +192,7 @@ class ListView (GUIControl) {
 		if (.RightClickSelects or .OnRightClick)
 			if r isnt selected
 				.Select(r)
-			|| c = .onrightclick 
+			|| c = .OnRightClick
 			if c and (c)(self, r)
 				.openmenu(r, y - .lastbottom)
 	
@@ -761,7 +761,6 @@ class ListView (GUIControl) {
 				WantsTo = i
 			  else
 				WantsTo = .listsource
-				|| top = .lasttop
 				if (p.y+p2.y > .lasttop)
 					|| s = .scrollstart
 						WantsTo = .bmove(s, -1)
@@ -1398,6 +1397,7 @@ class ListView (GUIControl) {
 	
 	function ScrollStart (assigns:|listviewrow|)
 		if ._ScrollStart!=value
+			if keys.Shift
 			._ScrollStart = value
 			.touch
 
@@ -1409,7 +1409,6 @@ class ListView (GUIControl) {
 		
 		|| clip = where.ControlClip
 		|| rect = .ActualRect
-		|| L = .ListSource
 		
 		.CalculateSkips
 		.DrawMarks(where, rect)

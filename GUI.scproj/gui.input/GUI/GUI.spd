@@ -390,7 +390,7 @@ module GUI
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		if .drawframelength
-			return true
+			return .StartedProperly
 		.DrawFrameLength = 60th.date // could try changing this to 61th?
 		
 		.GUICheck

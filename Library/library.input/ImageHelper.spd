@@ -10,14 +10,20 @@ module ImageHelper
 	function LoadPNG (|&byte| data, |int| len, |$int| x, |$int| y, |$int| comp, |?&byte|)
 		cpp_wrapper JB_Img__LoadPNG	
 
-	function ConvertPNGToVOI (|string| p, |string|)
-		rz = string.error
+	function ConvertPNGToVOI (|string| p, |message| where=nil, |StringThatWasReadSafely|)
 		|| x	= 0
 		|| y	= 0
 		|| comp	= 0
-		|| img = .LoadPNG( p.addr, p.length, x, y, comp )
-			|| n = 0
-			|| qoi = .WriteQOI(img, x, y, n)
-				rz = string.Own(qoi, n).compress(mzlab.strong)
-		memory.free(img!)
+		|| img = .LoadPNG( p.addr, p.length, x, y, comp )$
+		|| n = 0
+		|| qoi = .WriteQOI(img, x, y, n)
+		memory.free(img)
+		require qoi
+		|| O = string.Own(qoi, n)
+/		|| C = O.compress(mzlab.strong)
+		|| D = C.decompress // whyyyyyyyyy
+		if (O != D)
+			error (where, "Failed to compress image")
+			C = O
+		return C
 
