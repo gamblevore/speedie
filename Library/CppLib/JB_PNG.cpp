@@ -48,8 +48,9 @@ uint8* JB_Img__WriteQOI (uint8* data, int w, int h, int* len) {
 	return (uint8*)JB_ErrorHandleC("qoi could not encode", false);
 }
 
-// I'd rather strip png support, cos it needs gz.  But I can't for now. Sadly.
-// perhaps I could make gz part of jeebox? I mean... it has good support.
+// I'd rather strip png support, cos it needs deflate (Gz is based on deflate).
+// But I can't for now. Sadly. Perhaps I could make gz part of jeebox?
+// I mean... it has good support.
 uint8* JB_Img__LoadPNG (uint8* data, int len, int* x, int* y, int* comp) {
 	uint8* img = stbi_load_from_memory(data, len, x, y, comp, 4);
 	if (img)
