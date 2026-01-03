@@ -91,7 +91,7 @@ inline int JB_Int_Log2 (int X) {
 #endif
 }
 
-inline uint64 JB_u64_Log2 (u64 X) {
+inline int64 JB_u64_Log2 (u64 X) {
 #if __cpp_lib_bitops
 	return 31-std::countl_zero(X);
 #else
