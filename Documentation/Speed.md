@@ -62,7 +62,7 @@ The C++ version is at: [Documentation/CppComparison/SortLines.cpp](CppComparison
 
 The Speedie version is at: [Examples/SortLines.spd](../Examples/SortLines.spd) (237 bytes)
 
-The Speedie version is **11.5x smaller** (this was *after* I deleted some #ifdef'd code and comments from the C++ version).
+The Speedie source is **11.5x smaller** (this was *after* I deleted some #ifdef'd code and comments from the C++ version). The code compiles to much larger product, due to including all the libs. However the product is still much smaller than a hello-world `Rust` compile.
 
 The Speedie version has good error-checking on the file, and on app parameter handling. The C++ overhead is because C++ doesn't come with basic functions like "reading a file", which forces you to google or use stackoverflow to find answers to do basic things. Usually the simple answers are the wrong one. For file-reading, I found a 3-line C++ version, but it is very slow. Not good for a speed test! So I used the fastest (but still simple) C++ example I could find on stackoverflow.
 
