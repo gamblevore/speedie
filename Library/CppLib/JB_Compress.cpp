@@ -1,11 +1,8 @@
 
 #include "JB_Compress.h"
 #include "JB_MemUtils.h"
-// this still seems a lot SLOWER than the original! Despite all my opts!
-// could it be because the original perhaps used... registers? and mine isn't?
-// sigh. That will suck, to change.
-// it could be the myscore operation, though.
-// either way, this could get a lot faster.
+// this still seems a lot SLOWER than the original!
+// it could be the myscore operation?
 
 
 
@@ -107,6 +104,7 @@ scint HASH1_LEN   = MIN_MATCH;
 scint HASH2_LEN   = MIN_MATCH+1;
 scint HASH1_SIZE  = 1<<HASH1_BITS;
 scint HASH2_SIZE  = 1<<HASH2_BITS;
+scint HEAD_TO_PREV = HASH1_SIZE + HASH2_SIZE;
 scint HASH1_MASK  = HASH1_SIZE-1;
 scint HASH2_MASK  = HASH2_SIZE-1;
 scint HASH1_SHIFT = (HASH1_BITS+(HASH1_LEN-1))/HASH1_LEN;
@@ -122,10 +120,7 @@ static inline int update_hash2 (int h, int c) {
 
 
 extern "C" inline int MyScore (uint len, uint offset) {
-#if DEBUG
-	if (offset == 0) debugger;
-#endif
-    uint offbits = std::max(SLOT_BITS+31-JB_Int_Log2(offset), W_MINUS+1+SLOT_BITS);
+    uint offbits = std::max(SLOT_BITS+JB_Int_Log2(offset), W_MINUS+1+SLOT_BITS);
 	// could simplify. longer lengths are always better?
     uint l = len - MIN_MATCH;
     uint ln = 0;
@@ -173,12 +168,12 @@ struct Decomp {
 
 struct Compression {
 	int*			Head;
-	int*			Prev;
+//	int*			Prev;
 //	int*			TwoByte;
 	u8*				Read;
 	uint*			CmpOut;
 	uint*			CmpOutStart;
-	uint			Size;
+//	uint			Size;
 //	uint			Level;
 	uint			h1;
 	uint			h2;
@@ -194,7 +189,7 @@ struct Compression {
 		if (!Space and !(Space = JB_Realloc(NULL, N)))
 			return false;
 		
-		Size = JB_Str_Length(In);
+		int Size = JB_Str_Length(In);
 		
 		CmpOut = (uint*)JB_FS_WriteAlloc_(fs, (Size+20) + (Size>>6)); // might expand a little.
 		if (!CmpOut)
@@ -202,7 +197,7 @@ struct Compression {
 		CmpOutStart = CmpOut;
 
 		Head = (int*)Space;
-		Prev = Head + HASH1_SIZE + HASH2_SIZE;
+//		Prev = Head + HASH1_SIZE + HASH2_SIZE;
 //		TwoByte = Prev+W_SIZE;
 		Read = JB_Str_Address(In);
 
@@ -291,11 +286,6 @@ struct Compression {
 			PutBits(8, Read[LastOut++]);
 	}
 
-	inline void Escape (int LastOut, int p) {
-		if (LastOut < p)
-			EscapeSub(LastOut, p);
-	}
-	
 	inline void PutOffset (uint offset) {
 		int log = JB_Int_Log2(offset);
 		log = std::max(log, W_MINUS);
@@ -373,14 +363,16 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	int Len = 4;
 	auto Read = Fnd.Read;
 	auto Head = Fnd.Head;
-	while (p+Len < Fnd.Size) {
+	auto Size = self->Length;
+	while (p+Len < Size) {
 		{
 			int h1 = Fnd.h1; int h2 = Fnd.h2;
+			auto Prev = Head + HEAD_TO_PREV;
 			while (Len-- > 0) {
 	//			u16 SS = *((u16*)(Read+p));
 	//			TwoByte[SS] = p;
 				Head[h1]=p;
-				Fnd.Prev[p&W_MASK]=Head[h2+HASH1_SIZE];
+				Prev[p&W_MASK]=Head[h2+HASH1_SIZE];
 				Head[h2+HASH1_SIZE]=p++;
 				h1 = update_hash1(h1, Read[p+(HASH1_LEN-1)]);
 				h2 = update_hash2(h2, Read[p+HASH1_LEN]);
@@ -390,11 +382,11 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 		Len = 1;
 		int Offset = W_SIZE;
 		
-		const int max_match = Fnd.Size - p;
+		const int max_match = Size - p;
 		const int limit = std::max(p - W_SIZE, 0);
-		if (Head[Fnd.h1] >= limit) {
+		{
 			int s = Head[Fnd.h1];
-			if (Read[s]==Read[p]) {
+			if (s >= limit and Read[s]==Read[p]) {
 				int l = 0;
 				while (++l < max_match)
 					if (Read[s+l] != Read[p+l])
@@ -416,7 +408,8 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	//		if (!CanNest and len >= MIN_MATCH) {
 	//			CanNest = false;
 	//		}
-				
+			
+			auto Prev = Head + HEAD_TO_PREV;
 			while ((chain_len--!=0) and (s>=limit)) {
 				if ((Read[s+Len]==Read[p+Len]) and (Read[s]==Read[p])) {	
 					int l = 0;
@@ -437,12 +430,13 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 					if (l == max_match)
 						break;
 				}
-				s = Fnd.Prev[s & W_MASK];
+				s = Prev[s & W_MASK];
 			}
 		}
 		
 		if (Len >= MIN_MATCH) {
-			Fnd.Escape(LastOut, p);
+			if (LastOut < p)
+				Fnd.EscapeSub(LastOut, p);
 			Fnd.PutOffset(Offset);
 			Fnd.PutLength(Len - MIN_MATCH);
 			LastOut = p + Len;
@@ -451,9 +445,9 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 		}
 	}
 	
-	Fnd.Escape(LastOut, Fnd.Size);
+	if (LastOut < Size)
+		Fnd.EscapeSub(LastOut, Size);
 	Fnd.PutBits(31, 0);
-	auto Size = Fnd.Size;
 	int Req = (Size+20) + (Size>>6);
 	int Actual = (Fnd.CmpOut - Fnd.CmpOutStart) << 2;
 	*Fnd.CmpOutStart = Actual;

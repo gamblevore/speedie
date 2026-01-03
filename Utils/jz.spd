@@ -1,4 +1,4 @@
-#!/usr/local/bin/speedie
+#!/usr/local/bin/spd
 
 
 // todo: Add archiving of multiple files. Makes sense
@@ -50,7 +50,7 @@ main
 
 datatype Type (int)
 	flags
-		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=[Box, Jbin, Report], StdOut, SelfReplace, TestComp
+		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=[Box, Jbin, Report], StdOut, SelfReplace
 	
 	syntax is (|Type| test, |bool|)
 		return self & test 
@@ -83,8 +83,6 @@ function app.UseOne (|file| f)
 	if f.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
-	  elseif (conv.dest is TestComp)
-		conv.TestOne
 	  else 
 		conv.Process(f)
 	conv.End
@@ -122,9 +120,6 @@ function App.GetActions (|Type|)
 		  elseif name ~= "p"
 			rz |= type.stdout
 			.SingleFile(name)
-		  elseif name ~= "test"
-			rz |= type.TestComp
-			rz |= type.compressed
 		  elseif name ~= "d"
 			conv.Detected |= type.compressed
 		  elseif name ~= "c"
@@ -176,46 +171,6 @@ module Conv
 		.ast = nil
 		.Detected = nil
 		CompressionStats.all.Clear
-	
-
-	function TestOne
-		|| OrigIn = .in
-		|| OrigOut = .out
-		require OrigIn and origout and OrigIn.MustExist("test compression")
-		.done++
-		.DefaultStrength = MZLab.Strong
-
-		.TestSub(origIn)
-
-		.in = origin
-		.out = OrigOut
-		.DefaultStrength = MZLab.Strong
-		.TestSub(origIn)
-
-		.del(.out!, origin)		
-		.del(origout, origin)
-
-	
-	function Del (|file| f, |file| o)
-		if f.exists and f.path != o.path	
-			"deleting ${f.name}"
-			f.delete
-		
-		
-	function TestSub (|file| orig)
-		require StdErr.ok
-		expect (!.DestPath) ("Can't specify a dest-path!")
-
-		.CompressOnly(false)
-		require StdErr.ok
-
-		.in = .out
-		.out = (.in! + ".back").file
-
-		.CompressOnly(true)
-		require StdErr.ok
-		
-		.out!.CompareFile(Orig, Orig)
 
 
 	function Time (|string| Name, |bool| compress=false)
