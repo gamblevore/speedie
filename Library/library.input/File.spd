@@ -107,10 +107,7 @@ class File (String)
 	Syntax Access (assigns:|string| data, |ErrorInt|)
 		description "Writes to the file. Clears old data."
 		return .WriteAll(data)
-	
-	function String.Data (|string| Data, |ErrorInt|)
-		disabled "use string.WriteAll or string.ReadAll"
-	
+		
 	function String.WriteAll (|string| Data, |ErrorInt|)
 		description "Writes to the file. Clears old data. The entire data must be written. Or else the error-system kicks in."
 		|| f = .file // may be self

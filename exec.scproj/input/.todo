@@ -1,3 +1,0 @@
-
-
-* to debug speedie from perry, check for self-alter, then ext-compile ASM (same as speedie is debugged in xcode)

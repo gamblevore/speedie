@@ -1,5 +1,5 @@
 
-unfinished
+//unfinished
 
 module debugger
 	|message|		Root
@@ -8,12 +8,27 @@ module debugger
 	|string|		SrcMap
 	|&uint|			Base
 	|int|			Length
+	|string|		LastPath
 	
-	
-	function CakeVM.DebugFoundLocation (|String| FilePath, |uint| Position, |bool|)
-		print filepath
-		print ": "
-		printline Position.Render
+	function string.PathShrink (|string| Prev, |string|)
+		if self == prev
+			return .name
+		return self // do the rest later lol
+		
+	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |bool|)
+		if F
+			|| str = F.GetLine(position)
+			|| comment = str.find("//") // whoop!
+				str = str[0, comment]
+			str = str.trim
+
+			|| L = debugger.LastPath
+			if L!=F
+				debugger.lastpath = F
+			print "\t\t\t\t"
+			print F.PathShrink(L)
+			print ": "
+			printline str
 
 	// we need to respond to a few things:
 		// pause
@@ -47,7 +62,6 @@ module debugger
 	
 	function __Viewer__ (cakevm.CakeChef)
 		opt norefcounts
-		debugger
 		|| Index = .index(code)
 		if (index >= debugger.Length)
 			if StdErr.ok
@@ -56,8 +70,12 @@ module debugger
 		
 		|| Where = debugger.Base![index]
 		|| FileNum = where & (11~bits)
-		|| Path = debugger.files[FileNum]					#expect ("Missing file at index: " + filenum)
-		return .DebugFoundLocation( Path, Where>>11 )
+		|| Path = debugger.files[FileNum]
+		expect Path!=nil ("Missing file at index: " + filenum)
+		ifn path isa FileWithData
+			path = FileWithData(path)
+			debugger.files[filenum] = path
+		return .DebugFoundLocation( Path|&nil||filewithdata|, Where>>11 )
 	
 	
 	function StartDebug (|bool|)
@@ -91,4 +109,25 @@ module debugger
 			for i in spdtable.CodeLength
 				s[i] = 1<<31
 
+
+
+class FileWithData (stringshared)
+	default NIL
+	false NIL
+	|string?|   _Data
+
+	function GetLine (|int| Pos, |string|)
+		opt norefcounts
+		|| d = .data
+		|| Start = d.Find(charset.Line, pos, 0) // or should that be -1? what if pos == 0?
+		|| End = d.find(charset.line, pos, int.max)
+		return d[Start+1, End]
+		
+	function Data (|string|)
+		opt norefcounts
+		return ._Data init .ReadAll
+	
+	constructor (|string| Name)
+		super.constructor(name)
+		._data = nil
 

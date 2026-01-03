@@ -1,15 +1,22 @@
 
 
+// this replaces my entire old CharSet class!
+// no classes involved! Just raw data! So much smarter!
+// faster and smaller. And does more. And more expressive.
+
 function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
 	cpp_part FindCharset
 	nil checker
 	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
-							 // makes for confusing code. it WOULD have been good... if this were 1-based
+							 // makes for confusing code. Would be nice if Speedie had 1-based strings
 							 // because -1 is also the return value of a missing value.
 							 // nicer to make an explicit function that to handle end-relative searches
+							 // of course thats a tricky line to split. Should arrays be 1-based?
+							 // pointers too? No way on the pointers!
+	
 	|| p = &CharSet.Props[0]
-	|| addr = .addr
 	if self!=nil
+		|| addr = .addr
 		if from < After
 			from = from max 0
 			After = After min .Length
@@ -27,7 +34,7 @@ function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
 
 
 inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
-	return .find(~find, from, after)
+	return .find(~find, from, after) // so nice.
 
 
 
