@@ -20,7 +20,7 @@ datatype int
 		cpp_wrapper
 
 	inline IsPow2 (|bool|)
-		return (self!=0) & ((self & (self - 1)) == 0)
+		return 1<<.log2 == self
 
 	inline AlignUp (|int| To, |int|)
 		return self + (-self|uint| mod to)
@@ -238,7 +238,7 @@ datatype uint
 		return !(self mod n)
 
 	inline IsPow2 (|bool|)
-		return (self!=0) & ((self & (self - 1)) == 0)
+		return 1<<.log2 == self
 		
 	function Hash (|uint|)
 		cpp_wrapper JB_uint_hash
@@ -720,7 +720,7 @@ datatype int64
 //		return self & -self
 	
 	inline IsPow2 (|bool|)
-		return (self!=0) & ((self & (self - 1)) == 0)
+		return 1<<.log2 == self
 
 	function AsFloat (|Float64|)
 		cpp_wrapper
@@ -794,19 +794,9 @@ datatype uint64
 	function ByteSwap (|uint64|)
 		asm BSTT(dest, p1, 4)
 		cpp_wrapper (__builtin_bswap64)
-		
-	function Trim (|int| B, |uint64|)
-		B = 64-B
-		return (self << B) >> B
-
-	function XorDownTo8Bits (|byte|)
-		|uint| x = (self >> 32) xor self
-		x = (x >> 16) xor x
-		x = (x >> 8) xor x
-		return x
 
 	inline IsPow2 (|bool|)
-		return self|int64|.IsPow2
+		return 1<<.log2 == self
 		
 	syntax access (|int| bit, |bool|)
 		inline

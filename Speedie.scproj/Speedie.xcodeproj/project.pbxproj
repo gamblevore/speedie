@@ -368,7 +368,7 @@
 /* Begin PBXLegacyTarget section */
 		AC85018B299FF9AE00B63E29 /* speedie builder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--self --nocolor --x --nocompile --targetdebug";
+			buildArgumentsString = "--self --nocolor --x --nocompile --targetdebug --target=CompressionTest";
 			buildConfigurationList = AC85018C299FF9AE00B63E29 /* Build configuration list for PBXLegacyTarget "speedie builder" */;
 			buildPhases = (
 			);

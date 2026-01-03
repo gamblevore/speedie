@@ -71,6 +71,14 @@ class SteveMachine
 
 	syntax Access (|int| bits=64, |uint64|)
 		return .DivineBitPool(bits)
+
+
+	function uint64.XorDownTo8Bits (|byte|)
+		|uint| x = (self >> 32) xor self
+		x = (x >> 16) xor x
+		x = (x >> 8) xor x
+		return x
+	
 	
 	function DivineBitPool (|int| bits, |uint64|)
 		description "Returns up to 64 bits of randomness. Each bit of output comes from 12 bits of input, xored down to 1 bit."

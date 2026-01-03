@@ -149,6 +149,10 @@ extend Assembler
 		if 0: exp.JMKL
 		j._op += (mode&1)						// .JMPL
 		return J * dest
+		
+	function UInt64.Trim (|int| B, |uint64|)
+		B = 64-B
+		return (self << B) >> B
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)

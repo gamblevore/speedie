@@ -56,7 +56,6 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	expect fatasm.VerifyNumbers
-	// mzlab.testcompression
 	
 	app.parent // sigh. do this before clearenvs
 	.ClearEnvs
@@ -66,6 +65,8 @@ function compiler.SetupEnv
 
 	errorcolors.DisableIfNoTerminal
 	error.AutoPrint = 1
+	target CompressionTest
+		mzlab.testcompression
 	
 	if app.parent
 		error.AutoPrint = 0

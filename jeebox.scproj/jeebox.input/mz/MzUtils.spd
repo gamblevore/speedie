@@ -31,14 +31,9 @@ Module MZLab
 		if !rz
 			error "Decompression failed on: " + self
 			decomp = c.Decompress(int.max)
-		
 	
-	libinternal TestSub (|[string]| items, |FastString| FS, |int| i) 
-		for j in 4 
-			if i & (1<<j)
-				fs <~ items[j]!
-
-	target false
+	
+	target CompressionTest
 		function TestCompression
 			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 			require f.exists

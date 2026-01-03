@@ -263,11 +263,13 @@ struct Compression {
 	}
 
 	inline int GetOffset (Decomp& In) {
-		const int log = GetBits(In, SLOT_BITS) + W_MINUS;
+		int log = GetBits(In, SLOT_BITS) + W_MINUS;
+		int Add = 0;
 		if (log > W_MINUS)
-			return GetBits(In, log) + (1<<log);
+			Add = 1<<log;
 		  else
-			return GetBits(In, W_MINUS+1);
+			log = W_MINUS+1;
+		return GetBits(In, log) + Add;
 	}
 	
 	void EscapeSub (int LastOut, int p) {
@@ -287,67 +289,72 @@ struct Compression {
 	}
 
 	inline void PutOffset (uint offset) {
-		int log = JB_Int_Log2(offset);
-		log = std::max(log, W_MINUS);
+		int log = std::max(JB_Int_Log2(offset), W_MINUS);
 		PutBits(SLOT_BITS, log-W_MINUS);
+		int sub = 0;
 		if (log > W_MINUS)
-			PutBits(log, offset-(1<<log));		// removes the highest bit only. Neatly stores the rest.
+			sub = 1<<log;
 		  else
-			PutBits(W_MINUS+1, offset);			// Requires 6 bits, and stores numbers 0 to 63
+			log = W_MINUS+1;
+		PutBits(log, offset-sub);			// Requires 6 bits, and stores numbers 0 to 63
 	}
 	
 	inline void PutLength (uint l) {
 		int ll = 0;
 		int n = 0;
 		do {
-			++n; if (l<A_) {
-				ll = A_BITS; l -= 00; break;
+			if (l<A_) {
+				n = 1; ll = A_BITS; l -= 00; break;
 			}
-			++n; if (l<B_) {
-				ll = B_BITS; l -= A_; break;
+			if (l<B_) {
+				n = 2; ll = B_BITS; l -= A_; break;
 			}
-			++n; if (l<C_) {
-				ll = C_BITS; l -= B_; break;
+			if (l<C_) {
+				n = 3; ll = C_BITS; l -= B_; break;
 			}
-			++n; if (l<D_) {
-				ll = D_BITS; l -= C_; break;
+			if (l<D_) {
+				n = 4; ll = D_BITS; l -= C_; break;
 			}
-			++n; if (l<E_) {
-				ll = E_BITS; l -= D_; break;
+			if (l<E_) {
+				n = 5; ll = E_BITS; l -= D_; break;
 			}
-			++n; if (l<F_) {
-				ll = F_BITS; l -= E_; break;
+			if (l<F_) {
+				n = 6; ll = F_BITS; l -= E_; break;
 			}
-			++n; if (l<G_) {
-				ll = G_BITS; l -= F_; break;
+			if (l<G_) {
+				n = 7; ll = G_BITS; l -= F_; break;
 			}
-			++n; if (l<H_) {
-				ll = H_BITS; l -= G_; break;
+			if (l<H_) {
+				n = 8; ll = H_BITS; l -= G_; break;
 			}
-			++n; if (l<I_) {
-				ll = I_BITS; l -= H_; break;
+			if (l<I_) {
+				n = 9; ll = I_BITS; l -= H_; break;
 			}
-			++n; if (true) {
+			{
 				(void)I_; // just for viewing
-				ll = J_BITS; l -= I_; break;
+				n = 10; ll = J_BITS; l -= I_; break;
 			}
 		} while (0);
 		PutBits(n, 1);
 		PutBits(ll, l);
 	}
 	
-	inline int GetLength(Decomp& In) {
+	inline int GetLength (Decomp& In) {
 		int Z = HeaderBits(In);
-		if (Z==0) return GetBits(In, A_BITS) + 00;
-		if (Z==1) return GetBits(In, B_BITS) + A_;
-		if (Z==2) return GetBits(In, C_BITS) + B_;
-		if (Z==3) return GetBits(In, D_BITS) + C_;
-		if (Z==4) return GetBits(In, E_BITS) + D_;
-		if (Z==5) return GetBits(In, F_BITS) + E_;
-		if (Z==6) return GetBits(In, G_BITS) + F_;
-		if (Z==7) return GetBits(In, H_BITS) + G_;
-		if (Z==8) return GetBits(In, I_BITS) + H_;
-		if (true) return GetBits(In, J_BITS) + I_;
+		int Mode = A_BITS;
+		switch (Z) {
+			case 0:  break;
+			case 1:  {Mode = B_BITS; Z = A_; break;}
+			case 2:  {Mode = C_BITS; Z = B_; break;}
+			case 3:  {Mode = D_BITS; Z = C_; break;}
+			case 4:  {Mode = E_BITS; Z = D_; break;}
+			case 5:  {Mode = F_BITS; Z = E_; break;}
+			case 6:  {Mode = G_BITS; Z = F_; break;}
+			case 7:  {Mode = H_BITS; Z = G_; break;}
+			case 8:  {Mode = I_BITS; Z = H_; break;}
+			default: {Mode = J_BITS; Z = I_; break;}
+		}
+		return GetBits(In, Mode) + Z;
 	}
 };
 
@@ -468,11 +475,13 @@ extern "C" int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level)
 // Should return the consumed length. in case str had multiple compressed chunks appended.
 
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
-	int StrLen = JB_Str_Length(self);
-	require(StrLen);
-
-	u8* A = JB_Str_Address(self);
-	Decomp In = {(u32*)A, (u32*)(A + StrLen)};
+	Decomp In;
+	{
+		int N = JB_Str_Length(self);
+		require(N);
+		u8* A = JB_Str_Address(self);
+		In = {(u32*)A, (u32*)(A + N)};
+	 }
 
 	uint Size = In.Read4();
 	if (Size > 16*1024*1024)
