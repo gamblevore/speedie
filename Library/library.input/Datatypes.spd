@@ -20,7 +20,8 @@ datatype int
 		cpp_wrapper
 
 	inline IsPow2 (|bool|)
-		return 1<<.log2 == self
+		if self
+			return !(self&(self-1))
 
 	inline AlignUp (|int| To, |int|)
 		return self + (-self|uint| mod to)
@@ -238,7 +239,8 @@ datatype uint
 		return !(self mod n)
 
 	inline IsPow2 (|bool|)
-		return 1<<.log2 == self
+		if self
+			return !(self&(self-1))
 		
 	function Hash (|uint|)
 		cpp_wrapper JB_uint_hash
@@ -710,17 +712,9 @@ datatype int64
 	inline Log2 (|int64|) // highestbit, highbit
 		return (self|uint64|).log2
 	
-//	inline Lowest (|int|)
-//		return .lowestbit.log2
-//		
-//	inline Highest (|int|)
-//		return (self|uint64|).log2
-//
-//	inline LowestBit (|uint64|)
-//		return self & -self
-	
 	inline IsPow2 (|bool|)
-		return 1<<.log2 == self
+		if self
+			return !(self&(self-1))
 
 	function AsFloat (|Float64|)
 		cpp_wrapper
@@ -796,7 +790,8 @@ datatype uint64
 		cpp_wrapper (__builtin_bswap64)
 
 	inline IsPow2 (|bool|)
-		return 1<<.log2 == self
+		if self
+			return !(self&(self-1))
 		
 	syntax access (|int| bit, |bool|)
 		inline
@@ -844,7 +839,7 @@ datatype MaybeBool (byte) // could just put these on int? do we need a whole new
 	inline Negate (|maybebool|)
 		return (self|byte| xor 1)|maybebool|
 	syntax cast (|bool|)
-		disabled "Do you mean .istrue? Maybebools can have an unknown state."
+		disabled "Do you mean .KnownTrue? Maybebools can have an unknown state."
 	module
 		inline Default (|bool| Default, |Maybebool|)
 			return (8+default)|Maybebool|
