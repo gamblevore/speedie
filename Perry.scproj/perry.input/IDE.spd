@@ -822,7 +822,7 @@ class PerryIDE (Window)
 				if err.path ~= path
 					if txt.AddErrorToLine(err) == sel
 						txt.TryShowLineError(sel)
-					if jump and (!jumpto or err == lst.FirstSelected)
+					if jump and (!jumpto or err == lst.FirstSelected(true))
 						jumpto = err
 				if actual_compile
 					.CommsLogList <~ err.copy

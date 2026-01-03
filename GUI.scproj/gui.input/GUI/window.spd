@@ -228,7 +228,7 @@ class Window (GUIControl)
 		if !l
 			return true
 
-		|| Item = l.FirstSelected
+		|| Item = l.FirstSelected(true)
 		if keys.shift
 			fwd = !fwd
 		if !Item

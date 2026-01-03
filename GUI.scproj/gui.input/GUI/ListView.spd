@@ -432,7 +432,7 @@ class ListView (GUIControl) {
 			|| d = int.max
 			if keys.Cmd
 				.SelectMove( (-d, d)(Key is up) )
-			  elseif !.FirstSelected
+			  elseif !.FirstSelected(true)
 				.SelectMove( (-d, d)(Key is down) )
 			  else
 				|| i = 1
@@ -638,7 +638,7 @@ class ListView (GUIControl) {
 
 
 	libinternal BasicRowDrag (GuiListDragEvent)
-		|| s = .FirstSelected
+		|| s = .FirstSelected(true)
 		if !s or (.Hiernext(s) == before) and !s.nextselected
 			return true // no need
 		
@@ -721,7 +721,7 @@ class ListView (GUIControl) {
 	
 	
 	libinternal CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
-		if ._DraggingRowTo or (.FirstSelected != .lastselected)
+		if ._DraggingRowTo or (.FirstSelected(true) != .lastselected(True))
 			return true
 		require .draggingrowfrom != WantsBefore
 		require .Hiernext(.draggingrowfrom) != wantsbefore
@@ -776,7 +776,7 @@ class ListView (GUIControl) {
 		if .ClickedScroll(P, clicks)
 			return MouseDragging.Within
 		
-		|| FirstSel = .FirstSelected
+		|| FirstSel = .FirstSelected(true)
 		|| LC = .FindClickedCell(P)
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
 			if lc and lc.row == firstsel
@@ -811,14 +811,15 @@ class ListView (GUIControl) {
 		return MouseDragging.handled
 	
 	
-	function LastSelected (|ListViewrow|)
+	function LastSelected (|bool| NoChange=false, |ListViewrow|)
 		opt NoRefCounts
 		|| l = .end
 		while l
 			if l is selected
 				return l
 			l = .hierPrev(l)
-		return .OneAlways
+		if !NoChange
+			return .OneAlways
 			
 		
 	libinternal End (|ListViewrow|)
@@ -922,29 +923,41 @@ class ListView (GUIControl) {
 
 
 	function SelectAtLeastFirst	
-		if !.firstselected
+		if !.firstselected(true)
 			.select(.start)
 
+	
 	function Selected (|ListViewRow|)
 		disabled "Do you mean .FirstSelected or .LastSelected?"
 	
 	
-	function FirstSelected (|ListViewRow|)
+	inline FirstSelected (|ListViewRow|)
+		cpp_name FirstSelected0
+		return .FirstSelected(false)
+	
+	
+	function FirstSelected (|bool| NoChange, |ListViewRow|)
+		// changing the selection here is kinda... sussy.
+		// we should have two functions... I think.
+		// same with .LastSelected
+		// different names too?
+		
 		opt NoRefCounts
 		|| l = .start 		
 		while l
 			if l is selected
 				return l
 			l = .HierNext(l)
-		return .OneAlways
+
+		if !NoChange
+			return .OneAlways
 
 
 	libinternal OneAlways (|ListViewRow|)
 		opt norefcounts
 		if .onealwaysselected
 			|| it = .start
-				(it is selected)
-				.SelectedEvent( it )
+				.Select(it)
 				return it
 
 
@@ -985,7 +998,7 @@ class ListView (GUIControl) {
 	function SelectMove (|int| i, |bool| Multi=keys.shift)
 		opt norefcounts
 		require i
-		|| l = (.LastSelected, .FirstSelected)(i > 0)
+		|| l = (.LastSelected(true), .FirstSelected(true))(i > 0)
 		if !l
 			// what if .start or .end is disabled?
 			|| f = .edge(i, true)
@@ -1014,7 +1027,7 @@ class ListView (GUIControl) {
 
 
 	function SelectNone
-		opt NoRefCounts
+		opt NoRefCounts // this does not seem to select none??
 		|| one = .OneAlwaysSelected
 		|| s = (.FirstSelected ?? .start, nil)(one)
 		return .Select(s)
