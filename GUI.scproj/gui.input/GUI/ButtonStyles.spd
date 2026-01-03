@@ -3,10 +3,9 @@ function image.RoundRectDrawer (ImageDrawStyleEvent)
 	require !EdgeOnly
     || Col = g.bg.PreMul
     || Edge = g.edge.Color
-
-
     || center = rect.Center
     center.y -= 0.5
+
     || CS = G.CornerSize|float| * 0.25 + 1.0
     || Lim1 = (CS-0.5).pow2
     || Lim2 = (CS+g.LineWidth|float|-0.5).pow2
@@ -74,19 +73,17 @@ extend_module Image
 		return c
 
 
-// So... edge draws last. rework so edge draws last. no need to drawbg then.
-// not in here?
 function image.CurlieQueDrawer (ImageDrawStyleEvent)
 	|| BG = g.bg.PreMul
 	|| Edge = vec4(1).premul  //g.edge.Color.PreMul
 	|| Nothing = vec4(0).PreMul
-	|| center = rect.Center.iVec2
-	|| Active = g.CornersCut
+//	|| center = rect.Center.iVec2
+//	|| Active = g.CornersCut
 	|| Q = image.CurlieQue
 	
 	for Y in rect.Vert
 		|| W = self[rect.x, Y]
-		|| YCorner = (y >= center.y)
+//		|| YCorner = (y >= center.y)
 		for X in rect.Horz
 			|| D = rect.DistToCorner((X,Y)).abs
 			if 16 > d.x and d.y			
