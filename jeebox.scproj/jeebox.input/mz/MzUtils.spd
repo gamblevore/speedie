@@ -47,7 +47,8 @@ Module MZLab
 					|| s = ch.ReadAll
 					|| c = s.compress
 					|| d = c.Decompress
-//					expect s == d
+					expect (s == d) ("Compression fail")
+					(c)
 	
 			"TestCompression passed."
 		

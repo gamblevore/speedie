@@ -1,5 +1,6 @@
 
 #include "JB_Compress.h"
+#include "JB_MemUtils.h"
 // this still seems a lot SLOWER than the original! Despite all my opts!
 // could it be because the original perhaps used... registers? and mine isn't?
 // sigh. That will suck, to change.
@@ -124,7 +125,7 @@ extern "C" inline int MyScore (uint len, uint offset) {
 #if DEBUG
 	if (offset == 0) debugger;
 #endif
-    uint offbits = std::max(SLOT_BITS+31-__builtin_clz(offset), W_MINUS+1+SLOT_BITS);
+    uint offbits = std::max(SLOT_BITS+31-JB_Int_Log2(offset), W_MINUS+1+SLOT_BITS);
 	// could simplify. longer lengths are always better?
     uint l = len - MIN_MATCH;
     uint ln = 0;
@@ -178,7 +179,7 @@ struct Compression {
 	uint*			CmpOut;
 	uint*			CmpOutStart;
 	uint			Size;
-	uint			Level;
+//	uint			Level;
 	uint			h1;
 	uint			h2;
 	uint64_t		BitBuff;
@@ -296,12 +297,8 @@ struct Compression {
 	}
 	
 	inline void PutOffset (uint offset) {
-//#if DEBUG
-//	if (offset == 0) debugger;
-//#endif
-		int log = 0;
-		if (offset)
-			log = std::max(31-__builtin_clz(offset), W_MINUS);
+		int log = JB_Int_Log2(offset);
+		log = std::max(log, W_MINUS);
 		PutBits(SLOT_BITS, log-W_MINUS);
 		if (log > W_MINUS)
 			PutBits(log, offset-(1<<log));		// removes the highest bit only. Neatly stores the rest.
@@ -362,105 +359,88 @@ struct Compression {
 		if (Z==8) return GetBits(In, I_BITS) + H_;
 		if (true) return GetBits(In, J_BITS) + I_;
 	}
-
-	inline int InsertSubStrings (int p, int len) {
-		while (len-- > 0) {
-//			u16 SS = *((u16*)(Read+p));
-//			TwoByte[SS] = p;
-			Head[h1]=p;
-			Prev[p&W_MASK]=Head[h2+HASH1_SIZE];
-			Head[h2+HASH1_SIZE]=p++;
-			h1 = update_hash1(h1, Read[p+(HASH1_LEN-1)]);
-			h2 = update_hash2(h2, Read[p+HASH1_LEN]);
-		}
-		return p;
-	}
-	
-	inline int NextScore (int p) {
-		auto [A, B, C] = FindMatch(p, false);
-		return std::max(C,0);
-	}
-	
-	inline std::tuple<int, int, int> FindMatch (int p, bool CanNest=true) {
-		int len = 1;
-		int offset = W_SIZE;
-		const int max_match = Size - p;
-		const int limit = std::max(p - W_SIZE, 0);
-		
-//		auto SS = TwoByte[*((u16*)(Read+p))];
-//		if (SS) {
-//			offset = p - SS;
-//			if (offset < W_SIZE)
-//				len = 2;
-//			  else
-//				offset = W_SIZE;
-//		}
-		
-		if (Head[h1] >= limit) {
-			int s = Head[h1];
-			if (Read[s]==Read[p]) {
-				int l = 0;
-				while (++l < max_match)
-					if (Read[s+l] != Read[p+l])
-						break;
-				if (l > len) {
-					len = l;
-					offset = p-s;
-				}
-			}
-		}
-
-		// Attempt to find best PAIR seemed to make things worse? Not sure why.
-		int chain_len = 16 << (4*Level);
-		int s = Head[h2+HASH1_SIZE];
-				
-		int Sc = MyScore(len, offset);
-//		if (CanNest and len >= MIN_MATCH) {
-//			Sc += NextScore(p+len);
-//		}
-//		if (!CanNest and len >= MIN_MATCH) {
-//			CanNest = false;
-//		}
-			
-		while ((chain_len--!=0) and (s>=limit)) {
-			if ((Read[s+len]==Read[p+len]) and (Read[s]==Read[p])) {	
-				int l = 0;
-				while (++l < max_match)
-					if (Read[s+l] != Read[p+l])
-						break;
-				if (l >= MIN_MATCH) {
-					int Sc2 = MyScore(l, p-s); // seems to not work
-//					if (CanNest) {
-//						Sc2 += NextScore(p+len);
-//					}
-					if (Sc2 > Sc) {
-						len = l;
-						offset = p-s;
-						Sc = Sc2;
-					}
-				}
-				if (l == max_match)
-					break;
-			}
-			s = Prev[s & W_MASK];
-		}
-
-		return {len, offset, Sc};
-	}
 };
 
 
 
 int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	Compression Fnd = {};
-	Level = (std::max(std::min(Level, 30), 20) + 5) / 10;
-	Fnd.Level = Level;
 	require (Fnd.StartCompress(fs, self));
 	
+	Level = (std::max(std::min(Level, 30), 20) + 5) / 10;
 	int LastOut = 0;
-	int p = Fnd.InsertSubStrings(0, 4);
-	while (p < Fnd.Size) {
-		auto [Len, Offset, _] = Fnd.FindMatch(p);	
+	int p = 0;
+	int Len = 4;
+	auto Read = Fnd.Read;
+	auto Head = Fnd.Head;
+	while (p+Len < Fnd.Size) {
+		{
+			int h1 = Fnd.h1; int h2 = Fnd.h2;
+			while (Len-- > 0) {
+	//			u16 SS = *((u16*)(Read+p));
+	//			TwoByte[SS] = p;
+				Head[h1]=p;
+				Fnd.Prev[p&W_MASK]=Head[h2+HASH1_SIZE];
+				Head[h2+HASH1_SIZE]=p++;
+				h1 = update_hash1(h1, Read[p+(HASH1_LEN-1)]);
+				h2 = update_hash2(h2, Read[p+HASH1_LEN]);
+			}
+			Fnd.h1 = h1; Fnd.h2 = h2;
+		}
+		Len = 1;
+		int Offset = W_SIZE;
+		
+		const int max_match = Fnd.Size - p;
+		const int limit = std::max(p - W_SIZE, 0);
+		if (Head[Fnd.h1] >= limit) {
+			int s = Head[Fnd.h1];
+			if (Read[s]==Read[p]) {
+				int l = 0;
+				while (++l < max_match)
+					if (Read[s+l] != Read[p+l])
+						break;
+				if (l > Len) {
+					Len = l;
+					Offset = p-s;
+				}
+			}
+		}
+
+		{ // early free vars
+			int chain_len = 16 << (4*Level);
+			int s = Head[Fnd.h2+HASH1_SIZE];
+			int Sc = MyScore(Len, Offset);
+	//		if (CanNest and len >= MIN_MATCH) {
+	//			Sc += NextScore(p+len);
+	//		}
+	//		if (!CanNest and len >= MIN_MATCH) {
+	//			CanNest = false;
+	//		}
+				
+			while ((chain_len--!=0) and (s>=limit)) {
+				if ((Read[s+Len]==Read[p+Len]) and (Read[s]==Read[p])) {	
+					int l = 0;
+					while (++l < max_match)
+						if (Read[s+l] != Read[p+l])
+							break;
+					if (l >= MIN_MATCH) {
+						int Sc2 = MyScore(l, p-s); // seems to not work
+	//					if (CanNest) {
+	//						Sc2 += NextScore(p+len);
+	//					}
+						if (Sc2 > Sc) {
+							Len = l;
+							Offset = p-s;
+							Sc = Sc2;
+						}
+					}
+					if (l == max_match)
+						break;
+				}
+				s = Fnd.Prev[s & W_MASK];
+			}
+		}
+		
 		if (Len >= MIN_MATCH) {
 			Fnd.Escape(LastOut, p);
 			Fnd.PutOffset(Offset);
@@ -469,7 +449,6 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 		} else {
 			Len = 1;
 		}
-		p = Fnd.InsertSubStrings(p, Len);
 	}
 	
 	Fnd.Escape(LastOut, Fnd.Size);
@@ -503,12 +482,12 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 
 	uint Size = In.Read4();
 	if (Size > 16*1024*1024)
-		return JB_ErrorHandleC("Size field corrupt", 0, false);
+		return JB_ErrorHandleC("mz chunk size bad", 0, false);
 	
 	Compression Cmp = {};
 	auto Write = JB_FS_WriteAlloc_(fs, Size+7);
 	if (!Write)
-		return JB_ErrorHandleC("Size field corrupt", 0, false);
+		return 0;
 	
 	Cmp.BitBuff = In.Read4();	
 	for (int p = 0; p < Size;) {
@@ -516,7 +495,8 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 		int s = p - ago;
 		if (!ago) {
 			int n = Cmp.GetLength(In);
-			if (!n) break; // incase of bad data.
+			if (n <= 0 or p+n>Size)
+				return JB_ErrorHandleC("mz corruption", 0, false);
 			Cmp.HeaderBits(In); // clear
 			for (int i = 0; i < n; i++)
 				Write[p++] = Cmp.GetBits(In, 8);

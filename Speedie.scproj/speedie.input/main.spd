@@ -56,7 +56,8 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	expect fatasm.VerifyNumbers
-
+	// mzlab.testcompression
+	
 	app.parent // sigh. do this before clearenvs
 	.ClearEnvs
 	options.dev = app.prefs["dev"].int

@@ -4,6 +4,7 @@
 #define __JB_MEM_UTILS__
 
 #include <string.h>
+#include <bit>
 #if __PLATFORM_CURR__ == __PLATFORM_OSX__
     #include <malloc/malloc.h>
 #else
@@ -81,17 +82,23 @@ u64 JB_MemUsedOther();
 
 
 inline int JB_Int_Log2 (int X) {
-#if DEBUG
-	if (!X) debugger;
+#if __cpp_lib_bitops
+	return 31-std::countl_zero(X); // stable per-platform.
+#else
+	if (!X)
+		return -1;
+    return 31- __builtin_clz(X);   // this behaviour differs per-platform. very uncool!
 #endif
-    return 31- __builtin_clz(X);
 }
 
 inline uint64 JB_u64_Log2 (u64 X) {
-#if DEBUG
-	if (!X) debugger;
-#endif
+#if __cpp_lib_bitops
+	return 31-std::countl_zero(X);
+#else
+	if (!X)
+		return -1;
     return 63-__builtin_clzll(X);
+#endif
 }
 
 
@@ -102,19 +109,6 @@ inline void memzero (void* Where, int N) {
 
 inline int JB_Int_CountBits (int X) {
     return __builtin_popcount(X);
-}
-
-inline int JB_Int_CTZ (int X) {
-	return __builtin_ctz(X);
-}
-
-inline int JB_Int_BiggestBit (int X) {
-    int N = JB_Int_Log2( X );
-    return 1 << (N - 1);
-}
-
-inline int JB_Int_RoundUp(int N, int To) {
-	return N + (((uint)(-N)) % To);
 }
 
 }

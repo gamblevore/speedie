@@ -40,8 +40,11 @@ function InputStream.Decompress (|object| dest=nil,  |uint| Limit=256MB,  |&comp
 	
 	|| fs = FastString.UseAsOutput(dest)			#require
 	|| d = string.error
-	if .DecompressSub(fs, st.start(compressionstats.decompression), Remain)
+	st = st.start(compressionstats.decompression)
+	if .DecompressSub(fs, st, Remain)
 		d = fs.GetResult(dest)
+	
+	st.end
 	return d
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +57,7 @@ libinternal InputStream.DecompressSub (|faststring| fs,  |&compressionstats| st,
 		|| ChunkData = .str(InSize)
 		expect (ChunkData == InSize) 					(self, "mz input too short")
 		
-		|| OutSize = fs.DecompressChunk(ChunkData)		#loop
+		|| OutSize = fs.DecompressChunk(ChunkData)		#require
 		OutRemain -= OutSize
 		expect (OutRemain >= 0)							(self, "mz header invalid")		
 		// "|uint| Remain" in caller func, did not add up to the sizes found here!
@@ -62,7 +65,6 @@ libinternal InputStream.DecompressSub (|faststring| fs,  |&compressionstats| st,
 		fs.Flush
 		st.LiveUpdate(InSize + 4, OutSize)
 
-	st.end
 	return true
 
 
