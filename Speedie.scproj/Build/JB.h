@@ -4411,7 +4411,7 @@ uint JB_uint_LowestBit(uint Self);
 // uint64
 uint64 SC_uint64_rotl1(uint64 Self);
 
-uint64 JB_uint64_Trim(uint64 Self, int B);
+uint64 SC_uint64_Trim(uint64 Self, int B);
 
 
 
@@ -10898,8 +10898,6 @@ inline void JB_Print(JB_String* Data);
 
 inline void JB_PrintLine(JB_String* Data);
 
-inline byte* JB_Str_Addr(JB_String* Self);
-
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
 inline int JB_Str_CompareInt(JB_String* Self, int Other);
@@ -11283,7 +11281,10 @@ inline bool JB_dylib_IsOpen(JB_Dylib* Self) {
 }
 
 inline bool JB_int64_IsPow2(int64 Self) {
-	return ((bool)((Self != 0) & ((Self & (Self - 1)) == 0)));
+	if (Self) {
+		return (!(Self & (Self - 1)));
+	}
+	return false;
 }
 
 inline Float64 JB_int64_OperatorDiv(int64 Self, int64 D) {
@@ -11302,7 +11303,10 @@ inline int JB_int_AlignUp(int Self, int To) {
 }
 
 inline bool JB_int_IsPow2(int Self) {
-	return ((bool)((Self != 0) & ((Self & (Self - 1)) == 0)));
+	if (Self) {
+		return (!(Self & (Self - 1)));
+	}
+	return false;
 }
 
 inline float JB_int_OperatorDiv(int Self, int D) {
@@ -11466,10 +11470,6 @@ inline void JB_Print(JB_String* Data) {
 
 inline void JB_PrintLine(JB_String* Data) {
 	JB_Str_PrintLine(Data);
-}
-
-inline byte* JB_Str_Addr(JB_String* Self) {
-	return JB_Str_Address(Self);
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {

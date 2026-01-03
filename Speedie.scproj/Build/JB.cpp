@@ -3524,7 +3524,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[443]);
-	JB_FS_AppendInt32(_fsf0, (2026010316));
+	JB_FS_AppendInt32(_fsf0, (2026010319));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8225,7 +8225,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1388]);
-	JB_FS_AppendInt32(_fsf0, (2026010316));
+	JB_FS_AppendInt32(_fsf0, (2026010319));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -16095,7 +16095,7 @@ uint64 SC_uint64_rotl1(uint64 Self) {
 	return (Self << 1) | (Self >> 63);
 }
 
-uint64 JB_uint64_Trim(uint64 Self, int B) {
+uint64 SC_uint64_Trim(uint64 Self, int B) {
 	B = (64 - B);
 	return (Self << B) >> B;
 }
@@ -22757,7 +22757,7 @@ Ind SC_Pac_Const(Assembler* Self, ASMReg R, int Bits, bool Signed) {
 		int64 K = SC_Reg_Const(R);
 		if (SC_int64_Fits(K, Bits, Signed)) {
 			SC_Pac_NopConstWithReg(Self, R);
-			return JB_uint64_Trim(((uint64)K), Bits);
+			return SC_uint64_Trim(((uint64)K), Bits);
 		}
 	}
 	return -1;
@@ -23832,7 +23832,7 @@ ASMReg SC_Pac_KompareIntK(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Mess
 		return nil;
 	}
 	SC_Pac_NopConstWithReg(Self, R);
-	K = JB_uint64_Trim(((uint64)K), 9);
+	K = SC_uint64_Trim(((uint64)K), 9);
 	FatASM* J = SC_Msg_JMKM(Exp, L, K, nil);
 	if (0) {
 		SC_Msg_JMKL(Exp, nil, nil, nil);
@@ -32132,8 +32132,8 @@ Ind JB_Str_FindCharset(JB_String* Self, CharSet Find, int From, int After) {
 	if ((From < 0) or (After < 0)) {
 	}
 	byte* P = (&JB__CharSet_Props[0]);
-	byte* Addr = JB_Str_Addr(Self);
 	if (Self != nil) {
+		byte* Addr = Self->Addr;
 		if (From < After) {
 			From = JB_int_OperatorMax(From, 0);
 			After = JB_int_OperatorMin(After, JB_Str_Length(Self));
@@ -59574,4 +59574,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 2627349265131882846 7768642982253459242
+// 7802803664968684318 7768642982253459242
