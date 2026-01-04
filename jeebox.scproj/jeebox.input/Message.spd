@@ -110,6 +110,7 @@ Message is also:
 		if P
 			rz.position = P.position
 			rz.rangelength = P.rangelength
+			rz.tag = p.Tag // what about flags?
 		for v.fast in self
 			rz <~ v.CopyWithoutUsing(P)
 
