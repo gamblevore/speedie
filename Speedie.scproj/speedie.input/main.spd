@@ -65,8 +65,8 @@ function compiler.SetupEnv
 
 	errorcolors.DisableIfNoTerminal
 	error.AutoPrint = 1
-	target CompressionTest
-		mzlab.testcompression
+//	target CompressionTest
+//		mzlab.testcompression
 	
 	if app.parent
 		error.AutoPrint = 0
