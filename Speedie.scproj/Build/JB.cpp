@@ -3524,7 +3524,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[443]);
-	JB_FS_AppendInt32(_fsf0, (2026010319));
+	JB_FS_AppendInt32(_fsf0, (2026010413));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8225,7 +8225,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1388]);
-	JB_FS_AppendInt32(_fsf0, (2026010319));
+	JB_FS_AppendInt32(_fsf0, (2026010413));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -36622,6 +36622,7 @@ Message* JB_Msg_CopyWithoutUsing(Message* Self, Message* P) {
 	if (P) {
 		Rz->Position = P->Position;
 		Rz->RangeLength = P->RangeLength;
+		Rz->Tag = P->Tag;
 	}
 	{
 		Message* V = ((Message*)JB_Ring_First(Self));
