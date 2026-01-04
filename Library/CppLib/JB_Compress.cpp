@@ -289,14 +289,77 @@ struct Compression {
 	}
 
 	inline void PutOffset (uint offset) {
+		// we could shrink this by the current max length, plus a bit more for escapes
+		// don't wanna do this now. my energy is fried.
 		int log = std::max(JB_Int_Log2(offset), W_MINUS);
 		PutBits(SLOT_BITS, log-W_MINUS);
-		int sub = 0;
+		
+		///		11111, log2 is 4, but we bump it upto 5
+		///		We write 4 bits, of 0.   (0 = 5-5)
+		///		log == 5, so we add 1 to log, log is now 6
+		///		now we write 6 bits, containing 31
+		///		like this, we can write values up to 63, at the base log.
+		///		lets try a bigger number, 63.
+
+		///		63, log2 is 5.
+		///		write 4 bits of 0.
+		///		log becomes 6
+		///		write 6 bits containing 63
+		
+		///		I guess it worksout. we just write it that way.
+		///		small numbers take 10 bits. So what number would give a log2 that requires 1 less bit?
+		///		we got a log of 5 for 63.
+		///		64 gives a log of 6.
+		///		(we subtract 5 however)
+		///     the log also gives us the highest bit "for free". So lets include that.
+
+		//		63		= 5+1	(0)
+		//		127		= 6  	(1)
+		//		255		= 7  	(2)
+		//		511		= 8  	(3)
+		//		1023	= 9  	(4)
+		//		2047	= 10 	(5)
+		//		4K-1	= 11 	(6)
+		//		8K..	= 12 	(7)
+		//		16K		= 13 	(8)
+		//		32K		= 14 	(9)
+		//		64K		= 15 	(10)
+		//		128K	= 16 	(11)
+		//		256K	= 17 	(12)
+		//		512K	= 18 	(13)
+		//		1MB		= 19 	(14)
+		//		2MB		= 20 	(15)
+		
+		// now... we want to take off 1 bit. so the biggest number is 7.
+		// that gives us 8K. We could save 1-bit, per-offset, for files under 8K.
+
+		// we want to aim for saving some bits for 64K files. If we raised the base-bits
+		// lets say so that 64K takes number 7. So raise by 3. Then 0 is now at 512.
+		// So the smallest size we can write, is now 12-bit offset. we probably just
+		// increased the file-size. altough values of 512 to 64K could save 1-bit per-match
+		// it might help... or make things worse.
+		
+		// we do have a huge space, of 2MB possible offsets. Could they be reused somehow?
+		// I realy do feel somehow that these offsets are still large
+		// 10bits for a value of 0-63. Its a lot.
+		
+		// so do we want 3 bit overhead, or 2? Actually its not possible. Because we restore
+		// 1 bit using the log. but without the log, we can't restore it. We'd need 2 bits.
+		
+		// is there a better way? there HAS to be.
+
+		// Lets say... we store 0-255 in 9 bits. So thats 512 possibilities.
+		// we the other 256, and... do stufff with it. Maybe that will work? Seems cool?
+		
+		// I think the only thing I could do is fiddle with the stuff. Try multiplying
+		// the base-staRt by 8, and seeing if we can compress 64K files usign 3 bits
+		// this increases the bit-size of ranges under 255
+		
 		if (log > W_MINUS)
-			sub = 1<<log;
+			offset -= 1<<log;
 		  else
 			log = W_MINUS+1;
-		PutBits(log, offset-sub);			// Requires 6 bits, and stores numbers 0 to 63
+		PutBits(log, offset);				// Requires 6 bits, and stores numbers 0 to 63
 	}
 	
 	inline void PutLength (uint l) {
