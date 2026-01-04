@@ -12,7 +12,6 @@ module Globals
 	function LibGlobs (|&&nil|)
 		cpp_wrapper JB_App__LibGlobs
 	
-	
 	function CollectPackGlobs (|message| size_msg, |bool|)
 		opt norefcounts
 		|int| glob_size = size_msg.int(0, 1, 216MB)$

@@ -8,13 +8,7 @@ module debugger
 	|string|		SrcMap
 	|&uint|			Base
 	|int|			Length
-	|string|		LastPath
 	
-	function string.PathShrink (|string| Prev, |string|)
-		if self == prev
-			return .name
-		return self // do the rest later lol
-		
 	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |bool|)
 		if F
 			|| str = F.GetLine(position)
@@ -22,11 +16,8 @@ module debugger
 				str = str[0, comment]
 			str = str.trim
 
-			|| L = debugger.LastPath
-			if L!=F
-				debugger.lastpath = F
 			print "\t\t\t\t"
-			print F.PathShrink(L)
+			print F.name
 			print ": "
 			printline str
 
