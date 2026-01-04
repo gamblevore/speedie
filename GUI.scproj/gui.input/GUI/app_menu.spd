@@ -101,6 +101,6 @@ By '$creator'.`
 
 
 function AppMenuReturnkey (GuiListEvent)
-	(.window as appmenu)!.ReturnValue = .FirstSelected(True)
+	(.window as appmenu)!.ReturnValue = .FirstSelected
 	return true
 

@@ -61,7 +61,7 @@ class FileViewer (ListView)
 			isnt editable
 			isnt visible
 			.clipmode		= ControlClipMode.SlideBackInWindow
-			.OneAlwaysSelected = true
+			.KeepOneSelected = true
 			.ID				= "listopen"
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
 			.takesfocus 	= 0

@@ -157,7 +157,7 @@ extend PerryIDE
 			.OnRightClick = PerryFileViewRightClick
 			.OnChange = PerryRecheckEvent
 			.UseColorScheme	= true
-			.OneAlwaysSelected = true
+			.KeepOneSelected = true
 			.SetFocus
 			.Init
 	
@@ -302,7 +302,7 @@ extend PerryIDE
 			.IsTree			= true
 			.DontDrawSeparators	= true
 			.tooltip		= self.SearchArea.Tooltip			
-			.OneAlwaysSelected = true
+			.KeepOneSelected = true
 			.UseColorScheme	= true
 			.OnKeyDown		= DeleteableListKeys
 			.ID				= "FoundList"

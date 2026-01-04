@@ -25,7 +25,7 @@ function DeleteableListKeys (GuiKeyEvent)
 	opt norefcounts
 	require key.IsDelete
 	if self isa ListView
-		|| s = .FirstSelected(true)
+		|| s = .FirstSelected
 			|| p = s.parent
 			.RemoveRow(s)
 			if !p.HasAny

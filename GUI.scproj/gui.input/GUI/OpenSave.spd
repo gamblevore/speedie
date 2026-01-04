@@ -134,7 +134,7 @@ class OpenSaveDialog (Window)
 		
 		with .files
 			isnt DrawsFocus
-			.OneAlwaysSelected = true
+			.KeepOneSelected = true
 			.id			= "files"
 			.size 		= 1~inside by 23~up to 16~down
 			.gnormal.solid = ((0.0,0.0,0.0,0.1))
@@ -196,7 +196,7 @@ class OpenSaveDialog (Window)
 	
 	
 	libinternal GoIntoFolder (|bool|)
-		|| f = .files.FirstSelected(true) as filerow #expect beep
+		|| f = .files.FirstSelected as filerow #expect beep
 		|| Acceptable = (f isnt disabled) #expect beep
 		if f.asdir
 			if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")
@@ -265,7 +265,7 @@ class OpenSaveDialog (Window)
 		libinternal OnAskSaveReveal (GUIAction)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog			#require
-			|| f = w.files.FirstSelected(true)
+			|| f = w.files.FirstSelected
 			if f isa filerow
 				|| p = (w.path.text, f.location)(f.name == "..")
 				p.reveal
