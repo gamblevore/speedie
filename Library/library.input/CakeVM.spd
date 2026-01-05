@@ -43,7 +43,7 @@ target cpp or vm {
 		function New	(|int| StackSize = 1MB, |int| Flags = cakevm.WantProtect ||| cakevm.candebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
 	
-	prototype CakeChef (|&uint| Code,  |int| BreakValue, |bool|)
+	prototype CakeChef (|&uint| Code,  |int| BreakValue,  |int64|)
 		// returns false to continue breaking back into here.
 		// If you return true, make sure to sleep a little to avoid a hot-loop.
 }

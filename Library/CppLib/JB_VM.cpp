@@ -28,6 +28,7 @@ extern "C" {
 
 
 #define ı		Op = *Code++;   goto *JumpTable[Op>>24];
+#define VMCodePtr(V) ((ASM*)(((byte*)(V)) + (V)->StackSize))
 
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
@@ -47,9 +48,11 @@ void JB_ASM_Pause (CakeVM* V) {
 		J[i] = Pause;
 }
 
-bool JB_ASM_NoBreak (CakeVM* VM, u32* Code, int BreakValue) {
+
+int64 JB_ASM_NoBreak (CakeVM* VM, u32* Code, int BreakValue) {
 	return false;
 }
+
 
 int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 	if_rare (!V)
@@ -118,8 +121,20 @@ static void * const GlobalJumpTable[] = {
 	}
 	
 	BREAK:;											// the actual breakpoint
-	(vm.Break)(&vm, Code-1, (Code[CakeCodeMax-1]<<1)>>1);	// why loop back? the parent caller could do that?
-
+	if (int64 Value = (vm.Break)(&vm, Code-1, (Code[CakeCodeMax-1]<<1)>>1)) {
+		if (Value < 0) { // jump back? i guess so?
+			Code += Value;
+			if (Code < VMCodePtr(&vm))
+				Code -= Value; // fuck("Debugger jumped out of range");
+			  else 
+				Op = *Code++;
+		} else if (Value <= 256) {
+			if (Value == 256)
+				return 0;
+			exit(Value);
+		}
+		// ignore >= 256. maybe better to actually put an error somewhere.
+	}
 	goto *JumpTable[256+(Op>>24)];					// Resume
 }
 
@@ -156,10 +171,11 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 }
 
 
+
 ASM* JB_ASM_Code (CakeVM* V, int Length) {
 	if_rare (!V or (uint)Length > CakeCodeMax)
 		return 0;
-	auto D = (ASM*)(((byte*)V) + V->StackSize);
+	auto D = VMCodePtr(V);
 
 	int F = V->VFlags;
 	if (F&kJB_VM_IsProtected) {
@@ -199,7 +215,7 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Stack.Alloc = 0;
 	Stack.Marker = 12345;
 	Stack.Marker2 = 123;
-	ASM* Code = JB_ASM_Code(&V,0);
+	ASM* Code = VMCodePtr(&V);
 	Stack.Code = Code + CakeCodeMax-1;
 	if (Stack.Code[0]) // failed!
 		return 0;

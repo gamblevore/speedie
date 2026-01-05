@@ -35,7 +35,7 @@ module debugger
 				
 		
 		
-	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |bool|)
+	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |int64|)
 		|| str = F.GetLine(position)
 		|| comment = str.find("//") // whoop!
 			str = str[0, comment]
