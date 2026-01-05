@@ -5927,8 +5927,6 @@ int JB_ParserLineAndIndent_ArgPos(ParserLineAndIndent* Self);
 // JB_Pico
 JB_String* JB_Pico_Get(PicoComms* Self, float T);
 
-bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait);
-
 bool JB_Pico_SendString(PicoComms* Self, JB_String* Str, bool Wait);
 
 SpdProcess* JB_Pico_UseAsParent(PicoComms* Self);
@@ -5947,8 +5945,6 @@ PicoComms* JB_Pico__New(JB_StringC* Name, int Noise);
 
 
 // JB_PicoMessage
-void JB_Pico__From(JB_String* S, PicoMessage* Rz);
-
 
 
 // JB_RandomXOR

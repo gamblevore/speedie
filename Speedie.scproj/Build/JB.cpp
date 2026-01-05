@@ -3524,7 +3524,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[443]);
-	JB_FS_AppendInt32(_fsf0, (2026010413));
+	JB_FS_AppendInt32(_fsf0, (2026010517));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8225,7 +8225,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1388]);
-	JB_FS_AppendInt32(_fsf0, (2026010413));
+	JB_FS_AppendInt32(_fsf0, (2026010517));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -21699,16 +21699,9 @@ JB_String* JB_Pico_Get(PicoComms* Self, float T) {
 	return JB_LUB[0];
 }
 
-bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
-	//cpp_part;
-	return PicoSend(Self, A->Data, A->Length, Wait);
-}
-
 bool JB_Pico_SendString(PicoComms* Self, JB_String* Str, bool Wait) {
 	//cpp_part;
-	PicoMessage Msg = ((PicoMessage){});
-	JB_Pico__From(Str, (&Msg));
-	return JB_Pico_SendMsg(Self, (&Msg), Wait);
+	return PicoSend(Self, ((int8*)Str->Addr), JB_Str_Length(Str), Wait);
 }
 
 SpdProcess* JB_Pico_UseAsParent(PicoComms* Self) {
@@ -21744,11 +21737,6 @@ PicoComms* JB_Pico__New(JB_StringC* Name, int Noise) {
 
 
 
-
-void JB_Pico__From(JB_String* S, PicoMessage* Rz) {
-	Rz->Length = JB_Str_Length(S);
-	Rz->Data = ((int8*)S->Addr);
-}
 
 
 float JB_Rnd_Float(RandomXOR* Self) {
@@ -36961,7 +36949,6 @@ Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount) {
 	{
 		Message* S = ((Message*)JB_Ring_First(Self));
 		while (S) {
-			Message* _Nf1 = (((Message*)JB_Ring_NextSib(S)));
 			if (DoLower) {
 				(JB_Dict_ValueLowerSet(Rz, S->Name, S));
 			}
@@ -36971,7 +36958,7 @@ Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount) {
 			if (DoCount) {
 				S->Position = I++;
 			}
-			S = _Nf1;
+			S = (((Message*)JB_Ring_NextSib(S)));
 		};
 		;
 	}
@@ -48948,16 +48935,18 @@ bool JB_Proc_IsOpen(SpdProcess* Self) {
 }
 
 bool JB_Proc_Send(SpdProcess* Self, Message* Msg) {
+	bool Rz = false;
 	//cpp_part;
 	if (JB_ExitCode_NotStarted(JB_Sh_Status(Self))) {
 		JB_Sh_StartProcess(Self);
 	}
 	if (PicoError(Self->Pico) == 0) {
+		(JB_FS_LengthSet(Self->Writer, 0));
 		JB_FreeIfDead(JB_Msg_RenderJbin(Msg, JB_LUB[0], Self->Writer));
-		JB_Pico_SendString(Self->Pico, ((JB_String*)Self->Writer), false);
+		Rz = JB_Pico_SendString(Self->Pico, ((JB_String*)Self->Writer), false);
 		(JB_FS_LengthSet(Self->Writer, 0));
 	}
-	return false;
+	return Rz;
 }
 
 int JB_Proc__Init_() {
@@ -59575,4 +59564,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 7802803664968684318 7768642982253459242
+// 1471707222644297034 7768642982253459242
