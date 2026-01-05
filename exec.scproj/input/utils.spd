@@ -1,0 +1,9 @@
+
+api Exec_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
+// easier if this is always compiled.
+	cpp_name Exec_Main 
+	rz = app.sp_run(args, mode&4)
+	comms.UseAsParent // phew
+	if rz == 0
+		rz = app.sp_run(args, mode)
+

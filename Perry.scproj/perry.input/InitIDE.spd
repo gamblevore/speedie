@@ -784,13 +784,13 @@ extend PerryIDE
 		
 		.LostFunks = conf["unused_lib_funcs"]
 		for lib in .LostFunks
-			lib.name = .expandstr(lib.name)
+			lib.name = .PathExpand(lib.name)
 		
 		for ro in conf..roots
 			error.BackupErrorSource = ro
 			if ro.expect(@str)
 				file.OSXMaxCaseWarnings_[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
-				|| str = .ExpandStr(ro.name)
+				|| str = .PathExpand(ro.name)
 					f.addroot(str.file)
 				  else
 /					error (ro, "Can't find this project root. Please fix this path.")

@@ -1,7 +1,5 @@
 
 
-
-
 datatype CompileMode (int)
 	constants
 		|CompileMode|

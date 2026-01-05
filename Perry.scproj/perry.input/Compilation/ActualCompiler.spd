@@ -1,6 +1,5 @@
 
 
-
 function PerryIDE.ACTUAL_COMPILE
 	expect !.compilr (beep)  // wah?
 	require .FileList.SaveAll(DocumentState.saving)
@@ -14,17 +13,27 @@ function PerryIDE.ACTUAL_COMPILE
 	  else
 		args <~ "--perry=bin"
 	
-	if (.DebugMode is Cake) or ((.debugmode is debug) and Platform.IsDebug) // remove platform.isdebug
+	if (.DebugMode is Cake or debug)
 		args <~ "--bake"
-	  elseif .DebugMode is debug // remove this also with the platform.debug thing
-		.DebugMode &=~ CompileMode.Debug
-		.DebugMode |=  CompileMode.run
+	if (.debugmode is debug)
+		args <~ "--targetdebug"
 	args <~ .project
 
 	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)
 	if .compilr
 		.GUIIsCompiling(args)
 
+
+function filerow.CollectDebugSub (|jbin| j, |message| s, |string| d)
+	opt norefcounts
+	|| Depth = 0
+	for c.flat in s
+		if s is BreakPoint
+			Depth ?= j.TmpArg(.Location) // what about the position of the line??? we do need two numbers!
+			j.AddInt d.Find(charset.Line, s.position, 0)
+			j.AddInt d.find(charset.line, s.position, int.max)
+	j.exit(Depth)
+	
 
 function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug also. but whatever
 	|| out = .DebugAppCallArgsDisplay(F, args)
@@ -37,26 +46,20 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
 		return
 	
-	|message| hoi 
 	|| cake = SPDProcess.spawn(cake, args, ProcessMode.OwnGroup, f.name)
-		.RunCompileSub(cake)
-		hoi = cake.Get(5.0)
+	if cake
+		|| break = .CollectBreakPoints
+		|| hoi = cake.Get(5.0)
+			cake <~ break
+/			.logonecomm(hoi, "Cake Alive")
+			.RunCompileSub(cake)
+		  else
+			.logonecomm(hoi, "Cake Fall")
+			cake = nil
 	
-	if hoi
-		cake! <~ "perry ok"
-	  else
+	if !cake
 		.DebugMode = 0
-		Notifications <~ "Connection to cake lost"
-	
-
-
-
-function PerryIDE.RunCompileSub (|unixprocess| r)
-	if r and r.PID
-		.RunCompiledApp = r
-		.ShowProductIfMoreOutput = 0
-		.RunButton.text = "\07"
-
+		Notifications <~ "Debug connection lost"
 
 
 function PerryIDE.RUN_COMPILE_WRAP (|file!| product)

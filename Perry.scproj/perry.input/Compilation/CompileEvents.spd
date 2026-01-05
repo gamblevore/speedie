@@ -1,4 +1,5 @@
 
+
 function ClickedCompile (GUIaction)
 	|| DebugArgs = .ide.DebugArgs
 	if !DebugArgs
@@ -9,7 +10,7 @@ function ClickedCompile (GUIaction)
 	|| mode = CompileMode.compile
 	|| compile_mode = DebugArgs["compile"]
 		if compile_mode ~= "cake"
-			mode = CompileMode.Cake
+			mode |= CompileMode.Cake
 	
 	.ide.compile(mode)
 
@@ -28,11 +29,12 @@ function ClickedDebug (GUIAction)
 
 
 function PerryIDE.Compile (|CompileMode| Mode)
-	if !.isBuilding // they pressed it twice
+	if !.IsBuilding
 		.DebugMode = mode
 		.Actual_Compile
 		return 
 
+	// They pressed it twice
 	.DebugMode = 0
 	if !.ExpandCompileSep					// appeared to do nothing
 		ClickedCancel(.BuildButton)			// might as well just do the next thing then
@@ -55,4 +57,10 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 	.ShowCompileTab(.SpeedieText)
 	.ViewAsCurr
 
+
+function PerryIDE.RunCompileSub (|unixprocess| r)
+	if r and r.PID
+		.RunCompiledApp = r
+		.ShowProductIfMoreOutput = 0
+		.RunButton.text = "\07"
 

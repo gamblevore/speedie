@@ -1,0 +1,33 @@
+
+
+function PerryIDE.CanDebug (|FileRow| f, |bool|)
+	opt norefcounts
+	|| path = f.Location
+	|| spd = file.speediedir
+	if path[0, spd]
+		|| l = spd.Length
+		if path[l, "Library/", true] or path[l, "jeebox.scproj/", true] or path[l, "GUI.scproj/", true] or path[l, "Image.scproj/", true]
+			return false
+	return true
+
+
+function PerryIDE.CollectBreakPoints (|jbin|)	
+	|| j = jbin(@tmp, "breakpoints")
+	j.enter
+	|message--| f = .FileList.ListSource.first
+	while f
+		if f isa FileRow
+			if !.CanDebug(f)
+				f = f.FlatAfter
+				continue
+			if f isa "spd"
+				f.CollectDebug(j)
+		f = f.FlatNext
+	return j
+
+
+function filerow.CollectDebug (|jbin| j)
+	|| d = .FileData
+		|| msg = d.Parse
+			.CollectDebugSub(j, msg, d)
+

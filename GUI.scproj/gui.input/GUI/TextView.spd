@@ -1469,8 +1469,6 @@ class TextView (GUIControl)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
-//		if show
-//			.show(i)
 		
 		if !same
 			i = p.x + s.length
@@ -2232,8 +2230,6 @@ class TextView (GUIControl)
 			if show
 				.SelDirect(d.TypingPlace, nil)
 				.scrollpos = d.scrollpos
-				// 
-				// .ShowAndSelect(s.x, s.width)
 			return true
 		
 		.Clear("")

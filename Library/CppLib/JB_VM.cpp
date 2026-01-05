@@ -47,13 +47,16 @@ void JB_ASM_Pause (CakeVM* V) {
 		J[i] = Pause;
 }
 
+bool JB_ASM_NoBreak (CakeVM* VM, u32* Code, int BreakValue) {
+	return false;
+}
 
 int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 	if_rare (!V)
 		return 0;
 	auto J = V->JumpTable;
 	void* Break = J[512];
-	V->Break = Value;
+	V->Break = Value?Value:JB_ASM_NoBreak;
 	if ((Value != nil) != (J[0] == Break)) {
 		int i = 256;
 		if (Value) while (--i >= 0)
@@ -64,6 +67,15 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 	byte* B = (byte*)V;
 	return (int*)(B + (CakeCodeMax*4) + (V->StackSize));
 }
+
+// OK, so what should exec do, whenit is run, by perry
+// perhaps... just run? or... wait for instructions.
+// what about the breakpoints?
+// do we want to let perry tell exec what the breakpoints are?
+// I think so? So... we should wait for some breakpoints?
+// or else they'll have to be compiled into the app.
+// this makes no sense. We'll have two ways of setting/clearing points
+
 
 
 static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) {
@@ -86,7 +98,6 @@ static void * const GlobalJumpTable[] = {
 	#include "Instructions.i"
 	EXIT:;
     return &vm.Registers[1].Ivec;
-
 	
 	PAUSE:;											// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
@@ -107,9 +118,7 @@ static void * const GlobalJumpTable[] = {
 	}
 	
 	BREAK:;											// the actual breakpoint
-	while (auto B = vm.Break)
-		if (!(B)(&vm, Code-1, (Code[CakeCodeMax-1]<<1)>>1))
-			break;
+	(vm.Break)(&vm, Code-1, (Code[CakeCodeMax-1]<<1)>>1);	// why loop back? the parent caller could do that?
 
 	goto *JumpTable[256+(Op>>24)];					// Resume
 }
@@ -195,6 +204,7 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	if (Stack.Code[0]) // failed!
 		return 0;
 	int F = V.VFlags;
+	if (!V.Break) V.Break = JB_ASM_NoBreak;
 	if (~F&kJB_VM_IsProtected and F&kJB_VM_WantProtect)
 		if (mprotect(Code, CakeCodeMax*4, PROT_READ) == 0)				// protect!
 			V.VFlags |= kJB_VM_IsProtected;

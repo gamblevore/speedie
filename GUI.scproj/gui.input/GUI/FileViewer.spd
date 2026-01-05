@@ -168,7 +168,7 @@ class FileViewer (ListView)
 			
 	function ClearErrors
 		opt norefcounts
-		for s in self
+		for s.fast in self
 			if s isa filerow
 				s.HasError = false
 

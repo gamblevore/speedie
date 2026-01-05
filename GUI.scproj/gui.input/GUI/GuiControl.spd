@@ -57,7 +57,7 @@ class GUIControl (list)
 			fs <~ .id
 			fs <~ "'"
 			fs.indent++
-			for ch in self
+			for ch.fast in self
 				fs.IndentLine
 				ch|object|.render(Fs)
 			fs.indent--

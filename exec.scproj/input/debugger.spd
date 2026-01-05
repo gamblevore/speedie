@@ -1,25 +1,50 @@
 
-//unfinished
 
 module debugger
 	|message|		Root
 	|[string]|		Files
-	|string|		Vars
 	|string|		SrcMap
 	|&uint|			Base
 	|int|			Length
+	|bool|			GotBreaks
 	
-	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |bool|)
-		if F
-			|| str = F.GetLine(position)
-			|| comment = str.find("//") // whoop!
-				str = str[0, comment]
-			str = str.trim
+	function Start
+		opt norefcounts
+		|| p = perry
+			debugger.Read(p, 5.0)
+			if !.GotBreaks
+				p <~ "error: nobreakpoints"
 
-			print "\t\t\t\t"
-			print F.name
-			print ": "
-			printline str
+		
+	function Read (|SpdProcess| Perry, |float| Delay)
+		while (|| m = perry.Get(delay))
+			.HandleRead(m)
+		
+
+	function HandleRead (|message| M)
+		require m.expect(@tmp)
+		if m == "breakpoints"
+			.GetBreaks(m)
+	
+	
+	function GetBreaks (|message| B)
+		.GotBreaks = true
+		for F.fast in b[@arg]
+			if f.expect(@tmp)
+				printline f
+				
+		
+		
+	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |bool|)
+		|| str = F.GetLine(position)
+		|| comment = str.find("//") // whoop!
+			str = str[0, comment]
+		str = str.trim
+
+		print "\t\t\t\t"
+		print F.name
+		print ": "
+		printline str
 
 	// we need to respond to a few things:
 		// pause
@@ -51,25 +76,30 @@ module debugger
 		return cake.IsDebugging(V)
 	
 	
+	function Path (|int| i, |filewithdata|)
+		opt norefcounts
+		|| Path = .files[i]
+		expect Path!=nil ("Missing file at index: " + i)
+		if path isa FileWithData
+			return path
+
+		|| p = FileWithData(path)
+		debugger.files[i] = p
+		return p
+	
+	
 	function __Viewer__ (cakevm.CakeChef)
 		opt norefcounts
 		|| Index = .index(code)
-		if (index >= debugger.Length)
-			if StdErr.ok
-				error ("Code map too short: " + index)
-			return nil
-		
-		|| Where = debugger.Base![index]
-		|| FileNum = where & (11~bits)
-		|| Path = debugger.files[FileNum]
-		expect Path!=nil ("Missing file at index: " + filenum)
-		ifn path isa FileWithData
-			path = FileWithData(path)
-			debugger.files[filenum] = path
-		return .DebugFoundLocation( Path|&nil||filewithdata|, Where>>11 )
+		if index < debugger.Length
+			|| Where = debugger.Base![index]
+			|| Path = debugger.path(where & (11~bits))$
+			return .DebugFoundLocation( Path, Where>>11 )
+		if StdErr.ok
+			error ("Code map too short: " + index)
 	
 	
-	function StartDebug (|bool|)
+	function Load (|bool|)
 		opt norefcounts
 		|| R = .root
 		if !R
@@ -77,7 +107,18 @@ module debugger
 				.BreakAll
 			return true
 		
-		.Vars = R[@nil, 0].name.Decompress
+		|| Vars = R[@nil, 0].name.Decompress.parse
+		|| Curr = SpdTable.Funcs[0]
+		while vars.hasany
+			|| V = vars.first
+			if !curr 
+				error (v, "Orphan debug info found")
+				exit
+			curr <~ v
+			curr++
+
+		check (!curr) (vars, "Missing some debug info")
+			
 		|| M = R[@nil, 1]
 		.SrcMap = M.name
 		.Files = r[@nil, 2].name.decompress.Split
@@ -89,10 +130,7 @@ module debugger
 		|| L2 = spdtable.CodeLength
 		check (L2==L)						("map-length is: " + L) + (" but code-length is: " + L2)
 		
-// For now... lets break on each instruction on the shadow
-		if StdErr.ok
-			.BreakAll
-			return true
+		return StdErr.ok
 
 
 	function BreakAll

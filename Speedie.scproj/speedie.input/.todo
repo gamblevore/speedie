@@ -4,10 +4,17 @@
 Pre-release:
 	* selectors seem broken. just remove them. Sigh. (language2.scproj)
 	* remove game3d stuff (in compiler)
+	* audio should have one class, "Audio" that has a refcounted struct* used by a audiothread
+		* this contains all the info and functions.
+		* audio.play will create a new obj (copied!), and audio.start will play the existing
+		* also has useful things like a vec4 position, time fadeout, etc.
+			* (isn't it better to get the position off vobject? less forgetting to update)
 
 	
 Bugs:
-	* || s = shadow #require	// s shouldn't be optional!!
+	* for f2 in .FileList
+		if f2.Position < 0
+			continue_With f2.FlatAfter // doesn't like this? why.
 	* &uint... allow &int in c++ gen
 	* vector constants
 	* passing .hfloatvar to  func(float) causes reporting error

@@ -50,9 +50,17 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		return .status.isrunning
 
 
+	syntax append (|faststring| fs, |bool|)
+		inline
+		return self <~ fs|string|
+	
+	
 	syntax append (|string| str, |bool|)
 		cpp_Part SendStr
-		return self <~ @sstr.msg(str)
+		if .status.NotStarted
+			.start
+		if .pico.MessageStatus == 0
+			return .pico <~ str
 
 
 	syntax append (|message| msg, |bool|)
@@ -61,8 +69,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if .status.NotStarted
 			.start
 		if .pico.MessageStatus == 0
+			.writer.length = 0
 			msg.RenderJbin(.writer)
-			.pico <~ .writer|string|
+			rz = .pico <~ .writer|string|
 			.writer.length = 0
 
  

@@ -138,10 +138,10 @@ class PerryIDE (Window)
 		.EditStatus.text = .PerryStatus
 
 
-	function ExpandStr (|string| path, |string|)
+	function PathExpand (|string| path, |string|)
 		if !perry.pathdict
 			perry.pathdict = [ "spd"  :  file.speediedir ]
-		rz = path.Path_Expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
+		rz = path.Path_Expand(perry.PathDict)					#expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(true)
 	
 	

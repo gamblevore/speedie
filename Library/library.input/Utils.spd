@@ -36,7 +36,7 @@ function message.List (|[Message]|)
 
 function message.Array (|[Message]|)
 	opt norefcounts
-	for s in self
+	for s.fast in self
 		rz <~ s
 
 
@@ -49,7 +49,7 @@ function message.Dict (|bool| DoLower=false, |bool| DoCount=false,   |dictionary
 	opt norefcounts
 	rz = Dictionary()
 	|| i = 0
-	for s in self
+	for s.fast in self
 		if DoLower
 			rz.Valuelower(s.name) = s
 		  else

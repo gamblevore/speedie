@@ -61,9 +61,6 @@ class FileRow (ListViewRow)
 	behaviour DisplayName
 		if i == 0
 			return .name
-
-	operator isa (|string| s, |bool|)
-		return .location isa s
 	
 
 	function AskDelete (|fileviewer| fv)
@@ -99,6 +96,10 @@ class FileRow (ListViewRow)
 				rz = true
 
 
+	operator isa (|string| s, |bool|)
+		inline
+		return .location isa s
+		
 	function IsDir (|bool|)
 		disabled "use .Asdir. Not quite the same, but usually close enough"
 	
@@ -204,7 +205,19 @@ class FileRow (ListViewRow)
 		._Document = s
 		return s
 
-
+	
+//	function Parse (|message|)
+//		opt norefcounts
+//		|| d = ._Document
+//			|| s = d.DocParsed // for now: assume its up to date.
+//				return s
+//	
+//		// don't save to the document or disturb anything
+//		// what about errors? for perry, it wants to be able to NOT get errors
+//		// if we are just getting breakpoints. seems rare for now.
+//		return .FileData.Parse
+	
+	
 	function FileData (|string|)
 		|| d = ._Document
 			if d.current and d.SimpleUpdateFromDisk

@@ -12,6 +12,7 @@ module SpdTable
 		opt norefcounts
 		|| main = .funcs[2]					#expect ("Missing main")
 		|| init = .funcs[1]!
+		debugger.Start
 		if (init.Run|&int64|[] == 0)
 			return main.Run|&int64|[]
 		error "Init failed"

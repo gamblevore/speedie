@@ -14,11 +14,11 @@ main
 	require InputFile
 	
 	|| p = perry
-		p <~ "hoi :3"
+		p <~ "`hoi :3`"
 	
 	if CakeRun.GetStructure
 		SpdTable.Link
-		require debugger.StartDebug
+		require debugger.Load
 		return SpdTable.RunMain
 	return 1
 

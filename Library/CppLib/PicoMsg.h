@@ -749,8 +749,11 @@ struct PicoComms : PicoConfig {
 	static const char* StatusName (int T) {
 		if (T == 0)
 			return "Successful: 0";
-		if (T < 0)
-			return "Running: -1";
+		if (T < 0) {
+			if (T == -1)
+				return "Running: -1";
+			return "Not Started: -2";
+		}
 		if (T & 128)
 			return strsignal(T&~128);
 		return strerror(T);
@@ -1436,8 +1439,9 @@ extern "C" int PicoStatus (PicoComms* M, PicoProcStats* S=nullptr) _pico_code_ (
 	/// EG: After `PicoShellExec(M)`, then call `PicoStatus(M)` to find `M`'s status.
 	/// Result codes:
 	//  Positive:  A crash, or exited normally but with an error.
-	//  Negative:  The program is still running.
-	//  Zero	:  The program exited successfully.
+	//  -1:        The program is still running.
+	//  -2:        The program hasn't started yet.
+	//  Zero:      The program exited successfully.
 	
 	/// Positive numbers are either from errno, or signal numbers.
 	/// A number of 128 or more, is a signal.
@@ -1451,7 +1455,7 @@ extern "C" int PicoStatus (PicoComms* M, PicoProcStats* S=nullptr) _pico_code_ (
 extern "C" int PicoError (PicoComms* M) _pico_code_ (
 /// Returns an error that forced comms to close. If the comms is still open, the error is 0.
 	int S = M->PIDStatus;
-	if (S == -1)
+	if (S == -1) // still running
 		return M->SocketStatus;
 	if (S == 0)
 		return ESHUTDOWN;

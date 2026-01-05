@@ -66,19 +66,17 @@ struct Pico
 	
 	syntax append (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
-		|| Msg = picomessage.From(Str)
-		return .send(msg, wait)
+		return ._send(str.addr|&int8|, str.length, wait)
 		
 	libinternal _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
-	libinternal Send (|picomessage| A, |bool| Wait=false, |bool|)
-		cpp_Part SendMsg
-		return ._send(A.data, a.length, wait)
+//	libinternal Send (|picomessage| A, |bool| Wait=false, |bool|)
+//		cpp_Part SendMsg
+//		return ._send(A.data, a.length, wait)
 		
-	function Tickle
-		|| msg = PicoMessage.from("")
-		.send(msg)
+	function Tickle (|bool|)
+		return self <~ ""
 	
 	libinternal __Get (|PicoMessage| Msg, |float| T)
 		nil checker

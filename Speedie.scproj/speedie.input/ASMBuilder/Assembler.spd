@@ -81,8 +81,8 @@ struct Assembler
 	function FnLength (|int|)
 		return .curr_ - .funcstart
 	
-	function ActualLength (|int|)
-		return .curr_ - .Start
+//	function ActualLength (|int|)
+//		return .curr_ - .Start
 
 	function Index (|int|)
 		return .curr_ - .start
@@ -94,7 +94,7 @@ struct Assembler
 		opt NoRefCounts
 		|| j = DebugInfo
 			.DebugMark = j.Length // for .rework
-			j.Enter(@msg, fn.exportname) // AddDbg
+			j.Enter(@msg, fn.exportname) // Enter .debuginfo!
 
 		for a in fn.Args
 			.DeclReset(a)

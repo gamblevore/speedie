@@ -216,7 +216,7 @@ extend message
 
 
 function message.XMLToJeebox (|bool|)
-	for ch in self
+	for ch.fast in self
 		rz ?= ch == @xml
 		ch.XMLToJeeboxSub
 	check rz (self, "No XML found.")
@@ -238,7 +238,7 @@ libinternal message.XMLToJeeboxSub
 			ch.XMLToJeeboxSub
 		if prms.HasAny
 			self <~ prms
-			for ch in prms
+			for ch.fast in prms
 				ch.XMLToJeeboxSub
 		if arg
 			|| first = arg.first
