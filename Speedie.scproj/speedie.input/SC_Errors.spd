@@ -147,8 +147,9 @@ extend Error
 		|| Finish = d.find( CharSet.Line, .Position... )
 		if (Finish == -1)
 			Finish = D.Length + 1
+		finish = finish min start+84
 		
-		|| Line = d[Start, Finish]
+		|| Line = d[Start, Finish].unicodesync
 		Line = Line.ReplaceAll("\t", " ")
 		fs <~ Line
 		// mark where in the line the error occurs?
