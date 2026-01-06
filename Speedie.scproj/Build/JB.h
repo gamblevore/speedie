@@ -531,7 +531,7 @@ struct SCModule;
 
 typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After);
 
-typedef bool (*CakeVM_CakeChef)(CakeVM* Self, uint* Code, int BreakValue);
+typedef int64 (*CakeVM_CakeChef)(CakeVM* Self, uint* Code, int BreakValue);
 
 typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -1440,13 +1440,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2391])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2392])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2392])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2393])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2390])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2393])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2394])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2393])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2394])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2391])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2394])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2395])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1620,7 +1620,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2398])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2399])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1661,7 +1661,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2399])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2400])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1802,10 +1802,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2397])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2396])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2398])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2397])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2395])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2396])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2482,7 +2482,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2389])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2390])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -7520,6 +7520,8 @@ JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
 
 JB_String* SC_Str_internal(JB_String* Self);
 
+bool JB_Str_IsBinary(JB_String* Self, float F);
+
 bool SC_Str_isCLike(JB_String* Self);
 
 bool JB_Str_IsCompressed(JB_String* Self);
@@ -7657,6 +7659,8 @@ JB_String* SC_Str_UnicodeSafeName(JB_String* Self, FastString* Fs_in);
 int JB_Str_UnPrintable(JB_String* Self);
 
 JB_String* JB_Str_UpperFirst(JB_String* Self);
+
+ivec2 JB_Str_UTF8Badness(JB_String* Self);
 
 bool JB_Str_Visible(JB_String* Self);
 
@@ -11816,7 +11820,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1836], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1837], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
