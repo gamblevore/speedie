@@ -134,7 +134,7 @@ extend Parser
 		return .erroradd("Unexpected syntax", start)
 	
 
-	function ErrorAlwaysAdd (|String| s, |ind|Start, |Message|)
+	function ErrorAlwaysAdd (|String| s, |ind| Start, |Message|)
 	    .ErrorStart = start
 		
 		// create msg for memory-layer
@@ -143,7 +143,11 @@ extend Parser
 		(err is dontstrip)
 		(err is parse)
 		err.name			= s
-	    err.originaldata	= .data
+		|| d = .data
+		if d.IsBinary
+			err.name += " (it seems this is not a text-file.)"
+		  else
+			err.originaldata	= d
 		
 		nil|errorreceiver| <~ err
 	
