@@ -5,18 +5,16 @@ function PerryIDE.ACTUAL_COMPILE
 	require .FileList.SaveAll(DocumentState.saving)
 
 	|| args = ["--nocolor"]
-	if .DebugMode is Debug
-		args <~ "--hideaway" // store the scripts in a hidden temp folder
-
 	if .name ~= "Speedie.scproj"
 		args <~ "--perry"
 	  else
 		args <~ "--perry=bin"
 	
-	if (.DebugMode is Cake or debug)
+	if (.DebugMode is Cake)
 		args <~ "--bake"
 	if (.debugmode is debug)
 		args <~ "--targetdebug"
+		args <~ "--hideaway" // store the scripts in a hidden temp folder
 	args <~ .project
 
 	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)
@@ -42,7 +40,7 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 	.LogOneAction(str)
 	out <~ ("\n", 2)
 
-	if .DebugMode isnt debug
+	if .DebugMode isnt cake
 		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
 		return
 	
@@ -54,7 +52,6 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 /			.logonecomm(hoi, "Cake Alive")
 			.RunCompileSub(cake)
 		  else
-			.logonecomm(hoi, "Cake Fall")
 			cake = nil
 	
 	if !cake

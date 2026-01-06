@@ -4,8 +4,13 @@
 || Speedie = "/usr/local/bin/spd"
 
 
-main (|[string]| Files)
-	for f in files.GlobExpand 
+main (|[string]| Paths)
+	|| files = Paths.GlobExpand
+	if app["d"] // debug
+		printline Paths
+		printline Files
+		printline
+	for f in files
 		app.TryCompileOne(f)
 	if fails.Length	
 		printline fails

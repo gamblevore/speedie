@@ -8,9 +8,8 @@ function ClickedCompile (GUIaction)
 		return nil
 	
 	|| mode = CompileMode.compile
-	|| compile_mode = DebugArgs["compile"]
-		if compile_mode ~= "cake"
-			mode |= CompileMode.Cake
+	if DebugArgs["compile"] ~= "cake"
+		mode |= CompileMode.Cake
 	
 	.ide.compile(mode)
 
