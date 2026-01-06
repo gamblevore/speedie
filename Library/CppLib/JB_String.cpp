@@ -395,8 +395,7 @@ JB_String* JB_Str_UTF16To8(JB_String* Str, FastString* fs_in, int SrcIsBig) {
 
 // kUTF8FirstMin is a special trick to test for a UTF8 starter, in 1 test, instead of 2
 
-static int ValidateUTF8 (uint8* p, int Len) {
-	int i = 0;
+static int ValidateUTF8 (uint8* p, int i, int Len) {
 	while (i < Len) {		
 		u32 v = p[i++];									/* 0xxxxxxx */
 		if (v < 0x80) {
@@ -439,13 +438,11 @@ static int ValidateUTF8 (uint8* p, int Len) {
 }
 
 
-int JB_Str_BadUTF8 (JB_String* s, int Err) {
+int JB_Str_BadUTF8 (JB_String* s, int Start) {
 	int n = JB_Str_Length(s);
-	if (n <= 0)
-		return -1;
-
-	u8* Where = JB_Str_Address(s) + Err;
-	return ValidateUTF8(Where, n - Err);
+	if ((uint)Start < (uint)n) 
+		return ValidateUTF8(JB_Str_Address(s), Start, n);
+	return -1;
 }
 
 
@@ -514,7 +511,7 @@ int JB_Str_UTF8Value (JB_String* self, bool Strict) {
 		return UNI_BADOFFSET;
 
 	uint8* Source = self->Addr;
-	if (!Strict or ValidateUTF8(Source, Len) < 0) {
+	if (!Strict or ValidateUTF8(Source, 0, Len) < 0) {
 		uint8* Source = self->Addr;
 		int N = JB_u8_Size(*Source);
 		if ((N <= Len) and (!Strict or N == Len)) {
