@@ -347,15 +347,16 @@ class String
 	
 	function UTF8Badness (|ivec2|)
 		description "Returns the validness of UTF-8 text, as: (FirstBadPosition, NumberOfBadBytesFound) as an ivec2" 
-		|| pos = 0
+		|| First = .FindBadUTF8
+		if First < 0
+			return (First, 0)
+		
+		|| Pos = First
+/		|| Count = 1
 		while
-			|| p = .FindBadUTF8(pos)
-			if p < pos	
-				exit
-			if rz.x < 0
-				rz.x = p
-			pos = p+1
-			rz.y++
+			pos = .FindBadUTF8(pos+1) #loop
+			Count++
+		return (First, Count)
 			
 	operator Plus (|string?| other, |string|)
 		nil checker
