@@ -145,7 +145,7 @@ extend Parser
 		err.name			= s
 		|| d = .data
 		if d.IsBinary
-			err.name += " (it seems this is not a text-file.)"
+			err.name += " (It seems this is not plain-text)"
 		  else
 			err.originaldata	= d
 		

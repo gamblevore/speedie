@@ -150,8 +150,7 @@ extend Error
 		finish = finish min start+84
 		
 		|| Line = d[Start, Finish].unicodesync
-		Line = Line.ReplaceAll("\t", " ")
-		fs <~ Line
+		Line.ReplaceAll("\t", " ", fs)
 		// mark where in the line the error occurs?
 
 		|| Spaces = (.Position - Start)
@@ -233,7 +232,6 @@ extend Error
 					//   ^
 		.SCGrabLine(fs, options.color)
 		fs <~ '\n'
-
 		if options.color: fs <~ errorcolors.Normal
 		
 
