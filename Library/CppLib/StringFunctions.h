@@ -11,7 +11,6 @@ struct FastString;
 typedef JB_String* (*fpRenderer)(JB_Object* self, FastString* FS);
 
 JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in);
-//JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in);
 
 // StringCore
 
@@ -29,7 +28,6 @@ JB_String* JB_Str_CopyFromCString( const char* C );
 JB_String* JB_Str_Copy( JB_String* self );
 void JB_Str_Destructor(JB_StringShared* self);
 void JB_XStr_Destructor(JB_StringExternal* self);
-//JB_String* JB_Str_Constructor( JB_String* self );
 void JB_Str_Print( JB_String* s );
 void JB_Str_PrintLine( JB_String* s );
 void JB_PrintCString (const char* c);
@@ -113,16 +111,6 @@ void JB_CompFreeNow();
 
 
 
-// StringCloneAndCopy
-/*
-    JB_Object* JB_Str_DataCopy(JB_String* self);
-    bool JB_Str_UnSplit( JB_String* self );
-    bool JB_Str_Acquire( JB_String* self );
-    JB_String* JB_Str_ObjectCopy(JB_String* self);
- */
-
-
-
 // StringSplitters
 
 JB_String* JB_Str_Range(JB_String* self, int Start, int After, bool ShareAlways=false);
@@ -153,7 +141,6 @@ s64 JB_Str_TextIntegerValid(JB_String* self, Message* b);
 
 // StringProperties
 
-bool JB_Str_IsUnder(JB_String* self, u32 Under);
 int JB_Str_LengthUTF8(JB_String* self);
 uint64 JB_Str_CRC (JB_String* S, uint64 crc);
 uint64 JB_CRC (u8* buf, uint64 crc, int n);
