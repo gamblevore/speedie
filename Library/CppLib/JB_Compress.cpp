@@ -311,12 +311,12 @@ struct Compression {
 		probability_add(offset, W_MINUS);
 //		  2300928 // 8, 3, 4	     
 //		  2299300 // 9, 3, 3 // seems the most optimal.
- 
-		if (p >= 32*1024)
-			return PutOffset(offset);
-		if ((offset = PutOffsetSub(offset, 9)))
-			if ((offset = PutOffsetSub(offset, 3)))
-				PutOffsetSub(offset, 3, false);
+//		  2296448 // 8, 3, 3 // seems the most optimal.
+//		if (p >= 16*1024)
+		return PutOffset(offset);
+//		if ((offset = PutOffsetSub(offset, 8)))
+//			if ((offset = PutOffsetSub(offset, 3)))
+//				PutOffsetSub(offset, 3, false);
 	}
 	
 	
