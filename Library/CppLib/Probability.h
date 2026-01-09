@@ -4,6 +4,8 @@ int Count[32];
 int TotalCount[32];
 int GrandTotal;
 int OutTotal;
+int EscapeTotal;
+int EscapeCount;
 
 
 float PC (int P) {
@@ -29,6 +31,9 @@ extern "C" void JB_ProbabilityDump (FastString* fs) {
 		
 		n = snprintf(Buffer, 128, "\tFinal %i\n", OutTotal);
 		JB_FS_AppendMem_(fs, (u8*)Buffer, n);
+		
+		n = snprintf(Buffer, 128, "\tEscape %i / %i\n", EscapeTotal, EscapeCount);
+		JB_FS_AppendMem_(fs, (u8*)Buffer, n);
 	} else {
 		for (int i = 0; i < 32; i++) {
 			if (int P = Count[i]) {
@@ -45,6 +50,11 @@ extern "C" void JB_ProbabilityDump (FastString* fs) {
 
 void probability_output (int x) {
 	OutTotal+=x;
+}
+
+void probability_escape (int x) {
+	EscapeTotal+=x;
+	EscapeCount++;
 }
 
 void probability_add (int Offset, int Min) {
