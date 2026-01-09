@@ -140,6 +140,7 @@ class Array
 		return .length > 0
 	
 	syntax Append (|...?| item)
+		inline
 		.SyntaxAppend(item, 1)
 	
 	function Append (|[...]| R)
@@ -194,15 +195,21 @@ class Array
 
 
 prototype SorterComparer (|...| self , |...| b, |SortComparison|)
+	linkage
+		cpp_Part SrtFn
 	contains Object
 	syntax append (|array| x)
+		inline
+		cpp_part Sort
 		x.sort(self)
 	
 
 datatype SortComparison (int)
 	function bool.syntaxcast (|SortComparison|)
+		inline
 		return self|SortComparison|
 	function int.syntaxcast (|SortComparison|)
+		inline
 		return self|SortComparison|
 
 

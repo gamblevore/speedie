@@ -80,7 +80,7 @@ class FileRow (ListViewRow)
 			beep v + " is not a valid filename!"
 			return false
 		
-		if .location.name == v
+		if .location ~= v
 			return false
 		|| l = .location.file
 		|| f = l.sibling(v)
@@ -300,7 +300,7 @@ class FileRow (ListViewRow)
 		function FindFileName (|listview| s, |string| name, |filerow|)
 			for r.all in s
 				if r isa filerow
-					if r.location.name ~= name
+					if r.location iz name
 						return r
 
 		libinternal error.ViewDate (|date|)
@@ -373,7 +373,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 	|| s = .listsource
 	s.clear
 	|| path = InPath.Resolve(true)			#require
-	|| AllSight = (path.name == ".")
+	|| AllSight = (path iz ".")
 	|| AtRoot   = (path == "/")
 	|| pf		= path.file 
 	if !pf.exists or !pf.isdir

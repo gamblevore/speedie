@@ -2280,10 +2280,9 @@ class TextView (GUIControl)
 		mode = AllowJeebox
 		|| d = .document
 			|| l = d.Location
-				|| ext = l.ext
-				if ext ~= "spd" or "box" or "jbin" or "xml" or "jb"
+				if l isa "spd" or "box" or "jbin" or "xml" or "jb"
 					mode = CurrentlyJeebox
-				  elseif ext ~!= "todo" and "txt"
+				  elseif l isa "todo" and "txt"
 					mode = ProbablyJeebox // this seems wrong
 		.ExpectsParse = mode
 

@@ -170,10 +170,25 @@ Relative paths take the current working directory.`
 	function SetExt (|string| ext, |string|)
 		return .trimext.AddExt(ext)
 	
+	// abc/d.//////
+	function FindExt (|ivec2|)
+		|| End = .Length
+			|| a = .Addr
+			while a[End-1] == '/'
+				End--
+				require End > 0
+			
+			|| i = End
+			while --i >= 0
+				|| c = a[i]
+				require c != '/'
+				if c == '.'
+					require ++i < end
+					return (i, end)
+	
+	
 	function Ext (|string|)
-		|| i = .find( '.', int.max, 0 ) #require
-		|| n = .outbyte('/', int.max, 0) ?? .length
-		return self[i + 1, n+1]
+		return self[.FindExt]
 
 	function BackToApp (|string|)
 		|| s = .TrimSlashes
@@ -215,7 +230,19 @@ Relative paths take the current working directory.`
 
 	operator isa (|string| s, |bool|)
 		if self
-			return .ext ~= s
+			|| X = .FindExt
+			if s == x.Width
+				return self[x.x, s, true]
+
+	operator iz (|string| s, |bool|)
+		|| Last = .length
+			while self[last-1] == '/'
+				last--
+			|| First = .find('/', Last, 0) + 1
+			|| length = Last - First
+			if s == length
+				return self[first, s, true]
+			
 		
 	function File (|File!|)
 		cpp_part AsFile

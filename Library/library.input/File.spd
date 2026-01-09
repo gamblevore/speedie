@@ -310,6 +310,9 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function IsDir (|bool|)
 		cpp_wrapper JB_File_IsDir
 
+	function IsLink (|bool|)
+		disabled "use .IsSymLink"
+		
 	function IsSymLink (|bool|)
 		cpp_wrapper JB_File_IsLink
 
