@@ -1,5 +1,6 @@
 
 
+target CompressionTest {
 module MzResearch
 	linkage
 		cpp_part MzR
@@ -44,4 +45,5 @@ module MzResearch
 				  elseif c.size >= 4K
 					out <~ c
 
+}
 
