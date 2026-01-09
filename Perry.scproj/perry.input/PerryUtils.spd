@@ -56,11 +56,8 @@ function @string.ASCII_Chart (|int| StartAt=32, |string|)
 	return fs
 
 	
-function message.DebugArgNames (|string| f, |[string]|)
+function message.DebugArgNames (|[string]|)
 	opt norefcounts
-	if f
-		rz <~ f
-	
 	for s in self
 		|| i = s.GoodArgName
 		if i != string.error
@@ -68,6 +65,7 @@ function message.DebugArgNames (|string| f, |[string]|)
 
 
 function message.GoodArgName (|bool| NeedName=false, |string|)
+	opt norefcounts
 	|| name = .GoodArgNameSub
 		return name
 	if name.IsOK and needname

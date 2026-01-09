@@ -45,11 +45,10 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 		return
 	
 	|| cake = SPDProcess.spawn(cake, args, ProcessMode.OwnGroup, f.name)
-	if cake
 		|| break = .CollectBreakPoints
 		|| hoi = cake.Get(5.0)
 			cake <~ break
-/			.logonecomm(hoi, "Cake Alive")
+/			.LogOneComm(hoi, "Cake Alive")
 			.RunCompileSub(cake)
 		  else
 			cake = nil
@@ -69,7 +68,7 @@ function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
 	
 	|| f = Product
 	|| IsDebug = .DebugMode is debug
-	|| args = ArgMsg.DebugArgNames( F * IsDebug )
+	|| args = ArgMsg.DebugArgNames
 	if product.IsDir and Platform.OSX
 		f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
 	
