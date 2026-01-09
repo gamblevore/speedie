@@ -96,7 +96,6 @@ class SCImport
 		opt norefcounts
 		.Mod.ExportName = "App" // make it simple
 		require scf
-//		.conf = scf
 		for s in scf.AST
 			if s != @tmp
 				0
