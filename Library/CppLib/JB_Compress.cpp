@@ -274,7 +274,8 @@ struct Compression {
 				return PutOffset(x);
 		}
 		// I think the only way to improve this, is huff the escaped data. maybe a static-distribution-table?
-		
+		// I think it requires... some kind of fast-sort algorithm... once that works, the rest will.
+		// a single-linked list of array items, blablabla. refer to the thing that refers to the object...
 		PutOffset(0);
 		PutLength(p - LastOut);
 		while (LastOut < p)
@@ -519,7 +520,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 
 	uint Size = In.Read4();
 	if (Size > 16*1024*1024)
-		return JB_ErrorHandleC("mz chunk size bad", 0, false);
+		return (int)JB_ErrorHandleC("mz chunk size bad", 0, false);
 	
 	Compression Cmp = {};
 	auto Write = JB_FS_WriteAlloc_(fs, Size+7);
@@ -533,8 +534,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 		if (!ago) {
 			int n = Cmp.GetLength(In);
 			if (n <= 0 or p+n>Size)
-				return JB_ErrorHandleC("mz corruption", 0, false);
-			Cmp.HeaderBits(In); // clear
+				return (int)JB_ErrorHandleC("mz corruption", 0, false);
 			for (int i = 0; i < n; i++)
 				Write[p++] = Cmp.GetBits(In, 8);
 		
