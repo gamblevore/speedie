@@ -34,9 +34,10 @@ module MzResearch
 		return .size < b.size
 	
 	function CollectProbs (|file| base, |[file]| out)
-		for c.files in base
+		for n in base
+			|| c = base[n]
 			if c.visible
-				if c.IsSymLink or (c iz "Build") or (c isa "mov")
+				if c.IsSymLink or (n ~= "Build") or (n isa "mov") or (n contains "Compress")
 					0
 				  elseif c.isdir
 					.CollectProbs(c, out)
