@@ -124,6 +124,7 @@ function FindBytePosSub (|Message?| Node, |Message?|)
 
 
 function FindBytePos (|Message?| Node, |Message?|)
+	opt norefcounts
 	|| first = FindBytePosSub( node )
 		return first
 	|| msg = FindBytePosSub( node.parent )
@@ -151,12 +152,12 @@ extend Error
 		
 		|| Line = d[Start, Finish].unicodesync
 		Line.ReplaceAll("\t", " ", fs)
-		// mark where in the line the error occurs?
 
 		|| Spaces = (.Position - Start)
 		fs <~ '\n'
 		if Usecolor
 			fs <~ ErrorColors.Underline
+		// mark where in the line the error occurs
 		fs <~ (' ', spaces min 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
 		fs <~ '^'
 
