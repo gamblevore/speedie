@@ -5,6 +5,7 @@ import "GameExamples/tetris.spd"
 
 
 main
+//	mzresearch.SortTest
 	if .Yes("crash")
 		.Crash
 	GUI.Init

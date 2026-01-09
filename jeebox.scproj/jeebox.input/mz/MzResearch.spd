@@ -1,9 +1,60 @@
 
-
 target CompressionTest {
+struct MzItem
+	|int|	  Index
+	|int|	  Count
+	|byte|    Byte
+	|&MzItem| Next
+
+
 module MzResearch
 	linkage
 		cpp_part MzR
+	|mzitem[256]|	Items
+	|byte[256]|		Bins
+	
+	
+	function Sort (|int| Changed)
+		
+	// how to keep this list sorted?
+	// its a simple sorting issue.
+	// so... lets say we have the values, 0,0,0,0,0,0
+	// then we have: 0,0,0,0,1,0   but we want actually: 1,0,0,0,0,0
+	// so... we can just swap one item.
+	// how do we swap it. we need to know which to swap with
+	// we can loop up over the thing, assuming it was already sorted.
+	// hmmm. I guess we need some kinda "bin"?
+	// where are the bins stored? how many bins? 256?
+	// i think ill solve this another day.
+	
+
+	function Print
+		for i in 256
+			if i
+				print ", "
+			print "${.items[i].byte}:$i"
+		printline
+
+		
+	function Init
+		for i in 256
+			|| R = .Items[i]
+			R.Byte = i
+			r.Index = i
+			r.Count = 0
+			R.next = .items[(i-1)&255]
+	
+	
+	function SortTest
+		.init
+		.print
+		for i in 100000
+			|| x = 256()
+			.Items[x].Count++
+			.sort(x)
+			.print
+		
+		
 	function Run (|int|)
 		|| dump = "~/Desktop/prob.txt".outputstream
 			|| root = file.speediedir.file
@@ -25,8 +76,7 @@ module MzResearch
 			dump <~ "\tsize $sz // ${sz.strsize}\n"
 			dump.ProbabilityDump
 			dump <~ "}\n\n"
-			(s)
-			(d)
+			(s), (d)
 		
 	function Faststring.ProbabilityDump
 		cpp_wrapper JB_ProbabilityDump
