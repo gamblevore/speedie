@@ -1,0 +1,16 @@
+#!/usr/local/bin/spd
+
+main (|[File]| Files)
+	expect (Files) ("No files passed.")
+	files = files.GlobExpand
+	for f in files
+		if !f.IsDir
+			|| d = f.ReadAll
+				|| c = d.Compress
+				|| dc = c.Decompress
+				expect (d == dc) ("Failed to compress: " + f)
+				"Compressed: $f"
+	if StdErr.ok
+		app.say "Compressed ${files.length of `file`} OK"
+			
+	
