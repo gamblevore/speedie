@@ -36,7 +36,7 @@ struct DateLocker {
 static PicoDate			JB_LastFlush;
 static DateLocker		Allocator;
 static u8*				Space;
-static int				TotalEscaped;
+//static int				TotalEscaped;
 
 
 
@@ -276,17 +276,13 @@ struct Compression {
 		// I think the only way to improve this, is to do rolz.
 		
 		PutOffset(0);
-		TotalEscaped += p - LastOut;
+		probability_escape(p - LastOut);
 		PutLength(p - LastOut);
 		PutBits(1, 1); // aligner. Can be byte-aligned for speed. Optional.
 		while (LastOut < p)
 			PutBits(8, Read[LastOut++]);
 	}
-
-
 /*
-
-
 total {
 	GrandTotal 569446
 	Slot 32 = 120359   // (21.1%, 21.1%)  // 1 gain
@@ -300,14 +296,25 @@ total {
 	Slot 8192 = 37592  // (6.6%, 95.4%)
 	Slot 16384 = 20589 // (3.6%, 99.0%)
 	Slot 32768 = 5602  // (1.0%, 100.0%)
+	Final 2332448
+	      1987996 // saved 344452, 
+	       481216 // without escapes. So it seems most data is escaped!
+		  1712484 // without lengths
 }
 
  */
 
 
 	inline void PutOffset2 (uint offset) {
+		return PutOffset(offset);
 		int log = std::max(JB_Int_Log2(offset), W_MINUS);
-		PutBits(log, offset);
+		int extra = offset>=128;
+		PutBits(8, (offset&127) | (extra<<7));
+		if (extra) {
+			offset -= 127;
+			offset >>= 7;
+			
+		}
 	}
 	
 	
@@ -487,7 +494,7 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	int Req = (Size+20) + (Size>>6);
 	int Actual = ((int)(Fnd.CmpOut - Fnd.CmpOutStart)) << 2;
 	*Fnd.CmpOutStart = Actual;
-	probability_output(Actual - Req);
+	probability_output(Actual);
 	fs->Length += Actual - Req;
 	return Actual;
 }
