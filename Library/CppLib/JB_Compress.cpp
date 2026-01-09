@@ -1,6 +1,7 @@
 
 #include "JB_Compress.h"
 #include "JB_MemUtils.h"
+#include "Probability.h"
 // this still seems a lot SLOWER than the original!
 // it could be the myscore operation?
 
@@ -168,13 +169,9 @@ struct Decomp {
 
 struct Compression {
 	int*			Head;
-//	int*			Prev;
-//	int*			TwoByte;
 	u8*				Read;
 	uint*			CmpOut;
 	uint*			CmpOutStart;
-//	uint			Size;
-//	uint			Level;
 	uint			h1;
 	uint			h2;
 	uint64_t		BitBuff;
@@ -185,7 +182,7 @@ struct Compression {
 	}
 	
 	bool StartCompress (FastString* fs, JB_String* In) {
-		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE +256*256*0) * sizeof(int); //256*256 is for TwoByte
+		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE) * sizeof(int);
 		if (!Space and !(Space = JB_Realloc(NULL, N)))
 			return false;
 		
@@ -197,8 +194,6 @@ struct Compression {
 		CmpOutStart = CmpOut;
 
 		Head = (int*)Space;
-//		Prev = Head + HASH1_SIZE + HASH2_SIZE;
-//		TwoByte = Prev+W_SIZE;
 		Read = JB_Str_Address(In);
 
 		Write4(-1);				// reserve space for compressed size.
@@ -288,73 +283,40 @@ struct Compression {
 			PutBits(8, Read[LastOut++]);
 	}
 
+
+/*
+
+
+total {
+	GrandTotal 569446
+	Slot 32 = 120359   // (21.1%, 21.1%)  // 1 gain
+	Slot 64 = 49687	   // (8.7%, 29.9%)	  // 1 gain
+	Slot 128 = 55786   // (9.8%, 39.7%)   // 9 bit  --> 8 avail  --> 255 // 2 gain, 49.5 bits!
+	Slot 256 = 62815   // (11.0%, 50.7%)
+	Slot 512 = 57520   // (10.1%, 60.8%)
+	Slot 1024 = 57041  // (10.0%, 70.8%)
+	Slot 2048 = 55718  // (9.8%, 80.6%)
+	Slot 4096 = 46737  // (8.2%, 88.8%)
+	Slot 8192 = 37592  // (6.6%, 95.4%)
+	Slot 16384 = 20589 // (3.6%, 99.0%)
+	Slot 32768 = 5602  // (1.0%, 100.0%)
+}
+
+ */
+
+
+	inline void PutOffset2 (uint offset) {
+		int log = std::max(JB_Int_Log2(offset), W_MINUS);
+		PutBits(log, offset);
+	}
+	
+	
+	
+	
+
 	inline void PutOffset (uint offset) {
-		// we could shrink this by the current max length, plus a bit more for escapes
-		// don't wanna do this now. my energy is fried.
 		int log = std::max(JB_Int_Log2(offset), W_MINUS);
 		PutBits(SLOT_BITS, log-W_MINUS);
-		
-		///		11111, log2 is 4, but we bump it upto 5
-		///		We write 4 bits, of 0.   (0 = 5-5)
-		///		log == 5, so we add 1 to log, log is now 6
-		///		now we write 6 bits, containing 31
-		///		like this, we can write values up to 63, at the base log.
-		///		lets try a bigger number, 63.
-
-		///		63, log2 is 5.
-		///		write 4 bits of 0.
-		///		log becomes 6
-		///		write 6 bits containing 63
-		
-		///		I guess it worksout. we just write it that way.
-		///		small numbers take 10 bits. So what number would give a log2 that requires 1 less bit?
-		///		we got a log of 5 for 63.
-		///		64 gives a log of 6.
-		///		(we subtract 5 however)
-		///     the log also gives us the highest bit "for free". So lets include that.
-
-		//		63		= 5+1	(0)
-		//		127		= 6  	(1)
-		//		255		= 7  	(2)
-		//		511		= 8  	(3)
-		//		1023	= 9  	(4)
-		//		2047	= 10 	(5)
-		//		4K-1	= 11 	(6)
-		//		8K..	= 12 	(7)
-		//		16K		= 13 	(8)
-		//		32K		= 14 	(9)
-		//		64K		= 15 	(10)
-		//		128K	= 16 	(11)
-		//		256K	= 17 	(12)
-		//		512K	= 18 	(13)
-		//		1MB		= 19 	(14)
-		//		2MB		= 20 	(15)
-		
-		// now... we want to take off 1 bit. so the biggest number is 7.
-		// that gives us 8K. We could save 1-bit, per-offset, for files under 8K.
-
-		// we want to aim for saving some bits for 64K files. If we raised the base-bits
-		// lets say so that 64K takes number 7. So raise by 3. Then 0 is now at 512.
-		// So the smallest size we can write, is now 12-bit offset. we probably just
-		// increased the file-size. altough values of 512 to 64K could save 1-bit per-match
-		// it might help... or make things worse.
-		
-		// we do have a huge space, of 2MB possible offsets. Could they be reused somehow?
-		// I realy do feel somehow that these offsets are still large
-		// 10bits for a value of 0-63. Its a lot.
-		
-		// so do we want 3 bit overhead, or 2? Actually its not possible. Because we restore
-		// 1 bit using the log. but without the log, we can't restore it. We'd need 2 bits.
-		
-		// is there a better way? there HAS to be.
-
-		// Lets say... we store 0-255 in 9 bits. So thats 512 possibilities.
-		// we the other 256, and... do stufff with it. Maybe that will work? Seems cool?
-		
-		// I think the only thing I could do is fiddle with the stuff. Try multiplying
-		// the base-staRt by 8, and seeing if we can compress 64K files usign 3 bits
-		// this increases the bit-size of ranges under 255
-		
 		if (log > W_MINUS)
 			offset -= 1<<log;
 		  else
@@ -439,8 +401,6 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 			int h1 = Fnd.h1; int h2 = Fnd.h2;
 			auto Prev = Head + HEAD_TO_PREV;
 			while (Len-- > 0) {
-	//			u16 SS = *((u16*)(Read+p));
-	//			TwoByte[SS] = p;
 				Head[h1]=p;
 				Prev[p&W_MASK]=Head[h2+HASH1_SIZE];
 				Head[h2+HASH1_SIZE]=p++;
@@ -507,7 +467,13 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 		if (Len >= MIN_MATCH) {
 			if (LastOut < p)
 				Fnd.EscapeSub(LastOut, p);
-			Fnd.PutOffset(Offset);
+			if (p < 64*1024) {
+				probability_add(Offset, W_MINUS);
+				Fnd.PutOffset2(Offset);
+			 } else {
+				Fnd.PutOffset(Offset);
+			}
+			
 			Fnd.PutLength(Len - MIN_MATCH);
 			LastOut = p + Len;
 		} else {
@@ -519,11 +485,13 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 		Fnd.EscapeSub(LastOut, Size);
 	Fnd.PutBits(31, 0);
 	int Req = (Size+20) + (Size>>6);
-	int Actual = (Fnd.CmpOut - Fnd.CmpOutStart) << 2;
+	int Actual = ((int)(Fnd.CmpOut - Fnd.CmpOutStart)) << 2;
 	*Fnd.CmpOutStart = Actual;
+	probability_output(Actual - Req);
 	fs->Length += Actual - Req;
 	return Actual;
 }
+
 
 
 extern "C" int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level) {

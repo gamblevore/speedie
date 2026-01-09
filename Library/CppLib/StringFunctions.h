@@ -91,26 +91,22 @@ float JB_Str_SingleValue(JB_String* self, u32 offset);
 
 // StringAlterCopy
 
-
 JB_String* JB_Str_ReplaceAllB(JB_String* self, int cFrom, int cTo);
 struct FastString;
 struct JB_ErrorReceiver;
 JB_String* JB_Str_ReplaceAll(JB_String* self, JB_String* Old, JB_String* New, bool Lex, FastString* fs_in);
-JB_String* JB_Str_MultiReplaceAll(JB_String* self, 	Dictionary* Dict, JB_ErrorReceiver* Rec);
-//JB_String* JB_Str_MultiReplaceAll(JB_String* self,  Dictionary* Dict, JB_ErrorReceiver* Rec);
+JB_String* JB_Str_MultiReplaceAll(JB_String* self, Dictionary* Dict, JB_ErrorReceiver* Rec);
 JB_String* JB_Str_ReplaceBytesSub_(JB_String* self, int lFrom, int lTo, FastString* fs);
 JB_String* JB_Str_UnHex(JB_String* self, FastString* fs = nil);
 JB_String* JB_Str_Hex(JB_String* self, int Spaces, FastString* fs = nil);
-//JB_String* JB_Str_MapBytes(JB_String* self, ByteMap* CS, int Clear);
 JB_String* JB_Str_LowerCase(JB_String* self);
-//ByteMap* JB_BM__Lower();
 JB_String* JB_Str_UpperCase(JB_String* self);
 bool JB_Str_IsAsciiName(JB_String* self);
 JB_String* JB_Str_Reverse(JB_String* self, FastString* fs_in);
-void JB_Str_StretchBack_(JB_String* self, int i);
 JB_String* JB_ASCII();
 JB_String* JB_Upper();
 JB_String* JB_Lower();
+void JB_ProbabilityDump (FastString* fs);
 int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level);
 int JB_Str_DecompressChunk (FastString* fs,  JB_String* self);
 void JB_CompFreeNow();
@@ -129,9 +125,7 @@ void JB_CompFreeNow();
 
 // StringSplitters
 
-//JB_String* JB_Str_Mid(JB_String* self, int Start, int Count);
 JB_String* JB_Str_Range(JB_String* self, int Start, int After, bool ShareAlways=false);
-//void JB_Str__Uniqify(Dictionary* D);
 JB_String* JB_Str_Left(JB_String* self, int Count);
 JB_String* JB_Str_Right(JB_String* self, int Count);
 JB_String* JB_Str_OperatorPlus(JB_String* self, JB_String* other);
@@ -139,7 +133,6 @@ JB_String* JB_Str_Append4(JB_String* A, JB_String* B, JB_String* C, JB_String* D
 JB_String* JB_Str_Append6(JB_String* A, JB_String* B, JB_String* C, JB_String* D, JB_String* E, JB_String* F);
 JB_String* JB_Str_Unshare(JB_String* self);
 JB_Object* JB_Str_Owner(JB_String* self);
-//JB_String* JB_Str_RevMid(JB_String* self, int Count);
 
 
 
