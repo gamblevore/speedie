@@ -1,9 +1,8 @@
 
 #include "JB_Compress.h"
 #include "JB_MemUtils.h"
-#include "Probability.h"
-// this still seems a lot SLOWER than the original!
-// it could be the myscore operation?
+#include "CompressionProbability.h"
+// Can we speed up myscore?
 
 
 
@@ -268,53 +267,56 @@ struct Compression {
 	}
 	
 	void EscapeSub (int LastOut, int p) {
+		probability_escape(p - LastOut);
 		if (LastOut+1 == p) {
 			int x = LastOut + 1 + Read[LastOut];
 			if (x < W_SIZE)
 				return PutOffset(x);
 		}
-		// I think the only way to improve this, is to do rolz.
+		// I think the only way to improve this, is huff the escaped data. maybe a static-distribution-table?
 		
 		PutOffset(0);
-		probability_escape(p - LastOut);
 		PutLength(p - LastOut);
-		PutBits(1, 1); // aligner. Can be byte-aligned for speed. Optional.
 		while (LastOut < p)
 			PutBits(8, Read[LastOut++]);
 	}
-/*
-total {
-	GrandTotal 569446
-	Slot 32 = 120359   // (21.1%, 21.1%)  // 1 gain
-	Slot 64 = 49687	   // (8.7%, 29.9%)	  // 1 gain
-	Slot 128 = 55786   // (9.8%, 39.7%)   // 9 bit  --> 8 avail  --> 255 // 2 gain, 49.5 bits!
-	Slot 256 = 62815   // (11.0%, 50.7%)
-	Slot 512 = 57520   // (10.1%, 60.8%)
-	Slot 1024 = 57041  // (10.0%, 70.8%)
-	Slot 2048 = 55718  // (9.8%, 80.6%)
-	Slot 4096 = 46737  // (8.2%, 88.8%)
-	Slot 8192 = 37592  // (6.6%, 95.4%)
-	Slot 16384 = 20589 // (3.6%, 99.0%)
-	Slot 32768 = 5602  // (1.0%, 100.0%)
-	Final 2332448
-	      1987996 // saved 344452, 
-	       481216 // without escapes. So it seems most data is escaped!
-		  1712484 // without lengths
-}
 
- */
+/*total {
+	GrandTotal 567428
+	Slot 32 = 119883 // (21.1%, 21.1%)  // 1 gain
+	Slot 64 = 49465 // (8.7%, 29.8%)    // 1 gain
+	Slot 128 = 55573 // (9.8%, 39.6%)   // 9 bit  --> 8 avail  --> 255 // 2 gain, 49.5 bits!
+	Slot 256 = 62581 // (11.0%, 50.7%)
+	Slot 512 = 57313 // (10.1%, 60.8%)
+	Slot 1024 = 56816 // (10.0%, 70.8%)
+	Slot 2048 = 55536 // (9.8%, 80.6%)
+	Slot 4096 = 46539 // (8.2%, 88.8%)
+	Slot 8192 = 37537 // (6.6%, 95.4%)
+	Slot 16384 = 20584 // (3.6%, 99.0%)
+	Slot 32768 = 5601 // (1.0%, 100.0%)
+	Final 2313504-2299296 // 14K? ooof?
+	      2302128
+		  2300924 // 8, 3, 4	      
+	Escape 830623 / 202325
+} */
 
+	uint PutOffsetSub (uint offset, uint Bits, bool More=true) {
+		int B = 1<<Bits;
+		int extra = offset >= B;
+		PutBits(Bits+More, (offset&(B-1)) | (extra<<Bits));
+		return offset >> Bits;
+	}
 
-	inline void PutOffset2 (uint offset) {
-		return PutOffset(offset);
-		int log = std::max(JB_Int_Log2(offset), W_MINUS);
-		int extra = offset>=128;
-		PutBits(8, (offset&127) | (extra<<7));
-		if (extra) {
-			offset -= 127;
-			offset >>= 7;
-			
-		}
+	void PutOffset2 (uint p, uint offset) {
+		probability_add(offset, W_MINUS);
+//		  2300928 // 8, 3, 4	     
+//		  2299300 // 9, 3, 3 // seems the most optimal.
+ 
+		if (p >= 32*1024)
+			return PutOffset(offset);
+		if ((offset = PutOffsetSub(offset, 9)))
+			if ((offset = PutOffsetSub(offset, 3)))
+				PutOffsetSub(offset, 3, false);
 	}
 	
 	
@@ -474,13 +476,7 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 		if (Len >= MIN_MATCH) {
 			if (LastOut < p)
 				Fnd.EscapeSub(LastOut, p);
-			if (p < 64*1024) {
-				probability_add(Offset, W_MINUS);
-				Fnd.PutOffset2(Offset);
-			 } else {
-				Fnd.PutOffset(Offset);
-			}
-			
+			Fnd.PutOffset2(p, Offset);			
 			Fnd.PutLength(Len - MIN_MATCH);
 			LastOut = p + Len;
 		} else {
