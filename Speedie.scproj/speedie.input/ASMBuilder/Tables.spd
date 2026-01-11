@@ -92,8 +92,7 @@ function Swap (fn_asm)
 	|| B = .ExistingVar(prms.second!)
 	expect (A.reg and B.reg) (Exp, "Can only swap registers")
 	
-	|| T = .DeclareMe(exp, A)
-	T = .assign(exp, T, A)
+	|| T = .assign(exp, .TempOnly, A)
 	.assign(exp, A, B)
 	.assign(exp, B, T)
 	|| f = T.fat
@@ -356,14 +355,30 @@ function Decl (fn_asm) // declaresub declare
 	.DeclReset(ty)
 	|| rel = exp.last!
 	dest = .DeclareBody(rel, ty)
+	|| fat = .curr
 	rz = declsub(self, exp, dest, ty, rel)
+	if fat < .curr
+		(fat is newlydeclared)
+
+	// i'm not sure this is the right way.
+	// we should put the info into the actual ASM itself
+	// then the positions will match up properly
+	
+	// so the closing will have to be an instruction
+	// perhaps at the end of an arg. A nop FAT, but still
+	// enough for us to get a position.
+	// or else how can we store the "closevar" info in the FAT.
+	// i guess closing can generate a Nop, unless we have one alraedy
+	// we'll need to make sure the nop isn't reused.
 	|| j = assembler.DebugInfo
-		ty.DumpDecl(j, .index)				// AddDbg
+		if ty.mu.DataType|asmreg|.Reg != dest.reg // oof
+		.RegDebugInfo |= 1<<dest.reg
+		ty.DumpDecl(j, .FnLength)				// AddDbg
 	
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
 	opt norefcounts
-	(dest is unusedsofar)
+	(dest is NewlyDeclared)
 	if ty.IsBareStruct or ty.IsCarray
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	

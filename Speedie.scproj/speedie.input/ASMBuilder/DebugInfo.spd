@@ -18,10 +18,10 @@ function SCDecl.DumpCode (|int| Pos, |syntax|)
 
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
-	.WriteType(@back)				// type
-	.Appendhint(1 + pos.hintsize)	// size
-	.AppendHint(pos)				// data
-	.AppendByte(reg)
+	.WriteType(@back)				// close spd-var	// type
+	.Appendhint(1 + pos.hintsize)						// size
+	.AppendHint(pos)									// data
+/	.AppendByte(reg)
 
 
 function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
@@ -35,7 +35,10 @@ function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 			s = .name
 		if self is local
 			reg = .mu.DataType|asmreg|.Reg
-	
+
+//	|| fn = scfunction.currfunc
+//	if fn
+		
 	j.add(W, s, true)
 	j.AddDecl(self, Pos, W, Reg)
 	
@@ -53,7 +56,7 @@ function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 
 function jbin.AddDecl (|scdecl| D, |int| Pos, |syntax| W, |int| Reg)
 	opt norefcounts
-	|| t = d.type.debugID(W)
+	|| t = d.type.DebugTypeInfo(W)
 	|| Alloc = t.HIntsize + (reg > 0)
 	if pos >= 0
 		alloc += pos.hintsize
@@ -66,7 +69,7 @@ function jbin.AddDecl (|scdecl| D, |int| Pos, |syntax| W, |int| Reg)
 			.AppendByte(reg)			
 	
 
-function scclass.DebugID (|syntax| W, |int|)
+function scclass.DebugTypeInfo (|syntax| W, |int|)
 	opt norefcounts
 	if w == @bin or @str				// an object or struct
 		return .TableID

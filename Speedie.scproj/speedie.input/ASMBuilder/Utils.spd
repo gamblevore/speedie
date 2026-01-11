@@ -125,20 +125,23 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 		IsReal = false
 
 	|| v = extra.log2
-	|| Result = Curr &~ (1<<v)
-	.Regs.KnownMap &=~ (1<<v)
+	|| v_bits = 1<<v
+	|| Result = Curr &~ v_bits
+	.Regs.KnownMap &=~ v_bits
+	
 	if IsReal
-		.vdecls = Result // easier to debug >:O 
+		.vdecls = Result 
+		if .RegDebugInfo & v_bits
+			.RegDebugInfo &= ~v_bits
+			debuginfo!.DebugCloseVar(.FnLength, v)
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 
 	|| fat = .regs.Setters[v]
 		if exp
 			.SetRegister(v, nil, nil) // no reason to want to nop anything here.
-		// Does code below suffer from unallocating something that is used later?
 		return .ClearStruct(exp, .funcstart + fat, v)
-	|| j = debuginfo
-		j.DebugCloseVar(.index, v)
+
 	return true
 
 

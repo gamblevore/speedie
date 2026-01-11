@@ -6,9 +6,12 @@ role SpdFunc (message)
 		.tag = -1
 		.RangeLength = 0
 		.name = "(unused code)"
+		.func = @tmp
 		.Position = -1
 	
 	
+	// we want to make this easier to debug
+	// so... same message structure always
 	function message.CopyToVM
 		opt norefcounts
 		|| Code = .name
@@ -26,6 +29,7 @@ role SpdFunc (message)
 		if .func != @tmp
 			.func = @tmp
 			.name = "(unnamed)"
+		.clear
 	
 
 	function Run (|&ivec4|)

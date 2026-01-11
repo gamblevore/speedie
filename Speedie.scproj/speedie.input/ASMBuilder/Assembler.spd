@@ -25,6 +25,7 @@ struct Assembler
 	|byte|						InlineDepthLimit
 	target debug
 		|byte|					StackSize
+	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
 	|int|						CurrFuncGrab
@@ -56,14 +57,13 @@ struct Assembler
 		|int|						StringsOutOfRange
 		|jbin?|						DebugInfo
 
-		function SafeDebugInfo (|bool|debug = false, |string|)
-			require .debuginfo|string|.length
+		function SafeDebugInfo (|string|)
+			require .debuginfo.length
 			|| info = .debuginfo.GetResult
-/			if !info.ParseJbin 
+			if !info.ParseJbin 
 				error "Generated invalid debug info (jbin)"
 				info = ""
 			return info
-				
 
 	
 	function State (|&ASMState|)
@@ -465,27 +465,27 @@ struct Assembler
 
 
 	function µGetRealOffer (|message| exp, |asmreg| Dest,  |asmreg|)
-//		|| c = .curr
-		if dest isnt UnusedSoFar
+		#!"There could be a function call that smashes the first temp"
+		#!"for example:  y = (x+1) - .func()"
+		// (but what if there is not? Can we tell ahead of time?)
+
+		|| R = .ExistingVar(exp)
+		if r and (r isnt temp or r is okastemp)
+			return r
+		
+		if dest isnt NewlyDeclared
 			dest = nil // clear for .GetReal
+		
 		return .µGetReal(exp, dest)
-		// asmtodo: check if we can re-write the output to dest
-		// however its more tricky than I thought. Do later. 
 
 
 	function µGetReal (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
-		// the result should be considered "temp-like"?
-		// that means... it can be optimised away. maybe just allow temps on normal vars?
-		// like have another bit that says "its allowed"... but everything just checks
-		// "is temp" like normal.
-		
 		target debug
 			|| trap = ++ASMTrapper
-			// if trap == 5704
 		|| OV = .OpenVars
-		if ModeOnly is UnusedSoFar									// || x = (y + 1) + (z + 1)
-			ModeOnly = ModeOnly asnt asmreg.UnusedSoFar
-		  elseif ModeOnly is temp									//    x = (y + 1) + (z + 1)
+		if ModeOnly is NewlyDeclared									// || x = (y + 1) + (z + 1)
+			ModeOnly = ModeOnly asnt asmreg.NewlyDeclared
+		  elseif ModeOnly is temp										//    x = (y + 1) + (z + 1)
 			ModeOnly = .TempOnly(ModeOnly)
 			// asmtodo: what about doing all .declareme? simpler?
 		  else

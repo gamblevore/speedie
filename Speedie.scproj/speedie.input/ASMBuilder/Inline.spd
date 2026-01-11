@@ -68,7 +68,6 @@ struct InlineInfo
 extend assembler {
 function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
-	|| Start = .curr
 	|| OV = .OpenVars
 	|int| ID = .inlinedepth
 	|| st = .inlinestate[ID+1]
@@ -93,14 +92,12 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	st.ParentVars = .openvars
 	st.BranchDepth = 0
 	
+	|| Start = .curr
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
 				.asmreach(des)
-	
-	if !r
-		.SoftNopRange(start, .curr)				// rewind
 	
 	.inlinestate[ID] = nil
 	.inlinedepth = --ID
@@ -113,6 +110,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
 	LL.Start = .curr
+	|| jl = assembler.debuginfo.length
 
 	|SavedRegisters| regs 
 	|InlineInfo| Info
@@ -129,6 +127,9 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain)
 		regs.Rewind(self)
+		.SoftNopRange(ll.start, .curr)			// rewind
+		|| j = assembler.debuginfo
+			j.length = jl
 		return nil
 	
 	if !rz

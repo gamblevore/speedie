@@ -83,12 +83,15 @@ extend message
 		found = arg.msg(@tmp, key)
 		return found.msg(Needed, DefaultName)
 
+
 	function SyntaxAccess (|string| key, |bool| Err=false, |config|)
 		cpp_part GetConf
 		opt norefcounts
 		|| arg = .confarg
 		for item in arg
 			if item ~= key
+				if item.func == @msg // we'll handle this differently
+					return item
 				|| f = item.first
 					return f
 				if (Err)
@@ -97,6 +100,7 @@ extend message
 				return nil
 		if err
 			error (self, key + " not found.")
+	
 	
 	function Value (|string|)
 		if self

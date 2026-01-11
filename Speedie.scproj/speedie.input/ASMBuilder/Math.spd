@@ -40,7 +40,7 @@ extend Assembler
 			ml = .µGetASM(first, dest)
 		  else
 			ml = .µGetRealOffer(First, dest)
-			if (dest is UnusedSoFar) and !(ml iz dest)
+			if (dest is NewlyDeclared) and !(ml iz dest)
 				mr = dest
 	
 			mr = .µ(exp.last!, mr)

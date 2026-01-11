@@ -103,13 +103,12 @@ module debugger
 	
 	function LoadFuncs (|message| funcs)
 		opt norefcounts
-		|| Curr = SpdTable.Funcs[0]
-		while Funcs.hasany
-			|| V = Funcs.first
-			if !curr 
-				error (v, "Orphan debug info found")
-				exit
+		|| Curr = SpdTable.Funcs[1] // appinit
+		while (|| V = Funcs.first)
+			expect (curr) (v, "Orphan debug info found")
 			curr <~ v
+			v.name = ""
+			v.func = @arg
 			curr++
 
 		check (!curr) (funcs, "Missing some debug info")
@@ -124,9 +123,9 @@ module debugger
 			return true
 		
 		|| DebugInfo = R[@nil, 0].name.Decompress.parse
-/		.classes = DebugInfo["class"]
+		.classes = DebugInfo["class"]
 		.globs = DebugInfo["glob"]
-		.LoadFuncs(DebugInfo["funcs"])
+		.LoadFuncs(DebugInfo["func"])
 			
 		|| M = R[@nil, 1]
 		.SrcMap = M.name
@@ -136,8 +135,8 @@ module debugger
 		.Length = L // just for speed
 		
 		check (L < 1MB)						("Oversized source-map: " + L)
-		|| L2 = spdtable.CodeLength
-		check (L2==L)						("map-length is: " + L) + (" but code-length is: " + L2)
+		|| L2 = SpdTable.CodeLength
+		check (L2==L)						("Map-length is: " + L) + (" but code-length is: " + L2)
 		
 		return StdErr.ok
 

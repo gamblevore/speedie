@@ -21,7 +21,7 @@ datatype ASMReg (uint64)
 		Alternate
 		Subtract = Alternate
 		Set
-		UnusedSoFar
+		NewlyDeclared
 		ForceInto
 		NoScale
 		ContainsAddr
@@ -29,12 +29,9 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-//		BlockSafe
-//		BlockMostlySafe
 		OKAsTemp
 		AllowNopDest
 		BlockNop
-//		CompilerCreated
 		GlobalMemory
 		PreferEqul
 		Const
