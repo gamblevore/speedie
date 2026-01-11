@@ -192,7 +192,6 @@ GUI_FR_FindInFile
 GUI_FR_IsModified
 GUI_FR_Modifier
 GUI_FR_MoveTo
-GUI_FR_OperatorIsa
 GUI_FR_ReadFrom
 GUI_FR_ReadName
 GUI_FR_ReloadFiles
@@ -1074,7 +1073,6 @@ JB_Array_Size
 JB_Array_SizeSet
 JB_Array_Sort
 JB_Array_Swap
-JB_Array_SyntaxAppend
 JB_Array_Trim
 JB_Array_Value
 JB_Array_ValueSet
@@ -1800,7 +1798,6 @@ JB_Sh_StartProcess
 JB_Sh_Status
 JB_Sh__Spawn
 JB_Signal
-JB_SorterComparer_SyntaxAppend
 JB_StrC
 JB_StrCN
 JB_StrFromPtr
@@ -1848,6 +1845,7 @@ JB_Str_Fail
 JB_Str_FileSize
 JB_Str_FileThatExists
 JB_Str_FindCharset
+JB_Str_FindExt
 JB_Str_FindSlash
 JB_Str_First
 JB_Str_GetArchive
@@ -1892,6 +1890,7 @@ JB_Str_OpenInEditor
 JB_Str_OperatorGlobbed_By
 JB_Str_OperatorGlobs
 JB_Str_OperatorIsa
+JB_Str_OperatorIz
 JB_Str_OperatorMatch
 JB_Str_OperatorMul
 JB_Str_OperatorPlus
@@ -2118,7 +2117,6 @@ JB_bin_WriteType
 JB_bool_Append
 JB_bool_Render0
 JB_bool__MainArg
-JB_bool_syntaxcast
 JB_byte_CanPrintAsNormalChar
 JB_byte_EqualsByte
 JB_byte_In
@@ -2269,7 +2267,6 @@ JB_int_Towards
 JB_int_Wrap
 JB_int__MainArg
 JB_int_operatorof
-JB_int_syntaxcast
 JB_ivec2_Abs
 JB_ivec2_Clip
 JB_ivec2_Clip2
@@ -2344,8 +2341,6 @@ JB_uint64_OperatorMax
 JB_uint64_OperatorMin
 JB_uint64_RemoveOneBit
 JB_uint64_SyntaxAccessSet
-JB_uint64_Trim
-JB_uint64_XorDownTo8Bits
 JB_uint64_hash
 JB_uint_LowestBit
 JB_uint_OperatorMax
