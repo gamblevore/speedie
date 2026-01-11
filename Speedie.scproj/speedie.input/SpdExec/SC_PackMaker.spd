@@ -132,6 +132,7 @@ module PackMaker
 	function FATCompile (|bool|)
 		opt norefcounts
 		.FinalPrepare
+		scfunction.currfunc = nil
 		assembler.sh.FillDebugInfo
 
 		(Compiler is Hungry)
