@@ -1440,13 +1440,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2392])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2401])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2393])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2394])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2391])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2394])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2395])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2402])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2403])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2400])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2403])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2404])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1620,7 +1620,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2399])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2408])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1661,7 +1661,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2400])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2409])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1802,10 +1802,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2398])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2397])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2407])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2406])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2396])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2405])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2482,7 +2482,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2390])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2399])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2600,18 +2600,19 @@ struct JB_Globals {
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
-	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
-	FP_SorterComparer Str__Sorter;
-	FP_SorterComparer Msg__Sorter;
-	FP_fnIDGenerator Tk_Splitter;
-	CakeVM_CakeChef CakeVM_DummyChef;
-	FP_SorterComparer File__Sorter;
 	FP_SorterComparer Tree__Sorter;
 	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
+	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
+	FP_SorterComparer Str__Sorter;
+	FP_fnIDGenerator Tk_Splitter;
+	FP_SorterComparer Msg__Sorter;
+	FP_SorterComparer File_SizeSort;
+	CakeVM_CakeChef CakeVM_DummyChef;
+	FP_SorterComparer File__Sorter;
 	RandomXOR* Random;
-	RandomXOR RandomShared;
 	RandomXOR zalgo_R;
+	RandomXOR RandomShared;
 	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
 	uint64 Mrap_MDummy_[2];
@@ -3228,6 +3229,9 @@ int SC_Macros__Init_();
 
 
 // Math
+
+
+// MzR
 
 
 // Options
@@ -6712,8 +6716,6 @@ JB_String* JB_Array_join(Array* Self, JB_String* Sep);
 
 JB_String* JB_Array_join_sub(Array* Self, JB_String* Sep, int N);
 
-void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item);
-
 
 
 // JB_AutoItem
@@ -7512,6 +7514,8 @@ JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
 Ind JB_Str_FindCharset(JB_String* Self, CharSet Find, int From, int After);
 
+ivec2 JB_Str_FindExt(JB_String* Self);
+
 Ind JB_Str_FindSlash(JB_String* Self, int From);
 
 int JB_Str_FindTrailingSlashes(JB_String* Self);
@@ -7633,6 +7637,8 @@ JB_String* JB_Str_Squeeze(JB_String* Self);
 InputStream* JB_Str_Stream(JB_String* Self);
 
 int64 JB_Str_SuffixSize(JB_String* Self);
+
+JB_String* JB_Str_RangeVec(JB_String* Self, ivec2 R);
 
 JB_String* JB_Str_SyntaxAccess(JB_String* Self, JB_String* S);
 
@@ -10834,11 +10840,15 @@ inline bool JB_int_OperatorIsa(int Self, uint N);
 
 inline IntRange JB_int_OperatorTo(int Self, int Other);
 
+inline int JB_ivec2_Width(ivec2 Self);
+
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
 inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self);
 
 inline JB_String* SC_SCObject_Name(SCObject* Self);
+
+inline void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item);
 
 inline bool JB_Array_SyntaxCast(Array* Self);
 
@@ -11328,6 +11338,10 @@ inline IntRange JB_int_OperatorTo(int Self, int Other) {
 	return ((IntRange)ivec2{Self, Other + 1});
 }
 
+inline int JB_ivec2_Width(ivec2 Self) {
+	return Self[1] - Self[0];
+}
+
 inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
 	return (Self != nil) and Self->HasProperParams;
 }
@@ -11341,6 +11355,10 @@ inline JB_String* SC_SCObject_Name(SCObject* Self) {
 		return Self->Name;
 	}
 	return JB_LUB[13];
+}
+
+inline void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item) {
+	JB_Array_AppendCount(Self, Item, 1);
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
@@ -11820,7 +11838,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1837], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1846], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
