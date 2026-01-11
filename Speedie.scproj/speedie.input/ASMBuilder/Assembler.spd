@@ -59,7 +59,7 @@ struct Assembler
 		function SafeDebugInfo (|bool|debug = false, |string|)
 			require .debuginfo|string|.length
 			|| info = .debuginfo.GetResult
-			if !info.ParseJbin 
+/			if !info.ParseJbin 
 				error "Generated invalid debug info (jbin)"
 				info = ""
 			return info
@@ -602,7 +602,7 @@ struct Assembler
 			p.DumpDecl(self, p.exportposition)
 
 		
-	function FillDebugInfo
+	function FillDebugInfo 
 		opt norefcounts
 		if Options.TargetDebug
 			SourceMap.Positions = FastString()
@@ -620,6 +620,8 @@ struct Assembler
 		j.Enter(@msg, "glob")
 		j.PropertyLayout(Globs)
 		j.exit
+		
+		j.enter(@msg, "func")
 		debuginfo = j // AddDbg
 	
 	

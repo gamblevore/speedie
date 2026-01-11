@@ -173,14 +173,15 @@ module PackMaker
 		
 	function BakeDebug (|jbin| j)
 		|faststring--| p = SourceMap.Positions
-		|| dbg = assembler.SafeDebugInfo
-		if dbg and p
-			compiler.stDebugInfo += dbg.length
-			j.enter(@tmp, "debug")
-			j.AddStr(dbg.Compress)
-			j.add(@bin, p)
-			j.addStr(SCImport.AllFiles.join("\n").Compress)
-			j.exit
+			|| dbg = assembler.SafeDebugInfo
+				compiler.stDebugInfo += dbg.length
+				j.enter(@tmp, "debug")
+				
+				j.AddStr(dbg.Compress)
+				j.add(@bin, p)
+				j.addStr(SCImport.AllFiles.join("\n").Compress)
+				
+				j.exit
 
 	
 	function BakeASM (|jbin| j, |bool|)

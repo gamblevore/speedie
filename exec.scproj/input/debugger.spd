@@ -2,6 +2,8 @@
 
 module debugger
 	|message|		Root
+	|Message|		Globs
+	|Message|		Classes
 	|[string]|		Files
 	|string|		SrcMap
 	|&uint|			Base
@@ -99,6 +101,20 @@ module debugger
 			error ("Code map too short: " + index)
 	
 	
+	function LoadFuncs (|message| funcs)
+		opt norefcounts
+		|| Curr = SpdTable.Funcs[0]
+		while Funcs.hasany
+			|| V = Funcs.first
+			if !curr 
+				error (v, "Orphan debug info found")
+				exit
+			curr <~ v
+			curr++
+
+		check (!curr) (funcs, "Missing some debug info")
+	
+	
 	function Load (|bool|)
 		opt norefcounts
 		|| R = .root
@@ -107,17 +123,10 @@ module debugger
 				.BreakAll
 			return true
 		
-		|| Vars = R[@nil, 0].name.Decompress.parse
-		|| Curr = SpdTable.Funcs[0]
-		while vars.hasany
-			|| V = vars.first
-			if !curr 
-				error (v, "Orphan debug info found")
-				exit
-			curr <~ v
-			curr++
-
-		check (!curr) (vars, "Missing some debug info")
+		|| DebugInfo = R[@nil, 0].name.Decompress.parse
+/		.classes = DebugInfo["class"]
+		.globs = DebugInfo["glob"]
+		.LoadFuncs(DebugInfo["funcs"])
 			
 		|| M = R[@nil, 1]
 		.SrcMap = M.name
