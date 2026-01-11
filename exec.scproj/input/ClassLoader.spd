@@ -58,7 +58,7 @@ function Cakerun.LoadOneClass (|message| s)
 	|| Num = c[@num]
 	|| I = Num.int									#require
 	
-	|| Where = ((globals.LibBase!)|&byte| + I)|&?&classdata|
+	|| Where = (globals.LibBase + I)|&?&classdata|  #expect
 	|| PK = c.next
 		PK.Expect(@list)
 		return .UnpackClass(s, c, where, pk)
