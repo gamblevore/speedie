@@ -796,6 +796,7 @@ struct Assembler {
 	byte InlineDepth;
 	byte DeepestInline;
 	byte InlineDepthLimit;
+	uint RegDebugInfo;
 	uint VDecls_;
 	uint VTemps_;
 	int CurrFuncGrab;
@@ -1440,13 +1441,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2401])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2392])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2402])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2403])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2400])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2403])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2404])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2393])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2394])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2391])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2394])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2395])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1620,7 +1621,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2408])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2399])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1661,7 +1662,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2409])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2400])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1802,10 +1803,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2407])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2406])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2398])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2397])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2405])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2396])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2020,6 +2021,7 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_ForceInto ((ASMReg)8388608)
 #define kSC__Reg_GlobalMemory ((ASMReg)8589934592)
 #define kSC__Reg_Negate ((ASMReg)65536)
+#define kSC__Reg_NewlyDeclared ((ASMReg)4194304)
 #define kSC__Reg_NoScale ((ASMReg)16777216)
 #define kSC__Reg_OKAsTemp ((ASMReg)1073741824)
 #define kSC__Reg_Param ((ASMReg)524288)
@@ -2029,7 +2031,6 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_Subtract ((ASMReg)1048576)
 #define kSC__Reg_Temp ((ASMReg)1024)
 #define kSC__Reg_Textual ((ASMReg)67108864)
-#define kSC__Reg_UnusedSoFar ((ASMReg)4194304)
 #define kSC__Reg_Zero ((ASMReg)34360262712)
 #define kSC__ASMType_IncrAfter ((int)2)
 #define kSC__ASMType_IncrBefore ((int)0)
@@ -2482,7 +2483,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2399])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2390])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2600,19 +2601,18 @@ struct JB_Globals {
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
+	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
+	FP_SorterComparer Str__Sorter;
+	FP_SorterComparer Msg__Sorter;
+	FP_fnIDGenerator Tk_Splitter;
+	CakeVM_CakeChef CakeVM_DummyChef;
+	FP_SorterComparer File__Sorter;
 	FP_SorterComparer Tree__Sorter;
 	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
-	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
-	FP_SorterComparer Str__Sorter;
-	FP_fnIDGenerator Tk_Splitter;
-	FP_SorterComparer Msg__Sorter;
-	FP_SorterComparer File_SizeSort;
-	CakeVM_CakeChef CakeVM_DummyChef;
-	FP_SorterComparer File__Sorter;
 	RandomXOR* Random;
-	RandomXOR zalgo_R;
 	RandomXOR RandomShared;
+	RandomXOR zalgo_R;
 	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
 	uint64 Mrap_MDummy_[2];
@@ -3229,9 +3229,6 @@ int SC_Macros__Init_();
 
 
 // Math
-
-
-// MzR
 
 
 // Options
@@ -6431,7 +6428,7 @@ int SC_Pac__Init_();
 
 void adb();
 
-JB_String* SC_Pac__SafeDebugInfo(bool Debug);
+JB_String* SC_Pac__SafeDebugInfo();
 
 
 
@@ -10012,7 +10009,7 @@ JB_String* SC_Class_CSuperStructName(SCClass* Self);
 
 void SC_Class_DataTypePostLoad(SCClass* Self);
 
-int SC_Class_DebugID(SCClass* Self, Syntax W);
+int SC_Class_DebugTypeInfo(SCClass* Self, Syntax W);
 
 void SC_Class_DeclModel(SCClass* Self);
 
@@ -11838,7 +11835,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1846], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1837], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
