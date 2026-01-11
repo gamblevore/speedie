@@ -1,11 +1,13 @@
 
 
+#if DEBUG
 int Count[32];
 int TotalCount[32];
 int GrandTotal;
 int OutTotal;
 int EscapeTotal;
 int EscapeCount;
+int EscapeFile;
 
 
 float PC (int P) {
@@ -49,16 +51,31 @@ extern "C" void JB_ProbabilityDump (FastString* fs) {
 
 
 void probability_output (int x) {
-	OutTotal+=x;
+	OutTotal += x;
 }
 
-void probability_escape (int x) {
-	EscapeTotal+=x;
-	EscapeCount++;
+
+#include <fcntl.h>
+#include <unistd.h>
+void probability_escape (u8* Read, int x) {
+	if (EscapeFile == 0)
+		EscapeFile = open("/tmp/spd_comp.esc", O_WRONLY|O_CREAT|O_TRUNC|0755);
+	if (EscapeFile > 0)
+		write(EscapeFile, Read, x);
+	// save the data to a file...
+	EscapeTotal += x;
+	EscapeCount ++;
 }
 
 void probability_add (int Offset, int Min) {
 	int log = std::max(JB_Int_Log2(Offset), Min);
 	Count[log]++;
 }
+
+#else
+	extern "C" void JB_ProbabilityDump (FastString* fs) {;}
+	#define probability_output(a)
+	#define probability_escape(a, b)
+	#define probability_add(a, b)
+#endif
 

@@ -267,7 +267,7 @@ struct Compression {
 	}
 	
 	void EscapeSub (int LastOut, int p) {
-		probability_escape(p - LastOut);
+		probability_escape(Read, p - LastOut);
 		if (LastOut+1 == p) {
 			int x = LastOut + 1 + Read[LastOut];
 			if (x < W_SIZE)
