@@ -387,6 +387,7 @@ bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
 int JB_File__CheckLeaks (int From, int To, bool Print) {
 	int Count = 0;
 	while (From <= To) {
+	#ifdef F_GETPATH
 		char FilePath[PATH_MAX];
 		int Err = fcntl(From, F_GETPATH, FilePath);
 		if (!Err) {
@@ -394,7 +395,16 @@ int JB_File__CheckLeaks (int From, int To, bool Print) {
 				printf("%i: %s\n", From, FilePath);
 			Count++;
 		}
-			
+	#else
+		struct stat St;
+		int Err = fstat( From, &St );
+		if (!Err) {
+			if (Print)
+				printf("%i\n", From);
+			Count++;
+		}
+	#endif
+	
 		From++;
 	} 
 	
