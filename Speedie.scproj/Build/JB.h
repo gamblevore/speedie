@@ -804,7 +804,6 @@ struct Assembler {
 	u16 NextBranchID;
 	bool NeedsRework;
 	bool Inited;
-	int DebugMark;
 	SCFunction* Out;
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
@@ -818,7 +817,6 @@ struct Assembler {
 struct SavedRegisters {
 	byte RegCount;
 	u16 BasicBlock;
-	int DebugMark;
 	DeclAlterable Decls[32];
 	RegFile Regs;
 };
@@ -2460,7 +2458,7 @@ extern ArchonPurger SC__nil_T;
 extern IsaTester SC__IsaTester_T;
 #define kJB__TerminalDisplay_h ((int)35)
 #define kJB__TerminalDisplay_w ((int)80)
-extern FastString* SC__Pac_DebugInfo;
+extern FastString* SC__Pac_DebugDecls;
 extern MWrap* SC__Pac_HoistSpace;
 extern MWrap* SC__Pac_JSM;
 #define kSC__Pac_kContinue ((int)254)
@@ -3248,8 +3246,6 @@ bool SC_Options__ModeCpp();
 
 
 // PackMaker
-void SC_PackMaker__ActualCompile();
-
 void SC_PackMaker__AddAll();
 
 void SC_PackMaker__AddFunc(SCFunction* F);
@@ -3273,6 +3269,8 @@ bool SC_PackMaker__BuildGlobs();
 void SC_PackMaker__DumpStringsSub(FastString* Strs);
 
 bool SC_PackMaker__FATCompile();
+
+void SC_PackMaker__FatCompileSub();
 
 void SC_PackMaker__FinalPrepare();
 
@@ -4410,6 +4408,8 @@ uint JB_uint_LowestBit(uint Self);
 
 
 // uint64
+uint64 JB_uint64_LowestBit(uint64 Self);
+
 uint64 SC_uint64_rotl1(uint64 Self);
 
 uint64 SC_uint64_Trim(uint64 Self, int B);
@@ -5731,6 +5731,8 @@ void SC_FAT_DebugPrint(FatASM* Self);
 
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh);
 
+void SC_FAT_DumpDecl(FatASM* Self);
+
 bool SC_FAT_Exists(FatASM* Self);
 
 float SC_FAT_F32(FatASM* Self);
@@ -6146,8 +6148,6 @@ bool SC_Pac_FatterCompile(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_FillDebugInfo(Assembler* Self);
 
-void SC_Pac_FillLayout(Assembler* Self, FastString* J);
-
 Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* Prms, int N);
 
 void SC_Pac_FinishASM(Assembler* Self);
@@ -6239,6 +6239,8 @@ ASMReg SC_Pac_LocalThg(Assembler* Self, SCDecl* D);
 void SC_Pac_LoopFill(Assembler* Self, FatASM* C, FatASM* S, FatASM* A);
 
 ASMReg SC_Pac_MakeConstFromTwo(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R, fn_ASMConstifier Fn);
+
+void SC_Pac_MarkCloseInfo(Assembler* Self, int Reg);
 
 ASMReg SC_Pac_MegaNumFinder(Assembler* Self, int64 V, bool Special, uint /*DataTypeCode*/ Type);
 
@@ -6424,11 +6426,13 @@ ASMReg SC_Pac_xC2xB5Reffed(Assembler* Self, Message* Exp, SCDecl* A);
 
 ASMReg SC_Pac_xC2xB5Trin(Assembler* Self, Message* Exp);
 
+void SC_Pac__ClassLayout(FastString* J);
+
+JB_String* SC_Pac__DebugClassesAndGlobals();
+
 int SC_Pac__Init_();
 
 void adb();
-
-JB_String* SC_Pac__SafeDebugInfo();
 
 
 
@@ -7839,6 +7843,8 @@ jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into)
 jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
 
 void SC_bin_AddDecl(FastString* Self, SCDecl* D, int Pos, Syntax W, int Reg);
+
+void SC_bin_AddFunc(FastString* Self, SCFunction* Fn, bool Enter);
 
 void JB_bin_AddInt(FastString* Self, int64 Name);
 
@@ -10236,7 +10242,7 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 
 int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAlter, SCNode* Name_space, SCParamArray* Incoming);
 
-ASM* SC_Func_ASMBake(SCFunction* Self, ASM* Where, ASM* After, uint* Debug);
+ASM* SC_Func_ASMBake(SCFunction* Self, ASM* Where, ASM* After, uint* Positions);
 
 int SC_Func_ASMFuncID(SCFunction* Self);
 
@@ -11033,13 +11039,13 @@ inline bool JB_App__No(JB_String* Name);
 
 inline void JB_MzSt_Print(CompressionStats* Self);
 
-inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
-
 inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report);
 
-inline ASMReg SC_Pac_Exists(Assembler* Self, ASMReg Dest, ASMReg L, Message* Exp);
-
 inline bool JB_Str_CompressTest_(JB_String* Self, bool Report, int Which);
+
+inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
+
+inline ASMReg SC_Pac_Exists(Assembler* Self, ASMReg Dest, ASMReg L, Message* Exp);
 
 inline Message* JB_Macro_Run(Message* Self, Array* Prms);
 
@@ -11804,6 +11810,45 @@ inline void JB_MzSt_Print(CompressionStats* Self) {
 	JB_Decr(_tmPf0);
 }
 
+inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) {
+	bool Rz = false;
+	CompressionStats Stats = ((CompressionStats){});
+	JB_String* C = JB_Str_Compress(Self, Strength, (&Stats), nil);
+	JB_Incr(C);
+	if (Report) {
+		JB_MzSt_Print((&Stats));
+	}
+	JB_String* Decomp = JB_Str_Decompress(C, nil, kJB__int_Max, nil);
+	JB_Incr(Decomp);
+	Rz = (JB_Str_Equals(Self, Decomp, false));
+	if (!Rz) {
+		if (true) {
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1830], Self);
+			JB_Incr(_tmPf0);
+			JB_Str_Fail(_tmPf0);
+			JB_Decr(_tmPf0);
+		}
+		JB_SetRef(Decomp, JB_Str_Decompress(C, nil, kJB__int_Max, nil));
+	}
+	JB_Decr(C);
+	JB_Decr(Decomp);
+	return Rz;
+}
+
+inline bool JB_Str_CompressTest_(JB_String* Self, bool Report, int Which) {
+	if (Which & 1) {
+		if (!JB_Str_CompressTestSub_(Self, kJB__MZLab_Strong, Report)) {
+			return nil;
+		}
+	}
+	if (Which & 2) {
+		if (!JB_Str_CompressTestSub_(Self, kJB__MZLab_Strongest, Report)) {
+			return nil;
+		}
+	}
+	return true;
+}
+
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 	FatASM* F = SC_Reg_FAT(Src);
 	if (!F) {
@@ -11822,47 +11867,8 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 	return SC_Pac_ReDestWithFatReg(Self, F, Dest);
 }
 
-inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) {
-	bool Rz = false;
-	CompressionStats Stats = ((CompressionStats){});
-	JB_String* C = JB_Str_Compress(Self, Strength, (&Stats), nil);
-	JB_Incr(C);
-	if (Report) {
-		JB_MzSt_Print((&Stats));
-	}
-	JB_String* Decomp = JB_Str_Decompress(C, nil, kJB__int_Max, nil);
-	JB_Incr(Decomp);
-	Rz = (JB_Str_Equals(Self, Decomp, false));
-	if (!Rz) {
-		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1837], Self);
-			JB_Incr(_tmPf0);
-			JB_Str_Fail(_tmPf0);
-			JB_Decr(_tmPf0);
-		}
-		JB_SetRef(Decomp, JB_Str_Decompress(C, nil, kJB__int_Max, nil));
-	}
-	JB_Decr(C);
-	JB_Decr(Decomp);
-	return Rz;
-}
-
 inline ASMReg SC_Pac_Exists(Assembler* Self, ASMReg Dest, ASMReg L, Message* Exp) {
 	return SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__New());
-}
-
-inline bool JB_Str_CompressTest_(JB_String* Self, bool Report, int Which) {
-	if (Which & 1) {
-		if (!JB_Str_CompressTestSub_(Self, kJB__MZLab_Strong, Report)) {
-			return nil;
-		}
-	}
-	if (Which & 2) {
-		if (!JB_Str_CompressTestSub_(Self, kJB__MZLab_Strongest, Report)) {
-			return nil;
-		}
-	}
-	return true;
 }
 
 inline Message* JB_Macro_Run(Message* Self, Array* Prms) {
