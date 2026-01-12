@@ -1,4 +1,7 @@
 
+// Never marking early-closes as closing a var is the way
+// Otherwise, I have to mark some early-close before return, as "not valid after x-instructions"
+
 // pos, reg, name, class, type
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
