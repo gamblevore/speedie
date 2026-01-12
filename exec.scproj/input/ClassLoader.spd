@@ -42,7 +42,7 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 	|| Parent = cakerun[c[@thg, 1]]$
 
 	|| Name = s.Name
-	Name.Addr[name.Length] = 0 // :]
+	Name.Addr[name.Length] = 0		// :]
 	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, Parent, PK.rangelength)
 	where[0] = ClsData
 	cakerun.ClassTable[name] = ClsData
@@ -56,9 +56,9 @@ function Cakerun.LoadOneClass (|message| s)
 	opt norefcounts
 	|| c = S[@list]!
 	|| Num = c[@num]
-	|| I = Num.int									#require
+	|| I = Num.int										#require
 	
-	|| Where = (globals.LibBase + I)|&?&classdata|  #expect
+	|| Where = (globals.LibBase + I)|&?&classdata|		#expect
 	|| PK = c.next
 		PK.Expect(@list)
 		return .UnpackClass(s, c, where, pk)
