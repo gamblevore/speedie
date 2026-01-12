@@ -3524,7 +3524,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[443]);
-	JB_FS_AppendInt32(_fsf0, (2026011216));
+	JB_FS_AppendInt32(_fsf0, (2026011219));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8226,7 +8226,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1384]);
-	JB_FS_AppendInt32(_fsf0, (2026011216));
+	JB_FS_AppendInt32(_fsf0, (2026011219));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -15870,16 +15870,6 @@ ASMReg SC_int_ToASM(int Self) {
 	return Rz;
 }
 
-int SC_int_HIntSize(int Self) {
-	if (Self >= 0) {
-		if (Self > 0) {
-			Self = (JB_Int_Log2(Self) / 7);
-		}
-		return 1 + Self;
-	}
-	return 0;
-}
-
 bool SC_int_IsNormalMatch(int Self) {
 	return ((Self == kJB_kSimpleMatch) or ((Self == kJB_kNumericMatch) or (Self == kJB_kSuperClassMatch)));
 }
@@ -20827,10 +20817,10 @@ ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh) {
 }
 
 void SC_FAT_DumpDecl(FatASM* Self) {
+	FastString* J = SC__Pac_DebugDecls;
 	if (SC_FAT_GuessSize(Self)) {
 		JB_DoAt(1);
-		SCDecl* Ty = SC_Msg_FastDecl(Self->Msg);
-		SC_Decl_DumpDecl(Ty, SC__Pac_DebugDecls, Self->ASMIndex, 0);
+		SC_Decl_DumpDecl(SC_Msg_FastDecl(Self->Msg), J, Self->ASMIndex);
 	}
 	 else if (SC_FAT_SyntaxIs(Self, kSC__Reg_Discard)) {
 		{
@@ -20839,7 +20829,7 @@ void SC_FAT_DumpDecl(FatASM* Self) {
 			while (_currf0) {
 				uint64 I = JB_uint64_LowestBit(_currf0);
 				JB_DoAt(1);
-				SC_bin_DebugCloseVar(SC__Pac_DebugDecls, Self->ASMIndex, JB_u64_Log2(I));
+				SC_bin_DebugCloseVar(J, Self->ASMIndex, JB_u64_Log2(I));
 				_currf0 = (_currf0 & (~I));
 			};
 		};
@@ -23895,7 +23885,7 @@ ASMReg SC_Pac_MakeConstFromTwo(Assembler* Self, Message* Exp, ASMReg Dest, ASMRe
 
 void SC_Pac_MarkCloseInfo(Assembler* Self, int Reg) {
 	FatASM* Nop = SC_Pac_Curr(Self);
-	if (!SC_FAT_SyntaxEquals(Nop, kSC__ASM_NOOP)) {
+	if (((!SC_FAT_SyntaxEquals(Nop, kSC__ASM_NOOP))) or (((!SC_FAT_SyntaxIs(Nop, kSC__Reg_Discard))) or ((!SC_FAT_SyntaxIs(Nop, kSC__Reg_NewlyDeclared))))) {
 		Nop = SC_Msg_NOOP(SC_Pac_Curr(Self)->Msg);
 	}
 	(SC_FAT_SyntaxIsSet(Nop, kSC__Reg_Discard, true));
@@ -34380,23 +34370,6 @@ jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into
 	return JB_bin_Add(Self, Type, ((JB_String*)Fs), Into);
 }
 
-void SC_bin_AddDecl(FastString* Self, SCDecl* D, int Pos, Syntax W, int Reg) {
-	int T = SC_Class_DebugTypeInfo(D->Type, W);
-	int Alloc = SC_int_HIntSize(T) + (Reg > 0);
-	if (Pos >= 0) {
-		Alloc = (Alloc + SC_int_HIntSize(Pos));
-	}
-	JB_bin_WriteType(Self, kJB_SyxBack, false);
-	JB_FS_AppendHInt(Self, Alloc);
-	JB_FS_AppendHInt(Self, T);
-	if (Pos >= 0) {
-		JB_FS_AppendHInt(Self, Pos);
-		if (Reg > 0) {
-			JB_FS_AppendByte(Self, Reg);
-		}
-	}
-}
-
 void SC_bin_AddFunc(FastString* Self, SCFunction* Fn, bool Enter) {
 	FastString* Fs = JB_FS__FastNew(((FastString*)nil));
 	SCClass* Cls = Fn->Cls;
@@ -34448,7 +34421,7 @@ bool SC_bin_BakeASM(FastString* Self, SCFunction* Fn) {
 			if (A == nil) {
 				break;
 			}
-			SC_Decl_DumpDecl(A, J, 0, 0);
+			SC_Decl_DumpDecl(A, J, 0);
 			(++_if0);
 		};
 	}
@@ -34498,11 +34471,10 @@ FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name) {
 }
 
 void SC_bin_DebugCloseVar(FastString* Self, int Pos, int Reg) {
-	JB_bin_WriteType(Self, kJB_SyxBack, false);
-	JB_FS_AppendHInt(Self, 1 + SC_int_HIntSize(Pos));
 	JB_FS_AppendHInt(Self, Pos);
-	JB_DoAt(1);
-	JB_FS_AppendByte(Self, Reg);
+	JB_FS_AppendByte2(Self, '\x01');
+	JB_FS_AppendByte2(Self, '\x00');
+	JB_FS_AppendHInt(Self, Reg);
 }
 
 jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name) {
@@ -34535,7 +34507,7 @@ void SC_bin_PropertyLayout(FastString* Self, Array* List) {
 			if (P == nil) {
 				break;
 			}
-			SC_Decl_DumpDecl(P, Self, SC_Decl_ExportPosition(P), 0);
+			SC_Decl_DumpDecl(P, Self, SC_Decl_ExportPosition(P));
 			(++_if0);
 		};
 	};
@@ -45195,53 +45167,52 @@ SCDecl* SC_Decl_DownGrade(SCDecl* Self) {
 	return Self;
 }
 
-Syntax SC_Decl_DumpCode(SCDecl* Self, int Pos) {
-	if ((Pos >= 0) and SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Reference)) {
-		return kJB_SyxTmp;
+int SC_Decl_DumpCls(SCDecl* Self) {
+	if (SC_Decl_IsNormalObject(Self) or SC_Decl_IsBareStruct(Self)) {
+		return (Self->Type->TableID << 1) + SC_Decl_IsNormalObject(Self);
 	}
-	if (Self->PointerCount) {
-		return kJB_SyxMsg;
-	}
-	if (Self->C_Array) {
-		return kJB_SyxArg;
-	}
-	SCClass* Ty = Self->Type;
-	if (SC_Class_IsObject(Ty)) {
-		return kJB_SyxBin;
-	}
-	if (SC_Class_IsStruct(Ty)) {
-		return kJB_SyxStr;
-	}
-	return kJB_SyxChar;
+	return 0;
 }
 
-void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos, int Depth) {
-	Syntax W = SC_Decl_DumpCode(Self, Pos);
-	int Reg = 0;
-	JB_String* S = JB_LUB[0];
-	if (Pos >= 0) {
-		if (!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_ClassObj)) {
-			S = Self->Name;
+void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos) {
+	int64 Reg = SC_Decl_ExportPosition(Self);
+	if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)) {
+		Reg = SC_Reg_Reg(((ASMReg)Self->mu.DataType));
+	}
+	int Mark = J->Length;
+	JB_FS_AppendByte2(J, '\x00');
+	JB_FS_AppendHInt(J, Pos);
+	JB_FS_AppendString(J, Self->Name);
+	JB_FS_AppendByte2(J, '\x00');
+	JB_FS_AppendHInt(J, Reg);
+	JB_FS_AppendHInt(J, SC_Decl_DumpCls(Self));
+	if (Self->Type == SC_TypeByte) {
+		JB_DoAt(1);
+		//Compare byte pointers, byte-carray, byte reference!;
+		//we want the final typeinfo. Not the wierdness along the way.;
+		if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Reference)) {
 		}
-		if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)) {
-			Reg = SC_Reg_Reg(((ASMReg)Self->mu.DataType));
+		if (Self->PointerCount) {
+		}
+		if (Self->C_Array) {
 		}
 	}
-	JB_bin_Add(J, W, S, true);
-	SC_bin_AddDecl(J, Self, Pos, W, Reg);
-	int C = Self->C_Array;
-	if (C) {
-		JB_bin_AddInt(J, C);
+	JB_FS_AppendHInt(J, SC_Decl_TypeInfo(Self) & kJB__TC_PossibleBits);
+	SC_Decl_DumpWierdness(Self, J);
+	(JB_FS_ByteSet(J, Mark, J->Length - Mark));
+}
+
+void SC_Decl_DumpWierdness(SCDecl* Self, FastString* J) {
+	while (true) {
+		int Wierdness = ((SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Reference)) << 1) | (Self->PointerCount > 0);
+		Wierdness = (Wierdness | (Self->C_Array << 2));
+		if (!Wierdness) {
+			JB_FS_AppendHInt(J, 0);
+			break;
+		}
+		JB_FS_AppendHInt(J, Wierdness);
 		Self = Self->Internal;
-	}
-	 else if (W == kJB_SyxMsg) {
-		Self = Self->Internal;
-	}
-	 else if (W != kJB_SyxTmp) {
-		JB_bin_Exit(J, Depth + 1);
-		return;
-	}
-	SC_Decl_DumpDecl(Self, J, -1, Depth + 1);
+	};
 }
 
 void SC_Decl_ExpectFail(SCDecl* Self, SCDecl* O, Message* Errnode, Message* Backup) {
@@ -51263,13 +51234,6 @@ void SC_Class_DataTypePostLoad(SCClass* Self) {
 	}
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Node);
 	JB_MsgPos_Destructor((&_usingf0));
-}
-
-int SC_Class_DebugTypeInfo(SCClass* Self, Syntax W) {
-	if ((W == kJB_SyxBin) or (W == kJB_SyxStr)) {
-		return Self->TableID;
-	}
-	return JB_TC_DebugCode(Self->TypeInfo);
 }
 
 void SC_Class_DeclModel(SCClass* Self) {
@@ -59650,4 +59614,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1986440422830617738 -2432690219242352141
+// 742208833091427267 -2432690219242352141

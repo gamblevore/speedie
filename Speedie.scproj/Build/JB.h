@@ -4327,8 +4327,6 @@ float JB_f_UnTan(float Self, float Y);
 // int
 ASMReg SC_int_ToASM(int Self);
 
-int SC_int_HIntSize(int Self);
-
 bool SC_int_IsNormalMatch(int Self);
 
 bool SC_int_IsSimpleOrPointerCast(int Self);
@@ -7842,8 +7840,6 @@ jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into)
 
 jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
 
-void SC_bin_AddDecl(FastString* Self, SCDecl* D, int Pos, Syntax W, int Reg);
-
 void SC_bin_AddFunc(FastString* Self, SCFunction* Fn, bool Enter);
 
 void JB_bin_AddInt(FastString* Self, int64 Name);
@@ -9265,9 +9261,11 @@ void SC_Decl_Destructor(SCDecl* Self);
 
 SCDecl* SC_Decl_DownGrade(SCDecl* Self);
 
-Syntax SC_Decl_DumpCode(SCDecl* Self, int Pos);
+int SC_Decl_DumpCls(SCDecl* Self);
 
-void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos, int Depth);
+void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos);
+
+void SC_Decl_DumpWierdness(SCDecl* Self, FastString* J);
 
 void SC_Decl_ExpectFail(SCDecl* Self, SCDecl* O, Message* Errnode, Message* Backup);
 
@@ -10014,8 +10012,6 @@ JB_String* SC_Class_CStructNameSub(SCClass* Self);
 JB_String* SC_Class_CSuperStructName(SCClass* Self);
 
 void SC_Class_DataTypePostLoad(SCClass* Self);
-
-int SC_Class_DebugTypeInfo(SCClass* Self, Syntax W);
 
 void SC_Class_DeclModel(SCClass* Self);
 
@@ -10985,8 +10981,6 @@ inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet Find, int From, int After)
 
 inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
-inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self);
-
 inline int JB_TC_Floatness(uint /*DataTypeCode*/ Self);
 
 inline bool JB_byte_IsLower(uint /*byte*/ Self);
@@ -11649,26 +11643,6 @@ inline Ind JB_Str_OutCharSet(JB_String* Self, CharSet Find, int From, int After)
 
 inline Ind JB_Str_OutWhite(JB_String* Self, int Start, int After) {
 	return JB_Str_FindCharset(Self, (~kJB__CharSet_White), Start, After);
-}
-
-inline uint JB_TC_DebugCode(uint /*DataTypeCode*/ Self) {
-	uint Rz = 0;
-	if (JB_TC_SyntaxIs(Self, kJB__TC_bool)) {
-		return 64;
-	}
-	Rz = (((int)Self) & 48);
-	if (Rz == 48) {
-		Rz = 64;
-	}
-	if (Rz == 0) {
-		Rz = 8;
-	}
-	Rz = JB_uint_Log2(Rz);
-	Rz = (Rz | ((Self & 3) << 3));
-	Rz = (Rz | ((Self & 128) >> 2));
-	Rz = (Rz | (Self & 64));
-	Rz = (Rz | ((Self & kJB__TC_Pointer) >> 2));
-	return Rz;
 }
 
 inline int JB_TC_Floatness(uint /*DataTypeCode*/ Self) {
