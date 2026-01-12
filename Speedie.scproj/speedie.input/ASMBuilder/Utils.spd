@@ -133,7 +133,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 		.vdecls = Result 
 		if .RegDebugInfo & v_bits
 			.RegDebugInfo &= ~v_bits
-			debuginfo!.DebugCloseVar(.FnLength, v)
+			.MarkCloseInfo(v)
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 
@@ -143,6 +143,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 		return .ClearStruct(exp, .funcstart + fat, v)
 
 	return true
+
 
 
 function scdecl.CalculateDataType (|datatypecode|)

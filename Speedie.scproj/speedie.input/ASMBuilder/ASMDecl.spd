@@ -7,14 +7,12 @@
 struct SavedRegisters 
 	|byte|					RegCount
 	|uint16|				BasicBlock
-	|int|					DebugMark
 	|DeclAlterable[32]|		Decls
 	|RegFile|				Regs
 
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
 
-		.DebugMark = sh.DebugMark
 		.BasicBlock = sh.BasicBlock
 		.regs = sh.regs
 		expect args <= 32 - .RegCount
@@ -23,7 +21,6 @@ struct SavedRegisters
 
 
 	function Rewind	(|assembler| sh)
-		sh.DebugMark = .DebugMark
 		sh.BasicBlock = .BasicBlock
 		sh.regs = .regs
 
@@ -47,6 +44,6 @@ struct DeclAlterable
 function assembler.DeclReset (|scdecl| D)
 	d.exportposition = 0
 	(d isnt const)
-	d.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
+	d.DepthOfBranch = .state.BranchDepth // ASM doesn't use .DepthOfBranch tho?
 
 

@@ -24,9 +24,18 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 /	.AppendByte(reg)
 
 
-function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
+function FATASM.DumpDecl
 	opt norefcounts
+	if .GuessSize
+/		|| ty = .msg.FastDecl
+		ty.DumpDecl(.asmindex)
+	  elseif self is Discard
+		for i.bits in ._Const
+/			Assembler.DebugDecls!.DebugCloseVar(.asmindex, i.log2)
+
 	
+function SCDecl.DumpDecl (|jbin| j = Assembler.DebugDecls!, |int| Pos, |int| depth=0)
+	opt norefcounts
 	|| W = .DumpCode(pos)
 	|| Reg = 0
 	|| s = ""
@@ -35,9 +44,6 @@ function SCDecl.DumpDecl (|jbin| j, |int| Pos, |int| depth=0)
 			s = .name
 		if self is local
 			reg = .mu.DataType|asmreg|.Reg
-
-//	|| fn = scfunction.currfunc
-//	if fn
 		
 	j.add(W, s, true)
 	j.AddDecl(self, Pos, W, Reg)
@@ -83,3 +89,12 @@ function int.HIntSize (|int|)
 		return 1 + self
 
 
+function Assembler.MarkCloseInfo (|int| Reg)
+	debugger 
+	|| Nop = .curr
+	if nop != asm.noop
+		nop = .curr.Msg.NOOP
+	(nop is discard)
+	(nop is newlydeclared)
+	nop._Const |= 1<<reg
+	

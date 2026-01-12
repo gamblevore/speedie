@@ -33,7 +33,6 @@ struct Assembler
     |uint16|                    NextBranchID
 	|bool|						NeedsRework
 	|bool|						Inited
-	|int|						DebugMark
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
@@ -55,11 +54,36 @@ struct Assembler
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|int|						StringsOutOfRange
-		|jbin?|						DebugInfo
+		|jbin?|						DebugDecls
 
-		function SafeDebugInfo (|string|)
-			require .debuginfo.length
-			|| info = .debuginfo.GetResult
+		
+		function ClassLayout (|jbin| j)
+			opt norefcounts
+			for c in Compiler.ReachedClassTable
+				if !c.isbehaviourtable and (c.IsLibrary == options.MakeExec)
+					j.Enter(@msg, c.ExportName)
+					c.ListLayout(j)
+					j.exit
+
+		function DebugClassesAndGlobals (|string|) 
+			opt norefcounts
+			if !options.makeexec
+				require options.TargetDebug
+			
+			|| j = jbin()
+			
+			j.Enter(@msg, "class")
+			.ClassLayout(j)
+			j.exit
+			
+			j.Enter(@msg, "glob")
+			if Options.MakeExec
+				j.PropertyLayout(packmaker.libglobs)
+			  else
+				j.PropertyLayout(packmaker.PackGlobs)
+			j.exit
+			
+			|| info = j.GetResult
 			if !info.ParseJbin 
 				error "Generated invalid debug info (jbin)"
 				info = ""
@@ -92,15 +116,9 @@ struct Assembler
 
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
-		|| j = DebugInfo
-			.DebugMark = j.Length // for .rework
-			j.Enter(@msg, fn.exportname) // Enter .debuginfo!
-
 		for a in fn.Args
 			.DeclReset(a)
 			.DeclareVar(a.source, a)
-			if j
-				a.DumpDecl(j, 0) // AddDbg
 
 	function Last (|asm| type, |&FatASM|)
 		|| L = .curr_ - 1
@@ -585,15 +603,6 @@ struct Assembler
 		|| s = .super
 			s.ListLayout(j)
 		j.PropertyLayout(.Properties)
-
-		
-	function FillLayout (|jbin| j)
-		opt norefcounts
-		for c in Compiler.ReachedClassTable
-			if !c.isbehaviourtable and (c.IsLibrary == options.MakeExec)
-				j.Enter(@msg, c.ExportName)
-				c.ListLayout(j)
-				j.exit
 			
 			
 	function jbin.PropertyLayout (|[scdecl]| List)
@@ -606,23 +615,6 @@ struct Assembler
 		opt norefcounts
 		if Options.TargetDebug
 			SourceMap.Positions = FastString()
-		if !options.makeexec
-			require options.TargetDebug
-			if DebugInfo // how?
-		
-		|| j = jbin()
-		
-		j.Enter(@msg, "class")
-		.FillLayout(j)
-		j.exit
-
-		|| Globs = (packmaker.libglobs, packmaker.PackGlobs)(options.MakeExec)
-		j.Enter(@msg, "glob")
-		j.PropertyLayout(Globs)
-		j.exit
-		
-		j.enter(@msg, "func")
-		debuginfo = j // AddDbg
 	
 	
 	function ASMInit
@@ -711,8 +703,6 @@ struct Assembler
 		if !.last.IsFinisher
 			.FinishReturn
 		.FinishMost
-		|| dbg = DebugInfo
-			dbg.exit
 
 
 	function Guard
@@ -748,9 +738,6 @@ function assembler.RootGen (|scfunction| fn)
 
 
 function Assembler.Rework (|SCFunction| fn, |bool|)
-	|| j = debuginfo
-		j.length = .debugmark
-
 	HoistSpace.NeedSpare(.FnLength)
 	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 

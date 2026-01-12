@@ -122,7 +122,7 @@ module PackMaker
 			f.fPackID = ++id
 
 
-	function ActualCompile
+	function FatCompileSub
 		opt norefcounts
 		.PackFuncIndex = 0
 		while (|| fn = .packfuncs[.PackFuncIndex++])
@@ -137,7 +137,7 @@ module PackMaker
 
 		(Compiler is Hungry)
 		.Packfuncs.sort(&CodeSorter.Leafness)
-		.ActualCompile
+		.FatCompileSub
 		.Packfuncs.sort(&CodeSorter.fPackID)
 		
 		target debug and !perrydbg
@@ -174,16 +174,15 @@ module PackMaker
 		
 	function BakeDebug (|jbin| j)
 		|faststring--| p = SourceMap.Positions
-			|| dbg = assembler.SafeDebugInfo
-				compiler.stDebugInfo += dbg.length
+			|| ClsGlob = assembler.DebugClassesAndGlobals
+				compiler.stDebugInfo += ClsGlob.length
 				j.enter(@tmp, "debug")
-				
-				j.AddStr(dbg.Compress)
+				j.AddStr(ClsGlob)
 				j.add(@bin, p)
 				j.addStr(SCImport.AllFiles.join("\n").Compress)
 				
 				j.exit
-
+	
 	
 	function BakeASM (|jbin| j, |bool|)
 		opt norefcounts

@@ -45,9 +45,6 @@ struct FatASM
 		|| b = .baseop
 		return b == asm.fncx or asm.fnc
 	
-//	function IsUnused (|bool|)
-//		return .µRefCount <= 0 and self!=asm.NOOP
-	
 	function BaseOp (|int|)
 		rz = .op
 		if rz == asm.FNCX3

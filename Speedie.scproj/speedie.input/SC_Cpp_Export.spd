@@ -644,7 +644,7 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
 
 	.WriteVMFuncs(fs)
-	|| Dbg = Assembler.SafeDebugInfo
+	|| Dbg = Assembler.DebugClassesAndGlobals
 
 	fs <~ "};
 

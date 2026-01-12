@@ -18,25 +18,25 @@ extend SCFunction
 		return (.Position<<11) ||| (.tag >> 8)
 	
 	
-	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| debug,  |!&asm|)
+	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
 		opt norefcounts
-		rz = where
-			
+		rz = where		
 		|uint64| HasLabel
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
-			|| n = rz - where
-			if n > 250K/4
+			if (rz - where) > 250K/4
 				error (.source, "Function too large (over 250K)")
-			fat.ASMIndex = n
+			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
 
 			|| Curr = rz
 			rz = fat.µRenderInto(rz, after)
-			if debug
+			if Positions
+				if (fat is NewlyDeclared)
+					fat.DumpDecl
 				|| pos = fat.msg.SrcMap
 				while (Curr++ < rz)
-					debug++[] = pos
+					Positions++[] = pos
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
@@ -93,6 +93,7 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	opt norefcounts
 	for f in .PackFuncs
 		if .PackSaved.AddOrShrink(j, f is UsedByASM)
+			SCFunction.currfunc = f
 			require j.BakeASM(f)
 	return true
 
@@ -100,29 +101,44 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	opt norefcounts
 	|| Start = .ReserveMemory(@bin, t*4)|&asm|
-	|| dbg = SourceMap.Reserve(t*4)
-	|| after = fn.ASMBake(Start, Start+t, dbg)
+	|| Positions = SourceMap.Reserve(t*4)
+	|| after = fn.ASMBake(Start, Start+t, Positions)
 		
 	expect (after-start == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)
 
 
 function JBin.BakeASM (|SCFunction| fn, |bool|)
+	opt norefcounts
 	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
-		.add(@tmp, fn.exportname)
+		.AddFunc(fn)
 		return true
 	
-	SCFunction.currfunc = fn
 
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
-	|| tmp = Options.TargetDebug
-	if !tmp
+	|| j = assembler.DebugDecls
+	if !j
 		return .BakeASMSub(fn, t)
-	
-	.enter(@tmp, fn.exportname)			// maybe string.Length better than JB_Str_Length
-	.SyntaxAppend(0, 2)
+
+	.AddFunc(fn, true)
+
+	for a in fn.args	
+		a.DumpDecl(j, 0)
 	rz = .BakeASMSub(fn, t)
+	.add(@bin, j)
+	j.Length = 0
 	.exit
 
+
+function jbin.AddFunc (|scfunction| fn, |bool| Enter=false)
+	opt norefcounts
+	|| fs = FastString.new(nil|faststring|)
+	|| cls = fn.cls
+		fs <~ cls.name
+		fs <~ '.'
+	fs <~ fn.name
+	.add(@tmp, fs, enter)
+	self <~ '\0'
+	
 
