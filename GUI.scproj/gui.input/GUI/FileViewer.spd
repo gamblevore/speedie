@@ -350,6 +350,7 @@ class FileViewer (ListView)
 	
 	
 	function BatchFind (|string| str,  |bool| ForReplace,  |message| FoundList,  |uint| FindID=0)
+		opt norefcounts
 		require str
 		
 		|| Remain = 6K

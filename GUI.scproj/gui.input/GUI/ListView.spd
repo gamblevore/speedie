@@ -590,7 +590,8 @@ class ListView (GUIControl) {
 	
 	
 	function ExtractSelected (|ListViewrow| c, |ListViewrow|)
-		rz = ListViewrow()
+		opt norefcounts
+		rz = ListViewRow()
 		while c
 			|| p = c.nextselected
 			rz <~ c

@@ -227,13 +227,16 @@ class FileRow (ListViewRow)
 
 		// how do we know a file is binary? just... by checking it... really.
 		|| x = f.open(file.readmode)
-			|| preview = f.Read(4K)
 			|| fsize = f.size
+			|| ToRead = (fsize, 4K)(fsize <= 32K)
+			|| preview = f.Read(ToRead)
 			|| badness = preview.UTF8Badness
+			if badness.y > 0
 				require  badness.x >= 4093  and  fsize > 4096 // heuristic, in case we cut a char in half.
-			if fsize <= 4096
-				return preview
-			return f.ReadAll
+			if fsize != ToRead
+				preview = f.readall
+			
+			return preview
 
 
 	function FindAllParent (|message| FoundList, |error|)
@@ -247,7 +250,6 @@ class FileRow (ListViewRow)
 
 
 	function FindInFile (|string| text,  |message| FoundList,  |$int| Remain,  |bool| DoRepl)
-		require text
 		|| t = .FileData$
 		
 		|error| parent

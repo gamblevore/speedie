@@ -11,6 +11,7 @@ struct JB_StringC;
 uint8* JB_FastFileString( JB_String* S, uint8* Buff);
 uint8* JB_FastCString( JB_String* S, uint8* Buff, int Max);
 JB_StringC* JB_Str_MakeC( JB_String* self );
+int JB_File__CheckLeaks (int From, int To, bool Print);
 bool JB_Str_IsC ( JB_String* self );
 JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj);
 JB_String* JB_Str__Freeable(uint8* p, int n);

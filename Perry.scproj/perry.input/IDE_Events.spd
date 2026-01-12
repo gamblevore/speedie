@@ -270,6 +270,8 @@ function PerryIDE.BatchPhind (|string| text,  |bool| DoReplace, |uint| ID,  |boo
 	// theres no point re-searching it. Especially with 10 projects open. Thats 10 misses
 	// on the same damn file.
 	
+	opt norefcounts
+	.foundlist.clear
 	|| f = .FoundList.ListSource
 	f.clear
 	.filelist.BatchFind(text, DoReplace, f, ID)
@@ -594,7 +596,7 @@ function FileViewerCountCode (GuiMenuEvent)
 	|| Size = 0
 	for c.flat in row
 		|| L = c.ReadFrom
-		if l.isspd or !row.hasany
+		if l.isspd
 			|| f = l.file
 				|| p = f.parse
 					CLOC += p.loc

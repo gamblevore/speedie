@@ -383,6 +383,25 @@ bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
 	#endif
 }
 
+
+int JB_File__CheckLeaks (int From, int To, bool Print) {
+	int Count = 0;
+	while (From <= To) {
+		char FilePath[PATH_MAX];
+		int Err = fcntl(From, F_GETPATH, FilePath);
+		if (!Err) {
+			if (Print)
+				printf("%i: %s\n", From, FilePath);
+			Count++;
+		}
+			
+		From++;
+	} 
+	
+	return Count;
+}
+
+
 int JB_File_Open (JB_File* f, int OpenFlags, bool AllowMissing) {
 	if (!f)
 		return -1;
