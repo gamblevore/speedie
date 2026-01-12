@@ -14,15 +14,20 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 
 function FATASM.DumpDecl
 	opt norefcounts
+	|| j = Assembler.DebugDecls!
 	if .GuessSize
-/		|| ty = .msg.FastDecl
-		ty.DumpDecl(.asmindex)
+/		.msg.FastDecl.DumpDecl(j, .asmindex)
 	  elseif self is Discard
 		for i.bits in ._Const
-/			Assembler.DebugDecls!.DebugCloseVar(.asmindex, i.log2)
+/			j.DebugCloseVar(.asmindex, i.log2)
 
 
-function SCDecl.DumpDecl (|jbin| j = Assembler.DebugDecls!, |int| Pos, |int| depth=0)
+function scdecl.DumpCls (|int|)
+	if .IsNormalObject or .IsBareStruct
+		return (.type.tableid<<1) + .IsNormalObject
+
+
+function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 	opt norefcounts
 	|| Reg = .ExportPosition
 	if self is local
@@ -34,12 +39,8 @@ function SCDecl.DumpDecl (|jbin| j = Assembler.DebugDecls!, |int| Pos, |int| dep
 	j <~ .name
 	j <~ '\0'
 	j.AppendHInt(Reg)
-	|| Cls = 0
-	if .IsNormalObject or .IsBareStruct
-		Cls = (.type.tableid<<1) + .IsNormalObject
-	j.AppendHInt(Cls)
+	j.AppendHInt(.dumpcls)
 	
-	|| T = .typeinfo & DataTypeCode.possiblebits
 	if .Type == TypeByte
 		debugat
 		#!Compare byte pointers, byte-carray, byte reference!
@@ -48,16 +49,24 @@ function SCDecl.DumpDecl (|jbin| j = Assembler.DebugDecls!, |int| Pos, |int| dep
 		if .pointercount
 		if .C_Array
 
-	j.AppendHInt(T) // please be simple!
+	j.AppendHInt(.typeinfo & DataTypeCode.possiblebits) // please be simple!
 	
-	while
-		|| Wierdness = ((self is reference) << 1)  |||  (.pointercount > 0)
-		|| More = (.c_array << 2) + Wierdness
-		j.AppendHInt(More)
-		Loop More
-		self = .Internal!
+	.DumpWierdness(j)
+	
 	j[mark] = j.length - mark
 
+
+function SCDecl.DumpWierdness (|jbin| j)
+	opt norefcounts
+	while
+		|| Wierdness = ((self is reference) << 1)  |||  (.pointercount > 0)
+		Wierdness |= .C_Array<<2
+		if !Wierdness
+			j.AppendHInt(0)
+			exit
+		j.AppendHInt(Wierdness)
+		self = .Internal!
+	
 
 function Assembler.MarkCloseInfo (|int| Reg)
 	debugger 
