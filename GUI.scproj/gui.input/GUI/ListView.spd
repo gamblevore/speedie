@@ -471,16 +471,16 @@ class ListView (GUIControl) {
 		return !.listsource.hasany
 	
 	
-	function JumpTo (|string| s, ||)
+	function JumpTo (|string| s)
 		opt norefcounts
-		|| it = .partialfind(S)
+		|| it = .JumpFind(S)
 			.select(it)
 		
 		
-	libinternal PartialFind (|string| s, |listviewrow|)
+	libinternal JumpFind (|string| s, |listviewrow|)
 		opt norefcounts
 		for r.toplist in self
-			if listview.pf(r.name)[0, s]
+			if (r isnt UnSelectable) and listview.pf(r.name)[0, s]
 				return r
 
 
