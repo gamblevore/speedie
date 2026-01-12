@@ -1,27 +1,12 @@
 
-
-
-function SCDecl.DumpCode (|int| Pos, |syntax|)
-	opt norefcounts
-	if pos >= 0 and self is Reference
-		return @tmp
-	if .PointerCount					// @msg, @arg, @tmp, have names and children.
-		return @msg
-	if .C_Array
-		return @arg
-	|| ty = .type
-	if ty.IsObject
-		return @bin
-	if ty.IsStruct
-		return @str
-	return @char						// a plain old data-type
-
+// pos, reg, name, class, type
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
-	.WriteType(@back)				// close spd-var	// type
-	.Appendhint(1 + pos.hintsize)						// size
-	.AppendHint(pos)									// data
-/	.AppendByte(reg)
+	debugger
+	.AppendHInt(pos)
+	self <~ '\1'
+	self <~ '\0'
+	.AppendHInt(Reg)
 
 
 function FATASM.DumpDecl
@@ -33,68 +18,50 @@ function FATASM.DumpDecl
 		for i.bits in ._Const
 /			Assembler.DebugDecls!.DebugCloseVar(.asmindex, i.log2)
 
-	
+
 function SCDecl.DumpDecl (|jbin| j = Assembler.DebugDecls!, |int| Pos, |int| depth=0)
 	opt norefcounts
-	|| W = .DumpCode(pos)
-	|| Reg = 0
-	|| s = ""
-	if pos >= 0
-		if self isnt classobj
-			s = .name
-		if self is local
-			reg = .mu.DataType|asmreg|.Reg
-		
-	j.add(W, s, true)
-	j.AddDecl(self, Pos, W, Reg)
+	|| Reg = .ExportPosition
+	if self is local
+		reg = .mu.DataType|asmreg|.Reg
+
+	|| Mark = j.Length
+	j <~ '\0' // for speed
+	j.AppendHInt(pos)
+	j <~ .name
+	j <~ '\0'
+	j.AppendHInt(Reg)
+	|| Cls = 0
+	if .IsNormalObject or .IsBareStruct
+		Cls = (.type.tableid<<1) + .IsNormalObject
+	j.AppendHInt(Cls)
 	
-	|| C = .C_Array						// carray... we need the length of the carray
-		j.AddInt(C)
-		self = .internal!
-	  elseif w == @msg					// pointer
-		self = .internal!
-	  elseif w != @tmp					// not a reference
-		j.exit(depth+1)
-		return
+	|| T = .typeinfo & DataTypeCode.possiblebits
+	if .Type == TypeByte
+		debugat
+		#!Compare byte pointers, byte-carray, byte reference!
+		#!we want the final typeinfo. Not the wierdness along the way.
+		if self is Reference
+		if .pointercount
+		if .C_Array
+
+	j.AppendHInt(T) // please be simple!
 	
-	.DumpDecl(j, -1, depth+1)
-
-
-function jbin.AddDecl (|scdecl| D, |int| Pos, |syntax| W, |int| Reg)
-	opt norefcounts
-	|| t = d.type.DebugTypeInfo(W)
-	|| Alloc = t.HIntsize + (reg > 0)
-	if pos >= 0
-		alloc += pos.hintsize
-	.WriteType(@back)	// type
-	.Appendhint(alloc)	// size
-	.AppendHint(t)		// data
-	if pos >= 0
-		.AppendHint(pos)
-		if reg > 0
-			.AppendByte(reg)			
-	
-
-function scclass.DebugTypeInfo (|syntax| W, |int|)
-	opt norefcounts
-	if w == @bin or @str				// an object or struct
-		return .TableID
-	return .typeinfo.DebugCode
-
-
-function int.HIntSize (|int|)
-	if self >= 0
-		if self > 0
-			self = .log2/7
-		return 1 + self
+	while
+		|| Wierdness = ((self is reference) << 1)  |||  (.pointercount > 0)
+		|| More = (.c_array << 2) + Wierdness
+		j.AppendHInt(More)
+		Loop More
+		self = .Internal!
+	j[mark] = j.length - mark
 
 
 function Assembler.MarkCloseInfo (|int| Reg)
 	debugger 
 	|| Nop = .curr
-	if nop != asm.noop
+	if (nop != asm.noop) or (nop isnt discard) or (nop isnt NewlyDeclared)
 		nop = .curr.Msg.NOOP
 	(nop is discard)
 	(nop is newlydeclared)
 	nop._Const |= 1<<reg
-	
+

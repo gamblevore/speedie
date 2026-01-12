@@ -147,10 +147,10 @@ class FastString {
 			return fs
 		
 
-	syntax Access (|int| off, |Byte|)
+	syntax Access (|int| Offset, |Byte|)
 		cpp_wrapper JB_FS_Byte
 	
-	syntax Access (|int| off, assigns:|Byte|)
+	syntax Access (|int| Offset, assigns:|Byte|)
 		cpp_wrapper JB_FS_ByteSet
 	
 	function Last (|int| off=0, |int|)
