@@ -260,32 +260,6 @@ function RefDestructorMsg (|Message| msg, |SCFunction| fn, |Message|)
 	return RefMsg( msg, fn.exportname, fn )
 
 
-function RefCheckDisturbance (|Message| dcl, |int|)
-	require RefBasis( dcl, false ) == SCRefs.kbasisobj
-	
-	Return kSufferedNoise // for the moment.
-	
-	|| msg = dcl
-	|| arg = dcl.Parent
-	// Loop should start at "Dcl", that's why we predefine it.
-	// unless there's a better way?
-	|| name = dcl.DeclName.name
-	
-	for (msg.ScanArg in arg)
-		|Message| IgnoreArg
-		if (msg == @Tmp)
-			IgnoreArg = msg.find(@Arg)
-		
-		for (f in msg.CollectFuncsUsed( IgnoreArg ))
-			if (f.refs.disturbs)
-				Return kSufferedNoise
-		
-		if (msg == @Rel) and RelChangesDisowned( msg, name )
-			Return kSufferedNoise
-	
-	Return kNotDisturbed
-
-
 function message.IsReturnOrRejoin (|bool|)
 	return (self == @tmp) and (self == "return" or "rejoin")
 
@@ -345,22 +319,6 @@ function Message.DotType (|DotUseType|)
 		|| d = .obj
 		if d isa scdecl
 			Return (d is property) * DotUseType.Property 
-
-
-function RelChangesDisowned (|Message| msg, |String| name, |bool|)
-	return false // for now
-	
-	|| first = msg.first
-	if (first IsThing name)
-		Return first.VarOptFlag(kHoldsDisowned)
-
-
-
-function RefMarkAsDisturber (|SCFunction| fn)
-	opt norefcounts
-	|| r = fn.refs
-		|| ds = r.DisturbsGet
-			ds <~ "object"
 
 
 function RefSafeDecr (|Message| msg, |Message| place)
@@ -435,7 +393,6 @@ function DeRefTest (|int| xxx)
 
 
 function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| Basis)
-	if "DeRefTest".trap
 	if (Basis & kBasisDestructable)
 		if (!Blocker)
 			return .DeStructable(Blocker, arg, name)
@@ -921,21 +878,6 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 				error (dot, "Can only call destructors from within a destructor.")
 
 
-function SCFunction.RefsCheckPropertiesAltered
-	opt norefcounts
-	// Really... only if the variable we return, is disowned,
-	// then this function is a disowner!
-	// then I could remove .ReturnsDisowned = true
-	
-	for (curr.ScanArg in .SourceArg)
-		if (curr == @Rel)
-			|| ch = curr.first	 // a.b = x
-			if ch and ch.IsProperty				
-				// (not on self, within constructor)
-				ifn  (self is Constructor) and ( ch.first IsThing "self" )				
-					SCRefs.RefMarkAsDisturber( self )
-
-
 
 function scdecl.DeclToAddr (|SCDecl| P0, |Message|)
 	opt norefcounts
@@ -960,11 +902,4 @@ function scdecl.RefDestructor (|message|)
 	if .IsCArray
 		return screfs.DecrMulti(self, m, false)
 	return SCRefs.RefClearMsg( m )
-
-
-//function message.CheckFreeIfDeadValid
-//	opt inline
-//	opt norefcounts
-//	check (self == @func) (self, "assumption #749 invalid") // JB_FreeIfDead should exist on function calls.
-
 

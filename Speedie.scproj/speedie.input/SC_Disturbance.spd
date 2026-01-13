@@ -1,0 +1,60 @@
+
+unfinished
+
+function screfs.RefCheckDisturbance (|Message| dcl, |int|)
+	require RefBasis( dcl, false ) == SCRefs.kbasisobj
+	
+	Return kSufferedNoise // for the moment.
+	
+	|| msg = dcl
+	|| arg = dcl.Parent
+	// Loop should start at "Dcl", that's why we predefine it.
+	// unless there's a better way?
+	|| name = dcl.DeclName.name
+	
+	for (msg.ScanArg in arg)
+		|Message| IgnoreArg
+		if (msg == @Tmp)
+			IgnoreArg = msg.find(@Arg)
+		
+		for (f in msg.CollectFuncsUsed( IgnoreArg ))
+			if (f.refs.disturbs)
+				Return kSufferedNoise
+		
+		if (msg == @Rel) and RelChangesDisowned( msg, name )
+			Return kSufferedNoise
+	
+	Return kNotDisturbed
+
+
+
+function SCFunction.RefsCheckPropertiesAltered
+	opt norefcounts
+	// Really... only if the variable we return, is disowned,
+	// then this function is a disowner!
+	// then I could remove .ReturnsDisowned = true
+	
+	for (curr.ScanArg in .SourceArg)
+		if (curr == @Rel)
+			|| ch = curr.first	 // a.b = x
+			if ch and ch.IsProperty				
+				// (not on self, within constructor)
+				ifn  (self is Constructor) and ( ch.first IsThing "self" )				
+					SCRefs.RefMarkAsDisturber( self )
+
+
+function screfs.RelChangesDisowned (|Message| msg, |String| name, |bool|)
+	(kIsNoisy), (kIsDisowner), (kHoldsDisowned), (kNotDisturbed)
+	return false // for now
+	
+	|| first = msg.first
+	if (first IsThing name)
+		Return first.VarOptFlag(kHoldsDisowned)
+
+
+
+function screfs.RefMarkAsDisturber (|SCFunction| fn)
+	opt norefcounts
+	|| r = fn.refs
+		|| ds = r.DisturbsGet
+			ds <~ "object"
