@@ -122,7 +122,7 @@ function JBin.BakeASM (|SCFunction| fn, |bool|)
 		return .BakeASMSub(fn, t)
 
 	.AddFunc(fn, true)
-
+	if j.Length
 	for a in fn.args	
 		a.DumpDecl(j, 0)
 	rz = .BakeASMSub(fn, t)

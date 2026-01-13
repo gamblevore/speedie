@@ -398,10 +398,9 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	
 	if !Mask
 		exp = nil
-	if rz isnt ExitFunction
-		return .CloseVars(v, exp, rz & Mask) // tail
 	rz = .CloseVars(v, exp, rz & Mask)
-	.regs = Restore
+	if rz is ExitFunction
+		.regs = Restore
 
 
 // merge?
