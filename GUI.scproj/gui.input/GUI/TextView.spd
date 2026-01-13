@@ -1151,10 +1151,10 @@ class TextView (GUIControl)
 	
 	
 	function MessageAtSel (|message|)
-		return .MessageAt(.sel0)
+		return .MessageWithin(.sel0, false, true)
 	
 	
-	function MessageAt (|int| pos, |bool| named=false, |message|)
+	function MessageWithin (|int| pos, |bool| named, |Bool| Within, |message|)
 		opt NoRefCounts
 		|| d   = .findDrawInfo(pos)
 		require d isnt fakemsg
@@ -1163,6 +1163,8 @@ class TextView (GUIControl)
 		if pos > after
 			pos = .text.outwhite(pos, after)
 			if pos < 0
+				if within
+					return msg
 				return nil
 		
 		|| found = msg.FindTightest(pos, named)
@@ -1172,8 +1174,13 @@ class TextView (GUIControl)
 			|| p = found.parent
 			if found == p.second
 				return p
+		if within and !found
+			return msg
 		return found
-
+		
+		
+	inline MessageAt (|int| pos, |bool| named=false, |message|)
+		return .MessageWithin(pos, named, false)
 	
 	libinternal CommentableRange	(|intrange|)
 		|| sel	= .selrange
