@@ -21,6 +21,7 @@ module Macros {
 
 
 || MultiDecr = `JB_DecrMulti(_0, _1)`.macro
+|| MultiEarlyDecr = `JB_EarlyDecrMulti(_0, _1)`.macro
 
 || ConstructorNew = `if self == nil {
 	self = JB_NewClass(_0)|_0|}`.macro

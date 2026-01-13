@@ -352,7 +352,7 @@ class String
 			return (First, 0)
 		
 		|| Pos = First
-/		|| Count = 1
+		|| Count = 1
 		while
 			pos = .FindBadUTF8(pos+1) #loop
 			Count++

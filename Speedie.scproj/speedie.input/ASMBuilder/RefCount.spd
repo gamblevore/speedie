@@ -58,7 +58,9 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		Fat._Outputs = 0
 		return fat
 
-	if fn == Compiler.RefDecr
+	if fn == Compiler.RefDecr or Compiler.RefEarlyDecr
+		// we need some way, to say that the early close, goes up to the blocker
+		
 		.CloseOneEarly(Obj)
 		|| Last = .last(asm.rfun, asm.GOBJ)
 			|| Ret = .CanOptDecr(obj, last)

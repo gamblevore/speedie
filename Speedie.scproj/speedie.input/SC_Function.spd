@@ -1393,7 +1393,6 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 		exp_copy = exp.copy				// needed before get type :(
 										// or else we can't do array.size++
 
-//	Assembler.kcontinue = 1
 	|| Type = TypeOfExpr( exp, name_space )						#require
 	(type is readfrom)
 	check (type isnt const) (msg, "Not assignable.")

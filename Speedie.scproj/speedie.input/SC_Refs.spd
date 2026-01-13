@@ -158,7 +158,7 @@ function message.RefMsgToUse (|message|)
 	return self!
 
 
-function RefDecr (|Message| msg, |Message| place, |int| Basis)
+function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
 	// a = nil   ->   JB_decr(a),  a = nil 
 	opt norefcounts
 	
@@ -166,33 +166,39 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis)
 	if (OldPrev) and (OldPrev == @Func) and (OldPrev.first ~= "JB_SafeDecr")
 		place = OldPrev // safedecr always comes last
 	
-//	debugat 13
 	using place.refmsgtouse
 	|message| what 
 	if basis & kBasisCArray
-		what = DecrMulti( msg.parent!.asdecl!, msg.copy )
+		what = DecrMulti( msg.parent!.asdecl!, msg.copy, IsReturn )
 	  else
-		what = RefDecrMsg( msg )
+		what = RefDecrMsg( msg, IsReturn )
 	if place == @arg
 		place <~ what
 	  else
 		place.Prev = what
 
 
-function DecrMulti (|scdecl| d, |message| m, |message|)
+function DecrMulti (|scdecl| d, |message| m, |bool| IsReturn,  |message|)
 	opt norefcounts
 	|| Int = d.c_array.msg
 	int.obj = typeint!.typenormal // nice
-	rz = macros.MultiDecr.run(m, Int)
+	if IsReturn
+		rz = macros.MultiEarlyDecr.run(m, Int)
+	  else
+		rz = macros.MultiDecr.run(m, Int)
 	rz.ASMType = ASMType.kRefCount
 	|| prm = rz.second
-		prm.obj = Compiler.RefDecrmulti
+		if IsReturn
+			prm.obj = Compiler.RefEarlyDecrMulti
+		  else
+			prm.obj = Compiler.RefDecrMulti
 		rz.obj = typevoid
 
 
-function RefDecrMsg (|Message| msg, |Message|)
-	if parser.using.position < 0			// just to bypass my bug-catching attempt. Not needed.
-	rz = RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
+function RefDecrMsg (|Message| msg, |bool| IsReturn, |Message|)
+	if IsReturn
+		return RefMsg( msg, "JB_EarlyDecr", Compiler.RefEarlyDecr! )
+	return RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
 	
 
 
@@ -418,7 +424,18 @@ function message.DoesAnything (|bool|)
 		return true
 
 
+function DeRefTest (|int| xxx)
+	for 10
+		|| x = "abc"
+		if 0.5[]
+			(x) 
+			exit
+//		|| z = 99999
+	|| y = 1
+
+
 function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| Basis)
+	if "DeRefTest".trap
 	if (Basis & kBasisDestructable)
 		if (!Blocker)
 			return .DeStructable(Blocker, arg, name)
@@ -438,19 +455,17 @@ function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| 
 		return // no need?
 
 	if (!Blocker)
-		RefDecr( name, arg!, basis )
+		RefDecr( name, arg!, basis, false )
 		Return
 
-	|| IsReturn = Blocker.IsReturnOrRejoin
 	|| Child = Blocker.first
-		if IsReturn and (child.unbratype isThing name.name)
-			RefSafeDecr( name, blocker ) // needs to come after any decr!
-			return
-		if IsReturn and ExprNeedsTemping( Child, name )
-			//debugat
-			//ExprNeedsTemping( Child, name )
-			ReturnTempMoveOut(Child, blocker)
-	RefDecr( name, blocker, basis )
+		|| IsReturn = Blocker.IsReturnOrRejoin
+			if (child.unbratype isThing name.name)
+				RefSafeDecr( name, blocker ) // needs to come after any decr!
+				return
+			if ExprNeedsTemping( Child, name )
+				ReturnTempMoveOut(Child, blocker)
+	RefDecr( name, blocker, basis, blocker.asmtype.IsBlocker )
 
 
 function RC_RelInit (|Message| rel)
@@ -943,7 +958,7 @@ function scdecl.RefDestructor (|message|)
 	opt norefcounts
 	|| m = .DeclToDot(scfunction.currfunc!.self)
 	if .IsCArray
-		return screfs.DecrMulti(self, m)
+		return screfs.DecrMulti(self, m, false)
 	return SCRefs.RefClearMsg( m )
 
 

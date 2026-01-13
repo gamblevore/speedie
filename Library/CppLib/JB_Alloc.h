@@ -281,6 +281,8 @@ u32 JB_ObjCount();
 #define JB_SetRef(a,b)			JB_SetRef_((JB_Object**)(&a), (JB_Object*)(b))
 #define JB_Clear(a)				JB_Clear_((JB_Object**)(&a))
 #define JB_Swap(a,b)			({auto _T = b; b = a; a = _T;})
+#define JB_EarlyDecr			JB_Decr
+
 
 #if DEBUG
 	inline void JBObjRefTest(JB_Object* obj) {

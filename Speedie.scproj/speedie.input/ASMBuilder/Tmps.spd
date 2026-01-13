@@ -8,7 +8,6 @@ function Message.ASMType (|ASMType|)
 	
 // if we can fix this... we can get a bigger ASMType table!
 function Message.ASMType (assigns:|ASMType|)
-//	if .objectid == 12597256
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 
 
@@ -18,6 +17,9 @@ datatype ASMType (uint16)
 	syntax is (|ASMType| t, |bool|)
 		(krefcount)
 		return self == t
+
+	function IsBlocker (|bool|)
+		return self >= kContinue and self <= kRejoin
 
 	constants
 		|ASMType|
@@ -40,6 +42,7 @@ datatype ASMType (uint16)
 	
 	function Tester
 		disabled 
+		(kUnusedFirst)
 		|| x = kRefCount // last value
 	
 	
