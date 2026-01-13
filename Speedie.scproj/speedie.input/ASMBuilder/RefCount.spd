@@ -60,7 +60,11 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 	if fn == Compiler.RefDecr or Compiler.RefEarlyDecr
 		// we need some way, to say that the early close, goes up to the blocker
-		
+		// the problem is... where is the blocker?
+		// we'll have to leave some kind of "marker"? that waits for the blocker, right?
+		// it should exist at SOME POINT?
+		// it must exist aheadof us.
+		// but we don't know where.
 		.CloseOneEarly(Obj)
 		|| Last = .last(asm.rfun, asm.GOBJ)
 			|| Ret = .CanOptDecr(obj, last)
