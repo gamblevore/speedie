@@ -381,27 +381,6 @@ function PerryIDE.DoReplacements (|bool|)
 	return true
 	
 
-function PressedSearchKeys (GUIKeyEvent)
-	opt norefcounts
-	|| w = .ide
-	
-	if key.isaccept
-		if self == w.MassReplaceField
-			return w.DoReplacements
-		return w.MassSearch
-		
-	|| t = w.MassSearchField
-	if (key is down) and (t.selrange == t.text.length)
-		w.FoundList.setfocus
-		return true
-	
-	if key.IsCancel
-		if t.text
-			t.text = ""
-		  else
-			w.view(W.viewfiles)
-		return true
-
 
 function EditMeSelChange (GUITextEvent)
 	opt norefcounts
@@ -432,23 +411,6 @@ function EditMeSelError (GUITextErrorSelected)
 	i.DuringMsgFB = false
 
 	
-	
-function PressedEditKeys (GUIKeyEvent)
-	opt norefcounts
-	if self isa TextView
-		require .ExpectsParse >= 2
-		if key is Decl
-			return .PerryDeclKey
-		
-		
-		require key == -9 or -10 or 27
-		|| kabs = key.abs
-		
-		|| tabkind = .PerryInsertSyntax(kabs, key)
-			if tabkind == 1
-				.ide.EditMeTabRetryThing = 0
-			return true
-
 
 function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
 	opt norefcounts

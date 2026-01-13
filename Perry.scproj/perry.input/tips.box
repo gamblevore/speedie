@@ -11,6 +11,8 @@
 
 `Click the lower-left of the IDE window (--) to see more information!`
 
+"\1F\04. cancels the current compile"
+
 "Press the section-key (underneath esc) to open a CMM!"
 
 "\1F0-\1F9 can show or hide, various IDE sections. \1F0 can expand the text-editor to full-size."

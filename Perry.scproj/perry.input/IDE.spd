@@ -570,109 +570,6 @@ class PerryIDE (Window)
 		.MassSearchField.SelectAll
 		.MassSearchField.SetFocus
 		return true
-
-	
-	function CmdKey (|keys| key, |bool|)
-		if key is f
-			if .masssearchfield.hasfocus
-				.PrevView.Click?
-				return .editme.OpenSearch
-			return .ShowFind
-		if key is k
-			if super.KeyDown(key)
-				return true
-			|| t = .outtext 
-			if t and t.text
-				t.text = ""
-				return true
-			LogAreaKeys(.CommsLogList, key)
-			return true
-		if key is i
-			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
-			return true
-		if key is comma
-			return ClickedPrevNext(.goprev)
-		if key is period
-			return ClickedPrevNext(.gonext)
-		if key is b
-			Clickedcompile(.buildbutton)
-			return true
-		if key is r
-			if keys.Shift
-				PressingDebug(.runbutton)
-			  else
-				ClickedDebug(.runButton)
-			return true
-		if key is o
-			if keys.shift
-				clickedopenfile(self)
-			  else
-				clickedopenproj(self)
-			return true
-		if key is n
-			if keys.shift
-				clickedCreatefile(self)
-			  else
-				clickedCreateproj(self)
-			return true
-//		if key is m
-//			return .markup()
-		if key is l // l = file list
-			if keys.option or keys.Shift
-				RightClickNext(.goprev)
-				return .goprev.searchmenu
-			  else
-				return .ShowQuickStuff(true)
-		if key is d
-			return .ShowQuickStuff(false)
-		if  key is s  and  .editme is visible
-			.SaveEditing(documentstate.saving)
-			return true
-
-		if key is NUM3 // e for error
-			return .SaveAndShowErrors
-			
-		|| NumKey = key.IsNumber
-			return .NumberKey(numkey)
-		if key is p or backslash
-			.CommandsMenu.Click
-			return true
-		
-	
-	function OptionCmdNum (|int| Num, |bool|)
-		|| w = perry.projects[num-1]
-			.ProjectTabs.Selected() = w
-		
-		
-	function NumberKey (|int| Num, |bool|)
-		require !keys.shift
-		if keys.Option
-			return .OptionCmdNum(num)
-		if Num == 9
-			.flip(.ProductOut)
-			return true
-		if Num == 8
-			.flip(.SpeedieText)
-			return true
-		if Num == 7
-			return .FlipJeeboxField			
-		if Num == 6
-			.ASMButton.Click
-			return true
-		if Num == 5
-			return .StrongView(.ViewLog)
-		if Num == 4
-			return .StrongView(.ViewDebugger)
-		if Num == 3
-			return .SaveAndShowErrors
-		if Num == 2
-			return .StrongView(.ViewSearch)
-		if Num == 1
-			return .StrongView(.ViewFiles)
-		if Num == 0
-			.ViewTextModeSwap
-			return true		
-
 	
 	function Flip (|textview| s, |bool|)
 		|| Item = .compiletabs.selected
@@ -701,22 +598,6 @@ class PerryIDE (Window)
 				return true
 			return .FunctionMenu.SearchMenu
 			
-	
-	behaviour KeyDown
-		if keys.cmd and !keys.option and .cmdkey(key)
-			return true
-		if (key is tab) and .OpenedMenu == .autocomplete
-			return .autocomplete.doreturn
-		if super.keydown(key)
-			return true
-		if .OpenedMenu or key.IsModifier
-			return false
-		require !keys.cmd
-		
-		ifn .focus isa textview // the main listview IS considered editable!
-			.Editme.SetFocus	// should I just do this anyhow?
-			return .editme.__KeyDown__(key)
-
 	
 	function GotoIncludedFile (|string| path, |bool|)
 		opt norefcounts

@@ -161,10 +161,11 @@ extend PerryIDE
 				.ShowCompileErrors(p, true)
 			// Notifications will pick up the err otherwise!
 		  elseif !bad
-			|| msg = @tmp + "compile"
-			msg <~ (@thg, "ok")
-			.ShowCompileErrors(msg, false)
-			.CompiledOK
+			if !killed
+				|| msg = @tmp + "compile"
+				msg <~ (@thg, "ok")
+				.ShowCompileErrors(msg, false)
+			.CompiledOK(killed)
 		.compilr = nil
 		.RenableAfterCompile
 
@@ -176,11 +177,15 @@ extend PerryIDE
 				(.talker)
 	
 	
-	function CompiledOK
+	function CompiledOK (|bool| Killed)
 		|| db = .DebugMode
 		.CheckedOK("compile")
 		|| last = .speedietext.text.parse.last
-		if last.expect(@tmp, "Product")
+		
+		ifn last == @tmp and "Product"
+			if !killed
+				error last
+		  else
 			|| path = last[@nil]
 			if path.ExpectString
 				|| file = @url + "file"
@@ -192,8 +197,9 @@ extend PerryIDE
 				.notify(.name + str, file)
 				.say(str)
 				if .DebugMode != db // hmmm why not just get it here?
-				if (db is run or debug) and f.exists and stderr.ok
-					.run_compile_wrap(f)
+				if !killed
+					if (db is run or debug) and f.exists and stderr.ok
+						.run_compile_wrap(f)
 
 
 	function Notify (|string| What, |message| response=nil)
@@ -204,16 +210,18 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	
-	function CancelCompile (|bool|)
+	function CancelCompile (|bool| Beep=false, |bool|)
 		opt norefcounts
 		|| c = .Compilr
 		if !c
+			if beep
+				Notifications <~ "Nothing is building"
+				beep
 			return .RenableAfterCompile
 		c.Kill(0)
 		app.Sleep(0.025) // allow pipes to work
 		.Readlog(true)
 		return true
-
 
 
 	function RenableAfterCompile (|bool|)
