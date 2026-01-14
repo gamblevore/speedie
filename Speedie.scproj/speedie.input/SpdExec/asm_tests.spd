@@ -1,6 +1,20 @@
 
 
 
+function testrefs (|int| x)
+	|| m = Message()
+	if x
+		|| i = 0
+		// earlydecr happens AFTER the i! so we can keep m open!!
+		// as long as we set the reg to 0... it should be safe.
+		// we don't even need to close the var! A LOT SIMPLER!
+		// WE CAN CUT OUT A LOT OF SHIT THIS WAY
+		// I guess it's only true of early-decr, though.
+		// So we need to deref but not... close the var. Not yet anyhow.
+		return
+	(m)
+	
+
 struct StructWithObj
 	|object| A
 	|object| B

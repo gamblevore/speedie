@@ -678,6 +678,15 @@ struct Assembler
 		.VTemps = 0
 		.VDecls = 1							// set after .FuncStart
 		.AddFuncParams(fn)
+//		.TestAllFats
+//	
+//	function TestAllFats
+//		|| S = .Start
+//		|| A = .End
+//		While (S < A)
+//			S.Info++
+//			S.Info--
+//			S++
 
 
 	function CapASM 
