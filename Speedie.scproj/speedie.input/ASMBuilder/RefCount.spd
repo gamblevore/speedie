@@ -95,7 +95,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 			return .RefCountIncr(exp, prms, Obj)
 	
 		if fn == Compiler.RefDecr or fn == Compiler.RefEarlyDecr
-			.CloseOneEarly(Obj)										// close it properly.
+			.CloseOneVar(nil, 1<<Obj.reg)							// close it properly.
 			return .RefCountDecr(exp, prms, obj)					// reopener can reopen it...
 	
 		if fn == Compiler.RefSafeDecr
@@ -195,12 +195,6 @@ function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
 	if !(fat)(0) and !(fat)(2)
 		.softnop(fat)
 		return upon
-
-
-function assembler.CloseOneEarly (|asmreg| a)
-	|| r = 1 << a.reg
-	.CloseOneVar(nil, r)
-
 
 
 function FinalDecrements (fn_asm)

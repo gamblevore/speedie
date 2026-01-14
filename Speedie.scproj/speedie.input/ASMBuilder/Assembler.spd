@@ -322,7 +322,7 @@ struct Assembler
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
 		if fat is temp
-			.CloseOneEarly(fat.info) // why did I comment this out? // testin speedie first?
+/			.CloseOneVar(nil, 1<<fat.info.reg) // why did I comment this out? // testin speedie first?
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...

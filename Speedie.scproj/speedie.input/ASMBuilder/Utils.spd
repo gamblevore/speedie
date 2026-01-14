@@ -80,18 +80,12 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 		0
 
 	Missing = OrigDecls &~ .VDecls
+	if missing
+		.MarkReopenVar(Missing)
+		if !exp // oof? why?
+	
 	if !exp or !missing
 		return return
-	
-	/*
-		if value == nil {
-			JB_Decr(value) // the decl is closed early
-			exit
-		}
-		value.x++
-		// then it is "missing" after the arg closes. So this will reopen it.
-		// We assume that temps are never used in such a way and don't need reopening.
-	*/
 	
 	.VDecls |= Missing	
 	
@@ -132,8 +126,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	if IsReal
 		.vdecls = Result 
 		if .RegDebugInfo & v_bits
-			.MarkCloseInfo(v_bits)
-			// now what?
+			.MarkCloseVar(v_bits)
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 

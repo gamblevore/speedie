@@ -360,9 +360,14 @@ function Decl (fn_asm) // DeclareSub declare
 
 function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
 	|| After = .Last
-	while Start <= After
+	while
 		(start isnt discard)
-		(Start is newlydeclared) = (Start == After)
+		if start is ForceInto // huh?
+		(start isnt ForceInto)
+		if start == after
+			if start == asm.noop // huh?
+			(Start is newlydeclared)
+			exit
 		Start++
 	
 	return Declared
