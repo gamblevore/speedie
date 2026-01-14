@@ -335,7 +335,7 @@ class String
 	    return self[n, int.max] + self[0, n]
 		
 		
-	function FindBadUTF8 (|int|from=0, |ind|)
+	function FindBadUTF8 (|int| From=0, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8
 
 	function IsBinary (|float| f = 512.0, |bool|)
