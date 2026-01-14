@@ -24,8 +24,8 @@ extend SCFunction
 		|uint64| HasLabel
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
-			if (rz - where) > 250K/4
-				error (.source, "Function too large (over 250K)")
+			if (rz - where) > 63K
+				error (.source, "Function too large (over 63K)")
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
 

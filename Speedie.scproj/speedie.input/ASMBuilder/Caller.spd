@@ -1,10 +1,6 @@
 
 
 
-
-
-
-
 extend Assembler {
 
 function IsASMConst (|message| exp, |bool|)
@@ -61,12 +57,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		rz |= (8-ic) << 0
 	  else
 		rz |= (17-ic) << 6
-			
 
-//function QuickPrmFinish (|int| i, |int64| P, |int64|)
-//	P >>= 64-((i*5)+12)
-//	P |= (17-i) << 6
-//	return P
 
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
@@ -131,17 +122,7 @@ function SCFunction.HasCVersion (|bool|)
 	return self is wrapper
 
 
-function SCFunction.ASMFuncID (|int|)
-	|| ID = .FPackID
-//	target PrintFuncTable
-//	if  !.islibrary  and  Options.WhateverDebug
-//		|| p = packmaker.PackFuncIndex
-//			"$p: ${scfunction.CurrFunc!.exportname} linked to $.ExportName ($ID)"
-	return ID
-
-
 function assembler.Killed (|message| exp, |fatasm| fat, |asmreg|)
-	.CloseEarlyMarkedRegs(exp)						// sigquit just to be safe
 	fat = exp.EROR(nil, nil, 3)
 	fat.µRefCount++
 	return fat * asmreg.exit
@@ -160,7 +141,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 				return MiniDest
 		check (fn isnt LinkInline) (exp, "Unable to inline function")
 		
-		TableID = fn.ASMFuncID + 31
+		TableID = fn.FPackID + 31
 		if tableid <= 31							// failed!
 			if !fn.islibrary or !.state.fn.islibrary
 				error (exp, "Missing PackID[1]")

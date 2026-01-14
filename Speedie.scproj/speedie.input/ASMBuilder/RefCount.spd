@@ -94,18 +94,9 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		if fn == Compiler.RefIncr
 			return .RefCountIncr(exp, prms, Obj)
 	
-		if fn == Compiler.RefDecr
+		if fn == Compiler.RefDecr or fn == Compiler.RefEarlyDecr
 			.CloseOneEarly(Obj)										// close it properly.
-			return .RefCountDecr(exp, prms, obj)
-
-		if fn == Compiler.RefEarlyDecr
-			// it is gone at this point
-			// the thing is, it can reopen later.
-			// why are we not closing it early then.
-			// how 
-			// i think i'm fried. I can't do this.
-			.MarkForEarlyClose(exp, Obj)
-			return .RefCountDecr(exp, prms, obj)
+			return .RefCountDecr(exp, prms, obj)					// reopener can reopen it...
 	
 		if fn == Compiler.RefSafeDecr
 			return exp.rfun(ASMReg(), Obj)
@@ -114,38 +105,28 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 
 
-function assembler.CloseEarlyMarkedRegs (|message| exp)
-	opt norefcounts // for return / exit / etc
-	// the thing is... we don't want to actually close the regs.
-	// they will already be closed.
-	// we want to UPDATE existing info, about the length of what where the regs are.
-	// so how ? its like an end-marker really.
-	
-	// so where is the start?
-/*
-	|| x = obj()
-	if (y)
-		... // x can be early closed here
-		// we would write an instruction or info, that persists from here, to the actual return instruction
-		// which is.... where?
-		return
-		
-*/
+//function assembler.CloseEarlyMarkedRegs (|message| exp)
+//	opt norefcounts // for return / exit / etc
+//	// the thing is... we don't want to actually close the regs.
+//	// they will already be closed.
+//	// we want to UPDATE existing info, about the length of what where the regs are.
+//	// so how ? its like an end-marker really.
+//
+///	|| arg = exp.SCArg(nil)!
+//	|| R = arg.RegsToClear
+//	arg.RegsToClear = 0
+//	for B.bits in R
+//		.CloseOneVar(nil, B)
 
 
-/	|| arg = exp.SCArg(nil)!
-	|| R = arg.RegsToClear
-	arg.RegsToClear = 0
-	for B.bits in R
-		.CloseOneVar(nil, B)
-
-
-function assembler.MarkForEarlyClose (|message| exp, |asmreg| Obj)
-	opt norefcounts
-/	|| arg = exp.SCArg(nil)!
-	|| ToAdd = 1<<obj.reg
-	if arg.RegsToClear & ToAdd // oof
-	arg.RegsToClear |= ToAdd
+// i think we'll just reopen it.
+// So... each reg will have its own jbin!
+//function assembler.MarkForEarlyClose (|message| exp, |asmreg| Obj)
+//	opt norefcounts
+///	|| arg = exp.SCArg(nil)!
+//	|| ToAdd = 1<<obj.reg
+//	if arg.RegsToClear & ToAdd // oof
+//	arg.RegsToClear |= ToAdd
 
 
 

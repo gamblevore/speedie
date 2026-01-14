@@ -10,7 +10,6 @@ class SCArg (SCNode)
 
 	|SCFunction?|	ParentFunc
 	|Message?|		TmpMovedOutFor
-	|int|			RegsToClear // needs to be reset also for re-inlining
 	|bool|			IsClassArg
 	|bool|			IsStatementExpr
 	

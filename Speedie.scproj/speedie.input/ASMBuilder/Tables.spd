@@ -103,7 +103,6 @@ function Swap (fn_asm)
 
 function Rejoin (fn_asm)
 	opt norefcounts
-	.CloseEarlyMarkedRegs(exp)
 	(dest isnt discard)
 	return .µGetASM(exp.first!, dest)
 
@@ -199,7 +198,6 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 
 function Return (fn_asm)
 	opt norefcounts
-	.CloseEarlyMarkedRegs(exp)
 	|| L = .state.return
 		return InlinedReturn(self, exp, L)
 
