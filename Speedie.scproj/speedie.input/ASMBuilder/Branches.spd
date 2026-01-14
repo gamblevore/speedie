@@ -107,12 +107,14 @@ function WhileSub (|message| exp,  |asmreg|)
 
 function Exit			(fn_asm)
 	opt norefcounts
+	.CloseEarlyMarkedRegs(exp)
 	|| J = exp.jump											// request jump to exit
 	J._op = kexit
 
 
 function Continue		(fn_asm)
 	opt norefcounts
+	.CloseEarlyMarkedRegs(exp)
 	|| J = exp.jump											// request jump to continue
 	J._op = kcontinue
 

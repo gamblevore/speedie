@@ -35,7 +35,7 @@ extend Assembler
 		|| mr = ASMReg()
 		|| First = exp.first!
 		|| dest = mode
-		target debug: || mathtrap = ++ASMTrapper, if mathtrap == -1
+		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
 		if First.islast
 			ml = .µGetASM(first, dest)
 		  else
@@ -59,7 +59,7 @@ extend Assembler
 		(dest is Const) = (ml&mr is Const)
 		
 		|| op = exp.second ?? exp.first!
-		target debug: || mathtrap2 = ++asmtrapper, if mathtrap2 == -1
+		target debug: || MathTrap2 = ++ASMTrapper, if MathTrap2 == -1
 		rz = (fn)(self, op, dest, ml, mr)
 		
 		target debug: if rz.IsVec != ml.IsVec			// argh?

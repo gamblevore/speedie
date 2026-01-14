@@ -115,8 +115,8 @@ function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|
 function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	opt norefcounts
 	// we have a missing value. but is it missing from one, or the other? lets do it on that basis.
-	|uint| Curr = .vdecls
-	|uint| T = .vtemps
+	|| Curr = .vdecls
+	|| T = .vtemps
 	|| Extra = Curr & Missing
 	|| IsReal = true
 	if !Extra
@@ -124,7 +124,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 		Extra = Curr & Missing #require
 		IsReal = false
 
-	|| v = extra.log2
+	|| v = extra.Log2
 	|| v_bits = 1<<v
 	|| Result = Curr &~ v_bits
 	.Regs.KnownMap &=~ v_bits
@@ -132,8 +132,8 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	if IsReal
 		.vdecls = Result 
 		if .RegDebugInfo & v_bits
-			.RegDebugInfo &= ~v_bits
-			.MarkCloseInfo(v)
+			.MarkCloseInfo(v_bits)
+			// now what?
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 

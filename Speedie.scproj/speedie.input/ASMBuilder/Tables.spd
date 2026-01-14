@@ -103,6 +103,7 @@ function Swap (fn_asm)
 
 function Rejoin (fn_asm)
 	opt norefcounts
+	.CloseEarlyMarkedRegs(exp)
 	(dest isnt discard)
 	return .µGetASM(exp.first!, dest)
 
@@ -198,6 +199,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 
 function Return (fn_asm)
 	opt norefcounts
+	.CloseEarlyMarkedRegs(exp)
 	|| L = .state.return
 		return InlinedReturn(self, exp, L)
 
@@ -340,7 +342,6 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 	return .write(dest, exp, reff, nil, nil) * dest
 
 
-
 function AllocBearStruct (|int| Dir, |message| Exp, |asmreg| Dest, |int| Size, |asmreg|)
 	size = (size+15)>>4
 	|| fat = exp.ALLO(dest, size*dir)
@@ -348,17 +349,25 @@ function AllocBearStruct (|int| Dir, |message| Exp, |asmreg| Dest, |int| Size, |
 	return fat * dest
 
 	
-function Decl (fn_asm) // declaresub declare 
+function Decl (fn_asm) // DeclareSub declare 
 	opt norefcounts
 	
 	|| ty = exp.fastdecl
 	.DeclReset(ty)
-	|| rel = exp.last!
-	dest = .DeclareBody(rel, ty)
-	|| fat = .curr
-	rz = declsub(self, exp, dest, ty, rel)
-	if fat < .curr
-		(fat is newlydeclared)
+	dest = .DeclareBody(exp.last!, ty)
+	|| Start = .curr
+	|| Declared = DeclSub(self, exp, dest, ty, exp.last!)
+	return MarkNewlyDeclared(self, Start, Declared)
+
+
+function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
+	|| After = .Last
+	while Start <= After
+		(start isnt discard)
+		(Start is newlydeclared) = (Start == After)
+		Start++
+	
+	return Declared
 
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
@@ -423,7 +432,6 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
 		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
 															// So we simplify
-
 	|| base = .µGetReal(f, Mode)							// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
@@ -746,7 +754,7 @@ function Ignore			(fn_asm)
 
 
 function Unexpected		(fn_asm)
-	if !exp.asmtype
+	if !exp.ASMType
 		|| f = exp.func|int|
 			exp.asmtype = f
 			return .µGetASM(exp, dest)

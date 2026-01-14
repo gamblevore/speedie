@@ -1,88 +1,151 @@
 
 
 
-function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
+function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
+	opt	NoRefCounts
+	|| DestMsg = prms.first!
+	|| P = prms.second!
+	|| A = .µGetReal(DestMsg, ASMReg.AddrRequest temp p)
+	|| B = .µ(P, ASMReg.AddrRequest)
+	if A iz B
+		return nil // wat?
+	
+	|| offset = 0
+	if A isnt ContainsAddr
+		if B is ContainsAddr
+			B = .InlineOffsetOpt(B, 3, offset, 13, P.ASMDecl, p)
+			return exp.RFRD(A, B, 1, offset)				// mem to reg
+		return exp.RFST(A, B)								// reg to reg
+	
+	|| glob = DestMsg.ASMDecl
+	if  B is ContainsAddr
+		|| where = .Temponly()
+		where.µtype = datatypecode._voidptr
+		B = .Read(where, P, B, nil, p.ASMDecl) * where		// (mem to reg)?
+	
+	A = .InlineOffsetOpt(A, 3, offset, 13, glob, p)
+	return exp.RFWR(A, B, 1, offset)						// reg to mem
+
+
+
+function Assembler.RefCountClear (|message| exp, |message| prms, |&FatASM|)
+	opt	NoRefCounts
+	|| offset = 0
+	|| A = .µ(prms.first!, ASMReg.AddrRequest)
+	A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
+	return exp.RFWR(A, nil, 1, offset)						// reg to mem
+
+
+function Assembler.RefCountIncr2 (|message| exp, |message| prms, |&FatASM|)
+	opt	NoRefCounts
+	|| A = .µ(prms.first!, asmreg.AddrRequest)
+	target debug: if a isnt ContainsAddr					// always memory
+	|| offset = 0
+	A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
+	|| B = .µ(prms.second!)
+	target debug: if b is ContainsAddr						// always reg
+	return exp.RFWR(a, b, 0, offset)
+
+
+function Assembler.RefCountIncr (|message| exp, |message| prms, |ASMReg| Obj,  |&FatASM|)
+	opt	NoRefCounts
+	|| Last = .last(asm.GOBJ)
+		if (Last.r0 iz Obj) and !Last.r1
+			Last.r2 = 1										// incring a gobj. Lets do it internally!
+			return Last
+	|| fat = exp.rfun(asmreg(), asmreg(), Obj)
+	Fat._Outputs = 0
+	return fat
+
+
+
+function Assembler.RefCountDecr (|message| exp, |message| prms, |ASMReg| Obj, |&FatASM|)
+	opt	NoRefCounts
+	|| Last = .last(asm.rfun, asm.GOBJ)
+		|| Ret = .CanOptDecr(obj, last)
+			if ret != last
+				return nil
+			return ret
+
+		if (Last isa asm.GOBJ) and (Last.r0 iz Obj)  and  Last.r1
+			last.r2 = 0							// decring a global mem obj. Lets just NOT incr!
+			return nil
+	
+	return exp.RFUN(Obj, Obj)
+
+
+
+function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)
 	opt	NoRefCounts
 	
 	if fn == compiler.RefClear
-		|| offset = 0
-		|| A = .µ(prms.first!, ASMReg.AddrRequest)
-		A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
-		return exp.RFWR(A, nil, 1, offset)						// reg to mem
-
+		return .RefCountClear(exp, prms)
 
 	if fn == Compiler.RefSetRef
-		|| DestMsg = prms.first!
-		|| P = prms.second!
-		|| A = .µGetReal(DestMsg, ASMReg.AddrRequest temp p)
-		|| B = .µ(P, ASMReg.AddrRequest)
-		if A iz B
-			return nil // wat?
-		
-		|| offset = 0
-		if A isnt ContainsAddr
-			if B is ContainsAddr
-				B = .InlineOffsetOpt(B, 3, offset, 13, P.ASMDecl, p)
-				return exp.RFRD(A, B, 1, offset)				// mem to reg
-			return exp.RFST(A, B)								// reg to reg
-		
-		|| glob = DestMsg.ASMDecl
-		if  B is ContainsAddr
-			|| where = .Temponly()
-			where.µtype = datatypecode._voidptr
-			B = .Read(where, P, B, nil, p.ASMDecl) * where		// (mem to reg)?
-		
-		A = .InlineOffsetOpt(A, 3, offset, 13, glob, p)
-		return exp.RFWR(A, B, 1, offset)						// reg to mem
-
+		return .RefCountSet(exp, prms)
 
 	if fn == Compiler.RefIncr2
-		|| A = .µ(prms.first!, asmreg.AddrRequest)
-		target debug: if a isnt ContainsAddr					// always memory
-		|| offset = 0
-		A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
-		|| B = .µ(prms.second!)
-		target debug: if b is ContainsAddr						// always reg
-		return exp.RFWR(a, b, 0, offset)
+		return .RefCountIncr2(exp, prms)
 
 	|| Obj = .µ(prms.first!)
-	require !.RegIsConst(Obj, 0)
-	target debug: if Obj is ContainsAddr						// always a reg!
-
-	if fn == Compiler.RefIncr
-		|| Last = .last(asm.GOBJ)
-			if (Last.r0 iz Obj) and !Last.r1
-				Last.r2 = 1										// incring a gobj. Lets do it internally!
-				return Last
-		|| fat = exp.rfun(asmreg(), asmreg(), Obj)
-		Fat._Outputs = 0
-		return fat
-
-	if fn == Compiler.RefDecr or Compiler.RefEarlyDecr
-		// we need some way, to say that the early close, goes up to the blocker
-		// the problem is... where is the blocker?
-		// we'll have to leave some kind of "marker"? that waits for the blocker, right?
-		// it should exist at SOME POINT?
-		// it must exist aheadof us.
-		// but we don't know where.
-		.CloseOneEarly(Obj)
-		|| Last = .last(asm.rfun, asm.GOBJ)
-			|| Ret = .CanOptDecr(obj, last)
-				if ret != last
-					return nil
-				return ret
-
-			if (Last isa asm.GOBJ) and (Last.r0 iz Obj)  and  Last.r1
-				last.r2 = 0							// decring a global mem obj. Lets just NOT incr!
-				return nil
-
-		return exp.rfun(Obj, Obj)
+	if !.RegIsConst(Obj, 0)
+		target debug: if Obj is ContainsAddr						// always a reg!
 	
+		if fn == Compiler.RefIncr
+			return .RefCountIncr(exp, prms, Obj)
+	
+		if fn == Compiler.RefDecr
+			.CloseOneEarly(Obj)										// close it properly.
+			return .RefCountDecr(exp, prms, obj)
 
-	if fn == Compiler.RefSafeDecr
-		return exp.rfun(asmreg(), Obj)
+		if fn == Compiler.RefEarlyDecr
+			// it is gone at this point
+			// the thing is, it can reopen later.
+			// why are we not closing it early then.
+			// how 
+			// i think i'm fried. I can't do this.
+			.MarkForEarlyClose(exp, Obj)
+			return .RefCountDecr(exp, prms, obj)
+	
+		if fn == Compiler.RefSafeDecr
+			return exp.rfun(ASMReg(), Obj)
 
-	debugger 
+		debugger
+
+
+
+function assembler.CloseEarlyMarkedRegs (|message| exp)
+	opt norefcounts // for return / exit / etc
+	// the thing is... we don't want to actually close the regs.
+	// they will already be closed.
+	// we want to UPDATE existing info, about the length of what where the regs are.
+	// so how ? its like an end-marker really.
+	
+	// so where is the start?
+/*
+	|| x = obj()
+	if (y)
+		... // x can be early closed here
+		// we would write an instruction or info, that persists from here, to the actual return instruction
+		// which is.... where?
+		return
+		
+*/
+
+
+/	|| arg = exp.SCArg(nil)!
+	|| R = arg.RegsToClear
+	arg.RegsToClear = 0
+	for B.bits in R
+		.CloseOneVar(nil, B)
+
+
+function assembler.MarkForEarlyClose (|message| exp, |asmreg| Obj)
+	opt norefcounts
+/	|| arg = exp.SCArg(nil)!
+	|| ToAdd = 1<<obj.reg
+	if arg.RegsToClear & ToAdd // oof
+	arg.RegsToClear |= ToAdd
 
 
 
@@ -166,11 +229,3 @@ function FinalDecrements (fn_asm)
 	|| D3 = .decrObj
 	return exp.RFRT(d0, d1, d2, d3) * asmreg.Exit
 
-
-// OK... lets assume that we got a dest that came from rfap. well... it shouldn't.
-// rfap in fact does not alter anything.
-
-// so... shouldn't nopping reverse the .registers[] back to something that was set before
-// within the same block?
-// then... we can check that reg and use it.
-	

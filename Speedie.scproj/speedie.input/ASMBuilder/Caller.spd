@@ -2,6 +2,9 @@
 
 
 
+
+
+
 extend Assembler {
 
 function IsASMConst (|message| exp, |bool|)
@@ -110,7 +113,7 @@ function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Sta
 	// still need this tho.	caused an error tho?
 	|| i = dest.reg
 	while ++i <= 31
-		.setRegister(i, nil, nil)
+		.SetRegister(i, nil, nil)
 		
 }
 
@@ -135,6 +138,14 @@ function SCFunction.ASMFuncID (|int|)
 //		|| p = packmaker.PackFuncIndex
 //			"$p: ${scfunction.CurrFunc!.exportname} linked to $.ExportName ($ID)"
 	return ID
+
+
+function assembler.Killed (|message| exp, |fatasm| fat, |asmreg|)
+	.CloseEarlyMarkedRegs(exp)						// sigquit just to be safe
+	fat = exp.EROR(nil, nil, 3)
+	fat.µRefCount++
+	return fat * asmreg.exit
+
 
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
@@ -179,17 +190,14 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		if 0: exp.fncx
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
+	fat.µRefCount += fn isnt STATELESS				// NOICE!
 
 	.ClearGRABbedAndTrampled(exp, dest, Start)		// comment out? once tests work?
-	
-	fat.µRefCount += fn isnt STATELESS				// NOICE!
-	if fn is Killer									// return just to be safe
-		fat = exp.RET()
-		fat.µRefCount++
-		dest = asmreg.exit
-	
 	.CurrFuncGrab--
-	return fat * dest
+	
+	if fn isnt Killer
+		return fat * dest
+	return .Killed(exp, fat)
 
 
 

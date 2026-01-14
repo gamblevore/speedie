@@ -70,7 +70,8 @@ function SCDecl.DumpWierdness (|jbin| j)
 		self = .Internal!
 	
 
-function Assembler.MarkCloseInfo (|int| Reg)
+function Assembler.MarkCloseInfo (|int| RegBits)
+	.RegDebugInfo &= ~RegBits
 	|| Nop = .last
 	if nop.Index|int| < 0 //oof
 /		return
@@ -78,5 +79,5 @@ function Assembler.MarkCloseInfo (|int| Reg)
 		nop = nop.Msg.NOOP
 	(nop is discard)
 	(nop is newlydeclared)
-	nop._Const |= 1<<reg
+	nop._Const |= RegBits
 
