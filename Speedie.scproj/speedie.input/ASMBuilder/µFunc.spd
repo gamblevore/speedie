@@ -1,5 +1,7 @@
 unfinished
 
+|jbin[32]| DebugVars
+
 extend SCFunction
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
@@ -18,9 +20,10 @@ extend SCFunction
 		return (.Position<<11) ||| (.tag >> 8)
 	
 	
-	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
+	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,   |!&asm|)
 		opt norefcounts
-		rz = where		
+		rz = where
+		|| DbgVars = &DebugVars[0]
 		|uint64| HasLabel
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
@@ -33,7 +36,7 @@ extend SCFunction
 			rz = fat.µRenderInto(rz, after)
 			if Positions
 				if (fat is NewlyDeclared)
-					fat.DumpDecl
+					dbgvars = fat.DumpDecl(dbgvars)
 				|| pos = fat.msg.SrcMap
 				while (Curr++ < rz)
 					Positions++[] = pos

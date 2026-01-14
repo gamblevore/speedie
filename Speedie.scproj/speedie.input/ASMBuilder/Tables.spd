@@ -365,7 +365,7 @@ function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declare
 		if start is ForceInto // huh?
 		(start isnt ForceInto)
 		if start == after
-			if start == asm.noop // huh?
+			if start isa asm.noop // huh?
 			(Start is newlydeclared)
 			exit
 		Start++

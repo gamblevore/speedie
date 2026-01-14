@@ -117,7 +117,8 @@ struct FatASM
 		.msg = Value
 
 	syntax equals (|uint| x, |bool|)
-		return self - Assembler.sh.start == x
+		disabled "Use isa asm.xxx instead"
+		// if I need to compare vs an int, I can do... if 123 == fat
 	
 	function Index (|uint|) // for storing in uint16 actually
 		return self - Assembler.sh.funcstart_

@@ -12,7 +12,7 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	.AppendHInt(Reg)
 
 
-function FATASM.DumpDecl
+function FATASM.DumpDecl (|&jbin| Dbg, |&jbin|)
 	opt norefcounts
 	|| j = Assembler.DebugDecls!
 	if .GuessSize
@@ -21,6 +21,8 @@ function FATASM.DumpDecl
 		ifn self isa asm.noop // how?
 		for i.bits in ._Const
 /			j.DebugCloseVar(.asmindex, i.log2)
+
+	return dbg
 
 
 function scdecl.DumpCls (|int|)
@@ -73,9 +75,14 @@ function SCDecl.DumpWierdness (|jbin| j)
 function Assembler.MarkCloseVar (|int| RegBits)
 	.RegDebugInfo &= ~RegBits
 	|| Nop = .last
-	if nop.Index|int| < 0 //oof
-	if (nop != asm.noop) or (nop isnt discard) or (nop isnt NewlyDeclared)
+	if nop.Index|int| <= 0 // oof
+	if nop isa asm.rfun // now what? rfst 0 seems better. easier to read/debug
+		|| v = regbits.log2
+		if 1<<v == regbits
+			
+	if !(nop isa asm.noop) or (nop isnt discard) or (nop isnt NewlyDeclared)
 		nop = nop.Msg.NOOP
+		
 	(nop is discard)
 	(nop is newlydeclared)
 	nop._Const |= RegBits
@@ -85,8 +92,8 @@ function Assembler.MarkCloseVar (|int| RegBits)
 function Assembler.MarkReopenVar (|int| RegBits)
 	.RegDebugInfo |= RegBits
 	|| Nop = .last
-	if nop.Index|int| < 0 //oof
-	if (nop != asm.noop) or (nop is discard) or (nop isnt NewlyDeclared)
+	if nop.Index|int| <= 0 // oof
+	if !(nop isa asm.noop) or (nop is discard) or (nop isnt NewlyDeclared)
 		nop = nop.Msg.NOOP
 	(nop isnt discard)
 	(nop is newlydeclared)

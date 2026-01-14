@@ -95,44 +95,19 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 			return .RefCountIncr(exp, prms, Obj)
 	
 		if fn == Compiler.RefDecr or fn == Compiler.RefEarlyDecr
+			if "JB_App__CWDSet".trap
+			|| fat = .RefCountDecr(exp, prms, obj)					// reopener can reopen it...
 			.CloseOneVar(nil, 1<<Obj.reg)							// close it properly.
-			return .RefCountDecr(exp, prms, obj)					// reopener can reopen it...
+			return fat
 	
 		if fn == Compiler.RefSafeDecr
 			return exp.rfun(ASMReg(), Obj)
 
 		debugger
 
-
-
-//function assembler.CloseEarlyMarkedRegs (|message| exp)
-//	opt norefcounts // for return / exit / etc
-//	// the thing is... we don't want to actually close the regs.
-//	// they will already be closed.
-//	// we want to UPDATE existing info, about the length of what where the regs are.
-//	// so how ? its like an end-marker really.
-//
-///	|| arg = exp.SCArg(nil)!
-//	|| R = arg.RegsToClear
-//	arg.RegsToClear = 0
-//	for B.bits in R
-//		.CloseOneVar(nil, B)
-
-
-// i think we'll just reopen it.
-// So... each reg will have its own jbin!
-//function assembler.MarkForEarlyClose (|message| exp, |asmreg| Obj)
-//	opt norefcounts
-///	|| arg = exp.SCArg(nil)!
-//	|| ToAdd = 1<<obj.reg
-//	if arg.RegsToClear & ToAdd // oof
-//	arg.RegsToClear |= ToAdd
-
-
-
 // dead-code stripping means this is better in ASM, than at c-level phase.
 function assembler.CanOptDecr (|asmreg| Obj, |&fatasm| last, |&fatasm|)
-	require (last isa asm.rfun)
+	require (last isa asm.rfun) // rfst 0?
 	require  !last.RegOnly(0)  and  !last.regonly(1)
 
 	|| upon = last.r2
@@ -180,7 +155,7 @@ function fatasm.IsDecr (|asmreg|)
 	
 
 function Assembler.DecrObj (|asmreg|)
-	|| fat = .last(asm.RFUN)
+	|| fat = .last(asm.RFUN) // rfst 0 is better?
 		|| upon = fat.isdecr
 			.nop(fat)
 			return upon
