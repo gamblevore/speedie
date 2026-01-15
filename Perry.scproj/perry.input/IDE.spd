@@ -759,6 +759,7 @@ So anything not 0 means "its OK"`
 		if ok != 1
 			return ok
 
+		|| IsNewlyOpened = !r._Document
 		|| s = r.DirFile.name
 		if s[] == '.'
 			s = r.name + "/" + s
@@ -769,7 +770,7 @@ So anything not 0 means "its OK"`
 		.filelist.select(r)
 		
 		if !g
-			.LoadErrors(true, false)
+			.LoadErrors(IsNewlyOpened, false)
 			if .editme.ShouldDisplayJeebox < textview.ProbablyJeebox
 				.ProductSep.Collapse
 		

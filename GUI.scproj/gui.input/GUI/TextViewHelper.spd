@@ -356,20 +356,20 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 	opt norefcounts
 	|| x = .DrawOneStartLine(d.text) 
 	|int| big = ._LineNumWidth
-		|| P = (x+big+font.width-1, y)
+		x += big * font.width
+		|| P = (x-(4+font.width), y)
 		|| TLine = d.tline
 		|| pr = d.prev
 		if !pr or (tline != pr.tline)
+			|| F = font.small!
 			while
 				|| c = TLine mod 10
 				TLine = (tline - c)/10
 				c += '0'
-				font.small!.DrawChar(c, Where, p, lc)
+				F.DrawChar(c, Where, p, lc)
 				p.x -= font.Width
 				loop tline
 
-		x += big * font.width
-	
 	|| A = .Alignment
 	if  A is right  and  A isnt left
 		|| m = d.text.Bounds.x * font.width+8
@@ -505,14 +505,10 @@ libinternal codepoint.ImproveDraw (|string| t, |int| pos, |codepoint|)
 
 function int.LineNumWidth (|int|)
 	opt norefcounts
-	|| l = self
-	if l < 100 // 2 min
-		return 2
-	if l < 1000
-		return 3
-	if l < 10000
-		return 4
-	return 5
+	rz = 2
+	while self >= 100
+		self /= 10
+		rz++
 
 
 function string.TextLineCount (|int|)

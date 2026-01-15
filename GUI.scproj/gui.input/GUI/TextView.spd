@@ -367,12 +367,16 @@ class TextView (GUIControl)
 		gui.touch
 		return true
 
+
 	libinternal TypingPlaceTry (|IntRange| result, |bool| insert, |textviewline| d)
 		opt norefcounts
 		if .TypingPlaceDirect(result)
 			.TypingPlaceChanged(insert, d)
 
+
 	libinternal TypingPlaceChanged (|bool| insert, |textviewline| d)
+		opt norefcounts
+		
 		if .hasfocus
 			GUI.selchanged
 		if !.IsCleared
