@@ -355,27 +355,24 @@ libinternal textview.DrawLighter (|image| Where, |int| y)
 libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
 	opt norefcounts
 	|| x = .DrawOneStartLine(d.text) 
-	|int| big		    = ._LineNumWidth
-		|| P		= (x-3, y)
-		|| shift	= big - d.tline.LineNumWidth
-		|byte[8]|   buff
-		for i in 8
-			buff[i] = '0'
-		d.tline.render(&Buff[shift], 8-shift)
-		if d.tline != (d.prev.tline?)
-			|| draw	= false
-			for i in 8
-				|| c = buff[i] #loop
-				if c != '0'
-					draw = true
-				if draw
-					font.small!.DrawChar(c, Where, p, lc)
-					p.x += font.Width
+	|int| big = ._LineNumWidth
+		|| P = (x+big+font.width-1, y)
+		|| TLine = d.tline
+		|| pr = d.prev
+		if !pr or (tline != pr.tline)
+			while
+				|| c = TLine mod 10
+				TLine = (tline - c)/10
+				c += '0'
+				font.small!.DrawChar(c, Where, p, lc)
+				p.x -= font.Width
+				loop tline
 
 		x += big * font.width
 	
-	if .Alignment is right and .Alignment isnt left
-		|| m = d.text.Bounds.x*font.width+8
+	|| A = .Alignment
+	if  A is right  and  A isnt left
+		|| m = d.text.Bounds.x * font.width+8
 		|| w = .width
 		x += w - m
 	return x

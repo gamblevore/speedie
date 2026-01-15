@@ -86,7 +86,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		p <~ "--noisy"
 	p <~ "--check"
 	
-	target debug and !cake and !exec
+	target debug and (!cake and !exec)
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
@@ -103,13 +103,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		|| spd = SpdProcess.spawn(spd_on_disk, p, mode, f.name)
 			spd.pico.name = .project.name
 			return spd
-	
 
-
-
-// how should a lib-wrapper be called by a cake file?
-// hmmmm. well... basically we don't have access to that
-// so it shouldn't be compilable.
 
 target debug
 	target exec
@@ -117,4 +111,8 @@ target debug
 	  else
 		cpp_libwrapper Speedie_Main (spdprocess.Thread)
 || SpdLibAlreadyInUse = false
+	
 
+// how should a lib-wrapper be called by a cake file?
+// hmmmm. well... basically we don't have access to that
+// so it shouldn't be compilable.
