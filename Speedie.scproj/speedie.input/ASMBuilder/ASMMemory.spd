@@ -91,7 +91,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 
 function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 	|| bs = base.fat$
-	if bs isa asm.gobj or asm.gtab
+	//if bs isa asm.gobj or asm.gtab
 	|| Before = bs isa asm.addk
 	require before or (bs isa asm.ADAK)
 	if base isnt temp
@@ -124,8 +124,8 @@ function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |u
 
 function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, ||)
 	opt norefcounts
-	|| f = base.fat
-		if f isa asm.gobj or asm.gtab // hmmm.
+	//|| f = base.fat
+		//if f isa asm.gobj or asm.gtab // hmmm.
 	
 	if base is AddrNoFiddle
 		return base asnt ASMReg.AddrNoFiddle

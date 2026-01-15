@@ -80,10 +80,6 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 		0
 
 	Missing = OrigDecls &~ .VDecls
-	if missing
-		.MarkReopenVar(Missing)
-		if !exp // oof? why?
-	
 	if !exp or !missing
 		return return
 	
@@ -126,11 +122,13 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	if IsReal
 		.vdecls = Result 
 		if .RegDebugInfo & v_bits
-			.MarkCloseVar(v_bits)
+			.MarkVarClosed(v_bits)
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 
 	|| fat = .regs.Setters[v]
+		// why do I do this?
+		// Clearstruct also does nothing if exp==nil
 		if exp
 			.SetRegister(v, nil, nil) // no reason to want to nop anything here.
 		return .ClearStruct(exp, .funcstart + fat, v)

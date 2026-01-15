@@ -3,7 +3,7 @@
 	Speedie Internals. By Theodore H. Smith...
 */
 
-
+	
 module SCRefs {
 
 linkage
@@ -359,7 +359,6 @@ function Destructable (|Message| Blocker, |Message?| arg, |Message| name)
 
 
 function ReturnTempMoveOut (|Message| Child, |Message| blocker)
-	// debugat 173
 	|| Temp = SCFunction.TempMoveOut( child, blocker ) // still need to ref it.
 	ReturnTempMoveOutSub(child, blocker, temp)
 

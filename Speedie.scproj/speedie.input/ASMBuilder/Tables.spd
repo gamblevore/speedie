@@ -395,7 +395,7 @@ function StatExpr (fn_asm)
 
 
 function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
-	// merge into argument!
+	// merge into argument?
 	opt NoRefCounts
 	|| ch = exp.first
 	if !ch
@@ -403,6 +403,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	|| v = .OpenVars
 	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
 
+	if "DeAllocTest".trap
 	while
 		if ch.func == @decl
 			rz = decl(self, ch)
@@ -412,13 +413,15 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 		loop ch and rz isnt exit
 	
 	if !Mask
-		exp = nil
+		if exp != .fn.sourcearg
+		.RegDebugInfo = 0		// Leave all debug info open
+		//exp = nil				// But still dealloc structs // wait, setting this to nil BLOCKS dealloc?
+		
 	rz = .CloseVars(v, exp, rz & Mask)
 	if rz is ExitFunction
 		.regs = Restore
 
 
-// merge?
 function Argument (fn_asm) // argument 
 	return ArgumentSub(self, exp)
 

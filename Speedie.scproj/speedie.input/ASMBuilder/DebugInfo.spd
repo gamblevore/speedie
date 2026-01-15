@@ -54,7 +54,6 @@ function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 		if .C_Array
 
 	j.AppendHInt(.typeinfo & DataTypeCode.possiblebits) // please be simple!
-	
 	.DumpWierdness(j)
 	
 	j[mark] = j.length - mark
@@ -72,31 +71,32 @@ function SCDecl.DumpWierdness (|jbin| j)
 		self = .Internal!
 	
 
-function Assembler.MarkCloseVar (|int| RegBits)
+function Assembler.MarkVarClosed (|int| RegBits)
+	if "DeRefTest".trap or "JB_App__CWDSet".trap
 	.RegDebugInfo &= ~RegBits
 	|| Nop = .last
 	if nop.Index|int| <= 0 // oof
-	if nop isa asm.rfun // now what? rfst 0 seems better. easier to read/debug
-		|| v = regbits.log2
-		if 1<<v == regbits
-			
-	if !(nop isa asm.noop) or (nop isnt discard) or (nop isnt NewlyDeclared)
-		nop = nop.Msg.NOOP
+	
+	if !.CanMarkDecr(regbits, nop)
+		if !(nop isa asm.noop) or (nop isnt discard) or (nop isnt NewlyDeclared)
+			nop = nop.Msg.NOOP
 		
 	(nop is discard)
 	(nop is newlydeclared)
 	nop._Const |= RegBits
 
 
+// I think RFUN should be changed...
+// decr should be set reg to 0.
+// rfun isnt very fun really. You wouldn't combine these things with incr:
+// incr + freeifdead (Well its not dead is it)
+// incr + decr (whats the point?)
+// So you could do like... incr OR freeifdead
+// thats all really.
 
-function Assembler.MarkReopenVar (|int| RegBits)
-	.RegDebugInfo |= RegBits
-	|| Nop = .last
-	if nop.Index|int| <= 0 // oof
-	if !(nop isa asm.noop) or (nop is discard) or (nop isnt NewlyDeclared)
-		nop = nop.Msg.NOOP
-	(nop isnt discard)
-	(nop is newlydeclared)
-	nop._Const |= RegBits
-
+function assembler.CanMarkDecr (|int| R, |&FATASM| decr, |bool|)
+	require  (decr isa asm.rfun)  and  !(R&(R-1))   // pow2
+	|| v = R.log2
+	if  decr.regOnly(0) == v  and  decr.regonly(1) == v  and  decr.regonly(2) == 0
+/		return true
 

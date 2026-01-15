@@ -44,7 +44,7 @@ function Assembler.RefCountIncr2 (|message| exp, |message| prms, |&FatASM|)
 	A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
 	|| B = .µ(prms.second!)
 	target debug: if b is ContainsAddr						// always reg
-	return exp.RFWR(a, b, 0, offset)
+	return exp.RFWR(A, B, 0, offset)
 
 
 function Assembler.RefCountIncr (|message| exp, |message| prms, |ASMReg| Obj,  |&FatASM|)
@@ -94,16 +94,19 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		if fn == Compiler.RefIncr
 			return .RefCountIncr(exp, prms, Obj)
 	
-		if fn == Compiler.RefDecr or fn == Compiler.RefEarlyDecr
-			if "JB_App__CWDSet".trap
-			|| fat = .RefCountDecr(exp, prms, obj)					// reopener can reopen it...
-			.CloseOneVar(nil, 1<<Obj.reg)							// close it properly.
+		if fn == Compiler.RefEarlyDecr
+			return exp.RFST(Obj, asmreg())								// reg to 0
+	
+		if fn == Compiler.RefDecr
+			|| fat = .RefCountDecr(exp, prms, obj)
+			.CloseOneVar(nil, 1<<Obj.reg)
 			return fat
 	
 		if fn == Compiler.RefSafeDecr
 			return exp.rfun(ASMReg(), Obj)
 
 		debugger
+
 
 // dead-code stripping means this is better in ASM, than at c-level phase.
 function assembler.CanOptDecr (|asmreg| Obj, |&fatasm| last, |&fatasm|)
@@ -174,8 +177,8 @@ function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
 
 function FinalDecrements (fn_asm)
 	|| D0 = .SafeDecr(dest)$
-	|| D1 = .decrObj
-	|| D2 = .decrObj
-	|| D3 = .decrObj
+	|| D1 = .DecrObj
+	|| D2 = .DecrObj
+	|| D3 = .DecrObj
 	return exp.RFRT(d0, d1, d2, d3) * asmreg.Exit
 

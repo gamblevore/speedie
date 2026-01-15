@@ -1187,16 +1187,13 @@ function message.AsmIndent (|message| top, |int|)
 
 function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
 	opt norefcounts
-//	out.msg(@tmp, "")			// separator. perry gets messed up
-								// need to do this more cleanly
-
 	|| bb = 0
 	|message| path 
 	|| lp = 0
 	|| top = fn.SourceArg
 	|| Count = 0
 	|| Size = 0
-
+	if fn == "dereftest"
 	
 	for fat.fat in fn
 		if fat.WillRenderFat

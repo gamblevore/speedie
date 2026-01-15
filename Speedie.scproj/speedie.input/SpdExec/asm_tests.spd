@@ -1,7 +1,7 @@
 
 
 
-function testrefs (|int| x)
+function TestRefs (|int| x)
 	|| m = Message()
 	if x
 		|| i = 0
@@ -13,6 +13,11 @@ function testrefs (|int| x)
 		// So we need to deref but not... close the var. Not yet anyhow.
 		return
 	(m)
+
+
+function DeAllocTest
+	|int[5]| Mints
+	"hi"
 	
 
 struct StructWithObj
