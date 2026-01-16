@@ -1855,7 +1855,6 @@ extern SCClass* SC_TypeWrapper;
 #define kSC__ASM_DUMB ((ASM)34)
 extern ASM_Encoder SC__ASM_Encoders[256];
 #define kSC__ASM_EQUL ((ASM)71)
-#define kSC__ASM_EROR ((ASM)0)
 #define kSC__ASM_FABS ((ASM)156)
 #define kSC__ASM_FADD ((ASM)112)
 #define kSC__ASM_FADK ((ASM)113)
@@ -1896,6 +1895,7 @@ extern ASM_Encoder SC__ASM_Forms[128];
 #define kSC__ASM_GOBJ ((ASM)94)
 #define kSC__ASM_GRAB ((ASM)38)
 #define kSC__ASM_GTAB ((ASM)95)
+#define kSC__ASM_HALT ((ASM)0)
 #define kSC__ASM_ICLM ((ASM)53)
 #define kSC__ASM_JBAN ((ASM)85)
 #define kSC__ASM_JBOR ((ASM)84)
@@ -2021,6 +2021,7 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_Exit ((ASMReg)1649267441664)
 #define kSC__Reg_ExitAtAll ((ASMReg)1099511627776)
 #define kSC__Reg_ExitFunction ((ASMReg)549755813888)
+#define kSC__Reg_FlagsToRemove ((ASMReg)34364194816)
 #define kSC__Reg_ForceInto ((ASMReg)8388608)
 #define kSC__Reg_GlobalMemory ((ASMReg)8589934592)
 #define kSC__Reg_Negate ((ASMReg)65536)
@@ -2637,6 +2638,8 @@ JB_String* JB_App__Conf(JB_String* Name);
 void JB_App__Crash(JB_String* Reason);
 
 ErrorInt JB_App__CWDSet(JB_String* Value);
+
+JB_String* JB_App__FileName();
 
 int JB_App__Init_();
 
@@ -6067,7 +6070,7 @@ ASMReg SC_Pac_CallFunc(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* F
 
 bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T);
 
-bool SC_Pac_CanMarkDecr(Assembler* Self, int R, FatASM* Decr);
+bool SC_Pac_CanMarkDecr(Assembler* Self, int R, FatASM* Fat);
 
 FatASM* SC_Pac_CanOptDecr(Assembler* Self, ASMReg Obj, FatASM* Last);
 
@@ -8361,6 +8364,8 @@ Message* JB_Msg_GoIntoInvisArg(Message* Self, Message* Tmp, int Pos);
 FatASM* SC_Msg_GRAB(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_GTAB(Message* Self, ASMReg R1, int Mode, int Add);
+
+FatASM* SC_Msg_HALT(Message* Self, ASMReg R1, ASMReg R2, int SigNum, int Continue);
 
 bool SC_Msg_HasActualCode(Message* Self);
 
@@ -10914,8 +10919,6 @@ inline bool JB_byte_IsLetter(uint /*byte*/ Self);
 
 inline JB_String* JB_config_AsString(Message* Self);
 
-inline JB_String* JB_App__FileName();
-
 inline Message* JB_Str_Msg(JB_String* Self);
 
 inline Array* JB_Str_OperatorDivide(JB_String* Self, uint /*byte*/ Sep);
@@ -11604,16 +11607,6 @@ inline JB_String* JB_config_AsString(Message* Self) {
 	return JB_LUB[0];
 }
 
-inline JB_String* JB_App__FileName() {
-	JB_String* _tmPf0 = JB_App__OrigPath();
-	JB_Incr(_tmPf0);
-	JB_String* _tmPf1 = JB_Str_Name(_tmPf0);
-	JB_Incr(_tmPf1);
-	JB_EarlyDecr(_tmPf0);
-	JB_SafeDecr(_tmPf1);
-	return _tmPf1;
-}
-
 inline Message* JB_Str_Msg(JB_String* Self) {
 	return JB_Syx_OperatorPlus(kJB_SyxStr, Self);
 }
@@ -11627,13 +11620,7 @@ inline Array* JB_Str_Words(JB_String* Self) {
 }
 
 inline Message* JB_int64_Msg(int64 Self) {
-	JB_String* _tmPf0 = JB_int64_Render(Self, nil);
-	JB_Incr(_tmPf0);
-	Message* _tmPf1 = JB_Syx_OperatorPlus(kJB_SyxNum, _tmPf0);
-	JB_Incr(_tmPf1);
-	JB_EarlyDecr(_tmPf0);
-	JB_SafeDecr(_tmPf1);
-	return _tmPf1;
+	return JB_Syx_OperatorPlus(kJB_SyxNum, JB_int64_Render(Self, nil));
 }
 
 inline Message* JB_int_Msg(int Self) {
