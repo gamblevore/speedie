@@ -52,6 +52,12 @@ function message.FNCX3 (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, 
 }
 
 
+function message.MARK (|&fatasm|) {
+	visible
+	return assembler.sh.RequestOp(asm.MARK, self)
+}
+
+
 function message.KNST2 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh

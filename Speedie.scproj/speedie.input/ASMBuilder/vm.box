@@ -402,6 +402,10 @@ POS 27
 		ForeignFunc(vm, Code, r, Op, Code64) 
 		Code += 2
 
+POS 255
+	MARK (U0)
+		0 // not a real instruction.
+
 // we could make the function call a relative address
 // like add a number to the current PC?
 // It doesn't work for libglobs, though. For now... just do prototypes
