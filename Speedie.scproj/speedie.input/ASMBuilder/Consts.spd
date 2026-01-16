@@ -42,7 +42,7 @@ extend Assembler
 		dest = .TempOnly(dest)		
 		if dest isnt Textual
 			|| K = .Last(asm.knst)
-				if (k.r0 == dest.reg) and (k is temp)
+				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		
 		|| fat = exp.KNST(dest, 0, 0, 0)

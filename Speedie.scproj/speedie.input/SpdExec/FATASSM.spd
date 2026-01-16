@@ -226,14 +226,14 @@ struct FatASM
 				debugger
 
 ////////////////////////////////////////////////////////////
-	function r0 (|ASMParam|): return .prms[0]
-	function r1 (|ASMParam|): return .prms[1]
-	function r2 (|ASMParam|): return .prms[2]
-	function r3 (|ASMParam|): return .prms[3]
+	function p0 (|ASMParam|): return .prms[0]
+	function p1 (|ASMParam|): return .prms[1]
+	function p2 (|ASMParam|): return .prms[2]
+	function p3 (|ASMParam|): return .prms[3]
 
-	function r1 (assigns:|uint|): .prms[1] = value
-	function r2 (assigns:|uint|): .prms[2] = value
-	function r3 (assigns:|uint|): .prms[3] = value
+	function p1 (assigns:|uint|): .prms[1] = value
+	function p2 (assigns:|uint|): .prms[2] = value
+	function p3 (assigns:|uint|): .prms[3] = value
 	
 	
 	
@@ -294,13 +294,13 @@ struct FatASM
 
 
 	function FuncPrms (|scfunction| fn, |uint64|)
-		|| A = .r2|uint64|
+		|| A = .p2|uint64|
 		|| B = 0|uint64|
 		if self isa asm.tail
 			B = A
-			A = .r1
+			A = .p1
 		  else
-			B = .r3
+			B = .p3
 			
 		|| R = A ||| (B << 32)
 		|| op = ._op
@@ -352,7 +352,7 @@ struct FatASM
 	
 	
 	function WillRenderFat (|bool|)
-		if (!.exists)  and  (.msg.func == @sheb)
+		if (.GuessSize == 0)  and  (.msg.func == @sheb)
 			return false
 		return true
 	
@@ -426,15 +426,12 @@ struct FatASM
 	function GuessSize (|int|)
 		// don't really know the size, as consts are awkward to guess
 		// and long-jumps might require more awkward encoding.
-		if .Exists
-			if ._op < 32
-				return 2 + (._op&1)
+		|| o = ._op
+		if (o != asm.noop and asm.mark)
+			if o < 32
+				return 2 + (o&1)
 			return 1
 	
-	
-	function Exists (|bool|)
-		return .op != asm.noop
-
 	
 	function TmpRender (|faststring| fs, |message| msg)
 		opt norefcounts
@@ -548,6 +545,8 @@ struct FatASM
 		|| o = .op|asm|
 		if o == asm.ret or asm.trap or asm.TAIL or asm.rfrt
 			return true
+		if o == asm.eror
+			return !.p0 and !.p1 and .p2
 		if o == asm.jump
 			return .jump < 0
 

@@ -18,6 +18,8 @@ function Assembler.FinishMost
 
 
 function fatasm.Nop_Encoder (Asm_encoder)
+// could I put the debug info into the nop-encoder?
+
 	return curr
 
 
@@ -73,9 +75,9 @@ function fatasm.RotateConst (|uint64| v, |bool|)
 
 	for i in 64
 		if v <= (12~bits)|uint64|
-			.r1 = i
-			.r2 = inv|int|
-			.r3 = v|uint|
+			.p1 = i
+			.p2 = inv|int|
+			.p3 = v|uint|
 			return true
 		v = v.rotl1
 

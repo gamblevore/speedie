@@ -50,8 +50,8 @@ function Assembler.RefCountIncr2 (|message| exp, |message| prms, |&FatASM|)
 function Assembler.RefCountIncr (|message| exp, |message| prms, |ASMReg| Obj,  |&FatASM|)
 	opt	NoRefCounts
 	|| Last = .last(asm.GOBJ)
-		if (Last.r0 iz Obj) and !Last.r1
-			Last.r2 = 1										// incring a gobj. Lets do it internally!
+		if (Last.p0 iz Obj) and !Last.p1
+			Last.p2 = 1										// incring a gobj. Lets do it internally!
 			return Last
 	|| fat = exp.rfun(asmreg(), asmreg(), Obj)
 	Fat._Outputs = 0
@@ -67,8 +67,8 @@ function Assembler.RefCountDecr (|message| exp, |message| prms, |ASMReg| Obj, |&
 				return nil
 			return ret
 
-		if (Last isa asm.GOBJ) and (Last.r0 iz Obj)  and  Last.r1
-			last.r2 = 0							// decring a global mem obj. Lets just NOT incr!
+		if (Last isa asm.GOBJ) and (Last.p0 iz Obj)  and  Last.p1
+			last.p2 = 0							// decring a global mem obj. Lets just NOT incr!
 			return nil
 	
 	return exp.RFUN(Obj, Obj)
@@ -113,7 +113,7 @@ function assembler.CanOptDecr (|asmreg| Obj, |&fatasm| last, |&fatasm|)
 	require (last isa asm.rfun) // rfst 0?
 	require  !last.RegOnly(0)  and  !last.regonly(1)
 
-	|| upon = last.r2
+	|| upon = last.p2
 	require (upon iz Obj)
 
 	|| uponfat = last.InputFat(2)
@@ -123,8 +123,8 @@ function assembler.CanOptDecr (|asmreg| Obj, |&fatasm| last, |&fatasm|)
 			return last + 1
 	
 	// safe-decr result of func that returns disowned.
-	last.r1 = upon
-	last.r2 = 0
+	last.p1 = upon
+	last.p2 = 0
 	return last
 
 
@@ -158,7 +158,7 @@ function fatasm.IsDecr (|asmreg|)
 	
 
 function Assembler.DecrObj (|asmreg|)
-	|| fat = .last(asm.RFUN) // rfst 0 is better?
+	|| fat = .last(asm.RFUN)
 		|| upon = fat.isdecr
 			.nop(fat)
 			return upon
@@ -168,7 +168,7 @@ function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
 	|| fat = .last(asm.RFUN)$
 	|| upon = (fat)(1)$
 
-	require !match or upon iz match
+	require !match  or  upon iz match
 
 	if !(fat)(0) and !(fat)(2)
 		.softnop(fat)

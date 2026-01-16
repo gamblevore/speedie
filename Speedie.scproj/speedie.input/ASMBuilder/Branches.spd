@@ -61,9 +61,10 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 	while C < S
 		#!ClearExits
 		|| op = C.Op
-		if op >= kContinue
-			C._op = ASM.Jump
-			if op == kContinue			// continue
+		|| k = c._const
+		if (op == asm.jump) and k >= kContinue
+			C._Const = 0
+			if k == kContinue			// continue
 				C.JumpTo(S)
 			  else       				// exit
 				C.JumpTo(A)
@@ -108,13 +109,13 @@ function WhileSub (|message| exp,  |asmreg|)
 function Exit			(fn_asm)
 	opt norefcounts
 	|| J = exp.jump											// request jump to exit
-	J._op = kexit
+	j._Const = kexit
 
 
 function Continue		(fn_asm)
 	opt norefcounts
 	|| J = exp.jump											// request jump to continue
-	J._op = kcontinue
+	J._Const = kcontinue
 
 
 function BackCond (|fatasm| start)
@@ -301,7 +302,7 @@ function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |A
 	|| nB = last.prms[3]
 	|| rA = start.asmreg(2)
 	|| rB = last.asmreg(2)
-	if !start.r1.Reg and !last.r1.reg and (ra iz rb)
+	if !start.p1.Reg and !last.p1.reg and (ra iz rb)
 		0
 	  else
 		ifn na.EqulInputsAreBothBool and nb.EqulInputsAreBothBool

@@ -86,7 +86,7 @@ function GlobAddrSub (|SCDecl?| D, |message| exp, |AsmReg| Dest, |int64| ExportP
 	rz = fat * dest
 	
 	|| Missing = ExportPos - Direct
-		check (fat.r1) (exp, "Lib too big!") // should never happen!
+		check (fat.p1) (exp, "Lib too big!") // should never happen!
 		if missing >= 4096
 			fat = exp.ADDB(dest, missing >> 12)
 			fat.const = Direct + ((missing >> 12) << 12)

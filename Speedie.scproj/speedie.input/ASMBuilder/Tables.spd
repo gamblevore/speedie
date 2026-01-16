@@ -156,7 +156,7 @@ function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
 	
 	|| ReturnType = .out.ReturnType
 	require l isa asm.fnc or asm.fnc3
-	require !l.r3							// no pExt (not too many params)
+	require !l.p3							// no pExt (not too many params)
 	require !returntype or l.RegOnly == rr	// returning same var, or nothing at all.
 
 	rz = .iscurr(l)							// This fnc must always flow into the return!
@@ -360,19 +360,15 @@ function Decl (fn_asm) // DeclareSub declare
 
 function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
 	|| After = .Last
-//	|| Added = 0
 	if Start > After // huh?
 	while Start <= After
-		(start isnt discard)
-		if start is ForceInto // huh?
-		(start isnt ForceInto)
-		if start == after
-			if start isa asm.noop // huh?
-			(Start is newlydeclared)
-			exit
+		if start isa asm.mark
+			if start == after // aaargh
+		  else
+			(start isnt discard)
 		Start++
-//		Added++
 	
+	(After is newlydeclared)
 	return Declared
 
 	
@@ -391,7 +387,7 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 
 function StatExpr (fn_asm)
 	opt norefcounts
-	return ArgumentSub(exp.first!, -1|asmreg|) // test default struct-passing (speedie adds a &)
+	return ArgumentSub(exp.first!, -1|asmreg|)
 
 
 function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)

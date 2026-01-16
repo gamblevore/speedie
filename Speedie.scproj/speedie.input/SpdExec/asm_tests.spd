@@ -16,8 +16,12 @@ function TestRefs (|int| x)
 
 
 function DeAllocTest
+	cpp_Part AAAA
 	|int[5]| Mints
 	"hi"
+	{
+		|int[7]| Mince 
+	}
 	
 
 struct StructWithObj

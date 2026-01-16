@@ -394,7 +394,7 @@ extend Assembler
 			require (xin is temp)
 		|| add2 = XY1.prms[2] + add		
 		if add2.CanStoreAsAddK
-			xy1.r2 = add2
+			xy1.p2 = add2
 			if Changed
 				.ReDest(xy1, xout)
 			return true

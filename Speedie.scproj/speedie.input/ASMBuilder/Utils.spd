@@ -99,6 +99,7 @@ function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|
 	opt norefcounts
 	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
 		ASMType.AllocBearStruct(-1, exp.FlatLast, v.asm, fat.RegOnly(1)<<4)
+		.SetRegister(v, nil, nil)
 	return true
 
 
@@ -126,12 +127,12 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
 
-	|| fat = .regs.Setters[v]
+	|| fat = .register(v)
 		// why do I do this?
 		// Clearstruct also does nothing if exp==nil
 		if exp
 			.SetRegister(v, nil, nil) // no reason to want to nop anything here.
-		return .ClearStruct(exp, .funcstart + fat, v)
+		return .ClearStruct(exp, fat, v)
 
 	return true
 

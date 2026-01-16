@@ -74,16 +74,16 @@ function SCDecl.DumpWierdness (|jbin| j)
 function Assembler.MarkVarClosed (|int| RegBits)
 	if "DeRefTest".trap or "JB_App__CWDSet".trap
 	.RegDebugInfo &= ~RegBits
-	|| Nop = .last
-	if nop.Index|int| <= 0 // oof
+	|| Mark = .last
+	if Mark.Index|int| <= 0 // oof
 	
-	if !.CanMarkDecr(regbits, nop)
-		if !(nop isa asm.noop) or (nop isnt discard) or (nop isnt NewlyDeclared)
-			nop = nop.Msg.NOOP
+	if !.CanMarkDecr(regbits, mark)
+		if !(mark isa asm.MARK) or (mark isnt discard) or (mark isnt NewlyDeclared)
+			mark = mark.Msg.MARK
 		
-	(nop is discard)
-	(nop is newlydeclared)
-	nop._Const |= RegBits
+	(mark is discard)
+	(mark is newlydeclared)
+	mark._Const |= RegBits
 
 
 // I think RFUN should be changed...
@@ -98,5 +98,5 @@ function assembler.CanMarkDecr (|int| R, |&FATASM| decr, |bool|)
 	require  (decr isa asm.rfun)  and  !(R&(R-1))   // pow2
 	|| v = R.log2
 	if  decr.regOnly(0) == v  and  decr.regonly(1) == v  and  decr.regonly(2) == 0
-/		return true
+		return true
 

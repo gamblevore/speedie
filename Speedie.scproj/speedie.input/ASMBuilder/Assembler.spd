@@ -347,13 +347,6 @@ struct Assembler
 		|| r = .Regs.Setters[i]
 			return .funcstart_ + r
 
-
-//	function ASMRegister (|int| i, |asmreg|)
-//		|| f = .Register(i)
-//			if .IsCurr(f)
-//				return f.info
-//		return i.asm
-
 	
 	function KnownValues (|int| changed, assigns:|bool|)
 		|| M = .regs.KnownMap
@@ -370,11 +363,13 @@ struct Assembler
 		|| start = .FuncStart_
 		if value
 			n = value - start
-		
+			
 		.KnownValues(changed) = value is Const
 		|| where = &sh.regs.Setters[changed]
 		|| oldi = where[]
 		where[] = n // set value
+		target debug
+			if .Register(changed) != value // huh?
 		
 		if oldi and (info is AllowNopDest)
 			|| old = start + oldi
