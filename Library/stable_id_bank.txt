@@ -704,8 +704,8 @@ GUI_Text_Match
 GUI_Text_MaxPartialVisibleLines
 GUI_Text_MaxVisibleLines
 GUI_Text_MaxWidthInChars
-GUI_Text_MessageAt
 GUI_Text_MessageAtSel
+GUI_Text_MessageWithin
 GUI_Text_MouseDown
 GUI_Text_MouseMove
 GUI_Text_MoveSelection
@@ -1252,6 +1252,7 @@ JB_FS_Flush
 JB_FS_FreeSize
 JB_FS_GetResult
 JB_FS_Last
+JB_FS_Length
 JB_FS_LengthSet
 JB_FS_LineIndent
 JB_FS_Mark
