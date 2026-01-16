@@ -9,7 +9,6 @@ class SCArg (SCNode)
 		cpp_part		Arg
 
 	|SCFunction?|	ParentFunc
-//	|asmreg|		Rejoin // what about using TmpMovedOutFor? its kinda similar?
 	|Message?|		TmpMovedOutFor
 	|bool|			IsClassArg
 	|bool|			IsStatementExpr
