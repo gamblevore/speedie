@@ -283,7 +283,7 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 	if ActuallyMakeTheVM
 		R = []
 		.NameList = r
-		R <~ (@thg+"EROR",  256)
+		R <~ (@thg+"HALT",  256)
 	.vm_FillPos(list, r)
 	.VM_NewInstructions(list, false, R)
 	.VM_NewInstructions(list, true, R)

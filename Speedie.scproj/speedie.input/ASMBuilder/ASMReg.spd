@@ -38,6 +38,7 @@ datatype ASMReg (uint64)
 		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit        = [ExitFunction, ExitAtAll]
 		SetAlways   = Textual ||| Set  // reuse const
+		FlagsToRemove = Const ||| NewlyDeclared ||| discard
 		// don't go above 47
 		Zero	    = Const   ||| 56 ||| param		// 56 == datatypecode.uint64
 

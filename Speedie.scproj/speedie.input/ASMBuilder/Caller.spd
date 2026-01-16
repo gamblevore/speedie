@@ -123,7 +123,7 @@ function SCFunction.HasCVersion (|bool|)
 
 
 function assembler.Killed (|message| exp, |fatasm| fat, |asmreg|)
-	fat = exp.EROR(nil, nil, 3)
+	fat = exp.HALT(nil, nil, 3)
 	fat.µRefCount++
 	return fat * asmreg.exit
 

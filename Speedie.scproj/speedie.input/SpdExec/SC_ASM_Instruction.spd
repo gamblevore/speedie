@@ -75,5 +75,5 @@ class Instruction
 			  else
 				debugger 
 			.OpDict["bra"] = .OpDict["jbor"]
-			.OpDict["halt"] = .OpDict["eror"]
+			.OpDict["eror"] = .OpDict["halt"]
 

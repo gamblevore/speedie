@@ -342,7 +342,7 @@ forms
 
 
 #!						 (((((STOP)))))
-/**/ EROR (HALT)
+/**/ HALT (HALT)
 		if (!VMFinish(r, Op)) goto EXIT;
 
 

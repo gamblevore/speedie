@@ -210,7 +210,7 @@ function Name (|string|)
 	disabled ".Filename (terminal) or .appname (gui package osx)"
 
 
-inline FileName (|string|)
+function FileName (|string|)
 	return .Path.Name
 
 

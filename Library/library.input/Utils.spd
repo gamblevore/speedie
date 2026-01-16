@@ -154,15 +154,19 @@ function message.LOC (|ivec2|)
 // that marks certain functions as "not worth" being in the lib... that inlining is better.
 
 inline int.Msg (|message|)
+//	opt norefcounts
 	return @num + .render
 
 inline string.Msg (|message|)
+	opt norefcounts
 	return @str + self
 	
 inline int64.Msg (|message|)
+	opt norefcounts
 	return @num + .Render
 
 inline bool.Msg (|message|)
+	opt norefcounts
 	return @thg + .string
 
 

@@ -80,10 +80,21 @@ function message.KNST3 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |i
 }
 
 
+function message.HALT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| SigNum = nil, |int| Continue = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.halt, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = SigNum
+	rz.numinput(3) = Continue
+}
+
+
 function message.EROR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| SigNum = nil, |int| Continue = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.EROR, self)
+	rz = a.RequestOp(asm.halt, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = SigNum

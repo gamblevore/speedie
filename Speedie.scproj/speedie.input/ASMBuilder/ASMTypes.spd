@@ -9,7 +9,7 @@ extend_module ASM {
 		MARK = 255
 		KNST2 = 4
 		KNST3 = 5
-		EROR = 0
+		HALT = 0
 		TRAP = 32
 		NOOP = 33
 		DUMB = 34

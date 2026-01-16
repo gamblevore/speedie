@@ -77,9 +77,13 @@ function Assembler.MarkVarClosed (|int| RegBits)
 	|| Mark = .last
 	if Mark.Index|int| <= 0 // oof
 	
-	if !.CanMarkDecr(regbits, mark)
-		if !(mark isa asm.MARK) or (mark isnt discard) or (mark isnt NewlyDeclared)
-			mark = mark.Msg.MARK
+	|| op = mark._Op
+	if (op == asm.rfun) and .CanMarkDecr(regbits, mark)
+		0
+	  elseif op == asm.ret or asm.RFRT
+		0
+	  elseif (op != asm.MARK) or (mark isnt discard) or (mark isnt NewlyDeclared)
+		mark = mark.Msg.MARK()
 		
 	(mark is discard)
 	(mark is newlydeclared)
@@ -94,9 +98,9 @@ function Assembler.MarkVarClosed (|int| RegBits)
 // So you could do like... incr OR freeifdead
 // thats all really.
 
-function assembler.CanMarkDecr (|int| R, |&FATASM| decr, |bool|)
-	require  (decr isa asm.rfun)  and  !(R&(R-1))   // pow2
+function assembler.CanMarkDecr (|int| R, |&FATASM| fat, |bool|)
+	require !(R&(R-1))   // pow2
 	|| v = R.log2
-	if  decr.regOnly(0) == v  and  decr.regonly(1) == v  and  decr.regonly(2) == 0
+	if  fat.regOnly(0) == v  and  fat.regonly(1) == v  and  fat.regonly(2) == 0
 		return true
 

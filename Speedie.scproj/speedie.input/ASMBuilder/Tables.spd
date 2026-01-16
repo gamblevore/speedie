@@ -352,28 +352,38 @@ function Decl (fn_asm) // DeclareSub declare
 	
 	|| ty = exp.fastdecl
 	.DeclReset(ty)
-	dest = .DeclareBody(exp.last!, ty)
 	|| Start = .curr
 	|| Declared = DeclSub(self, exp, dest, ty, exp.last!)
 	return MarkNewlyDeclared(self, Start, Declared)
 
 
 function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
-	|| After = .Last
-	if Start > After // huh?
-	while Start <= After
-		if start isa asm.mark
-			if start == after // aaargh
-		  else
-			(start isnt discard)
-		Start++
+	|| Last = .Last
+	if Start > Last // huh?
+	// the last reg might not be the one setting it though?
+	// for example, allo(-1) in statexprs
 	
-	(After is newlydeclared)
-	return Declared
+	|| DR = Declared.reg
+	if Last isa asm.mark // argh?
+	while Start <= Last
+		if Last.Output.Reg == DR
+			(Last is newlydeclared)
+			return declared
+		Last--
+	
+	// nothing matched?
+/	return Declared
 
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
 	opt norefcounts
+	if !dest
+		dest = .DeclareBody(exp, ty)
+	  else
+		dest.µType = ty.CalculateASMType
+		ty.WholeType = dest
+		
+	
 	(dest is NewlyDeclared)
 	.RegDebugInfo |= 1<<dest.reg
 	if ty.IsBareStruct or ty.IsCarray
@@ -387,7 +397,28 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 
 function StatExpr (fn_asm)
 	opt norefcounts
-	return ArgumentSub(exp.first!, -1|asmreg|)
+	exp = exp.first
+	|scdecl| Rejoined
+	|| ch = exp.last.first
+	if ch and dest is NewlyDeclared
+		Rejoined = ch.FastDecl
+		
+	ch = exp.first
+	|| v = .OpenVars
+	
+	while ch
+		if ch.func == @decl
+			|asmreg| Sent = nil
+			if ch.obj == Rejoined
+				debugger
+				sent = dest // yikes
+				
+			rz = decl(self, ch, sent)
+		  else
+			rz = .µ(ch, asmreg.discard)
+		ch++
+		
+	rz = .CloseVars(v, exp, rz)
 
 
 function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
@@ -402,7 +433,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	if "DeAllocTest".trap
 	while
 		if ch.func == @decl
-			rz = decl(self, ch)
+			rz = decl(self, ch, nil)
 		  else
 			rz = .µ(ch, asmreg.discard)
 		ch++

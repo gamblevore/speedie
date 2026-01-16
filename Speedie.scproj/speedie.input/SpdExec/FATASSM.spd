@@ -90,7 +90,7 @@ struct FatASM
 	operator mul (|asmreg| flags, |asmreg|)
 		cpp_part AsReg
 		
-		(flags isnt const)
+		(flags isnt FlagsToRemove)
 		flags = flags.FatIndex(.index)
 		.info = flags
 		return flags
@@ -545,7 +545,7 @@ struct FatASM
 		|| o = .op|asm|
 		if o == asm.ret or asm.trap or asm.TAIL or asm.rfrt
 			return true
-		if o == asm.eror
+		if o == asm.halt
 			return !.p0 and !.p1 and .p2
 		if o == asm.jump
 			return .jump < 0

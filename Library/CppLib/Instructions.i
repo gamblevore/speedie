@@ -1,4 +1,4 @@
-ı EROR:;
+ı HALT:;
 	if (!VMFinish(r, Op)) goto EXIT;
 ı TAIL:;
 	TailStack(vm, r, Code, Op);

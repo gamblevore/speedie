@@ -831,7 +831,7 @@ function InputFileAlways (|String| s,  |File|)
 
 function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
 	|| d = .AddGlobalConst(name, c)
-	d.IsLookupOnly = @num + value.render
+	d.IsLookupOnly = value.msg
 	d.numberconst = value
 
 
