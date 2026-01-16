@@ -397,6 +397,7 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 
 function StatExpr (fn_asm)
 	opt norefcounts
+//	return ArgumentSub(exp.first!, -1|asmreg|)
 	exp = exp.first
 	|scdecl| Rejoined
 	|| ch = exp.last.first
