@@ -162,6 +162,7 @@ struct Assembler
 		dest = .TempOnly(dest)
 		|| Where = orig • dest
 		(where is Const)
+		(where isnt containsaddr)
 		|| K = .NumToReg(exp, where, amount, orig.µtype)
 		return .Plus(exp, dest, Orig, K)
 	
@@ -567,8 +568,7 @@ struct Assembler
 			dest.TmpCheck
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if asmtrapper == -1
-			if stacksize > 20 // ugh
+			if asmtrapper == -1 or stacksize > 20 // ugh
 		  else
 			opt inline
 		

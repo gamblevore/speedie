@@ -404,8 +404,14 @@ extend Assembler
 		if dest is Const									// perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntPlus)
 		
-		|| swapped =  l isnt alternate  and  l.LeftScore < r.LeftScore
-			swap (l) (r) // a+b == b+a
+//		if asmtrapper == 819
+		|| swapped = false
+		if l isnt alternate
+			|| LS = l.LeftScore
+			|| RS = r.LeftScore
+			if LS < RS
+				swap (l) (r) // a+b == b+a
+				swapped = true
 	
 		if r.iszero // add or subtract zero
 			return l//.Assign(exp, dest, l)
@@ -475,7 +481,7 @@ extend Assembler
 				return dest
 		  else
 			if (r iz l)
-				return .zeros(exp, dest)
+				return .zeros(dest)
 		
 		if l.IsFloat
 			return .FloatPlus(exp, dest, l, r)
@@ -628,7 +634,7 @@ extend Assembler
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitXor)
 		if (l iz r)
-			return .Zeros(exp, dest)
+			return .Zeros(dest)
 		if l.iszero
 			return r
 		if r.iszero
@@ -698,7 +704,7 @@ extend Assembler
 		if .nopconst(l, -1)
 			return r
 		if k == 0
-			return .zeros(exp, dest)
+			return .zeros(dest)
 
 	function BitAnd (fn_opasm)
 		if dest is Const
@@ -731,8 +737,8 @@ extend Assembler
 			swap (l) (r)
 			clear = -clear
 		
-		if Clear and r.signed and !l.iszero
-			r = exp.ExpandBits(r, l.µtype) // wat a shame.
+		if Clear and r.signed and !l.IsBitCorrect
+			r = exp.ExpandBits(r, l.µtype)			// wat a shame.
 			clear = 0
 			
 		|| fat = exp.BAND(dest, L, R, Clear)
@@ -832,7 +838,7 @@ extend Assembler
 		down += Extra
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
-			return .zeros(exp, dest)
+			return .zeros(dest)
 
 		if down >= 64
 			down = 63
@@ -841,13 +847,16 @@ extend Assembler
 		if old isa asm.bflg
 			|| Merge = .MergeBFLG(exp, dest, src, up, down, old)
 				return Merge
-			
+		
 		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
 		return fat.Vectorise(dest, asm.QFLG)
 
 
-	function Zeros (|message| exp, |asmreg| dest, |asmreg|)
-		return .NumToReg(exp, dest, 0, dest.µtype)
+	function Zeros (|asmreg| Info, |asmreg|)
+		Info.reg = 0
+		(Info isnt temp)
+		(Info is Const)
+		return Info
 				
 	
 	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)

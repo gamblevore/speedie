@@ -679,6 +679,9 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 
 function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
 
+	if !dest.reg
+		(dest is const)				// in case its not been cleared.
+
 	ifn  dest.isint  and  amount.fits(6)
 		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount, glob)
 
@@ -687,9 +690,10 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob, exp)
 	
 	|| fat = exp.CNTC(dest, Addr, offset, amount, bc)
-	fat.µRefCount++			// memory alteration!
+	fat.µRefCount++					// memory alteration!
+	(dest is set)
 	if !dest.reg
-		fat._Outputs &= ~1 // clear output
+		fat._Outputs &= ~1			// clear output
 	
 	if mode & IncrAfter
 		if 0: exp.CNTD

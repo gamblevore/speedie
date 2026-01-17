@@ -37,6 +37,11 @@ struct FatASM
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat
 	
+	function IsBitCorrect (|bool|)
+		if self is Const
+			return true
+		return .IsRead
+	
 	function IsRead (|bool|)
 		|| op = .op
 		return op >= asm.RD1U and op <= asm.RD16 

@@ -61,6 +61,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
+	opt norefcounts
 	.ASMReach(fn)
 	|| vd = .VDecls
 	|| v = vd.log2					// we can't use .declareme, .log2 is used to protect the vars. 
@@ -75,7 +76,9 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 		if .state.return
 			v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
 	dest.reg = v
-	return fn.ASMReturn(dest).ReallySimplify
+	
+	|| ty = fn.ASMReturn(dest)
+	return ty.ReallySimplify
 
 
 function RegClear (|message| exp, |&fatasm| C, |int| i)
@@ -154,9 +157,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		fn = dcl.Type.FuncProto						#expect (exp)
 
 	dest = .CallFunc(exp, dest, fn)
-	if !fn.ASMReturn
-		(dest is Const)
-	
 	|| Start = .curr
 	++.CurrFuncGrab
 	

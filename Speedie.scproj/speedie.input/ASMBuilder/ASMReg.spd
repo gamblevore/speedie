@@ -103,10 +103,6 @@ datatype ASMReg (uint64)
 	function IsZero (|bool|)
 		return  (self is Const) and (.const == 0)
 	
-	function IsRead (|bool|)
-		|| f = .fat
-			return f.isread
-	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
 	
@@ -184,6 +180,14 @@ datatype ASMReg (uint64)
 		opt inline
 		return self|datatypecode|.isint
 
+	function IsBitCorrect (|bool|)
+		if self is Const
+			return true
+		if .reg == 0 // what?
+			return true
+		|| f = .fat
+			return f.IsRead
+		
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
 		

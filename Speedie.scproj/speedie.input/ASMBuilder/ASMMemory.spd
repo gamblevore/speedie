@@ -132,6 +132,7 @@ function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBi
 	|uint| maximum = (1 << maxbits) - 1
 	|int64| LostBytes = 0
 	
+	// is addk handled in memopt?
 	if base is GlobalMemory
 		expect (glob)
 		if (glob is global) or (glob isnt property)			// not a property on a global struct

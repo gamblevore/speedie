@@ -25,11 +25,9 @@ extend Assembler
 
 
 	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |fatasm| vget, |asmreg|)
-		|| v = (1,1,1,1)
-		v.x++
 		if mode & ASMType.IncrAfter
 			rz = .Assign(exp, .temponly(dest), Src)
-		
+//		if asmtrapper >= 5984
 		if src.isfloat or vget.RegOnly(2)
 			|| tmp = .AddToReg(exp, nil, src, value)			// f[1]++ --> x = f[1], x++, f[1] = x
 /			exp.VSET(src, tmp, vget.asmreg(2), vget.prms[3])

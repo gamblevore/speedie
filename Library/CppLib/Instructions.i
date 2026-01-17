@@ -306,8 +306,7 @@
 ı QCLM:;
 	iv1 = JB_ivec4_ClampVec(iv2, iv3, iv4);
 ı QINC:;
-	i1 = iv2[VecInc_partu] + VecInc_Amounti;
-	iv2[VecInc_partu] = i1;
+	QInc(r, Op);
 ı QFLG:;
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
 ı QFLS:;

@@ -25,7 +25,8 @@ function message.AddOrSubInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |
 			if l isnt Alternate
 				return .ADDM(dest, L, R, sh)
 			return .SUBM(dest, L, R, sh)
-		if !l.IsRead
+
+		if !l.IsBitCorrect
 			l = .ExpandBits(L, r.µtype)
 			if subtract
 				problem (self, "Subtraction upon smaller type, by a bigger one.")

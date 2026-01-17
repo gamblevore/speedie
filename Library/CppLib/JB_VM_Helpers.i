@@ -693,3 +693,13 @@ AlwaysInline ivec4 QMin (ivec4 A, ivec4 B) {
 		std::min(A[3], B[3])
 	};
 }
+
+AlwaysInline void QInc (VMRegister* r, ASM Op) {
+	int i = VecInc_partu;
+	auto V = iv2;
+	auto N = V[i] + VecInc_Amounti;
+	V[i] = N;
+	if (n1)
+		i1 = N;
+}
+

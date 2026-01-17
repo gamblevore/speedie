@@ -758,8 +758,7 @@ POS 5
 /**/ QCLM (U4)
 		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
 /**/ QINC  (VecInc)
-		i1 = iv2[VecInc_partu] + VecInc_Amounti
-		iv2[VecInc_partu] = i1
+		QInc(r, Op)
 
 
 

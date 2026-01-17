@@ -45,19 +45,17 @@ extend Assembler
 				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		
-		|| fat = exp.KNST(dest, 0, 0, 0)
+		|| fat = exp.KNST(dest)
 		return fat.ConstFill(dest, v)
-		
+
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
-		if K  // didn't we remove into as a param?
+		if reg is ContainsAddr
+/			(reg isnt containsaddr) // hmmm never should happen.
+		if K
 			return .LoadNumber(exp, K, srctype.specialreg, Reg)
-		
-		reg.reg = 0
-		(reg isnt temp)
-		(reg is Const)
 		reg.µType = SrcType
-		return reg
+		return .Zeros(reg)
 	
 	
 	function TextConst (|Message| List,  |message| Orig,  |bool|)
@@ -70,6 +68,7 @@ extend Assembler
 		|| fat = src.fat
 			fat.ConstFinish
 		return true
+	
 	
 	
 function message.ASMConst (|uint64|) 
