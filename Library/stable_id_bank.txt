@@ -1005,6 +1005,7 @@ JB_App__Created
 JB_App__DocumentOpened
 JB_App__Env
 JB_App__ErrorNumber
+JB_App__FileName
 JB_App__GUIMode
 JB_App__GetChar
 JB_App__ID
