@@ -2132,14 +2132,14 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__CL1_High ((ControlPoint)2)
 #define kJB__CL1_Length ((ControlPoint)10)
 #define kJB__CL1_Low ((ControlPoint)0)
-#define kJB__TC__voidptr ((DataTypeCode)112)
+#define kJB__TC__voidptr ((DataTypeCode)624)
 #define kJB__TC_bool ((DataTypeCode)256)
 #define kJB__TC_byte ((DataTypeCode)72)
 #define kJB__TC_Byte2 ((DataTypeCode)73)
 #define kJB__TC_Byte3 ((DataTypeCode)74)
 #define kJB__TC_Byte4 ((DataTypeCode)75)
 #define kJB__TC_char ((DataTypeCode)8)
-#define kJB__TC_cstring ((DataTypeCode)112)
+#define kJB__TC_cstring ((DataTypeCode)624)
 #define kJB__TC_Double ((DataTypeCode)184)
 #define kJB__TC_f16 ((DataTypeCode)152)
 #define kJB__TC_f64 ((DataTypeCode)184)
@@ -4708,7 +4708,7 @@ ASMReg SC_Reg_HaveAddr(ASMReg Self);
 
 ASMReg SC_Reg_incr(ASMReg Self);
 
-bool SC_Reg_IsRead(ASMReg Self);
+bool SC_Reg_IsBitCorrect(ASMReg Self);
 
 bool SC_Reg_IsVec(ASMReg Self);
 
@@ -6426,7 +6426,7 @@ ASMReg SC_Pac_While(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp);
 
-ASMReg SC_Pac_Zeros(Assembler* Self, Message* Exp, ASMReg Dest);
+ASMReg SC_Pac_Zeros(Assembler* Self, ASMReg Info);
 
 ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest);
 
