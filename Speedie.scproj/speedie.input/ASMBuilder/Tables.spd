@@ -748,9 +748,11 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	if src is ContainsAddr
 		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
-	|| fat = src.fat
-	if fat isa asm.VGET
-		return .IncrVectorPart(p, dest, src, amount, mode, fat)
+	if src is temp // x[1]++
+		|| fat = src.fat
+		if fat isa asm.VGET
+			return .IncrVectorPart(p, dest, src, amount, mode)
+
 	NotTemp(self, src, p)
 		
 	if mode & IncrAfter

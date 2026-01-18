@@ -711,9 +711,9 @@ POS 5
 
 #!						(((((Vectors)))))
 /**/ VGET (VecGet)
-		i1 = iv2[n3+u4]
+		i1 = iv2[u3+n4]
 /**/ VSET (VecSet)
-		iv1[n3+u4] = i2
+		iv1[u3+n4] = i2
 /**/ VBLD (VecBuild)
 		v1 = VBuild(r, Op)
 /**/ VSWZ (VecSwizzle)

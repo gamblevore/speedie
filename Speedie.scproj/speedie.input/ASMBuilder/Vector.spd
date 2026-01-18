@@ -24,21 +24,34 @@ extend Assembler
 		return exp.VSET(base, dest, vara, k) * base
 
 
-	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |fatasm| vget, |asmreg|)
-		if mode & ASMType.IncrAfter
-			rz = .Assign(exp, .temponly(dest), Src)
-//		if asmtrapper >= 5984
-		if src.isfloat or vget.RegOnly(2)
-			|| tmp = .AddToReg(exp, nil, src, value)			// f[1]++ --> x = f[1], x++, f[1] = x
-/			exp.VSET(src, tmp, vget.asmreg(2), vget.prms[3])
-			return dest
+	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |asmreg|)
+		|AsmReg| OldValue
+		if (dest isnt discard) and mode & ASMType.IncrAfter		// x = S[1]++
+			OldValue = .Assign(exp, .temponly(dest), Src)
+
+		|| vget = src.fat!
+		|| VReg = vget.asmreg(2)
+		|| VecIndex = vget.prms[3]
+		if src.isfloat or vreg.reg
+			|| NewValue = .AddToReg(exp, nil, src, value)		// S[1]++  -->  x = S[1], x++, S[1] = x
+/			exp.VSET(src, NewValue, vreg, VecIndex)
+			if dest is Discard
+				return dest
+			if mode & ASMType.IncrAfter
+				return OldValue
+			return NewValue
 		
-		|| v2 = vget.prms[2]
+		if dest is Discard
+			dest = .zeros(dest)
+
 		src = vget.asmreg(1)
-		.softnop(vget)
-		dest = exp.QINC(dest, src, v2, value) * dest
-		ifn mode & asmtype.incrafter
-			rz = dest
+		.SoftNop(vget)
+		|| NewValue = exp.QINC(dest, src, VecIndex, value) * dest
+		if dest is Discard
+			return dest
+		if mode & asmtype.incrafter
+			return OldValue
+		return NewValue
 		
 
 	function VectorLoad (fn_asm)
