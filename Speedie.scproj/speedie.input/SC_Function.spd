@@ -1726,7 +1726,7 @@ function Tran_Return (TranFunc)  // exitter
 
  // this is where an "if" can become an exitter
 	node.LastInBlock(SCBlockage.Return)
-	node.CheckNotInStateExpr(fn.SourceArg)
+	node.CheckNotInStatExpr(fn.SourceArg)
 	
 
 

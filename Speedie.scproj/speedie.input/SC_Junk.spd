@@ -55,9 +55,7 @@ class __junktest_6__
 	module
 		function AbcVis (|~int|)
 			visible
-			|| x = ({|| y = "a", rejoin y})
-//	setter Abc (|int|)
-//		if value == 1
+			|| x = ({|| y = "a", rejoin "x"})
 
 
 

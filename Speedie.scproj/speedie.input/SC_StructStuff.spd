@@ -24,7 +24,7 @@ function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
 			typeofexpr(rel, name_space)
 
 
-function message.CheckNotInStateExpr (|message| top)
+function message.CheckNotInStatExpr (|message| top)
 	opt norefcounts
 	|| node = self
 	while node and node != top

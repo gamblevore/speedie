@@ -82,21 +82,12 @@ function Assembler.MarkVarClosed (|int| RegBits)
 		0
 	  elseif op == asm.ret or asm.RFRT
 		0
-	  elseif (op != asm.MARK) or (mark isnt discard) or (mark isnt NewlyDeclared)
+	  elseif op != asm.MARK
 		mark = mark.Msg.MARK()
 		
-	(mark is discard)
 	(mark is newlydeclared)
-	mark._Const |= RegBits
+	mark._Const |= (RegBits|uint64|<<32)
 
-
-// I think RFUN should be changed...
-// decr should be set reg to 0.
-// rfun isnt very fun really. You wouldn't combine these things with incr:
-// incr + freeifdead (Well its not dead is it)
-// incr + decr (whats the point?)
-// So you could do like... incr OR freeifdead
-// thats all really.
 
 function assembler.CanMarkDecr (|int| R, |&FATASM| fat, |bool|)
 	require !(R&(R-1))   // pow2

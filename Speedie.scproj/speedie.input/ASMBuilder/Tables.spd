@@ -358,20 +358,25 @@ function Decl (fn_asm) // DeclareSub declare
 
 
 function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
+	if "DeRefTest".trap or "JB_App__CWDSet".trap
 	|| Last = .Last
 	if Start > Last // huh?
 	// the last reg might not be the one setting it though?
 	// for example, allo(-1) in statexprs
 	
 	|| DR = Declared.reg
-	if Last isa asm.mark // argh?
 	while Start <= Last
 		if Last.Output.Reg == DR
-			(Last is newlydeclared)
+/			(Last is newlydeclared)
 			return declared
 		Last--
+
+/	last = .last
+	ifn last isa asm.mark
+		last = last.msg.mark()
+		(last is newlydeclared)
 	
-	// nothing matched?
+	last._Const |= 1<<DR
 /	return Declared
 
 	
@@ -397,26 +402,24 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 
 function StatExpr (fn_asm)
 	opt norefcounts
-//	return ArgumentSub(exp.first!, -1|asmreg|)
 	exp = exp.first
 	|scdecl| Rejoined
 	|| ch = exp.last.first
 	if ch and dest is NewlyDeclared
 		Rejoined = ch.FastDecl
+		if rejoined isnt body
+			rejoined = nil
 		
 	ch = exp.first
 	|| v = .OpenVars
 	
 	while ch
 		if ch.func == @decl
-			|asmreg| Sent = nil
-			if ch.obj == Rejoined
-				debugger
-				sent = dest // yikes
-				
+			|| Sent = (dest, nil)(ch.obj == Rejoined)
 			rz = decl(self, ch, sent)
 		  else
-			rz = .µ(ch, asmreg.discard)
+			|| Sent = (dest, asmreg.discard)(ch.islast)
+			rz = .µ(ch, Sent)
 		ch++
 		
 	rz = .CloseVars(v, exp, rz)
@@ -748,7 +751,7 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	if src is ContainsAddr
 		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
-	if src is temp // x[1]++
+	if src is temp // x[1]++,  // y = x[1], y++, x[1] = y
 		|| fat = src.fat
 		if fat isa asm.VGET
 			return .IncrVectorPart(p, dest, src, amount, mode)
