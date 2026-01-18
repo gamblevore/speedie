@@ -358,7 +358,7 @@ function Decl (fn_asm) // DeclareSub declare
 
 
 function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
-	if "DeRefTest".trap or "JB_App__CWDSet".trap
+	if "DeRefTest".trap
 	|| Last = .Last
 	if Start > Last // huh?
 	// the last reg might not be the one setting it though?
@@ -367,17 +367,17 @@ function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declare
 	|| DR = Declared.reg
 	while Start <= Last
 		if Last.Output.Reg == DR
-/			(Last is newlydeclared)
+			(Last is newlydeclared)
 			return declared
 		Last--
 
-/	last = .last
+	last = .last
 	ifn last isa asm.mark
 		last = last.msg.mark()
 		(last is newlydeclared)
 	
 	last._Const |= 1<<DR
-/	return Declared
+	return Declared
 
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
@@ -555,7 +555,7 @@ function Thg (fn_asm)
 	target debug
 		|| reg = thg.reg
 		if (reg-1)|uint| >= 31								// what?
-			if (!reg) and (thg is Const or discard)
+			if (!reg) and (thg is Const or discard or set)
 				return thg
 			error (exp, "Register out of bounds")
 	return thg										// Its still ok.   nil/false
@@ -622,18 +622,19 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
-
+	
 	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
 		|| addr = .GlobAddr(d, exp, dest)$ 
 		addr.µtype = d.mu.DataType
 		return addr.HaveAddr
-
-	//  Don't pass dest, if we are setting.  It would overwrite the input.
-	// what about reading? well... it should go away by the end anyhow? its just a temp?
-	|| addr = dest * (dest isnt set)	
-	addr = .GlobAddr(d, exp, nil)$ 
+	
+	|asmreg| addr
+	if dest isnt set // read
+		addr = dest
+	addr = .GlobAddr(d, exp, addr)$ 
 	dest.µtype = d.mu.DataType
 	(dest isnt ContainsAddr)
+
 	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
 

@@ -161,19 +161,17 @@ function Read (|| dest,  |message| exp,  || Ptr,  || VarAdd,  |scdecl| ReadDecl,
 function Write (|| Value,  |message| exp,  || Ptr,  || VarAdd,  |scdecl| DestDecl,  |int| index=0, |&fatasm|)
 	opt inline
 	(Value is set)
-	(Value is discard)
 	return .ReadOrWriteSub(Value, exp, ptr, VarAdd, DestDecl, index)
 
 
 function ReadOrWrite (|| dest,  |message| exp,  || base,  || VarAdd,  |scdecl| Ty,  |int| index=0, ||)
-	if dest is set					  // kludge to remove
-		(dest is discard)			  // make compiler happy
-	  else
+	if dest isnt set
 		dest = .TempTyped(exp, dest)
 	(dest isnt Const)
 	|| fat = .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index)
 	if dest is set
 		dest.reg = 0
+		(dest is const)
 	return fat*dest
 
 
