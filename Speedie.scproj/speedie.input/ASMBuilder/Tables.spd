@@ -354,28 +354,7 @@ function Decl (fn_asm) // DeclareSub declare
 	.DeclReset(ty)
 	|| Start = .curr
 	|| Declared = DeclSub(self, exp, dest, ty, exp.last!)
-	return MarkNewlyDeclared(self, Start, Declared)
-
-
-function MarkNewlyDeclared (|&assembler| self, |!&FatASM| Start, |ASMReg| Declared, |ASMReg|)
-	|| Last = .Last
-	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
-		start -= .iscurr(start-1)|int|		// and it gets replaced into a .gobj
-	
-	|| DR = Declared.reg
-	while Start <= Last
-		if Last.Output.Reg == DR
-			(Last is newlydeclared)
-			return declared
-		Last--
-
-	last = .last
-	ifn last isa asm.mark
-		last = last.msg.mark()
-		(last is newlydeclared)
-	
-	last._Const |= 1<<DR
-	return Declared
+	return .MarkVarOpen(Start, Declared)
 
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
@@ -386,7 +365,6 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 		dest.µType = ty.CalculateASMType
 		ty.WholeType = dest
 		
-	
 	(dest is NewlyDeclared)
 	.RegDebugInfo |= 1<<dest.reg
 	if ty.IsBareStruct or ty.IsCarray

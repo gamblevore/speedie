@@ -1,33 +1,29 @@
 
-// Never marking early-closes as closing a var is the way
-// Otherwise, I have to mark some early-close before return, as "not valid after x-instructions"
+// length, pos, reg, name, class, type
 
-// pos, reg, name, class, type
+// OK... so what is the issue.
+// We need the position of the actual baked-ASM.
+// we can't pregenerate, right?
+// but its easier to generate alongwith the fats.
+// this way, any optimisations don't destroy the output!
+// well... baking comes from the fats.
+// OK... so we get this by reading the fats
+// meaning, all the dbginfo needs to stored on the fats
+// honestly, the onyl awkwrd one is the type.
+// lets... store that in the actual... mark thing.
+// lets assume one var open per-instruction only.
+// but multiple can close. Easy?
+// it just seems like we need to store the scdecl on the actual fat somehow.
+// but how? that or PREdump it... perhaps into the prms?
+
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
-	debugger
+	|| Mark = .Length
+/	self <~ '\0'			// for speed
 	.AppendHInt(pos)
-	self <~ '\1'
-	self <~ '\0'
 	.AppendHInt(Reg)
-
-
-function FATASM.DumpDecl (|&jbin| Dbg, |&jbin|)
-	opt norefcounts
-	|| j = Assembler.DebugDecls!
-	if .GuessSize
-/		.msg.FastDecl.DumpDecl(j, .asmindex)
-	  elseif self is Discard
-		ifn self isa asm.noop // how?
-		for i.bits in ._Const
-/			j.DebugCloseVar(.asmindex, i.log2)
-
-	return dbg
-
-
-function scdecl.DumpCls (|int|)
-	if .IsNormalObject or .IsBareStruct
-		return (.type.tableid<<1) + .IsNormalObject
+	self <~ '\0'			// no name means we destroy the reg.
+	self[mark] = .length - mark
 
 
 function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
@@ -38,12 +34,11 @@ function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 
 	|| Mark = j.Length
 	j <~ '\0' // for speed
-	j.AppendShort(pos)
-	j.AppendShort(0) // finish
+	j.AppendHInt(pos)
+	j.AppendHInt(Reg)
 	j <~ .name
 	j <~ '\0'
-	j.AppendHInt(Reg)
-	j.AppendHInt(.dumpcls)
+	j.AppendHInt(.DumpCls)
 	
 	if .Type == TypeByte
 		debugat
@@ -59,39 +54,74 @@ function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 	j[mark] = j.length - mark
 
 
+function FATASM.FatDumpDecl
+	opt norefcounts
+	|| j = Assembler.DebugDecls!
+	|| Closes = ._Const>>32
+	for i.bits in Closes
+/		j.DebugCloseVar(.asmindex, i.log2)
+	
+	|| Opens = ._Const & 32~bits // shouldn't open more than 1? i hope not?
+	
+	ifn self isa asm.mark
+/		.msg.FastDecl.DumpDecl(j, .asmindex)
+
+
+function scdecl.DumpCls (|int|)
+	if .IsNormalObject or .IsBareStruct
+		return (.type.tableid<<1) + .IsNormalObject
+
+
 function SCDecl.DumpWierdness (|jbin| j)
 	opt norefcounts
 	while
 		|| Wierdness = ((self is reference) << 1)  |||  (.pointercount > 0)
 		Wierdness |= .C_Array<<2
-		if !Wierdness
-			j.AppendHInt(0)
-			exit
 		j.AppendHInt(Wierdness)
+		loop Wierdness
 		self = .Internal!
 	
 
+function FatASM.CanCloseRegs (|int| R, |bool|)
+	if .Index|int| <= 0 // oof
+	|| op = ._Op
+	if op == asm.ret or asm.RFRT or asm.MARK
+		return true
+	if (op == asm.rfun) and (R&(R-1) == 0)
+		|| v = R.log2
+		if  .RegOnly(0) == v  and  .regonly(1) == v  and  .regonly(2) == 0
+			return true
+	
+	
 function Assembler.MarkVarClosed (|int| RegBits)
 	if "DeRefTest".trap or "JB_App__CWDSet".trap
 	.RegDebugInfo &= ~RegBits
 	|| Mark = .last
-	if Mark.Index|int| <= 0 // oof
-	
-	|| op = mark._Op
-	if (op == asm.rfun) and .CanMarkDecr(regbits, mark)
-		0
-	  elseif op == asm.ret or asm.RFRT
-		0
-	  elseif op != asm.MARK
+	if !mark.CanCloseRegs(RegBits)
 		mark = mark.Msg.MARK()
+		mark.µrefcount = 1
 		
-	(mark is newlydeclared)
+	(mark is NewlyDeclared)
 	mark._Const |= (RegBits|uint64|<<32)
 
 
-function assembler.CanMarkDecr (|int| R, |&FATASM| fat, |bool|)
-	require !(R&(R-1))   // pow2
-	|| v = R.log2
-	if  fat.regOnly(0) == v  and  fat.regonly(1) == v  and  fat.regonly(2) == 0
-		return true
+function assembler.MarkVarOpen (|!&FatASM| Start, |ASMReg| Declared, |ASMReg|)
+	|| Last = .Last
+	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
+		start -= .iscurr(start-1)|int|		// and it gets replaced into a .gobj
+	
+	|| DR = Declared.reg
+	while Start <= Last
+		if Last.Output.Reg == DR
+			(Last is newlydeclared)
+			return declared
+		Last--
 
+	last = .last
+	ifn last isa asm.mark
+		last = last.msg.mark()
+		last.µrefcount = 1
+		(last is newlydeclared)
+	
+	last._Const |= 1<<DR
+	return Declared
