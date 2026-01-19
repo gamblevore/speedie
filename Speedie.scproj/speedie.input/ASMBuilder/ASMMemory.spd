@@ -57,7 +57,6 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		base = .MemOffsetFix(Base, byte_shift, index, 7, Decl, exp)
 	
 	|| pinc = .MemOpt(base, index, byte_shift)
-	
 	if (!pinc) and (dest isnt set) and (Byte_Shift == 3) and (!varadd.reg)
 		|| bs = base.fat
 		if bs isa asm.gtab

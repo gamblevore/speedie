@@ -1,5 +1,45 @@
 
 
+function @archonpurger.AAAAAA (|scdecl| dcl, |nilcheckmode| Test,  |&int| x)
+	visible
+	|| i = 123
+	x[] = i
+	|| j = .t.SetNilness(dcl, Test)
+	
+/*
+function AAAAAA (|scdecl| dcl, |nilcheckmode| Test, |&int| x)
+	#!visible
+
+	|| i = 123
+	x[0] = i
+	|| Y = &self.T
+	|| j = SC_nil_SetNilness(y, dcl, Test)
+	|| k = SC_nil_SetNilness(&self.T, dcl, test)
+
+knst: r4                  /# 123 #/           
+WR4U: r4, r3, r0, 1, 0                        
+GTAB: r5, 0, 9520         /# 9520 #/     /* adasda */      
+GOBJ: r7, 0, 0, 76160                         
+RD1U: t31, r1, r0, 51, 0                      
+FNC:  r8, 2045, (r7, r31, r2)                 
+BFLG: r6, r2, 0, 0, 0                         
+GOBJ: r9, 0, 0, 76160                         
+MARK:                                         
+RD1U: t31, r1, r0, 51, 0                      
+FNC:  r10, 2045, (r9, r31, r2)                
+BFLG: r7, r2, 0, 0, 0                         
+*/
+
+struct StructWithObj
+	|object| A
+	|object| B
+
+
+
+module ASMExamples {
+target cake { 
+|int| Glob
+|int| Bolg
 
 function TestRefs (|int| x)
 	|| m = ({|| i = 123, rejoin Message()})
@@ -17,21 +57,12 @@ function DeAllocTest
 	|| b = 1
 	
 
-struct StructWithObj
-	|object| A
-	|object| B
-
 
 function StructWithObj.TestProperty
 	visible
 	.a = ""
 	.b = ""
 
-	
-module ASMExamples {
-target cake { 
-|int| Glob
-|int| Bolg
 
 function Intrinsics (|vec4| x, |vec4| y, |float| a, |float| b)
 	visible

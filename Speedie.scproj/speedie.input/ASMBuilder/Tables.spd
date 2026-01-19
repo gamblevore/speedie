@@ -357,12 +357,10 @@ function Decl (fn_asm) // DeclareSub declare
 	return MarkNewlyDeclared(self, Start, Declared)
 
 
-function MarkNewlyDeclared (|&assembler| self, |&FatASM| Start, |ASMReg| Declared, |ASMReg|)
-	if "DeRefTest".trap
+function MarkNewlyDeclared (|&assembler| self, |!&FatASM| Start, |ASMReg| Declared, |ASMReg|)
 	|| Last = .Last
-	if Start > Last // huh?
-	// the last reg might not be the one setting it though?
-	// for example, allo(-1) in statexprs
+	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
+		start -= .iscurr(start-1)|int|		// and it gets replaced into a .gobj
 	
 	|| DR = Declared.reg
 	while Start <= Last
@@ -398,19 +396,22 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 	if .InlineDepth > 0
 		return .µInto(rel, dest) // tail.
 	return .µInto(rel, dest).incr
-
-
+	
+	
 function StatExpr (fn_asm)
 	opt norefcounts
 	exp = exp.first
 	|scdecl| Rejoined
 	|| ch = exp.last.first
-	if ch and dest is NewlyDeclared
+	ifn dest is NewlyDeclared or Temp
+		dest = nil
+	  elseif ch
 		Rejoined = ch.FastDecl
 		if rejoined isnt body
-			rejoined = nil
-		
+			Rejoined = nil
+	
 	ch = exp.first
+
 	|| v = .OpenVars
 	
 	while ch
