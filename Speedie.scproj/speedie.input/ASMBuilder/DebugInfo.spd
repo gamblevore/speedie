@@ -2,7 +2,7 @@
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	|| Mark = .Length
-/	self <~ '\0'			// for speed
+	self <~ '\0'			// for speed
 	.AppendHInt(pos)
 	.AppendHInt(Reg)
 	self <~ '\0'			// no name means we destroy the reg.
@@ -37,14 +37,15 @@ function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 	j[mark] = j.length - mark
 
 
-function FATASM.OutputNewlyDeclared
+function FATASM.OutputDebugVars
 	opt norefcounts
-	|| j = Assembler.DebugDecls!
+	|| dd = Assembler.DebugDecls!
 	for i.bits in ._Const
-/		j.DebugCloseVar(.ASMIndex, i.log2)
+/		dd.DebugCloseVar(.ASMIndex, i.log2)
 	
-	|| Opens = .Output
-/		.msg.FastDecl.DumpDecl(j, .ASMIndex)
+	if ._outputs
+		|| ty = .msg.NilDecl #debug_require
+/		ty.DumpDecl(dd, .ASMIndex)
 
 
 function scdecl.DumpCls (|int|)
@@ -81,7 +82,7 @@ function Assembler.MarkVarClosed (|int| RegBits)
 		mark = mark.Msg.MARK()
 		mark.µrefcount = 1
 		
-	(mark is NewlyDeclared)
+	(mark is DebugVars)
 	mark._Const |= RegBits
 
 
@@ -91,14 +92,14 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 		start -= .IsCurr(start-1)|int|		// and it gets replaced into a .gobj
 	
 	while Start <= Last
-		if (Last.Output.Reg == Declared.reg) and (last.msg.FastDecl == ty)
-			(Last is NewlyDeclared)
+		if (Last.Output.Reg == Declared.reg) and (last.msg.NilDecl == ty)
+			(Last is DebugVars)
 			return declared
 		Last--
 
 	last = exp.mark()
 	last._Outputs = 1,  last.µrefcount = 1,  last.prms[0] = Declared.reg
-	(last is newlydeclared)	
+	(last is DebugVars)	
 	return Declared
 
 

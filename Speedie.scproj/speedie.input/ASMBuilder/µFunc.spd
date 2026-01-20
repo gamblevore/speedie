@@ -22,6 +22,7 @@ extend SCFunction
 		opt norefcounts
 		rz = where
 		|uint64| HasLabel
+		assembler.sh.funcstart_ = .fatfirst-1 // for debug
 		for (fat.fat in self) (i)
 			haslabel |= fat.JumpPrm << (i&63)
 			if (rz - where) > 63K
@@ -32,8 +33,8 @@ extend SCFunction
 			|| Curr = rz
 			rz = fat.µRenderInto(rz, after)
 			if Positions
-				if (fat is NewlyDeclared)
-					fat.OutputNewlyDeclared
+				if (fat is DebugVars) and options.targetdebug
+					fat.OutputDebugVars
 				|| pos = fat.msg.SrcMap
 				while (Curr++ < rz)
 					Positions++[] = pos
@@ -116,21 +117,21 @@ function JBin.BakeASM (|SCFunction| fn, |bool|)
 
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
-	|| j = assembler.DebugDecls
-	if !j
+	|| dd = assembler.DebugDecls
+	if !dd
 		return .BakeASMSub(fn, t)
 
 	.AddFunc(fn, true)
-	if j.Length
+	if dd.Length
 	for a in fn.args	
-		a.DumpDecl(j, 0)
+		a.DumpDecl(dd, 0)
 	rz = .BakeASMSub(fn, t)
-	.add(@bin, j)
-	j.Length = 0
+	.add(@bin, dd)
+	dd.Length = 0
 	.exit
 
 
-function jbin.AddFunc (|scfunction| fn, |bool| Enter=false)
+function jbin.AddFunc (|SCFunction| fn, |bool| Enter=false)
 	opt norefcounts
 	|| fs = FastString.new(nil|faststring|)
 	|| cls = fn.cls

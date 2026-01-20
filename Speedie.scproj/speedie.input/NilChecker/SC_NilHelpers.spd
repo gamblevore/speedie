@@ -32,6 +32,16 @@ function FastDeclSafe (|SCDecl|)
 		return l|scdecl|
 
 
+function NilDecl (|SCDecl|)
+	opt norefcounts
+	|| obj = .obj
+	if obj isa scdecl
+		|| l = obj.IsLookupOnly
+		if l isa scdecl
+			return l
+		return obj
+
+
 function FastDecl (|SCDecl!|)
 	opt norefcounts
 	|| obj = .obj
