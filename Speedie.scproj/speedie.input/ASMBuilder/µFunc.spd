@@ -33,7 +33,7 @@ extend SCFunction
 			rz = fat.µRenderInto(rz, after)
 			if Positions
 				if (fat is NewlyDeclared)
-					fat.FatDumpDecl
+					fat.OutputNewlyDeclared
 				|| pos = fat.msg.SrcMap
 				while (Curr++ < rz)
 					Positions++[] = pos

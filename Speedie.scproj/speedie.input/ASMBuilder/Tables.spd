@@ -354,7 +354,7 @@ function Decl (fn_asm) // DeclareSub declare
 	.DeclReset(ty)
 	|| Start = .curr
 	|| Declared = DeclSub(self, exp, dest, ty, exp.last!)
-	return .MarkVarOpen(Start, Declared)
+	return .MarkVarOpen(exp, Declared, ty, Start)
 
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)

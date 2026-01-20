@@ -1,21 +1,4 @@
 
-// length, pos, reg, name, class, type
-
-// OK... so what is the issue.
-// We need the position of the actual baked-ASM.
-// we can't pregenerate, right?
-// but its easier to generate alongwith the fats.
-// this way, any optimisations don't destroy the output!
-// well... baking comes from the fats.
-// OK... so we get this by reading the fats
-// meaning, all the dbginfo needs to stored on the fats
-// honestly, the onyl awkwrd one is the type.
-// lets... store that in the actual... mark thing.
-// lets assume one var open per-instruction only.
-// but multiple can close. Easy?
-// it just seems like we need to store the scdecl on the actual fat somehow.
-// but how? that or PREdump it... perhaps into the prms?
-
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	|| Mark = .Length
@@ -48,23 +31,20 @@ function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 		if .pointercount
 		if .C_Array
 
-	j.AppendHInt(.typeinfo & DataTypeCode.possiblebits) // please be simple!
+	j.AppendHInt(.TypeInfo & DataTypeCode.PossibleBits) // please be simple!
 	.DumpWierdness(j)
 	
 	j[mark] = j.length - mark
 
 
-function FATASM.FatDumpDecl
+function FATASM.OutputNewlyDeclared
 	opt norefcounts
 	|| j = Assembler.DebugDecls!
-	|| Closes = ._Const>>32
-	for i.bits in Closes
-/		j.DebugCloseVar(.asmindex, i.log2)
+	for i.bits in ._Const
+/		j.DebugCloseVar(.ASMIndex, i.log2)
 	
-	|| Opens = ._Const & 32~bits // shouldn't open more than 1? i hope not?
-	
-	ifn self isa asm.mark
-/		.msg.FastDecl.DumpDecl(j, .asmindex)
+	|| Opens = .Output
+/		.msg.FastDecl.DumpDecl(j, .ASMIndex)
 
 
 function scdecl.DumpCls (|int|)
@@ -102,26 +82,23 @@ function Assembler.MarkVarClosed (|int| RegBits)
 		mark.µrefcount = 1
 		
 	(mark is NewlyDeclared)
-	mark._Const |= (RegBits|uint64|<<32)
+	mark._Const |= RegBits
 
 
-function assembler.MarkVarOpen (|!&FatASM| Start, |ASMReg| Declared, |ASMReg|)
+function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
 	|| Last = .Last
 	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
-		start -= .iscurr(start-1)|int|		// and it gets replaced into a .gobj
+		start -= .IsCurr(start-1)|int|		// and it gets replaced into a .gobj
 	
-	|| DR = Declared.reg
 	while Start <= Last
-		if Last.Output.Reg == DR
-			(Last is newlydeclared)
+		if (Last.Output.Reg == Declared.reg) and (last.msg.FastDecl == ty)
+			(Last is NewlyDeclared)
 			return declared
 		Last--
 
-	last = .last
-	ifn last isa asm.mark
-		last = last.msg.mark()
-		last.µrefcount = 1
-		(last is newlydeclared)
-	
-	last._Const |= 1<<DR
+	last = exp.mark()
+	last._Outputs = 1,  last.µrefcount = 1,  last.prms[0] = Declared.reg
+	(last is newlydeclared)	
 	return Declared
+
+
