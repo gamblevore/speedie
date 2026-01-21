@@ -2,26 +2,25 @@
 
 function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	|| Mark = .Length
-	self <~ '\0'			// for speed
+	self <~ '\0'					// range-length states that theres no name/type. So it must be a close!
 	.AppendHInt(pos)
 	.AppendHInt(Reg)
-	self <~ '\0'			// no name means we destroy the reg.
 	self[mark] = .length - mark
 
 
-function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
+function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	opt norefcounts
 	|| Reg = .ExportPosition
 	if self is local
 		reg = .mu.DataType|asmreg|.Reg
 
-	|| Mark = j.Length
-	j <~ '\0' // for speed
-	j.AppendHInt(pos)
-	j.AppendHInt(Reg)
-	j <~ .name
-	j <~ '\0'
-	j.AppendHInt(.DumpCls)
+	|| Mark = dd.Length
+	dd <~ '\0'						// range-length
+	dd.AppendHInt(pos)
+	dd.AppendHInt(Reg)
+	dd <~ .name
+	dd <~ '\0'
+	dd.AppendHInt(.DumpCls)
 	
 	if .Type == TypeByte
 		debugat
@@ -31,21 +30,21 @@ function SCDecl.DumpDecl (|jbin!| j, |int| Pos)
 		if .pointercount
 		if .C_Array
 
-	j.AppendHInt(.TypeInfo & DataTypeCode.PossibleBits) // please be simple!
-	.DumpWierdness(j)
+	dd.AppendHInt(.TypeInfo & DataTypeCode.PossibleBits) // please be simple!
+	.DumpWierdness(dd)
 	
-	j[mark] = j.length - mark
+	dd[mark] = dd.length - mark
 
 
 function FATASM.OutputDebugVars
 	opt norefcounts
 	|| dd = Assembler.DebugDecls!
 	for i.bits in ._Const
-/		dd.DebugCloseVar(.ASMIndex, i.log2)
+		dd.DebugCloseVar(.ASMIndex, i.log2)
 	
 	if ._outputs
 		|| ty = .msg.NilDecl #debug_require
-/		ty.DumpDecl(dd, .ASMIndex)
+		ty.DumpDecl(dd, .ASMIndex)
 
 
 function scdecl.DumpCls (|int|)
@@ -95,9 +94,10 @@ function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty,
 		if (msg.NilDecl == ty)
 			return true
 //		if exp.MsgOwningFunc == msg.MsgOwningFunc
-		.msg = exp			// srcmap won't change so this is OK.
-							// in fact, we never use .msg anyhow. so why not always change it?
-		return true			// we could remove the test above? try later!
+		if msg.func != @func	// fatrenderer needs @func
+			.msg = exp
+					
+			return true
 
 
 function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
