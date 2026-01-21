@@ -569,7 +569,6 @@ struct Assembler
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
 			if asmtrapper == -1 or stacksize > 20 // ugh
-			FatSanity()
 		  else
 			opt inline
 		

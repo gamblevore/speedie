@@ -86,13 +86,27 @@ function Assembler.MarkVarClosed (|int| RegBits)
 	mark._Const |= RegBits
 
 
+
+function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
+	opt norefcounts
+	require (self isnt DebugVars) or (self isa asm.mark)
+	if (.Output.Reg == Declared.reg)
+		|| msg = .msg
+		if (msg.NilDecl == ty)
+			return true
+//		if exp.MsgOwningFunc == msg.MsgOwningFunc
+		.msg = exp			// srcmap won't change so this is OK.
+							// in fact, we never use .msg anyhow. so why not always change it?
+		return true			// we could remove the test above? try later!
+
+
 function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
 	|| Last = .Last
 	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
 		start -= .IsCurr(start-1)|int|		// and it gets replaced into a .gobj
 	
 	while Start <= Last
-		if (Last.Output.Reg == Declared.reg) and (last.msg.NilDecl == ty)
+		if Last.CanMarkSomething(exp, Declared, ty)
 			(Last is DebugVars)
 			return declared
 		Last--

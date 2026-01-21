@@ -296,17 +296,20 @@ function CalculateSize (|int| Depth=0, |int|)
 function AlignProperties
 	opt norefcounts
 	require (self is SortsProperties) and (!.iswrapper) and !.isrole
-// Replicates some of .calculatesize... Not so simple to remove.
-// Perhaps CalculateSize could be merged?
 
 // Want things tight:       (usually biggest first)
 // Want RD1U accessibility: (smallest first)
 // Not so simple! If class <= 128, make it tight.
+
 	.properties.sort(SmallestAlignedFirst)			// Smallest first, structs last though
+
+
 	|| ParentSize = 4
 	|| sp = .super
-	if sp and sp != typeobject
-		ParentSize = sp.clsSizeRaw
+		if sp != typeobject
+			ParentSize = sp.clsSizeRaw
+	  elseif .isstruct
+		parentsize = 0 // oof
 
 	|| LargeSize = .properties.CarraySize(ParentSize)
 	if LargeSize > 128 // if over 128 keep curr sort
@@ -323,6 +326,7 @@ function AlignProperties
 			.alignsub(sorted, s)
 	
 	.properties = sorted
+
 
 
 function FindPropAlignedTo (|int| align, |scdecl|)

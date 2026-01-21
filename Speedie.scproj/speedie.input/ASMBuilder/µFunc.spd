@@ -35,7 +35,7 @@ extend SCFunction
 			if Positions
 				if (fat is DebugVars) and options.targetdebug
 					fat.OutputDebugVars
-				|| pos = fat.msg.SrcMap
+				|| pos = fat.SrcMap
 				while (Curr++ < rz)
 					Positions++[] = pos
 

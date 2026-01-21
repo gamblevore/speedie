@@ -8,8 +8,9 @@ struct FatASM
 	// phi-nodes are basically just the prms which have .fatindexes
 	|ASMParam[6]|		Prms
 	|ASMReg| 			Info
-	|message--| 		Msg
+	|message--| 		Msg			// i think just the type-system needs this now?
 	|uint64| 			_Const
+	|uint|				SrcMap
 	|int16|				µRefCount
 	|uint16| 			BasicBlock
 	|uint16| 			ASMIndex
@@ -27,9 +28,11 @@ struct FatASM
 	setter SetOp (|byte| value)
 		opt norefcounts
 		|| m = .Msg
-		|| k = ._Const		// leave msg, and _const. Other things may need them still.
+		|| s = .SrcMap
+		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
 		self[0] = nil
 		.Msg = m
+		.SrcMap = s
 		._Const = k
 		._op = value
 		
@@ -37,10 +40,10 @@ struct FatASM
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat
 	
-	function IsBitCorrect (|bool|)
-		if self is Const
-			return true
-		return .IsRead
+//	function IsBitCorrect (|bool|)
+//		if self is Const
+//			return true
+//		return .IsRead
 	
 	function IsRead (|bool|)
 		|| op = .op
@@ -118,9 +121,6 @@ struct FatASM
 		rz = ((&._const)|&f64|)[]
 		if !rz: rz = 0					// rationalise
 		
-	setter Debug (|message|)
-		.msg = Value
-
 	syntax equals (|uint| x, |bool|)
 		disabled "Use isa asm.xxx instead"
 		// if I need to compare vs an int, I can do... if 123 == fat
@@ -601,7 +601,8 @@ struct FatASM
 			require (asm.jmkm xor 1) == asm.jmkl
 			require (asm.jmke xor 1) == asm.jmkn
 			require (asm.jbor xor 1) == asm.jban
-			require (–sizeof FatASM) == 64
+			|| S = –sizeof FatASM
+			require S == 64
 			return true
 
 
