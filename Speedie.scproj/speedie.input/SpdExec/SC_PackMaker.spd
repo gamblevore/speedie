@@ -174,14 +174,13 @@ module PackMaker
 		
 	function BakeDebug (|jbin| j)
 		|faststring--| p = SourceMap.Positions
-			|| ClsGlob = assembler.DebugClassesAndGlobals
-				compiler.stDebugInfo += ClsGlob.length
-				j.enter(@tmp, "debug")
-				j.AddStr(ClsGlob)
-				j.add(@bin, p)
-				j.addStr(SCImport.AllFiles.join("\n").Compress)
-				
-				j.exit
+			|| JL = J.Length
+			j.tmparg("debug")
+			assembler.DebugClassesAndGlobals(j)
+			j.addrow("pos", @bin, p|string|)
+			j.addrow("files", @str, SCImport.AllFiles.join("\n").Compress)
+			j.exit(2)
+			compiler.stDebugInfo += j.Length - JL
 	
 	
 	function BakeASM (|jbin| j, |bool|)

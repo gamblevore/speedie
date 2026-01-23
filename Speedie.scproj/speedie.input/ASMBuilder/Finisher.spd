@@ -22,10 +22,7 @@ function Assembler.FinishMost
 			|| Start = &TestSpace[0]
 			|| After = s.µRenderInto(Start, start+4)
 			|| Actual = After - Start
-			if Actual != Predicted // uugh
-		
-		
-		
+			if Actual != Predicted // uugh		
 		S++
 		
 	.out.µASMLength = Length

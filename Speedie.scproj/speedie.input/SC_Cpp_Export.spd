@@ -644,15 +644,16 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
 
 	.WriteVMFuncs(fs)
-	|| Dbg = Assembler.DebugClassesAndGlobals
+	|| j = jbin()
+	Assembler.DebugClassesAndGlobals(j)
 
 	fs <~ "};
 
 extern \"C\" JB_StringC* JB_App__LibDebug() {
-	int n = ${Dbg.length};
+	int n = ${j.length};
 	const char* Data = "
 
-	fs.AppendCppAll(Dbg)
+	fs.AppendCppAll(j|string|)
 	
 	fs <~ ";
 	return JB_StrCN(Data, n);

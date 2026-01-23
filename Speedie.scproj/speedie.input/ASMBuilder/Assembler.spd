@@ -65,29 +65,18 @@ struct Assembler
 					c.ListLayout(j)
 					j.exit
 
-		function DebugClassesAndGlobals (|string|) 
+
+		function DebugClassesAndGlobals (|jbin| j) 
 			opt norefcounts
-			if !options.MakeExec
-				require options.TargetDebug
-			
-			|| j = jbin()
-			
 			j.Enter(@msg, "class")
 			.ClassLayout(j)
 			j.exit
 			
 			j.Enter(@msg, "glob")
-			if Options.MakeExec
-				j.PropertyLayout(packmaker.libglobs)
-			  else
-				j.PropertyLayout(packmaker.PackGlobs)
+			|| G = (packmaker.libglobs, packmaker.packglobs)(options.makeexec)
+			j.PropertyLayout(G)
 			j.exit
-			
-			|| info = j.GetResult
-			if !info.ParseJbin 
-				error "Generated invalid debug info (jbin)"
-				info = ""
-			return info
+		
 
 	
 	function State (|&ASMState|)
