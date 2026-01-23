@@ -102,10 +102,14 @@ extend message
 			error (self, key + " not found.")
 	
 	
+	// this can't be the right way....
 	function Value (|string|)
 		if self
+			if self == @msg
+				return .FirstName 
 			if self == @tmp and self in @arg
 				return .firstname
 			if self != @arg
 				return .name
 			return .FirstName
+

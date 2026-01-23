@@ -72,6 +72,11 @@ role JBin (Faststring)
 	
 	function AddInt			(|int64| name)
 		.add(@num, name.render)
+
+	function AddRow			(|string| Row, |syntax| type, |string| Value)
+		.enter(@msg, row)
+		.AddMemory(type, value.length, false, value.addr)
+		.exit
 	
 	function Add			(|syntax| type, |string| name="", |bool|into = false, |jbinleaver|)
 		return .AddMemory(type, name.length, into, name.addr)

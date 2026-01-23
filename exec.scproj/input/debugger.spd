@@ -122,14 +122,17 @@ module debugger
 				.BreakAll
 			return true
 		
-		|| DebugInfo = R[@nil, 0].name.Decompress.parse
-		.classes = DebugInfo["class"]
-		.globs = DebugInfo["glob"]
-		.LoadFuncs(DebugInfo["func"])
+		.classes = R["class"]
+		.globs = R["glob"]
+
+//		.LoadFuncs(DebugInfo["func"])
+//		j.tmparg("debug")
+//		assembler.DebugClassesAndGlobals(j)
+//		j.addrow("pos", @bin, p|string|)
+//		j.addrow("files", @str, SCImport.AllFiles.join("\n").Compress)
 			
-		|| M = R[@nil, 1]
-		.SrcMap = M.name
-		.Files = r[@nil, 2].name.decompress.Split
+/		.Files = r["files"].value.decompress.Split
+		.SrcMap = R["pos"]
 		.base = .SrcMap.Addr|&uint|
 		|| L = .SrcMap.Length >> 2
 		.Length = L // just for speed
