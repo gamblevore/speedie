@@ -6442,7 +6442,7 @@ ASMReg SC_Pac_xC2xB5Trin(Assembler* Self, Message* Exp);
 
 void SC_Pac__ClassLayout(FastString* J);
 
-JB_String* SC_Pac__DebugClassesAndGlobals();
+void SC_Pac__DebugClassesAndGlobals(FastString* J);
 
 int SC_Pac__Init_();
 
@@ -7862,7 +7862,7 @@ void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
 
-void JB_bin_AddStr(FastString* Self, JB_String* Name);
+void JB_bin_AddRow(FastString* Self, JB_String* Row, Syntax Type, JB_String* Value);
 
 bool SC_bin_BakeASM(FastString* Self, SCFunction* Fn);
 
