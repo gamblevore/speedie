@@ -12,6 +12,7 @@ Pre-release:
 
 	
 Bugs:
+	* jbin.length = 10 // doesn't use faststring's setter!
 	* for f2 in .FileList
 		if f2.Position < 0
 			continue_With f2.FlatAfter // doesn't like this? why.
