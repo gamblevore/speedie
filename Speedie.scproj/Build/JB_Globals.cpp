@@ -226,7 +226,6 @@ Message* SC__VM_Builder_TempDests;
 int SC__VM_Builder_Total;
 Message* SC__VM_Builder_Ugh;
 byte SC__VM_Builder_XType;
-FatASM* SC_Buggered;
 Dictionary* SC_ClassOrModuleLinkage;
 Dictionary* SC_ClsCollectTable;
 Dictionary* SC_CodePointTable;

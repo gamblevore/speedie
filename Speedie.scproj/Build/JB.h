@@ -691,19 +691,20 @@ struct FastBuff {
 };
 
 struct FatASM {
-	ASMParam Prms[6];
-	s16 xC2xB5RefCount;
-	u16 ASMIndex;
 	byte BranchID;
 	byte InputFats;
 	byte InputPrms;
 	byte _Outputs;
 	byte _Op;
 	byte JumpPrm;
+	u16 ASMIndex;
 	u16 BasicBlock;
+	s16 xC2xB5RefCount;
+	uint SrcMap;
+	ASMParam Prms[6];
 	uint64 _Const;
-	Message* Msg;
 	ASMReg Info;
+	Message* Msg;
 };
 
 struct FatRange {
@@ -1614,7 +1615,6 @@ extern Message* SC__VM_Builder_TempDests;
 extern int SC__VM_Builder_Total;
 extern Message* SC__VM_Builder_Ugh;
 extern byte SC__VM_Builder_XType;
-extern FatASM* SC_Buggered;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
@@ -4410,6 +4410,8 @@ uint JB_uint_LowestBit(uint Self);
 
 
 // uint64
+int JB_uint64_HintLength(uint64 Self);
+
 uint64 JB_uint64_LowestBit(uint64 Self);
 
 uint64 SC_uint64_rotl1(uint64 Self);
@@ -5721,6 +5723,8 @@ bool SC_FAT_CanCloseRegs(FatASM* Self, int R);
 
 ASMReg SC_FAT_CanGlobalGrab(FatASM* Self, uint64 Find, uint64 Range, uint64 BS);
 
+bool SC_FAT_CanMarkSomething(FatASM* Self, Message* Exp, ASMReg Declared, SCDecl* Ty);
+
 void SC_FAT_CheckHasOutput(FatASM* Self);
 
 int64 SC_FAT_Const(FatASM* Self);
@@ -5732,8 +5736,6 @@ ASMReg SC_FAT_ConstFill(FatASM* Self, ASMReg Dest, int64 K);
 void SC_FAT_ConstFinish(FatASM* Self);
 
 bool SC_FAT_CopyFrom(FatASM* Self, FatASM* D);
-
-void SC_FAT_DebugSet(FatASM* Self, Message* Value);
 
 void SC_FAT_DebugPrint(FatASM* Self);
 
@@ -7878,11 +7880,13 @@ int JB_bin_Exit(FastString* Self, int Amount);
 
 void JB_bin_Exit0(FastString* Self);
 
-void SC_bin_PropertyLayout(FastString* Self, Array* List);
+int JB_bin_FinishAdd(FastString* Self, Syntax Ty, int Start);
 
-byte* JB_bin_ReserveMemory(FastString* Self, Syntax Type, int L, bool GoIn);
+void SC_bin_PropertyLayoutWithArray(FastString* Self, Array* List);
 
 void JB_bin_RunHeader(FastString* Self, JB_String* Name);
+
+int JB_bin_StartAdd(FastString* Self);
 
 jbinLeaver JB_bin_TmpArg(FastString* Self, JB_String* Name);
 
@@ -9179,7 +9183,7 @@ SCDecl* SC_Decl_DownGrade(SCDecl* Self);
 
 int SC_Decl_DumpCls(SCDecl* Self);
 
-void SC_Decl_DumpDecl(SCDecl* Self, FastString* J, int Pos);
+void SC_Decl_DumpDecl(SCDecl* Self, FastString* Dd, int Pos);
 
 void SC_Decl_DumpWierdness(SCDecl* Self, FastString* J);
 
@@ -9224,6 +9228,8 @@ SCFunction* SC_Decl_HasStructDestructor(SCDecl* Self);
 SCDecl* SC_Decl_HighestArrayContainMatch(SCDecl* Self, SCDecl* Other);
 
 SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other);
+
+SCDecl* SC_Decl_Inner(SCDecl* Self);
 
 bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp);
 
