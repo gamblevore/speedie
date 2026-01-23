@@ -111,9 +111,6 @@ dispatch ClassOrModuleLinkage (TranFunc)
 	+'visible'				{} // (SCFunction.Tran_Visible)
 	+'ignore'				{}
 	+'noearlyfree'			{}
-
-//	+'internal'
-//		name_Space.setinternal(node, scnodeinfo.internalonly)
 		
 	+'embedded'
 		name_Space.setinternal(node, scnodeinfo.embeddedonly)

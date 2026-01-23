@@ -29,7 +29,7 @@ extend SCFunction
 				error (.source, "Function too large (over 63K)")
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
-
+				
 			|| Curr = rz
 			rz = fat.µRenderInto(rz, after)
 			if Positions
@@ -101,11 +101,12 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 
 function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	opt norefcounts
-	|| Start = .ReserveMemory(@bin, t*4)|&asm|
+	|| Start = .StartAdd
 	|| Positions = SourceMap.Reserve(t*4)
-	|| after = fn.ASMBake(Start, Start+t, Positions)
-		
-	expect (after-start == T)									(fn, "ASM length corrupt")
+	|| Addr = .reserve(t*4)|&asm|
+	|| after = fn.ASMBake(Addr, Addr+t, Positions)
+	.FinishAdd(@bin, Start)
+	expect (after-Addr == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)
 
 

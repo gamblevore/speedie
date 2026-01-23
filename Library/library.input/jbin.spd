@@ -94,11 +94,31 @@ role JBin (Faststring)
 		self <~ T|byte|
 		.Indent += goin
 
-	function ReserveMemory (|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
-		.WriteType(type, goin)
-		.AppendHInt(L)
-		return .Reserve(L)	
+//	function ReserveMemory (|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
+//		.WriteType(type, goin)
+//		.AppendHInt(L)
+//		return .Reserve(L)	
 
+	function StartAdd (|int|)
+		self <~ (0|byte|, 5)
+		return .Length
+		
+	function FinishAdd (|syntax| Ty, |int| Start, |int|)
+		|| NewLength = .Length
+		|| Gained = NewLength - Start
+		|| HLength = Gained|uint64|.hintlength
+		.Length = Start-5
+		self <~ (0|byte|, 5-(hlength+1))
+		self <~ (ty|int|<<1)|byte|
+		.AppendHInt(Gained)
+		self|faststring|.Length = NewLength // shouldn't be necessary
+		return Gained
+	
+	function uint64.HintLength (|int|)
+		rz = 1
+		while self >= 128
+			self = self >> 7
+			rz++
 
 
 libinternal InputStream.NextMsgInfo (|uint64|)

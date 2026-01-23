@@ -135,18 +135,6 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 
 
 
-//function SCDecl.CArrayFinal (|scdecl|)
-//	opt norefcounts
-//	|| i = self
-//	while
-//		|| n = i.Internal
-//		if !n
-//			return i
-//		if !n.IsCarray
-//			return n
-//		i = n
-
-
 function SCDecl.MemAccessNonStorable (|message| Exp, |message| side, |scdecl|)
 	opt norefcounts
 	if .TypeSuffers

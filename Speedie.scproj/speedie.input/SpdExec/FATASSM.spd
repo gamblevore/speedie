@@ -547,6 +547,7 @@ struct FatASM
 	
 
 	function IsFinisher (|bool|)
+		opt norefcounts
 		|| o = .op|asm|
 		if o == asm.ret or asm.trap or asm.TAIL or asm.rfrt
 			return true
@@ -554,6 +555,10 @@ struct FatASM
 			return !.p0 and !.p1 and .p2
 		if o == asm.jump
 			return .jump < 0
+		
+		if .info is exit
+			if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
+				return true
 
 
 	function DebugPrint 

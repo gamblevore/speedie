@@ -70,7 +70,7 @@ struct Assembler
 			if !options.MakeExec
 				require options.TargetDebug
 			
-/			|| j = jbin()
+			|| j = jbin()
 			
 			j.Enter(@msg, "class")
 			.ClassLayout(j)
@@ -602,6 +602,14 @@ struct Assembler
 			
 	function jbin.PropertyLayout (|[scdecl]| List)
 		opt norefcounts
+		|| S = .Startadd
+		for p in list
+			p.DumpDecl(self, p.exportposition)
+		.FinishAdd(@bin, S)
+
+	
+	function jbin.PropertyLayout (|[scdecl]| List, |faststring| fs)
+		opt norefcounts
 		for p in list
 			p.DumpDecl(self, p.exportposition)
 
@@ -624,6 +632,7 @@ struct Assembler
 
 		Instruction[asm.KNSR].Const
 		asm.encoders[asm.noop] = fatasm.Nop_Encoder
+		asm.encoders[asm.mark] = fatasm.Nop_Encoder
 
 		.Knst(asm.KNST)
 		.Knst(asm.KNST2)

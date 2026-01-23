@@ -126,9 +126,16 @@ function SCFunction.HasCVersion (|bool|)
 
 
 function assembler.Killed (|message| exp, |fatasm| fat, |asmreg|)
-	fat = exp.HALT(nil, nil, 3)
-	fat.µRefCount++
+	// needs the encoder set first, this is a 8-byte code!
+	// not ideal! its a loss of a 8 byte code. Not sure theres
+	// another way... use the last 32? scatter them?
+	
+	fat.µrefcount++
 	return fat * asmreg.exit
+	
+	|| fat2 = exp.HALT(nil, nil, 3)
+	fat2.µRefCount++
+	return fat2 * asmreg.exit
 
 
 

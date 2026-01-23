@@ -285,7 +285,6 @@ function NilFunction (NilTrackerFn)
 				// we'd have to swap and test to see if it makes more sense or less.
 				
 				.VariableSet(SentIn, recv.source!, ri, p!, ri.nilcurr)				
-//				.VariableSet(SentIn, p!, ri, recv.source!, ri.nilcurr) // surely its this?
 
 			  elseif In == 2
 				.VariableSet(Sent, recv.source!, recv, p!, recv.nilcurr)

@@ -6,12 +6,26 @@ function Assembler.FinishMost
 	|| S = .FuncStart
 	|| Length = 0
 	
+	target debug
+		|ASM[4]| TestSpace
+	
 	while A > S
 		if s isa asm.knst
 			S.ConstFinish
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
-		length += s.GuessSize
+
+		|| Predicted = s.guesssize
+		length += Predicted
+		
+		target debug
+			|| Start = &TestSpace[0]
+			|| After = s.µRenderInto(Start, start+4)
+			|| Actual = After - Start
+			if Actual != Predicted // uugh
+		
+		
+		
 		S++
 		
 	.out.µASMLength = Length

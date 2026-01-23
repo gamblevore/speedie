@@ -22,15 +22,7 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	dd <~ '\0'
 	dd.AppendHInt(.DumpCls)
 	
-	if .Type == TypeByte
-		debugat
-		#!Compare byte pointers, byte-carray, byte reference!
-		#!we want the final typeinfo. Not the wierdness along the way.
-		if self is Reference
-		if .pointercount
-		if .C_Array
-
-	dd.AppendHInt(.TypeInfo & DataTypeCode.PossibleBits) // please be simple!
+	dd.AppendHInt(.inner.TypeInfo & DataTypeCode.PossibleBits) // please be simple!
 	.DumpWierdness(dd)
 	
 	dd[mark] = dd.length - mark
@@ -58,8 +50,8 @@ function SCDecl.DumpWierdness (|jbin| j)
 		|| Wierdness = ((self is reference) << 1)  |||  (.pointercount > 0)
 		Wierdness |= .C_Array<<2
 		j.AppendHInt(Wierdness)
-		loop Wierdness
-		self = .Internal!
+		self = .Internal
+		loop Wierdness and self
 	
 
 function FatASM.CanCloseRegs (|int| R, |bool|)
@@ -85,7 +77,6 @@ function Assembler.MarkVarClosed (|int| RegBits)
 	mark._Const |= RegBits
 
 
-
 function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
 	opt norefcounts
 	require (self isnt DebugVars) or (self isa asm.mark)
@@ -93,10 +84,8 @@ function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty,
 		|| msg = .msg
 		if (msg.NilDecl == ty)
 			return true
-//		if exp.MsgOwningFunc == msg.MsgOwningFunc
 		if msg.func != @func	// fatrenderer needs @func
 			.msg = exp
-					
 			return true
 
 
@@ -116,4 +105,14 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 	(last is DebugVars)	
 	return Declared
 
+
+
+function SCDecl.Inner (|scdecl|)
+	opt norefcounts
+	visible
+	rz = self
+	while
+		self = .internal
+		if !self
+			exit
 
