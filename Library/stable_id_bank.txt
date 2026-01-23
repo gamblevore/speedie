@@ -2112,8 +2112,9 @@ JB_bin_Constructor
 JB_bin_Enter
 JB_bin_Exit
 JB_bin_Exit0
-JB_bin_ReserveMemory
+JB_bin_FinishAdd
 JB_bin_RunHeader
+JB_bin_StartAdd
 JB_bin_TmpArg
 JB_bin_WriteType
 JB_bool_Append
@@ -2337,6 +2338,7 @@ JB_munmap
 JB_u64_Log2
 JB_u8p_ByteCount
 JB_u8p_Read
+JB_uint64_HintLength
 JB_uint64_LowestBit
 JB_uint64_Now
 JB_uint64_OperatorMax
