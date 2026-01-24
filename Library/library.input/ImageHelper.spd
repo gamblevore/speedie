@@ -20,7 +20,7 @@ module ImageHelper
 		memory.free(img)
 		require qoi
 		|| O = string.Own(qoi, n)
-/		|| C = O.compress(mzlab.strong)
+		|| C = O.compress(mzlab.strong)
 		|| D = C.decompress // whyyyyyyyyy
 		if (O != D)
 			error (where, "Failed to compress image")

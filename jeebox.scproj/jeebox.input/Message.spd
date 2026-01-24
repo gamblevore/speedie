@@ -1098,25 +1098,16 @@ Message is also:
 
 	Syntax UsingComplete { }
 	
+	
 	function Int (|int| StrStart=0, |int64| low, |int64| high, |int64|)
 		cpp_part IntRange
-		|| i = .int(strstart)
+		|| i = .int(StrStart)
 		if i >= low and i <= high
 			return i
 		error (self, "Value out of range")
 	
-	function string.SuffixSize (|int64|)
-		|| n = .Length
-		if (n == 1) or (n == 2 and self[1] == 'B')
-			return self[].SuffixSize
-
-	libinternal byte.SuffixSize (|int64|)
-		cpp_wrapper
-		
 	
 	function Int (|int| StrStart = 0, |int64|)
-		// would be nice if this parseint can handle K, M, G, T also.
-		// perhaps by passing a second string?
 		opt norefcounts
 		if self
 			|| f = .First
@@ -1130,7 +1121,15 @@ Message is also:
 			|| Mul = f.Name.SuffixSize						#expect (self, "Invalid unit")
 			return (Value * Mul|float64|)|int64|
 			
+	
+	function string.SuffixSize (|int64|)
+		|| n = .Length
+		if (n == 1) or (n == 2 and self[1] == 'B')
+			return self[].SuffixSize
 
+	libinternal byte.SuffixSize (|int64|)
+		cpp_wrapper
+		
 	function Float (|Float64|)
 		if self
 			return .name.ParseFloat(self)
