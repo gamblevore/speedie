@@ -2,6 +2,9 @@
 class XVar
 	|int|			CodeIndex
 	|int|			CodeEnd
+	|int|			CArraySize  // isn't this in the wierdness?
+								// but then.... how to get at it? we don't wanna parse it each time.
+								// do we make this a recursive type?
 	|uint16|		Reg
 	|DataTypeCode|	DataType
 	|string|		Name
@@ -21,6 +24,64 @@ class XVar
 	function Close (|int| Pos)
 		expect (self) ("Bad close var index")
 		.CodeEnd = pos
+		
+	function Print (|!&ivec4| Reg)
+		|| fs = FastString(nil|faststring|)
+		.Render(fs, reg, true)
+		printline fs.GetResult
+	
+	
+	function Render (|faststring| fs, |!&ivec4| Reg, |bool| Full)
+		opt norefcounts
+		Reg += .reg
+		if full
+			fs <~ .name
+			fs <~ "(${.reg|int|}): " // remove .reg once this is reliable
+		|| C = .ClassType
+			return .RenderStruct(fs, reg, C)
+		return .RenderData(fs, reg)
+	
+	
+	function RenderStruct (|faststring| fs, |!&ivec4| Reg, |XType| T)
+		// object, message, string
+		// struct?
+		
+		
+	function RenderData (|faststring| fs, |!&ivec4| Reg)
+		|| T = .DataType
+		|| V = t.VecCount()
+		|| Small = t.ByteCount <= 4
+		if t is bool
+			fs <~ (reg|&bool|)[].string
+		  elseif t is int
+			if v <= 1
+				if !Small
+					fs <~ (reg|&int64|)[]
+				  elseif t.IsSigned 
+					fs <~ (reg|&int|)[]
+				  else
+					fs <~ (reg|&uint|)[]
+			  elseif v == 2
+				fs <~ (reg|&ivec2|)[]
+			  elseif v == 3
+				fs <~ (reg|&ivec3|)[]
+			  elseif v == 4
+				fs <~ (reg|&ivec4|)[]
+		  else
+			if v <= 1
+				if Small
+					fs <~ (reg|&float|)[]
+				  else
+					fs <~ (reg|&f64|)[]
+			  elseif v == 2
+				fs <~ (reg|&vec2|)[]
+			  elseif v == 3
+				fs <~ (reg|&vec3|)[]
+			  elseif v == 4
+				fs <~ (reg|&vec4|)[]
+	
+	syntax is (|datatypecode| T, |bool|)
+		return .DataType.SyntaxIs(t)
 				
 
 function message.xvariables (|[xvar]|)
