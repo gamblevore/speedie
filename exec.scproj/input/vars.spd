@@ -1,0 +1,60 @@
+
+class XVar
+	|int|			CodeIndex
+	|int|			CodeEnd
+	|uint16|		Reg
+	|DataTypeCode|	DataType
+	|string|		Name
+	|XType?|		ClassType
+	|byte[16]|		Weirdness
+		
+	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
+		.CodeIndex = pos
+		.reg = reg
+		.name = s.CString
+		.ClassType = xtype.GetType(s.hint, nil)
+		.DataType = s.HInt
+		|| i = 0
+		while  i < 16  and  s.Position < After
+			.weirdness[i++] = s.Byte
+
+	function Close (|int| Pos)
+		expect (self) ("Bad close var index")
+		.CodeEnd = pos
+				
+
+function message.xvariables (|[xvar]|)
+	opt norefcounts
+	if self
+		|xvar[32]| Regs
+		.xvariables(Regs, rz)
+
+
+function message.xproperties (|[xvar]|)
+	opt norefcounts
+	if self
+		.xvariables(nil, rz)
+
+
+function message.xvariables (|?&xvar| Registers, |[xvar]| out)
+	opt norefcounts
+	|| input = xtype.shared
+	input.Reset(.name)
+	while (|| Section = input.byte)
+		|| After = input.Position + Section
+		|| pos = Input.hint
+		|| reg = Input.hint
+		expect (registers and reg|uint| < 32) ("Too large register")
+		
+		if input.Position >= After // Close
+			if Registers
+				Registers[reg].Close(pos)
+		  else
+			|| var = xvar(input, pos, reg, After)
+			if Registers
+				Registers[reg] = var
+			out <~ var
+
+		expect (input.position == After) ("Corrupted debug vars")
+
+

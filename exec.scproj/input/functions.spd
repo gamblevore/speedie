@@ -9,9 +9,8 @@ role SpdFunc (message)
 		.func = @tmp
 		.Position = -1
 	
-	
-	// we want to make this easier to debug
-	// so... same message structure always
+
+	// we try to standardise the output structure
 	function message.CopyToVM
 		opt norefcounts
 		|| Code = .name
@@ -29,7 +28,7 @@ role SpdFunc (message)
 		if .func != @tmp
 			.func = @tmp
 			.name = "(unnamed)"
-		.clear
+		.first.remove
 	
 
 	function Run (|&ivec4|)

@@ -48,7 +48,7 @@ module SpdTable
 		.CodeLength = CodeLength
 
 
-	function LoadFuncs (|message| code)
+	function CopyToVM (|message| code)
 		opt norefcounts
  
 		.PreLoad(code)

@@ -131,12 +131,21 @@ function RC_Rel (|Message| rel)
 	rel.ReplaceWith( result )
 
 
+function scdecl.CanGetAddressSafely (|bool|)
+	if self == typenil
+		return true
+	return .iscarray or (self is global)
+
+
 function RC_CheckNoObjPms (|message| msg)
 	opt norefcounts
 	|| fn = msg.MsgFunc
+		|| p = msg.last.first
 		for i in fn.args
-			if i.PointerCount
-				expect (!i.Type.IsObject) (msg, "Can't pass address of object while using 'opt norefcounts'")
+			|| ty = typeofexpr(p, nil)
+				if i.PointerCount and !ty.CanGetAddressSafely
+					expect (!i.Type.IsObject) (p, p.name + "'s object address can't be passed, within 'opt norefcounts'.")
+			p++
 
 
 function RC_IgnoreReturn (|Message| msg)

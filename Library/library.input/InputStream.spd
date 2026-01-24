@@ -75,6 +75,7 @@ class InputStream
 	function NonZeroByte (|int|)
 		while 
 			|| b = .byte
+			if b != 0 // -1 means end
 				return b
 
 	function Find (|byte| c, |int|)
@@ -87,7 +88,7 @@ class InputStream
 			if b == c
 				return n
 	
-	function Byte (|int|)
+	function Byte (|ind|)
 		if .data.HasAny or .NextChunk
 			return .data.byte
 		return -1

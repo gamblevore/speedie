@@ -60,10 +60,12 @@ struct Assembler
 		function ClassLayout (|jbin| j)
 			opt norefcounts
 			for c in Compiler.ReachedClassTable
-				if !c.isbehaviourtable and (c.IsLibrary == options.MakeExec)
+				if !c.isbehaviourtable and (c.IsLibrary or options.MakeExec)
 					j.Enter(@msg, c.ExportName)
 					c.ListLayout(j)
 					j.exit
+				  else
+					j.add(@char)
 
 
 		function DebugClassesAndGlobals (|jbin| j) 
@@ -585,7 +587,8 @@ struct Assembler
 	function scclass.ListLayout (|jbin| j)
 		opt norefcounts
 		|| s = .super
-			s.ListLayout(j)
+		|| sid = (s.tableid, 0)(s)
+		j.AddInt(sid)
 		j.PropertyLayout(.Properties)
 			
 			

@@ -3,7 +3,6 @@
 module debugger
 	|message|		Root
 	|Message|		Globs
-	|Message|		Classes
 	|[string]|		Files
 	|string|		SrcMap
 	|&uint|			Base
@@ -100,20 +99,7 @@ module debugger
 		if StdErr.ok
 			error ("Code map too short: " + index)
 	
-	
-	function LoadFuncs (|message| funcs)
-		opt norefcounts
-		|| Curr = SpdTable.Funcs[1] // appinit
-		while (|| V = Funcs.first)
-			expect (curr) (v, "Orphan debug info found")
-			curr <~ v
-			v.name = ""
-			v.func = @arg
-			curr++
-
-		check (!curr) (funcs, "Missing some debug info")
-	
-	
+		
 	function Load (|bool|)
 		opt norefcounts
 		|| R = .root
@@ -122,16 +108,9 @@ module debugger
 				.BreakAll
 			return true
 		
-		.classes = R["class"]
-		.globs = R["glob"]
-
-//		.LoadFuncs(DebugInfo["func"])
-//		j.tmparg("debug")
-//		assembler.DebugClassesAndGlobals(j)
-//		j.addrow("pos", @bin, p|string|)
-//		j.addrow("files", @str, SCImport.AllFiles.join("\n").Compress)
-			
-/		.Files = r["files"].value.decompress.Split
+		xtype.loadtypes R["class"]
+		.Globs = R["glob"]
+		.Files = R["files"].value.decompress.Split
 		.SrcMap = R["pos"]
 		.base = .SrcMap.Addr|&uint|
 		|| L = .SrcMap.Length >> 2

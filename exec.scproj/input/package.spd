@@ -31,7 +31,7 @@ module CakeRun
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
 		
-		SpdTable.LoadFuncs(arg[@tmp, "code"][@arg])
+		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
 		.Strings = arg["strs"].name
 		.LoadClasses(arg["clss"])
 		Debugger.Root = arg["debug"].parent

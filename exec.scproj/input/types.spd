@@ -1,0 +1,40 @@
+
+class XType
+	|XType?|		Super
+	|bool|			IsObject
+	|string|		Name
+	|[XVar]|		Properties
+	
+	constructor (|message| msg, |int| IsObject)
+		opt norefcounts
+		.IsObject = IsObject
+		.name = msg.name
+		.Super = msg.xsuper
+		.properties = msg.second.xproperties
+		
+	module
+		|inputstream|	Shared = inputstream("")
+		|[XType]|		Types
+		
+		function LoadTypes (|message| list)
+			opt norefcounts
+			|| Alignment = 0
+			for msg in list
+				if !Alignment and msg.name == "Object"
+					Alignment = 4
+				.types <~ XType(msg, Alignment)
+		
+		function GetType (|int| i, |message| err, |xtype|)
+			opt norefcounts
+			|| Sup = xtype.Types[i]
+				return sup
+			error (err, "Super out of range")
+
+
+
+function message.XSuper (|xtype|)
+	opt norefcounts
+	|| Si = self[@num]
+		|| i = si.Int(0, 0, (xtype.types.length-1) max 0)
+			return xtype.GetType(i, si)		
+
