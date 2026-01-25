@@ -1107,6 +1107,7 @@ JB_CPath_ReadAll
 JB_CakeVM_DummyChef
 JB_CakeVM_IsDebuggingSet
 JB_CakeVM_Load
+JB_CanReadMemory
 JB_CharSet_SyntaxAccess
 JB_ClassData_CreateLayerAndUse
 JB_Class_AllocZeroed
@@ -2107,6 +2108,7 @@ JB_bin_AddCString
 JB_bin_AddFS
 JB_bin_AddInt
 JB_bin_AddMemory
+JB_bin_AddRow
 JB_bin_AddStr
 JB_bin_Constructor
 JB_bin_Enter
