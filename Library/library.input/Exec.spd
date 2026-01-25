@@ -77,7 +77,7 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 	false -1
 	syntax cast (|bool|)
 		inline
-		return self >= 0
+		return self == 0
 
 	function SignalName (|StringZeroTerminated|)
 		cpp_wrapper JB_Err_SignalName

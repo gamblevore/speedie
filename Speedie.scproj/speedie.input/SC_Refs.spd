@@ -144,7 +144,7 @@ function RC_CheckNoObjPms (|message| msg)
 		for i in fn.args
 			|| ty = typeofexpr(p, nil)
 				if i.PointerCount and !ty.CanGetAddressSafely
-					expect (!i.Type.IsObject) (p, p.name + "'s object address can't be passed, within 'opt norefcounts'.")
+					expect (!i.Type.IsObject) (p, p.name + "'s address can't be passed, within 'opt norefcounts'.")
 			p++
 
 

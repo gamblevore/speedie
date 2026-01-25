@@ -1,30 +1,35 @@
 
-class XVar
-	|int|			CodeIndex
+
+class XVar (list)
+	|Wierdness[5]|	Weirdness
 	|int|			CodeEnd
 	|int|			CArraySize  // isn't this in the wierdness?
 								// but then.... how to get at it? we don't wanna parse it each time.
 								// do we make this a recursive type?
+	|bool|			NormalView
 	|uint16|		Reg
 	|DataTypeCode|	DataType
 	|string|		Name
-	|XType?|		ClassType
-	|byte[16]|		Weirdness
 		
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
-		.CodeIndex = pos
+		.normalview = true
+		.position = pos
 		.reg = reg
 		.name = s.CString
-		.ClassType = xtype.GetType(s.hint, nil)
+		.obj = xtype.GetType(s.hint, nil)
 		.DataType = s.HInt
-		|| i = 0
-		while  i < 16  and  s.Position < After
-			.weirdness[i++] = s.Byte
+
+		for i in –count .Weirdness
+			|| x = 0
+			if s.Position < After
+				x = s.hint
+			.Weirdness[i] = x
 
 	function Close (|int| Pos)
 		expect (self) ("Bad close var index")
 		.CodeEnd = pos
-		
+	
+	
 	function Print (|!&ivec4| Reg)
 		|| fs = FastString(nil|faststring|)
 		.Render(fs, reg, true)
@@ -35,27 +40,89 @@ class XVar
 		opt norefcounts
 		Reg += .reg
 		if full
+			.TypeName(fs)
+			fs <~ " "
 			fs <~ .name
 			fs <~ "(${.reg|int|}): " // remove .reg once this is reliable
-		|| C = .ClassType
-			return .RenderStruct(fs, reg, C)
+		|| C = .obj|&nil||xtype|
+			if c.IsObject
+				return .RenderObject(fs, reg)
+
 		return .RenderData(fs, reg)
 	
 	
-	function RenderStruct (|faststring| fs, |!&ivec4| Reg, |XType| T)
+	function RenderObject (|faststring| fs, |!&ivec4| Reg)
+		opt norefcounts
+		require .TestMem(fs, reg, 8)
+		|| obj = reg|&object|[]		// this should share our classes, so class tests should work.
+		if !obj
+			fs <~ "(nil)"
+		  elseif obj isa string
+			fs <~ '"'
+			fs.AppendEscape(obj)
+			fs <~ '"'
+		  elseif obj isa Message
+			if .NormalView
+				obj.RenderAST(Fs)
+			  else
+				obj.render(Fs)
+		  else
+			fs <~ "0x"
+			fs.AppendHex(obj|int64|, 8)
+			fs <~ "*"
+			fs <~ obj.refcount
+			
 		// object, message, string
-		// struct?
+		// arrays are a bit sussy. Cos they can contain themselves! Better to force expansion
+	
+	
+	function TypeName (|faststring| fs)
+		opt norefcounts
+		for W in .Weirdness
+			loop W
+			if w is Reference // ref
+				fs <~ "$"
+			if w is Pointer
+				fs <~ "&"
+			w >>= 2
+			if w
+				fs <~ "[$w]"
+			
+		|| C = .obj|&nil||xtype|
+			 fs <~ C.Name
+		  else
+			.DataType.Render(Fs)
 		
-		
+	
+	function TestMem (|faststring| fs, |!&ivec4| Reg, |int| N, |bool|)
+		|| Err = memory.test(reg, N)
+			return true
+		fs <~ Err.signalname
+		fs <~ ": 0x"
+		fs.AppendHex(reg|int64|, 8)
+	
+	
 	function RenderData (|faststring| fs, |!&ivec4| Reg)
 		|| T = .DataType
-		|| V = t.VecCount()
-		|| Small = t.ByteCount <= 4
+		|| V = t.VecCount
+		|| BC = t.ByteCount
+		if (bc >= 12): bc = 16		
+		|| W = .weirdness[0]
+		if W is pointer or reference
+			require .TestMem(fs, reg, 8)
+			|| Ptr = Reg|&&nil|[]|int64|
+			fs <~ "0x"
+			fs.AppendHex(ptr, 8)
+			require !.weirdness[1]
+			reg = ptr|&ivec4|
+
+		require .testmem(fs, reg, bc)			
+				
 		if t is bool
 			fs <~ (reg|&bool|)[].string
 		  elseif t is int
 			if v <= 1
-				if !Small
+				if BC > 4
 					fs <~ (reg|&int64|)[]
 				  elseif t.IsSigned 
 					fs <~ (reg|&int|)[]
@@ -69,7 +136,7 @@ class XVar
 				fs <~ (reg|&ivec4|)[]
 		  else
 			if v <= 1
-				if Small
+				if BC <= 4
 					fs <~ (reg|&float|)[]
 				  else
 					fs <~ (reg|&f64|)[]
@@ -80,9 +147,11 @@ class XVar
 			  elseif v == 4
 				fs <~ (reg|&vec4|)[]
 	
+	
 	syntax is (|datatypecode| T, |bool|)
 		return .DataType.SyntaxIs(t)
-				
+	
+
 
 function message.xvariables (|[xvar]|)
 	opt norefcounts
@@ -117,5 +186,4 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 			out <~ var
 
 		expect (input.position == After) ("Corrupted debug vars")
-
 

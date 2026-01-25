@@ -587,7 +587,7 @@ struct Assembler
 	function scclass.ListLayout (|jbin| j)
 		opt norefcounts
 		|| s = .super
-		|| sid = (s.tableid, 0)(s)
+		|| sid = ((s.tableid<<1) + .isobject, 0)(s)
 		j.AddInt(sid)
 		j.PropertyLayout(.Properties)
 			

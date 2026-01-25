@@ -46,6 +46,7 @@ typedef void (*fn_app_deathaction)();
 int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
 int JB_Signal(int pid, int sig);
+int JB_CanReadMemory(void* B, int N);
 void JB_App__CrashOnInterupt (bool b);
 void JB_App__SetASMBreak(bool b);
 void JB_SigMsgReceived(int signum);
