@@ -7158,7 +7158,7 @@ bool JB_Flow__Cond2(bool Value);
 
 
 // JB_InputStream
-int JB_SS_Byte(InputStream* Self);
+Ind JB_SS_Byte(InputStream* Self);
 
 void JB_SS_CompressInto(InputStream* Self, JB_Object* Dest, int Strength, CompressionStats* St);
 
@@ -9117,6 +9117,8 @@ bool SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals);
 
 bool SC_Decl_CanCopyNormally(SCDecl* Self);
 
+bool SC_Decl_CanGetAddressSafely(SCDecl* Self);
+
 bool SC_Decl_CanNilCheck(SCDecl* Self);
 
 bool SC_Decl_CanRemoveArgOnReturn(SCDecl* Self, Message* R);
@@ -10981,7 +10983,7 @@ inline JB_Duration JB_Date_OperatorMinus(Date Self, Date D) {
 }
 
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt Self) {
-	return Self >= 0;
+	return Self == 0;
 }
 
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
