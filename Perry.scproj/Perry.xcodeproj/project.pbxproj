@@ -333,7 +333,6 @@
 
 /* Begin PBXFileReference section */
 		AC00B1B42EA694E800A1BA73 /* PicoMsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../Library/CppLib/PicoMsg.h; sourceTree = "<group>"; };
-		AC00B1B52EA6961600A1BA73 /* PicoMsg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../../include/PicoMsg/PicoMsg.h; sourceTree = "<group>"; };
 		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
 		AC1050122D6205EC00BB929B /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../Library/libSDL2.dylib; sourceTree = "<group>"; };
 		AC13B27E2EE1E77300BF1567 /* PerryExec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryExec.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -576,7 +575,6 @@
 			children = (
 				AC3A6A8D296082E700CE1E91 /* README.md */,
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
-				AC00B1B52EA6961600A1BA73 /* PicoMsg.h */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
 				AC66D1582ED1D6AC00EDFB82 /* Compiled Src Exec */,
 				AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */,
