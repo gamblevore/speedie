@@ -982,9 +982,11 @@ JB_ASM_FillTable
 JB_ASM_Index
 JB_ASM_InitTable
 JB_ASM_Pause
+JB_ASM_PrevStack
 JB_ASM_Registers
 JB_ASM_Run
 JB_ASM_SetDebug
+JB_ASM_StackCode
 JB_ASM__VM
 JB_AllClasses
 JB_AppArgument_Name
@@ -1298,7 +1300,6 @@ JB_FastBuff_SyntaxExpect
 JB_FastBuff_TmpStr
 JB_FastBuff_UInt16
 JB_FileSizeInt__MainArg
-JB_File_AccessPeek
 JB_File_Accessed
 JB_File_AnyDate
 JB_File_Child
@@ -1356,7 +1357,6 @@ JB_File_PathFix
 JB_File_Peek
 JB_File_Read
 JB_File_ReadAll
-JB_File_RelFile
 JB_File_RelaxPath
 JB_File_Render
 JB_File_Sibling
@@ -2568,6 +2568,3 @@ roundf
 sqrt
 sqrtf
 strlen
-JB_CakeVM_Prev
-JB_ASM_PrevStack
-JB_ASM_StackCode
