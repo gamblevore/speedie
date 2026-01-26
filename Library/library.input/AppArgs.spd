@@ -92,6 +92,9 @@ autogen @file.MainArg		(|int| Pos, |string| name, |file|)
 			rz = str.file
 	
 
+autogen @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
+	return string.MainArgSub(Pos, name, "file-size")$.float(true)|FileSizeInt|
+
 
 autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
@@ -103,9 +106,4 @@ autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringt
 		|| usage = app.Usage
 		error "Missing $name ($type).\n\n$usage"
 	return string.Error
-
-
-autogen @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
-	return string.MainArgSub(Pos, name, "file-size")$.float(true)|FileSizeInt|
-
 
