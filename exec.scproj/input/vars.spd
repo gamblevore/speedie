@@ -1,16 +1,14 @@
 
 
 class XVar (list)
-	|Wierdness[5]|	Weirdness
+	|Wierdness[5]|	Weirdness // pointers, references, carrays
 	|int|			CodeEnd
-	|int|			CArraySize  // isn't this in the wierdness?
-								// but then.... how to get at it? we don't wanna parse it each time.
-								// do we make this a recursive type?
 	|bool|			NormalView
 	|uint16|		Reg
 	|DataTypeCode|	DataType
 	|string|		Name
-		
+	
+	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
 		.normalview = true
 		.position = pos
@@ -60,6 +58,10 @@ class XVar (list)
 		  elseif obj isa string
 			fs <~ '"'
 			fs.AppendEscape(obj)
+			fs <~ '"'
+		  elseif obj isa faststring
+			fs <~ '"'
+			fs.AppendEscape(obj|&nil||string|)
 			fs <~ '"'
 		  elseif obj isa Message
 			if .NormalView
