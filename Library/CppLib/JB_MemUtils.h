@@ -83,7 +83,7 @@ u64 JB_MemUsedOther();
 
 inline int JB_Int_Log2 (int X) {
 #if __cpp_lib_bitops
-	return 31-std::countl_zero(X); // stable per-platform.
+	return 31-std::countl_zero((uint)X); // stable per-platform.
 #else
 	if (!X)
 		return -1;

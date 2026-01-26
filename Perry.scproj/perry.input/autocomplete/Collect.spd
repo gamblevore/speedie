@@ -105,14 +105,12 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			return spd
 
 
-target debug
+target debug and !cake and !exec
+	// cake shouldn't have access to this I think...
 	target exec
 		cpp_libwrapper Exec_Main (spdprocess.Thread)
 	  else
 		cpp_libwrapper Speedie_Main (spdprocess.Thread)
 || SpdLibAlreadyInUse = false
-	
 
-// how should a lib-wrapper be called by a cake file?
-// hmmmm. well... basically we don't have access to that
-// so it shouldn't be compilable.
+

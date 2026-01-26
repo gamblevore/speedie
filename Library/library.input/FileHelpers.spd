@@ -317,7 +317,15 @@ role StringThatWasReadSafely (string)
 
 
 datatype FileSizeInt (int64)
+	// file.write uses this. makes it easier to check if a write succeeded or not.
+	// also filesizeint.mainargs exists... kinda handy for demos
+	default 0
+	false -1
+	syntax cast (|bool|)
+		inline
+		return self >= 0
 	render
 		inline
 		return .strsize(fs)
+
 

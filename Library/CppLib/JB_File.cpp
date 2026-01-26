@@ -737,12 +737,12 @@ int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
 }
 
 
-int JB_File_Write ( JB_File* self, JB_String* Data ) {
+int64 JB_File_Write ( JB_File* self, JB_String* Data ) {
     if (!JB_Str_Length(Data))
 		return 0;
 	if (JB_File_Open( self, O_RDWR | O_CREAT, false ) >= 0 )
-		return (int)JB_File_WriteRaw_(self, Data->Addr, Data->Length );
-	int err = errno;
+		return JB_File_WriteRaw_(self, Data->Addr, Data->Length );
+	int64 err = errno;
     return -(err?err:1);
 }
 
@@ -1254,11 +1254,13 @@ int JB_File_Copy (JB_File* self, JB_File* To, bool AttrOnly) {
 
 
 
-int JB_File_DataSet ( JB_File* self, JB_String* Data ) {
-	bool WasOpen = self->Descriptor > STDPICO_FILENO;
+int64 JB_File_DataSet ( JB_File* self, JB_String* Data ) {
+	bool WasOpen = (self->Descriptor >= 0) and !JB_File_IsPipe(self);
 	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false) < 0)
 		return -errno;
-	int N = JB_File_Write(self, Data);
+	if (!WasOpen)
+		JB_File_OffsetSet(self, 0);
+	int64 N = JB_File_Write(self, Data);
 	if (N >= 0 and N != JB_Str_Length(Data))
 		N = -errno;
 	if (!WasOpen)

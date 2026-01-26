@@ -58,7 +58,7 @@ void JB_munmap (void* mem, int64 n);
 int JB_Str_MakeDir(JB_String* self);
 int JB_File_RelaxPath(JB_File* self, bool NeedsMode);
 JB_String* JB_File_Read(JB_File* self, int Length, bool Ignore);
-int JB_File_DataSet( JB_File* self, JB_String* Data );
+int64 JB_File_DataSet( JB_File* self, JB_String* Data );
 JB_File* JB_Str_File( JB_String* Path );
 JB_File* JB_File__NewPipe(int Pipe);
 JB_File* JB_File__StdOut( );
@@ -75,9 +75,8 @@ JB_String* JB_CPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFil
 int JB_File__chdir( JB_String* Path );
 JB_String* JB_File__CWD( );
 long JB_File_Remaining( JB_File* self );
-int JB_File_Write( JB_File* self, JB_String* Data );
+int64 JB_File_Write( JB_File* self, JB_String* Data );
 s64 JB_File_WriteRaw_( JB_File* self, uint8* Data, int N );
-int JB_File_WriteCompressed_( JB_File* self, JB_String* str );
 
 int JB_File_OpenEmpty( JB_File* self );
 int JB_File_Open(JB_File* self, int OpenFlags, bool ignore);

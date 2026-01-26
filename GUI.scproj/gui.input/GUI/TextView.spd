@@ -739,6 +739,9 @@ class TextView (GUIControl)
 				return .DoUndo(!keys.shift)
 
 		if key is left:				return .MoveSel(-1)
+		if key is BACKTICK or MacBackTick
+			if keys.Option or keys.Ctrl or keys.cmd
+				return .sectionkey
 		if key is section:			return .SectionKey
 		if key is right:			return .MoveSel(1)
 		if key is pageup:			return .MoveSelLine(-1, 1)

@@ -106,6 +106,6 @@ autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringt
 
 
 autogen @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
-	return string.MainArgSub(Pos, name, "file-size")$.float(true)|filesizeint|
+	return string.MainArgSub(Pos, name, "file-size")$.float(true)|FileSizeInt|
 
 

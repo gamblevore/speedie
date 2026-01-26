@@ -136,7 +136,7 @@ class Document (list)
 
 
 	function Save (|int| Purpose=0, |ind|)
-		// purpose is unused, right now.
+		(purpose)// purpose is unused, right now.
 		// it was used, originally... and might be again.
 		|| l = .Location			#require
 		|| c = .current				#require	
@@ -151,14 +151,17 @@ class Document (list)
 			KeepDate = .FindKeepDate(t, f)
 			if !f.writeall(t)
 				rz = -1
+		f.close
 		if rz
 			.original = c
+			|date| NewDate
 			if !deleted
 				if KeepDate
-					f.modified = .filedate
+					NewDate = .filedate
 				  else
-					f.modified = gui.FrameStart // just clear the subsecond bits
-			.filedate = f.modified  // read it back to be sure its what we think it is.
+					NewDate = gui.FrameStart // just clear the subsecond bits
+				f.modified = NewDate
+			.filedate = f.modified				// read it back to be sure its what we think it is.
 			.UpdateSavedState
 			
 
@@ -177,8 +180,10 @@ class Document (list)
 		if !d
 			return true			// unsaved... must be ok.
 		
-		if d == .Location.file.modified
-			return true			// no need
+		|| DiskMod = .Location.file.modified
+		|| DiskIsNewer = DiskMod - d
+		if DiskIsNewer == 0 
+			return true			// no need 
 		if .IsModified
 			return false		// not sure which to use.
 		return .load(true)		// Reload!
@@ -187,7 +192,7 @@ class Document (list)
 	function CheckModified (|bool|)
 		if .SimpleUpdateFromDisk
 			return true
-
+		
 		|| Options	= ["Save", "Reload"]
 		|| Answer	= confirmationdialog.ask("The file ${.location.name} has been externally modified. Reload or resave?", "", Options) 
 		if answer >=  1			// save
@@ -197,7 +202,7 @@ class Document (list)
 		return true
 
 
-//	function Length (|int|)
+//	function Length (|int|) 
 //		|| c = .current
 //			return c.text.length
 

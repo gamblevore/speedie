@@ -350,7 +350,7 @@ module Conv
 	
 	
 	function FormatInfo (|$int| Size = 0, |string|)
-		|| str = .in!.Section(0, 64)
+		|| str = .in!.Section(0, 64) // just read 64 bytes? why this helper?
 			if str == string.error
 				return str
 		
@@ -363,4 +363,14 @@ module Conv
 
 		if str.IsJbin
 			.Detected |= type.jbin
+
+
+function file.Section (|int| a, |int| b, |string|)
+	cpp_part AccessPeek
+	|| WasClosed = .descriptor < 0
+	if .open(File.readmode)
+		.offset = a
+		rz = .read(b-a)
+		if WasClosed
+			.close
 

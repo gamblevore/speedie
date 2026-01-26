@@ -88,10 +88,6 @@ Module Jeebox
 		SetDecodeEntities(.XML_UnEscapeStr!, true)
 
 		.EscapeStr![`${`] = `$\{`
-	
-
-//	function string.UnBackTick (|string|)
-//		return .replaceall("``", "`")
 
 
 	libinternal string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)

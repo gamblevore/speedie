@@ -560,7 +560,7 @@ class PerryIDE (Window)
 			.close
 			rz = true
 		  elseif .IsSingleFileProject
-			f.write("")
+			f.write("") // why not f.touch?
 				
 
 	function ShowFind (|bool|)

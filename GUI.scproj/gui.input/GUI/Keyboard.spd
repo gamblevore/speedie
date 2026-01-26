@@ -119,7 +119,7 @@ dataType Keys (int)
 
 	function IsCMM  (|bool| shift=false, |bool|)
 		if shift == (keys.shift or keys.option)
-			return self is section or MacBackQuote or backquote or APPLICATION or slash
+			return self is section or MacBacktick or backtick or APPLICATION or slash
 
 	function IsModifier (|bool|)
 		return (self is lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
@@ -574,8 +574,8 @@ dataType Keys (int)
 		RIGHTBRACKET = ']'
 		CARET = '^'
 		UNDERSCORE = '_'
-		BACKQUOTE = '`'
-		MacBackQuote = 167
+		BACKTICK = '`'
+		MacBackTick = 167
 		a = 'a'
 		b = 'b'
 		c = 'c'

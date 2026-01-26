@@ -85,7 +85,7 @@ class File (String)
 	function Length (|int|)
 		disabled "Do you mean the file's size or the file's path length?" 
 	
-	function Size (|int64|) // actually ints are less buggy. Like "|| NewSize = oldsize-1" with uint is bad.
+	function Size (|int64|)
 		description "Return the file-size."
 		cpp_wrapper JB_File_Size
 
@@ -104,14 +104,26 @@ class File (String)
 	function Close
 		cpp_wrapper JB_File_Close
 	
-	Syntax Access (assigns:|string| data, |ErrorInt|)
+	Syntax Access (assigns:|string| data, |FileSizeInt|)
 		description "Writes to the file. Clears old data."
 		return .WriteAll(data)
 		
-	function String.WriteAll (|string| Data, |ErrorInt|)
-		description "Writes to the file. Clears old data. The entire data must be written. Or else the error-system kicks in."
+	function String.WriteAll (|string| Data, |FileSizeInt|)
+		description "Writes to the file. Clears old data. Errors-out if some data isn't written"
 		|| f = .file // may be self
 		return f.writeall(data)
+	
+	function WriteAll (assigns:|String|Data, |FileSizeInt|)
+		description "Sets the entire file to this string. If you want to only append to the file call .Write() instead. Errors-out if some data is not written."
+		cpp_wrapper JB_File_DataSet
+
+	function Write (|string| Data, |FileSizeInt|)
+		description "Appends this string to the file. If we are not at the end of the file, this will overwrite existing file data. If you want to set the entire file, use .WriteAll instead.  Errors-out if some data is not written."
+		cpp_wrapper JB_File_Write	
+
+	function SmartData (assigns:|String| nieu, |bool|)
+		if (.size != nieu.length) or (.readall(true) != nieu)
+			return .writeall(Nieu)
 
 	Syntax Append (|string| data)
 		disabled "Use file[] = data, to set the entire file's data."
@@ -126,22 +138,8 @@ class File (String)
 	inline Hidden (|bool|)
 		return !.visible
 
-	function SmartData (assigns:|String| nieu, |bool|)
-		if (.size != nieu.length) or (.readall(true) != nieu)
-			return .writeall(Nieu)
-	
-//	operator plus (|string| s, |file|)
-//		opt norefcounts
-//		return (super+S).file
-	
 	function File (|file|)
 		disabled "This is already a file."
-	
-	function WriteAll (assigns:|String|Data, |ErrorInt|)
-		cpp_wrapper JB_File_DataSet
-
-	function Write (|string| Data, |ErrorInt|)
-		cpp_wrapper JB_File_Write	
 	
 	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |syntax| Owner=@nil,  |messageroot|)
 		// normally allowmissing is good, but here it is bad.
@@ -174,18 +172,6 @@ class File (String)
 		rz = .read(n)
 		.offset = i
 	
-	function Section (|int| a, |int| b, |string|)
-		cpp_part AccessPeek
-		|| WasClosed = .descriptor < 0
-		if .open(File.readmode)
-			.offset = a
-			rz = .read(b-a)
-			if WasClosed
-				.close
-
-	function RelFile (|file|)
-		|| cd = app.cwd.pathdir
-		return .trimstart(cd).File
 
 	render 
 		cpp_wrapper
@@ -348,7 +334,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		error (self, "Unable to find unique child name.")
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)
-		description "Does something with file permissions. If we are sudo, it makes this file not need sudo" 
+		description "Alters file permissions. If this process is in sudo mode, it makes this file not need sudo to access it"
 		cpp_Wrapper JB_File_RelaxPath
 	
 	function DeleteAll (|bool| KeepSelf=false, |ErrorInt|)
