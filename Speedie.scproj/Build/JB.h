@@ -7685,7 +7685,7 @@ ivec2 JB_Str_UTF8Badness(JB_String* Self);
 
 bool JB_Str_Visible(JB_String* Self);
 
-ErrorInt JB_Str_WriteAll(JB_String* Self, JB_String* Data);
+FileSizeInt JB_Str_WriteAll(JB_String* Self, JB_String* Data);
 
 bool JB_Str_Yes(JB_String* Self, Message* Where);
 
@@ -7833,7 +7833,7 @@ JB_File* JB_File_Sibling(JB_File* Self, JB_String* Name);
 
 bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu);
 
-ErrorInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data);
+FileSizeInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data);
 
 void JB_File_Fail(JB_File* Self, JB_String* Error);
 
@@ -10667,6 +10667,8 @@ inline int JB_FastBuff_Remaining(FastBuff* Self);
 
 inline bool JB_FileDes_SyntaxCast(FileDes Self);
 
+inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self);
+
 inline bool JB_File_Opened(JB_File* Self);
 
 inline JB_String* JB_File__Applications();
@@ -11030,6 +11032,10 @@ inline int JB_FastBuff_Remaining(FastBuff* Self) {
 }
 
 inline bool JB_FileDes_SyntaxCast(FileDes Self) {
+	return Self >= 0;
+}
+
+inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self) {
 	return Self >= 0;
 }
 

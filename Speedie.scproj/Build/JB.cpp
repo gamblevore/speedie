@@ -3533,7 +3533,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[444]);
-	JB_FS_AppendInt32(_fsf0, (2026012521));
+	JB_FS_AppendInt32(_fsf0, (2026012614));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8245,7 +8245,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1397]);
-	JB_FS_AppendInt32(_fsf0, (2026012521));
+	JB_FS_AppendInt32(_fsf0, (2026012614));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -33444,10 +33444,10 @@ bool JB_Str_Visible(JB_String* Self) {
 	return _tmPf1;
 }
 
-ErrorInt JB_Str_WriteAll(JB_String* Self, JB_String* Data) {
+FileSizeInt JB_Str_WriteAll(JB_String* Self, JB_String* Data) {
 	JB_File* F = JB_Str_AsFile(Self);
 	JB_Incr(F);
-	ErrorInt _tmPf0 = JB_File_DataSet(F, Data);
+	FileSizeInt _tmPf0 = JB_File_DataSet(F, Data);
 	JB_EarlyDecr(F);
 	return _tmPf0;
 }
@@ -34325,12 +34325,12 @@ bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu) {
 		JB_EarlyDecr(_tmPf1);
 		 _tmPf0;
 	})))) {
-		return JB_ErrorInt_SyntaxCast(JB_File_DataSet(Self, Nieu));
+		return JB_FileSizeInt_SyntaxCast(JB_File_DataSet(Self, Nieu));
 	}
 	return false;
 }
 
-ErrorInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data) {
+FileSizeInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data) {
 	return JB_File_DataSet(Self, Data);
 }
 
@@ -59282,4 +59282,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 3674550607364392069 2174900602060707106
+// -2222855062842374091 2174900602060707106
