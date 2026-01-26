@@ -7,6 +7,12 @@ module SpdTable
 	|spdfunc--|		CurrFunc
 	|&&nil|			LibFuncs = cakerun.LibFuncs
 	
+	function Find (|int| index, |spdfunc|)
+		opt norefcounts
+		for f in .funcs
+			|| P = f.Position
+			if  index >= P  and  index < P + f.RangeLength
+				return f
 	
 	function RunMain (|ind|)
 		opt norefcounts

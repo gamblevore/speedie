@@ -93,10 +93,13 @@ typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
 void	JB_InitClassList	(SaverLoadClass fn);
 
 struct	CakeVM;
-typedef int64 (*JB_ASM_Break)(CakeVM* VM, u32* Code, int BreakValue);
-u32*	JB_ASM_Code			(CakeVM* V, int Length);
-int		JB_ASM_Index		(CakeVM* vm, u32* Code);
+typedef int64 (*JB_ASM_Break)(CakeVM* VM, int Index, int BreakValue, ivec4* Reg0);
+
 CakeVM*	JB_ASM__VM			(int StackSize, int Flags);
+u32*	JB_ASM_Code			(CakeVM* V, int Length);
+int		JB_ASM_Index		(CakeVM* V, u32* Code);
+ivec4*	JB_ASM_PrevStack	(CakeVM* V, ivec4* Reg0);
+int		JB_ASM_StackCode	(CakeVM* V, ivec4* Reg0);
 void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex);
 void**	JB_ASM_InitTable	(CakeVM* V, int n, int g);

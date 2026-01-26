@@ -61,7 +61,7 @@ JB_String* JB_Sh_Render (ShellStream* Self, FastString* Fs_in) {
 }
 
 
-void JB_App__SetASMBreak (bool b) {
+void JB_App__SetCanBreak (bool b) {
 	CanASMBKPT = b;
 }
 

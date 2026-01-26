@@ -31,12 +31,6 @@ typedef u64 (*Fn11)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 
 
-struct Function { 
-	uint8			JbinStart; // bytes backward to the jbin string
-	uint			CallCount;
-	ASM				Code[];
-};
-
 
 struct vm_globs {
     byte*			LibGlobs;

@@ -180,7 +180,7 @@ function CompileAll
 	
 	.Successfulness |= StdErr.ok
 	target debug
-		if Compiler.InPerry: app.SetASMBreak(false)
+		if Compiler.InPerry: app.DebugBreaksActive(false)
 
 	intrinsics.Process
 	
@@ -189,7 +189,7 @@ function CompileAll
 		PackMaker.MakePack	
 
 	target debug
-		if Compiler.InPerry: app.SetASMBreak(true)
+		if Compiler.InPerry: app.DebugBreaksActive(true)
 	
 	if !compiler.inperry
 		intrinsics.Process

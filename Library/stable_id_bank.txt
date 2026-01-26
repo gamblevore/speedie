@@ -2568,3 +2568,6 @@ roundf
 sqrt
 sqrtf
 strlen
+JB_CakeVM_Prev
+JB_ASM_PrevStack
+JB_ASM_StackCode

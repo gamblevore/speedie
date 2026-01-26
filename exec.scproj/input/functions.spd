@@ -8,7 +8,6 @@ role SpdFunc (message)
 		.name = "(unused code)"
 		.func = @tmp
 		.Position = -1
-	
 
 	// we try to standardise the output structure
 	function message.CopyToVM
@@ -43,6 +42,16 @@ role SpdFunc (message)
 		SpdTable.LinksOK++
 		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
 
+	function Vars (|[xvar]|)
+		opt norefcounts
+		|| xv = .obj
+		if xv isa array
+			return xv|array of xvar|
+		
+		|| vars = .Last.xvariables
+		.obj = vars
+		return vars
+		
 	
 	module
 		|ivec4| Dummy

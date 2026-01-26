@@ -241,8 +241,8 @@ libinternal _chdir (|string| path, |ErrorInt|)
 
 
 target debug
-	function SetASMBreak (|bool| b)
-		cpp_wrapper JB_App__SetASMBreak
+	function DebugBreaksActive (|bool| b)
+		cpp_wrapper JB_App__SetCanBreak
 
 
 render MemoryUsage (|int| Over=0)

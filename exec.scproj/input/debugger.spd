@@ -1,4 +1,27 @@
 
+// we need to respond to a few things:
+	// pause
+	// run
+	// step over
+	// step in
+	// step out
+	// ask for vars
+	// ask for stack
+	// hit breakpoints and stop!
+	// deal with crashes.
+
+// of course... we can't actually do these.
+// not without the cake file
+// So... lets say they press pause. what do we do? well... we can't do anything
+// so what are we doing? Testing?
+// planning?
+// preparing?
+// lets pretend we paused. then send back some messages.
+// send back... variables, and stack
+
+// what about asking for ASM? That goes through speedie.
+// So might as well do that first?
+
 
 module debugger
 	|message|		Root
@@ -33,8 +56,6 @@ module debugger
 		for F.fast in b[@arg]
 			if f.expect(@tmp)
 				printline f
-				
-		
 		
 	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |int64|)
 		|| str = F.GetLine(position)
@@ -46,29 +67,6 @@ module debugger
 		print F.name
 		print ": "
 		printline str
-
-	// we need to respond to a few things:
-		// pause
-		// run
-		// step over
-		// step in
-		// step out
-		// ask for vars
-		// ask for stack
-		// hit breakpoints and stop!
-		// deal with crashes.
-
-	// of course... we can't actually do these.
-	// not without the xpd file
-	// So... lets say they press pause. what do we do? well... we can't do anything
-	// so what are we doing? Testing?
-	// planning?
-	// preparing?
-	// lets pretend we paused. then send back some messages.
-	// send back... variables, and stack
-	
-	// what about asking for ASM? That goes through speedie.
-	// So might as well do that first?
 	
 	function StartUp (|&int|)
 		|| V = &__Viewer__
@@ -91,13 +89,27 @@ module debugger
 	
 	function __Viewer__ (cakevm.CakeChef)
 		opt norefcounts
-		|| Index = .index(code)
-		if index < debugger.Length
-			|| Where = debugger.Base![index]
-			|| Path = debugger.path(where & (11~bits))$
-			return .DebugFoundLocation( Path, Where>>11 )
-		if StdErr.ok
-			error ("Code map too short: " + index)
+		if index >= debugger.Length
+			check (!stderr.ok) ("Code map too short: " + index)
+			return 0
+		
+		|| Where = debugger.Base![index]
+		|| Path = debugger.path(where & (11~bits))$
+/		.DebugFoundLocation( Path, Where>>11 )
+		.PrintStackVars(index, spdtable.Find(index), Reg0)
+	
+	
+	function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0)
+		if !fn
+			printline "(unknown)" // could print regs, but how many?
+			return
+		
+		printline fn.name
+		// now... we need to read the func's debug info! yikes
+		index -= fn.Position
+		for v in fn.vars
+			if v contains index
+				v.Print(reg0)
 	
 		
 	function Load (|bool|)

@@ -16,6 +16,7 @@ class XVar (list)
 		.name = s.CString
 		.obj = xtype.GetType(s.hint, nil)
 		.DataType = s.HInt
+		.CodeEnd = int.max
 
 		for i in –count .Weirdness
 			|| x = 0
@@ -27,16 +28,19 @@ class XVar (list)
 		expect (self) ("Bad close var index")
 		.CodeEnd = pos
 	
-	
-	function Print (|!&ivec4| Reg)
+	operator contains (|int| P, |bool|)
+		require P >= .Position and P < .codeend
+		
+
+	function Print (|!&ivec4| Reg0)
 		|| fs = FastString(nil|faststring|)
-		.Render(fs, reg, true)
+		.Render(fs, reg0, true)
 		printline fs.GetResult
 	
 	
-	function Render (|faststring| fs, |!&ivec4| Reg, |bool| Full)
+	function Render (|faststring| fs, |!&ivec4| Reg0, |bool| Full)
 		opt norefcounts
-		Reg += .reg
+		|| Reg = Reg0 + .reg
 		if full
 			.TypeName(fs)
 			fs <~ " "
@@ -173,19 +177,20 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 	|| input = xtype.shared
 	input.Reset(.name)
 	while (|| Section = input.byte)
-		|| After = input.Position + Section
+		|| ReadEnd = input.Position + Section
 		|| pos = Input.hint
 		|| reg = Input.hint
 		expect (registers and reg|uint| < 32) ("Too large register")
 		
-		if input.Position >= After // Close
+		if input.Position >= ReadEnd // Close
 			if Registers
 				Registers[reg].Close(pos)
 		  else
-			|| var = xvar(input, pos, reg, After)
+			|| var = xvar(input, pos, reg, ReadEnd)
 			if Registers
 				Registers[reg] = var
 			out <~ var
 
-		expect (input.position == After) ("Corrupted debug vars")
+		expect (input.position == ReadEnd) ("Corrupted debug vars")
+	
 

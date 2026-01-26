@@ -49,7 +49,7 @@ void JB_ASM_Pause (CakeVM* V) {
 }
 
 
-int64 JB_ASM_NoBreak (CakeVM* VM, u32* Code, int BreakValue) {
+int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
 	return false;
 }
 
@@ -70,15 +70,6 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 	byte* B = (byte*)V;
 	return (int*)(B + (CakeCodeMax*4) + (V->StackSize));
 }
-
-// OK, so what should exec do, whenit is run, by perry
-// perhaps... just run? or... wait for instructions.
-// what about the breakpoints?
-// do we want to let perry tell exec what the breakpoints are?
-// I think so? So... we should wait for some breakpoints?
-// or else they'll have to be compiled into the app.
-// this makes no sense. We'll have two ways of setting/clearing points
-
 
 
 #define EROR HALT
@@ -122,11 +113,11 @@ static void * const GlobalJumpTable[] = {
 	}
 	
 	BREAK:;											// the actual breakpoint
-	if (int64 Value = (vm.Break)(&vm, Code-1, (Code[CakeCodeMax-1]<<1)>>1)) {
-		if (Value < 0) { // jump back? i guess so?
+	if (int64 Value = (vm.Break)(&vm, JB_ASM_Index(&vm, Code-1), (Code[CakeCodeMax-1]<<1)>>1, (ivec4*)r)) {
+		if (Value < 0) {			// jump back? i guess so?
 			Code += Value;
 			if (Code < VMCodePtr(&vm))
-				Code -= Value; // fuck("Debugger jumped out of range");
+				Code -= Value;		// Debugger jumped out of range!!
 			  else 
 				Op = *Code++;
 		} else if (Value <= 256) {
@@ -140,13 +131,31 @@ static void * const GlobalJumpTable[] = {
 }
 
 
-int JB_ASM_Index (CakeVM* vm,  ASM* Code) {
+int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 	ASM* Start = (ASM*)(((byte*)vm) + vm->StackSize);
 	if (Code < Start)
 		return -1;
 	if (Code >= Start + CakeCodeMax)
 		return -1;
 	return (int)(Code - Start);
+}
+
+
+ivec4* JB_ASM_PrevStack (CakeVM* vm, ivec4* Reg0) {
+	if (!Reg0) return 0;
+	auto Stack = (VMStack*)(Reg0-1);
+	int Saved = Stack->SavedReg;
+	auto BackStack = Stack - Saved;
+	if (BackStack <= &vm->Registers[1].Stack)
+		return 0; // last?
+
+	return (ivec4*)(BackStack+1);
+}
+
+
+int JB_ASM_StackCode (CakeVM* vm, ivec4* Reg0) {
+	auto Stack = (VMStack*)(Reg0-1);
+	return JB_ASM_Index(vm, Stack->Code);
 }
 
 
@@ -195,8 +204,8 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 	
 	StackSize = std::max(StackSize, 256*1024);
 	int AllocSize = StackSize + CakeCodeMax*4;
-	if (true or (Flags&kJB_VM_CanDebug))
-		AllocSize += CakeCodeMax*4; // better that we can always debug. but hard without a map? we'll step into bare-ASM...
+	if (Flags&kJB_VM_CanDebug)
+		AllocSize += CakeCodeMax*4;
 	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);		// page aligned. Can call mprotect later.
 	if (V) {
 		memzero(V, AllocSize);
