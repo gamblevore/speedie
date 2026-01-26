@@ -26,9 +26,10 @@ class XType
 		
 		function GetType (|int| i, |message| err, |xtype|)
 			opt norefcounts
-			|| Sup = xtype.Types[i]
-				return sup
-			error (err, "Super out of range")
+			if i
+				|| Sup = xtype.Types[i]
+					return sup
+				error (err, "Super out of range")
 
 
 

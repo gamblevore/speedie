@@ -1597,7 +1597,7 @@
 					"$(inherited)",
 					/usr/local/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "";
+				LD_RUNPATH_SEARCH_PATHS = /usr/local/speedie/Library;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/lib,
@@ -1663,7 +1663,7 @@
 					"$(inherited)",
 					/usr/local/include,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "";
+				LD_RUNPATH_SEARCH_PATHS = /usr/local/speedie/Library;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/lib,
