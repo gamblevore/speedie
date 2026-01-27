@@ -260,8 +260,9 @@ class StretchDivider (GuiControl)
 
 	behaviour MouseMove
 		opt norefcounts
-		if state is enter
-			(SystemCursor.SizeWE+.d).Use
+		|| Cursor = SystemCursor.SizeWE+.d
+		if state is enter or systemcursor.curr != Cursor
+			Cursor.Use
 		
 		if .MouseDownOnSelfOrNil
 			return .InTest(P, true)

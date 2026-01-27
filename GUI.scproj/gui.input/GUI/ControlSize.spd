@@ -49,16 +49,21 @@ struct ControlSize
 			if self isa Window
 				._ReadjustBlock2D
 			GUI.NeedMouseMove = true
+			GUI.ControlResizedSafely = true
 			|| Initial = self isnt HasBeenSized
 			is HasBeenSized
 			.__Resized__(Initial)
-		if !.hasany
-			return rz
+
 		|| mine = rz
 		if self isa window
 			mine = mine.soothe
 			hard = mine
-		.Reflow(mine, hard)
+
+		prev = mine.x2y2x1y1 // noice
+		for R in self
+			|| curr = R.CalculateSize(mine, prev, hard)
+			if r is visible or Spacer
+				prev = Curr
 
 
 	function CalculateSize (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)

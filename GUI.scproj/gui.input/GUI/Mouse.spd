@@ -9,10 +9,12 @@ datatype MouseDragging (int)
 		EvenIfNoMovement = 4<<4
 
 
+
 datatype SystemCursor (int)
 	linkage
 		wrapper
 		cpp_class SystemCursor
+	
 	constants
 		|SystemCursor|
 		Arrow		// arrow
@@ -33,12 +35,14 @@ datatype SystemCursor (int)
 		return _Cursors[self] init .create
 	
 	function Use
+		SystemCursor.Curr = self
 		.get.use
 
 	libinternal Create (|!&SDL_Cursor|)
 		cpp_wrapper JB_CreateSystemCursor
 
 	module
+		|byte|				Curr
 		|(&SDL_Cursor)[12]| _Cursors
 				
 
@@ -47,12 +51,13 @@ datatype SystemCursor (int)
 struct SDL_Cursor
 	linkage
 		wrapper
-	function Use
+
+	libinternal Use
 		cpp_wrapper SDL_SetCursor
 	
 	module
-		|&SDL_Cursor| _Empty
-		|byte[1]| nothing
+		|&SDL_Cursor|	_Empty
+		|byte[1]|		Nothing
 		function Show (|int| show=-1, |int|)
 			cpp_wrapper SDL_ShowCursor
 			
@@ -61,3 +66,4 @@ struct SDL_Cursor
 
 		function Empty (|!&SDL_Cursor|)
 			return ._empty  init  Create(&.nothing, &.nothing, 1, 1, 0, 0)
+

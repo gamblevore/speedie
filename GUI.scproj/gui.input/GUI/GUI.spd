@@ -38,6 +38,7 @@ module GUI
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
 	|bool|						NeedMouseMove
+	|bool|						ControlResizedSafely
 	|bool|						AControlWasResized
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
@@ -485,7 +486,7 @@ module GUI
 
 	libinternal UpdateTextFocus (|window| w)
 		opt norefcounts
-		|| f = w.realfocus
+		|| f = w.RealFocus
 		|| AllowTyping = f and ((f is editable) or (f isa menu) or (f isa textview))
 		if !f and (w is editable)
 			AllowTyping = true	// allow type-through if the window is "editable". like to type secret codes in
@@ -626,11 +627,6 @@ module GUI
 		require w._NeedsResize or force
 		w._NeedsResize = false
 
-		|ivec4| OldSize
-		|| Sexy = .MouSexy
-		|| Curr = w.ControlOrMenuAt(Sexy)
-			oldsize = curr.lastrect
-		|| p = w.parent ?? window.all
 		|| D = GUI.Screen
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
@@ -638,10 +634,12 @@ module GUI
 			|| b = w.prev
 				rect = b.lastrect
 		w.CalculateSize(BigRect, rect, BigRect)
-		
-		if curr and curr.lastrect != OldSize
-			curr.__MouseMove__(Sexy, Sexy - gui.CurrMouseXY, SDL_WindowEventID.moved)
-		/////
+
+		if gui.ControlResizedSafely
+			gui.ControlResizedSafely = false
+			|| XY = .MouseXY
+			gui.MouseMoveEventSub(xy - gui.CurrMouseXY, w, xy)
+			// don't think we need fakemousemove if we can just do this here?
 
 	
 	libinternal CheckTaskAnimations
@@ -1008,7 +1006,6 @@ module GUI
 					Notifications <~ ov.ContainedName
 				  else
 					beep
-			
 		  
 		if (key is copy) or (cmd and key is c)
 			|| wf = w._FocusAttempt
@@ -1234,25 +1231,30 @@ module GUI
 		if (.CanDrag >= MouseDragging.Within) and (MB is left)
 			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
 			return SDLActivity.activity
-		
-		|guicontrol--| PrevOver = w.CurrMouseOver
-		|guicontrol--| Over  = w.ControlOrMenuAt(Xy, false)
+
+		return .MouseMoveEventSub(move, w, xy)
+
+	
+	libinternal MouseMoveEventSub (|ivec2| Move, |window| w, |ivec2| XY, |int|)
+		opt norefcounts
+		|| PrevOver = w.CurrMouseOver
+		|| Over  = w.ControlOrMenuAt(Xy, false)
 
 		w.CurrMouseOver = Over
 		|| Down = w.CurrMouseDown
 		if !Down and over
 			.SetToolTips(Over)
 		
-		if w.CreatedDate.guiago > 0.01s
-			if (PrevOver != nil and Over) and (Down == nil or PrevOver)
-				PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
-							
-			if (down == Over or nil)
-				|| state = (SDL_WindowEventID.moved, SDL_WindowEventID.enter)(PrevOver == Over)
-				if !over
-					Over = w
-				if Over.__MouseMove__(xy, move, state)
-					rz = SDLActivity.activity
+		require w.CreatedDate.guiago > 0.01s
+		if (PrevOver != nil and Over) and (Down == nil or PrevOver)
+			PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
+						
+		if (down == Over or nil)
+			|| state = (SDL_WindowEventID.moved, SDL_WindowEventID.enter)(PrevOver == Over)
+			if !over
+				Over = w
+			if Over.__MouseMove__(xy, move, state)
+				return SDLActivity.activity
 
 
 	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
