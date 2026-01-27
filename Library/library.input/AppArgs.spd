@@ -3,7 +3,7 @@
 function string.ArgName (|string|)
 	// "--Name=Value" --> "Name"
 	// "--Name" --> "Name"
-	if (self[] == '-') 
+	if (self and self[] == '-') 
 		|| i = .find( '=' ) ?? int.max
 		|| S = self[ 0, i ]
 		S = S.TrimFirst('-')
@@ -14,39 +14,18 @@ function string.ArgValue (|string|)
 	// "--Name=Value" --> "Value"
 	// "--Name" --> ""
 	// "Value" --> "Value"
-	if (self[0] != '-')
-		return self
-
-	|| it = .find( '=' )
-		return self[it + 1...]
-	return "true"
-
-
-
-role AppArgument (object)
-	function Value (|String|)
-		opt norefcounts
-		if (self isa string)
-			return .argValue
-		if (self isa message)
-			if (self == @item)
-				return .second.name ?? "true"
-			return .name
-		
+	if self
+		if (self[0] != '-')
+			return self
 	
-	function Name (|string|)
-		opt norefcounts
-		if (self isa string)
-			return .argName
-		if (self isa message)
-			require self == @item
-			return .firstname.lowercase
-	
-	operator has (|string| name, |bool|)
-		if .Name ~= name
-			rz = .value.yes
-		
+		|| it = .find( '=' )
+			return self[it + 1...]
+		return "true"
 
+
+function String.ArgSwitch (|string| name, |bool|)
+	if .argName ~= name
+		rz = .argvalue.yes
 
 // The idea is... we want to have an array of arguments... that can be messages or strings:
 	// * (name:)	  for switches:  --nocolor

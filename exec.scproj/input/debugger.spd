@@ -31,7 +31,7 @@ module debugger
 	|&uint|			Base
 	|int|			Length
 	|bool|			GotBreaks
-	|byte|			WantDebug
+	|bool|			WantDebug
 	
 	function Start
 		opt norefcounts

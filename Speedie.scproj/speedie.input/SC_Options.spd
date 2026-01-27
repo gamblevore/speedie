@@ -97,10 +97,6 @@ module Feedback
 			Options.ProjectIsMiniLib = true
 
 
-	function ParseArgs (|bool|)
-		return ParseArgsSub(app._rawargs)
-
-
 	function StopStripping
 		|message| m = nil|message|!
 		target debug
@@ -121,17 +117,19 @@ module Feedback
 			m.DUMB, m.FEET // for when you can't dance
 	
 	
-	function ParseArgsSub (|[]| args, |bool|) 
+	function ParseArgs (|bool|) 
 		.StopStripping
-		
+
+		|[string]--| Args = app._rawargs
 		if !Args
 			.CompilerInfo
 			.Help
 			return false
 
-		|| AskSelf = nil
-		for (S in args)
-			if s|AppArgument|.name != "self"
+
+		|| AskSelf = ""
+		for (S in Args)
+			if s.argname != "self"
 				.ParseOption(S)
 			  else
 				AskSelf = s
@@ -196,10 +194,9 @@ module Feedback
 			return path
 	
 	
-	function ParseOption (|AppArgument| Obj)
-		// something like that?
-		|| Name  = obj.Name
-		|| Value = obj.Value
+	function ParseOption (|string| Arg)
+		|| Name  = Arg.argName
+		|| Value = Arg.argValue
 
 		if Name
 			|| opt = .AppOptions[name]
