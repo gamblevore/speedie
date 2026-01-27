@@ -6,30 +6,51 @@ class XType
 	|string|		Name
 	|[XVar]|		Properties
 	
+	constructor
+		.name = "(unreached)"
+	
 	constructor (|message| msg)
 		opt norefcounts
 		|| Sup = msg[@num]
-		|| SupIndex = Sup.Int(0, 0, (xtype.types.length-1) max 0)
+		|| SupIndex = Sup.Int
 		.IsObject = SupIndex & 1
 		.name = msg.name
-		.Super = xtype.GetType(SupIndex>>1, Sup)
-		.properties = msg.second.xproperties
-		
+		.Super = xtype.GetType(SupIndex, Sup)
+
+	render
+		opt norefcounts
+		if !.IsObject
+			fs <~ "!"
+		fs <~ .name
+	
+	function LoadProp (|message| m, |message|)
+		opt norefcounts
+		|| P = m.Second
+			P.xvariables(nil, .properties)
+		return m.next
+	
+	
 	module
 		|InputStream|	Shared = InputStream("")
+		|XType|			Unreached = xtype()
 		|[XType]|		Types
 		
 		function LoadTypes (|message| list)
 			opt norefcounts
 			for msg in list
-				.types <~ XType(msg)
+				.types <~ (XType(msg), .unreached)(msg.func == @msg)
+			
+			|| m = list.first
+			for T in .types
+				m = t.LoadProp(m)
 		
 		function GetType (|int| i, |message| err, |xtype|)
 			opt norefcounts
-			if i
-				|| Sup = xtype.Types[i]
+			i >>= 1
+			if i > 0
+				|| Sup = xtype.Types[i-1]
 					return sup
-				error (err, "Super out of range")
+				error (err, "TypeID out of range")
 
 
 

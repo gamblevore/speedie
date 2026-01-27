@@ -587,8 +587,8 @@ struct Assembler
 	function scclass.ListLayout (|jbin| j)
 		opt norefcounts
 		|| s = .super
-		|| sid = ((s.tableid<<1) + .isobject, 0)(s)
-		j.AddInt(sid)
+		|| sid = (s.tableid<<1, 0)(s)
+		j.AddInt(sid + .isobject)
 		j.PropertyLayout(.Properties)
 			
 			
@@ -598,12 +598,6 @@ struct Assembler
 		for p in list
 			p.DumpDecl(self, p.exportposition)
 		.FinishAdd(@bin, S)
-
-	
-	function jbin.PropertyLayout (|[scdecl]| List, |faststring| fs)
-		opt norefcounts
-		for p in list
-			p.DumpDecl(self, p.exportposition)
 
 		
 	function FillDebugInfo 

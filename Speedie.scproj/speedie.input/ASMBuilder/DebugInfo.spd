@@ -40,18 +40,25 @@ function FATASM.OutputDebugVars
 
 
 function scdecl.DumpCls (|int|)
-	if .IsNormalObject or .IsBareStruct
-		return (.type.tableid<<1) + .IsNormalObject
+	opt norefcounts
+	|| t = .type
+	if t.isobject or t.isstruct
+		return (t.tableid<<1) + t.isobject
+
+
+function SCDecl.Wierdness (|int|)
+	rz = (self is reference) << 1
+	rz |= .pointercount > 0
+	rz |= .C_Array<<2
 
 
 function SCDecl.DumpWierdness (|jbin| j)
 	opt norefcounts
-	while
-		|| Wierdness = ((self is reference) << 1)  |||  (.pointercount > 0)
-		Wierdness |= .C_Array<<2
-		j.AppendHInt(Wierdness)
-		self = .Internal
-		loop Wierdness and self
+	|| Count = 0
+	while (|| W = .Wierdness)
+		expect (++Count < 5) (.source, "Too much wierdness")
+		j.AppendHInt(W)
+		self = .Internal$
 	
 
 function FatASM.CanCloseRegs (|int| R, |bool|)

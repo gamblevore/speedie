@@ -37,20 +37,25 @@ class XVar (list)
 		.Render(fs, reg0, true)
 		printline fs.GetResult
 	
-	
-	function Render (|faststring| fs, |!&ivec4| Reg0, |bool| Full)
+	render
 		opt norefcounts
-		|| Reg = Reg0 + .reg
+		.Render(fs, nil, true)
+	
+	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full)
+		opt norefcounts
 		if full
 			.TypeName(fs)
 			fs <~ " "
 			fs <~ .name
-			fs <~ "(${.reg|int|}): " // remove .reg once this is reliable
-		|| C = .obj|&nil||xtype|
-			if c.IsObject
-				return .RenderObject(fs, reg)
-
-		return .RenderData(fs, reg)
+			|int| R = .reg
+				fs <~ "($R): " // remove .reg once this is reliable
+		if reg0
+			|| Reg = Reg0 + .reg
+			|| C = .obj|&nil||xtype|
+				if c.IsObject
+					return .RenderObject(fs, reg)
+	
+			return .RenderData(fs, reg)
 	
 	
 	function RenderObject (|faststring| fs, |!&ivec4| Reg)
@@ -94,7 +99,7 @@ class XVar (list)
 			if w
 				fs <~ "[$w]"
 			
-		|| C = .obj|&nil||xtype|
+/		|| C = .obj|&nil||xtype|
 			 fs <~ C.Name
 		  else
 			.DataType.Render(Fs)
@@ -161,32 +166,32 @@ class XVar (list)
 
 function message.xvariables (|[xvar]|)
 	opt norefcounts
+	cpp_part xvar0
 	if self
 		|xvar[32]| Regs
 		.xvariables(Regs, rz)
 
 
-function message.xproperties (|[xvar]|)
-	opt norefcounts
-	if self
-		.xvariables(nil, rz)
-
-
 function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 	opt norefcounts
+	cpp_part xvar
 	|| input = xtype.shared
 	input.Reset(.name)
 	while (|| Section = input.byte)
 		|| ReadEnd = input.Position + Section
 		|| pos = Input.hint
 		|| reg = Input.hint
-		expect (registers and reg|uint| < 32) ("Too large register")
+		|| OK = !Reg
+		if registers: OK = (reg-1)|uint| < 31
+		expect (OK) ("Bad register")
 		
 		if input.Position >= ReadEnd // Close
-			if Registers
-				Registers[reg].Close(pos)
+			expect (Registers) "Bad register"
+			Registers[reg].Close(pos)
 		  else
 			|| var = xvar(input, pos, reg, ReadEnd)
+			target debug
+				var.DebugPrint
 			if Registers
 				Registers[reg] = var
 			out <~ var

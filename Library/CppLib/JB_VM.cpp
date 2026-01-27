@@ -120,12 +120,12 @@ static void * const GlobalJumpTable[] = {
 				Code -= Value;		// Debugger jumped out of range!!
 			  else 
 				Op = *Code++;
-		} else if (Value <= 256) {
-			if (Value == 256)
-				return 0;
-			exit(Value);
+		} else if (Value < 256) {
+			exit((int)Value);
+		} else {
+		// if value !=256 maybe better to actually put an error somewhere.
+			return 0;
 		}
-		// ignore >= 256. maybe better to actually put an error somewhere.
 	}
 	goto *JumpTable[256+(Op>>24)];					// Resume
 }
