@@ -28,7 +28,7 @@ Speedie doesn't require `Cake` to run it's programs. Speedie can output C++ and 
     * Increment/decrement memory (1 vs 3)
 * 64-bit direct constants (and 48-bit and 16-bit versions) without needing to load from a separate location.
 * Branching (1 vs 2)
-* Loop specific instructions do in (1 vs 3-4).
+* Loop specific instructions (1 vs 3-4).
 
 `Cake`'s instruction count is around 190. This includes all the SIMD instructions for faster graphics, replicating the functions of OpenGL/GLSL. (I'll probably add a few more before release, but not many.)
 
