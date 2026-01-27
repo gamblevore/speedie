@@ -1,19 +1,21 @@
 
-|string|     Speedie = "/usr/local/bin/speedie"
-|spdprocess| Perry = app.parent
-|!&cakevm|   Cake = CakeVM()
-|File|		 InputFile = CakeArgs.Collect
-|&int|		 BreakPoints = debugger.Startup
-|!&ASM|		 BeginCode = cake.code()|&ASM|
+
+module Cake
+	|String|     Speedie = "/usr/local/bin/speedie"
+	|SpdProcess| Perry = app.parent
+	|!&CakeVM|   VM = CakeVM()
+	|File|		 InputFile = CakeArgs.Collect
+	|&int|		 BreakPoints = debugger.Startup
+	|!&ASM|		 BeginCode = VM.code()|&ASM|
 
 
 main
 	opt NoRefCounts	
 	error.AutoPrint = 1
-	expect (BeginCode) ("Can't allocate VM")
-	require InputFile
+	expect (cake.BeginCode) ("Can't allocate VM")
+	require cake.InputFile
 	
-	|| p = perry
+	|| p = cake.perry
 		p <~ "`hoi :3`"
 	
 	if CakeRun.GetStructure

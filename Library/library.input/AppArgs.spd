@@ -25,31 +25,33 @@ function string.ArgValue (|string|)
 
 role AppArgument (object)
 	function Value (|String|)
-		if (self isa string):  return .argValue
-		if (self isa message): return .argValue
+		opt norefcounts
+		if (self isa string)
+			return .argValue
+		if (self isa message)
+			if (self == @item)
+				return .second.name ?? "true"
+			return .name
+		
 	
 	function Name (|string|)
-		if (self isa string):  return .argName
-		if (self isa message): return .argName
+		opt norefcounts
+		if (self isa string)
+			return .argName
+		if (self isa message)
+			require self == @item
+			return .firstname.lowercase
+	
+	operator has (|string| name, |bool|)
+		if .Name ~= name
+			rz = .value.yes
+		
 
 
 // The idea is... we want to have an array of arguments... that can be messages or strings:
 	// * (name:)	  for switches:  --nocolor
 	// * (name:value) for switches:  --level=3
 	// * (value)	  for paths:	 "/usr/dir/filexx"
-
-
-function Message.ArgName (|string|)
-	opt norefcounts
-	require self == @item
-	return .firstname.lowercase
-
-
-function Message.ArgValue (|string|)
-	opt norefcounts
-	if (self == @item)
-		return .second.name ?? "true"
-	return .name
 
 
 

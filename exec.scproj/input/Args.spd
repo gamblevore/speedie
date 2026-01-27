@@ -4,19 +4,23 @@ module CakeArgs
 	|| WantDebug = false
 	
 	function Collect (|File?|)
+		opt norefcounts
 		|| r = app._rawargs
 		|| r1 = r[0]
-			r.Remove(0)
-			if (r1.ArgName == "d") and r1.ArgValue.Yes
-				.WantDebug = true
-				r1 = r[0]
-				r.Remove(0)
+		if r1|appargument| has "d" // remove this eventually!
+			.WantDebug = true
+			r1 = r[1]
 		if !r1
 			"Usage: ${app.filename} /path/to/spd_proj.cake
 	May also pass .spd or .scproj files. They will be compiled, then run.\n"
 		  else
-			check (!r1.ArgName) "Unexpected switch: " + r1
+			check (r1[] != '-') ("Unexpected switch: " + r1)
 			rz = r1.FileThatExists("load executable")
+		if .WantDebug
+			r.Remove(0)
+//		if Perry
+//			.WantDebug = true // checked anyhow in debugger.StartUp
+		r.Remove(0)
 		
 
 		

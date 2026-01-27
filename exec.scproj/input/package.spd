@@ -40,14 +40,14 @@ module CakeRun
 
 	function file.Compile (|file|)
 		|| args = ["--bake", "--quiet", self]
-		|| Answer = speedie.ExecuteStr(args)
+		|| Answer = cake.speedie.ExecuteStr(args)
 			rz = Answer.file
 			if !rz.Exists
 				rz = nil
 	
 
 	function InputPack (|messageroot|)
-		|| F = InputFile
+		|| F = cake.InputFile
 		if F isa "spd" or "scproj" or "uwu" or "uwuz"
 			F = F.Compile
 		if f

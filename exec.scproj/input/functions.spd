@@ -22,7 +22,7 @@ role SpdFunc (message)
 		check  (n > 0)													(Code, "ASM missing.")
 		check  (n < 64K-1)												(Code, "ASM oversized.")
 		
-		|| dest = BeginCode + .Position
+		|| dest = cake.BeginCode + .Position
 		memory.Copy(dest, Code.addr, n<<2)
 		if .func != @tmp
 			.func = @tmp
@@ -31,10 +31,10 @@ role SpdFunc (message)
 	
 
 	function Run (|&ivec4|)
-		Cake.Registers
+		cake.VM.Registers
 		|| Code = .Position
 		if code >= 0
-			return cake.Run(Code)
+			return cake.VM.Run(Code)
 		return Dummy		
 
 

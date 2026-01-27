@@ -34,7 +34,7 @@ module debugger
 	
 	function Start
 		opt norefcounts
-		|| p = perry
+		|| p = cake.perry
 			debugger.Read(p, 5.0)
 			if !.GotBreaks
 				p <~ "error: nobreakpoints"
@@ -68,11 +68,12 @@ module debugger
 		print ": "
 		printline str
 	
+	
 	function StartUp (|&int|)
 		|| V = &__Viewer__
-		if !CakeArgs.WantDebug and !perry
+		if !CakeArgs.WantDebug and !cake.perry
 			V = nil
-		return cake.IsDebugging(V)
+		return cake.VM.IsDebugging(V)
 	
 	
 	function Path (|int| i, |filewithdata|)
@@ -95,7 +96,7 @@ module debugger
 		
 		|| Where = debugger.Base![index]
 		|| Path = debugger.path(where & (11~bits))$
-/		.DebugFoundLocation( Path, Where>>11 )
+		.DebugFoundLocation( Path, Where>>11 )
 		.PrintStackVars(index, spdtable.Find(index), Reg0)
 	
 	
@@ -116,10 +117,10 @@ module debugger
 		opt norefcounts
 		|| R = .root
 		if !R
-			target debug
-				.BreakAll
 			return true
-		
+
+		target debug
+/			.BreakAll
 		xtype.loadtypes R["class"]
 		.Globs = R["glob"]
 		.Files = R["files"].value.decompress.Split
@@ -136,7 +137,7 @@ module debugger
 
 
 	function BreakAll
-		|| s = __Globals__.BreakPoints
+		|| s = cake.BreakPoints
 			for i in spdtable.CodeLength
 				s[i] = 1<<31
 

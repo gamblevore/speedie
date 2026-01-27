@@ -64,7 +64,7 @@ module SpdTable
 
 	function SpdFunc.ASMStart (|&ASM|)
 		|| i = .Position
-			return BeginCode + i
+			return cake.BeginCode + i
 	
 	
 	function Link (|&asm|)
@@ -77,7 +77,7 @@ module SpdTable
 		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
 		|| Code = .position$
 		spdtable.CurrFunc = self
-		|| Base = BeginCode + Code
+		|| Base = Cake.BeginCode + Code
 		|| after = base + .Length
 
 		while base < after

@@ -32,7 +32,7 @@ module Globals
 			jb_incr(last)									// oof
 			StringTable[i] = Last
 		
-		cake.ExecInit(.LibBase!, g, spdtable.LibFuncs!)
+		cake.vm.ExecInit(.LibBase!, g, spdtable.LibFuncs!)
 		
 		return true
 	
