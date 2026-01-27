@@ -52,7 +52,7 @@ Perry's inbuilt ASM-viewer... has an extra advantage, it is instant! (Unlike god
 
 • Within 1.5 years of having successfully built a community, a `Cake` JIT will be created for ARM, running `Cake` apps on ARM at native speed.
 
-• `Cake` allows to hand-writen ASM that runs on any platform. It will be a great way to learn ASM!
+• `Cake` allows to hand-write ASM that runs on any platform. It will be a great way to learn ASM!
 
 • `Cake` has many SIMD instructions... useful for 3D graphics, audio, etc.
 
