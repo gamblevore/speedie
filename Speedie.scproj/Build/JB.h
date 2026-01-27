@@ -1437,13 +1437,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2401])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2402])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2402])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2403])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2400])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2403])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2404])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2403])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2404])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2401])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2404])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2405])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1618,7 +1618,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2408])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2409])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1659,7 +1659,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2409])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2410])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1800,10 +1800,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2407])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2406])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2408])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2407])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2405])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2406])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2483,7 +2483,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2399])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2400])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -7882,7 +7882,7 @@ void JB_bin_Exit0(FastString* Self);
 
 int JB_bin_FinishAdd(FastString* Self, Syntax Ty, int Start);
 
-void SC_bin_PropertyLayoutWithArray(FastString* Self, Array* List);
+void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
 void JB_bin_RunHeader(FastString* Self, JB_String* Name);
 
@@ -9452,6 +9452,8 @@ bool SC_Decl_TypeSuffers(SCDecl* Self);
 void SC_Decl_WholeTypeSet(SCDecl* Self, ASMReg Value);
 
 ASMReg SC_Decl_WholeType(SCDecl* Self);
+
+int SC_Decl_Wierdness(SCDecl* Self);
 
 Message* SC_Decl_WriteDeclFull(SCDecl* Self, JB_String* DeclName, int Minimal);
 
@@ -11707,7 +11709,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1840], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1841], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
