@@ -4,7 +4,7 @@ module Cake
 	|String|     Speedie = "/usr/local/bin/speedie"
 	|SpdProcess| Perry = app.parent
 	|!&CakeVM|   VM = CakeVM()
-	|File|		 InputFile = CakeArgs.Collect
+	|File|		 InputFile = Cake.Collect
 	|&int|		 BreakPoints = debugger.Startup
 	|!&ASM|		 BeginCode = VM.code()|&ASM|
 

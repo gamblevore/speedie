@@ -31,6 +31,7 @@ module debugger
 	|&uint|			Base
 	|int|			Length
 	|bool|			GotBreaks
+	|byte|			WantDebug
 	
 	function Start
 		opt norefcounts
@@ -71,7 +72,7 @@ module debugger
 	
 	function StartUp (|&int|)
 		|| V = &__Viewer__
-		if !CakeArgs.WantDebug and !cake.perry
+		if !debugger.WantDebug and !cake.perry
 			V = nil
 		return cake.VM.IsDebugging(V)
 	
@@ -119,7 +120,7 @@ module debugger
 		if !R
 			return true
 
-		target debug
+		if Platform.IsDebug or debugger.wantdebug
 /			.BreakAll
 		xtype.loadtypes R["class"]
 		.Globs = R["glob"]
