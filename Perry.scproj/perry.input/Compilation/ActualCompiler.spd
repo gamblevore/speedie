@@ -41,6 +41,7 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 	out <~ ("\n", 2)
 
 	if .DebugMode isnt cake
+		.LogOneAction("Unix Debug: " + f)
 		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
 		return
 	

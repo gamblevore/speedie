@@ -18,6 +18,8 @@ extend PerryIDE
 
 	
 	function CmdKey (|keys| key, |bool|)
+		if key is t
+			return PressingDebug(.runbutton)			
 		if key is f
 			if .MassSearchField.hasfocus
 				.PrevView.Click?
@@ -45,10 +47,7 @@ extend PerryIDE
 			Clickedcompile(.buildbutton)
 			return true
 		if key is r
-			if keys.Shift
-				PressingDebug(.runbutton)
-			  else
-				ClickedDebug(.runButton)
+			ClickedDebug(.runButton)
 			return true
 		if key is o
 			if keys.shift

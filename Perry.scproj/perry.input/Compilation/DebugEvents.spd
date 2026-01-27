@@ -83,6 +83,7 @@ function PressingDebug (GUIAction)
 		db.ClearFocus
 	  else
 		db.setfocus
+	return true
 
 
 function PerryIDE.DebugEnvs (|message| env)

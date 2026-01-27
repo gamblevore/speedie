@@ -18,7 +18,9 @@ function ClickedDebug (GUIAction)
 	|| i = .ide
 	if .text == "\02"		// play
 		require i.MakeNothingRunning(" before debugging?")
-		i.compile(compilemode.Debug)
+		|| alt = keys.shift or keys.option
+		|| Mode = compilemode.Debug ||| (alt*CompileMode.Cake)
+		i.compile(Mode)
 		i.ShowText(i.ProductOut, "", false)
 		|| itm = i.CompileTabs.ButtonSource[3]
 			(itm is hidden)
