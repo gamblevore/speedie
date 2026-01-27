@@ -8,7 +8,6 @@ class XVar (list)
 	|DataTypeCode|	DataType
 	|string|		Name
 	
-	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
 		.normalview = true
 		.position = pos
@@ -31,6 +30,8 @@ class XVar (list)
 	operator contains (|int| P, |bool|)
 		require P >= .Position and P < .codeend
 		
+	function CanBeNil (|bool|)
+		return .DataType & (DataTypeCode.PossibleBits+1)
 
 	function Print (|!&ivec4| Reg0)
 		|| fs = FastString(nil|faststring|)
@@ -44,7 +45,9 @@ class XVar (list)
 	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full)
 		opt norefcounts
 		if full
+			fs <~ "|"
 			.TypeName(fs)
+			fs <~ "|"
 			fs <~ " "
 			fs <~ .name
 			|int| R = .reg
@@ -82,9 +85,7 @@ class XVar (list)
 			fs.AppendHex(obj|int64|, 8)
 			fs <~ "*"
 			fs <~ obj.refcount
-			
-		// object, message, string
-		// arrays are a bit sussy. Cos they can contain themselves! Better to force expansion
+		// Contains can contain themselves! So no deep rendering... for now. Maybe if we mark/unmark them.
 	
 	
 	function TypeName (|faststring| fs)
@@ -99,10 +100,11 @@ class XVar (list)
 			if w
 				fs <~ "[$w]"
 			
-/		|| C = .obj|&nil||xtype|
+		|| C = .obj|&nil||xtype|
 			 fs <~ C.Name
 		  else
-			.DataType.Render(Fs)
+			|| T = .DataType|||datatypecode.Numeric
+			T.Render(Fs)
 		
 	
 	function TestMem (|faststring| fs, |!&ivec4| Reg, |int| N, |bool|)

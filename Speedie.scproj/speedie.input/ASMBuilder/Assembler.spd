@@ -59,9 +59,12 @@ struct Assembler
 		
 		function ClassLayout (|jbin| j)
 			opt norefcounts
+			|| names = FastString()
 			for c in Compiler.ReachedClassTable
 				if !c.isbehaviourtable and (c.IsLibrary or options.MakeExec)
-					j.Enter(@msg, c.ExportName)
+					c.exportname.MiniName(names, c.IsObject)
+					j.Enter(@msg, names|string|)
+					names.Length = 0
 					c.ListLayout(j)
 					j.exit
 				  else

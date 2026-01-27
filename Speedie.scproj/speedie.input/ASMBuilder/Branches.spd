@@ -249,10 +249,8 @@ function FoundReg (|message| All, |int| R, |bool|)
 	
 	if all == @thg or @num	// nums used to be hoistable.
 		|| d = all.FastDeclSafe
-		if d is local
-			|| v = d.WholeType
-			if v.reg == r
-				return true
+		if (d is local) and (d.reg == r)
+			return true
 		
 	for s.fast in All
 		if .FoundReg(s, r)

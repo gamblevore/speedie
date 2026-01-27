@@ -8,24 +8,43 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	self[mark] = .length - mark
 
 
+function SCDecl.MiniName (|faststring| fs)
+	.name.MiniName(fs, self is classobj)
+
+
+function string.MiniName (|faststring| fs, |bool| IsClass)
+	opt norefcounts
+	|| n = .name
+	|| i = 0
+	|| after = int.max
+	if IsClass
+		fs <~ "("
+		if n.EndsWith("data", true)
+			after = n.Length - 4 // ErrorData --> (Error)
+	if n[0, "JB_", true]
+		i = 3
+	fs.AppendRange(n, i, after)
+	if IsClass
+		fs <~ ")"
+
+
 function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	opt norefcounts
-	|| Reg = .ExportPosition
-	if self is local
-		reg = .mu.DataType|asmreg|.Reg
-
 	|| Mark = dd.Length
 	dd <~ '\0'						// range-length
 	dd.AppendHInt(pos)
-	dd.AppendHInt(Reg)
-	dd <~ .name
+	dd.AppendHInt(.Reg * (self is local))
+	.mininame(dd)
 	dd <~ '\0'
 	dd.AppendHInt(.DumpCls)
 	
-	dd.AppendHInt(.inner.TypeInfo & DataTypeCode.PossibleBits) // please be simple!
+	|| T = .inner.TypeInfo & DataTypeCode.PossibleBits
+	if .NilDeclared is Nilish
+		T |= DataTypeCode.PossibleBits+1
+	dd.AppendHInt(T)
 	.DumpWierdness(dd)
 	
-	dd[mark] = dd.length - mark
+	dd[mark] = dd.length - (mark + 1)
 
 
 function FATASM.OutputDebugVars

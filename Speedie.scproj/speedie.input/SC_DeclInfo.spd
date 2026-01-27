@@ -1,0 +1,106 @@
+
+constants
+	// worse errors are higher numbers
+	// don't go to 1024 << 22 ! even 512 risks negative ints.
+	kNeedsAddressOfButAlsoNeedsSuperMatch  = 64 << 22
+	kNeedsAddressOf				= 32 << 22
+	kNeedsTypeCast				= 16 << 22
+	kNeeds						= kNeedsTypeCast ||| kNeedsAddressOf ||| kNeedsAddressOfButAlsoNeedsSuperMatch 
+
+	kUseDefaultParams  			= 8 << 22
+	kLossyCastedMatch			= 7 << 22
+	kCastedMatch				= 6 << 22
+	kVoidPtrMatch				= 5 << 22
+	kSuperClassMatch			= 4 << 22
+	kAddressOfMatch				= 3 << 22
+	kNumericMatch				= 2 << 22
+	kSimpleMatch				= 1 << 22
+	kMultipleErrors				= 1 << 21
+	kNoMatch					= 0
+
+	kTypeCastMost				= 1
+	kTypeCastNumbers			= 2
+	kTypeCastIgnoreContained	= 4
+	kTypeCastIgnoreAddressOf	= 8
+	kTypeCastBothWays			= 16
+	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // the default case
+	kNoBoolTypeCast				= 32
+	kTypeCastAssigns			= 64
+	kTypeCastWantSuperDistance	= 128
+	kTypeCastDescribeErrors		= 256
+	kTypeCastForSetRel			= 512
+	kTypeCastSetToMemory		= 1K
+	kTypeCastFromZero			= 2K
+	kTypeCastFromSmallInt		= 4K
+	kTypeCastForRelSet			= 8K
+	kTypeCastForParams			= 16K
+	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast ||| kTypeCastForParams)  
+	kTypeCastFalse				= 0
+
+
+
+datatype SCDeclInfo (uint)
+	flags
+		// could look for other exclusive flags
+		// consts can't be borrowed.
+		
+		|SCDeclInfo|
+		Borrowed
+		StayBorrowed
+		DirectNumber						// Eg: 7, 1, 100
+		Const
+		UnknownConst
+		NumberConst = DirectNumber + Const	// const: x = 7
+		UpgradeableContained
+		TypeImprove
+		API
+		ClassObj
+		CompilerCreated
+		PropertyWasConstructed
+		
+		///
+		Param // exclusive. Could be... combined
+		Body
+		Property
+		Global
+		///
+		
+		Return
+		AlteredCopy = [Altered,AlteredInBranch,AlteredInLoop,AlteredParamObject]
+		AlteredBranchLike = AlteredInBranch|||AlteredInLoop
+		Reference
+		AlteredOrRef = Altered ||| Reference
+		Task
+		Self
+		ReadFrom
+		SetTo
+		Grabbed
+		PostIncremented
+		VarThatGotReturned // unused? but it should be?
+		ReturnedStruct
+		Library
+		ASMReached
+		IntendedAsReturn
+		
+		Temp			= body ||| CompilerCreated
+		VarType			= Param ||| Body ||| Global ||| Property
+		Local			= Body  ||| Param
+		SelfImplicit	= Self  ||| local // local is set by CollectOneParam, anyhow?
+		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
+		NeedsClose      = Body ||| AlteredParamObject
+
+
+	function CheckHighestValue 
+		|| x = IntendedAsReturn
+	
+	
+	syntax is (|SCDeclInfo| d, |bool|)
+		return self & d // for debug
+	
+	
+	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
+		if b
+			return self ||| d
+		return self &~ d
+		
+	

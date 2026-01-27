@@ -55,7 +55,7 @@ class XType
 
 
 datatype Wierdness (int)
-	constants
+	flags
 		Pointer
 		Reference
 	syntax is (|Wierdness| N, |bool|)
