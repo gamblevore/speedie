@@ -531,7 +531,7 @@ struct SCModule;
 
 typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After);
 
-typedef int64 (*CakeVM_CakeChef)(CakeVM* Self, uint* Code, int BreakValue);
+typedef int64 (*CakeVM_CakeChef)(CakeVM* Self, int Index, int BreakValue, ivec4* Reg0);
 
 typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
