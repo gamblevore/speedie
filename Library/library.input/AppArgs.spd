@@ -24,8 +24,8 @@ function string.ArgValue (|string|)
 
 
 function String.ArgSwitch (|string| name, |bool|)
-	if .argName ~= name
-		rz = .argvalue.yes
+	if .ArgName ~= name
+		rz = .ArgValue.yes
 
 // The idea is... we want to have an array of arguments... that can be messages or strings:
 	// * (name:)	  for switches:  --nocolor

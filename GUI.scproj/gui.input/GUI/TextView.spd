@@ -1159,6 +1159,10 @@ class TextView (GUIControl)
 	
 	function MessageAtSel (|message|)
 		return .MessageWithin(.sel0, false, true)
+
+		
+	inline MessageAt (|int| pos, |bool| named=false, |message|)
+		return .MessageWithin(pos, named, false)
 	
 	
 	function MessageWithin (|int| pos, |bool| named, |Bool| Within, |message|)
@@ -1185,9 +1189,6 @@ class TextView (GUIControl)
 			return msg
 		return found
 		
-		
-	inline MessageAt (|int| pos, |bool| named=false, |message|)
-		return .MessageWithin(pos, named, false)
 	
 	libinternal CommentableRange	(|intrange|)
 		|| sel	= .selrange

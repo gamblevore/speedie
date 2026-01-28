@@ -155,7 +155,7 @@ function PerryIDE.ListAllFuncsMsg (|message| items, |message| result, |string| f
 				|| arg = line.last
 				if arg == @arg
 					.ListAllFuncsMsg(arg, result, filter)
-			  elseif AutoComplete.owner.valuelower(line.name)						// class/module/etc
+			  elseif AutoComplete.owner_dict.valuelower(line.name)						// class/module/etc
 				.ListAllFuncsMsg(line.funcarg, result, filter)
 			  elseif AutoComplete.isafunc(line)
 				result.IDEAddfunc(line, filter)

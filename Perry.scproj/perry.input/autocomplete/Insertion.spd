@@ -188,10 +188,11 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 	
 	|| ok2 = false
 	|| i = .ide
-	|| msg = .MessageAt(x, true)
-		i.editme.CanAutoComplete = 1
-		ok2 = i.MaybeSendMessage(type, msg, msg.name, reason)
-		rz = true
+	if !before.IsWhite
+		|| msg = .MessageAt(x, true)
+			i.editme.CanAutoComplete = 1
+			ok2 = i.MaybeSendMessage(type, msg, msg.name, reason)
+			rz = true
 	if !ok2 or !GUI.IsTyping
 		i.AutoComplete.CloseMenu
 

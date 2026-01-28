@@ -432,7 +432,7 @@ function LoadClassName (|message| node, |string|)
 	if s == @rel
 		error (node, "Classes should look like: class ClassName (SuperName)")
 	  else
-		error (node, "Can't find class name.")
+		error (node, "Class missing it's name.")
 }
 
 function SCFunction.CopyParams (|message| list)

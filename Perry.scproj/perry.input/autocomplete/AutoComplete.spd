@@ -1,5 +1,47 @@
 
 
+	
+extend_module Autocomplete
+	|| Owners			= "module/extend_module/class/struct/role/task/datatype/extend"
+	|| Owner_dict		= owners.dict('/')
+	|| RootOnly			= ["main"]
+	
+	|| FunctionClsList = autocomplete.function_cls_only / '/'
+	|| FunctionAnywhereList = autocomplete.function_anywhere  / '/'
+	|| OwnerList = autocomplete.Owners / '/'
+
+
+function PerryIDE.BuildTmp (|string| reason, |message| where, |string| name,  |message|)
+	|| response = .BuildTmpSub(where, name)
+		.AutoCompleteFB(response, AutoCompleteMode.edit, reason)
+
+	
+function PerryIDE.BuildTmpSub (|message| where, |string| name,  |message|)
+	opt norefcounts
+	rz = rz.AddToAutoCompleteList(name, autocomplete.FunctionAnywhereList)
+	|| ClsMod = where.owningSyntax(AutoComplete.owner_dict, true)
+	|| IsMod = (ClsMod ~= "module" or "extend_module")
+	if !ClsMod or IsMod
+		rz = rz.AddToAutoCompleteList(name, autocomplete.OwnerList)
+	if clsmod and !IsMod
+		rz = rz.AddToAutoCompleteList(name, autocomplete.FunctionClsList)
+	if !ClsMod
+		rz = rz.AddToAutoCompleteList(name, autocomplete.RootOnly)
+
+
+
+function message.AddToAutoCompleteList (|string| name, |[string]| CouldBe, |message|)
+	opt norefcounts
+	for s in CouldBe
+		if s[0, name, true]
+			if !self
+				self = @arg + name
+			|| tmp = self.msg(@tmp, s)
+			tmp <~ s
+	return self
+				
+
+
 function message.list_desired (|int| common, |string|)
 	rz = .firstname[0, Common]
 	if self == rz
@@ -461,13 +503,16 @@ function message.CommandIsOK (|bool|)
 
 
 function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
-	if (where == @thg) and Where.IsDeclName
-		if !where.OwningFunc
-			return .BuildDeclCommand(cmd,  where,  name,  reason)
+	opt norefcounts
+	|| spd_func = where.OwningFunc
+		return .BuildNormalCommand(cmd,  where,  spd_func, name,  reason)
 	
-	rz = .BuildNormalCommand(cmd,  where,  name,  reason)
-	if !rz.CommandIsOK
-		rz = nil
+	if (where == @thg) and Where.IsDeclName
+		return .BuildDeclCommand(cmd,  where,  name,  reason)
+	if (where == @tmp) and cmd[0, "autocomplete"]
+		return .BuildTmp(reason, where, name)
+
+		
 
 
 function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
@@ -476,8 +521,7 @@ function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| na
 	debugger  // do some shit
 
 
-function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
-	|| spd_func = where.OwningFunc
+function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message| spd_func,  |string| name,  |string| reason,  |message|)
 	if spd_func == where
 		|| thg = where.first
 		if thg == @dot or @thg
@@ -529,6 +573,8 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |string| 
 
 	if !rz.hasany or ((jump==1) and cmd[0, "autocomplete"])
 		rz = nil
+	if !rz.CommandIsOK
+		rz = nil
 
 
 function PerryIDE.DescribeWhere (|message| out, |message| where)
@@ -561,12 +607,12 @@ function message.OwningFunc (|bool| EndAtArg = false, |message|) // isfunction
 function message.OwningModclass (|bool| EndAtArg=true, |message|)
 	opt norefcounts
 	require self
-	rz = .owningSyntax(AutoComplete.owner, EndAtArg)
+	rz = .owningSyntax(AutoComplete.owner_dict, EndAtArg)
 	if !.parent
 		rz ?= @tmp+"root"
 	
 	
-function message.owningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
+function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 	opt norefcounts
 	|| s = self
 	|| WillEnd = false
