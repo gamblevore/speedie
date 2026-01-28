@@ -297,7 +297,7 @@ class StretchDivider (GuiControl)
 	
 	module
 		constants
-			kGrabDist = 9
+			kGrabDist = 6
 		
 		function DrawDash (GUIDrawShader)
 			|| C = vec4(0)
@@ -348,7 +348,7 @@ class StretchDivider (GuiControl)
 
 		
 		if !.d
-			|| TickCount = 5
+			|| TickCount = 7
 			|| txy = (xy + add * (h*0.5)|int|) - (kGrabDist*add*TickCount)
 			
 			if !DrawColored
