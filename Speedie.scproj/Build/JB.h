@@ -429,8 +429,6 @@ struct SCFunction_Behaviour;
 
 struct SCModule_Behaviour;
 
-struct JB_Object;
-
 struct AutoItem;
 
 struct CppRefs;
@@ -1344,9 +1342,11 @@ JBClass ( SCModule , SCBetterNode ,
 #define JB__App__stdin JB__.App__stdin
 #define JB__App__StdOut JB__.App__StdOut
 #define JB__App_Usage JB__.App_Usage
+extern JB_String* SC__AutoComplete_function_anywhere;
+extern JB_String* SC__AutoComplete_function_cls_only;
 extern JB_String* SC__AutoComplete_function_names;
+extern JB_String* SC__AutoComplete_function_root_only;
 extern Dictionary* SC__AutoComplete_Functions;
-extern Dictionary* SC__AutoComplete_Owner;
 extern JB_File* SC__Comp__BuildFolder;
 extern JB_String* SC__Comp__Projects;
 extern JB_String* SC__Comp__SpeedieProj;
@@ -1437,13 +1437,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2402])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2404])
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2403])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2404])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2401])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2404])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2405])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2405])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2406])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2403])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2406])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2407])
 extern SCFunction* SC__FastStringOpts_FnAppend;
 extern SCFunction* SC__FastStringOpts_FnAppend4;
 extern SCFunction* SC__FastStringOpts_FnAppend6;
@@ -1618,7 +1618,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2409])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2411])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1659,7 +1659,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2410])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2412])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1800,10 +1800,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2408])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2407])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2410])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2409])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2406])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2408])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2483,7 +2483,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2400])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2402])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3013,9 +3013,7 @@ int SC_FB__Init_();
 
 bool SC_FB__ParseArgs();
 
-bool SC_FB__ParseArgsSub(Array* Args);
-
-void SC_FB__ParseOption(JB_Object* Obj);
+void SC_FB__ParseOption(JB_String* Arg);
 
 void SC_FB__SetFlow();
 
@@ -6707,13 +6705,6 @@ JB_Object* JB_Object_TypeFailed(JB_Object* Self, JB_Class* Cls, Message* Where);
 
 
 
-// JB_AppArgument
-JB_String* JB_AppArgument_Name(JB_Object* Self);
-
-JB_String* JB_AppArgument_Value(JB_Object* Self);
-
-
-
 // JB_Array
 void SC_Array_AddCStr(Array* Self, JB_String* S);
 
@@ -7575,6 +7566,8 @@ JB_File* SC_Str_MakeAndGoInto(JB_String* Self);
 
 ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last);
 
+void SC_Str_MiniName(JB_String* Self, FastString* Fs, bool IsClass);
+
 JB_String* JB_Str_Moat(JB_String* Self);
 
 JB_String* JB_Str_Name(JB_String* Self);
@@ -7590,6 +7583,8 @@ Ind JB_Str_OpInList(JB_String* Self, Array* List);
 bool JB_Str_OperatorIsa(JB_String* Self, JB_String* S);
 
 JB_String* JB_Str_OperatorMul(JB_String* Self, int N);
+
+JB_String* SC_Str_OperatorOof(JB_String* Self, JB_String* Next_part);
 
 JB_String* JB_Str_OperatorPlusWithCstring(JB_String* Self, _cstring C);
 
@@ -7946,10 +7941,6 @@ void JB_Msg_AppendMacro(Message* Self, Message* M, Array* Prms);
 void JB_Msg_ARel__(Message* Self, FastString* Fs);
 
 void JB_Msg_Arg__(Message* Self, FastString* Fs);
-
-JB_String* JB_Msg_ArgName(Message* Self);
-
-JB_String* JB_Msg_ArgValue(Message* Self);
 
 void JB_Msg_Arr__(Message* Self, FastString* Fs);
 
@@ -9339,6 +9330,8 @@ SCDecl* SC_Decl_MemAccessSub(SCDecl* Self, Message* Exp, Message* Side);
 
 bool SC_Decl_MiniMatch(SCDecl* Self, SCDecl* O, int TypeCast);
 
+void SC_Decl_MiniName(SCDecl* Self, FastString* Fs);
+
 void SC_Decl_NameSet(SCDecl* Self, JB_String* Value);
 
 bool SC_Decl_NeedsContainedfix(SCDecl* Self);
@@ -9396,6 +9389,8 @@ JB_String* SC_Decl_RealName(SCDecl* Self);
 Message* SC_Decl_RefDestructor(SCDecl* Self);
 
 SCDecl* SC_Decl_RefineDecl(SCDecl* Self, Message* List);
+
+int SC_Decl_Reg(SCDecl* Self);
 
 JB_String* SC_Decl_Render(SCDecl* Self, FastString* Fs_in);
 
@@ -11709,7 +11704,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1841], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1843], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
