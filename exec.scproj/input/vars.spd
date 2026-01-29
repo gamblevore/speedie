@@ -35,9 +35,14 @@ class XVar (list)
 		return .DataType & (DataTypeCode.PossibleBits+1)
 
 	function Print (|!&ivec4| Reg0)
-		|| fs = FastString(nil|faststring|)
-		.Render(fs, reg0, true)
-		printline fs.GetResult
+		opt norefcounts
+		.Render(Printer, reg0, true)
+		printline Printer.GetResult
+	
+	
+	module
+		|| Printer = faststring()
+	
 	
 	render
 		opt norefcounts
@@ -64,7 +69,9 @@ class XVar (list)
 	function RenderObject (|faststring| fs, |!&ivec4| Reg)
 		opt norefcounts
 		require .TestMem(fs, reg, 8)
-		|| obj = reg|&object|[]		// this should share our classes, so class tests should work.
+		|| obj = reg|&object|[]		// this shares our classes, class tests should work!
+		require .TestObj(fs, obj)
+		
 		if !obj
 			fs <~ "(nil)"
 		  elseif obj isa string
@@ -107,12 +114,18 @@ class XVar (list)
 			T.Render(Fs)
 		
 	
-	function TestMem (|faststring| fs, |!&ivec4| Reg, |int| N, |bool|)
-		|| Err = memory.test(reg, N)
+	function TestObj (|faststring| fs, |object| Obj, |bool|)
+		return .TestMem(fs, obj|&nil|, -1)
+	
+	
+	function TestMem (|faststring| fs, |?&nil| Mem, |int| N, |bool|)
+		if !Mem
+			return true
+		|| Err = memory.test(Mem, N)
 			return true
 		fs <~ Err.signalname
 		fs <~ ": 0x"
-		fs.AppendHex(reg|int64|, 8)
+		fs.AppendHex(Mem|int64|, 8)
 	
 	
 	function RenderData (|faststring| fs, |!&ivec4| Reg)

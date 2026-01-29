@@ -28,6 +28,7 @@ What about this idea? Pointer compression:
  */
 
 #include "JB_Alloc.h"
+#include <setjmp.h>
 
 
 
@@ -43,8 +44,11 @@ What about this idea? Pointer compression:
 
 extern "C" {
 
-int RefTrap = 0;
-bool DoTotalMemoryTest=false;
+bool			DoTotalMemoryTest;
+jmp_buf 		MemFailJump;
+byte			MemFailKeeper;
+JB_MemoryWorld	MemoryManager;
+
 
 inline void failed(const char* c) {
 	printf("jbmem error: %s\n", c);
@@ -100,7 +104,6 @@ static inline AllocationBlock* EndBlock_(SuperBlock* Block) {return (AllocationB
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-JB_MemoryWorld MemoryManager;
 
 
 static JBObject_Behaviour DummyFuncTable = {};
@@ -608,7 +611,73 @@ void JB_DebugAllMemory(bool b)  {
 	DoTotalMemoryTest = b;
 }
 
-bool JB_TotalSanity(bool Force) {
+
+static void MemoryAccessError (int sig) {
+	longjmp(MemFailJump, sig);
+}
+
+
+
+static int ReadMemory (byte* B, int N) {
+	int C = 0;
+	for (int i = 0; i < N; i++)
+		C ^= B[i];
+	MemFailKeeper = C; // stop optimiser
+	return 0;
+}
+
+
+static bool SuperIsValid (SuperBlock* B) {
+	auto F = MemoryManager.CurrSuper;
+	auto C = F;
+	while (C) {
+		if (C == B)
+			return true;
+		C = C->Next;
+		if (C == F)
+			break;
+	}
+	return false;
+}
+
+
+static int ObjIsValid (JB_Object* Obj) {
+	auto Block = ObjBlock_(Obj);
+	if (!SuperIsValid(Block->Super))
+		return 1000;
+	
+	int Count = Block->ObjCount + Block->HiddenObjCount;
+	if (!Count)
+		return 1001;
+	int Size = Block->ObjSize;
+	int TotalSize = Size*Count;
+	const int AllowedTotal = (int)((1<<kBlockSize)-sizeof(AllocationBlock));
+	if (TotalSize > AllowedTotal)
+		return 1002; // block itself is invalid
+	if (!Block->Next or !Block->Prev)
+		return 1003;
+	if (!Block->Owner->Class)
+		return 1004;
+	return 0;
+}
+
+
+int JB_CanReadMemory (void* B, int N) {
+	int C = setjmp(MemFailJump);
+	if (C)
+		return C;
+
+	if (!B or !N) return -1;
+
+	auto OldSeg = signal(SIGSEGV, MemoryAccessError);
+	auto OldBus = signal(SIGBUS, MemoryAccessError);
+	int Err =  (N < 0)  ?  ObjIsValid((JB_Object*)B)  :  ReadMemory((byte*)B, N);
+	signal(SIGSEGV, OldSeg);
+	signal(SIGBUS, OldBus);
+	return Err;
+}
+
+bool JB_TotalSanity (bool Force) {
 	if (!Force and !DoTotalMemoryTest)
 		return true;
 	auto cls = AllClasses;

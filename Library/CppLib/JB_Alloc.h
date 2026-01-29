@@ -297,7 +297,8 @@ u32 JB_ObjCount();
 #endif
 
 
-bool JB_TotalSanity(bool Force);
+bool JB_TotalSanity (bool Force);
+bool JB_Obj_IsValid (JB_Object* Obj);
 
 
 inline JB_Object* JB_Incr_(JB_Object* self) {

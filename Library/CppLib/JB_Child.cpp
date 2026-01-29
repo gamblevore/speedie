@@ -18,7 +18,6 @@ extern "C" {
 #include <errno.h>
 #include <signal.h>
 #include <execinfo.h>
-#include <setjmp.h>
 	
 #include <unistd.h>
 #include <errno.h>
@@ -49,8 +48,6 @@ static const unsigned int WakeList = x(SIGURG) x(SIGVTALRM) x(SIGALRM) x(SIGINFO
 extern _cstring			App_CallPath;
 extern const char**		JB_Main__Args;
 bool					JB_NoExitOnCrash;
-byte					MemFailKeeper;
-jmp_buf					JB_MemFailJump;
 
 
 
@@ -165,35 +162,6 @@ void JB_App__CrashInstall() {
 
 
 
-
-static void MemoryAccessError (int sig) {
-	longjmp(JB_MemFailJump, sig);
-}
-
-
-static int ReadMemory (byte* B, int N) {
-	int C = setjmp(JB_MemFailJump);
-	if (C)
-		return C;
-
-	for (int i = 0; i < N; i++)
-		C ^= B[i];
-	MemFailKeeper = C; // stop optimiser
-	return 0;
-}
-
-
-int JB_CanReadMemory (void* B, int N) {
-	if (B and N > 0) {
-		auto OldSeg = signal(SIGSEGV, MemoryAccessError);
-		auto OldBus = signal(SIGBUS, MemoryAccessError);
-		int Result = ReadMemory((byte*)B, N);
-		signal(SIGSEGV, OldSeg);
-		signal(SIGBUS, OldBus);
-		return Result;
-	}
-	return 0;
-}
 
 }
 
