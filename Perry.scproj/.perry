@@ -6,7 +6,7 @@ roots		// this is used by the IDE Perry. This does not affect compilation!
 	"@spd/GUI.scproj/gui.input/"
 	"@spd/Image.scproj/image.input/"
 	"@spd/temporal.scproj/temporal.input/8ball.spd"
-
+	"@spd/Speedie.scproj/speedie.input/AutoCompleteHelpers"
 	
 unused_lib_funcs // This also does not affect compiliation! It tells the IDE not to report certain warnings.
 	"@spd/GUI.scproj"
