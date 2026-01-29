@@ -71,3 +71,6 @@ void JB_SDL_RemoveWindowBorder (void* w) {
 	window.styleMask |= NSWindowStyleMaskFullSizeContentView;
 }
 
+//void JB_SDL_FullScreen (void* w, bool On) {
+//}
+

@@ -2,11 +2,11 @@
 
 #include <stdio.h>
 #include "SDL.h"
-#include "JB_BasicTypes.h"
 
 
-extern "C" {
 #ifdef __linux__
+#include "JB_BasicTypes.h"
+extern "C" {
 void* JB_App__DocumentOpened (bool Clear) {
 	return 0;
 }
@@ -31,20 +31,19 @@ void JB_SDL_SetModified(void* w, bool b) {
 	printf("Unimplemented request to set Window Modified State\n");
 }
 
-void JB_SDL_FullScreen (void* w, bool On) {
-	uint state = On ? SDL_WINDOW_FULLSCREEN : 0; // fullscreen_desktop fails in WSL?
-	SDL_SetWindowFullscreen((SDL_Window*)w, state);
-}
 
 void JB_SDL_RemoveWindowBorder (void* w) {
 	SDL_SetWindowBordered((SDL_Window*)w, false);
 }
+}
 #else
-	
-	void JB_Stub_OSNative() {
-		; // do nothing. avoid complaints about empty files.
-	}
+
+extern "C" void JB_SDL_FullScreen (void* w, bool On) {
+	uint state = On ? 1 : 0; // fullscreen_desktop fails in WSL?
+	SDL_SetWindowFullscreen((SDL_Window*)w, state);
+}
+
 #endif
 
-}
+
 

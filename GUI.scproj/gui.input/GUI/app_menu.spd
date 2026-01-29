@@ -9,10 +9,13 @@ class AppMenu (Window)
 		super.constructor
 		.id					= "appmenu"
 		.ClickOutsideCloses = true
-		.Choices			= ListView(self,	nil,	AppMenuReturnkey)
+		.Choices			= ListView(self,	nil,	MenuReturnkey)
 		.gnormal.edge = (0.5, 0.0, 1.0, 0.5).px
 		.init
 
+	
+	function ScreenModeStr (|string|)
+		return "Go FullScreen"
 
 	function Init
 		is visible
@@ -21,10 +24,11 @@ class AppMenu (Window)
 		.setfocus
 		|| first = "About " + app.filename
 		|| it = .choices
-		it <~ (first,						AppMenuAbout)
+		it <~ (first,						MenuAbout)
 		it.addsep
-		it <~ ("Help",						AppMenuHelp)
-		it <~ ("Quit",						AppMenuQuit)
+//		it <~ (.ScreenModeStr,				MenuScreen) // doesn't quite work yet. locks up the mac!
+		it <~ ("Help",						MenuHelp)
+		it <~ ("Quit",						MenuQuit)
 		it.gnormal = ¥.Menus 
 		it.gRowSel = ¥.MenuRowSel 
 
@@ -73,34 +77,38 @@ class AppMenu (Window)
 			return SDLActivity.activity
 
 
-function AppMenuHelp (GuiMenuEvent)
-	|| it = app.Conf("HelpURL")
-		app.showurl(it)
-		return 
-	if self isa listview
-		menu.removequietly(self)
-	beep "No help available."
+		function MenuScreen (GuiMenuEvent)
+			|| W = GUI.ScreenWindow #expect beep
+//			gui.SDL_SetWindowFullscreen(W, GUI.WINDOW_FULLSCREEN) // OSX doesn't like this!
 
+		function MenuHelp (GuiMenuEvent)
+			|| it = app.Conf("HelpURL")
+				app.showurl(it)
+				return 
+			if self isa listview
+				menu.removequietly(self)
+			beep "No help available."
+		
+		
+		function MenuQuit (GuiMenuEvent)
+			GUI.QuitReason |= sdlactivity.exiting
+		
 
-function AppMenuQuit (GuiMenuEvent)
-	GUI.QuitReason |= sdlactivity.exiting
-
-
-function AppMenuAbout (GuiMenuEvent)
-	|| aboutstr = app.Conf("about")
-	if !aboutstr
-		aboutstr = `$appname v$version $apptime.
+		function MenuReturnkey (GuiListEvent)
+			(.window as appmenu)!.ReturnValue = .FirstSelected
+			return true
+		
+		
+		function MenuAbout (GuiMenuEvent)
+			|| aboutstr = app.Conf("about")
+			if !aboutstr
+				aboutstr = `$appname v$version $apptime.
 
 By '$creator'.`
-	aboutstr = aboutstr.ReplaceAll(`$appname`, app.filename)
-	aboutstr = aboutstr.ReplaceAll(`$apptime`, app.TimeID|int64|.render)
-	aboutstr = aboutstr.ReplaceAll(`$appdate`, app.Created.localtime)
-	aboutstr = aboutstr.ReplaceAll(`$version`, app.Conf("version"))
-	aboutstr = aboutstr.ReplaceAll(`$creator`, app.Conf("creator"))
-	app.alert aboutstr
-
-
-function AppMenuReturnkey (GuiListEvent)
-	(.window as appmenu)!.ReturnValue = .FirstSelected
-	return true
+			aboutstr = aboutstr.ReplaceAll(`$appname`, app.filename)
+			aboutstr = aboutstr.ReplaceAll(`$apptime`, app.TimeID|int64|.render)
+			aboutstr = aboutstr.ReplaceAll(`$appdate`, app.Created.localtime)
+			aboutstr = aboutstr.ReplaceAll(`$version`, app.Conf("version"))
+			aboutstr = aboutstr.ReplaceAll(`$creator`, app.Conf("creator"))
+			app.alert aboutstr
 
