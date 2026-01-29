@@ -78,7 +78,7 @@ ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/speedie
 chmod 775 /usr/local/bin/speedie
 chown $U /usr/local/bin/speedie
 
-/usr/local/speedie/Terminal/Speedie /usr/local/speedie/exec.scproj --output_path=/usr/local/speedie/Terminal/Cake
+/usr/local/speedie/Terminal/Speedie /usr/local/speedie/Cake.scproj --output_path=/usr/local/speedie/Terminal/Cake
 
 echo "Linking Speedie"
 
