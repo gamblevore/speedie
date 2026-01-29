@@ -278,7 +278,8 @@ function Message.Clean (|bool| erl = false)
 		  elseif (f == @adj)
 			if curr.first ~= "target"
 				curr.BecomeTarget
-			
+
+
 		  elseif (f == @tmp)
 			if curr.parent != IgnoreArg
 				|| s  = curr.name.Lowercase
@@ -289,7 +290,7 @@ function Message.Clean (|bool| erl = false)
 					continue_with curr.tran_target
 				  elseif s == "is" or "isnt"
 					curr.Tran_Isnt("self")
-				  elseif SCGlobals.UniqueNum and AutoComplete.isafunc(s)
+				  elseif SCGlobals.UniqueNum and AutoComplete.functions[s]!=nil
 					SCGlobals.UniqueNum = 0 // why not? make for smaller/more-predictable numbers
 				  elseif s == "dispatch" or "functiontable" or "flags" or "constants"
 					IgnoreArg = curr.last

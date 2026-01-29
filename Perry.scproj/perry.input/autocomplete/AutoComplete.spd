@@ -30,10 +30,8 @@ function message.AddToAutoCompleteList (|string| name, |[string]| CouldBe, |mess
 	opt norefcounts
 	for s in CouldBe
 		if s[0, name, true]
-			if !self
-				self = @arg + name
-			|| tmp = self.msg(@tmp, s)
-			tmp <~ s
+			self ?= @arg + name
+			.msg(@tmp, s) <~ s
 	return self
 				
 
