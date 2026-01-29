@@ -50,6 +50,7 @@ GUI__App_AppDocumentOpen
 GUI__App_BlurBackgroundStart
 GUI__App_CanDrag
 GUI__App_ChangeSelFlash
+GUI__App_ControlResizedSafely
 GUI__App_CurrMouseXY
 GUI__App_DrawDrag
 GUI__App_DrawFinish
@@ -100,12 +101,14 @@ GUI__Pxl_Clear
 GUI__Pxl_White
 GUI__RayInfo_Miss
 GUI__Ray_AdjustmentFinder
+GUI__SDL_Cursor_Nothing
 GUI__SDL_Cursor__Empty
 GUI__SDL_Cursor_nothing
 GUI__Sch_DefaultColors
 GUI__ScrollInfo_InDrag_
 GUI__ScrollInfo_JustClicked_
 GUI__SpaceTree_Holders
+GUI__SystemCursor_Curr
 GUI__SystemCursor__Cursors
 GUI__Text_CounterParts
 GUI__Text_CounterParts2
