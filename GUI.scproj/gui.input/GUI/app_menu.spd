@@ -14,10 +14,10 @@ class AppMenu (Window)
 		.init
 
 	
-	function ScreenModeStr (|string|)
+	libinternal ScreenModeStr (|string|)
 		return "Go FullScreen"
 
-	function Init
+	libinternal Init
 		is visible
 		isnt drawsfocus
 		.id = "AppMenu"
@@ -60,28 +60,28 @@ class AppMenu (Window)
 			|| where = .GetAppMenu.Choices.listsource.second
 				where.next = menuitem(name, ev)
 
-		function AddSep
+		inline  AddSep
 			self <~ ("", nil)
 
-		function GetAppMenu (|appmenu!|)
+		libinternal GetAppMenu (|appmenu!|)
 			rz = .menu
 			if !rz
 				rz = appmenu()
 				.menu = rz
 				rz.hide
 
-		function Show (|int|)
+		libinternal Show (|int|)
 			|| m = .GetAppMenu
 			m.choices.setfocus
 			m.ShowAsDialog
 			return SDLActivity.activity
 
 
-		function MenuScreen (GuiMenuEvent)
+		libinternal MenuScreen (GuiMenuEvent)
 			|| W = GUI.ScreenWindow #expect beep
 //			gui.SDL_SetWindowFullscreen(W, GUI.WINDOW_FULLSCREEN) // OSX doesn't like this!
 
-		function MenuHelp (GuiMenuEvent)
+		libinternal MenuHelp (GuiMenuEvent)
 			|| it = app.Conf("HelpURL")
 				app.showurl(it)
 				return 
@@ -90,16 +90,16 @@ class AppMenu (Window)
 			beep "No help available."
 		
 		
-		function MenuQuit (GuiMenuEvent)
+		libinternal MenuQuit (GuiMenuEvent)
 			GUI.QuitReason |= sdlactivity.exiting
 		
 
-		function MenuReturnkey (GuiListEvent)
+		libinternal MenuReturnkey (GuiListEvent)
 			(.window as appmenu)!.ReturnValue = .FirstSelected
 			return true
 		
 		
-		function MenuAbout (GuiMenuEvent)
+		libinternal MenuAbout (GuiMenuEvent)
 			|| aboutstr = app.Conf("about")
 			if !aboutstr
 				aboutstr = `$appname v$version $apptime.
