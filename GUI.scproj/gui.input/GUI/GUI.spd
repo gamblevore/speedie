@@ -89,14 +89,18 @@ module GUI
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
 	cpp_Wrapper JB_SDL_RemoveWindowBorder (|&nil| window)
 	cpp_Wrapper JB_SDL_SetModified		(|&nil| window, |bool| b)
-	cpp_wrapper JB_SDL_FullScreenToggle	(|&nil| w)
+	target osx
+		cpp_wrapper JB_SDL_FullScreenToggle	(|&nil| w)
+	cpp_wrapper JB_SDL_FullScreen	(|&nil| w, |bool| On)
 	cpp_Wrapper SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
 
 	libinternal SDL_FullScreen (|&nil| w, |int| Mode=1)
-		|| full = .isfullscreen
-		if (mode == 0) or (!full and mode>0) or (full and mode<0)
-			.JB_SDL_FullScreenToggle(w) // toggle is just for MacOSX
-										// linux wants the real sdl_setfullscreen!!
+		target osx
+			|| full = .isfullscreen
+			if (mode == 0) or (!full and mode>0) or (full and mode<0)
+				.JB_SDL_FullScreenToggle(w)
+		  else
+			.JB_SDL_FullScreen(W, Mode>0)
 		
 	function DocumentOpened  (|bool|Clear=true, |String|)
 		cpp_Wrapper JB_App__DocumentOpened
@@ -263,32 +267,34 @@ module GUI
 
 	
 	constants
-		SDL_PIXELFORMAT_ARGB8888 = 372645892
-		SDL_PIXELFORMAT_RGBA8888 = 373694468
-		SDL_PIXELFORMAT_ABGR8888 = 376840196
-		ChosenPixelFormat = SDL_PIXELFORMAT_ABGR8888
-		SDL_INIT_TIMER =			0x00000001
-		SDL_INIT_AUDIO =			0x00000010
-		SDL_INIT_VIDEO =			0x00000020  /** implies SDL_INIT_EVENTS */
-		SDL_INIT_JOYSTICK =			0x00000200  /** implies SDL_INIT_EVENTS */
-		SDL_INIT_HAPTIC =			0x00001000
-		SDL_INIT_GAMECONTROLLER =	0x00002000  /** implies SDL_INIT_JOYSTICK */
-		SDL_INIT_EVENTS =			0x00004000
-		SDL_INIT_SENSOR =			0x00008000
-		SDL_WINDOWPOS_CENTERED =	0x2FFF0000
-		SDL_TEXTUREACCESS_STREAMING = 1
-		SDL_WINDOW_RESIZABLE =		0x20
-		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
+		PIXELFORMAT_ARGB8888 = 372645892
+		PIXELFORMAT_RGBA8888 = 373694468
+		PIXELFORMAT_ABGR8888 = 376840196
+		ChosenPixelFormat = PIXELFORMAT_ABGR8888
+		INIT_TIMER =			0x00000001
+		INIT_AUDIO =			0x00000010
+		INIT_VIDEO =			0x00000020  /** implies SDL_INIT_EVENTS */
+		INIT_JOYSTICK =			0x00000200  /** implies SDL_INIT_EVENTS */
+		INIT_HAPTIC =			0x00001000
+		INIT_GAMECONTROLLER =	0x00002000  /** implies SDL_INIT_JOYSTICK */
+		INIT_EVENTS =			0x00004000
+		INIT_SENSOR =			0x00008000
+		WINDOWPOS_CENTERED =	0x2FFF0000
+		TEXTUREACCESS_STREAMING = 1
+		WINDOW_RESIZABLE =		0x20
+		WINDOW_ALLOW_HIGHDPI =	0x00002000
+		WINDOW_FULLSCREEN = 	0x1
+		WINDOW_FULLSCREENISH = 	0x1001
 
 
 	libinternal InitSDL (|&nil|)
 		expect (font.small) "SmallFont not loaded."
 		// joystick works around a sdl2-bug
-		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC ||| SDL_INIT_JOYSTICK)
+		SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
 
 		|| DS = .CurrDisplaySize
-		|| W = SDL_CreateWindow(.NiceAppName.cstr, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			DS.x, DS.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
+		|| W = SDL_CreateWindow(.NiceAppName.cstr, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
+			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
@@ -365,7 +371,7 @@ module GUI
 		|| bigPx = v2.ivec2
 		.Screen.AreaInfo = bigPx
 		|| r = .Renderer
-			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
+			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
 			.scale = Scale
 			window.all.lastrect = bigPx.rect
 		
@@ -883,7 +889,7 @@ module GUI
 		|| v = (.NewSize.vec2/.Scale).ivec2
 		.newsize = nil										// phew
 		.Screen.size = v
-		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
+		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, TEXTUREACCESS_STREAMING, v.x, v.y)
 
 		window.all.FullScreen = v
 		.StartResize(true)
