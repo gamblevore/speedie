@@ -1,17 +1,9 @@
 // beta-file. Unstable.
 GUI_AM_Constructor
 GUI_AM_Destructor
-GUI_AM_Init
 GUI_AM_KeyDown
 GUI_AM_ShowAsDialog
-GUI_AM__AddSep
-GUI_AM__GetAppMenu
-GUI_AM__Show
 GUI_AM__SyntaxAppend
-GUI_AppMenuAbout
-GUI_AppMenuHelp
-GUI_AppMenuQuit
-GUI_AppMenuReturnkey
 GUI_App__Alert
 GUI_App__AskOpen
 GUI_App__AskSave
@@ -989,8 +981,6 @@ JB_ASM_SetDebug
 JB_ASM_StackCode
 JB_ASM__VM
 JB_AllClasses
-JB_AppArgument_Name
-JB_AppArgument_Value
 JB_App__AppPath
 JB_App__AppleScript
 JB_App__ArgValue
@@ -1485,8 +1475,6 @@ JB_Msg_Ancestor
 JB_Msg_AppendMacro
 JB_Msg_AppendNum
 JB_Msg_AppendString
-JB_Msg_ArgName
-JB_Msg_ArgValue
 JB_Msg_Array
 JB_Msg_BecomeCopy
 JB_Msg_BecomeMacro
@@ -1745,6 +1733,7 @@ JB_Rnd_TimeSeed
 JB_Rnd_Vec2
 JB_Rnd_Vec3
 JB_Rnd_Vec4
+JB_SDL_FullScreen
 JB_SDL_FullScreenToggle
 JB_SDL_RemoveWindowBorder
 JB_SDL_SetModified
@@ -1810,6 +1799,7 @@ JB_Str_AfterByte
 JB_Str_Append4
 JB_Str_Append6
 JB_Str_ArgName
+JB_Str_ArgSwitch
 JB_Str_ArgValue
 JB_Str_AsFile
 JB_Str_BackToApp
@@ -2520,7 +2510,6 @@ SDL_RenderPresent
 SDL_ResetKeyboard
 SDL_RestoreWindow
 SDL_SetClipboardText
-SDL_SetCursor
 SDL_SetRelativeMouseMode
 SDL_SetWindowFullscreen
 SDL_SetWindowMaximumSize
