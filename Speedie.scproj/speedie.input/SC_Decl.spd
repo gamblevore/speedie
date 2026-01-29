@@ -83,7 +83,7 @@ class SCDecl (SCObject) {
 		.mu.info = .mu.info.set(d, Value)
 
 	function Sanity 
-		// if .name ~= "&JB_ListData"
+
 
 	function IsNil (|bool|)
 		return self == typenil

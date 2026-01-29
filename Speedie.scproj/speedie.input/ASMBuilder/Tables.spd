@@ -413,7 +413,6 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	|| v = .OpenVars
 	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
 
-	if "DeAllocTest".trap
 	while
 		if ch.func == @decl
 			rz = decl(self, ch, nil)

@@ -110,7 +110,7 @@ module debugger
 		printline fn.name
 		// now... we need to read the func's debug info! yikes
 		index -= fn.Position
-		for v in fn.vars
+		for v in fn.obj|array of xvar|
 			if v contains index
 				v.Print(reg0)
 	
@@ -118,24 +118,31 @@ module debugger
 	function Load (|bool|)
 		opt norefcounts
 		|| R = .root
-		if !R
-			return true
+		if !R: return true
 
+		|| L = .LoadDebug(R)
+		|| L2 = SpdTable.CodeLength
+		
+		expect (L < 1MB)					("Oversized source-map: " + L)
+		expect (L2 == L)					("Map-length is: " + L) + (" but code-length is: " + L2)
+		
 		if Platform.IsDebug or debugger.wantdebug
 			.BreakAll
+		
+		for fn in SpdTable.funcs
+			fn.loadvars
+		return StdErr.ok
+		
+
+	helper LoadDebug (|message| R, |int|)
+		opt norefcounts
 		xtype.loadtypes R["class"]
 		.Globs = R["glob"]
 		.Files = R["files"].value.decompress.Split
 		.SrcMap = R["pos"]
 		.base = .SrcMap.Addr|&uint|
-		|| L = .SrcMap.Length >> 2
-		.Length = L // just for speed
-		
-		check (L < 1MB)						("Oversized source-map: " + L)
-		|| L2 = SpdTable.CodeLength
-		check (L2==L)						("Map-length is: " + L) + (" but code-length is: " + L2)
-		
-		return StdErr.ok
+		rz = .SrcMap.Length >> 2
+		.Length = rz					// just for speed
 
 
 	function BreakAll

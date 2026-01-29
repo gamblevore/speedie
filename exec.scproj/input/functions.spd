@@ -42,15 +42,9 @@ role SpdFunc (message)
 		SpdTable.LinksOK++
 		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
 
-	function Vars (|[xvar]|)
+	function LoadVars
 		opt norefcounts
-		|| xv = .obj
-		if xv isa array
-			return xv|array of xvar|
-		
-		|| vars = .Last.xvariables
-		.obj = vars
-		return vars
+		.obj = .Last.xvariables
 		
 	
 	module

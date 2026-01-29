@@ -4,7 +4,8 @@ main
 	zalgoline "start world"
 	for i in 10
 		ifn i&1
-			"hello world!"
+			|| s = "hello world!"
+			printline s
 		  else
 			"bye world!"
 	zalgoline "end world"

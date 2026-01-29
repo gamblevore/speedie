@@ -146,8 +146,11 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 		exp.rfun(A)
 		return a
 
+	|| Last = .last
 	|| fat = .RefCountSub(exp, prms, fn)
 		fat.µrefcount++
+		if fat == last
+			return asmreg() // don't wipe info
 		return (fat * asmreg()) as asmreg()
 
 

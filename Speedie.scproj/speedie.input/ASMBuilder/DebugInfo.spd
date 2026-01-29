@@ -92,7 +92,6 @@ function FatASM.CanCloseRegs (|int| R, |bool|)
 	
 	
 function Assembler.MarkVarClosed (|int| RegBits)
-	if "DeRefTest".trap or "JB_App__CWDSet".trap
 	.RegDebugInfo &= ~RegBits
 	|| Mark = .last
 	if !mark.CanCloseRegs(RegBits)
