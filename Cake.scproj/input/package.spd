@@ -40,6 +40,8 @@ module CakeRun
 
 	function file.Compile (|file|)
 		|| args = ["--bake", "--quiet", self]
+		if debugger.WantDebug
+			args <~ "-targetdebug"
 		|| Answer = cake.speedie.ExecuteStr(args)
 			rz = Answer.file
 			if !rz.Exists
