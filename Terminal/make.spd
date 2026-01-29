@@ -138,7 +138,7 @@ ${comp(`users`)}
 echo \"Linking Speedie\"
 ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
-$SpdTerm $Speedie/exec.scproj --output_path=$Speedie/Terminal/Cake
+$SpdTerm $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
 
 echo \"Linking Speedie\"
 ${link(ExecTerm, `/usr/local/bin/cake`)}
