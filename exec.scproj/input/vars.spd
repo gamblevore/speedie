@@ -28,7 +28,8 @@ class XVar (list)
 		.CodeEnd = pos
 	
 	operator contains (|int| P, |bool|)
-		require P >= .Position and P < .codeend
+		// if p == .position, then the instruction isn't yet run.
+		return P > .Position and P < .codeend
 		
 	function CanBeNil (|bool|)
 		return .DataType & (DataTypeCode.PossibleBits+1)
@@ -50,8 +51,7 @@ class XVar (list)
 			fs <~ "|"
 			fs <~ " "
 			fs <~ .name
-			|int| R = .reg
-				fs <~ "($R): " // remove .reg once this is reliable
+			fs <~ ": "
 		if reg0
 			|| Reg = Reg0 + .reg
 			|| C = .obj|&nil||xtype|
@@ -192,8 +192,6 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 			Registers[reg].Close(pos)
 		  else
 			|| var = xvar(input, pos, reg, ReadEnd)
-			target debug
-				var.DebugPrint
 			if Registers
 				Registers[reg] = var
 			out <~ var

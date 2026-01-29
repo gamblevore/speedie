@@ -102,6 +102,7 @@ module debugger
 	
 	
 	function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0)
+		opt norefcounts
 		if !fn
 			printline "(unknown)" // could print regs, but how many?
 			return
@@ -121,7 +122,7 @@ module debugger
 			return true
 
 		if Platform.IsDebug or debugger.wantdebug
-/			.BreakAll
+			.BreakAll
 		xtype.loadtypes R["class"]
 		.Globs = R["glob"]
 		.Files = R["files"].value.decompress.Split
@@ -149,6 +150,10 @@ class FileWithData (stringshared)
 	false NIL
 	|string?|   _Data
 
+	render
+		opt norefcounts
+		fs <~ self|string|
+	
 	function GetLine (|int| Pos, |string|)
 		opt norefcounts
 		|| d = .data

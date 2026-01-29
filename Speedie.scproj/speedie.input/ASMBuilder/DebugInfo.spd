@@ -5,7 +5,7 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	self <~ '\0'					// range-length states that theres no name/type. So it must be a close!
 	.AppendHInt(pos)
 	.AppendHInt(Reg)
-	self[mark] = .length - mark
+	self[mark] = .length - (mark + 1)
 
 
 function SCDecl.MiniName (|faststring| fs)
