@@ -172,6 +172,10 @@
 		AC66D1462ED1D54C00EDFB82 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
 		AC66D1472ED1D54C00EDFB82 /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
 		AC8EA6B92D726C6F00158029 /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */; };
+		ACA61E802F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
+		ACA61E812F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
+		ACA61E822F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
+		ACA61E832F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
 		ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EBF2961F9B2005EFB9D /* JB_Vectors.cpp */; };
 		ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528E7D2961F946005EFB9D /* JB_Globals.cpp */; };
 		ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED32961F9B3005EFB9D /* JB_OSX.m */; };
@@ -414,6 +418,7 @@
 		AC66D15B2ED1D6DA00EDFB82 /* JB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JB.h; path = ../exec.scproj/Cpp/JB.h; sourceTree = "<group>"; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSpeedie.dylib; path = Build/Debug/libSpeedie.dylib; sourceTree = "<group>"; };
+		ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_OSNative.cpp; path = ../GUI.scproj/gui.input/c_includes/JB_OSNative.cpp; sourceTree = SOURCE_ROOT; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dylib.cpp; path = ../Library/CppLib/JB_Dylib.cpp; sourceTree = "<group>"; };
@@ -506,6 +511,7 @@
 				AC528EC72961F9B2005EFB9D /* JB_MSR.cpp */,
 				AC528EC32961F9B2005EFB9D /* JB_Array.cpp */,
 				AC528ED32961F9B3005EFB9D /* JB_OSX.m */,
+				ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */,
 				AC528ED02961F9B3005EFB9D /* JB_Pipe.cpp */,
 				AC528ED22961F9B3005EFB9D /* JB_PNG.cpp */,
 				AC528EC02961F9B2005EFB9D /* JB_List.cpp */,
@@ -930,6 +936,7 @@
 				AC13B2712EE1E77300BF1567 /* JB_Array.cpp in Sources */,
 				ACE989EE2EF043BF00526C32 /* JB_Dylib.cpp in Sources */,
 				AC13B2722EE1E77300BF1567 /* JB_FastString.cpp in Sources */,
+				ACA61E822F2BB6F800C71221 /* JB_OSNative.cpp in Sources */,
 				AC13B2732EE1E77300BF1567 /* JB_String.cpp in Sources */,
 				AC13B2742EE1E77300BF1567 /* JB_Dictionary.cpp in Sources */,
 			);
@@ -1047,6 +1054,7 @@
 				AC66D1402ED1D54C00EDFB82 /* JB_Array.cpp in Sources */,
 				AC66D1412ED1D54C00EDFB82 /* JB_FastString.cpp in Sources */,
 				AC2218C72EE9A6DC004D73E0 /* FF_ARM64.S in Sources */,
+				ACA61E812F2BB6F800C71221 /* JB_OSNative.cpp in Sources */,
 				AC66D1422ED1D54C00EDFB82 /* JB_String.cpp in Sources */,
 				AC66D1432ED1D54C00EDFB82 /* JB_Dictionary.cpp in Sources */,
 			);
@@ -1087,6 +1095,7 @@
 				ACE989ED2EF043BF00526C32 /* JB_Dylib.cpp in Sources */,
 				ACB2D26D29BCCAB70070E60F /* JB_FastString.cpp in Sources */,
 				ACB2D26E29BCCAB70070E60F /* JB_String.cpp in Sources */,
+				ACA61E802F2BB6F800C71221 /* JB_OSNative.cpp in Sources */,
 				ACB2D26F29BCCAB70070E60F /* JB_Dictionary.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1126,6 +1135,7 @@
 				ACE989EF2EF043BF00526C32 /* JB_Dylib.cpp in Sources */,
 				AC528EFA2961F9B4005EFB9D /* JB_FastString.cpp in Sources */,
 				AC528EF22961F9B4005EFB9D /* JB_String.cpp in Sources */,
+				ACA61E832F2BB6F800C71221 /* JB_OSNative.cpp in Sources */,
 				AC528F002961F9B4005EFB9D /* JB_Dictionary.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1552,6 +1562,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -1629,6 +1640,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
