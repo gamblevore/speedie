@@ -20,11 +20,7 @@ void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
 }
 
 
-#ifndef ENV64BIT
-    #define kArrayLengthMax (1024*1024*512) // 512MB
-#else
-    #define kArrayLengthMax (2147483644) // 2GB
-#endif
+#define kArrayLengthMax (2147483644)	 	// 16GB on 64-bit platforms, 8GB on 32-bit platforms.
 #define PtrSize (sizeof(void*))
 
 

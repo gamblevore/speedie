@@ -19,7 +19,9 @@ extend_module ASM
 				testvm.Registers(true)
 				testvm.IsDebugging = true
 				testvm.load(ff.ptr, ff.length)
+				object.totalsanity
 				testvm.Run(0)
+				object.totalsanity
 				testvm.IsDebugging = false
 
 

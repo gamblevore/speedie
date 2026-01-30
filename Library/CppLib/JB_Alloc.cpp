@@ -32,13 +32,8 @@ What about this idea? Pointer compression:
 
 
 
-#ifdef ENV64BIT
-    #define kBlockSize          13  // 8K!
-    #define BadBit				3
-#else
-    #define kBlockSize          12  // 4K
-    #define BadBit				3
-#endif
+#define kBlockSize          13  // 8K!
+#define BadBit				3
 
 
 

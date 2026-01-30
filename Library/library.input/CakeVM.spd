@@ -30,7 +30,7 @@ target cpp or vm {
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 		cpp_wrapper JB_ASM_FillTable
 	
-	function IsDebugging (assigns:|CakeChef?| Value, |&int|)
+	function IsDebugging (assigns:|CakeChef?| Value, |?&int|)
 		cpp_wrapper JB_ASM_SetDebug
 	
 	function Prev (|&ivec4| Reg0, |&ivec4|)

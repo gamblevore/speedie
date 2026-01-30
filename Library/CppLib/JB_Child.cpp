@@ -10,7 +10,6 @@ extern "C" {
 	void JB_RemoveHandlers() {};
 }
 
-
 #else
 
 #include "JB_Umbrella.hpp"
@@ -45,7 +44,6 @@ static const unsigned int WakeList = x(SIGURG) x(SIGVTALRM) x(SIGALRM) x(SIGINFO
 #undef x
 
 
-//extern _cstring			App_CallPath;
 extern const char**		JB_Main__Args;
 bool					JB_NoExitOnCrash;
 
@@ -131,6 +129,7 @@ void JB_CrashHandler (int Sig) {
 		exit(128|Sig);
 	}
 }
+
 
 
 // For some reason... once we have set the sigint to ignore, setting it to the crashhandler

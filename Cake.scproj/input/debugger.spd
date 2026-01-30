@@ -96,21 +96,17 @@ module debugger
 			return 0
 		
 		|| Where = debugger.Base![index]
-		|| Path = debugger.path(where & (11~bits))$
-		.DebugFoundLocation( Path, Where>>11 )
-		.PrintStackVars(index, spdtable.Find(index), Reg0)
+		|| Path = debugger.path(where & (11~bits))
+			.DebugFoundLocation( Path, Where>>11 )
+			|| fn = spdtable.Find(index)
+				.PrintStackVars(index, fn, Reg0)
 	
 	
 	function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0)
 		opt norefcounts
-		if !fn
-			printline "(unknown)" // could print regs, but how many?
-			return
-		
 		printline fn.name
-		// now... we need to read the func's debug info! yikes
 		index -= fn.Position
-		for v in fn.obj|array of xvar|
+		for v in fn.obj|[xvar]|
 			if v contains index
 				v.Print(reg0)
 	

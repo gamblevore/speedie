@@ -101,7 +101,6 @@ class Object
 		
 		function TotalSanity (|bool| Force=true, |bool|)
 			cpp_wrapper JB_TotalSanity
-			// something like that?
 
 
 struct ClassData

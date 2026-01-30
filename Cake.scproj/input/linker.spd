@@ -3,6 +3,7 @@
 module SpdTable 
 	|int|			LinksOK
 	|int|			CodeLength
+	|bool|			FailedIndex
 	|[SpdFunc]|		Funcs
 	|spdfunc--|		CurrFunc
 	|&&nil|			LibFuncs = cakerun.LibFuncs
@@ -13,6 +14,11 @@ module SpdTable
 			|| P = f.Position
 			if  index >= P  and  index < P + f.RangeLength
 				return f
+		
+		if !.FailedIndex
+			.FailedIndex = true
+			error "Can't find code index: " + index
+	
 	
 	function RunMain (|ind|)
 		opt norefcounts

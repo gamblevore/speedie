@@ -16,11 +16,7 @@
 extern "C" {
 
 
-#ifdef ENV64BIT
-    #define kStrLengthMax (2147483644) // 2GB string max
-#else
-    #define kStrLengthMax (1024*1024*1024) // 1GB string max
-#endif
+#define kStrLengthMax (2147483644) // 2GB string max
 
 // probably should move all this into the string header... utf-8 isnt needed elsewhere
 #if kPlatformEndian == 0

@@ -357,8 +357,11 @@ struct FatASM
 	
 	
 	function WillRenderFat (|bool|)
-		if (.GuessSize == 0)  and  (.msg.func == @sheb)
-			return false
+		if (.GuessSize == 0)
+			if .msg.func == @sheb
+				return false
+			if self isa asm.mark
+				return false
 		return true
 	
 	

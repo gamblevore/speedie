@@ -42,10 +42,12 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 
 void JB_ASM_Pause (CakeVM* V) {
-	auto J = V->JumpTable;
-	void* Pause = J[513];
-	for (int i = 0; i < 256; i++)
-		J[i] = Pause;
+	if (V->VFlags&kJB_VM_CanDebug) {
+		auto J = V->JumpTable;
+		void* Pause = J[513];
+		for (int i = 0; i < 256; i++)
+			J[i] = Pause;
+	}
 }
 
 
@@ -55,7 +57,7 @@ int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
 
 
 int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
-	if_rare (!V)
+	if_rare (!V or !(V->VFlags&kJB_VM_CanDebug))
 		return 0;
 	auto J = V->JumpTable;
 	void* Break = J[512];
@@ -67,8 +69,8 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 		  else
 			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
 	}
-	byte* B = (byte*)V;
-	return (int*)(B + (CakeCodeMax*4) + (V->StackSize));
+	auto AASM = VMCodePtr(V);
+	return (int*)(AASM + CakeCodeMax);
 }
 
 
@@ -89,6 +91,8 @@ static void * const GlobalJumpTable[] = {
     RegVar(r, r21) = vm.Registers+2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
 	Op = *Code++;									// spelled out for debug
+
+	// // // // //  START VM  // // // // // 
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
 	EXIT:;
@@ -97,7 +101,7 @@ static void * const GlobalJumpTable[] = {
 	PAUSE:;											// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
 	for (int i = 0; i < 256; i++)
-		JumpTable[i] = &&TRYBREAK;
+		JumpTable[i] = &&TRYBREAK;					// Restore
 	goto BREAK;
 
 	
@@ -112,19 +116,23 @@ static void * const GlobalJumpTable[] = {
 		}
 	}
 	
-	BREAK:;											// the actual breakpoint
-	if (int64 Value = (vm.Break)(&vm, JB_ASM_Index(&vm, Code-1), (Code[CakeCodeMax-1]<<1)>>1, (ivec4*)r)) {
-		if (Value < 0) {			// jump back? i guess so?
-			Code += Value;
-			if (Code < VMCodePtr(&vm))
-				Code -= Value;		// Debugger jumped out of range!!
-			  else 
-				Op = *Code++;
-		} else if (Value < 256) {
-			exit((int)Value);
-		} else {
-		// if value !=256 maybe better to actually put an error somewhere.
-			return 0;
+	BREAK:;	{										// the actual breakpoint
+		auto Index = JB_ASM_Index(&vm, Code-1);
+		auto Break = (Code[CakeCodeMax-1]<<1)>>1;
+		int64 Value = (vm.Break)(&vm, Index, Break, (ivec4*)r);
+		if_rare (Value) {
+			if (Value < 0) {			// jump back? i guess so?
+				Code += Value;
+				if (Code < VMCodePtr(&vm))
+					Code -= Value;		// Debugger jumped out of range!!
+				  else 
+					Op = *Code++;
+			} else if (Value < 256) {
+				exit((int)Value);
+			} else {
+			// if value !=256 maybe better to actually put an error somewhere.
+				return 0;
+			}
 		}
 	}
 	goto *JumpTable[256+(Op>>24)];					// Resume
@@ -132,7 +140,7 @@ static void * const GlobalJumpTable[] = {
 
 
 int JB_ASM_Index (CakeVM* vm, ASM* Code) {
-	ASM* Start = (ASM*)(((byte*)vm) + vm->StackSize);
+	ASM* Start = VMCodePtr(vm);//(ASM*)(((byte*)vm) + vm->StackSize);
 	if (Code < Start)
 		return -1;
 	if (Code >= Start + CakeCodeMax)
