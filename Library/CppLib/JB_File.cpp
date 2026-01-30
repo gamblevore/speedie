@@ -431,7 +431,7 @@ int JB_File_Open (JB_File* f, int OpenFlags, bool AllowMissing) {
 
 
 // does what write() should do.
-// well kinda. It could write some of the bytes and STILL get an error. so the interface is just bad.
+// could be improved actually. if write fails the 2nd time around, we return -1. It should have a "total" param.
 int JB_Write_ (int fd, uint8* buffer, int N) {
     int TotalCount = 0;
 
@@ -510,20 +510,24 @@ static bool CrashLogSub (const char* c) {
 		chmod(JB_CrashLogFileName, 777);
 		if (CrashLogFile)
 			fprintf(stderr, "Log At: %s\n", JB_CrashLogFileName);
+		  else
+			CrashLogFile = -1;
 	}
 
-	fputs(c, stderr);
-
-	if (!CrashLogFile) return false;
+	if (CrashLogFile <= 0) return false;
     JB_Write_( CrashLogFile, (u8*)c, (int)strlen(c) );
     return true;
 }
 
 
-void JB_Rec__CrashLog (const char* c) {
-	if (c and CrashLogSub(c))
-		JB_Write_( CrashLogFile, (u8*)"\n", 1 );
-	fputc('\n', stderr);
+void JB_Rec__CrashLog (const char* c, bool Cap) {
+	if (c) {
+		fputs(c, stderr);
+		if (Cap)
+			fputc('\n', stderr);
+		if (CrashLogSub(c) and Cap)
+			JB_Write_( CrashLogFile, (u8*)"\n", 1 );
+	}
 }
 
 

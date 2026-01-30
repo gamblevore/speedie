@@ -45,7 +45,7 @@ static const unsigned int WakeList = x(SIGURG) x(SIGVTALRM) x(SIGALRM) x(SIGINFO
 #undef x
 
 
-extern _cstring			App_CallPath;
+//extern _cstring			App_CallPath;
 extern const char**		JB_Main__Args;
 bool					JB_NoExitOnCrash;
 
@@ -63,7 +63,6 @@ void JB_Wake(int Sig) { ; /* do nothing! This will wake up the process hopefully
 
 
 
-void JB_Rec__CrashLog			(const char* c);
 void JB_Proc__TellParentIDied	(const char* signal);
 int JB_Rec_ShellPrintErrors		(void* self);
 
@@ -90,38 +89,39 @@ void JB_RemoveHandlers() {
 
 
 void JB_CrashHandler (int Sig) {
-						// stop crash-loops.
+	if (Sig <= 0)		// Some unixes/shells can do this?
+		return;
+
+						// Stop crash-loops.
 	static bool AlreadyCrashed;
 	if (AlreadyCrashed)
 		return;
 	AlreadyCrashed = true;
-						// Some unixes/shells can do this?
-	if (Sig <= 0)
-		return;
 	
-						// deregister
+						// Deregister
 	JB_RemoveHandlers();
 
-						// report to stdout
+						// Report + Log
 	char ErrorBuff[128];
 	auto T = time(0);
-	snprintf(ErrorBuff, sizeof(ErrorBuff), "%s\nDate: %sSignal: %s\n", App_CallPath, ctime(&T), strsignal(Sig));
-	fputs(ErrorBuff, stderr);
-	
-						// log to file
+	snprintf(ErrorBuff, sizeof(ErrorBuff), "%sSignal %i in %s", ctime(&T), Sig, *JB_Main__Args);
 	if (Sig != SIGHUP and Sig != SIGQUIT and Sig != SIGKILL) {
 		JB_Rec__CrashLog("\n\n****** CRASHED ******");
-		JB_Rec__CrashLog("Args: [");
+		JB_Rec__CrashLog(ErrorBuff, false);
+		JB_Rec__CrashLog(" [");
 		const char** c = JB_Main__Args;
-		while (*c)
-			JB_Rec__CrashLog(*c++);
-		JB_Rec__CrashLog("]");
-		JB_Rec__CrashLog(ErrorBuff);
+		while (*(++c)) {
+			JB_Rec__CrashLog("\t", 0);
+			JB_Rec__CrashLog(*c);
+		}
+		JB_Rec__CrashLog("]\n");
 		JB_CrashTracer();
 		JB_Rec__CrashLog("-----------------------\n");
+	} else {
+		fputs(ErrorBuff, stderr);
 	}
 
-						// print normal-errors
+						// Print Normal Errors
 	JB_Rec_ShellPrintErrors(nil);
 	PicoFinish();
 	bool AskExit = (Sig == SIGHUP) or (Sig == SIGQUIT) or (Sig == SIGKILL);

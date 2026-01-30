@@ -7,11 +7,15 @@
 
 #include <stdio.h>
 
+extern "C" {
+
 const char** JB_Main__Args;
 
-
-extern "C" int JB_SP_Run (const char** args, int Mode);
-extern "C" int main (int count, const char** args) {
+int JB_SP_Run (const char** args, int Mode);
+int main (int count, const char** args) {
 	JB_Main__Args = args;	
     return 255 & JB_SP_Run(args, 3);
 }
+
+}
+

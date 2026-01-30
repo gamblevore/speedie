@@ -8,4 +8,5 @@ main
 			printline s
 		  else
 			"bye world!"
+		printline
 	zalgoline "end world"

@@ -62,7 +62,7 @@ typedef void (*fnCrashHandler)(int);
 void JB_KillWithParent();
 void JB__DefaultCrashHandler(int Signal);
 //void JB__ErrorStackTrace(int Signal);
-void JB_Rec__CrashLog(const char* c);
+void JB_Rec__CrashLog(const char* c, bool Cap=true);
 struct SpdProcess;
 void JB_App__SetThreadName(JB_String* name);
 void JB_Pipe__StdErrorSet(int F);

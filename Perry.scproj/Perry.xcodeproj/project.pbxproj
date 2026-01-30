@@ -413,9 +413,9 @@
 		AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
 		AC61010E2798768C00278BEF /* libSpeedie.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedie.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC66D14D2ED1D54C00EDFB82 /* Exec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Exec.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC66D1592ED1D6DA00EDFB82 /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../exec.scproj/Cpp/JB.cpp; sourceTree = "<group>"; };
-		AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../exec.scproj/Cpp/JB_Globals.cpp; sourceTree = "<group>"; };
-		AC66D15B2ED1D6DA00EDFB82 /* JB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JB.h; path = ../exec.scproj/Cpp/JB.h; sourceTree = "<group>"; };
+		AC66D1592ED1D6DA00EDFB82 /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../Cake.scproj/Cpp/JB.cpp; sourceTree = "<group>"; };
+		AC66D15A2ED1D6DA00EDFB82 /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../Cake.scproj/Cpp/JB_Globals.cpp; sourceTree = "<group>"; };
+		AC66D15B2ED1D6DA00EDFB82 /* JB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JB.h; path = ../Cake.scproj/Cpp/JB.h; sourceTree = "<group>"; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSpeedie.dylib; path = Build/Debug/libSpeedie.dylib; sourceTree = "<group>"; };
 		ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_OSNative.cpp; path = ../GUI.scproj/gui.input/c_includes/JB_OSNative.cpp; sourceTree = SOURCE_ROOT; };
@@ -644,7 +644,7 @@
 /* Begin PBXLegacyTarget section */
 		AC66D1522ED1D58700EDFB82 /* ExecBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/exec.scproj";
+			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/Cake.scproj";
 			buildConfigurationList = AC66D1532ED1D58700EDFB82 /* Build configuration list for PBXLegacyTarget "ExecBuilder" */;
 			buildPhases = (
 			);

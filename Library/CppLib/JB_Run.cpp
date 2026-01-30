@@ -53,6 +53,9 @@ JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );
 
 extern JB_Class JB_TaskData;
 extern bool JB_NoExitOnCrash;
+extern const char** JB_Main__Args;
+extern const char* JB_ThreadName;
+
 
 
 
@@ -65,7 +68,6 @@ thread_local byte	JB_Active = 0;
 extern char**		environ;
 uint				Flow_Disabled;
 static Array*		Raw_Args;
-_cstring			App_CallPath;
 
 
 Dictionary* JB_App__Env() {
@@ -170,9 +172,8 @@ int JB_GUICareTaker(PicoDate D) {
 }
 
 
-
 Array*		JB_App__Args()					{ return Raw_Args; }
-JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
+JB_StringC*	JB_App__CallPath()				{ return JB_StrC(JB_Main__Args[0]); }
 void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
 bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
 bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
@@ -186,7 +187,6 @@ void		JB_App__GUIMode(bool GUI) {
 }
 
 
-extern const char* JB_ThreadName;
 int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
@@ -206,7 +206,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
         return ENOMEM;
         
 	if (R) {
-		App_CallPath = *R;
+//		App_CallPath = *R;
 		
 		#ifndef AS_LIBRARY
 			int err = dup2( STDOUT_FILENO, STDFUN_FILENO );	// reserve StdFUN
