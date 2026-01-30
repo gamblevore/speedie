@@ -138,7 +138,6 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 		|| A = .µ(pf!) // merge gtab into ralo?
 		return exp.RALO(dest, A) * Dest
 
-	//if compiler is hungry
 	if fn == Compiler.RefFreeIfDead
 		|| A = .µ(pf!)
 		#! Disallow: if obj.X(),   when obj.X() is a disowner
@@ -147,7 +146,6 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 		exp.rfun(A)
 		return a
 
-	|| Last = .last
 	|| fat = .RefCountSub(exp, prms, fn)
 		fat.µrefcount++
 		return fat.info as asmreg() // fat * asmreg() // unneeded???
