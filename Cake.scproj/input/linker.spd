@@ -101,11 +101,12 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction,
 	|| ID = ((Old << 13) >> 13) - 31
 	require ID > 0 // not a register!
 	
-/	|| fn = SpdTable.Funcs[id]
+	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart						// Fast-branch for speed.
-			|| Jump = self - Pos					// 19-bits // later we can upgrade to 21-bit
-			if  Jump  ==  (Jump << 13) >> 13
-				|| Final = (Jump|uint| << 13) >> 13
+			|| Jump = (Pos - self)|int|				// 19-bits // later we can upgrade to 21-bit
+			|| J13 = Jump << 13
+			if  Jump  ==  J13 >> 13
+				|| Final = J13|uint| >> 13
 				Final |= (Old>>24) << 24
 				self[] = Final
 //				fn.DebugSuccess(id)
