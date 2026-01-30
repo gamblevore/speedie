@@ -1157,7 +1157,7 @@ function IsPointerMath (|SCDecl| L, |SCDecl| R, |SCOperator| opp, |Message| exp,
 			return R
 		if (R.PointerCount) and (L.PointerCount) and (opp == scoperator.subtract)
 			L.ExpectMatch(R, 0, exp)
-			return TypeInt!.TypeNormal
+			return TypeInt64!.TypeNormal
 
 
 function scdecl.CheckMath (|message| exp, |scdecl|)
