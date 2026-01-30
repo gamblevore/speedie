@@ -68,7 +68,7 @@ class XVar (list)
 	
 	function RenderObject (|faststring| fs, |!&ivec4| Reg)
 		opt norefcounts
-		require .TestMem(fs, reg, 8)
+		require .TestMem(fs, reg, 8, "Bad Stack")
 		|| obj = reg|&object|[]		// this shares our classes, class tests should work!
 		require .TestObj(fs, obj)
 		
@@ -115,34 +115,38 @@ class XVar (list)
 		
 	
 	function TestObj (|faststring| fs, |object| Obj, |bool|)
-		return .TestMem(fs, obj|&nil|, -1)
+		return .TestMem(fs, obj|&nil|, -1, "Bad Object")
 	
 	
-	function TestMem (|faststring| fs, |?&nil| Mem, |int| N, |bool|)
+	function TestMem (|faststring| fs,  |?&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
 		if !Mem
 			return true
 		|| Err = memory.test(Mem, N)
 			return true
-		fs <~ Err.signalname
+		fs <~ ErrName
 		fs <~ ": 0x"
 		fs.AppendHex(Mem|int64|, 8)
 	
 	
 	function RenderData (|faststring| fs, |!&ivec4| Reg)
+		opt norefcounts
 		|| T = .DataType
 		|| V = t.VecCount
 		|| BC = t.ByteCount
 		if (bc >= 12): bc = 16		
 		|| W = .weirdness[0]
+		
+		|| Err = "Bad Stack"
 		if W is pointer or reference
-			require .TestMem(fs, reg, 8)
+			require .TestMem(fs, reg, 8, Err)
 			|| Ptr = Reg|&&nil|[]|int64|
 			fs <~ "0x"
 			fs.AppendHex(ptr, 8)
 			require !.weirdness[1]
 			reg = ptr|&ivec4|
+			Err = "Bad Pointer"
 
-		require .testmem(fs, reg, bc)			
+		require .TestMem(fs, reg, bc, Err)
 				
 		if t is bool
 			fs <~ (reg|&bool|)[].string
