@@ -61,7 +61,7 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 		return 0;
 	auto J = V->JumpTable;
 	void* Break = J[512];
-	V->Break = Value?Value:JB_ASM_NoBreak;
+	V->__VIEW__ = Value?Value:JB_ASM_NoBreak;
 	if ((Value != nil) != (J[0] == Break)) {
 		int i = 256;
 		if (Value) while (--i >= 0)
@@ -119,7 +119,7 @@ static void * const GlobalJumpTable[] = {
 	BREAK:;	{										// the actual breakpoint
 		auto Index = JB_ASM_Index(&vm, Code-1);
 		auto Break = (Code[CakeCodeMax-1]<<1)>>1;
-		int64 Value = (vm.Break)(&vm, Index, Break, (ivec4*)r);
+		int64 Value = (vm.__VIEW__)(&vm, Index, Break, (ivec4*)r);
 		if_rare (Value) {
 			if (Value < 0) {			// jump back? i guess so?
 				Code += Value;
@@ -238,7 +238,7 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	if (Stack.Code[0]) // failed!
 		return 0;
 	int F = V.VFlags;
-	if (!V.Break) V.Break = JB_ASM_NoBreak;
+	if (!V.__VIEW__) V.__VIEW__ = JB_ASM_NoBreak;
 	if (~F&kJB_VM_IsProtected and F&kJB_VM_WantProtect)
 		if (mprotect(Code, CakeCodeMax*4, PROT_READ) == 0)				// protect!
 			V.VFlags |= kJB_VM_IsProtected;

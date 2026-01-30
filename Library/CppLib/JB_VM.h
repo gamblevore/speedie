@@ -44,7 +44,7 @@ struct CakeVM {
     byte*			AllocBase;
     int				AllocCurr;
     int				StackSize;
-    JB_ASM_Break	Break;
+    JB_ASM_Break	__VIEW__;
     
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];
