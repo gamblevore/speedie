@@ -2,8 +2,8 @@
 
 
 Pre-release:
-	* selectors seem broken. just remove them. Sigh. (language2.scproj)
-	* remove game3d stuff (in compiler)
+	* remove selectors
+	* remove game3d stuff
 	* audio should have one class, "Audio" that has a refcounted struct* used by a audiothread
 		* this contains all the info and functions.
 		* audio.play will create a new obj (copied!), and audio.start will play the existing
