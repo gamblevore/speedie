@@ -42,6 +42,7 @@ module PackMaker
 		  else
 			|| R = f.MyReacher
 				check (f isnt ExternalLib) (R.Source, "External library functions can't yet be used in cake files.")
+			if R or compiler.InPerry // otherwise we'll get missing packid[1] bugs...
 				.PackFuncs <~ f
 	
 	
