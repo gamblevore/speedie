@@ -52,11 +52,13 @@ module LibStability
 			return .FPackID
 		return .GPackID
 	
+	
 	function SCObject.PackID (|bool| isFunc, assigns:|int|)
 		if IsFunc
 			.FPackID = value
 		  else
 			.GPackID = value
+	
 	
 	function scobject.MakeID (|faststring| fs, |?&&nil| table, |bool| IsFunc)
 		|| id = .packid(isfunc)
@@ -72,10 +74,12 @@ module LibStability
 			|| fn = SelfLib[.exportname] // an actual function pointer for testing
 				Table[id+31] = fn
 
+	
 	function Find (|string| str, |bool| Funcs, |scobject|)
 		if funcs
 			return Compiler.ExportNames[str]
 		return compiler.ExportGlobs[str]
+	
 	
 	function UseBank (|string| Data, |bool| Funcs)
 		|| ID = .LastLibID
