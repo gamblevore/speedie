@@ -386,11 +386,11 @@ POS 2
 
 POS 24 // force position
 	FNC (Func)			// func: 
-		Code = BumpStack(vm, r, Code+1, Op, *Code)
+		Code = BumpStack(vm, r, Code+0, Op, *Code)
 
 POS 25
 	FNC3 (Func)
-		Code = BumpStack(vm, r, Code+2, Op, Code64)
+		Code = BumpStack(vm, r, Code+1, Op, Code64)
 
 POS 26
 	FNCX (ForeignFunc)

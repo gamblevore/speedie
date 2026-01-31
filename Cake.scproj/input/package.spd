@@ -12,8 +12,8 @@ module CakeRun
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs
 		
-	syntax access (|int| i, |SpdFunc|)
-		return SpdTable.Funcs[i]
+//	syntax access (|int| i, |SpdFunc|)
+//		return SpdTable.Funcs[i]
 
 	function message.Arg (|string| name, |bool| Err = false, |message|)
 		opt norefcounts

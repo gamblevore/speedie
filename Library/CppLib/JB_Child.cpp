@@ -67,7 +67,7 @@ int JB_Rec_ShellPrintErrors		(void* self);
 
 void JB_CrashTracer() {
     int   size = 32;
-    void* array[size];
+    void* array[32];
     auto  strings = JB_App__BackTrace(array, &size);
 
     for_(size) {

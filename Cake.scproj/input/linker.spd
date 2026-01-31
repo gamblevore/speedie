@@ -96,24 +96,26 @@ module SpdTable
 			base += asm.size
 
 
-function asm.PutCandlesOnCake (|&asm| self, |asm| Old) // SPDLink, LinkFunction, linkall
+function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
 	opt norefcounts
-	|| ID = ((Old << 13) >> 13) - 31
-	require ID > 0 // not a register!
+	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
+	
+	|| Op = JumpAndReg >> 24						// FNC or FNC3
+	|| Reg = (JumpAndReg >> 19) & 31
+	|| ID = (JumpAndReg & 19~bits) - 31
+	require  ID > 0									// IDs 0-31, are registers. The first 32-funcs are empty.
 	
 	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart						// Fast-branch for speed.
-			|| Jump = (Pos - self)|int|				// 19-bits // later we can upgrade to 21-bit
-			|| J13 = Jump << 13
-			if  Jump  ==  J13 >> 13
-				|| Final = J13|uint| >> 13
-				Final |= (Old>>24) << 24
+			|| Jump = (Pos - (self+1))|int|			// 19-bits
+			if  Jump&(19~bits)  ==  Jump
+				|| Final = (Jump<<0) ||| (Reg << 19) ||| (Op<<24)
 				self[] = Final
 //				fn.DebugSuccess(id)
 				return
-			expect (false) (spdtable.Currfunc, "Executable too large to link: " + fn.name )
-		expect (false) (spdtable.Currfunc, "Function was trimmed: " + fn.name )
-	error (spdtable.Currfunc, "Bad function ID: "  + id )
+			expect (false) (SpdTable.CurrFunc, "Executable too large to link: " + fn.name )
+		expect (false) (SpdTable.CurrFunc, "Function was trimmed: " + fn.name )
+	error (SpdTable.CurrFunc, "Bad function ID: " + id )
 
 
 function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs

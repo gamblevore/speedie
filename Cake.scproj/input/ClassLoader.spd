@@ -23,7 +23,7 @@ function CakeRun.LoadClasses (|message| Cls)
 		.LoadOneClass(C)
 
 
-function Cakerun.Func (|message| V, |uint64|)
+function CakeRun.Func (|message| V, |uint64|)
 	opt norefcounts
 	|| Info = V.int(0, 1, 64K)$
 	|| Index = Info >> 1

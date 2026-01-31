@@ -29,7 +29,7 @@ extern "C" {
 
 #define ı		Op = *Code++;   goto *JumpTable[Op>>24];
 #define VMCodePtr(V) ((ASM*)(((byte*)(V)) + (V)->StackSize))
-
+#define CanDebug(V)  (((uint64)(V))>>63)
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	if_rare (!V)
@@ -41,8 +41,9 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 }
 
 
+
 void JB_ASM_Pause (CakeVM* V) {
-	if (V->VFlags&kJB_VM_CanDebug) {
+	if CanDebug(V) {
 		auto J = V->JumpTable;
 		void* Pause = J[513];
 		for (int i = 0; i < 256; i++)
@@ -57,7 +58,7 @@ int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
 
 
 int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
-	if_rare (!V or !(V->VFlags&kJB_VM_CanDebug))
+	if_rare (!CanDebug(V))
 		return 0;
 	auto J = V->JumpTable;
 	void* Break = J[512];
@@ -152,7 +153,7 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 ivec4* JB_ASM_PrevStack (CakeVM* vm, ivec4* Reg0) {
 	if (!Reg0) return 0;
 	auto Stack = (VMStack*)(Reg0-1);
-	int Saved = Stack->SavedReg;
+	int Saved = Stack->DestReg;
 	auto BackStack = Stack - Saved;
 	if (BackStack <= &vm->Registers[1].Stack)
 		return 0; // last?
@@ -212,10 +213,14 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 	
 	StackSize = std::max(StackSize, 256*1024);
 	int AllocSize = StackSize + CakeCodeMax*4;
-	if (Flags&kJB_VM_CanDebug)
+	if (Flags&kJB_VM_AskDebug)
 		AllocSize += CakeCodeMax*4;
 	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);		// page aligned. Can call mprotect later.
 	if (V) {
+		auto HighBit = 1ull << 63ull;
+		V = (CakeVM*)(((int64)V)&~HighBit);
+		if (Flags&kJB_VM_AskDebug)
+			V = (CakeVM*)(((int64)(V)) | HighBit);
 		memzero(V, AllocSize);
 		V->VFlags = Flags;
 		V->StackSize = StackSize;
@@ -229,9 +234,9 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
 	V.Registers[2] = {};
 	auto& Stack = V.Registers[1].Stack;
-	Stack.SavedReg = 0;
+	Stack.DestReg = 0;
 	Stack.Alloc = 0;
-	Stack.Marker = 12345;
+	Stack.Depth = 1;
 	Stack.Marker2 = 123;
 	ASM* Code = VMCodePtr(&V);
 	Stack.Code = Code + CakeCodeMax-1;

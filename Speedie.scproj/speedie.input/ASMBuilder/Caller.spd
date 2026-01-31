@@ -17,10 +17,9 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 	|| args = fn.args
 	|| i = 0
 	for p.fast in prms
-		|int64| v = .µReffed(p!, args[i]!).reg
+		|int64| v = .µReffed(p!, args[i++]!).reg
 		sh += 5
 		rz |= v << sh
-		i++
 	
 	rz |= i
 
@@ -51,7 +50,6 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	rz >>= 64-((n*5)+12)
 	if fc>8 or ic>8			// hmmm
 	rz |= fn.ASMReturn.SpecialReg << 11
-//	if fn == "JB_Str_FindCharset"
 	if fc
 		rz |= (8-fc) << 6
 		rz |= (8-ic) << 0
@@ -165,7 +163,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 
 	dest = .CallFunc(exp, dest, fn)
 	|| Start = .curr
-	++.CurrFuncGrab
+	.CurrFuncGrab++
 	
 	|| Closer = .OpenVars
 	|| P = .PrmCollect(prms, fn)
@@ -189,7 +187,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 
 
 
-function assembler.ASMReach (|scfunction| fn)
+function assembler.ASMReach (|SCFunction| fn)
 	opt norefcounts
 	|| orig = .out
 	if Orig.MyReacher and !orig.IsLibrary

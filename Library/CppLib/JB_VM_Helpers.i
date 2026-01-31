@@ -123,13 +123,13 @@ AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
 	if (Mode == 2)
 		return JB_u64_Log2(R2);
 	if (Mode == 3)
-		return (uint)JB_Int_Log2(R2);
+		return (uint)JB_Int_Log2((u32)R2);
 	
 				// byte_swap //
 	if (Mode == 4)
 		return __builtin_bswap64(R2);
 	if (Mode == 5)
-		return (uint)__builtin_bswap32(R2);
+		return (uint)__builtin_bswap32((u32)R2);
 	return 0;
 }
 
@@ -518,18 +518,21 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 
-AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& r, ASM Op) {
-	auto stck	= r - 1;
-	auto R1		= stck - stck->Stack.SavedReg;
-	auto Code	= stck->Stack.Code;
-	vm.AllocCurr = stck->Stack.Alloc;
+// r0(1), <stack/result>, <r0> (2)...<r31>
+  
+AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& R0, ASM Op) {
+	auto Stack	= R0 - 1;
+	int Dest	= Stack->Stack.DestReg;
 	auto Imm	= RET_Valuei;	// get before copy!
-	auto Src	= r + n1;
+	auto Src	= R0 + n1;
 	
-	*stck		= *Src;
-	stck->Uint |= Imm;			// immediate
-	r			= R1 - 1;		// NewZero
-	*r			= {};
+	auto Code	 = Stack->Stack.Code;
+	vm.AllocCurr = Stack->Stack.Alloc;
+
+	*Stack		= *Src;
+	Stack->Uint |= Imm;			// immediate
+	R0			= Stack - Dest;	// NewZero
+	*R0			= {};			// remove this? unnecessary?
 	
 	return Code;
 }
@@ -588,9 +591,10 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 
 
 AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
-	VMRegister* Stack = r + Save + 1;
+	VMRegister* Stack = r + Save;
 	Stack->Stack.Code = CodePtr;
-	Stack->Stack.SavedReg = Save;
+	Stack->Stack.DestReg = Save;
+	Stack->Stack.Depth = r[-1].Stack.Depth+1;
 	Stack->Stack.Alloc = vm.AllocCurr;
 	return Stack+1;
 }
@@ -600,7 +604,7 @@ AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, i
 AlwaysInline bool VMFinish (VMRegister* r, ASM Op) {
 	int Signal = HALT_SigNumu;
 	if (!Signal)
-		Signal = i1;
+		Signal = (int)i1;
 	if (Signal)
 		kill(getpid(), SIGINT);
 	return HALT_Continueu;
@@ -623,7 +627,6 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 		Transfer3( 3);
 		Transfer3( 2);
 		Transfer3( 1);
-		debugger; 
 	}
 
 	Zero[ 0] = {};

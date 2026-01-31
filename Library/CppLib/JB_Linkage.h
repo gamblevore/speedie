@@ -69,8 +69,8 @@ struct VMStack {
 	u32*		Code;
 	uint		Alloc;			
 	byte		Marker2;
-	byte		SavedReg;
-	u16			Marker;
+	byte		DestReg;
+	u16			Depth;
 };
 
 

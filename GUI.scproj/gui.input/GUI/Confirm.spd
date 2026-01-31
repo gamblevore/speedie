@@ -10,7 +10,7 @@ extend_module app
 	function BeepSub
 		cpp_Wrapper JB_App__Beep
 	
-	function Beep (|string?| q="")
+	function Beep (|string?| q=nil)
 		if beep.OK.fired
 			.BeepSub
 			beep.OK = date.now + (1s/12) // really must be date.now, NOT framestart!

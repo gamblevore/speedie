@@ -16,7 +16,7 @@ autogen StrPrintLine_ (|string?| data)	// ideally move this to string._printline
 inline Print (|string?| data)
 	StrPrint_(data)
 
-inline PrintLine (|string?| data="")
+inline PrintLine (|string?| data=nil)
 	StrPrintLine_(Data)							// to disambiguate vs macro
 
 function Print (|cstring?| data)

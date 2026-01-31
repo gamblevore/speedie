@@ -58,7 +58,7 @@ struct CakeVM {
 #define kJB_VM_TrapTooFar 1
 #define kJB_VM_WantProtect 2
 #define kJB_VM_IsProtected (1<<31)
-#define kJB_VM_CanDebug 4
+#define kJB_VM_AskDebug 4
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

@@ -213,8 +213,6 @@ datatype ASMReg (uint64)
 		return ((self|uint64| & ~Mask) ||| (value|uint64|&Mask))|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
-		target debug
-			if !r|int64|.ispow2 and r != asmreg.exit // ooof?
 		return self & R
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)

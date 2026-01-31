@@ -133,9 +133,9 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		(rz is Const)							// no longer zero
 	|| last = .last
 	if (last == ll.start) and last.IsFunc
-		|| P = prms.parent! // cleanup
-//		last.msg = P
-		last.srcmap = P.srcmap	
+		|| P = prms.parent!		// cleanup
+//		last.Msg = P			// right? or else the autocomplete goes wrong? Or not?
+		last.srcmap = P.srcmap
 
 
 	
