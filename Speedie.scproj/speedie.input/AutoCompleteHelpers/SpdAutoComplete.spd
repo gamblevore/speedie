@@ -5,6 +5,6 @@ module AutoComplete
 	|| function_cls_only= "syntax/setter/operator/render/behaviour/virtual/constructor/destructor"
 	|| function_anywhere = "prototype/function/autogen/inline/task/api"
 	
-	|| function_names	= function_cls_only +"/"+ function_anywhere + "/syx/libinternal/cpp_wrapper/main"
+	|| function_names	= function_cls_only +"/"+ function_anywhere + "/helper/syx/libinternal/cpp_wrapper/main"
 	|| Functions		= function_names.dict('/')
 	
