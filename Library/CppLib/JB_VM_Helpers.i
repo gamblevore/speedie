@@ -522,17 +522,20 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
   
 AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& R0, ASM Op) {
 	auto Stack	= R0 - 1;
-	int Dest	= Stack->Stack.DestReg;
-	auto Imm	= RET_Valuei;	// get before copy!
+	int StepBack= Stack->Stack.DestReg;
+	auto Imm	= RET_Valuei;		// get before copy!
 	auto Src	= R0 + n1;
 	
 	auto Code	 = Stack->Stack.Code;
 	vm.AllocCurr = Stack->Stack.Alloc;
 
 	*Stack		= *Src;
-	Stack->Uint |= Imm;			// immediate
-	R0			= Stack - Dest;	// NewZero
-	*R0			= {};			// remove this? unnecessary?
+	Stack->Uint |= Imm;				// immediate
+	R0			= Stack - StepBack;	// NewZero
+	#if DEBUG
+	if (R0->Obj) debugger;
+	#endif
+//	*R0			= {};			// remove this? unnecessary?
 	
 	return Code;
 }

@@ -54,6 +54,7 @@ function PackMaker.RunAFewTests
 	fn = .testfn("Mul")
 	if fn
 		self[0] = 8725, self[1] = 275, self[2] = 4, self[3] = 2	
+		#!  ((8725+275)*4)/2 == 18000
 		|| num = fn.TestObesity|&int64|[]
 		if num != 18000
 		
@@ -72,7 +73,7 @@ function PackMaker.RunAFewTests
 	fn = .testfn("TestAtomic")
 	if fn
 		|| atomic = fn.TestObesity|&int|[]
-		printline atomic
+		if atomic != 1150 // oof
 
 
 |ivec4| Butter 

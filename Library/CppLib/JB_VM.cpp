@@ -37,7 +37,7 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	auto Ret = V->Registers;
 	if (Clear)
 		memset(Ret, 0xFE, sizeof(VMRegister)*35);
-	return (ivec4*)(Ret+3);
+	return (ivec4*)(Ret+3); // unused, stack, R0, R1 // don't return R0 cos we don't want them altering it.
 }
 
 
@@ -232,9 +232,10 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
+	V.Registers[0] = {};
 	V.Registers[2] = {};
 	auto& Stack = V.Registers[1].Stack;
-	Stack.DestReg = 0;
+	Stack.DestReg = 1;
 	Stack.Alloc = 0;
 	Stack.Depth = 1;
 	Stack.Marker2 = 123;
