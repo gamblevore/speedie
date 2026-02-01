@@ -5517,8 +5517,6 @@ NilRecord SC_nil_Value(ArchonPurger* Self);
 
 void SC_nil_ValueSet(ArchonPurger* Self, NilRecord Dest);
 
-void SC_nil__AAAAAA(SCDecl* Dcl, NilCheckMode Test, int* X);
-
 NilState SC_nil__Access(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Arel(Message* Msg, NilCheckMode Test);
@@ -5758,7 +5756,9 @@ FatASM* SC_FAT_InputFat(FatASM* Self, int I);
 
 ASMReg SC_FAT_IsDecr(FatASM* Self);
 
-bool SC_FAT_IsFinisher(FatASM* Self);
+bool SC_FAT_IsFinisherWithReg(FatASM* Self, ASMReg Info);
+
+bool SC_FAT_IsFinisherWith0(FatASM* Self);
 
 bool SC_FAT_IsFunc(FatASM* Self);
 
@@ -6177,7 +6177,7 @@ ASMReg SC_Pac_If(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_IfSub(Assembler* Self, Message* Exp, ASMReg Dest);
 
-ASMReg SC_Pac_InbuiltTernary(Assembler* Self, ASMReg Dest, ASMReg Ma, ASMReg Mb, Message* Cond);
+ASMReg SC_Pac_InbuiltTernary(Assembler* Self, ASMReg Dest, ASMReg A, ASMReg B, Message* Cond);
 
 ASMReg SC_Pac_IncrPointerByVar(Assembler* Self, ASMReg Dest, ASMReg Base, ASMReg Vara, Message* Exp);
 
