@@ -735,7 +735,7 @@ function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	(e)
 
 
-function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
+function MulTest (|int| a, |int| b, |int| c, |int| d, |int|)
 	visible
 	|| x = 12 * 10
 	return ((a + b) * c) / d
@@ -746,7 +746,7 @@ function Math2 (|int| a, |int| b, |int|)
 	return ((a + b) / 2) - ((a / b) * 2)
 
 
-function AndOr (|int| a, |int| b, |bool| c, |int|)
+function AndOrTest (|int| a, |int| b, |bool| c, |int|)
 	visible
 	|| five = 5, || min = -1
 	if b < min and b > five
@@ -763,7 +763,7 @@ function AndOr (|int| a, |int| b, |bool| c, |int|)
 		rz = 1
 
 		
-function AndOr2 (|bool| c, |bool| d, |int|)
+function AndOrTest2 (|bool| c, |bool| d, |int|)
 	visible
 
 	if (c or d)

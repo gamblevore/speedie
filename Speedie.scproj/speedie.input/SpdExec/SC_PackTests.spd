@@ -23,6 +23,8 @@ extend_module PackMaker
 function PackMaker.RunAFewTests 
 	|scfunction--| fn
 	
+	// only AndOrTest is actually testing >= < etc...
+	// the others nothing or equality
 	fn = .testfn("BranchTests")
 	if fn
 /		|| OK = fn.TestObesity|&bool|[]
@@ -56,20 +58,20 @@ function PackMaker.RunAFewTests
 			self[0] = 12+i, self[1] = 6+i
 			|| num = fn.TestObesity|&int64|[]
 			
-	fn = .testfn("Mul")
+	fn = .testfn("MulTest")
 	if fn
 		self[0] = 8725, self[1] = 275, self[2] = 4, self[3] = 2	
 		#!  ((8725+275)*4)/2 == 18000
 		|| num = fn.TestObesity|&int64|[]
 		if num != 18000
 		
-	fn = .testfn("AndOr")
+	fn = .testfn("AndOrTest")
 	if fn
 		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
 		|| Andor = fn.TestObesity|&int64|[]
 		if andor != 3
 		
-	fn = .testfn("AndOr2")
+	fn = .testfn("AndOrTest2")
 	if fn
 		for i in 4
 			self[0] = i&1,   self[1] = (i&2)>>1
