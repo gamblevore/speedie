@@ -25,34 +25,34 @@ function PackMaker.RunAFewTests
 	
 	// only AndOrTest is actually testing >= < etc...
 	// the others nothing or equality
-	fn = .testfn("BranchTests")
+	fn = .testfn("BranchTests") /// active ///
 	if fn
 /		|| OK = fn.TestObesity|&bool|[]
 		if !OK
 
-	fn = .testfn("FloatConsts")
+	fn = .testfn("FloatConstTest")
 	if fn
 		|| D = fn.TestObesity|&f64|[]
 		D = D
 
-	fn = .testfn("SemiConst")
+	fn = .testfn("SemiConstTest")
 	if fn
 		for i in 2
 			self[0] = i*16K
 			|| found = fn.TestObesity|&int|[]
 	
-	fn = .testfn("AndOrConsts")
+	fn = .testfn("AndOrConstTest")
 	if fn
 		|| AndOrConst = fn.TestObesity|&int64|[]
 		AndOrConst++
 	
-	fn = .testfn("ForeignFuncs")
+	fn = .testfn("ForeignFuncTest")
 	if fn
 		self[0] = "hello", self[1] = "abc"
 		|| str = fn.TestObesity|&string|[]
 		printline str
 		
-	fn = .testfn("Math2")
+	fn = .testfn("Math2Test")
 	if fn
 		for i in 5
 			self[0] = 12+i, self[1] = 6+i
@@ -71,7 +71,7 @@ function PackMaker.RunAFewTests
 		|| Andor = fn.TestObesity|&int64|[]
 		if andor != 3
 		
-	fn = .testfn("AndOrTest2")
+	fn = .testfn("AndOr2Test")
 	if fn
 		for i in 4
 			self[0] = i&1,   self[1] = (i&2)>>1

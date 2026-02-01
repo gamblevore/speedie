@@ -12,12 +12,15 @@ target cake {
 |int| Bolg
 
 
-function BranchTests (|bool|)
+function BranchTest (|bool|) /// Active ///
 	visible
 	|| a = 0
 	|| b = 1
 	|| c = 0
 	|| d = 0
+
+// Perhaps this is doubly wrong? not sure? i don't test while/for anywhere active?
+// but it is tested in hello_world.spd?
 
 	while a <= 1
 		d += a > b
@@ -158,7 +161,7 @@ function ForTest (|int| x)
 
 	|| y = 0
 	|| v = 0
-	for i in 10
+	for (i in 10)
 		if v == 0
 			x++
 
@@ -326,7 +329,7 @@ function Const_Branching (|int| x, |int|)
 
 
 function loop_const (|int| n, |int|)
-	for n
+	for (n)
 		|| x = 1
 		rz += x
 
@@ -441,7 +444,7 @@ function AddK2 (|int| x, |int|)
 	x++
 	return x
 
-function AndOrConsts (|int|)
+function AndOrConstTest (|int|) /// active ///
 	visible
 	|| f1 = 4 or  0
 	|| f2 = 0 and 5
@@ -462,7 +465,7 @@ function VarConst (|int| a)
 	|| w = a<<x
 
 
-function SemiConst (|int| f1, |int|)
+function SemiConstTest (|int| f1, |int|) /// active ///
 	visible
 	|| y6  =  1  or  f1
 	y6  =  true  or  f1
@@ -633,7 +636,7 @@ function Floats2 (|float64| A, |float64| B, |bool|)
 	return A > B
 
 
-function FloatConsts (|float64|)
+function FloatConstTest (|float64|) /// active ///
 	visible
 	
 	|float64| r1 = 2							// int as f64
@@ -653,7 +656,7 @@ function Incr (|int| x, |int| y, |int|)
 	return .math2(x++, --y)
 
 
-function ForeignFuncs (|string?| x, |string?| y, |string|)
+function ForeignFuncTest (|string?| x, |string?| y, |string|) /// /
 	visible
 	|| x3 = x.inwhite(12345, 98765)
 	|| x4 = x.Length
@@ -687,7 +690,7 @@ function TestGlob (|int|)
 
 function TestAtomic (|int|)
 	visible
-	for i in 100
+	for (i in 100)
 		.Glob++
 		.Glob += i&1
 		.bolg--
@@ -720,9 +723,6 @@ function RefCountOpts (|message| m)
 	
 
 function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
-	// need destructor for refclear
-	// need incr2 for constructors
-
 	#!function call for freeifdead.
 	|| e = string.char(0xb16b00b5)
 	
@@ -735,18 +735,18 @@ function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	(e)
 
 
-function MulTest (|int| a, |int| b, |int| c, |int| d, |int|)
+function MulTest (|int| a, |int| b, |int| c, |int| d, |int|) /// active ///
 	visible
 	|| x = 12 * 10
 	return ((a + b) * c) / d
 
 
-function Math2 (|int| a, |int| b, |int|)
+function Math2Test (|int| a, |int| b, |int|) /// active ///
 	visible
 	return ((a + b) / 2) - ((a / b) * 2)
 
 
-function AndOrTest (|int| a, |int| b, |bool| c, |int|)
+function AndOrTest (|int| a, |int| b, |bool| c, |int|) /// Active ///
 	visible
 	|| five = 5, || min = -1
 	if b < min and b > five
@@ -763,7 +763,7 @@ function AndOrTest (|int| a, |int| b, |bool| c, |int|)
 		rz = 1
 
 		
-function AndOrTest2 (|bool| c, |bool| d, |int|)
+function AndOr2Test (|bool| c, |bool| d, |int|) /// Active ///
 	visible
 
 	if (c or d)
@@ -872,12 +872,12 @@ function NoInline6 (|int| b, |int| c, |int|)
 
 // case 7
 function LoopTest7 (|int|)
-	for 10
+	for (10)
 		rz++
 
 
 function Loop2Test7 (|int| x, |int|)
-	for i in 10
+	for (i in 10)
 		if i&1 == x&1
 			rz += i
 
@@ -977,7 +977,7 @@ function FloatConv24 (|float|)
 	
 
 function loop25 (|int| a, |int|)
-	for i in 24 // the loop might opt, though? just not the rz
+	for (i in 24) // the loop might opt, though? just not the rz
 		if a[i] // unless we generate tight code in the first place?
 			rz += i*9
 	rz *= 2
@@ -991,7 +991,7 @@ function Func26 (|message?| m, |string?|)
 
 function Func27 (|message?| m)
 	opt norefcounts
-	for s in m
+	for (s in m)
 		printline s.name
 
 
