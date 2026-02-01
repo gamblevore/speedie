@@ -158,7 +158,7 @@ extend Assembler
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 //		CmpSub(0,  A >   B)
 //		CmpSub(1,  A <=  B)
-		debugat 51
+//		debugat 51
 		if mode > 1 // wat?
 		mode |= !r.signed<<1
 		mode ^= dest is Negate

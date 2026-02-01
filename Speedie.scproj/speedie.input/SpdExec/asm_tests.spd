@@ -1,34 +1,42 @@
 
 
-function @archonpurger.AAAAAA (|scdecl| dcl, |nilcheckmode| Test,  |&int| x)
-	visible
-	|| i = 123
-	x[] = i
-	|| j = .t.SetNilness(dcl, Test)
-	
-/*
-function AAAAAA (|scdecl| dcl, |nilcheckmode| Test, |&int| x)
-	#!visible
 
-	|| i = 123
-	x[0] = i
-	|| Y = &self.T
-	|| j = SC_nil_SetNilness(y, dcl, Test)
-	|| k = SC_nil_SetNilness(&self.T, dcl, test)
+function BranchTests (|bool|)
+	|| a = -1
+	|| b = 0
+	|| d = 0
+	|| c = 0
 
-knst: r4                  /# 123 #/           
-WR4U: r4, r3, r0, 1, 0                        
-GTAB: r5, 0, 9520         /# 9520 #/     /* adasda */      
-GOBJ: r7, 0, 0, 76160                         
-RD1U: t31, r1, r0, 51, 0                      
-FNC:  r8, 2045, (r7, r31, r2)                 
-BFLG: r6, r2, 0, 0, 0                         
-GOBJ: r9, 0, 0, 76160                         
-MARK:                                         
-RD1U: t31, r1, r0, 51, 0                      
-FNC:  r10, 2045, (r9, r31, r2)                
-BFLG: r7, r2, 0, 0, 0                         
-*/
+	while a <= 1
+		d += a > b
+		if a > b: c++
+		require d==c
+
+		d += a < b
+		if a < b: c++
+		require d==c
+
+		d += a >= b
+		if a >= b: c++
+		require d==c
+
+		d += a <= b
+		if a <= b: c++
+		require d==c
+
+		d += a == b
+		if a == b: c++
+		require d==c
+
+		d += a != b
+		if a != b: c++
+		require d==c
+
+		a++
+
+	return true
+		
+
 
 struct StructWithObj
 	|object| A
@@ -41,6 +49,8 @@ target cake {
 |int| Glob
 |int| Bolg
 
+
+	
 function TestRefs (|int| x)
 	|| m = ({|| i = 123, rejoin Message()})
 	(m)

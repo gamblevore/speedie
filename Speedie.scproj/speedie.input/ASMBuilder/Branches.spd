@@ -192,19 +192,19 @@ function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
 		rz = A
 
 
-function InbuiltTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
+function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)
 	opt norefcounts
-	|| mc = ASMReg()
-	|| dr = dest.reg
-		if (dr != ma.reg and mb.reg)
-			mc = dest
-	mc = .µ(cond, mc)
+	dest = .temponly(dest)
+	|| C = ASMReg()
+	ifn (Dest iz A or B)
+		C = dest
+	C = .µ(cond, C)
 	
-	if mc isnt Const
-		return cond.TERN(dest, mc, ma, mb, mc.issmall|int|) * dest
+	if C isnt Const
+		return cond.TERN(dest, C, A, B, C.issmall|int|) * dest
 
-	|| t = (ma, mb)(mc.Const)
-	.NopConst(mc)
+	|| t = (A, B)(C.Const)
+	.NopConst(C)
 	return t
 
 

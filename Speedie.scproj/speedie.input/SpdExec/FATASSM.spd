@@ -95,9 +95,12 @@ struct FatASM
 		.info = dest
 		return dest
 	
+	
 	operator mul (|asmreg| flags, |asmreg|)
 		cpp_part AsReg
 		
+		if (flags is Exit) and !.IsFinisher
+			(flags isnt exit) // right?
 		(flags isnt FlagsToRemove)
 		flags = flags.FatIndex(.index)
 		.info = flags
@@ -558,10 +561,8 @@ struct FatASM
 			return !.p0 and !.p1 and .p2
 		if o == asm.jump
 			return .jump < 0
-		
-		if .info is exit
-			if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
-				return true
+		if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
+			return true
 
 
 	function DebugPrint 
