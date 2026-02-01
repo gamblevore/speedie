@@ -756,8 +756,8 @@ target debug
 		fn.µprint
 
 
-function Assembler.FatterCompile (|SCFunction| fn, |bool|) // AsmGenerate, ASMRender, GenerateASM, ASMCompile, RenderASM
-// if you are looking for the other render, look for ASMBake
+function Assembler.FatterCompile (|SCFunction| fn, |bool|)
+// AsmGenerate, ASMRender, GenerateASM, ASMCompile, RenderASM, genasm
 	opt norefcounts
 	scfunction.currfunc = fn
 	

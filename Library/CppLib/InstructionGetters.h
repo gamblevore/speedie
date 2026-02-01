@@ -60,11 +60,6 @@
 #define   AddOrSubM_Li       ((( int)((Op)<<29))>>29)
 #define   AddOrSubM_Lu       (((uint)((Op)<<29))>>29)
 
-#define   JCmpF_Cmpi       ((( int)((Op)<<18))>>29)
-#define   JCmpF_Cmpu       (((uint)((Op)<<18))>>29)
-#define   JCmpF_Jmpi       ((( int)((Op)<<21))>>21)
-#define   JCmpF_Jmpu       (((uint)((Op)<<21))>>21)
-
 #define   TERN_Smalli       ((( int)((Op)<<28))>>31)
 #define   TERN_Smallu       (((uint)((Op)<<28))>>31)
 #define   TERN_Li       ((( int)((Op)<<29))>>29)
@@ -84,6 +79,11 @@
 #define   CmpF_Cmpu       (((uint)((Op)<<23))>>28)
 #define   CmpF_Li       ((( int)((Op)<<27))>>27)
 #define   CmpF_Lu       (((uint)((Op)<<27))>>27)
+
+#define   JCmpF_Cmpi       ((( int)((Op)<<18))>>29)
+#define   JCmpF_Cmpu       (((uint)((Op)<<18))>>29)
+#define   JCmpF_Jmpi       ((( int)((Op)<<21))>>21)
+#define   JCmpF_Jmpu       (((uint)((Op)<<21))>>21)
 
 #define   Compare4_Smalli       ((( int)((Op)<<28))>>31)
 #define   Compare4_Smallu       (((uint)((Op)<<28))>>31)

@@ -103,7 +103,7 @@ module Feedback
 			if 0==1
 				m.jdb2
 				|| i = 1
-				|| j = i.AsFloat
+				i.AsFloat
 				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
 				Assembler.PrintProgress

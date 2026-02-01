@@ -1,6 +1,11 @@
 
 
 
+#include <utility>
+#if !__has_builtin(__builtin_unreachable)
+	#define __builtin_unreachable()
+#endif
+
 // need to allow vectorcall on windows. to allow vectors to be passed
 // using the SIMD registers.
 typedef void (*FFI_Fn)(void);
@@ -290,6 +295,8 @@ AlwaysInline void RegConv (VMRegister* r, ASM Op) {
         case 13: d->Int    = s->Double;		break;
         case 14: d->Int    = s->Uint;  		break; // actually pointless
 /**/    case 15: d->Int    = s->Int;   		break; // just copies
+		default:
+		__builtin_unreachable();
     }
 //    d = d;
 //    s = s;
@@ -343,17 +350,16 @@ bool CompI_ (int64 A, int64 B, uint Mode) {
 		
 		CmpSub(12,   (int) A  >   (int) B );
 		CmpSub(13,   (int) A  <=  (int) B );
-		CmpSub(14,   (uint)A  >  (uint) B ); default:;
+		CmpSub(14,   (uint)A  >  (uint) B );
 		CmpSub(15,   (uint)A  <= (uint) B );
+		default:
+		__builtin_unreachable();
 	};
 }
 
 
-bool CompF_ (VMRegister* r, ASM Op) {
-	auto A = &i1;
-	auto B = &i2;
-
-	switch (JCmpF_Cmpu) {
+bool CompF_ (VMRegister* A, VMRegister* B, uint Mode) {
+	switch (Mode) {
 		CmpSub(0 , FA >  FB);
 		CmpSub(1 , FA <= FB);
 		CmpSub(2 , FA == FB);
@@ -361,8 +367,10 @@ bool CompF_ (VMRegister* r, ASM Op) {
 		
 		CmpSub(4, DA >  DB);
 		CmpSub(5, DA <= DB);
-		CmpSub(6, DA == DB); default:
+		CmpSub(6, DA == DB);
 		CmpSub(7, DA != DB);
+		default:
+		__builtin_unreachable();
 	};
 }
 
@@ -373,15 +381,23 @@ AlwaysInline ASM* JumpI (VMRegister* r, ASM Op, ASM* Code) {
 }
 		
 AlwaysInline void CompI (VMRegister* r, ASM Op) {
-	r[i1].Int = CompI_(i2, i3, CmpI_Cmpu);
+	auto V = CompI_(i2, i3, CmpI_Cmpu);
+	i1 = V;
 }
 
+//	JCmpF
+//		r1		r
+//		r2		r
+//		Cmp		3
+//		Jmp		j
+
+
 AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompF_(r, Op)*JCmpF_Jmpi;
+	return Code + CompF_(r+n1, r+n2, JCmpF_Cmpu)*JCmpF_Jmpi;
 }
 
 AlwaysInline void CompF (VMRegister* r, ASM Op) {
-	r[JCmpF_Jmpu].Int = CompF_(r, Op);
+	i1 = CompF_(r+n2, r+n3, CmpF_Cmpu);
 }
 
 
@@ -506,11 +522,12 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 		Old = *((u32*)PP); New = Old+Add;
 		*((u32*)PP) = (u32)(New);
 		break;
-	default:
 	case 3:
 		Old = *((u64*)PP); New = Old+Add;
 		*((u64*)PP) = New;
 		break;
+	default:
+		__builtin_unreachable();
 	}
 	if (ni)
 		*Result = UseOld?Old:New;
@@ -620,8 +637,8 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	auto Zero = SaveVMState(vm, r, CodePtr, n1);
 	rp = Zero;
 
-	switch ( Code&15 ) {
-	default:
+	switch ( Code ) {
+		default: __builtin_unreachable();
 		Transfer3( 8);
 		Transfer3( 7);
 		Transfer3( 6);

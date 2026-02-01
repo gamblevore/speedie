@@ -1,11 +1,23 @@
 
 
+struct StructWithObj
+	|object| A
+	|object| B
+
+
+
+module ASMExamples {
+target cake { 
+|int| Glob
+|int| Bolg
+
 
 function BranchTests (|bool|)
-	|| a = -1
-	|| b = 0
-	|| d = 0
+	visible
+	|| a = 0
+	|| b = 1
 	|| c = 0
+	|| d = 0
 
 	while a <= 1
 		d += a > b
@@ -36,20 +48,6 @@ function BranchTests (|bool|)
 
 	return true
 		
-
-
-struct StructWithObj
-	|object| A
-	|object| B
-
-
-
-module ASMExamples {
-target cake { 
-|int| Glob
-|int| Bolg
-
-
 	
 function TestRefs (|int| x)
 	|| m = ({|| i = 123, rejoin Message()})

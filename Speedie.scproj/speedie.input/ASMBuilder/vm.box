@@ -65,12 +65,6 @@ forms
 		r3		r
 		Sh		6
 
-	JCmpF
-		r1		r
-		r2		r
-		Cmp		3
-		Jmp		j
-
 	TERN
 		r1		R
 		r2		r
@@ -95,6 +89,12 @@ forms
 		r2		r
 		r3		r
 		Cmp		4
+
+	JCmpF
+		r1		r
+		r2		r
+		Cmp		3
+		Jmp		j
 
 	Compare4
 		r1		R
@@ -348,7 +348,7 @@ forms
 
 /**/ TRAP (Trap)
 		// actually a noop. the debugger itself will put this in the shadow
-		0
+		((0))
 
 
 #!						 (((((UTIL)))))

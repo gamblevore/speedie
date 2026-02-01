@@ -283,25 +283,6 @@ datatype ASM_AddOrSubM (ASM) {
 }
 
 ASM.Forms[15] = &ASM_AddOrSubM.Encode
-datatype ASM_JCmpF (ASM) {
-	module {
-		function Encode (ASM_Encoder, ) {
-			visible true
-			|asm| rz = .op|asm| << 24
-			rz.r1 = .prms[0]
-			rz.r2 = .prms[1]
-			rz.JCmpF_Cmp = .prms[2]
-			rz.JCmpF_Jmp = .prms[3]
-			if curr < after {
-				curr++[] = rz
-			}
-
-			return curr
-		}
-	}
-}
-
-ASM.Forms[16] = &ASM_JCmpF.Encode
 datatype ASM_TERN (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -322,7 +303,7 @@ datatype ASM_TERN (ASM) {
 	}
 }
 
-ASM.Forms[17] = &ASM_TERN.Encode
+ASM.Forms[16] = &ASM_TERN.Encode
 datatype ASM_JCmpI (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -341,7 +322,7 @@ datatype ASM_JCmpI (ASM) {
 	}
 }
 
-ASM.Forms[18] = &ASM_JCmpI.Encode
+ASM.Forms[17] = &ASM_JCmpI.Encode
 datatype ASM_CmpI (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -361,7 +342,7 @@ datatype ASM_CmpI (ASM) {
 	}
 }
 
-ASM.Forms[19] = &ASM_CmpI.Encode
+ASM.Forms[18] = &ASM_CmpI.Encode
 datatype ASM_CmpF (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -381,7 +362,26 @@ datatype ASM_CmpF (ASM) {
 	}
 }
 
-ASM.Forms[20] = &ASM_CmpF.Encode
+ASM.Forms[19] = &ASM_CmpF.Encode
+datatype ASM_JCmpF (ASM) {
+	module {
+		function Encode (ASM_Encoder, ) {
+			visible true
+			|asm| rz = .op|asm| << 24
+			rz.r1 = .prms[0]
+			rz.r2 = .prms[1]
+			rz.JCmpF_Cmp = .prms[2]
+			rz.JCmpF_Jmp = .prms[3]
+			if curr < after {
+				curr++[] = rz
+			}
+
+			return curr
+		}
+	}
+}
+
+ASM.Forms[20] = &ASM_JCmpF.Encode
 datatype ASM_Compare4 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {

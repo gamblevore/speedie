@@ -23,6 +23,11 @@ extend_module PackMaker
 function PackMaker.RunAFewTests 
 	|scfunction--| fn
 	
+	fn = .testfn("BranchTests")
+	if fn
+/		|| OK = fn.TestObesity|&bool|[]
+		if !OK
+
 	fn = .testfn("FloatConsts")
 	if fn
 		|| D = fn.TestObesity|&f64|[]

@@ -18,7 +18,7 @@
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
 ı TRAP:;
-	0;
+	((0));
 ı NOOP:;
 	i1 = i1;
 	// NOOP

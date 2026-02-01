@@ -99,9 +99,9 @@ struct FatASM
 	operator mul (|asmreg| flags, |asmreg|)
 		cpp_part AsReg
 		
-		if (flags is Exit) and !.IsFinisher
-			(flags isnt exit) // right?
 		(flags isnt FlagsToRemove)
+		if (flags is Exit) and !.IsFinisher(flags)
+			(flags isnt exit) // right?
 		flags = flags.FatIndex(.index)
 		.info = flags
 		return flags
@@ -552,7 +552,7 @@ struct FatASM
 			return true
 	
 
-	function IsFinisher (|bool|)
+	function IsFinisher (|asmreg| Info, |bool|)
 		opt norefcounts
 		|| o = .op|asm|
 		if o == asm.ret or asm.trap or asm.TAIL or asm.rfrt
@@ -561,8 +561,13 @@ struct FatASM
 			return !.p0 and !.p1 and .p2
 		if o == asm.jump
 			return .jump < 0
-		if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
-			return true
+		if info is exit
+			if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
+				return true
+		
+		
+	function IsFinisher (|bool|)
+		return .IsFinisher(.info)
 
 
 	function DebugPrint 
