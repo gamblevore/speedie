@@ -19,12 +19,6 @@ function BranchTest (|string| Obj, |bool|) /// Active ///
 	|| c = 0
 	|| d = 0
 
-// Perhaps this is doubly wrong? not sure? i don't test while/for anywhere active?
-// but it is tested in hello_world.spd?
-
-	for i in 3
-		printline obj + i
-
 	while a <= 1
 		d += a > b
 		if a > b: c++
@@ -747,16 +741,6 @@ function MulTest (|int| a, |int| b, |int| c, |int| d, |int|) /// active ///
 function Math2Test (|int| a, |int| b, |int|) /// active ///
 	visible
 	return ((a + b) / 2) - ((a / b) * 2)
-
-
-// GOOD: x = a <=> b (with cmpi)
-
-
-// FAILS: if <=> (with jmpi and jmkl)
-// GOOD : if ==!
-
-// FAILS: while ==!
-// GOOD:  while <=> (with jmpi, jmkl)
 
 
 function AndOrTest (|int| a, |int| b, |bool| c, |string| Err,  |int|) /// Active ///

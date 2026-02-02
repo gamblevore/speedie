@@ -556,6 +556,7 @@ function message.CMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 function message.JUMP (|int| JUMP = nil, |&fatasm|) {
 	visible
+	if "UpToArg".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.JUMP, self)
 	rz.jumpinput(0) = JUMP

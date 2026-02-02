@@ -29,8 +29,6 @@ function PackMaker.RunAFewTests
 		|| Andor = fn.TestObesity|&int64|[]
 		if andor != 3
 
-	// only AndOrTest is actually testing >= < etc...
-	// the others nothing or equality
 	fn = .testfn("BranchTest") /// active ///
 	if fn
 		self[0] = "hello"

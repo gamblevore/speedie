@@ -75,7 +75,7 @@ function While (fn_asm)
 	|| Old = .BranchID
 	.branchID = ++.NextBranchID
 	
-	.state.BranchDepth++ // loops are still branches
+	.state.BranchDepth++ // Loops are still branches
 	rz = .WhileSub(exp)
 	.state.BranchDepth--
 	
@@ -84,11 +84,11 @@ function While (fn_asm)
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
-	|| InitialJump = exp.JUMP // basicblock ++								// test goes after loop
+	|| InitialJump = exp.JUMP // BasicBlock ++								// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)						// arg
 
 	|FatRange| loop_test
-	.Branch(exp.first!, loop_test, true)
+/	.Branch(exp.first!, loop_test) // we need a true here. lets see how it affects things?
 	if loop_test.never
 		return ASMReg()
 	
@@ -100,7 +100,7 @@ function WhileSub (|message| exp,  |asmreg|)
 		InitialJump.JumpTo(loop_test.start)
 		loop_test.JumpTo(InitialJump+1)
 
-	.loopfill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
+	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 	
 	return returns * loop_test.Always
 
@@ -210,6 +210,15 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
+	// doing this for while-loops is a bit awkward.
+	// if true:    x()		// This skips the branch, and just does x
+	// while true: x()		// This NEEDS the branch.
+
+	// we could further optimise it perhaps... by simplifying the branch.
+	// if we know that its always true or not... just put a branch at the end?
+	// or remove the entire thing. That might solve both problems at once?
+	// :D
+	
 	range.Start = .curr
 	|| mode = asmreg.CondRequest.Negate(neg)
 
