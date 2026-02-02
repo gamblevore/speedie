@@ -22,12 +22,11 @@ extend_module PackMaker
 	
 function PackMaker.RunAFewTests 
 	|scfunction--| fn
-	
 		
 	fn = .testfn("AndOrTest")
 	if fn
-		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0,   self[4] = "B < -1:  B = "
-/		|| Andor = fn.TestObesity|&int64|[]
+		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = "branch failed: "
+		|| Andor = fn.TestObesity|&int64|[]
 		if andor != 3
 
 	// only AndOrTest is actually testing >= < etc...

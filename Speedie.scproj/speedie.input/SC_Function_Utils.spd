@@ -109,7 +109,7 @@ dispatch FuncPreReader (fnPreReader)
 
 
 function SCFunction.MakeLinkInline
-	check (.islibrary) (self, "Only library funcs can use this.")
+	check (.islibrary) (self, "Only library funcs can use this. Use `opt inline` if you want to optimise without affecting linking.")
 	is OptInline
 	is LinkInline
 

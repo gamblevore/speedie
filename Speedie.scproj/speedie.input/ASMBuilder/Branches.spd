@@ -88,7 +88,7 @@ function WhileSub (|message| exp,  |asmreg|)
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)						// arg
 
 	|FatRange| loop_test
-	.Branch(exp.first!, loop_test)
+	.Branch(exp.first!, loop_test, true)
 	if loop_test.never
 		return ASMReg()
 	

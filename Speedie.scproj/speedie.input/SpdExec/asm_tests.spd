@@ -749,12 +749,27 @@ function Math2Test (|int| a, |int| b, |int|) /// active ///
 	return ((a + b) / 2) - ((a / b) * 2)
 
 
+// GOOD: x = a <=> b (with cmpi)
+
+
+// FAILS: if <=> (with jmpi and jmkl)
+// GOOD : if ==!
+
+// FAILS: while ==!
+// GOOD:  while <=> (with jmpi, jmkl)
+
+
 function AndOrTest (|int| a, |int| b, |bool| c, |string| Err,  |int|) /// Active ///
 	opt norefcounts
 	visible
+	a += 4
+	while a < b
+		printline err + b
+		a++
+	app.quit
+	return 0
+
 	|| five = 5, || min = -1
-	if b < min
-		printline Err + B
 	if b < min and b > five
 		rz = 6
 	if b < min or b > five

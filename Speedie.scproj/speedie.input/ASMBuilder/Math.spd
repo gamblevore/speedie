@@ -6,15 +6,22 @@ prototype fn_ASMConstifier  (|asmreg| L, |asmreg| R, |int64|)
 
 
 extend asmreg
-	function BoolAnswer (|asmreg|)
+	function BoolNegateAnswer (|asmreg|)
+		opt inline
 		.µtype = DataTypeCode.bool
-		
 		is AlreadyNegated
 		isnt negate
+		return self
+		
+	function BoolCondAnswer (|asmreg|)
+		opt inline
 		if self is CondRequest
 			isnt condrequest
 			is CondAnswer
-		return self 
+		return self
+		
+	function BoolAnswer (|asmreg|)
+		return .boolcondanswer.BoolNegateAnswer 
 
 	
 	
@@ -134,7 +141,7 @@ extend Assembler
 		return .Equals(exp, dest.negate, l, r)
 
 
-	function KompareIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
+	function JumpIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
 		require  l is Const  or  r is Const
 		|| swapped = l is Const
 			swap (l) (r)					// 10 > x   -->  x <  10  -->  x <= 9
@@ -158,12 +165,11 @@ extend Assembler
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 //		CmpSub(0,  A >   B)
 //		CmpSub(1,  A <=  B)
-//		debugat 51
 		if mode > 1 // wat?
 		mode |= !r.signed<<1
 		mode ^= dest is Negate
-		dest = dest.BoolAnswer // strips negate off dest
 
+		dest = dest.BoolNegateAnswer
 		if l is Const and r is Const
 			return .ConstCompareInt(dest, L, R, exp, Mode)
 
@@ -173,7 +179,9 @@ extend Assembler
 		if Dest isnt CondAnswer
 			return exp.CMPI(dest, L, R, mode) * dest
 
-		|| kk = .KompareIntK(dest, l, r, exp, mode)
+		dest = dest.BoolCondAnswer
+		mode ^= 1										// more convenient for the ASM to use 1 == jump
+		|| kk = .JumpIntK(dest, l, r, exp, mode)		// but for if-branches that means false. So we negate.
 			return kk
 		
 		return exp.JMPI(L, R, mode, 0) * dest
@@ -231,12 +239,17 @@ extend Assembler
 		mode |= r.IsBig<<2
 		// if dest is negate
 		mode ^= dest is Negate
-		dest = dest.BoolAnswer
+		dest = dest.BoolNegateAnswer
+
 		if (l is Const and r is Const) // needs to handle this!
 			return .ConstCompareFloat(dest, L, R, exp, Mode)
+
 		if dest isnt Condanswer
 			return exp.CMPF(dest, L, R, Mode) * dest
-		return exp.JMPF(L, R, Mode, 0) * dest
+
+		dest = dest.boolcondanswer
+		mode ^= 1									// More graceful ASM design. Or else we need to change the VM.
+		return exp.JMPF(L, R, Mode, 0) * dest		// Allows cmpf+jmpf to share code, and the VM is more natural.
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
