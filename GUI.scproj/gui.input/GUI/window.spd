@@ -129,7 +129,7 @@ class Window (GUIControl)
 		require !(Cancel)() and self isnt visible // recursive... sigh
 		.OpenDialog
 		.returnvalue = nil
-		while GUI.SingleFrame
+		while GUI.SingleFrameNested
 			rz = .returnvalue
 			if rz or (Cancel)()
 				exit

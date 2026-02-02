@@ -230,7 +230,7 @@ module GUI
 		expect (window.all.HasAny) "Create a window first, then call GUI.run"
 			
 		require .init
-		while .SingleFrame
+		while .SingleFrameSub
 			0
 		.quit
 		.sdl_quit
@@ -478,6 +478,7 @@ module GUI
 			.DoFakeMouseMove
 		|| Quitish = .QuitReason &~ (SDLActivity.Activity ||| SDLActivity.Questioning)
 			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
+
 		.QuitReason = 0
 		.StartResize	// don't remove! causes delayed updates! resizes can happen here
 						// and the next thing that happens is a draw!
@@ -788,11 +789,16 @@ module GUI
 		return .FrameStart.loop(length)
 
 	
-	libinternal SingleFrame (|bool|)
-		if .SingleFrameNest <= 2
+	libinternal SingleFrameNested (|bool|)
+		if .SingleFrameNest <= 1
 			.SingleFrameNest++
+			|| WasQuitting = .quitreason
 			rz = .SingleFrameSub
 			.SingleFrameNest--
+
+			|| NowQuit = .quitreason
+			gui.quitreason = NowQuit ||| (WasQuitting &~ sdlactivity.exiting)
+			return (NowQuit isnt exitorterminate and wasquitting isnt terminating)
 
 
 	libinternal SingleFrameSub (|bool|)
