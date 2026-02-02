@@ -12,15 +12,18 @@ target cake {
 |int| Bolg
 
 
-function BranchTest (|bool|) /// Active ///
+function BranchTest (|string| Obj, |bool|) /// Active ///
 	visible
-	|| a = 0
-	|| b = 1
+	|| a = 1
+	|| b = 2
 	|| c = 0
 	|| d = 0
 
 // Perhaps this is doubly wrong? not sure? i don't test while/for anywhere active?
 // but it is tested in hello_world.spd?
+
+	for i in 3
+		printline obj + i
 
 	while a <= 1
 		d += a > b
@@ -653,7 +656,7 @@ function FloatConstTest (|float64|) /// active ///
 
 
 function Incr (|int| x, |int| y, |int|)
-	return .math2(x++, --y)
+	return .math2test(x++, --y)
 
 
 function ForeignFuncTest (|string?| x, |string?| y, |string|) /// /
@@ -746,9 +749,12 @@ function Math2Test (|int| a, |int| b, |int|) /// active ///
 	return ((a + b) / 2) - ((a / b) * 2)
 
 
-function AndOrTest (|int| a, |int| b, |bool| c, |int|) /// Active ///
+function AndOrTest (|int| a, |int| b, |bool| c, |string| Err,  |int|) /// Active ///
+	opt norefcounts
 	visible
 	|| five = 5, || min = -1
+	if b < min
+		printline Err + B
 	if b < min and b > five
 		rz = 6
 	if b < min or b > five
