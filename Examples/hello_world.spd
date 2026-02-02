@@ -1,4 +1,4 @@
-#!/usr/local/bin/cake
+#!/usr/local/bin/cake -d
 
 main
 	zalgoline "start world"

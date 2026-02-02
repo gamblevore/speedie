@@ -142,6 +142,7 @@ $SpdTerm $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
 
 echo \"Linking Speedie\"
 ${link(ExecTerm, `/usr/local/bin/cake`)}
+${link(ExecTerm, `/usr/local/bin/🎂`)}
 
 echo \"\"
 echo \"Build Complete.\"
