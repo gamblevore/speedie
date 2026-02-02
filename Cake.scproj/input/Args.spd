@@ -8,8 +8,11 @@ function cake.Collect (|File?|)
 		debugger.WantDebug = true
 		r1 = r[1]
 
-	expect (r1)	"Usage: ${app.filename} /path/to/spd_proj.cake
-May also pass .spd or .scproj files. They will be compiled, then run."
+	if !r1
+		quit "Usage: ${app.filename} /path/to/spd_proj.cake
+
+Passed cake files are run.
+Passed speedie projects are compiled then run."
 		
 	check (r1[] != '-') ("Unexpected switch: " + r1)
 	rz = r1.FileThatExists("load executable")

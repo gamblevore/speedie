@@ -87,6 +87,11 @@ chmod 775 /usr/local/bin/cake
 chown $U /usr/local/bin/cake
 
 
+ln -sf /usr/local/speedie/Terminal/Cake /usr/local/bin/🎂
+chmod 775 /usr/local/bin/🎂
+chown $U /usr/local/bin/🎂
+
+
 echo ""
 echo "Build Complete."
 
