@@ -185,7 +185,8 @@ function Message.TestFuncName (|bool|)
 
 
 function MakeLibOnly (|message| node)
-	check (.IsLibrary) (node, "This function can't be lib-internal")
+	if self != Interact.AnonFn
+		check (.IsLibrary) (node, "This function can't be lib-internal")
 	.NoAutoComplete = 2
 	(self|scnode| is libonly)					// limited to internal within a project
 
@@ -1883,7 +1884,7 @@ function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 	.IntPrmCount = 0
 	.FuncInfo = 0
 	.TmpCounter = 0
-	.Description = ""
+	.Description = ""	
 	.Init_Sub(src, nil)
 	require StillOK
 

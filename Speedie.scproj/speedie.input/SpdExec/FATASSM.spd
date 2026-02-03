@@ -517,12 +517,16 @@ struct FatASM
 		fs <~ " #/"
 		
 	
-	function JumpNegate (|assembler| sh,  |fatasm| mid,  |bool|)
+	function JumpNegate
 		|| m = .op
 		if m == asm.jmpi or asm.jmpf
 			.prms[2] xor= 1
 		  else
 			._op = m xor 1
+	
+	
+	function JumpNegate (|assembler| sh,  |fatasm| mid,  |bool|)
+		.JumpNegate
 		|| j = .JumpPrm - 1
 		.prms[j] += mid.Jump
 		sh.nop(mid)

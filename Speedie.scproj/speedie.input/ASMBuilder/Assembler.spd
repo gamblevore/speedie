@@ -311,8 +311,8 @@ struct Assembler
 		return .nop_sub(ToNop, false, 0)
 	
 	
-	function SoftNop (|FATASM| Fat)
-		return .nop_sub(fat, true, 0)
+	function SoftNop (|FATASM| ToNop)
+		return .nop_sub(ToNop, true, 0)
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
@@ -410,8 +410,12 @@ struct Assembler
 	
 	
 	function SoftNopRange (|fatasm| Start, |fatasm| After)
+		opt inline
+		.NopRange(start, after, true)
+	
+	function NopRange (|fatasm| Start, |fatasm| After, |bool| Soft=false)
 		while start < After
-			.SoftNop(--after)
+			.nop_sub(--After, Soft, 0)
 	
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////

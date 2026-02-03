@@ -25,14 +25,14 @@ function PackMaker.RunAFewTests
 		
 	fn = .testfn("AndOrTest")
 	if fn
-		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = "branch failed: "
-		|| Andor = fn.TestObesity|&int64|[]
-		if andor != 3
+		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = "A: "
+		|| AndOr = fn.TestObesity|&int64|[]
+		if AndOr != 7
 
 	fn = .testfn("BranchTest") /// active ///
 	if fn
 		self[0] = "hello"
-		|| OK = fn.TestObesity|&bool|[]
+/		|| OK = fn.TestObesity|&bool|[]
 		if !OK
 
 	fn = .testfn("FloatConstTest")

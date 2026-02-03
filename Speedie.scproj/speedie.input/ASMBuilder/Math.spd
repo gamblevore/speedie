@@ -176,7 +176,7 @@ extend Assembler
 		mode |= l.issmall << 2
 		mode |= R.issmall << 3		
 
-		if Dest isnt CondAnswer
+		if Dest isnt CondRequest
 			return exp.CMPI(dest, L, R, mode) * dest
 
 		dest = dest.BoolCondAnswer
@@ -244,7 +244,7 @@ extend Assembler
 		if (l is Const and r is Const) // needs to handle this!
 			return .ConstCompareFloat(dest, L, R, exp, Mode)
 
-		if dest isnt Condanswer
+		if dest isnt CondRequest
 			return exp.CMPF(dest, L, R, Mode) * dest
 
 		dest = dest.boolcondanswer

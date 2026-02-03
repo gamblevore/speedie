@@ -377,9 +377,10 @@ bool CompF_ (VMRegister* A, VMRegister* B, uint Mode) {
 
 
 AlwaysInline ASM* JumpI (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompI_(i1, i2, JCmpI_Cmpu)*JCmpI_Jmpi;
+	auto V = CompI_(i1, i2, JCmpI_Cmpu);
+	return Code + V*JCmpI_Jmpi;
 }
-		
+
 AlwaysInline void CompI (VMRegister* r, ASM Op) {
 	auto V = CompI_(i2, i3, CmpI_Cmpu);
 	i1 = V;

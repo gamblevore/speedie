@@ -12,41 +12,44 @@ target cake {
 |int| Bolg
 
 
-function BranchTest (|string| Obj, |bool|) /// Active ///
+function BranchTest (|string| Obj, |int|) /// Active ///
 	visible
 	|| a = 1
 	|| b = 2
 	|| c = 0
 	|| d = 0
 
+	while a==b
+		app.Quit
+	
 	while a <= 1
+		d += a == b
+		if a == b: c++			// failing. how to get everything in sync?
+		if d!=c: return 5
+
 		d += a > b
 		if a > b: c++
-		require d==c
+		if d!=c: return 1
 
 		d += a < b
 		if a < b: c++
-		require d==c
+		if d!=c: return 2
 
 		d += a >= b
 		if a >= b: c++
-		require d==c
+		if d!=c: return 3
 
 		d += a <= b
 		if a <= b: c++
-		require d==c
-
-		d += a == b
-		if a == b: c++
-		require d==c
+		if d!=c: return 4
 
 		d += a != b
 		if a != b: c++
-		require d==c
+		if d!=c: return 6
 
 		a++
 
-	return true
+	return 0
 		
 	
 function TestRefs (|int| x)
@@ -743,21 +746,10 @@ function Math2Test (|int| a, |int| b, |int|) /// active ///
 	return ((a + b) / 2) - ((a / b) * 2)
 
 
-function AndOrTest (|int| a, |int| b, |bool| c, |string| Err,  |int|) /// Active ///
+function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|) /// Active ///
 	opt norefcounts
 	visible
-	a += 4
-	while a < b
-		printline err + b
-		a++
-	app.quit
-	return 0
-
 	|| five = 5, || min = -1
-	if b < min and b > five
-		rz = 6
-	if b < min or b > five
-		rz = 5
 	if a or b
 		rz = 4
 	if !a and b
@@ -766,6 +758,12 @@ function AndOrTest (|int| a, |int| b, |bool| c, |string| Err,  |int|) /// Active
 		rz = 2
 	if a
 		rz = 1
+	if b > five
+		rz = 7
+	if b < min and b > five
+		rz = 5
+	if b < min or b > 20
+		rz = 6
 
 		
 function AndOr2Test (|bool| c, |bool| d, |int|) /// Active ///

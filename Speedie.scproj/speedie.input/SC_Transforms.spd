@@ -684,13 +684,6 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 
 || SyxID = 0
 function Tran_Syx (|Message| msg, |Message|)
-	// this would be better doing file generation...
-	// perhaps with optional "instant" imports or "fixable" imports
-	// generating code and then instantly using it like this is
-	// so buggy and hard to debug. At least for when you are making
-	// radical compiler-internal changes. If the compiler is stable
-	// its fine.
-	
 	msg.name	= "libinternal"
 	|| name		= msg[@thg]							#require
 	|| arg		= msg.last(@arg)					#require

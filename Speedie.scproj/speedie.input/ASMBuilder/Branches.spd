@@ -84,21 +84,27 @@ function While (fn_asm)
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
+//	if exp.first!.UnBra isthing "true"
 	|| InitialJump = exp.JUMP // BasicBlock ++								// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)						// arg
-
+	
 	|FatRange| loop_test
-/	.Branch(exp.first!, loop_test) // we need a true here. lets see how it affects things?
-	if loop_test.never
+	.Branch(exp.first!, loop_test, true)				// we need a true here. lets see how it affects things?
+	if loop_test.always									// actually "never"
+		.noprange(initialjump, loop_Test.after)
 		return ASMReg()
 	
-	if loop_test.always
+	if loop_test.never									// actually "always"
 		.Nop(InitialJump)	
 		exp.JUMP.JumpTo(initialjump+1)
 		loop_test.after++
 	  else
 		InitialJump.JumpTo(loop_test.start)
 		loop_test.JumpTo(InitialJump+1)
+//		if loop_Test.length == 1						// great
+//			InitialJump.copyfrom(loop_test.Start)
+//			InitialJump.JumpTo(loop_test.After+1)
+//			InitialJump.JumpNegate
 
 	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 	
@@ -210,15 +216,6 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
-	// doing this for while-loops is a bit awkward.
-	// if true:    x()		// This skips the branch, and just does x
-	// while true: x()		// This NEEDS the branch.
-
-	// we could further optimise it perhaps... by simplifying the branch.
-	// if we know that its always true or not... just put a branch at the end?
-	// or remove the entire thing. That might solve both problems at once?
-	// :D
-	
 	range.Start = .curr
 	|| mode = asmreg.CondRequest.Negate(neg)
 
@@ -522,10 +519,11 @@ Struct FatRange
 	|&FatASM|   After
 	|maybebool| Constness
 	
+	function Length (|int|)
+		return .after - .Start
 	
 	function Always (|bool|)
 		return .Constness.KnownTrue
-	
 	
 	function Never (|bool|)
 		return .Constness.KnownFalse

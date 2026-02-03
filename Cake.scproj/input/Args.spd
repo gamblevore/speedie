@@ -9,10 +9,19 @@ function cake.Collect (|File?|)
 		r1 = r[1]
 
 	if !r1
-		quit "Usage: ${app.filename} /path/to/spd_proj.cake
+		|| name = app.filename
+		quit "Usage:
+	$name /path/to/app.cake
+	$name /path/to/project.scproj
 
-Passed cake files are run.
-Passed speedie projects are compiled then run."
+You may pass arguments also (args go *after* the program path):
+
+	$name /path/to/app.cake arg1 arg2 --switch=value
+
+`Cake` runs executable files, that were compiled with `Speedie`, to the cake-format.
+
+Learn more about Speedie at: http://github.com/gamblevore/speedie/
+"
 		
 	check (r1[] != '-') ("Unexpected switch: " + r1)
 	rz = r1.FileThatExists("load executable")
