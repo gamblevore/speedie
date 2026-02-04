@@ -139,7 +139,7 @@ function FindBytePos (|Message?| Node, |Message?|)
 extend Error
 	function SCGrabLine (|faststring| fs, |bool| Usecolor)
 		if Usecolor
-			fs <~ ErrorColors.Normal
+			fs <~ TerminalColor.Normal
 
 		|| d = .SCOriginalData	#require
 		require .HasPosition
@@ -156,7 +156,7 @@ extend Error
 		|| Spaces = (.Position - Start)
 		fs <~ '\n'
 		if Usecolor
-			fs <~ ErrorColors.Underline
+			fs <~ TerminalColor.Underline
 		// mark where in the line the error occurs
 		fs <~ (' ', spaces min 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
 		fs <~ '^'
@@ -198,7 +198,7 @@ extend Error
 // <path>:<line number>:<bytedownline>: error/warning: <message>
 ///.../Speedie.scproj/BuildTest/JB.cpp:2679:10: error: conflicting types for 'JB__Comp_InputFile'
 
-		if options.color: fs <~ errorcolors.Bold
+		if options.color: fs <~ TerminalColor.Bold
 		
 		|| node = .node
 		|| data = .SCOriginalData
@@ -216,16 +216,16 @@ extend Error
 		fs <~ ' '
 		if options.color
 			if (.iswarning)
-				fs <~ errorcolors.warn
+				fs <~ TerminalColor.warn
 			  else
-				fs <~ errorcolors.Error
+				fs <~ TerminalColor.Error
 		
 		if .severity is problem
 			fs <~ "warning" // "problem" isnt a valid unix thingy
 		  else
 			.severity.render(Fs)
 		fs <~ ": "
-		if options.color: fs <~ errorcolors.Bold
+		if options.color: fs <~ TerminalColor.Bold
 		fs <~ .name
 		fs <~ '\n'
 
@@ -233,7 +233,7 @@ extend Error
 					//   ^
 		.SCGrabLine(fs, options.color)
 		fs <~ '\n'
-		if options.color: fs <~ errorcolors.Normal
+		if options.color: fs <~ TerminalColor.Normal
 		
 
 		

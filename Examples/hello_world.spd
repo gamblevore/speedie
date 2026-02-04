@@ -21,11 +21,12 @@ main
 
 function HelloWorld	(|int| i, |int|)
 	i--
-	if i&1
-		"hello world!"
-	  else
-		"bye world!"
-	if (i >= 0)
-		"More than 0"
+	for i
+		if i&1
+			"hello world!"
+		  elseif (i >= 0)
+			"yeah world!"
+		  else
+			"bye world!"
 	return 1234
 

@@ -45,10 +45,10 @@ module Options
 	|bool|	HideawayScripts
 	
 	function Color (assigns:|bool|)
-		ErrorColors.enabled = Value
+		TerminalColor.enabled = Value
 
 	function Color (|bool|)
-		return ErrorColors.enabled
+		return TerminalColor.enabled
 	
 	function ModeCake (|bool|)
 		return .mode == cake

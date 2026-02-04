@@ -885,13 +885,22 @@ function AddMain (|int| mark, |bool|)
 |string|		LastTimeName
 |FastString|	TimerOutput = FastString.new
 
+function FastString.Normal (|string| s)
+	if (TerminalColor.enabled):  self <~ TerminalColor.normal
+	self <~ "\n"
+	self <~ s
+	self <~ ":"
+	self <~ (' ', 18-s.LengthUTF8)
+	if (TerminalColor.enabled):  self <~ TerminalColor.good
+		
+
 function AppendCompilerTime (|string| s, |int| Durr)
 	compiler.TimerOutput.appendwidth(s, compiler.kTimeWidth)
 	if options.color
-		compiler.TimerOutput <~ errorcolors.good
+		compiler.TimerOutput <~ TerminalColor.good
 	compiler.TimerOutput.appenddurr(Durr)
 	if options.color
-		compiler.TimerOutput <~ errorcolors.normal
+		compiler.TimerOutput <~ TerminalColor.normal
 	compiler.TimerOutput <~ '\n'
 
 

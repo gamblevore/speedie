@@ -37,7 +37,7 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
 	if options.color
-		fs <~ errorcolors.normal
+		fs <~ TerminalColor.normal
 	
 	if Options.PrintMemoryUsage
 		fs <~ "\n"

@@ -110,7 +110,7 @@ class Error (Message)
 	
 	function GrabLine (|faststring| fs, |bool| Usecolor=false)
 		if Usecolor
-			fs <~ ErrorColors.Normal
+			fs <~ TerminalColor.Normal
 
 		|| d = .OriginalData
 		require d and .HasPosition
@@ -127,7 +127,7 @@ class Error (Message)
 		if spaces > 200: spaces = 0 // stop bugs.
 		
 		fs <~ '\n'
-		if Usecolor: fs <~ ErrorColors.Underline
+		if Usecolor: fs <~ TerminalColor.Underline
 		fs <~ (' ', Spaces)
 		fs <~ '^'
 
@@ -254,36 +254,4 @@ datatype ErrorSeverity (Byte)
 					return i
 			if err
 				error err
-
-
-
-module ErrorColors
-	|bool| Enabled
-	
-	constants
-		normal		= "\1b[0m"
-		bold		= "\1b[0;1m"
-		error		= "\1b[0;1;31m"
-		good		= "\1b[0;1;32m"
-		warn		= "\1b[0;1;33m"
-		underline	= "\1b[0;1;32m"
-	
-	
-	function String.PrintlineColor (|string| color)
-		if (errorcolors.enabled): print color
-		printline self
-		if (errorcolors.enabled): print ErrorColors.normal
-	
-		
-	function FastString.Normal (|string| s)
-		if (errorcolors.enabled):  self <~ ErrorColors.normal
-		self <~ "\n"
-		self <~ s
-		self <~ ":"
-		self <~ (' ', 18-s.LengthUTF8)
-		if (errorcolors.enabled):  self <~ ErrorColors.good
-		
-	
-	function DisableIfNoTerminal
-		.enabled = filedes.StdOut.IsTerminal
 

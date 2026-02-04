@@ -63,14 +63,14 @@ function compiler.SetupEnv
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
 
-	errorcolors.DisableIfNoTerminal
+	TerminalColor.DisableIfNoTerminal
 	error.AutoPrint = 1
 //	target CompressionTest
 //		mzlab.testcompression
 	
 	if app.parent
 		error.AutoPrint = 0
-		ErrorColors.enabled = false
+		TerminalColor.enabled = false
 
 
 

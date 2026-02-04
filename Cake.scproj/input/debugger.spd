@@ -65,9 +65,11 @@ module debugger
 		str = str.trim
 
 		print "\t\t\t\t"
+		print terminalcolor.bold
 		print F.name
 		print ": "
-		printline str
+		print str
+		printline TerminalColor.normal
 	
 	
 	function StartUp (|&int|)
@@ -104,11 +106,15 @@ module debugger
 	
 	function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0)
 		opt norefcounts
+		print "\t\t\t\t"
+		print terminalcolor.bold
 		printline fn.name
 		index -= fn.Position
 		for v in fn.obj|[xvar]|
 			if v contains index
+				print "\t\t\t\t"
 				v.Print(reg0)
+		print terminalcolor.normal
 	
 		
 	function Load (|bool|)
