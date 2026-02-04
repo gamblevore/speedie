@@ -1189,7 +1189,6 @@ JB_Err_SyntaxIsSet
 JB_Err_UpgradeWithNode
 JB_Err_WorseThan
 JB_Err__CantParseNum
-JB_ErrorColors__DisableIfNoTerminal
 JB_ErrorSeverity_Render
 JB_ErrorSeverity_SyntaxIs
 JB_ErrorSeverity_SyntaxUsing
@@ -1231,6 +1230,7 @@ JB_FS_AppendQuotedEscape
 JB_FS_AppendRange
 JB_FS_AppendShort
 JB_FS_AppendString
+JB_FS_AppendTermCol
 JB_FS_AppendUTF8Char
 JB_FS_Byte
 JB_FS_ByteSet
@@ -1252,7 +1252,6 @@ JB_FS_LineIndent
 JB_FS_Mark
 JB_FS_MsgErrorName
 JB_FS_NeedSpare
-JB_FS_Normal
 JB_FS_PadTo
 JB_FS_PrintNicely
 JB_FS_ProblemsFound
@@ -2007,6 +2006,8 @@ JB_Task_Destructor
 JB_Task_SyntaxIs
 JB_Task_SyntaxIsSet
 JB_TerminalColor_Colorise
+JB_TerminalColor_Render
+JB_TerminalColor__DisableIfNoTerminal
 JB_TerminalDisplay_Beep
 JB_TerminalDisplay_Destructor
 JB_TerminalDisplay_Display
