@@ -299,7 +299,33 @@ function SCFunction.CheckUnused (|message| feedback)
 					d.MarkUnused(feedback, 'D')
 
 	
-	
+
+function scobject.AutoCompleteKind (|string|)
+	if self isa SCModule
+		return "module"
+	if self isa scclass
+		if .FuncProto
+			return "function prototype"
+		if .IsDataTypeOnly
+			return "datatype"
+		if .IsStruct
+			return "struct"
+		if .IsObject
+			return "class"
+	if self isa SCDecl
+		if self is Const
+			return "Constant"
+		if self is Global
+			return "Global"
+		if self is Property
+			return "Property"
+		if self is Param
+			return "Parameter"
+		return "Variable"
+
+	return "unknown"
+
+
 function scobject.UnusedStr (|string| name, |string|)
 	|| reason = .UnusedReason$
 	|| fs = FastString()

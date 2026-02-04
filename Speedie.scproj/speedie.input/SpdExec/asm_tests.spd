@@ -12,12 +12,36 @@ target cake {
 |int| Bolg
 
 
-function Mark
-function BranchTest (|int|)		/// Active ///
+function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|)	/// Active ///
+	opt norefcounts
 	visible
+	|| five = 5, || min = -1
+	if a or b
+		rz = 4
+	if !a and b
+		rz = 3
+	if a and b
+		rz = 2
+	if a
+		rz = 1
+	if b > five
+		rz = 7
+	if b < min and b > five
+		rz = 5
+	if b < min or b > 20
+		rz = 6
 
+
+function BranchTest (|int|)												/// Active ///
+	visible
 	|| a = 1
 	|| b = 2
+	for i in 10
+		if i&1
+			a = 1
+		  else
+			b++
+	b = 2
 	
 	while a==b
 		b = 2
@@ -742,35 +766,15 @@ function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	(e)
 
 
-function MulTest (|int| a, |int| b, |int| c, |int| d, |int|) /// active ///
+function MulTest (|int| a, |int| b, |int| c, |int| d, |int|)			/// Active ///
 	visible
 	|| x = 12 * 10
 	return ((a + b) * c) / d
 
 
-function Math2Test (|int| a, |int| b, |int|) /// active ///
+function Math2Test (|int| a, |int| b, |int|)							/// Active ///
 	visible
 	return ((a + b) / 2) - ((a / b) * 2)
-
-
-function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|) /// Active ///
-	opt norefcounts
-	visible
-	|| five = 5, || min = -1
-	if a or b
-		rz = 4
-	if !a and b
-		rz = 3
-	if a and b
-		rz = 2
-	if a
-		rz = 1
-	if b > five
-		rz = 7
-	if b < min and b > five
-		rz = 5
-	if b < min or b > 20
-		rz = 6
 
 		
 function AndOr2Test (|bool| c, |bool| d, |int|) /// Active ///

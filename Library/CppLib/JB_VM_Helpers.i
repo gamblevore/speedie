@@ -394,7 +394,8 @@ AlwaysInline void CompI (VMRegister* r, ASM Op) {
 
 
 AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompF_(r+n1, r+n2, JCmpF_Cmpu)*JCmpF_Jmpi;
+	auto V = CompF_(r+n1, r+n2, JCmpF_Cmpu);
+	return Code + V*JCmpF_Jmpi;
 }
 
 AlwaysInline void CompF (VMRegister* r, ASM Op) {

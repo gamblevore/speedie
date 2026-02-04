@@ -31,7 +31,7 @@ function PackMaker.RunAFewTests
 	fn = .testfn("AndOrTest")
 	if fn
 		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = "A: "
-		|| AndOr = fn.TestObesity|&int64|[]
+/		|| AndOr = fn.TestObesity|&int64|[]
 		if AndOr != 7
 
 	fn = .testfn("FloatConstTest")

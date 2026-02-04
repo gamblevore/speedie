@@ -4,7 +4,12 @@ main
 	zalgoline "start world"
 	printline
 	printline
+	
 //	for i in 10
+//		if i & 1
+//			printline "bye world" + i
+//		  else
+//			printline "hello world" + i
 //		|| s = ("hello world! ", "bye world!   ")(!(i&1))
 //		printline s + (i+1)
 	HelloWorld(10)

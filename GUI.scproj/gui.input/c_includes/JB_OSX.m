@@ -1,4 +1,5 @@
 
+#if __ALLOW_OSX_EXTENSIONS__
 #import <Cocoa/Cocoa.h>
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
@@ -10,6 +11,7 @@ void* JB_Str_CopyFromCString( const char* C );
 void JB_FreeIfDead_(void* c);
 static id							sigh;
 static NSString*					FileOpened;
+
 
 void* JB_App__DocumentOpened (bool Clear) {
 	NSString* F = FileOpened;
@@ -73,4 +75,32 @@ void JB_SDL_RemoveWindowBorder (void* w) {
 
 //void JB_SDL_FullScreen (void* w, bool On) {
 //}
+#else
+#define bool unsigned char
+void* JB_App__DocumentOpened (bool Clear) {
+	return 0;
+}
 
+void JB_App__InitStuff (void) {
+}
+
+void JB_App__Beep(void) {
+}
+
+void JB_App__ShowURL (const char* Path) {
+}
+
+void JB_App__SetIcon(const char* Path) {
+}
+
+void JB_SDL_SetModified(void* w, bool b) {
+}
+
+void JB_SDL_FullScreenToggle (void* w) {
+}
+
+void JB_SDL_RemoveWindowBorder (void* w) {
+}
+
+
+#endif

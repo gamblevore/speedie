@@ -225,6 +225,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	if platform.osx // OSX likes playing hide and seek
 		if SC_Targets..gui or linkage.interpreter
 			rz.appendwords("-F/Library/Frameworks  -framework Cocoa")
+			rz.AppendWords("-D __ALLOW_OSX_EXTENSIONS__=1")
 			rz.appendwords("-rpath @executable_path/../Frameworks")
 		rz.appendwords("-rpath ~/Library/Frameworks  -rpath $spdroot/Library  -rpath /Library/Frameworks")
 	// god c++ is so crappy. you gotta do all this shit just to make anything work?
