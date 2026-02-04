@@ -23,17 +23,16 @@ extend_module PackMaker
 function PackMaker.RunAFewTests 
 	|scfunction--| fn
 		
+	fn = .testfn("BranchTest") /// active ///
+	if fn
+		|| Err = fn.TestObesity|&bool|[]
+		if Err
+
 	fn = .testfn("AndOrTest")
 	if fn
 		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = "A: "
 		|| AndOr = fn.TestObesity|&int64|[]
 		if AndOr != 7
-
-	fn = .testfn("BranchTest") /// active ///
-	if fn
-		self[0] = "hello"
-/		|| OK = fn.TestObesity|&bool|[]
-		if !OK
 
 	fn = .testfn("FloatConstTest")
 	if fn

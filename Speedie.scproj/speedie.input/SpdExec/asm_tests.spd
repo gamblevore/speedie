@@ -12,16 +12,23 @@ target cake {
 |int| Bolg
 
 
-function BranchTest (|string| Obj, |int|) /// Active ///
+function Mark
+function BranchTest (|int|)		/// Active ///
 	visible
+
 	|| a = 1
 	|| b = 2
+	
+	while a==b
+		b = 2
+		app.Quit
+
 	|| c = 0
 	|| d = 0
 
-	while a==b
+	while c!=d
 		app.Quit
-	
+
 	while a <= 1
 		d += a == b
 		if a == b: c++			// failing. how to get everything in sync?

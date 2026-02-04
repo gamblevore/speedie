@@ -13,9 +13,9 @@ Speedie doesn't require `Cake` to run it's programs. Speedie can output C++ and 
 * Compiles without needing gcc/clang
 
 
-### Nutritrious Small Cakes Baked Quickly
+### Nutritious Small Cakes Baked Quickly
 
-`Cake` is a low-calorie platform, at around 2-3x smaller than ARM. `Cake` also links against SpeedieLib, drastically reducing size. The (very featureful) IDE [`Perry`](Perry.md) compiles to 80KB in Cake! _(For ARM-C++ it takes 900KB.)_
+`Cake` is a low-size platform, code usually compiles 2-3x smaller than ARM. `Cake` also links against SpeedieLib, drastically reducing size. The (very featureful) IDE [`Perry`](Perry.md) compiles to 80KB in Cake! _(For ARM-C++ it takes 900KB.)_
 
 **Comparison notes:** _If I say (2 vs 13), that means `Cake` takes 2 instructions to do something, and ARM would take 13 to do the same._
 

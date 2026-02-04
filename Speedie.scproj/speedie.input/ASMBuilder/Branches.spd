@@ -101,10 +101,10 @@ function WhileSub (|message| exp,  |asmreg|)
 	  else
 		InitialJump.JumpTo(loop_test.start)
 		loop_test.JumpTo(InitialJump+1)
-//		if loop_Test.length == 1						// great
-//			InitialJump.copyfrom(loop_test.Start)
-//			InitialJump.JumpTo(loop_test.After+1)
-//			InitialJump.JumpNegate
+		if loop_Test.length == 1						// great
+			InitialJump.copyfrom(loop_test.Start)
+			InitialJump.JumpTo(loop_test.After)
+			InitialJump.JumpNegate
 
 	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 	

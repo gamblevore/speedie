@@ -89,6 +89,7 @@ extend Assembler
 		if  r is Const  and  l isnt Const
 			swap (l) (r)
 		
+		negate = !negate // jmp/cond are used oppositely
 		|| RS = r.issmall|int|
 		|&fatasm| fat
 		if !l.IsZero
@@ -166,6 +167,7 @@ extend Assembler
 //		CmpSub(0,  A >   B)
 //		CmpSub(1,  A <=  B)
 		if mode > 1 // wat?
+
 		mode |= !r.signed<<1
 		mode ^= dest is Negate
 

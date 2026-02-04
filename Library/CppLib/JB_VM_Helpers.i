@@ -421,15 +421,13 @@ inline uint64 jclip (uint64 x, uint64 s) {
 }
 
 AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
-	if (jclip(u1, JCmpEq_LSmallu<<5) == jclip(u2, JCmpEq_RSmallu<<5))
-		return Code;
-	return Code + JCmpEq_Jmpi;
+	auto V = jclip(u1, JCmpEq_LSmallu<<5) == jclip(u2, JCmpEq_RSmallu<<5);
+	return Code + V*JCmpEq_Jmpi;
 }
 
 AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
-	if (jclip(u1, JCmpEq_LSmallu<<5) != jclip(u2, JCmpEq_RSmallu<<5))
-		return Code;
-	return Code + JCmpEq_Jmpi;
+	auto V = jclip(u1, JCmpEq_LSmallu<<5) != jclip(u2, JCmpEq_RSmallu<<5);
+	return Code + V*JCmpEq_Jmpi;
 }
 
 AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
