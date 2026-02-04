@@ -57,19 +57,6 @@ module debugger
 		for F.fast in b[@arg]
 			if f.expect(@tmp)
 				printline f
-		
-	function CakeVM.DebugFoundLocation (|FileWithData| F, |uint| Position, |int64|)
-		|| str = F.GetLine(position)
-		|| comment = str.find("//") // whoop!
-			str = str[0, comment]
-		str = str.trim
-
-		print "\t\t\t\t"
-		print terminalcolor.bold
-		print F.name
-		print ": "
-		print str
-		printline TerminalColor.normal
 	
 	
 	function StartUp (|&int|)
@@ -99,22 +86,18 @@ module debugger
 		
 		|| Where = debugger.Base![index]
 		|| Path = debugger.path(where & (11~bits))
-			.DebugFoundLocation( Path, Where>>11 )
-			|| fn = spdtable.Find(index)
-				.PrintStackVars(index, fn, Reg0)
-	
-	
-	function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0)
+		|| fn = spdtable.Find(index)
+		if path
+			|| TabTo = .PrintCodeLocation(Path, fn, Where>>11 )
+			if fn and fn.HasVar(index)
+				.PrintStackVars(index, fn, Reg0, TabTo)
+
+
+	function spdfunc.HasVar (|int| Index, |bool|)
 		opt norefcounts
-		print "\t\t\t\t"
-		print terminalcolor.bold
-		printline fn.name
-		index -= fn.Position
-		for v in fn.obj|[xvar]|
+		for v in .obj|&nil||[xvar]|
 			if v contains index
-				print "\t\t\t\t"
-				v.Print(reg0)
-		print terminalcolor.normal
+				return true
 	
 		
 	function Load (|bool|)
@@ -152,29 +135,38 @@ module debugger
 			for i in spdtable.CodeLength
 				s[i] = 1<<31
 
-
-
-class FileWithData (stringshared)
-	default NIL
-	false NIL
-	|string?|   _Data
-
-	render
-		opt norefcounts
-		fs <~ self|string|
-	
-	function GetLine (|int| Pos, |string|)
-		opt norefcounts
-		|| d = .data
-		|| Start = d.Find(charset.Line, pos, 0) // or should that be -1? what if pos == 0?
-		|| End = d.find(charset.line, pos, int.max)
-		return d[Start+1, End]
 		
-	function Data (|string|)
-		opt norefcounts
-		return ._Data init .ReadAll
+		
+function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| Position, |int|)
+	print "\t\t\t\t\t\t"
+	if TerminalColor.Enabled
+		print terminalcolor.green.render
 	
-	constructor (|string| Name)
-		super.constructor(name)
-		._data = nil
+	|| filename = file.name
+	print Filename
+	print " "
+	if fn
+		print fn.name
+		print ": "
+	
+	if TerminalColor.Enabled
+		print TerminalColor.normal
+
+	|| Code = File.GetLine(position)
+	|| comment = Code.find("//") // whoop!
+		Code = Code[0, comment]
+	Code = Code.trim
+
+	printline Code
+	return 7 + filename.Length + fn.Name.Length
+
+
+function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0, |int| TabTo)
+	opt norefcounts 
+	index -= fn.Position
+	for v in fn.obj|[xvar]|
+		if v contains index
+			print "\t\t\t\t\t\t"
+			v.Print(reg0, TabTo)
+	printline
 
