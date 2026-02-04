@@ -342,16 +342,15 @@ struct HairyMan
 	|uint16| Curr
 	|uint|	 Total
 
-	function AddOrShrink (|jbin| j, |bool| b, |bool|)
+	function AddOrShrink (|jbin| j, |scfunction| F, |bool|)
 		.Total++
-		if b or Options.TargetDebug
+		if (f is usedbyasm) or f.isbehaviour
 			|| c = .curr
 				j.addint(c)
 			.curr = 0
 			return true
 		.curr++
 		.Savings++
-		return false
 			
 	function Churn (|faststring| fs)
 		fs <~ "$.Savings / $.Total"

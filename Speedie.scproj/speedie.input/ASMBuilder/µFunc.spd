@@ -93,7 +93,7 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	opt norefcounts
 	for f in .PackFuncs
-		if .PackSaved.AddOrShrink(j, f is UsedByASM)
+		if .PackSaved.AddOrShrink(j, f)
 			SCFunction.currfunc = f
 			require j.BakeASM(f)
 	return true
@@ -104,7 +104,7 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	|| Start = .StartAdd
 	|| Positions = SourceMap.Reserve(t*4)
 	|| Addr = .reserve(t*4)|&asm|
-	|| after = fn.ASMBake(Addr, Addr+t, Positions)
+/	|| after = fn.ASMBake(Addr, Addr+t, Positions)
 	.FinishAdd(@bin, Start)
 	expect (after-Addr == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)
@@ -112,9 +112,9 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 
 function JBin.BakeASM (|SCFunction| fn, |bool|)
 	opt norefcounts
-	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
-		.AddFunc(fn)
-		return true
+//	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
+//		.AddFunc(fn)
+//		return true
 
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
