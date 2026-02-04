@@ -72,6 +72,8 @@ dispatch FuncPreReader (fnPreReader)
 					is NotRefCounted
 				  elseif f ~= "inline"
 					is OptInline
+				  elseif f ~= "noinline"
+					is CantInline
 				  else
 					error f
 
