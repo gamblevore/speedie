@@ -176,6 +176,7 @@ JB__Proc__Parent
 JB__Rec_Progress
 JB__Syx_CurrFuncID_
 JB__TC_Types_Dict
+JB__TerminalColor_Enabled
 JB__Tk_Splitter
 JB__Tk_Using
 JB__Tk__DotInsertAllow
