@@ -76,7 +76,7 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 
 
 #define EROR HALT
-static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) {
+static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__
 static void * const GlobalJumpTable[] = {
 	#include "InstructionList.h"
 	&&TRYBREAK,

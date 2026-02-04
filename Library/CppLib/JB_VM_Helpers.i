@@ -610,10 +610,10 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 }
 
 
-AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
-	VMRegister* Stack = r + Save;
+AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, int Dest) { // jumpstack
+	VMRegister* Stack = r + Dest;
 	Stack->Stack.Code = CodePtr;
-	Stack->Stack.DestReg = Save;
+	Stack->Stack.DestReg = Dest;
 	Stack->Stack.Depth = r[-1].Stack.Depth+1;
 	Stack->Stack.Alloc = vm.AllocCurr;
 	return Stack+1;
@@ -637,7 +637,7 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	auto Zero = SaveVMState(vm, r, CodePtr, n1);
 	rp = Zero;
 
-	switch ( Code ) {
+	switch ( Code&15 ) {
 		default: __builtin_unreachable();
 		Transfer3( 8);
 		Transfer3( 7);
