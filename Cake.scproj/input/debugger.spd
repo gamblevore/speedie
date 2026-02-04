@@ -142,8 +142,7 @@ function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| P
 	if TerminalColor.Enabled
 		print terminalcolor.green.render
 	
-	|| filename = file.name
-	print Filename
+	print file.filename
 	print " "
 	if fn
 		print fn.name
@@ -158,7 +157,7 @@ function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| P
 	Code = Code.trim
 
 	printline Code
-	return 7 + filename.Length + fn.Name.Length
+	return 7 + file.filename.Length + fn.Name.Length
 
 
 function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0, |int| TabTo)
