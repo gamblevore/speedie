@@ -17,7 +17,14 @@ datatype TerminalColor (int)
 		|TerminalColor|
 		Black = 30
 		Red,Green,Yellow,Blue,Magenta,Cyan,White
+	
+	function faststring.syntaxappend (|terminalColor| Col)
+		cpp_part AppendTermCol
+		self <~ "\1b[${Col|int|}m"
 
+	render
+		fs <~ self
+		
 	constants
 		normal		= "\1b[0m"
 		bold		= "\1b[0;1m"
@@ -119,7 +126,7 @@ struct TerminalDisplay
 				|| CCol = cell.terminalcolor
 				if PrevCol != CCol
 					PrevCol = CCol
-					.fs <~ "\1b[1;${CCol}m"
+					.fs <~ CCol
 				.fs <~ cell
 				line[i] = " "
 			.fs <~ '\n'
