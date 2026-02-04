@@ -4,7 +4,9 @@ function cake.Collect (|File?|)
 	opt norefcounts
 	|| r = app._rawargs
 	|| r1 = r[0]
-	if r1.ArgSwitch("d") // remove "d" eventually!
+	if r1.ArgSwitch("d")
+		if r1.find('D')
+			TerminalColor.Enabled = true
 		debugger.WantDebug = true
 		r1 = r[1]
 
