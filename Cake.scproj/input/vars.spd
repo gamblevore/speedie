@@ -34,9 +34,9 @@ class XVar (list)
 	function CanBeNil (|bool|)
 		return .DataType & (DataTypeCode.PossibleBits+1)
 
-	function Print (|!&ivec4| Reg0)
+	function Print (|!&ivec4| Reg0, |int| TabTo)
 		opt norefcounts
-		.Render(Printer, reg0, true)
+		.Render(Printer, reg0, true, TabTo)
 		printline Printer.GetResult
 	
 	
@@ -46,17 +46,27 @@ class XVar (list)
 	
 	render
 		opt norefcounts
-		.Render(fs, nil, true)
+		.Render(fs, nil, true, 0)
 	
-	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full)
+	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo)
 		opt norefcounts
 		if full
+			if TerminalColor.Enabled
+				fs <~ terminalcolor.yellow
+			
+			|| M = fs.mark
 			fs <~ "|"
 			.TypeName(fs)
 			fs <~ "|"
 			fs <~ " "
 			fs <~ .name
 			fs <~ ": "
+			if TerminalColor.Enabled
+				fs <~ terminalcolor.normal
+			if TabTo
+				|| Missing = TabTo - (fs.mark - M)
+				fs <~ (' ', missing)
+		
 		if reg0
 			|| Reg = Reg0 + .reg
 			|| C = .obj|&nil||xtype|
