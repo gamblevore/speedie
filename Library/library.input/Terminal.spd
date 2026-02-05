@@ -7,37 +7,35 @@
 
 
 datatype TerminalColor (int)
-	module
-		|bool| Enabled
-		
-		function DisableIfNoTerminal
-			.enabled = filedes.StdOut.IsTerminal
-	
 	constants
 		|TerminalColor|
 		Black = 30
-		Red,Green,Yellow,Blue,Magenta,Cyan,White
+		Red, Green, Yellow, Blue, Magenta, Cyan, White
 	
-	function faststring.syntaxappend (|terminalColor| Col)
-		cpp_part AppendTermCol
-		self <~ "\1b[${Col|int|}m"
-
-	render
-		fs <~ self
-		
 	constants
-		normal		= "\1b[0m"
-		bold		= "\1b[0;1m"
-		error		= "\1b[0;1;31m"
-		good		= "\1b[0;1;32m"
-		warn		= "\1b[0;1;33m"
-		underline	= "\1b[0;1;32m"
+		Normal		= "\1b[0m"
+		Bold		= "\1b[0;1m"
+		Error		= "\1b[0;1;31m"
+		Good		= "\1b[0;1;32m"
+		Warn		= "\1b[0;1;33m"
+		Underline	= "\1b[0;1;32m"
 
+	module
+		|bool| Enabled			
+	
+	render
+		opt norefcounts
+		fs <~ "\1b[${self|int|}m"
+
+	inline FastString.SyntaxAppend (|TerminalColor| Col)
+		cpp_part AppendTermCol
+		col.Render(self)
+		
 
 
 target !minilib {
 
-function terminalcolor.Colorise (|string| s, |string|)
+function TerminalColor.Colorise (|string| s, |string|)
 	// handy trick of using high-bits on objects
 	|int64| C = (self-Black)&7
 	|| addr = (s|int64|<<3)>>3
