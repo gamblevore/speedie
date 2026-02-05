@@ -1,7 +1,6 @@
 #!/usr/local/bin/cake -d
 
 main
-	"Bad pos"
 	zalgoline "start world\n\n"
 	RecursiveHello(0, 0)
 	zalgoline "\n\nend world"
