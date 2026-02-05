@@ -107,8 +107,8 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFu
 	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart								// Fast-branch for speed.
 			|| Jump = (Pos - Self)|int|						// 19-bits
-//			Jump -= (op&1) + 1
 			Jump -= 2
+			Jump -= op&1
 			|| EncodedJump = Jump&19~bits
 			if  (EncodedJump<<13)>>13  ==  Jump
 				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op<<24)
