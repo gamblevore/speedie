@@ -1,32 +1,19 @@
 #!/usr/local/bin/cake -d
 
 main
-	zalgoline "start world"
-	printline
-	printline
-	
-//	for i in 10
-//		if i & 1
-//			printline "bye world" + i
-//		  else
-//			printline "hello world" + i
-//		|| s = ("hello world! ", "bye world!   ")(!(i&1))
-//		printline s + (i+1)
-	HelloWorld(10)
-//	printline
-//	printline
-	zalgoline "end world"
+	zalgoline "start world\n\n"
+	RecursiveHello(0, 0)
+	zalgoline "\n\nend world"
 
 
+function RecursiveHello	(|int| A, |int| B, |int| Depth=0)
+	Depth++
+	if Depth > 9 // how?
+		app.Quit "Too deep"
 
-function HelloWorld	(|int| i, |int|)
-	i--
-	for i
-		if i&1
-			"hello world!"
-		  elseif (i >= 0)
-			"yeah world!"
-		  else
-			"bye world!"
-	return 1234
+	printline ("hello world: " + A) + (", " + B) + (", " + Depth)
+	if b < 4
+		RecursiveHello(A, B+1, depth)
+	if a < 4
+		RecursiveHello(A+1, B, depth)
 
