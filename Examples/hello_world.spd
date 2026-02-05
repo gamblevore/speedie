@@ -1,6 +1,7 @@
 #!/usr/local/bin/cake -d
 
 main
+	"Bad pos"
 	zalgoline "start world\n\n"
 	RecursiveHello(0, 0)
 	zalgoline "\n\nend world"
@@ -11,7 +12,8 @@ function RecursiveHello	(|int| A, |int| B, |int| Depth=0)
 	if Depth > 9 // how?
 		app.Quit "Too deep"
 
-	printline ("hello world: " + A) + (", " + B) + (", " + Depth)
+	"hello world: $A, $B, $Depth"
+	
 	if b < 4
 		RecursiveHello(A, B+1, depth)
 	if a < 4
