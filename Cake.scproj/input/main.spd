@@ -19,7 +19,8 @@ main
 		p <~ "`hoi :3`"
 	
 	if CakeRun.GetStructure
-		SpdTable.Link
+		for f in SpdTable.funcs
+			f.Link❗
 		require debugger.Load
 		return SpdTable.RunMain
 	return 1

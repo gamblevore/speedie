@@ -1,6 +1,4 @@
 
-		
-
 
 datatype ASMOp (uint)
 	function IsSPDFunc (|bool|)

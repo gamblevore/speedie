@@ -9,7 +9,7 @@ role SpdFunc (message)
 		.func = @tmp
 		.Position = -1
 
-	// we try to standardise the output structure
+	// We try to standardise the output structure
 	function message.CopyToVM
 		opt norefcounts
 		|| Code = .name

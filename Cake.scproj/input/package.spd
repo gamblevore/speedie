@@ -35,6 +35,7 @@ module CakeRun
 		.Strings = arg["strs"].name
 		.LoadClasses(arg["clss"])
 		Debugger.Root = arg["debug"].parent
+		
 		return globals.CollectPackGlobs(sz)
 		
 

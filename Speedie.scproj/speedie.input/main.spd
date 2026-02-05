@@ -57,17 +57,14 @@ function compiler.SetupEnv
 	opt norefcounts
 	expect fatasm.VerifyNumbers
 	
-	app.parent // sigh. do this before clearenvs
+	app.Parent									// sigh. do this before clearenvs
 	.ClearEnvs
 	options.dev = app.prefs["dev"].int
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
 
-	TerminalColor.DisableIfNoTerminal
+	TerminalColor.Enabled = FileDes.StdOut.IsTerminal
 	error.AutoPrint = 1
-//	target CompressionTest
-//		mzlab.testcompression
-	
 	if app.parent
 		error.AutoPrint = 0
 		TerminalColor.enabled = false

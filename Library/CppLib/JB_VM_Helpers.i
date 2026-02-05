@@ -632,7 +632,7 @@ AlwaysInline bool VMFinish (VMRegister* r, ASM Op) {
 
 
 
-AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) { // jumpstack
+AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
 	auto Zero = SaveVMState(vm, r, CodePtr, n1);
 	rp = Zero;
@@ -647,6 +647,7 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 		Transfer3( 3);
 		Transfer3( 2);
 		Transfer3( 1);
+		case 0:;
 	}
 
 	Zero[ 0] = {};

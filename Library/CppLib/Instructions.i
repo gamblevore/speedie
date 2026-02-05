@@ -8,9 +8,9 @@
 	LoadConst(r, Op, *((uint64 *)(Code)));
 	Code += 2;
 ı FNC:;
-	Code = BumpStack(vm, r, Code + 0, Op, *Code);
+	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 ı FNC3:;
-	Code = BumpStack(vm, r, Code + 1, Op, Code64);
+	Code = BumpStack(vm, r, Code + 2, Op, Code64);
 ı FNCX:;
 	ForeignFunc(vm, Code, r, Op, *Code);
 	Code++;
