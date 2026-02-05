@@ -103,7 +103,9 @@ module debugger
 	function Load (|bool|)
 		opt norefcounts
 		|| R = .root
-		if !R: return true
+		if !R
+			expect (!debugger.WantDebug)	("Program file doesn't contain debug info. Remove -d to run it.")
+			return true
 
 		|| L = .LoadDebug(R)
 		|| L2 = SpdTable.CodeLength

@@ -537,7 +537,8 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 // r0(1), <stack/result>, <r0> (2)...<r31>
   
-AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& R0, ASM Op) {
+AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugCode) {
+	(DebugCode);
 	auto Stack	= R0 - 1;
 	int StepBack= Stack->Stack.DestReg;
 	auto Imm	= RET_Valuei;		// get before copy!
@@ -551,6 +552,7 @@ AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& R0, ASM Op) {
 	R0			= Stack - StepBack;	// NewZero
 	#if DEBUG
 	if (R0->Obj) debugger;
+//	printf("\t\t\t\tReturnAt: %i,  backto: %i\n", JB_ASM_Index(&vm, DebugCode), JB_ASM_Index(&vm, Code));
 	#endif
 //	*R0			= {};			// remove this? unnecessary?
 	
@@ -567,7 +569,7 @@ AlwaysInline ASM* DeRefRegs (CakeVM& vm, VMRegister*& r, ASM Op) {
 		JB_Decr(o2);
 	if (n1)
 		JB_SafeDecr(o1);
-	return ReturnFromFunc(vm, r, (Op>>19)<<19);
+	return ReturnFromFunc(vm, r, (Op>>19)<<19, 0);
 }
 
 
@@ -652,6 +654,7 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 
 	Zero[ 0] = {};
 	int j = Func_JUMPi;
+//	printf("\t\t\t\tCallAt: %i,  jump: %i\n", JB_ASM_Index(&vm, CodePtr), j);
 	return CodePtr + j;
 }
 

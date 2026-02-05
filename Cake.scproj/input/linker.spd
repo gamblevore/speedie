@@ -30,7 +30,7 @@ module SpdTable
 		error "Init failed"
 	
 	
-	function Message.CodeLength (|int|)
+	function Message.PreLoadLength (|int|)
 		opt norefcounts
 		if .func != @tmp
 			return .Length
@@ -50,7 +50,7 @@ module SpdTable
 				spd.tag = .funcs.Length
 				spd.Position = CodeLength
 				.funcs <~ spd
-				CodeLength += spd.CodeLength>>2
+				CodeLength += spd.PreLoadLength>>2
 			expect (.funcs < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
 
 		.Funcs.Shrink		
@@ -72,13 +72,17 @@ module SpdTable
 		|| i = .Position
 			return cake.BeginCode + i
 	
-
+	
+	function spdfunc.length
+		disabled "Do you mean message.length or spdfunc.rangelength?"
+		
+		
 	function spdfunc.Link❗
 		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
 		|| Code = .position$
 		spdtable.CurrFunc = self
 		|| Base = Cake.BeginCode + Code
-		|| after = base + .Length
+		|| after = base + .RangeLength
 
 		while base < after
 			|| asm = base[]
@@ -105,8 +109,9 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFu
 			|| Jump = (Pos - Self)|int|						// 19-bits
 //			Jump -= (op&1) + 1
 			Jump -= 2
-			if  Jump&(19~bits)  ==  Jump
-				self[] = (Jump<<0) ||| (Reg << 19) ||| (Op<<24)
+			|| EncodedJump = Jump&19~bits
+			if  (EncodedJump<<13)>>13  ==  Jump
+				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op<<24)
 				return
 
 			error (SpdTable.CurrFunc, "Executable too large to link: " + fn.name )

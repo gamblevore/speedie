@@ -104,7 +104,7 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	|| Start = .StartAdd
 	|| Positions = SourceMap.Reserve(t*4)
 	|| Addr = .reserve(t*4)|&asm|
-/	|| after = fn.ASMBake(Addr, Addr+t, Positions)
+	|| after = fn.ASMBake(Addr, Addr+t, Positions)
 	.FinishAdd(@bin, Start)
 	expect (after-Addr == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)

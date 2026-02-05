@@ -27,7 +27,7 @@ role SpdFunc (message)
 		if .func != @tmp
 			.func = @tmp
 			.name = "(unnamed)"
-		.first.remove
+//		.first.remove
 	
 
 	function Run (|&ivec4|)

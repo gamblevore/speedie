@@ -377,7 +377,7 @@ forms
 		u1 = (uint64)(&u2)
 
 /**/ RET (Ret)				// ret: 
-		Code = ReturnFromFunc(vm, r, Op)
+		Code = ReturnFromFunc(vm, r, Op, Code)
 
 POS 2
 	TAIL (Tail)

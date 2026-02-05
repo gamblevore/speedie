@@ -34,7 +34,7 @@
 ı GRAB:;
 	u1 = (uint64)(&u2);
 ı RET:;
-	Code = ReturnFromFunc(vm, r, Op);
+	Code = ReturnFromFunc(vm, r, Op, Code);
 ı AFNC:;
 	i1 = FuncAddr(vm, Op, Code);
 ı ALLO:;
