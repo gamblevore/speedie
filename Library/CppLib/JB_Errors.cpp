@@ -118,10 +118,10 @@ static JB_String* Path_(JB_String* self) {
 }
 
 
-int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char* BackupErr, const char* op, int Severity, const char* verb) {
+int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char* DefaultErr, const char* op, int Severity, const char* verb) {
 	if (!errnum)
 		return 0;
-	JB_String* Desc = Desc_(self, other, errnum, BackupErr, op, verb);
+	JB_String* Desc = Desc_(self, other, errnum, DefaultErr, op, verb);
 	JB_String* Path = Path_(self);
 	extern JB_Class JB_ErrorData;
 	JB_Error* Err = (JB_Error*)JB_NewClass(&JB_ErrorData);

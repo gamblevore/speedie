@@ -185,13 +185,16 @@ class Error (Message)
 		fs <~ ": "
 		fs <~ .name
 		.GrabLine(fs)
+		if .StackTrace
+			fs <~ "\n"
+			fs <~ .StackTrace
 
 
 	module
 			
 		|message|		BackupErrorSource
-		|byte|			AutoPrint = 0 // errorflags.PrintAndRemove
-		|bool|			KeepStackTrace = false
+		|byte|			AutoPrint			// Can be set to PrintAndRemove
+		|bool|			KeepStackTrace
 
 
 

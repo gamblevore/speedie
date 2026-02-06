@@ -30,10 +30,10 @@ jmp_buf 		VMRestorer;
 #include "JB_VM_Helpers.i"
 
 
-#define ı		Op = *Code++;   goto *JumpTable[Op>>24];
+#define ı			 Op = *Code++;   goto *JumpTable[Op>>24];
 #define VMCodePtr(V) ((ASM*)(((byte*)(V)) + 1024*1024))
 #define CanDebug(V)  (((uint64)(V))>>63)
-
+#define StackOverFlowErr (1<<10)
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	if_rare (!V)
@@ -95,6 +95,20 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 }
 
 
+static int StackOverFlow (CakeVM* V) {
+	VMStack* Stack = V->CurrStack;
+	if ( (byte*)Stack >= ((byte*)V)+(1024*1024*2) )
+		return 2; // really far out
+	if ( (byte*)Stack < (byte*)(V+1) )
+		return -1;
+	
+	if ( ((ASM*)(Stack+32) < VMCodePtr(V)))
+		return 0;
+	V->ErrNo = errno | StackOverFlowErr;
+	return 1;
+}
+
+
 #define EROR HALT
 static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__
 static void * const GlobalJumpTable[] = {
@@ -117,10 +131,9 @@ static void * const GlobalJumpTable[] = {
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
 	EXIT:;
-	if (VMCodePtr(&vm)[-1] != VMHexEndStack) {
-		debugger;
-	}
-
+	
+	if (StackOverFlow(&vm))
+		return 0;
     return &vm.Registers[1].Ivec;
 	
 	PAUSE:;											// Assume was in debug mode
@@ -154,6 +167,7 @@ static void * const GlobalJumpTable[] = {
 				Op = *Code++;
 		}
 	}
+	
 	goto *JumpTable[256+(Op>>24)];					// Resume
 }
 
@@ -177,22 +191,22 @@ int JB_ASM_StackCode (CakeVM* vm, ivec4* Reg0) {
 
 
 void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
-	vm->Env.LibGlobs = LibGlobs;
-	vm->Env.PackGlobs = PackGlobs;
-	vm->Env.CppFuncs = (Fn0*)CppFuncs;
+	vm->LibGlobs = LibGlobs;
+	vm->PackGlobs = PackGlobs;
+	vm->CppFuncs = (Fn0*)CppFuncs;
 }
 
 
 void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
-	if (vm->Env.CppFuncs)
-		return (void**)(vm->Env.CppFuncs);
+	if (vm->CppFuncs)
+		return (void**)(vm->CppFuncs);
 	int FuncBytes = sizeof(void*) * FuncCount;
 	auto Result = (byte*)calloc(FuncBytes + GlobBytes + 8, 1);
 	if (Result) {
 		((int64*)(Result + GlobBytes))[0] = 0x12345789ABCDEFED; // sentinel
-		vm->Env.PackGlobs = Result;
-		vm->Env.CppFuncs = (Fn0*)(Result + GlobBytes + 8);
-		return (void**)(vm->Env.CppFuncs);
+		vm->PackGlobs = Result;
+		vm->CppFuncs = (Fn0*)(Result + GlobBytes + 8);
+		return (void**)(vm->CppFuncs);
 	}
 	return 0;
 }
@@ -206,7 +220,7 @@ static ASM* VMProtect (CakeVM& V, bool Protect) {
 	if (CanWrite  !=  (F&PROT_WRITE)) {
 		int Err = mprotect(Code, CakeCodeMax*4, PROT_READ|CanWrite);
 		if (Err) {
-			V.CantProtect = true; // JB_ErrorHandleFileC(nil, errno, "mprotect(CakeVM.Code)"); // too aggressive 
+			V.ErrNo = errno; // JB_ErrorHandleFileC is too aggressive for this
 			return Code;
 		}
 		F = (F & ~PROT_WRITE) | CanWrite;
@@ -237,6 +251,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 		JB_ErrorHandleFileC(nil, errno, "mmap CakeVM");
 		return 0;
 	}
+	
 	memzero(V, AllocSize);
 	auto HighBit = 1ull << 63ull;
 	V = (CakeVM*)(((int64)V)&~HighBit);
@@ -268,18 +283,29 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Stack.Code = Code + CakeCodeMax-1;
 	if (Stack.Code[0] == VMHexEndCode)
 		return __CAKE_VM__(V, VMProtect(V, true) + CodeIndex, 0);
-	V.StackOverFlow = true;
+	V.ErrNo |= StackOverFlowErr;
 	return 0;
 }
 
 
 static ivec4* Crashed (CakeVM* V, int Signal) {
-	VMStack* Stack = V->CurrStack;
-	Stack += 32;
+	Signal |= 128;
+	errno = Signal;
+	char ErrorBuff[40];
 	const char* ErrStr = "Run CakeVM";
-	if ((ASM*)Stack >= VMCodePtr(V))
-		V->StackOverFlow = true;
-	JB_ErrorHandleFileC(nil, Signal|128, ErrStr);
+	int OverFlow = StackOverFlow(V);
+	
+	if (OverFlow < 0) {
+		ErrStr = "StackUnderFlow";
+	} else if (OverFlow > 1) {
+		ErrStr = "StackPointerCorrupt";
+	} else if (OverFlow == 1) {
+		auto Stack = V->CurrStack;
+		int Depth = Stack->Depth;
+		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
+		ErrStr = ErrorBuff;
+	}
+	JB_ErrorHandleFileC(nil, Signal, ErrStr);
 	return 0; 
 }
 

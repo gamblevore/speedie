@@ -35,24 +35,18 @@ typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 
 
 
-struct vm_globs {
+struct CakeVM {
+    int				ErrNo;
+    int				VFlags;
     byte*			LibGlobs;
     byte*			PackGlobs;
     Fn0*			CppFuncs;
-};
-
-
-struct CakeVM {
-	vm_globs		Env;
     byte*			AllocBase;
     int				AllocCurr;
-    bool			CantProtect;
-    bool			StackOverFlow;
     JB_ASM_Break	__VIEW__;
     
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];
-    int				VFlags;
     VMStack*		CurrStack;
     
     ASM				ExitGuard;

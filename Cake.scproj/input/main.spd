@@ -12,6 +12,8 @@ module Cake
 main
 	opt NoRefCounts	
 	error.AutoPrint = 1
+	error.KeepStackTrace = true
+	
 	expect (cake.BeginCode) ("Can't allocate VM")
 	require cake.InputFile
 	
@@ -22,6 +24,6 @@ main
 		for f in SpdTable.funcs
 			f.Link❗
 		require debugger.Load
-		return SpdTable.RunMain
+		return SpdTable.RunProgram
 	return 1
 

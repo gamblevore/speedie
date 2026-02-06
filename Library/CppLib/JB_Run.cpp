@@ -192,7 +192,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_TaskData.Size = 128;
 	Flow_Disabled = 0x7fffFFFF;
 	JB_CollectClassDepths();
-	;
+
 #if __APPLE__
 	pthread_setname_np(JB_ThreadName); // why?
 #else

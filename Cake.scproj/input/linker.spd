@@ -20,18 +20,19 @@ module SpdTable
 			error "Can't find code index: " + index
 	
 	
-	function RunMain (|ind|)
+	function RunProgram (|ind|)
 		opt norefcounts
 		|| main = .funcs[2]					#expect ("Missing main")
 		|| init = .funcs[1]!
 		debugger.Start
+
 		|| ExitReg = init.Run
-		if (ExitReg and ExitReg|&int64|[] == 0)
-			ExitReg = main.Run
-			if ExitReg
-				return ExitReg|&int64|[]
-		error "Init failed"
-	
+		expect (ExitReg and ExitReg|&int64|[] == 0) "Init failed"
+		ExitReg = main.Run
+		if ExitReg
+			return ExitReg|&int64|[]
+		return Cake.vm.ErrNo ?? -1
+
 	
 	function Message.PreLoadLength (|int|)
 		opt norefcounts
@@ -39,7 +40,8 @@ module SpdTable
 			return .Length
 		|| f = .first
 			return f.Length
-		
+	
+	
 	function PreLoad (|message| code)
 		opt norefcounts
 		.funcs <~ SpdFunc()							// null func

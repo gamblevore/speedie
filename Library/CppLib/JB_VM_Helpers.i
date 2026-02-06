@@ -247,13 +247,13 @@ AlwaysInline JB_Object* alloc(void* o) {
 u64 table (CakeVM& vm, ASM Op) {
 	auto Add = GTable_Addu<<6;
 	if (GTable_Modeu)
-		return (u64)(vm.Env.LibGlobs+Add);
-	return (u64)(vm.Env.PackGlobs+Add);
+		return (u64)(vm.LibGlobs+Add);
+	return (u64)(vm.PackGlobs+Add);
 }
 
 
 JB_Object* strs (CakeVM& vm, ASM Op) {
-	auto Where = GObj_Modeu?vm.Env.LibGlobs:vm.Env.PackGlobs;
+	auto Where = GObj_Modeu?vm.LibGlobs:vm.PackGlobs;
 	auto Str = ((JB_Object**)(Where))[GObj_Addu];
 	if (GObj_Refu)
 		JB_Incr(Str);
@@ -679,7 +679,7 @@ extern "C"  __attribute__((sysv_abi))   void  __CAKE_BRIDGE__ (u64 data, Fn0 fn,
 
 AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
-		return (int64)(vv.Env.CppFuncs[FuncAddr_Indexu]);
+		return (int64)(vv.CppFuncs[FuncAddr_Indexu]);
 	return (int64)(Code+FuncAddr_Indexi);
 }
 
@@ -687,7 +687,7 @@ AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
-	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.CppFuncs[T]);
+	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.CppFuncs[T]);
 	return __CAKE_BRIDGE__(funcdata, fn, r, n1);
 }
 

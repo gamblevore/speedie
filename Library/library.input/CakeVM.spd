@@ -2,11 +2,17 @@
 
 
 struct CakeVM {
+//|int| ErrNo
+
 linkage: cpp_class CakeVM, wrapper
 
 constants
 	TrapTooFar		= 16
 	CanDebug		= 32
+
+
+inline ErrNo (|int|)
+	return self|&int|[]&255
 
 
 target cpp or vm {
