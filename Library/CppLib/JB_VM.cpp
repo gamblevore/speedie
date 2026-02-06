@@ -16,9 +16,12 @@ Design:
 #define __H__  inline
 #include "JB_Vectors.cpp"
 #include <sys/mman.h>
+#include <setjmp.h>
 
 
 extern "C" {
+jmp_buf 		VMRestorer;
+
 #ifdef __VM__
 #pragma GCC optimize ("Os")
 
@@ -28,8 +31,9 @@ extern "C" {
 
 
 #define ı		Op = *Code++;   goto *JumpTable[Op>>24];
-#define VMCodePtr(V) ((ASM*)(((byte*)(V)) + (V)->StackSize))
+#define VMCodePtr(V) ((ASM*)(((byte*)(V)) + 1024*1024))
 #define CanDebug(V)  (((uint64)(V))>>63)
+
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	if_rare (!V)
@@ -42,7 +46,7 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 
 int JB_ASM_Index (CakeVM* vm, ASM* Code) {
-	ASM* Start = VMCodePtr(vm);//(ASM*)(((byte*)vm) + vm->StackSize);
+	ASM* Start = VMCodePtr(vm);
 	if (Code < Start)
 		return -1;
 	if (Code >= Start + CakeCodeMax)
@@ -113,6 +117,10 @@ static void * const GlobalJumpTable[] = {
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
 	EXIT:;
+	if (VMCodePtr(&vm)[-1] != VMHexEndStack) {
+		debugger;
+	}
+
     return &vm.Registers[1].Ivec;
 	
 	PAUSE:;											// Assume was in debug mode
@@ -190,71 +198,112 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 }
 
 
+static ASM* VMProtect (CakeVM& V, bool Protect) {
+	ASM* Code = VMCodePtr(&V);
+	Code = (ASM*)((((int64)Code)<<1)>>1);
+	int F = V.VFlags;
+	int CanWrite = PROT_WRITE*(!Protect);
+	if (CanWrite  !=  (F&PROT_WRITE)) {
+		int Err = mprotect(Code, CakeCodeMax*4, PROT_READ|CanWrite);
+		if (Err) {
+			V.CantProtect = true; // JB_ErrorHandleFileC(nil, errno, "mprotect(CakeVM.Code)"); // too aggressive 
+			return Code;
+		}
+		F = (F & ~PROT_WRITE) | CanWrite;
+		V.VFlags = F;
+	}
+	return Code;
+}
+
+
 ASM* JB_ASM_Code (CakeVM* V, int Length) {
 	if_rare (!V or (uint)Length > CakeCodeMax)
 		return 0;
-	auto D = VMCodePtr(V);
-
-	int F = V->VFlags;
-	if (F&kJB_VM_IsProtected) {
-		if (mprotect(D, CakeCodeMax*4, PROT_WRITE|PROT_READ)==0)	// unprotect
-			F &=~ kJB_VM_IsProtected;
-		V->VFlags = F;
-	}
-	return D;
+	return VMProtect(*V, false);
 }
 
 
-CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns deep.
+CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	const int Page = 16*1024;
-	Flags &=~ kJB_VM_IsProtected;
-	StackSize = StackSize&~(Page-1);						// remove garbage
+	int StackSize = 1024*1024;
 	
-	StackSize = std::max(StackSize, 256*1024);
 	int AllocSize = StackSize + CakeCodeMax*4;
 	if (Flags&kJB_VM_AskDebug)
 		AllocSize += CakeCodeMax*4;
-	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);		// page aligned. Can call mprotect later.
-	if (V) {
-		auto HighBit = 1ull << 63ull;
-		V = (CakeVM*)(((int64)V)&~HighBit);
-		if (Flags&kJB_VM_AskDebug)
-			V = (CakeVM*)(((int64)(V)) | HighBit);
-		memzero(V, AllocSize);
-		V->VFlags = Flags;
-		V->StackSize = StackSize;
-		VMCodePtr(V)[CakeCodeMax-1] = VMHexEndCode;
-		__CAKE_VM__(*V, 0, StackSize);
+	
+	Flags |= PROT_READ | PROT_WRITE;
+	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);
+	if (!V) {
+		JB_ErrorHandleFileC(nil, errno, "mmap CakeVM");
+		return 0;
 	}
+	memzero(V, AllocSize);
+	auto HighBit = 1ull << 63ull;
+	V = (CakeVM*)(((int64)V)&~HighBit);
+	if (Flags&kJB_VM_AskDebug)
+		V = (CakeVM*)(((int64)(V)) | HighBit);
+	
+	V->VFlags = Flags;
+	VMCodePtr(V)[CakeCodeMax-1] = VMHexEndCode;
+	VMCodePtr(V)[-1] = VMHexEndStack;
+	
+	__CAKE_VM__(*V, 0, StackSize);
 	return V;
 }
+
 
 
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
 	V.Registers[0] = {};
 	V.Registers[2] = {};
+	if (!V.__VIEW__) V.__VIEW__ = JB_ASM_NoBreak;
 	auto& Stack = V.Registers[1].Stack;
+	V.CurrStack = (VMStack*)(&Stack);
 	Stack.DestReg = 1;
 	Stack.Alloc = 0;
 	Stack.Depth = 1;
 	Stack.Marker2 = 123;
 	ASM* Code = VMCodePtr(&V);
 	Stack.Code = Code + CakeCodeMax-1;
-	if (Stack.Code[0]!=VMHexEndCode) // failed!
-		return 0;
-	int F = V.VFlags;
-	if (!V.__VIEW__) V.__VIEW__ = JB_ASM_NoBreak;
-	if (~F&kJB_VM_IsProtected and F&kJB_VM_WantProtect)
-		if (mprotect(Code, CakeCodeMax*4, PROT_READ) == 0)				// protect!
-			V.VFlags |= kJB_VM_IsProtected;
-	return __CAKE_VM__(V, Code + CodeIndex, 0);
+	if (Stack.Code[0] == VMHexEndCode)
+		return __CAKE_VM__(V, VMProtect(V, true) + CodeIndex, 0);
+	V.StackOverFlow = true;
+	return 0;
+}
+
+
+static ivec4* Crashed (CakeVM* V, int Signal) {
+	VMStack* Stack = V->CurrStack;
+	Stack += 32;
+	const char* ErrStr = "Run CakeVM";
+	if ((ASM*)Stack >= VMCodePtr(V))
+		V->StackOverFlow = true;
+	JB_ErrorHandleFileC(nil, Signal|128, ErrStr);
+	return 0; 
+}
+
+
+static void CakeCorrupt (int Sig) {
+	longjmp(VMRestorer, Sig);
 }
 
 
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
-	return JB_ASM_Run_(*V, Code); // i can't stand pointer syntax.
+#ifdef DEBUG
+	static_assert((sizeof(VMRegister) == sizeof(VMStack)), "sizeof type");
+#endif
+
+	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
+	auto OldBus = signal(SIGBUS,  CakeCorrupt);
+
+	int Signal = setjmp(VMRestorer);
+	ivec4* Reg =  Signal  ?  Crashed(V, Signal)  :  JB_ASM_Run_(*V, Code);
+	signal(SIGSEGV, OldSeg);
+	signal(SIGBUS, OldBus);
+	return Reg;
 }
+
 
 #else
 
@@ -267,7 +316,7 @@ int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
 void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}
 u32*	JB_ASM_Code			(CakeVM* V, int Length)					{return 0;}
-CakeVM* JB_ASM__VM			(int StackSize, int Flags)				{return 0;}
+CakeVM* JB_ASM__VM			(int Flags)								{return 0;}
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex)				{return 0;}
 
 #endif

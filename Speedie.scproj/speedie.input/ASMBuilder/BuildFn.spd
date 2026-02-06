@@ -1,7 +1,7 @@
 
 
 target debug and vm
-	|!&CakeVM| TestVM = CakeVM(1MB, cakevm.WantProtect)
+	|!&CakeVM| TestVM = CakeVM(1MB)
 
   
 extend_module ASM

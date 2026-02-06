@@ -63,8 +63,13 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 			  else
 				str = EmptyPath;
 		}
-		if (!str)
-			str = strerror(err);
+		if (!str) {
+			if (err > 0 and err <= ELAST)
+				str = strerror(err);
+			  else if (err >= 128 and err < 256) {
+				str = strsignal(err&~128);
+			}
+		}
 	}
 	if (str)
 		JB_FS_AppendCString(FS, str);

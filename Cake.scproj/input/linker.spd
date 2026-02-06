@@ -25,9 +25,11 @@ module SpdTable
 		|| main = .funcs[2]					#expect ("Missing main")
 		|| init = .funcs[1]!
 		debugger.Start
-		if (init.Run|&int64|[] == 0)
-			|| ExitReg = main.Run
-			return ExitReg|&int64|[]
+		|| ExitReg = init.Run
+		if (ExitReg and ExitReg|&int64|[] == 0)
+			ExitReg = main.Run
+			if ExitReg
+				return ExitReg|&int64|[]
 		error "Init failed"
 	
 	

@@ -5,9 +5,8 @@ struct CakeVM {
 linkage: cpp_class CakeVM, wrapper
 
 constants
-	TrapTooFar		= 1
-	WantProtect		= 2
-	CanDebug		= 4
+	TrapTooFar		= 16
+	CanDebug		= 32
 
 
 target cpp or vm {
@@ -52,7 +51,7 @@ target cpp or vm {
 	function DummyChef (CakeChef)
 
 	module
-		function New	(|int| StackSize = 1MB, |int| Flags = cakevm.WantProtect ||| cakevm.CanDebug, |&CakeVM|)
+		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
 	
 	prototype CakeChef (|int| Index,  |int| BreakValue,  |&ivec4| Reg0,  |int64|)

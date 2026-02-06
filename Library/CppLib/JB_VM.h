@@ -1,6 +1,7 @@
 
 #define CakeCodeMax		(1024*256)
-#define VMHexEndCode	0xBADA55 
+#define VMHexEndCode	0x00BADA55 
+#define VMHexEndStack	0xBAD57ACC 
 
 
 #define std_swap std::swap
@@ -45,22 +46,23 @@ struct CakeVM {
 	vm_globs		Env;
     byte*			AllocBase;
     int				AllocCurr;
-    int				StackSize;
+    bool			CantProtect;
+    bool			StackOverFlow;
     JB_ASM_Break	__VIEW__;
     
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];
     int				VFlags;
+    VMStack*		CurrStack;
     
     ASM				ExitGuard;
 	VMRegister		Registers[];
 };
 
 
-#define kJB_VM_TrapTooFar 1
-#define kJB_VM_WantProtect 2
-#define kJB_VM_IsProtected (1<<31)
-#define kJB_VM_AskDebug 4
+#define kJB_VM_WantProtect 8
+#define kJB_VM_TrapTooFar 16
+#define kJB_VM_AskDebug 32
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))

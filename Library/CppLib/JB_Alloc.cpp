@@ -658,15 +658,13 @@ static int ObjIsValid (JB_Object* Obj) {
 
 
 int JB_CanReadMemory (void* B, int N) {
-	int C = setjmp(MemFailJump);
-	if (C)
-		return C;
-
 	if (!B or !N) return -1;
 
 	auto OldSeg = signal(SIGSEGV, MemoryAccessError);
 	auto OldBus = signal(SIGBUS, MemoryAccessError);
-	int Err =  (N < 0)  ?  ObjIsValid((JB_Object*)B)  :  ReadMemory((byte*)B, N);
+	int Err = setjmp(MemFailJump);
+	if (!Err)
+		Err =  (N < 0)  ?  ObjIsValid((JB_Object*)B)  :  ReadMemory((byte*)B, N);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
 	return Err;

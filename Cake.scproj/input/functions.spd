@@ -30,12 +30,11 @@ role SpdFunc (message)
 //		.first.remove
 	
 
-	function Run (|&ivec4|)
+	function Run (|?&ivec4|)
 		cake.VM.Registers
 		|| Code = .Position
 		if code >= 0
 			return cake.VM.Run(Code)
-		return Dummy		
 
 
 	function DebugSuccess (|int| id)
@@ -46,7 +45,4 @@ role SpdFunc (message)
 		opt norefcounts
 		.obj = .Last.xvariables
 		
-	
-	module
-		|ivec4| Dummy
 

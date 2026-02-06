@@ -96,7 +96,7 @@ void	JB_InitClassList	(SaverLoadClass fn);
 struct	CakeVM;
 typedef int64 (*JB_ASM_Break)(CakeVM* VM, int Index, int BreakValue, ivec4* Reg0);
 
-CakeVM*	JB_ASM__VM			(int StackSize, int Flags);
+CakeVM*	JB_ASM__VM			(int Flags);
 u32*	JB_ASM_Code			(CakeVM* V, int Length);
 int		JB_ASM_Index		(CakeVM* V, u32* Code);
 ivec4*	JB_ASM_PrevStack	(CakeVM* V, ivec4* Reg0);
