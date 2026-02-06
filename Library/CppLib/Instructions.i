@@ -1,5 +1,8 @@
 ı HALT:;
-	if (!VMFinish(r, Op)) goto EXIT;
+	if (Op != VMHexEndCode)
+	JB_ASM_Debug(vm, Code - 1, r)
+;
+	goto EXIT;
 ı TAIL:;
 	TailStack(vm, r, Code, Op);
 ı KNST2:;
@@ -18,7 +21,7 @@
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
 ı TRAP:;
-	((0));
+	goto BREAK;
 ı NOOP:;
 	i1 = i1;
 	// NOOP

@@ -1,5 +1,7 @@
 
-#define CakeCodeMax (1024*256)
+#define CakeCodeMax		(1024*256)
+#define VMHexEndCode	0xBADA55 
+
 
 #define std_swap std::swap
 #if __CPU_TYPE__ == __CPU_ARM__

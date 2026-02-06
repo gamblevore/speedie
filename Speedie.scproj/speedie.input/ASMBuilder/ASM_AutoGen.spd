@@ -249,9 +249,8 @@ datatype ASM_HALT (ASM) {
 			visible true
 			|asm| rz = .op|asm| << 24
 			rz.r1 = .prms[0]
-			rz.r2 = .prms[1]
-			rz.HALT_SigNum = .prms[2]
-			rz.HALT_Continue = .prms[3]
+			rz.HALT_SigNum = .prms[1]
+			rz.HALT_ExitCode = .prms[2]
 			rz.HALT_L = .prms[5]
 			if curr < after {
 				curr++[] = rz

@@ -81,14 +81,13 @@ function message.KNST3 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |i
 }
 
 
-function message.HALT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| SigNum = nil, |int| Continue = nil, |&fatasm|) {
+function message.HALT (|asmreg| r1 = nil, |int| SigNum = nil, |int| ExitCode = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.HALT, self)
 	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.numinput(2) = SigNum
-	rz.numinput(3) = Continue
+	rz.numinput(1) = SigNum
+	rz.numinput(2) = ExitCode
 }
 
 

@@ -41,6 +41,22 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 }
 
 
+int JB_ASM_Index (CakeVM* vm, ASM* Code) {
+	ASM* Start = VMCodePtr(vm);//(ASM*)(((byte*)vm) + vm->StackSize);
+	if (Code < Start)
+		return -1;
+	if (Code >= Start + CakeCodeMax)
+		return -1;
+	return (int)(Code - Start);
+}
+
+
+int64 JB_ASM_Debug (CakeVM& vm, ASM* Code, VMRegister* r) {
+	auto Index = JB_ASM_Index(&vm, Code);
+	auto Break = (Code[CakeCodeMax]<<1)>>1;
+	return (vm.__VIEW__)(&vm, Index, Break, (ivec4*)r);
+}
+
 
 void JB_ASM_Pause (CakeVM* V) {
 	if CanDebug(V) {
@@ -89,7 +105,7 @@ static void * const GlobalJumpTable[] = {
 		return 0;
 	}
   
-    RegVar(r, r21) = vm.Registers+2;
+    RegVar(r, r21) = vm.Registers + 2;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
 	Op = *Code++;									// spelled out for debug
 
@@ -117,36 +133,20 @@ static void * const GlobalJumpTable[] = {
 		}
 	}
 	
-	BREAK:;	{										// the actual breakpoint
-		auto Index = JB_ASM_Index(&vm, Code-1);
-		auto Break = (Code[CakeCodeMax-1]<<1)>>1;
-		int64 Value = (vm.__VIEW__)(&vm, Index, Break, (ivec4*)r);
+	BREAK:;	{										// The actual breakpoint
+		int64 Value = JB_ASM_Debug(vm, Code-1, r);
 		if_rare (Value) {
-			if (Value < 0) {			// jump back? i guess so?
-				Code += Value;
-				if (Code < VMCodePtr(&vm))
-					Code -= Value;		// Debugger jumped out of range!!
-				  else 
-					Op = *Code++;
-			} else if (Value < 256) {
-				exit((int)Value);
-			} else {
-			// if value !=256 maybe better to actually put an error somewhere.
-				return 0;
-			}
+			if (Value >= 256) return 0;				// Should we set an error in the VM?
+			if (Value >= 0)   exit((int)Value);
+						
+			Code += Value;							// Jump back? I guess so?
+			if (Code < VMCodePtr(&vm))
+				Code -= Value;						// Debugger jumped out of range!!
+			  else 
+				Op = *Code++;
 		}
 	}
 	goto *JumpTable[256+(Op>>24)];					// Resume
-}
-
-
-int JB_ASM_Index (CakeVM* vm, ASM* Code) {
-	ASM* Start = VMCodePtr(vm);//(ASM*)(((byte*)vm) + vm->StackSize);
-	if (Code < Start)
-		return -1;
-	if (Code >= Start + CakeCodeMax)
-		return -1;
-	return (int)(Code - Start);
 }
 
 
@@ -190,7 +190,6 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 }
 
 
-
 ASM* JB_ASM_Code (CakeVM* V, int Length) {
 	if_rare (!V or (uint)Length > CakeCodeMax)
 		return 0;
@@ -224,6 +223,7 @@ CakeVM* JB_ASM__VM (int StackSize, int Flags) {				// 256K is around 1600 ~fns d
 		memzero(V, AllocSize);
 		V->VFlags = Flags;
 		V->StackSize = StackSize;
+		VMCodePtr(V)[CakeCodeMax-1] = VMHexEndCode;
 		__CAKE_VM__(*V, 0, StackSize);
 	}
 	return V;
@@ -241,7 +241,7 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Stack.Marker2 = 123;
 	ASM* Code = VMCodePtr(&V);
 	Stack.Code = Code + CakeCodeMax-1;
-	if (Stack.Code[0]) // failed!
+	if (Stack.Code[0]!=VMHexEndCode) // failed!
 		return 0;
 	int F = V.VFlags;
 	if (!V.__VIEW__) V.__VIEW__ = JB_ASM_NoBreak;
@@ -255,6 +255,7 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	return JB_ASM_Run_(*V, Code); // i can't stand pointer syntax.
 }
+
 #else
 
 					// Stubs //

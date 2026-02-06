@@ -54,10 +54,9 @@ forms
 		Jmp		j
 
 	HALT
-		r1			r		// Signal
-		r2			r		// Reserved
+		r1			r		// SignalReg
 		SigNum		5		// Intrinsic
-		Continue	4
+		ExitCode	7
 
 	AddOrSubM
 		r1		R
@@ -343,12 +342,13 @@ forms
 
 #!						 (((((STOP)))))
 /**/ HALT (HALT)
-		if (!VMFinish(r, Op)) goto EXIT;
+		if (Op != VMHexEndCode)
+			JB_ASM_Debug(vm, Code-1, r)
+		goto EXIT
 
 
 /**/ TRAP (Trap)
-		// actually a noop. the debugger itself will put this in the shadow
-		((0))
+	goto BREAK  // this could be adapted to send signals also.
 
 
 #!						 (((((UTIL)))))

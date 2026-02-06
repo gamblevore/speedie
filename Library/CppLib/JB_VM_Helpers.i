@@ -622,18 +622,6 @@ AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, i
 }
 
 
-
-AlwaysInline bool VMFinish (VMRegister* r, ASM Op) {
-	int Signal = HALT_SigNumu;
-	if (!Signal)
-		Signal = (int)i1;
-	if (Signal)
-		kill(getpid(), SIGINT);
-	return HALT_Continueu;
-}
-
-
-
 AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
 	auto Zero = SaveVMState(vm, r, CodePtr, n1);
