@@ -77,15 +77,23 @@ int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
 }
 
 
-int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
+/*
+	So...
+	
+	We need to always have exec's debugger in here. always. for stackoverflow reporting.
+	
+	That means we need another param for on/off.
+*/
+ 
+
+int* JB_ASM_SetDebug (CakeVM* V, bool On) {
 	if_rare (!CanDebug(V))
 		return 0;
 	auto J = V->JumpTable;
 	void* Break = J[512];
-	V->__VIEW__ = Value?Value:JB_ASM_NoBreak;
-	if ((Value != nil) != (J[0] == Break)) {
+	if ((On) != (J[0] == Break)) {
 		int i = 256;
-		if (Value) while (--i >= 0)
+		if (On) while (--i >= 0)
 			J[i] = Break;
 		  else
 			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
@@ -98,17 +106,20 @@ int* JB_ASM_SetDebug (CakeVM* V, JB_ASM_Break Value) {
 static int StackOverFlow (CakeVM* V) {
 	VMStack* Stack = V->CurrStack;
 	if ( (byte*)Stack >= ((byte*)V)+(1024*1024*2) )
-		return 2; // really far out
+		return 2;									// Really far out
 	if ( (byte*)Stack < (byte*)(V+1) )
-		return -1;
+		return -1;									// Gone back. Must be corrupt.
 	
-	if ( ((ASM*)(Stack+32) < VMCodePtr(V)))
+	if ( ((ASM*)(Stack+32) < VMCodePtr(V)))			// Still in range
 		return 0;
-	V->ErrNo = errno | StackOverFlowErr;
+		
+	V->ErrNo = errno | StackOverFlowErr;			
+	(V->__VIEW__)(V, -1, 0, (ivec4*)(Stack+1));
 	return 1;
 }
 
 
+ 
 #define EROR HALT
 static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__
 static void * const GlobalJumpTable[] = {
@@ -118,7 +129,7 @@ static void * const GlobalJumpTable[] = {
 };
     if (Op) {
 		vm.OriginalJumpTable = &GlobalJumpTable[0];
-		memcpy(vm.JumpTable, GlobalJumpTable, 256*sizeof(void*));
+		memcpy(vm.JumpTable,     GlobalJumpTable, sizeof(void*)     * 256);
 		memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
 		return 0;
 	}
@@ -132,14 +143,15 @@ static void * const GlobalJumpTable[] = {
 	#include "Instructions.i"
 	EXIT:;
 	
-	if (StackOverFlow(&vm))
+	if (StackOverFlow(&vm)) {
 		return 0;
+	}
     return &vm.Registers[1].Ivec;
 	
 	PAUSE:;											// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
 	for (int i = 0; i < 256; i++)
-		JumpTable[i] = &&TRYBREAK;					// Restore
+		JumpTable[i] = &&TRYBREAK;					// Restore debug mode
 	goto BREAK;
 
 	
@@ -154,6 +166,7 @@ static void * const GlobalJumpTable[] = {
 		}
 	}
 	
+	// stackoverflow should call this also.
 	BREAK:;	{										// The actual breakpoint
 		int64 Value = JB_ASM_Debug(vm, Code-1, r);
 		if_rare (Value) {
@@ -258,6 +271,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	if (Flags&kJB_VM_AskDebug)
 		V = (CakeVM*)(((int64)(V)) | HighBit);
 	
+	V->__VIEW__ = JB_ASM_NoBreak;
 	V->VFlags = Flags;
 	VMCodePtr(V)[CakeCodeMax-1] = VMHexEndCode;
 	VMCodePtr(V)[-1] = VMHexEndStack;
@@ -294,18 +308,26 @@ static ivec4* Crashed (CakeVM* V, int Signal) {
 	char ErrorBuff[40];
 	const char* ErrStr = "Run CakeVM";
 	int OverFlow = StackOverFlow(V);
+	auto Stack = V->CurrStack;
 	
-	if (OverFlow < 0) {
-		ErrStr = "StackUnderFlow";
-	} else if (OverFlow > 1) {
-		ErrStr = "StackPointerCorrupt";
-	} else if (OverFlow == 1) {
-		auto Stack = V->CurrStack;
+	if (OverFlow == 1) {
 		int Depth = Stack->Depth;
 		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
 		ErrStr = ErrorBuff;
+	} else {
+		if (OverFlow)
+			Stack = 0;
+		if (OverFlow < 0) {
+			ErrStr = "StackUnderFlow";
+		} else if (OverFlow > 1) {
+			ErrStr = "StackPointerCorrupt";
+		}
+		OverFlow = 2;
 	}
+	
 	JB_ErrorHandleFileC(nil, Signal, ErrStr);
+	(V->__VIEW__)(V, -OverFlow, 0, (ivec4*)(Stack + !!Stack));
+	
 	return 0; 
 }
 
@@ -337,7 +359,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
 void	JB_ASM_Pause		(CakeVM* V)								{}
-int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value)			{return 0;}
+int*	JB_ASM_SetDebug		(CakeVM* V, bool On)					{return 0;}
 int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
 void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}

@@ -38,12 +38,12 @@ typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 struct CakeVM {
     int				ErrNo;
     int				VFlags;
+    JB_ASM_Break	__VIEW__;
     byte*			LibGlobs;
     byte*			PackGlobs;
     Fn0*			CppFuncs;
     byte*			AllocBase;
     int				AllocCurr;
-    JB_ASM_Break	__VIEW__;
     
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];

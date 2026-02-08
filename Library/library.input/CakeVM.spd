@@ -2,17 +2,15 @@
 
 
 struct CakeVM {
-//|int| ErrNo
+|int|		ErrNo
+|int|		VFlags
+|CakeChef|	__VIEWER__
 
 linkage: cpp_class CakeVM, wrapper
 
 constants
 	TrapTooFar		= 16
 	CanDebug		= 32
-
-
-inline ErrNo (|int|)
-	return self|&int|[]&255
 
 
 target cpp or vm {
@@ -35,7 +33,7 @@ target cpp or vm {
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 		cpp_wrapper JB_ASM_FillTable
 	
-	function IsDebugging (assigns:|CakeChef?| Value, |?&int|)
+	function IsDebugging (|bool| SetDebug, |?&int|)
 		cpp_wrapper JB_ASM_SetDebug
 	
 	function Prev (|&ivec4| Reg0, |&ivec4|)
@@ -47,10 +45,6 @@ target cpp or vm {
 	function Pause
 		cpp_wrapper JB_ASM_Pause
 
-	function IsDebugging (assigns:|bool| Value, |&int|)
-		|| v = (dummychef, nil)(value)
-		return .IsDebugging(v)
-
 	function Index (|&uint| Code,  |int|)
 		cpp_wrapper JB_ASM_Index
 	
@@ -60,7 +54,10 @@ target cpp or vm {
 		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
 	
-	prototype CakeChef (|int| Index,  |int| BreakValue,  |&ivec4| Reg0,  |int64|)
-		// return 0 to continue onwards. return 1-256 to exit the program. return -1 or less to jump backwards
 }
+
+prototype CakeChef (|int| Index,  |int| BreakValue,  |&ivec4| Reg0,  |int64|)
+	// return 0 to continue onwards. return 1-256 to exit the program. Return -1 or less to jump backwards
+
 }
+

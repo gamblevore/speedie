@@ -60,10 +60,9 @@ module debugger
 	
 	
 	function StartUp (|&int|)
-		|| V = &__Viewer__
-		if !debugger.WantDebug and !cake.perry
-			V = nil
-		return cake.VM.IsDebugging(V)
+		|| Dbg = debugger.WantDebug or cake.perry
+		cake.vm.__Viewer__ = __Viewer__
+		return cake.VM.IsDebugging(Dbg)
 	
 	
 	function Path (|int| i, |filewithdata|)

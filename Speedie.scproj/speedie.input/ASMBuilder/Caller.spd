@@ -84,7 +84,7 @@ function RegClear (|message| exp, |&fatasm| C, |int| i)
 	|| L = c.Const
 	|| signed = L < 0
 		L = -L
-	exp.BFLG(i.asm, i.asm, L, L, signed|int|)
+	.BFLG_Sub(exp, i.asm, i.asm, L, L, signed)
 
 
 function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Start)

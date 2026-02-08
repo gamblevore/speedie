@@ -17,12 +17,12 @@ extend_module ASM
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
-				testvm.IsDebugging = true
+				testvm.IsDebugging(true)
 				testvm.load(ff.ptr, ff.length)
 				object.totalsanity
 				testvm.Run(0)
 				object.totalsanity
-				testvm.IsDebugging = false
+				testvm.IsDebugging(false)
 
 
 	function GetASMFunc (|message| m, |scfunction|)

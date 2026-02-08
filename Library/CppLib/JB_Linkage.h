@@ -105,7 +105,7 @@ void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppF
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex);
 void**	JB_ASM_InitTable	(CakeVM* V, int n, int g);
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear);
-int*	JB_ASM_SetDebug		(CakeVM* V, JB_ASM_Break Value);
+int*	JB_ASM_SetDebug		(CakeVM* V, bool On);
 void	JB_ASM_Pause		(CakeVM* V);
 
 } // ExternCEnd

@@ -5,7 +5,7 @@ function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
 	|| sh = Assembler.sh
 	|| closer = sh.OpenVars
 	|| Where = sh.TempOnly(Type|asmreg|)
-	|| dest = .BFLG(where, Src, 32, 32, Src.Signed|int|) * Where
+	|| dest = sh.BFLG_Sub(self, where, Src, 32, 32, Src.Signed)
 	return sh.CloseVars(Closer, dest)
 	
 	

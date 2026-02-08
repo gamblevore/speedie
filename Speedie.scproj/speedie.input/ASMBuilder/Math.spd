@@ -323,7 +323,7 @@ extend Assembler
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
 			if 0: exp.QFLG
-			return exp.BFLG(dest, L,  Pow2-1, 0, 0).Vectorise(Dest, asm.QFLG) // y = x * 4  -->  y = x << 2
+			return .BFLG_Sub(Exp, dest, L,  Pow2-1, 0, false) // y = x * 4  -->  y = x << 2
 			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
 			if 0: exp.QADD, exp.QSUB
@@ -462,7 +462,7 @@ extend Assembler
 		if src.issmall and cmp.IsBig
 			cmp.reg = 0
 			|| dest = .TempOnly(cmp)
-			return exp.BFLG(dest, src, 32, 32, 0) * dest
+			return .BFLG_Sub(exp, dest, src, 32, 32, false)
 		return src
 		
 
@@ -590,7 +590,7 @@ extend Assembler
 				exp.DivByZero
 			return .Quick1Or1Sub(dest, l, ptoi, exp)
 		if !l.Signed
-			return exp.BFLG(dest, l, 0, ptoi-1, 0).Vectorise(Dest, asm.QFLG)		// u / 2 --> u >> 1
+			return .BFLG_Sub(exp, dest, l, 0, ptoi-1, false)							// u / 2 --> u >> 1
 		return exp.DIV2(dest, l, l.Bitloss, ptoi-1) * Dest		// nice
 
 
@@ -735,16 +735,29 @@ extend Assembler
 		if 0: exp.qand
 		return .BitMaker(dest, l, r, exp, asm.band, asm.QAND)
 	
-	
+
+	function CanBAND_BFLG (|asmreg| R, |int|)
+		if R is Const
+			|| k = R.const
+			if k and (++k).IsPow2
+				.NopConst(R)
+				return 64 - k.Log2
+
+		
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp, |asmreg|)
 		if asm.BORK!=asm.borr+4 // what?
 
-		if r.reg and (opp != asm.bnot) and !dest.IsVec
+		if (r.reg) and (opp != asm.bnot) and (!dest.IsVec)
+			if (opp == asm.BAND)
+				|| B = .CanBAND_BFLG(R)
+					return .BFLG_Sub(exp, dest, L, B, B, false)
+			
 			|| k = .Const(R, 14, true)
 				if 0:  exp.BORK,  exp.BXRK
-				|| fat = exp.BANK(dest, L, K) 
+				|| fat = exp.BANK(Dest, L, K)
 				fat._op = opp+4
 				return fat * Dest
+
 				
 		|| Clear = l.BitCount - r.BitCount
 		if Clear < 0
@@ -850,7 +863,11 @@ extend Assembler
 		|| Extra = 64 - SrcBits
 		up += Extra
 		down += Extra
-		
+		return .BFLG_Sub(Exp, dest, src, up, down, src.signed)
+
+
+	function BFLG_Sub (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |bool| Sign, |asmreg|)
+		if "IsFloat".trap
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest)
 
@@ -862,7 +879,7 @@ extend Assembler
 			|| Merge = .MergeBFLG(exp, dest, src, up, down, old)
 				return Merge
 		
-		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
+		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|) 
 		return fat.Vectorise(dest, asm.QFLG)
 
 

@@ -277,7 +277,7 @@ function TypeCast (fn_asm)
 	
 
 	|| sh2 = 64 - NewType.BitCount
-	return exp.BFLG(dest, from, sh2, sh2, dest.signed|int|) * dest
+	return .BFLG_Sub(exp, dest, from, sh2, sh2, dest.signed)
 
 
 

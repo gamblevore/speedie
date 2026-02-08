@@ -614,11 +614,11 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 
 AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, int Dest) { // jumpstack
 	VMRegister* Stack = r + Dest;
-	vm.CurrStack = &Stack->Stack;
 	Stack->Stack.Code = CodePtr;
 	Stack->Stack.DestReg = Dest;
 	Stack->Stack.Depth = r[-1].Stack.Depth+1;
 	Stack->Stack.Alloc = vm.AllocCurr;
+	vm.CurrStack = &Stack->Stack;
 	return Stack+1;
 }
 

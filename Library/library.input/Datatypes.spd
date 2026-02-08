@@ -709,7 +709,7 @@ datatype int64
 			self = -self
 		return self
 
-	inline Log2 (|int64|) // highestbit, highbit
+	inline Log2 (|int|) // highestbit, highbit
 		return (self|uint64|).log2
 	
 	inline IsPow2 (|bool|)
@@ -777,7 +777,7 @@ datatype uint64
 		if self < s: return self
 		return s
 	
-	function Log2 (|int64|)
+	function Log2 (|int|)
 		asm BSTT(dest, p1, 2)
 		cpp_wrapper JB_u64_Log2
 
