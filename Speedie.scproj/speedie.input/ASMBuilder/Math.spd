@@ -828,28 +828,37 @@ extend Assembler
 		return exp.BLSH(dest, L, R, l.bitloss).Vectorise(Dest, asm.QLSH)
 
 
-	function MergeBFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |fatasm| bflg,  |asmreg|)
-		require ((src is temp) or ((src iz dest) and .iscurr(bflg)))
-		// if this test fails... we can STILl opt this! Just take it's input, and make a new µop
-		// in fact, we could make a new op always, if its from a bflg.
-		// allow for the input to be nopped. For example, inline type-casted params, that are now unused.
-		
-		|| oup = bflg.prms[2]
-		|| odw = bflg.prms[3]
-		require oup == odw and oup >= up and oup >= down // sigh... i can't figure out much else right now.
-		if oup
-			// this logic doesn't make perfect sense either. why add only if its not 0?
-			|| total = up - down
-			if total > 0
-				bflg.prms[2] = oup + total
-			  elseif total < 0
-				bflg.prms[3] = odw - total
-		  else
-			bflg.prms[2] = up
-			bflg.prms[3] = down
 
-// we need to get all the cases below correct, and more. What about upgrades as well as adding?
-		return .ReDest(bflg, dest)
+
+	function MergeBFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |bool| Sign,  |fatasm| bflg,  |asmreg|)
+		// * Must be from the same block.   (temp isnt enough)
+		// * Sign needs checking.
+		// * we need to modify from the bigger values...
+		
+		// (Theres also the sign)
+		
+		|| b_up = bflg.prms[2]
+		|| b_down = bflg.prms[3]
+		|| b_extra = b_up - b_down
+		if b_extra < 0					// x = (x << 10) >> 11
+			require up <= down			// x = (x << 1)				// no way to combine this
+		|| extra = up - down
+		
+		// we need to figure it out in terms of	shift + cleartop + clearbottom
+		// that is the ACTUAL actions... so thats the only thing it can be solved in terms of
+
+// NewMore, OldMore		// a = (a << 20) >> 10,   b = (a << 20) >> 10  -->  b = (a << 30) >> 10
+// NewMore, OldEq		// a = (a << 20) >> 20,   b = (a << 20) >> 10  -->  b = (a << ) >> 
+// NewMore, OldLess		// a = (a << 10) >> 20,   b = (a << 20) >> 10  -->  b = (a << ) >> 
+
+// NewEq  , OldMore		// a = (a << 20) >> 10,   b = (a << 20) >> 20  -->  
+// NewEq  , OldEq		// a = (a << 20) >> 20,   b = (a << 20) >> 20  -->  
+// NewEq  , OldLess		// a = (a << 10) >> 20,   b = (a << 20) >> 20  -->  
+
+// NewLess, OldMore		// a = (a << 20) >> 10,   b = (a << 10) >> 20  -->  
+// NewLess, OldEq		// a = (a << 20) >> 20,   b = (a << 10) >> 20  -->  
+// NewLess, OldLess		// a = (a << 10) >> 20,   b = (a << 10) >> 20  -->  
+		
 		
 
 	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
@@ -874,9 +883,9 @@ extend Assembler
 		if down >= 64
 			down = 63
 		
-		|| old = src.fat
-		if old isa asm.bflg
-			|| Merge = .MergeBFLG(exp, dest, src, up, down, old)
+		|| old = .Register(src.reg)
+		if (old isa asm.bflg) and .iscurr(old)
+			|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign, old)
 				return Merge
 		
 		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|) 
