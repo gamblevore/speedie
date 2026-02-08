@@ -65,6 +65,10 @@ void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
 
 
 // VM 
+struct CakeVM;
+typedef int64 (*JB_ASM_Break)(CakeVM* VM, int Index, int BreakValue, ivec4* Reg0);
+typedef u64 (*Fn0 )();
+
 struct VMStack {
 	u32*		Code;
 	uint		Alloc;			
@@ -90,11 +94,28 @@ struct VMRegister {
 	};
 };
 
+struct CakeVM {
+    int				ErrNo;
+    int				VFlags;
+    JB_ASM_Break	__VIEW__;
+    byte*			LibGlobs;
+    byte*			PackGlobs;
+    Fn0*			CppFuncs;
+    byte*			AllocBase;
+    int				AllocCurr;
+    
+	void*const*		OriginalJumpTable;
+	void*			JumpTable[514];
+    VMStack*		CurrStack;
+    
+    u32				ExitGuard;
+	VMRegister		Registers[];
+};
+
+
 typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
 void	JB_InitClassList	(SaverLoadClass fn);
 
-struct	CakeVM;
-typedef int64 (*JB_ASM_Break)(CakeVM* VM, int Index, int BreakValue, ivec4* Reg0);
 
 CakeVM*	JB_ASM__VM			(int Flags);
 u32*	JB_ASM_Code			(CakeVM* V, int Length);

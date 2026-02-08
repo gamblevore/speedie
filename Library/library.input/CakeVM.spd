@@ -4,7 +4,7 @@
 struct CakeVM {
 |int|		ErrNo
 |int|		VFlags
-|CakeChef|	__VIEWER__
+|CakeChef|	__VIEW__
 
 linkage: cpp_class CakeVM, wrapper
 

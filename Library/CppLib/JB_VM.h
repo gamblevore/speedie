@@ -12,46 +12,12 @@
 #endif
 
 
-
-// // // // // // // // // // // //  
-
 #ifndef ASM
 	#define ASM u32
 #endif
 
+
 typedef u64 (*Fn0 )();
-typedef u64 (*Fn1 )(u64);
-typedef u64 (*Fn2 )(u64, u64);
-typedef u64 (*Fn3 )(u64, u64, u64);
-typedef u64 (*Fn4 )(u64, u64, u64, u64);
-typedef u64 (*Fn5 )(u64, u64, u64, u64, u64);
-typedef u64 (*Fn6 )(u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn7 )(u64, u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn8 )(u64, u64, u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn9 )(u64, u64, u64, u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn10)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn11)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
-
-
-
-struct CakeVM {
-    int				ErrNo;
-    int				VFlags;
-    JB_ASM_Break	__VIEW__;
-    byte*			LibGlobs;
-    byte*			PackGlobs;
-    Fn0*			CppFuncs;
-    byte*			AllocBase;
-    int				AllocCurr;
-    
-	void*const*		OriginalJumpTable;
-	void*			JumpTable[514];
-    VMStack*		CurrStack;
-    
-    ASM				ExitGuard;
-	VMRegister		Registers[];
-};
 
 
 #define kJB_VM_WantProtect 8

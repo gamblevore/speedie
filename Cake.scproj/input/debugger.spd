@@ -61,7 +61,7 @@ module debugger
 	
 	function StartUp (|&int|)
 		|| Dbg = debugger.WantDebug or cake.perry
-		cake.vm.__Viewer__ = __Viewer__
+		cake.vm.__View__ = __Viewer__
 		return cake.VM.IsDebugging(Dbg)
 	
 	
