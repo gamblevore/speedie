@@ -514,6 +514,7 @@ POS 5
 
 
 #!						 (((((MiniCompare)))))
+// maybe good to get a comparison vs a const? do later...
 /**/ EQUL  (CmpI)
 		u1 = BitComp(r, Op)
 

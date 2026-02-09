@@ -131,9 +131,9 @@ function assembler.Killed (|message| exp, |fatasm| fat, |asmreg|)
 	fat.µrefcount++
 	return fat * asmreg.exit
 	
-	|| fat2 = exp.HALT(nil, nil, 3)
-	fat2.µRefCount++
-	return fat2 * asmreg.exit
+//	|| fat2 = exp.HALT(nil, nil, 3)
+//	fat2.µRefCount++
+//	return fat2 * asmreg.exit
 
 
 

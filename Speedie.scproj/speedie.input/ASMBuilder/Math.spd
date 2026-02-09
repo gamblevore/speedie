@@ -707,7 +707,7 @@ extend Assembler
 				return old.µtype(Dest)
 			|| mini = .MiniBFLS(exp, dest, l, r)
 				return mini
-
+		
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
 
@@ -772,33 +772,6 @@ extend Assembler
 		fat._op = opp
 		return fat.Vectorise(dest, vopp)
 
-
-	function BFLG_Right  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| down, |asmreg|)
-		// x = y << 1				// doesn't care about sign
-		// x = x >> 1				// does
-		// -->
-		// bflg: x, y, 1, 1
-/*
-	x = (x << 9)			>> 5
-	x = (x << 9) >> 7       >> 4
-	x = (x >> 7)            >> 3
-*/
-
-		|| xy1 = .last(asm.bflg)$ // what about qflg. allow both?
-		require xy1.RegOnly == src.reg
-		require (src is temp) or (dest iz src)
-
-		// src is temp:     dest = (will_be_temp<<3) >> kDown
-		// dest iz src:     dest = y << 3,  dest = dest >> 3
-		
-		|| sign = xy1.Prms[4] > 0 // dest0, src1, up2, down3, sign4
-		require (sign == src.signed) or !xy1.prms[3]
-		
-		xy1.prms[3] += down
-		if src is temp
-			.ReDest(xy1, dest, 0)
-		return dest
-	
 	
 	function SHR  (fn_opasm)
 		if dest is Const
@@ -806,8 +779,6 @@ extend Assembler
 		|| K = .const(R, 6, false)
 			if k == 0
 				return L
-			|| Opt = .BFLG_Right(exp, dest, l, k)
-				return Opt
 			return .BFLG(exp, dest, l, 0, k)
 		
 		|| fat = exp.BRSH(dest, L, R, l.bitloss)
@@ -828,37 +799,56 @@ extend Assembler
 		return exp.BLSH(dest, L, R, l.bitloss).Vectorise(Dest, asm.QLSH)
 
 
-
-
-	function MergeBFLG  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |bool| Sign,  |fatasm| bflg,  |asmreg|)
-		// * Must be from the same block.   (temp isnt enough)
-		// * Sign needs checking.
-		// * we need to modify from the bigger values...
+	function MergeBFLG (|message| exp, |asmreg| dest, |asmreg| Src, |uint| upB, |uint| downB, |int| SignB,  |asmreg|)
+		// y = (x << a) >> b
+		// z = (y << c) >> d
+		// -->
+		// z = (x << e) >> f // the question is what is E and F.
+		// can it be done, even. The maths is too complex for me to figure out.
+		// So I gave up and brute-forced it.
 		
-		// (Theres also the sign)
+		|| bflg = .Register(src.reg)
+		require (bflg isa asm.bflg) and .iscurr(bflg)
 		
-		|| b_up = bflg.prms[2]
-		|| b_down = bflg.prms[3]
-		|| b_extra = b_up - b_down
-		if b_extra < 0					// x = (x << 10) >> 11
-			require up <= down			// x = (x << 1)				// no way to combine this
-		|| extra = up - down
+		|| UpA = bflg.prms[2]						// check sign!
+		|| DownA = bflg.prms[3]
+		|| SignA = bflg.prms[4]
+		if signA != signB
+			if downa and downb
+				return nil
+			if downa
+				signb = signa
 		
-		// we need to figure it out in terms of	shift + cleartop + clearbottom
-		// that is the ACTUAL actions... so thats the only thing it can be solved in terms of
+		|| Total = (UpA+UpB) - (DownA+DownB)		// check that it can even be done
+		|| Up = .CanMergeBits(upa, downa, upb, downb, total)
+			|| PrevInput = bflg.ASMReg(1)
+			if  src is temp  or  dest iz src
+				src = PrevInput
+				.SoftNop(bflg)						// write over the old
+			  else
+				if PrevInput iz src
+//		BFLG: r3, r3, 0, 0, 0                          /* self.mu.DataType|asmreg| */
+//		BFLG: t4, r3, 0, 11, 0                         /* self|uint64| >> 11 */
+/					return nil // self-replace will fail. We don't have the old version!
+			return exp.BFLG(dest, PrevInput, up, up-total, signb) * dest
 
-// NewMore, OldMore		// a = (a << 20) >> 10,   b = (a << 20) >> 10  -->  b = (a << 30) >> 10
-// NewMore, OldEq		// a = (a << 20) >> 20,   b = (a << 20) >> 10  -->  b = (a << ) >> 
-// NewMore, OldLess		// a = (a << 10) >> 20,   b = (a << 20) >> 10  -->  b = (a << ) >> 
 
-// NewEq  , OldMore		// a = (a << 20) >> 10,   b = (a << 20) >> 20  -->  
-// NewEq  , OldEq		// a = (a << 20) >> 20,   b = (a << 20) >> 20  -->  
-// NewEq  , OldLess		// a = (a << 10) >> 20,   b = (a << 20) >> 20  -->  
-
-// NewLess, OldMore		// a = (a << 20) >> 10,   b = (a << 10) >> 20  -->  
-// NewLess, OldEq		// a = (a << 20) >> 20,   b = (a << 10) >> 20  -->  
-// NewLess, OldLess		// a = (a << 10) >> 20,   b = (a << 10) >> 20  -->  
+	function CanMergeBits (|int| UpA,  |int| DownA,  |int| UpB,  |int| DownB, |int| Total, |ind|)
+		if DownA > UpA
+			require (upb <= downb) // i think this test isn't needed but I can't figure out why.
+		|uint64| MaxB = -1									  // Assume 100% filled
+		|| Target = (MaxB << UpA) >> DownA
+		Target    = (Target << UpB) >> DownB
 		
+		for up in 64
+			|| down = up - Total
+			if down|uint| < 64
+				|| C = MaxB << Up
+				|| D = C >> Down
+				if D == Target
+					return up
+	
+			
 		
 
 	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
@@ -876,17 +866,17 @@ extend Assembler
 
 
 	function BFLG_Sub (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |bool| Sign, |asmreg|)
-		if "IsFloat".trap
+		if !up and !down and dest iz src // oof
+			return src
+		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest)
 
 		if down >= 64
 			down = 63
 		
-		|| old = .Register(src.reg)
-		if (old isa asm.bflg) and .iscurr(old)
-			|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign, old)
-				return Merge
+		|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign|int|)
+			return Merge
 		
 		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|) 
 		return fat.Vectorise(dest, asm.QFLG)
@@ -945,7 +935,14 @@ extend Assembler
 			sh = 0 // no point otherwise. just make the asm simpler.
 				
 		(dest isnt Const)
-		return exp.BFLG(dest, src, sh, sh, src.signed|int|) * Dest
+		// going through bflg_sub would cause issues, like NOT assigning to dest.
+		// assign must assign to dest, the others can return an input if its unchanged.
+
+		|| Sign = src.signed|int|
+		|| Merge = .MergeBFLG(exp, dest, src, sh, sh, Sign)
+/			return Merge
+		
+		return exp.BFLG(dest, src, sh, sh, sign) * Dest
 	
 	
 function int64.Fits (|int| amount, |bool| signed=true,  |bool|)

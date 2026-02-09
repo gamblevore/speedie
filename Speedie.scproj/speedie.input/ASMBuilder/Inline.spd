@@ -15,12 +15,21 @@ struct InlineInfo
 		.CleanupClash(args)
 
 
-	function NopConsts (|int| n)
+	function NopParams (|int| n, |asmreg| Ret)
 		|| sh = Assembler.sh
 		while  --n >= 0
 			|| r = .Items[n] // now what to do?
-			if r.reg and r is Const 
+			|| v = r.reg
+			if !v
+				0
+			  elseif r is Const 
 				sh.Decr(r.needfat, false)
+			  elseif r iz Ret
+				0
+			  else
+				|| s = r.fat
+				if s  and  !s.µrefcount  and  s.guesssize
+					sh.nop(s) 
 
 	
 	function PreInlineOneParam (|message| p, |scdecl| a, |assembler| sh, |asmreg|)
@@ -116,9 +125,9 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 	regs.Collect(fn.args, self)
 	.InlineParameters(prms, info)
-	|| RealStart = .curr						// Params need to be done anyhow... so don't count them.
+	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
-	info.NopConsts(fn.args.length)
+	info.NopParams(fn.args.length, .state.return)
 	regs.Restore(fn.args)
 	
 	ll.after = .curr
@@ -126,15 +135,15 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain)
 		regs.Rewind(self)
-		.SoftNopRange(ll.start, .curr)			// rewind
+		.SoftNopRange(ll.start, .curr)				// rewind
 		return nil
 	
 	if !rz
-		(rz is Const)							// no longer zero
+		(rz is Const)								// no longer zero
 	|| last = .last
 	if (last == ll.start) and last.IsFunc
-		|| P = prms.parent!		// cleanup
-		last.Msg = P			// right? or else the autocomplete goes wrong? Or not?
+		|| P = prms.parent!							// cleanup
+		last.Msg = P								// right? or else the autocomplete goes wrong? Or not?
 		last.srcmap = P.srcmap
 
 
@@ -221,7 +230,7 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 					rz = dest.info 
 				  else
 					rz = s.prms[0]|int|.asm
-					rz.µType = .state.Return.µType
+					rz.µType = .state.return.µType
 			s.SetOp = asm.jump
 			s.JumpPrm = 1
 			s.JumpFix(.curr)
@@ -232,7 +241,7 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 	rz = rz.ExpectSameType(dest)
 	if !rz.reg
 		(rz is const) // make compiler happy
-	
+
 
 }
 

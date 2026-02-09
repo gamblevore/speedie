@@ -260,7 +260,7 @@ struct FatASM
 	function JumpInput (|int| a, assigns:|int| v)
 		.prms[a] = v
 		.JumpPrm = a + 1
-		.µRefCount = 1 max .µRefCount // control flow is always used?
+		.µRefCount += !.µRefCount // control flow is always used?
 		Assembler.sh.NextBasicBlock
 	
 	
