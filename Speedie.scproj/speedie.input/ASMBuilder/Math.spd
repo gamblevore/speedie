@@ -79,14 +79,12 @@ extend Assembler
 		|| B = L.Fat
 			if (b isa asm.BFLG) and .IsCurr(b)
 				if b.prms[4] == 0  and  b.prms[3] == 63
-					|| T = B.info
-					target debug2
-						B.info.µType = DataTypeCode.bool
-					  else
-						T.µtype = DataTypeCode.bool
-						B.info = T
+//					|| T = B.info
+//					T.µtype = DataTypeCode.bool
+//					B.info = T
 					L.µType = DataTypeCode.bool
-/					return L
+					B.info = L
+					return L
 		
 
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
