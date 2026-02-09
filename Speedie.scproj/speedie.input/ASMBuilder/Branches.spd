@@ -560,12 +560,13 @@ function @assembler.PrintProgress
 		"---"
 		|| fn = scfunction.currfunc!
 		printline fn
-		|| Base = assembler.sh.Start + fn.µStart
-		|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
-		for n in amount
-			base[n].debugprint
-		
-		.PrintRegs
+		|| Start = fn.µStart
+			|| Base = assembler.sh.Start + Start
+			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+			for n in amount
+				base[n].debugprint
+			
+			.PrintRegs
 
 
 function @assembler.PrintRegs

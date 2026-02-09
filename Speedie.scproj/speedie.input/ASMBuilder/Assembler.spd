@@ -126,8 +126,7 @@ struct Assembler
 	
 	
 	function IsCurr (|&fatasm| f, |bool|)
-		// needs to take loops into account
-		// also, perhaps BlockIDs instead.
+		// maybe use BlockIDs instead.
 		// Assembler.RefCountSub doesn't seem to need that complexity and literally just wants the basicblock?
 		// this could be nicer. Assuming its not altered in a branch... the blockID could work.
 			

@@ -809,6 +809,10 @@ extend Assembler
 		
 		|| bflg = .Register(src.reg)
 		require (bflg isa asm.bflg) and .iscurr(bflg)
+		|| PrevInput = bflg.ASMReg(1)
+		if (.last != bflg)
+			|| Intefere = .register(previnput.reg)
+			require Intefere <= bflg
 		
 		|| UpA = bflg.prms[2]						// check sign!
 		|| DownA = bflg.prms[3]
@@ -821,7 +825,6 @@ extend Assembler
 		
 		|| Total = (UpA+UpB) - (DownA+DownB)		// check that it can even be done
 		|| Up = .CanMergeBits(upa, downa, upb, downb, total)
-			|| PrevInput = bflg.ASMReg(1)
 			if  src is temp  or  dest iz src
 				src = PrevInput
 				.SoftNop(bflg)						// write over the old
@@ -829,7 +832,7 @@ extend Assembler
 				if PrevInput iz src
 //		BFLG: r3, r3, 0, 0, 0                          /* self.mu.DataType|asmreg| */
 //		BFLG: t4, r3, 0, 11, 0                         /* self|uint64| >> 11 */
-/					return nil // self-replace will fail. We don't have the old version!
+					return nil // self-replace will fail. We don't have the old version!
 			return exp.BFLG(dest, PrevInput, up, up-total, signb) * dest
 
 
@@ -867,7 +870,7 @@ extend Assembler
 
 	function BFLG_Sub (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |bool| Sign, |asmreg|)
 		if !up and !down and dest iz src // oof
-			return src
+			return dest
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest)
@@ -935,12 +938,10 @@ extend Assembler
 			sh = 0 // no point otherwise. just make the asm simpler.
 				
 		(dest isnt Const)
-		// going through bflg_sub would cause issues, like NOT assigning to dest.
-		// assign must assign to dest, the others can return an input if its unchanged.
 
 		|| Sign = src.signed|int|
 		|| Merge = .MergeBFLG(exp, dest, src, sh, sh, Sign)
-/			return Merge
+			return Merge
 		
 		return exp.BFLG(dest, src, sh, sh, sign) * Dest
 	
