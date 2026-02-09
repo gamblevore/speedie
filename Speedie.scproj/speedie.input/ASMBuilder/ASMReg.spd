@@ -102,6 +102,8 @@ datatype ASMReg (uint64)
 		
 
 	function IsZero (|bool|)
+		if .reg == 0 // what if "const" needs fixing?
+			return true
 		return  (self is Const) and (.const == 0)
 	
 	function Negate (|bool| Neg=true, |asmreg|)

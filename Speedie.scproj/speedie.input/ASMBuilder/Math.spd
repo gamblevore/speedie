@@ -74,6 +74,21 @@ extend Assembler
 		rz = rz.ExpectSameType(dest)
 
 
+	function AlreadyABool (|asmreg| L, |asmreg| Zero, |asmreg|)
+		require Zero.IsZero
+		|| B = L.Fat
+			if (b isa asm.BFLG) and .IsCurr(b)
+				if b.prms[4] == 0  and  b.prms[3] == 63
+					|| T = B.info
+					target debug2
+						B.info.µType = DataTypeCode.bool
+					  else
+						T.µtype = DataTypeCode.bool
+						B.info = T
+					L.µType = DataTypeCode.bool
+/					return L
+		
+
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
@@ -82,9 +97,15 @@ extend Assembler
 			|| num = ((l.const==r.const) != negate)|int|
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
 		
+		if "IsFloat".trap
 		if dest isnt CondRequest
+			if negate
+				|| B = .AlreadyABool(l, R)
+					return B
+				|| B2 = .AlreadyABool(R, L)
+					return B2
 			dest = .TempTyped(TypeBool!.TypeNormal, dest)
-			return exp.EQUL(dest, L, R, negate.equlmode(l,r)) * dest
+			return exp.EQUL(dest, L, R, negate.EqulMode(l,r)) * dest
 
 		if  r is Const  and  l isnt Const
 			swap (l) (r)

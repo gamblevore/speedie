@@ -127,23 +127,26 @@ module {
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
-		if opch ~= "~>"
-		|| result = opch.obj|SCOperator|
-			if (result isnt custom)
-				opch.name = result.name
-			return result
-		
-		|| op = opch.name
-		Result = .dict[ op ]
-		
-		if (!Result)
-			result = AddCustom( op )
+		if opch.func == @opp
+			|| result = opch.obj|SCOperator|
+				if (result isnt custom)
+					opch.name = result.name
+				return result
+			
+			|| op = opch.name
+			Result = .dict[ op ]
+			
+			if (!Result)
+				result = AddCustom( op )
 
-		  elseif (op != result.name)
-			if (result isnt custom)
-				opch.name = result.name
-		
-		return Result
+			  elseif (op != result.name)
+				if (result isnt custom)
+					opch.name = result.name
+			
+			return Result
+
+		error (opch)
+		return .bnot
 
 
 	function Init 
