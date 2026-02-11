@@ -1281,7 +1281,7 @@ ive been~running #since morning
 
 
 
-module parser
+module Parser
 	linkage
 		visible false
 		cpp_part Tk

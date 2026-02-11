@@ -1,15 +1,20 @@
 #!/usr/local/bin/cake
 
+|| Count = 123
 main
+	|| x = app.Args[0]
+		printline x
+	Count++
 	zalgoline "start world\n\n"
 	RecursiveHello()
 	zalgoline "\n\nend world"
-	app.crash
+//	app.crash
 //	Platform.halt_clean
 
 
 function RecursiveHello	(|int| A=1)
-	"hello world: $A"
-	if A < 50000
+	"hello world: $Count"
+	Count++
+	if A < 5
 		RecursiveHello(A+1)
 
