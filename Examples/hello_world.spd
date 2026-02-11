@@ -4,6 +4,8 @@ main
 	zalgoline "start world\n\n"
 	RecursiveHello()
 	zalgoline "\n\nend world"
+//	app.crash
+	Platform.halt
 
 
 function RecursiveHello	(|int| A=1)

@@ -95,7 +95,6 @@ extend Assembler
 			|| num = ((l.const==r.const) != negate)|int|
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
 		
-		if "IsFloat".trap
 		if dest isnt CondRequest
 			if negate
 				|| B = .AlreadyABool(l, R)

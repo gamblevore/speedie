@@ -54,9 +54,7 @@ forms
 		Jmp		j
 
 	HALT
-		r1			r		// SignalReg
-		SigNum		5		// Intrinsic
-		ExitCode	7
+		Reserved l
 
 	AddOrSubM
 		r1		R
@@ -343,7 +341,7 @@ forms
 #!						 (((((STOP)))))
 /**/ HALT (HALT)
 		if (Op != VMHexEndCode)
-			JB_ASM_Debug(vm, Code-1, r)
+			CakeCrashed(&vm, 0); //JB_ASM_Debug(vm, Code-1, r)
 		// theres no return value, so we need to erase the stack. Or not?
 		goto EXIT
 
@@ -377,8 +375,8 @@ forms
 /**/ GRAB (U2) 
 		u1 = (uint64)(&u2)
 
-/**/ RET (Ret)				// ret: 
-		Code = ReturnFromFunc(vm, r, Op, Code)
+/**/ RET (Ret)
+		Code = RestoreStack(vm, r, Op, Code)
 
 POS 2
 	TAIL (Tail)

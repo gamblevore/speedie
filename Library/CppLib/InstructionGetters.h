@@ -48,12 +48,8 @@
 #define   JCmpEq_Jmpi       ((( int)((Op)<<20))>>20)
 #define   JCmpEq_Jmpu       (((uint)((Op)<<20))>>20)
 
-#define   HALT_SigNumi       ((( int)((Op)<<13))>>27)
-#define   HALT_SigNumu       (((uint)((Op)<<13))>>27)
-#define   HALT_ExitCodei       ((( int)((Op)<<18))>>25)
-#define   HALT_ExitCodeu       (((uint)((Op)<<18))>>25)
-#define   HALT_Li       ((( int)((Op)<<25))>>25)
-#define   HALT_Lu       (((uint)((Op)<<25))>>25)
+#define   HALT_Reservedi       ((( int)((Op)<<8))>>8)
+#define   HALT_Reservedu       (((uint)((Op)<<8))>>8)
 
 #define   AddOrSubM_Shi       ((( int)((Op)<<23))>>26)
 #define   AddOrSubM_Shu       (((uint)((Op)<<23))>>26)

@@ -29,7 +29,7 @@ uint			CrashCount;
 
 #define kReallyFarOut	-4								// Really far out
 #define kTooFarBack		-3								// Gone back. Must be corrupt.
-#define kOverFlow		-2
+#define kOverFlowStack	-2
 #define kStillInRange	-1
 #define		VMCodePtr(V)			((ASM*)(((byte*)(V)) + 1024*1024))
 #define		CanDebug(V)				(((uint64)(V))>>63)
@@ -271,8 +271,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
-	V.Registers[0] = {};
-	V.Registers[2] = {};
+	memset(V.Registers, 0, sizeof(VMRegister)*4);
 	if (!V.__VIEW__) V.__VIEW__ = JB_ASM_NoBreak;
 	auto& Stack = V.Registers[1].Stack;
 	V.CurrStack = (VMStack*)(&Stack);
@@ -295,27 +294,22 @@ static int StackOverFlow (CakeVM* V) {
 	VMStack* Stack = V->CurrStack;
 	if ( (byte*)Stack >= ((byte*)V)+(1024*1024*2) )
 		return kReallyFarOut;							// Really far out
-	CrashState = 6;
 	if ( (byte*)Stack < (byte*)(V+1) )
 		return kTooFarBack;								// Gone back. Must be corrupt.
 	
-	CrashState = 7;
 	if ( ((ASM*)(Stack+32) < VMCodePtr(V)))				// Still in range
 		return kStillInRange;
 		
-	CrashState = 8;
 	V->CakeFail = errno | ErrStck;			
-	CrashState = 9;
-	return kOverFlow;
+	return kOverFlowStack;
 }
 
 
 
 static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack) {
-	int Signal = errno;
 	char ErrorBuff[40];
 	const char* ErrStr = "Run CakeVM";					CrashState = 3;
-	if (ErrorKind == kOverFlow) {
+	if (ErrorKind == kOverFlowStack) {
 		int Depth = Stack->Depth;
 		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
 		ErrStr = ErrorBuff;
@@ -326,8 +320,9 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack) {
 		  else
 			ErrStr = "StackUnderFlow";
 	}
-													
+	
 	(V->__VIEW__)(V, ErrorKind, 0, (ivec4*)(Stack));	CrashState = 30;
+	errno = SIGSEGV|128;
 	JB_ErrorHandleFileC(nil, SIGSEGV|128, ErrStr);		CrashState = 40;
 	
 	return 0; 
@@ -343,7 +338,9 @@ static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 	errno = Signal;
 	int ErrorKind = StackOverFlow(V);					CrashState = 4;
 	auto Stack = V->CurrStack;							CrashState = 20;
-	return CakeCrashedSub(V, ErrorKind, Stack);
+	CakeCrashedSub(V, ErrorKind, Stack);
+	V->Registers[1] = {.Int = errno};
+	return 0;
 }
 
 

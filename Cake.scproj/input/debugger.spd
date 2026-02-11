@@ -254,7 +254,11 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 		if stack > LastStack:					return "Stack Too Large"
 		Count++
 		Stack += Stack.GoUp+1
-		if stack.Depth!=Count+1:				return "Stack Depth Invalid"
+		if stack.Depth!=Count+1
+			if stack.Depth
+				return "Stack Depth Invalid"
+			 // allow... as last one
+			LastStack = stack
 	return nil
 
 

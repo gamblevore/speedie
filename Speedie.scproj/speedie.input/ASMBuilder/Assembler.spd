@@ -626,6 +626,7 @@ struct Assembler
 		ASMType.InitAccess
 
 		Instruction[asm.KNSR].Const
+		asm.encoders[asm.halt] = fatasm.Halt_Encoder
 		asm.encoders[asm.noop] = fatasm.Nop_Encoder
 		asm.encoders[asm.mark] = fatasm.Nop_Encoder
 

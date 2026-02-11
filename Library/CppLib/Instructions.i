@@ -1,6 +1,6 @@
 ı HALT:;
 	if (Op != VMHexEndCode)
-	JB_ASM_Debug(vm, Code - 1, r)
+	CakeCrashed(&vm, 0)
 ;
 	goto EXIT;
 ı TAIL:;
@@ -37,7 +37,7 @@
 ı GRAB:;
 	u1 = (uint64)(&u2);
 ı RET:;
-	Code = ReturnFromFunc(vm, r, Op, Code);
+	Code = RestoreStack(vm, r, Op, Code);
 ı AFNC:;
 	i1 = FuncAddr(vm, Op, Code);
 ı ALLO:;

@@ -248,10 +248,7 @@ datatype ASM_HALT (ASM) {
 		function Encode (ASM_Encoder, ) {
 			visible true
 			|asm| rz = .op|asm| << 24
-			rz.r1 = .prms[0]
-			rz.HALT_SigNum = .prms[1]
-			rz.HALT_ExitCode = .prms[2]
-			rz.HALT_L = .prms[5]
+			rz.HALT_Reserved = .prms[0]
 			if curr < after {
 				curr++[] = rz
 			}

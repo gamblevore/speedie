@@ -11,25 +11,25 @@ module Platform
 	function Name (|string|)
 		cpp_wrapper JB_Platform
 
-	libinternal cpu (|int|)
+	autogen cpu (|int|)
 		cpp_wrapper JB_Platform__CPU
 	
-	function CPU_Intel (|bool|)
+	inline CPU_Intel (|bool|)
 		return .cpu & 4
 
-	function CPU_PPC (|bool|)
-		return .cpu & 8
+//	inline CPU_PPC (|bool|)
+//		return .cpu & 8
 
-	function CPU_ARM (|bool|)
+	inline CPU_ARM (|bool|)
 		return .cpu & 2
 
-	function CPU_Spd (|bool|)
+	inline CPU_Spd (|bool|)
 		return .cpu & 1
 
 	function CPU_Name (|string|)
 		if .CPU_Intel: return "intel"
 		if .CPU_ARM:   return "arm"
-		if .CPU_PPC:   return "ppc"
+//		if .CPU_PPC:   return "ppc"
 		if .CPU_Spd:   return "spd"
 
 	function OSX (|bool|)
@@ -44,17 +44,21 @@ module Platform
 	function IsDebug (|bool|)
 		cpp_Wrapper JB_IsDebug
 	
-	function Release (|bool|)
+	inline Release (|bool|)
 		return !.Isdebug
 
 	function PointerBits (|int|)
 		cpp_wrapper JB_PointerSize
 
-	function PointerBytes (|int|)
+	inline PointerBytes (|int|)
 		return .PointerBits >> 03
 
-	function Is64Bit (|bool|)
+	inline Is64Bit (|bool|)
 		return .PointerBits == 64
+
+	autogen HALT
+		asm HALT(0)
+
 		
 	function Log (|string| s)
 		visible

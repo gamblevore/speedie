@@ -10,6 +10,8 @@
 // using the SIMD registers.
 typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack);
+static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
 AlwaysInline int64 Div2 (int64 V, int Clear, int Down) {
@@ -537,24 +539,26 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 // r0(1), <stack/result>, <r0> (2)...<r31>
   
-AlwaysInline ASM* ReturnFromFunc (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugCode) {
+AlwaysInline ASM* RestoreStack (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugCode) {
 	(DebugCode);
-	auto Stack	= R0 - 1;
-	int StepBack= Stack->Stack.DestReg;
+	auto Dest	= R0 - 1;
+	int StepBack= Dest->Stack.DestReg;
 	auto Imm	= RET_Valuei;		// get before copy!
 	auto Src	= R0 + n1;
 	
-	auto Code	 = Stack->Stack.Code;
-	vm.AllocCurr = Stack->Stack.Alloc;
+	auto Code	 = Dest->Stack.Code;
+	vm.AllocCurr = Dest->Stack.Alloc;
 
-	*Stack		= *Src;
-	Stack->Uint |= Imm;				// immediate
-	R0			= Stack - StepBack;	// NewZero
-	#if DEBUG
-	if (R0->Obj) debugger;
-//	printf("\t\t\t\tReturnAt: %i,  backto: %i\n", JB_ASM_Index(&vm, DebugCode), JB_ASM_Index(&vm, Code));
-	#endif
-//	*R0			= {};			// remove this? unnecessary?
+	*Dest		= *Src;
+	Dest->Uint |= Imm;				// immediate
+	
+	Dest -= StepBack;
+	
+	auto Curr = (VMStack*)(Dest - 1);
+	Curr->GoUp = 0;
+	vm.CurrStack = Curr;
+	R0			= Dest;				// NewZero
+//	*R0			= {};				// unnecessary?
 	
 	return Code;
 }
@@ -569,7 +573,7 @@ AlwaysInline ASM* DeRefRegs (CakeVM& vm, VMRegister*& r, ASM Op) {
 		JB_Decr(o2);
 	if (n1)
 		JB_SafeDecr(o1);
-	return ReturnFromFunc(vm, r, (Op>>19)<<19, 0);
+	return RestoreStack(vm, r, (Op>>19)<<19, 0);
 }
 
 
@@ -612,7 +616,6 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 }
 
 
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack);
 
 AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
@@ -621,8 +624,8 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	{
 		auto OldStack = (VMStack*)(r-1);
 		auto End = (VMStack*)(((byte*)(&vm)) + CakeStackSize-1024);
-		if_rare (Stack >= End) { // hmmm
-			CakeCrashedSub(&vm, kOverFlow, OldStack);
+		if_rare (Stack >= End) {			// stackoverflow
+			CakeCrashedSub(&vm, kOverFlowStack, OldStack);
 			vm.Registers[1] = {.Int = errno}; // clear stack. its gone. And we already reported it.
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
@@ -636,8 +639,6 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	Stack->Alloc = vm.AllocCurr;
 	vm.CurrStack = Stack;
 	auto Zero = ((VMRegister*)Stack)+1;
-	
-//	auto Zero = SaveVMState(vm, r, CodePtr, n1);
 	rp = Zero;
 
 	switch ( Code&15 ) {
@@ -655,7 +656,6 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 
 	Zero[ 0] = {};
 	int j = Func_JUMPi;
-//	printf("\t\t\t\tCallAt: %i,  jump: %i\n", JB_ASM_Index(&vm, CodePtr), j);
 	return CodePtr + j;
 }
 

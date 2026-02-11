@@ -59,13 +59,11 @@ function TimeID (|uint64|)
 function AllowInteruptCrash (assigns:|bool|)
 	cpp_wrapper JB_App__CrashOnInterupt
 
-function Crash (|string| reason="")
+function Crash (|string?| reason=nil)
 	opt norefcounts
 	if reason
 		printline reason
-	.CrashLog "AboutToCrash".cstr
 	-1|&byte|[] = 0
-	"Crash Failed!"
 	app.quit(-1)
 
 

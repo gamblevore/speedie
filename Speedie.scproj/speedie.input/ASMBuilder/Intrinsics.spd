@@ -110,6 +110,8 @@ function assembler.TheTrinity (|message| SrcPrms, |message| ASMPrms, |asmreg| de
 		Collection[n++] = .µTrin(s)
 	
 	|| fat = .RequestOp(OpCode, SrcPrms.parent!)
+	if opcode == asm.halt
+		(Dest is exit)
 	|| DestPos = .FillTheFat(collection, fat, ASMPrms, n)
 		dest = .TempOnly(dest)
 		fat.Dest(destpos, dest, self)
