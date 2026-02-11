@@ -1505,7 +1505,6 @@ extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_ForceRecompile;
 extern bool SC__Options_GenFlowControlCode;
 extern bool SC__Options_HideawayScripts;
-extern bool SC__Options_IgnoreCantSaveErrors;
 extern bool SC__Options_InlineLib;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
@@ -1527,6 +1526,7 @@ extern bool SC__Options_SelfReplacement;
 extern bool SC__Options_Silent;
 extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
+extern bool SC__Options_StripNames;
 extern bool SC__Options_TargetDebug;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
@@ -1610,7 +1610,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2411])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2412])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1651,7 +1651,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2412])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2413])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1792,10 +1792,10 @@ extern SCClass* SC_TypeWrapper;
 #define kJB__Tk_kTmpOpp ((int)32784)
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2410])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2409])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2411])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2410])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2408])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2409])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2419,17 +2419,17 @@ extern int SC__SCNodeFindMode_aaa;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2404])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2405])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
 #define JB__TerminalColor_Enabled JB__.TerminalColor_Enabled
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2405])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2406])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2406])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2407])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2403])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2404])
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2406])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2407])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2407])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2408])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2445,6 +2445,10 @@ extern FP_NilTrackerFn SC__nil_NilTable[64];
 extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
 #define kJB__CakeVM_CanDebug ((int)32)
+#define kJB__CakeVM_ErrOverFlow ((int)-2)
+#define kJB__CakeVM_ErrReallyFarOut ((int)-4)
+#define kJB__CakeVM_ErrStillInRange ((int)-1)
+#define kJB__CakeVM_ErrTooFarBack ((int)-3)
 #define kJB__CakeVM_TrapTooFar ((int)16)
 #define JB__MzSt_All JB__.MzSt_All
 #define kJB__MzSt_Compression ((int)1)
@@ -2481,7 +2485,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2402])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2403])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2946,8 +2950,6 @@ bool SC_FB__AppOptions_help(JB_String* Name, JB_String* Value, FastString* Purpo
 
 bool SC_FB__AppOptions_hideaway(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_ignorecantsave(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 bool SC_FB__AppOptions_inlinelib(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_keepallerrors(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -2977,6 +2979,8 @@ bool SC_FB__AppOptions_self(JB_String* Name, JB_String* Value, FastString* Purpo
 bool SC_FB__AppOptions_single(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_stages(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_strip(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_target(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -5645,6 +5649,9 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* Self, JB_String* Name, Message* 
 // JB_AtomicLock
 
 
+// JB_CakeStack
+
+
 // JB_CakeVM
 
 
@@ -7852,8 +7859,6 @@ jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into)
 
 jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
 
-void SC_bin_AddFunc(FastString* Self, SCFunction* Fn, bool Enter);
-
 void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
@@ -7863,6 +7868,8 @@ void JB_bin_AddRow(FastString* Self, JB_String* Row, Syntax Type, JB_String* Val
 bool SC_bin_BakeASM(FastString* Self, SCFunction* Fn);
 
 bool SC_bin_BakeASMSub(FastString* Self, SCFunction* Fn, int T);
+
+void SC_bin_BakeFuncName(FastString* Self, SCFunction* Fn);
 
 void SC_bin_Cakeify(FastString* Self, SCFunction* Fn);
 
@@ -10947,6 +10954,8 @@ inline void JB_Msg_Fail(Message* Self, JB_String* Error);
 
 inline void JB_Msg_SyntaxProblem(Message* Self, JB_String* Error);
 
+inline void JB_Str_SyntaxProblem(JB_String* Self);
+
 inline JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name);
 
 inline Message* JB_Msg_Arg(Message* Self);
@@ -11690,6 +11699,10 @@ inline void JB_Msg_Fail(Message* Self, JB_String* Error) {
 
 inline void JB_Msg_SyntaxProblem(Message* Self, JB_String* Error) {
 	JB_Rec__NewProblem(Self, Error, nil);
+}
+
+inline void JB_Str_SyntaxProblem(JB_String* Self) {
+	JB_Rec__NewProblem(nil, Self, nil);
 }
 
 inline JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name) {
