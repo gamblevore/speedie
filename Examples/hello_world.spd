@@ -5,11 +5,11 @@ main
 	RecursiveHello()
 	zalgoline "\n\nend world"
 //	app.crash
-	Platform.halt
+	Platform.halt_clean
 
 
 function RecursiveHello	(|int| A=1)
 	"hello world: $A"
-	if A < 100
+	if A < 5
 		RecursiveHello(A+1)
 

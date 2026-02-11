@@ -71,7 +71,7 @@ typedef u64 (*Fn0 )();
 
 struct VMStack {
 	u32*		Code;
-	uint		Alloc;			
+	uint		Dummy;			
 	byte		GoUp;
 	byte		DestReg;
 	u16			Depth;
@@ -102,10 +102,11 @@ struct CakeVM {
     byte*			PackGlobs;
     Fn0*			CppFuncs;
     byte*			AllocBase;
-    int				AllocCurr;
+//    int				AllocCurr;
     
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];
+	uint*			LastCode;
     VMStack*		CurrStack;
     
     u32				ExitGuard;

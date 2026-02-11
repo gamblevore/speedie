@@ -341,8 +341,9 @@ forms
 #!						 (((((STOP)))))
 /**/ HALT (HALT)
 		if (Op != VMHexEndCode)
-			CakeCrashed(&vm, 0); //JB_ASM_Debug(vm, Code-1, r)
-		// theres no return value, so we need to erase the stack. Or not?
+			CakeCrashed(&vm, SIGKILL);
+		else
+			vm.Registers[2].Int = 0 // cleanup
 		goto EXIT
 
 

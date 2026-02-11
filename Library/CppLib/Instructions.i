@@ -1,6 +1,9 @@
 ı HALT:;
 	if (Op != VMHexEndCode)
-	CakeCrashed(&vm, 0)
+	CakeCrashed(&vm, SIGKILL)
+;
+	else
+	vm.Registers[2].Int = 0
 ;
 	goto EXIT;
 ı TAIL:;

@@ -56,8 +56,11 @@ module Platform
 	inline Is64Bit (|bool|)
 		return .PointerBits == 64
 
-	autogen HALT
+	autogen HALT_Crash
 		asm HALT(0)
+
+	autogen HALT_Clean // this should return an error number of 0...
+		asm HALT(0xBADA55)
 
 		
 	function Log (|string| s)

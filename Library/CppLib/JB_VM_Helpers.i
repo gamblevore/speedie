@@ -6,11 +6,13 @@
 	#define __builtin_unreachable()
 #endif
 
+
+extern "C" {
 // need to allow vectorcall on windows. to allow vectors to be passed
 // using the SIMD registers.
 typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack);
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Signal);
 static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
@@ -538,27 +540,24 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 // r0(1), <stack/result>, <r0> (2)...<r31>
-  
+
 AlwaysInline ASM* RestoreStack (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugCode) {
 	(DebugCode);
-	auto Dest	= R0 - 1;
-	int StepBack= Dest->Stack.DestReg;
-	auto Imm	= RET_Valuei;		// get before copy!
+	auto Stack	= (VMStack*)(R0 - 1);
+	int StepBack= Stack->DestReg;
+	auto Imm	= RET_Valuei;					// get before copy!
 	auto Src	= R0 + n1;
 	
-	auto Code	 = Dest->Stack.Code;
-	vm.AllocCurr = Dest->Stack.Alloc;
-
-	*Dest		= *Src;
-	Dest->Uint |= Imm;				// immediate
+	*((VMRegister*)Stack) = *Src;
+	((VMRegister*)Stack)->Uint |= Imm;			// immediate
 	
-	Dest -= StepBack;
-	
-	auto Curr = (VMStack*)(Dest - 1);
-	Curr->GoUp = 0;
-	vm.CurrStack = Curr;
-	R0			= Dest;				// NewZero
-//	*R0			= {};				// unnecessary?
+	auto NewR0 = (VMRegister*)(Stack-StepBack);
+	R0			= NewR0;						// NewZero
+	Stack		= (VMStack*)(NewR0 - 1);
+	vm.CurrStack = Stack;
+	auto Code	= Stack->Code;
+	Stack->GoUp = 0;
+//	*R0			= {};							// unnecessary?
 	
 	return Code;
 }
@@ -601,7 +600,8 @@ AlwaysInline void AllocStack (CakeVM& vm, VMRegister* r, ASM Op) {
 
 AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 	VMRegister* stck = r-1;
-	vm.AllocCurr = stck->Stack.Alloc;
+	debugger;
+//	vm.AllocCurr = stck->Stack.Alloc;
 	ASM Code2 = Code[0];
 	// What if this overwrites params that we mean to read from?
 	
@@ -617,29 +617,45 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 
 
 
+
+//	HaltStack.DestReg = 1;
+//	HaltStack.Alloc = 0;
+//	HaltStack.Depth = 1;
+//	HaltStack.GoUp = 0;
+//	HaltStack.Code = VMCodePtr(&V) + CakeCodeMax-1;
+//
+//	auto Code = VMProtect(V, true) + CodeIndex;
+//	MainStack.DestReg = 1;
+//	MainStack.Alloc = 0;
+//	MainStack.Depth = 1;
+//	MainStack.GoUp = 0;
+//	MainStack.Code = Code;
+
 AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
 	int Dest = n1;
-	VMStack* Stack = &((r + Dest)->Stack);
+	VMStack* NewStack = &((r + Dest)->Stack);
 	{
-		auto OldStack = (VMStack*)(r-1);
 		auto End = (VMStack*)(((byte*)(&vm)) + CakeStackSize-1024);
-		if_rare (Stack >= End) {			// stackoverflow
-			CakeCrashedSub(&vm, kOverFlowStack, OldStack);
-			vm.Registers[1] = {.Int = errno}; // clear stack. its gone. And we already reported it.
+		auto OldStack = (VMStack*)(r-1);
+		if_rare (NewStack >= End) {			// stackoverflow
+			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
+			vm.Registers[2] = {.Int = errno}; // clear stack. its gone. And we already reported it.
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		
 		OldStack->GoUp = Dest;
-		Stack->Depth = OldStack->Depth+1;
+		NewStack->Depth = OldStack->Depth+1;
+		OldStack->Code = CodePtr;
 	}
-	Stack->Code = CodePtr;
-	Stack->DestReg = Dest;
-	Stack->GoUp = 0;
-	Stack->Alloc = vm.AllocCurr;
-	vm.CurrStack = Stack;
-	auto Zero = ((VMRegister*)Stack)+1;
+	NewStack->DestReg = Dest;
+	NewStack->GoUp = 0;
+//	NewStack->Alloc = vm.AllocCurr;
+	vm.CurrStack = NewStack;
+	auto Zero = ((VMRegister*)NewStack)+1;
 	rp = Zero;
+	CodePtr += Func_JUMPi;
+	NewStack->Code = CodePtr;
 
 	switch ( Code&15 ) {
 		default: __builtin_unreachable();
@@ -655,8 +671,7 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	}
 
 	Zero[ 0] = {};
-	int j = Func_JUMPi;
-	return CodePtr + j;
+	return CodePtr;
 }
 
 /*
@@ -730,4 +745,7 @@ AlwaysInline void QInc (VMRegister* r, ASM Op) {
 	if (n1)
 		i1 = N;
 }
+
+}
+
 

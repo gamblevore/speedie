@@ -20,18 +20,25 @@ module SpdTable
 			error "Can't find code index: " + index
 	
 	
-	function RunProgram (|ind|)
-		opt norefcounts
-		|| main = .funcs[2]					#expect ("Missing main")
-		|| init = .funcs[1]!
+	function RunProgram (|int|)
 		debugger.Start
-
-		|| ExitReg = init.Run
-		expect (ExitReg and ExitReg|&int64|[] == 0) "Init failed"
-		ExitReg = main.Run
-		if ExitReg
-			return ExitReg|&int64|[]
-		return (Cake.vm.CakeFail&255) ?? -1
+		|| Err = .RunFunc(1)
+			return Err
+		Err = .RunFunc(2)
+		if err
+			return err
+	
+	
+	function RunFunc (|int| i, |int|)
+		opt norefcounts
+		|| fn = .funcs[i]					#expect ("Missing function: " + i)
+		|| ExitReg = fn.Run
+			|| Err = ExitReg|&int64|[]
+			|uint| MiniErr = Err
+			if err and !MiniErr
+				MiniErr = -1 // sigh
+			return MiniErr
+		return Cake.vm.CakeFail&255 ?? -1
 
 	
 	function Message.PreLoadLength (|int|)

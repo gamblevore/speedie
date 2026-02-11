@@ -50,8 +50,9 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 		return 0;
 	auto Ret = V->Registers;
 	if (Clear)
-		memset(Ret, 0xFE, sizeof(VMRegister)*35);
-	return (ivec4*)(Ret+3); // unused, stack, R0, R1 // don't return R0 cos we don't want them altering it.
+		memset(Ret, 0xFE, sizeof(VMRegister)*31);
+	return (ivec4*)(Ret+4);
+	// stack(halt), r0, stack(main), R0, R1 // don't return R0 cos we don't want them altering it.
 }
 
 
@@ -128,7 +129,7 @@ static void * const GlobalJumpTable[] = {
 		return 0;
 	}
   
-    RegVar(r, r21) = vm.Registers + 2;
+    RegVar(r, r21) = vm.Registers + 3;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
 	Op = *Code++;									// spelled out for debug
 
@@ -136,7 +137,7 @@ static void * const GlobalJumpTable[] = {
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
 	EXIT:;
-	return &vm.Registers[1].Ivec;
+	return &vm.Registers[2].Ivec;
 	
 	PAUSE:;											// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
@@ -179,7 +180,7 @@ ivec4* JB_ASM_PrevStack (CakeVM* vm, ivec4* Reg0) {
 	auto Stack = (VMStack*)(Reg0-1);
 	int Saved = Stack->DestReg;
 	auto BackStack = Stack - Saved;
-	if (BackStack <= &vm->Registers[1].Stack)
+	if (BackStack <= &vm->Registers[2].Stack)
 		return 0; // last?
 
 	return (ivec4*)(BackStack+1);
@@ -268,23 +269,22 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 }
 
 
-
+ 
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
-	memset(V.Registers, 0, sizeof(VMRegister)*4);
-	if (!V.__VIEW__) V.__VIEW__ = JB_ASM_NoBreak;
-	auto& Stack = V.Registers[1].Stack;
-	V.CurrStack = (VMStack*)(&Stack);
-	Stack.DestReg = 1;
-	Stack.Alloc = 0;
-	Stack.Depth = 1;
-	Stack.GoUp = 0;
-	ASM* Code = VMCodePtr(&V);
-	Stack.Code = Code + CakeCodeMax-1;
-	if (Stack.Code[0] == VMHexEndCode)
-		return __CAKE_VM__(V, VMProtect(V, true) + CodeIndex, 0);
-	V.CakeFail |= ErrStck;
-	return 0;
+	V.CurrStack = (VMStack*)(&V.Registers[2]);
+	auto Base = (VMStack*)(&V.Registers[0]);
+	Base[0].Code = VMCodePtr(&V) + CakeCodeMax-1;
+	Base[2].Code = VMProtect(V, true) + CodeIndex;
+	for (int i = 1; i <= 2; i++) {
+		Base->DestReg = 1;
+		Base->Dummy = 987654321;
+		Base->Depth = i;
+		Base->GoUp = 0;
+		Base[1] = {};
+		Base += 2;
+	}
+	return __CAKE_VM__(V, Base[-2].Code, 0);
 }
 
 
@@ -306,7 +306,7 @@ static int StackOverFlow (CakeVM* V) {
 
 
 
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack) {
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Signal) {
 	char ErrorBuff[40];
 	const char* ErrStr = "Run CakeVM";					CrashState = 3;
 	if (ErrorKind == kOverFlowStack) {
@@ -322,8 +322,8 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack) {
 	}
 	
 	(V->__VIEW__)(V, ErrorKind, 0, (ivec4*)(Stack));	CrashState = 30;
-	errno = SIGSEGV|128;
-	JB_ErrorHandleFileC(nil, SIGSEGV|128, ErrStr);		CrashState = 40;
+	JB_ErrorHandleFileC(nil, Signal, ErrStr);			CrashState = 40;
+	V->Registers[2] = {.Int = Signal};
 	
 	return 0; 
 }
@@ -338,8 +338,7 @@ static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 	errno = Signal;
 	int ErrorKind = StackOverFlow(V);					CrashState = 4;
 	auto Stack = V->CurrStack;							CrashState = 20;
-	CakeCrashedSub(V, ErrorKind, Stack);
-	V->Registers[1] = {.Int = errno};
+	CakeCrashedSub(V, ErrorKind, Stack, Signal);
 	return 0;
 }
 

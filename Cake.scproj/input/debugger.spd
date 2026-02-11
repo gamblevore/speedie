@@ -233,23 +233,20 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 
 	error.KeepStackTrace = false
 	|| Stack = (.Registers(false)-2)|&CakeStack|
-	|| Count = 0
+/	|| Count = 0
 	while Memory.Test(Stack, 16)
 		if (Count >= 1K):						return "..." // huge stacks aren't that useful...
 			
 		|| CodePtr = Stack.Code
 		if !CodePtr:							return "Missing CodePtr"
-		if Count								// the first code isn't anything useful, its main anyhow.
-			print "\t"
-			|| index = .index(CodePtr)
-			|| fn = spdtable.Find(index)
-				print fn.Name
-			  else
-				print "[Unknown]"				// Avoid string/memory alterations by using faststring...
-			printline "()"
-//		  else									// Could upgrade JB_FS_AppendVArg to print directly. No objects.
-//			print "main"
-//		printline "()"
+		print "\t"
+		|| index = .index(CodePtr)
+		|| fn = spdtable.Find(index)
+			print fn.Name
+		  else
+			print "[Unknown]"					// Avoid string/memory alterations by using faststring...
+		printline "()"
+												// Could upgrade JB_FS_AppendVArg to print directly. No objects.
 		if stack== LastStack:					return nil
 		if stack > LastStack:					return "Stack Too Large"
 		Count++
