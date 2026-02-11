@@ -322,6 +322,7 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Sign
 	}
 	
 	(V->__VIEW__)(V, ErrorKind, 0, (ivec4*)(Stack));	CrashState = 30;
+	Signal |= 128;
 	JB_ErrorHandleFileC(nil, Signal, ErrStr);			CrashState = 40;
 	V->Registers[2] = {.Int = Signal};
 	

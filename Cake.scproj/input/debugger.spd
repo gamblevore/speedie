@@ -202,7 +202,6 @@ function CakeVM.PrintCrashTrace (|int| Err, |?&CakeStack| LastStack,  |int64|)
 	opt norefcounts
 	"****** CRASHED ******"
 	|| BadMsg = .PrintStackTrace(err, laststack)
-		print "\t"
 		printline BadMsg
 	"---------------------"
 
@@ -212,9 +211,9 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 	require LastStack and (err == ErrStillInRange or ErrOverFlow)
 	require !debugger.OverFlowTrack++
 
-// Still need this to be printed AND we need it to be capturable
-// into FastString... maybe with the new JB_FS_AppendVArg idea?
-// its possible? I think so! Even the date!
+// We need to make the new JB_FS_AppendVArg to get the numbers printing nicely.
+// into FastString... maybe with the new JB_FS_AppendVArg idea? Should be cool, right?
+
 
 //Tue Feb 10 23:49:23 2026
 //Signal 11 in /tmp/SpeedieApps/6074286623726617078/hello_world [
@@ -233,12 +232,12 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 
 	error.KeepStackTrace = false
 	|| Stack = (.Registers(false)-2)|&CakeStack|
-/	|| Count = 0
+	|| Depth = Stack.Depth
 	while Memory.Test(Stack, 16)
-		if (Count >= 1K):						return "..." // huge stacks aren't that useful...
+		if (Depth >= 1K):						return "..." // huge stacks aren't that useful...
 			
 		|| CodePtr = Stack.Code
-		if !CodePtr:							return "Missing CodePtr"
+		if !CodePtr:							return "! Missing CodePtr"
 		print "\t"
 		|| index = .index(CodePtr)
 		|| fn = spdtable.Find(index)
@@ -248,14 +247,10 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 		printline "()"
 												// Could upgrade JB_FS_AppendVArg to print directly. No objects.
 		if stack== LastStack:					return nil
-		if stack > LastStack:					return "Stack Too Large"
-		Count++
+		if stack > LastStack:					return "! Stack Too Large"
+		Depth++
 		Stack += Stack.GoUp+1
-		if stack.Depth!=Count+1
-			if stack.Depth
-				return "Stack Depth Invalid"
-			 // allow... as last one
-			LastStack = stack
+		if stack.Depth!=Depth:					return "! Stack Depth Invalid"
 	return nil
 
 
