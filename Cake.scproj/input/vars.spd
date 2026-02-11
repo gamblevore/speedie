@@ -34,7 +34,7 @@ class XVar (list)
 	function CanBeNil (|bool|)
 		return .DataType & (DataTypeCode.PossibleBits+1)
 
-	function Print (|!&ivec4| Reg0, |int| TabTo)
+	function Print (|!&ivec4| Reg0, |int| TabTo=0)
 		opt norefcounts
 		.Render(Printer, reg0, true, TabTo)
 		printline Printer.GetResult

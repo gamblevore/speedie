@@ -344,6 +344,7 @@ forms
 /**/ HALT (HALT)
 		if (Op != VMHexEndCode)
 			JB_ASM_Debug(vm, Code-1, r)
+		// theres no return value, so we need to erase the stack. Or not?
 		goto EXIT
 
 

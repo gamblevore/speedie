@@ -72,7 +72,7 @@ typedef u64 (*Fn0 )();
 struct VMStack {
 	u32*		Code;
 	uint		Alloc;			
-	byte		Marker2;
+	byte		GoUp;
 	byte		DestReg;
 	u16			Depth;
 };
@@ -95,7 +95,7 @@ struct VMRegister {
 };
 
 struct CakeVM {
-    int				ErrNo;
+    int				CakeFail;
     int				VFlags;
     JB_ASM_Break	__VIEW__;
     byte*			LibGlobs;

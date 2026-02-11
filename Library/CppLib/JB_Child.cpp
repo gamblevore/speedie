@@ -114,7 +114,7 @@ void JB_CrashHandler (int Sig) {
 		}
 		JB_Rec__CrashLog("]\n");
 		JB_CrashTracer();
-		JB_Rec__CrashLog("-----------------------\n");
+		JB_Rec__CrashLog("---------------------\n");
 	} else {
 		fputs(ErrorBuff, stderr);
 	}

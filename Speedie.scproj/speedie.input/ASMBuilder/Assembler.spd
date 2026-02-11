@@ -617,6 +617,9 @@ struct Assembler
 		require !.Inited
 		.Inited = true
 		if options.targetdebug
+			if Options.StripNames
+				problem "Can't use --strip and --targetdebug"
+				Options.StripNames = false
 			debugdecls = faststring()
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit

@@ -4,19 +4,19 @@ module Options
 	flags: cpp, cake
 	
 	||		BannedClasses			= nil|dictionary|
-	||		exe_path				= "" // if not exist, use output_path
+	||		exe_path				= ""		// if not exist, use output_path
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""
-	|| 		Arch					= "" // TargetArchitecture
+	|| 		Arch					= ""		// TargetArchitecture
 	||		SingleCppOutput			= true
 	|| 		NilTestAllocNeverFails	= true
 	|| 		Beep					= false
-	|| 		Dev						= 0
+	||		Dev						= 0
 
 	|bool|	InlineLib				= true
 	|byte|	Mode					= Cpp
-	||		MakeExec			= false
+	||		MakeExec				= false
 	||		Compile					= true
 	||		TargetDebug				= false
 	||		CompileDebugSeparately  = false // for now
@@ -30,16 +30,15 @@ module Options
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
 	||		ProjectIsMiniLib		= false
-	||		IgnoreCantSaveErrors	= false
 	||		ArgStats				= false
 	||		PrintCompileString		= false
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
-//	||		UpdateStability			= false
+	||		StripNames				= false
+
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
-//	|bool|	WhateverDebug			= 0 // just remove this whenever.
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|bool|	HideawayScripts
@@ -304,10 +303,6 @@ module Feedback
 			Explain(purpose)$
 			"We seems alive :)" // used by perry
 			return true
-
-		+'ignorecantsave' 
-			Explain(Purpose)$
-			options.IgnoreCantSaveErrors = true
 		
 		+'quiet' 
 			Explain(Purpose, "Prints less stuff")$
@@ -357,7 +352,11 @@ module Feedback
 			Explain(Purpose, "Silent bake")$
 			Options.Silent = true
 			options.Mode = options.cake
-
+		
+		+'strip'
+			Explain(Purpose)$
+			Options.StripNames = value.optionbool
+			
 		+'bake'
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$
 			if value.optionbool

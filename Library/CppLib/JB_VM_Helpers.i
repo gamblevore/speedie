@@ -612,20 +612,32 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 }
 
 
-AlwaysInline VMRegister* SaveVMState (CakeVM& vm, VMRegister* r, ASM* CodePtr, int Dest) { // jumpstack
-	VMRegister* Stack = r + Dest;
-	Stack->Stack.Code = CodePtr;
-	Stack->Stack.DestReg = Dest;
-	Stack->Stack.Depth = r[-1].Stack.Depth+1;
-	Stack->Stack.Alloc = vm.AllocCurr;
-	vm.CurrStack = &Stack->Stack;
-	return Stack+1;
-}
-
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack);
 
 AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
-	auto Zero = SaveVMState(vm, r, CodePtr, n1);
+	int Dest = n1;
+	VMStack* Stack = &((r + Dest)->Stack);
+	{
+		auto OldStack = (VMStack*)(r-1);
+		auto End = (VMStack*)(((byte*)(&vm)) + CakeStackSize-1024);
+		if_rare (Stack >= End) { // hmmm
+			CakeCrashedSub(&vm, kOverFlow, OldStack);
+			vm.Registers[1] = {.Int = errno}; // clear stack. its gone. And we already reported it.
+			return VMCodePtr(&vm)+CakeCodeMax-1;
+		}
+		
+		OldStack->GoUp = Dest;
+		Stack->Depth = OldStack->Depth+1;
+	}
+	Stack->Code = CodePtr;
+	Stack->DestReg = Dest;
+	Stack->GoUp = 0;
+	Stack->Alloc = vm.AllocCurr;
+	vm.CurrStack = Stack;
+	auto Zero = ((VMRegister*)Stack)+1;
+	
+//	auto Zero = SaveVMState(vm, r, CodePtr, n1);
 	rp = Zero;
 
 	switch ( Code&15 ) {

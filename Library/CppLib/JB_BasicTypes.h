@@ -160,7 +160,7 @@ typedef int64					Date;
 
 
 #ifndef FieldOffset
-	#define FieldOffset(type, field) (int)(&((type *) 0)->field)
+	#define FieldOffset(type, field) ((int64)(&((type *) 0)->field))
 #endif
 #define CountCArray(x) (sizeof(x)/sizeof(x[0]))
 

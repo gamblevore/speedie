@@ -2,7 +2,7 @@
 
 
 struct CakeVM {
-|int|		ErrNo
+|int|		CakeFail
 |int|		VFlags
 |CakeChef|	__VIEW__
 
@@ -12,12 +12,18 @@ constants
 	TrapTooFar		= 16
 	CanDebug		= 32
 
+	
+	ErrReallyFarOut = -4
+	ErrTooFarBack = -3
+	ErrOverFlow = -2
+	ErrStillInRange = -1
+
 
 target cpp or vm {
 	function Load (|&uint| ASM, |int| Length)
 		|| Code = .code(Length) // length is just used to check that its within the maximum
 			memory.copy(code, asm, length<<2)
-	
+		
 	function Code		(|int| CodeLength=0, |?&uint|)
 		cpp_wrapper JB_ASM_Code
 	
@@ -61,3 +67,14 @@ prototype CakeChef (|int| Index,  |int| BreakValue,  |&ivec4| Reg0,  |int64|)
 
 }
 
+
+
+struct CakeStack
+	linkage
+		wrapper
+		cpp_class VMStack
+	|&uint|		Code
+	|uint|		Alloc
+	|byte|		GoUp
+	|byte|		DestReg
+	|uint16|	Depth

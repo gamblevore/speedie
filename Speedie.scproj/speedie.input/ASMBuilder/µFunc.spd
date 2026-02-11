@@ -22,9 +22,9 @@ extend SCFunction
 		opt norefcounts
 		rz = where
 		|uint64| HasLabel
-		assembler.sh.funcstart_ = .fatfirst-1 // for debug
+		assembler.sh.funcstart_ = .fatfirst - 1 // for debug
 		for (fat.fat in self) (i)
-			haslabel |= fat.JumpPrm << (i&63)
+			HasLabel |= fat.JumpPrm << (i&63)
 			if (rz - where) > 63K
 				error (.source, "Function too large (over 63K)")
 			fat.ASMIndex = rz - where
@@ -106,40 +106,40 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	|| Addr = .reserve(t*4)|&asm|
 	|| after = fn.ASMBake(Addr, Addr+t, Positions)
 	.FinishAdd(@bin, Start)
-	expect (after-Addr == T)									(fn, "ASM length corrupt")
+	expect (after-addr == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)
 
 
 function JBin.BakeASM (|SCFunction| fn, |bool|)
 	opt norefcounts
-//	if  (options.targetdebug)  and  (fn isnt usedbyasm)  and  (!fn.isbehaviour)
-//		.AddFunc(fn)
-//		return true
-
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
+	
+	if !Options.StripNames // never true if dd
+		.BakeFuncName(fn)
+
 	|| dd = assembler.DebugDecls
-	if !dd
-		return .BakeASMSub(fn, t)
-
-	.AddFunc(fn, true)
-	if dd.Length
-	for a in fn.args	
-		a.DumpDecl(dd, 0)
+		for a in fn.args	
+			a.DumpDecl(dd, 0)
+	
 	rz = .BakeASMSub(fn, t)
-	.add(@bin, dd)
-	dd.Length = 0
-	.exit
+	
+	if dd
+		.add(@bin, dd)
+		dd.Length = 0
+		
+	if !Options.StripNames
+		.exit
 
 
-function jbin.AddFunc (|SCFunction| fn, |bool| Enter=false)
+function jbin.BakeFuncName (|SCFunction| fn)
 	opt norefcounts
 	|| fs = FastString.new(nil|faststring|)
 	|| cls = fn.cls
 		fs <~ cls.name
 		fs <~ '.'
 	fs <~ fn.name
-	.add(@tmp, fs, enter)
+	.add(@tmp, fs, true)
 	self <~ '\0'
 	
 

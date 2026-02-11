@@ -21,19 +21,29 @@ Design:
 
 extern "C" {
 jmp_buf 		VMRestorer;
+byte			CrashState;
+uint			CrashCount;
 
 #ifdef __VM__
 #pragma GCC optimize ("Os")
+
+#define kReallyFarOut	-4								// Really far out
+#define kTooFarBack		-3								// Gone back. Must be corrupt.
+#define kOverFlow		-2
+#define kStillInRange	-1
+#define		VMCodePtr(V)			((ASM*)(((byte*)(V)) + 1024*1024))
+#define		CanDebug(V)				(((uint64)(V))>>63)
+
 
 #include "BitFields.h"
 #include "JB_VM.h"
 #include "JB_VM_Helpers.i"
 
 
-#define ı			 Op = *Code++;   goto *JumpTable[Op>>24];
-#define VMCodePtr(V) ((ASM*)(((byte*)(V)) + 1024*1024))
-#define CanDebug(V)  (((uint64)(V))>>63)
-#define StackOverFlowErr (1<<10)
+#define		ı						Op = *Code++;   goto *JumpTable[Op>>24];
+#define		ErrStck					(1<<10)
+
+
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	if_rare (!V)
@@ -103,22 +113,6 @@ int* JB_ASM_SetDebug (CakeVM* V, bool On) {
 }
 
 
-static int StackOverFlow (CakeVM* V) {
-	VMStack* Stack = V->CurrStack;
-	if ( (byte*)Stack >= ((byte*)V)+(1024*1024*2) )
-		return 2;									// Really far out
-	if ( (byte*)Stack < (byte*)(V+1) )
-		return -1;									// Gone back. Must be corrupt.
-	
-	if ( ((ASM*)(Stack+32) < VMCodePtr(V)))			// Still in range
-		return 0;
-		
-	V->ErrNo = errno | StackOverFlowErr;			
-	(V->__VIEW__)(V, -1, 0, (ivec4*)(Stack+1));
-	return 1;
-}
-
-
  
 #define EROR HALT
 static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__
@@ -142,11 +136,7 @@ static void * const GlobalJumpTable[] = {
 	goto *JumpTable[Op>>24];
 	#include "Instructions.i"
 	EXIT:;
-	
-	if (StackOverFlow(&vm)) {
-		return 0;
-	}
-    return &vm.Registers[1].Ivec;
+	return &vm.Registers[1].Ivec;
 	
 	PAUSE:;											// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
@@ -166,7 +156,6 @@ static void * const GlobalJumpTable[] = {
 		}
 	}
 	
-	// stackoverflow should call this also.
 	BREAK:;	{										// The actual breakpoint
 		int64 Value = JB_ASM_Debug(vm, Code-1, r);
 		if_rare (Value) {
@@ -233,7 +222,7 @@ static ASM* VMProtect (CakeVM& V, bool Protect) {
 	if (CanWrite  !=  (F&PROT_WRITE)) {
 		int Err = mprotect(Code, CakeCodeMax*4, PROT_READ|CanWrite);
 		if (Err) {
-			V.ErrNo = errno; // JB_ErrorHandleFileC is too aggressive for this
+			V.CakeFail = errno; // JB_ErrorHandleFileC is too aggressive for this
 			return Code;
 		}
 		F = (F & ~PROT_WRITE) | CanWrite;
@@ -252,9 +241,7 @@ ASM* JB_ASM_Code (CakeVM* V, int Length) {
 
 CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	const int Page = 16*1024;
-	int StackSize = 1024*1024;
-	
-	int AllocSize = StackSize + CakeCodeMax*4;
+	int AllocSize = CakeStackSize + CakeCodeMax*4;
 	if (Flags&kJB_VM_AskDebug)
 		AllocSize += CakeCodeMax*4;
 	
@@ -276,7 +263,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	VMCodePtr(V)[CakeCodeMax-1] = VMHexEndCode;
 	VMCodePtr(V)[-1] = VMHexEndStack;
 	
-	__CAKE_VM__(*V, 0, StackSize);
+	__CAKE_VM__(*V, 0, CakeStackSize);
 	return V;
 }
 
@@ -292,47 +279,76 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Stack.DestReg = 1;
 	Stack.Alloc = 0;
 	Stack.Depth = 1;
-	Stack.Marker2 = 123;
+	Stack.GoUp = 0;
 	ASM* Code = VMCodePtr(&V);
 	Stack.Code = Code + CakeCodeMax-1;
 	if (Stack.Code[0] == VMHexEndCode)
 		return __CAKE_VM__(V, VMProtect(V, true) + CodeIndex, 0);
-	V.ErrNo |= StackOverFlowErr;
+	V.CakeFail |= ErrStck;
 	return 0;
 }
 
 
-static ivec4* Crashed (CakeVM* V, int Signal) {
-	Signal |= 128;
-	errno = Signal;
-	char ErrorBuff[40];
-	const char* ErrStr = "Run CakeVM";
-	int OverFlow = StackOverFlow(V);
-	auto Stack = V->CurrStack;
+
+static int StackOverFlow (CakeVM* V) {
+	CrashState = 5;
+	VMStack* Stack = V->CurrStack;
+	if ( (byte*)Stack >= ((byte*)V)+(1024*1024*2) )
+		return kReallyFarOut;							// Really far out
+	CrashState = 6;
+	if ( (byte*)Stack < (byte*)(V+1) )
+		return kTooFarBack;								// Gone back. Must be corrupt.
 	
-	if (OverFlow == 1) {
+	CrashState = 7;
+	if ( ((ASM*)(Stack+32) < VMCodePtr(V)))				// Still in range
+		return kStillInRange;
+		
+	CrashState = 8;
+	V->CakeFail = errno | ErrStck;			
+	CrashState = 9;
+	return kOverFlow;
+}
+
+
+
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack) {
+	int Signal = errno;
+	char ErrorBuff[40];
+	const char* ErrStr = "Run CakeVM";					CrashState = 3;
+	if (ErrorKind == kOverFlow) {
 		int Depth = Stack->Depth;
 		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
 		ErrStr = ErrorBuff;
-	} else {
-		if (OverFlow)
-			Stack = 0;
-		if (OverFlow < 0) {
-			ErrStr = "StackUnderFlow";
-		} else if (OverFlow > 1) {
+	} else if (ErrorKind != kStillInRange) {
+		Stack = 0;
+		if (ErrorKind == kReallyFarOut)
 			ErrStr = "StackPointerCorrupt";
-		}
-		OverFlow = 2;
+		  else
+			ErrStr = "StackUnderFlow";
 	}
-	
-	JB_ErrorHandleFileC(nil, Signal, ErrStr);
-	(V->__VIEW__)(V, -OverFlow, 0, (ivec4*)(Stack + !!Stack));
+													
+	(V->__VIEW__)(V, ErrorKind, 0, (ivec4*)(Stack));	CrashState = 30;
+	JB_ErrorHandleFileC(nil, SIGSEGV|128, ErrStr);		CrashState = 40;
 	
 	return 0; 
 }
 
 
+static ivec4* CakeCrashed (CakeVM* V, int Signal) {
+	if (CrashState) {
+		printf("Crashed inside crash handler, at point: %i\n", CrashState);
+		return 0;
+	}													CrashState = 2;
+	Signal |= 128;
+	errno = Signal;
+	int ErrorKind = StackOverFlow(V);					CrashState = 4;
+	auto Stack = V->CurrStack;							CrashState = 20;
+	return CakeCrashedSub(V, ErrorKind, Stack);
+}
+
+
 static void CakeCorrupt (int Sig) {
+	CrashCount++;
 	longjmp(VMRestorer, Sig);
 }
 
@@ -342,13 +358,15 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	static_assert((sizeof(VMRegister) == sizeof(VMStack)), "sizeof type");
 #endif
 
+	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull));
 	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
 	auto OldBus = signal(SIGBUS,  CakeCorrupt);
 
 	int Signal = setjmp(VMRestorer);
-	ivec4* Reg =  Signal  ?  Crashed(V, Signal)  :  JB_ASM_Run_(*V, Code);
+	ivec4* Reg =  Signal  ?  CakeCrashed(V, Signal)  :  JB_ASM_Run_(*V, Code);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
+	CrashState = 0;
 	return Reg;
 }
 

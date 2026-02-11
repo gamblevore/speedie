@@ -1052,7 +1052,7 @@ Message is also:
 		inline
 		errorreceiver.NewProblem( self, Error )
 	
-	Syntax Warn ( |string?| Error = nil )
+	Syntax Warn ( |string?| Error = nil ) // i think "warn" was removed. So this is unreachable.
 		inline
 		errorreceiver.NewWarning( self, Error )
 	

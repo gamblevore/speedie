@@ -241,7 +241,7 @@ class ErrorReceiver
 
 
 extend Object
-	syntax expect
+	syntax Expect
 		cpp_part Fail
 		app.CrashPrint
 		|| fs = FastString()
@@ -252,10 +252,14 @@ extend Object
 
 
 extend string
-	syntax expect
+	syntax Expect
 		cpp_part Fail
 		visible
 		errorreceiver.NewError(nil, self)
+
+	Syntax Problem
+		inline
+		errorreceiver.NewProblem( nil, self )
 
 
 extend faststring

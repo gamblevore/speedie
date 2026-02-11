@@ -1,4 +1,5 @@
 
+#define CakeStackSize	(1024*1024)
 #define CakeCodeMax		(1024*256)
 #define VMHexEndCode	0x00BADA55 
 #define VMHexEndStack	0xBAD57ACC 
