@@ -2,12 +2,12 @@
 
 main
 	zalgoline "start world\n\n"
-	RecursiveHello(1)
+	RecursiveHello()
 	zalgoline "\n\nend world"
 
 
-function RecursiveHello	(|int| A)
+function RecursiveHello	(|int| A=1)
 	"hello world: $A"
-	if A < 1MB
+	if A < 100
 		RecursiveHello(A+1)
 
