@@ -79,7 +79,7 @@ module debugger
 	
 	function __Viewer__ (cakevm.CakeChef)
 		opt norefcounts
-		if index < 0 // stack overflow  or crash
+		if index < 0						// stack overflow  or crash
 			return .PrintCrashTrace(Index, Reg0|&CakeStack|)
 
 		if index >= debugger.Length
@@ -201,19 +201,19 @@ function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |&ivec4| Reg0, |int| 
 function CakeVM.PrintCrashTrace (|int| Err, |?&CakeStack| LastStack,  |int64|)
 	opt norefcounts
 	"****** CRASHED ******"
-	|| BadMsg = .PrintStackTrace(err, laststack)
-		printline BadMsg
+	if debugger.OverFlowTrack // in case we crash during a stack-trace
+		"! Crashed during CrashTrace"
+	  else
+		debugger.OverFlowTrack = 1
+		|| BadMsg = .PrintStackTrace(laststack)
+			printline BadMsg
 	"---------------------"
 
 
-function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
+function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 	opt norefcounts
-	require LastStack and (err == ErrStillInRange or ErrOverFlow)
-	require !debugger.OverFlowTrack++
-
 // We need to make the new JB_FS_AppendVArg to get the numbers printing nicely.
 // into FastString... maybe with the new JB_FS_AppendVArg idea? Should be cool, right?
-
 
 //Tue Feb 10 23:49:23 2026
 //Signal 11 in /tmp/SpeedieApps/6074286623726617078/hello_world [
@@ -229,12 +229,11 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 //7   main + 28
 //8   start + 7184
 
-
-	error.KeepStackTrace = false
 	|| Stack = (.Registers(false)-2)|&CakeStack|
 	|| Depth = Stack.Depth
+	LastStack ?= Stack + 1MB/16
 	while Memory.Test(Stack, 16)
-		if (Depth >= 1K):						return "..." // huge stacks aren't that useful...
+		if (Depth >= 1K):						return "..." // huge stacks aren't that useful
 			
 		|| CodePtr = Stack.Code
 		if !CodePtr:							return "! Missing CodePtr"
@@ -245,11 +244,13 @@ function CakeVM.PrintStackTrace (|int| Err, |?&CakeStack| LastStack,  |?string|)
 		  else
 			print "[Unknown]"					// Avoid string/memory alterations by using faststring...
 		printline "()"
-												// Could upgrade JB_FS_AppendVArg to print directly. No objects.
-		if stack== LastStack:					return nil
+
+		require stack!=LastStack
 		if stack > LastStack:					return "! Stack Too Large"
+		|| Up = stack.GoUp	#require
+		Stack += Up+1
 		Depth++
-		Stack += Stack.GoUp+1
+		if (Up > 32):							return "! Stack Chain Invalid"
 		if stack.Depth!=Depth:					return "! Stack Depth Invalid"
 	return nil
 

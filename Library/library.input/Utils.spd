@@ -192,7 +192,7 @@ target debug and !cake
 		cpp_name jdb2
 		visible
 		if Self
-			printline self|message|.RenderAST
+			printline self|message|.RenderAST(True)
 		  else
 			"(nil)"
   else
@@ -200,7 +200,7 @@ target debug and !cake
 		cpp_name jdb2
 		visible
 		if Self
-			printline .RenderAST
+			printline .RenderAST(true)
 		  else
 			"(nil)"
 

@@ -145,8 +145,9 @@ Message is also:
 		require .hasany
 		.RenderWithSpaces(fs)
 
-	syx Type (Typecast)
-//                                     obj|type|
+
+	syx Type (Typecast)					// obj|type|
+		opt norefcounts
 		|| obj = .First					#require
 		|| type = obj.next
 		fs <~ obj
@@ -155,8 +156,9 @@ Message is also:
 		fs <~ '|'
 	
 
-	syx Decl (Declaration)					//		|x| a = b
-		|| ch = .First				#require
+	syx Decl (Declaration)				// |x| a = b
+		opt norefcounts
+		|| ch = .First					#require
 		fs <~ '|'
 		fs <~ ch
 		fs <~ '|'
@@ -262,6 +264,7 @@ Message is also:
 		fs.appendhexdata(.name)
 		fs <~ ")#"
 	
+	
 	syx Str (String)
 		opt norefcounts
 		fs <~ '"'
@@ -288,6 +291,7 @@ Message is also:
 	
 
 	syx ARel (After_Relationship)
+		opt norefcounts
 		fs <~ .First
 		fs <~ .Name
 
@@ -645,9 +649,11 @@ Message is also:
 		fs <~ self
 	
 	
-	render RenderAST		//  function ast,  message.ast
+	render RenderAST (|bool| RenderRoot=false)		//  function ast,  message.ast
 		opt norefcounts
-		|| Indent  =  !((.func == @arg) and (.parent == nil) and !.name)
+		if !RenderRoot
+			RenderRoot = !((.func == @arg) and (.parent == nil) and !.name)
+		if RenderRoot
 			fs <~ "«"
 			fs <~ .Func.name
 			fs <~ ' '
@@ -660,12 +666,12 @@ Message is also:
 			for ch.fast in self
 				fs.IndentLine
 				ch.RenderAST(fs)
-			fs.Indent -= Indent
+			fs.Indent -= RenderRoot
 			fs.IndentLine
 		  else
-			fs.Indent -= Indent
+			fs.Indent -= RenderRoot
 
-		if Indent
+		if RenderRoot
 			fs <~ "»"
 		
 	

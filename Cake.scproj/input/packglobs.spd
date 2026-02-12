@@ -5,11 +5,14 @@ module Globals
 	|&uint16|				LibLink = Globals.GlobTable
 	|uint|					LibMax
 
+
 	function GlobTable (|&uint16|)
 		cpp_wrapper JB_App__GlobTable
 
+
 	function LibGlobs (|&&nil|)
 		cpp_wrapper JB_App__LibGlobs
+	
 	
 	function CollectPackGlobs (|message| size_msg, |bool|)
 		opt norefcounts
@@ -33,11 +36,10 @@ module Globals
 			StringTable[i] = Last
 		
 		cake.vm.ExecInit(.LibBase!, g, spdtable.LibFuncs!)
-		
 		return true
 	
 	
-	function CheckLib (|bool|)
+	function VerifyGlobs (|bool|)
 		opt norefcounts
 		|| T = .LibLink!
 		for i in 4K
@@ -47,3 +49,5 @@ module Globals
 				return true
 			expect (G == 64K-1) or (G < 16K) ("LibGlobs item too far: " + i)
 		error "Too many LibGlobs?"
+
+

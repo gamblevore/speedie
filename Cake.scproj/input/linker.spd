@@ -139,7 +139,8 @@ function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs
 /	|| ID = (Old << 15) >> 15
 	expect (ID > 0 and ID < globals.LibMax)					(spdtable.Currfunc, "Bad LibGlob ID: " + ID )
 	
-	ID = globals.LibLink![ID]
+	ID = globals.LibLink![ID-1]
+	expect (ID != 16~bits)									(spdtable.currfunc, "Global missing in libarry")
 	if (old.op == asm.GOBJ)
 		old = (Old >> 17) << 17
 		old |= ID >> 3

@@ -2,6 +2,7 @@
 
 || Count = 123
 main
+	opt norefcounts
 	|| x = app.Args[0]
 		printline x
 	Count++
@@ -9,12 +10,12 @@ main
 	RecursiveHello()
 	zalgoline "\n\nend world"
 //	app.crash
-//	Platform.halt_clean
+	Platform.HALT_Clean
 
 
 function RecursiveHello	(|int| A=1)
 	"hello world: $Count"
 	Count++
-	if A < 5
+	if A < 2
 		RecursiveHello(A+1)
 

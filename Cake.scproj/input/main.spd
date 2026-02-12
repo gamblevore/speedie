@@ -11,10 +11,10 @@ module Cake
 
 main
 	opt NoRefCounts	
-	error.AutoPrint = 1
-	error.KeepStackTrace = true
-	
+	target debug
+		error.AutoPrint = 1	
 	expect (cake.BeginCode) ("Can't allocate VM")
+	require Globals.VerifyGlobs
 	require cake.InputFile
 	
 	|| p = cake.perry

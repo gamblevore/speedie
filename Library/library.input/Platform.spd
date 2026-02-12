@@ -56,10 +56,10 @@ module Platform
 	inline Is64Bit (|bool|)
 		return .PointerBits == 64
 
-	autogen HALT_Crash
-		asm HALT(0)
+	inline HALT_Crash
+		asm HALT(0) // creates sigkill
 
-	autogen HALT_Clean // this should return an error number of 0...
+	inline HALT_Clean
 		asm HALT(0xBADA55)
 
 		

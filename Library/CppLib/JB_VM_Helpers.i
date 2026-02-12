@@ -256,7 +256,7 @@ u64 table (CakeVM& vm, ASM Op) {
 }
 
 
-JB_Object* strs (CakeVM& vm, ASM Op) {
+JB_Object* gobj (CakeVM& vm, ASM Op) {
 	auto Where = GObj_Modeu?vm.LibGlobs:vm.PackGlobs;
 	auto Str = ((JB_Object**)(Where))[GObj_Addu];
 	if (GObj_Refu)
@@ -554,7 +554,7 @@ AlwaysInline ASM* RestoreStack (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugC
 	auto NewR0 = (VMRegister*)(Stack-StepBack);
 	R0			= NewR0;						// NewZero
 	Stack		= (VMStack*)(NewR0 - 1);
-	vm.CurrStack = Stack;
+//	vm.CurrStack = Stack;
 	auto Code	= Stack->Code;
 	Stack->GoUp = 0;
 //	*R0			= {};							// unnecessary?
@@ -651,7 +651,7 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	NewStack->DestReg = Dest;
 	NewStack->GoUp = 0;
 //	NewStack->Alloc = vm.AllocCurr;
-	vm.CurrStack = NewStack;
+//	vm.CurrStack = NewStack;
 	auto Zero = ((VMRegister*)NewStack)+1;
 	rp = Zero;
 	CodePtr += Func_JUMPi;

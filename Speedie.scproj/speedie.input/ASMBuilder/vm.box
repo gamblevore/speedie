@@ -601,7 +601,7 @@ POS 5
 
 #!						(((((Memory)))))
 /**/ GOBJ  (GObj)
-		o1 = strs(vm, Op)
+		o1 = gobj(vm, Op)
 /**/ GTAB  (gtable)
 		u1 = table(vm, Op)
 /**/ RD1U  (Read)

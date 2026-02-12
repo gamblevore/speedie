@@ -169,7 +169,7 @@
 ı RFRT:;
 	Code = DeRefRegs(vm, r, Op);
 ı GOBJ:;
-	o1 = strs(vm, Op);
+	o1 = gobj(vm, Op);
 ı GTAB:;
 	u1 = table(vm, Op);
 ı RD1U:;

@@ -227,13 +227,13 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 		.PopupDisplay.ExpectsParse = textview.probablyjeebox
 		(f is style2)
 		.popupreason = 1
-		.DisplayInPopup(f.render, display.name contains "forced")
+		.DisplayInPopup(f.render.trim, display.name contains "forced")
 
 
 // "" '' <(``)> ``
 
 function PerryIDE.DisplayStr (|message| f, |date|)
-	|| r = f.Range // + f.rangetrim
+	|| r = f.Range						// + f.rangetrim
 	|| orig = .EditMe[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0

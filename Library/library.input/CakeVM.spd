@@ -12,9 +12,6 @@ constants
 	TrapTooFar		= 16
 	CanDebug		= 32
 
-	
-	ErrReallyFarOut = -4
-	ErrTooFarBack = -3
 	ErrOverFlow = -2
 	ErrStillInRange = -1
 

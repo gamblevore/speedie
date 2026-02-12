@@ -107,7 +107,7 @@ struct CakeVM {
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];
 	uint*			LastCode;
-    VMStack*		CurrStack;
+//    VMStack*		CurrStack;
     
     u32				ExitGuard;
 	VMRegister		Registers[];
