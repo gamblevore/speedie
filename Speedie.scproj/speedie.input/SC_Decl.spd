@@ -1195,12 +1195,18 @@ function @scdecl.Sorter (SorterComparer of scdecl)
 	opt norefcounts
 	rz = b.carraysize - .carraysize
 	if !rz
-		rz = (b.type == typejbclass) - (.type == typejbclass)
+		rz = (b.SortScore) - (.SortScore)
 	if !rz
 		rz = b.mu.ModuleNum - .mu.ModuleNum // keep commonly accessed stuff together
 	if !rz
 		rz = b.name.SyntaxCompare(.name, true)
-	
+
+
+function scdecl.SortScore (|int|)
+	if .PointerCount
+		return SCNodeType.Pointer|int|
+	return 1 + .type.BaseType|int|
+
 
 function scdecl.Complexity (|int|)
 	opt norefcounts

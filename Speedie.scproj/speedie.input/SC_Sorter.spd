@@ -34,12 +34,12 @@ module CodeSorter
 		return fb - fa	  // we need init and main first
 	
 	
-	helper GPackID (sortercomparer of scobject)
+	helper GPackID (sortercomparer of scdecl)
 		|| fA = .gPackID|int|
 		|| fB = b.gPackID|int|
 		if !fa or !fb
 			if !fa and !fb
-				return self|scdecl|.exportposition < b|scdecl|.ExportPosition
+				return scdecl.sorter(self, b)
 			return !fb
 		
 		return fb - fa	  // we need init and main first

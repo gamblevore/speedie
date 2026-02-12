@@ -1,6 +1,7 @@
 
 
 struct SDL_Event
+	size 56
 	linkage
 		wrapper union
 		cpp_part Event

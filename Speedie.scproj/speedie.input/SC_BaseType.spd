@@ -7,10 +7,10 @@ datatype SCNodeType (byte)
 		|SCNodeType|
 		Module = 0	// not actually a type
 		DataType
-//		Nil			// hasptr
 		Struct		// hasptr
 		ProtoType	// hasptr
 		Object		// hasptr
+		Pointer		// hasptr
 	)   // carrays are on decls, not on types.
 	
 	syntax is (|SCNodetype| d, |bool|)

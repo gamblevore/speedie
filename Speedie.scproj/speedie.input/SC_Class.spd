@@ -59,7 +59,7 @@ linkage
 |SCClass?|					ProcessAs
 |SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
-|(&ClassData)?|				InbuiltClass
+//|(&ClassData)?|				InbuiltClass
 |ClassInfo|					Flags
 |DataTypeCode|  			TypeInfo
 |DataTypeCode|  			ASMTypeInfo
@@ -241,7 +241,7 @@ function compiler.CollectInbuiltSizes
 			if p and p.Parent and (name ~= "String")
 				continue
 			|| cls = Compiler[name, SCNodeFindMode.NoErrors]|scclass--|
-				cls.InbuiltClass = cd
+//				cls.InbuiltClass = cd
 				if cls != typetask
 					cls.clssize = cd.size
 
