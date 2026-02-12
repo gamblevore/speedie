@@ -1252,7 +1252,6 @@ JBClass ( SCClass , SCBetterNode ,
 	u16 ClsSize;
 	u16 TaskObjectCount;
 	ClassInfo Flags;
-	JB_Class* InbuiltClass;
 	SCDecl* DataObject;
 	SCClass* DowngradeTo;
 	SCClass* ProcessAs;
@@ -1539,6 +1538,48 @@ extern Array* SC__PackMaker_PackGlobs;
 extern int SC__PackMaker_PackGlobSize;
 extern HairyMan SC__PackMaker_PackSaved;
 extern Array* SC__PackMaker_PackStrings;
+#define JB__Tk__DotInsertAllow JB__.Tk__DotInsertAllow
+#define JB__Tk__EndOfLineMarker JB__.Tk__EndOfLineMarker
+#define JB__Tk__ErrorNames JB__.Tk__ErrorNames
+#define JB__Tk__StopBars JB__.Tk__StopBars
+#define kJB__Tk_kAdjectiveOp ((int)1)
+#define kJB__Tk_kAllow ((bool)false)
+#define kJB__Tk_kColon ((int)2)
+#define kJB__Tk_kColonArg ((int)4)
+#define kJB__Tk_kComma ((int)128)
+#define kJB__Tk_kEnd ((int)448)
+#define kJB__Tk_kEndContainer ((int)256)
+#define kJB__Tk_kEndOfLine ((int)64)
+#define kJB__Tk_kExpect ((bool)1)
+#define kJB__Tk_kFuncAfterAny ((int)3584)
+#define kJB__Tk_kFuncAfterBar ((int)2048)
+#define kJB__Tk_kFuncAfterNormal ((int)512)
+#define kJB__Tk_kFuncAfterNoSpace ((int)1024)
+#define kJB__Tk_kIllegalChar ((int)4194304)
+#define kJB__Tk_kLameTemporal ((int)56)
+#define kJB__Tk_kOpp ((int)258048)
+#define kJB__Tk_kOppBar ((int)16384)
+#define kJB__Tk_kOppBra ((int)4096)
+#define kJB__Tk_kOppChain ((int)94208)
+#define kJB__Tk_kOppNoBar ((int)241664)
+#define kJB__Tk_kOppSNB ((int)8192)
+#define kJB__Tk_kOppSyx ((int)24576)
+#define kJB__Tk_kOppTemporal ((int)32768)
+#define kJB__Tk_kOppWord ((int)65536)
+#define kJB__Tk_kOppYoda ((int)131072)
+#define kJB__Tk_kTemporal ((int)56)
+#define kJB__Tk_kTemporalBar ((int)32)
+#define kJB__Tk_kTemporalSyx ((int)48)
+#define kJB__Tk_kTemporalSyxNoBar ((int)16)
+#define kJB__Tk_kTemporalWord ((int)8)
+#define kJB__Tk_kTemporalWordColon ((int)262144)
+#define kJB__Tk_kThing ((int)3670016)
+#define kJB__Tk_kThingBar ((int)1048576)
+#define kJB__Tk_kThingSyx ((int)524288)
+#define kJB__Tk_kThingWord ((int)2097152)
+#define kJB__Tk_kTmpOpp ((int)32784)
+#define JB__Tk_Splitter JB__.Tk_Splitter
+#define JB__Tk_Using JB__.Tk_Using
 #define kJB__PicoNoise_All ((int)15)
 #define kJB__PicoNoise_Debug ((int)3)
 #define kJB__PicoNoise_DebugChild ((int)1)
@@ -1610,7 +1651,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2412])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2407])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1651,7 +1692,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2413])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2408])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1750,52 +1791,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define JB__Tk__DotInsertAllow JB__.Tk__DotInsertAllow
-#define JB__Tk__EndOfLineMarker JB__.Tk__EndOfLineMarker
-#define JB__Tk__ErrorNames JB__.Tk__ErrorNames
-#define JB__Tk__StopBars JB__.Tk__StopBars
-#define kJB__Tk_kAdjectiveOp ((int)1)
-#define kJB__Tk_kAllow ((bool)false)
-#define kJB__Tk_kColon ((int)2)
-#define kJB__Tk_kColonArg ((int)4)
-#define kJB__Tk_kComma ((int)128)
-#define kJB__Tk_kEnd ((int)448)
-#define kJB__Tk_kEndContainer ((int)256)
-#define kJB__Tk_kEndOfLine ((int)64)
-#define kJB__Tk_kExpect ((bool)1)
-#define kJB__Tk_kFuncAfterAny ((int)3584)
-#define kJB__Tk_kFuncAfterBar ((int)2048)
-#define kJB__Tk_kFuncAfterNormal ((int)512)
-#define kJB__Tk_kFuncAfterNoSpace ((int)1024)
-#define kJB__Tk_kIllegalChar ((int)4194304)
-#define kJB__Tk_kLameTemporal ((int)56)
-#define kJB__Tk_kOpp ((int)258048)
-#define kJB__Tk_kOppBar ((int)16384)
-#define kJB__Tk_kOppBra ((int)4096)
-#define kJB__Tk_kOppChain ((int)94208)
-#define kJB__Tk_kOppNoBar ((int)241664)
-#define kJB__Tk_kOppSNB ((int)8192)
-#define kJB__Tk_kOppSyx ((int)24576)
-#define kJB__Tk_kOppTemporal ((int)32768)
-#define kJB__Tk_kOppWord ((int)65536)
-#define kJB__Tk_kOppYoda ((int)131072)
-#define kJB__Tk_kTemporal ((int)56)
-#define kJB__Tk_kTemporalBar ((int)32)
-#define kJB__Tk_kTemporalSyx ((int)48)
-#define kJB__Tk_kTemporalSyxNoBar ((int)16)
-#define kJB__Tk_kTemporalWord ((int)8)
-#define kJB__Tk_kTemporalWordColon ((int)262144)
-#define kJB__Tk_kThing ((int)3670016)
-#define kJB__Tk_kThingBar ((int)1048576)
-#define kJB__Tk_kThingSyx ((int)524288)
-#define kJB__Tk_kThingWord ((int)2097152)
-#define kJB__Tk_kTmpOpp ((int)32784)
-#define JB__Tk_Splitter JB__.Tk_Splitter
-#define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2411])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2410])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2406])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2405])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2409])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2404])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2407,6 +2406,7 @@ extern int SC__SCNodeFindMode_aaa;
 #define kSC__SCNodeType_DataType ((SCNodeType)1)
 #define kSC__SCNodeType_Module ((SCNodeType)0)
 #define kSC__SCNodeType_Object ((SCNodeType)4)
+#define kSC__SCNodeType_Pointer ((SCNodeType)5)
 #define kSC__SCNodeType_ProtoType ((SCNodeType)3)
 #define kSC__SCNodeType_Struct ((SCNodeType)2)
 #define JB__Syx_CurrFuncID_ JB__.Syx_CurrFuncID_
@@ -2419,17 +2419,17 @@ extern int SC__SCNodeFindMode_aaa;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2405])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2400])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
 #define JB__TerminalColor_Enabled JB__.TerminalColor_Enabled
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2406])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2407])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2401])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2402])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2404])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2399])
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2407])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2408])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2402])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2403])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2446,9 +2446,7 @@ extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
 #define kJB__CakeVM_CanDebug ((int)32)
 #define kJB__CakeVM_ErrOverFlow ((int)-2)
-#define kJB__CakeVM_ErrReallyFarOut ((int)-4)
 #define kJB__CakeVM_ErrStillInRange ((int)-1)
-#define kJB__CakeVM_ErrTooFarBack ((int)-3)
 #define kJB__CakeVM_TrapTooFar ((int)16)
 #define JB__MzSt_All JB__.MzSt_All
 #define kJB__MzSt_Compression ((int)1)
@@ -2485,7 +2483,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2403])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2398])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2579,11 +2577,11 @@ struct JB_Globals {
 	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
-	JB_File* Platform_Logger_;
-	JB_ErrorReceiver* StdErr;
 	Message* Tk__EndOfLineMarker;
 	Dictionary* Constants_EscapeStr;
 	Dictionary* TC_Types_Dict;
+	JB_File* Platform_Logger_;
+	JB_ErrorReceiver* StdErr;
 	Dictionary* Constants_JS_EscapeStr;
 	JB_String* App_Usage;
 	Dictionary* Constants_UnEscapeStr;
@@ -2604,8 +2602,8 @@ struct JB_Globals {
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
 	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
-	FP_SorterComparer Str__Sorter;
 	FP_fnIDGenerator Tk_Splitter;
+	FP_SorterComparer Str__Sorter;
 	FP_SorterComparer Msg__Sorter;
 	CakeVM_CakeChef CakeVM_DummyChef;
 	FP_SorterComparer File__Sorter;
@@ -2613,8 +2611,8 @@ struct JB_Globals {
 	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
 	RandomXOR* Random;
-	RandomXOR zalgo_R;
 	RandomXOR RandomShared;
+	RandomXOR zalgo_R;
 	CompressionStats MzSt_All;
 	MessagePosition Tk_Using;
 	uint64 Mrap_MDummy_[2];
@@ -2671,7 +2669,7 @@ int SC_AutoComplete__Init_();
 // CodeSorter
 SortComparison SC_CodeSorter__FPackID(SCObject* Self, SCObject* B);
 
-SortComparison SC_CodeSorter__GPackID(SCObject* Self, SCObject* B);
+SortComparison SC_CodeSorter__GPackID(SCDecl* Self, SCDecl* B);
 
 SortComparison SC_CodeSorter__Leafness(SCFunction* Self, SCFunction* B);
 
@@ -3285,29 +3283,284 @@ bool SC_PackMaker__UseMain(JB_String* Name, int Id);
 
 
 
+// Tk
+Message* JB_Tk__AddToOutput(Message* Output, Message* Curr, Message* Prev, int Pos);
+
+void JB_Tk__AddXMLText(Message* XML, JB_String* S, int Start, int I);
+
+Message* JB_Tk__BarThings(int Start, Syntax Syx);
+
+Message* JB_Tk__BeforeRelSub(int Start, bool Mode);
+
+bool JB_Tk__CanDot();
+
+bool JB_Tk__CanStatement();
+
+Message* JB_Tk__ChainTemporalRels(Message* FirstThing, Message* Opp);
+
+JB_String* JB_Tk__CharName(int Start, uint /*byte*/ Find);
+
+Message* JB_Tk__CloseXML(Message* XML, int I, JB_String* S);
+
+Message* JB_Tk__DecorateThing(Message* R, int Ops);
+
+Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent);
+
+Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr);
+
+int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpFlags);
+
+Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start);
+
+Message* JB_Tk__ErrorAlwaysAdd(JB_String* S, Ind Start);
+
+void JB_Tk__ErrorEvent(int Start, int ExpectedBits, int RealBits);
+
+void JB_Tk__ErrorLetter(int Start);
+
+bool JB_Tk__ExpectEndChar(int Start, JB_String* S, bool Expect);
+
+Message* JB_Tk__fAccess(int Start, Message* Parent);
+
+Message* JB_Tk__fAdjectiveOp(int Start, Message* Parent);
+
+Message* JB_Tk__fAdjectiveThing(int Start, Message* Parent);
+
+Message* JB_Tk__fAfterRel(int Start, Message* Parent);
+
+Message* JB_Tk__fArgColon(int Start, Message* Parent);
+
+Message* JB_Tk__fArgName(int Start, Message* Parent);
+
+Message* JB_Tk__fArgOpen(int Start, Message* Parent);
+
+Message* JB_Tk__fArray(int Start, Message* Parent);
+
+Message* JB_Tk__fAsk(int Start, Message* Parent);
+
+Message* JB_Tk__fAskSub(int Start, Message* Parent, Syntax F);
+
+Message* JB_Tk__fAtName(int Start, Message* Parent);
+
+Message* JB_Tk__fAtNamedExp(int Start, Message* Parent);
+
+Message* JB_Tk__fBackTick(int Start, Message* Parent);
+
+Message* JB_Tk__fBAdjectiveOp(int Start, Message* Parent);
+
+Message* JB_Tk__fBAdjectiveThing(int Start, Message* Parent);
+
+Message* JB_Tk__fBeforeRel(int Start, Message* Parent);
+
+Message* JB_Tk__fBeforeRelMinus(int Start, Message* Parent);
+
+Message* JB_Tk__fBinary(int Start, Message* Parent);
+
+Message* JB_Tk__fBracket(int Start, Message* Parent);
+
+Message* JB_Tk__fChar(int Start, Message* Parent);
+
+Message* JB_Tk__fCharSub(int Pos, int Start, uint /*byte*/ Find);
+
+Message* JB_Tk__fComment(int Start, Message* Parent);
+
+Message* JB_Tk__fCommentLine(int Start, Message* Parent);
+
+Message* JB_Tk__fDecl(int Start, Message* Parent);
+
+Message* JB_Tk__fDot(int Start, Message* Parent);
+
+Message* JB_Tk__fDotAccess(int Start, Message* Parent);
+
+Message* JB_Tk__fEndOfLine(int Start, Message* Parent);
+
+Message* JB_Tk__fError(int Start, Message* Parent);
+
+Message* JB_Tk__fError2(int Start, Message* Parent);
+
+Message* JB_Tk__fFuncCall(int Start, Message* Parent);
+
+Message* JB_Tk__FillXML(Message* XML, Ind I);
+
+int JB_Tk__FindError(int Num);
+
+int JB_Tk__FinishParseLoop(int Lines, Message* Output, int After);
+
+Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent);
+
+Message* JB_Tk__FixTRels(Message* Self, Message* Last);
+
+Message* JB_Tk__fMsgList(int Start, Message* Parent);
+
+Message* JB_Tk__fNumber(int Start, Message* Parent);
+
+Message* JB_Tk__fOpAsThing(int Start, Message* Parent);
+
+Message* JB_Tk__fOppBracket(int Start, Message* Parent);
+
+Message* JB_Tk__fOppSyx(int Start, Message* Parent);
+
+Message* JB_Tk__fOppSyxNeq(int Start, Message* Parent);
+
+Message* JB_Tk__fOppWord(int Start, Message* Parent);
+
+Message* JB_Tk__fQuestion(int Start, Message* Parent);
+
+Message* JB_Tk__fQuoteLang(int Start, Message* Parent);
+
+Message* JB_Tk__fSDot(int Start, Message* Parent);
+
+Message* JB_Tk__fShebang(int Start, Message* Parent);
+
+Message* JB_Tk__fStatement(int Start, Message* Parent);
+
+Message* JB_Tk__fStatementColon(int Start, Message* Parent);
+
+Message* JB_Tk__fString(int Start, Message* Parent);
+
+Message* JB_Tk__fSuperStr(int Start, Message* Parent);
+
+Message* JB_Tk__fSyntacticComment(int Start, Message* Parent);
+
+Message* JB_Tk__fTemporalHashThing(int Start, Message* Parent);
+
+Message* JB_Tk__fTemporalRel(int Start, Message* Parent);
+
+Message* JB_Tk__fTemporalRelSyx(int Start, Message* Parent);
+
+Message* JB_Tk__fThingSyx(int Start, Message* Parent);
+
+Message* JB_Tk__fThingWord(int Start, Message* Parent);
+
+Message* JB_Tk__fTmp(int Start, int OpFlags, int ThingFlags, Message* Parent);
+
+Message* JB_Tk__fTmpPlus(int Start, Message* Parent);
+
+Message* JB_Tk__fTmpSection(int Start, Message* Parent);
+
+Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags);
+
+Message* JB_Tk__fTypeCast(int Start, Message* Parent);
+
+Message* JB_Tk__fURL(int Start, Message* Parent);
+
+Message* JB_Tk__fXML(int Start, Message* Parent);
+
+Message* JB_Tk__fXML_Comment(int Start, Message* Parent);
+
+Message* JB_Tk__fXML_DTD(int Start, Message* Parent);
+
+Message* JB_Tk__fXML_PI(int Start, Message* Parent);
+
+Message* JB_Tk__fYoda(int Start, Message* Parent);
+
+Message* JB_Tk__GetFuncAfter(Message* Result);
+
+int JB_Tk__GotoEndOfLine(int From);
+
+Message* JB_Tk__IndentBug(Message* Curr);
+
+void JB_Tk__Init();
+
+int JB_Tk__Init_();
+
+int JB_Tk__InitCode_();
+
+Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr);
+
+Message* JB_Tk__MakeInvisArg(Message* Tmp);
+
+Message* JB_Tk__MakeRel(Message* First, int Bits);
+
+int JB_Tk__MessageErrorSub(FastString* Fs, int Num);
+
+bool JB_Tk__NeedName(Message* Thg);
+
+Message* JB_Tk__NewParentName(Message* Parent, Syntax Func, int Start, JB_String* Name);
+
+Message* JB_Tk__NewParent(Message* Parent, Syntax Func, int Start, int End);
+
+Message* JB_Tk__NewEmpty(Message* P, Syntax F, int Start, int After);
+
+Message* JB_Tk__NewSkip(Message* P, Syntax F, int Start, int NameStart, int NameEnd);
+
+Message* JB_Tk__NewWord(Message* P, Syntax F, int Start, int SearchFrom);
+
+void JB_Tk__NextLineAndIndent(Message* Parent, ParserLineAndIndent* Rz);
+
+bool JB_Tk__NoFuncAfter(uint /*byte*/ B);
+
+Message* JB_Tk__NumberSub(int Start, int RealStart);
+
+int JB_Tk__NumEnd(JB_String* NumStr, int Start);
+
+bool JB_Tk__OK();
+
+Message* JB_Tk__OppChain(Message* Opp);
+
+void JB_Tk__Params(Message* Parent, int N);
+
+Message* JB_Tk__ParseItem(Message* Ch, int TemporalFlags, int Ops);
+
+int JB_Tk__ParseLoop(Message* Output, int TmpoFlags);
+
+bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpFlags);
+
+Message* JB_Tk__ParseLoopItem(Message* Output, int TmpoFlags, Message* Prev, int Indent);
+
+Message* JB_Tk__PostInnerAdj(Message* Rel, Message* Opp);
+
+Message* JB_Tk__ProcessSyxParent(Message* Parent, int Ops, int ThingFlags);
+
+Message* JB_Tk__ProcessSyxSub(Message* Parent, int Ops, int KindOfThing, bool Expect);
+
+Message* JB_Tk__ProcessThing(int Ops, bool Expect);
+
+Message* JB_Tk__ProcessThingNoBar(int Ops, bool Expect);
+
+Message* JB_Tk__ProcessThingOrTmp(int Opps);
+
+Message* JB_Tk__ReRoute(Message* Output, Message* Cnj, Message* F);
+
+Message* JB_Tk__ThingXMLAtt(int Start, Message* Parent);
+
+void JB_Tk__TokensChar(JB_String* Range, TokHan* H);
+
+void JB_Tk__TokensFn(Array* Arr, int Bits, FP_ParseHandler Func);
+
+void JB_Tk__TokensHan(Array* Arr, TokHan* H);
+
+void JB_Tk__TokenzFn(JB_String* S, int Bits, FP_ParseHandler Func);
+
+Message* JB_Tk__UnexpectedSyntax(Message* Bad);
+
+Message* JB_Tk__UnTmpPlace(Message* R);
+
+bool JB_Tk__WillEnd();
+
+int JB_Tk__WordAfter(int Start);
+
+int JB_Tk__WordAfterSub(int Start, CharSet Cs);
+
+int JB_Tk__XMLAttribs(Message* XML, int Start);
+
+Message* JB_Tk__XMLWhatever(int S, int Skip, JB_String* Ender, Syntax Fn);
+
+Ind JB_Tk__XMLWordEnd(int From);
+
+
+
 // PicoNoise
 
 
 // Platform
-bool JB_Platform__CPU_ARM();
-
-bool JB_Platform__CPU_Intel();
-
 JB_String* JB_Platform__CPU_Name();
-
-bool JB_Platform__CPU_PPC();
-
-bool JB_Platform__CPU_Spd();
 
 int JB_Platform__Init_();
 
 void JB_Platform__Log(JB_String* S);
 
 JB_File* JB_Platform__OpenLog();
-
-int JB_Platform__PointerBytes();
-
-bool JB_Platform__Release();
 
 
 
@@ -3974,273 +4227,6 @@ SCClass* SC_VecType(bool Isfloat, int Count);
 
 
 
-// Tk
-Message* JB_Tk__AddToOutput(Message* Output, Message* Curr, Message* Prev, int Pos);
-
-void JB_Tk__AddXMLText(Message* XML, JB_String* S, int Start, int I);
-
-Message* JB_Tk__BarThings(int Start, Syntax Syx);
-
-Message* JB_Tk__BeforeRelSub(int Start, bool Mode);
-
-bool JB_Tk__CanDot();
-
-bool JB_Tk__CanStatement();
-
-Message* JB_Tk__ChainTemporalRels(Message* FirstThing, Message* Opp);
-
-JB_String* JB_Tk__CharName(int Start, uint /*byte*/ Find);
-
-Message* JB_Tk__CloseXML(Message* XML, int I, JB_String* S);
-
-Message* JB_Tk__DecorateThing(Message* R, int Ops);
-
-Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent);
-
-Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr);
-
-int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpFlags);
-
-Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start);
-
-Message* JB_Tk__ErrorAlwaysAdd(JB_String* S, Ind Start);
-
-void JB_Tk__ErrorEvent(int Start, int ExpectedBits, int RealBits);
-
-void JB_Tk__ErrorLetter(int Start);
-
-bool JB_Tk__ExpectEndChar(int Start, JB_String* S, bool Expect);
-
-Message* JB_Tk__fAccess(int Start, Message* Parent);
-
-Message* JB_Tk__fAdjectiveOp(int Start, Message* Parent);
-
-Message* JB_Tk__fAdjectiveThing(int Start, Message* Parent);
-
-Message* JB_Tk__fAfterRel(int Start, Message* Parent);
-
-Message* JB_Tk__fArgColon(int Start, Message* Parent);
-
-Message* JB_Tk__fArgName(int Start, Message* Parent);
-
-Message* JB_Tk__fArgOpen(int Start, Message* Parent);
-
-Message* JB_Tk__fArray(int Start, Message* Parent);
-
-Message* JB_Tk__fAsk(int Start, Message* Parent);
-
-Message* JB_Tk__fAskSub(int Start, Message* Parent, Syntax F);
-
-Message* JB_Tk__fAtName(int Start, Message* Parent);
-
-Message* JB_Tk__fAtNamedExp(int Start, Message* Parent);
-
-Message* JB_Tk__fBackTick(int Start, Message* Parent);
-
-Message* JB_Tk__fBAdjectiveOp(int Start, Message* Parent);
-
-Message* JB_Tk__fBAdjectiveThing(int Start, Message* Parent);
-
-Message* JB_Tk__fBeforeRel(int Start, Message* Parent);
-
-Message* JB_Tk__fBeforeRelMinus(int Start, Message* Parent);
-
-Message* JB_Tk__fBinary(int Start, Message* Parent);
-
-Message* JB_Tk__fBracket(int Start, Message* Parent);
-
-Message* JB_Tk__fChar(int Start, Message* Parent);
-
-Message* JB_Tk__fCharSub(int Pos, int Start, uint /*byte*/ Find);
-
-Message* JB_Tk__fComment(int Start, Message* Parent);
-
-Message* JB_Tk__fCommentLine(int Start, Message* Parent);
-
-Message* JB_Tk__fDecl(int Start, Message* Parent);
-
-Message* JB_Tk__fDot(int Start, Message* Parent);
-
-Message* JB_Tk__fDotAccess(int Start, Message* Parent);
-
-Message* JB_Tk__fEndOfLine(int Start, Message* Parent);
-
-Message* JB_Tk__fError(int Start, Message* Parent);
-
-Message* JB_Tk__fError2(int Start, Message* Parent);
-
-Message* JB_Tk__fFuncCall(int Start, Message* Parent);
-
-Message* JB_Tk__FillXML(Message* XML, Ind I);
-
-int JB_Tk__FindError(int Num);
-
-int JB_Tk__FinishParseLoop(int Lines, Message* Output, int After);
-
-Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent);
-
-Message* JB_Tk__FixTRels(Message* Self, Message* Last);
-
-Message* JB_Tk__fMsgList(int Start, Message* Parent);
-
-Message* JB_Tk__fNumber(int Start, Message* Parent);
-
-Message* JB_Tk__fOpAsThing(int Start, Message* Parent);
-
-Message* JB_Tk__fOppBracket(int Start, Message* Parent);
-
-Message* JB_Tk__fOppSyx(int Start, Message* Parent);
-
-Message* JB_Tk__fOppSyxNeq(int Start, Message* Parent);
-
-Message* JB_Tk__fOppWord(int Start, Message* Parent);
-
-Message* JB_Tk__fQuestion(int Start, Message* Parent);
-
-Message* JB_Tk__fQuoteLang(int Start, Message* Parent);
-
-Message* JB_Tk__fSDot(int Start, Message* Parent);
-
-Message* JB_Tk__fShebang(int Start, Message* Parent);
-
-Message* JB_Tk__fStatement(int Start, Message* Parent);
-
-Message* JB_Tk__fStatementColon(int Start, Message* Parent);
-
-Message* JB_Tk__fString(int Start, Message* Parent);
-
-Message* JB_Tk__fSuperStr(int Start, Message* Parent);
-
-Message* JB_Tk__fSyntacticComment(int Start, Message* Parent);
-
-Message* JB_Tk__fTemporalHashThing(int Start, Message* Parent);
-
-Message* JB_Tk__fTemporalRel(int Start, Message* Parent);
-
-Message* JB_Tk__fTemporalRelSyx(int Start, Message* Parent);
-
-Message* JB_Tk__fThingSyx(int Start, Message* Parent);
-
-Message* JB_Tk__fThingWord(int Start, Message* Parent);
-
-Message* JB_Tk__fTmp(int Start, int OpFlags, int ThingFlags, Message* Parent);
-
-Message* JB_Tk__fTmpPlus(int Start, Message* Parent);
-
-Message* JB_Tk__fTmpSection(int Start, Message* Parent);
-
-Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags);
-
-Message* JB_Tk__fTypeCast(int Start, Message* Parent);
-
-Message* JB_Tk__fURL(int Start, Message* Parent);
-
-Message* JB_Tk__fXML(int Start, Message* Parent);
-
-Message* JB_Tk__fXML_Comment(int Start, Message* Parent);
-
-Message* JB_Tk__fXML_DTD(int Start, Message* Parent);
-
-Message* JB_Tk__fXML_PI(int Start, Message* Parent);
-
-Message* JB_Tk__fYoda(int Start, Message* Parent);
-
-Message* JB_Tk__GetFuncAfter(Message* Result);
-
-int JB_Tk__GotoEndOfLine(int From);
-
-Message* JB_Tk__IndentBug(Message* Curr);
-
-void JB_Tk__Init();
-
-int JB_Tk__Init_();
-
-int JB_Tk__InitCode_();
-
-Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr);
-
-Message* JB_Tk__MakeInvisArg(Message* Tmp);
-
-Message* JB_Tk__MakeRel(Message* First, int Bits);
-
-int JB_Tk__MessageErrorSub(FastString* Fs, int Num);
-
-bool JB_Tk__NeedName(Message* Thg);
-
-Message* JB_Tk__NewParentName(Message* Parent, Syntax Func, int Start, JB_String* Name);
-
-Message* JB_Tk__NewParent(Message* Parent, Syntax Func, int Start, int End);
-
-Message* JB_Tk__NewEmpty(Message* P, Syntax F, int Start, int After);
-
-Message* JB_Tk__NewSkip(Message* P, Syntax F, int Start, int NameStart, int NameEnd);
-
-Message* JB_Tk__NewWord(Message* P, Syntax F, int Start, int SearchFrom);
-
-void JB_Tk__NextLineAndIndent(Message* Parent, ParserLineAndIndent* Rz);
-
-bool JB_Tk__NoFuncAfter(uint /*byte*/ B);
-
-Message* JB_Tk__NumberSub(int Start, int RealStart);
-
-int JB_Tk__NumEnd(JB_String* NumStr, int Start);
-
-bool JB_Tk__OK();
-
-Message* JB_Tk__OppChain(Message* Opp);
-
-void JB_Tk__Params(Message* Parent, int N);
-
-Message* JB_Tk__ParseItem(Message* Ch, int TemporalFlags, int Ops);
-
-int JB_Tk__ParseLoop(Message* Output, int TmpoFlags);
-
-bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpFlags);
-
-Message* JB_Tk__ParseLoopItem(Message* Output, int TmpoFlags, Message* Prev, int Indent);
-
-Message* JB_Tk__PostInnerAdj(Message* Rel, Message* Opp);
-
-Message* JB_Tk__ProcessSyxParent(Message* Parent, int Ops, int ThingFlags);
-
-Message* JB_Tk__ProcessSyxSub(Message* Parent, int Ops, int KindOfThing, bool Expect);
-
-Message* JB_Tk__ProcessThing(int Ops, bool Expect);
-
-Message* JB_Tk__ProcessThingNoBar(int Ops, bool Expect);
-
-Message* JB_Tk__ProcessThingOrTmp(int Opps);
-
-Message* JB_Tk__ReRoute(Message* Output, Message* Cnj, Message* F);
-
-Message* JB_Tk__ThingXMLAtt(int Start, Message* Parent);
-
-void JB_Tk__TokensChar(JB_String* Range, TokHan* H);
-
-void JB_Tk__TokensFn(Array* Arr, int Bits, FP_ParseHandler Func);
-
-void JB_Tk__TokensHan(Array* Arr, TokHan* H);
-
-void JB_Tk__TokenzFn(JB_String* S, int Bits, FP_ParseHandler Func);
-
-Message* JB_Tk__UnexpectedSyntax(Message* Bad);
-
-Message* JB_Tk__UnTmpPlace(Message* R);
-
-bool JB_Tk__WillEnd();
-
-int JB_Tk__WordAfter(int Start);
-
-int JB_Tk__WordAfterSub(int Start, CharSet Cs);
-
-int JB_Tk__XMLAttribs(Message* XML, int Start);
-
-Message* JB_Tk__XMLWhatever(int S, int Skip, JB_String* Ender, Syntax Fn);
-
-Ind JB_Tk__XMLWordEnd(int From);
-
-
-
 // zalgo
 int JB_zalgo__Init_();
 
@@ -4515,11 +4501,7 @@ ASM SC_ASM_GTable_AddSet(ASM Self, uint Value);
 
 ASM SC_ASM_GTable_ModeSet(ASM Self, uint Value);
 
-ASM SC_ASM_HALT_ExitCodeSet(ASM Self, uint Value);
-
-ASM SC_ASM_HALT_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_HALT_SigNumSet(ASM Self, uint Value);
+ASM SC_ASM_HALT_ReservedSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpEq_JmpSet(ASM Self, uint Value);
 
@@ -5717,8 +5699,6 @@ int SC_FAT_BaseOp(FatASM* Self);
 
 bool SC_FAT_CanCloseRegs(FatASM* Self, int R);
 
-ASMReg SC_FAT_CanGlobalGrab(FatASM* Self, uint64 Find, uint64 Range, uint64 BS);
-
 bool SC_FAT_CanMarkSomething(FatASM* Self, Message* Exp, ASMReg Declared, SCDecl* Ty);
 
 void SC_FAT_CheckHasOutput(FatASM* Self);
@@ -5752,6 +5732,8 @@ int64 SC_FAT_FloatIntConvConst(FatASM* Self, uint /*DataTypeCode*/ Src, uint /*D
 uint64 SC_FAT_FuncPrms(FatASM* Self, SCFunction* Fn);
 
 int SC_FAT_GuessSize(FatASM* Self);
+
+ASM* SC_FAT_Halt_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
 uint SC_FAT_Index(FatASM* Self);
 
@@ -6182,8 +6164,6 @@ FatASM* SC_Pac_FuncStart(Assembler* Self);
 
 ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest);
 
-ASMReg SC_Pac_GlobAddrSub(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest, int64 ExportPos);
-
 void SC_Pac_Guard(Assembler* Self);
 
 ASMReg SC_Pac_If(Assembler* Self, Message* Exp, ASMReg Dest);
@@ -6306,6 +6286,8 @@ ASMReg SC_Pac_NumToReg(Assembler* Self, Message* Exp, ASMReg Reg, int64 K, uint 
 
 uint64 SC_Pac_OpenVars(Assembler* Self);
 
+ASMReg SC_Pac_PackGlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest, int64 ExportPos);
+
 ASMReg SC_Pac_Plus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_PlusSub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -6399,8 +6381,6 @@ ASMReg SC_Pac_Ternary(Assembler* Self, Message* Exp, ASMReg Dest);
 ASMReg SC_Pac_TernRefCount(Assembler* Self, ASMReg A, ASMReg B);
 
 ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* SrcPrms, Message* ASMPrms, ASMReg Dest, uint /*byte*/ OpCode);
-
-ASMReg SC_Pac_TryGetGlob(Assembler* Self, SCDecl* D, ASMReg Mode);
 
 ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn, int AllowedGain);
 
@@ -8764,7 +8744,7 @@ JB_String* JB_Msg_Render(Message* Self, FastString* Fs_in);
 
 void JB_Msg_render_jbin_sub(Message* Self, FastString* Js);
 
-JB_String* JB_Msg_RenderAST(Message* Self, FastString* Fs_in);
+JB_String* JB_Msg_RenderAST(Message* Self, bool RenderRoot, FastString* Fs_in);
 
 JB_String* JB_Msg_RenderJbin(Message* Self, JB_String* Shell_path, FastString* Fs_in);
 
@@ -9220,8 +9200,6 @@ SCDecl* SC_Decl_GetCArray(SCDecl* Self, int Amount);
 
 SCIterator* SC_Decl_GetIteratorAny(SCDecl* Self, JB_String* Name, Message* Node);
 
-DataTypeCode SC_Decl_GlobInfo(SCDecl* Self);
-
 bool SC_Decl_HasStruct(SCDecl* Self);
 
 SCFunction* SC_Decl_HasStructDestructor(SCDecl* Self);
@@ -9415,6 +9393,8 @@ bool SC_Decl_SameForReplace(SCDecl* Self, SCDecl* C);
 void SC_Decl_Sanity(SCDecl* Self);
 
 int SC_Decl_SizeOfQuery(SCDecl* Self);
+
+int SC_Decl_SortScore(SCDecl* Self);
 
 bool SC_Decl_SpecialReg(SCDecl* Self);
 
@@ -10832,6 +10812,16 @@ inline void JB_MzSt_End(CompressionStats* Self);
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in);
 
+inline bool JB_Platform__CPU_ARM();
+
+inline bool JB_Platform__CPU_Intel();
+
+inline bool JB_Platform__CPU_Spd();
+
+inline int JB_Platform__PointerBytes();
+
+inline bool JB_Platform__Release();
+
 inline void JB_Print(JB_String* Data);
 
 inline void JB_PrintLine(JB_String* Data);
@@ -11420,6 +11410,26 @@ inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
 	return (((__Object_Render__)(Table->render)))(Self, Fs_in);
 }
 
+inline bool JB_Platform__CPU_ARM() {
+	return ((bool)(JB_Platform__CPU() & 2));
+}
+
+inline bool JB_Platform__CPU_Intel() {
+	return ((bool)(JB_Platform__CPU() & 4));
+}
+
+inline bool JB_Platform__CPU_Spd() {
+	return ((bool)(JB_Platform__CPU() & 1));
+}
+
+inline int JB_Platform__PointerBytes() {
+	return JB_PointerSize() >> 3;
+}
+
+inline bool JB_Platform__Release() {
+	return (!JB_IsDebug());
+}
+
 inline void JB_Print(JB_String* Data) {
 	JB_Str_Print(Data);
 }
@@ -11628,7 +11638,7 @@ inline void JB_FS_AppendTermCol(FastString* Self, TerminalColor Col) {
 }
 
 inline JB_File* JB_File__Logs() {
-	return JB_Str_AsFile(JB_LUB[532]);
+	return JB_Str_AsFile(JB_LUB[529]);
 }
 
 inline void JB_Msg_AppendSyx(Message* Self, Syntax Fn, JB_String* Name) {
@@ -11750,7 +11760,7 @@ inline bool JB_Str_CompressTestSub_(JB_String* Self, int Strength, bool Report) 
 	Rz = (JB_Str_Equals(Self, Decomp, false));
 	if (!Rz) {
 		if (true) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1843], Self);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1840], Self);
 			JB_Incr(_tmPf0);
 			JB_Str_Fail(_tmPf0);
 			JB_Decr(_tmPf0);
@@ -11844,11 +11854,11 @@ struct JB_Globals {
 	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
-	JB_Object* Platform_Logger_;
-	JB_Object* StdErr;
 	JB_Object* Tk__EndOfLineMarker;
 	JB_Object* Constants_EscapeStr;
 	JB_Object* TC_Types_Dict;
+	JB_Object* Platform_Logger_;
+	JB_Object* StdErr;
 	JB_Object* Constants_JS_EscapeStr;
 	JB_Object* App_Usage;
 	JB_Object* Constants_UnEscapeStr;
