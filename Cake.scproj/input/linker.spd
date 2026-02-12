@@ -97,13 +97,13 @@ module SpdTable
 		|| after = base + .RangeLength
 
 		while base < after
-			|| asm = base[]
-			|| Op = asm.op
+			|| µ = base[]
+			|| Op = µ.op
 			if op.IsSPDFunc
-				base.PutCandlesOnCake(asm)
-			  elseif op.IsGlob and asm.IsLibGlob
-				base.LibGlob(asm)
-			base += asm.size
+				base.PutCandlesOnCake(µ)
+			  elseif op.IsGlob and µ.IsLibGlob
+				base.LibGlob(µ, op == asm.GOBJ)
+			base += µ.size
 
 
 
@@ -134,18 +134,22 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFu
 
 
 
-function asm.LibGlob (|&asm| self, |asm| Old) // Globlink, DoGlobs
+function asm.LibGlob (|&asm| self, |asm| Old, |bool| GOBJ)				// Globlink, DoGlobs
 	opt norefcounts
-/	|| ID = (Old << 15) >> 15
-	expect (ID > 0 and ID < globals.LibMax)					(spdtable.Currfunc, "Bad LibGlob ID: " + ID )
+	|| Shift = 14 + GOBJ
+	|| ID = (Old << Shift) >> Shift
+	expect (ID > 0 and ID < globals.LibMax)					(SpdTable.Currfunc, "Bad LibGlob ID: " + ID )
 	
 	ID = globals.LibLink![ID-1]
-	expect (ID != 16~bits)									(spdtable.currfunc, "Global missing in libarry")
-	if (old.op == asm.GOBJ)
+	expect (ID != 16~bits)									(SpdTable.currfunc, "Global missing in library")
+	
+	if (GOBJ)
 		old = (Old >> 17) << 17
 		old |= ID >> 3
-	  else			//GTAB
+	  else													// GTAB
 		old = (Old >> 18) << 18
 		old |= ID
 	self[] = old
+
+
 

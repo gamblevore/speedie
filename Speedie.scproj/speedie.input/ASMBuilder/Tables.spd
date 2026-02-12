@@ -833,13 +833,13 @@ function Str (fn_asm)
 		k = PackMaker.PackGlobSize + (PackMaker.PackStrings.length<<3)
 		real.Position = k
 	
-	if k <= 20~bits
+	if k <= 20~bits										// this is never a lib. always pack.
 		return exp.GOBJ(dest, 0, 0, K>>3) * dest		// seems good!
 	
 	if !StringsOutOfRange++
 		problem (exp, "String performance may slow. Large global table pushed a string out of fast-reach.")
 	
-	|| addr = .GlobAddrSub(nil, exp, dest, k)
+	|| addr = .PackGlobAddr(nil, exp, dest, k)
 	return .Read(dest, exp, addr, nil, exp.obj as scdecl) * dest
 
 

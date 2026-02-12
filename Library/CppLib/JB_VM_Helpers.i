@@ -248,11 +248,10 @@ AlwaysInline JB_Object* alloc(void* o) {
 	return JB_AllocNew(((JB_MemoryLayer*)o)->CurrBlock);
 }
 
-u64 table (CakeVM& vm, ASM Op) {
-	auto Add = GTable_Addu<<6;
-	if (GTable_Modeu)
-		return (u64)(vm.LibGlobs+Add);
-	return (u64)(vm.PackGlobs+Add);
+u64 gtable (CakeVM& vm, ASM Op) {
+	auto Where = GTable_Modeu?vm.LibGlobs:vm.PackGlobs;
+	auto Add = GTable_Addu;
+	return (u64)(Where+Add);
 }
 
 

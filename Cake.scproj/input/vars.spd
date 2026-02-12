@@ -67,13 +67,18 @@ class XVar (list)
 				|| Missing = TabTo - (fs.mark - M)
 				fs <~ (' ', missing)
 		
-		if reg0
-			|| Reg = Reg0 + .reg
-			|| C = .obj|&nil||xtype|
-				if c.IsObject
-					return .RenderObject(fs, reg)
-	
-			return .RenderData(fs, reg)
+		require reg0
+		if TerminalColor.Enabled
+			fs <~ terminalcolor.red
+
+		|| Reg = Reg0 + .reg
+		|| C = .obj|&nil||xtype|
+		if c and c.IsObject
+			.RenderObject(fs, reg)
+		  else
+			.RenderData(fs, reg)
+		if TerminalColor.Enabled
+			fs <~ terminalcolor.normal
 	
 	
 	function RenderObject (|faststring| fs, |!&ivec4| Reg)

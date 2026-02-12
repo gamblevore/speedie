@@ -1,9 +1,12 @@
 ı HALT:;
-	if (Op != VMHexEndCode)
-	CakeCrashed(&vm, SIGKILL)
+	if (Op == VMHexEndCleanly)
+	vm.Registers[2].Int = 0
+;
+	else if (Op == VMHexFinalReturn)
+	0
 ;
 	else
-	vm.Registers[2].Int = 0
+	CakeCrashed(&vm, SIGKILL)
 ;
 	goto EXIT;
 ı TAIL:;
@@ -171,7 +174,7 @@
 ı GOBJ:;
 	o1 = gobj(vm, Op);
 ı GTAB:;
-	u1 = table(vm, Op);
+	u1 = gtable(vm, Op);
 ı RD1U:;
 	u1 = mem1(uint8);
 	mem2(uint8);

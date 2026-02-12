@@ -25,7 +25,6 @@ function message.ASMDecl (|SCDecl!|)
 function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	|| p = .Curr
 	if p < .End
-		if "jb_main".trap
 		.curr_ = p + 1
 		p[0] = nil
 		p.info = (p.index|uint64|<<48)|asmreg| // no need to call fat*reg now

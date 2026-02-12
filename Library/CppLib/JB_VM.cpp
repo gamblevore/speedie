@@ -261,7 +261,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	
 	V->__VIEW__ = JB_ASM_NoBreak;
 	V->VFlags = Flags;
-	VMCodePtr(V)[CakeCodeMax-1] = VMHexEndCode;
+	VMCodePtr(V)[CakeCodeMax-1] = VMHexFinalReturn;
 	VMCodePtr(V)[-1] = VMHexEndStack;
 	
 	__CAKE_VM__(*V, 0, CakeStackSize);
@@ -272,7 +272,6 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
  
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
-//	V.CurrStack = (VMStack*)(&V.Registers[2]);
 	auto Base = (VMStack*)(&V.Registers[0]);
 	Base[0].Code = VMCodePtr(&V) + CakeCodeMax-1;
 	Base[2].Code = VMProtect(V, true) + CodeIndex;

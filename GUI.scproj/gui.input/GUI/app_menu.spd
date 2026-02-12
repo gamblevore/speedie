@@ -13,9 +13,6 @@ class AppMenu (Window)
 		.gnormal.edge = (0.5, 0.0, 1.0, 0.5).px
 		.init
 
-	
-	libinternal ScreenModeStr (|string|)
-		return "Go FullScreen"
 
 	libinternal Init
 		is visible
@@ -26,7 +23,7 @@ class AppMenu (Window)
 		|| it = .choices
 		it <~ (first,						MenuAbout)
 		it.addsep
-//		it <~ (.ScreenModeStr,				MenuScreen) // doesn't quite work yet. locks up the mac!
+//		it <~ ("Go FullScreen",				MenuScreen) // doesn't quite work yet. locks up the mac!
 		it <~ ("Help",						MenuHelp)
 		it <~ ("Quit",						MenuQuit)
 		it.gnormal = ¥.Menus 
