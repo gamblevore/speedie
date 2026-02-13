@@ -28,10 +28,7 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 	
 	syntax Compare (|float| Other, |int|)
 		|| oof = other.date
-		if (self > oof)
-			return 1
-		if (self < oof)
-			return -1
+		return (self > oof) - (self < oof)  // -1, 0, or +1
 	
 	function WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16

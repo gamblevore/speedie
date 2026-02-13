@@ -4,8 +4,6 @@
 */
 
 module Macros {
-//|| FS = "|| fs = faststring()".macro
-
 || InitExpand = "({
 	|| _X = _0
 	if _X == nil // useful for initing arrays... which could start as nil
@@ -30,7 +28,7 @@ module Macros {
 }`.macro
 || MainArgBasic      = `|| _0 =  _1.MainArg(_2+1, "_0"),           `.macro
 || MainArgBasicReq   = `|| _0 =  _1.MainArg(_2+1, "_0") #require,  `.macro
-|| MainArgDefault    = `|| _0 =  _1.MainArg(-(_2+1), "_0"),  _0 ?= _3 `.macro
+|| MainArgDefault    = `|| _0 =  _1.MainArg(-(_2+1), "_0"),_0 ?= _3`.macro
 || MainArgArray      = `
 |[_1]| _0
 || __ArgCurr = _2

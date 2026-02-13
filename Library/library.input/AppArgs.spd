@@ -33,7 +33,6 @@ function String.ArgSwitch (|string| name, |bool|)
 	// * (value)	  for paths:	 "/usr/dir/filexx"
 
 
-
 autogen @int.MainArg         (|int| Pos, |string| name, |int|)
 	|| big = int64.mainarg(pos, name)
 	expect (big <= int.max and big >= int.min) ("Int out of range")
@@ -87,4 +86,15 @@ autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringt
 		|| usage = app.Usage
 		error "Missing $name ($type).\n\n$usage"
 	return string.Error
+
+
+////////////////////////////////////////////////////////
+
+autogen app.MainArgsStart (|string| Usage, |int|)
+	opt norefcounts
+	if !.usage
+		.usage = usage
+	|| C = .args.length
+		return C
+	printline .usage.replaceall("\$app", .callpath.name)
 

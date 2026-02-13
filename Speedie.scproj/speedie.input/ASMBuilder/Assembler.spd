@@ -504,14 +504,15 @@ struct Assembler
 			|| trap = ++ASMTrapper
 		|| OV = .OpenVars
 		if ModeOnly is NewlyDeclared									// || x = (y + 1) + (z + 1)
-			ModeOnly = ModeOnly asnt asmreg.NewlyDeclared
-		  elseif ModeOnly is temp										//    x = (y + 1) + (z + 1)
-			ModeOnly = .TempOnly(ModeOnly)
-//			 asmtodo: what about doing all .declareme? simpler?
+			ModeOnly = ModeOnly asnt ASMReg.NewlyDeclared
 		  else
-			ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
+			if ModeOnly is temp											//    x = (y + 1) + (z + 1)
+				ModeOnly = .TempOnly(ModeOnly)
+	//			 asmtodo: what about doing all .declareme? simpler?
+			  else
+				ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
+				(modeonly is Temp)
 			(modeonly is OKAsTemp)
-			(modeonly is Temp)
 		
 		target debug
 			ModeOnly.TmpCheck

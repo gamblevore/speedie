@@ -9,7 +9,7 @@ bool JB_Platform__Lin();
 int JB_Platform__CPU();
 bool JB_IsLibrary();
 Array* JB_App__Args();
-JB_StringC*	JB_App__CallPath();
+JB_StringC*	JB_App__CallPath(const char*);
 JB_String* JB_App__Readline();
 bool JB_App__ShouldDie();
 int JB_App__LostChild();

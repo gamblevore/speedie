@@ -173,7 +173,6 @@ int JB_GUICareTaker(PicoDate D) {
 
 
 Array*		JB_App__Args()					{ return Raw_Args; }
-JB_StringC*	JB_App__CallPath()				{ return JB_StrC(JB_Main__Args[0]); }
 void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
 bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
 bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
@@ -184,6 +183,13 @@ void		JB_App__GUIMode(bool GUI) {
 // GUICareTaker seems to cause problems and I'm fed up with it.
 	PicoGlobalConf()->Observer = GUI ? JB_GUICareTaker : JB_BasicCareTaker;
 	JB_NoExitOnCrash = GUI;
+}
+
+JB_StringC*	JB_App__CallPath (const char* New) {
+	if (!New)
+		return JB_StrC(JB_Main__Args[0]);
+	JB_Main__Args[0] = New;
+	return 0;
 }
 
 

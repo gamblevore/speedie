@@ -200,19 +200,14 @@ function message.MainArgsCanBeZero (|bool|)
 		require  dcl.second == @rel  or  dcl.first == @arr
 	return true
 
-		
+
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
 	|| usage = "Usage: \$app " + prms.Render
 	|| FirstArg = `
-
-if !app.usage
-	app.usage = "_0"
-|| __ArgCount = app.args.length
-if __ArgCount == 0
-	printline app.usage.replaceall("\$app", app.callpath.name)
-	return 0
-
+	|| __ArgCount = app.mainargsstart("_0")
+	if !__ArgCount
+		return 0
 `.macro
 	if prms.MainArgsCanBeZero
 		firstarg.Source.last.remove

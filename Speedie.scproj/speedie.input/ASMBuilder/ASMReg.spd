@@ -36,6 +36,7 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		Const
+//		NotNil
 		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit        = [ExitFunction, ExitAtAll]
 		SetAlways   = Textual ||| Set  // reuse const
@@ -123,10 +124,9 @@ datatype ASMReg (uint64)
 	
 	function FatIndex (assigns:|uint|, |asmreg|)
 		return (((self|uint64| << 16) >> 16) ||| (value|uint64| << 48))|asmreg|
-	
+
 	function FAT (|?&fatasm|)
-		|| i = .FatIndex
-			return i.fat
+		return .FatIndex.fat
 	
 	function NeedFAT (|&fatasm|)
 		|| f = .fatindex.fat

@@ -27,6 +27,8 @@ Learn more about Speedie at: http://github.com/gamblevore/speedie/
 		
 	check (r1[] != '-') ("Unexpected switch: " + r1)
 	rz = r1.FileThatExists("load executable")
+	if rz
+		app.CallPath(r1.Addr|cstring|)
 	if debugger.WantDebug
 		r.Remove(0)
 	r.Remove(0)
