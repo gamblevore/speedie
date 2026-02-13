@@ -106,15 +106,22 @@ module SpdTable
 			base += µ.size
 
 
-
 function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
+	opt norefcounts
+	|| err = .PutCandlesOnCakeSub(jumpandreg)
+		error (SpdTable.CurrFunc, err)
+
+
+function asm.PutCandlesOnCakeSub (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
 	opt norefcounts
 	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
 	
 	|| Op = JumpAndReg >> 24								// FNC or FNC3
 	|| Reg = (JumpAndReg >> 19) & 31
 	|| ID = (JumpAndReg & 19~bits) - 31
-	require  ID > 0											// IDs 0-31, are registers. The first 32-funcs are empty.
+	if  ID <= 0
+		return nil
+	// IDs 0-31, are registers. The first 32-funcs are empty.
 	
 	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart								// Fast-branch for speed.
@@ -124,13 +131,10 @@ function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFu
 			|| EncodedJump = Jump&19~bits
 			if  (EncodedJump<<13)>>13  ==  Jump
 				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op<<24)
-				return
-
-			error (SpdTable.CurrFunc, "Executable too large to link: " + fn.name )
-			return
-		error (SpdTable.CurrFunc, "Function was trimmed: " + fn.name )
-		return
-	error (SpdTable.CurrFunc, "Bad function ID: " + id )
+				return nil
+			return "Executable too large to link: " + fn.name
+		return "Function was trimmed: " + fn.name
+	return "Bad function ID: " + id
 
 
 

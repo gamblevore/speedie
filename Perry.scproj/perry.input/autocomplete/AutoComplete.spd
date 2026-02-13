@@ -411,15 +411,15 @@ function PerryIDE.InteractUpdate
 function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| reason, |bool| Instant)
 	opt norefcounts
 	if err
-		.lastextrainfo = nil
+		.LastExtraInfo = nil
 		.PopupDisplay.ExpectsParse = 0
 		.PopupDisplayCorner = p
-		.popupreason = 2
+		.PopupReason = 2
 		.DisplayInPopup(err.name, Instant, err.severity.color, P)
 		return 
 	
 	if !M
-		return .popuphide
+		return .PopupHide
 
 	require (M != .lastextrainfo) or (.popupdisplay isnt visible)
 	|| s = .feedback
@@ -479,13 +479,13 @@ function PerryIDE.FuncText (|message| spd_func, |message|)
 	Last.msg(@sstr, .editme[oop])
 
 
-function message.IsDeclName (|bool|)
-	opt norefcounts
-	|| p = .parent!
-	if (p == @decl)
-		return p.second == self
-	if (p == @rel) and (p in @decl)
-		return .isfirst
+//function message.IsDeclName (|bool|)
+//	opt norefcounts
+//	|| p = .parent!
+//	if (p == @decl)
+//		return p.second == self
+//	if (p == @rel) and (p in @decl)
+//		return .isfirst
 
 
 function message.CommandIsOK (|bool|)
@@ -499,20 +499,22 @@ function message.CommandIsOK (|bool|)
 function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
 	opt norefcounts
 	|| spd_func = where.OwningFunc
+	if spd_func or ((where == @decl) or where.Ancestor(@decl))
 		return .BuildNormalCommand(cmd,  where,  spd_func, name,  reason)
 	
-	if (where == @thg) and Where.IsDeclName
-		return .BuildDeclCommand(cmd,  where,  name,  reason)
+//	if (where == @thg) and Where.IsDeclName
+//		return .BuildDeclCommand(cmd,  where,  name,  reason)
+	
 	if (where == @tmp) and cmd[0, "autocomplete"]
 		return .BuildTmp(reason, where, name)
 
 		
 
 
-function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
-	ignore
-		global "/usr/local/speedie/Perry.scproj/perry.input/IDE.spd" 15814 17
-	debugger  // do some shit
+//function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
+//	ignore
+//		global "/usr/local/speedie/Perry.scproj/perry.input/IDE.spd" 15814 17
+//	debugger  // do some shit
 
 
 function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message| spd_func,  |string| name,  |string| reason,  |message|)

@@ -17,7 +17,7 @@ linkage
 
 function Rename (|message| name)
 	opt norefcounts
-	expect !(name.HasAny) (name, "We can't do that yet")
+	expect !(name.HasAny) (name, "Missing variable name on iterator")
 	for n in .nodes
 		n.func = name.func
 		n.name = name.name

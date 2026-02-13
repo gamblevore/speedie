@@ -35,6 +35,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	|| ic = 0
 	|| args = fn.args
 	|| n = args.Length
+
 	for Ints in 2
 		|| i = 0
 		for p.fast in prms
@@ -141,10 +142,11 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
+	
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
-		if fn isnt CantInline
+		if fn isnt CantInline and fn isnt cpp
 			|| MiniDest = .AskForInline(prms, dest, fn)
 				return MiniDest
 		check (fn isnt LinkInline) (exp, "Unable to inline function")
@@ -170,7 +172,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	.CloseVars(Closer)
 	
 	|| PExt = P >> 32
-	(dest isnt Const) // why would it be?
+	(dest isnt Const)								// why would it be?
 	|| fat = exp.FNC(dest, TableID, P,  PExt)		// prms.fncx
 	if fn.HasCVersion
 		if 0: exp.fncx

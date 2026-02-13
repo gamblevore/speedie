@@ -1293,6 +1293,7 @@ module GUI
 		|| kev = ev.keysym
 		|| key = kev.sym
 		
+//		if (key is BACKTICK) and keys.cmd
 //		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
 
 		if .ForeGroundTime.GuiAgo < 0.1s

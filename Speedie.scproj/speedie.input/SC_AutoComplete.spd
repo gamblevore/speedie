@@ -1219,7 +1219,6 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 	|| top = fn.SourceArg
 	|| Count = 0
 	|| Size = 0
-	if fn == "dereftest"
 	
 	for fat.fat in fn
 		if fat.WillRenderFat

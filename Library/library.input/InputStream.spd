@@ -101,6 +101,7 @@ class InputStream
 	
 	function Position (|int|)				// can't make this int64 without making remaining/length/startfrom also.
 		return .data.position + .StartFrom	// and data.position
+
 	setter Position (|int|)
 		.data.position = value - .StartFrom
 

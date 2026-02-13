@@ -1411,7 +1411,6 @@ class ListView (GUIControl) {
 	
 	function ScrollStart (assigns:|listviewrow|)
 		if ._ScrollStart!=value
-			if keys.Shift
 			._ScrollStart = value
 			.touch
 

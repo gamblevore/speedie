@@ -55,6 +55,7 @@ struct Assembler
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|int|						StringsOutOfRange
 		|jbin?|						DebugDecls
+		|faststring|				DebugSize
 
 		
 		function ClassLayout (|jbin| j)
@@ -315,8 +316,8 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		if fat is temp
-			.CloseOneVar(nil, 1<<fat.info.reg) // why did I comment this out? // testin speedie first?
+		if fat is temp and fat isnt okastemp
+			.CloseOneVar(nil, 1<<fat.info.reg) // why did I comment this out? // test in speedie first?
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...
@@ -491,6 +492,14 @@ struct Assembler
 
 
 	function µGetReal (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
+		// "Real" means var should remain "alive", and not just die after this leaves
+		// the problem is, that this doesn't work very well with temps.
+		// and we are setting this to temp. I'm not sure why? to allow for temp ops?
+		// either way, if you nop a temp... it gets closed. Which defeats the purpose of this.
+		// (memread a gtab, it will nop, and a gobj is made)
+		
+		// so... I think this should never be temp?
+		
 		target debug
 			|| trap = ++ASMTrapper
 		|| OV = .OpenVars
@@ -498,7 +507,7 @@ struct Assembler
 			ModeOnly = ModeOnly asnt asmreg.NewlyDeclared
 		  elseif ModeOnly is temp										//    x = (y + 1) + (z + 1)
 			ModeOnly = .TempOnly(ModeOnly)
-			// asmtodo: what about doing all .declareme? simpler?
+//			 asmtodo: what about doing all .declareme? simpler?
 		  else
 			ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
 			(modeonly is OKAsTemp)
@@ -520,13 +529,21 @@ struct Assembler
 
 
 	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
-		// asmtodo: if this gets nopped... we need to decr all the params!
-		// but we don't have the fats. Could we make an extended fat?
-		// like a fat that... holds params just for storing? and then
-		// we refer to that fatter fat?
+		// why is this a temp? each should be real.
+		// if the decl is unused... we can undeclare it after.
+		// the problem is that memory-reads (and other stuff) can nop stuff.
+		// and nopping will undeclare a temp.
 		
-		|| Mode = exp.AllowsTemp
+		// we already defined the number of regs to save, so that shouldn't happen.
+		// and we already open/close vars in the function!
+		
+		// so... just use a decl? makes things simpler??? right?
+		
+		|asmreg| Mode = nil//exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
+
+
+//		|| r = .µGetASM(Exp, ModeOnly)
 		|| r = .µGetReal(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
 			error (exp|object|)
@@ -621,6 +638,7 @@ struct Assembler
 				problem "Can't use --strip and --targetdebug"
 				Options.StripNames = false
 			debugdecls = faststring()
+//		DebugSize = file.SpeedieDir["spd_asm_size.txt"].OutputStream
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit
 		ASMType.InitAccess
@@ -680,15 +698,6 @@ struct Assembler
 		.VTemps = 0
 		.VDecls = 1							// set after .FuncStart
 		.AddFuncParams(fn)
-//		.TestAllFats
-//	
-//	function TestAllFats
-//		|| S = .Start
-//		|| A = .End
-//		While (S < A)
-//			S.Info++
-//			S.Info--
-//			S++
 
 
 	function CapASM 
@@ -697,7 +706,22 @@ struct Assembler
 		|| n = .fnlength
 		fn.µfatlength = n
 		jsm!.length = .curr - .start 
+		|| fs = DebugSize
+			.TrackFunctionSize(fn, fs)
 
+
+	function SCFunction.µGuessLength (|int|)
+		opt norefcounts
+		for x.fat in self
+			rz += x.GuessSize
+		
+		
+	function TrackFunctionSize (|scfunction| fn, |faststring| fs)
+		fs <~ fn.exportname
+		fs <~ " "
+		fs <~ fn.µguesslength
+		fs <~ "\n"
+		
 	
 	function FinishReturn 
 		opt norefcounts
@@ -711,7 +735,7 @@ struct Assembler
 	
 	function FinishASM 
 		opt norefcounts
-		if !.last.IsFinisher
+		if (.FnLength <= 0) or !.last.IsFinisher
 			.FinishReturn
 		.FinishMost
 

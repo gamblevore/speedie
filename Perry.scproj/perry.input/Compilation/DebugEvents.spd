@@ -242,7 +242,6 @@ function ClickedASMButton (guiaction)
 
 function perryide.TryReselectASM (|bool|)
 	require !.DuringASMEvent and (.ASMVis)
-	if keys.option 
 	.DuringASMEvent = true
 	.UpdateASM
 	.ReselectASM

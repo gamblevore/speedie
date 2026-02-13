@@ -135,7 +135,7 @@ class Menu (ListView)
 
 	
 	behaviour KeyDown
-		if key.isaccept or (keys.cmd and key.IsCmm)
+		if key.isaccept //or (keys.cmd and key.IsCmm)
 			return .doreturn
 		if key.iscancel or (key.iscmm and .iscmm)
 			.closemenu

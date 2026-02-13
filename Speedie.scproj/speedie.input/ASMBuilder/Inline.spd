@@ -176,8 +176,6 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-	require fn isnt cpp
-
 	require .InlineDepth < 7 // for LinkInline funcs
 	|| N = fn.µfatlength
 	if fn isnt LinkInline

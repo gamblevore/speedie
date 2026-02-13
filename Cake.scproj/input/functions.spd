@@ -19,15 +19,19 @@ role SpdFunc (message)
 
 		|| n = Code.length >> 2
 		.RangeLength = n
-		check  (n > 0)													(Code, "ASM missing.")
-		check  (n < 64K-1)												(Code, "ASM oversized.")
 		
-		|| dest = cake.BeginCode + .Position
-		memory.Copy(dest, Code.addr, n<<2)
-		if .func != @tmp
-			.func = @tmp
-			.name = "(unnamed)"
-//		.first.remove
+		if (n-1)|uint| < (16~bits)|uint|
+			|| dest = cake.BeginCode + .Position
+			memory.Copy(dest, Code.addr, n<<2)
+			if .func != @tmp
+				.func = @tmp
+				.name = "(unnamed)"
+		  elseif n
+			error										(Code, "ASM oversized")
+		  else
+			error										(Code, "Empty function")
+		
+				
 	
 
 	function Run (|?&ivec4|)

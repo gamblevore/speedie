@@ -26,7 +26,6 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 	function Float64 (|Float64|)
 		return self|Float64| * kOneStep
 	
-	
 	syntax Compare (|float| Other, |int|)
 		|| oof = other.date
 		if (self > oof)
