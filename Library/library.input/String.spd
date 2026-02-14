@@ -262,6 +262,7 @@ class String
 
 
 	function Split (|Byte| sep = '\n', |[String]|)
+		opt norefcounts
 		|| Last = 0
 		while
 			|| Word = .NextField(sep, Last)

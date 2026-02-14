@@ -24,9 +24,7 @@ module SpdTable
 		debugger.Start
 		|| Err = .RunFunc(1)
 			return Err
-		Err = .RunFunc(2)
-		if err
-			return err
+		return .RunFunc(2)
 	
 	
 	function RunFunc (|int| i, |int|)

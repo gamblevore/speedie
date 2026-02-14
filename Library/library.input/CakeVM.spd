@@ -23,7 +23,7 @@ target cpp or vm {
 		
 	function Code		(|int| CodeLength=0, |?&uint|)
 		cpp_wrapper JB_ASM_Code
-	
+		
 	function Run		(|int| StartAt, |&ivec4|)
 		cpp_wrapper JB_ASM_Run
 			
@@ -36,7 +36,7 @@ target cpp or vm {
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 		cpp_wrapper JB_ASM_FillTable
 	
-	function IsDebugging (|bool| SetDebug, |?&int|)
+	function IsDebugging (|bool| SetDebug, |?&uint|)
 		cpp_wrapper JB_ASM_SetDebug
 	
 	function Prev (|&ivec4| Reg0, |&ivec4|)

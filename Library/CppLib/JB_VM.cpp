@@ -97,7 +97,7 @@ int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
 */
  
 
-int* JB_ASM_SetDebug (CakeVM* V, bool On) {
+uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
 	if_rare (!CanDebug(V))
 		return 0;
 	auto J = V->JumpTable;
@@ -110,7 +110,7 @@ int* JB_ASM_SetDebug (CakeVM* V, bool On) {
 			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
 	}
 	auto AASM = VMCodePtr(V);
-	return (int*)(AASM + CakeCodeMax);
+	return AASM + CakeCodeMax;
 }
 
 
@@ -350,7 +350,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
 void	JB_ASM_Pause		(CakeVM* V)								{}
-int*	JB_ASM_SetDebug		(CakeVM* V, bool On)					{return 0;}
+uint*	JB_ASM_SetDebug		(CakeVM* V, bool On)					{return 0;}
 int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
 void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}

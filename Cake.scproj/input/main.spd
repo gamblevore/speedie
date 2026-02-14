@@ -5,7 +5,7 @@ module Cake
 	|SpdProcess| Perry = app.parent
 	|!&CakeVM|   VM = CakeVM()
 	|File|		 InputFile = Cake.Collect
-	|&int|		 BreakPoints = debugger.Startup
+	|&uint|		 BreakPoints = debugger.Startup
 	|!&ASM|		 BeginCode = VM.code()|&ASM|
 
 
@@ -20,10 +20,10 @@ main
 	|| p = cake.perry
 		p <~ "`hoi :3`"
 	
-	if CakeRun.GetStructure
-		for f in SpdTable.funcs
-			f.Link❗
-		require debugger.Load
-		return SpdTable.RunProgram
-	return 1
+	require CakeRun.GetStructure
+	for f in SpdTable.funcs
+		f.Link❗
+	
+	require debugger.Load
+	return SpdTable.RunProgram
 

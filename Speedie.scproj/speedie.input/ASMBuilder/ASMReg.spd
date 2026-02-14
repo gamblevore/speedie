@@ -36,7 +36,7 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		Const
-//		NotNil
+//		NotNil // probably quite a big addition. Will need tests...
 		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit        = [ExitFunction, ExitAtAll]
 		SetAlways   = Textual ||| Set  // reuse const
