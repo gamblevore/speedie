@@ -8,15 +8,16 @@ struct FatASM
 	// phi-nodes are basically just the prms which have .fatindexes
 	|ASMParam[6]|		Prms
 	|ASMReg| 			Info
-	|message--| 		Msg			// i think just the type-system needs this now?
+	|Message--| 		Msg			// Only used for reporting now. Not ASMGen. Not easy to remove.
 	|uint64| 			_Const
 	|uint|				SrcMap
 	|int16|				µRefCount
 	|uint16| 			BasicBlock
 	|uint16| 			ASMIndex
-	|byte|				BranchID  // could be used to check if a const earlier in the same branch, but a different block
-	|byte|				InputFats
-	|byte|				InputPrms
+	|byte|				BranchID	// To check consts set earlier in same branch, but diff block.
+									// (Could we merge with basicblock and use somebits for the branchid?)
+	|byte|				InputFats	// could merge with inputprms... easy and better probably. Do later
+	|byte|				InputPrms	
 	|byte| 				_Outputs
 	|byte|				_Op
 	|byte|				JumpPrm

@@ -1491,6 +1491,39 @@ function Tran_NotAllowed (TranFunc) // "continue"
 		error (node)
 
 
+function Tran_BreakPoint (TranFunc)
+	// this needs to be done early, because other things can destroy/transform messages
+	// but breakpoints are not debugger statements. Soooo... we need a new name?
+	opt norefcounts
+	if (node is inserted and breakpoint) and (node == @tmp) // seems we already did this?
+		return compiler.program
+	
+	(node isnt BreakPoint)
+	using node
+		|| trap = @tmp.msg("breakpoint")
+		(trap is breakpoint) // hehe
+		trap.asmtype = asmtype.kdebugger
+		node.prev = trap
+		if options.modecpp
+			Tran_DebugAt( fn, trap, name_space )
+	return compiler.program
+		
+
+
+function Tran_DebugAt (TranFunc)
+	opt norefcounts
+	|| ch = node.first
+	using (node)
+		node.become(@func)
+		node.msg(@thg, "JB_DebugAt")
+		|| prm = node.msg(@prm)
+		if !ch
+			ch = 1.msg
+		prm <~ ch
+	TypeOfExpr(node, name_Space)
+	node.asmtype = asmtype.kdebugger
+	
+
 function Tran_Debugger (TranFunc)
 	if !Options.targetdebug
 		node.remove
@@ -1512,33 +1545,6 @@ function Tran_Debugger (TranFunc)
 		trap.ASMType = ASMType.kdebugger
 	
 	Tran_If(fn, node, name_space)
-
-	// "Apple... I think I've heard of that name. Do they eat computers?"
-	// I think It's better to forget society.
-
-
-
-function Tran_BreakPoint (|scfunction| fn, |scnode| p, |message| ch)
-	opt norefcounts
-	(ch isnt BreakPoint)
-	using ch
-		|| trap = @tmp.msg
-		ch.prev = trap
-		Tran_DebugAt( fn, trap, p )
-
-
-function Tran_DebugAt (TranFunc)
-	opt norefcounts
-	|| ch = node.first
-	using (node)
-		node.become(@func)
-		node.msg(@thg, "JB_DebugAt")
-		|| prm = node.msg(@prm)
-		if !ch
-			ch = 1.msg
-		prm <~ ch
-	TypeOfExpr(node, name_Space)
-	node.asmtype = asmtype.kdebugger
 
 
 

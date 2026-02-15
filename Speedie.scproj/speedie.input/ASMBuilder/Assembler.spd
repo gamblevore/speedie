@@ -8,6 +8,7 @@ struct ASMState
 	|bool|			TailInlineable
 
 
+
 struct RegFile
 	|uint16[32]|				Setters
 	|int|						KnownMap
@@ -17,9 +18,9 @@ struct RegFile
 struct Assembler
 	contains asmreg
 	linkage: cpp_part Pac
-	|uint16| 					BasicBlock
 
 	|ASMState[8]|				InlineState
+	|uint16| 					BasicBlock
 	|byte|						InlineDepth
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
@@ -35,12 +36,12 @@ struct Assembler
 	|bool|						Inited
 	|scfunction--|				Out
 
+	|AsmReg|					RequestBreak
 	|?&FatASM|					InlineEnd
-//	|?&FatASM|					Orig
 	|&FatASM|					FuncStart_
 	|&FatASM|					Start
 	|&FatASM|					Curr_
-	|&FatASM|					End    
+	|&FatASM|					End  
 
 	|RegFile|					Regs
 	|FatASM| 					Zero
@@ -55,8 +56,9 @@ struct Assembler
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|int|						StringsOutOfRange
 		|jbin?|						DebugDecls
-		|faststring|				DebugSize
-
+		|jbin?|						BreakMap
+//		|FastString|				DebugSize
+ 
 		
 		function ClassLayout (|jbin| j)
 			opt norefcounts
@@ -316,8 +318,12 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		if fat is temp and fat isnt okastemp
-			.CloseOneVar(nil, 1<<fat.info.reg) // why did I comment this out? // test in speedie first?
+		|| info = fat.info
+		if (info is Break) and (.BranchID == fat.BranchID)
+			(.RequestBreak as= info&asmreg.Break)
+		if  info is temp  and  info isnt OKAsTemp
+			.CloseOneVar(nil, 1<<info.reg)
+		
 		|| C = .curr - 1
 		if fat == C
 			.curr_ = C // do it before both kinds of nop...
@@ -325,10 +331,10 @@ struct Assembler
 		depth++
 		if depth > 7
 		
-		for f.fatinputs in fat
+		for f.FatInputs in fat
 			.Decr(f, Soft, depth)
 		
-		for v.regoutputs in fat
+		for v.RegOutputs in fat
 			v &= 31
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
@@ -634,12 +640,14 @@ struct Assembler
 		opt norefcounts
 		require !.Inited
 		.Inited = true
-		if options.targetdebug
+		if options.TargetDebug
 			if Options.StripNames
 				problem "Can't use --strip and --targetdebug"
 				Options.StripNames = false
-			debugdecls = faststring()
+			DebugDecls = FastString()
+			BreakMap = FastString()
 //		DebugSize = file.SpeedieDir["spd_asm_size.txt"].OutputStream
+		
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit
 		ASMType.InitAccess
@@ -707,8 +715,8 @@ struct Assembler
 		|| n = .fnlength
 		fn.µfatlength = n
 		jsm!.length = .curr - .start 
-		|| fs = DebugSize
-			.TrackFunctionSize(fn, fs)
+//		|| fs = DebugSize
+//			.TrackFunctionSize(fn, fs)
 
 
 	function SCFunction.µGuessLength (|int|)

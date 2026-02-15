@@ -60,8 +60,6 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	if (!pinc) and (dest isnt set) and (Byte_Shift == 3) and (!varadd.reg)
 		|| bs = base.fat
 		if bs isa asm.gtab
-			target debug: if decl.islib != bs.prms[1] // huh?
-		
 			if bs.prms[1]									// This is lib, and is always in range.
 				|| GlobID = bs.prms[2]
 				.asknop(bs)

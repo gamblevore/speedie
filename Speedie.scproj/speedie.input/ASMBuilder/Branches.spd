@@ -21,14 +21,17 @@ function ElseSub (|message?| other, |asmreg|)
 
 
 function If (fn_asm)
+	|| NothingDone = .curr
+	|| BreakReq = .RequestBreak
 	|| Old = .BranchID
 	.branchID = ++.NextBranchID
 
 	.state.BranchDepth++
 	rz = .ifsub(exp, dest)
 	.state.BranchDepth--
-
+	
 	.branchID = Old
+	.RequestBreak = (BreakReq, nil)(NothingDone == .curr)
   
 
 
@@ -72,19 +75,22 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 	
 
 function While (fn_asm)
+	|| NothingDone = .curr
+	|| BreakReq = .RequestBreak
+	
 	|| Old = .BranchID
 	.branchID = ++.NextBranchID
 	
-	.state.BranchDepth++ // Loops are still branches
+	.state.BranchDepth++
 	rz = .WhileSub(exp)
 	.state.BranchDepth--
 	
 	.BranchID = Old
-
+	.RequestBreak = (BreakReq, nil)(NothingDone == .curr)
+	
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
-//	if exp.first!.UnBra isthing "true"
 	|| InitialJump = exp.JUMP // BasicBlock ++								// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)						// arg
 	

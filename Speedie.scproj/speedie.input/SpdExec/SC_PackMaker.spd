@@ -129,8 +129,8 @@ module PackMaker
 		while (|| fn = .packfuncs[.PackFuncIndex++])
 			require Assembler.sh.FatterCompile(fn)
 
-		|| T = assembler.debugsize
-			T.Flush
+//		|| T = assembler.debugsize
+//			T.Flush
 	
 	
 	function FATCompile (|bool|)

@@ -200,7 +200,7 @@ class Memory
 		(_0.ptr|&...|)[_1]
 	
 	macro SyntaxAppend
-		(_0.appendplace|&...|)[0] = _1
+		(_0.appendplace |&...|)[0] = _1
 
 	syntax cast (|&...|)
 		inline

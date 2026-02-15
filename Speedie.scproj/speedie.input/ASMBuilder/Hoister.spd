@@ -20,9 +20,6 @@ function message.Declable (|message!|)
 
 
 extend Assembler {
-function scdecl.IsLib (|int|)
-	return (self Is Library)|int|
-
 
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
@@ -32,7 +29,7 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	(Dest is GlobalMemory)
 	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr
-	if !d.isLib
+	if (d Isnt Library)
 		return .PackGlobAddr(d, exp, dest, d.exportposition)
 	
 	|| fat = exp.GTAB(dest,  1,  d.gpackid)
@@ -48,8 +45,6 @@ function PackGlobAddr (|SCDecl?| D, |message| exp, |AsmReg| Dest, |int64| Export
 	if  dest isnt AddrNoFiddle  and  d isnt ClassObj
 		ExportPos &= ~63
 	
-	target debug: expect !d.islib
-	
 	|| Direct = ExportPos & 18~bits
 	|| fat = exp.GTAB(dest,  0,  Direct)
 	fat.Const = Direct										// Is this needed?
@@ -60,7 +55,7 @@ function PackGlobAddr (|SCDecl?| D, |message| exp, |AsmReg| Dest, |int64| Export
 		fat.const = -1									// Not directly accessable anymore.
 		fat = exp.ADDB(dest, missing >> 12)
 //		fat.const = Direct + ((missing >> 12) << 12)	// Not needed.
-/		rz = fat * dest
+		rz = fat * dest
 
 }
 

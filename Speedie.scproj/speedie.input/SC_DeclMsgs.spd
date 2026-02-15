@@ -158,6 +158,7 @@ function scclass.CollectProp (|Message| msg, |bool|)
 	|| dcl = msg.CollectDecl( .modul, self, DeclMode.properties, self)
 		.properties <~ dcl
 		(dcl is property)
+		(dcl is library) = .islibrary
 		dcl.becomereal
 		return true
 

@@ -75,14 +75,22 @@ function InitAccess
 
 function Debugger (fn_asm)
 	opt norefcounts
-	if Options.TargetDebug
-		|| num = 0
-		if exp == @func
-			exp = exp.last!
+	|| fn = exp.func
+	if fn == @tmp
+		(.RequestBreak as= ASMReg.BreakPoint)
+		return nil
+
+	require Options.TargetDebug
+
+	|| num = 0
+	if fn == @func
+		exp = exp.last!
 		|| ch = exp.first
 			num = ch.int
-			require num > 0 // oof
-		exp.TRAP(asmreg(), num)
+			if num <= 0
+				exp.NOOP
+				return nil
+	exp.TRAP(asmreg(), num)
 
 
 function Swap (fn_asm)
@@ -412,8 +420,9 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 		return asmreg()
 	|| v = .OpenVars
 	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
-
+	
 	while
+		(.requestbreak as= ASMReg.Breakable)
 		if ch.func == @decl
 			rz = decl(self, ch, nil)
 		  else
@@ -421,10 +430,11 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 		ch++
 		loop ch and rz isnt exit
 	
+	
 	if !Mask
 		if exp != .fn.sourcearg
 		.RegDebugInfo = 0		// Leave all debug info open
-		//exp = nil				// But still dealloc structs // wait, setting this to nil BLOCKS dealloc?
+		// exp = nil			// But still dealloc structs // wait, setting this to nil BLOCKS dealloc?
 		
 	rz = .CloseVars(v, exp, rz & Mask)
 	if rz is ExitFunction

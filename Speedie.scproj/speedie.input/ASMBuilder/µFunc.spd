@@ -33,16 +33,35 @@ extend SCFunction
 			|| Curr = rz
 			rz = fat.µRenderInto(rz, after)
 			if Positions
-				if (fat is DebugVars) and options.targetdebug
-					fat.OutputDebugVars
 				|| pos = fat.SrcMap
 				while (Curr++ < rz)
 					Positions++[] = pos
+				if options.targetdebug
+					fat.AddDebug(pos)
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
 				|| r = fat.JumpPrm
 					fat.FillLabelRequest(where, rz, r-1)	
+	
+	
+	function fatasm.AddBreakPoint (|uint| SrcMap)
+		
+		
+	function fatasm.AddBreakable (|uint| SrcMap)
+		
+		
+	function fatasm.AddDebug (|uint| SrcMap)
+		opt inline
+		|| info = .info
+		if info is break
+			if info is Breakable
+				.AddBreakable(SrcMap)
+			if info is Breakpoint
+				.AddBreakPoint(SrcMap)
+		if info is DebugVars
+			.OutputDebugVars
+	
 	
 	target debug
 		render µRender (|bool| RenderBlocks = false)

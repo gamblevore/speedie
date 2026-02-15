@@ -22,6 +22,7 @@ dispatch TemporalStatements (TranFunc)
 	once					(Tran_Once)
 	ifn						(Tran_Ifn)
 	debugger				(Tran_Debugger)
+	breakpoint				(Tran_BreakPoint)
 	crash					{app.crash(node.firstname)}
 	bad						(Tran_TestProblem)
 	problem					(Tran_Problem)
@@ -381,6 +382,13 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 	Tran_All_Final(fn, s, p, f)
 
 
+
+function abc
+	printline nil
+/	printline nil
+
+
+
 function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f) // transform ()
 	if s.func != @sheb
 		if (s == @arg) and (f != @arg)
@@ -389,7 +397,7 @@ function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f)
 		|| ch = s.first
 		while (ch)
 			if ch is BreakPoint and ch in @arg
-				Tran_Breakpoint(fn, p, ch)
+				Tran_Breakpoint(fn, ch, p)
 			|| n = ch.next
 			if (ch == @Arg)
 				Tran_All( fn, ch, ch.scarg(p, s)! )

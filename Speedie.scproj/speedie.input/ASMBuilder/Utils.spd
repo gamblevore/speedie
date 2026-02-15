@@ -27,9 +27,11 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	if p < .End
 		.curr_ = p + 1
 		p[0] = nil
-		p.info = (p.index|uint64|<<48)|asmreg| // no need to call fat*reg now
+		p.info = ((p.index|uint64|<<48) ||| .RequestBreak|uint64|)|asmreg| // no need to call fat*reg now
+//		p.info = (p.index|uint64|<<48)|asmreg| // no need to call fat*reg now
 		p._op = op
 		p.msg = exp // could remove this?
+		.requestbreak = nil
 		p.BranchID = .BranchID
 		p.BasicBlock = .BasicBlock
 		p.SrcMap = exp.SrcMap

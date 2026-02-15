@@ -27,8 +27,8 @@ datatype ASMReg (uint64)
 		NoScale
 		ContainsAddr
 		Textual
-		ConstRequest
-		CondRequest
+		ConstRequest	// Could we merge? Probably dont want const+cond+AddrRequest
+		CondRequest		// Perhaps the responses could also be merged into a number, all exclusive.
 		CondAnswer
 		OKAsTemp
 		AllowNopDest
@@ -36,6 +36,7 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		Const
+		Break = [Breakable, Breakpoint]
 //		NotNil // probably quite a big addition. Will need tests...
 		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit        = [ExitFunction, ExitAtAll]
@@ -327,7 +328,7 @@ datatype ASMReg (uint64)
 		|| R = .reg
 		|| IsTmp = self is temp and self isnt OKAsTemp
 		|| Big = R >= 26
-		if big == IsTmp // bad?
+		if big == IsTmp or (big and self is temp)
 			return true
 		if big
 			"big reg $R unmarked"

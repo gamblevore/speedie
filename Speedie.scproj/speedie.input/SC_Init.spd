@@ -225,7 +225,7 @@ function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 				NewDefault.Obj = nil // just keep doing what it used to do
 		
 		if newdefault
-			if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
+			if !newdefault.IsNilOrZero
 				|| fn = @sdot
 				if self == compiler.program
 					fn = @thg
