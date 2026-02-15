@@ -5,7 +5,7 @@ extend SCFunction
 		description "Generate some code (only for testing)."
 		rz = asm[.µfatlength|int|*3]!
 		|| p = rz.ptr
-		|| after = .ASMBake(P, P+rz.Size, nil)
+		|| after = .ASMBake(P, P+rz.Size, nil, nil)
 		rz.Size = after-p
 		rz.length = rz.Size   //   ::::::]]]]]]]
 
@@ -18,7 +18,7 @@ extend SCFunction
 		return (.Position<<11) ||| (.tag >> 8)
 	
 	
-	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,   |!&asm|)
+	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |uint| ASMTotal,  |!&asm|)
 		opt norefcounts
 		rz = where
 		|uint64| HasLabel
@@ -37,7 +37,7 @@ extend SCFunction
 				while (Curr++ < rz)
 					Positions++[] = pos
 				if options.targetdebug
-					fat.AddDebug(pos)
+					fat.AddDebug(pos, ASMTotal)
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
@@ -45,20 +45,19 @@ extend SCFunction
 					fat.FillLabelRequest(where, rz, r-1)	
 	
 	
-	function fatasm.AddBreakPoint (|uint| SrcMap)
+	function fatasm.AddBreak (|uint64| SrcMap, |asmreg| info, |uint| ASMTotal)
+		|| i = .ASMIndex + ASMTotal
+		if info is Breakpoint
+			
+		if info is Breakable
+			SrcMap = (SrcMap<<32) ||| i // do this lattterrrr.
+			
 		
-		
-	function fatasm.AddBreakable (|uint| SrcMap)
-		
-		
-	function fatasm.AddDebug (|uint| SrcMap)
+	function fatasm.AddDebug (|uint| SrcMap, |uint| ASMTotal)
 		opt inline
 		|| info = .info
 		if info is break
-			if info is Breakable
-				.AddBreakable(SrcMap)
-			if info is Breakpoint
-				.AddBreakPoint(SrcMap)
+			.AddBreak(SrcMap, info, ASMTotal)
 		if info is DebugVars
 			.OutputDebugVars
 	
@@ -123,7 +122,7 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	|| Start = .StartAdd
 	|| Positions = SourceMap.Reserve(t*4)
 	|| Addr = .reserve(t*4)|&asm|
-	|| after = fn.ASMBake(Addr, Addr+t, Positions)
+	|| after = fn.ASMBake(Addr, Addr+t, Positions, .Length>>2)
 	.FinishAdd(@bin, Start)
 	expect (after-addr == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)
