@@ -105,15 +105,6 @@ function message.NOOP (|&fatasm|, ) {
 }
 
 
-function message.DUMB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.DUMB, self)
-	rz.reginput(1) = r2
-	rz.dest(0, r1, a)
-}
-
-
 function message.TIME (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -206,6 +197,7 @@ function message.ADDB (|asmreg| r1 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ADDB, self)
+	rz.reginput(0) = r1
 	rz.numinput(1) = K
 	rz.dest(0, r1, a)
 }
@@ -225,6 +217,7 @@ function message.ADAK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fa
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ADAK, self)
+	rz.reginput(1) = r2
 	rz.numinput(2) = K
 	rz.dest(0, r1, a)
 	rz.dest(1, r2, a)
@@ -374,17 +367,6 @@ function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 	rz.numinput(2) = up
 	rz.numinput(3) = down
 	rz.numinput(4) = sign
-	rz.dest(0, r1, a)
-}
-
-
-function message.BFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.BFLS, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
 	rz.dest(0, r1, a)
 }
 
@@ -1320,19 +1302,6 @@ function message.QFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |in
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QFLG, self)
-	rz.reginput(1) = r2
-	rz.numinput(2) = up
-	rz.numinput(3) = down
-	rz.numinput(4) = sign
-	rz.dest(0, r1, a)
-}
-
-
-function message.QFLS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.QFLS, self)
-	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = up
 	rz.numinput(3) = down

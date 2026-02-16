@@ -113,7 +113,7 @@ module Feedback
 				|fatasm| X
 				X.DebugPrint
 		if 0
-			m.DUMB, m.FEET // for when you can't dance
+			m.FEET // for when you can't dance
 	
 	
 	function ParseArgs (|bool|) 

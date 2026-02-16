@@ -677,7 +677,13 @@ extend Assembler
 		return .BitMaker(dest, l, r, exp, asm.bxor, asm.qxor)
 
 
-	function MiniBOR (|asmreg| l, |asmreg| r, |asmreg|)
+
+	function MiniBOR (|asmreg| l, |asmreg| r, |asmreg| Dest, |asmreg|)
+		|| F = .MiniBORSub(l, r)
+			return f.µtype(Dest)
+	
+	
+	function MiniBORSub (|asmreg| l, |asmreg| r, |asmreg|)
 		if (l iz r)
 			return l
 		if r is Const
@@ -688,32 +694,7 @@ extend Assembler
 				return r
 
 
-	function RemoveableBFLG (|asmreg| dest, |asmreg| A,  |asmreg| B, |asmreg|) // canremove, cantemp, caninline, CanSquish
-		require (A is temp) or (A iz dest)
-		|| bflg = A.Fat$
-		require (bflg isa asm.bflg) and (bflg.µRefCount <= 1)
-		require (bflg == .Last) and .IsCurr(bflg)
-		|| up = bflg.prms[2]|int|
-		|| down = bflg.prms[3]
-		require (down == 0) or ((64 - A.BitCount) >= up)
-		|| Diff = up - down
-		if Diff > 0
-			bflg.RegInput(2) = bflg.ASMReg(1)
-			bflg.RegInput(1) = B
-			bflg.prms[3] = Diff
-			bflg.prms[4] = 0
-			bflg._op = asm.BFLS
-			return .ReDest(bflg, dest)
-
-
-	function MiniBFLS (|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
-		|| bl = .RemoveableBFLG(dest, L, R)
-			return bl
-		|| br = .RemoveableBFLG(dest, R, L)
-			return br
-			
-
-	function BitOr (fn_opasm)
+	function BitOr (fn_opasm) 
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r,  ConstifyBitOr)
 
@@ -721,10 +702,8 @@ extend Assembler
 			swap (l) (r)
 
 		if dest isnt Textual
-			|| old = .MiniBOR(l,r)
-				return old.µtype(Dest)
-			|| mini = .MiniBFLS(exp, dest, l, r)
-				return mini
+			|| F = .MiniBOR(l, r, dest)
+				return F
 		
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
@@ -733,7 +712,7 @@ extend Assembler
 	function BitAndNop (|assembler| self, |message| exp, |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
 		require l is Const
 		|| k = l.const
-		if .nopconst(l, -1)
+		if .NopConst(l, -1)
 			return r
 		if k == 0
 			return .zeros(dest)

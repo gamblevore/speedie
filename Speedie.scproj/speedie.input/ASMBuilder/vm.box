@@ -223,7 +223,7 @@ forms
 		Length  14
 		
 	AddB
-		r1		R
+		r1		P
 		K		l
 	
 	AddK
@@ -233,7 +233,7 @@ forms
 		
 	AddAK
 		r1		R
-		r2		R
+		r2		P
 		K		l
 	
 	Div2
@@ -356,10 +356,10 @@ forms
 #!						 (((((UTIL)))))
 
 /**/ NOOP (U0)	// does nothing // (could be replaced with bitor 0?)
-		i1 = i1
+		0
 		#!NOOP
-/**/ DUMB (U2)
-		0 // Can be added or removed... just to align the jumps really!
+///**/ DUMB (U2)
+//		0 // Can be added or removed... just to align the jumps really!
 /**/ TIME (U2)
 		Time_(r, Op)
 /**/ CONV (Convert)
@@ -486,8 +486,11 @@ POS 5
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
-/**/ BFLS  (Shift)
-		u1 = u2 ||| (u3 << Shift_Shu)
+///**/ BFLS  (BFLS) // over-complex
+//		if (BFLD_signu)
+//			i1 |= ((i2 << BFLD_upu) >> BFLD_downu)
+//		else
+//			u1 |= ((u2 << BFLD_upu) >> BFLD_downu)	
 /**/ BRSS  (Shift)
 		i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3
 /**/ BRSH  (Shift)
@@ -768,8 +771,11 @@ POS 5
 #!						 (((((Vector Bitshifts)))))
 /**/ QFLG  (BFLD)
 		iv1 = ((iv2 << BFLD_upu) >> BFLD_downu)
-/**/ QFLS  (BFLS)
-		iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu)
+///**/ QFLS  (BFLS) // over complex.
+//		if (BFLD_signu)
+//			iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu)
+//		else
+//			uv1 |= ((uv2 << BFLD_upu) >> BFLD_downu)	
 /**/ QRSS  (Shift)
 		iv1 = (iv2 >> Shift_Shu) >> iv3
 /**/ QRSH  (Shift)

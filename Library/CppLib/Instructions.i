@@ -29,11 +29,9 @@
 ı TRAP:;
 	goto BREAK;
 ı NOOP:;
-	i1 = i1;
+	0;
 	// NOOP
 
-ı DUMB:;
-	0;
 ı TIME:;
 	Time_(r, Op);
 ı CONV:;
@@ -90,8 +88,6 @@
 	else
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
-ı BFLS:;
-	u1 = u2 | (u3 << Shift_Shu);
 ı BRSS:;
 	i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3;
 ı BRSH:;
@@ -318,8 +314,6 @@
 	QInc(r, Op);
 ı QFLG:;
 	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
-ı QFLS:;
-	iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu);
 ı QRSS:;
 	iv1 = (iv2 >> Shift_Shu) >> iv3;
 ı QRSH:;

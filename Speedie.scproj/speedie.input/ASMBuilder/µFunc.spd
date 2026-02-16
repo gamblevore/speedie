@@ -48,6 +48,7 @@ extend SCFunction
 	function fatasm.AddBreak (|uint64| SrcMap, |asmreg| info, |uint| ASMTotal)
 		|| i = .ASMIndex + ASMTotal
 		if info is Breakpoint
+			info = info
 			
 		if info is Breakable
 			SrcMap = (SrcMap<<32) ||| i // do this lattterrrr.

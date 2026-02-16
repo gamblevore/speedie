@@ -1,0 +1,40 @@
+
+
+// could be cool to make some generic something...
+// the thing is... theres too many needs
+// faststring / fastbuff / MemoryObject
+// each needs different things... In fact, fastString wants a byte-buff... for string reuse very easily.
+// what about fastbuff / memoryobject? MAYBEEEE. who knows???
+// memoryobject could wrap this.
+// and fastbuff could... also. FastBuff needs extra stuff...
+// and for what? I think... just keep it separate. For sexyness....
+
+// nice!
+function @ASM.Alloc (|int| Length, |&ASM|)
+	visible
+	|| Buff = Memory.Zalloc((length+1)<<2)|&asm|
+		Buff[Length] = Length
+	return buff
+	
+	
+function ASM.Append (|&ASM| self, |uint| Value, |&ASM|)
+	opt inline
+	visible
+	real self
+	|| Length = Self[]
+	if !Length
+		Self++[] = Value
+		return self
+	return .AppendSub(value, length)
+
+
+function ASM.AppendSub (|&ASM| self, |uint| Value, |int| Length,  |&ASM|)
+	real self
+	visible
+	|| NewLength = Length*2
+	|| Self2 = Memory.Realloc(self - Length, (NewLength+1)<<2)|&ASM|
+		Self2[NewLength] = NewLength
+		Self2 += Length
+		Self2++[] = Value
+	return Self2
+

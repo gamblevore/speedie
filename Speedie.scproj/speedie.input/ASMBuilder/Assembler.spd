@@ -318,6 +318,7 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+		if "AppendSub".trap
 		|| info = fat.info
 		if (info is Break) and (.BranchID == fat.BranchID)
 			(.RequestBreak as= info&asmreg.Break)
@@ -755,7 +756,7 @@ struct Assembler
 		target debug
 			if arg.position < 0
 				arg.position = 0 // skip error detection
-		Arg.EROR.BasicBlock = -1
+		Arg.HALT.BasicBlock = -1
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 
