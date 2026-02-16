@@ -389,9 +389,10 @@ function EditMeModified (guitextevent)
 		|| sub = i.CurrFileName.SubMenu
 			(sub.ListSource is modified) = Mod
 	
-	i.CurrASMFunc = nil
-	if i.ASMVis
-		i.UpdateASM
+	if !i.duringasmevent
+		i.CurrASMFunc = nil
+		if i.ASMVis
+			i.UpdateASM
 
 
 function PerryIDE.ShowStats

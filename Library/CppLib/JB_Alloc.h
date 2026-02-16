@@ -146,7 +146,7 @@ struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bu
     
     JB_Object*          Obj;
     JB_Object*          Obj2;
-    uint64				Num3;
+    uint64				Num3; // remove this...
     AllocationBlock     Dummy;
 }; 
 JBStructData (JB_MemoryLayer);
@@ -223,8 +223,6 @@ void JB_Mem_Mark( );
 void JB_Mem_OwnedSet(JB_MemoryLayer* Mem, bool b);
 bool JB_ObjIsOwned(JB_Object* Obj);
 JB_Class* JB_ObjClass(JB_Object* Obj);
-void* JB_BlockShadow(AllocationBlock* B);
-void ClassWierdTest( );
 int JB_RefCount(JB_Object* Obj);
 uint8* JB_ObjClassBehaviours(JB_Object* Obj);
 JB_Object* JB_Mem_First( JB_MemoryLayer* Mem );
@@ -238,9 +236,9 @@ JB_Object* JB_Class_AllocZeroed( JB_Class* Cls );
 int64 JB_Class_MemoryUsed( JB_Class* Cls );
 void JB_Class_Add( JB_Class* Cls, const char* s );
 JB_Class* JB_Class__First();
-JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj);
+//JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj);
 void JB_Mem_InitAndUse(JB_MemoryLayer* Mem, JB_Class* Cls);
-JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls );
+JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
 void JB_Class_SetIndex(JB_Class* cls, int i);
 int JB_Class_Index(JB_Class* cls);

@@ -419,22 +419,21 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls ) {
+JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj ) {
 	JB_New2(JB_MemoryLayer);
     JB_Zero(self);
     self->Class = Cls;
     self->CurrBlock = (AllocationBlock*)&(self->Dummy);
     self->Dummy.Owner = self;
+    JB_SetRef(self->Obj, Obj);
     self->World = JB_MemStandardWorld();
     return self;
 }
 
 
-JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj) {
-    JB_MemoryLayer* Mem = JB_Mem_Constructor(0, Cls);
-    JB_SetRef(Mem->Obj, Obj);
-    return Mem;
-}
+//JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj) {
+//    return JB_Mem_Constructor(0, Cls, Obj);
+//}
 
 
 

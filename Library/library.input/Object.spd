@@ -122,14 +122,14 @@ struct ClassData
 	function MemoryUsed (|int64|)
 		cpp_Wrapper JB_Class_MemoryUsed
 	
-	function CreateLayer (|Object| obj, |MemoryLayer!|)
-		cpp_Wrapper JB_Mem_CreateLayer
+//	inline CreateLayer (|Object| obj, |MemoryLayer!|)
+//		return MemoryLayer(self, obj)
 
 	function CreateLayerAndUse (|Object| obj, |object| obj2, |MemoryLayer!|)
 		opt norefcounts
-		rz = .createlayer(obj)
-		rz.use
+		rz = MemoryLayer(self, obj)
 		rz.obj2 = obj2
+		rz.use
 
 	function Layer (|MemoryLayer|)
 		cpp_Wrapper JB_Class_Layer
@@ -193,13 +193,10 @@ class MemoryLayer
 
 	|Object?|		Obj
 	|Object?|		Obj2
-	|uint64|		Num3 // unused?
+	//|uint64|		Num3 // unused?
 	
-	constructor (|&ClassData| Cls)
+	constructor (|&ClassData| Cls, |object?| obj=nil)
 		cpp_wrapper JB_Mem_Constructor
-
-	function LayerClass (|&ClassData|)
-		disabled "unused?"
 
 	function Use
 		cpp_wrapper JB_Mem_Use

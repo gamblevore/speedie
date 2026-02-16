@@ -141,7 +141,7 @@ function cstring.OperatorPlus (|string| s, |string|)
 	return .wrap
 
 
-struct VirtualJBString
+struct VirtualJBString // fakejbstring
 	|int| Refcount
 	|int| Length
 	|&byte| Addr

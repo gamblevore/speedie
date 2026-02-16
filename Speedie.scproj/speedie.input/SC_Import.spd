@@ -25,7 +25,7 @@ class SCImport
 		.WarnUnusedFuncs = !.IsSTDLib 
 		.Resources = Dictionary()
 		.BlindCast = (0, errorseverity.error)(builtin)
-		.DeclLayer = (scdecl).CreateLayer(self)
+		.DeclLayer = MemoryLayer(scdecl, self)
 		|| M = SCModule.NeuModule( nil, compiler.program, nil )|SCModule|!
 		.Mod = M
 		M.Project = self

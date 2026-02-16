@@ -177,20 +177,23 @@ module PackMaker
 	
 		
 	function BakeDebug (|jbin| j)
-		|faststring--| p = SourceMap.Positions
-			|| JL = J.Length
-			j.tmparg("debug")
-			assembler.DebugClassesAndGlobals(j)
-			j.addrow(@bin, "pos", p|string|)
-			j.addrow(@str, "files", SCImport.AllFiles.join("\n").Compress)
-			
-			SourceMap.SortBreaks
-/			|| BP = sourcemap.Breakable.read
-			j.addrow(@str, "breakmap", (&BP)|string|)
-			BP = sourcemap.BreakPoints.read
-			j.addrow(@str, "breakpoints", (&BP)|string|)
-			j.exit(2)
-			compiler.stDebugInfo += j.Length - JL
+/		|| X = sourcemap.Breakable.read
+		j.addrow(@str, "breakmap", (&X)|string|)
+		
+		|faststring--| p = SourceMap.Positions$
+		|| JL = J.Length
+		j.tmparg("debug")
+		assembler.DebugClassesAndGlobals(j)
+		j.addrow(@bin, "pos", p|string|)
+		j.addrow(@str, "files", SCImport.AllFiles.join("\n").Compress)
+		
+		SourceMap.SortBreaks
+/		|| BP = sourcemap.Breakable.read
+		j.addrow(@str, "breakmap", (&BP)|string|)
+		BP = sourcemap.BreakPoints.read
+		j.addrow(@str, "breakpoint", (&BP)|string|)
+		j.exit(2)
+		compiler.stDebugInfo += j.Length - JL
 	
 	
 	function BakeASM (|jbin| j, |bool|)

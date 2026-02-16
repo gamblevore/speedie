@@ -36,7 +36,7 @@ class SCFile (file)
 	
 	function Start_AST (|message|)
 		if .IsInternal
-			(Message).createLayer(self).use
+			memorylayer(Message, self).use
 			rz = message(@arg, "")
 			(message).restore
 	

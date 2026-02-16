@@ -5,10 +5,12 @@ cpp_part AC
 
 |scfunction|		AnonFn
 |scobject|			OrigFn
-|string|			AnonText
+|memorylayer|		ParseLayer
 |SCNode|			AnonParent
 |errorreceiver|		Errors
 |bool|				Cleaned
+|int|				Max_Total = 400
+|int|				Total
 ||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
  `)>.macro
  
@@ -449,6 +451,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	if src != @dot
 		return .GetFunc2(myfile, ff, n)
 	|| fn   = .AnonFn init scfunction()
+	|| layer = .ParseLayer init MemoryLayer(message)
 	|| prm  = src.second
 	|| mpos = prm.first
 	|| str  = prm.second
@@ -462,24 +465,28 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	
 	expect parent "noparent"
 
-	if parent == .AnonParent and str == .anontext
+	if parent == .AnonParent and str == layer.obj2|string| and myfile == layer.obj
 		return fn
+
 	.OrigFn = fn.InsertIn(parent, src.name)
 	|| pos = mpos.int
 	parser._dotinsertallow = true
-	if fn.update_source(pos, str.name)
+
+	layer.obj = myfile
+	layer.obj2 = str.name
+	layer.use
+
+	if fn.update_source(pos, str.name, myfile)
 		.AnonParent = parent
-		.anontext = str.name
 		return fn
+	layer.obj = nil
+	layer.obj2 = nil
 
 
-function SCFunction.Update_Source (|int| start, |string| text, |bool|)
+function SCFunction.Update_Source (|int| start, |string| text, |scfile| File,   |bool|)
 	parser.using.Position = -1
 	parser.using.Flags = 0
-	parser.using.Tag = 0
-	|| s = .source
-		s.MemoryLayer.use
-		parser.using.Tag = s.tag
+	parser.using.Tag = file.FileNum << 8
 	
 	|| source = text.ParseClean
 	if source and source != @tmp
@@ -751,10 +758,6 @@ function SCObject.NextDisplay (|bool| exact, |SCObject|)
 			return .hiderfunc
 			
 	
-
-|| max_total = 400
-|| total	 =   0
-
 function Active (|bool|)
 	return .total < .max_total
 
