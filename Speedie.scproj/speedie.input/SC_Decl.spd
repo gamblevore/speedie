@@ -1086,11 +1086,11 @@ class SCDecl (SCObject) {
 		return .Type.typeinfo				// perhaps this is already set correctly.
 	
 	
-	function GlobInfo (|DataTypeCode|)
-		opt norefcounts
-		if .pointercount
-			return datatypecode._voidptr
-		return .Type.typeinfo
+//	function GlobInfo (|DataTypeCode|)
+//		opt norefcounts
+//		if .pointercount
+//			return datatypecode._voidptr
+//		return .Type.typeinfo
 		
 		
 	function Alignment (|bool| PutStructsAfter=false, |int|)

@@ -146,7 +146,6 @@ struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bu
     
     JB_Object*          Obj;
     JB_Object*          Obj2;
-    uint64				Num3; // remove this...
     AllocationBlock     Dummy;
 }; 
 JBStructData (JB_MemoryLayer);
