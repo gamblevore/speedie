@@ -318,7 +318,6 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		if "AppendSub".trap
 		|| info = fat.info
 		if (info is Break) and (.BranchID == fat.BranchID)
 			(.RequestBreak as= info&asmreg.Break)
@@ -690,6 +689,7 @@ struct Assembler
 		HoistSpace.Length = 0
 		
 		.inlinestate[0] = nil // the rest get auto-cleared
+		.inlinestate[0].TailInlineable = true
 		.out = fn
 		.state.fn = fn
 		SCFunction.CurrFunc = fn

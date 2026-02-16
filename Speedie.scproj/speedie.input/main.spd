@@ -55,7 +55,7 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
-	expect fatasm.VerifyNumbers
+	expect fatasm.VerifyNumbers "ASM Setup failiure"
 	
 	app.Parent									// sigh. do this before clearenvs
 	.ClearEnvs

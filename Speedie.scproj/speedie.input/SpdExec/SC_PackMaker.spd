@@ -181,8 +181,14 @@ module PackMaker
 			|| JL = J.Length
 			j.tmparg("debug")
 			assembler.DebugClassesAndGlobals(j)
-			j.addrow("pos", @bin, p|string|)
-			j.addrow("files", @str, SCImport.AllFiles.join("\n").Compress)
+			j.addrow(@bin, "pos", p|string|)
+			j.addrow(@str, "files", SCImport.AllFiles.join("\n").Compress)
+			
+			SourceMap.SortBreaks
+/			|| BP = sourcemap.Breakable.read
+			j.addrow(@str, "breakmap", (&BP)|string|)
+			BP = sourcemap.BreakPoints.read
+			j.addrow(@str, "breakpoints", (&BP)|string|)
 			j.exit(2)
 			compiler.stDebugInfo += j.Length - JL
 	

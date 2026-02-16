@@ -232,4 +232,7 @@ class Memory
 		autogen  Test	 (|?&nil| p, |int| n, |ErrorInt|):				cpp_wrapper JB_CanReadMemory
 
 		libinternal _Free (|?&nil| b):									cpp_wrapper free
-
+	
+		autogen Sort (|&nil| FP, |&object| First, |&object| Last)
+			cpp_wrapper SpdSort
+			

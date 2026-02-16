@@ -1,12 +1,10 @@
 
 
-
-// byteposes are good enough. Perry can store byteposes on the textviewline
-// perry can collect the byteposes, before compile and store on the textviewlines...
-
 module SourceMap
-	|faststring|	Positions
-	|int|			LastLength
+	|faststring|		Positions
+	|int|				LastLength
+	|FastASM|			BreakPoints
+	|FastASM|			Breakable
 
 	function Check (|scfunction| fn, |int| T, |bool|)
 		opt norefcounts
@@ -15,8 +13,44 @@ module SourceMap
 			expect (dbg == T)								(fn, "Debug length corrupt")
 		return true
 		
+
 	function Reserve (|int| T, |&uint|)
 		opt norefcounts
 		|| p = .positions
-			.lastlength = p.length
-			return p.Reserve(T)|&uint|
+			if .breakable.alloc(4KB) and .breakpoints.alloc(4KB)
+				.lastlength = p.length
+				return p.Reserve(T)|&uint|
+
+
+	prototype UintSorter (|uint64| A, |uint64| B, |int|)
+	function BreakableSorter (UintSorter)
+/		return (A>>32) - (B>>32)
+
+	function SortBreaks
+		|| Start = .Breakable.Start
+		|| Last = .Breakable.Curr - 1
+/		memory.sort((&BreakableSorter)|&nil|, Start|&object|, Last|&object|)
+
+
+	////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////
+
+
+function fatasm.BakeBreak (|uint| SrcMap, |asmreg| info, |uint| ASMTotal)
+	|| i = .ASMIndex + ASMTotal
+	if info is Breakpoint
+		SourceMap.BreakPoints <~ I
+		
+	if info is Breakable
+		SourceMap.Breakable <~ SrcMap
+		SourceMap.Breakable <~ I
+		
+	
+function fatasm.BakeDebug (|uint| SrcMap, |uint| ASMTotal)
+	opt inline
+	|| info = .info
+	if info is break
+		.BakeBreak(SrcMap, info, ASMTotal)
+	if info is DebugVars
+		.OutputDebugVars
+
+

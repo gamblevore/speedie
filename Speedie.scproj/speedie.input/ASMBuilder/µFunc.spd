@@ -37,30 +37,12 @@ extend SCFunction
 				while (Curr++ < rz)
 					Positions++[] = pos
 				if options.targetdebug
-					fat.AddDebug(pos, ASMTotal)
+					fat.BakeDebug(pos, ASMTotal)
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self
 				|| r = fat.JumpPrm
 					fat.FillLabelRequest(where, rz, r-1)	
-	
-	
-	function fatasm.AddBreak (|uint64| SrcMap, |asmreg| info, |uint| ASMTotal)
-		|| i = .ASMIndex + ASMTotal
-		if info is Breakpoint
-			info = info
-			
-		if info is Breakable
-			SrcMap = (SrcMap<<32) ||| i // do this lattterrrr.
-			
-		
-	function fatasm.AddDebug (|uint| SrcMap, |uint| ASMTotal)
-		opt inline
-		|| info = .info
-		if info is break
-			.AddBreak(SrcMap, info, ASMTotal)
-		if info is DebugVars
-			.OutputDebugVars
 	
 	
 	target debug

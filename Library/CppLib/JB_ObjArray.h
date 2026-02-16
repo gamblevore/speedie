@@ -16,6 +16,9 @@ JBClass( Array, JB_Object,
 	int					Capacity;
 	int					Length;
 );
+
+void SpdSort (void* fp, JB_Object** low, JB_Object** high);
+
 typedef int (*ArraySorterComparerInt)(JB_Object* a, JB_Object* b);
 
 void JB_Array_Sort( Array* self, ArraySorterComparerInt fp );

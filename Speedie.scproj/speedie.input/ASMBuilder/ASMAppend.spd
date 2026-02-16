@@ -1,40 +1,36 @@
 
 
-// could be cool to make some generic something...
-// the thing is... theres too many needs
-// faststring / fastbuff / MemoryObject
-// each needs different things... In fact, fastString wants a byte-buff... for string reuse very easily.
-// what about fastbuff / memoryobject? MAYBEEEE. who knows???
-// memoryobject could wrap this.
-// and fastbuff could... also. FastBuff needs extra stuff...
-// and for what? I think... just keep it separate. For sexyness....
 
-// nice!
-function @ASM.Alloc (|int| Length, |&ASM|)
-	visible
-	|| Buff = Memory.Zalloc((length+1)<<2)|&asm|
-		Buff[Length] = Length
-	return buff
+struct FastASM
+	|&uint| Start
+	|&uint| Curr
+	syntax Append (|uint| Value)
+		opt inline
+		real self
+		|| A = .Curr++
+		|| Length = A[]
+		if !Length
+			A[] = Value
+			return
+		return .AppendSub(value, length)
+
+	helper AppendSub (|uint| Value, |int| Length)
+		real self
+		|| NewLength = Length*2
+		|| Bigger = Memory.Realloc(self - Length, (NewLength+1)<<2)|&ASM|
+			.Start = Bigger
+			Bigger[NewLength] = NewLength
+			Bigger += Length
+			Bigger++[] = Value
+			.curr = Bigger
 	
+	function Alloc (|int| Length, |&asm|)
+		|| Buff = Memory.Zalloc((length+1)<<2)|&asm|
+			Buff[Length] = Length
+			.Start = Buff
+			.curr = buff
+		return buff
 	
-function ASM.Append (|&ASM| self, |uint| Value, |&ASM|)
-	opt inline
-	visible
-	real self
-	|| Length = Self[]
-	if !Length
-		Self++[] = Value
-		return self
-	return .AppendSub(value, length)
-
-
-function ASM.AppendSub (|&ASM| self, |uint| Value, |int| Length,  |&ASM|)
-	real self
-	visible
-	|| NewLength = Length*2
-	|| Self2 = Memory.Realloc(self - Length, (NewLength+1)<<2)|&ASM|
-		Self2[NewLength] = NewLength
-		Self2 += Length
-		Self2++[] = Value
-	return Self2
-
+	function Read (|VirtualJBString|)
+		rz.Addr = .Start|&byte|
+		rz.Length = .curr|&byte| - .Start|&byte|
