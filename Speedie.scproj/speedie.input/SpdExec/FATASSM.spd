@@ -302,7 +302,7 @@ struct FatASM
 		return (ASM.encoders[.op]!)(self, where, after)
 
 
-	function FuncPrms (|scfunction| fn, |uint64|)
+	function FuncPrms (|uint64|)
 		|| A = .p2|uint64|
 		|| B = 0|uint64|
 		if self isa asm.tail
@@ -335,12 +335,12 @@ struct FatASM
 			if !fn
 /				fs <~ "(unknown)"
 				return
-		|| regs = .FuncPrms(fn)
+		|| regs = .FuncPrms
 		|int64| n  = fn.Args.Length
 		fs <~ "("
 		
 		if n > 10
-/			n = 10 // sigh
+			n = 10 // sigh
 
 		|| IsC = (self isa asm.fncx or asm.fncx3)
 

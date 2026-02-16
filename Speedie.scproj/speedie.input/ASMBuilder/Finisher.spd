@@ -9,11 +9,16 @@ function Assembler.FinishMost
 	target debug
 		|ASM[4]| TestSpace
 	
+	if .out == "typereach"
+	
 	while A > S
-		if s isa asm.knst
+		|| op = s.op
+		if op == asm.knst
 			S.ConstFinish
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
+		  elseif op == asm.FNC3 or asm.FNC
+			.TryTail(s)
 
 		|| Predicted = s.guesssize
 		length += Predicted
@@ -28,23 +33,25 @@ function Assembler.FinishMost
 	.out.µASMLength = Length
 
 
-function fatasm.Nop_Encoder (Asm_encoder)
-	return curr
 
+function assembler.TryTail (|fatasm| FNC)
+	opt norefcounts
+	|| Ret = Fnc + 1
+	require ret isa asm.ret
+	|| rr = ret.regonly
+	require (fnc.BasicBlock == ret.BasicBlock) and (!fnc.p3)	// no pext, won't fit in tail.
+	|| ReturnType = .out.ReturnType
+	require !returntype or fnc.RegOnly == rr					// returning same var, or nothing at all.
 
-function fatasm.Halt_Encoder (Asm_encoder)
-	curr++[] = .prms[0]&0xFFFfff // a shame to waste this opcode.
-	curr++[] = 0				 // we'd have to move the 2/3 codes out of 0. Or up by 1.
-	return curr
+/	Fnc.prms[0] = Fnc.prms[1]
+	Fnc.prms[1] = Fnc.prms[2]
+	Fnc.prms[2] = 0
+	Fnc._Outputs = 0
+	Fnc._op = asm.tail
+	(Fnc.info as= ASMReg.exit)
+	ret._op = asm.noop
+	if 0: nil|message|!.TAIL
 
-
-function fatasm.KNST_Encoder (Asm_encoder)
-	rz = ASM_ConstStretchy.Encode(self, curr, after)
-	|| op = .op
-	if op != asm.knst
-		rz++[] = .prms[4]
-		if op == asm.knst3
-			rz++[] = .prms[5]
 
 
 function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)

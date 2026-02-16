@@ -129,55 +129,34 @@ function Sheb (fn_asm)
 	opt NoRefCounts
 	exp.noop
 	return nil
-	
-
-function BadBflg (|&Assembler| self, |fatasm| L, |int| rr, |bool|)
-	require (l.RegOnly == rr)
-	require .iscurr(l)
-	require (l isa asm.BFLG)
-	require !l.prms[2] and !l.prms[3]
-	return true
 
 
-function ReturnOpt (|&Assembler| self, |$asmreg| Ret_,  |bool|)
+
+function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	opt norefcounts
-	require .state.TailInlineable
-	|| l = .last
-	|| ret = ret_
 	|| rr = ret.reg
+	if !rr or !.state.TailInlineable
+		return ret
 
-	// We can tail functions that return nothing, assuming we also return nothing?
-	
-	if rr and BadBflg(self, l, rr)
-		// we could make the thing that put it here... change instead?
-		|| input = l.prms[1]&31
-		|| fn = l-1
-		|| fnout = fn.asmreg(0) // fn.output
-		if .iscurr(fn) and (fnout.reg == input)
-			if ret is Const != fnout is Const // sigh.
-			ret.reg = fnout
-			ret_ = ret
-			.SoftNop(l)
-			l = fn
-			rr = ret.reg
-	
-	
-	|| ReturnType = .out.ReturnType
-	require l isa asm.fnc or asm.fnc3
-	require !l.p3							// no pExt (not too many params)
-	require !returntype or l.RegOnly == rr	// returning same var, or nothing at all.
+	|| l = .last	
+	ifn (l.RegOnly == rr) and .iscurr(l) and (l isa asm.BFLG)
+		return ret
 
-	rz = .iscurr(l)							// This fnc must always flow into the return!
-											// So its not required to "just work". But
-	l.prms[0] = l.prms[1]					// We can't skip the ret if its not curr.
-	l.prms[1] = l.prms[2]
-	l.prms[2] = 0
-	l._Outputs = 0
-	l._op = asm.tail
-	(l.info as= ASMReg.exit)
-	if 0: nil|message|!.TAIL
-
+	if l.prms[2] or l.prms[3] // no shifts!
+		return ret
 	
+	|| input = l.prms[1]&31
+	|| fn = l-1
+	|| fnout = fn.asmreg(0)							// fn.output
+	if .iscurr(fn) and (fnout.reg == input)
+		if ret is Const != fnout is Const			// sigh.
+		ret.reg = fnout
+		.SoftNop(l)
+	  else
+		0 // could opt even if not a func? like y = x, return y... just return x
+	return ret
+	
+		
 function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)
 	opt norefcounts
 	// What about getting the address of registers?
@@ -195,8 +174,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	(dest as= extras) // it can get lost... sadly.
 	if .state.TailInlineable
 		.ClearAllStructs(exp)
-		if  ReturnOpt(self, dest)
-			return dest
+		dest = ReturnOpt(self, dest)
 	
 	|| fat = exp.RET(Dest)
 	fat.µRefCount = 1
@@ -215,8 +193,7 @@ function Return (fn_asm)
 	
 	.ClearAllStructs(exp)
 
-	if ReturnOpt(self, dest)
-		return asmreg.exit
+	dest = ReturnOpt(self, dest)
 	
 	|| SafeDecr = FinalDecrements(self, exp, Dest)
 		return SafeDecr

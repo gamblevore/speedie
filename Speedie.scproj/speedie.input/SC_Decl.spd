@@ -82,6 +82,7 @@ class SCDecl (SCObject) {
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.mu.info = .mu.info.set(d, Value)
 
+	
 	function Sanity 
 
 

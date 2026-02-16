@@ -56,7 +56,6 @@ struct Assembler
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|int|						StringsOutOfRange
 		|jbin?|						DebugDecls
-		|jbin?|						BreakMap
 //		|FastString|				DebugSize
  
 		
@@ -645,7 +644,6 @@ struct Assembler
 				problem "Can't use --strip and --targetdebug"
 				Options.StripNames = false
 			DebugDecls = FastString()
-			BreakMap = FastString()
 //		DebugSize = file.SpeedieDir["spd_asm_size.txt"].OutputStream
 		
 		VM_Builder.JustDefineInstructions
@@ -720,33 +718,32 @@ struct Assembler
 //			.TrackFunctionSize(fn, fs)
 
 
-	function SCFunction.µGuessLength (|int|)
-		opt norefcounts
-		for x.fat in self
-			rz += x.GuessSize
-		
-		
-	function TrackFunctionSize (|scfunction| fn, |faststring| fs)
-		fs <~ fn.exportname
-		fs <~ " "
-		fs <~ fn.µguesslength
-		fs <~ "\n"
+//	function SCFunction.µGuessLength (|int|)
+//		opt norefcounts
+//		for x.fat in self
+//			rz += x.GuessSize
+//		
+//		
+//	function TrackFunctionSize (|scfunction| fn, |faststring| fs)
+//		fs <~ fn.exportname
+//		fs <~ " "
+//		fs <~ fn.µguesslength
+//		fs <~ "\n"
 		
 	
-	function FinishReturn 
+	function MissingReturn 
 		opt norefcounts
 		debugger !.fn.ASMReturn
 		|| dl = .fn.Source!.FlatLast
 		.CloseVars(1, dl)
-		|asmreg| dest = nil
-		if !ASMType.ReturnOpt(self, dest)
-			dl.RET
+		ASMType.ReturnOpt(self, nil)
+		dl.RET
 
 	
 	function FinishASM 
 		opt norefcounts
 		if (.FnLength <= 0) or !.last.IsFinisher
-			.FinishReturn
+			.MissingReturn
 		.FinishMost
 
 
