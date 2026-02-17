@@ -91,7 +91,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
 
-	target debug: || TrapInline = ++asmtrapper, if  TrapInline == 56415
+	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
 	
