@@ -36,7 +36,6 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		PreferEqul
 		Const
-		Break = [Breakable, Breakpoint]
 //		NotNil // probably quite a big addition. Will need tests...
 		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit        = [ExitFunction, ExitAtAll]

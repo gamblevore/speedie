@@ -57,6 +57,7 @@ class DataObject
 		disabled "This property is immutable"
 
 	render
+		opt norefcounts
 		visible // hmmm
 		|| k = .kind
 		if k.isfloat

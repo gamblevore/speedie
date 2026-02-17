@@ -8,9 +8,7 @@ function Assembler.FinishMost
 	
 	target debug
 		|ASM[4]| TestSpace
-	
-	if .out == "typereach"
-	
+		
 	while A > S
 		|| op = s.op
 		if op == asm.knst
@@ -43,7 +41,7 @@ function assembler.TryTail (|fatasm| FNC)
 	|| ReturnType = .out.ReturnType
 	require !returntype or fnc.RegOnly == rr					// returning same var, or nothing at all.
 
-/	Fnc.prms[0] = Fnc.prms[1]
+	Fnc.prms[0] = Fnc.prms[1]
 	Fnc.prms[1] = Fnc.prms[2]
 	Fnc.prms[2] = 0
 	Fnc._Outputs = 0

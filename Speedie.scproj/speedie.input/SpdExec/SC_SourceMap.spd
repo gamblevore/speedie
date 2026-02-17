@@ -22,8 +22,8 @@ module SourceMap
 				return p.Reserve(T)|&uint|
 
 
-	prototype UintSorter (|uint64| A, |uint64| B, |int|)
-	function BreakableSorter (UintSorter)
+	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
+	function BreakableSorter (SourceSorter)
 /		return (A>>32) - (B>>32)
 
 	function SortBreaks
@@ -35,22 +35,38 @@ module SourceMap
 	////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////    ////
 
 
-function fatasm.BakeBreak (|uint| SrcMap, |asmreg| info, |uint| ASMTotal)
+datatype SourceLocation (uint64)
+	function FileNum (|uint|)
+		return self >> 53
+	
+	function BytePos (|uint|)
+		return (self>>32) & (21~bits)
+
+
+function fatasm.BakeBreak (|uint| SrcMap, |uint| ASMTotal, |uint| Break)
 	|| i = .ASMIndex + ASMTotal
-	if info is Breakpoint
+	if break & Assembler.BreakPoint
 		SourceMap.BreakPoints <~ I
 		
-	if info is Breakable
-		SourceMap.Breakable <~ SrcMap
+	if break & Assembler.Breakable
+/		SourceMap.Breakable <~ SrcMap
 		SourceMap.Breakable <~ I
+
+		target debug
+			FoundBreaks++
+//			printline ("::::" + FoundBreaks)// + (" / " + breakCount) + (" - " + LostBreaks)
+
+target debug
+	|| LostBreaks = 0
+	|| FoundBreaks = 0
+	|| BreakCount = 0
 		
 	
-function fatasm.BakeDebug (|uint| SrcMap, |uint| ASMTotal)
+function fatasm.BakeDebug (|uint| SrcMap, |uint| ASMTotal, |uint| Break)
 	opt inline
-	|| info = .info
-	if info is break
-		.BakeBreak(SrcMap, info, ASMTotal)
-	if info is DebugVars
+	if break
+		.BakeBreak(SrcMap, ASMTotal, break)
+	if .info is DebugVars
 		.OutputDebugVars
 
 

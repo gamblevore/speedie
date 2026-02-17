@@ -86,11 +86,14 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 			|| type = fn.ASMReturn
 				dest = .declarebody(prms, type) // asmtodo: mark this as a declaration?
 												// (shouldn't all declaremes be like that?)
-	if dest isnt ExitFunction
-		.state.TailInlineable = false
+
 	
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
+
+	target debug: || TrapInline = ++asmtrapper, if  TrapInline == 56415
+	if dest isnt ExitFunction
+		.state.TailInlineable = false
 	
 	dest = dest.simplify
 	dest.µtype = fn.ASMReturn.ASMRegType
@@ -112,6 +115,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	.inlinedepth = --ID
 	if !ID
 		.InlineEnd = nil
+		
 	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
 
 
@@ -153,7 +157,7 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 	|| p = prms.first$
 
 	|| args = .fn.args
-	target debug: if asmtrapper == -1
+	target debug: || trap = asmtrapper, if trap == -1
 	info.DoImmediates(p, args)
 	
 	for (a in args) (i)

@@ -6,11 +6,20 @@ struct StructWithObj
 
 
 
+
+function UintOnly (|uint|)
+	opt noinline
+	return ASMExamples.glob + 1
+
+
 module ASMExamples {
-target cake { 
 |int| Glob
 |int| Bolg
+target cake { 
 
+function Uint64Trim (|uint64|)
+	visible
+	return UintOnly()>>31
 
 function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|)	/// Active ///
 	opt norefcounts

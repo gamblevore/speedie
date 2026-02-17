@@ -27,6 +27,7 @@ extend SCFunction
 			HasLabel |= fat.JumpPrm << (i&63)
 			if (rz - where) > 63K
 				error (.source, "Function too large (over 63K)")
+			|| Break = fat.ASMIndex
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
 				
@@ -37,7 +38,7 @@ extend SCFunction
 				while (Curr++ < rz)
 					Positions++[] = pos
 				if options.targetdebug
-					fat.BakeDebug(pos, ASMTotal)
+					fat.BakeDebug(pos, ASMTotal, break)
 
 		if HasLabel // Use this as a jump-map??? To skip huge sections?
 			for fat.fat in self

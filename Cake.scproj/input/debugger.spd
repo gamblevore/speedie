@@ -25,10 +25,10 @@
 
 datatype SourceLocation (uint)
 	function FileNum (|uint|)
-		return self & 11~bits
+		return self >> 21
 	
 	function BytePos (|uint|)
-		return self >> 11
+		return self & 21~bits
 
 
 module debugger

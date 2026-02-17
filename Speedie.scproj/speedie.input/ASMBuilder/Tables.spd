@@ -77,7 +77,7 @@ function Debugger (fn_asm)
 	opt norefcounts
 	|| fn = exp.func
 	if fn == @tmp
-		(.RequestBreak as= ASMReg.BreakPoint)
+		.Breakrequest |= assembler.BreakPoint
 		return nil
 
 	require Options.TargetDebug
@@ -138,22 +138,22 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	if !rr or !.state.TailInlineable
 		return ret
 
-	|| l = .last	
-	ifn (l.RegOnly == rr) and .iscurr(l) and (l isa asm.BFLG)
+	|| BFLG = .last(asm.bflg)
+	if !bflg or (BFLG.RegOnly != rr)
 		return ret
 
-	if l.prms[2] or l.prms[3] // no shifts!
+	if BFLG.prms[2] or BFLG.prms[3] // no shifts!
 		return ret
 	
-	|| input = l.prms[1]&31
-	|| fn = l-1
-	|| fnout = fn.asmreg(0)							// fn.output
-	if .iscurr(fn) and (fnout.reg == input)
-		if ret is Const != fnout is Const			// sigh.
-		ret.reg = fnout
-		.SoftNop(l)
-	  else
-		0 // could opt even if not a func? like y = x, return y... just return x
+	|| BeefIn = BFLG.ASMReg(1)
+	|| R = .Register(BeefIn.reg)
+	if !R or !.IsCurr(R)
+		return ret
+	
+	BeefIn = r.info
+	ret.reg = beefin			// keep exit flags or other stuff
+	ret.µtype = beefin.µtype	// not copied in .reg...
+	.SoftNop(BFLG)
 	return ret
 	
 		
@@ -197,7 +197,14 @@ function Return (fn_asm)
 	
 	|| SafeDecr = FinalDecrements(self, exp, Dest)
 		return SafeDecr
-
+	
+	|| ty = .out.ASMReturn
+		|| Needed = ty.ASMRegType
+		|| BC = dest.BitCount
+		if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
+			|| Wipe = 64 - BC
+			dest = .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
+			
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0
 	|| fat = exp.RET(dest*!HasK, K * HasK)
@@ -399,7 +406,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
 	
 	while
-		(.requestbreak as= ASMReg.Breakable)
+		.BreakRequest |= assembler.Breakable
 		if ch.func == @decl
 			rz = decl(self, ch, nil)
 		  else
@@ -409,13 +416,14 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	
 	
 	if !Mask
-		if exp != .fn.sourcearg
-		.RegDebugInfo = 0		// Leave all debug info open
-		// exp = nil			// But still dealloc structs // wait, setting this to nil BLOCKS dealloc?
+		.RegDebugInfo = 0		// Leave all debug info open, but still dealloc structs
+		// exp = nil			// Can't set exp = nil, or we block dealloc.
 		
 	rz = .CloseVars(v, exp, rz & Mask)
-	if rz is ExitFunction
-		.regs = Restore
+
+	if rz is ExitFunction		// this is being triggered by inlined returns
+		.regs = Restore			// but they don't ACTUALLY exit. Did I alter how inline returns work?
+								// i didn't get this problem before?
 
 
 function Argument (fn_asm) // argument 

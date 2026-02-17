@@ -36,7 +36,8 @@ struct Assembler
 	|bool|						Inited
 	|scfunction--|				Out
 
-	|AsmReg|					RequestBreak
+	|byte|						BreakRequest
+//	|AsmReg|					RequestBreak
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
 	|&FatASM|					Start
@@ -49,6 +50,8 @@ struct Assembler
 	constants
 		kContinue		= 254
 		kExit			= 255
+		Breakable		= 1
+		BreakPoint		= 2
 
 	module
 		|Assembler|					Sh
@@ -317,9 +320,12 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+		|| Break = fat.ASMIndex
+		if (break)
+			//target debug: LostBreaks++
+			if (.BranchID == fat.BranchID)
+				.Breakrequest |= Break
 		|| info = fat.info
-		if (info is Break) and (.BranchID == fat.BranchID)
-			(.RequestBreak as= info&asmreg.Break)
 		if  info is temp  and  info isnt OKAsTemp
 			.CloseOneVar(nil, 1<<info.reg)
 		

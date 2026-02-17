@@ -22,7 +22,7 @@ function ElseSub (|message?| other, |asmreg|)
 
 function If (fn_asm)
 	|| NothingDone = .curr
-	|| BreakReq = .RequestBreak
+	|| BreakReq = .BreakRequest
 	|| Old = .BranchID
 	.branchID = ++.NextBranchID
 
@@ -31,7 +31,7 @@ function If (fn_asm)
 	.state.BranchDepth--
 	
 	.branchID = Old
-	.RequestBreak = (BreakReq, nil)(NothingDone == .curr)
+	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
   
 
 
@@ -76,7 +76,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 function While (fn_asm)
 	|| NothingDone = .curr
-	|| BreakReq = .RequestBreak
+	|| BreakReq = .BreakRequest
 	
 	|| Old = .BranchID
 	.branchID = ++.NextBranchID
@@ -86,7 +86,7 @@ function While (fn_asm)
 	.state.BranchDepth--
 	
 	.BranchID = Old
-	.RequestBreak = (BreakReq, nil)(NothingDone == .curr)
+	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
 	
 
 function WhileSub (|message| exp,  |asmreg|)
