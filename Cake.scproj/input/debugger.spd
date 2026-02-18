@@ -8,20 +8,6 @@
 	// ask for vars
 	// ask for stack
 	// hit breakpoints and stop!
-	// deal with crashes.
-
-// of course... we can't actually do these.
-// not without the cake file
-// So... lets say they press pause. what do we do? well... we can't do anything
-// so what are we doing? Testing?
-// planning?
-// preparing?
-// lets pretend we paused. then send back some messages.
-// send back... variables, and stack
-
-// what about asking for ASM? That goes through speedie.
-// So might as well do that first?
-
 
 datatype SourceLocation (uint)
 	function FileNum (|uint|)

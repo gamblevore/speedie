@@ -10,7 +10,7 @@ struct FatASM
 	|ASMReg| 			Info
 	|Message--| 		Msg			// Only used for reporting now. Not ASMGen. Not easy to remove.
 	|uint64| 			_Const
-	|uint|				SrcMap
+	|uint|				FatMap
 	|int16|				µRefCount
 	|uint16| 			BasicBlock
 	|uint16| 			ASMIndex
@@ -29,11 +29,11 @@ struct FatASM
 	setter SetOp (|byte| value)
 		opt norefcounts
 		|| m = .Msg
-		|| s = .SrcMap
+		|| s = .FatMap
 		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
 		self[0] = nil
 		.Msg = m
-		.SrcMap = s
+		.FatMap = s
 		._Const = k
 		._op = value
 		

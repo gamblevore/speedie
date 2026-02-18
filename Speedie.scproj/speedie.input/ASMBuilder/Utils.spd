@@ -38,7 +38,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		.breakrequest = nil
 		p.BranchID = .BranchID
 		p.BasicBlock = .BasicBlock
-		p.SrcMap = exp.SrcMap
+		p.FatMap = exp.SrcMap
 		return p
 
 	error (exp, "Function too large (over 64K)")

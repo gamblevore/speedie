@@ -74,6 +74,7 @@ int JB_int_Render(int Self, byte* Addr, int N);
 void JB_FS_AppendDurr(FastString* self, Date D);
 void JB_FS_AppendLocalTime(FastString* self, Date D);
 void JB_FS_AppendShort(FastString* self, int s);
+void JB_FS_AppendInteger64(FastString* self, int64 l);
 void JB_FS_AppendInteger(FastString* self, int l);
 void JB_FS_AppendFract16(FastString* self, u16 Fract);
 void JB_FS_AppendDouble(FastString* self, double d);

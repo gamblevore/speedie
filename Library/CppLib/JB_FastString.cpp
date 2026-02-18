@@ -508,16 +508,23 @@ void JB_FS_AppendShort(FastString* self, int s) {
 
 
 void JB_FS_AppendInteger(FastString* self, int l) {
-	int* wp = (int*)JB_FS_WriteAlloc_Inline_( self, 4 );
-	if (wp) {
+	auto wp = (int*)JB_FS_WriteAlloc_Inline_( self, 4 );
+	if (wp)
 		*wp = l;
-	}
+	FS_SanityCheck_(self);
+}
+
+
+void JB_FS_AppendInteger64(FastString* self, int64 l) {
+	auto wp = (int64*)JB_FS_WriteAlloc_Inline_( self, 8 );
+	if (wp)
+		*wp = l;
 	FS_SanityCheck_(self);
 }
 
 
 void JB_FS_AppendDouble(FastString* self, double d) {
-	double* fp = (double*)JB_FS_WriteAlloc_( self, 8 );
+	auto fp = (double*)JB_FS_WriteAlloc_( self, 8 );
 	if (fp)
 		*fp = d;
 	FS_SanityCheck_(self);

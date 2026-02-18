@@ -24,8 +24,10 @@ module SourceMap
 
 
 	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
+
 	function BreakableSorter (SourceSorter)
-/		return (A>>32) - (B>>32)
+		return A - B
+
 
 	function SortBreaks (|FastString| B)
 		|| Start = B.ResultPtr
@@ -50,8 +52,8 @@ function fatasm.BakeBreak (|uint| SrcMap, |uint| ASMTotal, |uint| Break)
 		SourceMap.BreakPoints!.AppendInt(I)
 		
 	if break & Assembler.Breakable
-		SourceMap.Breakable!.AppendInt(SrcMap)
-		SourceMap.Breakable!.AppendInt(I)
+		|| value = (SrcMap|uint64| << 32) ||| I
+		SourceMap.Breakable!.AppendInt64(Value)
 
 		target debug
 			FoundBreaks++

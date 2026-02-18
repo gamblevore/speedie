@@ -1,4 +1,4 @@
-unfinished
+//unfinished
 
 extend SCFunction
 	function µTest (|memory of asm|)
@@ -15,16 +15,21 @@ extend SCFunction
 	
 	
 	function Message.SrcMap (|uint|)
-		return (.Position<<11) ||| (.tag >> 8)
+		// 11-bits for the file num, 21-bits for the position
+		// 2K files and 2MB per-file max
+		// File Num goes at the top, to make it more significant
+		|| FileNum = (.tag&~31)|uint|
+		return (FileNum<<16) ||| (.Position&(21~bits))
 	
 	
 	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |uint| ASMTotal,  |!&asm|)
 		opt norefcounts
 		rz = where
-		|uint64| HasLabel
 		assembler.sh.funcstart_ = .fatfirst - 1 // for debug
-		for (fat.fat in self) (i)
-			HasLabel |= fat.JumpPrm << (i&63)
+
+		|byte| HasLabel
+		for fat.fat in self
+			HasLabel |= fat.JumpPrm
 			if (rz - where) > 63K
 				error (.source, "Function too large (over 63K)")
 			|| Break = fat.ASMIndex
@@ -34,13 +39,13 @@ extend SCFunction
 			|| Curr = rz
 			rz = fat.µRenderInto(rz, after)
 			if Positions
-				|| pos = fat.SrcMap
+				|| pos = fat.FatMap
 				while (Curr++ < rz)
 					Positions++[] = pos
-				if options.targetdebug
+				if options.TargetDebug
 					fat.BakeDebug(pos, ASMTotal, break)
 
-		if HasLabel // Use this as a jump-map??? To skip huge sections?
+		if HasLabel
 			for fat.fat in self
 				|| r = fat.JumpPrm
 					fat.FillLabelRequest(where, rz, r-1)	
@@ -75,6 +80,7 @@ extend SCFunction
 
 
 function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
+	(after)
 	|| SelfOut = start + .ASMIndex
 	target debug: debug_require  SelfOut >= start  and  SelfOut < after 
 

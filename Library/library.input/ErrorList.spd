@@ -204,6 +204,7 @@ class ErrorReceiver
 	
 	
 	Syntax UsingComplete (|object| idk=nil)
+		inline
 //		stderr.printerrors // note to self: don't readd this!
 		stderr = self
 
@@ -262,10 +263,22 @@ extend string
 		errorreceiver.NewProblem( nil, self )
 
 
+extend File
+	Syntax Expect (|string| Error)
+		opt norefcounts
+		cpp_part Fail
+		errorreceiver.NewError( nil, Error, .path )
+
+	Syntax Problem (|string| Error)
+		opt norefcounts
+		errorreceiver.NewProblem( nil, Error, .path )
+
+
 extend faststring
 	syntax expect
+		opt norefcounts
 		cpp_part Fail
-		visible
+		inline
 		.GetResult.SyntaxExpect
 
 
@@ -273,3 +286,4 @@ datatype ErrorMarker (int)
 	syntax cast (|bool|)
 		inline
 		return stderr.errorcount == self
+

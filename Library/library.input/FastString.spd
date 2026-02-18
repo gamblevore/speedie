@@ -194,6 +194,9 @@ class FastString {
 	
 	function AppendInt (|int| data)
 		cpp_Wrapper JB_FS_AppendInteger
+	
+	function AppendInt64 (|int64| data)
+		cpp_Wrapper JB_FS_AppendInteger64
 			
 	function AppendShort (|uint16| data)
 		cpp_wrapper JB_FS_AppendShort

@@ -32,6 +32,11 @@ class SCFile (file)
 		(SCImport.Recent max= f.modified) 
 		FlowControl.DisabledIncr(-1)
 		
+		if .FileNum >= 2K
+			if !TooManyFiles
+				TooManyFiles = true
+				problem (f, "Too many files included, debugging will misreport some file-positions")
+		
 	
 	
 	function Start_AST (|message|)
@@ -110,7 +115,7 @@ class SCFile (file)
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.Using.Tag = .FileNum << 8
+			parser.Using.Tag = .FileNum << 5
 			if !orig
 				rz = .fData.ParseClean
 			  else
@@ -124,7 +129,8 @@ class SCFile (file)
 		(Message).restore
 	
 	module
-		|scfile--| Curr
+		|bool|		TooManyFiles
+		|scfile--|	Curr
 		
 		function Sorter (SorterComparer of scfile)
 			opt norefcounts

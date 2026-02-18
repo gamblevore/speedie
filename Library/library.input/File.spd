@@ -466,11 +466,6 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		reader.listend
 	
 
-	function SyntaxExpect (|string| Error)
-		opt norefcounts
-		cpp_part Fail
-		errorreceiver.NewError( nil, Error, (.path, "")(self) )
-
 	module
 		|string| _Speedie
 				

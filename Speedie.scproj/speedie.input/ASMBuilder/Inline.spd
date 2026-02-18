@@ -148,7 +148,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	if (last == RealStart) and last.IsFunc
 		|| P = prms.parent!							// cleanup
 		last.Msg = P								// right? or else the autocomplete goes wrong? Or not?
-		last.srcmap = P.srcmap
+		last.Fatmap = P.srcmap
 
 
 	
