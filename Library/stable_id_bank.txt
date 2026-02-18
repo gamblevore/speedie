@@ -1003,6 +1003,7 @@ JB_App__GetChar
 JB_App__ID
 JB_App__IconSet
 JB_App__IsMainThread
+JB_App__MainArgsStart
 JB_App__MemoryUsage
 JB_App__OrigPath
 JB_App__Parent
@@ -1216,6 +1217,7 @@ JB_FS_AppendInfoFloat
 JB_FS_AppendInfoNum
 JB_FS_AppendInt64s
 JB_FS_AppendInteger
+JB_FS_AppendInteger64
 JB_FS_AppendIntegerAsText
 JB_FS_AppendInts
 JB_FS_AppendJoin
@@ -1235,7 +1237,6 @@ JB_FS_ByteSet
 JB_FS_Constructor
 JB_FS_ConstructorSize
 JB_FS_Destructor
-JB_FS_Fail
 JB_FS_FieldEnter
 JB_FS_FieldStart
 JB_FS_File
@@ -1352,6 +1353,7 @@ JB_File_SizeSet
 JB_File_Skip
 JB_File_SmartDataSet
 JB_File_SyntaxAccessSet
+JB_File_SyntaxProblem
 JB_File_Touch
 JB_File_UniqueChild
 JB_File_Write
@@ -1437,7 +1439,6 @@ JB_MemUsedOther
 JB_MemUsedString
 JB_Mem_ClassLeakCounter
 JB_Mem_Constructor
-JB_Mem_CreateLayer
 JB_Mem_Use
 JB_MessageTable_AppendMsg
 JB_MessageTable_GetMsg
@@ -1616,7 +1617,6 @@ JB_Plane3D__Normals
 JB_Platform
 JB_Platform__CPU
 JB_Platform__CPU_Name
-JB_Platform__HALT
 JB_Platform__Lin
 JB_Platform__Log
 JB_Platform__OSX
@@ -1662,7 +1662,6 @@ JB_Rec_RenderErrors
 JB_Rec_RenderErrors0
 JB_Rec_ShellPrintErrors
 JB_Rec_SyntaxUsing
-JB_Rec_SyntaxUsingComplete
 JB_Rec__CrashLog
 JB_Rec__Latchkum
 JB_Rec__NewCriticalError
@@ -2516,6 +2515,7 @@ SDL_StartTextInput
 SDL_StopTextInput
 SDL_UnlockTexture
 SDL_WarpMouseInWindow
+SpdSort
 __builtin_bswap32
 __builtin_bswap64
 __builtin_popcountll
@@ -2550,5 +2550,3 @@ roundf
 sqrt
 sqrtf
 strlen
-JB_App__MainArgsStart
-SpdSort
