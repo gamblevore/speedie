@@ -53,7 +53,9 @@ struct			PicoMessage { char* Data; int Length;  operator bool () {return Data;};
 typedef void	(*PicoThreadFn)(PicoComms* M, unsigned int Mode, const char** Args);
 typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
 typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
+typedef char*   (*PicoActionFn)(void* Upon, int MsgLength);
 
+struct 			PicoAction {PicoActionFn Action; void* Upon;};
 
 #ifdef PICO_IMPLEMENTATION
 
@@ -87,8 +89,9 @@ struct PicoTrousers { // only one person can wear them at a time.
 
 struct 			PicoConfig  {
 	char 				Name[16];		/// Used for reporting events to stdout.
-	PicoDate			LastRead;		/// The date of the last Read.
+	PicoDate			LastRead;		/// The date of the last read.
 	PicoDate			LastSend;		/// The date of the last send.
+	PicoAction*			ReceiveAction;	/// Allows Pico to notify an external threaded system of new messages.
 	unsigned short		DeathCount;		/// How many times the subprocess died.
 	unsigned short		SendFailCount;	/// How many times sending failed.
 	unsigned short		ReadFailCount;	/// How many times reading failed.
@@ -911,6 +914,8 @@ struct PicoComms : PicoConfig {
 			Reading->ReadInput4(Data, L);
 			PreData = Data;
 			LastRead = PicoNow();
+			if (auto Act = ReceiveAction; Act)
+				(Act->Action)(Act->Upon, L);
 			return true;
 		}
 

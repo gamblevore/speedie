@@ -163,14 +163,6 @@ void JB_FinalEvents() {
 
 
 int JB_BasicCareTaker(PicoDate D);
-int JB_GUICareTaker(PicoDate D) {
-	return JB_BasicCareTaker(D);
-//	return -(getppid() <= 1); // this seems to cause problems and I'm fed up with it
-							  // the idea is to die if the parent process dies.
-							  // seems not so hard... but maybe it is.
-							  // only used for GUIs anyhow.
-}
-
 
 Array*		JB_App__Args()					{ return Raw_Args; }
 void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
@@ -179,11 +171,7 @@ bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
 void		JB_App__CrashInstall();
 void		JB_CollectClassDepths ();
 int			JB_SP_AppInit();
-void		JB_App__GUIMode(bool GUI) {
-// GUICareTaker seems to cause problems and I'm fed up with it.
-	PicoGlobalConf()->Observer = GUI ? JB_GUICareTaker : JB_BasicCareTaker;
-	JB_NoExitOnCrash = GUI;
-}
+void		JB_App__GUIMode(bool GUI)		{ JB_NoExitOnCrash = GUI; }
 
 JB_StringC*	JB_App__CallPath (const char* New) {
 	if (!New)
@@ -211,15 +199,12 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
         
-	if (R) {
-//		App_CallPath = *R;
-		
+	if (R) {		
 		#ifndef AS_LIBRARY
 			int err = dup2( STDOUT_FILENO, STDFUN_FILENO );	// reserve StdFUN
 			err = dup2( STDOUT_FILENO, STDPICO_FILENO );	// reserve StdPico
 			if (!IsThread) {
 				JB_App__CrashInstall();
-//				if (getppid() > 1)
 				PicoGlobalConf()->Observer = JB_BasicCareTaker;
 			}
 			atexit(PicoFinish);
@@ -275,9 +260,9 @@ int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
 }
 
 
-void JB_Flow__DisabledIncr(int i) {	Flow_Disabled += i; }
-void JB_Flow__DisabledSet(int i) { 	Flow_Disabled = i; }
-bool JB_Flow__IsDisabled() { return Flow_Disabled; }
+void JB_Flow__DisabledIncr(int i)	{	Flow_Disabled += i; }
+void JB_Flow__DisabledSet (int i)	{ 	Flow_Disabled = i; }
+bool JB_Flow__IsDisabled  ()		{ return Flow_Disabled; }
 
 
 byte* JB_App__ErrorNumber () {

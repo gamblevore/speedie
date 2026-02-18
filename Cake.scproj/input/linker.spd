@@ -21,7 +21,6 @@ module SpdTable
 	
 	
 	function RunProgram (|int|)
-		debugger.Start
 		|| Err = .RunFunc(1)
 			return Err
 		return .RunFunc(2)

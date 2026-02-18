@@ -30,9 +30,11 @@ void** JB_App__LibGlobs();
 u16* JB_App__GlobTable();
 JB_String* JB_App__LibClasses(); 
 
+
 // Startup
 void JB_LibShutdown();
 bool JB_LibIsThreaded();
+
 
 // APP
 void JB_App__Beep ();
@@ -46,10 +48,12 @@ void JB_SDL_SetModified (void* w, bool b);
 void JB_App__ShowURL (const char* Path);
 JB_String* JB_App__DocumentOpened (bool Clear);
 
+
 // Sub process
 int* JB_SP_ErrorNumber ();
 int	 JB_SP_Run (const char** R, int Mode);
 int	 JB_SP_Init (const char** R, bool IsThread);
+
 
 // dylib
 #include <dlfcn.h>
@@ -103,6 +107,12 @@ struct CakeVM {
     byte*			PackGlobs;
     Fn0*			CppFuncs;
     byte*			AllocBase;
+    PicoAction		Pico; // what do we want to do when we get this?
+						  // We want to break into the debugger, right?
+						  // so we need to update the VM table. I guess into pause-mode?
+						  // something like that. At least I want the VM to get an event.
+						  // so I need to update the instruction-table.
+						  // Do this later....
     
 	void*const*		OriginalJumpTable;
 	void*			JumpTable[514];
@@ -115,7 +125,6 @@ struct CakeVM {
 
 typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
 void	JB_InitClassList	(SaverLoadClass fn);
-
 
 CakeVM*	JB_ASM__VM			(int Flags);
 u32*	JB_ASM_Code			(CakeVM* V, int Length);

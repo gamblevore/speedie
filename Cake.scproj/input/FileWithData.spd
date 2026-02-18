@@ -4,7 +4,14 @@ class FileWithData (stringshared)
 	false NIL
 	|string?|   _Data
 	|string|	FileName
-	|int|		Position
+	|int|		Index
+
+	constructor (|string| Path, |int| I)
+		super.constructor(Path)
+		._data = nil
+		.FileName = path.name
+		.Index = I
+
 
 	render
 		opt norefcounts
@@ -21,9 +28,3 @@ class FileWithData (stringshared)
 		opt norefcounts
 		return ._Data init .ReadAll
 	
-	constructor (|string| Path, |int| Pos)
-		super.constructor(Path)
-		._data = nil
-		.FileName = path.name
-		.Position = pos
-
