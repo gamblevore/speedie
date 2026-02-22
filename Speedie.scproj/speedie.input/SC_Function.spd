@@ -1254,7 +1254,7 @@ function SCDecl.MarkAsAltered  // markaltered
 	require self is local
 	(self is altered)
 	if SCFunction.InBranch > .DepthOfBranch
-		is AlteredInBranch
+		is AlteredInIf
 	if SCFunction.InLoop > .DepthOfLoop
 		is AlteredInLoop
 	if .IsNormalObject and self is param

@@ -25,6 +25,7 @@ datatype ASMReg (uint64)
 		DebugVars
 		ForceInto
 		NoScale
+		FromInline
 		ContainsAddr
 		Textual
 		ConstRequest	// Could we merge? Probably dont want const+cond+AddrRequest

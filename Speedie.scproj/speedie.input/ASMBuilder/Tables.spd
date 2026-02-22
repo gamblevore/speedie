@@ -843,19 +843,30 @@ helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 	return exp.VSWZ(T, src, 0) * T
 
 
+function CanConst (|scdecl| D, |&fatasm| f, |bool|)
+	if .IsCurr(f)
+		return true
+	if d is AlteredByBranch
+		return false
+	// not sure if we can improve on this.
+	// if this isn't alteredby a branch, but it is inline....
+	// then it depends on if its REALLY altered by a branch
+	// do later... or not. might not be important.
+	// the basicblock is already different... sooo
+	
+	return f isnt FromInline
+	
+
 function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
 
 	(t is param) = d is param
-//	(t is BlockMostlySafe) = d isnt AlteredInBranch // unused?
-//	(t is BlockSafe) = d isnt AlteredBranchLike
-	|| f = .Register(t.reg)
-
-	// consts must have fats! both in and out. unless r0.
-	if f and (.iscurr(f) or (d isnt AlteredBranchLike))
-		t.FatIndex = f.index
-		(T is Const) = (f is Const)
+	|| f = .Register(t.reg)	// consts must have fats! both in and out. unless r0.
+		if .CanConst(d, f)
+			t.FatIndex = f.index
+			(T is Const) = (f is Const)	
+	
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
@@ -863,16 +874,7 @@ function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
 			(T is temp) = (ret is temp)
 	  else
 		(t is const)
-	
-	// ASMReg() calling SC_Reg_SyntaxIsSet() triggers this.
-	//if d is const and t isnt Const // oof. lost somehow?
-	//	debugger
-	// this is possible. Using inlines. We can write to a "const register"... but only in the return value.
-	// if there are multiple branches, then they'll see the previous branch's write. Which is fine...
-	// we just lose the const value, thats all. The arg can't restore this either. It would need to be
-	// "unrestored" after the else condition is done. And then merged. What a mess. Nil-checker complexity.
-	// leave this as it is!
-	
+		
 	return T
 }
 

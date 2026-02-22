@@ -66,8 +66,8 @@ datatype SCDeclInfo (uint)
 		///
 		
 		Return
-		AlteredCopy = [Altered,AlteredInBranch,AlteredInLoop,AlteredParamObject]
-		AlteredBranchLike = AlteredInBranch|||AlteredInLoop
+		AlteredCopy = [Altered,AlteredInIf,AlteredInLoop,AlteredParamObject]
+		AlteredByBranch = AlteredInIf|||AlteredInLoop
 		Reference
 		AlteredOrRef = Altered ||| Reference
 		Task

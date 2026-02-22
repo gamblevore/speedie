@@ -124,24 +124,26 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	opt norefcounts
 	LL.Start = .curr
 
-	|SavedRegisters| regs 
+	|SavedRegisters| svregs 
 	|InlineInfo| Info
 
-	regs.Collect(fn.args, self)
+	svregs.Collect(fn.args, self)
 	.InlineParameters(prms, info)
 	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	info.NopParams(fn.args.length, .state.return)
-	regs.Restore(fn.args)
+	svregs.Restore(fn.args)
 	
 	ll.after = .curr
-	rz = .InlineFinish(ll)
+	rz = .InlineFinish(ll, svregs)
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain)
-		regs.Rewind(self)
+		svregs.Rewind(self)
 		.SoftNopRange(ll.start, .curr)				// rewind
 		return nil
 	
+	if svregs.ReturnCount > 1
+		.BasicBlock++
 	if !rz
 		(rz is Const)								// no longer zero
 	|| last = .last
@@ -221,10 +223,11 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 
 
-function InlineFinish (|fatrange| R, |ASMReg|)
+function InlineFinish (|fatrange| R, |savedregisters| sv, |ASMReg|)
 	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
 	for s in R
 		if s isa asm.ret
+			sv.ReturnCount++
 			if rz
 				rz = rz.simplify
 			  else
@@ -236,6 +239,8 @@ function InlineFinish (|fatrange| R, |ASMReg|)
 			s.SetOp = asm.jump
 			s.JumpPrm = 1
 			s.JumpFix(.curr)
+		if s.GuessSize
+			(s.info as= asmreg.FromInline)
 	
 	rz &= ~ASMReg.Exit
 	|| dest = .state.return

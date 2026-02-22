@@ -1,11 +1,9 @@
 
 
 
-// Use the decl's reg for the index?
-
-	
 struct SavedRegisters 
 	|byte|					RegCount
+	|byte|					ReturnCount
 	|uint16|				BasicBlock
 	|DeclAlterable[32]|		Decls
 	|RegFile|				Regs
