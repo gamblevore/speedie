@@ -2,7 +2,14 @@
 #include "JB_Compress.h"
 #include "JB_MemUtils.h"
 #include "CompressionProbability.h"
-// Can we speed up myscore?
+// Possible ideas:
+// * Can we speed up myscore?
+// * What about trying a putoffset, with a base-bits of 8? and 3 bits of log
+//   for data under 32K. So the min-offset is 11 bits, and max is 18-bits.
+// * What about... some kind of offset reduction? any way to rolz things? or no?
+// * What about... huffing the escaped bytes? perhaps using 256 different tables
+//	 One per byte. And doing it dynamically? And storing the actual byte-length
+//	 not the bit-length? Tricky but posisble. (and slow? IDK...)
 
 
 
@@ -311,7 +318,7 @@ struct Compression {
 	void PutOffset2 (uint p, uint offset) {
 		probability_add(offset, W_MINUS);
 //		  2300928 // 8, 3, 4	     
-//		  2299300 // 9, 3, 3 // seems the most optimal.
+//		  2299300 // 9, 3, 3
 //		  2296448 // 8, 3, 3 // seems the most optimal.
 //		if (p >= 16*1024)
 		return PutOffset(offset);
@@ -319,20 +326,18 @@ struct Compression {
 //			if ((offset = PutOffsetSub(offset, 3)))
 //				PutOffsetSub(offset, 3, false);
 	}
-	
-	
-	
-	
+		
 
 	inline void PutOffset (uint offset) {
 		int log = std::max(JB_Int_Log2(offset), W_MINUS);
-		PutBits(SLOT_BITS, log-W_MINUS);
+		PutBits(SLOT_BITS, log - W_MINUS);
 		if (log > W_MINUS)
 			offset -= 1<<log;
 		  else
 			log = W_MINUS+1;
 		PutBits(log, offset);				// Requires 6 bits, and stores numbers 0 to 63
 	}
+	// 
 	
 	inline void PutLength (uint l) {
 		int ll = 0;
