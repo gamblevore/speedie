@@ -3523,7 +3523,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[438]);
-	JB_FS_AppendInt32(_fsf0, (2026021818));
+	JB_FS_AppendInt32(_fsf0, (2026022218));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -9823,7 +9823,6 @@ uint* SC_SourceMap__Reserve(int T) {
 void SC_SourceMap__SortBreaks(FastString* B) {
 	byte* Start = B->ResultPtr;
 	JB_Object** Last = ((JB_Object**)(Start + B->Length)) - 1;
-	JB_DoAt(1);
 	SpdSort(((void*)((&SC_SourceMap__BreakableSorter))), ((JB_Object**)Start), Last);
 }
 
@@ -10506,7 +10505,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1386]);
-	JB_FS_AppendInt32(_fsf0, (2026021818));
+	JB_FS_AppendInt32(_fsf0, (2026022218));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -22676,6 +22675,16 @@ int SC_Pac_CanBAND_BFLG(Assembler* Self, ASMReg R) {
 	return 0;
 }
 
+bool SC_Pac_CanConst(Assembler* Self, SCDecl* D, FatASM* F) {
+	if (SC_Pac_IsCurr(Self, F)) {
+		return true;
+	}
+	if (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredByBranch)) {
+		return false;
+	}
+	return (!SC_FAT_SyntaxIs(F, kSC__Reg_FromInline));
+}
+
 Ind SC_Pac_CanMergeBits(Assembler* Self, int UpA, int DownA, int UpB, int DownB, int Total) {
 	if (DownA > UpA) {
 		if (UpB > DownB) {
@@ -23689,13 +23698,14 @@ bool SC_Pac_InlineAddK(Assembler* Self, ASMReg XIn, int64 Add, ASMReg XOut) {
 	return false;
 }
 
-ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R) {
+ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 	ASMReg Rz = ((ASMReg)0);
 	{
 		FatASM* S = R->After;
 		while (S > R->Start) {
 			(--S);
 			if (SC_FAT_OperatorIsa(S, kSC__ASM_RET)) {
+				(++Sv->ReturnCount);
 				if (Rz) {
 					Rz = SC_Reg_Simplify(Rz);
 				}
@@ -23712,6 +23722,9 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R) {
 				(SC_FAT_SetOpSet(S, kSC__ASM_JUMP));
 				S->JumpPrm = 1;
 				SC_FAT_JumpFix(S, SC_Pac_Curr(Self));
+			}
+			if (SC_FAT_GuessSize(S)) {
+				(S->Info = SC_Reg_OperatorAs(S->Info, kSC__Reg_FromInline));
 			}
 		};
 	}
@@ -23976,9 +23989,11 @@ ASMReg SC_Pac_LocalThg(Assembler* Self, SCDecl* D) {
 	ASMReg T = SC_Decl_WholeType(D);
 	T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Param, SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_Param)));
 	FatASM* F = SC_Pac_Register(Self, SC_Reg_Reg(T));
-	if (F and (SC_Pac_IsCurr(Self, F) or ((!SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredBranchLike))))) {
-		T = SC_Reg_FatIndexSet(T, SC_FAT_Index(F));
-		T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Const, (SC_FAT_SyntaxIs(F, kSC__Reg_Const))));
+	if (F) {
+		if (SC_Pac_CanConst(Self, D, F)) {
+			T = SC_Reg_FatIndexSet(T, SC_FAT_Index(F));
+			T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Const, (SC_FAT_SyntaxIs(F, kSC__Reg_Const))));
+		}
 	}
 	int Rr = SC_Reg_Reg(T);
 	if (Rr) {
@@ -25271,21 +25286,24 @@ ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction*
 ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int AllowedGain, FatRange* LL) {
 	ASMReg Rz = ((ASMReg)0);
 	LL->Start = SC_Pac_Curr(Self);
-	SavedRegisters Regs = ((SavedRegisters){});
+	SavedRegisters Svregs = ((SavedRegisters){});
 	InlineInfo Info = ((InlineInfo){});
-	SC_SavedRegisters_Collect((&Regs), Fn->Args, Self);
+	SC_SavedRegisters_Collect((&Svregs), Fn->Args, Self);
 	SC_Pac_InlineParameters(Self, Prms, (&Info));
 	FatASM* RealStart = SC_Pac_Curr(Self);
 	SC_ASMType__ArgumentSub(Self, SC_Func_SourceArg(Fn), kSC__Reg_Exit);
 	SC_InlineInfo_NopParams((&Info), JB_Array_Size(Fn->Args), SC_Pac_State(Self)->Return);
-	SC_SavedRegisters_Restore((&Regs), Fn->Args);
+	SC_SavedRegisters_Restore((&Svregs), Fn->Args);
 	LL->After = SC_Pac_Curr(Self);
-	Rz = SC_Pac_InlineFinish(Self, LL);
+	Rz = SC_Pac_InlineFinish(Self, LL, (&Svregs));
 	int Grown = SC_Pac_CurrGain(Self, RealStart);
 	if (Grown > AllowedGain) {
-		SC_SavedRegisters_Rewind((&Regs), Self);
+		SC_SavedRegisters_Rewind((&Svregs), Self);
 		SC_Pac_SoftNopRange(Self, LL->Start, SC_Pac_Curr(Self));
 		return nil;
+	}
+	if (Svregs.ReturnCount > 1) {
+		(++Self->BasicBlock);
 	}
 	if (!Rz) {
 		Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_Const, true);
@@ -46081,7 +46099,7 @@ void SC_Decl_MarkAsAltered(SCDecl* Self) {
 	}
 	(SC_Decl_SyntaxIsSet(Self, kSC__SCDeclInfo_Altered, true));
 	if (SC__Func_InBranch > Self->DepthOfBranch) {
-		(SC_Decl_SyntaxIsSet(Self, kSC__SCDeclInfo_AlteredInBranch, true));
+		(SC_Decl_SyntaxIsSet(Self, kSC__SCDeclInfo_AlteredInIf, true));
 	}
 	if (SC__Func_InLoop > Self->DepthOfLoop) {
 		(SC_Decl_SyntaxIsSet(Self, kSC__SCDeclInfo_AlteredInLoop, true));
@@ -59818,4 +59836,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 3549789513985604331 -3327290652217765304
+// -4649627333089686214 -3327290652217765304

@@ -815,6 +815,7 @@ struct Assembler {
 
 struct SavedRegisters {
 	byte RegCount;
+	byte ReturnCount;
 	u16 BasicBlock;
 	DeclAlterable Decls[32];
 	RegFile Regs;
@@ -1996,39 +1997,40 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__ASM_WR2U ((ASM)103)
 #define kSC__ASM_WR4U ((ASM)104)
 #define kSC__ASM_WR8U ((ASM)105)
-#define kSC__Reg_AddrForceRequest ((ASMReg)274877906944)
-#define kSC__Reg_AddrNeed ((ASMReg)962072674304)
-#define kSC__Reg_AddrNoFiddle ((ASMReg)549755813888)
-#define kSC__Reg_AddrRequest ((ASMReg)137438953472)
-#define kSC__Reg_AllowNopDest ((ASMReg)4294967296)
+#define kSC__Reg_AddrForceRequest ((ASMReg)549755813888)
+#define kSC__Reg_AddrNeed ((ASMReg)1924145348608)
+#define kSC__Reg_AddrNoFiddle ((ASMReg)1099511627776)
+#define kSC__Reg_AddrRequest ((ASMReg)274877906944)
+#define kSC__Reg_AllowNopDest ((ASMReg)8589934592)
 #define kSC__Reg_AlreadyNegated ((ASMReg)131072)
 #define kSC__Reg_Alternate ((ASMReg)1048576)
-#define kSC__Reg_BlockNop ((ASMReg)8589934592)
-#define kSC__Reg_CondAnswer ((ASMReg)1073741824)
-#define kSC__Reg_CondRequest ((ASMReg)536870912)
-#define kSC__Reg_Const ((ASMReg)68719476736)
-#define kSC__Reg_ConstRequest ((ASMReg)268435456)
-#define kSC__Reg_ContainsAddr ((ASMReg)67108864)
+#define kSC__Reg_BlockNop ((ASMReg)17179869184)
+#define kSC__Reg_CondAnswer ((ASMReg)2147483648)
+#define kSC__Reg_CondRequest ((ASMReg)1073741824)
+#define kSC__Reg_Const ((ASMReg)137438953472)
+#define kSC__Reg_ConstRequest ((ASMReg)536870912)
+#define kSC__Reg_ContainsAddr ((ASMReg)134217728)
 #define kSC__Reg_DebugVars ((ASMReg)8388608)
 #define kSC__Reg_Discard ((ASMReg)262144)
-#define kSC__Reg_Exit ((ASMReg)3298534883328)
-#define kSC__Reg_ExitAtAll ((ASMReg)2199023255552)
-#define kSC__Reg_ExitFunction ((ASMReg)1099511627776)
-#define kSC__Reg_FlagsToRemove ((ASMReg)68719738880)
+#define kSC__Reg_Exit ((ASMReg)6597069766656)
+#define kSC__Reg_ExitAtAll ((ASMReg)4398046511104)
+#define kSC__Reg_ExitFunction ((ASMReg)2199023255552)
+#define kSC__Reg_FlagsToRemove ((ASMReg)137439215616)
 #define kSC__Reg_ForceInto ((ASMReg)16777216)
-#define kSC__Reg_GlobalMemory ((ASMReg)17179869184)
+#define kSC__Reg_FromInline ((ASMReg)67108864)
+#define kSC__Reg_GlobalMemory ((ASMReg)34359738368)
 #define kSC__Reg_Negate ((ASMReg)65536)
 #define kSC__Reg_NewlyDeclared ((ASMReg)4194304)
 #define kSC__Reg_NoScale ((ASMReg)33554432)
-#define kSC__Reg_OKAsTemp ((ASMReg)2147483648)
+#define kSC__Reg_OKAsTemp ((ASMReg)4294967296)
 #define kSC__Reg_Param ((ASMReg)524288)
-#define kSC__Reg_PreferEqul ((ASMReg)34359738368)
+#define kSC__Reg_PreferEqul ((ASMReg)68719476736)
 #define kSC__Reg_Set ((ASMReg)2097152)
-#define kSC__Reg_SetAlways ((ASMReg)136314880)
+#define kSC__Reg_SetAlways ((ASMReg)270532608)
 #define kSC__Reg_Subtract ((ASMReg)1048576)
 #define kSC__Reg_Temp ((ASMReg)1024)
-#define kSC__Reg_Textual ((ASMReg)134217728)
-#define kSC__Reg_Zero ((ASMReg)68720001080)
+#define kSC__Reg_Textual ((ASMReg)268435456)
+#define kSC__Reg_Zero ((ASMReg)137439477816)
 #define kSC__ASMType_IncrAfter ((int)2)
 #define kSC__ASMType_IncrBefore ((int)0)
 #define kSC__ASMType_kContinue ((ASMType)52)
@@ -2356,9 +2358,9 @@ extern Array* SC__NilReason_values;
 #define kSC__SCBlockage_Quit ((int)4)
 #define kSC__SCBlockage_Return ((int)4)
 #define kSC__SCDeclInfo_Altered ((SCDeclInfo)65536)
-#define kSC__SCDeclInfo_AlteredBranchLike ((SCDeclInfo)393216)
+#define kSC__SCDeclInfo_AlteredByBranch ((SCDeclInfo)393216)
 #define kSC__SCDeclInfo_AlteredCopy ((SCDeclInfo)983040)
-#define kSC__SCDeclInfo_AlteredInBranch ((SCDeclInfo)131072)
+#define kSC__SCDeclInfo_AlteredInIf ((SCDeclInfo)131072)
 #define kSC__SCDeclInfo_AlteredInLoop ((SCDeclInfo)262144)
 #define kSC__SCDeclInfo_AlteredOrRef ((SCDeclInfo)1114112)
 #define kSC__SCDeclInfo_AlteredParamObject ((SCDeclInfo)524288)
@@ -6075,6 +6077,8 @@ bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T);
 
 int SC_Pac_CanBAND_BFLG(Assembler* Self, ASMReg R);
 
+bool SC_Pac_CanConst(Assembler* Self, SCDecl* D, FatASM* F);
+
 Ind SC_Pac_CanMergeBits(Assembler* Self, int UpA, int DownA, int UpB, int DownB, int Total);
 
 FatASM* SC_Pac_CanOptDecr(Assembler* Self, ASMReg Obj, FatASM* Last);
@@ -6205,7 +6209,7 @@ void SC_Pac_InitAndStartFunc(Assembler* Self, SCFunction* Fn);
 
 bool SC_Pac_InlineAddK(Assembler* Self, ASMReg XIn, int64 Add, ASMReg XOut);
 
-ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R);
+ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv);
 
 ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Bytes, int& Index, uint MaxBits, SCDecl* Decl, Message* Exp);
 
