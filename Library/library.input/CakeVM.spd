@@ -42,7 +42,7 @@ target cpp or vm {
 	function Prev (|&ivec4| Reg0, |&ivec4|)
 		cpp_wrapper JB_ASM_PrevStack
 
-	function Code (|&ivec4| Reg0, |&ivec4|)
+	function Stack (|&ivec4| Reg0, |&ivec4|)
 		cpp_wrapper JB_ASM_StackCode
 
 	function Pause
