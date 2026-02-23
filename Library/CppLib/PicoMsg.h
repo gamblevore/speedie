@@ -53,12 +53,12 @@ struct			PicoMessage { char* Data; int Length;  operator bool () {return Data;};
 typedef void	(*PicoThreadFn)(PicoComms* M, unsigned int Mode, const char** Args);
 typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
 typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
-typedef char*   (*PicoActionFn)(void* Upon, int MsgLength);
+typedef bool	(*PicoActionFn)(void* Upon, char* Data, int MsgLength);
 
 struct 			PicoAction {PicoActionFn Action; void* Upon;};
 
-#ifdef PICO_IMPLEMENTATION
 
+#ifdef PICO_IMPLEMENTATION
 	#include <fcntl.h>
 	#include <unistd.h>
 	#include <pthread.h>
@@ -85,6 +85,7 @@ struct PicoTrousers { // only one person can wear them at a time.
 	}
 };
 #endif
+
 
 
 struct 			PicoConfig  {
@@ -251,13 +252,6 @@ struct PicoLister {
 
 
 
-//#ifdef PICO_DEBUG_LOG
-//	#include <fcntl.h>
-//	#include <sys/stat.h>
-//	extern "C" PicoConfig* PicoCommsConf (PicoComms* M);
-//#endif
-
-
 
 struct PicoBuff {
 	const char*			Name;
@@ -265,9 +259,6 @@ struct PicoBuff {
 	std::atomic_uint	Head;
 	int					Size;
 	int					Pipe;
-//	#ifdef PICO_DEBUG_LOG
-//	int					FDLog;
-//	#endif
 	void*				ThreadArgs;
 	int					ThreadMode;
 	std::atomic_short	RefCount;
@@ -283,55 +274,11 @@ struct PicoBuff {
 		Rz->Tail = 0; Rz->Head = 0; Rz->ThreadArgs = 0; Rz->ThreadMode = 0;
 		Rz->RefCount = 1; Rz->Pipe = pipe;
 		Rz->Size = 1<<bits; Rz->Name = name;
-//	#ifdef PICO_DEBUG_LOG
-//		char Path[128] = {};
-//		snprintf(Path, sizeof(Path), "%s/%s/%s%s.txt", PICO_DEBUG_LOG, PicoCommsConf(O)->Name, PicoCommsConf(O)->Name, name);
-//		int Sep = (int)(strlen(PICO_DEBUG_LOG) + 1 + strlen(PicoCommsConf(O)->Name));
-//		Path[Sep] = 0;	
-//		if (mkdir(Path, 0755) < 0 and errno!=EEXIST) {
-//			printf("%s creating Path: %s\n", strerror(errno), Path);
-//			exit(errno);
-//		}
-//			
-//		Path[Sep] = '/';	
-//		Rz->FDLog = open(Path, O_WRONLY|O_CREAT|O_TRUNC|0755);
-//		if (Rz->FDLog == -1) {
-//			printf("%s opening LOG: %s\n", strerror(errno), Path);
-//			exit(errno);
-//		}
-//			
-//	#endif
 		return Rz;
 	}
 
 	void Log (const char* Src, int Length) {
-//	#ifdef PICO_DEBUG_LOG
-//		if (FDLog > 0) {
-//			char Tmp[32*1024]; // increase this yourself if using PICO_DEBUG_LOG
-//			int N = std::min(Length, (int)sizeof(Tmp)-1);
-//			for (int i = 0; i < N; i++) {
-//				int c = Src[i];
-//				if (c < 32 or c >= 128)
-//					c = '?';
-//				Tmp[i] = c;
-//			}
-//			Tmp[N++] = '\n';
-//
-//			int x = 0;
-//			while (x < N) {
-//				int err = (int)write(FDLog, Tmp+x, N-x);
-//				if (!err) break;
-//				if (err < 0) {
-//					err = errno;
-//					if (err == EINTR or err == EAGAIN)
-//						continue;
-//					perror("Failed write: ");
-//					exit(errno); // sigh
-//				}
-//				x+=N;
-//			}
-//		}
-//	#endif
+		///
 	}
 	
 	void lost (int N) {
@@ -355,12 +302,6 @@ struct PicoBuff {
 	}
 	
 	static void Decr (PicoBuff* self) {
-//	#ifdef PICO_DEBUG_LOG
-//		if (self->FDLog) {
-//			fsync(self->FDLog);
-//			close(self->FDLog);
-//		}
-//	#endif
 		if (self and --(self->RefCount) == 0)
 			free(self);
 	}
@@ -910,12 +851,17 @@ struct PicoComms : PicoConfig {
 		if (Reading->Length() < L)
 			return false;
 		
+		// we want each message... to be passed to the action
+		// Need to lock the GrabLock before setting ReceiveAction? That should do it!
+		// nice! Then... after locking, we can send any existing PreData...
+		// so its pico's job to set this thing, really!		
+		
 		if (char* Data = phalloc(L+1); Data) {
 			Reading->ReadInput4(Data, L);
-			PreData = Data;
 			LastRead = PicoNow();
 			if (auto Act = ReceiveAction; Act)
-				(Act->Action)(Act->Upon, L);
+				(Act->Action)(Act->Upon, Data, L);
+			PreData = Data;
 			return true;
 		}
 
