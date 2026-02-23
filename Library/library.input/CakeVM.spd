@@ -76,7 +76,7 @@ struct CakeStack
 	|byte|		DestReg
 	|uint16|	Depth
 	
-	function Reg0 (|&ivec4|)
+	inline Reg0 (|&ivec4|)
 		return self|&ivec4| + 1
 
 
