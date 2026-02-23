@@ -1,6 +1,9 @@
 
 
 prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil)
+prototype PicoActionFn (|&nil| Receiver, |&int8| Data, |int| Length)
+
+
 // todo: pico could use shared memory, instead of pipes. This actually reduces memory use!
 // To under half the memory.
 
@@ -117,7 +120,6 @@ struct Pico
 	function Name (|string|)
 		|| x = &.config.name[0]
 		return string.copy(x|cstring|)
-	
 		
 	
 

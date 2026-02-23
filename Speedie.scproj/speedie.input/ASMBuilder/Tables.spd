@@ -76,11 +76,14 @@ function InitAccess
 function Debugger (fn_asm)
 	opt norefcounts
 	|| fn = exp.func
-	if fn == @tmp
+	if (fn == @tmp) and (exp is BreakPoint)
 		.Breakrequest |= assembler.BreakPoint
 		return nil
 
-	require Options.TargetDebug
+	require Options.ShouldBuildTrap
+		// inperry because I just wanna see it... in action. Its confusing a little otherwise
+		// what difference does it make?
+										
 
 	|| num = 0
 	if fn == @func
@@ -88,7 +91,9 @@ function Debugger (fn_asm)
 		|| ch = exp.first
 			num = ch.int
 			if num <= 0
-				exp.NOOP
+				exp.NOOP // debugat 0... I guess we just want a space to count something.
+						 // but it won't be generated... we need a different noop. Something non-removeable.
+						 // + 0? or 0? idk...
 				return nil
 	exp.TRAP(asmreg(), num)
 

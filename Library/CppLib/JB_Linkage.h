@@ -66,8 +66,6 @@ void* JB_dylib_Load (JB_Dylib* Self, JB_String* Path);
 void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
 
 
-
-
 // VM 
 struct CakeVM;
 typedef int64 (*JB_ASM_Break)(CakeVM* VM, int Index, int BreakValue, ivec4* Reg0);
@@ -107,14 +105,8 @@ struct CakeVM {
     byte*			PackGlobs;
     Fn0*			CppFuncs;
     byte*			AllocBase;
-    PicoAction		Pico; // what do we want to do when we get this?
-						  // We want to break into the debugger, right?
-						  // so we need to update the VM table. I guess into pause-mode?
-						  // something like that. At least I want the VM to get an event.
-						  // so I need to update the instruction-table.
-						  // Do this later....
-    
-	void*const*		OriginalJumpTable;
+    PicoAction		Pico;
+	void* const*	OriginalJumpTable;
 	void*			JumpTable[514];
 	uint*			LastCode;
     
@@ -136,6 +128,7 @@ ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex);
 void**	JB_ASM_InitTable	(CakeVM* V, int n, int g);
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear);
 uint*	JB_ASM_SetDebug		(CakeVM* V, bool On);
+void	JB_ASM_LinkPico		(CakeVM* V, PicoComms* P, PicoActionFn Fn);
 void	JB_ASM_Pause		(CakeVM* V);
 
 } // ExternCEnd

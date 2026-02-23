@@ -36,6 +36,7 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		StripNames				= false
+	||		TrapFromPerry			= true
 
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -55,6 +56,12 @@ module Options
 	function ModeCpp (|bool|)
 		return .mode == cpp
 	
+	function ShouldBuildTrap (|bool|)
+		return .TargetDebug or (.TrapFromPerry and Compiler.InPerry)
+		// its nice to see traps in perry...
+		// i mean... isnt it nice to see debug code?
+		// but I don't wanna see all. I guess its a comprimise. Perhaps I should go all the way...
+		// but I like this more.
 
 
 

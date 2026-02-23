@@ -8,7 +8,6 @@
 Design:
 	* 256 OpCodes, including a few variable length opcodes
 	* r0 = 0
-	* can recursive vm->c->vm! 
 */
 
 
@@ -96,6 +95,7 @@ int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
 	That means we need another param for on/off.
 */
  
+ 
 
 uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
 	if_rare (!CanDebug(V))
@@ -112,6 +112,13 @@ uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
 	auto AASM = VMCodePtr(V);
 	return AASM + CakeCodeMax;
 }
+
+void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
+	V->Pico.Action = Fn;
+	((PicoConfig*)(P))->ReceiveAction = &(V->Pico);
+	// we need to update the PreData thing...
+}
+
 
 
  
@@ -261,9 +268,9 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	
 	V->__VIEW__ = JB_ASM_NoBreak;
 	V->VFlags = Flags;
+    V->Pico.Upon = V;
 	VMCodePtr(V)[CakeCodeMax-1] = VMHexFinalReturn;
 	VMCodePtr(V)[-1] = VMHexEndStack;
-	
 	__CAKE_VM__(*V, 0, CakeStackSize);
 	return V;
 }

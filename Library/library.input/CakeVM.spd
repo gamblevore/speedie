@@ -44,7 +44,10 @@ target cpp or vm {
 
 	function Stack (|&ivec4| Reg0, |&ivec4|)
 		cpp_wrapper JB_ASM_StackCode
-
+			
+	function Action (|Pico| P, assigns:|PicoActionFn|)
+		cpp_wrapper JB_ASM_LinkPico
+		
 	function Pause
 		cpp_wrapper JB_ASM_Pause
 

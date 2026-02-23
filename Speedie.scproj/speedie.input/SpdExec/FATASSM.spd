@@ -134,7 +134,7 @@ struct FatASM
 
 	function uint.FAT (|&FATASM|)
 		if self
-			return Assembler.sh.funcstart_ + self
+			rz = Assembler.sh.funcstart_ + self
 	
 	operator isa (|asm| m, |bool|)
 		nil checker

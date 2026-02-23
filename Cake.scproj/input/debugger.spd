@@ -41,12 +41,13 @@ module debugger
 		|| Base = .SrcMapStr.Addr|&uint|
 		if index < .Length
 			return base[index]
-	
-		
-	function Read (|SpdProcess| Perry, |float| Delay)
-		while (|| m = perry.Get(delay))
-			.HandleRead(m)
-		
+
+	function PicoReader (PicoActionFn)	
+//	
+//	function Read (|SpdProcess| Perry, |float| Delay)
+//		while (|| m = perry.Get(delay))
+//			.HandleRead(m)
+//		
 
 	function HandleRead (|message| M)
 		require m.expect(@tmp)
@@ -129,9 +130,13 @@ module debugger
 	
 	function StartUp (|&uint|)
 		cake.vm.__View__ = __Viewer__
-		return cake.VM.IsDebugging(debugger.WantDebug or cake.perry)
-	
-	
+		rz = cake.VM.IsDebugging(debugger.WantDebug or cake.perry)
+		|| p = cake.Perry
+			// i think pico needs... to be able to pass everything into the reader...
+			// we might as well wait till its running? or about to run?
+			cake.vm.Action(p.pico) = PicoReader	
+
+
 	function Path (|int| i, |filewithdata|)
 		opt norefcounts
 		return .files[i]						#expect ("Missing file at index: " + i)
