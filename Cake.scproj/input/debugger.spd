@@ -180,7 +180,7 @@ module debugger
 		
 function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| Position, |int|)
 	print "\t\t\t\t\t\t"
-	if TerminalColor.Enabled
+	if TerminalColor.RainbowTerm
 		print terminalcolor.green.render
 	
 	print file.filename
@@ -189,7 +189,7 @@ function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| P
 		print fn.name
 		print ": "
 	
-	if TerminalColor.Enabled
+	if TerminalColor.RainbowTerm
 		print TerminalColor.normal
 
 	|| Code = File.GetLine(position)

@@ -21,7 +21,7 @@ datatype TerminalColor (int)
 		Underline	= "\1b[0;1;32m"
 
 	module
-		|bool| Enabled			
+		|bool| RainbowTerm
 	
 	render
 		opt norefcounts
@@ -47,9 +47,9 @@ inline string.TerminalColor (|terminalcolor|)
 
 
 function String.PrintlineColor (|string| color)
-	if (TerminalColor.enabled): print color
+	if (TerminalColor.RainbowTerm): print color
 	printline self
-	if (TerminalColor.enabled): print TerminalColor.normal
+	if (TerminalColor.RainbowTerm): print TerminalColor.normal
 
 
 

@@ -52,7 +52,7 @@ class XVar (list)
 	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo)
 		opt norefcounts
 		if full
-			if TerminalColor.Enabled
+			if TerminalColor.RainbowTerm
 				fs <~ terminalcolor.yellow
 			
 			|| M = fs.mark
@@ -62,14 +62,14 @@ class XVar (list)
 			fs <~ " "
 			fs <~ .name
 			fs <~ ": "
-			if TerminalColor.Enabled
+			if TerminalColor.RainbowTerm
 				fs <~ terminalcolor.normal
 			if TabTo
 				|| Missing = TabTo - (fs.mark - M)
 				fs <~ (' ', missing)
 		
 		require reg0
-		if TerminalColor.Enabled
+		if TerminalColor.RainbowTerm
 			fs <~ terminalcolor.red
 
 		|| Reg = Reg0 + .reg
@@ -78,7 +78,7 @@ class XVar (list)
 			.RenderObject(fs, reg)
 		  else
 			.RenderData(fs, reg)
-		if TerminalColor.Enabled
+		if TerminalColor.RainbowTerm
 			fs <~ terminalcolor.normal
 	
 	
