@@ -115,8 +115,7 @@ uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
 
 void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
 	V->Pico.Action = Fn;
-	((PicoConfig*)(P))->ReceiveAction = &(V->Pico);
-	// we need to update the PreData thing...
+	PicoSetAction(P, &(V->Pico));
 }
 
 

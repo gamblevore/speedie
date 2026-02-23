@@ -50,10 +50,10 @@ struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;  operator bool () {return Data;}; };
 #pragma pack(pop)
 
-typedef void	(*PicoThreadFn)(PicoComms* M, unsigned int Mode, const char** Args);
-typedef int		(*PicoObserverFn)(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
-typedef char*   (*PicoAppenderFn)(void* Obj, int Length);
-typedef bool	(*PicoActionFn)(void* Upon, char* Data, int MsgLength);
+typedef void	(*PicoThreadFn)		(PicoComms* M, unsigned int Mode, const char** Args);
+typedef int		(*PicoObserverFn)	(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
+typedef char*   (*PicoAppenderFn)	(void* Obj, int Length);
+typedef int		(*PicoActionFn)		(void* Upon, char* Data, int MsgLength);
 
 struct 			PicoAction {PicoActionFn Action; void* Upon;};
 
@@ -652,6 +652,14 @@ struct PicoComms : PicoConfig {
 	
 	PicoMessage ReadStdOut (PicoAppenderFn Fn, void* Obj) {
 		return GetStd(Fn, Obj, StdOut);
+	}
+	
+	void SetAction (PicoAction* Fn) {
+		GrabLock.lock();
+		
+		GrabLock.leave();
+		// needs to lock da grabba thing.
+		// blablablabla
 	}
 	
 	PicoMessage Get (float T = 0.0) {
@@ -1378,6 +1386,13 @@ extern "C" bool PicoInit (int DesiredThreadCount=0) _pico_code_ (
 /// Starts the PicoMsg worker threads.
 	return pico_init(DesiredThreadCount);
 )    ;;;/*_*/;;;  ;;;/*_*/;;;     ;;;/*_*/;;;   // the final spiders
+
+extern "C" void PicoSetAction (PicoComms* M, PicoAction* Fn) _pico_code_ (
+/// Allows calling code from a pico worker thread. New messages will seen by the function in Fn, AND by the main thread that checks `PicoGet()`. 
+/// PicoSetAction allows Speedie's debugger to safely pause, and at a later time analyse the paused VM when it is safe to do so...
+	return M->SetAction(Fn);
+)
+
 
 
 
