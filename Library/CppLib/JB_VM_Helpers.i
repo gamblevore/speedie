@@ -12,7 +12,7 @@ extern "C" {
 // using the SIMD registers.
 typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Signal);
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal);
 static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
@@ -23,7 +23,7 @@ AlwaysInline int64 Div2 (int64 V, int Clear, int Down) {
 	return (V + Sign) >> Down;
 }
 
-AlwaysInline void DivMath(VMRegister* r, ASM Op) {
+AlwaysInline void DivMath(CakeRegister* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	uint A = n1;
@@ -44,7 +44,7 @@ AlwaysInline void DivMath(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void DivMath32(VMRegister* r, ASM Op) {
+AlwaysInline void DivMath32(CakeRegister* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	uint A = n1;
@@ -64,7 +64,7 @@ AlwaysInline void DivMath32(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void BFLS (VMRegister* r, ASM Op) { // rrxxbbb --> rr00bbb
+AlwaysInline void BFLS (CakeRegister* r, ASM Op) { // rrxxbbb --> rr00bbb
 	auto o = i2; // we want to clear those middle bits
 	int up = BFLD_upu;
 	int down = BFLD_downu;
@@ -83,7 +83,7 @@ inline u64 JB_u64_RotR (u64 x, u64 N) {
 	return (x >> N) | (x << (64-N));
 }
 
-AlwaysInline void RotateConst (VMRegister* r, ASM Op) {
+AlwaysInline void RotateConst (CakeRegister* r, ASM Op) {
 	auto V = RotateConst_Valueu; auto R = RotateConst_Rotu;
 	uint64 A = JB_u64_RotR(V, R);
 	if (RotateConst_Invu)
@@ -109,7 +109,7 @@ double FloatSh2 (uint64 u, int S) {
 
 
 
-AlwaysInline void LoadConst (VMRegister* r, ASM Op, uint64 Value) {
+AlwaysInline void LoadConst (CakeRegister* r, ASM Op, uint64 Value) {
 	int N = n1;
 	if (!ConstStretchy_Condu or !r[N].Int) {
 		Value <<= 17;
@@ -146,12 +146,12 @@ AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
 ///
 
 
-AlwaysInline vec4 VBuild (VMRegister* r, ASM Op) {
+AlwaysInline vec4 VBuild (CakeRegister* r, ASM Op) {
 	return vec4{f2, f3, f4, f5};
 }
 
 
-AlwaysInline vec4 VBuild2 (VMRegister* r, ASM Op) {
+AlwaysInline vec4 VBuild2 (CakeRegister* r, ASM Op) {
 	auto F = f2;
 	uint Bits = Alloc_Amountu; 
 	return vec4{
@@ -163,7 +163,7 @@ AlwaysInline vec4 VBuild2 (VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline vec4 VSwiz (VMRegister* r, ASM Op) {
+AlwaysInline vec4 VSwiz (CakeRegister* r, ASM Op) {
 	auto Input = v2;
 	vec4 Output;
 	auto F = VecSwizzle_Fieldsu;
@@ -185,7 +185,7 @@ AlwaysInline vec4 VSwiz (VMRegister* r, ASM Op) {
 
 
 
-AlwaysInline void SetRefRegToMem(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefRegToMem(CakeRegister* r, ASM Op) {
 	auto New = o2;				 						// reg
 	auto pOld = ((JB_Object**)(u1))+RefSet2_Offsetu;	// mem
 	auto Old = *pOld;
@@ -196,7 +196,7 @@ AlwaysInline void SetRefRegToMem(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void SetRefMemToReg(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefMemToReg(CakeRegister* r, ASM Op) {
 	auto pNew = ((JB_Object**)(u2))+RefSet2_Offsetu;
 	auto New = *pNew;									// mem
 	auto Old = o1;				 						// reg
@@ -207,7 +207,7 @@ AlwaysInline void SetRefMemToReg(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void SetRefDecrMem(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefDecrMem(CakeRegister* r, ASM Op) {
 	auto Where = ((JB_Object**)(u1))+RefDecrMem_Offsetu;	// mem
 	int n = RefDecrMem_Countu;
 	for (int i = 0;  i <= n;  i++) {
@@ -216,7 +216,7 @@ AlwaysInline void SetRefDecrMem(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void SetRefBasic(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefBasic(CakeRegister* r, ASM Op) {
 	int out = n1;
 	int in = n2;
 	auto B = r[in].Obj;
@@ -229,7 +229,7 @@ AlwaysInline void SetRefBasic(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void SetRefApart (VMRegister* r, ASM Op) {
+AlwaysInline void SetRefApart (CakeRegister* r, ASM Op) {
 	JB_Incr(o3);
 	JB_SafeDecr(o2);
 	JB_FreeIfDead(o1);
@@ -263,7 +263,7 @@ JB_Object* gobj (CakeVM& vm, ASM Op) {
 	return Str;
 }
 
-AlwaysInline void VecConv (VMRegister* r, ASM Op) {
+AlwaysInline void VecConv (CakeRegister* r, ASM Op) {
 	// vec/ivec conversions
 	auto s = r + n2;
 	auto d = r + n1;
@@ -276,7 +276,7 @@ AlwaysInline void VecConv (VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void RegConv (VMRegister* r, ASM Op) {
+AlwaysInline void RegConv (CakeRegister* r, ASM Op) {
 	// float, double, u64, s64. 12 conversions possible (and 6 pointless ones)
 	auto s = r + n2;
 	auto d = r + n1;
@@ -305,7 +305,7 @@ AlwaysInline void RegConv (VMRegister* r, ASM Op) {
 //    s = s;
 }
 
-AlwaysInline void Time_ (VMRegister* r, ASM Op) {
+AlwaysInline void Time_ (CakeRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = n2;
 	if (r2 == 1) {		// time
@@ -361,7 +361,7 @@ bool CompI_ (int64 A, int64 B, uint Mode) {
 }
 
 
-bool CompF_ (VMRegister* A, VMRegister* B, uint Mode) {
+bool CompF_ (CakeRegister* A, CakeRegister* B, uint Mode) {
 	switch (Mode) {
 		CmpSub(0 , FA >  FB);
 		CmpSub(1 , FA <= FB);
@@ -379,12 +379,12 @@ bool CompF_ (VMRegister* A, VMRegister* B, uint Mode) {
 
 
 
-AlwaysInline ASM* JumpI (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpI (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = CompI_(i1, i2, JCmpI_Cmpu);
 	return Code + V*JCmpI_Jmpi;
 }
 
-AlwaysInline void CompI (VMRegister* r, ASM Op) {
+AlwaysInline void CompI (CakeRegister* r, ASM Op) {
 	auto V = CompI_(i2, i3, CmpI_Cmpu);
 	i1 = V;
 }
@@ -396,12 +396,12 @@ AlwaysInline void CompI (VMRegister* r, ASM Op) {
 //		Jmp		j
 
 
-AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpF (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = CompF_(r+n1, r+n2, JCmpF_Cmpu);
 	return Code + V*JCmpF_Jmpi;
 }
 
-AlwaysInline void CompF (VMRegister* r, ASM Op) {
+AlwaysInline void CompF (CakeRegister* r, ASM Op) {
 	i1 = CompF_(r+n2, r+n3, CmpF_Cmpu);
 }
 
@@ -412,7 +412,7 @@ inline uint64 clip (uint64 x, uint64 s) {
 }
 
 
-AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) {
+AlwaysInline uint64 BitComp (CakeRegister* r, ASM Op) {
 	auto i = CmpI_Cmpu;
 	auto A = clip(u2, (i >> 1)&7);
 	auto B = clip(u3, (i >> 4)&7);
@@ -424,35 +424,35 @@ inline uint64 jclip (uint64 x, uint64 s) {
 	return (x << s) >> s;
 }
 
-AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpEq (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = jclip(u1, JCmpEq_LSmallu<<5) == jclip(u2, JCmpEq_RSmallu<<5);
 	return Code + V*JCmpEq_Jmpi;
 }
 
-AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpNeq (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = jclip(u1, JCmpEq_LSmallu<<5) != jclip(u2, JCmpEq_RSmallu<<5);
 	return Code + V*JCmpEq_Jmpi;
 }
 
-AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpK (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 > K);
 	return Code + J;
 }
 
-AlwaysInline ASM* JumpKN (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpKN (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 <= K);
 	return Code + J;
 }
 
-AlwaysInline ASM* JumpKE (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpKE (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 == K);
 	return Code + J;
 }
 
-AlwaysInline ASM* JumpKNE (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpKNE (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 != K);
 	return Code + J;
@@ -491,7 +491,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 
-AlwaysInline void MemCopyRDWR (VMRegister* r, ASM Op) {
+AlwaysInline void MemCopyRDWR (CakeRegister* r, ASM Op) {
 	byte* d = (byte*)u2;
 	uint s = n1;
 	uint n = MemoryCopy_Lengthu;
@@ -503,7 +503,7 @@ AlwaysInline void MemCopyRDWR (VMRegister* r, ASM Op) {
 	}
 }
  
-AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
+AlwaysInline void IncrementAddr (CakeRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = (int)(CNTC_offsetu);
 	int Add  = CNTC_cnsti;
@@ -540,19 +540,19 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 // r0(1), <stack/result>, <r0> (2)...<r31>
 
-AlwaysInline ASM* RestoreStack (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugCode) {
+AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) {
 	(DebugCode);
-	auto Stack	= (VMStack*)(R0 - 1);
+	auto Stack	= (CakeStack*)(R0 - 1);
 	int StepBack= Stack->DestReg;
 	auto Imm	= RET_Valuei;					// get before copy!
 	auto Src	= R0 + n1;
 	
-	*((VMRegister*)Stack) = *Src;
-	((VMRegister*)Stack)->Uint |= Imm;			// immediate
+	*((CakeRegister*)Stack) = *Src;
+	((CakeRegister*)Stack)->Uint |= Imm;			// immediate
 	
-	auto NewR0 = (VMRegister*)(Stack-StepBack);
+	auto NewR0 = (CakeRegister*)(Stack-StepBack);
 	R0			= NewR0;						// NewZero
-	Stack		= (VMStack*)(NewR0 - 1);
+	Stack		= (CakeStack*)(NewR0 - 1);
 //	vm.CurrStack = Stack;
 	auto Code	= Stack->Code;
 	Stack->GoUp = 0;
@@ -562,7 +562,7 @@ AlwaysInline ASM* RestoreStack (CakeVM& vm, VMRegister*& R0, ASM Op, ASM* DebugC
 }
 
 
-AlwaysInline ASM* DeRefRegs (CakeVM& vm, VMRegister*& r, ASM Op) {
+AlwaysInline ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op) {
 	if (n4)
 		JB_Decr(o4);
 	if (n3)
@@ -579,7 +579,7 @@ AlwaysInline ASM* DeRefRegs (CakeVM& vm, VMRegister*& r, ASM Op) {
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
 
 
-AlwaysInline void AllocStack (CakeVM& vm, VMRegister* r, ASM Op) {
+AlwaysInline void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?
 	int Amount = Alloc_Amounti << 4;
 	auto B = vm.AllocBase;
@@ -597,8 +597,8 @@ AlwaysInline void AllocStack (CakeVM& vm, VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
-	VMRegister* stck = r-1;
+AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* Code, ASM Op) {
+	CakeRegister* stck = r-1;
 	debugger;
 //	vm.AllocCurr = stck->Stack.Alloc;
 	ASM Code2 = Code[0];
@@ -630,13 +630,13 @@ AlwaysInline ASM* TailStack (CakeVM& vm, VMRegister* r, ASM* Code, ASM Op) {
 //	MainStack.GoUp = 0;
 //	MainStack.Code = Code;
 
-AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
+AlwaysInline ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
 	int Dest = n1;
-	VMStack* NewStack = &((r + Dest)->Stack);
+	CakeStack* NewStack = &((r + Dest)->Stack);
 	{
-		auto End = (VMStack*)(((byte*)(&vm)) + CakeStackSize-1024);
-		auto OldStack = (VMStack*)(r-1);
+		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
+		auto OldStack = (CakeStack*)(r-1);
 		if_rare (NewStack >= End) {			// stackoverflow
 			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
 			vm.Registers[2] = {.Int = errno}; // clear stack. its gone. And we already reported it.
@@ -651,7 +651,7 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, 
 	NewStack->GoUp = 0;
 //	NewStack->Alloc = vm.AllocCurr;
 //	vm.CurrStack = NewStack;
-	auto Zero = ((VMRegister*)NewStack)+1;
+	auto Zero = ((CakeRegister*)NewStack)+1;
 	rp = Zero;
 	CodePtr += Func_JUMPi;
 	NewStack->Code = CodePtr;
@@ -701,7 +701,7 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
 
-extern "C"  __attribute__((sysv_abi))   void  __CAKE_BRIDGE__ (u64 data, Fn0 fn, VMRegister* r, int64 n);
+extern "C"  __attribute__((sysv_abi))   void  __CAKE_BRIDGE__ (u64 data, Fn0 fn, CakeRegister* r, int64 n);
 
 AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
@@ -710,9 +710,12 @@ AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
 }
 
 
-AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
+AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
+	((CakeStack*)(r))[-1].Code = CodePtr;	// Make it better...
+											// Also need to set before calling the viewer
+											// Also need to pass just the vmstack...
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.CppFuncs[T]);
 	return __CAKE_BRIDGE__(funcdata, fn, r, n1);
 }
@@ -736,7 +739,7 @@ AlwaysInline ivec4 QMin (ivec4 A, ivec4 B) {
 	};
 }
 
-AlwaysInline void QInc (VMRegister* r, ASM Op) {
+AlwaysInline void QInc (CakeRegister* r, ASM Op) {
 	int i = VecInc_partu;
 	auto V = iv2;
 	auto N = V[i] + VecInc_Amounti;

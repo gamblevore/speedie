@@ -656,10 +656,12 @@ struct PicoComms : PicoConfig {
 	
 	void SetAction (PicoAction* Fn) {
 		GrabLock.lock();
-		
+		auto Msg = (char*)PreData;
+		if (Msg) {						// make sure we don't miss any message.
+			(Fn->Action)(Fn->Upon, Msg, PreLength);
+		}
+		ReceiveAction = Fn;
 		GrabLock.leave();
-		// needs to lock da grabba thing.
-		// blablablabla
 	}
 	
 	PicoMessage Get (float T = 0.0) {
@@ -859,10 +861,8 @@ struct PicoComms : PicoConfig {
 		if (Reading->Length() < L)
 			return false;
 		
-		// we want each message... to be passed to the action
-		// Need to lock the GrabLock before setting ReceiveAction? That should do it!
-		// nice! Then... after locking, we can send any existing PreData...
-		// so its pico's job to set this thing, really!		
+		// Each message will be passed to the action
+		// Use PicoSetAction to set PicoComms.ReceiveAction		
 		
 		if (char* Data = phalloc(L+1); Data) {
 			Reading->ReadInput4(Data, L);
@@ -1388,8 +1388,9 @@ extern "C" bool PicoInit (int DesiredThreadCount=0) _pico_code_ (
 )    ;;;/*_*/;;;  ;;;/*_*/;;;     ;;;/*_*/;;;   // the final spiders
 
 extern "C" void PicoSetAction (PicoComms* M, PicoAction* Fn) _pico_code_ (
-/// Allows calling code from a pico worker thread. New messages will seen by the function in Fn, AND by the main thread that checks `PicoGet()`. 
-/// PicoSetAction allows Speedie's debugger to safely pause, and at a later time analyse the paused VM when it is safe to do so...
+/// Allows calling code from a pico worker thread. New messages will seen both by your callback, AND the your thread calling `PicoGet()`. 
+/// `PicoSetAction` is used by Speedie for it's VM... "Cake". Probably won't need it unless you are doing complex stuff like that.
+/// Speedie uses it to pause the VM.
 	return M->SetAction(Fn);
 )
 

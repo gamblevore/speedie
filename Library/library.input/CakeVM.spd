@@ -3,7 +3,7 @@
 
 struct CakeVM {
 |int|		CakeFail
-|int|		VFlags
+|int|		UserFlags
 |CakeChef|	__VIEW__
 
 linkage: cpp_class CakeVM, wrapper
@@ -12,21 +12,21 @@ constants
 	TrapTooFar		= 16
 	CanDebug		= 32
 
-	ErrOverFlow = -2
+	ErrOverFlow		= -2
 	ErrStillInRange = -1
 
 
 target cpp or vm {
-	function Load (|&uint| ASM, |int| Length)
+	function Load		(|&uint| ASM, |int| Length)
 		|| Code = .code(Length) // length is just used to check that its within the maximum
 			memory.copy(code, asm, length<<2)
-		
+	
 	function Code		(|int| CodeLength=0, |?&uint|)
 		cpp_wrapper JB_ASM_Code
-		
+	
 	function Run		(|int| StartAt, |&ivec4|)
 		cpp_wrapper JB_ASM_Run
-			
+	
 	function Registers	(|bool| Clear=true, |&ivec4|)
 		cpp_wrapper JB_ASM_Registers
 	
@@ -39,30 +39,27 @@ target cpp or vm {
 	function IsDebugging (|bool| SetDebug, |?&uint|)
 		cpp_wrapper JB_ASM_SetDebug
 	
-	function Prev (|&ivec4| Reg0, |&ivec4|)
+	function Prev		(|cakestack| Stack, |cakestack|)
 		cpp_wrapper JB_ASM_PrevStack
-
-	function Stack (|&ivec4| Reg0, |&ivec4|)
-		cpp_wrapper JB_ASM_StackCode
-			
-	function Action (|Pico| P, assigns:|PicoActionFn|)
+	
+	function Action		(|Pico| P, assigns:|PicoActionFn|)
 		cpp_wrapper JB_ASM_LinkPico
-		
+	
 	function Pause
 		cpp_wrapper JB_ASM_Pause
 
-	function Index (|&uint| Code,  |int|)
+	function Index		(|&uint| Code, |int|)
 		cpp_wrapper JB_ASM_Index
 	
-	function DummyChef (CakeChef)
+	function DummyChef	(CakeChef)
 
 	module
 		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
-	
 }
 
-prototype CakeChef (|int| Index,  |int| BreakValue,  |&ivec4| Reg0,  |int64|)
+
+prototype CakeChef (|&CakeStack| Stack,  |ErrorInt| ErrorCode,  |int64|)
 	// return 0 to continue onwards. return 1-256 to exit the program. Return -1 or less to jump backwards
 
 }
@@ -72,9 +69,14 @@ prototype CakeChef (|int| Index,  |int| BreakValue,  |&ivec4| Reg0,  |int64|)
 struct CakeStack
 	linkage
 		wrapper
-		cpp_class VMStack
+		cpp_class CakeStack
 	|&uint|		Code
 	|uint|		Alloc
 	|byte|		GoUp
 	|byte|		DestReg
 	|uint16|	Depth
+	
+	function Reg0 (|&ivec4|)
+		return self|&ivec4| + 1
+
+

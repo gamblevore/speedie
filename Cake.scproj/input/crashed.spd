@@ -1,0 +1,59 @@
+
+
+function CakeVM.PrintCrashTrace (|int| Err, |?&CakeStack| LastStack,  |int64|)
+	opt norefcounts, (err)
+	"****** CRASHED ******"
+	if debugger.OverFlowTrack // in case we crash during a stack-trace
+		"! Crashed during CrashTrace"
+	  else
+		debugger.OverFlowTrack = 1
+		|| BadMsg = .PrintStackTrace(laststack)
+			printline BadMsg
+	"---------------------"
+
+
+function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
+	opt norefcounts
+// We need to make the new JB_FS_AppendVArg to get the numbers printing nicely.
+// into FastString... maybe with the new JB_FS_AppendVArg idea? Should be cool, right?
+
+//Tue Feb 10 23:49:23 2026
+//Signal 11 in /tmp/SpeedieApps/6074286623726617078/hello_world [
+//]
+//
+//0   JB_App__BackTrace + 28
+//1   JB_CrashTracer + 56
+//2   JB_CrashHandler + 352
+//3   _sigtramp + 56
+//4   JB_App__Crash + 60
+//5   JB_Main + 20
+//6   JB_SP_Run + 344
+//7   main + 28
+//8   start + 7184
+
+	|| Stack = (.Registers(false)-2)|&CakeStack|
+	|| Depth = Stack.Depth
+	LastStack ?= Stack + 1MB/16
+	while Memory.Test(Stack, 16)
+		if (Depth >= 1K):						return "..." // huge stacks aren't that useful
+			
+		|| CodePtr = Stack.Code
+		if !CodePtr:							return "! Missing CodePtr"
+		print "\t"
+		|| index = .index(CodePtr)
+		|| fn = spdtable.Find(index)
+			print fn.Name
+		  else
+			print "[Unknown]"					// Avoid string/memory alterations by using faststring...
+		printline "()"
+
+		require stack!=LastStack
+		if stack > LastStack:					return "! Stack Too Large"
+		|| Up = stack.GoUp	#require
+		Stack += Up+1
+		Depth++
+		if (Up > 32):							return "! Stack Chain Invalid"
+		if stack.Depth!=Depth:					return "! Stack Depth Invalid"
+	return nil
+
+

@@ -1,0 +1,88 @@
+
+
+
+function __PerryView__ (cakevm.CakeChef)
+	if (ErrorCode)
+		.SendCrash(stack)
+	.ClearTempBreak(stack)
+	while .CheckMoreMessages or ErrorCode
+		.UpdatePerry(stack)
+
+
+prototype PerryResponse (|cakevm| self, |message| m, |bool|)
+dispatch DebuggerActions (PerryResponse)
+	+'set'
+		0
+		
+	run
+		opt norefcounts
+		return .isdebugging(m.firstname!="fast")
+	
+	stop: app.quit
+		
+	pause: 0 // returns false == pause, and update already sends updates. 
+		
+	step: return .TempBreak(.StepPoint)
+		
+	stepout:  return .TempBreak(.StepOut)
+		
+	stepover:  return .TempBreak(.StepOver)
+
+//	stepback:0 // todo
+
+
+function cakevm.ClearTempBreak (|cakestack| stack)
+	|| index = .Index(stack.code)
+	|| B = cake.BreakPoints
+	if B and index > 0
+		|| Break = B+index
+		if break == debugger.BreakToClear
+			debugger.BreakToClear = nil
+			Break[] &= 1<<31
+
+	
+function cakevm.TempBreak (|?&uint| Break, |bool|)
+	if !Break
+		return true
+	ifn break[]>>31 // has no breakpoint... add one
+		break[] |= 1<<31
+		debugger.BreakToClear = break // nice
+	return true
+
+function cakevm.StepPoint (|&Uint|)
+	// we need to mark a place to break at. how? is it just the next instruction?
+	// we need to get the curr code location... find the next line, set a break there.
+function cakevm.StepOut (|&uint|)
+function cakevm.StepOver (|&uint|)
+
+
+function cakevm.CheckMoreMessages (|bool|)
+	|| m = cake.perry.Get(0.01)
+	if !m: return true
+	return !.ResumeCode(m)
+
+	
+function cakevm.ResumeCode (|message| m,   |bool|)
+	if m == @tmp
+		|| fn = DebuggerActions[m.name]
+			return (fn[])(cake.vm, m)
+	printerror "Debugger received unexpected " + m.Name
+	
+
+function cakevm.UpdatePerry (|cakestack| stack)
+
+
+function cakevm.SendCrash (|cakestack| stack)
+
+	
+
+//function cakevm.PrintIndex (|CakeStack| Stack)
+//	opt norefcounts
+//	|| index = .Index(Stack.Code)
+//	|| Where = debugger.SrcMap(index)
+//	|| fn = spdtable.Find(index)
+//	|| Path = debugger.path(Where.FileNum)
+//		|| TabTo = .PrintCodeLocation(Path, fn, Where.BytePos )
+//		if fn and fn.HasVar(index)
+//			.PrintStackVars(index, fn, Stack, TabTo)
+

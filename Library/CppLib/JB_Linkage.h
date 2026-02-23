@@ -67,11 +67,11 @@ void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
 
 
 // VM 
-struct CakeVM;
-typedef int64 (*JB_ASM_Break)(CakeVM* VM, int Index, int BreakValue, ivec4* Reg0);
+struct CakeVM; struct CakeStack;
+typedef int64 (*JB_ASM_Break)(CakeVM* VM, CakeStack* Stack, int Error);
 typedef u64 (*Fn0 )();
 
-struct VMStack {
+struct CakeStack {
 	u32*		Code;
 	uint		Dummy;			
 	byte		GoUp;
@@ -80,9 +80,9 @@ struct VMStack {
 };
 
 
-struct VMRegister {
+struct CakeRegister {
 	union {
-		VMStack			Stack;
+		CakeStack		Stack;
 		JB_Object*		Obj;
 		s64				Int;
 		u64				Uint;
@@ -99,7 +99,7 @@ struct VMRegister {
 
 struct CakeVM {
     int				CakeFail;
-    int				VFlags;
+    int				UserFlags;
     JB_ASM_Break	__VIEW__;
     byte*			LibGlobs;
     byte*			PackGlobs;
@@ -108,10 +108,10 @@ struct CakeVM {
     PicoAction		Pico;
 	void* const*	OriginalJumpTable;
 	void*			JumpTable[514];
-	uint*			LastCode;
     
+    int				VFlags;
     u32				ExitGuard;
-	VMRegister		Registers[];
+	CakeRegister	Registers[];
 };
 
 
@@ -121,7 +121,7 @@ void	JB_InitClassList	(SaverLoadClass fn);
 CakeVM*	JB_ASM__VM			(int Flags);
 u32*	JB_ASM_Code			(CakeVM* V, int Length);
 int		JB_ASM_Index		(CakeVM* V, u32* Code);
-ivec4*	JB_ASM_PrevStack	(CakeVM* V, ivec4* Reg0);
+CakeStack* JB_ASM_PrevStack	(CakeVM* V, CakeStack* Stack);
 int		JB_ASM_StackCode	(CakeVM* V, ivec4* Reg0);
 void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex);

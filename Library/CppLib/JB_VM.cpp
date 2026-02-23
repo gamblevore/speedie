@@ -19,19 +19,19 @@ Design:
 
 
 extern "C" {
-jmp_buf 		VMRestorer;
-byte			CrashState;
+jmp_buf 		CakeRestore;
+byte			SubCrash;							// If the crash reporting system itself crashes.
 uint			CrashCount;
 
 #ifdef __VM__
 #pragma GCC optimize ("Os")
 
-#define kReallyFarOut	-4								// Really far out
-#define kTooFarBack		-3								// Gone back. Must be corrupt.
+#define kReallyFarOut	-4							// Really far out
+#define kTooFarBack		-3							// Gone back. Must be corrupt.
 #define kOverFlowStack	-2
 #define kStillInRange	-1
-#define		VMCodePtr(V)			((ASM*)(((byte*)(V)) + 1024*1024))
-#define		CanDebug(V)				(((uint64)(V))>>63)
+#define	VMCodePtr(V)	((ASM*)(((byte*)(V)) + 1024*1024))
+#define	CanDebug(V)		(((uint64)(V))>>63)
 
 
 #include "BitFields.h"
@@ -49,7 +49,7 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 		return 0;
 	auto Ret = V->Registers;
 	if (Clear)
-		memset(Ret, 0xFE, sizeof(VMRegister)*31);
+		memset(Ret, 0xFE, sizeof(CakeRegister)*31);
 	return (ivec4*)(Ret+4);
 	// stack(halt), r0, stack(main), R0, R1 // don't return R0 cos we don't want them altering it.
 }
@@ -65,10 +65,9 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 }
 
 
-int64 JB_ASM_Debug (CakeVM& vm, ASM* Code, VMRegister* r) {
-	auto Index = JB_ASM_Index(&vm, Code);
-	auto Break = (Code[CakeCodeMax]<<1)>>1;
-	return (vm.__VIEW__)(&vm, Index, Break, (ivec4*)r);
+AlwaysInline int64 JB_ASM_Debug (CakeVM& vm, ASM* Code, CakeRegister* r) {
+	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
+	return (vm.__VIEW__)(&vm, (CakeStack*)(r-1), 0);
 }
 
 
@@ -82,20 +81,10 @@ void JB_ASM_Pause (CakeVM* V) {
 }
 
 
-int64 JB_ASM_NoBreak (CakeVM* VM, int Code, int BreakValue, ivec4* R) {
-	return false;
+int64 JB_ASM_NoBreak (CakeVM* VM, CakeStack* R, int Code) {
+	return 0;
 }
 
-
-/*
-	So...
-	
-	We need to always have exec's debugger in here. always. for stackoverflow reporting.
-	
-	That means we need another param for on/off.
-*/
- 
- 
 
 uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
 	if_rare (!CanDebug(V))
@@ -112,6 +101,7 @@ uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
 	auto AASM = VMCodePtr(V);
 	return AASM + CakeCodeMax;
 }
+
 
 void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
 	V->Pico.Action = Fn;
@@ -181,21 +171,11 @@ static void * const GlobalJumpTable[] = {
 }
 
 
-ivec4* JB_ASM_PrevStack (CakeVM* vm, ivec4* Reg0) {
-	if (!Reg0) return 0;
-	auto Stack = (VMStack*)(Reg0-1);
-	int Saved = Stack->DestReg;
-	auto BackStack = Stack - Saved;
-	if (BackStack <= &vm->Registers[2].Stack)
-		return 0; // last?
-
-	return (ivec4*)(BackStack+1);
-}
-
-
-int JB_ASM_StackCode (CakeVM* vm, ivec4* Reg0) {
-	auto Stack = (VMStack*)(Reg0-1);
-	return JB_ASM_Index(vm, Stack->Code);
+CakeStack* JB_ASM_PrevStack (CakeVM* vm, CakeStack* Stack) {
+	auto BackStack = Stack - Stack->DestReg;
+	if (BackStack > &vm->Registers[2].Stack)
+		return BackStack;
+	return 0; // last?
 }
 
 
@@ -278,7 +258,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
  
 AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
-	auto Base = (VMStack*)(&V.Registers[0]);
+	auto Base = (CakeStack*)(&V.Registers[0]);
 	Base[0].Code = VMCodePtr(&V) + CakeCodeMax-1;
 	Base[2].Code = VMProtect(V, true) + CodeIndex;
 	for (int i = 1; i <= 2; i++) {
@@ -293,9 +273,9 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 }
 
 
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Signal) {
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal) {
 	char ErrorBuff[40];
-	const char* ErrStr = "Run CakeVM";					CrashState = 3;
+	const char* ErrStr = "Run CakeVM";					SubCrash = 3;
 	if (Stack) {
 		int Depth = Stack->Depth;
 		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
@@ -304,8 +284,8 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Sign
 	
 	Signal |= 128;
 	V->CakeFail = Signal;
-	(V->__VIEW__)(V, ErrorKind, 0, (ivec4*)(Stack));	CrashState = 30;
-	JB_ErrorHandleFileC(nil, Signal, ErrStr);			CrashState = 40;
+	(V->__VIEW__)(V, Stack, ErrorKind);					SubCrash = 30;
+	JB_ErrorHandleFileC(nil, Signal, ErrStr);			SubCrash = 40;
 	V->Registers[2] = {.Int = Signal};
 	
 	return 0; 
@@ -313,14 +293,14 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, VMStack* Stack, int Sign
 
 
 static ivec4* CakeCrashed (CakeVM* V, int Signal) {
-	if (CrashState) {
-		printf("Crashed inside crash handler, at point: %i\n", CrashState);
+	if (SubCrash) {
+		printf("Crashed inside crash handler, at point: %i\n", SubCrash);
 		return 0;
-	}													CrashState = 2;
+	}													SubCrash = 2;
 	Signal |= 128;
 	errno = Signal;
-	//int ErrorKind = StackOverFlow(V);						CrashState = 4;
-	//auto Stack = V->CurrStack;							CrashState = 20;
+	//int ErrorKind = StackOverFlow(V);					SubCrash = 4;
+	//auto Stack = V->CurrStack;						SubCrash = 20;
 	CakeCrashedSub(V, -1, nil, Signal);
 	return 0;
 }
@@ -328,24 +308,22 @@ static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 
 static void CakeCorrupt (int Sig) {
 	CrashCount++;
-	longjmp(VMRestorer, Sig);
+	longjmp(CakeRestore, Sig);
 }
 
 
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
-#ifdef DEBUG
-	static_assert((sizeof(VMRegister) == sizeof(VMStack)), "sizeof type");
-#endif
+	static_assert((sizeof(CakeRegister) == sizeof(CakeStack)), "sizeof type");
 
 	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull));
 	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
 	auto OldBus = signal(SIGBUS,  CakeCorrupt);
 
-	int Signal = setjmp(VMRestorer);
+	int Signal = setjmp(CakeRestore);
 	ivec4* Reg =  Signal  ?  CakeCrashed(V, Signal)  :  JB_ASM_Run_(*V, Code);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
-	CrashState = 0;
+	SubCrash = 0;
 	return Reg;
 }
 
