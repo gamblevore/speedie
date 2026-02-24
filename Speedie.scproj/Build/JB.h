@@ -531,7 +531,7 @@ struct SCModule;
 
 typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After);
 
-typedef int64 (*CakeVM_CakeChef)(CakeVM* Self, int Index, int BreakValue, ivec4* Reg0);
+typedef int64 (*CakeVM_CakeChef)(CakeVM* Self, CakeStack* Stack, int ErrorCode);
 
 typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -1535,6 +1535,7 @@ extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
 extern bool SC__Options_StripNames;
 extern bool SC__Options_TargetDebug;
+extern bool SC__Options_TrapFromPerry;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
 extern Array* SC__PackMaker_LibFuncs;
@@ -1619,6 +1620,7 @@ extern Message* SC__SCTasks_TaskMacro;
 extern Message* SC__SCTasks_tmp;
 extern Dictionary* SC__Errors_IgnoredBranches;
 extern Dictionary* SC__SC_Targets_Items;
+extern int SC__SourceMap_ASMTotal;
 extern FastString* SC__SourceMap_Breakable;
 extern FastString* SC__SourceMap_BreakPoints;
 extern int SC__SourceMap_LastLength;
@@ -2429,12 +2431,12 @@ extern int SC__SCNodeFindMode_aaa;
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
 #define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2398])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define JB__TerminalColor_Enabled JB__.TerminalColor_Enabled
 #define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2399])
 #define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2400])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
 #define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2397])
+#define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
 #define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2400])
 #define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2401])
@@ -2574,7 +2576,7 @@ extern int SC__Mod_ModuleDepth;
 struct JB_Globals {
 	byte __Dummy__;
 	bool Tk__DotInsertAllow;
-	bool TerminalColor_Enabled;
+	bool TerminalColor_RainbowTerm;
 	bool Flow_AlwaysMove;
 	bool Flow_BreakOnFail;
 	byte Flow_Active;
@@ -3249,6 +3251,8 @@ bool SC_Options__ModeCake();
 
 bool SC_Options__ModeCpp();
 
+bool SC_Options__ShouldBuildTrap();
+
 
 
 // Output
@@ -3728,6 +3732,8 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 int SC_SourceMap__BreakableSorter(SourceLocation A, SourceLocation B);
 
 bool SC_SourceMap__Check(SCFunction* Fn, int T);
+
+void SC_SourceMap__Clear();
 
 int SC_SourceMap__Init_();
 
@@ -4609,7 +4615,7 @@ ASM SC_ASM_TERN_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_TERN_SmallSet(ASM Self, uint Value);
 
-ASM SC_ASM_Trap_UponSet(ASM Self, uint Value);
+ASM SC_ASM_Trap_AtSet(ASM Self, uint Value);
 
 ASM SC_ASM_U0_LSet(ASM Self, uint Value);
 
@@ -4759,7 +4765,9 @@ ASMReg SC_Reg_xC2xB5TypeSetWithTc(ASMReg Self, uint /*DataTypeCode*/ Value);
 
 ASMReg SC_Reg_xC2xB5TypeSetWithReg(ASMReg Self, ASMReg Value);
 
-ASMReg SC_Reg__New();
+ASMReg SC_Reg__NewWith0();
+
+ASMReg SC_Reg__NewWithInt(int I);
 
 
 
@@ -5716,7 +5724,7 @@ void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 // JB_FatASM
 ASMReg SC_FAT_ASMReg(FatASM* Self, int A);
 
-void SC_FAT_BakeBreak(FatASM* Self, uint SrcMap, uint ASMTotal, uint Break);
+void SC_FAT_BakeBreak(FatASM* Self, uint SrcMap, uint Break);
 
 int SC_FAT_BaseOp(FatASM* Self);
 
@@ -6626,6 +6634,9 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 
 
 // ParseHandler
+
+
+// PicoActionFn
 
 
 // PicoThreadFn
@@ -7865,7 +7876,7 @@ jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into)
 
 jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
 
-void JB_bin_AddInt(FastString* Self, int64 Name);
+void JB_bin_AddInt(FastString* Self, int64 Value);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, int L, bool GoIn, byte* Data);
 
@@ -8974,7 +8985,7 @@ void SC_Msg_TranAllTargets(Message* Self);
 
 Message* SC_Msg_TranModel(Message* Self);
 
-FatASM* SC_Msg_TRAP(Message* Self, ASMReg R1, int Upon);
+FatASM* SC_Msg_TRAP(Message* Self, int At);
 
 void JB_Msg_TRel__(Message* Self, FastString* Fs);
 
@@ -10269,7 +10280,7 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 
 int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAlter, SCNode* Name_space, SCParamArray* Incoming);
 
-ASM* SC_Func_ASMBake(SCFunction* Self, ASM* Where, ASM* After, uint* Positions, uint ASMTotal);
+ASM* SC_Func_ASMBake(SCFunction* Self, ASM* Where, ASM* After, uint* Positions);
 
 SCDecl* SC_Func_ASMReturnWith0(SCFunction* Self);
 
@@ -11084,7 +11095,7 @@ inline bool JB_App__No(JB_String* Name);
 
 inline void JB_MzSt_Print(CompressionStats* Self);
 
-inline void SC_FAT_BakeDebug(FatASM* Self, uint SrcMap, uint ASMTotal, uint Break);
+inline void SC_FAT_BakeDebug(FatASM* Self, uint SrcMap, uint Break);
 
 inline void SC_Pac_SoftNopRange(Assembler* Self, FatASM* Start, FatASM* After);
 
@@ -11880,9 +11891,9 @@ inline void JB_MzSt_Print(CompressionStats* Self) {
 	JB_Decr(_tmPf0);
 }
 
-inline void SC_FAT_BakeDebug(FatASM* Self, uint SrcMap, uint ASMTotal, uint Break) {
+inline void SC_FAT_BakeDebug(FatASM* Self, uint SrcMap, uint Break) {
 	if (Break) {
-		SC_FAT_BakeBreak(Self, SrcMap, ASMTotal, Break);
+		SC_FAT_BakeBreak(Self, SrcMap, Break);
 	}
 	if (SC_Reg_SyntaxIs(Self->Info, kSC__Reg_DebugVars)) {
 		SC_FAT_OutputDebugVars(Self);
@@ -11951,7 +11962,7 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 }
 
 inline ASMReg SC_Pac_Exists(Assembler* Self, ASMReg Dest, ASMReg L, Message* Exp) {
-	return SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__New());
+	return SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__NewWith0());
 }
 
 inline Message* JB_Macro_Run(Message* Self, Array* Prms) {
@@ -11986,7 +11997,7 @@ inline FatASM* SC_Pac_Write(Assembler* Self, ASMReg Value, Message* Exp, ASMReg 
 struct JB_Globals {
 	byte __Dummy__;
 	bool Tk__DotInsertAllow;
-	bool TerminalColor_Enabled;
+	bool TerminalColor_RainbowTerm;
 	bool Flow_AlwaysMove;
 	bool Flow_BreakOnFail;
 	byte Flow_Active;
