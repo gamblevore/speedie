@@ -171,8 +171,8 @@
 #define   Div_Li       ((( int)((Op)<<30))>>30)
 #define   Div_Lu       (((uint)((Op)<<30))>>30)
 
-#define   Trap_Uponi       ((( int)((Op)<<13))>>13)
-#define   Trap_Uponu       (((uint)((Op)<<13))>>13)
+#define   Trap_Ati       ((( int)((Op)<<8))>>8)
+#define   Trap_Atu       (((uint)((Op)<<8))>>8)
 
 #define   Float_Di       ((( int)((Op)<<28))>>31)
 #define   Float_Du       (((uint)((Op)<<28))>>31)

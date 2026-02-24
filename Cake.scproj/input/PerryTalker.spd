@@ -57,9 +57,9 @@ dispatch DebuggerActions (PerryResponse)
 
 function cakevm.ClearTempBreak (|cakestack| stack)
 	|| index = .Index(stack.code)
-	|| B = cake.BreakPoints
+	|| B = cake.ActiveBreaks
 	if B and index > 0
-		|| Break = B+index
+		|| Break = B + index
 		if break == debugger.BreakToClear
 			debugger.BreakToClear = nil
 			Break[] &= 1<<31

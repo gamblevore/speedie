@@ -3,9 +3,21 @@
 module SourceMap
 	|faststring|		Positions
 	|int|				LastLength
+	|int|				ASMTotal
 	|FastString|		BreakPoints
 	|FastString|		Breakable
 
+	function Clear
+		opt norefcounts
+		|| p = .Positions
+			p.Length = 0
+		|| bp = .BreakPoints
+			bp.Length = 0
+		|| b = .Breakable
+			b.Length = 0
+		.ASMTotal = 0
+		.LastLength = 0
+		
 	function Check (|scfunction| fn, |int| T, |bool|)
 		opt norefcounts
 		|| p = .positions
@@ -46,8 +58,8 @@ datatype SourceLocation (uint64)
 		return (self>>32) & (21~bits)
 
 
-function fatasm.BakeBreak (|uint| SrcMap, |uint| ASMTotal, |uint| Break)
-	|| i = .ASMIndex + ASMTotal
+function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
+	|| i = .ASMIndex + sourcemap.ASMTotal
 	if break & Assembler.BreakPoint
 		SourceMap.BreakPoints!.AppendInt(I)
 		
@@ -65,10 +77,10 @@ target debug
 	|| BreakCount = 0
 		
 	
-function fatasm.BakeDebug (|uint| SrcMap, |uint| ASMTotal, |uint| Break)
+function fatasm.BakeDebug (|uint| SrcMap, |uint| Break)
 	opt inline
 	if break
-		.BakeBreak(SrcMap, ASMTotal, break)
+		.BakeBreak(SrcMap, break)
 	if .info is DebugVars
 		.OutputDebugVars
 

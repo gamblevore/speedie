@@ -44,6 +44,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	libinternal ParentAlive (|bool|)
 		return app.ParentID > 1
 
+
 	libinternal ChildAlive (|bool|)
 		if .SubProcess
 			return .CommsOpen

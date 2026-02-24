@@ -5,7 +5,7 @@ module Cake
 	|SpdProcess| Perry = app.parent
 	|!&CakeVM|   VM = CakeVM()
 	|File|		 InputFile = Cake.Collect
-	|&uint|		 BreakPoints = debugger.Startup
+	|&uint|		 ActiveBreaks = debugger.Startup
 	|!&ASM|		 BeginCode = VM.code()|&ASM|
 
 

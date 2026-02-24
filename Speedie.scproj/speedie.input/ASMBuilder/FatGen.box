@@ -89,12 +89,11 @@ function message.HALT (|int| Reserved = nil, |&fatasm|) {
 }
 
 
-function message.TRAP (|asmreg| r1 = nil, |int| Upon = nil, |&fatasm|) {
+function message.TRAP (|int| At = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.TRAP, self)
-	rz.reginput(0) = r1
-	rz.numinput(1) = Upon
+	rz.numinput(0) = At
 }
 
 

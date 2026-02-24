@@ -184,8 +184,8 @@ module PackMaker
 		j.addrow(@bin, "pos", p|string|)
 		j.addrow(@str, "files", SCImport.AllFiles.join("\n").Compress)
 
-		|faststring--| Breakable = sourcemap.Breakable
-		|faststring--| Points = sourcemap.Breakpoints
+		|faststring--| Breakable = SourceMap.Breakable
+		|faststring--| Points = SourceMap.Breakpoints
 		if breakable and points
 			SourceMap.SortBreaks(breakable)
 			j.addrow(@str, "breakmap", Breakable|string|)

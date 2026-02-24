@@ -3,17 +3,17 @@
 || Count = 123
 main
 	opt norefcounts
-	Count++
-	zalgoline "start world\n\n"
-	RecursiveHello()
-	zalgoline "\n\nend world"
+/	Count++
+/	zalgoline "start world\n\n"
+/	RecursiveHello()
+/	zalgoline "\n\nend world"
 //	app.crash
 	Platform.HALT_Clean
 
 
 function RecursiveHello	(|int| A=1)
 	"hello world: $Count"
-	Count++
+/	Count++
 	if A < 2
 		RecursiveHello(A+1)
 

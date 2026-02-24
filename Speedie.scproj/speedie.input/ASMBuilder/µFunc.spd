@@ -5,7 +5,7 @@ extend SCFunction
 		description "Generate some code (only for testing)."
 		rz = asm[.µfatlength|int|*3]!
 		|| p = rz.ptr
-		|| after = .ASMBake(P, P+rz.Size, nil, nil)
+		|| after = .ASMBake(P, P+rz.Size, nil)
 		rz.Size = after-p
 		rz.length = rz.Size   //   ::::::]]]]]]]
 
@@ -22,7 +22,7 @@ extend SCFunction
 		return (FileNum<<16) ||| (.Position&(21~bits))
 	
 	
-	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |uint| ASMTotal,  |!&asm|)
+	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
 		opt norefcounts
 		rz = where
 		assembler.sh.funcstart_ = .fatfirst - 1 // for debug
@@ -43,7 +43,7 @@ extend SCFunction
 				while (Curr++ < rz)
 					Positions++[] = pos
 				if options.TargetDebug
-					fat.BakeDebug(pos, ASMTotal, break)
+					fat.BakeDebug(pos, break)
 
 		if HasLabel
 			for fat.fat in self
@@ -112,7 +112,8 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
 	|| Start = .StartAdd
 	|| Positions = SourceMap.Reserve(t*4)
 	|| Addr = .reserve(t*4)|&asm|
-	|| after = fn.ASMBake(Addr, Addr+t, Positions, .Length>>2)
+	|| after = fn.ASMBake(Addr, Addr+t, Positions)
+	sourcemap.ASMTotal += t
 	.FinishAdd(@bin, Start)
 	expect (after-addr == T)									(fn, "ASM length corrupt")
 	return sourcemap.check(fn, T*4)

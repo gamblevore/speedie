@@ -1201,6 +1201,7 @@ function ASM (|message| msg,  |SCFunction| fn, |bool|)
 	Assembler.Sh.ASMInit
 	Assembler.JSM.zero
 	Assembler.JSM.Length = 0
+	SourceMap.Clear
 
 	if Assembler.sh.FatterCompile(fn)
 		|| fs = FastString()

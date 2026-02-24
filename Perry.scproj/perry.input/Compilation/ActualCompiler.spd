@@ -68,7 +68,7 @@ function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
 	argmsg.Ask
 	
 	|| f = Product
-	|| IsDebug = .DebugMode is debug
+//	|| IsDebug = .DebugMode is debug
 	|| args = ArgMsg.DebugArgNames
 	if product.IsDir and Platform.OSX
 		f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!

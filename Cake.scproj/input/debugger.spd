@@ -3,11 +3,11 @@
 module debugger
 	|message|		Root
 	|Message|		Globs
-	|[fileWithData]|	Files
-	|dictionary of filewithdata| FileMap
+	|[fileWithData]| Files
+	|Dictionary of filewithdata| FileMap
 	|string|		SrcMapStr
-	|string|		Breakables
-	|string|		BreakPoints
+	|string|		Breakables // breakmap
+	|string|		InbuiltBreaks
 	|uint|			Length
 	|uint|			OverFlowTrack
 	|bool|			WantDebug
@@ -25,17 +25,17 @@ module debugger
 
 	
 	function ActivateInbuiltBreaks
-		|| CakeBreak = cake.BreakPoints$
-		|| P = .Breakpoints.Addr|&uint|
-		|int| n = .Breakpoints.Length >> 2
+		|| CakeBreak = cake.ActiveBreaks$
+		|| P = .InbuiltBreaks.Addr|&uint|
+		|int| n = .InbuiltBreaks.Length >> 2
 		for i in n
-			|| Code = P[i++]
+			|| Code = P[i]
 /			if Code < .Length
 				CakeBreak[Code] |= (1<<31)
 	
 
 	function UserMultiBreak (|FileWithData| Path, |uint| Position, |bool| Active=true)
-/		|| CakeBreak = cake.BreakPoints$
+/		|| CakeBreak = cake.ActiveBreaks$
 
 		|| Map = .Breakables.Addr|&sourcelocation|
 		|| n = .Breakables.Length >> 2
@@ -63,7 +63,7 @@ module debugger
 			i += 2
 		
 		if BestScore
-			.SetUserBreak(cakebreak, Map[BestIndex+1], active)
+			.SetUserBreak(CakeBreak, Map[BestIndex+1], active)
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |bool| Active)
@@ -146,7 +146,7 @@ module debugger
 		.LoadFiles(R["files"].value.decompress)
 		.SrcMapStr = R["pos"]
 		.Breakables = R["breakmap"]
-		.Breakpoints = R["breakpoint"]
+		.InbuiltBreaks = R["breakpoint"]
 		.Length = .SrcMapStr.Length >> 2
 
 		|| L2 = SpdTable.CodeLength

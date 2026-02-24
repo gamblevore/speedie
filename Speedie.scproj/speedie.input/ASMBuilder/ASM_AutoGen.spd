@@ -693,8 +693,7 @@ datatype ASM_Trap (ASM) {
 		function Encode (ASM_Encoder, ) {
 			visible true
 			|asm| rz = .op|asm| << 24
-			rz.r1 = .prms[0]
-			rz.Trap_Upon = .prms[1]
+			rz.Trap_At = .prms[0]
 			if curr < after {
 				curr++[] = rz
 			}

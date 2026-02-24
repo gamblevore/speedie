@@ -196,8 +196,7 @@ forms
 		Kind	2
 	
 	Trap
-		r1		r
-		Upon	l
+		At		l
 
 	Float
 		r1		R

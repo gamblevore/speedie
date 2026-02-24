@@ -95,7 +95,7 @@ function Debugger (fn_asm)
 						 // but it won't be generated... we need a different noop. Something non-removeable.
 						 // + 0? or 0? idk...
 				return nil
-	exp.TRAP(asmreg(), num)
+	exp.TRAP(num)
 
 
 function Swap (fn_asm)
