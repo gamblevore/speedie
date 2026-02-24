@@ -329,7 +329,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 					// Stubs //
 
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
-uint*	JB_ASM_SetDebug		(CakeVM* V, bool On)					{return 0;}
+uint*	JB_ASM_SetDebug		(CakeVM* V, int On)						{return 0;}
 int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
 void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}
