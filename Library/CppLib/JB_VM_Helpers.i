@@ -16,6 +16,17 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
+AlwaysInline bool CanTrap(CakeVM* V, ASM Op, ASM* Code) {
+	if (!CanDebug(V))
+		return false;
+	uint At = Trap_Atu;
+	if (!At)
+		return true;
+	uint B = Code[CakeCodeMax-1];
+	return (B-1)<<1 == At<<1;
+}
+
+
 AlwaysInline int64 Div2 (int64 V, int Clear, int Down) {
 	int64 Sign = V < 0;
 	Sign = (Sign << Down) - Sign;

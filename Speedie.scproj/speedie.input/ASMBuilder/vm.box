@@ -349,7 +349,8 @@ forms
 
 
 /**/ TRAP (Trap)
-	goto BREAK  // this could be adapted to send signals also.
+	if (CanTrap(&vm, Op, Code))
+		goto BREAK
 
 
 #!						 (((((UTIL)))))

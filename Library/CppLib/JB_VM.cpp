@@ -118,7 +118,7 @@ static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __ca
 static void * const GlobalJumpTable[] = {
 	#include "InstructionList.h"
 	&&TRYBREAK,
-	&&PAUSE,
+	&&ALWAYSBREAK,
 };
     if (Op) {
 		vm.OriginalJumpTable = &GlobalJumpTable[0];
@@ -137,10 +137,8 @@ static void * const GlobalJumpTable[] = {
 	EXIT:;
 	return &vm.Registers[2].Ivec;
 	
-	PAUSE:;											// Assume was in debug mode
+	ALWAYSBREAK:;											// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
-	for (int i = 0; i < 256; i++)
-		JumpTable[i] = &&TRYBREAK;					// Restore debug mode
 	goto BREAK;
 
 	

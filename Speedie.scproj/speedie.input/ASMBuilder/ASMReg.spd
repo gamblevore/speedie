@@ -341,6 +341,10 @@ datatype ASMReg (uint64)
 		function New (|asmreg|)
 			return Zero
 		
+		function New (|int| i, |asmreg|)
+			rz = 56|asmreg|
+			rz.reg = i
+		
 	
 
 // we could do this instead (ON RENDER?)

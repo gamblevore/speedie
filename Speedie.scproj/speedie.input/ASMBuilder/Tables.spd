@@ -89,11 +89,11 @@ function Debugger (fn_asm)
 	if fn == @func
 		exp = exp.last!
 		|| ch = exp.first
-			num = ch.int
-			if num <= 0
-				exp.NOOP // debugat 0... I guess we just want a space to count something.
-						 // but it won't be generated... we need a different noop. Something non-removeable.
-						 // + 0? or 0? idk...
+			num = ch.int + 1
+			if num <= 1
+				exp.ADDB(asmreg(1), 0)  // non-removeable noop == debugat 0
+								// So we can track the op-runcount.
+								// then replace with a trap, later
 				return nil
 	exp.TRAP(num)
 

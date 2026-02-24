@@ -28,9 +28,10 @@ module debugger
 		|| CakeBreak = cake.ActiveBreaks$
 		|| P = .InbuiltBreaks.Addr|&uint|
 		|int| n = .InbuiltBreaks.Length >> 2
+		|| L = .Length
 		for i in n
 			|| Code = P[i]
-/			if Code < .Length
+			if Code < L
 				CakeBreak[Code] |= (1<<31)
 	
 
