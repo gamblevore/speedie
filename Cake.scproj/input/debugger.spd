@@ -88,19 +88,19 @@ module debugger
 				  else
 					error (F, "Breakpoint is in missing file")
 	
-	
+
+	function Path (|int| i, |filewithdata|)
+		opt norefcounts
+		return .files[i]						#expect ("Missing file at index: " + i)
+
+
 	function StartUp (|&uint|)
 		opt norefcounts
 		cake.vm.__View__ = __Dumper__
 		|| p = cake.Perry
 			cake.vm.__View__ = __PerryView__
 			cake.vm.Action(p.pico) = PicoReader	
-		return cake.VM.IsDebugging(debugger.WantDebug)
-
-
-	function Path (|int| i, |filewithdata|)
-		opt norefcounts
-		return .files[i]						#expect ("Missing file at index: " + i)
+		return cake.VM.IsDebugging(debugger.WantDebug*2)
 			
 		
 	function __Dumper__ (cakevm.CakeChef)
@@ -122,7 +122,6 @@ module debugger
 			|| TabTo = .PrintCodeLocation(Path, fn, Where.BytePos )
 			if fn and fn.HasVar(index)
 				.PrintStackVars(index, fn, Stack, TabTo)
-
 
 
 	function spdfunc.HasVar (|int| Index, |bool|)

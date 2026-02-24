@@ -52,7 +52,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	syntax append (|faststring| fs, |bool|)
 		inline
-		return self <~ fs|string|
+		rz = (self <~ fs|string|)
+		fs.Length = 0
 	
 	
 	syntax append (|string| str, |bool|)

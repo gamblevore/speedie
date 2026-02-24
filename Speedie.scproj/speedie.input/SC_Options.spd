@@ -45,10 +45,10 @@ module Options
 	|bool|	HideawayScripts
 	
 	function Color (assigns:|bool|)
-		TerminalColor.enabled = Value
+		TerminalColor.RainbowTerm = Value
 
 	function Color (|bool|)
-		return TerminalColor.enabled
+		return TerminalColor.RainbowTerm
 	
 	function ModeCake (|bool|)
 		return .mode == cake

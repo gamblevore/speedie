@@ -19,33 +19,38 @@
 		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
 */
 
+// we need to put a breakpoint in the original file... then see what happens
+// also need to fix the breaksystem...
 
 function __PerryView__ (cakevm.CakeChef)
+	// perry always exists by now
 	if (ErrorCode)
 		.SendCrash(stack)
 	.ClearTempBreak(stack)
+	
 	while !.StopCheckMessages or ErrorCode
-		.UpdatePerry(stack)
+		|| j = .getjbin
+		.UpdatePerry(stack, 0, j)
+		cake.Perry! <~ j
 
 
 prototype PerryResponse (|cakevm| self, |message| m, |bool|)
 dispatch DebuggerActions (PerryResponse)
-	+'setvar'
-		0
+	setvar:		
 		
 	run
 		opt norefcounts
-		return .isdebugging(m.firstname!="fast")
+		return .IsDebugging(2-(m.firstname=="fast"))
 	
-	stop: app.quit
+	stop:		app.quit
 		
-	pause: 0 // returns false == pause, and update already sends updates. 
+	pause:		return false // caller already updates...
 		
-	stepin: return .TempBreak(.StepIn)
+	stepin:		return .TempBreak(.StepIn)
 		
-	stepout:  return .TempBreak(.StepOut)
+	stepout:	return .TempBreak(.StepOut)
 		
-	stepover:  return .TempBreak(.StepOver)
+	stepover:	return .TempBreak(.StepOver)
 
 //	stepback:0 // todo
 
@@ -68,44 +73,114 @@ function cakevm.TempBreak (|?&uint| Break, |bool|)
 		debugger.BreakToClear = break // nice
 	return true
 
+
 function cakevm.StepIn (|&Uint|)
 	// we need to mark a place to break at. how? is it just the next instruction?
 	// we need to get the curr code location... find the next line, set a break there.
+
 function cakevm.StepOut (|&uint|)
+
+
 function cakevm.StepOver (|&uint|)
-
-
-function cakevm.StopCheckMessages (|bool|)
-	|| m = cake.perry.Get(0.01)$
-	return .ResumeCode(m)
-
-	
-function cakevm.ResumeCode (|message| m,   |bool|)
-	if m == @tmp
-		|| fn = DebuggerActions[m.name]
-			return (fn[])(cake.vm, m)
-	printerror "Debugger received unexpected " + m.Name
-	
-
-function cakevm.UpdatePerry (|cakestack| stack)
 
 
 function cakevm.SendCrash (|cakestack| stack)	
 
-//function cakevm.PrintIndex (|CakeStack| Stack)
-//	opt norefcounts
-//	|| index = .Index(Stack.Code)
-//	|| Where = debugger.SrcMap(index)
-//	|| fn = spdtable.Find(index)
-//	|| Path = debugger.path(Where.FileNum)
-//		|| TabTo = .PrintCodeLocation(Path, fn, Where.BytePos )
-//		if fn and fn.HasVar(index)
-//			.PrintStackVars(index, fn, Stack, TabTo)
+
+function cakevm.StopCheckMessages (|bool|)
+/	|| m = cake.perry.Get(0.01)$
+	return .ResumeCode(m)
+
+	
+function cakevm.ResumeCode (|message| m, |bool|)
+	if m == @tmp
+		|| fn = DebuggerActions[m.name]
+			return (fn[])(cake.vm, m)
+	printerror "Debugger received unexpected " + m.Name
+
+
+function cakevm.GetJBin (|jbin--|)
+/	|jbin--| j = XVar.printer
+	if j.Length
+		debugger
+		j.Length = 0
+	
+	j <~ jbin.header
+	j.enter @arg
+	return j
 
 
 
+function cakevm.UpdatePerry (|cakestack| stack, |int| Count, |jbin| j)
+	opt norefcounts
+	while stack
+/		|| err = .CheckStack(stack)
+			j.add(@tmp, err)
+			exit
+		
+		|faststring| fs
+		if !Count++
+			fs = VariablePrinter init FastString()
+
+		.CollectStack(stack, j, fs)
+		Stack = .prev(stack)
+	
+
+function cakevm.CheckStack (|cakestack| stack, |string|)
+/	if !Memory.Test(Stack, 16):				return "StackCorrupt"
+	if stack < .basestack:					return "StackUnderflow"
+	|| Depth = stack.Depth - 1
+	|| Down = stack.DestReg
+	if !Down or Down > 31:					return "StackBad"
+	Stack -= Down + 1
+	if stack.Depth!=Depth:					return "StackTripped"
 
 
+function cakevm.Prev (|cakestack| stack, |&cakestack|)
+/	|| Down = stack.DestReg
+	Stack -= Down + 1
+	if stack >= .BaseStack
+		return Stack
 
+
+function jbin.SyntaxExpect (|string| s, |int64| Code)
+/	.Enter(@tmp, s)
+	.AddInt(Code)
+	.exit
+
+
+|faststring| VariablePrinter
+function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
+/	opt norefcounts
+	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
+	|| Where = debugger.SrcMap(index)
+	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
+	|| Path = debugger.path(Where.FileNum)		#expect (j, "MissingFile", where.filenum)
+	|| Locals = fn.obj|[xvar]|
+
+	j.Enter(@tmp, "function")
+	j.AddStr(fn.Name)
+	j.AddStr(path)
+	j.AddInt(where.bytepos)
+	
+	if Vars
+		vars.Length = 0
+		j.Enter
+		index -= fn.Position
+		for v in Locals
+			if v contains index
+				j.Enter(@tmp, v.name)
+
+				v.RenderType(vars)
+				j.AddStr(vars|string|)
+				j.Length = 0
+
+				v.RenderValue(vars, Stack.reg0)
+				j.AddStr(vars|string|)
+				j.Length = 0
+
+				j.exit
+		j.exit
+	j.exit
 
 

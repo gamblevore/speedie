@@ -6,7 +6,6 @@ function cake.Collect (|File?|)
 	|| r1 = r[0]
 	if r1.ArgSwitch("d")
 		if r1.find('D')
-			"CAKECAKECKAKE"
 			TerminalColor.RainbowTerm = true
 		debugger.WantDebug = true
 		r1 = r[1]

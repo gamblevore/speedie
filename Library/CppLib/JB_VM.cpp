@@ -43,7 +43,6 @@ uint			CrashCount;
 #define		ErrStck					(1<<10)
 
 
-
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 	if_rare (!V)
 		return 0;
@@ -57,11 +56,10 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 	ASM* Start = VMCodePtr(vm);
-	if (Code < Start)
-		return -1;
-	if (Code >= Start + CakeCodeMax)
-		return -1;
-	return (int)(Code - Start);
+	int64 Diff = Code - Start;
+	if ((uint64)Diff < CakeCodeMax)
+		return (int)Diff;
+	return -1;
 }
 
 
@@ -71,35 +69,39 @@ AlwaysInline int64 JB_ASM_Debug (CakeVM& vm, ASM* Code, CakeRegister* r) {
 }
 
 
-void JB_ASM_Pause (CakeVM* V) {
-	if CanDebug(V) {
-		auto J = V->JumpTable;
-		void* Pause = J[513];
-		for (int i = 0; i < 256; i++)
-			J[i] = Pause;
-	}
-}
-
-
 int64 JB_ASM_NoBreak (CakeVM* VM, CakeStack* R, int Code) {
 	return 0;
 }
 
 
-uint* JB_ASM_SetDebug (CakeVM* V, bool On) {
+uint* JB_ASM_SetDebug (CakeVM* V, int Level) {
+	auto Rz = VMCodePtr(V) + CakeCodeMax;
+	int CurrLevel = V->BreakState;
+	if (CurrLevel == Level) // no point locking this...
+		return Rz;			// even if we did... the calling code can mess things up
+							// with no races in here.
+							// so the calling code would need locks or the logic-sorted out.
+							
 	if_rare (!CanDebug(V))
 		return 0;
+
+	bool Expected = false;
+	if_rare (!((V->Lock).compare_exchange_strong(Expected, true)))
+		return 0;	// allow pico to loop until we are able to set it properly.
+	
+
+	V->BreakState = Level;
 	auto J = V->JumpTable;
-	void* Break = J[512];
-	if ((On) != (J[0] == Break)) {
-		int i = 256;
-		if (On) while (--i >= 0)
+	void* Break = J[512+(Level>2)];
+	if (Level <= 1)
+		memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));		
+	  else if (Level >= 2)
+		for_(256)
 			J[i] = Break;
-		  else
-			memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));
-	}
-	auto AASM = VMCodePtr(V);
-	return AASM + CakeCodeMax;
+
+	V->Lock = false;
+	
+	return Rz;
 }
 
 
@@ -171,13 +173,6 @@ static void * const GlobalJumpTable[] = {
 }
 
 
-CakeStack* JB_ASM_PrevStack (CakeVM* vm, CakeStack* Stack) {
-	auto BackStack = Stack - Stack->DestReg;
-	if (BackStack > &vm->Registers[2].Stack)
-		return BackStack;
-	return 0; // last?
-}
-
 
 void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
 	vm->LibGlobs = LibGlobs;
@@ -227,7 +222,7 @@ ASM* JB_ASM_Code (CakeVM* V, int Length) {
 
 
 CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
-	const int Page = 16*1024;
+	const int Page = 16 * 1024;
 	int AllocSize = CakeStackSize + CakeCodeMax*4;
 	if (Flags&kJB_VM_AskDebug)
 		AllocSize += CakeCodeMax*4;
@@ -245,6 +240,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	if (Flags&kJB_VM_AskDebug)
 		V = (CakeVM*)(((int64)(V)) | HighBit);
 	
+	V->BreakState = 1;
 	V->__VIEW__ = JB_ASM_NoBreak;
 	V->VFlags = Flags;
     V->Pico.Upon = V;
@@ -333,7 +329,6 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 					// Stubs //
 
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
-void	JB_ASM_Pause		(CakeVM* V)								{}
 uint*	JB_ASM_SetDebug		(CakeVM* V, bool On)					{return 0;}
 int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}

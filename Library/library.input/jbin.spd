@@ -70,11 +70,11 @@ role JBin (Faststring)
 	function AddStr			(|string| name)
 		.add(@str, name)
 	
-	function AddInt			(|int64| name)
-		.add(@num, name.render)
+	function AddInt			(|int64| value)
+		.add(@num, value.render)
 
 	function AddRow			(|syntax| type, |string| Row, |string| Value)
-		.enter(@msg, row)
+		.enter(@tmp, row)
 		.Add(type, value, false)
 		.exit
 	

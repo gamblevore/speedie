@@ -109,7 +109,9 @@ struct CakeVM {
 	void* const*	OriginalJumpTable;
 	void*			JumpTable[514];
     
-    int				VFlags;
+    u16				VFlags;
+std::atomic<bool>	Lock;
+	u8				BreakState;
     u32				ExitGuard;
 	CakeRegister	Registers[];
 };
@@ -121,13 +123,12 @@ void	JB_InitClassList	(SaverLoadClass fn);
 CakeVM*	JB_ASM__VM			(int Flags);
 u32*	JB_ASM_Code			(CakeVM* V, int Length);
 int		JB_ASM_Index		(CakeVM* V, u32* Code);
-CakeStack* JB_ASM_PrevStack	(CakeVM* V, CakeStack* Stack);
 int		JB_ASM_StackCode	(CakeVM* V, ivec4* Reg0);
 void	JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex);
 void**	JB_ASM_InitTable	(CakeVM* V, int n, int g);
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear);
-uint*	JB_ASM_SetDebug		(CakeVM* V, bool On);
+uint*	JB_ASM_SetDebug		(CakeVM* V, int Level);
 void	JB_ASM_LinkPico		(CakeVM* V, PicoComms* P, PicoActionFn Fn);
 void	JB_ASM_Pause		(CakeVM* V);
 

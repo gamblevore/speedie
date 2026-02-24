@@ -8,6 +8,8 @@ function CakeVM.PrintCrashTrace (|int| Err, |?&CakeStack| LastStack,  |int64|)
 	  else
 		debugger.OverFlowTrack = 1
 		|| BadMsg = .PrintStackTrace(laststack)
+			if BadMsg != "..."
+				print "! "
 			printline BadMsg
 	"---------------------"
 
@@ -20,7 +22,6 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 //Tue Feb 10 23:49:23 2026
 //Signal 11 in /tmp/SpeedieApps/6074286623726617078/hello_world [
 //]
-//
 //0   JB_App__BackTrace + 28
 //1   JB_CrashTracer + 56
 //2   JB_CrashHandler + 352
@@ -34,11 +35,12 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 	|| Stack = (.Registers(false)-2)|&CakeStack|
 	|| Depth = Stack.Depth
 	LastStack ?= Stack + 1MB/16
-	while Memory.Test(Stack, 16)
+	while
+		if !Memory.Test(Stack, 16):				return "Stack Corrupt"
 		if (Depth >= 1K):						return "..." // huge stacks aren't that useful
 			
 		|| CodePtr = Stack.Code
-		if !CodePtr:							return "! Missing CodePtr"
+		if !CodePtr:							return "Missing CodePtr"
 		print "\t"
 		|| index = .index(CodePtr)
 		|| fn = spdtable.Find(index)
@@ -48,12 +50,11 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 		printline "()"
 
 		require stack!=LastStack
-		if stack > LastStack:					return "! Stack Too Large"
+		if stack > LastStack:					return "Stack Too Large"
 		|| Up = stack.GoUp	#require
 		Stack += Up+1
 		Depth++
-		if (Up > 32):							return "! Stack Chain Invalid"
-		if stack.Depth!=Depth:					return "! Stack Depth Invalid"
-	return nil
+		if (Up > 32):							return "Stack Chain Invalid"
+		if stack.Depth!=Depth:					return "Stack Depth Invalid"
 
 

@@ -36,8 +36,9 @@ class XVar (list)
 
 	function Print (|!&CakeStack| Stack, |int| TabTo=0)
 		opt norefcounts
-		.Render(Printer, Stack.reg0, true, TabTo)
-		printline Printer.GetResult
+		.Render(Printer, Stack.reg0, true, TabTo, TerminalColor.RainbowTerm)
+		printline Printer|&nil||string|
+		printer.Length = 0
 	
 	
 	module
@@ -46,40 +47,43 @@ class XVar (list)
 	
 	render
 		opt norefcounts
-		.Render(fs, nil, true, 0)
+		.Render(fs, nil, true, 0, false)
 	
 	
-	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo)
-		opt norefcounts
-		if full
-			if TerminalColor.RainbowTerm
-				fs <~ terminalcolor.yellow
-			
-			|| M = fs.mark
-			fs <~ "|"
-			.TypeName(fs)
-			fs <~ "|"
-			fs <~ " "
-			fs <~ .name
-			fs <~ ": "
-			if TerminalColor.RainbowTerm
-				fs <~ terminalcolor.normal
-			if TabTo
-				|| Missing = TabTo - (fs.mark - M)
-				fs <~ (' ', missing)
-		
-		require reg0
-		if TerminalColor.RainbowTerm
-			fs <~ terminalcolor.red
-
+	function RenderValue (|faststring| fs, |&ivec4| Reg0)
 		|| Reg = Reg0 + .reg
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
 			.RenderObject(fs, reg)
 		  else
 			.RenderData(fs, reg)
-		if TerminalColor.RainbowTerm
-			fs <~ terminalcolor.normal
+
+
+	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo, |bool| Color)
+		opt norefcounts
+		if full
+			if color
+				fs <~ terminalcolor.yellow
+			
+			|| M = fs.mark
+			fs <~ "|"
+			.RenderType(fs)
+			fs <~ "|"
+			fs <~ " "
+			fs <~ .name
+			fs <~ ": "
+			if color
+				fs <~ terminalcolor.normal
+			if TabTo
+				|| Missing = TabTo - (fs.mark - M)
+				fs <~ (' ', missing)
+		
+		if reg0
+			if color
+				fs <~ terminalcolor.red
+			.RenderValue(fs, reg0)
+			if color
+				fs <~ terminalcolor.normal
 	
 	
 	function RenderObject (|faststring| fs, |!&ivec4| Reg)
@@ -111,7 +115,7 @@ class XVar (list)
 		// Contains can contain themselves! So no deep rendering... for now. Maybe if we mark/unmark them.
 	
 	
-	function TypeName (|faststring| fs)
+	function RenderType (|faststring| fs)
 		opt norefcounts
 		for W in .Weirdness
 			loop W

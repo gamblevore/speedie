@@ -886,12 +886,12 @@ function AddMain (|int| mark, |bool|)
 |FastString|	TimerOutput = FastString.new
 
 function FastString.Normal (|string| s)
-	if (TerminalColor.enabled):  self <~ TerminalColor.normal
+	if (TerminalColor.RainbowTerm):  self <~ TerminalColor.normal
 	self <~ "\n"
 	self <~ s
 	self <~ ":"
 	self <~ (' ', 18-s.LengthUTF8)
-	if (TerminalColor.enabled):  self <~ TerminalColor.good
+	if (TerminalColor.RainbowTerm):  self <~ TerminalColor.good
 		
 
 function AppendCompilerTime (|string| s, |int| Durr)
