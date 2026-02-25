@@ -75,7 +75,7 @@ extend PerryIDE
 			.SaveEditing(documentstate.saving)
 			return true
 
-		if key is NUM3 // e for error
+		if key is NUM3 or E // e for error
 			return .SaveAndShowErrors
 			
 		|| NumKey = key.IsNumber
