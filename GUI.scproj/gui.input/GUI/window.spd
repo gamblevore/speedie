@@ -75,7 +75,7 @@ class Window (GUIControl)
 
 	virtual DrawBackground (|image| where)
 		|| a = .GNormal.bg.Alpha()
-		if .IsFullScreen and (a < 1.0)
+		if .UsesEntireScreen and (a < 1.0)
 			¥.DrawIntoBackground(where)
 		
 		if a > 0
@@ -310,7 +310,7 @@ class Window (GUIControl)
 		return .islast
 
 
-	inline IsFullScreen (|bool|)
+	inline UsesEntireScreen (|bool|)
 		return .LastRect == All.lastrect
 
 

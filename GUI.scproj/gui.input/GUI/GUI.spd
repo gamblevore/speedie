@@ -34,7 +34,7 @@ module GUI
 	|date|						ForeGroundTime
 	|bool|						FlashSelector
 	|sdlactivity|				QuitReason
-	|date|						FixScreenBug
+//	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
 	|bool|						NeedMouseMove
@@ -350,18 +350,20 @@ module GUI
 		|| n = GUI.NativeWindow
 			.SDL_FullScreen(n, (value<<1)-1)
 		
+		
 	function IsFullScreen (|bool|)
 		return .CurrDisplaySize.y <= .Screenraw.size.y
 		
-		
-	libinternal BumpSize
-		description "Fixes a MacOSX bug. Not my fault!" 
-		.FixScreenBug = 0
-		|| n = GUI.NativeWindow
-			|| was = .IsFullScreen
-			.SDL_FullScreen(n, -1)
-			if was
-				.SDL_FullScreen(n, 1)
+	
+//  seems unneeded now?
+//	libinternal BumpSize
+//		description "Fixes a MacOSX bug. Not my fault!" 
+//		.FixScreenBug = 0
+//		|| n = GUI.NativeWindow
+//			|| was = .IsFullScreen
+//			.SDL_FullScreen(n, -1)
+//			if was
+//				.SDL_FullScreen(n, 1)
 	
 	
 	function Scaling (assigns:|float| scale)
@@ -533,8 +535,8 @@ module GUI
 	libinternal HandleOpenFile
 		|| d = .DocumentOpened$
 		.OpenDocument(d, false)
-		if .OpenedFirst.guiago < 3s
-			.FixScreenBug = .FrameStart + 1s
+//		if .OpenedFirst.guiago < 3s
+//			.FixScreenBug = .FrameStart + 1s
 
 
 	libinternal OrderWindows (|window|)
@@ -555,9 +557,9 @@ module GUI
 		
 	libinternal PreFrame (|sdlactivity|)
 		opt norefcounts
-		if .FixScreenBug.Fired
-			.BumpSize
-			rz = SDLActivity.activity
+//		if .FixScreenBug.Fired
+//			.BumpSize
+//			rz = SDLActivity.activity
 		
 		while (|| err = stderr.pop)
 			notifications <~ err
@@ -608,7 +610,7 @@ module GUI
 	libinternal DrawWinFrom (|window|)
 		opt norefcounts
 		for w.reverse in window.all
-			if w.isviewable and w.isfullscreen
+			if w.isviewable and w.UsesEntireScreen
 				return w
 		return window.all.first
 
@@ -897,7 +899,7 @@ module GUI
 		.Screen.size = v
 		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, TEXTUREACCESS_STREAMING, v.x, v.y)
 
-		window.all.FullScreen = v
+		window.all.EntireScreen = v
 		.StartResize(true)
 
 

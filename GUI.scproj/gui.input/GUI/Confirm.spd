@@ -119,7 +119,7 @@ class ConfirmationDialog (Window)
 		.response		= textview(self, nil)
 		.Question		= textview(self, nil)
 		.gnormal        = ¥.systemstyle 
-		.FullScreen		= (300, 150)
+		.EntireScreen	= (300, 150)
 		.AddButton(.yes, "Yes")
 		.AddButton(.No,	 "No" )
 		.AddButton(.Cancel, "Cancel")

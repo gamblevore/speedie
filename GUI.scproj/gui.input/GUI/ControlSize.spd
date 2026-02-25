@@ -31,7 +31,7 @@ struct ControlSize
 	function Size (|int| i,  |int|)
 		return .GSize[i]>>4
 
-	setter guicontrol.FullScreen (|ivec2|) // for full-screen windows
+	setter guicontrol.EntireScreen (|ivec2|) // for full-screen windows
 		.lastrect = (0,0,value)
 
 		.sizer.g(0, self) = ControlPoint.low
