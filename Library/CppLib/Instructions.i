@@ -10,7 +10,7 @@
 ;
 	goto EXIT;
 ı TAIL:;
-	TailStack(vm, r, Code, Op);
+	Code = TailStack(vm, r, Code + 1, Op, *Code);
 ı KNST2:;
 	LoadConst(r, Op, *Code++);
 ı KNST3:;

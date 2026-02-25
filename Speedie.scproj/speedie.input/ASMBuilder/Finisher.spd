@@ -35,11 +35,13 @@ function Assembler.FinishMost
 function assembler.TryTail (|fatasm| FNC)
 	opt norefcounts
 	|| Ret = Fnc + 1
-	require ret isa asm.ret
+	require (ret isa asm.ret) and (!fnc.p3)	// no pext, won't fit in tail.
 	|| rr = ret.regonly
-	require (fnc.BasicBlock == ret.BasicBlock) and (!fnc.p3)	// no pext, won't fit in tail.
 	|| ReturnType = .out.ReturnType
 	require !returntype or fnc.RegOnly == rr					// returning same var, or nothing at all.
+
+	// If this overwrites params... then we need to copy params
+	// We could adapt the TAIL encoder! That should do it.
 
 	Fnc.prms[0] = Fnc.prms[1]
 	Fnc.prms[1] = Fnc.prms[2]
@@ -47,7 +49,8 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc._Outputs = 0
 	Fnc._op = asm.tail
 	(Fnc.info as= ASMReg.exit)
-	ret._op = asm.noop
+	if (fnc.BasicBlock == ret.BasicBlock)
+		ret._op = asm.noop // nice
 	if 0: nil|message|!.TAIL
 
 

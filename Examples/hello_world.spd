@@ -3,6 +3,7 @@
 || Count = 123
 main
 	opt norefcounts
+	debugat 0
 /	Count++
 /	zalgoline "start world\n\n"
 /	RecursiveHello()
@@ -14,6 +15,6 @@ main
 function RecursiveHello	(|int| A=1)
 	"hello world: $Count"
 /	Count++
-	if A < 2
+	if A < 100
 		RecursiveHello(A+1)
 

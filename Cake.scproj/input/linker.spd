@@ -114,8 +114,13 @@ function asm.PutCandlesOnCakeSub (|&asm| self, |asm| JumpAndReg, |string?|) // S
 	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
 	
 	|| Op = JumpAndReg >> 24								// FNC or FNC3
-	|| Reg = (JumpAndReg >> 19) & 31
-	|| ID = (JumpAndReg & 19~bits) - 31
+	|| Reg = 0
+	|| ID = JumpAndReg & (24~bits)
+	if Op!=asm.tail
+		Reg = (JumpAndReg >> 19) & 31
+		ID &= 19~bits
+		
+	ID -= 31
 	if  ID <= 0
 		return nil
 	// IDs 0-31, are registers. The first 32-funcs are empty.
@@ -125,9 +130,13 @@ function asm.PutCandlesOnCakeSub (|&asm| self, |asm| JumpAndReg, |string?|) // S
 			|| Jump = (Pos - Self)|int|						// 19-bits
 			Jump -= 2
 			Jump -= op&1
+			if op == asm.tail
+				self[] = (Jump&24~bits) ||| (Op <<24)
+				return nil
+				
 			|| EncodedJump = Jump&19~bits
 			if  (EncodedJump<<13)>>13  ==  Jump
-				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op<<24)
+				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op <<24)
 				return nil
 			return "Executable too large to link: " + fn.name
 		return "Function was trimmed: " + fn.name

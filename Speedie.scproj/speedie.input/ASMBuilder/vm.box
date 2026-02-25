@@ -383,7 +383,7 @@ forms
 
 POS 2
 	TAIL (Tail)
-		TailStack(vm, r, Code, Op)
+		Code = TailStack(vm, r, Code+1, Op, *Code)
 
 
 POS 24 // force position

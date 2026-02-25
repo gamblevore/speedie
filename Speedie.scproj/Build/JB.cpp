@@ -3523,7 +3523,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[438]);
-	JB_FS_AppendInt32(_fsf0, (2026022418));
+	JB_FS_AppendInt32(_fsf0, (2026022514));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10528,7 +10528,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1386]);
-	JB_FS_AppendInt32(_fsf0, (2026022418));
+	JB_FS_AppendInt32(_fsf0, (2026022514));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -17192,18 +17192,21 @@ ASMReg SC_ASMType__Debugger(Assembler* Self, Message* Exp, ASMReg Dest) {
 		return nil;
 	}
 	int Num = 0;
+	FatASM* Fat = nil;
 	if (Fn == kJB_SyxFunc) {
 		Exp = ((Message*)JB_Ring_Last(Exp));
 		Message* Ch = ((Message*)JB_Ring_First(Exp));
 		if (Ch) {
 			Num = (JB_Msg_Int(Ch, 0) + 1);
 			if (Num <= 1) {
-				SC_Msg_ADDB(Exp, SC_Reg__NewWithInt(1), 0);
-				return nil;
+				Fat = SC_Msg_ADDB(Exp, SC_Reg__NewWithInt(1), 0);
 			}
 		}
 	}
-	SC_Msg_TRAP(Exp, Num);
+	if (!Fat) {
+		Fat = SC_Msg_TRAP(Exp, Num);
+	}
+	(++Fat->xC2xB5RefCount);
 	return ((ASMReg)0);
 }
 
@@ -23733,7 +23736,11 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 		FatASM* S = R->After;
 		while (S > R->Start) {
 			(--S);
-			if (SC_FAT_OperatorIsa(S, kSC__ASM_RET)) {
+			uint Op = SC_FAT_Op(S);
+			if (Op == kSC__ASM_RFRT) {
+				(++Sv->ReturnCount);
+			}
+			 else if (Op == kSC__ASM_RET) {
 				(++Sv->ReturnCount);
 				if (Rz) {
 					Rz = SC_Reg_Simplify(Rz);
@@ -25348,13 +25355,10 @@ ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int A
 
 void SC_Pac_TryTail(Assembler* Self, FatASM* FNC) {
 	FatASM* Ret = FNC + 1;
-	if (!SC_FAT_OperatorIsa(Ret, kSC__ASM_RET)) {
+	if (!((SC_FAT_OperatorIsa(Ret, kSC__ASM_RET)) and ((!SC_FAT_p3(FNC))))) {
 		return;
 	}
 	int Rr = SC_FAT_RegOnly(Ret, 0);
-	if (!((FNC->BasicBlock == Ret->BasicBlock) and ((!SC_FAT_p3(FNC))))) {
-		return;
-	}
 	SCDecl* ReturnType = Self->Out->ReturnType;
 	if (!((!ReturnType) or (SC_FAT_RegOnly(FNC, 0) == Rr))) {
 		return;
@@ -25365,7 +25369,9 @@ void SC_Pac_TryTail(Assembler* Self, FatASM* FNC) {
 	FNC->_Outputs = 0;
 	FNC->_Op = kSC__ASM_TAIL;
 	(FNC->Info = SC_Reg_OperatorAs(FNC->Info, kSC__Reg_Exit));
-	Ret->_Op = kSC__ASM_NOOP;
+	if (FNC->BasicBlock == Ret->BasicBlock) {
+		Ret->_Op = kSC__ASM_NOOP;
+	}
 	if (0) {
 		SC_Msg_TAIL(((Message*)nil), nil, nil);
 	}

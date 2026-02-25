@@ -2,7 +2,7 @@
 
 datatype ASMOp (uint)
 	function IsSPDFunc (|bool|)
-		return (self == asm.FNC or asm.fnc3)
+		return (self == asm.FNC or asm.fnc3 or asm.tail)
 	
 	function IsGlob (|bool|)
 		return (self == asm.GOBJ or asm.GTAB)

@@ -226,7 +226,10 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 function InlineFinish (|fatrange| R, |savedregisters| sv, |ASMReg|)
 	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
 	for s in R
-		if s isa asm.ret
+		|| op = s.op
+		if op == asm.RFRT
+			sv.ReturnCount++
+		  elseif op == asm.ret
 			sv.ReturnCount++
 			if rz
 				rz = rz.simplify

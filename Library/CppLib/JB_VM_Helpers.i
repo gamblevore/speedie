@@ -608,21 +608,23 @@ AlwaysInline void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* Code, ASM Op) {
-	CakeRegister* stck = r-1;
-	debugger;
-//	vm.AllocCurr = stck->Stack.Alloc;
-	ASM Code2 = Code[0];
-	// What if this overwrites params that we mean to read from?
-	
-	r[1] = Transfer(Code2, 0);
-	r[2] = Transfer(Code2, 1);
-	r[3] = Transfer(Code2, 2);
-	r[4] = Transfer(Code2, 3);
-	r[5] = Transfer(Code2, 4);
-	r[6] = Transfer(Code2, 5);
+AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, ASM Code) {
+	CakeStack* stck = (CakeStack*)(r-1);
+	#define Zero r
+	switch ( Code&15 ) {
+		default: __builtin_unreachable();
+		Transfer3( 5);
+		Transfer3( 4);
+		Transfer3( 3);
+		Transfer3( 2);
+		Transfer3( 1);
+		case 0:;
+	}
+	#undef Zero
 
-	return Code + Tail_JUMPi;
+	CodePtr += Tail_JUMPi;
+	stck->Code = CodePtr;
+	return CodePtr;
 }
 
 

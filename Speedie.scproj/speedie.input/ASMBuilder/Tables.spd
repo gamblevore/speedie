@@ -86,16 +86,17 @@ function Debugger (fn_asm)
 										
 
 	|| num = 0
+	|&fatasm| fat
 	if fn == @func
 		exp = exp.last!
 		|| ch = exp.first
 			num = ch.int + 1
-			if num <= 1
-				exp.ADDB(asmreg(1), 0)  // non-removeable noop == debugat 0
-								// So we can track the op-runcount.
-								// then replace with a trap, later
-				return nil
-	exp.TRAP(num)
+			if num <= 1   // debugat 0 --> non-removeable noop. To track BreakCount
+				fat = exp.ADDB(asmreg(1), 0)
+	if !fat
+		fat = exp.TRAP(num)
+	
+	fat.µRefCount++
 
 
 function Swap (fn_asm)
