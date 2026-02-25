@@ -7,7 +7,17 @@
 module SC_Targets
 	|dictionary of string| Items = dictionary()
 	syntax Access (|string| name, |bool|)
+		opt norefcounts
 		return .items.valuelower(name).yes
 
 	syntax Access (|string| name, assigns:|bool|)
+		opt norefcounts
 		.items.valuelower(name) = value.string
+		
+	render List
+		for (v in .items) (k)
+			fs <~ k
+			fs <~ ": \""
+			fs <~ v
+			fs <~ "\"\n"
+		fs <~ "\n"

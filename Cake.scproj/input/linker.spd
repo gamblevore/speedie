@@ -97,19 +97,20 @@ module SpdTable
 			|| µ = base[]
 			|| Op = µ.op
 			if op.IsSPDFunc
-				base.PutCandlesOnCake(µ)
+				base.LightCandles(µ)
 			  elseif op.IsGlob and µ.IsLibGlob
 				base.LibGlob(µ, op == asm.GOBJ)
 			base += µ.size
 
 
-function asm.PutCandlesOnCake (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
+function asm.LightCandles (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
 	opt norefcounts
-	|| err = .PutCandlesOnCakeSub(jumpandreg)
+	|| err = .MusicalSoaps(jumpandreg)
 		error (SpdTable.CurrFunc, err)
 
 
-function asm.PutCandlesOnCakeSub (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
+function asm.MusicalSoaps (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
+	description "Yes I am very bored... why else with these names?" 
 	opt norefcounts
 	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
 	
@@ -121,10 +122,7 @@ function asm.PutCandlesOnCakeSub (|&asm| self, |asm| JumpAndReg, |string?|) // S
 		ID &= 19~bits
 		
 	ID -= 31
-	if  ID <= 0
-		return nil
-	// IDs 0-31, are registers. The first 32-funcs are empty.
-	
+	require  ID > 0	
 	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart								// Fast-branch for speed.
 			|| Jump = (Pos - Self)|int|						// 19-bits

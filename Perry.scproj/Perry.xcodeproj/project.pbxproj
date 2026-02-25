@@ -40,7 +40,6 @@
 		AC13B2722EE1E77300BF1567 /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECC2961F9B3005EFB9D /* JB_FastString.cpp */; };
 		AC13B2732EE1E77300BF1567 /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC82961F9B3005EFB9D /* JB_String.cpp */; };
 		AC13B2742EE1E77300BF1567 /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECF2961F9B3005EFB9D /* JB_Dictionary.cpp */; };
-		AC13B2762EE1E77300BF1567 /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */; };
 		AC13B2772EE1E77300BF1567 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
 		AC13B2782EE1E77300BF1567 /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
 		AC13B2832EE1E78E00BF1567 /* JB_Umbrella.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */; };
@@ -172,6 +171,11 @@
 		AC66D1462ED1D54C00EDFB82 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
 		AC66D1472ED1D54C00EDFB82 /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
 		AC8EA6B92D726C6F00158029 /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */; };
+		AC90B9162F4F5D2E006B4F52 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
+		AC90B9172F4F5D31006B4F52 /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
+		AC90B9182F4F5D54006B4F52 /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED32961F9B3005EFB9D /* JB_OSX.m */; };
+		AC90B9192F4F5D7C006B4F52 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
+		AC90B91B2F4F5DA1006B4F52 /* libExec.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC90B91A2F4F5DA1006B4F52 /* libExec.dylib */; };
 		ACA61E802F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
 		ACA61E812F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
 		ACA61E822F2BB6F800C71221 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */; };
@@ -220,13 +224,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		AC13B2512EE1E77300BF1567 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AC9E1719233A859B003B433F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AC9220A22857A127002F3F97;
-			remoteInfo = DebugBuilder;
-		};
 		AC13B2A82EE1E79C00BF1567 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AC9E1719233A859B003B433F /* Project object */;
@@ -254,6 +251,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = AC61010D2798768C00278BEF;
 			remoteInfo = Speedie;
+		};
+		AC90B9142F4F5C21006B4F52 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AC9E1719233A859B003B433F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC13B27F2EE1E78E00BF1567;
+			remoteInfo = ExecLib;
+		};
+		AC90B9202F4F5F4E006B4F52 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AC9E1719233A859B003B433F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AC90B91C2F4F5EEC006B4F52;
+			remoteInfo = ExecPerryBuilder;
 		};
 		ACB2D24D29BCCAB70070E60F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -340,7 +351,7 @@
 		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
 		AC1050122D6205EC00BB929B /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../Library/libSDL2.dylib; sourceTree = "<group>"; };
 		AC13B27E2EE1E77300BF1567 /* PerryExec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryExec.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC13B2A72EE1E78E00BF1567 /* libExecLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libExecLib.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC13B2A72EE1E78E00BF1567 /* libExec.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libExec.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_Intel.S; path = ../Library/CppLib/FF_Intel.S; sourceTree = "<group>"; };
 		AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_ARM64.S; path = ../Library/CppLib/FF_ARM64.S; sourceTree = "<group>"; };
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
@@ -418,6 +429,7 @@
 		AC66D15B2ED1D6DA00EDFB82 /* JB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JB.h; path = ../Cake.scproj/Cpp/JB.h; sourceTree = "<group>"; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSpeedie.dylib; path = Build/Debug/libSpeedie.dylib; sourceTree = "<group>"; };
+		AC90B91A2F4F5DA1006B4F52 /* libExec.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libExec.dylib; path = Build/Debug/libExec.dylib; sourceTree = "<group>"; };
 		ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_OSNative.cpp; path = ../GUI.scproj/gui.input/c_includes/JB_OSNative.cpp; sourceTree = SOURCE_ROOT; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -429,9 +441,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC13B2762EE1E77300BF1567 /* libSpeedie.dylib in Frameworks */,
 				AC13B2772EE1E77300BF1567 /* AVFoundation.framework in Frameworks */,
 				AC13B2782EE1E77300BF1567 /* libSDL2.dylib in Frameworks */,
+				AC90B91B2F4F5DA1006B4F52 /* libExec.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +451,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC90B9162F4F5D2E006B4F52 /* AVFoundation.framework in Frameworks */,
+				AC90B9172F4F5D31006B4F52 /* libSDL2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -608,7 +622,7 @@
 				ACB2D27929BCCAB70070E60F /* PerryDebug.app */,
 				AC66D14D2ED1D54C00EDFB82 /* Exec.app */,
 				AC13B27E2EE1E77300BF1567 /* PerryExec.app */,
-				AC13B2A72EE1E78E00BF1567 /* libExecLib.dylib */,
+				AC13B2A72EE1E78E00BF1567 /* libExec.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -616,6 +630,7 @@
 		ACE989F22EF043ED00526C32 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AC90B91A2F4F5DA1006B4F52 /* libExec.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -653,21 +668,35 @@
 			dependencies = (
 			);
 			name = ExecBuilder;
-			passBuildSettingsInEnvironment = 1;
+			passBuildSettingsInEnvironment = 0;
 			productName = debug;
 		};
-		AC9220A22857A127002F3F97 /* DebugBuilder */ = {
+		AC90B91C2F4F5EEC006B4F52 /* ExecPerryBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetdebug --target=exec --target=perry /usr/local/speedie/Perry.scproj";
-			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugBuilder" */;
+			buildArgumentsString = "--target=perryexec --nocolor --x --noisy  --nocompile --targetlist --targetdebug /usr/local/speedie/Perry.scproj";
+			buildConfigurationList = AC90B91D2F4F5EEC006B4F52 /* Build configuration list for PBXLegacyTarget "ExecPerryBuilder" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/local/bin/speedie;
 			buildWorkingDirectory = "";
 			dependencies = (
 			);
-			name = DebugBuilder;
-			passBuildSettingsInEnvironment = 1;
+			name = ExecPerryBuilder;
+			passBuildSettingsInEnvironment = 0;
+			productName = debug;
+		};
+		AC9220A22857A127002F3F97 /* DebugPerryBuilder */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "--nocolor --x --nocompile --targetlist --targetdebug /usr/local/speedie/Perry.scproj";
+			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugPerryBuilder" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/local/bin/speedie;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = DebugPerryBuilder;
+			passBuildSettingsInEnvironment = 0;
 			productName = debug;
 		};
 		AC9E17A5233A8B70003B433F /* ReleaseBuilder */ = {
@@ -681,7 +710,7 @@
 			dependencies = (
 			);
 			name = ReleaseBuilder;
-			passBuildSettingsInEnvironment = 1;
+			passBuildSettingsInEnvironment = 0;
 			productName = debug;
 		};
 		ACBA49F027AAB490009C2631 /* SpeedieBuilder */ = {
@@ -713,8 +742,9 @@
 			buildRules = (
 			);
 			dependencies = (
-				AC13B2502EE1E77300BF1567 /* PBXTargetDependency */,
+				AC90B9212F4F5F4E006B4F52 /* PBXTargetDependency */,
 				ACB529BB2EE9E5E900D6524D /* PBXTargetDependency */,
+				AC90B9152F4F5C21006B4F52 /* PBXTargetDependency */,
 			);
 			name = PerryExec;
 			productName = Multiplay;
@@ -736,7 +766,7 @@
 			);
 			name = ExecLib;
 			productName = SpeedieLib;
-			productReference = AC13B2A72EE1E78E00BF1567 /* libExecLib.dylib */;
+			productReference = AC13B2A72EE1E78E00BF1567 /* libExec.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		AC61010D2798768C00278BEF /* SpeedieLib */ = {
@@ -860,7 +890,8 @@
 				ACB86AF8260BB58900555758 /* PerryApp */,
 				AC61010D2798768C00278BEF /* SpeedieLib */,
 				AC13B27F2EE1E78E00BF1567 /* ExecLib */,
-				AC9220A22857A127002F3F97 /* DebugBuilder */,
+				AC9220A22857A127002F3F97 /* DebugPerryBuilder */,
+				AC90B91C2F4F5EEC006B4F52 /* ExecPerryBuilder */,
 				AC9E17A5233A8B70003B433F /* ReleaseBuilder */,
 				ACBA49F027AAB490009C2631 /* SpeedieBuilder */,
 				AC66D1522ED1D58700EDFB82 /* ExecBuilder */,
@@ -952,6 +983,7 @@
 				AC13B2AB2EE1E7BC00BF1567 /* JB_Globals.cpp in Sources */,
 				AC13B2852EE1E78E00BF1567 /* JB_Errors.cpp in Sources */,
 				AC13B2862EE1E78E00BF1567 /* JB_Compress.cpp in Sources */,
+				AC90B9182F4F5D54006B4F52 /* JB_OSX.m in Sources */,
 				AC13B2872EE1E78E00BF1567 /* JB_File.cpp in Sources */,
 				AC13B2882EE1E78E00BF1567 /* JB_Alloc.cpp in Sources */,
 				AC13B2892EE1E78E00BF1567 /* JB_MSR.cpp in Sources */,
@@ -975,6 +1007,7 @@
 				AC13B29D2EE1E78E00BF1567 /* JB_Saveable.cpp in Sources */,
 				AC13B29E2EE1E78E00BF1567 /* JB_PNG.cpp in Sources */,
 				AC13B29F2EE1E78E00BF1567 /* JB_Dictionary.cpp in Sources */,
+				AC90B9192F4F5D7C006B4F52 /* JB_OSNative.cpp in Sources */,
 				AC13B2A02EE1E78E00BF1567 /* JB_Utils.cpp in Sources */,
 				AC13B2A12EE1E78E00BF1567 /* JB_Array.cpp in Sources */,
 				AC13B2A22EE1E78E00BF1567 /* JB_Main.cpp in Sources */,
@@ -1143,11 +1176,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		AC13B2502EE1E77300BF1567 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AC9220A22857A127002F3F97 /* DebugBuilder */;
-			targetProxy = AC13B2512EE1E77300BF1567 /* PBXContainerItemProxy */;
-		};
 		AC13B2A92EE1E79C00BF1567 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AC66D1522ED1D58700EDFB82 /* ExecBuilder */;
@@ -1168,6 +1196,16 @@
 			target = AC61010D2798768C00278BEF /* SpeedieLib */;
 			targetProxy = AC7E16DC29703FE100CE3387 /* PBXContainerItemProxy */;
 		};
+		AC90B9152F4F5C21006B4F52 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC13B27F2EE1E78E00BF1567 /* ExecLib */;
+			targetProxy = AC90B9142F4F5C21006B4F52 /* PBXContainerItemProxy */;
+		};
+		AC90B9212F4F5F4E006B4F52 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AC90B91C2F4F5EEC006B4F52 /* ExecPerryBuilder */;
+			targetProxy = AC90B9202F4F5F4E006B4F52 /* PBXContainerItemProxy */;
+		};
 		ACB2D24C29BCCAB70070E60F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AC61010D2798768C00278BEF /* SpeedieLib */;
@@ -1175,7 +1213,7 @@
 		};
 		ACB2D27C29BCCB9D0070E60F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AC9220A22857A127002F3F97 /* DebugBuilder */;
+			target = AC9220A22857A127002F3F97 /* DebugPerryBuilder */;
 			targetProxy = ACB2D27B29BCCB9D0070E60F /* PBXContainerItemProxy */;
 		};
 		ACB529BB2EE9E5E900D6524D /* PBXTargetDependency */ = {
@@ -1317,7 +1355,7 @@
 					"-Wno-nullability-completeness",
 					"-D__VM__",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Exec;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -1349,7 +1387,7 @@
 					"-Wno-nullability-completeness",
 					"-D__VM__",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Exec;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -1528,6 +1566,24 @@
 			name = Debug;
 		};
 		AC66D1552ED1D58700EDFB82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		AC90B91E2F4F5EEC006B4F52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AC90B91F2F4F5EEC006B4F52 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEAD_CODE_STRIPPING = YES;
@@ -1946,7 +2002,16 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugBuilder" */ = {
+		AC90B91D2F4F5EEC006B4F52 /* Build configuration list for PBXLegacyTarget "ExecPerryBuilder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC90B91E2F4F5EEC006B4F52 /* Debug */,
+				AC90B91F2F4F5EEC006B4F52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugPerryBuilder" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AC9220A42857A127002F3F97 /* Debug */,

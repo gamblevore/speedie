@@ -611,6 +611,10 @@ AlwaysInline void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, ASM Code) {
 	CakeStack* stck = (CakeStack*)(r-1);
 	#define Zero r
+	int J = Tail_JUMPi;
+	CodePtr += J;
+	if (Code&16)
+		CodePtr = (ASM*)(r[J&31].Uint);
 	switch ( Code&15 ) {
 		default: __builtin_unreachable();
 		Transfer3( 5);
@@ -622,26 +626,10 @@ AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, 
 	}
 	#undef Zero
 
-	CodePtr += Tail_JUMPi;
 	stck->Code = CodePtr;
 	return CodePtr;
 }
 
-
-
-
-//	HaltStack.DestReg = 1;
-//	HaltStack.Alloc = 0;
-//	HaltStack.Depth = 1;
-//	HaltStack.GoUp = 0;
-//	HaltStack.Code = VMCodePtr(&V) + CakeCodeMax-1;
-//
-//	auto Code = VMProtect(V, true) + CodeIndex;
-//	MainStack.DestReg = 1;
-//	MainStack.Alloc = 0;
-//	MainStack.Depth = 1;
-//	MainStack.GoUp = 0;
-//	MainStack.Code = Code;
 
 AlwaysInline ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
@@ -650,9 +638,9 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op
 	{
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		auto OldStack = (CakeStack*)(r-1);
-		if_rare (NewStack >= End) {			// stackoverflow
+		if_rare (NewStack >= End) {				// Stackoverflow
 			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
-			vm.Registers[2] = {.Int = errno}; // clear stack. its gone. And we already reported it.
+			vm.Registers[2] = {.Int = errno};	// Clear stack. Its gone. And we already reported it.
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		
@@ -662,11 +650,13 @@ AlwaysInline ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op
 	}
 	NewStack->DestReg = Dest;
 	NewStack->GoUp = 0;
-//	NewStack->Alloc = vm.AllocCurr;
-//	vm.CurrStack = NewStack;
 	auto Zero = ((CakeRegister*)NewStack)+1;
 	rp = Zero;
-	CodePtr += Func_JUMPi;
+	
+	Dest = Func_JUMPi;
+	CodePtr += Dest;
+	if (Code&16)
+		CodePtr = (ASM*)(r[Dest&31].Uint);
 	NewStack->Code = CodePtr;
 
 	switch ( Code&15 ) {

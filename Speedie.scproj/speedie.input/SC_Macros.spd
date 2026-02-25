@@ -85,11 +85,30 @@ function message.TargetTest (|bool|) // target true, target false,
 		return .TargetThg
 
 
-function message.TargetThg (|bool|) // target true, target false,
-	expect (self ~!= "mac" or "macos")     (self, "Use OSX")
-	expect (self ~!= "linux")   (self, "Use lin")
-	expect (self ~!= "windows") (self, "Use win")
-	expect (self ~!= "import")  (self, "Use imported")
+function message.TargetThg (|bool|)
+	return .name.targetthg(self)
+
+
+function string.InBuiltTargetWrong (|string?|)
+	if (self ~= "mac" or "macos")
+		return "OSX"
+	if (self ~= "linux")
+		return "lin"
+	if (self ~= "windows")
+		return "win"
+	if (self ~= "import")
+		return "imported"
+	return nil
+
+
+function string.InBuiltTarget (|message| err=nil, |SortComparison|)	// target true, target false,
+	opt norefcounts
+	|| Prefered = .inbuilttargetwrong
+	if Prefered != nil
+		if err
+			error (Err, "Use " + Prefered)
+		return 0
+		
 	if self ~= "cake"
 		return options.mode == options.cake
 	if self ~= "cpp"
@@ -118,7 +137,13 @@ function message.TargetThg (|bool|) // target true, target false,
 		return Options.ProjectisLibrary
 	if self ~= "minilib"
 		return options.ProjectIsMiniLib
+	return -1
 		
+
+function string.TargetThg (|message| err, |bool|)	// target true, target false,
+	|| Found = .InBuiltTarget(err)
+	if Found >= 0
+		return Found
 	return SC_Targets[.name]
 
 

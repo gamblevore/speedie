@@ -86,7 +86,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		p <~ "--noisy"
 	p <~ "--check"
 	
-	target debug and (!cake and !exec)
+	target debug and !perryexec
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
@@ -105,10 +105,10 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			return spd
 
 
-target debug and !cake and !exec
+target debug
 	// cake shouldn't have access to this I think...
-	target exec
-		cpp_libwrapper Exec_Main (spdprocess.Thread)
+	target perryexec
+		cpp_libwrapper Cake_Main (spdprocess.Thread)
 	  else
 		cpp_libwrapper Speedie_Main (spdprocess.Thread)
 || SpdLibAlreadyInUse = false

@@ -46,22 +46,6 @@ function compiler.PrintCompileTime (|date| durr)
 
 
 
-function compiler.PrintStats 
-	require options.argstats
-	|| fs = faststring()
-	fs <~ "FuncStats: "
-	for i in 12
-		|| c = scfunction.FuncStats[i]
-			if i
-				fs <~ ", "
-			fs <~ i
-			fs <~ ":"
-			fs <~ c
-	
-//	SCFunction.PrintStats(fs)
-	printline fs
-
-
 function compiler.PrintCompileErrors
 	if Options.Warnings
 		require stderr.HasAnything

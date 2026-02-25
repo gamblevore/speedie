@@ -27,3 +27,12 @@ main
 	require debugger.Load
 	return SpdTable.RunProgram
 
+
+api Cake_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
+	// to debug Cake from Perry
+	cpp_name Cake_Main 
+	rz = app.sp_run(args, mode&4)
+	comms.UseAsParent // phew
+	if rz == 0
+		rz = app.sp_run(args, mode)
+

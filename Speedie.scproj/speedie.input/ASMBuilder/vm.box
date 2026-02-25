@@ -385,9 +385,8 @@ POS 2
 	TAIL (Tail)
 		Code = TailStack(vm, r, Code+1, Op, *Code)
 
-
 POS 24 // force position
-	FNC (Func)			// func: 
+	FNC (Func)			// func:		// we could merge these two by fall-through?
 		Code = BumpStack(vm, r, Code+1, Op, *Code)
 
 POS 25

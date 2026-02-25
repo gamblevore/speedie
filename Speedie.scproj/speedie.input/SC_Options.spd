@@ -30,7 +30,7 @@ module Options
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
 	||		ProjectIsMiniLib		= false
-	||		ArgStats				= false
+	||		Noisy					= false
 	||		PrintCompileString		= false
 	||		PrintStages				= false
 	||		Warnings				= false
@@ -300,11 +300,11 @@ module Feedback
 			SC_Targets["flow"] = b
 
 		+'noisy'
-			Explain(Purpose, "Prints more stuff.")$
-			"NoiseActivated"
-			Options.PrintCompileString = true
-			options.PrintLibraries = true
-			options.argstats = true
+			Explain(Purpose, "Prints more stuff")$
+			|| b = value.yes
+			Options.PrintCompileString = b
+			options.PrintLibraries = b
+			options.noisy = b
 		
 		+'alive'
 			Explain(purpose)$
@@ -385,12 +385,16 @@ module Feedback
 		+'targetdebug'
 			Explain(Purpose, "Enables your own debug code in compiled-output.")$
 			options.targetdebug = value.optionbool
+
 		
 		+'target'
 			Explain(Purpose, "Set names used by preprocessor. --target=AnyName")$
 			if value ~= "debug"
 				error "Use 'targetdebug' instead."
-			SC_Targets[value] = true
+			  elseif value.InBuiltTarget >= 0
+				error "Target is inbuilt already: " + value
+			  else
+				SC_Targets[value] = true
 //	
 //		+'k'
 //			Explain(purpose)$
