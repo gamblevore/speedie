@@ -395,10 +395,6 @@ module Feedback
 				error "Target is inbuilt already: " + value
 			  else
 				SC_Targets[value] = true
-//	
-//		+'k'
-//			Explain(purpose)$
-//			options.WhateverDebug = true
 			
 		+'warn'
 			Explain(Purpose, "Show warnings.")$

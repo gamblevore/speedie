@@ -45,7 +45,12 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
 		return
 	
-	|| cake = SPDProcess.spawn(cake, args, ProcessMode.OwnGroup, f.name)
+	target perryexec
+/		|| cake = (Cake_Main).Spawn(CakeExec, args)
+	  else
+		|| cake = SPDProcess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)
+	
+	if cake
 		|| break = .CollectBreakPoints
 		|| hoi = cake.Get(5.0)
 			cake <~ break
