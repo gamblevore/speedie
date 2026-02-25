@@ -673,7 +673,7 @@
 		};
 		AC90B91C2F4F5EEC006B4F52 /* ExecPerryBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--target=perryexec --nocolor --x --noisy  --nocompile --targetlist --targetdebug /usr/local/speedie/Perry.scproj";
+			buildArgumentsString = "--target=perryexec --nocolor --x --noisy  --nocompile --targetdebug /usr/local/speedie/Perry.scproj";
 			buildConfigurationList = AC90B91D2F4F5EEC006B4F52 /* Build configuration list for PBXLegacyTarget "ExecPerryBuilder" */;
 			buildPhases = (
 			);
