@@ -851,7 +851,7 @@ GUI_ctrl_DeclutterSet
 GUI_ctrl_Decluttered
 GUI_ctrl_Destructor
 GUI_ctrl_Draw
-GUI_ctrl_FullScreenSet
+GUI_ctrl_EntireScreenSet
 GUI_ctrl_Gesture
 GUI_ctrl_GotFocus
 GUI_ctrl_HasAnyFocus
@@ -973,12 +973,10 @@ JB_ASM_Code
 JB_ASM_FillTable
 JB_ASM_Index
 JB_ASM_InitTable
-JB_ASM_Pause
-JB_ASM_PrevStack
+JB_ASM_LinkPico
 JB_ASM_Registers
 JB_ASM_Run
 JB_ASM_SetDebug
-JB_ASM_StackCode
 JB_ASM__VM
 JB_AllClasses
 JB_App__AppPath
@@ -1050,6 +1048,7 @@ JB_Array_FastRemove
 JB_Array_Find
 JB_Array_First
 JB_Array_GlobExpand
+JB_Array_Insert
 JB_Array_Last
 JB_Array_Next
 JB_Array_NextSet
@@ -1418,6 +1417,7 @@ JB_Lk_Constructor
 JB_Lk_Destructor
 JB_Lk_Test
 JB_Lk__New
+JB_MPC_Spawn
 JB_MSR_DecodeEntitySet
 JB_MSR_EscapeCodeSet
 JB_Macro_CallFast
@@ -1607,7 +1607,6 @@ JB_Pico_NameSet
 JB_Pico_SendString
 JB_Pico_Thread_Spawn
 JB_Pico_Tickle
-JB_Pico_UseAsParent
 JB_Pico__Fork
 JB_Pico__From
 JB_Pico__New
@@ -1637,7 +1636,6 @@ JB_Proc_LastSend
 JB_Proc_Send
 JB_Proc_SendStr
 JB_Proc_SpawnAsChild
-JB_Proc_Thread_Spawn
 JB_Proc_TimeWaitingForReply
 JB_Proc_TimedOut
 JB_Proc__Spawn
