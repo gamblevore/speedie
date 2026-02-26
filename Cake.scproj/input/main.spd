@@ -17,7 +17,6 @@ main
 	require cake.InputFile
 	
 	|| p = cake.perry
-		"CAKEEEE"
 		p <~ "`hoi :3`"
 	
 	require CakeRun.GetStructure
