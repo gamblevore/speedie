@@ -23,16 +23,27 @@
 // we need to put a breakpoint in the original file... then see what happens
 
 
+function cakevm.PerryAnswer (|cakestack| stack)
+	|jbin--| j = .StartStack
+	.StackToPerry(stack, 0, j)
+/	cake.Perry! <~ j
+	
+	
+
 function __PerryView__ (cakevm.CakeChef)
 	// perry always exists by now
 	if (ErrorCode)
 		.SendCrash(stack)
 	.ClearTempBreak(stack)
 	
-	while !.StopCheckMessages or ErrorCode
-		|| j = .getjbin
-		.UpdatePerry(stack, 0, j)
-		cake.Perry! <~ j
+	.PerryAnswer(stack)
+	while {										// no resuming if theres an error.
+		|| Resume = false
+		while !Resume
+			|| m = cake.perry.Get(5.0)
+				Resume = .ResumeCode(m)
+				.PerryAnswer(stack)
+	} (ErrorCode)
 
 
 prototype PerryResponse (|cakevm| self, |message| m, |bool|)
@@ -43,23 +54,23 @@ dispatch DebuggerActions (PerryResponse)
 		opt norefcounts
 		return .IsDebugging(2-(m.firstname=="fast"))
 	
-	stop:		app.quit
-		
-	pause:		return false // caller already updates...
-		
 	stepin:		return .TempBreak(.StepIn)
 		
 	stepout:	return .TempBreak(.StepOut)
 		
 	stepover:	return .TempBreak(.StepOver)
 
+	stop:		app.quit
+		
+	pause:		return false // caller already updates...
+		
 //	stepback:0 // todo
 
 
 function cakevm.ClearTempBreak (|cakestack| stack)
 	|| index = .Index(stack.code)
 	|| B = cake.ActiveBreaks
-	if B and index > 0
+	if B and index
 		|| Break = B + index
 		if break == debugger.BreakToClear
 			debugger.BreakToClear = nil
@@ -67,9 +78,7 @@ function cakevm.ClearTempBreak (|cakestack| stack)
 
 	
 function cakevm.TempBreak (|?&uint| Break, |bool|)
-	if !Break
-		return true
-	ifn break[]>>31 // has no breakpoint... add one
+	if break and !(break[]>>31) // has no breakpoint... add one
 		break[] |= 1<<31
 		debugger.BreakToClear = break // nice
 	return true
@@ -87,58 +96,54 @@ function cakevm.StepOver (|&uint|)
 
 function cakevm.SendCrash (|cakestack| stack)	
 
-
-function cakevm.StopCheckMessages (|bool|)
-/	|| m = cake.perry.Get(0.01)$
-	return .ResumeCode(m)
-
 	
 function cakevm.ResumeCode (|message| m, |bool|)
-	if m == @tmp
+/	if m == @tmp
 		|| fn = DebuggerActions[m.name]
 			return (fn[])(cake.vm, m)
 	printerror "Debugger received unexpected " + m.Name
 
 
-function cakevm.GetJBin (|jbin--|)
-/	|jbin--| j = XVar.printer
+function cakevm.StartStack (|jbin--|)
+	|jbin--| j = XVar.printer
 	if j.Length
 		debugger
 		j.Length = 0
 	
 	j <~ jbin.header
-	j.enter @arg
+	j.tmparg("stack")
 	return j
 
 
 
-function cakevm.UpdatePerry (|cakestack| stack, |int| Count, |jbin| j)
+function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j)
 	opt norefcounts
 	while stack
-/		|| err = .CheckStack(stack)
+		|| err = .CheckStack(stack)
+		if err != nil
 			j.add(@tmp, err)
 			exit
 		
-		|faststring| fs
-		if !Count++
-			fs = VariablePrinter init FastString()
+		|| fs = (debugger.VariablePrinter, nil)(!Count)
+		Count++
 
 		.CollectStack(stack, j, fs)
 		Stack = .prev(stack)
 	
 
-function cakevm.CheckStack (|cakestack| stack, |string|)
-/	if !Memory.Test(Stack, 16):				return "StackCorrupt"
+function cakevm.CheckStack (|cakestack| stack, |string?|)
+	if !Memory.Test(Stack, 16):				return "StackCorrupt"
 	if stack < .basestack:					return "StackUnderflow"
 	|| Depth = stack.Depth - 1
 	|| Down = stack.DestReg
 	if !Down or Down > 31:					return "StackBad"
 	Stack -= Down + 1
 	if stack.Depth!=Depth:					return "StackTripped"
+	return nil
 
 
 function cakevm.Prev (|cakestack| stack, |&cakestack|)
-/	|| Down = stack.DestReg
+	|| Down = stack.DestReg
 	Stack -= Down + 1
 	if stack >= .BaseStack
 		return Stack
@@ -150,9 +155,8 @@ function jbin.SyntaxExpect (|string| s, |int64| Code)
 	.exit
 
 
-|faststring| VariablePrinter
 function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
-/	opt norefcounts
+	opt norefcounts
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
 	|| Where = debugger.SrcMap(index)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
@@ -170,7 +174,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 		index -= fn.Position
 		for v in Locals
 			if v contains index
-				j.Enter(@tmp, v.name)
+/				j.Enter(@tmp, v.name)
 
 				v.RenderType(vars)
 				j.AddStr(vars|string|)

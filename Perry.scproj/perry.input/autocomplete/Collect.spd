@@ -108,9 +108,9 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 target debug
 	// cake shouldn't have access to this I think...
 	target perryexec
-		cpp_libwrapper Cake_Main (spdprocess.Thread)
+		cpp_libwrapper Cake_Main (spdprocess.MicroProcess)
 	  else
-		cpp_libwrapper Speedie_Main (spdprocess.Thread)
+		cpp_libwrapper Speedie_Main (spdprocess.MicroProcess)
 || SpdLibAlreadyInUse = false
 
 

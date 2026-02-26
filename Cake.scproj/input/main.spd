@@ -1,5 +1,4 @@
 
-
 module Cake
 	|String|     Speedie = "/usr/local/bin/speedie"
 	|SpdProcess| Perry = app.parent
@@ -18,6 +17,7 @@ main
 	require cake.InputFile
 	
 	|| p = cake.perry
+		"CAKEEEE"
 		p <~ "`hoi :3`"
 	
 	require CakeRun.GetStructure
@@ -28,11 +28,13 @@ main
 	return SpdTable.RunProgram
 
 
-api Cake_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
+
+api Cake_Main (spdprocess.MicroProcess)
 	// to debug Cake from Perry
 	cpp_name Cake_Main 
+	SpdProcess._ForceParent = Comms
 	rz = app.sp_run(args, mode&4)
-	comms.UseAsParent // phew
 	if rz == 0
 		rz = app.sp_run(args, mode)
+	memory.Free(args) // no need anymore!
 

@@ -41,7 +41,8 @@ extern "C" {
         return __FLT_MAX__;
     }
     inline float JB_f__nan () {
-        return __builtin_nanf("");
+		const int x = ((1<<11)-1)<<21;
+		return reinterpret_cast<const float&>(x);
     }
 
 #if __PLATFORM_CURR__ != __PLATFORM_OSX__

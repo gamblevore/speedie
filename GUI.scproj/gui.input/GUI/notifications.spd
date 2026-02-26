@@ -81,7 +81,7 @@ module Notifications
 				w.remove
 		
 	
-	syntax append (|string| desc, |message| details=@emb.msg, |errorseverity| strength=errorseverity.ok)
+	syntax append (|string| desc, |message| details=nil, |errorseverity| strength=errorseverity.ok)
 		cpp_part Str
 		self <~ error(details, desc, strength)
 

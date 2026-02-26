@@ -10,7 +10,7 @@ function PerryIDE.ACTUAL_COMPILE
 	  else
 		args <~ "--perry=bin"
 	
-	if (.DebugMode is Cake)
+	if (.DebugMode is CakeMode)
 		args <~ "--bake"
 	if (.debugmode is debug)
 		args <~ "--targetdebug"
@@ -22,46 +22,26 @@ function PerryIDE.ACTUAL_COMPILE
 		.GUIIsCompiling(args)
 
 
-function filerow.CollectDebugSub (|jbin| j, |message| s, |string| d)
-	opt norefcounts
-	|| Depth = 0
-	for c.flat in s
-		if s is BreakPoint
-			Depth ?= j.TmpArg(.Location) // what about the position of the line??? we do need two numbers!
-			j.AddInt d.Find(charset.Line, s.position, 0)
-			j.AddInt d.find(charset.line, s.position, int.max)
-	j.exit(Depth)
-	
-
 function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug also. but whatever
 	|| out = .DebugAppCallArgsDisplay(F, args)
 	|| str = out.GetResult
 	.ProductOut.Log(str, 256K)
 	.LogOneAction(str)
-	out <~ ("\n", 2)
+	out <~ ('\n', 2)
 
-	if .DebugMode isnt cake
+	if .DebugMode isnt cakeMode
 		.LogOneAction("Unix Debug: " + f)
 		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
 		return
 	
 	target perryexec
-/		|| cake = (Cake_Main).Spawn(CakeExec, args)
+		args.insert(0, f)
+		|| cake = (Cake_Main).Spawn(CakeExec, args)
 	  else
-		|| cake = SPDProcess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)
+		|| cake = spdprocess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)
 	
-	if cake
-		|| break = .CollectBreakPoints
-		|| hoi = cake.Get(5.0)
-			cake <~ break
-/			.LogOneComm(hoi, "Cake Alive")
-			.RunCompileSub(cake)
-		  else
-			cake = nil
-	
-	if !cake
-		.DebugMode = 0
-		Notifications <~ "Debug connection lost"
+	.RunCompileSub(cake)	
+
 
 
 function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
@@ -73,7 +53,6 @@ function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
 	argmsg.Ask
 	
 	|| f = Product
-//	|| IsDebug = .DebugMode is debug
 	|| args = ArgMsg.DebugArgNames
 	if product.IsDir and Platform.OSX
 		f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!

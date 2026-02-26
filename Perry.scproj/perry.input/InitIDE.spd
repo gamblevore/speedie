@@ -629,6 +629,7 @@ extend PerryIDE
 		g.OnKeyDown = LogAreaKeys
 		.LogComms = .AddBaseLog("-- speedie comms --")
 		.LogActions = .AddBaseLog("-- perry actions --")
+		.LogCake = .AddBaseLog("-- cake actions --")
 	
 	
 	function AddBaseLog (|string| s, |listviewrow|)
@@ -656,10 +657,11 @@ extend PerryIDE
 
 	function LogOneAction (|message| msg, |string| type="")
 		opt norefcounts
-		.LogOneThing(msg, type, .LogActions$)
+
 
 	function LogOneAction (|string| msg, |string| type="")
-		.LogOneAction(@emb + msg)
+		.LogOneThing(@emb + msg, type, .LogActions$)
+
 
 	function ErrorLogInit (|listview| lv, |string| s)
 		with lv
@@ -744,7 +746,7 @@ extend PerryIDE
 			.Stack.use(stk)
 		|| vars = v as listviewrow
 			.Variables.use(vars)
-		.appinfo.text = "Speedie\n(Inactive)"
+		.SetAppInfo
 	
 	
 	function RelistStartupErrors

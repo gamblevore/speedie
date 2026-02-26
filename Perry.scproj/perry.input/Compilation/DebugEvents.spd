@@ -1,15 +1,20 @@
 
 
 datatype CompileMode (int)
-	constants
+	flags
 		|CompileMode|
 		Compile = 0
-		Debug = 1
-		Run = 2
-		Cake = 4
+		Debug
+		Run
+		CakeMode
+		ReceivedHello
+		Finished
 	syntax is (|CompileMode| M, |bool|)
 		return (self&M) == M
-	
+	syntax is (|CompileMode| M, assigns:|bool|, |CompileMode|)
+		if Value
+			return self|||M
+		return self&~M
 	
 
 function DebugArgsKeyDown (GUIKeyEvent)
@@ -74,8 +79,6 @@ function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
 	return !prod
 
 
-
-
 function PressingDebug (GUIAction)
 	opt norefcounts
 	|| db = .ide.DebugArgsText
@@ -120,8 +123,6 @@ function PerryIDE.DebugPath (|message| conf)
 			app.cwd = path
 
 
-
-
 function PerryIDE.CompileTab (|int| i, |listviewrow|) // for autocomplete
 	return .CompileTabs.ButtonSource[i]
 
@@ -150,16 +151,20 @@ function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 
-	|| rout = r.readstdout
+	|| rout = r.ReadStdOut
 		.UpdateProductText(r, rout)
-	
+
 	|| x = r.Status	
 	if kill or !x.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
+		.SetAppInfo
 	
 	.AddProductErr(r.ReadStdErr)
 	
+	if !kill and r isa SpdProcess
+		.CakeTalk(r)
+
 	if kill
 		.ProductOut.log("\n(--Process Killed--)")
 	  elseif !x.IsRunning

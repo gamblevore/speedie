@@ -47,7 +47,10 @@ extend PerryIDE
 			Clickedcompile(.buildbutton)
 			return true
 		if key is r
-			ClickedDebug(.runButton)
+			if keys.shift
+				PressingDebug(.runbutton)
+			  else
+				ClickedDebug(.runButton)
 			return true
 		if key is o
 			if keys.shift

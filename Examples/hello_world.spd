@@ -1,20 +1,18 @@
 #!/usr/local/bin/cake
 
-|| Count = 123
+|| Count = 0
 main
 	opt norefcounts
-	debugat 0
-/	Count++
 /	zalgoline "start world\n\n"
 /	RecursiveHello()
 /	zalgoline "\n\nend world"
 //	app.crash
-	Platform.HALT_Clean
+//	Platform.HALT_Crash
 
 
 function RecursiveHello	(|int| A=1)
 	"hello world: $Count"
 /	Count++
-	if A < 100
+	if A < 13
 		RecursiveHello(A+1)
 

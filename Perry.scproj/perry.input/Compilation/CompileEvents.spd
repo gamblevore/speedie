@@ -1,32 +1,41 @@
 
 
 function ClickedCompile (GUIaction)
-	|| DebugArgs = .ide.DebugArgs
-	if !DebugArgs
-		.ide.DebugArgsText.SetFocus
+	opt norefcounts
+	|| i = .ide
+	|| mode = i.WantCake(compilemode.compile)
+	i.compile(mode)
+
+
+function perryide.WantCake (|CompileMode| Mode, |compilemode|)
+	|| DebugArgs = .DebugArgs	
+		if DebugArgs["compile"] ~= "cake"
+			Mode |= CompileMode.CakeMode
+	  else
+		.DebugArgsText.SetFocus
 		notifications <~ "Please fix the debug args first."
-		return nil
-	
-	|| mode = CompileMode.compile
-	if DebugArgs["compile"] ~= "cake"
-		mode |= CompileMode.Cake
-	
-	.ide.compile(mode)
+		mode = nil	
+	return mode	
 
 
 function ClickedDebug (GUIAction)
+	opt norefcounts
 	|| i = .ide
-	if .text == "\02"		// play
-		require i.MakeNothingRunning(" before debugging?")
-		|| alt = keys.shift or keys.option
-		|| Mode = compilemode.Debug ||| (alt*CompileMode.Cake)
-		i.compile(Mode)
-		i.ShowText(i.ProductOut, "", false)
-		|| itm = i.CompileTabs.ButtonSource[3]
-			(itm is hidden)
-		i.ProductErrors.text = ""
-	  elseif .text == "\07" // stop
-		require i.MakeNothingRunning("?")
+
+	if (.text == "\07") // stop
+		i.MakeNothingRunning("?")
+		return nil
+		
+	require i.MakeNothingRunning(" before debugging?")
+	|compilemode| CakeMode
+	target debug
+		cakemode = (.text == "\02") * CompileMode.CakeMode // play
+	CakeMode = i.WantCake(cakemode|||compilemode.debug)
+	i.compile(CakeMode)
+	i.ShowText(i.ProductOut, "", false)
+	|| itm = i.CompileTabs.ButtonSource[3]
+		(itm is hidden)
+	i.ProductErrors.text = ""
 
 
 function PerryIDE.Compile (|CompileMode| Mode)
@@ -60,8 +69,12 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 
 
 function PerryIDE.RunCompileSub (|unixprocess| r)
-	if r and r.PID
+	if r.PID or (r isa SpdProcess)
 		.RunCompiledApp = r
 		.ShowProductIfMoreOutput = 0
 		.RunButton.text = "\07"
+		.SetAppInfo
+
+
+
 

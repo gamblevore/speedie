@@ -50,7 +50,7 @@ struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;  operator bool () {return Data;}; };
 #pragma pack(pop)
 
-typedef void	(*PicoThreadFn)		(PicoComms* M, unsigned int Mode, const char** Args);
+typedef int		(*PicoThreadFn)		(PicoComms* M, unsigned int Mode, const char** Args);
 typedef int		(*PicoObserverFn)	(PicoDate CurrTime);  /// Receives the time via clock_gettime(CLOCK_REALTIME)
 typedef char*   (*PicoAppenderFn)	(void* Obj, int Length);
 typedef int		(*PicoActionFn)		(void* Upon, char* Data, int MsgLength);
@@ -88,7 +88,7 @@ struct PicoTrousers { // only one person can wear them at a time.
 
 
 
-struct 			PicoConfig  {
+struct PicoConfig {
 	char 				Name[16];		/// Used for reporting events to stdout.
 	PicoDate			LastRead;		/// The date of the last read.
 	PicoDate			LastSend;		/// The date of the last send.
@@ -657,10 +657,10 @@ struct PicoComms : PicoConfig {
 	void SetAction (PicoAction* Fn) {
 		GrabLock.lock();
 		auto Msg = (char*)PreData;
+		ReceiveAction = Fn;
 		if (Msg) {						// make sure we don't miss any message.
 			(Fn->Action)(Fn->Upon, Msg, PreLength);
 		}
-		ReceiveAction = Fn;
 		GrabLock.leave();
 	}
 	
@@ -749,7 +749,7 @@ struct PicoComms : PicoConfig {
 		auto Args = (const char**)R->ThreadArgs;
 		auto Mode = R->ThreadMode;
 		S->ThreadArgs = 0; R->ThreadArgs = 0;
-		(fn)(C, Mode, Args);
+		C->PIDStatus = (fn)(C, Mode, Args);
 		C->AskDestroy("ThreadCompleted");
 		return 0;
 	}

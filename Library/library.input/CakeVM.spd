@@ -52,7 +52,7 @@ target cpp or vm {
 		while !.IsDebugging(3)
 			0
 
-	function Index		(|&uint| Code, |int|)
+	function Index		(|&uint| Code, |ind|)
 		cpp_wrapper JB_ASM_Index
 	
 	function DummyChef	(CakeChef)		

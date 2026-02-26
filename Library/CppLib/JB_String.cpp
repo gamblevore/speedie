@@ -1776,8 +1776,11 @@ Array* JB_Str_ArgV(const char** ArgV) {
         const char* c = *++ArgV;
         if (!c)
 			break;
-        if (c[0] == '-' and c[1] == '-' and c[2] == 0)
-			break; // useful to ignore arguments that xcode is spamming us with.
+		// this is actually meant to signify that these are...
+		// NOT switches... so yeah.
+		// I guess i should leave it in.
+//        if (c[0] == '-' and c[1] == '-' and c[2] == 0)
+//			break; // useful to ignore arguments that xcode is spamming us with.
 				   // its also a unix semi-convention
         JB_Array_Append(Result, JB_StrC(c));
     }

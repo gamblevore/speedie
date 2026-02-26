@@ -1,6 +1,6 @@
 
 
-prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil)
+prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil, |ErrorInt|)
 prototype PicoActionFn (|&nil| self, |&int8| Data, |int| Length, |ErrorInt|)
 
 
@@ -30,6 +30,7 @@ function @string.FromPico (|picomessage| M, |string|)
 
 
 struct PicoConfig
+	// needs to be adjusted (For cake) along with ALL the speedie structs ;_;
 	linkage: wrapper, cpp_part PCF
 	|int8[16]| 				Name
 	|Date|					LastRead
@@ -147,8 +148,10 @@ struct Pico
 			
 		function Create (|cstring| Name, |int| ByteBufferSize = 0, |?&pico|)
 			cpp_wrapper PicoCreate
-
-		function Fork (|stringzeroterminated| name="", |int| Noise=piconoise.events,   |&pico|)
+		
+		// could we rename this to app.fork? it kinda makes more sense, right?
+		// i mean... we don't HAVE an app.fork...
+		function Fork (|StringZeroTerminated| name="", |int| Noise=piconoise.events,   |&pico|)
 			|| p = .new(name, noise)
 				|| pid = p.spawnfork
 				if pid >= 0

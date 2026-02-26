@@ -16,11 +16,11 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 "
 	contains SpdProcess
 	|jbin|						Writer
-	|?spdprocess.Thread|		SubProcess
+	|?MicroProcess|				SubProcess		// mostly exists for debug
 	|int| 						DeathLimit
 	|bool|						AlreadyWarnedDied
 
-	constructor	(|string| path, |?spdprocess.Thread| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
+	constructor	(|string| path, |?MicroProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
 		mode |= ProcessMode.MsgPassing
 		super.constructor(path, mode, params, pico)
 		.deathlimit = 12
@@ -160,28 +160,32 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			yield msg
 
 
+	function app.Parent (|bool| Expect=false, |spdprocess?|)
+		opt norefcounts
+		if spdprocess.CheckedParent
+			return spdprocess._parent
+		spdprocess.CheckedParent = true
+
+		|| comms = spdprocess._ForceParent
+		if comms or pico.HasParentSocket
+			if !comms
+				comms = pico.new
+			if comms
+				if app.IsThreadedAsLib or comms.CompleteExec
+					|| p = SpdProcess(comms.name, nil, comms)
+					SpdProcess._parent = p
+					return p
+				comms.Close("Parent lost connection")
+
+		if expect
+			error "Parent lost connection"
+
+
 	module
 		|bool|		 CheckedParent
+		|&pico|		 _ForceParent
 		|SpdProcess| _Parent
-		
-		function pico.UseAsParent (|spdprocess?|)
-			if !app.IsThreadedAsLib
-				require .CompleteExec
-			|| p = SpdProcess("", nil, self)
-			SpdProcess._parent = p
-			return p
-		
-		function app.Parent (|bool| Expect=false, |spdprocess?|)
-			opt norefcounts
-			if spdprocess.CheckedParent
-				return spdprocess._parent
-			spdprocess.CheckedParent = true
-			if pico.HasParentSocket
-				|| comms = pico.new
-					return comms.UseAsParent
-			if expect
-				error "Parent lost connection"
-
+				
 
 		libinternal CreateArgs (|string| path, |[string]!| Args, |&cstring|)
 			cpp_wrapper
@@ -214,18 +218,21 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 //			rz.pid = id
 
 	
-	prototype Thread (|&pico| Comms, |int64| Data, |&cstring| args, |bool|)
-		function Spawn (|string| ThreadName,  |[string]!| R = [],  |SpdProcess|)
-			description `This is meant to run a "main-function" from a lib, as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
-			
-			|| c_args = SpdProcess.CreateArgs("", r)
-			|| pico_fn = pico.new(threadname)
-				|| proc = SpdProcess(threadname, self, pico_fn, r)
-				if proc.pico.SpawnThread(self|picothreadfn|, 7, c_args)
-					return proc
-			// its the called-threads responsibility to free the std-args received. Or not!
-			// at least we don't crash this way.
-			memory.free(c_args)
+prototype MicroProcess (|&pico| Comms, |int64| Mode, |&cstring| args, |int|)
+	linkage
+		cpp_part MPC
+	function Spawn (|string| ThreadName,  |[string]!| R = [],  |SpdProcess|)
+		description `This is meant to run a "main-function" from a lib, as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
+		
+		|| c_args = SpdProcess.CreateArgs("", r)
+		// its the called-threads responsibility to free the std-args received.
+		// (Look at Speedie_Main in Speedie.scproj for example)
+		|| pico_fn = pico.new(threadname)
+			|| proc = SpdProcess(threadname, self, pico_fn, r)
+			if proc.pico.SpawnThread(self|picothreadfn|, 7, c_Args)
+				return proc
+		// free cos we never had a chance to free it.
+		memory.free(c_args)
 
 
 

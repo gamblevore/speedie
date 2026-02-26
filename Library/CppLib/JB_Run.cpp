@@ -67,7 +67,8 @@ byte				JB_ErrorNumber;
 thread_local byte	JB_Active = 0;
 extern char**		environ;
 uint				Flow_Disabled;
-static Array*		Raw_Args;
+static Array*		Obj_Args;
+const char**		JB_Main__Args;
 
 
 Dictionary* JB_App__Env() {
@@ -164,7 +165,7 @@ void JB_FinalEvents() {
 
 int JB_BasicCareTaker(PicoDate D);
 
-Array*		JB_App__Args()					{ return Raw_Args; }
+Array*		JB_App__Args()					{ return Obj_Args; }
 void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
 bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
 bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
@@ -181,7 +182,10 @@ JB_StringC*	JB_App__CallPath (const char* New) {
 }
 
 
-int JB_SP_Init (_cstring* R, bool IsThread) {
+
+int JB_SP_Init (_cstring* Args, bool IsThread) {
+	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
+
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
 	Flow_Disabled = 0x7fffFFFF;
@@ -193,25 +197,25 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 	pthread_setname_np(pthread_self(), JB_ThreadName);
 #endif
 	
-	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)
         return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
-        
-	if (R) {		
-		#ifndef AS_LIBRARY
-			int err = dup2( STDOUT_FILENO, STDFUN_FILENO );	// reserve StdFUN
-			err = dup2( STDOUT_FILENO, STDPICO_FILENO );	// reserve StdPico
-			if (!IsThread) {
-				JB_App__CrashInstall();
-				PicoGlobalConf()->Observer = JB_BasicCareTaker;
-			}
-			atexit(PicoFinish);
-		#endif
-	}
 	
-	Raw_Args = JB_Incr(JB_Str_ArgV(R));			// Allow caller to remove their c-string data.
+	if (Args) {		
+#ifndef AS_LIBRARY
+		int err = dup2( STDOUT_FILENO, STDFUN_FILENO );	// reserve StdFUN
+		err = dup2( STDOUT_FILENO, STDPICO_FILENO );	// reserve StdPico
+		if (!IsThread) {
+			JB_App__CrashInstall();
+			PicoGlobalConf()->Observer = JB_BasicCareTaker;
+		}
+		atexit(PicoFinish);
+#endif
+	}
+
+	JB_Main__Args = Args;	
+	Obj_Args = JB_Incr(JB_Str_ArgV(Args));
     
     ErrorString_ = emptystr();
     JB_FS__FastNew( 0 );						// Stop leak tests catching this.
@@ -223,32 +227,32 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 		return Err;
 	
 	PicoInit(0);
-    #if DEBUG
+#if DEBUG
 	JB_TotalSanity(true);
-	#endif
+#endif
 	return 0;
 }
 
 
 
-int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
+int JB_SP_Run (_cstring* Args, int Mode)	{ // JB_SP_Main
 	if (JB_Active & 1)
 		return EALREADY;
 	JB_Active = 1 | (Mode&4);
 	if (JB_LibIsShutdown()) {
 		AddError(EACCES, "jb.shutdown");
 	} else {
-		if (!Raw_Args and C) {
-			AddError(JB_SP_Init(C, Mode&4), "jb.initlib");
+		if (!Obj_Args and Args) {
+			AddError(JB_SP_Init(Args, Mode&4), "jb.initlib");
 			if (JB_ErrorNumber)
 				return JB_ErrorNumber;
 			AddError(JB_SP_AppInit(), "jb.initapp");
 		}
 		
-		if ((Mode & 1) and Raw_Args and !JB_ErrorNumber)
+		if ((Mode & 1) and Obj_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),	"occurred");
 
-		if ((Mode & 2) and Raw_Args)
+		if ((Mode & 2) and Obj_Args)
 			JB_FinalEvents();
 	}
 	JB_Active &= ~1;

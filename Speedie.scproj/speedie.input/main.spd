@@ -70,11 +70,12 @@ function compiler.SetupEnv
 
 
 
-api Speedie_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
+api Speedie_Main (spdprocess.MicroProcess)
 // easier if this is always compiled.
-	cpp_name Speedie_Main 
+	cpp_name Speedie_Main
+	SpdProcess._ForceParent = Comms
 	rz = app.sp_run(args, mode&4)
-	comms.UseAsParent // phew
 	if rz == 0
 		rz = app.sp_run(args, mode)
+	memory.Free(args) // no need anymore!
 

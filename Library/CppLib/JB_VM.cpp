@@ -334,6 +334,7 @@ void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}
 u32*	JB_ASM_Code			(CakeVM* V, int Length)					{return 0;}
 CakeVM* JB_ASM__VM			(int Flags)								{return 0;}
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex)				{return 0;}
+void JB_ASM_LinkPico		(CakeVM* V, PicoComms* P, PicoActionFn Fn) {}
 
 #endif
 } // extern c

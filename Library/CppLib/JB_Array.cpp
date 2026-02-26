@@ -96,20 +96,41 @@ int JB_Array_Find (Array* Self, JB_Object* F) {
 
 
 
-void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
-	require0 (self and Value and Count > 0);
+bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
+	require (Value and Count > 0);
 	int n = self->Length; 
-	require0(GrowToLength_(self, n+Count, true));
+	require(GrowToLength_(self, n+Count, true));
 	JB_SetRefCount(Value, JB_RefCount(Value) + Count);
 	auto P = self->_Ptr + n;
 	auto Pf = P + Count;
 	while (P < Pf)
 		*P++ = Value;
+	return true;
 }
 
 
-void JB_Array_Append( Array* self, JB_Object* Value ) {
-	JB_Array_AppendCount(self, Value, 1);
+bool JB_Array_Append( Array* self, JB_Object* Value ) {
+	return JB_Array_AppendCount(self, Value, 1);
+}
+
+bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
+	int n = self->Length;
+	if ( (uint)Pos > n  or  !JB_Array_AppendCount(self, Value, 1) )
+		return false;
+	if (Pos == n)
+		return true; // already done.
+	
+	auto P = self->_Ptr;
+	
+	JB_Object** Curr = P+n;
+	JB_Object** First = P+Pos;
+	while (Curr > First) {
+		Curr--;
+		Curr[1] = Curr[0];
+	}
+	First[0] = Value;
+	
+	return true;
 }
 
 

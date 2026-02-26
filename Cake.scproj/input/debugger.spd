@@ -13,6 +13,7 @@ module debugger
 	|bool|			WantDebug
 	|bool|			BreakMapBad
 	|&uint|			BreakToClear
+	|faststring|	VariablePrinter
 	
 	function SrcMap (|uint| Index, |SourceLocation|)
 		|| Base = .SrcMapStr.Addr|&uint|
@@ -21,7 +22,7 @@ module debugger
 	
 	
 	function PicoReader (PicoActionFn)	
-		self|&cakevm|.Pause // cool. now we can safely do stuff
+/		self|&cakevm|.Pause // cool. now we can safely do stuff
 
 	
 	function ActivateInbuiltBreaks
@@ -98,10 +99,12 @@ module debugger
 	function StartUp (|&uint|)
 		opt norefcounts
 		cake.vm.__View__ = __Dumper__
+		|| Dbg = debugger.WantDebug<<1
 		|| p = cake.Perry
 			cake.vm.__View__ = __PerryView__
 			cake.vm.Action(p.pico) = PicoReader	
-		return cake.VM.IsDebugging(debugger.WantDebug*2)
+			dbg = 2
+		return cake.VM.IsDebugging(dbg)
 			
 		
 	function __Dumper__ (cakevm.CakeChef)
@@ -139,10 +142,11 @@ module debugger
 		opt norefcounts
 		|| R = .root
 		if !R
-			expect (!debugger.WantDebug)	("Program file doesn't contain debug info. Remove -d to run it.")
+			expect !(debugger.WantDebug or cake.perry)	("Program file doesn't contain debug info.")
 			return true
 
 		xtype.loadtypes R["class"]
+		.VariablePrinter = FastString()
 		.Globs = R["glob"]
 		.LoadFiles(R["files"].value.decompress)
 		.SrcMapStr = R["pos"]

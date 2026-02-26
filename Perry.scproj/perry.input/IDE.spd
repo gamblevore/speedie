@@ -7,6 +7,8 @@ class PerryIDE (Window)
 	|SpdProcess?|				Feedback
 	|UnixProcess?|				compilr
 	|UnixProcess?|				RunCompiledApp
+	|UnixProcess?|				Talker // for app.say
+
 	|string|					CompileOKString
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
@@ -50,6 +52,7 @@ class PerryIDE (Window)
 	|StretchControl|			FileSep
 	|listviewrow?|				LogComms
 	|listviewrow?|				LogActions
+	|listviewrow?|				LogCake
 	|menu|						AutoComplete
 	|ListView|					ErrorList
 	|listview|					CommsLogList
@@ -75,7 +78,6 @@ class PerryIDE (Window)
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
-	|UnixProcess?|				Talker
 	|message|					RecentFiles
 	|string| 					LastCmdStr
 	|date|						LastSendTime

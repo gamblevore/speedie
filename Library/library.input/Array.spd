@@ -87,8 +87,8 @@ class Array
 	function Reverse
 		cpp_wrapper JB_Array_Reverse
 	
-//	function Insert (|int| Pos, || Value)
-//		cpp_wrapper JB_Array_Insert
+	function Insert (|int| Pos, || Value)
+		cpp_wrapper JB_Array_Insert
 			
 	function Remove (|int| Pos)
 		cpp_wrapper JB_Array_Remove
@@ -149,7 +149,7 @@ class Array
 		for s in r
 			self <~ s
 	
-	syntax Append (|...?| item, |int64| Count)
+	syntax Append (|...?| item, |int| Count)
 		cpp_wrapper JB_Array_AppendCount
 	
 	render

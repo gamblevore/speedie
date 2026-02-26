@@ -1,33 +1,97 @@
 
 
-function PerryIDE.CanDebug (|FileRow| f, |bool|)
-	opt norefcounts
-	|| path = f.Location
-	|| spd = file.speediedir
-	if path[0, spd]
-		|| l = spd.Length
-		if path[l, "Library/", true] or path[l, "jeebox.scproj/", true] or path[l, "GUI.scproj/", true] or path[l, "Image.scproj/", true]
-			return false
-	return true
+extend PerryIDE {
+function CakeTalk (|SpdProcess| Cake)
+	|| msg = cake.Get$
+
+/	|| c = .LogCake
+		.LogOneThing(msg, "", C)
+		
+	if msg == "hoi :3"
+		.GotHello(msg.name)
+	  else
+		Notifications <~ ("unrecognised message", msg)
+		
+
+function AppInfoExtra (|unixprocess| r, |string|)
+	if !r
+		return "Inactive"
+	|| st = r.Status
+	if r isa SpdProcess
+		if .DebugMode isnt ReceivedHello
+			return "Waiting..."
+		if st.IsRunning
+			return ""
+	return st.Name
 
 
-function PerryIDE.CollectBreakPoints (|jbin|)	
-	|| j = jbin(@tmp, "breakpoints")
-	j.enter
-	|message--| f = .FileList.ListSource.first
-	while f
-		if f isa FileRow
-			if !.CanDebug(f)
-				f = f.FlatAfter
-				continue
-			if f isa "spd"
-				f.CollectDebug(j)
-		f = f.FlatNext
-	return j
+function SetAppInfo
+	|| s = .Project.name.TrimExt
+	|| r = .RunCompiledApp
+	|| extra = .AppInfoExtra(r)
+		s += "\n("
+		s += extra
+		s += ")"
+	.appinfo.text = s
+	
+
+function GotHello (|string| msg)
+	|| m = .DebugMode
+	if m is ReceivedHello
+		Notifications <~ msg // weird?
+	  else
+		(M is ReceivedHello)
+		.DebugMode = m
+		.StrongView(.ViewDebugger) // view debugger!
+	.SetAppInfo
 
 
-function filerow.CollectDebug (|jbin| j)
-	|| d = .FileData
-		|| msg = d.Parse
-			.CollectDebugSub(j, msg, d)
+/// now what?
+/// just see that we got anything?
+		
 
+		
+}
+
+//function PerryIDE.CanDebug (|FileRow| f, |bool|)
+//	opt norefcounts
+//	|| path = f.Location
+//	|| spd = file.speediedir
+//	if path[0, spd]
+//		|| l = spd.Length
+//		if path[l, "Library/", true] or path[l, "jeebox.scproj/", true] or path[l, "GUI.scproj/", true] or path[l, "Image.scproj/", true]
+//			return false
+//	return true
+
+
+// we only need to add new breakpoints now....
+//function PerryIDE.CollectBreakPoints (|jbin|)	
+//	|| j = jbin(@tmp, "breakpoints")
+//	j.enter
+//	|message--| f = .FileList.ListSource.first
+//	while f
+//		if f isa FileRow
+//			if !.CanDebug(f)
+//				f = f.FlatAfter
+//				continue
+//			if f isa "spd"
+//				f.CollectDebug(j)
+//		f = f.FlatNext
+//	return j
+//
+//
+//function filerow.CollectDebug (|jbin| j)
+//	|| d = .FileData
+//		|| msg = d.Parse
+//			.CollectDebugSub(j, msg, d)
+//
+//
+//function filerow.CollectDebugSub (|jbin| j, |message| s, |string| d)
+//	opt norefcounts
+//	|| Depth = 0
+//	for c.flat in s
+//		if s is BreakPoint
+//			Depth ?= j.TmpArg(.Location) // what about the position of the line??? we do need two numbers!
+//			j.AddInt d.Find(charset.Line, s.position, 0)
+//			j.AddInt d.find(charset.line, s.position, int.max)
+//	j.exit(Depth)

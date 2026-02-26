@@ -9,12 +9,10 @@
 
 extern "C" {
 
-const char** JB_Main__Args;
 
-int JB_SP_Run (const char** args, int Mode);
-int main (int count, const char** args) {
-	JB_Main__Args = args;	
-    return 255 & JB_SP_Run(args, 3);
+int JB_SP_Run (const char** Args, int Mode);
+int main (int count, const char** Args) {
+    return 255 & JB_SP_Run(Args, 3);
 }
 
 }
