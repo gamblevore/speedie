@@ -22,7 +22,7 @@ module debugger
 	
 	
 	function PicoReader (PicoActionFn)	
-/		self|&cakevm|.Pause // cool. now we can safely do stuff
+		self|&cakevm|.Pause // cool. now we can safely do stuff
 
 	
 	function ActivateInbuiltBreaks
@@ -99,12 +99,12 @@ module debugger
 	function StartUp (|&uint|)
 		opt norefcounts
 		cake.vm.__View__ = __Dumper__
-		|| Dbg = debugger.WantDebug<<1
+		|| Dbg = 1+debugger.WantDebug
 		|| p = cake.Perry
 			cake.vm.__View__ = __PerryView__
 			cake.vm.Action(p.pico) = PicoReader	
 			dbg = 2
-		return cake.VM.IsDebugging(dbg)
+		return cake.VM.SetBreakLevel(dbg)
 			
 		
 	function __Dumper__ (cakevm.CakeChef)
@@ -146,7 +146,7 @@ module debugger
 			return true
 
 		xtype.loadtypes R["class"]
-		.VariablePrinter = FastString()
+		.VariablePrinter = FastString(64)
 		.Globs = R["glob"]
 		.LoadFiles(R["files"].value.decompress)
 		.SrcMapStr = R["pos"]

@@ -67,7 +67,7 @@ role JBin (Faststring)
 			self <~ '\n' // noice
 		self <~ Jbin.Header
 	
-	function AddStr			(|string| name)
+	function AddStr			(|string?| name)
 		.add(@str, name)
 	
 	function AddInt			(|int64| value)
@@ -78,8 +78,13 @@ role JBin (Faststring)
 		.Add(type, value, false)
 		.exit
 	
-	function Add			(|syntax| type, |string| name="", |bool|into = false, |jbinleaver|)
-		return .AddMemory(type, name.length, into, name.addr)
+	function Add			(|syntax| type, |string?| name="", |bool|into = false, |jbinleaver|)
+		.WriteType(type, into)
+		|| L = name.Length
+		.AppendHInt(L)
+		if L
+			.AppendMemory(name!.addr, L)
+		return into|int|
 	
 	function Add			(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
 		cpp_part AddFS

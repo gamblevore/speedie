@@ -79,7 +79,7 @@ struct Pico
 //		cpp_Part SendMsg
 //		return ._send(A.data, a.length, wait)
 		
-	function Tickle (|bool|)
+	inline Tickle (|bool|)
 		return self <~ ""
 	
 	libinternal __Get (|PicoMessage| Msg, |float| T)
@@ -100,7 +100,7 @@ struct Pico
 		nil checker
 		cpp_wrapper PicoError
 	
-	function IsOK (|bool|)
+	inline IsOK (|bool|)
 		nil checker
 		|| s = .MessageStatus
 		return s == 0 or 255
@@ -108,8 +108,7 @@ struct Pico
 	function IsSending (|bool|)
 		cpp_wrapper PicoStillSending
 
-	function Config (|&PicoConfig|)
-		inline
+	inline Config (|&PicoConfig|)
 		return self|&PicoConfig|
 	
 	function Name (assigns:|string|)

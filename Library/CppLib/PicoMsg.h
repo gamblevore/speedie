@@ -118,6 +118,7 @@ struct PicoConfig {
 	std::atomic<char*>	PreData;
 	int					PreLength;
 	bool				KeepAlive;
+	unsigned char		FriendID;
 #endif
 };
 
@@ -514,6 +515,9 @@ struct PicoComms : PicoConfig {
 
 		mark_started();
 		C->mark_started();
+		auto Base = (PicoComms*)(&pico_all[0]);
+		C->FriendID = 1 + (this - Base);
+		FriendID = 1 + (C - Base);
 		
 		pthread_t T = 0;   						;;;/*_*/;;;   // creeping upwards!!
 		C->Reading->ThreadArgs = Args;
@@ -749,7 +753,16 @@ struct PicoComms : PicoConfig {
 		auto Args = (const char**)R->ThreadArgs;
 		auto Mode = R->ThreadMode;
 		S->ThreadArgs = 0; R->ThreadArgs = 0;
-		C->PIDStatus = (fn)(C, Mode, Args);
+
+		int St = (fn)(C, Mode, Args);
+
+		PicoComms* Owner = (PicoComms*)(&pico_all[C->FriendID-1]);
+		if (St < 0)
+			St = 127;
+		C->PIDStatus = St;
+		Owner->PIDStatus = St;
+		Owner->PartClosed = 15;
+
 		C->AskDestroy("ThreadCompleted");
 		return 0;
 	}

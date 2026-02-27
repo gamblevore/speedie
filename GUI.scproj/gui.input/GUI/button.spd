@@ -280,7 +280,7 @@ class ButtonView (GUIControl)
 //		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
 		textcol.a = fader
-		pn.x = where.DrawText(t,  Pn, TextCol, false) + 2
+		pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
 		
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
 		require  mi and !disabled and .pressing  and  r.Width > 19  

@@ -21,9 +21,11 @@ module SpdTable
 	
 	
 	function RunProgram (|int|)
+		opt inline
 		|| Err = .RunFunc(1)
-			return Err
-		return .RunFunc(2)
+		if !err
+			err = .RunFunc(2)
+		return err
 	
 	
 	function RunFunc (|int| i, |int|)
@@ -110,7 +112,7 @@ function asm.LightCandles (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFuncti
 
 
 function asm.MusicalSoaps (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
-	description "Yes I am very bored... why else with these names?" 
+	description "Yes I am bored... why else with these names?" 
 	opt norefcounts
 	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
 	

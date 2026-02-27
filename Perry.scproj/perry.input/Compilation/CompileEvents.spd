@@ -71,6 +71,10 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 function PerryIDE.RunCompileSub (|unixprocess| r)
 	if r.PID or (r isa SpdProcess)
 		.RunCompiledApp = r
+		if r isa SpdProcess
+			|| btn = .DebugBtns.last
+				btn.text = "\0E" // pause
+
 		.ShowProductIfMoreOutput = 0
 		.RunButton.text = "\07"
 		.SetAppInfo

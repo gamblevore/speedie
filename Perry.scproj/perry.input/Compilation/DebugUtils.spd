@@ -2,13 +2,18 @@
 
 extend PerryIDE {
 function CakeTalk (|SpdProcess| Cake)
-	|| msg = cake.Get$
+	|| msg = cake.Get$ // getmsg
 
-/	|| c = .LogCake
+	|listviewrow--| c = .LogCake
 		.LogOneThing(msg, "", C)
 		
 	if msg == "hoi :3"
 		.GotHello(msg.name)
+	  elseif msg == "stack" or "break"
+		.UpdateStack(msg)
+	  elseif msg == "run"
+		.DebugMode &= ~compilemode.paused
+		.SetAppInfo
 	  else
 		Notifications <~ ("unrecognised message", msg)
 		
@@ -28,14 +33,27 @@ function AppInfoExtra (|unixprocess| r, |string|)
 function SetAppInfo
 	|| s = .Project.name.TrimExt
 	|| r = .RunCompiledApp
+
+//	if .DebugMode is Finished
+	|| CanDebug = (r isa SpdProcess) and r.Status.IsRunning
+	|| Paused = .DebugMode is paused
+
+	for btn in .DebugBtns
+		|| Last = btn.IsLast
+			btn.text = ("\02\02", "\0E")(paused)
+		(btn is enabled) = CanDebug and (Paused or Last)
+
 	|| extra = .AppInfoExtra(r)
 		s += "\n("
 		s += extra
 		s += ")"
+	  elseif r
+		s += (": " + r.pid)
 	.appinfo.text = s
 	
 
 function GotHello (|string| msg)
+	opt norefcounts
 	|| m = .DebugMode
 	if m is ReceivedHello
 		Notifications <~ msg // weird?
@@ -46,52 +64,42 @@ function GotHello (|string| msg)
 	.SetAppInfo
 
 
-/// now what?
-/// just see that we got anything?
-		
+function listview.Fixup (|message| NewList)
+	.ListSource = NewList
+	// we also want to try to keep older items... so replacing messages with the updated content...
+	// but do that later.
 
-		
+
+function UpdateStack (|message| stack)
+	opt norefcounts
+	
+	|| info = stack.first // nice info about RAM/Pico :]
+	|| arg = stack.last$
+
+	.stack.Fixup(arg)
+	
+	for m in Arg
+		|| l = m.Last
+		if l == @arg // assume its a var-dump
+			.Variables.Fixup(l)
+			l.Remove // make M easier to deal with
+			exit
+
+	|| Break = stack == "break"
+		|| F = arg.first
+		if !.stack.FirstSelected
+			.stack.Select(F)
+		ClickedStack(.stack, F) // jump to new place
+
+	|| M = .DebugMode
+	if m is Paused != Break
+		(M is paused) = Break
+		.DebugMode = M
+		.SetAppInfo
+
 }
 
-//function PerryIDE.CanDebug (|FileRow| f, |bool|)
-//	opt norefcounts
-//	|| path = f.Location
-//	|| spd = file.speediedir
-//	if path[0, spd]
-//		|| l = spd.Length
-//		if path[l, "Library/", true] or path[l, "jeebox.scproj/", true] or path[l, "GUI.scproj/", true] or path[l, "Image.scproj/", true]
-//			return false
-//	return true
+//		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow.SetResponse" 3362
+//		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd" "FileViewer.ShowQuickOpen" 2540
+//		function "Main" "/usr/local/speedie/Examples/hello_world.spd" 70 {
 
-
-// we only need to add new breakpoints now....
-//function PerryIDE.CollectBreakPoints (|jbin|)	
-//	|| j = jbin(@tmp, "breakpoints")
-//	j.enter
-//	|message--| f = .FileList.ListSource.first
-//	while f
-//		if f isa FileRow
-//			if !.CanDebug(f)
-//				f = f.FlatAfter
-//				continue
-//			if f isa "spd"
-//				f.CollectDebug(j)
-//		f = f.FlatNext
-//	return j
-//
-//
-//function filerow.CollectDebug (|jbin| j)
-//	|| d = .FileData
-//		|| msg = d.Parse
-//			.CollectDebugSub(j, msg, d)
-//
-//
-//function filerow.CollectDebugSub (|jbin| j, |message| s, |string| d)
-//	opt norefcounts
-//	|| Depth = 0
-//	for c.flat in s
-//		if s is BreakPoint
-//			Depth ?= j.TmpArg(.Location) // what about the position of the line??? we do need two numbers!
-//			j.AddInt d.Find(charset.Line, s.position, 0)
-//			j.AddInt d.find(charset.line, s.position, int.max)
-//	j.exit(Depth)

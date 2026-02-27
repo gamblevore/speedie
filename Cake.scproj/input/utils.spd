@@ -11,3 +11,6 @@ datatype SourceLocation (uint)
 		|| Diff = .BytePos - ToFind.BytePos
 		if diff >= 0
 			return int.max - diff
+	
+	function File (|FileWithData|)
+		return debugger.path(.FileNum)

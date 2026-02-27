@@ -8,6 +8,7 @@ datatype CompileMode (int)
 		Run
 		CakeMode
 		ReceivedHello
+		Paused
 		Finished
 	syntax is (|CompileMode| M, |bool|)
 		return (self&M) == M
@@ -156,6 +157,7 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 
 	|| x = r.Status	
 	if kill or !x.IsRunning
+		.DebugMode = CompileMode.Finished
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 		.SetAppInfo
@@ -200,26 +202,35 @@ function ReturnVariables (GUIListEvent)
 	
 	
 function DebugStepOver (guiaction)
-	beep "over"
-	
-	
-function DebugStepInCutely (guiaction)
-	// goes in a function IGNORING the functions in params
-	beep "cutely in"
-	
-	
+	.sendmsg("stepover")
+
+
 function DebugStepIn (guiaction)
 	if keys.Shift
-		return DebugStepInCutely(self, state, row, prev)
-	beep "in"
-	
+		.sendmsg("stepincutely")
+	  else
+		.sendmsg("stepin")
+
+
 function DebugStepOut (guiaction)
-	beep "out"
-	
+	.sendmsg("stepout")
+
+
 function DebugStepRun (guiaction)
-	beep "run"
+	if keys.Shift
+		.sendmsg("run fast")
+	  else
+		.sendmsg("run")
 	
 
+function GUIControl.SendMsg (|string| s)
+	opt norefcounts
+	|| i = .ide
+	|| r = i.RunCompiledApp
+	if r isa SpdProcess
+		if !(r <~ s)
+			Notifications <~ "Debugger connection failed"
+	
 
 function Perryide.ASMVis (|bool|)
 	return .ASMStretch is Visible

@@ -23,27 +23,31 @@
 // we need to put a breakpoint in the original file... then see what happens
 
 
-function cakevm.PerryAnswer (|cakestack| stack)
-	|jbin--| j = .StartStack
+function cakevm.PerryAnswer (|cakestack| stack, |spdprocess| perry)
+	|jbin--| j = .StartStack("break")
 	.StackToPerry(stack, 0, j)
-/	cake.Perry! <~ j
+	perry <~ j
 	
 	
 
 function __PerryView__ (cakevm.CakeChef)
-	// perry always exists by now
+	|spdprocess--| p = cake.perry!	// perry always exists by now
 	if (ErrorCode)
-		.SendCrash(stack)
+		p <~ "crashed " + ErrorCode
 	.ClearTempBreak(stack)
 	
-	.PerryAnswer(stack)
+	.PerryAnswer(stack, p)
 	while {										// no resuming if theres an error.
 		|| Resume = false
 		while !Resume
-			|| m = cake.perry.Get(5.0)
+			|| m = p.Get(5.0)
 				Resume = .ResumeCode(m)
-				.PerryAnswer(stack)
+				if !Resume
+					.PerryAnswer(stack, p)
 	} (ErrorCode)
+	p <~ "run"
+//	.SetBreakLevel(1) // run
+
 
 
 prototype PerryResponse (|cakevm| self, |message| m, |bool|)
@@ -52,7 +56,7 @@ dispatch DebuggerActions (PerryResponse)
 		
 	run
 		opt norefcounts
-		return .IsDebugging(2-(m.firstname=="fast"))
+		return .SetBreakLevel(2-(m.firstname=="fast"))
 	
 	stepin:		return .TempBreak(.StepIn)
 		
@@ -94,24 +98,42 @@ function cakevm.StepOut (|&uint|)
 function cakevm.StepOver (|&uint|)
 
 
-function cakevm.SendCrash (|cakestack| stack)	
-
-	
 function cakevm.ResumeCode (|message| m, |bool|)
-/	if m == @tmp
+	opt norefcounts
+	if m == @tmp
 		|| fn = DebuggerActions[m.name]
 			return (fn[])(cake.vm, m)
-	printerror "Debugger received unexpected " + m.Name
+	printerror m.Name
 
 
-function cakevm.StartStack (|jbin--|)
+function cakevm.StartStack (|string| name, |jbin--|)
 	|jbin--| j = XVar.printer
 	if j.Length
 		debugger
 		j.Length = 0
 	
 	j <~ jbin.header
-	j.tmparg("stack")
+	j.Enter(@tmp, name)
+	{
+		j.Enter(@list)
+		{
+			j.Enter(@list)
+			j.AddInt(app.ObjMemory)
+			j.AddInt(app.StringMemory)
+			j.AddInt(app.OtherMemory)
+			// in case we want to add more items without muddling things...
+			j.exit
+		}
+		{
+			|| PS = PicoGlobalStats()
+			j.Enter(@list)
+			j.AddInt(PS.OpenSockets)
+			j.AddInt(PS.OpenPicos)
+			j.exit
+		}
+		j.exit
+	}
+	j.Enter(@arg)
 	return j
 
 
@@ -158,15 +180,19 @@ function jbin.SyntaxExpect (|string| s, |int64| Code)
 function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 	opt norefcounts
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
-	|| Where = debugger.SrcMap(index)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
-	|| Path = debugger.path(Where.FileNum)		#expect (j, "MissingFile", where.filenum)
-	|| Locals = fn.obj|[xvar]|
+	
+	{
+	|| Where = debugger.SrcMap(index)
+	|| Path = Where.File						#expect (j, "MissingFile", where.filenum)
 
 	j.Enter(@tmp, "function")
-	j.AddStr(fn.Name)
 	j.AddStr(path)
+	j.AddStr(fn.Name)
 	j.AddInt(where.bytepos)
+	}
+	
+	|| Locals = fn.obj|[xvar]|
 	
 	if Vars
 		vars.Length = 0
@@ -174,15 +200,20 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 		index -= fn.Position
 		for v in Locals
 			if v contains index
-/				j.Enter(@tmp, v.name)
+				j.Enter(@tmp, "local")
 
+				|| Src = v.srcmap
+				j.AddStr(src.file)
+				j.AddStr(v.name)
+				j.AddInt(src.bytepos)
+				
 				v.RenderType(vars)
 				j.AddStr(vars|string|)
-				j.Length = 0
+				vars.Length = 0
 
 				v.RenderValue(vars, Stack.reg0)
 				j.AddStr(vars|string|)
-				j.Length = 0
+				vars.Length = 0
 
 				j.exit
 		j.exit

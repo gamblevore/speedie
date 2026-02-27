@@ -34,7 +34,10 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	dd <~ '\0'						// range-length
 	dd.AppendHInt(pos)
 	dd.AppendHInt(.Reg * (self is local))
-	.mininame(dd)
+	|| s = .source
+	|| srcmap = (s.srcmap, 0)(s)
+	dd.AppendHInt(srcmap)
+	.MiniName(dd)
 	dd <~ '\0'
 	dd.AppendHInt(.DumpCls)
 	

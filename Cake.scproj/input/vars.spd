@@ -3,12 +3,14 @@
 class XVar (list)
 	|Wierdness[5]|	Weirdness // pointers, references, carrays
 	|int|			CodeEnd
+	|SourceLocation|SrcMap
 	|bool|			NormalView
 	|uint16|		Reg
 	|DataTypeCode|	DataType
 	|string|		Name
 	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
+		.SrcMap = s.hint
 		.normalview = true
 		.position = pos
 		.reg = reg
