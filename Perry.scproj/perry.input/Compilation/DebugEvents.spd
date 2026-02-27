@@ -3,7 +3,7 @@
 datatype CompileMode (int)
 	flags
 		|CompileMode|
-		Compile = 0
+		Compile
 		Debug
 		Run
 		CakeMode
@@ -71,12 +71,17 @@ function fnStillRunning (fnConfirmCanceller)
 		return !.RunCompiledApp
 
 
+function PerryIDE.Stop (|unixprocess| prod, |bool|)
+	if prod
+		prod.kill(-1)
+		.UpdateDebuggedApp(true)
+	return true
+
+
 function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
 	|| prod = .runcompiledapp
-		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
-			prod.kill(-1)
-			.UpdateDebuggedApp(true)
-			prod = nil
+	if prod and .confirm("Kill running product " + .Name + Reason, fnStillRunning) and .stop(prod)
+		prod = nil
 	return !prod
 
 
@@ -158,9 +163,10 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| x = r.Status	
 	if kill or !x.IsRunning
 		.DebugMode = CompileMode.Finished
-		.RunCompiledApp = nil
 		.RunButton.text = "\02"
+		.DelayedRun = nil
 		.SetAppInfo
+		.RunCompiledApp = nil
 	
 	.AddProductErr(r.ReadStdErr)
 	
@@ -180,12 +186,13 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 		
 
 function ClickedStack (GUIListEvent)
+	opt norefcounts
 	require row
 	|| path = row.firstname
 	|| i = .ide	
 
 	i.EditPath(path, false)
-	i.editme.ShowAndSelect(row.last.int, true)
+	i.editme.ShowAndSelect(row[2].int, true)
 	return true
 
 

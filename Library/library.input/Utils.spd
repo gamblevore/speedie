@@ -178,7 +178,7 @@ datatype HumanDate (date)
 	inline Faststring.syntaxappend (|humandate| d)
 		.appendlocaltime(d)
 	
-	inline message.date (|humanDate|)
+	inline message.humandate (|humanDate|)
 		return .int
 
 

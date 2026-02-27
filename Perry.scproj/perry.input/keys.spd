@@ -41,10 +41,10 @@ extend PerryIDE
 			return ClickedPrevNext(.goprev)
 		if key is period
 			if keys.shift
-				return .CancelCompile(true)
+				return .CancelKey
 			return ClickedPrevNext(.gonext)
 		if key is b
-			Clickedcompile(.buildbutton)
+/			Clickedcompile(.buildbutton)
 			return true
 		if key is r
 			if keys.shift

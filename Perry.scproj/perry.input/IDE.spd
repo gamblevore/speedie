@@ -8,6 +8,7 @@ class PerryIDE (Window)
 	|UnixProcess?|				compilr
 	|UnixProcess?|				RunCompiledApp
 	|UnixProcess?|				Talker // for app.say
+	|message?|					DelayedRun
 
 	|string|					CompileOKString
 	|[error]|					StartupErrors

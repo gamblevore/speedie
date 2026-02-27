@@ -34,8 +34,8 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
 		return
 	
+	args.insert(0, f)
 	target perryexec
-		args.insert(0, f)
 		|| cake = (Cake_Main).Spawn(CakeExec, args)
 	  else
 		|| cake = spdprocess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)
@@ -44,27 +44,26 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 
 
 
-function PerryIDE.RUN_COMPILE_WRAP (|file!| product)
-	.DebugArgsText.InitDebugArgs
+function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 	|| DebugArgs = .DebugArgs						#require
-	|| ArgMsg = DebugArgs["args"]					#require
+	|| ArgMsg = DebugArgs["args"]
+		ArgMsg = ArgMsg.Copy
+		argmsg.Ask
 	
-	ArgMsg = ArgMsg.Copy
-	argmsg.Ask
+	|[string]| args	
+	if ArgMsg.DebugArgNames(args)
+		|| f = Product
+		if product.IsDir and Platform.OSX
+			f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
+		
+		|| old = app.cwd
+		.DebugPath(debugargs)	
+		.DebugEnvs(debugargs["env"])		
+		.ACTUAL_DEBUG(f, args)
 	
-	|| f = Product
-	|| args = ArgMsg.DebugArgNames
-	if product.IsDir and Platform.OSX
-		f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
-	
-	|| old = app.cwd
-	.DebugPath(debugargs)	
-	.DebugEnvs(debugargs["env"])		
-	.ACTUAL_DEBUG(f, args)
-
-	if !StdErr.ok
-		.DebugArgsText.FillErrors(StdErr)
-		|| err = StdErr.LastError
-			Notifications <~ err
-	app.cwd = old
+		if !StdErr.ok
+			.DebugArgsText.FillErrors(StdErr)
+			|| err = StdErr.LastError
+				Notifications <~ err
+		app.cwd = old
 

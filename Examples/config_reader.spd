@@ -10,7 +10,7 @@ curropen "/Users/jojosiwa/HowILostMySiwa"
 main
 	|| conf = ConfData.parse		#require
 	"Theme:       ${conf[`theme`]}"
-	"Last Opened: ${conf[`date`].date}" // .date makes this as some human understandable text... kinda. Well a type that convets to that.
+	"Last Opened: ${conf[`date`].humandate}" // a human readable date
 	"Curr File:   ${conf[`curropen`]}"
 
 	if 0.5[] // just added this for fun

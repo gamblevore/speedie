@@ -500,12 +500,11 @@ function LogAreaKeys (GuiKeyEvent)
 	|message--| R = .ide.CommsLogList.listsource
 	|| Count = 0
 	for s in r
-		Count += r.Count
+		Count += s.Count
 	if Count and .ide.askclearlog(Count)
 		for s in r
-			Count += r.Count
-			r.clear
-			r.position = 0
+			s.clear
+			s.position = 0
 	return true
 
 

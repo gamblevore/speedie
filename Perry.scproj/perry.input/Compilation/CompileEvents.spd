@@ -4,13 +4,20 @@ function ClickedCompile (GUIaction)
 	opt norefcounts
 	|| i = .ide
 	|| mode = i.WantCake(compilemode.compile)
-	i.compile(mode)
+		i.compile(mode)
 
 
 function perryide.WantCake (|CompileMode| Mode, |compilemode|)
-	|| DebugArgs = .DebugArgs	
-		if DebugArgs["compile"] ~= "cake"
-			Mode |= CompileMode.CakeMode
+	|| DebugArgs = .DebugArgs
+		|| req = DebugArgs["compile"]
+			if req ~= "cake"
+				(mode is cakemode)
+			  elseif req ~= "cpp"
+				(mode isnt cakemode)
+			  else
+				Notifications <~ "Unrecognised compile mode: " + req.name
+		if keys.Shift
+			Mode ^= CompileMode.CakeMode
 	  else
 		.DebugArgsText.SetFocus
 		notifications <~ "Please fix the debug args first."
@@ -23,19 +30,21 @@ function ClickedDebug (GUIAction)
 	|| i = .ide
 
 	if (.text == "\07") // stop
-		i.MakeNothingRunning("?")
+		i.Stop(i.RunCompiledApp)
 		return nil
-		
-	require i.MakeNothingRunning(" before debugging?")
-	|compilemode| CakeMode
-	target debug
-		cakemode = (.text == "\02") * CompileMode.CakeMode // play
-	CakeMode = i.WantCake(cakemode|||compilemode.debug)
-	i.compile(CakeMode)
-	i.ShowText(i.ProductOut, "", false)
-	|| itm = i.CompileTabs.ButtonSource[3]
+	
+	if i.MakeNothingRunning(" before debugging?")
+		|| CakeMode = i.WantCake(CompileMode.CakeMode|||compilemode.debug)
+			i.compile(CakeMode)
+			i.Showoutput
+
+
+function Perryide.ShowOutput
+	opt norefcounts
+	.ShowText(.ProductOut, "", false)
+	|| itm = .CompileTabs.ButtonSource[3]
 		(itm is hidden)
-	i.ProductErrors.text = ""
+	.ProductErrors.text = ""
 
 
 function PerryIDE.Compile (|CompileMode| Mode)
@@ -51,6 +60,7 @@ function PerryIDE.Compile (|CompileMode| Mode)
 
 
 function PerryIDE.DebugArgs (|message|)
+	.DebugArgsText.InitDebugArgs
 	return .DebugArgsText.text.Parse(@arg)	
 
 

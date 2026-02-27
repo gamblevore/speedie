@@ -5,7 +5,7 @@ module GUI
 		cpp_part App
 	|image|						Screen = image("read")
 	|error|						ToolTip = error()
-	|date|						OpenedFirst
+	|date|						OpenedTime
 	|GUIPasteEvent|				AppDocumentOpen
 	|string|					LastSearch
 	|uint|						EventCount
@@ -405,8 +405,8 @@ module GUI
 		.GUICheck
 		app.Guimode = true
 		pico.start
-		.OpenedFirst = date.now
-		.ForeGroundTime = .OpenedFirst
+		.OpenedTime = date.now
+		.ForeGroundTime = .OpenedTime
 		.CurrMouseXY = ivec2(-1)
 
 		AppMenu.GetAppMenu

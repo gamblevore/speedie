@@ -210,6 +210,12 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	
+	function CancelKey (|bool|)
+		if .compilr
+			return .CancelCompile(true)
+		if .RunCompiledApp
+			return .MakeNothingRunning("?")
+	
 	function CancelCompile (|bool| Beep=false, |bool|)
 		opt norefcounts
 		|| c = .Compilr

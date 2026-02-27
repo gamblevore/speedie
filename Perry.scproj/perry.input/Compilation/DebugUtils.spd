@@ -1,7 +1,22 @@
 
+function message.ago (|Duration|)
+	if self
+		return date.now - .Date
 
+function message.date (assigns:|date|)
+	.Position = ((value - gui.OpenedTime) >> 10)
+	
+function message.date (|date|)
+	return (.Position << 10) + gui.OpenedTime
+	
+	
 extend PerryIDE {
 function CakeTalk (|SpdProcess| Cake)
+	if .DelayedRun.ago > 0.5s
+/		.DelayedRun = nil
+		.DebugMode &= ~compilemode.paused
+		.SetAppInfo		
+	
 	|| msg = cake.Get$ // getmsg
 
 	|listviewrow--| c = .LogCake
@@ -10,18 +25,33 @@ function CakeTalk (|SpdProcess| Cake)
 	if msg == "hoi :3"
 		.GotHello(msg.name)
 	  elseif msg == "stack" or "break"
+		.DelayedRun = nil
 		.UpdateStack(msg)
 	  elseif msg == "run"
-		.DebugMode &= ~compilemode.paused
-		.SetAppInfo
+		.DelayedRun = msg
+		msg.date = date.now
 	  else
 		Notifications <~ ("unrecognised message", msg)
-		
+
+
+function GotHello (|string| msg)
+	opt norefcounts
+	|| m = .DebugMode
+	if m is ReceivedHello
+		Notifications <~ msg // weird?
+	  else
+		(M is ReceivedHello)
+		.DebugMode = m
+		.StrongView(.ViewDebugger) // view debugger!
+	.SetAppInfo
+
 
 function AppInfoExtra (|unixprocess| r, |string|)
 	if !r
 		return "Inactive"
 	|| st = r.Status
+	if st == 0
+		return "Exit OK"
 	if r isa SpdProcess
 		if .DebugMode isnt ReceivedHello
 			return "Waiting..."
@@ -51,18 +81,6 @@ function SetAppInfo
 		s += (": " + r.pid)
 	.appinfo.text = s
 	
-
-function GotHello (|string| msg)
-	opt norefcounts
-	|| m = .DebugMode
-	if m is ReceivedHello
-		Notifications <~ msg // weird?
-	  else
-		(M is ReceivedHello)
-		.DebugMode = m
-		.StrongView(.ViewDebugger) // view debugger!
-	.SetAppInfo
-
 
 function listview.Fixup (|message| NewList)
 	.ListSource = NewList
