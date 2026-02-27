@@ -64,7 +64,6 @@ function SetAppInfo
 	|| s = .Project.name.TrimExt
 	|| r = .RunCompiledApp
 
-//	if .DebugMode is Finished
 	|| CanDebug = (r isa SpdProcess) and r.Status.IsRunning
 	|| Paused = .DebugMode is paused
 
@@ -72,6 +71,9 @@ function SetAppInfo
 		|| Last = btn.IsLast
 			btn.text = ("\02\02", "\0E")(paused)
 		(btn is enabled) = CanDebug and (Paused or Last)
+
+	if !CanDebug
+		.editme._ActivePoint = -1
 
 	|| extra = .AppInfoExtra(r)
 		s += "\n("
@@ -91,7 +93,7 @@ function listview.Fixup (|message| NewList)
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
-	|| info = stack.first // nice info about RAM/Pico :]
+//	|| info = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
 
 	.stack.Fixup(arg)
@@ -107,7 +109,9 @@ function UpdateStack (|message| stack)
 		|| F = arg.first
 		if !.stack.FirstSelected
 			.stack.Select(F)
-		ClickedStack(.stack, F) // jump to new place
+		.ClickedStack(F, true) // jump to new place
+	  else
+		.EditMe._ActivePoint = -1
 
 	|| M = .DebugMode
 	if m is Paused != Break
@@ -118,6 +122,5 @@ function UpdateStack (|message| stack)
 }
 
 //		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow.SetResponse" 3362
-//		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd" "FileViewer.ShowQuickOpen" 2540
-//		function "Main" "/usr/local/speedie/Examples/hello_world.spd" 70 {
+//		function "Main" "/usr/local/speedie/Examples/hello_world.spd" 70 {}
 

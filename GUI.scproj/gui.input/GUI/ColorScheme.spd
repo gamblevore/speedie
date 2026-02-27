@@ -8,6 +8,7 @@ class ColorScheme
 	|ImagePixel[64]|		SyxCol
 	|ImagePixel|			RootTmp
 	|ImagePixel|			None
+	|ImagePixel|			ActiveTextLine
 	|ImagePixel[8]|			History
 	|vec4[4]|				BGCorners
 	|int|					HistoryIndex
@@ -37,6 +38,11 @@ class ColorScheme
 
 	
 	constructor
+		// speedie could try to optimise this. its a big function!
+		// all we want to do is write some numbers into a memorylocation...
+		// could just be a 4-byte const and... write it.
+		// would be nice to have imagepixel/vec4 conversion optimised...
+		.ActiveTextLine			<~ ((0.2, 0.5, 0.2, 0.3))
 		.scroll.bg				<~ ((0.5, 0.0, 0.7, 0.4)) 
 		.scroll.edge			<~ ((0.75, 0.25, 0.9, 0.5))
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
@@ -179,23 +185,4 @@ function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagep
 	if HasColor == 3
 		return .None
 	return .SyxCol[0]
-
-
-function textview.LineNumColor (|imagepixel|)
-	|| c = .gnormal.bg.color
-	c = 0.35.mix(c, colors.white)
-	c.a = 1.0
-	return c.px
-
-
-function textview.CanDrawLight (|TextViewLine| D, |bool|)
-	require (self is editable) and !.SingleLine
-	// should involve ._PreferPrevLine or something calling it.
-	// or else we can select "off the end" of a line, by clicking after it
-	// yet we draw the next line "light"
-	|| sr = .SelRange	
-	if !sr.width and (d.range contains sr.x)
-		return true
-	if (sr.x >= d.range.x2) and !d.next
-		return true
 

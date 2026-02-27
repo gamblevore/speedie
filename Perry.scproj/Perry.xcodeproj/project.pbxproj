@@ -687,7 +687,7 @@
 		};
 		AC9220A22857A127002F3F97 /* DebugPerryBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetlist --targetdebug /usr/local/speedie/Perry.scproj";
+			buildArgumentsString = "--nocolor --x --nocompile --target=xcode --targetdebug /usr/local/speedie/Perry.scproj";
 			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugPerryBuilder" */;
 			buildPhases = (
 			);

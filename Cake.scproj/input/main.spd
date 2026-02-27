@@ -26,6 +26,40 @@ main
 	require debugger.Load
 	return SpdTable.RunProgram
 
+	
+function cake.Collect (|File?|)
+	opt norefcounts
+	|| r = app._rawargs
+	|| r1 = r[0]
+	if r1.ArgSwitch("d")
+		if r1.find('D')
+			TerminalColor.RainbowTerm = true
+		debugger.WantDebug = true
+		r1 = r[1]
+
+	if !r1
+		|| name = app.filename
+		quit "Usage:
+	$name /path/to/app.cake
+	$name /path/to/project.scproj
+
+You may pass arguments also (args go *after* the program path):
+
+	$name /path/to/app.cake arg1 arg2 --switch=value
+
+`Cake` runs executable files, that were compiled with `Speedie`, to the cake-format.
+
+Learn more about Speedie at: http://github.com/gamblevore/speedie/
+"
+		
+	check (r1[] != '-') ("Unexpected switch: " + r1)
+	rz = r1.FileThatExists("load executable")
+	if rz
+		app.CallPath(r1.Addr|cstring|)
+	if debugger.WantDebug
+		r.Remove(0)
+	r.Remove(0)
+
 
 
 api Cake_Main (spdprocess.MicroProcess)

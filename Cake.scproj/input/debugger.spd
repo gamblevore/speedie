@@ -104,7 +104,7 @@ module debugger
 			cake.vm.__View__ = __PerryView__
 			cake.vm.Action(p.pico) = PicoReader	
 			dbg = 2
-		return cake.VM.SetBreakLevel(dbg)
+		rz = cake.VM.SetBreakLevel(dbg)
 			
 		
 	function __Dumper__ (cakevm.CakeChef)

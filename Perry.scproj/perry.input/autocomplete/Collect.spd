@@ -15,7 +15,7 @@ function PerryIDE.MaybeSendMessage (|string| cmd, |message| where,  |string| nam
 	if (fn == @char or @num) or fn.isstring
 		.PopupHide
 		return nil
-
+	
 	.SetAutoPoint(where.Position)
 	return .SendFeedbackRequest(cmd, where, name, reason)
 
@@ -86,7 +86,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		p <~ "--noisy"
 	p <~ "--check"
 	
-	target debug and !perryexec
+	target debug and !perryexec and xcode
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
@@ -105,7 +105,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			return spd
 
 
-target debug
+target debug and xcode
 	target perryexec
 		cpp_libwrapper Cake_Main (spdprocess.MicroProcess)
 	  else

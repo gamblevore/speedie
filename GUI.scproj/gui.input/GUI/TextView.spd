@@ -23,6 +23,7 @@ class TextView (GUIControl)
 	|byte|						_CodeInsertionState
 	|uint16|					_LastDrawWidth
 	|int|						_RemainingHeight
+	|int|						_ActivePoint
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
 	|TextViewLine|				_Start
@@ -45,6 +46,7 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
 		|| TV = TextViewLine()
+		._ActivePoint = -1
 		._Lines = TV
 		._Start = TV							// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On

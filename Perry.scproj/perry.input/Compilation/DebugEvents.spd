@@ -153,6 +153,16 @@ function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 		.CompileTabSelect(.ProductOut)
 		.ProductSep.Show
 	
+
+function PerryIDE.ClearRun
+	.DebugMode = CompileMode.Finished
+	.RunButton.text = "\02"
+	.DelayedRun = nil
+	.SetAppInfo
+	.RunCompiledApp = nil
+	.stack.clear
+	.Variables.clear
+	
 	
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
@@ -162,11 +172,7 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 
 	|| x = r.Status	
 	if kill or !x.IsRunning
-		.DebugMode = CompileMode.Finished
-		.RunButton.text = "\02"
-		.DelayedRun = nil
-		.SetAppInfo
-		.RunCompiledApp = nil
+		.ClearRun
 	
 	.AddProductErr(r.ReadStdErr)
 	
@@ -187,12 +193,19 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 
 function ClickedStack (GUIListEvent)
 	opt norefcounts
-	require row
-	|| path = row.firstname
-	|| i = .ide	
+	if row
+		return .ide.ClickedStack(row)
+	return true
 
-	i.EditPath(path, false)
-	i.editme.ShowAndSelect(row[2].int, true)
+
+function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
+	opt norefcounts
+	|| path = row.firstname
+	.EditPath(path, false)
+	|| Where = row[2].int
+	if Active
+		.editme._ActivePoint = where
+	.editme.ShowAndSelect(where, true)
 	return true
 
 

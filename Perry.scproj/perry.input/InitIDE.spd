@@ -356,6 +356,7 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			.IsSpreadSheetLike = true
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
 			.DontDrawSeparators	= true

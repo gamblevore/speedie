@@ -35,7 +35,7 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 		return
 	
 	args.insert(0, f)
-	target perryexec
+	target perryexec and xcode
 		|| cake = (Cake_Main).Spawn(CakeExec, args)
 	  else
 		|| cake = spdprocess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)

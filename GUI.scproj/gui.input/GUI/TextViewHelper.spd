@@ -2,7 +2,6 @@
 
 datatype TextLineFlags (uint16)
 	flags
-		// Error
 		BreakPoint
 		Colored
 		Found
@@ -60,8 +59,7 @@ class TextViewLine (list)
 
 	operator contains (|ind| b, |bool|)
 		|| d = .range
-		if self is last
-			d.x2 -= 1 
+		d.x2 -= (self is last)
 		return d contains b
 
 	syntax is (|TextLineFlags| F, |bool|)
@@ -344,12 +342,16 @@ libinternal textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine|
 
 
 
-libinternal textview.DrawLighter (|image| Where, |int| y)
+libinternal textview.DrawBackGround (|image| Where, |int| y, |imagepixel| col)
 	|| r	= .lastrect
 	r.y		= y + 1
 	r.y2	= y + .lineheight + 1
-	|| col	= (1.0, 1.0, 1.0, 0.06).px
 	where.DrawRect(r, col)
+
+
+libinternal textview.DrawLighter (|image| Where, |int| y)
+	|| col = (1.0, 1.0, 1.0, 0.06)
+	.drawbackground(Where, y, col.px)
 
 
 libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
@@ -396,11 +398,17 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 			  else
 				d.LineError = nil // sigh. crappy bug fix
 	
+		if d contains ._ActivePoint
+			|| bg = ¥.ActiveTextLine
+			.Drawbackground(where, y + GoUp, bg)
+
 		if .CanDrawLight(d)				// linelight
 			lc.r += 80
 			lc.g += 80
 			lc.b += 80
 			.DrawLighter(where, y+GoUp)
+			
+		
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1
 	|| state = MsgTextDrawState(x, d)
@@ -599,6 +607,26 @@ function error.TextColor (|float| alpha=1.0, |vec4|)
 		rz *= (0.6, 0.6, 0.6, 1.0)
 	if .Severity <= ErrorSeverity.Hint
 		rz.a *= 0.5
+
+
+function textview.LineNumColor (|imagepixel|)
+	|| c = .gnormal.bg.color
+	c = 0.35.mix(c, colors.white)
+	c.a = 1.0
+	return c.px
+
+
+function textview.CanDrawLight (|TextViewLine| D, |bool|)
+	require (self is editable) and !.SingleLine
+	// should involve ._PreferPrevLine or something calling it.
+	// or else we can select "off the end" of a line, by clicking after it
+	// yet we draw the next line "light"
+	|| sr = .SelRange	
+	if !sr.width and (d.range contains sr.x)
+		return true
+	if (sr.x >= d.range.x2) and !d.next
+		return true
+
 
 //	
 //	if .severity == errorseverity.ok

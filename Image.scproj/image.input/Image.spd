@@ -446,10 +446,9 @@ class Image (memory)
 			into.CopyTo(self)
 					
 		
-	function DrawRect (|ivec4| Rect, |vec4| Color=colors.white)
+	function DrawRect (|ivec4| Rect, |imagepixel| Color)
 		cpp_part SimpleRectSub
-		|| px = color.px
-		require px.a
+		require Color.a
 		|| i = 0
 		|| range = self[rect]
 		if color.a != 255
@@ -458,12 +457,16 @@ class Image (memory)
 				sigh.Overlay(C)
 				i++
 		  elseif Rect == .rect
-			memory.fillint(.ptr|&int|, .length, px)
+			memory.fillint(.ptr|&int|, .length, Color)
 		  else
 			for (sigh in range) (v)
-				sigh[0] = px
+				sigh[0] = Color
 				i++
-
+		
+		
+	inline DrawRect (|ivec4| Rect, |vec4| Color)
+		.DrawRect(Rect, color.px)
+	
 
 	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
 		require Edge.a
