@@ -900,16 +900,18 @@ DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict )
 
 
 
-
+extern "C" JB_String* JB_Str_NewInlined(int Length, JB_Class* Cls);
 void JB_Dict__Init() {
-    TheDictName = (JB_String16*)JB_Str_New(16);
+JB_TotalSanity(true);
+    TheDictName = (JB_String16*)JB_Str_NewInlined( 8, &JB_String16Data );
     JB_SetRefCount(TheDictName, 10000);
     TheDictName->Addr = TheDictName->Data;
 }
 
 
-JB_String* JB_DictName_Trim (JB_String16* D, int N) {
+static JB_String* DictName_Trim_ (JB_String16* D) {
     uint8* Addr = D->Data;
+    int N = 8;
     while (!Addr[N-1] and --N>1) {};
     D->Length = N;
     return D;
@@ -918,13 +920,13 @@ JB_String* JB_DictName_Trim (JB_String16* D, int N) {
 JB_String* JB_Obj_DictName (JB_Object* obj) {
     JB_String16* D = TheDictName;
     *((JB_Object**)D->Data) = obj;
-    return JB_DictName_Trim(D, sizeof(obj));
+    return DictName_Trim_(D);
 }
 
 JB_String* JB_int64_DictName (int64 obj) {
     JB_String16* D = TheDictName;
     *((int64*)D->Data) = obj;
-    return JB_DictName_Trim(D, sizeof(obj));
+    return DictName_Trim_(D);
 }
     
 } // 
