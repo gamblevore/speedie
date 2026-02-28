@@ -138,7 +138,7 @@ struct AllocationBlock {
 struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bug won't let me use "JBClass(JB_MemoryLayer..."
     u16                 HiddenRefCount;
     bool                IsActive;
-    bool                BoostMode;
+    bool                DummyBool;
     AllocationBlock*    CurrBlock;
     JB_Class*           Class;
     AllocationBlock*    SpareBlock;

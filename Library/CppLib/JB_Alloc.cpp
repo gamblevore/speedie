@@ -248,14 +248,13 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 			failed("corrupt freeobj next ptr");
 		return Obj->Next;
 	}
+	
 	void AllocBlock_Debug(AllocationBlock* B) {
 		FreeObject* Obj = B->FirstFree;
 		while (Obj) {
 			Obj = ObjInBlock(Obj, B);
 		};
 	}
-
-
 
 	static bool FreeBlock_(AllocationBlock* B) {
 		return (GetDestructor_(B) == BlockIsFreeMark);
@@ -759,9 +758,9 @@ static void InitObjectsInBlock_(JB_MemoryLayer* Mem, AllocationBlock* NewBlock, 
     int BlockBits = (1 << BS) - 1;
     FreeObject* Curr = (FreeObject*)(((IntPtr)NewBlock) &~ BlockBits);
     NewBlock->FirstFree = Curr; // for LinkIn_
-	if (Mem->BoostMode) {
-		return;
-	}
+//	if (Mem->BoostMode) {
+//		return;
+//	}
 
     FreeObject* TrueFirst = NewBlock->Super->StartObj;
     if (Curr < TrueFirst) {
