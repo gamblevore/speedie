@@ -71,9 +71,16 @@ class Menu (ListView)
 		
 	libinternal CmmWidth (|guicontrol?| owner, |int|)
 		|| mw = owner.width? min 140
-		mw = .TextWidth + 14 max mw
+		mw = .FindTextWidth + 14 max mw
 		return mw max 64
+	
 
+	libinternal FindTextWidth (|int|)
+		opt norefcounts
+		for row.all in self
+			rz = rz max row.__TableCell__(0).bounds.x
+		rz *= font.width
+	
 	
 	function ShowCmm (|GUIControl| Owner, |int| X, |int| Y)
 		opt norefcounts
@@ -149,7 +156,7 @@ class Menu (ListView)
 
 	libinternal FindTypedRow (|string| input, |listviewrow|)
 		for s.all in self
-			if s.__DisplayName__[0, input, true]
+			if s.__Tablecell__(0)[0, input, true]
 				return s
 
 

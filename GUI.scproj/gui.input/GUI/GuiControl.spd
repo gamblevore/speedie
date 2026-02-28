@@ -188,7 +188,7 @@ class GUIControl (list)
 	function TextWidth (|int|)
 		opt norefcounts
 		return .text.bounds.x * font.width
-
+	
 	syntax cast (|ivec4|)
 		inline
 		return .lastrect
@@ -221,14 +221,18 @@ class GUIControl (list)
 		inline
 		return .Declutterer.final
 	
+
 	setter Declutter (|bool|) 
 		.declutterer.fire(0.334, 0.5) = value
+
 
 //	setter DeclutterNow (|bool|) 
 //		.declutterer.value = value
 		
-	function Decluttered (|bool|)
+		
+	inline Decluttered (|bool|)
 		return .Declutterer.Finished
+	
 	
 	function Touch (|int| Amount = 1)
 		opt norefcounts
@@ -238,12 +242,14 @@ class GUIControl (list)
 		if gui.TouchCount < amount
 			gui.TouchCount = amount
 
+
 //// SCROLL ////
 	task ScrollEvent (taskgui)
 		constructor
 			is animation
 		run
 			// do nothing
+
 
 	libinternal NoScroll
 		opt norefcounts
@@ -392,6 +398,7 @@ class GUIControl (list)
 	function Width (|int|)
 		inline
 		return .lastrect.width
+	
 	setter Width (|controlline|)
 		.sizer.g(0, self) = value[0]|controlpoint|
 		.sizer.g(2, self) = value[1]|controlpoint|
@@ -399,6 +406,7 @@ class GUIControl (list)
 	function Height (|int|)
 		inline
 		return .lastrect.Height
+	
 	setter Height (|controlline|)
 		.sizer.g(1, self) = value[0]|controlpoint|
 		.sizer.g(3, self) = value[1]|controlpoint|
@@ -521,6 +529,7 @@ class GUIControl (list)
 		if .HasFocus
 			return .FaintingEdgeSub
 	
+	
 	libinternal FaintingEdgeSub (|float|)
 		opt norefcounts
 		|| w = .window!
@@ -555,8 +564,10 @@ class GUIControl (list)
 		|| w = .window
 			return w.CurrMouseDown == self
 	
+	
 	setter Text (|string|)
 		.textset(value)
+	
 	
 	libinternal TextSet (assigns:|string| text, |bool|)
 		cpp_part TextSetter
@@ -586,7 +597,6 @@ class GUIControl (list)
 		constructor
 			is animation  // doing this seems to break the system? no idea why.
 		run 
-//			printline progress
 			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
 			if .dir is close

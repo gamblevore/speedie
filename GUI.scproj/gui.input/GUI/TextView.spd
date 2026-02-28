@@ -23,9 +23,9 @@ class TextView (GUIControl)
 	|byte|						_CodeInsertionState
 	|uint16|					_LastDrawWidth
 	|int|						_RemainingHeight
-	|int|						_ActivePoint
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
+	|message?|					_ActiveLine
 	|TextViewLine|				_Start
 	|TextViewLine|				_Lines
 	|ivec3|						_Reclaim		
@@ -46,7 +46,6 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
 		|| TV = TextViewLine()
-		._ActivePoint = -1
 		._Lines = TV
 		._Start = TV							// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
@@ -1331,7 +1330,7 @@ class TextView (GUIControl)
 		|| e = i.editingfor
 		if e isa listview
 			if e._isediting
-				.finishediting(e.IsSpreadSheetLike)
+				.finishediting(e.columninfo>0)
 				return true
 		
 		return .InlineAcceptSearch

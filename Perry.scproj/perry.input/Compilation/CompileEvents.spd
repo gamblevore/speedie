@@ -28,7 +28,7 @@ function perryide.WantCake (|CompileMode| Mode, |compilemode|)
 function ClickedDebug (GUIAction)
 	opt norefcounts
 	|| i = .ide
-
+	
 	if (.text == "\07") // stop
 		i.Stop(i.RunCompiledApp)
 		return nil

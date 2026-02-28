@@ -47,10 +47,12 @@ extend PerryIDE
 /			Clickedcompile(.buildbutton)
 			return true
 		if key is r
-			if keys.shift
+			if keys.shift or keys.Option
 				PressingDebug(.runbutton)
+			  elseif (.RunCompiledApp  and  .DebugMode is CakeMode) // Run key
+				DebugStepRun(.RunButton)
 			  else
-				ClickedDebug(.runButton)
+				ClickedDebug(.RunButton)
 			return true
 		if key is o
 			if keys.shift

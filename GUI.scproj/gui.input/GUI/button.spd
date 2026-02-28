@@ -300,7 +300,7 @@ class ButtonView (GUIControl)
 	function ListViewRow.ButtonText (|string| Default, |string|)
 		if !self
 			return default
-		rz = .DisplayName
+		rz = .__TableCell__
 		rz ?= Default
 		if self is Broken
 			rz += " \17"

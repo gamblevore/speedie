@@ -52,11 +52,11 @@ struct InlineEditor
 			l.__Search__(s, true)
 	
 	
-	function FinishAndClear (|bool|focus=true)
+	function FinishAndClear (|bool| focus = true)
 		opt norefcounts
 		|| e = .editor
 		|| c = .cell
-		if e and c and e.text != c.__DisplayName__
+		if e and c and e.text != c.value
 			|| l = .editingfor
 			if l isa listview
 				l.TryRenameCellTo(c, e.text)
@@ -83,6 +83,7 @@ struct InlineEditor
 	
 	function Edit (|ListViewCell| r, |ListView| l, |bool|)
 		opt norefcounts
+		
 		l ?= .editingfor as ListView
 		
 		debug_require l and r
@@ -92,7 +93,7 @@ struct InlineEditor
 			.FinishEditing(false)
 			.visible = true
 			.setfocus
-			.text = r
+			.text = r.value
 			.selrange = .text.length
 		l.Select(r.row)
 		l <~ .editor

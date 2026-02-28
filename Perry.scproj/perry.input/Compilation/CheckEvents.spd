@@ -214,24 +214,25 @@ extend PerryIDE
 		if .compilr
 			return .CancelCompile(true)
 		if .RunCompiledApp
-			return .MakeNothingRunning("?")
+			return .MakeNothingRunning
+	
 	
 	function CancelCompile (|bool| Beep=false, |bool|)
 		opt norefcounts
 		|| c = .Compilr
-		if !c
-			if beep
-				Notifications <~ "Nothing is building"
-				beep
-			return .RenableAfterCompile
-		c.Kill(0)
-		app.Sleep(0.025) // allow pipes to work
-		.Readlog(true)
-		return true
+			c.Kill(0)
+			app.Sleep(0.025) // allow pipes to work
+			.Readlog(true)
+			return true
+
+		if beep
+			Notifications <~ "Nothing is building"
+			beep
+		.debugmode = 0
+		return .RenableAfterCompile
 
 
 	function RenableAfterCompile (|bool|)
-		.DebugMode = 0
 		|| code = .ProjIsSpeedieCode
 		(.buildbutton is enabled) = code
 		(.runbutton is enabled) = code

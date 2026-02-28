@@ -123,8 +123,11 @@ class String
 	function LowerCase	(|string|)					{ nil checker, cpp_wrapper JB_Str_LowerCase }
 
 	render TitleCase
-		fs <~ (self[]).uppercase
-		fs <~ self[1, int.max].lowercase
+		opt norefcounts
+		for (s in self) (i)
+			if i == 0
+				s = s.UpperCase
+			fs <~ s
 
 	render Remove (|CharSet| remove, |int| to=-1)
 		cpp_part RemoveProp
@@ -202,7 +205,7 @@ class String
 			return self
 		Return self[].Uppercase.render + self[1...]
 	
-	function Shorten (|int| n, |string|)
+	inline Shorten (|int| n, |string|)
 		return self[0, .length-n]
 	function rtrim (|int| n, |string|)
 		disabled "Use .shorten"
@@ -273,6 +276,7 @@ class String
 
 	inline FirstLine (|string|)
 		return .Before("\n")
+		
 		
 	function Before (|string| s, |string|)
 		|| f = .find(s)
@@ -507,6 +511,7 @@ class String
 		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
 		
 	function Right (|int| N, |string|)
+		inline
 		|| L = .length
 		return self[L-N, L]
 	
@@ -515,6 +520,7 @@ class String
 		
 	syntax Access (|ivec2| r, |string|)
 		cpp_part RangeVec
+		inline
 		return self[r.x, r.x2]
 
 	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)
@@ -555,12 +561,6 @@ class String
 						exit
 		return (s - s0)|ind|
 
-
-	operator match (|string| s, |int|)
-		if s ~= self
-			return 2
-		if s contains self
-			return 1
 
 	operator starts (|string| s, |bool|)
 		inline

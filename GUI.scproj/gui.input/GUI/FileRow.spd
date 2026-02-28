@@ -49,19 +49,18 @@ class FileRow (ListViewRow)
 		.lastfilecount = (!.asdir)|int|
 		is hierarchical
 	
-	behaviour CopyID
-		return .location
 	
+	behaviour TableCell
+/		if Value == nil
+			if Column == -1
+				return .location
+			if Column == 0
+				return .name
+
 	render
 		fs <~ "file: "
 		fs <~ .location
-		fs <~ .dirfile
-		
-	
-	behaviour DisplayName
-		if i == 0
-			return .name
-	
+		fs <~ .dirfile	
 
 	function AskDelete (|fileviewer| fv)
 		|| ex = fv.extra

@@ -73,15 +73,16 @@ function fnStillRunning (fnConfirmCanceller)
 
 function PerryIDE.Stop (|unixprocess| prod, |bool|)
 	if prod
-		prod.kill(-1)
+/		prod.kill(-1)
 		.UpdateDebuggedApp(true)
 	return true
 
 
-function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
-	|| prod = .runcompiledapp
-	if prod and .confirm("Kill running product " + .Name + Reason, fnStillRunning) and .stop(prod)
-		prod = nil
+function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
+	|| prod = .RunCompiledApp
+	if prod and .confirm("Kill running product " + .Name + Reason, fnStillRunning)
+		if .stop(prod)
+			prod = nil
 	return !prod
 
 
@@ -204,7 +205,9 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	.EditPath(path, false)
 	|| Where = row[2].int
 	if Active
-		.editme._ActivePoint = where
+		|| item = row.first
+			item.Position = where
+		.editme._ActiveLine = item
 	.editme.ShowAndSelect(where, true)
 	return true
 

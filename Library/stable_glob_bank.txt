@@ -179,3 +179,7 @@ GUI__Key_Record
 GUI__SystemCursor__Cursors
 JB__CharSet_Props
 JB__Constants__FuncArray
+JB__TerminalColor_RainbowTerm
+JB__Proc__ThreadedParent
+JB__Proc__ForceParent
+GUI__App_OpenedTime

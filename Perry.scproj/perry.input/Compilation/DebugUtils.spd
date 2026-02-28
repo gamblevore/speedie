@@ -1,13 +1,3 @@
-
-function message.ago (|Duration|)
-	if self
-		return date.now - .Date
-
-function message.date (assigns:|date|)
-	.Position = ((value - gui.OpenedTime) >> 10)
-	
-function message.date (|date|)
-	return (.Position << 10) + gui.OpenedTime
 	
 	
 extend PerryIDE {
@@ -22,16 +12,16 @@ function CakeTalk (|SpdProcess| Cake)
 	|listviewrow--| c = .LogCake
 		.LogOneThing(msg, "", C)
 		
-	if msg == "hoi :3"
-		.GotHello(msg.name)
-	  elseif msg == "stack" or "break"
-		.DelayedRun = nil
-		.UpdateStack(msg)
-	  elseif msg == "run"
-		.DelayedRun = msg
-		msg.date = date.now
+	if msg == "run"
+		.DelayedRun = date.now
 	  else
-		Notifications <~ ("unrecognised message", msg)
+		.DelayedRun = nil
+		if msg == "stack" or "break"
+			.UpdateStack(msg)
+		  elseif msg == "hoi :3"
+			.GotHello(msg.name) 
+		  else
+			Notifications <~ ("unrecognised message", msg)
 
 
 function GotHello (|string| msg)
@@ -41,7 +31,7 @@ function GotHello (|string| msg)
 		Notifications <~ msg // weird?
 	  else
 		(M is ReceivedHello)
-		.DebugMode = m
+		.DebugMode = M
 		.StrongView(.ViewDebugger) // view debugger!
 	.SetAppInfo
 
@@ -53,6 +43,8 @@ function AppInfoExtra (|unixprocess| r, |string|)
 	if st == 0
 		return "Exit OK"
 	if r isa SpdProcess
+		// wait... if its finished... hmmm
+		if .debugmode is finished // huh?
 		if .DebugMode isnt ReceivedHello
 			return "Waiting..."
 		if st.IsRunning
@@ -73,7 +65,7 @@ function SetAppInfo
 		(btn is enabled) = CanDebug and (Paused or Last)
 
 	if !CanDebug
-		.editme._ActivePoint = -1
+		.editme._ActiveLine = nil
 
 	|| extra = .AppInfoExtra(r)
 		s += "\n("
@@ -111,7 +103,7 @@ function UpdateStack (|message| stack)
 			.stack.Select(F)
 		.ClickedStack(F, true) // jump to new place
 	  else
-		.EditMe._ActivePoint = -1
+		.EditMe._ActiveLine = nil
 
 	|| M = .DebugMode
 	if m is Paused != Break

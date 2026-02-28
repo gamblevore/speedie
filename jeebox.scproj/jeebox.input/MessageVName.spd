@@ -4,52 +4,25 @@
 */
 
 
+// Simplified to one vfunc on message. Can merge with listview.ColumFinder... later!
+
 extend message
-	function TextViewChild (|message|)
+	virtual TableCell (|int| Column=0, assigns:|string?| Value = nil, |string|)
 		opt norefcounts
-		if self != @tmp
-			return self
-		
-		|| ch = .first
-			|| ch2 = ch.next
-			if ch2.ListViewable
-				return ch2
-			if ch.ListViewable
-				return ch
-		return self
-	
-	
-	function ListViewable (|bool|)
-		return self and .func.ListViewable
-
-	// this is for listview. However... a better approach would be to REMOVE these
-	// And just a column-based dictionary finder. Something like:
-	// prototype message.GetNameForColumn (|string| Name, |int| Index, |string|)
-	// prototype message.SetNameForColumn (|string| Name, |int| Index, |string| Value)
-	// then you are free to do it however you like. No wierd OOP complexity.
-
-	// So this isnt really designed the best way. However its OK! Because its only
-	// a little code. Didn't take too long to make.
-	
-	virtual DisplayName		(|int| i=0, |string|)
-		opt norefcounts
-		if i == 0
-			return .TextViewChild.name
-
-
-	virtual TextSet		(|int| i=0, |string| v, |bool|)
-		opt norefcounts
-		if i == 0
-			.TextViewChild.name = v
-			return true
-
-
-	virtual CopyID		(|string|)
-		return ""
+		real self
+		if column >= 0
+			self = self[Column]$
+		if value == nil // get
+			return .name
+		.name = value // set
 
 
 	function SearchColumns (|string| find, |int| n, |int|)
+		opt norefcounts
 		for i in n
-			rz = rz max (find match .__DisplayName__(i))
-			if rz == 2
+			|| s = .__TableCell__(i)
+			if find ~= s
+				rz = 2
 				exit
+			rz = (s contains find)|int|
+

@@ -2548,3 +2548,8 @@ roundf
 sqrt
 sqrtf
 strlen
+GUI_LV_RenameColumn
+GUI_Cell_ValueSet
+GUI_FR_TableCellSet
+JB_Msg_TableCellSet
+JB_Msg___TableCell__Set

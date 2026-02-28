@@ -37,6 +37,7 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	|| s = .source
 	|| srcmap = (s.srcmap, 0)(s)
 	dd.AppendHInt(srcmap)
+	if self is ClassObj
 	.MiniName(dd)
 	dd <~ '\0'
 	dd.AppendHInt(.DumpCls)

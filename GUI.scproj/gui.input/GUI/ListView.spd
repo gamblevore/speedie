@@ -7,12 +7,11 @@ class ListView (GUIControl) {
 	|bool|							UseColorScheme
 	|bool|							DontDrawSeparators
 
-	|bool|							IsSpreadSheetLike
+//	|bool|							IsSpreadSheetLike
 	|bool|							IsMainListView
 	|bool|							IsTree
 
 	|int|							ScrollShift
-	|byte|							ColumnCount
 	|bool|							RightClickSelects
 	|bool|							MultiSelection
 	|bool|							KeepOneSelected
@@ -33,19 +32,19 @@ class ListView (GUIControl) {
 	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
 	|listviewrow?| 					Headers
-	|string|						ColumnInfo
 	|menu?|							CMM
 	|DrawStyle|						gRowSel 
+	|[message]|						ColumnInfo
 	
+	|ColumnFinder?|					ColumnFinder
+	|GUIListDragEvent?|				OnDragRow
+	|ListViewRowDraw?|				OnDrawRow
 	|GUIListEditEvent?|				TryEditCell
 	|GUIListEvent?|					OnChange
 	|GUIListEvent?|					OnSelected
 	|GUIKeyEvent?|					OnKeyDown
 	|GUIListEvent?|					OnReturn
-	|GUIListEvent?|					CalculateColumnWidths
 	|GUIListEvent?|					OnRightClick
-	|GUIListDragEvent?|				OnDragRow
-	|ListViewRowDraw?|				OnDrawRow
 	|GUIListEditEvent?| 			OnTypingFilter
 	|textview?| 					TypingFilter
 
@@ -53,7 +52,6 @@ class ListView (GUIControl) {
 	constructor (|guicontrol| p,  |GUIListEvent| sel,  |GUIListEvent| ret)
 		super.constructor(p)
 		.RowHeight		= 13
-		.ColumnCount	= 1
 		.takesfocus 	= takesfocusflag.On
 		.onreturn		= ret
 		.onselected 	= sel
@@ -89,7 +87,7 @@ class ListView (GUIControl) {
 			return (tec)(self, cell, value)
 
 		|| orig = cell.row
-		orig.__textset__(cell.column, value)
+		orig.__TableCell__(cell.column) = value
 		return true
 
 
@@ -134,40 +132,10 @@ class ListView (GUIControl) {
 		|| t = .typingfilter
 			rz += t.height - 1 
 
-
-	libinternal ColBounds (|int| col,  |ivec4| z2, |ListViewrow| sc, |intrange|)
-		(sc) // one day I'll use it, I guess
-		|| x1	= .columns(col)
-		|| col1 = col+1
-		|| x2	= .columns(col1) - 1
-		rz		= (x1, x2) + z2.x
-		rz.x2	= rz.x2 min z2.x2
-
-		
-	libinternal Columns (|int| i, |int|)
-		require i > 0
-
-		|| w = .width
-		if .ColumnsToDraw == 3
-			if i == 1
-				return (w/2)
-			if i == 2
-				return (w/2)+(w/4)
-		return w
 	
-	
-	function ColumnsToDraw (|int|)
-		if .width < 150
-			return 1
-		return .ColumnCount
+	module
+		prototype ColumnFinder (|ListViewRow| Row, |int| Column, |string?| Value=nil, |string?|)
 
-	
-	libinternal TextWidth (|int|)
-		opt norefcounts
-		for row.all in self
-			rz = rz max row.__DisplayName__.bounds.x
-		rz *= font.width
-	
 
 	function NewCmm (|menu|)
 		rz = .cmm
@@ -176,8 +144,8 @@ class ListView (GUIControl) {
 			return rz
 		rz = menu(self, nil, nil)
 		rz.clipmode = ControlClipMode.SlideBackInWindow
-		.cmm = rz
 		rz.id = "cmm"
+		.cmm = rz
 	
 	
 	behaviour RightClick
@@ -312,7 +280,7 @@ class ListView (GUIControl) {
 		return .EditCell(r.cell)
 	
 	
-	function RenameCol (|ListViewRow| r, |int| col, |bool|)
+	function RenameColumn (|ListViewRow| r, |int| col, |bool|)
 		return .EditCell( r.cell(col) )
 	
 		
@@ -446,12 +414,14 @@ class ListView (GUIControl) {
 			return .openorclose(key)
 
 	
+	inline ListViewRow.CopyID (|string|)
+		return .__TableCell__(-1)
+		
 	function DefaultCopy (GUICopyEvent)
 		|| fs = faststring()
 		for s.listsel in self
-			|| it = s.__copyid__
-			it ?= s.DisplayName
-			it ?= s.name
+			|| it = s.copyid
+			it ?= s.__TableCell__
 			if fs.length
 				fs <~ '\n'
 			fs <~ it
@@ -463,7 +433,7 @@ class ListView (GUIControl) {
 		.EditDelayed = nil
 		.clearinternaldrops
 		for s.listsel in self
-			|| it = s.__copyid__
+			|| it = s.copyid
 				rz <~ it
 
 	
@@ -1181,7 +1151,19 @@ class ListView (GUIControl) {
 	libinternal HeaderHeight (|int|)
 		return 19
 	
-	
+
+	libinternal CellAtX (|ListViewrow| R, |int| x, |ListViewcell|)
+		// So... what are columns
+		// 0-100 --> 30, 60
+		// if x < a number, we are in that thing.
+		|| col = 0
+		for i in (1 to .ColumnsToDraw-1)
+			if .ColumnStart(i) >= x
+				exit
+			col++
+		return R.cell(col)
+
+
 	libinternal FindClickedCell (|ivec2| Search, |ListViewCell|)
 		opt NoRefCounts
 		|| r = .ActualRect
@@ -1190,7 +1172,7 @@ class ListView (GUIControl) {
 		for sc.visible in self
 			r.y = r.y2 - .RowHeight
 			if r.vert contains search.y
-				return .DrawCell( sc, x )
+				return .CellAtX( sc, x )
 			r.y2 = r.y
 
 
@@ -1203,23 +1185,6 @@ class ListView (GUIControl) {
 			if row == search
 				return r.y2
 			r.y2 = r.y
-
-	
-	libinternal DefaultColumnWidths (GUIListEvent)
-		return nil
-		/*
-		|| cw = .ColumnWidths$
-		|| Weights = cw.length$
-		|| sect = .width / Weights
-		|| x = sect*2
-		cw[0] = 0
-		cw[1] = x
-		
-		for i in (2 to weights)
-			x+=sect
-			cw[i] = x
-		cw[weights-1] = .width
-		*/
 	
 	
 	function LastVisible (|ListViewrow|)
@@ -1237,8 +1202,8 @@ class ListView (GUIControl) {
 		opt norefcounts
 		require prev
 		for i in 1 to n
-			|| t =     .__DisplayName__(i)
-			|| p = prev.__DisplayName__(i)
+			|| t =     .__TableCell__(i)
+			|| p = prev.__TableCell__(i)
 			if (t == p) // and t and p 
 				rz |= 1<<i
 	
@@ -1282,7 +1247,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| sc = cell.row!
 		|| B = .RowBounds(.scrollstart, sc, .rowheight)			#require
-		B.horz = .ColBounds(cell.column, B, sc)
+		B.horz = .ColumnBounds(cell.column, B, sc)
 		B.x += sc.depth(self) * font.width*2
 		return (B down .lastbottom) left .lastleft 
 
@@ -1297,7 +1262,7 @@ class ListView (GUIControl) {
 			for r.visible in self
 				|| n = .ColumnsToDraw
 				for i in n
-					z2.horz = .ColBounds(i, rect, r)
+					z2.horz = .ColumnBounds(i, rect, r)
 					r.DrawDividerH(z2, where, i)
 					if i < n-1
 						r.DrawDividerV(z2, where)
@@ -1416,8 +1381,6 @@ class ListView (GUIControl) {
 
 	behaviour Draw
 		opt NoRefCounts
-		|| c = (.CalculateColumnWidths) ?? (DefaultColumnWidths)
-		(c)(self, nil) // allow the thing to calculate the column widths before draw
 		.ScrollProtect
 		
 		|| clip = where.ControlClip

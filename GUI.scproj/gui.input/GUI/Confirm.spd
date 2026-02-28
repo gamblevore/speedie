@@ -3,6 +3,7 @@
 module beep
 	|date| OK = 1
 	syntax expect (|string?| s=nil)
+		inline
 		app.beep(s)
 
 
@@ -127,6 +128,7 @@ class ConfirmationDialog (Window)
 		isnt visible
 		.init
 	
+	
 	function Resize (|string| s)
 		|| desired = .question.TextSize(s) + (19, 34)
 		|| actual = desired max (200, 100)
@@ -154,7 +156,6 @@ class ConfirmationDialog (Window)
 			.takesfocus = 0
 			&.gnormal.edge<~ (0,0,0,0)
 			&.gnormal.bg  <~ ((0.11,0.11,0.11,1.0))
-		
 		with .response
 			is editable
 			isnt drawsfocus
@@ -192,17 +193,17 @@ class ConfirmationDialog (Window)
 	module	
 		|ConfirmationDialog| _asker
 
+
 	
 function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 	|| can = ConfirmCanceller(self, fn)
-	if q.confirm(can)
-		return true
+	return q.confirm(can)
 
 
 function OnConfirmAnswer (GUIAction)
 	opt norefcounts
-	.window$.ReturnValue = self // self isa button, not a window! (i made this mistake once)
-
+	|| w = .window
+		w.ReturnValue = self // self isa button, not a window! (i made this mistake once)
 
 
 // this could be better as a task... one less class to think about.

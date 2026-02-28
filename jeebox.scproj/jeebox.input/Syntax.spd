@@ -13,29 +13,28 @@ datatype Syntax (Byte)
 		cpp_Part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion
 
-	function Translateable (|bool|) 
-		return self <= @Thg and self >= @tmp
+	inline Translateable (|bool|) 
+		if self <= @Thg and self >= @tmp
+			return true
 
-	function ListViewable (|bool|) 
-		return .translateable or .isstring
-
-	function IsString (|bool|)
-		return self >= @sstr and self <= @str
+	inline IsString (|bool|)
+		if self >= @sstr and self <= @str
+			return true
 
 // relies on me having cleverly ordered all my syntax :> to group them up.
-	function NoChildren (|bool|)
+	inline NoChildren (|bool|)
 		return self >= @Cnj	and self <= @Bin
 
-	function IsRel (|bool|) 
+	inline IsRel (|bool|) 
 		return self >= @rel and self <= @yoda
 
-	function IsAdj (|bool|) 
+	inline IsAdj (|bool|) 
 		return self >= @adj and self <= @badj
 
-	function IsList (|bool|) 
+	inline IsList (|bool|) 
 		return self >= @bra and self <= @Arr
 
-	function Message.Translateable (|bool|) 
+	inline Message.Translateable (|bool|) 
 		return .Func.Translateable
 			
 	operator plus (|string| m, |message|)
@@ -44,6 +43,7 @@ datatype Syntax (Byte)
 	
 	operator plus (|int64| m, |message|)
 		opt norefcounts
+		inline
 		cpp_Part PlusNum
 		return .msg(m.render)
 		
@@ -61,15 +61,14 @@ datatype Syntax (Byte)
 				return o.longname
 		return "child"
 	
-	function Obj (|syntaxobj|) 
+	inline Obj (|syntaxobj|) 
 		return jeebox._FuncArray[self|int|]
 	
 	
-	function Msg ( |string| name="", |Message| ) 
+	inline Msg ( |string| name="", |Message| ) 
 		return Message( nil, self, name )
 	
-	
-	function message.Msg ( |syntax| fn, |string| name="", |Message| )
+	inline message.Msg ( |syntax| fn, |string| name="", |Message| )
 		return Message( self, fn, name )
 	
 	
@@ -77,16 +76,16 @@ datatype Syntax (Byte)
 	function Msg ( |int64| name, |Message| )
 		disabled "Use int64.msg instead"
 		
-	function ExportAddr (assigns:|fpMsgRender|) 
+	inline ExportAddr (assigns:|fpMsgRender|) 
 		Opt NoRefCounts
 		.obj!.exportaddr = Value
 	
-	function ExportAddr (|fpMsgRender|) 
+	inline ExportAddr (|fpMsgRender|) 
 		Opt NoRefCounts
 		return .obj!.exportaddr
 	
 
-	function RenderAddr (|fpMsgRender|) 
+	inline RenderAddr (|fpMsgRender|) 
 		Opt NoRefCounts
 		return .obj!.renderaddr
 	

@@ -15,12 +15,15 @@ role ListViewRow (message)
 		.tag = state
 
 	function State (|ListViewState|)
+		inline
 		return .tag
 
 	function State (assigns:|ListViewState|)
+		inline
 		.tag = value
 
 	syntax is (|ListViewState| s, |bool|)
+		inline
 		if self
 			return .tag & s
 
@@ -35,6 +38,7 @@ role ListViewRow (message)
 
 
 	libinternal Vis (|int| i, |bool|)
+		// move this over to the columns array
 		if !self
 			return true
 		return !((.Indent)&(1<<i))
@@ -69,21 +73,10 @@ role ListViewRow (message)
 		if (self is expanded) or (self == root)
 			return .flatnext
 		return .next ?? .flatafter
-				
-	
-	libinternal ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
-		// So... what are columns
-		// 0-100 --> 30, 60
-		// if x < a number, we are in that thing.
-		|| col = 0
-		for i in (1 to .ColumnsToDraw-1)
-			if .columns(i) >= x
-				exit
-			col++
-		return R.cell(col)
-	
+					
 		
 	function RemoveQuietly (|listview| lv)
+		inline
 		.remove(lv, false)
 	
 	
@@ -134,7 +127,7 @@ role ListViewRow (message)
 		where.controlclip = rect.clip(p.lastrect)
 		
 		for i in p.ColumnsToDraw
-			rect.horz	= p.ColBounds(i, z2, self)
+			rect.horz	= p.ColumnBounds(i, z2, self)
 			rect.x	   += depth*font.width*2
 			.DrawRowColumn(rect, where,  p, depth, i, str) 
 
@@ -155,12 +148,18 @@ role ListViewRow (message)
 			where.DrawRect(z2, edge)
 
 
+	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|) // __TableCell__(column)
+		if parent.ColumnInfo > 0
+			return .__TableCell__(column)
+		return .__TableCell__(-1)
+		
+		
 	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
 		opt NoRefCounts
 
 		require .vis(column)
 
-		|| na = .__DisplayName__(column)
+		|| na = .CellOrRow(parent, column)
 		if !na and (self is Separator)
 			.DrawSep(Rect, where, str)
 			return
@@ -212,6 +211,7 @@ datatype ListViewState (uint16)
 		
 	syntax is (|ListViewState| s, |bool|)
 		(Hidden)
+		inline
 		return self & s
 
 
@@ -228,40 +228,7 @@ datatype ListViewSelectMode (uint)
 		Normal = 0
 	
 	syntax is (|ListViewSelectMode| s, |bool|)
+		inline
 		return (self|uint| & s|uint|) == s
 
-
-role ListViewCell (message)
-	linkage
-		cpp_part Cell
-	function Original (|ListViewrow|)
-		disabled "Use .row" // or should it just be .row
-	function Column (|int|)
-		if self
-			return .position
-	function Row (|ListViewrow!|)
-		return (.obj as Message)|listviewrow|!
-	syntax cast (|string|)
-		return self$.value
-	function Step (|int|i, |ListViewcell|)	
-		return .step(i, .position)
-	function Step (|int|i, |int|col, |ListViewcell|)
-		cpp_Part StepCol
-		|| c = .row.move(i)
-			return c.cell(col)  
-	syntax equals (|ListViewcell| c, |bool|)
-		return c.obj == .obj  and  c.position == .position
-	function Value (|string|)
-		require self
-		return .row.__DisplayName__(.column)
-	
-	
-	function Tab (|bool| dir, |ListView| lv, |ListViewcell|)
-		|| n    = .column + (1, -1)(dir)
-		|| cols = lv.ColumnsToDraw
-		if n >= cols
-			return .step( 1, 0)
-		if n < 0
-			return .step(-1, cols-1)
-		return .row.cell(n)
 

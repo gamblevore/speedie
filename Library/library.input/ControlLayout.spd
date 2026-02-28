@@ -42,12 +42,15 @@ datatype ControlRect (ivec4)
 		return (.x2>>4, .y2>>4)
 	
 	function Width (|ControlLine|)
+		inline
 		return (.x1, .x2)|ControlLine|
 	
 	function Height (|ControlLine|)
+		inline
 		return (.y1, .y2)|ControlLine|
 	
 	function BasicSize (|ivec4|)
+		inline
 		return self >> 4
 	
 	function IsBasic (|bool|)
@@ -81,6 +84,7 @@ datatype ControlLine (ivec2)
 		return (.x,b.x,   .y,b.y)|ControlRect|
 	operator by (|Controlpoint| B, |ControlRect|)
 		cpp_part ByPoint
+		inline
 		return self by b.expand
 	operator by (|intrange| B,    |ControlRect|)
 		cpp_part ByRange
@@ -95,6 +99,7 @@ datatype ControlPoint (int)
 		cpp_part CL1
 		numeric false // disallow implicit (syntax <--> int) conversion
 	syntax is (|ControlPoint| m, |bool|)
+		inline
 		return (self|int|&15)==m
 	operator plus (|int| n, |ControlPoint|)
 		return ((self|int|&15) ||| ( (.length+n) << 4))|controlpoint|
@@ -105,12 +110,14 @@ datatype ControlPoint (int)
 		inline
 		return (self|int|, high|int|)|ControlLine|
 	operator for (|int| n, |controlline|)
+		inline
 		return (self|int|, ((n)~long)|int|)|ControlLine|
 	operator for (|controlpoint| pc, |controlline|)
 		cpp_Part ForPoint
 		inline
 		return (self|int|, pc|int|)|ControlLine|
 	operator back (|int| n, |controlline|)
+		inline
 		return (((n)~long)|int|, self|int|)|ControlLine|
 	operator back (|controlpoint| cp, |controlline|)
 		cpp_Part BackPoint
@@ -118,11 +125,14 @@ datatype ControlPoint (int)
 		return (cp|int|, self|int|)|ControlLine|
 	operator by (|ControlPoint| B, |controlRect|)
 		cpp_part ByPoint
+		inline
 		return .expand by b.expand
 	operator by (|ControlLine| B, |controlRect|)
 		cpp_part ByLine
+		inline
 		return .expand by b
 	function Length (|int|)
+		inline
 		return self|int|>>4
 		
 	function Expand (|ControlLine|)
@@ -131,6 +141,7 @@ datatype ControlPoint (int)
 		if self is high
 			return self to the~top
 	function Layout (|int| value, |ControlPoint|)
+		inline
 		return (self|int| ||| value<<4)|controlpoint|
 	
 	function AppendInto (|faststring| fs)

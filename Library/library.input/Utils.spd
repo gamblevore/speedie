@@ -2,7 +2,8 @@
 // allow the short sort of one-liners that other languages have...
 // good for demos and language-tests
 
-function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
+inline dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
+	opt norefcounts
 	rz = .values // a more efficient sorter could extract only needed
 	rz.sort(fn)
 	rz.Length = count
@@ -34,7 +35,8 @@ role MessageTable (Dictionary)
 function message.List (|[Message]|)
 	disabled "Use .array if you want an array of all the children. Message is already a 'list'."
 
-function message.Array (|[Message]|)
+
+inline message.Array (|[Message]|)
 	opt norefcounts
 	for s.fast in self
 		rz <~ s
@@ -101,7 +103,7 @@ autogen Message.FindNotInserted (|message|)
 	return self
 
 
-function message.IsTypeOfDecl (|bool|)
+inline message.IsTypeOfDecl (|bool|)
 	return .WithinType(1)
 
 
@@ -171,6 +173,7 @@ inline bool.Msg (|message|)
 
 datatype HumanDate (date)
 	inline Render (|faststring| fs_in, |string|)
+		opt norefcounts
 		|| fs = FastString(fs_in)
 		fs.AppendLocalTime(self)
 		return fs.GetResult(fs)

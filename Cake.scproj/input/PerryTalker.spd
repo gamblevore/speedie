@@ -186,9 +186,9 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 	|| Where = debugger.SrcMap(index)
 	|| Path = Where.File						#expect (j, "MissingFile", where.filenum)
 
-	j.Enter(@tmp, "function")
-	j.AddStr(path)
+	j.Enter(@tmp, "\0B")
 	j.AddStr(fn.Name)
+	j.AddStr(path)
 	j.AddInt(where.bytepos)
 	}
 	
