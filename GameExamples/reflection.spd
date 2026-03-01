@@ -201,7 +201,7 @@ class Breakout (Window)
 			where.DrawRect(b, b.color)
 			|| Col = colors.wheel(H, 1.0, 0.4)
 			where.DrawOutlineOnly(b, col.px)
-		where.DrawRect(.bar)
+		where.DrawRect(.bar, colors.white)
 
 		|| L = 24s()
 		for (s in .Spirals) (i)

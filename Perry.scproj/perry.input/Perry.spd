@@ -19,6 +19,10 @@ module Perry
 				rz = true
 	
 	
+	function ReadButtonNames (listview.ColumnFinder)
+		return .firstname
+	
+	
 	function LoadAppArg (|string| arg, |perryide|)
 		|| line = (0, 0)
 		|| path = arg.ExtractPathAndLine(line)

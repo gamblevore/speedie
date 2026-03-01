@@ -56,9 +56,9 @@ struct InlineEditor
 		opt norefcounts
 		|| e = .editor
 		|| c = .cell
-		if e and c and e.text != c.value
-			|| l = .editingfor
-			if l isa listview
+		|| l = .editingfor
+		if  e and c  and  l isa listview
+			if e.text != l.TableCell(c)
 				l.TryRenameCellTo(c, e.text)
 		.Clear(focus)
 		
@@ -69,8 +69,6 @@ struct InlineEditor
 		|| s = .EditingFor 
 		if s isa listview
 			GUI.LastSearch = .editor!.text
-			if focus
-				s.setfocus
 		with .editor
 			.visible = false
 			.text = ""      // wants new
@@ -93,12 +91,13 @@ struct InlineEditor
 			.FinishEditing(false)
 			.visible = true
 			.setfocus
-			.text = r.value
+			.text = l.TableCell(r)
+//			r.value
 			.selrange = .text.length
 		l.Select(r.row)
 		l <~ .editor
 		l._isediting = true
-		l.ShowFast(r.row)
+		l.Show(r.row)
 		.cell = r
 		.EditingFor = l
 		return true

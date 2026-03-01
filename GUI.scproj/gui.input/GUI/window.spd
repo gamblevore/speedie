@@ -137,10 +137,6 @@ class Window (GUIControl)
 		if rz == self
 			rz = nil
 		.Close
-
-
-//	setter Focus (|guicontrol|)
-//		.SetFocus(value)
 	
 
 	libinternal SetInnerFocus (|guicontrol| Focus)

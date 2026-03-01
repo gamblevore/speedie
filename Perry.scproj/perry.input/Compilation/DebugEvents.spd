@@ -10,13 +10,27 @@ datatype CompileMode (int)
 		ReceivedHello
 		Paused
 		Finished
+		
 	syntax is (|CompileMode| M, |bool|)
 		return (self&M) == M
+	
 	syntax is (|CompileMode| M, assigns:|bool|, |CompileMode|)
 		if Value
 			return self|||M
 		return self&~M
 	
+
+function PerryAppInfoKeys (guikeyevent)
+	// keys.movement is almost ok... but it uses ctrl for down... sigh.
+/	if key is RIGHT or PERIOD or Num6
+		DebugStepOver(self)
+	if key is DOWN or S or Num8
+		DebugStepIn(self)
+	if key is UP or W or Num2
+		DebugStepOut(self)
+	if (key is space) or key.IsAccept
+		DebugStepRun(self)
+		
 
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
@@ -73,7 +87,7 @@ function fnStillRunning (fnConfirmCanceller)
 
 function PerryIDE.Stop (|unixprocess| prod, |bool|)
 	if prod
-/		prod.kill(-1)
+		prod.kill(-1)
 		.UpdateDebuggedApp(true)
 	return true
 
@@ -161,9 +175,21 @@ function PerryIDE.ClearRun
 	.DelayedRun = nil
 	.SetAppInfo
 	.RunCompiledApp = nil
+	.editme._ActiveLine = nil
 	.stack.clear
 	.Variables.clear
 	
+	
+function PerryVariableFinder (listview.columnfinder)
+	opt norefcounts
+	if value == nil
+		if Column == 0
+			return .name
+		if column == 1
+			return self[3].name
+	  else
+		// can't set yet
+
 	
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
@@ -203,7 +229,7 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	opt norefcounts
 	|| path = row.firstname
 	.EditPath(path, false)
-	|| Where = row[2].int
+	|| Where = row[1].int
 	if Active
 		|| item = row.first
 			item.Position = where
@@ -251,8 +277,13 @@ function GUIControl.SendMsg (|string| s)
 	|| i = .ide
 	|| r = i.RunCompiledApp
 	if r isa SpdProcess
-		if !(r <~ s)
+		if (r <~ s)
+			i.AppInfo.setfocus
+		  else
 			Notifications <~ "Debugger connection failed"
+	  else
+		Notifications <~ "Program already finished"
+		i.editme.setfocus
 	
 
 function Perryide.ASMVis (|bool|)

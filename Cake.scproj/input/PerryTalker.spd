@@ -186,8 +186,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 	|| Where = debugger.SrcMap(index)
 	|| Path = Where.File						#expect (j, "MissingFile", where.filenum)
 
-	j.Enter(@tmp, "\0B")
-	j.AddStr(fn.Name)
+	j.Enter(@tmp, fn.Name)
 	j.AddStr(path)
 	j.AddInt(where.bytepos)
 	}
@@ -200,11 +199,10 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 		index -= fn.Position
 		for v in Locals
 			if v contains index
-				j.Enter(@tmp, "local")
+				j.Enter(@tmp, v.name)
 
 				|| Src = v.srcmap
 				j.AddStr(src.file)
-				j.AddStr(v.name)
 				j.AddInt(src.bytepos)
 				
 				v.RenderType(vars)

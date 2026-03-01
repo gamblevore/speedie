@@ -2553,3 +2553,8 @@ GUI_Cell_ValueSet
 GUI_FR_TableCellSet
 JB_Msg_TableCellSet
 JB_Msg___TableCell__Set
+GUI_LV_ColumnsSet
+GUI_Btn_ButtonText
+GUI_LV_TableCellSet
+GUI_Row_CellSet
+GUI_FV__FileRowCellSet

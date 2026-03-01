@@ -105,7 +105,7 @@ class Document (list)
 		return latest
 
 
-	function ClearTo (|string| s)
+	inline ClearTo (|string| s)
 		.clear
 		.AddState(s, nil)
 
@@ -216,13 +216,15 @@ class Document (list)
 			return nil
 		if it isa TextView
 			return it
-		
+	
+	
 	function ShowParseErrorInViewers
 		opt norefcounts
 		|| v = .viewers.first
 		while v
 			|| it = v.NextViewer(v)
 				it.parse
+
 
 	function UpdateViewers (|int| Reason)
 		opt norefcounts
@@ -241,7 +243,6 @@ class Document (list)
 				(it is modified) = false
 				(it.ontextchanged)(it, documentstate.Saving, false)?
 				
-
 
 	function LoadSub (|bool| ChangedExternal, |bool|)
 		|| f = .Location.file
@@ -353,7 +354,7 @@ extend TextView
 			.UndoChecker = x
 
 
-	function DoUndo (|bool| undo, |bool|)
+	inline DoUndo (|bool| undo, |bool|)
 		.undo(undo)
 		return true
 
@@ -420,16 +421,18 @@ class DocumentState (list)
 		ErrorChecking = -5
 
 	function Text	(|string|)
+		opt norefcounts
+		|| T = ._Text
 		if UseCompression
-			return ._Text.Decompress
-		  else
-			return ._Text
+			T = T.Decompress
+		return T
 
 	setter Text (|string|)
+		opt norefcounts
 		if UseCompression
-			._text = value.Compress // mz is pretty fast anyway
-		  else
-			._Text = value
+			value = value.Compress // mz is pretty fast anyway
+		._Text = value
+
 	module
 		|bool| UseCompression
 

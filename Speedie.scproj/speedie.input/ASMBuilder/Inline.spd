@@ -182,11 +182,12 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-	require .InlineDepth < 7 // for LinkInline funcs
+//	require .InlineDepth < 7 // for LinkInline funcs
+// inliner needs improvements... :]
+	require .InlineDepth < .InlineDepthLimit
 	|| N = fn.µfatlength
 	if fn isnt LinkInline
 		require N and (N < 64)
-		require .InlineDepth < .InlineDepthLimit
 		|| MaxEnd = .InlineEnd
 			|| SubInline = .curr + (N / 3)
 			require SubInline < MaxEnd

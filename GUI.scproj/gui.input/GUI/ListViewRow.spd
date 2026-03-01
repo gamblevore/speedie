@@ -149,9 +149,9 @@ role ListViewRow (message)
 
 
 	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|) // __TableCell__(column)
-		if parent.ColumnInfo > 0
-			return .__TableCell__(column)
-		return .__TableCell__(-1)
+		if parent._Columns == nil
+			column = -1
+		return parent.TableCell(self, column)
 		
 		
 	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
@@ -173,12 +173,6 @@ role ListViewRow (message)
 		|| TextCol	= parent.ColorRow(depth, column, moved.y)
 		TextCol.alpha *= str
 		font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
-		
-
-	function Cell (|int| i=0, |ListViewCell|)
-		rz = Message()
-		rz.obj = self
-		rz.position = i
 		
 	
 	module

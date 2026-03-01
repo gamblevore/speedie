@@ -49,13 +49,6 @@ class FileRow (ListViewRow)
 		.lastfilecount = (!.asdir)|int|
 		is hierarchical
 	
-	
-	behaviour TableCell
-/		if Value == nil
-			if Column == -1
-				return .location
-			if Column == 0
-				return .name
 
 	render
 		fs <~ "file: "

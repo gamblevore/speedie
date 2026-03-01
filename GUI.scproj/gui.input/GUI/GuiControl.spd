@@ -8,6 +8,7 @@ class GUIControl (list)
 	|GUIAction?|				OnFocus
 	|GUIPasteEvent?|			OnPaste
 	|GUICopyEvent?|				OnCopy
+	|GUIKeyEvent?|				OnKeyDown
 
 	|ivec4| 					LastRect
 	|string|					ID
@@ -68,6 +69,8 @@ class GUIControl (list)
 	virtual Gesture	    (|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
 	virtual RightClick	(|ivec2| P)
 	virtual KeyDown		(|keys| Key, |bool|)
+		if (.OnKeydown)(self, key)?
+			return true	
 	virtual MouseUp		(|ivec2| P)
 	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
 		return 1
@@ -89,6 +92,7 @@ class GUIControl (list)
 	virtual Resized (|bool| Initial)
 		0
 	
+	behaviour Search
 	behaviour MouseMove
 		if state isnt leave
 			if self is editable
@@ -98,9 +102,7 @@ class GUIControl (list)
 			  else
 				SystemCursor.Arrow.use
 	
-	behaviour Search
 	behaviour Gesture
-	behaviour KeyDown
 	behaviour RightClick
 	behaviour MouseUp
 	behaviour Copy
@@ -210,11 +212,9 @@ class GUIControl (list)
 			.state &= ~F
 		
 		if f & guicontrolflags.visible
-			if self is TrapVisibleChange
-			if true // .HasAny		// seems to cause issues. perhaps I need to check for items AFTER this?
-				GUI.resized(self)
-			  else
-				gui.Touch(self)
+//			if self is TrapVisibleChange
+//			if true // .HasAny		// seems to cause issues. perhaps I need to check for items AFTER this?
+			GUI.resized(self)
 			
 
 	function Decluttering (|bool|)
@@ -585,12 +585,8 @@ class GUIControl (list)
 	libinternal RefSanity
 		visible
 		opt norefcounts
-		|| c	= .class		// Cls->Memory
-		|| m	= c.layer
-		|| rc	= m.refcount
 		for r in self
-			|| r2 = r
-			r2.RefSanity
+			r.RefSanity
 
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)

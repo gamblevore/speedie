@@ -1,5 +1,7 @@
 	
-	
+
+|| VarPrinter = faststring()	
+
 extend PerryIDE {
 function CakeTalk (|SpdProcess| Cake)
 	if .DelayedRun.ago > 0.5s
@@ -42,13 +44,12 @@ function AppInfoExtra (|unixprocess| r, |string|)
 	|| st = r.Status
 	if st == 0
 		return "Exit OK"
-	if r isa SpdProcess
-		// wait... if its finished... hmmm
-		if .debugmode is finished // huh?
+	if (r isa SpdProcess) and st.IsRunning
+		if .DebugMode is Finished
+			return "Finished"
 		if .DebugMode isnt ReceivedHello
 			return "Waiting..."
-		if st.IsRunning
-			return ""
+		return ""
 	return st.Name
 
 
@@ -56,7 +57,7 @@ function SetAppInfo
 	|| s = .Project.name.TrimExt
 	|| r = .RunCompiledApp
 
-	|| CanDebug = (r isa SpdProcess) and r.Status.IsRunning
+	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (.debugmode isnt finished)
 	|| Paused = .DebugMode is paused
 
 	for btn in .DebugBtns
@@ -82,6 +83,26 @@ function listview.Fixup (|message| NewList)
 	// but do that later.
 
 
+function ImproveVar (|message| s)
+	opt norefcounts
+	|| fs = VarPrinter
+	fs <~ s.name
+	fs <~ " |"
+	fs <~ s[2].name
+	fs <~ "|"
+	s.name = fs
+//		A "/usr/local/speedie/Examples/hello_world.spd" 199 "int" "1"
+//		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "(FastString)" "\"\""
+	
+	
+function ShowDebugVars (|message| v)
+	opt norefcounts
+	.Variables.Fixup(v)
+	for s in v
+		.ImproveVar(s)
+	v.Remove // make owner easier to deal with
+	
+
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
@@ -93,8 +114,7 @@ function UpdateStack (|message| stack)
 	for m in Arg
 		|| l = m.Last
 		if l == @arg // assume its a var-dump
-			.Variables.Fixup(l)
-			l.Remove // make M easier to deal with
+			.ShowDebugVars(l)
 			exit
 
 	|| Break = stack == "break"
@@ -110,9 +130,5 @@ function UpdateStack (|message| stack)
 		(M is paused) = Break
 		.DebugMode = M
 		.SetAppInfo
-
 }
-
-//		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow.SetResponse" 3362
-//		function "Main" "/usr/local/speedie/Examples/hello_world.spd" 70 {}
 

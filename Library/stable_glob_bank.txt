@@ -183,3 +183,4 @@ JB__TerminalColor_RainbowTerm
 JB__Proc__ThreadedParent
 JB__Proc__ForceParent
 GUI__App_OpenedTime
+GUI_FV__FileRowCellSet

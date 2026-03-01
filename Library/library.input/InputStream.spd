@@ -131,13 +131,13 @@ class InputStream
 			.position = zpos+1
 			return .data[p, zpos] // don't call .section, seeing as its not streaming.
 
-	function CString (|string|)
+	inline CString (|string|)
 		return .DelimitedString(0)
 	
-	function UpTo (|int| end, |int|)
+	inline UpTo (|int| end, |int|)
 		return end - .position
 	
-	function Int32BE (|int|)
+	inline Int32BE (|int|)
 		return .uintbe(4)
 
 	function UIntBE (|int| Size, |uint64|)
@@ -242,7 +242,7 @@ function string.Stream (|string| Header, |InputStream?|)
 		rz = nil
 
 // can't be unified with above.	The above returns optional.
-function string.Stream (|InputStream!|)
+inline string.Stream (|InputStream!|)
 	return InputStream(self)
 
 

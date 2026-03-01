@@ -1,11 +1,21 @@
 
 
+// Perhaps I should make a tableview... as a "Role" of listview?? I mean... maybe?
+
+
+extend_module ListView
+	prototype ColumnFinder (|ListViewRow| self, |int| Column=-1, assigns:|string?| Value=nil, |string|)
+
+
+function ListViewRow.Cell (|int| Column=-1, |listview.columnfinder?| fn, assigns:|string?| Value=nil, |string|)
+	if fn
+		return (fn)(self, column, value)
+	return .__TableCell__(column, value)
+
+
 role ListViewCell (message)
 	linkage
 		cpp_part Cell
-	
-	function Original (|ListViewrow|)
-		disabled "Use .row" // or should it just be .row
 		
 	function Column (|int|)
 		inline
@@ -32,14 +42,6 @@ role ListViewCell (message)
 	syntax equals (|ListViewcell| c, |bool|)
 		return (c.obj == .obj)  and  (c.position == .position)
 		
-	function Value (|string|)
-		require self
-		return .row.__TableCell__(.position)
-			
-	function Value (assigns:|string|)
-		require self
-		.row.__TableCell__(.column) = value
-	
 	function Tab (|bool| dir, |ListView| lv, |ListViewcell|)
 		|| n    = .column + (1, -1)(dir)
 		|| cols = lv.ColumnsToDraw
@@ -49,14 +51,24 @@ role ListViewCell (message)
 			return .step(-1, cols-1)
 		return .row.cell(n)
 
+	function listviewrow.Cell (|int| i=0, |ListViewCell|)
+		rz = Message()
+		rz.obj = self
+		rz.position = i
+		
 
 
-// Perhaps I should make a tableview... as a "Role" of listview?? I mean... maybe?
+
+
 extend ListView
 	function Columns (assigns:|string|value)
+		|| x = Message()
+		._Columns = x
 		for s in value.Split(',')
-			.ColumnInfo <~ @thg + s
-		
+			x.msg(@thg, s)
+			x.Position++
+	
+	
 	libinternal ColumnStart (|int| i, |int|)
 		require i > 0
 
@@ -85,4 +97,8 @@ extend ListView
 	
 	
 	inline ColumnCount (|int|)
-		return .ColumnInfo.Length max 1
+		if !._Columns
+			return 1
+		return ._columns.Count
+
+

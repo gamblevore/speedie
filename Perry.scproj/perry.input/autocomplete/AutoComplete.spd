@@ -53,8 +53,11 @@ function PerryIDE.CallFromSelect (|listviewrow| list)
 			Count++
 		  else
 			(s isnt selected)
+			
 		if s.last.int < 0
 			(s is separator)
+		s.name = s.second.name
+	
 	if !count
 		|| f = list.first
 			(f is selected)
@@ -74,9 +77,9 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	list.first = define
 	.autocomplete.listsource = list!
 	.SetAutoPoint(.editme.selrange.x)
+	.CallFromSelect(list)
 	.ShowAutoComplete
 	(.AutoComplete isnt typethrough)
-	.CallFromSelect(list)
 
 
 function message.DefineToLine (|int| count)

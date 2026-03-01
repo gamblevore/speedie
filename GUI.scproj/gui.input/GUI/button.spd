@@ -13,6 +13,7 @@ class ButtonView (GUIControl)
 	|listviewrow?|				CurrOverItem
 	|listviewrow?|				ButtonSource
 	|listviewrow?|				ClickedItem
+	|listview.columnfinder?|	ColumnFinder
 	|int|						ItemWidth
 	|int| 						ItemGap
 	|byte|						_ClickCount
@@ -228,8 +229,8 @@ class ButtonView (GUIControl)
 			return xy 
 
 
-	libinternal DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| i)
-		|| disabled = (i and i is disabled) or (self isnt enabled)
+	libinternal DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| Tab)
+		|| disabled = (tab and tab is disabled) or (self isnt enabled)
 			grow = nil
 		if .MenuIsOpen
 			grow = nil
@@ -239,9 +240,9 @@ class ButtonView (GUIControl)
 		|| clicked = .MouseIsDown and mouseXinside and !.DontDrawClicked
 		|| strength = 1.0
 		
-		|| WillDrawFocus = clicked and i and .ClickedItem
+		|| WillDrawFocus = clicked and tab and .ClickedItem
 		|| fader = 1.0
-		if i is Active
+		if tab is Active
 			strength += (GUI.cycle(1.25s)*0.95)-0.2
 			.Touch
 		  else
@@ -257,12 +258,12 @@ class ButtonView (GUIControl)
 		|| G = .GNormal
 		using G
 			G.strengthen(strength)
-			|| darker = (!i and clicked)
-			if (i is Selected) or darker
+			|| darker = (!Tab and clicked)
+			if (tab is Selected) or darker
 				if darker != .PressMakesLighter
 					G.Overlay(0.3~black, 0.25)
 				  else
-					|| amount = (0.66, 0.3)(i is active)
+					|| amount = (0.66, 0.3)(tab is active)
 					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
 				
 			if disabled
@@ -273,11 +274,11 @@ class ButtonView (GUIControl)
 			g.Strengthen(fader)
 			Where.DrawRectStyled(Grow, G)
 		
-		if !i
-			i = .ListSource // allow these text to be added.
-		|| t = i.ButtonText(.text)
+
+		if !Tab
+			Tab = .ListSource // allow these text to be added.
+		|| t = .ButtonText(tab, .text)
 		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
-//		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
 		textcol.a = fader
 		pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
@@ -297,16 +298,14 @@ class ButtonView (GUIControl)
 		where.DrawText("\03", pn, TextCol, false)
 		
 		
-	function ListViewRow.ButtonText (|string| Default, |string|)
-		if !self
+	function ButtonText (|listviewrow| Tab, |string| Default, |string|)
+		if !tab
 			return default
-		rz = .__TableCell__
+		rz = tab.Cell(.ColumnFinder)
 		rz ?= Default
-		if self is Broken
+		if tab is Broken
 			rz += " \17"
-//		if self is dead
-//			rz += " (!)"
-		if self is Modified
+		if tab is Modified
 			rz += "*"
 
 	
@@ -322,9 +321,9 @@ class ButtonView (GUIControl)
 		
 		|| rx1 = r.x
 		R.x2 = rx1 + W
-		for i in .ButtonSource
-			if i isnt hidden
-				.DrawOneButton(where, R, grow, i)
+		for tab in .ButtonSource
+			if tab isnt hidden
+				.DrawOneButton(where, R, grow, tab)
 				R = R right W + .itemgap
 			loop r.x < where.width
 

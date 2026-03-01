@@ -38,10 +38,10 @@ role JBin (Faststring)
 		disabled `Use jbin(@syx, "name")`
 		cpp_part Constructor0
 
-	function Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
+	inline Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
 
-	function ExitAll
+	inline ExitAll
 		cpp_Part Exit0
 		.Exit(.indent)
 	
@@ -67,7 +67,7 @@ role JBin (Faststring)
 			self <~ '\n' // noice
 		self <~ Jbin.Header
 	
-	function AddStr			(|string?| name)
+	inline AddStr			(|string?| name)
 		.add(@str, name)
 	
 	function AddInt			(|int64| value)

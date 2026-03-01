@@ -96,14 +96,12 @@ class XVar (list)
 		
 		if !obj
 			fs <~ "(nil)"
-		  elseif obj isa string
-			fs <~ '"'
-			fs.AppendEscape(obj)
-			fs <~ '"'
-		  elseif obj isa faststring
-			fs <~ '"'
-			fs.AppendEscape(obj|&nil||string|)
-			fs <~ '"'
+		  elseif obj isa string or obj isa faststring
+			|| str = obj|&nil||string|
+			if str.length
+				fs <~ '"'
+				fs.AppendEscape(str)
+				fs <~ '"'
 		  elseif obj isa Message
 			if .NormalView
 				obj.RenderAST(Fs)

@@ -24,6 +24,7 @@ class FileViewer (ListView)
 		.ondrawrow			= InsideFileViewRowDraw
 		.tryeditcell		= FileRowRenamer
 		.listsource			= filerow("", "root")
+		.ColumnFinder		= FileRowCell
 		
 		.quickopen.tag = self
 		.listopen.tag = self
@@ -467,6 +468,12 @@ class FileViewer (ListView)
 		.SelectFast(rz)
 
 	module
+		function FileRowCell (listview.columnfinder)
+			if Value == nil
+				if (Column < -1) and (self isa FileRow)
+					return .location
+				return .name
+		
 		function FileRowRenamer (guilisteditevent)
 			opt norefcounts
 			|| o = cell!.row as filerow

@@ -397,7 +397,7 @@ class PerryIDE (Window)
 
 
 	function HideStuff 
-		|| M  = .MouseXY
+		|| M  = .MouSEXY
 		|| LB = .ViewButtons.lastrect.y1
 		|| LF = .filelist.lastrect.x2-2
 		

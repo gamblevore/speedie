@@ -32,7 +32,6 @@ class TextView (GUIControl)
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
 	
-	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
 	|Document?|					_Viewing
@@ -583,7 +582,7 @@ class TextView (GUIControl)
 			.ShowAndSelect(d.position)
 
 	
-	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
+	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine!|)
 		return .ViewPos(x, .MaxVisibleLines/3, mode)
 	
 
@@ -703,9 +702,9 @@ class TextView (GUIControl)
 		opt norefcounts
 //		if key is cmd // should change cursor.
 			
-		if self is editable
-			if (.OnKeyDown)(self, key)?
-				return true
+//		if self is editable // right? editable doesn't matter??
+		if (.OnKeyDown)(self, key)?
+			return true
 		if .KeyDownTest(key) // to be called by other funcs
 			return true
 		|| oncl = .onclicked
@@ -713,7 +712,11 @@ class TextView (GUIControl)
 			(oncl)(self)
 			return true			
 		if (key is RGUI or LGUI) and GUI.CursorVisible
-			.ShowExtraInfo(.mousexy)
+			.ShowExtraInfo(.mouSEXY)
+			return true
+//		|| sigh = .OnKeyDown // no need?
+//			return (sigh)(self, key)
+		
 	
 
 	libinternal KeyDownTest (|keys| key, |bool|)
@@ -1330,7 +1333,7 @@ class TextView (GUIControl)
 		|| e = i.editingfor
 		if e isa listview
 			if e._isediting
-				.finishediting(e.columninfo>0)
+				.finishediting(e._columns!=nil)
 				return true
 		
 		return .InlineAcceptSearch

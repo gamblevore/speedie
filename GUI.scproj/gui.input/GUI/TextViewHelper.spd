@@ -40,11 +40,13 @@ class TextViewLine (list)
 			fs.appendescape(.text)
 			fs <~ '"'
 
+
 	libinternal ClearForPrepare
 		.message = nil
 		.TextState = nil
 		.lineerror = nil
 		.text = ""
+
 
 	function textview.FindBackwardsIgnoringSpaces (|string| name, |int| pos, |codepoint|)
 		while --pos >= 0
@@ -62,21 +64,24 @@ class TextViewLine (list)
 		d.x2 -= (self is last)
 		return d contains b
 
-	syntax is (|TextLineFlags| F, |bool|)
+
+	libinternal SyntaxIs (|TextLineFlags| F, |bool|)
 		if self
 			return .TextState&F
-	
-	syntax is (|TextLineFlags|F, assigns:|bool|)
+
+
+	libinternal syntaxis (|TextLineFlags| F, assigns:|bool|)
 		if value
 			.TextState |= f
 		  else
 			.TextState &= ~F
 
-	function XOfChar (|ind| Pos, |int|)
+
+	libinternal XOfChar (|ind| Pos, |int|)
 		return .SquaresAtByte(pos) * font.width
 
 	
-	function SquaresAtByte (|ind| B, |int|)
+	libinternal SquaresAtByte (|ind| B, |int|)
 		opt norefcounts
 		b -= .position
 		require b > 0
@@ -132,8 +137,7 @@ class TextViewLine (list)
 
 	
 	libinternal EmptyLine (|bool|)
-		require self
-		return (.text.length == 1) and .text[0].istextline
+		return (.text.length == 1) and .text[].istextline
 
 
 	libinternal ColoriseSub (|message| srch, |message|)
@@ -208,15 +212,15 @@ class TextViewLine (list)
 						return par
 
 
-	function Ends (|bool|)
+	libinternal Ends (|bool|)
 		return .endswithline or self is last
 		
 		
-	function EndsWithLine (|bool|)
+	libinternal EndsWithLine (|bool|)
 		return .text.last.IsTextLine
 
 
-	function DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
+	libinternal DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
 		opt min 3
 		|| M = .Range
 		require (r.x <= m.x2) and (r.x2 >= m.x)
@@ -244,12 +248,12 @@ class TextViewLine (list)
 		Where.DrawRectStyled(sel, g)
 
 
-	function SetLineNum (|int| t, |int|)
+	libinternal SetLineNum (|int| t, |int|)
 		.tline = t
 		return t + .endswithline
 
 	
-	function TrySetError (|error| e, |bool|)
+	libinternal TrySetError (|error| e, |bool|)
 		opt norefcounts
 		|| old = .LineError
 			e.when = old.when
@@ -258,7 +262,7 @@ class TextViewLine (list)
 		return e != old
 
 
-	function InitDefaults (|textview| parent, |int| t, |int|)
+	libinternal InitDefaults (|textview| parent, |int| t, |int|)
 		opt norefcounts
 		|| e = parent.MyError
 			if (self contains e.position) and (!e.obj) 
@@ -269,13 +273,13 @@ class TextViewLine (list)
 		return .SetLineNum(t)
 
 
-	function TakeEntireText (|string| txt, |ind| p, |ind|)
+	libinternal TakeEntireText (|string| txt, |ind| p, |ind|)
 		.Text = txt[p, int.max]
 		(self is AvoidLastChar) = .EndsWithLine
 		is last
 	
 	
-	function FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
+	libinternal FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
 		(self is StartsNormally) = txt[p-1].IsTextLine
 		.position = p
 		if .vline > 1000K

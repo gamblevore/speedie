@@ -11,44 +11,45 @@ struct SDL_Event
 
 
 	module 
-		function HasAny (|bool|)
+		inline HasAny (|bool|)
 			return (nil|&SDL_Event|).poll
 	
 	function Poll (|bool|)
 		nil self
 		cpp_wrapper SDL_PollEvent
 
-	function Window (|&SDL_WindowEvent|)
+	inline Window (|&SDL_WindowEvent|)
 		return self|&SDL_WindowEvent|
 
-	function Button (|&SDL_MouseButtonEvent|)
+	inline Button (|&SDL_MouseButtonEvent|)
 		return self|&SDL_MouseButtonEvent|
 	
-	function Gesture (|&SDL_MultiGestureEvent|)
+	inline Gesture (|&SDL_MultiGestureEvent|)
 		return self|&SDL_MultiGestureEvent|
 	
-	function Finger (|&SDL_TouchFingerEvent|)
+	inline Finger (|&SDL_TouchFingerEvent|)
 		return self|&SDL_TouchFingerEvent|
 	
-	function Motion (|&SDL_MouseMotionEvent|)
+	inline Motion (|&SDL_MouseMotionEvent|)
 		return self|&SDL_MouseMotionEvent|
 	
-	function Wheel (|&SDL_MouseWheelEvent|)
+	inline Wheel (|&SDL_MouseWheelEvent|)
 		return self|&SDL_MouseWheelEvent|
 	
-	function Key (|&SDL_KeyboardEvent|)
+	inline Key (|&SDL_KeyboardEvent|)
 		return self|&SDL_KeyboardEvent|
 		
-	function KeySym (|&sdl_keysym|)
+	inline KeySym (|&sdl_keysym|)
 		return &.key.keysym
 		
-	function Drop (|&SDL_DropEvent|)
+	inline Drop (|&SDL_DropEvent|)
 		return self|&SDL_DropEvent|
 		
-	function Editing (|&SDL_TextEditingEvent|)
+	inline Editing (|&SDL_TextEditingEvent|)
 		return self|&SDL_TextEditingEvent| 
 		
 	syntax is (|SDLEventType| b, |bool|)
+		inline
 		return .type == b
 
 
@@ -106,7 +107,7 @@ struct SDL_MouseWheelEvent
 	|int|						x
 	|int|						y
 	|int|						direction
-	function XY (|ivec2|)
+	inline XY (|ivec2|)
 		return (.x,.y)
 
 
@@ -126,7 +127,7 @@ struct SDL_TouchFingerEvent
 	|float|						pressure
 	|uint|						windowID
 
-	function NumFingers (|int|)
+	inline NumFingers (|int|)
 		return SDL_GetNumTouchFingers(.touchid)
 
 	module 
@@ -138,6 +139,7 @@ datatype MouseButton (uint)
 	linkage
 		cpp_part MB
 	syntax is (|MouseButton| x, |bool|)
+		inline
 		return self & x
 
 	flags
@@ -151,6 +153,7 @@ datatype MouseButton (uint)
 	module
 		|date|						DownAt
 		function Durr (|date|)
+			inline
 			return gui.FrameStart - .DownAt
 	
 
@@ -199,7 +202,7 @@ struct SDL_MouseButtonEvent
 	|int|			x				// mouse-x, window-relative
 	|int|			y				// mouse-y, window-relative
 	
-	function XY (|ivec2|)
+	inline XY (|ivec2|)
 		return (.x,.y).sdlxy
 
 
@@ -219,6 +222,7 @@ datatype SDLEventType (uint)
 		wrapper
 		cpp_part ET
 	syntax is (|SDLEventType| x, |bool|)
+		inline
 		return self == x
 		
 	constants
@@ -351,7 +355,9 @@ datatype SDL_WindowEventID (byte)
 		CLOSE          /* The window manager requests that the window be closed */
 		TAKE_FOCUS     /* Window is being offered a focus (should SetWindowInputFocus() on itself or a subwindow, or ignore) */
 		HIT_TEST        /* Window had a hit test that wasn't SDL_HITTEST_NORMAL. */
-	syntax is (|SDL_WindowEventID| state, |bool|)	
+
+	syntax is (|SDL_WindowEventID| state, |bool|)
+		inline
 		return self == state
 
 

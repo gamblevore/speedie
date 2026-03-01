@@ -7,7 +7,6 @@ class ListView (GUIControl) {
 	|bool|							UseColorScheme
 	|bool|							DontDrawSeparators
 
-//	|bool|							IsSpreadSheetLike
 	|bool|							IsMainListView
 	|bool|							IsTree
 
@@ -34,7 +33,7 @@ class ListView (GUIControl) {
 	|listviewrow?| 					Headers
 	|menu?|							CMM
 	|DrawStyle|						gRowSel 
-	|[message]|						ColumnInfo
+	|message?|						_Columns
 	
 	|ColumnFinder?|					ColumnFinder
 	|GUIListDragEvent?|				OnDragRow
@@ -42,7 +41,6 @@ class ListView (GUIControl) {
 	|GUIListEditEvent?|				TryEditCell
 	|GUIListEvent?|					OnChange
 	|GUIListEvent?|					OnSelected
-	|GUIKeyEvent?|					OnKeyDown
 	|GUIListEvent?|					OnReturn
 	|GUIListEvent?|					OnRightClick
 	|GUIListEditEvent?| 			OnTypingFilter
@@ -72,22 +70,15 @@ class ListView (GUIControl) {
 	
 	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
 		opt NoRefCounts
-		require .TryRenameCellSub(cell, value)
+		|| tec = .TryEditCell
+			require (tec)(self, cell, value)
+
+		.TableCell(cell) = value
 		|| o = cell.row
 		.touch
 		.show(o)
 		(.OnChange)(self, o)?
 		(.onselected)(self, o)?
-		return true
-
-
-	libinternal TryRenameCellSub (|listviewcell!| cell, |string| value, |bool|)
-		opt norefcounts
-		|| tec = .TryEditCell
-			return (tec)(self, cell, value)
-
-		|| orig = cell.row
-		orig.__TableCell__(cell.column) = value
 		return true
 
 
@@ -132,9 +123,6 @@ class ListView (GUIControl) {
 		|| t = .typingfilter
 			rz += t.height - 1 
 
-	
-	module
-		prototype ColumnFinder (|ListViewRow| Row, |int| Column, |string?| Value=nil, |string?|)
 
 
 	function NewCmm (|menu|)
@@ -167,7 +155,7 @@ class ListView (GUIControl) {
 
 	libinternal MenuForSelRow
 		|| sels = .FirstSelected$
-		.showfast(sels)
+		.show(sels)
 		|| y = .DrawYRow(sels)
 		|| fp = .onrightclick
 		if fp and (fp)(self, sels)
@@ -415,17 +403,27 @@ class ListView (GUIControl) {
 
 	
 	inline ListViewRow.CopyID (|string|)
-		return .__TableCell__(-1)
-		
+		return .TableCell(-2)
+	
+	
 	function DefaultCopy (GUICopyEvent)
 		|| fs = faststring()
 		for s.listsel in self
 			|| it = s.copyid
-			it ?= s.__TableCell__
+			it ?= .TableCell(s)
 			if fs.length
 				fs <~ '\n'
 			fs <~ it
 		return fs
+
+
+	inline TableCell (|listviewCell| C, assigns:|string?| Value=nil, |string|)
+		return .TableCell(C.row, C.column)
+
+
+	inline TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
+		cpp_part TableCellRow
+		return row.cell(column, .columnfinder, value)
 
 
 	libinternal CopyList (|array of string|)
@@ -437,7 +435,7 @@ class ListView (GUIControl) {
 				rz <~ it
 
 	
-	function IsEmpty (|bool|) // similar: hasany, rowcount
+	inline IsEmpty (|bool|) // similar: hasany, rowcount
 		return !.listsource.hasany
 	
 	
@@ -460,7 +458,7 @@ class ListView (GUIControl) {
 		return h / r
 	
 
-	function FullyVisibleRows (|int|)
+	inline FullyVisibleRows (|int|)
 		return .height / .RowHeight
 
 
@@ -511,7 +509,7 @@ class ListView (GUIControl) {
 		super.lostfocus
 	
 	
-	function SlideScroll (assigns:|listviewrow|r)
+	libinternal SlideScroll (assigns:|listviewrow|r)
 		.ScrollSet(r) // we wanted this to slide smoothly... sigh. do it later.
 					  // in terms of the nodes and mousewheel.
 
@@ -699,7 +697,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	function FixScroll (|bool|)
+	libinternal FixScroll (|bool|)
 		if !.scrollstart
 			.scrollset(.start)
 			return .scrollstart
@@ -862,12 +860,19 @@ class ListView (GUIControl) {
 	
 
 	function SearchItems (|string| s, |bool|)
-		|| c = .columncount
+		|| cc = .columncount
 		opt norefcounts
 		for m.all in self
-			|| n = m.searchcolumns(s, c)
-			(m is found) = (n > 0)
+			(m is found) = .searchcolumns(s, cc, m)
 			rz = true
+			
+	
+	libinternal SearchColumns (|string| find, |int| cc, |listviewrow| row,  |bool|)
+		opt norefcounts
+		for i in cc
+			|| s = .TableCell(row, i)
+			if (s contains find)
+				return true
 
 
 	libinternal OpenOrClose (|keys| K, |bool|)
@@ -881,7 +886,7 @@ class ListView (GUIControl) {
 			Force = true
 		if sel != .listsource
 			if (!Expand and sel contains .scrollstart)
-				.showfast(sel)
+				.show(sel)
 		if !force and !expand and (sel.AllExpandState & 2)
 			for r in sel
 				(r is expanded)=false
@@ -1004,11 +1009,11 @@ class ListView (GUIControl) {
 		return .Select(s)
 	
 	
-	function SelectNoShow (|ListViewRow| s)
+	inline SelectNoShow (|ListViewRow| s)
 		.select(s, ListViewSelectMode.Noshow)
 	
 	
-	function SelectFast (|ListViewRow| s)
+	inline SelectFast (|ListViewRow| s)
 		.select(s, ListViewSelectMode.Fast)
 		
 		
@@ -1017,7 +1022,7 @@ class ListView (GUIControl) {
 		require !._DuringSelect
 		require s and s != .ListSource
 		require s isnt UnSelectable
-		require .owns(s)
+		require .ListSource contains s
 		
 		.ExpandParents(s)
 		|| Modified = 0
@@ -1062,14 +1067,6 @@ class ListView (GUIControl) {
 			.scrollset(.bmove(s, v))
 	
 	
-	libinternal ShowFast (|ListViewrow| i)
-		.show(i)
-
-	
-	function Owns (|ListViewrow| i, |bool|)
-		return .listsource contains i
-	
-	
 	function ExpandParents (|ListViewrow| i)
 		opt norefcounts
 		require i
@@ -1079,9 +1076,7 @@ class ListView (GUIControl) {
 
 	
 	function Show (|ListViewrow| i)
-		require i
-		debug_Require .owns(i)
-		
+		require i and .ListSource contains i
 		.ExpandParents(i)
 		require !.InView(i)
 		|| n = .visiblerows|float|*0.34
@@ -1132,12 +1127,6 @@ class ListView (GUIControl) {
 			t.remove
 			.typingfilter = nil
 		return true
-		
-
-//	function FilterText (|string|)
-//		opt norefcounts
-//		|| t = .TypingFilter
-//			rz = t.text
 
 
 	libinternal ActualRect (|ivec4|)
@@ -1198,12 +1187,12 @@ class ListView (GUIControl) {
 			where.DrawRectStyled(r, g)
 	
 	
-	libinternal ListViewRow.CalculateSkip (|ListViewRow| prev, |int| n, |int|)
+	libinternal CalculateSkip (|listviewrow| curr, |ListViewRow| prev, |int| n, |int|)
 		opt norefcounts
 		require prev
 		for i in 1 to n
-			|| t =     .__TableCell__(i)
-			|| p = prev.__TableCell__(i)
+			|| t = .TableCell(curr, i)
+			|| p = .TableCell(prev, i)
 			if (t == p) // and t and p 
 				rz |= 1<<i
 	
@@ -1213,7 +1202,7 @@ class ListView (GUIControl) {
 		|| n = .ColumnCount
 		|ListViewRow| prev
 		for sk.visible in self
-			|| ind = (0, sk.CalculateSkip(prev, n))(.IsTree)
+			|| ind = (0, .CalculateSkip(sk, prev, n))(.IsTree)
 			sk.indent = ind
 			prev = sk
 	
@@ -1370,7 +1359,7 @@ class ListView (GUIControl) {
 		where.DrawRect(Rect, v) 
 
 
-	function ScrollStart (|listviewrow|)
+	inline ScrollStart (|listviewrow|)
 		return ._ScrollStart
 
 	
@@ -1433,14 +1422,6 @@ class ListView (GUIControl) {
 			if i < 0
 				.selrange = 0
 		return true
-
-
-//	libinternal LastNamed (|string| s, |ListViewrow|)
-//		opt norefcounts
-//		rz = .listsource.last
-//		while rz
-//			if rz.name ~= s
-//				return rz
 	
 	
 	syntax Append (|string| name, |GUIMenuEvent| ev, |object| obj=nil)
@@ -1455,7 +1436,8 @@ class ListView (GUIControl) {
 			.select(r)
 	
 	
-	function AddSep
+	inline AddSep
+		opt norefcounts
 		self <~ menuitem("", nil)
 
 
@@ -1500,10 +1482,6 @@ class ListView (GUIControl) {
 
 	module
 		|date|				DelayEditTill_
-		.init
-
-		function Init
-	
 	
 		libinternal pf (|string| s, |string|)
 			for (c in s) (i)

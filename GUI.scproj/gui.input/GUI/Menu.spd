@@ -78,7 +78,8 @@ class Menu (ListView)
 	libinternal FindTextWidth (|int|)
 		opt norefcounts
 		for row.all in self
-			rz = rz max row.__TableCell__(0).bounds.x
+			|| t = row.CellOrRow(self, 0)
+			rz = rz max t.bounds.x
 		rz *= font.width
 	
 	
@@ -156,7 +157,7 @@ class Menu (ListView)
 
 	libinternal FindTypedRow (|string| input, |listviewrow|)
 		for s.all in self
-			if s.__Tablecell__(0)[0, input, true]
+			if .Tablecell(s)[0, input, true]
 				return s
 
 
