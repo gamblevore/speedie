@@ -461,12 +461,14 @@ class PerryIDE (Window)
 	function CheckCrashed (|UnixProcess| p, |string| what, |bool|)
 		require p
 		|| Exit = p.Status
-		if exit.Crashed
-			|| fs = faststring()
-			fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
-			fs <~ p.ReadStdErr.FindStacktrace
-			.Notify(fs, @emb + what)
-			return .CancelCompile
+		if !exit.Crashed
+			return false
+		
+		|| fs = faststring()
+		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
+		fs <~ p.ReadStdErr.FindStacktrace
+		.Notify(fs, @emb + what)
+		return .CancelCompile
 
 
 	function string.FindStacktrace (|string|)
@@ -519,7 +521,7 @@ class PerryIDE (Window)
 			.SpeedieMsgReceive(f)
 		.UpdateSearchText
 		.UpdateStatusErrors
-		.ReadLog
+		.ReadLog(false)
 		.PopupDisplayFadeIn
 		
 		require .IsFront

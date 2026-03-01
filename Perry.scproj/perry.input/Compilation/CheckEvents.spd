@@ -148,7 +148,17 @@ extend PerryIDE
 		.showstats
 
 	
-	function ReadLog (|bool| Killed=false)
+	function CrashLog (|UnixProcess| c, |bool|)
+		|| StdOut = c.ReadStdOut
+		.SpeedieText.log(StdOut)
+		|| Errors = c.readstderr
+			|| p = errors.parse
+				.ShowCompileErrors(p, true)
+		.compilr = nil
+		.RenableAfterCompile
+
+
+	function ReadLog (|bool| Killed)
 		|| c = .Compilr $
 		|| StdOut = c.ReadStdOut
 		.SpeedieText.log(StdOut)
@@ -222,8 +232,7 @@ extend PerryIDE
 		|| c = .Compilr
 			c.Kill(0)
 			app.Sleep(0.025) // allow pipes to work
-			.Readlog(true)
-			return true
+			return .CrashLog(c)
 
 		if beep
 			Notifications <~ "Nothing is building"
