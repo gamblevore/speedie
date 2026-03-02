@@ -620,7 +620,7 @@ extend Assembler
 
 		// Dividing a big one by a small one, then?     bad.   We use 64-bit divide. But the small has garbage
 
-		if l.isbig and dest.issmall		// what?		
+		if l.reg and l.isbig and dest.issmall		// what?		
 		if l.IsBig and r.issmall         // Sigh.  Small has garbage, but were doing a 64-bit divide.
 			r = .SmallToBig(r, l, exp)
 		

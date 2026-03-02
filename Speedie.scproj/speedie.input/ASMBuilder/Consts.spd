@@ -27,7 +27,7 @@ extend Assembler
 		// shouldn't the BranchID shift with the basicblock Or not? IDK?
 		|| cc = .curr
 		for f.Known in self
-			if (f.BranchID == bi) and (f < cc) and (f isa asm.KNST) and (f._const == v)
+			if (f.fatBranch == bi) and (f < cc) and (f isa asm.KNST) and (f._const == v)
 				|| info = f.info
 				if info.µType.SpecialReg == Special
 					(info is blocknop) // the value might have not been used yet:   x[1] = 1

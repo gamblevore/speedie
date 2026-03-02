@@ -1,25 +1,22 @@
 
-
 struct StructWithObj
 	|object| A
 	|object| B
 
 
-
-
-function UintOnly (|uint|)
-	opt noinline
-	return ASMExamples.glob + 1
+function UintOnly (|int|)
+	return ASMExamples.BBB
 
 
 module ASMExamples {
 |int| Glob
 |int| Bolg
+|byte| BBB
 target cake { 
 
 function Uint64Trim (|uint64|)
 	visible
-	return UintOnly()>>31
+	return UintOnly()
 
 function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|)	/// Active ///
 	opt norefcounts

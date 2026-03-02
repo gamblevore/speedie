@@ -41,6 +41,7 @@ function FillTypePrm (|string| fname, |int| pname)
 
 function FinishAcc 
 	opt NoRefCounts
+	
 	|| s = .dt_prm
 		|int| X = .XType
 			Macro.TmpPrms_ <~ x.msg

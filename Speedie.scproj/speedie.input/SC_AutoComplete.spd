@@ -1236,12 +1236,13 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 			fs <~ (' ', fat.msg.asmindent(top)*2)
 			fat.RenderFat(fs, true)
 			|| tmp = out.msg(@tmp, fs)
-			|| p = fat.msg.Position
+			|| msg = fat.msg
+			|| p = (msg.Position, 0)(msg?) // could be nil due to the length set wrongly...
 			if p <= 0
 				p = lp
 			tmp <~ p
 			lp = p
-			path = fat.msg.NextPath(tmp, path)
+			path = msg.NextPath(tmp, path)
 	
 	|| title = out.first // going into the wrong place :D
 	title <~ count

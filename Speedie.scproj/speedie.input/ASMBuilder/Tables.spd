@@ -204,12 +204,15 @@ function Return (fn_asm)
 	|| SafeDecr = FinalDecrements(self, exp, Dest)
 		return SafeDecr
 	
-	|| ty = .out.ASMReturn
-		|| Needed = ty.ASMRegType
-		|| BC = dest.BitCount
-		if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
-			|| Wipe = 64 - BC
-			dest = .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
+	
+	// we need the same rules as typecast...
+	if !dest.IsBitCorrect
+		|| ty = .out.ASMReturn
+			|| Needed = ty.ASMRegType
+			|| BC = dest.BitCount
+			if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
+				|| Wipe = 64 - BC
+				dest = .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
 			
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0

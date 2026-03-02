@@ -84,10 +84,8 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	if dest isnt discard
 		if (!dest.reg or dest is temp)
 			|| type = fn.ASMReturn
-				dest = .declarebody(prms, type) // asmtodo: mark this as a declaration?
+				dest = .DeclareBody(prms, type) // asmtodo: mark this as a declaration?
 												// (shouldn't all declaremes be like that?)
-
-	
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
 
@@ -104,18 +102,17 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	st.ParentVars = .openvars
 	st.BranchDepth = 0
 	
-	|| Start = .curr
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
 				.asmreach(des)
 	
-	.inlinestate[ID] = nil
-	.inlinedepth = --ID
+	.InlineState[ID] = nil
+	.InlineDepth = --ID
 	if !ID
 		.InlineEnd = nil
-		
+	
 	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
 
 
@@ -137,13 +134,15 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	ll.after = .curr
 	rz = .InlineFinish(ll, svregs)
 	|| Grown = .CurrGain(RealStart)
-	if (Grown > AllowedGain)
+	if (Grown > AllowedGain) or .EntireInlineFailed
+		if  .EntireInlineFailed  and  (fn isnt linkinline)
+			.EntireInlineFailed = 0
 		svregs.Rewind(self)
 		.SoftNopRange(ll.start, .curr)				// rewind
 		return nil
 	
 	if svregs.ReturnCount > 1
-		.BasicBlock++
+		.NextBasicBlock
 	if !rz
 		(rz is Const)								// no longer zero
 	|| last = .last
@@ -182,9 +181,6 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-//	require .InlineDepth < 7 // for LinkInline funcs
-// inliner needs improvements... :]
-	require .InlineDepth < .InlineDepthLimit
 	|| N = fn.µfatlength
 	if fn isnt LinkInline
 		require N and (N < 64)
@@ -192,10 +188,10 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 			|| SubInline = .curr + (N / 3)
 			require SubInline < MaxEnd
 	
-	|| AllowedGain = 5 + (fn is OptInline) * 23		// Assume that functions have 5 instruction overhead.
+	|| AllowedGain = 5 + (fn is OptInline) * 18		// Assume that functions have 5 instruction overhead.
 	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
 	if fn is LinkInline
-		allowedgain += 5
+		allowedgain += 2
 	  elseif fn.IsLibrary
 		AllowedGain -= 1 + (fn is OptInline)<<2
 

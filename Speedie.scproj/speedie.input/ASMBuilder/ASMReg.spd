@@ -96,11 +96,13 @@ datatype ASMReg (uint64)
 		// every single caller must check for Const (and does!)
 		|| F = .FAT
 			return f.const
-		if .reg == 0
-			return 0
-		if self is Const // WHA DA FA!
-		if self isnt param
-			.NeedFAT
+
+		target debug
+			if .reg == 0
+				return 0
+			if self is Const // WHA DA FA!
+			if self isnt param
+				.NeedFAT
 		
 
 	function IsZero (|bool|)

@@ -94,15 +94,14 @@ function file.InputFol (|file|)
 function file.FindProjectMain (|file|)
 	|| inp = .inputfol$
 	|| best = inp.child("main.spd")
-	if best.exists
-		return best
-	best = inp.child("index.spd")
-	if best.exists
-		return best
-	for c.files in inp
-		if c.isspd
-			rz = c
-			exit
+	ifn best.exists
+		best = inp.child("index.spd")
+		ifn best.exists
+			for c.files in inp
+				if c.isspd
+					best = c
+					exit
+	return best
 
 
 function PerryIDE.FindConfFile (|filerow|)
@@ -141,6 +140,7 @@ function PerryIDE.ClickedTodo
 
 		
 function PerryRecheckEvent (guilistevent)
+	opt norefcounts
 	.ide.Recheck
 
 
@@ -151,11 +151,13 @@ function ReturnProjectPath (GUIListEvent)
 
 
 function ReturnRecents (GUIListEvent)
+	opt norefcounts
 	perry.IdeAddProj(row.name)
 	return true
 
 
 function ReturnAllFuncs (GUIListEvent)
+	opt norefcounts
 	|| e = .ide.EditMe
 	e.ShowAndSelect(row!.position, true)
 	e.SetFocus
@@ -163,23 +165,27 @@ function ReturnAllFuncs (GUIListEvent)
 
 	
 function OpenProjectPath (GUIaction)
+	opt norefcounts
 	|| f = .ide.filelist.FirstSelected as FileRow
 		if (self isa buttonview)
 			.FillMenuPath(f.location)
 
 
 function ClickedStatus (GUIaction)
+	opt norefcounts
 	.ide.editme.ShowNextParseError
 
 
 function ClickedProjectInfo (GUIaction)
+	opt norefcounts
 	.ide.NextProjInfo
 
 
 function PerryIDE.SaveAndShowErrors (|bool|) // checkerrors recheckforerrors
 	opt norefcounts
 	.SaveEditing(DocumentState.ErrorChecking)
-	.RecheckAfterModify
+	.ModifiedForCompile = true
+	.recheck
 	|| t = .IsTextMode
 	.ViewAsProject
 	if t and .IsViewing(.errorlist)
@@ -296,12 +302,13 @@ function PressedCharInfo (GUIaction)
 
 
 function PressedSearchWithin (Guiaction)
+	opt norefcounts
 	|| i = .ide
 	|| f = i.FileList
-	|| r = f.SearchWithin
-		f.SearchWithin = nil
-	  else
-		f.SearchWithin = f.FindSearchWithin
+	|filerow| r = nil 
+	if !f.SearchWithin
+		r = f.FindSearchWithin
+	f.SearchWithin = r
 	i.ReTextSubFind
 
 
@@ -442,23 +449,14 @@ function file.IsNicelyViewable (|bool|)
 function PerryIDE.ClickedFind (|error| row)
 	opt norefcounts
 	.GotoIncludedFile(row.path)
-	|| L0 = .MassSearchField.text.length
-	|| f1 = row.first
 	if row.position
 		|| L = row.rangelength
-		L ?= L0
+		L ?= .MassSearchField.text.length
 		.editme.ShowAndSelect(row.position, L, true)
 		return
 
-	|| curr = .MoveError(f1, row.path, -1)$
-//	|| last = .MoveError(f1, row.path,  1)
-
-	.editme.show(curr.position)
-//	while curr
-//		.editme.MarkAsFound(curr)
-//		if curr == last
-//			exit
-//		curr++
+	|| curr = .MoveError(row.first, row.path, -1)
+		.editme.show(curr.position)
 
 
 function ErrorListPaste (guipasteevent)
@@ -477,6 +475,7 @@ function ErrorListPaste (guipasteevent)
 	
 	
 function ClickedError (GUIListEvent)
+	opt norefcounts
 	|| ide = .ide
 	if row isa error
 		if self == ide.errorlist
@@ -536,6 +535,7 @@ function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 
 
 function HideSomeStuffOnResize (guiaction)
+	opt norefcounts
 	if self isa guicontrol
 		.ide.PopupHide
 	

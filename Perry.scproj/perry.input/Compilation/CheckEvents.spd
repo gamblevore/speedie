@@ -1,10 +1,6 @@
 
 
 extend PerryIDE
-	function RecheckAfterModify
-		.ModifiedForCompile = true
-		.recheck
-	
 	function Recheck
 		if .ModifiedForCompile
 			.ProjectWasModified
@@ -110,9 +106,10 @@ extend PerryIDE
 				h.name = n of "issue"
 
 	function ExpandCompileSep (|bool|)
-		|| coll = .ProductSep.divider.Collapsed
+		|| div = .ProductSep.Divider
+		|| coll = div.Collapsed
 			.ShowCompileTab(.SpeedieText)
-			return !.ProductSep.divider.Collapsed
+			rz = !div.Collapsed
 
 
 	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
@@ -121,11 +118,6 @@ extend PerryIDE
 		|| cmd = @tmp + operation
 		cmd <~ .Project.path
 		return cmd
-
-
-	function DebugFB (|message| msg)
-		// || pp = .ProductPath
-		// we actually... hmmm... can't open the debugger yet. not until it's made!
 	
 		
 	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
@@ -139,8 +131,6 @@ extend PerryIDE
 		  elseif NoErrors
 			if errsvis
 				.view(.viewfiles)
-			if msg ~= "debug"
-				.debugFB(msg)
 		  elseif !errsvis
 			.view(.viewerrors)
 			.say(" failed. Could not compile")
@@ -156,6 +146,7 @@ extend PerryIDE
 				.ShowCompileErrors(p, true)
 		.compilr = nil
 		.RenableAfterCompile
+		return true
 
 
 	function ReadLog (|bool| Killed)
@@ -165,6 +156,8 @@ extend PerryIDE
 		|| IsRunning = c.status.IsRunning
 		require !IsRunning or Killed
 
+		// can we call .crashlog? lets say... c.status.crashed?
+		// simplify this?
 		|| Bad = .CheckCrashed(c,  "compiler")
 		|| Errors = c.readstderr
 			|| p = errors.parse
@@ -206,7 +199,6 @@ extend PerryIDE
 					str += " But it doesn't exist :("
 				.notify(.name + str, file)
 				.say(str)
-				if .DebugMode != db // hmmm why not just get it here?
 				if !killed
 					if (db is run or debug) and f.exists and stderr.ok
 						.run_compile_wrap(f)
@@ -269,8 +261,8 @@ function ClickedCancel (GUIAction)
 		return true
 	|| can = ConfirmCanceller(i, fnBuildIsDead)
 	|| name = i.project.TrimCodeExt
-	|| q = "Currently building $name... Cancel Build of $name?"
+	|| q = "Currently building $name... Cancel building $name?"
 	if q.confirm(can)
-		return i.CancelCompile
+		rz = i.CancelCompile
 
 

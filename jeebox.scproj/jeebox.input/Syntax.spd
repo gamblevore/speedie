@@ -39,6 +39,7 @@ datatype Syntax (Byte)
 			
 	operator plus (|string| m, |message|)
 		inline
+		opt norefcounts
 		return .msg(m)
 	
 	operator plus (|int64| m, |message|)

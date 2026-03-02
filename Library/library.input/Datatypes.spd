@@ -67,6 +67,7 @@ datatype int
 		// don't put a cast to string here. not even in 'datatype Byte'
 
 	render
+		opt norefcounts
 		cpp_part RenderFS
 		fs <~ self
 	
@@ -75,12 +76,13 @@ datatype int
 		
 	render StrSize
 		cpp_part RenderSize
+		inline
 		return self|int64|.strsize(fs_in)
 
 	render (|int| zeros)
 		cpp_part RenderZeros
 		opt norefcounts
-		fs.appendintegerastext(self, zeros)
+		fs.AppendIntegerAsText(self, zeros)
 	
 	operator AbsMin (|uint| Limit, |int|)
 		if .abs|uint| < Limit: return self
@@ -244,6 +246,7 @@ datatype uint
 		
 	function Hash (|uint|)
 		cpp_wrapper JB_uint_hash
+	
 	function Unhash (|uint|)
 		cpp_wrapper JB_uint_unhash 
 	
@@ -260,10 +263,9 @@ datatype uint
 		asm uclm(dest, p1, p1, p2, 1)
 		if self < other: return self
 		return other
-
-
 	
 	render
+		opt norefcounts
 		fs <~ self|int64|
 	
 	inline Log2 (|int|)
@@ -337,10 +339,15 @@ datatype float
 		function Nan (|float|)
 			cpp_wrapper JB_f__nan
 	
+	
 	render
+		opt norefcounts
+		inline
 		return .Render(6, fs_in)
 
+	
 	Render RenderDuration (|bool| ms = false)
+		opt norefcounts
 		// perhaps just cast this to an ACTUAL duration
 		// AND THEN DO THE CAST!?
 		if self < 0
@@ -355,12 +362,16 @@ datatype float
 		fs.AppendFloat(s, 1+2*ms, false)
 		fs <~ 's'
 	
+	
 	render (|int| dp)
 		cpp_part RenderDP
+		opt norefcounts
+		inline
 		fs.AppendFloat(self, dp)
 
 
 	render Percent // operator percent, operator pc 
+		opt norefcounts
 		if !self
 			fs <~ "0"
 		  elseif self < 0.001
@@ -638,9 +649,11 @@ datatype f64
 		cpp_wrapper (fmin)
 
 	render (|int| dp=6)
+		opt norefcounts
 		fs.appenddouble(self, dp, true)
 
 	render RenderFloat
+		opt norefcounts
 		fs.appenddouble(self, 6, false)
 
 	inline Date (|date|)
@@ -674,6 +687,7 @@ datatype int64
 //		return self|bool|
 
 	render
+		opt norefcounts
 		fs <~ self
 
 	inline AlignUp (|int64| To, |int64|)
@@ -715,6 +729,7 @@ datatype int64
 	inline IsPow2 (|bool|)
 		if self
 			return !(self&(self-1))
+		
 
 	function AsFloat (|Float64|)
 		cpp_wrapper

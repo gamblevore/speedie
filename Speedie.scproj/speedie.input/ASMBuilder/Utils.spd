@@ -36,7 +36,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		p._op = op
 		p.msg = exp // could remove this?
 		.breakrequest = nil
-		p.BranchID = .BranchID
+		p.fatBranch = .BranchID
 		p.BasicBlock = .BasicBlock
 		p.FatMap = exp.SrcMap
 		return p

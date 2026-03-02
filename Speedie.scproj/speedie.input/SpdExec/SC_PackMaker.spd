@@ -15,10 +15,16 @@ module PackMaker
 	helper scfunction.NeedsLibExport (|bool|)
 		opt norefcounts
 		require (.MyReacher or options.MakeExec)
-		require (self isnt NoExport) and !.ismacro
+		require !.ismacro
 		require self|scnode| isnt libonly
 		require self|scnode| isnt embeddedonly
-		return (.IsCppInBuilt < 2)
+		require (.IsCppInBuilt < 2)
+		if (self is NoExport)
+			if Options.ModeCpp
+				return false
+			if self is DontCheckInCakeLib
+				return false
+		return true
 			
 	// not sure why I have two versions of the same thing?
 	// one is to allow a stableID generated

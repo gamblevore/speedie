@@ -149,10 +149,21 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
+		
 		if  fn isnt CantInline  and  fn isnt cpp
-			|| MiniDest = .AskForInline(prms, dest, fn)
-				return MiniDest
-		check (fn isnt LinkInline) (exp, "Unable to inline function")
+			|| DepthOK = .InlineDepth < (.InlineDepthLimit + (fn is linkinline)|uint|)
+				if !.InlineDepth
+					if .EntireInlineFailed
+/						.EntireInlineFailed = 0
+				|| MiniDest = .AskForInline(prms, dest, fn)
+					return MiniDest
+			
+			if fn is LinkInline
+				if !.InlineDepth
+					|| reason = ("Unable to inline function", "Inline depth too great")(.EntireInlineFailed<2)
+					error (exp, reason)
+				.EntireInlineFailed = 1 + !DepthOK
+				return asmreg()
 		
 		TableID = fn.FPackID + 31
 		if tableid <= 31							// failed!

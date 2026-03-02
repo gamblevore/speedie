@@ -165,14 +165,6 @@ function Ternary		(fn_asm)
 			return .InbuiltTernary(dest, ma, mb, cond)
 	
 	dest = .TempTyped(exp, dest)
-// too complex. also, miniternary starts off by assining cond to dest, which 
-// might have been used in the input! Better to use some kind of asm-macro
-// maybe just copy the code from "z"
-//	if  ma isa DestType  and  ma isnt Const						// goes thru kk.isknown!
-//		|| mC = .ExistingVar(cond)
-//		if (ma == mc)
-//			return .MiniTernary(dest, ma, b, cond)
-	
 	|FatRange| br
 	.Branch(cond, Br)
 	|| KK = br.Constness
@@ -183,14 +175,19 @@ function Ternary		(fn_asm)
 	return .RealTernary(exp, dest, a, b, br)
 
 
+function powtest (|int| self, |bool|)
+	visible
+	return (!(self&(self-1)), false)(self)
+
+
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
-	|| µA = .µInto(A, dest)
-	|| Exit = exp.jump // basicblock ++
+	|| mA = .µInto(A, dest)
+	|| Exit = exp.jump // .JumpInput already calls .NextBasicBlock
 	.BranchToCurr(Branch)
-	rz = .µInto(B, dest)
+	|| mB = .µInto(B, dest)
 	.NextBasicBlock
 	
-	rz = .TernRefCount(µa, rz)						
+	rz = .TernRefCount(ma, mb)						
 	Exit.jumpto(.curr)
 
 
@@ -456,15 +453,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	
 	
 function NextBasicBlock
-	// remove stuff in .register thats from a diff block as us? MAN i need to sleep first!
 	.BasicBlock++
-	// CloseOneVar does the closing right now. Which... isn't very good, because the var may still
-	// be part of the same basic block, and therefor still exist!
-
-	// shouldn't the BranchID shift with the basicblock Or not? IDK? For MegaNumFinder
-	
-	// or else ReDest is failing!
-
 	
 	
 function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
