@@ -306,7 +306,7 @@ function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
 	|| A = exp.first!.asmunbra
 	|| X = .ExistingVar(A)
-		return .µInto(exp.last!, X)
+		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
 
 	// Probably x.y = z, or x[y] = z 
 

@@ -21,6 +21,7 @@ struct Assembler
 
 	|InlineState[8]|			InlineState
 	|uint16| 					BasicBlock
+	|uint16| 					BasicParent
 	|byte|						InlineDepth
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
@@ -31,9 +32,7 @@ struct Assembler
 	|uint|						VDecls_
 	|uint|						VTemps_
 	|int|						CurrFuncGrab
-    |uint16|                    BranchID
-    |uint16|                    NextBranchID
-	|bool|						NeedsRework
+	|bool|						NeedsRework // hoisting
 	|bool|						Inited
 	|scfunction--|				Out
 
@@ -46,7 +45,7 @@ struct Assembler
 
 	|FatASM| 					Zero
 	|RegFile|					Regs
-	|uint16[4K]|				BlockParent
+	|uint16[4K]|				BlockParents
 
 	constants
 		kContinue		= 254
@@ -130,12 +129,49 @@ struct Assembler
 		if (l isa type or type2) and .IsCurr(L)
 			return L
 	
-	
-	function IsCurr (|&fatasm| f, |bool|)
-		// maybe use BlockIDs instead.
-		// Assembler.RefCountSub doesn't seem to need that complexity and literally just wants the basicblock?
-		// this could be nicer. Assuming its not altered in a branch... the blockID could work.
+	function IsWithin (|&fatasm| f, |bool|)
+		// loops could still fail...
+		// we need to mark vars as set in loops... in the asm, right?
+		// we'd have to not mark as fat as CONST even if it came from a const...
+		// I guess... the y=2 thing would have to clear the const bits...
+		// perhaps we shouldn't "pre-lookup" the var its going into...
+		// but instead just GET IT... then... clear bits or whatever
+		// in setrel or whatever it is
+		
+		/*
+			y = 1
+			while x
+				z = y+1
+				y++
+		*/
+
+		// IF cant fail
+		/*
+			y = 1
+			if x			// bp = 1
+				z = y+1		// accept
+				y = 2
+							// bp = 0
+			z = y + 1		// reject
+			if x
+				z = y + 1
+		*/
+
+		|| ToFind = .parentblock(f.basicblock)
+		|| Us = .BasicParent
+		while
+			if Us == ToFind
+				return true
+			if !Us
+				return false
+			Us = .ParentBlock(Us)
 			
+
+	function IsCurrBranch (|&fatasm| f, |bool|)
+		return .BasicParent == .parentblock(f.basicblock)
+
+
+	function IsCurr (|&fatasm| f, |bool|)
 		return .basicblock == f.basicblock
 
 	
@@ -293,16 +329,16 @@ struct Assembler
 		
 		if R is Const
 			|| RF = R.fat
-			if rf and (.BranchID == RF.fatBranch)
-				|| k = RF.const
-				if k.fits(bits, signed)
-					.NopConst(R)
-					return k|uint64|.trim(bits)
-			  elseif rf
-				ConstFails++
-//				printline "aaaaaa: " + ConstFails
-//				assembler.PrintProgress
-//				debugger 
+				if .IsWithin(RF)
+					|| k = RF.const
+					if k.fits(bits, signed)
+						.NopConst(R)
+						return k|uint64|.trim(bits)
+				  else
+					ConstFails++
+	//				printline "aaaaaa: " + ConstFails
+	//				assembler.PrintProgress
+	//				debugger 
 	
 	
 	function NopConst (|asmreg| R, |int64| K, |bool|)
@@ -326,11 +362,16 @@ struct Assembler
 	function SoftNop (|FATASM| ToNop)
 		return .nop_sub(ToNop, true, 0)
 	
+
+	function ParentBlock (|uint16| B, |uint16|)
+		if B >= 4K // argh
+		return .BlockParents[B&(4K-1)]
+	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
 		|| Break = fat.ASMIndex
-			if (.BranchID == fat.fatBranch)
-				.Breakrequest |= Break
+			if .iscurrbranch(fat)
+				.BreakRequest |= Break
 		
 		|| info = fat.info
 		if  info is temp  and  info isnt OKAsTemp
@@ -705,8 +746,6 @@ struct Assembler
 		SCFunction.CurrFunc = fn
 		.InlineDepthLimit = 3
 		.BasicBlock = 1						// good to start these at 1.
-		.BranchID = 1
-		.NextBranchID = 1
 		.zero.info = AsmReg()
 		.Guard
 		fn.µstart = .Index

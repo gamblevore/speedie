@@ -258,6 +258,7 @@ datatype ASMReg (uint64)
 		.fatindex = value.fatindex
 		return self
 
+
 	function SCDecl.ASMReg (assigns:|asmreg|)
 		target debug
 			if !value.reg and self is alteredorref

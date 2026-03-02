@@ -23,14 +23,14 @@ function ElseSub (|message?| other, |asmreg|)
 function If (fn_asm)
 	|| NothingDone = .curr
 	|| BreakReq = .BreakRequest
-	|| Old = .BranchID
-	.branchID = ++.NextBranchID
+	|| Old = .Basicparent
+	.basicparent = .BasicBlock
 
 	.state.BranchDepth++
 	rz = .ifsub(exp, dest)
 	.state.BranchDepth--
 	
-	.branchID = Old
+	.basicparent = Old
 	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
   
 
@@ -78,14 +78,14 @@ function While (fn_asm)
 	|| NothingDone = .curr
 	|| BreakReq = .BreakRequest
 	
-	|| Old = .BranchID
-	.branchID = ++.NextBranchID
+	|| Old = .BasicParent
+	.basicparent = .BasicBlock
 	
 	.state.BranchDepth++
 	rz = .WhileSub(exp)
 	.state.BranchDepth--
 	
-	.BranchID = Old
+	.basicparent = Old
 	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
 	
 

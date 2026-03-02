@@ -23,15 +23,15 @@ extend Assembler
 	function MegaNumFinder (|int64| V, |bool| Special, |DataTypeCode| Type, |ASMReg|)
 		if v == 0
 			return asmreg.zero.µtype(type)
-		|| bi = .BranchID
 		// shouldn't the BranchID shift with the basicblock Or not? IDK?
 		|| cc = .curr
 		for f.Known in self
-			if (f.fatBranch == bi) and (f < cc) and (f isa asm.KNST) and (f._const == v)
-				|| info = f.info
-				if info.µType.SpecialReg == Special
-					(info is blocknop) // the value might have not been used yet:   x[1] = 1
-					return info
+			if (f < cc) and (f isa asm.KNST) and (f._const == v)
+				if .IsWithin(f)
+					|| info = f.info
+					if info.µType.SpecialReg == Special
+						(info is blocknop) // the value might have not been used yet:   x[1] = 1
+						return info
 			
 	
 	function LoadNumber (|message| exp, |int64| V, |bool| Special, |asmreg| Dest=nil, |asmreg|)

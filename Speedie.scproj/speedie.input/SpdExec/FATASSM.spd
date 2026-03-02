@@ -13,9 +13,8 @@ struct FatASM
 	|int16|				µRefCount
 	|uint16| 			BasicBlock
 	|uint16| 			ASMIndex
-	|byte|				FatBranch	// To check consts set earlier in same branch, but diff block.
-									// (Could we merge with basicblock and use somebits for the branchid?)
-	|byte|				InputFats	// could merge with inputprms... easy and better probably. Do later
+	|byte|				_Unused
+	|byte|				InputFats 	// could merge with inputprms... easy and better probably. Do later
 	|byte|				InputPrms	
 	|byte| 				_Outputs
 	|byte|				_Op
