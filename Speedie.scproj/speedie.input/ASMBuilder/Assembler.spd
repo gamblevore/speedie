@@ -732,7 +732,7 @@ struct Assembler
 		
 		self[0] = nil // CLEAR!
 		
-/		|| j = Assembler.jsm
+		|| j = Assembler.jsm
 		.end = j.NeedSpare(64K, 64K)
 		.start = j.ptr
 		.curr_ = .start + j.Length

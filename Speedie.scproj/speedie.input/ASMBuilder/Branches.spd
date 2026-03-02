@@ -453,7 +453,8 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	
 	
 function NextBasicBlock
-	.BasicBlock++
+	|| B = ++.BasicBlock
+	.BlockParents[B] = .BasicParent
 	
 	
 function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)

@@ -60,15 +60,6 @@ function compiler.PrintCompileErrors
 	stderr.clear
 
 
-function compiler.VariousSelfTests
-	target cpp
-		Jeebox.test // bug if put into compiler.run!. Wierd!
-		if (options.perryoutput < 2) and !options.scripting and !app.Parent
-			if options.PrintLibraries
-				if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
-					"Compression: OK"
-	mzlab.FreeNow
-
 
 function compiler.TimeTest (|date| elapsed, |bool|)
 	flow off
@@ -104,3 +95,34 @@ function compiler.CompileTime
 		stringcorrector.CorrectStrings
 
 
+
+function compiler.VariousSelfTests
+	target cpp
+		Jeebox.test // bug if put into compiler.run!. Wierd!
+		if (options.perryoutput < 2) and !options.scripting and !app.Parent
+			if options.PrintLibraries
+				if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
+					"Compression: OK"
+	mzlab.FreeNow
+
+
+target cpp {
+function string.CompressTest_ (|bool| report, |int| which=3, |bool|)
+	if which & 1
+		require .CompressTestSub_(mzlab.strong, report)
+	if which & 2
+		require .CompressTestSub_(mzlab.strongest, report)
+	return true
+
+
+function string.CompressTestSub_ (|int| Strength, |bool| report, |bool|)
+	|compressionstats| stats
+	|| c = .compress(Strength, stats)
+	if report // remove? compression is good for now.
+		stats.Print
+	|| decomp = c.Decompress(int.max, nil)
+	rz = self == decomp
+	if !rz
+		error "Decompression failed on: " + self
+		decomp = c.Decompress(int.max)
+}

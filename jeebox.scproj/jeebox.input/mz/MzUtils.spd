@@ -13,26 +13,6 @@ Module MZLab
 		cpp_wrapper JB_CompFreeNow
 		
 	
-	inline string.CompressTest_ (|bool| report, |int| which=3, |bool|)
-		if which & 1
-			require .CompressTestSub_(mzlab.strong, report)
-		if which & 2
-			require .CompressTestSub_(mzlab.strongest, report)
-		return true
-	
-	
-	inline string.CompressTestSub_ (|int| Strength, |bool| report, |bool|)
-		|compressionstats| stats
-		|| c = .compress(Strength, stats)
-		if report // remove? compression is good for now.
-			stats.Print
-		|| decomp = c.Decompress(int.max, nil)
-		rz = self == decomp
-		if !rz
-			error "Decompression failed on: " + self
-			decomp = c.Decompress(int.max)
-	
-	
 	target CompressionTest
 		function TestCompression
 			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
