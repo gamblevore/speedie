@@ -7,9 +7,8 @@
 main (|[string]| Paths)
 	|| files = Paths.GlobExpand
 	if app["d"] // debug
-		printline Paths
-		printline Files
-		printline
+		"$Paths\n$Files\n"
+	
 	for f in files
 		app.TryCompileOne(f)
 	if fails.Length	
