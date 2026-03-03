@@ -425,12 +425,13 @@ function SCBetterNode.LoadExportName
 		.IsCppInBuilt ?= (fn == @list or @bra)|int|
 		(self is cpp) = cw
 		|| CppWrapper = cw.WrapperCpp
+		if cw!=nil
+			is wrapper
 			.MakeParamsReal
 		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and (self isnt disabled)
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
 		cppname = .ExportNameBuilder(cpppart)
-		(self Is Wrapper) = cw!=nil
 	  else
 		CppPart ?= .Name
 		CppName ?= CppPart
