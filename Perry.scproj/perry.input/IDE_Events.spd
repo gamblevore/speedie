@@ -504,7 +504,7 @@ function LogAreaKeys (GuiKeyEvent)
 		for s in r
 			s.clear
 			s.position = 0
-	return true
+		return true
 
 
 function ReturnErrorList (GuiListEvent)
@@ -573,4 +573,23 @@ function FileViewerCountCode (GuiMenuEvent)
 	|| fstr = "file".pluralize(FileCount)
 	|| r = (size|float| / cloc[]|float|).Render
 	app.alert "${Cloc[]} lines of code and ${Cloc[1]} nodes in ${size.strsize} text ($r bytes per line)\n\n$fstr at: ${row.location}"
+
+
+
+function perryide.ClearIDE (|keys| key, |bool|)
+	opt norefcounts
+	if super.KeyDown(key)
+		return true
+	|| t = .outtext 
+	if t and t.text
+		t.text = ""
+		return true
+	if LogAreaKeys(.CommsLogList, key)
+		return true
+	|| r = .RunCompiledApp
+		if .IsViewing(.debugger) and !r.status.IsRunning
+			.DebugMode = 0
+			.SetAppInfo
+	return true
+
 
