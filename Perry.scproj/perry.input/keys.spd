@@ -26,14 +26,7 @@ extend PerryIDE
 				return .editme.OpenSearch
 			return .ShowFind
 		if key is k
-			if super.KeyDown(key)
-				return true
-			|| t = .outtext 
-			if t and t.text
-				t.text = ""
-				return true
-			LogAreaKeys(.CommsLogList, key)
-			return true
+			return .ClearIDE(key)
 		if key is i
 			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
 			return true
