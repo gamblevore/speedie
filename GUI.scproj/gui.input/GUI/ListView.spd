@@ -418,11 +418,13 @@ class ListView (GUIControl) {
 
 
 	inline TableCell (|listviewCell| C, assigns:|string?| Value=nil, |string|)
+		opt norefcounts
 		return .TableCell(C.row, C.column)
 
 
 	inline TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
 		cpp_part TableCellRow
+		opt norefcounts
 		return row.cell(column, .columnfinder, value)
 
 

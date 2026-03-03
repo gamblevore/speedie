@@ -24,7 +24,7 @@ function compiler.PrintCompileTime (|date| durr)
 		|| gs = packmaker.GlobalsSize(G)
 		gs.StrSize(fs)
 	
-	|| vm_ops = VM_Builder.Total
+	|| vm_ops = VM_Builder.InstructionCount
 		fs.normal  "vm_ops",    fs <~ vm_ops
 	
 	|| ASM_Ops = compiler.stTotalASMOps

@@ -23,13 +23,13 @@ datatype CompileMode (int)
 function PerryAppInfoKeys (guikeyevent)
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.
 /	if key is RIGHT or PERIOD or Num6
-		DebugStepOver(self)
+		DebugStepOver(self, -1)
 	if key is DOWN or S or Num8
-		DebugStepIn(self)
+		DebugStepIn(self, -1)
 	if key is UP or W or Num2
-		DebugStepOut(self)
+		DebugStepOut(self, -1)
 	if (key is space) or key.IsAccept
-		DebugStepRun(self)
+		DebugStepRun(self, -1)
 		
 
 function DebugArgsKeyDown (GUIKeyEvent)
@@ -251,28 +251,28 @@ function ReturnVariables (GUIListEvent)
 	
 	
 function DebugStepOver (guiaction)
-	.sendmsg("stepover")
+	.sendmsg("stepover", state)
 
 
 function DebugStepIn (guiaction)
 	if keys.Shift
-		.sendmsg("stepincutely")
+		.sendmsg("stepincutely", state)
 	  else
-		.sendmsg("stepin")
+		.sendmsg("stepin", state)
 
 
 function DebugStepOut (guiaction)
-	.sendmsg("stepout")
+	.sendmsg("stepout", state)
 
 
 function DebugStepRun (guiaction)
-	if keys.Shift
-		.sendmsg("run fast")
+	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
+		.sendmsg("run fast", state)
 	  else
-		.sendmsg("run")
+		.sendmsg("run", state)
 	
 
-function GUIControl.SendMsg (|string| s)
+function GUIControl.SendMsg (|string| s, |int| state)
 	opt norefcounts
 	|| i = .ide
 	|| r = i.RunCompiledApp
@@ -281,7 +281,7 @@ function GUIControl.SendMsg (|string| s)
 			i.AppInfo.setfocus
 		  else
 			Notifications <~ "Debugger connection failed"
-	  else
+	  elseif !state
 		Notifications <~ "Program already finished"
 		i.editme.setfocus
 	

@@ -25,6 +25,7 @@ role Macro (Message)
 				.first = rz
 	
 	inline Run (|[message]| prms=nil, |message|)
+		opt norefcounts
 		rz = message()
 		rz.BecomeMacro(self, prms)
 	

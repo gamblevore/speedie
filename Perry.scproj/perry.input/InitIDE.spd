@@ -337,6 +337,8 @@ extend PerryIDE
 			.ID				= "Application Info"
 			.size 			= the~width  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			.GNormal.Edge	= Colors.Yellow.px
+			.GNormal.Edge.a = (0.05*255.0)|int|
 
 
 		with .DebugBtns

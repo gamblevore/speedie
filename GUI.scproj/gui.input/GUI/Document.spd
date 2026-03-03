@@ -105,9 +105,10 @@ class Document (list)
 		return latest
 
 
-	inline ClearTo (|string| s)
+	function ClearTo (|string| s)
 		.clear
 		.AddState(s, nil)
+
 
 	function IsModified (|bool|)
 		opt norefcounts

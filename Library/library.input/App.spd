@@ -140,8 +140,9 @@ function Restart
 function ThreadName (assigns:|string|)
 	cpp_Wrapper JB_App__SetThreadName
 
-inline AppName (|string|)
-	return .apppath.name
+function AppName (|string|)
+	opt norefcounts
+	return .path.name
 
 function AppPath (|string|)
 	if platform.osx

@@ -490,7 +490,7 @@ class GUIControl (list)
 
 	libinternal DrawFocus (|image| where, |float| strength=1.0)
 		if self
-			.DrawFocusRect(Where, .lastrect, .FaintingEdge*strength)
+			.DrawFocusRect(Where, .lastrect, .FaintingEdge * strength)
 
 
 	libinternal FocusBorderStyle (|drawstyle|)

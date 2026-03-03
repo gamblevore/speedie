@@ -177,7 +177,6 @@ extend PerryIDE
 		target osx
 			if !.IsFront or GUI.IsBackground
 				.Talker = unixProcess.spawn("/usr/bin/say", [.name.trimext + str])
-				(.talker)
 	
 	
 	function CompiledOK (|bool| Killed)

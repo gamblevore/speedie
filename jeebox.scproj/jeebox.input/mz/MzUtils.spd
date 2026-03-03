@@ -15,7 +15,7 @@ Module MZLab
 	
 	target CompressionTest
 		function TestCompression
-			|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
+			|| f = file.SpeedieDir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 			require f.exists
 			for ch in f.ListFiles
 				if ch.visible

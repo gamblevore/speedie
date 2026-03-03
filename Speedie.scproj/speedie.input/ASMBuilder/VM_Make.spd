@@ -9,10 +9,8 @@ module VM_Builder {
 |faststring|	form_h = faststring()
 |message|		dt_prm
 |string|		parent
-|int| 			Total
+|int|			InstructionCount
 |byte| 			XType
-|byte|			NormalPos = 0
-|uint|			FreeMultiASM = ~1
 |FastString|	FatFile
 |[message]|		rdz
 
@@ -71,10 +69,9 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		lname = "_" + line.name 
 	
 	lname = .Parent + lname
+	
 	|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
-	
 	SCFunction.NewFunc(fnc_src, nil, line)
-	
 	.FillTypePrm(lname, pname)
 	
 	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
@@ -178,7 +175,8 @@ function JustDefineInstructions (|bool|)
 	|| VMDef = .VMBox
 		|| forms = VMDef.find("forms")
 		.GenerateForms(forms, false)
-		.FillEncoders(vmdef, false)
+		|| missing = .FillEncoders(vmdef, false)
+		(missing)
 
 
 function BuildFiles (|bool|)
@@ -259,37 +257,51 @@ function MissingInstruction (ASM_Encoder)
 	debugger
 
 
-function VM_NewInstructions (|message| list, |bool| Amount, |[message]| out)
+function VM_CleanupList (|message| list, |[message]| out)
 	opt norefcounts
+	
 	for ch in list
-		require .VM_NewIns(ch, amount, out)
-
-
-function VM_FillPos (|message| list, |[message]| out)
-	opt norefcounts
-	for ch in list
-		if ch ~= "POS"
+		if ch != @tmp
+			ch.remove
+		  elseif ch ~= "forms" or "ignore"
+			ch.remove
+		  elseif ch ~= "POS"
 			|| f = ch.first
 			if f == @num
-				ch.flags |= 32K
-				|| i = f.int
-				|| arg = ch.last(@arg) // now what?
+				|| arg = ch.last(@arg)
 				|| item = arg.first
-					.VM_MakeInstructionSub(item, false, out, i)				
+					.VM_MakeInstructionSub(item, out, f.int(0, 1, 255))
+			ch.Remove
 
 
-function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
+function VM_NewInstructions (|message| list, |[message]| out)
+	opt norefcounts
+	|| OpPos = 32
+	for ch in list
+		expect (OpPos < 256) (ch, "Too many opcodes")
+		.VM_MakeInstructionSub(ch, out, OpPos++)
+
+
+function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true, |int|)
 	opt norefcounts
 	|[message]| R = nil
 	if ActuallyMakeTheVM
 		R = []
 		.NameList = r
 		R <~ (@thg+"HALT",  256)
-	.vm_FillPos(list, r)
-	.VM_NewInstructions(list, false, R)
-	.VM_NewInstructions(list, true, R)
+
+	.VM_CleanupList(list, r)
+/	|| C2 = .InstructionCount
+	|| HALT = list.first
+		.VM_MakeInstructionSub(HALT, R, 0)
+		|| C3 = .InstructionCount
+		.VM_NewInstructions(list, R)
+	|| C4 = .InstructionCount
+
 	for i in 256
-		asm.encoders[i] ?= MissingInstruction
+		if !asm.encoders[i]
+			asm.encoders[i] = MissingInstruction
+			rz++
 
 	
 function VMCpp (|faststring| vm_code, |faststring| jump)
@@ -316,59 +328,35 @@ function MakeVM (|message| tmp, |faststring| vm)
 		.VMLine(line, vm)
 
 
-function message.VMBits (|int|)
-	opt norefcounts
-	for s in self
-		if s == @num
-			rz |= 1<<(s.int(0, 1, 3)-1)
-	rz ?= 1
-
 
 // vmmake
-function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| ActuallyMakeTheVM, |int| ForceID)
+function VM_MakeInstructionSub (|message| tmp, |[message]?| ActuallyMakeTheVM, |int| ForceID)
 	opt norefcounts
-
-	// We need to actually write to a file... that we can hand-modify.
 	
 	|| prms = tmp.first
-	|| FoundBits = prms.VMBits
-	if ask
-		require FoundBits & 1
-	
-	tmp.flags |= 32K
 	|| P1 = prms.first
 	
-	|| name = p1.name					//  .ASMNormalise
+	|| name = p1.name
 	|| form = µform.NeedForm(name, p1)
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
 	using tmp
-	++.Total
 	
 	.MakeFatCreator(tmp.name, form)
-	if forceid
-		.FreeMultiASM &=~ (1<<forceid)
-		if .OKBoomer(tmp, forceid, formenc, ActuallyMakeTheVM)
-			.AddµOp(tmp.name, forceid)
-		return 
-	
-	|| id = 0
-	if ask
-		id = .FreeID(tmp, foundbits)
-	|| Done = false
-	for (b.bits in foundbits) (extra)
-		|| x = id + extra
-		if .OKBoomer(tmp, x, formenc, ActuallyMakeTheVM) and !done
-			.AddµOp(tmp.name, X)
-			done = true
+	if .OKBoomer(tmp, ForceID, FormEnc, ActuallyMakeTheVM)
+		.AddµOp(tmp.name, forceid)
+	tmp.remove
+
 
 
 function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| FormEnc,  |array?| R,  |bool|)
-	check (!asm.encoders[x]) (tmp, "ASM clash?") 
+	expect (!asm.encoders[x]) (tmp, "ASM clash?")
+	.InstructionCount++
 	asm.Encoders[x] = FormEnc
 	if R != nil
 		R[x] = tmp
 		return true
+
 
 
 helper message.VMMsgArgName (|int| i, |string|)
@@ -384,7 +372,6 @@ function MakeFatCreator (|string| name, |µform| form)
 		fs <~ "\n"
 		fn.Render(fs)
 		fs <~ "\n"
-
 
 
 function FatCreatorSub (|string| name, |µform| form, |message|)
@@ -443,30 +430,6 @@ function AddµOp (|string| name, |int| id)
 	|| msg = id.msg
 	|| thg = @thg + name
 	.ModuleArg <~ NewEqRel(thg, msg)
-
-	
-function FreeID (|message| m, |int| ask, |int|)
-	if ask <= 1
-		|int| n = .normalpos ?? 32
-		.normalpos = n+1
-		expect (n < 256) (m, "Too many opcodes")
-		return n
-	
-	|| f = .FreeMultiASM
-	for i in 16
-		if f&ask == ask
-			.freemultiasm = f&~ask
-			return i<<2
-		ask <<= 4
-	error (m, "Can't find free ID for ASM")
-
-
-function VM_NewIns (|message| tmp, |bool| ask, |[message]?| ActuallyMakeTheVM, |bool|)
-	if (tmp == @tmp) and !(tmp.flags&32K) 
-		if (tmp != "forms" and "ignore")
-			.VM_MakeInstructionSub(tmp, ask, ActuallyMakeTheVM, 0)
-			require ask
-	return true
 
 
 function VMLine (|message| line, |faststring| vm)

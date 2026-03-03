@@ -33,7 +33,6 @@ struct Assembler
 	|uint|						VTemps_
 	|int|						CurrFuncGrab
 	|bool|						NeedsRework // hoisting
-	|bool|						Inited
 	|scfunction--|				Out
 
 	|byte|						BreakRequest
@@ -57,10 +56,9 @@ struct Assembler
 		|Assembler|					Sh
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
-		|int|						StringsOutOfRange
-		|jbin?|						DebugDecls
-//		|FastString|				DebugSize
- 
+		|uint16|					StringsOutOfRange
+		|bool|						Inited
+		|jbin?|						DebugDecls 
 		
 		function ClassLayout (|jbin| j)
 			opt norefcounts
@@ -103,9 +101,6 @@ struct Assembler
 		
 	function FnLength (|int|)
 		return .curr_ - .funcstart
-	
-//	function ActualLength (|int|)
-//		return .curr_ - .Start
 
 	function Index (|int|)
 		return .curr_ - .start
@@ -691,14 +686,13 @@ struct Assembler
 	
 	function ASMInit
 		opt norefcounts
-		require !.Inited
-		.Inited = true
+		require !Inited
+		Inited = true
 		if options.TargetDebug
 			if Options.StripNames
 				problem "Can't use --strip and --targetdebug"
 				Options.StripNames = false
 			DebugDecls = FastString()
-//		DebugSize = file.SpeedieDir["spd_asm_size.txt"].OutputStream
 		
 		VM_Builder.JustDefineInstructions
 		instruction.InstructionInit

@@ -36,7 +36,7 @@ function message.List (|[Message]|)
 	disabled "Use .array if you want an array of all the children. Message is already a 'list'."
 
 
-inline message.Array (|[Message]|)
+function message.Array (|[Message]|)
 	opt norefcounts
 	for s.fast in self
 		rz <~ s
