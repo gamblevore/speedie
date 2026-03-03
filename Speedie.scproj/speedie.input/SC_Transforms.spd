@@ -1007,10 +1007,6 @@ function Tran_Log (TranFunc)
 	TypeOfExpr( node, name_space )			// Platform.log
 
 
-function testmulti
-	target debug2
-		time ("abc", 10)
-			0
 
 function Tran_Time (TranFunc)
 	opt norefcounts							// kinda handy. 
