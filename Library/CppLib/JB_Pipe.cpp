@@ -66,10 +66,6 @@ void JB_App__SetCanBreak (bool b) {
 }
 
 
-
-// what if we get rid of the global object list?
-// instead... collect "dead" IDs. So we don't just update things all over.
-
 int JB_Sh_Status (ShellStream* F) {
 	return PicoStatus(F->Pico);
 }
