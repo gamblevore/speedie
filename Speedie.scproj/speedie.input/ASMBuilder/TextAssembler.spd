@@ -12,7 +12,8 @@ module TextAssembler
 		compiler.exportnames[fn.exportname] = fn
 		Assembler.Sh.CapASM
 		Assembler.Sh.LoadLabelJumps
-		.Labels.dispose
+		|| l = .Labels
+			l.dispose
 
 
 	function TextData (|message| msg) // assemble a function from text

@@ -78,8 +78,8 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 	.ViewAsCurr
 
 
-function PerryIDE.RunCompileSub (|unixprocess| r)
-	if r.PID or (r isa SpdProcess)
+function PerryIDE.RunCompileSub (|unixprocess?| r)
+	if r and r.PID or (r isa SpdProcess)
 		.RunCompiledApp = r
 		if r isa SpdProcess
 			|| btn = .DebugBtns.last
