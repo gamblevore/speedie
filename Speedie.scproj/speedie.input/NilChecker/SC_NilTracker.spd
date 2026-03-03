@@ -46,7 +46,6 @@ struct ArchonPurger
 		error (where, "Branch depth too deep (over 63)")
 		
 	
-	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
 		rz = value()
 		.value = A
@@ -66,6 +65,7 @@ struct ArchonPurger
 			.Realnesses = -1
 		return NilState.real
 	
+	
 	function BranchExit (|NilRecord| A,  |nilstate|)
 		|| B = value()
 		.Neel--[] = 0 // cleanup
@@ -77,8 +77,6 @@ struct ArchonPurger
 			
 	function Declare (|scdecl| D, |nilstate| nd, |message| ToClose, |nilstate|)
 		rz = .DeclareSub(d, nd, toclose)
-		target debugnil	
-			d.NilPrint("add")
 	
 	
 	function DeclareSub (|scdecl| D, |nilstate| nd, |message?| ToClose, |nilstate|)
@@ -95,7 +93,6 @@ struct ArchonPurger
 		if d isnt Grabbed						// grabbed's previous use was only on properties. can't clash.
 			t.closers[n] = ToClose
 		
-//		d.ArgDepth = ArgDepth
 		d.DepthOfBranch = .BranchDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd
@@ -112,8 +109,6 @@ struct ArchonPurger
 		opt inline
 		|| P = (.Neel)|&nilrecorder|
 		(P)(d.NilReg) = new
-		target debugnil
-			d.NilPrint("set")
 		return New
 
 
@@ -134,15 +129,10 @@ struct ArchonPurger
 		for d in f.args
 			d.Paramfix
 			.DeclareSub(d, d.nildeclared, d.source!)
-
-		target debugnil
-			f.NilPrint("\n ****** ", false)
 		
 		|| r = f.ReturnType
 			if !r.nilstated
 				r.nildeclared = 0 // build this up carefully.
-		target debugnil
-			if "": ArchonPurger.ndb4
 
 		return f.SourceArg
 
@@ -157,8 +147,6 @@ struct ArchonPurger
 			r.nildeclared |= nilstate.stated
 		for a in f.Args
 			a.nildeclared |= nilstate.stated
-		target debugnil
-			f.NilPrint(" !!!!! ", true)
 	
 
 	function CheckNilCheck (|SCFunction| f)
