@@ -57,7 +57,6 @@ struct Assembler
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|uint16|					StringsOutOfRange
-		|bool|						Inited
 		|jbin?|						DebugDecls 
 		
 		function ClassLayout (|jbin| j)
@@ -686,8 +685,7 @@ struct Assembler
 	
 	function ASMInit
 		opt norefcounts
-		require !Inited
-		Inited = true
+/		require !asm.encoders[0]
 		if options.TargetDebug
 			if Options.StripNames
 				problem "Can't use --strip and --targetdebug"

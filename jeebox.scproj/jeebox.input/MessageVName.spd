@@ -7,7 +7,7 @@
 // Simplified to one vfunc on message. Can merge with listview.ColumFinder... later!
 
 extend message
-	virtual TableCell (|int| Column=-1, assigns:|string?| Value = nil, |string|)
+	function TableCell (|int| Column=-1, assigns:|string?| Value = nil, |string|)
 		description "Column -1 means the row's name (if hierarchical or single-column)
 Column -2 means the CopyID, which can be the same as the Name if needed.
 Column 0 is meant to mean the first item... but it could mean the row itself if none-exist.

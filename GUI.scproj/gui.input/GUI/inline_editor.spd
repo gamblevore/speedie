@@ -92,8 +92,8 @@ struct InlineEditor
 			.visible = true
 			.setfocus
 			.text = l.TableCell(r)
-//			r.value
 			.selrange = .text.length
+		
 		l.Select(r.row)
 		l <~ .editor
 		l._isediting = true

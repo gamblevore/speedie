@@ -417,12 +417,12 @@ class ListView (GUIControl) {
 		return fs
 
 
-	inline TableCell (|listviewCell| C, assigns:|string?| Value=nil, |string|)
+	libinternal TableCell (|listviewCell| C, assigns:|string?| Value=nil, |string|)
 		opt norefcounts
-		return .TableCell(C.row, C.column)
+		return .TableCell(C.row, C.column, value)
 
 
-	inline TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
+	function TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
 		cpp_part TableCellRow
 		opt norefcounts
 		return row.cell(column, .columnfinder, value)

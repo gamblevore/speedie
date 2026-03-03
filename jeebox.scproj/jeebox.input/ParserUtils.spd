@@ -260,10 +260,7 @@ struct MessagePosition
 	
 	destructor
 		parser.using = self[0]
-	    .Layer.use 
-	
-//	function CopyFrom (|MessagePosition| x)
-//		self[0] = x[0]
+	    .Layer.use
 	
 	function SyntaxUsingComplete (|object| idk=nil)
 
@@ -298,6 +295,5 @@ role MessageRoot (Message)
 	linkage
 		noauto
 		pragma noearlyfree
-//	operator isa (|string| s, |bool|)
-//		return .FilePath isa s
+
 

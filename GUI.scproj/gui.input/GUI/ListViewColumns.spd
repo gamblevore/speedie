@@ -10,7 +10,9 @@ extend_module ListView
 function ListViewRow.Cell (|int| Column=-1, |listview.columnfinder?| fn, assigns:|string?| Value=nil, |string|)
 	if fn
 		return (fn)(self, column, value)
-	return .__TableCell__(column, value)
+	return .TableCell(column, value)
+
+
 
 
 role ListViewCell (message)

@@ -281,8 +281,9 @@ function GUIControl.SendMsg (|string| s, |int| state)
 			i.AppInfo.setfocus
 		  else
 			Notifications <~ "Debugger connection failed"
-	  elseif !state
-		Notifications <~ "Program already finished"
+	  else
+		if !state
+			Notifications <~ "Program already finished"
 		i.editme.setfocus
 	
 
