@@ -342,9 +342,6 @@ function Return (NilTrackerFn)
 	if ret.StatedReal
 		expect (v isnt nilish) (msg, "Declaration does not allow returning " + v.rawname)
 	ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)				// assume real, unless it becomes optional??
-	target debugnil
-		ret.NilPrint("return")
-
 
 
 function Exit (NilTrackerFn)
@@ -566,7 +563,6 @@ function StatExpr (NilTrackerFn)
 function Argument (NilTrackerFn)
 	opt norefcounts
 	|| VarDepth = .value.DepthOfVars
-//	ArgDepth++
 	
 	for s.fast in msg
 		|| t = test & -s.islast
@@ -576,17 +572,19 @@ function Argument (NilTrackerFn)
 		rz = .SyncJump(s, T ||| nilcheckmode.Disappears)
 		if prev is borked
 			error.AutoPrint = .oldprint
-			expect !(stderr.ok) (s, "Borking but no zergs found?")
+			if stderr.ok
+				target debug
+/					.SyncJump(s, T ||| nilcheckmode.Disappears)
+				error (s, "Borking but no zergs found?")
+				return nil
 			stderr.clear
 		if rz is Killer
 			exit
 	
-//	--ArgDepth
 	|| FinalVars = ArchonPurger.value
 	|| Allowed = (1|uint64| << ((vardepth+1)<<1)) - 1|uint64|
 	.t.value = FinalVars & Allowed
 	
-//	.MergeVars(msg, finalvars, vardepth)
 
 
 function Bracket (NilTrackerFn)
