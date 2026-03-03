@@ -69,9 +69,10 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		lname = "_" + line.name 
 	
 	lname = .Parent + lname
-	
 	|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
+	
 	SCFunction.NewFunc(fnc_src, nil, line)
+	
 	.FillTypePrm(lname, pname)
 	
 	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
@@ -291,12 +292,9 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true, |int|)
 		R <~ (@thg+"HALT",  256)
 
 	.VM_CleanupList(list, r)
-/	|| C2 = .InstructionCount
 	|| HALT = list.first
 		.VM_MakeInstructionSub(HALT, R, 0)
-		|| C3 = .InstructionCount
 		.VM_NewInstructions(list, R)
-	|| C4 = .InstructionCount
 
 	for i in 256
 		if !asm.encoders[i]

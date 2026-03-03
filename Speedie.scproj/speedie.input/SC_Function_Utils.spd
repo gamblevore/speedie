@@ -112,7 +112,8 @@ dispatch FuncPreReader (fnPreReader)
 
 function SCFunction.MakeLinkInline
 	check (.islibrary) (self, "Only library funcs can use this. Use `opt inline` if you want to optimise without affecting linking.")
-	is OptInline
+	if Options.AutoOptInline
+		is OptInline
 	is LinkInline
 
 
@@ -156,12 +157,13 @@ function SCFunction.NilSelff (|message| where, |nilstate| v)
 
 
 function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
-	if .isascii
+	opt norefcounts
+	if .IsASCII
 		if fs_in
 			fs_in <~ self
 		return self
 	
-	|| fs = faststring(fs_in)
+	|| fs = FastString(fs_in)
 	for s in self
 		if CharSet.SafeInC[s]
 			fs <~ s

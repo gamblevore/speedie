@@ -140,7 +140,7 @@ class FixedDict
 
 
 	module
-		inline TimeTest (|[string]| items)
+		libinternal TimeTest (|[string]| items)
 			|fixeddict of string|  fd = fixeddict()
 			|dictionary of string| ed = dictionary()
 			|| n = 4
@@ -181,7 +181,7 @@ class FixedDict
 						expect (ed[a] == a)
 		
 		
-		inline Test
+		libinternal Test
 			|[string]| items	= []
 			|| fs				= faststring.new
 

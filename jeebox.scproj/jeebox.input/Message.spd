@@ -1191,7 +1191,9 @@ Message is also:
 
 	inline IsString (|bool|) // use .expectstring if you need this to be a string
 		if self
-			return .func.isstring
+			|| fn = .func
+			if fn >= @sstr and fn <= @str
+				return true
 
 
 

@@ -219,8 +219,10 @@ module GUI
 		.Touch(modified)
 
 	
-	inline IsTyping (|bool|)
-		return .event is TEXTINPUT or KEYDOWN
+	function IsTyping (|bool|)
+		opt inline
+		|| ev = .event
+		return ev is TEXTINPUT or KEYDOWN
 	
 	
 	function Run (|errorint|)

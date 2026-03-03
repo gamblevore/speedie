@@ -340,12 +340,6 @@ datatype float
 			cpp_wrapper JB_f__nan
 	
 	
-	render
-		opt norefcounts
-		inline
-		return .Render(6, fs_in)
-
-	
 	Render RenderDuration (|bool| ms = false)
 		opt norefcounts
 		// perhaps just cast this to an ACTUAL duration
@@ -363,7 +357,7 @@ datatype float
 		fs <~ 's'
 	
 	
-	render (|int| dp)
+	render (|int| dp=6)
 		cpp_part RenderDP
 		opt norefcounts
 		inline

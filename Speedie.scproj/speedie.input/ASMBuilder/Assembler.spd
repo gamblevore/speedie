@@ -685,7 +685,7 @@ struct Assembler
 	
 	function ASMInit
 		opt norefcounts
-/		require !asm.encoders[0]
+		require !asmtype.ReadASM[0] // set in ASMType.InitAccess
 		if options.TargetDebug
 			if Options.StripNames
 				problem "Can't use --strip and --targetdebug"

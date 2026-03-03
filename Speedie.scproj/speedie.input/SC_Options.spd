@@ -30,13 +30,14 @@ module Options
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
 	||		ProjectIsMiniLib		= false
-	||		Noisy					= false
+//	||		Noisy					= false
 	||		PrintCompileString		= false
 	||		PrintStages				= false
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		StripNames				= false
 	||		TrapFromPerry			= true
+	||		AutoOptInline			= false
 
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -218,7 +219,7 @@ module Feedback
 			options.OperationCount++
 
 	
-	function Explain (|faststring| Purpose, |string| name="", |bool|) 
+	function Explain (|faststring| Purpose, |string?| name="", |bool|) 
 		ifn purpose: return true
 		purpose <~ name
 
@@ -299,12 +300,16 @@ module Feedback
 			Options.GenFlowControlCode = b 
 			SC_Targets["flow"] = b
 
+		+'optinline'
+			Explain(Purpose, nil)$
+			options.AutoOptInline = value.optionbool
+			
 		+'noisy'
 			Explain(Purpose, "Prints more stuff")$
 			|| b = value.yes
 			Options.PrintCompileString = b
 			options.PrintLibraries = b
-			options.noisy = b
+//			options.noisy = b
 		
 		+'alive'
 			Explain(purpose)$

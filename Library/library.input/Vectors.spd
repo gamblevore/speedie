@@ -712,6 +712,7 @@ datatype mat2 (vec4)
 
 inline vecmix (|vec2|a, |vec2|b, |vec4|)
 	cpp_part mix22
+	opt inline
 	return (a.x, a.y, b.x, b.y)
 inline vecmix (|float|a, |float|b, |vec2|c, |vec4|)
 	cpp_part mix112
