@@ -14,6 +14,21 @@ module ASMExamples {
 |byte| BBB
 target cake { 
 
+
+function ConstBranch1 (|int| y)
+	|| x = 1
+	if y
+		y |= x // x is always equal to 1
+	
+
+function ConstBranch2 (|int| y, |int| y2)
+	|| x = 1
+	if y2
+		x = 2
+	if y
+		y |= x // x could be 1 or 2
+	
+	
 function Uint64Trim (|uint64|)
 	visible
 	return UintOnly()

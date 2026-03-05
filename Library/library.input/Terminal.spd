@@ -102,6 +102,8 @@ struct TerminalDisplay
 	
 	
 	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
+		opt norefcounts
+		
 		|| r2 = rect + (1, 1, -2, -2)
 		for s.rect in rect
 			|| c = inside

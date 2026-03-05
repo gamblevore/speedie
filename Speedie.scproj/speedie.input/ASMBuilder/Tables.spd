@@ -447,7 +447,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	
 	|| f = exp.first!
 	|| d = f.asmdecl
-		
+	
 	|| sc = exp.Second.first!
 	|| mode = ASMReg.AddrRequest temp sc
 	

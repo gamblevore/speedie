@@ -1,17 +1,18 @@
 #!/usr/local/bin/cake
 
-|| Limit = 100
+|| Limit = 10
 main
 	opt norefcounts
 	zalgoline "start world\n\n"
 	RecursiveHello()
-/	zalgoline "\n\nend world"
+	for 5
+		zalgoline "\n\nend world"
 //	app.crash
 //	Platform.HALT_Crash
 
 
 function RecursiveHello	(|int| A=1)
 	"hello world: $A"
-/	if A < Limit
+	if A < Limit
 		RecursiveHello(A+1)
 

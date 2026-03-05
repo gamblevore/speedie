@@ -123,6 +123,7 @@ struct Assembler
 		if (l isa type or type2) and .IsCurr(L)
 			return L
 	
+	
 	function IsWithin (|&fatasm| f, |bool|)
 		// loops could still fail...
 		// we need to mark vars as set in loops... in the asm, right?
@@ -130,7 +131,7 @@ struct Assembler
 		// I guess... the y=2 thing would have to clear the const bits...
 		// perhaps we shouldn't "pre-lookup" the var its going into...
 		// but instead just GET IT... then... clear bits or whatever
-		// in setrel or whatever it is
+		// in setrel or whatever it is.
 		
 		/*
 			y = 1
@@ -138,25 +139,20 @@ struct Assembler
 				z = y+1
 				y++
 		*/
-
-		// IF cant fail
-		/*
-			y = 1
-			if x			// bp = 1
-				z = y+1		// accept
-				y = 2
-							// bp = 0
-			z = y + 1		// reject
-			if x
-				z = y + 1
-		*/
-
-		|| ToFind = .parentblock(f.basicblock)
+		
+		|| B = f.basicblock
+		|| ToFind = .parentblock(B)
 		|| Us = .BasicParent
 		while
 			if Us == ToFind
 				return true
 			if !Us
+				if B == .basicblock // What? something is corrupt here.
+									// So what is corrupting it?
+									// lets see.....
+									// which of the two seem correct?
+									// the block or the parent or the parenttable?
+					if "iszero".trap
 				return false
 			Us = .ParentBlock(Us)
 			
@@ -330,9 +326,9 @@ struct Assembler
 						return k|uint64|.trim(bits)
 				  else
 					ConstFails++
-	//				printline "aaaaaa: " + ConstFails
-	//				assembler.PrintProgress
-	//				debugger 
+					printline "aaaaaa: " + ConstFails
+					assembler.PrintProgress
+					debugger 
 	
 	
 	function NopConst (|asmreg| R, |int64| K, |bool|)
