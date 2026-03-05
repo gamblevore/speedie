@@ -5,6 +5,7 @@ struct SavedRegisters
 	|byte|					RegCount
 	|byte|					ReturnCount
 	|uint16|				BasicBlock
+	|uint16|				BasicParent
 	|DeclAlterable[32]|		Decls
 	|RegFile|				Regs
 
@@ -12,6 +13,7 @@ struct SavedRegisters
 		opt norefcounts
 
 		.BasicBlock = sh.BasicBlock
+		.BasicParent = sh.BasicParent
 		.regs = sh.regs
 		expect args <= 32 - .RegCount
 		for p in args
@@ -20,6 +22,7 @@ struct SavedRegisters
 
 	function Rewind	(|assembler| sh)
 		sh.BasicBlock = .BasicBlock
+		sh.basicparent = .basicparent
 		sh.regs = .regs
 
 

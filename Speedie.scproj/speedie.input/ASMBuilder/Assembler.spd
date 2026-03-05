@@ -140,6 +140,7 @@ struct Assembler
 				y++
 		*/
 		
+		.ParentSanity
 		|| B = f.basicblock
 		|| ToFind = .parentblock(B)
 		|| Us = .BasicParent
@@ -147,18 +148,19 @@ struct Assembler
 			if Us == ToFind
 				return true
 			if !Us
-				if B == .basicblock // What? something is corrupt here.
-									// So what is corrupting it?
-									// lets see.....
-									// which of the two seem correct?
-									// the block or the parent or the parenttable?
-					if "iszero".trap
 				return false
 			Us = .ParentBlock(Us)
 			
 
 	function IsCurrBranch (|&fatasm| f, |bool|)
 		return .BasicParent == .parentblock(f.basicblock)
+
+
+	function ParentSanity 
+		target debug
+			|| P = .BasicParent
+			|| B = .parentblock(.basicblock)
+			if B != P 
 
 
 	function IsCurr (|&fatasm| f, |bool|)

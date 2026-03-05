@@ -12,21 +12,30 @@ module ASMExamples {
 |int| Glob
 |int| Bolg
 |byte| BBB
+|float| KNOB1 = 10
+
 target cake { 
+
+function soundmain2 (|float| input,  |float|) {
+	|| thresh = .KNOB1 / 20.0						// NEED FIX
+	|| output = (input.abs min thresh).CopySign(input)
+	return output * 20
+}
+
+
+function ConstBranch2 (|int| y, |int| y2)
+	|| x = 1
+	if y2
+		x = 2
+		if y		
+			y |= x									// NEED FIX
+	
 
 
 function ConstBranch1 (|int| y)
 	|| x = 1
 	if y
 		y |= x // x is always equal to 1
-	
-
-function ConstBranch2 (|int| y, |int| y2)
-	|| x = 1
-	if y2
-		x = 2
-	if y
-		y |= x // x could be 1 or 2
 	
 	
 function Uint64Trim (|uint64|)
@@ -1088,4 +1097,9 @@ helper asm_test_flow (|int| a, |int| b, |int|)
 }}}
 
 // im not sure what other tests need doing? We'll think of some... over time!!
+
+
+
+
+
 

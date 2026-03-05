@@ -21,6 +21,7 @@ function ElseSub (|message?| other, |asmreg|)
 
 
 function If (fn_asm)
+	.Parentsanity
 	|| NothingDone = .curr
 	|| BreakReq = .BreakRequest
 	|| Old = .Basicparent
@@ -32,6 +33,7 @@ function If (fn_asm)
 	
 	.basicparent = Old
 	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
+	.Parentsanity
   
 
 
@@ -79,6 +81,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 	
 
 function While (fn_asm)
+	.Parentsanity
 	|| NothingDone = .curr
 	|| BreakReq = .BreakRequest
 	
@@ -91,24 +94,21 @@ function While (fn_asm)
 	
 	.basicparent = Old
 	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
+	.ParentSanity
 	
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
-	|| InitialJump = exp.JUMP //BasicBlock ++						// test goes after loop
+	|| InitialJump = exp.JUMP										// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
 	.Branch(exp.first!, loop_test, true)
 
-	|| BB = .basicblock
-	if BB!=loop_test.FirstBlock										// we need to move it up.
-		.BlockParents[BB] = .ParentBlock(.ParentBlock(BB))
-	
 	|| Known = loop_test.Constness.negate							// loops are weird :]
 	if Known.knownfalse
-		.nop(initialjump)
+		.nop(InitialJump)
 		return ASMReg()
-	
+
 	if Known.knowntrue
 		.Nop(InitialJump)	
 		exp.JUMP.JumpTo(initialjump+1)
@@ -123,6 +123,11 @@ function WhileSub (|message| exp,  |asmreg|)
 		returns = nil
 
 	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
+
+	|| BB = .BasicBlock												// just do it always?
+//	if BB!=loop_test.FirstBlock										// we do have a jump anyhow... 
+	.BlockParents[BB] = .ParentBlock(.ParentBlock(BB))				// we need to move it up.
+
 	
 	return returns
 

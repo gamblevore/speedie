@@ -420,6 +420,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 			rz = decl(self, ch, nil)
 		  else
 			rz = .µ(ch, asmreg.discard)
+		.parentsanity
 		ch++
 		loop ch and rz isnt exit
 	
