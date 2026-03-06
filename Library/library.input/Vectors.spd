@@ -211,16 +211,16 @@ datatype vec3
 	function Lum (|float|)
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
 
-	function Sine (|vec3|)
+	inline Sine (|vec3|)
 		return self|vec4|.sine|vec3|
 
-	function Cos (|vec3|)
+	inline Cos (|vec3|)
 		return self|vec4|.cos|vec3|
 
-	function Fract (|vec3|)
+	inline Fract (|vec3|)
 		return self|vec4|.fract|vec3|
 
-	function Ceil (|vec3|)
+	inline Ceil (|vec3|)
 		return self|vec4|.ceil|vec3|
 
 	function SinBad (|vec3|)
@@ -233,14 +233,17 @@ datatype vec3
 		return self|vec4|.Operatorpow(p|vec4|)|vec3|
 
 	operator min (|vec3| s, |vec3|)
+		inline
 		cpp_part Min3
 		return self|vec4|.Operatormin(s|vec4|)|vec3|
 
 	operator max (|vec3| s, |vec3|)
+		inline
 		cpp_part Max3
 		return self|vec4|.Operatormax(s|vec4|)|vec3|
 
 	operator max (|float| s, |vec3|)
+		inline
 		return self|vec4|.Operatormin(vec4(s))|vec3|
 	
 	function Max (|float|)
@@ -250,22 +253,27 @@ datatype vec3
 		return .x min .y min .z
 		
 	operator Sign (|vec3| C, |vec3|)
+		inline
 		return (self|vec4| sign C|vec4|)|vec3|
 
 	function iVec3 (|ivec3|)
 		return (.x|int|, .y|int|, .z|int|)
 
 	function Clamp (|float| min=0.0, |float| max=1.0, |vec3|)
+		inline
 		return self|vec4|.clamp(min, max)|vec3|
 	
 	function Clamp (|vec3| min=0.0, |vec3| max=1.0, |vec3|)
 		cpp_part ClampVec
+		inline
 		return self|vec4|.clamp(min|vec4|, max|vec4|)|vec3|
 	
 	inline Round (|vec3|)
+		inline
 		return self|vec4|.round|vec3|
 
 	inline Length (|float|)
+		inline
 		.w = 0
 		return self|vec4|.length
 		
@@ -278,6 +286,7 @@ datatype vec3
 
 	operator mul (|float| x, |vec3|)
 		cpp_part MulF
+		inline
 		return (x,x,x)*self
 
 	operator mul (|vec3| v, |vec3|)
@@ -289,6 +298,7 @@ datatype vec3
 	
 	operator • (|vec3| other, |float|)
 		cpp_part Dot
+		inline
 		return (self * other).sum
 
 	function Reflect (|vec3| plane, |vec3|)
@@ -353,14 +363,17 @@ datatype ivec3
 datatype IntRange (ivec2)
 	linkage
 		cpp_part Rg
+	
 	inline Width (|int|)
 		return .x2 - .x
+	
 	operator Inside (|ivec4| R, |bool|)
 		inline
 		return R.Contains(.x, .y)
 
 	operator overlaps (|intrange| r, |bool|)
 		return r.x1 < .x2 and r.x2 > .x1
+	
 	function By (|intrange| r, |ivec4|)
 		return (.x, r.x, .y, r.y)
  

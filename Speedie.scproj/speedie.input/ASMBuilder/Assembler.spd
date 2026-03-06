@@ -5,6 +5,7 @@ struct InlineState
 	|asmreg|		Return
 	|uint64|		ParentVars
 	|byte|			BranchDepth
+	|byte|			RealBranchDepth
 	|bool|			TailInlineable
 
 
@@ -22,6 +23,7 @@ struct Assembler
 	|InlineState[8]|			InlineState
 	|uint16| 					BasicBlock
 	|uint16| 					BasicParent
+	|byte|						BasicDepth
 	|byte|						InlineDepth
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
@@ -44,7 +46,6 @@ struct Assembler
 
 	|FatASM| 					Zero
 	|RegFile|					Regs
-	|uint16[4K]|				BlockParents
 
 	constants
 		kContinue		= 254
@@ -58,6 +59,7 @@ struct Assembler
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|uint16|					StringsOutOfRange
 		|jbin?|						DebugDecls 
+		|uint16[16K]|				BlockParents
 		
 		function ClassLayout (|jbin| j)
 			opt norefcounts
@@ -142,7 +144,7 @@ struct Assembler
 		
 		.ParentSanity
 		|| B = f.basicblock
-		|| ToFind = .parentblock(B)
+		|| ToFind = .ParentBlock(B)
 		|| Us = .BasicParent
 		while
 			if Us == ToFind
@@ -153,14 +155,15 @@ struct Assembler
 			
 
 	function IsCurrBranch (|&fatasm| f, |bool|)
-		return .BasicParent == .parentblock(f.basicblock)
+		return .BasicParent == .ParentBlock(f.basicblock)
 
 
 	function ParentSanity 
 		target debug
-			|| P = .BasicParent
-			|| B = .parentblock(.basicblock)
-			if B != P 
+			|| PP = .BasicParent
+			|| BB = .basicblock
+			|| BP = .parentblock(BB)
+			if BP != PP 
 
 
 	function IsCurr (|&fatasm| f, |bool|)
@@ -356,8 +359,8 @@ struct Assembler
 	
 
 	function ParentBlock (|uint16| B, |uint16|)
-		if B >= 4K // argh
-		return .BlockParents[B&(4K-1)]
+		if B >= 16K // argh
+		return BlockParents[B&(16K-1)]
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
@@ -718,8 +721,12 @@ struct Assembler
 		opt norefcounts
 		
 		target debug
-			asm.noisyasm = 3
-		
+			asm.NoisyASM = 3
+		{
+			|| BB = .BasicBlock
+			|| N = (BB+1)*2  min  –sizeof BlockParents
+			Memory.Zero(&BlockParents[0], N)
+		}
 		self[0] = nil // CLEAR!
 		
 		|| j = Assembler.jsm

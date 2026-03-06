@@ -33,33 +33,33 @@ module Math
 		cpp_wrapper (__tanpif)
 	
 
-function int64.Hash (|uint64|)
+inline int64.Hash (|uint64|)
 	return self|uint64|.hash 
 
-function int.Hash (|uint|)
+inline int.Hash (|uint|)
 	return self|uint|.hash 
 
 function uint64.Hash (|uint64|)
 	cpp_wrapper JB_uint64_hash
 	
-function uint64.LowestBit (|uint64|)
+inline uint64.LowestBit (|uint64|)
 	return self & -self 
 
-function uint.LowestBit (|uint|)
+inline uint.LowestBit (|uint|)
 	return self & -self 
 
-function uint64.RemoveOneBit (|uint64|)
+inline uint64.RemoveOneBit (|uint64|)
 	return self & (self-1)
 
 
 
 extend int
-	function CopySign (|int| From, |int|)
+	inline CopySign (|int| From, |int|)
 		if (From xor Self)|uint| >> 31
-			return -self
+			self = -self
 		return self
 	
-	function Abs (|int|)
+	inline Abs (|int|)
 		if self < 0
 			self = -self
 		return self
@@ -76,14 +76,16 @@ extend int
 				rz *= self
 
 	operator minus0 (|int| a, |int|)
+		inline
 		|| r = self - a
-		if r >= 0
-			return r
+		if r < 0
+			r = 0
+		return r
 			
-	function LowestBit (|int|)
+	inline LowestBit (|int|)
 		return self & -self 
 	
-	function RemoveOneBit (|int|)
+	inline RemoveOneBit (|int|)
 		return self & (self-1)
 	
 	function GetSign (|int|)
@@ -111,39 +113,40 @@ extend int
 			self = high
 		return self
 	
+	// seems to assume positive ints. No good. What if its negative?
 	function SetSign (|bool| IsNeg, |int|)
 		description "bool.dir is better. Try that?"
 		if (IsNeg)
-			return -self
+			self = -self
 		return self
 	
-	function SignBit (|int|)
+	inline SignBit (|int|)
 		return self|uint| >> 31
 		
-	function Reduce1 (|int|)
-		disabled "seems buggy, doesnt work for 0"
-		return self + (.signbit << 1) - 1
-	
-	function Reduce (|int| d=1, |int|)
-		// what if this goes past 0?
-		// why not use .towards(0)?
-		
-		if (self > d)
-			return self - d
-		  elseif (self < -d)
-			return self + d
-
-	
-	function Towards (|int| Dest, |int| N, |int|)
-		if (self >= dest)
-			self -= N
-			if (self <= dest)
-				return dest 
-		  else
-			self += N
-			if (self >= dest)
-				return dest
-		return self	
+//	function Reduce1 (|int|)
+//		disabled "seems buggy, doesnt work for 0"
+//		return self + (.signbit << 1) - 1
+//	
+//	function Reduce (|int| d=1, |int|)
+//		// what if this goes past 0?
+//		// why not use .towards(0)?
+//		
+//		if (self > d)
+//			return self - d
+//		  elseif (self < -d)
+//			return self + d
+//
+//
+//	function Towards (|int| Dest, |int| N, |int|)
+//		if (self >= dest)
+//			self -= N
+//			if (self <= dest)
+//				return dest 
+//		  else
+//			self += N
+//			if (self >= dest)
+//				return dest
+//		return self	
 
 
 
@@ -163,9 +166,9 @@ extend f64
 			self = high
 		return self
 		
-	function Negate (|bool| b, |Float64|)
+	inline Negate (|bool| b, |Float64|)
 		if (b)
-			return -self
+			self = -self
 		return self
 	
 	function Sqrt (|Float64|)
@@ -188,38 +191,30 @@ extend float
 		|| sq = mul.Sqrt
 		return factor / sq
 	
-	function Clamp (|float| H = 1.0, |float|)
+	inline Clamp (|float| H = 1.0, |float|)
 		return .clamp(0, h)
 		
 	function Cluster (|float|)
 		cpp_Wrapper	
 
-	function Negate (|bool| b, |float|)
+	inline Negate (|bool| b, |float|)
 		if (b)
-			return -self
+			self = -self
 		return self
 
 	function Reduce (|float| f, |float|)
 		return .length.minus0(f).copysign(self)
 	
-	function Increase (|float| f, |float|)
+	inline Increase (|float| f, |float|)
 		return self + f.copysign(self)
 	
 	function IsNormal (|bool|)
 		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
 		
-	function Sanity (|bool|)
-		if .IsSane
-			return true
-		debugger
-		
-	function IsSane (|bool|)
-		ifn .isnan or .isinf
-			return true
-	
 	function MakeSane (|float|)
-		if .IsSane
-			return self
+		if .isnan or .isinf
+			self = 0
+		return self
 	
 	function f64.IsNan (|bool|)
 		cpp_wrapper (__isnand)
@@ -233,41 +228,28 @@ extend float
 		for n
 			rz *= self
 
-	function Pow2 (|float|)
+	inline Pow2 (|float|)
 		return self*self
 
-	function Pow3 (|float|)
+	inline Pow3 (|float|)
 		return self*self*self
 
-	function Pow4 (|float|)
+	inline Pow4 (|float|)
 		rz = self*self
 		rz *= rz
 
-	function Pow6 (|float|)
+	inline Pow6 (|float|)
 		rz = self*self
 		rz = rz*rz*rz
 
-	function Pow8 (|float|)
+	inline Pow8 (|float|)
 		rz = self * self
 		rz *= rz
 		rz *= rz
 
-	function Pow16 (|float|)
-		rz = self * self
-		rz *= rz
-		rz *= rz
-		rz *= rz
-
-	function Pow32 (|float|)
-		rz = self * self
-		rz *= rz
-		rz *= rz
-		rz *= rz
-		rz *= rz
 
 
-
-function float.UnMix (|float| X, |float| Y, |float|) // inbetweenness
+inline float.UnMix (|float| X, |float| Y, |float|) // inbetweenness
 	return (self - x)/(Y - X)
 
 function float.Mix (|vec4| A, |vec4| B, |vec4|)
@@ -312,7 +294,7 @@ datatype FloatRangeConverter (vec4)
 		return f.mix(.z, .w)
 
 datatype FloatRangeConverterBasic (vec2)
-	function Convert (|float| x, |float|)
+	inline Convert (|float| x, |float|)
 		return (x + .x) * .y
 
 

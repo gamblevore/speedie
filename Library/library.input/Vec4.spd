@@ -180,7 +180,7 @@ datatype vec4
 	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
 
-	function Lum (|float|)
+	inline Lum (|float|)
 		return self|vec3|.lum
 
 	inline  Width (|float|)

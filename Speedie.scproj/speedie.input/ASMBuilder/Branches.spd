@@ -11,29 +11,13 @@ function ElseSub (|message?| other, |asmreg|)
 		return asmreg()
 	|| T = other.ASMType
 	if T == ASMType.kif
-		return .IF(other, asmreg())
+		return .IfOrWhile(other, asmreg())
 	if other != @arg
 		other = other.first!
 	  else
 		debugger
 	rz = ASMType.Argument(self, other)
 	// .NextBasicBlock // Will be done by the caller (IfSub)
-
-
-function If (fn_asm)
-	.Parentsanity
-	|| NothingDone = .curr
-	|| BreakReq = .BreakRequest
-	|| Old = .Basicparent
-	.basicparent = .BasicBlock
-
-	.state.BranchDepth++
-	rz = .ifsub(exp, dest)
-	.state.BranchDepth--
-	
-	.basicparent = Old
-	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
-	.Parentsanity
   
 
 
@@ -56,14 +40,12 @@ function IfSub (fn_asm)
 		|| Clamped = .MiniClampOpt(exp, b.start)
 			return Clamped
 		.BranchToCurr(b)
-		.NextBasicBlock(True)
 		return asmreg()
 	
 	|| AfterFirst = other.jump		// Basicblock ++
 	.BranchToCurr(b)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.JumpTo(.curr)
-	.NextBasicBlock(True)
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -78,23 +60,31 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 			  else       				// exit
 				C.JumpTo(A)
 		C++
+
+
+function IfOrWhile (fn_asm)
+	.ParentSanity
+	|| NothingDone = .curr
+	|| BreakReq = .BreakRequest
+	|| Old = .BasicParent
+
+	|| s = .state
+	s.BranchDepth++
+	s.RealBranchDepth++
+	if dest == nil
+		rz = .WhileSub(exp)
+	  else
+		rz = .IfSub(exp, nil)
+	s.BranchDepth--
+	s.RealBranchDepth--
+	
+	if old != .basicparent
+		.nextbasicblock
+	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
 	
 
 function While (fn_asm)
-	.Parentsanity
-	|| NothingDone = .curr
-	|| BreakReq = .BreakRequest
-	
-	|| Old = .BasicParent
-	.basicparent = .BasicBlock
-	
-	.state.BranchDepth++
-	rz = .WhileSub(exp)
-	.state.BranchDepth--
-	
-	.basicparent = Old
-	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
-	.ParentSanity
+	return .IfOrWhile(exp, nil)
 	
 
 function WhileSub (|message| exp,  |asmreg|)
@@ -124,10 +114,10 @@ function WhileSub (|message| exp,  |asmreg|)
 
 	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 
-	|| BB = .BasicBlock												// just do it always?
-//	if BB!=loop_test.FirstBlock										// we do have a jump anyhow... 
-	.BlockParents[BB] = .ParentBlock(.ParentBlock(BB))				// we need to move it up.
-
+//	I can't underrstand this.
+//	|| BB = .BasicBlock												// just do it always?
+//	.BlockParents[BB] = .ParentBlock(.ParentBlock(BB))				// we need to move it up.
+// looks hard. and broken.
 	
 	return returns
 
@@ -461,16 +451,39 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	// a or b
 	
 	return first
-	
-	
-function NextBasicBlock (|bool| Closing=false)
-	|| B = ++.BasicBlock
+
+
+
+// We should do one basicblock per depth...
+// And one down per depth... it could make it simpler
+
+function NextBasicBlock
+	// goes up one at a time... to allow for going DOWN one at a time.	
+/	.ParentSanity
+	|| B = .BasicBlock
 	|| P = .BasicParent
-	if Closing
-		p = .ParentBlock(P)
-	if B >= 4K // whaaaaat??
-	.BlockParents[B&(4K-1)] = p
-	
+
+	|| Depth = .state.RealBranchDepth
+	|| Gain = Depth - .BasicDepth
+	while {
+		if Gain
+			.BasicDepth = depth
+			if Gain > 0
+				P = B
+			  else
+				P = .ParentBlock(P)
+			.BasicParent = P
+		
+		.BasicBlock = ++B						
+		if B >= 16K								// whaaaaat??
+		BlockParents[B&(16K-1)] = P
+
+		.ParentSanity
+		gain -= (gain>0).dir
+	} (gain)
+		
+
+
 	
 function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 	// Clamp for ints isn't used so much...

@@ -22,7 +22,7 @@ dispatch fn_asm_table (fn_asm)
 	@type:					ASMType.TypeCast
 	@tmp:					ASMType.unexpected
 
-	(ASMType.kif):			Assembler.If
+	(ASMType.kif):			Assembler.IfOrWhile
 	(ASMType.kwhile):		Assembler.While
 	(ASMType.kTern):		Assembler.Ternary
 	(ASMType.kContinue):	Assembler.Continue
@@ -414,6 +414,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	|| v = .OpenVars
 	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
 	
+	.parentsanity
 	while
 		.BreakRequest |= assembler.Breakable
 		if ch.func == @decl

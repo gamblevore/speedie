@@ -4,6 +4,7 @@
 struct SavedRegisters 
 	|byte|					RegCount
 	|byte|					ReturnCount
+	|byte|					BasicDepth
 	|uint16|				BasicBlock
 	|uint16|				BasicParent
 	|DeclAlterable[32]|		Decls
@@ -12,6 +13,7 @@ struct SavedRegisters
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
 
+		.BasicDepth = sh.BasicDepth
 		.BasicBlock = sh.BasicBlock
 		.BasicParent = sh.BasicParent
 		.regs = sh.regs
@@ -21,6 +23,7 @@ struct SavedRegisters
 
 
 	function Rewind	(|assembler| sh)
+		sh.BasicDepth = .BasicDepth
 		sh.BasicBlock = .BasicBlock
 		sh.basicparent = .basicparent
 		sh.regs = .regs

@@ -84,9 +84,9 @@ datatype int
 		opt norefcounts
 		fs.AppendIntegerAsText(self, zeros)
 	
-	operator AbsMin (|uint| Limit, |int|)
-		if .abs|uint| < Limit: return self
-		return Limit|int|.setsign(self<0)
+//	operator AbsMin (|uint| Limit, |int|)
+//		if .abs|uint| < Limit: return self
+//		return Limit|int|.setsign(self<0)
 
 	operator Min (|int| other, |int|)
 		asm iclm(dest, p1, p1, p2, 1)
@@ -156,6 +156,7 @@ datatype int
 
 	
 	operator downto (|int| other, |IntDownRange|)
+		inline
 		rz.From = self
 		rz.To = other
 
@@ -360,7 +361,6 @@ datatype float
 	render (|int| dp=6)
 		cpp_part RenderDP
 		opt norefcounts
-		inline
 		fs.AppendFloat(self, dp)
 
 
@@ -568,7 +568,8 @@ datatype float
 		|| t = ((self - low) / (high - low)).clamp
 		return t * t * (3.0 - 2.0 * t)
 	
-	function IsNan (|int|)
+	function IsNan (|int|) // perhaps these IsNan/IsInf can be merged? makes more sense
+						   // than wasting opcodes.
 		trin (22, XNN)
 		cpp_wrapper (__isnanf)
 	
@@ -723,7 +724,6 @@ datatype int64
 	inline IsPow2 (|bool|)
 		if self
 			return !(self&(self-1))
-		
 
 	function AsFloat (|Float64|)
 		cpp_wrapper
@@ -731,7 +731,7 @@ datatype int64
 	render Hex
 		opt norefcounts
 		fs.AppendHex(self)
-		
+	
 	render StrSize
 		opt norefcounts
 		if self <= 512
@@ -885,6 +885,7 @@ datatype bool
 	function Render (|faststring!| fs_in)
 		cpp_Part Append
 		opt norefcounts
+		inline
 		fs_in <~ .string
 	
 	iterator
