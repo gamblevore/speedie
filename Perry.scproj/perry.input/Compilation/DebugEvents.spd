@@ -20,9 +20,10 @@ datatype CompileMode (int)
 		return self&~M
 	
 
-function PerryAppInfoKeys (guikeyevent)
+
+function PerryAppInfoKeys (GUIKeyEvent)
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.
-/	if key is RIGHT or PERIOD or Num6
+	if key is RIGHT or PERIOD or Num6
 		DebugStepOver(self, -1)
 	if key is DOWN or S or Num8
 		DebugStepIn(self, -1)
@@ -30,6 +31,7 @@ function PerryAppInfoKeys (guikeyevent)
 		DebugStepOut(self, -1)
 	if (key is space) or key.IsAccept
 		DebugStepRun(self, -1)
+	return true
 		
 
 function DebugArgsKeyDown (GUIKeyEvent)
@@ -161,7 +163,7 @@ function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 	.ProductOut.Log(rout, 256K)
 	if r and !(r.userflags&1)
 		.ShowCompileTab(.productout)
-		r.userflags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
+		r.UserFlags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
 
 	if .ShowProductIfMoreOutput < .ProductOut.Length
 		.ShowProductIfMoreOutput = int.max // no more updates
@@ -251,7 +253,7 @@ function ReturnVariables (GUIListEvent)
 	
 	
 function DebugStepOver (guiaction)
-	.sendmsg("stepover", state)
+	.SendMsg("stepover", state)
 
 
 function DebugStepIn (guiaction)
