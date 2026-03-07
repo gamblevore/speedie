@@ -286,7 +286,9 @@ function GUIControl.SendMsg (|string| s, |int| state)
 	  else
 		if !state
 			Notifications <~ "Program already finished"
-		i.editme.setfocus
+		  else
+			beep
+//			i.editme.setfocus // shitty mistypes
 	
 
 function Perryide.ASMVis (|bool|)

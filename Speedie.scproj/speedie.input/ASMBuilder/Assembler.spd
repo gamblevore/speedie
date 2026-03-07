@@ -366,6 +366,7 @@ struct Assembler
 		|| Break = fat.ASMIndex
 			if .iscurrbranch(fat)
 				.BreakRequest |= Break
+				// maybe better to use nop2 (addb) instead?
 		
 		|| info = fat.info
 		if  info is temp  and  info isnt OKAsTemp

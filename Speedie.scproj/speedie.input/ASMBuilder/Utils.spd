@@ -200,3 +200,9 @@ function message.CallChainError (|string| name)
 		|| src = fn.source
 			problem (src, "\tInlined from here.")
 
+
+function message.NOP2 (|&fatasm|)
+	// unremoveable nop
+	return .ADDB(asmreg(1), 0)
+
+

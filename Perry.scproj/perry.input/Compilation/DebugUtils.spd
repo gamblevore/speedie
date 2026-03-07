@@ -36,6 +36,8 @@ function GotHello (|string| msg)
 		.DebugMode = M
 		.StrongView(.ViewDebugger) // view debugger!
 	.SetAppInfo
+	.AppInfo.setfocus // i generally don't like stealing the focus... leads to mistypes
+					  // but as long as it runs instantly, it should be OK?
 
 
 function AppInfoExtra (|unixprocess| r, |string|)

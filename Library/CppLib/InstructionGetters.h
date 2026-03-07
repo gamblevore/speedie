@@ -248,6 +248,11 @@
 #define   VecGet_Li       ((( int)((Op)<<25))>>25)
 #define   VecGet_Lu       (((uint)((Op)<<25))>>25)
 
+#define   VecOpPart_Modei       ((( int)((Op)<<23))>>26)
+#define   VecOpPart_Modeu       (((uint)((Op)<<23))>>26)
+#define   VecOpPart_Li       ((( int)((Op)<<29))>>29)
+#define   VecOpPart_Lu       (((uint)((Op)<<29))>>29)
+
 #define   VecSet_Indi       ((( int)((Op)<<23))>>30)
 #define   VecSet_Indu       (((uint)((Op)<<23))>>30)
 #define   VecSet_Li       ((( int)((Op)<<25))>>25)

@@ -300,6 +300,12 @@ forms
 		r3		r
 		Ind		2
 
+	VecOpPart
+		r1		R
+		r2		r
+		r3		r
+		Mode	6
+
 	VecSet
 		r1		P
 		r2		r
@@ -750,17 +756,29 @@ POS 5
 
 
 
+#!						 (((((vec4 parts)))))
+/**/ UADD (VecOpPart)
+		pv1 = pv2 + pv3
+/**/ USUB (VecOpPart)
+		pv1 = pv2 - pv3
+/**/ UMUL (VecOpPart)
+		pv1 = pv2 * pv3
+/**/ UDIV (VecOpPart)
+		pv1 = pv2 / pv3
+
+
+
 #!						(((((Integer VecMath)))))
 /**/ QADD  (Shift)
 		iv1 = iv2 + (iv3 << Shift_Shu)
 /**/ QSUB  (Shift)              						// must come after ADD
 		iv1 = (iv2 - iv3) >> Shift_Shu
-/**/ QADK (AddK)
-		iv1 = iv2 + U2_Li
 /**/ QMUL  (U4)
 		iv1 = (iv2 * iv3) + iv4
 /**/ QDIV (Div)
 		iv1 = iv2 / iv3
+/**/ QADK (AddK)
+		iv1 = iv2 + U2_Li
 /**/ QCLM (U4)
 		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
 /**/ QINC  (VecInc)
@@ -797,6 +815,17 @@ POS 5
 /**/ QCNV (Convert)
 		VecConv(r, Op)
 
+
+
+#!						 (((((ivec4 parts)))))
+/**/ PADD (VecOpPart)
+		piv1 = piv2 + piv3
+/**/ PSUB (VecOpPart)
+		piv1 = piv2 - piv3
+/**/ PMUL (VecOpPart)
+		piv1 = piv2 * piv3
+/**/ PDIV (VecOpPart)
+		piv1 = piv2 / piv3
 
 
 

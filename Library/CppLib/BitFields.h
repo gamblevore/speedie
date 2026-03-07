@@ -62,6 +62,13 @@
 #define uv3     (r[n3].Uvec)
 #define uv4     (r[n4].Uvec)
 
+#define pv1		(r[n1].Ivec[(VecOpPart_Modeu>>0)&3])
+#define pv2		(r[n2].Ivec[(VecOpPart_Modeu>>2)&3])
+#define pv3		(r[n3].Ivec[(VecOpPart_Modeu>>4)&3])
+
+#define piv1	(r[n1].Ivec[(VecOpPart_Modeu>>0)&3])
+#define piv2	(r[n2].Ivec[(VecOpPart_Modeu>>2)&3])
+#define piv3	(r[n3].Ivec[(VecOpPart_Modeu>>4)&3])
 
 #define btc(x)  ((x)<<(Compare4_Smallu<<5))
 
