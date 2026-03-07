@@ -215,6 +215,7 @@ forms
 		Cond	1		// 0 == always, 1 = only if dest == 0
 		Inv		1
 		Value	17
+//		Extra	x
 	
 	MemoryCopy
 		r1		r		// dest

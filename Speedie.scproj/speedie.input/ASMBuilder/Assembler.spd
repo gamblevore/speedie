@@ -142,7 +142,6 @@ struct Assembler
 				y++
 		*/
 		
-		.ParentSanity
 		|| B = f.basicblock
 		|| ToFind = .ParentBlock(B)
 		|| Us = .BasicParent

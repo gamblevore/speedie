@@ -16,31 +16,53 @@ module ASMExamples {
 
 target cake { 
 
-function soundmain2 (|float| input,  |float|) {
-	|| thresh = .KNOB1 / 20.0						// NEED FIX
+function SoundMain2 (|float| input,  |float|) {
+	visible
+	|| thresh = .KNOB1 / 2000.0
+	thresh    = .KNOB1 / 20.0
 	|| output = (input.abs min thresh).CopySign(input)
 	return output * 20
 }
 
 
-function ConstBranch2 (|int| y, |int| y2)
+function ConstBranch2 (|int| y)
 	|| x = 1
-	if y2
+	if y
 		x = 2
 		if y		
-			y |= x									// NEED FIX
-	
+			y |= x
+
+
+function ConstBranch3 (|int| y)
+	|| x = 2
+	|| z = 2
+	while y
+		y |= z
+		y |= x
+		x++
+		y--
 
 
 function ConstBranch1 (|int| y)
 	|| x = 1
 	if y
 		y |= x // x is always equal to 1
+		x = 2
+	if y
+		y |= x
+	
+	x = 3
+	if y
+		y |= x
+		x = 4
+	y |= x
+	
 	
 	
 function Uint64Trim (|uint64|)
 	visible
 	return UintOnly()
+
 
 function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|)	/// Active ///
 	opt norefcounts

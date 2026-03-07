@@ -458,8 +458,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 // And one down per depth... it could make it simpler
 
 function NextBasicBlock
-	// goes up one at a time... to allow for going DOWN one at a time.	
-/	.ParentSanity
+	// Goes up one at a time... to allow for going DOWN one at a time.	
 	|| B = .BasicBlock
 	|| P = .BasicParent
 

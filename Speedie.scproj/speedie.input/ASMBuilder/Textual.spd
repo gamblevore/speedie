@@ -82,7 +82,7 @@ extend Assembler
 			return true
 		i--
 		|| name = jumper.msg.first[i]
-			|| dest_index = textassembler.Labels.valuelower(name.name) #expect (name, "arg")
+			|| dest_index = textassembler.Labels.valuelower(name.name)		#expect (name, "arg")
 			jumper.prms[i] = dest_index[] - jumper.index
 			return true
 				
@@ -97,7 +97,6 @@ extend Assembler
 
 	function TextFuncSub (|message| m)
 		opt NoRefCounts
-//		.IsTextual = true
 		.vdecls = -1 // work around
 		for ch in .LoadTitle(m)
 			if ch == @name

@@ -9,7 +9,9 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 
 
 function SCDecl.MiniName (|faststring| fs)
-	.name.MiniName(fs, self is classobj)
+	|| Bra = self is classobj
+		if .type != typejbclass
+	.name.MiniName(fs, Bra)
 
 
 function string.MiniName (|faststring| fs, |bool| IsClass)
@@ -37,7 +39,6 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	|| s = .source
 	|| srcmap = (s.srcmap, 0)(s)
 	dd.AppendHInt(srcmap)
-	if self is ClassObj
 	.MiniName(dd)
 	dd <~ '\0'
 	dd.AppendHInt(.DumpCls)

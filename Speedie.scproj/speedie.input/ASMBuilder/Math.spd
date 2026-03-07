@@ -366,7 +366,7 @@ extend Assembler
 			|| x = r.const
 			|| y = x >> 18
 			if x == y << 18
-				.NopReg(r)
+				.Nopconst(r)
 				if 0: exp.VMLK
 				return exp.FMLK(dest, l, x).Vectorise(dest, asm.VMLK)
 

@@ -857,14 +857,12 @@ helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
 function CanConst (|scdecl| D, |&fatasm| f, |bool|)
 	if .IsCurr(f)
 		return true
-	if d is AlteredByBranch
+	if d is Alteredinloop
 		return false
-	// not sure if we can improve on this.
-	// if this isn't alteredby a branch, but it is inline....
-	// then it depends on if its REALLY altered by a branch
-	// do later... or not. might not be important.
-	// the basicblock is already different... sooo
-	
+	if .IsWithin(f)
+		return true
+	if d is alteredinif
+		return false // remove this test? not sure how this works.
 	return f isnt FromInline
 	
 

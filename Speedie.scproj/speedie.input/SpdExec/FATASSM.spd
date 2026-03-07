@@ -243,7 +243,6 @@ struct FatASM
 	function p3 (assigns:|uint|): .prms[3] = value
 	
 	
-	
 	function RegOnly (|int| i=0, |int|)
 		return .prms[i] & 31 // remove tmpbit + fatindex		
 
@@ -277,7 +276,7 @@ struct FatASM
 			  else
 				debugger // what?
 	
-
+	
 ////////////////////////////////////////////////////////////
 
 
@@ -285,8 +284,8 @@ struct FatASM
 		|| p = .Prms[i]
 		if p.reg
 			return p.ASMReg
-		
-		
+	
+	
 	function CheckHasOutput 
 		target debug {
 		opt norefcounts
@@ -294,7 +293,8 @@ struct FatASM
 			if !.regonly(i)
 				error (self, "Missing ASM output")
 		}
-		
+	
+	
 	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline
 		return (ASM.encoders[.op]!)(self, where, after)
@@ -314,7 +314,7 @@ struct FatASM
 		ifn op == asm.fncx or asm.fncx3
 			return R >> 5
 		return R >> 12
-
+	
 	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
@@ -408,7 +408,7 @@ struct FatASM
 			if .op == asm.knst
 				exit
 		
-		if (self  isa  asm.knst or asm.knsr or asm.gtab)
+		if (self  isa  asm.knst or asm.knsr or asm.gtab or asm.knst2 or asm.knst3)
 			.RendaKnst(fs, fs.mark-m)
 			fs <~ ' '
 		
@@ -423,13 +423,13 @@ struct FatASM
 				.RendaMsg(fs, n)
 	
 
-	function ConditionDoesAnything (|bool|)
-		// to help remove branches!
-		for o.RegOutputs in self
-			|| r = o.Reg
-				return true
-		
-		expect (!.IsFinisher) ("You can't return in the middle of a condition!")
+//	function ConditionDoesAnything (|bool|)
+//		// to help remove branches!
+//		for o.RegOutputs in self
+//			|| r = o.Reg
+//				return true
+//		
+//		expect (!.IsFinisher) ("You can't return in the middle of a condition!")
 				
 
 
@@ -443,6 +443,7 @@ struct FatASM
 			return 1
 	
 	
+	target debug {
 	function TmpRender (|faststring| fs, |message| msg)
 		opt norefcounts
 		|| arg = msg.Find(@arg)
@@ -454,8 +455,8 @@ struct FatASM
 		arg.Render(Fs)
 		if fs.Length > start + 30
 			fs.Length = start + 30
-			
-	target debug {
+
+
 	function RendaMsg (|faststring| fs, |int| sofar)
 		opt norefcounts
 		|| msg = .msg
@@ -495,6 +496,7 @@ struct FatASM
 		fs <~ " "						// reuse "*/" string
 		fs <~ "*/"
 	}
+	
 	
 	function RendaKnst (|faststring| fs, |int| sofar)
 		|| ty = .info.µType
@@ -554,7 +556,7 @@ struct FatASM
 			.JumpTo(D)
 			return true
 	
-
+	
 	function IsFinisher (|asmreg| Info, |bool|)
 		opt norefcounts
 		|| o = .op|asm|
@@ -565,8 +567,8 @@ struct FatASM
 		if info is exit
 			if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
 				return true
-		
-		
+	
+	
 	function IsFinisher (|bool|)
 		return .IsFinisher(.info)
 
