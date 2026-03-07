@@ -74,7 +74,7 @@ datatype ivec4
 	function Width (|bool|d, |int|)
 		disabled "use .length"
 	
-	function Length (|bool|d, |int|)
+	function Length (|bool| d, |int|)
 		return self[2+d|int|] - self[0+d|int|]
 	
 	inline H (|ivec2|)

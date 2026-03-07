@@ -258,11 +258,11 @@ function float.Mix (|vec4| A, |vec4| B, |vec4|)
 
 function float.Mix (|vec3| A, |vec3| B, |vec3|)
 	cpp_Part Vec3Mix
-	return .mix(A|vec4|, B|vec4|)|vec3|
+	return A + (self * (B - A))
 
-function float.Mix (|vec2| A, |float|)
+function float.Mix (|vec2| A, |vec2| B, |vec2|)
 	cpp_Part Vec2Mix
-	return .mix(a.x1, a.x2)
+	return A + (self * (B - A))
 
 
 

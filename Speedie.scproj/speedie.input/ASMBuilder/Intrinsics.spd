@@ -100,14 +100,17 @@ function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |scfunction| fn,
 	
 	dest = fn.ASMReturn(dest) // .ReallySimplify // not sure I should do simplify? hmmm. unclear.
 	return .TheTrinity(where.last, trin, dest, op.opcode)
+	
 
 
 function assembler.TheTrinity (|message| SrcPrms, |message| ASMPrms, |asmreg| dest, |byte| OpCode, |asmreg|)
 	opt norefcounts
 	|| n = 0
 	|asmreg[6]| Collection
+	|| Closer = .OpenVars
 	for s.fast in SrcPrms
 		Collection[n++] = .µTrin(s)
+	.CloseVars(Closer, SrcPrms, nil)
 	
 	|| fat = .RequestOp(OpCode, SrcPrms.parent!)
 	if opcode == asm.halt

@@ -99,12 +99,13 @@ class Slider (GuiControl)
 		return s
 	
 
-	function DrawPos (|float|v, |int|)
+	function DrawPos (|float| F, |int|)
 		|| s  = .MiniSize
 		|| D  = s.width > s.height
-		return v.mix(s.vert(d).vec2)|int|
-
-
+		|| V = s.vert(d).vec2
+		return F.mix(v.x, v.y)|int|
+	
+		
 	behaviour Draw
 		|| s  = .MiniSize
 		|| D  = s.width > s.height
@@ -120,7 +121,7 @@ class Slider (GuiControl)
 
 		if .ValueCap < 1.0
 			|| s2 = .MiniSize
-			y = .valuecap.mix(s2.vert(d).vec2)|int|
+			y = .DrawPos(.valuecap)
 			s2[x] = y
 			s2[x2] = y
 			|| px = colors.white(0.15)

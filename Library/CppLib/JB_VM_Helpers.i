@@ -175,13 +175,17 @@ AlwaysInline vec4 VBuild2 (CakeRegister* r, ASM Op) {
 
 
 AlwaysInline vec4 VSwiz (CakeRegister* r, ASM Op) {
+	vec4 Output = {};
 	auto Input = v2;
-	vec4 Output;
 	auto F = VecSwizzle_Fieldsu;
-	Output[0] = Input[(F>>0)&2]*((F>>2 )&1);
-	Output[1] = Input[(F>>3)&2]*((F>>5 )&1);
-	Output[2] = Input[(F>>6)&2]*((F>>8 )&1);
-	Output[3] = Input[(F>>9)&2]*((F>>11)&1);
+	if ((F>>2)&1)
+		Output[0] = Input[(F>>0)&3];
+	if ((F>>5 )&1)
+		Output[1] = Input[(F>>3)&3];
+	if ((F>>8 )&1)
+		Output[2] = Input[(F>>6)&3];
+	if ((F>>11)&1)
+		Output[3] = Input[(F>>9)&3];
 	return Output;
 }
 

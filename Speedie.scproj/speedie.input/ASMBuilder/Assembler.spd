@@ -529,7 +529,7 @@ struct Assembler
 		return .Assign(exp, dest, r)
 
 
-	function µGetRealOffer (|message| exp, |asmreg| Dest,  |asmreg|)
+	function µGetRealOrExisting (|message| exp, |asmreg| Dest,  |asmreg|)
 		#!"There could be a function call that smashes the first temp"
 		#!"for example:  y = (x+1) - .func()"
 		// (but what if there is not? Can we tell ahead of time?)
@@ -544,34 +544,52 @@ struct Assembler
 		return .µGetReal(exp, dest)
 
 
+	function uint64.AddReg (|asmreg| V, |uint64|)
+		|| r = v.reg
+		|| One = 1|uint64|
+		|| T = One << (r+32)
+		|| D = One << (r)
+		|| Srch = D ||| T
+		|| IsTemp = v is temp
+		if Self & Srch // i guess its already OK.
+//			if !(T&self, D&self)(IsTemp)
+			T = 0
+		  elseif !IsTemp
+			T = D
+//		  else
+//			D = 0
+		return self ||| T
+			
+
 	function µGetReal (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
-		// "Real" means var should remain "alive", and not just die after this leaves
-		// the problem is, that this doesn't work very well with temps.
-		// and we are setting this to temp. I'm not sure why? to allow for temp ops?
-		// either way, if you nop a temp... it gets closed. Which defeats the purpose of this.
-		// (memread a gtab, it will nop, and a gobj is made)
-		
-		// so... I think this should never be temp?
+		// "Real" means var will remain alive, as vdecl or vtemp.
+		// This is used for passing params to funcs, or to anything func-like.
 		
 		target debug
 			|| trap = ++ASMTrapper
-		|| OV = .OpenVars
+			if trap == 27
 		if ModeOnly is NewlyDeclared									// || x = (y + 1) + (z + 1)
 			ModeOnly = ModeOnly asnt ASMReg.NewlyDeclared
 		  else
 			if ModeOnly is temp											//    x = (y + 1) + (z + 1)
 				ModeOnly = .TempOnly(ModeOnly)
-	//			 asmtodo: what about doing all .declareme? simpler?
+	//			 asmtodo: what about doing all .declareme? simpler? once we have
+	//			 self-tests working, we can start playing around and altering this stuff...
 			  else
 				ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
+				// why are we saying this is temp????
+				// this is for params, right?
+				// something to do with gtab maybe? or... nopping?
 				(modeonly is Temp)
 			(modeonly is OKAsTemp)
 		
 		target debug
 			ModeOnly.TmpCheck
+
+		|| OV = .OpenVars
 		|| r = .µGetASM(Exp, ModeOnly)
-		if r iz ModeOnly
-			return r
+		ov = ov.AddReg(R)
+		// this will close all vars, except the one we just got back!
 		return .CloseVars(ov, nil, r)
 		
 		
@@ -582,7 +600,7 @@ struct Assembler
 		return .CloseVars(Closer, nil, v)
 
 
-	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
+	function µPrms (|message| exp, |scdecl!| A, |asmreg|)
 		// why is this a temp? each should be real.
 		// if the decl is unused... we can undeclare it after.
 		// the problem is that memory-reads (and other stuff) can nop stuff.
@@ -593,7 +611,7 @@ struct Assembler
 		
 		// so... just use a decl? makes things simpler??? right?
 		
-		|asmreg| Mode = nil//exp.AllowsTemp
+		|asmreg| Mode = nil //exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
 
 

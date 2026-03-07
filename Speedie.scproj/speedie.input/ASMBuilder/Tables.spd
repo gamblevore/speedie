@@ -849,9 +849,13 @@ function Str (fn_asm)
 	return .Read(dest, exp, addr, nil, exp.obj as scdecl) * dest
 
 
-helper VectorUpgrade (|asmreg| Src, |message| exp,  |asmreg|)
-	|| T = .TempOnly(src.BasicVec)
-	return exp.VSWZ(T, src, 0) * T
+helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
+	// seems to be overwriting good registers?
+	// its going into t31? but we have somerthing there already?
+	|| T = src.BasicVec.reg(0)
+	T = .TempOnly(T)
+	|| Mode = (1<<2) + (1<<5) + (1<<8) + (1<<11)
+	return exp.VSWZ(T, src, Mode) * T
 
 
 function CanConst (|scdecl| D, |&fatasm| f, |bool|)

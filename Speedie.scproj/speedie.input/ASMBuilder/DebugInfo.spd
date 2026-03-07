@@ -10,24 +10,18 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 
 function SCDecl.MiniName (|faststring| fs)
 	|| Bra = self is classobj
-		if .type != typejbclass
 	.name.MiniName(fs, Bra)
 
 
 function string.MiniName (|faststring| fs, |bool| IsClass)
 	opt norefcounts
 	|| n = .name
-	|| i = 0
 	|| after = int.max
-	if IsClass
-		fs <~ "("
-		if n.EndsWith("data", true)
-			after = n.Length - 4 // ErrorData --> (Error)
-	if n[0, "JB_", true]
-		i = 3
-	fs.AppendRange(n, i, after)
-	if IsClass
-		fs <~ ")"
+	if IsClass and  n.EndsWith("data", true)
+		after = n.Length - 4						// ErrorData
+	
+	|| i = n[0, "JB_", true]
+	fs.AppendRange(n, i * 3, after)
 
 
 function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)

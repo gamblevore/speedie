@@ -43,24 +43,30 @@ extend Assembler
 		|| First = exp.first!
 		|| dest = mode
 		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
+
+		|| Closer = .OpenVars
 		if First.islast
 			ml = .µGetASM(first, dest)
 		  else
-			ml = .µGetRealOffer(First, dest)
+			ml = .µGetRealOrExisting(First, dest)
 			if (dest is NewlyDeclared) and !(ml iz dest)
 				mr = dest
-	
-			mr = .µ(exp.last!, mr)
-			if ml.IsVec != mr.IsVec
-				if ml.IsVec
-					mr = .VectorUpgrade(mr, exp)
-				  else
-					ml = .VectorUpgrade(ml, exp)
+			mr = .µGetASM(exp.last!, mr)
+
 		
 		if dest is Discard
 			.AskNopTemp(ml)
 			.AskNopTemp(mr)
 			return dest // returning from inline, into func that discards result.
+	
+		
+		if (!first.IsLast) and (ml.IsVec != mr.IsVec)
+			if ml.IsVec
+				mr = .VectorUpgrade(mr, exp)
+			  else
+				ml = .VectorUpgrade(ml, exp)
+		
+		.CloseVars(Closer)
 		
 		dest = .TempTyped(exp, dest)
 		(dest is Const) = (ml&mr is Const)

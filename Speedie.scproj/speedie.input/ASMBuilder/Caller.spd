@@ -20,7 +20,7 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 		rz |= 16
 	
 	for p.fast in prms
-		|int64| v = .µReffed(p!, args[i++]!).reg
+		|int64| v = .µPrms(p!, args[i++]!).reg
 		sh += 5
 		rz |= v << sh
 	
@@ -44,7 +44,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		for p.fast in prms
 			|| ty = p.ASMDecl
 			if ty.SpecialReg|int| != Ints
-				|int64| v = .µReffed(p!, args[i]!).reg
+				|int64| v = .µPrms(p!, args[i]!).reg
 				sh -= 5
 				rz  |=  v << sh
 				ic += ints
@@ -153,9 +153,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		
 		if  fn isnt CantInline  and  fn isnt cpp
 			|| DepthOK = .InlineDepth < (.InlineDepthLimit + (fn is linkinline)|uint|)
-				if !.InlineDepth
-					if .EntireInlineFailed
-/						.EntireInlineFailed = 0
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
 			
