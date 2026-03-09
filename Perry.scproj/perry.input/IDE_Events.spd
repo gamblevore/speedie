@@ -261,7 +261,7 @@ function PerryIDE.UpdateJeeboxField (|bool|)
 
 function perryide.UpdateFoundHeader
 	|| f = .FoundList
-	|| h = f.Headers
+	|| h = f.Columns.first
 		|| files = 0
 		|| matches = 0
 		for s.fast in f.ListSource

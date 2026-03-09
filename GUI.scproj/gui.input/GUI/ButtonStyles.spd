@@ -82,7 +82,6 @@ function image.CurlieQueDrawer (ImageDrawStyleEvent)
 	
 	for Y in rect.Vert
 		|| W = self[rect.x, Y]
-//		|| YCorner = (y >= center.y)
 		for X in rect.Horz
 			|| D = rect.DistToCorner((X,Y)).abs
 			if 16 > d.x and d.y			

@@ -79,7 +79,7 @@ class Window (GUIControl)
 			¥.DrawIntoBackground(where)
 		
 		if a > 0
-			where.DrawRectStyled(.lastrect.soothe, .GNormal, 1)
+			where.DrawRectStyled(.lastrect.soothe, .GNormal, movecode.open)
 	
 	
 	behaviour AppForeGroundChange
@@ -317,7 +317,7 @@ class Window (GUIControl)
 		.DrawContents(where)
 		.__draw__(where)
 		|| gd = .GNormal.StyleDrawer
-			(gd)(where, .LastRect, .GNormal, movecode.AllCodes)
+			(gd)(where, .LastRect, .GNormal, MoveCode.Edges)
 		.RunWindowTasks(true)
 
 

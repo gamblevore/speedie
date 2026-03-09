@@ -216,7 +216,7 @@ extend PerryIDE
 
 
 		with .ErrorList
-			.Headers = ListViewRow("", listviewstate.aligncenter)
+			.Columns = ListViewRow("", listviewstate.aligncenter)
 			.IsMainListView = true
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 			.GNormal.Solid = LeftBG
@@ -295,11 +295,10 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
-			.Headers = ListViewRow("", listviewstate.aligncenter)
+			.Columns = ListViewRow("", listviewstate.aligncenter)
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
 			.IsTree			= true
-			.DontDrawSeparators	= true
 			.tooltip		= self.SearchArea.Tooltip			
 			.KeepOneSelected = true
 			.UseColorScheme	= true
@@ -310,6 +309,7 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			.GNormal.seps = 0
 		.UpdateFoundHeader
 			
 
@@ -371,8 +371,9 @@ extend PerryIDE
 			.size 			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.inside = LeftBG
-			.GNormal.seps	= colors.white.px//(LeftBG*1.1).px
+			.GNormal.seps	= self.AppInfo.GNormal.edge
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+//			.GNormal.StyleDrawer = image.CurlieQueDrawer
 
 
 		with .stack
@@ -380,7 +381,6 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.RowHeight		= .rowheight + 3
-			.DontDrawSeparators	= true
 			.KeepOneSelected = true
 			.AlwaysSendChangeEvent = true
 			.tooltip		= "The function call stack"
@@ -390,6 +390,7 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = vec4(0.13, 0.135, 0.120, 0.975)
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			.GNormal.Seps = 0
 			
 			
 		with .progress

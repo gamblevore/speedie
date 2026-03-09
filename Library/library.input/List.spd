@@ -54,8 +54,8 @@ class list
 
 	function Root	 (|...!|)			{ cpp_wrapper JB_Ring_Root }
 	function IsRoot  (|bool|)			{ cpp_wrapper JB_Ring_IsRoot, nil checker }
-	function IsFirst (|bool|)			{ opt norefcounts, return .prev == nil }
-	function IsLast  (|bool|)			{ opt norefcounts, return .next == nil}
+	inline IsFirst (|bool|)				{ opt norefcounts, return .prev == nil }
+	inline IsLast  (|bool|)				{ opt norefcounts, return .next == nil}
 
 	function HasAny	 (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
 	function HasChildren   (|bool|)		{ Disabled ".hasany" }
@@ -125,7 +125,7 @@ class list
 		nil checker
 		cpp_wrapper JB_Ring_FlatNext0
 
-	function WrapWith (|...!| W, |...!|)
+	inline WrapWith (|...!| W, |...!|)
 		.Prev = W
 		W.first = self
 		return W
@@ -157,13 +157,16 @@ class list
 			if s == self
 				return true
 
+	
 	operator In (|list| f, |bool|)
 		opt norefcounts
 		inline
 		return .parent == f
 		
-	function Remove
+
+	inline Remove
 		.Parent = nil
+
 	
 	function ClearTree
 		opt norefcounts
@@ -184,7 +187,7 @@ class list
 					
 	operator gt (|list| rt, |bool|)
 		inline
-		return .fwddist(rt)
+		return .FwdDist(rt)
 
 	operator plus (|int| n, ||)
 		disabled ".moveflat or .move?"
@@ -210,7 +213,7 @@ class list
 		return self
 
 	
-	function MoveCapped (|int| n, |...!|)
+	inline MoveCapped (|int| n, |...!|)
 		|| r = 0
 		return .MoveCapped(n, r)
 	
@@ -292,7 +295,8 @@ class list
 	function IsOnlyChild (|bool|)
 		return .IsLast and .IsFirst
 
-	function HasOneChild (|bool|)
+
+	inline HasOneChild (|bool|)
 		nil checker
 		return .HasChildCount(1)
 
@@ -326,6 +330,7 @@ class list
 
 
 	syntax access (||)
+		inline
 		description "Returns the first item. Consistant with ptr[] == ptr[0]" 
 		return .first
 
@@ -363,6 +368,7 @@ class list
 			fs <~ "(nil)"
 
 	syntax Append (|| Last)
+		inline
 		.Last = Last
 
 

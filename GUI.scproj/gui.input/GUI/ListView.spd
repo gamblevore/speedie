@@ -5,17 +5,17 @@ class ListView (GUIControl) {
 	|int|							RowHeight
 	|bool|							MultiLineDraw
 	|bool|							UseColorScheme
-	|bool|							DontDrawSeparators
 
 	|bool|							IsMainListView
 	|bool|							IsTree
 
 	|int|							ScrollShift
 	|bool|							RightClickSelects
-	|bool|							MultiSelection
-	|bool|							KeepOneSelected
 	|bool|							AlwaysSendChangeEvent
 	|byte|							CommandSelectRow
+
+	|bool|							MultiSelection // these two...
+	|bool|							KeepOneSelected // should be merged. Maybe IsTree also.
 
 	|bool|							_IsEditing
 	|byte|							_ScrollRealigner
@@ -30,10 +30,10 @@ class ListView (GUIControl) {
 	|ListViewCell?|					MouseDownCell
 	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
-	|listviewrow?| 					Headers
+//	|listviewrow?| 					Headers
 	|menu?|							CMM
 	|DrawStyle|						gRowSel 
-	|message?|						_Columns
+	|listviewrow?|					Columns
 	
 	|ColumnFinder?|					ColumnFinder
 	|GUIListDragEvent?|				OnDragRow
@@ -599,12 +599,10 @@ class ListView (GUIControl) {
 
 	libinternal CanBasicRowDrag (|ListViewrow| s, |ListViewrow|before, |bool|)
 		opt norefcounts
-		if !.hasSeps
-			return true
-			
-		while s
-			require .CanBasicRowDragOne(s, before) 
-			s = s.nextselected
+		if .hasSeps
+			while s
+				require .CanBasicRowDragOne(s, before) 
+				s = s.nextselected
 		return true
 
 
@@ -707,6 +705,7 @@ class ListView (GUIControl) {
 
 
 	behaviour MouseDown
+		opt norefcounts
 		.EditDelayed = nil
 		if clicks >= 0
 			._SelJustChanged = clicks > 1
@@ -759,6 +758,7 @@ class ListView (GUIControl) {
 			if !Keys.Cmd
 				.selectnone
 			return MouseDragging.handled
+		
 		|| l = lc.row 
 		if L is Separator
 			return MouseDragging.handled
@@ -901,6 +901,7 @@ class ListView (GUIControl) {
 
 
 	function SelectAtLeastFirst	
+		opt norefcounts
 		if !.firstselected
 			.select(.start)
 
@@ -994,14 +995,13 @@ class ListView (GUIControl) {
 
 	function SelectAdd (|ListViewrow| m, |bool| State=true, |bool| Multi=keys.shift)
 		opt norefcounts
-		if .KeepOneSelected
-			return .Select(m)
-		
-		if .MultiSelection and multi
+		if !.KeepOneSelected and .MultiSelection and multi
 			if .ChangeSel(m, state)
 				.SelectedEvent(m)
-		  else
-			.Select(m)
+			return
+		if !state
+			m = nil
+		.Select(m)
 
 
 	function SelectNone
@@ -1022,16 +1022,16 @@ class ListView (GUIControl) {
 	function Select (|ListViewRow?| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
 		opt norefcounts
 		require !._DuringSelect
-		require s and s != .ListSource
-		require s isnt UnSelectable
-		require .ListSource contains s
-		
-		.ExpandParents(s)
+		if s
+			require (s != .ListSource) and (.ListSource contains s)
+			require (s isnt UnSelectable)
+			.ExpandParents(s)
+
 		|| Modified = 0
 		for r.all in self
 			modified += .ChangeSel(r, r == s)
 		
-		if modified or .AlwaysSendChangeEvent or mode is SendEvent
+		if modified or .AlwaysSendChangeEvent or (mode is SendEvent)
 			.SelectedEvent(s, mode)
 		if mode isnt noshow
 			.show(s)
@@ -1069,9 +1069,8 @@ class ListView (GUIControl) {
 			.scrollset(.bmove(s, v))
 	
 	
-	function ExpandParents (|ListViewrow| i)
+	function ExpandParents (|ListViewrow?| i)
 		opt norefcounts
-		require i
 		while i != .listsource
 			i = i.parent		#require
 			(i is expanded)
@@ -1136,11 +1135,14 @@ class ListView (GUIControl) {
 		rz = .lastrect
 		|| t = .TypingFilter
 			rz.y2 -= t.height-1
-		if .Headers
-			rz.y2 -= .HeaderHeight
+		|| c = .columns
+		if c and c isnt hidden
+			|| r = 19
+			|int| i = c.indent
+				r = (.RowHeight max i)
+			rz.y2 -= r
+				
 			
-	libinternal HeaderHeight (|int|)
-		return 19
 	
 
 	libinternal CellAtX (|ListViewrow| R, |int| x, |ListViewcell|)
@@ -1243,22 +1245,35 @@ class ListView (GUIControl) {
 		return (B down .lastbottom) left .lastleft 
 
 
+	libinternal DrawBordersSub2 (|image| Where, |ivec4| Rect, |ivec4| z2, |listviewRow| R, |int| NRows,  |ivec4|)
+		opt norefcounts
+		while R and nrows >= 1
+			|| n = .ColumnsToDraw
+			for i in n
+				z2.horz = .ColumnBounds(i, rect, r)
+				if r.next
+					r.DrawDividerH(z2, where, i)
+				r.DrawDividerV(z2, where)
+
+			z2 = z2 down .rowheight
+			R = .Hiernext(R)
+			--nrows
+		return z2
+		
+		
 	libinternal DrawBordersSub (|image| Where,  |ivec4| Rect)
-		require !.decluttered
+		opt norefcounts
 		|| z2 = rect
 		z2.y2 += .scrollshift
 		z2.y  = z2.y2 - .rowheight
 		
-		if (self ~= "Variables") and keys.Shift
-		if !.DontDrawSeparators and .gnormal.seps.a
-			for r.visible in self
-				|| n = .ColumnsToDraw
-				for i in n
-					z2.horz = .ColumnBounds(i, rect, r)
-					r.DrawDividerH(z2, where, i)
-					if i < n-1
-						r.DrawDividerV(z2, where)
-				z2 = z2 down .rowheight
+		if .gnormal.seps.a
+			|| c = .Columns
+			if c and c isnt hidden
+/*			if .ListSource.HasAny*/
+				Where.MarkLineH(z2.x1y2, z2.width, 1)
+				z2 = .DrawBordersSub2(where, rect, z2, c, 1)
+			.DrawBordersSub2(where, rect, z2, ._scrollstart, .visiblerows)
 
 		z2 = rect
 		z2.y2 += .scrollshift
@@ -1269,8 +1284,10 @@ class ListView (GUIControl) {
 			z2 = z2 down .rowheight
 
 
-	function DrawMarks (|image| Where,  |ivec4| Rect)
+	libinternal DrawBorders (|image| Where,  |ivec4| Rect)
 		where.clearmarks(.lastrect)
+		require !.decluttered
+
 		.DrawBordersSub(where, rect)
 		|| bg		= .gnormal.bg
 		|| focus	= .gRowSel.bg
@@ -1347,19 +1364,19 @@ class ListView (GUIControl) {
 
 	libinternal DrawHeaders (|image| where, |ivec4| rect)
 		opt NoRefCounts
-		|| l = .headers$
-
-		rect.y = rect.y2
-		rect.y2 = .lastrect.y2
-		l.ListRowDraw(Where, rect, self, 0)
+		|| Cols = .columns
+		if Cols and Cols isnt hidden
+			rect.y = rect.y2
+			rect.y2 = .lastrect.y2
+			Cols.ListRowDraw(Where, rect, self, 0, .columnstodraw)
 		
-		require l.Name
-		
-		rect.y2 = rect.y +1
-		|| v = .GNormal.Seps.color
-		v = 0.2.mix(v, colors.white)
-		v.a = 0.5
-		where.DrawRect(Rect, v) 
+//		require Cols.Name
+//		
+//		rect.y2 = rect.y + 1
+//		|| v = .GNormal.Seps.color
+//		v = 0.2.mix(v, colors.white)
+//		v.a = 0.5
+//		where.DrawRect(Rect, v) 
 
 
 	inline ScrollStart (|listviewrow|)
@@ -1371,29 +1388,34 @@ class ListView (GUIControl) {
 			._ScrollStart = value
 			.touch
 
+	
 	behaviour Draw
 		opt NoRefCounts
 		.ScrollProtect
+		.fixscroll // why do we need both?
 		
+		if keys.shift and self~="FoundList"
 		|| clip = where.ControlClip
 		|| rect = .ActualRect
 		
 		.CalculateSkips
-		.DrawMarks(where, rect)
+		.DrawBorders(where, rect)
 		.drawheaders(where, rect)
 		
 		rect.y2 += .ScrollSlide
 		|| End = .End
 		._CanSeeAllLines = false
 		
+		{|| NCols = .Columncount
 		for r.visible in self
 			rect.y = rect.y2 - .RowHeight
 			|| D = (r.depth(self), 0)(.IsTree)
-			r.ListRowDraw(Where, rect, self, D)
+			r.ListRowDraw(Where, rect, self, D, NCols)
 			rect.y2 = rect.y
 			if (r == end) and .start == .scrollstart
 				._CanSeeAllLines = (rect.y >= .lastrect.y)
-
+		}
+		
 		where.ControlClip = clip
 		where.horz = .lastrect.h // redundant?
 		|| cmm = .cmm
@@ -1453,21 +1475,21 @@ class ListView (GUIControl) {
 	iterator Visible
 		.fixscroll
 		|| F = ._scrollstart
-		|| n = .VisibleRows
-		while f and n >= 1
+		|| nrows = .VisibleRows
+		while f and nrows >= 1
 			yield f
 			f = .Hiernext(f)
-			--n
+			--nrows
 
 
 	iterator FullyVisible
 		.fixscroll
 		|| F = ._scrollstart
-		|| n = .FullyVisibleRows
-		while f and n >= 1
+		|| nrows = .FullyVisibleRows
+		while f and nrows >= 1
 			yield f
 			f = .Hiernext(f)
-			--n
+			--nrows
 
 
 	iterator All

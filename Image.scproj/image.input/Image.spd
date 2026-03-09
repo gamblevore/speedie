@@ -267,7 +267,7 @@ class Image (memory)
 			px.a = mark
 
 	function MarkLineH  (|ivec2| P, |int| Width, |int| Mark)
-		|| R = .clip(P.xyxy + (0,0,width,0))
+		|| R = .clip(P.xyxy + (0,0,width+1,0))
 		|| sigh = self[R.xy]
 		for r.width
 			(sigh++).a = Mark
@@ -417,8 +417,8 @@ class Image (memory)
 			.DrawOutlineOnly(R, g.SafeEdge, g.SafeBG, Edges)
 
 
-	function DrawRectStyled (|ivec4| R, |DrawStyle?| G=nil, |MoveCode| Edges=movecode.allcodes)
-		|| D = g.StyleDrawer?
+	function DrawRectStyled (|ivec4| R, |DrawStyle| G, |MoveCode| Edges=movecode.allcodes)
+		|| D = g.StyleDrawer
 			(D)(self, r, G!, edges)
 		  else
 			.DrawRectOutlined(r, g, edges)

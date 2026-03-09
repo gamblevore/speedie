@@ -32,6 +32,9 @@ function cakevm.PerryAnswer (|cakestack| stack, |spdprocess| perry)
 
 function __PerryView__ (cakevm.CakeChef)
 	|spdprocess--| p = cake.perry!	// perry always exists by now
+	if !p.IsOpen
+		app.Quit(0) // stop runaway processes
+	
 	if (ErrorCode)
 		p <~ "crashed " + ErrorCode
 	.ClearTempBreak(stack)

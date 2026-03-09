@@ -63,17 +63,29 @@ role ListViewCell (message)
 
 
 extend ListView
-	function Columns (assigns:|string|value)
+	setter Columns (|listviewrow?| cols)
 		opt norefcounts
-		|| x = value.parse
+		cpp_part SetColumnsMsg
+		if cols
+			|| Count = 0
+			if !cols.hasany // ugh
+				|| arg = @arg.msg
+				arg.tag = cols.tag
+				cols = cols.wrapwith(arg)
+				
 			|| wmax = (1<<14)|f64| / 100.0
-			for m.fast in x
+			for (m.fast in cols)
 				m.flags = m["min"].int
 				m.rangelength = (m["pc"].float * wmax)|int|
 				m.Indent = nil
-				x.Position++
-			x.rangelength = (1<<14) / (x.Position)
-		._Columns = x
+				Count++
+			cols.rangelength = (1<<14) / (Count)
+		.Columns = cols
+	
+	
+	setter Columns (|string| value)
+		opt norefcounts
+		.Columns() = value.parse(@arg)|listviewrow|
 	
 	
 	libinternal ColumnWidth (|Message| m, |int| w, |int|)
@@ -82,13 +94,14 @@ extend ListView
 		|int| pc = m.rangelength
 		if !w2 and !pc
 			pc = m.parent!.rangelength
+			pc ?= 150 // sigh
 		pc = (w * pc)>>14
 		return w2 max pc
 	
 	
 	libinternal ColumnStart (|int| i, |int|)
 		opt norefcounts
-		|| c = ._Columns
+		|| c = .Columns
 		require (i > 0)
 		|| w = .width
 		if !c
@@ -117,9 +130,9 @@ extend ListView
 			rz++
 	
 	
-	inline ColumnCount (|int|)
+	libinternal ColumnCount (|int|)
 		opt norefcounts
-		|| c = ._Columns
+		|| c = .Columns
 			|| n = c.Count
 			c.Position = n
 			return n

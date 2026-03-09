@@ -918,6 +918,7 @@ datatype MoveCode (byte)
 		MiddleLeft  = Left + Vertical
 		MiddleRight = Right + Vertical
 		AllCodes = 255
+		Edges = 63
 		Center = 63
 
 	function ivec2.MoveCode (|movecode|)

@@ -1333,7 +1333,7 @@ class TextView (GUIControl)
 		|| e = i.editingfor
 		if e isa listview
 			if e._isediting
-				.finishediting(e._columns!=nil)
+				.finishediting(e.columns!=nil)
 				return true
 		
 		return .InlineAcceptSearch

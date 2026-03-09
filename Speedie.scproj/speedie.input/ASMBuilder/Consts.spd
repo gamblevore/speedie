@@ -35,7 +35,6 @@ extend Assembler
 			
 	
 	function LoadNumber (|message| exp, |int64| V, |bool| Special, |asmreg| Dest=nil, |asmreg|)
-		if "ConstBranch2".trap
 		if !Dest.reg
 			|| Found = .MegaNumFinder(v, special, dest.µtype)
 				return Found

@@ -100,7 +100,7 @@ extend PerryIDE
 
 	function UpdateErrorCount
 		opt norefcounts
-		|| h = .errorlist.headers
+		|| h = .errorlist.Columns.first
 			h.name = ""
 			|| n = .errorlist.listsource.Count
 				h.name = n of "issue"

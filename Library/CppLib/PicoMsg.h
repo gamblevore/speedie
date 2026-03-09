@@ -670,7 +670,7 @@ struct PicoComms : PicoConfig {
 	
 	PicoMessage Get (float T = 0.0) {
 		if (!PreData and !pre_grab())
-			if (!T or !delay_read(T))
+			if (!T or !delay_get(T))
 				return {};
 		
 		PicoMessage M = {PreData, PreLength};
@@ -833,12 +833,17 @@ struct PicoComms : PicoConfig {
 		return !(PartClosed&1)  and  (Socket > 0)  and  (Sending->Length());
 	}
 
-	bool delay_read (float T) {
+	
+	// Get() shouldn't return instantly... if the user requested to wait a number of seconds
+	// the caller might be relying on using pico as a "idle-loop" and it will suck up all the CPU
+	// if the connection is closed.
+	
+	bool delay_get (float T) {
 		if (T < 0) T = SendTimeOut;
-		T = std::min(T, 543210000.0f); // 17 years?
+		T = std::min(T, 30.0f); // 30 seconds
 		PicoDate Final = PicoNow() + (PicoDate)(T*65536.0f);
-		timespec ts = {0, 1000000}; int n = T*16000;
-		for ( int i = 0;  i < n and !(PartClosed&2);   i++) {
+		timespec ts = {0, 1000000}; int n = T*16000.0f;
+		for ( int i = 0;  i < n;   i++) {
 			nanosleep(&ts, 0);
 			if (PreData) return true; 
 			if (PicoNow() > Final) return false;

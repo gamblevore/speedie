@@ -35,7 +35,7 @@ role config (message)
 	function Save (|bool|)
 		|file--| f = .path
 			|| r = .render
-			|| p = r.parse
+			|| p = r.parse(@arg)
 				rz = f.smartdata(r)
 	
 	function Path (|file|)

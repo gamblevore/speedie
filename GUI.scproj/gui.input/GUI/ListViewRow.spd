@@ -117,7 +117,7 @@ role ListViewRow (message)
 		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
 
 	
-	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth)
+	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth, |int| N)
 		opt NoRefCounts
 		require self and !p.decluttered
 		|| w	= p.window	
@@ -126,20 +126,20 @@ role ListViewRow (message)
 		|| str = p.Declutterer.Strength
 		where.controlclip = rect.clip(p.lastrect)
 		
-		for i in p.ColumnsToDraw
+		for i in n
 			rect.horz	= p.ColumnBounds(i, z2, self)
-			rect.x	   += depth*font.width*2
+			rect.x	   += depth * font.width * 2
 			.DrawRowColumn(rect, where,  p, depth, i, str) 
-
+		
 		if self is active
 			where.horz	= z2.h
 			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1.0)
-				
+		
 		if self is Disabled
 			|| c = 0.5.mix(p.GNormal.BG.Color, vec4(0.5))
 			c.a = (str * 0.7) min 1.0
 			where.DrawRect(z2 + (0,0,0,-1), c)
-
+		
 		if self is found
 			z2 += (0, 1, 0, 0)
 			z2.y2 = z2.y + 2
@@ -149,7 +149,12 @@ role ListViewRow (message)
 
 
 	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|) // __TableCell__(column)
-		if parent._Columns == nil
+		opt norefcounts
+
+		|| Cols = parent.columns
+		if cols == self
+			return self[column].name
+		if (Cols == nil) or parent.IsTree
 			column = -1
 		return parent.TableCell(self, column)
 		
