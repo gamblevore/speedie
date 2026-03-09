@@ -363,18 +363,27 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
-		|| Break = fat.ASMIndex
-			if .iscurrbranch(fat)
-				.BreakRequest |= Break
-				// maybe better to use nop2 (addb) instead?
-		
 		|| info = fat.info
 		if  info is temp  and  info isnt OKAsTemp
 			.CloseOneVar(nil, 1<<info.reg)
-		
-		|| C = .curr - 1
-		if fat == C
-			.curr_ = C // do it before both kinds of nop...
+
+		|| Type = asm.noop
+		|| Break = fat.ASMIndex
+			if .IsCurrBranch(fat)
+				.BreakRequest |= Break
+				// Maybe better to use nop2 (addb) instead?
+				// OK... so what should we do if we are nopping something with a break?
+				// we put a breakrequest, right? So that the net one gets it
+				// but what if... we can't? or what if there IS no next one?
+				// we could make it into a trap instruction?
+			if break & BreakPoint
+				type = asm.TRAP
+
+		if type != asm.trap
+			|| C = .curr - 1
+			if fat == C
+				.curr_ = C // do it before both kinds of nop...
+				Type = nil
 
 		depth++
 		if depth > 7
@@ -386,8 +395,7 @@ struct Assembler
 			v &= 31
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
-			
-		|| Type = asm.noop * (fat < .curr_)
+		
 		fat.setop = Type
 			
 		
@@ -457,6 +465,13 @@ struct Assembler
 			if !soft and C <= 0
 				.nop_sub(f, soft, depth)
 	
+	
+	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
+		if ToNop.µRefCount <= 0
+			|| br = ToNop.ASMIndex
+			.nop(ToNop)
+			replace.ASMIndex = br
+
 	
 	function AskNop (|fatasm| ToNop)
 		if ToNop.µRefCount <= 0

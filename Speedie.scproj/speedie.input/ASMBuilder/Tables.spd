@@ -94,6 +94,7 @@ function Debugger (fn_asm)
 			if num <= 1   // debugat 0 --> non-removeable noop. To track BreakCount
 				fat = exp.nop2
 	if !fat
+		if "IsString".trap
 		fat = exp.TRAP(num)
 	
 	fat.µRefCount++

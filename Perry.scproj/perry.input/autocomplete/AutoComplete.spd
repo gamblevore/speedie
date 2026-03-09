@@ -298,7 +298,7 @@ function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	if g.BG.a != New
 		GUI.touch
 	g.BG.a = New
-	g.Text.a = New
+	g.TextColor.a = New
 	return true
 
 

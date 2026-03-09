@@ -141,7 +141,7 @@ class OpenSaveDialog (Window)
 			.growsel = ¥.Menurowsel
 		
 		.gnormal = ¥.systemstyle.Copy
-		.gnormal.Drawer = image.CurlieQueDrawer
+		.gnormal.StyleDrawer = image.CurlieQueDrawer
 
 
 	behaviour TypedString

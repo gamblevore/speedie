@@ -141,6 +141,8 @@ function assembler.Fries (|&ASMReg| Collection, |fatasm| fat, |message| s, |int|
 	require s.expect(@thg)
 
 	|| name = s.name
+	if name ~= "p0"
+		error (fat, "Use r0")
 	if name ~= "r0" // now what?
 		fat.RegInput(i) = asmreg()
 		return

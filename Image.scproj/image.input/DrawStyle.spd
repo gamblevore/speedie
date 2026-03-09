@@ -1,6 +1,6 @@
 
 
-prototype ImageDrawStyleEvent (|Image| self,  |ivec4| Rect, |drawstyle| G, |bool| EdgeOnly)
+prototype ImageDrawStyleEvent (|Image| self,  |ivec4| Rect, |drawstyle| G, |MoveCode| Edges)
 
 class DrawStyle
 	linkage
@@ -9,10 +9,10 @@ class DrawStyle
 	|imagePixel|				BG
 	|imagePixel|				Edge
 	|imagePixel|				Seps
-	|imagePixel|				Text
-	|imagePixel|				_BG
-	|imagePixel|				_Edge
-	|ImageDrawStyleEvent?|		Drawer
+	|imagePixel|				TextColor
+	|imagePixel|				_BackupBG
+	|imagePixel|				_BackupEdge
+	|ImageDrawStyleEvent?|		StyleDrawer
 	|Byte|						CornerSize
 	|byte| 						CornersCut
 	|Byte|						LineWidth
@@ -21,14 +21,14 @@ class DrawStyle
 	constructor
 		.LineWidth = 1
 		.clear
-		.text <~ vec4(1.0)
+		.textColor <~ vec4(1.0)
 
 	constructor (|DrawStyle| c)
 		cpp_part ConstructorCopy
 		.bg = c.bg
 		.edge = c.edge
 		.seps = c.seps
-		.text = c.text
+		.textcolor = c.textcolor
 		.CornerSize = c.CornerSize
 		.CornersCut = c.CornersCut
 	
@@ -41,7 +41,7 @@ class DrawStyle
 		fs <~ "\nSeps: "
 		.seps.Render(fs)
 		fs <~ "\ntext: "
-		.text.Render(fs)
+		.textColor.Render(fs)
 	
 	function Overlay (|vec4| C, |float| a=0)
 		|| T = C.PreMul
@@ -82,13 +82,13 @@ class DrawStyle
 		return font.height
 
 	syntax using (|drawstyle|)
-		._bg = .bg
-		._Edge = .edge
+		._backupbg = .bg
+		._backupEdge = .edge
 		return self
 
 	syntax UsingComplete (|object| idk)
-		.Edge = ._Edge
-		.bg = ._BG
+		.Edge = ._BackupEdge
+		.bg = ._BackupBG
 
 	function Strengthen (|float| s)
 		require s!=1.0

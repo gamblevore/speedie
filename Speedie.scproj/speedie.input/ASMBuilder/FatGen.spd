@@ -93,7 +93,7 @@ function message.TRAP (|int| At = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.TRAP, self)
-	rz.numinput(0) = At
+	rz.NumInput(0) = At
 }
 
 
@@ -438,6 +438,7 @@ function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 
 function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
+//	if "JB_Err_SyntaxIsSet"
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BNOT, self)
 	rz.reginput(1) = r2

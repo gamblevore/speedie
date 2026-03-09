@@ -713,7 +713,7 @@ datatype int64
 			return d
 		return self
 	
-	function Abs (|int64|)
+	inline Abs (|int64|)
 		if self < 0
 			self = -self
 		return self
@@ -917,7 +917,7 @@ datatype MoveCode (byte)
 		Horizontal  = Right + Left
 		MiddleLeft  = Left + Vertical
 		MiddleRight = Right + Vertical
-		All = 63
+		AllCodes = 255
 		Center = 63
 
 	function ivec2.MoveCode (|movecode|)
@@ -929,6 +929,13 @@ datatype MoveCode (byte)
 	syntax is (|movecode| m, |bool|)
 		inline
 		return (self & m) == m
+
+	syntax is (|movecode| m, assigns:|bool|, |movecode|)
+		inline
+		self |= m
+		if !value
+			self &= ~m
+		return self
 
 	function Field (|int|)
 		if self & Vertical

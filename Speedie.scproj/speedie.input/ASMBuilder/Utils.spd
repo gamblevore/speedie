@@ -202,7 +202,6 @@ function message.CallChainError (|string| name)
 
 
 function message.NOP2 (|&fatasm|)
-	// unremoveable nop
 	return .ADDB(asmreg(1), 0)
 
 

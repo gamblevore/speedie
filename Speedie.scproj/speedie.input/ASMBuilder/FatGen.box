@@ -436,13 +436,13 @@ function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BNOT, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
+	rz.numinput(3) = K
 	rz.dest(0, r1, a)
 }
 
@@ -1419,13 +1419,13 @@ function message.QORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QNOT, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
+	rz.numinput(3) = K
 	rz.dest(0, r1, a)
 }
 

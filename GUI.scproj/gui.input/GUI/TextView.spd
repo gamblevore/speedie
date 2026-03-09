@@ -732,7 +732,7 @@ class TextView (GUIControl)
 			if key is LEFTBRACKET:		return .tabIndent(-1, "\t")
 			if key is RIGHTBRACKET:		return .TabIndent(1, "\t")
 			if (key is tab) and !keys.option
-				return .trytab
+				return .TryTab
 			if key iscmd keys.SLASH:	return .CommentSlash(false)
 			if key iscmd keys.Num8:		return .CommentSlash(true)
 			if key is delete:			return .DeleteKey(keys.shift)

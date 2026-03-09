@@ -57,31 +57,48 @@ role ListViewCell (message)
 		rz = Message()
 		rz.obj = self
 		rz.position = i
-		
+
 
 
 
 
 extend ListView
 	function Columns (assigns:|string|value)
-		|| x = Message()
+		opt norefcounts
+		|| x = value.parse
+			|| wmax = (1<<14)|f64| / 100.0
+			for m.fast in x
+				m.flags = m["min"].int
+				m.tag = (m["pc"].float * wmax)|int|
+				m.Indent = nil
+				x.Position++
+			x.tag = (1<<14) / (x.Position)
 		._Columns = x
-		for s in value.Split(',')
-			x.msg(@thg, s)
-			x.Position++
+	
+	
+	libinternal ColumnWidth (|Message| m, |int| w, |int|)
+		opt norefcounts
+		|int| w2 = m.flags
+		|int| pc = m.tag
+		if !w2 and !pc
+			pc = m.parent!.tag
+		pc = (w * pc)>>14
+		return w2 max pc
 	
 	
 	libinternal ColumnStart (|int| i, |int|)
-		require i > 0
-
+		opt norefcounts
+		|| c = ._Columns
+		require (i > 0)
 		|| w = .width
-		if .ColumnsToDraw > 1
-			if i == 1
-				return (w/2)
-			if i == 2
-				return (w/2)+(w/4)
-		return w
-
+		if !c
+			return w
+		|| r = c.first
+		for j in i
+			loop r
+			rz += .ColumnWidth(r, w)
+			r++
+	
 	
 	libinternal ColumnBounds (|int| col,  |ivec4| z2,  |ListViewrow| sc,  |intrange|)
 		(sc) // one day I'll use it, I guess
@@ -89,18 +106,23 @@ extend ListView
 		|| x2	= .ColumnStart(col+1) - 1
 		rz		= (x1, x2) + z2.x
 		rz.x2	= rz.x2 min z2.x2
-
+	
 	
 	function ColumnsToDraw (|int|)
-		// should use the column info instead
-		if .width < 150
-			return 1
-		return .ColumnCount
+		|| w = .Width
+		|| n = .ColumnCount
+		for i in n
+			if .ColumnStart(i) >= w
+				exit
+			rz++
 	
 	
 	inline ColumnCount (|int|)
-		if !._Columns
-			return 1
-		return ._columns.Count
+		opt norefcounts
+		|| c = ._Columns
+			|| n = c.Count
+			c.Position = n
+			return n
+		return 1
 
 

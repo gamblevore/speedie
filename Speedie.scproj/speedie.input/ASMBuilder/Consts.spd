@@ -45,6 +45,7 @@ extend Assembler
 				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		
+		if "ConstBranch2".trap
 		|| fat = exp.KNST(dest)
 		return fat.ConstFill(dest, v)
 

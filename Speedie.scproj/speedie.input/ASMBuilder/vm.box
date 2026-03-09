@@ -62,6 +62,12 @@ forms
 		r3		r
 		Sh		6
 
+	BoolNot
+		r1		R
+		r2		r
+		r3		r
+		K		l
+
 	TERN
 		r1		R
 		r2		r
@@ -513,8 +519,8 @@ POS 5
 		u1 = u2 ||| ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BXOR  (Shift)
 		u1 = u2  ^  ((u3 << Shift_Shu) >> Shift_Shu)
-/**/ BNOT  (Shift)
-		u1 = ~u2 &  ((~u3 << Shift_Shu) >> Shift_Shu)
+/**/ BNOT  (BoolNot)
+		u1 = (~u2) & (u3|||BoolNot_Ki)
 /**/ BANK  (AddK)
 		u1 = u2  &  U2_Li
 /**/ BORK  (AddK)
@@ -810,8 +816,8 @@ POS 5
 		uv1 = uv2  ^  (uv3 ||| Shift_Shu)
 /**/ QORR  (Shift)
 		uv1 = uv2 ||| (uv3 ||| Shift_Shu)
-/**/ QNOT  (Shift)
-		uv1 = ~uv2 & ~(uv3 ||| Shift_Shu)
+/**/ QNOT  (BoolNot)
+		uv1 = (~uv2) & (uv3|||BoolNot_Ki)
 /**/ QCNV (Convert)
 		VecConv(r, Op)
 

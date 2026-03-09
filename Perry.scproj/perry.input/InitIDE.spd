@@ -337,8 +337,8 @@ extend PerryIDE
 			.ID				= "Application Info"
 			.size 			= the~width  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
-			.GNormal.Edge	= Colors.Yellow.px
-			.GNormal.Edge.a = (0.05*255.0)|int|
+			.GNormal.edge = (0.5, 0.5, 0.1, 0.25).px
+			.GNormal.StyleDrawer = image.CurlieQueDrawer
 
 
 		with .DebugBtns
@@ -358,10 +358,9 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
-			.Columns = "Name,Value"
+			.Columns = "Name {min 60, pc 20}, Value {min 160, pc 80}"
 			.ColumnFinder = PerryVariableFinder
 			.IsMainListView = true
-			.DontDrawSeparators	= true
 			.UseColorScheme	= true
 			.AlwaysSendChangeEvent = true
 			.RowHeight		= .rowheight + 3
@@ -369,7 +368,8 @@ extend PerryIDE
 			.ID				= "Variables"
 			.size 			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
-			.GNormal.Solid = LeftBG
+			.GNormal.inside = LeftBG
+			.GNormal.Edge	= (LeftBG*1.1).px
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
 
@@ -514,7 +514,7 @@ extend PerryIDE
 			|| pf = perry.projects.first 
 				 (pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
-			.GNormal.Drawer = image.RoundRectDrawer
+			.GNormal.StyleDrawer = image.RoundRectDrawer
 			.GNormal.CornersCut = 12
 			.GNormal.CornerSize = 6
 

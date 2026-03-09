@@ -316,8 +316,8 @@ class Window (GUIControl)
 		.__drawbackground__(where)
 		.DrawContents(where)
 		.__draw__(where)
-		|| gd = .GNormal.Drawer
-			(gd)(where, .LastRect, .GNormal, true)
+		|| gd = .GNormal.StyleDrawer
+			(gd)(where, .LastRect, .GNormal, movecode.AllCodes)
 		.RunWindowTasks(true)
 
 
@@ -332,30 +332,27 @@ class Window (GUIControl)
 		|| lim = .LastRect.Soothe
 		
 		.DrawChildren(where, lim, inner)
-		|| f = .Focus
-			|| str = (0.70, 1.0)(inner)
-			if keys.Shift
-			f.drawfocus(where, str)
-//			Notifications <~ f.ID
-			
-	
-		|| m = .openedmenu
-			m.DrawInner(where)
-		  else
-			inner.DrawInner(where)
 
+		|| m = .openedmenu
+			inner = m
+		ifn inner and inner.DrawInner(where)
+			|| f = .Focus
+				f.drawfocus(where, 1.0)
+		
 		where.ResetBoundsToSize
 		if ._AlphaFader and ._FlashSelf
 			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
 
-
+	
 	libinternal guicontrol.DrawInner (|image| where, |bool|)
-		if .IsViewableMenu
+		opt norefcounts
+		|| R = .LastRect
+		if R.ispositive and .window.isviewable
 			where.ControlClip = self
 			.__Draw__(Where)
-			.DrawChildren(where, .lastrect)
+			.DrawChildren(where, R)
 			where.ControlClip = self
-			.DrawFocus(where)
+			.DrawFocus(where, 0.7)
 			return true
 
 

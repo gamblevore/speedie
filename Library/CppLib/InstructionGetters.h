@@ -56,6 +56,9 @@
 #define   AddOrSubM_Li       ((( int)((Op)<<29))>>29)
 #define   AddOrSubM_Lu       (((uint)((Op)<<29))>>29)
 
+#define   BoolNot_Ki       ((( int)((Op)<<23))>>23)
+#define   BoolNot_Ku       (((uint)((Op)<<23))>>23)
+
 #define   TERN_Smalli       ((( int)((Op)<<28))>>31)
 #define   TERN_Smallu       (((uint)((Op)<<28))>>31)
 #define   TERN_Li       ((( int)((Op)<<29))>>29)

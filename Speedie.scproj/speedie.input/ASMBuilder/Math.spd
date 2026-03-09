@@ -664,8 +664,8 @@ extend Assembler
 		if r.reg // what?
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, asmreg(), ConstifyBitNot)
-		if 0: exp.BNOT, exp.qnot
-		return .BitMaker(dest, l, asmreg(), exp, asm.bnot, asm.qnot)
+		if 0: exp.qnot
+		return exp.bnot(dest, l, asmreg(), -1).Vectorise(dest, asm.qnot)
 
 
 	function BitXor (fn_opasm)
@@ -715,13 +715,20 @@ extend Assembler
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
 
 	
-	function BitAndNop (|assembler| self, |message| exp, |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
-		require l is Const
-		|| k = l.const
-		if .NopConst(l, -1)
-			return r
-		if k == 0
-			return .zeros(dest)
+	function BitAndOpt (|assembler| self, |message| exp,  |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
+		if l is Const
+			|| k = l.const
+			if .NopConst(l, -1)
+				return r
+			if k == 0
+				return .zeros(dest)
+		|| f = l.fat
+		if  f  and  (f isa asm.bnot or asm.qnot)  and  (f.prms[3]==-1) // now what?
+			// D = ~L & R
+			if .IsWithin(f)
+				|| bnot = exp.bnot(dest, f.asmreg(1), R, 0)
+				.AskNop(f, bnot)
+				return bnot.Vectorise(dest, asm.qnot)
 
 
 	function BitAnd (fn_opasm)
@@ -729,10 +736,7 @@ extend Assembler
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitAnd)
 		if (l iz r)
 			return l
-		|| k = .BitAndNop(exp, dest, l, r)
-			return k
-		k = .BitAndNop(exp, dest, r, l)
-		if k
+		|| k = .BitAndOpt(exp, dest, l, r) ?? .BitAndOpt(exp, dest, r, l)
 			return k
 		if (l is Const)
 			swap (l) (r)
@@ -751,7 +755,7 @@ extend Assembler
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp, |asmreg|)
 		if asm.BORK!=asm.borr+4 // what?
 
-		if (r.reg) and (opp != asm.bnot) and (!dest.IsVec)
+		if (r.reg) and (!dest.IsVec)
 			if (opp == asm.BAND)
 				|| B = .CanBAND_BFLG(R)
 					return .BFLG_Sub(exp, dest, L, B, B, false)

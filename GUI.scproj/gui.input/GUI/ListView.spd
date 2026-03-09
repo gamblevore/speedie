@@ -1397,13 +1397,13 @@ class ListView (GUIControl) {
 		where.controlclip = clip
 		where.horz = .lastrect.h // redundant?
 		|| cmm = .cmm
-			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.border)
+			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.focusborder)
 
 		|| re = .RowBounds(.scrollstart, ._DraggingRowTo, 1)
 			re = re up .rowheight
 			if !._draggingrowto.prev
 				re = re down 2
-			where.DrawRectStyled(re, ¥.border)
+			where.DrawRectStyled(re, ¥.focusborder)
 		
 		.SetInlineSize
 		

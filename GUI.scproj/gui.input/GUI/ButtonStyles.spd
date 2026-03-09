@@ -1,6 +1,6 @@
 
 function image.RoundRectDrawer (ImageDrawStyleEvent)
-	require !EdgeOnly
+	require Edges is open
     || Col = g.bg.PreMul
     || Edge = g.edge.Color
     || center = rect.Center
@@ -31,7 +31,7 @@ function image.RoundRectDrawer (ImageDrawStyleEvent)
 
 
 function image.ClippedRectDrawer (ImageDrawStyleEvent)
-	require !EdgeOnly
+	require Edges is open
 	rect.y2-- // seems to draw too high? not sure why.
 	|| Col = g.bg.PreMul
 	|| Edge = g.edge.Color.PreMul
@@ -74,11 +74,10 @@ extend_module Image
 
 
 function image.CurlieQueDrawer (ImageDrawStyleEvent)
+	opt norefcounts
 	|| BG = g.bg.PreMul
-	|| Edge = vec4(1).premul  //g.edge.Color.PreMul
+	|| Edge = g.edge.Color.PreMul
 	|| Nothing = vec4(0).PreMul
-//	|| center = rect.Center.iVec2
-//	|| Active = g.CornersCut
 	|| Q = image.CurlieQue
 	
 	for Y in rect.Vert
@@ -89,17 +88,14 @@ function image.CurlieQueDrawer (ImageDrawStyleEvent)
 			if 16 > d.x and d.y			
 				if q and Q[D].r > 128 // white
 					w.overlay(edge)
-				  elseif EdgeOnly
-					0
-				  elseif (d.x+d.y) >= 2
-					w.overlay(bg)
-				  else
-					w.overlay(nothing)
+				  elseif edges is OPEN
+					if (d.x+d.y) >= 2
+						w.overlay(bg)
+					  else
+						w.overlay(nothing)
 			  elseif !d.x or !d.y
 				w.overlay(edge)
-			  elseif EdgeOnly
-				0
-			  else
+			  elseif edges is OPEN
 				w.overlay(bg)
 
 			W++

@@ -315,14 +315,6 @@ class GUIControl (list)
 			self = .parent
 		return true
 
-
-	function IsViewableMenu (|bool|)
-		opt norefcounts
-		nil checker
-		|| w = .window
-		if w and self!.lastrect.ispositive
-			return w.isviewable
-
 		
 	function ContainsMouse (|bool|)
 		opt norefcounts
@@ -495,7 +487,7 @@ class GUIControl (list)
 
 	libinternal FocusBorderStyle (|drawstyle|)
 		if (self isnt modified) or (self is NeverDrawModified)
-			return ¥.Border
+			return ¥.FocusBorder
 		return ¥.ModifiedBorder
 		
 		
@@ -504,7 +496,16 @@ class GUIControl (list)
 		require strength > 0
 		|| oldclip = where._ControlClip // maybe outside
 		where.controlclip = (0, 0, 31K, 31K)
-		where.EdgeAlpha(R, .FocusBorderStyle, Strength, ~.FindAttachedEdge)
+		|| g = .FocusBorderStyle
+		|| g2 = .GNormal
+		if g2.StyleDrawer
+			g = g2
+		using g								// restores old values
+			g.edge.alpha = Strength
+			g.bg.a = 0
+			|| Edge = ~.FindAttachedEdge
+			(edge isnt open)
+			where.DrawEdge(R, g, Edge)
 		where.controlclip = oldclip
 
 	
@@ -525,7 +526,7 @@ class GUIControl (list)
 	libinternal FaintingEdge (|float|)
 		opt norefcounts
 		if self is drawsfocus
-			return 1.0
+			return 0.75
 		if .HasFocus
 			return .FaintingEdgeSub
 	
@@ -544,7 +545,8 @@ class GUIControl (list)
 			if w._FlashSelf&2
 				f2 *= 0.2
 			return f2
-		w._alphafader = 0
+			
+		w._AlphaFader = 0
 		w._FlashSelf = 0
 	
 			

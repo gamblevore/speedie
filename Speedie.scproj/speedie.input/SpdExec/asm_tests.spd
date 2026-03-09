@@ -18,8 +18,7 @@ target cake {
 
 function SoundMain2 (|float| input,  |float|) {
 	visible
-	|| thresh = .KNOB1 / 2000.0
-	thresh    = .KNOB1 / 20.0
+	|| thresh = .KNOB1 / 20.0
 	|| output = (input.abs min thresh).CopySign(input)
 	return output * 20
 }
@@ -28,7 +27,7 @@ function SoundMain2 (|float| input,  |float|) {
 function ConstBranch2 (|int| y)
 	|| x = 1
 	if y
-		x = 2
+		x = 0
 		if y		
 			y |= x
 

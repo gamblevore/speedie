@@ -103,7 +103,7 @@
 ı BXOR:;
 	u1 = u2 ^ ((u3 << Shift_Shu) >> Shift_Shu);
 ı BNOT:;
-	u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu);
+	u1 = (~u2) & (u3 | BoolNot_Ki);
 ı BANK:;
 	u1 = u2 & U2_Li;
 ı BORK:;
@@ -337,7 +337,7 @@
 ı QORR:;
 	uv1 = uv2 | (uv3 | Shift_Shu);
 ı QNOT:;
-	uv1 = ~uv2 & ~(uv3 | Shift_Shu);
+	uv1 = (~uv2) & (uv3 | BoolNot_Ki);
 ı QCNV:;
 	VecConv(r, Op);
 ı PADD:;

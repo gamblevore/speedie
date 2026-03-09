@@ -24,14 +24,13 @@ datatype CompileMode (int)
 function PerryAppInfoKeys (GUIKeyEvent)
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.
 	if key is RIGHT or PERIOD or Num6
-		DebugStepOver(self, -1)
+		return DebugStepOver(self, -1)
 	if key is DOWN or S or Num8
-		DebugStepIn(self, -1)
+		return DebugStepIn(self, -1)
 	if key is UP or W or Num2
-		DebugStepOut(self, -1)
+		return DebugStepOut(self, -1)
 	if (key is space) or key.IsAccept
-		DebugStepRun(self, -1)
-	return true
+		return DebugStepRun(self, -1)
 		
 
 function DebugArgsKeyDown (GUIKeyEvent)
@@ -253,28 +252,26 @@ function ReturnVariables (GUIListEvent)
 	
 	
 function DebugStepOver (guiaction)
-	.SendMsg("stepover", state)
+	return .SendMsg("stepover", state)
 
 
 function DebugStepIn (guiaction)
 	if keys.Shift
-		.sendmsg("stepincutely", state)
-	  else
-		.sendmsg("stepin", state)
+		return .sendmsg("stepincutely", state)
+	return .sendmsg("stepin", state)
 
 
 function DebugStepOut (guiaction)
-	.sendmsg("stepout", state)
+	return .sendmsg("stepout", state)
 
 
 function DebugStepRun (guiaction)
 	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
-		.sendmsg("run fast", state)
-	  else
-		.sendmsg("run", state)
+		return .sendmsg("run fast", state)
+	return .sendmsg("run", state)
 	
 
-function GUIControl.SendMsg (|string| s, |int| state)
+function GUIControl.SendMsg (|string| s, |int| state, |bool|)
 	opt norefcounts
 	|| i = .ide
 	|| r = i.RunCompiledApp
@@ -287,8 +284,8 @@ function GUIControl.SendMsg (|string| s, |int| state)
 		if !state
 			Notifications <~ "Program already finished"
 		  else
-			beep
-//			i.editme.setfocus // shitty mistypes
+			beep				//	i.editme.setfocus // shitty mistypes
+	return true
 	
 
 function Perryide.ASMVis (|bool|)

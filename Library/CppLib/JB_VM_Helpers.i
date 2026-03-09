@@ -16,7 +16,7 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
-AlwaysInline bool CanTrap(CakeVM* V, ASM Op, ASM* Code) {
+AlwaysInline bool CanTrap (CakeVM* V, ASM Op, ASM* Code) {
 	if (!CanDebug(V))
 		return false;
 	uint At = Trap_Atu;

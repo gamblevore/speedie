@@ -13,13 +13,13 @@ class ColorScheme
 	|vec4[4]|				BGCorners
 	|int|					HistoryIndex
 	|int|					Altered
-
+//Border
 	|drawstyle| 			Scroll
 	|drawstyle| 			TextSelection
-	|drawstyle|				TextCopy
+//	|drawstyle|				TextCopy
 	|drawstyle|				TextSelectionUnfocus
 	|drawstyle|				ModifiedBorder
-	|drawstyle|				Border
+	|drawstyle|				FocusBorder
 	|drawstyle|				DragAndDrop
 	|drawstyle|				WhiteStyle
 	|drawstyle|				SystemStyle
@@ -46,22 +46,23 @@ class ColorScheme
 		.scroll.bg				<~ ((0.5, 0.0, 0.7, 0.4)) 
 		.scroll.edge			<~ ((0.75, 0.25, 0.9, 0.5))
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
-		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
-		.TextCopy.edge			<~ ((0.6, 0.6, 0.1, 0.2))
+//		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
+//		.TextCopy.edge			<~ ((0.6, 0.6, 0.1, 0.2))
 		.TextSelection.edge		<~ ((1.0, 0.25, 0.75, 0.5))
 		.TextSelectionUnfocus.bg <~ ((1.0, 0.35, 0.65, 0.2))
 		.TextSelectionUnfocus.edge <~ ((1.0, 0.35, 0.65, 0.2))
 		.modifiedborder.edge	<~ ((1.0, 1.0, 0.5, 1.0))
 		.modifiedborder.Bg		<~ ((0.0, 0.0, 0.0, 0.0))
-		.border.edge			<~ vec4(1)
-		.border.Bg				= nil
+		.focusborder.edge		<~ vec4(1)
+		.Focusborder.Bg			= nil
 		.DragAndDrop.edge		<~ ((1.0, 0.0, 0.0, 1.0))
 		.DragAndDrop.bg			<~ ((1.0, 0.0, 0.0, 1.0))
 		.whitestyle.bg			<~ vec4(1)
 		.whitestyle.edge		<~ vec4(1)
 		.systemstyle.bg		<~ ((0.0, 0.1, 0.0, 0.96))
-		.systemstyle.edge	<~ ((0.0, 0.1, 0.0, 0.5))
-		.systemstyle.Drawer = image.CurlieQueDrawer		
+		.systemstyle.edge	<~ vec4(1)
+		
+		.systemstyle.StyleDrawer = image.CurlieQueDrawer		
 		.BGCorners[0]		= (0.7, 1.0, 0.2, 1.0)
 		.BGCorners[1]		= .BGCorners[0] 
 		.BGCorners[2]		= (0.6, 1.0, 0.1, 1.0)

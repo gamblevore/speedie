@@ -38,7 +38,7 @@ class Image (memory)
 		return .Temp init image(.size)
 
 
-	function ImageOfSameSize (|string| name="", |image|)
+	inline ImageOfSameSize (|string| name="", |image|)
 		return image(.size, name)
 	
 	function CopyImage (|string| name="", |Image|)
@@ -94,7 +94,7 @@ class Image (memory)
 		return .size.y
 	
 	
-	function AreaInfo (assigns:|ivec2| wh)
+	inline AreaInfo (assigns:|ivec2| wh)
 		.area = wh
 		.ResetBoundsToSize
 
@@ -235,6 +235,7 @@ class Image (memory)
 		
 	syntax access (|int| x, |int| y, |&imagePixel|)
 		cpp_part AtXYInt
+		inline
 		return self[(x,y)]
 	
 	
@@ -246,6 +247,7 @@ class Image (memory)
 
 	syntax call (|ivec2| P, |vec4|)
 		cpp_part ColXY
+		inline
 		return .SyntaxAccess(p)[].Color
 	
 		
@@ -255,7 +257,7 @@ class Image (memory)
 //			f.RawWritePng(.size.x, .size.y, .ptr|&byte|)
 	
 		
-	function ClearMarks (|ivec4| R)
+	inline ClearMarks (|ivec4| R)
 		.mark(r, 0)
 	
 	
@@ -402,22 +404,23 @@ class Image (memory)
 		return .Pixels
 	
 	
-	function CurrSize (|ivec2|)
+	inline CurrSize (|ivec2|)
 		return ._controlclip.size
 	
 				
-	function EdgeAlpha (|ivec4| R, |DrawStyle| G, |float| alpha, |MoveCode| AllowEdge=movecode.all)
-		using g
-			g.edge.alpha = alpha
-			g.bg.a = 0
-			.DrawRectOutlined(r, G, AllowEdge)
-
-
-	function DrawRectStyled (|ivec4| R, |DrawStyle?| G=nil, |uint| Side=3)
-		|| D = g.Drawer?
-			(D)(self, r, G!, side == 2)
+	function DrawEdge (|ivec4| R, |DrawStyle| G, |MoveCode| AllowEdge)
+		opt norefcounts
+		|| d = g.StyleDrawer
+			(d)(self, r, G, AllowEdge)
 		  else
-			.DrawRectOutlined(r, g)
+			.DrawOutlineOnly(R, g.SafeEdge, g.SafeBG, AllowEdge)
+
+
+	function DrawRectStyled (|ivec4| R, |DrawStyle?| G=nil, |MoveCode| Edges=movecode.allcodes)
+		|| D = g.StyleDrawer?
+			(D)(self, r, G!, edges)
+		  else
+			.DrawRectOutlined(r, g, edges)
 
 		
 	function Rotate (|image| Dest, |bool| Right=true)
@@ -468,7 +471,7 @@ class Image (memory)
 		.DrawRect(Rect, color.px)
 	
 
-	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
+	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.allCodes)
 		require Edge.a
 		// not sure why this is so complicated.
 		// did I do something wrong? is all my code off by 1 or something?
