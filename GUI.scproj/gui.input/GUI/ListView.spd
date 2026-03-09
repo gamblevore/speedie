@@ -1249,6 +1249,7 @@ class ListView (GUIControl) {
 		z2.y2 += .scrollshift
 		z2.y  = z2.y2 - .rowheight
 		
+		if (self ~= "Variables") and keys.Shift
 		if !.DontDrawSeparators and .gnormal.seps.a
 			for r.visible in self
 				|| n = .ColumnsToDraw
@@ -1385,7 +1386,6 @@ class ListView (GUIControl) {
 		|| End = .End
 		._CanSeeAllLines = false
 		
-		
 		for r.visible in self
 			rect.y = rect.y2 - .RowHeight
 			|| D = (r.depth(self), 0)(.IsTree)
@@ -1394,7 +1394,7 @@ class ListView (GUIControl) {
 			if (r == end) and .start == .scrollstart
 				._CanSeeAllLines = (rect.y >= .lastrect.y)
 
-		where.controlclip = clip
+		where.ControlClip = clip
 		where.horz = .lastrect.h // redundant?
 		|| cmm = .cmm
 			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.focusborder)

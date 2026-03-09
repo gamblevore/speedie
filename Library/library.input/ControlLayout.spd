@@ -90,6 +90,11 @@ datatype ControlLine (ivec2)
 		cpp_part ByRange
 		inline
 		return self by (b<<4)|controlline|
+	operator back (|int| N, |controlline|)
+		inline
+		.y = .y|controlpoint| - n
+		return self
+		
 
 
 

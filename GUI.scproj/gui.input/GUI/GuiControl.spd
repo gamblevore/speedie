@@ -503,9 +503,7 @@ class GUIControl (list)
 		using g								// restores old values
 			g.edge.alpha = Strength
 			g.bg.a = 0
-			|| Edge = ~.FindAttachedEdge
-			(edge isnt open)
-			where.DrawEdge(R, g, Edge)
+			where.DrawEdge(R, g, ~.FindAttachedEdge)
 		where.controlclip = oldclip
 
 	

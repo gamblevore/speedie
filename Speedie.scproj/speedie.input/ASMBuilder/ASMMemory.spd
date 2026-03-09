@@ -59,11 +59,14 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	|| pinc = .MemOpt(base, index, byte_shift)
 	if (!pinc) and (dest isnt set) and (Byte_Shift == 3) and (!varadd.reg)
 		|| bs = base.fat
-		if bs isa asm.gtab
-			if bs.prms[1]									// This is lib, and is always in range.
+		if (bs isa asm.gtab) and  .iswithin(bs)
+			if bs.prms[1]		// This is lib, and is always in range.
 				|| GlobID = bs.prms[2]
-				.asknop(bs)
-				return exp.GOBJ(dest, 1, 0, GlobID)
+				|| gobj = exp.GOBJ(dest, 1, 0, GlobID)
+				if bs is temp
+					.AskNop(bs, gobj)
+				return gobj
+				
 
 			|| K = bs.Const + ((index-1) << 3)
 			if K <= 20~bits

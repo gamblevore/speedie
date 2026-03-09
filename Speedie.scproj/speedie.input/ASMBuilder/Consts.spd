@@ -35,6 +35,7 @@ extend Assembler
 			
 	
 	function LoadNumber (|message| exp, |int64| V, |bool| Special, |asmreg| Dest=nil, |asmreg|)
+		if "ConstBranch2".trap
 		if !Dest.reg
 			|| Found = .MegaNumFinder(v, special, dest.µtype)
 				return Found
@@ -45,12 +46,12 @@ extend Assembler
 				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		
-		if "ConstBranch2".trap
 		|| fat = exp.KNST(dest)
 		return fat.ConstFill(dest, v)
 
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
+		reg.fatindex = 0 // nice
 		if reg is ContainsAddr
 /			(reg isnt containsaddr) // hmmm never should happen.
 		if K

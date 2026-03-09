@@ -25,9 +25,10 @@ function SoundMain2 (|float| input,  |float|) {
 
 
 function ConstBranch2 (|int| y)
+	visible
 	|| x = 1
 	if y
-		x = 0
+		x = 1
 		if y		
 			y |= x
 

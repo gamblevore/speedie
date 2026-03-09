@@ -408,12 +408,13 @@ class Image (memory)
 		return ._controlclip.size
 	
 				
-	function DrawEdge (|ivec4| R, |DrawStyle| G, |MoveCode| AllowEdge)
+	function DrawEdge (|ivec4| R, |DrawStyle| G, |MoveCode| Edges)
 		opt norefcounts
+		(Edges isnt open)
 		|| d = g.StyleDrawer
-			(d)(self, r, G, AllowEdge)
+			(d)(self, r, G, Edges)
 		  else
-			.DrawOutlineOnly(R, g.SafeEdge, g.SafeBG, AllowEdge)
+			.DrawOutlineOnly(R, g.SafeEdge, g.SafeBG, Edges)
 
 
 	function DrawRectStyled (|ivec4| R, |DrawStyle?| G=nil, |MoveCode| Edges=movecode.allcodes)

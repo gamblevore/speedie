@@ -69,19 +69,19 @@ extend ListView
 			|| wmax = (1<<14)|f64| / 100.0
 			for m.fast in x
 				m.flags = m["min"].int
-				m.tag = (m["pc"].float * wmax)|int|
+				m.rangelength = (m["pc"].float * wmax)|int|
 				m.Indent = nil
 				x.Position++
-			x.tag = (1<<14) / (x.Position)
+			x.rangelength = (1<<14) / (x.Position)
 		._Columns = x
 	
 	
 	libinternal ColumnWidth (|Message| m, |int| w, |int|)
 		opt norefcounts
 		|int| w2 = m.flags
-		|int| pc = m.tag
+		|int| pc = m.rangelength
 		if !w2 and !pc
-			pc = m.parent!.tag
+			pc = m.parent!.rangelength
 		pc = (w * pc)>>14
 		return w2 max pc
 	

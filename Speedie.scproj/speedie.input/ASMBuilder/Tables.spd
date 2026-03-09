@@ -527,7 +527,6 @@ function Num (fn_asm)
 	|| d = exp.ASMDecl
 	|| T = d.typeonly
 	dest.µtype = T
-	(dest is Const)
 	return .NumToReg(exp, dest, d.ExportPosition, T)
 
 

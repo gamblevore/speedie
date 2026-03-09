@@ -320,7 +320,9 @@ extend PerryIDE
 			.tooltip		= "Debugger Area"
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "DebuggerArea"
+			
 			.size 			= the~width by the~bottom to 15~down
+			.size
 			.gnormal		= self.errorlist.gnormal
 			.AddLow(self.Stack)
 			.addhigh(self.AppInfo)
@@ -335,7 +337,7 @@ extend PerryIDE
 			.Alignment		= MoveCode.Center
 			.tooltip		= self.debugger.Tooltip
 			.ID				= "Application Info"
-			.size 			= the~width  by  1~down back 40
+			.size 			= (the~width back 1)  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.GNormal.edge = (0.5, 0.5, 0.1, 0.25).px
 			.GNormal.StyleDrawer = image.CurlieQueDrawer
@@ -369,7 +371,7 @@ extend PerryIDE
 			.size 			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.inside = LeftBG
-			.GNormal.Edge	= (LeftBG*1.1).px
+			.GNormal.seps	= colors.white.px//(LeftBG*1.1).px
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
 
