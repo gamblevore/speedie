@@ -28,15 +28,18 @@ function perryide.WantCake (|CompileMode| Mode, |compilemode|)
 function ClickedDebug (GUIAction)
 	opt norefcounts
 	|| i = .ide
-	
-	if (.text == "\07") // stop
+	if (.text == "\07")				// stop
 		i.Stop(i.RunCompiledApp)
 		return nil
+	return i.start
 	
-	if i.MakeNothingRunning(" before debugging?")
-		|| CakeMode = i.WantCake(CompileMode.CakeMode|||compilemode.debug)
-			i.compile(CakeMode)
-			i.Showoutput
+
+function perryide.Start (|bool|)
+	if .MakeNothingRunning(" before debugging?")
+		|| CakeMode = .WantCake(CompileMode.CakeMode|||compilemode.debug)
+			.compile(CakeMode)
+			.Showoutput
+	return true
 
 
 function Perryide.ShowOutput

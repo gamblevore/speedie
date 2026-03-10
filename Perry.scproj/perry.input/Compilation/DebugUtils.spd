@@ -87,16 +87,54 @@ function listview.Fixup (|message| NewList)
 
 function ImproveVar (|message| s)
 	opt norefcounts
+	s <~ (@thg, s.name) // save item
+	
 	|| fs = VarPrinter
+	// try align to the right. assume... x chars long
+	|| ColWidth = 12
+	|| Spaces = ColWidth - (s.name.LengthUTF8 + 2)
 	fs <~ s.name
-	fs <~ " |"
+	fs <~ ' '
+	fs <~ (' ', spaces)
+	fs <~ "|"
 	fs <~ s[2].name
 	fs <~ "|"
 	s.name = fs
 //		A "/usr/local/speedie/Examples/hello_world.spd" 199 "int" "1"
-//		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "(FastString)" "\"\""
-	
-	
+//		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "FastString" "\"\""
+
+
+function message.PerryAppendMsg (|int| Item, |string| s)
+	opt norefcounts
+	|| v = VarPrinter!
+	v <~ s
+	|| ch = self[item]
+		v <~ ch.name
+
+
+function listviewrow.PerryCopyVar (|string|)
+	opt norefcounts
+	.PerryAppendMsg(2, "|")
+	.PerryAppendMsg(4, "| ")
+	.PerryAppendMsg(3, " = ")
+	return VarPrinter
+}
+
+
+function PerryVariableFinder (listview.columnfinder)
+	opt norefcounts
+	|| upon = self
+	if Column
+		if column == -2
+			return .PerryCopyVar()
+		upon = self[3]
+	if value == nil
+		return upon.name
+	if upon
+		upon.name = value		
+
+
+extend perryide {	
 function ShowDebugVars (|message| v)
 	opt norefcounts
 	.Variables.Fixup(v)

@@ -21,14 +21,20 @@ datatype CompileMode (int)
 	
 
 
-function PerryAppInfoKeys (GUIKeyEvent)
+function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
+	opt norefcounts
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.
-	if key is RIGHT or PERIOD or Num6
+	|| i = .ide
+	if key is PERIOD
+		return i.MakeNothingRunning
+	if key is RIGHT or Num6
 		return DebugStepOver(self, -1)
 	if key is DOWN or S or Num8
 		return DebugStepIn(self, -1)
 	if key is UP or W or Num2
 		return DebugStepOut(self, -1)
+	if  key.IsAccept and !i.RunCompiledApp
+		return i.start
 	if (key is space) or key.IsAccept
 		return DebugStepRun(self, -1)
 		
@@ -180,18 +186,7 @@ function PerryIDE.ClearRun
 	.stack.clear
 	.Variables.clear
 	
-	
-function PerryVariableFinder (listview.columnfinder)
-	opt norefcounts
-	if value == nil
-		if Column == 0
-			return .name
-		if column == 1
-			return self[3].name
-	  else
-		// can't set yet
-
-	
+		
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 

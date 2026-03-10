@@ -32,8 +32,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		pico.destroy(.pico, "destructor")
 			
 	function CommsOpen (|bool|)
-		if self
-			return .pico.MessageStatus == 0
+		return (.pico.MessageStatus == 0, false)(self)
 
 	libinternal Alive (|bool|)
 		disabled "use .CommsOpen"
@@ -89,7 +88,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				rz = str.parse
 	
 
-	function LastSend (|date|)
+	inline LastSend (|date|)
 		|| p = .pico
 		return p.config.lastsend
 	

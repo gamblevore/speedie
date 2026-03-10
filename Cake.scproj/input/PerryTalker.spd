@@ -33,16 +33,18 @@ function cakevm.PerryAnswer (|cakestack| stack, |spdprocess| perry)
 function __PerryView__ (cakevm.CakeChef)
 	|spdprocess--| p = cake.perry!	// perry always exists by now
 	if !p.IsOpen
-		app.Quit(0) // stop runaway processes
+		app.Quit(0)					// stop the runaway!
 	
 	if (ErrorCode)
 		p <~ "crashed " + ErrorCode
 	.ClearTempBreak(stack)
 	
 	.PerryAnswer(stack, p)
-	while {										// no resuming if theres an error.
-		|| Resume = false
+	while {							// Controlflow simplify! Just remove resume!
+		|| Resume = false			// perhaps just... only refcount the part that needs it: p.get+resumecode(m)
 		while !Resume
+			if !p.IsOpen
+				app.Quit(0)
 			|| m = p.Get(5.0)
 				Resume = .ResumeCode(m)
 				if !Resume
@@ -149,10 +151,7 @@ function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j)
 			j.add(@tmp, err)
 			exit
 		
-		|| fs = (debugger.VariablePrinter, nil)(!Count)
-		Count++
-
-		.CollectStack(stack, j, fs)
+		.CollectStack(stack, j, Count++)
 		Stack = .prev(stack)
 	
 
@@ -180,23 +179,27 @@ function jbin.SyntaxExpect (|string| s, |int64| Code)
 	.exit
 
 
-function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
+function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 	opt norefcounts
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
-	
+
+	|| vars = debugger.VariablePrinter$
 	{
 	|| Where = debugger.SrcMap(index)
 	|| Path = Where.File						#expect (j, "MissingFile", where.filenum)
-
-	j.Enter(@tmp, fn.Name)
+	
+	vars.Length = 0
+	vars <~ fn.name
+	vars <~ "()"
+	j.Enter(@tmp, vars|&nil||string|)
 	j.AddStr(path)
 	j.AddInt(where.bytepos)
 	}
 	
-	|| Locals = fn.obj|[xvar]|
+	|| Locals = fn.obj|&nil||[xvar]|
 	
-	if Vars
+	if !Count
 		vars.Length = 0
 		j.Enter
 		index -= fn.Position
@@ -209,11 +212,11 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |faststring| Vars)
 				j.AddInt(src.bytepos)
 				
 				v.RenderType(vars)
-				j.AddStr(vars|string|)
+				j.AddStr(vars|&nil||string|)
 				vars.Length = 0
 
 				v.RenderValue(vars, Stack.reg0)
-				j.AddStr(vars|string|)
+				j.AddStr(vars|&nil||string|)
 				vars.Length = 0
 
 				j.exit

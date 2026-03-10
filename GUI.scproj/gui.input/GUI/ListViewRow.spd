@@ -37,8 +37,7 @@ role ListViewRow (message)
 			.tag = t2
 
 
-	libinternal Vis (|int| i, |bool|)
-		// move this over to the columns array
+	libinternal NotDeclutteredCell (|int| i, |bool|)
 		if !self
 			return true
 		return !((.Indent)&(1<<i))
@@ -108,7 +107,7 @@ role ListViewRow (message)
 	libinternal DrawDividerH (|ivec4| z2, |image| Where, |int| i)
 		opt NoRefCounts
 		require (self isnt disabled) and (.prev isnt disabled)
-		|| Vis	= .vis(i)
+		|| Vis	= .NotDeclutteredCell(i)
 			Where.MarkLineH(z2.x1y2, z2.width, 1)
 
 
@@ -124,11 +123,11 @@ role ListViewRow (message)
 		|| z2	= rect
 		
 		|| str = p.Declutterer.Strength
-		where.controlclip = rect.clip(p.lastrect)
 		
 		for i in n
 			rect.horz	= p.ColumnBounds(i, z2, self)
 			rect.x	   += depth * font.width * 2
+			where.controlclip = rect.clip(p.lastrect)
 			.DrawRowColumn(rect, where,  p, depth, i, str) 
 		
 		if self is active
@@ -146,8 +145,8 @@ role ListViewRow (message)
 			|| edge = ¥.textselection.edge
 			edge.Alpha *= str
 			where.DrawRect(z2, edge)
-
-
+	
+	
 	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|) // __TableCell__(column)
 		opt norefcounts
 
@@ -162,7 +161,7 @@ role ListViewRow (message)
 	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
 		opt NoRefCounts
 
-		require .vis(column)
+		require .NotDeclutteredCell(column)
 
 		|| na = .CellOrRow(parent, column)
 		if !na and (self is Separator)

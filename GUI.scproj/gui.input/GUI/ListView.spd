@@ -30,7 +30,6 @@ class ListView (GUIControl) {
 	|ListViewCell?|					MouseDownCell
 	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
-//	|listviewrow?| 					Headers
 	|menu?|							CMM
 	|DrawStyle|						gRowSel 
 	|listviewrow?|					Columns
@@ -401,25 +400,24 @@ class ListView (GUIControl) {
 		if .IsTree and (key is left or right)
 			return .openorclose(key)
 
-	
-	inline ListViewRow.CopyID (|string|)
-		return .TableCell(-2)
-	
-	
+		
 	function DefaultCopy (GUICopyEvent)
 		|| fs = faststring()
 		for s.listsel in self
-			|| it = s.copyid
-			it ?= .TableCell(s)
+			|| it = .copyid(s)
 			if fs.length
 				fs <~ '\n'
 			fs <~ it
 		return fs
 
 
-	libinternal TableCell (|listviewCell| C, assigns:|string?| Value=nil, |string|)
+	libinternal TableCell (|listviewCell| Cell, assigns:|string?| Value=nil, |string|)
 		opt norefcounts
-		return .TableCell(C.row, C.column, value)
+		return cell.row.cell(Cell.column, .columnfinder, value)
+
+
+	inline CopyID (|ListViewRow| row, |string|)
+		return .tablecell(row, -2)
 
 
 	function TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
@@ -433,7 +431,7 @@ class ListView (GUIControl) {
 		.EditDelayed = nil
 		.clearinternaldrops
 		for s.listsel in self
-			|| it = s.copyid
+			|| it = .copyid(s)
 				rz <~ it
 
 	
@@ -1270,7 +1268,6 @@ class ListView (GUIControl) {
 		if .gnormal.seps.a
 			|| c = .Columns
 			if c and c isnt hidden
-/*			if .ListSource.HasAny*/
 				Where.MarkLineH(z2.x1y2, z2.width, 1)
 				z2 = .DrawBordersSub2(where, rect, z2, c, 1)
 			.DrawBordersSub2(where, rect, z2, ._scrollstart, .visiblerows)
@@ -1286,9 +1283,9 @@ class ListView (GUIControl) {
 
 	libinternal DrawBorders (|image| Where,  |ivec4| Rect)
 		where.clearmarks(.lastrect)
-		require !.decluttered
+		if !.decluttered
+			.DrawBordersSub(where, rect)
 
-		.DrawBordersSub(where, rect)
 		|| bg		= .gnormal.bg
 		|| focus	= .gRowSel.bg
 		|| focuscol	= focus.color
@@ -1394,7 +1391,6 @@ class ListView (GUIControl) {
 		.ScrollProtect
 		.fixscroll // why do we need both?
 		
-		if keys.shift and self~="FoundList"
 		|| clip = where.ControlClip
 		|| rect = .ActualRect
 		
@@ -1403,17 +1399,18 @@ class ListView (GUIControl) {
 		.drawheaders(where, rect)
 		
 		rect.y2 += .ScrollSlide
-		|| End = .End
-		._CanSeeAllLines = false
-		
-		{|| NCols = .Columncount
-		for r.visible in self
-			rect.y = rect.y2 - .RowHeight
-			|| D = (r.depth(self), 0)(.IsTree)
-			r.ListRowDraw(Where, rect, self, D, NCols)
-			rect.y2 = rect.y
-			if (r == end) and .start == .scrollstart
-				._CanSeeAllLines = (rect.y >= .lastrect.y)
+		{
+			|| End = .End
+			._CanSeeAllLines = false
+			|| NCols = .Columncount
+
+			for r.visible in self
+				rect.y = rect.y2 - .RowHeight
+				|| D = (r.depth(self), 0)(.IsTree)
+				r.ListRowDraw(Where, rect, self, D, NCols)
+				rect.y2 = rect.y
+				if (r == end) and .start == .scrollstart
+					._CanSeeAllLines = (rect.y >= .lastrect.y)
 		}
 		
 		where.ControlClip = clip

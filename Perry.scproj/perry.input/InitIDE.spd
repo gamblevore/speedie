@@ -360,9 +360,10 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
-			.Columns = "Name {min 60, pc 20}, Value {min 160, pc 80}"
+			.Columns = "Name {min 60, pc 40}, Value {min 160, pc 80}"
 			.ColumnFinder = PerryVariableFinder
 			.IsMainListView = true
+			.MultiSelection = true
 			.UseColorScheme	= true
 			.AlwaysSendChangeEvent = true
 			.RowHeight		= .rowheight + 3
@@ -381,7 +382,7 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.RowHeight		= .rowheight + 3
-			.KeepOneSelected = true
+			.MultiSelection = true
 			.AlwaysSendChangeEvent = true
 			.tooltip		= "The function call stack"
 			.UseColorScheme	= true
