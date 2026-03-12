@@ -30,7 +30,7 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		|| oof = other.date
 		return (self > oof) - (self < oof)  // -1, 0, or +1
 	
-	function WholeSeconds (|int64|) // needs 48 bits!
+	inline WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16
 	
 //	function Rate (|Float64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
@@ -57,12 +57,15 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 			return now() - self
 	
 	render LocalTime
+		opt norefcounts
 		fs.AppendLocalTime(self)
 	
 	render RenderDurr
+		opt norefcounts
 		fs.AppendDurr(self)
 
 	render RenderInt
+		opt norefcounts
 		fs.appendintegerastext(self)
 	
 	render  // hmmm... i guess this is just for data-formats.
@@ -74,18 +77,18 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 			return self < date.now
 	
 	function Days (|int64|)
-		return (.wholeSeconds / date.kSecondsPerDay)
+		return .wholeSeconds / date.kSecondsPerDay
 	
-	function Minutes (|int64|) // needs 48 bits!
+	inline Minutes (|int64|) // needs 48 bits!
 		return .wholeSeconds / 60
 
-	function DayOfWeekApprox (|int|)
+	inline DayOfWeekApprox (|int|)
 		return .Days mod 7
 	
-	function MonthsApprox (|int64|)
-		return (.wholeSeconds / date.kSecondsPerMonthApprox)
+	inline MonthsApprox (|int64|)
+		return .WholeSeconds / date.kSecondsPerMonthApprox
 	
-	function WeekOfYear (|int|)
+	inline WeekOfYear (|int|)
 		return .Weeks mod 52
 	
 	function TimeID (|uint64|)
@@ -94,7 +97,7 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 	function Weeks (|int64|)
 		return (.wholeSeconds / kSecondsPerWeek)
 
-	function int64.ToSeconds (|date|)
+	inline int64.ToSeconds (|date|)
 		return self << 16
 
 
@@ -121,10 +124,10 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 			yield ((CurrTime - StartDate).float) (CurrTime-StartDate) // why a float at all?
 
 	module
-		function TimeID (|uint64|)
+		inline TimeID (|uint64|)
 			return .now.timeID
 			
-		function Ticks (|int64|)
+		inline Ticks (|int64|)
 			description "64 ticks per second, not 60." 
 			return (.now>>10) //64KB-->64
 
@@ -147,7 +150,7 @@ datatype Duration (date)
 	function Float (|float|)
 		return .float64|float| // better. Or else we lose too much precision
 
-	function WholeSeconds (|int64|) // needs 48 bits!
+	inline WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16
 	
 	syntax cast (|float|)
