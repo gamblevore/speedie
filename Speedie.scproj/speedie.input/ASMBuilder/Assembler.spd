@@ -329,10 +329,7 @@ struct Assembler
 						.NopConst(R)
 						return k|uint64|.trim(bits)
 				  else
-					ConstFails++
-					printline "aaaaaa: " + ConstFails
-					assembler.PrintProgress
-					//debugger 
+					debugger 
 	
 	
 	function NopConst (|asmreg| R, |int64| K, |bool|)

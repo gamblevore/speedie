@@ -140,8 +140,9 @@ class FastString {
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 
-		function New (|file!| F, |FastString|)
+		inline New (|file!| F, |FastString|)
 			cpp_part NewFile
+			opt norefcounts
 			|| fs = FastString()
 			fs.file = F
 			return fs
