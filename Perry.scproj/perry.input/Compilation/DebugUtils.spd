@@ -52,6 +52,8 @@ function AppInfoExtra (|unixprocess| r, |string|)
 		if .DebugMode isnt ReceivedHello
 			return "Waiting..."
 		return ""
+	if st.IsRunning
+		"Running"
 	return st.Name
 
 

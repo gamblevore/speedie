@@ -31,9 +31,9 @@ function cakevm.PerryAnswer (|cakestack| stack, |spdprocess| perry)
 	
 
 function __PerryView__ (cakevm.CakeChef)
-	|spdprocess--| p = cake.perry!	// perry always exists by now
+	|spdprocess--| p = cake.perry!	// Perry always exists by now
 	if !p.IsOpen
-		app.Quit(0)					// stop the runaway!
+		app.Quit(0)					// Stop the runaway!
 	
 	if (ErrorCode)
 		p <~ "crashed " + ErrorCode
@@ -41,7 +41,7 @@ function __PerryView__ (cakevm.CakeChef)
 	
 	.PerryAnswer(stack, p)
 	while {							// Controlflow simplify! Just remove resume!
-		|| Resume = false			// perhaps just... only refcount the part that needs it: p.get+resumecode(m)
+		|| Resume = false			// Perhaps just... only refcount the part that needs it: p.get+resumecode(m)
 		while !Resume
 			if !p.IsOpen
 				app.Quit(0)
@@ -73,7 +73,7 @@ dispatch DebuggerActions (PerryResponse)
 		
 	pause:		return false // caller already updates...
 		
-//	stepback:0 // todo
+//	stepback:	0 // todo
 
 
 function cakevm.ClearTempBreak (|cakestack| stack)
@@ -96,6 +96,7 @@ function cakevm.TempBreak (|?&uint| Break, |bool|)
 function cakevm.StepIn (|&Uint|)
 	// we need to mark a place to break at. how? is it just the next instruction?
 	// we need to get the curr code location... find the next line, set a break there.
+
 
 function cakevm.StepOut (|&uint|)
 

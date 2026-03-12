@@ -373,7 +373,7 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.inside = LeftBG
 			.GNormal.seps	= self.AppInfo.GNormal.edge
-			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			.gRowSel.solid  = vec4(0.36, 0.18, 0.24, 0.875)
 //			.GNormal.StyleDrawer = image.CurlieQueDrawer
 
 
@@ -389,8 +389,8 @@ extend PerryIDE
 			.ID				= "Stack"
 			.size 			= the~area
 			.gnormal		= self.FileList.GNormal.copy
-			.GNormal.Solid = vec4(0.13, 0.135, 0.120, 0.975)
-			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			.GNormal.Solid  = vec4(0.13, 0.135, 0.120, 0.975)
+			.gRowSel.solid  = vec4(0.11, 0.335, 0.12, 0.675)
 			.GNormal.Seps = 0
 			
 			

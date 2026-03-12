@@ -738,7 +738,8 @@ inline vecmix (|float|a, |vec2|b, |float|c, |vec4|)
 	return (a, b.x, b.y, c)
 inline vecmix (|vec3|a, |float|b, |vec4|)
 	cpp_part mix31
-	return (a.x, a.y, a.z, b)
+	a.w = b
+	return a|vec4|
 inline vecmix (|float|a, |vec3|b, |vec4|)
 	cpp_part mix13
 	return (a, b.x, b.y, b.z)
@@ -762,7 +763,8 @@ inline ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
 	return (a, b.x, b.y, c)
 inline ivecmix (|ivec3|a, |int|b, |ivec4|)
 	cpp_part imix31
-	return (a.x, a.y, a.z, b)
+	a.w = b
+	return a|ivec4|
 inline ivecmix (|int|a, |ivec3|b, |ivec4|)
 	cpp_part imix13
 	return (a, b.x, b.y, b.z)
