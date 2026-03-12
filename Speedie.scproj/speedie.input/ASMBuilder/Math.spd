@@ -822,7 +822,7 @@ extend Assembler
 			|| Intefere = .register(previnput.reg)
 			require Intefere <= bflg
 		
-		|| UpA = bflg.prms[2]						// check sign!
+		|| UpA = bflg.prms[2]							// check sign!
 		|| DownA = bflg.prms[3]
 		|| SignA = bflg.prms[4]
 		if signA != signB
@@ -831,23 +831,21 @@ extend Assembler
 			if downa
 				signb = signa
 		
-		|| Total = (UpA+UpB) - (DownA+DownB)		// check that it can even be done
+		|| Total = (UpA+UpB) - (DownA+DownB)			// check that it can even be done
 		|| Up = .CanMergeBits(upa, downa, upb, downb, total)
 			if  src is temp  or  dest iz src
 				src = PrevInput
-				.SoftNop(bflg)						// write over the old
+				.SoftNop(bflg)							// write over the old
 			  else
 				if PrevInput iz src
-//		BFLG: r3, r3, 0, 0, 0                          /* self.mu.DataType|asmreg| */
-//		BFLG: t4, r3, 0, 11, 0                         /* self|uint64| >> 11 */
-					return nil // self-replace will fail. We don't have the old version!
+					return nil							// self-replace will fail. Dont have the old version!
 			return exp.BFLG(dest, PrevInput, up, up-total, signb) * dest
 
 
 	function CanMergeBits (|int| UpA,  |int| DownA,  |int| UpB,  |int| DownB, |int| Total, |ind|)
 		if DownA > UpA
 			require (upb <= downb) // i think this test isn't needed but I can't figure out why.
-		|uint64| MaxB = -1									  // Assume 100% filled
+		|uint64| MaxB = -1								// Assume 100% filled
 		|| Target = (MaxB << UpA) >> DownA
 		Target    = (Target << UpB) >> DownB
 		
@@ -857,9 +855,7 @@ extend Assembler
 				|| C = MaxB << Up
 				|| D = C >> Down
 				if D == Target
-					return up
-	
-			
+					return up			
 		
 
 	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)

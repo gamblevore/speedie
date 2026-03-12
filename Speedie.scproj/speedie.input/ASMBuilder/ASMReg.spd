@@ -36,6 +36,7 @@ datatype ASMReg (uint64)
 		BlockNop
 		GlobalMemory
 		PreferEqul
+		VerySpecial
 		Const
 //		NotNil // probably quite a big addition. Will need tests...
 		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]

@@ -22,7 +22,7 @@ dispatch fn_asm_table (fn_asm)
 	@type:					ASMType.TypeCast
 	@tmp:					ASMType.unexpected
 
-	(ASMType.kif):			Assembler.IfOrWhile
+	(ASMType.kif):			Assembler.MainBrancher
 	(ASMType.kwhile):		Assembler.While
 	(ASMType.kTern):		Assembler.Ternary
 	(ASMType.kContinue):	Assembler.Continue
@@ -189,6 +189,16 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	return fat * Dest
 
 
+function ExpandBits2 (|&assembler| self, |message| exp, |asmreg| dest, |scdecl| ty,  |asmreg|)
+	if !dest.IsBitCorrect
+		|| Needed = ty.ASMRegType
+		|| BC = dest.BitCount
+		if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
+			|| Wipe = 64 - BC
+			return .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
+	return dest
+	
+	
 function Return (fn_asm)
 	opt norefcounts
 	|| L = .state.return
@@ -204,16 +214,8 @@ function Return (fn_asm)
 	
 	|| SafeDecr = FinalDecrements(self, exp, Dest)
 		return SafeDecr
-	
-	
-	// we need the same rules as typecast...
-	if !dest.IsBitCorrect
-		|| ty = .out.ASMReturn
-			|| Needed = ty.ASMRegType
-			|| BC = dest.BitCount
-			if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
-				|| Wipe = 64 - BC
-				dest = .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
+
+	dest = ExpandBits2(self, exp, dest, .out.ASMReturn)	
 			
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0
@@ -272,11 +274,8 @@ function TypeCast (fn_asm)
 			return exp.VMOV(dest, from) * dest
 		return exp.QCNV(dest, from, OldType.isfloat|int|) * dest
 		
-		// lets do it
-		
 	if oldtype.isfloat or newtype.isfloat
 		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest
-	
 
 	|| sh2 = 64 - NewType.BitCount
 	return .BFLG_Sub(exp, dest, from, sh2, sh2, dest.signed)

@@ -11,7 +11,7 @@ function ElseSub (|message?| other, |asmreg|)
 		return asmreg()
 	|| T = other.ASMType
 	if T == ASMType.kif
-		return .IfOrWhile(other, asmreg())
+		return .MainBrancher(other, asmreg())
 	if other != @arg
 		other = other.first!
 	  else
@@ -42,10 +42,11 @@ function IfSub (fn_asm)
 		.BranchToCurr(b)
 		return asmreg()
 	
-	|| AfterFirst = other.jump		// Basicblock ++
+	|| AfterFirst = other.jump								// Basicblock ++
 	.BranchToCurr(b)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.JumpTo(.curr)
+
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -62,7 +63,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		C++
 
 
-function IfOrWhile (fn_asm)
+function MainBrancher (fn_asm)
 	.ParentSanity
 	|| NothingDone = .curr
 	|| BreakReq = .BreakRequest
@@ -73,8 +74,10 @@ function IfOrWhile (fn_asm)
 	s.RealBranchDepth++
 	if dest == nil
 		rz = .WhileSub(exp)
-	  else
+	  elseif dest isnt VerySpecial
 		rz = .IfSub(exp, nil)
+	  else
+		rz = .TernarySub(Exp, dest)
 	s.BranchDepth--
 	s.RealBranchDepth--
 	
@@ -84,7 +87,7 @@ function IfOrWhile (fn_asm)
 	
 
 function While (fn_asm)
-	return .IfOrWhile(exp, nil)
+	return .MainBrancher(exp, nil)
 	
 
 function WhileSub (|message| exp,  |asmreg|)
@@ -147,11 +150,16 @@ function BackCond (|fatasm| start)
 
 function Ternary		(fn_asm)
 	opt norefcounts
-	
+	return .MainBrancher(exp, dest as asmreg.veryspecial)
+
+
+function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
 	// I'd rather actually re-write this to be like an if-condition! Like reuse the code
 	// then we can put back in, the opts... into the generalised "if" thing.
 	// this will do for now.
-	
+	opt norefcounts	
+	dest = dest &~ asmreg.veryspecial	
+
 	|| A = exp.second.second!
 	|| B = A.next!
 	
@@ -182,11 +190,9 @@ function Ternary		(fn_asm)
 
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
 	|| mA = .µInto(A, dest)
-	|| Exit = exp.jump // .JumpInput already calls .NextBasicBlock
+	|| Exit = exp.jump				// .JumpInput already calls .NextBasicBlock
 	.BranchToCurr(Branch)
-	|| mB = .µInto(B, dest)
-	.NextBasicBlock
-	
+	|| mB = .µInto(B, dest)	
 	rz = .TernRefCount(ma, mb)						
 	Exit.jumpto(.curr)
 
@@ -458,7 +464,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 // And one down per depth... it could make it simpler
 
 function NextBasicBlock
-	// Goes up one at a time... to allow for going DOWN one at a time.	
+	// Goes up one at a time... to allow for going DOWN one at a time.
 	|| B = .BasicBlock
 	|| P = .BasicParent
 
@@ -478,7 +484,8 @@ function NextBasicBlock
 		BlockParents[B&(16K-1)] = P
 
 		.ParentSanity
-		gain -= (gain>0).dir
+		if gain
+			gain -= (gain>0).dir
 	} (gain)
 		
 

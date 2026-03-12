@@ -382,6 +382,13 @@ struct FatASM
 			  else
 				fs <~ op.name
 			fs <~ ':'
+			target debug
+				|int| bb = .basicblock
+				fs <~ "("
+				fs <~ bb
+				fs <~ "/"
+				fs <~ assembler.sh.parentblock(bb)
+				fs <~ ")"
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""
 		|| Remain = 24

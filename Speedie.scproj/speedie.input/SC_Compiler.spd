@@ -546,9 +546,9 @@ function ImportAll
 	for m in .ModuleList
 		m.InitDecls
 	for F in SCImport.AllFiles
-		F.CollectGlobals Compiler.Program
+		F.CollectGlobals Compiler.Program	
 
-	scimport.noproj
+	SCImport.noproj
 	(Message).Restore
 
 	for m in .ModuleList
@@ -568,7 +568,7 @@ function ImportAll
 	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList
-		c.CheckIterator
+		c.CheckItersAndVirtuals
 
 	.Timer( "Transform" )
 	.Stage( "Transforming Functions" )

@@ -275,7 +275,7 @@ module PackMaker
 				|| BaseClass = .InterfaceForBehaviour(fn)
 					j.Cakeify(fn)
 					continue
-			.missingvirtual(m.name)
+			.MissingBehaviour(m.name)
 
 	
 	function jbin.Cakeify (|scfunction| fn)

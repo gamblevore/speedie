@@ -444,7 +444,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 
 	self <~ " = "
 	if !fn
-		self <~ "nil"
+		self <~ "nil" // for the destructor. the rest can't be nil.
 	  else
 		self <~ '('
 		if Type
@@ -456,16 +456,19 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 	self <~ ";\n"
 
 
-function SCClass.MissingVirtual (|string| s)
+function SCClass.MissingBehaviour (|string| s)
+	opt norefcounts
 	error (.source, "Missing behaviour: " + s)
 
 
 function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
-	|| b		= cls.behaviour									#require
-	|| TableCls = b.FuncTable!.cls
+	|scbehaviour--| B = cls.behaviour									#require
+	|scclass--| TableCls = b.FuncTable!.cls
 	|| N		= TableCls.CstructName
 	|| CN		= cls.CStructName
-
+	
+	if cls == "vobj"
+	
 	fs <~ N
 	fs <~ " InitTable"
 	fs <~ CN
@@ -475,20 +478,22 @@ function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 	
 	// behaviours are exported here!
 	fs.AppendBehaviour("", cls.destructorfunc, nil)
-	
+
+	|| FailedCount = 0
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|| fn = cls.BestBehaviourFor(s)
-				|| BaseClass = cls.InterfaceForBehaviour(fn)
-					ifn (M.IsRequiredInterface and !cls.Behaviour![s])
-						fs.AppendBehaviour(s, fn, Baseclass)
-						fn = nil
-			
-			if fn
-				cls.MissingVirtual(s)
+			|scfunction--| fn = cls.BestBehaviourFor(s)
+			|scclass--| BaseClass = (cls.InterfaceForBehaviour(fn), nil)(fn)
+				fs.AppendBehaviour(s, fn, Baseclass)
+			  else
+				if !FailedCount
+					cls.MissingBehaviour(s)
+				FailedCount++
 		b = b.upwards
 	
+
+	check (!FailedCount) (cls, "")
 	fs <~ "\treturn Result;\n}\n\n"
 	fs <~ "$N ${CN}_FuncTable_ = InitTable${CN}_();\n"
 	return true
