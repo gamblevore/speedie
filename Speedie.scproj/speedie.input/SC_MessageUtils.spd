@@ -152,10 +152,12 @@ function Message.MsgArg (|SCArg|)
 function Message.MsgFunc (|SCFunction|)
 	opt norefcounts
 	if self
-		|| fn = .func
-		if fn == @Dot or @Func
+		|| s = .func
+		if s == @Dot or @Func
 			|| sc = .second
-				return sc.asfunc
+				|| fnc = sc.obj
+				if (fnc isa SCFunction)
+					return fnc
 
 
 function Message.DclExp (|Message|)
@@ -190,7 +192,6 @@ function Message.VarName (|string|)
 			f = ch.func
 		if f == @thg
 			return ch.name
-			
 		error (ch)
 
 
@@ -461,10 +462,10 @@ function NewRejoin (|message|)
 	rz.ASMType = ASMType.kRejoin
 
 
-function NewDecl (|string| type, |string| name="", |message|)
-	opt norefcounts
-	|| msg = (@thg+name, nil)(name)
-	return newdecl(type, msg)
+//function NewDecl (|string| type, |string| name="", |message|)
+//	opt norefcounts
+//	|| msg = (@thg+name, nil)(name)
+//	return newdecl(type, msg)
 
 
 function NewDecl (|string| type, |message| RelOrName, |message|)
