@@ -135,6 +135,10 @@ class RayTracer
 		pxl.AppendRGB((C*0.2)|vec3|)
 	
 
+	libinternal imagepixel.AppendRGB (|&imagepixel| self, |vec3| V)
+		self|&imagepixelstruct|.AppendVec3(v)
+	
+
 	libinternal Prepare (|vec2| XY)
 		._XY = XY
 		._CamDir = .Dir(xy)

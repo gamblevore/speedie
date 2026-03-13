@@ -35,14 +35,7 @@ struct ImagePixelStruct
 
 
 datatype ImagePixel (uint)
-//	|byte| R
-//	|byte| G
-//	|byte| B
-//	|byte| A
-//  We should be able to define rgba like this... and have all these accessor functions auto-created.
-
 	linkage
-//		datatype true
 		cpp_part Pxl
 		opt min 3
 
@@ -132,10 +125,6 @@ datatype ImagePixel (uint)
 	function HasColor (|bool|)
 		inline
 		return (self << 8) != 0
-
-	function HasAny (|bool|)
-		inline
-		return (self != 0)
 		
 	operator in (|&imagepixel| self, |image| src, |bool|)
 		disabled "Use: image contains pixel"
@@ -163,9 +152,6 @@ datatype ImagePixel (uint)
 		inline
 		self|&imagepixelstruct|.AppendVec4(v)
 
-	function AppendRGB (|&imagepixel| self, |vec3| V)
-		self|&imagepixelstruct|.AppendVec3(v)
-	
 	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
 		cpp_part AppendInts
 		.R = r.clamp(255)
@@ -186,6 +172,9 @@ datatype ImagePixel (uint)
 		D.a = r.a
 		.raw = D
 
+	function Overlay (|&imagepixel| self, |vec4| T)
+		disabled "Call .Premul on this first for great speed boost!"
+
 	function Color (|vec4|)
 		return vec4(.r, .g, .b, .a) * (1.0/254.99)
 
@@ -203,29 +192,21 @@ datatype ImagePixel (uint)
 		.g = value.g
 		.b = value.b
 		.a = value.a
-			
-	
-	syntax append (|float| v)
-		disabled "Use a vector instead."
-	
-	syntax append (|&imagepixel| self, |float| r, |float| g, |float| b, |float| a=255)
-		cpp_part AppendFloats
-		disabled "Just make a vector instead."
 		
-	function Overlay (|&imagepixel| self, |vec4| T)
-		disabled "Call .Premul on this first for great speed boost!"
-
+	syntax append (|&imagepixel| self, |float| r, |float| g=0, |float| b=0, |float| a=0)
+		cpp_part AppendFloats
+		disabled "Just append a vector instead."
+		
 
 	module 
 		inline New (|imagepixel|)
+			description "A black pixel at full opacity" 
 			rz = 255
-		
-		|ImagePixel| Bad
 
 
 
 function vec3.syntaxcast (|imagepixel|)
-	disabled "use .px"
+	disabled "use .vec4.px"
 		
 function vec4.syntaxcast (|imagepixel|)
 	disabled "Use .px"
@@ -236,15 +217,4 @@ function ivec4.syntaxcast (|imagepixel|)
 
 inline vec4.Px (|imagepixel|)
 	(&rz)|&imagepixelstruct|.AppendVec4(self)
-
-inline vec3.Px (|imagepixel|)
-	.w = 0
-	return self|vec4|.px
-
-//function ivec4.Px (|imagepixel|)
-//	|| C = .r&255
-//	C |= (.b|uint|<<24)>>16
-//	C |= (.g|uint|<<24)>>8
-//	C |= (.a|uint|<<24)>>0
-//	return C
 

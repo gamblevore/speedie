@@ -321,7 +321,7 @@ function ViewAsVis (|bool| AsProject)
 	|| AnyViews = false
 	for v in .ViewButtons
 		|| t = v.tag as guicontrol
-			(t is visible) = (v.gnormal.bg.hasany)
+			(t is visible) = (v.gnormal.bg!=nil)
 			AnyViews ?= t is visible 
 	
 	if AsProject and !AnyViews
