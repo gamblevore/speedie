@@ -18,7 +18,7 @@ JB__Tk__DotInsertAllow
 GUI__ScrollInfo_JustClicked_
 GUI__Key_Debug
 GUI__SystemCursor_Curr
-JB__TerminalColor_Enabled
+JB__TerminalColor_RainbowTerm
 GUI__SDL_Cursor_Nothing
 JB__Flow_Active
 JB__Flow_AlwaysMove
@@ -33,9 +33,6 @@ JB__Tk__StopBars
 GUI__App_EventCount
 GUI__App_Scale
 GUI__ScrollInfo_InDrag_
-GUI__Pxl_Bad
-GUI__Pxl_Clear
-GUI__Pxl_White
 JB__Syx_CurrFuncID_
 GUI__Ray_AdjustmentFinder
 GUI__VObject_DrawScale
@@ -46,14 +43,14 @@ GUI__App_ChangeSelFlash
 GUI__App_CurrMouseXY
 GUI__App_DrawFinish
 GUI__App_FastToolTipDate
-GUI__App_FixScreenBug
 GUI__App_ForeGroundTime
 GUI__App_FrameLastDelay
 GUI__App_FrameStart
 GUI__App_NewSize
-GUI__App_OpenedFirst
+GUI__App_OpenedTime
 GUI__App_TryResizeLater
 GUI__beep_OK
+GUI__font_Char
 GUI__MB_DownAt
 JB__Rec_Progress
 GUI__GridSection_Dummy
@@ -81,6 +78,7 @@ GUI_VShapes__PlasticColor
 GUI_VShapes__Rainbows
 GUI_VShapes__Sphere
 JB_Str__Sorter
+GUI_Ray__DistanceSorter
 JB_CakeVM_DummyChef
 JB_Tree__Sorter
 JB_File__Sorter
@@ -91,13 +89,13 @@ JB_ID__ByID
 GUI_LV_DefaultCopy
 JB_ID__ByFreq
 GUI_Div__DrawDash
-GUI_Ray__DistanceSorter
 GUI_Img_RoundRectDrawer
 GUI_OnConfirmAnswer
 GUI_FR__BatchFindSorter
-GUI_FV__FileRowRenamer
+GUI_FV__FileRowCellSet
 GUI_FV__ClickedOpenList
 GUI_FV__FileRowNameSorter
+GUI_FV__FileRowRenamer
 GUI_FV__FileRowScoreSorter
 GUI_FileViewerCMMShow
 GUI_FV__InsideFileViewRowDraw
@@ -154,6 +152,7 @@ JB__File__Speedie
 GUI__Img_CurlieQue_
 JB__bin_Header
 GUI__SpaceTree_Holders
+JB__Proc__ForceParent
 JB__Proc__Parent
 GUI__VObject__Particles
 JB__Err_BackupErrorSource
@@ -179,8 +178,3 @@ GUI__Key_Record
 GUI__SystemCursor__Cursors
 JB__CharSet_Props
 JB__Constants__FuncArray
-JB__TerminalColor_RainbowTerm
-JB__Proc__ThreadedParent
-JB__Proc__ForceParent
-GUI__App_OpenedTime
-GUI_FV__FileRowCellSet
