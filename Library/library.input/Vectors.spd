@@ -344,7 +344,7 @@ datatype ivec3
 		return self != ivec3()
 
 	function Vec3 (|vec3|)
-		// should be inline...
+		// should be instrinsic
 		return (.x|float|, .y|float|, .z|float|)	
 
 	render
@@ -352,10 +352,8 @@ datatype ivec3
 		fs <~ "(${.x}, ${.y}, ${.z})"
 
 	syntax Equals (|ivec3| v, |bool|)
-		inline
 		|| d = (v-self)|ivec4|
-		d.w = 0
-		return d!=nil
+		return !d.x and !d.y and !d.z
 	
 	module
 		inline New (|ivec3|)
