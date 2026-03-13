@@ -177,7 +177,7 @@ libinternal message.UseRootTmpColor (|bool|)
 function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)
 	opt NoRefCounts
 	if !HasColor
-		return imagepixel.clear
+		return 0
 	if msg
 		|| fixed_msg = FixupColor(msg, pos)
 			if fixed_msg.UseRootTmpColor

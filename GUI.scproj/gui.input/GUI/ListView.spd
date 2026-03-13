@@ -87,7 +87,7 @@ class ListView (GUIControl) {
 			return (0.5, 0.5, 0.5, 1.0).px
 		if .UseColorScheme
 			return ¥.SyxCol[1]
-		return imagepixel.clear
+		return 0
 
 
 	libinternal DistBetween (|ListViewRow| c, |ListViewRow| b, |int|)

@@ -48,12 +48,12 @@ function AppInfoExtra (|unixprocess| r, |string|)
 		return "Exit OK"
 	if (r isa SpdProcess) and st.IsRunning
 		if .DebugMode is Finished
-			return "Finished"
+			return "Killed" // right?
 		if .DebugMode isnt ReceivedHello
 			return "Waiting..."
 		return ""
 	if st.IsRunning
-		"Running"
+		return "Running"
 	return st.Name
 
 

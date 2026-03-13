@@ -23,7 +23,8 @@ class Image (memory)
 		if .name
 			"Destroying: $.name"
 	
-	render	
+	render
+		opt norefcounts
 		fs <~ "image${.size}:${.name}"
 	
 	setter Size (|ivec2|)
@@ -35,6 +36,7 @@ class Image (memory)
 		return .area
 	
 	function NeedTemp (|image|)
+		opt norefcounts
 		return .Temp init image(.size)
 
 
@@ -461,13 +463,13 @@ class Image (memory)
 		|| range = self[rect]
 		if color.a != 255
 			|| c = color.PreMul
-			for (sigh in range) (v)
+			for sigh in range
 				sigh.Overlay(C)
 				i++
 		  elseif Rect == .rect
 			memory.fillint(.ptr|&int|, .length, Color)
 		  else
-			for (sigh in range) (v)
+			for sigh in range
 				sigh[0] = Color
 				i++
 		
@@ -476,7 +478,7 @@ class Image (memory)
 		.DrawRect(Rect, color.px)
 	
 
-	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.allCodes)
+	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=0, |MoveCode| AllowEdge=MoveCode.allCodes)
 		require Edge.a
 		// not sure why this is so complicated.
 		// did I do something wrong? is all my code off by 1 or something?
@@ -572,11 +574,6 @@ class Image (memory)
 			if MD > vv
 				|| D = maxdist / vv.sqrt
 				self[Pix].add((D-dim)*c1)
-
-
-	// not sure how to call this. figure it out later.
-//	task DrawShader2 (|image| Upon)
-//		run (|&imagepixel| px, |vec4| Color)
 
 	
 

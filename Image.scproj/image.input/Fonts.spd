@@ -9,6 +9,9 @@ module font
 		Width = 6 
 		Height = 9 
 
+	|ImagePixel[2]| Char
+	.Char[1] = -1
+
 
 function image.DrawText (|string| Str, |ivec2| xy, |vec4| Col = colors.clear, |bool| DrawInvis=false, |int|)
 	opt norefcounts
@@ -163,9 +166,9 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 		|| dz = where[clip.xy]
 		for ww in clip.width
 			if (MissingChar)
-				sz = &imagepixel.clear
-				if (ww-1 inrange 4) and y-1 inrange 6
-					sz = imagepixel.char(missingchar)
+				sz = &font.char[0]
+				if (ww-1 inrange 4) and (y-1 inrange 6)
+					sz = font.char[missingchar&1]
 					MissingChar>>=1
 			
 			if sz[]
