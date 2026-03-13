@@ -96,8 +96,18 @@ function Message.Negate (|Message!|)
 
 
 function Message.IsAssignable (|bool|)
+	opt norefcounts
+	self = .unbra
 	|| f = .func
-	return f != @Func and @type and @num // unless... its an assigns func?
+	if f == @acc // hmmmmm
+		|| L = .first!.unbra // now what
+		|| fn = l.MsgFunc
+			|| t = fn.ReturnType
+				if t.IsNumeric // hmmm not possible. even for a temp-vector.
+					return false
+		
+			
+	return f != @Func and @type and @num
 
 
 function message.IsTern (|bool|)
@@ -141,9 +151,11 @@ function Message.MsgArg (|SCArg|)
 
 function Message.MsgFunc (|SCFunction|)
 	opt norefcounts
-	if self == @Dot or @Func
-		|| sc = .second
-			return sc.asfunc
+	if self
+		|| fn = .func
+		if fn == @Dot or @Func
+			|| sc = .second
+				return sc.asfunc
 
 
 function Message.DclExp (|Message|)

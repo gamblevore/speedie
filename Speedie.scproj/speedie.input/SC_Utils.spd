@@ -153,10 +153,7 @@ function ListFunctionsSub (|object!| o, |[SCFunction]| out)
 
 function message.IsReffer (|bool|)
 	opt norefcounts
-	if self == @func
-		|| l = .last
-			|| fn = l.asfunc
-				return fn is reffer
+	return .MsgFunc is reffer
 
 
 

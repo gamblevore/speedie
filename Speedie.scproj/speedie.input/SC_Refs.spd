@@ -881,7 +881,7 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 	// calling a destructor is only allowed within a destructor.
 	opt norefcounts
 	ifn dot in @bra and dot.parent in @bra // allow
-		|| fn = dot.last!.asfunc
+		|| fn = dot.MsgFunc
 			if (fn is Destructor) and self isnt Destructor
 				error (dot, "Can only call destructors from within a destructor.")
 

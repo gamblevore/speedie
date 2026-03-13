@@ -1178,12 +1178,10 @@ function TypeOfDot (ExprResolver)
 	  else
 		decl = typevoid!
 	
-	L = exp.last // may have changed
-	if L
-		|| fn = L.asfunc
-			exp.obj = decl
-			if exp != @func
-				fn.DotFuncToNormalFunc( exp )
+	|scfunction--| fn = exp.MsgFunc
+		exp.obj = decl
+		if exp != @func
+			fn.DotFuncToNormalFunc( exp )
 		
 	return decl
 
@@ -1884,10 +1882,8 @@ function SCDecl.ProcessAs (|Message!| msg, |SCDecl|)
 function Message.FindDestructor (|Message|)
 	opt norefcounts
 	for c in self
-		if c == @Func // i guess its a dot?
-			|| cl = c.Last
-				if cl.asfunc is Destructor
-					Return c
+		if c.MsgFunc is Destructor
+			Return c
 
 
 function TypeOfArgArr (ExprResolver)

@@ -929,11 +929,11 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 	if s != @func
 		Return true
 
-	|| List = s.last!
-	|| f = List.AsFunc
+	|| f = s.MsgFunc
 	ifn (f isa SCFunction) and (f is TypeTest)
 		Return true
 	
+	|| List = s.last!
 	|| L1 = List.First
 		|| R1 = L1.next
 			|| cls = R1.ObjCls

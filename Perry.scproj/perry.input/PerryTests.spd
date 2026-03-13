@@ -5,4 +5,4 @@ function TestVec (|ivec2| V)
 	|| W = V.Width // ideally should be 1 instruction, not 3
 
 function raytracer.SetterTest
-	.Rotation.y = 3
+//	.Rotation.y = 3
