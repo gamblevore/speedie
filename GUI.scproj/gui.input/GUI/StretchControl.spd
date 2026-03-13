@@ -299,7 +299,7 @@ class StretchDivider (GuiControl)
 		constants
 			kGrabDist = 6
 		
-		function DrawDash (GUIDrawShader)
+		function DrawDash (Image.Shader)
 			|| C = vec4(0)
 			if P.y != rect.y
 				C = colors.white(0.1)

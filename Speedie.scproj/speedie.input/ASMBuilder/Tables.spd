@@ -94,7 +94,6 @@ function Debugger (fn_asm)
 			if num <= 1   // debugat 0 --> non-removeable noop. To track BreakCount
 				fat = exp.nop2
 	if !fat
-		if "IsString".trap
 		fat = exp.TRAP(num)
 	
 	fat.µRefCount++
@@ -548,18 +547,6 @@ function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scd
 	return dest
 
 
-function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
-	opt norefcounts
-	dest = .TempTyped(d, dest)
-	
-	|| fat = exp.GRAB(dest, t)
-	if d.IsInt and !d.IsBool
-		|| L = t.BitLoss
-			|| bastard = .CurrFuncGrab.SetSign(t.Signed)|int64|
-			fat.Prms[5] = bastard
-			fat.const = L
-	return fat * dest.HaveAddr
-
 
 function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
@@ -576,7 +563,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		|| T = .LocalThg(d)
 		if d.IsBareStruct or d.iscarray					// it already has the address 
 			return T.haveaddr
-		return GrabAddr(self, exp, dest, d, T)
+		return .GrabAddr(exp, dest, d, T)
 	
 	if d isnt global
 		if dest is Discard

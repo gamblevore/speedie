@@ -1,6 +1,6 @@
 
 
-roots		// this is used by the IDE Perry. This does not affect compilation!
+roots		// this is used by the IDE (Perry). This does not affect compilation!
 	"@spd/Library/library.input/"
 	"@spd/jeebox.scproj/jeebox.input/"
 	"@spd/GUI.scproj/gui.input/"

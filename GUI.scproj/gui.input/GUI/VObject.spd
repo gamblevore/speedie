@@ -65,13 +65,15 @@ class VObject (list)
 	function OverlapsRect (|vec4| B, |vec4|)
 		return B.Clip(.box2d)
 	
-	function Screen (|ivec4|)
+	inline Screen (|ivec4|)
 		return .box2d.Screen
 	
 	syntax cast (|ivec4|)
+		inline
 		return .Screen
 		
 	syntax is (|vobjectinfo| i, |bool|)
+		inline
 		return (.position & i) == i
 	
 	syntax is (|vobjectinfo| i, assigns:|bool| value)
@@ -88,7 +90,7 @@ class VObject (list)
 			.pos = rz
 	
 	
-	function ActualRadius (|float|)
+	inline ActualRadius (|float|)
 		return .Radius.Length
 	
 	module
@@ -134,7 +136,7 @@ function controlsize.CalculateBlocks (|ivec4|)
 function vec4.ScreenFloat (|vec4|)
 	return (self + VObject.Drawmovement.xyxy) * VObject.DrawScale
 
-function ivec4.Screen (|ivec4|)
+inline ivec4.Screen (|ivec4|)
 	return .Vec4.Screen
 
 function vec4.Screen (|ivec4|)

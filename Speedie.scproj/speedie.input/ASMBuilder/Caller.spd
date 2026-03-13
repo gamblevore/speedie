@@ -3,6 +3,7 @@
 
 extend Assembler {
 
+
 function IsASMConst (|message| exp, |bool|)
 	|| fn = exp.func
 	if fn == @num
@@ -83,33 +84,51 @@ function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	return ty.ReallySimplify
 
 
-function RegClear (|message| exp, |&fatasm| C, |int| i)
-	c.prms[5] = 0
+function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
+	opt norefcounts
+	dest = .TempTyped(d, dest)
+	
+	|| fat = exp.GRAB(dest, t)
+	fat.CurrGrabID = .CurrFuncGrab
+	if false and d.IsInt and !d.IsBool
+		|| L = t.BitLoss(D)
+			
+			// What if it has enough bits already?    How can we tell?
+			// So... we never need it if its 64-bit.  Hmmmm
+			// What if its 32-bit... I mean... most ops are 32-bit clean, right?
+			// We could compare the bit-size of the param-passed, and register?
+			// see if its more? rarely, right?
+
+			// need a real problem case before we can write this...
+		
+			L = L.SetSign(t.signed)
+			fat.const = L // what if we are passing a const? well... its not an address!
+	return fat * dest.HaveAddr
+
+
+target false {
+function RegClear (|message| exp, |&fatasm| C, |asmreg| R)
+	c.CurrGrabID = 0
 	|| L = c.Const
 	|| signed = L < 0
 		L = -L
-	.BFLG_Sub(exp, i.asm, i.asm, L, L, signed)
+	.BFLG_Sub(exp, R, R, L, L, signed)
+}
 
 
-function ClearGRABbedAndTrampled (|message| prms,  |asmreg| Dest,  |&fatasm| Start)
+function ClearTrampling (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
 	// asmtodo: unnecessary? Values are always 32 or 64-bit. everthing else should be
 	// set correctly, right? remove later?
 	opt norefcounts
-	if 0: prms.FNC3, prms.FNCX3			// MARK USED
+	if 0: AllPrms.FNC3, AllPrms.FNCX3			// MARK USED
 
 	|| c = .Last - 1
 	while C >= Start
 		if (c isa asm.GRAB)
-			|| id = c.Prms[5]
-			if id == .CurrFuncGrab
-				.RegClear(prms, c, c.RegOnly(0))
+			if c.CurrGrabID == .CurrFuncGrab
+//				.RegClear(AllPrms, c, c.output.asmreg)
+				.SetRegister(c.regonly(1), nil, fn)
 		c--
-	if 1
-		return
-	// still need this tho.	caused an error tho?
-	|| i = dest.reg
-	while ++i <= 31
-		.SetRegister(i, nil, nil)
 		
 }
 
@@ -125,19 +144,6 @@ function SCFunction.HasCVersion (|bool|)
 		return true
 
 	return self is wrapper
-
-
-function assembler.Killed (|message| exp, |fatasm| fat, |asmreg|)
-	// needs the encoder set first, this is a 8-byte code!
-	// not ideal! its a loss of a 8 byte code. Not sure theres
-	// another way... use the last 32? scatter them?
-	
-	fat.µrefcount++
-	return fat * asmreg.exit
-	
-//	|| fat2 = exp.HALT(nil, nil, 3)
-//	fat2.µRefCount++
-//	return fat2 * asmreg.exit
 
 
 
@@ -192,12 +198,13 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	fat._op += PExt > 0
 	fat.µRefCount += fn isnt STATELESS				// NOICE!
 
-	.ClearGRABbedAndTrampled(exp, dest, Start)		// comment out? once tests work?
+	.ClearTrampling(exp, Start, fat)
 	.CurrFuncGrab--
 	
-	if fn isnt Killer
-		return fat * dest
-	return .Killed(exp, fat)
+	if fn is Killer
+		dest = asmreg.exit
+		fat.µrefcount++
+	return fat * dest
 
 
 

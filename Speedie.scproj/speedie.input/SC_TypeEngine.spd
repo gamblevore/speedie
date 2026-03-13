@@ -128,6 +128,26 @@ function TypeOfFunc (ExprResolver)
 	return fn
 
 
+
+function Message.InsideParam (|bool|)
+	opt norefcounts
+	while
+		self = .parent					#require
+		if self == @prm or @dot
+			return true
+			
+		if self != @type and @bra
+			|| b1 = .name[]
+			if self == @brel
+				ifn b1 == '&'			// allow
+					return false
+			  elseif self == @arel
+				ifn b1 == '!' or '?'	// allow
+					return false
+			  else
+				return false
+
+
 function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	opt norefcounts
 	|| curr = .unbra
@@ -141,7 +161,7 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	expect (T2 isnt NumberConst)        		(curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and t2.IsRegister
-		error (curr, "Can't get the address of local vars.")
+		expect (curr.insideparam)				(curr, "Can't get the address of local vars.")
 	
 	return true
 

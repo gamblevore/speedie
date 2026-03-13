@@ -33,6 +33,22 @@ function image.DrawFont (|string| Str, |ivec2| xy, |vec4| Col, |bool| DrawInvis,
 	return xy.x
 
 
+libinternal codepoint.ImproveDraw (|string| t, |int| pos, |codepoint|)
+	if self == '!'
+		if t[pos+1] == '='
+			return 130
+	  elseif self == '='
+		if t[pos-1] == '!'
+			return 131
+	  elseif self == '<'
+		if t[pos+1] == '~'
+			return 132
+	  elseif self == '~'
+		if t[pos-1] == '<'
+			return 133
+	return self
+
+
 function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col, |int| H)
 	opt min 3
 	|| lines = (H / 12) max 1
@@ -69,26 +85,35 @@ libinternal string.FontLoad (|image|)
 
 
 	
-function image.FontCleanupChar (|ivec2| s)
+//libinternal image.FontCleanupChar (|ivec2| s)
+//	|| full	= 0.95*3.0 // fair?
+//	for v in (6, 8)
+//		|| p = v+s
+//		|| c = self[p].color
+//		
+//		|| total = c.x+c.y+c.z
+//		if total >= 0.3
+//			|| c2 = vec4(1)
+//			if total < full						// "anything above this is 100% white"
+//				c2.a = total/full				// anything else... is white, but less opaque
+//			self[p] <~ c
+
+
+libinternal image.FontCleanupChar (|ivec2| s)
+	|| full	= 0.95*3 // fair?
 	for v in (6, 8)
 		|| p = v+s
 		|| c = self[p].color
-		self[p] <~ c.FontPixelCleanup
+		|| cc = vec4()
+		|| total = c.x+c.y+c.z
+		if total >= 0.3
+			cc = vec4(1)
+			if total < full						// "anything above this is 100% white"
+				cc.a = total/full				// anything else... is white, but less opaque
+		self[p] <~ cc
 
 
-
-function vec4.FontPixelCleanup (|vec4|)
-	|| full		= 0.95 // fair?
-	|| total	= (.x+.y+.z)/3.0
-	require total >= 0.1
-	
-	rz = vec4(1)
-	if total < full						// "anything above this is 100% white"
-		rz.a = total/full				// anything else... is white, but less opaque
-
-
-
-function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col=colors.white)
+inline image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col=colors.white)
 	.drawchar(c, where, xy, col, 0) 
 
 

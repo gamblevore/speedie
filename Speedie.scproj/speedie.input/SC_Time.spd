@@ -31,7 +31,7 @@ function compiler.PrintCompileTime (|date| durr)
 		fs.Normal  "ASM",    (ASM_Ops*4).strsize(fs)
 		if PackMaker.PackSaved.Savings
 			fs.Normal  "PackFuncs Trimmed", packmaker.PackSaved.Churn(fs)
-		if .stdebuginfo
+		if .stDebugInfo
 			fs.normal  "DebugInfo",  .stdebuginfo.strsize(fs)
 
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"

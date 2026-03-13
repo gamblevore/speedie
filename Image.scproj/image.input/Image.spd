@@ -213,6 +213,7 @@ class Image (memory)
 
 	syntax access (|ivec4| rect, |imagereader|)
 		cpp_part imagereader
+		inline
 		rz.rect = .clip(rect)
 		rz.img = self
 	
@@ -302,7 +303,10 @@ class Image (memory)
 			sigh++
 	
 	
-	function DrawShader (|GUIDrawShader| Shader, |ivec4| Rect, |vec4| Col=vec4(1))
+	prototype Shader (|ivec4| Rect,  |ivec2| P,  |&imagepixel| Pix,  |vec4| color)
+	
+	
+	function DrawShader (|Image.Shader| Shader, |ivec4| Rect, |vec4| Col=vec4(1))
 		|| R = .clip(rect)
 		|| range = self[r]
 		for (px in range) (pos)

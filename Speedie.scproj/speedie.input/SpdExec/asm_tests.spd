@@ -9,10 +9,11 @@ function UintOnly (|int|)
 
 
 module ASMExamples {
-|int| Glob
-|int| Bolg
-|byte| BBB
+|int|   Glob
+|int|   Bolg
+|byte|  BBB
 |float| KNOB1 = 10
+
 
 target cake { 
 

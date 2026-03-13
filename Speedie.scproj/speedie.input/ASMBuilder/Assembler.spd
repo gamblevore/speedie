@@ -33,7 +33,7 @@ struct Assembler
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
-	|int|						CurrFuncGrab
+	|byte|						CurrFuncGrab
 	|bool|						NeedsRework // hoisting
 	|scfunction--|				Out
 
@@ -249,24 +249,30 @@ struct Assembler
 		Type.WholeType = rz
 		target debug: Type.ASMSanity
 
+
 	function vdecls (|uint|)
 		return .vdecls_
 
+
 	function vtemps (|uint|)
 		return .vtemps_
+
 
 	setter vdecls (|uint|)
 		if value & .vtemps_ // huh?
 		.vdecls_ = value
 
+
 	setter vtemps (|uint|)
 		if value & .vdecls_ // huh?
 		.vtemps_ = value
+
 
 	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
 		if type
 			t.µtype = type.mu.DataType
 		return .TempOnly(t)
+	
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
@@ -275,6 +281,7 @@ struct Assembler
 			// and if its NEVER different... why add it?
 			t.µtype = where.asmdecl.mu.DataType
 		return .TempOnly(t)
+
 
 	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
@@ -321,15 +328,14 @@ struct Assembler
 		if r.reg == 0
 			return 0 // sigh. I DIE.
 		
-		if R is Const
-			|| RF = R.fat
-				if .IsWithin(RF)
-					|| k = RF.const
-					if k.fits(bits, signed)
-						.NopConst(R)
-						return k|uint64|.trim(bits)
-				  else
-					debugger 
+		require R is Const
+
+		|| RF = R.fat
+		if rf and .IsWithin(RF)
+			|| k = RF.const
+			if k.fits(bits, signed)
+				.NopConst(R)
+				return k|uint64|.trim(bits)
 	
 	
 	function NopConst (|asmreg| R, |int64| K, |bool|)
@@ -342,7 +348,7 @@ struct Assembler
 		require r.reg
 		target debug: if r isnt Const 		// hah
 
-		if R is temp and r isnt blocknop	// don't think we can do better. not easily. 
+		if  R is temp  and  r isnt blocknop	// don't think we can do better. not easily. 
 			.AskNop(r.NeedFAT)				// for example .iscurr(f) gets params used by future stuff
 	
 	
@@ -412,7 +418,7 @@ struct Assembler
 		.regs.KnownMap = M
 			
 
-	function SetRegister (|int| changed, |asmreg| info, |?&FATASM| Value, |asmreg|)
+	function SetRegister (|int| changed, |asmreg| NopDest, |?&FATASM| Value, |asmreg|)
 		|| n = 0
 		|| start = .FuncStart_
 		if value
@@ -425,12 +431,12 @@ struct Assembler
 		target debug
 			if .Register(changed) != value // huh?
 		
-		if oldi and (info is AllowNopDest)
+		if oldi and (NopDest is AllowNopDest)
 			|| old = start + oldi
 			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
 				sh.nop(old)
-		(info isnt AllowNopDest)
-		return info
+		(NopDest isnt AllowNopDest)
+		return NopDest
 
 
 	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
@@ -580,7 +586,10 @@ struct Assembler
 		
 		target debug
 			|| trap = ++ASMTrapper
-			if trap == 27
+			if trap == 12590
+
+		|| OV = .OpenVars
+
 		if ModeOnly is NewlyDeclared									// || x = (y + 1) + (z + 1)
 			ModeOnly = ModeOnly asnt ASMReg.NewlyDeclared
 		  else
@@ -599,7 +608,6 @@ struct Assembler
 		target debug
 			ModeOnly.TmpCheck
 
-		|| OV = .OpenVars
 		|| r = .µGetASM(Exp, ModeOnly)
 		ov = ov.AddReg(R)
 		// this will close all vars, except the one we just got back!
@@ -667,7 +675,7 @@ struct Assembler
 			dest.TmpCheck
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if trap == -1 or stacksize > 20 // ugh
+			if trap == -1 or stacksize > 30 // ugh
 		  else
 			opt inline
 		
@@ -873,6 +881,3 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 		check (fn.µasmlength <= max) (fn.SourceArg, "ASM too large")
 	return true
 
-
-
-|| ConstFails = 0

@@ -27,6 +27,7 @@ datatype ivec4
 			rz.y = bn.y2 - .height
 		
 	function Vec4 (|vec4|)
+		// should be an intrinsic...
 		return (.x|float|, .y|float|, .z|float|, .w|float|)
 
 	operator minus (|ivec2| D, |ivec4|)
@@ -106,7 +107,7 @@ datatype ivec4
 		.x2 = r.x2
 		return self
 	
-	function Contains (|int| x, |int| y, |bool|)
+	inline Contains (|int| x, |int| y, |bool|)
 		cpp_part ContainsInt
 		return .contains((x,y), 0)
 		
@@ -116,9 +117,9 @@ datatype ivec4
 		require p.y >= .y+i and p.y < .y2-i
 		return true
 	
-	function Contains (|ivec2| v, |bool|)
-		cpp_part ContainsVec2
-		return .contains(v, 0)
+//	function Contains (|ivec2| v, |bool|)
+//		cpp_part ContainsVec2
+//		return .contains(v, 0)
 	
 	operator Min (|ivec4| v, |ivec4|)
 		return (.x min v.x, .y min v.y,  .z min v.z,  .w min v.w )
@@ -128,21 +129,19 @@ datatype ivec4
 		return .contains(v.x1y1) and .contains(v.x2y2)
 	
 	operator overlaps (|ivec4| v, |bool|)
-		require v.x2 > .x1
-		require v.x1 < .x2 
-		require v.y2 > .y1
-		require v.y1 < .y2
-		return true 
+		if v.x2 > .x1  and  v.x1 < .x2 
+			if v.y2 > .y1  and  v.y1 < .y2
+				return true
 	
 	operator contains (|ivec2| v, |bool|)
 		inline
 		return .contains(v)
 	
 	function IsPositive (|bool|)
-		return (.x2 > .x) & (.y2 > .y)
+		return (.x2 > .x) and (.y2 > .y)
 	
 	function IsNegative (|bool|)
-		return (.x2 < .x) ||| (.y2 < .y)
+		return (.x2 < .x) or (.y2 < .y)
 		
 	syntax cast (|bool|)
 		cpp_part Bool
@@ -156,6 +155,7 @@ datatype ivec4
 		return (.x2 - .x1, .y2 - .y1)	
 
 	render
+		opt norefcounts
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
 	
 	module
@@ -313,6 +313,7 @@ datatype vec3
 		return self|vec4|.OperatorCross(v|vec4|)|vec3|
 
 	render
+		opt norefcounts
 		fs <~ "(${.x}, ${.y}, ${.z})"
 	
 	module
@@ -343,13 +344,18 @@ datatype ivec3
 		return self != ivec3()
 
 	function Vec3 (|vec3|)
+		// should be inline...
 		return (.x|float|, .y|float|, .z|float|)	
 
 	render
+		opt norefcounts
 		fs <~ "(${.x}, ${.y}, ${.z})"
 
 	syntax Equals (|ivec3| v, |bool|)
-		return (.x == v.x) & (.y == v.y) & (.z == v.z)
+		inline
+		|| d = (v-self)|ivec4|
+		d.w = 0
+		return d!=nil
 	
 	module
 		inline New (|ivec3|)
@@ -566,6 +572,7 @@ datatype vec2
 		fs <~ "(${.x}, ${.y})"
 
 	inline iVec2 (|ivec2|)
+		// should be inline...
 		return (.x|int|, .y|int|)
 	
 	function Reflect (|vec2| plane, |vec2|)
@@ -788,7 +795,7 @@ function ivec4.Max (|int| L, |ivec4|)
 function ivec4.Min (|int| L, |ivec4|)
 	return (.x min L, .y min L, .z min L, .w min L )
 
-function ivec4.Center (|vec2|)
+inline ivec4.Center (|vec2|)
 	return .vec4.center
 
 function vec4.Center (|vec2|)

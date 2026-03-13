@@ -13,7 +13,7 @@ struct FatASM
 	|int16|				µRefCount
 	|uint16| 			BasicBlock
 	|uint16| 			ASMIndex
-	|byte|				_Unused
+	|byte|				CurrGrabID
 	|byte|				InputFats 	// could merge with inputprms... easy and better probably. Do later
 	|byte|				InputPrms	
 	|byte| 				_Outputs
@@ -170,7 +170,7 @@ struct FatASM
 		
 		|| old = f.prms[a] & 31 							// Need to remove the old output.
 			if .Register(old) == f
-				.SetRegister(old, nil, f.FindOlder )
+				.SetRegister(old, nil, f.FindOlder)
 		
 		return f.Dest(a, dest, self)						// Then we set it to the new value
 	

@@ -46,7 +46,7 @@ class RayTracer
 
 	|Vec3|				MainLight
 	|Vec3|				Camera
-	|vec3|				Rotation	// we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
+	|vec3|				_Rotation	// we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
 	|byte|				_StillGood
 		
 	|&RayBoost|			RootNode	// make these not ?!
@@ -93,18 +93,22 @@ class RayTracer
 			._StillGood = 0
 
 
+	function Rotation (|vec3|)
+		return ._Rotation
+	
+	
 	setter Rotation (|vec3|)
 		value = Value.Fract
-		if .rotation != value
-			.Rotation = Value
+		if ._rotation != value
+			._Rotation = Value
 			._StillGood = 0
 	
 	
 	function ViewMat (|&mat4|)
 		ifn ._StillGood & 2
 			._StillGood |= 2
-			._LookAt = .Rotation.y.SinCos.RotateAroundY
-			|| M = .Rotation.x.SinCos.RotateAroundX
+			._LookAt = ._Rotation.y.SinCos.RotateAroundY
+			|| M = ._Rotation.x.SinCos.RotateAroundX
 			._LookAt *= M
 			._Fwd = (0.0, 0.0, 1.0) * ._LookAt
 		return ._LookAt
@@ -195,7 +199,6 @@ class RayTracer
 			hit.z = 0
 			return hit
 		
-		
 		|| d = hit.x
 		for .RayAccuracy
 			P = .Camera + ._camdir*d,  P.w = 1.0	// Scaling factor
@@ -247,7 +250,6 @@ class RayTracer
 		|| DMin = V.Length
 		|| DMax = DMin
 		|| R = obj.ActualRadius
-
 
 		if V • ._Fwd < 0
 			dmax = R-Dmax
@@ -524,7 +526,7 @@ struct RayTraceCell
 	|byte|						W
 	|bool|						Aliased
 
-	function Obj (|vobject|)
+	libinternal Obj (|vobject|)
 		|| n = .node
 			return n.draw
 			

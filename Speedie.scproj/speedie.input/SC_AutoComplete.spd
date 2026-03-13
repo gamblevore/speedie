@@ -1265,10 +1265,11 @@ function scfunction.RenderSheBless (|string|)
 	
 function CppView (|message| out, |scfunction| fn)
 	out.msg(@tmp, "")						// separator
+//	out.msg(@tmp, "// " + fn.exportname)	// none exists! D:
 	for s.lines in fn.Rendershebless
 		if !s
 			s = " "
-		out.msg(@tmp, s)				// C-view
+		out.msg(@tmp, s)					// C-view
 
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
@@ -1279,11 +1280,11 @@ function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |
 
 function Define_Behaviour (|SCFunction| fn,  |string| purpose,  |message|)
 	// behaviour abc --> .__abc__
-	|| cls = fn.cls #require
-	|| name = fn.name.moat
-	|| found = cls.UpCheck(name)
-	if found isa SCFunction
-		rz = .DefineOrCall(found.source!, purpose, found)
+	|| cls = fn.cls
+		|| name = fn.name.moat
+		|| found = cls.UpCheck(name)
+		if found isa SCFunction
+			rz = .DefineOrCall(found.source!, purpose, found)
 
 
 function message.CutifyCopy (|message!|)
@@ -1383,7 +1384,7 @@ function LocateDefinition (|message| msg, |SCObject| already_defined, |bool| Dis
 
 	if msg in @tmp
 		msg = msg.parent
-	if (msg == @tmp)
+	if msg == @tmp
 		|| fn = msg.obj
 		if fn isa SCFunction
 			return fn.Source

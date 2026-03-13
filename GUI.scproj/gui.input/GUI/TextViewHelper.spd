@@ -502,22 +502,6 @@ struct MsgTextDrawState
 			rz.font = font.small!
 
 
-libinternal codepoint.ImproveDraw (|string| t, |int| pos, |codepoint|)
-	if self == '!'
-		if t[pos+1] == '='
-			return 130
-	  elseif self == '='
-		if t[pos-1] == '!'
-			return 131
-	  elseif self == '<'
-		if t[pos+1] == '~'
-			return 132
-	  elseif self == '~'
-		if t[pos-1] == '<'
-			return 133
-	return self
-
-
 function int.LineNumWidth (|int|)
 	opt norefcounts
 	rz = 2

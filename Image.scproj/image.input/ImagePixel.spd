@@ -23,10 +23,7 @@ struct ImagePixelStruct
 		.r = iv.r
 		.g = iv.g
 		.b = iv.b
-	
-	inline Px (|ImagePixel|)
-		return self|&ImagePixel|[]
-				
+					
 //	libinternal ivec4._CB (|ivec4|)
 //		// test if this is faster.
 //		description "A secret ClampByte"
@@ -203,7 +200,7 @@ datatype ImagePixel (uint)
 
 
 	module 
-		function New (|imagepixel|)
+		inline New (|imagepixel|)
 			rz = 255
 		
 		|ImagePixel| Bad
@@ -215,7 +212,7 @@ datatype ImagePixel (uint)
 		libinternal Init
 			.white <~ vec4(1.0)
 		
-		function Char (|codepoint| c, |&imagepixel|)
+		libinternal Char (|codepoint| c, |&imagepixel|)
 			if (c&1)!=0
 				return .white
 			return .clear
@@ -232,19 +229,17 @@ function ivec4.syntaxcast (|imagepixel|)
 	disabled "Use .px"
 
 
-function vec4.Px (|imagepixel|)
-	|imagepixelstruct| Tmp
-	Tmp.AppendVec4(self)
-	return tmp.px
+inline vec4.Px (|imagepixel|)
+	(&rz)|&imagepixelstruct|.AppendVec4(self)
 
-function vec3.Px (|imagepixel|)
-	|imagepixelstruct| Tmp
-	tmp.appendvec3(self)
-	tmp.a = 255
-	return tmp.px
+inline vec3.Px (|imagepixel|)
+	.w = 0
+	return self|vec4|.px
 
 function ivec4.Px (|imagepixel|)
-	|imagepixelstruct| tmp
-	tmp.r = .r, tmp.g = .g, tmp.b = .b, tmp.a = .a
-	return tmp.px
+	|| C = .r&255
+	C |= (.b|uint|<<24)>>16
+	C |= (.g|uint|<<24)>>8
+	C |= (.a|uint|<<24)>>0
+	return C
 

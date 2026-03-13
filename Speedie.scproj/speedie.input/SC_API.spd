@@ -65,8 +65,7 @@ module SC_API
 	
 	function DelayedClassAPI (|message| node, |string| proj)
 		if (node == "api")
-			.NewAPI(node, "", Compiler.program, proj)
-			return
+			return .NewAPI(node, "", Compiler.program, proj)
 		
 		|| name		= node[@thg]						#require
 		|| partname = name.Next(@bra)[@thg]				#require
