@@ -10,8 +10,7 @@ struct ImagePixelStruct
 
 	function AppendVec4 (|vec4| V)
 		v = (v * 255.0) + 0.5
-		|| iv = v.iVec4
-		iv = iv.clamp(0,255)
+		|| iv = v.iVec4.clamp(0,255)
 		.r = iv.r
 		.g = iv.g
 		.b = iv.b
@@ -23,15 +22,7 @@ struct ImagePixelStruct
 		.r = iv.r
 		.g = iv.g
 		.b = iv.b
-					
-//	libinternal ivec4._CB (|ivec4|)
-//		// test if this is faster.
-//		description "A secret ClampByte"
-//		|| L = ivec4((.x<0)|int|,   (.y<0)|int|,   (.z<0)|int|,   (.w<0)|int|)
-//		|| H = ivec4((.x>255)|int|, (.y>255)|int|, (.z>255)|int|, (.w>255)|int|)
-//	    self &= L-1			// clamp < 0
-//	    self |= -H			// clamp > 255
-//	    return self
+
 
 
 datatype ImagePixel (uint)
@@ -39,17 +30,17 @@ datatype ImagePixel (uint)
 		cpp_part Pxl
 		opt min 3
 
-		
+	
 	function Alpha (|&imagepixel| self, assigns:|float| a)
 		cpp_part Alpha2
 		a = (a * 255.0) + 0.25
 		.a = a.clamp(255.0)|int|
-		
+	
 	function Alpha (assigns:|float| a, |imagepixel|)
 		a = (a * 255.0) + 0.25
 		.a = a.clamp(255.0)|int|
 		return self
-		
+	
 	inline Alpha (|float|)
 		return .a|float| * 255th
 
@@ -125,9 +116,6 @@ datatype ImagePixel (uint)
 	function HasColor (|bool|)
 		inline
 		return (self << 8) != 0
-		
-	operator in (|&imagepixel| self, |image| src, |bool|)
-		disabled "Use: image contains pixel"
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
@@ -176,12 +164,12 @@ datatype ImagePixel (uint)
 		disabled "Call .Premul on this first for great speed boost!"
 
 	function Color (|vec4|)
-		return vec4(.r, .g, .b, .a) * (1.0/254.99)
+		return vec4(.r, .g, .b, .a) * (1.0/254.5)
 
 	function Color (|&imagepixel| self, |vec4|)
 		cpp_part ColorLoad
 		rz = vec4.load(self|&byte|)
-		rz *= (1.0/254.99)
+		rz *= (1.0/254.5)
 		
 	function Raw (|&imagepixel| self, |ivec4|)
 		inline
@@ -206,7 +194,7 @@ datatype ImagePixel (uint)
 
 
 function vec3.syntaxcast (|imagepixel|)
-	disabled "use .vec4.px"
+	disabled "use .px"
 		
 function vec4.syntaxcast (|imagepixel|)
 	disabled "Use .px"
