@@ -89,24 +89,25 @@ class XVar (list)
 				fs <~ terminalcolor.normal
 	
 	
-	function DisplayString (|faststring| fs, |string| str)
-		|| n = str.Length
+	function DisplayString (|faststring| fs, |?&byte| Addr, |int| n)
 		if n < 0
 			fs <~ "InvalidLength: "
 			fs <~ N
 			return
-		
+		if !addr												// testmem allows nil addr...
+			fs <~ "nil!"
+			return
 		if !n
 			fs <~ `""`
 			return
 		
-		require .testmem(fs, str.addr, n, "BadStringData")		// check string
+		require .testmem(fs, addr, n, "BadStringData")			// check string
 
 		|VirtualJBString| Skkrt
-		Skkrt.Addr = str.Addr
+		Skkrt.Addr = Addr
 		Skkrt.Length = n
 		if n > 50
-			Skkrt.length = str.ByteCountUTF8(50)				// shrink string
+			Skkrt.length = (&skkrt)|string|.ByteCountUTF8(50)	// shrink string
 		fs <~ '"'
 		fs.AppendEscape((&Skkrt)|string|)
 		fs <~ '"'
@@ -127,7 +128,7 @@ class XVar (list)
 		
 		if obj isa string or obj isa faststring
 			|| str = obj|&nil||string|
-			.DisplayString(fs, str)
+			.DisplayString(fs, str.addr, str.length)
 			return
 
 		if obj isa Message

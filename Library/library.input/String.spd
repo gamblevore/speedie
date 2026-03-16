@@ -435,9 +435,12 @@ class String
 			cpp_Wrapper JB_Str_New
 
 		function New (|cstring| s, |StringZeroTerminated|)
+			description "Wraps an existing cstring into a Speedie string" 
 			cpp_Wrapper JB_StrC
 
+		// could merge these two... give it a 0 length and see what you get?
 		function New (|cstring| s, |int| n, |StringZeroTerminated|)
+			description "Wraps existing memory into a Speedie string. Must be a c-string. The length is just for speed."
 			cpp_Wrapper JB_StrCN
 
 		function Own (|&byte| addr,  |int| n, |string|)
@@ -448,14 +451,6 @@ class String
 
 		function Copy (|&nil| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
-
-		function WrapMem (|cstring| Addr, |stringzeroterminated|)
-			disabled "Use string.new(addr)"
-
-		
-		function WrapMem (|&Byte| Addr, |string|)
-			disabled "cast to a cstring first"
-			cpp_Part fromcstr2
 
 		function FromC (|cstring| str, |stringzeroterminated|)
 			disabled "use .copy"
@@ -483,7 +478,7 @@ class String
 		syntax Access (|int|b, |string|)
 			disabled ".char or .byte?"
 
-		function Char (|codepoint| c, |string|)
+		function UTF8 (|codepoint| c, |string|)
 			cpp_wrapper JB_Str_ChrUTF8
 		
 

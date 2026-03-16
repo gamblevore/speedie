@@ -38,11 +38,11 @@ datatype Codepoint (int)
 	inline In (|int| a, |int| b, |bool|)
 		return  (self - a)|uint| <= (b-a)|uint|
 	inline Str (|string|)
-		return string.char(self)
+		return string.UTF8(self)
 	syntax cast (|string|)
 		cpp_part AsString
 		inline
-		return string.char(self)
+		return string.UTF8(self)
 	syntax cast (|bool|)
 		cpp_part Bool
 		inline

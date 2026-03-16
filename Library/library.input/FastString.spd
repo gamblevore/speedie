@@ -13,11 +13,14 @@ class FastString {
 // Fast appends and tools for building data formats
 
 	|int|			Length
-	|int|			Reserved
 	|&Byte|			ResultPtr
+	|&nil|			Dummy1
+	|&nil|			Dummy2
+	|int64|			WrittenLength // invisible
+	
+	|int|			Reserved
 	|uint16|		Indent
 	|Byte|			IndentChar
-//	|int64|			WrittenLength // invisible
 	
 /////
 
@@ -32,11 +35,10 @@ class FastString {
 	
 	function AppendLower (|string| data)
 		cpp_wrapper JB_FS_AppendLower
-	function FreeSize (|int|):	cpp_wrapper JB_FS_FreeSize
+	function FreeSize (|int|)			{ cpp_wrapper JB_FS_FreeSize }
 	function FreeSize (assigns:|int|, |&byte|) {cpp_wrapper JB_FS_NeedSpare}
 
-	function StreamLength (|int|)
-		cpp_wrapper JB_FS_StreamLength
+	function StreamLength (|int|)		{ cpp_wrapper JB_FS_StreamLength }
 
 	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
 	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
@@ -48,7 +50,7 @@ class FastString {
 	function AppendHexData (|string| Data)
 		cpp_part AppendHexStr 
 		if data
-			.appendhexdata(Data.addr, data.length)
+			.AppendHexData(Data.addr, data.length)
 	
 	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
 		cpp_wrapper JB_FS_AppendHexData
@@ -109,7 +111,7 @@ class FastString {
 
 	syntax Append (|string| data, |int| count)
 		cpp_part AppendMultiStr
-		|| needed = data.Length*count
+		|| needed = data.Length * count
 		if .FreeSize < needed
 			.FreeSize = needed
 		for count
@@ -300,9 +302,12 @@ class FastString {
 		opt norefcounts
 		self <~ b.string
 	
+
 	function Mark (|int|)
+		// this is just the streamlength! remove it?
 		description "Returns 'The Mark'. This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .mark == .length"
 		cpp_wrapper
+
 	
 	macro SyntaxAppend
 		_1.render(_0)
@@ -314,6 +319,7 @@ class FastString {
 }
 
 
+
 extend FastString
 	function File (|File|)
 		cpp_wrapper JB_FS_File
@@ -321,37 +327,38 @@ extend FastString
 	function File (assigns:|File|)
 		cpp_wrapper JB_FS_FileSet
 
-	// use syntax-append instead? "fs <~ (doubles, n)"
-	function AppendFloats (|&float| Data, |int| N)
-		self <~ '['
-		for (i in N)
-			self <~ ", "
-			start
-			self <~ Data[i]
-		self <~ ']'
 
-	function AppendDoubles (|&f64| Data, |int| N)
-		self <~ '['
-		for (i in N)
-			self <~ ", "
-			start
-			self <~ Data[i]
-		self <~ ']'
-
-	function AppendInts (|&int| Data, |int| N)
-		self <~ '['
-		for (i in N)
-			self <~ ", "
-			start
-			self <~ Data[i]
-		self <~ ']'
-
-	function AppendInt64s (|&int64| Data, |int| N)
-		self <~ '['
-		for (i in N)
-			self <~ ", "
-			start
-			self <~ Data[i]
-		self <~ ']'
+//	// use syntax-append instead? "fs <~ (doubles, n)" //
+//	function AppendFloats (|&float| Data, |int| N)
+//		self <~ '['
+//		for (i in N)
+//			self <~ ", "
+//			start
+//			self <~ Data[i]
+//		self <~ ']'
+//
+//	function AppendDoubles (|&f64| Data, |int| N)
+//		self <~ '['
+//		for (i in N)
+//			self <~ ", "
+//			start
+//			self <~ Data[i]
+//		self <~ ']'
+//
+//	function AppendInts (|&int| Data, |int| N)
+//		self <~ '['
+//		for (i in N)
+//			self <~ ", "
+//			start
+//			self <~ Data[i]
+//		self <~ ']'
+//
+//	function AppendInt64s (|&int64| Data, |int| N)
+//		self <~ '['
+//		for (i in N)
+//			self <~ ", "
+//			start
+//			self <~ Data[i]
+//		self <~ ']'
 
 

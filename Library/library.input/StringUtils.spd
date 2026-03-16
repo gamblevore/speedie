@@ -127,10 +127,7 @@ function String.UTF8 (|string|)
 	return .UTF16To8
 
 
-/*function string.Appender4 (|string| a, |string| b, |string| c=nil, |string|)
-	cpp_wrapper JB_Str_Appender4 // if we wanted 2 params just use "+"
-
-function string.Appender7 (|string| a, |string| b, |string| c, |string| d, |string| e=nil, |string| f=nil, |string|)
+/*function string.Appender7 (|string| a, |string| b, |string| c, |string| d, |string| e=nil, |string| f=nil, |string|)
 	cpp_wrapper JB_Str_Appender7
 */ // do later. compiler can use this :)
 
