@@ -1505,11 +1505,9 @@ function message.BackTrackCC (|message|)
 	
 
 function Tran_BreakPoint (TranFunc)
-	// this needs to be done early, because other things can destroy/transform messages
-	// but breakpoints are not debugger statements. Soooo... we need a new name?
 	opt norefcounts
-	if (node is inserted and breakpoint) and (node == @tmp) // seems we already did this?
-		return compiler.program
+	if (node is inserted and breakpoint) and (node == @tmp)
+		return compiler.program	// done already!
 	
 	(node isnt BreakPoint)
 	using node

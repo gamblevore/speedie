@@ -253,7 +253,7 @@ function CalculateSize (|int| Depth=0, |int|)
 	
 	if .IsDataTypeOnly
 		return .mini_size(.typeinfo.ByteCount)
-
+	
 	expect (Depth < 16) (.SourceArg, "Class hierarchy too deep")
 	|| AlignTo = 1
 	if self == typeobject
@@ -261,7 +261,10 @@ function CalculateSize (|int| Depth=0, |int|)
 		rz = 4 // refcount
 	
 	|| s = .super  // we can rely on everything being sorted.
-		rz = s.clssize							#expect (self)
+		rz = 4
+		if s != typeobject
+			rz = s.clssize							#expect (self)
+			
 		AlignTo = AlignTo max s.Alignment
 	
 	|| bits = 0

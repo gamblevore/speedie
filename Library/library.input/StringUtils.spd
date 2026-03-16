@@ -5,27 +5,27 @@ macro Print
 	StrPrint_(_0.render)
 
 macro PrintLine
-	StrPrintLine_(_0.render) // not self-referential anymore.
+	StrPrintLine_(_0.render)				// not self-referential anymore.
 
 autogen StrPrint_ (|string?| data)
 	cpp_wrapper JB_Str_Print
 
-autogen StrPrintLine_ (|string?| data)	// ideally move this to string._printline
-	cpp_wrapper JB_Str_PrintLine		// AND... make printline x use this.
+autogen StrPrintLine_ (|string?| data)		// ideally move this to string._printline
+	cpp_wrapper JB_Str_PrintLine			// AND... make printline x use this.
 
 inline Print (|string?| data)
 	StrPrint_(data)
 
 inline PrintLine (|string?| data=nil)
-	StrPrintLine_(Data)							// to disambiguate vs macro
+	StrPrintLine_(Data)						// to disambiguate vs macro
 
 
-/*
-inline PrintLine (|Faststring| data)
+
+inline PrintLine (|Faststring!| data)
 	cpp_part PrintFS
-	StrPrintLine_(Data|string|) // breaks cake
+	StrPrintLine_(Data|string|)				// breaks cake
 	data.Length = 0
-*/
+
 
 function Print (|cstring?| data)
 	cpp_wrapper JB_PrintCString

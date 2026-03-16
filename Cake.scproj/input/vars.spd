@@ -53,6 +53,7 @@ class XVar (list)
 	
 	
 	function RenderValue (|faststring| fs, |&ivec4| Reg0)
+		opt norefcounts
 		|| Reg = Reg0 + .reg
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject

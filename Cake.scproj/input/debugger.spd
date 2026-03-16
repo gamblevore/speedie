@@ -109,6 +109,7 @@ module debugger
 		
 	function __Dumper__ (cakevm.CakeChef)
 		// just dumps everything. Useful for testing the system even works.
+		opt norefcounts
 		if ErrorCode
 			return .PrintCrashTrace(ErrorCode, Stack)
 		|| index = .Index(Stack.code)

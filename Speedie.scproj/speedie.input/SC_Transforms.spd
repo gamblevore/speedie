@@ -383,11 +383,6 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 
 
 
-function abc
-	printline nil
-/	printline nil
-
-
 
 function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f) // transform ()
 	if s.func != @sheb
