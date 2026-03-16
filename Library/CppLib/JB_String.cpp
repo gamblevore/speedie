@@ -602,9 +602,8 @@ void JB_FS_AppendHex3(FastString* fs, int tVal) {
 
 inline uint8* u8Pos( MiniStr S, uint8 TheChar ) {
 	while (	S ) {
-		if (S.Next() == TheChar) {
+		if (S.Next() == TheChar)
 			return S;
-		}
 	}
 	return 0;
 }
@@ -613,9 +612,8 @@ inline uint8* u8Pos( MiniStr S, uint8 TheChar ) {
 inline uint8* u8PosLex( MiniStr S, uint8 TheChar ) {
 	TheChar = LowerCaseB(TheChar);
 	while (	S ) {
-		if (S.NextLower() == TheChar) {
+		if (S.NextLower() == TheChar)
 			return S;
-		}
 	}
 	return 0;
 }
@@ -652,9 +650,8 @@ inline MiniStr Theo2PosLex( MiniStr S, uint8 Find1, uint8 Find2 ) {
 
 inline uint8* u8PosRev( MiniStr S, uint8 TheChar ) {
 	while (	S ) {
-		if (S.Prev() == TheChar) {
+		if (S.Prev() == TheChar)
 			return S;
-		}
 	}
 	return 0;
 }
@@ -663,9 +660,8 @@ inline uint8* u8PosRev( MiniStr S, uint8 TheChar ) {
 inline uint8* u8PosRevLex( MiniStr S, uint8 TheChar ) {
 	TheChar = LowerCaseB(TheChar);
 	while (	S ) {
-		if (S.PrevLower() == TheChar) {
+		if (S.PrevLower() == TheChar)
 			return S;
-		}
 	}
 	return 0;
 }
@@ -709,8 +705,7 @@ uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
     if (!F) {
 		if (Lex)
 			return u8PosLex(S, FirstChar);
-		  else
-			return u8Pos( S, FirstChar );
+		return u8Pos( S, FirstChar );
     }
     u32 SecondChar = F.Next();
     
@@ -744,8 +739,7 @@ uint8* SearchBackward_( MiniStr S, MiniStr F, bool Lex ) {
     if (!F) {
 		if (Lex)
 			return u8PosRevLex( S, FirstChar );
-		else
-			return u8PosRev( S, FirstChar );
+		return u8PosRev( S, FirstChar );
 	}
 	
     u32 SecondChar = F.Next();
@@ -875,11 +869,9 @@ bool JB_Str_Equals(JB_String* self, JB_String* find, bool Lexer) {
 			self = EmptyString_;
 		if (!find)
 			find = EmptyString_;
-		if ( ! Lexer ) {
+		if ( !Lexer )
 			return StrEquals( Mini(self), Mini(find) );
-		} else {
-			return StrEqualsLex( Mini(self), Mini(find) );
-		}
+		return StrEqualsLex( Mini(self), Mini(find) );
 	}
 	return true;
 }
@@ -890,11 +882,9 @@ int JB_Str_Compare(JB_String* self, JB_String* Find, bool Lexer) {
 		self = EmptyString_;
 	if (!Find)
 		Find = EmptyString_;
-	if ( ! Lexer ) {
+	if ( !Lexer )
 		return OffsetCompare_( Mini(self), Mini(Find) );
-	} else {
-		return OffsetCompareLex( Mini(self), Mini(Find) );
-	}
+	return OffsetCompareLex( Mini(self), Mini(Find) );
 }
 
 
@@ -912,11 +902,9 @@ bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool CaseA
 		self = EmptyString_;
 
 	MiniStr S = ReadAddrs_( self,  BeginOff,  BeginOff + n );
-	if ( CaseAware ) {
+	if ( CaseAware )
 		return StrEqualsLex( Mini(find), S );
-	} else {
-		return StrEquals( Mini(find), S );
-	}
+	return StrEquals( Mini(find), S );
 }
 
 
@@ -928,25 +916,19 @@ bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool CaseA
 bool IsAsciiSub_(uint8* SelfPos, u32 Length) {
 	uint8* SelfEnd = SelfPos + Length; // must be done before I alter selfpos!
 
-	while ( ((UintPtr)SelfPos % 4) and SelfPos < SelfEnd ) {
-		if ( *SelfPos++ >= 0x80 ) {
+	while ( ((UintPtr)SelfPos % 4) and SelfPos < SelfEnd )
+		if ( *SelfPos++ >= 0x80 )
 			return false;
-		}
-	}
 	
-	while ( ((UintPtr)SelfEnd % 4) and SelfPos < SelfEnd ) {
-		if ( *(--SelfEnd) >= 0x80 ) {
+	while ( ((UintPtr)SelfEnd % 4) and SelfPos < SelfEnd )
+		if ( *(--SelfEnd) >= 0x80 )
 			return false;
-		}
-	}
 	
 	int TrimLength = (int)(SelfEnd - SelfPos) / 4;
 	u32* intPos = (u32*)SelfPos;
-	while ( TrimLength-- ) {
-		if ( (*intPos++) & k4HighBits ) {
+	while ( TrimLength-- )
+		if ( (*intPos++) & k4HighBits )
 			return false;
-		}
-	}
 
 	return true;
 }
@@ -1034,7 +1016,6 @@ void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos, bool Overflo
 void ParseNumErr_( JB_String* self, uint8* BadPos, Message*& Where, bool OverFlow ) {
     int CharPos = (int)(BadPos - self->Addr - 1);
     JB_Err__CantParseNum(Where, self, CharPos, OverFlow);
-    
     Where = nil;
 }
 
@@ -1200,9 +1181,8 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr 
 		}
 	}
 
-	if (IsMinus) {
+	if (IsMinus)
 		Value = -Value;
-	}
 	return Value;
 }
 
@@ -1287,9 +1267,8 @@ JB_String* JB_FS_Return( JB_String* Data, FastString* fs_in ) {
 }
 
 JB_String* JB_FS_SmartResult( FastString* fs, JB_Object* Orig ) {
-	if ( !Orig ) {
+	if ( !Orig )
 		return JB_FS_GetResult( fs );
-	}
 	return EmptyString_;
 }
 
