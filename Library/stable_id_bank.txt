@@ -1682,6 +1682,7 @@ JB_Str_BackToApp
 JB_Str_BadUTF8
 JB_Str_Before
 JB_Str_BeforeLastByte
+JB_Str_ByteCount
 JB_Str_ByteSplit
 JB_Str_ByteValue
 JB_Str_ByteValue2
@@ -1836,7 +1837,6 @@ JB_Str_Widen
 JB_Str_Wrap
 JB_Str_WriteAll
 JB_Str_Yes
-JB_Str_Zalgo
 JB_Str__Byte
 JB_Str__Error
 JB_Str__Freeable
@@ -1883,7 +1883,6 @@ JB_Tree_Array
 JB_Tree_Clear
 JB_Tree_ClearTree
 JB_Tree_Count
-JB_Tree_ExtractChild
 JB_Tree_FlatCount
 JB_Tree_FlatLast
 JB_Tree_FlatLoop
@@ -1911,7 +1910,6 @@ JB_Tree_Sort
 JB_Tree_StepN
 JB_Tree_Trim
 JB_Tree_Upward
-JB_Tree__New
 JB_Tree__Sorter
 JB_Tree_stepbool
 JB_Validator_All
@@ -2142,7 +2140,6 @@ JB_ivec4_WidthSet
 JB_jbinLeaver_SyntaxUsingComplete
 JB_munmap
 JB_u64_Log2
-JB_u8p_ByteCount
 JB_u8p_Read
 JB_uint64_HintLength
 JB_uint64_Now
@@ -2254,7 +2251,6 @@ JB_vec4_Uncos
 JB_vec4_Unsin
 JB_vec4_Up
 JB_vec4_iVec4
-JB_zalgo__Rand
 JB_zalgo__Render
 PicoCanGet
 PicoClose
