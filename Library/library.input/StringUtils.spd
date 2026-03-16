@@ -19,6 +19,14 @@ inline Print (|string?| data)
 inline PrintLine (|string?| data=nil)
 	StrPrintLine_(Data)							// to disambiguate vs macro
 
+
+/*
+inline PrintLine (|Faststring| data)
+	cpp_part PrintFS
+	StrPrintLine_(Data|string|) // breaks cake
+	data.Length = 0
+*/
+
 function Print (|cstring?| data)
 	cpp_wrapper JB_PrintCString
 
@@ -26,8 +34,8 @@ function Print (|cstring?| data)
 
 
 
-function ZalgoLine (|string| data)
-	printline data.zalgo
+function ZalgoLine (|string| data, |float| Wierdness=8)
+	printline data.zalgo(wierdness)
 
 macro ZalgoLine
 	Printline _0.render.zalgo

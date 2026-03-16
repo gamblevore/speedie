@@ -6,7 +6,7 @@ module zalgo
 		mid = #(CC95CC9BCD80CD81CD98CCA1CCA2CCA7CCA8CCB4CCB5CCB6CD8FCD9CCD9DCD9ECD9FCDA0CDA2CCB8CCB7CDA1D289)#
 		down = #(CC96CC97CC98CC99CC9CCC9DCC9ECC9FCCA0CCA4CCA5CCA6CCA9CCAACCABCCACCCADCCAECCAFCCB0CCB1CCB2CCB3CCB9CCBACCBBCCBCCD85CD87CD88CD89CD8DCD8ECD93CD94CD95CD96CD99CD9ACCA3)#
 
-	function Rand (|faststring| fs, |string| z)	
+	libinternal Rand (|faststring| fs, |string| z)	
 		|| n = z.length|float| * 0.5
 		|| i = (zalgo.R[0, n]|int|)*2
 		fs <~ z[i]
@@ -22,7 +22,7 @@ module zalgo
 				fs.zalgo(s, wierdness, scale|float|)
 
 
-function string.Zalgo (|float| Wierdness=8, |string|)
+inline string.Zalgo (|float| Wierdness=8.0, |string|)
 	return zalgo.render(self, Wierdness, nil)
 
 
