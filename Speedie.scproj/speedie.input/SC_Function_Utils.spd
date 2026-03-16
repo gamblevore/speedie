@@ -3,10 +3,6 @@
 	Speedie Internals. By Theodore H. Smith...
 */
 
-constants
-	kUsingStr = "Function here:"
-
-
 
 
 prototype fnPreReader (|scfunction| self, |message| msg, |bool|)

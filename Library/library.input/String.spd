@@ -188,7 +188,7 @@ class String
 	function UnicodeSync (|string|)
 		cpp_wrapper JB_Str_UnicodeSync
 
-	function CharCount (|int|Start=0, |int|After=int.max, |int|)
+	function LengthUTF8 (|int| Start, |int| After=int.max, |int|)
 		cpp_wrapper JB_Str_CharCount
 
 	function Preview (|int| N = 100, |string|)
@@ -449,8 +449,13 @@ class String
 		function Copy (|&nil| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
 
-		function Wrap (|cstring| Addr, |stringzeroterminated|)
+		function WrapMem (|cstring| Addr, |stringzeroterminated|)
 			disabled "Use string.new(addr)"
+
+		
+		function WrapMem (|&Byte| Addr, |string|)
+			disabled "cast to a cstring first"
+			cpp_Part fromcstr2
 
 		function FromC (|cstring| str, |stringzeroterminated|)
 			disabled "use .copy"
@@ -460,10 +465,6 @@ class String
 		
 		function FromPtr (|&nil| Addr,  |int| N,  |&nil| free = nil,  |&nil| obj = nil,  |string|)
 			cpp_wrapper JB_StrFromPtr
-		
-		function Wrap (|&Byte| Addr, |string|)
-			disabled "cast to a cstring first"
-			cpp_Part fromcstr2
 			
 		function Hash (|[string]| r, |uint64|)
 			opt norefcounts
@@ -515,7 +516,7 @@ class String
 		|| L = .length
 		return self[L-N, L]
 	
-	function Codepoint (|bool| Strict=true, |CodePoint|)
+	function CodePoint (|bool| Strict=true, |CodePoint|)
 		cpp_wrapper JB_Str_UTF8Value
 		
 	syntax Access (|ivec2| r, |string|)

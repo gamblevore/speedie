@@ -115,10 +115,10 @@ module debugger
 		|| index = .Index(Stack.code)
 		if index|uint| >= debugger.Length
 			app.quit "Code pointer escaped: " + index
-		.PrintIndex(Stack)
+		.DumpStackAtIndex(Stack)
 		
 
-	function cakevm.PrintIndex (|CakeStack| Stack)
+	function cakevm.DumpStackAtIndex (|CakeStack| Stack)
 		opt norefcounts
 		|| index = .Index(Stack.Code)
 		|| Where = debugger.SrcMap(index)

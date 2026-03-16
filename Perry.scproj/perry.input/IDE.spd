@@ -243,7 +243,7 @@ class PerryIDE (Window)
 			|| e = .editme
 			|| t = e.text
 
-			fs <~ "Chars ${t.charcount}   Lines ${t.linecount}"
+			fs <~ "Chars ${t.lengthutf8}   Lines ${t.linecount}"
 			|| msg = .EditMe.ParsedMessage
 				|| loc = msg.loc
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
@@ -332,8 +332,8 @@ class PerryIDE (Window)
 			fs <~ "byte $sel0"
 			n = sel.Length
 		  else
-			fs <~ "ch ${t.charcount(0, sel0)}"
-			n = sel.CharCount
+			fs <~ "ch ${t.lengthutf8(0, sel0)}"
+			n = sel.lengthutf8
 		if n
 			fs <~ "+"
 			fs <~ n

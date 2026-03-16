@@ -524,8 +524,14 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			.DescribeParamFail(incoming, first)
 		  else
 			error (incoming.exp, "Too many params sent to " + .RenderTitle)
-			problem (self.source,  kusingstr)
+			.ErrorIsHere
+//			problem (self.source,  kusingstr)
 
+
+function ErrorIsHere
+	opt norefcounts
+	|| n = .name
+	problem (.source, "Function $n() here:")
 
 
 function message.DefaultPrmFix (|scdecl?| Base)

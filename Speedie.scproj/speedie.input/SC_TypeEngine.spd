@@ -1187,14 +1187,6 @@ function TypeOfDot (ExprResolver)
 
 
 
-function message.ExpFunc (|scfunction|)
-	opt norefcounts
-	|| it = .unbra.last
-		|| fn = it.obj
-		if fn isa scfunction
-			return fn
-
-
 function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 	opt norefcounts
 	|| OldCount = stderr.errorcount
@@ -1203,8 +1195,8 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 		return result
 	if (oldcount == stderr.errorcount)
 		error (exp, "This expression doesn't return anything.")
-		|| it = exp.expfunc
-			problem (it.source, kUsingStr)
+		|| it = exp.unbra.msgfunc
+			it.ErrorIsHere
 			
 
 function message.BecomeSetRel

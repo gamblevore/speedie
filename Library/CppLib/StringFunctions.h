@@ -52,8 +52,8 @@ u32 JB_u8p_Read ( uint8** source );
 int JB_Str_CharCount(JB_String* self, int s, int s2);
 JB_String* JB_Str_UTF16To8(JB_String* Str, FastString* fs_in, int SrcIsBig);
 int JB_Str_BadUTF8 (JB_String* s, int err);
-int JB_u8p_ByteCount(uint8* a, int Len, int CharCount);
-u32 JB_u8_Size( uint8 FirstChar );
+int JB_Str_ByteCount (JB_String* S, int CharCount);
+u32 JB_u8_Size ( uint8 FirstChar );
 JB_String* JB_Str_Cleanse(JB_String* self, u32 Code);
 
 

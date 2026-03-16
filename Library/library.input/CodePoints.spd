@@ -56,8 +56,9 @@ datatype Codepoint (int)
 		function UTF8Read ( |$&byte| source, |Codepoint|)
 			cpp_wrapper JB_u8p_Read
 		
-		function UTF8ByteCount (|&Byte| S, |int| Len, |int| CharCount, |int|)
-			cpp_wrapper JB_u8p_ByteCount	
-		
+	
+function string.ByteCountUTF8 (|int| N, |int|)
+	description "Returns the number of bytes used by a string for N codepoints"
+	cpp_wrapper JB_Str_ByteCount	
 				
 

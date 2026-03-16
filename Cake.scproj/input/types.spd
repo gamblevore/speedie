@@ -2,6 +2,7 @@
 
 class XType
 	|XType?|		Super
+	// what about the size? we need it for memory-checking...
 	|bool|			IsObject
 	|string|		Name
 	|[XVar]|		Properties

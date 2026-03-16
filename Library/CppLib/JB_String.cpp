@@ -443,10 +443,12 @@ int JB_Str_BadUTF8 (JB_String* s, int Start) {
 
 
 // Param and return is 1 based!
-int JB_u8p_ByteCount(uint8* a, int Len, int CharCount) {
+int JB_Str_ByteCount (JB_String* S, int CharCount) {
 	if (CharCount <= 0)
 		return 0;
-
+	
+	uint8* a = S->Addr;
+	int Len = S->Length;
 	int8* s = (int8*)a;
 	int Count = 0;
 	for (int n = Len; n > 0; n--)
@@ -455,6 +457,7 @@ int JB_u8p_ByteCount(uint8* a, int Len, int CharCount) {
 
 	return Len;
 }
+
 
 int u8Count_ (uint8* a, int Len) {
 	char* s = (char*)a;	
@@ -1297,43 +1300,6 @@ JB_String* JB_Str_Hex(JB_String* s, int Spaces, FastString* fs_in) {
 	return JB_FS_SmartResult( fs, fs_in );
 }
 
-
-// bytemap should be removed. Just... do upper/lower manually!
-//static int BM_Affects_(ByteMap* BM, JB_String* s) {
-//	if (s and BM) {
-//		uint8* map = BM->Cache;
-//		uint8* a = s->Addr;
-//		int n = s->Length;
-//		for_(n) {
-//			uint8 c = a[i];
-//			if (map[c] != c) {
-//				return i;
-//			}
-//		}
-//	}
-//	return -1;
-//}
-
-//JB_String* JB_Str_MapBytes(JB_String* s, ByteMap* BM, int Clear) {
-//	if ( BM_Affects_( BM, s ) == -1 ) return s;
-//
-//	JB_String* r = JB_Str_New( s->Length );
-//
-//	uint8* map = BM->Cache;
-//	uint8* SelfPos = s->Addr;
-//	uint8* OutPos = r->Addr;
-//	int SelfLen = s->Length;
-//
-//	while ( SelfLen-- > 0 ) {
-//		uint8 C = map[ *SelfPos++ ];
-//		if (C!=Clear)
-//			*OutPos++ = C;
-//	}
-//	r->Length = (int)(OutPos - r->Addr);
-//
-//	return r;
-//}
-//
 
 JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
 	int SelfLen = JB_Str_Length(self);

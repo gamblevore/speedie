@@ -221,7 +221,7 @@ libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 				WordEnd += (self[WordEnd] > 32)
 			  else
 				WordEnd = .length min paramax
-			|| MW2 = MaxWidth - .CharCount(i, WordEnd)
+			|| MW2 = MaxWidth - .lengthutf8(i, WordEnd)
 			if MW2 < 0
 				if i == p
 					i = p + MaxWidth

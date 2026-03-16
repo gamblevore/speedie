@@ -89,30 +89,58 @@ class XVar (list)
 				fs <~ terminalcolor.normal
 	
 	
+	function DisplayString (|faststring| fs, |string| str)
+		|| n = str.Length
+		if n < 0
+			fs <~ "InvalidLength: "
+			fs <~ N
+			return
+		
+		if !n
+			fs <~ `""`
+			return
+		
+		require .testmem(fs, str.addr, n, "BadStringData")		// check string
+
+		|VirtualJBString| Skkrt
+		Skkrt.Addr = str.Addr
+		Skkrt.Length = n
+		if n > 50
+			Skkrt.length = str.ByteCountUTF8(50)				// shrink string
+		fs <~ '"'
+		fs.AppendEscape((&Skkrt)|string|)
+		fs <~ '"'
+		if n < Skkrt.Length
+			fs <~ ('.', 3)
+		
+	
 	function RenderObject (|faststring| fs, |!&ivec4| Reg)
 		opt norefcounts
-		require .TestMem(fs, reg, 8, "Bad Stack")
-		|| obj = reg|&object|[]		// this shares our classes, class tests should work!
-		require .TestObj(fs, obj)
-		
+		require .TestMem(fs, reg, 8, "BadStack")				// check register
+		|| obj = reg|&object|[]
 		if !obj
 			fs <~ "(nil)"
-		  elseif obj isa string or obj isa faststring
+			return
+
+		require .TestObj(fs, obj)								// check object is readable and sane
+		
+		
+		if obj isa string or obj isa faststring
 			|| str = obj|&nil||string|
-			if str.length
-				fs <~ '"'
-				fs.AppendEscape(str)
-				fs <~ '"'
-		  elseif obj isa Message
+			.DisplayString(fs, str)
+			return
+
+		if obj isa Message
 			if .NormalView
 				obj.RenderAST(Fs)
 			  else
 				obj.render(Fs)
-		  else
-			fs <~ "0x"
-			fs.AppendHex(obj|int64|, 8)
-			fs <~ "*"
-			fs <~ obj.refcount
+			return
+
+		fs <~ "0x"
+		fs.AppendHex(obj|int64|, 8)
+		fs <~ "*"
+		fs <~ obj.refcount
 		// Contains can contain themselves! So no deep rendering... for now. Maybe if we mark/unmark them.
 	
 	
@@ -144,6 +172,7 @@ class XVar (list)
 			return true
 		|| Err = memory.test(Mem, N)
 			return true
+				
 		fs <~ ErrName
 		fs <~ ": 0x"
 		fs.AppendHex(Mem|int64|, 8)

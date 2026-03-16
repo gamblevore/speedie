@@ -536,18 +536,23 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					Return o
 				///////
 				
-				ifn o isa SCFunction					// can it be anything other than a decl?
+				if o isa SCFunction	
+					ifn exp in @dot							// x = a.b is still a function call
+						|scdecl--| pr = o.HasProto
+							Return pr
+						|string--| err = "Using address of protoless-function: " + o.name
+						if side and !paramsarray.MacroSize
+							err = "Not assignable."
+						error (exp, err)
+						o.ErrorIsHere
+						return nil
+				  else										// can it be anything other than a decl?
 					if exp and !ParamsArray.IsDot and CurrFunc and !CurrFunc.Cls
 						if o isa scdecl					// O could be a module!
 							if (o isnt const) and (b!=compiler.program) and (b isa scmodule)  // bad?
 								error (exp, "Put a dot before this expression.")
 					return o
-				ifn exp in @dot			// x = a.b is still a function call
-					|string--| err = "Can't get the address of a function unless it has a prototype."
-					if side and !paramsarray.MacroSize
-						err = "Not assignable."
-					check (o|scfunction|.HasProto) (exp, err)
-					Return o|scfunction|.HasProto
+
 
 	if missing	// the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
 		return Missing.MacroFix( contains, arg_space, paramsarray )
