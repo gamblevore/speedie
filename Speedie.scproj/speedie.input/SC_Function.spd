@@ -1492,6 +1492,18 @@ function Tran_NotAllowed (TranFunc) // "continue"
 		error (node)
 
 
+function message.BackTrackCC (|message|)
+	opt norefcounts // goes before compiler-created stuff.
+	|| pos = .position
+	|| f = .file
+	while (|| p = .prev)
+		if  (p isnt Inserted)  or  (p.file != f) or (p.position < pos)
+			exit
+		self = p
+		
+	return self
+	
+
 function Tran_BreakPoint (TranFunc)
 	// this needs to be done early, because other things can destroy/transform messages
 	// but breakpoints are not debugger statements. Soooo... we need a new name?
@@ -1504,7 +1516,8 @@ function Tran_BreakPoint (TranFunc)
 		|| trap = @tmp.msg("breakpoint")
 		(trap is breakpoint) // hehe
 		trap.asmtype = asmtype.kdebugger
-		node.prev = trap
+		
+		node.BackTrackCC.prev = trap // go before compiler-created stuff too!
 		if options.modecpp
 			Tran_DebugAt( fn, trap, name_space )
 	return compiler.program
