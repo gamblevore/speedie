@@ -324,9 +324,11 @@ class list
 			++rz
 
 
-	function ExtractChild (||)
-		rz = .First
-		rz.parent = nil
+	inline ExtractChild (||)
+		opt norefcounts
+		|| f = .First
+		f.parent = nil
+		return f
 
 
 	syntax access (||)
@@ -528,9 +530,12 @@ class list
 
 
 	module // just for making a simple demo involving storing numbers.
-		function New (|| Parent=nil, |int| Position, |list|)
-			rz = list(parent)
-			rz.Position = Position
+		inline New (|| Parent=nil, |int| Position, |list|)
+			opt norefcounts
+			visible
+			|| List = list(parent)
+			list.Position = Position
+			return list
 
 		function Sorter (SorterComparer of list)
 			return .position < b.position
