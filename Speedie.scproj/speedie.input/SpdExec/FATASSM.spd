@@ -34,6 +34,9 @@ struct FatASM
 		.FatMap = s
 		._Const = k
 		._op = value
+	
+	setter _op (|byte|)
+		._op = value
 		
 	function InputFat (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
@@ -49,7 +52,7 @@ struct FatASM
 		return op >= asm.RD1U and op <= asm.RD16 
 	
 	function IsFunc (|bool|)
-		|| b = .baseop
+		|| b = .BaseOp
 		return b == asm.fncx or asm.fnc
 	
 	function BaseOp (|int|)
@@ -567,7 +570,7 @@ struct FatASM
 	function IsFinisher (|asmreg| Info, |bool|)
 		opt norefcounts
 		|| o = .op|asm|
-		if o == asm.ret or asm.trap or asm.TAIL or asm.rfrt or asm.halt
+		if o == asm.ret or asm.TAIL or asm.rfrt or asm.halt
 			return true
 		if o == asm.jump
 			return .jump < 0

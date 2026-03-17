@@ -168,9 +168,9 @@ class XVar (list)
 		return .TestMem(fs, obj|&nil|, -1, "Bad Object")
 	
 	
-	function TestMem (|faststring| fs,  |?&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
-		if !Mem
-			return true
+	function TestMem (|faststring| fs,  |!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
+//		if !Mem
+//			return true
 		|| Err = memory.test(Mem, N)
 			return true
 				

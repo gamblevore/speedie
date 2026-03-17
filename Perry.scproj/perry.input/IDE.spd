@@ -576,6 +576,7 @@ class PerryIDE (Window)
 		.MassSearchField.SetFocus
 		return true
 	
+	
 	function Flip (|textview| s, |bool|)
 		|| Item = .compiletabs.selected
 		if item  and  .ProductSep.isopen  and item.obj == s

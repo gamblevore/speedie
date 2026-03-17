@@ -658,9 +658,7 @@ static int ObjIsValid (JB_Object* Obj) {
 	if (TotalSize > AllowedTotal)
 		return 1002; // block itself is invalid
 
-	ReadMemory((byte*)Obj, Size);
-	
-	return 0;
+	return ReadMemory((byte*)Obj, Size);
 }
 
 

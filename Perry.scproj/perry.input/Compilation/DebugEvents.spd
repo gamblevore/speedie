@@ -21,6 +21,12 @@ datatype CompileMode (int)
 	
 
 
+function perryide.ViewRun (|bool|)
+	.UseThisView(.ViewDebugger, true)
+	.AppInfo.SetFocus
+	return true
+
+
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.

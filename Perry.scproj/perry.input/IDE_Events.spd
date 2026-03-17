@@ -211,6 +211,7 @@ function ClickedAView (GUIaction)
 	opt norefcounts
 	if self isa ButtonView
 		.ide.UseThisView(self, true)
+	return true
 
 
 function PerryIDE.UseThisView (|buttonview| btn, |bool| chng=false)

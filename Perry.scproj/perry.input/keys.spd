@@ -16,7 +16,18 @@ extend PerryIDE
 			.Editme.SetFocus	// should I just do this anyhow?
 			return .editme.__KeyDown__(key)
 
-	
+
+	function RunKey (|bool|)
+		opt norefcounts
+		|| B = .RunButton
+		if keys.shift or keys.Option
+			return PressingDebug(B)
+		if .RunCompiledApp  and  .DebugMode is CakeMode // Run key
+			return .ViewRun
+		ClickedDebug(B)
+		return true 
+
+
 	function CmdKey (|keys| key, |bool|)
 		if key is t
 			return PressingDebug(.runbutton)			
@@ -40,13 +51,7 @@ extend PerryIDE
 /			Clickedcompile(.buildbutton)
 			return true
 		if key is r
-			if keys.shift or keys.Option
-				PressingDebug(.runbutton)
-			  elseif (.RunCompiledApp  and  .DebugMode is CakeMode) // Run key
-				DebugStepRun(.RunButton)
-			  else
-				ClickedDebug(.RunButton)
-			return true
+			return .RunKey
 		if key is o
 			if keys.shift
 				clickedopenfile(self)
@@ -156,3 +161,4 @@ function PressedEditKeys (GUIKeyEvent)
 			if tabkind == 1
 				.ide.EditMeTabRetryThing = 0
 			return true
+
