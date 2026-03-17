@@ -239,7 +239,7 @@ class TextViewLine (list)
 		
 		|| LinePos = r.x2-(1+m.x1)
 		if (.text[linepos].IsTextline) or (r.x2 > m.x2)
-			sel.x2 = parent.right-1
+			sel.x2 = parent.lastright-1
 		  elseif r.x2==m.x2
 			sel.x2++
 
@@ -307,7 +307,7 @@ libinternal textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
 	require y >= 0 and y <= 1.0
 	
 	Y *= .height|float|
-	|| p = ivec2(.right - 5, .lastrect.y + Y|int|)
+	|| p = ivec2(.lastright - 5, .lastrect.y + Y|int|)
 	|| strength = .DrawScrollStrength * c.a * 0.35
 	for i in -1 to 1
 		C.a = Strength

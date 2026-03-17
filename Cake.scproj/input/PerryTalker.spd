@@ -185,7 +185,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
 
-	|| vars = debugger.VariablePrinter$
+	|| vars = debugger.VariablePrinter!
 	{
 	|| Where = debugger.SrcMap(index)
 	|| Path = Where.File						#expect (j, "MissingFile", where.filenum)
@@ -194,6 +194,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 	vars <~ fn.name
 	vars <~ "(${stack.depth-1})"
 	j.Enter(@tmp, vars|&nil||string|)
+	vars.Length = 0
 	j.AddStr(path)
 	j.AddInt(where.bytepos)
 	}
@@ -201,29 +202,48 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 	|| Locals = fn.obj|&nil||[xvar]|
 	
 	if !Count
-		vars.Length = 0
-		j.Enter
 		index -= fn.Position
+		j.Enter
 		for v in Locals
+			|| R = stack.reg0 + v.reg
 			if v contains index
-				j.Enter(@tmp, v.name)
-
-				|| Src = v.srcmap
-				j.AddStr(src.file)
-				j.AddInt(src.bytepos)
-				
-				v.RenderType(vars)
-				j.AddStr(vars|&nil||string|)
-				vars.Length = 0
-
-				|| ok = v.RenderValue(vars, Stack.reg0)
-				j.AddStr(vars|&nil||string|)
-				vars.Length = 0
-				if !ok
-					j.add(@thg, "bad")
-
-				j.exit
+				v.jbin(j, R, 0)
 		j.exit
 	j.exit
+
+
+
+function jbin.Expand (|&&byte| Obj, |int| Depth, |[xvar]| props)
+	opt norefcounts
+	.Enter
+	for v in props
+		v.jbin(self, Obj+v.position, depth)
+	.exit
+
+
+
+function xvar.Jbin (|jbin| j, |&nil| Where, |int| Depth)
+	opt norefcounts
+	j.Enter(@tmp, .name)
+
+	|| Src = .srcmap
+	j.AddStr(src.file)
+	j.AddInt(src.bytepos)
+	
+	|| vars = debugger.VariablePrinter!
+	.RenderType(vars)
+	j.AddStr(vars)
+
+	|| OK = .RenderValue(vars, Where)
+	j.AddStr(vars)
+	
+	if ok
+/		|| Props = .CanExpand(depth)
+			j.Expand(where|&&byte|[], depth+1, props)
+	  else
+		j.add(@thg, "bad")
+
+	j.exit
+
 
 

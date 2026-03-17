@@ -877,6 +877,10 @@ JB_StringC* JB_File_PathFix (JB_String* P) {
 		free((void*)Created);
 	}
 	RemovePathGarbage_(FS, PS, N);
+	if (JB_Str_IsC(P) and JB_Str_Equals(P, (JB_String*)FS, false)) {
+		FS->Length = 0;
+		return (JB_StringC*)P;
+	}
 	return (JB_StringC*)JB_FS_GetResult(FS);
 }
 

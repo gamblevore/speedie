@@ -15,7 +15,7 @@ extend_module App
 	
 	function Prefs (|config|)
 		opt norefcounts
-		|| P = ._prefs
+		|config--| P = ._prefs
 		if !P
 			|| Path = .conf("prefs")
 			if !path

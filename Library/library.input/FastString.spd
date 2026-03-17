@@ -14,8 +14,8 @@ class FastString {
 
 	|int|			Length
 	|&Byte|			ResultPtr
-	|&nil|			Dummy1
-	|&nil|			Dummy2
+	|?&nil|			Dummy1
+	|?&nil|			Dummy2
 	|int64|			WrittenLength // invisible
 	
 	|int|			Reserved

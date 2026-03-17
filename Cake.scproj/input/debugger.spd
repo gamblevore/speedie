@@ -148,6 +148,8 @@ module debugger
 
 		xtype.loadtypes R["class"]
 		.VariablePrinter = FastString(64)
+		expect .VariablePrinter
+		
 		.Globs = R["glob"]
 		.LoadFiles(R["files"].value.decompress)
 		.SrcMapStr = R["pos"]

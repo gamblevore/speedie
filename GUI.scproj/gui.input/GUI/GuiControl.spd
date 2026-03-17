@@ -224,10 +224,6 @@ class GUIControl (list)
 
 	setter Declutter (|bool|) 
 		.declutterer.fire(0.334, 0.5) = value
-
-
-//	setter DeclutterNow (|bool|) 
-//		.declutterer.value = value
 		
 		
 	inline Decluttered (|bool|)
@@ -334,7 +330,8 @@ class GUIControl (list)
 					r.drawchildren(where, Sublim, avoid)
 
 	
-	function CopyToClipboard (|object| item=nil, |bool|)
+	function CopyToClipboard (|bool|)
+		opt norefcounts
 		|| S = .getcopy
 		clipboard.text = s
 		return S
@@ -374,12 +371,9 @@ class GUIControl (list)
 			return nil
 		return .onpaste
 
-
-	libinternal CopyEvent (|GUICopyEvent|)
-		return .OnCopy
-
 	
 	libinternal CopyList (|array|)
+		opt norefcounts
 		if self isa ListView
 			return .copylist
 		if self isa textview
@@ -404,7 +398,7 @@ class GUIControl (list)
 		.sizer.g(3, self) = value[1]|controlpoint|
 	
 	libinternal GetCopy (|object?| item=nil, |string|)
-		return (.CopyEvent$)(self, item)
+		return (.oncopy$)(self, item)
 	
 	
 	syntax equals (|string| s, |bool| aware=false, |bool|)
@@ -426,9 +420,9 @@ class GUIControl (list)
 		cpp_Part SizePart
 		.sizer.g(i, self) = value
 	
-	function Right (|int|)			// these are not synced but i dont know what to do.....
-		inline
-		return .lastrect.x2			// set a controlpoint, but get a lastrect int?
+	function Right (|int|)
+		disabled "Use .lastright"
+
 	setter Left (|ControlPoint|)
 		inline
 		.size(0) = value

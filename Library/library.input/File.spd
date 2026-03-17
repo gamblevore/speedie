@@ -543,11 +543,11 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		function Prefs (|string?| name=nil, |file|)
 			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."
 			target osx
-				|| P = "~/Library/Preferences"
+				|string--| P = "~/Library/Preferences"
 			  elseif win
-				|| P = "~\AppData\Roaming" // whatever
+				|string--| P = "~\AppData\Roaming" // whatever
 			  else
-				|| P = "~/.config"
+				|string--| P = "~/.config"
 			if name
 				return P.child(Name).file
 			return P.file

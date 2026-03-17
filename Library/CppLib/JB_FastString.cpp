@@ -23,18 +23,19 @@ inline uint8 NumToHex(u32 Num) {
 }
 
 
-void JB_FS_AppendMini(FastString* fs, MiniStr S) {
+void JB_FS_AppendMem_(FastString* fs, const u8* Read, int Length) {
 	FS_SanityCheck_(fs);
 	dbgexpect(fs);
-	dbgexpect(S.Length >= 0);
+	dbgexpect(Length >= 0);
 
-    uint8* Write = JB_FS_WriteAlloc_Inline_(fs, (int)S.Length);
-    
-	if (S.Length < 8) {
-		while ( S )
-			*Write++ = S.Next();
-	} else {
-		CopyBytes(S.Addr, Write, S.Length);
+    uint8* Write = JB_FS_WriteAlloc_Inline_(fs, Length);
+    if_usual (Write) {
+		if (Length < 8) {
+			while ( Length-- > 0 )
+				*Write++ = *Read++;
+		} else {
+			CopyBytes(Read, Write, Length);
+		}
 	}
     
 	FS_SanityCheck_(fs);
@@ -107,11 +108,6 @@ JB_String* JB_FS_AppendVArg (FastString* fs_in, JB_String* Fmt, ...) {
 }
 
 
-void JB_FS_AppendMem_(FastString* fs, const uint8* s0, int Length) {
-    MiniStr S = {Length, (uint8*)s0};
-	JB_FS_AppendMini(fs, S);
-}
-
 uint8* JB_FS_WriteAlloc_(FastString* fs, int GrowBy) {
 	return JB_FS_WriteAlloc_Inline_(fs, GrowBy);
 }
@@ -145,15 +141,19 @@ JB_String* JB_FS_Copy (FastString* fs) {
     return JB_Str_CopyFromPtr(fs->ResultPtr, fs->Length);
 }
 
+
+static byte DummySpace[4];
+
 bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
     FS_SanityCheck_(fs);
-    if (NewLength == fs->Reserved) {
+    if (NewLength == fs->Reserved)
         return true;
-    }
+    
 
 	auto S = fs->Result;
 	if (!S) {
-		if (fs->ResultPtr) return false; // direct memory write.
+		auto Old = fs->ResultPtr;
+		if (Old and Old!=DummySpace) return false; // direct memory write.
 		S = JB_Incr(JB_New( JB_String ));
 		S->Addr = 0;
 		S->Length = 0;
@@ -624,6 +624,7 @@ FastString* JB_FS_Constructor(FastString* self) {
 	JB_New2(FastString);
     JB_Zero(self);
     self->IndentChar = '\t';
+    self->ResultPtr = DummySpace;
 	return self;
 }
 
@@ -636,12 +637,11 @@ FastString* JB_FS_ConstructorSize(FastString* Self, int Size) {
 }
 
 
-void JB_FS_Destructor(FastString* self) {
-	// .dispose can call this.
+void JB_FS_Destructor (FastString* self) {
+// object.dispose() doesn't exist anymore :]
     JB_FS_Flush( self );
-    JB_SetRef( self->Result, 0 );
-	JB_SetRef( self->File, 0 );
-    JB_FS_Constructor(self); // clear pointers and length
+    JB_Decr( self->Result );
+	JB_Decr( self->File );
 }
 
 

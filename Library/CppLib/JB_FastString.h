@@ -31,7 +31,7 @@ JBClass( FastString, JB_Object,
 
         /* function declarations */
 
-void JB_FS_AppendMini(FastString* fs, MiniStr S);
+//void JB_FS_AppendMini(FastString* fs, const uint8* s0, int len);
 void JB_FS_AppendMem_(FastString* fs, const uint8* s0, int len);
 void JB_FS_AppendCString(FastString* self, const char* c);
 JB_String* JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...);
