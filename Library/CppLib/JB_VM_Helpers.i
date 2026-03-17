@@ -631,6 +631,7 @@ AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, 
 	#undef Zero
 
 	stck->Code = CodePtr;
+	stck->Depth++; // noice
 	return CodePtr;
 }
 

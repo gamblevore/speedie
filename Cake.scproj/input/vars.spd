@@ -51,11 +51,25 @@ class XVar (list)
 		opt norefcounts
 		.Render(fs, nil, true, 0, false)
 	
+
+	function Wierdness
+		Disabled "Spelt wrong!"
+	
+	
+	function NilOK (|faststring| fs, |&ivec4| Reg0,  |bool|)
+		|| Ptr = (Reg0|&uint64|)[]
+		if (!Ptr and .CanBeNil) or (Ptr >= 64K)
+			return true
+		fs <~ "0x"
+		fs.AppendHex(Ptr)
+		fs <~ "!"
+	
 	
 	function RenderValue (|faststring| fs, |&ivec4| Reg0, |bool|)
 		opt norefcounts
 		|| Reg = Reg0 + .reg
-		|| C = .obj|&nil||xtype|
+		require .TestMem(fs, reg, 16, "BadStack")
+		|| C = .obj|&nil||xtype|			// should never be nil?
 		if c and c.IsObject
 			return .RenderObject(fs, reg)
 		return .RenderData(fs, reg)
@@ -67,7 +81,7 @@ class XVar (list)
 			if color
 				fs <~ terminalcolor.yellow
 			
-			|| M = fs.mark
+			|| M = fs.StreamLength
 			fs <~ "|"
 			.RenderType(fs)
 			fs <~ "|"
@@ -77,7 +91,7 @@ class XVar (list)
 			if color
 				fs <~ terminalcolor.normal
 			if TabTo
-				|| Missing = TabTo - (fs.mark - M)
+				|| Missing = TabTo - (fs.streamlength - M)
 				fs <~ (' ', missing)
 		
 		if reg0
@@ -100,7 +114,8 @@ class XVar (list)
 			fs <~ `""`
 			return true
 		
-		require .testmem(fs, addr, n, "BadStringData")			// check string
+		require .testmem(fs, addr, n, "BadString")				// check string
+			
 
 		|VirtualJBString| Skkrt
 		Skkrt.Addr = Addr
@@ -117,7 +132,7 @@ class XVar (list)
 	
 	function RenderObject (|faststring| fs, |!&ivec4| Reg, |bool|)
 		opt norefcounts
-		require .TestMem(fs, reg, 8, "BadStack")				// check register
+		require .NilOK(fs, reg)
 		|| obj = reg|&object|[]
 		if !obj
 			fs <~ "(nil)"
@@ -169,14 +184,12 @@ class XVar (list)
 	
 	
 	function TestMem (|faststring| fs,  |!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
-//		if !Mem
-//			return true
 		|| Err = memory.test(Mem, N)
 			return true
 				
 		fs <~ ErrName
 		fs <~ ": 0x"
-		fs.AppendHex(Mem|int64|, 8)
+		fs.AppendHex(Mem|int64|)
 	
 	
 	function RenderData (|faststring| fs, |!&ivec4| Reg, |bool|)
@@ -187,19 +200,15 @@ class XVar (list)
 		if (bc >= 12): bc = 16		
 		|| W = .weirdness[0]
 		
-		|| Err = "Bad Stack"
 		if W is pointer or reference
-			require .TestMem(fs, reg, 8, Err)
+			require .NilOK(fs, reg)
 			|| Ptr = Reg|&&nil|[]|int64|
 			fs <~ "0x"
 			fs.AppendHex(ptr, 2)
-			if .weirdness[1] // its a pointer to a pointer, so we don't want to render that below.
-				return true // or do we?
+			if .weirdness[1] // its a pointer to a pointer, so we don't want to render it
+				return true
 			reg = ptr|&ivec4|
-			Err = "Bad Pointer"
-
-		require .TestMem(fs, reg, bc, Err)
-		if W is pointer or reference
+			require .TestMem(fs, reg, bc, "Bad Pointer")
 			fs <~ ": "
 				
 		if t is bool

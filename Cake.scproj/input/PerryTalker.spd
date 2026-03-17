@@ -157,13 +157,13 @@ function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j)
 	
 
 function cakevm.CheckStack (|cakestack| stack, |string?|)
-	if !Memory.Test(Stack, 16):				return "StackCorrupt"
-	if stack < .basestack:					return "StackUnderflow"
+	if !Memory.Test(Stack, 16):				return "StackCorrupt!"
+	if stack < .basestack:					return "StackUnderflow!"
 	|| Depth = stack.Depth - 1
 	|| Down = stack.DestReg
-	if !Down or Down > 31:					return "StackBad"
+	if !Down or Down > 31:					return "StackBad!"
 	Stack -= Down + 1
-	if stack.Depth!=Depth:					return "StackTripped"
+	if stack.Depth>Depth:					return "StackTripped!"
 	return nil
 
 
@@ -192,7 +192,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 	
 	vars.Length = 0
 	vars <~ fn.name
-	vars <~ "()"
+	vars <~ "(${stack.depth-1})"
 	j.Enter(@tmp, vars|&nil||string|)
 	j.AddStr(path)
 	j.AddInt(where.bytepos)

@@ -170,7 +170,7 @@ class Error (Message)
 
 
 	render RenderUnix
-		|| M = fs.mark
+		|| M = fs.StreamLength
 		|| p = .path
 			if self isnt PreferNoRenderPath
 				fs <~ .path
@@ -179,7 +179,7 @@ class Error (Message)
 		if (!.LineIdentifiers(fs, P) and .node)
 			.node.render(fs)
 		
-		if fs.mark > m
+		if fs.streamlength > m
 			fs <~ " "
 		.severity.render(fs)
 		fs <~ ": "

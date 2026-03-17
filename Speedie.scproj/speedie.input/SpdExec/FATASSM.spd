@@ -377,7 +377,7 @@ struct FatASM
 				.RendaMsg(fs, 0)
 			return 
 		
-		|| M = fs.mark
+		|| M = fs.StreamLength
 		|| op = instruction.typelist[.baseop]!
 		if .baseop != asm.noop
 			if self is Const
@@ -419,10 +419,10 @@ struct FatASM
 				exit
 		
 		if (self  isa  asm.knst or asm.knsr or asm.gtab or asm.knst2 or asm.knst3)
-			.RendaKnst(fs, fs.mark-m)
+			.RendaKnst(fs, fs.StreamLength-m)
 			fs <~ ' '
 		
-		|| n = fs.mark - m
+		|| n = fs.StreamLength - m
 		if n <= 2
 			fs.length--
 			fs <~ "..."

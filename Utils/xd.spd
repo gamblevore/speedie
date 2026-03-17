@@ -35,7 +35,6 @@ function string.ColumnHex (|int| linelen, |int| chunklen, |string|)
 			fs <~ " "
 			chunkpos = 1
 		fs.AppendHex(c)
-		fs.Mark
 	
 	fs <~ (' ', sigh - (fs.length - fslen))
 	.ColumnFinish(lastout, .length, fs)

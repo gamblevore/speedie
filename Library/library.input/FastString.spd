@@ -38,7 +38,10 @@ class FastString {
 	function FreeSize (|int|)			{ cpp_wrapper JB_FS_FreeSize }
 	function FreeSize (assigns:|int|, |&byte|) {cpp_wrapper JB_FS_NeedSpare}
 
-	function StreamLength (|int|)		{ cpp_wrapper JB_FS_StreamLength }
+	function StreamLength (|int|) {
+		cpp_wrapper JB_FS_StreamLength
+		description "This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .StreamLength == .length"
+	}
 
 	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
 	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
@@ -301,14 +304,7 @@ class FastString {
 		inline
 		opt norefcounts
 		self <~ b.string
-	
-
-	function Mark (|int|)
-		// this is just the streamlength! remove it?
-		description "Returns 'The Mark'. This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .mark == .length"
-		cpp_wrapper
-
-	
+		
 	macro SyntaxAppend
 		_1.render(_0)
 		
