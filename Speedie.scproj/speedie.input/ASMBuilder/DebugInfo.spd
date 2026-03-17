@@ -8,9 +8,11 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 	self[mark] = .length - (mark + 1)
 
 
+
 function SCDecl.MiniName (|faststring| fs)
 	|| Bra = self is classobj
 	.name.MiniName(fs, Bra)
+
 
 
 function string.MiniName (|faststring| fs, |bool| IsClass)
@@ -18,32 +20,39 @@ function string.MiniName (|faststring| fs, |bool| IsClass)
 	|| n = .name
 	|| after = int.max
 	if IsClass and  n.EndsWith("data", true)
-		after = n.Length - 4						// ErrorData
+		after = n.Length - 4							// ErrorData
 	
 	|| i = n[0, "JB_", true]
 	fs.AppendRange(n, i * 3, after)
 
 
+
 function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	opt norefcounts
 	|| Mark = dd.Length
-	dd <~ '\0'						// range-length
+	dd <~ '\0'											// range-length
 	dd.AppendHInt(pos)
 	dd.AppendHInt(.Reg * (self is local))
+	
 	|| s = .source
-	|| srcmap = (s.srcmap, 0)(s)
-	dd.AppendHInt(srcmap)
+	|| SrcMap = (s.SrcMap, 0)(s)
+	dd.AppendHInt(SrcMap)
 	.MiniName(dd)
 	dd <~ '\0'
 	dd.AppendHInt(.DumpCls)
 	
-	|| T = .inner.TypeInfo & DataTypeCode.PossibleBits
+	|| PB = DataTypeCode.PossibleBits
+	|| T = .Type.TypeInfo  &  PB
+//	|| T2 = .inner.TypeInfo  &  PB
+//	if t!=t2											// seems never different
 	if .NilDeclared is Nilish
-		T |= DataTypeCode.PossibleBits+1
+		T |= PB + 1
+	
 	dd.AppendHInt(T)
 	.DumpWierdness(dd)
 	
 	dd[mark] = dd.length - (mark + 1)
+
 
 
 function FATASM.OutputDebugVars
@@ -57,6 +66,7 @@ function FATASM.OutputDebugVars
 		ty.DumpDecl(dd, .ASMIndex)
 
 
+
 function scdecl.DumpCls (|int|)
 	opt norefcounts
 	|| t = .type
@@ -64,10 +74,12 @@ function scdecl.DumpCls (|int|)
 		return (t.tableid<<1) + t.isobject
 
 
+
 function SCDecl.Wierdness (|int|)
 	rz = (self is reference) << 1
 	rz |= .pointercount > 0
 	rz |= .C_Array<<2
+
 
 
 function SCDecl.DumpWierdness (|jbin| j)
@@ -79,6 +91,7 @@ function SCDecl.DumpWierdness (|jbin| j)
 		self = .Internal$
 	
 
+
 function FatASM.CanCloseRegs (|int| R, |bool|)
 	if .Index|int| <= 0 // oof
 	|| op = ._Op
@@ -88,7 +101,8 @@ function FatASM.CanCloseRegs (|int| R, |bool|)
 		|| v = R.log2
 		if  .RegOnly(0) == v  and  .regonly(1) == v  and  .regonly(2) == 0
 			return true
-	
+
+
 	
 function Assembler.MarkVarClosed (|int| RegBits)
 	.RegDebugInfo &= ~RegBits
@@ -101,6 +115,7 @@ function Assembler.MarkVarClosed (|int| RegBits)
 	mark._Const |= RegBits
 
 
+
 function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
 	opt norefcounts
 	require (self isnt DebugVars) or (self isa asm.mark)
@@ -111,6 +126,7 @@ function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty,
 		if msg.func != @func	// fatrenderer needs @func
 			.msg = exp
 			return true
+
 
 
 function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
@@ -135,8 +151,9 @@ function SCDecl.Inner (|scdecl|)
 	opt norefcounts
 	visible
 	rz = self
-	while
-		self = .internal
-		if !self
-			exit
+	self = .internal
+	while self
+		rz = self
+		self = .Internal
+
 

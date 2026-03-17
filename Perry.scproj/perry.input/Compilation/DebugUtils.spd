@@ -87,9 +87,13 @@ function listview.Fixup (|message| NewList)
 	// but do that later.
 
 
-function ImproveVar (|message| s)
+function ImproveVar (|listviewrow| s)
 	opt norefcounts
 	s <~ (@thg, s.name) // save item
+	|| bad = (s[4] ~= "bad")
+	(s is error) = bad
+	if bad
+		Notifications <~ "Something wrong with var: " + s.name
 	
 	|| fs = VarPrinter
 	// try align to the right. assume... x chars long

@@ -1396,7 +1396,7 @@ class ListView (GUIControl) {
 		
 		.CalculateSkips
 		.DrawBorders(where, rect)
-		.drawheaders(where, rect)
+		.DrawHeaders(where, rect)
 		
 		rect.y2 += .ScrollSlide
 		{

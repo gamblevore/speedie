@@ -738,7 +738,7 @@ function ForeignFuncTest (|string?| x, |string?| y, |string|) /// /
 	|| x4 = x.Length
 	|| x5 = x._Addr
 	|| x6 = x! + y!
-	|| x7 = string.char(0xb16b00b5) // JB_Str_ChrUTF8
+	|| x7 = string.utf8(0xb16b00b5) // JB_Str_ChrUTF8
 	|| x8 = Message()
 	if x8.parent
 	x8.parent
@@ -800,7 +800,7 @@ function RefCountOpts (|message| m)
 
 function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	#!function call for freeifdead.
-	|| e = string.char(0xb16b00b5)
+	|| e = string.utf8(0xb16b00b5)
 	
 	#!all 4 combos of mem/ptr set
 	e = b  

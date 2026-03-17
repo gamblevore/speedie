@@ -121,7 +121,6 @@ role ListViewRow (message)
 		require self and !p.decluttered
 		|| w	= p.window	
 		|| z2	= rect
-		
 		|| str = p.Declutterer.Strength
 		
 		for i in n
@@ -130,6 +129,8 @@ role ListViewRow (message)
 			where.controlclip = rect.clip(p.lastrect)
 			.DrawRowColumn(rect, where,  p, depth, i, str) 
 		
+		where.controlclip = z2
+		
 		if self is active
 			where.horz	= z2.h
 			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1.0)
@@ -137,7 +138,11 @@ role ListViewRow (message)
 		if self is Disabled
 			|| c = 0.5.mix(p.GNormal.BG.Color, vec4(0.5))
 			c.a = (str * 0.7) min 1.0
-			where.DrawRect(z2 + (0,0,0,-1), c)
+			where.DrawRect(z2, c)
+
+		if self is Error
+			|| c = vec4(1.0, 0.25, 0.125, 0.2)
+			where.DrawRect(z2, c)
 		
 		if self is found
 			z2 += (0, 1, 0, 0)
@@ -181,6 +186,7 @@ role ListViewRow (message)
 	
 	module
 		function NewSeparator (|int| Pos = 0, |listviewrow|)
+			opt norefcounts
 			rz = @str + ""
 			rz.Position = Pos
 			(rz is separator)
@@ -197,7 +203,8 @@ datatype ListViewState (uint16)
 		Modified
 
 		UnSelectable = [Separator, Disabled]
-		Broken		// we tried to use the item but it failed
+		Broken		// we tried to use the item but it failed. maybe replace with "Missing"?
+		Error		// something is definitely wrong
 		Active
 
 		Editable

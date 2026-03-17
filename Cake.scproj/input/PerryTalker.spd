@@ -216,9 +216,11 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 				j.AddStr(vars|&nil||string|)
 				vars.Length = 0
 
-				v.RenderValue(vars, Stack.reg0)
+				|| ok = v.RenderValue(vars, Stack.reg0)
 				j.AddStr(vars|&nil||string|)
 				vars.Length = 0
+				if !ok
+					j.add(@thg, "bad")
 
 				j.exit
 		j.exit
