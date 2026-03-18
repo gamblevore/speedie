@@ -1662,7 +1662,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2425])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2428])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1703,7 +1703,6 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2426])
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
@@ -1802,10 +1801,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2424])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2423])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2427])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2426])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2422])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2425])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2439,17 +2438,17 @@ extern int SC__SCNodeFindMode_aaa;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2418])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2421])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2419])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2420])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2422])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2423])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2417])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2420])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2420])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2421])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2423])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2424])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2506,7 +2505,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2416])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2419])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -4145,6 +4144,8 @@ void JB_Print(JB_String* Data);
 void JB_Obj_Print(JB_Object* O);
 
 void JB_PrintLine(JB_String* Data);
+
+void JB_PrintFS(FastString* Data);
 
 void SC_RelSetOrExpansion(Message* Exp);
 
@@ -5864,6 +5865,8 @@ void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 
 
 // JB_FatASM
+void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value);
+
 ASMReg SC_FAT_ASMReg(FatASM* Self, int A);
 
 void SC_FAT_BakeBreak(FatASM* Self, uint SrcMap, uint Break);
@@ -8020,6 +8023,8 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
 JB_List* JB_Tree_WrapWith(JB_List* Self, JB_List* W);
 
+JB_List* JB_Tree__New(JB_List* Parent, int Position);
+
 
 
 // JB_µForm
@@ -8264,6 +8269,8 @@ SCFunction* SC_Msg_AutoMsgFuncFn(Message* Self);
 void SC_Msg_AvoidSafeDecr(Message* Self);
 
 void JB_Msg_Back__(Message* Self, FastString* Fs);
+
+Message* SC_Msg_BackTrackCC(Message* Self);
 
 void JB_Msg_Badj__(Message* Self, FastString* Fs);
 
@@ -8512,8 +8519,6 @@ bool SC_Msg_ExpectMatch(Message* Self, SCNode* Name_space, SCClass* With);
 Message* SC_Msg_ExpectParamsTransform(Message* Self, int P, Message* Errnode, JB_String* Type);
 
 bool JB_Msg_ExpectString(Message* Self);
-
-SCFunction* SC_Msg_ExpFunc(Message* Self);
 
 void JB_Msg_Export(Message* Self, FastString* Fs);
 
@@ -10651,6 +10656,8 @@ bool SC_Func_DoRefs(SCFunction* Self);
 void SC_Func_DotFuncToNormalFunc(SCFunction* Self, Message* Dot);
 
 bool SC_Func_EqualOrMoreSpecific(SCFunction* Self, SCFunction* F);
+
+void SC_Func_ErrorIsHere(SCFunction* Self);
 
 JB_String* SC_Func_ExportNameBuilder(SCFunction* Self, JB_String* CppPart);
 
