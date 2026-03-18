@@ -69,8 +69,8 @@ role ListViewRow (message)
 
 	libinternal HierNext  (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
-		if h is HierarchicalLast
-/			|| L = .Last.first
+		if self is expanded  and  h is HierarchicalLast
+			|| L = .Last.first
 				return L
 		if (self is expanded) or (self == root)
 			return .flatnext
@@ -156,7 +156,7 @@ role ListViewRow (message)
 		|| Cols = parent.columns
 		if cols == self
 			return self[column].name
-		if (Cols == nil) or parent.IsTree
+		if (Cols == nil) or parent._Hierarchical is Hierarchical
 			column = -1
 		return parent.TableCell(self, column)
 		

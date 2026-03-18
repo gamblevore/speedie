@@ -89,11 +89,10 @@ function listview.DebugFixup (|message| NewList)
 
 function ImproveVar (|listviewrow| s)
 	opt norefcounts
-	s <~ (@thg, s.name) // save item
-	|| bad = (s[4] ~= "bad")
-	(s is error) = bad
-	if bad
+	|| thg = s[4]
+	|| bad = (thg == @thg and "bad")
 		Notifications <~ "Something wrong with var: " + s.name
+	(s is error) = bad
 	
 	|| fs = VarPrinter
 	// try align to the right. assume... x chars long
@@ -108,8 +107,8 @@ function ImproveVar (|listviewrow| s)
 	s.name = fs
 
 	|| Fields = s.Last
-	if Fields == @arg
-		for prop in Fields
+	if fields == @arg
+		for prop.fast in Fields
 			.ImproveVar(prop)
 //		A "/usr/local/speedie/Examples/hello_world.spd" 199 "int" "1"
 //		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "FastString" "\"\""
@@ -132,13 +131,14 @@ function listviewrow.PerryCopyVar (|string|)
 }
 
 
-function PerryVariableFinder (listview.columnfinder)
+function @perry.VariableFinder (listview.columnfinder)
 	opt norefcounts
 	|| upon = self
 	if Column
 		if column == -2
-			return .PerryCopyVar()
-		upon = self[3]
+			return .PerryCopyVar
+		if column != -1
+			upon = self[3]
 	if value == nil
 		return upon.name
 	if upon

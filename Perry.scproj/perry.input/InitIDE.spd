@@ -356,13 +356,13 @@ extend PerryIDE
 			self.AddDebugButtons(DebugStepRun,  "\02\02", "Run")
 
 
-		with .variables // not showing up anymore?
+		with .variables
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
 			.Columns = "Name {min 60, pc 40}, Value {min 160, pc 80}"
-			.ColumnFinder = PerryVariableFinder
-			.Hierarchical = listviewhierarchy.HierarchicalLast
+			.ColumnFinder = &Perry.VariableFinder
+			.Hierarchical = ListViewHierarchy.HierarchicalLast
 			.IsMainListView = true
 			.MultiSelection = true
 			.UseColorScheme	= true

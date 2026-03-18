@@ -213,9 +213,9 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 
 
 
-function jbin.Expand (|&byte| Obj, |int| Depth, |[xvar]| props)
+function jbin.Expand (|&byte| Obj, |int| Depth, |[xvar]| props, |string| name)
 	opt norefcounts
-	.Enter
+	.Enter(@arg, name)
 	for v in props
 		v.Describe(self, Obj+v.position, depth)
 	.exit
@@ -239,7 +239,7 @@ function xvar.Describe (|jbin| j, |&nil| Where, |int| Depth)
 	
 	if ok
 		|| Props = .CanExpand(depth)
-			j.Expand(where|&&byte|[], depth+1, props)
+		j.Expand(where|&&byte|[], depth+1, props, .name)
 	  else
 		j.add(@thg, "bad")
 

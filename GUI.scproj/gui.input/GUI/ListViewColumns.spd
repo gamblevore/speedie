@@ -5,6 +5,9 @@
 
 extend_module ListView
 	prototype ColumnFinder (|ListViewRow| self, |int| Column=-1, assigns:|string?| Value=nil, |string|)
+		description "Column -1 means the row's name (if hierarchical or single-column)
+Column -2 means the CopyID, which can be the same as the Name if needed.
+Column 0 is meant to mean the first item... but it could mean the row itself if none-exist."
 
 
 function ListViewRow.Cell (|int| Column=-1, |listview.columnfinder?| fn, assigns:|string?| Value=nil, |string|)
@@ -30,7 +33,6 @@ role ListViewCell (message)
 		
 	syntax cast (|string|)
 		disabled "just get the value"
-		return self$.value
 		
 	function Step (|int| i, |ListViewcell|)	
 		inline
@@ -38,6 +40,7 @@ role ListViewCell (message)
 		
 	function Step (|int| i, |int| col, |ListViewcell|)
 		cpp_Part StepCol
+		opt norefcounts
 		|| c = .row.move(i)
 			return c.cell(col)
 
@@ -54,6 +57,7 @@ role ListViewCell (message)
 		return .row.cell(n)
 
 	function listviewrow.Cell (|int| i=0, |ListViewCell|)
+		opt norefcounts
 		rz = Message()
 		rz.obj = self
 		rz.position = i
