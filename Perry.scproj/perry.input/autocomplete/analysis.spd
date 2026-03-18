@@ -59,7 +59,7 @@ function PerryIDE.ImproveFuncList (|message| result)
 	|message| p0
 	for s.fast in result
 		|| p = s[@nil][@nil]
-			if !p0 or !p.ShallowEquals(p0, true)
+			if !p.ShallowEquals(p0, true)
 				|| d = listviewrow()
 				d.name = p.name.funclistsep
 				(d is Separator)

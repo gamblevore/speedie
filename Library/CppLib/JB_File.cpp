@@ -846,6 +846,10 @@ void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
 
 JB_StringC* JB_File_PathFix (JB_String* P) {
 // creates c-strings.
+// might be nicer to instead... have a "path is clean" function
+// if so... KEEP IT. Rather than create a string and only use it if its different
+// faster
+
 	int N = JB_Str_Length(P);
 	if (!N) return (JB_StringC*)P;
 	if (N >= PATH_MAX) {

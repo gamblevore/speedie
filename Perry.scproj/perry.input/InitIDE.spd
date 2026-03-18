@@ -362,7 +362,7 @@ extend PerryIDE
 			isnt DrawsFocus
 			.Columns = "Name {min 60, pc 40}, Value {min 160, pc 80}"
 			.ColumnFinder = &Perry.VariableFinder
-			.Hierarchical = ListViewHierarchy.HierarchicalLast
+			.Hierarchical = ListViewHierarchy.Last
 			.IsMainListView = true
 			.MultiSelection = true
 			.UseColorScheme	= true

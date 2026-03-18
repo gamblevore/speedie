@@ -729,12 +729,18 @@ Message is also:
 
 	function FuncName (|string|)
 		return .Func.LongName.lowercase
-		
+	
+	
 	inline Length (|int|)
 		return .name.length
 	
+
 	function ShallowEquals (|message| B, |bool| Aware=false, |bool|)
-		return (.func == b.func) and .name.syntaxequals(b.name, aware)
+		if !self
+			return !B
+		if B
+			return (.func == b.func) and .name.syntaxequals(b.name, aware)
+
 	
 	function DeepEquals (|message?| B, |bool| Aware=false, |bool|)
 		opt norefcounts
@@ -743,13 +749,10 @@ Message is also:
 		|| A2 = .FlatAfter
 		|| B2 = b.FlatAfter
 		while
-			|| ADone = A==A2
-			|| BDone = B==B2
-			if ADone And BDone
+			if A==A2 and B==B2
 				return true
 
-			if (ADone!=BDone) or (!a!.ShallowEquals(b!, aware))
-				return false
+			require a.ShallowEquals(b, aware)
 				
 			A = A.flatnext
 			b = b.flatnext

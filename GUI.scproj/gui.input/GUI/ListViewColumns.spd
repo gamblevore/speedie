@@ -143,3 +143,20 @@ extend ListView
 		return 1
 
 
+function message.TableCell (|int| Column=-1, assigns:|string?| Value = nil, |string|)
+	description "Column -1 means the row's name (if hierarchical or single-column)
+Column -2 means the CopyID, which can be the same as the Name if needed.
+Column 0 is meant to mean the first item... but it could mean the row itself if none-exist."
+	opt norefcounts
+	real self
+//	if .root.name == "FoundList"
+	|| ch = self
+	if column >= 0
+		ch = self[Column]
+		if !ch
+			ch = self
+	if value == nil // get
+		return ch.name
+	ch.name = value	// set
+
+

@@ -81,8 +81,48 @@ function SetAppInfo
 	.appinfo.text = s
 	
 
-function listview.DebugFixup (|message| NewList)
+function listviewrow.DebugMatch (|listviewrow| New, |int| Ch,  |bool|)
+	opt norefcounts
+	return New[Ch].ShallowEquals(self[Ch])
+
+
+function listviewrow.DebugUpdate (|listviewrow| N, |bool|)
+	opt norefcounts
+	for i in 3
+		require .DebugMatch(N,i)
+
+	|| O3 = self[3]
+	|| N3 = N[3]
+	if O3 and N3
+		O3.name = N3.name // update value
+		return true
+
+ignore
+	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" 146
+		fs "/usr/local/speedie/Examples/hello_world.spd" 89 "FastString" "\"Start:\\n\""
+
+function listview.DebugFixup (|listviewrow| NewList)
+	.ListSource.DebugFixup(newlist)
 	.ListSource = NewList
+
+
+// figure out the rest later. we need to deal with inserted/removed items
+// or maybe not? the position wont match up???
+
+function listviewrow.DebugFixup (|listviewrow| NewList)
+	opt norefcounts
+/	|| O = .first
+	|| N = NewList.first
+	while O and N
+		if !O.DebugUpdate(N)
+			O.ReplaceWith(N)
+		|| argO = O.Last
+		|| argN = N.Last
+		if argO == @arg and argn == @arg
+			
+		O++
+		N++
+	
 	// we also want to try to keep older items... so replacing messages with the updated content...
 	// but do that later.
 
@@ -116,10 +156,9 @@ function ImproveVar (|listviewrow| s)
 
 function message.PerryAppendMsg (|int| Item, |string| s)
 	opt norefcounts
-	|| v = VarPrinter!
-	v <~ s
+	VarPrinter <~ s
 	|| ch = self[item]
-		v <~ ch.name
+		VarPrinter <~ ch.name
 
 
 function listviewrow.PerryCopyVar (|string|)

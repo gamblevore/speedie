@@ -69,9 +69,9 @@ role ListViewRow (message)
 
 	libinternal HierNext  (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
-		if self is expanded  and  h is HierarchicalLast
+		if self is expanded  and  h is Last
 			|| L = .Last.first
-				return L
+			return L
 		if (self is expanded) or (self == root)
 			return .flatnext
 		return .next ?? .flatafter
@@ -238,8 +238,12 @@ datatype ListViewSelectMode (uint)
 
 datatype ListViewHierarchy (int8)
 	constants
-		Hierarchical = -1
-		HierarchicalLast = -2
+		Flat = 0
+		Hierarchical = -1		// a normal tree, we are the container.
+		Last = -2				// our last item is used as the container
+		First = 1
+		Second = 2
+								
 
 	syntax is (|ListViewHierarchy| s, |bool|)
 		inline
@@ -254,7 +258,7 @@ extend ListView
 	setter Hierarchical (|bool|)
 		inline
 		cpp_part HierBool
-		._Hierarchical = value|int|
+		._Hierarchical = -value|int|
 
 	setter Hierarchical (|listviewhierarchy|)
 		inline

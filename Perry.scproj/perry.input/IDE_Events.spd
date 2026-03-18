@@ -280,6 +280,7 @@ function PerryIDE.BatchPhind (|string| text,  |bool| DoReplace, |uint| ID,  |boo
 	opt norefcounts
 	.foundlist.clear
 	|| f = .FoundList.ListSource
+	f.name = "FoundList"
 	f.clear
 	.filelist.BatchFind(text, DoReplace, f, ID)
 	.foundlist.setfocus

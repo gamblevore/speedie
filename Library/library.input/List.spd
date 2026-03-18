@@ -153,7 +153,7 @@ class list
 
 	operator contains (|| r, |bool|)
 		opt norefcounts
-		for s.up in r
+		for s.up in r		
 			if s == self
 				return true
 

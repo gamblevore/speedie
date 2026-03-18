@@ -122,7 +122,7 @@ class TextViewLine (list)
 		require !parsedok
 
 		|| r = .text.Parse
-			.msgpos = .position
+			.msgpos = .position // msgpos seems unused? remove it?
 			r.addpos(.position)
 			.ColoriseSub(r)
 			is fakemsg
@@ -366,6 +366,11 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 		|| P = (x-(4+font.width), y)
 		|| TLine = d.tline
 		|| pr = d.prev
+
+		|| m = d.message
+		if !m or m == @arg // hmmm
+			lc.a = lc.a >> 1
+
 		if !pr or (tline != pr.tline)
 			|| F = font.small!
 			while
