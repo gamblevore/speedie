@@ -213,7 +213,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 
 
 
-function jbin.Expand (|&&byte| Obj, |int| Depth, |[xvar]| props)
+function jbin.Expand (|&byte| Obj, |int| Depth, |[xvar]| props)
 	opt norefcounts
 	.Enter
 	for v in props
@@ -234,7 +234,7 @@ function xvar.Jbin (|jbin| j, |&nil| Where, |int| Depth)
 	.RenderType(vars)
 	j.AddStr(vars)
 
-	|| OK = .RenderValue(vars, Where)
+	|| OK = .RenderValue(vars, Where, depth == 0)
 	j.AddStr(vars)
 	
 	if ok

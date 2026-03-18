@@ -542,6 +542,7 @@ datatype ivec2
 		return (-.y, .x)
 		
 	render
+		opt norefcounts
 		fs <~ "(${.x}, ${.y})"
 	
 	
@@ -567,6 +568,7 @@ datatype ivec2
 
 datatype vec2
 	render
+		opt norefcounts
 		fs <~ "(${.x}, ${.y})"
 
 	inline iVec2 (|ivec2|)

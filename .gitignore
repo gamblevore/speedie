@@ -53,3 +53,4 @@ Speedie.scproj/.strings.txt
 *.cake
 /Documentation/CppComparison/*
 Terminal/Cake
+GameExamples/tetris.spd.pref

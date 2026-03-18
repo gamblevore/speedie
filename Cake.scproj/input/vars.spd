@@ -58,8 +58,9 @@ class XVar (list)
 		Disabled "Spelt wrong!"
 	
 	
-	function NilOK (|faststring| fs, |&nil| Reg0,  |bool|)
-		|| Ptr = (Reg0|&uint64|)[]
+	function NilOK (|faststring| fs, |&nil| Where,  |bool|)
+		require .TestMem(fs, Where, 8, "Unreadable")
+		|| Ptr = (Where|&uint64|)[]
 		if (!Ptr and .CanBeNil) or (Ptr >= 64K)
 			return true
 		fs <~ "0x"
@@ -75,13 +76,14 @@ class XVar (list)
 					return C.Properties
 
 		
-	function RenderValue (|faststring| fs, |&nil| Reg, |bool|)
+	function RenderValue (|faststring| fs, |&nil| Where, |bool| IsReg, |bool|)
 		opt norefcounts
-		require .TestMem(fs, reg, 16, "BadStack")
+		if IsReg
+			require .TestMem(fs, Where, 16, "BadStack") // we still need to check for readability, though!
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
-			return .RenderObject(fs, reg)
-		return .RenderData(fs, reg)
+			return .RenderObject(fs, Where)
+		return .RenderData(fs, Where)
 
 
 	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo, |bool| Color)
@@ -106,7 +108,8 @@ class XVar (list)
 		if reg0
 			if color
 				fs <~ terminalcolor.red
-			.RenderValue(fs, reg0)
+			|| reg = reg0 + .reg
+			.RenderValue(fs, reg, true)
 			if color
 				fs <~ terminalcolor.normal
 	
@@ -212,14 +215,17 @@ class XVar (list)
 		if W is pointer or reference
 			require .NilOK(fs, reg)
 			|| Ptr = Reg|&&nil|[]|int64|
+			if !ptr
+				fs <~ "(nil)"
+				return true
 			fs <~ "0x"
 			fs.AppendHex(ptr, 2)
 			if .weirdness[1] // its a pointer to a pointer, so we don't want to render it
 				return true
 			reg = ptr|&ivec4|
-			require .TestMem(fs, reg, bc, "Bad Pointer")
 			fs <~ ": "
 				
+		require .TestMem(fs, reg, bc, "UnReadable")
 		if t is bool
 			fs <~ (reg|&bool|)[].string
 		  elseif t isnt Floating
