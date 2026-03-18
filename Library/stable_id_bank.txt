@@ -332,7 +332,6 @@ GUI_Key__Option
 GUI_Key__PlatCmd
 GUI_Key__Reset
 GUI_Key__Shift
-GUI_LV_AppendMenuItem
 GUI_LV_Clear
 GUI_LV_ClearSearch
 GUI_LV_ColumnsSet
@@ -387,7 +386,6 @@ GUI_LV_SelectShift
 GUI_LV_SelectableCount
 GUI_LV_SetColumnsMsg
 GUI_LV_Show
-GUI_LV_Start
 GUI_LV_StopFilter
 GUI_LV_SyntaxAppend
 GUI_LV_TableCellRow
@@ -425,6 +423,7 @@ GUI_Msg_EndsBefore
 GUI_Msg_FlatRange
 GUI_Msg_StartsAfter
 GUI_Msg_StartsBefore
+GUI_Msg_TableCellSet
 GUI_Note__CheckForDisappear
 GUI_Note__Clicked
 GUI_Note__ClickedAt
@@ -484,9 +483,6 @@ GUI_Row_Constructor
 GUI_Row_ConstructorNamed
 GUI_Row_Depth
 GUI_Row_FileSort
-GUI_Row_HierEnd
-GUI_Row_HierNext
-GUI_Row_HierPrev
 GUI_Row_NextSelected
 GUI_Row_Remove
 GUI_Row_SyntaxIsSet
@@ -1107,10 +1103,8 @@ JB_FS_AppendByte
 JB_FS_AppendCString
 JB_FS_AppendDoubleAsText
 JB_FS_AppendDoubleAsText0
-JB_FS_AppendDoubles
 JB_FS_AppendDurr
 JB_FS_AppendEscape
-JB_FS_AppendFloats
 JB_FS_AppendHInt
 JB_FS_AppendHex
 JB_FS_AppendHex3
@@ -1120,11 +1114,9 @@ JB_FS_AppendIndent
 JB_FS_AppendInfo
 JB_FS_AppendInfoFloat
 JB_FS_AppendInfoNum
-JB_FS_AppendInt64s
 JB_FS_AppendInteger
 JB_FS_AppendInteger64
 JB_FS_AppendIntegerAsText
-JB_FS_AppendInts
 JB_FS_AppendJoin
 JB_FS_AppendLocalTime
 JB_FS_AppendLower
@@ -1153,7 +1145,6 @@ JB_FS_Last
 JB_FS_Length
 JB_FS_LengthSet
 JB_FS_LineIndent
-JB_FS_Mark
 JB_FS_MsgErrorName
 JB_FS_NeedSpare
 JB_FS_PadTo
@@ -1449,7 +1440,6 @@ JB_Msg_SyntaxIs
 JB_Msg_SyntaxIsSet
 JB_Msg_SyntaxUsing
 JB_Msg_SyntaxUsingComplete
-JB_Msg_TableCellSet
 JB_Msg_UnEmbedStr
 JB_Msg_Validate
 JB_Msg_Value
@@ -1970,7 +1960,6 @@ JB_byte_OperatorEq
 JB_byte_Render
 JB_byte_UpperCase
 JB_config_ConfFirst
-JB_config_Path
 JB_config_Save
 JB_config__Create
 JB_cstring_Copy
