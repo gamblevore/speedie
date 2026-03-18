@@ -12,7 +12,7 @@ class MessageView (ListView)
 		.onrightclick		= RightClickJeeboxView
 		.ondrawrow			= InsideJeeboxViewRowDraw
 		.tryeditcell		= JeeboxViewRenamer
-		.IsTree	= true
+		.Hierarchical		= true
 		.GNormal.Seps = 0
 		.EnableDrag	
 	

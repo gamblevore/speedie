@@ -298,7 +298,7 @@ extend PerryIDE
 			.Columns = ListViewRow("", listviewstate.aligncenter)
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
-			.IsTree			= true
+			.Hierarchical	= true
 			.tooltip		= self.SearchArea.Tooltip			
 			.KeepOneSelected = true
 			.UseColorScheme	= true
@@ -362,6 +362,7 @@ extend PerryIDE
 			isnt DrawsFocus
 			.Columns = "Name {min 60, pc 40}, Value {min 160, pc 80}"
 			.ColumnFinder = PerryVariableFinder
+			.Hierarchical = listviewhierarchy.HierarchicalLast
 			.IsMainListView = true
 			.MultiSelection = true
 			.UseColorScheme	= true
@@ -630,7 +631,7 @@ extend PerryIDE
 		
 	function SetupLogArea
 		|| g = .CommsLogList
-		g.istree = true
+		g.Hierarchical = true
 		g.id = "log"
 		require !app.prefs["nolog"]
 		g.gnormal.seps = g.gnormal.bg

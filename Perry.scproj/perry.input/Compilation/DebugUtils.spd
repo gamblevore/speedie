@@ -81,7 +81,7 @@ function SetAppInfo
 	.appinfo.text = s
 	
 
-function listview.Fixup (|message| NewList)
+function listview.DebugFixup (|message| NewList)
 	.ListSource = NewList
 	// we also want to try to keep older items... so replacing messages with the updated content...
 	// but do that later.
@@ -106,6 +106,11 @@ function ImproveVar (|listviewrow| s)
 	fs <~ s[2].name
 	fs <~ "|"
 	s.name = fs
+
+	|| Fields = s.Last
+	if Fields == @arg
+		for prop in Fields
+			.ImproveVar(prop)
 //		A "/usr/local/speedie/Examples/hello_world.spd" 199 "int" "1"
 //		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "FastString" "\"\""
 
@@ -143,7 +148,7 @@ function PerryVariableFinder (listview.columnfinder)
 extend perryide {	
 function ShowDebugVars (|message| v)
 	opt norefcounts
-	.Variables.Fixup(v)
+	.Variables.DebugFixup(v)
 	for s in v
 		.ImproveVar(s)
 	v.Remove // make owner easier to deal with
@@ -155,7 +160,7 @@ function UpdateStack (|message| stack)
 //	|| info = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
 
-	.stack.Fixup(arg)
+	.stack.DebugFixup(arg)
 	
 	for m in Arg
 		|| l = m.Last

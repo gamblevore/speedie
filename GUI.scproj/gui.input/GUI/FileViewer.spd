@@ -37,7 +37,7 @@ class FileViewer (ListView)
 
 
 	function Init
-		.IsTree	= true
+		.Hierarchical = true
 		.gnormal.seps = 0
 		.EnableDrag
 		with .quickopen

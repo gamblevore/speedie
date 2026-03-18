@@ -33,7 +33,6 @@ class FileRow (ListViewRow)
 		.lastfilecount = r.lastfilecount
 		.DoesntExist = r.DoesntExist
 		.InMainProj = r.InMainProj
-		is hierarchical
 	
 	constructor (|string| path, |string| name, |string| DirFile="")
 		.func		= @file
@@ -47,7 +46,6 @@ class FileRow (ListViewRow)
 		if path and !.asdir
 			.lastsize = path.File.Size
 		.lastfilecount = (!.asdir)|int|
-		is hierarchical
 	
 
 	render

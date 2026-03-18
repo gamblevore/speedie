@@ -52,33 +52,31 @@ role ListViewRow (message)
 				rz |= 1
 
 
-	function HierEnd (|listviewrow| root, |bool| searchall = false, ||)
+	libinternal HierEnd (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
 		rz = self
-		while searchall or (rz is expanded) or (rz == root)
+		while (rz is expanded) or (rz == root)
 			rz = rz.last		#loop
 
 
-	function HierPrev (|listviewrow| root, |bool| searchall=false, || )
+	libinternal HierPrev (|listviewrow| root, |listviewhierarchy| H, || )
 		opt norefcounts
 		|| p = .Prev
-			return p.hierend(root, SearchAll)
+			return p.hierend(root, H)
 		p = .parent
 		return (nil, p)(p == root)
 
 
-	function HierNext  (|listviewrow| root, ||)
+	libinternal HierNext  (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
+		if h is HierarchicalLast
+/			|| L = .Last.first
+				return L
 		if (self is expanded) or (self == root)
 			return .flatnext
 		return .next ?? .flatafter
 					
 		
-	function RemoveQuietly (|listview| lv)
-		inline
-		.remove(lv, false)
-	
-	
 	function Remove (|listview| lv, |bool| Update=true)
 		if (lv)
 			lv.removerow(self, Update)
@@ -210,7 +208,6 @@ datatype ListViewState (uint16)
 		Editable
 		Expanded
 		Found
-		Hierarchical
 		
 		Hidden
 		
@@ -218,6 +215,7 @@ datatype ListViewState (uint16)
 		(Hidden)
 		inline
 		return self & s
+
 
 
 datatype ListViewSelectMode (uint)
@@ -235,5 +233,47 @@ datatype ListViewSelectMode (uint)
 	syntax is (|ListViewSelectMode| s, |bool|)
 		inline
 		return (self|uint| & s|uint|) == s
+
+
+
+datatype ListViewHierarchy (int8)
+	constants
+		Hierarchical = -1
+		HierarchicalLast = -2
+
+	syntax is (|ListViewHierarchy| s, |bool|)
+		inline
+		return self == s
+
+
+
+extend ListView
+	inline Istree (|bool|)
+		return ._Hierarchical
+	
+	setter Hierarchical (|bool|)
+		inline
+		cpp_part HierBool
+		._Hierarchical = value|int|
+
+	setter Hierarchical (|listviewhierarchy|)
+		inline
+		._Hierarchical = value
+	
+	libinternal HierStep (|ListViewrow| l, |bool| Forward, |ListViewrow|)
+		opt norefcounts
+		if L
+			|| H = ._Hierarchical
+				|| root = .ListSource
+				if Forward
+					return l.hiernext(root, H)
+				  else
+					return l.hierprev(root, H)
+			  else
+				if Forward
+					return l.next
+				  else
+					return l.prev
+
 
 

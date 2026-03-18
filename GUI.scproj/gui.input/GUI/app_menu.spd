@@ -83,7 +83,7 @@ class AppMenu (Window)
 				app.showurl(it)
 				return 
 			if self isa listview
-				menu.removequietly(self)
+				menu.remove(self, false)
 			beep "No help available."
 		
 		

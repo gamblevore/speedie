@@ -3,7 +3,7 @@
 datatype SCNodeType (byte)
 	linkage
 		numeric false
-	constants (
+	constants
 		|SCNodeType|
 		Module = 0	// not actually a type
 		DataType
@@ -11,7 +11,7 @@ datatype SCNodeType (byte)
 		ProtoType	// hasptr
 		Object		// hasptr
 		Pointer		// hasptr
-	)   // carrays are on decls, not on types.
+	   // carrays are on decls, not on types.
 	
 	syntax is (|SCNodetype| d, |bool|)
 		return self == d

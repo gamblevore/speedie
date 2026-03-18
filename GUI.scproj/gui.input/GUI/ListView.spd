@@ -7,7 +7,7 @@ class ListView (GUIControl) {
 	|bool|							UseColorScheme
 
 	|bool|							IsMainListView
-	|bool|							IsTree
+	|ListViewHierarchy|				_Hierarchical
 
 	|int|							ScrollShift
 	|bool|							RightClickSelects
@@ -191,12 +191,18 @@ class ListView (GUIControl) {
 	libinternal Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
 		opt norefcounts
 		if orig == gone
-			return .sib(orig)
+			return .HierNext(orig) ?? .hierPrev(orig)
 		return orig
 	
-	
-	libinternal Sib (|ListViewrow| r, |ListViewrow|)
-		return .HierNext(r) ?? .hierPrev(r)
+
+	libinternal HierNext (|ListViewrow| l, |ListViewRow|)
+		opt inline
+		return .HierStep(l, true)
+
+
+	libinternal HierPrev (|ListViewrow| l, |ListViewrow|)
+		opt inline
+		return .HierStep(l, false)
 	
 	
 	libinternal CheckRemoved (|ListViewrow| r)
@@ -448,7 +454,7 @@ class ListView (GUIControl) {
 	libinternal JumpFind (|string| s, |listviewrow|)
 		opt norefcounts
 		for r.toplist in self
-			if (r isnt UnSelectable) and listview.pf(r.name)[0, s]
+			if (r isnt UnSelectable) and r.JumpFindMatch(s)
 				return r
 
 
@@ -521,17 +527,8 @@ class ListView (GUIControl) {
 		debug_require s != .listsource
 		.scrollstart = s
 		.ExpandParents(s)
-//		.checkdrawupdate
 		if ._isediting and (s and !.InView(s))
 			.ClearEdits
-
-
-//	function VisContains (|ListViewRow| s, |bool|)
-//		opt norefcounts
-//		require s
-//		for r.visible in self
-//			if r == s
-//				return true
 
 
 	function InView (|ListViewRow!| s, |bool|)
@@ -552,7 +549,7 @@ class ListView (GUIControl) {
 		for .VisibleRowsGap
 			if last == s
 				s = nil
-			last = .hierstep(last, false) #loop
+			last = .hierPrev(last) #loop
 		if !s
 			.scrollset(last)
 	
@@ -566,16 +563,16 @@ class ListView (GUIControl) {
 			c = p
 	
 	
-	libinternal FoundSep (|ListViewrow| m, |ListViewrow| before, |int|dir, |bool|)
+	libinternal FoundSep (|ListViewrow| m, |ListViewrow| before, |int| dir, |bool|)
 		opt norefcounts
-		|| answer = false
+		|| Found = false
 		while
 			m = .hierstep(m, dir>0)
 			if m == before
-				return answer
+				return Found
 			require m
 			if m is Separator
-				answer = true
+				Found = true
 			
 
 	libinternal CanBasicRowDragOne (|ListViewrow| s, |ListViewrow| before, |bool|)
@@ -787,14 +784,14 @@ class ListView (GUIControl) {
 			if l is selected
 				return l
 			l = .hierPrev(l)
-//		if !NoChange
-//			return .OneAlways
 			
 		
 	libinternal End (|ListViewrow|)
 		opt norefcounts
 		|| li = .listsource 
-		return (li.hierend(li), li.last)(.IsTree)
+		|| H = ._Hierarchical
+			return li.hierend(li, H)
+		return li.Last
 	
 	libinternal Edge (|int|i, |bool| Selectable=false, |ListViewrow|)
 		opt norefcounts
@@ -804,41 +801,32 @@ class ListView (GUIControl) {
 				rz = rz.step(i <= 0)
 		
 	autogen Start (|ListViewrow|)
+		inline
 		return .listsource.first
 	
 	libinternal SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
 		opt norefcounts
-		|| root = .listsource
 		if !fwd
-			return l.hierprev(root) ?? .end
-		if l != root // compare to .list? instead?
-			(l is expanded) // might as well
-		return l.hiernext(.listsource) ?? .start
-	libinternal HierNext (|ListViewrow| l, |ListViewRow|)
-		if l
-			return (l.hiernext(.listsource), l.next)(.istree)
-	libinternal HierPrev (|ListViewrow| l, |ListViewrow|)
-		if l
-			return (l.hierprev(.listsource), l.prev)(.istree)
-	libinternal HierStep (|ListViewrow| l, |bool|fwd, |ListViewrow|)
-		if fwd
-			return .Hiernext(l)
-		return .hierprev(l)
+			return .HierPrev(l) ?? .end
+		if l != .listsource
+			(l is expanded)
+		return .HierNext(l) ?? .start
+	
 	
 	libinternal BMove (|ListViewrow| l, |int| Req, |ListViewrow|)
 		opt norefcounts
 		rz = l
 		|| n = req.abs
 		while n > 0 
-			l = .hierstep(l, req > 0) #loop
-			if l isnt UnSelectable // skip as if non-existing
+			l = .hierstep(l, req > 0)			#loop
+			if l isnt UnSelectable				// skip as if non-existing
 				rz = l
 				n--
 
 
 	function NextSearch (|ListViewRow| curr, |ListViewRow|)
 		opt norefcounts
-		|| dir = !keys.shift				// can do this backwards... if we want.
+		|| dir = !keys.shift					// can do this backwards... if we want.
 		
 		curr ?= .start
 		|| Start = curr
@@ -908,11 +896,6 @@ class ListView (GUIControl) {
 		disabled "Do you mean .FirstSelected or .LastSelected?"
 	
 	
-//	inline FirstSelected (|ListViewRow|)
-//		cpp_name FirstSelected0
-//		return .FirstSelected(false)
-	
-	
 	function FirstSelected (|ListViewRow|)
 		// changing the selection here is kinda... sussy.
 		// we should have two functions... I think.
@@ -925,17 +908,6 @@ class ListView (GUIControl) {
 			if l is selected
 				return l
 			l = .HierNext(l)
-
-//		if !NoChange
-//			return .OneAlways
-
-
-//	libinternal OneAlways (|ListViewRow|)
-//		opt norefcounts
-//		if .onealwaysselected
-//			|| it = .start
-//				.Select(it)
-//				return it
 
 
 	function SelectAll (|bool|)
@@ -1243,19 +1215,25 @@ class ListView (GUIControl) {
 		return (B down .lastbottom) left .lastleft 
 
 
-	libinternal DrawBordersSub2 (|image| Where, |ivec4| Rect, |ivec4| z2, |listviewRow| R, |int| NRows,  |ivec4|)
+	libinternal DrawRowBorders (|image| Where, |ivec4| Rect, |ivec4| z2, |listviewRow| R, |int| NRows,  |ivec4|)
 		opt norefcounts
 		while R and nrows >= 1
-			|| n = .ColumnsToDraw
-			for i in n
-				z2.horz = .ColumnBounds(i, rect, r)
-				if r.next
-					r.DrawDividerH(z2, where, i)
-				r.DrawDividerV(z2, where)
-
-			z2 = z2 down .rowheight
+			z2 = .DrawOneRowBorders(where, rect, z2, R)
 			R = .Hiernext(R)
 			--nrows
+		return z2
+
+
+	libinternal DrawOneRowBorders (|image| Where, |ivec4| Rect, |ivec4| z2, |listviewRow| R,  |ivec4|)
+		opt norefcounts
+		|| n = .ColumnsToDraw
+		for i in n
+			z2.horz = .ColumnBounds(i, rect, r)
+			if r.next
+				r.DrawDividerH(z2, where, i)
+			r.DrawDividerV(z2, where)
+
+		z2 = z2 down .rowheight
 		return z2
 		
 		
@@ -1269,8 +1247,8 @@ class ListView (GUIControl) {
 			|| c = .Columns
 			if c and c isnt hidden
 				Where.MarkLineH(z2.x1y2, z2.width, 1)
-				z2 = .DrawBordersSub2(where, rect, z2, c, 1)
-			.DrawBordersSub2(where, rect, z2, ._scrollstart, .visiblerows)
+				z2 = .DrawOneRowBorders(where, rect, z2, c)
+			.DrawRowBorders(where, rect, z2, ._scrollstart, .visiblerows)
 
 		z2 = rect
 		z2.y2 += .scrollshift
@@ -1340,7 +1318,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		rz = .end
 		for .VisibleRowsGap
-			rz = .hierstep(rz, false) #loop
+			rz = .hierPrev(rz) #loop
 	
 	
 	libinternal ScrollPixelsSub (|int| rem, |bool|)
@@ -1366,14 +1344,6 @@ class ListView (GUIControl) {
 			rect.y = rect.y2
 			rect.y2 = .lastrect.y2
 			Cols.ListRowDraw(Where, rect, self, 0, .columnstodraw)
-		
-//		require Cols.Name
-//		
-//		rect.y2 = rect.y + 1
-//		|| v = .GNormal.Seps.color
-//		v = 0.2.mix(v, colors.white)
-//		v.a = 0.5
-//		where.DrawRect(Rect, v) 
 
 
 	inline ScrollStart (|listviewrow|)
@@ -1447,6 +1417,8 @@ class ListView (GUIControl) {
 	
 	syntax Append (|string| name, |GUIMenuEvent| ev, |object| obj=nil)
 		cpp_part AppendMenuItem
+		inline
+		opt norefcounts
 		self <~ menuitem(name, ev, obj)
 
 	
@@ -1504,10 +1476,10 @@ class ListView (GUIControl) {
 	module
 		|date|				DelayEditTill_
 	
-		libinternal pf (|string| s, |string|)
-			for (c in s) (i)
-				if c.IsAlphaNum
-					return s[i...].lowercase
+	libinternal listviewrow.JumpFindMatch (|string| s, |bool|)
+		for (c in s) (i)
+			if c.IsAlphaNum
+				return .name[i, s, true]
 			
 }
 

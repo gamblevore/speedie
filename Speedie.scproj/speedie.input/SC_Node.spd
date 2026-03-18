@@ -593,13 +593,12 @@ helper message.ConstructorAddNil (|bool| isdot)
 	.first = .CreateNil
 
 
-constants (
+constants
 	kPurposeFunc
 	kPurposeDot
 	kPurposeVar
 	kPurposeVarDecl
 	DontGoUp = 2
-)
 
 
 function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)

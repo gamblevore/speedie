@@ -123,7 +123,7 @@ function ClassData.Virtuals  (|&&nil|)
 
 
 datatype BaseType (int)
-	constants (
+	constants
 		|BaseType|
 		Module = 0 // not actually a type
 		Nil
@@ -131,7 +131,7 @@ datatype BaseType (int)
 		Struct
 		DataType
 		FuncProto
-	)
+	
 	syntax is (|BaseType| d, |bool|)
 		return self == d
 

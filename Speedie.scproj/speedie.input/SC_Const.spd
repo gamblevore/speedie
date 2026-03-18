@@ -334,6 +334,11 @@ struct ArgArrayCounter
 
 
 function @scmodule.ConstantCollector (collectfunc)
+	opt norefcounts
+	|| arg = node.Last
+		arg.Expect(@arg)
+	  elseif Compiler.InPerry
+		problem (node, "No constants declared")
 	compiler.ConstantsList <~ node
 	if name_space isa SCClass
 		node.Obj = name_space.Modul

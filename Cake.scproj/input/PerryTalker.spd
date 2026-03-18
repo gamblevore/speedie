@@ -207,7 +207,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 		for v in Locals
 			|| R = stack.reg0 + v.reg
 			if v contains index
-				v.jbin(j, R, 0)
+				v.Describe(j, R, 0)
 		j.exit
 	j.exit
 
@@ -217,12 +217,12 @@ function jbin.Expand (|&byte| Obj, |int| Depth, |[xvar]| props)
 	opt norefcounts
 	.Enter
 	for v in props
-		v.jbin(self, Obj+v.position, depth)
+		v.Describe(self, Obj+v.position, depth)
 	.exit
 
 
 
-function xvar.Jbin (|jbin| j, |&nil| Where, |int| Depth)
+function xvar.Describe (|jbin| j, |&nil| Where, |int| Depth)
 	opt norefcounts
 	j.Enter(@tmp, .name)
 
@@ -238,7 +238,7 @@ function xvar.Jbin (|jbin| j, |&nil| Where, |int| Depth)
 	j.AddStr(vars)
 	
 	if ok
-/		|| Props = .CanExpand(depth)
+		|| Props = .CanExpand(depth)
 			j.Expand(where|&&byte|[], depth+1, props)
 	  else
 		j.add(@thg, "bad")
