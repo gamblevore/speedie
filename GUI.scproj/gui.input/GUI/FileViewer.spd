@@ -145,22 +145,19 @@ class FileViewer (ListView)
 		|| p = fol.path
 		if !fol.isdir
 			return FileRow(p, p.name)
-		|| F = FileRow(p, p.TrimExtAndPath, .folfile)
+		|| F = FileRow(p, p.TrimExtAndPath, .listsource.name)
 		f.InMainProj = IsMainProj
 		(f is expanded) = IsMainProj
-		f.FillFilesSub(fol, .excludes, .folfile, c)
+		f.FillFilesSub(fol, .excludes, .listsource.name, c)
 		return f
 
 	
-	function FolFile (|string|)
-		return .listsource.name
-	
-	
-	function FolFile (assigns:|string|)
+	inline FolFile (assigns:|string|)
 		.listsource.name = value
 
 
 	function ErrorAt (|error| e)
+		opt norefcounts
 		|| f = self[e.path]
 		while f and f != .ListSource
 			f.HasError = true
@@ -235,7 +232,7 @@ class FileViewer (ListView)
 		|| n = m.Length
 		|| fstr = "file".pluralize(n)
 		fs <~ "Save $fstr in project "
-		fs <~ .start!.name
+		fs <~ .liststart!.name
 		fs <~ "?"
 		fs <~ "\n"
 		for m0 in m
@@ -372,9 +369,11 @@ class FileViewer (ListView)
 
 
 	function OpenQuickRelist (|string| path, |bool| Improve=false)
+		opt norefcounts
 		|| b = .OpenQuickRelistsub(path, improve)
 			path = b
 		.QuickOpen.text = b
+		
 		
 	libinternal OpenQuickRelistSub (|string| path,  |bool| Improve,  |string|)
 		rz = path
@@ -498,10 +497,12 @@ class FileViewer (ListView)
 			return A.name.syntaxcompare(b.name, true)
 
 		function QuickOpenModified (GUITextEvent)
+			opt norefcounts
 			|| fv = .tag as fileviewer
 				fv.OpenQuickRelist(.text)
 
 		function QuickOpenKey (guikeyevent)
+			opt norefcounts
 			|| fv = .tag as fileviewer				#require
 			|| l = fv.listopen
 			if key.IsAccept
@@ -518,12 +519,14 @@ class FileViewer (ListView)
 
 
 		function QuickOpenFocus (guiaction)
+			opt norefcounts
 			require state == 0
 			|| fv = .tag as FileViewer
 				rz = fv.hideopenlist
 
 
 		function ClickedOpenList (GuiListevent)
+			opt norefcounts
 			|| V = .tag as FileViewer
 			|| r = row!.obj as filerow
 			require r and v
@@ -623,15 +626,15 @@ function fileviewer.RightClickFileList (GUIListEvent)
 
 
 function FileViewerCMMShow (GuiMenuEvent)
+	opt norefcounts
 	|| row = clicked!.row
 	if row isa FileRow
 		row.location.Reveal
 
 
 function FileViewerRenameFile (GuiMenuEvent)
-	|| row = clicked!.row as filerow
-	if self isa FileViewer
-		.rename(row)
+	if clicked and self isa FileViewer
+		.editcell(clicked)
 	
 
 function FileViewerCreateFile (GuiMenuEvent)
@@ -644,7 +647,7 @@ function FileViewerCreateFile (GuiMenuEvent)
 		|| created = filerow(f.path, f.name) 
 		row <~ created
 		row.filesort
-		.rename(created)
+		.editrow(created)
 		.checksize
 		.SomethingChanged(row)
 
@@ -667,6 +670,7 @@ function FileViewerCopyPath (GuiMenuEvent)
 
 
 function FileViewerTrash (GuiMenuEvent)
+	opt norefcounts
 	|| row = clicked!.row
 	if  row isa FileRow  and  self isa fileviewer
 		row.AskDelete(self)
@@ -674,6 +678,7 @@ function FileViewerTrash (GuiMenuEvent)
 
 
 function FileViewerRemove (GuiMenuEvent) // just removes knowledge of the item
+	opt norefcounts
 	|| row = clicked!.row
 	if row isa FileRow and self isa FileViewer
 		row.remove

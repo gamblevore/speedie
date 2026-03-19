@@ -627,7 +627,7 @@ class PerryIDE (Window)
 		
 	function Root (|filerow|)
 		opt norefcounts
-		return .FileList.start as filerow
+		return .FileList.liststart as filerow
 
 
 	function file.NeedsOwnWindow (|bool|)

@@ -322,11 +322,11 @@ class Document (list)
 
 
 extend TextView
-	function KeepUndosOnLoseFocus (|bool|)
+	libinternal KeepUndosOnLoseFocus (|bool|)
 		return (self is editable) and !.isinline
 
 	
-	function UpdateAllViews (|string| nt, |ivec2| NS, |int| Reason)
+	libinternal UpdateAllViews (|string| nt, |ivec2| NS, |int| Reason)
 		opt norefcounts
 		|| u = .document
 			u.UpdateViewers(Reason)
@@ -375,7 +375,7 @@ extend TextView
 			.UseState(m, u, pos, DocumentState.UndoOrRedo)
 
 
-	function UpdateModState (|document| D, |int| reason)
+	libinternal UpdateModState (|document| D, |int| reason)
 		|| ismod = d.ismodified
 		if (self is modified) != ismod 
 			(self is modified) = ismod
@@ -384,7 +384,7 @@ extend TextView
 		(.OnTextChanged)(self, Reason, ismod)?
 
 
-	function UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
+	libinternal UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
 		require .parent
 		.UndoChecker = -1
 		.GuessExpectsParse

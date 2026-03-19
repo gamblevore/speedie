@@ -96,14 +96,14 @@ class ListView (GUIControl) {
 		while a
 			if a == b
 				return rz
-			a = .Hiernext(a)
+			a = .listnext(a)
 			++rz
 		a = c
 		rz = 0
 		while a
 			if a == b
 				return rz
-			a = .Hierprev(a)
+			a = .listprev(a)
 			--rz
 
 
@@ -191,16 +191,29 @@ class ListView (GUIControl) {
 	libinternal Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
 		opt norefcounts
 		if orig == gone
-			return .HierNext(orig) ?? .hierPrev(orig)
+			return .ListNext(orig) ?? .ListPrev(orig)
 		return orig
 	
 
-	libinternal HierNext (|ListViewrow| l, |ListViewRow|)
+	autogen ListStart (|ListViewrow|)
+		inline
+		return .listsource.first
+	
+
+	libinternal ListEnd (|ListViewrow|)
+		opt norefcounts
+		|| li = .listsource 
+		|| H = ._Hierarchical
+			return li.hierend(li, H)
+		return li.Last
+	
+	
+	libinternal ListNext (|ListViewrow| l, |ListViewRow|)
 		opt inline
 		return .HierStep(l, true)
 
 
-	libinternal HierPrev (|ListViewrow| l, |ListViewrow|)
+	libinternal ListPrev (|ListViewrow| l, |ListViewrow|)
 		opt inline
 		return .HierStep(l, false)
 	
@@ -263,18 +276,14 @@ class ListView (GUIControl) {
 		return true
 		
 		
-	function Rename (|bool|)
+	function EditCell (|bool|)
 		cpp_part RenameCurr
 		return .EditCell(.LastSelected.cell)
 	
 	
-	function Rename (|ListViewRow| r, |bool|) 
-		cpp_part RenameRow
-		return .EditCell(r.cell)
-	
-	
-	function RenameColumn (|ListViewRow| r, |int| col, |bool|)
-		return .EditCell( r.cell(col) )
+	function EditRow (|ListViewRow| r, |bool|)
+		cpp_part EditRowCol
+		return .EditCell( r.cell(0) )
 	
 		
 	function EditCell (|ListViewcell!| rc, |bool|)  //  .editcell
@@ -295,6 +304,7 @@ class ListView (GUIControl) {
 			if !key.iscancel
 				return false
 			return p.StopFilter
+
 
 	libinternal textview.RefilterTextChange (GUITextEvent)
 		opt norefcounts
@@ -354,7 +364,7 @@ class ListView (GUIControl) {
 			
 	libinternal KeyDownTest (|keys| key, |bool|)
 		if (key is INSERT or Enter)
-			.rename
+			.editcell
 			return true
 
 		if key.IsAccept
@@ -368,7 +378,7 @@ class ListView (GUIControl) {
 			if .ClearSearch
 				return true
 			if keys.shift
-				return .rename
+				return .editcell
 			
 		if .OnRightClick and (key.IsCmm)
 			.menuforselrow
@@ -383,10 +393,10 @@ class ListView (GUIControl) {
 			.ScrollByRows(.VisibleRows-1)
 			return true
 		if (key is HOME)
-			.slidescroll = .start
+			.slidescroll = .liststart
 			return true
 		if (key is END)
-			.slidescroll = .end
+			.slidescroll = .listend
 			return true
 			
 		if key is up or down
@@ -417,19 +427,19 @@ class ListView (GUIControl) {
 		return fs
 
 
-	libinternal TableCell (|listviewCell| Cell, assigns:|string?| Value=nil, |string|)
-		opt norefcounts
-		return cell.row.cell(Cell.column, .columnfinder, value)
-
-
 	inline CopyID (|ListViewRow| row, |string|)
 		return .tablecell(row, -2)
 
 
-	function TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
+	inline TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
 		cpp_part TableCellRow
 		opt norefcounts
-		return row.cell(column, .columnfinder, value)
+		return row.cell(column, .ColumnFinder, value)
+
+
+	libinternal TableCell (|listviewCell| Cell, assigns:|string?| Value=nil, |string|)
+		opt norefcounts
+		return cell.row.cell(Cell.column, .ColumnFinder, value)
 
 
 	libinternal CopyList (|array of string|)
@@ -521,7 +531,7 @@ class ListView (GUIControl) {
 
 
 	libinternal ScrollSet (|ListViewrow?| s)
-		s ?= .start
+		s ?= .liststart
 		.scrollshift = 0
 		._ScrollRealigner = 0
 		debug_require s != .listsource
@@ -542,14 +552,14 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| s	= .scrollstart
 		ifn .listsource contains s
-			s = .start
+			s = .liststart
 			.scrollstart = s
 		require s
-		|| last = .end
+		|| last = .listend
 		for .VisibleRowsGap
 			if last == s
 				s = nil
-			last = .hierPrev(last) #loop
+			last = .listPrev(last) #loop
 		if !s
 			.scrollset(last)
 	
@@ -585,7 +595,7 @@ class ListView (GUIControl) {
 
 	libinternal HasSeps (|bool|)
 		opt norefcounts
-		|| l = .start
+		|| l = .liststart
 		while l
 			if l is Separator
 				return true
@@ -603,7 +613,7 @@ class ListView (GUIControl) {
 
 	libinternal BasicRowDrag (GuiListDragEvent)
 		|| s = .FirstSelected
-		if !s or (.Hiernext(s) == before) and !s.nextselected
+		if !s or (.listnext(s) == before) and !s.nextselected
 			return true // no need
 		
 		if (before is selected)
@@ -688,13 +698,13 @@ class ListView (GUIControl) {
 		if ._DraggingRowTo or (.FirstSelected != .lastselected)
 			return true
 		require .draggingrowfrom != WantsBefore
-		require .Hiernext(.draggingrowfrom) != wantsbefore
+		require .listnext(.draggingrowfrom) != wantsbefore
 		return true
 
 
 	libinternal FixScroll (|bool|)
 		if !.scrollstart
-			.scrollset(.start)
+			.scrollset(.liststart)
 			return .scrollstart
 		return true
 
@@ -779,38 +789,28 @@ class ListView (GUIControl) {
 	
 	function LastSelected (|ListViewrow|)
 		opt NoRefCounts
-		|| l = .end
+		|| l = .listend
 		while l
 			if l is selected
 				return l
-			l = .hierPrev(l)
+			l = .listPrev(l)
 			
 		
-	libinternal End (|ListViewrow|)
-		opt norefcounts
-		|| li = .listsource 
-		|| H = ._Hierarchical
-			return li.hierend(li, H)
-		return li.Last
-	
 	libinternal Edge (|int|i, |bool| Selectable=false, |ListViewrow|)
 		opt norefcounts
-		rz = (.end, .start)(i > 0)
+		rz = (.listend, .liststart)(i > 0)
 		if selectable
 			while rz and rz is UnSelectable
 				rz = rz.step(i <= 0)
 		
-	autogen Start (|ListViewrow|)
-		inline
-		return .listsource.first
-	
+
 	libinternal SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
 		opt norefcounts
 		if !fwd
-			return .HierPrev(l) ?? .end
+			return .listPrev(l) ?? .listend
 		if l != .listsource
 			(l is expanded)
-		return .HierNext(l) ?? .start
+		return .listNext(l) ?? .liststart
 	
 	
 	libinternal BMove (|ListViewrow| l, |int| Req, |ListViewrow|)
@@ -828,7 +828,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| dir = !keys.shift					// can do this backwards... if we want.
 		
-		curr ?= .start
+		curr ?= .liststart
 		|| Start = curr
 		
 		while curr {
@@ -889,7 +889,7 @@ class ListView (GUIControl) {
 	function SelectAtLeastFirst	
 		opt norefcounts
 		if !.firstselected
-			.select(.start)
+			.select(.liststart)
 
 	
 	function Selected (|ListViewRow|)
@@ -903,16 +903,16 @@ class ListView (GUIControl) {
 		// different names too?
 		
 		opt NoRefCounts
-		|| l = .start 		
+		|| l = .liststart
 		while l
 			if l is selected
 				return l
-			l = .HierNext(l)
+			l = .listNext(l)
 
 
 	function SelectAll (|bool|)
 		opt norefcounts
-		return .selectshift(.start, .end)
+		return .selectshift(.liststart, .listend)
 
 
 	function SelectFirst (|listviewselectmode| mode = listviewselectmode.normal, |bool|)
@@ -929,7 +929,7 @@ class ListView (GUIControl) {
 		expect (l.parent == m.parent) (beep)
 		
 		|| modified = 0
-		|| all		= (l == .start) and (m == .end) 
+		|| all		= (l == .liststart) and (m == .listend) 
 		|| i		= .DistBetween(l,m)
 		|| n		= i.abs + 1
 		for n
@@ -977,7 +977,7 @@ class ListView (GUIControl) {
 	function SelectNone
 		opt NoRefCounts // this does not seem to select none??
 		|| one = .KeepOneSelected
-		|| s = (.FirstSelected ?? .start, nil)(one)
+		|| s = (.FirstSelected ?? .liststart, nil)(one)
 		return .Select(s)
 	
 	
@@ -1029,13 +1029,15 @@ class ListView (GUIControl) {
 
 
 	function ScrollByRows (|int| Rows)
+		opt norefcounts
 		|| s = .scrollstart
 			.scrollset( .bmove(s, rows) )
 			.TouchScrollBar
 
 	
 	function ScrollMoveTo (|int| v)
-		|| s = .start
+		opt norefcounts
+		|| s = .liststart
 			.scrollset(.bmove(s, v))
 	
 	
@@ -1079,8 +1081,9 @@ class ListView (GUIControl) {
 
 
 	libinternal FindClicked (|ivec2| Search, |ListViewRow|)
-		|| c = .FindClickedCell((0, search.y))
-			return c.row
+		search.x = 0
+		|| c = .FindClickedCell(search)
+			rz = c.row
 	
 	
 	libinternal FindClickedMenu (|int| y, |ListViewRow|)
@@ -1094,6 +1097,7 @@ class ListView (GUIControl) {
 	
 	
 	function StopFilter (|bool|)
+		opt norefcounts
 		|| t = .typingfilter
 			t.remove
 			.typingfilter = nil
@@ -1191,7 +1195,7 @@ class ListView (GUIControl) {
 		while curr != find
 			top -= .rowheight
 			require (curr) and (top >= low)
-			curr = .hiernext(curr)
+			curr = .listnext(curr)
 		return (s.x, top, s.x2, top + add)
 
 
@@ -1219,7 +1223,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		while R and nrows >= 1
 			z2 = .DrawOneRowBorders(where, rect, z2, R)
-			R = .Hiernext(R)
+			R = .listnext(R)
 			--nrows
 		return z2
 
@@ -1316,14 +1320,14 @@ class ListView (GUIControl) {
 
 	function ScrollEnd (|listviewrow|)
 		opt norefcounts
-		rz = .end
+		rz = .listend
 		for .VisibleRowsGap
-			rz = .hierPrev(rz) #loop
+			rz = .ListPrev(rz) #loop
 	
 	
 	libinternal ScrollPixelsSub (|int| rem, |bool|)
 		rem += .scrollShift
-		|| cmp = (.start, .scrollend)(rem < 0) 
+		|| cmp = (.liststart, .scrollend)(rem < 0) 
 		if cmp == .scrollstart
 			rem = 0
 		
@@ -1339,6 +1343,7 @@ class ListView (GUIControl) {
 
 	libinternal DrawHeaders (|image| where, |ivec4| rect)
 		opt NoRefCounts
+		if keys.shift and self ~= "Variables"
 		|| Cols = .columns
 		if Cols and Cols isnt hidden
 			rect.y = rect.y2
@@ -1370,7 +1375,7 @@ class ListView (GUIControl) {
 		
 		rect.y2 += .ScrollSlide
 		{
-			|| End = .End
+			|| End = .ListEnd
 			._CanSeeAllLines = false
 			|| NCols = .Columncount
 
@@ -1379,7 +1384,7 @@ class ListView (GUIControl) {
 				|| D = (r.depth(self), 0)(.IsTree)
 				r.ListRowDraw(Where, rect, self, D, NCols)
 				rect.y2 = rect.y
-				if (r == end) and .start == .scrollstart
+				if (r == end) and .liststart == .scrollstart
 					._CanSeeAllLines = (rect.y >= .lastrect.y)
 		}
 		
@@ -1447,7 +1452,7 @@ class ListView (GUIControl) {
 		|| nrows = .VisibleRows
 		while f and nrows >= 1
 			yield f
-			f = .Hiernext(f)
+			f = .listnext(f)
 			--nrows
 
 
@@ -1457,18 +1462,19 @@ class ListView (GUIControl) {
 		|| nrows = .FullyVisibleRows
 		while f and nrows >= 1
 			yield f
-			f = .Hiernext(f)
+			f = .listnext(f)
 			--nrows
 
 
 	iterator All
-		|| F = .start
+		|| F = .Liststart
 		while f
 			yield f
-			f = .Hiernext(f)
+			f = .listnext(f)
+
 
 	iterator TopList
-		|| F = .start
+		|| F = .Liststart
 		while f
 			yield f
 			f = f.next

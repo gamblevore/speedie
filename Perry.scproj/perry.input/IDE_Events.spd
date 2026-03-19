@@ -485,7 +485,7 @@ function ClickedError (GUIListEvent)
 		  else
 			ide.ClickedFind(row)
 	  elseif GUI.event is mousedown
-		if !.Start and ide.filelist isnt visible
+		if !.listStart and ide.filelist isnt visible
 			ClickedAView(ide.ViewFiles)
 	return true
 

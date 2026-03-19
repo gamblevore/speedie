@@ -116,7 +116,7 @@ class FileRow (ListViewRow)
 
 	function AddFile (|file| f, |fileviewer| o)
 		|| Count = 2000
-		.AddFileSub(f,  o.excludes,  o.folfile,  Count)
+		.AddFileSub(f,  o.excludes,  o.listsource.name,  Count)
 
 
 	libinternal AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |$int| Count, |bool|)

@@ -89,7 +89,7 @@ extend ListView
 	
 	setter Columns (|string| value)
 		opt norefcounts
-		.Columns() = value.parse(@arg)|listviewrow|
+		.Columns(/*KeepBrackets To Use function setter*/) = value.parse(@arg)|listviewrow|
 	
 	
 	libinternal ColumnWidth (|Message| m, |int| w, |int|)
@@ -105,9 +105,9 @@ extend ListView
 	
 	libinternal ColumnStart (|int| i, |int|)
 		opt norefcounts
-		|| c = .Columns
 		require (i > 0)
 		|| w = .width
+		|| c = .Columns
 		if !c
 			return w
 		|| r = c.first
@@ -149,7 +149,6 @@ Column -2 means the CopyID, which can be the same as the Name if needed.
 Column 0 is meant to mean the first item... but it could mean the row itself if none-exist."
 	opt norefcounts
 	real self
-//	if .root.name == "FoundList"
 	|| ch = self
 	if column >= 0
 		ch = self[Column]

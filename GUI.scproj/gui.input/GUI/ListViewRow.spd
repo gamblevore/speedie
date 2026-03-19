@@ -56,6 +56,8 @@ role ListViewRow (message)
 		opt norefcounts
 		rz = self
 		while (rz is expanded) or (rz == root)
+			if h is last
+				rz = rz.last
 			rz = rz.last		#loop
 
 
@@ -63,16 +65,18 @@ role ListViewRow (message)
 		opt norefcounts
 		|| p = .Prev
 			return p.hierend(root, H)
+		if h is last
+			self = .parent
 		p = .parent
 		return (nil, p)(p == root)
 
 
 	libinternal HierNext  (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
-		if self is expanded  and  h is Last
-			|| L = .Last.first
-			return L
+		// listviewhierarchy isnt so easy to get working...
 		if (self is expanded) or (self == root)
+			if h is Last
+				self = .last
 			return .flatnext
 		return .next ?? .flatafter
 					
@@ -150,7 +154,7 @@ role ListViewRow (message)
 			where.DrawRect(z2, edge)
 	
 	
-	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|) // __TableCell__(column)
+	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|)
 		opt norefcounts
 
 		|| Cols = parent.columns

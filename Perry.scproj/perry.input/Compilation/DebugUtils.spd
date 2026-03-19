@@ -101,9 +101,11 @@ ignore
 	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" 146
 		fs "/usr/local/speedie/Examples/hello_world.spd" 89 "FastString" "\"Start:\\n\""
 
+
 function listview.DebugFixup (|listviewrow| NewList)
-	.ListSource.DebugFixup(newlist)
+//	.ListSource.DebugFixup(newlist)
 	.ListSource = NewList
+	.listsource.name = "vars"
 
 
 // figure out the rest later. we need to deal with inserted/removed items
@@ -199,7 +201,7 @@ function UpdateStack (|message| stack)
 //	|| info = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
 
-	.stack.DebugFixup(arg)
+	.stack.listsource = arg
 	
 	for m in Arg
 		|| l = m.Last

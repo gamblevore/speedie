@@ -812,7 +812,7 @@ extend PerryIDE
 		opt norefcounts
 		|| projfol = .MainProjFol
 		if !projfol
-			.EditRow(.filelist.start)
+			.EditRow(.filelist.liststart)
 			return 
 		
 		projfol.dirfile = ".todo"

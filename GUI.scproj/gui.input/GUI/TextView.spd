@@ -61,7 +61,7 @@ class TextView (GUIControl)
 	destructor
 		.document = nil		
 	
-	function Document (|document|)
+	inline Document (|document|)
 		return ._Viewing
 	
 	function Document (assigns:|document?|)
@@ -183,6 +183,7 @@ class TextView (GUIControl)
 	
 	
 	setter ExpectsParse (|byte|)
+		inline
 		.ExpectsParse = value
 		
 		
@@ -1316,7 +1317,6 @@ class TextView (GUIControl)
 				c = c.tab(!keys.shift, lv)
 				if c
 					lv.EditCell(c)
-					
 		return true
 	
 	
@@ -1420,7 +1420,8 @@ class TextView (GUIControl)
 
 	function SelText (|string|)
 		return self[.selrange]
-		
+	
+	
 	function SelText (assigns:|string|)
 		.Insert(value, true)
 
@@ -1544,6 +1545,7 @@ class TextView (GUIControl)
 
 
 	function Path (|string|)
+		opt norefcounts
 		|| u = .document
 			return u.Location
 
@@ -1556,15 +1558,15 @@ class TextView (GUIControl)
 		return true
 
 
-	function ExtendToLineEnd (|ind| i, |ind|)
+	libinternal ExtendToLineEnd (|ind| i, |ind|)
 		return .LineExpand((i,i)).x2
 
 	
-	function Length (|int|)
+	inline Length (|int|)
 		return .text.length
 
 	
-	function FindLineSeperator (|int|start=0, |int|end=int.max, |ind|)
+	libinternal FindLineSeperator (|int|start=0, |int|end=int.max, |ind|)
 		return .text.find(charset.Line, start, End )
 
 
