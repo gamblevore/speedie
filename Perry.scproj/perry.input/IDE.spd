@@ -15,8 +15,8 @@ class PerryIDE (Window)
 	|FileViewer|				FileList
 
 	|listview|					Stack
-	|ListView|					Variables
-	|stretchcontrol|			Debugger
+//	|ListView|					Variables
+	|guiControl|				Debugger
 
 	|textview|					AppInfo
 	|Guicontrol|				DebugBtns

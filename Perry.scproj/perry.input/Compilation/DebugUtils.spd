@@ -137,17 +137,14 @@ function ImproveVar (|listviewrow| s)
 	(s is error) = bad
 	
 	|| fs = VarPrinter
+	fs.Length = 0
 	// merge with PerryCopyVar?
-	|| ColWidth = 12
-	|| Spaces = ColWidth - (s.name.LengthUTF8 + 2)
 	fs <~ s.name
-	fs <~ ' '
-	fs <~ (' ', spaces)
+	fs <~ (' ', 11 - fs.LengthUTF8)
+	s.PerryAppendMsg(" = ", 3)
+	fs <~ (' ', 32 - fs.LengthUTF8)
+	s.PerryAppendMsg(" |", 2)
 	fs <~ "|"
-	fs <~ s[2].name
-	fs <~ "|"
-	fs <~ " = "
-	fs <~ s[3].name
 	s.name = fs
 
 	|| Fields = s.Last
@@ -158,7 +155,7 @@ function ImproveVar (|listviewrow| s)
 //		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "FastString" "\"\""
 
 
-function message.PerryAppendMsg (|int| Item, |string| s)
+function message.PerryAppendMsg (|string| s, |int| Item)
 	opt norefcounts
 	VarPrinter <~ s
 	|| ch = self[item]
@@ -167,9 +164,9 @@ function message.PerryAppendMsg (|int| Item, |string| s)
 
 function listviewrow.PerryCopyVar (|string|)
 	opt norefcounts
-	.PerryAppendMsg(2, "|")
-	.PerryAppendMsg(4, "| ")
-	.PerryAppendMsg(3, " = ")
+	.PerryAppendMsg("|",   2)
+	.PerryAppendMsg("| ",  4)
+	.PerryAppendMsg(" = ", 3)
 	return VarPrinter
 }
 
@@ -191,7 +188,7 @@ function @perry.VariableFinder (listview.columnfinder)
 extend perryide {	
 function ShowDebugVars (|message| v)
 	opt norefcounts
-	.Variables.DebugFixup(v)
+//	.Variables.DebugFixup(v)
 	for s in v
 		.ImproveVar(s)
 //	v.Remove // make owner easier to deal with // or not?

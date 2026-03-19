@@ -3,6 +3,11 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+//|int| Reserved = 4096
+//X        = 4096       |int|
+//Reserved = 4096       |int|
+//Reserved = 4096 |int|
+//Reserved = 4096
 
 class FastString {
 	linkage
@@ -128,6 +133,8 @@ class FastString {
 	function AppendEscape (|string| s)
 		.AppendMultiReplace( s, jeebox.EscapeStr )
 
+	inline LengthUTF8 (|int|)
+		return self|string|.LengthUTF8
 
 	module
 		function UseAsOutput (|object| other, |FastString|)
@@ -322,39 +329,3 @@ extend FastString
 	
 	function File (assigns:|File|)
 		cpp_wrapper JB_FS_FileSet
-
-
-//	// use syntax-append instead? "fs <~ (doubles, n)" //
-//	function AppendFloats (|&float| Data, |int| N)
-//		self <~ '['
-//		for (i in N)
-//			self <~ ", "
-//			start
-//			self <~ Data[i]
-//		self <~ ']'
-//
-//	function AppendDoubles (|&f64| Data, |int| N)
-//		self <~ '['
-//		for (i in N)
-//			self <~ ", "
-//			start
-//			self <~ Data[i]
-//		self <~ ']'
-//
-//	function AppendInts (|&int| Data, |int| N)
-//		self <~ '['
-//		for (i in N)
-//			self <~ ", "
-//			start
-//			self <~ Data[i]
-//		self <~ ']'
-//
-//	function AppendInt64s (|&int64| Data, |int| N)
-//		self <~ '['
-//		for (i in N)
-//			self <~ ", "
-//			start
-//			self <~ Data[i]
-//		self <~ ']'
-
-

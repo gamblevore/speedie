@@ -190,7 +190,7 @@ function PerryIDE.ClearRun
 	.RunCompiledApp = nil
 	.editme._ActiveLine = nil
 	.stack.clear
-	.Variables.clear
+//	.Variables.clear
 	
 		
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
