@@ -186,32 +186,32 @@ function @perry.VariableFinder (listview.columnfinder)
 
 
 extend perryide {	
-function ShowDebugVars (|message| v)
-	opt norefcounts
-//	.Variables.DebugFixup(v)
-	for s in v
-		.ImproveVar(s)
-//	v.Remove // make owner easier to deal with // or not?
-	
-
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
 //	|| info = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
 
+	// we really want to copy over certain info from the new one
+	// it seems better to simply use the new one, outright. rather than frankenstein
+	// blobs from all over various runs. Then... we want to expanded/selected flags over
+	// So thats the hard thing... how to identify what is the same... 
+	
 	.stack.listsource = arg
 	
 	for m in Arg
 		|| l = m.Last
 		if l == @arg // assume its a var-dump
-			.ShowDebugVars(l)
+			for s in l
+				.ImproveVar(s)
 			exit
+	
 
 	|| Break = stack == "break"
 		|| F = arg.first
 		if !.stack.FirstSelected
 			.stack.Select(F)
+			.stack.ExpandSelection(true)
 		.ClickedStack(F, true) // jump to new place
 	  else
 		.EditMe._ActiveLine = nil
@@ -222,4 +222,5 @@ function UpdateStack (|message| stack)
 		.DebugMode = M
 		.SetAppInfo
 }
+
 

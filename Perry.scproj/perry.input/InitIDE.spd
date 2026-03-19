@@ -13,7 +13,6 @@ extend PerryIDE
 		.Debugger			= guicontrol(self)
 		.AppInfo			= TextView(self)
 		.DebugBtns			= guicontrol(self)
-//		.Variables			= listview(self, ClickedVariables, ReturnVariables)
 		.Stack				= listview(self, ClickedStack, ReturnStack)
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 

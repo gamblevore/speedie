@@ -184,11 +184,21 @@ role ListViewRow (message)
 
 		|| R		= Rect.TextCorner(parent.gnormal, na, .state)
 		|| sighy	= ((rect.y + rect.y2)/2) - 3
-		|| moved	= (parent.OnDrawRow)(self, Rect.y1, sighy, where, parent, column, str)?
-		R.x += moved.x
+		|| TextCol	= parent.GNormal.TextColor
+		|| Shader = parent.OnDrawRow
+			|| Shading = (Shader)(self, Rect.y1, sighy, where, parent, column, str) // why would y get adjusted??
+			r.x += shading.x
+			|imagepixel| Col = Shading.y
+				textcol = Col
+		  elseif (Column==0) and parent.Istree
+			if parent.listchild(self)
+				|| exp = ("\02", "\03")(self isnt expanded)
+				|| VCol = vec4(1, 0.5)
+				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.rowheight)
+			r.x += font.width + 1
+		
 		if parent.MultiLineDraw
 			r.y = rect.y2 - 10
-		|| TextCol	= parent.ColorRow(depth, column, moved.y)
 		TextCol.alpha *= str
 		font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
 		

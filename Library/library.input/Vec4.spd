@@ -246,10 +246,10 @@ datatype vec4
 			cpp_part New1
 			numeric
 			return (f,f,f,f)
-		inline  New (|float| g, |float| a, |vec4|)
+		inline  New (|float| gray, |float| a, |vec4|)
 			cpp_part Gray
 			numeric
-			return (g,g,g,a)
+			return (gray,gray,gray,a)
 		inline  New (|float| a, |float| b, |float| c, |float| d, |vec4|)
 			cpp_part New4
 			numeric

@@ -65,6 +65,7 @@ class ListView (GUIControl) {
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
+		.GNormal.TextColor = 0xFF60B0E0 // oof
 			
 	
 	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
@@ -79,15 +80,6 @@ class ListView (GUIControl) {
 		(.OnChange)(self, o)?
 		(.onselected)(self, o)?
 		return true
-
-
-	libinternal ColorRow (|int| Depth, |int| Column, |int| y, |imagepixel|)
-		(depth), (column) // one day i'll use it?
-		if y
-			return (0.5, 0.5, 0.5, 1.0).px
-		if .UseColorScheme
-			return ¥.SyxCol[1]
-		return 0
 
 
 	libinternal DistBetween (|ListViewRow| c, |ListViewRow| b, |int|)
@@ -414,7 +406,7 @@ class ListView (GUIControl) {
 			return true
 		
 		if .IsTree and (key is left or right)
-			return .openorclose(key)
+			return .ExpandSelection(key is right)
 
 		
 	function DefaultCopy (GUICopyEvent)
@@ -879,10 +871,9 @@ class ListView (GUIControl) {
 		return row.parent
 	
 	
-	libinternal OpenOrClose (|keys| K, |bool|)
+	function ExpandSelection (|bool| Expand, |bool|)
 		opt norefcounts
 		|| sel		= .LastSelected$
-		|| Expand	= (k is right)
 		|| Force	= keys.option 
 		if  !Expand  and  (!.listchild(sel) or (sel isnt expanded))
 			sel = .listparent(sel)

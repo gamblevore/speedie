@@ -87,20 +87,6 @@ libinternal string.FontLoad (|image|)
 			rz.FontCleanupChar((c*6, 0))
 
 
-	
-//libinternal image.FontCleanupChar (|ivec2| s)
-//	|| full	= 0.95*3.0 // fair?
-//	for v in (6, 8)
-//		|| p = v+s
-//		|| c = self[p].color
-//		
-//		|| total = c.x+c.y+c.z
-//		if total >= 0.3
-//			|| c2 = vec4(1)
-//			if total < full						// "anything above this is 100% white"
-//				c2.a = total/full				// anything else... is white, but less opaque
-//			self[p] <~ c
-
 
 libinternal image.FontCleanupChar (|ivec2| s)
 	|| full	= 0.95*3 // fair?
