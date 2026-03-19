@@ -137,7 +137,7 @@ function ImproveVar (|listviewrow| s)
 	(s is error) = bad
 	
 	|| fs = VarPrinter
-	// try align to the right. assume... x chars long
+	// merge with PerryCopyVar?
 	|| ColWidth = 12
 	|| Spaces = ColWidth - (s.name.LengthUTF8 + 2)
 	fs <~ s.name
@@ -146,6 +146,8 @@ function ImproveVar (|listviewrow| s)
 	fs <~ "|"
 	fs <~ s[2].name
 	fs <~ "|"
+	fs <~ " = "
+	fs <~ s[3].name
 	s.name = fs
 
 	|| Fields = s.Last
@@ -192,7 +194,7 @@ function ShowDebugVars (|message| v)
 	.Variables.DebugFixup(v)
 	for s in v
 		.ImproveVar(s)
-	v.Remove // make owner easier to deal with
+//	v.Remove // make owner easier to deal with // or not?
 	
 
 function UpdateStack (|message| stack)

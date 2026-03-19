@@ -56,19 +56,26 @@ role ListViewRow (message)
 		opt norefcounts
 		rz = self
 		while (rz is expanded) or (rz == root)
-			if h is last
-				rz = rz.last
-			rz = rz.last		#loop
+			|| try = rz.last
+			if (h is last) and (rz!=root)
+				try = try.last
+			loop try
+			rz = try
+			
 
 
-	libinternal HierPrev (|listviewrow| root, |listviewhierarchy| H, || )
+	libinternal HierPrev (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
 		|| p = .Prev
 			return p.hierend(root, H)
 		if h is last
 			self = .parent
+			if self == root
+				return nil
 		p = .parent
-		return (nil, p)(p == root)
+		if p == root
+			p = nil
+		return p
 
 
 	libinternal HierNext  (|listviewrow| root, |listviewhierarchy| H, ||)

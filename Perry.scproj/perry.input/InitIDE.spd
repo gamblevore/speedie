@@ -382,6 +382,8 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			.ColumnFinder	= &Perry.VariableFinder
+			.Hierarchical()	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
 			.MultiSelection = true
 			.AlwaysSendChangeEvent = true

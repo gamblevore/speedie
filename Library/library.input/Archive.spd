@@ -45,12 +45,14 @@ role FileArchive (message)
 			l++
 
 	function InstallTo (|file| dest, |bool| overwrite=false, |int64|)
+		opt norefcounts
 		require self and dest.MakeEntirePath
 		for f in self
 			rz += .install(f, dest, overwrite)
 
 
-	function FileCount (|int|)
+	inline FileCount (|int|)
+		opt norefcounts
 		return .last.Count
 
 	

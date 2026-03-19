@@ -863,14 +863,31 @@ class ListView (GUIControl) {
 				return true
 
 
+	libinternal ListChild (|listviewrow| row, |listviewrow|)
+		opt norefcounts
+		|| h = ._Hierarchical
+		if h is Last
+			row = row.Last
+		return row.first
+	
+
+	libinternal ListParent (|listviewrow| row, |listviewrow|)
+		opt norefcounts
+		|| h = ._Hierarchical
+		if h is Last
+			row = row.parent
+		return row.parent
+	
+	
 	libinternal OpenOrClose (|keys| K, |bool|)
 		opt norefcounts
 		|| sel		= .LastSelected$
 		|| Expand	= (k is right)
 		|| Force	= keys.option 
-		if (!Expand and (!sel.hasany or sel isnt expanded))
-			sel = sel.parent!
-			.Select(sel)
+		if  !Expand  and  (!.listchild(sel) or (sel isnt expanded))
+			sel = .listparent(sel)
+			if sel
+				.Select(sel)
 			Force = true
 		if sel != .listsource
 			if (!Expand and sel contains .scrollstart)
@@ -879,12 +896,14 @@ class ListView (GUIControl) {
 			for r in sel
 				(r is expanded)=false
 			return true
-		if Force or (Expand == (sel is expanded))
-			for r.flat in sel
-				(r is expanded) = Expand
-		(sel is expanded) = Expand
-		return true
 
+		Force |= (Expand == (sel is expanded))
+		while sel
+			(sel is expanded) = Expand
+			loop force
+			sel = .listnext(sel)
+		return true
+	
 
 	function SelectAtLeastFirst	
 		opt norefcounts
@@ -1343,7 +1362,6 @@ class ListView (GUIControl) {
 
 	libinternal DrawHeaders (|image| where, |ivec4| rect)
 		opt NoRefCounts
-		if keys.shift and self ~= "Variables"
 		|| Cols = .columns
 		if Cols and Cols isnt hidden
 			rect.y = rect.y2
