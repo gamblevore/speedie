@@ -139,7 +139,7 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
     Cls.Memory.World = &MemoryManager;
     Cls.Size = Max(Size, sizeof(FreeObject));
     if (Parent) {
-        Parent->HasSubclasses = true;
+        Parent->HasSubClasses = true;
 		Cls.ClassDepth = Parent->ClassDepth + 1; 
     }
     

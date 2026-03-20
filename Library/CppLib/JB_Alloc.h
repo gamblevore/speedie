@@ -154,16 +154,18 @@ JBStructData (JB_MemoryLayer);
 
 struct JB_Class : JB_Object { // JB_ClassData
     u16                 Size;
-    bool                HasSubclasses;  // for optimised isa testing
+    bool                HasSubClasses;  // for optimised isa testing
     uint8               ClassDepth;		// also
+    const char*         Name;
     JB_Class*           Parent;
     AllocationBlock*    DefaultBlock;
     JB_Class*           NextClass;
     int					LeakCounter;
-    JB_MemoryLayer      Memory;
-    const char*         Name;
+    int					Index;
     JBObject_Behaviour* Virtuals; 
     uint8*              SaveInfo;
+
+    JB_MemoryLayer      Memory;
 };
 
 

@@ -1,5 +1,5 @@
 
-
+// syntactic replace
 // needs proper-testing
 // better to print the data out
 main (|file.existing| folder, |string| Func, |string| From, |String| To)

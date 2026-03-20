@@ -3,11 +3,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-//|int| Reserved = 4096
-//X        = 4096       |int|
-//Reserved = 4096       |int|
-//Reserved = 4096 |int|
-//Reserved = 4096
 
 class FastString {
 	linkage
@@ -125,7 +120,9 @@ class FastString {
 		for count
 			self <~ data
 
-	function AppendQuotedEscape (|string| s, |byte| Quote = '"')
+	function AppendQuotedEscape (|string| s, |byte| Quote = 0)
+		if !Quote
+			quote = '"'
 		self <~ Quote
 		.appendescape(s)
 		self <~ Quote

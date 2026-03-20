@@ -4,7 +4,7 @@ module CakeRun
 	linkage: cpp_part Pack
 	|String|				Strings
 	|String|				FileSrc
-	|dictionary of &classdata| ClassTable = dictionary()
+	|dictionary of object| ClassTable = dictionary()
 	
 	constants
 		FuncIsLib = 1
@@ -26,7 +26,7 @@ module CakeRun
 	
 	function GetStructure (|bool|)
 		opt norefcounts
-		|| app = .InputPack$
+		|| app = .UnboxCake$
 		|| sz = app[@num]
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
@@ -49,7 +49,7 @@ module CakeRun
 				rz = nil
 	
 
-	function InputPack (|messageroot|)
+	function UnboxCake (|messageroot|)
 		|| F = cake.InputFile
 		if F isa "spd" or "scproj" or "uwu" or "uwuz"
 			F = F.Compile

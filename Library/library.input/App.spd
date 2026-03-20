@@ -244,29 +244,30 @@ target debug
 		cpp_wrapper JB_App__SetCanBreak
 
 
+libinternal MemorySorter (sortercomparer of classdata)
+	return .MemoryUsed < b.MemoryUsed
+
+
 render MemoryUsage (|int| Over=0)
-	|[message]| items
-	
+	|[]| items
+
 	for cls in classdata.First_
-		|| Mem = cls.MemoryUsed
-		if mem > over
-			|| s = message(@str, cls.name.wrap)
-			s.Position = mem
-			items <~ s
-	
-	items.sort
+		items <~ cls|object|
+	items.sort(MemorySorter)
 
 	fs <~ "\n"
-	for I in items
-		fs.memoryreport(i.name, i.position)
+	|| i = 0
+	while 
+		|&classdata| C = items[i++]|&classdata|  #loop
+		fs.memoryreport(c.name, nil, C.memoryused)
 	fs <~ "\n"
 
-	fs.memoryreport("obj",	.ObjMemory)
-	fs.memoryreport("str",	.StringMemory)
-	fs.memoryreport("arr",	.OtherMemory)	
+	fs.memoryreport(nil, "obj",	.ObjMemory)
+	fs.memoryreport(nil, "str",	.StringMemory)
+	fs.memoryreport(nil, "arr",	.OtherMemory)	
 	
 	
-libinternal FastString.MemoryReport (|string| name, |int64| Amount)
+libinternal FastString.MemoryReport (|cstring?| name, |string?| name2, |int64| Amount)
 	if amount
 		self <~ name
 		self <~ ": "

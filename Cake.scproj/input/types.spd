@@ -10,19 +10,28 @@ class XType
 	constructor
 		.name = "(unreached)"
 	
-	constructor (|message| msg)
+	constructor (|message| msg, |int| index)
 		opt norefcounts
 		|| Sup = msg[@num]
 		|| SupIndex = Sup.Int
 		.IsObject = SupIndex & 1
 		.name = msg.name
 		.Super = xtype.GetType(SupIndex, Sup)
+		|| jbcls = cakerun.ClassTable.valuelower(.name)|&Classdata|
+			jbcls.Index = index
 
+
+	operator in (|xtype| Sup, |bool|)
+		opt norefcounts
+		while self
+			if self == sup
+				return true
+			self = .super
+		
 	render
 		opt norefcounts
-		if !.IsObject
-			fs <~ "!"
 		fs <~ .name
+
 	
 	function LoadProp (|message| m, |message|)
 		opt norefcounts
@@ -38,8 +47,10 @@ class XType
 		
 		function LoadTypes (|message| list)
 			opt norefcounts
+			|| i = 0
 			for msg in list
-				.types <~ (XType(msg), .unreached)(msg.func == @msg)
+				++i
+				.types <~ (XType(msg, i), .unreached)(msg.func == @msg)
 			
 			|| m = list.first
 			for T in .types

@@ -38,8 +38,8 @@ function __PerryView__ (cakevm.CakeChef)
 	if (ErrorCode)
 		p <~ "crashed " + ErrorCode
 	.ClearTempBreak(stack)
-	
 	.PerryAnswer(stack, p)
+	
 	while {							// Controlflow simplify! Just remove resume!
 		|| Resume = false			// Perhaps just... only refcount the part that needs it: p.get+resumecode(m)
 		while !Resume
@@ -64,9 +64,7 @@ dispatch DebuggerActions (PerryResponse)
 		return .SetBreakLevel(2-(m.firstname=="fast"))
 	
 	stepin:		return .TempBreak(.StepIn)
-		
 	stepout:	return .TempBreak(.StepOut)
-		
 	stepover:	return .TempBreak(.StepOver)
 
 	stop:		app.quit
@@ -207,39 +205,60 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 		for v in Locals
 			|| R = stack.reg0 + v.reg
 			if v contains index
-				v.Describe(j, R, 0)
+				v.DescribeJBin(j, R, 0)
 		j.exit
 	j.exit
 
 
 
-function jbin.Expand (|&byte| Obj, |int| Depth, |[xvar]| props, |string| name)
+function xtype.ExpandSub (|jbin| j, |&byte| Obj, |int| Depth)
 	opt norefcounts
-	.Enter(@arg, name)
-	for v in props
-		v.Describe(self, Obj+v.position, depth)
-	.exit
+	|| Sue = .Super
+		sue.ExpandSub(j, obj, depth)
+	depth++
+	for v in .Properties
+		v.DescribeJBin(j, Obj+v.position, depth)
 
 
+function xtype.ActualType (|&nil| ObjAddr, |xtype|)
+	opt norefcounts
+	if .IsObject and ObjAddr
+		|| Cls = ObjAddr|&object|[].Class
+		while Cls
+			|| i = cls.Index
+				|| Improved = xtype.Types[i-1]
+					return Improved
+			Cls = Cls.Parent // in case it wasn't found?
+	return self
 
-function xvar.Describe (|jbin| j, |&nil| Where, |int| Depth)
+
+function xvar.Expand (|jbin| j, |&byte| Obj, |int| Depth, |xtype?| Type)
+	opt norefcounts
+	j.Enter(@arg, .name)
+	if type and .Expanded > Depth
+		Type.ExpandSub(j, Obj, Depth)
+	j.exit
+
+
+function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	opt norefcounts
 	j.Enter(@tmp, .name)
 
-	|| Src = .srcmap
+	|| Src = .SrcMap
 	j.AddStr(src.file)
 	j.AddInt(src.bytepos)
 	
 	|| vars = debugger.VariablePrinter!
-	.RenderType(vars)
+	|| Type = .ObjType
+		Type = type.ActualType(where)
+	|| OK = .RenderType(vars, type)
 	j.AddStr(vars)
 
-	|| OK = .RenderValue(vars, Where, depth == 0)
+	OK = .RenderValue(vars, Where, depth == 0) and OK
 	j.AddStr(vars)
 	
 	if ok
-		|| Props = .CanExpand(depth)
-		j.Expand(where|&&byte|[], depth+1, props, .name)
+		.Expand(j, where|&&byte|[], depth, type)
 	  else
 		j.add(@thg, "bad")
 

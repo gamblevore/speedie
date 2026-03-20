@@ -4,7 +4,7 @@ class XVar (list)
 	|Wierdness[5]|	Weirdness // pointers, references, carrays
 	|int|			CodeEnd
 	|SourceLocation|SrcMap
-	|bool|			NormalView
+	|byte|			ViewStrength
 	|byte|			Expanded
 	|uint16|		Reg
 	|DataTypeCode|	DataType
@@ -12,11 +12,11 @@ class XVar (list)
 	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
 		.SrcMap = s.hint
-		.normalview = true
+		.ViewStrength = 0
 		.position = pos
 		.reg = reg
 		.name = s.CString
-		.Expanded = 1
+		.Expanded = 4
 		.obj = xtype.GetType(s.hint, nil)
 		.DataType = s.HInt
 		.CodeEnd = int.max
@@ -40,7 +40,7 @@ class XVar (list)
 
 	function Print (|!&CakeStack| Stack, |int| TabTo=0)
 		opt norefcounts
-		.Render(Printer, Stack.reg0, true, TabTo, TerminalColor.RainbowTerm)
+		.RenderForPrint(Printer, Stack.reg0, true, TabTo, TerminalColor.RainbowTerm)
 		printline Printer|&nil||string|
 		printer.Length = 0
 	
@@ -51,7 +51,7 @@ class XVar (list)
 	
 	render // for debug
 		opt norefcounts
-		.Render(fs, nil, true, 0, false)
+		.RenderForPrint(fs, nil, true, 0, false)
 	
 
 	function Wierdness
@@ -68,12 +68,11 @@ class XVar (list)
 		fs <~ "!"
 	
 	
-	function CanExpand (|int| Depth, |[xvar]|)
+	function ObjType (|xtype|)
 		opt norefcounts
-		if .Expanded > Depth
-			|| C = .obj|&nil||xtype|
-				if c.IsObject or .Weirdness[]
-					return C.Properties
+		|| Ty = .obj|&nil||xtype|
+			if Ty.IsObject or .Weirdness[]
+				return Ty
 
 		
 	function RenderValue (|faststring| fs, |&nil| Where, |bool| IsReg, |bool|)
@@ -86,7 +85,7 @@ class XVar (list)
 		return .RenderData(fs, Where)
 
 
-	function Render (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo, |bool| Color)
+	function RenderForPrint (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo, |bool| Color)
 		opt norefcounts
 		if full
 			if color
@@ -94,7 +93,7 @@ class XVar (list)
 			
 			|| M = fs.StreamLength
 			fs <~ "|"
-			.RenderType(fs)
+			.RenderType(fs, nil)
 			fs <~ "|"
 			fs <~ " "
 			fs <~ .name
@@ -133,9 +132,7 @@ class XVar (list)
 		Skkrt.Length = n
 		if n > 50
 			Skkrt.length = (&skkrt)|string|.ByteCountUTF8(50)	// shrink string
-		fs <~ '"'
-		fs.AppendEscape((&Skkrt)|string|)
-		fs <~ '"'
+		fs.AppendQuotedEscape((&Skkrt)|string|)
 		if n < Skkrt.Length
 			fs <~ ('.', 3)
 		
@@ -150,18 +147,21 @@ class XVar (list)
 			fs <~ "(nil)"
 			return true
 
-		require .TestObj(fs, obj)								// check object is readable and sane
+		require .TestObj(fs, obj)		// check object is readable and sane
 		
 		if obj isa string or obj isa faststring
 			|| str = obj|&nil||string|
 			return .DisplayString(fs, str.addr, str.length)
 
-		if obj isa Message
-			// what if crash in here? ooof
-			if .NormalView
-				obj.RenderAST(Fs)
+		if obj isa Message				// What if crash in here? ooof
+			if .ViewStrength == 0
+				fs <~ obj.func.name
+				fs <~ "@"
+				fs.AppendQuotedEscape(obj.name)
+			  elseif .ViewStrength == 1
+				obj.render(Fs)			// How to quote so looks distinct? «abc » is used .renderAST
 			  else
-				obj.render(Fs)
+				obj.RenderAST(Fs)
 			return true
 
 		fs <~ "0x"
@@ -172,7 +172,7 @@ class XVar (list)
 		// Contains can contain themselves! So no deep rendering... for now. Maybe if we mark/unmark them.
 	
 	
-	function RenderType (|faststring| fs)
+	function RenderType (|faststring| fs, |xtype?| type, |bool|)
 		opt norefcounts
 		for W in .Weirdness
 			loop W
@@ -183,12 +183,24 @@ class XVar (list)
 			w >>= 2
 			if w
 				fs <~ "[$w]"
-			
+		
 		|| C = .obj|&nil||xtype|
-			 fs <~ C.Name
-		  else
+		if !C and !type
 			|| T = .DataType|||datatypecode.Numeric
 			T.Render(Fs)
+			return true
+		
+		if C
+			fs <~ C.Name
+		if type and type != C
+			fs <~ "("
+			fs <~ type.name
+			fs <~ ")"
+			
+			ifn type in C
+				require c in type // we lost info?
+				fs <~ '?'
+		return true
 		
 	
 	function TestObj (|faststring| fs, |object| Obj, |bool|)
@@ -245,17 +257,13 @@ class XVar (list)
 					value = (value << sh) >> sh
 				fs.AppendIntegerAsText(value)
 
-				if (bc == 1) and !t.IsSigned
-					fs <~ " "
-					// what if this is UTF-8?
+				if value and (bc == 1) and !t.IsSigned
+					fs <~ " "								// what if this is UTF-8?
 					|| Container = '('+(256*')')
 					if  "()[]<>{}"  contains  value|byte|
 						Container = '\''+(256*'\'')
 					fs <~ Container|byte|
-					|| str = jeebox.EscapeStr[value|byte|.render]
-						fs <~ str
-					  else
-						fs <~ value|byte|
+					fs.EscapeByte(value)
 					fs <~ (Container>>8)|byte|
 				
 			  elseif v == 2
@@ -279,6 +287,14 @@ class XVar (list)
 
 		return true
 
+
+	function faststring.EscapeByte (|byte| value)
+		opt norefcounts
+		if  value > 32  and  value != 9 and 10 and 13
+			|| str = jeebox.EscapeStr[value|byte|.render]
+				self <~ str
+				return
+		self <~ value|byte|
 	
 	
 	syntax is (|datatypecode| T, |bool|)

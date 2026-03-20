@@ -117,6 +117,7 @@ class ListView (GUIControl) {
 
 
 	function NewCmm (|menu|)
+		opt norefcounts
 		rz = .cmm
 		if rz
 			rz.ListSource.Clear
@@ -145,6 +146,7 @@ class ListView (GUIControl) {
 	
 
 	libinternal MenuForSelRow
+		opt norefcounts
 		|| sels = .FirstSelected$
 		.show(sels)
 		|| y = .DrawYRow(sels)
@@ -154,6 +156,7 @@ class ListView (GUIControl) {
 		
 	
 	function PressReturnKey (|bool|)
+		opt norefcounts
 		|| r = .OnReturn$
 		(r)(self, .FirstSelected)
 		return true
@@ -211,6 +214,7 @@ class ListView (GUIControl) {
 	
 	
 	libinternal CheckRemoved (|ListViewrow| r)
+		opt norefcounts
 		.ScrollStart	= .replaced(r, ._Scrollstart)
 		._DraggingRowTo	= .replaced(r, ._DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
@@ -256,6 +260,7 @@ class ListView (GUIControl) {
 	
 	
 	behaviour Search
+		opt norefcounts
 		require s
 		.OpenSearch // whatever
 		if JustUpdate
@@ -503,7 +508,7 @@ class ListView (GUIControl) {
 	behaviour MouseMove
 		|| c = .FindClickedCell(P)
 		.cursorforrow(c).use
-			
+		
 		if ._CanSeeAllLines
 			.NoScroll
 			return .HasFocus
@@ -604,7 +609,7 @@ class ListView (GUIControl) {
 
 
 	libinternal BasicRowDrag (GuiListDragEvent)
-		|| s = .FirstSelected
+		|listviewrow--| s = .FirstSelected 
 		if !s or (.listnext(s) == before) and !s.nextselected
 			return true // no need
 		

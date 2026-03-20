@@ -47,7 +47,7 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 	where[0] = ClsData
 	cakerun.ClassTable[name] = ClsData
 
-	|| V = ClsData.Virtuals
+	|| V = ClsData.Virtuals|&&nil|
 	for VFn.fast in PK
 		V++[] = .Func(Vfn[@num])|&nil|
 
@@ -69,13 +69,13 @@ function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
 	opt norefcounts
 	if m
 		|| obj = .ClassTable[m.name]
-			return (obj.PrivValue)|&Classdata|
+			return (obj)|&Classdata|
 		error (m, "Can't find class: " + m.name )
 
 
-function CakeRun.StoreClass (|ClassData| cd)
+function CakeRun.StoreClass (|&ClassData| cd)
 	|| name = cd.Name.wrap
-	.ClassTable.ValueLower(name) = cd
+	.ClassTable.ValueLower(name) = cd|object|
 
 
 /*
@@ -116,8 +116,8 @@ function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, 
 function @ClassData.CakePrepare  (|int| ClassCount, |int| VCount, |bool|)
 	cpp_wrapper JB_Cake__Prepare
 
-function ClassData.Virtuals  (|&&nil|)
-	cpp_wrapper JB_Cake_Virtuals
+//function ClassData.Virtuals  (|&&nil|)
+//	cpp_wrapper JB_Cake_Virtuals
 
 	
 

@@ -36,9 +36,7 @@ class TextViewLine (list)
 				fs <~ '\n'
 		  else
 			fs <~ "${.position}: "
-			fs <~ '"'
-			fs.appendescape(.text)
-			fs <~ '"'
+			fs.AppendQuotedEscape(.text)
 
 
 	libinternal ClearForPrepare

@@ -20,14 +20,14 @@ module zalgo
 			fs <~ s
 			if s < 128
 				|| scale = (s<=32) + (txt[i+1]<=32) + (txt[i-1]<=32)
-				fs.zalgo(s, wierdness, scale|float|)
+				fs.zalgo(wierdness, scale|float|)
 
 
 inline string.Zalgo (|float| Wierdness=8.0, |string|)
 	return zalgo.render(self, Wierdness, nil)
 
 
-function faststring.Zalgo (|byte| s, |float| Wierdness, |float| whites)
+function faststring.Zalgo (|float| Wierdness, |float| whites)
 	|| mul  = 1.0/(whites+1.0)
 	|| up   = zalgo.R[3.0, 3.0+Wierdness]*mul
 	for (up)

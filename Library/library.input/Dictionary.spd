@@ -66,8 +66,8 @@ class Dictionary
 	function ValueLower (|string| s, assigns:||)
 		if s.IsLower
 			self[s] = value
-		  else
-			self[s.lowercase] = value
+			return
+		self[s.lowercase] = value
 
 
 	function Dispose
