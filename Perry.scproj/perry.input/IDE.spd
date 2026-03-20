@@ -168,11 +168,12 @@ class PerryIDE (Window)
 
 
 	function RemoveProjFromList
+		opt norefcounts
 		|| r = .SharedProjectTabSource
-			.SharedProjectTabSource = message() // for now
 			|| n = r.next
 			n ?= r.prev
 			.ProjectTabs.selected = n
+			.SharedProjectTabSource = message() // for now
 			r.remove
 
 
@@ -302,6 +303,7 @@ class PerryIDE (Window)
 
 
 	function ShowLeftStats (|int| i = -1)
+		opt norefcounts
 		if i >= 0
 			perryide.StatsMode = i
 		.ProjectInfo.text = .InfoStatus	
@@ -397,6 +399,7 @@ class PerryIDE (Window)
 
 
 	function HideStuff 
+		opt norefcounts
 		|| M  = .MouSEXY
 		|| LB = .ViewButtons.lastrect.y1
 		|| LF = .filelist.lastrect.x2-2
@@ -440,7 +443,7 @@ class PerryIDE (Window)
 			if .viewing == .viewfiles
 				.noneed
 				|| fl = .filelist.ListSource as filerow
-					fl.SmartName = "file".pluralize(fl.LastFileCount)
+					fl.Name = "file".pluralize(fl.LastFileCount)
 
 
 //	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)

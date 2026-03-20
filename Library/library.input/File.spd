@@ -87,6 +87,7 @@ class File (String)
 	
 	function Size (|int64|)
 		description "Return the file-size."
+		nil checker
 		cpp_wrapper JB_File_Size
 
 	function Length (assigns:|int|)	

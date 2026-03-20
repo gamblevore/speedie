@@ -458,11 +458,15 @@ class ListView (GUIControl) {
 			.select(it)
 		
 		
-	libinternal JumpFind (|string| s, |listviewrow|)
+	libinternal JumpFind (|string| J, |listviewrow|)
 		opt norefcounts
+		|| BestScore = int.max
 		for r.toplist in self
-			if (r isnt UnSelectable) and r.JumpFindMatch(s)
-				return r
+			if (r isnt UnSelectable) 
+				|| S = r.JumpFindMatch(J)
+				if S >= 0 and S < BestScore
+					BestScore = S
+					rz = r
 
 
 	function VisibleRows (|int|)
@@ -1496,10 +1500,17 @@ class ListView (GUIControl) {
 	module
 		|date|				DelayEditTill_
 	
-	libinternal listviewrow.JumpFindMatch (|string| s, |bool|)
-		for (c in s) (i)
-			if c.IsAlphaNum
-				return .name[i, s, true]
+
+	libinternal listviewrow.JumpFindMatch (|string| ToFind, |ind|)
+		opt norefcounts
+		|| n = .name
+		|| pos = n.find(ToFind)
+		if pos < 0
+			return pos
+		|| HasBad = n.OutCharSet(CharSet.LettersOnly, 0)
+		if HasBad > 0
+			pos += HasBad
+		return pos
 			
 }
 

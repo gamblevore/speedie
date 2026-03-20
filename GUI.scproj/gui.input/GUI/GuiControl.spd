@@ -338,7 +338,7 @@ class GUIControl (list)
 	
 
 	libinternal PasteSub (|string| Data, |copypasteflags| Type, |window| w, |bool|)
-		|| c = self
+		|guicontrol--| c = self
 		if !c.PasteEvent
 			c = w
 		  elseif !(c.CopyPaste & Type) and (w.copypaste & type)
@@ -349,7 +349,7 @@ class GUIControl (list)
 			|| items = [Data]
 			if (c.copypaste == copypasteflags.pastefile) // split by lines
 				items = data.split
-			|ListViewrow| After
+			|ListViewrow--| After
 			if c isa ListView
 				after = c.lastselected
 				c.selectnone

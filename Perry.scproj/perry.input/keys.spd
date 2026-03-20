@@ -155,9 +155,7 @@ function PressedEditKeys (GUIKeyEvent)
 			return .PerryDeclKey
 		
 		require key == -9 or -10 or 27
-		|| kabs = key.abs
-		
-		|| tabkind = .PerryInsertSyntax(kabs, key)
+		|| tabkind = .PerryInsertSyntax(key.abs, key)
 			if tabkind == 1
 				.ide.EditMeTabRetryThing = 0
 			return true

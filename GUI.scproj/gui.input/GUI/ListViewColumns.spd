@@ -30,7 +30,7 @@ role ListViewCell (message)
 	function Row (|ListViewrow!|)
 		inline
 		return (.obj as Message)|listviewrow|!
-		
+	
 	syntax cast (|string|)
 		disabled "just get the value"
 		
