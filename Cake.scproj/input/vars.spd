@@ -59,7 +59,7 @@ class XVar (list)
 	
 	
 	function NilOK (|faststring| fs, |&nil| Where,  |bool|)
-		require .TestMem(fs, Where, 8, "Unreadable")
+		require fs.TestMem(Where, 8, "Unreadable")
 		|| Ptr = (Where|&uint64|)[]
 		if (!Ptr and .CanBeNil) or (Ptr >= 64K)
 			return true
@@ -78,7 +78,7 @@ class XVar (list)
 	function RenderValue (|faststring| fs, |&nil| Where, |bool| IsReg, |bool|)
 		opt norefcounts
 		if IsReg
-			require .TestMem(fs, Where, 16, "BadStack") // we still need to check for readability, though!
+			require fs.TestMem(Where, 16, "BadStack") // we still need to check for readability, though!
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
 			return .RenderObject(fs, Where)
@@ -125,7 +125,7 @@ class XVar (list)
 			fs <~ `""`
 			return true
 		
-		require .TestMem(fs, addr, n, "BadString")				// check string
+		require fs.TestMem(addr, n, "BadString")				// check string
 		
 		|VirtualJBString| Skkrt
 		Skkrt.Addr = Addr
@@ -137,7 +137,21 @@ class XVar (list)
 			fs <~ ('.', 3)
 		
 		return true
-		
+	
+
+	function message.DebugRender (|faststring| fs, |bool|)
+		opt norefcounts
+		fs <~ .func.name
+		fs <~ "@"
+		|| name = .name
+		require fs.testobj(name)
+		if name isa string
+			fs.AppendQuotedEscape(name)
+			return true
+
+		fs <~ name.class.name
+		fs <~ "!"
+
 	
 	function RenderObject (|faststring| fs, |!&nil| Reg, |bool|)
 		opt norefcounts
@@ -147,26 +161,18 @@ class XVar (list)
 			fs <~ "(nil)"
 			return true
 
-		require .TestObj(fs, obj)		// check object is readable and sane
+		require fs.TestObj(obj)									// check object is readable and sane
 		
 		if obj isa string or obj isa faststring
 			|| str = obj|&nil||string|
 			return .DisplayString(fs, str.addr, str.length)
 
-		if (obj.class == Message) and (obj isa message)				// What if crash in here? ooof
-			// avoid rendering error as a message
+		if (obj.class == Message) and (obj isa message)			// avoid rendering error as a message
 			if .ViewStrength == 0
-				fs <~ obj.func.name
-				fs <~ "@"
-				|| name = obj.name
-				require .testobj(fs, name)
-				ifn name isa string
-					fs <~ name.class.name
-					fs <~ "!"
-					return false
-				fs.AppendQuotedEscape(name)
-			  elseif .ViewStrength == 1
-				obj.render(Fs)			// How to quote so looks distinct? «abc » is used .renderAST
+				return obj.DebugRender(fs)
+			
+			if .ViewStrength == 1					// What if crash in here? ooof
+				obj.render(Fs)						// How to quote so looks distinct? «abc » is used .renderAST
 			  else
 				obj.RenderAST(Fs)
 			return true
@@ -210,17 +216,17 @@ class XVar (list)
 		return true
 		
 	
-	function TestObj (|faststring| fs, |object| Obj, |bool|)
-		return .TestMem(fs, obj|&nil|, -1, "BadObject")
+	function faststring.TestObj (|object| Obj, |bool|)
+		return .TestMem(obj|&nil|, -1, "BadObject")
 	
 	
-	function TestMem (|faststring| fs,  |!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
+	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
 		|| Err = memory.test(Mem, N)
 			return true
 				
-		fs <~ ErrName
-		fs <~ ": 0x"
-		fs.AppendHex(Mem|int64|)
+		self <~ ErrName
+		self <~ ": 0x"
+		.AppendHex(Mem|int64|)
 	
 	
 	function RenderData (|faststring| fs, |!&nil| Reg, |bool|)
@@ -244,7 +250,7 @@ class XVar (list)
 			reg = ptr|&ivec4|
 			fs <~ ": "
 				
-		require .TestMem(fs, reg, bc, "UnReadable")
+		require fs.TestMem(reg, bc, "UnReadable")
 		if t is bool
 			fs <~ (reg|&bool|)[].string
 		  elseif t isnt Floating
