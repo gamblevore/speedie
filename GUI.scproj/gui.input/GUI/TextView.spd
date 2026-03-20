@@ -1647,9 +1647,12 @@ class TextView (GUIControl)
 
 	setter Text (|string|)
 		cpp_part TextSetReal
+		opt norefcounts
 		isnt modified
 		if .Clear(value)
-			.undoer.ClearTo(value)?
+			|| u = .undoer
+				u.clear
+				u.AddState(value, nil)
 	
 
 	function TextLeft (|int|)
@@ -2241,7 +2244,7 @@ class TextView (GUIControl)
 
 	function LoadDocument (|document| D, |bool| Show, |bool|)
 		|| old = .document
-			require .GroupSaveAll or old.DocClose
+			require .GroupSaveAll or old.SaveBeforeClose
 			.UnloadDoc(old)
 		
 		d.SimpleUpdateFromDisk

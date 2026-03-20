@@ -36,6 +36,7 @@ class Document (list)
 		.ref.DeRef
 	
 	render
+		opt norefcounts
 		fs <~ .location
 		fs <~ "\n"
 		super.render(fs)
@@ -61,7 +62,7 @@ class Document (list)
 		|| c = .Current
 			return c.text
 
-	function ExpectCurr (||)
+	libinternal ExpectCurr (||)
 		opt NoRefCounts
 		|| o = .original
 		|| c = .Current
@@ -77,7 +78,7 @@ class Document (list)
 		return c
 
 
-	function UpdateState (|string| nt, |ivec2| ns)
+	libinternal UpdateState (|string| nt, |ivec2| ns)
 		opt norefcounts
 		|| c = .Current
 			if c != .original
@@ -88,7 +89,7 @@ class Document (list)
 		.addstate(nt, ns)
 	 
 
-	function AddState (|string| nt, |ivec2| ns, |DocumentState|)
+	libinternal AddState (|string| nt, |ivec2| ns, |DocumentState|)
 		|| c = .current
 			if c.text == nt
 				return c
@@ -105,11 +106,6 @@ class Document (list)
 		return latest
 
 
-	function ClearTo (|string| s)
-		.clear
-		.AddState(s, nil)
-
-
 	function IsModified (|bool|)
 		opt norefcounts
 		|| c = .current
@@ -118,7 +114,7 @@ class Document (list)
 		return (c != o) and (c.text!=o.text)
 
 
-	function DocClose (|bool|)
+	function SaveBeforeClose (|bool|)
 		if !.IsModified
 			return true
 		|| Answer = ("Save file " + .Location.name + "?").AskSaveOrCancel()
@@ -166,7 +162,7 @@ class Document (list)
 			.UpdateSavedState
 			
 
-	function FindKeepDate (|string| t,  |file| f,  |bool|)
+	libinternal FindKeepDate (|string| t,  |file| f,  |bool|)
 		require .CompareTreesOnSave
 		|| old = f.ReadAll
 			|| jold = old.Parse
@@ -208,7 +204,7 @@ class Document (list)
 //			return c.text.length
 
 	
-	function DocumentViewer.NextViewer (|$?DocumentViewer| out, |textview|)
+	libinternal DocumentViewer.NextViewer (|$?DocumentViewer| out, |textview|)
 		opt norefcounts
 		|| it = .Viewer
 		out = .next
@@ -227,7 +223,7 @@ class Document (list)
 				it.parse
 
 
-	function UpdateViewers (|int| Reason)
+	libinternal UpdateViewers (|int| Reason)
 		opt norefcounts
 		|| a = .current$
 		|| v = .viewers.first
@@ -236,7 +232,7 @@ class Document (list)
 				it.UseState(a,  self,  a.typingplace, Reason)
 
 
-	function UpdateSavedState 
+	libinternal UpdateSavedState 
 		opt norefcounts
 		|| v = .viewers.first
 		while v
@@ -245,7 +241,7 @@ class Document (list)
 				(it.ontextchanged)(it, documentstate.Saving, false)?
 				
 
-	function LoadSub (|bool| ChangedExternal, |bool|)
+	libinternal LoadSub (|bool| ChangedExternal, |bool|)
 		|| f = .Location.file
 		|| Lim = document.AskLimit(f)
 		|| Data	= f.readall(lim)		#require
@@ -279,7 +275,7 @@ class Document (list)
 		return true
 
 
-	function Trim
+	libinternal Trim
 		opt norefcounts
 		|| L = .last$
 		|| F = .first
@@ -310,7 +306,7 @@ class Document (list)
 				rz = .Cache_.DocumentCached(path)
 			rz ?= document(path, 120)
 			
-		function AskLimit (|file| f, |int|)
+		libinternal AskLimit (|file| f, |int|)
 			|| n = f.size
 			if n <= 128MB or n >= int.max
 				return 128MB
