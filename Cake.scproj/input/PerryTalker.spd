@@ -232,10 +232,10 @@ function xtype.ActualType (|&nil| ObjAddr, |xtype|)
 	return self
 
 
-function xvar.Expand (|jbin| j, |&byte| Obj, |int| Depth, |xtype?| Type)
+function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |int| Depth, |xtype?| Type)
 	opt norefcounts
 	j.Enter(@arg, .name)
-	if type and .Expanded > Depth
+	if obj and type and .Expanded > Depth
 		Type.ExpandSub(j, Obj, Depth)
 	j.exit
 
@@ -258,7 +258,7 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	j.AddStr(vars)
 	
 	if ok
-		.Expand(j, where|&&byte|[], depth, type)
+		.ExpandVar(j, where|&&byte|[], depth, type)
 	  else
 		j.add(@thg, "bad")
 

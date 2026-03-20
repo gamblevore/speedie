@@ -153,11 +153,18 @@ class XVar (list)
 			|| str = obj|&nil||string|
 			return .DisplayString(fs, str.addr, str.length)
 
-		if obj isa Message				// What if crash in here? ooof
+		if (obj.class == Message) and (obj isa message)				// What if crash in here? ooof
+			// avoid rendering error as a message
 			if .ViewStrength == 0
 				fs <~ obj.func.name
 				fs <~ "@"
-				fs.AppendQuotedEscape(obj.name)
+				|| name = obj.name
+				require .testobj(fs, name)
+				ifn name isa string
+					fs <~ name.class.name
+					fs <~ "!"
+					return false
+				fs.AppendQuotedEscape(name)
 			  elseif .ViewStrength == 1
 				obj.render(Fs)			// How to quote so looks distinct? «abc » is used .renderAST
 			  else
@@ -204,7 +211,7 @@ class XVar (list)
 		
 	
 	function TestObj (|faststring| fs, |object| Obj, |bool|)
-		return .TestMem(fs, obj|&nil|, -1, "Bad Object")
+		return .TestMem(fs, obj|&nil|, -1, "BadObject")
 	
 	
 	function TestMem (|faststring| fs,  |!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)

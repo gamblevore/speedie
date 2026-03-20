@@ -14,8 +14,8 @@ class FastString {
 
 	|int|			Length
 	|&Byte|			ResultPtr
-	|?&nil|			Dummy1
-	|?&nil|			Dummy2
+	|?object|		__
+	|?File|			File
 	|int64|			WrittenLength // invisible
 	
 	|int|			Reserved
@@ -37,6 +37,9 @@ class FastString {
 		cpp_wrapper JB_FS_AppendLower
 	function FreeSize (|int|)			{ cpp_wrapper JB_FS_FreeSize }
 	function FreeSize (assigns:|int|, |&byte|) {cpp_wrapper JB_FS_NeedSpare}
+
+	setter File (|File?|)
+		cpp_wrapper JB_FS_FileSet
 
 	function StreamLength (|int|) {
 		cpp_wrapper JB_FS_StreamLength
@@ -318,11 +321,3 @@ class FastString {
 		return .streamlength - n
 }
 
-
-
-extend FastString
-	function File (|File|)
-		cpp_wrapper JB_FS_File
-	
-	function File (assigns:|File|)
-		cpp_wrapper JB_FS_FileSet

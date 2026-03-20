@@ -93,6 +93,7 @@ class Validator
 		return self
 
 	autogen ReportMissing
+		opt norefcounts
 		if self
 			"!!!!"
 			printline .msg_
@@ -110,6 +111,7 @@ class Validator
 			
 	syntax Expect (|string?| Description=nil)
 		inline
+		opt norefcounts
 		.msg.SyntaxExpect(description)
 
 

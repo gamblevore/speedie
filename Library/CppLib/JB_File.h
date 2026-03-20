@@ -7,8 +7,6 @@
 
 extern "C" {
 
-// put this separately as its own struct eventually... 
-// half way there!
 struct JB_File;
 struct JB_DirReader {
     void*           Dir;

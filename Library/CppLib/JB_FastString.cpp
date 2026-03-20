@@ -605,13 +605,10 @@ bool JB_FS_Flush(FastString* fs) {
     return false;
 }
 
-JB_File* JB_FS_File(FastString* fs) {
-    return fs->File;
-}
 
 void JB_FS_FileSet(FastString* fs, JB_File* F) {
     JB_SetRef( fs->File, F );
-    if (F->Descriptor < 0) {
+    if (F and F->Descriptor < 0) {
         JB_File_OpenEmpty(F);
     }
 }

@@ -69,7 +69,7 @@ function FATASM.OutputDebugVars
 
 function scdecl.DumpCls (|int|)
 	opt norefcounts
-	|| t = .type
+	|| t = .type.RealClass
 	if t.isobject or t.isstruct
 		return (t.tableid<<1) + t.isobject
 
