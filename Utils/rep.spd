@@ -7,7 +7,7 @@ main (|file.existing| folder, |string| Func, |string| From, |String| To)
 
 
 function app.Replace (|file| p, |bool|)
-	if p isfile "spd"
+	if p.isfile and (p isa "spd")
 		return p.SyntacticReplace
 		
 	for f.files in p

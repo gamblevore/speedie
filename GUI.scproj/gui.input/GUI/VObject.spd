@@ -30,16 +30,16 @@ class VObject (list)
 		.Health = 256
 		.id = ++ObjID
 	
-	function BigR (|float|)
+	inline BigR (|float|)
 		return .radius.max
 		
 	function Towards (|vec3| P, |float| Speed)
 		.Velocity = (P - .pos).Normal * Speed
 	
-	function y (|float|)
+	inline y (|float|)
 		return .pos.y
 
-	function x (|float|)
+	inline x (|float|)
 		return .pos.x
 
 	function left (|float|)
@@ -96,7 +96,7 @@ class VObject (list)
 	module
 		function Box (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white, |vobject|)
 			rz = VObject((pos, 0.0), vec3(size,1.0), &VShapes.Box, color)
-		function NewParticle (|vobject|)
+		libinternal NewParticle (|vobject|)
 			visible
 			// This will us let ALL drawn objects be vobjects, even particles
 			// we could pre-allocate 1000 or something, or just allocate on demand and keep them.
@@ -136,8 +136,10 @@ function controlsize.CalculateBlocks (|ivec4|)
 function vec4.ScreenFloat (|vec4|)
 	return (self + VObject.Drawmovement.xyxy) * VObject.DrawScale
 
+
 inline ivec4.Screen (|ivec4|)
 	return .Vec4.Screen
+
 
 function vec4.Screen (|ivec4|)
 	|| p = .ScreenFloat
@@ -180,8 +182,10 @@ extend Window
 		.BlockMode = (.BlockMode &~2) ||| (Middle<<1)
 		
 	setter BlockHeight (|float|)
+		inline
 		.Blockscale = -Value.length
 	
 	setter BlockWidth (|float|)
+		inline
 		.Blockscale = Value.length
 

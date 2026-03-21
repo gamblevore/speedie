@@ -56,6 +56,10 @@ datatype CharSet (uint)
 		inline // selftool uses this
 		return (self|uint| ||| c|uint|)|charset|
 
+	syntax is (|charset| cs, |bool|)
+		inline
+		return self|uint| & cs|uint|
+		
 	
 	constants
 		|int| 
@@ -69,35 +73,21 @@ datatype CharSet (uint)
 		fDotDash				// .-
 		fCommaSlash				// \,
 		fRemainingPunct			// &|~@!()[]}?
-		fAfterTmp				// '`"{#$%
-		fEditorSeparators		// -^+/*;<>=
+		fAfterTmp				// '`"{#$%		 // { directly after a TMP doesn't change it... should it?
+		fEditorSeparators		// -^+/*;<>=	 // would be nice to remove { from aftertmp...
 		fNumber					// 0123456789
 		fUpper					// A-Z
 		fLower					// a-z
 		fUnicode				// 128+
 
-	flags
-		|CharSet| 
-		Invalid
-		Null
-		Unprintable
-		Line
-		HSpace
-		Underscore
-		Colon
-		DotDash
-		CommaSlash
-		RemainingPunct
-		AfterTmp
-		EditorSeparators
-		Number
-		Upper
-		Lower
-
 	constants
 		|CharSet| 
+		Line			= (1<<fLine)
 		SafeInC			= (1<<fUpper) + (1<<fLower) + (1<<fUnderScore) + (1<<fNumber)
 		Unicode			= (1<<fUnicode)
+		LowerCase		= (1<<fLower)
+		UpperCase		= (1<<fUpper)
+		UnderScore		= (1<<fUnderscore)
 		LettersOnly 	= (1<<fUpper) + (1<<fLower) + Unicode
 		LettersUnderScore= LettersOnly+ (1<<fUnderscore) 
 		NameMid			= LettersUnderScore + (1<<fNumber)
@@ -107,6 +97,9 @@ datatype CharSet (uint)
 		AfterStatement	= White + (1<<fColon) + (1<<fCommaSlash) + (1<<fAfterTmp)
 		EditorSplitter  = White + (1<<fColon) + (1<<fCommaSlash) + (1<<fEditorSeparators)
 		Trim			= White + (1<<fNull)
+	
+	inline byte.CharSet (|charset|)
+		return (1<<charset.Props[self])|charset|
 	
 	module
 		|byte[256]| Props

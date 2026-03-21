@@ -30,13 +30,14 @@ class File (String)
 
 ////////////////////////////////////////////////////////////////////////////
 
-	constructor ( |string| path = "" )
+	constructor (|string| path = "" )
 		cpp_wrapper JB_File_Constructor
 	
 	destructor
 		cpp_wrapper JB_File_Destructor
 
 	function Mode (|FileMode|)
+		nil checker
 		cpp_Wrapper JB_File_Mode
 	
 	function Path (|string|)
@@ -80,7 +81,7 @@ class File (String)
 
 	syntax equals (|string?| s, |bool| aware=false, |bool|)
 		inline
-		return super.syntaxequals(s, aware)
+		return super.SyntaxEquals(s, aware)
 			
 	function Length (|int|)
 		disabled "Do you mean the file's size or the file's path length?" 
@@ -96,9 +97,6 @@ class File (String)
 	function Size (assigns:|int|N)
 		cpp_wrapper JB_File_SizeSet
 
-	function Created (|Date|)
-		cpp_wrapper JB_File_Created
-
 	function Flush (|ErrorInt|)
 		cpp_wrapper JB_File_Flush
 		
@@ -107,6 +105,7 @@ class File (String)
 	
 	Syntax Access (assigns:|string| data, |FileSizeInt|)
 		description "Writes to the file. Clears old data."
+		inline
 		return .WriteAll(data)
 		
 	function String.WriteAll (|string| Data, |FileSizeInt|)
@@ -124,7 +123,7 @@ class File (String)
 
 	function SmartData (assigns:|String| nieu, |bool|)
 		if (.size != nieu.length) or (.readall(true) != nieu)
-			return .writeall(Nieu)
+			return .WriteAll(Nieu)
 
 	Syntax Append (|string| data)
 		disabled "Use file[] = data, to set the entire file's data."
@@ -154,6 +153,9 @@ class File (String)
 			(message).restore
 
 	
+	function Created (|Date|)
+		cpp_wrapper JB_File_Created
+
 	function Accessed (|Date|)
 		nil checker
 		cpp_wrapper JB_File_Accessed
@@ -187,7 +189,7 @@ class File (String)
 		expect (rz.exists) (Self, "Can't find file/folder: " + rz)
 	
 	
-	function Parent (|File|)
+	inline Parent (|File|)
 		opt norefcounts
 		return File.new( super.Parent )
 	
@@ -352,11 +354,13 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		if !KeepSelf and rz == 0
 			rz = .Delete
 
-	operator isfile (|string| ext, |bool|)
-		return !.isdir and self isa ext
+	function IsFile (|bool|)
+		inline
+		return !.isdir
 
-	operator isdir (|string| ext, |bool|)
-		return .isdir and self isa ext
+//	operator isdir (|string| ext, |bool|)
+//		inline
+//		return .isdir and self isa ext
 		
 	function DirectoryContains (|string| path, |bool|)
 		return path.AbsolutePath starts .PathDir
@@ -419,7 +423,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				exit
 	
 	
-	function ListFiles (|int| Mode=file.AllowSymLinks, |[file]|)
+	inline ListFiles (|int| Mode=file.AllowSymLinks, |[file]|)
 		return .list(mode|||WantFileObjects)|[file]|
 	
 	
@@ -451,14 +455,16 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	function Read (|int| Length, |bool| AllowMissing=true, |string|)
 		cpp_wrapper JB_File_Read
 
-	function Skip (|int| n=1)
+	inline Skip (|int| n=1)
 		.offset += n
+
 
 	iterator
 		|| reader = .ListStart
 		while ( reader.MoveNext )
 			yield reader.CurrChild
 		reader.listend
+
 
 	iterator Files
 		|| reader = .ListStart
@@ -567,8 +573,8 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				return file.MainArg(pos, name)$.Outputstream
 
 
-	function AnyDate (|date|)
-		return .created ?? .modified
+//	function AnyDate (|date|)
+//		return .created ?? .modified
 
 
 

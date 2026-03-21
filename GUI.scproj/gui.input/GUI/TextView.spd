@@ -409,25 +409,25 @@ class TextView (GUIControl)
 	
 	libinternal FindEnd (|ind| x,  |int| i,  |int|)
 		opt norefcounts
-		|| f = csAntiWords!
-		|| avoid = false
+		|| ToFind = ~charset.NameMid
+		|| avoid = false // is always false?
 		|| s = .text
 		if i > 0
 			|| x2 = s.MoveCodePoint(x, 1)
-			if f[s[x]]	// so... if we have "|   " and we wanna move forward. then what?
+			if ToFind[s[x]]	// so... if we have "|   " and we wanna move forward. then what?
 				if !avoid
 					return x2
-				x = s.outcharset(f, x2) 
+				x = s.outcharset(ToFind, x2) 
 			  else
-				x = s.find(f, x2...)
+				x = s.find(ToFind, x2...)
 		  elseif x > 0
 			|| x2 = s.MoveCodePoint(x, -1)
-			if f[s[x2]]
+			if ToFind[s[x2]]
 				if !avoid
 					return x2
-				x = s.outcharset(F, x2, 0)
+				x = s.outcharset(ToFind, x2, 0)
 			  else
-				x = s.find(f, x2, 0)
+				x = s.find(ToFind, x2, 0)
 			if x
 				x = s.MoveCodePoint(x, 1)
 		if x
@@ -436,72 +436,95 @@ class TextView (GUIControl)
 			return s.length
 	
 	
-	libinternal WordMove (|ind| pos, |int| dir, |ind|)
+	libinternal ControlMove (|ind| pos, |int| dir, |ind| x, |ind|)
 		opt norefcounts
 		|| s = .text
-		|| x = .WordMoveSub(pos, dir)
-		|| Control = keys.platcmd(false)
-		ifn (x!=pos) and control
-			return .clamp(x)
-		//
 		|| shift = (dir==1)-1
-		|| G = s.group(pos+shift)
-		if  dir == 1  and  g == 1
+		|| G = s.TVCharSet(pos+shift)
+		if  g isnt LettersOnly
+			return pos
+		
+		if  (dir == 1)
 			while
 				if pos >= x
 					return pos
-				|| g2 = s.group(pos+shift)
+				|| g2 = s.TVCharSet(pos+shift)
 				if g2 != g
 					g = g2
 					exit
 				pos++
 				
 		while x != pos // move pos
-			|| ng = s.group(pos+shift)
+			|| ng = s.TVCharSet(pos+shift)
 			if ng!=G
-				if (dir == -1) and (G == 2) and (ng==1)
+				if (dir == -1) and (G is lowercase) and (ng is uppercase)
 					pos--
 				return pos
 			pos+=dir
 			if pos <= 0 or pos >= s.length
 				exit
 		return pos
-	
 
-	function string.Group (|int| i, |int|) // replace this with charprops.spd?
-		|| b = self[i]
-		if b.IsUpper
-			return 1
-		if b.IsLower or b == '_'
-			return 2
-		if b.IsInt
-			return 3
-		if b.iswhite
-			return 4
-		if b >= 128
-			return 5
+
+	libinternal WordMove (|ind| pos, |int| dir, |ind|)
+		opt norefcounts
+		|| x = .clamp(.WordMoveSub(pos, dir))
+		|| Control = keys.platcmd(false)
+		if (x==pos) or !control
+			return x
+
+		|| pos2 = .controlMove(pos, dir, x)
+		if pos2 != pos
+			return pos2
+		return x
+			
+
+
+	libinternal string.TVCharSet (|int| i, |charset|) // replace this with charset.spd?
+		|| Cs = self[i].CharSet
+		if cs is underscore
+			cs = CharSet.lowercase
+		return cs
 
 			
 	libinternal WordMoveSub (|ind| pos, |int| dir, |ind|)
 		opt norefcounts
+		require dir >= 0 or pos > 0
 		|| s = .text
-		|| orig = pos
+		|| Adjust = (dir - 1) >> 1							// -1 = -1,   +1 = 0
+		|| ToFind = s[pos + Adjust]
+		if dir < 0 and ToFind == '.'
+			pos--
+			ToFind = s[pos + adjust]
+		|| FindCS = ToFind.charset
+
+		if FindCS is LettersUnderScore
+			FindCS = CharSet.LettersUnderScore
+			
+		|| IsAContainer = CounterParts.find(ToFind)
+			|| CanOpen = (IsAContainer&1) == 0
+			|| CanClose = !CanOpen or (CounterParts[IsAContainer+1] == ToFind)   // " can be open OR close.
+			if (CanClose == dir < 0) or (CanOpen == Dir > 0)
+				pos += dir
+				|| SecondCS = s[pos + Adjust].charset 			// ((abc)) (<abc>)
+				if SecondCS == FindCS				 			// undo our attempt
+					pos -= dir
+				FindCS = SecondCS
+
+	
+		|| After = s.Length
 		if dir < 0
-			if pos > 0
-				pos = s.OutCharSet(textview.csantiWords!, pos-1, 0)
-				if pos
-					pos = s.find(textview.csantiWords!, pos, 0)
-					if pos
-						pos = pos max .FindLineSeperator(orig-1, pos)
-						return pos + 1
-		  else
-			pos = s.OutCharSet(textview.csantiWords!, pos...)
-			if pos
-				pos = s.find(textview.csantiWords!, pos...)
-				|| t2 = .FindLineSeperator(pos, orig+1)
-					pos = pos min t2
-			pos ?= s.length
-			return pos
+			after = 0
+		|| Found = s.find(~FindCS, Pos, After)
+			if IsAContainer
+				|| Other = CounterParts[IsAContainer+1]
+				|| Ch = s[Found]
+				if Other == Ch
+					found += dir
+			return Found - Adjust
+		if dir > 0
+			return After
+		return 0
 	
 	
 	libinternal MoveSel (|int| i, |bool|)
@@ -1375,54 +1398,55 @@ class TextView (GUIControl)
 			p++
 
 		
-	libinternal CounterPartType (|string| s, |bool|)
-		require (!.singleline and s.length == 1)
+	libinternal TypedACounterPart (|byte| s, |bool|)
+		require (!.singleline)
 		|| sel  = .SelRange
 		|| sel2 = sel.x2
-		|| t    = .seltext
-
-		if (!sel.width and s == "=")			//   a |=| b   -->   a |= b
-			if  self[sel2] == '|'  and  self[sel2-1] == '|'
-				.selrange = (sel2, sel2+1)
-			return false
-
-		require t or (.ExpectsParse >= probablyjeebox)
-		|| c     = counterparts.find(s)
-		|| After = self[sel2]
-		if !c
-			c = CounterParts2.find(s)
-			if c and after.equals(s)
-				.selrange = sel2+1
-				return true				// sigh could simplify this. cant be bothered
-			return false
+		|| SW = sel.Width
 		
-		if (t.length == 1) and counterparts.find(t)  // stop awkward things like: " --> (")
-			require (s == "'" or "\"") and (s != t)
+		if (!SW  and  s == '=')							//   a |=| b   -->   a |= b
+			if  self[sel2] == '|'  and  self[sel2-1] == '|'
+				.SelRange = (sel2, sel2+1)
+			return false
+
+		require SW or (.ExpectsParse >= probablyjeebox)
+		|| c     = counterparts.find(s)					#require
+
+		|| After = self[sel2]
+		if (c&1) and (after == s)
+			.selrange = sel2+1
+			return true									// sigh could simplify this. cant be bothered
+		
+		if (SW == 1)
+			|| tb = self[sel.x]
+			if counterparts.find(tb)		// stop awkward things like: " --> (")
+				require (s == '\'' or '"') and (s != tb)
+		
 		
 		// what about ' within a comment. its quite frustrating.
-			
-		|| Other = CounterParts2[c]
-		if other.equals(s) and other==after
+		|| other = CounterParts[c+1]
+		if (Other==s) and (after == s)
 			.selrange = sel2+1
 			return true
 
 		require .SelMsgValid(sel) // we want to avoid this after comments. how do we know if something is commented?
 								  // only after parsing, really. we can backscan. but thats more of a pain. 
 
-		if !sel.width
-			require s != "{"
+		if !SW
+			require s != '{'
 		
 		.undochecker = -1
-		|| x = .insert(s + t + other.render)
+		|| t    = .seltext
+		|| x = .insert(s.render + t + other.render)
 		.selrange = (x+1, x+t.length+1)
 		return true
 
 
-	function SelText (|string|)
+	inline SelText (|string|)
 		return self[.selrange]
 	
 	
-	function SelText (assigns:|string|)
+	inline SelText (assigns:|string|)
 		.Insert(value, true)
 
 	
@@ -1447,7 +1471,7 @@ class TextView (GUIControl)
 		debug_require self is editable
 		GUI.ShowCursor(false)
 		
-		if .CounterPartType(s)
+		if (s == 1) and .TypedACounterPart(s[])
 			return 2
 		.insert(S)
 		return 1
@@ -2324,9 +2348,7 @@ class TextView (GUIControl)
 		SingleLineWithTabs = 2
 	
 	module
-		|| csAntiWords		= ~charset.NameMid
-		|| CounterParts		= <(`{[(`'"|`)>
-		|| CounterParts2	= <(`}])`'"|`)>
+		|| CounterParts	= <(`{}[]()``''""||`)> 
 		
 		function Block (|guicontrol| parent, |float| x, |float| w, |float| y, |float| h, |textview|)
 			rz = TextView(parent)
@@ -2383,5 +2405,6 @@ datatype TextViewJumpMode (int)
 		SlowScroll
 		WantAGoodView
 	syntax is (|TextViewJumpMode| m, |bool|)
+		inline
 		return self|int| & m|int|
 

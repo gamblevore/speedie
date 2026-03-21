@@ -37,7 +37,7 @@ datatype byte
 	function IsHex (|bool|)
 		return .IsInt  or  .in('a', 'f')  or  .in('A', 'F')
 
-	function IsInt (|bool|)
+	inline IsInt (|bool|)
 		return (self|int| - '0')|uint| <= 9
 		
 	operator eq (|byte| b, |bool|)
@@ -55,7 +55,7 @@ datatype byte
 		return self|codepoint|.isupper
 	inline IsLower (|bool|)
 		return self|codepoint|.islower
-	function In (|uint| a, |uint| b, |bool|)
+	inline In (|uint| a, |uint| b, |bool|)
 		return  self >= a  and  self <= b
 	
 	iterator
