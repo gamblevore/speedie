@@ -390,7 +390,7 @@ datatype IntRange (ivec2)
 			return false
 		return true
 		
-	inline Resolve (|intrange|)
+	function Resolve (|intrange|)
 		return (.lower, .higher)
 	inline Higher (|int|)
 		return .x1 max .x2

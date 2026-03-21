@@ -216,27 +216,25 @@ class TextView (GUIControl)
 		if dist < 0
 			l = -1
 		return .StartLine.move(L)
+		
+		
+	libinternal ExpandWordLike (|intrange| t, |intrange|)
+		opt norefcounts		
+				
+		if (t.x1 > t.x2)
+			t = (t[1], t[0])
+		|| A = .WordMoveSub(t[0], -1, false)
+		|| B = .WordMoveSub(t[1],  1, false)
 
-	
-	libinternal ExpandToAntiWords (|intrange| t, |intrange|)
-		opt norefcounts
-		|| M = .MessageAt(t.x1)
-		|| M2 = .MessageAt(t.x2)
-		if false and m != nil and m == m2
-			if m in @decl
-				m = m.parent
-				if t.x1 >= m.position and t.x2 <= m.after
-					t.x1 = m.position
-					t.x2 = m.after
-					return t
-			
-		|| IsForward = t.x1 < t.x2 
-		|| fwd = 0+( IsForward)
-		|| bck = 0+(!IsForward)
-		t.x1 += fwd
-		t[bck] = .FindEnd(t[bck], -1)
-		t[fwd] = .FindEnd(t[fwd],  1)
-		return t
+		|| LastOpp = ContainerOpposite(self[B-1], 1)
+		|| FirstOpp = ContainerOpposite(self[A], -1)
+		
+		if  (LastOpp)  and  (!firstopp)  and self[A-1] == lastopp
+			A--
+		if  (!LastOpp)  and  (firstopp)  and self[B] == lastopp
+			B++
+		
+		return (A,B)
 
 	
 	libinternal TextViewLine.ooof (|bool| t, |int|)
@@ -278,7 +276,7 @@ class TextView (GUIControl)
 	
 	libinternal ExpandSel (|ivec2| t, |int| C, |ivec2|)
 		if (C == 2)
-			return .ExpandToAntiWords(t)
+			return .ExpandWordLike(t)
 		if (C == 3)
 			return .ExpandToVis(t)
 		if (C >= 4)
@@ -326,14 +324,14 @@ class TextView (GUIControl)
 	function Sel (assigns:|int|)
 		disabled "Use selrange"
 		
-	function SelRange (assigns: |int| r)
+	inline SelRange (assigns: |int| r)
 		cpp_part TypingPlaceInt
 		.selrange = (r, r)
 		
 	function SelRange (assigns:|intrange|)
 		.TypingPlaceTry(value, false, nil)
 
-	function SelRange (|intrange|)
+	inline SelRange (|intrange|)
 		return ._typingplace.resolve
 		
 	libinternal Sel0 (|int|)
@@ -377,7 +375,6 @@ class TextView (GUIControl)
 
 	libinternal TypingPlaceChanged (|bool| insert, |textviewline| d)
 		opt norefcounts
-		
 		if .hasfocus
 			GUI.selchanged
 		if !.IsCleared
@@ -405,38 +402,9 @@ class TextView (GUIControl)
 		|| dse = ._ErrorDelayer
 			dse.remove
 			._ErrorDelayer = nil
-		
-	
-	libinternal FindEnd (|ind| x,  |int| i,  |int|)
-		opt norefcounts
-		|| ToFind = ~charset.NameMid
-		|| avoid = false // is always false?
-		|| s = .text
-		if i > 0
-			|| x2 = s.MoveCodePoint(x, 1)
-			if ToFind[s[x]]	// so... if we have "|   " and we wanna move forward. then what?
-				if !avoid
-					return x2
-				x = s.outcharset(ToFind, x2) 
-			  else
-				x = s.find(ToFind, x2...)
-		  elseif x > 0
-			|| x2 = s.MoveCodePoint(x, -1)
-			if ToFind[s[x2]]
-				if !avoid
-					return x2
-				x = s.outcharset(ToFind, x2, 0)
-			  else
-				x = s.find(ToFind, x2, 0)
-			if x
-				x = s.MoveCodePoint(x, 1)
-		if x
-			return x
-		if i > 0
-			return s.length
 	
 	
-	libinternal ControlMove (|ind| pos, |int| dir, |ind| x, |ind|)
+	libinternal ControlMove (|ind| Pos, |int| Dir, |ind| X, |ind|)
 		opt norefcounts
 		|| s = .text
 		|| shift = (dir==1)-1
@@ -454,30 +422,26 @@ class TextView (GUIControl)
 					exit
 				pos++
 				
-		while x != pos // move pos
+		while  (x != pos)									// move pos
 			|| ng = s.TVCharSet(pos+shift)
 			if ng!=G
 				if (dir == -1) and (G is lowercase) and (ng is uppercase)
 					pos--
 				return pos
-			pos+=dir
+			pos += dir
 			if pos <= 0 or pos >= s.length
 				exit
+		
 		return pos
 
 
 	libinternal WordMove (|ind| pos, |int| dir, |ind|)
 		opt norefcounts
-		|| x = .clamp(.WordMoveSub(pos, dir))
-		|| Control = keys.platcmd(false)
-		if (x==pos) or !control
-			return x
-
-		|| pos2 = .controlMove(pos, dir, x)
-		if pos2 != pos
-			return pos2
-		return x
-			
+		rz = .WordMoveSub(pos, dir, true)
+		if (rz != pos) and keys.platcmd(false)
+			|| pos2 = .ControlMove(pos, dir, rz)
+			if pos2 != pos
+				return pos2
 
 
 	libinternal string.TVCharSet (|int| i, |charset|) // replace this with charset.spd?
@@ -486,41 +450,56 @@ class TextView (GUIControl)
 			cs = CharSet.lowercase
 		return cs
 
-			
-	libinternal WordMoveSub (|ind| pos, |int| dir, |ind|)
+
+	libinternal @textview.ContainerOpposite (|byte| ToFind, |int| Dir,  |byte|)
 		opt norefcounts
-		require dir >= 0 or pos > 0
+		require Dir
+		// this would be better off within charset!
+		// so ( can be open, and ) close, and | be both!
+		// do later!
+		
+		|| Parts = textview.CounterParts
+		|| IsAContainer = Parts.find(ToFind)
+			|| Other = Parts[IsAContainer xor 1]
+			|| Found = IsAContainer&1
+			if dir > 0
+				Found = Found xor 1
+				if ToFind == Other
+					Found = 1
+			if Found
+				return Other
+			
+			
+		
+			
+	libinternal WordMoveSub (|ind| pos, |int| dir, |bool| ExpandContainers, |ind|)
+		opt norefcounts
+		ifn dir >= 0 or pos > 0
+			return .clamp(pos)
 		|| s = .text
 		|| Adjust = (dir - 1) >> 1							// -1 = -1,   +1 = 0
 		|| ToFind = s[pos + Adjust]
 		if dir < 0 and ToFind == '.'
-			pos--
-			ToFind = s[pos + adjust]
+			pos-- // MoveCodePoint instead?
+			ToFind = s[pos + adjust] // also adjust should use MoveCodePoint?
 		|| FindCS = ToFind.charset
 
 		if FindCS is LettersUnderScore
 			FindCS = CharSet.LettersUnderScore
-			
-		|| IsAContainer = CounterParts.find(ToFind)
-			|| CanOpen = (IsAContainer&1) == 0
-			|| CanClose = !CanOpen or (CounterParts[IsAContainer+1] == ToFind)   // " can be open OR close.
-			if (CanClose == dir < 0) or (CanOpen == Dir > 0)
-				pos += dir
-				|| SecondCS = s[pos + Adjust].charset 			// ((abc)) (<abc>)
-				if SecondCS == FindCS				 			// undo our attempt
-					pos -= dir
-				FindCS = SecondCS
-
+		
+		|| Opp = ContainerOpposite(ToFind, Dir * ExpandContainers)
+			pos += dir
+			|| SecondCS = s[pos + Adjust].charset 			// ((abc)) (<abc>)
+			if SecondCS == FindCS				 			// undo our attempt
+				pos -= dir
+			FindCS = SecondCS
 	
 		|| After = s.Length
 		if dir < 0
 			after = 0
 		|| Found = s.find(~FindCS, Pos, After)
-			if IsAContainer
-				|| Other = CounterParts[IsAContainer+1]
-				|| Ch = s[Found]
-				if Other == Ch
-					found += dir
+			if Opp and Opp == s[Found]
+				found += dir
 			return Found - Adjust
 		if dir > 0
 			return After
@@ -584,7 +563,7 @@ class TextView (GUIControl)
 
 	libinternal ShowTypingPlace (|ivec2| r)
 		opt norefcounts
-		|| i = (r.width>0)|int|
+		|| i = (r.width > 0)|int|
 		.ViewPos(r[i], 0)
 
 
@@ -602,6 +581,7 @@ class TextView (GUIControl)
 	
 	
 	function ViewLineAndSel (|int| L)
+		opt norefcounts
 		|| d = .DrawInfoAtLine(L)
 			.ShowAndSelect(d.position)
 
@@ -659,13 +639,13 @@ class TextView (GUIControl)
 		return true	
 
 
-	function Clamp (|intrange| r, |intrange|)
+	libinternal Clamp (|intrange| r, |intrange|)
 		cpp_part Clamp2
 		r = r.resolve
 		return (.clamp(r.x), .clamp(r.x2))
 
 
-	function Clamp (|int| x, |int|)
+	libinternal Clamp (|int| x, |int|)
 		return x.clamp(.text.length)
 		
 
@@ -724,8 +704,6 @@ class TextView (GUIControl)
 	
 	behaviour KeyDown
 		opt norefcounts
-//		if key is cmd // should change cursor.
-			
 //		if self is editable // right? editable doesn't matter??
 		if (.OnKeyDown)(self, key)?
 			return true
