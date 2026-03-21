@@ -37,7 +37,6 @@ JB__Syx_CurrFuncID_
 GUI__Ray_AdjustmentFinder
 GUI__VObject_DrawScale
 GUI__VObject_ObjID
-GUI__Text_csAntiWords
 GUI__App_BlurBackgroundStart
 GUI__App_ChangeSelFlash
 GUI__App_CurrMouseXY
@@ -159,7 +158,6 @@ JB__Err_BackupErrorSource
 JB__Macro_TmpPrms_
 GUI__Bar_RandomBank
 GUI__Text_CounterParts
-GUI__Text_CounterParts2
 GUI__Win_ActiveControl
 GUI__Win_All
 GUI__Win_LeakedTestObj
