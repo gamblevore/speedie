@@ -47,13 +47,12 @@ dispatch PerryCommands (|perryide| self, |string| s)
 
 |listviewrow| _PerryCommandsMenu
 function PerryCommandsMenu (|listviewrow|)
-	|| L = _PerryCommandsMenu
+	|listviewrow--| L = _PerryCommandsMenu
 		return L
 	L = ListViewRow()
 	for (v in perrycommands) (k)
-		|| M = @str + k
+		|message--| M = L.msg(@str, k)
 		m.obj = v
-		L <~ M
 	_PerryCommandsMenu = L
 	return L
 	
@@ -77,7 +76,11 @@ function ReturnCommands (GUIListEvent)
 
 
 function textview.beep (assigns:|string| s)
-	expect (.text != s) (beep)
+/	expect (.text != s) (beep)
 	.SelText = s
+
+
+
+
 
 

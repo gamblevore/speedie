@@ -362,8 +362,7 @@ forms
 
 
 /**/ TRAP (Trap)
-	if (CanTrap(&vm, Op, Code))
-		goto BREAK
+	TryTrap()
 
 
 #!						 (((((UTIL)))))

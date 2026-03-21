@@ -16,6 +16,7 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
+#define TryTrap() if (CanTrap(&vm, Op, Code)) {Op = *Code++; goto BREAK;}
 AlwaysInline bool CanTrap (CakeVM* V, ASM Op, ASM* Code) {
 	if (!CanDebug(V))
 		return false;

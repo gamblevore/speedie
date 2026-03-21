@@ -63,9 +63,11 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 }
 
 
-AlwaysInline int64 JB_ASM_Debug (CakeVM& vm, ASM* Code, CakeRegister* r) {
+AlwaysInline int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
 	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
-	return (vm.__VIEW__)(&vm, (CakeStack*)(r-1), 0);
+	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull));
+	r = (CakeRegister*)(((IntPtr)r)&~(1ull<<63ull));
+	return (V->__VIEW__)(V, (CakeStack*)(r-1), 0);
 }
 
 
@@ -114,7 +116,7 @@ void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
 
  
 #define EROR HALT
-static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__
+static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm
 static void * const GlobalJumpTable[] = {
 	#include "InstructionList.h"
 	&&TRYBREAK,
@@ -154,7 +156,7 @@ static void * const GlobalJumpTable[] = {
 	}
 	
 	BREAK:;	{										// The actual breakpoint
-		int64 Value = JB_ASM_Debug(vm, Code-1, r);
+		int64 Value = JB_ASM_Debug(&vm, Code-1, r);
 		if_rare (Value) {
 			if (Value >= 256) return 0;				// Should we set an error in the VM?
 			if (Value >= 0)   exit((int)Value);
@@ -309,7 +311,7 @@ static void CakeCorrupt (int Sig) {
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	static_assert((sizeof(CakeRegister) == sizeof(CakeStack)), "sizeof type");
 
-	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull));
+//	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull)); // ruins CanDebug
 	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
 	auto OldBus = signal(SIGBUS,  CakeCorrupt);
 

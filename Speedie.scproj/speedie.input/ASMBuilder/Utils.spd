@@ -29,9 +29,6 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		p[0] = nil
 		|| Info = p.index|uint64|<<48
 		p.info = Info|asmreg|				// no need to call fat*reg now
-//		target debug
-//			if .BreakRequest
-//				breakCount++
 		p.ASMIndex = .BreakRequest
 		p._op = op
 		p.msg = exp // could remove this?

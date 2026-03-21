@@ -960,7 +960,7 @@ void JB_File_Destructor (JB_File* self) {
 void JB_File_StopSHM (JB_File* self) {
 	#ifndef AS_LIBRARY
 	if (self->MyFlags & 1) { // 1 == server!
-		printf("unlinking %s\n", self->Addr);
+//		printf("unlinking %s\n", self->Addr);
 		shm_unlink((const char*)(self->Addr));
 		self->MyFlags &= ~1;
 	}

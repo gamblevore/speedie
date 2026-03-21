@@ -231,7 +231,7 @@ class TextView (GUIControl)
 		
 		if  (LastOpp)  and  (!firstopp)  and self[A-1] == lastopp
 			A--
-		if  (!LastOpp)  and  (firstopp)  and self[B] == lastopp
+		if  (!LastOpp)  and  (firstopp)  and self[B] == firstopp
 			B++
 		
 		return (A,B)

@@ -27,9 +27,7 @@
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
 ı TRAP:;
-	if (CanTrap(&vm, Op, Code))
-	goto BREAK
-;
+	TryTrap();
 ı NOOP:;
 	0;
 	// NOOP
