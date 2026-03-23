@@ -93,7 +93,7 @@ function message.TRAP (|int| At = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.TRAP, self)
-	rz.NumInput(0) = At
+	rz.numinput(0) = At
 }
 
 
@@ -436,14 +436,13 @@ function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
 	visible
-//	if "JB_Err_SyntaxIsSet"
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BNOT, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
+	rz.numinput(3) = K
 	rz.dest(0, r1, a)
 }
 
@@ -1220,6 +1219,54 @@ function message.VMIN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
+function message.UADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.UADD, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.USUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.USUB, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.UMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.UMUL, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.UDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.UDIV, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
 function message.QADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -1238,16 +1285,6 @@ function message.QSUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
-	rz.dest(0, r1, a)
-}
-
-
-function message.QADK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.QADK, self)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
 	rz.dest(0, r1, a)
 }
 
@@ -1272,6 +1309,16 @@ function message.QDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	rz.numinput(4) = Kind
 	rz.dest(0, r1, a)
 	rz.dest(1, r2, a)
+}
+
+
+function message.QADK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.QADK, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -1376,13 +1423,13 @@ function message.QORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QNOT, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
+	rz.numinput(3) = K
 	rz.dest(0, r1, a)
 }
 
@@ -1393,6 +1440,54 @@ function message.QCNV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |
 	rz = a.RequestOp(asm.QCNV, self)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.PADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.PADD, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.PSUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.PSUB, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.PMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.PMUL, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
+	rz.dest(0, r1, a)
+}
+
+
+function message.PDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Mode = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.PDIV, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Mode
 	rz.dest(0, r1, a)
 }
 
