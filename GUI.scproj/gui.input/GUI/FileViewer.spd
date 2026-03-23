@@ -25,6 +25,8 @@ class FileViewer (ListView)
 		.tryeditcell		= FileRowRenamer
 		.listsource			= filerow("", "root")
 		.ColumnFinder		= FileRowCell
+		.gnormal.textcolor  = 0xFF6FB6D7
+//		D7B66FFF
 		
 		.quickopen.tag = self
 		.listopen.tag = self
@@ -86,6 +88,7 @@ class FileViewer (ListView)
 	
 	
 	behaviour KeyDown
+		opt norefcounts
 		if key.isdelete
 			|| r = .FirstSelected
 			if r isa filerow
@@ -99,13 +102,12 @@ class FileViewer (ListView)
 		opt norefcounts
 		require .asdir
 		for f in self
-			if f isa filerow
-				for ext in sc
-					if f isa ext
-						rz += (f.lastsize|int|, 1)
-						exit
-				if f.asdir
-					rz += f.dirsize(Sc)
+			for ext in sc
+				if f isa ext
+					rz += (f.lastsize|int|, 1)
+					exit
+			if f.asdir
+				rz += f.dirsize(Sc)
 		.lastsize = rz[0]
 		.lastfilecount = rz[1]
 	
@@ -166,27 +168,35 @@ class FileViewer (ListView)
 			
 	function ClearErrors
 		opt norefcounts
-		for s.fast in self
-			if s isa filerow
-				s.HasError = false
+		for s in self
+			s.HasError = false
 
 
 	iterator
-		|| _curr = .listsource.first
+		|| _curr = .NextFileRow(.listsource, true)
 		while _curr
-			|| N_ = _curr.FlatNext
+			|| N_ = .NextFileRow(_curr)
 			yield _curr
 			_curr = N_
 		(self)
 
 
+	libinternal NextFileRow (|listviewrow| Upon, |bool| First=false, |filerow|)
+		opt norefcounts
+		|| n = (Upon.first, Upon.flatnext)(first)
+		|| n2 = n as filerow
+			return n2
+		n.remove
+	
+	
 	function SaveAll (|int| Purpose, |bool|)
 		cpp_part SaveAllArr
-		rz = true		
-		|| m = .Modified // what if like 100 are invalid? THEN? ask for all?
-		for f in m
-			if !.Save(f, purpose)
-				rz = false
+		opt norefcounts
+		// what if like 100 are invalid? THEN? ask for all?
+		for f in self
+			if f.ismodified
+				require .Save(f, purpose)
+		return true
 
 
 	function Save (|filerow| f, |int| Purpose=documentstate.saving, |bool|)
@@ -200,6 +210,7 @@ class FileViewer (ListView)
 
 
 	libinternal CanSave (|int| Purpose, |filerow| f,   |bool|)
+		opt norefcounts
 		|| d = f._Document		#require
 		if !d.ShouldntSave
 			return true
@@ -214,16 +225,11 @@ class FileViewer (ListView)
 		return true
 
 
-	function Modified (|[FileRow]|)
-		opt norefcounts
-		for f in self
-			if f isa filerow
-				if f.ismodified
-					rz <~ f
-
-
 	function AskSaveAll (|bool|)
-		|| m = .modified 
+		|[filerow]| m
+		for r in self
+			if r.ismodified
+				m <~ r
 		if !m
 			return true
 		.focuson(m.first!)
@@ -254,9 +260,8 @@ class FileViewer (ListView)
 		if path.file.IsDir
 			path = path.PathDir // standardise
 		for f in self
-			if f isa filerow
-				if path ~= f.location or f.ReadFrom
-					return f
+			if path ~= f.location or f.ReadFrom
+				return f
 
 
 	libinternal string.name (|bool| YeahReally, |string|)
@@ -353,11 +358,8 @@ class FileViewer (ListView)
 		
 		|| Remain = 6K
 		for f in self
-			if (f isa filerow) // in case someone added bad stuff.
-				if .CanFind(f, FindID)
-					f.FindInFile(str, FoundList, Remain, ForReplace)
-			  else
-/				f.remove
+			if .CanFind(f, FindID)
+				f.FindInFile(str, FoundList, Remain, ForReplace)
 		FoundList.sort(&filerow.BatchFindSorter)
 	
 

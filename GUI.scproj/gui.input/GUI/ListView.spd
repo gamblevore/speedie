@@ -65,7 +65,7 @@ class ListView (GUIControl) {
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
-		.GNormal.TextColor = 0xFF60B0E0 // oof
+		.GNormal.TextColor = -1 // oof
 			
 	
 	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)

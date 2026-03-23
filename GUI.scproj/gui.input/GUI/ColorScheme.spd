@@ -16,7 +16,6 @@ class ColorScheme
 //Border
 	|drawstyle| 			Scroll
 	|drawstyle| 			TextSelection
-//	|drawstyle|				TextCopy
 	|drawstyle|				TextSelectionUnfocus
 	|drawstyle|				ModifiedBorder
 	|drawstyle|				FocusBorder
