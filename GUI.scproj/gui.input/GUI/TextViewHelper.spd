@@ -150,7 +150,7 @@ class TextViewLine (list)
 					rz?=r
 					exit
 		
-		if r and !r.startsafter(.range)
+		if r and !r.StartsAfter(.range)
 			(self is breakpoint) = r is breakpoint
 			.msgpos = .position // isn't it r.position?
 			.message = r
@@ -168,14 +168,17 @@ class TextViewLine (list)
 				require p==@arg
 				return p
 			
-		if srch.StartsAfter(r)							// AFTER
+		if srch.StartsAfter(r)
 			return srch
-			
-		while srch.startsbefore(R) and srch.iscontainer
-			|| nxt = srch.flatnext #loop
+		
+		|| Attempt = Srch
+		while Attempt.startsbefore(R) and Attempt.iscontainer
+			|| nxt = Attempt.flatnext			#loop
 			if nxt.StartsAfter(r)
 				exit
-			srch = nxt									// what about...
+			Attempt = nxt
+			if !attempt.endsbefore(r)
+				srch = Attempt
 		
 		return srch
 
