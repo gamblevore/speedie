@@ -125,8 +125,7 @@ function parser.fXML_Comment (ParseHandler)
 
 function parser.fXML_DTD (ParseHandler)
 	opt norefcounts
-	|| d = .data
-/	|| i = .nextstart
+	|| d = .data	|| i = .nextstart
 	
 	while (|| c = d[i++])
 		if c == '>'

@@ -825,8 +825,7 @@ function scnode.Module (|scmodule|)
 	if self isa scmodule
 		return self
 	if self isa scclass
-		return .modul
-/	return compiler.program // never happens?
+		return .modul	return compiler.program // never happens?
 
 
 function CreateNameDict (|Message| FuncName, |[message]| NameList) {

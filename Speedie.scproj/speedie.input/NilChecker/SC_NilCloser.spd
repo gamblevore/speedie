@@ -15,12 +15,10 @@ target argh {
 function Message.MarkVarClosed (|message| Closer, |scdecl| D)
 	opt norefcounts
 	|| T = .asmtype
-	if t is kif or kwhile
-/		0 // what to do? In fact the entire issue seems useless. delete the entire code?
+	if t is kif or kwhile		0 // what to do? In fact the entire issue seems useless. delete the entire code?
 	|| next = .next
 	require next and next.ASMType != ASMType.kreturn
-		
-/	|| m = Message(@xml, d.name)
+			|| m = Message(@xml, d.name)
 	m.asmtype = ASMType.kIgnore
 	
 	if d.IsNormalObject
@@ -30,14 +28,11 @@ function Message.MarkVarClosed (|message| Closer, |scdecl| D)
 		m.msg(@thg, "JB_Decr")
 		|| p = m.msg(@prm)
 		p.obj = Compiler.RefDecr
-		p.msg(@thg, d.name).obj = d
-/		d = TypeVoid
+		p.msg(@thg, d.name).obj = d		d = TypeVoid
 	
 	m.obj = d
-	if closer!=@arg
-/		closer.prev = m
-	  else
-/		closer <~ m
+	if closer!=@arg		closer.prev = m
+	  else		closer <~ m
 
 
 

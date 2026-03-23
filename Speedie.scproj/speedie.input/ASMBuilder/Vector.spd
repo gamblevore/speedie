@@ -21,8 +21,7 @@ extend Assembler
 		|| VReg = vget.asmreg(2)
 		|| VecIndex = vget.prms[3]
 		if src.isfloat or vreg.reg
-			|| NewValue = .AddToReg(exp, nil, src, value)		// S[1]++  -->  x = S[1], x++, S[1] = x
-/			exp.VSET(src, NewValue, vreg, VecIndex)
+			|| NewValue = .AddToReg(exp, nil, src, value)		// S[1]++  -->  x = S[1], x++, S[1] = x			exp.VSET(src, NewValue, vreg, VecIndex)
 			if dest is Discard
 				return dest
 			if mode & ASMType.IncrAfter

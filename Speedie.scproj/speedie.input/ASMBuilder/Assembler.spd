@@ -224,8 +224,7 @@ struct Assembler
 		// remove this?
 		|| st = .state
 		|| ret = st.return
-		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
-/			ret.µtype = rz|DataTypeCode|
+		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)			ret.µtype = rz|DataTypeCode|
 			D.wholetype = ret
 			return ret
 

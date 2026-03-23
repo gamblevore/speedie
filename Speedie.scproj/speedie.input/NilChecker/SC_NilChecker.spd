@@ -574,7 +574,7 @@ function Argument (NilTrackerFn)
 			error.AutoPrint = .oldprint
 			if stderr.ok
 				target debug
-/					.SyncJump(s, T ||| nilcheckmode.Disappears)
+					.SyncJump(s, T ||| nilcheckmode.Disappears)
 				error (s, "Borking but no zergs found?")
 				return nil
 			stderr.clear

@@ -87,7 +87,7 @@ libinternal file.FileGlobSub (|[string]| GlobParts, |[file]| result, |int| pi)
 	while
 		|string--| str = p
 		if names!=nil
-/			str = names[n++]
+			str = names[n++]
 			loop str!=nil
 			ifn p globs str
 				continue

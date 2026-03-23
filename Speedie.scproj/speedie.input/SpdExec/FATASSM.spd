@@ -339,8 +339,7 @@ struct FatASM
 				fn = obj.type.funcproto
 			  else
 				debugger
-			if !fn
-/				fs <~ "(unknown)"
+			if !fn				fs <~ "(unknown)"
 				return
 		|| regs = .FuncPrms
 		|int64| n  = fn.Args.Length

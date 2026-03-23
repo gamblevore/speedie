@@ -1045,8 +1045,8 @@ ive been~running #since morning
 
 			  elseif (c == '/')
 				|| c2 = d[n]
-				if (c2 != '/' and '*')
-					if state&2
+				if (c2 != '/' and c2 != '*')
+					if state&2					// allow  /  in case some people really don't like the \r thing
 						if rz.IsDebug > 1
 							.ErrorAdd("Invalid breakpoint", n-1)
 						rz.IsDebug = 3

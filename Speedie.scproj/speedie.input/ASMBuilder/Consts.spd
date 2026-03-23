@@ -51,8 +51,7 @@ extend Assembler
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
 		reg.fatindex = 0 // nice
-		if reg is ContainsAddr
-/			(reg isnt containsaddr) // hmmm never should happen.
+		if reg is ContainsAddr			(reg isnt containsaddr) // hmmm never should happen.
 		if K
 			return .LoadNumber(exp, K, srctype.specialreg, Reg)
 		reg.µType = SrcType
