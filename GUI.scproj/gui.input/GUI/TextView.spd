@@ -100,7 +100,7 @@ class TextView (GUIControl)
 		.ShowExtraInfo(P, true)
 		return InScroll
 	
-
+	
 	behaviour MouseDown
 		if (clicks == 1) and (keys.cmd or keys.ctrl)
 			.SendSpecialClick(p, !keys.PlatCmd)
@@ -124,7 +124,7 @@ class TextView (GUIControl)
 			return MouseDragging.Within				// used to be 4, now 2?
 		
 		return MouseDragging.handled
-
+	
 	
 	libinternal LineNumRight (|int|)
 		return 5 + .lastleft + ._LineNumWidth*font.width
@@ -140,41 +140,46 @@ class TextView (GUIControl)
 			if !c.IsWhite
 				exit
 		return -1
-			
-			
-	libinternal string._TextLineClickedBreakpoint (|string|)
-		|| i = ._FindBreakpoint
-		if i == int.max
-			beep
-			return string.Error
-		if i == -1 // ok... this means that the thing isn't found, so we can add it.
-			return "/" + self
-		// are these two branches the same? test later.
-		// we did find one! but it might be in the middle!
-		return .trimmiddle(i, i+1)
-
-		
+	
+	
 	libinternal ClickedLineNum (|ivec2| P, |bool|)
+		opt norefcounts
 		require self is editable
 		require p.x < .LineNumRight
 		|| bs = (0, 0)
 		|| d = .ByteAtXY(p, bs)
 		require d is StartsNormally
 		
-		|| Restore = .selrange
-		// so now we are within the area, and have a valid line. we can now alter the text!
-		|| txt = d.Text._TextLineClickedBreakpoint
-		if !txt.isok
+		// We can now alter the text!
+		|| txt = d.Text
+		|| i = txt._FindBreakpoint
+		if i == int.max									// COMMENTED
+			beep
 			return true
+				|| Range = d.range
+		if (i < 0)										// ADD/REMOVE
+			range.y = range.x
+			|| x = --range.x
+			if x <= 0
+				beep
+				return true
+			|| HasBreak = (self[x] == '\r')
+			|| Line = ("\n", "\r")(HasBreak)
+			.InsertText(Line, Range, false)
+			return true
+
+														// REMOVE
+		txt = txt.TrimMiddle(i, i+1)
 		
 		// adjust position first
+		|| Restore = .selrange
 		if Restore.x > d.position
 			Restore += txt.length - d.text.length
 		
-		// now insert it		
-		.InsertText(txt, d.Range, false)
-
+		// now insert it
+		.InsertText(txt, Range, false)
 		.selrange = Restore
+		
 		return true	
 		
 		
@@ -1489,7 +1494,7 @@ class TextView (GUIControl)
 	
 	function InsertText (|string| s, |intrange| p, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
-		|| Same = (p.width == s.length) and self[p.x, s] 
+		|| Same = (s == p.width) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
 		
 		if !same

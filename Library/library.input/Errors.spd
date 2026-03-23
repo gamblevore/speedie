@@ -188,7 +188,6 @@ class Error (Message)
 
 
 	module
-			
 		|message|		BackupErrorSource
 		|byte|			AutoPrint			// Can be set to PrintAndRemove
 		|bool|			KeepStackTrace

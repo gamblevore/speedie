@@ -1076,7 +1076,7 @@ ive been~running #since morning
 					rz.FirstLine = n-1
 				rz.Position = n-1
 				rz.dentine = 0
-				rz.IsDebug = 0
+				rz.IsDebug = (c == '\r')|int|
 				commas = 0
 				State = 2
 				if parent.func == @list

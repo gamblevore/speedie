@@ -161,7 +161,6 @@ class TextViewLine (list)
 		
 	libinternal ColoriseSub2 (|message| srch, |message|)
 		opt norefcounts
-		if Keys.Shift
 		|| r	= .range
 		while srch.EndsBefore(r)
 			|| p = srch
@@ -176,8 +175,8 @@ class TextViewLine (list)
 			return srch
 		
 		// What to do with things that wrap us, but we have something better?
-		if r[0] <= srch.Position and r[1] >= srch.After
-			return srch // seems good?
+//		if r[0] <= srch.Position and r[1] >= srch.After
+//			return srch // seems good?
 		
 		|| Attempt = Srch
 		while Attempt.StartsNotAfter(R) and Attempt.iscontainer
@@ -447,9 +446,9 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		|| col = ¥.GetColor(state.msg, usecol, pos)
 		if d.LineError and c == 9 and prev == 32 
 			c = -c
-		if NoDrawFirst and !c.IsWhite
+		if NoDrawFirst and c == '/'
 			NoDrawFirst = false
-		  elseif !NoDrawFirst
+		  else
 			state.font.DrawChar(c, Where, (x, y), col, 1)
 		prev = c
 	
