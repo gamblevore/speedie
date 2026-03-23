@@ -1,8 +1,13 @@
 
 
-function asm.VecMathPart (|asm|)
+function asm.VecIntMathPart (|asm|)
 	if self >= asm.add and self <= asm.mul		// div is a lil tricky. can do mod, and inputs in different order
 		return self + (asm.padd - asm.add)
+	
+
+function assembler.OptVecMathTwo (|$asmreg| A, |$asmreg| B, |int|)
+	rz  = .OptVecMathOne(A) << 2
+	rz |= .OptVecMathOne(B) << 4
 
 
 function assembler.OptVecMathOne (|$asmreg| V, |int|)
@@ -18,12 +23,10 @@ function assembler.OptVecMathOne (|$asmreg| V, |int|)
 
 function message.OptVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift, |ASM| Op,  |&fatasm|)
 	if !shift
-		|| as = Assembler.sh
-		shift = as.OptVecMathOne(L) << 2
-		shift |= as.OptVecMathOne(R) << 4
+		Shift = assembler.sh.OptVecMathTwo(L, R)
 		if Shift
 			Shift &= 63
-			op = op.VecMathPart
+			op = op.VecIntMathPart
 
 	|| fat = .ADD(dest, l, r, shift)
 	fat._op = op
@@ -33,9 +36,10 @@ function message.OptVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift,
 
 function fatasm.IsPartiable (|bool|)
 	|| op = ._op
-	if op >= asm.padd and op <= asm.pdiv
+	if (op >= asm.padd and op <= asm.pdiv) or (op >= asm.uadd and op <= asm.udiv)
 		return true
 	
+
 
 function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
 	|| k = .Const(vara, 2, false)
@@ -55,20 +59,19 @@ function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |A
 				return .redest(party, base)
 		
 			|| op = party.op|asm|
-			|| vop = op.VecMathPart
+			|| vop = op.VecIntMathPart
 				if party.prms[3] == 0							// no shift or 3rd part in mul
 					party._op = vop
 					party.Prms[3] |= k
 					return .ReDest(party, base)
 			
 			if (op isa asm.VGET) and (party.prms[2] == 0)		// vset+vget...
-//				|| v2 = exp.padd
-/				party.prms[3] = (party.prms[3]<<2) ||| K
-				party._op = asm.padd
-				return .ReDest(party, base)
+				k |= party.prms[3]<<2
+				|| v2 = exp.padd(base, party.asmreg(1), asmreg(), K)
+				.Nop(party)
+				return v2 * base
 					
 
 	return exp.VSET(base, dest, vara, k) * base
-
 
 
