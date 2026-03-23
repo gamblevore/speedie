@@ -182,7 +182,6 @@ GUI_FV_FindSearchWithin
 GUI_FV_HideOpenList
 GUI_FV_Init
 GUI_FV_KeyDown
-GUI_FV_Modified
 GUI_FV_MouseDown
 GUI_FV_OpenQuick
 GUI_FV_OpenQuickRelist
@@ -538,7 +537,6 @@ GUI_Str_Bounds
 GUI_Str_Confirm
 GUI_Str_ConfirmOrCancel
 GUI_Str_FixLineEndings
-GUI_Str_Group
 GUI_Str_LoadQOI
 GUI_Str_TextLineCount
 GUI_Str_TypeContains
@@ -561,7 +559,6 @@ GUI_Sty_Width
 GUI_SystemCursor_Get
 GUI_SystemCursor_Use
 GUI_TFF_Tab
-GUI_TextViewJumpMode_SyntaxIs
 GUI_Text_AddErrorToLine
 GUI_Text_AutoCompleteBack
 GUI_Text_AutoCompleteBackSet
@@ -573,8 +570,6 @@ GUI_Text_CanAutoComplete
 GUI_Text_CanAutoCompleteSet
 GUI_Text_CanDrawLight
 GUI_Text_CancelEditing
-GUI_Text_Clamp
-GUI_Text_Clamp2
 GUI_Text_ClearErrors
 GUI_Text_Constructor
 GUI_Text_CurrLine
@@ -626,10 +621,7 @@ GUI_Text_Save
 GUI_Text_ScrollPos
 GUI_Text_ScrollPosSet
 GUI_Text_Search
-GUI_Text_SelRange
 GUI_Text_SelRangeSet
-GUI_Text_SelText
-GUI_Text_SelTextSet
 GUI_Text_SelectAll
 GUI_Text_SelectedLine
 GUI_Text_SendSpecialClick
@@ -646,7 +638,6 @@ GUI_Text_TextSetReal
 GUI_Text_TextSize
 GUI_Text_TryShowLineError
 GUI_Text_TypedString
-GUI_Text_TypingPlaceInt
 GUI_Text_Undo
 GUI_Text_UndoCheckerSet
 GUI_Text_ViewLineAndSel
@@ -659,7 +650,6 @@ GUI_Toy_Drawbackground
 GUI_Toy_FrameStep
 GUI_Toy_SilentRun
 GUI_VObject_AdjustPos
-GUI_VObject_BigR
 GUI_VObject_Box2D
 GUI_VObject_ConstructorShape
 GUI_VObject_Destructor
@@ -670,12 +660,9 @@ GUI_VObject_Step
 GUI_VObject_SyntaxIsSet
 GUI_VObject_Towards
 GUI_VObject__Box
-GUI_VObject__NewParticle
 GUI_VObject__Size2D
 GUI_VObject_left
 GUI_VObject_right
-GUI_VObject_x
-GUI_VObject_y
 GUI_VShapes__Black
 GUI_VShapes__Box
 GUI_VShapes__CloudBubble
@@ -695,8 +682,6 @@ GUI_VShapes__PlasticColor
 GUI_VShapes__Rainbows
 GUI_VShapes__Sphere
 GUI_Win_AppForeGroundChange
-GUI_Win_BlockHeightSet
-GUI_Win_BlockWidthSet
 GUI_Win_BlockXSet
 GUI_Win_BlockYSet
 GUI_Win_CalculateSize
@@ -1159,7 +1144,6 @@ JB_FastBuff_TmpStr
 JB_FastBuff_UInt16
 JB_FileSizeInt__MainArg
 JB_File_Accessed
-JB_File_AnyDate
 JB_File_Child
 JB_File_ChildExisting
 JB_File_Close
@@ -1189,7 +1173,6 @@ JB_File_LinkToGet
 JB_File_LinkToSet
 JB_File_List
 JB_File_ListEnd
-JB_File_ListFiles
 JB_File_ListStart
 JB_File_Mode
 JB_File_ModeSet
@@ -1205,10 +1188,7 @@ JB_File_Offset
 JB_File_OffsetSet
 JB_File_Open
 JB_File_OpenEmpty
-JB_File_OperatorIsdir
-JB_File_OperatorIsfile
 JB_File_Output__MainArg
-JB_File_Parent
 JB_File_Parse
 JB_File_Path
 JB_File_PathFix
@@ -1220,9 +1200,7 @@ JB_File_Render
 JB_File_Sibling
 JB_File_Size
 JB_File_SizeSet
-JB_File_Skip
 JB_File_SmartDataSet
-JB_File_SyntaxAccessSet
 JB_File_SyntaxProblem
 JB_File_Touch
 JB_File_UniqueChild
@@ -1529,6 +1507,7 @@ JB_Rg_Contains2
 JB_Rg_LimitTo
 JB_Rg_OperatorDtd
 JB_Rg_OperatorOverlaps
+JB_Rg_Resolve
 JB_Rg_Shrink
 JB_Ring_Constructor
 JB_Ring_Constructor0
@@ -1762,7 +1741,6 @@ JB_Str_SilentExecute
 JB_Str_SimpleName
 JB_Str_Sort
 JB_Str_SpacesToTabs
-JB_Str_Spawn
 JB_Str_Spin
 JB_Str_Split
 JB_Str_Squeeze
@@ -1924,10 +1902,8 @@ JB_bool_Render0
 JB_bool__MainArg
 JB_byte_CanPrintAsNormalChar
 JB_byte_EqualsByte
-JB_byte_In
 JB_byte_IsConso
 JB_byte_IsHex
-JB_byte_IsInt
 JB_byte_IsTextLine
 JB_byte_IsVowel
 JB_byte_LowerCase
