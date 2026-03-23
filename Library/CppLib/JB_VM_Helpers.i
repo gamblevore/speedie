@@ -8,8 +8,8 @@
 
 
 extern "C" {
-// need to allow vectorcall on windows. to allow vectors to be passed
-// using the SIMD registers.
+// Need to allow vectorcall on windows. To allow vectors to be passed
+// Using the SIMD registers.
 typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
 static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal);
