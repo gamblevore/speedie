@@ -171,12 +171,12 @@ class TextViewLine (list)
 		// OK now... this thing at least, doesn't end before us
 
 		
-		if srch.StartsAfter(r) // starting after is OK, so lets just use it now!
+		if srch.StartsAfter(r)					// starting after is OK, so lets just use it now!
 			return srch
 		
 		// What to do with things that wrap us, but we have something better?
 //		if r[0] <= srch.Position and r[1] >= srch.After
-//			return srch // seems good?
+//			return srch							// seems good?
 		
 		|| Attempt = Srch
 		while Attempt.StartsNotAfter(R) and Attempt.iscontainer
