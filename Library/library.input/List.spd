@@ -145,23 +145,17 @@ class list
 	function IsAncestor (|| root, |bool|)
 		disabled "Use inside or contains operator"
 
-
-	operator inside (|| s, |bool|)
-		inline
-		return s contains self
-
-
-	operator contains (|| r, |bool|)
+	operator In (|list| P, |bool|)
 		opt norefcounts
-		for s.up in r		
+		description "Checks if the parent is P" 
+		inline
+		return .parent == P
+
+	operator contains (|| baby, |bool|)
+		opt norefcounts
+		for s.up in baby	
 			if s == self
 				return true
-
-	
-	operator In (|list| f, |bool|)
-		opt norefcounts
-		inline
-		return .parent == f
 		
 
 	inline Remove
