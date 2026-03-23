@@ -113,6 +113,7 @@ extend PerryIDE
 
 
 	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
+		opt norefcounts
 		if SaveAll
 			require .filelist.SaveAll(documentstate.saving)
 		|| cmd = @tmp + operation
