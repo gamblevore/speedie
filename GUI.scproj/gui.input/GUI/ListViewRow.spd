@@ -190,7 +190,7 @@ role ListViewRow (message)
 			r.x += shading.x
 			|imagepixel| Col = Shading.y
 				textcol = Col
-		  elseif (Column==0) and parent.Istree
+		  elseif (Column==0) and parent.Istree and (self!=parent.Columns)
 			if parent.listchild(self)
 				|| exp = ("\02", "\03")(self isnt expanded)
 				|| VCol = vec4(1, 0.5)

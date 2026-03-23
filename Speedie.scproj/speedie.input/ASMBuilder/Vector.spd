@@ -11,19 +11,7 @@ extend Assembler
 		|| fat = exp.VSWZ(dest, src, swiz)
 		return fat * dest
 	
-		
-	function VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
-		|| k = .Const(vara, 8, false)
-			vara = asmreg()
-		  else
-			k = 0
-
-		if dest isnt set
-			return exp.VGET(dest, base, vara, k) * dest
-
-		return exp.VSET(base, dest, vara, k) * base
-
-
+	
 	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |asmreg|)
 		|AsmReg| OldValue
 		if (dest isnt discard) and mode & ASMType.IncrAfter		// x = S[1]++

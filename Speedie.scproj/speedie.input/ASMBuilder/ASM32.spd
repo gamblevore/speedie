@@ -7,11 +7,12 @@ function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
 	|| Where = sh.TempOnly(Type|asmreg|)
 	|| dest = sh.BFLG_Sub(self, where, Src, 32, 32, Src.Signed)
 	return sh.CloseVars(Closer, dest)
-	
-	
-function message.AddOrSubInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+
+
+
+function message.AddInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
 	|| Subtract = l is subtract
-	if dest.IsVec							// Extra bits get clipped if we do:    ivec4 + big
+	if dest.IsVec									// Extra bits get clipped if we do:    ivec4 + big
 		if Subtract
 			return .QSUB(dest, l, r, sh)
 		return .QADD(dest, l, r, sh)
@@ -19,9 +20,9 @@ function message.AddOrSubInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |
 	|| BigLast = R.IsBig
 	if L.IsBig != BigLast
 		if  BigLast  and  (sh == 0  and  l isnt Alternate)
-			swap (L) (R)				    // r1 = small + big --> r1 = big + small
+			swap (L) (R)				   			// r1 = small + big --> r1 = big + small
 			BigLast = false
-		if !BigLast							// r1 = big + small << sh
+		if !BigLast									// r1 = big + small << sh
 			if l isnt Alternate
 				return .ADDM(dest, L, R, sh)
 			return .SUBM(dest, L, R, sh)
@@ -32,7 +33,7 @@ function message.AddOrSubInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |
 				problem (self, "Subtraction upon smaller type, by a bigger one.")
 	
 	if Subtract
-		return .SUB(dest, L, R, sh)		
+		return .OptVecMath(dest, l,r,sh, asm.SUB)
 
 	if (r is temp)
 		|| oof = .AddShifted(dest, l, r, sh)
@@ -40,7 +41,7 @@ function message.AddOrSubInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |
 			
 	// if its a normal add a = b + c, then LMUL==1, which comes through here.
 
-	return .ADD(dest, L, R, sh)
+	return .OptVecMath(dest, l,r,sh, asm.add)
 
 
 function message.AddShifted (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)

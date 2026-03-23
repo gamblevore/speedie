@@ -1,1 +1,74 @@
 
+
+function asm.VecMathPart (|asm|)
+	if self >= asm.add and self <= asm.mul		// div is a lil tricky. can do mod, and inputs in different order
+		return self + (asm.padd - asm.add)
+
+
+function assembler.OptVecMathOne (|$asmreg| V, |int|)
+	|| Get = v.within(asm.vget)
+		if !get.prms[2]
+			|| Sh = Get.Prms[3]
+			V = get.ASMReg(1)
+			if get is temp
+				.Nop(get)
+				sh |= 32K
+			return sh ||| 1K
+			
+
+function message.OptVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift, |ASM| Op,  |&fatasm|)
+	if !shift
+		|| as = Assembler.sh
+		shift = as.OptVecMathOne(L) << 2
+		shift |= as.OptVecMathOne(R) << 4
+		if Shift
+			Shift &= 63
+			op = op.VecMathPart
+
+	|| fat = .ADD(dest, l, r, shift)
+	fat._op = op
+	return fat
+
+
+
+function fatasm.IsPartiable (|bool|)
+	|| op = ._op
+	if op >= asm.padd and op <= asm.pdiv
+		return true
+	
+
+function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
+	|| k = .Const(vara, 2, false)
+		vara = nil
+	  else
+		k = 0
+
+	if dest isnt set
+		return exp.VGET(dest, base, vara, k) * dest
+
+
+	// Doesn't yet handle:   x[1] = a - b 
+	if  !vara  and  (dest is temp)
+		|| party = dest.fat
+			if party.IsPartiable
+				party.prms[3] |= k
+				return .redest(party, base)
+		
+			|| op = party.op|asm|
+			|| vop = op.VecMathPart
+				if party.prms[3] == 0							// no shift or 3rd part in mul
+					party._op = vop
+					party.Prms[3] |= k
+					return .ReDest(party, base)
+			
+			if (op isa asm.VGET) and (party.prms[2] == 0)		// vset+vget...
+//				|| v2 = exp.padd
+/				party.prms[3] = (party.prms[3]<<2) ||| K
+				party._op = asm.padd
+				return .ReDest(party, base)
+					
+
+	return exp.VSET(base, dest, vara, k) * base
+
+
+

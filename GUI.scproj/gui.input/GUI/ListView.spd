@@ -1360,13 +1360,13 @@ class ListView (GUIControl) {
 		return !rem
 
 
-	libinternal DrawHeaders (|image| where, |ivec4| rect)
+	libinternal DrawColumns (|image| where, |ivec4| rect)
 		opt NoRefCounts
 		|| Cols = .columns
 		if Cols and Cols isnt hidden
 			rect.y = rect.y2
 			rect.y2 = .lastrect.y2
-			Cols.ListRowDraw(Where, rect, self, 0, .columnstodraw)
+			Cols.ListRowDraw(Where, rect, self, 0, .ColumnsToDraw)
 
 
 	inline ScrollStart (|listviewrow|)
@@ -1389,7 +1389,7 @@ class ListView (GUIControl) {
 		
 		.CalculateSkips
 		.DrawBorders(where, rect)
-		.DrawHeaders(where, rect)
+		.DrawColumns(where, rect)
 		
 		rect.y2 += .ScrollSlide
 		{

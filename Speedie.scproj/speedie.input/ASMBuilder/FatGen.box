@@ -1223,6 +1223,7 @@ function message.UADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.UADD, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1234,6 +1235,7 @@ function message.USUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.USUB, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1245,6 +1247,7 @@ function message.UMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.UMUL, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1256,6 +1259,7 @@ function message.UDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.UDIV, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1444,6 +1448,7 @@ function message.PADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.PADD, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1455,6 +1460,7 @@ function message.PSUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.PSUB, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1466,6 +1472,7 @@ function message.PMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.PMUL, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode
@@ -1477,6 +1484,7 @@ function message.PDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.PDIV, self)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Mode

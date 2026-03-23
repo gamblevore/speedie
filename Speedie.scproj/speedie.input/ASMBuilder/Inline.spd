@@ -81,11 +81,14 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	|int| ID = .inlinedepth
 	|| st = .inlinestate[ID+1]
 	st[0] = .inlinestate[ID]
-	if dest isnt discard
-		if (!dest.reg or dest is temp)
-			|| type = fn.ASMReturn
-				dest = .DeclareBody(prms, type) // asmtodo: mark this as a declaration?
-												// (shouldn't all declaremes be like that?)
+	
+	if (dest isnt discard) and (!dest.reg)	  // (!dest.reg) or dest is temp    // are temps bad?
+		|| type = fn.ASMReturn
+			dest = .TempTyped(type, dest)	  // surely this is better temped?
+											  // is this about clobbering?
+											  // IDK... surely thats set on return?
+											  // we'll see... I guess.
+				
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
 

@@ -79,7 +79,7 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function Simplify (|asmreg|)
-		return .ReallySimplify as (self & Temp)
+		return .ReallySimplify as (self & (Temp as okastemp))
 
 	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|

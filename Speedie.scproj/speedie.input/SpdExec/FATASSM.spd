@@ -154,6 +154,12 @@ struct FatASM
 			(.info &= ~flags)
 
 
+	function asmreg.Within (|asm| op, |&fatasm|)
+		|| f = .fat
+			if (f isa op) and Assembler.sh.IsWithin(f)
+				return f
+
+
 	function CopyFrom (|fatasm| D, |bool|)
 		(self)[0] = (d)[0]
 		for i.FatInputs in self

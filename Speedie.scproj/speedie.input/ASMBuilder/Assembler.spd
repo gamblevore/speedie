@@ -117,7 +117,7 @@ struct Assembler
 
 	function Last (|asm| type, |&FatASM|)
 		|| L = .curr_ - 1
-		if (l isa type) and .IsCurr(L)
+		if .IsCurr(L, type)
 			return L
 
 	function Last (|asm| type, |asm| type2, |&FatASM|)
@@ -165,7 +165,13 @@ struct Assembler
 			if BP != PP 
 
 
+
+	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
+		return (f isa type) and (.basicblock == f.basicblock)
+
+
 	function IsCurr (|&fatasm| f, |bool|)
+		// can these use .within?
 		return .basicblock == f.basicblock
 
 	
@@ -591,8 +597,9 @@ struct Assembler
 		  else
 			if ModeOnly is temp											//    x = (y + 1) + (z + 1)
 				ModeOnly = .TempOnly(ModeOnly)
-	//			 asmtodo: what about doing all .declareme? simpler? once we have
-	//			 self-tests working, we can start playing around and altering this stuff...
+	//			asmtodo: what about doing all .declareme? simpler? once we have
+	//			self-tests working, we can start playing around and altering this stuff...
+	//			probAbly need to keep it marked as temp, though. More nopping.
 			  else
 				ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
 				// why are we saying this is temp????

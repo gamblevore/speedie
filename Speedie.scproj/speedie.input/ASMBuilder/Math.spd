@@ -45,6 +45,7 @@ extend Assembler
 		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
 
 		|| Closer = .OpenVars
+		
 		if First.islast
 			ml = .µGetASM(first, dest)
 		  else
@@ -83,7 +84,7 @@ extend Assembler
 	function AlreadyABool (|asmreg| L, |asmreg| Zero, |asmreg|)
 		require Zero.IsZero
 		|| B = L.Fat
-			if (b isa asm.BFLG) and .IsCurr(b)
+			if .IsCurr(b, asm.bflg)
 				if b.prms[4] == 0  and  b.prms[3] == 63
 //					|| T = B.info
 //					T.µtype = DataTypeCode.bool
@@ -442,7 +443,6 @@ extend Assembler
 		if dest is Const									// perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntPlus)
 		
-//		if asmtrapper == 819
 		|| swapped = false
 		if l isnt alternate
 			|| LS = l.LeftScore
@@ -462,23 +462,23 @@ extend Assembler
 			if l is Subtract
 				RR = -RR
 			rr *= lmul
-			if .CanAddK(r, RR)									// a - 1,  a + 1
+			if .CanAddK(r, RR)											// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
 				if 0: exp.QADK
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
-		if LMul.IsPow2			  									// x = int1 + int2
-			return exp.AddOrSubInt(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
+		if LMul.IsPow2			  										// x = int1 + int2
+			return exp.AddInt(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
 		
 		// L is now a POINTER.
 		|| v = .NumToReg(exp,  ASMReg(),  LMul,  DataTypeCode.uint)
-		if l is Subtract										// x = (lptr - rptr)/12
-			exp.AddOrSubInt(dest, L, R, 0)!
+		if l is Subtract												// x = (lptr - rptr)/12
+			exp.AddInt(dest, L, R, 0)!
 			debugger
 			return .DivInt(exp, dest, dest, v)
 
-		// L is still a pointer.								// x = lptr + r*12
+		// L is still a pointer.										// x = lptr + r*12
 		return .MUL_(dest, R, V, L, exp) * dest
 	
 	
@@ -816,7 +816,7 @@ extend Assembler
 		// So I gave up and brute-forced it.
 		
 		|| bflg = .Register(src.reg)
-		require (bflg isa asm.bflg) and .iscurr(bflg)
+		require bflg and .iscurr(bflg, asm.bflg)
 		|| PrevInput = bflg.ASMReg(1)
 		if (.last != bflg)
 			|| Intefere = .register(previnput.reg)
