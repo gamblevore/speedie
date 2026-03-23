@@ -284,7 +284,7 @@ class GUIControl (list)
 
 	function VisText (assigns:|string|s)
 		.TextSet(s)
-		(self is visible) = s.Length > 0
+		(self is visible) = s > 0
 	
 	
 	setter Visible (|bool|)

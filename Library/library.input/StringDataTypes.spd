@@ -16,7 +16,7 @@ datatype byte
 		
 	function Equals (|string| B, |bool|)
 		cpp_part EqualsByte
-		return b.length == 1 and b[] == self
+		return b == 1 and b[] == self
 	
 	render
 		if (!fs_in)

@@ -29,7 +29,7 @@ extend_module perry
 	function Remove_Old (|file| fol, |int| allowed, |bool| keep_first=false, |file|)
 		fol.MakeEntirePath
 		|| items = fol.list
-		while items.length > allowed
+		while items > allowed
 			|| i = items.pop #loop
 			|| s = fol[i]!
 			if keep_first

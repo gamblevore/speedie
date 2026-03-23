@@ -26,7 +26,7 @@ class TextViewLine (list)
 	|int|					tline
 	|TextLineFlags|			TextState
 
-	constructor (|int| p=0)
+	constructor (|int| p = 0)
 		.position = p
 	
 	render
@@ -106,7 +106,8 @@ class TextViewLine (list)
 
 	libinternal message.addpos (|int| p)
 		opt norefcounts
-		for ch.flat in self: ch.position += p
+		for ch.flat in self
+			ch.position += p
 
 
 	libinternal Colorise (|message| msg, |bool| ParsedOK, |message|)
@@ -135,7 +136,7 @@ class TextViewLine (list)
 
 	
 	libinternal EmptyLine (|bool|)
-		return (.text.length == 1) and .text[].istextline
+		return (.text == 1) and .text[].istextline
 
 
 	libinternal ColoriseSub (|message| srch, |message|)
@@ -146,7 +147,7 @@ class TextViewLine (list)
 			r = srch
 			while r
 				r = r.parent
-				if (r == @arg) and r.StartsBefore(.range)
+				if (r == @arg) and r.StartsNotAfter(.range)
 					rz?=r
 					exit
 		
@@ -156,23 +157,30 @@ class TextViewLine (list)
 			.message = r
 		  else
 			isnt breakpoint
-			
+	
 		
 	libinternal ColoriseSub2 (|message| srch, |message|)
 		opt norefcounts
+		if Keys.Shift
 		|| r	= .range
 		while srch.EndsBefore(r)
 			|| p = srch
 			srch = srch.flatnext
 			if !srch
-				require p==@arg
+				require p.IsContainer
 				return p
-			
-		if srch.StartsAfter(r)
+		// OK now... this thing at least, doesn't end before us
+
+		
+		if srch.StartsAfter(r) // starting after is OK, so lets just use it now!
 			return srch
 		
+		// What to do with things that wrap us, but we have something better?
+		if r[0] <= srch.Position and r[1] >= srch.After
+			return srch // seems good?
+		
 		|| Attempt = Srch
-		while Attempt.startsbefore(R) and Attempt.iscontainer
+		while Attempt.StartsNotAfter(R) and Attempt.iscontainer
 			|| nxt = Attempt.flatnext			#loop
 			if nxt.StartsAfter(r)
 				exit
@@ -463,7 +471,7 @@ libinternal TextView.AutoLim (|textviewline| d, |bool|)
 
 function TextView.AutoCompleteShowingDots_ (|int|)
 	|| n = ._autocompleteback
-	if ._AutoCompleteString=="" or ._AutoCompleteString.length == n
+	if ._AutoCompleteString=="" or ._AutoCompleteString == n
 		return -1
 	return n
 
@@ -556,12 +564,12 @@ libinternal string.HasWord (|string| s, |ind| i = 0, |bool|)
 
 
 extend message
-	function EndsBefore (|intrange| r, |bool|)
+	libinternal EndsBefore (|intrange| r, |bool|)
 		return .after <= r.x
-	function StartsAfter (|intrange| r, |bool|)
+	libinternal StartsAfter (|intrange| r, |bool|)
 		return .position >= r.x2
-	function StartsBefore (|intrange| r, |bool|)
-		return .position < r.x
+	libinternal StartsNotAfter (|intrange| r, |bool|)
+		return .position <= r.x
 		
 	
 	

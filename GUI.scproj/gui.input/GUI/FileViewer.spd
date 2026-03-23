@@ -416,7 +416,7 @@ class FileViewer (ListView)
 			m.tag = p.tag
 			self <~ m
 			m.obj = p
-		(self is visible) = items.length > 0
+		(self is visible) = items > 0
 		|| d = .DesiredHeight
 		|| d2 = d.clamp(100, 250)
 		.size = the~same by 0~before back d2
@@ -561,10 +561,10 @@ class FileViewer (ListView)
 
 libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
 	require self[0] != '.'
-	if !atroot
+	if !AtRoot
 		return true
 	if platform.osx
-		return (.length > 3) and !.islower
+		return (self > 3) and !.islower
 	return true
 
 

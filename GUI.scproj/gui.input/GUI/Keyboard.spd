@@ -154,6 +154,7 @@ dataType Keys (int)
 		disabled "Use [] to test keydown. Use != 0 to test key is real"
 
 	syntax is (|keys| x, |bool|)
+		// need an automatic inline...
 		return self == x
 	
 	module
@@ -166,7 +167,7 @@ dataType Keys (int)
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
 				.record[i].Clear
-
+		
 		libinternal KeysVs (|keys| pa, |keys| pb,  |keys| ma, |keys| mb, |float| Limit,  |float|)
 			|| P = pa._ago(pb)
 			|| M = ma._ago(mb)
@@ -185,7 +186,7 @@ dataType Keys (int)
 				ma.limit
 				mb.limit
 				return str
-			
+		
 		
 		libinternal keys._ago (|keys| O, |duration|)
 			|| a = .record
@@ -288,10 +289,12 @@ dataType Keys (int)
 			return .FindTwoModifiers(lgui, rgui)
 
 		function PlatCmd (|bool|yes=true,|bool|)
-			if platform.osx==yes
+			|| OSX = true
+			target !osx
+				OSX = false
+			if OSX==yes
 				return .gui
-			  else
-				return .ctrl
+			return .ctrl
 
 		function Shift (|bool|) 
 			return .FindTwoModifiers(lshift, rshift)
@@ -801,6 +804,7 @@ struct GUIKeyRecord
 		.state = nil
 	
 	syntax is (|GUIKeyRecordInfo| V, |bool|)
+		// need an automatic inliner...
 		return .state == v
 
 

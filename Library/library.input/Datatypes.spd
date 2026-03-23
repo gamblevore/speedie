@@ -452,20 +452,12 @@ datatype float
 		if self > 0
 			return self + i
 		return self - i
-
-	operator avg (|float| f, |float|)
-		inline
-		return (f + self) * 0.5
 	
 	function Bounce (|float|)
 		|| f = .fract
 		if self|int| isa 2
 			return f
 		return 1.0-f
-	
-	operator IsNear (|float|other, |bool|)
-		disabled "what uses this even?"
-		return (self - other).abs < 0.0001 // seems close enough?
 
 	operator longer (|float| other, |float|)
 		if .length > other.length

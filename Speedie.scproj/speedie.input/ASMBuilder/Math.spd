@@ -610,7 +610,7 @@ extend Assembler
 		|| Small = dest.IsSmall|int|
 			if !dest.isvec
 				|| Shift = .OptVecMathTwo(L,R)
-					return exp.udiv(dest, l, r, shift) * dest
+					return exp.udiv(dest, l, r, shift&63) * dest
 		
 		return exp.FDIV(dest,  L,  R,  asmreg(), Small).Vectorise(dest, asm.VDIV)
 
