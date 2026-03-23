@@ -1504,7 +1504,7 @@ class ListView (GUIControl) {
 	libinternal listviewrow.JumpFindMatch (|string| ToFind, |ind|)
 		opt norefcounts
 		|| n = .name
-		|| pos = n.find(ToFind)
+		|| pos = n.find(ToFind, true)
 		if pos < 0
 			return pos
 		|| HasBad = n.OutCharSet(CharSet.LettersOnly, 0)
