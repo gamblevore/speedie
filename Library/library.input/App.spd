@@ -281,7 +281,8 @@ libinternal LeakMarkMemory
 libinternal LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
 	
-libinternal IsQuarantined (|bool|)	
+libinternal IsQuarantined (|bool|)
+	opt norefcounts
 	return .path contains "/AppTranslocation/"
 
 
