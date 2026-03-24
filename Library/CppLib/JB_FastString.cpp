@@ -371,13 +371,13 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
 		if (RoundTo == 1 or Value == 0)
 			return JB_FS_AppendMultiByte( self, (int)('0' + Value), RoundTo );
 
-	u8 Space[21];
-	uint8* wp = Space+20;
+	u8 Space[24]; // 19 digits rounds up to 24 if roundto is 8
+	uint8* wp = Space+sizeof(Space)-1;
 	uint64 LeftOver = (Value < 0) ? (uint64)(-Value) : Value;	
 	uint8* wp2 = WriteIntToBuffer(wp, LeftOver);
 	
 	if (RoundTo > 1) {
-		if (RoundTo > 16) RoundTo = 16;
+		if (RoundTo > 8) RoundTo = 8;
 		int PadCount = ((int)(wp - wp2) + (Value < 0)) % RoundTo;
 		while ( PadCount and PadCount++ < RoundTo )
 			*--wp2 = '0';
@@ -386,7 +386,7 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
     if (Value < 0)
         *--wp2 = '-';
 
-	JB_FS_AppendMem_(self, wp2, (int)((Space+20)-wp2));
+	JB_FS_AppendMem_(self, wp2, (int)(wp-wp2));
 }
 
 
