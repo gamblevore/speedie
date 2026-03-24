@@ -377,7 +377,7 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 
 		|| m = d.message
 		if !m or m == @arg // hmmm
-			lc.a = lc.a >> 1
+			lc.a = lc.a >> 2
 
 		if !pr or (tline != pr.tline)
 			|| F = font.small!

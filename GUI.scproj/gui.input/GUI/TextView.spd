@@ -34,12 +34,13 @@ class TextView (GUIControl)
 	
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
+	|GUITextLineEvent?|			OnBreakPoint
 	|Document?|					_Viewing
 
 	|Error?|					MyError
 	|DelayedShowError?| 		_ErrorDelayer
 	|GUITextShowEvent?|			OnShowExtraInfo
-	|GUITextErrorSelected?|		OnSelError
+	|GUITextLineEvent?|			OnSelError
 
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
@@ -148,39 +149,41 @@ class TextView (GUIControl)
 		require p.x < .LineNumRight
 		|| bs = (0, 0)
 		|| d = .ByteAtXY(p, bs)
-		require d is StartsNormally
-		
-		// We can now alter the text!
+		if d is StartsNormally
+			.addbreak(d)
+			return true
+	
+	
+	libinternal AddBreak (|textviewline| d, |int|)
+		opt norefcounts
 		|| txt = d.Text
 		|| i = txt._FindBreakpoint
-		if i == int.max									// COMMENTED
+		|| Range = d.range
+		if (i == int.max) or (i < 0 and range.x <= 1)	// CANT BREAKPOINT
 			beep
-			return true
-				|| Range = d.range
+			return 0
+		
 		if (i < 0)										// ADD/REMOVE
 			range.y = range.x
 			|| x = --range.x
-			if x <= 0
-				beep
-				return true
 			|| HasBreak = (self[x] == '\r')
+			|| OnBreak = .OnBreakPoint
+				require !(onbreak)(self, D, 1-HasBreak)	// true means cancel
+			
 			|| Line = ("\n", "\r")(HasBreak)
-			.InsertText(Line, Range, false)
-			return true
+			return .InsertText(Line, Range, false)
 
+		|| OnBreak = .OnBreakPoint
+			require !(onbreak)(self, D, -1)
 														// REMOVE
 		txt = txt.TrimMiddle(i, i+1)
 		
-		// adjust position first
 		|| Restore = .selrange
 		if Restore.x > d.position
 			Restore += txt.length - d.text.length
 		
-		// now insert it
 		.InsertText(txt, Range, false)
 		.selrange = Restore
-		
-		return true	
 		
 		
 	libinternal ClickedScroll (|ivec2| P, |int| Clicks, |bool|)

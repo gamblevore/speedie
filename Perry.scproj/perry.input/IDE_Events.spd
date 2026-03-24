@@ -411,12 +411,12 @@ function EditMeSelChange (GUITextEvent)
 		e.PerryTryAutoComplete(s.x2, "autocomplete_sel", PerryAutoCompleteReason.sel)
 
 
-function EditMeSelError (GUITextErrorSelected)
+function EditMeSelError (GUITextLineEvent)
 	opt norefcounts
 	|| i = .ide
 	|| el = i.errorlist
 	i.DuringMsgFB = true
-	el.select(error.lineerror)
+	el.select(line.lineerror)
 	i.DuringMsgFB = false
 
 	

@@ -238,20 +238,24 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 		.editme._ActiveLine = item
 	.editme.ShowAndSelect(where, true)
 	return true
-
-
-function ReturnStack (guilistevent) // show ASM?
-	return ClickedStack(self, row)
 	
 
-function ClickedVariables (GUIListEvent)
-//	return ClickedStack(self, row)
+function EditMeBreakPointAdd (GuiTextLineEvent)
+	opt norefcounts
+	|| i = .ide
+	require i.DebugMode is CakeMode and Debug
+	if Direction < 0
+		beep
+		Notifications <~ "Removing this during debug breaks the debug positions."
+		return true
 	
+	|| pos = line.Position
+	|| str = ("brkadd ", "brkrem")(direction > 0)
+	i.SendMsg(str + pos, 0)
+		
+	// so... now what?
 
-function ReturnVariables (GUIListEvent)
-	return ClickedStack(self, row)
-	
-	
+
 function DebugStepOver (guiaction)
 	return .SendMsg("stepover", state)
 
@@ -285,7 +289,7 @@ function GUIControl.SendMsg (|string| s, |int| state, |bool|)
 		if !state
 			Notifications <~ "Program already finished"
 		  else
-			beep				//	i.editme.setfocus // shitty mistypes
+			beep
 	return true
 	
 

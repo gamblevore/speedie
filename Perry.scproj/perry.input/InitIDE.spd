@@ -13,7 +13,7 @@ extend PerryIDE
 		.Debugger			= guicontrol(self)
 		.AppInfo			= TextView(self)
 		.DebugBtns			= guicontrol(self)
-		.Stack				= listview(self, ClickedStack, ReturnStack)
+		.Stack				= listview(self, ClickedStack, ClickedStack)
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
@@ -173,6 +173,7 @@ extend PerryIDE
 			.gnormal.solid	= vec4(0.1, 0.974)
 			.OnSelChanged   = EditMeSelChange
 			.OnSelError		= EditMeSelError
+			.OnBreakPoint	= EditMeBreakPointAdd
 
 
 		with .DrawMe
