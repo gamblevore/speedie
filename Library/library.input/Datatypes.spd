@@ -512,6 +512,9 @@ datatype float
 	function Log2 (|float|)
 		trin (10, LG2)
 		cpp_wrapper (log2f)
+	
+	function Log10 (|float64|)
+		cpp_wrapper (log10f)
 
 	function Unsin (|float|)
 		trin (12, NIS)
@@ -619,6 +622,9 @@ datatype f64
 	
 	operator pow (|Float64| other, |Float64|)
 		cpp_wrapper (pow)
+	
+	function Log10 (|float64|)
+		cpp_wrapper (log10)
 
 	operator mod (|float64| upon, |float|)
 		asm fmod(dest, p1, p2, r0, 0)
@@ -712,6 +718,7 @@ datatype int64
 
 	inline Log2 (|int|) // highestbit, highbit
 		return (self|uint64|).log2
+		
 	
 	inline IsPow2 (|bool|)
 		if self

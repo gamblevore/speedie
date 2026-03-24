@@ -44,7 +44,7 @@ FastString* JB_FS__FastNew(FastString* Old);
 JB_String* JB_FS_SmartResult(FastString* fs, JB_Object* Orig);
 FastString* JB_FS__FileAppend(JB_File* f);
 JB_String* JB_FS_Return( JB_String* Data, FastString* Orig );
-uint8*  JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
+uint8*  JB__WriteIntToBuffer (uint8* wp, u64 LeftOver);
 bool JB_FS_SizeIf_( FastString* fs, int InitLength);
 void JB_FS_ByteSet(FastString* self, int offset, byte Val);
 uint8*  JB_FS_WriteAlloc_(FastString* fs, int GrowBy);

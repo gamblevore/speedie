@@ -146,6 +146,22 @@ function cstring.OperatorPlus (|string| s, |string|)
 	return .wrap
 
 
+function string.OperatorPlus (|int64| i, |string|)
+	opt norefcounts
+	|| fs = faststring(nil|faststring|)
+	|| n = (i < 0)|int|
+	|| i2 = i
+	while
+		n++
+		i2 /= 10
+		loop i2
+	
+	fs.size = .length + n
+	fs <~ self
+	fs <~ i
+	return fs
+	
+
 struct VirtualJBString // fakejbstring
 	|int| Refcount
 	|int| Length
@@ -286,6 +302,3 @@ function String.Spin (|int| f, |byte|)
 	return `|/-\`[f&3] // useful for printing "processing" spinning line to stdout
 	
 
-function string.OperatorPlus (|int64| i, |string|)
-	return self + i.Render
-	

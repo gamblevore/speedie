@@ -349,11 +349,12 @@ void JB_FS_AppendReplaceB(FastString* self, JB_String* Data, int From, int To) {
 
 // "2 000 000 000" is 10 int!
 
-uint8* JB__WriteIntToBuffer (uint8* wp, int64 LeftOver) {
+static uint8* WriteIntToBuffer (uint8* wp, uint64 LeftOver) {
     do {
-		auto Div = std::div(LeftOver, (int64)10);
-        *--wp = (uint8)(Div.rem + '0');
-        LeftOver = Div.quot;
+		uint64 Prev = LeftOver;
+		LeftOver = LeftOver / 10;
+		uint64 Missing = Prev - (LeftOver*10);
+        *--wp = (uint8)(Missing + '0');
     } while (LeftOver);
     return wp;
 }
@@ -364,41 +365,28 @@ int JB_int_Render(int self, byte* Addr, int N) {
 }
 
 
-void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
-	if (RoundTo <= 0) {RoundTo = 1;} else if (RoundTo > 16) {RoundTo = 16;}
-     
-	if (!LeftOver) {
-		return JB_FS_AppendMultiByte( self, '0', RoundTo );
-	} else if (LeftOver == (1ull << 63ull)) {
-		return JB_FS_AppendCString(self, "-9223372036854775808");
-	}
 
-	const int Alloced = 21; 
-	uint8* wp = JB_FS_WriteAlloc_( self, Alloced );
-	if ( !wp )
-        return;
+void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
+	if (Value >= 0 and Value <= 9)
+		if (RoundTo == 1 or Value == 0)
+			return JB_FS_AppendMultiByte( self, (int)('0' + Value), RoundTo );
 
-    int SignLen = LeftOver < 0;
-    if (SignLen) {
-        *wp++ = '-';
-        LeftOver = -LeftOver;
-    }
+	u8 Space[21];
+	uint8* wp = Space+20;
+	uint64 LeftOver = (Value < 0) ? (uint64)(-Value) : Value;	
+	uint8* wp2 = WriteIntToBuffer(wp, LeftOver);
 	
-    double tmpCount = log10( (double)LeftOver ); // all math lib funcs are DAMN fast.
-    dbgexpect( tmpCount >= 0 and tmpCount <= 19 );
-    int CountDigits = (int)tmpCount + 1;
-    int PadCount = (CountDigits + SignLen) % RoundTo;
-    if (PadCount) PadCount = RoundTo - PadCount;
-    int PadFirst = PadCount;
+	if (RoundTo > 1) {
+		if (RoundTo > 16) RoundTo = 16;
+		int PadCount = ((int)(wp - wp2) + (Value < 0)) % RoundTo;
+		while ( PadCount and PadCount++ < RoundTo )
+			*--wp2 = '0';
+	}
+	
+    if (Value < 0)
+        *--wp2 = '-';
 
-    wp = wp + CountDigits + PadCount;
-    wp = JB__WriteIntToBuffer(wp, LeftOver);
-
-    while ( PadCount-- ) {
-        *--wp = '0';
-    }
-    
-    JB_FS_AdjustLength_( self, Alloced, CountDigits + PadFirst + SignLen );
+	JB_FS_AppendMem_(self, wp2, (int)((Space+20)-wp2));
 }
 
 

@@ -866,7 +866,6 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
 
 
 extern "C" int64 JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
-extern "C" uint8* JB__WriteIntToBuffer (uint8* wp, s64 LeftOver);
 
 
 void JB_OutOfMainMemory(int64 N) {
