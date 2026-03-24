@@ -405,10 +405,7 @@ GUI_Menu_ShowCmm
 GUI_Menu_ShowMenu
 GUI_Menu_TypedString
 GUI_Menu_UseMenu
-GUI_Msg_EndsBefore
 GUI_Msg_FlatRange
-GUI_Msg_StartsAfter
-GUI_Msg_StartsBefore
 GUI_Msg_TableCellSet
 GUI_Note__CheckForDisappear
 GUI_Note__Clicked
@@ -2281,6 +2278,8 @@ fmod
 fmodf
 jdb
 jdb2
+log10
+log10f
 log2f
 logf
 memcpy
