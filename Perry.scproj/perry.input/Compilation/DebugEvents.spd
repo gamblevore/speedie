@@ -241,8 +241,7 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	
 
 function EditMeBreakPointAdd (GuiTextLineEvent)
-	opt norefcounts
-	|| i = .ide
+	|perryide--| i = .ide
 	require i.DebugMode is CakeMode and Debug
 	if Direction < 0
 		beep
@@ -250,8 +249,12 @@ function EditMeBreakPointAdd (GuiTextLineEvent)
 		return true
 	
 	|| pos = line.Position
-	|| str = ("brkadd ", "brkrem")(direction > 0)
-	i.SendMsg(str + pos, 0)
+	|| fs = faststring()
+	fs <~ ("brkadd ", "brkrem ")(direction > 0)
+	fs <~ i.path
+	fs <~ " "
+	fs <~ pos
+	i.SendMsg(fs, 0)
 		
 	// so... now what?
 
