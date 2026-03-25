@@ -315,26 +315,18 @@ extend PerryIDE
 			
 
 		{
-		|| D = .debugger
-		D <~ .appinfo
-		D <~ .DebugBtns
-		D <~ .Stack
-		with D
-			.size 			= the~width by the~bottom to 15~down
-
-			is enabled
-//			.divider.DefaultFraction = 0.25
-			.tooltip		= "Debugger Area"
-			.takesfocus 	= takesfocusflag.CanFocus
-			.ID				= "DebuggerArea"
-//.vert(self, 200~up, 60, 100)			
-			.gnormal		= self.errorlist.gnormal
+			|| D = .debugger
+			D <~ .appinfo
+			D <~ .DebugBtns
+			D <~ .Stack
+			with D
+				.size 			= the~width by the~bottom to 15~down
+				is enabled
+				.tooltip		= "Debugger Area"
+				.takesfocus 	= takesfocusflag.CanFocus
+				.ID				= "DebuggerArea"
+				.gnormal		= self.errorlist.gnormal
 		}
-			
-//			.AddLow(self.Stack)
-//			.addhigh(self.AppInfo)
-//			.addhigh(self.DebugBtns)
-//			.AddHigh(self.variables)
 
 		
 		with .appinfo
@@ -363,33 +355,10 @@ extend PerryIDE
 			self.AddDebugButtons(DebugStepRun,  "\02\02", "Run")
 
 
-//		with .variables
-//			is   visible
-//			is   UnSearchable
-//			isnt DrawsFocus
-//			.Columns = "Name {min 60, pc 40}, Value {min 160, pc 80}"
-//			.ColumnFinder = &Perry.VariableFinder
-//			.Hierarchical = ListViewHierarchy.Last
-//			.IsMainListView = true
-//			.MultiSelection = true
-//			.UseColorScheme	= true
-//			.AlwaysSendChangeEvent = true
-//			.RowHeight		= .rowheight + 3
-//			.tooltip		= "The variables in the current function"
-//			.ID				= "Variables"
-//			.size 			= the~width by 0~up to 1~under
-//			.gnormal		= self.FileList.GNormal.copy
-//			.GNormal.inside = LeftBG
-//			.GNormal.seps	= self.AppInfo.GNormal.edge
-//			.gRowSel.solid  = vec4(0.36, 0.18, 0.24, 0.875)
-////			.GNormal.StyleDrawer = image.CurlieQueDrawer
-
-
 		with .stack
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
-//			.Columns = "Stack"
 			.ColumnFinder	= &Perry.VariableFinder
 			.Hierarchical()	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
@@ -694,11 +663,11 @@ extend PerryIDE
 			.AlwaysSendChangeEvent = true
 			.copypaste	   |= copypasteflags.copytext
 			.gnormal.edge	= .gnormal.bg
-			.rowheight	    = .rowheight * 2
+			.rowheight		= .rowheight * 2
 
 
 	function AddViewButton (|ButtonView| BTN, |string| Oof, |guicontrol| tag)
-		.ViewButtons <~ btn // 
+		.ViewButtons <~ btn
 		btn.tag		= tag
 		.addlbutton(Btn, oof, tag.id, tag.tooltip)
 		btn.id		= "btn_"+tag.id
@@ -766,8 +735,8 @@ extend PerryIDE
 		// * need to alter the saved errors when the .perry file is altered...
 	
 	
-	function StartFiles 
-		|| IsDir     = .project.isdir
+	function StartFiles
+		|| IsDir	 = .project.isdir
 		|| ProjConf	 = .perryfile
 		error.BackupErrorSource = @tmp+projconf
 		|message| conf
