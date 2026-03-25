@@ -11,6 +11,7 @@ datatype TextLineFlags (uint16)
 		AvoidLastChar
 		FakeMsg
 		FakeLine
+		Lighter
 
 
 class TextViewLine (list)
@@ -366,19 +367,17 @@ libinternal textview.DrawLighter (|image| Where, |int| y)
 	.drawbackground(Where, y, col.px)
 
 
-libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
+// GUITextLineBreakColor
+libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |int|)
 	opt norefcounts
+	
 	|| x = .DrawOneStartLine(d.text) 
 	|int| big = ._LineNumWidth
 		x += big * font.width
 		|| P = (x-(4+font.width), y)
 		|| TLine = d.tline
 		|| pr = d.prev
-
-		|| m = d.message
-		if !m or m == @arg // hmmm
-			lc.a = lc.a >> 2
-
+		|| lc = .LineNumColor(d)
 		if !pr or (tline != pr.tline)
 			|| F = font.small!
 			while
@@ -398,15 +397,31 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 
 
 libinternal TextView.UseColorAnyway (|int|)
-	ifn .isinline
+	if !.isinline
 		if .ParsedMessage // or .myerror
 			return 2
 		return 3
 
 
-libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol, |imagepixel| lc)
+libinternal TextView.SpaceDisplayAsDot (|textviewline| d, |int|)
+	if self is CodeEditor  and  .ExpectsParse >= ProbablyJeebox
+		rz = 0x13FFFFFF
+		if ._DrawInBreakArea & 1
+			._DrawInBreakArea |= 2
+			|| mx = .MouseXY.x
+			if mx < .linenumright and mx >= .LastLeft
+				rz += 0x2F000000
+				if d is Lighter
+					rz += 0x3F000000
+			  elseif d is Lighter
+				rz += 0x0F000000
+
+	
+
+libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol)
 	opt norefcounts
 	opt min 3
+	(d isnt lighter)
 	if d isnt FakeLine
 		|| GoUp = (7 - .lineheight)/2
 		if d.LineError
@@ -423,20 +438,17 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 					.Drawbackground(where, y + GoUp, bg)
 
 		if .CanDrawLight(d)				// linelight
-			lc.r += 80
-			lc.g += 80
-			lc.b += 80
+			(d is lighter)
 			.DrawLighter(where, y+GoUp)
-			
-		
-
-	|| x	 = .DrawLineNumber(where, d, y, lc)-1
+	
+	|| x	 = .DrawLineNumber(where, d, y)-1
 	|| state = MsgTextDrawState(x, d)
 	|| NoDrawFirst =  self is CodeEditor  and  d is breakpoint
 		state.font.DrawChar('\18', Where, (x, y), nil)
 	
 	|codepoint| Prev
 	|| xlimit = .lastrect.x2
+	|| SpaceDisplay = .SpaceDisplayAsDot(d)
 	for (c.CodePoints2 in state.t) (pos)
 		x = state.next(c, pos)
 		if x > xlimit
@@ -449,7 +461,12 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		if NoDrawFirst and c == '/'
 			NoDrawFirst = false
 		  else
-			state.font.DrawChar(c, Where, (x, y), col, 1)
+			|| yadd = 0
+			if (c == 32) and SpaceDisplay
+				yadd = 3
+				c = '.'
+				col = SpaceDisplay
+			state.font.DrawChar(c, Where, (x, y+yadd), col, 1)
 		prev = c
 	
 	if .AutoLim(d)
@@ -550,8 +567,7 @@ libinternal string.CountBytesInSquares (|int| Remain, |int|)
 
 function TextView.DrawOneStartLine (|string| txt, |int|)
 	|| s = .lastrect
-	|| b = font.width
-	|| x = s.x1 + b
+	|| x = s.x1 + font.width
 	if .Alignment is Horizontal
 		|| W = (txt.length) * font.width
 		x += (s.width - W)/2
@@ -613,9 +629,20 @@ function error.TextColor (|float| alpha=1.0, |vec4|)
 		rz.a *= 0.5
 
 
-function textview.LineNumColor (|imagepixel|)
-	|| c = .gnormal.bg.color
-	c = 0.35.mix(c, colors.white)
+libinternal textview.ColorLineNum (GUITextLineBreakColor)
+	opt norefcounts
+	|| msg = line.Message
+	if !msg or msg == @arg
+		return colors.white(0.175)
+	return colors.white(0.35)
+
+
+function textview.LineNumColor (|textviewline| D, |imagepixel|)
+	opt norefcounts
+	|| w = (.OnDrawLineNumber)(self, d)
+	if d is Lighter
+		w.a *= 2.0
+	|| c = w.a.mix(.gnormal.bg.Color, w)
 	c.a = 1.0
 	return c.px
 

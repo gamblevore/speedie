@@ -6,14 +6,14 @@ module Effects
 		opt NoRefCounts
 		for i in 3
 			.Fireworks(window.all, 5s, gui.framestart + 0.25s*i, (-3.0, 0), (0,0), strength)
-
+	
 
 	task Fireworks (guicontrol.taskgui, |vec2| V, |ivec2| Start, |float| Strength)
 		constructor
 			is Animation
 		
 		run
-			|| Particles = 24 
+			|| Particles = 24
 			|| S = .starttime// + .d.position
 			for p in particles
 				|| V2 = (S + p).RandomVec2 - 0.5
@@ -33,3 +33,28 @@ module Effects
 			|| C1 = (1.0, 1.0, 2.0, alpha)
 			|| Rect = (s-2.5, s+2.5)
 			GUI.Screen.DrawSoftCircle( Rect,  C1 )
+
+
+
+function PerryColorLineNum (GUITextLineBreakColor)
+	opt norefcounts
+	|| f = 0.0625
+	|| m = line.message
+		if m.OwningFunc
+			if m == @arg
+				f = 0.2
+			  else
+				f = 0.35
+		  elseif m!=@arg
+			f = 0.175
+		
+	return colors.white(f)
+
+
+
+
+
+
+
+
+

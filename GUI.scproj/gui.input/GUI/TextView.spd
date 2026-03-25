@@ -6,7 +6,7 @@ class TextView (GUIControl)
 		cpp_part Text
 	|byte|						SingleLine
 
-	|bool| 						ShowLineNumbers
+	|bool|						ShowLineNumbers
 	|bool|						GroupSaveAll
 	|byte|						LineHeight
 	|bool|						IsALogTextView // Is this textview used for displaying a Log.
@@ -14,6 +14,7 @@ class TextView (GUIControl)
 	|int8|						YAdjust
 	|MoveCode|					Alignment // centered, left, right
 
+	|byte|						_DrawInBreakArea
 	|byte|						_CanAutoComplete
 	|int|						_AutoCompleteBack
 	|int64|						_LogTrimmed
@@ -35,10 +36,11 @@ class TextView (GUIControl)
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
 	|GUITextLineEvent?|			OnBreakPoint
+	|GUITextLineBreakColor|		OnDrawLineNumber
 	|Document?|					_Viewing
 
 	|Error?|					MyError
-	|DelayedShowError?| 		_ErrorDelayer
+	|DelayedShowError?|			_ErrorDelayer
 	|GUITextShowEvent?|			OnShowExtraInfo
 	|GUITextLineEvent?|			OnSelError
 
@@ -57,6 +59,7 @@ class TextView (GUIControl)
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
 		.oncopy = textCopy|GUICopyEvent|
+		.OnDrawLineNumber = ColorLineNum
 		.init
 
 	destructor
@@ -88,15 +91,20 @@ class TextView (GUIControl)
 	
 	behaviour MouseMove
 		|| InScroll = .MouseMoveInScrollArea(P)
-		
+		|| WantInBreaks = false
+		if (.ExpectsParse >= ProbablyJeebox) and (self is codeeditor)
+			WantInBreaks = ._LineNumWidth and (p.x < .LineNumRight) and (p.x >= .lastleft)
+
 		if state is enter or moved
-			if InScroll
+			if InScroll or WantInBreaks
 				SystemCursor.hand.use
 			  else
-				|| InLines = ._LineNumWidth and (State isnt leave) and (p.x < .LineNumRight)
-					SystemCursor.hand.use
-				  else
-					super.MouseMove(p, move, state)
+				super.MouseMove(p, move, state)
+
+		|| InlinesWasDrawn = ._DrawInBreakArea&2
+		if ((InlinesWasDrawn!=0) != WantInBreaks)  and  .IsViewable
+			gui.touch(self)
+		._DrawInBreakArea = WantInBreaks ||| InlinesWasDrawn
 
 		.ShowExtraInfo(P, true)
 		return InScroll
@@ -143,12 +151,18 @@ class TextView (GUIControl)
 		return -1
 	
 	
-	libinternal ClickedLineNum (|ivec2| P, |bool|)
+	libinternal InLineNum (|ivec2| P, |textviewline|)
 		opt norefcounts
 		require self is editable
-		require p.x < .LineNumRight
+		|| x = p.x
+		require x < .LineNumRight and x >= .LastLeft
 		|| bs = (0, 0)
-		|| d = .ByteAtXY(p, bs)
+		return .ByteAtXY(p, bs)
+	
+	
+	libinternal ClickedLineNum (|ivec2| P, |bool|)
+		opt norefcounts
+		|| d = .InLineNum(p)
 		if d is StartsNormally
 			.addbreak(d)
 			return true
@@ -497,8 +511,8 @@ class TextView (GUIControl)
 		
 		|| Opp = ContainerOpposite(ToFind, Dir * ExpandContainers)
 			pos += dir
-			|| SecondCS = s[pos + Adjust].charset 			// ((abc)) (<abc>)
-			if SecondCS == FindCS				 			// undo our attempt
+			|| SecondCS = s[pos + Adjust].charset			// ((abc)) (<abc>)
+			if SecondCS == FindCS							// undo our attempt
 				pos -= dir
 			FindCS = SecondCS
 	
@@ -1396,27 +1410,30 @@ class TextView (GUIControl)
 			return false
 
 		require SW or (.ExpectsParse >= probablyjeebox)
-		|| c     = counterparts.find(s)					#require
+/		|| c = counterparts.find(s)						#require
 
-		|| After = self[sel2]
+		|| After = self[sel2]							// type through
 		if (c&1) and (after == s)
 			.selrange = sel2+1
-			return true									// sigh could simplify this. cant be bothered
+			return true
+			
 		
 		if (SW == 1)
 			|| tb = self[sel.x]
-			if counterparts.find(tb)		// stop awkward things like: " --> (")
+			if counterparts.find(tb)					// stop awkward things like: " --> (")
 				require (s == '\'' or '"') and (s != tb)
 		
 		
+		if (c&1)
+/			return false
 		// what about ' within a comment. its quite frustrating.
 		|| other = CounterParts[c+1]
 		if (Other==s) and (after == s)
-			.selrange = sel2+1
+			.SelRange = sel2+1
 			return true
 
-		require .SelMsgValid(sel) // we want to avoid this after comments. how do we know if something is commented?
-								  // only after parsing, really. we can backscan. but thats more of a pain. 
+		require .SelMsgValid(sel)	// we want to avoid this after comments. how do we know if something is commented?
+									// only after parsing, really. we can backscan. but thats more of a pain. 
 
 		if !SW
 			require s != '{'
@@ -1845,7 +1862,6 @@ class TextView (GUIControl)
 		opt norefcounts
 		
 		|| d		= .StartLine
-		|| lc		= .LineNumColor
 		|| y		= (.lineheight - font.height) + .LastTop
 		|| yEnd		= .LastBottom
 		|| Remain	= .LastRect.Height
@@ -1859,11 +1875,12 @@ class TextView (GUIControl)
 		
 		._CanSeeLastLine = false
 		._CanSeeAllLines = false
+		._DrawInBreakArea &=~ 2
 		while (y > yEnd)
 			y -= .LineHeight
 			Remain -= .LineHeight
 			if Draw
-				.DrawOneLine(where, D, y, usecol, lc)
+				.DrawOneLine(where, D, y, usecol)
 			d++
 			if !d
 				._CanSeeLastLine = true
@@ -2316,8 +2333,8 @@ class TextView (GUIControl)
 			|| l = d.Location
 				if l isa "spd" or "box" or "jbin" or "xml" or "jb"
 					mode = CurrentlyJeebox
-				  elseif l isa "todo" and "txt"
-					mode = ProbablyJeebox // this seems wrong
+//				  elseif l isa "todo" and "txt"
+//					mode = ProbablyJeebox // this seems wrong
 		.ExpectsParse = mode
 
 	
@@ -2366,9 +2383,9 @@ libinternal string.InsertTrim (|ivec2|)
 
 libinternal string.DeleteTwoBytes (|ivec2|r, |string|)
 	|| fs = faststring(.length-2)
-	fs <~ self[0,       r.x]
-	fs <~ self[r.x+1,   r.x2+1]
-	fs <~ self[r.x2+2,  int.max]
+	fs <~ self[0,		r.x]
+	fs <~ self[r.x+1,	r.x2+1]
+	fs <~ self[r.x2+2,	int.max]
 	return fs
 
 

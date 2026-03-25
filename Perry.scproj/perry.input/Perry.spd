@@ -5,11 +5,11 @@
 
 
 module Perry
-    |ListViewRow|					Projects = Message()
+	|ListViewRow|					Projects = Message()
 	|Dictionary of String|			PathDict
 	|listviewrow|					RecentProjects = message()
-    |date|							FinishedStartUp
-    |byte| 							FindID	
+	|date|							FinishedStartUp
+	|byte|							FindID	
 	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0

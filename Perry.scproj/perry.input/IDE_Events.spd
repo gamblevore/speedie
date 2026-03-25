@@ -1,5 +1,5 @@
- 
- 
+
+
 function FileSepClicker (guiaction)
 	opt norefcounts
 	.ide.ViewTextModeSwap
@@ -65,7 +65,7 @@ function ClickedCompileTabs (Guiaction)
 
 	
 function PerryIDE.ShowCompileTab (|object| tab) // showtab
-	.ShowCompileCutely           // OOOP. 
+	.ShowCompileCutely					// OOOP.
 	.CompileTabSelect(tab)
 
 

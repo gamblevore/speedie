@@ -1,8 +1,8 @@
 
 
 extend PerryIDE  
-    constructor (|file| project, |bool| Dummy)
-		super.constructor 
+	constructor (|file| project, |bool| Dummy)
+		super.constructor
 		(dummy)
 		.IsMainWindow		= true
 		.Project			= project
@@ -14,14 +14,14 @@ extend PerryIDE
 		.AppInfo			= TextView(self)
 		.DebugBtns			= guicontrol(self)
 		.Stack				= listview(self, ClickedStack, ClickedStack)
-		.SearchArea			= guicontrol(self) 
-		.ViewButtons		= guicontrol(self) 
+		.SearchArea			= guicontrol(self)
+		.ViewButtons		= guicontrol(self)
 		.RBorder			= guicontrol(self)
-		.CompileArea	    = guicontrol(self)
+		.CompileArea		= guicontrol(self)
 		.Toolbar			= buttonview(self,		ClickedToolBar)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
-		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    	 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
+		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,		 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open, ClickedOpenRecent, ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -37,7 +37,7 @@ extend PerryIDE
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
-		.ASMView			= Listview(self,        SelectedASM, SelectedASM)
+		.ASMView			= Listview(self,		SelectedASM, SelectedASM)
 		.ASMStretch			= StretchControl.horz(self, 200~left, 110, 110)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
@@ -93,18 +93,18 @@ extend PerryIDE
 	
 	
 	function InitIDE // perryide.init
-		.size      = the~area
-		.CopyPaste = CopyPasteFlags.PasteFile
-		.onpaste   = perryopendoc
+		.size		= the~area
+		.CopyPaste	= CopyPasteFlags.PasteFile
+		.onpaste	= perryopendoc
 
 		|| LeftBG = vec4(0.125, 0.975)
 		with .toolbar 
-			.size 			= the~width  by  20~down
+			.size			= the~width  by  20~down
 			.takesfocus		= 0
 			.ID				= "toolbar" 
 			isnt drawsfocus
 			.align			= ListViewState.aligncenter
-			.gnormal.solid  = vec4(0.125, 0.94) 
+			.gnormal.solid  = vec4(0.125, 0.94)
 			.DontDrawClicked  = true
 		
 		
@@ -140,9 +140,9 @@ extend PerryIDE
 			.folfile		= ".perry"
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "FileList"
-			.size 			= the~width by the~bottom to 15~down
-			.copypaste	   |= copypasteflags.pastefile
-			.OnSearchWithin = PerrySearchWithin
+			.size			= the~width by the~bottom to 15~down
+			.copypaste		|= copypasteflags.pastefile
+			.OnSearchWithin	= PerrySearchWithin
 			.onpaste		= PerryOpenDoc
 			.newcmm				// for the hideside test
 			.sizecheckers	= "spd,txt" / ','
@@ -161,9 +161,9 @@ extend PerryIDE
 	
 	
 		with .EditMe
-			is   enabled
-			is   editable
-			is   codeeditor
+			is	enabled
+			is	editable
+			is	codeeditor
 			isnt drawsfocus
 			.ID				= "EditMe"
 			.GroupSaveAll	= true
@@ -171,9 +171,10 @@ extend PerryIDE
 			.OnTextChanged	= EditMeModified
 			.OnShowExtraInfo = OnShowExtraInfo
 			.gnormal.solid	= vec4(0.1, 0.974)
-			.OnSelChanged   = EditMeSelChange
+			.OnSelChanged	= EditMeSelChange
 			.OnSelError		= EditMeSelError
 			.OnBreakPoint	= EditMeBreakPointAdd
+			.OnDrawLineNumber = PerryColorLineNum
 
 
 		with .DrawMe
@@ -203,10 +204,10 @@ extend PerryIDE
 		
 
 		with .autocomplete
-			.OnRightClick   = PerrySuperAutoComplete
+			.OnRightClick	= PerrySuperAutoComplete
 			.onselected		= PerryAutocompleteSelected
 			.ID				= "AutoComplete"
-			.takesfocus 	= takesfocusflag.CanFocus
+			.takesfocus		= takesfocusflag.CanFocus
 			|| dark			= self.filelist.GNormal.bg.color
 			.GNormal.bg		= 0.05.mix(  dark, vec4(0.5, 1.0, 0.0, 1.0)).px	// mostly dark
 			.GNormal.edge	= 0.1.mix(dark, colors.green ).px				// less dark
@@ -223,8 +224,8 @@ extend PerryIDE
 			.onpaste = ErrorListPaste
 			.OnKeyDown = DeleteableListKeys
 			.listsource = error()
-			.copypaste	   |= copypasteflags.pastetext
-			.copypaste	   |= copypasteflags.CopyText
+			.copypaste |= copypasteflags.pastetext
+			.copypaste |= copypasteflags.CopyText
 			
 		
 		with .CommsLogList
@@ -824,7 +825,7 @@ extend PerryIDE
 		|| projfol = .MainProjFol
 		if !projfol
 			.EditRow(.filelist.liststart)
-			return 
+			return
 		
 		projfol.dirfile = ".todo"
 		.findnottodo

@@ -990,7 +990,7 @@ ive been~running #since morning
 		while output.indentScore > chin
 			if output == @arg
 				if  output isnt style2
-				    return parser.indentbug(curr)
+					return parser.indentbug(curr)
 				  else
 					0
 				if backpos > 0

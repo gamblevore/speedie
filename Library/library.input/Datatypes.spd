@@ -173,6 +173,17 @@ datatype Ind (int) // an INDex. And an INT.
 	syntax cast (|bool|)
 		inline
 		return self >= 0
+		
+	operator bitand (|int| x, |int|)
+		// shame we need this... but we do! or else (i&1) will be tested >= 0 rather than != 0
+		inline // now we can't test if an index is even or odd
+		return self|int| & x
+//	operator bitor (|int| x, |int|) // might need these too. not sure.
+//		inline
+//		return self|int|	||| x
+//	operator xor (|int| x, |int|)
+//		inline
+//		return self|int| ^ x
 
 
 struct RetroFloat
@@ -792,7 +803,7 @@ datatype uint64
 	function CountBits (|int|)
 		asm BSTT(dest, p1, 0)
 		cpp_Wrapper (__builtin_popcountll)
-	
+
 	function ByteSwap (|uint64|)
 		asm BSTT(dest, p1, 4)
 		cpp_wrapper (__builtin_bswap64)
@@ -807,8 +818,8 @@ datatype uint64
 
 	syntax access (|int| bit, assigns:|bool|, |uint64|)
 		|| mask = 1|uint64|<<bit
-		return (self &~ mask) ||| (value|uint64| << bit) 
-		
+		return (self &~ mask) ||| (value|uint64| << bit)
+	
 	
 	iterator bits				// Get 1 bit of the original per loop
 		|| curr = self|uint64|

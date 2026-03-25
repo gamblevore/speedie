@@ -16,6 +16,7 @@ prototype GUICopyEvent			(|GUIControl|  self,  |object?| item, |string|)
 
 prototype GUITextEvent			(|textview|    self,  |int| Reason, |bool| TextWasAltered)
 prototype GUITextLineEvent		(|textview|    self,  |textviewline| Line, |int| Direction=false, |bool|)
+prototype GUITextLineBreakColor	(|textview|    self,  |textviewline| Line, |vec4|)
 prototype GUITextShowEvent		(|TextView|    self,  |ivec2| LeftCorner, |message?| Msg, |error?| err, |string| reason, |bool| WasDelayed)
 prototype SorterComparerWindow	(|window|      A,     |window| B, |int|)
 
