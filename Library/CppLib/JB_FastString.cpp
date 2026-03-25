@@ -368,9 +368,13 @@ int JB_int_Render(int self, byte* Addr, int N) {
 
 void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
 	if (Value >= 0 and Value <= 9)
-		if (RoundTo == 1 or Value == 0)
+		if (RoundTo <= 1 or Value == 0)
 			return JB_FS_AppendMultiByte( self, (int)('0' + Value), RoundTo );
 
+	// the simplest way of writing digits... is to "just write it". No pre-guessing.
+	// of course we don't know how long it is until its already done.
+	// Thats why we need a buffer space.
+	
 	u8 Space[24]; // 19 digits rounds up to 24 if roundto is 8
 	uint8* wp = Space+sizeof(Space)-1;
 	uint64 LeftOver = (Value < 0) ? (uint64)(-Value) : Value;	

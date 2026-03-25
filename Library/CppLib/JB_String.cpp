@@ -504,16 +504,16 @@ u32 JB_Str_UTF8Size ( u32 c ) {
 }
 
 
-int JB_Str_UTF8Value (JB_String* self, bool Strict) {
+int JB_Str_UTF8Value (JB_String* self, bool Loose) {
 	int Len = JB_Str_Length(self);
 	if (Len <= 0)
 		return UNI_BADOFFSET;
 
 	uint8* Source = self->Addr;
-	if (!Strict or ValidateUTF8(Source, 0, Len) < 0) {
+	if (Loose or ValidateUTF8(Source, 0, Len) < 0) {
 		uint8* Source = self->Addr;
 		int N = JB_u8_Size(*Source);
-		if ((N <= Len) and (!Strict or N == Len)) {
+		if ((N <= Len) and (Loose or N == Len)) {
 			u32 Result;
 			u8Read( Source, &Result );
 			return (int)Result;
@@ -982,28 +982,28 @@ int JB_Str_OutByte( JB_String* self, int StartOff, int AfterOff, int SearchChar 
 
 
 byte JB_Str_First(JB_String* self) {
-	int n = self->Length;
-	if (n)
+	if (self->Length > 0)
 		return self->Addr[0];
 	return 0;
 }
 
 
 int JB_Str_ByteValue2(JB_String* self, int offset, int Default) {
-	if ((u32)offset < (u32)self->Length) {
-		return (int) (self->Addr[offset]) ;
-
-	} else if (offset < 0) {
-		offset = self->Length + offset;
-		if ((u32)offset < (u32)self->Length) {
-			return (int) (self->Addr[offset]) ;
-		}
-	}
-    return Default;
+	if ((u32)offset < (u32)self->Length)
+		return (int) (self->Addr[offset]);
+	return Default;
 }
 
 int JB_Str_ByteValue(JB_String* self, int offset) {
-	return JB_Str_ByteValue2(self, offset, 0);
+	if ((u32)offset < (u32)self->Length)
+		return (int) (self->Addr[offset]);
+
+	if (offset < 0) {
+		offset += self->Length;
+		if ((u32)offset < (u32)self->Length)
+			return (int) (self->Addr[offset]);
+	}
+    return 0;
 }
 
 
