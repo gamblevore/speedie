@@ -77,19 +77,6 @@ module debugger
 			.BreakMapBad = true
 			printerror "BreakMap out of range"
 		
-	
-	function GetUserBreaks (|message| B)
-		opt norefcounts
-		for P.fast in b[@arg]
-			if p.expect(@tmp)
-				|| F = .FileMap[p.name]
-					for Pos in P
-						|| i = p.int
-						if i >= 1
-							.UserMultiBreak(F, i)
-				  else
-					error (F, "Breakpoint is in missing file")
-	
 
 	function Path (|int| i, |filewithdata|)
 		opt norefcounts

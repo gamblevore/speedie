@@ -66,12 +66,23 @@ dispatch DebuggerActions (PerryResponse)
 	stepin:		return .TempBreak(.StepIn)
 	stepout:	return .TempBreak(.StepOut)
 	stepover:	return .TempBreak(.StepOver)
+		
+	brkadd:		return debugger.BreakSet(m, true)
+	brkrem:		return debugger.BreakSet(m, false)
 
 	stop:		app.quit
 		
 	pause:		return false // caller already updates...
 		
 //	stepback:	0 // todo
+
+
+function debugger.BreakSet (|message| m, |bool| Active, |bool|)
+	debugger
+	opt norefcounts
+	|| F = .FileMap[m.firstname]				#expect (F, "Breakpoint is in missing file")
+	|| p = m[1].int
+	.UserMultiBreak(F, p, Active)
 
 
 function cakevm.ClearTempBreak (|cakestack| stack)
