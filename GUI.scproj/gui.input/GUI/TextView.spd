@@ -1410,7 +1410,7 @@ class TextView (GUIControl)
 			return false
 
 		require SW or (.ExpectsParse >= probablyjeebox)
-/		|| c = counterparts.find(s)						#require
+		|| c = counterparts.find(s)						#require
 
 		|| After = self[sel2]							// type through
 		if (c&1) and (after == s)
@@ -1425,7 +1425,7 @@ class TextView (GUIControl)
 		
 		
 		if (c&1)
-/			return false
+			return false
 		// what about ' within a comment. its quite frustrating.
 		|| other = CounterParts[c+1]
 		if (Other==s) and (after == s)

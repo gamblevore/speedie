@@ -533,12 +533,11 @@ function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
 	
 	hfile <~ "\n);\n"
 
+	
 	if !cls.isrole
 		|| HasTable = .ExportBehaviourInstance(cls, cppfile)
 		CppFile <~ "JBClassPlace5(${cls.CStructName}, ${cls.CSuperStructName}, \"${cls.name}\", "
-		if (!HasTable)
-			cls = TypeObject
-		cppfile <~ cls.CStructName
+		cppfile <~ (cls, typeobject)(hastable).CStructName
 		cppfile <~ "_FuncTable_);\n\n"
 
 

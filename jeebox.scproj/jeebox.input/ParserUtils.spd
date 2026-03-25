@@ -97,14 +97,14 @@ To get around this, just do:  x = str.parse(@arg)
 libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 	description "My language-parsing idea uses Owner as @list"
 	if !Parser.CppInited
-	    Parser.Init
+		Parser.Init
 
 	parser.StartParse( self )
 	parser._StopBars = 0
 	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal
 	|| Func		= Owner
-	Func	   ?= @arg
+	Func		?= @arg
 	|| into		= message.new(nil, Func, 0, "", 0)
 	if func == @arg
 		(into is style2)
@@ -117,7 +117,7 @@ libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 
 	parser.CleanSpaces
 	if parser.Running
-	    parser.Expect( 0 )
+		parser.Expect( 0 )
 	
 	parser.startparse(nil) // clear error message
 	if !OK
@@ -162,17 +162,17 @@ extend Parser
 
 
 	function ErrorEvent (|int|Start, |int| ExpectedBits, |int| RealBits)
-	    visible true // called directly by the tokeniser... sorry :PPPP
+		visible true // called directly by the tokeniser... sorry :PPPP
 
 		|| Err = FastString.new
-	    ifn RealBits & kIllegalChar
+		ifn RealBits & kIllegalChar
 			ifn ExpectedBits and Realbits and FindError(expectedbits)
-	            err <~ "Unexpected "
+				err <~ "Unexpected "
 			  else
-	            for (5) { // 5, in case there is a bug causing infinite loop.
-	                ExpectedBits = MessageErrorSub( err, ExpectedBits )
-	            } (ExpectedBits)
-	            err <~ " but found "
+				for (5) { // 5, in case there is a bug causing infinite loop.
+					ExpectedBits = MessageErrorSub( err, ExpectedBits )
+				} (ExpectedBits)
+				err <~ " but found "
 
 		if (RealBits == kEndOfLine)
 			err <~ "end-of-line"
@@ -186,20 +186,20 @@ extend Parser
 
 			if (RealBits & kIllegalChar)
 				err <~ "Found illegal-character "
-	            || illegal = parser[start]
-	            if (illegal.CanPrintAsNormalChar) 
-	                err <~ '\''
-	                err <~ parser[start]
-	                err <~ '\''
+				|| illegal = parser[start]
+				if (illegal < 127 and Illegal >= 32)
+					err <~ '\''
+					err <~ parser[start]
+					err <~ '\''
 				  else
-	                err <~ "0x"
-	                err.AppendHex( illegal )
-	                err <~ ' '
+					err <~ "0x"
+					err.AppendHex( illegal )
+					err <~ ' '
 			  else
-	            err <~ '\''
-	            |ind| N = parser.NextStart min (start + 100)
-	            err <~ parser[ start, N, @nil ].escape
-	            err <~ '\''
+				err <~ '\''
+				|ind| N = parser.NextStart min (start + 100)
+				err <~ parser[ start, N, @nil ].escape
+				err <~ '\''
 
 		Parser.ErrorAdd( err, start )
 
@@ -207,7 +207,7 @@ extend Parser
 	function FindError (|int| num, |int|)
 		if num == kThing: return kThing
 		for (._ErrorNames) (Key)
-	        || i = key.parseint|int|
+			|| i = key.parseint|int|
 			if (num & i) == i
 				return i
 
@@ -217,20 +217,20 @@ extend Parser
 		if !e
 			e = Dictionary()
 			._ErrorNames = e
-	        e[kTemporal]           = "Temporal"
-	        e[kTemporalSyx]        = "Declaration"
-	        e[kTemporalWord]       = "Statement"
-	        e[kEndOfLine]          = "End-Of-Line"
-	        E[kColon]              = "':'"
-	        E[kOppSyx]             = "Operator"
-	        E[kOppWord]            = "Operator"
-	        E[kOpp]                = "Operator"
-	        E[kOppTemporal]        = "Temporal-operator"
-	        E[kThing]              = "A name"
-	        E[kThingWord]          = "A name"
-	        E[kThingSyx]           = "Something"
-	        E[kIllegalChar]        = "Illegal-character"
-	    
+			e[kTemporal]			= "Temporal"
+			e[kTemporalSyx]			= "Declaration"
+			e[kTemporalWord]		= "Statement"
+			e[kEndOfLine]			= "End-Of-Line"
+			E[kColon]				= "':'"
+			E[kOppSyx]				= "Operator"
+			E[kOppWord]				= "Operator"
+			E[kOpp]					= "Operator"
+			E[kOppTemporal]			= "Temporal-operator"
+			E[kThing]				= "A name"
+			E[kThingWord]			= "A name"
+			E[kThingSyx]			= "Something"
+			E[kIllegalChar]			= "Illegal-character"
+		
 		if fs.length
 			fs <~ " / "
 		  else
@@ -252,25 +252,21 @@ struct MessagePosition
 		cpp_part MsgPos
 		noauto
 	
-	|MemoryLayer--|     Layer
-	|int|               Position
-	|int|               Length
+	|MemoryLayer--|		Layer
+	|int|				Position
+	|int|				Length
 	|MsgParseFlags|		Flags
-	|uint16|            Tag
+	|uint16|			Tag
 	
 	destructor
 		parser.using = self[0]
-	    .Layer.use
+		.Layer.use
 	
 	function SyntaxUsingComplete (|object| idk=nil)
+		inline
 
 
-
-function byte.CanPrintAsNormalChar (|bool|)
-	return (self < 127 and self >= 32)
-
-
-// remove tokenhandler_fp, its just parsehandler!
+// todo: remove tokenhandler_fp, same as ParseHandler
 prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)
 prototype TokenHandler_fp		(|int| Start, |message?| Parent=nil, |Object?|)
 prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
@@ -278,18 +274,26 @@ prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
 
 
 struct ParserLineAndIndent
+	linkage
+		libinternal
+
 	|int| Lines
-	|int| Position
+	|int| PzLine
 	|int| Dentine
 	|int| IsDebug
 	|int| FirstLine
+	|int| EndArg
+	|int| TotalLines
 	
 	function ArgPos (|Int|)
 		|| p = .FirstLine
 			return p
-		return .Position
+		return .PzLine
+	
+	function NextLine
+		Memory.zero(self, 6*4) // oof. We want to leave TotalLines unset.
 
- 
+
 role MessageRoot (Message)
 	contains Message
 	linkage

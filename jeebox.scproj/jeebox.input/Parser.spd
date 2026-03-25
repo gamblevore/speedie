@@ -248,7 +248,7 @@ extend Parser
 
 	function fInnerNiceAdj (ParseHandler)
 		// >~ can i run home,  >~ can i run ,  >~ can i
-		return fAskSub(start, parent, @binn)
+		return fAskSub(start, @binn)
 
 
 	function fArray (ParseHandler)
@@ -551,12 +551,14 @@ extend Parser
 
 
 	function fOpAsThing (ParseHandler)
+		opt norefcounts
 		rz = parser.new( nil, @Oat, start)
 		rz <~ parser.Process( kOpp )
 		rz <~ parser.ProcessThing
 
 	
 	function OppChain (|Message| opp, |Message|)
+		opt norefcounts
 		|| result = parser.Process( kAdjectiveOp, opp )
 			if !opp.parent
 				result.First = opp
@@ -600,7 +602,7 @@ extend Parser
 		return result
 	
 	
-	function fAskSub (|int| Start, |message| Parent, |syntax| f, |Message|)
+	function fAskSub (|int| Start, |syntax| f, |Message|)
 		|| opp = parser.process(kOpp, parser.kExpect)
 		|| first = parser.ProcessThing(kOppSyx, parser.kExpect)
 		require (first and opp)
@@ -619,7 +621,7 @@ extend Parser
 
 
 	function fAsk (ParseHandler)
-		return fAskSub(start, parent, @ask)
+		return fAskSub(start, @ask)
 
 
 	function fYoda (ParseHandler)
@@ -983,6 +985,10 @@ ive been~running #since morning
 	
 	
 	function LoweredIndent (|message| output, |message| curr, |message|)
+		// we'd need to keep track of the last node we created... 
+		// and then the first line found after making a node.
+		// seems posisble?
+		// we have addtooutput?
 		Opt NoRefCounts
 	
 		|| BackPos = parser.data.find( CharSet.Line, curr.position, 0 )
@@ -991,8 +997,6 @@ ive been~running #since morning
 			if output == @arg
 				if  output isnt style2
 					return parser.indentbug(curr)
-				  else
-					0
 				if backpos > 0
 					output.after = backpos
 			output = output.parent
@@ -1007,7 +1011,7 @@ ive been~running #since morning
 		return output
 
 
-	function NextLineAndIndent (|message| parent, |ParserLineAndIndent|)
+	function NextLineAndIndent (|message| parent, |&ParserLineAndIndent| lin)
 		Opt NoRefCounts
 
 		|| first		= .NextStart	// Should ind??
@@ -1021,36 +1025,36 @@ ive been~running #since morning
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
-				rz.dentine = (rz.dentine&~3) + ((!commas)<<2)
-				if ((State&1) and rz.Lines)
+				lin.dentine = (lin.dentine&~3) + ((!commas)<<2)
+				if ((State&1) and lin.Lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
 			  elseif (c == ',')
 				commas++
 				|| l = parent.last
-					rz.dentine = l.indent
+					lin.dentine = l.indent
 				  else
-					rz.dentine = 0									// int.min
+					lin.dentine = 0									// int.min
 				State = 0
 
 			  elseif (c == ' ')
 				State |= 1
-				if rz.IsDebug != 3
-					rz.dentine += !commas
+				if lin.IsDebug != 3
+					lin.dentine += !commas
 				  else
-					if rz.dentine < 4 // do it anyhow
-						rz.dentine += !commas
+					if lin.dentine < 4 // do it anyhow
+						lin.dentine += !commas
 						
-					rz.IsDebug = 2
+					lin.IsDebug = 2
 
 			  elseif (c == '/')
 				|| c2 = d[n]
 				if (c2 != '/' and c2 != '*')
 					if state&2					// allow  /  in case some people really don't like the \r thing
-						if rz.IsDebug > 1
+						if lin.IsDebug > 1
 							.ErrorAdd("Invalid breakpoint", n-1)
-						rz.IsDebug = 3
-						rz.dentine += !commas
+						lin.IsDebug = 3
+						lin.dentine += !commas
 						continue
 					n--
 					exit
@@ -1059,8 +1063,8 @@ ive been~running #since morning
 					n = .GotoEndOfLine(n+1)
 					continue
 
-				rz.Lines++
-				rz.dentine = 0
+				lin.Lines++
+				lin.dentine = 0
 				.nextstart = n-1
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
@@ -1071,20 +1075,20 @@ ive been~running #since morning
 				if c != '\n' and '\r' and ';'
 					n--
 					exit
-				rz.Lines++
-				if !rz.FirstLine
-					rz.FirstLine = n-1
-				rz.Position = n-1
-				rz.dentine = 0
-				rz.IsDebug = (c == '\r')|int|
+				lin.Lines++
+				if !lin.FirstLine
+					lin.FirstLine = n-1
+				lin.PzLine = n-1
+				lin.dentine = 0
+				lin.IsDebug = (c == '\r')|int|
 				commas = 0
 				State = 2
 				if parent.func == @list
 					(parent is style2)
 
-		rz.Lines += commas
-		if !rz.lines and (parent.func == @arg and parent isnt style2) // we can't have an indent if we have no lines
-			rz.Dentine = 252
+		lin.Lines += commas
+		if !lin.lines and (parent.func == @arg and parent isnt style2) // we can't have an indent if we have no lines
+			lin.Dentine = 252
 		.NextStart = n
 		
 
@@ -1116,8 +1120,8 @@ ive been~running #since morning
 		parser.new(prev, @arg, curr.position)
 		prev <~ curr
 		return prev
-	 
-	 
+	
+	
 	function AddToOutput (|Message!| Output,  |message| Curr,  |message| Prev,  |int| Pos,  |message|)
 		Opt NoRefCounts
 		|| f = Output.func
@@ -1133,7 +1137,7 @@ ive been~running #since morning
 		return output
 	
 
-	libinternal FinishParseLoop (|int| lines, |message| output, |int| After, |int|)
+	libinternal SetArgEnd (|int| lines, |message| output, |int| After, |int|)
 		opt norefcounts
 		if output.func == @arg and output is style2
 			output.after = after
@@ -1145,37 +1149,44 @@ ive been~running #since morning
 					output.after = after
 		
 		return lines
-		
-		
+	
+
+
 	function ParseLoop (|Message| Output, |int| TmpoFlags, |int|)
 		Opt NoRefCounts
 		|message| prev
 		|ParserLineAndIndent| Info
 		while
-			Info = .NextLineAndIndent(output)
-			rz += info.Lines
-
+			.NextLineAndIndent(output, info)
+			info.TotalLines += info.lines
+			
 			if .WillEnd
-				|| nxt = .nextstart
-				if !.Running
-					nxt = parser.data.length
-				return .FinishParseLoop(rz, output, nxt)
+				TmpoFlags = (.nextstart, parser.data.length)(.running)
+				exit
 			
 			if (prev and !info.Lines)
-				return .FinishParseLoop(rz, output, .nextstart-1)
+				TmpoFlags = .nextstart-1
+				exit
 			
 			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.dentine)
 			if !ch
-				return .FinishParseLoop(rz, output, .nextstart-1)
+				TmpoFlags = .nextstart - 1
+				exit
 			
 			if ch != output // haha
-				rz += (ch == @item)
+				info.TotalLines += ch==@item
 				if info.IsDebug
 					(ch is breakpoint)
+				info.EndArg = -1
 				output = .AddToOutput(output, ch, prev, info.ArgPos)
-				if !Output: exit
+				if !output
+					TmpoFlags = .nextstart-1
+					exit				// return info.TotalLines
 				prev = ch
-			Info = nil
+			info.nextline
+		
+		return .SetArgEnd(info.TotalLines, output, TmpoFlags)
+
 
 
 	function DecorateThing (|message!| R, |int| Ops, |Message!|)
@@ -1285,7 +1296,7 @@ module Parser
 	linkage
 		visible false
 		cpp_part Tk
-		libinternal 
+		libinternal
 
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData
@@ -1295,8 +1306,8 @@ module Parser
 	|fnIDGenerator|			Splitter = &parser.range
 	visible false
 	|message|				_EndOfLineMarker
-	|dictionary of string|  _ErrorNames = nil
-	|uint16|                _StopBars
+	|dictionary of string|	_ErrorNames = nil
+	|uint16|				_StopBars
 	|bool|					_DotInsertAllow
 
 	.using.Position = -1
@@ -1307,22 +1318,22 @@ module Parser
 		kColon
 		kColonArg
 
-		kTemporal       = [kTemporalWord,	kTemporalSyxNoBar,  kTemporalBar]
-		kEnd            = [kEndOfLine,		kComma,				kEndContainer] 
-		kFuncAfterAny   = [kFuncAfterNormal,kFuncAfterNoSpace,  kFuncAfterBar]
-		kOpp            = [kOppBra,			kOppSNB,			kOppBar, kOppTemporal,		kOppWord,	kOppYoda]
+		kTemporal		= [kTemporalWord,	kTemporalSyxNoBar,	kTemporalBar]
+		kEnd			= [kEndOfLine,		kComma,				kEndContainer] 
+		kFuncAfterAny	= [kFuncAfterNormal,kFuncAfterNoSpace,	kFuncAfterBar]
+		kOpp			= [kOppBra,			kOppSNB,			kOppBar,	kOppTemporal,	kOppWord,	kOppYoda]
 		kTemporalWordColon
-		kThing          = [kThingSyx, kThingBar, kThingWord]
+		kThing			= [kThingSyx, kThingBar, kThingWord]
 		kOppSyx			= koppSNB (|) koppbar
-		kTemporalSyx    = kTemporalSyxNoBar (|) kTemporalBar
+		kTemporalSyx	= kTemporalSyxNoBar (|) kTemporalBar
 		kOppNoBar		= kopp &~ koppbar
 
 		kOppChain		= kOppWord (|) kOppBra (|) koppsyx
 		kIllegalChar
-		kAllow          = false
-		kExpect         = true
-		kTmpOpp         = kOppTemporal  (|) kTemporalSyxNoBar
-		kLameTemporal   = kTemporalWord (|) ktemporalsyx // kTemporalSyxNoBar? for .parseloopflags
+		kAllow			= false
+		kExpect			= true
+		kTmpOpp			= kOppTemporal  (|) kTemporalSyxNoBar
+		kLameTemporal	= kTemporalWord (|) ktemporalsyx // kTemporalSyxNoBar? for .parseloopflags
 														 // might want to separate "#!shebang" from "||decl"
 
 
@@ -1380,6 +1391,7 @@ extend Message
 
 datatype MsgParseFlags (uint16)
 	syntax is (|MsgParseFlags| v, |bool|)
+		inline
 		return self & v
 	flags
 		// These are not set during parse, but after.
