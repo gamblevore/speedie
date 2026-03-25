@@ -495,23 +495,24 @@ class String
 		inline
 		return .cstr
 
-	function Byte (|int| index, |int| Default, |int|)
+	function Byte (|int| index, |int| Missing=-1, |int|)
+		description "Returns 'Missing' if the value can't be found. Negative numbers are treated as missing, unlike str[index]." 
 		cpp_wrapper JB_Str_ByteValue2
 		
 	syntax Access (|int| index, |Byte|)
 		nil checker
-		description "Returns 0 if the value can't be found. If you want a different number, call .byte(|int| index, |int| default)" 
+		description "Returns 0 if the value can't be found. Pass negative index to read from the end, unlike str.byte(index)"
 		cpp_wrapper JB_Str_ByteValue
 	
 	syntax Access (|int| start, |int| after, |bool| ShareAlways=false, |string|)
-		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
+		cpp_wrapper JB_Str_Range
 		
 	function Right (|int| N, |string|)
 		inline
 		|| L = .length
 		return self[L-N, L]
 	
-	function CodePoint (|bool| Strict=true, |CodePoint|)
+	function CodePoint (|bool| Loose=false, |CodePoint|)
 		cpp_wrapper JB_Str_UTF8Value
 		
 	syntax Access (|ivec2| r, |string|)
