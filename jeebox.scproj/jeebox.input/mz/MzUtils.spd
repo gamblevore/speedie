@@ -73,7 +73,7 @@ struct CompressionStats
 	inline LiveUpdate (|int| s, |int| outt, |bool| compress=true)
 	inline Durr (|float|)
 	render Report (|bool| Compression)
-		inline
+		inlined
 	inline Clear
 	inline Print (|bool| Compress=true)
 	

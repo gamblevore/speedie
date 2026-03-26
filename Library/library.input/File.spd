@@ -64,7 +64,7 @@ class File (String)
 		disabled "use .opened"
 	
 	function Opened (|bool|) // isopen
-		inline
+		inlined
 		return .descriptor >= 0
 
 	function Name (assigns:|string|Name, |errorint|)
@@ -72,7 +72,7 @@ class File (String)
 	
 	syntax cast (|bool|)
 		opt norefcounts // what? why is this necessary?
-		inline
+		inlined
 		return self|bool|
 
 //	syntax cast (|faststring|)
@@ -80,7 +80,7 @@ class File (String)
 //		return .out
 
 	syntax equals (|string?| s, |bool| aware=false, |bool|)
-		inline
+		inlined
 		return super.SyntaxEquals(s, aware)
 			
 	function Length (|int|)
@@ -105,7 +105,7 @@ class File (String)
 	
 	Syntax Access (assigns:|string| data, |FileSizeInt|)
 		description "Writes to the file. Clears old data."
-		inline
+		inlined
 		return .WriteAll(data)
 		
 	function String.WriteAll (|string| Data, |FileSizeInt|)
@@ -279,7 +279,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		return self|string|.fileexists
 	
 	syntax access (|string| name, |File!|)
-		inline
+		inlined
 		return .Child(name)
 
 	autogen ListStart (|DirectoryReader|)
@@ -289,7 +289,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		cpp_wrapper
 
 	function OpenForRead (|bool| AllowMissing = false, |filedes|)
-		inline
+		inlined
 		return .open(0, AllowMissing)
 	
 	function OpenEmpty (|ErrorInt|)
@@ -355,11 +355,11 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			rz = .Delete
 
 	function IsFile (|bool|)
-		inline
+		inlined
 		return !.isdir
 
 //	operator isdir (|string| ext, |bool|)
-//		inline
+//		inlined
 //		return .isdir and self isa ext
 		
 	function DirectoryContains (|string| path, |bool|)
@@ -370,11 +370,11 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		return self isnewerthan f.modified
 	
 	operator IsNewerThan (|date| F, |bool|)
-		inline
+		inlined
 		return (.Modified > F)
 	
 	operator IsOlderThan (|File| F, |bool|)
-		inline
+		inlined
 		return (.Modified < F.Modified)
 
 	function string.Out (|bool| Clear=true, |Faststring|)
@@ -500,7 +500,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 		
 // can rename these from path into files :)
 		function TrashPath (|string|)
-			inline
+			inlined
 			target OSX
 				return "~/.Trash/"
 			target win
@@ -509,14 +509,14 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 				return "~/.local/share/Trash"
 		
 		function SystemDrive (|string|)
-			inline
+			inlined
 			target win
 				return getenv("%ProgramFiles%")
 			  else
 				return "/"
 		
 		function Applications (|string|)
-			inline
+			inlined
 			target OSX
 				return "/Applications/"
 			target win
@@ -536,15 +536,15 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 			cpp_wrapper JB_CPath_ReadAll
 
 		function Documents (|file|)
-			inline
+			inlined
 			return "~/Documents/".file			// .file calls pathfix already
  
 		function Desktop (|file|)
-			inline
+			inlined
 			return "~/Desktop/".file
 
 		function Logs (|file|)
-			inline
+			inlined
 			return "/tmp/logs/".file
 
 		function Prefs (|string?| name=nil, |file|)

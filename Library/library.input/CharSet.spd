@@ -44,7 +44,7 @@ datatype CharSet (uint)
 		
 	operator contains (|string| s, |bool|)
 		cpp_Part ContainsStr
-		inline
+		inlined
 		return s.OutCharSet(self) < 0
 		
 	syntax Access (|uint| b, |bool|)
@@ -53,11 +53,11 @@ datatype CharSet (uint)
 			return (1<<cp) & self|uint|
 	
 	operator Plus (|Charset| C, |charset|)
-		inline // selftool uses this
+		inlined // selftool uses this
 		return (self|uint| ||| c|uint|)|charset|
 
 	syntax is (|charset| cs, |bool|)
-		inline
+		inlined
 		return self|uint| & cs|uint|
 		
 	

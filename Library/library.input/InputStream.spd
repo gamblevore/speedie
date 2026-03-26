@@ -95,7 +95,7 @@ class InputStream
 	
 	
 	syntax Compare (|int| n, |int|)
-		inline
+		inlined
 		return .length - n
 	
 	

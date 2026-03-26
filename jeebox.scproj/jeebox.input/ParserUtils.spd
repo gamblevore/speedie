@@ -263,7 +263,7 @@ struct MessagePosition
 		.Layer.use
 	
 	function SyntaxUsingComplete (|object| idk=nil)
-		inline
+		inlined
 
 
 prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)

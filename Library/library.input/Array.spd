@@ -51,7 +51,7 @@ class Array
 		return .marker < .length
 
 	function Reset
-		inline
+		inlined
 		.marker = 0
 	
 	function Trim
@@ -136,11 +136,11 @@ class Array
 		return self[.length.now]
 	
 	syntax cast (|bool|)
-		inline
+		inlined
 		return .length > 0
 	
 	syntax Append (|...?| item)
-		inline
+		inlined
 		.SyntaxAppend(item, 1)
 	
 	function Append (|[...]| R)
@@ -162,12 +162,12 @@ class Array
 
 	syntax Compare (|int| n, |int|)
 		nil self
-		inline
+		inlined
 		return .length - n
 	
 	syntax Equals (|int| n, |bool|)
 		nil self
-		inline
+		inlined
 		return .length == n
 	
 	function OperatorPlus (|array of ...| other, |array of ...|)
@@ -199,17 +199,17 @@ prototype SorterComparer (|...| self , |...| b, |SortComparison|)
 		cpp_Part SrtFn
 	contains Object
 	syntax append (|array| x)
-		inline
+		inlined
 		cpp_part Sort
 		x.sort(self)
 	
 
 datatype SortComparison (int)
 	function bool.syntaxcast (|SortComparison|)
-		inline
+		inlined
 		return self|SortComparison|
 	function int.syntaxcast (|SortComparison|)
-		inline
+		inlined
 		return self|SortComparison|
 
 

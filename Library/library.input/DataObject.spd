@@ -44,12 +44,12 @@ class DataObject
 		.PrivValue = p|int64|
 
 	syntax access (||) // for floats... use DataObjectFloat
-		inline
+		inlined
 		if self
 			return .PrivValue
 	
 	function Value (|int64|)
-		inline
+		inlined
 		if self
 			return .privvalue
 

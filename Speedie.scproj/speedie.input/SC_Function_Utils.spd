@@ -52,6 +52,12 @@ dispatch FuncPreReader (fnPreReader)
 		
 	+'inline'
 		opt norefcounts
+		problem (msg, "Use 'inlined' instead")
+		msg.expectempty
+		.MakeLinkInline
+
+	+'inlined'
+		opt norefcounts
 		msg.expectempty
 		.MakeLinkInline
 		

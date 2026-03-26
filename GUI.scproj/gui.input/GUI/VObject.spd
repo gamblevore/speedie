@@ -69,11 +69,11 @@ class VObject (list)
 		return .box2d.Screen
 	
 	syntax cast (|ivec4|)
-		inline
+		inlined
 		return .Screen
 		
 	syntax is (|vobjectinfo| i, |bool|)
-		inline
+		inlined
 		return (.position & i) == i
 	
 	syntax is (|vobjectinfo| i, assigns:|bool| value)
@@ -182,10 +182,10 @@ extend Window
 		.BlockMode = (.BlockMode &~2) ||| (Middle<<1)
 		
 	setter BlockHeight (|float|)
-		inline
+		inlined
 		.Blockscale = -Value.length
 	
 	setter BlockWidth (|float|)
-		inline
+		inlined
 		.Blockscale = Value.length
 

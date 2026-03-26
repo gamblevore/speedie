@@ -1051,18 +1051,18 @@ Message is also:
 	// would be nicer if SyntaxExpect becomes a function named "fail"
 	Syntax Expect (|string?| Error = nil)
 		cpp_part Fail
-		inline
+		inlined
 		errorreceiver.NewError( self, Error )
 
 //	Syntax Deprecate ( |string| Error = "Deprecated." )
 //		.SyntaxProblem(error)
 
 	Syntax Problem ( |string?| Error = nil )
-		inline
+		inlined
 		errorreceiver.NewProblem( self, Error )
 	
 	Syntax Warn ( |string?| Error = nil ) // i think "warn" was removed. So this is unreachable.
-		inline
+		inlined
 		errorreceiver.NewWarning( self, Error )
 	
 	inline SyntaxAppend (|syntax| Fn, |string| name="")
@@ -1071,7 +1071,7 @@ Message is also:
 		.msg(fn, name)
 
 	Syntax SendTo (|syntax| Fn, |string| name="", |message|)
-		inline
+		inlined
 		cpp_part SendSyx
 		opt norefcounts
 		.msg(fn, name)
@@ -1172,7 +1172,7 @@ Message is also:
 	operator Contains (|string| s, |bool|)
 		opt norefcounts
 		cpp_part ContainsStr
-		inline
+		inlined
 		return .FindNested(@nil, s, false)
 
 

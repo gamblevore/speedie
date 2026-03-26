@@ -312,7 +312,7 @@ role StringThatWasReadSafely (string)
 		cpp_part Safe
 	false string.error
 	syntax cast (|bool|)
-		inline
+		inlined
 		return .isok
 
 
@@ -322,10 +322,10 @@ datatype FileSizeInt (int64)
 	default 0
 	false -1
 	syntax cast (|bool|)
-		inline
+		inlined
 		return self >= 0
 	render
-		inline
+		inlined
 		return .strsize(fs)
 
 

@@ -15,7 +15,7 @@ datatype FileDes (int)
 		cpp_wrapper JB_IsTerminal
 		
 	syntax cast (|bool|)
-		inline
+		inlined
 		return self >= 0
 
 
@@ -23,7 +23,7 @@ datatype FileDes (int)
 datatype PID_Int (int)
 	description "This is the process ID of a process."
 	syntax cast (|bool|)
-		inline
+		inlined
 		return self > 0
 	function Kill (|ErrorInt|)
 		cpp_wrapper JB_Kill
@@ -40,17 +40,17 @@ datatype ExitCode (int)
 	
 	function Crashed (|bool|)
 		description "This is a signal error (a crash)" 
-		inline
+		inlined
 		return  self > 128
 		
 	function NoErrors (|bool|)
 		description "We have either completed successfully, or not yet started. Either way there is no error." 
-		inline
+		inlined
 		return  self <= 0
 		
 	function Successful (|bool|)
 		description "Completed successfully." 
-		inline
+		inlined
 		return  self == 0
 		
 	syntax cast (|bool|)
@@ -63,11 +63,11 @@ datatype ExitCode (int)
 		return self|errorint|.Name
 	
 	function IsRunning (|bool|)
-		inline
+		inlined
 		return self == -1 or EINPROGRESS
 
 	function NotStarted (|bool|)
-		inline
+		inlined
 		return self < -1
 
 
@@ -76,7 +76,7 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 	default 0 // defaults to true... unlike everything else.
 	false -1
 	syntax cast (|bool|)
-		inline
+		inlined
 		return self == 0
 
 	function SignalName (|StringZeroTerminated|)

@@ -7,11 +7,11 @@ role Macro (Message)
 		super.constructor
 	
 	function Cleaned (|bool|)
-		inline
+		inlined
 		return self is MacroMade
 	
 	function Cleaned (assigns:|bool|)
-		inline
+		inlined
 		(self is MacroMade) = value
 		
 	function Source (|message|) // can't I use a getter?

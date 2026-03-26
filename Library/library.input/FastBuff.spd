@@ -26,7 +26,7 @@ struct FastBuff
 		.curr = c 
 
 	function Reset
-		inline
+		inlined
 		.curr = .start
 	
 	function String (|string|)
@@ -37,7 +37,7 @@ struct FastBuff
 		return string.copy(.start, .length)
 	
 	syntax Compare (|int| n,  |int|)
-		inline
+		inlined
 		return .Length - n
 	
 	syntax Append (|byte| v, |bool|)
@@ -90,7 +90,7 @@ struct FastBuff
 		Memory.Copy(Dest, A, rz)
 		
 	function Byte (|byte|)
-		inline
+		inlined
 		return .curr++[]
 	
 	syntax Expect (|string| s)
@@ -114,7 +114,7 @@ struct FastBuff
 	
 	function HasAny (|bool|)
 		cpp_Part HasAny
-		inline
+		inlined
 		return .end > .curr
 	
 	setter ReadFrom (|string|)
@@ -148,11 +148,11 @@ struct FastBuff
 			return .end - .start
 
 	function Remaining (|int|)
-		inline
+		inlined
 		return (.end - .curr)|int|
 
 	function Position (|int|)
-		inline
+		inlined
 		return (.curr - .start)|int|
 	
 	setter Position (|int|)

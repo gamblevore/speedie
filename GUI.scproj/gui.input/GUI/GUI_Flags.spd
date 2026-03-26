@@ -19,7 +19,7 @@ datatype CopyPasteFlags (uint16)
 	inline CanPasteInto (|CopyPasteFlags| dest, |bool|)
 		return (dest >> 4) & (self&copy)
 	syntax is (|CopyPasteFlags| v, |bool|)
-		inline
+		inlined
 		return self & v
 
 

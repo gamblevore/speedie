@@ -23,19 +23,19 @@ role ListViewCell (message)
 		cpp_part Cell
 		
 	function Column (|int|)
-		inline
+		inlined
 		if self
 			return .position
 		
 	function Row (|ListViewrow!|)
-		inline
+		inlined
 		return (.obj as Message)|listviewrow|!
 	
 	syntax cast (|string|)
 		disabled "just get the value"
 		
 	function Step (|int| i, |ListViewcell|)	
-		inline
+		inlined
 		return .step(i, .position)
 		
 	function Step (|int| i, |int| col, |ListViewcell|)

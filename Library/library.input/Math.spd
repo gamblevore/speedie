@@ -76,7 +76,7 @@ extend int
 				rz *= self
 
 	operator minus0 (|int| a, |int|)
-		inline
+		inlined
 		|| r = self - a
 		if r < 0
 			r = 0

@@ -110,7 +110,7 @@ class Validator
 		return .msg_.func == fn
 			
 	syntax Expect (|string?| Description=nil)
-		inline
+		inlined
 		opt norefcounts
 		.msg.SyntaxExpect(description)
 

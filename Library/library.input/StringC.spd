@@ -17,9 +17,9 @@ class StringZeroTerminated (string)
 	false			""
 	default			""
 	function CString (|cstring|)
-		inline
+		inlined
 		return .addr|cstring|
 	
 	syntax cast (|cstring|)
-		inline
+		inlined
 		return .addr|cstring|

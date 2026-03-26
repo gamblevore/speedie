@@ -15,15 +15,15 @@ role ListViewRow (message)
 		.tag = state
 
 	function State (|ListViewState|)
-		inline
+		inlined
 		return .tag
 
 	function State (assigns:|ListViewState|)
-		inline
+		inlined
 		.tag = value
 
 	syntax is (|ListViewState| s, |bool|)
-		inline
+		inlined
 		if self
 			return .tag & s
 
@@ -234,7 +234,7 @@ datatype ListViewState (uint16)
 		
 	syntax is (|ListViewState| s, |bool|)
 		(Hidden)
-		inline
+		inlined
 		return self & s
 
 
@@ -252,7 +252,7 @@ datatype ListViewSelectMode (uint)
 		Normal = 0
 	
 	syntax is (|ListViewSelectMode| s, |bool|)
-		inline
+		inlined
 		return (self|uint| & s|uint|) == s
 
 
@@ -267,7 +267,7 @@ datatype ListViewHierarchy (int8)
 								
 
 	syntax is (|ListViewHierarchy| s, |bool|)
-		inline
+		inlined
 		return self == s
 
 
@@ -277,12 +277,12 @@ extend ListView
 		return ._Hierarchical
 	
 	setter Hierarchical (|bool|)
-		inline
+		inlined
 		cpp_part HierBool
 		._Hierarchical = -value|int|
 
 	setter Hierarchical (|listviewhierarchy|)
-		inline
+		inlined
 		._Hierarchical = value
 	
 	libinternal HierStep (|ListViewrow| l, |bool| Forward, |ListViewrow|)

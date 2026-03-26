@@ -15,7 +15,7 @@ datatype Codepoint (int)
 	function UTF8Size (|int|)	
 		cpp_wrapper JB_Str_UTF8Size
 	inline IsAscii (|bool|)
-		inline
+		inlined
 		return self <= 127
 	inline IsLower (|bool|)
 		return .in('a', 'z')
@@ -41,11 +41,11 @@ datatype Codepoint (int)
 		return string.UTF8(self)
 	syntax cast (|string|)
 		cpp_part AsString
-		inline
+		inlined
 		return string.UTF8(self)
 	syntax cast (|bool|)
 		cpp_part Bool
-		inline
+		inlined
 		return self > 0
 	render
 		if fs_in

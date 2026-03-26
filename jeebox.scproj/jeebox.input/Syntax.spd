@@ -38,13 +38,13 @@ datatype Syntax (Byte)
 		return .Func.Translateable
 			
 	operator plus (|string| m, |message|)
-		inline
+		inlined
 		opt norefcounts
 		return .msg(m)
 	
 	operator plus (|int64| m, |message|)
 		opt norefcounts
-		inline
+		inlined
 		cpp_Part PlusNum
 		return .msg(m.render)
 		

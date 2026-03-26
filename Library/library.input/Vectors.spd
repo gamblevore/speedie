@@ -31,27 +31,27 @@ datatype ivec4
 		return (.x|float|, .y|float|, .z|float|, .w|float|)
 
 	operator minus (|ivec2| D, |ivec4|)
-		inline
+		inlined
 		return self - (D,D)
 
 	operator plus (|ivec2| D, |ivec4|)
-		inline
+		inlined
 		return self + (D,D)
 
 	operator right (|int|x, |ivec4|)
-		inline
+		inlined
 		return self + (x,0,x,0)
 	
 	operator up (|int|x, |ivec4|)
-		inline
+		inlined
 		return self + (0,x,0,x)
 
 	operator left (|int|x, |ivec4|)
-		inline
+		inlined
 		return self - (x,0,x,0)
 		
 	operator down (|int|x, |ivec4|)
-		inline
+		inlined
 		return self - (0,x,0,x)
 		
 	function MoveTo (|ivec2| XY, |ivec4|)
@@ -134,7 +134,7 @@ datatype ivec4
 				return true
 	
 	operator contains (|ivec2| v, |bool|)
-		inline
+		inlined
 		return .contains(v)
 	
 	function IsPositive (|bool|)
@@ -145,7 +145,7 @@ datatype ivec4
 		
 	syntax cast (|bool|)
 		cpp_part Bool
-		inline
+		inlined
 		return self!=ivec4()	
 
 	function Soothe (|ivec4|)
@@ -190,7 +190,7 @@ datatype vec3
 	size 16 // We are using vec4 for vec3 :)
 	syntax cast (|bool|)
 		cpp_part Bool
-		inline
+		inlined
 		return (self != vec3())
 			
 	syntax Compare (|float| Other, |float|)
@@ -233,17 +233,17 @@ datatype vec3
 		return self|vec4|.Operatorpow(p|vec4|)|vec3|
 
 	operator min (|vec3| s, |vec3|)
-		inline
+		inlined
 		cpp_part Min3
 		return self|vec4|.Operatormin(s|vec4|)|vec3|
 
 	operator max (|vec3| s, |vec3|)
-		inline
+		inlined
 		cpp_part Max3
 		return self|vec4|.Operatormax(s|vec4|)|vec3|
 
 	operator max (|float| s, |vec3|)
-		inline
+		inlined
 		return self|vec4|.Operatormin(vec4(s))|vec3|
 	
 	function Max (|float|)
@@ -253,27 +253,27 @@ datatype vec3
 		return .x min .y min .z
 		
 	operator Sign (|vec3| C, |vec3|)
-		inline
+		inlined
 		return (self|vec4| sign C|vec4|)|vec3|
 
 	function iVec3 (|ivec3|)
 		return (.x|int|, .y|int|, .z|int|)
 
 	function Clamp (|float| min=0.0, |float| max=1.0, |vec3|)
-		inline
+		inlined
 		return self|vec4|.clamp(min, max)|vec3|
 	
 	function Clamp (|vec3| min=0.0, |vec3| max=1.0, |vec3|)
 		cpp_part ClampVec
-		inline
+		inlined
 		return self|vec4|.clamp(min|vec4|, max|vec4|)|vec3|
 	
 	inline Round (|vec3|)
-		inline
+		inlined
 		return self|vec4|.round|vec3|
 
 	inline Length (|float|)
-		inline
+		inlined
 		.w = 0
 		return self|vec4|.length
 		
@@ -286,7 +286,7 @@ datatype vec3
 
 	operator mul (|float| x, |vec3|)
 		cpp_part MulF
-		inline
+		inlined
 		return (x,x,x)*self
 
 	operator mul (|vec3| v, |vec3|)
@@ -298,7 +298,7 @@ datatype vec3
 	
 	operator • (|vec3| other, |float|)
 		cpp_part Dot
-		inline
+		inlined
 		return (self * other).sum
 
 	function Reflect (|vec3| plane, |vec3|)
@@ -372,7 +372,7 @@ datatype IntRange (ivec2)
 		return .x2 - .x
 	
 	operator Inside (|ivec4| R, |bool|)
-		inline
+		inlined
 		return R.Contains(.x, .y)
 
 	operator overlaps (|intrange| r, |bool|)
@@ -497,7 +497,7 @@ datatype ivec2
 		return (o min .x, o min .y)
 		
 	operator fma (|int| w, |int|)
-		inline
+		inlined
 		return .x + .y*w
 
 	operator inrange (|ivec2| p, |bool|)
@@ -530,7 +530,7 @@ datatype ivec2
 		return (.x == v.x) & (.y == v.y)
 
 	syntax Equals (|int| v, |bool|)
-		inline
+		inlined
 		return self == (v,v) 
 	
 	inline RotateRight (|ivec2|)

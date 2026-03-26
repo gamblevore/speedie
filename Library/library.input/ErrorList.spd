@@ -128,7 +128,7 @@ class ErrorReceiver
 		
 	
 	function Mark (|errormarker|)
-		inline
+		inlined
 		return .ErrorCount
 	
 	function Count (|int|)
@@ -191,7 +191,7 @@ class ErrorReceiver
 	
 	function BadCount (|int|)
 		visible
-		inline
+		inlined
 		return .errorcount + .problemcount
 		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
@@ -204,7 +204,7 @@ class ErrorReceiver
 	
 	
 	Syntax UsingComplete (|object| idk=nil)
-		inline
+		inlined
 //		stderr.printerrors // note to self: don't readd this!
 		stderr = self
 
@@ -259,7 +259,7 @@ extend string
 		errorreceiver.NewError(nil, self)
 
 	Syntax Problem
-		inline
+		inlined
 		errorreceiver.NewProblem( nil, self )
 
 
@@ -278,12 +278,12 @@ extend faststring
 	syntax expect
 		opt norefcounts
 		cpp_part Fail
-		inline
+		inlined
 		.GetResult.SyntaxExpect
 
 
 datatype ErrorMarker (int)
 	syntax cast (|bool|)
-		inline
+		inlined
 		return stderr.errorcount == self
 

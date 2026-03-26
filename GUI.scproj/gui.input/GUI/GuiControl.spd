@@ -110,7 +110,7 @@ class GUIControl (list)
 		0
 
 	function Size (|ivec2|)
-		inline
+		inlined
 		return .lastrect.size
 
 	setter Size (|ivec2|)
@@ -192,11 +192,11 @@ class GUIControl (list)
 		return .text.bounds.x * font.width
 	
 	syntax cast (|ivec4|)
-		inline
+		inlined
 		return .lastrect
 	
 	syntax append (|guicontrol| g)
-		inline
+		inlined
 		super <~ g
 		
 	syntax is (|guicontrolflags| F, |bool|)
@@ -218,7 +218,7 @@ class GUIControl (list)
 			
 
 	function Decluttering (|bool|)
-		inline
+		inlined
 		return .Declutterer.final
 	
 
@@ -288,7 +288,7 @@ class GUIControl (list)
 	
 	
 	setter Visible (|bool|)
-		inline
+		inlined
 		(self is visible) = value
 
 	
@@ -382,7 +382,7 @@ class GUIControl (list)
 
 
 	function Width (|int|)
-		inline
+		inlined
 		return .lastrect.width
 	
 	setter Width (|controlline|)
@@ -390,7 +390,7 @@ class GUIControl (list)
 		.sizer.g(2, self) = value[1]|controlpoint|
 
 	function Height (|int|)
-		inline
+		inlined
 		return .lastrect.Height
 	
 	setter Height (|controlline|)
@@ -406,7 +406,7 @@ class GUIControl (list)
 			return .id.syntaxequals(s, aware)
 
 	operator Contains (|ivec2| p, |bool|)
-		inline
+		inlined
 		return .lastrect.contains(p)
 	
 	function Window (|Window|)
@@ -424,16 +424,16 @@ class GUIControl (list)
 		disabled "Use .lastright"
 
 	setter Left (|ControlPoint|)
-		inline
+		inlined
 		.size(0) = value
 	setter Bottom (|ControlPoint|)
-		inline
+		inlined
 		.size(1) = value
 	setter Right (|ControlPoint|)
-		inline
+		inlined
 		.size(2) = value
 	setter Top (|ControlPoint|)
-		inline
+		inlined
 		.size(3) = value
 		
 	inline LastBottom (|int|)
@@ -618,11 +618,11 @@ class GUIControl (list)
 			return 1.0
 				
 		run (|window| window, |float| progress, |ErrorInt|)
-			inline
+			inlined
 			return -1
 		
 		function Remove
-			inline
+			inlined
 			gui.touch
 			super.remove
 			

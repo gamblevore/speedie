@@ -75,11 +75,11 @@ class String
 		cpp_wrapper JB_Str_First
 		
 	operator divide (|byte| sep, |[string]|)
-		inline
+		inlined
 		return .split(sep)
 	
 	operator minus (|string|s, |int|)
-		inline
+		inlined
 		return .length - s.length
 	
 	function Widen (|int| Width, |int| Mode=1, |byte| Char=' ', |string|)
@@ -307,16 +307,16 @@ class String
 	
 	operator Contains (|Byte| b, |bool|)
 		cpp_part ContainsByte
-		inline
+		inlined
 		return .find(b)
 	
 	operator EndsWith (|string| s, |bool|)
-		inline
+		inlined
 		return .endswith(s, true)
 	
 	operator mul (|bool| b, |string|)
 		cpp_part MulBool
-		inline
+		inlined
 		return (self,"")(b)
 	
 	operator Mul (|int| n, |string|)
@@ -487,12 +487,12 @@ class String
 
 	syntax cast ( |&byte| )
 		cpp_part CastByte
-		inline
+		inlined
 		return ._addr|&byte|
 	
 	syntax cast (|StringZeroTerminated|)
 		cpp_part CastZero
-		inline
+		inlined
 		return .cstr
 
 	function Byte (|int| index, |int| Missing=-1, |int|)
@@ -508,7 +508,7 @@ class String
 		cpp_wrapper JB_Str_Range
 		
 	function Right (|int| N, |string|)
-		inline
+		inlined
 		|| L = .length
 		return self[L-N, L]
 	
@@ -517,7 +517,7 @@ class String
 		
 	syntax Access (|ivec2| r, |string|)
 		cpp_part RangeVec
-		inline
+		inlined
 		return self[r.x, r.x2]
 
 	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)
@@ -529,7 +529,7 @@ class String
 
 	syntax Compare (|int| Other, |int|)
 		cpp_part CompareInt
-		inline
+		inlined
 		return .length - other
 	
 	syntax Equals (|string?| Other, |bool| Aware=false, |bool|)
@@ -538,7 +538,7 @@ class String
 	
 	syntax Equals (|int| Other, |bool|)
 		cpp_part EqualsInt
-		inline
+		inlined
 		return .length == other
 
 	libinternal MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
@@ -560,7 +560,7 @@ class String
 
 
 	operator starts (|string| s, |bool|)
-		inline
+		inlined
 		return self[0, s, true]
 		
 	function EndsWith (|string| s, |bool| aware=false, |bool|)

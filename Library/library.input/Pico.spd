@@ -13,7 +13,7 @@ struct PicoMessage
 	|?&int8|		Data
 	
 	syntax cast (|bool|)
-		inline
+		inlined
 		if self
 			return .data
 	
@@ -204,7 +204,7 @@ struct PicoGlobalStats
 		cpp_wrapper PicoGlobals
 	module
 		function New (|PicoGlobalStats|)
-			inline
+			inlined
 			rz.read
 
 

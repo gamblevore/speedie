@@ -87,7 +87,7 @@ class FileRow (ListViewRow)
 
 
 	operator isa (|string| s, |bool|)
-		inline
+		inlined
 		return .location isa s
 		
 	function IsDir (|bool|)

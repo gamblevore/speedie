@@ -3,7 +3,7 @@
 module beep
 	|date| OK = 1
 	syntax expect (|string?| s=nil)
-		inline
+		inlined
 		app.beep(s)
 
 

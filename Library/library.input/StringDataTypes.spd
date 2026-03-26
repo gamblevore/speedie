@@ -105,7 +105,7 @@ datatype cstring
 		return b|cstring|
 	
 	syntax cast (|&byte|)
-		inline
+		inlined
 		return self|&byte|
 	
 	render

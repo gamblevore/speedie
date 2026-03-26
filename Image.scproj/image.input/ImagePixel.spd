@@ -114,17 +114,17 @@ datatype ImagePixel (uint)
 //		return .color.lum
 	
 	function HasColor (|bool|)
-		inline
+		inlined
 		return (self << 8) != 0
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
-		inline
+		inlined
 		return .color
 
 	syntax cast (|PremultipliedColor|)
 		cpp_part CastPremul
-		inline
+		inlined
 		return .PreMul
 
 	function AddAlpha (|&imagepixel| self, |float| v)
@@ -132,12 +132,12 @@ datatype ImagePixel (uint)
 		.Alpha = v
 		
 	syntax append (|&imagepixel| self, |imagepixel| r)
-		inline
+		inlined
 		self[] = r
 		
 	syntax append (|&imagepixel| self, |vec4| V)
 		cpp_part AppendVec
-		inline
+		inlined
 		self|&imagepixelstruct|.AppendVec4(v)
 
 	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
@@ -172,7 +172,7 @@ datatype ImagePixel (uint)
 		rz *= (1.0/254.5)
 		
 	function Raw (|&imagepixel| self, |ivec4|)
-		inline
+		inlined
 		return ivec4.load(self|&byte|)
 
 	function Raw (|&imagepixel| self, assigns:|ivec4|)

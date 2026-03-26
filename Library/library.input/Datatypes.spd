@@ -31,11 +31,11 @@ datatype int
 	
 	operator Div (|int| D, |float|)
 		opt inline
-		inline
+		inlined
 		return self|float| / d|float|
 		 
 	syntax compare (|string| s, |int|)
-		inline
+		inlined
 		return self - s.length
 
 	syntax access (|bool|) // should be a bool?
@@ -43,7 +43,7 @@ datatype int
 		disabled "use intnum() for a random int, or floatnum[] for a chance at getting true"
 
 	syntax access (|int| bit, |bool|)
-		inline
+		inlined
 		return self&(1<<bit)
 
 	syntax access (|int| bit, assigns:|bool|, |int|)
@@ -51,7 +51,7 @@ datatype int
 		return (self &~ mask) ||| (value|int| << bit) 
 
 	operator isa (|uint| n, |bool|)
-		inline
+		inlined
 		return !(self mod n)
 
 	function Wrap (|int| N, |int|)
@@ -76,7 +76,7 @@ datatype int
 		
 	render StrSize
 		cpp_part RenderSize
-		inline
+		inlined
 		return self|int64|.strsize(fs_in)
 
 	render (|int| zeros)
@@ -151,19 +151,19 @@ datatype int
 	
 	operator to (|int| other, |IntRange|)
 		// for 5 to 10 // this should be inclusive
-		inline
+		inlined
 		return (self, other+1)
 
 	
 	operator downto (|int| other, |IntDownRange|)
-		inline
+		inlined
 		rz.From = self
 		rz.To = other
 
 
 datatype SizeInt (int)
 	syntax cast (|string|)
-		inline
+		inlined
 		return .strsize
 
 
@@ -171,18 +171,18 @@ datatype Ind (int) // an INDex. And an INT.
 	default -1
 	false -1
 	syntax cast (|bool|)
-		inline
+		inlined
 		return self >= 0
 		
 	operator bitand (|int| x, |int|)
 		// shame we need this... but we do! or else (i&1) will be tested >= 0 rather than != 0
-		inline // now we can't test if an index is even or odd
+		inlined // now we can't test if an index is even or odd
 		return self|int| & x
 //	operator bitor (|int| x, |int|) // might need these too. not sure.
-//		inline
+//		inlined
 //		return self|int|	||| x
 //	operator xor (|int| x, |int|)
-//		inline
+//		inlined
 //		return self|int| ^ x
 
 
@@ -192,7 +192,7 @@ struct RetroFloat
 	|float|		Remain
 	
 	syntax Append (|float| n)
-		inline
+		inlined
 		.Amount += n
 	
 	syntax Access (|int|)
@@ -249,7 +249,7 @@ datatype uint
 		min = 0
 
 	operator isa (|uint| n, |bool|)
-		inline
+		inlined
 		return !(self mod n)
 
 	inline IsPow2 (|bool|)
@@ -703,11 +703,11 @@ datatype int64
 			return (self|uint64| < Length|uint64|)
 
 	operator Div (|int64| D, |float64|)
-		inline
+		inlined
 		return self|float64| / d|float64|
 
 	operator isa (|uint| n, |bool|)
-		inline
+		inlined
 		return !(self mod n)
 
 	operator max (|int64| d, |int64|)
@@ -780,7 +780,7 @@ datatype uint64
 		max = -1
 
 	operator isa (|uint| n, |bool|)
-		inline
+		inlined
 		return !(self mod n)
 	
 //	function Exists (|int|)
@@ -813,7 +813,7 @@ datatype uint64
 			return !(self&(self-1))
 		
 	syntax access (|int| bit, |bool|)
-		inline
+		inlined
 		return self&(1<<bit)
 
 	syntax access (|int| bit, assigns:|bool|, |uint64|)
@@ -880,7 +880,7 @@ datatype bool
 //		return self|maybebool|
 		
 	function Dir (|int|)
-		inline
+		inlined
 		return (self|int|<<1)-1
 	
 	function String (|string|)
@@ -889,13 +889,13 @@ datatype bool
 
 	function Render (|string|)
 		opt norefcounts
-		inline
+		inlined
 		return .string
 	
 	function Render (|faststring!| fs_in)
 		cpp_Part Append
 		opt norefcounts
-		inline
+		inlined
 		fs_in <~ .string
 	
 	iterator
@@ -938,11 +938,11 @@ datatype MoveCode (byte)
 			rz |= movecode.Up << (y < 0)
 			
 	syntax is (|movecode| m, |bool|)
-		inline
+		inlined
 		return (self & m) == m
 
 	syntax is (|movecode| m, assigns:|bool|, |movecode|)
-		inline
+		inlined
 		self |= m
 		if !value
 			self &= ~m

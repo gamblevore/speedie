@@ -127,7 +127,7 @@ datatype DataTypeCode (uint16)
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 		
 	syntax is (|datatypecode| M, |bool|)
-		inline
+		inlined
 		return self&M == M
 	
 	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)

@@ -49,7 +49,7 @@ struct SDL_Event
 		return self|&SDL_TextEditingEvent| 
 		
 	syntax is (|SDLEventType| b, |bool|)
-		inline
+		inlined
 		return .type == b
 
 
@@ -139,7 +139,7 @@ datatype MouseButton (uint)
 	linkage
 		cpp_part MB
 	syntax is (|MouseButton| x, |bool|)
-		inline
+		inlined
 		return self & x
 
 	flags
@@ -153,7 +153,7 @@ datatype MouseButton (uint)
 	module
 		|date|						DownAt
 		function Durr (|date|)
-			inline
+			inlined
 			return gui.FrameStart - .DownAt
 	
 
@@ -222,7 +222,7 @@ datatype SDLEventType (uint)
 		wrapper
 		cpp_part ET
 	syntax is (|SDLEventType| x, |bool|)
-		inline
+		inlined
 		return self == x
 		
 	constants
@@ -357,7 +357,7 @@ datatype SDL_WindowEventID (byte)
 		HIT_TEST        /* Window had a hit test that wasn't SDL_HITTEST_NORMAL. */
 
 	syntax is (|SDL_WindowEventID| state, |bool|)
-		inline
+		inlined
 		return self == state
 
 

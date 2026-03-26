@@ -71,7 +71,7 @@ function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog
 
 syntax expect (|string?| s=nil)
-	inline
+	inlined
 	.quit(s, -1)
 
 

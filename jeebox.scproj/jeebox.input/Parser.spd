@@ -1379,7 +1379,7 @@ extend Message
 
 datatype MsgParseFlags (uint16)
 	syntax is (|MsgParseFlags| v, |bool|)
-		inline
+		inlined
 		return self & v
 	flags
 		// These are not set during parse, but after.

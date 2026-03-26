@@ -81,7 +81,7 @@ struct TerminalDisplay
 			cpp_wrapper JB_App__GetChar
 	
 	syntax access (|CodePoint|)
-		inline
+		inlined
 		return TerminalDisplay.getchar
 		
 	

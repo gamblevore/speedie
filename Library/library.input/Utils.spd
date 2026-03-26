@@ -224,6 +224,6 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 	default FailableInt.fail
 	false   FailableInt.fail
 	syntax cast (|bool|)
-		inline
+		inlined
 		return self != fail|int|
 

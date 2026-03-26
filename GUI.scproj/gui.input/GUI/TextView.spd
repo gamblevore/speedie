@@ -205,7 +205,7 @@ class TextView (GUIControl)
 	
 	
 	setter ExpectsParse (|byte|)
-		inline
+		inlined
 		.ExpectsParse = value
 		
 		
@@ -2394,6 +2394,6 @@ datatype TextViewJumpMode (int)
 		SlowScroll
 		WantAGoodView
 	syntax is (|TextViewJumpMode| m, |bool|)
-		inline
+		inlined
 		return self|int| & m|int|
 
