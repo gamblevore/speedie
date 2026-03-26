@@ -4,6 +4,8 @@
 
 // ----- //
 
+"To disable unused code warnings, add 'unfinished' at the top of your file."
+
 "You can delete entries from searchresults, errorlists, and even callback-lists"
 
 "\1F\04R opens the run-argument editor"

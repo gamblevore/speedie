@@ -9,7 +9,7 @@ class ByteFrequency
 	render
 		|| c = .char
 		fs <~ "$.freq of "
-		if (c > 32) and c.CanPrintAsNormalChar
+		if (c > 32) and c <= 127
 			fs <~ C
 		  else
 			fs <~ "'"

@@ -615,7 +615,7 @@ function message.OwningModclass (|bool| EndAtArg=true, |message|)
 function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 	opt norefcounts
 	|| First = .OwningSyntaxSub(find, endatarg)
-	if first and !EndAtArg and (find == autocomplete.spdfunctions)
+	if first and !EndAtArg and (find == autocomplete.spdfunctions) and !first.HasAny
 		|| second = first.parent.OwningSyntaxSub(find, endatarg)
 			return second
 	return first

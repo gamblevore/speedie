@@ -69,6 +69,7 @@ function PerryColorLineNum (GUITextLineBreakColor)
 	|| c = vec4(1)
 	|| f = .userinfo
 	if f < 0
+		// try this as a background instead... could be better...
 		c.b = 0.75
 		c.g = 0.75
 		f = -f
