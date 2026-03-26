@@ -553,8 +553,6 @@ typedef SortComparison (*FP_SorterComparer)(JB_Object* Self, JB_Object* B);
 
 typedef int (*FP_SourceSorter)(SourceLocation A, SourceLocation B);
 
-typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
-
 typedef bool (*FP_TranFunc)(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 typedef JB_String* (*__Object_Render__)(JB_Object* Self, FastString* Fs_in);
@@ -760,10 +758,11 @@ struct NilRecorder {
 
 struct ParserLineAndIndent {
 	int Lines;
-	int Position;
-	int Dentine;
-	int IsDebug;
+	int PzLine;
+	u16 Dentine;
+	u16 IsDebug;
 	int FirstLine;
+	int TotalLines;
 };
 
 struct RandomXOR {
@@ -1353,7 +1352,7 @@ extern float SC__ASMExamples_KNOB1;
 extern JB_String* SC__AutoComplete_function_anywhere;
 extern JB_String* SC__AutoComplete_function_cls_only;
 extern JB_String* SC__AutoComplete_function_names;
-extern Dictionary* SC__AutoComplete_Functions;
+extern Dictionary* SC__AutoComplete_SpdFunctions;
 extern JB_File* SC__Comp__BuildFolder;
 extern JB_String* SC__Comp__Projects;
 extern JB_String* SC__Comp__SpeedieProj;
@@ -1662,7 +1661,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2426])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2430])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1801,10 +1800,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2425])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2424])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2428])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2423])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2427])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2427,17 +2426,17 @@ extern int SC__SCNodeFindMode_aaa;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2419])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2423])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2420])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2421])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2425])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2418])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2422])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2421])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2422])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2426])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2494,7 +2493,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2417])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2421])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3309,7 +3308,7 @@ bool SC_PackMaker__UseMain(JB_String* Name, int Id);
 
 
 // Tk
-Message* JB_Tk__AddToOutput(Message* Output, Message* Curr, Message* Prev, int Pos);
+Message* JB_Tk__AddToOutput(Message* Output, Message* Curr, Message* Prev, ParserLineAndIndent* Info);
 
 void JB_Tk__AddXMLText(Message* XML, JB_String* S, int Start, int I);
 
@@ -3334,6 +3333,8 @@ Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent);
 Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr);
 
 int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpFlags);
+
+int JB_Tk__EndArg(Message* Output, ParserLineAndIndent* Info);
 
 Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start);
 
@@ -3363,7 +3364,7 @@ Message* JB_Tk__fArray(int Start, Message* Parent);
 
 Message* JB_Tk__fAsk(int Start, Message* Parent);
 
-Message* JB_Tk__fAskSub(int Start, Message* Parent, Syntax F);
+Message* JB_Tk__fAskSub(int Start, Syntax F);
 
 Message* JB_Tk__fAtName(int Start, Message* Parent);
 
@@ -3408,8 +3409,6 @@ Message* JB_Tk__fFuncCall(int Start, Message* Parent);
 Message* JB_Tk__FillXML(Message* XML, Ind I);
 
 int JB_Tk__FindError(int Num);
-
-int JB_Tk__FinishParseLoop(int Lines, Message* Output, int After);
 
 Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent);
 
@@ -3491,7 +3490,7 @@ int JB_Tk__Init_();
 
 int JB_Tk__InitCode_();
 
-Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr);
+Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr, int BackPos);
 
 Message* JB_Tk__MakeInvisArg(Message* Tmp);
 
@@ -3511,7 +3510,7 @@ Message* JB_Tk__NewSkip(Message* P, Syntax F, int Start, int NameStart, int Name
 
 Message* JB_Tk__NewWord(Message* P, Syntax F, int Start, int SearchFrom);
 
-void JB_Tk__NextLineAndIndent(Message* Parent, ParserLineAndIndent* Rz);
+void JB_Tk__NextLineAndIndent(Message* Parent, ParserLineAndIndent* Lin);
 
 bool JB_Tk__NoFuncAfter(uint /*byte*/ B);
 
@@ -4082,6 +4081,8 @@ bool SC_FuncPreReader_disabled(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_inline(SCFunction* Self, Message* Msg);
 
+bool SC_FuncPreReader_inlined(SCFunction* Self, Message* Msg);
+
 bool SC_FuncPreReader_nil(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_numeric(SCFunction* Self, Message* Msg);
@@ -4290,8 +4291,6 @@ JB_String* JB_bool_Render0(bool Self);
 
 
 // byte
-bool JB_byte_CanPrintAsNormalChar(uint /*byte*/ Self);
-
 bool JB_byte_In(uint /*byte*/ Self, uint A, uint B);
 
 bool JB_byte_IsHex(uint /*byte*/ Self);
@@ -5121,6 +5120,8 @@ bool SC_FunctionType_SyntaxIs(FunctionType Self, FunctionType T);
 
 
 // Ind
+int JB_Ind_OperatorBitand(Ind Self, int X);
+
 
 
 // IntRange
@@ -6093,6 +6094,8 @@ void SC_NRC_SyntaxCallSet(NilRecorder* Self, uint64 Item, uint64 Value);
 // JB_ParserLineAndIndent
 int JB_ParserLineAndIndent_ArgPos(ParserLineAndIndent* Self);
 
+void JB_ParserLineAndIndent_NextLine(ParserLineAndIndent* Self);
+
 
 
 // JB_Pico
@@ -6825,9 +6828,6 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 
 
 // Thread
-
-
-// TokenHandler_fp
 
 
 // TranFunc
@@ -10885,6 +10885,8 @@ SCNode* SC_Func__NewHelper(Message* Node, SCNode* Name_space, Message* ErrPlace)
 SCNode* SC_Func__NewHider(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 SCNode* SC_Func__NewMacro(Message* Node, SCNode* Name_space, Message* ErrPlace);
+
+SCNode* SC_Func__NewOldHelper(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 SCNode* SC_Func__NewProtoType(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
