@@ -1,3 +1,12 @@
+//function Object.ObjectTag (|byte|)
+//	nil self
+//	return self|uint64| >> 56
+//
+//
+//function Object.ObjectTag (assigns:|byte|, |object?|)
+//	nil checker
+//	|| Old = (self|uint64| << 8) >> 8
+//		return (Old ||| (value|uint64|<<56))|object|
 
 
 // finish later
@@ -6,7 +15,6 @@ module Effects
 		opt NoRefCounts
 		for i in 3
 			.Fireworks(window.all, 5s, gui.framestart + 0.25s*i, (-3.0, 0), (0,0), strength)
-	
 
 	task Fireworks (guicontrol.taskgui, |vec2| V, |ivec2| Start, |float| Strength)
 		constructor
@@ -25,36 +33,46 @@ module Effects
 
 		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
 			|| str = 1.0
-
 			|| T2 = T - p * 0.0125
 			|| s = start.vec2 + (V*T2 + A)
 			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
 			Alpha *= str * .Strength
 			|| C1 = (1.0, 1.0, 2.0, alpha)
 			|| Rect = (s-2.5, s+2.5)
-			GUI.Screen.DrawSoftCircle( Rect,  C1 )
+			GUI.Screen.DrawSoftCircle( Rect, C1 )
 
 
 
 function PerryColorLineNum (GUITextLineBreakColor)
-	opt norefcounts
-	|| f = 0.0625
-	|| m = line.message
-		if m.OwningFunc
-			if m == @arg
-				f = 0.2
-			  else
+	opt norefcounts													// Could we Precolor these? Maybe?
+	if PreRun
+		|| f = 0.0625
+		|| m = .message
+			|| fn = m.OwningFunc
+				|| Prev = PreRun[]
 				f = 0.35
-		  elseif m!=@arg
-			f = 0.175
-		
-	return colors.white(f)
-
-
-
-
-
-
-
+				if m == @arg
+					f = 0.2
+				|| pflags = (1 & Prev.flags, 0)(prev)
+				if Prev != fn										// how do we know which is which? what color?
+					pflags ^= 1
+					prerun[] = fn
+					fn.flags = (fn.flags&~1)||| pflags
+				if pflags
+					f = -f
+				
+			  elseif m!=@arg
+				f = 0.175
+		.UserInfo = f
+		return nil
+	
+	|| c = vec4(1)
+	|| f = .userinfo
+	if f < 0
+		c.b = 0.75
+		c.g = 0.75
+		f = -f
+	c.a = f
+	return c
 
 

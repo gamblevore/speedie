@@ -22,6 +22,7 @@ class TextViewLine (list)
 	|string|				Text
 	|message?|				Message
 	|Error?|				LineError
+	|float|					UserInfo
 	|int|					MsgPos
 	|int|					vline
 	|int|					tline
@@ -99,13 +100,13 @@ class TextViewLine (list)
 		return .position + .text.length
 
 
-	function ByteOfX (|int| X, |ind|)
+	libinternal ByteOfX (|int| X, |ind|)
 		|| chars	= (x max 0) / font.width
 		|| bytes	= .text.CountBytesInSquares(chars) min .text.length
 		return bytes + .position
 	
 
-	libinternal message.addpos (|int| p)
+	libinternal message.AddPos (|int| p)
 		opt norefcounts
 		for ch.flat in self
 			ch.position += p
@@ -130,7 +131,7 @@ class TextViewLine (list)
 			stderr.pop
 	
 	
-	function Range (|intrange|)
+	libinternal Range (|intrange|)
 		|| p = .position
 		|| L = .text.length
 		return (P, P+L)
@@ -258,7 +259,15 @@ class TextViewLine (list)
 			sel.y--
 		Where.DrawRectStyled(sel, g)
 
-
+	
+	libinternal ColorLineNum (GUITextLineBreakColor)
+		opt norefcounts
+		|| msg = .Message
+		if !msg or msg == @arg
+			return colors.white(0.175)
+		return colors.white(0.35)
+	
+	
 	libinternal SetLineNum (|int| t, |int|)
 		.tline = t
 		return t + .endswithline
@@ -369,7 +378,6 @@ libinternal textview.DrawLighter (|image| Where, |int| y)
 	.drawbackground(Where, y, col.px)
 
 
-// GUITextLineBreakColor
 libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |int|)
 	opt norefcounts
 	
@@ -534,7 +542,7 @@ struct MsgTextDrawState
 			rz.font = font.small!
 
 
-function int.LineNumWidth (|int|)
+libinternal int.LineNumWidth (|int|)
 	opt norefcounts
 	rz = 2
 	while self >= 100
@@ -630,17 +638,10 @@ function error.TextColor (|float| alpha=1.0, |vec4|)
 		rz.a *= 0.5
 
 
-libinternal textview.ColorLineNum (GUITextLineBreakColor)
-	opt norefcounts
-	|| msg = line.Message
-	if !msg or msg == @arg
-		return colors.white(0.175)
-	return colors.white(0.35)
-
-
 function textview.LineNumColor (|textviewline| D, |imagepixel|)
 	opt norefcounts
-	|| w = (.OnDrawLineNumber)(self, d)
+	|| fn = .OnDrawLineNumber ?? textviewline.ColorLineNum
+	|| w = (fn)(d, nil)
 	if d is Lighter
 		w.a *= 2.0
 	|| c = w.a.mix(.gnormal.bg.Color, w)
@@ -658,15 +659,4 @@ function textview.CanDrawLight (|TextViewLine| D, |bool|)
 		return true
 	if (sr.x >= d.range.x2) and !d.next
 		return true
-
-
-//	
-//	if .severity == errorseverity.ok
-//		return (0.6, 0.6, 0.6, alpha)
-//	if .severity < errorseverity.problem
-//		return (0.6, 0.6, 0.1, alpha)
-//	|| v = (1.0, 0.1, 0.1, alpha)
-//	if .severity == errorseverity.problem
-//		v.g = v.r*0.5
-//	return v
 

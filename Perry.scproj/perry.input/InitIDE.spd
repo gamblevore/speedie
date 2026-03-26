@@ -184,21 +184,21 @@ extend PerryIDE
 			.ID				= "DrawMe"
 			.size = the~width by the~bottom to 0~before 
 			.gnormal.bg		= vec4(0.0, 0.81).px
-			.gnormal.edge   = vec4(0.2, 1.0).px
+			.gnormal.edge	= vec4(0.2, 1.0).px
 			.gnormal.seps	= vec4(0.4, 1.0).px
 
 
 		with .ASMView
 			.tooltip		= "Displays ASM"
-			.MultiSelection = true
-			.TakesFocus 	= TakesFocusFlag.CanFocus
+			.MultiSelection	= true
+			.TakesFocus		= TakesFocusFlag.CanFocus
 			.ID				= "ASMView"
-			.size 			= the~area
+			.size			= the~area
 			is NoSearch
-			.AttachedFrom = ~MoveCode.Left
-			.GNormal.inside = LeftBG + vec4(0.004, 0.002, -0.002, 0) // warmer
-			.GNormal.Edge = self.asmstretch.Divider.GNormal.Edge
-			.GNormal.Edge.a = (0.05*255.0)|int|
+			.AttachedFrom	= ~MoveCode.Left
+			.GNormal.inside	= LeftBG + vec4(0.004, 0.002, -0.002, 0) // warmer
+			.GNormal.Edge	= self.asmstretch.Divider.GNormal.Edge
+			.GNormal.Edge.a	= (0.05*255.0)|int|
 			
 			.OnKeyDown = ASMViewKeys
 		
@@ -238,13 +238,13 @@ extend PerryIDE
 		.ErrorLogInit(.CommsLogList,   "LogArea" )
 
 		with .UnNeededLabel 
-			.takesfocus 	= 0
+			.takesfocus		= 0
 			.ID				= "NoNeed"
-			.size 			= 5~inside  by  100~down back 60
+			.size			= 5~inside  by  100~down back 60
 			isnt editable
 			isnt visible
 			isnt drawsfocus
-			.copypaste	   |= copypasteflags.copytext
+			.copypaste		|= copypasteflags.copytext
 			.alignment		= MoveCode.Center
 			.gnormal.clear 
 
@@ -278,7 +278,7 @@ extend PerryIDE
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "replace"
-			.size 			= 3~inside  by  2~under back 15
+			.size			= 3~inside  by  2~under back 15
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.autocompletestring = "Replace..."
 
@@ -297,7 +297,7 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.Columns = ListViewRow("", listviewstate.aligncenter)
-			.IsMainListView = true
+			.IsMainListView	= true
 			.RowHeight		= .rowheight + 3
 			.Hierarchical	= true
 			.tooltip		= self.SearchArea.Tooltip			
@@ -320,10 +320,10 @@ extend PerryIDE
 			D <~ .DebugBtns
 			D <~ .Stack
 			with D
-				.size 			= the~width by the~bottom to 15~down
+				.size			= the~width by the~bottom to 15~down
 				is enabled
 				.tooltip		= "Debugger Area"
-				.takesfocus 	= takesfocusflag.CanFocus
+				.takesfocus		= takesfocusflag.CanFocus
 				.ID				= "DebuggerArea"
 				.gnormal		= self.errorlist.gnormal
 		}
@@ -336,7 +336,7 @@ extend PerryIDE
 			.Alignment		= MoveCode.Center
 			.tooltip		= self.debugger.Tooltip
 			.ID				= "Application Info"
-			.size 			= (the~width back 1)  by  1~down back 40
+			.size			= (the~width back 1)  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.GNormal.edge = (0.5, 0.5, 0.1, 0.25).px
 			.GNormal.StyleDrawer = image.CurlieQueDrawer
@@ -347,7 +347,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID = "DebugButtons"
 			.tooltip		= self.debugger.Tooltip
-			.size 			= the~width  by  1~under back 18
+			.size			= the~width  by  1~under back 18
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			self.AddDebugButtons(DebugStepOver, "\02", "Step Over")
 			self.AddDebugButtons(DebugStepIn,   "\03", "Step In")
@@ -368,7 +368,7 @@ extend PerryIDE
 			.tooltip		= "Variables and the Stack"
 			.UseColorScheme	= true
 			.ID				= "Stack"
-			.size 			= the~width by 0~up to 1~under
+			.size			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid  = vec4(0.13, 0.135, 0.120, 0.975)
 			.gRowSel.solid  = vec4(0.11, 0.335, 0.12, 0.675)
@@ -386,7 +386,7 @@ extend PerryIDE
 			is PassThru
 			.clipmode = ControlClipMode.SlideBackInWindow
 			.ID				= "PopupDisplay"
-			.size 			= the~area
+			.size			= the~area
 			.takesfocus		= 0
 			.expectsparse	= TextView.probablyjeebox
 
@@ -396,7 +396,7 @@ extend PerryIDE
 			.alignment		= MoveCode.Center
 			isnt editable
 			.takesfocus		= 0
-			.size 			= the~width  by  0 to 13
+			.size			= the~width  by  0 to 13
 			.gnormal.solid  = vec4(0.125, 0.94)
 
 
@@ -404,9 +404,9 @@ extend PerryIDE
 			.ID				= "ProjectInfo"
 			.alignment		= MoveCode.MiddleLeft
 			.SingleLine		= TextView.SingleLine
-			isnt editable 
+			isnt editable
 			.takesfocus		= 0
-			.size 			= the~left for 400  by  0 to 13
+			.size			= the~left for 400  by  0 to 13
 			.gnormal.clear
 
 		with .CharInfo 
@@ -415,7 +415,7 @@ extend PerryIDE
 			.SingleLine		= TextView.singleline
 			isnt editable
 			.takesfocus		= 0
-			.size 			= 2~left back 92  by  0 to 13
+			.size			= 2~left back 92  by  0 to 13
 			.gnormal.clear
 
 		with .LineInfo 
@@ -424,7 +424,7 @@ extend PerryIDE
 			.SingleLine		= TextView.singleline
 			isnt editable
 			.takesfocus		= 0
-			.size 			= 5~before back 75  by  0 to 13
+			.size			= 5~before back 75  by  0 to 13
 			.gnormal.clear
 
 		with .FileSep
@@ -472,10 +472,10 @@ extend PerryIDE
 		.AddIDEButton(.buildbutton,		"\1C", "Build Project", "compile")
 		.BuildButton.next = .Progress
 		.AddIDEButton(.progress,	"", "", "progress")
-		.RunButton.size =   5~after for 22  by  3~inside
+		.RunButton.size =	5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
 		.StartScreen.size = 7~left back 22  by  3~down back 14
-		.progress.size =    0~before for 60  by  3~inside
+		.progress.size =	0~before for 60  by  3~inside
 		
 		.RunButton.ExpandOnMouseOver = 1
 		.BuildButton.ExpandOnMouseOver = 1
@@ -487,7 +487,7 @@ extend PerryIDE
 			
 		with .CompileArea
 			.ID				= "OutBorder"
-			.size 			= the~width  by  18~down
+			.size			= the~width  by  18~down
 			.gnormal.solid	= vec4(0.087, 0.95)
 
 		with .ProjectTabs
@@ -498,7 +498,7 @@ extend PerryIDE
 			.ButtonSource = perry.projects
 			.ColumnFinder = &Perry.ReadButtonNames
 			|| pf = perry.projects.first 
-				 (pf is selected)
+				(pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
 			.GNormal.StyleDrawer = image.RoundRectDrawer
 			.GNormal.CornersCut = 12
@@ -603,7 +603,7 @@ extend PerryIDE
 		isnt editable
 		isnt drawsfocus
 		.ID				= name
-		.size 			= the~width by the~bottom to 0~under
+		.size			= the~width by the~bottom to 0~under
 		.gnormal.solid	= vec4(0.077, 0.95)
 		.expectsparse	= Parse
 		.IsALogTextView = true
@@ -653,15 +653,15 @@ extend PerryIDE
 
 	function ErrorLogInit (|listview| lv, |string| s)
 		with lv
-			.takesfocus 	= takesfocusflag.CanFocus
+			.takesfocus		= takesfocusflag.CanFocus
 			.ID				= s
-			.size 			= the~width by the~bottom to 15~down
+			.size			= the~width by the~bottom to 15~down
 			isnt visible
 			isnt drawsfocus
 			is unsearchable
 			.MultiLineDraw = true
 			.AlwaysSendChangeEvent = true
-			.copypaste	   |= copypasteflags.copytext
+			.copypaste		|= copypasteflags.copytext
 			.gnormal.edge	= .gnormal.bg
 			.rowheight		= .rowheight * 2
 
@@ -671,8 +671,8 @@ extend PerryIDE
 		btn.tag		= tag
 		.addlbutton(Btn, oof, tag.id, tag.tooltip)
 		btn.id		= "btn_"+tag.id
-		btn.size    = 3~after for 21  by  1~down back 13
-		tag.tooltip = ""
+		btn.size	= 3~after for 21  by  1~down back 13
+		tag.tooltip	= ""
 	
 	
 	function AddLButton (|ButtonView| BTN, |string| txt, |string| id, |string|tool)

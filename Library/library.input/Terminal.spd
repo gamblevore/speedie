@@ -35,11 +35,11 @@ datatype TerminalColor (int)
 
 target !minilib {
 
-function TerminalColor.Colorise (|string| s, |string|)
+function TerminalColor.Colorise (|string| S, |string|)
 	// handy trick of using high-bits on objects
 	|int64| C = (self-Black)&7
-	|| addr = (s|int64|<<3)>>3
-	return (addr|||(C<<60))|string|
+	|| S2 = (s|int64|<<3)>>3
+	return (S2|||(C<<60))|string|
 
 
 inline string.TerminalColor (|terminalcolor|)

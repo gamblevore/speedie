@@ -36,7 +36,7 @@ class TextView (GUIControl)
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
 	|GUITextLineEvent?|			OnBreakPoint
-	|GUITextLineBreakColor|		OnDrawLineNumber
+	|GUITextLineBreakColor?|	OnDrawLineNumber
 	|Document?|					_Viewing
 
 	|Error?|					MyError
@@ -59,7 +59,7 @@ class TextView (GUIControl)
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
 		.oncopy = textCopy|GUICopyEvent|
-		.OnDrawLineNumber = ColorLineNum
+		.OnDrawLineNumber = &textviewline.ColorLineNum
 		.init
 
 	destructor
@@ -829,7 +829,7 @@ class TextView (GUIControl)
 		return "\t" * (c/4)
 
 
-	libinternal NewLineSub (|int|extra, |bool|)
+	libinternal NewLineSub (|int| Extra, |bool|)
 		|| sr = .selrange
 		|| ind = 0
 		|| i = 0
@@ -911,21 +911,16 @@ class TextView (GUIControl)
 //		d.vline = last.vline + 1
 //		d.tline = last.tline + 1
 //		last.next = d
-			
-		
-
-	syntax access (|int| i, |string| s, |bool|)
-		cpp_Part Match
-		return .text[i, s]
 	
 		
 	libinternal DeComment (|bool|)
 		require !.singleline
 		|| r = .selrange
 		|| s = ""
-		if self[r.x, "/*"]  and  self[r.x2-2, "*/"]
-			s = self[r + (2,-2)]
-		  elseif self[r.x-2, "/*"]  and  self[r.x2, "*/"]
+		|| t = .text
+		if T[r.x, "/*"]  and  T[r.x2-2, "*/"]
+			s = T[r + (2,-2)]
+		  elseif T[r.x-2, "/*"]  and  T[r.x2, "*/"]
 			s = self[r]
 			r = r + (-2, 2)
 		  else
@@ -1480,7 +1475,7 @@ class TextView (GUIControl)
 		return 1
 
 	
-	function Insert (|string| s, |bool| selnew = false, |int|)
+	function Insert (|string| s, |bool| SelNew = false, |int|)
 		return .InsertText(s, .selrange, selnew)
 
 
@@ -1502,19 +1497,9 @@ class TextView (GUIControl)
 		return msg
 
 	
-//	libinternal CanAlterRange (|intrange| r, |bool|)
-//		disabled "This would be a massive project"
-//		opt norefcounts
-//		|| p = .ParsedMessage
-//		|| s1 = p.findtightest(r.x1)
-//		|| s2 = p.findtightest(r.x2)
-//		return s1 is editable and s2 is editable
-//		// good for now!
-
-	
-	function InsertText (|string| s, |intrange| p, |bool| SelectText=false, |bool| Show = true, |int|)
+	function InsertText (|string| S, |intrange| P, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
-		|| Same = (s == p.width) and self[p.x, s] 
+		|| Same = (s == p.width) and .text[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
 		
 		if !same
@@ -2151,7 +2136,7 @@ class TextView (GUIControl)
 
 	libinternal PrepareLinesOfText 
 		opt norefcounts
-		|| Changed	= .NeedsPrepare						#require
+		|| Changed	= .NeedsPrepare										#require
 		.TextAlteredForDraw = 0
 		|| expect	= .ShouldDisplayJeebox
 		|| msg		= .Parse(changed >= 2, expect)
@@ -2159,17 +2144,14 @@ class TextView (GUIControl)
 		|| Pos		= .StartPos
 		|| StayAtEnd= .IsALogTextView and ._CanSeeLastLine
 		|| d		= .NeedFirst
-			
-		// could be nice to make it the general case anyway?
-		// like if new lines are added... we just stay at the end.
-		// its useful for typing even. or pasting stuff!
+		|message--| LastOwner
 		
 		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
 		if .SingleLine
 			charw = 4KB
 	
-		|| ARGH = 0 // .ReclaimRestart(d) // disabled for now.
-		|| t = d.tline // always 0?
+		|| ARGH = 0					// .ReclaimRestart(d) // disabled for now.
+		|| t = d.tline				// always 0?
 		|| p = 0
 		(._Lines isnt breakpoint)
 		._LineNumWidth = 0
@@ -2178,12 +2160,15 @@ class TextView (GUIControl)
 
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
-
+		
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
 			if expect >= AllowJeebox
 				msg = d.ColoriseText(msg, ParsedOK)
+			|| draw = .OnDrawLineNumber // so now what?
+				(draw)(d, &LastOwner)
+				
 			if d is breakpoint
 				(._Lines is breakpoint)
 			loop p >= 0
@@ -2242,6 +2227,7 @@ class TextView (GUIControl)
 	function ScrollPos (|int|)
 		return ._Start.position
 
+	
 	setter ScrollPos (|int|)
 		opt norefcounts
 		for s in ._Lines

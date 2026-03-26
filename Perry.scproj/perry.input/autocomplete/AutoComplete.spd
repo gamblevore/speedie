@@ -601,7 +601,7 @@ function message.SimpleComplete (|message| pp, |message| where, |bool|)
 
 
 function message.OwningFunc (|bool| EndAtArg = false, |message|) // isfunction
-	return .owningSyntax(AutoComplete.Functions, EndAtArg)
+	return .owningSyntax(AutoComplete.spdFunctions, EndAtArg)
 
 		
 function message.OwningModclass (|bool| EndAtArg=true, |message|)
@@ -614,13 +614,22 @@ function message.OwningModclass (|bool| EndAtArg=true, |message|)
 	
 function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 	opt norefcounts
+	|| First = .OwningSyntaxSub(find, endatarg)
+	if first and !EndAtArg and (find == autocomplete.spdfunctions)
+		|| second = first.parent.OwningSyntaxSub(find, endatarg)
+			return second
+	return first
+
+
+function message.OwningSyntaxSub (|dictionary| find, |bool| EndAtArg, |message|)
+	opt norefcounts
 	nil self
 	|| s = self
 	|| WillEnd = false
 	while s
 		if (s == @tmp) and find.ValueLower(s.name)
 			return s
-		require !willend
+		require !WillEnd
 		|| p = s.parent
 		if EndAtArg and p == @arg
 			Willend = true
@@ -629,7 +638,7 @@ function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 
 function autocomplete.IsAFunc (|message| m, |bool|)
 	opt norefcounts
-	return .functions.valueLower(m.name) != nil
+	return .spdfunctions.valueLower(m.name) != nil
 
 
 function message.OwningFullName (|syntax| prm, |message|)
