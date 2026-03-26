@@ -3,18 +3,24 @@
 module Clipboard
 	cpp_part Clip
 	|string| _InternalCopy
+	|string| _Clip2
 
-	cpp_Wrapper SDL_GetClipboardText (|cstring|) 
+	cpp_Wrapper SDL_GetClipboardText (|cstring|)
 	cpp_wrapper SDL_SetClipboardText (|cstring| s, |errorint|)
-		
+	
+	
 	function Data (|string|)
 		|| cstr = .SDL_GetClipboardText
 		|| s = cstr.Wrap
 			return s
 		return ._InternalCopy
-			
+	
+	
 	function Text (|string|)
+		if keys.Shift
+			return ._Clip2
 		return .data.FixLineEndings
+	
 	
 	function Text (assigns: |string| s)
 		description "Pass valid UTF-8 only" 
@@ -23,9 +29,15 @@ module Clipboard
 		._internalcopy = ""
 		
 		|| c = s
-		if keys.Shift
+		if keys.Option
 			c = c.TabsToSpaces
-			Notifications <~ "Copied (without tabs):\n" + c.Preview(128)		
+			Notifications <~ "Copied (without tabs):\n" + c.Preview(128)	
+			
+		if keys.Shift
+			._clip2 = c
+			Notifications <~ "Clip 2 used for: \n" + c.Preview(128)
+			return
+		
 		c = c.cstr
 		|| err = .SDL_SetClipboardText(c.addr|cstring|)
 		if (err!=0) // or s.FindBadUTF8		// osx might fail anyhow
@@ -34,7 +46,9 @@ module Clipboard
 	
 	
 	function Clear
-		|byte[1]| null 
+		|byte[1]| null
+		._InternalCopy = ""
+		._Clip2 = ""
 		.SDL_SetClipboardText((&null[0])|cstring|)
 
 
@@ -43,6 +57,7 @@ module Clipboard
 		if s
 			.text = s
 			Notifications <~ "Copied: " + s
+
 
 
 function string.FixLineEndings (|string| dest="\n", |String|)
