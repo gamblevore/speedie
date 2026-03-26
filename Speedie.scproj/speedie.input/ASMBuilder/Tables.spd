@@ -324,7 +324,8 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 	if dest is AddrRequest // (|$int|) v {v++}
 		return reff.haveaddr	
 	
-	if dr == d.WholeType.reg		return dest
+	if dr == d.WholeType.reg
+		return dest
 
 	dest.µType = Reff.µType
 	
@@ -781,6 +782,7 @@ function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmre
 	if prop.iscarray
 		dest.µtype = DataTypeCode._voidptr
 	dest = dest.haveaddr
+	dest.µtype = obj.µtype // i guess?
 	obj = obj as asmreg.NoScale
 	return .AddToReg(exp, dest, obj, pos)
 

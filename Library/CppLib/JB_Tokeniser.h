@@ -16,7 +16,7 @@ extern "C" {
 
     struct NodeArrayShift;
 	typedef void (*TokErrorEvent)(int Start, int ExpectedBits, int RealBits );
-	typedef JB_Object* (*fpTok)( int TokenAfter, Message* Parent );
+	typedef Message* (*fpTok)( int TokenAfter, Message* Parent );
 	
 	
 	JBClass( TokHan, JB_Object,

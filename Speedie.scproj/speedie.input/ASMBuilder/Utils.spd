@@ -35,6 +35,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		.breakrequest = nil
 		p.BasicBlock = .BasicBlock
 		p.FatMap = exp.SrcMap
+		if "GUI_VObject_left".trap
 		return p
 
 	error (exp, "Function too large (over 64K)")

@@ -111,7 +111,7 @@ class TextViewLine (list)
 			ch.position += p
 
 
-	libinternal Colorise (|message| msg, |bool| ParsedOK, |message|)
+	libinternal ColoriseText (|message| msg, |bool| ParsedOK, |message|)
 		.msgpos = -1
 		.message = nil
 		isnt fakemsg
@@ -144,15 +144,17 @@ class TextViewLine (list)
 		opt norefcounts
 		rz = .ColoriseSub2(srch)
 		|| r = rz
-		if !r or r.StartsAfter(.range)
+		|| range = .range
+		if !r or r.StartsAfter(range)
 			r = srch
 			while r
 				r = r.parent
-				if (r == @arg) and r.StartsNotAfter(.range)
-					rz?=r
-					exit
+				if (r == @arg) and r.StartsNotAfter(range)
+					rz ?= r
+					if !r.endsbefore(range)
+						exit
 		
-		if r and !r.StartsAfter(.range)
+		if r and !r.StartsAfter(range)
 			(self is breakpoint) = r is breakpoint
 			.msgpos = .position // isn't it r.position?
 			.message = r
@@ -429,7 +431,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 				.DrawErrorBackground(where, y+GoUp, d)
 			  else
 				d.LineError = nil // sigh. crappy bug fix
-
+		
 		|| m = ._ActiveLine
 			if d contains m.Position
 				|| f = .Path
@@ -618,7 +620,6 @@ function message.FlatRange (|intrange|)
 		if ss.x >= 0
 			rz.x = rz.x min ss.x
 			rz.x2 = rz.x2 max ss.x2
-
 
 
 function error.TextColor (|float| alpha=1.0, |vec4|)

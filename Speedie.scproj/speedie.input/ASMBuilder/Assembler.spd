@@ -192,13 +192,17 @@ struct Assembler
 
 
 	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|) // addnum
+		|| T = orig.µtype
+		if t is pointer // makes no sense
+			T = DataTypeCode.int
 		if !dest or dest == asmreg()
-			dest.µtype = orig.µtype
+			dest.µtype = T
 		dest = .TempOnly(dest)
 		|| Where = orig • dest
 		(where is Const)
 		(where isnt containsaddr)
-		|| K = .NumToReg(exp, where, amount, orig.µtype)
+		where.µType = T // why so much fiddling?
+		|| K = .NumToReg(exp, where, amount, T)
 		return .Plus(exp, dest, Orig, K)
 	
 	
@@ -224,7 +228,8 @@ struct Assembler
 		// remove this?
 		|| st = .state
 		|| ret = st.return
-		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)			ret.µtype = rz|DataTypeCode|
+		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
+			ret.µtype = rz|DataTypeCode|
 			D.wholetype = ret
 			return ret
 
@@ -587,7 +592,7 @@ struct Assembler
 		
 		target debug
 			|| trap = ++ASMTrapper
-			if trap == 12590
+			if trap == -1
 
 		|| OV = .OpenVars
 
@@ -677,7 +682,7 @@ struct Assembler
 			dest.TmpCheck
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if trap == -1 or stacksize > 30 // ugh
+			if trap == 9282 or stacksize > 30 // ugh
 				
 		  else
 			opt inline

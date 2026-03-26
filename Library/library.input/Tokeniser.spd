@@ -13,7 +13,7 @@ class TokenHandler
 		cpp_part TH
 		libinternal
 	
-	function Link (|int| BitTypes, |TokenHandler_fp| Func, |TokenHandler|)
+	function Link (|int| BitTypes, |ParseHandler| Func, |TokenHandler|)
 		cpp_wrapper JB_TH_Link
 
 
@@ -51,7 +51,7 @@ extend Parser {
 
 	function TokenNil		(|string| name, assigns:|TokenHandler!|)
 		cpp_wrapper
-	function Handler		(|int| BitTypes, |TokenHandler_fp|Func=nil, |TokenHandler!|)
+	function Handler		(|int| BitTypes, |ParseHandler|Func=nil, |TokenHandler!|)
 		cpp_wrapper
 	function Process		(|int| BitTypes, |bool|Mode=false, |message?| paren=nil, |message?|)
 		cpp_wrapper

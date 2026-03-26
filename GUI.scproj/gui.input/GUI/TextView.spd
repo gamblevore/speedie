@@ -2151,14 +2151,14 @@ class TextView (GUIControl)
 
 	libinternal PrepareLinesOfText 
 		opt norefcounts
-		|| Changed    = .NeedsPrepare						#require
+		|| Changed	= .NeedsPrepare						#require
 		.TextAlteredForDraw = 0
-		|| expect	  = .ShouldDisplayJeebox
-		|| msg   	  = .Parse(changed >= 2, expect)
-		|| ParsedOK   = (msg!=nil) or (.ExpectsParse <= AllowJeebox)
-		|| Pos	 	  = .StartPos
-		|| StayAtEnd  = .IsALogTextView and ._CanSeeLastLine// and .StartPos > 0
-		|| d		  = .NeedFirst
+		|| expect	= .ShouldDisplayJeebox
+		|| msg		= .Parse(changed >= 2, expect)
+		|| ParsedOK	= (msg!=nil) or (.ExpectsParse <= AllowJeebox)
+		|| Pos		= .StartPos
+		|| StayAtEnd= .IsALogTextView and ._CanSeeLastLine
+		|| d		= .NeedFirst
 			
 		// could be nice to make it the general case anyway?
 		// like if new lines are added... we just stay at the end.
@@ -2182,8 +2182,8 @@ class TextView (GUIControl)
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
-			if expect >= allowJeebox // didn't I use to have it on allowjeebox?
-				msg = d.colorise(msg, ParsedOK)
+			if expect >= AllowJeebox
+				msg = d.ColoriseText(msg, ParsedOK)
 			if d is breakpoint
 				(._Lines is breakpoint)
 			loop p >= 0

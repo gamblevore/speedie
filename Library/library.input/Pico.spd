@@ -4,8 +4,7 @@ prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil, |ErrorIn
 prototype PicoActionFn (|&nil| self, |&int8| Data, |int| Length, |ErrorInt|)
 
 
-// todo: pico could use shared memory, instead of pipes. This actually reduces memory use!
-// To under half the memory.
+// todo: pico could use shared memory, instead of pipes. Reduces memory use
 
 
 struct PicoMessage

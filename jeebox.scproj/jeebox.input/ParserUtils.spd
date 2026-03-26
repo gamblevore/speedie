@@ -134,7 +134,7 @@ extend Parser
 		return .erroradd("Unexpected syntax", start)
 	
 
-	function ErrorAlwaysAdd (|String| s, |ind| Start, |Message|)
+	function ErrorAlwaysAdd (|String| s, |ind| Start, |Message?|)
 	    .ErrorStart = start
 		
 		// create msg for memory-layer
@@ -266,9 +266,7 @@ struct MessagePosition
 		inline
 
 
-// todo: remove tokenhandler_fp, same as ParseHandler
 prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)
-prototype TokenHandler_fp		(|int| Start, |message?| Parent=nil, |Object?|)
 prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
 
 
@@ -277,21 +275,21 @@ struct ParserLineAndIndent
 	linkage
 		libinternal
 
-	|int| Lines
-	|int| PzLine
-	|int| Dentine
-	|int| IsDebug
-	|int| FirstLine
-	|int| EndArg
-	|int| TotalLines
+	|int|		Lines
+	|int|		PzLine
+	|uint16|	Dentine
+	|uint16|	IsDebug
+	|int|		FirstLine
+	|int|		TotalLines
 	
 	function ArgPos (|Int|)
 		|| p = .FirstLine
+		if p >= 0
 			return p
 		return .PzLine
 	
 	function NextLine
-		Memory.zero(self, 6*4) // oof. We want to leave TotalLines unset.
+		Memory.zero(self, 4*4) // oof. Need to leave TotalLines unset.
 
 
 role MessageRoot (Message)

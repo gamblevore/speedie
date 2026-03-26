@@ -19,12 +19,12 @@ ignore
 
 extend Parser
 	function Init
-		// assert that the funcs are ordered properly
-		debugger @thg.translateable  and  @opp.translateable and  @cnj.translateable  and  @tmp.translateable
-		debugger @str.isstring and @char.isstring and @sstr.isstring and @bin.isstring and @back.isstring 
-		debugger @Cnj.NoChildren and @Opp.NoChildren and @Thg.NoChildren and @Sheb.NoChildren and @SCnj.NoChildren and @SThg.NoChildren and @Num.NoChildren and @SStr
-		debugger @cnj|int| == 8 
-		debugger @max|int| <= 63  
+		target debug		// assert these are ordered properly
+			debugger @thg.translateable  and  @opp.translateable and  @cnj.translateable  and  @tmp.translateable
+			debugger @str.isstring and @char.isstring and @sstr.isstring and @bin.isstring and @back.isstring 
+			debugger @Cnj.NoChildren and @Opp.NoChildren and @Thg.NoChildren and @Sheb.NoChildren and @SCnj.NoChildren and @SThg.NoChildren and @Num.NoChildren and @SStr
+			debugger @cnj|int| == 8 
+			debugger @max|int| <= 63  
 		
 		.Tokenz( "\r \n ;", kEndOfLine, fEndOfLine )
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
@@ -59,25 +59,25 @@ extend Parser
 		.Tokenz( "&",			kThingSyx,				fBeforeRel			)
 
 // Everything else
-		.Tokenz( "{",			kThingSyx,              fArgOpen			)
+		.Tokenz( "{",			kThingSyx,				fArgOpen			)
 		.Tokenz( "--> <-- <--> <≈", kTmpOpp,			fTemporalRelSyx		)
 		.Tokenz( "/#",			kTmpOpp,				fSyntacticComment	)
 
 // I think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
-		.TokenRange( "09", 		.Handler(kThingSyx, fNumber)				)
-		.Tokenz( "#!",			kTemporalSyxNoBar,      fShebang			)
+		.TokenRange( "09", 		.Handler(kThingSyx,		fNumber)			)
+		.Tokenz( "#!",			kTemporalSyxNoBar,		fShebang			)
 		.Tokenz( "//",			kEndOfLine,				fCommentLine		)
 		.Tokenz( "/*",			kEndOfLine,				fComment			)
-		.Tokenz( op_comp,		kOppSNB,                fOppSyxNeq			)
+		.Tokenz( op_comp,		kOppSNB,				fOppSyxNeq			)
 		.Tokenz( op_math,		kOppSNB,				fOppSyx				)
 		.Tokenz( "|",			kOppBar,				fOppSyx				)
-		.Tokenz( "...",			kThingSyx,              fThingSyx			)
-		.Tokenz( `"`,			kThingSyx,              fString				)
-		.Tokenz( "'",			kThingSyx,              fChar				)
-		.Tokenz( "`",           kThingSyx,			    fBackTick			)
-		.Tokenz( "<(`",         kThingSyx,			    fSuperStr			)
-		.Tokenz( "#(",			kThingSyx,              fBinary				)
+		.Tokenz( "...",			kThingSyx,				fThingSyx			)
+		.Tokenz( `"`,			kThingSyx,				fString				)
+		.Tokenz( "'",			kThingSyx,				fChar				)
+		.Tokenz( "`",			kThingSyx,				fBackTick			)
+		.Tokenz( "<(`",			kThingSyx,				fSuperStr			)
+		.Tokenz( "#(",			kThingSyx,				fBinary				)
 
 // a~(long tailed mouse) ate all~my~cheese
 // a◊long tailed mouse ate all~my~cheese // ◊ could parse like a-b and -b :)
@@ -92,7 +92,7 @@ extend Parser
 		.Tokenz( ">~",			kthingsyx,				fInnerNiceAdj		)		// >~ quickly he ran home
 		.Tokenz( "¬",			kThingSyx,				fYoda				)		// ¬ powerful you have~become
 		.Tokenz( "“",			kThingSyx,				fQuoteLang			)
-		.Tokenz( `–`,           kThingSyx,				fQuestion			)
+		.Tokenz( `–`,			kThingSyx,				fQuestion			)
 		.Tokenz( "∆",			kThingSyx,				fAsk				)
 //		.Tokenz( "‡",			kThingSyx,				fBunchOfThings		)
 
@@ -971,7 +971,7 @@ ive been~running #since morning
 
 
 	libinternal Message.IndentScore (|int|)
-		|| ind = .indent //&~ 1
+		|| ind = .indent
 		if self == @tmp or @item
 			return ind + 2
 		if self == @arg
@@ -980,18 +980,13 @@ ive been~running #since morning
 		parser.erroradd("This can't be an indentation parent.", .position)
 	
 	
-	function parser.IndentBug (|message| curr, |message|)
+	function parser.IndentBug (|message| curr, |message?|)
 		return parser.ErrorAlwaysAdd("Indent too low.", curr.position)
 	
 	
-	function LoweredIndent (|message| output, |message| curr, |message|)
-		// we'd need to keep track of the last node we created... 
-		// and then the first line found after making a node.
-		// seems posisble?
-		// we have addtooutput?
+	function LoweredIndent (|message| output, |message| curr, |int| BackPos, |message|)
 		Opt NoRefCounts
 	
-		|| BackPos = parser.data.find( CharSet.Line, curr.position, 0 )
 		|| chin = curr.indent|int|
 		while output.indentScore > chin
 			if output == @arg
@@ -1021,6 +1016,7 @@ ive been~running #since morning
 		|| addr			= D.addr
 		|| State		= 0				// 2 = line, 1 = space, 0 = neither, 3 = both
 		|| Commas		= 0
+		lin.FirstLine = -1
 
 		while (n < end)
 			|| c = addr[n++]
@@ -1076,7 +1072,7 @@ ive been~running #since morning
 					n--
 					exit
 				lin.Lines++
-				if !lin.FirstLine
+				if lin.FirstLine < 0
 					lin.FirstLine = n-1
 				lin.PzLine = n-1
 				lin.dentine = 0
@@ -1120,36 +1116,21 @@ ive been~running #since morning
 		parser.new(prev, @arg, curr.position)
 		prev <~ curr
 		return prev
+
 	
-	
-	function AddToOutput (|Message!| Output,  |message| Curr,  |message| Prev,  |int| Pos,  |message|)
+	function AddToOutput (|Message!| Output,  |message| Curr,  |message| Prev,  |ParserLineAndIndent| Info,  |message?|)
 		Opt NoRefCounts
 		|| f = Output.func
 		if (prev and !f.IsList and f!=@msg)
 			|| Extra = curr.PrevIndentCheck(prev)
 			if Extra < 0
-				return parser.LoweredIndent(output, curr)
+				return parser.LoweredIndent(output, curr, info.firstline)		// can return nil via .indentbug
 			if Extra > 0
 				if (extra == 2) and (prev.indent|int| isa 4)
 					return .ElseIfAdder(prev, curr)
-				return curr.GoIntoInvisArg(prev, pos)
+				return curr.GoIntoInvisArg(prev, info.argpos)
 		output <~ curr
 		return output
-	
-
-	libinternal SetArgEnd (|int| lines, |message| output, |int| After, |int|)
-		opt norefcounts
-		if output.func == @arg and output is style2
-			output.after = after
-			while
-				output = output.parent
-				loop output
-				if output.func == @arg
-					loop output is style2
-					output.after = after
-		
-		return lines
-	
 
 
 	function ParseLoop (|Message| Output, |int| TmpoFlags, |int|)
@@ -1161,32 +1142,39 @@ ive been~running #since morning
 			info.TotalLines += info.lines
 			
 			if .WillEnd
-				TmpoFlags = (.nextstart, parser.data.length)(.running)
+				info.firstline = (.nextstart, parser.data.length)(.running)
 				exit
 			
 			if (prev and !info.Lines)
-				TmpoFlags = .nextstart-1
+				info.firstline = .nextstart-1
 				exit
 			
 			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.dentine)
 			if !ch
-				TmpoFlags = .nextstart - 1
 				exit
 			
-			if ch != output // haha
+			if ch != output							// haha
 				info.TotalLines += ch==@item
 				if info.IsDebug
 					(ch is breakpoint)
-				info.EndArg = -1
-				output = .AddToOutput(output, ch, prev, info.ArgPos)
+				output = .AddToOutput(output, ch, prev, info)
 				if !output
-					TmpoFlags = .nextstart-1
-					exit				// return info.TotalLines
+					return info.TotalLines			// only is nil if theres an error.
 				prev = ch
 			info.nextline
-		
-		return .SetArgEnd(info.TotalLines, output, TmpoFlags)
 
+		return .EndArg(output, info)
+
+
+	function EndArg (|message| output, |ParserLineAndIndent| info, |int|)
+		opt norefcounts
+		if output  and (output.func == @arg and output is style2)
+			while output
+				if output.func == @arg
+					loop output is style2
+					output.After = info.FirstLine
+				output = output.parent
+		return info.TotalLines
 
 
 	function DecorateThing (|message!| R, |int| Ops, |Message!|)

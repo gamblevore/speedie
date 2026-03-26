@@ -1,6 +1,20 @@
 
 
 target debug
+	function compiler.NilBug2 (|Message!| Output,  |message?|)
+		Opt NoRefCounts
+		Output.Position++
+		if 0.5[]
+			return output	
+	
+	function compiler.NilBug (|Message| Output, |int|)
+		Opt NoRefCounts
+		while 0.5[]
+			output = .NilBug2(output)				// confusing the nil checker?
+		borks										// nil checker fail	
+		if output
+	
+
 	function @ArchonPurger.ndb4
 		cpp_name ndb4
 		visible

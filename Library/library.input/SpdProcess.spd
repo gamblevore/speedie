@@ -33,12 +33,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			
 	function CommsOpen (|bool|)
 		return (.pico.MessageStatus == 0, false)(self)
-
-	libinternal Alive (|bool|)
-		disabled "use .CommsOpen"
-		// todo: why isn't this just .CommsOpen? 
-//		if self != nil
-//			rz = (.ChildAlive, .ParentAlive)(.isParent)
 	
 	libinternal ParentAlive (|bool|)
 		return app.ParentID > 1
