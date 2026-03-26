@@ -298,7 +298,7 @@ datatype uint
 			curr = curr &~ Lowest
 	
 	
-	 
+	
 	iterator flags
 		|| curr = self
 		while curr

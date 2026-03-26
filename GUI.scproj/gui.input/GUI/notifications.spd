@@ -123,7 +123,7 @@ module Notifications
 		|| p = data.parse.Rand
 			Notifications <~ (prefix + p.name)
 
-	cpp_wrapper SDL_GetError (|cstring|)
+	cpp_func SDL_GetError (|cstring|)
 		
 	function NotifySDLError
 		opt norefcounts

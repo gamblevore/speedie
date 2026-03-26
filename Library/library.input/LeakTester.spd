@@ -43,5 +43,5 @@ libinternal object.RefCountMark (|int|)
 	return S[] & 1
 
 
-cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
-cpp_wrapper JB_Mem_ClassLeakCounter ()
+cpp_func JB_FindLeakedObject 	(|object| Obj,			|array| dest)
+cpp_func JB_Mem_ClassLeakCounter ()

@@ -5,8 +5,8 @@ module Clipboard
 	|string| _InternalCopy
 	|string| _Clip2
 
-	cpp_Wrapper SDL_GetClipboardText (|cstring|)
-	cpp_wrapper SDL_SetClipboardText (|cstring| s, |errorint|)
+	cpp_func SDL_GetClipboardText (|cstring|)
+	cpp_func SDL_SetClipboardText (|cstring| s, |errorint|)
 	
 	
 	function Data (|string|)

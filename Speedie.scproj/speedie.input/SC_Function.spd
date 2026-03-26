@@ -1753,11 +1753,7 @@ function Tran_Return (TranFunc)  // exitter
  // this is where an "if" can become an exitter
 	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStatExpr(fn.SourceArg)
-	
 
-function NewOldHelper (CollectFunc)
-	problem (node, "Deprecated")
-	return NewHelper(node, name_space, errplace)
 
 
 function NewCppWrapper (CollectFunc)
@@ -1770,7 +1766,7 @@ function NewCppWrapper (CollectFunc)
 	|| thg = @thg + name.name
 	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
-	if !IsNothing and !islib
+	if !IsNothing and !islib and node == "cpp_wrapper"
 		problem (node, "Deprecated")
 	node.name = "function"
 	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ thg
@@ -1986,7 +1982,7 @@ function NewFuncSub (|message| node, |SCNode| name_space, |scfunction|)
 function NewFunc (CollectFunc)
 	opt norefcounts
 	require node
-	|| name = node.first			   #expect (node, "No function name found.")
+	|| name = node.first								#expect (node, "No function name found.")
 	if name == @Dot
 		return SCClass.ExtendOneFunc(node)
 	return NewFuncSub(node, name_Space)	

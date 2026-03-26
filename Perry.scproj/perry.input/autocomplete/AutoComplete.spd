@@ -317,7 +317,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	if (c == .compilr) and !c.CommsOpen
 		isnt active
 
-	|| msg = C.Get 		#require
+	|| msg = C.Get					#require
 	|message| date
 	if msg == @arg and "Perry"
 		date = msg[@num]
@@ -358,7 +358,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			0 //
 		  elseif msg starts "callfrom"
 			.CallFromFB(msg)
-	      elseif msg starts "asm"
+		  elseif msg starts "asm"
 			.GotASM(msg)
 		  elseif msg starts "check"
 			.ErrorListFB(msg)
@@ -611,17 +611,8 @@ function message.OwningModclass (|bool| EndAtArg=true, |message|)
 	if !.parent
 		rz ?= @tmp+"root"
 	
-	
+
 function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
-	opt norefcounts
-	|| First = .OwningSyntaxSub(find, endatarg)
-	if first and !EndAtArg and (find == autocomplete.spdfunctions) and !first.HasAny
-		|| second = first.parent.OwningSyntaxSub(find, endatarg)
-			return second
-	return first
-
-
-function message.OwningSyntaxSub (|dictionary| find, |bool| EndAtArg, |message|)
 	opt norefcounts
 	nil self
 	|| s = self

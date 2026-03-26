@@ -641,7 +641,7 @@ function error.TextColor (|float| alpha=1.0, |vec4|)
 function textview.LineNumColor (|textviewline| D, |imagepixel|)
 	opt norefcounts
 	|| fn = .OnDrawLineNumber ?? textviewline.ColorLineNum
-	|| w = (fn)(d, nil)
+	|| w = (fn)(d, nil, (._DrawInBreakArea&1)!=0)
 	if d is Lighter
 		w.a *= 2.0
 	|| c = w.a.mix(.gnormal.bg.Color, w)

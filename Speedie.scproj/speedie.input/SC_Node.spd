@@ -985,10 +985,11 @@ dispatch RootCollectTable (CollectFunc)
 	+'api'					SCFunction.NewFunc
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
+	+'cpp_func'				SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
 	+'libinternal'			SCFunction.NewHelper
-	+'inline'				SCFunction.NewOldHelper
+	+'inline'				SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
 	+'macro'				SCFunction.NewMacro
 	+'insertion'			SCThe.NewInsertion
@@ -1027,10 +1028,10 @@ dispatch ClsCollectTable (CollectFunc)
 	+'render'				SCFunction.NewRender			// ??
 	+'setter'				SCFunction.NewHider
 	+'function'				SCFunction.NewFunc
-	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
+	+'extend_function'		SCFunction.NewFunc				// user shouldn't write these
 	+'api'					SCFunction.NewFunc
 	+'macro'				SCFunction.NewMacro
-	+'inline'				SCFunction.NewOldHelper
+	+'inline'				SCFunction.NewHelper
 	+'helper'				SCFunction.NewHelper
 	+'libinternal'			SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper
@@ -1038,8 +1039,9 @@ dispatch ClsCollectTable (CollectFunc)
 	+'actual'				SCBehaviour.NewActual
 	+'virtual'				SCBehaviour.NewVirtual
 	+'iterator'				SCIterator.NeuIter
-	+'syx'					SCFunction.NeuSyx			   // jeebox specific
+	+'syx'					SCFunction.NeuSyx				// jeebox specific
 	+'cpp_wrapper'			SCFunction.NewCppWrapper
+	+'cpp_func'				SCFunction.NewCppWrapper
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
 	+'prototype'			SCFunction.NewProtoType
 	+'syntax'				SCClass.LoadSyntax
@@ -1077,7 +1079,7 @@ datatype SCNodeInfo (byte)
 		Visible
 		AllowLinkedLists
 		InBuiltDataType
-		LibOnly // how is this different to internalonly?
+		LibOnly								// how is this different to internalonly?
 		LibOnlyAll
 		EmbeddedOnly
 		
@@ -1092,8 +1094,4 @@ datatype SCNodeFindMode (int)
 		ForClass
 	syntax is (|SCNodeFindMode| m, |bool|)
 		return self & m
-	module
-		|int| aaa
-		function argh
-			.aaa = 1
 

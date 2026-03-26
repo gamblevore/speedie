@@ -45,14 +45,13 @@ module Effects
 
 function PerryColorLineNum (GUITextLineBreakColor)
 	opt norefcounts													// Could we Precolor these? Maybe?
+	|| m = .message
 	if PreRun
 		|| f = 0.0625
-		|| m = .message
+		if m
 			|| fn = m.OwningFunc
 				|| Prev = PreRun[]
 				f = 0.35
-				if m == @arg
-					f = 0.2
 				|| pflags = (1 & Prev.flags, 0)(prev)
 				if Prev != fn										// how do we know which is which? what color?
 					pflags ^= 1
@@ -68,11 +67,13 @@ function PerryColorLineNum (GUITextLineBreakColor)
 	
 	|| c = vec4(1)
 	|| f = .userinfo
-	if f < 0
-		// try this as a background instead... could be better...
+	
+	if f < 0														// use as background instead... better?
 		c.b = 0.75
 		c.g = 0.75
 		f = -f
+	if (m == @arg) and (f >= 0.25) and InBreakArea
+		f = 0.2
 	c.a = f
 	return c
 

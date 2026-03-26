@@ -216,7 +216,7 @@ dataType Keys (int)
 				
 		
 		function State (|&int| n, |&byte|)
-			cpp_Wrapper SDL_GetKeyboardState
+			cpp_wrapper SDL_GetKeyboardState
 		
 		
 		libinternal Count (|int|)

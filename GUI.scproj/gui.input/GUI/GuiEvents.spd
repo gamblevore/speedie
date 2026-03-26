@@ -131,7 +131,7 @@ struct SDL_TouchFingerEvent
 		return SDL_GetNumTouchFingers(.touchid)
 
 	module 
-		cpp_wrapper SDL_GetNumTouchFingers (|int| touchid, |int|)
+		cpp_func SDL_GetNumTouchFingers (|int| touchid, |int|)
 
 
 
