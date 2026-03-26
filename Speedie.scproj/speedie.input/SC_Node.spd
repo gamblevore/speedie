@@ -977,7 +977,7 @@ class SCBetterNode (SCNode)
 function DontRemove (CollectFunc)
 	return Compiler.Program // OK
 
-
+ 
 dispatch RootCollectTable (CollectFunc)
 	+'love'					SCGame3D.Love
 	+'function'				SCFunction.NewFunc
@@ -988,7 +988,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
 	+'libinternal'			SCFunction.NewHelper
-	+'inline'				SCFunction.NewHelper
+	+'inline'				SCFunction.NewOldHelper
 	+'autogen'				SCFunction.NewHelper
 	+'macro'				SCFunction.NewMacro
 	+'insertion'			SCThe.NewInsertion
@@ -1030,7 +1030,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
 	+'api'					SCFunction.NewFunc
 	+'macro'				SCFunction.NewMacro
-	+'inline'				SCFunction.NewHelper
+	+'inline'				SCFunction.NewOldHelper
 	+'helper'				SCFunction.NewHelper
 	+'libinternal'			SCFunction.NewHelper
 	+'autogen'				SCFunction.NewHelper

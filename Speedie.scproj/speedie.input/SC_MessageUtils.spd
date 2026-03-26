@@ -5,6 +5,7 @@
 
 
 function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClass,  |string|)
+	opt norefcounts
 	return .FindAndRemoveSub(name, NothingOK, isclass)$.name
 
 

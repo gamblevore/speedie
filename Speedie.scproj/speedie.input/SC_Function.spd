@@ -1755,16 +1755,23 @@ function Tran_Return (TranFunc)  // exitter
 	node.CheckNotInStatExpr(fn.SourceArg)
 	
 
+function NewOldHelper (CollectFunc)
+	problem (node, "Deprecated")
+	return NewHelper(node, name_space, errplace)
+
 
 function NewCppWrapper (CollectFunc)
 	|| name = node[@thg]$
 	|| prm = name.Next$
 	expect (prm.islast) (prm)
+	// this doesn't code-autocomplete so well in perry...
 	
 	using name
 	|| thg = @thg + name.name
 	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
+	if !IsNothing and !islib
+		problem (node, "Deprecated")
 	node.name = "function"
 	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ thg
 
