@@ -34,7 +34,7 @@ function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
 
 
 inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
-	return .find(~find, from, after) // so nice.
+	return .find(~find, from, after)					// so nice.
 
 
 
@@ -81,7 +81,7 @@ datatype CharSet (uint)
 		fUnicode				// 128+
 
 	constants
-		|CharSet| 
+		|CharSet|
 		Line			= (1<<fLine)
 		SafeInC			= (1<<fUpper) + (1<<fLower) + (1<<fUnderScore) + (1<<fNumber)
 		Unicode			= (1<<fUnicode)

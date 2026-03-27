@@ -128,14 +128,14 @@ libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 
 extend Parser
 	function fError (ParseHandler)
-	    return nil // seems OK... doesn't need to do more
+		return nil // seems OK... doesn't need to do more
 
 	function fError2 (ParseHandler)
 		return .erroradd("Unexpected syntax", start)
 	
 
 	function ErrorAlwaysAdd (|String| s, |ind| Start, |Message?|)
-	    .ErrorStart = start
+		.ErrorStart = start
 		
 		// create msg for memory-layer
 		|| err				= Error.new(message())

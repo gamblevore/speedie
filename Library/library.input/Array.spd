@@ -180,7 +180,7 @@ class Array
 		|| i = 0
 		while
 			|| Item = self[i]
-			if item == nil: exit 
+			if item == nil: exit
 			yield Item (i)
 			++i
 
@@ -188,7 +188,7 @@ class Array
 		|| i = .length - 1
 		while
 			|| Item = self[i]
-			if item == nil: exit 
+			if item == nil: exit
 			yield Item (i)
 			--i
 

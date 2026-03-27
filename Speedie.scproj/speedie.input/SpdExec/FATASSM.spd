@@ -648,7 +648,8 @@ datatype ASMParam (uint)
 	// at this point... its too late, really.
 	
 	function ASMReg (|asmreg|)
-		(rz is temp) = (self>>31)
+		if self >> 31
+			(rz is temp)
 		rz.reg = self&31
 		|uint64| fatindex = (self >> 15)&0xFFFF
 		rz = rz as (fatindex << 48)|asmreg|
@@ -663,4 +664,17 @@ function asmreg.Prm	(|asmparam|)
 	|| r = .reg
 	|| t = (self is Temp)<<31
 	return r ||| t ||| i
+
+
+
+datatype FatNopMode	(byte)
+	default 0
+	flags
+		Hard = 0
+		CanClose
+		Soft
+	
+	syntax is (|fatnopmode| f, |bool|)
+		return self&f
+		
 

@@ -796,7 +796,7 @@ So anything not 0 means "its OK"`
 			
 
 	function EditDraw (|FileRow| r, |int|)
-		require .drawme.LoadFile(r.location)
+		require .drawme.LoadFile(r.location, r)
 		.HideASM
 		return 1
 		

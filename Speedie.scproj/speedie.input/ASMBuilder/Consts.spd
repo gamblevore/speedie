@@ -55,7 +55,7 @@ extend Assembler
 		if K
 			return .LoadNumber(exp, K, srctype.specialreg, Reg)
 		reg.µType = SrcType
-		return .Zeros(reg)
+		return reg.zero
 	
 	
 	function TextConst (|Message| List,  |message| Orig,  |bool|)
@@ -64,14 +64,16 @@ extend Assembler
 		|| ValMsg = RegMsg.Next						#require
 		|| Value  = ValMsg.ASMConst
 		
-		|| src = .NumToReg(orig, RegMsg.Reg.textasm, value, datatypecode.uint64)
+		|| Reg = asmreg.textual
+		reg.reg = regmsg.reg
+		|| src = .NumToReg(orig, Reg, value, datatypecode.uint64)
 		|| fat = src.fat
 			fat.ConstFinish
 		return true
 	
 	
 	
-function message.ASMConst (|uint64|) 
+function message.ASMConst (|uint64|)
 	opt norefcounts
 	if (self == @unit)
 		.expect(@nil, "d")$

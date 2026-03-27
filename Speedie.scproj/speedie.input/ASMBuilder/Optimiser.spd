@@ -42,11 +42,15 @@ function fatasm.IsPartiable (|bool|)
 
 
 function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
+	if base is ContainsAddr
+		if dest is ContainsAddr // really what?
+/		return .ReadOrWrite(dest, exp, base, vara, nil)
+
 	|| k = .Const(vara, 2, false)
 		vara = nil
 	  else
 		k = 0
-
+	
 	if dest isnt set
 		return exp.VGET(dest, base, vara, k) * dest
 

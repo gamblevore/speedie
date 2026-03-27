@@ -13,9 +13,9 @@ class GraphicsEditor (GuiControl)
 	linkage
 		cpp_part Draw
 	|[image]|				Layers
-	|image| 				Merged
-	|file?| 				Backing
-	|int| 					BG
+	|image|					Merged
+	|file?|					Backing
+	|int|					BG
 	
 	constructor (|guicontrol| parent)
 		super.Constructor(parent)
@@ -170,10 +170,10 @@ class GraphicsEditor (GuiControl)
 		dest[] = .Merged.WriteQOI
 		
 		
-	function LoadFile (|string| path, |bool|)
-		|| data = path.Readall								#require
+	function LoadFile (|string| path, |message| Where=nil, |bool|)
+		|| data = path.Readall									#require
 		if path isa "png"
-			data = imagehelper.ConvertPNGToVOI(data)		#require
+			data = imagehelper.ConvertPNGToVOI(data, where)		#require
 		return .LoadImage(data, path)
 		
 

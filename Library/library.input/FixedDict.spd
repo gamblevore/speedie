@@ -12,9 +12,9 @@ class FixedDict
 	
 	constants
 		TypeValue	= 0
-		TypeObj     = 1
+		TypeObj		= 1
 		TypeStem	= 2
-		TypeDict    = 3
+		TypeDict	= 3
 	
 	constructor (|&nil| Value = nil, |Byte| type = 0)
 		cpp_part ConstructorValue

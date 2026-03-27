@@ -5,11 +5,10 @@
 //
 //function Object.ObjectTag (assigns:|byte|, |object?|)
 //	nil checker
-//	|| Old = (self|uint64| << 8) >> 8
+//	|| Old = (self|uint64| << 8) >> 8 // destroys object equality testing ;_;
 //		return (Old ||| (value|uint64|<<56))|object|
 
 
-// finish later
 module Effects
 	function DoFirework (|float| strength)
 		opt NoRefCounts
@@ -72,8 +71,9 @@ function PerryColorLineNum (GUITextLineBreakColor)
 		c.b = 0.75
 		c.g = 0.75
 		f = -f
-	if (m == @arg) and (f >= 0.25) and InBreakArea
-		f = 0.2
+	if (f >= 0.25) and (m == @arg)
+//		if InBreakArea
+			f = 0.275
 	c.a = f
 	return c
 

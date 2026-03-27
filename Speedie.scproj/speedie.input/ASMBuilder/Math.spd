@@ -36,12 +36,11 @@ extend Assembler
 		return .DoMathSub(exp, dest, fn)
 
 
-	helper DoMathSub (|message| exp,  |ASMReg| Mode,  |fn_opasm!| fn, |ASMReg|)
+	helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		opt norefcounts
 		|| ml = ASMReg()
 		|| mr = ASMReg()
 		|| First = exp.first!
-		|| dest = mode
 		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
 
 		|| Closer = .OpenVars
@@ -49,12 +48,15 @@ extend Assembler
 		if First.islast
 			ml = .µGetASM(first, dest)
 		  else
-			ml = .µGetRealOrExisting(First, dest)
-			if (dest is NewlyDeclared) and !(ml iz dest)
-				mr = dest
+			if dest isnt NewlyDeclared
+				ml = .µGetPrms(First, ml)
+			  else
+				ml = .µgetasm(first, dest)
+				ifn ml iz dest
+					mr = dest
 			mr = .µGetASM(exp.last!, mr)
 
-		
+
 		if dest is Discard
 			.AskNopTemp(ml)
 			.AskNopTemp(mr)
@@ -525,7 +527,7 @@ extend Assembler
 				return dest
 		  else
 			if (r iz l)
-				return .zeros(dest)
+				return dest.zero
 		
 		if l.IsFloat
 			return .FloatPlus(exp, dest, l, r)
@@ -689,7 +691,7 @@ extend Assembler
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitXor)
 		if (l iz r)
-			return .Zeros(dest)
+			return dest.Zero
 		if l.iszero
 			return r
 		if r.iszero
@@ -738,7 +740,7 @@ extend Assembler
 			if .NopConst(l, -1)
 				return r
 			if k == 0
-				return .zeros(dest)
+				return dest.zero
 		|| f = l.fat
 		if  f  and  (f isa asm.bnot or asm.qnot)  and  (f.prms[3]==-1) // now what?
 			// D = ~L & R
@@ -894,7 +896,7 @@ extend Assembler
 			return dest
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
-			return .zeros(dest)
+			return dest.zero
 
 		if down >= 64
 			down = 63
@@ -905,13 +907,6 @@ extend Assembler
 		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|) 
 		return fat.Vectorise(dest, asm.QFLG)
 
-
-	function Zeros (|asmreg| Info, |asmreg|)
-		Info.reg = 0
-		(Info isnt temp)
-		(Info is Const)
-		return Info
-				
 	
 	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)
 		opt inline

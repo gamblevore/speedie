@@ -13,7 +13,7 @@ datatype Syntax (Byte)
 		cpp_Part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion
 
-	inline Translateable (|bool|) 
+	inline Translateable (|bool|)
 		if self <= @Thg and self >= @tmp
 			return true
 
@@ -25,16 +25,16 @@ datatype Syntax (Byte)
 	inline NoChildren (|bool|)
 		return self >= @Cnj	and self <= @Bin
 
-	inline IsRel (|bool|) 
+	inline IsRel (|bool|)
 		return self >= @rel and self <= @yoda
 
-	inline IsAdj (|bool|) 
+	inline IsAdj (|bool|)
 		return self >= @adj and self <= @badj
 
-	inline IsList (|bool|) 
+	inline IsList (|bool|)
 		return self >= @bra and self <= @Arr
 
-	inline Message.Translateable (|bool|) 
+	inline Message.Translateable (|bool|)
 		return .Func.Translateable
 			
 	operator plus (|string| m, |message|)
@@ -48,25 +48,25 @@ datatype Syntax (Byte)
 		cpp_Part PlusNum
 		return .msg(m.render)
 		
-	function Name (|string|) 
+	function Name (|string|)
 		Opt NoRefCounts
 		if self
 			|| o = .obj
 				return o.name
 		return "child"
 	
-	function LongName (|string|) 
+	function LongName (|string|)
 		Opt NoRefCounts
 		if self
 			|| o = .obj
 				return o.longname
 		return "child"
 	
-	inline Obj (|syntaxobj|) 
+	inline Obj (|syntaxobj|)
 		return jeebox._FuncArray[self|int|]
 	
 	
-	inline Msg ( |string| name="", |Message| ) 
+	inline Msg ( |string| name="", |Message| )
 		return Message( nil, self, name )
 	
 	inline message.Msg ( |syntax| fn, |string| name="", |Message| )
@@ -77,16 +77,16 @@ datatype Syntax (Byte)
 	function Msg ( |int64| name, |Message| )
 		disabled "Use int64.msg instead"
 		
-	inline ExportAddr (assigns:|fpMsgRender|) 
+	inline ExportAddr (assigns:|fpMsgRender|)
 		Opt NoRefCounts
 		.obj!.exportaddr = Value
 	
-	inline ExportAddr (|fpMsgRender|) 
+	inline ExportAddr (|fpMsgRender|)
 		Opt NoRefCounts
 		return .obj!.exportaddr
 	
 
-	inline RenderAddr (|fpMsgRender|) 
+	inline RenderAddr (|fpMsgRender|)
 		Opt NoRefCounts
 		return .obj!.renderaddr
 	
@@ -99,7 +99,7 @@ datatype Syntax (Byte)
 			|| obj = jeebox._syxdict.valuelower(name)		#expect (where, "Unknown syntax " + name)
 			return obj.id
 			
-		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |int| ID,  |Syntax|) 
+		function StdNew (|fpMsgRender| msg, |string| Name, |String| LongName, |int| ID, |Syntax|)
 			|| result = Syntaxobj.new(msg, name, ID)
 			jeebox._syxdict[name] = result
 			jeebox._Funcarray[ID] = result
@@ -112,7 +112,7 @@ datatype Syntax (Byte)
 
 
 
-class SyntaxObj 
+class SyntaxObj
 	linkage
 		cpp_part Fn
 	visible			true
@@ -121,10 +121,10 @@ class SyntaxObj
 	|fpMsgRender|			ExportAddr
 	|String|				Name
 	|String|				LongName
-	|Syntax|            	ID
+	|Syntax|				ID
 
 
-	constructor (|fpMsgRender| msg, |string| name, |int| ID) 
+	constructor (|fpMsgRender| msg, |string| name, |int| ID)
 		.RenderAddr = msg
 		.Name		= Name
 		.ID			= ID|syntax|
@@ -132,7 +132,7 @@ class SyntaxObj
 	
 	
 	render 
-		if !fs_in 
+		if !fs_in
 			return .LongName.lowercase
 		fs_in.appendlower(.LongName)
 	

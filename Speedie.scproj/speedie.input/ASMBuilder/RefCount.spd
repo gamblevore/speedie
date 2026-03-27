@@ -5,7 +5,7 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
 	|| DestMsg = prms.first!
 	|| P = prms.second!
-	|| A = .µGetReal(DestMsg, ASMReg.AddrRequest temp p)
+	|| A = .µGetPrms(DestMsg, ASMReg.AddrRequest temp p)
 	|| B = .µ(P, ASMReg.AddrRequest)
 	if A iz B
 		return nil // wat?

@@ -601,24 +601,20 @@ function @assembler.PrintRegs
 		|| T = .sh.vtemps
 		|| X = D|||T
 		|| Prev = false
+		print "Regs: "
 		while ++i <= 31
 			|| test = 1<<i
 			if X&Test
 				if Prev
-					print ", "
-				  else
-					Prev = true
-				
-				print i 
+					print ",  "
+				Prev = true
+
 				ifn D&Test
-					print ": T"
+					print "t"
 				  elseif T&Test
-					print ": X"
+					print "x"
 				  else
-					print ": D"
+					print "r"
+				print i
 		printline
-				
-			
-			  
-			
 

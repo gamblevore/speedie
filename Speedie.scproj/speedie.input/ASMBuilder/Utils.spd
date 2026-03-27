@@ -102,7 +102,9 @@ function Assembler.ClearAllStructs (|message!| exp,  |bool|)
 function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|)
 	opt norefcounts
 	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
-		ASMType.AllocBearStruct(-1, exp.FlatLast, v.asm, fat.RegOnly(1)<<4)
+		|asmreg| vreg
+		vreg.reg = v
+		ASMType.AllocBearStruct(-1, exp.FlatLast, vreg, fat.RegOnly(1)<<4)
 		.SetRegister(v, nil, nil)
 	return true
 
@@ -200,6 +202,8 @@ function message.CallChainError (|string| name)
 
 
 function message.NOP2 (|&fatasm|)
-	return .ADDB(asmreg(1), 0)
+	|| r1 = 56|asmreg|
+	r1.reg = 1
+	return .ADDB(r1, 0)
 
 

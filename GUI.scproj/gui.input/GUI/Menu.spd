@@ -15,8 +15,8 @@ class Menu (ListView)
 		.MultiSelection = false
 		.OnKeyDown = keys
 		.ClipMode = ControlClipMode.SlideBackInWindow
-		.gnormal = ¥.Menus 
-		.gRowSel = ¥.MenuRowSel 
+		.gnormal = ¥.Menus
+		.gRowSel = ¥.MenuRowSel
 	
 	
 	behaviour RightClick

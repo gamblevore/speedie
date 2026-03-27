@@ -23,7 +23,7 @@ struct InlineInfo
 			if !v
 				0
 			  elseif r is Const 
-				sh.Decr(r.needfat, false)
+				sh.Decr(r.needfat, fatnopmode.hard)
 			  elseif r iz Ret
 				0
 			  else
@@ -81,13 +81,18 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	|int| ID = .inlinedepth
 	|| st = .inlinestate[ID+1]
 	st[0] = .inlinestate[ID]
+	st.ParentVars = .openvars
+	st.fn = fn
+	st.BranchDepth = 0
 	
-	if (dest isnt discard) and (!dest.reg)	  // (!dest.reg) or dest is temp    // are temps bad?
-		|| type = fn.ASMReturn
-			dest = .TempTyped(type, dest)	  // surely this is better temped?
-											  // is this about clobbering?
-											  // IDK... surely thats set on return?
-											  // we'll see... I guess.
+	dest.tmpcheck
+	if (dest isnt discard) and (!dest.reg or dest is temp)
+		debugat 0
+		dest = .CallFunc(prms, dest, fn)			// better to put this in the right place...
+		dest.tmpcheck
+													// also, temps force subfuncs to store all!
+			
+	st.Return = dest
 				
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
@@ -100,10 +105,6 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	dest.µtype = fn.ASMReturn.ASMRegType
 	if !dest.reg
 		(dest is discard)
-	st.fn = fn
-	st.Return = dest
-	st.ParentVars = .openvars
-	st.BranchDepth = 0
 	
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
@@ -124,7 +125,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	opt norefcounts
 	LL.Start = .curr
 
-	|SavedRegisters| svregs 
+	|SavedRegisters| svregs
 	|InlineInfo| Info
 
 	svregs.Collect(fn.args, self)
@@ -224,7 +225,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 
 function InlineFinish (|fatrange| R, |savedregisters| sv, |ASMReg|)
-	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
+	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == 133169
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
@@ -235,9 +236,9 @@ function InlineFinish (|fatrange| R, |savedregisters| sv, |ASMReg|)
 				rz = rz.simplify
 			  else
 				|| dest = s.inputfat(0)
-					rz = dest.info 
+					rz = dest.info
 				  else
-					rz = s.prms[0]|int|.asm
+					rz.reg = s.asmreg(0) // what about the temp?
 					rz.µType = .state.return.µType
 			s.SetOp = asm.jump
 			s.JumpPrm = 1

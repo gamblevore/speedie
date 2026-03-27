@@ -1,7 +1,7 @@
 
 
 struct InlineState
-	|scfunction!--|	Fn    
+	|scfunction!--|	Fn
 	|asmreg|		Return
 	|uint64|		ParentVars
 	|byte|			BranchDepth
@@ -21,8 +21,8 @@ struct Assembler
 	linkage: cpp_part Pac
 
 	|InlineState[8]|			InlineState
-	|uint16| 					BasicBlock
-	|uint16| 					BasicParent
+	|uint16|					BasicBlock
+	|uint16|					BasicParent
 	|byte|						BasicDepth
 	|byte|						InlineDepth
 	|byte|						DeepestInline
@@ -42,9 +42,9 @@ struct Assembler
 	|&FatASM|					FuncStart_
 	|&FatASM|					Start
 	|&FatASM|					Curr_
-	|&FatASM|					End  
+	|&FatASM|					End
 
-	|FatASM| 					Zero
+	|FatASM|					Zero
 	|RegFile|					Regs
 
 	constants
@@ -58,7 +58,7 @@ struct Assembler
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|uint16|					StringsOutOfRange
-		|jbin?|						DebugDecls 
+		|jbin?|						DebugDecls
 		|uint16[16K]|				BlockParents
 		
 		function ClassLayout (|jbin| j)
@@ -75,7 +75,7 @@ struct Assembler
 					j.add(@char)
 
 
-		function DebugClassesAndGlobals (|jbin| j) 
+		function DebugClassesAndGlobals (|jbin| j)
 			opt norefcounts
 			j.Enter(@msg, "class")
 			.ClassLayout(j)
@@ -94,8 +94,8 @@ struct Assembler
 	function fn (|scfunction!--|)
 		return .state.fn
 	
-    function Curr (|&fatasm|)
-        return .curr_
+	function Curr (|&fatasm|)
+		return .curr_
 
 	function FuncStart (|&fatasm|)
 		return .FuncStart_ + 1
@@ -284,7 +284,7 @@ struct Assembler
 		return .TempOnly(t)
 	
 	
-	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
+	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)		// .needreg
 		opt norefcounts
 		if t isnt textual
 			// what if there is a type and its different?
@@ -293,7 +293,7 @@ struct Assembler
 		return .TempOnly(t)
 
 
-	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
+	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)						// .needreg
 		opt norefcounts
 		if t.reg
 			return t
@@ -356,18 +356,18 @@ struct Assembler
 	
 	function NopConst (|asmreg| R)
 		require r.reg
-		target debug: if r isnt Const 		// hah
+		target debug: if r isnt Const		// hah
 
 		if  R is temp  and  r isnt blocknop	// don't think we can do better. not easily. 
 			.AskNop(r.NeedFAT)				// for example .iscurr(f) gets params used by future stuff
 	
 	
 	function Nop (|FATASM| ToNop)
-		return .nop_sub(ToNop, false, 0)
+		return .nop_sub(ToNop, fatnopmode.hard, 0)
 	
 	
 	function SoftNop (|FATASM| ToNop)
-		return .nop_sub(ToNop, true, 0)
+		return .nop_sub(ToNop, fatnopmode.soft, 0)
 	
 
 	function ParentBlock (|uint16| B, |uint16|)
@@ -375,10 +375,13 @@ struct Assembler
 		return BlockParents[B&(16K-1)]
 	
 	
-	function nop_sub (|FATASM| Fat, |bool| Soft,  |int| Depth)
+	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode,  |int| Depth=0)
 		|| info = fat.info
-		if  info is temp  and  info isnt OKAsTemp
-			.CloseOneVar(nil, 1<<info.reg)
+
+//		Not entirely sure how to go about this. Closing temps isnt so important
+//		for optimisation, but terrible if I get this wrong.
+		if  info is temp  and  nopmode is CanClose
+			.CloseOneVar(nil, 1<<info.reg)		// Maybe remove this instead
 
 		|| Type = asm.noop
 		|| Break = fat.ASMIndex
@@ -398,7 +401,7 @@ struct Assembler
 		if depth > 7
 		
 		for f.FatInputs in fat
-			.Decr(f, Soft, depth)
+			.Decr(f, NopMode, depth)
 		
 		for v.RegOutputs in fat
 			v &= 31
@@ -440,7 +443,7 @@ struct Assembler
 		if oldi and (NopDest is AllowNopDest)
 			|| old = start + oldi
 			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
-				sh.nop(old)
+				sh.nop_sub(old, fatnopmode.hard)
 		(NopDest isnt AllowNopDest)
 		return NopDest
 
@@ -466,13 +469,13 @@ struct Assembler
 			return f.const == k
 	
 	
-	function Decr (|?&fatasm| f, |bool| Soft, |int| Depth=0)
+	function Decr (|?&fatasm| f, |fatnopmode| Mode, |int| Depth=0)
 		if f
 			|| C = f.µrefcount
 			C -= (C > 0)
 			f.µrefcount = C
-			if !soft and C <= 0
-				.nop_sub(f, soft, depth)
+			if (mode isnt soft) and C <= 0
+				.nop_sub(f, mode, depth)
 	
 	
 	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
@@ -488,12 +491,8 @@ struct Assembler
 	
 	
 	function SoftNopRange (|fatasm| Start, |fatasm| After)
-		opt inline
-		.NopRange(start, after, true)
-	
-	function NopRange (|fatasm| Start, |fatasm| After, |bool| Soft=false)
 		while start < After
-			.nop_sub(--After, Soft, 0)
+			.nop_sub(--After, fatnopmode.soft, 0)
 	
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -537,10 +536,10 @@ struct Assembler
 		theres also references...
 		
 		A+B: nil
-		A:   reg1
-		B:	 asmreg.into // can't pass B, so pass a copy?
-		0:   asmreg.into // if altered or ref
-		0:   nil         // otherwise
+		A:	reg1
+		B:	asmreg.into	// can't pass B, so pass a copy?
+		0:	asmreg.into	// if altered or ref
+		0:	nil			// otherwise
 	*/
 
 		|| OV = .OpenVars
@@ -552,21 +551,6 @@ struct Assembler
 			return .CloseVars(ov, nil, r)
 		(dest isnt forceinto)
 		return .Assign(exp, dest, r)
-
-
-	function µGetRealOrExisting (|message| exp, |asmreg| Dest,  |asmreg|)
-		#!"There could be a function call that smashes the first temp"
-		#!"for example:  y = (x+1) - .func()"
-		// (but what if there is not? Can we tell ahead of time?)
-
-		|| R = .ExistingVar(exp)
-		if r and (r isnt temp or r is okastemp)
-			return r
-		
-		if dest isnt NewlyDeclared
-			dest = nil // clear for .GetReal
-		
-		return .µGetReal(exp, dest)
 
 
 	function uint64.AddReg (|asmreg| V, |uint64|)
@@ -581,70 +565,52 @@ struct Assembler
 			T = 0
 		  elseif !IsTemp
 			T = D
-//		  else
-//			D = 0
 		return self ||| T
 			
 
-	function µGetReal (|message| exp,  |asmreg| ModeOnly,  |asmreg|)
-		// "Real" means var will remain alive, as vdecl or vtemp.
+	function µGetPrms (|message| exp,  |asmreg| Dest,  |asmreg|)
+		// Returns a var that will remain alive, as vdecl or vtemp.
 		// This is used for passing params to funcs, or to anything func-like.
-		
 		target debug
 			|| trap = ++ASMTrapper
 			if trap == -1
+			Dest.TmpCheck(true)
 
 		|| OV = .OpenVars
 
-		if ModeOnly is NewlyDeclared									// || x = (y + 1) + (z + 1)
-			ModeOnly = ModeOnly asnt ASMReg.NewlyDeclared
+		if Dest is NewlyDeclared									// || x = (y + 1) + (z + 1)
+			Dest = Dest asnt ASMReg.NewlyDeclared
+		  elseif Dest is temp										//	x = (y + 1) + (z + 1)
+			Dest = .TempOnly(Dest)
 		  else
-			if ModeOnly is temp											//    x = (y + 1) + (z + 1)
-				ModeOnly = .TempOnly(ModeOnly)
-	//			asmtodo: what about doing all .declareme? simpler? once we have
-	//			self-tests working, we can start playing around and altering this stuff...
-	//			probAbly need to keep it marked as temp, though. More nopping.
-			  else
-				ModeOnly = .DeclareMe(exp, ModeOnly) as ModeOnly
-				// why are we saying this is temp????
-				// this is for params, right?
-				// something to do with gtab maybe? or... nopping?
-				(modeonly is Temp)
-			(modeonly is OKAsTemp)
+			// when compiling:		x()[y()] = z()
+			// function y() will destroy temps in z() and x(), so we need (temp) declarations.
+			// but these are functionally temps.
+			Dest = .DeclareMe(exp, Dest)
+			(Dest is Temp)
+			(Dest is OKAsTemp)
 		
 		target debug
-			ModeOnly.TmpCheck
+			Dest.TmpCheck
 
-		|| r = .µGetASM(Exp, ModeOnly)
+		|| r = .µGetASM(Exp, Dest)
 		ov = ov.AddReg(R)
 		// this will close all vars, except the one we just got back!
 		return .CloseVars(ov, nil, r)
 		
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
-		description "Same as µGetASM, except this closes temp vars for reuse." 
+		description "Same as µGetASM, except this closes temp vars for reuse."
 		|| Closer = .OpenVars
 		|| v = .µGetASM(exp, dest)
 		return .CloseVars(Closer, nil, v)
 
 
-	function µPrms (|message| exp, |scdecl!| A, |asmreg|)
-		// why is this a temp? each should be real.
-		// if the decl is unused... we can undeclare it after.
-		// the problem is that memory-reads (and other stuff) can nop stuff.
-		// and nopping will undeclare a temp.
-		
-		// we already defined the number of regs to save, so that shouldn't happen.
-		// and we already open/close vars in the function!
-		
-		// so... just use a decl? makes things simpler??? right?
-		
+	function µFuncPrms (|message| exp, |scdecl!| A, |asmreg|)
 		|asmreg| Mode = nil //exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
 
-
-//		|| r = .µGetASM(Exp, ModeOnly)
-		|| r = .µGetReal(exp, Mode)
+		|| r = .µGetPrms(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
 			error (exp|object|)
 		return r.incr
@@ -652,7 +618,7 @@ struct Assembler
 
 	function µTrin (|message| exp, |asmreg|)
 		opt norefcounts
-		return .µGetReal(exp, exp.AllowsTemp) as asmreg.Textual
+		return .µGetPrms(exp, exp.AllowsTemp) as asmreg.Textual
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -676,13 +642,13 @@ struct Assembler
 		
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
-		cpp_part GetASM 
+		cpp_part GetASM
 		
 		target debug
 			dest.TmpCheck
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if trap == 9282 or stacksize > 30 // ugh
+			if trap == 977 or stacksize > 30 // ugh
 				
 		  else
 			opt inline
@@ -730,7 +696,7 @@ struct Assembler
 			SourceMap.Positions = FastString()
 	
 	
-	function ASMInit
+	function ASMInit 
 		opt norefcounts
 		require !asmtype.ReadASM[0] // set in ASMType.InitAccess
 		if options.TargetDebug
@@ -763,7 +729,7 @@ struct Assembler
 		asm.encoders[op] = fatasm.KNST_Encoder
 		
 	
-	function InitAndStartFunc (|scfunction| fn) // init 
+	function InitAndStartFunc (|scfunction| fn)			// init
 		opt norefcounts
 		
 		target debug
@@ -788,11 +754,11 @@ struct Assembler
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
 		.InlineDepthLimit = 3
-		.BasicBlock = 1						// good to start these at 1.
+		.BasicBlock = 1							// good to start these at 1.
 		.zero.info = AsmReg()
 		.Guard
 		fn.µstart = .Index
-		.VDecls = 1							// set after .FuncStart
+		.VDecls = 1								// set after .FuncStart
 		.AddFuncParams(fn)
 
 

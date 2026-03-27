@@ -35,7 +35,7 @@ class FlowControl
 		|| w = .Write
 			w <~ .buff
 		.buff.Curr = .buff.start
-			 
+	
 
 	destructor
 		flow off
@@ -200,8 +200,9 @@ class FlowControl
 			.flow = FlowControl(.askpath(name,false), .askpath(name,true))
 
 
-		function Attempt (|string| name,  |FlowControlStopper|)
+		function Attempt (|string| name, |FlowControlStopper|)
 			flow off
+			(name)
 			target flow
 				return .Activate(name)
 

@@ -23,7 +23,7 @@ class DataObject
 		.Kind = datatypecode.s64
 		.PrivValue = v
 	
-	constructor (|bool| b)  // could be an issue as most things convert to a bool...
+	constructor (|bool| b)					// could be an issue as most things convert to a bool...
 		cpp_part ConstructorBool
 		.Kind = datatypecode.bool
 		.PrivValue = b|int|
@@ -43,7 +43,7 @@ class DataObject
 		.Kind = datatypecode._voidptr
 		.PrivValue = p|int64|
 
-	syntax access (||) // for floats... use DataObjectFloat
+	syntax access (||)						// for floats... use DataObjectFloat
 		inlined
 		if self
 			return .PrivValue

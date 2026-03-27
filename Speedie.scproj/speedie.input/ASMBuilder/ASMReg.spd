@@ -39,12 +39,13 @@ datatype ASMReg (uint64)
 		VerySpecial
 		Const
 //		NotNil // probably quite a big addition. Will need tests...
-		AddrNeed    = [AddrRequest, AddrForceRequest, AddrNoFiddle]
-		Exit        = [ExitFunction, ExitAtAll]
-		SetAlways   = Textual ||| Set  // reuse const
+		TempFlags	= OKAsTemp ||| Temp
+		AddrNeed	= [AddrRequest, AddrForceRequest, AddrNoFiddle]
+		Exit		= [ExitFunction, ExitAtAll]
+		SetAlways	= Textual ||| Set  // reuse const
 		FlagsToRemove = Const ||| discard
 		// don't go above 47
-		Zero	    = Const   ||| 56 ||| param		// 56 == datatypecode.uint64
+		Zero		= Const	||| 56 ||| param		// 56 == datatypecode.uint64
 
 	
 
@@ -79,7 +80,7 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function Simplify (|asmreg|)
-		return .ReallySimplify as (self & (Temp as okastemp))
+		return .ReallySimplify as (self & tempflags) // okastemp
 
 	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|
@@ -106,6 +107,13 @@ datatype ASMReg (uint64)
 				.NeedFAT
 		
 
+	function Zero (|asmreg|)
+		// keep the fatasm... like for .write() which returns reg0.
+		.reg = 0
+		is const
+		isnt TempFlags
+		return self
+		
 	function IsZero (|bool|)
 		if .reg == 0 // what if "const" needs fixing?
 			return true
@@ -224,8 +232,7 @@ datatype ASMReg (uint64)
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)
 			return self as r
-		  else
-			return self asnt r
+		return self asnt r
 		
 	function datatypecode.zero (|asmreg|)
 		|| K = asmreg.Const
@@ -247,15 +254,18 @@ datatype ASMReg (uint64)
 		|| Bugged = value&31
 		self &= ~(31 << 11)|asmreg|
 		(self as= (Bugged << 11)|asmreg|)
-		(self is temp) = (value >> 31)
-		target debug: if .reg != Bugged // what?
+		if value >> 31
+			(self is temp)
+			if value < 26
+				(self is okastemp) // no other way.
 		return self
 
 	
 	function Reg (assigns:|asmreg|, |asmreg|)
+		// we could do all of this in two bit-operations...
+		// just clear, then copy
 		.reg = value.reg
-		(self is temp) = (value is temp)
-		(self is OKAsTemp) = (value is OKAsTemp)
+		self = .temp(value)
 		.fatindex = value.fatindex
 		return self
 
@@ -290,15 +300,17 @@ datatype ASMReg (uint64)
 			is temp
 		return self
 	
+	function Temp (|asmreg| Other, |asmreg|)
+		self &=~ TempFlags
+		(self as= other&tempflags)
+		return self
+		
 
 	syntax cast (|int|)
 		disabled "use .reg"
 		
 	operator bitand (|asmreg| A, |asmreg|)
 		return (self|int64| & A|int64|)|asmreg|
-
-//	operator xor (|asmreg| A, |asmreg|)
-//		return (self|int64| xor A|int64|)|asmreg|
 	
 	operator as (|asmreg| A, |asmreg|)
 		return (self|int64| ||| A|int64|)|asmreg|
@@ -314,7 +326,7 @@ datatype ASMReg (uint64)
 	function TryReg (assigns:|asmreg| dest, |asmreg|)
 		if .reg or dest isnt temp
 			return self
-		.reg = dest 
+		.reg = dest
 		return self
 	
 	target debug {
@@ -328,8 +340,10 @@ datatype ASMReg (uint64)
 				""
 	}
 	
-	function TmpCheck (|bool|)
+	function TmpCheck (|bool| AllowZero=false, |bool|)
 		|| R = .reg
+		if !r and AllowZero
+			return true
 		|| IsTmp = self is temp and self isnt OKAsTemp
 		|| Big = R >= 26
 		if big == IsTmp or (big and self is temp)
@@ -345,23 +359,3 @@ datatype ASMReg (uint64)
 		function New (|asmreg|)
 			return Zero
 		
-		function New (|int| i, |asmreg|)
-			rz = 56|asmreg|
-			rz.reg = i
-		
-	
-
-// we could do this instead (ON RENDER?)
-// (self-1)&31!!
-// this will "rotate" 0 back to 31 and 1 to 0.
-
-function int.asm (|asmreg|)
-	cpp_part ToASM
-	rz.reg = self // (self - 1)&31 // would be better?
-
-
-function int.TextASM (|asmreg|)
-	rz.reg = self // (self - 1)&31 // would be better?
-	(rz is textual)
-
-

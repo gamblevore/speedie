@@ -98,7 +98,7 @@ function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |scfunction| fn,
 	trin = name.next(@prm)$
 	|| op = instruction[name!]$
 	
-	dest = fn.ASMReturn(dest) // .ReallySimplify // not sure I should do simplify? hmmm. unclear.
+	dest = fn.ASMReturn(dest)
 	return .TheTrinity(where.last, trin, dest, op.opcode)
 	
 

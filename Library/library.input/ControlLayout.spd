@@ -29,7 +29,7 @@ insertion
 	inside	_0.insidelayout
 	above	ControlPoint.After.layout(_0)
 	under	ControlPoint.Before.layout(-(_0))
-	long	ControlPoint.length.layout(_0) 
+	long	ControlPoint.length.layout(_0)
 //	pc		Controlpoint.percent.layout(_0*64K)
 	
 
@@ -79,18 +79,18 @@ function ivec2.Layout (|controlrect|)
 datatype ControlLine (ivec2)
 	linkage:cpp_part CL2
 	
-	operator by (|ControlLine| B, |ControlRect|)
+	operator by (|ControlLine| B,	|ControlRect|)
 		cpp_part By
 		return (.x,b.x,   .y,b.y)|ControlRect|
-	operator by (|Controlpoint| B, |ControlRect|)
+	operator by (|Controlpoint| B,	|ControlRect|)
 		cpp_part ByPoint
 		inlined
 		return self by b.expand
-	operator by (|intrange| B,    |ControlRect|)
+	operator by (|intrange| B,		|ControlRect|)
 		cpp_part ByRange
 		inlined
 		return self by (b<<4)|controlline|
-	operator back (|int| N, |controlline|)
+	operator back (|int| N,			|controlline|)
 		inlined
 		.y = .y|controlpoint| - n
 		return self
@@ -175,15 +175,15 @@ datatype ControlPoint (int)
 	constants
 		|ControlPoint|
 		Low		= 0
-		High 	= 2
-		Before	= 4 
-		After   = 6
+		High	= 2
+		Before	= 4
+		After	= 6
 		Centered = 7
 //		Percent = 8
 		Length	= 10
 
 
-datatype ControlClipMode (byte) 
+datatype ControlClipMode (byte)
 	Flags
 		SlideBackInParent
 		SlideBackInWindow

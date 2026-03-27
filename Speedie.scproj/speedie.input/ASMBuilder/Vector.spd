@@ -29,7 +29,7 @@ extend Assembler
 			return NewValue
 		
 		if dest is Discard
-			dest = .zeros(dest)
+			dest = dest.zero
 
 		src = vget.asmreg(1)
 		.SoftNop(vget)
@@ -47,7 +47,7 @@ extend Assembler
 		|asmreg[4]| VV
 		|| Count = 0
 		for s.fast in exp
-			vv[Count++] = .µGetReal(s, s.AllowsTemp)
+			vv[Count++] = .µGetPrms(s, s.AllowsTemp)
 		
 		|| T = vv[0].µType
 		Count += (count == 3)

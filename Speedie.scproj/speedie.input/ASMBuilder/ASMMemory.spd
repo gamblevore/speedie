@@ -66,8 +66,8 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 				if bs is temp
 					.AskNop(bs, gobj)
 				return gobj
-				
-
+			
+			
 			|| K = bs.Const + ((index-1) << 3)
 			if K <= 20~bits
 				if Compiler is Hungry
@@ -173,8 +173,7 @@ function ReadOrWrite (|| dest,  |message| exp,  || base,  || VarAdd,  |scdecl| T
 	(dest isnt Const)
 	|| fat = .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index)
 	if dest is set
-		dest.reg = 0
-		(dest is const)
+		dest = dest.zero
 	return fat*dest
 
 

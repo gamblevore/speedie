@@ -21,7 +21,7 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 		rz |= 16
 	
 	for p.fast in prms
-		|int64| v = .µPrms(p!, args[i++]!).reg
+		|int64| v = .µFuncPrms(p!, args[i++]!).reg
 		sh += 5
 		rz |= v << sh
 	
@@ -45,7 +45,7 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		for p.fast in prms
 			|| ty = p.ASMDecl
 			if ty.SpecialReg|int| != Ints
-				|int64| v = .µPrms(p!, args[i]!).reg
+				|int64| v = .µFuncPrms(p!, args[i]!).reg
 				sh -= 5
 				rz  |=  v << sh
 				ic += ints
@@ -62,26 +62,36 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		rz |= (17-ic) << 6
 
 
+function message.RegCheck (|int| Bad)
+	if bad
+		error (self, "Too many registers in use. No space for result.")
+
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	opt norefcounts
 	.ASMReach(fn)
-	|| vd = .VDecls
-	|| v = vd.log2					// we can't use .declareme, .log2 is used to protect the vars. 
-	|| diff = (!v or dest.reg != v)
-	v += diff
+	|uint| v = 0
 	
-	vd |= 1<<v
-	.Vdecls = vd
+	|| ret = .state.return
+	if ret and (dest is ExitAtAll)
+		v = ret.reg
+		v ?= .state.parentvars|uint|.log2 + 1
+		dest = dest.Temp(ret)
+	  else
+		|| vd = .VDecls
+		v = vd.log2					// we can't use .declareme, .log2 is used to protect the vars. 
+		if v == 0 or dest.reg != v
+			v++
+		vd |= 1<<v
+		.Vdecls = vd
+		dest &=~ asmreg.tempflags
+		exp.RegCheck(vd & .vtemps)
 	
-	check ((v < 32) and !(vd & .vtemps)) (exp, "Too many registers in use. No space for result.")
-	if (dest is ExitAtAll)
-		if .state.return
-			v = 1 max (.state.parentvars|uint|.log2) // a simple max will fix this?
+	exp.RegCheck((v >= 32)|int|)
 	dest.reg = v
 	
 	|| ty = fn.ASMReturn(dest)
-	return ty.ReallySimplify
+	return ty.Simplify
 
 
 function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
@@ -147,33 +157,47 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
+function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |asmreg|)				// dofunction function
+	if !.InlineDepth
+		|| reason = ("Unable to inline function", "Inline depth too great")(.EntireInlineFailed<2)
+		error (exp, reason)
+	.EntireInlineFailed = 1 + !DepthOK
+	return asmreg()
+
+
+
+function assembler.DepthOK (|scfunction| fn, |bool|)
+	opt inline
+	return .InlineDepth < (.InlineDepthLimit + (fn is linkinline)|uint|)
+
+
+function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
+	rz = fn.FPackID + 31
+	if rz <= 31							// failed!
+		if !Compiler.InPerry					// shut the compiler up
+			if !fn.islibrary or !.state.fn.islibrary
+				error (exp, "Missing PackID[1]")
+		rz = 0xFFFF	
+
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
 	
 	.parentsanity
+	
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
-		
+			
 		if  fn isnt CantInline  and  fn isnt cpp
-			|| DepthOK = .InlineDepth < (.InlineDepthLimit + (fn is linkinline)|uint|)
+			|| DepthOK = .Depthok(fn)
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
-			
 			if fn is LinkInline
-				if !.InlineDepth
-					|| reason = ("Unable to inline function", "Inline depth too great")(.EntireInlineFailed<2)
-					error (exp, reason)
-				.EntireInlineFailed = 1 + !DepthOK
-				return asmreg()
+				return .CantLinkInline(exp, depthok)
 		
-		TableID = fn.FPackID + 31
-		if tableid <= 31							// failed!
-			if !fn.islibrary or !.state.fn.islibrary
-				error (exp, "Missing PackID[1]")
-			tableid = 0xFFFF
+		TableID = .asmtableid(exp, fn)
 		
 	  else // function pointers
 		|| f = exp.first!
@@ -182,6 +206,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		fn = dcl.Type.FuncProto						#expect (exp)
 
 	dest = .CallFunc(exp, dest, fn)
+
 	|| Start = .curr
 	.CurrFuncGrab++
 	

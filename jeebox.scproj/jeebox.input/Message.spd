@@ -1178,10 +1178,10 @@ Message is also:
 
 	function Contains (|ind| p, |bool| AllowJustAfter=false, |bool|)
 		cpp_part ContainsInd
-		opt norefcounts // we want to put textview's insertion after a name and still find it
-					    // like: abc      // abc is found still.   
-					    //			^
-		return .position <= p and (.after+AllowJustAfter) > p 
+		opt norefcounts	// we want to put textview's insertion after a name and still find it
+						// like: abc      // abc is found still.
+						//			^
+		return .position <= p and (.after+AllowJustAfter) > p
 		
 	operator In (|syntax| f, |bool|)
 		opt norefcounts

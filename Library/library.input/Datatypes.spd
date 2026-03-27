@@ -12,7 +12,7 @@ datatype int
 	default 0
 
 	constants
-		|int| 
+		|int|
 		Max = 0x7FFFffff
 		Min = 0x80000000
 
@@ -30,10 +30,9 @@ datatype int
 		return self - (self mod to)
 	
 	operator Div (|int| D, |float|)
-		opt inline
 		inlined
 		return self|float| / d|float|
-		 
+		
 	syntax compare (|string| s, |int|)
 		inlined
 		return self - s.length
@@ -48,7 +47,7 @@ datatype int
 
 	syntax access (|int| bit, assigns:|bool|, |int|)
 		|| mask = (1<<bit)
-		return (self &~ mask) ||| (value|int| << bit) 
+		return (self &~ mask) ||| (value|int| << bit)
 
 	operator isa (|uint| n, |bool|)
 		inlined

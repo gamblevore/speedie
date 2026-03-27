@@ -296,6 +296,9 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 		|| oof = srf.Const << sh
 		K = (oof|int64| >> sh, oof|uint64| >> sh)(dest.Signed) // shift up and down
 
+	if srf._const == K // haha.
+		return srf.info
+	
 	.NopConst(from)
 	return .NumToReg(exp, dest, K, new)
 
@@ -311,7 +314,7 @@ function SetRel (fn_asm)						// function relset (
 
 	exp = exp.last!
 	dest = nil|asmreg| temp a
-	|| Src = .µGetReal(exp, dest)
+	|| Src = .µGetPrms(exp, dest)
 	(Src is SetAlways)
 	.µ(A, Src)
 	return asmreg.discard
@@ -455,7 +458,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
 		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
 															// So we simplify
-	|| base = .µGetReal(f, Mode)							// x = a.b[0]
+	|| base = .µGetPrms(f, Mode)							// x = a.b[0]
 	|| vara = .µGetASM(sc)
 
 	|| TyA = d.ASMRegType
@@ -814,6 +817,7 @@ function ExistingVar (|message| m, |asmreg|)
 	return .MegaNumFinder(d.ExportPosition, d.SpecialReg, d.mu.DataType)
 
 
+
 function Str (fn_asm)
 	opt	norefcounts
 	dest = .TempOnly(dest)
@@ -837,8 +841,6 @@ function Str (fn_asm)
 
 
 helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
-	// seems to be overwriting good registers?
-	// its going into t31? but we have somerthing there already?
 	|| T = src.BasicVec.reg(0)
 	T = .TempOnly(T)
 	|| Mode = (1<<2) + (1<<5) + (1<<8) + (1<<11)
@@ -871,7 +873,7 @@ function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
 	|| rr = T.reg
 		|| Ret = .State.Return
 		if rr == ret.reg
-			(T is temp) = (ret is temp)
+			t = t.temp(ret)
 	  else
 		(t is const)
 		

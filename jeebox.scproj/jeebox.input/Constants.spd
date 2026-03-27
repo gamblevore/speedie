@@ -7,40 +7,40 @@
 
 
 Module Jeebox
-	|SyntaxObj[64]|             _FuncArray
+	|SyntaxObj[64]|				_FuncArray
 	|Dictionary of SyntaxObj|	_SyxDict = Dictionary.New
 	linkage
 		cpp_part Constants
 	
 	|| EscapeStr = [
-		"\00"  : `\00` // just for escaping, not unescaping
-		"\0A"  : `\n`
-		"\0D"  : `\r`
-		"\09"  : `\t`
-		`"`    : `\"`
-		`'`    : `\'`
-		`\`    : `\\`
-		`&#`   : `\&#`
+		"\00"	: `\00` // just for escaping, not unescaping
+		"\0A"	: `\n`
+		"\0D"	: `\r`
+		"\09"	: `\t`
+		`"`		: `\"`
+		`'`		: `\'`
+		`\`		: `\\`
+		`&#`	: `\&#`
 	]
 	
 
 	|| XML_EscapeStr = [
-		"&"    : `&amp;` 
-		"'"    : `&apos;` 
-		"\""   : `&quot;` 
-		"<"    : `&lt;` 
-		">"    : `&gt;`
+		"&"		: `&amp;`
+		"'"		: `&apos;`
+		"\""	: `&quot;`
+		"<"		: `&lt;`
+		">"		: `&gt;`
 	]
 
 	
 	|| JS_EscapeStr = [
-		"\08"  : `\b`
-		"\0C"  : `\f` 
-		"\0A"  : `\n` 
-		"\0D"  : `\r` 
-		"\09"  : `\t`
-		"\""   : `\"`
-		"\\"   : `\\`
+		"\08"	: `\b`
+		"\0C"	: `\f`
+		"\0A"	: `\n`
+		"\0D"	: `\r`
+		"\09"	: `\t`
+		"\""	: `\"`
+		"\\"	: `\\`
 	]
 	
 	|dictionary of string| UnEscapeStr
@@ -68,10 +68,10 @@ Module Jeebox
 		.EscapeChr = dictionary.Copy(.EscapeStr!)
 		.EscapeStr[`$`] = `\$`
 		.UnEscapeStr		= dictionary.Reverse(.EscapeStr!)			// unify data
-		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr!)		// unify data 
-		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr!)		// unify data 
+		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr!)		// unify data
+		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr!)		// unify data
 		.EscapeChr![`"`]	= nil|string|
-		.EscapeChr![`$`] 	= nil|string|
+		.EscapeChr![`$`]	= nil|string|
 
 		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
 		.Unescapestr![`\`]	= ""
