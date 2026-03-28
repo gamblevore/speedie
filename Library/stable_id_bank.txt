@@ -554,6 +554,7 @@ GUI_Sty_Width
 GUI_SystemCursor_Get
 GUI_SystemCursor_Use
 GUI_TFF_Tab
+GUI_Text_AddBreak
 GUI_Text_AddErrorToLine
 GUI_Text_AutoCompleteBack
 GUI_Text_AutoCompleteBackSet
@@ -604,7 +605,6 @@ GUI_Text_MessageWithin
 GUI_Text_MouseDown
 GUI_Text_MouseMove
 GUI_Text_MoveSelection
-GUI_Text_NeedFirst
 GUI_Text_Parse
 GUI_Text_ParsedMessage
 GUI_Text_Path
@@ -624,7 +624,6 @@ GUI_Text_Show
 GUI_Text_ShowAndSelect
 GUI_Text_ShowExtraInfoAtPos
 GUI_Text_ShowNextParseError
-GUI_Text_StartAtInt
 GUI_Text_StartSet
 GUI_Text_SyntacticEndOfLine_
 GUI_Text_TextLeft
@@ -650,13 +649,10 @@ GUI_VObject_Destructor
 GUI_VObject_OverlapsBlock
 GUI_VObject_OverlapsRect
 GUI_VObject_SizeSet
-GUI_VObject_Step
 GUI_VObject_SyntaxIsSet
 GUI_VObject_Towards
 GUI_VObject__Box
 GUI_VObject__Size2D
-GUI_VObject_left
-GUI_VObject_right
 GUI_VShapes__Black
 GUI_VShapes__Box
 GUI_VShapes__CloudBubble
