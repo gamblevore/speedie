@@ -25,15 +25,15 @@ class Error (Message)
 		.position = -1
 		.node = node
 		.severity = level
-		.name = desc // sigh
+		.name = desc
 		.path = path
 		.when = date.now
-		.func = @sstr // whatever
+		.func = @sstr
 		.UpgradeWithNode
 	
 	
 	constructor
-		cpp_part Nothing // Not an error actually.
+		cpp_part Nothing								// Not an error actually.
 		super.constructor
 		.position = -1
 		.severity = ErrorSeverity.ok
@@ -41,18 +41,18 @@ class Error (Message)
 		.func = @arg
 
 
-	constructor (|error| orig) 
-		description "Error Copier" 
+	constructor (|error| orig)
+		description "Error Copier"
 		cpp_Part Copy
 		super.constructor
 		.position = orig.position
 		.node = orig.node
 		.severity = orig.severity
-		.name = orig.name // sigh
+		.name = orig.name
 		.path = orig.path
 		.OriginalData = orig.OriginalData
 		.when = orig.when
-		.func = @sstr // whatever
+		.func = @sstr
 	
 	
 	function UpgradeWithNode
@@ -72,16 +72,13 @@ class Error (Message)
 		return self and .ErrorFlags&F
 		
 	syntax is (|ErrorFlags|F, assigns:|bool|)
-		if Value
-			.ErrorFlags |= f
-		  else
-			.ErrorFlags &= ~F
+		.ErrorFlags = (.ErrorFlags & ~F) ||| (F * value)
 	
 	function LinePos (|string| data, |int|)
 		if (.HasPosition)
 			return data[ 0, .Position ].LineCount
 
-	function HasPosition (|bool|)
+	inline HasPosition (|bool|)
 		return .Position >= 0 
 		
 	function ShiftPosition (|int| i)
@@ -91,13 +88,13 @@ class Error (Message)
 			node.position += i
 	
 	
-	function IsWarning (|bool|)
+	inline IsWarning (|bool|)
 		return (.severity <= errorseverity.Warning)
 
-	function IsBad (|bool|)
+	inline IsBad (|bool|)
 		return (.severity >= errorseverity.problem)
 
-	function IsError (|bool|)
+	inline IsError (|bool|)
 		return (.severity >= errorseverity.error)
 
 	
@@ -139,7 +136,7 @@ class Error (Message)
 	
 	function LineIdentifiers (|faststring| fs, |string| path, |bool|)
 		require (.HasPosition)
-		|| d = .OriginalData #require
+		|| d = .OriginalData								#require
 
 		if !path: fs <~ "line "
 		fs <~ .LinePos( d )
@@ -218,25 +215,27 @@ datatype ErrorSeverity (Byte)
 			if name
 				fs_in <~ name
 	
-	syntax is (|errorseverity| e, |bool|)
+	syntax is (|ErrorSeverity| e, |bool|)
+		inlined
 		return self == e
 		
-	syntax Using (|errorseverity|)
+	syntax Using (|ErrorSeverity|)
 		rz = StdErr.LowerErrorsTo
 		StdErr.LowerErrorsTo = self
 
 	syntax UsingComplete (|object| idk=nil)
+		inlined
 		StdErr.LowerErrorsTo = self
 
 
-	constants // Severity
+	constants
 		|ErrorSeverity|
-		MaxError	= 6	    // dont use this!
+		MaxError	= 6		// Dont use this!
 		Critical	= 5		// Unrecoverable "OutOfMemory / signals / etc"  need to quit.
-		Error		= 4		// parse errors, file not exists, etc.
-		Problem		= 3		// always print these, but still continue
+		Error		= 4		// Parse errors, file not exists, etc.
+		Problem		= 3		// Always print these, but still continue
 		Warning		= 2		// Its probably bad, and probably better corrected. 
-		Hint		= 1		// We can’t tell if its wrong, just letting you know if you want it fixed
+		Hint		= 1		// We can't tell if its wrong, just letting you know if you want it fixed
 		OK			= 0
 	
 	module
