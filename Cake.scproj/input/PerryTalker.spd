@@ -78,7 +78,6 @@ dispatch DebuggerActions (PerryResponse)
 
 
 function debugger.BreakSet (|message| m, |bool| Active, |bool|)
-	debugger
 	opt norefcounts
 	|| F = .FileMap[m.firstname]				#expect (F, "Breakpoint is in missing file")
 	|| p = m[1].int

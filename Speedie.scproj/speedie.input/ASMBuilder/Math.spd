@@ -470,8 +470,8 @@ extend Assembler
 				if 0: exp.QADK
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
-		if LMul.IsPow2			  										// x = int1 + int2
-			return exp.AddInt(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
+		if LMul.IsPow2													// x = int1 + int2
+			return exp.AddInt(dest, L, R, LMul.log2) * dest				// x = lptr + r<<3
 		
 		// L is now a POINTER.
 		|| v = .NumToReg(exp,  ASMReg(),  LMul,  DataTypeCode.uint)
@@ -625,10 +625,10 @@ extend Assembler
 		return .NumToReg(exp, dest, 0x3ff0000000000000 /*1.0 double*/, DataTypeCode.f64)
 
 
-	function QuickIntDiv    (fn_opasm)
+	function QuickIntDiv (fn_opasm)
 		require r is Const
 		|| PToi = .IntPowerOftwo(r)$
-		if ptoi <= 1																//   x/1  x/0  x/-1
+		if ptoi <= 1																	//   x/1  x/0  x/-1
 			if ptoi == 0
 				exp.DivByZero
 			return .Quick1Or1Sub(dest, l, ptoi, exp)

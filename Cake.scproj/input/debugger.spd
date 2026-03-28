@@ -38,6 +38,7 @@ module debugger
 	
 
 	function UserMultiBreak (|FileWithData| Path, |uint| Position, |bool| Active=true)
+		opt norefcounts
 /		|| CakeBreak = cake.ActiveBreaks$
 		|| Map = .Breakables.Addr|&sourcelocation|
 		|| n = .Breakables.Length >> 2

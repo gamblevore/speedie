@@ -100,7 +100,7 @@ class FastString {
 	render
 		opt norefcounts
 		if !fs_in
-			return self
+			return self|string|.Copy // don't wanna clear this FS! we are still appending on it!
 		fs_in <~ self
 
 	syntax Append (|Byte| data, |int| count)

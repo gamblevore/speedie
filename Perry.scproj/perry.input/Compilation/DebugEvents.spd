@@ -240,7 +240,7 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	return true
 	
 
-function EditMeBreakPointAdd (GuiTextLineEvent)
+function DebugBreakAdd (GuiTextLineEvent)
 	|perryide--| i = .ide
 	require i.DebugMode is CakeMode and Debug
 	if Direction < 0
@@ -249,12 +249,12 @@ function EditMeBreakPointAdd (GuiTextLineEvent)
 		return true
 	
 	|| pos = line.Position
-	|| fs = faststring()
-	fs <~ ("brkadd ", "brkrem ")(direction > 0)
-	fs <~ i.path
-	fs <~ " "
-	fs <~ pos
-	i.SendMsg(fs, 0)
+	|string--| cmd = ("brkadd", "brkrem")(direction > 0)
+	|| j = jbin(@tmp, cmd)
+	j.addstr i.path
+	j.addint pos
+	j.exit
+	i.SendMsg(j|&nil||string|, 0)
 		
 	// so... now what?
 

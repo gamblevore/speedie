@@ -15,7 +15,8 @@ module zalgo
 
 	render (|string| txt, |float| Wierdness)
 		opt norefcounts
-		for i in (-1 to txt.length) 			|byte| s = txt.byte(i, 0) ?? ' '
+		for i in (-1 to txt.length)
+			|byte| s = txt.byte(i, 0) ?? ' '
 			fs <~ s
 			if s < 128
 				|| scale = (s<=32) + (txt[i+1]<=32) + (txt[i-1]<=32)
@@ -37,3 +38,4 @@ function faststring.Zalgo (|float| Wierdness, |float| whites)
 	|| down = zalgo.R[3.0,3.0+Wierdness]*mul
 	for (down)
 		zalgo.rand(self, zalgo.down)
+
