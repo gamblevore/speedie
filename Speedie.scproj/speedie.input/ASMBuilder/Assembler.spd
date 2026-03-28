@@ -587,6 +587,7 @@ struct Assembler
 			// function y() will destroy temps in z() and x(), so we need (temp) declarations.
 			// but these are functionally temps.
 			Dest = .DeclareMe(exp, Dest)
+			(dest isnt const)										// :3
 			(Dest is Temp)
 			(Dest is OKAsTemp)
 		
@@ -648,7 +649,7 @@ struct Assembler
 			dest.TmpCheck
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if trap == 977 or stacksize > 30 // ugh
+			if trap == -1 or stacksize > 30 // ugh
 				
 		  else
 			opt inline

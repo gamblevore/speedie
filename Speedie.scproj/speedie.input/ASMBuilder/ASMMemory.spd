@@ -186,9 +186,6 @@ function Dummy (|message| exp)
 function scdecl.CanCopyNormally (|bool|)
 	opt norefcounts
 	|| i = .Internal
-	if i and i.IsBareStruct
-		return false
-//		|| s = i.calculatesize
-//		return (s <= 16) and s.IsPow2
-	return true
+	if !i or !i.IsBareStruct
+		return true
 

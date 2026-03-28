@@ -51,9 +51,9 @@ extend Assembler
 			if dest isnt NewlyDeclared
 				ml = .µGetPrms(First, ml)
 			  else
-				ml = .µgetasm(first, dest)
+				ml = .µgetasm(first, dest.µtype(0))
 				ifn ml iz dest
-					mr = dest
+					mr = dest.µtype(0)
 			mr = .µGetASM(exp.last!, mr)
 
 
