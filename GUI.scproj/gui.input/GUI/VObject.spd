@@ -42,10 +42,10 @@ class VObject (list)
 	inline x (|float|)
 		return .pos.x
 
-	function left (|float|)
+	inline left (|float|)
 		return .pos.x - .Radius.x
 
-	function right (|float|)
+	inline right (|float|)
 		return .pos.x + .Radius.x
 	
 	setter Size	(|vec3|)
@@ -56,7 +56,7 @@ class VObject (list)
 		|| p = .pos.xy
 		return (P-rad, P+rad)
 
-	function Step
+	inline Step
 		.pos += .Velocity
 
 	function OverlapsBlock (|VObject| B, |vec4|)
@@ -77,10 +77,9 @@ class VObject (list)
 		return (.position & i) == i
 	
 	syntax is (|vobjectinfo| i, assigns:|bool| value)
-		if value
-			.position |= i
-		  else
-			.position &= ~i
+		|| p = .Position &~ i
+		p |= i *value
+		.position = p
 	
 	function AdjustPos (|float| scale, |vec3|)
 		rz = .pos

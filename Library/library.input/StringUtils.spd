@@ -148,7 +148,7 @@ function cstring.OperatorPlus (|string| s, |string|)
 
 function string.OperatorPlus (|int64| i, |string|)
 	opt norefcounts
-	|| fs = faststring(nil|faststring|)
+	|| fs = faststring._Leaf
 	|| n = (i < 0)|int|
 	|| i2 = i
 	while

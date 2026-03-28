@@ -162,16 +162,16 @@ function InlineParameters (|message| prms, |InlineInfo| Info)
 	|| p = prms.first$
 
 	|| args = .fn.args
-	target debug: || trap = asmtrapper, if trap == -1
 	info.DoImmediates(p, args)
 	
 	for (a in args) (i)
 		|| V = info.Items[i]
+		target debug: || trap = ++asmtrapper, if trap == -1
 		if !(V asnt ASMReg.ForceInto) // its nil or into
 			info.items[i] = .µInlineParam(p, a, V)
-		p = p.next!
 		
 		a.AsmReg = info.Items[i] // a is the output, nt the input decls.
+		p = p.next!
 
 
 	
@@ -225,7 +225,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 
 function InlineFinish (|fatrange| R, |savedregisters| sv, |ASMReg|)
-	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == 133169
+	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT

@@ -167,9 +167,11 @@ class TextView (GUIControl)
 			.addbreak(d)
 			return true
 	
-	
-	libinternal AddBreak (|textviewline| d, |int|)
+	function AddBreak (|textviewline?| d=nil, |int| Pos=0,  |int|)
 		opt norefcounts
+		if !d
+			d = .FindLine(pos)
+		
 		|| txt = d.Text
 		|| i = txt._FindBreakpoint
 		|| Range = d.range
@@ -1946,12 +1948,12 @@ class TextView (GUIControl)
 		.TouchScrollBar
 	
 	
-	function StartLine (assigns:|int| v)
+	libinternal StartLine (assigns:|int| v)
 		cpp_part StartAtInt
 		.StartLine = .needfirst.MoveCapped(V)!
 	
 	
-	function NeedFirst (|textviewline|)
+	libinternal NeedFirst (|textviewline|)
 		opt norefcounts
 		|| f = ._lines.first
 			return f
@@ -2188,7 +2190,7 @@ class TextView (GUIControl)
 			|| n = 1 - .MaxVisibleLines
 			d = d.MoveCapped(n)
 		  elseif (changed == 1) or .IsALogTextView
-			d = .FindScroll(pos)
+			d = .FindLine(pos)
 		  else
 			d = ._Lines.first!
 		.StartWithoutScrollDraw(d)
@@ -2235,7 +2237,7 @@ class TextView (GUIControl)
 				.start = s
 				return
 
-	libinternal FindScroll (|int| Value, |textviewline!|)
+	libinternal FindLine (|int| Value, |textviewline!|)
 		opt norefcounts
 		for s in ._Lines
 			if s.Position >= Value

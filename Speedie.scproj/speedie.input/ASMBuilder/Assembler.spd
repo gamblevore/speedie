@@ -377,7 +377,6 @@ struct Assembler
 	
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode,  |int| Depth=0)
 		|| info = fat.info
-
 //		Not entirely sure how to go about this. Closing temps isnt so important
 //		for optimisation, but terrible if I get this wrong.
 		if  info is temp  and  nopmode is CanClose

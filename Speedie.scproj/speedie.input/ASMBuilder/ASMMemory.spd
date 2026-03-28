@@ -89,6 +89,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	if pinc     // || y = (x++)[]
 		rz.µrefcount++
 		rz.Dest(1, base, self) // base is being written to, but it is still an input
+	if rz is const // what
 	
 
 

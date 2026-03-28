@@ -878,13 +878,20 @@ extend Assembler
 		
 
 	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
-		|| SrcBits = src.BitCount
-		if (up > srcbits or down > SrcBits)	 and !src.IsBool
-			problem (exp, "Shift too far")
-		
 		if !up and !down
 			return src.µtype(Dest)
-		
+
+		|| SrcBits = src.BitCount
+		if srcbits == 1							// bool
+			if down > up
+				problem (exp, "Bool shifted into nothing")
+			if down == up
+				return src.µtype(Dest)
+			srcbits = (up+1) min 64
+			
+		if (up > srcbits) or (down > SrcBits)
+			problem (exp, "Shift too far")
+			
 		|| Extra = 64 - SrcBits
 		up += Extra
 		down += Extra
@@ -924,11 +931,14 @@ extend Assembler
 	
 	function Assign (|message| exp, |asmreg| dest, |asmreg| src, |asmreg|)  // assigns (
 		if src iz dest
-			return dest // return src makes more sense? type-wise?
+			return src													// return src makes more sense? type-wise?
 		
-		if !src.reg and (src isnt const)
-			debugger
-			(src is const)
+		if src isnt const
+			if !src.reg
+				debugger
+				(src is const)
+			(Dest is const) = (src is const)
+			
 		
 		target debug: if (dest.IsVec != src.IsVec) and src.reg
 		|| improve = .ImproveAssign(dest, src)
@@ -962,7 +972,7 @@ extend Assembler
 		return exp.BFLG(dest, src, sh, sh, sign) * Dest
 	
 	
-function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
+function int64.Fits (|int| amount, |bool| signed=true, |bool|)
 	|int64| sh = 64 - amount
 	|| x = self << sh
 	if signed

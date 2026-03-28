@@ -1,7 +1,8 @@
 
 struct StructWithObj
-	|object| A
-	|object| B
+	|object|	A
+	|object|	B
+	|vec4[2]|	carray
 
 
 function UintOnly (|int|)
@@ -9,13 +10,34 @@ function UintOnly (|int|)
 
 
 module ASMExamples {
-|int|   Glob
-|int|   Bolg
-|byte|  BBB
-|float| KNOB1 = 10
+|int|		Glob
+|int|		Bolg
+|byte|		BBB
+|vec2[2]|	carray
+|float|		KNOB1 = 10
 
 
-target cake { 
+target cake {
+
+function VecTest (|&vec2| A, |&vec4| B, |structwithobj| C, |int| n)
+	visible
+	|| f = 0.0
+	f += A[5].x
+	f += A[10].y
+	f += B[5].x
+	f += B[5].y
+	f += C.carray[1].y
+	f += asmexamples.carray[1].y
+	#!eh!
+	f += A[n].x
+	f += A[n].y
+	f += B[n].x
+	f += B[n].y
+	f += C.carray[n].y
+	f += asmexamples.carray[n].y
+
+	
+	
 
 function SoundMain2 (|float| input,  |float|) {
 	visible

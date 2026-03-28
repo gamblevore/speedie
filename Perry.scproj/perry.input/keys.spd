@@ -83,9 +83,11 @@ extend PerryIDE
 			
 		|| NumKey = key.IsNumber
 			return .NumberKey(numkey)
-		if key is p or backslash
+		if key is p
 			.CommandsMenu.Click
 			return true
+		if key is BACKSLASH
+			.editme.AddBreak(.editme.SelRange.x)
 		
 	
 	function OptionCmdNum (|int| Num, |bool|)

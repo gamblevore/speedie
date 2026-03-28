@@ -28,7 +28,7 @@ class FastString {
 	constructor (|int| BufferSize)		{ cpp_wrapper JB_FS_ConstructorSize }
 	destructor							{ cpp_wrapper JB_FS_Destructor }
 
-	function Length (|int|)             { nil safe, cpp_wrapper JB_FS_Length }
+	function Length (|int|)				{ nil safe, cpp_wrapper JB_FS_Length }
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
 	setter Reserved (|int|)				{ disabled }
 	setter ResultPtr (|int|)			{ disabled }
@@ -54,7 +54,7 @@ class FastString {
 		cpp_wrapper JB_FS_AppendHex
 	
 	function AppendHexData (|string| Data)
-		cpp_part AppendHexStr 
+		cpp_part AppendHexStr
 		if data
 			.AppendHexData(Data.addr, data.length)
 	
@@ -99,7 +99,9 @@ class FastString {
 		
 	render
 		opt norefcounts
-		fs <~ self
+		if !fs_in
+			return self
+		fs_in <~ self
 
 	syntax Append (|Byte| data, |int| count)
 		cpp_wrapper JB_FS_AppendMultiByte
@@ -151,6 +153,10 @@ class FastString {
 		
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
+		
+		inline _Leaf (|faststring|)
+			description "Don't use this :] Only I know how to use it properly"
+			return faststring(nil|faststring|)
 
 		inline New (|file!| F, |FastString|)
 			cpp_part NewFile
