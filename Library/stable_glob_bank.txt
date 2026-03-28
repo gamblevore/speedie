@@ -176,3 +176,4 @@ GUI__Key_Record
 GUI__SystemCursor__Cursors
 JB__CharSet_Props
 JB__Constants__FuncArray
+GUI__Clip__Clip2
