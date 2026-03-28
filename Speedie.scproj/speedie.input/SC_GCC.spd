@@ -136,7 +136,7 @@ function NoGoodObject ( |string| Cpp,  |File| h,  |File| o,  |int| )
 	if cpd > od or .LatestLibDate > od 
 		return 2
 
- 
+
 function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	flowcontrol.input(cpp, "objtest")
 	|| aslib = options.projectislibrary
@@ -289,7 +289,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 function ExecuteGCC (|[string]| Commands, |bool|)
 	|| fserrs = FastString()
 	fserrs <~ "<(`\nC++ compiler failed to compile source code. Command:\n\n $.CppCompilerPath \n" // prebuild
-	|| Result = .CppCompilerPath.Execute(Commands, nil, fserrs) 
+	|| Result = .CppCompilerPath.Execute(Commands, nil, fserrs)
 	rz = Result.Successful
 	if !rz
 		fserrs <~ (Commands, " ")
@@ -300,7 +300,7 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
-	|| TmpFol = Output.MakeAndGoInto 
+	|| TmpFol = Output.MakeAndGoInto
 	
 	|| Cpps = .CollectCppsInto( Input, TmpFol )
 	return .TransCompileWrap(cpps)

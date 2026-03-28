@@ -265,7 +265,7 @@ module Feedback
 		+'x' (AppTransCompile)
 		
 		+'arch'
-			|| str = "intel/arm/ppc/spd" // don't we just want a bitfield?
+			|| str = "intel/arm" // don't we just want a bitfield?
 			explain(Purpose, "Set to "+str)
 			for v in str / '/'
 				if v~=value
