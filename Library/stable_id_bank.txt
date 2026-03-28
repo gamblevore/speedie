@@ -379,11 +379,9 @@ GUI_LV_TypedString
 GUI_LV_Use
 GUI_LV_VisibleRows
 GUI_Line_After
-GUI_Line_ByteOfX
 GUI_Line_Constructor
 GUI_Line_Destructor
 GUI_Line_OperatorContains
-GUI_Line_Range
 GUI_Line_ReclaimEnd
 GUI_Line_Render
 GUI_Line_SlowMove
@@ -598,7 +596,6 @@ GUI_Text_LoadDocument
 GUI_Text_Log
 GUI_Text_LostFocus
 GUI_Text_MakeInline
-GUI_Text_Match
 GUI_Text_MaxPartialVisibleLines
 GUI_Text_MaxVisibleLines
 GUI_Text_MaxWidthInChars
@@ -829,7 +826,6 @@ GUI_inl_FinishAndClear
 GUI_inl_Init
 GUI_inl_NextSearch
 GUI_inl_UpdateSearch
-GUI_int_LineNumWidth
 GUI_ivec2_SDLXY
 GUI_ivec4_DistToCorner
 GUI_ivec4_Msg
@@ -1032,10 +1028,6 @@ JB_Err_ConstructorNothing
 JB_Err_Destructor
 JB_Err_Fill
 JB_Err_GrabLine
-JB_Err_HasPosition
-JB_Err_IsBad
-JB_Err_IsError
-JB_Err_IsWarning
 JB_Err_LineIdentifiers
 JB_Err_LinePos
 JB_Err_Name
@@ -1049,9 +1041,7 @@ JB_Err_UpgradeWithNode
 JB_Err_WorseThan
 JB_Err__CantParseNum
 JB_ErrorSeverity_Render
-JB_ErrorSeverity_SyntaxIs
 JB_ErrorSeverity_SyntaxUsing
-JB_ErrorSeverity_SyntaxUsingComplete
 JB_ErrorSeverity__Find
 JB_ErrorSeverity__InitNames
 JB_ExitCode_Name
@@ -1311,9 +1301,7 @@ JB_Mrap_Zero
 JB_Mrap__Fill
 JB_Mrap__Object
 JB_Mrap__Random
-JB_MsgParseFlags_SyntaxIs
 JB_MsgPos_Destructor
-JB_MsgPos_SyntaxUsingComplete
 JB_Msg_Ancestor
 JB_Msg_AppendMacro
 JB_Msg_AppendNum
@@ -1431,8 +1419,6 @@ JB_Object_OperatorMustBe
 JB_Object___Render__
 JB_OutOfMemoryOccurred
 JB_PIDM_SyntaxIs
-JB_ParserLineAndIndent_ArgPos
-JB_ParserLineAndIndent_Constructor
 JB_Pico_Get
 JB_Pico_Name
 JB_Pico_NameSet
@@ -1897,7 +1883,6 @@ JB_bin_TmpArg
 JB_bin_WriteType
 JB_bool_Render0
 JB_bool__MainArg
-JB_byte_CanPrintAsNormalChar
 JB_byte_EqualsByte
 JB_byte_IsConso
 JB_byte_IsHex
