@@ -3,6 +3,7 @@
 datatype TextLineFlags (uint16)
 	flags
 		BreakPoint
+		RealBreakPoint
 		Colored
 		Found
 		CurrFound
@@ -10,7 +11,6 @@ datatype TextLineFlags (uint16)
 		StartsNormally
 		AvoidLastChar
 		FakeMsg
-		FakeLine
 		Lighter
 
 
@@ -432,24 +432,23 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	opt norefcounts
 	opt min 3
 	(d isnt lighter)
-	if d isnt FakeLine
-		|| GoUp = (7 - .lineheight)/2
-		if d.LineError
-			if .MyError
-				.DrawErrorBackground(where, y+GoUp, d)
-			  else
-				d.LineError = nil // sigh. crappy bug fix
-		
-		|| m = ._ActiveLine
-			if d contains m.Position
-				|| f = .Path
-				if m ~= f
-					|| bg = ¥.ActiveTextLine
-					.Drawbackground(where, y + GoUp, bg)
+	|| GoUp = (7 - .lineheight)/2
+	if d.LineError
+		if .MyError
+			.DrawErrorBackground(where, y+GoUp, d)
+		  else
+			d.LineError = nil // sigh. crappy bug fix
+	
+	|| m = ._ActiveLine
+		if d contains m.Position
+			|| f = .Path
+			if m ~= f
+				|| bg = ¥.ActiveTextLine
+				.Drawbackground(where, y + GoUp, bg)
 
-		if .CanDrawLight(d)				// linelight
-			(d is lighter)
-			.DrawLighter(where, y+GoUp)
+	if .CanDrawLight(d)				// linelight
+		(d is lighter)
+		.DrawLighter(where, y+GoUp)
 	
 	|| x	 = .DrawLineNumber(where, d, y)-1
 	|| state = MsgTextDrawState(x, d)

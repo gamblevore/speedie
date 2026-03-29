@@ -98,7 +98,7 @@ function BreakAction (perryresponse)
 
 
 function BreakRemoveAction (perryresponse)
-	return BreakAction(self, m, 1)
+	return BreakAction(self, m, state xor 1)
 
 
 function cakevm.ClearTempBreak (|cakestack| stack)
@@ -133,7 +133,7 @@ function cakevm.Respond (|message| m, |StepAction|)
 	opt norefcounts
 	if m == @tmp
 		|| fn = DebuggerActions[m.name]
-			return (fn[])(cake.vm, m, 0)
+			return (fn[])(cake.vm, m, 1)
 	printerror m.Name
 	return StepAction.DoNothing
 

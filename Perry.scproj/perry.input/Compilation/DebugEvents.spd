@@ -27,6 +27,11 @@ function perryide.ViewRun (|bool|)
 	return true
 
 
+function perryide.WantsRun (|bool|)
+	if .RunCompiledApp
+		return DebugStepRun(self, -1)
+	return .start
+	
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.
@@ -39,9 +44,9 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 		return DebugStepIn(self, -1)
 	if key is UP or W or Num2
 		return DebugStepOut(self, -1)
-	if  key.IsAccept and !i.RunCompiledApp
-		return i.start
-	if (key is space) or key.IsAccept
+	if key.IsAccept
+		return i.WantsRun
+	if key is space
 		return DebugStepRun(self, -1)
 		
 

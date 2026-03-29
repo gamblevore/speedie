@@ -30,7 +30,9 @@ extend PerryIDE
 
 	function CmdKey (|keys| key, |bool|)
 		if key is t
-			return PressingDebug(.runbutton)			
+			return PressingDebug(.runbutton)		
+		if key.IsAccept
+			return .WantsRun
 		if key is f
 			if .MassSearchField.hasfocus
 				.PrevView.Click?
@@ -80,7 +82,7 @@ extend PerryIDE
 
 		if key is NUM3 or E // e for error
 			return .SaveAndShowErrors
-			
+		
 		|| NumKey = key.IsNumber
 			return .NumberKey(numkey)
 		if key is p
