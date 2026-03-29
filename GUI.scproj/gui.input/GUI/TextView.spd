@@ -2319,7 +2319,7 @@ class TextView (GUIControl)
 		mode = AllowJeebox
 		|| d = .document
 			|| l = d.Location
-				if l isa "spd" or "box" or "jbin" or "xml" or "jb"
+				if l isa "spd" or "box" or "jbin" or "xml" or "jb" or "jbin"
 					mode = CurrentlyJeebox
 //				  elseif l isa "todo" and "txt"
 //					mode = ProbablyJeebox // this seems wrong

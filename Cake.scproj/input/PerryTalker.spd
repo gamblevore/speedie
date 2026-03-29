@@ -7,23 +7,32 @@
 	  OR if we get in/out the stack... So we need to STAY in "pause" mode... Not go in/out all the time
 	* Stepout is a little faster... only needs to check if we hit the out point... set a break there...
 	
-	* Now we need a special pause system. Instead of isdebugging, we need "BreakLevel" 1,2,3
-		* 1 is fast, 2 is breakpoints, 3 is all instructions
-		* We can get it down to 1 byte... and a high-bit to say "is being altered"
-		* Need spinlocks and sheee to make it work properly... so we can't make a mess of things
-			* Highest dest-value wins!! (after). same-value does nothing. only lower if not busy.
-	
 	* BreakOnObjID can be done by modifying the allocation system... to only preallocate x% objs
 	  in a block... so when we run out... we already have a hit-point to check... then we restore the
 	  other objects... right? :)
 		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
 */
 
-
 // we need to put a breakpoint in the original file... then see what happens
 
 
-function cakevm.PerryAnswer (|cakestack| stack, |spdprocess| perry)
+prototype PerryResponse (|CakeVM| self, |message| m, |uint| State,  |StepAction|)
+datatype StepAction (uint)
+	default false
+	linkage
+		numeric false
+	flags
+		|StepAction|
+		DoNothing = 0
+		SendVars
+		GoRun				// run will already send the vars, after we hit the next break.
+	
+	syntax is (|stepaction| k, |bool|)
+		return self|uint|&k|uint|
+	
+
+
+function cakevm.SendVars (|cakestack| stack, |spdprocess| perry)
 	|jbin--| j = .StartStack("break")
 	.StackToPerry(stack, 0, j)
 	perry <~ j
@@ -31,57 +40,65 @@ function cakevm.PerryAnswer (|cakestack| stack, |spdprocess| perry)
 	
 
 function __PerryView__ (cakevm.CakeChef)
-	|spdprocess--| p = cake.perry!	// Perry always exists by now
+	|spdprocess--| p = cake.perry!			// Perry always exists by now
 	if !p.IsOpen
-		app.Quit(0)					// Stop the runaway!
+		app.Quit(0)							// Stop the runaway!
 	
 	if (ErrorCode)
-		p <~ "crashed " + ErrorCode
+		p <~ "crashed " + ErrorCode			// allow them to fix their memory and resume...
+
 	.ClearTempBreak(stack)
-	.PerryAnswer(stack, p)
+	.SendVars(stack, p)
 	
-	while {							// Controlflow simplify! Just remove resume!
-		|| Resume = false			// Perhaps just... only refcount the part that needs it: p.get+resumecode(m)
-		while !Resume
-			if !p.IsOpen
-				app.Quit(0)
-			|| m = p.Get(5.0)
-				Resume = .ResumeCode(m)
-				if !Resume
-					.PerryAnswer(stack, p)
-	} (ErrorCode)
+	while									// Controlflow simplify! Just remove resume!
+		if !p.IsOpen
+			app.Quit(0)
+		|| m = p.Get(5.0)
+			|| Action = .respond(m)
+			if Action is SendVars
+				.SendVars(stack, p)
+			if Action is GoRun
+				exit
 	p <~ "run"
-//	.SetBreakLevel(1) // run
 
 
 
-prototype PerryResponse (|cakevm| self, |message| m, |bool|)
+
+function RunAction (perryresponse)
+	opt norefcounts
+	.SetBreakLevel(2-(m.firstname=="fast"))
+	return StepAction.gorun
+
+
 dispatch DebuggerActions (PerryResponse)
-	setvar:		
+	setvar:		return StepAction.donothing
 		
-	run
-		opt norefcounts
-		return .SetBreakLevel(2-(m.firstname=="fast"))
+	run			RunAction
 	
 	stepin:		return .TempBreak(.StepIn)
 	stepout:	return .TempBreak(.StepOut)
 	stepover:	return .TempBreak(.StepOver)
 		
-	brkadd:		return debugger.BreakSet(m, true)
-	brkrem:		return debugger.BreakSet(m, false)
+	brkadd		BreakAction
+	brkrem		BreakRemoveAction
 
-	stop:		app.quit
+	stop:		app.quit, return StepAction.donothing
 		
-	pause:		return false // caller already updates...
+	pause:		return StepAction.SendVars
 		
 //	stepback:	0 // todo
 
 
-function debugger.BreakSet (|message| m, |bool| Active, |bool|)
+function BreakAction (perryresponse)
 	opt norefcounts
-	|| F = .FileMap[m.firstname]				#expect (F, "Breakpoint is in missing file")
+	|| F = debugger.FileMap[m.firstname]				#expect (F, "Breakpoint is in missing file")
 	|| p = m[1].int
-	.UserMultiBreak(F, p, Active)
+	debugger.UserMultiBreak(F, p, state|bool|)
+	return StepAction.DoNothing
+
+
+function BreakRemoveAction (perryresponse)
+	return BreakAction(self, m, 1)
 
 
 function cakevm.ClearTempBreak (|cakestack| stack)
@@ -94,11 +111,11 @@ function cakevm.ClearTempBreak (|cakestack| stack)
 			Break[] &= 1<<31
 
 	
-function cakevm.TempBreak (|?&uint| Break, |bool|)
-	if break and !(break[]>>31) // has no breakpoint... add one
+function cakevm.TempBreak (|?&uint| Break, |StepAction|)
+	if break and !(break[]>>31)					// has no breakpoint... add one
 		break[] |= 1<<31
-		debugger.BreakToClear = break // nice
-	return true
+		debugger.BreakToClear = break			// nice
+	return StepAction.GoRun
 
 
 function cakevm.StepIn (|&Uint|)
@@ -112,22 +129,18 @@ function cakevm.StepOut (|&uint|)
 function cakevm.StepOver (|&uint|)
 
 
-function cakevm.ResumeCode (|message| m, |bool|)
+function cakevm.Respond (|message| m, |StepAction|)
 	opt norefcounts
 	if m == @tmp
 		|| fn = DebuggerActions[m.name]
-			return (fn[])(cake.vm, m)
+			return (fn[])(cake.vm, m, 0)
 	printerror m.Name
+	return StepAction.DoNothing
 
 
 function cakevm.StartStack (|string| name, |jbin--|)
 	|jbin--| j = XVar.printer
-	if j.Length
-		debugger
-		j.Length = 0
-	
-	j <~ jbin.header
-	j.Enter(@tmp, name)
+	j.Start(@tmp, name)
 	{
 		j.Enter(@list)
 		{

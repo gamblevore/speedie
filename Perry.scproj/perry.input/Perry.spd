@@ -71,7 +71,7 @@ module Perry
 			if force or f.FileExists
 				return f
 		for f in s.file
-			if f isa "spd" or "scproj"
+			if f isa "spd" or "scproj" or "spd.jbin"
 				return f
 				
 

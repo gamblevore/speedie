@@ -85,7 +85,6 @@ datatype Syntax (Byte)
 		Opt NoRefCounts
 		return .obj!.exportaddr
 	
-
 	inline RenderAddr (|fpMsgRender|)
 		Opt NoRefCounts
 		return .obj!.renderaddr

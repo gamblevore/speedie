@@ -53,9 +53,9 @@ datatype Type (int)
 		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=[Box, Jbin, Report], StdOut, SelfReplace
 	
 	syntax is (|Type| test, |bool|)
-		return self & test 
+		return self & test
 
-	function Format (|Type|) 
+	function Format (|Type|)
 		return self & (Box ||| jbin ||| xml ||| json)
 	
 	render
@@ -83,7 +83,7 @@ function app.UseOne (|file| f)
 	if f.IsDir
 		if app.args == 1
 			"${conv.in} is a folder"
-	  else 
+	  else
 		conv.Process(f)
 	conv.End
 
@@ -146,17 +146,17 @@ function App.GetActions (|Type|)
 module Conv
 	|string|		Data
 	|file|			In
-	|file| 			RealOut
-	|file| 			Out
+	|file|			RealOut
+	|file|			Out
 	|date|			Start
-	|type| 			Dest
-	|type| 			Detected
-	|float| 		Size
-	|message| 		AST
+	|type|			Dest
+	|type|			Detected
+	|float|			Size
+	|message|		AST
 	|int|			Done
 	|string|		DestPath
 	||				DefaultStrength = mzlab.strong
-	|| 				Speed = faststring()
+	||				Speed = faststring()
 
 	function End
 		|| s = .speed.GetResult
@@ -199,7 +199,7 @@ module Conv
 			.Time("Decompress", true)
 		  else 
 			.size = .in!.size|float|
-			src.CompressInto(d, .DefaultStrength) 
+			src.CompressInto(d, .DefaultStrength)
 			.time("Compress", true)
 		if .dest is selfreplace
 			.RealOut!.MoveTo(.out!)
@@ -323,7 +323,7 @@ module Conv
 		if .dest is box
 			return "box"
 		if .dest is jbin
-			return "jbn"
+			return "jbin"
 	
 	
 	function OutPath (|file|)
@@ -338,7 +338,7 @@ module Conv
 			str = str.TrimExt
 		
 		|| x = .ext
-			if str isa "box" or "jbn" or "xml"			
+			if str isa "box" or "jbin" or "xml"			
 				str = str.SetExt(x)
 			  else
 				str = str.AddExt(x) 

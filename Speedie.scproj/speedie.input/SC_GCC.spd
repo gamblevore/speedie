@@ -9,8 +9,8 @@ module TransCompiler { // cppcomp, external_compiler, TransComp
 linkage:cpp_part Ext
 |[File]|		FoundObjects
 |[File]|		Cleanup
-|int| 			CompilingLibFiles
-|string| 		CppCompilerPath = "/usr/bin/g++"
+|int|			CompilingLibFiles
+|string|		CppCompilerPath = "/usr/bin/g++"
 |date|			LatestLibDate = date.highest
 
 
@@ -591,7 +591,7 @@ function array.AddCStr (|array of string| self, |string| s)
 		self <~ s.cstr
 
 
-function array.AppendWords (|array of string| self, |string| R) // appendoptions, addoptions
+function array.AppendWords (|array of string| self, |string| R)		// appendoptions, addoptions
 	for S in R / ' '
 		.AddCStr(s)
 

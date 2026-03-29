@@ -30,7 +30,7 @@ function @string.ASCII_Chart (|int| StartAt=32, |string|)
 		for x in 4
 			|| c = StartAt+y+x*mul
 			
-			fs.AppendIntegerAsText(c, 3)
+			fs.AppendDecimal(c, 3)
 			fs <~ '\1E'
 			fs <~ "x"
 			fs.AppendHex(c, 2)

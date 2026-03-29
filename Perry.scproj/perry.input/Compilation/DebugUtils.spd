@@ -1,6 +1,6 @@
 	
 
-|| VarPrinter = faststring()	
+|jbin| VarPrinter = faststring()	
 
 extend PerryIDE {
 function CakeTalk (|SpdProcess| Cake)

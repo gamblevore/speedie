@@ -47,13 +47,16 @@ function String.ParseJSON (|Messageroot|)
 	
 
 function String.IsJbin (|ind|)
-	if  self[] == '#'  and  self[1] == '!' // shebang
-		|| nl = .find('\n')
-			nl++
-			if self[nl, Jbin.Header]
-				return nl
-	  elseif self[0, Jbin.Header]
-		return 0
+	|| length = .length
+	|| Start = 0
+	if length >= 4
+		|| A = .addr
+		if  A|&uint16|[] == 0x2123				// #!
+			Start = .find('\n', 2) + 1
+			if start <= 2
+				return -1
+		if (length-start>=4) and ((.addr+start)|&uint|[] == jbin.JBinHeader)
+			return 0
 	return -1
 
 
@@ -90,6 +93,9 @@ To get around this, just do:  x = str.parse(@arg)
 		doc = data.ParseJbin
 	  else
 		doc = data.ParseSub(owner)
+		if !doc
+			debugger 
+			j1 = .isjbin
 	return doc
 		
 
@@ -162,14 +168,14 @@ extend Parser
 
 
 	function ErrorEvent (|int|Start, |int| ExpectedBits, |int| RealBits)
-		visible true // called directly by the tokeniser... sorry :PPPP
+		visible true					// called directly by the tokeniser... sorry :PPPP
 
 		|| Err = FastString.new
 		ifn RealBits & kIllegalChar
 			ifn ExpectedBits and Realbits and FindError(expectedbits)
 				err <~ "Unexpected "
 			  else
-				for (5) { // 5, in case there is a bug causing infinite loop.
+				for (5) {				// 5, in case there is a bug causing infinite loop.
 					ExpectedBits = MessageErrorSub( err, ExpectedBits )
 				} (ExpectedBits)
 				err <~ " but found "
@@ -289,7 +295,7 @@ struct ParserLineAndIndent
 		return .PzLine
 	
 	function NextLine
-		Memory.zero(self, 4*4) // oof. Need to leave TotalLines unset.
+		Memory.zero(self, 4*4)				// oof. Need to leave TotalLines unset.
 
 
 role MessageRoot (Message)

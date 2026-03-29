@@ -116,6 +116,7 @@ Message is also:
 
 
 	operator Starts (|string| s, |bool|)
+		inlined
 		return .name[0, s, true]
 
 
@@ -212,8 +213,7 @@ Message is also:
 			fs <~ n
 
 	
-	syx Cnj (conj)
-//                                  I eat cheese #when I feel hungry
+	syx Cnj (conj)					// I eat cheese #when I feel hungry
 		fs <~ '#'
 		fs <~ .Name
 
@@ -229,7 +229,7 @@ Message is also:
 		fs <~ '\n'
 
 	syx SCnj (Syntactic_conj)
-		fs <~ .Name						// a - b --> b + -a
+		fs <~ .Name					// a - b --> b + -a
 
 	syx SThg (Syntactic_Thing)
 		fs <~ .Name
@@ -281,11 +281,11 @@ Message is also:
 		fs <~ '"'
 
 
-	syx Unit						// 20cm
+	syx Unit											// 20cm
 		opt norefcounts
 		|| num = .FirstName
 		fs <~ num
-		if (num.ishexlike) and (num.last != '_')       // 0xFF
+		if (num.ishexlike) and (num.last != '_')		// 0xFF
 			fs <~ '_'
 		fs <~ .name  // 20cm, 0xFF_cm
 	
@@ -299,15 +299,15 @@ Message is also:
 	syx Name
 		opt norefcounts
 		|| ch = .First
-			fs <~ .Name      // sonic
+			fs <~ .Name									// sonic
 			fs <~ " @ "			
-			fs <~ ch         // the~hedgehog
+			fs <~ ch									// the~hedgehog
 		  else
 			fs <~ '@'
 			fs <~ .Name
 
 
-	syx Dot (Dot)					// x.fn(a)
+	syx Dot (Dot)										// x.fn(a)
 		opt norefcounts
 		|| ch = .First
 			fs <~ ch
@@ -327,9 +327,9 @@ Message is also:
 		fs <~ .First
 
 
-	syx Func (Function)					// fn(a)
+	syx Func (Function)									// fn(a)
 		opt norefcounts
-		|| ch = .First                  #require
+		|| ch = .First					#require
 		fs <~ ch
 		fs <~ ch.Next
 	
@@ -377,7 +377,7 @@ Message is also:
 		fs <~ ch.Next
 
 	
-	syx Bra (Bracket)
+	syx Bra (Bracket) // don't reorder these... @bra, @list, @prm, @arr is used in iscontainezr.
 		opt norefcounts
 		fs <~ '('
 		fs <~ .First
@@ -728,6 +728,7 @@ Message is also:
 
 
 	function FuncName (|string|)
+		opt norefcounts
 		return .Func.LongName.lowercase
 	
 	
@@ -892,6 +893,7 @@ Message is also:
 
 	syntax Append (|string| key)
 		cpp_part AppendString
+		inlined
 		self <~ (@str, key)
 
 
@@ -1190,7 +1192,8 @@ Message is also:
 
 	function IsContainer (|bool|)
 		|| f = .func
-		return f == @arg or @list or @prm or @arr or @bra or @msg
+		if (f >= @bra and f <= @arr) or (f == @arg) or (f == @msg)
+			return true
 
 	inline IsString (|bool|) // use .expectstring if you need this to be a string
 		if self

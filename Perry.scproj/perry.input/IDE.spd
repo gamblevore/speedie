@@ -264,7 +264,7 @@ class PerryIDE (Window)
 			
 			if d
 				if d.WasJbin
-					fs <~ ".jbn"
+					fs <~ ".jbin"
 				if d.WasCompressed
 					fs <~ ".mz"
 			

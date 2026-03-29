@@ -240,23 +240,31 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	return true
 	
 
+function TextViewLine.MsgPos (|int|)
+	opt norefcounts	
+	rz = .Position
+	|| m = .Message
+		|| mp = m.Position
+		if self contains mp
+			(rz max= m.Position)
+	
+	
 function DebugBreakAdd (GuiTextLineEvent)
-	|perryide--| i = .ide
+	opt norefcounts
+	|| i = .ide
 	require i.DebugMode is CakeMode and Debug
 	if Direction < 0
 		beep
 		Notifications <~ "Removing this during debug breaks the debug positions."
 		return true
 	
-	|| pos = line.Position
-	|string--| cmd = ("brkadd", "brkrem")(direction > 0)
-	|| j = jbin(@tmp, cmd)
+	|| cmd = ("brkadd", "brkrem")(direction > 0)
+	|| j = VarPrinter
+	j.start(@tmp, cmd)
 	j.addstr i.path
-	j.addint pos
+	j.addint line.MsgPos
 	j.exit
 	i.SendMsg(j|&nil||string|, 0)
-		
-	// so... now what?
 
 
 function DebugStepOver (guiaction)

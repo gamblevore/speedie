@@ -292,7 +292,7 @@ class FileRow (ListViewRow)
 		function FindFileName (|listview| s, |string| name, |filerow|)
 			for r.all in s
 				if r isa filerow
-					if r.location iz name
+					if r.location.hasname(name)
 						return r
 
 		libinternal error.ViewDate (|date|)
@@ -365,7 +365,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 	|| s = .listsource
 	s.clear
 	|| path = InPath.Resolve(true)			#require
-	|| AllSight = (path iz ".")
+	|| AllSight = path.hasname(".")
 	|| AtRoot   = (path == "/")
 	|| pf		= path.file 
 	if !pf.exists or !pf.isdir

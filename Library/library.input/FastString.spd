@@ -205,11 +205,15 @@ class FastString {
 		inlined
 		data.Render(self)
 
-	function AppendIntegerAsText (|int64| data, |int| PadTo = 1)
+	function AppendDecimal (|int64| data, |int| PadTo = 1)
+		// less confuseable with appendinteger!
 		cpp_wrapper JB_FS_AppendIntegerAsText
 
 	function AppendInteger (|int64| data, |int|RoundTo=1)
-		disabled "appendintegerastext or appendint?"
+		disabled "AppendDecimal or AppendInt?"
+	
+	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
+		disabled "use .AppendDecimal"
 	
 	function AppendInt (|int| data)
 		cpp_Wrapper JB_FS_AppendInteger
@@ -223,27 +227,27 @@ class FastString {
 	syntax Append (|int64| data)
 		inlined // disambiguation
 		cpp_part AppendInt64
-		.AppendIntegerAsText(data, 1)
+		.AppendDecimal(data, 1)
 	
 	syntax Append (|uint64| data)
 		inlined // disambiguation
 		cpp_part AppendUInt64
-		.AppendIntegerAsText(data, 1)
+		.AppendDecimal(data, 1)
 	
 	syntax Append (|uint| data)
 		inlined // disambiguation
 		cpp_part AppendUint
-		.AppendIntegerAsText(data, 1)
+		.AppendDecimal(data, 1)
 
 	syntax Append (|uint16| data)
 		inlined // disambiguation
 		cpp_part AppendUint16
-		.AppendIntegerAsText(data, 1)
+		.AppendDecimal(data, 1)
 
 	syntax Append (|int| data)
 		inlined // disambiguation
 		cpp_part AppendInt32
-		.AppendIntegerAsText(data, 1)
+		.AppendDecimal(data, 1)
 		
 //	function AppendFile (|File| f, |int64| N=-1, |bool| LeaveOpen=false,  |ErrorInt|)
 //		cpp_wrapper JB_FS_AppendFile

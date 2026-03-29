@@ -24,20 +24,25 @@ extend message
 
 
 role JBin (Faststring)
-	module
-		|| Header     = "\01\10\EA\E2"
+	constants
+		|int|
+		JBinHeader = 0xE2EA1001 // intel appends this backwards somehow. it works tho!
 
 	linkage: cpp_part bin
 
-	constructor         	(|syntax| type=@arg, |string| name="")
+	constructor				(|syntax| type=@arg, |string| name="")
 		cpp_part Constructor
-		self <~ Jbin.Header
-		.enter(type, name)
+		.start(type, name)
 	
 	constructor (|int| n)
 		disabled `Use jbin(@syx, "name")`
 		cpp_part Constructor0
 
+	function Start			(|syntax| type=@arg, |string| name="")
+		.Length = 0
+		.AppendInt(JBinHeader)
+		.enter(type, name)
+			
 	inline Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
 
@@ -59,13 +64,13 @@ role JBin (Faststring)
 		.Enter(@arg)
 		return 2
 
-	function RunHeader     (|string| name)
+	function RunHeader		(|string| name)
 		if name
 			self <~ '#'
 			self <~ '!'
 			self <~ name
 			self <~ '\n' // noice
-		self <~ Jbin.Header
+		self.AppendInt(JBinHeader)
 	
 	inline AddStr			(|string?| name)
 		.add(@str, name)
@@ -108,11 +113,6 @@ role JBin (Faststring)
 		|| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
 		.Indent += goin
-
-//	function ReserveMemory (|syntax| type, |int| L, |bool| GoIn=false, |&byte|)
-//		.WriteType(type, goin)
-//		.AppendHInt(L)
-//		return .Reserve(L)	
 
 	function StartAdd (|int|)
 		self <~ (0|byte|, 5)
@@ -167,7 +167,9 @@ libinternal InputStream.NextMsgInfo (|uint64|)
 function InputStream.StreamJbin (|int64| Remain=1G, |MessageRoot|)	
 	if .Eat("#!") == 2				 // shebang
 		.Find('\n')
-	expect (.HasHeader(Jbin.Header))  (Self, "Parsed data lacks jbin header.")
+	|| H = .str(4)
+	if !h.IsJbin
+	expect (h.IsJbin)  (Self, "Parsed data lacks jbin header.")
 
 	._Object = nil
 	|| Root = .NextMsgInfo|message|
@@ -189,6 +191,5 @@ function string.Digest (|string|)
 	if .IsJbin
 		return self
 	return .parse$.renderjbin
-
 
 

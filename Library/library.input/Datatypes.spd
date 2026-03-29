@@ -81,7 +81,7 @@ datatype int
 	render (|int| zeros)
 		cpp_part RenderZeros
 		opt norefcounts
-		fs.AppendIntegerAsText(self, zeros)
+		fs.AppendDecimal(self, zeros)
 	
 //	operator AbsMin (|uint| Limit, |int|)
 //		if .abs|uint| < Limit: return self

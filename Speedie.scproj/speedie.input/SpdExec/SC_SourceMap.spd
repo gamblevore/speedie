@@ -38,7 +38,7 @@ module SourceMap
 	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
 
 	function BreakableSorter (SourceSorter)
-		return A - B
+		return B - A
 
 
 	function SortBreaks (|FastString| B)
@@ -51,18 +51,18 @@ module SourceMap
 
 
 datatype SourceLocation (uint64)
-	function FileNum (|uint|)
-		return self >> 53
-	
-	function BytePos (|uint|)
-		return (self>>32) & (21~bits)
+//	function FileNum (|uint|)
+//		return self >> 53
+//	
+//	function BytePos (|uint|)
+//		return (self>>32) & (21~bits)
 
 
 function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
 	|| i = .ASMIndex + sourcemap.ASMTotal
 	if break & Assembler.BreakPoint
 		SourceMap.BreakPoints!.AppendInt(I)
-		
+	
 	if break & Assembler.Breakable
 		|| value = (SrcMap|uint64| << 32) ||| I
 		SourceMap.Breakable!.AppendInt64(Value)

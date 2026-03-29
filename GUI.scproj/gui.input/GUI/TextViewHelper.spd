@@ -23,7 +23,7 @@ class TextViewLine (list)
 	|message?|				Message
 	|Error?|				LineError
 	|float|					UserInfo
-	|int|					MsgPos
+	|int|					AdderPos
 	|int|					vline
 	|int|					tline
 	|TextLineFlags|			TextState
@@ -113,7 +113,7 @@ class TextViewLine (list)
 
 
 	libinternal ColoriseText (|message| msg, |bool| ParsedOK, |message|)
-		.msgpos = -1
+		.adderpos = -1
 		.message = nil
 		isnt fakemsg
 
@@ -123,7 +123,7 @@ class TextViewLine (list)
 		require !parsedok
 
 		|| r = .text.Parse
-			.msgpos = .position // msgpos seems unused? remove it?
+			.adderpos = .position // not sure what its used for?
 			r.addpos(.position)
 			.ColoriseSub(r)
 			is fakemsg
@@ -157,7 +157,7 @@ class TextViewLine (list)
 		
 		if r and !r.StartsAfter(range)
 			(self is breakpoint) = r is breakpoint
-			.msgpos = .position // isn't it r.position?
+			.adderpos = .position // isn't it r.position?
 			.message = r
 		  else
 			isnt breakpoint
@@ -536,7 +536,7 @@ struct MsgTextDrawState
 		function New (|int| x, |textviewline| d, |MsgTextDrawState|)
 			rz.i = 0
 			rz.x = x
-			rz.adder = d.msgpos
+			rz.adder = d.AdderPos
 			rz.msg = d.message
 			rz.t = d.text
 			rz.font = font.small!

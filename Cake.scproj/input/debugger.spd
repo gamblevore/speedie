@@ -39,39 +39,42 @@ module debugger
 
 	function UserMultiBreak (|FileWithData| Path, |uint| Position, |bool| Active=true)
 		opt norefcounts
-/		|| CakeBreak = cake.ActiveBreaks$
-		|| Map = .Breakables.Addr|&sourcelocation|
-		|| n = .Breakables.Length >> 2
-		|| i = 0		
+		|| CakeBreak = cake.ActiveBreaks$		
+		|| MapRaw = .Breakables.Addr|&uint64|
+		|| n = .Breakables.Length >> 3
 		|| ToFind = (path.index << 21) ||| Position
-
-		while i < n
-			|| Src = Map[i++]
-			|| Code = Map[i++]
-			if (Src == ToFind)
-				path = nil
-				.SetUserBreak(cakebreak, Code, active)
-				
-		require path != nil
-
-		i = 0
+		
 		|| BestScore = 0
-		|| BestIndex = 0
-		while i < n
-			|| Src = Map[i]
+		|| BestValue = 0
+		|| BestCount = 0
+		
+		for i in n
+			|| Raw = MapRaw[i]
+			|| Src = (Raw>>32)|sourcelocation|
 			|| Score = Src.MatchScore(ToFind)
 			if Score > BestScore
 				BestScore = Score
-				BestIndex = i
-			i += 2
-		
-		if BestScore
-			.SetUserBreak(CakeBreak, Map[BestIndex+1], active)
+				BestValue = Raw
+				BestCount = 1
+			  elseif Score == BestScore
+				BestCount++
+				require BestCount
+		if BestCount == 1
+			return .SetUserBreak(CakeBreak, BestValue, active)
+
+		for i in n
+			|| Raw = MapRaw[i]
+			|| Src = (Raw>>32)|sourcelocation|
+			|| Score = Src.MatchScore(ToFind)
+			if Score == BestScore
+				.SetUserBreak(CakeBreak, Raw, active)
+			
+			
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |bool| Active)
 		if Code < .dbgLength
-			|| B = CakeBreak[Code] &~ (1<<31)
+			|| B = (CakeBreak[Code] <<1) >>1
 			B |= Active<<31
 			CakeBreak[Code] = B
 		  elseif !.BreakMapBad

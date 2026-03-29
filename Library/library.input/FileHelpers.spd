@@ -234,7 +234,7 @@ Relative paths take the current working directory.`
 			if s == x.Width
 				return self[x.x, s, true]
 
-	operator iz (|string| s, |bool|)
+	function HasName (|string| s, |bool|)
 		|| Last = .length
 			while self[last-1] == '/'
 				last--

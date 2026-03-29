@@ -481,7 +481,7 @@ function PerryIDE.IsEditingSource (|bool|)
 
 	
 function string.IsSpd (|bool|)
-	return self isa "uwu" or "spd"
+	return self isa "uwu" or "spd" or "spd.jbin"
 
 
 function guicontrol.IDE (|perryide!|)

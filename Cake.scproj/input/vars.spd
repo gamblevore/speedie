@@ -268,7 +268,7 @@ class XVar (list)
 				|| sh = 64 - (bc*8)
 				if !t.IsSigned and (sh > 0)
 					value = (value << sh) >> sh
-				fs.AppendIntegerAsText(value)
+				fs.AppendDecimal(value)
 
 				if value and (bc == 1) and !t.IsSigned
 					fs <~ " "								// what if this is UTF-8?
