@@ -1301,7 +1301,6 @@ JB_MsgPos_Destructor
 JB_Msg_Ancestor
 JB_Msg_AppendMacro
 JB_Msg_AppendNum
-JB_Msg_AppendString
 JB_Msg_Array
 JB_Msg_BecomeCopy
 JB_Msg_BecomeMacro
@@ -1353,7 +1352,6 @@ JB_Msg_NeedSyxOK
 JB_Msg_NextOf
 JB_Msg_NilCheck
 JB_Msg_OperatorIn
-JB_Msg_OperatorStarts
 JB_Msg_OriginalFilePath
 JB_Msg_OriginalParseData
 JB_Msg_ParseAST
@@ -1643,6 +1641,7 @@ JB_Str_FindSlash
 JB_Str_First
 JB_Str_GetArchive
 JB_Str_GlobExpand
+JB_Str_HasName
 JB_Str_Hex
 JB_Str_HexInteger
 JB_Str_HexIntegerSection
@@ -1683,7 +1682,6 @@ JB_Str_OpenInEditor
 JB_Str_OperatorGlobbed_By
 JB_Str_OperatorGlobs
 JB_Str_OperatorIsa
-JB_Str_OperatorIz
 JB_Str_OperatorMul
 JB_Str_OperatorPlus
 JB_Str_OperatorPlusWithCstring
@@ -1874,6 +1872,7 @@ JB_bin_Constructor
 JB_bin_Exit
 JB_bin_FinishAdd
 JB_bin_RunHeader
+JB_bin_Start
 JB_bin_StartAdd
 JB_bin_TmpArg
 JB_bin_WriteType
