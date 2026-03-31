@@ -1664,7 +1664,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2431])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2430])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1803,10 +1803,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2430])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2428])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2428])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2427])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2432,17 +2432,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2423])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2425])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2426])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2425])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2423])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2422])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2426])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2427])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2426])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2499,7 +2499,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2422])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2421])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2544,7 +2544,7 @@ extern Dictionary* SC__xC2xB5Form_Forms;
 #define kJB__File_TruncateMode ((int)1024)
 #define kJB__File_WantFileObjects ((int)4)
 #define kJB__File_WriteMode ((int)1)
-#define JB__bin_Header JB__.bin_Header
+#define kJB__bin_JBinHeader ((int)3806990337)
 extern SCIterator* SC__Iter_carray;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern bool SC__Base_CurrVisibility;
@@ -2608,7 +2608,6 @@ struct JB_Globals {
 	Message* App__Prefs;
 	JB_File* App__StdOut;
 	JB_String* File__Speedie;
-	JB_String* bin_Header;
 	JB_File* App__stdin;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
@@ -2619,6 +2618,7 @@ struct JB_Globals {
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
+	FP_SorterComparer ID__ByFreq;
 	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
 	FP_fnIDGenerator Tk_Splitter;
 	FP_SorterComparer Str__Sorter;
@@ -2627,13 +2627,12 @@ struct JB_Globals {
 	FP_SorterComparer File__Sorter;
 	FP_SorterComparer Tree__Sorter;
 	FP_SorterComparer ID__ByID;
-	FP_SorterComparer ID__ByFreq;
 	RandomXOR* Random;
 	PicoComms* Proc__ForceParent;
 	RandomXOR zalgo_R;
 	RandomXOR RandomShared;
-	CompressionStats MzSt_All;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mrap_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -7399,8 +7398,6 @@ int JB_SS_Find(InputStream* Self, uint /*byte*/ C);
 
 bool JB_SS_HasAny(InputStream* Self);
 
-bool JB_SS_HasHeader(InputStream* Self, JB_String* Header);
-
 int JB_SS_HInt(InputStream* Self);
 
 bool JB_SS_NextChunk(InputStream* Self);
@@ -8189,13 +8186,13 @@ void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
 void JB_bin_RunHeader(FastString* Self, JB_String* Name);
 
+void JB_bin_Start(FastString* Self, Syntax Type, JB_String* Name);
+
 int JB_bin_StartAdd(FastString* Self);
 
 jbinLeaver JB_bin_TmpArg(FastString* Self, JB_String* Name);
 
 void JB_bin_WriteType(FastString* Self, Syntax Type, bool GoIn);
-
-int JB_bin__Init_();
 
 
 
@@ -11265,7 +11262,7 @@ inline JB_String* SC_SCObject_Name(SCObject* Self) {
 	if (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[13];
+	return JB_LUB[12];
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
@@ -11444,7 +11441,6 @@ struct JB_Globals {
 	JB_Object* App__Prefs;
 	JB_Object* App__StdOut;
 	JB_Object* File__Speedie;
-	JB_Object* bin_Header;
 	JB_Object* App__stdin;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
