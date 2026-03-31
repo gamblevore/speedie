@@ -16,6 +16,7 @@ struct PicoMessage
 		inlined
 		if self
 			return .data
+//		return (.data, false)(self) // fails?
 	
 	module
 		function From (|string| s, |PicoMessage|)
@@ -31,7 +32,7 @@ function @string.FromPico (|picomessage| M, |string|)
 struct PicoConfig
 	// needs to be adjusted (For cake) along with ALL the speedie structs ;_;
 	linkage: wrapper, cpp_part PCF
-	|int8[16]| 				Name
+	|int8[16]|				Name
 	|Date|					LastRead
 	|Date|					LastSend
 	|int|					QueueSize
@@ -53,7 +54,7 @@ struct Pico
 	function IsParent (|bool|)
 		cpp_wrapper PicoIsParent
 		
-	function CanGet (|bool|)
+	function CanGet (|ind|)
 		nil self
 		cpp_wrapper PicoCanGet
 		
@@ -73,10 +74,6 @@ struct Pico
 		
 	libinternal _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
-
-//	libinternal Send (|picomessage| A, |bool| Wait=false, |bool|)
-//		cpp_Part SendMsg
-//		return ._send(A.data, a.length, wait)
 		
 	inline Tickle (|bool|)
 		return self <~ ""
@@ -87,7 +84,7 @@ struct Pico
 
 	function Get (|float| T, |string|)
 		nil checker
-		if (T > 0) or .canget // important that Pico pauses if asked! Or else we get hot-loops...
+		if (T > 0) or (.canget > 0)				// important that Pico pauses if asked! Or else we get hot-loops...
 			|picomessage| msg
 			.__get(msg, T)
 			return string.FromPico(msg)
@@ -99,7 +96,7 @@ struct Pico
 		nil checker
 		cpp_wrapper PicoError
 	
-	inline IsOK (|bool|)
+	function IsOK (|bool|)
 		nil checker
 		|| s = .MessageStatus
 		return s == 0 or 255
@@ -136,7 +133,7 @@ struct Pico
 			cpp_wrapper PicoDestroy
 			
 		function Replace (|&&pico| Where, |bool|)
-			|| New = pico.new #require
+			|| New = pico.new									#require
 			.destroy(where, "replace")
 			where[0] = new
 			return true
@@ -149,7 +146,7 @@ struct Pico
 		
 		// could we rename this to app.fork? it kinda makes more sense, right?
 		// i mean... we don't HAVE an app.fork...
-		function Fork (|StringZeroTerminated| name="", |int| Noise=piconoise.events,   |&pico|)
+		function Fork (|StringZeroTerminated| name="", |int| Noise=piconoise.events, |&pico|)
 			|| p = .new(name, noise)
 				|| pid = p.spawnfork
 				if pid >= 0
@@ -221,21 +218,16 @@ struct AtomicLock
 	function Enter (|bool|)
 		cpp_wrapper PicoEnter
 	
-	function Leave
+	inline Leave
 		.Locked = false
 
-	syntax Using (|&AtomicLock|) // I don't like how this works... I wnt to return nothing.
+	syntax Using (|&AtomicLock|) // I don't like how this works... I want to return nothing.
+		inlined
 		.Enter
 		return self
 
 	syntax UsingComplete (|&AtomicLock| idk=nil)
+		inlined
 		// param order should be reversed! sigh...
 		.locked = false
 
-//	module
-//		function Test
-//			visible
-//			|AtomicLock| Lock
-//			using Lock
-//				"hello"
-//			

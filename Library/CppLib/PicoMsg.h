@@ -609,8 +609,10 @@ struct PicoComms : PicoConfig {
 		return 0;
 	}
 
-	bool CanGet () {
-		return !(PartClosed & 2) or PreData;
+	int CanGet () {
+		if (PreData)
+			return 1;
+		return -((PartClosed & 2)>>1);
 	}
 	
 	bool StillSending () {
@@ -1385,9 +1387,12 @@ extern "C" int PicoPartsOpen (PicoComms* M) _pico_code_ (
 	return (~(M->PartClosed)) & 15;
 )
 
-extern "C" bool PicoCanGet (PicoComms* M) _pico_code_ (
-/// Returns if we either HAVE unread messages, or MIGHT get them in the future (That is, it is not closed)
-	return M?M->CanGet():false;
+extern "C" int PicoCanGet (PicoComms* M) _pico_code_ (
+/// Return values:
+// -1: Theres no messages to get, AND we WON'T get any in the future.
+//  0: No messages to get, but we can still get things in the future.
+//  1: There is something to get. Can return 1 even if closed, if there are remaining messages. 
+	return M ? M->CanGet() : -1;
 )
 
 extern "C" bool PicoIsParent (PicoComms* M) _pico_code_ (
