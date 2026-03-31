@@ -30,7 +30,7 @@ function image.DrawFont (|string| Str, |ivec2| xy, |vec4| Col, |bool| DrawInvis,
 		pc = pc.ImproveDraw(str, ptr - str.addr)
 		.DrawChar(pc, Where, xy, Col)
 
-		|| w = (1, i.tabsWidth)(c != '\t')
+		|| w = (1 (c != '\t') i.tabsWidth)
 		i += w
 		xy.x += w * font.width
 	return xy.x

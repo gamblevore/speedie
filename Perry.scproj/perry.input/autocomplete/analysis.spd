@@ -20,7 +20,7 @@ function PerryIDE.ListAllFuncs (|bool| Sel = false, |string| Filter = "")
 	.ListAllFuncsMsg(.EditMe.Parse, result, filter)
 	if sel
 		.FindSelectedMenuItem(result)
-	result.obj = (.editme._Start, nil)(sel)
+	result.obj = (.editme._Start (sel) nil)
 	result.Sort(FuncListSorter)
 	(.FunctionMenu is visible) = filter or result.HasAny
 	.FunctionMenu.text = "(" + result.Count.Render + ")"

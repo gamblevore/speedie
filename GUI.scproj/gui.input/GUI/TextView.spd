@@ -1679,7 +1679,7 @@ class TextView (GUIControl)
 				c.y--
 				c.y2--
 				where.ControlClip = c
-			|| g = (¥.TextSelection, ¥.TextSelectionUnfocus)(.HasAnyFocus)
+			|| g = (¥.TextSelection (.HasAnyFocus) ¥.TextSelectionUnfocus)
 			.DrawSelRange(Where, r, g)
 		  elseif .ShouldDrawSel
 			|| Cp = (1.0, 1.0, 1.0, 0.666).px

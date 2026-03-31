@@ -167,7 +167,7 @@ function TextView.DoTheParamDisplayThing (|int| x, |bool| Force, |bool|) // para
 	opt norefcounts
 	|| i = .ide
 	|| msg = .MessageAt(x, true)
-	|| type = ("displayallforced", "displayall")(force)
+	|| type = ("displayallforced" (force) "displayall")
 	|| msg2 = .ParamDisplayPlace(msg, x)
 		i.MaybeSendMessage(type, msg2, msg2.name, "Sel")
 	  else

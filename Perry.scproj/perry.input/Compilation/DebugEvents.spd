@@ -263,7 +263,7 @@ function DebugBreakAdd (GuiTextLineEvent)
 		Notifications <~ "Removing this during debug breaks the debug positions."
 		return true
 	
-	|| cmd = ("brkadd", "brkrem")(direction > 0)
+	|| cmd = ("brkadd" (direction > 0) "brkrem")
 	|| j = VarPrinter
 	j.start(@tmp, cmd)
 	j.addstr i.path

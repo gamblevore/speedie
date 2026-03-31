@@ -82,7 +82,7 @@ function @confirmationdialog.Ask (|string| Q,  |string| Title,  |[string]| Answe
 			|| a = answers[i]
 			a ?= ""
 			b.vistext = a
-			|| l = (3,7)(i > 0)
+			|| l = (3 (i > 0) 7)
 			b.size    = (l)~after for bW  by 5~up  for 17
 		.SetResponse(response)
 		

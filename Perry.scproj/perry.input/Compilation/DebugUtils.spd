@@ -87,7 +87,7 @@ function SetAppInfo
 
 	for btn in .DebugBtns
 		|| Last = btn.IsLast
-			btn.text = ("\02\02", "\0E")(paused)
+			btn.text = ("\02\02" (paused) "\0E")
 		(btn is enabled) = CanDebug and (Paused or Last)
 
 	if !CanDebug

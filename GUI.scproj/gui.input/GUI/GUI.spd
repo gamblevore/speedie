@@ -727,7 +727,7 @@ module GUI
 
 		|| fps = .SimulationFPS|int|
 		if fps < 10
-			fps = (60, 10)(.Tasks.first)
+			fps = 10 + 50*(.Tasks.first!=nil)
 			fps >>= gui.IsBackground
 		
 		|int| i = ._FrameNum

@@ -663,7 +663,8 @@ class PerryIDE (Window)
 		
 	
 		function PerryOpenDoc (GUIPasteEvent)
-			|| i = .ide?
+			opt norefcounts
+			|| i = (.ide (self) nil)
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)
@@ -677,7 +678,6 @@ class PerryIDE (Window)
 	function OpenDoc (|string| Path, |object|)
 		require self
 		|| p   = path
-//		|| ext = p.ext
 		|| f   = p.file
 		if f.isdir
 			p = p.pathdir
@@ -697,12 +697,12 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| txt = .EditMe
 		|| doc = txt.document
-		|| path = (doc.location, "")(doc)
+		|| path = (doc.location (doc) "")
 		|| lst = .errorlist
 		txt.ClearErrors
 		.filelist.ClearErrors
 
-		|error| jumpto 
+		|error| jumpto
 		|| src = lst.ListSource
 		|| ActualErrors = 0
 		|| sel = txt.Selectedline
@@ -765,7 +765,7 @@ So anything not 0 means "its OK"`
 			.DuringLoad++
 			.ViewAsCurr
 			.DuringLoad--
-		|| ok = (.EditDraw(r), .EditText(r))(g)
+		|| ok = (.EditDraw(r) (g) .EditText(r))
 		if ok != 1
 			return ok
 
@@ -804,7 +804,7 @@ So anything not 0 means "its OK"`
 
 	task CheckScrollErrors (taskgui)
 		run
-			|| e = .upon.editme 
+			|| e = .upon.editme
 			if e.myerror
 				e.TouchScrollBar
 			
@@ -880,8 +880,7 @@ So anything not 0 means "its OK"`
 		¥.LoadFromPrefs
 
 
-	function ParseErrorDetect
-		// not necessarily an error!? what if the file is not spd?
+	function ParseErrorDetect						// not necessarily an error!? what if the file is not spd?
 		for e.toplist in .errorlist
 			if e isa error
 				if e is parse
@@ -892,7 +891,7 @@ So anything not 0 means "its OK"`
 				ifn err isa error
 					log "ParseErrorDetect bug"
 				  elseif err is parse
-					.errorlist <~ err // right?
+					.errorlist <~ err				// right?
 
 	
 	function LoadStartupErrors

@@ -41,7 +41,7 @@ extend PerryIDE
 
 	function ClearErrors (|bool| Compiled)
 		isnt Broken
-		.CompileOKString = ("Compile OK", "Check OK")(Compiled)
+		.CompileOKString = ("Compile OK" (Compiled) "Check OK")
 		.errorlist.Clear
 		.editme.ClearErrors
 		.filelist.ClearErrors

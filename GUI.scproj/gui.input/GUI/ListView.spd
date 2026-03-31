@@ -1469,7 +1469,7 @@ class ListView (GUIControl) {
 		self <~ menuitem(name, ev, obj)
 
 	
-	Syntax append (|ListViewRow| R)
+	syntax append (|ListViewRow| R)
 		opt norefcounts
 		.listsource <~ r
 		if .keeponeselected and !r.prev

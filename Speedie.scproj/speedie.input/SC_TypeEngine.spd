@@ -897,6 +897,7 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 
 
 function TypeOfTernary (ExprResolver)
+	// want to remove this!
 	opt norefcounts
 	|| list		= exp.first
 	|| params	= list.next
@@ -917,7 +918,8 @@ function TypeOfTernary (ExprResolver)
 		params.obj = compiler.TernaryFunc
 		params <~ list.first
 		exp.ASMType = ASMType.ktern
-		problem exp
+		if params.second != @func
+			problem exp
 		return result
 
 
@@ -951,7 +953,7 @@ function message.DeOpp
 function TypeOfTernary2 (ExprResolver)
 	opt norefcounts
 	using exp
-/	|| first	= exp.first!
+	|| first	= exp.first!
 	|| Test		= first.next!
 	|| second	= test.next
 	if !second

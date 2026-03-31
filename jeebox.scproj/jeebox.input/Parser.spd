@@ -577,22 +577,27 @@ extend Parser
 	
 	
 	function fOppBracket (ParseHandler)
+		opt norefcounts
 		ignore
-			x = x (i > 0) z
-		|| result = parser.new( nil, @Bra, start )
-		|| opp1 = parser.Process( kOppChain )
-		|| opp2 = parser.Process( kOpp )
-		if !opp2
-			result <~ opp1
-		  else
-			|| rel = parser.new( result, @rel, parser.nextstart - 1 )
-			rel <~ opp1
-			rel <~ opp2
-			rel <~ parser.Process( kOppChain ||| kThingSyx )
+			x = x (a > 0) z
+		|| bra = parser.new( nil, @Bra, start )
+		|| inside = .ProcessThing			// "oppify" the things...
+			|| fn = inside.func
+			if fn == @thg
+				inside.func = @opp
+			  elseif fn == @rel
+				|| f = inside.first
+				|| op = f.next
+				|| s = op.next
+				if f == @thg
+					f.func = @opp
+				if s == @thg
+					s.func = @opp
+			bra <~ inside
 
 		parser.ExpectEndChar( start, ")" )
-		result.after = parser.nextstart
-		return parser.OppChain( result )
+		bra.after = parser.nextstart
+		return parser.OppChain( bra )
 	
 
 	function fOppSyx (ParseHandler)

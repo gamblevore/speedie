@@ -51,7 +51,8 @@ function PerryColorLineNum (GUITextLineBreakColor)
 			|| fn = m.OwningFunc
 				|| Prev = PreRun[]
 				f = 0.35
-				|| pflags = (1 & Prev.flags, 0)(prev)
+				|| pflags = 0
+				if prev: pflags = 1 & Prev.flags
 				if Prev != fn										// how do we know which is which? what color?
 					pflags ^= 1
 					prerun[] = fn

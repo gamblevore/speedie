@@ -272,8 +272,10 @@ function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec
 
 function PerryIDE.StartPopupVis (|bool| instant)
 	if !.PopupDateOn
-		// using GUITask would be better... sigh.
-		|| add = (-10.0s, 0.5s)(instant or keys.CmdAgo(2s))
+		// Using GUITask would be better... sigh.
+		|| add = 0.5s
+		if  instant or keys.CmdAgo(2s)
+			add = -10s
 		.PopupDateOn = gui.framestart + add
 	.PopupDisplayFadeIn
 
@@ -466,7 +468,7 @@ function JumpToDefinition (GUIAction)
 			|| f = msg.owningfunc
 				if msg == f  or  msg in f
 					cmd = false
-			|| op = ("define", "callfrom")(cmd)
+			|| op = ("define" (cmd) "callfrom")
 			|| d = ide.MaybeSendMessage(op, msg)
 			ide.SectionKeyTime = d * rightclick
 			

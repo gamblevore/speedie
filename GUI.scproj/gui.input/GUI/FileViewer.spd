@@ -285,7 +285,7 @@ class FileViewer (ListView)
 			return 0
 			
 		|| HasSlash = ToFind contains '/'
-		|| which = (self, .name)(HasSlash)
+		|| which = (self (HasSlash) .name)
 		if which contains ToFind
 			rz = 2
 			if .endswith(ToFind) and self[(self-ToFind)-1] == '.'
@@ -408,7 +408,7 @@ class FileViewer (ListView)
 		for p in items
 			|| m = message(@str, p.name)
 			|| dir = p.Location.file.isdir
-			m.name = ("\10 ", "\11 ")(dir) + m.name
+			m.name = ("\10 " (dir) "\11 ") + m.name
 			
 			if HasSel and p isnt UnSelectable
 				(p is selected)

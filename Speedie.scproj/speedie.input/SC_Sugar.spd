@@ -34,7 +34,6 @@ function message.QMarkRel (|message|)
 		require x == @dot
 
 
-
 function message.BecomeAppend (|string| s)
 	opt NoRefCounts
 	|| p = .parent!
@@ -79,16 +78,13 @@ function message.MsgFix (|message| parent=nil, |message!|) // «
 
 
 
-function message.Tran_QMark 
+function message.Tran_QMark//"?"
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func)
-	if thedot == @dot
-		problem (thedot)
-	if !isnormal
+	if !isnormal							// if x? --> if (x)
 		expect (thedot == @thg) (thedot, "Question-mark must be:  a.b?  or  (a)(b)?  or  a.b?=c")
 		.func = @bra
 		return
-
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)
 	|| inside = thedot.first!
@@ -102,36 +98,38 @@ function message.Tran_QMark
 		rel.next = self
 		.become(@arg)
 		inside.replaceWith(@thg.msg("_t"))
-		|| decl = MakeDecl("",  "_t", inside, scdeclinfo.temp) 
+		|message--| decl = MakeDecl("",  "_t", inside, scdeclinfo.temp) 
 		self <~ decl
 		decl.msg(@arg) <~ rel
 		return
 
-	|| tern = self
-	if self in @arg					//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
-		.become(@arg)
-		is style2 
-	  elseif (inside == @thg)		// (a.b, nil)(a))
-		.func = @func
-	  else							// ({ || t = a(), (t.b, nil)(t) })
-		.func = @bra
-		tern = .msg(@arg)
-		(tern is style2)
-		tern = tern.msg(@func)
-	
 	|| Cond = @thg + inside.name
-	if self in @arg
+	|| tern = self
+	if self in @arg							//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
+		.become(@arg)
+		is style2
 		tern = .msg(@tmp, "if")
 		tern <~ cond
 		// add |()--| to thedot?
 		// is there an easier way? Just add... like a bit somewhere to the msg?
 		tern.msg(@arg) <~ thedot
 	  else
+		if (inside == @thg)
+			error self						// im trying to remove '?' syntax bit by bit...
+											// sometimes its really nice, but we have other alternatives
+											// like terns... (a (t) b)
+											// its still really nice for this!   (.somefunc)(a,b)?
+											// ({ || t = a(), (t.b, nil)(t) })
+		.func = @bra
+		tern = .msg(@arg)
+		(tern is style2)
+		tern = tern.msg(@func)
+//		tern = tern.msg(@rel)				// need a rel instead of a func! // todoooooo!!
 		|| options = tern.msg(@list)
 		tern.msg(@prm) <~ cond
 		options <~ thedot
-		options <~ (@thg, "nil")	// TypeOfTern could "just give the default"!
-									// So I don't even need to enter "nil"! Just delete it!
+		options <~ (@thg, "nil")			// TypeOfTern could "just give the default"!
+											// So I don't even need to enter "nil"! Just delete it!
 	if (inside != @thg)
 		cond.name = "_t"
 		inside.replaceWith(@thg.msg("_t"))
@@ -147,8 +145,8 @@ function message.MainArgDotFix (|message|)
 		require .expect(@dot)
 		self[@emb, 1]
 		self = .first!
-	
-	
+
+
 function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
 	
@@ -162,8 +160,8 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	|| MaybeNil = Type isarel "?"
 		Type = Type.first!
 	
-	|| InnerType = type.MainArgDotFix$
-	|| cls = Compiler[InnerType] #require
+	|| InnerType = type.MainArgDotFix					#require
+	|| cls = Compiler[InnerType]						#require
 	if !maybenil
 		maybenil = cls.IsDataTypeOnly	
 	
@@ -183,7 +181,7 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 			arg.AppendMacro(macros.MainArgbasicReq.clean, prms)
 		return 2
 	
-	name = name[@thg]					#require
+	name = name[@thg]									#require
 	prms[0] = name
 	|| opp = name.next(@opp, "=")
 	|| l = opp.Next(@Nil)
@@ -231,7 +229,7 @@ function compiler.AddFunny (|message| msg, |message| curr)	// autoimport
 	require !.HasFunny
 	.HasFunny = true
 	problem (curr, "Strange behaviour")
-	msg.msg(@tmp, "import") <~ ".Funny" // hehe
+	msg.msg(@tmp, "import") <~ ".Funny"			// hehe
 
 
 

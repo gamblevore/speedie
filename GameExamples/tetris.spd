@@ -218,7 +218,7 @@ class Tetris (GridSection)
 		
 	
 	function NextShape (|bool| Troll=false)
-		|| bag = (trollshapes,Shapes)(troll)
+		|| bag = (trollshapes (troll) Shapes)
 		|| B = bag.Next
 		if !b
 			bag.Shuffle
@@ -291,7 +291,10 @@ class Tetris (GridSection)
 			if b is dropper
 				rz = 0
 				|| dest = x+c
-				|| T = (dest[]&test, -1)(dest >= .at)
+				|| T = -1
+				if (dest >= .at)
+					T = dest[]&test
+				if t
 					.fail
 					return t
 				dest[] |= b<<16
