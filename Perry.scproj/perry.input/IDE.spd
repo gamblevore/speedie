@@ -156,7 +156,7 @@ class PerryIDE (Window)
 		|| e = .editme.myerror.useable(0)
 			if .editme.ParsedMessage				// don't show simple parse errors
 				return e
-			if .editme.expectsparse >= textview.probablyjeebox
+			if .editme.JeeboxMode >= textview.probablyjeebox
 				return e
 		return GUI.tooltip.useable
 	
@@ -820,6 +820,8 @@ So anything not 0 means "its OK"`
 			doc.ExpectJeebox = TextView.AllowJeebox
 
 		|| Loaded = E.LoadDocument(doc, true)					#require
+		if e._ActiveLine
+			.ReloadBreaks
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
 		doc.CompareTreesOnSave = doc.ExpectJeebox

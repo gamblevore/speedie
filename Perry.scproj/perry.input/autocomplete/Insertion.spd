@@ -327,7 +327,7 @@ function textview.PerryDeclKey (|bool|)
 	|| s = .SelRange
 	require !s.width
 
-	|| d = .FindDrawInfo(s.x)
+	|| d = .FindTextLine(s.x)
 	|| m = d.message
 		|| com = .InPrmsAndBetweenDecls(m, s.x)
 			return PerryInsert6(self, (com,com)+1)
@@ -392,7 +392,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 	if  key is escape  and  ide.PopupDateOn.ago > 0.5s
 		ide.PopupHide
 		return 1
-	require  .ExpectsParse >= ProbablyJeebox
+	require  .JeeboxMode >= ProbablyJeebox
 	
 	|| s = .SelRange
 	|| i2 = s.x2
@@ -414,7 +414,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 			return 1
 	
 	require key isnt escape
-	|| dd = .FindDrawInfo(s.x)
+	|| dd = .FindTextLine(s.x)
 	require  (dd contains i2)
 	|| err = dd.lineerror
 		require err isnt parse

@@ -1808,13 +1808,6 @@ void JB_FS_AppendEscape(FastString* fs, JB_String* self);
 
 JB_String* JB_Str_Render(JB_String* self, FastString* fs_in) {
     FastString* fs = JB_FS__FastNew(fs_in);
-
-//    JB_String Fmt;
-//    Fmt.Addr = (u8*)"\x0CHello\x01\x0DMyName\x02\x09Is\x05\x0B""Cool";
-//    Fmt.Length = strlen((const char*)Fmt.Addr);
-//    auto cwd = "/usr/local/speedie";
-//    JB_FS_AppendVArg(fs, &Fmt, cwd, '/', self);
-
     JB_FS_AppendByte(fs, '"');
     JB_FS_AppendEscape(fs, self);
     JB_FS_AppendByte(fs, '"');

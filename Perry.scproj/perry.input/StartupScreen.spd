@@ -37,7 +37,7 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 			|| b = buttonview(._win,	fnc)
 			|| t = buttonview(._win,	fnc,		nil)
 			
-			(t isnt editable) 
+			(t isnt editable)
 			t.text		= "\n" + name
 			t.tooltip	= tooltip
 			b.tooltip	= tooltip
@@ -50,8 +50,8 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 			b.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
 			t.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
 			
-			b.size 		= 4~right for 30 by 4~after for 30 
-			t.size 		= 6~after to 6~left  by  the~same
+			b.size		= 4~right for 30 by 4~after for 30 
+			t.size		= 6~after to 6~left  by  the~same
 			t.align		= ListViewState.aligncenter
 			
 
@@ -64,10 +64,10 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 			._win = rz
 			
 			with rz
-				.id			   = "startup"
-				.size		   = 200 by 140
-				.gnormal       = ¥.SystemStyle.copy
-				.gnormal.solid = ((0.01, 0.05, 0.01, 0.9))
+				.id				= "startup"
+				.size			= 200 by 140
+				.gnormal		= ¥.SystemStyle.copy
+				.gnormal.solid	= ((0.01, 0.05, 0.01, 0.9))
 				.ClickOutsideCloses = true
 				isnt visible
 

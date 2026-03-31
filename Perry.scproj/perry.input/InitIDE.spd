@@ -1,6 +1,6 @@
 
 
-extend PerryIDE  
+extend PerryIDE
 	constructor (|file| project, |bool| Dummy)
 		super.constructor
 		(dummy)
@@ -117,7 +117,7 @@ extend PerryIDE
 			.gnormal.solid = (0.05, 0.05, 0.05, 0.95)
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125).px
 			.OnKeyDown = DebugArgsKeyDown
-			.expectsparse = textview.AlwaysJeebox
+			.JeeboxMode = textview.AlwaysJeebox
 			.attachedfrom = movecode.top
 			.ClickOutsideCloses = true		
 
@@ -388,7 +388,7 @@ extend PerryIDE
 			.ID				= "PopupDisplay"
 			.size			= the~area
 			.takesfocus		= 0
-			.expectsparse	= TextView.probablyjeebox
+			.JeeboxMode	= TextView.probablyjeebox
 
 
 		with .EditStatus 
@@ -605,7 +605,7 @@ extend PerryIDE
 		.ID				= name
 		.size			= the~width by the~bottom to 0~under
 		.gnormal.solid	= vec4(0.077, 0.95)
-		.expectsparse	= Parse
+		.JeeboxMode	= Parse
 		.IsALogTextView = true
 		.ide.productsep.addleft(self)
 		

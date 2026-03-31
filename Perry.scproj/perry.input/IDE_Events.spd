@@ -248,7 +248,7 @@ function PerryIDE.UpdateJeeboxField (|bool|)
 	|| sr = e.SelRange
 	|| txt = e.SelText
 	if !sr.width
-		txt = e.FindDrawInfo(sr.x).text
+		txt = e.FindTextLine(sr.x).text
 	
 	|| str = ""
 	|| msg = txt.Parse
@@ -434,7 +434,7 @@ function PerryIDE.ClickedError (|error| row)
 	require !.DuringMsgFB
 	using self
 		|| f = row.path.file
-		if (row.path != .editme.path) and f.IsNicelyViewable
+		if (row.path != .editme.filepath) and f.IsNicelyViewable
 			.EditPath(f, false)
 		.editme.ShowAndSelect(row.position, true)
 		.editme.MyError = row

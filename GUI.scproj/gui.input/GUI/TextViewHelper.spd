@@ -4,6 +4,7 @@ datatype TextLineFlags (uint16)
 	flags
 		BreakPoint
 		RealBreakPoint
+		Reached
 		Colored
 		Found
 		CurrFound
@@ -11,7 +12,7 @@ datatype TextLineFlags (uint16)
 		StartsNormally
 		AvoidLastChar
 		FakeMsg
-		Lighter
+		Selected
 
 
 class TextViewLine (list)
@@ -65,16 +66,13 @@ class TextViewLine (list)
 		return d contains b
 
 
-	libinternal SyntaxIs (|TextLineFlags| F, |bool|)
-		if self
-			return .TextState&F
+	inline SyntaxIs (|TextLineFlags| F, |bool|)
+		return .TextState&F
 
-
-	libinternal syntaxis (|TextLineFlags| F, assigns:|bool|)
-		if value
-			.TextState |= f
-		  else
-			.TextState &= ~F
+	function syntaxis (|TextLineFlags| F, assigns:|bool|)
+		|| T = .textstate&~F
+		T |= F*value
+		.textstate = T
 
 
 	libinternal XOfChar (|ind| Pos, |int|)
@@ -322,7 +320,7 @@ class TextViewLine (list)
 
 libinternal textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
 	|| v = s.vline|float|
-	|float| N = ._lines.last!.vline|float|
+	|float| N = .WrappedLines.last!.vline|float|
 	|| Y = 1.0 - (v/n)
 	require y >= 0 and y <= 1.0
 	
@@ -414,46 +412,52 @@ libinternal TextView.UseColorAnyway (|int|)
 
 
 libinternal TextView.SpaceDisplayAsDot (|textviewline| d, |int|)
-	if self is CodeEditor  and  .ExpectsParse >= ProbablyJeebox
+	if self is CodeEditor  and  .JeeboxMode >= ProbablyJeebox
 		rz = 0x13FFFFFF
-		if ._DrawInBreakArea & 1
-			._DrawInBreakArea |= 2
+		if ._DrawInLineArea & 1
+			._DrawInLineArea |= 2
 			|| mx = .MouseXY.x
 			if mx < .linenumright and mx >= .LastLeft
 				rz += 0x2F000000
-				if d is Lighter
+				if d is Selected
 					rz += 0x3F000000
-			  elseif d is Lighter
+			  elseif d is Selected
 				rz += 0x0F000000
 
 	
 
-libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| usecol)
+libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
 	opt norefcounts
 	opt min 3
-	(d isnt lighter)
+	(d isnt Selected)
 	|| GoUp = (7 - .lineheight)/2
 	if d.LineError
 		if .MyError
 			.DrawErrorBackground(where, y+GoUp, d)
 		  else
-			d.LineError = nil // sigh. crappy bug fix
+			d.LineError = nil							// sigh. crappy bug fix
 	
 	|| m = ._ActiveLine
 		if d contains m.Position
-			|| f = .Path
+			|| f = .FilePath
 			if m ~= f
 				|| bg = ¥.ActiveTextLine
 				.Drawbackground(where, y + GoUp, bg)
 
-	if .CanDrawLight(d)				// linelight
-		(d is lighter)
+	if .CanDrawSelected(d)									// linelight
+		(d is Selected)
 		.DrawLighter(where, y+GoUp)
 	
 	|| x	 = .DrawLineNumber(where, d, y)-1
 	|| state = MsgTextDrawState(x, d)
-	|| NoDrawFirst =  self is CodeEditor  and  d is breakpoint
-		state.font.DrawChar('\18', Where, (x, y), nil)
+	|| NoDrawFirst =  (self is CodeEditor)  and  (d is breakpoint or RealBreakPoint)
+		|| col = vec4(0)
+		if (._ActiveLine) and (d is realbreakpoint)!=(d is BreakPoint)
+			col = (1.0, 1.0, 0.75, 0.375)
+			if d is realbreakpoint
+				col = colors.blue(0.375)
+		state.font.DrawChar('\18', Where, (x, y), col, 0)
+		
 	
 	|codepoint| Prev
 	|| xlimit = .lastrect.x2
@@ -465,7 +469,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		ifn useCol & 2
 			UseCol = (d is colored)|int|
 		|| col = ¥.GetColor(state.msg, usecol, pos)
-		if d.LineError and c == 9 and prev == 32 
+		if d.LineError  and  c == 9  and  prev == 32
 			c = -c
 		if NoDrawFirst and c == '/'
 			NoDrawFirst = false
@@ -517,7 +521,7 @@ struct MsgTextDrawState
 	|string--|				t
 	|image--|				font
 	
-	function Next (|$codepoint| Char, |$int| ppos, |int|)
+	libinternal Next (|$codepoint| Char, |$int| ppos, |int|)
 		opt norefcounts
 		|| c = Char
 		|| w = (1, .i.tabsWidth)(c != '\t')
@@ -532,7 +536,7 @@ struct MsgTextDrawState
 			
 		
 	module
-		function New (|int| x, |textviewline| d, |MsgTextDrawState|)
+		libinternal New (|int| x, |textviewline| d, |MsgTextDrawState|)
 			rz.i = 0
 			rz.x = x
 			rz.adder = d.AdderPos
@@ -574,7 +578,7 @@ libinternal string.CountBytesInSquares (|int| Remain, |int|)
 	return .length
 
 
-function TextView.DrawOneStartLine (|string| txt, |int|)
+libinternal TextView.DrawOneStartLine (|string| txt, |int|)
 	|| s = .lastrect
 	|| x = s.x1 + font.width
 	if .Alignment is Horizontal
@@ -607,7 +611,7 @@ libinternal Textviewline.ReclaimStart (|int| p, |textviewline|)
 		rz = rz.next #loop
 
 
-function Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
+libinternal Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
 	opt norefcounts
 	|| v  = .vline
 	
@@ -637,18 +641,18 @@ function error.TextColor (|float| alpha=1.0, |vec4|)
 		rz.a *= 0.5
 
 
-function textview.LineNumColor (|textviewline| D, |imagepixel|)
+libinternal textview.LineNumColor (|textviewline| D, |imagepixel|)
 	opt norefcounts
 	|| fn = .OnDrawLineNumber ?? textviewline.ColorLineNum
-	|| w = (fn)(d, nil, (._DrawInBreakArea&1)!=0)
-	if d is Lighter
+	|| w = (fn)(d, nil, (._DrawInLineArea&1)!=0)
+	if d is Selected
 		w.a *= 2.0
 	|| c = w.a.mix(.gnormal.bg.Color, w)
 	c.a = 1.0
 	return c.px
 
 
-function textview.CanDrawLight (|TextViewLine| D, |bool|)
+libinternal textview.CanDrawSelected (|TextViewLine| D, |bool|)
 	require (self is editable) and !.SingleLine
 	// should involve ._PreferPrevLine or something calling it.
 	// or else we can select "off the end" of a line, by clicking after it

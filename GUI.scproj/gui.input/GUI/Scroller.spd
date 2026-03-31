@@ -26,7 +26,7 @@ libinternal ListView.SLH (|vec3|)
 libinternal textview.SLH (|vec3|)
 	opt norefcounts
 	|| s = .StartLine
-	|| ll = ._lines.last!
+	|| ll = .WrappedLines.last!
 	|| n = ll.vline - (.maxvisiblelines - 2)
 	return (s.vline,  n max 1,  .lineheight).vec3
 

@@ -89,7 +89,7 @@ libinternal string.FontLoad (|image|)
 
 
 libinternal image.FontCleanupChar (|ivec2| s)
-	|| full	= 0.95*3 // fair?
+	|| full	= 0.95*3							// fair?
 	for v in (6, 8)
 		|| p = v+s
 		|| c = self[p].color
@@ -103,7 +103,7 @@ libinternal image.FontCleanupChar (|ivec2| s)
 
 
 inline image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col=colors.white)
-	.drawchar(c, where, xy, col, 0) 
+	.drawchar(c, where, xy, col, 0)
 
 
 function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |int| DrawMode=1)
@@ -139,9 +139,9 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 	|| Clip		= where.clip((XY, xy+Read))
 	require clip.ispositive
 	
-	|| X2  		= C|int| * font.Width
+	|| X2		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy
-	if (c < 32) and (col == vec4(1) or drawmode == 1)
+	if (c < 32) and (col == vec4(1) or drawmode == 1 or col.a <= 0)
 		drawmode = -1
 	  elseif drawmode == 1
 		drawmode = (col.a*255.0)|int| + 1
@@ -158,7 +158,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 					MissingChar>>=1
 			
 			if sz[]
-				if drawmode > 0
+				if drawmode > 0									// text mode
 					|| A = (sz.a + 1) * DrawMode
 					|| c2 = col
 					if A < 64K									

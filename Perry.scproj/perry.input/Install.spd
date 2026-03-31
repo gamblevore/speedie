@@ -168,7 +168,7 @@ extend_module perry
 			return old.path
 
 
-	function MoveToAppFolder (|string|) // disabled?
+	function MoveToAppFolder (|string|)				// disabled?
 		|| dest = app.NeedsIdealPath$
 		|| me = app.apppath.file
 		|| t = file.trash(me.name)$
@@ -179,13 +179,12 @@ extend_module perry
 			  elseif me.moveto(dest)
 				return "" // success
 			  else
-				t.moveto(dest) /*undo*/ 
+				t.moveto(dest)						/*undo*/
 				rz = "\n\nFailed to move $me to destination"
 		
 	function TestCompiler (|string|)
 		if !CppCompiler.fileexists
 			return "No c++ compiler exists at '$CppCompiler' ! Please make one available from that path."
-
 
 
 	function GenerateArchive
@@ -202,7 +201,8 @@ extend_module perry
 			fs <~ f.Size|int|.strsize
 			fs <~ "\n"
 		return fs.render.confirm
-			
+	
+	
 	function GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
 		|| p = file.speediedir

@@ -1123,6 +1123,8 @@ Message is also:
 		if self
 			|| f = .First
 			if !f or .func != @unit
+				// we want to allow some way to parse BINARY. For jbin purposes...
+				// makes things smaller
 				return .name.ParseInt(StrStart, self)
 			
 			if self == "x"

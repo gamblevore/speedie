@@ -9,7 +9,7 @@ class SnakeWin (window)
 	|ivec2|						Speed
 	|Piece|						Food
 	|int|						Score
-    |randomXOR|					Rng
+	|randomXOR|					Rng
 	constants: GridSize = 16
 	
 	constructor
@@ -30,9 +30,9 @@ class SnakeWin (window)
 				return true
 	
 	function GimmeFood
-	    for 100
-	        || xy = .rng[(GridSize, gridsize)]
-	        if !.HitSnake(xy)
+		for 100
+			|| xy = .rng[(GridSize, gridsize)]
+			if !.HitSnake(xy)
 				.food = Piece(xy, colors.red)
 				exit
 	

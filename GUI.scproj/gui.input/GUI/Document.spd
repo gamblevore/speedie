@@ -383,7 +383,7 @@ extend TextView
 	libinternal UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
 		require .parent
 		.UndoChecker = -1
-		.GuessExpectsParse
+		.GuessJeeboxMode
 		if l.text
 			self|guicontrol|.text = l.text
 			|| i = d.scrollpos

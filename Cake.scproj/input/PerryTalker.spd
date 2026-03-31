@@ -13,10 +13,30 @@
 		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
 */
 
-// we need to put a breakpoint in the original file... then see what happens
+// We need to put a breakpoint in the original file... then see what happens
+
 
 
 prototype PerryResponse (|CakeVM| self, |message| m, |uint| State,  |StepAction|)
+dispatch DebuggerActions (PerryResponse)
+	setvar:			return StepAction.donothing
+		
+	run				RunAction
+	
+	stepin:			return .TempBreak(.StepIn)
+	stepout:		return .TempBreak(.StepOut)
+	stepover:		return .TempBreak(.StepOver)
+	
+	brkadd			BreakAction
+	brkrem			BreakRemoveAction
+	sendbreaks		SendBreakAction
+
+	stop:			app.quit, return StepAction.donothing
+		
+	pause:			return StepAction.SendVars
+
+
+
 datatype StepAction (uint)
 	default false
 	linkage
@@ -25,6 +45,7 @@ datatype StepAction (uint)
 		|StepAction|
 		DoNothing = 0
 		SendVars
+		AllowRun
 		GoRun				// run will already send the vars, after we hit the next break.
 	
 	syntax is (|stepaction| k, |bool|)
@@ -32,36 +53,51 @@ datatype StepAction (uint)
 	
 
 
-function cakevm.SendVars (|cakestack| stack, |spdprocess| perry)
-	|jbin--| j = .StartStack("break")
-	.StackToPerry(stack, 0, j)
+function cakevm.SendStack (|cakestack| stack, |spdprocess| perry)
+	opt norefcounts
+	|| j = .StartStack("stack")
+	|| file = .StackToPerry(stack, 0, j)
 	perry <~ j
+	if file
+		perry.SendBreaks(file)
 	
 	
-
+	
+	
 function __PerryView__ (cakevm.CakeChef)
+	description "We just hit a breakpoint! (or crashed)"
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
 	if !p.IsOpen
-		app.Quit(0)							// Stop the runaway!
+		app.Quit							// Stop the runaway!
 	
 	if (ErrorCode)
 		p <~ "crashed " + ErrorCode			// allow them to fix their memory and resume...
 
 	.ClearTempBreak(stack)
-	.SendVars(stack, p)
+	.SendStack(stack, p)
 	
 	while									// Controlflow simplify! Just remove resume!
 		if !p.IsOpen
-			app.Quit(0)
+			app.Quit
 		|| m = p.Get(5.0)
 			|| Action = .respond(m)
 			if Action is SendVars
-				.SendVars(stack, p)
-			if Action is GoRun
-				exit
+				.SendStack(stack, p)
+			if !ErrorCode
+				if Action is GoRun
+					exit
+				if Action is AllowRun
+					// we want to know if theres any... more messsages waiting
+					// how?				
 	p <~ "run"
 
 
+
+function SendBreakAction (perryresponse)
+	opt norefcounts
+	|| f = debugger.file(m)
+		cake.perry!.SendBreaks(f)
+	return StepAction.AllowRun
 
 
 function RunAction (perryresponse)
@@ -70,30 +106,61 @@ function RunAction (perryresponse)
 	return StepAction.gorun
 
 
-dispatch DebuggerActions (PerryResponse)
-	setvar:		return StepAction.donothing
-		
-	run			RunAction
-	
-	stepin:		return .TempBreak(.StepIn)
-	stepout:	return .TempBreak(.StepOut)
-	stepover:	return .TempBreak(.StepOver)
-		
-	brkadd		BreakAction
-	brkrem		BreakRemoveAction
 
-	stop:		app.quit, return StepAction.donothing
-		
-	pause:		return StepAction.SendVars
-		
-//	stepback:	0 // todo
+function Debugger.SourceMap (|&SourceMap|)
+	return .Breakables.Addr|&SourceMap|
+
+
+function jbin.SendCode (|uint| Break, |int| Position)
+	opt norefcounts
+	|| name = "line"
+	if break >> 31
+		name = "break"
+		break = (break << 1) >> 1
+	.Enter(@tmp, name)
+	.AddInt(break)
+	.AddInt(position)
+	.exit
+	
+
+function Spdprocess.SendBreaks (|filewithdata| F)
+	opt norefcounts
+	|| CakeBreak = cake.ActiveBreaks$
+	|| L = debugger.dbgLength
+	
+	|jbin| j = xvar.Printer
+	j.start(@tmp, "breakpoint")
+	j.AddStr(f)
+	j.Enter
+
+	|| ToFind = F.Index
+	|| Count = 0
+
+	for raw in debugger.SourceMap
+		|| Src = raw.Location
+		|| File = Src.FileNum
+		if file == tofind
+			|| P = raw.code(L)
+				|| Code = CakeBreak[P]
+					Count++
+					j.SendCode(Code, Src.Position)
+	j.exit(2)
+	if Count
+		self <~ j
+	j.Length = 0
+	
+
+function debugger.file (|message| m, |filewithdata|)
+	opt norefcounts
+	return .FileMap[m.firstname]						#expect (m, "Can't find file")	
 
 
 function BreakAction (perryresponse)
 	opt norefcounts
-	|| F = debugger.FileMap[m.firstname]				#expect (F, "Breakpoint is in missing file")
-	|| p = m[1].int
-	debugger.UserMultiBreak(F, p, state|bool|)
+	|| F = debugger.file(m)
+		|| p = m[1].int
+		debugger.UserMultiBreak(F, p, state|bool|)
+		cake.perry!.SendBreaks(F)
 	return StepAction.DoNothing
 
 
@@ -165,7 +232,7 @@ function cakevm.StartStack (|string| name, |jbin--|)
 
 
 
-function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j)
+function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j, |filewithdata|)
 	opt norefcounts
 	while stack
 		|| err = .CheckStack(stack)
@@ -173,7 +240,8 @@ function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j)
 			j.add(@tmp, err)
 			exit
 		
-		.CollectStack(stack, j, Count++)
+		|| File = .CollectStack(stack, j, Count++)
+			rz = file
 		Stack = .prev(stack)
 	
 
@@ -201,7 +269,7 @@ function jbin.SyntaxExpect (|string| s, |int64| Code)
 	.exit
 
 
-function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
+function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData|)
 	opt norefcounts
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
@@ -209,28 +277,29 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count)
 	|| vars = debugger.VariablePrinter!
 	{
 	|| Where = debugger.SrcMap(index)
-	|| Path = Where.File						#expect (j, "MissingFile", where.filenum)
+	rz = Where.File								#expect (j, "MissingFile", where.filenum)
 	
 	vars.Length = 0
 	vars <~ fn.name
 	vars <~ "(${stack.depth-1})"
 	j.Enter(@tmp, vars|&nil||string|)
 	vars.Length = 0
-	j.AddStr(path)
-	j.AddInt(where.bytepos)
+	j.AddStr(rz)
+	j.AddInt(where.Position)
 	}
 	
-	|| Locals = fn.obj|&nil||[xvar]|
-	
-	if !Count
-		index -= fn.Position
-		j.Enter
-		for v in Locals
-			|| R = stack.reg0 + v.reg
-			if v contains index
-				v.DescribeJBin(j, R, 0)
+	if count
 		j.exit
-	j.exit
+		return nil
+
+	index -= fn.Position
+	j.Enter
+	|| Locals = fn.obj|&nil||[xvar]|
+	for v in Locals
+		|| R = stack.reg0 + v.reg
+		if v contains index
+			v.DescribeJBin(j, R, 0)
+	j.exit(2)
 
 
 
@@ -269,7 +338,7 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 
 	|| Src = .SrcMap
 	j.AddStr(src.file)
-	j.AddInt(src.bytepos)
+	j.AddInt(src.Position)
 	
 	|| vars = debugger.VariablePrinter!
 	|| Type = .ObjType

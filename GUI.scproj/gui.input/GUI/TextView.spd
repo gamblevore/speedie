@@ -10,11 +10,11 @@ class TextView (GUIControl)
 	|bool|						GroupSaveAll
 	|byte|						LineHeight
 	|bool|						IsALogTextView // Is this textview used for displaying a Log.
-	|byte|						ExpectsParse
+	|byte|						JeeboxMode
 	|int8|						YAdjust
 	|MoveCode|					Alignment // centered, left, right
 
-	|byte|						_DrawInBreakArea
+	|byte|						_DrawInLineArea
 	|byte|						_CanAutoComplete
 	|int|						_AutoCompleteBack
 	|int64|						_LogTrimmed
@@ -28,11 +28,11 @@ class TextView (GUIControl)
 	|bool|						_PreferPrevLine
 	|message?|					_ActiveLine
 	|TextViewLine|				_Start
-	|TextViewLine|				_Lines
 	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
 	
+	|TextViewLine|				WrappedLines
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
 	|GUITextLineEvent?|			OnBreakPoint
@@ -48,14 +48,14 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
 		|| TV = TextViewLine()
-		._Lines = TV
+		.WrappedLines = TV
 		._Start = TV							// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
 		._CanAutoComplete = 2
 		.LineHeight = font.Height + 4			// Whatever
-		.ExpectsParse = TextView.allowjeebox
+		.JeeboxMode = TextView.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
 		.oncopy = textCopy|GUICopyEvent|
@@ -92,7 +92,7 @@ class TextView (GUIControl)
 	behaviour MouseMove
 		|| InScroll = .MouseMoveInScrollArea(P)
 		|| WantInBreaks = false
-		if (.ExpectsParse >= ProbablyJeebox) and (self is codeeditor)
+		if (.JeeboxMode >= ProbablyJeebox) and (self is codeeditor)
 			WantInBreaks = ._LineNumWidth and (p.x < .LineNumRight) and (p.x >= .lastleft)
 
 		if state is enter or moved
@@ -101,10 +101,10 @@ class TextView (GUIControl)
 			  else
 				super.MouseMove(p, move, state)
 
-		|| InlinesWasDrawn = ._DrawInBreakArea&2
+		|| InlinesWasDrawn = ._DrawInLineArea&2
 		if ((InlinesWasDrawn!=0) != WantInBreaks)  and  .IsViewable
 			gui.touch(self)
-		._DrawInBreakArea = WantInBreaks ||| InlinesWasDrawn
+		._DrawInLineArea = WantInBreaks ||| InlinesWasDrawn
 
 		.ShowExtraInfo(P, true)
 		return InScroll
@@ -163,7 +163,7 @@ class TextView (GUIControl)
 	libinternal ClickedLineNum (|ivec2| P, |bool|)
 		opt norefcounts
 		|| d = .InLineNum(p)
-		if d is StartsNormally
+		if d and d is StartsNormally
 			.addbreak(d)
 			return true
 	
@@ -204,11 +204,6 @@ class TextView (GUIControl)
 		
 	libinternal ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
 		return .ClickedScrollbar(P, Clicks, .slh)
-	
-	
-	setter ExpectsParse (|byte|)
-		inlined
-		.ExpectsParse = value
 		
 		
 	behaviour LostFocus
@@ -270,8 +265,8 @@ class TextView (GUIControl)
 	libinternal ExpandToVis (|intrange| t, |intrange|)
 		opt norefcounts
 		|| m = t
-		|| d1 = .FindDrawInfo(m.x1)
-		|| d2 = .FindDrawInfo(m.x2)
+		|| d1 = .FindTextLine(m.x1)
+		|| d2 = .FindTextLine(m.x2)
 		t.x1 = d1.ooof(m.x1 <= m.x2)
 		t.x2 = d2.ooof(m.x2 <  m.x1)
 		return t
@@ -368,7 +363,7 @@ class TextView (GUIControl)
 		.TypingPlaceTry(value, false, d)
 
 	autogen SelectedLine (|textviewline|)
-		return .FindDrawInfo(.sel0)
+		return .FindTextLine(.sel0)
 
 	libinternal TypingPlaceReal (assigns:|intrange| result)
 		opt norefcounts
@@ -403,7 +398,7 @@ class TextView (GUIControl)
 			GUI.selchanged
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
-		d ?= .FindDrawInfo(.sel0)
+		d ?= .FindTextLine(.sel0)
 
 		while
 			.TryShowLineError(d)
@@ -598,10 +593,10 @@ class TextView (GUIControl)
 	libinternal DrawInfoAtLine (|int| L, |textviewline|)
 		opt norefcounts
 		.PrepareLinesOfText
-		for r in ._lines
+		for r in .WrappedLines
 			if r.tline >= l
 				return r
-		return ._lines.last
+		return .WrappedLines.last
 	
 	
 	function ViewLineAndSel (|int| L)
@@ -1104,7 +1099,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		.MyError = nil
 		|| s = .Selectedline
-		for d in ._lines
+		for d in .WrappedLines
 			if d.LineError
 				if d == s
 					.shownoextra
@@ -1115,7 +1110,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
 		|| p = .clamp(e.position)
-		|| r = .FindDrawInfo(p)
+		|| r = .FindTextLine(p)
 
 		|| old = .myerror
 		if r.TrySetError(e) or !old
@@ -1138,7 +1133,7 @@ class TextView (GUIControl)
 			is Animation
 		
 		run
-			require .d in .upon._Lines
+			require .d in .upon.WrappedLines
 			|| LH = .upon.lineheight|float|
 			|| Y = .upon.Y(.d)|float| + LH*0.75
 			|| H = .upon.lastrect.x1x2.vec2
@@ -1192,7 +1187,7 @@ class TextView (GUIControl)
 	
 	function MessageWithin (|int| pos, |bool| named, |Bool| Within, |message|)
 		opt NoRefCounts
-		|| d   = .findDrawInfo(pos)
+		|| d   = .FindTextLine(pos)
 		require d isnt fakemsg
 		|| msg = d.message						#require
 		|| after = d.after_with_msg
@@ -1373,8 +1368,8 @@ class TextView (GUIControl)
 		opt norefcounts
 		require  sel.width or .SyntacticEndOfLine_(sel.x)
 
-		if .expectsparse
-			|| d = .finddrawinfo(sel.x)
+		if .JeeboxMode
+			|| d = .FindTextLine(sel.x)
 			while d and (d.range overlaps sel)
 				require d.message or .parsedmessage
 				d++
@@ -1406,7 +1401,7 @@ class TextView (GUIControl)
 				.SelRange = (sel2, sel2+1)
 			return false
 
-		require SW or (.ExpectsParse >= probablyjeebox)
+		require SW or (.JeeboxMode >= probablyjeebox)
 		|| c = counterparts.find(s)						#require
 
 		|| After = self[sel2]							// type through
@@ -1483,17 +1478,17 @@ class TextView (GUIControl)
 
 	libinternal ValidateNewText (|message|)
 		|| msg = .text.Parse
-			msg.obj = .path
+			msg.obj = .Filepath
 			if .MyError is parse
 				.MyError = nil
 		  else
 			|| e = StdErr.pop
-			if .expectsparse >= currentlyjeebox
+			if .JeeboxMode >= currentlyjeebox
 				.myerror = e
 
 		|| v = ._Viewing
 			v.ShouldntSave = false
-			if .ExpectsParse > probablyjeebox
+			if .JeeboxMode > probablyjeebox
 				v.ShouldntSave = !msg
 			v.DocParsed = msg
 		return msg
@@ -1558,7 +1553,7 @@ class TextView (GUIControl)
 			return true
 
 
-	function Path (|string|)
+	function FilePath (|string|)
 		opt norefcounts
 		|| u = .document
 			return u.Location
@@ -1669,7 +1664,7 @@ class TextView (GUIControl)
 				u.AddState(value, nil)
 	
 
-	function TextLeft (|int|)
+	libinternal TextLeft (|int|)
 		return .lastleft + 2 + ._LineNumWidth*font.width
 
 
@@ -1711,14 +1706,15 @@ class TextView (GUIControl)
 			return true
 
 	
-	function FindDrawInfo (|int| Char, |TextViewLine!|)
+	function FindTextLine (|int| Char, |TextViewLine!|)
 		|| vline = 0
 		return .FindDrawInfoSub(char, vline)
 	
 
 	libinternal FindDrawInfoSub (|int| Char,  |$int| VLine,  |TextViewLine!|)
-		.PrepareLinesOfText
 		opt norefcounts
+
+		.PrepareLinesOfText
 		char = .clamp(char)
 		|| c = -int.max
 		|| s = .StartLine
@@ -1758,7 +1754,7 @@ class TextView (GUIControl)
 		if (i > 0) and (keys.shift) and (self[x2].IsTextLine)
 			x2++
 		
-		|| d = .FindDrawInfo(x2)
+		|| d = .FindTextLine(x2)
 		|| r = d.range
 		x2 = r.x2
 		if (i > 0) and (keys.shift) and (d is avoidlastchar) and !d.endswithline
@@ -1779,7 +1775,7 @@ class TextView (GUIControl)
 				pos--
 		if page
 			i *= (.maxvisiblelines-1)
-		|| d = .FindDrawInfo(pos)
+		|| d = .FindTextLine(pos)
 		|| x = 0
 		if !t.width or keys.shift
 			x = d.xOfChar(Pos)
@@ -1806,7 +1802,7 @@ class TextView (GUIControl)
 		where.ControlClip = c			/// restore!
 
 		require  !._CanSeeAllLines and .DrawScrollStrength
-		if .MyError or (._Lines is breakpoint)
+		if .MyError or (.WrappedLines is breakpoint)
 			.DrawScrollMarks(where)
 		if sel
 			.DrawScroll(.slh, where)
@@ -1815,7 +1811,7 @@ class TextView (GUIControl)
 	libinternal DrawScrollMarks (|image| where)
 		opt norefcounts
 		require .DrawScrollStrength
-		for s in ._lines
+		for s in .WrappedLines
 			|| E = s.LineError
 				|| Sev = E.Severity
 				|| c = Sev.color(1.0)
@@ -1862,7 +1858,7 @@ class TextView (GUIControl)
 		
 		._CanSeeLastLine = false
 		._CanSeeAllLines = false
-		._DrawInBreakArea &=~ 2
+		._DrawInLineArea &=~ 2
 		while (y > yEnd)
 			y -= .LineHeight
 			Remain -= .LineHeight
@@ -1877,12 +1873,12 @@ class TextView (GUIControl)
 		return Remain
 
 
-	function MaxWidthInChars (|int|)
+	libinternal MaxWidthInChars (|int|)
 		|| C = (.width - 9) / font.Width
 		return c max 16
 
 
-	function MaxPartialVisibleLines (|int|)
+	libinternal MaxPartialVisibleLines (|int|)
 		|| h = .height
 		h += .LineHeight-3
 		return .height / .lineheight|int|
@@ -1955,10 +1951,10 @@ class TextView (GUIControl)
 	
 	libinternal NeedFirst (|textviewline|)
 		opt norefcounts
-		|| f = ._lines.first
+		|| f = .WrappedLines.first
 			return f
 		rz = TextViewLine()
-		._lines <~ rz
+		.WrappedLines <~ rz
 	
 	
 	function TextViewLine.SlowMove (|TextViewLine| start, |int| amount, |...!|)
@@ -1977,7 +1973,7 @@ class TextView (GUIControl)
 			d = d.SlowMove(._Start, 2)
 
 		|| n = 3 - .MaxVisibleLines
-		|| L = ._lines.last!
+		|| L = .WrappedLines.last!
 		|| last = L.movecapped(n)!
 		
 		if d.position > last.position
@@ -1990,7 +1986,7 @@ class TextView (GUIControl)
 		require ._Start != d
 		._Start = d
 		|| p = d.Position
-			._lines.Position = p
+			.WrappedLines.Position = p
 			|| doc = .document
 				doc.scrollpos = p
 		.ShowExtraInfo(GUI.mousexy, false)
@@ -1999,7 +1995,7 @@ class TextView (GUIControl)
 	
 	libinternal Clear (|string| NewText, |bool|)
 		rz = super.textset(NewText)
-		require rz or !._lines.hasany
+		require rz or !.WrappedLines.hasany
 
 		._LogTrimmed = 0
 		|| sel = (.text.length, 0)(.SingleLine) 
@@ -2008,10 +2004,10 @@ class TextView (GUIControl)
 		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
 //		._Start = ._lines
-		._lines.clear
+		.WrappedLines.clear
 
 		|| d = textviewline()
-		._lines <~ d
+		.WrappedLines <~ d
 		.ClearReclaim
 		d.tline = 1
 		d.position = -1
@@ -2034,7 +2030,7 @@ class TextView (GUIControl)
 		|| CW	= .MaxWidthInChars
 		|| ldw	= ._LastDrawWidth
 		._LastDrawWidth = CW
-		if (!._lines.hasany) or (.TextAlteredForDraw & 2)
+		if (!.WrappedLines.hasany) or (.TextAlteredForDraw & 2)
 			return 2
 		if (CW != ldw)
 			return 1
@@ -2062,7 +2058,7 @@ class TextView (GUIControl)
 		|| mul = (font.width, .lineheight)
 		|| bd  = s.bounds
 		|| add = (6, 0)
-		return bd * mul + add 
+		return bd * mul + add
 
 
 	libinternal WillAttemptParse (|int| Expect, |bool|)
@@ -2071,7 +2067,7 @@ class TextView (GUIControl)
 		|| L = .text.Length
 		if Expect == allowJeebox
 			return L < 64K
-		return L < 4MB	// my largest jb file is 60k! 
+		return L < 4MB	// my largest jb file is 60k!
 // todo: Just segment longer files into "chapters". No one needs 10000KB file word-wrapped.
 
 
@@ -2105,17 +2101,9 @@ class TextView (GUIControl)
 		return p
 
 
-//	libinternal ColoriseRoot (|message| p)
-//		opt norefcounts
-//		for m in p	// do this directly in the actual coloriser!!
-//					// uncool to do this here
-//			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
-//				m.flags |= textview.NotRoot
-
-
 	libinternal IsCleared (|bool|)
 		opt norefcounts
-		|| d = ._lines.first
+		|| d = .WrappedLines.first
 		return !d or d.position < 0
 
 
@@ -2123,7 +2111,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		if ._start.position < 0
 			._start.position = 0
-		return ._lines.position
+		return .WrappedLines.position
 
 
 	libinternal AddLogTrim (|TextViewLine| d, |TextViewLine|)
@@ -2142,7 +2130,7 @@ class TextView (GUIControl)
 		.TextAlteredForDraw = 0
 		|| expect	= .ShouldDisplayJeebox
 		|| msg		= .Parse(changed >= 2, expect)
-		|| ParsedOK	= (msg!=nil) or (.ExpectsParse <= AllowJeebox)
+		|| ParsedOK	= (msg!=nil) or (.JeeboxMode <= AllowJeebox)
 		|| Pos		= .StartPos
 		|| StayAtEnd= .IsALogTextView and ._CanSeeLastLine
 		|| d		= .NeedFirst
@@ -2155,7 +2143,7 @@ class TextView (GUIControl)
 		|| ARGH = 0					// .ReclaimRestart(d) // disabled for now.
 		|| t = d.tline				// always 0?
 		|| p = 0
-		(._Lines isnt breakpoint)
+		(.WrappedLines isnt breakpoint)
 		._LineNumWidth = 0
 		if .ShowLineNumbers or Expect >= 3
 			._LineNumWidth = .text.TextLineCount.LineNumWidth
@@ -2172,7 +2160,7 @@ class TextView (GUIControl)
 				(draw)(d, &LastOwner, false)
 				
 			if d is breakpoint
-				(._Lines is breakpoint)
+				(.WrappedLines is breakpoint)
 			loop p >= 0
 			|| n = d.next
 				
@@ -2192,7 +2180,7 @@ class TextView (GUIControl)
 		  elseif (changed == 1) or .IsALogTextView
 			d = .FindLine(pos)
 		  else
-			d = ._Lines.first!
+			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
 		.ClearReclaim	
 	
@@ -2226,23 +2214,24 @@ class TextView (GUIControl)
 			return .text
 	
 	
-	function ScrollPos (|int|)
+	libinternal ScrollPos (|int|)
 		return ._Start.position
 
 	
-	setter ScrollPos (|int|)
+	libinternal ScrollPos (assigns:|int|)
 		opt norefcounts
-		for s in ._Lines
+		for s in .WrappedLines
 			if s.Position >= Value
 				.start = s
 				return
 
+	
 	libinternal FindLine (|int| Value, |textviewline!|)
 		opt norefcounts
-		for s in ._Lines
+		for s in .WrappedLines
 			if s.Position >= Value
 				return s
-		return ._lines.first!
+		return .WrappedLines.first!
 		
 		
 	libinternal UnloadDoc (|document| old)
@@ -2278,7 +2267,7 @@ class TextView (GUIControl)
 		if (self is editable) and (purpose is PasteTextLike)
 			if data > 1
 				.UndoChecker = -1
-			if .ExpectsParse >= textview.AlwaysJeebox
+			if .JeeboxMode >= textview.AlwaysJeebox
 				data = data.SpacesToTabs
 				if (data contains ";") and !data.parse
 					|| Q = "The text below contains ';'. Would you like to strip it?\n\n" + data.Preview(200)
@@ -2298,7 +2287,7 @@ class TextView (GUIControl)
 			.ShowLineNumbers = true
 		if t.HasWord("//linesoff")
 			.ShowLineNumbers = false
-		rz = .ExpectsParse
+		rz = .JeeboxMode
 		if rz
 			if rz >= AlwaysJeebox
 				return rz
@@ -2312,20 +2301,18 @@ class TextView (GUIControl)
 		return .ShouldDisplayJeebox >= ProbablyJeebox
 	
 	
-	function GuessExpectsParse
-		|| mode = .expectsparse
-		require mode > 0 and mode < alwaysjeebox
+	function GuessJeeboxMode
+		|| mode = .JeeboxMode
+		require mode >= AllowJeebox and mode < alwaysjeebox
 
 		mode = AllowJeebox
 		|| d = .document
 			|| l = d.Location
 				if l isa "spd" or "box" or "jbin" or "xml" or "jb" or "jbin"
 					mode = CurrentlyJeebox
-//				  elseif l isa "todo" and "txt"
-//					mode = ProbablyJeebox // this seems wrong
-		.ExpectsParse = mode
+		.JeeboxMode = mode
 
-	
+
 	flags
 		NotRoot = 0x800
 	

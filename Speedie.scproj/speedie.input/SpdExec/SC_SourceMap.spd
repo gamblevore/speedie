@@ -38,7 +38,7 @@ module SourceMap
 	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
 
 	function BreakableSorter (SourceSorter)
-		return B - A
+		return A - B
 
 
 	function SortBreaks (|FastString| B)

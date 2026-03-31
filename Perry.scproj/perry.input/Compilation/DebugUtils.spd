@@ -5,7 +5,7 @@
 extend PerryIDE {
 function CakeTalk (|SpdProcess| Cake)
 	if .DelayedRun.ago > 0.5s
-/		.DelayedRun = nil
+		.DelayedRun = nil
 		.DebugMode &= ~compilemode.paused
 		.SetAppInfo		
 	
@@ -14,30 +14,51 @@ function CakeTalk (|SpdProcess| Cake)
 	|listviewrow--| c = .LogCake
 		.LogOneThing(msg, "", C)
 		
-	if msg == "run"
+	if msg ~= "run"
 		.DelayedRun = date.now
 	  else
 		.DelayedRun = nil
-		if msg == "stack" or "break"
+		if msg ~= "stack"
 			.UpdateStack(msg)
-		  elseif msg == "hoi :3"
-			.GotHello(msg.name) 
+		  elseif msg ~= "hoi :3"
+			.GotHello(msg.name)
+		  elseif msg ~= "breakpoint"
+			.SetBreaks(msg)
 		  else
 			Notifications <~ ("unrecognised message", msg)
 
+
+
+function SetBreaks (|message| breaks)
+	opt norefcounts
+	|| file = breaks.FirstName
+	require file ~= .editme.FilePath
+	for l in .editme.WrappedLines
+		(l isnt realbreakpoint)
+		(l isnt reached)
+	for line in breaks.last
+		|| Pos = line.second.int
+		if pos <= .editme.text.Length
+			|| D = .editme.FindTextLine(pos)
+			(D is reached)
+			if line ~= "break"
+				(D is realbreakpoint)
+	.editme.Touch			
+		
+	
 
 function GotHello (|string| msg)
 	opt norefcounts
 	|| m = .DebugMode
 	if m is ReceivedHello
-		Notifications <~ msg // weird?
+		Notifications <~ msg				// Weird?
 	  else
 		(M is ReceivedHello)
 		.DebugMode = M
-		.StrongView(.ViewDebugger) // view debugger!
+		.StrongView(.ViewDebugger)			// View debugger!
 	.SetAppInfo
-	.AppInfo.setfocus // i generally don't like stealing the focus... leads to mistypes
-					  // but as long as it runs instantly, it should be OK?
+	.AppInfo.setfocus						// I generally don't like stealing the focus... leads to mistypes
+											// But as long as it runs instantly, it should be OK?
 
 
 function AppInfoExtra (|unixprocess| r, |string|)
@@ -186,6 +207,16 @@ function @perry.VariableFinder (listview.columnfinder)
 
 
 extend perryide {	
+
+
+function ReloadBreaks
+	opt norefcounts
+	|| j = VarPrinter
+	j.start(@tmp, "sendbreaks")
+	j.addstr .path
+	.SendMsg(j|&nil||string|, false)
+	
+	
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
@@ -207,7 +238,7 @@ function UpdateStack (|message| stack)
 			exit
 	
 
-	|| Break = stack == "break"
+	|| Break = stack == "stack"
 		|| F = arg.first
 		if !.stack.FirstSelected
 			.stack.Select(F)
@@ -222,5 +253,6 @@ function UpdateStack (|message| stack)
 		.DebugMode = M
 		.SetAppInfo
 }
+
 
 

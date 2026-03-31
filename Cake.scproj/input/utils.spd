@@ -1,16 +1,33 @@
 
+
 datatype SourceLocation (uint)
 	function FileNum (|uint|)
 		return self >> 21
 	
-	function BytePos (|uint|)
+	function Position (|uint|)
 		return self & 21~bits
 	
 	function MatchScore (|sourcelocation| ToFind, |int|)
 		require .FileNum == ToFind.FileNum
-		|| Diff = .BytePos - ToFind.BytePos
+		|| Diff = .Position - ToFind.Position
 		if diff >= 0
 			return int.max - diff
 	
 	function File (|FileWithData|)
 		return debugger.path(.FileNum)
+
+
+datatype SourceMap (uint64)
+	function Location (|SourceLocation|)
+		return self>>32
+	function Code (|uint| Max, |uint|)
+		self = (self<<32)>>32
+		if self < Max
+			return self
+	
+	iterator
+		|int| MapPos = debugger.Breakables.Length>>3
+		while (MapPos >= 0)
+			yield self[MapPos]
+			MapPos--
+		

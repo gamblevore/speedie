@@ -238,9 +238,9 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	.EditPath(path, false)
 	|| Where = row[1].int
 	if Active
-		|| item = row.first
-			item.Position = where
-		.editme._ActiveLine = item
+		|| file_path = row.first
+			file_path.Position = where
+		.editme._ActiveLine = file_path
 	.editme.ShowAndSelect(where, true)
 	return true
 	
@@ -269,40 +269,41 @@ function DebugBreakAdd (GuiTextLineEvent)
 	j.addstr i.path
 	j.addint line.MsgPos
 	j.exit
-	i.SendMsg(j|&nil||string|, 0)
+	i.SendMsg(j|&nil||string|, false)
 
 
 function DebugStepOver (guiaction)
-	return .SendMsg("stepover", state)
+	return .SendMsg("stepover")
 
 
 function DebugStepIn (guiaction)
 	if keys.Shift
-		return .sendmsg("stepincutely", state)
-	return .sendmsg("stepin", state)
+		return .sendmsg("stepincutely")
+	return .sendmsg("stepin")
 
 
 function DebugStepOut (guiaction)
-	return .sendmsg("stepout", state)
+	return .sendmsg("stepout")
 
 
 function DebugStepRun (guiaction)
 	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
-		return .sendmsg("run fast", state)
-	return .sendmsg("run", state)
+		return .sendmsg("run fast")
+	return .sendmsg("run")
 	
 
-function GUIControl.SendMsg (|string| s, |int| state, |bool|)
+function GUIControl.SendMsg (|string| s, |bool| PressingAButton=true, |bool|)
 	opt norefcounts
 	|| i = .ide
 	|| r = i.RunCompiledApp
 	if r isa SpdProcess
 		if (r <~ s)
-			i.AppInfo.setfocus
+			if PressingAButton
+				i.AppInfo.setfocus
 		  else
 			Notifications <~ "Debugger connection failed"
 	  else
-		if !state
+		if PressingAButton
 			Notifications <~ "Program already finished"
 		  else
 			beep
@@ -386,7 +387,7 @@ function perryide.ClearOldASMErrors
 	|| After = fn.FlatLast.After
 	|| Start = fn.Position
 	// how to clear lines in this range.
-	|| s = .EditMe.findDrawInfo(Start)
+	|| s = .EditMe.FindTextLine(Start)
 	while s and (s.Position <= after)
 		err = s.LineError
 		if err and err.tag == 8888

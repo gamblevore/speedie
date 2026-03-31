@@ -39,32 +39,30 @@ module debugger
 
 	function UserMultiBreak (|FileWithData| Path, |uint| Position, |bool| Active=true)
 		opt norefcounts
-		|| CakeBreak = cake.ActiveBreaks$		
-		|| MapRaw = .Breakables.Addr|&uint64|
-		|| n = .Breakables.Length >> 3
+		|| CakeBreak = cake.ActiveBreaks$
 		|| ToFind = (path.index << 21) ||| Position
 		
 		|| BestScore = 0
 		|| BestValue = 0
 		|| BestCount = 0
+		|| L = debugger.dbgLength
 		
-		for i in n
-			|| Raw = MapRaw[i]
-			|| Src = (Raw>>32)|sourcelocation|
+		for Raw in .SourceMap
+			|| Src = raw.Location
 			|| Score = Src.MatchScore(ToFind)
 			if Score > BestScore
-				BestScore = Score
-				BestValue = Raw
-				BestCount = 1
+				|| Best = Raw.code(l)
+					BestScore = Score
+					BestValue = Best
+					BestCount = 1
 			  elseif Score == BestScore
 				BestCount++
 				require BestCount
 		if BestCount == 1
 			return .SetUserBreak(CakeBreak, BestValue, active)
 
-		for i in n
-			|| Raw = MapRaw[i]
-			|| Src = (Raw>>32)|sourcelocation|
+		for Raw in .SourceMap
+			|| Src = raw.location
 			|| Score = Src.MatchScore(ToFind)
 			if Score == BestScore
 				.SetUserBreak(CakeBreak, Raw, active)
@@ -116,7 +114,7 @@ module debugger
 		|| Where = debugger.SrcMap(index)
 		|| fn = spdtable.Find(index)
 		|| Path = debugger.path(Where.FileNum)
-			|| TabTo = .PrintCodeLocation(Path, fn, Where.BytePos)
+			|| TabTo = .PrintCodeLocation(Path, fn, Where.Position)
 			if fn and fn.HasVar(index)
 				.PrintStackVars(index, fn, Stack, TabTo)
 

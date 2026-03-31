@@ -162,7 +162,7 @@ function PerryIDE.ShowAutoBeep (|bool| beeps)
 function PerryIDE.ShowAutoComplete (|bool|)
 	|| a = .autocomplete
 	if a.listsource.hasany
-		a.ListSource.obj = .editme.Path
+		a.ListSource.obj = .editme.FilePath
 		
 		// this thing can get too large. So... how to make it smaller.
 		// those job is it to limit the size? us? the cmm itself? a huge menu
@@ -227,7 +227,7 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	if (f == @arg) and !f.hasany and (display starts "displayall")
 		.PopupHide
 	  else
-		.PopupDisplay.ExpectsParse = textview.probablyjeebox
+		.PopupDisplay.JeeboxMode = textview.probablyjeebox
 		(f is style2)
 		.popupreason = 1
 		.DisplayInPopup(f.render.trim, display.name contains "forced")
@@ -239,7 +239,7 @@ function PerryIDE.DisplayStr (|message| f, |date|)
 	|| r = f.Range						// + f.rangetrim
 	|| orig = .EditMe[r]
 	if f.name != orig
-		.PopupDisplay.expectsparse = 0
+		.PopupDisplay.JeeboxMode = 0
 		.popupreason = 1
 		.DisplayInPopup(f.name, false)
 	return 1
@@ -416,7 +416,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| r
 	opt norefcounts
 	if err
 		.LastExtraInfo = nil
-		.PopupDisplay.ExpectsParse = 0
+		.PopupDisplay.JeeboxMode = 0
 		.PopupDisplayCorner = p
 		.PopupReason = 2
 		.DisplayInPopup(err.name, Instant, err.severity.color, P)
@@ -578,7 +578,7 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message|
 
 
 function PerryIDE.DescribeWhere (|message| out, |message| where)
-	out <~ (@str, .editme.path) 
+	out <~ (@str, .editme.Filepath) 
 	out <~ where.position
 	out <~ where.rangelength
 

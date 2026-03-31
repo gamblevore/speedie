@@ -93,9 +93,6 @@ To get around this, just do:  x = str.parse(@arg)
 		doc = data.ParseJbin
 	  else
 		doc = data.ParseSub(owner)
-		if !doc
-			debugger 
-			j1 = .isjbin
 	return doc
 		
 
