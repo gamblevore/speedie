@@ -96,11 +96,11 @@ function ReachFuncFromFunc (|SCFunction| from)
 
 function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach 
 	opt norefcounts
-	flow off // memory order dependant!
+	flow off							// memory order dependant!
 	
 	require .UnReached(from)
 	if .borked
-		error (.source,    "Borked function reached!")
+		error (.source,	"Borked function reached!")
 		error (from.source, from.ReachedName)
 
 	.MyReacher = from
@@ -109,7 +109,8 @@ function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach
 	if .IsLibrary
 		Compiler.stLibFuncs++
 
-	.cls.Reach(self)?
+	|| cls = .cls
+		cls.Reach(self)
 		
 	for o in .LinkTo
 		if (o isa SCFunction)
@@ -197,7 +198,8 @@ function SCDecl.Reach
 
 function compiler.DeadStrip
 	opt norefcounts
-	compiler.MainFunc.DetectIfReached?
+	|| main = Compiler.MainFunc
+		main.DetectIfReached
 	
 	for f in .FuncList
 		f.DetectIfReached

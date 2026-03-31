@@ -43,7 +43,7 @@ module Intrinsics
 	function scdecl.Trin (|byte|)
 		|| Ty = .TypeInfo
 		|| ReturnVec = Ty.NumericCount > 1
-		rz = ('v', 'f')(ReturnVec)
+		rz = ('v' (ReturnVec) 'f')
 		if ty is bool
 			rz = 'u' // isnan
 	

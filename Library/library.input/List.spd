@@ -223,7 +223,8 @@ class list
 		|| p = .parent
 			|| c = .movesub(n, r)
 				return c
-			return (p.first!, p.last!)(n < 0)
+			|| Nega = n < 0
+			return ((p.first!) (nega) (p.last!))
 		return self
 
 	
@@ -384,9 +385,13 @@ class list
 		if n <= 0
 			.clear
 		  elseif first
-			self[n-1].removeafter?
+			self = self[n-1]
+			if self
+				.removeafter
 		  else
-			self[-n].removebefore?
+			self = self[-n]
+			if self
+				.removebefore
 
 
 	function AppendAfter (|| item, || after)

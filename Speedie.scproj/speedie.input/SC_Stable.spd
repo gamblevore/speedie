@@ -18,7 +18,8 @@ module LibStability
 		|| funcs = Compiler.library[name]
 		|| Data = funcs.ReadAll.trim
 		.UseBank(data, IsFuncs)
-		|| fs = (faststring(), nil)(options.MakeExec)
+		|| Exec = options.MakeExec
+		|| fs = (faststring() (exec) nil)
 			fs <~ data ?? "// beta-file. Unstable."
 		.StabiliseSub2(fs, list, isfuncs)
 		if fs and !Options.TargetDebug

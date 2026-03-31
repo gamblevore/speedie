@@ -36,7 +36,7 @@ class GUIControl (list)
 
 	constructor (|guicontrol| parent)
 		super.constructor(parent)
-		.id = ("", "root")(parent)
+		.id = ("" (parent) "root")
 		if parent
 			.tabindex = parent.loadtabindex
 		.gnormal = drawstyle()

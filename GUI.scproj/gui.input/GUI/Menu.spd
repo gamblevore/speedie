@@ -70,7 +70,9 @@ class Menu (ListView)
 	
 		
 	libinternal CmmWidth (|guicontrol?| owner, |int|)
-		|| mw = owner.width? min 140
+		|| mw = 0
+		if owner
+			mw = owner.width min 140
 		mw = .FindTextWidth + 14 max mw
 		return mw max 64
 	
@@ -91,7 +93,9 @@ class Menu (ListView)
 			w = (x)~right for mw
 		  elseif .MouseXY.x > .Horz.mid
 			w = the~right back mw
-		|| CP = ((Y)~up, ControlPoint.low)(Y)
+		|| CP = ControlPoint.low
+		if y
+			cp = (Y)~up
 		|| H = CP back .DesiredHeight
 		.size = w by h
 		.ShowMenu

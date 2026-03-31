@@ -37,7 +37,8 @@ class ProgressBar (GUIControl)
 				light = vec4(0.4, s).PreMul
 				
 			for (p in where) (v)
-				p.overlay((dark, light)(.StripeDark(v)))
+				|| First = .StripeDark(v)
+				p.overlay((dark (first) light))
 	
 	setter Progress	(|float|)
 		if .Progress != value

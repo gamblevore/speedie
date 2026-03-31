@@ -38,7 +38,7 @@ class FileRow (ListViewRow)
 		.func		= @file
 		.rangelength = 0 // for the sorter
 
-		.Location	= (path.PathDir, path)(DirFile)
+		.Location	= (path.PathDir (DirFile) path)
 		.dirfile	= DirFile
 
 		.asdir		= dirfile
@@ -218,7 +218,8 @@ class FileRow (ListViewRow)
 		// how do we know a file is binary? just... by checking it... really.
 		|| x = f.open(file.readmode)
 			|| fsize = f.size
-			|| ToRead = (fsize, 4K)(fsize <= 32K)
+			|| ToRead = 4K
+			if fsize <= 32K: toread = fsize
 			|| preview = f.Read(ToRead)
 			|| badness = preview.UTF8Badness
 			if badness.y > 0
@@ -230,9 +231,12 @@ class FileRow (ListViewRow)
 
 
 	function FindAllParent (|message| FoundList, |error|)
+		opt norefcounts
 		rz = error(nil, .location, errorseverity.ok)
 		(rz|listviewrow| is expanded)
-		rz.name = ("\11 ", "\19 ")(!.asdir) + .location.name
+		|| str = "\11 "
+		if .asdir: str = "\11 "
+		rz.name = str + .location.name
 		rz.path = .location
 		rz.obj = self
 		rz.position = -1

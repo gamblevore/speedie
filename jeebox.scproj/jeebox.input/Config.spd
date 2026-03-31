@@ -67,7 +67,8 @@ extend message
 		opt norefcounts
 		if self == @arg or nil
 			return self
-		|| w = (.last, .next)(self == @tmp)
+		|| IsTmp = (self == @tmp)
+		|| w = (.last (IsTmp) .next)
 		if w == @arg
 			return w
 

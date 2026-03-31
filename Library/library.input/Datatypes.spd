@@ -884,7 +884,7 @@ datatype bool
 	
 	function String (|string|)
 		cpp_part Render0
-		return ("true", "false")(self)
+		return ("true" (self) "false")
 
 	function Render (|string|)
 		opt norefcounts

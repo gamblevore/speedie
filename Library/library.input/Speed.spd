@@ -44,7 +44,9 @@ function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Dur
 		  elseif rate <= 1.0
 			rate *= 1.0K
 			unit = 'K'
-		|| dp = (5,2)(rate <= 0.01)
+		|| dp = 2
+		if (rate <= 0.01)
+			dp = 5
 		fs <~ "  ("
 		fs.appendfloat(rate, dp)
 		fs <~ unit

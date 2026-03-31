@@ -183,7 +183,7 @@ class FileViewer (ListView)
 
 	libinternal NextFileRow (|listviewrow| Upon, |bool| First=false, |filerow|)
 		opt norefcounts
-		|| n = (Upon.first, Upon.flatnext)(first)
+		|| n = (Upon.first (first) Upon.flatnext)
 		|| n2 = n as filerow
 			return n2
 		n.remove
@@ -548,8 +548,9 @@ class FileViewer (ListView)
 				|| z	= parent.lastrect
 				|| sh	= font.width*2
 				|| v	= (6 + .depth(parent)*sh, texty)
-				|| mod	= ._Document.ismodified?
-				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
+				|| D	= ._Document
+				|| mod	= (D.ismodified (D) nil)
+				|| ddd	= (Colors.black(0.5) (mod) Colors.clear)
 				ddd.a *= strength // sigh...
 				font.small!.drawicon(.Modifier, where, V, ddd)
 

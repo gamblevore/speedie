@@ -159,7 +159,8 @@ function SCFunction.HasCVersion (|bool|)
 
 function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |asmreg|)				// dofunction function
 	if !.InlineDepth
-		|| reason = ("Unable to inline function", "Inline depth too great")(.EntireInlineFailed<2)
+		|| unable = (.EntireInlineFailed<2)
+		|| reason = ("Unable to inline function" (unable) "Inline depth too great")
 		error (exp, reason)
 	.EntireInlineFailed = 1 + !DepthOK
 	return asmreg()

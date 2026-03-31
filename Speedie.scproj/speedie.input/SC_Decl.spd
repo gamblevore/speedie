@@ -194,8 +194,9 @@ class SCDecl (SCObject) {
 			
 		if .isfloat or t.isfloat
 			|| bits = .bestfloat(ot)
-			|| FF = (datatypecode.double.floatness, datatypecode.float.floatness)(bits > 32)
-			|| dest = (TypeFloat64!, TypeFloat!)(bits > 32)
+			|| Big = (bits > 32)
+			|| FF = (datatypecode.double.floatness (big) datatypecode.float.floatness)
+			|| dest = (TypeFloat64! (big) TypeFloat!)
 			if s.floatness != FF
 				left.CastToClass(dest)
 			if t.floatness != FF
@@ -231,12 +232,12 @@ class SCDecl (SCObject) {
 		if Op isnt ShiftOnly
 			signed ?= t.IsSigned
 		if bits > 32
-			return (typeint64, typeuint64)(signed)
+			return (typeint64 (signed) typeuint64)
 		if bits > 16
-			return (typeint  , typeuint  )(signed)
+			return (typeint (signed) typeuint)
 		if bits >  8
-			return (typeint16, typeuint16)(signed)
-		return (typechar, TypeByte)(signed)
+			return (typeint16 (signed) typeuint16)
+		return (typechar (signed) TypeByte)
 
 
 	function PointeryMatch (|scdecl| O, |bool|)

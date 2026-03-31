@@ -110,7 +110,7 @@ class ErrorReceiver
 			
 
 	function Incr (|error| err, |bool| add=true)
-		|| n = (1, -1)(add)
+		|| n = add.Dir
 		
 		if err.severity == errorseverity.problem
 			.problemcount += n

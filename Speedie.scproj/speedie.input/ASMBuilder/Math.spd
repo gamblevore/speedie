@@ -802,7 +802,9 @@ extend Assembler
 	
 	function SHR  (fn_opasm)
 		if dest is Const
-			return .MakeConstFromTwo(exp, dest, l, r, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
+			|| Signed = l.signed
+			|| fn = (ConstifyBitSHS (signed) ConstifyBitSHR)
+			return .MakeConstFromTwo(exp, dest, l, r, fn)
 		|| K = .const(R, 6, false)
 			if k == 0
 				return L

@@ -289,7 +289,7 @@ datatype ASMReg (uint64)
 	
 	
 	operator mul (|bool| b, |asmreg|)
-		return (self, nil)(b)
+		return (self (b) nil)
 			
 
 	operator mul (|message| m, |asmreg|)

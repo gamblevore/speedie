@@ -205,7 +205,8 @@ module {
 		|| opp = SCOperator.new(s, ASM, mode ||| opmode.compare)
 		opp.InitComp( s )
 
-		|| newname = ("~" + s, "~=")(s != "==")
+		|| NotEq = (s != "==")
+		|| newname = (("~" + s) (noteq) ("~="))
 		Mode = mode &~ opmode.NilTest
 		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
 	
@@ -309,14 +310,8 @@ function Message.AOrBExpand (|bool|)
 	using (rel)
 	|| f = rel.first!
 	if !f.HasAny
-		|| list = rel.msg(@list)
-		rel <~ self
-		rel.func = @func
-		.become(@prm)
 		.msg(f.func, f.name)
-		list <~ f
-		list <~ rel.first
-//		x ?? b --> (x,b)(x)
+		.become(@bra)
 	  else
 		|| P			= rel.BunchFixPrepare
 		|| subject		= P.first!
@@ -549,7 +544,8 @@ function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	|| size = nk.BitsNeeded
 	require uk or size > lc.typeinfo.bitcount
 
-	|| ty = (typeint64!, typeint!)(size > 32)
+	|| IsBig = (size > 32)
+	|| ty = (typeint64! (isbig) typeint!)
 	if uk and rk > 32
 		ty = typeint64!
 	|| ty2 = ty.typenormal.copydecl

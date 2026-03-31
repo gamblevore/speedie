@@ -147,8 +147,10 @@ class Window (GUIControl)
 				(menu isnt visible) // makes sense?
 		.InnerFocus = focus
 		.finishfocus(focus)
-		focus.__GotFocus__?
-		old.__LostFocus__?
+		if focus
+			focus.__GotFocus__
+		if old
+			old.__LostFocus__
 //		.InnerLostFocus = old
 
 
@@ -179,8 +181,10 @@ class Window (GUIControl)
 		|| old = .focus
 		.focus = focus
 
-		focus.__GotFocus__?
-		old.__LostFocus__?
+		if focus
+			focus.__GotFocus__
+		if old
+			old.__LostFocus__
 		
 		.FinishFocus(focus)
 
@@ -228,7 +232,7 @@ class Window (GUIControl)
 		if keys.shift
 			fwd = !fwd
 		if !Item
-			item = (L.liststart, l.Listend)(fwd)
+			item = (L.liststart (fwd) l.Listend)
 		  else
 			item = l.SearchStep(item, fwd)
 		if item

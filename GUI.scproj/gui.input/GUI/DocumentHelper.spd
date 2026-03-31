@@ -59,7 +59,8 @@ class DocumentViewer (list)
 
 function document.RemoveViewer (|guicontrol| g)
 	opt norefcounts
-	.viewers.find(g).remove?
+	|| found = .viewers.find(g)
+		found.remove
 
 
 function document.AddViewer (|guicontrol| g)

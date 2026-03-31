@@ -89,7 +89,7 @@ class ButtonView (GUIControl)
 		
 		.Touch(2)
 		if !._DuringSelectEvent++
-			|| fn = (.onrightclick, .OnClicked)(RightClick)
+			|| fn = (.onrightclick (RightClick) .OnClicked)
 				(fn)(self, value, prev)
 		._DuringSelectEvent--
 
@@ -201,7 +201,7 @@ class ButtonView (GUIControl)
 			.ClickedItem ?= d
 		
 		if !.Pressing
-			return (mousedragging.Beyond, mousedragging.handled)(D)
+			return (mousedragging.Beyond (D) mousedragging.handled)
 		
 		|| n = gui.FrameStart
 		if !.DelayTill
@@ -263,7 +263,7 @@ class ButtonView (GUIControl)
 				if darker != .PressMakesLighter
 					G.Overlay(0.3~black, 0.25)
 				  else
-					|| amount = (0.66, 0.3)(tab is active)
+					|| amount = ((0.66) (tab is active) (0.3))
 					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
 				
 			if disabled

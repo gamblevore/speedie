@@ -186,7 +186,7 @@ class TextView (GUIControl)
 			|| OnBreak = .OnBreakPoint
 				require !(onbreak)(self, D, 1-HasBreak)	// true means cancel
 			
-			|| Line = ("\n", "\r")(HasBreak)
+			|| Line = ("\n" (HasBreak) "\r")
 			return .InsertText(Line, Range, false)
 
 		|| OnBreak = .OnBreakPoint
@@ -207,7 +207,8 @@ class TextView (GUIControl)
 		
 		
 	behaviour LostFocus
-		.isinline.clear(False)?
+		|| c = .IsInline
+			c.clear(False)
 		
 		if !.KeepUndosOnLoseFocus
 			.document = nil
@@ -333,7 +334,7 @@ class TextView (GUIControl)
 		.EditClickText(p, 0, !IsRightClick)
 		if IsRightClick and .__keydown__(keys.section)
 			return
-		|| Code = (-1, -2)(IsRightClick)
+		|| Code = -2 + IsRightClick
 		(.onclicked)(self, Code)?
 	
 	
@@ -536,7 +537,7 @@ class TextView (GUIControl)
 		|| fwd = false
 		if !keys.shift
 			|| r = t.resolve
-			x = (r.x2, r.x)(i > 0)
+			x = r[(i > 0)|int|]
 		if keys.platCmd									// line-end
 			|| t2 = (t.x - (i < 0), t.x2)
 			x = .FindDrawLineEdge(t2, i)
@@ -677,7 +678,8 @@ class TextView (GUIControl)
 			target osx
 				page |= (keys.ctrl)|int|
 			
-		|| x  = (.text.length, 0)(i > 0)
+		|| x  = 0
+		if i > 0: x = .text.length
 		|| t  = ._TypingPlace
 		|| bs = .FindDrawSelMove(t, i, page>0)
 		if .SingleLine and (t == bs.x)
@@ -1497,7 +1499,7 @@ class TextView (GUIControl)
 	function InsertText (|string| S, |intrange| P, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
 		|| Same = (s == p.width) and .text[p.x, s] 
-		|| i	= (p.x + s.length, p.x2)(!Same)
+		|| i	= ( p.x2 (Same) p.x + s.length )
 		
 		if !same
 			i = p.x + s.length
@@ -1516,7 +1518,7 @@ class TextView (GUIControl)
 			if ._CanAutoComplete <= 1
 				.CanAutoComplete = 0
 				.AutoCompleteString = ""
-			|| x = (p.x, p.x2)(s)
+			|| x = (p.x (s) p.x2)
 			|| tab = (s in '\t')
 				.UndoChecker() = -1
 			
@@ -1548,9 +1550,10 @@ class TextView (GUIControl)
 
 	function Save (|bool|)
 		opt norefcounts
-		if .undoer.save(DocumentState.saving)?
-			.AlphaFade
-			return true
+		|| u = .undoer
+			if u.save(DocumentState.saving)
+				.AlphaFade
+				return true
 
 
 	function FilePath (|string|)
@@ -1560,7 +1563,7 @@ class TextView (GUIControl)
 
 
 	function DeleteKey (|bool| fwd, |bool|)
-		|| d = (1, -1)(fwd)
+		|| d = fwd.dir
 		if !.deletekeysub(d)
 			beep
 		GUI.showcursor(false)
@@ -1609,7 +1612,7 @@ class TextView (GUIControl)
 
 		|| x = r.x
 		if keys.option or keys.platcmd(false)
-			r.x2 = .wordmove(x, (1,-1)(keys.shift))
+			r.x2 = .wordmove(x, keys.shift.dir)
 			return r
 	
 		if  (self[x-1] == '(')  and  (self[x] == ')')
@@ -1761,7 +1764,9 @@ class TextView (GUIControl)
 			//
 		  elseif (d is AvoidLastChar) and canavoid
 			x2 = .text.MoveCodePoint(x2, -1)
-		return (r.x, x2)(i < 0) 
+		if i < 0
+			x2 = r.x
+		return x2
  
 
 	libinternal FindDrawSelMove (|intrange| t, |int| i, |bool|page, |ivec2|)
@@ -1770,7 +1775,9 @@ class TextView (GUIControl)
 		|| pos = t.x2
 		if !keys.shift
 			t = t.resolve
-			pos = (t.x, t.x2)(i < 0)
+			pos = t.x
+			if i >= 0
+				pos = t.x2
 			if (t.width) and (pos > 0) and (i > 0) and (self[pos-1].IsTextLine)
 				pos--
 		if page
@@ -1782,7 +1789,7 @@ class TextView (GUIControl)
 		  else
 			x = d.xofchar(t.lower)
 		|| movedCount = 0
-		d = d.MoveCapped(i, movedCount) 
+		d = d.MoveCapped(i, movedCount)
 		if MovedCount
 			return .lastlinefix(d, x)
 		if i > 0
@@ -1993,17 +2000,20 @@ class TextView (GUIControl)
 		GUI.touch(self)
 			
 	
+	setter WrappedLines (|textviewline|)
+		disabled
+	
 	libinternal Clear (|string| NewText, |bool|)
 		rz = super.textset(NewText)
 		require rz or !.WrappedLines.hasany
 
 		._LogTrimmed = 0
-		|| sel = (.text.length, 0)(.SingleLine) 
+		|| sel = 0
+		if .SingleLine: sel = .text.length
 		.TypingPlaceDirect((sel,sel))
 		
 		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
-//		._Start = ._lines
 		.WrappedLines.clear
 
 		|| d = textviewline()

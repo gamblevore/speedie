@@ -83,7 +83,10 @@ function MainBrancher (fn_asm)
 	
 	if old != .basicparent
 		.nextbasicblock
-	.BreakRequest = (BreakReq, nil)(NothingDone == .curr)
+
+	.breakrequest = nil
+	if NothingDone == .curr
+		.BreakRequest = BreakReq
 	
 
 function While (fn_asm)
@@ -182,7 +185,8 @@ function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
 	.Branch(cond, Br)
 	|| KK = br.Constness
 	if KK.IsKnown
-		|| which = (A, B)(KK.Default)
+		|| which = B
+		if (KK.Default): which = A
 		return .µInto(which, dest)
 
 	return .RealTernary(exp, dest, a, b, br)
@@ -218,7 +222,9 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 	if C isnt Const
 		return cond.TERN(dest, C, A, B, C.issmall|int|) * dest
 
-	|| t = (A, B)(C.Const)
+	|| T = B
+	if (C.Const)
+		T = A
 	.NopConst(C)
 	return t
 
@@ -330,7 +336,8 @@ function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |A
 			return bowl
 		start.RegInput(1) = rB
 		start.prms[3] = 63
-		start._op = (asm.BAND, asm.BORR)((middle == asm.jban) == (na==0))
+		|| WantBAND = ((middle == asm.jban) == (na==0))|int|
+		start._op = asm.BORR - WantBAND
 		if na
 			A.parent!.BNOT(dest, dest, nil, -1)
 		return start.info
@@ -521,7 +528,7 @@ function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 	
 	.SoftNop(bflg)
 	.SoftNop(compare)
-	|| input = (y,x)(ismax)
+	|| input = (y (ismax) x)
 	|| f = exp.iclm(a, x, input, y, small)
 	if IsFloat
 		f.prms[4] = small^1						// other way around, wew.

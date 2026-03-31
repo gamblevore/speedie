@@ -142,9 +142,9 @@ module debugger
 		
 		.Globs = R["glob"]
 		.LoadFiles(R["files"].value.decompress)
-		.SrcMapStr = R["pos"]
 		.Breakables = R["breakmap"]
 		.InbuiltBreaks = R["breakpoint"]
+		.SrcMapStr = R["pos"]
 		.dbgLength = .SrcMapStr.Length >> 2
 
 		|| L2 = SpdTable.CodeLength
@@ -152,13 +152,32 @@ module debugger
 		expect (L2 < 1MB)						("Oversized source-map: " + L2)
 		
 		.ActivateInbuiltBreaks
+		target debug
+			.PrintBreaks
 		
 		for fn in SpdTable.funcs
 			fn.LoadVars
 		
 		return StdErr.ok
 	
-
+	
+	target debug {
+	function PrintBreaks
+		|| T = SpdTable.CodeLength
+		|FileWithData| LastFile
+		printline "--- BreakInfo ---"
+		for raw in .SourceMap
+			|| Src = raw.Location
+			|| P = src.Position
+			|| Code = raw.code(T)
+			|| File = src.File
+			if File!=LastFile
+				printline
+				printline File
+				LastFile = file
+			printline "char: $P,  code: $code"
+	}
+	
 	helper LoadFiles (|string| List)
 		opt norefcounts
 		|| Last = 0

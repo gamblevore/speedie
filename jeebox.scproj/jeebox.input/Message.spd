@@ -516,7 +516,7 @@ Message is also:
 		|| OF = opp.first
 
 		fs <~ SepA
-		fs <~ (of, opp)(of)
+		fs <~ (of (of) opp)
 		fs <~ ' '
 		fs <~ f
 
@@ -976,7 +976,8 @@ Message is also:
 				l = .msg(@arg)
 		for tmp in l
 			if (tmp ~= key)
-				tmp.last.remove?
+				|| TL = tmp.last
+					TL.remove
 				return tmp  
 		return l.msg(@tmp, key)
 
@@ -1055,7 +1056,7 @@ Message is also:
 		cpp_part Fail
 		inlined
 		errorreceiver.NewError( self, Error )
-
+ 
 //	Syntax Deprecate ( |string| Error = "Deprecated." )
 //		.SyntaxProblem(error)
 

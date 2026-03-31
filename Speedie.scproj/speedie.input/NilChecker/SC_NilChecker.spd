@@ -510,7 +510,9 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return nilstate.real
 
 	if scop Is NilTest
-		|| side = (rr, ll)(lnil == 1)
+		|| side = ll
+		if (lnil == 1)
+			side = rr
 		if test is active
 			(test is reversed) = scop Is ExactlyEquals
 			test = test.activate

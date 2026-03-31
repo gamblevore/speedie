@@ -42,7 +42,8 @@ class SCObject
 		|| src = .Source
 			return src.File
 		if self isa SCModule
-			return .cls.file?
+			|| c = .cls
+				return c.file
 
 	syntax is (|SCNodeInfo| i, |bool|)
 		return .NodeInfo&i

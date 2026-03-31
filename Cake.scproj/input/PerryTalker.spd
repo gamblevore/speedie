@@ -155,7 +155,7 @@ function debugger.file (|message| m, |filewithdata|)
 	return .FileMap[m.firstname]						#expect (m, "Can't find file")	
 
 
-function BreakAction (perryresponse)
+function BreakAction (PerryResponse)
 	opt norefcounts
 	|| F = debugger.file(m)
 		|| p = m[1].int
@@ -239,7 +239,6 @@ function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j, |filewit
 		if err != nil
 			j.add(@tmp, err)
 			exit
-		
 		|| File = .CollectStack(stack, j, Count++)
 			rz = file
 		Stack = .prev(stack)

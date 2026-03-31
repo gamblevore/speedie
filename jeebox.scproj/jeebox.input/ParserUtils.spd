@@ -43,7 +43,8 @@ function String.ParseJSON (|Messageroot|)
 	jeebox.UnEscapeStr = Jeebox.JS_UnEscapeStr
 	rz = .parse
 	jeebox.UnEscapeStr = tmp
-	rz.ConvertJSONToJB?
+	if rz
+		rz.ConvertJSONToJB
 	
 
 function String.IsJbin (|ind|)

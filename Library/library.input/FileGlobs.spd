@@ -82,7 +82,8 @@ function array.GlobExpand (|[string]| self, |[file]|)
 libinternal file.FileGlobSub (|[string]| GlobParts, |[file]| result, |int| pi)
 	|string--| p = GlobParts[pi++]$
 	
-	|| Names = (.list, nil)(p contains '*')
+	|| Star = (p contains '*')
+	|| Names = (.list (Star) nil)
 	|| n = 0 
 	while
 		|string--| str = p

@@ -294,7 +294,9 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 	  else
 		|| sh = 64 - NC
 		|| oof = srf.Const << sh
-		K = (oof|int64| >> sh, oof|uint64| >> sh)(dest.Signed) // shift up and down
+		K = oof|uint64| >> sh
+		if dest.Signed						// shift up and down
+			K = (oof|int64| >> sh)			//
 
 	if srf._const == K // haha.
 		return srf.info
@@ -396,11 +398,14 @@ function StatExpr (fn_asm)
 	|| v = .OpenVars
 	
 	while ch
+		|| sent = dest
 		if ch.func == @decl
-			|| Sent = (dest, nil)(ch.obj == Rejoined)
+			if ch.obj != Rejoined
+				sent = nil
 			rz = decl(self, ch, sent)
 		  else
-			|| Sent = (dest, asmreg.discard)(ch.islast)
+			if !ch.islast
+				sent = asmreg.discard
 			rz = .µ(ch, Sent)
 		ch++
 		
@@ -677,7 +682,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 
 function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
 	opt norefcounts
-	rz = (1,-1)(IsPlus & 1)
+	rz = (IsPlus & 1)|bool|.dir
 	if upon.isfloat
 		if upon.FourBytes
 			rz = rz|float|.asint

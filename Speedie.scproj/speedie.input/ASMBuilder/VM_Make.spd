@@ -43,7 +43,7 @@ function FinishAcc
 	|| s = .dt_prm
 		|int| X = .XType
 			Macro.TmpPrms_ <~ x.msg
-		|macro--| M = (VM_Builder.double_rizzler, VM_Builder.rizzler)(x)
+		|macro--| M = (VM_Builder.double_rizzler (x) VM_Builder.rizzler)
 		s.AppendMacro(M, macro.TmpPrms_)
 		macro.TmpPrms_.clear
 	.XType = 0
@@ -383,7 +383,8 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 		.rdz <~ (arg, 2)
 	
 	for (p in form) (i)
-		|| ty = ("asmreg", "int")(p.isreg)
+		|| pisreg = p.isreg
+		|| ty = ("asmreg" (pisreg) "int")
 		|| pname = f.VMMsgArgName(i)
 		|| rel = NewEqRel(@thg + pname, @thg + "nil")
 		|| dcl = NewDecl(ty, rel)

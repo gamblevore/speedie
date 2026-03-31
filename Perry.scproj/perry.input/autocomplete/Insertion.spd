@@ -450,7 +450,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 			return 1 // why not
 		return 0 // i think?
 	
-	|| after= where.after?
+	|| after= (where.after (where) 0)
 	|| A	= (after, after)
 	if state != 10  and  (!s.width or state == 5)
 		if state == 1

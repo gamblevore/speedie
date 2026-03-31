@@ -45,11 +45,13 @@ class MessageView (ListView)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect
-				|| d	= ._Document
 				|| sh	= font.width*2
 				|| v	= (6 + .depth(parent)*sh, texty)
-				|| mod	= d.ismodified?
-				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
+				|| d	= ._Document
+				|| mod	= (d.ismodified (d) nil)
+				|| ddd	= colors.clear
+				if d and d.IsModified
+					ddd = colors.Black(0.5)
 				ddd.a *= strength
 				font.small!.drawicon(.Modifier, where, V, ddd)
 

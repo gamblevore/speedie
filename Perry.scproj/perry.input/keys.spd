@@ -35,7 +35,8 @@ extend PerryIDE
 			return .WantsRun
 		if key is f
 			if .MassSearchField.hasfocus
-				.PrevView.Click?
+				|| p = .PrevView
+					p.Click
 				return .editme.OpenSearch
 			return .ShowFind
 		if key is k

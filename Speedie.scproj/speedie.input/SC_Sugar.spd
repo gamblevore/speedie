@@ -81,9 +81,11 @@ function message.MsgFix (|message| parent=nil, |message!|) // «
 
 function message.Tran_QMark 
 	|| thedot		= .first$
-	|| IsNormal		= (thedot == @dot or @sdot or @func) 
+	|| IsNormal		= (thedot == @dot or @sdot or @func)
+	if thedot == @dot
+		problem (thedot)
 	if !isnormal
-		expect (thedot == @thg) (thedot, "Question-mark not one of:  a.b?,  (a)(b)?,  a.b? = c")
+		expect (thedot == @thg) (thedot, "Question-mark must be:  a.b?  or  (a)(b)?  or  a.b?=c")
 		.func = @bra
 		return
 
@@ -123,8 +125,6 @@ function message.Tran_QMark
 		tern <~ cond
 		// add |()--| to thedot?
 		// is there an easier way? Just add... like a bit somewhere to the msg?
-		// maybe not?
-		// what if we do something like type with a name?
 		tern.msg(@arg) <~ thedot
 	  else
 		|| options = tern.msg(@list)

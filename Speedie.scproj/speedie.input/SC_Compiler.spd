@@ -359,7 +359,8 @@ function ImportLibs
 	.VisibleFuncs.project = Lib // visible-only funcs must be considered lib
 	
 	scimport.STDLibTime = false
-	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
+	|| Single = (options.SingleFileInput)
+	|| ToUse = (options.SingleFileInput.file (single) .BaseProjectPath!)
 	compiler.Project = SCImport(ToUse, false)
 
 	scimport.curr = compiler.project // perhaps I should put it into there instead of compiler.program anyhow.
@@ -871,7 +872,8 @@ function AddMain (|int| mark, |bool|)
 			abc.name = compiler.ConfMsg.RenderJbin
 		Compiler.AppInitCode.first = P
 	
-	|| b = (Truebool!, falsebool!)(Options.ProjectisLibrary) 
+	|| IsLib = Options.ProjectisLibrary
+	|| b = (Truebool! (IsLib) falsebool!)
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 
 	stderr.LowerErrorsTo = 0

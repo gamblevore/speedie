@@ -23,12 +23,13 @@ function RelSetOrExpansion (|Message| exp)
 	using (exp)
 	exp.clear
 	l.AppendAllInto(exp)
-	|| cond = r.first!.copy
-	|| tmp = @tmp + "if"
+	|message--| cond = r.first!.copy
+	|message--| tmp = @tmp + "if"
 	tmp <~ cond.Negate
 	tmp.msg(@arg) <~ r
-	|| P = exp.parent
-	((p, exp)(P == @decl)).next = tmp
+	|message--| P = exp.parent
+	|| IsDecl = P == @decl
+	((p! (isdecl) exp)).next = tmp
 
 
 

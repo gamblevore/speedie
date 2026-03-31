@@ -446,7 +446,7 @@ class Image (memory)
 			|| Read = self[0, y]
 			|| R = (h1-y, 0)
 			|| L = (y, dh1)
-			|| start = (R,L)(right)
+			|| start = (R (right) L)
 			|| Write = into[start]
 			for i in w
 				Write[0] = Read[i]
@@ -487,19 +487,19 @@ class Image (memory)
 		// sigh.
 
 		|| P = r.x2y1+(-1,1)
-		|| C = (edge, attached_edge)(AllowEdge is right)
+		|| C = (edge (AllowEdge is right) attached_edge)
 		.DrawLineV(P, r.height-2, C)
 		
 		P = r.x1y1+(0,1)
-		C = (edge, attached_edge)(AllowEdge is left)
+		C = (edge (AllowEdge is left) attached_edge)
 		.DrawLineV(P,  r.height-2, C)
 		
 		P = r.x1y2+(0,-1)
-		C = (edge, attached_edge)(AllowEdge is top)
+		C = (edge (AllowEdge is top) attached_edge)
 		.DrawLineH(P,  r.width,  C)
 		
 		P = r.x1y1
-		C = (edge, attached_edge)(AllowEdge is bottom)
+		C = (edge (AllowEdge is bottom) attached_edge)
 		.DrawLineH(P,  r.width,  C)
 
 

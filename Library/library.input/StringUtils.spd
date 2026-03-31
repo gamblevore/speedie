@@ -177,7 +177,8 @@ libinternal cstring.temp (|VirtualJBString|)
 function String.ExtractPathAndLine (|$ivec2| LineAndByte, |string|)
 	if .LineCount > 1	
 		|| parsed = .Parse
-			|| curr = (parsed.first, parsed)(parsed == @arg)
+			|| isArg = (parsed == @arg)
+			|| curr = (parsed.first (isarg) parsed)
 			while curr
 				|| pos = curr["pos"]
 				|| path = curr["file"]

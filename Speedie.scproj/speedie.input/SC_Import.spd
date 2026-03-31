@@ -24,7 +24,7 @@ class SCImport
 		.IsSTDLib = SCImport.STDLibTime or f==nil
 		.WarnUnusedFuncs = !.IsSTDLib 
 		.Resources = Dictionary()
-		.BlindCast = (0, errorseverity.error)(builtin)
+		.BlindCast = (0 (builtin) errorseverity.error)
 		.DeclLayer = MemoryLayer(scdecl, self)
 		|| M = SCModule.NeuModule( nil, compiler.program, nil )|SCModule|!
 		.Mod = M

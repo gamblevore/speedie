@@ -32,7 +32,7 @@ function Compiler.PrintResults
 	if options.SelfReplacement and FileDes.StdOut.IsTerminal
 		if ok and !StdErr.ok // how?
 		if .VariantSuffix ~= "Test"
-			|| msg = ("Success", "Failed")(ok)
+			|| msg = ("Success" (ok) "Failed")
 			app.say(msg, false)
 	if Options.Beep
 		"\07"

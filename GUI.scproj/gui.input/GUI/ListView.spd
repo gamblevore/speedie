@@ -180,7 +180,8 @@ class ListView (GUIControl) {
 			
 	libinternal ClearEdits
 		opt norefcounts
-		.InlineCell.FinishAndClear(false)?
+		|| c = .inlinecell
+			c.FinishAndClear(false)
 	
 	
 	libinternal Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
@@ -399,9 +400,13 @@ class ListView (GUIControl) {
 		if key is up or down
 			|| d = int.max
 			if keys.Cmd
-				.SelectMove( (-d, d)(Key is up) )
+				if (Key is up)
+					d = -d
+				.SelectMove( d )
 			  elseif !.FirstSelected
-				.SelectMove( (-d, d)(Key is down) )
+				if key is down
+					d = -d
+				.SelectMove( d )
 			  else
 				|| i = 1
 				if keys.option: i = .VisibleRows/2
@@ -489,7 +494,9 @@ class ListView (GUIControl) {
 		
 
 	function EnableDrag
-		.OnDragRow = (nil, &BasicRowDrag)(.istree)
+		.OnDragRow = nil 
+		if .istree
+			.ondragrow = &BasicRowDrag
 	
 
 	libinternal CursorForRow (|listviewCell?| c, |systemcursor|)
@@ -521,7 +528,8 @@ class ListView (GUIControl) {
 	
 	
 	behaviour LostFocus
-		.InlineCell.clear(false)?
+		|| c = .inlinecell
+			c.clear(false)
 		.clearinternaldrops
 		super.lostfocus
 	
@@ -682,7 +690,9 @@ class ListView (GUIControl) {
 
 	libinternal DelayedRename (|ListViewCell| i)
 		.EditDelayed = i
-		delayedittill_ = (gui.FrameStart + 0.5s, nil)(i)
+		delayedittill_ = nil
+		if i
+			delayedittill_ = gui.FrameStart + 0.5s
 
 
 	libinternal TryDelayedEdit
@@ -797,12 +807,14 @@ class ListView (GUIControl) {
 			l = .listPrev(l)
 			
 		
-	libinternal Edge (|int|i, |bool| Selectable=false, |ListViewrow|)
+	libinternal Edge (|int| i, |ListViewrow|)
 		opt norefcounts
-		rz = (.listend, .liststart)(i > 0)
-		if selectable
-			while rz and rz is UnSelectable
-				rz = rz.step(i <= 0)
+		if i > 0
+			rz = .listend
+		  else
+			rz = .liststart
+		while rz and rz is UnSelectable
+			rz = rz.step(i <= 0)
 		
 
 	libinternal SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
@@ -835,7 +847,8 @@ class ListView (GUIControl) {
 		while curr {
 			curr = .searchstep(curr, dir)
 			if curr == start
-				return (start, nil)(curr is found)
+				require curr is found
+				return start
 		} (curr isnt found)
 		return curr
 	
@@ -937,7 +950,7 @@ class ListView (GUIControl) {
 	function SelectFirst (|listviewselectmode| mode = listviewselectmode.normal, |bool|)
 		opt norefcounts
 		
-		.select(.edge(-1, true), mode)
+		.select(.edge(-1), mode)
 		return true
 
 
@@ -959,17 +972,21 @@ class ListView (GUIControl) {
 			|| mode = listviewselectmode.normal
 			if all
 				mode = listviewselectmode.noshow
-			.SelectedEvent( (m, nil)(i), mode )
+			.SelectedEvent( (m (i) nil), mode )
 		return true
 
 
 	function SelectMove (|int| i, |bool| Multi=keys.shift)
 		opt norefcounts
 		require i
-		|| l = (.LastSelected, .FirstSelected)(i > 0)
+		|listviewrow| l
+		if i > 0
+			l = .LastSelected
+		  else
+			l = .FirstSelected
 		if !l
 			// what if .start or .end is disabled?
-			|| f = .edge(i, true)
+			|| f = .edge(i)
 			return .Select(f)
 		
 		|| m = .bmove(l, i)
@@ -995,8 +1012,10 @@ class ListView (GUIControl) {
 
 	function SelectNone
 		opt NoRefCounts // this does not seem to select none??
+		|listviewrow| s 
 		|| one = .KeepOneSelected
-		|| s = (.FirstSelected ?? .liststart, nil)(one)
+			s = .FirstSelected		
+			s ?= .liststart
 		return .Select(s)
 	
 	
@@ -1199,7 +1218,9 @@ class ListView (GUIControl) {
 		|| n = .ColumnCount
 		|ListViewRow| prev
 		for sk.visible in self
-			|| ind = (0, .CalculateSkip(sk, prev, n))(.IsTree)
+			|| ind = 0
+			if .IsTree
+				ind = .CalculateSkip(sk, prev, n)
 			sk.indent = ind
 			prev = sk
 	
@@ -1278,7 +1299,7 @@ class ListView (GUIControl) {
 		z2.y = z2.y2 - .rowheight
 		for r.visible in self
 			if r is Selected
-				Where.mark(z2, (2, 3)(.hasfocus))
+				Where.mark(z2, 2 + .hasfocus)
 			z2 = z2 down .rowheight
 
 
@@ -1333,7 +1354,7 @@ class ListView (GUIControl) {
 		if rem
 			.ScrollPixelsSub(rem)
 			.TouchScrollBar
-			._ScrollRealigner = (48, 0)(.scrollshift)
+			._ScrollRealigner = 48*(.scrollshift!=0)
 			GUI.touch(self)
 
 
@@ -1346,7 +1367,9 @@ class ListView (GUIControl) {
 	
 	libinternal ScrollPixelsSub (|int| rem, |bool|)
 		rem += .scrollShift
-		|| cmp = (.liststart, .scrollend)(rem < 0) 
+		|| cmp = .liststart
+		if rem >= 0
+			cmp = .scrollend
 		if cmp == .scrollstart
 			rem = 0
 		
@@ -1399,7 +1422,8 @@ class ListView (GUIControl) {
 
 			for r.visible in self
 				rect.y = rect.y2 - .RowHeight
-				|| D = (r.depth(self), 0)(.IsTree)
+				|| D = 0
+				if .Istree: d = r.depth(self)
 				r.ListRowDraw(Where, rect, self, D, NCols)
 				rect.y2 = rect.y
 				if (r == end) and .liststart == .scrollstart

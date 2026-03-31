@@ -317,7 +317,7 @@ class String
 	operator mul (|bool| b, |string|)
 		cpp_part MulBool
 		inlined
-		return (self,"")(b)
+		return (self (b) "")
 	
 	operator Mul (|int| n, |string|)
 		if n <= 1

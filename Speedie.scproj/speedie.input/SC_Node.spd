@@ -142,7 +142,7 @@ function FindModule (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0
 		upon = upon.FindModuleParent(mode)
 		
 	if where and (Mode isnt NoErrors)
-		|| err = ("Can’t find class: ", "Can’t find module: ")(mode is ForClass)
+		|| err = ("Can’t find class: " (mode is ForClass) "Can’t find module: ")
 		error (where, err + name)
 
 

@@ -82,7 +82,8 @@ struct Assembler
 			j.exit
 			
 			j.Enter(@msg, "glob")
-			|| G = (packmaker.libglobs, packmaker.packglobs)(options.makeexec)
+			|| MakeExec = options.makeexec
+			|| G = (packmaker.libglobs (makeexec) packmaker.packglobs)
 			j.PropertyLayout(G)
 			j.exit
 		
@@ -677,7 +678,7 @@ struct Assembler
 	function scclass.ListLayout (|jbin| j)
 		opt norefcounts
 		|| s = .super
-		|| sid = (s.tableid<<1, 0)(s)
+		|| sid = (s.tableid<<1 (s) 0)
 		j.AddInt(sid + .isobject)
 		j.PropertyLayout(.Properties)
 			

@@ -524,7 +524,9 @@ struct MsgTextDrawState
 	libinternal Next (|$codepoint| Char, |$int| ppos, |int|)
 		opt norefcounts
 		|| c = Char
-		|| w = (1, .i.tabsWidth)(c != '\t')
+		|| w = 1
+		if (c == '\t')
+			w = .i.tabsWidth
 		rz   = .x
 		.x   = rz + w*font.width
 		.i  += w

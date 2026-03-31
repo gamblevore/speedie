@@ -53,7 +53,8 @@ function compiler.PrintCompileErrors
 		require StdErr.HasProblems
 	stderr.PrePrintErrors
 	
-	|| MinSev = (ErrorSeverity.warning, ErrorSeverity.problem)(Options.Warnings)
+	|| MinSev = ErrorSeverity.problem
+	if (Options.Warnings): MinSev = ErrorSeverity.Warning
 	if Compiler.Successfulness >= 2
 		MinSev = ErrorSeverity.Error
 	.PrintErrors(MinSev)

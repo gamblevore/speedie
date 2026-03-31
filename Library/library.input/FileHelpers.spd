@@ -25,7 +25,7 @@ extend String
 	
 	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
 		visible class~file
-		|| p = (self, .parent)(last)
+		|| p = (self (last) .parent)
 		
 		for S.Paths in p
 			|| err = S.MakeDir|int|

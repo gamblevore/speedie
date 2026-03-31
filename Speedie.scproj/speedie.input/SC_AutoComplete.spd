@@ -143,7 +143,8 @@ function CmdWrap (|Message| arg, |bool|)
 		app.crash
 	
 	|| cmd = .CmdCleanUp(arg)
-	|| response = (.docmd(cmd), nil)(cmd != "error")
+	|| IsOK = cmd != "error"
+	|| response = (.docmd(cmd) (IsOK) nil)
 	response ?= .WriteError(cmd.name)
 
 	if cmd != response
@@ -742,7 +743,7 @@ function SCObject.Display (|bool| exact, |string|)
 	if self isa scfunction
 		if .IsAllocOrNew or (self is disabled)
 			return ""
-		return (.RenderTitle(false), .name)(Exact)
+		return (.RenderTitle(false) (Exact) .name)
 	if self isa SCDecl
 		return .AutoCompleteName
 	if self isa sciterator
@@ -1237,7 +1238,7 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 			fat.RenderFat(fs, true)
 			|| tmp = out.msg(@tmp, fs)
 			|| msg = fat.msg
-			|| p = (msg.Position, 0)(msg?) // could be nil due to the length set wrongly...
+			|| p = (msg.Position (msg) 0)//(msg?) // could be nil due to the length set wrongly...
 			if p <= 0
 				p = lp
 			tmp <~ p

@@ -308,8 +308,10 @@ module GUI
 	function vsync (assigns:|bool|)
 		// Lowers frame-rate. We'll need a better option to resyncing.
 		// if we draw into our own buffer anyhow.
-		|| v = ("1", "0")(value)
-		.SetHint("SDL_RENDER_VSYNC".cstr, v.cstr)
+		|byte[2]| cvalue
+		cvalue[0] = '0' + value
+//		|| v = ("1" (value) "0")
+		.SetHint("SDL_RENDER_VSYNC".cstr, (&cvalue[0])|cstring|)
 	
 	
 	function RemoveBorder
@@ -492,7 +494,8 @@ module GUI
 	
 	libinternal DroppingInto (|guicontrol|)
 		opt norefcounts
-		return window.front.droppinginto?
+		|| fr = window.front
+			return fr.droppinginto
 
 
 	libinternal UpdateTextFocus (|window| w)
@@ -949,7 +952,7 @@ module GUI
 		|| path = drop.file.copy
 		memory.free((drop.file)|&byte|)
 		Drop.file = nil
-		|| p = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)
+		|| p = ((copypasteflags.pastefile) (t is dropfile) (copypasteflags.pastetext))
 		|| c = w[.MouseXY] ?? w
 		c.PasteFromClipboard(path, p)
 		w.DroppingInto = nil
@@ -1266,7 +1269,7 @@ module GUI
 			PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
 						
 		if (down == Over or nil)
-			|| state = (SDL_WindowEventID.moved, SDL_WindowEventID.enter)(PrevOver == Over)
+			|| state = ((SDL_WindowEventID.moved) (PrevOver == Over) (SDL_WindowEventID.enter))
 			if !over
 				Over = w
 			if Over.__MouseMove__(xy, move, state)
@@ -1372,7 +1375,8 @@ module GUI
 		|guicontrol--| clicked 
 		if (bn == 3) or (Ctrl and bn == 1) 
 			clicked = .ControlOrMenuAt(xy)
-			clicked.__rightclick__(xy)?
+			if clicked
+				clicked.__rightclick__(xy)
 		  else
 			mousebutton.DownAt = gui.FrameStart
 			clicked = .DoMouseDown(xy, clicks)
@@ -1400,7 +1404,9 @@ module GUI
 		|| info = ""
 		ifn r isa textview  and  r is editable
 			info = r.Description
-		|| delay = (0.0s, 1.5s)(!GUI.FastToolTipDate.fired)
+		|| delay = 0.0s
+		if GUI.FastToolTipDate.fired
+			delay = 1.5s
 		|| now = gui.FrameStart
 		|| t = .tooltip
 		if t.name and t.when.fired

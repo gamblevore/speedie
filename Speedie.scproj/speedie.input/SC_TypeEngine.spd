@@ -336,7 +336,7 @@ function TypeOfChar (ExprResolver)
 	|| place = d.MakePlace(str)
 	|| char_decl = place[]
 	if !char_decl
-		|| type = (typebyte!, TypeCodePoint!)(IsByte)
+		|| type = (typebyte! (IsByte) TypeCodePoint!)
 		char_decl = type.typenormal.CopyDecl
 		place[] = char_decl
 		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
@@ -902,7 +902,6 @@ function TypeOfTernary (ExprResolver)
 	|| params	= list.next
 	expect  list.hasany and params.HasOneChild  (exp, "expected: (a,b)(cond)")
 	
-	
 	|| first	= list.first!
 	|| second	= first.next
 		require second.expectlast
@@ -918,7 +917,57 @@ function TypeOfTernary (ExprResolver)
 		params.obj = compiler.TernaryFunc
 		params <~ list.first
 		exp.ASMType = ASMType.ktern
+		problem exp
 		return result
+
+
+function message.DeOpp
+	nil self
+	opt norefcounts
+	
+	// (a (a==b) b)
+	// (a), ((a)), (a==b)					// all need deopping
+	
+	while
+		if !self
+			return
+		if .func != @bra
+			exit
+		self = self[@nil]
+	
+	|| fn = .func
+	if fn == @opp
+		.func = @thg
+		return
+	if fn == @rel
+		.first.deopp
+		|| op = .second!
+		if op == @bra
+			op.deopp
+		op.next.deopp
+
+
+
+function TypeOfTernary2 (ExprResolver)
+	opt norefcounts
+	using exp
+/	|| first	= exp.first!
+	|| Test		= first.next!
+	|| second	= test.next
+	if !second
+		second = test.msg(@thg, "nil")
+
+	rz = SameTypeSub(first, second, name_space)
+	|| test_inner = test[@nil]
+		test_inner.Deopp
+		if rz and test_inner.ExpandToBool( name_space )
+			test.func = @prm
+			test <~ test.prev					// in case it have changed...
+			test <~ test.next					// so we use test.next instead of second
+			exp.first = @thg + "JB_Ternary"
+			exp.become(@func)
+			test.obj = compiler.TernaryFunc
+			exp.ASMType = ASMType.ktern
 
 
 function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
@@ -1451,6 +1500,9 @@ function message.AndOrExpansionTest (|int|)
 
 function TypeOfRel (ExprResolver)
 	|message--| opch = exp.second!
+	if opch == @bra										/// ooh!... interesting!
+		return TypeOfTernary2(exp, name_Space)
+	
 	|SCOperator--| Comp = SCOperator.Lookup( opch )
 	|| RN = opch.Next								#expect	(exp, "Missing right hand side")
 		
@@ -1461,7 +1513,7 @@ function TypeOfRel (ExprResolver)
 	side = nil
 	|| P = exp.niceParent
 	|| ParentFunc = P.func
-	|| ShouldBeSet = (ParentFunc == @Arg or @Decl) 
+	|| ShouldBeSet = (ParentFunc == @Arg or @Decl)
 	if (comp isnt Assigns)
 		if (ShouldBeSet)
 			if comp is ExactlyEquals
@@ -1483,7 +1535,7 @@ function TypeOfRel (ExprResolver)
 		if rc
 			LC = TypeOfExpr( LN, name_space, side )
 			if (exp == @rel) and (ln == exp.last)		// oop. it just changed.
-				return TypeOfRel(Exp, name_space, side) // lol.
+				return TypeOfRel(Exp, name_space, side)	// lol.
 	  else 
 		LC = TypeOfExpr( LN, name_space )
 		RC = TypeOfExprNeeded( RN, name_space )
@@ -1495,7 +1547,7 @@ function TypeOfRel (ExprResolver)
 	
 	opch.obj = comp // shouldn't this be higher even?
 	if comp is AndOr // either
-		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
+		return Or_And_Expansion( LC, RC, exp, name_Space )		// expects both sides to be booleans, right?
 
 
 	if (RC != TypeNil)
@@ -1503,7 +1555,7 @@ function TypeOfRel (ExprResolver)
 			return ipm.CheckMath(exp)
 	
 	
-	|| Custom = UseCustomOperators(LC, RC, comp, exp) 
+	|| Custom = UseCustomOperators(LC, RC, comp, exp)
 
 	if Custom == CustomOps.needed
 		if (comp isnt CompOrSet)
@@ -1514,12 +1566,13 @@ function TypeOfRel (ExprResolver)
 	  elseif (comp is Bit)
 		require RC.IntsOnly(RN) and LC.IntsOnly(LN)
 	
-	if !side and (custom & CustomOps.TypeCastFromBool) 
+	if !side and (custom & CustomOps.TypeCastFromBool)
 		lc = typeint!.typenormal
 		rc = lc	
 
 	if Custom > CustomOps.needed
-		return ((LC, RC)(Custom == CustomOps.OnlyLeftIsVector)).NotLocal	// return bigger
+		|| LeftVec = Custom == CustomOps.OnlyLeftIsVector
+		return (LC (leftvec) RC).NotLocal						// return bigger
 
 	if lc is IntendedAsReturn
 		ln = ln.MakeAccess0
@@ -1527,7 +1580,7 @@ function TypeOfRel (ExprResolver)
 		ln.obj = lc // put inside MakeAccess0?
 		// rz --> rz[]
 	
-	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
+	if LC.ExpectRelMatch( RC, RN, side, exp )					// RN/LN have changed... and their types too!
 		ln = exp.first! //
 		rn = exp.last!
 		rc = rn.fastdecl
@@ -1678,7 +1731,7 @@ function TypeOfList (ExprResolver)
 		return cns
 
 	using (exp)
-	|| name = ("vecmix", "ivecmix")(isfloat)
+	|| name = ("vecmix" (isfloat) "ivecmix")
 	|| list = @prm.msg
 	exp.AppendAllInto(list)
 	exp <~ (@thg, name)

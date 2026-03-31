@@ -213,7 +213,8 @@ function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 		using (name)
 
 		|| P = name.parent
-		|| NewDefault = (P.last, nil)(P == @Rel)
+		|| PRel = (P == @Rel)
+		|| NewDefault = (P.last (PRel) nil)
 		
 		if !NewDefault
 // this code seems wrong... these decls always have a default! So why create a default?

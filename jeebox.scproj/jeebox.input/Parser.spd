@@ -216,7 +216,9 @@ extend Parser
 
 	function fAccess (ParseHandler)
 		// x[a, b]
-		|| pos = (parent.position, start)(parent)
+		|| pos = start
+		if parent
+			pos = parent.position
 		rz = parser(nil, @Acc, pos)
 		|| prms = parser(rz, @Arr, start)
 		parser.ParseLoopFlags(prms, "]", 0)
@@ -575,6 +577,8 @@ extend Parser
 	
 	
 	function fOppBracket (ParseHandler)
+		ignore
+			x = x (i > 0) z
 		|| result = parser.new( nil, @Bra, start )
 		|| opp1 = parser.Process( kOppChain )
 		|| opp2 = parser.Process( kOpp )
@@ -584,9 +588,10 @@ extend Parser
 			|| rel = parser.new( result, @rel, parser.nextstart - 1 )
 			rel <~ opp1
 			rel <~ opp2
-			rel <~ parser.Process( kOppChain )
+			rel <~ parser.Process( kOppChain ||| kThingSyx )
 
 		parser.ExpectEndChar( start, ")" )
+		result.after = parser.nextstart
 		return parser.OppChain( result )
 	
 
@@ -745,7 +750,9 @@ extend Parser
 	function UnTmpPlace (|message| R, |message|)
 		Opt NoRefCounts
 		|| p = R.parent
-		return (p, r)(p == @tmp)	
+		if p == @tmp
+			return p
+		return r
 	
 	
 	function fTmp (|int| Start, |int| OpFlags, |int| ThingFlags, |message| parent, |message|)
@@ -1142,7 +1149,10 @@ ive been~running #since morning
 			info.TotalLines += info.lines
 			
 			if .WillEnd
-				info.firstline = (.nextstart, parser.data.length)(.running)
+				if .running
+					info.firstline = .nextstart
+				  else
+					info.firstline = parser.data.length
 				exit
 			
 			if (prev and !info.Lines)

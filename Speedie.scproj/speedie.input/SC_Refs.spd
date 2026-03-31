@@ -256,7 +256,8 @@ function Message.AvoidSafeDecr
 	|| decr = arg.last.prev
 	|| prms = decr.Last
 		if prms.obj == Compiler.RefSafeDecr
-			prms.first.becomenil?  // remove it without, removing it. cos its still tested for in RefDecr!
+			|| f = prms.first
+				f.becomenil  // remove it without, removing it. cos its still tested for in RefDecr!
 
 
 function message.BecomeNil
@@ -518,9 +519,9 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 			|| D = Curr.Obj
 			if (D isa SCDecl)
 				if !D.IsNormalObject
-					return (curr, last)(parent)
+					return (curr (parent) last)
 		  elseif !curr.reftransparent
-			return (curr, Last)(parent)
+			return (curr (parent) Last)
 		
 		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
 
