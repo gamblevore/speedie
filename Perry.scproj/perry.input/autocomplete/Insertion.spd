@@ -26,9 +26,8 @@ function TextView.CodeInsertion (|textviewline| D, |$int| s_end, |$bool| InRange
 	opt norefcounts
 	
 	|| i2 = s_end
-	|| prevchar = self[i2-1]
-	while prevchar == ' '
-		prevchar = self[--i2]
+	while self[i2-1] == ' '
+		--i2
 	s_end = i2
 
 	|| msg	= d.message.FindTightest(s_End)
@@ -125,6 +124,14 @@ function TextView.CodeInsertion (|textviewline| D, |$int| s_end, |$bool| InRange
 		decl = decl.next
 	
 	if Name
+		if i2 >= s_end
+			state = -2
+			return nil							//   function a.b (|type| name)*
+		
+		if func_name
+			if i2 >= func_name.after and i2 <= prms.position
+				state = -2
+				return nil						//   function a.b*(|type| name)
 		state = 5
 		return name								// 5:function a.b (|type| name*)
 	
