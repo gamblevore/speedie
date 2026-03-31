@@ -4260,6 +4260,8 @@ SCObject* SC_TypeOfSyx(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfTernary(Message* Exp, SCNode* Name_space, Message* Side);
 
+SCObject* SC_TypeOfTernary2(Message* Exp, SCNode* Name_space, Message* Side);
+
 SCObject* SC_TypeOfThg(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfType(Message* Exp, SCNode* Name_space, Message* Side);
@@ -8478,6 +8480,8 @@ Message* SC_Msg_Deepest(Message* Self, Syntax Tmp, JB_String* Name);
 void SC_Msg_DefaultPrmFix(Message* Self, SCDecl* Base);
 
 void SC_Msg_DenyPreviousUse(Message* Self, Message* Msg);
+
+void SC_Msg_DeOpp(Message* Self);
 
 int SC_Msg_DeprecatedClassOption(Message* Self, JB_String* Name, JB_String* Kind);
 
