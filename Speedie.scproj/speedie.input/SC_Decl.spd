@@ -404,17 +404,25 @@ class SCDecl (SCObject) {
 
 
 	function IsReallyNumeric (|bool|)
-		if scnode.ConstantsLoadingOverride
+		if scnode.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
 			if .IsNormal
-				return .type.HigherNumber
+				return .type.ASMTypeInfo.NumericCount
 
-//	function scdecl.IsReallyNumeric (|bool|)
-//		if scnode.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
-//			if .IsNormal
-//				return .type.ASMTypeInfo.NumericCount
-	
+		
+	function IsNormalNumber (|bool|)
+		opt norefcounts
+		require (!.IsCArray) and (!.PointerCount)
+		if (.Type.NumericCount == 1)
+			return true
+		
+		if scnode.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
+			if .type.ASMTypeInfo.VecCount == 1
+				return true
+
+
 	function scclass.IsCurrentlyBeingUsed (|bool|)
 		opt norefcounts
+		return false					// seems to cause problems... Maybe some other time i'll try.
 		|| fn = scfunction.currfunc
 			if self == fn.cls
 				return true
@@ -423,34 +431,13 @@ class SCDecl (SCObject) {
 				return true
 
 
-
-	function scclass.HigherNumber (|scclass|)
-		opt norefcounts
-		while self
-			if .IsDataTypeOnly
-				return self
-			self = .Super
-		
-		
-	function IsNormalNumber (|bool|)
-		opt norefcounts
-		require (!.IsCArray) and (!.PointerCount)
-		if (.Type.NumericCount == 1)
-			return true
-		
-		if scnode.ConstantsLoadingOverride
-			|| t = .type.HigherNumber
-				if t.typeinfo.VecCount == 1 
-					return true
-
-
 	function IsNearlyNormalNumber (|bool|)
 		require (!.IsCArray) and (!.PointerCount)
 		return .Type.NumericCount > 0
 	
 	
 	function IsNormalBool (|bool|)
-		return (!.IsCArray) and (!.PointerCount) and (.Type == typebool) 
+		return (!.IsCArray) and (!.PointerCount) and (.Type == typebool)
 
 
 	function IsNumeric (|int|)
@@ -458,13 +445,16 @@ class SCDecl (SCObject) {
 		if (!.IsCArray) and (!.PointerCount)
 			return .Type.NumericCount
 
-	function MiniMatch (|scdecl?| self, |SCDecl?| O, |int| TypeCast = 0, |bool|)
+
+	function MiniMatch (|SCDecl?| self, |SCDecl?| O, |int| TypeCast = 0, |bool|)
 		if self
 			return .TypeMatch( O, TypeCast, nil )
+
 
 	function IsBool (|bool|)
 		if self and .isnormal
 			return .type == typebool
+
 	
 	function CanWrap (|bool|)
 		if (.pointercount or .type.funcproto)
