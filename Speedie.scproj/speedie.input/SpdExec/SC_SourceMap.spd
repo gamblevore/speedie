@@ -7,6 +7,7 @@ module SourceMap
 	|FastString|		BreakPoints
 	|FastString|		Breakable
 
+	
 	function Clear
 		opt norefcounts
 		|| p = .Positions
@@ -17,7 +18,8 @@ module SourceMap
 			b.Length = 0
 		.ASMTotal = 0
 		.LastLength = 0
-		
+	
+	
 	function Check (|scfunction| fn, |int| T, |bool|)
 		opt norefcounts
 		|| p = .positions
@@ -51,37 +53,27 @@ module SourceMap
 
 
 datatype SourceLocation (uint64)
-//	function FileNum (|uint|)
-//		return self >> 53
-//	
-//	function BytePos (|uint|)
-//		return (self>>32) & (21~bits)
-
 
 function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
 	|| i = .ASMIndex + sourcemap.ASMTotal
 	if break & Assembler.BreakPoint
 		SourceMap.BreakPoints!.AppendInt(I)
 	
-	if break & Assembler.Breakable
+	if break & Assembler.Breakable // surely if theres a breakpoint... we need to know where we can put it?
+				// Perhaps... we should output every instruction's location...
+				// what if the user puts a breakpoint later but we could have put one there now. and now we don't
+				// have the correct breakpoint place?
 		|| value = (SrcMap|uint64| << 32) ||| I
 		SourceMap.Breakable!.AppendInt64(Value)
 
 		target debug
 			FoundBreaks++
-//			printline ("::::" + FoundBreaks)// + (" / " + breakCount) + (" - " + LostBreaks)
+
+
 
 target debug
 	|| LostBreaks = 0
 	|| FoundBreaks = 0
 	|| BreakCount = 0
-		
-	
-function fatasm.BakeDebug (|uint| SrcMap, |uint| Break)
-	opt inline
-	if break
-		.BakeBreak(SrcMap, break)
-	if .info is DebugVars
-		.OutputDebugVars
 
 

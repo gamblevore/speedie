@@ -1,13 +1,13 @@
 
 
 
-class PerryIDE (Window) 
+class PerryIDE (Window)
 	linkage: cpp_part IDE
 
 	|SpdProcess?|				Feedback
 	|UnixProcess?|				compilr
 	|UnixProcess?|				RunCompiledApp
-	|UnixProcess?|				Talker // for app.say
+	|UnixProcess?|				Talker				// for app.say
 	|date|						DelayedRun
 
 	|string|					CompileOKString
@@ -15,33 +15,32 @@ class PerryIDE (Window)
 	|FileViewer|				FileList
 
 	|listview|					Stack
-//	|ListView|					Variables
 	|guiControl|				Debugger
 
 	|textview|					AppInfo
 	|Guicontrol|				DebugBtns
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
-	|guicontrol| 				CompileArea
+	|guicontrol|				CompileArea
 	
 	|listviewrow?|				SharedProjectTabSource
-	|File|						Project // merge this and SharedProjectTabSource?
+	|File|						Project				// merge this and SharedProjectTabSource?
 
 	|FileRow?|					NotTodo
 	|message?|					CurrASMFunc
-	|message?| 					LostFunks
+	|message?|					LostFunks
 	|[guicontrol]|				Views
 	|ivec2|						AutoPoint
-	|TextView| 					ProductOut
-	|TextView| 					ProductErrors
+	|TextView|					ProductOut
+	|TextView|					ProductErrors
 	|TextView|					SpeedieText
 	|TextView|					JeeboxText
 	|TextView|					MassSearchField
 	|TextView|					MassReplaceField
 	|TextView|					EditMe
-    |listview|                	ASMView
-    |StretchControl|            ASMStretch
-	|GraphicsEditor| 			DrawMe
+	|listview|					ASMView
+	|StretchControl|			ASMStretch
+	|GraphicsEditor|			DrawMe
 	|TextView|					EditStatus
 	|TextView|					ProjectInfo
 	|TextView|					LineInfo
@@ -58,17 +57,17 @@ class PerryIDE (Window)
 	|ListView|					ErrorList
 	|listview|					CommsLogList
 	|ListView|					FoundList
-	|textview| 					DebugArgsText
+	|textview|					DebugArgsText
 	|Guicontrol of buttonview|	ViewButtons
 	|buttonview?--|				PrevView
 	|ButtonView|				CurrFileName
-	|Buttonview|                ASMButton
+	|Buttonview|				ASMButton
 	|ButtonView|				FunctionMenu // .funclist
 	|ButtonView|				CommandsMenu
 	|buttonview|				Toolbar
 	|Buttonview|				ProjectTabs
 	|buttonview|				CompileTabs // compilertabs
-	|buttonview|				SubFindCheckBox    
+	|buttonview|				SubFindCheckBox
 	|Buttonview|				ViewErrors
 	|Buttonview|				ViewFiles
 	|Buttonview|				ViewSearch
@@ -80,33 +79,32 @@ class PerryIDE (Window)
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
 	|message|					RecentFiles
-	|string| 					LastCmdStr
+	|string|					LastCmdStr
 	|date|						LastSendTime
 	|date|						SectionKeyTime
-//	|string|					AttachedProgram
 	|ProgressBar|				Progress
 	|Faststring?|				Stats
 	|ivec2|						PopupDisplayCorner
 	|date|						LastAutoCompleteDate
 	|date|						PopupDateOn
-	|uint[3]| 					LastMemory
+	|uint[3]|					LastMemory
 	|int|						EditMeTabRetryThing
 	|int|						ShowProductIfMoreOutput
 	|byte|						DuringLoad
-	|byte| 						DuringTempView
+	|byte|						DuringTempView
 	|bool|						BytesInfoMode
 	|bool|						DuringASMEvent
 	|bool|						AlreadyExpandedCompileTab
-	|bool| 						StillJumping
+	|bool|						StillJumping
 	|bool|						CanAskingAboutMissing
-	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
+	|bool|						DuringMsgFB				// canloadfile, canupdate, .disable 
 	|int8|						DuringNextPrev
 	|bool|						IsTextMode
 	|bool|						UsingSpdLib
-	|CompileMode| 				DebugMode
+	|CompileMode|				DebugMode
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
-	|bool| 						IsGraphics
+	|bool|						IsGraphics
 	|byte|						PopupReason
 
 	
@@ -148,7 +146,7 @@ class PerryIDE (Window)
 		rz = rz.resolve(true)
 	
 	
-	function PerryError (|error?|) 
+	function PerryError (|error?|)
 		opt norefcounts
 		if keys.shift
 			|| u = GUI.tooltip.useable
@@ -420,7 +418,7 @@ class PerryIDE (Window)
 			HideTop = false
 			HideTabs = false
 		
-		require !.CurrMouseDown 
+		require !.CurrMouseDown
 		if HideTabs == VisTabs
 			.ProjectTabs.declutter = HideTabs
 			
@@ -444,21 +442,6 @@ class PerryIDE (Window)
 				.noneed
 				|| fl = .filelist.ListSource as filerow
 					fl.Name = "file".pluralize(fl.LastFileCount)
-
-
-//	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
-//		|| p = (pp[])|process--|
-//		require p
-//		|| Exit = p.Status
-//		if !exit.Crashed
-//			return true
-//
-//		|| fs = faststring()
-//		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
-//		fs <~ p.ErrorOutput.getresult.FindStacktrace
-//		pp[] = nil
-//		.Notify(fs, @emb + what)
-//		.CancelCompile
 
 
 	function CheckCrashed (|UnixProcess| p, |string| what, |bool|)
@@ -531,7 +514,7 @@ class PerryIDE (Window)
 		if ._FrameNum == 1
 			require !.ProjClosed
 			
-		if .UpdateMem 
+		if .UpdateMem
 			.ShowLeftStats
 		
 		if ._FrameNum == 1
@@ -693,7 +676,7 @@ class PerryIDE (Window)
 		return ide
 
 		
-	function LoadErrors (|bool| jump, |bool| actual_compile) 
+	function LoadErrors (|bool| jump, |bool| actual_compile)
 		opt norefcounts
 		|| txt = .EditMe
 		|| doc = txt.document

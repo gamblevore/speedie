@@ -409,7 +409,7 @@ struct Assembler
 		
 		fat.setop = Type
 		if type != asm.noop
-			fat.ASMIndex = breakpoint
+			fat.ASMIndex = breakpoint ||| Breakable
 			
 		
 	function Register (|int| i, |?&FATASM|)

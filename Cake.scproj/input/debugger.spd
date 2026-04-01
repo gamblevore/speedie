@@ -161,22 +161,34 @@ module debugger
 		return StdErr.ok
 	
 	
-	target debug {
 	function PrintBreaks
+		target true {
+
 		|| T = SpdTable.CodeLength
-		|FileWithData| LastFile
+		|filewithdata--| LastFile
 		printline "--- BreakInfo ---"
+		
 		for raw in .SourceMap
 			|| Src = raw.Location
 			|| P = src.Position
 			|| Code = raw.code(T)
-			|| File = src.File
-			if File!=LastFile
-				printline
-				printline File
-				LastFile = file
-			printline "char: $P,  code: $code"
+			|| fn = src.FileNum
+				|filewithdata--| File = debugger.path(fn)
+				if File!=LastFile
+					printline
+					printline File
+					LastFile = file
+			  else
+				print "(NoFile) "
+			printline "textpos: $P,  code: $code"
+		
+		printline "--- InbuiltBreaks ---"
+		|| CakeBreak = cake.ActiveBreaks$
+		for i in T							// now what?
+			|| Code = CakeBreak[i]
+				printline "break: $i"
 	}
+	
 	
 	helper LoadFiles (|string| List)
 		opt norefcounts

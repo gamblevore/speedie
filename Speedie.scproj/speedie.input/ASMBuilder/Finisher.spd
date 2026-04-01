@@ -23,7 +23,7 @@ function Assembler.FinishMost
 		
 		target debug
 			|| Start = &TestSpace[0]
-			|| After = s.µRenderInto(Start, start+4)
+			|| After = s.µBakeInto(Start, start+4)
 			|| Actual = After - Start
 			if Actual != Predicted // uugh		
 		S++

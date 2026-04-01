@@ -1,4 +1,4 @@
-//unfinished
+
 
 extend SCFunction
 	function µTest (|memory of asm|)
@@ -7,7 +7,7 @@ extend SCFunction
 		|| p = rz.ptr
 		|| after = .ASMBake(P, P+rz.Size, nil)
 		rz.Size = after-p
-		rz.length = rz.Size   //   ::::::]]]]]]]
+		rz.length = rz.Size		// ::::::]]]]]]]
 
 
 	function FatFirst (|&fatasm|)
@@ -25,8 +25,9 @@ extend SCFunction
 	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
 		opt norefcounts
 		rz = where
-		assembler.sh.funcstart_ = .fatfirst - 1 // for debug
+		assembler.sh.funcstart_ = .fatfirst - 1						// for debug
 
+		if "jb_main".trap
 		|byte| HasLabel
 		for fat.fat in self
 			HasLabel |= fat.JumpPrm
@@ -37,13 +38,16 @@ extend SCFunction
 			fat.CheckHasOutput
 				
 			|| Curr = rz
-			rz = fat.µRenderInto(rz, after)
+			rz = fat.µBakeInto(rz, after)
+
 			if Positions
 				|| pos = fat.FatMap
 				while (Curr++ < rz)
 					Positions++[] = pos
-				if options.TargetDebug
-					fat.BakeDebug(pos, break)
+				if break
+					fat.BakeBreak(Pos, break)
+				if fat.info is DebugVars
+					fat.OutputDebugVars
 
 		if HasLabel
 			for fat.fat in self
@@ -82,7 +86,7 @@ extend SCFunction
 function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	(after)
 	|| SelfOut = start + .ASMIndex
-	target debug: debug_require  SelfOut >= start  and  SelfOut < after 
+	target debug: debug_require  SelfOut >= start  and  SelfOut < after
 
 	// this needs fixing.
 	|int| J = .prms[reg]
@@ -94,7 +98,7 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	|| J2 = (dest - SelfOut) -1
 	check (J2 != -1) (self, "Infinite loop")
 	.prms[reg] = J2
-	.µRenderInto(SelfOut, SelfOut+1)		// rerender
+	.µBakeInto(SelfOut, SelfOut+1)			// rerender
 	.prms[reg] = J							// restore!
 
 

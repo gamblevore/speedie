@@ -304,7 +304,7 @@ struct FatASM
 		}
 	
 	
-	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
+	function µBakeInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline
 		return (ASM.encoders[.op]!)(self, where, after)
 

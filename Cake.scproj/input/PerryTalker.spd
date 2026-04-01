@@ -87,8 +87,8 @@ function __PerryView__ (cakevm.CakeChef)
 				if Action is GoRun
 					exit
 				if Action is AllowRun
-					// we want to know if theres any... more messsages waiting
-					// how?				
+					if p.pico.CanGet <= 0	// nothing more to get
+						exit
 	p <~ "run"
 
 

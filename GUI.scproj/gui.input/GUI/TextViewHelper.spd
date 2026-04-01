@@ -2,8 +2,7 @@
 
 datatype TextLineFlags (uint16)
 	flags
-		BreakPoint
-		RealBreakPoint
+		BothBreaks = [BreakPoint, RealBreakPoint]
 		Reached
 		Colored
 		Found
@@ -154,7 +153,7 @@ class TextViewLine (list)
 						exit
 		
 		if r and !r.StartsAfter(range)
-			(self is breakpoint) = r is breakpoint
+			(self is BothBreaks) = r is breakpoint
 			.adderpos = .position // isn't it r.position?
 			.message = r
 		  else
