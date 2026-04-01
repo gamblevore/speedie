@@ -607,7 +607,12 @@ function int.IsSimpleOrPointerCast (|bool|)
 	return (self == kSimpleMatch) or (self == kNumericMatch) or (self == kNeedsAddressOf)
 
 
-function TryKeepBetter (|int|OldMatch, |SCFunction| f, |int| Match, |SCFunction|)
+function TryKeepBetter (|int| OldMatch, |SCFunction| f, |int| Match, |SCFunction|)
+	if (f is disabled) != (self is disabled)
+		if self is disabled
+			return f
+		return self
+	
 	if (OldMatch & kSuperClassMatch) and (Match.issimpleOrPointerCast)
 		return f
 	if (Match & kSuperClassMatch) and (OldMatch.issimpleOrPointerCast)
@@ -621,7 +626,7 @@ function TryKeepBetter (|int|OldMatch, |SCFunction| f, |int| Match, |SCFunction|
 	
 	if (Match == kSimpleMatch) and (OldMatch != kSimpleMatch)
 		return f
-		
+	
 	if (OldMatch < Match)
 		return self
 	if (Match < OldMatch)

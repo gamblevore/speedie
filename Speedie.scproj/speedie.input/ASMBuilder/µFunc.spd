@@ -27,7 +27,6 @@ extend SCFunction
 		rz = where
 		assembler.sh.funcstart_ = .fatfirst - 1						// for debug
 
-		if "jb_main".trap
 		|byte| HasLabel
 		for fat.fat in self
 			HasLabel |= fat.JumpPrm
@@ -41,6 +40,7 @@ extend SCFunction
 			rz = fat.µBakeInto(rz, after)
 
 			if Positions
+//				if "recursivehello".trap and fat.Jump
 				|| pos = fat.FatMap
 				while (Curr++ < rz)
 					Positions++[] = pos

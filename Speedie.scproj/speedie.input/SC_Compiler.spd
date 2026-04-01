@@ -299,12 +299,12 @@ function InitBasicStuff (|int|) // compiler.init
 		Compiler.InitedOK = false
 	
 	TypeNil   = .AddGlobalConst( "nil",		TypeObject!,	NilState.ActuallyNil )
-	TrueBool  = .AddGlobalConst( "true",	TypeBool!,  	NilState.real ||| NilState.trueValue )
-	FalseBool = .AddGlobalConst( "false",	TypeBool!,  	NilState.real ||| NilState.falseValue )
+	TrueBool  = .AddGlobalConst( "true",	TypeBool!,		NilState.real ||| NilState.trueValue )
+	FalseBool = .AddGlobalConst( "false",	TypeBool!,		NilState.real ||| NilState.falseValue )
 	
 	TrueBool!.numberconst = 1
-	.AddGlobalConstNum( "__time_id__", 		typeint! , 		scimport.recent.timeid )
-	.AddGlobalConstNum( "__now__",     		typedate!,		date.now )
+	.AddGlobalConstNum( "__time_id__",		typeint!,		scimport.recent.timeid )
+	.AddGlobalConstNum( "__now__",			typedate!,		date.now )
 	.AddGlobalConstNum( "__modified__",		typedate!,		scimport.recent)
 	.AddGlobalConstFloat( "π",				typefloat64!,	"3.1415926535897932")
 	.AddGlobalConstFloat( "τ",				typefloat64!,	"6.2831853071795864")
@@ -493,7 +493,6 @@ function ImportAll
 
 //	.DoSavers(1)
 
-
 	require .Stage( "Creating Class Exportnames" )
 	for c in .ClassList: c.LoadExportName
 
@@ -514,7 +513,6 @@ function ImportAll
 
 	require StdErr.OK
 	
-
 //	.DoSavers(2)
 
 	
@@ -536,7 +534,7 @@ function ImportAll
 	for c in .ClassList
 		c.ExportName = c.StructName // minifier...
 		c.AfterFuncsDecled //
-	  
+
 
 	require .Stage( "Even More Stuff On Classes" )
 	for c in .ClassList

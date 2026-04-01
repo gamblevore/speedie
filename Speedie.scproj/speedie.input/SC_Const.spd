@@ -355,13 +355,23 @@ function compiler.CollectConstants
 			b.CollectOneConstants(ch)
 
 
+function scclass.IsCurrentlyBeingUsed (|bool|)
+	opt norefcounts
+	|| fn = scfunction.currfunc
+		if self == fn.cls
+			return true
+		|| m = fn.parent.Module
+		if m.Cls == self
+			return true
+
+
 function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
-	// use NumericCountWithBools instead
+	opt norefcounts
 	if Self is numeric
 		return .VecCount
 	if self & bool
 		return 1
-	if scnode.ConstantsLoadingOverride and d is const
+	if scnode.ConstantsLoadingOverride and (d is const)
 		return .VecCount
 		
 

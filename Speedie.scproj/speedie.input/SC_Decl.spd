@@ -404,8 +404,24 @@ class SCDecl (SCObject) {
 
 
 	function IsReallyNumeric (|bool|)
-		if .IsNormal		
-			return .type.HigherNumber
+		if scnode.ConstantsLoadingOverride
+			if .IsNormal
+				return .type.HigherNumber
+
+//	function scdecl.IsReallyNumeric (|bool|)
+//		if scnode.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
+//			if .IsNormal
+//				return .type.ASMTypeInfo.NumericCount
+	
+	function scclass.IsCurrentlyBeingUsed (|bool|)
+		opt norefcounts
+		|| fn = scfunction.currfunc
+			if self == fn.cls
+				return true
+			|| m = fn.parent.Module
+			if m.Cls == self
+				return true
+
 
 
 	function scclass.HigherNumber (|scclass|)

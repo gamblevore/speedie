@@ -531,8 +531,8 @@ struct MsgTextDrawState
 		.i  += w
 		|| m = .msg
 			|| pos	= ppos
-			Char    = c.ImproveDraw(.t, pos)
-			pos	   += .adder, ppos = pos
+			Char	= c.ImproveDraw(.t, pos)
+			pos		+= .adder, ppos = pos
 			.msg	= m.NextColor(pos)
 			
 		

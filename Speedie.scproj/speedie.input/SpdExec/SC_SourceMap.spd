@@ -59,21 +59,9 @@ function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
 	if break & Assembler.BreakPoint
 		SourceMap.BreakPoints!.AppendInt(I)
 	
-	if break & Assembler.Breakable // surely if theres a breakpoint... we need to know where we can put it?
-				// Perhaps... we should output every instruction's location...
-				// what if the user puts a breakpoint later but we could have put one there now. and now we don't
-				// have the correct breakpoint place?
-		|| value = (SrcMap|uint64| << 32) ||| I
-		SourceMap.Breakable!.AppendInt64(Value)
-
-		target debug
-			FoundBreaks++
-
-
-
-target debug
-	|| LostBreaks = 0
-	|| FoundBreaks = 0
-	|| BreakCount = 0
+	// surely if theres a breakpoint... we need to know where we can put it?
+	// Perhaps... we should output every instruction's location? Im too stressed to try now.
+	|| value = (SrcMap|uint64| << 32) ||| I
+	SourceMap.Breakable!.AppendInt64(Value)
 
 

@@ -423,6 +423,7 @@ function scdecl.IsZero (|bool|)
 
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
 	opt norefcounts
+
 	if (comp is Custom or CaseAware)
 		return CustomOps.Needed
 	
@@ -431,11 +432,10 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		return CustomOps.Needed
 		
 	|| RNT		= RC.TypeInfo
-	if scnode.ConstantsLoadingOverride
-		if lc.IsReallyNumeric
-			(lnt is numeric)
-		if rc.isreallyNumeric
-			(rnt is numeric)
+	if (lnt isnt numeric) and lc.IsReallyNumeric
+		(lnt is numeric)
+	if  (rnt isnt numeric) and rc.isreallyNumeric
+		(rnt is numeric)
 
 	|| LN		= LNT.NumericCountBoolsToo(lc)
 	|| RN		= RNT.NumericCountBoolsToo(Rc)
