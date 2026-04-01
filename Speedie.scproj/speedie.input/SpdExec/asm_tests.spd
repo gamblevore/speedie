@@ -19,6 +19,17 @@ module ASMExamples {
 
 target cake {
 
+function ivec4.CenterBroken2 (|ivec2|)
+	rz.x = (.x2 + .x)
+	rz.y = (.y2 + .y)
+	rz >>= 1 // wierd output
+
+function ivec4.CenterBroken (|ivec2|)
+	visible
+	rz.x = (.x2 - .x) // these seem to confusing each other
+	rz.y = (.y2 - .y)
+	
+
 function VecTest (|&vec2| A, |&vec4| B, |structwithobj| C, |int| n)
 	visible
 	|| f = 0.0

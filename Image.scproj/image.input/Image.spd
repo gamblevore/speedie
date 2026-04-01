@@ -535,7 +535,7 @@ class Image (memory)
 		|| Back		= .Clip(R)$
 		
 		R -= (0,0,1,1)
-		|| mid		= r.Center
+		|| mid		= r.CenterVec2
 		|| maxdist	= (0.5 * r.width|float|) + 0.5
 		|| scale	= (1.0, r.aspect)
 		|| area_over= r.area|float|

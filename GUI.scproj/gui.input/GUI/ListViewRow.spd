@@ -130,8 +130,8 @@ role ListViewRow (message)
 		require self and !p.decluttered
 		|| w	= p.window	
 		|| z2	= rect
-		|| str = p.Declutterer.Strength
-		
+		|| str = 1.0
+
 		for i in n
 			rect.horz	= p.ColumnBounds(i, z2, self)
 			rect.x	   += depth * font.width * 2

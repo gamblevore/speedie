@@ -117,10 +117,6 @@ datatype ivec4
 		require p.y >= .y+i and p.y < .y2-i
 		return true
 	
-//	function Contains (|ivec2| v, |bool|)
-//		cpp_part ContainsVec2
-//		return .contains(v, 0)
-	
 	operator Min (|ivec4| v, |ivec4|)
 		return (.x min v.x, .y min v.y,  .z min v.z,  .w min v.w )
 	
@@ -380,7 +376,7 @@ datatype IntRange (ivec2)
 	
 	function By (|intrange| r, |ivec4|)
 		return (.x, r.x, .y, r.y)
- 
+
 	operator ± (|int|i, |intrange|)
 		cpp_part Shrink
 		return (.x+i, .x2-i)
@@ -428,7 +424,7 @@ datatype ivec2
 		return (self * other).sum
 
 	function LengthSq (|float|)
-		return (.x * .x)|float| + (.y * .y)|float| 
+		return (.x * .x)|float| + (.y * .y)|float|
 
 	function Hash (|ivec2|)
 		return (.x.hash, .y.hash)
@@ -460,7 +456,7 @@ datatype ivec2
 		
 	function Clip (|ivec2| p, |ivec2|)
 		cpp_part Clip2
-		p.x = .x.clamp(p.x) 
+		p.x = .x.clamp(p.x)
 		p.y = .y.clamp(p.y)
 		return p
 			
@@ -795,8 +791,14 @@ function ivec4.Max (|int| L, |ivec4|)
 function ivec4.Min (|int| L, |ivec4|)
 	return (.x min L, .y min L, .z min L, .w min L )
 
-inline ivec4.Center (|vec2|)
+inline ivec4.CenterVec2 (|vec2|)
 	return .vec4.center
+	
+function ivec4.Center (|ivec2|)
+	rz.x = (.x2 + .x)
+	rz.y = (.y2 + .y)
+	rz >>= 1
+
 
 function vec4.Center (|vec2|)
 	return (.x+.x2, .y+.y2)*0.5

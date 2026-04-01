@@ -158,7 +158,7 @@ class Breakout (Window)
 			b.Radius -= 0.03
 			if b.Radius <= 0.02
 				.explosions.fastRemove(i)
-			  else 
+			  else
 				.Dohits(b)
 		
 		for (b.backwards in .balls) (i)
@@ -206,7 +206,7 @@ class Breakout (Window)
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			|| B = s.Screen
-			where.DrawSpiral(0.005*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
+			where.DrawSpiral(0.005*b.width|float|*vobject.drawscale, L, b.centervec2, s.color, (3s+i*1s)())
 		.BallDraw(where, .balls)
 		.BallDraw(where, .explosions)
 	

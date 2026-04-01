@@ -615,18 +615,18 @@ class ListView (GUIControl) {
 		opt norefcounts
 		if .hasSeps
 			while s
-				require .CanBasicRowDragOne(s, before) 
+				require .CanBasicRowDragOne(s, before)
 				s = s.nextselected
 		return true
 
 
 	libinternal BasicRowDrag (GuiListDragEvent)
-		|listviewrow--| s = .FirstSelected 
+		|listviewrow--| s = .FirstSelected
 		if !s or (.listnext(s) == before) and !s.nextselected
 			return true // no need
 		
 		if (before is selected)
-			if before != s 
+			if before != s
 				beep
 			return true
 		
@@ -660,11 +660,11 @@ class ListView (GUIControl) {
 		.ClearInternalDrops
 
 		if f and t
-			|| dr = .OnDragRow 	#debug_require
+			|| dr = .OnDragRow						#debug_require
 			if t == .listsource
-				(dr)(self, nil, t) 
+				(dr)(self, nil, t)
 			  else
-				(dr)(self, t, nil) 
+				(dr)(self, t, nil)
 			
 		  elseif !sl
 			|| LC = .FindClickedCell(P)
@@ -678,13 +678,13 @@ class ListView (GUIControl) {
 
 	function SelCount (|int|)
 		opt norefcounts
-		for f.listsel in self 
+		for f.listsel in self
 			RZ++
 
 
 	function SelectableCount (|int|)
 		opt norefcounts
-		for f.all in self 
+		for f.all in self
 			rz += f isnt UnSelectable
 
 
@@ -775,7 +775,7 @@ class ListView (GUIControl) {
 				.selectnone
 			return MouseDragging.handled
 		
-		|| l = lc.row 
+		|| l = lc.row
 		if L is Separator
 			return MouseDragging.handled
 			
@@ -1093,11 +1093,6 @@ class ListView (GUIControl) {
 		|| n = .visiblerows|float|*0.34
 		.scrollset(.bmove(i, -n|int|))
 	
-		
-//	function Contains (|int| Y,  |ivec2| Search,  |bool|)
-//		|| Srch = (.absleft,  y - .RowHeight,  .right,  y)
-//		return Srch.contains(Search)
-	
 	
 	function Use (|ListViewrow!| PL, |bool| SendClickEvent=false)
 		opt norefcounts
@@ -1209,7 +1204,7 @@ class ListView (GUIControl) {
 		for i in 1 to n
 			|| t = .TableCell(curr, i)
 			|| p = .TableCell(prev, i)
-			if (t == p) // and t and p 
+			if (t == p)					// and t and p
 				rz |= 1<<i
 	
 	
@@ -1303,10 +1298,13 @@ class ListView (GUIControl) {
 			z2 = z2 down .rowheight
 
 
-	libinternal DrawBorders (|image| Where,  |ivec4| Rect)
+	libinternal DrawBackGround (|image| Where,  |ivec4| Rect, |imagepixel|)
 		where.clearmarks(.lastrect)
-		if !.decluttered
-			.DrawBordersSub(where, rect)
+		|| R = .lastrect ± 1
+		|| Middle = R.Center
+		rz = where[Middle]
+
+		.DrawBordersSub(where, rect)
 
 		|| bg		= .gnormal.bg
 		|| focus	= .gRowSel.bg
@@ -1318,7 +1316,9 @@ class ListView (GUIControl) {
 		unfoc.a		= focuscol.a
 		unfoc		= 0.667.mix(focuscol, unfoc)
 		unfoc.a += 0.2
-		where.fillmarks(.lastrect ± 1, bgcol.px, .gnormal.seps, focuscol.px, unfoc.px)
+		where.fillmarks(R, bg, .gnormal.seps, focuscol.px, unfoc.px)
+
+		rz.Overlay(bg)
 
 			
 	behaviour Gesture
@@ -1405,17 +1405,17 @@ class ListView (GUIControl) {
 	behaviour Draw
 		opt NoRefCounts
 		.ScrollProtect
-		.fixscroll // why do we need both?
+		.fixscroll								// Why do we need both?
 		
 		|| clip = where.ControlClip
 		|| rect = .ActualRect
-		
 		.CalculateSkips
-		.DrawBorders(where, rect)
-		.DrawColumns(where, rect)
-		
-		rect.y2 += .ScrollSlide
+
 		{
+			|| bg = .DrawBackground(where, rect)			// Cellborders too
+			.DrawColumns(where, rect)
+			
+			rect.y2 += .ScrollSlide
 			|| End = .ListEnd
 			._CanSeeAllLines = false
 			|| NCols = .Columncount
@@ -1428,10 +1428,24 @@ class ListView (GUIControl) {
 				rect.y2 = rect.y
 				if (r == end) and .liststart == .scrollstart
 					._CanSeeAllLines = (rect.y >= .lastrect.y)
+			
+			where.ControlClip = clip
+			where.horz = .lastrect.h // redundant?
+			
+			|| str = .Declutterer.Strength
+			if str < 1.0
+				// could use .gnormal.bg instead of bg. The thing is... we ALREADY drew the background
+				// in .drawbackground, which might be semi-transparent. So before we draw
+				// we get the discovered color from the middle of ourself. But the output color flickers ;-;
+				// Using .gnormal.bg wouldn't do that. it really shouldn't flicker tho. Oh well...
+				// perhaps a math bug somwhere?... essentially, for the non-text-pixels, we should blend between
+				// x and x... leading to x. because its the same input. So why the flicker?
+				|| col = bg.Color // .gnormal.bg.color
+				col.a = 1.0 - str
+				where.DrawRect(clip, col.px)
 		}
 		
-		where.ControlClip = clip
-		where.horz = .lastrect.h // redundant?
+		
 		|| cmm = .cmm
 			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.focusborder)
 

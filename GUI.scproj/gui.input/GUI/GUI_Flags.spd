@@ -76,17 +76,15 @@ struct TimeFader
 	|Date| 		Final
 	|float|		Scale
 	
-	function Strength (|date| now=gui.framestart, |bool| touch=true, |float|)
+	function Strength (|float|)
 		|| f = .final
 		if !f
 			return 1.0
-		|| remy = f - now
-		if remy > 0
-			|| str = remy.float * .Scale
-			if touch
-				GUI.touch
-			rz = str.clamp
-			if rz == 0.0
+		|| remain = f - gui.framestart
+		if remain > 0
+			GUI.touch
+			rz = (remain.float * .Scale).clamp
+			if !rz
 				.final = 0
 				.scale = 0
 	

@@ -3,7 +3,7 @@ function image.RoundRectDrawer (ImageDrawStyleEvent)
 	require Edges is open
     || Col = g.bg.PreMul
     || Edge = g.edge.Color
-    || center = rect.Center
+    || center = rect.CenterVec2
     center.y -= 0.5
 
     || CS = G.CornerSize|float| * 0.25 + 1.0
@@ -36,7 +36,7 @@ function image.ClippedRectDrawer (ImageDrawStyleEvent)
 	|| Col = g.bg.PreMul
 	|| Edge = g.edge.Color.PreMul
 	|| Lim = (G.CornerSize|float| * 0.5 + 1.0)|int|
-	|| center = rect.Center.iVec2
+	|| center = rect.Center
 	|| Active = g.CornersCut
 
 	for Y in rect.Vert
