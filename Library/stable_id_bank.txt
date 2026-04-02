@@ -606,8 +606,8 @@ GUI_Text_ShowExtraInfoAtPos
 GUI_Text_ShowNextParseError
 GUI_Text_StartSet
 GUI_Text_SyntacticEndOfLine_
-GUI_Text_TextSetReal
 GUI_Text_TextSize
+GUI_Text_TextViewSet
 GUI_Text_TryShowLineError
 GUI_Text_TypedString
 GUI_Text_Undo
@@ -750,7 +750,7 @@ GUI_ctrl_SyntaxIsSet
 GUI_ctrl_TaskGUI_Constructor
 GUI_ctrl_TaskGUI_TaskProgress
 GUI_ctrl_TaskGUI_interface_SyntaxCall
-GUI_ctrl_TextSet
+GUI_ctrl_TextSetter
 GUI_ctrl_TextWidth
 GUI_ctrl_Touch
 GUI_ctrl_TouchScrollBar
@@ -1244,11 +1244,6 @@ JB_MemUsedString
 JB_Mem_ClassLeakCounter
 JB_Mem_Constructor
 JB_Mem_Use
-JB_MessageTable_AppendMsg
-JB_MessageTable_GetMsg
-JB_MessageTable_SetMsg
-JB_MessageTable_SyntaxAccess
-JB_MessageTable_SyntaxAccessSet
 JB_MoveCode_Field
 JB_MoveCode_Flip
 JB_Mrap_AppendPlace
@@ -1314,8 +1309,8 @@ JB_Msg_GiveArg
 JB_Msg_Int
 JB_Msg_IntRange
 JB_Msg_IsContainer
-JB_Msg_LOC
 JB_Msg_Last
+JB_Msg_LinesOfContent
 JB_Msg_Locate
 JB_Msg_MiniName
 JB_Msg_NeedSyx
