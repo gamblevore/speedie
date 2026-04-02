@@ -3499,7 +3499,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[450]);
-	JB_FS_AppendInt32(_fsf0, (2026040219));
+	JB_FS_AppendInt32(_fsf0, (2026040220));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -6049,7 +6049,7 @@ void SC_PackMaker__BakePackToDisk() {
 	}
 	JB_bin_RunHeader(J, JB_LUB[1917]);
 	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[1369]);
-	JB_bin_AddInt(J, JB_int_AlignUp(SC__PackMaker_PackGlobSize, 8));
+	JB_bin_AddHint(J, JB_int_AlignUp(SC__PackMaker_PackGlobSize, 8));
 	JB_bin_Enter(J, kJB_SyxArg, JB_LUB[0]);
 	if (SC_PackMaker__BakeASM(J)) {
 		SC_PackMaker__BakeStrings(J);
@@ -10525,7 +10525,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026040219));
+	JB_FS_AppendInt32(_fsf0, (2026040220));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -18678,6 +18678,13 @@ bool JB_Syx_IsList(Syntax Self) {
 	return (Self >= kJB_SyxBra) and (Self <= kJB_SyxArr);
 }
 
+bool JB_Syx_IsString(Syntax Self) {
+	if ((Self >= kJB_SyxSStr) and (Self <= kJB_SyxStr)) {
+		return true;
+	}
+	return false;
+}
+
 JB_String* JB_Syx_LongName(Syntax Self) {
 	if (Self) {
 		SyntaxObj* O = JB_Syx_Obj(Self);
@@ -21918,7 +21925,7 @@ bool SC_HairyMan_AddOrShrink(HairyMan* Self, FastString* J, SCFunction* F) {
 	if ((SC_Func_SyntaxIs(F, kSC__FunctionType_UsedByASM)) or SC_Func_IsBehaviour(F)) {
 		uint C = Self->Curr;
 		if (C) {
-			JB_bin_AddInt(J, C);
+			JB_bin_AddHint(J, C);
 		}
 		Self->Curr = 0;
 		return true;
@@ -35504,11 +35511,10 @@ jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into
 	return JB_bin_Add(Self, Type, ((JB_String*)Fs), Into);
 }
 
-void JB_bin_AddInt(FastString* Self, int64 Value) {
-	JB_String* _tmPf0 = JB_int64_Render(Value, nil);
-	JB_Incr(_tmPf0);
-	JB_bin_Add(Self, kJB_SyxNum, _tmPf0, false);
-	JB_Decr(_tmPf0);
+void JB_bin_AddHint(FastString* Self, int64 Value) {
+	JB_bin_WriteType(Self, kJB_SyxHInt, false);
+	JB_FS_AppendHInt(Self, JB_uint64_HintLength(((uint64)Value)));
+	JB_FS_AppendHInt(Self, Value);
 }
 
 void JB_bin_AddRow(FastString* Self, Syntax Type, JB_String* Row, JB_String* Value) {
@@ -35578,7 +35584,7 @@ void SC_bin_BakeFuncName(FastString* Self, SCFunction* Fn) {
 
 void SC_bin_Cakeify(FastString* Self, SCFunction* Fn) {
 	if (!Fn) {
-		JB_bin_AddInt(Self, 0);
+		JB_bin_AddHint(Self, 0);
 		return;
 	}
 	JB_bin_Enter(Self, kJB_SyxUnit, Fn->Name);
@@ -35587,7 +35593,7 @@ void SC_bin_Cakeify(FastString* Self, SCFunction* Fn) {
 		JB_Msg_Fail(Fn->Source, JB_LUB[953]);
 	}
 	Id = ((Id << 1) + SC_Base_IsLibrary(Fn));
-	JB_bin_AddInt(Self, Id);
+	JB_bin_AddHint(Self, Id);
 	JB_bin_Exit(Self, 1);
 }
 
@@ -40129,6 +40135,10 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 		}
 		Message* F = ((Message*)JB_Ring_First(Self));
 		if ((!F) or (Fn != kJB_SyxUnit)) {
+			if (!((Fn == kJB_SyxNum) or (JB_Syx_IsString(Fn) or (StrStart > 0)))) {
+				JB_Msg_Fail(Self, nil);
+				return 0;
+			}
 			return JB_Str_TextIntegerSection(Self->Name, StrStart, Self);
 		}
 		if (JB_Msg_SyntaxEquals(Self, JB_LUB[968], false)) {
@@ -52622,13 +52632,13 @@ void SC_Class_DescribeInPack(SCClass* Self, FastString* J) {
 	JB_bin_Enter(J, kJB_SyxTmp, _tmPf0);
 	JB_Decr(_tmPf0);
 	JB_bin_Enter(J, kJB_SyxList, JB_LUB[0]);
-	JB_bin_AddInt(J, SC_Decl_ExportPosition(Self->ClassType));
+	JB_bin_AddHint(J, SC_Decl_ExportPosition(Self->ClassType));
 	if (!SC_Base_IsLibrary(Self)) {
 		JB_String* _tmPf1 = JB_Str_LowerCase(Self->Super->Name);
 		JB_Incr(_tmPf1);
 		JB_bin_Add(J, kJB_SyxThg, _tmPf1, false);
 		JB_Decr(_tmPf1);
-		JB_bin_AddInt(J, Sz);
+		JB_bin_AddHint(J, Sz);
 	}
 	JB_bin_Exit(J, 1);
 	if (!SC_Base_IsLibrary(Self)) {
@@ -53303,7 +53313,7 @@ void SC_Class_Iterfailed(SCClass* Self, JB_String* Name, Message* Node) {
 void SC_Class_ListLayout(SCClass* Self, FastString* J) {
 	SCClass* S = Self->Super;
 	uint Sid = (((uint)JB_Ternary(S, S->TableID << 1, ((uint)0))));
-	JB_bin_AddInt(J, Sid + SC_Class_IsObject(Self));
+	JB_bin_AddHint(J, Sid + SC_Class_IsObject(Self));
 	SC_bin_PropertyLayout(J, Self->Properties);
 }
 
@@ -60995,4 +61005,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -510627131273297611 8304943768751425933
+// 2148307056401217599 8304943768751425933

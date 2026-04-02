@@ -5273,6 +5273,8 @@ FP_fpMsgRender JB_Syx_ExportAddr(Syntax Self);
 
 bool JB_Syx_IsList(Syntax Self);
 
+bool JB_Syx_IsString(Syntax Self);
+
 JB_String* JB_Syx_LongName(Syntax Self);
 
 Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
@@ -8184,7 +8186,7 @@ jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into)
 
 jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
 
-void JB_bin_AddInt(FastString* Self, int64 Value);
+void JB_bin_AddHint(FastString* Self, int64 Value);
 
 void JB_bin_AddRow(FastString* Self, Syntax Type, JB_String* Row, JB_String* Value);
 

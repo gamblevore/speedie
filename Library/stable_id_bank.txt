@@ -67,21 +67,9 @@ GUI_Clip__Data
 GUI_Clip__NotifiedTextSet
 GUI_Clip__Text
 GUI_Clip__TextSet
-GUI_Colors__Black
-GUI_Colors__Blue
-GUI_Colors__Brown
-GUI_Colors__Clear
-GUI_Colors__Gray
-GUI_Colors__Green
-GUI_Colors__Magenta
-GUI_Colors__Orange
-GUI_Colors__Purple
 GUI_Colors__Rainbow
-GUI_Colors__Red
 GUI_Colors__Wheel
 GUI_Colors__WheelVec
-GUI_Colors__White
-GUI_Colors__Yellow
 GUI_Date_GuiAgo
 GUI_Dict_DocumentCached
 GUI_DistanceFunction_New
@@ -321,10 +309,12 @@ GUI_Key__Reset
 GUI_Key__Shift
 GUI_LV_Clear
 GUI_LV_ClearSearch
+GUI_LV_ClickedExpand
 GUI_LV_ColumnsSet
 GUI_LV_ColumnsToDraw
 GUI_LV_Constructor
 GUI_LV_DefaultCopy
+GUI_LV_DepthX
 GUI_LV_DesiredHeight
 GUI_LV_Destructor
 GUI_LV_Draw
@@ -332,7 +322,7 @@ GUI_LV_EditCell
 GUI_LV_EditRowCol
 GUI_LV_EnableDrag
 GUI_LV_ExpandParents
-GUI_LV_ExpandSelection
+GUI_LV_ExpandRow
 GUI_LV_ExtractSelected
 GUI_LV_FirstSelected
 GUI_LV_FocusOn
@@ -429,11 +419,9 @@ GUI_Pxl_AlphaSet
 GUI_Pxl_AppendInts
 GUI_Pxl_Color
 GUI_Pxl_ColorLoad
-GUI_Pxl_CopyFrom
 GUI_Pxl_Load
 GUI_Pxl_LoadMsg
 GUI_Pxl_Overlay
-GUI_Pxl_PreMul
 GUI_Pxl_RawSet
 GUI_Pxl_Render
 GUI_Pxl_bf
@@ -462,7 +450,6 @@ GUI_Row_Cell
 GUI_Row_CellSet
 GUI_Row_Constructor
 GUI_Row_ConstructorNamed
-GUI_Row_Depth
 GUI_Row_FileSort
 GUI_Row_NextSelected
 GUI_Row_Remove
@@ -1029,7 +1016,6 @@ JB_Err__CantParseNum
 JB_ErrorSeverity_Render
 JB_ErrorSeverity_SyntaxUsing
 JB_ErrorSeverity__Find
-JB_ErrorSeverity__InitNames
 JB_ExitCode_Name
 JB_F64_Exponent
 JB_FS_AppendBuff
@@ -1853,6 +1839,7 @@ JB_ZalgoLine
 JB_bin_Add
 JB_bin_AddCString
 JB_bin_AddFS
+JB_bin_AddHint
 JB_bin_AddInt
 JB_bin_AddMemory
 JB_bin_AddRow
@@ -2017,6 +2004,7 @@ JB_ivec4_Area
 JB_ivec4_Aspect
 JB_ivec4_Bound
 JB_ivec4_BoundClip
+JB_ivec4_Center
 JB_ivec4_Clamp
 JB_ivec4_Clip
 JB_ivec4_ContainsIvec2
