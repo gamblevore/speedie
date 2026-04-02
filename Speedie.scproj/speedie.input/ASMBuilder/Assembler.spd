@@ -679,7 +679,7 @@ struct Assembler
 		opt norefcounts
 		|| s = .super
 		|| sid = (s.tableid<<1 (s) 0)
-		j.AddInt(sid + .isobject)
+		j.AddhInt(sid + .isobject)
 		j.PropertyLayout(.Properties)
 			
 			

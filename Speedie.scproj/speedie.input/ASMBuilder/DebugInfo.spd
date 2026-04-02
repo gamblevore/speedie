@@ -43,8 +43,6 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 	
 	|| PB = DataTypeCode.PossibleBits
 	|| T = .Type.TypeInfo  &  PB
-//	|| T2 = .inner.TypeInfo  &  PB
-//	if t!=t2											// seems never different
 	if .NilDeclared is Nilish
 		T |= PB + 1
 	

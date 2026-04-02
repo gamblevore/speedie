@@ -302,7 +302,7 @@ extend Assembler
 
 
 	// MATH 
-	function QuickFloat32Plus    (fn_OpASM)
+	function QuickFloat32Plus	(fn_OpASM)
 		if  r is Const // a + 1,   a - 1
 			|| QQ = .QuickFloatPlusConstSub(exp, dest, l, r)
 				return qq
@@ -310,7 +310,7 @@ extend Assembler
 			return .QuickFloatPlusConstSub(exp, dest, r asnt asmreg.alternate, l)
 	
 			
-	function QuickFloatPlusConstSub    (fn_OpASM)
+	function QuickFloatPlusConstSub	(fn_OpASM)
 		|| k = r.Const|uint64|
 		k ^= (l is Subtract)<<31
 		require (k >> 18) << 18 == k

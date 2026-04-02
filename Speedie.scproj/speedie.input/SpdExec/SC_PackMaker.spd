@@ -172,7 +172,7 @@ module PackMaker
 		|jbin| j = Compiler.ProductPath.OutputStream$
 		j.RunHeader("/usr/local/bin/cake")
 		j.Enter(@tmp, "cake")
-		j.AddInt(.PackGlobSize.AlignUp(8))
+		j.AddHInt(.PackGlobSize.AlignUp(8))
 		j.enter
 		
 		if .BakeASM(j)
@@ -280,12 +280,12 @@ module PackMaker
 	
 	function jbin.Cakeify (|scfunction| fn)
 		if !fn
-			.addint 0
+			.addhint 0
 			return
 		.Enter(@unit, fn.name)
 		|| id = fn.fPackID							#check ( fn.source,  "Missing PackID[2]" )
 		id = (id << 1) + fn.IsLibrary
-		.AddInt(id)
+		.AddhInt(id)
 		.exit
 
 	
@@ -295,10 +295,10 @@ module PackMaker
 		j.enter(@tmp, .name.lowercase)
 		
 		j.Enter(@list)     //////     //////     //////
-		j.AddInt(.classtype!.ExportPosition)
+		j.AddhInt(.classtype!.ExportPosition)
 		if !.IsLibrary
 			j.Add(@thg, .super!.name.lowercase)
-			j.addint(sz)
+			j.addhint(sz)
 		j.exit     		   ///
 		
 		if !.IsLibrary     //////     //////     //////
@@ -362,7 +362,7 @@ struct HairyMan
 		.Total++
 		if (f is usedbyasm) or f.isbehaviour
 			|| c = .curr
-				j.addint(c)
+				j.addhint(c)
 			.curr = 0
 			return true
 		.curr++
