@@ -78,8 +78,22 @@ function AppInfoExtra (|unixprocess| r, |string|)
 	return st.Name
 
 
+function ExtraAppInfo
+	opt norefcounts
+	|| o = .appinfo.tag
+	if o isa Message
+		|| l = o.first$
+		VarPrinter <~ "\n"
+		l.MemPrint("Obj", 0, 2)
+		l.MemPrint("Str", 1, 3)
+		l.MemPrint("Img", 2, 3)
+		l = o.second
+		if l
+			l.MemPrint("Sck", 0, 3)
+			l.MemPrint("/", 1, 0)
+
+
 function SetAppInfo
-	|| s = .Project.name.TrimExt
 	|unixprocess--| r = .RunCompiledApp
 
 	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (.debugmode isnt finished)
@@ -92,16 +106,19 @@ function SetAppInfo
 
 	if !CanDebug
 		.editme._ActiveLine = nil
+		.AppInfo.tag = nil
 
+	|| fs = VarPrinter
+	fs <~ .Project.name.TrimExt
 	|| extra = .AppInfoExtra(r)
-		s += "\n("
-		s += extra
-		s += ")"
-		|object--| o = .tag
-		if o
+		fs <~ "\n("
+		fs <~ extra
+		fs <~ ")"
 	  elseif r
-		s += (": " + r.pid)
-	.appinfo.text = s
+		fs <~ ": "
+		fs <~ r.pid
+	.ExtraAppInfo
+	.appinfo.text = fs
 	
 
 function listviewrow.DebugMatch (|listviewrow| New, |int| Ch,  |bool|)
@@ -178,11 +195,25 @@ function ImproveVar (|listviewrow| s)
 //		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "FastString" "\"\""
 
 
+
+function message.MemPrint (|string| s, |int| item, |int| Mode)
+	opt norefcounts
+	|| v = VarPrinter
+	|| ch = self[item]
+		if Mode&1
+			v <~ ", "
+		v <~ s
+		if Mode&2
+			v <~ ": "
+		ch.int.StrSize(v)
+
+
 function message.PerryAppendMsg (|string| s, |int| Item)
 	opt norefcounts
-	VarPrinter <~ s
+	|| v = VarPrinter
+	v <~ s
 	|| ch = self[item]
-		VarPrinter <~ ch.name
+		v <~ ch.name
 
 
 function listviewrow.PerryCopyVar (|string|)
