@@ -231,20 +231,21 @@ class PerryIDE (Window)
 		perryide.StatsMode = rz
 	
 	
-	function InfoStatus (|string|)
+	function InfoStatus (|faststring|)
+		opt norefcounts
 		|| fs = .stats init FastString()
 		|| i = .MyStatsMode
+		|| e = .editme
 		|| d = .editme.Document
 		if i == 0
 			fs <~ "  --" // :)
 		
 		  elseif i == 1
-			|| e = .editme
 			|| t = e.text
 
 			fs <~ "Chars ${t.lengthutf8}   Lines ${t.linecount}"
 			|| msg = .EditMe.ParsedMessage
-				|| loc = msg.loc
+				|| loc = msg.LinesOfContent
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
 
 			fs <~ (' ', 3)
@@ -265,37 +266,44 @@ class PerryIDE (Window)
 					fs <~ ".jbin"
 				if d.WasCompressed
 					fs <~ ".mz"
-			
+
 		  elseif i == 2
 			|| f = .filelist.FirstSelected as filerow
-			if !f
-				0
-			  elseif f.asdir
-				fs <~ f.Name + "/"
-			  else
-				fs <~ "proj"
-				f = (.filelist.listsource as filerow)
+				if f.asdir
+					fs <~ f.Name
+					fs <~ "/"
+				  else
+					fs <~ "proj"
+					f = (.filelist.listsource as filerow)
 			
 			if f
 				|| s = f.lastsize
-					fs <~ " ${s.StrSize} in (${f.LastFileCount} \11)"
+					fs <~ " "
+					s.StrSize(fs)
+					fs <~ " in (${f.LastFileCount} \11)"
 				  else
 					fs.Length = 0
 					fs <~ "no source found"
 		
 		  elseif i == 3
 			|| img = GUI.screen.size.area*4*2
+			fs.strsize("Obj ", app.ObjMemory)
+			fs.strsize("   Str ", app.stringmemory)
+			fs.strsize("   Img ", app.OtherMemory+img)
 			|| PS = PicoGlobalStats()
-			fs <~ "Obj ${app.ObjMemory.strsize}"
-			fs <~ "   Str ${app.stringmemory.strsize}"
-			fs <~ "   Img ${(app.OtherMemory+img).strsize}"
 			fs <~ "   Sck ${PS.OpenSockets}/${PS.OpenPicos}"
 		
 		if d and d.ShouldntSave
 			fs <~ "  Invalid Jeebox!"
+
 		return fs
 
 
+	function faststring.strsize (|string| name, |int64| S)
+		self <~ name
+		s.StrSize(self)
+	
+	
 	function NextProjInfo
 		.ShowLeftStats(perryide.StatsMode+1)
 
@@ -511,9 +519,10 @@ class PerryIDE (Window)
 		.PopupDisplayFadeIn
 		
 		require .IsFront
-		if ._FrameNum == 1
+		if ._FrameNum == 1			// once a second?
 			require !.ProjClosed
 			
+//		for 100
 		if .UpdateMem
 			.ShowLeftStats
 		

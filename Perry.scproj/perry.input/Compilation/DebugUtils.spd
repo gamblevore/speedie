@@ -107,9 +107,11 @@ function SetAppInfo
 	if !CanDebug
 		.editme._ActiveLine = nil
 		.AppInfo.tag = nil
-
-	|| fs = VarPrinter
-	fs <~ .Project.name.TrimExt
+	
+//	.AppInfo.text = "disabled"
+//	return
+	|faststring--| fs = VarPrinter
+	fs <~ .Project.TrimExtAndPath
 	|| extra = .AppInfoExtra(r)
 		fs <~ "\n("
 		fs <~ extra

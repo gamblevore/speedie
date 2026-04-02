@@ -1657,14 +1657,22 @@ class TextView (GUIControl)
 			d++
 
 
+	setter Text (|faststring|)
+		inlined
+		cpp_Part FS
+		.TextViewSet(value)	
+	
 	setter Text (|string|)
-		cpp_part TextSetReal
+		inlined
+		.TextViewSet(value)
+	
+	autogen TextViewSet (|object| value)
 		opt norefcounts
 		isnt modified
-		if .Clear(value)
+		if .Clear(value) 
 			|| u = .undoer
 				u.clear
-				u.AddState(value, nil)
+				u.AddState(.text, nil)
 	
 
 	libinternal TextLeft (|int|)
@@ -2003,7 +2011,8 @@ class TextView (GUIControl)
 	setter WrappedLines (|textviewline|)
 		disabled
 	
-	libinternal Clear (|string| NewText, |bool|)
+	
+	libinternal Clear (|object| NewText, |bool|)
 		rz = super.textset(NewText)
 		require rz or !.WrappedLines.hasany
 

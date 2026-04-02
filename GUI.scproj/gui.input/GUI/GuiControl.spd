@@ -561,14 +561,31 @@ class GUIControl (list)
 			return w.CurrMouseDown == self
 	
 	
+	setter Text (|faststring|)
+		inlined
+		cpp_Part FS
+		.TextSet(value)	
+	
 	setter Text (|string|)
+		inlined
 		.textset(value)
 	
 	
-	libinternal TextSet (assigns:|string| text, |bool|)
+	autogen TextSet (assigns:|object| text, |bool|)
 		cpp_part TextSetter
-		require (self and text != .text)
-		.text = text
+		opt norefcounts
+
+		if text isa string
+			if (text == .text)
+				return false
+			.text = text
+		  elseif text isa FastString
+			if (text|&nil||string| == .text) // same!
+				text.Length = 0
+				return false
+			.text = text.GetResult
+		  else
+			return false
 		.TextAlteredForDraw |= 2
 		.Touch
 		return true	

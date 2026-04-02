@@ -3,7 +3,7 @@
 class Window (GUIControl)
 	linkage
 		cpp_part Win
-	|byte| 								SimulationFPS
+	|byte|								SimulationFPS
 	|bool|								IsDialog
 	|bool|								IsMainWindow
 	|GUIControl?|						Focus
@@ -26,9 +26,9 @@ class Window (GUIControl)
 	|vec2|								BlockMove
 	|byte|								BlockMode
 	|guicontrol?|						_FocusAttempt
-	|byte| 								_FrameNum
-	|uint16| 							_FrameNext
-	|date| 								_LastTimeSeen
+	|byte|								_FrameNum
+	|uint16|							_FrameNext
+	|date|								_LastTimeSeen
 	|byte|								_FlashSelf
 	|bool|								_NeedsResize
 	|bool|								_BlockRecurseKeyDown

@@ -18,17 +18,22 @@ function string.Sort (|byte| sep = '\n', |string|)
 role MessageTable (Dictionary)
 	contains Message
 	syntax Access (|string| Key, assigns:||)
+		inlined
 		super.valuelower(key) = value
 	syntax Access (|string| Key, ||)
+		inlined
 		return super.valuelower(key)
 	syntax Access (|message| Key, assigns:||)
 		cpp_part GetMsg
+		inlined
 		super.valuelower(key.name) = value
 	syntax Access (|message| Key, ||)
 		cpp_part SetMsg
+		inlined
 		return super.valuelower(key.name)
 	syntax append (|message| Msg)
 		cpp_part AppendMsg
+		inlined
 		super.valuelower(msg.name) = msg
 	
 
@@ -141,7 +146,7 @@ function message.FindTightest (|int| pos, |bool| Named=false, |bool| SamePositio
 				size = r
 
 
-function message.LOC (|ivec2|)
+function message.LinesOfContent (|ivec2|)
 	description "Calculate Lines of content" 
 	opt norefcounts
 	for s.flat in self
@@ -221,6 +226,8 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 	constants
 		|int| 
 		Fail = 0x8000_0000
+		Max = 0x7FFF_FFFF
+		Min = 0x8000_0001
 	default FailableInt.fail
 	false   FailableInt.fail
 	syntax cast (|bool|)

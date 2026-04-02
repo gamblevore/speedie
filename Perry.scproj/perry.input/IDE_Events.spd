@@ -568,7 +568,7 @@ function FileViewerCountCode (GuiMenuEvent)
 		if l.isspd
 			|| f = l.file
 				|| p = f.parse
-					CLOC += p.loc
+					CLOC += p.LinesOfContent
 				size += f.size
 				FileCount++
 	

@@ -115,7 +115,7 @@ function file.CLOC
 	|| Durr = start.ago
 	counts.MemEnd
 	if msg
-		counts.Lines += msg.loc[0]
+		counts.Lines += msg.linesofcontent[0]
 	  else
 		Counts.Lines += data.loc
 	counts.TotalSize += data.Length

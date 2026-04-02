@@ -178,6 +178,7 @@ function float64.SyntaxCall (|float64|)
 	return random.float64 * self
 
 function int.SyntaxCall (|int|)
+	description "Returns a random number from 0 to N-1" 
 	return (random.Float64 * self|Float64|)|int|
 
 function int.Rand (|int|)
