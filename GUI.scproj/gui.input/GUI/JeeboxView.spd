@@ -5,7 +5,7 @@
 class MessageView (ListView)
 	linkage
 		cpp_part JBV
-    
+
 	constructor (|guicontrol| p, |GUIListEvent| sel, |GUIListEvent| ret)
 		super.constructor(p, sel, ret)
 		.MultiSelection 	= true
@@ -26,37 +26,13 @@ class MessageView (ListView)
 	
 	module
 		libinternal JeeboxViewRenamer (guilisteditevent)
-			|| o = cell!.row
-			if o isa filerow
-				if o.moveto(value)
-					return true
 
 
 		libinternal RightClickJeeboxView (GuiListevent)
-			|| fl = .tag as FileViewer
-			if row and fl
-				|| f = row.obj
-				if f isa filerow
-					.select(f)
-				fl.hideopenlist
+			opt norefcounts
+			|| View = .tag as MessageView
 			
 
 		libinternal InsideJeeboxViewRowDraw (ListViewRowDraw)
 			opt norefcounts
-			if self isa filerow
-				|| z	= parent.lastrect
-				|| sh	= font.width*2
-				|| v	= (6 + .depth(parent)*sh, texty)
-				|| d	= ._Document
-				|| mod	= (d.ismodified (d) nil)
-				|| ddd	= colors.clear
-				if d and d.IsModified
-					ddd = colors.Black(0.5)
-				ddd.a *= strength
-				font.small!.drawicon(.Modifier, where, V, ddd)
-
-				if .HasError
-					v.x = z.x2-sh
-					font.small!.drawicon('\17', where, V, ddd) // not sure???
-				return (sh, 0)
 

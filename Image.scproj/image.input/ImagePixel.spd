@@ -122,10 +122,10 @@ datatype ImagePixel (uint)
 		inlined
 		return .color
 
-	syntax cast (|PremultipliedColor|)
-		cpp_part CastPremul
-		inlined
-		return .PreMul
+//	syntax cast (|PremultipliedColor|)
+//		cpp_part CastPremul
+//		inlined
+//		return .PreMul
 
 	function AddAlpha (|&imagepixel| self, |float| v)
 		v += .Alpha
@@ -147,7 +147,7 @@ datatype ImagePixel (uint)
 		.b = b.clamp(255)
 		.a = a.clamp(255)
 	
-	function CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N)
+	inline CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N)
 		Memory.Copy(self, src, N*4)
 		
 	function Add (|&imagepixel| self, |vec4| c)

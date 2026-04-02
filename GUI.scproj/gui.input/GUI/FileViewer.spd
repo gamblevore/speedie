@@ -546,8 +546,7 @@ class FileViewer (ListView)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect
-				|| sh	= font.width*2
-				|| v	= (6 + .depth(parent)*sh, texty)
+				|| v	= (6 + parent.depthx(self), texty)
 				|| D	= ._Document
 				|| mod	= (D.ismodified (D) nil)
 				|| ddd	= (Colors.black(0.5) (mod) Colors.clear)
@@ -555,9 +554,9 @@ class FileViewer (ListView)
 				font.small!.drawicon(.Modifier, where, V, ddd)
 
 				if .HasError and (!.hasany or self isnt expanded)
-					v.x = z.x2-sh
+					v.x = z.x2-font.width*2
 					font.small!.drawicon('\17', where, V, ddd) // not sure???
-				return (sh, 0)
+				return (font.width*2, 0)
 
 
 libinternal string.PlatformVisible (|bool| AtRoot, |bool|)

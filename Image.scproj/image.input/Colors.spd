@@ -3,26 +3,23 @@
 module Colors
 	function Rainbow (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
 		description "Rainbow color wheel. More orange than color.Wheel" 
-//		h-=3th
-//		if keys.shift
-//			return .wheel(h,s,b,a)
 		h = h.Fract
 		h = h * 7.0
-	    || i = h|int|
-	    || hf = h.fract
+		|| i = h|int|
+		|| hf = h.fract
 		|| f = hf*B
 		
-	    if (i == 0)							// R->O
+		if (i == 0)							// R->O
 			rz = (B, f*0.5, 0, a)
-	      elseif (i == 1)					// O->Y
+		  elseif (i == 1)					// O->Y
 			rz = (B, (f+B)*0.5, 0, a)
-	      elseif (i == 2)					// Y->G
+		  elseif (i == 2)					// Y->G
 			rz = (B-f, B, 0,  a)
-	      elseif (i == 3)					// G->T
+		  elseif (i == 3)					// G->T
 			rz = (0, B, f, a)
-	      elseif (i == 4)					// T->B
+		  elseif (i == 4)					// T->B
 			rz = (0, B-f, B, a)
-	      elseif (i == 5)					// B->P
+		  elseif (i == 5)					// B->P
 			rz = (f, 0, B, a)			
 		  else								// P->R
 			rz = (B, 0, B-f, a)			
@@ -35,23 +32,23 @@ module Colors
 		description "Perceptual color wheel. Not truely HSV." 
 		h = h.Fract
 		h = h * 6.0
-	    || i = h|int|
-	    || f = h.fract
-	    || p = b * (1.0 - s)
-	    || q = b * (1.0 - (s * f))
+		|| i = h|int|
+		|| f = h.fract
+		|| p = b * (1.0 - s)
+		|| q = b * (1.0 - (s * f))
 
 		f = (2.0-f)*f // theo-addition? :o) might tweak later. Not enough red.
-	    || t = b * (1.0 - (s * (1.0 - f)))
+		|| t = b * (1.0 - (s * (1.0 - f)))
 	
-	    if (i == 0)
+		if (i == 0)
 			return (b, t, p, a)
-	    if (i == 1)
+		if (i == 1)
 			return (q, b, p, a)
-	    if (i == 2)
+		if (i == 2)
 			return (p, b, t, a)
-	    if (i == 3)
+		if (i == 3)
 			return (p, q, b, a)
-	    if (i == 4)
+		if (i == 4)
 			return (t, p, b, a)
 		return (b, p, q, a)
 	
@@ -59,29 +56,29 @@ module Colors
 		cpp_part WheelVec
 		return .Wheel(y.r, y.g, y.b, y.a)
 	
-	function White (|float| alpha=1.0, |vec4|)
+	inline White (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, alpha)
-	function Gray (|float| alpha=1.0, |vec4|)
+	inline Gray (|float| alpha=1.0, |vec4|)
 		return vec4(0.5, alpha)
-	function Black (|float| alpha=1.0, |vec4|)
+	inline Black (|float| alpha=1.0, |vec4|)
 		return vec4(0.0, alpha)
-	function Red (|float| alpha=1.0, |vec4|)
+	inline Red (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 0.0, 0.0, alpha)
-	function Orange (|float| alpha=1.0, |vec4|)
+	inline Orange (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 0.5, 0.0, alpha)
-	function Yellow (|float| alpha=1.0, |vec4|)
+	inline Yellow (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 1.0, 0.0, alpha)
-	function Green (|float| alpha=1.0, |vec4|)
+	inline Green (|float| alpha=1.0, |vec4|)
 		return vec4(0.0, 1.0, 0.0, alpha)
-	function Blue (|float| alpha=1.0, |vec4|)
+	inline Blue (|float| alpha=1.0, |vec4|)
 		return vec4(0.0, 0.0, 1.0, alpha)
-	function Purple (|float| alpha=1.0, |vec4|)
+	inline Purple (|float| alpha=1.0, |vec4|)
 		return vec4(0.5, 0.0, 1.0, alpha)
-	function Magenta (|float| alpha=1.0, |vec4|)
+	inline Magenta (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 0.0, 1.0, alpha)
-	function Brown (|float| alpha=1.0, |vec4|)
+	inline Brown (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 0.5, 0.25, alpha)
-	function Clear (|vec4|)
+	inline Clear (|vec4|)
 		0 // lol
 
 insertion
@@ -93,7 +90,8 @@ insertion
 datatype PreMultipliedColor (ivec4)
 
 
-function imagepixel.PreMul (|PreMultipliedColor|)
+libinternal imagepixel.PreMul (|PreMultipliedColor|)
+	opt inline
 	return .Color.PreMul
 
 

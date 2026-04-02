@@ -220,13 +220,11 @@ function ReloadBreaks
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
-//	|| info = stack.first // nice info about RAM/Pico :]
+	|| info = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
 
 	// we really want to copy over certain info from the new one
-	// it seems better to simply use the new one, outright. rather than frankenstein
-	// blobs from all over various runs. Then... we want to expanded/selected flags over
-	// So thats the hard thing... how to identify what is the same... 
+	// it seems better to simply use the new one, than frankenstein
 	
 	.stack.listsource = arg
 	
@@ -242,7 +240,7 @@ function UpdateStack (|message| stack)
 		|| F = arg.first
 		if !.stack.FirstSelected
 			.stack.Select(F)
-			.stack.ExpandSelection(true)
+			.stack.ExpandRow(true)
 		.ClickedStack(F, true) // jump to new place
 	  else
 		.EditMe._ActiveLine = nil

@@ -125,18 +125,17 @@ role ListViewRow (message)
 		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
 
 	
-	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth, |int| N)
+	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depthx, |int| N)
 		opt NoRefCounts
-		require self and !p.decluttered
 		|| w	= p.window	
 		|| z2	= rect
 		|| str = 1.0
 
 		for i in n
 			rect.horz	= p.ColumnBounds(i, z2, self)
-			rect.x	   += depth * font.width * 2
+			rect.x		+= depthx
 			where.controlclip = rect.clip(p.lastrect)
-			.DrawRowColumn(rect, where,  p, depth, i, str) 
+			.DrawRowColumn(rect, where,  p, i, str)
 		
 		where.controlclip = z2
 		
@@ -172,7 +171,7 @@ role ListViewRow (message)
 		return parent.TableCell(self, column)
 		
 		
-	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
+	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Column, |float| str)
 		opt NoRefCounts
 
 		require .NotDeclutteredCell(column)
@@ -195,7 +194,7 @@ role ListViewRow (message)
 				|| exp = ("\02" (self isnt expanded) "\03")
 				|| VCol = vec4(1, 0.5)
 				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.rowheight)
-			r.x += font.width + 1
+			r.x += font.width + 2
 		
 		if parent.MultiLineDraw
 			r.y = rect.y2 - 10

@@ -416,7 +416,7 @@ class ListView (GUIControl) {
 			return true
 		
 		if .IsTree and (key is left or right)
-			return .ExpandSelection(key is right)
+			return .ExpandRow(key is right)
 
 		
 	function DefaultCopy (GUICopyEvent)
@@ -653,8 +653,8 @@ class ListView (GUIControl) {
 	behaviour MouseUp
 		ScrollInfo.endDrag
 
-		|| f = .DraggingRowFrom
-		|| t = ._DraggingRowTo
+		|object--| f = .DraggingRowFrom
+		|listviewrow--| t = ._DraggingRowTo
 		|| sl = ._SelJustChanged
 		.DraggingRowFrom = nil
 		.ClearInternalDrops
@@ -667,7 +667,7 @@ class ListView (GUIControl) {
 				(dr)(self, t, nil)
 			
 		  elseif !sl
-			|| LC = .FindClickedCell(P)
+			|listviewcell--| LC = .FindClickedCell(P)
 				|| L = LC.row
 				require (L isnt UnSelectable)
 				if (L is selected) and (.SelCount > 1)
@@ -690,9 +690,9 @@ class ListView (GUIControl) {
 
 	libinternal DelayedRename (|ListViewCell| i)
 		.EditDelayed = i
-		delayedittill_ = nil
+		listview.delayedittill_ = nil
 		if i
-			delayedittill_ = gui.FrameStart + 0.5s
+			listview.delayedittill_ = gui.FrameStart + 0.5s
 
 
 	libinternal TryDelayedEdit
@@ -714,16 +714,33 @@ class ListView (GUIControl) {
 
 
 	libinternal FixScroll (|bool|)
+		opt norefcounts
 		if !.scrollstart
 			.scrollset(.liststart)
 			return .scrollstart
 		return true
 
 
+	function ClickedExpand (|ivec2| P, |int|)
+		require .Istree
+		|| T = .ColumnStart(0)
+		|| R = .findClicked(P)
+		if r and r != .columns
+			T += .depthx(R)
+			|| T2 = T + font.width + 6
+			|| x = p.x
+			if (x >= T and x <= t2) and .listchild(R)// and ((r is selected) or keys.option or keys.gui)
+				.ExpandRow(R, R isnt expanded)
+				._SelJustChanged = true // block mouseup editing a cell
+				return MouseDragging.Handled
+
+
 	behaviour MouseDown
 		opt norefcounts
 		.EditDelayed = nil
 		if clicks >= 0
+			|| Expanding = .ClickedExpand(P)
+				return Expanding			
 			._SelJustChanged = clicks > 1
 		if (!keys.Cmd) and (.CommandSelectRow)
 			return MouseDragging.handled
@@ -893,13 +910,14 @@ class ListView (GUIControl) {
 		return row.parent
 	
 	
-	function ExpandSelection (|bool| Expand, |bool|)
+	function ExpandRow (|listViewRow| Sel=nil, |bool| Expand, |bool|)
 		opt norefcounts
-		|| sel		= .LastSelected$
+		if !sel
+			sel = .LastSelected$
 		|| Force	= keys.option 
 		if  !Expand  and  (!.listchild(sel) or (sel isnt expanded))
 			sel = .listparent(sel)
-			if sel
+			if sel and sel isnt Selected
 				.Select(sel)
 			Force = true
 		if sel != .listsource
@@ -1250,7 +1268,7 @@ class ListView (GUIControl) {
 		|| sc = cell.row!
 		|| B = .RowBounds(.scrollstart, sc, .rowheight)			#require
 		B.horz = .ColumnBounds(cell.column, B, sc)
-		B.x += sc.depth(self) * font.width*2
+		B.x += .depthx(sc)
 		return (B down .lastbottom) left .lastleft 
 
 
@@ -1318,7 +1336,7 @@ class ListView (GUIControl) {
 		unfoc.a += 0.2
 		where.fillmarks(R, bg, .gnormal.seps, focuscol.px, unfoc.px)
 
-		rz.Overlay(bg)
+		rz.Overlay(bg.premul)
 
 			
 	behaviour Gesture
@@ -1422,9 +1440,7 @@ class ListView (GUIControl) {
 
 			for r.visible in self
 				rect.y = rect.y2 - .RowHeight
-				|| D = 0
-				if .Istree: d = r.depth(self)
-				r.ListRowDraw(Where, rect, self, D, NCols)
+				r.ListRowDraw(Where, rect, self, .depthx(R), NCols)
 				rect.y2 = rect.y
 				if (r == end) and .liststart == .scrollstart
 					._CanSeeAllLines = (rect.y >= .lastrect.y)
@@ -1554,12 +1570,16 @@ class ListView (GUIControl) {
 
 
 
-function ListViewrow.Depth (|listview| me, |int|)
+function ListView.DepthX (|listviewRow| Row, |int|)
+	// maybe better to just return an indent... 
 	opt norefcounts
-	|| c = self
-	rz = -1
-	|| root = me.listsource
-	while c and (root != c)
-		rz++
-		c = c.parent
+	if .Istree
+		rz = -1
+		|| root = .listsource
+		|| c = Row
+		while c and (root != c)
+			rz++
+			c = c.parent
+		rz *= font.Width*2
+		
 

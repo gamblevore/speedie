@@ -80,7 +80,7 @@ struct InlineEditor
 	
 	
 	function Edit (|ListViewCell| r, |ListView| l, |bool|)
-		opt norefcounts
+/		opt norefcounts
 		
 		l ?= .editingfor as ListView
 		
