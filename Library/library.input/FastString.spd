@@ -13,12 +13,16 @@ class FastString {
 // Fast appends and tools for building data formats
 
 	|int|			Length
-	|&Byte|			_ResultPtr
+	visible false	// todo: reorder...
+	|&Byte|			ResultPtr
 	|?object|		__
+	visible true
 	|?File|			File
+	visible false
 	|int64|			_WrittenLength // invisible
 	
 	|int|			_Reserved
+	visible true
 	|uint16|		Indent
 	|Byte|			IndentChar
 	
