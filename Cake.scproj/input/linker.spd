@@ -54,7 +54,7 @@ module SpdTable
 		|| CodeLength = 0
 				
 		for spd.fast in code
-			if spd == @num
+			if spd == @num or @hint
 				for spd.int
 					.funcs <~ .funcs[0]
 			  else

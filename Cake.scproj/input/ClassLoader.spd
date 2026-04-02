@@ -49,13 +49,13 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 
 	|| V = ClsData.Virtuals|&&nil|
 	for VFn.fast in PK
-		V++[] = .Func(Vfn[@num])|&nil|
+		V++[] = .Func(Vfn[@nil])|&nil|
 
 
 function Cakerun.LoadOneClass (|message| s)
 	opt norefcounts
 	|| c = S[@list]!
-	|| Num = c[@num]
+	|| Num = c[@nil]
 	|| I = Num.int										#require
 	
 	|| Where = (globals.LibBase + I)|&?&classdata|		#expect

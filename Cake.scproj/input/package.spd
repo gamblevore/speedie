@@ -27,7 +27,7 @@ module CakeRun
 	function GetStructure (|bool|)
 		opt norefcounts
 		|| app = .UnboxCake$
-		|| sz = app[@num]
+		|| sz = app[@nil]
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
 		

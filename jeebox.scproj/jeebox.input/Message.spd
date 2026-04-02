@@ -1163,6 +1163,7 @@ Message is also:
 				return .ParseHInt(StrStart)
 			|| f = .First
 			if !f or fn != @unit
+				expect ((fn == @num) or fn.IsString or (strstart > 0)) (self)   // parsing p123, from index 1
 				return .name.ParseInt(StrStart, self)
 			
 			if self == "x"

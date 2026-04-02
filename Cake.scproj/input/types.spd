@@ -12,7 +12,7 @@ class XType
 	
 	constructor (|message| msg, |int| index)
 		opt norefcounts
-		|| Sup = msg[@num]
+		|| Sup = msg[@nil]
 		|| SupIndex = Sup.Int
 		.IsObject = SupIndex & 1
 		.name = msg.name
