@@ -68,7 +68,7 @@ void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
 
 // VM 
 struct CakeVM; struct CakeStack;
-typedef int64 (*JB_ASM_Break)(CakeVM* VM, CakeStack* Stack, int Error);
+typedef int64 (*JB_ASM_Break)(CakeVM* VM, CakeStack* Stack, int Error, uint Break);
 typedef u64 (*Fn0 )();
 
 struct CakeStack {

@@ -18,7 +18,7 @@ function CakeTalk (|SpdProcess| Cake)
 		.DelayedRun = date.now
 	  else
 		.DelayedRun = nil
-		if msg ~= "stack"
+		if msg ~= "stack" or "break"
 			.UpdateStack(msg)
 		  elseif msg ~= "hoi :3"
 			.GotHello(msg.name)
@@ -80,7 +80,7 @@ function AppInfoExtra (|unixprocess| r, |string|)
 
 function SetAppInfo
 	|| s = .Project.name.TrimExt
-	|| r = .RunCompiledApp
+	|unixprocess--| r = .RunCompiledApp
 
 	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (.debugmode isnt finished)
 	|| Paused = .DebugMode is paused
@@ -97,6 +97,8 @@ function SetAppInfo
 		s += "\n("
 		s += extra
 		s += ")"
+		|object--| o = .tag
+		if o
 	  elseif r
 		s += (": " + r.pid)
 	.appinfo.text = s
@@ -206,8 +208,8 @@ function @perry.VariableFinder (listview.columnfinder)
 		upon.name = value		
 
 
-extend perryide {	
 
+extend perryide {	
 
 function ReloadBreaks
 	opt norefcounts
@@ -220,7 +222,7 @@ function ReloadBreaks
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
-	|| info = stack.first // nice info about RAM/Pico :]
+	.appinfo.tag = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
 
 	// we really want to copy over certain info from the new one
@@ -236,12 +238,11 @@ function UpdateStack (|message| stack)
 			exit
 	
 
-	|| Break = stack == "stack"
-		|| F = arg.first
+	|| Break = stack == "break"
+		|| f = arg.first
 		if !.stack.FirstSelected
-			.stack.Select(F)
-			.stack.ExpandRow(true)
-		.ClickedStack(F, true) // jump to new place
+			.stack.ExpandRow(F, true)
+		.ClickedStack(F, true)
 	  else
 		.EditMe._ActiveLine = nil
 
@@ -249,7 +250,7 @@ function UpdateStack (|message| stack)
 	if m is Paused != Break
 		(M is paused) = Break
 		.DebugMode = M
-		.SetAppInfo
+	.SetAppInfo
 }
 
 

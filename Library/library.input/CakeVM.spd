@@ -63,7 +63,7 @@ target cpp or vm {
 }
 
 
-prototype CakeChef (|&CakeStack| Stack,  |int| ErrorCode,  |int64|)
+prototype CakeChef (|&CakeStack| Stack,  |int| ErrorCode, |uint| Break, |int64|)
 	// return 0 to continue onwards. return 1-256 to exit the program. Return -1 or less to jump backwards
 
 }

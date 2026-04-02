@@ -10,12 +10,14 @@ class GUIControl (list)
 	|GUICopyEvent?|				OnCopy
 	|GUIKeyEvent?|				OnKeyDown
 
-	|ivec4| 					LastRect
+	|ivec4|						LastRect
 	|string|					ID
 	|string|					Text
 	|string|					Tooltip
-	|object?|					Tag
-	|Drawstyle|  				GNormal
+	|object?|					Tag				// how is this different than .obj??
+												// try making it SET obj... see if it varies somehow?
+												// weird huh?
+	|Drawstyle|					GNormal
 	
 	|TimeFader|					Declutterer
 	|ControlSize|				Sizer
@@ -23,8 +25,8 @@ class GUIControl (list)
 	|ControlClipMode|			ClipMode
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
-	|uint16| 					_TransitionFraction
-	|movecode| 					AttachedFrom
+	|uint16|					_TransitionFraction
+	|movecode|					AttachedFrom
 	|byte|						TextAlteredForDraw
 	|byte|						Padding
 	|byte|						ExpandOnMouseOver
@@ -466,7 +468,7 @@ class GUIControl (list)
 	function HasFocus (|bool|)
 		opt norefcounts
 		|| w = .window
-			return self == w.realfocus 
+			return self == w.realfocus
 
 	function HasAnyFocus (|bool|)
 		opt norefcounts

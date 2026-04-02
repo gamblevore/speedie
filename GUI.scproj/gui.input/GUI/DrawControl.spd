@@ -72,7 +72,7 @@ class GraphicsEditor (GuiControl)
 		|jbin| j = b.outputstream		#require
 		j.start(@arg)
 		j.enter(@tmp, "jdraw")
-		j.addint 1
+		j.addhint 1
 		j.enter @arg
 		j.enter(@tmp, "layers")
 		j.enter @arg
@@ -88,8 +88,8 @@ class GraphicsEditor (GuiControl)
 					
 	function jbin.AddImage	(|image| img, |string| name)
 		.enter(@tmp, name)
-		.addint(img.Width)
-		.addint(img.height)
+		.addhint(img.Width)
+		.addhint(img.height)
 		.add(@bin, img.rawdata.compress)
 		.exit
 		

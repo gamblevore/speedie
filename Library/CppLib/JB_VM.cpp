@@ -64,14 +64,15 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 
 
 AlwaysInline int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
+	auto Break = Code[CakeCodeMax]; 
 	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
 	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull));
 	r = (CakeRegister*)(((IntPtr)r)&~(1ull<<63ull));
-	return (V->__VIEW__)(V, (CakeStack*)(r-1), 0);
+	return (V->__VIEW__)(V, (CakeStack*)(r-1), 0, Break);
 }
 
 
-int64 JB_ASM_NoBreak (CakeVM* VM, CakeStack* R, int Code) {
+int64 JB_ASM_NoBreak (CakeVM* VM, CakeStack* R, int Code, uint Break) {
 	return 0;
 }
 
@@ -280,7 +281,7 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 	
 	Signal |= 128;
 	V->CakeFail = Signal;
-	(V->__VIEW__)(V, Stack, ErrorKind);					SubCrash = 30;
+	(V->__VIEW__)(V, Stack, ErrorKind, 0);				SubCrash = 30;
 	JB_ErrorHandleFileC(nil, Signal, ErrStr);			SubCrash = 40;
 	V->Registers[2] = {.Int = Signal};
 	

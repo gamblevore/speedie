@@ -235,22 +235,24 @@ jbstring* jb_readfile(_cstring Path, bool AllowMissingFile); /* Reads entire fil
 #define $todo 47
 #define JB_SyxURL 48;
 #define $url 48
-#define JB_SyxXAtt 49;
-#define $xatt 49
-#define JB_SyxXML 50;
-#define $xml 50
-#define JB_SyxXPI 51;
-#define $xpi 51
-#define JB_SyxXCom 52;
-#define $xcom 52
-#define JB_SyxXCDT 53;
-#define $xcdt 53
-#define JB_SyxXTxt 54;
-#define $xtxt 54
-#define JB_SyxXDTD 55;
-#define $xdtd 55
-#define JB_Syxmax 56;
-#define $max 56
+#define JB_SyxHInt 49;
+#define $hint 49
+#define JB_SyxXAtt 50;
+#define $xatt 50
+#define JB_SyxXML 51;
+#define $xml 51
+#define JB_SyxXPI 52;
+#define $xpi 52
+#define JB_SyxXCom 53;
+#define $xcom 53
+#define JB_SyxXCDT 54;
+#define $xcdt 54
+#define JB_SyxXTxt 55;
+#define $xtxt 55
+#define JB_SyxXDTD 56;
+#define $xdtd 56
+#define JB_Syxmax 57;
+#define $max 57
 
 
 #ifdef __nodebug

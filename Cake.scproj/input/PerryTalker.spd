@@ -19,14 +19,12 @@
 
 prototype PerryResponse (|CakeVM| self, |message| m, |uint| State,  |StepAction|)
 dispatch DebuggerActions (PerryResponse)
-	setvar:			return StepAction.donothing
-		
 	run				RunAction
-	
 	stepin:			return .TempBreak(.StepIn)
 	stepout:		return .TempBreak(.StepOut)
 	stepover:		return .TempBreak(.StepOver)
 	
+	edit			EditAction
 	brkadd			BreakAction
 	brkrem			BreakRemoveAction
 	sendbreaks		SendBreakAction
@@ -45,7 +43,6 @@ datatype StepAction (uint)
 		|StepAction|
 		DoNothing = 0
 		SendVars
-		AllowRun
 		GoRun				// run will already send the vars, after we hit the next break.
 	
 	syntax is (|stepaction| k, |bool|)
@@ -53,9 +50,9 @@ datatype StepAction (uint)
 
 
 
-function cakevm.SendStack (|cakestack| stack, |spdprocess| perry)
+function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name)
 	opt norefcounts
-	|| j = .StartStack("stack")
+	|| j = .StartStack(name)
 	|| file = .StackToPerry(stack, 0, j)
 	perry <~ j
 	if file
@@ -73,30 +70,37 @@ function __PerryView__ (cakevm.CakeChef)
 		p <~ "crashed " + ErrorCode			// allow them to fix their memory and resume...
 
 	.ClearTempBreak(stack)
-	.SendStack(stack, p)
-	
-	while									// Controlflow simplify! Just remove resume!
+	.SendStack(stack, p, "break")
+
+	|| Stopped = (Break>>31)!=0
+	while
 		if !p.IsOpen
 			app.Quit
 		|| m = p.Get(5.0)
-			|| Action = .respond(m)
-			if Action is SendVars
-				.SendStack(stack, p)
-			if !ErrorCode
-				if Action is GoRun
-					exit
-				if Action is AllowRun
-					if p.pico.CanGet <= 0	// nothing more to get
-						exit
+		if !m: continue
+
+		|| Action = .respond(m)
+		if Action is SendVars
+			.SendStack(stack, p, "stack")
+		if !ErrorCode and .GoRun(p, stopped, action)
+			exit
+
 	p <~ "run"
 
+
+function cakevm.GoRun (|spdprocess| p, |bool| Stopped, |StepAction| Action, |bool|)
+	if Action is GoRun
+		return true
+	if (Stopped == false) and (p.pico.CanGet <= 0)
+		.SetBreakLevel(2)
+		return true
 
 
 function SendBreakAction (perryresponse)
 	opt norefcounts
 	|| f = debugger.file(m)
 		cake.perry!.SendBreaks(f)
-	return StepAction.AllowRun
+	return StepAction.DoNothing
 
 
 function RunAction (perryresponse)
@@ -117,8 +121,8 @@ function jbin.SendCode (|uint| Break, |int| Position)
 		name = "break"
 		break = (break << 1) >> 1
 	.Enter(@tmp, name)
-	.AddInt(break)
-	.AddInt(position)
+	.AddhInt(break)
+	.AddhInt(position)
 	.exit
 	
 
@@ -154,6 +158,10 @@ function debugger.file (|message| m, |filewithdata|)
 	return .FileMap[m.firstname]						#expect (m, "Can't find file")	
 
 
+function EditAction (PerryResponse)
+	return StepAction.DoNothing
+
+	
 function BreakAction (PerryResponse)
 	opt norefcounts
 	|| F = debugger.file(m)
@@ -211,17 +219,17 @@ function cakevm.StartStack (|string| name, |jbin--|)
 		j.Enter(@list)
 		{
 			j.Enter(@list)
-			j.AddInt(app.ObjMemory)
-			j.AddInt(app.StringMemory)
-			j.AddInt(app.OtherMemory)
+			j.AddhInt(app.ObjMemory)
+			j.AddhInt(app.StringMemory)
+			j.AddhInt(app.OtherMemory)
 			// in case we want to add more items without muddling things...
 			j.exit
 		}
 		{
 			|| PS = PicoGlobalStats()
 			j.Enter(@list)
-			j.AddInt(PS.OpenSockets)
-			j.AddInt(PS.OpenPicos)
+			j.AddhInt(PS.OpenSockets)
+			j.AddhInt(PS.OpenPicos)
 			j.exit
 		}
 		j.exit
@@ -263,7 +271,7 @@ function cakevm.Prev (|cakestack| stack, |&cakestack|)
 
 function jbin.SyntaxExpect (|string| s, |int64| Code)
 /	.Enter(@tmp, s)
-	.AddInt(Code)
+	.AddhInt(Code)
 	.exit
 
 
@@ -283,7 +291,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	j.Enter(@tmp, vars|&nil||string|)
 	vars.Length = 0
 	j.AddStr(rz)
-	j.AddInt(where.Position)
+	j.AddhInt(where.Position)
 	}
 	
 	if count
@@ -335,8 +343,10 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	j.Enter(@tmp, .name)
 
 	|| Src = .SrcMap
-	j.AddStr(src.file)
-	j.AddInt(src.Position)
+	|| AtBase = depth == 0
+	j.AddStr(src.file * AtBase)
+	j.Addhint(src.Position * AtBase)
+		
 	
 	|| vars = debugger.VariablePrinter!
 	|| Type = .ObjType
@@ -344,7 +354,7 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	|| OK = .RenderType(vars, type)
 	j.AddStr(vars)
 
-	if !.RenderValue(vars, Where, depth == 0)
+	if !.RenderValue(vars, Where, AtBase)
 		OK = false
 	j.AddStr(vars)
 	j.AddHInt((where|uint64|<<8)>>8)

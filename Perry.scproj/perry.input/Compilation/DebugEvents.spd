@@ -235,13 +235,13 @@ function ClickedStack (GUIListEvent)
 function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 	opt norefcounts
 	|| path = row.firstname
-	.EditPath(path, false)
-	|| Where = row[1].int
-	if Active
-		|| file_path = row.first
-			file_path.Position = where
-		.editme._ActiveLine = file_path
-	.editme.ShowAndSelect(where, true)
+		if .EditPath(path, false)
+			|| Where = row[1].int
+			if Active
+				|| file_path = row.first
+					file_path.Position = where
+				.editme._ActiveLine = file_path
+			.editme.ShowAndSelect(where, true)
 	return true
 	
 

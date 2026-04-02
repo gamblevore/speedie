@@ -13,12 +13,12 @@ class FastString {
 // Fast appends and tools for building data formats
 
 	|int|			Length
-	|&Byte|			ResultPtr
+	|&Byte|			_ResultPtr
 	|?object|		__
 	|?File|			File
-	|int64|			WrittenLength // invisible
+	|int64|			_WrittenLength // invisible
 	
-	|int|			Reserved
+	|int|			_Reserved
 	|uint16|		Indent
 	|Byte|			IndentChar
 	
@@ -31,7 +31,7 @@ class FastString {
 	function Length (|int|)				{ nil safe, cpp_wrapper JB_FS_Length }
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
 	setter Reserved (|int|)				{ disabled }
-	setter ResultPtr (|int|)			{ disabled }
+	setter _ResultPtr (|int|)			{ disabled }
 	
 	function AppendLower (|string| data)
 		cpp_wrapper JB_FS_AppendLower
