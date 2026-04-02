@@ -66,6 +66,7 @@ extend Parser
 // I think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
 		.TokenRange( "09", 		.Handler(kThingSyx,		fNumber)			)
+		.Tokenz( "\\", 			kThingSyx,				fHint				)
 		.Tokenz( "#!",			kTemporalSyxNoBar,		fShebang			)
 		.Tokenz( "//",			kEndOfLine,				fCommentLine		)
 		.Tokenz( "/*",			kEndOfLine,				fComment			)
@@ -513,22 +514,20 @@ extend Parser
 			if X.isletter: return 2
 
 
+	function fHint (ParseHandler)
+		opt norefcounts
+		rz = .Numbersub(start+1, start)
+		if (rz.func != @num) or rz.HasAny
+			error rz
+		  else
+			|| fs = FastString._Leaf
+			fs.AppendHInt(rz.int(1))
+			rz.name = fs.GetResult(nil)
+			rz.func = @hint
+
+
 	function fNumber (ParseHandler)
 		return .Numbersub(start, start)
-
-
-//	function fBinaryThing (ParseHandler)
-		// so we need to turn \123 into an integer
-		// this needs to be expressed as binary. otherwise... we can't call .int on it properly
-		// as .int on @bnum will just return the integer value.
-		// so... this is doing a lot of work... that is not efficient for binary documents
-		// this makes a format that sucks as jeebox but works well as jbin.
-		// I'm not sure the idea is worth it. What if the file is usually binary?
-		// just use a bin?
-		// what about a parseflag affecting the meaning? TERRIBLE.
-		// its either slow, or it does not exist.
-		
-//		return .Numbersub(start, start+1)
 
 
 	function NumberSub (|int| Start, |int| RealStart, |Message|)
@@ -1250,6 +1249,8 @@ ive been~running #since morning
 
 
 	function Tokenz (|string| s, |int|bits, |ParseHandler| func = nil)
+		// perhaps a slightly better format could allow removing some of these tokensfuncs... whatever
+		// good for now!
 		cpp_part TokenzFn
 		if s contains " "
 			.Tokens( s.words, bits, func )	

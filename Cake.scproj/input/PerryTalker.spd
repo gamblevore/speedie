@@ -50,7 +50,7 @@ datatype StepAction (uint)
 	
 	syntax is (|stepaction| k, |bool|)
 		return self|uint|&k|uint|
-	
+
 
 
 function cakevm.SendStack (|cakestack| stack, |spdprocess| perry)
@@ -60,10 +60,9 @@ function cakevm.SendStack (|cakestack| stack, |spdprocess| perry)
 	perry <~ j
 	if file
 		perry.SendBreaks(file)
-	
-	
-	
-	
+
+
+
 function __PerryView__ (cakevm.CakeChef)
 	description "We just hit a breakpoint! (or crashed)"
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
@@ -345,8 +344,10 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	|| OK = .RenderType(vars, type)
 	j.AddStr(vars)
 
-	OK = .RenderValue(vars, Where, depth == 0) and OK
+	if !.RenderValue(vars, Where, depth == 0)
+		OK = false
 	j.AddStr(vars)
+	j.AddHInt((where|uint64|<<8)>>8)
 	
 	if ok
 		.ExpandVar(j, where|&&byte|[], depth, type)

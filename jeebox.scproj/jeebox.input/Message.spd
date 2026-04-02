@@ -218,7 +218,7 @@ Message is also:
 		fs <~ .Name
 
 	syx Opp (Operator)
-		fs <~ .Name
+		return .Thg__(fs)
 	
 	syx Thg (Thing)
 		fs <~ .Name
@@ -229,15 +229,14 @@ Message is also:
 		fs <~ '\n'
 
 	syx SCnj (Syntactic_conj)
-		fs <~ .Name					// a - b --> b + -a
+		return .Thg__(fs)			// a - b --> b + -a
 
 	syx SThg (Syntactic_Thing)
-		fs <~ .Name
+		return .Thg__(fs)
 
 	syx Num (Number)
-		Opt NoRefCounts
-		fs <~ .Name // 123
-
+		return .Thg__(fs)			// 123
+	
 	syx SStr (Super_String)			// <(`abc`)>
 		fs <~ "<(`"
 		fs <~ .Name
@@ -618,6 +617,16 @@ Message is also:
 		fs <~ "://"
 		|| f = .first
 			fs <~ f.name
+			
+
+	syx HInt (BitInteger)
+		opt norefcounts
+		|| Curr = 0
+		while
+			fs <~ '\\'
+			fs <~ .parsehint(Curr)
+			loop .name > Curr
+	
 	
 	libinternal RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
 		fs <~ b1
@@ -1119,13 +1128,41 @@ Message is also:
 		error (self, "Value out of range")
 	
 	
+	libinternal ParseHInt (|$int| StrStart, |int64|)
+		opt norefcounts
+		|| s = .name
+		|| n = s.Length
+		|| i = StrStart
+		require n or i
+		expect (i|uint| < n|uint|) (self, "Bad Length")
+
+		// size-oriented, not speed. HInt is great at this.
+		// speed-orient needs final-app-specific knowledge
+		
+		|| a = s.Addr
+		|| sh = 0
+		|| v = 0
+		while i < n
+			|uint| b = a[i++]
+			v |= (b&127) << sh
+			sh += 7
+			if b <= 127
+				StrStart = i
+				if b == 0
+					v = -v
+				return v
+		StrStart = int.max
+		error (self, "HInt ended early.")
+	
+	
 	function Int (|int| StrStart = 0, |int64|)
 		opt norefcounts
 		if self
+			|| fn = .func
+			if fn == @hint
+				return .ParseHInt(StrStart)
 			|| f = .First
-			if !f or .func != @unit
-				// we want to allow some way to parse BINARY. For jbin purposes...
-				// makes things smaller
+			if !f or fn != @unit
 				return .name.ParseInt(StrStart, self)
 			
 			if self == "x"
