@@ -518,7 +518,7 @@ class String
 		
 	syntax Access (|ivec2| r, |string|)
 		cpp_part RangeVec
-		inlined
+		opt noinline // I kinda prefer this... makes trimextandpath compile nicer
 		return self[r.x, r.x2]
 
 	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)

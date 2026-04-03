@@ -78,23 +78,31 @@ function AppInfoExtra (|unixprocess| r, |string|)
 	return st.Name
 
 
-function ExtraAppInfo
+function ExtraAppInfo (|faststring| fs)
 	opt norefcounts
+	|| r = .RunCompiledApp
+	if !r or .DebugMode is Finished
+		fs <~ "  --"
+		return
+	
+	|| R0 = r.args[0]
+		fs.AppendRange(r0, R0.NamePart)
+	fs <~ "://"
 	|| o = .appinfo.tag
 	if o isa Message
-		|| l = o.first$
-		VarPrinter <~ "\n"
-		l.MemPrint("Obj", 0, 2)
-		l.MemPrint("Str", 1, 3)
-		l.MemPrint("Img", 2, 3)
+		|message--| l = o.first$
+		l.MemPrint("Obj", 0, 3, fs)
+		l.MemPrint("Str", 1, 3, fs)
+		l.MemPrint("Img", 2, 3, fs)
 		l = o.second
 		if l
-			l.MemPrint("Sck", 0, 3)
-			l.MemPrint("/", 1, 0)
+			l.MemPrint("Sck", 0, 3, fs)
+			l.MemPrint("/", 1, 0, fs)
 
 
 function SetAppInfo
-	|unixprocess--| r = .RunCompiledApp
+	opt norefcounts
+	|| r = .RunCompiledApp
 
 	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (.debugmode isnt finished)
 	|| Paused = .DebugMode is paused
@@ -104,23 +112,32 @@ function SetAppInfo
 			btn.text = ("\02\02" (paused) "\0E")
 		(btn is enabled) = CanDebug and (Paused or Last)
 
+	|| Box = .AppInfo
 	if !CanDebug
 		.editme._ActiveLine = nil
-		.AppInfo.tag = nil
+		Box.tag = nil
 	
-//	.AppInfo.text = "disabled"
-//	return
-	|faststring--| fs = VarPrinter
-	fs <~ .Project.TrimExtAndPath
+	|| fs = VarPrinter
+	fs.Length = 0
+	fs.AppendRange(.project, .project.namepart)
+	if r
+		fs <~ ": "
+		fs <~ r.pid
+	
 	|| extra = .AppInfoExtra(r)
 		fs <~ "\n("
 		fs <~ extra
 		fs <~ ")"
-	  elseif r
-		fs <~ ": "
-		fs <~ r.pid
-	.ExtraAppInfo
-	.appinfo.text = fs
+	
+	|| l = (Box.obj as message).first
+		|| mem = l.first.int + l.second.int + l[2].int
+			fs <~ "\n"
+			mem.StrSize(Fs)
+
+	Box.text = fs
+
+	if .MyStatsMode == 0
+		.ShowLeftStats
 	
 
 function listviewrow.DebugMatch (|listviewrow| New, |int| Ch,  |bool|)
@@ -198,16 +215,15 @@ function ImproveVar (|listviewrow| s)
 
 
 
-function message.MemPrint (|string| s, |int| item, |int| Mode)
+function message.MemPrint (|string| s, |int| item, |int| Mode, |faststring| fs)
 	opt norefcounts
-	|| v = VarPrinter
 	|| ch = self[item]
 		if Mode&1
-			v <~ ", "
-		v <~ s
+			fs <~ (' ', 3)
+		fs <~ s
 		if Mode&2
-			v <~ ": "
-		ch.int.StrSize(v)
+			fs <~ " "
+		ch.int.StrSize(fs)
 
 
 function message.PerryAppendMsg (|string| s, |int| Item)
@@ -250,13 +266,14 @@ function ReloadBreaks
 	j.start(@tmp, "sendbreaks")
 	j.addstr .path
 	.SendMsg(j|&nil||string|, false)
+	j.length = 0
 	
 	
 function UpdateStack (|message| stack)
 	opt norefcounts
 	
-	.appinfo.tag = stack.first // nice info about RAM/Pico :]
 	|| arg = stack.last$
+	.appinfo.tag = stack.first							// nice info about RAM/Pico :]
 
 	// we really want to copy over certain info from the new one
 	// it seems better to simply use the new one, than frankenstein

@@ -14,9 +14,6 @@ class GUIControl (list)
 	|string|					ID
 	|string|					Text
 	|string|					Tooltip
-	|object?|					Tag				// how is this different than .obj??
-												// try making it SET obj... see if it varies somehow?
-												// weird huh?
 	|Drawstyle|					GNormal
 	
 	|TimeFader|					Declutterer
@@ -48,6 +45,14 @@ class GUIControl (list)
 		is Enabled
 		is Drawsfocus
 
+	setter tag (|object|)
+		inlined
+		.obj = value
+		
+	function tag (|object|)
+		inlined
+		return .obj
+	
 	render
 		if !self
 			fs <~ "(nil)"

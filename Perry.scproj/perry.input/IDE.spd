@@ -236,15 +236,14 @@ class PerryIDE (Window)
 		|| fs = .stats init FastString()
 		|| i = .MyStatsMode
 		|| e = .editme
-		|| d = .editme.Document
+		|| d = e.Document
 		if i == 0
-			fs <~ "  --" // :)
-		
+			.ExtraAppInfo(fs)		
 		  elseif i == 1
 			|| t = e.text
 
 			fs <~ "Chars ${t.lengthutf8}   Lines ${t.linecount}"
-			|| msg = .EditMe.ParsedMessage
+			|| msg = e.ParsedMessage
 				|| loc = msg.LinesOfContent
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
 

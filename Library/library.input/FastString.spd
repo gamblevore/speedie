@@ -65,6 +65,10 @@ class FastString {
 	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
 		cpp_wrapper JB_FS_AppendHexData
 
+	function AppendRange (|String| Data, |ivec2| Range)
+		cpp_part AppendIvec2
+		.AppendRange(data, range[0], range[1])
+		
 	function AppendRange (|String| Data, |int| Start, |int| After=int.max)
 		// would be nice if speedie can optimise
 		// fs <~ a[b,c]				// into

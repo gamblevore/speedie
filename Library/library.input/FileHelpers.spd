@@ -89,20 +89,20 @@ extend String
 
 	function TrimExt (|string|)
 		return .TrimExtAndPath(false)
-	
-	function TrimExtKeepPath (|string|)
-		disabled "Just use .trimext"
-		return .TrimExtAndPath(false)
 
-	function TrimExtAndPath (|bool| RemovePath=true, |string|)
-		Description "already does .name, no need for .name.trimext"
+	function NamePart (|bool| RemovePath=true, |ivec2|)
 		|| N	 = .FindTrailingSlashes
 		|| slash = .find('/', n-1, 0) + 1
 		|| dot	 = .find('.', n-1, slash)
 		dot ?= n
 		if !RemovePath
 			slash = 0
-		return self[slash, dot]
+		return (slash, dot)
+		
+	inline TrimExtAndPath (|bool| RemovePath=true, |string|)
+		Description "Extracts the name only. Using .TrimExtAndPath can replace .name.trimext"
+		|| V = .NamePart(RemovePath)
+		return self[V]
 	
 	function ReadAll (|int| lim = 16MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
 		return .file.readall(lim, AllowMissing)
