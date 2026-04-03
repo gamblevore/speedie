@@ -50,9 +50,9 @@ Both `A` and `B` are tested in the same way. But the first looks better to me. I
 
 Lets make a list of the statements:
 
-+ `expect X`  - If X is false, this will create an error, then the function will return nil.
-+ `require X` - If X is false, the function will return nil. No error.
-+ `check X`   - If X is false, this will create an error. But the code will continue to flow.
++ `expect X`  - If X is `false`, this will create an error, then the function will return `false`.
++ `require X` - If X is `false`, the function will return `false`. No error.
++ `check X`   - If X is `false`, this will create an error. But the code will continue to flow.
 + `error`     - This will create an error. Same as `check false`
 
 `expect`, `check` and `error` usually are used by passing an "Error identifier", as well as the object to test. For example:

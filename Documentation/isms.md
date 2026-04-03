@@ -89,9 +89,9 @@ This is quite useful for when you don't want to waste time writing code like `Ru
 Sometimes you want to define that one flag, is the combination of a few others. Heres a quick way to do it:
     
     flags
-        kEnd = (kEndOfLine, kComma, kEndContainer) 
+        kEnd = [kEndOfLine, kComma, kEndContainer]
 
-This defines 3 flags (kEndOfLine, etc), and says that kEnd is equal to all of them combined.
+This defines 3 flags [kEndOfLine, kComma, kEndContainer] and says that kEnd is equal to all of them combined.
 
 Flags and constants can also have a custom datatype set to them.
 
@@ -150,8 +150,9 @@ Speedie uses custom operators a lot. For string appends obviously, but for all s
 We can also set bits on ints even. Like above where I did `x[i] = true`, that is setting an individual bit on an int.
 
 We have ternary expressions too. Useful sometimes.
-
-    || x = (.LeftHand, .RightHand)(BeLeft)
+    
+    function Which (|bool| BeLeft)
+        || x = (.LeftHand (BeLeft) .RightHand)
 
 Strings can be divided and multiplied. Dividing just calls `.split`.
     
