@@ -261,12 +261,9 @@ function @perry.VariableFinder (listview.columnfinder)
 extend perryide {	
 
 function ReloadBreaks
-	opt norefcounts
-	|| j = VarPrinter
-	j.start(@tmp, "sendbreaks")
+	|| j = jbin(@tmp, "sendbreaks")
 	j.addstr .path
-	.SendMsg(j|&nil||string|, false)
-	j.length = 0
+	.SendMsg(j, false)
 	
 	
 function UpdateStack (|message| stack)
