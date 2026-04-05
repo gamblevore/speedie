@@ -332,7 +332,7 @@ function xtype.ActualType (|&nil| ObjAddr, |xtype|)
 
 function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |int| Depth, |xtype?| Type)
 	opt norefcounts
-	j.Enter(@arg, .name)
+	j.Enter(@arg)
 	if obj and type and .Expanded > Depth
 		Type.ExpandSub(j, Obj, Depth)
 	j.exit
