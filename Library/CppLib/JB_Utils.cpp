@@ -85,14 +85,14 @@ u64 JB_MemUsedOther() {
 
 void JB_Free(const void* Arr) {
 	if (Arr) {
-		TotalOtherBytes -= (JB_msize(Arr)+16);
+		TotalOtherBytes -= JB_msize(Arr);
 		free((void*)Arr);
     }
 }
 
 void JB_FreeString(const void* Arr) {
 	if (Arr) {
-		TotalStringBytes -= (JB_msize(Arr)+16);
+		TotalStringBytes -= JB_msize(Arr);
 		free((void*)Arr);
     }
 }
