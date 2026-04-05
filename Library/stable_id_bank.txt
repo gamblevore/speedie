@@ -1037,6 +1037,7 @@ JB_FS_AppendInfoNum
 JB_FS_AppendInteger
 JB_FS_AppendInteger64
 JB_FS_AppendIntegerAsText
+JB_FS_AppendIvec2
 JB_FS_AppendJoin
 JB_FS_AppendLocalTime
 JB_FS_AppendLower
@@ -1642,6 +1643,7 @@ JB_Str_MidEquals
 JB_Str_Moat
 JB_Str_MultiReplaceAll
 JB_Str_Name
+JB_Str_NamePart
 JB_Str_NeatenPath
 JB_Str_New
 JB_Str_NextField
@@ -1659,6 +1661,7 @@ JB_Str_OutByte
 JB_Str_OutputStream
 JB_Str_Parent
 JB_Str_Parse
+JB_Str_ParseHInt
 JB_Str_ParseJSON
 JB_Str_ParseJbin
 JB_Str_PathDir
@@ -1670,6 +1673,7 @@ JB_Str_PrintError
 JB_Str_PrintLine
 JB_Str_PrintlineColor
 JB_Str_Range
+JB_Str_RangeVec
 JB_Str_ReadAll
 JB_Str_RegularPath
 JB_Str_RemoveProp
@@ -1703,7 +1707,6 @@ JB_Str_TextIntegerValid
 JB_Str_TitleCase
 JB_Str_Trim
 JB_Str_TrimExt
-JB_Str_TrimExtAndPath
 JB_Str_TrimFirst
 JB_Str_TrimMiddle
 JB_Str_TrimSlashes
