@@ -624,7 +624,7 @@ Message is also:
 		|| Curr = 0
 		while
 			fs <~ '\\'
-			fs <~ .parsehint(Curr)
+			fs <~ .name.parsehint(Curr, self)
 			loop .name > Curr
 	
 	
@@ -1128,20 +1128,19 @@ Message is also:
 		error (self, "Value out of range")
 	
 	
-	libinternal ParseHInt (|$int| StrStart, |int64|)
+	function string.ParseHInt (|$int| StrStart, |message| Error=nil, |int64|)
 		opt norefcounts
-		|| s = .name
-		|| n = s.Length
+		|| n = .Length
 		|| i = StrStart
 		require n or i
-		expect (i|uint| < n|uint|) (self, "Bad Length")
+		expect (i|uint| < n|uint|) (Error, "Bad Length")
 
 		// size-oriented, not speed. HInt is great at this.
 		// speed-orient needs final-app-specific knowledge
 		
-		|| a = s.Addr
+		|| a = .Addr
 		|| sh = 0
-		|| v = 0
+		|int64| v
 		while i < n
 			|uint| b = a[i++]
 			v |= (b&127) << sh
@@ -1152,7 +1151,7 @@ Message is also:
 					v = -v
 				return v
 		StrStart = int.max
-		error (self, "HInt ended early.")
+		error (Error, "HInt ended early.")
 	
 	
 	function Int (|int| StrStart = 0, |int64|)
@@ -1160,7 +1159,7 @@ Message is also:
 		if self
 			|| fn = .func
 			if fn == @hint
-				return .ParseHInt(StrStart)
+				return .name.ParseHInt(StrStart, self)
 			|| f = .First
 			if !f or fn != @unit
 				expect ((fn == @num) or fn.IsString or (strstart > 0)) (self)   // parsing p123, from index 1
