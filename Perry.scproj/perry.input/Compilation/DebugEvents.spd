@@ -31,7 +31,8 @@ function perryide.WantsRun (|bool|)
 	if .RunCompiledApp
 		return DebugStepRun(self, -1)
 	return .start
-	
+
+
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
 	// keys.movement is almost ok... but it uses ctrl for down... sigh.
@@ -195,7 +196,6 @@ function PerryIDE.ClearRun
 	.RunCompiledApp = nil
 	.editme._ActiveLine = nil
 	.stack.clear
-//	.Variables.clear
 	
 		
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)

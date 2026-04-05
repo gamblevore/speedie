@@ -9,9 +9,7 @@ function CakeTalk (|SpdProcess| Cake)
 		.DebugMode &= ~compilemode.paused
 		.SetAppInfo		
 	
-	|| msg = cake.Get$ // getmsg
-
-//	|listviewrow--| c = 
+	|| msg = cake.Get$							// getmsg
 	.LogOneThing(msg, "", .LogCake)
 		
 	if msg ~= "run"
@@ -138,62 +136,74 @@ function SetAppInfo
 
 	if .MyStatsMode == 0
 		.ShowLeftStats
+
+
+function message.NameCheck (|message| other, |int| index=0, |bool|)
+	opt norefcounts
+	self = self[index]
+	other = other[index]
+	return .ShallowEquals(other)
+
+
+function message.IsSameItem (|message| row, |int| Depth, |bool|)
+	opt norefcounts
+	if .NameCheck(row)
+		|| index = 2
+		if depth > 0
+			index = 1
+		return .NameCheck(row, index)
+
+
+function message.CopyNames (|message| Row)
+	opt norefcounts
+	.name = row.name
+	self = .first
+	row = row.first
+	while self and row
+		.name = row.name
+		self++
+		row++
+	if self
+		.RemoveAfter
+		.Remove
+
+
+function message.CopyDebugData (|message| InputRow, |int| Depth)
+	opt norefcounts
+	.CopyNames(Inputrow)
+	|| InputArg = InputRow.last
+	if InputArg == @arg
+		.givearg.StitchAndFixup(InputArg, Depth)
+		
 	
 
-function listviewrow.DebugMatch (|listviewrow| New, |int| Ch,  |bool|)
+function message.StitchAndFixup (|message| NewList, |int| Depth)
 	opt norefcounts
-	return New[Ch].ShallowEquals(self[Ch])
+	|| O = .last
+	while (|| N = NewList.Last)
+		if !o
+			.first = n
+		  elseif !o.IsSameItem(n, Depth)
+			o.next = n
+		  else
+			o.CopyDebugData(n, Depth+1)
+			n.remove
+			o--
+
+	o.RemoveBefore
+	o.remove
 
 
-function listviewrow.DebugUpdate (|listviewrow| N, |bool|)
-	opt norefcounts
-	for i in 3
-		require .DebugMatch(N,i)
-
-	|| O3 = self[3]
-	|| N3 = N[3]
-	if O3 and N3
-		O3.name = N3.name // update value
-		return true
-
-ignore
-	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" 146
-		fs "/usr/local/speedie/Examples/hello_world.spd" 89 "FastString" "\"Start:\\n\""
-
-
-function listview.DebugFixup (|listviewrow| NewList)
-//	.ListSource.DebugFixup(newlist)
-	.ListSource = NewList
-	.listsource.name = "vars"
-
-
-// figure out the rest later. we need to deal with inserted/removed items
-// or maybe not? the position wont match up???
-
-function listviewrow.DebugFixup (|listviewrow| NewList)
-	opt norefcounts
-/	|| O = .first
-	|| N = NewList.first
-	while O and N
-		if !O.DebugUpdate(N)
-			O.ReplaceWith(N)
-		|| argO = O.Last
-		|| argN = N.Last
-		if argO == @arg and argn == @arg
-			
-		O++
-		N++
-	
-	// we also want to try to keep older items... so replacing messages with the updated content...
-	// but do that later.
-
-
-function ImproveVar (|listviewrow| s)
+function ImproveVar (|listviewrow| s, |int| Depth=0)
 	opt norefcounts
 	|| thg = s[4]
 	|| bad = (thg == @thg and "bad")
 		Notifications <~ "Something wrong with var: " + s.name
 	(s is error) = bad
+	if depth > 0
+		|| s1 = s.second
+			s1.name = s.name
+			s1.func = @thg
 	
 	|| fs = VarPrinter
 	fs.Length = 0
@@ -209,9 +219,7 @@ function ImproveVar (|listviewrow| s)
 	|| Fields = s.Last
 	if fields == @arg
 		for prop.fast in Fields
-			.ImproveVar(prop)
-//		A "/usr/local/speedie/Examples/hello_world.spd" 199 "int" "1"
-//		_fsf0 "/usr/local/speedie/Examples/hello_world.spd" 211 "FastString" "\"\""
+			.ImproveVar(prop, depth+1)
 
 
 
@@ -221,7 +229,7 @@ function message.MemPrint (|string| s, |int| item, |int| Mode, |faststring| fs)
 		if Mode&1
 			fs <~ (' ', 3)
 		fs <~ s
-		if Mode&2
+		if Mode & 2
 			fs <~ " "
 		ch.int.StrSize(fs)
 
@@ -246,6 +254,7 @@ function listviewrow.PerryCopyVar (|string|)
 function @perry.VariableFinder (listview.columnfinder)
 	opt norefcounts
 	|| upon = self
+	if keys.Shift
 	if Column
 		if column == -2
 			return .PerryCopyVar
@@ -258,24 +267,19 @@ function @perry.VariableFinder (listview.columnfinder)
 
 
 
-extend perryide {	
-
-function ReloadBreaks
+function perryide.ReloadBreaks
 	|| j = jbin(@tmp, "sendbreaks")
 	j.addstr .path
 	.SendMsg(j, false)
 	
 	
-function UpdateStack (|message| stack)
+function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
 	|| arg = stack.last$
-	.appinfo.tag = stack.first							// nice info about RAM/Pico :]
+	.appinfo.tag = stack.first		// nice info about RAM/Pico :]
 
-	// we really want to copy over certain info from the new one
-	// it seems better to simply use the new one, than frankenstein
-	
-	.stack.listsource = arg
+	|| StackSrc = .stack.listsource
 	
 	for m in Arg
 		|| l = m.Last
@@ -283,12 +287,15 @@ function UpdateStack (|message| stack)
 			for s in l
 				.ImproveVar(s)
 			exit
+
+	StackSrc.StitchAndFixup(arg, 0)
+	StackSrc.name = "vars"
 	
 
 	|| Break = stack == "break"
-		|| f = arg.first
-		if !.stack.FirstSelected
-			.stack.ExpandRow(F, true)
+		|| f = .stack.liststart
+		if f and !.stack.FirstSelected
+			(f is expanded)
 		.ClickedStack(F, true)
 	  else
 		.EditMe._ActiveLine = nil
@@ -298,19 +305,6 @@ function UpdateStack (|message| stack)
 		(M is paused) = Break
 		.DebugMode = M
 	.SetAppInfo
-}
 
 
-
-ignore {
-
-break ((\417792, \15696, \3680), (\1, \1))
-	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \139
-
-break ((\458752, \19776, \3680), (\1, \1))
-	+'RecursiveHello(2)' "/usr/local/speedie/Examples/hello_world.spd" \466 // vars don't need relogging.
-																			// we need the func's original pos also.
-	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \234
-
-}
 

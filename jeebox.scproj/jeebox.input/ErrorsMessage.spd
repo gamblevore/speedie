@@ -45,9 +45,19 @@ function Message.OriginalParseData (|string|)
 extend_module Error
 	function CantParseNum (|Message| Where, |string| num, |int| Pos, |bool| Overflow)
 		visible // for lib
-		|| str = "Numeric overflow parsing number" 
-		if !Overflow
-			Str = "Can’t parse number. Found: '" + num[pos].render + "' in: " + num.Preview(32)
-		nil|errorreceiver| <~ error(where, str)
+		
+		|| fs = FastString()
+		
+		if Overflow
+			fs <~ "Numeric overflow parsing number"
+		  else
+			fs <~ "Can’t parse number. Found: '"
+			fs.AppendRange(num, pos, 1)
+			fs <~ "' in: "
+			fs <~ num.Preview(32)
+		
+		|string--| str = fs.getresult
+		|error--| err = error(where, str)
+		nil|errorreceiver| <~ err
 
 
