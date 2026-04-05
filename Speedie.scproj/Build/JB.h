@@ -2207,6 +2207,8 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ErrorSeverity_Warning ((ErrorSeverity)2)
 #define kJB__ExitCode_EINPROGRESS ((int)36)
 #define kJB__FailableInt_Fail ((int)2147483648)
+#define kJB__FailableInt_Max ((int)2147483647)
+#define kJB__FailableInt_Min ((int)2147483649)
 #define kSC__FatNopMode_CanClose ((int)1)
 #define kSC__FatNopMode_Hard ((int)0)
 #define kSC__FatNopMode_Soft ((int)2)
@@ -7285,6 +7287,8 @@ void SC_FS_AppendLibGlob(FastString* Self, SCDecl* D);
 
 void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S, uint /*byte*/ Quote);
 
+void JB_FS_AppendIvec2(FastString* Self, JB_String* Data, ivec2 Range);
+
 void SC_FS_AppendVoid(FastString* Self, JB_String* S, uint /*byte*/ Extra);
 
 void SC_FS_AppendWidth(FastString* Self, JB_String* S, int Width);
@@ -7857,6 +7861,8 @@ Message* JB_Str_Msg(JB_String* Self);
 
 JB_String* JB_Str_Name(JB_String* Self);
 
+ivec2 JB_Str_NamePart(JB_String* Self, bool RemovePath);
+
 JB_String* JB_Str_NextField(JB_String* Self, uint /*byte*/ Sep, int& Begin);
 
 JB_String* SC_Str_NicerClassName(JB_String* Self);
@@ -7902,6 +7908,8 @@ Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool AllowDecomp);
 Message* SC_Str_ParseClean(JB_String* Self);
 
 Message* SC_Str_ParseCleanWipe(JB_String* Self);
+
+int64 JB_Str_ParseHInt(JB_String* Self, int& StrStart, Message* Error);
 
 Message* JB_Str_ParseJbin(JB_String* Self, int64 Max);
 
@@ -9056,8 +9064,6 @@ Message* SC_Msg_OrigMsg(Message* Self);
 JB_String* SC_Msg_OrigRender(Message* Self, FastString* Fs_in);
 
 FatASM* SC_Msg_PADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
-
-int64 JB_Msg_ParseHInt(Message* Self, int& StrStart);
 
 Message* SC_Msg_ParseShaderSub(Message* Self);
 
