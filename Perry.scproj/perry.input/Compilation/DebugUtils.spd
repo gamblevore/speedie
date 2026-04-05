@@ -11,8 +11,8 @@ function CakeTalk (|SpdProcess| Cake)
 	
 	|| msg = cake.Get$ // getmsg
 
-	|listviewrow--| c = .LogCake
-		.LogOneThing(msg, "", C)
+//	|listviewrow--| c = 
+	.LogOneThing(msg, "", .LogCake)
 		
 	if msg ~= "run"
 		.DelayedRun = date.now
@@ -301,4 +301,16 @@ function UpdateStack (|message| stack)
 }
 
 
+
+ignore {
+
+break ((\417792, \15696, \3680), (\1, \1))
+	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \139
+
+break ((\458752, \19776, \3680), (\1, \1))
+	+'RecursiveHello(2)' "/usr/local/speedie/Examples/hello_world.spd" \466 // vars don't need relogging.
+																			// we need the func's original pos also.
+	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \234
+
+}
 

@@ -8,6 +8,9 @@ extend PerryIDE
 		.Project			= project
 		.InConstructor		= true
 		.CanAskingAboutMissing = true
+		.LogComms			= Message()
+		.LogActions			= Message()
+		.LogCake			= Message()
 		.RecentFiles 		= message()
 		.id					= "IDE"
 		.Debugger			= guicontrol(self)
@@ -619,21 +622,23 @@ extend PerryIDE
 		g.gnormal.seps.alpha *= 0.8
 		
 		g.OnKeyDown = LogAreaKeys
-		.LogComms = .AddBaseLog("-- speedie comms --")
-		.LogActions = .AddBaseLog("-- perry actions --")
-		.LogCake = .AddBaseLog("-- cake actions --")
+		.AddBaseLog("-- speedie comms --", .logcomms)
+		.AddBaseLog("-- perry actions --", .logactions)
+		.AddBaseLog("-- cake actions --", .logcake)
 	
 	
-	function AddBaseLog (|string| s, |listviewrow|)
-		rz = @arg + s
-		.CommsLogList.listsource <~ rz
-		(rz is expanded)
-		(rz is aligncenter)
+	function AddBaseLog (|string| s, |listviewrow| list)
+		list.name = s
+		.CommsLogList.listsource <~ list
+		(list is expanded)
+		(list is aligncenter)
 
 
 	function LogOneThing (|message| msg, |string| type, |listviewrow| m)
-		opt norefcounts
-		m <~ @emb + (type + msg.render)
+		|| fs = FastString()
+		fs <~ type
+		msg.Render(fs)
+		m <~ @emb + fs.GetResult
 		m.position++ 
 		while m.position > 300
 			m.first.remove
@@ -644,11 +649,11 @@ extend PerryIDE
 	
 	function LogOneComm (|message| msg, |string| type="")
 		opt norefcounts
-		.LogOneThing(msg, type, .LogComms!)
+		.LogOneThing(msg, type, .LogComms)
 
 
 	function LogOneAction (|string| msg, |string| type="")
-		.LogOneThing(@emb + msg, type, .LogActions$)
+		.LogOneThing(@emb + msg, type, .LogActions)
 
 
 	function ErrorLogInit (|listview| lv, |string| s)

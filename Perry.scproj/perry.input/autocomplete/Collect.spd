@@ -23,7 +23,9 @@ function PerryIDE.MaybeSendMessage (|string| cmd, |message| where,  |string| nam
 function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |date|)
 	|| msg = .BuildCmd(cmd, where, name, reason)		#require
 
-	|| CmdStr = msg.RenderJbin
+	|| CmdStr = msg.RenderJbin	// why are we rendering this? then sending the feedbackmsg?
+								// i think cos of the date... to avoid sending duplicate msgs
+
 	if .CanSend(Cmdstr)
 		rz = .SendFeedbackMsg(msg)
 	.LastCmdStr = CmdStr
@@ -59,8 +61,8 @@ function PerryIDE.DateWrap (|message| msg, |date| d, |message|)
 
 
 function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
-	require msg and .projIsSpeedieCode
-	|| fb = .FeedbackInit(.feedback)			#require
+	require msg and .ProjIsSpeedieCode
+	|| fb = .FeedbackInit(.feedback)					#require
 	.feedback = fb
 	|| d = gui.framestart
 	|| record = .DateWrap(msg, d)
@@ -86,6 +88,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		p <~ "--noisy"
 	p <~ "--check"
 	
+	SpdLibAlreadyInUse = SpdLibAlreadyInUse
 	target debug and !perryexec and xcode
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true

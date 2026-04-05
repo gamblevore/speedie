@@ -50,9 +50,9 @@ class PerryIDE (Window)
 	|message?|					LastExtraInfo
 	|StretchControl|			ProductSep
 	|StretchControl|			FileSep
-	|listviewrow?|				LogComms
-	|listviewrow?|				LogActions
-	|listviewrow?|				LogCake
+	|listviewrow|				LogComms
+	|listviewrow|				LogActions
+	|listviewrow|				LogCake
 	|menu|						AutoComplete
 	|ListView|					ErrorList
 	|listview|					CommsLogList
@@ -224,9 +224,9 @@ class PerryIDE (Window)
 	
 	function MyStatsMode (|int|)
 		rz = perryide.StatsMode|int|
-		if rz > 3
-			rz = 0
 		if rz < 0
+			rz = 3
+		if rz > 3
 			rz = 0
 		perryide.StatsMode = rz
 	
@@ -298,19 +298,18 @@ class PerryIDE (Window)
 		return fs
 
 
-	function faststring.strsize (|string| name, |int64| S)
+	function faststring.StrSize (|string| name, |int64| S)
 		self <~ name
 		s.StrSize(self)
 	
 	
 	function NextProjInfo
-		.ShowLeftStats(perryide.StatsMode+1)
+		perryide.StatsMode = perryide.StatsMode - keys.Shift.dir
+		.ShowLeftStats
 
 
-	function ShowLeftStats (|int| i = -1)
+	function ShowLeftStats
 		opt norefcounts
-		if i >= 0
-			perryide.StatsMode = i
 		.ProjectInfo.text = .InfoStatus	
 
 
@@ -645,7 +644,7 @@ class PerryIDE (Window)
 
 
 	module
-		|byte|						StatsMode
+		|int8|						StatsMode
 		
 		function New (|file| path, |perryide!|)
 			rz = PerryIDE(path, false)

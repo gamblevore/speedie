@@ -222,7 +222,7 @@ function Message.Clean (|bool| erl = false)
 			QEscape = nil
 		
 		|| f = curr.func
-		if (f != @Back and @Str and @sstr and @bin)
+		if (f != @Back and @Str and @sstr and @bin and @hint)
 			expect !(curr.name contains "\A0") (curr, "Node contains option-space")
 
 		if (f == @arg)
