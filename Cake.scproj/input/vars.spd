@@ -1,14 +1,14 @@
 
 
 class XVar (list)
-	|Wierdness[5]|	Weirdness // pointers, references, carrays
-	|int|			CodeEnd
-	|SourceLocation|SrcMap
-	|byte|			ViewStrength
-	|byte|			Expanded
-	|uint16|		Reg
-	|DataTypeCode|	DataType
-	|string|		Name
+	|Wierdness[5]|		Weirdness // pointers, references, carrays
+	|int|				CodeEnd
+	|SourceLocation|	SrcMap
+	|byte|				ViewStrength
+	|byte|				Expanded
+	|uint16|			Reg
+	|DataTypeCode|		DataType
+	|string|			Name
 	
 	contains xvar
 	
@@ -49,6 +49,7 @@ class XVar (list)
 	
 	module
 		|| Printer = faststring()
+		|| Expansion = message()
 	
 	
 	render // for debug
@@ -87,13 +88,14 @@ class XVar (list)
 		return .DataValue(Where, value)
 	
 	
-	function RenderValue (|faststring| fs, |&nil| Where, |bool|)
+	function RenderValue (|faststring| fs, |&nil| Where, |$int| RefCount,  |bool|)
 		opt norefcounts
 		if .Reg
 			require fs.TestMem(Where, 16, "BadStack")		// we still need to check for readability, though!
+
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
-			return .RenderObject(fs, Where)
+			return .RenderObject(fs, Where, RefCount)
 		return .RenderData(fs, Where)
 
 
@@ -119,8 +121,8 @@ class XVar (list)
 		if reg0
 			if color
 				fs <~ terminalcolor.red
-			|| reg = reg0 + .reg
-			.RenderValue(fs, reg)
+			|| RefCount = 0
+			.RenderValue(fs, reg0 + .reg, RefCount)
 			if color
 				fs <~ terminalcolor.normal
 	
@@ -216,17 +218,19 @@ class XVar (list)
 //		reg[] = NewObj
 	
 
-	function RenderObject (|faststring| fs, |!&nil| Reg, |bool|)
+	function RenderObject (|faststring| fs, |!&nil| Reg, |$int| RefCount,  |bool|)
 		opt norefcounts
 		require .NilOK(fs, reg)
 		|| obj = reg|&object|[]
 		if !obj
 			fs <~ "(nil)"
 			return true
-
-		require fs.TestObj(obj)									// check object is readable and sane
 		
-		if obj isa string or obj isa faststring
+		require fs.TestObj(obj)									// check object is readable and sane
+
+		RefCount = obj.RefCount
+		
+		if obj isa string or faststring
 			|| str = obj|&nil||string|
 			return .DisplayString(fs, str.addr, str.length)
 
@@ -241,9 +245,7 @@ class XVar (list)
 			return true
 
 		fs <~ "0x"
-		fs.AppendHex(obj|int64|, 8)
-		fs <~ " * "
-		fs <~ obj.refcount
+		fs.AppendHex(obj|int64|, 2)
 		return true
 	
 	

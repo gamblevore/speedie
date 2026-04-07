@@ -25,6 +25,7 @@ dispatch DebuggerActions (PerryResponse)
 	stepover:		return .TempBreak(.StepOver)
 	
 	edit			EditAction
+	expansions		ExpandAction
 	brkadd			BreakAction
 	brkrem			BreakRemoveAction
 	sendbreaks		SendBreakAction
@@ -178,8 +179,15 @@ function CakeVM.GetVar (|xvar| Var, |message| Name, |xvar|)
 			return v
 
 
+function ExpandAction (PerryResponse)
+	opt norefcounts
+	XVar.Expansion = m
+	return StepAction.DoNothing
+
+
 function EditAction (PerryResponse)
-	opt norefcounts	|| path = m.second
+	opt norefcounts
+	|| path = m.second
 	|| n = path.int
 	while n > 0
 		n--
@@ -320,6 +328,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
 
+	
 	|| vars = debugger.VariablePrinter!
 	{
 	|| Where = debugger.SrcMap(index)
@@ -333,7 +342,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	
 	vars.Length = 0
 	j.AddStr(rz)
-	j.AddhInt(where.Position)
+	j.AddHint(where.Position)
 	j.AddHint(fn.Position)
 	}
 	
@@ -395,13 +404,17 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	|| vars = debugger.VariablePrinter!
 	|| Type = .ObjType
 		Type = type.ActualType(where)
+	
 	|| OK = .RenderType(vars, type)
 	j.AddStr(vars)
 	
-	if !.RenderValue(vars, Where)
+	|| RefCount = int.min
+	if !.RenderValue(vars, Where, RefCount)
 		OK = false
 	j.AddStr(vars)
 	j.AddHint(.reg)
+	if RefCount != int.min
+		j.AddHint(refcount)
 
 	// Don't send the 'Where' anymore. We use paths.
 	if ok
