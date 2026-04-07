@@ -3499,7 +3499,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[450]);
-	JB_FS_AppendInt32(_fsf0, (2026040513));
+	JB_FS_AppendInt32(_fsf0, (2026040717));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10525,7 +10525,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026040513));
+	JB_FS_AppendInt32(_fsf0, (2026040717));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -25876,11 +25876,10 @@ ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int A
 	if (!Rz) {
 		Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_Const, true);
 	}
-	FatASM* Last = SC_Pac_LastWith0(Self);
-	if ((Last == RealStart) and SC_FAT_IsFunc(Last)) {
+	if (SC_Pac_Curr(Self) > RealStart) {
 		Message* P = ((Message*)JB_Ring_Parent(Prms));
-		Last->Msg = P;
-		Last->FatMap = SC_Msg_SrcMap(P);
+		RealStart->Msg = P;
+		RealStart->FatMap = SC_Msg_SrcMap(P);
 	}
 	return Rz;
 }
@@ -35765,7 +35764,7 @@ Message* JB_Msg_AccessAdd(Message* Self, JB_String* Key) {
 		Message* Tmp = ((Message*)JB_Ring_First(L));
 		while (Tmp) {
 			Message* _Nf1 = (((Message*)JB_Ring_NextSib(Tmp)));
-			if ((JB_Msg_SyntaxEquals(Tmp, Key, true))) {
+			if (JB_Msg_SyntaxEquals(Tmp, Key, true)) {
 				Message* TL = ((Message*)JB_Ring_Last(Tmp));
 				if (TL) {
 					JB_Tree_Remove(TL);
@@ -50813,28 +50812,24 @@ void JB_Err_UpgradeWithNode(JB_Error* Self) {
 
 void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos, bool Overflow) {
 	//visible;
-	JB_String* Str = JB_LUB[693];
-	JB_Incr(Str);
-	if (!Overflow) {
-		JB_String* _tmPf1 = JB_byte_Render(JB_Str_ByteValue(Num, Pos), nil);
-		JB_Incr(_tmPf1);
-		JB_String* _tmPf3 = JB_Str_Preview(Num, 32);
-		JB_Incr(_tmPf3);
-		JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[695], _tmPf3);
-		JB_Incr(_tmPf2);
-		JB_Decr(_tmPf3);
-		JB_String* _tmPf0 = JB_Str_OperatorPlus(_tmPf1, _tmPf2);
+	FastString* Fs = JB_FS_Constructor(nil);
+	JB_Incr(Fs);
+	if (Overflow) {
+		JB_FS_AppendString(Fs, JB_LUB[693]);
+	}
+	 else {
+		JB_FS_AppendString(Fs, JB_LUB[694]);
+		JB_FS_AppendRange(Fs, Num, Pos, 1);
+		JB_FS_AppendString(Fs, JB_LUB[695]);
+		JB_String* _tmPf0 = JB_Str_Preview(Num, 32);
 		JB_Incr(_tmPf0);
-		JB_Decr(_tmPf1);
-		JB_Decr(_tmPf2);
-		JB_SetRef(Str, JB_Str_OperatorPlus(JB_LUB[694], _tmPf0));
+		JB_FS_AppendString(Fs, _tmPf0);
 		JB_Decr(_tmPf0);
 	}
-	JB_Error* _tmPf4 = JB_Err_Constructor(nil, Where, Str, kJB__ErrorSeverity_Error, JB_LUB[0]);
-	JB_Incr(_tmPf4);
-	JB_Decr(Str);
-	JB_Rec_AppendErr(((JB_ErrorReceiver*)nil), _tmPf4);
-	JB_Decr(_tmPf4);
+	JB_String* Str = JB_FS_GetResult(Fs);
+	JB_Decr(Fs);
+	JB_Error* Err = JB_Err_Constructor(nil, Where, Str, kJB__ErrorSeverity_Error, JB_LUB[0]);
+	JB_Rec_AppendErr(((JB_ErrorReceiver*)nil), Err);
 }
 
 int JB_Err__Init_() {

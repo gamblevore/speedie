@@ -323,7 +323,6 @@ GUI_LV_EditRowCol
 GUI_LV_EnableDrag
 GUI_LV_ExpandParents
 GUI_LV_ExpandRow
-GUI_LV_ExtractSelected
 GUI_LV_FirstSelected
 GUI_LV_FocusOn
 GUI_LV_Gesture
@@ -360,7 +359,6 @@ GUI_LV_SelectFirst
 GUI_LV_SelectMove
 GUI_LV_SelectNone
 GUI_LV_SelectShift
-GUI_LV_SelectableCount
 GUI_LV_SetColumnsMsg
 GUI_LV_Show
 GUI_LV_StopFilter
@@ -446,8 +444,8 @@ GUI_Ray_RotationSet
 GUI_Ray_ViewMat
 GUI_Ray__DistanceSorter
 GUI_Ray__New
-GUI_Row_Cell
-GUI_Row_CellSet
+GUI_Row_AsCell
+GUI_Row_CellValueSet
 GUI_Row_Constructor
 GUI_Row_ConstructorNamed
 GUI_Row_FileSort
@@ -667,7 +665,6 @@ GUI_Win_DrawBackground
 GUI_Win_FrameStep
 GUI_Win_Gesture
 GUI_Win_Inline
-GUI_Win_InlineEditor
 GUI_Win_KeyDown
 GUI_Win_MouseXY
 GUI_Win_OpenedMenu
@@ -700,7 +697,6 @@ GUI_csiz_Size
 GUI_csiz_SyntaxAccess
 GUI_ctrl_AppForeGroundChange
 GUI_ctrl_BlockSize
-GUI_ctrl_CanSearch
 GUI_ctrl_ClearFocus
 GUI_ctrl_Constructor
 GUI_ctrl_ContainsMouse
@@ -727,7 +723,6 @@ GUI_ctrl_MouseMove
 GUI_ctrl_MouseUp
 GUI_ctrl_MouseXY
 GUI_ctrl_OpenSearch
-GUI_ctrl_OpenSearchSub
 GUI_ctrl_OuterFocus
 GUI_ctrl_PasteFromClipboard
 GUI_ctrl_PostLoad
@@ -792,14 +787,14 @@ GUI_docview_Constructor
 GUI_docview_Destructor
 GUI_docview_Find
 GUI_font__Small
-GUI_inl_AcceptSearch
 GUI_inl_Clear
 GUI_inl_Constructor
 GUI_inl_Destructor
 GUI_inl_Edit
 GUI_inl_FinishAndClear
-GUI_inl_Init
-GUI_inl_NextSearch
+GUI_inl_GetListValue
+GUI_inl_SyntaxIs
+GUI_inl_SyntaxIsSet
 GUI_inl_UpdateSearch
 GUI_ivec2_SDLXY
 GUI_ivec4_DistToCorner
@@ -1742,6 +1737,7 @@ JB_Syx_LongName
 JB_Syx_Name
 JB_Syx_NilCheck
 JB_Syx__Func
+JB_Syx__FuncCute
 JB_Syx__StdNew
 JB_TC_BitCount
 JB_TC_NumericCount
@@ -1782,6 +1778,7 @@ JB_Tree_FlatPrev
 JB_Tree_Flatten
 JB_Tree_FwdDist
 JB_Tree_Get
+JB_Tree_Index
 JB_Tree_IsOnlyChild
 JB_Tree_Loop
 JB_Tree_Move
