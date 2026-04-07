@@ -42,7 +42,7 @@ extend PerryIDE
 		if key is k
 			return .ClearIDE(key)
 		if key is i
-			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
+			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.ascell)
 			return true
 		if key is comma
 			return ClickedPrevNext(.goprev)

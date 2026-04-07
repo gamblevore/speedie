@@ -17,7 +17,7 @@
 
 
 
-prototype PerryResponse (|CakeVM| self, |message| m, |uint| State,  |StepAction|)
+prototype PerryResponse (|CakeVM| self, |message| m, |CakeStack| Stack, |uint| State,  |StepAction|)
 dispatch DebuggerActions (PerryResponse)
 	run				RunAction
 	stepin:			return .TempBreak(.StepIn)
@@ -77,13 +77,11 @@ function __PerryView__ (cakevm.CakeChef)
 		if !p.IsOpen
 			app.Quit
 		|| m = p.Get(5.0)
-		if !m: continue
-
-		|| Action = .respond(m)
-		if Action is SendVars
-			.SendStack(stack, p, "stack")
-		if !ErrorCode and .GoRun(p, stopped, action)
-			exit
+			|| Action = .respond(m, stack)
+			if Action is SendVars
+				.SendStack(stack, p, "stack")
+			if !ErrorCode and .GoRun(p, stopped, action)
+				exit
 
 	p <~ "run"
 
@@ -153,15 +151,61 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 	j.Length = 0
 	
 
-function debugger.file (|message| m, |filewithdata|)
+
+function debugger.file (|message| m, |FileWithData|)
 	opt norefcounts
 	return .FileMap[m.firstname]						#expect (m, "Can't find file")	
 
 
+
+function CakeVM.GetReg (|cakestack| Stack, |message| Name, |xvar|)
+	opt norefcounts
+	|| index = .Index(Stack.Code)$
+	|| fn = spdtable.Find(index)$
+	index -= fn.Position
+	
+	|| Locals = fn.obj|&nil||[xvar]|
+		for v in Locals
+			if v contains index
+				if Name ~= v.Name
+					return v
+
+
+function CakeVM.GetVar (|xvar| Var, |message| Name, |xvar|)
+	opt norefcounts
+	for v.fast in var
+		if Name ~= v.Name
+			return v
+
+
 function EditAction (PerryResponse)
+	opt norefcounts	|| path = m.second
+	|| n = path.int
+	while n > 0
+		n--
+		stack = .prev(stack)$
+	
+	path++
+	
+	|| v = .GetReg(stack, path)$
+	|| Where = stack + v
+	
+	while v
+		xvar.Printer.Length = 0
+		n++
+		path++
+		if !path
+			if !v.SetValue(Where, m.firstname)
+				error "Invalid address"
+			return StepAction.SendVars
+		where = where|&&byte|[]
+		v = .GetVar(v, path)
+
+	xvar.Printer.Length = 0
 	return StepAction.DoNothing
 
-	
+
+
 function BreakAction (PerryResponse)
 	opt norefcounts
 	|| F = debugger.file(m)
@@ -172,7 +216,7 @@ function BreakAction (PerryResponse)
 
 
 function BreakRemoveAction (perryresponse)
-	return BreakAction(self, m, state xor 1)
+	return BreakAction(self, m, stack, state xor 1)
 
 
 function cakevm.ClearTempBreak (|cakestack| stack)
@@ -203,11 +247,11 @@ function cakevm.StepOut (|&uint|)
 function cakevm.StepOver (|&uint|)
 
 
-function cakevm.Respond (|message| m, |StepAction|)
+function cakevm.Respond (|message| m, |cakestack| stack, |StepAction|)
 	opt norefcounts
 	if m == @tmp
 		|| fn = DebuggerActions[m.name]
-			return (fn[])(cake.vm, m, 1)
+			return (fn[])(self, m, stack, 1)
 	printerror m.Name
 	return StepAction.DoNothing
 
@@ -251,6 +295,7 @@ function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j, |filewit
 		Stack = .prev(stack)
 	
 
+
 function cakevm.CheckStack (|cakestack| stack, |string?|)
 	if !Memory.Test(Stack, 16):				return "StackCorrupt!"
 	if stack < .basestack:					return "StackUnderflow!"
@@ -262,17 +307,12 @@ function cakevm.CheckStack (|cakestack| stack, |string?|)
 	return nil
 
 
-function cakevm.Prev (|cakestack| stack, |&cakestack|)
-	|| Down = stack.DestReg
-	Stack -= Down + 1
-	if stack >= .BaseStack
-		return Stack
-
 
 function jbin.SyntaxExpect (|string| s, |int64| Code)
 /	.Enter(@tmp, s)
 	.AddhInt(Code)
 	.exit
+
 
 
 function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData|)
@@ -288,10 +328,13 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	vars.Length = 0
 	vars <~ fn.name
 	vars <~ "(${stack.depth-1})"
+	
 	j.Enter(@tmp, vars|&nil||string|)
+	
 	vars.Length = 0
 	j.AddStr(rz)
 	j.AddhInt(where.Position)
+	j.AddHint(fn.Position)
 	}
 	
 	if count
@@ -299,14 +342,17 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 		return nil
 
 	index -= fn.Position
-	j.Enter
 	|| Locals = fn.obj|&nil||[xvar]|
-	for v in Locals
-		|| R = stack.reg0 + v.reg
-		if v contains index
-			v.DescribeJBin(j, R, 0)
-	j.exit(2)
+		j.Enter
+		for v in Locals
+			if v contains index
+				v.DescribeJBin(j, stack + v, 0)
+		j.exit
+	j.exit
 
+
+function cakestack.OperatorPlus (|xvar| v, |&nil|)
+	return .reg0 + v.reg
 
 
 function xtype.ExpandSub (|jbin| j, |&byte| Obj, |int| Depth)
@@ -332,10 +378,10 @@ function xtype.ActualType (|&nil| ObjAddr, |xtype|)
 
 function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |int| Depth, |xtype?| Type)
 	opt norefcounts
-	j.Enter(@arg)
 	if obj and type and .Expanded > Depth
+		j.Enter(@arg)
 		Type.ExpandSub(j, Obj, Depth)
-	j.exit
+		j.exit
 
 
 function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
@@ -343,22 +389,21 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	j.Enter(@tmp, .name)
 
 	|| Src = .SrcMap
-	|| AtBase = depth == 0
-	j.AddStr(src.file * AtBase)
-	j.Addhint(src.Position * AtBase)
-		
+	j.AddStr(src.file * (depth == 0))
+	j.Addhint(src.Position * (depth == 0))
 	
 	|| vars = debugger.VariablePrinter!
 	|| Type = .ObjType
 		Type = type.ActualType(where)
 	|| OK = .RenderType(vars, type)
 	j.AddStr(vars)
-
-	if !.RenderValue(vars, Where, AtBase)
+	
+	if !.RenderValue(vars, Where)
 		OK = false
 	j.AddStr(vars)
-	j.AddHInt((where|uint64|<<8)>>8)
-	
+	j.AddHint(.reg)
+
+	// Don't send the 'Where' anymore. We use paths.
 	if ok
 		.ExpandVar(j, where|&&byte|[], depth, type)
 	  else

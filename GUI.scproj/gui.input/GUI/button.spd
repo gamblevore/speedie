@@ -301,7 +301,7 @@ class ButtonView (GUIControl)
 	function ButtonText (|listviewrow| Tab, |string| Default, |string|)
 		if !tab
 			return default
-		rz = tab.Cell(.ColumnFinder)
+		rz = tab.CellValue(.ColumnFinder)
 		rz ?= Default
 		if tab is Broken
 			rz += " \17"

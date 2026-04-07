@@ -194,32 +194,42 @@ function message.StitchAndFixup (|message| NewList, |int| Depth)
 	o.remove
 
 
-function ImproveVar (|listviewrow| s, |int| Depth=0)
+function message.DebugName (|string|)
 	opt norefcounts
-	|| thg = s[4]
+	|| n = .name
+	|| i = n.find(~charset.NameMid)
+	if i >= 0
+		n = n[0, i]
+	.obj = n
+	return n
+	
+
+function listviewrow.ImproveVar (|int| Depth=0)
+	opt norefcounts
+	|| thg = self[4]
 	|| bad = (thg == @thg and "bad")
-		Notifications <~ "Something wrong with var: " + s.name
-	(s is error) = bad
+		Notifications <~ "Something wrong with var: " + .name
+		is error
+	is editable
 	if depth > 0
-		|| s1 = s.second
-			s1.name = s.name
+		|| s1 = .second
+			s1.name = .name
 			s1.func = @thg
 	
 	|| fs = VarPrinter
 	fs.Length = 0
-	// merge with PerryCopyVar?
-	fs <~ s.name
+	fs <~ .DebugName
 	fs <~ (' ', 11 - fs.LengthUTF8)
-	s.PerryAppendMsg(" = ", 3)
+	.PerryAppendMsg(" = ", 3)
 	fs <~ (' ', 32 - fs.LengthUTF8)
-	s.PerryAppendMsg(" |", 2)
+	.PerryAppendMsg(" |", 2)
 	fs <~ "|"
-	s.name = fs
+	.name = fs
 
-	|| Fields = s.Last
+	|| Fields = .Last
 	if fields == @arg
 		for prop.fast in Fields
-			.ImproveVar(prop, depth+1)
+			prop.ImproveVar(depth+1)
 
 
 
@@ -244,9 +254,9 @@ function message.PerryAppendMsg (|string| s, |int| Item)
 
 function listviewrow.PerryCopyVar (|string|)
 	opt norefcounts
-	.PerryAppendMsg("|",   2)
-	.PerryAppendMsg("| ",  4)
-	.PerryAppendMsg(" = ", 3)
+	.PerryAppendMsg("|",	2)
+	.PerryAppendMsg("| ",	4)
+	.PerryAppendMsg(" = ",	3)
 	return VarPrinter
 }
 
@@ -254,7 +264,6 @@ function listviewrow.PerryCopyVar (|string|)
 function @perry.VariableFinder (listview.columnfinder)
 	opt norefcounts
 	|| upon = self
-	if keys.Shift
 	if Column
 		if column == -2
 			return .PerryCopyVar
@@ -263,7 +272,43 @@ function @perry.VariableFinder (listview.columnfinder)
 	if value == nil
 		return upon.name
 	if upon
-		upon.name = value		
+		upon.name = value
+
+
+
+function PerryStackEditCell (GUIListEditEvent)
+	opt norefcounts
+	|| row = cell.row!
+	|| field = row[3]
+		if value==nil
+			return field.name
+		field.name = value
+		row.ImproveVar
+		.ide.DebugEditVar(row, value)
+	
+	
+
+extend ListViewRow
+	function DebugPath (|jbin| j)
+		opt norefcounts
+		|| p = .parent
+		if !p.isroot
+			p.DebugPath(j)
+		
+		if self != @arg
+			if p.isroot
+				j.addHInt(.index)
+			  else
+				j.addstr(.debugname)
+	
+
+
+function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
+	|jbin--| j = VarPrinter
+	j.start(@tmp, "edit")
+	j.addstr value
+	row.DebugPath(j)
+	.SendMsg(j|&nil||string|, false)
 
 
 
@@ -271,26 +316,25 @@ function perryide.ReloadBreaks
 	|| j = jbin(@tmp, "sendbreaks")
 	j.addstr .path
 	.SendMsg(j, false)
-	
-	
+
+
+
 function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
 	|| arg = stack.last$
 	.appinfo.tag = stack.first		// nice info about RAM/Pico :]
-
 	|| StackSrc = .stack.listsource
 	
 	for m in Arg
 		|| l = m.Last
 		if l == @arg // assume its a var-dump
 			for s in l
-				.ImproveVar(s)
+				s|listviewrow|.ImproveVar
 			exit
 
 	StackSrc.StitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
-	
 
 	|| Break = stack == "break"
 		|| f = .stack.liststart
@@ -305,6 +349,5 @@ function perryide.UpdateStack (|message| stack)
 		(M is paused) = Break
 		.DebugMode = M
 	.SetAppInfo
-
 
 

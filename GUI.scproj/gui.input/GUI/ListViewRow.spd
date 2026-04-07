@@ -166,7 +166,7 @@ role ListViewRow (message)
 		|| Cols = parent.columns
 		if cols == self
 			return self[column].name
-		if (Cols == nil) or parent._Hierarchical is Hierarchical
+		if (Cols == nil) or (parent._Hierarchical is Hierarchical)
 			column = -1
 		return parent.TableCell(self, column)
 		
@@ -272,7 +272,7 @@ datatype ListViewHierarchy (int8)
 
 
 extend ListView
-	inline Istree (|bool|)
+	inline IsTree (|bool|)
 		return ._Hierarchical
 	
 	setter Hierarchical (|bool|)

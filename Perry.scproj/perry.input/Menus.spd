@@ -76,9 +76,12 @@ function ClickedPrevNext (GUIaction)
 		return true
 	
 
-function PerryFileListFilter (GUIListEditEvent)
+function PerryFileListFilter (GUIListFilterEvent)
 	opt norefcounts
-	.ListSource = .ide.SortedPrevious(value)
+	if value != nil
+		.ListSource = .ide.SortedPrevious(value)
+	  else
+		debugger
 
 
 function PerryIDE.GoToMarker (|message| m, |int| dir)

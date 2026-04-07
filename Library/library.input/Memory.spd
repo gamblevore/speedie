@@ -230,6 +230,7 @@ class Memory
 		function Free	 (|?&nil| b):									cpp_wrapper JB_Free, description "same as free() but also decreases the reported used-memory count." 
 
 		autogen  Test	 (|!&nil| p, |int| n, |ErrorInt|):				cpp_wrapper JB_CanReadMemory
+		inline   Test	 (|object!| p, |ErrorInt|):						return .test(p|&nil|, -1)
 
 		libinternal _Free (|?&nil| b):									cpp_wrapper free
 	

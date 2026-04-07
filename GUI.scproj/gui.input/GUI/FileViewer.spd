@@ -3,30 +3,29 @@
 class FileViewer (ListView)
 	linkage
 		cpp_part FV
-    |dictionary?|					Excludes
-    |dictionary?|					NoFind
-    |TextView|						QuickOpen
-    |ListView|						ListOpen
-    |textView|						Editme
-    |filerow?| 						Extra
-    |filerow?| 						SearchWithin
-    |[string]|						SizeCheckers
-    |GUIListEvent?|					OnSearchWithin
-    
-	constructor (|window| p, |GUIListEvent| sel, |GUIListEvent| ret, |TextView| EditMe)
-		super.constructor(p, sel, ret)
-		.MultiSelection 	= true
+	|dictionary?|					Excludes
+	|dictionary?|					NoFind
+	|TextView|						QuickOpen
+	|ListView|						ListOpen
+	|textView|						Editme
+	|filerow?|						Extra
+	|filerow?|						SearchWithin
+	|[string]|						SizeCheckers
+	|GUIListEvent?|					OnSearchWithin
+
+	constructor (|window| p, |GUIListEvent| select, |GUIListEvent| return, |TextView| EditMe)
+		super.constructor(p, select, return)
+		.MultiSelection		= true
 		.editme				= editme
-		.OnReturn			= ReturnFileList|GUIListEvent| // c++ work around
+		.OnReturn			= ReturnFileList|GUIListEvent|		// c++ work around
 		.OnRightClick		= RightClickFileList|GUIListEvent|
 		.quickopen			= textview(nil,		nil,		nil)
-		.Listopen			= ListView(nil,		nil, 		ClickedOpenList)
+		.Listopen			= ListView(nil,		nil,		ClickedOpenList)
 		.ondrawrow			= InsideFileViewRowDraw
-		.tryeditcell		= FileRowRenamer
+		.Oneditcell			= FileRowRenamer
 		.listsource			= filerow("", "root")
 		.ColumnFinder		= FileRowCell
-		.gnormal.textcolor  = 0xFF6FB6D7
-//		D7B66FFF
+		.gnormal.textcolor	= 0xFF6FB6D7
 		
 		.quickopen.tag = self
 		.listopen.tag = self
@@ -48,7 +47,7 @@ class FileViewer (ListView)
 			isnt visible
 			.clipmode		= ControlClipMode.SlideBackInWindow
 			.ID				= "quickopen"
-			.size 			= 400~wide by 15~high
+			.size			= 400~wide by 15~high
 			.OnKeyDown		= QuickOpenKey
 			.OnTextChanged	= QuickOpenModified
 			.onfocus		= QuickOpenFocus
@@ -209,7 +208,7 @@ class FileViewer (ListView)
 		return true
 
 
-	libinternal CanSave (|int| Purpose, |filerow| f,   |bool|)
+	libinternal CanSave (|int| Purpose, |filerow| f, |bool|)
 		opt norefcounts
 		|| d = f._Document		#require
 		if !d.ShouldntSave
@@ -219,7 +218,7 @@ class FileViewer (ListView)
 		.editme.LoadDocument(d, false)
 		d.ShowParseErrorInViewers
 		if Purpose == DocumentState.ErrorChecking
-			return false 
+			return false
 		if (purpose == DocumentState.Saving)
 			Notifications <~ "Invalid jeebox saved to: " + f.location
 		return true
@@ -252,6 +251,7 @@ class FileViewer (ListView)
 
 
 	syntax access (|int| i, |filerow|)
+		opt norefcounts
 		return .listsource[i] as filerow
 
 
@@ -278,6 +278,7 @@ class FileViewer (ListView)
 
 		if Tofind globs self
 			return 8
+		
 		if (ToFind[0] == '.' and ToFind[1] != '/') and .endswith(ToFind, true)
 			return 1
 
@@ -298,7 +299,7 @@ class FileViewer (ListView)
 
 	function FindPaths (|string| path,  |listviewrow| within=nil, |bool| Copy=false, |[filerow]|)
 		require path
-		|| NameOnly = path[0, "./"] 
+		|| NameOnly = path[0, "./"]
 			path = path[2...]
 
 		within ?= .listsource
@@ -468,6 +469,7 @@ class FileViewer (ListView)
 		x <~ rz
 		.SelectFast(rz)
 
+
 	module
 		function FileRowCell (listview.columnfinder)
 			if Value == nil
@@ -475,10 +477,13 @@ class FileViewer (ListView)
 					return .location
 				return .name
 		
+		
 		function FileRowRenamer (guilisteditevent)
 			opt norefcounts
-			|| o = cell!.row as filerow
-				return o.moveto(value)
+			|| o = cell.row as filerow
+				if value==nil
+					return FileRowCell(o, cell.column) // getting the value for edit.
+				o.MoveTo(value)
 		
 		
 		function FileRowScoreSorter (SorterComparer of FileRow)
@@ -492,16 +497,19 @@ class FileViewer (ListView)
 				
 			return b.rangelength - .rangelength
 
+
 		function FileRowNameSorter (SorterComparerFileRow)
 			opt norefcounts
 			|| c = b.asdir - a.asdir
 				return c
 			return A.name.syntaxcompare(b.name, true)
 
+
 		function QuickOpenModified (GUITextEvent)
 			opt norefcounts
 			|| fv = .tag as fileviewer
 				fv.OpenQuickRelist(.text)
+
 
 		function QuickOpenKey (guikeyevent)
 			opt norefcounts

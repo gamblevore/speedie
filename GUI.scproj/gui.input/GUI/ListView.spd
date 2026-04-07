@@ -7,17 +7,17 @@ class ListView (GUIControl) {
 	|bool|							UseColorScheme
 
 	|bool|							IsMainListView
-	|ListViewHierarchy|				_Hierarchical
 
 	|int|							ScrollShift
 	|bool|							RightClickSelects
 	|bool|							AlwaysSendChangeEvent
 	|byte|							CommandSelectRow
 
-	|bool|							MultiSelection // these two...
-	|bool|							KeepOneSelected // should be merged. Maybe IsTree also.
+	|bool|							MultiSelection		// These two...
+	|bool|							KeepOneSelected		// Should be merged.  Maybe _Hierarchical also.
+	|ListViewHierarchy|				_Hierarchical
 
-	|bool|							_IsEditing
+//	|bool|							_IsEditing
 	|byte|							_ScrollRealigner
 	|bool|							_DuringSelect
 	|bool| 							_BlockedDuringUse
@@ -26,32 +26,32 @@ class ListView (GUIControl) {
 	|ListViewRow?|					_DraggingRowTo
 	|ListViewrow?|					_ScrollStart
 	
-	|ListViewCell?|					EditDelayed
+	|ListViewCell?|					_EditDelayed
 	|ListViewCell?|					MouseDownCell
 	|ListViewrow?|					DraggingRowFrom
 	|ListViewrow|					ListSource
 	|menu?|							CMM
-	|DrawStyle|						gRowSel 
+	|DrawStyle|						gRowSel
 	|listviewrow?|					Columns
 	
 	|ColumnFinder?|					ColumnFinder
 	|GUIListDragEvent?|				OnDragRow
 	|ListViewRowDraw?|				OnDrawRow
-	|GUIListEditEvent?|				TryEditCell
+	|GUIListEditEvent?|				OnEditCell
 	|GUIListEvent?|					OnChange
 	|GUIListEvent?|					OnSelected
 	|GUIListEvent?|					OnReturn
 	|GUIListEvent?|					OnRightClick
-	|GUIListEditEvent?| 			OnTypingFilter
-	|textview?| 					TypingFilter
+	|GUIListFilterEvent?|			OnTypingFilter
+	|textview?|						TypingFilter
 
 
-	constructor (|guicontrol| p,  |GUIListEvent| sel,  |GUIListEvent| ret)
-		super.constructor(p)
+	constructor (|guicontrol| Parent,  |GUIListEvent| Select,  |GUIListEvent| Return)
+		super.constructor(Parent)
 		.RowHeight		= 13
-		.takesfocus 	= takesfocusflag.On
-		.onreturn		= ret
-		.onselected 	= sel
+		.takesfocus		= takesfocusflag.On
+		.onreturn		= return
+		.onselected		= Select
 		.oncopy			= (&listview.defaultcopy)|GUICopyEvent|
 		is editable
 		isnt drawsfocus
@@ -59,27 +59,26 @@ class ListView (GUIControl) {
 		.gRowSel		= .gnormal.copy
 		.RightClickSelects = true
 		.init
-	
-	
+
+
 	libinternal Init
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
 		.GNormal.TextColor = -1 // oof
-			
-	
-	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
-		opt NoRefCounts
-		|| tec = .TryEditCell
-			require (tec)(self, cell, value)
 
-		.TableCell(cell) = value
+
+	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value)
+		opt NoRefCounts
+		|| OnEdit = .OnEditCell
+			require (OnEdit)(self, cell, value)!=nil
+		  else
+			.TableCell(cell) = value
 		|| o = cell.row
 		.touch
 		.show(o)
 		(.OnChange)(self, o)?
 		(.onselected)(self, o)?
-		return true
 
 
 	libinternal DistBetween (|ListViewRow| c, |ListViewRow| b, |int|)
@@ -112,8 +111,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		rz = 2 + ((.ListSource.Count max 2) * .RowHeight)
 		|| t = .typingfilter
-			rz += t.height - 1 
-
+			rz += t.height - 1
 
 
 	function NewCmm (|menu|)
@@ -129,7 +127,7 @@ class ListView (GUIControl) {
 	
 	
 	behaviour RightClick
-		.EditDelayed = nil
+		._EditDelayed = nil
 		listview.delayEditTill_ = nil
 		.MouseDownCell = .FindClickedCell(P)
 		|| mdc = .MouseDownCell$
@@ -157,9 +155,9 @@ class ListView (GUIControl) {
 	
 	function PressReturnKey (|bool|)
 		opt norefcounts
-		|| r = .OnReturn$
-		(r)(self, .FirstSelected)
-		return true
+		|| r = .OnReturn
+			(r)(self, .FirstSelected)
+			return true
 		
 	
 	function Clear
@@ -172,10 +170,10 @@ class ListView (GUIControl) {
 
 	libinternal InlineCell (|bool| always = false, |&InlineEditor|)
 		opt norefcounts
-		|| w = .window$
-		|| t = w.inline
-		if always or (self == T.editingfor)
-			return t
+		|| w = .window
+			|| t = w.inline
+			if always or (self == T.editingfor)
+				return t
 
 			
 	libinternal ClearEdits
@@ -229,6 +227,7 @@ class ListView (GUIControl) {
 		if !gui.TouchCount and .RowIsViewable(row)
 			gui.touch
 		(row is selected) = newstate
+		._SelJustChanged = true
 		return 1
 
 
@@ -253,17 +252,17 @@ class ListView (GUIControl) {
 		
 		if willsel
 			.ChangeSel(willsel, true)
-			.SelectedEvent( willsel )
+			.SelectedEvent( willsel, ListViewSelectMode.normal )
 
 		GUI.touch(self)
 		if Update
-			.touch				// setmodified
+			.touch						// SetModified
 	
 	
 	behaviour Search
 		opt norefcounts
 		require s
-		.OpenSearch // whatever
+		.OpenSearch						// Whatever
 		if JustUpdate
 			return .SearchItems(s)
 		|| f = .nextsearch(.lastselected)$
@@ -276,15 +275,15 @@ class ListView (GUIControl) {
 		
 	function EditCell (|bool|)
 		cpp_part RenameCurr
-		return .EditCell(.LastSelected.cell)
+		return .EditCell(.LastSelected.ascell)
 	
 	
 	function EditRow (|ListViewRow| r, |bool|)
 		cpp_part EditRowCol
-		return .EditCell( r.cell(0) )
+		return .EditCell( r.ascell )
 	
 		
-	function EditCell (|ListViewcell!| rc, |bool|)  //  .editcell
+	function EditCell (|ListViewcell!| rc, |bool|)	// .editcell
 		opt norefcounts
 		|| r = rc.row
 		.SelectAdd(r)
@@ -342,7 +341,7 @@ class ListView (GUIControl) {
 		|| t = .OnTypingFilter
 		|| tf = .TypingFilter
 		require t and tf
-		(t)(self, nil, tf.text)
+		(t)(self, tf.text)
 		.touch
 		if self isa menu
 			.Sizer.g(1, self) = .DesiredHeight~long
@@ -356,12 +355,12 @@ class ListView (GUIControl) {
 	behaviour KeyDown
 		opt norefcounts
 		if .KeyDownTest(key) or (.OnKeydown)(self, key)?
-			.editdelayed = nil
+			._EditDelayed = nil
 			return true
 			
 			
 	libinternal KeyDownTest (|keys| key, |bool|)
-		if (key is INSERT or Enter)
+		if key is INSERT or Enter
 			.editcell
 			return true
 
@@ -378,22 +377,23 @@ class ListView (GUIControl) {
 			if keys.shift
 				return .editcell
 			
-		if .OnRightClick and (key.IsCmm)
-			.menuforselrow
+		if key.IsCmm
+			if .OnRightClick
+				.menuforselrow
 			return true
 			
-		if (key iscmd keys.A)
+		if key iscmd keys.A
 			return .SelectAll
-		if (key is PAGEUP)
+		if key is PAGEUP
 			.ScrollByRows(-.VisibleRows+1)
 			return true
-		if (key is PAGEDOWN)
+		if key is PAGEDOWN
 			.ScrollByRows(.VisibleRows-1)
 			return true
-		if (key is HOME)
+		if key is HOME
 			.slidescroll = .liststart
 			return true
-		if (key is END)
+		if key is END
 			.slidescroll = .listend
 			return true
 			
@@ -436,17 +436,17 @@ class ListView (GUIControl) {
 	inline TableCell (|listviewrow| Row, |int| Column=-1, assigns:|string?| Value=nil, |string|)
 		cpp_part TableCellRow
 		opt norefcounts
-		return row.cell(column, .ColumnFinder, value)
+		return row.CellValue(column, .ColumnFinder, value)
 
 
 	libinternal TableCell (|listviewCell| Cell, assigns:|string?| Value=nil, |string|)
 		opt norefcounts
-		return cell.row.cell(Cell.column, .ColumnFinder, value)
+		return cell.row.CellValue(Cell.column, .ColumnFinder, value)
 
 
 	libinternal CopyList (|array of string|)
 		opt norefcounts
-		.EditDelayed = nil
+		._EditDelayed = nil
 		.clearinternaldrops
 		for s.listsel in self
 			|| it = .copyid(s)
@@ -534,7 +534,7 @@ class ListView (GUIControl) {
 		super.lostfocus
 	
 	
-	libinternal SlideScroll (assigns:|listviewrow|r)
+	libinternal SlideScroll (assigns:|listviewrow| r)
 		.ScrollSet(r) // we wanted this to slide smoothly... sigh. do it later.
 					  // in terms of the nodes and mousewheel.
 
@@ -546,8 +546,10 @@ class ListView (GUIControl) {
 		debug_require s != .listsource
 		.scrollstart = s
 		.ExpandParents(s)
-		if ._isediting and (s and !.InView(s))
-			.ClearEdits
+		|| w = .window
+			|| i = w.inline
+			if (i.editingfor == self) and (s and !.InView(s))
+				.ClearEdits
 
 
 	function InView (|ListViewRow!| s, |bool|)
@@ -573,7 +575,7 @@ class ListView (GUIControl) {
 			.scrollset(last)
 	
 	
-	function ExtractSelected (|ListViewrow| c, |ListViewrow|)
+	libinternal ExtractSelected (|ListViewrow| c, |ListViewrow|)
 		opt norefcounts
 		rz = ListViewRow()
 		while c
@@ -665,15 +667,18 @@ class ListView (GUIControl) {
 				(dr)(self, nil, t)
 			  else
 				(dr)(self, t, nil)
-			
-		  elseif !sl
-			|listviewcell--| LC = .FindClickedCell(P)
-				|| L = LC.row
-				require (L isnt UnSelectable)
-				if (L is selected) and (.SelCount > 1)
-					.Select(l)
-				  elseif !keys.Cmd and (.window!._SelBeforeMouseDown == self)
-					.DelayedRename(Lc)
+			return
+
+		require !sl
+		|| LC = .FindClickedCell(P)$
+
+		|listviewrow--| L = LC.row
+		require (L isnt UnSelectable)
+		|window--| w = .window!
+		if (L is selected) and (.SelCount > 1)
+			.Select(l)
+		  elseif !keys.Cmd and (W._SelBeforeMouseDown == self)
+			.DelayedRename(Lc)
 			
 
 	function SelCount (|int|)
@@ -682,22 +687,22 @@ class ListView (GUIControl) {
 			RZ++
 
 
-	function SelectableCount (|int|)
+	libinternal SelectableCount (|int|)
 		opt norefcounts
 		for f.all in self
 			rz += f isnt UnSelectable
 
 
 	libinternal DelayedRename (|ListViewCell| i)
-		.EditDelayed = i
+		._EditDelayed = i
 		listview.delayedittill_ = nil
 		if i
 			listview.delayedittill_ = gui.FrameStart + 0.5s
 
 
 	libinternal TryDelayedEdit
-		|| i = .EditDelayed$
-		.EditDelayed = nil
+		|| i = ._EditDelayed$
+		._EditDelayed = nil
 		|| p = .mouseXY
 		if self contains p
 			|| R = .FindClickedCell(p)
@@ -737,7 +742,7 @@ class ListView (GUIControl) {
 
 	behaviour MouseDown
 		opt norefcounts
-		.EditDelayed = nil
+		._EditDelayed = nil
 		if clicks >= 0
 			|| Expanding = .ClickedExpand(P)
 				return Expanding			
@@ -755,7 +760,7 @@ class ListView (GUIControl) {
 			if !.fixscroll
 				.ClearInternalDrops
 				debugger
-				return MouseDragging.handled // why MouseDragging.DragWhatFixThis
+				return MouseDragging.handled				// why MouseDragging.DragWhatFixThis
 			|| p2 = (0, .rowheight / 2)
 			|| i  = .FindClicked(P - P2)
 			|ListViewrow--| WantsTo
@@ -780,7 +785,7 @@ class ListView (GUIControl) {
 			return MouseDragging.Within
 		
 		|| FirstSel = .FirstSelected
-		|| LC = .FindClickedCell(P)
+		|| LC = .FindClickedCell(P)							// leaks
 		if (Clicks > 1) and (firstsel) and !(keys.Cmd)
 			if lc and lc.row == firstsel
 				(.OnReturn)(self, firstsel)?
@@ -789,7 +794,7 @@ class ListView (GUIControl) {
 		.MouseDownCell = LC
 		if !lc
 			if !Keys.Cmd
-				.selectnone
+				.SelectNone
 			return MouseDragging.handled
 		
 		|| l = lc.row
@@ -984,7 +989,7 @@ class ListView (GUIControl) {
 		|| n		= i.abs + 1
 		for n
 			modified += .ChangeSel(l, (l isnt UnSelectable))
-			 l = .hierstep(l, i > 0)#loop
+			l = .hierstep(l, i > 0)		#loop
 
 		if modified
 			|| mode = listviewselectmode.normal
@@ -1019,9 +1024,9 @@ class ListView (GUIControl) {
 
 	function SelectAdd (|ListViewrow| m, |bool| State=true, |bool| Multi=keys.shift)
 		opt norefcounts
-		if !.KeepOneSelected and .MultiSelection and multi
+		if  multi  and  !.KeepOneSelected  and  .MultiSelection
 			if .ChangeSel(m, state)
-				.SelectedEvent(m)
+				.SelectedEvent(m, ListViewSelectMode.normal)
 			return
 		if !state
 			m = nil
@@ -1070,11 +1075,13 @@ class ListView (GUIControl) {
 		.Select(r)
 
 	
-	libinternal SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
+	libinternal SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode)
 		opt norefcounts
 		require !._DuringSelect
+//		._SelJustChanged = true
 		.ClearEdits
-		._SelJustChanged = true
+//		if !._SelJustChanged
+
 		if s and (Mode isnt noshow)
 			.Show(s)
 
@@ -1138,13 +1145,12 @@ class ListView (GUIControl) {
 	
 	
 	libinternal FindClickedMenu (|int| y, |ListViewRow|)
-		opt norefcounts
 		if y <= .lastBottom
 			return .bmove(.LastVisible$, 1)
 		if y > .lastTop
 			return .bmove(.scrollstart$, -1)
-		|| c = .FindClickedCell((0,y))
-			return c.row
+		|| c = .FindClickedCell((0,y)) // disowner
+			rz = c.row
 	
 	
 	function StopFilter (|bool|)
@@ -1179,7 +1185,7 @@ class ListView (GUIControl) {
 			if .ColumnStart(i) >= x
 				exit
 			col++
-		return R.cell(col)
+		return R.ascell(col)
 
 
 	libinternal FindClickedCell (|ivec2| Search, |ListViewCell|)

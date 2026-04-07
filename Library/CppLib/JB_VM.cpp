@@ -30,6 +30,7 @@ uint			CrashCount;
 #define kTooFarBack		-3							// Gone back. Must be corrupt.
 #define kOverFlowStack	-2
 #define kStillInRange	-1
+#define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
 #define	VMCodePtr(V)	((ASM*)(((byte*)(V)) + 1024*1024))
 #define	CanDebug(V)		(((uint64)(V))>>63)
 
@@ -44,6 +45,7 @@ uint			CrashCount;
 
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
+	V = VMClearHigh(V);
 	if_rare (!V)
 		return 0;
 	auto Ret = V->Registers;
@@ -55,6 +57,7 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 
 int JB_ASM_Index (CakeVM* vm, ASM* Code) {
+	vm = VMClearHigh(vm);
 	ASM* Start = VMCodePtr(vm);
 	int64 Diff = Code - Start;
 	if ((uint64)Diff < CakeCodeMax)
@@ -66,8 +69,7 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 AlwaysInline int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
 	auto Break = Code[CakeCodeMax]; 
 	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
-	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull));
-	r = (CakeRegister*)(((IntPtr)r)&~(1ull<<63ull));
+	r = VMClearHigh(r);
 	return (V->__VIEW__)(V, (CakeStack*)(r-1), 0, Break);
 }
 
@@ -199,7 +201,7 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 
 static ASM* VMProtect (CakeVM& V, bool Protect) {
 	ASM* Code = VMCodePtr(&V);
-	Code = (ASM*)((((int64)Code)<<1)>>1);
+	Code = VMClearHigh(Code);
 	int F = V.VFlags;
 	int CanWrite = PROT_WRITE*(!Protect);
 	if (CanWrite  !=  (F&PROT_WRITE)) {
@@ -312,7 +314,7 @@ static void CakeCorrupt (int Sig) {
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	static_assert((sizeof(CakeRegister) == sizeof(CakeStack)), "sizeof type");
 
-//	V = (CakeVM*)(((IntPtr)V)&~(1ull<<63ull)); // ruins CanDebug
+//	V = VMClearHigh(V)								// ruins CanDebug
 	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
 	auto OldBus = signal(SIGBUS,  CakeCorrupt);
 
@@ -330,7 +332,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 					// Stubs //
 
 ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear)					{return 0;}
-uint*	JB_ASM_SetDebug		(CakeVM* V, int On)						{return 0;}
+uint*	JB_ASM_SetDebug		(CakeVM* V, int Level)					{return 0;}
 int		JB_ASM_Index		(CakeVM* V, u32* Code)					{return 0;}
 void	JB_ASM_FillTable	(CakeVM* V, byte*, byte*, void**)		{}
 void**	JB_ASM_InitTable	(CakeVM* V, int, int)					{return 0;}

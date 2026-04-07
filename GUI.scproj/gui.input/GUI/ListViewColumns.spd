@@ -10,7 +10,7 @@ Column -2 means the CopyID, which can be the same as the Name if needed.
 Column 0 is meant to mean the first item... but it could mean the row itself if none-exist."
 
 
-function ListViewRow.Cell (|int| Column=-1, |listview.columnfinder?| fn, assigns:|string?| Value=nil, |string|)
+function ListViewRow.CellValue (|int| Column=-1, |listview.columnfinder?| fn, assigns:|string?| Value=nil, |string|)
 	if fn
 		return (fn)(self, column, value)
 	return .TableCell(column, value)
@@ -42,7 +42,7 @@ role ListViewCell (message)
 		cpp_Part StepCol
 		opt norefcounts
 		|| c = .row.move(i)
-			return c.cell(col)
+			return c.ascell(col)
 
 	syntax equals (|ListViewcell| c, |bool|)
 		return (c.obj == .obj)  and  (c.position == .position)
@@ -54,9 +54,9 @@ role ListViewCell (message)
 			return .step( 1, 0)
 		if n < 0
 			return .step(-1, cols-1)
-		return .row.cell(n)
+		return .row.ascell(n)
 
-	function listviewrow.Cell (|int| i=0, |ListViewCell|)
+	function listviewrow.AsCell (|int| i=0, |ListViewCell|)
 		opt norefcounts
 		rz = Message()
 		rz.obj = self

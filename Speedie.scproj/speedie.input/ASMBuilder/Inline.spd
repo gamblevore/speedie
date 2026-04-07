@@ -149,11 +149,11 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		.NextBasicBlock
 	if !rz
 		(rz is Const)								// no longer zero
-	|| last = .last
-	if (last == RealStart) and last.IsFunc
+
+	if (.curr > RealStart)							// useful, to stop jumping all over in IDE
 		|| P = prms.parent!							// cleanup
-		last.Msg = P								// right? or else the autocomplete goes wrong? Or not?
-		last.Fatmap = P.srcmap
+		realstart.Msg = P
+		realstart.Fatmap = P.srcmap
 
 
 	

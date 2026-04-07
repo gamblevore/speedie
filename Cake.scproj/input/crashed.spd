@@ -58,3 +58,10 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 		if stack.Depth!=Depth:					return "Stack Depth Invalid"
 
 
+
+function cakevm.Prev (|cakestack| stack, |&cakestack|)
+	|| Down = stack.DestReg
+	Stack -= Down + 1
+	if stack >= .BaseStack
+		return Stack
+

@@ -984,10 +984,10 @@ Message is also:
 			if l != @arg
 				l = .msg(@arg)
 		for tmp in l
-			if (tmp ~= key)
+			if tmp ~= key
 				|| TL = tmp.last
 					TL.remove
-				return tmp  
+				return tmp
 		return l.msg(@tmp, key)
 
 	
@@ -1045,12 +1045,8 @@ Message is also:
 		cpp_part EqualsSyx
 		return self and (.Func == X)
 
-//	sadly... this would mess up anything that tests msg == 1
-//  bytes aren't really numbers...
+//	sadly... this would mess up anything that tests msg == 1. bytes aren't really numbers...
 //	syntax equals (|byte| B, |bool|Aware, |bool|)
-//		cpp_part EqualsByte
-//		return self and .name == B
-	
 
 	function Export (|FastString| fs)
 		|| fn = (.Func.ExportAddr)
@@ -1065,9 +1061,6 @@ Message is also:
 		cpp_part Fail
 		inlined
 		errorreceiver.NewError( self, Error )
- 
-//	Syntax Deprecate ( |string| Error = "Deprecated." )
-//		.SyntaxProblem(error)
 
 	Syntax Problem ( |string?| Error = nil )
 		inlined
@@ -1117,6 +1110,7 @@ Message is also:
 		parser.Using.Flags = MsgParseFlags.Inserted // right?
 		.MemoryLayer.use
 
+
 	Syntax UsingComplete { }
 	
 	
@@ -1129,6 +1123,7 @@ Message is also:
 	
 	
 	function string.ParseHInt (|$int| StrStart, |message| Error=nil, |int64|)
+		// Actually... dont need two hints! Can just read the entire thing in...
 		opt norefcounts
 		|| n = .Length
 		|| i = StrStart
@@ -1173,12 +1168,12 @@ Message is also:
 			return (Value * Mul|float64|)|int64|
 			
 	
-	function string.SuffixSize (|int64|)
+	function string.SuffixSize (|int64|)			// 10GB, 10G, 4KB, 4K
 		|| n = .Length
 		if (n == 1) or (n == 2 and self[1] == 'B')
 			return self[].SuffixSize
 
-	libinternal byte.SuffixSize (|int64|)
+	libinternal byte.SuffixSize (|int64|)			//  K=1024,  M=1024^2,  G=1024^3,  T=1024^4
 		cpp_wrapper
 		
 	function Float (|Float64|)
@@ -1206,7 +1201,6 @@ Message is also:
 
 	inline After (|int|)
 		return .position + .RangeLength
-
 	inline After (assigns:|int|)
 		.RangeLength = Value - .position
 

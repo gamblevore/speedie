@@ -180,6 +180,7 @@ function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
 				error (exp, "Missing PackID[1]")
 		rz = 0xFFFF	
 
+
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!

@@ -1326,6 +1326,7 @@ class TextView (GUIControl)
 	
 	
 	libinternal FinishEditing (|bool| Focus, |bool|)
+		opt norefcounts
 		|| it = .isinline
 			|| c = it.cell
 			|| lv = it.editingfor
@@ -1339,7 +1340,7 @@ class TextView (GUIControl)
 	
 	libinternal InlineAcceptSearch (|bool|)
 		opt norefcounts
-		|| i = .isinline #debug_require
+		|| i = .isinline				#debug_require
 		i.AcceptSearch(.text, false)
 		return true
 
@@ -1349,8 +1350,8 @@ class TextView (GUIControl)
 		|| i = .isinline$
 		|| e = i.editingfor
 		if e isa listview
-			if e._isediting
-				.finishediting(e.columns!=nil)
+			if i is editing
+				.FinishEditing(e.columns!=nil)
 				return true
 		
 		return .InlineAcceptSearch
@@ -1426,8 +1427,7 @@ class TextView (GUIControl)
 			.SelRange = sel2+1
 			return true
 
-		require .SelMsgValid(sel)	// we want to avoid this after comments. how do we know if something is commented?
-									// only after parsing, really. we can backscan. but thats more of a pain. 
+		require .SelMsgValid(sel)	// we want to avoid this after comments.
 
 		if !SW
 			require s != '{'
@@ -1525,6 +1525,7 @@ class TextView (GUIControl)
 			._Reclaim = (p, s.length - p.width)
 			.TryCaptureUndo(x, nt, updatedsel)
 			|| it = .isinline
+			if it Is Searching
 				it.UpdateSearch(nt)
 		
 		if show

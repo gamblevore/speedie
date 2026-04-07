@@ -1,5 +1,12 @@
 
 
+datatype InlineEditorMode (byte)
+	constants
+		Nothing = 0
+		Searching
+		Editing
+		
+		
 struct InlineEditor
 	linkage
 		cpp_part inl
@@ -7,9 +14,9 @@ struct InlineEditor
 	|Textview?|			Editor
 	|Guicontrol?|		EditingFor
 	|bool|				NeedsHide
-	  
+	|InlineEditorMode|	Mode
 	
-	function Init (|Window| w)
+	libinternal Init (|Window| w)
 		.editor = textview(w)
 		with .editor
 			//.clipmode		= controlclipmode.debug
@@ -19,31 +26,33 @@ struct InlineEditor
 			(self.editor! is editable)
 			&.gnormal.bg	<~ (0, 0, 0, 255)
 	
+	syntax Is (|InlineEditorMode| Mode, |bool|)
+		nil checker
+		if self
+			return .mode==Mode
+	syntax Is (|InlineEditorMode| Mode, assigns:|bool|)
+		if value and self
+			.mode=Mode
+		
+//	libinternal IsSearching (|bool|)
+//		return .mode == 1
+//
+//	libinternal IsEditing (|bool|)
+//		return .mode == 2
 	
-	function NextSearch
+	libinternal NextSearch
+		opt norefcounts
 		|| L = .EditingFor
 		if L and !L.__Search__(GUI.LastSearch, false)
 			beep
 
 	
-	function AcceptSearch (|string| s, |bool| hide=false)
+	libinternal AcceptSearch (|string| s, |bool| hide=false)
 		GUI.LastSearch = s
 		.NextSearch
 		if hide
 			.clear
 	
-	
-/*
-	function Accept (|string| s, |bool| hide)
-		.AcceptSearch(s)
-	 // not sure why it did this? it never made sense
-		if .editingfor isa textview
-			.AcceptSearch(s)
-			if hide
-				.clear
-		  elseif .editingfor isa listview
-			.finishandclear
-		*/
 	
 	function UpdateSearch (|string| s)
 		|| l = .editingfor
@@ -58,7 +67,7 @@ struct InlineEditor
 		|| c = .cell
 		|| l = .editingfor
 		if  e and c  and  l isa listview
-			if e.text != l.TableCell(c)
+			if e.text != .getlistvalue(c,l)
 				l.TryRenameCellTo(c, e.text)
 		.Clear(focus)
 		
@@ -66,21 +75,33 @@ struct InlineEditor
 	function Clear (|bool| Focus = true)
 		.NeedsHide = false
 		.cell = nil
-		|| s = .EditingFor 
+		|| s = .EditingFor
 		if s isa listview
 			GUI.LastSearch = .editor!.text
 		with .editor
 			.visible = false
 			.text = ""      // wants new
 		if s isa listview
-			s._IsEditing = false
+			.mode = 0
 			if focus
 				s.setfocus
 		.EditingFor = nil
 	
+
+	function GetListValue (|listviewcell| C, |listview| L, |string?|)
+		opt norefcounts
+		|| ed = l.OnEditCell
+			|| t = (ed)(l, c, nil)
+			if t!=nil
+				return t
+			.editor.CancelEditing
+			return nil
+		return l.TableCell(c)
+
+	
 	
 	function Edit (|ListViewCell| r, |ListView| l, |bool|)
-/		opt norefcounts
+		opt norefcounts
 		
 		l ?= .editingfor as ListView
 		
@@ -89,14 +110,17 @@ struct InlineEditor
 		require row is editable and row isnt UnSelectable and l is editable
 		with .editor
 			.FinishEditing(false)
+			|| t = self.getlistvalue(r, l)
+			if t == nil
+				return false
+			.text = t
+			.selrange = t.length
 			.visible = true
 			.setfocus
-			.text = l.TableCell(r)
-			.selrange = .text.length
 		
 		l.Select(r.row)
 		l <~ .editor
-		l._isediting = true
+		is editing
 		l.Show(r.row)
 		.cell = r
 		.EditingFor = l
@@ -108,12 +132,12 @@ function window.Inline (|&InlineEditor|) // avoid getting the struct itself
 	return &.InlineEditorPlace
 
 
-function window.InlineEditor (|guicontrol|)
+libinternal window.InlineEditor (|guicontrol|)
 	opt norefcounts
 	return .InlineEditorPlace.Editor
 
 
-function GuiControl.CanSearch (|int|)
+libinternal GuiControl.CanSearch (|int|)
 	if self is unsearchable
 		return 0
 	if self isa textview
@@ -123,7 +147,6 @@ function GuiControl.CanSearch (|int|)
 			return 0
 		if self isnt editable
 			require .hasfocus
-				
 	return 1
 
 
@@ -145,11 +168,12 @@ function GuiControl.OpenSearch (|bool|)
 	} (f and f != self)
 
 
-function GuiControl.OpenSearchSub (|bool|)
+libinternal GuiControl.OpenSearchSub (|bool|)
+	opt norefcounts
 	|| e	= .window!.inline
 	|| FOR	= e.editingfor
 	require for != self
-	 
+	
 	if for
 		e.FinishAndClear(False)
 	if self isa textview
@@ -159,6 +183,7 @@ function GuiControl.OpenSearchSub (|bool|)
 	
 	|| f = e.editor!
 	e.editingfor = self
+	(e is Searching)
 	self <~ f
 	debug_require !(self isa window)
 	f.size = 115~left  by  15~down to the~top
@@ -167,6 +192,7 @@ function GuiControl.OpenSearchSub (|bool|)
 	.setfocus // makes sense
 	f.setfocus
 	f.selectall
-	if GUI.lastsearch
-		e.UpdateSearch(GUI.lastsearch)
+	|| Search = GUI.LastSearch
+		e.UpdateSearch(Search)
 	return true
+

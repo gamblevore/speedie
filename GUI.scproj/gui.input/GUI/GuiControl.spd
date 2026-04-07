@@ -566,14 +566,15 @@ class GUIControl (list)
 			return w.CurrMouseDown == self
 	
 	
+	setter Text (|string|)
+		inlined
+		.textset(value)
+
+	
 	setter Text (|faststring|)
 		inlined
 		cpp_Part FS
 		.TextSet(value)	
-	
-	setter Text (|string|)
-		inlined
-		.textset(value)
 	
 	
 	autogen TextSet (assigns:|object| text, |bool|)

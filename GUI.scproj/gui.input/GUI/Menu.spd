@@ -52,7 +52,7 @@ class Menu (ListView)
 		if (L isa menuitem)
 			if (L.MenuEvent)
 				|| p = .parent
-					(L.MenuEvent!)(p,  l,  e.cell)
+					(L.MenuEvent!)(p,  l,  e.ascell)
 				return
 		(.onreturn)(self, L)?
 			

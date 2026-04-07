@@ -10,6 +10,8 @@ class XVar (list)
 	|DataTypeCode|	DataType
 	|string|		Name
 	
+	contains xvar
+	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
 		.SrcMap = s.hint
 		.ViewStrength = 0
@@ -58,11 +60,12 @@ class XVar (list)
 		Disabled "Spelt wrong!"
 	
 	
-	function NilOK (|faststring| fs, |&nil| Where,  |bool|)
+	function NilOK (|faststring!| fs, |&nil| Where,  |bool|)
 		require fs.TestMem(Where, 8, "Unreadable")
 		|| Ptr = (Where|&uint64|)[]
 		if (!Ptr and .CanBeNil) or (Ptr >= 64K)
 			return true
+
 		fs <~ "0x"
 		fs.AppendHex(Ptr)
 		fs <~ "!"
@@ -75,10 +78,19 @@ class XVar (list)
 				return Ty
 
 		
-	function RenderValue (|faststring| fs, |&nil| Where, |bool| IsReg, |bool|)
+	function SetValue (|&nil| where, |string| Value, |bool|)
+		opt norefcounts		if .Reg
+			require memory.test(Where, 16)
+		|| C = .obj|&nil||xtype|
+		if c and c.IsObject
+			return .ObjectValue(Where|&object|, value)
+		return .DataValue(Where, value)
+	
+	
+	function RenderValue (|faststring| fs, |&nil| Where, |bool|)
 		opt norefcounts
-		if IsReg
-			require fs.TestMem(Where, 16, "BadStack") // we still need to check for readability, though!
+		if .Reg
+			require fs.TestMem(Where, 16, "BadStack")		// we still need to check for readability, though!
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
 			return .RenderObject(fs, Where)
@@ -108,7 +120,7 @@ class XVar (list)
 			if color
 				fs <~ terminalcolor.red
 			|| reg = reg0 + .reg
-			.RenderValue(fs, reg, true)
+			.RenderValue(fs, reg)
 			if color
 				fs <~ terminalcolor.normal
 	
@@ -143,6 +155,7 @@ class XVar (list)
 		opt norefcounts
 		fs <~ .func.name
 		fs <~ "@"
+		
 		|| name = .name
 		require fs.testobj(name)
 		if name isa string
@@ -152,7 +165,57 @@ class XVar (list)
 		fs <~ name.class.name
 		fs <~ "!"
 
+
+	function ParseObj (|object| Old, |string| Value, |object?|)		|| msg = Value.parse
+			|| fn = msg.func
+			if fn.IsString and !msg.HasAny
+				rz = msg.name
+			  elseif fn == @name
+				|| NewType = Syntax.Func(msg)
+					|message--| ch = msg.first
+					if !ch.IsString or ch.HasAny
+						ch = nil
+					|string--| NewName = ch.Name
+					if old isa Message
+						old.func = NewType
+						old.name = NewName
+						rz = old
+					  else
+						rz = NewType + NewName
+			  elseif (old isa Message)
+				if msg.iscontainer and msg == 1 // like (@str) incase i wanna set it to @str
+					rz = msg.first
+
+
+	function ObjectValue (|!&object| Reg, |string| Value, |bool|)
+		opt norefcounts		|| OldObj = Reg[]
+			require Memory.test(OldObj)
+		if value ~= "nil" or "0" or "0x0"
+			require .CanBeNil
+			reg[] = nil
+			return true
 	
+		|object| NewObj
+		if value.IsInt
+			NewObj = Value.ParseInt()|object|!
+		  else
+			NewObj = .ParseObj(OldObj, value)$
+		require Memory.test(NewObj)
+		reg[] = NewObj
+		return true
+	
+	
+	function DataValue (|!&nil| Reg, |string| Value, |bool|)
+		opt norefcounts
+//		|| OldObj = Reg[]
+//		require Memory.test(OldObj)
+//		|| NewObj = value.CakeObj
+//		if !NewObj
+//			require Memory.test(NewObj)
+//			
+//		reg[] = NewObj
+	
+
 	function RenderObject (|faststring| fs, |!&nil| Reg, |bool|)
 		opt norefcounts
 		require .NilOK(fs, reg)
@@ -179,10 +242,9 @@ class XVar (list)
 
 		fs <~ "0x"
 		fs.AppendHex(obj|int64|, 8)
-		fs <~ "*"
+		fs <~ " * "
 		fs <~ obj.refcount
 		return true
-		// Contains can contain themselves! So no deep rendering... for now. Maybe if we mark/unmark them.
 	
 	
 	function RenderType (|faststring| fs, |xtype?| type, |bool|)
@@ -223,10 +285,10 @@ class XVar (list)
 	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
 		|| Err = memory.test(Mem, N)
 			return true
-				
-		self <~ ErrName
-		self <~ ": 0x"
-		.AppendHex(Mem|int64|)
+		if self
+			self <~ ErrName
+			self <~ ": 0x"
+			.AppendHex(Mem|int64|)
 	
 	
 	function RenderData (|faststring| fs, |!&nil| Reg, |bool|)

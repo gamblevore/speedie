@@ -359,22 +359,25 @@ extend PerryIDE
 
 
 		with .stack
+			if self.stack isnt Editable // hmmmm
+			is   editable
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
 			.ColumnFinder	= &Perry.VariableFinder
 			.Hierarchical()	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
-			.IsMainListView = true
-			.MultiSelection = true
+			.IsMainListView	= true
+			.MultiSelection	= true
+			.OnEditCell = PerryStackEditCell
 			.AlwaysSendChangeEvent = true
 			.tooltip		= "Variables and the Stack"
 			.UseColorScheme	= true
 			.ID				= "Stack"
 			.size			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
-			.GNormal.Solid  = vec4(0.13, 0.135, 0.120, 0.975)
-			.gRowSel.solid  = vec4(0.11, 0.335, 0.12, 0.675)
+			.GNormal.Solid	= vec4(0.13, 0.135, 0.120, 0.975)
+			.gRowSel.solid	= vec4(0.11, 0.335, 0.12, 0.675)
 			.GNormal.Seps = 0
 			.GNormal.StyleDrawer = image.CurlieQueDrawer
 			
@@ -394,16 +397,16 @@ extend PerryIDE
 			.JeeboxMode	= TextView.probablyjeebox
 
 
-		with .EditStatus 
+		with .EditStatus
 			.ID				= "Status And Errors"
 			.alignment		= MoveCode.Center
 			isnt editable
 			.takesfocus		= 0
 			.size			= the~width  by  0 to 13
-			.gnormal.solid  = vec4(0.125, 0.94)
+			.gnormal.solid	= vec4(0.125, 0.94)
 
 
-		with .ProjectInfo 
+		with .ProjectInfo
 			.ID				= "ProjectInfo"
 			.alignment		= MoveCode.MiddleLeft
 			.SingleLine		= TextView.SingleLine
@@ -412,7 +415,7 @@ extend PerryIDE
 			.size			= the~left for 400  by  0 to 13
 			.gnormal.clear
 
-		with .CharInfo 
+		with .CharInfo
 			.ID				= "CharInfo"
 			.alignment		= MoveCode.Center
 			.SingleLine		= TextView.singleline
@@ -421,7 +424,7 @@ extend PerryIDE
 			.size			= 2~left back 92  by  0 to 13
 			.gnormal.clear
 
-		with .LineInfo 
+		with .LineInfo
 			.ID				= "LineInfo"
 			.alignment		= MoveCode.Center
 			.SingleLine		= TextView.singleline

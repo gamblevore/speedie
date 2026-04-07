@@ -675,6 +675,7 @@ int JB_CanReadMemory (void* B, int N) {
 	return Err;
 }
 
+
 bool JB_TotalSanity (bool Force) {
 	if (!Force and !DoTotalMemoryTest)
 		return true;

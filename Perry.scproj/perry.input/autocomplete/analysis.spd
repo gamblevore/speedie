@@ -1,9 +1,12 @@
 
 
 	
-function PerryFuncListFilter (GUIListEditEvent)
+function PerryFuncListFilter (GUIListFilterEvent)
 	opt norefcounts
-	.ide.ListAllFuncs(false, value)
+	if value!=nil
+		.ide.ListAllFuncs(false, value)
+	  else
+		debugger
 
 
 function MenuAllFuncs (GUIaction)
@@ -102,7 +105,7 @@ function PerryAutoCompleteSelected (GUIListEvent)
 			e.ShowAndSelect(rl.int, true)
 	i.DuringTempView--
 
-	
+
 function PerryFuncMenuSelected (GUIListEvent)
 	opt norefcounts
 	|| e = .ide.EditMe

@@ -11,7 +11,7 @@ class MessageView (ListView)
 		.MultiSelection 	= true
 		.onrightclick		= RightClickJeeboxView
 		.ondrawrow			= InsideJeeboxViewRowDraw
-		.tryeditcell		= JeeboxViewRenamer
+		.Oneditcell			= JeeboxViewRenamer
 		.Hierarchical		= true
 		.GNormal.Seps = 0
 		.EnableDrag	

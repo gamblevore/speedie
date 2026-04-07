@@ -101,6 +101,9 @@ class Object
 		
 		function TotalSanity (|bool| Force=true, |bool|)
 			cpp_wrapper JB_TotalSanity
+		
+		function New (|object|)
+			disabled "Subclass object to create one"
 
 
 
