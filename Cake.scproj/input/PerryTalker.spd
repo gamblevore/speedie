@@ -25,7 +25,7 @@ dispatch DebuggerActions (PerryResponse)
 	stepover:		return .TempBreak(.StepOver)
 	
 	edit			EditAction
-	expansions		ExpandAction
+	expansion		ExpandAction
 	brkadd			BreakAction
 	brkrem			BreakRemoveAction
 	sendbreaks		SendBreakAction
@@ -387,9 +387,10 @@ function xtype.ActualType (|&nil| ObjAddr, |xtype|)
 
 function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |int| Depth, |xtype?| Type)
 	opt norefcounts
-	if obj and type and .Expanded > Depth
+	if obj and type
 		j.Enter(@arg)
-		Type.ExpandSub(j, Obj, Depth)
+		if .Expanded > Depth
+			Type.ExpandSub(j, Obj, Depth)
 		j.exit
 
 
