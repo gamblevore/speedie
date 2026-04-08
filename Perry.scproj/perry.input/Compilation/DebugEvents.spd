@@ -29,7 +29,9 @@ function perryide.ViewRun (|bool|)
 
 function perryide.WantsRun (|bool|)
 	if .RunCompiledApp
-		return DebugStepRun(self, -1)
+		if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
+			return .SendRunMsg("run fast")
+		return .SendRunMsg("run")
 	return .start
 
 
@@ -273,33 +275,42 @@ function DebugBreakAdd (GuiTextLineEvent)
 
 
 function DebugStepOver (guiaction)
-	return .SendMsg("stepover")
+	return .SendRunMsg("stepover")
 
 
 function DebugStepIn (guiaction)
 	if keys.Shift
-		return .sendmsg("stepincutely")
-	return .sendmsg("stepin")
+		return .SendRunMsg("stepincutely")
+	return .SendRunMsg("stepin")
 
 
 function DebugStepOut (guiaction)
-	return .sendmsg("stepout")
+	return .SendRunMsg("stepout")
 
 
 function DebugStepRun (guiaction)
-	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
-		return .sendmsg("run fast")
-	return .sendmsg("run")
+	// would be nicer if we immediately hide the buttons for this
+	// but delayedly do it for the other .sendrunmsg
+	if .text contains "\02"
+		return .ide.WantsRun
+	return .SendRunMsg("pause")
+	
 	
 
-function GUIControl.SendMsg (|string| s, |bool| PressingAButton=true, |bool|)
-	opt norefcounts
-	|| i = .ide
-	|| r = i.RunCompiledApp
+function GUIControl.SendRunMsg (|string| s, |bool|)
+	// need to disable gui? or is it ok already.
+	return .SendMsg(s, true)
+
+
+function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
+//	opt norefcounts
+	|perryide--| i = .ide
+	|unixprocess--| r = i.RunCompiledApp
 	if r isa SpdProcess
+		i.LogOneThing(@emb + s, "\1C ", i.LogCake)
 		if (r <~ s)
 			if PressingAButton
-				i.AppInfo.setfocus
+				i.AppInfo.SetFocus
 		  else
 			Notifications <~ "Debugger connection failed"
 	  else

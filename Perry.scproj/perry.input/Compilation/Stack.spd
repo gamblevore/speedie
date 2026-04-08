@@ -10,10 +10,11 @@ function CakeTalk (|SpdProcess| Cake)
 		.SetAppInfo		
 	
 	|| msg = cake.Get$							// getmsg
-	.LogOneThing(msg, "", .LogCake)
-		
+	.LogOneThing(msg, "\1B ", .LogCake)
+
 	if msg ~= "run"
 		.DelayedRun = date.now
+		.UpdateDebugButtons(true)
 	  else
 		.DelayedRun = nil
 		if msg ~= "stack" or "break"
@@ -98,27 +99,40 @@ function ExtraAppInfo (|faststring| fs)
 			l.MemPrint("/", 1, 0, fs)
 
 
-function SetAppInfo
+
+function UpdateDebugButtons (|bool| ForceRunning=false, |bool|)
 	opt norefcounts
 	|| r = .RunCompiledApp
 
 	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (.debugmode isnt finished)
 	|| Paused = .DebugMode is paused
+	if ForceRunning
+		paused = false
 
 	for btn in .DebugBtns
 		|| Last = btn.IsLast
 			btn.text = ("\02\02" (paused) "\0E")
 		(btn is enabled) = CanDebug and (Paused or Last)
+	
+	return CanDebug
+
+
+
+function SetAppInfo
+	opt norefcounts
+	|| CanDebug = .UpdateDebugButtons
 
 	|| Box = .AppInfo
 	if !CanDebug
-		.editme._ActiveLine = nil
 		Box.tag = nil
+	if !CanDebug or .DebugMode isnt paused
+		.editme._ActiveLine = nil
+		.stack.clear
 	
 	|| fs = VarPrinter
 	fs.Length = 0
 	fs.AppendRange(.project, .project.namepart)
-	if r
+	|| r = .RunCompiledApp
 		fs <~ ": "
 		fs <~ r.pid
 	
@@ -136,6 +150,7 @@ function SetAppInfo
 
 	if .MyStatsMode == 0
 		.ShowLeftStats
+
 
 
 function message.NameCheck (|message| other, |int| index=0, |bool|)
@@ -323,14 +338,14 @@ function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
 	|| arg = stack.last$
-	.appinfo.tag = stack.first		// nice info about RAM/Pico :]
+	.appinfo.tag = stack.first			// nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
 	
 	for m in Arg
 		|| l = m.Last
-		if l == @arg // assume its a var-dump
+		if l == @arg					// assume its a var-dump
 			for s in l
-				s|listviewrow|.ImproveVar
+				s|ListViewRow|.ImproveVar
 			exit
 
 	StackSrc.StitchAndFixup(arg, 0)
@@ -341,13 +356,33 @@ function perryide.UpdateStack (|message| stack)
 		if f and !.stack.FirstSelected
 			(f is expanded)
 		.ClickedStack(F, true)
-	  else
-		.EditMe._ActiveLine = nil
-
-	|| M = .DebugMode
-	if m is Paused != Break
-		(M is paused) = Break
-		.DebugMode = M
+		|| m = .DebugMode
+		if M isnt Paused
+			(m is paused)
+		.DebugMode = m
 	.SetAppInfo
 
+
+
+function perryide.CollectExpansion
+	// don't wanna send this while running
+	// also... does the stack disappear while we are running?
+	// cos it SHOULD.
+	
+	opt norefcounts
+	|| s = .Stack.ListSource
+	|| j = VarPrinter
+	j.Start(@tmp, "expansion")
+	j.Enter(@arg)
+	.Blabble(s, j)
+
+
+function perryide.Blabble (|message| s, |jbin| j)
+	opt norefcounts
+	for ch in s
+		
+		
+	
+	
+	
 

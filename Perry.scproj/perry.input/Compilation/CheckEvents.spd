@@ -208,7 +208,7 @@ extend PerryIDE
 		|| c = what
 		if response
 			c = what + ("\n" + response.render) // hmmm... seems awkward
-		.LogOneComm(@emb + ("\1b " + c))
+		.LogOneComm(@emb + c, "\1b ")
 		notifications <~ (what, response)
 	
 	

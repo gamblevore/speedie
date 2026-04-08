@@ -241,21 +241,25 @@ class ListView (GUIControl) {
 				return true
 
 	
-	function RemoveRow (|ListViewrow| r, |bool| update=true)
+	function Remove (|ListViewrow| R, |bool| NoUpdate=false)
+		disabled "Do you mean .RemoveRow?"
+	
+	
+	function RemoveRow (|ListViewrow| R, |bool| NoUpdate=false)
 		opt norefcounts
 		.CheckRemoved(r)
 		
 		|ListViewrow| willsel
 		if r is selected
 			willsel = r.prev ?? r.next
-		r|list|.remove
+		r.remove
 		
 		if willsel
 			.ChangeSel(willsel, true)
 			.SelectedEvent( willsel, ListViewSelectMode.normal )
 
-		GUI.touch(self)
-		if Update
+//		GUI.touch(self)
+		if !NoUpdate
 			.touch						// SetModified
 	
 	

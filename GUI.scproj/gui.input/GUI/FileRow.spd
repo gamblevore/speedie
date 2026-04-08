@@ -56,12 +56,12 @@ class FileRow (ListViewRow)
 	function AskDelete (|fileviewer| fv)
 		|| ex = fv.extra
 		if ex contains self
-			.remove(fv)
+			fv.Removerow(self)
 			return
 		|| l = .Location$
 		require keys.shift or "Delete file: ${l.name}?\n\nAt ${l.parent}".confirm
 		if l.file.MoveToTrash
-			.remove(fv)
+			fv.removerow(self)
 		fv.checksize
 	
 	

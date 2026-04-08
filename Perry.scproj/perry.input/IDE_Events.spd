@@ -490,22 +490,38 @@ function ClickedError (GUIListEvent)
 	return true
 
 
-function PerryIDE.AskClearLog (|int| Count, |bool|)
-	return "Clear log?\n\nContains $count items.".confirm
+function PerryIDE.AskClearLog (|int| Count, |string| name, |bool|)
+	return "Clear $name?\n\nContains $count items.".confirm
 	
-	
+
+function listviewrow.PerryLogClear
+	.clear
+	.position = 0
+	gui.touch
+
+
 function LogAreaKeys (GuiKeyEvent)
 	opt norefcounts
+	|| Comms = .ide.CommsLogList
+	|| R = Comms.listsource
+	if key.IsDelete
+		|| l = Comms.FirstSelected // only 1 anyhow
+			if l.parent.isroot
+				|| Count = l.Count
+				if Count and .ide.AskClearLog(Count, l.name)
+					l.PerryLogClear
+			  else
+				comms.RemoveRow(l)
+		return true
+	
 	require key iscmd keys.k
 
-	|message--| R = .ide.CommsLogList.listsource
 	|| Count = 0
 	for s in r
 		Count += s.Count
-	if Count and .ide.askclearlog(Count)
+	if Count and .ide.AskClearLog(Count, "All logs")
 		for s in r
-			s.clear
-			s.position = 0
+			s.PerryLogClear
 		return true
 
 

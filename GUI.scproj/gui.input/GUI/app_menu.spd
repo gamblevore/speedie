@@ -74,16 +74,17 @@ class AppMenu (Window)
 			return SDLActivity.activity
 
 
-		libinternal MenuScreen (GuiMenuEvent)
-			|| W = GUI.ScreenWindow #expect beep
+//		libinternal MenuScreen (GuiMenuEvent)
+//			|| W = GUI.ScreenWindow #expect beep
 //			gui.SDL_SetWindowFullscreen(W, GUI.WINDOW_FULLSCREEN) // OSX doesn't like this!
+
 
 		libinternal MenuHelp (GuiMenuEvent)
 			|| it = app.Conf("HelpURL")
 				app.showurl(it)
 				return 
 			if self isa listview
-				menu.remove(self, false)
+				.RemoveRow(menu)
 			beep "No help available."
 		
 		

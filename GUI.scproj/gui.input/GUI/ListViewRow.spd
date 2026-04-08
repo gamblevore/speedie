@@ -86,14 +86,7 @@ role ListViewRow (message)
 				self = .last
 			return .flatnext
 		return .next ?? .flatafter
-					
-		
-	function Remove (|listview| lv, |bool| Update=true)
-		if (lv)
-			lv.removerow(self, Update)
-		  else
-			super.remove
-
+	
 
 	function NextSelected (||)
 		opt norefcounts
