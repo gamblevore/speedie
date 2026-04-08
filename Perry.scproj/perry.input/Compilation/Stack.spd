@@ -92,7 +92,7 @@ function ExtraAppInfo (|faststring| fs)
 		|message--| l = o.first$
 		l.MemPrint("Obj", 0, 3, fs)
 		l.MemPrint("Str", 1, 3, fs)
-		l.MemPrint("Img", 2, 3, fs)
+		l.MemPrint("IDK", 2, 3, fs)
 		l = o.second
 		if l
 			l.MemPrint("Sck", 0, 3, fs)

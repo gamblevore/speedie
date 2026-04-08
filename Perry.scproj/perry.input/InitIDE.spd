@@ -352,10 +352,10 @@ extend PerryIDE
 			.tooltip		= self.debugger.Tooltip
 			.size			= the~width  by  1~under back 18
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
-			self.AddDebugButtons(DebugStepOver, "\02", "Step Over")
-			self.AddDebugButtons(DebugStepIn,   "\03", "Step In")
-			self.AddDebugButtons(DebugStepOut,  "\04", "Step Out")
-			self.AddDebugButtons(DebugStepRun,  "\02\02", "Run")
+			self.AddDebugButtons(DebugStepOver, "\02",		"Step Over")
+			self.AddDebugButtons(DebugStepIn,   "\03",		"Step In")
+			self.AddDebugButtons(DebugStepOut,  "\04",		"Step Out")
+			self.AddDebugButtons(DebugStepRun,  "\02\02",	"Run")
 
 
 		with .stack

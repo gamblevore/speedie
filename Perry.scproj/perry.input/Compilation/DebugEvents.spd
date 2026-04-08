@@ -28,11 +28,15 @@ function perryide.ViewRun (|bool|)
 
 
 function perryide.WantsRun (|bool|)
-	if .RunCompiledApp
-		if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
-			return .SendRunMsg("run fast")
-		return .SendRunMsg("run")
-	return .start
+	if !.RunCompiledApp
+		return .start
+
+	if .DebugMode isnt Paused
+		return .SendRunMsg("pause")
+
+	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
+		return .SendRunMsg("run fast")
+	return .SendRunMsg("run")
 
 
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
@@ -291,9 +295,7 @@ function DebugStepOut (guiaction)
 function DebugStepRun (guiaction)
 	// would be nicer if we immediately hide the buttons for this
 	// but delayedly do it for the other .sendrunmsg
-	if .text contains "\02"
-		return .ide.WantsRun
-	return .SendRunMsg("pause")
+	return .ide.WantsRun
 	
 	
 

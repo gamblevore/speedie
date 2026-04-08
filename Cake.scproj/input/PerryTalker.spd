@@ -32,7 +32,7 @@ dispatch DebuggerActions (PerryResponse)
 
 	stop:			app.quit, return StepAction.donothing
 		
-	pause:			return StepAction.SendVars
+	pause:			return StepAction.SendVarsPause
 
 
 
@@ -44,7 +44,9 @@ datatype StepAction (uint)
 		|StepAction|
 		DoNothing = 0
 		SendVars
+		Pause
 		GoRun				// run will already send the vars, after we hit the next break.
+		SendVarsPause = SendVars+Pause
 	
 	syntax is (|stepaction| k, |bool|)
 		return self|uint|&k|uint|
@@ -81,6 +83,8 @@ function __PerryView__ (cakevm.CakeChef)
 			|| Action = .respond(m, stack)
 			if Action is SendVars
 				.SendStack(stack, p, "stack")
+			if action is pause
+				stopped = true
 			if !ErrorCode and .GoRun(p, stopped, action)
 				exit
 
