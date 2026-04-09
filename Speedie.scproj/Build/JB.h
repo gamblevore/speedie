@@ -8222,8 +8222,6 @@ void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
 void JB_bin_RunHeader(FastString* Self, JB_String* Name);
 
-void JB_bin_Start(FastString* Self, Syntax Type, JB_String* Name);
-
 int JB_bin_StartAdd(FastString* Self);
 
 jbinLeaver JB_bin_TmpArg(FastString* Self, JB_String* Name);
