@@ -65,7 +65,7 @@ struct Assembler
 			opt norefcounts
 			|| names = FastString()
 			for c in Compiler.ReachedClassTable
-				if !c.isrole and !c.isbehaviourtable and (!c.IsLibrary or options.MakeExec)
+				if !c.isrole and !c.IsBehaviourTable and (c.IsLibrary == options.MakeExec)
 					c.exportname.MiniName(names, c.IsObject)
 					j.Enter(@msg, names|string|)
 					names.Length = 0
