@@ -26,6 +26,7 @@ int JB_App__SetEnv(JB_StringC* name, JB_StringC* value);
 int JB_Rec__PrintErrors();
 JB_String* JB_App__LibInfo();   
 void** JB_App__LibFuncs();
+JB_StringC* JB_App__LibDebug();
 void** JB_App__LibGlobs();
 u16* JB_App__GlobTable();
 JB_String* JB_App__LibClasses(); 
