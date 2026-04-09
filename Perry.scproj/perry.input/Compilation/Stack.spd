@@ -382,6 +382,8 @@ function @perry.CollectExpansion (GUIListExpandEvent)
 
 
 function perryide.CollectExpansion
+	// This would expand ALL vars of the same function... even if recursive.
+	// So how to deal with recursive funcs? Whatever... too much is still OK??
 //	main: "/usr/local/speedie/Examples/hello_world.spd" \150 \4
 
 	opt norefcounts
