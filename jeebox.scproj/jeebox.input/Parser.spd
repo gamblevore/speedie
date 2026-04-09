@@ -340,7 +340,7 @@ extend Parser
 		|| d = parser.data
 		|| Nest = 1
 		while
-			|| After = d.find( '`', Parser.Nextstart ) #loop
+			|| After = d.find( '`', Parser.Nextstart )			#loop
 			Parser.NextStart = After + 3
 			if d[after-2, "<(`"]
 				Nest++
@@ -352,6 +352,7 @@ extend Parser
 
 
 	function BeforeRelSub (|int| Start, |bool| Mode, |Message|)
+		opt norefcounts
 		rz = parser.new( nil, @Brel, start, parser.NextStart )
 		rz <~ parser.ProcessThing( 0, Mode )$
 
@@ -406,12 +407,14 @@ extend Parser
 		return nil
 	
 	function fCharSub (|int| pos, |int| start, |byte| find, |message|)
+		opt norefcounts
 		|| name = .CharName(start, find)
 		if name != nil
 			rz = parser.new( nil, @char, pos, name )
 
 
 	function fChar (ParseHandler)
+		opt norefcounts
 		rz = fcharsub(start, start, '\'')
 		if !rz
 			Return parser.ErrorAdd( "Char didn't close!" )
@@ -447,13 +450,14 @@ extend Parser
 
 
 	function fDecl (ParseHandler)
+		opt norefcounts
 		|| Result = parser.BarThings( Start, @Decl )
 			if !parser.WillEnd
 				result <~ parser.ProcessThing(kOppSyx (|) kOppTemporal)
 		return Result
 	// decl and typecast are neighbours :)
 	function fTypeCast (ParseHandler)
-		return parser.BarThings( Start, @Type )		#require
+		return parser.BarThings( Start, @Type )
 
 
 	function fDot (ParseHandler)
@@ -480,6 +484,7 @@ extend Parser
 
 
 	function fFuncCall (ParseHandler)
+		opt norefcounts
 		rz = parser.new(nil, @Func, parent!.position)
 		parser.Params( rz, start )
 
@@ -566,6 +571,7 @@ extend Parser
 	
 	
 	function fOppWord (ParseHandler)
+		opt norefcounts
 		|| After = parser.WordAfter( start )
 		if (parser[after] != '.')
 			|| opp = parser.new( nil, @Opp, start, after )
@@ -602,6 +608,7 @@ extend Parser
 
 
 	function fOppSyxNeq (ParseHandler)
+		opt norefcounts
 		|| result = parser.fOppSyx(start, nil)
 		if  '='  == parser.NextByte
 			Return parser.ErrorAdd( "Can’t have '=' after this operator." )
@@ -609,6 +616,7 @@ extend Parser
 	
 	
 	function fAskSub (|int| Start, |syntax| f, |Message|)
+		opt norefcounts
 		|| opp = parser.process(kOpp, parser.kExpect)
 		|| first = parser.ProcessThing(kOppSyx, parser.kExpect)
 		require (first and opp)
@@ -662,6 +670,7 @@ extend Parser
 
 
 	function fArgName (ParseHandler)
+		opt norefcounts
 		if parent
 			|| f = parent.func
 			if f == @arg or @list or @bra or @arr
@@ -739,6 +748,7 @@ extend Parser
 	
 	
 	function fSyntacticComment (ParseHandler)
+		opt norefcounts
 		rz = parser.new(nil, @list, start)
 		parser.ParseLoopFlags( rz, "#/", kTemporalSyxNoBar )
 		rz.Func = @scom
@@ -801,6 +811,7 @@ extend Parser
 
 
 	function fStatement (ParseHandler)
+		opt norefcounts
 		|| tmp = fTmp(start, kOpp & ~kOppBra, kthing, parent )
 		if tmp != @thg
 			return tmp
@@ -818,6 +829,7 @@ ive been~running #since morning
 #since (morning) (ive been~running) */
  
 	function fTemporalHashThing (ParseHandler)
+		opt norefcounts
 		|| Result = .New( parent, @tril, start )
 		|ind| S = parser.nextstart
 		.new( result, @cnj, s, .WordAfter( s ) )
@@ -834,6 +846,7 @@ ive been~running #since morning
 	
 	
 	function fThingWord (ParseHandler)
+		opt norefcounts
 		|| name = parser.WordAfter( start )
 		return parser.new( nil, @Thg, start, name )
 

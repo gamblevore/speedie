@@ -136,7 +136,7 @@ role JBin (Faststring)
 		self|faststring|.Length = NewLength // shouldn't be necessary
 		return Gained
 	
-	function uint64.HintLength (|int|)
+	libinternal uint64.HintLength (|int|)
 		rz = 1
 		if self|int64|<0
 			self = -self
