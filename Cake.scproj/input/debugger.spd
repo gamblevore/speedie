@@ -57,7 +57,8 @@ module debugger
 					BestCount = 1
 			  elseif Score == BestScore
 				BestCount++
-				require BestCount
+		
+		require BestCount
 		if BestCount == 1
 			return .SetUserBreak(CakeBreak, BestValue, active)
 
@@ -65,9 +66,7 @@ module debugger
 			|| Src = raw.location
 			|| Score = Src.MatchScore(ToFind)
 			if Score == BestScore
-				.SetUserBreak(CakeBreak, Raw, active)
-			
-			
+				.SetUserBreak(CakeBreak, Raw, active)			
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |bool| Active)

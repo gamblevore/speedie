@@ -195,6 +195,7 @@ function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 	
 
 function PerryIDE.ClearRun
+	.LogOneCake("--Finished--")
 	.DebugMode = CompileMode.Finished
 	.RunButton.text = "\02"
 	.DelayedRun = nil
@@ -270,12 +271,11 @@ function DebugBreakAdd (GuiTextLineEvent)
 		return true
 	
 	|| cmd = ("brkadd" (direction > 0) "brkrem")
-	|| j = VarPrinter
-	j.start(@tmp, cmd)
+	|| j = VarPrinter.start(@tmp, cmd)
 	j.addstr i.path
 	j.addint line.MsgPos
 	j.exit
-	i.SendMsg(j|&nil||string|, false)
+	i.SendJbin(j)
 
 
 function DebugStepOver (guiaction)
@@ -304,12 +304,15 @@ function GUIControl.SendRunMsg (|string| s, |bool|)
 	return .SendMsg(s, true)
 
 
+function GUIControl.SendJbin (|jbin| j, |bool|)
+	.SendMsg(j.getresult, false)
+
+
 function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
-//	opt norefcounts
 	|perryide--| i = .ide
 	|unixprocess--| r = i.RunCompiledApp
 	if r isa SpdProcess
-		i.LogOneThing(@emb + s, "\1C ", i.LogCake)
+		i.LogOneCake(s.parse, "\1C ")
 		if (r <~ s)
 			if PressingAButton
 				i.AppInfo.SetFocus

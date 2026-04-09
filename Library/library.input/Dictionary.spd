@@ -192,9 +192,9 @@ extend dictionary
 
 
 
-function object._dictname (|string|): cpp_wrapper JB_Obj_DictName
-function int64._dictname (|string|): cpp_wrapper JB_int64_DictName
-function string.idcase    (|string|): return .lowercase
+libinternal object._dictname (|string|): cpp_wrapper JB_Obj_DictName
+libinternal int64._dictname (|string|): cpp_wrapper JB_int64_DictName
+libinternal string.idcase    (|string|): return .lowercase
 // can't remove diacritics cos... spanish needs them for disambig!
 // literally two words with different diacritics
 

@@ -78,7 +78,7 @@ role ListViewRow (message)
 		return p
 
 
-	libinternal HierNext  (|listviewrow| root, |listviewhierarchy| H, ||)
+	libinternal HierNext (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
 		// listviewhierarchy isnt so easy to get working...
 		if (self is expanded) or (self == root)
@@ -162,8 +162,8 @@ role ListViewRow (message)
 		if (Cols == nil) or (parent._Hierarchical is Hierarchical)
 			column = -1
 		return parent.TableCell(self, column)
-		
-		
+	
+	
 	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Column, |float| str)
 		opt NoRefCounts
 
@@ -183,7 +183,7 @@ role ListViewRow (message)
 			|imagepixel| Col = Shading.y
 				textcol = Col
 		  elseif (Column==0) and parent.Istree and (self!=parent.Columns)
-			if parent.listchild(self)
+			if parent.CanExpand(self)
 				|| exp = ("\02" (self isnt expanded) "\03")
 				|| VCol = vec4(1, 0.5)
 				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.rowheight)
@@ -193,6 +193,15 @@ role ListViewRow (message)
 			r.y = rect.y2 - 10
 		TextCol.alpha *= str
 		font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
+	
+
+	function listview.CanExpand (|listviewrow| Row, |bool|)
+		opt norefcounts
+		if row.last == @arg
+			return true // Right? even if its empty.
+						// Cos we need some way to ask a server/process for open a folder
+		if .listchild(row)
+			return true // also
 		
 	
 	module
@@ -241,7 +250,10 @@ datatype ListViewSelectMode (uint)
 		NoShow
 		NoEvent
 		SendEvent
+		
 		Normal = 0
+		Expanded = 1
+
 	
 	syntax is (|ListViewSelectMode| s, |bool|)
 		inlined

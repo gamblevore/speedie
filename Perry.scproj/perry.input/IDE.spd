@@ -807,7 +807,7 @@ So anything not 0 means "its OK"`
 		
 		if doc.location.pathiscode
 			doc.ExpectJeebox = TextView.AlwaysJeebox
-		  else
+		  else 
 			doc.ExpectJeebox = TextView.AllowJeebox
 
 		|| Loaded = E.LoadDocument(doc, true)					#require

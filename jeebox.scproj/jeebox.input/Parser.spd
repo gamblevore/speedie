@@ -48,7 +48,7 @@ extend Parser
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
 		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
-		.Token( `#` )  = .Handler( kTemporalSyx, fTmpSection )
+		.Token( `#` )  = .Handler( kTemporalSyx, fTmpSection ) // where is this used?
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
 
@@ -378,7 +378,7 @@ extend Parser
 
 
 	function fBracket (ParseHandler)
-		Opt NoRefCounts			  // (,,a:b,,c:d,e,)
+		Opt NoRefCounts							// (,,a:b,,c:d,e,)
 
 		rz = parser.new(nil, @list, start)
 		|| Lines = parser.ParseLoopFlags( rz, ")", kTemporalSyxNoBar )
@@ -388,7 +388,7 @@ extend Parser
 
 
 	function fQuoteLang (ParseHandler)
-		Opt NoRefCounts			// he said “ clouds are white ”
+		Opt NoRefCounts							// he said “ clouds are white ”
 		rz = parser.new(nil, @quot, start)
 		parser.ParseLoopFlags( rz, "”", kTemporalSyxNoBar )
 
@@ -448,14 +448,12 @@ extend Parser
 
 	function fDecl (ParseHandler)
 		|| Result = parser.BarThings( Start, @Decl )
-		
-		if result and !parser.WillEnd
-			|| Curr = parser.ProcessThing(kOppSyx (|) kOppTemporal)
-				result <~ curr
+			if !parser.WillEnd
+				result <~ parser.ProcessThing(kOppSyx (|) kOppTemporal)
 		return Result
 	// decl and typecast are neighbours :)
 	function fTypeCast (ParseHandler)
-		return parser.BarThings( Start, @Type ) #require
+		return parser.BarThings( Start, @Type )		#require
 
 
 	function fDot (ParseHandler)
@@ -463,7 +461,7 @@ extend Parser
 
 	
 	function fAfterRel (ParseHandler)
-		return parser.New( nil, @ARel, Start, parser.NextStart ) // sigh...
+		return parser.New( nil, @ARel, Start, parser.NextStart )		// sigh...
 	
 	
 	function fDotAccess (ParseHandler)
@@ -473,9 +471,8 @@ extend Parser
 		|| after = parser.nextstart
 		name.name = name.name.replaceall("–", " ")
 		rz = parser.NewEmpty(nil, @acc, start, after) 
-		|| prms = parser.newempty(rz, @arr, start, start)
+		|| prms = parser.NewEmpty(rz, @arr, start, start)
 		prms <~ name
-
 
 
 	function fEndOfLine (ParseHandler)

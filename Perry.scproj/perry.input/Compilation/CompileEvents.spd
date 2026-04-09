@@ -1,6 +1,6 @@
 
 
-function ClickedCompile (GUIaction)
+function ClickedCompile (GUIAction)
 	opt norefcounts
 	|| i = .ide
 	|| mode = i.WantCake(compilemode.compile)
@@ -8,6 +8,7 @@ function ClickedCompile (GUIaction)
 
 
 function perryide.WantCake (|CompileMode| Mode, |compilemode|)
+	opt norefcounts
 	|| DebugArgs = .DebugArgs
 		|| req = DebugArgs["compile"]
 			if req ~= "cake"
@@ -54,7 +55,7 @@ function PerryIDE.Compile (|CompileMode| Mode)
 	if !.IsBuilding
 		.DebugMode = mode
 		.Actual_Compile
-		return 
+		return
 
 	// They pressed it twice
 	.DebugMode = 0

@@ -65,7 +65,7 @@ struct Assembler
 			opt norefcounts
 			|| names = FastString()
 			for c in Compiler.ReachedClassTable
-				if !c.isrole and !c.isbehaviourtable and (c.IsLibrary or options.MakeExec)
+				if !c.isrole and !c.isbehaviourtable and (!c.IsLibrary or options.MakeExec)
 					c.exportname.MiniName(names, c.IsObject)
 					j.Enter(@msg, names|string|)
 					names.Length = 0
@@ -82,8 +82,9 @@ struct Assembler
 			j.exit
 			
 			j.Enter(@msg, "glob")
-			|| MakeExec = options.makeexec
-			|| G = (packmaker.libglobs (makeexec) packmaker.packglobs)
+			|| G = PackMaker.LibGlobs
+			if !options.makeexec
+				g = PackMaker.PackGlobs
 			j.PropertyLayout(G)
 			j.exit
 		

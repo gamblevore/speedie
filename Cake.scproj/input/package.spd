@@ -9,11 +9,13 @@ module CakeRun
 	constants
 		FuncIsLib = 1
 	
+
+	function LibDebug (|string|)
+		cpp_Wrapper JB_App__LibDebug // needs to be used somehow
+
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs
-		
-//	syntax access (|int| i, |SpdFunc|)
-//		return SpdTable.Funcs[i]
+	
 
 	function message.Arg (|string| name, |bool| Err = false, |message|)
 		opt norefcounts

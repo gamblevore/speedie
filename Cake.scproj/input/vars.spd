@@ -5,7 +5,6 @@ class XVar (list)
 	|int|				CodeEnd
 	|SourceLocation|	SrcMap
 	|byte|				ViewStrength
-	|byte|				Expanded
 	|uint16|			Reg
 	|DataTypeCode|		DataType
 	|string|			Name
@@ -18,7 +17,6 @@ class XVar (list)
 		.position = pos
 		.reg = reg
 		.name = s.CString
-		.Expanded = 4
 		.obj = xtype.GetType(s.hint, nil)
 		.DataType = s.HInt
 		.CodeEnd = int.max

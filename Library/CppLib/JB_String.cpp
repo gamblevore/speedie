@@ -133,12 +133,6 @@ JB_StringC* JB_StrCN( const void* c, int N ) {
 	return (JB_StringC*)JB_Str__Empty();
 }
 
-JB_String* JB_Str__Freeable(uint8* p, int n) {
-    JB_String* Str = JB_New( JB_String );
-    Str->Addr = (uint8*)p;
-    Str->Length = n;
-    return Str;
-}
 
 JB_String* JB_Str__Freeable0(const char* Msg) {
 	return JB_Str__Freeable((uint8*)Msg, (int)strlen(Msg));

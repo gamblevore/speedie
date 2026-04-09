@@ -10,7 +10,7 @@ function CakeTalk (|SpdProcess| Cake)
 		.SetAppInfo		
 	
 	|| msg = cake.Get$							// getmsg
-	.LogOneThing(msg, "\1B ", .LogCake)
+	.LogOneCake(msg, "\1B ")
 
 	if msg ~= "run"
 		.DelayedRun = date.now
@@ -75,6 +75,7 @@ function AppInfoExtra (|unixprocess| r, |string|)
 	if st.IsRunning
 		return "Running"
 	return st.Name
+
 
 
 function ExtraAppInfo (|faststring| fs)
@@ -319,18 +320,17 @@ extend ListViewRow
 
 
 function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
-	|jbin--| j = VarPrinter
-	j.start(@tmp, "edit")
+	|jbin--| j = VarPrinter.start(@tmp, "edit")
 	j.addstr value
 	row.DebugPath(j)
-	.SendMsg(j|&nil||string|, false)
+	.SendJbin(j)
 
 
 
 function perryide.ReloadBreaks
-	|| j = jbin(@tmp, "sendbreaks")
+	|jbin--| j = VarPrinter.start(@tmp, "sendbreaks")
 	j.addstr .path
-	.SendMsg(j, false)
+	.SendJbin(j)
 
 
 
@@ -338,23 +338,22 @@ function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
 	|| arg = stack.last$
-	.appinfo.tag = stack.first			// nice info about RAM/Pico :]
+	.appinfo.tag = stack.first			// Nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
 	
 	for m in Arg
 		|| l = m.Last
-		if l == @arg					// assume its a var-dump
+		if l == @arg					// Assume its a var-dump
 			for s in l
 				s|ListViewRow|.ImproveVar
-			exit
 
 	StackSrc.StitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
-
+	
 	|| Break = stack == "break"
 		|| f = .stack.liststart
 		if f and !.stack.FirstSelected
-			(f is expanded)
+			.stack.ExpandRow(f)
 		.ClickedStack(F, true)
 		|| m = .DebugMode
 		if M isnt Paused
@@ -364,25 +363,69 @@ function perryide.UpdateStack (|message| stack)
 
 
 
+function jbin.ExpandDebug (|listviewrow| list)
+	opt norefcounts
+	.enter
+	for var in list
+		|| arg = var.last
+		if (arg == @arg) and (var is expanded)
+			|| name = var.obj as string
+				.enter(@tmp, name)
+				.ExpandDebug(arg)
+				.exit
+	.exit
+		
+
+function @perry.CollectExpansion (GUIListExpandEvent)
+	opt norefcounts
+	.ide.CollectExpansion
+
+
 function perryide.CollectExpansion
-	// don't wanna send this while running
-	// also... does the stack disappear while we are running?
-	// cos it SHOULD.
-	
+//	main: "/usr/local/speedie/Examples/hello_world.spd" \150 \4
+
 	opt norefcounts
-	|| s = .Stack.ListSource
-	|| j = VarPrinter
-	j.Start(@tmp, "expansion")
+	|| funcs = .Stack.ListSource
+	|| j = VarPrinter.Start(@tmp, "expansion")
 	j.Enter(@arg)
-	.Blabble(s, j)
+
+	for fn in funcs
+		|| arg = fn.last
+		if (arg == @arg) and (fn is Expanded)
+			j.Enter(@tmp, fn.name)
+			j.AddStr(fn.firstname) // path
+			|| loc = fn[2]
+			j.Add(loc.func, loc.name)
+			j.ExpandDebug(arg)
+			j.exit
+	
+	.SendJbin(j)
 
 
-function perryide.Blabble (|message| s, |jbin| j)
-	opt norefcounts
-	for ch in s
-		
-		
+/*
+Assumptions:
+	* Expansions only change when its visible.
+	* The program is stopped when expand/collapse changes.
 	
+	* Lets say is everything nicely synced up. We press run and hit a new break.
 	
+	* The old expansion info reflects what we HAD... the stack names/numbers might be different.
+	* We aren't going to stitch things on the cake-side. I don't wanna reimplement.
 	
+	So... lets assume we get the new stack... restitch stuff... 
+	
+	then reapply the expansion? seems... it could go wrong.
+	
+	So what then? is there a better way? I can't think of any. Lets make some possibilities:
+	
+	* Perry restitches, then reapplies the old expansion info?
+	
+	* What if we previously had stuff expanded, and its no longer expanded?
+		* Maybe thats OK? I mean... if it closed cos of running... then its expected?
+	
+	* OK... so... how do we know if a function changed? or what functions we are in?
+	
+	* Lets do it by source-position? So where to get the sourcepos from?
+		* its in ONE of our inputs, right?
+*/
 

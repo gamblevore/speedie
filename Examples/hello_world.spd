@@ -1,47 +1,33 @@
 #!/usr/local/bin/cake
 
-|| Limit = 10
 
-//class ABC
-//	|string| Name
-//	|ABC?| Second
-//	|DEF?| Third
-//	
-//Class DEF
-//	|int| ZipCode
-//	|ABC?| Fourth
+class HelloTest
+	|string| Name
+	
 
 main
-//	opt norefcounts
-//	|| A = ABC("hello", nil,)
-//	A.Second = A
-//	A.Third = DEF(99, A)
+	|| H = HelloTest("hello")
 	zalgoline "start world\n\n"
-	|| fs = FastString(0)
+	|| fs = FastString()
 	fs <~ "Start:\n"
-	fs.file = nil
+	|| x = h.name
 	RecursiveHello(1, fs)
 	for 3
 		zalgoline "\n\nend world"
+	debugger
+	printline x
+	for i in 20
+		printline i
+		app.sleep(1s)
 //	app.crash
 //	Platform.HALT_Crash
 
-
-function RecursiveHello (|int| A=1, |faststring| input)	|| rhx = &Input.ResultPtr	|| y = rhx[]
-
-//	x[] = nil!|&byte|
-	rhx[] = y
-	if A&1
+function RecursiveHello (|int| A=1, |faststring| input)
+	a |= ~a & a	if A&1
 		input <~ "hello world: $A"
 	  else
 		input <~ "hewwo world: $A"
 	printline input
-	if A < Limit
+	if A < 10
 		RecursiveHello(A+1, input)
-
-ignore
-
-
-
-
 

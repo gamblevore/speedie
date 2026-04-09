@@ -42,6 +42,8 @@ class ListView (GUIControl) {
 	|GUIListEvent?|					OnSelected
 	|GUIListEvent?|					OnReturn
 	|GUIListEvent?|					OnRightClick
+	|GUIListExpandEvent?|			OnExpandRow
+	
 	|GUIListFilterEvent?|			OnTypingFilter
 	|textview?|						TypingFilter
 
@@ -420,7 +422,7 @@ class ListView (GUIControl) {
 			return true
 		
 		if .IsTree and (key is left or right)
-			return .ExpandRow(key is right)
+			return .ExpandRow((key is right).dir)
 
 		
 	function DefaultCopy (GUICopyEvent)
@@ -739,7 +741,7 @@ class ListView (GUIControl) {
 			|| T2 = T + font.width + 6
 			|| x = p.x
 			if (x >= T and x <= t2) and .listchild(R)// and ((r is selected) or keys.option or keys.gui)
-				.ExpandRow(R, R isnt expanded)
+				.ExpandRow(R, (R isnt expanded).dir)
 				._SelJustChanged = true // block mouseup editing a cell
 				return MouseDragging.Handled
 
@@ -841,14 +843,14 @@ class ListView (GUIControl) {
 			rz = .liststart
 		while rz and rz is UnSelectable
 			rz = rz.step(i <= 0)
-		
+	
 
 	libinternal SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
 		opt norefcounts
 		if !fwd
 			return .listPrev(l) ?? .listend
 		if l != .listsource
-			(l is expanded)
+			.ExpandRow(l)
 		return .listNext(l) ?? .liststart
 	
 	
@@ -871,7 +873,7 @@ class ListView (GUIControl) {
 		|| Start = curr
 		
 		while curr {
-			curr = .searchstep(curr, dir)
+			curr = .SearchStep(curr, dir)
 			if curr == start
 				require curr is found
 				return start
@@ -891,11 +893,11 @@ class ListView (GUIControl) {
 		|| cc = .columncount
 		opt norefcounts
 		for m.all in self
-			(m is found) = .searchcolumns(s, cc, m)
+			(m is found) = .SearchColumns(s, cc, m)
 			rz = true
 			
 	
-	libinternal SearchColumns (|string| find, |int| cc, |listviewrow| row,  |bool|)
+	libinternal SearchColumns (|string| find, |int| cc, |listviewrow| row, |bool|)
 		opt norefcounts
 		for i in cc
 			|| s = .TableCell(row, i)
@@ -919,29 +921,38 @@ class ListView (GUIControl) {
 		return row.parent
 	
 	
-	function ExpandRow (|listViewRow| Sel=nil, |bool| Expand, |bool|)
+	function ExpandRow (|listViewRow| Sel=nil, |int| WantExpand=0, |bool|)
 		opt norefcounts
 		if !sel
 			sel = .LastSelected$
-		|| Force	= keys.option 
-		if  !Expand  and  (!.listchild(sel) or (sel isnt expanded))
+		if WantExpand == 0 and sel is Expanded // no change :]
+			return true
+		
+		|| Expand = WantExpand >= 0
+		|| Force = keys.option
+		if  !Expand  and  (sel isnt expanded)
 			sel = .listparent(sel)
 			if sel and sel isnt Selected
 				.Select(sel)
 			Force = true
+		
 		if sel != .listsource
 			if (!Expand and sel contains .scrollstart)
 				.show(sel)
+
 		if !force and !expand and (sel.AllExpandState & 2)
 			for r in sel
-				(r is expanded)=false
-			return true
+				(r isnt expanded)
+		  else
+			Force |= (Expand == (sel is expanded))
+			while sel
+				(sel is expanded) = Expand
+				loop force
+				sel = .listnext(sel)
 
-		Force |= (Expand == (sel is expanded))
-		while sel
-			(sel is expanded) = Expand
-			loop force
-			sel = .listnext(sel)
+		|| fn = .OnExpandRow
+			(fn)(self, expand)
+		
 		return true
 	
 
@@ -1075,16 +1086,14 @@ class ListView (GUIControl) {
 	function FocusOn (|ListViewrow| r)
 		require .listsource contains r
 		.ScrollSet(r)
-		(r is expanded)
+		.ExpandRow(r)
 		.Select(r)
 
 	
 	libinternal SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode)
 		opt norefcounts
 		require !._DuringSelect
-//		._SelJustChanged = true
 		.ClearEdits
-//		if !._SelJustChanged
 
 		if s and (Mode isnt noshow)
 			.Show(s)
@@ -1112,7 +1121,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		while i != .listsource
 			i = i.parent		#require
-			(i is expanded)
+			.ExpandRow(i)
 
 	
 	function Show (|ListViewrow| i)
@@ -1428,7 +1437,13 @@ class ListView (GUIControl) {
 		if ._ScrollStart!=value
 			._ScrollStart = value
 			.touch
-
+			
+/*
+ expansion {
+	+'RecursiveHello(2)' "/usr/local/speedie/Examples/hello_world.spd" \57 {
+	}
+}
+*/
 	
 	behaviour Draw
 		opt NoRefCounts

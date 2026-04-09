@@ -13,13 +13,13 @@ function CakeRun.CountClasses (|message| list)
 	Classdata.cakeprepare(N, B)
 		
 	
-function CakeRun.LoadClasses (|message| Cls)
+function CakeRun.LoadClasses (|message| Clss)
 	opt norefcounts
 	for cd in ClassData.First_
 		.StoreClass(cd)
-
-	.CountClasses(cls)
-	for c.fast in Cls
+	.CountClasses(clss)
+	
+	for c.fast in Clss
 		.LoadOneClass(C)
 
 
@@ -119,19 +119,17 @@ function @ClassData.CakePrepare  (|int| ClassCount, |int| VCount, |bool|)
 //function ClassData.Virtuals  (|&&nil|)
 //	cpp_wrapper JB_Cake_Virtuals
 
-	
-
-
-datatype BaseType (int)
-	constants
-		|BaseType|
-		Module = 0 // not actually a type
-		Nil
-		Object
-		Struct
-		DataType
-		FuncProto
-	
-	syntax is (|BaseType| d, |bool|)
-		return self == d
-
+//datatype BaseType (int)
+//	constants
+//		|BaseType|
+//		Module = 0 // not actually a type
+//		Nil
+//		Object
+//		Struct
+//		DataType
+//		FuncProto
+//	
+//	syntax is (|BaseType| d, |bool|)
+//		return self == d
+//
+//

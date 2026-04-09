@@ -5,6 +5,7 @@
 prototype GUIDrawBackground		(|object|		self,	|image| where)
 prototype GUIListDragEvent		(|ListView|		self,	|ListViewrow?| Before, |ListViewrow?| Into, |bool|)
 prototype GUIListEvent			(|ListView|		self,	|ListViewrow?| Row, |listviewselectmode| Mode = ListViewSelectMode.normal, |bool|)
+prototype GUIListExpandEvent	(|ListView|		self,	|bool| Expanded)
 prototype GUIListEditEvent		(|ListView|		self,	|ListViewcell!| Cell, |string?| Value=nil, |string?|)
 	description "Returning nil means cancelled set/get"
 prototype GUIListFilterEvent	(|ListView|		self,	|string?| Value=nil, |bool|)
@@ -24,7 +25,7 @@ prototype GUITextEvent			(|textview|		self,  |int| Reason, |bool| TextWasAltered
 prototype GUITextLineEvent		(|textview|		self,  |textviewline| Line, |int| Direction=false, |bool|)
 prototype GUITextLineBreakColor	(|textviewline|	self, |?&message--| PreRun, |bool| InBreakArea,  |vec4|)
 prototype GUITextShowEvent		(|TextView|		self,  |ivec2| LeftCorner, |message?| Msg, |error?| err, |string| reason, |bool| WasDelayed)
-prototype SorterComparerWindow	(|window|		A,     |window| B, |int|)
+prototype SorterComparerWindow	(|window|		A,	|window| B, |int|)
 
 
 ///

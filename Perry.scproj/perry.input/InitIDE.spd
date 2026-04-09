@@ -365,6 +365,7 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.ColumnFinder	= &Perry.VariableFinder
+			.OnExpandRow = &Perry.collectexpansion
 			.Hierarchical()	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
 			.IsMainListView	= true
@@ -630,33 +631,48 @@ extend PerryIDE
 		.AddBaseLog("-- cake actions --", .logcake)
 	
 	
-	function AddBaseLog (|string| s, |listviewrow| list)
+	function AddBaseLog (|string| s, |ListViewRow| list)
 		list.name = s
 		.CommsLogList.listsource <~ list
 		(list is expanded)
 		(list is aligncenter)
 
 
-	function LogOneThing (|message| msg, |string| type, |listviewrow| m)
-		|| fs = FastString()
-		fs <~ type
-		msg.Render(fs)
-		m <~ @emb + fs.GetResult
-		m.position++ 
+	function LogOneThing (|object| msg, |string| type, |ListViewRow| m)
+		if !type
+			if msg isa Message
+				m <~ msg
+			  elseif msg isa string
+				m <~ @emb + msg
+		  else
+			|| fs = FastString()
+			fs <~ type
+			if msg isa Message
+				msg.Render(fs)
+			  elseif msg isa string
+				fs <~ msg
+			m <~ @emb + fs.GetResult
+		m.position++
+		
 		while m.position > 300
 			m.first.remove
 			m.position--
+		
 		if .CommsLogList.IsViewable
 			GUI.Touch
 	
 	
-	function LogOneComm (|message| msg, |string| type="")
+	function LogOneCake (|object| msg, |string| type="")
+		.LogOneThing(msg, type, .LogCake)
+		
+	
+	function LogOneComm (|object| msg, |string| type="")
 		opt norefcounts
 		.LogOneThing(msg, type, .LogComms)
 
 
-	function LogOneAction (|string| msg, |string| type="")
-		.LogOneThing(@emb + msg, type, .LogActions)
+	function LogOneAction (|object| msg, |string| type="")
+		.LogOneThing(msg, type, .LogActions)
 
 
 	function ErrorLogInit (|listview| lv, |string| s)

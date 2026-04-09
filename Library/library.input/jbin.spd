@@ -38,11 +38,13 @@ role JBin (Faststring)
 		disabled `Use jbin(@syx, "name")`
 		cpp_part Constructor0
 
-	function Start			(|syntax| type=@arg, |string| name="")
+	function Start			(|syntax| type=@arg, |string| name="", |jbin|)
 		.Length = 0
 		.AppendInt(JBinHeader)
 		.enter(type, name)
-			
+		return self
+	
+	
 	inline Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
 

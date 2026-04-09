@@ -252,6 +252,7 @@ class Document (list)
 			data = data.decompress
 		.WasJBin = data.Isjbin
 		if .wasjbin
+			.ExpectJeebox = TextView.AlwaysJeebox
 			data = data.parse.render
 			
 		.filedate = f.modified

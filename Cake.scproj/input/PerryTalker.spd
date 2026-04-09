@@ -80,12 +80,12 @@ function __PerryView__ (cakevm.CakeChef)
 		if !p.IsOpen
 			app.Quit
 		|| m = p.Get(5.0)
-			|| Action = .respond(m, stack)
+			|| Action = .Respond(m, stack)
 			if Action is SendVars
 				.SendStack(stack, p, "stack")
-			if action is pause
-				stopped = true
-			if !ErrorCode and .GoRun(p, stopped, action)
+			if Action is pause
+				Stopped = true
+			if !ErrorCode and .GoRun(p, stopped, Action)
 				exit
 
 	p <~ "run"
@@ -181,12 +181,6 @@ function CakeVM.GetVar (|xvar| Var, |message| Name, |xvar|)
 	for v.fast in var
 		if Name ~= v.Name
 			return v
-
-
-function ExpandAction (PerryResponse)
-	opt norefcounts
-	XVar.Expansion = m
-	return StepAction.DoNothing
 
 
 function EditAction (PerryResponse)
@@ -350,16 +344,14 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	j.AddHint(fn.Position)
 	}
 	
-	if count
-		j.exit
-		return nil
-
+	|| xp = fn.IsExpanded(rz)
 	index -= fn.Position
 	|| Locals = fn.obj|&nil||[xvar]|
 		j.Enter
-		for v in Locals
-			if v contains index
-				v.DescribeJBin(j, stack + v, 0)
+		if xp or (count == 0)
+			for v in Locals
+				if v contains index
+					v.DescribeJBin(j, stack + v, xp)
 		j.exit
 	j.exit
 
@@ -368,13 +360,13 @@ function cakestack.OperatorPlus (|xvar| v, |&nil|)
 	return .reg0 + v.reg
 
 
-function xtype.ExpandSub (|jbin| j, |&byte| Obj, |int| Depth)
+function xtype.ExpandSub (|jbin| j, |&byte| Obj, |message| xp)
 	opt norefcounts
 	|| Sue = .Super
-		sue.ExpandSub(j, obj, depth)
-	depth++
+		sue.ExpandSub(j, obj, xp)
+//	depth++
 	for v in .Properties
-		v.DescribeJBin(j, Obj+v.position, depth)
+		v.DescribeJBin(j, Obj+v.position, xp)
 
 
 function xtype.ActualType (|&nil| ObjAddr, |xtype|)
@@ -385,26 +377,29 @@ function xtype.ActualType (|&nil| ObjAddr, |xtype|)
 			|| i = cls.Index
 				|| Improved = xtype.Types[i-1]
 					return Improved
-			Cls = Cls.Parent // in case it wasn't found?
+			Cls = Cls.Parent						// in case it wasn't found?
 	return self
 
 
-function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |int| Depth, |xtype?| Type)
+function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| xp)
 	opt norefcounts
 	if obj and type
 		j.Enter(@arg)
-		if .Expanded > Depth
-			Type.ExpandSub(j, Obj, Depth)
+		xp = .IsExpanded(xp)
+		if xp
+			Type.ExpandSub(j, Obj, xp)
 		j.exit
+		
 
 
-function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
+function xvar.DescribeJBin (|jbin| j, |&nil| Where, |message?| xp)
 	opt norefcounts
 	j.Enter(@tmp, .name)
-
+	
 	|| Src = .SrcMap
-	j.AddStr(src.file * (depth == 0))
-	j.Addhint(src.Position * (depth == 0))
+	|| AtRoot = !xp.parent.parent
+	j.AddStr(src.file * AtRoot)
+	j.Addhint(src.Position * AtRoot)
 	
 	|| vars = debugger.VariablePrinter!
 	|| Type = .ObjType
@@ -420,14 +415,40 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |int| Depth)
 	j.AddHint(.reg)
 	if RefCount != int.min
 		j.AddHint(refcount)
-
+	
 	// Don't send the 'Where' anymore. We use paths.
 	if ok
-		.ExpandVar(j, where|&&byte|[], depth, type)
+		.ExpandVar(j, where|&&byte|[], type, xp)
 	  else
 		j.add(@thg, "bad")
 
 	j.exit
 
+
+
+function ExpandAction (PerryResponse)
+	opt norefcounts
+	XVar.Expansion = m
+	return StepAction.SendVars
+
+
+function xvar.IsExpanded (|message?| xp, |message|)
+	opt norefcounts
+	|| arg = xp.last
+	if arg == @arg
+		for c_var.fast in arg
+			if c_var.name ~= .Name
+				return c_var
+
+
+function spdfunc.IsExpanded (|FileWithData| F, |message|)
+	opt norefcounts
+	|| arg = xvar.Expansion.last
+	for c.fast in arg
+		|| c_file = c.FirstName
+		if f ~= c_file							// files match
+			|| c_pos = c.Second.int
+			if c_pos == .Position				// id pos match
+				return c
 
 

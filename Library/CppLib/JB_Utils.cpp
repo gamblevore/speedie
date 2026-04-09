@@ -32,6 +32,14 @@ static uint  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELV
 static uint  TotalStringBytes;
 
 
+JB_String* JB_Str__Freeable(uint8* p, int n) {
+    JB_String* Str = JB_New( JB_String );
+	TotalStringBytes += JB_msize(p); // or else pico makes us think we are losing memory!
+    Str->Addr = (uint8*)p;
+    Str->Length = n;
+    return Str;
+}
+
 
 void JB_TooLargeAlloc(int64 N, const char* S) {
 	JB_ReportMemoryError("Jeebox: Oversized alloc requested: ", N, S); 
