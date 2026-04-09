@@ -69,7 +69,7 @@ ${unmod(dest)}
 |file|   CppLib
 |string| SpdSrc
 |string| SpdTerm
-|string| ExecTerm
+|string| CakeTerm
 |string| LibPath
 
 module Vars
@@ -102,7 +102,7 @@ sudo apt install gedit
 		CppLib   = "$Speedie/Library/CppLib".file
 		SpdSrc   = "$Speedie/Speedie.scproj/Build"
 		SpdTerm  = "$Speedie/Terminal/Speedie"
-		ExecTerm = "$Speedie/Terminal/Cake"
+		CakeTerm = "$Speedie/Terminal/Cake"
 		LibPath  = "/usr/local/lib/$LibName"
 
 
@@ -135,14 +135,16 @@ ${comp(`xml`)}
 ${comp(`test`)}
 ${comp(`users`)}
 
-echo \"Linking Speedie\"
+echo \"Symlinking Speedie\"
 ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
+
+echo \"Making 🎂 Cake 🎂\"
 $SpdTerm $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
 
-echo \"Linking Speedie\"
-${link(ExecTerm, `/usr/local/bin/cake`)}
-${link(ExecTerm, `/usr/local/bin/🎂`)}
+echo \"Symlinking 🎂\"
+${link(CakeTerm, `/usr/local/bin/cake`)}
+${link(CakeTerm, `/usr/local/bin/🎂`)}
 
 echo \"\"
 echo \"Build Complete.\"

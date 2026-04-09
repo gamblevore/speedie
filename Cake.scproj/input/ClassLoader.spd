@@ -10,9 +10,10 @@ function CakeRun.CountClasses (|message| list)
 			|| PB = pk.Count
 			B += PB
 			pk.RangeLength = PB
-	Classdata.cakeprepare(N, B)
-		
-	
+	Classdata.CakePrepare(N, B)
+
+
+
 function CakeRun.LoadClasses (|message| Clss)
 	opt norefcounts
 	for cd in ClassData.First_
@@ -21,6 +22,7 @@ function CakeRun.LoadClasses (|message| Clss)
 	
 	for c.fast in Clss
 		.LoadOneClass(C)
+
 
 
 function CakeRun.Func (|message| V, |uint64|)
@@ -34,6 +36,7 @@ function CakeRun.Func (|message| V, |uint64|)
 	|| Fn = SpdTable.Funcs[Index]					#expect (V, "Virtual out of bounds")
 	|| spdfn = fn.ASMStart							#expect (V, "Virtual is missing")
 	return spdfn|int64| ||| Spd
+
 	
 	
 function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |message| PK)
@@ -52,6 +55,7 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 		V++[] = .Func(Vfn[@nil])|&nil|
 
 
+
 function Cakerun.LoadOneClass (|message| s)
 	opt norefcounts
 	|| c = S[@list]!
@@ -65,12 +69,14 @@ function Cakerun.LoadOneClass (|message| s)
 	where[0] = cakerun[s]
 
 
+
 function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
 	opt norefcounts
 	if m
 		|| obj = .ClassTable[m.name]
 			return (obj)|&Classdata|
 		error (m, "Can't find class: " + m.name )
+
 
 
 function CakeRun.StoreClass (|&ClassData| cd)
@@ -116,20 +122,4 @@ function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, 
 function @ClassData.CakePrepare  (|int| ClassCount, |int| VCount, |bool|)
 	cpp_wrapper JB_Cake__Prepare
 
-//function ClassData.Virtuals  (|&&nil|)
-//	cpp_wrapper JB_Cake_Virtuals
 
-//datatype BaseType (int)
-//	constants
-//		|BaseType|
-//		Module = 0 // not actually a type
-//		Nil
-//		Object
-//		Struct
-//		DataType
-//		FuncProto
-//	
-//	syntax is (|BaseType| d, |bool|)
-//		return self == d
-//
-//

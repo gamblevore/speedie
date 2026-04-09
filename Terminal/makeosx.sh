@@ -67,7 +67,7 @@ chmod 775 Build/users
 chown $U Build/users
 
 
-echo "Linking Speedie"
+echo "Symlinking Speedie"
 
 ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/spd
 chmod 775 /usr/local/bin/spd
@@ -78,9 +78,11 @@ ln -sf /usr/local/speedie/Terminal/Speedie /usr/local/bin/speedie
 chmod 775 /usr/local/bin/speedie
 chown $U /usr/local/bin/speedie
 
+
+echo "Making 🎂 Cake 🎂"
 /usr/local/speedie/Terminal/Speedie /usr/local/speedie/Cake.scproj --output_path=/usr/local/speedie/Terminal/Cake
 
-echo "Linking Speedie"
+echo "Symlinking 🎂"
 
 ln -sf /usr/local/speedie/Terminal/Cake /usr/local/bin/cake
 chmod 775 /usr/local/bin/cake

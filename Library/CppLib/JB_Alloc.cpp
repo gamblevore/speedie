@@ -6,7 +6,7 @@
 // * Use JB_List for world/super/block! makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
-// * also... can put worlds together. Like sound/map/graphics/obj
+// * Simplify to have only one world?
 
 /*
 What about this idea? Pointer compression:
@@ -87,8 +87,6 @@ static fpDestructor GetDestructor_(AllocationBlock* B) {
 	return (fpDestructor)(B->Virtuals->__destructor__);
 }
 
-
-
 static inline AllocationBlock* OfficialStart_(SuperBlock* NewSuper, IntPtr BlockSize) {
 	return (AllocationBlock*)(((IntPtr)NewSuper | (BlockSize-1)) &~ (sizeof(AllocationBlock)-1));
 }
@@ -102,7 +100,7 @@ static inline AllocationBlock* EndBlock_(SuperBlock* Block) {return (AllocationB
 
 
 static JBObject_Behaviour DummyFuncTable = {};
-JB_Class* AllClasses;
+static JB_Class* AllClasses;
 static int DM = 0;
 
 
@@ -405,16 +403,6 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 	}
 #endif
 
-//void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size) {
-//    memzero(Cls, sizeof(JB_Class)); // can’t use JB_Zero.
-//    Cls->DefaultBlock = (AllocationBlock*)(&Cls->Memory.Dummy);
-//    Cls->Size = Size;
-//    Cls->Memory.RefCount = 1; // so it never goes away
-//    Cls->Memory.CurrBlock = (AllocationBlock*)(&Cls->Memory.Dummy);
-//    Cls->Memory.Dummy.Owner = &Cls->Memory;
-//    Cls->Memory.World = World;
-//    Cls->Memory.Class = Cls;
-//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

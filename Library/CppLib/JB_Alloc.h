@@ -302,7 +302,7 @@ bool JB_Obj_IsValid (JB_Object* Obj);
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
-//		JB_TotalSanity(true);
+//		JB_TotalSanity(false);
         self->RefCount += 1<<JB_RefCountShift;
 		JBObjRefTest(self);
     }
@@ -312,7 +312,7 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
-//		JB_TotalSanity(true);
+//		JB_TotalSanity(false);
 		int N = self->RefCount - (1<<JB_RefCountShift);  self->RefCount = N;
 		JBObjRefTest(self);
         if (!N)

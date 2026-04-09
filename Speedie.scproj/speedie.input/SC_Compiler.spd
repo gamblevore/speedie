@@ -404,7 +404,7 @@ function ImportAll
 
 	require .Stage( "Import" )
 	.Timer( "Import" )
-	
+			
 	for L in SCImport.AllFiles
 		L.Proj.use
 		compiler.program.ImportFile( L )

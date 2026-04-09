@@ -195,7 +195,7 @@ role ListViewRow (message)
 		font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
 	
 
-	function listview.CanExpand (|listviewrow| Row, |bool|)
+	libinternal listview.CanExpand (|listviewrow| Row, |bool|)
 		opt norefcounts
 		if row.last == @arg
 			return true // Right? even if its empty.

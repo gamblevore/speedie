@@ -32,7 +32,8 @@ role JBin (Faststring)
 
 	constructor				(|syntax| type=@arg, |string| name="")
 		cpp_part Constructor
-		.start(type, name)
+		.AppendInt(JBinHeader)
+		.enter(type, name)
 	
 	constructor (|int| n)
 		disabled `Use jbin(@syx, "name")`
@@ -43,7 +44,6 @@ role JBin (Faststring)
 		.AppendInt(JBinHeader)
 		.enter(type, name)
 		return self
-	
 	
 	inline Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
@@ -95,7 +95,7 @@ role JBin (Faststring)
 		.Add(type, value, false)
 		.exit
 	
-	function Add			(|syntax| type, |string?| name="", |bool|into = false, |jbinleaver|)
+	function Add			(|syntax| type, |string?| name="", |bool| into = false, |jbinleaver|)
 		.WriteType(type, into)
 		|| L = name.Length
 		.AppendHInt(L)
@@ -103,7 +103,7 @@ role JBin (Faststring)
 			.AppendMemory(name!.addr, L)
 		return into|int|
 	
-	function Add			(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
+	function Add			(|syntax| type, |faststring| fs, |bool| into = false, |jbinleaver|)
 		cpp_part AddFS
 		return .add(Type, fs|string|, into)
 

@@ -902,7 +902,7 @@ DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict )
 
 extern "C" JB_String* JB_Str_NewInlined(int Length, JB_Class* Cls);
 void JB_Dict__Init() {
-JB_TotalSanity(true);
+//JB_TotalSanity(true);
     TheDictName = (JB_String16*)JB_Str_NewInlined( 8, &JB_String16Data );
     JB_SetRefCount(TheDictName, 10000);
     TheDictName->Addr = TheDictName->Data;
