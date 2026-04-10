@@ -463,10 +463,11 @@ class ListView (GUIControl) {
 		return !.listsource.hasany
 	
 	
-	function JumpTo (|string| s)
+	function JumpTo (|string| s, |bool|)
 		opt norefcounts
 		|| it = .JumpFind(S)
 			.select(it)
+			return true
 		
 		
 	libinternal JumpFind (|string| J, |listviewrow|)

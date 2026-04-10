@@ -411,7 +411,7 @@ libinternal TextView.UseColorAnyway (|int|)
 
 
 libinternal TextView.SpaceDisplayAsDot (|textviewline| d, |int|)
-	if self is CodeEditor  and  .JeeboxMode >= ProbablyJeebox
+	if self is CodeEditor  and  .JeeboxMode is Prefer
 		rz = 0x13FFFFFF
 		if ._DrawInLineArea & 1
 			._DrawInLineArea |= 2
@@ -587,9 +587,6 @@ libinternal TextView.DrawOneStartLine (|string| txt, |int|)
 		x += (s.width - W)/2
 	return x
 
-
-libinternal string.HasWord (|string| s, |ind| i = 0, |bool|)
-	return self[i, s]  and  self[s.length].iswhite
 
 
 extend message

@@ -8,7 +8,6 @@
 //	|| Old = (self|uint64| << 8) >> 8 // destroys object equality testing ;_;
 //		return (Old ||| (value|uint64|<<56))|object|
 
-
 module Effects
 	function DoFirework (|float| strength)
 		opt NoRefCounts

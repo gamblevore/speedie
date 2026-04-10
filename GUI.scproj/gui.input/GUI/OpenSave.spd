@@ -151,7 +151,8 @@ class OpenSaveDialog (Window)
 			.Keyboard = ""
 		.KeyDownExpired = gui.FrameStart + 0.5s
 		.Keyboard += input
-		.Files.JumpTo(.keyboard)
+		if !.Files.JumpTo(.keyboard)
+			beep
 		return true
 
 		

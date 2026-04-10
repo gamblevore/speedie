@@ -154,7 +154,7 @@ class PerryIDE (Window)
 		|| e = .editme.myerror.useable(0)
 			if .editme.ParsedMessage				// don't show simple parse errors
 				return e
-			if .editme.JeeboxMode >= textview.probablyjeebox
+			if .editme.JeeboxMode is Expect
 				return e
 		return GUI.tooltip.useable
 	
@@ -292,7 +292,7 @@ class PerryIDE (Window)
 			|| PS = PicoGlobalStats()
 			fs <~ "   Sck ${PS.OpenSockets}/${PS.OpenPicos}"
 		
-		if d and d.ShouldntSave
+		if d and d.InvalidJeebox
 			fs <~ "  Invalid Jeebox!"
 
 		return fs
@@ -687,7 +687,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| txt = .EditMe
 		|| doc = txt.document
-		|| path = (doc.location (doc) "")
+		|| path = (doc.FilePath (doc) "")
 		|| lst = .errorlist
 		txt.ClearErrors
 		.filelist.ClearErrors
@@ -737,7 +737,7 @@ So anything not 0 means "its OK"`
 
 	function Path (|string|)
 		opt norefcounts
-		return .editme.document$.location
+		return .editme.FilePath
 	
 
 	function EditFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
@@ -771,7 +771,7 @@ So anything not 0 means "its OK"`
 		
 		if !g
 			.LoadErrors(IsNewlyOpened, false)
-			if .editme.ShouldDisplayJeebox < textview.ProbablyJeebox
+			if .editme.JeeboxMode isnt expect
 				.ProductSep.Collapse
 		
 		.PopupHide
@@ -804,17 +804,16 @@ So anything not 0 means "its OK"`
 		|document--| doc = r.document
 		if e.Document == doc
 			return -1
-		if doc.Location isa "cake"
-		doc.ExpectJeebox = TextView.AllowJeebox
-		if doc.location.pathiscode
-			doc.ExpectJeebox = TextView.AlwaysJeebox
+
+		if doc.FilePath.pathiscode
+			doc.JeeboxMode |= documentjeeboxmode.Expect
 		
 		|| Loaded = E.LoadDocument(doc, true)					#require
 		if e._ActiveLine
 			.ReloadBreaks
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
-		doc.CompareTreesOnSave = doc.ExpectJeebox
+		doc.CompareTreesOnSave = doc.JeeboxMode is Jeebox
 		.ListAllFuncs
 		.CheckScrollErrors(0, gui.framestart + 0.25s)		
 		|| it = .SharedProjectTabSource
@@ -835,7 +834,7 @@ So anything not 0 means "its OK"`
 
 	function UpdateActiveFile
 		|| d = .editme.Document
-			|| l = d.Location.Resolve(true)
+			|| l = d.FilePath.Resolve(true)
 			if l ~= app.prefs.path
 				.UpdatePrefs
 			  else

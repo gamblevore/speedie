@@ -399,7 +399,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 	if  key is escape  and  ide.PopupDateOn.ago > 0.5s
 		ide.PopupHide
 		return 1
-	require  .JeeboxMode >= ProbablyJeebox
+	require  .JeeboxMode is Expect
 	
 	|| s = .SelRange
 	|| i2 = s.x2

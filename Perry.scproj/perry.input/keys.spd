@@ -155,7 +155,7 @@ function PressedSearchKeys (GUIKeyEvent)
 function PressedEditKeys (GUIKeyEvent)
 	opt norefcounts
 	if self isa TextView
-		require .JeeboxMode >= 2
+		require .JeeboxMode is Jeebox or Expect
 		if key is Decl
 			return .PerryDeclKey
 		

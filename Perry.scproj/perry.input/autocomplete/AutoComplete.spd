@@ -227,7 +227,7 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	if (f == @arg) and !f.hasany and (display starts "displayall")
 		.PopupHide
 	  else
-		.PopupDisplay.JeeboxMode = textview.probablyjeebox
+		.PopupDisplay.JeeboxMode = documentjeeboxmode.prefer
 		(f is style2)
 		.popupreason = 1
 		.DisplayInPopup(f.render.trim, display.name contains "forced")
@@ -239,7 +239,7 @@ function PerryIDE.DisplayStr (|message| f, |date|)
 	|| r = f.Range						// + f.rangetrim
 	|| orig = .EditMe[r]
 	if f.name != orig
-		.PopupDisplay.JeeboxMode = 0
+		.PopupDisplay.jeeboxMode = 0
 		.popupreason = 1
 		.DisplayInPopup(f.name, false)
 	return 1

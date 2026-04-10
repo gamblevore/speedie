@@ -211,7 +211,7 @@ class FileViewer (ListView)
 	libinternal CanSave (|int| Purpose, |filerow| f, |bool|)
 		opt norefcounts
 		|| d = f._Document		#require
-		if !d.ShouldntSave
+		if !d.InvalidJeebox
 			return true
 
 		// some kinda error. We'll save anyhow. but alert them.
@@ -648,13 +648,13 @@ function FileViewerRenameFile (GuiMenuEvent)
 	
 
 function FileViewerCreateFile (GuiMenuEvent)
-	|| row = clicked!.row as filerow		#require
+	|| row = clicked!.row as filerow					#require
 	if !row.asdir
 		row = row.parent!
 	|| l = row.location
 	|| f = l.file.UniqueChild("untitled")
 	if f and f.CreateEmpty and self isa FileViewer
-		|| created = filerow(f.path, f.name) 
+		|| created = filerow(f.path, f.name)
 		row <~ created
 		row.filesort
 		.editrow(created)

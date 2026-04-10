@@ -6,14 +6,13 @@ class TextView (GUIControl)
 		cpp_part Text
 	|byte|						SingleLine
 
-	|bool|						ShowLineNumbers
 	|bool|						GroupSaveAll
 	|byte|						LineHeight
-	|bool|						IsALogTextView // Is this textview used for displaying a Log.
-	|byte|						JeeboxMode
+	|bool|						IsALogTextView		// Is this textview used for displaying a Log.
 	|int8|						YAdjust
-	|MoveCode|					Alignment // centered, left, right
+	|MoveCode|					Alignment			// centered, left, right
 
+	|DocumentJeeboxMode|		_JeeboxMode			// used if the document is nil.
 	|byte|						_DrawInLineArea
 	|byte|						_CanAutoComplete
 	|int|						_AutoCompleteBack
@@ -55,7 +54,7 @@ class TextView (GUIControl)
 		.OnKeyDown	= keys
 		._CanAutoComplete = 2
 		.LineHeight = font.Height + 4			// Whatever
-		.JeeboxMode = TextView.allowjeebox
+//		.backupJeeboxMode = document.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
 		.oncopy = textCopy|GUICopyEvent|
@@ -89,10 +88,14 @@ class TextView (GUIControl)
 		return v
 	
 	
+	libinternal UsingLineNumbers (|bool|)
+		return (.JeeboxMode is colorise) and (self is codeeditor)
+	
+	
 	behaviour MouseMove
 		|| InScroll = .MouseMoveInScrollArea(P)
 		|| WantInBreaks = false
-		if (.JeeboxMode >= ProbablyJeebox) and (self is codeeditor)
+		if .UsingLineNumbers
 			WantInBreaks = ._LineNumWidth and (p.x < .LineNumRight) and (p.x >= .lastleft)
 
 		if state is enter or moved
@@ -1404,7 +1407,7 @@ class TextView (GUIControl)
 				.SelRange = (sel2, sel2+1)
 			return false
 
-		require SW or (.JeeboxMode >= probablyjeebox)
+		require SW or (.JeeboxMode is colorise)
 		|| c = counterparts.find(s)						#require
 
 		|| After = self[sel2]							// type through
@@ -1475,7 +1478,7 @@ class TextView (GUIControl)
 
 	
 	function Insert (|string| s, |bool| SelNew = false, |int|)
-		return .InsertText(s, .selrange, selnew)
+		return .InsertText(s, .SelRange, selnew)
 
 
 	libinternal ValidateNewText (|message|)
@@ -1483,15 +1486,14 @@ class TextView (GUIControl)
 			msg.obj = .Filepath
 			if .MyError is parse
 				.MyError = nil
+			.JeeboxMode |= DocumentJeeboxMode.Jeebox
 		  else
 			|| e = StdErr.pop
-			if .JeeboxMode >= currentlyjeebox
+			if .JeeboxMode is Jeebox
 				.myerror = e
+			.JeeboxMode &=~DocumentJeeboxMode.Jeebox
 
 		|| v = ._Viewing
-			v.ShouldntSave = false
-			if .JeeboxMode > probablyjeebox
-				v.ShouldntSave = !msg
 			v.DocParsed = msg
 		return msg
 
@@ -1560,7 +1562,7 @@ class TextView (GUIControl)
 	function FilePath (|string|)
 		opt norefcounts
 		|| u = .document
-			return u.Location
+			return u.FilePath
 
 
 	function DeleteKey (|bool| fwd, |bool|)
@@ -1579,8 +1581,8 @@ class TextView (GUIControl)
 		return .text.length
 
 	
-	libinternal FindLineSeperator (|int|start=0, |int|end=int.max, |ind|)
-		return .text.find(charset.Line, start, End )
+	libinternal FindLineSeperator (|int| Start = 0, |int| End = int.max, |ind|)
+		return .text.find(charset.Line, start, End)
 
 
 	libinternal SelectToLineStart (|intrange|)
@@ -1670,7 +1672,7 @@ class TextView (GUIControl)
 	autogen TextViewSet (|object| value)
 		opt norefcounts
 		isnt modified
-		if .Clear(value) 
+		if .Clear(value)
 			|| u = .undoer
 				u.clear
 				u.AddState(.text, nil)
@@ -1757,7 +1759,7 @@ class TextView (GUIControl)
 
 	libinternal XYOfCharSub (|textviewline| D, |ind| vline, |ind| pos, |ivec2|)
 		|| y = .lasttop - (vline+1) * .lineheight|int|
-		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
+		|| x = d.XOfChar(pos) + font.width + .textleft			// sigh
 		return (x, y) - 2
 	
 
@@ -1910,8 +1912,7 @@ class TextView (GUIControl)
 
 	libinternal ShowExtraInfo (|ivec2| P, |bool| MouseMove=false)
 		opt norefcounts
-		require .OnShowExtraInfo and .isjeeboxmode
-
+		require .OnShowExtraInfo and .JeeboxMode is Jeebox
 		|ivec2| b
 		P += (0,2)				// too easy to slip down to lower line otherwise
 		|| d = .ByteAtXY(P, b)
@@ -2064,7 +2065,6 @@ class TextView (GUIControl)
 				rz.y++
 				if rz.x < w
 					rz.x = w
-//				(rz.x max= w) 
 				w = 0
 			  elseif c != '\t'
 				w++
@@ -2081,11 +2081,11 @@ class TextView (GUIControl)
 		return bd * mul + add
 
 
-	libinternal WillAttemptParse (|int| Expect, |bool|)
-		require (expect >= ProbablyJeebox)
+	libinternal WillAttemptParse (|documentjeeboxmode| Mode, |bool|)
+		require (Mode is colorise)
 		require !.singleline
 		|| L = .text.Length
-		if Expect == allowJeebox
+		if Mode isnt expect
 			return L < 64K
 		return L < 4MB	// my largest jb file is 60k!
 // todo: Just segment longer files into "chapters". No one needs 10000KB file word-wrapped.
@@ -2098,13 +2098,16 @@ class TextView (GUIControl)
 						
 
 	function Parse (|message|)
-		return .Parse(false, .ShouldDisplayJeebox)
+		return .Parse(false, .JeeboxMode)
 	
 	
-	libinternal Parse (|bool| Changed, |int| expect, |message|)
+	libinternal Parse (|bool| Changed, |documentjeeboxmode| Mode, |message|)
 		cpp_Part ViewParseSub
-		if !.WillAttemptParse(expect)
+		|| v = ._viewing
+		if !.WillAttemptParse(Mode)
 			.MyError = nil // more reliable
+			if v
+				v.DocParsed = nil
 			return nil
 		
 		|| p = .ParsedMessage
@@ -2116,7 +2119,7 @@ class TextView (GUIControl)
 
 		p = .ValidateNewText
 		
-		if expect <= textview.AllowJeebox
+		if Mode isnt expect
 			.myerror = nil
 		return p
 
@@ -2148,14 +2151,18 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
 		.TextAlteredForDraw = 0
-		|| expect	= .ShouldDisplayJeebox
-		|| msg		= .Parse(changed >= 2, expect)
-		|| ParsedOK	= (msg!=nil) or (.JeeboxMode <= AllowJeebox)
+		|| JX		= .JeeboxMode
+		|| msg		= .Parse(changed >= 2, JX)
+		|| ParsedOK	= (msg!=nil) or (JX isnt expect)
 		|| Pos		= .StartPos
 		|| StayAtEnd= .IsALogTextView and ._CanSeeLastLine
 		|| d		= .NeedFirst
 		|message--| LastOwner
 		
+		._LineNumWidth = 0
+		if .UsingLineNumbers
+			._LineNumWidth = .text.TextLineCount.LineNumWidth
+
 		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
 		if .SingleLine
 			charw = 4KB
@@ -2164,9 +2171,6 @@ class TextView (GUIControl)
 		|| t = d.tline				// always 0?
 		|| p = 0
 		(.WrappedLines isnt breakpoint)
-		._LineNumWidth = 0
-		if .ShowLineNumbers or Expect >= 3
-			._LineNumWidth = .text.TextLineCount.LineNumWidth
 
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
@@ -2174,7 +2178,7 @@ class TextView (GUIControl)
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
-			if expect >= AllowJeebox
+			if JX is Colorise
 				msg = d.ColoriseText(msg, ParsedOK)
 			|| draw = .OnDrawLineNumber // so now what?
 				(draw)(d, &LastOwner, false)
@@ -2206,7 +2210,7 @@ class TextView (GUIControl)
 	
 	
 	libinternal textview.ClearReclaim
-		._reclaim  = (0, 1GB, 0)
+		._reclaim = (0, 1GB, 0)
 	
 
 	target ReclaimAttempt {
@@ -2283,70 +2287,49 @@ class TextView (GUIControl)
 		.Clear("")
 
 
-	libinternal TextPaste (GUIPasteEvent)
-		if (self is editable) and (purpose is PasteTextLike)
-			if data > 1
-				.UndoChecker = -1
-			if .JeeboxMode >= textview.AlwaysJeebox
-				data = data.SpacesToTabs
-				if (data contains ";") and !data.parse
-					|| Q = "The text below contains ';'. Would you like to strip it?\n\n" + data.Preview(200)
-					if Q.Confirm
-						data = data.ReplaceAll(";", "")
-			.Insert(data)
-			return true
-
-
-	function ShouldDisplayJeebox (|int|)
+	setter JeeboxMode (|documentjeeboxmode|)
 		opt norefcounts
 		|| d = .Document
-			if d.WasJbin
-				.ShowLineNumbers = true
+			d.JeeboxMode = value
+			return
+		._JeeboxMode = value
+		
+
+	function JeeboxMode (|documentjeeboxmode|)
+		opt norefcounts
+
+		rz = ._JeeboxMode
+		|| d = .Document
+			rz = d.JeeboxMode
+
 		|| t = .text
-		if t.HasWord("//lineson")
-			.ShowLineNumbers = true
-		if t.HasWord("//linesoff")
-			.ShowLineNumbers = false
-		rz = .JeeboxMode
-		if rz
-			if rz >= AlwaysJeebox
-				return rz
-			if t.HasWord("<?jb?>") or t.hasword("//jb")
-				rz = CurrentlyJeebox
-		if d
-			(rz max= d.ExpectJeebox)
+		if (t[] == '/') and t[0,"//jb"]
+			(rz is expect)
 	
 	
-	function GuessJeeboxMode
-		|| mode = .JeeboxMode
-		require mode >= AllowJeebox and mode < alwaysjeebox
+	libinternal TextPaste (GUIPasteEvent)
+		require (self is Editable) and (purpose is PasteTextLike)
+		if data > 1
+			.UndoChecker = -1
+		|| j = .JeeboxMode
+		if j is Expect or Jeebox
+			data = data.SpacesToTabs
+			if (data contains ";") and !data.parse
+				|| Q = "The text below contains ';'. Would you like to strip it?\n\n" + data.Preview(200)
+				if Q.Confirm
+					data = data.ReplaceAll(";", "")
+		.Insert(data)
+		return true
 
-		mode = AllowJeebox
-		|| d = .document
-			|| l = d.Location
-			if l isa "spd" or "box" or "xml"
-				mode = CurrentlyJeebox
-		.JeeboxMode = mode
 
-
-	libinternal IsJeeboxMode (|bool|)
-		return .ShouldDisplayJeebox >= ProbablyJeebox
-
-
-	flags
-		NotRoot = 0x800
-	
 	constants
-		NotJeebox = 0
-		AllowJeebox
-		ProbablyJeebox
-		CurrentlyJeebox
-		AlwaysJeebox
+//		NotRoot = 0x800
 		SingleLine = 1
 		SingleLineWithTabs = 2
 	
+	
 	module
-		|| CounterParts	= <(`{}[]()``''""||`)> 
+		|| CounterParts	= <(`{}[]()``''""||`)>
 		
 		function Block (|guicontrol| parent, |float| x, |float| w, |float| y, |float| h, |textview|)
 			rz = TextView(parent)
@@ -2405,4 +2388,5 @@ datatype TextViewJumpMode (int)
 	syntax is (|TextViewJumpMode| m, |bool|)
 		inlined
 		return self|int| & m|int|
+
 

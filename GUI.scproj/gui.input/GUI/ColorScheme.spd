@@ -167,7 +167,7 @@ function FixupColor (|message| self, |ind| pos, |message|)
 
 libinternal message.UseRootTmpColor (|bool|)
 	require (self == @tmp)
-	require	!(.flags & TextView.NotRoot)
+//	require	!(.flags & TextView.NotRoot)
 	|| p = .parent
 	if !p or !p.parent
 		return true

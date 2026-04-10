@@ -120,7 +120,7 @@ extend PerryIDE
 			.gnormal.solid = (0.05, 0.05, 0.05, 0.95)
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125).px
 			.OnKeyDown = DebugArgsKeyDown
-			.JeeboxMode = textview.AlwaysJeebox
+			.JeeboxMode = DocumentJeeboxMode.Expect
 			.attachedfrom = movecode.top
 			.ClickOutsideCloses = true		
 
@@ -395,7 +395,7 @@ extend PerryIDE
 			.ID				= "PopupDisplay"
 			.size			= the~area
 			.takesfocus		= 0
-			.JeeboxMode	= TextView.probablyjeebox
+			.JeeboxMode = documentjeeboxmode.prefer
 
 
 		with .EditStatus
@@ -472,7 +472,7 @@ extend PerryIDE
 	
 		.JeeboxText.SetupOut("Jeebox")
 		.SpeedieText.SetupOut("Speedie")
-		.ProductOut.SetupOut("Product", TextView.AllowJeebox)
+		.ProductOut.SetupOut("Product", documentjeeboxmode.prefer)
 		.ProductErrors.SetupOut("Errors")
 
 		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")
@@ -603,7 +603,7 @@ extend PerryIDE
 		obj.tag = rz
 
 
-	function textview.SetupOut (|string| name, |int| Parse=TextView.probablyjeebox)
+	function textview.SetupOut (|string| name, |documentjeeboxmode| Parse=documentjeeboxmode.expect)
 		opt norefcounts
 		is enabled
 		is alwaysscrollable

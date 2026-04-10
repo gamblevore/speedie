@@ -282,10 +282,10 @@ module PackMaker
 		if !fn
 			.addhint 0
 			return
-		.Enter(@unit, fn.name)
+		.Enter(@name, fn.name)
 		|| id = fn.fPackID							#check ( fn.source,  "Missing PackID[2]" )
 		id = (id << 1) + fn.IsLibrary
-		.AddhInt(id)
+		.AddHint(id)
 		.exit
 
 	

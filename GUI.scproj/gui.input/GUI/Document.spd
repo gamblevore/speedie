@@ -1,4 +1,4 @@
- 
+
 
 class Document (list)
 	linkage
@@ -7,16 +7,15 @@ class Document (list)
 	|int|					UndoChecker
 	|int|					ScrollPos
 	|byte|					MaxUndos
-	|bool|					WasCompressed
-	|bool|					WasJbin
-	|byte|					ExpectJeebox
-	|bool| 					CompareTreesOnSave
-	|bool|					LoadedFromFile
-	|bool|					ShouldntSave	
+	|bool|					WasJbin			// merge into jeeboxmode?
+    |bool|					WasCompressed	// also?
+	|DocumentJeeboxMode|	JeeboxMode
+	|bool|					CompareTreesOnSave
+	|bool|					_LoadedFromFile
 	|DocumentState?|		Current
 	|DocumentState?|		Original
 	|message?|				DocParsed
-	|string|				Location
+	|string|				FilePath
 	|date|					FileDate
 	|date|					ViewDate
 	|intrange|				TypingPlace
@@ -26,18 +25,23 @@ class Document (list)
 	
 	constructor (|string| path, |int| Undos)
 		.maxundos	= Undos
-		.Location	= path
+		.FilePath	= path
 		.ref		= CachedPath(path, document.Cache_, self)
 		.Viewers	= DocumentViewer(nil)
+//		.JeeboxMode = DocumentJeeboxMode.Prefer // Actually no. then todo/txt files get linenumbers
+												// Its a known file-type, so it should be set explicitly.
+		if path isa "spd" or "box" or "xml" or "jb"
+			.jeeboxmode = DocumentJeeboxMode.Expect
 
 	
 	destructor
 		.Viewers.clear
 		.ref.DeRef
 	
+	
 	render
 		opt norefcounts
-		fs <~ .location
+		fs <~ .FilePath
 		fs <~ "\n"
 		super.render(fs)
 
@@ -45,14 +49,14 @@ class Document (list)
 	function Clear 
 		.original = nil
 		.current = nil
-		.loadedfromfile = false
+		._loadedfromfile = false
 		super.clear
 		
 	
 	function MoveTo (|string| path)
-		require .Location != path
-		.ref.Cache.ValueLower(.location) = nil
-		.Location = path
+		require .FilePath != path
+		.ref.Cache.ValueLower(.FilePath) = nil
+		.FilePath = path
 		.ref.Path = path
 		.ref.Cache.ValueLower(path) = .ref
 
@@ -61,6 +65,7 @@ class Document (list)
 		opt norefcounts
 		|| c = .Current
 			return c.text
+
 
 	libinternal ExpectCurr (||)
 		opt NoRefCounts
@@ -87,7 +92,7 @@ class Document (list)
 				return
 		
 		.addstate(nt, ns)
-	 
+	
 
 	libinternal AddState (|string| nt, |ivec2| ns, |DocumentState|)
 		|| c = .current
@@ -117,7 +122,7 @@ class Document (list)
 	function SaveBeforeClose (|bool|)
 		if !.IsModified
 			return true
-		|| Answer = ("Save file " + .Location.name + "?").AskSaveOrCancel()
+		|| Answer = ("Save file " + .FilePath.name + "?").AskSaveOrCancel()
 		if answer >= 1		// save
 			return .save(DocumentState.Closing)
 		return answer == 0	// don't
@@ -135,7 +140,7 @@ class Document (list)
 	function Save (|int| Purpose=0, |ind|)
 		(purpose)// purpose is unused, right now.
 		// it was used, originally... and might be again.
-		|| l = .Location			#require
+		|| l = .FilePath			#require
 		|| c = .current				#require	
 		|| f = l.file
 		|| t = .SaveText(c)
@@ -177,10 +182,10 @@ class Document (list)
 		if !d
 			return true			// unsaved... must be ok.
 		
-		|| DiskMod = .Location.file.modified
+		|| DiskMod = .FilePath.file.modified
 		|| DiskIsNewer = DiskMod - d
-		if DiskIsNewer == 0 
-			return true			// no need 
+		if DiskIsNewer == 0
+			return true			// no need
 		if .IsModified
 			return false		// not sure which to use.
 		return .load(true)		// Reload!
@@ -191,7 +196,7 @@ class Document (list)
 			return true
 		
 		|| Options	= ["Save", "Reload"]
-		|| Answer	= confirmationdialog.ask("The file ${.location.name} has been externally modified. Reload or resave?", "", Options)
+		|| Answer	= confirmationdialog.ask("The file ${.FilePath.name} has been externally modified. Reload or resave?", "", Options)
 		if answer >=  1			// save
 			.save(DocumentState.Saving)
 		if answer ==  0			// reload
@@ -234,21 +239,31 @@ class Document (list)
 			|| it = v.Nextviewer(v)
 				(it is modified) = false
 				(it.ontextchanged)(it, documentstate.Saving, false)?
-				
+	
+	
+	function InvalidJeebox (|bool|)
+		|| j = .JeeboxMode
+		return (j isnt Jeebox) & (j is Expect)
 
+	
 	libinternal LoadSub (|bool| ChangedExternal, |bool|)
-		|| f = .Location.file
+		|| f = .FilePath.file
 		|| Lim = document.AskLimit(f)
-		|| Data	= f.readall(lim)		#require
+		|| Data	= f.readall(lim)						#require
 		
 		.viewdate = gui.FrameStart
 		.wascompressed = data.IsCompressed
 		if .wascompressed
 			data = data.decompress
-		.WasJBin = data.Isjbin
-		if .wasjbin
-			.ExpectJeebox = TextView.AlwaysJeebox
-			data = data.parse.render
+
+		|| bin = data.Isjbin
+		.WasJBin = bin // remove and use the mode instead?
+		if bin
+			.Jeeboxmode |= documentjeeboxmode.Expect
+			.DocParsed = data.parse
+			if .DocParsed
+				data = .DocParsed.render
+				.Jeeboxmode |= documentjeeboxmode.Jeebox
 			
 		.filedate = f.modified
 		|| OldPos = (0,0)
@@ -260,12 +275,12 @@ class Document (list)
 			
 		.AddState(data, OldPos)
 		.Original = .Current
-		.LoadedFromFile = true
+		._LoadedFromFile = true
 		return true
 
 
 	function Load (|bool| ChangedExternal = false, |bool|)
-		if ChangedExternal or !.LoadedFromFile
+		if ChangedExternal or !._LoadedFromFile
 			require .LoadSub(ChangedExternal)
 		.UpdateViewers(DocumentState.Initialset)
 		return true
@@ -293,7 +308,7 @@ class Document (list)
 			.first = .original
 			f.remove
 
-
+	
 	module
 		|dictionary of cachedpath| Cache_ = dictionary()
 		
@@ -312,6 +327,25 @@ class Document (list)
 				return n+1
 			return 128MB
 
+
+
+datatype DocumentJeeboxMode (byte)
+	flags
+		NotJeebox = 0
+		Prefer
+		Expect
+		Colorise = Expect+Prefer
+		Jeebox
+	
+	syntax is (|DocumentJeeboxMode| m, |bool|)
+		inlined
+		return self&m
+	
+	syntax is (|DocumentJeeboxMode| m, assigns:|bool|, |DocumentJeeboxMode|)
+		inlined
+		self &=~m
+		self |= m*value
+		return self
 
 
 
@@ -360,7 +394,7 @@ extend TextView
 		|| m = u.ExpectCurr$
 		|| pos = m.TypingPlace.xx
 		
-		m = m.step(!undo)		#expect beep
+		m = m.step(!undo)										#expect beep
 		if undo
 			pos = m.TypingPlace
 		u.current = m
@@ -371,7 +405,7 @@ extend TextView
 
 	libinternal UpdateModState (|document| D, |int| reason)
 		|| ismod = d.ismodified
-		if (self is modified) != ismod 
+		if (self is modified) != ismod
 			(self is modified) = ismod
 			if ismod
 				.touch
@@ -381,7 +415,6 @@ extend TextView
 	libinternal UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
 		require .parent
 		.UndoChecker = -1
-		.GuessJeeboxMode
 		if l.text
 			self|guicontrol|.text = l.text
 			|| i = d.scrollpos
@@ -395,8 +428,7 @@ extend TextView
 		  else	
 			.Clear(l.text)		
 		
-		.UpdateModState(d, reason)
-	
+		.UpdateModState(d, reason)	
 
 
 
@@ -405,7 +437,7 @@ class DocumentState (list)
 		cpp_part dcs
 	contains DocumentState
 	|string|			_Text
-	|IntRange|			TypingPlace 
+	|IntRange|			TypingPlace
 
 	constants
 		InitialSet = 0
