@@ -36,7 +36,10 @@ function cake.Collect (|File?|)
 			TerminalColor.RainbowTerm = true
 		debugger.WantDebug = true
 		r1 = r[1]
-
+	  else
+		target debug
+			debugger.WantDebug = true
+	
 	if !r1
 		|| name = app.filename
 		quit "Usage:

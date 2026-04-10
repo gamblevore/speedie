@@ -1,5 +1,6 @@
 
 
+
 struct InlineState
 	|scfunction!--|	Fn
 	|asmreg|		Return

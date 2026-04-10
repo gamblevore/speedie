@@ -73,10 +73,11 @@ module SpdTable
 
 	function CopyToVM (|message| code)
 		opt norefcounts
- 
 		.PreLoad(code)
 		for spd.fast in code
-			spd.CopyToVM
+			|| fn = spd.func
+			if fn != @num and @hint
+				spd.CopyToVM
 	
 
 	function SpdFunc.ASMStart (|&ASM|)

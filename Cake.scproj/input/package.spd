@@ -35,8 +35,10 @@ module CakeRun
 		
 		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
 		.Strings = arg["strs"].name
+		if debugger.WantDebug
+			Debugger.Root = arg["debug"].parent
+			.LoadClasses(.LibDebug.parse)
 		.LoadClasses(arg["clss"])
-		Debugger.Root = arg["debug"].parent
 		
 		return globals.CollectPackGlobs(sz)
 		
