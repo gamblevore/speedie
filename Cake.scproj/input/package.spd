@@ -11,7 +11,7 @@ module CakeRun
 	
 
 	function LibDebug (|string|)
-		cpp_Wrapper JB_App__LibDebug // needs to be used somehow
+		cpp_Wrapper JB_App__LibDebug		// needs to be used somehow
 
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs
@@ -28,18 +28,20 @@ module CakeRun
 	
 	function GetStructure (|bool|)
 		opt norefcounts
+		
+		for cd in ClassData.First_
+			.StoreClass(cd)
+
 		|| app = .UnboxCake$
 		|| sz = app[@nil]
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
-		
+
 		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
+		Debugger.Root = arg["debug"].parent
 		.Strings = arg["strs"].name
-		if debugger.WantDebug
-			Debugger.Root = arg["debug"].parent
-			.LoadClasses(.LibDebug.parse)
-		.LoadClasses(arg["clss"])
 		
+		.LoadClasses(arg["clss"])
 		return globals.CollectPackGlobs(sz)
 		
 

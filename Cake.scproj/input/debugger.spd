@@ -130,20 +130,24 @@ module debugger
 		// then we can move  fn.loadvars into the link-loop
 		
 		opt norefcounts
-		|| R = .root
-		if !R
+		|| PackInfo = .root
+		if !PackInfo
 			expect !(debugger.WantDebug or cake.perry)	("Program file doesn't contain debug info.")
 			return true
 
-		xtype.loadtypes R["class"]
+		|| LibInfo = cakerun.LibDebug.parse
+		xtype.LoadTypes( libinfo["class"])
+		xtype.loadtypes(PackInfo["class"])
 		.VariablePrinter = FastString(64)
 		expect .VariablePrinter
 		
-		.Globs = R["glob"]
-		.LoadFiles(R["files"].value.decompress)
-		.Breakables = R["breakmap"]
-		.InbuiltBreaks = R["breakpoint"]
-		.SrcMapStr = R["pos"]
+/		|| LibGlobs = LibInfo["glob"]
+		.Globs = PackInfo["glob"] ?? Message()
+		
+		.LoadFiles(PackInfo["files"].value.decompress)
+		.Breakables = PackInfo["breakmap"]
+		.InbuiltBreaks = PackInfo["breakpoint"]
+		.SrcMapStr = PackInfo["pos"]
 		.dbgLength = .SrcMapStr.Length >> 2
 
 		|| L2 = SpdTable.CodeLength

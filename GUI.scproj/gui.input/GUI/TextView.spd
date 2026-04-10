@@ -54,7 +54,6 @@ class TextView (GUIControl)
 		.OnKeyDown	= keys
 		._CanAutoComplete = 2
 		.LineHeight = font.Height + 4			// Whatever
-//		.backupJeeboxMode = document.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
 		.oncopy = textCopy|GUICopyEvent|
@@ -2323,7 +2322,6 @@ class TextView (GUIControl)
 
 
 	constants
-//		NotRoot = 0x800
 		SingleLine = 1
 		SingleLineWithTabs = 2
 	

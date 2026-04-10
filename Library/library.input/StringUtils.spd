@@ -31,9 +31,6 @@ function Print (|cstring?| data)
 	cpp_wrapper JB_PrintCString
 
 
-
-
-
 function ZalgoLine (|string| data, |float| Wierdness=8)
 	printline data.zalgo(wierdness)
 
@@ -56,10 +53,10 @@ function byte.IsConso (|bool|)
 
 function byte.IsVowel (|bool|)
 	|| b = .lowercase
-	return (b == 'a' or 'i' or 'e' or 'o' or 'u') 
+	return (b == 'a' or 'i' or 'e' or 'o' or 'u')
 
 
-function int.operatorof (|string| type, |string| nothing="", |string|)
+inline int.operatorof (|string| type, |string| nothing="", |string|)
 	return type.Pluralize(self, nothing)
 
 
@@ -94,6 +91,7 @@ extend string
 
 
 function string.Moat (|string|)
+	opt norefcounts
 	|| fs = faststring()
 	fs.size = .length + 4
 	fs <~ "__"
@@ -103,17 +101,21 @@ function string.Moat (|string|)
 
 
 function string.IsFileLike (|bool|)
-	|| c = self[]
-	return (c == '/') or ((c == '.' or c == '~') and ((self[1] == '.') or (self[1] == '/')))
+    || c = self[]
+    || c2 = self[1]
+	if (c == '/') or ((c == '.' or c == '~') and ((c2 == '.') or (c2 == '/')))
+		return true
 	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
 	
-function byte.IsTextLine (|bool|)
-	return self == '\n' or '\r'
+inline byte.IsTextLine (|bool|)
+	if self == '\n' or '\r'
+		return true
 
-function codepoint.IsTextLine (|bool|)
-	return self == '\n' or '\r'
+inline codepoint.IsTextLine (|bool|)
+	if self == '\n' or '\r'
+		return true
 
-function int.TabsWidth (|int|)
+inline int.TabsWidth (|int|)
 	return 4-(self & 3)
 
 
@@ -266,7 +268,6 @@ libinternal String.TabsToSpacesSub (|faststring| fs)
 			i++
 
 
-
 function String.TabsToSpaces (|string|)
 	|| fs = FastString()
 	for (l.lines in self) (p)
@@ -298,8 +299,7 @@ function string.UnPrintable (|int|)
 				return '\n'
 			return -2
 
-
-function String.Spin (|int| f, |byte|)
-	return `|/-\`[f&3] // useful for printing "processing" spinning line to stdout
+//inline String.Spin (|int| f, |byte|)
+//	return `|/-\`[f&3] // useful for printing "processing" spinning line to stdout
 	
 

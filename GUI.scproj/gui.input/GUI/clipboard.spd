@@ -9,7 +9,7 @@ module Clipboard
 	cpp_func SDL_SetClipboardText (|cstring| s, |errorint|)
 	
 	
-	function Data (|string|)
+	libinternal Data (|string|)
 		|| cstr = .SDL_GetClipboardText
 		|| s = cstr.Wrap
 			return s
@@ -23,7 +23,7 @@ module Clipboard
 	
 	
 	function Text (assigns: |string| s)
-		description "Pass valid UTF-8 only" 
+		description "Pass valid UTF-8 only"
 		expect (s) (beep)
 
 		._internalcopy = ""
@@ -35,22 +35,15 @@ module Clipboard
 			
 		if keys.Shift
 			._clip2 = c
-			Notifications <~ "Clip 2 used for: \n" + c.Preview(128)
+			Notifications <~ "Clip 2 used for:\n" + c.Preview(128)
 			return
 		
 		c = c.cstr
 		|| err = .SDL_SetClipboardText(c.addr|cstring|)
-		if (err!=0) // or s.FindBadUTF8		// osx might fail anyhow
+		if (err!=0)											// can't use .FindBadUTF8, osx might fail anyhow
 			._internalcopy = c
 			Notifications.NotifySDLError		
 	
-	
-	function Clear
-		|byte[1]| null
-		._InternalCopy = ""
-		._Clip2 = ""
-		.SDL_SetClipboardText((&null[0])|cstring|)
-
 
 	function NotifiedText (assigns: |string| s)
 		opt norefcounts
@@ -61,12 +54,15 @@ module Clipboard
 
 
 function string.FixLineEndings (|string| dest="\n", |String|)
-	|| type = .DetectLineEndings &~ 1
-		if type & 4
-			self = .ReplaceAll("\r\n", dest)
-		if type & 2
-			self = .ReplaceAll("\r", dest)
-	return self
+	|| type = .DetectLineEndings()
+	if type <= 1
+		return self
+	|| repl = self
+	if type & 4
+		repl = .ReplaceAll("\r\n", dest)
+	if type & 2
+		repl = repl.ReplaceAll("\r", dest)
+	return repl
 	
 	
 libinternal string.DetectLineEndings (|int|)

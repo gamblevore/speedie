@@ -16,10 +16,7 @@ function CakeRun.CountClasses (|message| list)
 
 function CakeRun.LoadClasses (|message| Clss)
 	opt norefcounts
-	for cd in ClassData.First_
-		.StoreClass(cd)
 	.CountClasses(clss)
-	
 	for c.fast in Clss
 		.LoadOneClass(C)
 
@@ -37,8 +34,8 @@ function CakeRun.Func (|message| V, |uint64|)
 	|| spdfn = fn.ASMStart							#expect (V, "Virtual is missing")
 	return spdfn|int64| ||| Spd
 
-	
-	
+
+
 function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |message| PK)
 	opt norefcounts
 	|| sz = c[2].int

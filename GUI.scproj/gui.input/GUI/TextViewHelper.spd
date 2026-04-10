@@ -410,18 +410,18 @@ libinternal TextView.UseColorAnyway (|int|)
 		return 3
 
 
-libinternal TextView.SpaceDisplayAsDot (|textviewline| d, |int|)
-	if self is CodeEditor  and  .JeeboxMode is Prefer
-		rz = 0x13FFFFFF
-		if ._DrawInLineArea & 1
-			._DrawInLineArea |= 2
-			|| mx = .MouseXY.x
-			if mx < .linenumright and mx >= .LastLeft
-				rz += 0x2F000000
-				if d is Selected
-					rz += 0x3F000000
-			  elseif d is Selected
-				rz += 0x0F000000
+libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |int|)
+	require .UsingLineNumbers
+	rz = 0x13FFFFFF
+	if ._DrawInLineArea & 1
+		._DrawInLineArea |= 2
+		|| mx = .MouseXY.x
+		if mx < .LineNumRight and mx >= .LastLeft
+			rz += 0x2F000000
+			if d is Selected
+				rz += 0x3F000000
+		  elseif d is Selected
+			rz += 0x0F000000
 
 	
 
