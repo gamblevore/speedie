@@ -62,8 +62,6 @@ GUI_CaP_Destructor
 GUI_Cell_StepCol
 GUI_Cell_SyntaxEquals
 GUI_Cell_Tab
-GUI_Clip__Clear
-GUI_Clip__Data
 GUI_Clip__NotifiedTextSet
 GUI_Clip__Text
 GUI_Clip__TextSet
@@ -99,6 +97,7 @@ GUI_Doc_CheckModified
 GUI_Doc_Clear
 GUI_Doc_Constructor
 GUI_Doc_Destructor
+GUI_Doc_InvalidJeebox
 GUI_Doc_IsModified
 GUI_Doc_Load
 GUI_Doc_MoveTo
@@ -450,7 +449,6 @@ GUI_Row_Constructor
 GUI_Row_ConstructorNamed
 GUI_Row_FileSort
 GUI_Row_NextSelected
-GUI_Row_Remove
 GUI_Row_SyntaxIsSet
 GUI_Row__NewSeparator
 GUI_SC_AddHigh
@@ -568,10 +566,11 @@ GUI_Text_FindBackwardsIgnoringSpaces
 GUI_Text_FindTextLine
 GUI_Text_Gesture
 GUI_Text_GotFocus
-GUI_Text_GuessJeeboxMode
 GUI_Text_Insert
 GUI_Text_InsertAutoComplete
 GUI_Text_InsertText
+GUI_Text_JeeboxMode
+GUI_Text_JeeboxModeSet
 GUI_Text_JumpToError
 GUI_Text_KeyDown
 GUI_Text_LineAttention_Constructor
@@ -597,7 +596,6 @@ GUI_Text_SelRangeSet
 GUI_Text_SelectAll
 GUI_Text_SelectedLine
 GUI_Text_SendSpecialClick
-GUI_Text_ShouldDisplayJeebox
 GUI_Text_Show
 GUI_Text_ShowAndSelect
 GUI_Text_ShowExtraInfoAtPos
@@ -924,7 +922,6 @@ JB_CL4_IsBasic
 JB_CL4_Render
 JB_CP_IsAlphaNum
 JB_CP_IsLetter
-JB_CP_IsTextLine
 JB_CP_IsWhite
 JB_CP_LowerCase
 JB_CP_Render
@@ -1362,7 +1359,6 @@ JB_Nav_ValueSet
 JB_ObjClass
 JB_ObjClassBehaviours
 JB_ObjLayer
-JB_Obj_DictName
 JB_Obj_Print
 JB_Obj_Render
 JB_ObjectID
@@ -1686,7 +1682,6 @@ JB_Str_SilentExecute
 JB_Str_SimpleName
 JB_Str_Sort
 JB_Str_SpacesToTabs
-JB_Str_Spin
 JB_Str_Split
 JB_Str_Squeeze
 JB_Str_StreamWithHeader
@@ -1732,7 +1727,6 @@ JB_Str__Hash
 JB_Str__MainArg
 JB_Str__MainArgSub
 JB_Str__Sorter
-JB_Str_idcase
 JB_Syx_LongName
 JB_Syx_Name
 JB_Syx_NilCheck
@@ -1851,7 +1845,6 @@ JB_bool__MainArg
 JB_byte_EqualsByte
 JB_byte_IsConso
 JB_byte_IsHex
-JB_byte_IsTextLine
 JB_byte_IsVowel
 JB_byte_LowerCase
 JB_byte_OperatorEq
@@ -1930,7 +1923,6 @@ JB_fix_TypeOfSet
 JB_flow_SyntaxUsing
 JB_flow_SyntaxUsingComplete
 JB_int64_AsFloat
-JB_int64_DictName
 JB_int64_Hex
 JB_int64_OperatorInRange
 JB_int64_OperatorMax
@@ -1960,10 +1952,8 @@ JB_int_Shrink
 JB_int_Sqrt
 JB_int_SyntaxAccessSet
 JB_int_SyntaxCall
-JB_int_TabsWidth
 JB_int_Wrap
 JB_int__MainArg
-JB_int_operatorof
 JB_ivec2_Abs
 JB_ivec2_Clip
 JB_ivec2_Clip2
@@ -2029,7 +2019,6 @@ JB_jbinLeaver_SyntaxUsingComplete
 JB_munmap
 JB_u64_Log2
 JB_u8p_Read
-JB_uint64_HintLength
 JB_uint64_Now
 JB_uint64_OperatorMax
 JB_uint64_OperatorMin
