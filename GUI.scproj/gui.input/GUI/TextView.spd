@@ -2315,10 +2315,6 @@ class TextView (GUIControl)
 				rz = CurrentlyJeebox
 		if d
 			(rz max= d.ExpectJeebox)
-
-
-	libinternal IsJeeboxMode (|bool|)
-		return .ShouldDisplayJeebox >= ProbablyJeebox
 	
 	
 	function GuessJeeboxMode
@@ -2328,9 +2324,13 @@ class TextView (GUIControl)
 		mode = AllowJeebox
 		|| d = .document
 			|| l = d.Location
-				if l isa "spd" or "box" or "jbin" or "xml" or "jb" or "jbin"
-					mode = CurrentlyJeebox
+			if l isa "spd" or "box" or "xml"
+				mode = CurrentlyJeebox
 		.JeeboxMode = mode
+
+
+	libinternal IsJeeboxMode (|bool|)
+		return .ShouldDisplayJeebox >= ProbablyJeebox
 
 
 	flags

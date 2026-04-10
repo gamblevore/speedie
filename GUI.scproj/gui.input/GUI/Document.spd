@@ -266,7 +266,7 @@ class Document (list)
 
 	function Load (|bool| ChangedExternal = false, |bool|)
 		if ChangedExternal or !.LoadedFromFile
-			require .loadsub(ChangedExternal)
+			require .LoadSub(ChangedExternal)
 		.UpdateViewers(DocumentState.Initialset)
 		return true
 

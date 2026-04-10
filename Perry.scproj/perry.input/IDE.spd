@@ -800,16 +800,15 @@ So anything not 0 means "its OK"`
 			
 	
 	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen
-		|| E	= .editme
-		|| doc	= r.document
+		|textview--| E = .editme
+		|document--| doc = r.document
 		if e.Document == doc
 			return -1
-		
+		if doc.Location isa "cake"
+		doc.ExpectJeebox = TextView.AllowJeebox
 		if doc.location.pathiscode
 			doc.ExpectJeebox = TextView.AlwaysJeebox
-		  else 
-			doc.ExpectJeebox = TextView.AllowJeebox
-
+		
 		|| Loaded = E.LoadDocument(doc, true)					#require
 		if e._ActiveLine
 			.ReloadBreaks
