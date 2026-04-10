@@ -1,18 +1,18 @@
 
 
 /*
-	FlowControl system.
-	Makes sure your code is rock solid, and works identical when porting from one system to another!
-	Smash all bugs!
+	Idea is to make sure your code works identical when porting from one system to another!
+	Smashing all bugs!
+	However... I should remove this. Speedie is already too large.
 */
 
 		
-class FlowControl 
+class FlowControl
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
 	|InputStream?|			ReadInput
-	|faststring?| 			Write
-	|bool| 					CanDoErrors
+	|faststring?|			Write
+	|bool|					CanDoErrors
 
 	constructor (|string| OutPath, |string| InPath)
 		flow off
@@ -50,7 +50,8 @@ class FlowControl
 		flow off
 		if .buff <~ value
 			.Flush
-		
+	
+	
 	libinternal TestByte (|byte| value, |bool|)
 		flow off, opt norefcounts, visible
 
@@ -76,9 +77,9 @@ class FlowControl
 			fs <~ "New-stream longer than old-stream."
 		  else
 			fs <~ "Expected: "
-			fs.printnicely(expected)
+			fs.FlowPrintNicely(expected)
 			fs <~ " but found: "
-			fs.printnicely(found)
+			fs.FlowPrintNicely(found)
 		fs <~ "\n"
 		
 		app.StackTrace(3, fs)
@@ -89,14 +90,25 @@ class FlowControl
 			debugger
 
 
-	function faststring.PrintNicely (|string| s)
-		|| Cause = s.UnPrintable
-		if cause < 0
+	libinternal faststring.FlowPrintNicely (|string| s)
+		|| Cause = s.FlowUnPrintable
+		if Cause < 0
 			self <~ "#(${s.hex})#"
 		  elseif cause == '\n'
 			s.ReplaceAll("\n", `\n`, self)
 		  else
 			self <~ s
+
+	
+	libinternal string.FlowUnPrintable (|int|)
+		if .FindBadUTF8
+			return -1
+		
+		for c in self
+			ifn (c >= ' ' or c == 9)
+				if c.IsTextLine
+					return '\n' // This makes it not generic...
+				return -2
 	
 	
 	module
@@ -187,7 +199,7 @@ class FlowControl
 					name += "debug"
 				print "logging at: "
 			rz = "/tmp/Speedie/FlowControl".child( name + ".txt" )
-			printline 
+			printline
 
 		function Activate (|string| name,  |FlowControlStopper|)
 			flow off
@@ -198,7 +210,6 @@ class FlowControl
 			print "#!FlowControl "
 			.Disabled = int.max			// in case its set badly
 			.flow = FlowControl(.askpath(name,false), .askpath(name,true))
-
 
 		function Attempt (|string| name, |FlowControlStopper|)
 			flow off
@@ -213,7 +224,6 @@ datatype FlowControlStopper (int)
 	syntax UsingComplete (|object| dummy=nil)
 		flow off
 		flowcontrol.stop
-
 
 	syntax Using (|FlowControlStopper|)
 		flow off

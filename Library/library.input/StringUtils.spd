@@ -246,15 +246,6 @@ libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
 			i = WordEnd
 
 
-libinternal String.UnTabbifySub (|faststring| fs)
-	|| Tabs = .OutByte('\t') ?? .Length
-	if tabs == 0
-		fs <~ self
-	  else
-		fs <~ (' ', tabs*4)
-		fs.appendRange(self, tabs, int.max)
-
-
 libinternal String.TabsToSpacesSub (|faststring| fs)
 	|| i = 0 
 	for (c in self)
@@ -280,24 +271,19 @@ function String.TabsToSpaces (|string|)
 function String.SpacesToTabs (|string|)
 	|| fs = faststring()
 	|| n = 0
-	for t.lines in self
+	for line.lines in self
 		if n++
 			fs <~ '\n'
-		t.UntabbifySub(fs)
-	rz = fs.GetResult
-	if rz == self // nice opt
-		rz = self
+		|| SpaceCount = line.OutByte(' ') ?? line.Length
+		if spacecount > 0
+			fs <~ ('\t', SpaceCount >> 2)
+			fs <~ (' ', spacecount&3)
+		fs.AppendRange(line, spacecount, int.max)
+	return fs
+//	if rz == self // nice opt // i wonder if we could do that as a helper func?
+//		rz = self
 
 	
-function string.UnPrintable (|int|)
-	if .FindBadUTF8
-		return -1
-	
-	for c in self
-		ifn (c >= ' ' or c == 9)
-			if c.IsTextLine
-				return '\n'
-			return -2
 
 //inline String.Spin (|int| f, |byte|)
 //	return `|/-\`[f&3] // useful for printing "processing" spinning line to stdout
