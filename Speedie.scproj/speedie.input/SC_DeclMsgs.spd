@@ -224,7 +224,10 @@ function scdecl.AddToGlobs (|bool|)
 //	if ('_' == n[]) ||| ('_' == n.Last)
 //		is hidden
 // maybe just do visibility textually?
+
 	if  self is Library  and  self isnt ClassObj
+		// classobj done separately: Class data (via jbclassplace) is stored anywhere
+		// by the C++ compiler. Cake needs to store them manually into packglobs
 		PackMaker.LibGlobs <~ self
 	  else
 		packmaker.PackGlobs <~ self

@@ -16,12 +16,12 @@ module Globals
 	
 	function CollectPackGlobs (|message| size_msg, |bool|)
 		opt norefcounts
-		|int| glob_size = size_msg.int(0, 1, 216MB)$
+		|int| Glob_Size = size_msg.int(0, 1, 216MB)$
 		
 		|| input		= InputStream(cakerun.strings)
 		|| n_strs		= input.HInt
 		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
-		|| alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
+		|| Alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
 		|| g = Memory.Zalloc(alloc_size)									#require
 	
 		|| StringTable = (g + glob_size + 8)|&string|

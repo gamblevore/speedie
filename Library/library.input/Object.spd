@@ -186,7 +186,7 @@ struct MemoryWorld
 		wrapper
 		cpp_class JB_MemoryWorld
 
-	|&Byte|		 	Name
+	|&Byte|			Name
 	|Byte|			SuperSize
 	|Byte|			BlockSize
 	|Byte|			Alignment
@@ -197,17 +197,17 @@ class MemoryLayer
 	linkage
 		wrapper
 		cpp_class JB_MemoryLayer
-		cpp_part  Mem
+		cpp_part  Layer
 
 	|Object?|		Obj
 	|Object?|		Obj2
 	//|uint64|		Num3 // unused?
 	
 	constructor (|&ClassData| Cls, |object?| obj=nil)
-		cpp_wrapper JB_Mem_Constructor
+		cpp_wrapper JB_Layer_Constructor
 
 	function Use
-		cpp_wrapper JB_Mem_Use
+		cpp_wrapper JB_Layer_Use
 	
 //	syntax Using (|memorylayer|) // need the default for this class... sigh
 		

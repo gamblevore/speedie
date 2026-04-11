@@ -3,7 +3,7 @@ module Cake
 	|String|     Speedie = "/usr/local/bin/speedie"
 	|SpdProcess| Perry = app.parent
 	|!&CakeVM|   VM = CakeVM()
-	|File|		 InputFile = Cake.Collect
+	|File|		 InputFile = Cake.Collect // why not make it a filewithdata? :]
 	|&uint|		 ActiveBreaks = debugger.Startup
 	|!&ASM|		 BeginCode = VM.code()|&ASM|
 

@@ -73,7 +73,7 @@ enum {
 int JB_AllocationBlockHeaderSize() {
     return sizeof(AllocationBlock);
 }
-void JB_Mem_Destructor( JB_MemoryLayer* self );
+void JB_Layer_Destructor( JB_MemoryLayer* self );
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,9 +150,9 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 JB_Class* CakeClass;
 void** CakeVirtuals;
 bool JB_Cake__Prepare (int N, int B) {
-	N*=sizeof(JB_Class);
-	B*=sizeof(void*);
-	byte* Data = (byte*)calloc(N + B + 8, 1);
+	N *= sizeof(JB_Class);
+	B *= sizeof(void*);
+	byte* Data = (byte*)JB_Realloc(nil, N + B + 8);
 	if (!Data) return false;
 	CakeClass = (JB_Class*)Data;
 	CakeVirtuals = (void**)(Data + N + 8);
@@ -406,7 +406,7 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj ) {
+JB_MemoryLayer* JB_Layer_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj ) {
 	JB_New2(JB_MemoryLayer);
     JB_Zero(self);
     self->Class = Cls;
@@ -424,7 +424,7 @@ JB_MemoryLayer* JB_Mem_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Obje
 
 
 
-void JB_Mem_Use( JB_MemoryLayer* self ) {
+void JB_Layer_Use( JB_MemoryLayer* self ) {
     // shouldn't we incr the layer? or not?
     if (self->IsActive) { // save time...
         return;
@@ -455,7 +455,7 @@ void JB_Mem_Mark( ) {
 }
 
 
-void JB_Mem_Destructor( JB_MemoryLayer* self ) {
+void JB_Layer_Destructor( JB_MemoryLayer* self ) {
     if (self->SpareBlock) {
         self->SpareBlock->Owner = 0;
     }
@@ -1343,7 +1343,7 @@ void JB_MemFree(JB_MemoryWorld* World) {
 
 JBObject_Behaviour Obj_FuncTable = {};
 JBClassPlace5( JB_Object,		0,			"Object",		Obj_FuncTable );
-JBClassPlace( JB_MemoryLayer,	JB_Object,	"MemoryLayer",	JB_Mem_Destructor,	0 );
+JBClassPlace( JB_MemoryLayer,	JB_Object,	"MemoryLayer",	JB_Layer_Destructor,	0 );
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

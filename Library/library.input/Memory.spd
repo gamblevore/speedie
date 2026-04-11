@@ -16,7 +16,7 @@
 
 class Memory
 	linkage
-		cpp_part Mrap
+		cpp_part Mem2
 		cpp_class MWrap
 		pragma noearlyfree
 	
@@ -147,9 +147,7 @@ class Memory
 	
 
 	function DebugPrint
-		|| fs = FastString()
-		.dump(fs)
-		printline fs
+		printline .dump
 	
 	
 	inline String (|string|)
@@ -157,8 +155,9 @@ class Memory
 	
 	
 	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
+		opt norefcounts
 		|| p = ._ptr
-		|| p2 = p + .ByteCapacity 
+		|| p2 = p + .ByteCapacity
 		|| i = 0
 		|| com = 0
 		fs <~ "dumping memory:\n"

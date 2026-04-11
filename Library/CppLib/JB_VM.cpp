@@ -178,6 +178,7 @@ static void * const GlobalJumpTable[] = {
 
 
 void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs) {
+	// cake uses this... Should I sync this up a bit better?
 	vm->LibGlobs = LibGlobs;
 	vm->PackGlobs = PackGlobs;
 	vm->CppFuncs = (Fn0*)CppFuncs;
@@ -185,10 +186,11 @@ void JB_ASM_FillTable (CakeVM* vm,  byte* LibGlobs,  byte* PackGlobs,  void** Cp
 
 
 void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
+	// the compiler uses this
 	if (vm->CppFuncs)
 		return (void**)(vm->CppFuncs);
 	int FuncBytes = sizeof(void*) * FuncCount;
-	auto Result = (byte*)calloc(FuncBytes + GlobBytes + 8, 1);
+	auto Result = (byte*)JB_Realloc(nil, FuncBytes + GlobBytes + 8);
 	if (Result) {
 		((int64*)(Result + GlobBytes))[0] = 0x12345789ABCDEFED; // sentinel
 		vm->PackGlobs = Result;

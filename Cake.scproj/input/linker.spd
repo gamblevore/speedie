@@ -105,10 +105,11 @@ module SpdTable
 		while base < after
 			|| µ = base[]
 			|| Op = µ.op
+			if op == asm.GTAB
 			if op.IsSPDFunc
 				base.LightCandles(µ)
 			  elseif µ.IsLibGlob and op.IsGlob
-/				base.LibGlob(µ, op == asm.GOBJ)
+				base.LibGlob(µ, op == asm.GOBJ)
 			base += µ.size
 
 
