@@ -117,6 +117,7 @@ JB__App__Prefs
 JB__App__stdin
 JB__App__StdOut
 JB__App_Usage
+GUI__Clip__Clip2
 GUI__Clip__InternalCopy
 GUI__App_DrawDrag
 GUI__App_LastSearch
@@ -149,7 +150,6 @@ JB__Flow_Flow
 GUI__Doc_Cache_
 JB__File__Speedie
 GUI__Img_CurlieQue_
-JB__bin_Header
 GUI__SpaceTree_Holders
 JB__Proc__ForceParent
 JB__Proc__Parent
@@ -166,7 +166,7 @@ GUI__cwin__asker
 GUI__Open__Asker
 JB__TC_Types_Dict
 GUI__RayInfo_Miss
-JB__Mrap_MDummy_
+JB__Mem_MDummy_
 JB_RandomShared
 JB__zalgo_R
 JB__Tk_Using
@@ -176,4 +176,3 @@ GUI__Key_Record
 GUI__SystemCursor__Cursors
 JB__CharSet_Props
 JB__Constants__FuncArray
-GUI__Clip__Clip2
