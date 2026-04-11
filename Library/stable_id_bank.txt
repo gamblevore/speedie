@@ -1060,7 +1060,6 @@ JB_FS_LineIndent
 JB_FS_MsgErrorName
 JB_FS_NeedSpare
 JB_FS_PadTo
-JB_FS_PrintNicely
 JB_FS_ProblemsFound
 JB_FS_RemoveByte
 JB_FS_Render
@@ -1268,7 +1267,7 @@ JB_Msg_BecomeMacro
 JB_Msg_BecomeMsg
 JB_Msg_BinnRender
 JB_Msg_CantFind
-JB_Msg_ConfArg
+JB_Msg_ConfigItem
 JB_Msg_Constructor
 JB_Msg_ConstructorCopy
 JB_Msg_ConstructorEmpty
@@ -1297,7 +1296,6 @@ JB_Msg_FirstName
 JB_Msg_Float
 JB_Msg_Float32
 JB_Msg_FuncName
-JB_Msg_GetConf
 JB_Msg_GiveArg
 JB_Msg_Int
 JB_Msg_IntRange
@@ -1326,7 +1324,6 @@ JB_Msg_SetInt
 JB_Msg_SetMsg
 JB_Msg_SetStr
 JB_Msg_ShallowEquals
-JB_Msg_SyntaxAccess
 JB_Msg_SyntaxCall
 JB_Msg_SyntaxEquals
 JB_Msg_SyntaxIs
@@ -1707,7 +1704,6 @@ JB_Str_UTF8Badness
 JB_Str_UTF8Size
 JB_Str_UTF8Value
 JB_Str_UnHex
-JB_Str_UnPrintable
 JB_Str_UnicodeSync
 JB_Str_UniqueFile
 JB_Str_Unshare
