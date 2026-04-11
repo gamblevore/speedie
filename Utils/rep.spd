@@ -30,7 +30,7 @@ module rep
 	|string?|	To    = app.args[3]
 	|syntax?|	Func  = syntax.Func(app.args[1])
 	|int|		Where = 0
-	|bool|		Aware = app..caseaware.yes
+	|bool|		Aware = app["caseaware"].yes
 	
 	function Match (|message| msg, |bool|)
 		return (msg == .func)  and  msg.syntaxequals(.from, .aware)

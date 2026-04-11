@@ -43,7 +43,7 @@ extend Parser
 		.Token( "[" )  = .Handler( kFuncAfterNoSpace, fAccess ).Link( kThingSyx, fArray )
 		.Token( "«" )  = .Handler( kThingSyx, fMsgList )
 		.Token( "." )  = .Handler( kFuncAfterNoSpace, fDot ).Link( kThingSyx, fSDot )
-		.Token( ".." ) = .Handler( kFuncAfterNoSpace, fDotAccess )
+//		.Token( ".." ) = .Handler( kFuncAfterNoSpace, fDotAccess ) // I don't like this
 		.Token("://")  = .Handler( kFuncAfterNoSpace, fURL)
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
 		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
@@ -468,16 +468,16 @@ extend Parser
 		return parser.New( nil, @ARel, Start, parser.NextStart )		// sigh...
 	
 	
-	function fDotAccess (ParseHandler)
-		opt norefcounts
-		|| n = .nextstart
-		|| name = parser.NewWord(nil, @str, n, n)
-		|| after = parser.nextstart
-		name.name = name.name.replaceall("–", " ")
-		rz = parser.NewEmpty(nil, @acc, start, after)
-		problem rz // i actually don't like this...
-		|| prms = parser.NewEmpty(rz, @arr, start, start)
-		prms <~ name
+//	function fDotAccess (ParseHandler)
+//		opt norefcounts
+//		|| n = .nextstart
+//		|| name = parser.NewWord(nil, @str, n, n)
+//		|| after = parser.nextstart
+//		name.name = name.name.replaceall("–", " ")
+//		rz = parser.NewEmpty(nil, @acc, start, after)
+//		problem rz // i actually don't like this...
+//		|| prms = parser.NewEmpty(rz, @arr, start, start)
+//		prms <~ name
 
 
 	function fEndOfLine (ParseHandler)
