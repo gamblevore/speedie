@@ -1665,7 +1665,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2432])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2428])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1805,10 +1805,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2431])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2430])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2427])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2426])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2425])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2436,17 +2436,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2421])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2426])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2427])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2422])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2423])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2420])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2427])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2428])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2423])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2424])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2503,7 +2503,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2423])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2419])
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2519,7 +2519,7 @@ extern bool SC__Cpp_WriteAPI;
 #define kSC__Instruction_kTypeConst ((int)2)
 extern Dictionary* SC__Instruction_OpDict;
 extern Instruction* SC__Instruction_TypeList[256];
-#define JB__Mrap_MDummy_ JB__.Mrap_MDummy_
+#define JB__Mem_MDummy_ JB__.Mem_MDummy_
 extern Array* SC__Imp_AllFiles;
 extern SCImport* SC__Imp_Curr;
 extern byte SC__Imp_CurrIsManuallyImported;
@@ -2637,7 +2637,7 @@ struct JB_Globals {
 	RandomXOR RandomShared;
 	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
-	uint64 Mrap_MDummy_[2];
+	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
 };
@@ -3308,7 +3308,7 @@ void SC_PackMaker__MakePack();
 
 void SC_PackMaker__OrderLibGlobs();
 
-void SC_PackMaker__PackClasses(FastString* J, bool Pack);
+void SC_PackMaker__PackClasses(FastString* J, bool Lib);
 
 void SC_PackMaker__PackIDFuncs(Array* List);
 
@@ -3404,8 +3404,6 @@ Message* JB_Tk__fCommentLine(int Start, Message* Parent);
 Message* JB_Tk__fDecl(int Start, Message* Parent);
 
 Message* JB_Tk__fDot(int Start, Message* Parent);
-
-Message* JB_Tk__fDotAccess(int Start, Message* Parent);
 
 Message* JB_Tk__fEndOfLine(int Start, Message* Parent);
 
@@ -7313,6 +7311,8 @@ void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, Float64 Data);
 
 void JB_FS_FieldStart(FastString* Self, JB_String* Name);
 
+void JB_FS_FlowPrintNicely(FastString* Self, JB_String* S);
+
 void SC_FS_IncludeH(FastString* Self, JB_String* Name);
 
 void JB_FS_MemoryReport(FastString* Self, _cstring Name, JB_String* Name2, int64 Amount);
@@ -7322,8 +7322,6 @@ void JB_FS_MsgErrorName(FastString* Self, JB_String* Name);
 void SC_FS_Normal(FastString* Self, JB_String* S);
 
 void JB_FS_PadTo(FastString* Self, int N, uint /*byte*/ B);
-
-void JB_FS_PrintNicely(FastString* Self, JB_String* S);
 
 void JB_FS_ProblemsFound(FastString* Self, int Count);
 
@@ -7484,33 +7482,33 @@ Instruction* SC_Instruction__SyntaxAccessWithInt(int Pos);
 
 
 // JB_Memory
-int JB_Mrap_ByteCapacity(MWrap* Self);
+int JB_Mem_ByteCapacity(MWrap* Self);
 
-MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
+MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
 
-int JB_Mrap_CopyFrom(MWrap* Self, void* Src, int Length);
+int JB_Mem_CopyFrom(MWrap* Self, void* Src, int Length);
 
-void JB_Mrap_Destructor(MWrap* Self);
+void JB_Mem_Destructor(MWrap* Self);
 
-void JB_Mrap_LengthSet(MWrap* Self, int Value);
+void JB_Mem_LengthSet(MWrap* Self, int Value);
 
-byte* JB_Mrap_NeedSpare(MWrap* Self, int ReqItems, int Extra);
+byte* JB_Mem_NeedSpare(MWrap* Self, int ReqItems, int Extra);
 
-byte* JB_Mrap_Ptr(MWrap* Self);
+byte* JB_Mem_Ptr(MWrap* Self);
 
-bool JB_Mrap_SetSize(MWrap* Self, int ItemCount);
+bool JB_Mem_SetSize(MWrap* Self, int ItemCount);
 
-void JB_Mrap_Zero(MWrap* Self);
+void JB_Mem_Zero(MWrap* Self);
 
-Array* SC_Mrap__CollectLeaks_(JB_Object* Self);
+Array* SC_Mem__CollectLeaks_(JB_Object* Self);
 
-int JB_Mrap__Init_();
+int JB_Mem__Init_();
 
-MWrap* JB_Mrap__Object(int Count, int ItemSize);
+MWrap* JB_Mem__Object(int Count, int ItemSize);
 
-void SC_Mrap__PrintLeaks(JB_Object* Self);
+void SC_Mem__PrintLeaks(JB_Object* Self);
 
-byte* JB_Mrap__Zalloc(int N);
+byte* JB_Mem__Zalloc(int N);
 
 
 
@@ -7803,6 +7801,8 @@ int JB_Str_FindTrailingSlashes(JB_String* Self);
 
 Float64 JB_Str_Float(JB_String* Self, bool Suffixes);
 
+int JB_Str_FlowUnPrintable(JB_String* Self);
+
 SortComparison SC_Str_InBuiltTarget(JB_String* Self, Message* Err);
 
 JB_String* SC_Str_InBuiltTargetWrong(JB_String* Self);
@@ -7991,8 +7991,6 @@ JB_String* JB_Str_Unescape(JB_String* Self);
 
 JB_String* SC_Str_UnicodeSafeName(JB_String* Self, FastString* Fs_in);
 
-int JB_Str_UnPrintable(JB_String* Self);
-
 JB_String* JB_Str_UpperFirst(JB_String* Self);
 
 ivec2 JB_Str_UTF8Badness(JB_String* Self);
@@ -8129,7 +8127,7 @@ bool JB_File_CompareMsg(JB_File* Self, ErrorInt Code, JB_String* Error);
 
 ErrorInt JB_File_FileCompareSub(JB_File* Self, JB_File* A);
 
-Message* JB_File_Config(JB_File* Self, int Lim);
+Message* JB_File_Config(JB_File* Self, int Limit);
 
 ErrorInt JB_File_CopyAll(JB_File* Self, JB_String* Dest, bool AttrOnly);
 
@@ -8448,6 +8446,10 @@ Message* SC_Msg_CollectionPlace(Message* Self);
 bool SC_Msg_CollectOneParam(Message* Self, SCFunction* Func, SCNode* Recv, SCClass* Cls);
 
 Message* JB_Msg_ConfArg(Message* Self);
+
+Message* JB_Msg_ConfigItem(Message* Self, JB_String* Key, Syntax ValueType, JB_String* DefaultName);
+
+Message* JB_Msg_ConfigValue(Message* Self, Message* Item, Syntax ValueType);
 
 void SC_Msg_ConfTake(Message* Self, Message* Dest, JB_String* Name);
 
@@ -9185,7 +9187,7 @@ Message* SC_Msg_ReplaceWith(Message* Self, Message* J);
 
 Message* SC_Msg_ReplaceWithChild(Message* Self);
 
-void JB_Msg_CantFind(Message* Self, Syntax S, JB_String* Name, Message* Found);
+Message* JB_Msg_CantFind(Message* Self, Syntax S, JB_String* Name, Message* Found);
 
 Message* SC_Msg_Resync(Message* Self, Message* Parent);
 
@@ -9265,7 +9267,7 @@ void JB_Msg_SetStr(Message* Self, JB_String* Key, JB_String* Value);
 
 void JB_Msg_SetMsg(Message* Self, JB_String* Key, Message* Value);
 
-Message* JB_Msg_GetConf(Message* Self, JB_String* Key, bool Err);
+Message* JB_Msg_SyntaxAccess(Message* Self, JB_String* Key);
 
 void JB_Msg_AppendString(Message* Self, JB_String* Key);
 

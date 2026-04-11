@@ -16,7 +16,7 @@
 
 class Memory
 	linkage
-		cpp_part Mem2
+		cpp_part Mem
 		cpp_class MWrap
 		pragma noearlyfree
 	
