@@ -192,11 +192,11 @@ datatype HumanDate (date)
 
 
 insertion
-	parse (–digest _0).ParseJbin! // could possibly compress large files too?
+	parse (–digest _0).ParseJbin!		// could possibly compress large files too?
 
 
 target debug and !cake
-	function list.JDB2 // makes it easier to debug from xcode
+	function list.JDB2					// makes it easier to debug from xcode
 		cpp_name jdb2
 		visible
 		if Self
@@ -213,7 +213,7 @@ target debug and !cake
 			"(nil)"
 
 
-function object.DebugPrint  // more for use in XCode, than anything else.
+function object.DebugPrint				// more for use in XCode, than anything else.
 	cpp_name jdb
 	visible true
 	if self
@@ -222,9 +222,12 @@ function object.DebugPrint  // more for use in XCode, than anything else.
 	printline .render
 
 
-datatype FailableInt (int) // useful when you want most numbers, even negatives, and zero but still want AN error code
+datatype FailableInt (int)
+	description "A balanced integer: -int.max = FailableInt.min.
+	0x8000_0000 == false
+	0x0 == true! (and all others too)"
 	constants
-		|int| 
+		|int|
 		Fail = 0x8000_0000
 		Max = 0x7FFF_FFFF
 		Min = 0x8000_0001
