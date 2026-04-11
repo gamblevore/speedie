@@ -155,14 +155,7 @@ Take a look again at the first example. Its just **sooo** much better. Everythin
 
 Accessing messages is so common that manually creating errors all the time would be totally undoable. In fact this is why my error system exists. But still useful elsewhere, especially for files or anything really.
  
-Speedie's error-reporting system has a lot more features, such as:
-
-+ Warnings: These get printed like errors, but leave `stderr.ok` true.
-+ Logging of errors to a logfile
-+ Treating errors as warnings during certain code-sections
-+ Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
-
-Overall it is a great thing. Use it if you need to deal with errors or generate errors. Sometimes you don't want errors to occur, like when reading from a file that doesn't exist, but actually I've already thought about that. `file.ReadAll` defaults to ignoring non-existing files.
+Overall Speedie's error system is great. Use it if you need to deal with errors or generate errors. Sometimes you don't want errors to occur, like when reading from a file that doesn't exist, but actually I've already thought about that. `file.ReadAll` defaults to ignoring non-existing files.
 
     || x = "/path/to/optional_file"
     || data = x.file.readall
@@ -333,7 +326,7 @@ In Speedie:
 
 Again! Super simple! Once the program exits, you get the list of errors printed. With nicely informative error message:
 
-    error: File doesn't exist when makedir '/tmp/a/b/c/'.
+    error: File doesn't exist when creating a folder '/tmp/a/b/c/'.
     
 
 ### C++ Exceptions
