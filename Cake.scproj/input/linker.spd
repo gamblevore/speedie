@@ -18,7 +18,7 @@ module SpdTable
 		if !.FailedIndex
 			.FailedIndex = true
 			error "Can't find code index: " + index
-	
+		
 	
 	function RunProgram (|int|)
 		opt inline
@@ -89,6 +89,12 @@ module SpdTable
 		disabled "Do you mean message.length or spdfunc.rangelength?"
 		
 		
+	function LinkAll
+		opt norefcounts
+		for f in .funcs
+			f.Link❗
+
+
 	function spdfunc.Link❗
 		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
 		|| Code = .position$
@@ -101,8 +107,8 @@ module SpdTable
 			|| Op = µ.op
 			if op.IsSPDFunc
 				base.LightCandles(µ)
-			  elseif op.IsGlob and µ.IsLibGlob
-				base.LibGlob(µ, op == asm.GOBJ)
+			  elseif µ.IsLibGlob and op.IsGlob
+/				base.LibGlob(µ, op == asm.GOBJ)
 			base += µ.size
 
 

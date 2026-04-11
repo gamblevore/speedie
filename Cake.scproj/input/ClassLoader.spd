@@ -14,10 +14,10 @@ function CakeRun.CountClasses (|message| list)
 
 
 
-function CakeRun.LoadClasses (|message| Clss)
+function CakeRun.LoadPackClasses (|message| PackCls)
 	opt norefcounts
-	.CountClasses(clss)
-	for c.fast in Clss
+	.CountClasses(PackCls)
+	for c.fast in PackCls
 		.LoadOneClass(C)
 
 

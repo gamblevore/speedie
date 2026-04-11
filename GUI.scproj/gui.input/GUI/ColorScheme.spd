@@ -78,14 +78,14 @@ class ColorScheme
 
 
 	function Load (|message| s)
-		|| list = s..syx$
+		|| list = s["syx"]$
 		for syx in list
 			|| num = syntax.Func(syx.Name, syx)
 				|| c = &.syxcol[num]
 				c.load(syx.first)
 				c.a = 255
-		.RootTmp.load(s..root)
-		.none.load(s..none)
+		.RootTmp.load(s["root"])
+		.none.load(s["none"])
 
 
 	render SaveColors

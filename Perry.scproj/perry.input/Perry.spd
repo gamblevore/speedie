@@ -129,7 +129,7 @@ module Perry
 		
 
 		if !.LoadWindowsFromArgs
-			.Projects = app.prefs["lastproj", @arg]|listviewrow|
+			.Projects = app.prefs.giveitem("lastproj", @arg)|listviewrow|
 			.LoadWindowsSub
 		
 		|| oof = (.FindProj(old) (old) .Projects.First)

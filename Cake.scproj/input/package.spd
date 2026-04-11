@@ -38,10 +38,10 @@ module CakeRun
 		arg.ExpectLast
 
 		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
-		Debugger.Root = arg["debug"].parent
+		Debugger.PackInfo = arg["debug"]
 		.Strings = arg["strs"].name
 		
-		.LoadClasses(arg["clss"])
+		.LoadPackClasses(arg["clss"])
 		return globals.CollectPackGlobs(sz)
 		
 

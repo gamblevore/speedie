@@ -78,7 +78,7 @@ struct Assembler
 
 		function DebugClassesAndGlobals (|jbin| j)
 			opt norefcounts
-			j.Enter(@msg, "class")
+			j.Enter(@msg, "type")
 			.ClassLayout(j)
 			j.exit
 			

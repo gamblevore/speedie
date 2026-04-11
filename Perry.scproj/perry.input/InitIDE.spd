@@ -779,7 +779,7 @@ extend PerryIDE
 	function LoadConfSub (|message| conf)
 		|| f = .FileList
 		f.Excludes = dictionary()
-		for ex in conf..excludes
+		for ex in conf["excludes"]
 			f.Excludes![ex.value] = "x"
 		
 		if !conf and .projIsSpeedieCode
@@ -789,7 +789,7 @@ extend PerryIDE
 		for lib in .LostFunks
 			lib.name = .PathExpand(lib.name)
 		
-		for ro in conf..roots
+		for ro in conf["roots"]
 			error.BackupErrorSource = ro
 			if ro.expect(@str)
 				file.OSXMaxCaseWarnings_[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.

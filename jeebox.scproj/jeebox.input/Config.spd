@@ -53,61 +53,70 @@ role config (message)
 
 
 
-function file.Config (|int| lim = 1MB, |config|)
+function file.Config (|int| Limit = 1MB, |config|)
 // why would a conf-file be so big?
 	opt NoRefCounts
 	if .Exists
-		rz = .Parse(lim, @arg)|config|
+		rz = .Parse(Limit, @arg)|config|
 	rz ?= message()
 	rz.obj = self
 
 
+
 extend message
-	function ConfArg (|config|)
+	libinternal ConfArg (|config|)
 		opt norefcounts
 		if self == @arg or nil
 			return self
-		|| IsTmp = (self == @tmp)
-		|| w = (.last (IsTmp) .next)
+		|| w = .next
+		if self == @tmp
+			w = .last
 		if w == @arg
 			return w
+			
 
-	function SyntaxAccess (|string| key, |syntax| Needed, |string| DefaultName="", |config|)
+	inline GiveItem (|string| Key, |syntax| ValueType, |string| DefaultName="", |config|)
+		description "Creates the correct child type if not found"
+		if !valuetype
+			valuetype = @str // oof!
+		return .ConfigItem(key, valuetype, defaultname)!
+
+
+	inline SyntaxAccess (|string| Key, |config|)
+		description "Returns the value of the config item found by Key. To create (if not found), use .GiveItem"
+		return .ConfigItem(key, nil, nil)
+
+
+	libinternal ConfigValue (|message| item, |syntax| ValueType, |message|)
 		opt norefcounts
-		description "Creates the correct child type if not found" 
-		|| found = .SyntaxAccess(key)
-		if found == Needed
-			return found
-		|| arg = .confarg
-		if found
-			error (found)
-		found = arg.msg(@tmp, key)
-		return found.msg(Needed, DefaultName)
+		if item.func == @msg
+			if (!ValueType or ValueType == @msg)	// handle @msg differently
+				return item
+			return .ReportFailiure(ValueType, "", item)
+		
+		|| f = item.first
+			if ValueType == nil or f.func			// matched
+				return f
+			return .ReportFailiure(ValueType, "", f)
 
+		if ValueType								// item lacks a value. seems bad.
+			return item.ReportFailiure(@nil, "", nil)
 
-	function SyntaxAccess (|string| key, |bool| Err=false, |config|)
-		cpp_part GetConf
+	
+	autogen ConfigItem (|string| key, |syntax| ValueType=nil, |string?| DefaultName=nil, |config|)
 		opt norefcounts
-		|| arg = .confarg
-		for item in arg
+		for item in .confarg
 			if item ~= key
-				if item.func == @msg // we'll handle this differently
-					return item
-				|| f = item.first
-					return f
-				if (Err)
-					error (item, "Empty value for row: " + key)
-				// don't remove the item to cleanup. Its possible they are using it for a menu or something.
-				return nil
-		if err
-			error (self, key + " not found.")
+				return .configvalue(item, valuetype)
+		if ValueType
+			|| arg = .GiveArg
+			return arg.msg(@tmp, key).msg(valuetype, DefaultName)
 	
 	
-	// this can't be the right way....
 	function Value (|string|)
 		if self
 			if self == @msg
-				return .FirstName 
+				return .FirstName
 			if self == @tmp and self in @arg
 				return .firstname
 			if self != @arg

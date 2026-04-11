@@ -19,12 +19,10 @@ main
 	|| p = cake.perry
 		p <~ "`hoi :3`"
 	
-	require CakeRun.GetStructure
-	for f in SpdTable.funcs
-		f.Link❗
-	
-	require debugger.Load
-	return SpdTable.RunProgram
+	if CakeRun.GetStructure
+		SpdTable.LinkAll
+		if debugger.LoadDebugger
+			return SpdTable.RunProgram
 
 	
 function cake.Collect (|File?|)

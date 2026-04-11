@@ -35,6 +35,7 @@ dispatch FuncPreReader (fnPreReader)
 		is disabled
 		.description = "Called a disabled function."
 		|| s = msg.first
+			s.Expectlast
 			s.ExpectString
 			.description = s.name
 
@@ -107,8 +108,9 @@ dispatch FuncPreReader (fnPreReader)
 	
 
 	+'description'
-		expect (self isnt disabled) (msg, "Already disabled")
-		.ReadDescription(msg)
+		if (self isnt disabled)
+			.ReadDescription(msg)
+		
 	
 
 

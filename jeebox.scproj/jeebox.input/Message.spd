@@ -63,9 +63,12 @@ Message is also:
 		.tag		= parser.Using.Tag
 
 			
-	constructor (|Message| Parent=nil, |Syntax| Func,  |string| name="")
-		description "Default message constructor function. Intended for general-use" 
+	constructor (|Message| Parent=nil, |Syntax| Func,  |string?| name=nil)
+		description "Default message constructor function. Intended for general-use"
+		opt norefcounts
 		super.constructor(Parent)
+		if !name
+			name = ""
 		.name		= name
 		.Position	= parser.using.Position
 		.func		= func
@@ -812,7 +815,7 @@ Message is also:
 				return ch
 
 		if Err
-			.ReportFailiure(s, name, nil)
+			return .ReportFailiure(s, name, nil)
 	
 
 	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err = false, |Message|)
@@ -822,7 +825,7 @@ Message is also:
 			if curr == fn or fn == nil
 				if name == nil  or  curr ~= name: Return curr
 		if err
-			.ReportFailiure(fn, name, nil)
+			return .ReportFailiure(fn, name, nil)
 	
 	
 	function FastString.MsgErrorName (|string?| name)
@@ -832,11 +835,11 @@ Message is also:
 			self <~ "' "
 
 
-	function ReportFailiure (|syntax| s, |string?| name = nil, |message?| found = nil)
+	function ReportFailiure (|syntax| s, |string?| name = nil, |message?| found = nil, |message|)
 		cpp_part CantFind
 		if !self and !found
 			jb_api.NilHandler
-			return
+			return nil
 		
 		|| fs = faststring.new
 		if found
@@ -855,6 +858,7 @@ Message is also:
 			found = self
 
 		errorreceiver.NewError( found, fs.getresult )
+		return nil
 
 
 	function ExpectLast (|string?| Err=nil, |bool|)
@@ -926,7 +930,7 @@ Message is also:
 				if found == OK or found == need or (OK == @nil)
 					return found
 			if OK!=@nil
-				.ReportFailiure(need, nil, found)
+				return .ReportFailiure(need, nil, found)
 	
 	
 	inline NeedFirst (|message|)
@@ -940,7 +944,7 @@ Message is also:
 			if s == nil or found.func == s
 				return found
 		if self
-			.ReportFailiure(s, "", found)
+			return .ReportFailiure(s, "", found)
 
 
 	Syntax Access (|syntax| s, |int| n, |message|)
@@ -949,7 +953,7 @@ Message is also:
 		|| Ch = self[n]
 			if !s or ch.func==s
 				return ch
-		.ReportFailiure(s, Nil, ch)
+		return .ReportFailiure(s, Nil, ch)
 	
 	
 	Syntax Access (|Syntax| s, |string?| name, |Message|)
@@ -1023,7 +1027,7 @@ Message is also:
 		|| ch = .last
 		if ch and (!need or ch==Need)
 			return ch
-		.ReportFailiure(Need, nil, ch)
+		return .ReportFailiure(Need, nil, ch)
 
 	
 	function Next (|syntax| Need, |string?| name=nil,  |Message|)
@@ -1034,7 +1038,7 @@ Message is also:
 			|| ch = .next
 				if (!need or ch.func==Need)  and  (name == nil or ch.name ~= name)
 					return ch
-			.ReportFailiure(Need, nil, ch)
+			return .ReportFailiure(Need, nil, ch)
 
 
 	syntax Equals (|string?| name, |bool| Aware=false, |bool|)

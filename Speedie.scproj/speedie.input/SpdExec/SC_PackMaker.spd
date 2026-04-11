@@ -227,10 +227,10 @@ module PackMaker
 			strs <~ s
 
 
-	function PackClasses (|jbin| j, |bool| Pack)
+	function PackClasses (|jbin| j, |bool| Lib)
 		opt norefcounts
 		for c in Compiler.ClassList
-			if (c.islibrary != pack) and c.NeedsPackExport
+			if (c.islibrary == Lib) and c.NeedsPackExport
 				C.DescribeInPack(j)
 
 
@@ -244,8 +244,8 @@ module PackMaker
 	function BakeClasses (|jbin| j)
 		if .AnyClassesNeeded
 			j.TmpArg("clss")
-			.PackClasses(j, false)
 			.PackClasses(j, true)
+			.PackClasses(j, false)
 			j.exit(2)
 	
 	

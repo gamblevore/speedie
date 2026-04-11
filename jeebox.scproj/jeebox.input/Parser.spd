@@ -474,7 +474,8 @@ extend Parser
 		|| name = parser.NewWord(nil, @str, n, n)
 		|| after = parser.nextstart
 		name.name = name.name.replaceall("–", " ")
-		rz = parser.NewEmpty(nil, @acc, start, after) 
+		rz = parser.NewEmpty(nil, @acc, start, after)
+		problem rz // i actually don't like this...
 		|| prms = parser.NewEmpty(rz, @arr, start, start)
 		prms <~ name
 

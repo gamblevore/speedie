@@ -78,9 +78,9 @@ extend_module perry
 		for i in arc
 			|| s = i.name
 				|| curr_file = base[s]!
-				if curr_File.isdir or curr_file.readall(true) != i..data.Value
+				if curr_File.isdir or curr_file.readall(true) != i["data"].Value
 					|| diskmod = curr_file.modified
-					|| arcmod = i..modified.int|date|
+					|| arcmod = i["modified"].int|date|
 					if diskmod <= arcmod
 						rz |= arc_newer
 						newer.FileDiff(i.name, "And newer ones too")

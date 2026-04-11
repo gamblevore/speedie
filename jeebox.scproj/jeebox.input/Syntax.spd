@@ -66,10 +66,10 @@ datatype Syntax (Byte)
 		return jeebox._FuncArray[self|int|]
 	
 	
-	inline Msg ( |string| name="", |Message| )
+	inline Msg ( |string?| name=nil, |Message| )
 		return Message( nil, self, name )
 	
-	inline message.Msg ( |syntax| fn, |string| name="", |Message| )
+	inline message.Msg ( |syntax| fn, |string?| name=nil, |Message| )
 		return Message( self, fn, name )
 	
 	

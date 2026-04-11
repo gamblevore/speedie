@@ -28,13 +28,13 @@ role FileArchive (message)
 
 
 	function Install (|message| item, |file| base, |bool| overwrite, |int64|)
-		|| path = item.name
-			|| data = item..data.value
+		|| path = item.name 
+			|| data = item["data"].value
 			|| chld = base.child(path)
 			if overwrite and chld.isdir
 				chld.DeleteAll
 			if chld.writeall(data)
-				|| it = item..mode
+				|| it = item["mode"]
 					chld.mode = it.int
 				rz = data.length
 	
@@ -67,19 +67,19 @@ role FileArchive (message)
 		opt norefcounts
 		rz = .copy
 		for file in rz
-			|| d = file..data
-				file..size = d.value.length
+			|| d = file["data"]
+				file["size"] = d.value.length
 				d.remove
 	
 	
 	function Size (|int|)
 		opt norefcounts
 		for file in self
-			rz += file..data.value.length
+			rz += file["data"].value.length
 		
 
 	syntax append (|string| path, |string| data)
-		.msg(@tmp, path)..data = data
+		.msg(@tmp, path)["data"] = data
 
 
 	syntax append (|file| f)
@@ -89,9 +89,9 @@ role FileArchive (message)
 		|| where = p.trimstart(.base)
 		if where != p
 			|| item = .last.msg(@tmp, where)
-			item..data = f.readall
-			item..modified = f.modified.renderint
-			item..mode = f.mode.render
+			item["data"] = f.readall
+			item["modified"] = f.modified.renderint
+			item["mode"] = f.mode.render
 
 
 	function Base (|string|)

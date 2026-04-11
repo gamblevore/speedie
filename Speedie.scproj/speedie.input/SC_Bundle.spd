@@ -6,7 +6,7 @@
 function compiler.Bundle 
 	target osx
 		require !Compiler.IsTest and !Options.ExternalCompile
-		require SC_Targets..gui // what about exec? or other that want to be cmd-line?
+		require SC_Targets["gui"] // what about exec? or other that want to be cmd-line?
 		require !linkage["nobundle"]
 		|| Pd = .productfile
 		|| Pj = .BaseProjectPath 
@@ -14,8 +14,8 @@ function compiler.Bundle
 
 	
 function compiler.WrongConf (CollectFunc)
-	expect (!.ConfMsg) (node, "Conf already exists!") 
-	error (node, "Conf must be in the app.conf file") 
+	expect (!.ConfMsg) (node, "Conf already exists!")
+	error (node, "Conf must be in the app.conf file")
 
 
 function compiler.IdealName (|string|)

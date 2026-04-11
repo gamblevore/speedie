@@ -4,20 +4,20 @@ class XType
 	|XType?|		Super
 	// what about the size? we need it for memory-checking...
 	|bool|			IsObject
-	|string|		Name
+	|message|		Name
 	|[XVar]|		Properties
 	
 	constructor
-		.name = "(unreached)"
+		.name = @emb+"(unreached)"
 	
 	constructor (|message| msg, |int| index)
 		opt norefcounts
 		|| Sup = msg[@nil]
 		|| SupIndex = Sup.Int
 		.IsObject = SupIndex & 1
-		.name = msg.name
+		.name = msg//.name
 		.Super = xtype.GetType(SupIndex, Sup)
-		|| jbcls = cakerun.ClassTable.valuelower(.name)|&Classdata|
+		|| jbcls = cakerun.ClassTable.valuelower(.name.name)|&Classdata|
 			jbcls.Index = index
 
 
@@ -31,30 +31,34 @@ class XType
 	render
 		opt norefcounts
 		fs <~ .name
-
-	
-	function LoadProp (|message| m, |message|)
-		opt norefcounts
-		|| P = m.Second
-			P.xvariables(nil, .properties)
-		return m.next
 	
 	
 	module
 		|InputStream|	Shared = InputStream("")
 		|XType|			Unreached = xtype()
 		|[XType]|		Types
-		
-		function LoadTypes (|message| list)
+
+		function LoadTypes (|message| Pack, |message| Lib)
 			opt norefcounts
-			|| i = 0
-			for msg in list
-				++i
-				.types <~ (XType(msg, i), .unreached)(msg.func == @msg)
-			
-			|| m = list.first
+			|| i = .LoadTypesSub(lib, 0)
+			.LoadTypesSub(pack, i)
+
 			for T in .types
-				m = t.LoadProp(m)
+				|| P = T.name.Second
+					P.xvariables(nil, T.properties)
+		
+		
+		function LoadTypesSub (|message| list, |int| i, |int|)
+			opt norefcounts
+			
+			for Type.fast in List
+				++i
+				if type.func == @msg
+					.types <~ XType(Type, i)
+				  else
+					.types <~ .unreached
+			
+			return i
 		
 		
 		function GetType (|int| i, |message| err, |xtype|)

@@ -43,7 +43,7 @@ function compiler.Adj (|message| f, |dictionary of macro|)
 	|| d = compiler.AdjDicts
 	if f == @thg
 		return d.expect(f)
-	return d..general
+	return d["general"]
 	
 
 function TypeOfAdj (ExprResolver)

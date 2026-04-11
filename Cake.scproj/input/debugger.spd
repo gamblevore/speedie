@@ -1,7 +1,7 @@
 
 
 module debugger
-	|message|		Root
+	|message|		PackInfo
 	|Message|		Globs
 	|[fileWithData]| Files
 	|Dictionary of filewithdata| FileMap
@@ -124,25 +124,42 @@ module debugger
 			if v contains index
 				return true
 	
+	/*
+		What are we doing with the libglobs. we allocate it, right? in .CakePrepare
 		
-	function Load (|bool|)
-		// this could come before the linking
-		// then we can move  fn.loadvars into the link-loop
+		So... previously... we allocated space for libclasses. So we should keep doing that.
 		
+		But what was it used for. Debugging, or actually running. If its debugging, whats the good in that.
+		
+		Yeah... I'm not sure how this works.
+		
+		Previously... we output all the LIB classes, then used them for CakePrepare
+	*/
+	
+	function LoadDebugger (|bool|)
 		opt norefcounts
-		|| PackInfo = .root
-		if !PackInfo
-			expect !(debugger.WantDebug or cake.perry)	("Program file doesn't contain debug info.")
-			return true
+		|| PackInfo = .PackInfo
+			.VariablePrinter = FastString(64)
+			require .VariablePrinter
+			return .LoadSub(.PackInfo)
 
+		return !(debugger.WantDebug or cake.perry)			#expect "Program file doesn't contain debug info."
+
+
+	function LoadLibAndGlobs (|message| PackInfo)
+		opt norefcounts
 		|| LibInfo = cakerun.LibDebug.parse
-		xtype.LoadTypes( libinfo["class"])
-		xtype.loadtypes(PackInfo["class"])
-		.VariablePrinter = FastString(64)
-		expect .VariablePrinter
+		xtype.LoadTypes(PackInfo["type"], libinfo["type"])
 		
-/		|| LibGlobs = LibInfo["glob"]
-		.Globs = PackInfo["glob"] ?? Message()
+		.Globs = PackInfo.giveitem("glob", @msg)
+		|| LibGlobs = LibInfo["glob"]
+			.globs.Appendall(libglobs)						// merge!
+	
+	
+	function LoadSub (|message| PackInfo, |bool|)
+		opt norefcounts
+
+		.LoadLibAndGlobs(packinfo)
 		
 		.LoadFiles(PackInfo["files"].value.decompress)
 		.Breakables = PackInfo["breakmap"]
