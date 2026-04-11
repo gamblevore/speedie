@@ -16,7 +16,7 @@ class String
 		Disturbs		nil
 
 	default			""
-	false			""
+	false			""				// is string.error better?
 	
 	|int|		Length_
 	|&byte|		Addr
@@ -197,8 +197,8 @@ class String
 			return self
 		return self[0, N].UnicodeSync + "..."
 
-	function SimpleName (|string|)
-		return .lowercase.TrimExtAndPath
+//	function SimpleName (|string|)
+//		return .lowercase.TrimExtAndPath
 	
 	function UpperFirst (|String|)
 		if self[].IsUpper
@@ -207,9 +207,7 @@ class String
 	
 	inline Shorten (|int| n, |string|)
 		return self[0, .length-n]
-	function rtrim (|int| n, |string|)
-		disabled "Use .shorten"
-
+	
 	function TrimMiddle (|int| A, |int| B, |string|)
 		// The GUI uses this. Could probably be used more by the text-editor?
 		|| X = .length
@@ -453,9 +451,6 @@ class String
 		function Copy (|&nil| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
 
-		function FromC (|cstring| str, |stringzeroterminated|)
-			disabled "use .copy"
-
 		inline Hex (|int64| i, |string|)
 			return i.hex!
 		
@@ -476,13 +471,21 @@ class String
 		function Byte (|int| b, |string--|)
 			cpp_wrapper JB_Str__Byte
 		
-		syntax Access (|int|b, |string|)
-			disabled ".char or .byte?"
-
 		function UTF8 (|codepoint| c, |string|)
 			cpp_wrapper JB_Str_ChrUTF8
 		
+/// disabled stuff	
+		function FromC (|cstring| str, |stringzeroterminated|)
+			disabled "use .copy"
 
+		syntax Access (|int|b, |string|)
+			disabled ".char or .byte?"
+
+	function rtrim (|int| n, |string|)
+		disabled "Use .shorten"
+
+
+// normal stuff
 	syntax cast ( |bool| )
 		cpp_wrapper JB_Str_Exists
 
@@ -577,14 +580,6 @@ class String
 		return true
 
 
-//	function HasMoat (|bool|)
-//		|| n = .length-2
-//		require n>2
-//		|| u = '_'
-//		|| d = .addr
-//		return u == d[0] and d[1] and d[n] and d[n+1]
-
-
 	function IsURL (|string|)
 		for i in .length
 			if self[i, "://"]
@@ -636,7 +631,7 @@ class String
 					return (from, l)
 				--from
 		return (-1, 0)
-					
+
 
 	function Hash (|uint64| last=0, |uint64|)
 		cpp_Wrapper JB_Str_CRC
