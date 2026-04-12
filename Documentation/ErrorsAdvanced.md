@@ -44,6 +44,8 @@ Because there are no "real errors" we need to call `stderr.printall`, as warning
             printline "We are still OK!"
         printline msg
 
+You should see one error printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
+
 
 ### Logging
 
@@ -51,11 +53,10 @@ Because there are no "real errors" we need to call `stderr.printall`, as warning
         stderr.LogFile = file.desktop.Child("demo.log")
         if msg.name != "hello"
             // this problem is logged to the file demo.log at the line below...
-            problem (msg, "Aren't you going to say hello?")
+            error (msg, "Aren't you going to say hello?")
             // even if the program crashes after this, it is already logged.
-        if stderr.ok
-            printline "We are still OK!"
-        printline msg
+
+You'll see one error printed, but also you'll find a file `demo.log` containing this error logged nicely.
 
 
 
