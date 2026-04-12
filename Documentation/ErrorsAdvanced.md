@@ -44,21 +44,23 @@ The only **`warnings`** created, are the ones you yourself explicitly created.
 
 #### Problems
 
-**Problems** are considered something "bad", but still leave `stderr.ok` as true. However, **problems** DO get printed by default.
+**Problems** are considered something "bad", but still leave `stderr.ok` as true. However, **problems** _do_ get printed by default.
 
     
     main (|message| msg)
         if msg.name != "hello"
             problem (msg, "Aren't you going to say hello?")
-        if stderr.ok
+        if stderr.ok                       // this should be true!
             printline "We are still OK!"
         printline msg
 
 You should see one **`error`** printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
 
-Why use **`problems`** instead of **`errors`**? Well... lets say you deprecated a feature. Lets say you are processing a song databank. 
+Why use **`problems`** instead of **`errors`**?
 
-Song nodes were previously called "songinfo", but now you wanted to rename it to be just "song". So your users have to update their databanks. But you do want old databanks to work, AND you want the user to know to update them. So try this:
+Lets say you deprecated a feature. Lets say you are processing a song databank, and your song nodes were previously called "songinfo", but now you wanted to rename it to be just "song".
+
+So your users have to update their databanks. But you want old databanks to work, _and_ you want the user to know to update them. So try this:
 
     function LoadAllSongs (|message| music_list)
         for song in music_list
