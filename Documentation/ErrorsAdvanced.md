@@ -18,7 +18,7 @@ Speedie has multiple error levels:
 
         Critical: 5   // Unrecoverable. EG: OutOfMemory / signals
         Error:    4   // Real errors that stop the program doing what you wanted.
-        Problem:  3   // Something bad that
+        Problem:  3   // Not bad enough to stop the program working, but still bad.
         Warning:  2   // Probably is bad, best to let the user know about it.
         Hint:     1   // A suggestion for possible improvement.
 
