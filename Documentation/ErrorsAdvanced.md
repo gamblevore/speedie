@@ -3,7 +3,7 @@
 Speedie's error-reporting system has some rarer used features, such as:
 
 + Problems: These get printed like errors, but leave `stderr.ok` true.
-+ Warnings: Also leaves `stderr.ok` true, but won't get auto-printed. (You can call `stderr.printall` to see them.)
++ Warnings: Also leaves `stderr.ok` true, but won't get auto-printed. (Call `stderr.printall` to see them.)
 + Logging of errors to a file.
 + Lowering errors to warnings during certain code-sections
 + Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
@@ -19,7 +19,6 @@ Speedie has multiple error levels.
         Problem:  3   // Something bad that
         Warning:  2   // Probably is bad, best to let the user know about it.
         Hint:     1   // A suggestion for possible improvement.
-        OK:       0   // Not for use.
 
 The severity level doesn't have much difference in effect. The object still uses the same **`error`** class, and is added to the error-list, even if it's severity is **`hint`**.
 
