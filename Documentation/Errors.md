@@ -211,6 +211,12 @@ Here are a few examples why exceptions are bad:
 
 Quite often an app will simply make a "Catch all" exception handler, and hope it never happens... which kind of defeats the purpose of exceptions in the first place but at least it lets your code survive thems.
 
+
+# Advanced Error Handling:
+
+If you need more advanced error handling, such as logging of errors, warnings, error-lowering, or "containing" of errors, read the [Advanced Error Handling](ErrorsAdvanced.md) file.
+
+
 # Comparisons
 Lets compare speedie error handling, to other languages.
 
@@ -419,6 +425,7 @@ Now lets look at Speedie's version:
         return DB.getUserById(id)        #expect ("Cannot find the user by id $id")
 
 Wow. Same code... same result, but Speedie is just clear and simple.
+
 
 
 # Conclusion:

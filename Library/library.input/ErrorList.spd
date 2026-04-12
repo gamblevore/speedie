@@ -14,8 +14,8 @@ class ErrorReceiver
 	contains ErrorReceiver
 
 	|Error|					Errors
-	|fnErrorLogger?| 		_LogFunc
-	|object?| 				_LogObj
+	|fnErrorLogger?|		_LogFunc
+	|object?|				_LogObj
 	|int|					MaxErrors
 	|int|					MaxProblems
 	|int|					ErrorCount
@@ -161,16 +161,19 @@ class ErrorReceiver
 		.rendererrors(fs, errorseverity.problem, false)
 		
 	
-	function PrintErrors (|int|)
+	inline PrintErrors (|int|)
 		return .PrintErrors(errorseverity.problem, false, false)
 
+	inline PrintAll (|bool| Shell=true, |int|)
+		return .PrintErrors(errorseverity.hint, false, Shell)
 
-	function ShellPrintErrors (|int|)
+
+	inline ShellPrintErrors (|int|)
 		visible // for jb_main.cpp
 		return .PrintErrors(errorseverity.problem, false, true)
 	
 	
-	function PrintErrors (|errorseverity| Level, |bool| PrintCount, |bool| shell, |int|)
+	function PrintErrors (|errorseverity| Level, |bool| PrintCount=false, |bool| shell=true, |int|)
 		cpp_part PrintErrorsMain
 		|| rec = StdErr
 		if self
@@ -189,9 +192,8 @@ class ErrorReceiver
 		self <~ Count of "issue"
 		self <~ " found\n" // "1 issue found"
 	
-	function BadCount (|int|)
+	inline BadCount (|int|)
 		visible
-		inlined
 		return .errorcount + .problemcount
 		
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
@@ -224,7 +226,6 @@ class ErrorReceiver
 
 
 	module
-		|Float64|		Progress
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred
 			
@@ -267,10 +268,12 @@ extend File
 	Syntax Expect (|string| Error)
 		opt norefcounts
 		cpp_part Fail
+		inlined
 		errorreceiver.NewError( nil, Error, .path )
 
 	Syntax Problem (|string| Error)
 		opt norefcounts
+		inlined
 		errorreceiver.NewProblem( nil, Error, .path )
 
 
