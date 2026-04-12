@@ -80,21 +80,21 @@ You'll see one error printed, but also you'll find a file `demo.log` containing 
 ### Error Reduction
 
     function app.CheckMsg (|message| msg)
-        if msg.name != "hello"
-            problem (msg, "Aren't you going to say hello?")
+        if msg != "oof"
+            error (msg, "Expected an 'oof'")
         printline msg
     
     main (|message| msg)
-        problem "Just testing problems!"
+        error "First error!"
         using ErrorSeverity.Warning
             .checkmsg(msg)
         StdErr.PrintAll
         StdErr.Clear      // or else we see the errors twice
             
 
-Here... we should see only one error printed after the program exits. Which is _"Just testing problems!"_
+Here... we should see only two errors printed after the program exits:  _"First error!"_ and _"Expected an 'oof'"_
 
-By adding stderr.PrintAll, we see the warning too.
+We need to use `stderr.PrintAll`, to see the warnings, and of `stderr.Clear` to stop the system from printing errors again after we exit.
 
 
 
