@@ -93,11 +93,11 @@ Sometimes, you want to "contain" errors... But still detect them. Here is one ni
 We should see two errors created. One at the **`error`** line, and the other because we can't read that wierd file-path. So lets contain that error:
 
     main (|message| msg)
-        error "Only one error allowed!"
         using errorreceiver.new
             || f = "/not/a/file/that/exists.haha".FileThatExists
             if !stderr.ok
                 printline "Awesome! we found an error but its not gonna harm us"
+        error "Only one error allowed!"
 
 Now we only see the first error created. And we see "Awesome!..." printed, proving that the error did exist... for a while.
 
