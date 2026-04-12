@@ -85,14 +85,14 @@ You'll see one error printed, but also you'll find a file `demo.log` containing 
         printline msg
     
     main (|message| msg)
-        error "First error!"
+        .checkmsg(msg)
         using ErrorSeverity.Warning
             .checkmsg(msg)
         StdErr.PrintAll
         StdErr.Clear      // or else we see the errors twice
             
 
-Here... we should see only two errors printed after the program exits:  _"First error!"_ and _"Expected an 'oof'"_
+Here... we should see two errors printed after the program exits:  Both are _"Expected an 'oof'"_. But one will be marked as a warning.
 
 We need to use `stderr.PrintAll`, to see the warnings, and of `stderr.Clear` to stop the system from printing errors again after we exit.
 
@@ -116,7 +116,7 @@ We should see two errors created. One at the **`error`** line, and the other bec
                 printline "Awesome! we found an error but its not gonna harm us"
         error "Only one error allowed!"
 
-Now we only see the first error created. And we see "Awesome!..." printed, proving that the error did exist... for a while.
+Now we only see the last error created. And we see "Awesome!..." printed, proving that the error did exist... for a while.
 
 
 
