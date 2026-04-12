@@ -1665,7 +1665,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2428])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2429])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1805,10 +1805,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2427])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2426])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2428])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2427])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2425])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2426])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2436,17 +2436,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2421])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2422])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2422])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2423])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2423])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2424])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2420])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2421])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2423])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2425])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2503,8 +2503,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2419])
-#define JB__Rec_Progress JB__.Rec_Progress
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2420])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -2595,18 +2594,17 @@ struct JB_Globals {
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
 	int Syx_CurrFuncID_;
-	Float64 Rec_Progress;
-	Dictionary* Constants_JS_UnEscapeStr;
-	Dictionary* Constants_XML_UnEscapeStr;
-	Dictionary* Constants_EscapeChr;
-	Message* Tk__EndOfLineMarker;
-	Dictionary* Constants_EscapeStr;
-	Dictionary* TC_Types_Dict;
-	JB_File* Platform_Logger_;
 	JB_ErrorReceiver* StdErr;
+	JB_File* Platform_Logger_;
+	Dictionary* TC_Types_Dict;
+	Dictionary* Constants_EscapeStr;
+	Message* Tk__EndOfLineMarker;
+	Dictionary* Constants_EscapeChr;
+	Dictionary* Constants_XML_UnEscapeStr;
+	Dictionary* Constants_JS_UnEscapeStr;
+	Dictionary* Constants_UnEscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
 	JB_String* App_Usage;
-	Dictionary* Constants_UnEscapeStr;
 	FlowControl* Flow_Flow;
 	Message* App__Conf;
 	Message* App__Prefs;
@@ -2633,10 +2631,10 @@ struct JB_Globals {
 	FP_SorterComparer ID__ByID;
 	RandomXOR* Random;
 	PicoComms* Proc__ForceParent;
-	RandomXOR zalgo_R;
 	RandomXOR RandomShared;
-	MessagePosition Tk_Using;
+	RandomXOR zalgo_R;
 	CompressionStats MzSt_All;
+	MessagePosition Tk_Using;
 	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -7176,13 +7174,11 @@ int64 JB_Wrap_Value(DTWrap* Self);
 
 
 // JB_Dictionary
-JB_Object* JB_Dict_Expect(Dictionary* Self, Message* M);
+JB_Object* SC_Dict_Expect(Dictionary* Self, Message* M);
 
 JB_Object* JB_Dict_Obj(Dictionary* Self, JB_Object* Prm);
 
 void JB_Dict_ObjSet(Dictionary* Self, JB_Object* Prm, JB_Object* Value);
-
-void JB_Dict_SetValue(Dictionary* Self, JB_String* Key, int64 Value);
 
 JB_Object* JB_Dict_Value0(Dictionary* Self, JB_String* Key);
 
@@ -7253,8 +7249,6 @@ JB_ErrorReceiver* JB_Rec_SyntaxUsing(JB_ErrorReceiver* Self);
 void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self, JB_Object* Idk);
 
 bool SC_Rec_TooMany(JB_ErrorReceiver* Self);
-
-int JB_Rec__Init_();
 
 void JB_Rec__NewCriticalError(Message* Node, JB_String* Desc, JB_String* Path);
 
@@ -11453,18 +11447,17 @@ struct JB_Globals {
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
 	int Syx_CurrFuncID_;
-	Float64 Rec_Progress;
-	JB_Object* Constants_JS_UnEscapeStr;
-	JB_Object* Constants_XML_UnEscapeStr;
-	JB_Object* Constants_EscapeChr;
-	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Constants_EscapeStr;
-	JB_Object* TC_Types_Dict;
-	JB_Object* Platform_Logger_;
 	JB_Object* StdErr;
+	JB_Object* Platform_Logger_;
+	JB_Object* TC_Types_Dict;
+	JB_Object* Constants_EscapeStr;
+	JB_Object* Tk__EndOfLineMarker;
+	JB_Object* Constants_EscapeChr;
+	JB_Object* Constants_XML_UnEscapeStr;
+	JB_Object* Constants_JS_UnEscapeStr;
+	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
 	JB_Object* App_Usage;
-	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Flow_Flow;
 	JB_Object* App__Conf;
 	JB_Object* App__Prefs;
