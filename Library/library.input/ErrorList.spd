@@ -50,7 +50,7 @@ class ErrorReceiver
 			self = stderr!
 		Return (.errorcount ||| .problemcount)
 	
-	function HasAnything (|bool|) // totallyok
+	function HasAnything (|bool|) // Totally OK
 		opt norefcounts
 		if !self
 			self = stderr!
@@ -82,12 +82,12 @@ class ErrorReceiver
 			.errors <~ err
 
 
-	syntax append (|string| LogMsg)
+	syntax append (|string| LogString)
 		cpp_part Log
 		if !._LogFunc
 			.LogFile = app.filename + ".log"
 		|| log = ._logfunc
-			(log)(self, LogMsg)
+			(log)(self, LogString)
 
 
 	setter LogFile (|string|)
@@ -134,7 +134,6 @@ class ErrorReceiver
 	function Count (|int|)
 		disabled "Do you mean .ErrorCount or .WarnCount, or .TotalCount?"
 
-
 	function List (|error|)
 		disabled "Do you mean .Errors?"
 
@@ -175,27 +174,21 @@ class ErrorReceiver
 	
 	function PrintErrors (|errorseverity| Level, |bool| PrintCount=false, |bool| shell=true, |int|)
 		cpp_part PrintErrorsMain
-		|| rec = StdErr
-		if self
-			rec = self
-
-		|| fs    = faststring()
-		|| Count = rec.rendererrors(fs, level, shell)$
-		printerror fs.GetResult
-		fs.problemsfound(count)
-		PrintError fs.getresult
-		if Count
-			return -1
-
-
-	function faststring.ProblemsFound (|int| count)
-		self <~ Count of "issue"
-		self <~ " found\n" // "1 issue found"
+		|| rec = (self (self) StdErr)
+		|| fs	= faststring()
+		|| Count = rec.rendererrors(fs, level, shell)
+			fs <~ Count of "issue"
+			fs <~ " found\n"							// "1 issue found"
+			PrintError fs|string|
+			if Count
+				rz = -1
+	
 	
 	inline BadCount (|int|)
 		visible
 		return .errorcount + .problemcount
-		
+	
+	
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
 		require !.BlockErrors and !ErrorReceiver.OutOfMemory
 		if level == ErrorSeverity.problem
