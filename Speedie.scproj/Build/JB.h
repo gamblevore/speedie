@@ -892,7 +892,7 @@ JBClass ( JB_ErrorReceiver , JB_Object ,
 	int MaxErrors;
 	JB_Object* _LogObj;
 	ErrorSeverity LowerErrorsTo;
-	bool BlockErrors;
+	ErrorSeverity PrintSeverity;
 	int MaxProblems;
 	int ErrorCount;
 	int ProblemCount;
@@ -2196,12 +2196,11 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ErrorFlags_Parse ((ErrorFlags)4)
 #define kJB__ErrorFlags_PreferNoRenderPath ((ErrorFlags)2)
 #define kJB__ErrorFlags_PrintAndKeep ((int)1)
-#define kJB__ErrorFlags_PrintAndRemove ((int)2)
 #define JB__ErrorSeverity__ErrorNames JB__.ErrorSeverity__ErrorNames
 #define kJB__ErrorSeverity_Critical ((ErrorSeverity)5)
 #define kJB__ErrorSeverity_Error ((ErrorSeverity)4)
 #define kJB__ErrorSeverity_Hint ((ErrorSeverity)1)
-#define kJB__ErrorSeverity_MaxError ((ErrorSeverity)6)
+#define kJB__ErrorSeverity_IgnoreAllErrors ((ErrorSeverity)6)
 #define kJB__ErrorSeverity_OK ((ErrorSeverity)0)
 #define kJB__ErrorSeverity_Problem ((ErrorSeverity)3)
 #define kJB__ErrorSeverity_Warning ((ErrorSeverity)2)
@@ -4390,8 +4389,6 @@ bool JB_int_OperatorIsa(int Self, uint N);
 int JB_int_OperatorMax(int Self, int Other);
 
 int JB_int_OperatorMin(int Self, int Other);
-
-JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing);
 
 IntRange JB_int_OperatorTo(int Self, int Other);
 
@@ -7232,15 +7229,15 @@ JB_Error* JB_Rec_Pop(JB_ErrorReceiver* Self);
 
 void SC_Rec_PrePrintErrors(JB_ErrorReceiver* Self);
 
-int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level, bool PrintCount, bool Shell);
+int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level, bool Shell);
 
 JB_String* JB_Rec_Render(JB_ErrorReceiver* Self, FastString* Fs_in);
 
-int JB_Rec_RenderErrors(JB_ErrorReceiver* Self, FastString* Fs, uint /*ErrorSeverity*/ Level, bool Shell);
+int JB_Rec_RenderErrors(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level, bool Shell, FastString* Fs);
 
 int SC_Rec_ReturnErrors(JB_ErrorReceiver* Self, JB_ErrorReceiver* To);
 
-int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self);
+int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level);
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err);
 
@@ -7316,8 +7313,6 @@ void JB_FS_MsgErrorName(FastString* Self, JB_String* Name);
 void SC_FS_Normal(FastString* Self, JB_String* S);
 
 void JB_FS_PadTo(FastString* Self, int N, uint /*byte*/ B);
-
-void JB_FS_ProblemsFound(FastString* Self, int Count);
 
 JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in);
 
@@ -7913,7 +7908,7 @@ JB_String* JB_Str_PathDir(JB_String* Self);
 
 JB_String* SC_Str_PathFixSpd(JB_String* Self);
 
-JB_String* JB_Str_PluraliseAmount(JB_String* Self, int Amount, JB_String* Nothing);
+JB_String* JB_Str_PluraliseAmount(JB_String* Self, FastString* Fs_in, int Amount, JB_String* Nothing);
 
 JB_String* JB_Str_Pluralize(JB_String* Self, bool Plural, FastString* Fs_in);
 
@@ -10158,8 +10153,6 @@ void JB_Err_GrabLine(JB_Error* Self, FastString* Fs, bool Usecolor);
 bool JB_Err_HasPosition(JB_Error* Self);
 
 void SC_Err_Improve(JB_Error* Self);
-
-bool JB_Err_IsBad(JB_Error* Self);
 
 bool JB_Err_IsError(JB_Error* Self);
 
