@@ -3,11 +3,11 @@
 Speedie's error-reporting system has some rarer used features, such as:
 
 + Problems: These get printed like errors, but leave `stderr.ok` true.
-+ Warnings: Also leaves `stderr.ok` true. But these won't get auto-printed. (You can call `stderr.printall` to see them though.)
-+ Logging of errors to a logfile
-+ Treating errors as warnings during certain code-sections
++ Warnings: Also leaves `stderr.ok` true, but won't get auto-printed. (You can call `stderr.printall` to see them.)
++ Logging of errors to a file.
++ Lowering errors to warnings during certain code-sections
 + Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
-+ You can loop over the errors to "clean them" if you like.
++ You can loop over the errors to "clean" them if you like.
 
 
 ### Warnings and Problems
