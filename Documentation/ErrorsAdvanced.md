@@ -2,7 +2,8 @@
 
 Speedie's error-reporting system has some rarer used features, such as:
 
-+ Warnings and Problems: These get printed like errors, but leave `stderr.ok` true.
++ Problems: These get printed like errors, but leave `stderr.ok` true.
++ Warnings: Also leaves `stderr.ok` true. But these won't get auto-printed. (You can call `stderr.printall` to see them though.)
 + Logging of errors to a logfile
 + Treating errors as warnings during certain code-sections
 + Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
@@ -24,7 +25,7 @@ The error level doesn't have much difference in effect. It will be added to the 
 
 However: **`Problem`**, **`Warning`**, and **`Hint`** leave `stderr.OK` as `true`.
 
-If you need to make a warning, instead of an error do this:
+If you need to make a **`warning`**, instead of an **`error`** do this:
     
     main (|message| msg)
         if msg.name != "hello"
@@ -33,6 +34,13 @@ If you need to make a warning, instead of an error do this:
         StdErr.PrintAll
 
 Because there are no "real errors" we need to call `stderr.printall`, as warnings are not printed by default.
+
+Theres no worry about needing to call `stderr.printall` to catch **`warnings`** in all your apps. Its just internal to your app. Speedie itself, does not create any **`warnings`**.
+
+For example: All file-errors are proper **`errors`**, if created at all.
+
+The only **`warnings`** created, are the ones you yourself explicitly created.
+
 
 #### Problems
 
@@ -46,7 +54,7 @@ Because there are no "real errors" we need to call `stderr.printall`, as warning
             printline "We are still OK!"
         printline msg
 
-You should see one error printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
+You should see one **`error`** printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
 
 Why use **`problems`** instead of **`errors`**? Well... lets say you deprecated a feature. Lets say you are processing a song databank. 
 
@@ -73,7 +81,7 @@ Now your files still work as before, `stderr.ok` is still true, and the user is 
             error (msg, "Aren't you going to say hello?")
             // even if the program crashes after this, it is already logged.
 
-You'll see one error printed, but also you'll find a file `demo.log` containing this error logged nicely.
+You'll see one **`error`** printed, but also you'll find a file `demo.log` containing this **`error`** logged nicely.
 
 
 
@@ -92,22 +100,22 @@ You'll see one error printed, but also you'll find a file `demo.log` containing 
         StdErr.Clear      // or else we see the errors twice
             
 
-Here... we should see two errors printed after the program exits:  Both are _"Expected an 'oof'"_. But one will be marked as a warning.
+Here... we should see two **`errors`** printed after the program exits:  Both are _"Expected an 'oof'"_. But one will be marked as a warning.
 
-We need to use `stderr.PrintAll`, to see the warnings, and of `stderr.Clear` to stop the system from printing errors again after we exit.
+We need to use `stderr.PrintAll`, to see the **`warnings`**, and of `stderr.Clear` to stop the system from printing **`errors`** again after we exit.
 
 
 
 ### Replacing StdErr
 
-Sometimes, you want to "contain" errors... But still detect them. Here is one nice way to do it. Lets look at the first example:
+Sometimes, you want to "contain" **`errors`**... But still detect them. Here is one nice way to do it. Lets look at the first example:
 
     main
         || f = "/not/a/file/that/exists.haha".FileThatExists
             printline "wierd, why does this file exist?"
         error "Only one error allowed!"
     
-We should see two errors created. One at the **`error`** line, and the other because we can't read that wierd file-path. So lets contain that error:
+We should see two **`errors`** created. One at the **`error`** line, and the other because we can't read that wierd file-path. So lets contain that **`error`**:
 
     main
         using errorreceiver.new
@@ -116,7 +124,7 @@ We should see two errors created. One at the **`error`** line, and the other bec
                 printline "Awesome! we found an error but its not gonna harm us"
         error "Only one error allowed!"
 
-Now we only see the last error created. And we see "Awesome!..." printed, proving that the error did exist... for a while.
+Now we only see the last **`error`** created. And we see "Awesome!..." printed, proving that the **`error`** did exist... for a while.
 
 
 
@@ -131,14 +139,14 @@ Now we only see the last error created. And we see "Awesome!..." printed, provin
     		if !(err.name contains "keep")
     			err.remove
 
-So... we created 33 errors. But we removed 30 of them. We only see these output:
+So... we created 33 **`errors`**. But we removed 30 of them. We only see these output:
     
     error: Lets keep this: 1
     error: Lets keep this: 2
     error: Lets keep this: 3
     3 issues found
 
-Can be quite useful... for situations where one bad input, causes many errors.
+Can be quite useful... for situations where one bad input, causes many **`errors`**.
 
 
 
