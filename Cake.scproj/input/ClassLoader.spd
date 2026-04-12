@@ -10,15 +10,14 @@ function CakeRun.CountClasses (|message| list)
 			|| PB = pk.Count
 			VirtualCount += PB
 			pk.RangeLength = PB
-/	Classdata.CakePrepare(ClassCount, VirtualCount)
+	Classdata.CakePrepare(ClassCount, VirtualCount)
 
 
 
 function CakeRun.LoadPackClasses (|message| PackCls) // loadclasses
 	opt norefcounts
-	.CountClasses(PackCls)
 	for c.fast in PackCls
-		.LoadOneClass(C)
+		.LoadPackClass(C)
 
 
 
@@ -53,14 +52,14 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 
 
 
-function Cakerun.LoadOneClass (|message| s)
+function Cakerun.LoadPackClass (|message| s)
 	opt norefcounts
 	|| c = S[@list]!
 	|| Num = c[@nil]
 	|| I = Num.int										#require
 
-	// what if this is a pack class???
-/	|| Where = (globals.LibBase + I)|&?&classdata|		#expect
+	expect (i|uint|+7 < globals.PackGlobSize) (num)
+	|| Where = (globals.packglobs + I)|&?&classdata|!
 	|| PK = c.next
 		PK.Expect(@list)
 		return .UnpackClass(s, c, where, pk)

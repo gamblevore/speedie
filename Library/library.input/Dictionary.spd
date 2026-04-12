@@ -4,9 +4,6 @@
 */
 
 
-
-//// Advice: Avoid using dictname within anything fast unless wrapped with norefcounts
-
 class Dictionary
 	size 2080 // wow. would be great to use fixeddict instead.
 	linkage
@@ -24,6 +21,7 @@ class Dictionary
 			
 	syntax Access (|string?| Key, ||)
 		cpp_part Value0
+		inlined
 		return self[key, nil]
 			
 	syntax Access (|string?| Key, |...| Default=nil, ||)
@@ -32,28 +30,24 @@ class Dictionary
 		
 	function MakePlace (|string?| key, |&...|)
 		cpp_wrapper JB_Dict_MakePlace
-		
-	function GetPlace (|string?| key, |?&...|)
-		cpp_wrapper JB_Dict_GetPlace
+	
 		
 	syntax Access (|uint64| Key, assigns:||)
 		opt norefcounts
 		cpp_part SetInt
+		inlined
 		self[key|int64|._DictName] = Value
 
 	syntax Access (|uint64| Key, ||)
 		opt norefcounts
 		cpp_part ValueInt
+		inlined
 		return self[key|int64|._DictName]
 	
-//	function Longest (|string| key, |&int| LengthFound, ||)
-//		cpp_wrapper JB_Dict_Longest
 
 	function Find (|string| match, |$ivec2| Found, ||)
 		cpp_wrapper JB_Dict_FindStr
 	
-//	syntax append (|message| m) // don't we normally want to lower-case this?
-//		self[m.name] = m
 	
 	function ValueLower (|string?| s, ||)
 		if s.islower
@@ -77,13 +71,10 @@ class Dictionary
 	// "..." means "Whatever it is that we contain"
 	// so.. we return a dictionary reader containing whatever we contain.
 	function Navigate (|DictionaryReader of ...|) { cpp_wrapper JB_Dict_Navigate, nil checker }
-
-	function Values (|[...]|)
-		for V in self
-			rz <~ V
 	
 	function List (|[...]|)
-		return .values
+		for V in self
+			rz <~ V
 
 	function Keys (|array of string|)
 		for (V in self) (key)
@@ -92,18 +83,18 @@ class Dictionary
 	render
 		cpp_wrapper
 	
-	
 	iterator
 		|| nav = .Navigate
 		while
 			|| v = nav.NextValue
 			if v == nil: exit
 			yield v (nav.Name)
-			
+	
+	
 	module
-		function Reverse (|dictionary of string|Dict, |dictionary of string|)
+		function Reverse (|dictionary of string| Dict, |dictionary of string|)
 			cpp_name JB_Dict__Reverse
-			rz = dictionary.new
+			rz = dictionary()
 			for (value in Dict) (key)
 				rz[value] = key
 
@@ -127,8 +118,8 @@ class DictionaryReader
 	function Value (||)
 		cpp_wrapper JB_Nav_Value
 
-	function Value (assigns:||)
-		cpp_wrapper JB_Nav_ValueSet
+//	function Value (assigns:||)
+//		cpp_wrapper JB_Nav_ValueSet
 	
 	function MoveNext (|bool|)
 		cpp_wrapper JB_Nav_MoveNext
@@ -145,7 +136,6 @@ class DictionaryReader
 
 	syntax cast (|bool|)
 		disabled "Do you mean .movenext or self!=nil"
-		// return .MoveNext
 
 
 
@@ -155,46 +145,24 @@ function String.ReplaceAll (|dictionary of string| Dict, |ErrorReceiver| Rec=Std
 function SetDecodeEntities (|dictionary of string|Dict, |bool| Value)
 	cpp_wrapper JB_MSR_DecodeEntitySet
 
-function SetEscapeCode (|dictionary of string|Dict, |bool| Value)
+function SetEscapeCode (|dictionary of string| Dict, |bool| Value)
 	cpp_wrapper JB_MSR_EscapeCodeSet
 
 
 ////////////////////////////////////////////////////////////////////////
 
+function dictionary.Obj (|object| prm, ||)
+	opt norefcounts
+	return self[prm._Dictname]
 
-
-extend dictionary
-	function Obj (|object| prm, ||)
-		opt norefcounts
-		return self[prm._Dictname]
-		
-	function Obj (|object| prm, assigns:||)
-		opt norefcounts
-		self[prm._Dictname] = Value
-
-	function Set (|string| key, |int64| Value)
-		cpp_part SetValue
-		opt norefcounts
-		self[key] = value
-
-	function Set (|string| key, |string| Value)
-		self[key] = value
-
-	function MsgLower (|message| m, ||)
-		return self[m.name.idcase]
-
-	function MsgLower (|message| m, assigns:||)
-		self[m.name.idcase] = Value
 	
-	function Expect (|message| m, ||)
-		return self[m.name]		#expect (m)
+function dictionary.Obj (|object| prm, assigns:||)
+	opt norefcounts
+	self[prm._Dictname] = Value
 
 
-
-
-libinternal object._dictname (|string|): cpp_wrapper JB_Obj_DictName
-libinternal int64._dictname (|string|): cpp_wrapper JB_int64_DictName
-libinternal string.idcase    (|string|): return .lowercase
+autogen object._dictname (|string|): cpp_wrapper JB_Obj_DictName
+autogen int64._dictname (|string|): cpp_wrapper JB_int64_DictName
 // can't remove diacritics cos... spanish needs them for disambig!
 // literally two words with different diacritics
 

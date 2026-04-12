@@ -32,7 +32,7 @@ module CakeRun
 		for cd in ClassData.First_
 			.StoreClass(cd)
 
-		|| app = .UnboxCake$
+		|| App = Cake.CollectInput
 		|| sz = app[@nil]
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
@@ -40,31 +40,20 @@ module CakeRun
 		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
 		Debugger.PackInfo = arg["debug"]
 		.Strings = arg["strs"].name
-		
-		.LoadPackClasses(arg["clss"])
-		return globals.CollectPackGlobs(sz)
+
+		|| PackCls = arg["clss"]
+		.CountClasses(PackCls)
+		if globals.CollectPackGlobs(sz)
+			.LoadPackClasses(PackCls)
+			return true
 		
 
-	function file.Compile (|file|)
-		|| args = ["--bake", "--quiet", self]
+	function string.Compile (|string?|)
+		|| args = ["-bake", "-quiet", self]
 		if debugger.WantDebug
-			args <~ "-targetdebug"
+			args <~ "-d"
 		|| Answer = cake.speedie.ExecuteStr(args)
-			rz = Answer.file
-			if !rz.Exists
-				rz = nil
+		if !Answer.FileExists
+			Answer = nil
+		return Answer
 	
-
-	function UnboxCake (|messageroot|)
-		|| F = cake.InputFile
-		if F isa "spd" or "scproj" or "uwu" or "uwuz"
-			F = F.Compile
-		if f
-			rz = F.Parse
-			if rz
-				.FileSrc = rz.OriginalParseData
-				if rz == @arg
-					rz = rz.first // sigh
-				if !rz.expect(@tmp)
-					rz = nil
-

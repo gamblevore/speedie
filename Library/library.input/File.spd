@@ -148,7 +148,7 @@ class File (String)
 		if s.iscompressed
 			s = s.Decompress(lim, nil)
 		if s
-			(Message).CreateLayerAndUse(self, s) 
+			(Message).CreateLayerAndUse(self, s)
 			rz = S.parse(owner, false) // already decompressed.
 			(message).restore
 

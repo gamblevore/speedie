@@ -9,7 +9,7 @@ module App {
 |string|					Usage
 |message|					_Conf
 |config|					_Prefs
-|string?| 					_Path = nil
+|string?|					_Path = nil
 |file?|						_StdOut
 |file?|						_stdin
 
@@ -134,7 +134,8 @@ render StackTrace (|int| skip = 2)
 	cpp_wrapper JB_App__StackTrace
 
 
-function Restart
+inline Restart
+	opt norefcounts
 	.turninto(.path, ._rawargs)
 
 function ThreadName (assigns:|string|)
@@ -149,10 +150,19 @@ function AppPath (|string|)
 		return .path.backtoapp
 	return .path
 
-function CallPath (|?cstring| NewPath=nil, |stringzeroterminated|)
+
+inline CallPath (assigns:|cstring| NewPath)
+	description "Sets the path that this program was called from."
+	opt norefcounts
+	cpp_part CallPathSet
+	.CallPath(NewPath)
+
+function CallPath (|?cstring| NewPath=nil, |stringzeroterminated--|)
+	description "Gets the path that this program was called from."
 	cpp_wrapper JB_App__CallPath
 
-function TurnInto (|string| s, |[string]| R=nil, |bool|)
+function TurnInto (|string| ExePath, |[string]| R=nil, |bool|)
+	description "Replaces this program, with the program at {ExePath}, with arguments {R}... Sort of like monster-transformation. Used by .Restart() which turns the program into itself..."
 	cpp_Wrapper JB_App__TurnInto
 
 function ObjMemory (|int64|)

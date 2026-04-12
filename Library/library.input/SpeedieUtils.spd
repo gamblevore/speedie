@@ -1,10 +1,11 @@
 
-// allow the short sort of one-liners that other languages have...
+
+// These util functions allow the short sort of one-liners that other languages have...
 // good for demos and language-tests
 
 inline dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 	opt norefcounts
-	rz = .values // a more efficient sorter could extract only needed
+	rz = .list // a more efficient sorter could extract only needed
 	rz.sort(fn)
 	rz.Length = count
 
@@ -113,6 +114,8 @@ inline message.IsTypeOfDecl (|bool|)
 
 
 function message.WithinType (|int| Allowed=3, |bool|)
+	// used by both speedie and perry...
+	// should I remove this from the lib? Sigh....
 	opt norefcounts
 	|| p = .parent
 	|| msg = self
@@ -147,7 +150,7 @@ function message.FindTightest (|int| pos, |bool| Named=false, |bool| SamePositio
 
 
 function message.LinesOfContent (|ivec2|)
-	description "Calculate Lines of content" 
+	description "Calculate Lines of content"
 	opt norefcounts
 	for s.flat in self
 		++(rz[1])
@@ -155,8 +158,7 @@ function message.LinesOfContent (|ivec2|)
 			|| pf = p.func
 			rz[0] += (pf == @arg) or (pf == @tmp  and  s == @tmp)
 
-
-// maybe the compiler should have some kind of "Cleanlyness" feature.
+// Maybe the compiler should have some kind of "Cleanlyness" feature.
 // that marks certain functions as "not worth" being in the lib... that inlining is better.
 
 	
@@ -175,6 +177,7 @@ inline string.Msg (|message|)
 inline bool.Msg (|message|)
 	opt norefcounts
 	return @thg.msg(.string)
+
 
 
 datatype HumanDate (date)

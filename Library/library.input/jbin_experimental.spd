@@ -18,7 +18,7 @@ datatype jbinLeaver (int)
 						// The rework would break all my syntax usings. SyntaxUsing2?
 						// then rework moving each to using2, then rename using2 to using.
 
-						  
+
 	
 /*
 function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| name=nil,  |Message|)
@@ -29,20 +29,11 @@ function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| 
 	// A good concept, but untested and unused. So its not a real function unless I can see a real use.
 */
 
-/* 
-	Ideas
-	Speedups (annoying):
-		* Node-info can't cross 16MB boundary (name can tho). Then can keep ptrs in regs.
-		  (will need work on faststring, I think.)  Needs end with three zeros, also.
+/*
+	Ideas:
 		* Allocate one block at a time! Call constructors. Just need Curr+Last ptr.
-
-	Language level additions (meh):
 		* Allow MessageID during parse. Could save on RAM+CPU, if done properly, say only on @tmp, or
 		  done on a per-document-basis that knows what types to use.
-
-	Jbin level additions: (probably bad)
-		* A back-ref mode? Some objects can store their name+type in a cache for reuse.	
-			* Some unused @syx could represent backrefs.
 */
 
 

@@ -329,6 +329,39 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 }
 
 
+
+static JB_Class*	CakeClass;
+static void**		CakeVirtuals;
+
+bool JB_Cake__Prepare (int N, int B) {
+	// if its small enough... we could put this into the stack area.
+	// needs a little rework... but could make things faster!
+	// lets say 128K or less. Otherwise, we allocate.
+	N *= sizeof(JB_Class);
+	B *= sizeof(void*);
+	byte* Data = (byte*)JB_Realloc(nil, N + B + 8);
+	if (!Data) return false;
+	CakeClass = (JB_Class*)Data;
+	CakeVirtuals = (void**)(Data + N + 8);
+	return true;
+}
+
+void** JB_Cake_Virtuals(JB_Class* C) {
+	return (void**)C->Virtuals;
+}
+
+JB_Class* JB_Cake__Class(const char* Name, int Size, JB_Class* Parent, int VCount) {
+	auto Cls = CakeClass;
+	CakeClass = Cls + 1;
+	auto V = CakeVirtuals;
+	CakeVirtuals = V + VCount;
+	JBClassInitReal(*Cls, Name, Size, Parent, (JBObject_Behaviour*)V);
+	return Cls;
+}
+
+
+
+
 #else
 
 					// Stubs //

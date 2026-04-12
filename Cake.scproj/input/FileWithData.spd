@@ -2,11 +2,11 @@
 class FileWithData (stringshared)
 	default NIL
 	false NIL
-	|string?|   _Data
+	|string?|	_Data
 	|string|	FileName
 	|int|		Index
 
-	constructor (|string| Path, |int| I)
+	constructor (|string| Path, |int| I=0)
 		super.constructor(Path)
 		._data = nil
 		.FileName = path.name
@@ -19,12 +19,12 @@ class FileWithData (stringshared)
 		|| Start = d.Find(charset.Line, pos, 0)
 		|| End = d.find(charset.line, pos, int.max)
 		return d[Start+1, End]
-		
-	function Data (|string|)
+	
+	function Data (|int| Lim=16MB, |string|)
 		opt norefcounts
 		|| d = ._Data
 		if d == nil
-			d = .ReadAll
+			d = .ReadAll(lim)
 			._Data = d
 		return d
 	

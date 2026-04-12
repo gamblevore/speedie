@@ -1,0 +1,69 @@
+
+
+module Cake
+	|String|		Speedie = "/usr/local/bin/speedie"
+	|SpdProcess|	Perry = app.parent
+	|message|		CakeBox
+	|!&CakeVM|		VM = CakeVM()
+	|FileWithData|	InputFile
+	|&uint|			ActiveBreaks = debugger.Startup
+	|!&ASM|			BeginCode = VM.code()|&ASM|
+
+	
+	function CollectInput (|message|)
+		opt norefcounts
+		|| F = .FindCakePath
+		if F isa "spd" or "scproj" or "uwu" or "uwuz"
+			F = F.Compile
+		if F
+			.InputFile = FileWithData(f)
+			|| caek = .InputFile.file.parse(256MB)
+				.CakeBox = caek				// might contain resources? that we could use.
+				(.CakeBox)					// shut up compiler
+				if caek == @arg
+					caek = caek.first		// sigh
+				require caek.expect(@tmp)
+				|| R = app._RawArgs
+				if debugger.WantDebug
+					r.Remove(0)
+				r.Remove(0)
+				return caek
+
+
+	function FindCakePath (|string?|)
+		opt norefcounts
+		|| r = app._rawargs
+		|| r1 = r[0]
+		if r1.ArgSwitch("d")
+			if r1.find('D')
+				TerminalColor.RainbowTerm = true
+			debugger.WantDebug = true
+			r1 = r[1]
+		  else
+			target debug
+				debugger.WantDebug = true
+		
+		if !r1
+			|| name = app.filename
+			quit "Usage:
+	$name /path/to/app.cake
+	$name /path/to/project.scproj
+
+You may pass arguments also (args go *after* the program path):
+
+	$name /path/to/app.cake arg1 arg2 --switch=value
+
+`Cake` runs executable files, that were compiled with `Speedie`, to the cake-format.
+
+Learn more about Speedie at: http://github.com/gamblevore/speedie/
+"
+		
+		check (r1[] != '-') ("Unexpected switch: " + r1)
+		if r1.FileExists
+			app.CallPath = r1.Addr|cstring|
+		  else
+			r1.FileThatExists
+			r1 = nil
+		return r1
+
+

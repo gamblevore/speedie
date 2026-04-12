@@ -13,16 +13,16 @@
 
 struct ArchonPurger
 	linkage: cpp_part nil
-	|&NilRecord| 			Neel
-	|&NilRecord| 			RowEnd
-	|Nilrecord| 			Realnesses		// could be removed after we remove the param upgrader!
-	|Scdecl--[32]| 			Decls
+	|&NilRecord|			Neel
+	|&NilRecord|			RowEnd
+	|Nilrecord|				Realnesses		// could be removed after we remove the param upgrader!
+	|Scdecl--[32]|			Decls
 	|message--[32]|			Closers
 	|scdecl?|				Return
-	|int| 					InsideBoolLogic
+	|int|					InsideBoolLogic
 	|bool|					FnAbleToNilCheck
 	|bool|					AnyReturns
-	|NilRecord[64]| 		Rows
+	|NilRecord[64]|			Rows
 	
 	
 	function BranchDepth (|int|)

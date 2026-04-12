@@ -5,6 +5,15 @@
 
 
 
+function dictionary.Expect (|message| m, ||)
+	opt norefcounts
+	|| v = self[m.name]
+	if !v
+		error m
+	return v
+
+
+
 //  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
 
 

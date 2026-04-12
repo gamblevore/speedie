@@ -2179,7 +2179,7 @@ class TextView (GUIControl)
 			t = d.InitDefaults(self, t)
 			if JX is Colorise
 				msg = d.ColoriseText(msg, ParsedOK)
-			|| draw = .OnDrawLineNumber // so now what?
+			|| draw = .OnDrawLineNumber
 				(draw)(d, &LastOwner, false)
 				
 			if d is breakpoint

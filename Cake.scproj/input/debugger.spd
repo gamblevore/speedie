@@ -124,21 +124,10 @@ module debugger
 			if v contains index
 				return true
 	
-	/*
-		What are we doing with the libglobs. we allocate it, right? in .CakePrepare
-		
-		So... previously... we allocated space for libclasses. So we should keep doing that.
-		
-		But what was it used for. Debugging, or actually running. If its debugging, whats the good in that.
-		
-		Yeah... I'm not sure how this works.
-		
-		Previously... we output all the LIB classes, then used them for CakePrepare
-	*/
 	
 	function LoadDebugger (|bool|)
 		opt norefcounts
-		|| PackInfo = .PackInfo
+		if .PackInfo
 			.VariablePrinter = FastString(64)
 			require .VariablePrinter
 			return .LoadSub(.PackInfo)
@@ -172,8 +161,8 @@ module debugger
 		expect (L2 < 1MB)						("Oversized source-map: " + L2)
 		
 		.ActivateInbuiltBreaks
-		target debug
-			.PrintBreaks
+//		target debug
+//			.PrintBreaks
 		
 		for fn in SpdTable.funcs
 			fn.LoadVars
@@ -182,7 +171,7 @@ module debugger
 	
 	
 	function PrintBreaks
-		target true {
+		target debug {
 
 		|| T = SpdTable.CodeLength
 		|filewithdata--| LastFile
@@ -204,7 +193,7 @@ module debugger
 		
 		printline "--- InbuiltBreaks ---"
 		|| CakeBreak = cake.ActiveBreaks$
-		for i in T							// now what?
+		for i in T
 			|| Code = CakeBreak[i]
 				printline "break: $i"
 	}

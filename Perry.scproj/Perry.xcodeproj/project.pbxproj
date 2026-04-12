@@ -433,6 +433,7 @@
 		ACA61E7F2F2BB6F800C71221 /* JB_OSNative.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_OSNative.cpp; path = ../GUI.scproj/gui.input/c_includes/JB_OSNative.cpp; sourceTree = SOURCE_ROOT; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ACE0BD952F8C1D45007EA0E5 /* Instructions.i */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c.preprocessed; name = Instructions.i; path = ../Library/CppLib/Instructions.i; sourceTree = SOURCE_ROOT; };
 		ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dylib.cpp; path = ../Library/CppLib/JB_Dylib.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -595,6 +596,7 @@
 			children = (
 				AC3A6A8D296082E700CE1E91 /* README.md */,
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
+				ACE0BD952F8C1D45007EA0E5 /* Instructions.i */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
 				AC66D1582ED1D6AC00EDFB82 /* Compiled Src Exec */,
 				AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */,

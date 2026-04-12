@@ -30,7 +30,7 @@ class Object
 		description "Returns an object ID, decided by class-type, and order of creation (but not memory-location)."
 		nil checker
 		cpp_wrapper JB_ObjectID
-
+	
 	operator isa (|ClassData| cls, |bool|)
 		cpp_part Isa
 		if (self)
@@ -43,6 +43,7 @@ class Object
 	
 	operator MustBe (|ClassData| x, |bool|)  // perhaps mustbe should just be isa.
 		nil checker
+		inlined
 		return self.mustbe(x)
 	
 
@@ -55,6 +56,7 @@ class Object
 
 	operator fast_isa (|ClassData| x, |bool|)
 		cpp_part FastIsa
+		inlined
 		return (self) and (.Class == x)
 
 	// perhaps... as and fast_as should just return nil and no errors
@@ -74,7 +76,7 @@ class Object
 				return self
 			return .TypeFailed(x, nil)
 	
-	libinternal TypeFailed (|ClassData| Cls, |message?| where,  |object|)
+	libinternal TypeFailed (|ClassData| Cls, |message?| where, |object|)
 		|| name = .Class.name.wrap
 		error (where, name + " (object) is not a: " + cls.name )
 		debugger
@@ -90,7 +92,7 @@ class Object
 			errorreceiver.NewError( Error )
 
 
-	autogen string.SyntaxWarn
+	inline string.SyntaxWarn
 		cpp_part Warn
 		errorreceiver.Newwarning( self )
 	
@@ -210,6 +212,4 @@ class MemoryLayer
 	
 //	syntax Using (|memorylayer|) // need the default for this class... sigh
 		
-
-
 

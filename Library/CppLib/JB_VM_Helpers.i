@@ -258,10 +258,9 @@ AlwaysInline void SetRefApart (CakeRegister* r, ASM Op) {
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_movei))
 
 
-AlwaysInline JB_Object* alloc(void* o) {
-	// we need a class table, and look it up from there.
-	// we don't have dynamicly created classes anyhow...
-	return JB_AllocNew(((JB_MemoryLayer*)o)->CurrBlock);
+AlwaysInline JB_Object* alloc(void* o) {	// could RALO directly read from the globs?
+	JB_Class* Cls = *((JB_Class**)o);		// what about lib/packglobs?
+	return JB_AllocNew(Cls->DefaultBlock);
 }
 
 u64 gtable (CakeVM& vm, ASM Op) {

@@ -864,11 +864,11 @@ function $name (|dictionary of $AllSameType|)
 "
 
 	for s in NameList
-		fs <~ `	_T.Set("`
+		fs <~ `	_T["`
 		fs.appendlower(s.name)
-		fs <~ `", `
+		fs <~ `"] = `
 		fs <~ s
-		fs <~ ")\n"
+		fs <~ "\n"
 		
 	fs <~ "
 	return _T
