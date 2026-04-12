@@ -99,7 +99,7 @@ We should see two errors created. One at the **`error`** line, and the other bec
             if !stderr.ok
                 printline "Awesome! we found an error but its not gonna harm us"
 
-Now we only see the first error created.
+Now we only see the first error created. And we see "Awesome!..." printed, proving that the error did exist... for a while.
 
 
 
