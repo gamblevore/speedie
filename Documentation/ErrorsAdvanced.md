@@ -1,6 +1,6 @@
 ## Advanced Error Handling
 
-Speedie's error-reporting system has some rarer used features, such as:
+Speedie's error-reporting system has some more advanced features:
 
 + Problems: These get printed like errors, but leave `stderr.ok` true.
 + Warnings: Also leaves `stderr.ok` true, but won't get auto-printed. (Call `stderr.printall` to see them.)
@@ -8,6 +8,8 @@ Speedie's error-reporting system has some rarer used features, such as:
 + Lowering errors to warnings during certain code-sections
 + Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
 + You can loop over the errors to "clean" them if you like.
+
+Most programs won't need them, but its there if you do.
 
 
 ### Warnings and Problems
