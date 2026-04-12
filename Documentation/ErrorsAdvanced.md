@@ -27,11 +27,13 @@ However: Severities of **`Problem`**, **`Warning`**, and **`Hint`** leave `stder
 
 To make a **`warning`** instead of an **`error`**, do this:
     
-    main (|message| msg)
+    main (|message| msg, |bool| PrintWarnings)
         if msg.name != "hello"
             warn (msg, "Aren't you going to say hello?")
         printline msg
-        StdErr.PrintAll
+        if PrintWarnings
+            StdErr.PrintAll
+            stderr.clean
 
 Because there are no "real errors" we need to call `stderr.printall`, as **`warnings`** are not printed by default.
 
@@ -77,14 +79,17 @@ Now your files still work as before, `stderr.ok` is still true, and the user is 
 ### Logging
 
     main (|message| msg)
-        stderr.LogFile = file.desktop.Child("demo.log")
+        stderr.LogFile = "demo.log"
         if msg.name != "hello"
             // this problem is logged to the file demo.log at the line below...
             error (msg, "Aren't you going to say hello?")
             // even if the program crashes after this, it is already logged.
 
-You'll see one **`error`** printed, but also you'll find a file `demo.log` containing this **`error`** logged nicely.
+You'll see one **`error`** printed, but also you'll find a file `demo.log` in `/tmp/logs/` containing this **`error`** logged nicely. 
 
+This will log everything: **`warnings`**, **`errors`** and all.
+
+You can also specify a full filepath to `stderr.logfile`, in case you don't want it in `/tmp/logs`.
 
 
 ### Error Reduction
