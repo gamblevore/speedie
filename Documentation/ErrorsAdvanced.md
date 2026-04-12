@@ -12,7 +12,7 @@ Speedie's error-reporting system has some rarer used features, such as:
 
 ### Warnings and Problems
 
-Speedie has multiple error levels.
+Speedie has multiple error levels:
 
         Critical: 5   // Unrecoverable. EG: OutOfMemory / signals
         Error:    4   // Real errors that stop the program doing what you wanted.
@@ -32,7 +32,7 @@ To make a **`warning`** instead of an **`error`**, do this:
         printline msg
         if PrintWarnings
             StdErr.PrintAll
-            stderr.clean
+            stderr.clear
 
 Because there are no "real errors" we need to call `stderr.printall`, as **`warnings`** are not printed by default.
 
