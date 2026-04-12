@@ -21,11 +21,11 @@ Speedie has multiple error levels.
         Hint:     1   // A suggestion for possible improvement.
         OK:       0   // Not for use.
 
-The error level doesn't have much difference in effect. It will be added to the error-list.
+The severity level doesn't have much difference in effect. The object still uses the same **`error`** class, and is added to the error-list, even if it's severity is **`hint`**.
 
-However: **`Problem`**, **`Warning`**, and **`Hint`** leave `stderr.OK` as `true`.
+However: Severities of **`Problem`**, **`Warning`**, and **`Hint`** leave `stderr.OK` as `true`.
 
-If you need to make a **`warning`**, instead of an **`error`** do this:
+To make a **`warning`** instead of an **`error`**, do this:
     
     main (|message| msg)
         if msg.name != "hello"
@@ -33,7 +33,7 @@ If you need to make a **`warning`**, instead of an **`error`** do this:
         printline msg
         StdErr.PrintAll
 
-Because there are no "real errors" we need to call `stderr.printall`, as warnings are not printed by default.
+Because there are no "real errors" we need to call `stderr.printall`, as **`warnings`** are not printed by default.
 
 Theres no worry about needing to call `stderr.printall` to catch **`warnings`** in all your apps. Its just internal to your app. Speedie itself, does not create any **`warnings`**.
 
