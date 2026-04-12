@@ -85,14 +85,14 @@ By adding stderr.PrintAll, we see the warning too.
 
 Sometimes, you want to "contain" errors... But still detect them. Here is one nice way to do it. Lets look at the first example:
 
-    main (|message| msg)
+    main
         || f = "/not/a/file/that/exists.haha".FileThatExists
             printline "wierd, why does this file exist?"
         error "Only one error allowed!"
     
 We should see two errors created. One at the **`error`** line, and the other because we can't read that wierd file-path. So lets contain that error:
 
-    main (|message| msg)
+    main
         using errorreceiver.new
             || f = "/not/a/file/that/exists.haha".FileThatExists
             if !stderr.ok
