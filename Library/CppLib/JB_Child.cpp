@@ -62,7 +62,7 @@ void JB_Wake(int Sig) { ; /* do nothing! This will wake up the process hopefully
 
 
 void JB_Proc__TellParentIDied	(const char* signal);
-int JB_Rec_ShellPrintErrors		(void* self);
+int JB_Rec_ShellPrintErrors		(void* self, int Level);
 
 
 void JB_CrashTracer() {
@@ -120,7 +120,7 @@ void JB_CrashHandler (int Sig) {
 	}
 
 						// Print Normal Errors
-	JB_Rec_ShellPrintErrors(nil);
+	JB_Rec_ShellPrintErrors(nil, nil);
 	PicoFinish();
 	bool AskExit = (Sig == SIGHUP) or (Sig == SIGQUIT) or (Sig == SIGKILL);
 	if (!JB_NoExitOnCrash or AskExit) {
@@ -137,7 +137,7 @@ void JB_CrashHandler (int Sig) {
 
 static void TerminalInterupt(int Sig) {
 	signal(Sig, SIG_IGN);
-	JB_Rec_ShellPrintErrors(nil);
+	JB_Rec_ShellPrintErrors(nil, nil);
 	_exit(0);
 }
 

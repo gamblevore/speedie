@@ -60,12 +60,15 @@ inline int.operatorof (|string| type, |string| nothing="", |string|)
 	return type.Pluralize(self, nothing)
 
 
-function string.Pluralize (|int| amount, |string| nothing="", |string|)
+function string.Pluralize (|faststring| fs_in=nil, |int| amount, |string| nothing="", |string|)
 	cpp_part PluraliseAmount
+	opt norefcounts
 	if !amount and nothing
+		if fs_in
+			fs_in <~ nothing
 		return nothing
 		
-	|| fs = FastString()
+	|| fs = FastString(fs_in)
 	if amount
 		fs <~ amount
 	  else
@@ -75,11 +78,12 @@ function string.Pluralize (|int| amount, |string| nothing="", |string|)
 		fs <~ self
 	  else
 		.Pluralize(fs)
-	return fs
+	return fs.getresult(fs_in)
 
 
 extend string
 	render Pluralize (|bool| Plural=true)
+		opt norefcounts
 		fs <~ self
 		if Plural
 			|| l = .last

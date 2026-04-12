@@ -129,11 +129,6 @@ class Error (Message)
 		fs <~ '^'
 
 
-	function WorseThan (|error| Other, |bool|)
-		if !other
-			return true
-		return .severity > other.severity
-	
 	function LineIdentifiers (|faststring| fs, |string| path, |bool|)
 		require (.HasPosition)
 		|| d = .OriginalData								#require
@@ -200,13 +195,12 @@ datatype ErrorFlags (Byte)
 	constants
 		Keep = 0
 		PrintAndKeep = 1
-		PrintAndRemove = 2
 
 
 
 datatype ErrorSeverity (Byte)
 	render
-		if (self < MaxError)
+		if (self < IgnoreAllErrors)
 			|| name = errorseverity.ErrorNames[self|int|]
 			if !fs_in
 				if name != nil
@@ -226,17 +220,17 @@ datatype ErrorSeverity (Byte)
 	syntax UsingComplete (|object| idk=nil)
 		inlined
 		StdErr.LowerErrorsTo = self
-	
 
 	constants
 		|ErrorSeverity|
-		MaxError	= 6		// Dont use this!
-		Critical	= 5		// Unrecoverable "OutOfMemory / signals / etc"  need to quit.
-		Error		= 4		// Parse errors, file not exists, etc.
-		Problem		= 3		// Always print these, but still continue
-		Warning		= 2		// Its probably bad, and probably better corrected. 
-		Hint		= 1		// We can't tell if its wrong, just letting you know if you want it fixed
-		OK			= 0
+		OK
+		Hint				// We can't tell if its wrong, just letting you know if you want it fixed
+		Warning				// Its probably bad, and probably better corrected. 
+		Problem				// Always print these, but still continue
+		Error				// Parse errors, file not exists, etc.
+		Critical			// Unrecoverable "OutOfMemory / signals / etc"  need to quit.
+		IgnoreAllErrors		// Undocumented :]
+	
 	
 	module
 		|[string]| _ErrorNames = nil

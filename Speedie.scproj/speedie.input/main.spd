@@ -63,7 +63,7 @@ function compiler.SetupEnv
 		app.ThreadName = "SpeedieDebug"
 
 	TerminalColor.RainbowTerm = FileDes.StdOut.IsTerminal
-	error.AutoPrint = 1
+	error.AutoPrint = errorflags.printandkeep
 	if app.parent
 		error.AutoPrint = 0
 		TerminalColor.RainbowTerm = false

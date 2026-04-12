@@ -1108,8 +1108,8 @@ class TextView (GUIControl)
 				if d == s
 					.shownoextra
 				d.LineError = nil
-
-
+	
+	
 	function AddErrorToLine (|error| e, |bool| ForceParse=true, |textviewline|)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
@@ -1118,12 +1118,11 @@ class TextView (GUIControl)
 
 		|| old = .myerror
 		if r.TrySetError(e) or !old
-			if e.WorseThan(old)
+			if !old or (e.Severity > old.Severity)
 				.MyError = e
 			GUI.touch(Self)
 			return r
 		return nil
-		
 
 
 	function DoExplode (|textviewline| D)
@@ -1485,12 +1484,16 @@ class TextView (GUIControl)
 			msg.obj = .Filepath
 			if .MyError is parse
 				.MyError = nil
-			.JeeboxMode |= DocumentJeeboxMode.Jeebox
 		  else
 			|| e = StdErr.pop
 			if .JeeboxMode is Jeebox
 				.myerror = e
-			.JeeboxMode &=~DocumentJeeboxMode.Jeebox
+
+		|| J = .JeeboxMode(true)
+		(J isnt Jeebox)
+		if msg
+			(J is Jeebox)
+		.JeeboxMode = J
 
 		|| v = ._Viewing
 			v.DocParsed = msg
@@ -2294,16 +2297,17 @@ class TextView (GUIControl)
 		._JeeboxMode = value
 		
 
-	function JeeboxMode (|documentjeeboxmode|)
+	function JeeboxMode (|bool| Hard=false, |documentjeeboxmode|)
 		opt norefcounts
 
 		rz = ._JeeboxMode
 		|| d = .Document
 			rz = d.JeeboxMode
-
-		|| t = .text
-		if (t[] == '/') and t[0,"//jb"]
-			(rz is expect)
+	
+		if !Hard
+			|| t = .text
+			if (t[] == '/') and t[0,"//jb"]
+				(rz is prefer)
 	
 	
 	libinternal TextPaste (GUIPasteEvent)

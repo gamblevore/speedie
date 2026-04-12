@@ -63,9 +63,9 @@ function errorreceiver.PrePrintErrors
 
 
 function Compiler.PrintErrors (|errorseverity| MinSev)
-	stderr.BlockErrors = true
-	|| s = .RenderErrors(stderr, minsev)
-	stderr.BlockErrors = false
+	|| s = ""
+	using ErrorSeverity.IgnoreAllErrors
+		s = .RenderErrors(stderr, minsev)
 	
 	if stderr.errorcount
 		if options.perryoutput == 2

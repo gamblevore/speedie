@@ -25,7 +25,7 @@ JB_Class a ## Data = JBClassInit(a##Data, (#a), sizeof(a), c, (JBObject_Behaviou
 #define AddError(Result, name) {int abc = Result; if (abc and !JB_ErrorNumber) {JB_ErrorNumber = abc; fprintf(stderr, "error %s (%i)\n", name, abc); };} 
 
 
-int  JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
+int  JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self, int Level);
 void JB_Dict__Init();
 
 
@@ -157,7 +157,7 @@ void JB_Str__LoadGlobals () {
 
 
 void JB_FinalEvents() {
-	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
+	AddError(JB_Rec_ShellPrintErrors(nil, nil),	"jb.stderr");
 	JB_LibShutdown();
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
 }
@@ -278,7 +278,7 @@ void JB_App__Quit (JB_String* Err, int Code) {
 		if (!Code) {Code = -1;}
 		JB_Str_PrintLine(Err);
 	}
-	JB_Rec_ShellPrintErrors(nil);
+	JB_Rec_ShellPrintErrors(nil, nil);
 	if (!Code)
 		Code = JB_ErrorNumber;
     exit(Code);

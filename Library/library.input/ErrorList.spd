@@ -22,13 +22,14 @@ class ErrorReceiver
 	|int|					ProblemCount
 	|int|					WarnCount
 	|ErrorSeverity|			LowerErrorsTo
-	|bool|					BlockErrors
+	|ErrorSeverity|			PrintSeverity
 	|string|				Source
 
 	constructor
 		.errors = error()
 		.MaxErrors = 512
 		.MaxProblems = 64
+		.PrintSeverity = ErrorSeverity.Problem
 		JB_API.NilHappened_ = nil
 
 
@@ -60,9 +61,11 @@ class ErrorReceiver
 	syntax append (|errorreceiver--|self, |Error| Err)
 		cpp_part AppendErr
 		if !self
-			self = StdErr!
+			self = StdErr
 		target debug
 			|| CanPrint = !.BadCount and error.autoprint
+			// remove autoprint? seems only true for speedie.
+			// or just make it a bool on this class.
 		  else
 			|| CanPrint = false
 		
@@ -73,13 +76,14 @@ class ErrorReceiver
 			err.StackTrace ?= app.StackTrace
 		|| log = ._logfunc
 			(log)(self, err.render)
-		if CanPrint and err.IsBad
-			printline err.render
+
 		target debug
+			if CanPrint and err.IsBad
+				printline err.render
 			if error.autoprint and err.severity > Errorseverity.problem
 				debugat
-		if error.autoprint != errorflags.PrintAndRemove
-			.errors <~ err
+
+		.errors <~ err
 
 
 	syntax append (|string| LogString)
@@ -139,48 +143,38 @@ class ErrorReceiver
 
 	
 	render
-		.rendererrors(fs, 0, false)
-
-
-	function RenderErrors (|faststring| fs, |errorseverity| Level, |bool| shell, |int|)
 		opt norefcounts
-		require self
+		.rendererrors(errorseverity.hint, false, fs)
+
+
+	inline ShellPrintErrors (|errorseverity| Level=nil, |int|)
+		visible // for jb_main.cpp
+		return .PrintErrors(Level, true)
+
+
+	function RenderErrors (|errorseverity| Level, |bool| shell, |faststring| fs, |int|)
+		opt norefcounts
+		Level ?= .PrintSeverity
 		for err in self
-			if err.severity >= level
-				++RZ
+			|| S = err.Severity
+			if S >= level
+				rz++
 				if shell
 					err.renderunix(Fs)
 				  else
 					err.render(fs)
 				fs <~ "\n"
-
-
-	render RenderErrors
-		cpp_part RenderErrors0
-		.rendererrors(fs, errorseverity.problem, false)
-		
-	
-	inline PrintErrors (|int|)
-		return .PrintErrors(errorseverity.problem, false, false)
-
-	inline PrintAll (|bool| Shell=true, |int|)
-		return .PrintErrors(errorseverity.hint, false, Shell)
-
-
-	inline ShellPrintErrors (|int|)
-		visible // for jb_main.cpp
-		return .PrintErrors(errorseverity.problem, false, true)
 	
 	
-	function PrintErrors (|errorseverity| Level, |bool| PrintCount=false, |bool| shell=true, |int|)
+	function PrintErrors (|errorseverity| Level=nil, |bool| shell=false, |int|)
 		cpp_part PrintErrorsMain
 		|| rec = (self (self) StdErr)
 		|| fs	= faststring()
-		|| Count = rec.rendererrors(fs, level, shell)
-			fs <~ Count of "issue"
+		|| Count = rec.rendererrors(level, shell, fs)
+			"issue".Pluralize(fs, Count)
 			fs <~ " found\n"							// "1 issue found"
 			PrintError fs|string|
-			if Count
+			if rec.BadCount
 				rz = -1
 	
 	
@@ -190,7 +184,8 @@ class ErrorReceiver
 	
 	
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
-		require !.BlockErrors and !ErrorReceiver.OutOfMemory
+		require .LowerErrorsTo < ErrorSeverity.IgnoreAllErrors
+		require !ErrorReceiver.OutOfMemory
 		if level == ErrorSeverity.problem
 			return (.problemcount < .maxproblems)
 		if level >= ErrorSeverity.error // a warning
