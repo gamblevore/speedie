@@ -22,7 +22,7 @@ Speedie has multiple error levels.
 
 The error level doesn't have much difference in effect. It will be added to the error-list.
 
-However: **`Problem`**, **`Warning`**, and **`Hint`** leave `stderr` as being `OK`. This is found via `stderr.OK`
+However: **`Problem`**, **`Warning`**, and **`Hint`** leave `stderr.OK` as `true`.
 
 If you need to make a warning, instead of an error do this:
     
@@ -45,6 +45,18 @@ Because there are no "real errors" we need to call `stderr.printall`, as warning
         printline msg
 
 You should see one error printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
+
+Why use **`problems`** instead of **`errors`**? Well... lets say you deprecated a feature. Lets say you are processing a file, and wanted to rename a `message` name from `MyCoolData` to `AwesomeData`. But you still want to allow `MyCoolData` to be processed in the same way, and you don't want your old files to be unprocessable. But you DO want the user to know that the name is bad. You can do something like this:
+
+    for node in list
+        if node == "MyCoolData"
+            problem (node, "This should be renamed to AwesomeData")
+            node.name = "AwesomeData"
+        if node == "AwesomeData"
+            .Process(node)
+        require stderr.ok // exit loop if real errors occur (not the problem above)
+
+Now your files still work as before, `stderr.ok` is still true, and the user is informed!
 
 
 ### Logging
