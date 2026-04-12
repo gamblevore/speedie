@@ -34,6 +34,8 @@ If you need to make a warning, instead of an error do this:
 
 Because there are no "real errors" we need to call `stderr.printall`, as warnings are not printed by default.
 
+#### Problems
+
 **Problems** are considered something "bad", but still leave `stderr.ok` as true. However, **problems** DO get printed by default.
 
     
@@ -46,15 +48,18 @@ Because there are no "real errors" we need to call `stderr.printall`, as warning
 
 You should see one error printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
 
-Why use **`problems`** instead of **`errors`**? Well... lets say you deprecated a feature. Lets say you are processing a file, and wanted to rename a `message` name from `MyCoolData` to `AwesomeData`. But you still want to allow `MyCoolData` to be processed in the same way, and you don't want your old files to be unprocessable. But you DO want the user to know that the name is bad. You can do something like this:
+Why use **`problems`** instead of **`errors`**? Well... lets say you deprecated a feature. Lets say you are processing a song databank. 
 
-    for node in list
-        if node == "MyCoolData"
-            problem (node, "This should be renamed to AwesomeData")
-            node.name = "AwesomeData"
-        if node == "AwesomeData"
-            .Process(node)
-        require stderr.ok // exit loop if real errors occur (not the problem above)
+Song nodes were previously called "songinfo", but now you wanted to rename it to be just "song". So your users have to update their databanks. But you do want old databanks to work, AND you want the user to know to update them. So try this:
+
+    function LoadAllSongs (|message| music_list)
+        for song in music_list
+            if song == "songinfo"
+                problem (song, "This should be renamed to 'song'")
+                song.name = "song"
+            if song == "song"
+                .LoadSong(song)
+            require stderr.ok // exit loop if real errors occur (not the problem above)
 
 Now your files still work as before, `stderr.ok` is still true, and the user is informed!
 
