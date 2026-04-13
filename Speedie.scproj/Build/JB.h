@@ -890,15 +890,16 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
 	int MaxErrors;
-	JB_Object* _LogObj;
+	JB_Error* Errors;
+	ErrorSeverity Filter;
 	ErrorSeverity LowerErrorsTo;
-	ErrorSeverity PrintSeverity;
+	byte PrintNewErrors;
 	int MaxProblems;
 	int ErrorCount;
 	int ProblemCount;
 	int WarnCount;
-	JB_Error* Errors;
 	FP_fnErrorLogger _LogFunc;
+	JB_Object* _LogObj;
 	JB_String* Source;
 );
 
@@ -2192,10 +2193,11 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__DeclMode_TypeCast ((DeclMode)32)
 #define kSC__DotUseType_Property ((DotUseType)1)
 #define kJB__ErrorFlags_DontStrip ((ErrorFlags)1)
-#define kJB__ErrorFlags_Keep ((int)0)
 #define kJB__ErrorFlags_Parse ((ErrorFlags)4)
 #define kJB__ErrorFlags_PreferNoRenderPath ((ErrorFlags)2)
-#define kJB__ErrorFlags_PrintAndKeep ((int)1)
+#define kJB__ErrorFlags_PrintAll ((int)2)
+#define kJB__ErrorFlags_PrintFirst ((int)1)
+#define kJB__ErrorFlags_Silent ((int)0)
 #define JB__ErrorSeverity__ErrorNames JB__.ErrorSeverity__ErrorNames
 #define kJB__ErrorSeverity_Critical ((ErrorSeverity)5)
 #define kJB__ErrorSeverity_Error ((ErrorSeverity)4)
@@ -2558,7 +2560,6 @@ extern bool SC__Base_CurrVisibility;
 #define JB__Proc__ForceParent JB__.Proc__ForceParent
 #define JB__Proc__Parent JB__.Proc__Parent
 #define JB__Proc_CheckedParent JB__.Proc_CheckedParent
-#define JB__Err_AutoPrint JB__.Err_AutoPrint
 #define JB__Err_BackupErrorSource JB__.Err_BackupErrorSource
 #define JB__Err_KeepStackTrace JB__.Err_KeepStackTrace
 #define JB__Macro_TmpPrms_ JB__.Macro_TmpPrms_
@@ -2588,7 +2589,6 @@ struct JB_Globals {
 	bool Flow_BreakOnFail;
 	byte Flow_Active;
 	bool Proc_CheckedParent;
-	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
@@ -2596,13 +2596,14 @@ struct JB_Globals {
 	JB_ErrorReceiver* StdErr;
 	JB_File* Platform_Logger_;
 	Dictionary* TC_Types_Dict;
-	Dictionary* Constants_EscapeStr;
+	Dictionary* Constants__SyxDict;
 	Message* Tk__EndOfLineMarker;
 	Dictionary* Constants_EscapeChr;
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_UnEscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
+	Dictionary* Constants_XML_EscapeStr;
 	JB_String* App_Usage;
 	FlowControl* Flow_Flow;
 	Message* App__Conf;
@@ -2612,13 +2613,13 @@ struct JB_Globals {
 	JB_File* App__stdin;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
-	Dictionary* Constants_XML_EscapeStr;
-	Dictionary* Constants__SyxDict;
+	Dictionary* Constants_EscapeStr;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
+	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
 	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
 	FP_fnIDGenerator Tk_Splitter;
@@ -2627,9 +2628,8 @@ struct JB_Globals {
 	CakeVM_CakeChef CakeVM_DummyChef;
 	FP_SorterComparer File__Sorter;
 	FP_SorterComparer Tree__Sorter;
-	FP_SorterComparer ID__ByID;
-	RandomXOR* Random;
 	PicoComms* Proc__ForceParent;
+	RandomXOR* Random;
 	RandomXOR RandomShared;
 	RandomXOR zalgo_R;
 	CompressionStats MzSt_All;
@@ -10154,6 +10154,8 @@ bool JB_Err_HasPosition(JB_Error* Self);
 
 void SC_Err_Improve(JB_Error* Self);
 
+bool JB_Err_IsBad(JB_Error* Self);
+
 bool JB_Err_IsError(JB_Error* Self);
 
 bool JB_Err_IsWarning(JB_Error* Self);
@@ -11435,7 +11437,6 @@ struct JB_Globals {
 	bool Flow_BreakOnFail;
 	byte Flow_Active;
 	bool Proc_CheckedParent;
-	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
@@ -11443,13 +11444,14 @@ struct JB_Globals {
 	JB_Object* StdErr;
 	JB_Object* Platform_Logger_;
 	JB_Object* TC_Types_Dict;
-	JB_Object* Constants_EscapeStr;
+	JB_Object* Constants__SyxDict;
 	JB_Object* Tk__EndOfLineMarker;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* App_Usage;
 	JB_Object* Flow_Flow;
 	JB_Object* App__Conf;
@@ -11459,8 +11461,7 @@ struct JB_Globals {
 	JB_Object* App__stdin;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
-	JB_Object* Constants_XML_EscapeStr;
-	JB_Object* Constants__SyxDict;
+	JB_Object* Constants_EscapeStr;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
 	JB_Object* App__Path;

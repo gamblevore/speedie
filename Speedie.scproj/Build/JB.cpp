@@ -2460,9 +2460,9 @@ void SC_Comp__SetupEnv() {
 		(JB_App__SetThreadName(JB_LUB[2096]));
 	}
 	JB__TerminalColor_RainbowTerm = JB_IsTerminal(kJB__FileDes_StdOut);
-	JB__Err_AutoPrint = kJB__ErrorFlags_PrintAndKeep;
+	JB_StdErr->PrintNewErrors = kJB__ErrorFlags_PrintFirst;
 	if (JB_App__Parent(false)) {
-		JB__Err_AutoPrint = 0;
+		JB_StdErr->PrintNewErrors = 0;
 		JB__TerminalColor_RainbowTerm = false;
 	}
 }
@@ -2725,9 +2725,7 @@ JB_File* SC_Comp__UsingScript(JB_File* F) {
 	JB_Decr(_tmPf2);
 	JB_SetRef(Rz, JB_Str_AsFile(_tmPf1));
 	JB_Decr(_tmPf1);
-	if (JB__Err_AutoPrint == kJB__ErrorFlags_PrintAndKeep) {
-		JB__Err_AutoPrint = 0;
-	}
+	JB_StdErr->PrintNewErrors = 0;
 	JB_SetRef(SC__Options_output_path, Rz);
 	SC__Options_Scripting = true;
 	SC__Options_Silent = true;
@@ -3040,7 +3038,7 @@ bool SC_FB__AppOptions_breakonerr(JB_String* Name, JB_String* Value, FastString*
 	if (!SC_FB__Explain(Purpose, JB_LUB[0])) {
 		return nil;
 	}
-	JB__Err_AutoPrint = SC_Str_OptionInt(Value);
+	JB_StdErr->PrintNewErrors = SC_Str_OptionInt(Value);
 	return false;
 }
 
@@ -3506,7 +3504,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[449]);
-	JB_FS_AppendInt32(_fsf0, (2026041300));
+	JB_FS_AppendInt32(_fsf0, (2026041310));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10450,7 +10448,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1389]);
-	JB_FS_AppendInt32(_fsf0, (2026041300));
+	JB_FS_AppendInt32(_fsf0, (2026041310));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -19836,7 +19834,7 @@ NilState SC_nil__Argument(Message* Msg, NilCheckMode Test) {
 			uint Prev = Rz;
 			Rz = SC_nil__SyncJump(S, T | kSC__khalai_Disappears);
 			if (SC_NilState_SyntaxIs(Prev, kSC__NilState_Borked)) {
-				JB__Err_AutoPrint = SC__nil_OldPrint;
+				JB_StdErr->PrintNewErrors = SC__nil_OldPrint;
 				if (JB_Rec_OK(JB_StdErr)) {
 					if (true) {
 						JB_Msg_Fail(S, JB_LUB[1995]);
@@ -20055,8 +20053,8 @@ void SC_nil__ExterminateZergBugs(SCFunction* F) {
 }
 
 NilState SC_nil__Fail(Message* Msg, NilCheckMode Test) {
-	SC__nil_OldPrint = JB__Err_AutoPrint;
-	JB__Err_AutoPrint = 0;
+	SC__nil_OldPrint = JB_StdErr->PrintNewErrors;
+	JB_StdErr->PrintNewErrors = 0;
 	return kSC__NilState_Borked;
 }
 
@@ -29087,25 +29085,26 @@ JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self) {
 	if (Self == nil) {
 		Self = ((JB_ErrorReceiver*)JB_NewClass(&JB_ErrorReceiverData));
 	}
-	Self->_LogObj = nil;
 	Self->LowerErrorsTo = 0;
+	Self->PrintNewErrors = 0;
 	Self->ErrorCount = 0;
 	Self->ProblemCount = 0;
 	Self->WarnCount = 0;
 	Self->_LogFunc = nil;
+	Self->_LogObj = nil;
 	JB_Incr2(Self->Source, JB_LUB[0]);
 	JB_Incr2(Self->Errors, JB_Err_ConstructorNothing(nil));
 	Self->MaxErrors = 512;
 	Self->MaxProblems = 64;
-	Self->PrintSeverity = kJB__ErrorSeverity_Problem;
+	Self->Filter = kJB__ErrorSeverity_Problem;
 	JB__API_NilHappened_ = nil;
 	return Self;
 }
 
 void JB_Rec_Destructor(JB_ErrorReceiver* Self) {
 	//cpp_part;
-	JB_Clear(Self->_LogObj);
 	JB_Clear(Self->Errors);
+	JB_Clear(Self->_LogObj);
 	JB_Clear(Self->Source);
 }
 
@@ -29254,7 +29253,7 @@ JB_String* JB_Rec_Render(JB_ErrorReceiver* Self, FastString* Fs_in) {
 int JB_Rec_RenderErrors(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level, bool Shell, FastString* Fs) {
 	int Rz = 0;
 	if (!Level) {
-		Level = Self->PrintSeverity;
+		Level = Self->Filter;
 	}
 	{
 		JB_Error* Err = ((JB_Error*)JB_Ring_First(Self->Errors));
@@ -29303,8 +29302,6 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
 	if (!Self) {
 		Self = JB_StdErr;
 	}
-	bool CanPrint = false;
-	JB_Rec_Incr(Self, Err, true);
 	if (!JB_Str_Exists(Err->Path)) {
 		JB_SetRef(Err->Path, Self->Source);
 	}
@@ -29313,12 +29310,22 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
 			JB_SetRef(Err->StackTrace, JB_App__StackTrace(2, nil));
 		}
 	}
+	uint CanPrint = Self->PrintNewErrors;
+	if (CanPrint and JB_Err_IsBad(Err)) {
+		if ((CanPrint != kJB__ErrorFlags_PrintFirst) or (!JB_Rec_BadCount(Self))) {
+			JB_String* _tmPf0 = JB_Err_Render(Err, nil);
+			JB_Incr(_tmPf0);
+			JB_PrintLine(_tmPf0);
+			JB_Decr(_tmPf0);
+		}
+	}
+	JB_Rec_Incr(Self, Err, true);
 	FP_fnErrorLogger Log = ((FP_fnErrorLogger)(Self->_LogFunc));
 	if (Log) {
-		JB_String* _tmPf0 = JB_Err_Render(Err, nil);
-		JB_Incr(_tmPf0);
-		(Log)(Self, _tmPf0);
-		JB_Decr(_tmPf0);
+		JB_String* _tmPf1 = JB_Err_Render(Err, nil);
+		JB_Incr(_tmPf1);
+		(Log)(Self, _tmPf1);
+		JB_Decr(_tmPf1);
 	}
 	JB_Tree_SyntaxAppend(Self->Errors, Err);
 }
@@ -50373,6 +50380,10 @@ void SC_Err_Improve(JB_Error* Self) {
 	}
 }
 
+bool JB_Err_IsBad(JB_Error* Self) {
+	return (Self->Severity >= kJB__ErrorSeverity_Problem);
+}
+
 bool JB_Err_IsError(JB_Error* Self) {
 	return (Self->Severity >= kJB__ErrorSeverity_Error);
 }
@@ -60886,4 +60897,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -1315780341975388270 -7608574505477376555
+// 5499465224354273766 -7608574505477376555
