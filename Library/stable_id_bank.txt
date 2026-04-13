@@ -992,7 +992,6 @@ JB_Err_SignalName
 JB_Err_SyntaxIs
 JB_Err_SyntaxIsSet
 JB_Err_UpgradeWithNode
-JB_Err_WorseThan
 JB_Err__CantParseNum
 JB_ErrorSeverity_Render
 JB_ErrorSeverity_SyntaxUsing
@@ -1049,7 +1048,6 @@ JB_FS_LineIndent
 JB_FS_MsgErrorName
 JB_FS_NeedSpare
 JB_FS_PadTo
-JB_FS_ProblemsFound
 JB_FS_RemoveByte
 JB_FS_Render
 JB_FS_Size
@@ -1101,7 +1099,6 @@ JB_File_Destructor
 JB_File_DirectoryContains
 JB_File_Existing__MainArg
 JB_File_Exists
-JB_File_Fail
 JB_File_FileCompare
 JB_File_Flush
 JB_File_HardLinkTo
@@ -1141,7 +1138,6 @@ JB_File_Sibling
 JB_File_Size
 JB_File_SizeSet
 JB_File_SmartDataSet
-JB_File_SyntaxProblem
 JB_File_Touch
 JB_File_UniqueChild
 JB_File_Write
@@ -1408,18 +1404,12 @@ JB_Rec_Log
 JB_Rec_LogFileSet
 JB_Rec_OK
 JB_Rec_Pop
-JB_Rec_PrintErrors
 JB_Rec_PrintErrorsMain
 JB_Rec_Render
 JB_Rec_RenderErrors
-JB_Rec_RenderErrors0
-JB_Rec_ShellPrintErrors
 JB_Rec_SyntaxUsing
 JB_Rec__CrashLog
-JB_Rec__Latchkum
-JB_Rec__NewCriticalError
-JB_Rec__NewProblem
-JB_Rec__NewWarning
+JB_Rec__NewErrorSub
 JB_RefCount
 JB_RetroFloat_Constructor
 JB_RetroFloat_SyntaxAccess
@@ -1997,7 +1987,6 @@ JB_ivec4_SyntaxEquals
 JB_ivec4_Vec4
 JB_ivec4_Vert
 JB_ivec4_WidthSet
-JB_jbinLeaver_SyntaxUsingComplete
 JB_munmap
 JB_u64_Log2
 JB_u8p_Read
