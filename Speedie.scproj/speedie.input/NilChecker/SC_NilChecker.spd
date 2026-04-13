@@ -573,7 +573,7 @@ function Argument (NilTrackerFn)
 		|| prev = rz
 		rz = .SyncJump(s, T ||| nilcheckmode.Disappears)
 		if prev is borked
-			error.AutoPrint = .oldprint
+			stderr.PrintNewErrors = .oldprint
 			if stderr.ok
 				target debug
 					.SyncJump(s, T ||| nilcheckmode.Disappears)
@@ -706,8 +706,8 @@ function SetRel (NilTrackerFn)
 
 
 function Fail (NilTrackerFn)
-	.OldPrint = error.autoprint 
-	error.AutoPrint = 0
+	.OldPrint = stderr.PrintNewErrors
+	stderr.PrintNewErrors = 0
 	return nilstate.borked
 
 

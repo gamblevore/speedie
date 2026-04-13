@@ -22,14 +22,15 @@ class ErrorReceiver
 	|int|					ProblemCount
 	|int|					WarnCount
 	|ErrorSeverity|			LowerErrorsTo
-	|ErrorSeverity|			PrintSeverity
+	|ErrorSeverity|			Filter
+	|byte|					PrintNewErrors
 	|string|				Source
 
 	constructor
 		.errors = error()
 		.MaxErrors = 512
 		.MaxProblems = 64
-		.PrintSeverity = ErrorSeverity.Problem
+		.Filter = ErrorSeverity.Problem
 		JB_API.NilHappened_ = nil
 
 
@@ -45,11 +46,13 @@ class ErrorReceiver
 			Return !.errorcount
 		return !stderr.errorcount
 	
+	
 	function HasProblems (|bool|) // totallyok
 		opt norefcounts
 		if !self
 			self = stderr!
 		Return (.errorcount ||| .problemcount)
+	
 	
 	function HasAnything (|bool|) // Totally OK
 		opt norefcounts
@@ -58,30 +61,27 @@ class ErrorReceiver
 		Return (.errorcount ||| .problemcount ||| .warncount)
 	
 	
-	syntax append (|errorreceiver--|self, |Error| Err)
+	syntax append (|errorreceiver--| Self, |Error| Err)
 		cpp_part AppendErr
 		if !self
 			self = StdErr
-		target debug
-			|| CanPrint = !.BadCount and error.autoprint
-			// remove autoprint? seems only true for speedie.
-			// or just make it a bool on this class.
-		  else
-			|| CanPrint = false
-		
-		.incr(err)
-		
+
 		err.path ?= .source
 		if Error.KeepStackTrace
 			err.StackTrace ?= app.StackTrace
+
+		|| CanPrint = .PrintNewErrors
+		if CanPrint and err.IsBad
+			if (CanPrint != ErrorFlags.PrintFirst) or !.BadCount
+				printline err.render
+				target debug
+					if err.severity > Errorseverity.problem
+						debugat
+		
+		.incr(err)
+		
 		|| log = ._logfunc
 			(log)(self, err.render)
-
-		target debug
-			if CanPrint and err.IsBad
-				printline err.render
-			if error.autoprint and err.severity > Errorseverity.problem
-				debugat
 
 		.errors <~ err
 
@@ -154,7 +154,7 @@ class ErrorReceiver
 
 	function RenderErrors (|errorseverity| Level, |bool| shell, |faststring| fs, |int|)
 		opt norefcounts
-		Level ?= .PrintSeverity
+		Level ?= .Filter
 		for err in self
 			|| S = err.Severity
 			if S >= level
@@ -170,7 +170,7 @@ class ErrorReceiver
 		cpp_part PrintErrorsMain
 		|| rec = (self (self) StdErr)
 		|| fs	= faststring()
-		|| Count = rec.rendererrors(level, shell, fs)
+		|| Count = rec.RenderErrors(level, shell, fs)
 			"issue".Pluralize(fs, Count)
 			fs <~ " found\n"							// "1 issue found"
 			PrintError fs|string|

@@ -5,7 +5,7 @@
 main
 	opt NoRefCounts	
 	target debug
-		error.AutoPrint = 1	
+		stderr.PrintNewErrors = ErrorFlags.PrintFirst
 	expect (cake.BeginCode) ("Can't allocate VM")
 
 	require Globals.VerifyGlobs

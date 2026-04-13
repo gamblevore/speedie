@@ -3,7 +3,7 @@
 Speedie's error-reporting system has some more advanced features:
 
 + Problems: These get printed like errors, but leave `stderr.ok` true.
-+ Warnings: Also leaves `stderr.ok` true, but won't get auto-printed. (Call `stderr.printall` to see them.)
++ Warnings: Also leaves `stderr.ok` true, but won't get printed unless you ask.
 + Logging of errors to a file.
 + Lowering errors to warnings during certain code-sections
 + Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
@@ -16,7 +16,7 @@ Most programs won't need them, but its there if you do.
 
 Speedie has multiple error levels:
 
-        Critical: 5   // Unrecoverable. EG: OutOfMemory / signals
+        Critical: 5   // Severe errors that get priority attention from the user
         Error:    4   // Real errors that stop the program doing what you wanted.
         Problem:  3   // Not bad enough to stop the program working, but still bad.
         Warning:  2   // Probably is bad, best to let the user know about it.
@@ -33,12 +33,11 @@ To make a **`warning`** instead of an **`error`**, do this:
             warn (msg, "Aren't you going to say hello?")
         printline msg
         if PrintWarnings
-            StdErr.PrintAll
-            stderr.clear
+            stderr.Filter = ErrorSeverity.Warning        
 
-Because there are no "real errors" we need to call `stderr.printall`, as **`warnings`** are not printed by default.
+To print the warnings, we need to lower the filter-level to `ErrorSeverity.Warning`.
 
-Theres no worry about needing to call `stderr.printall` to catch **`warnings`** in all your apps. Its just internal to your app. Speedie itself, does not create any **`warnings`**.
+Theres no need to worry about setting `stderr.Filter` to print **`warnings`** in all your apps. Because Speedie itself, does not create any **`warnings`**.
 
 For example: All file-errors are proper **`errors`**, if created at all.
 
@@ -77,6 +76,7 @@ So your users have to update their databanks. But you want old databanks to work
 Now your files still work as before, `stderr.ok` is still true, and the user is informed!
 
 
+
 ### Logging
 
     main (|message| msg)
@@ -88,9 +88,10 @@ Now your files still work as before, `stderr.ok` is still true, and the user is 
 
 You'll see one **`error`** printed, but also you'll find a file `demo.log` in `/tmp/logs/` containing this **`error`** logged nicely. 
 
-This will log everything: **`warnings`**, **`errors`** and all.
+This will log everything: **`warnings`**, **`errors`** and all. (No filtering.)
 
 You can also specify a full filepath to `stderr.logfile`, in case you don't want it in `/tmp/logs`.
+
 
 
 ### Error Reduction
@@ -104,13 +105,9 @@ You can also specify a full filepath to `stderr.logfile`, in case you don't want
         .checkmsg(msg)
         using ErrorSeverity.Warning
             .checkmsg(msg)
-        StdErr.PrintAll
-        StdErr.Clear      // or else we see the errors twice
-            
+        stderr.Filter = ErrorSeverity.Warning // allow seeing the warnings
 
-Here... we should see two **`errors`** printed after the program exits:  Both are _"Expected an 'oof'"_. But one will be marked as a warning.
-
-We need to use `stderr.PrintAll`, to see the **`warnings`**, and of `stderr.Clear` to stop the system from printing **`errors`** again after we exit.
+Here... we should see two **`errors`** printed after the program exits:  Both are _"Expected an 'oof'"_. But one will be marked as a **`warning`**.
 
 
 
@@ -119,15 +116,14 @@ We need to use `stderr.PrintAll`, to see the **`warnings`**, and of `stderr.Clea
 Sometimes, you want to "contain" **`errors`**... But still detect them. Here is one nice way to do it. Lets look at the first example:
 
     main
-        || f = "/not/a/file/that/exists.haha".FileThatExists
-            printline "wierd, why does this file exist?"
+        || f = "/missing/file".FileThatExists // this creates an error
         error "Only one error allowed!"
     
 We should see two **`errors`** created. One at the **`error`** line, and the other because we can't read that wierd file-path. So lets contain that **`error`**:
 
     main
         using errorreceiver.new
-            || f = "/not/a/file/that/exists.haha".FileThatExists
+            || f = "/missing/file".FileThatExists // this creates an error
             if !stderr.ok
                 printline "Awesome! we found an error but its not gonna harm us"
         error "Only one error allowed!"

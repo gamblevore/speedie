@@ -181,7 +181,6 @@ class Error (Message)
 
 	module
 		|message|		BackupErrorSource
-		|byte|			AutoPrint			// Can be set to PrintAndRemove
 		|bool|			KeepStackTrace
 
 
@@ -193,8 +192,9 @@ datatype ErrorFlags (Byte)
 		PreferNoRenderPath
 		Parse
 	constants
-		Keep = 0
-		PrintAndKeep = 1
+		Silent = 0
+		PrintFirst = 1
+		PrintAll = 2
 
 
 
@@ -223,12 +223,12 @@ datatype ErrorSeverity (Byte)
 
 	constants
 		|ErrorSeverity|
-		OK
+		OK = 0
 		Hint				// We can't tell if its wrong, just letting you know if you want it fixed
 		Warning				// Its probably bad, and probably better corrected. 
 		Problem				// Always print these, but still continue
 		Error				// Parse errors, file not exists, etc.
-		Critical			// Unrecoverable "OutOfMemory / signals / etc"  need to quit.
+		Critical			// Severe errors.
 		IgnoreAllErrors		// Undocumented :]
 	
 	

@@ -283,8 +283,8 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 	if (JB_FS_Length(Errs) and (Mode&kStdErrNil)==kStdErrPassThru) {
 		// Do we want to pass through, or capture?
 		// capture makes more sense. Leave it like this for now.
-		void JB_Rec__Latchkum (Message* node, JB_String* Desc, JB_Object* Source);
-		JB_Rec__Latchkum(nil, JB_FS_GetResult(Errs), nil);
+		void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
+		JB_Rec__NewErrorSub(nil, JB_FS_GetResult(Errs), nil, 4);
 	}
 	if (!ErrsIn and Errs)
 		JB_Delete((FreeObject*)Errs);

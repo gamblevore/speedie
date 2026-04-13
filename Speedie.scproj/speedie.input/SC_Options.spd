@@ -240,9 +240,9 @@ module Feedback
 			Explain(Purpose, "Will not compile any .cpp generated.")$
 			Options.Compile = false
 			
-		+'breakonerr' 
+		+'breakonerr'  // nothing uses this? remove?
 			Explain(Purpose)$
-			error.AutoPrint = value.optionint
+			stderr.PrintNewErrors = value.optionint
 		
 		+'path'
 			Explain(Purpose)$

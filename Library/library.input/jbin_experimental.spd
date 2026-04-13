@@ -7,6 +7,7 @@ datatype jbinLeaver (int)
 	// not finished
 
 	syntax UsingComplete (|jbin| jb)
+		inlined
 		StdErr.LowerErrorsTo = self
 		
 	module

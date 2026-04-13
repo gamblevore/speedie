@@ -7,8 +7,7 @@ function compiler.UsingScript (|file| f, |file|)
 	
 	rz = feedback.TryUseProject(f, true).ScriptLocation.file
 	
-	if error.autoprint == errorflags.printandkeep
-		error.AutoPrint = 0
+	stderr.PrintNewErrors = 0
 	
 	options.output_path = rz
 	options.scripting = true
