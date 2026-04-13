@@ -12,7 +12,6 @@ linkage
 
 
 flags
-	kBasisNotObj = 0 // just be 0, for #require
 	kBasisObj
 	kBasisDeSTRUCTable
 	kBasisTempStruct
@@ -74,7 +73,7 @@ function DeclInit (|SCFunction| fn, |Message| dcl, |bool| IsJustAnArg)
 	
 	|| Curr  = dcl
 	|| After = arg.FlatAfter
-	while  (Curr != After)  and  (Curr != LastPlace) 
+	while  (Curr != After)  and  (Curr != LastPlace)
 		if (Curr == @Arg)
 			|| Block2 = Curr.CausesUnReachable( arg )
 				ReturnHandle( Block2, nil, name, basis )
@@ -86,7 +85,7 @@ function SCFunction.DoRefs (|bool|)
 
 
 function RefBasis (|Message| msg, |bool| SetOnly, |int|)
-	return RefBasisStruct(msg, SetOnly) &~ kBasisTempStruct 
+	return RefBasisStruct(msg, SetOnly) &~ kBasisTempStruct
 
 
 function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
@@ -158,7 +157,7 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 	if fn is constructor
 		if self is Constructor					// calling a super, I hope.
 			|| first = prm.first
-			expect (first isthing "self") (first)
+			check (first isthing "self") (first)
 			return
 		if fn isnt StoresSelf
 			problem (msg, "Object evaporates here?")
@@ -398,16 +397,6 @@ function message.DoesAnything (|bool|)
 	if self
 		require self != @thg and @num and @str and @char
 		return true
-
-
-function DeRefTest (|int| xxx)
-	for 10
-		|| x = "abc"
-		if 0.5[]
-			(x) 
-			exit
-//		|| z = 99999
-	|| y = 1
 
 
 function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| Basis)
