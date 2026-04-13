@@ -1722,8 +1722,8 @@ function Tran_Problem (TranFunc)
 
 	using (node)
 		stuff.func = @prm
+		|| Dot = node.msg(@dot, "Syntax" + node.name)
 		node.become(@bra)
-		|| Dot = node.msg(@dot, "SyntaxProblem")
 		Dot <~ stuff.first
 		Dot <~ stuff
 

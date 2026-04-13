@@ -74,8 +74,6 @@ function AppInfoExtra (|unixprocess| r, |string|)
 		return ""
 	if st.IsRunning
 		return "Running"
-	if st >= 128
-		beep "ooooooo"+st
 	return st.Name
 
 

@@ -251,6 +251,14 @@ extend string
 		inlined
 		errorreceiver.NewProblem( nil, self )
 
+	Syntax Hint
+		inlined
+		errorreceiver.NewHint( nil, self )
+
+	Syntax Critical
+		inlined
+		errorreceiver.NewCritical( nil, self )
+
 
 extend File
 	Syntax Expect (|string| Error)

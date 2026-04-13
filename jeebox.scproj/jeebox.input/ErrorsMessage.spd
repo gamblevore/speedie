@@ -1,24 +1,27 @@
 
 
 extend_module ErrorReceiver
-	function NewWarning (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+	inline NewHint (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, ErrorSeverity.Hint)
+
+	inline NewWarning (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		.NewErrorSub(node, desc, path, ErrorSeverity.warning)
 	
-	function NewProblem (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+	inline NewProblem (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		.NewErrorSub(node, desc, path, ErrorSeverity.problem)
 
-	function NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
-		cpp_part Latchkum
+	inline NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		.NewErrorSub(node, desc, path, ErrorSeverity.Error)
 
-	function NewCriticalError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+	inline NewCritical (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		.NewErrorSub(node, desc, path, ErrorSeverity.Critical)
 
-	libinternal NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
+	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
 		opt norefcounts
-		|| Lower = stderr.LowerErrorsTo
-			sev = lower|int| min sev
-		if stderr.CanAddMore(sev)			// should critical errors get lowered? probably not?
+		if sev < ErrorSeverity.Critical // keep criticals...
+			|| Lower = stderr.LowerErrorsTo
+				sev = lower|int| min sev
+		if stderr.CanAddMore(sev)
 			if !desc
 				desc = node.MiniName("Unexpected ")
 			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path??"")
@@ -44,10 +47,9 @@ function Message.OriginalParseData (|string|)
 
 extend_module Error
 	function CantParseNum (|Message| Where, |string| num, |int| Pos, |bool| Overflow)
-		visible // for lib
+		visible							// for lib
 		
 		|| fs = FastString()
-		
 		if Overflow
 			fs <~ "Numeric overflow parsing number"
 		  else
@@ -56,7 +58,7 @@ extend_module Error
 			fs <~ "' in: "
 			fs <~ num.Preview(32)
 		
-		|string--| str = fs.getresult
+		|string--| str = fs.GetResult
 		|error--| err = error(where, str)
 		nil|errorreceiver| <~ err
 

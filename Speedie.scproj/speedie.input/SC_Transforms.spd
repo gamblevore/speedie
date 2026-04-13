@@ -26,6 +26,8 @@ dispatch TemporalStatements (TranFunc)
 	crash					{app.crash(node.firstname)}
 	bad						(Tran_TestProblem)
 	problem					(Tran_Problem)
+	hint					(Tran_Problem)
+	critical				(Tran_Problem)
 	borks					(Tran_Fails)
 	
 	blindcasts				(Tran_BlindCasts)

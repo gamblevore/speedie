@@ -18,7 +18,7 @@ struct LoopInfo
 		|| Ex = .ExitRecord
 		ArchonPurger.t.value = Ex
 		if !ex
-			ErrorReceiver.NewCriticalError(msg, "Loop never exits.")
+			ErrorReceiver.NewCritical(msg, "Loop never exits.")
 
 		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
