@@ -219,8 +219,6 @@ class GUIControl (list)
 			.state &= ~F
 		
 		if f & guicontrolflags.visible
-//			if self is TrapVisibleChange
-//			if true // .HasAny		// seems to cause issues. perhaps I need to check for items AFTER this?
 			GUI.resized(self)
 			
 
@@ -339,7 +337,7 @@ class GUIControl (list)
 	
 	function CopyToClipboard (|bool|)
 		opt norefcounts
-		|| S = .getcopy
+		|| S = .GetCopy
 		clipboard.text = s
 		return S
 	
