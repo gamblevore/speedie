@@ -19,7 +19,7 @@ module Options
 	||		MakeExec				= false
 	||		Compile					= true
 	||		TargetDebug				= false
-	||		CompileDebugSeparately  = false // for now
+	||		CompileDebugSeparately	= false // for now
 	||		PrintMemoryUsage		= false
 	||		PrintLibraries			= false
 	||		GenFlowControlCode		= false
@@ -66,7 +66,7 @@ module Options
 
 
 
-module Feedback 
+module Feedback
 	linkage
 		cpp_part FB
 	
@@ -82,8 +82,6 @@ module Feedback
 			// load from prefs unless overwritten by --flow
 			Options.GenFlowControlCode = app.prefs["self_flow"].yes
 		
-		
-
 		// update current target
 		SC_Targets["flow"] = options.GenFlowControlCode
 	
@@ -124,7 +122,7 @@ module Feedback
 			m.FEET // for when you can't dance
 	
 	
-	function ParseArgs (|bool|) 
+	function ParseArgs (|bool|)
 		.StopStripping
 
 		|[string]--| Args = app._rawargs
@@ -219,18 +217,18 @@ module Feedback
 			options.OperationCount++
 
 	
-	function Explain (|faststring| Purpose, |string?| name="", |bool|) 
+	function Explain (|faststring| Purpose, |string?| name="", |bool|)
 		ifn purpose: return true
 		purpose <~ name
 
 
-	function AppTransCompile (ShellOption) 
+	function AppTransCompile (ShellOption)
 		explain(purpose, "Places the .cpp and header files locally")$
 		Options.ExternalCompile = true
 		Options.Color = false // makes sense... we want to do this using xcode
 
 
-	function AppVersionNumber (ShellOption) 
+	function AppVersionNumber (ShellOption)
 		Explain(Purpose, "Print version number.")$
 		return CompilerInfo()
 

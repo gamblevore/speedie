@@ -262,7 +262,7 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 	if (TimeOut > 0)
 		ExitAfter = JB_Date__Now() + TimeOut;
 
-	while (TimeOut >= 0) {							// allow -1 time out which instantly exits...
+	while (TimeOut >= 0) {					// allow -1 time out which instantly exits...
 		int ReadAny = 0;
 		if (Errs)
 			ReadAny = PicoStdErr(Sh->Pico, (PicoAppenderFn)JB_FS_WriteAlloc_, Errs).Length;
