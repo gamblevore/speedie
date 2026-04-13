@@ -27,16 +27,16 @@ function perryide.ViewRun (|bool|)
 	return true
 
 
-function perryide.WantsRun (|bool|)
+function perryide.ContinueProgram (|int| state, |bool|)
 	if !.RunCompiledApp
 		return .start
 
 	if .DebugMode isnt Paused
-		return .SendRunMsg("pause")
+		return .SendRunMsg("pause", state)
 
 	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
-		return .SendRunMsg("run fast")
-	return .SendRunMsg("run")
+		return .SendRunMsg("run fast", state)
+	return .SendRunMsg("run", state)
 
 
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
@@ -52,7 +52,7 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	if key is UP or W or Num2
 		return DebugStepOut(self, -1)
 	if key.IsAccept
-		return i.WantsRun
+		return i.ContinueProgram(-1)
 	if key is space
 		return DebugStepRun(self, -1)
 		
@@ -279,29 +279,29 @@ function DebugBreakAdd (GuiTextLineEvent)
 
 
 function DebugStepOver (guiaction)
-	return .SendRunMsg("stepover")
+	return .SendRunMsg("stepover", state)
 
 
 function DebugStepIn (guiaction)
 	if keys.Shift
-		return .SendRunMsg("stepincutely")
-	return .SendRunMsg("stepin")
+		return .SendRunMsg("stepincutely", state)
+	return .SendRunMsg("stepin", state)
 
 
 function DebugStepOut (guiaction)
-	return .SendRunMsg("stepout")
+	return .SendRunMsg("stepout", state)
 
 
 function DebugStepRun (guiaction)
 	// would be nicer if we immediately hide the buttons for this
 	// but delayedly do it for the other .sendrunmsg
-	return .ide.WantsRun
+	return .ide.ContinueProgram(State)
 	
 	
 
-function GUIControl.SendRunMsg (|string| s, |bool|)
+function GUIControl.SendRunMsg (|string| s, |int| state, |bool|)
 	// need to disable gui? or is it ok already.
-	return .SendMsg(s, true)
+	return .SendMsg(s, state >= 0)
 
 
 function GUIControl.SendJbin (|jbin| j, |bool|)

@@ -22,11 +22,29 @@ extern "C" {
 #define JBClassPlaceSaver(a, b, c, d, e, f, g)  \
 JBSaver_Behaviour a ## _FuncTable = {(void*)b,(void*)d,(void*)e,(void*)f,(void*)g};  \
 JB_Class a ## Data = JBClassInit(a##Data, (#a), sizeof(a), c, (JBObject_Behaviour*)&(a##_FuncTable));
-#define AddError(Result, name) {int abc = Result; if (abc and !JB_ErrorNumber) {JB_ErrorNumber = abc; fprintf(stderr, "error %s (%i)\n", name, abc); };} 
 
 
-int  JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self, int Level);
-void JB_Dict__Init();
+static void AddError (int NewError, const char* Name) {
+	if (!NewError) return;
+	int Err = JB_ErrorNumber;
+	if (!Err or (Err < 128 and NewError >= 128)) {
+		JB_ErrorNumber = NewError;
+		if (NewError >= 128) {
+			auto Kind = strsignal(NewError&~128);
+			fprintf(stderr, "%s during %s\n", Kind, Name);
+		} else {
+			fprintf(stderr, "error %s (%i)\n", Name, NewError);
+		}
+	};
+} 
+
+
+
+int			JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self, int Level);
+JB_String** JB_Str__FindGlobals	(u8** src, uint64* Hash);
+void		JB_RemoveHandlers	();
+void		JB_Dict__Init();
+int			JB_BasicCareTaker(PicoDate D);
 
 
 // im pretty sure the only string we subclass is stringshared?
@@ -51,24 +69,25 @@ JBClassPlace( FastString,		JB_Object,	"FastString", JB_FS_Destructor,		JB_FS_Ren
 JBClassPlace( JB_List,			JB_Object,	"List",		JB_Ring_Destructor,		JB_List_Render );
 JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );
 
-extern JB_Class JB_TaskData;
-extern bool JB_NoExitOnCrash;
-extern const char** JB_Main__Args;
-extern const char* JB_ThreadName;
 
+extern JB_Class			JB_TaskData;
+extern bool				JB_NoExitOnCrash;
+extern const char** 	JB_Main__Args;
+extern const char*		JB_ThreadName;
 
+JB_StringC*         	EmptyString_;
+JB_StringC*         	ErrorString_;
+JBObject_Behaviour  	JB_Object_FuncTable_;
+JB_Class*           	ClassList;
+extern char**			environ;
+uint					Flow_Disabled;
+static Array*			Obj_Args;
+const char**			JB_Main__Args;
+byte					StringVersionNum;
+byte					JB_ErrorNumber;
 
+thread_local byte		JB_Active = 0;
 
-JB_StringC*         EmptyString_;
-JB_StringC*         ErrorString_;
-JBObject_Behaviour  JB_Object_FuncTable_;
-JB_Class*           ClassList;
-byte				JB_ErrorNumber;
-thread_local byte	JB_Active = 0;
-extern char**		environ;
-uint				Flow_Disabled;
-static Array*		Obj_Args;
-const char**		JB_Main__Args;
 
 
 Dictionary* JB_App__Env() {
@@ -92,11 +111,6 @@ static JB_StringC* emptystr() {
 }
 
 
-JB_String** JB_Str__FindGlobals	(u8** src, uint64* Hash);
-void		JB_RemoveHandlers	();
-
-
-byte StringVersionNum;
 static uint DecodeLength (u8*& p) {
 	uint v = *p++;
 	if (v <= 127)
@@ -163,7 +177,6 @@ void JB_FinalEvents() {
 }
 
 
-int JB_BasicCareTaker(PicoDate D);
 
 Array*		JB_App__Args()					{ return Obj_Args; }
 void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
@@ -174,13 +187,13 @@ void		JB_CollectClassDepths ();
 int			JB_SP_AppInit();
 void		JB_App__GUIMode(bool GUI)		{ JB_NoExitOnCrash = GUI; }
 
+
 JB_StringC*	JB_App__CallPath (const char* New) {
 	if (!New)
 		return JB_StrC(JB_Main__Args[0]);
 	JB_Main__Args[0] = New;
 	return 0;
 }
-
 
 
 int JB_SP_Init (_cstring* Args, bool IsThread) {
@@ -250,17 +263,18 @@ int JB_SP_Run (_cstring* Args, int Mode)	{ // JB_SP_Main
 		}
 		
 		if ((Mode & 1) and Obj_Args and !JB_ErrorNumber)
-			AddError(JB_Main(),	"occurred");
+			AddError(JB_Main(),	"main()");
 
 		if ((Mode & 2) and Obj_Args)
 			JB_FinalEvents();
 	}
 	JB_Active &= ~1;
 	
-	byte b = JB_ErrorNumber;
-	if (b >= 128)
-		b = EINVAL;
-	return b;
+	return JB_ErrorNumber; // we need this info. why were we throwing it away?
+//	byte b = JB_ErrorNumber;
+//	if (b >= 128)
+//		b = EINVAL;
+//	return b;
 }
 
 

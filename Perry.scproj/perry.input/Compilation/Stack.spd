@@ -74,6 +74,8 @@ function AppInfoExtra (|unixprocess| r, |string|)
 		return ""
 	if st.IsRunning
 		return "Running"
+	if st >= 128
+		beep "ooooooo"+st
 	return st.Name
 
 
@@ -123,9 +125,8 @@ function SetAppInfo
 	opt norefcounts
 	|| CanDebug = .UpdateDebugButtons
 
-	|| Box = .AppInfo
 	if !CanDebug
-		Box.tag = nil
+		.AppInfo.tag = nil
 	if !CanDebug or .DebugMode isnt paused
 		.editme._ActiveLine = nil
 		.stack.clear
@@ -142,12 +143,12 @@ function SetAppInfo
 		fs <~ extra
 		fs <~ ")"
 	
-	|| l = (Box.obj as message).first
+	|| l = (.AppInfo.obj as message).first
 		|| mem = l.first.int + l.second.int + l[2].int
 			fs <~ "\n"
 			mem.StrSize(Fs)
 
-	Box.text = fs
+	.AppInfo.text = fs
 
 	if .MyStatsMode == 0
 		.ShowLeftStats

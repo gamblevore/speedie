@@ -216,7 +216,6 @@ function RefDecrMsg (|Message| msg, |bool| IsReturn, |Message|)
 	if IsReturn
 		return RefMsg( msg, "JB_EarlyDecr", Compiler.RefEarlyDecr! )
 	return RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
-	
 
 
 function RefClearMsg (|Message| msg, |Message|)
@@ -306,10 +305,10 @@ function Message.CausesUnReachable (|Message| arg, |Message?| Dcl=nil, |Message?
 
 function ExitHitsOrGoesPast (|Message!| curr, |Message!| arg, |bool|)
 	opt norefcounts
-	// while {||A, exit}			 // true
-	// while {||A, if(true){exit}}   // true
-	// while {if(true){||A, exit}}   // true
-	// while {while {||A, exit}}	 // false
+	// while {||A, exit}				// true
+	// while {||A, if(true){exit}}		// true
+	// while {if(true){||A, exit}}		// true
+	// while {while {||A, exit}}		// false
 	while
 		curr = curr.Parent
 		if curr == arg
@@ -498,7 +497,7 @@ function Message.Unwrap (|Message!|)
 	opt norefcounts
 	rz = self
 	while rz.RefTransparent
-		|| f = rz.first #loop
+		|| f = rz.first				#loop
 		rz = f
 
 
@@ -575,7 +574,7 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 	// Bad: Possible obscure destructor bug, fired before you expect.
 	// Maybe ordering issues with writing to stdout, files, etc.
 	opt norefcounts
-	|| d = name.AsDecl #expect
+	|| d = name.AsDecl						#expect
 	|| Type = d.Type
 	require Type isnt NoEarlyFree 
 	
@@ -658,7 +657,6 @@ function message.RC_HasTemporary (|int|)
 
 function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 	opt norefcounts
-
 	// Test if exists within and/or
 
 	|| HitArg = false
@@ -701,9 +699,9 @@ function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 		fnc.Last <~ msg
 		return
 	
-	if (parent == @prm) 
+	if (parent == @prm)
 		if (parent.obj == compiler.TernaryFunc)
-			require ch.UseNonRefChangers == parent.first    //    (a,b)(c)-->(c,a,b)
+			require ch.UseNonRefChangers == parent.first	//    (a,b)(c)-->(c,a,b)
 		if (parent.obj == Compiler.RefFreeIfDead)
 			return nil										// already done!!!
 	
@@ -727,8 +725,7 @@ function SCFunction.CallSuperMem (|SCFunction| fn)
 	lst.obj = fn
 	
 	for (a in fnargs) (i)
-		|| msg = lst.msg(@thg, a.name) 
-		//msg.resetasm
+		|| msg = lst.msg(@thg, a.name)
 		msg.obj = .args[i]
 
 	if (self is Constructor)
@@ -783,8 +780,8 @@ function SCFunction.CallParents
 
 function SCFunction.ConOrDesForCall (|scclass| c, |bool| IsConstructor, |int| Task,  |scfunction|)
 	opt norefcounts
-	|| parent = c.super		#require	
-	|| fn = parent.ConOrDesForCall(isconstructor, task)
+	|| parent = c.super										#require	
+	|| fn = parent.ConOrDesForCall(IsConstructor, task)
 		return fn
 
 	if self is Constructor
@@ -827,8 +824,6 @@ function SCFunction.BuildConstructorDestructor
 		.FillInDestructor
 
 
-
-
 function SCFunction.AnalyseRefs (|[message]| list)
 	|| root				= .SourceArg
 	|| IsConstructor	= self is Constructor
@@ -836,7 +831,6 @@ function SCFunction.AnalyseRefs (|[message]| list)
 		|| it = msg.RC_HasTemporary							// need to always do this?
 			if .dorefs or (it != screfs.kBasisObj)
 				SCRefs.RC_HandleDisappearing( msg, it )
-	
 	
 	// avoid reading same thing that we alter.
 	for (msg.ScanArg in root)
@@ -864,13 +858,13 @@ function SCFunction.AnalyseRefs (|[message]| list)
 			if !.DoRefs
 				SCRefs.RC_CheckNoObjPms(msg)
 			SCRefs.RC_CheckFuncAllocOK( self, msg )
-			SCRefs.RC_IgnoreReturn( self, msg )  // func(a,b,c)
+			SCRefs.RC_IgnoreReturn( self, msg )				// func(a,b,c)
 			
 		  elseif (msg.IsStatementExpr)
 			SCRefs.RC_IgnoreReturn( self, msg )
 			
 		  elseif (f == @Decl)
-			SCRefs.DeclInit( self, msg, false ) // || a = b, incr(b)
+			SCRefs.DeclInit( self, msg, false )				// || a = b, incr(b)
 
 
 
