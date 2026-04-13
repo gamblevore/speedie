@@ -61,6 +61,11 @@ dispatch FuncPreReader (fnPreReader)
 		opt norefcounts
 		msg.expectempty
 		.MakeLinkInline
+	
+	+'stores_self'
+		opt norefcounts
+		msg.expectempty
+		is StoresSelf
 		
 	
 	+'opt'

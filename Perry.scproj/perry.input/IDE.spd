@@ -393,7 +393,7 @@ class PerryIDE (Window)
 	
 	function UpdateSearchText
 		opt norefcounts
-		|| other = .UpdateSearchSwap #require 
+		|| other = .UpdateSearchSwap			#require
 		|| rf = .RealFocus // what if they just used the same document??
 			|| t = rf.text // sigh
 			GUI.LastSearch = t
@@ -419,7 +419,7 @@ class PerryIDE (Window)
 		if .filelist.cmm == .openedmenu
 			hideside = false 
 
-		if VisSide and VisTop and (HideSide != HideTop) 
+		if VisSide and VisTop and (HideSide != HideTop)
 			HideSide = false
 			HideTop = false
 			HideTabs = false
@@ -471,7 +471,7 @@ class PerryIDE (Window)
 		|| After = .find("\n-----------------------\n", where)
 		if !after: after = int.max
 		
-		return self[where, after] 
+		return self[where, after]
 		
 
 	function FeedBackLivedTooLong (|spdprocess!| f, |bool|)
@@ -488,7 +488,7 @@ class PerryIDE (Window)
 	
 	function SaveMemory
 		if .IsFront
-			return 
+			return
 		require !.UsingSpdLib
 		|| f = .Feedback
 		if f.CommsOpen  and  .FeedBackLivedTooLong(f)
@@ -519,8 +519,7 @@ class PerryIDE (Window)
 		require .IsFront
 		if ._FrameNum == 1			// once a second?
 			require !.ProjClosed
-			
-//		for 100
+		
 		if .UpdateMem
 			.ShowLeftStats
 		

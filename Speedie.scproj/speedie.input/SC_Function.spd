@@ -41,6 +41,7 @@ datatype FunctionType (int)
 		API
 		Stateless
 		HidesProperties
+		StoresSelf
 
 		Wrapper // isn't this the same as cpp?
 		Cpp
@@ -963,6 +964,8 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 					|| pfdecl = pf.obj as SCDecl
 					if  fn is constructor  and  pfdecl is self // super.constructor...
 						GotSuperConstructor = true
+						if fn is StoresSelf
+							is StoresSelf
 						check (dot in root) (dot, NoNesting)
 		
 		|| UsedAtAll = dot.SelfUsedForProperty

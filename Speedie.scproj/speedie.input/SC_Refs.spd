@@ -44,10 +44,10 @@ function Message.LastUsedFix (|Message|)
 			|| it = .FindRef(Compiler.RefIncr, Ch.name)
 				return it.Next
 	
-	return .Next  
- 
+	return .Next
 
-function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
+
+function DeclInit (|SCFunction| fn, |Message| dcl, |bool| IsJustAnArg)
 	opt norefcounts
 	|| Basis = RefBasis( dcl, true )
 	if fn.dorefs
@@ -148,16 +148,25 @@ function RC_CheckNoObjPms (|message| msg)
 			p++
 
 
-function RC_IgnoreReturn (|Message| msg)
+function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 	opt norefcounts
 	require RefBasis( msg, false ) == kBasisObj
 	require msg.func == @func
-	|| fn = msg.last!.obj|scfunction|
-	if fn isnt constructor	
-		parser.using.position = msg.position
-		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
-		msg.FuncWrap( free_if_dead )
-		parser.using.position = -1
+	
+	|| Prm = msg.last!
+	|| fn = Prm.obj|scfunction|
+	if fn is constructor
+		if self is Constructor					// calling a super, I hope.
+			|| first = prm.first
+			expect (first isthing "self") (first)
+			return
+		if fn isnt StoresSelf
+			problem (msg, "Object evaporates here?")
+			
+	parser.using.position = msg.position
+	|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
+	msg.FuncWrap( free_if_dead )
+	parser.using.position = -1
 
 
 function message.RefMsgToUse (|message|)
@@ -612,7 +621,7 @@ function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 	using arg
 	|| dcl = AR.WriteNilDecl
 	arg.First = dcl
-	.DeclInit( dcl, fn, true )
+	.DeclInit( fn, dcl, true )
 	dcl.remove
 
 
@@ -839,13 +848,12 @@ function SCFunction.AnalyseRefs (|[message]| list)
 			if .dorefs or (it != screfs.kBasisObj)
 				SCRefs.RC_HandleDisappearing( msg, it )
 	
-		
+	
 	// avoid reading same thing that we alter.
 	for (msg.ScanArg in root)
 		list <~ msg
 	// can we remove this ^^^ at some point?
-	
-	
+		
 	if .dorefs
 		for (ar in .args)
 			if (Ar is altered) and (ar.IsNormalObject)
@@ -861,19 +869,19 @@ function SCFunction.AnalyseRefs (|[message]| list)
 				SCRefs.RC_Rel( msg )
 			
 		  elseif (f == @Dot)
-			SCRefs.RC_IgnoreReturn( msg )
+			SCRefs.RC_IgnoreReturn( self, msg )
 			
 		  elseif (f == @Func)
 			if !.DoRefs
 				SCRefs.RC_CheckNoObjPms(msg)
 			SCRefs.RC_CheckFuncAllocOK( self, msg )
-			SCRefs.RC_IgnoreReturn( msg )  // func(a,b,c)
+			SCRefs.RC_IgnoreReturn( self, msg )  // func(a,b,c)
 			
 		  elseif (msg.IsStatementExpr)
-			SCRefs.RC_IgnoreReturn( msg )
+			SCRefs.RC_IgnoreReturn( self, msg )
 			
 		  elseif (f == @Decl)
-			SCRefs.DeclInit( msg, self, false ) // || a = b, incr(b)
+			SCRefs.DeclInit( self, msg, false ) // || a = b, incr(b)
 
 
 

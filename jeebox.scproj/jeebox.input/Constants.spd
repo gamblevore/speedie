@@ -63,7 +63,7 @@ Module Jeebox
 
 
 	libinternal InitConstants
-		array.new // needed by argv
+		|| Temp = array.new // needed by argv
 
 		.EscapeChr = dictionary.Copy(.EscapeStr!)
 		.EscapeStr[`$`] = `\$`
@@ -75,7 +75,7 @@ Module Jeebox
 
 		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
 		.Unescapestr![`\`]	= ""
-		.EscapeStr!["'"]		= nil|stringzeroterminated|
+		.EscapeStr!["'"]	= nil|stringzeroterminated|
 		
 		|| tfs = faststring()
 		for i in 256

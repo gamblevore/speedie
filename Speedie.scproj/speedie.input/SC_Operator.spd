@@ -16,9 +16,9 @@ datatype OpMode (int)
 		MakesSigned		// -
 		ExactlyEquals
 		EqualOrNot
-		Comparison  	// >  >=  <  <=
-		More  			// >				// if unsigned > 0
-		Less  			// <				// if 0 < unsigned
+		Comparison		// >  >=  <  <=
+		More			// >				// if unsigned > 0
+		Less			// <				// if 0 < unsigned
 		MoreOrEqual		// >=
 		LessOrEqual		// <=
 		NilTest			// not the same as EqualOrNot... because those include customops
@@ -53,10 +53,11 @@ linkage
 |string|		FuncName
 |fn_OpASM?|		OpASM
 |OpMode|		Kind
-|SCOperator--?|	Opposite 
+|SCOperator--?|	Opposite
 
 
 constructor (|string| name="", |fn_opasm?| ASM, |OpMode| mode=0)
+	stores_self
 	.name = name
 	.kind = mode
 	.OpASM = asm
@@ -68,9 +69,6 @@ syntax is (|OpMode| x, |opmode|)
 	
 render
 	fs <~ .name
-
-//function CaseAwareStr (|String|)
-//	return (self is caseaware)|bool|.string
 
 
 function SimpleName (|String|)
@@ -120,9 +118,9 @@ module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
 	|scoperator|						Assigns
-	|scoperator| 						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!
-	|scoperator| 						Subtract														// a-b!!
-	|scoperator| 						Bnot	= SCOperator.new(&Assembler.BitNot, opmode.Bit)
+	|scoperator|						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!
+	|scoperator|						Subtract														// a-b!!
+	|scoperator|						Bnot	= SCOperator.new(&Assembler.BitNot, opmode.Bit)
 	|scoperator|						LeftShift
 	
 	function Lookup ( |Message| opch, |SCOperator| )
@@ -183,7 +181,7 @@ module {
 		|| BitOr = .dict[ "(|)" ]
 		.dict["|"] = bitor // for: a |= b
 		.dict["|||"] = bitor
-		.dict["operatorsub"]= .dict["operatorminus"]
+		.dict["operatorsub"] = .dict["operatorminus"]
 		
 		// these two arent bits???
 		.AddBit( "is",		"is", nil, opmode.SyntaxIs )					// if obj is flag
@@ -327,6 +325,7 @@ function Message.OppExpand (|bool|)
 		return .AOrBExpand
 	if self == "init"
 		return .initexpand
+
 
 function Message.InitExpand (|bool|)
 	opt norefcounts

@@ -684,6 +684,7 @@ function FindClassType (|message| n, |scdecl|)
 	|| c = m.findclassmsg(n)
 		return c.typenormal
 
+
 function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
 	return compiler.program.FindModulemsg(where, Mode)
 

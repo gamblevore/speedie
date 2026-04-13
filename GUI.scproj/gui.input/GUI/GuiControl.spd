@@ -633,6 +633,7 @@ class GUIControl (list)
 		|float| PrevProgress
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
+			stores_self
 			upon.addtask(self)
 		
 		function TaskProgress (|date| now=gui.framestart, |float|)
