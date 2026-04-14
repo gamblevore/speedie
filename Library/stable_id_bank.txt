@@ -811,6 +811,7 @@ JB_API__Init
 JB_API__NilCallBack
 JB_API__NilHandler
 JB_API__Parse
+JB_ASM_BaseStack
 JB_ASM_Code
 JB_ASM_FillTable
 JB_ASM_Index
