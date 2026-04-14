@@ -196,8 +196,8 @@ function Message.BuildTask (|message| fields, |int| level)
 	
 || TaskMacro = `
 	role interface (task)
-		prototype prototype (^"_0")
-		syntax call (^"_0")
+		prototype prototype (^"_0")			// wierd syntax to give the list a name of _0
+		syntax call (^"_0")					// this helps the macro system to find the list by name.
 			return (._func|prototype|)()
 `.macro
 

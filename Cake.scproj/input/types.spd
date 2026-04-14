@@ -2,25 +2,32 @@
 
 class XType
 	|XType?|		Super
-	// what about the size? we need it for memory-checking...
 	|bool|			IsObject
-	|message|		Name
+	|bool|			IsLib
+	|message|		Msg
 	|[XVar]|		Properties
 	
 	constructor
-		.name = @emb+"(unreached)"
+		.msg = @emb + "(unreached)"
 	
 	constructor (|message| msg, |int| index)
 		opt norefcounts
 		|| Sup = msg[@nil]
 		|| SupIndex = Sup.Int
+		.IsLib = msg == @tmp
 		.IsObject = SupIndex & 1
-		.name = msg//.name
+		.msg = msg
+		// hmm.... did we get these twice?
+		// if an object subclasses from message, whats the super-index?
+		// thats no fun.
 		.Super = xtype.GetType(SupIndex, Sup)
-		|| jbcls = cakerun.ClassTable.valuelower(.name.name)|&Classdata|
+		|| JBCls = cakerun.ClassTable.valuelower(.msg.name)|&Classdata|
 			jbcls.Index = index
 
-
+	
+	function Name (|string|)
+		return .msg.name
+		
 	operator in (|xtype| Sup, |bool|)
 		opt norefcounts
 		while self
@@ -38,27 +45,24 @@ class XType
 		|XType|			Unreached = xtype()
 		|[XType]|		Types
 
-		function LoadTypes (|message| Pack, |message| Lib)
+		function LoadTypes (|message| Pack)
 			opt norefcounts
-			|| i = .LoadTypesSub(lib, 0)
-			.LoadTypesSub(pack, i)
+			.LoadTypesSub(pack)
 
 			for T in .types
-				|| P = T.name.Second
+				|| P = T.msg.Second
 					P.xvariables(nil, T.properties)
 		
 		
-		function LoadTypesSub (|message| list, |int| i, |int|)
+		function LoadTypesSub (|message| list)
 			opt norefcounts
-			
+			|| i = 0
 			for Type.fast in List
 				++i
-				if type.func == @msg
+				if type.func == @msg or @tmp
 					.types <~ XType(Type, i)
 				  else
 					.types <~ .unreached
-			
-			return i
 		
 		
 		function GetType (|int| i, |message| err, |xtype|)

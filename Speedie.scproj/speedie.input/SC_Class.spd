@@ -40,7 +40,7 @@ linkage
 |SCDecl|					TypeNormal
 |SCDecl|					TypeOptional
 |SCDecl|					TypeReal
-|[SCFunction]|  			Casts
+|[SCFunction]|				Casts
 |[SCClass]|					Children
 |SCDecl?|					Contained
 |scdecl?|					Signed								// int/uint
@@ -55,14 +55,14 @@ linkage
 |SCDecl?|					ClassType
 |SCDecl|					SelfDecl
 |Message?|					IsModel
-|SCBehaviour?|   			Behaviour
+|SCBehaviour?|				Behaviour
 |SCClass?|					ProcessAs
 |SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
 //|(&ClassData)?|				InbuiltClass
 |ClassInfo|					Flags
-|DataTypeCode|  			TypeInfo
-|DataTypeCode|  			ASMTypeInfo
+|DataTypeCode|				TypeInfo
+|DataTypeCode|				ASMTypeInfo
 |uint16|					TableID
 |uint16|					ClsSizeRaw
 |uint16|					ClsSize			// use scdecl.ByteSize to find the size of this in a var.
@@ -74,7 +74,7 @@ linkage
 |byte|						IsWrapper
 
 |byte|						IsRole
-|SCNodeType| 				BaseType
+|SCNodeType|				BaseType
 
 
 constructor (|Message| node, |bool| HasPtrs, |scmodule| m)

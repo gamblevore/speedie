@@ -10,8 +10,8 @@ module CakeRun
 		FuncIsLib = 1
 	
 
-	function LibDebug (|string|)
-		cpp_Wrapper JB_App__LibDebug		// needs to be used somehow
+	function LibDebug (|string|)			// I think this should be just for comparison.
+		cpp_Wrapper JB_App__LibDebug		// just check the types are the same size, properties the same, etc.
 
 	function LibFuncs (|&&nil|)
 		cpp_wrapper JB_App__LibFuncs

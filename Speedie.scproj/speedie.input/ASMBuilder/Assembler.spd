@@ -35,7 +35,7 @@ struct Assembler
 	|uint|						VDecls_
 	|uint|						VTemps_
 	|byte|						CurrFuncGrab
-	|bool|						NeedsRework // hoisting
+	|bool|						NeedsRework				// hoisting
 	|scfunction--|				Out
 
 	|byte|						BreakRequest
@@ -61,34 +61,6 @@ struct Assembler
 		|uint16|					StringsOutOfRange
 		|jbin?|						DebugDecls
 		|uint16[16K]|				BlockParents
-		
-		function ClassLayout (|jbin| j)
-			opt norefcounts
-			|| names = FastString()
-			for c in Compiler.ReachedClassTable
-				if !c.isrole and !c.IsBehaviourTable and (c.IsLibrary == options.MakeExec)
-					c.exportname.MiniName(names, c.IsObject)
-					j.Enter(@msg, names|string|)
-					names.Length = 0
-					c.ListLayout(j)
-					j.exit
-				  else
-					j.add(@char)
-
-
-		function DebugClassesAndGlobals (|jbin| j)
-			opt norefcounts
-			j.Enter(@msg, "type")
-			.ClassLayout(j)
-			j.exit
-			
-			j.Enter(@msg, "glob")
-			|| G = PackMaker.LibGlobs
-			if !options.makeexec
-				g = PackMaker.PackGlobs
-			j.PropertyLayout(G)
-			j.exit
-		
 
 	
 	function State (|&InlineState|)

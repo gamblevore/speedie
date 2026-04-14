@@ -138,10 +138,10 @@ module debugger
 	function LoadLibAndGlobs (|message| PackInfo)
 		opt norefcounts
 		|| LibInfo = cakerun.LibDebug.parse
-		xtype.LoadTypes(PackInfo["type"], libinfo["type"])
+		xtype.LoadTypes(PackInfo["type"])
 		
 		.Globs = PackInfo.giveitem("glob", @msg)
-		|| LibGlobs = LibInfo["glob"]
+		|| LibGlobs = LibInfo["glob"]						// probably need to keep the libglobs.
 			.globs.Appendall(libglobs)						// merge!
 	
 	

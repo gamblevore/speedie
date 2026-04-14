@@ -718,7 +718,7 @@ extend PerryIDE
 
 	function AddDebugButtons (|GUIAction| action, |string| icon, |string| id)
 		|| btn = buttonview(.DebugBtns, action)
-		btn.size = 5~after for 22  by  3~inside
+		btn.size = 5~after for (22*icon.length)  by  3~inside
 		btn.id = id
 		btn.Tooltip = id
 		btn.Text = icon

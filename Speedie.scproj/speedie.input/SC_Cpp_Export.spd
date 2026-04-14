@@ -649,7 +649,7 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 
 	.WriteVMFuncs(fs)
 	|| j = jbin()
-	Assembler.DebugClassesAndGlobals(j)
+	packmaker.DebugClassesAndGlobals(j)
 
 	fs <~ "};
 

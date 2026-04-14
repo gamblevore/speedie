@@ -208,8 +208,8 @@ class InputStream
 	
 
 	iterator
-        while
-		    || _b = .byte
+		while
+			|| _b = .byte
 			if (_b < 0): exit
 			yield (_b) (.Position)
 		

@@ -186,7 +186,7 @@ module PackMaker
 		|faststring--| p = SourceMap.Positions$
 		|| JL = J.Length
 		j.tmparg("debug")
-		assembler.DebugClassesAndGlobals(j)
+		.DebugClassesAndGlobals(j)
 		j.addrow(@bin, "pos", p|string|)
 		j.addrow(@str, "files", SCImport.AllFiles.join("\n").Compress)
 
@@ -230,8 +230,9 @@ module PackMaker
 	function PackClasses (|jbin| j, |bool| Lib)
 		opt norefcounts
 		for c in Compiler.ClassList
-			if (c.islibrary == Lib) and c.NeedsPackExport
-				C.DescribeInPack(j)
+			if (c.islibrary == Lib)
+				if c.NeedsPackExport
+					C.DescribeInPack(j)
 
 
 	function AnyClassesNeeded (|bool|)
@@ -244,6 +245,7 @@ module PackMaker
 	function BakeClasses (|jbin| j)
 		if .AnyClassesNeeded
 			j.TmpArg("clss")
+//			.ReachSupers
 			.PackClasses(j, true)
 			.PackClasses(j, false)
 			j.exit(2)
@@ -251,14 +253,13 @@ module PackMaker
 	
 	function SCClass.NeedsPackExport (|bool|) // needsexport, needexport, PackneedsExport
 		opt norefcounts
-		require .isobject and !.IsRole
+		require .isobject and !.IsRole and !.IsBehaviourTable
 		|| R = .MyReacher
 		require r and !r.IsLibrary
 		
 		if .IsLibrary // what about lib only?
 			require self|scnode| isnt EmbeddedOnly
-			require .ClassType is ASMReached
-			if self|scnode| is libonly // now what?
+			require (.ClassType is ASMReached)// or (!r.islibrary)
 			
 		return true
 
@@ -294,18 +295,18 @@ module PackMaker
 		|| sz = .clssize
 		j.enter(@tmp, .name.lowercase)
 		
-		j.Enter(@list)     //////     //////     //////
+		j.Enter(@list)		//////		//////		//////
 		j.AddhInt(.classtype!.ExportPosition)
 		if !.IsLibrary
 			j.Add(@thg, .super!.name.lowercase)
 			j.addhint(sz)
-		j.exit     		   ///
+		j.exit				///
 		
-		if !.IsLibrary     //////     //////     //////
+		if !.IsLibrary		//////		//////		//////
 			j.enter(@list)
 			j.Cakeify(.destructorfunc)
 			.CollectBehaviours(j, B)
-			j.exit    	  ///
+			j.exit			///
 		j.exit
 
 
@@ -385,3 +386,50 @@ function Message.IsCake (|bool|)
 		require s.first istmp "code"
 		return true // ooof. its actually a cake file.
 
+
+/////
+
+
+
+
+function scclass.NeedsClassLayout (|bool|)
+	opt norefcounts
+	require !.isrole
+	require !.IsBehaviourTable
+	if (.IsLibrary == options.MakeExec)
+		return true
+	|| r = .MyReacher
+		if R.IsLibrary == Options.MakeExec
+			return true
+
+
+function packmaker.ClassLayout (|jbin| j)
+	opt norefcounts
+	|| names = FastString()
+	for c in Compiler.ReachedClassTable
+		if c.NeedsClassLayout
+			c.exportname.MiniName(names, c.IsObject)
+			|| fn = @msg
+			if c.IsLibrary
+				fn = @tmp // whatever
+			j.Enter(fn, names|string|)
+			names.Length = 0
+//					j.addhint(c.IsLibrary|int|)
+			c.ListLayout(j)
+			j.exit
+		  else
+			j.add(@char)
+
+
+function packmaker.DebugClassesAndGlobals (|jbin| j)
+	opt norefcounts
+	j.Enter(@msg, "type")
+	.ClassLayout(j)
+	j.exit
+	
+	j.Enter(@msg, "glob")
+	|| G = PackMaker.LibGlobs
+	if !options.makeexec
+		g = PackMaker.PackGlobs
+	j.PropertyLayout(G)
+	j.exit
