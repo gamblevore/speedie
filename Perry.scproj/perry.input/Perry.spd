@@ -264,7 +264,7 @@ function NoNeed (|string| s = "", |buttonview| old = nil)
 	|bool| Vis = s
 	(n is visible) = vis 
 	if !vis
-		n.tag = old
+		n.obj = old
 
 
 function CheckViewWorthIt (|buttonview| old)

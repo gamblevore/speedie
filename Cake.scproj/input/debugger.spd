@@ -99,7 +99,7 @@ module debugger
 		// just dumps everything. Useful for testing the system even works.
 		opt norefcounts
 		if ErrorCode
-			return .PrintCrashTrace(ErrorCode, Stack)
+			return .PrintCrashTrace(Stack)
 		if debugger.VariablePrinter
 			|| index = .Index(Stack.code)
 			if index|uint| >= debugger.dbgLength

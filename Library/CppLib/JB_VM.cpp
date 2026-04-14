@@ -26,22 +26,20 @@ uint			CrashCount;
 #ifdef __VM__
 #pragma GCC optimize ("Os")
 
-#define kReallyFarOut	-4							// Really far out
-#define kTooFarBack		-3							// Gone back. Must be corrupt.
-#define kOverFlowStack	-2
-#define kStillInRange	-1
-#define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
-#define	VMCodePtr(V)	((ASM*)(((byte*)(V)) + 1024*1024))
-#define	CanDebug(V)		(((uint64)(V))>>63)
+#define kOverFlowStack		-2
+#define kStillInRange		-1
+//#define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
+#define	VMCodePtr(V)		((ASM*)(((byte*)(V)) + 1024*1024))
+#define	CanDebug(V)			(((uint64)(V))>>63)
 
 
 #include "BitFields.h"
 #include "JB_VM.h"
 #include "JB_VM_Helpers.i"
 
+#define		ı				Op = *Code++;   goto *JumpTable[Op>>24];
+#define		ErrStck			(1<<10)
 
-#define		ı						Op = *Code++;   goto *JumpTable[Op>>24];
-#define		ErrStck					(1<<10)
 
 
 ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
@@ -58,6 +56,7 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 	vm = VMClearHigh(vm);
+	Code = VMClearHigh(Code);
 	ASM* Start = VMCodePtr(vm);
 	int64 Diff = Code - Start;
 	if ((uint64)Diff < CakeCodeMax)
@@ -149,6 +148,7 @@ static void * const GlobalJumpTable[] = {
 	
 	TRYBREAK:; {
 		auto BreakValue = ++(Code[CakeCodeMax-1]);
+		((CakeStack*)(r))[-1].Code = Code-1;		// save for crash-debug
 		if_usual (!(BreakValue & 0x80000000))
 			goto *JumpTable[256+(Op>>24)];			// Resume
 		if_rare (!(BreakValue<<1)) {				// Accidental trap from 2GB loop.
@@ -285,13 +285,37 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 	
 	Signal |= 128;
 	V->CakeFail = Signal;
-	(V->__VIEW__)(V, Stack, ErrorKind, 0);				SubCrash = 30;
+	Stack = VMClearHigh(Stack);
+	(V->__VIEW__)(V, Stack, Signal, 0);					SubCrash = 30;
 	JB_ErrorHandleFileC(nil, Signal, ErrStr);			SubCrash = 40;
 	V->Registers[2] = {.Int = Signal};
 	
 	return 0; 
 }
 
+
+static CakeStack* GetMaxStack (CakeVM* V) {
+	auto Curr = &(V->Registers[2].Stack);
+	while (true) {
+		int Up = Curr->GoUp;
+		if (Up < 1 or Up > 31)
+			return Curr;
+		auto Stack = Curr + Up;
+		if (Stack >= &(V->Registers[CakeStackSize/sizeof(CakeRegister)].Stack))
+			return Curr;
+		Curr = Stack; // escaped?
+//struct CakeStack {
+//	u32*		Code;
+//	uint		Dummy;			
+//	byte		GoUp;
+//	byte		DestReg;
+//	u16			Depth;
+//};
+	}
+	
+	return Curr;
+	
+}
 
 static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 	if (SubCrash) {
@@ -300,14 +324,13 @@ static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 	}													SubCrash = 2;
 	Signal |= 128;
 	errno = Signal;
-	//int ErrorKind = StackOverFlow(V);					SubCrash = 4;
-	//auto Stack = V->CurrStack;						SubCrash = 20;
-	CakeCrashedSub(V, -1, nil, Signal);
+	
+	CakeCrashedSub(V, kStillInRange, GetMaxStack(V), Signal);
 	return 0;
 }
 
 
-static void CakeCorrupt (int Sig) {
+void CakeCorrupt (int Sig) {
 	CrashCount++;
 	longjmp(CakeRestore, Sig);
 }

@@ -1143,7 +1143,18 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
 // It could be very good to combine with reworking the constructor/new/alloc system which is
 // overcomplex... Also allows for a simpler disposer...
 
+//#ifdef PerryExec
+//	struct CakeVM;
+//	extern CakeVM* Cake__Cake_VM;
+//#endif
 __hot void JB_Delete( FreeObject* Obj ) {
+//#ifdef PerryExec
+//		static int x = 0;
+//		x++;
+//		void CakeCorrupt (int Sig);
+//		if (x == 612 and Cake__Cake_VM)
+//			CakeCorrupt(SIGSEGV);
+//#endif
 	AllocationBlock* Block = ObjBlock_(Obj);
 	Sanity(Block);
 	fpDestructor Destructor = GetDestructor_(Block);
@@ -1154,7 +1165,6 @@ __hot void JB_Delete( FreeObject* Obj ) {
 }
 
 
-void JB_Array_Append(Array* R, JB_Object* Obj);
 
 static void BlockFindLeakedObject_(AllocationBlock* Block, JB_Object* Obj, Array* R) {
 	if (IsDummy(Block)) { // how???
@@ -1169,6 +1179,7 @@ static void BlockFindLeakedObject_(AllocationBlock* Block, JB_Object* Obj, Array
 		if (JB_RefCount(S) < 1000) {
 			while (Prop < PropEnd) {
 				if (*Prop == Obj) {
+					void JB_Array_Append(Array* R, JB_Object* Obj);
 					JB_Array_Append(R, S);
 					break;
 				}

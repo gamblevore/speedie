@@ -53,12 +53,14 @@ datatype StepAction (uint)
 
 
 
-function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name)
+function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name, |int| ErrorCode)
 	opt norefcounts
-	|| j = .StartStack(name)
-	|| file = .StackToPerry(stack, 0, j)
+	if ErrorCode
+		name = "crash"
+	|| j = .StartStack(name, ErrorCode)
+	|| file = .StackToPerry(stack, j)
 	perry <~ j
-	if file
+	if !ErrorCode and file
 		perry.SendBreaks(file)
 
 
@@ -69,11 +71,10 @@ function __PerryView__ (cakevm.CakeChef)
 	if !p.IsOpen
 		app.Quit							// Stop the runaway!
 	
-	if (ErrorCode)
-		p <~ "crashed " + ErrorCode			// allow them to fix their memory and resume...
-
-	.ClearTempBreak(stack)
-	.SendStack(stack, p, "break")
+	if !ErrorCode
+		.ClearTempBreak(stack)
+	
+	.SendStack(stack, p, "break", ErrorCode)
 
 	|| Stopped = (Break>>31)!=0
 	while
@@ -82,7 +83,7 @@ function __PerryView__ (cakevm.CakeChef)
 		|| m = p.Get(5.0)
 			|| Action = .Respond(m, stack)
 			if Action is SendVars
-				.SendStack(stack, p, "stack")
+				.SendStack(stack, p, "stack", ErrorCode)
 			if Action is pause
 				Stopped = true
 			if !ErrorCode and .GoRun(p, stopped, Action)
@@ -110,7 +111,6 @@ function RunAction (perryresponse)
 	opt norefcounts
 	.SetBreakLevel(2-(m.firstname=="fast"))
 	return StepAction.gorun
-
 
 
 function Debugger.SourceMap (|&SourceMap|)
@@ -262,7 +262,7 @@ function cakevm.Respond (|message| m, |cakestack| stack, |StepAction|)
 	return StepAction.DoNothing
 
 
-function cakevm.StartStack (|string| name, |jbin--|)
+function cakevm.StartStack (|string| name, |int| ErrorCode,  |jbin--|)
 	|jbin--| j = XVar.printer
 	j.Start(@tmp, name)
 	{
@@ -282,6 +282,11 @@ function cakevm.StartStack (|string| name, |jbin--|)
 			j.AddhInt(PS.OpenPicos)
 			j.exit
 		}
+		{
+			j.enter(@list)
+			j.AddHint(ErrorCode)
+			j.exit			
+		}
 		j.exit
 	}
 	j.Enter(@arg)
@@ -289,12 +294,12 @@ function cakevm.StartStack (|string| name, |jbin--|)
 
 
 
-function cakevm.StackToPerry (|cakestack| stack, |int| Count, |jbin| j, |filewithdata|)
+function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata|)
 	opt norefcounts
+	|| Count = 0
 	while stack
 		|| err = .CheckStack(stack)
-		if err != nil
-			j.add(@tmp, err)
+		if err != nil			j.add(@tmp, err)
 			exit
 		|| File = .CollectStack(stack, j, Count++)
 			rz = file

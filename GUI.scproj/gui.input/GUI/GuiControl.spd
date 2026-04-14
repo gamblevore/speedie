@@ -46,6 +46,7 @@ class GUIControl (list)
 		is Drawsfocus
 
 	setter tag (|object|)
+		disabled "use .obj"
 		inlined
 		.obj = value
 		

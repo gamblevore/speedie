@@ -27,8 +27,8 @@ class FileViewer (ListView)
 		.ColumnFinder		= FileRowCell
 		.gnormal.textcolor	= 0xFF6FB6D7
 		
-		.quickopen.tag = self
-		.listopen.tag = self
+		.quickopen.obj = self
+		.listopen.obj = self
 	
 	
 	destructor

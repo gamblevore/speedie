@@ -559,19 +559,19 @@ AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* Debu
 	(DebugCode);
 	auto Stack	= (CakeStack*)(R0 - 1);
 	int StepBack= Stack->DestReg;
-	auto Imm	= RET_Valuei;					// get before copy!
+	auto Imm	= RET_Valuei;						// get before copy!
 	auto Src	= R0 + n1;
 	
 	*((CakeRegister*)Stack) = *Src;
 	((CakeRegister*)Stack)->Uint |= Imm;			// immediate
 	
 	auto NewR0 = (CakeRegister*)(Stack-StepBack);
-	R0			= NewR0;						// NewZero
+	R0			= NewR0;							// NewZero
 	Stack		= (CakeStack*)(NewR0 - 1);
 //	vm.CurrStack = Stack;
 	auto Code	= Stack->Code;
 	Stack->GoUp = 0;
-//	*R0			= {};							// unnecessary?
+//	*R0			= {};								// unnecessary?
 	
 	return Code;
 }

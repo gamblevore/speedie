@@ -270,11 +270,7 @@ int JB_SP_Run (_cstring* Args, int Mode)	{ // JB_SP_Main
 	}
 	JB_Active &= ~1;
 	
-	return JB_ErrorNumber; // we need this info. why were we throwing it away?
-//	byte b = JB_ErrorNumber;
-//	if (b >= 128)
-//		b = EINVAL;
-//	return b;
+	return JB_ErrorNumber;
 }
 
 

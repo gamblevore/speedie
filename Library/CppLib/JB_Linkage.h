@@ -2,6 +2,8 @@
 
 extern "C" {
 
+#define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
+
 JB_String* JB_Platform();
 bool JB_Platform__OSX();
 bool JB_Platform__Win();
@@ -132,6 +134,14 @@ ivec4*	JB_ASM_Registers	(CakeVM* V, bool Clear);
 uint*	JB_ASM_SetDebug		(CakeVM* V, int Level);
 void	JB_ASM_LinkPico		(CakeVM* V, PicoComms* P, PicoActionFn Fn);
 void	JB_ASM_Pause		(CakeVM* V);
+inline CakeStack* JB_ASM_BaseStack (CakeVM* V) {
+	V = VMClearHigh(V);
+	return (CakeStack*)(V->Registers+2);
+}
+
+bool		JB_Cake__Prepare (int N, int B);
+JB_Class*	JB_Cake__Class (const char* Name, int Size, JB_Class* Parent, int VCount);
+void**		JB_Cake_Virtuals(JB_Class* C);
 
 } // ExternCEnd
 

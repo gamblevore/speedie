@@ -35,7 +35,7 @@ module Notifications
 			sz = (width)~left  by  (height)~up back height
 		  elseif !(w contains GUI.mousexy)				// swap-direction
 			w.CreatedDate = gui.FrameStart
-			w.tag = nil
+			w.obj = nil
 				
 		w.Size = sz
 		return true
@@ -51,7 +51,7 @@ module Notifications
 				n.firstname.Reveal
 			  else
 				clipboard.text = T.name
-		w.tag = nil
+		w.obj = nil
 		w.CreatedDate = gui.FrameStart
 	
 	
@@ -91,7 +91,7 @@ module Notifications
 		if note.path
 			s = (s + "\n\"") + (note.path + "\"")
 		|| w = .NewWindow(s)
-			w.tag = note
+			w.obj = note
 			if note.IsError
 				printerror s
 				printerror "\n"

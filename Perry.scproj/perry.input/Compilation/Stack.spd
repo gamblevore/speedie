@@ -17,7 +17,7 @@ function CakeTalk (|SpdProcess| Cake)
 		.UpdateDebugButtons(true)
 	  else
 		.DelayedRun = nil
-		if msg ~= "stack" or "break"
+		if msg ~= "stack" or "break" or "crash"
 			.UpdateStack(msg)
 		  elseif msg ~= "hoi :3"
 			.GotHello(msg.name)
@@ -60,18 +60,23 @@ function GotHello (|string| msg)
 											// But as long as it runs instantly, it should be OK?
 
 
-function AppInfoExtra (|unixprocess| r, |string|)
+function AppInfoExtra (|UnixProcess| r, |string|)
 	if !r
 		return "Inactive"
 	|| st = r.Status
 	if st == 0
 		return "Exit OK"
+	
 	if (r isa SpdProcess) and st.IsRunning
-		if .DebugMode is Finished
+		|| DB = .DebugMode
+		if DB is Finished
 			return "Killed" // right?
-		if .DebugMode isnt ReceivedHello
+		if DB is Crashed
+			return "Crashed"
+		if DB isnt ReceivedHello
 			return "Waiting..."
 		return ""
+	
 	if st.IsRunning
 		return "Running"
 	return st.Name
@@ -104,19 +109,42 @@ function ExtraAppInfo (|faststring| fs)
 function UpdateDebugButtons (|bool| ForceRunning=false, |bool|)
 	opt norefcounts
 	|| r = .RunCompiledApp
-
-	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (.debugmode isnt finished)
-	|| Paused = .DebugMode is paused
+	|| D = .DebugMode
+	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (D isnt finished)
+	|| Paused = D is paused
 	if ForceRunning
 		paused = false
 
 	for btn in .DebugBtns
 		|| Last = btn.IsLast
 			btn.text = ("\02\02" (paused) "\0E")
-		(btn is enabled) = CanDebug and (Paused or Last)
+		|| On = CanDebug and (Paused or Last) and (D isnt crashed)
+		(btn is enabled) = On
 	
 	return CanDebug
 
+
+function AppInfoWrite (|faststring| fs, |message| info, |string| extra)
+	opt norefcounts
+	if extra
+		fs <~ "\n("
+		fs <~ extra
+		if .DebugMode is Crashed
+			fs <~ " "
+			|| Err = info[2].first.int|ErrorInt|
+			|| name = err.name
+			|| m = .editme._ActiveLine
+				m.clear
+				m <~ name
+			fs <~ name
+		fs <~ ")"
+
+	|| mem = 0
+	for c.fast in info.first
+		mem += c.int
+	if mem
+		fs <~ "\n"
+		mem.StrSize(Fs)
 
 
 function SetAppInfo
@@ -124,7 +152,7 @@ function SetAppInfo
 	|| CanDebug = .UpdateDebugButtons
 
 	if !CanDebug
-		.AppInfo.tag = nil
+		.AppInfo.obj = nil
 	if !CanDebug or .DebugMode isnt paused
 		.editme._ActiveLine = nil
 		.stack.clear
@@ -135,17 +163,10 @@ function SetAppInfo
 	|| r = .RunCompiledApp
 		fs <~ ": "
 		fs <~ r.pid
-	
-	|| extra = .AppInfoExtra(r)
-		fs <~ "\n("
-		fs <~ extra
-		fs <~ ")"
-	
-	|| l = (.AppInfo.obj as message).first
-		|| mem = l.first.int + l.second.int + l[2].int
-			fs <~ "\n"
-			mem.StrSize(Fs)
 
+	|| Info = .AppInfo.obj as message
+	|| extra = .AppInfoExtra(r)
+	.AppInfoWrite(fs, info, extra)
 	.AppInfo.text = fs
 
 	if .MyStatsMode == 0
@@ -337,7 +358,7 @@ function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
 	|| arg = stack.last$
-	.appinfo.tag = stack.first			// Nice info about RAM/Pico :]
+	.appinfo.obj = stack.first			// Nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
 	
 	for m in Arg
@@ -349,15 +370,22 @@ function perryide.UpdateStack (|message| stack)
 	StackSrc.StitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
 	
-	|| Break = stack == "break"
-		|| f = .stack.liststart
-		if f and !.stack.FirstSelected
-			.stack.ExpandRow(f)
-		.ClickedStack(F, true)
+	|| Break = stack != "stack"
+		|| f = .stack.liststart|listviewrow|
+			if !.stack.FirstSelected
+				.stack.ExpandRow(f)
+		
 		|| m = .DebugMode
-		if M isnt Paused
-			(m is paused)
+		|| crash = stack == "crash"
+			if f
+				(f is Error)
+			(M is Crashed)
+		|| l = .editme._ActiveLine
+			l.Flags = crash|int|
+		(m is paused)
 		.DebugMode = m
+
+		.ClickedStack(F, true)
 	.SetAppInfo
 
 

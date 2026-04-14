@@ -10,6 +10,7 @@ datatype CompileMode (int)
 		ReceivedHello
 		Paused
 		Finished
+		Crashed
 		
 	syntax is (|CompileMode| M, |bool|)
 		return (self&M) == M

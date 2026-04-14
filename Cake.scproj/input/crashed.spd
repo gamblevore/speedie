@@ -1,7 +1,7 @@
 
 
-function CakeVM.PrintCrashTrace (|int| Err, |?&CakeStack| LastStack,  |int64|)
-	opt norefcounts, (err)
+function CakeVM.PrintCrashTrace (|?&CakeStack| LastStack,  |int64|)
+	opt norefcounts
 	"****** CRASHED ******"
 	if debugger.OverFlowTrack // in case we crash during a stack-trace
 		"! Crashed during CrashTrace"

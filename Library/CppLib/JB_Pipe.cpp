@@ -98,11 +98,18 @@ int JB_Sh_Kill (ShellStream* F, int Code) {
 
 JB_StringC* JB_Err_SignalName (int Sig) {
 	const char* S = "NormalExit";
-	if (Sig) S = strsignal(Sig);
+	if (Sig) {
+		Sig &= ~128;
+		S = "UnknownSignal";
+		if (Sig)
+			S = strsignal(Sig);
+	}
 	return JB_StrC(S);
 }
 
 JB_StringC* JB_Err_Name (int Err) {
+	if (Err >= 128)
+		return JB_Err_SignalName(Err);
 	return JB_StrC(strerror(Err));
 }
 

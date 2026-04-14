@@ -199,10 +199,6 @@ struct JBSaver_Behaviour {
 };
 
 
-bool		JB_Cake__Prepare (int N, int B);
-JB_Class*	JB_Cake__Class (const char* Name, int Size, JB_Class* Parent, int VCount);
-void**		JB_Cake_Virtuals(JB_Class* C);
-
 
 void JBClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
 inline JB_Class JBClassInit (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {

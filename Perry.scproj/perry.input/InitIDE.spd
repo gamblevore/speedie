@@ -600,7 +600,7 @@ extend PerryIDE
 		rz.name = obj.id
 		root <~ rz
 		rz.obj = obj
-		obj.tag = rz
+		obj.obj = rz
 
 
 	function textview.SetupOut (|string| name, |documentjeeboxmode| Parse=documentjeeboxmode.expect)
@@ -692,7 +692,7 @@ extend PerryIDE
 
 	function AddViewButton (|ButtonView| BTN, |string| Oof, |guicontrol| tag)
 		.ViewButtons <~ btn
-		btn.tag		= tag
+		btn.obj		= tag
 		.addlbutton(Btn, oof, tag.id, tag.tooltip)
 		btn.id		= "btn_"+tag.id
 		btn.size	= 3~after for 21  by  1~down back 13

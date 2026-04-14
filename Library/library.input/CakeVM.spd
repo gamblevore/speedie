@@ -42,8 +42,8 @@ target cpp or vm {
 //	function Prev		(|cakestack| Stack, |cakestack|)
 //		cpp_wrapper JB_ASM_PrevStack
 
-	inline BaseStack (|&CakeStack|)
-		return .registers(false)|&cakestack| - 2
+	function BaseStack	(|&CakeStack|)
+		cpp_wrapper JB_ASM_BaseStack
 	
 	function Action		(|Pico| P, assigns:|PicoActionFn|)
 		cpp_wrapper JB_ASM_LinkPico

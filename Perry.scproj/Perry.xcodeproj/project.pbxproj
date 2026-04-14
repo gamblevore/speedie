@@ -1275,6 +1275,7 @@
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
 					"-D__VM__",
+					"-DPerryExec",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1322,6 +1323,7 @@
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
 					"-D__VM__",
+					"-DPerryExec",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";

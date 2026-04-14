@@ -68,6 +68,7 @@ class TextViewLine (list)
 	inline SyntaxIs (|TextLineFlags| F, |bool|)
 		return .TextState&F
 
+	
 	function syntaxis (|TextLineFlags| F, assigns:|bool|)
 		|| T = .textstate&~F
 		T |= F*value
@@ -229,7 +230,7 @@ class TextViewLine (list)
 		return .text.last.IsTextLine
 
 
-	libinternal DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
+	libinternal DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| G)
 		opt min 3
 		|| M = .Range
 		require (r.x <= m.x2) and (r.x2 >= m.x)
@@ -434,14 +435,18 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		if .MyError
 			.DrawErrorBackground(where, y+GoUp, d)
 		  else
-			d.LineError = nil							// sigh. crappy bug fix
+			d.LineError = nil								// sigh. crappy bug fix
 	
 	|| m = ._ActiveLine
-		if d contains m.Position
-			|| f = .FilePath
-			if m ~= f
-				|| bg = ¥.ActiveTextLine
-				.Drawbackground(where, y + GoUp, bg)
+	if (m) and (d contains m.Position) and (m ~= .FilePath)
+		|| bg = ¥.ActiveTextLine
+		if m.flags&1
+			bg = colors.red(0.25).px
+		.Drawbackground(where, y + GoUp, bg)
+		|| str = m.firstname
+			|| x = .LastRight - (.gnormal.width(str) + 10)
+			where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
+
 
 	if .CanDrawSelected(d)									// linelight
 		(d is Selected)
@@ -453,11 +458,10 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		|| col = vec4(0)
 		if (._ActiveLine) and (d is realbreakpoint)!=(d is BreakPoint)
 			col = (1.0, 1.0, 0.75, 0.375)
-			if d is realbreakpoint
+			if d is realbreakpoint // purplebug!
 				col = colors.blue(0.375)
 		state.font.DrawChar('\18', Where, (x, y), col, 0)
 		
-	
 	|codepoint| Prev
 	|| xlimit = .lastrect.x2
 	|| SpaceDisplay = .SpaceDisplayAsDot(d)
