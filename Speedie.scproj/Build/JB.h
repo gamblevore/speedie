@@ -1609,7 +1609,6 @@ extern Dictionary* SC__SCGame3D_Types;
 extern int SC__SC_UniqueNum;
 #define kSC__Refs_kBasisCArray ((int)8)
 #define kSC__Refs_kBasisDeSTRUCTable ((int)2)
-#define kSC__Refs_kBasisNotObj ((int)0)
 #define kSC__Refs_kBasisObj ((int)1)
 #define kSC__Refs_kBasisTempStruct ((int)4)
 #define kSC__Refs_kHoldsDisowned ((int)128)
@@ -1666,7 +1665,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2429])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2432])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1806,10 +1805,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2428])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2427])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2431])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2430])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2426])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2429])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2228,7 +2227,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__FunctionType_CantInline ((FunctionType)131072)
 #define kSC__FunctionType_ConOrDes ((FunctionType)3)
 #define kSC__FunctionType_Constructor ((FunctionType)1)
-#define kSC__FunctionType_Cpp ((FunctionType)134217728)
+#define kSC__FunctionType_Cpp ((FunctionType)268435456)
 #define kSC__FunctionType_Destructor ((FunctionType)2)
 #define kSC__FunctionType_Disabled ((FunctionType)2097152)
 #define kSC__FunctionType_DontCheckInCakeLib ((FunctionType)2097216)
@@ -2250,10 +2249,11 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__FunctionType_Reffer ((FunctionType)4)
 #define kSC__FunctionType_Render ((FunctionType)16384)
 #define kSC__FunctionType_Stateless ((FunctionType)16777216)
+#define kSC__FunctionType_StoresSelf ((FunctionType)67108864)
 #define kSC__FunctionType_TypeTest ((FunctionType)32)
-#define kSC__FunctionType_UsedByASM ((FunctionType)268435456)
+#define kSC__FunctionType_UsedByASM ((FunctionType)536870912)
 #define kSC__FunctionType_VirtualCaller ((FunctionType)512)
-#define kSC__FunctionType_Wrapper ((FunctionType)67108864)
+#define kSC__FunctionType_Wrapper ((FunctionType)134217728)
 #define kJB__MaybeBool_False ((MaybeBool)0)
 #define kJB__MaybeBool_MaybeFalse ((MaybeBool)8)
 #define kJB__MaybeBool_MaybeTrue ((MaybeBool)9)
@@ -2437,17 +2437,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2422])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2425])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2423])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2426])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2427])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2421])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2424])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2424])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2427])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2428])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2504,7 +2504,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2420])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2423])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -3289,6 +3289,10 @@ void SC_PackMaker__BakeStrings(FastString* J);
 
 bool SC_PackMaker__BuildGlobs();
 
+void SC_PackMaker__ClassLayout(FastString* J);
+
+void SC_PackMaker__DebugClassesAndGlobals(FastString* J);
+
 void SC_PackMaker__DumpStringsSub(FastString* Strs);
 
 bool SC_PackMaker__FATCompile();
@@ -3632,7 +3636,7 @@ int SC__Init_();
 
 
 // Refs
-void SC_Refs__DeclInit(Message* Dcl, SCFunction* Fn, bool IsJustAnArg);
+void SC_Refs__DeclInit(SCFunction* Fn, Message* Dcl, bool IsJustAnArg);
 
 Message* SC_Refs__DecrMulti(SCDecl* D, Message* M, bool IsReturn);
 
@@ -3654,7 +3658,7 @@ void SC_Refs__RC_HandleDisappearing(Message* Msg, int Basis);
 
 void SC_Refs__RC_HandleDisappearingSub(Message* Msg, int Basis);
 
-void SC_Refs__RC_IgnoreReturn(Message* Msg);
+void SC_Refs__RC_IgnoreReturn(SCFunction* Self, Message* Msg);
 
 bool SC_Refs__RC_NeedsOwnBlock(Message* Msg, Message* Pp);
 
@@ -4096,6 +4100,8 @@ bool SC_FuncPreReader_numeric(SCFunction* Self, Message* Msg);
 bool SC_FuncPreReader_opt(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_real(SCFunction* Self, Message* Msg);
+
+bool SC_FuncPreReader_stores_self(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_todo(SCFunction* Self, Message* Msg);
 
@@ -6648,10 +6654,6 @@ ASMReg SC_Pac_xC2xB5Into(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5Trin(Assembler* Self, Message* Exp);
 
-void SC_Pac__ClassLayout(FastString* J);
-
-void SC_Pac__DebugClassesAndGlobals(FastString* J);
-
 int SC_Pac__Init_();
 
 void adb();
@@ -7247,9 +7249,9 @@ void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self, JB_Object* Idk);
 
 bool SC_Rec_TooMany(JB_ErrorReceiver* Self);
 
-void JB_Rec__NewCriticalError(Message* Node, JB_String* Desc, JB_String* Path);
+void JB_Rec__NewCritical(Message* Node, JB_String* Desc, JB_String* Path);
 
-void JB_Rec__Latchkum(Message* Node, JB_String* Desc, JB_String* Path);
+void JB_Rec__NewError(Message* Node, JB_String* Desc, JB_String* Path);
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
 
@@ -10503,6 +10505,8 @@ int SC_Class_mini_size(SCClass* Self, int B);
 void SC_Class_MissingBehaviour(SCClass* Self, JB_String* S);
 
 void SC_Class_ModelDecls(SCClass* Self);
+
+bool SC_Class_NeedsClassLayout(SCClass* Self);
 
 void SC_Class_NeedsDefaultValue(SCClass* Self, Message* Def, Message** Place, JB_String* Name);
 
