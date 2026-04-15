@@ -396,7 +396,7 @@ function EditMeSelChange (GUITextEvent)
 	|| i = .ide
 	|| proj = i.SharedProjectTabSource
 		proj["pos"] = self|textview|.SelRange.x
-	
+
 	i.TryReselectASM
 	if i.ProductSep.IsOpen and i.jeeboxtext is visible
 		i.UpdateJeeboxField

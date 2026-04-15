@@ -53,7 +53,6 @@ static uint8* AllocateSub (int N, const void* Arr, uint* Where) {
 		Diff = -JB_msize(Arr);
 		Result = (uint8*)realloc((void*)Arr, N);
 	} else {
-		Diff = 16;
 		Result = (uint8*)calloc(1, N); // zeroed
 	}
 	if (Result) {

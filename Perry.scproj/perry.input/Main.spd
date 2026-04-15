@@ -3,8 +3,17 @@ import "GameExamples/arkanoid3D.spd"
 import "GameExamples/bubbles.spd"
 import "GameExamples/tetris.spd"
 
+//function LeakTest
+//	|int[100]| sizes
+//	for i in 100
+///		sizes[i] = app.StringMemory
+//		|| x = 453.Render
+//		x = string(20)
+//	
+	
 
 main
+//	LeakTest()
 	if .Yes("crash")
 		.Crash
 	GUI.Init

@@ -430,11 +430,12 @@ class String
 
 
 	module
-		function New (|int| n, |string|)
+		autogen New (|int| n, |string|)
+			description "Creates a new string containing garbage data."
 			cpp_Wrapper JB_Str_New
 
 		function New (|cstring| s, |StringZeroTerminated|)
-			description "Wraps an existing cstring into a Speedie string" 
+			description "Wraps an existing cstring into a Speedie string"
 			cpp_Wrapper JB_StrC
 
 		// could merge these two... give it a 0 length and see what you get?

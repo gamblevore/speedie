@@ -75,7 +75,7 @@ class PerryIDE (Window)
 	|Buttonview|				ViewLog
 	|Buttonview|				GoNext
 	|Buttonview|				GoPrev
-	|Buttonview|				StartScreen
+	|Buttonview|				RecentAndSplash
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
 	|message|					RecentFiles
@@ -412,7 +412,7 @@ class PerryIDE (Window)
 		|| HideSide = (m.x > LF)
 		|| HideTabs = HideTop or .IsTextMode
 		|| VisSide  = !.filelist.decluttering
-		|| VisTop   = !.StartScreen.decluttering
+		|| VisTop   = !.RecentAndSplash.decluttering
 		|| VisTabs  = !.ProjectTabs.Decluttering
 
 		// OK... so .. if one is visible, we don't make the other invis
@@ -429,7 +429,7 @@ class PerryIDE (Window)
 			.ProjectTabs.declutter = HideTabs
 			
 		if (hidetop == vistop)
-			.StartScreen.declutter = hidetop
+			.RecentAndSplash.declutter = hidetop
 			.ASMButton.Declutter = Hidetop
 			if HideTop
 				(.DebugArgsText isnt visible)			// better to declutter

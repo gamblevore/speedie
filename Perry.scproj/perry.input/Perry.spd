@@ -11,6 +11,10 @@ module Perry
 	|date|							FinishedStartUp
 	|byte|							FindID	
 	
+	function RecentProjNames (listview.columnfinder)
+		if value == nil
+			return .FirstName
+	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0
 		for arg in app.args // load specified documents
@@ -134,9 +138,7 @@ module Perry
 		
 		|| oof = (.FindProj(old) (old) .Projects.First)
 			oof.ide.showide
-		
 		perry.FinishedStartUp = date.now
-			
 
 
 	function FindProj (|string| path, |message|)
@@ -322,7 +324,7 @@ function ViewAsVis (|bool| AsProject)
 	for v in .ViewButtons
 		|| t = v.tag as guicontrol
 			(t is visible) = (v.gnormal.bg!=nil)
-			AnyViews ?= t is visible 
+			AnyViews ?= t is visible
 	
 	if AsProject and !AnyViews
 		.viewfiles.selected = nil|listviewrow| // typecast shouldn't be necessary

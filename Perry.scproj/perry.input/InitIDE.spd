@@ -22,28 +22,28 @@ extend PerryIDE
 		.RBorder			= guicontrol(self)
 		.CompileArea		= guicontrol(self)
 		.Toolbar			= buttonview(self,		ClickedToolBar)
-		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
+		.RunButton			= buttonview(.Toolbar,	ClickedDebug,		PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
-		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,		 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
-		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open, ClickedOpenRecent, ReturnRecents)
+		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
+		.RecentAndSplash	= ButtonView(.Toolbar,	&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
-		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs) 
-		.CommandsMenu		= ButtonView(.RBorder,	MenuCommands,	 nil,	ReturnCommands) 
+		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs)
+		.CommandsMenu		= ButtonView(.RBorder,	MenuCommands,	 nil,	ReturnCommands)
 		.ASMButton			= ButtonView(.rborder,  ClickedASMButton)
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin)
-		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
-		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
+		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList)
+		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList)
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.ASMView			= Listview(self,		SelectedASM, SelectedASM)
 		.ASMStretch			= StretchControl.horz(self, 200~left, 110, 110)
 		.DrawMe				= GraphicsEditor(self)
-		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
+		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme)
 		.EditStatus			= TextView(self,		ClickedStatus)
 		.ProjectInfo		= TextView(self,		ClickedProjectInfo)
 		.CharInfo			= TextView(self,		PressedCharInfo)
@@ -52,7 +52,7 @@ extend PerryIDE
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
-		.CompileTabs		= ButtonView(.CompileArea,		ClickedCompileTabs) 
+		.CompileTabs		= ButtonView(.CompileArea,		ClickedCompileTabs)
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self,			AutoCompleteKeys,		AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -125,13 +125,13 @@ extend PerryIDE
 			.ClickOutsideCloses = true		
 
 
-		with .ViewButtons 
+		with .ViewButtons
 			.ID				= "LBorder"
 			.size 			= the~width  by  15~down
 			.gnormal.solid  = vec4(0.077, 0.95)
 
 
-		with .Rborder 
+		with .Rborder
 			.ID				= "RBorder"
 			.size 			= the~width  by  15~down
 			.gnormal.solid	= vec4(0.077, 0.95)
@@ -481,7 +481,7 @@ extend PerryIDE
 		.AddIDEButton(.progress,	"", "", "progress")
 		.RunButton.size =	5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
-		.StartScreen.size = 7~left back 22  by  3~down back 14
+		.RecentAndSplash.size = 7~left back 22  by  3~down back 14
 		.progress.size =	0~before for 60  by  3~inside
 		
 		.RunButton.ExpandOnMouseOver = 1
@@ -526,7 +526,7 @@ extend PerryIDE
 			(c is Broken)
 			
 
-		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
+		.AddIDEButton(.RecentAndSplash,	"\1a", "Startup screen", "startup")
 		.AddViewButton(.Viewfiles,		"\10",	.filelist)
 		.AddViewButton(.viewsearch,		"\16",	.searcharea)
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
@@ -572,13 +572,13 @@ extend PerryIDE
 			.ListSource = PerryCommandsMenu()
 
 		with .ASMButton
-			.gnormal = self.startscreen.gnormal
+			.gnormal = self.RecentAndSplash.gnormal
 			.id = "asm"
 			.tooltip = "ASM-Viewer (Inbuilt GodBolt)"
 			.size = 6~left back 23  by  the~same
 			.text = "\1d"
 
-		with .startscreen.submenu
+		with .RecentAndSplash.submenu
 			isnt drawsfocus
 			.ID = "RecentList"
 

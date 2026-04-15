@@ -125,11 +125,11 @@ function message.IDE (|perryide|)
 				if .name ~= w.Project
 					return w
 
-
 function ClickedOpenRecent (GUIaction)
 	if self isa ButtonView
 		|| s = .SubMenu
 			s.ListSource = Perry.RecentProjects
+			s.ColumnFinder = &perry.RecentProjNames
 			.OpenMenu
 
 
