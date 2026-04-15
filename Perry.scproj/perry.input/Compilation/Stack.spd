@@ -14,7 +14,7 @@ function CakeTalk (|SpdProcess| Cake)
 
 	if msg ~= "run"
 		.DelayedRun = date.now
-		.UpdateDebugButtons(true)
+		.UpdateDebugButtons		//(true)
 	  else
 		.DelayedRun = nil
 		if msg ~= "stack" or "break" or "crash"

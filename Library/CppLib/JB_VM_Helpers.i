@@ -158,8 +158,8 @@ AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
 ///
 
 
-AlwaysInline vec4 VBuild (CakeRegister* r, ASM Op) {
-	return vec4{f2, f3, f4, f5};
+AlwaysInline ivec4 VBuild (CakeRegister* r, ASM Op) {
+	return ivec4{ii2, ii3, ii4, ii5};
 }
 
 
