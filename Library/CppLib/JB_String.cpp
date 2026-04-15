@@ -180,7 +180,7 @@ JB_String* JB_Str_New (int64 Length) {
 	// only allows huge values to "Catch" file-errors... otherwise limited to int-length.
 	if (Length < 16) {
         if (Length < 8) {
-            if (Length < 0)
+            if (Length <= 0) 
 				return 0;	// error
 			return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String8) );
         }
@@ -188,8 +188,8 @@ JB_String* JB_Str_New (int64 Length) {
     }
     
     require (Length <= kStrLengthMax);
-    JB_String* Str = JB_New( JB_String ); // is a cstring... but how do I KNOW that?
-    if_usual (Str) {							  // I guess as long as it's not shared????? is that it?
+    JB_String* Str = JB_New( JB_String );		// is a cstring... but how do I KNOW that?
+    if_usual (Str) {							 // I guess as long as it's not shared????? is that it?
 		Str->Addr = 0;
 		if (JB_BA_Realloc_(Str, (int)Length))
 			return Str;
@@ -1282,7 +1282,7 @@ JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
     JB_FS_SizeSet(fs, SelfLen / 2);
 	
 	
-	if ( fs->Reserved ) {
+	if ( fs->Size ) {
 		int PrevByte = -1;
 
 		while ( SelfLen-- ) {

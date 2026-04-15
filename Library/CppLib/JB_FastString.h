@@ -21,7 +21,7 @@ JBClass( FastString, JB_Object,
     JB_File*        File;
     int64           WrittenLength;
 
-	int 			Reserved;		// actual size of buffer. here for speeeed.
+	int 			Size;			// reserved size of buffer. here for speeeed.
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
 );
@@ -108,7 +108,7 @@ inline uint8* JB_FS_WriteAlloc_Inline_(FastString* fs, int GrowBy) {
 	int OldLen = fs->Length;
 	int NewLen = OldLen + GrowBy;
 
-	if ( fs->Reserved >= NewLen ) { // we put the usual case first :)
+	if ( fs->Size >= NewLen ) { // we put the usual case first :)
 		fs->Length = NewLen;
 		return fs->ResultPtr + OldLen;
 	}

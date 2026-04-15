@@ -113,13 +113,13 @@ uint8* JB_FS_WriteAlloc_(FastString* fs, int GrowBy) {
 }
 
 int JB_FS_FreeSize(FastString* fs) {
-	return fs->Reserved - fs->Length;
+	return fs->Size - fs->Length;
 }
 
 uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { // JB_FS_FreeSizeSet
     int Spare = JB_FS_FreeSize(fs);
     if (Spare < Extra)
-        if (!JB_FS_ResizeTo_(fs, fs->Reserved + Extra))
+        if (!JB_FS_ResizeTo_(fs, fs->Size + Extra))
 			return 0;
     return fs->ResultPtr + fs->Length;
 }
@@ -146,7 +146,7 @@ static byte DummySpace[4];
 
 bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
     FS_SanityCheck_(fs);
-    if (NewLength == fs->Reserved)
+    if (NewLength == fs->Size)
         return true;
     
 
@@ -163,7 +163,7 @@ bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
 
 	require (JB_BA_Realloc_(S, NewLength));
     
-    fs->Reserved = (int)JB_msize(S->Addr);
+    fs->Size = (int)JB_msize(S->Addr);
     fs->ResultPtr = S->Addr;
 	fs->Length = Min(NewLength, fs->Length);
 
@@ -172,7 +172,7 @@ bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
 
 
 uint8* JB_FS_GrowBy (FastString* fs, int Needs) {
-    if ( JB_FS_Flush( fs ) and fs->Reserved >= Needs ) {
+    if ( JB_FS_Flush( fs ) and fs->Size >= Needs ) {
         fs->Length = Needs;
         return fs->ResultPtr;
     }
@@ -537,13 +537,13 @@ bool JB_FS_Grew(FastString* self, int Old) {
 
 
 int JB_FS_Byte(FastString* fs, int offset) {
-	if ((u32)offset < fs->Reserved)
+	if ((u32)offset < fs->Size)
 		return fs->ResultPtr[offset];
 	return -1;
 }
 
 void JB_FS_ByteSet(FastString* fs, int offset, byte B) {
-	if ((u32)offset < fs->Reserved)
+	if ((u32)offset < fs->Size)
 		fs->ResultPtr[offset] = B;
 }
 
@@ -553,7 +553,7 @@ void JB_FS_ByteSet(FastString* fs, int offset, byte B) {
 
 int JB_FS_Size(FastString* fs) {
 	FS_SanityCheck_(fs);
-	return fs->Reserved;
+	return fs->Size;
 }
 
 void JB_FS_SizeSet(FastString* fs, int NewSize) {
@@ -576,7 +576,7 @@ int64 JB_FS_StreamLength(FastString* self) {
 }
 
 void JB_FS_LengthSet(FastString* fs, int NewLength) {
-    if ((u32)NewLength < (u32)fs->Reserved) {
+    if ((u32)NewLength < (u32)fs->Size) {
         fs->Length = NewLength;
     }
 	FS_SanityCheck_(fs);
@@ -633,24 +633,38 @@ void JB_FS_Destructor (FastString* self) {
 	JB_Decr( self->File );
 }
 
+FastString* TheSharedFastString;
 
 JB_String* JB_FS_GetResult(FastString* self) {
 	if (!self)
 		return JB_Str__Empty();
+	
 	int Length = self->Length;
+	int Actual = self->Size;
 	JB_String* Result = self->Result;
-    if (Result)
+	
+	self->Length = 0;
+    self->WrittenLength = 0;
+    self->Indent = 0;
+    self->IndentChar = '\t';
+
+    if (Result) {
+		if (Actual >= Length*4 and self == TheSharedFastString)
+			return JB_Str_CopyFromPtr(self->ResultPtr, Length);
 		JB_SafeDecr(Result);
-	  else
+	} else {
 		Result = JB_Str__Empty();
-	JB_SetRef( self->File, 0 );
-    JB_FS_Constructor(self);
+	}
+    
+	self->Size = 0;
+    self->Result = 0;
+    self->ResultPtr = DummySpace;
 
 	return Str_Shrink(Result, Length); // calls freeifdead
 }
 
 
-FastString* TheSharedFastString;
+
 FastString* JB_FS__FastNew(FastString* other) {
     if (other) {
         return other;
