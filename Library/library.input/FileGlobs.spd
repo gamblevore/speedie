@@ -84,7 +84,7 @@ libinternal file.FileGlobSub (|[string]| GlobParts, |[file]| result, |int| pi)
 	
 	|| Star = (p contains '*')
 	|| Names = (.list (Star) nil)
-	|| n = 0 
+	|| n = 0
 	while
 		|string--| str = p
 		if names!=nil

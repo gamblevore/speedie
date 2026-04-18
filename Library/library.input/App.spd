@@ -27,6 +27,7 @@ inline TrySleep (|float| Duration, |bool|)
 	
 syntax access (|int| i, |string?|)
 	opt norefcounts
+	inlined
 	return app.args[i]
 
 syntax access (|string| name, |string|)
@@ -42,12 +43,14 @@ function Option (|string| name, |bool|)
 
 function Yes (|string| name, |bool|)
 	opt norefcounts
+	inlined
 	return app[name].yes
 	
 //operator Has (|string| name, |bool|)
 //	return .yes(name)
 
 inline No (|string| name, |bool|)
+	inlined
 	return !.yes(name)
 
 function Created (|date|)

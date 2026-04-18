@@ -50,20 +50,21 @@ class FixedDict
 		.itemtypes = 0
 	
 	
-	function TypeOf (|int| i, |int|)
+	libinternal TypeOf (|int| i, |int|)
 		return 3 & .itemtypes >> (i<<1)
 
 
-	function TypeOf (|int| i2, assigns:|uint|)
+	libinternal TypeOf (|int| i2, assigns:|uint|)
 		i2 <<= 1
 		.itemtypes	= (.itemtypes &~ (3 << i2))  |||  (Value << i2)
 
 
-	syntax access (|int| i, |fixeddict?|)
+	libinternal syntaxaccess (|int| i, |fixeddict?|)
+		inlined
 		return .items[i]|fixeddict?|
 
 
-	function SetPart (|int| B, || Val, |int| type)
+	libinternal SetPart (|int| B, || Val, |int| type)
 		opt NoRefCounts
 		if type
 			jb_incr(val)
@@ -86,7 +87,7 @@ class FixedDict
 				jb_decr( obj )				// cos we call this last, compiler can opt it.
 	
 
-	function DownPart (|int| part, |FixedDict|)
+	libinternal DownPart (|int| part, |FixedDict|)
 		opt NoRefCounts
 		|| rt = .typeof(part)
 		|| r  = self[Part]
@@ -230,58 +231,3 @@ class FixedDict
 	// * FixedDict can be upgraded to a proper dictionary
 
 
-role NameTableConcept (object)
-	description "Just an idea of what we could do. Not an actual useful code."
-	function Add (|!&NameTableConcept| self, |message| y)
-		opt norefcounts
-		|| v = self[]
-		if !v
-			self[] = y
-			return 
-		
-		if v isa FixedDict
-			v.NameTableAdd(y)
-			return 
-
-		|| d = FixedDict()
-		self[] = d
-		d.NameTableAdd(v|&nil||message|)
-		d.NameTableAdd(y)
-
-
-	libinternal fixedDict.NameTableAdd (|message| value)
-		opt norefcounts
-		|| l = .Letter
-		.Letter = l+1
-		.SetPart(l++, value, fixeddict.TypeObj)
-		if l <= 7
-			return
-		
-		|message--[8]| Tmp
-		|| n = Platform.PointerBytes * 8
-		Memory.Copy((&tmp[0])|&nil|, (&.items[0])|&nil|, n)
-		Memory.zero((&.items[0])|&nil|, n) // remove all objects
-		.ItemTypes = 0
-		
-		// ReAdd objects
-		for i in 8
-			|| msg = tmp[i]!
-			|| name = msg.name
-			.addtype(name.addr, name.length, msg, fixeddict.typeobj)
-			jb_decr(msg) // oof
-	
-	
-	function Get (|string| name, |message|)
-		nil checker
-		if self isa FixedDict
-			|int| l = .letter
-				while --l >= 0
-					|| s = .items[l]|&nil||message|
-					if s.name == name
-						return s
-				return nil
-			return self[name]|&nil||message|
-		if self isa message
-			if .name == name
-				return self
-			

@@ -7,8 +7,8 @@ class InputStream
 	|ParserCallBack?|			CallBack
 	|object--?|					_Object
 	|int|						ChunkSize
-	|int| 						StartFrom
-	|bool| 						_NoMoreChunks
+	|int|						StartFrom
+	|bool|						_NoMoreChunks
 	|bool|						TryRecoverBadData
 
 	linkage

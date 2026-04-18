@@ -167,7 +167,8 @@ class FastString {
 		function New (|FastString?| other, |FastString|)
 			cpp_wrapper JB_FS__FastNew
 		
-		inline _Leaf (|faststring|)
+		autogen Shared (|faststring|)
+			inlined
 			description "Don't use this :] Only I know how to use it properly"
 			return faststring(nil|faststring|)
 

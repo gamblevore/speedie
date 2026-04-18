@@ -23,7 +23,7 @@ struct DynamicLibrary
 		cpp_wrapper JB_dylib_Load
 		
 	libinternal Open (|string?| F, |int| Mode = 0)
-		cpp_wrapper 
+		cpp_wrapper
 	
 	module
 		function New (|string?| F, |int| Mode = 0, |DynamicLibrary|)

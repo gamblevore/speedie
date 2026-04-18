@@ -38,6 +38,7 @@ extend String
 		return self
 
 	function Sibling (|string| name, |string|)
+		inlined
 		return .ReplacePathComponent(-1, Name)
 		
 	function file.Sibling (|string| name, |file|)
@@ -88,6 +89,7 @@ extend String
 		rz = p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
 
 	function TrimExt (|string|)
+		inlined
 		return .TrimExtAndPath(false)
 
 	function NamePart (|bool| RemovePath=true, |ivec2|)
@@ -119,6 +121,7 @@ extend String
 		Return self + cname[1, int.max]
 
 	syntax access (|string| s, |string|)
+		inlined
 		return .child(s)
 
 	function Parent (|string|)
@@ -170,8 +173,8 @@ Relative paths take the current working directory.`
 	function SetExt (|string| ext, |string|)
 		return .trimext.AddExt(ext)
 	
-	// abc/d.//////
 	function FindExt (|ivec2|)
+		// abc/d.//////	 --> .findext == ""
 		|| End = .Length
 			|| a = .Addr
 			while a[End-1] == '/'
@@ -208,12 +211,7 @@ Relative paths take the current working directory.`
 			rz = .find('/', from)
 			if !rz
 				rz = .length		
-			
-//	function CopyFileTo (|String| Dest, |bool| AttrOnly=false, |ErrorInt|)
-//		return .file.copyto(dest.file, attronly)
-//	
-// "/a/b/c" becomes "/a", "/a/b", "/a/b/c"
-// "a/b/c"  becomes "a",  "a/b",  "a/b/c"
+
 
 	iterator Paths
 		|| P = .regularpath
@@ -222,7 +220,6 @@ Relative paths take the current working directory.`
 		while i > 0
 			yield P[0, i]
 			i = p.FindSlash(i+1)
-
 
 
 
@@ -242,7 +239,6 @@ Relative paths take the current working directory.`
 			|| length = Last - First
 			if s == length
 				return self[first, s, true]
-			
 		
 	function File (|File!|)
 		cpp_part AsFile
@@ -282,29 +278,6 @@ function @file.OSXMaxCaseWarnings_ (|&int|)
 
 function string.ShellPath (|string|)
 	return .replaceall(" ", `\ `)
-
-
-//target !minilib {
-//extend file
-//	function UploadTo (|string| url, |ExitCode|) // move to the network module
-//		return "/usr/bin/curl".silentexecute([
-//			"-T"
-//			self
-//			url
-//		])
-//	
-//	function ZipTo (|string| zip, |errorint|) //zip -r foo.zip foo
-//		|| p = .shellpath // sigh. // zip is so bad.
-//		|| dir = p.parent
-//		|| name = p[dir.length...]
-//		rz = "cd $dir; zip  -r  $zip  $name".system
-//		
-//	function ZipUpload (|string| url, |ExitCode|)
-//		require self
-//		|| zip = "/tmp/zipupload/${.name}.zip"
-//		if .zipto(zip)
-//			return zip.file.uploadto(url)
-//}
 
 
 role StringThatWasReadSafely (string)

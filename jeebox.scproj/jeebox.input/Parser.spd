@@ -523,7 +523,7 @@ extend Parser
 		if (rz.func != @num) or rz.HasAny
 			error rz
 		  else
-			|| fs = FastString._Leaf
+			|| fs = FastString.Shared
 			fs.AppendHInt(rz.int(1))
 			rz.name = fs.GetResult(nil)
 			rz.func = @hint

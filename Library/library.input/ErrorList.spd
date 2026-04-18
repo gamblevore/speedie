@@ -47,14 +47,16 @@ class ErrorReceiver
 		return !stderr.errorcount
 	
 	
-	function HasProblems (|bool|) // totallyok
+	function HasProblems (|bool|)
+		description "Nearly OK. Errors or problems included, but no warnings."
 		opt norefcounts
 		if !self
 			self = stderr!
 		Return (.errorcount ||| .problemcount)
 	
 	
-	function HasAnything (|bool|) // Totally OK
+	function HasAnything (|bool|)					// Totally OK
+		description "Nothing at all reported! No warnings even!"
 		opt norefcounts
 		if !self
 			self = stderr!
@@ -148,7 +150,7 @@ class ErrorReceiver
 
 
 	inline ShellPrintErrors (|errorseverity| Level=nil, |int|)
-		visible // for jb_main.cpp
+		visible									// for jb_main.cpp
 		return .PrintErrors(Level, true)
 
 
