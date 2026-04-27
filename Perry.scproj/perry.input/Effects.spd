@@ -1,12 +1,3 @@
-//function Object.ObjectTag (|byte|)
-//	nil self
-//	return self|uint64| >> 56
-//
-//
-//function Object.ObjectTag (assigns:|byte|, |object?|)
-//	nil checker
-//	|| Old = (self|uint64| << 8) >> 8 // destroys object equality testing ;_;
-//		return (Old ||| (value|uint64|<<56))|object|
 
 module Effects
 	function DoFirework (|float| strength)
