@@ -395,7 +395,7 @@ extend PerryIDE
 			.ID				= "PopupDisplay"
 			.size			= the~area
 			.takesfocus		= 0
-			.JeeboxMode = documentjeeboxmode.prefer
+			.JeeboxMode		= documentjeeboxmode.prefer
 
 
 		with .EditStatus
