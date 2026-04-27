@@ -7,7 +7,7 @@ module VM_Builder {
 |message|			TempDests = message()
 |faststring|		form_h = faststring()
 |message|			dt_prm
-|string|			parent
+|string|			Parent
 |int|				InstructionCount
 |byte|				XType
 |FastString|		FatFile
@@ -51,26 +51,22 @@ function FinishAcc
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 	opt norefcounts
 	|| n = Max - bit_pos
-	|| lname = "_L"
-	if line
-		|| f = line.NeedFirst$
-		|| f0 = f.name[]
-		if f0 == 'x' and bit_pos == 32 // x means an extra 4 bytes of values. like 8-byte ASM.
-			.XType = pname
-			return int.max
-		if f0 == 'r' or 'R' or 'P'
-			.FillTypePrm(line.name, pname)
-			return 5+bit_pos
-		if f0.isint
-			n = f.int
-		expect (n >= 1)			(line, "Too many total bits")
-		expect (n <= (Max-8))	(line, "Too large field. Found: " + n)
-		lname = "_" + line.name	
-	
-	lname = .Parent + lname
-	|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
-	
-	SCFunction.NewFunc(fnc_src, nil, line)	
+	|| f = line.NeedFirst$
+	|| f0 = f.name[]
+	if f0 == 'x' and bit_pos == 32 // x means an extra 4 bytes of values. like 8-byte ASM.
+		.XType = pname
+		return int.max
+	if f0 == 'r' or 'R' or 'P'
+		.FillTypePrm(line.name, pname)
+		return 5+bit_pos
+	if f0.isint
+		n = f.int
+	expect (n >= 1)			(line, "Too many total bits")
+	expect (n <= (Max-8))	(line, "Too large field. Found: " + n)
+	|| lname = .Parent + line.name
+	using line
+		|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
+		SCFunction.NewFunc(fnc_src, nil, line)	
 	.FillTypePrm(lname, pname)
 	
 	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
@@ -126,7 +122,7 @@ function GenerateForms (|message| forms, |bool| DoMore)
 function GenerateOne (|message| form_msg, |int| f)
 	opt norefcounts
 	.dt_prm = .DataTypeCreate(form_msg, f)
-	.parent = form_msg.name
+	.parent = form_msg.name + "_"
 	|| bit_pos = 8
 	|| p   = -1
 	|| arg = form_msg[@arg, -1]							#require
@@ -136,8 +132,6 @@ function GenerateOne (|message| form_msg, |int| f)
 		if bit_pos > 32
 			exit
 	
-//	if bit_pos < 32 and p < 5						// is this bad?
-//		.GenAcc(nil, bit_pos, 5, 32)
 	.FinishAcc
 	.form_h <~ '\n'
 

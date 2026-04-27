@@ -272,9 +272,9 @@
 	f1 = std_clamp(f2, f3, f4)
 ;
 ı VGET:;
-	i1 = iv2[u3 + n4];
+	i1 = iv2[u3 + VecGet_Indu];
 ı VSET:;
-	iv1[u3 + n4] = i2;
+	iv1[u3 + VecSet_Indu] = i2;
 ı VBLD:;
 	v1 = VBuild(r, Op);
 ı VSWZ:;

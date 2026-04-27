@@ -232,6 +232,7 @@ datatype vec4
 
 	
 	render
+		opt norefcounts
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
 	
 	module
