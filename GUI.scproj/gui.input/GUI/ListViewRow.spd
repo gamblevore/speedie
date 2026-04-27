@@ -216,10 +216,10 @@ role ListViewRow (message)
 
 datatype ListViewState (uint16)
 	flags
-		|ListViewState| 
-		AlignLeft = 0
+		|ListViewState|
+		AlignLeft	= 0
 		Align		= [AlignCenter, AlignRight]
-		Selected 
+		Selected
 		Modified
 
 		UnSelectable = [Separator, Disabled]

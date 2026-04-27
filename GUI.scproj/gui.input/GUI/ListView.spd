@@ -17,7 +17,6 @@ class ListView (GUIControl) {
 	|bool|							KeepOneSelected		// Should be merged.  Maybe _Hierarchical also.
 	|ListViewHierarchy|				_Hierarchical
 
-//	|bool|							_IsEditing
 	|byte|							_ScrollRealigner
 	|bool|							_DuringSelect
 	|bool| 							_BlockedDuringUse
@@ -1252,7 +1251,7 @@ class ListView (GUIControl) {
 		|ListViewRow| prev
 		for sk.visible in self
 			|| ind = 0
-			if .IsTree
+			if !.IsTree
 				ind = .CalculateSkip(sk, prev, n)
 			sk.indent = ind
 			prev = sk
@@ -1438,14 +1437,7 @@ class ListView (GUIControl) {
 		if ._ScrollStart!=value
 			._ScrollStart = value
 			.touch
-			
-/*
- expansion {
-	+'RecursiveHello(2)' "/usr/local/speedie/Examples/hello_world.spd" \57 {
-	}
-}
-*/
-	
+		
 	behaviour Draw
 		opt NoRefCounts
 		.ScrollProtect
