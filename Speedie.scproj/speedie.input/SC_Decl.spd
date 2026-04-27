@@ -35,7 +35,7 @@ class SCDecl (SCObject) {
 		opt norefcounts
 		.type = type
 		.NilDeclared = NilState.Either
-		.mu.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
+		.mu.info = scdeclinfo.altered				// why? surely it should only be if its ACTUALLY altered??? sigh.
 		.mu.datatype = 0
 		if .project.isstdlib
 			is Library

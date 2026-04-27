@@ -75,22 +75,6 @@ AlwaysInline void DivMath32(CakeRegister* r, ASM Op) {
 	}
 }
 
-
-AlwaysInline void BFLS (CakeRegister* r, ASM Op) { // rrxxbbb --> rr00bbb
-	auto o = i2; // we want to clear those middle bits
-	int up = BFLD_upu;
-	int down = BFLD_downu;
-	uint64 mask = -1;
-	mask <<= up; mask >>= down;
-	
-	auto i = o << up;
-	if (BFLD_Lu) 
-		i = i >> down;
-	  else 
-		i = (uint64)i >> down;
-	i2 = (o&mask) | i;
-}
-
 inline u64 JB_u64_RotR (u64 x, u64 N) {
 	return (x >> N) | (x << (64-N));
 }

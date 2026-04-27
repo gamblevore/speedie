@@ -171,13 +171,6 @@ forms
 		down	6
 		sign	1
 
-	BFLS
-		r1		P
-		r2		r
-		up		6
-		down	6
-		sign	1
-
 	Convert
 		r1		R
 		r2		r
@@ -453,17 +446,17 @@ POS 5
 #!						 (((((Math)))))
 
 /**/ ADDB (AddB) // add big
-		i1 = i1 + (U1_Li<<12)
+		i1 = i1 + (AddB_Ki<<12)
 /**/ ADDK (AddK)
-		i1 = i2 + U2_Li
+		i1 = i2 + AddK_Ki
 /**/ ADAK (AddAK) // after-increment (post-increment)
 		i1 = i2
-		i2 = i2 + U2_Li
+		i2 = i2 + AddAK_Ki
 /**/ MULK  (AddK)
-		i1 = i2 * U2_Li
+		i1 = i2 * AddK_Ki
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
-/**/ SUB  (Shift)              						// must come after ADD
+/**/ SUB  (Shift)										// must come after ADD
 		i1 = (i2 - i3) >> Shift_Shu
 /**/ MUL  (U4)
 		i1 = (i2 * i3) + i4
@@ -521,11 +514,11 @@ POS 5
 /**/ BNOT  (BoolNot)
 		u1 = (~u2) & (u3|||BoolNot_Ki)
 /**/ BANK  (AddK)
-		u1 = u2  &  U2_Li
+		u1 = u2  &  AddK_Ki
 /**/ BORK  (AddK)
-		u1 = u2 ||| U2_Li
+		u1 = u2 ||| AddK_Ki
 /**/ BXRK  (AddK)
-		u1 = u2  ^  U2_Li
+		u1 = u2  ^  AddK_Ki
 
 
 
@@ -550,7 +543,8 @@ POS 5
 
 #!						 (((((Branches)))))
 /**/ JUMP (jump)
-		Code += l0
+		Code += Jump_JUMPi
+
 
 /**/ JMPI  (JCmpI)
 		Code = JumpI(r, Op, Code)
@@ -783,7 +777,7 @@ POS 5
 /**/ QDIV (Div)
 		iv1 = iv2 / iv3
 /**/ QADK (AddK)
-		iv1 = iv2 + U2_Li
+		iv1 = iv2 + AddK_Ki
 /**/ QCLM (U4)
 		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
 /**/ QINC  (VecInc)
@@ -836,5 +830,5 @@ POS 5
 
 #!						(((((Intrinsics!)))))
 /**/ BSTT  (addk)
-		u1 = bitstats(u2, U2_Li)
+		u1 = bitstats(u2, AddK_Ki)
   

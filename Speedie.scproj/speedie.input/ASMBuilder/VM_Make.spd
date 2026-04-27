@@ -1,24 +1,23 @@
 
-
 module VM_Builder {
-|[message]| 	NameList
-|message|		ModuleArg
-|message|		ASMFile
-|[message]|		Appended
-|message|		TempDests = message()
-|faststring|	form_h = faststring()
-|message|		dt_prm
-|string|		parent
-|int|			InstructionCount
-|byte| 			XType
-|FastString|	FatFile
-|[message]|		rdz
+|[message]|			NameList
+|message|			ModuleArg
+|message|			ASMFile
+|[message]|			Appended
+|message|			TempDests = message()
+|faststring|		form_h = faststring()
+|message|			dt_prm
+|string|			parent
+|int|				InstructionCount
+|byte|				XType
+|FastString|		FatFile
+|[message]|			rdz
 
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down,  |byte| c,  |byte| c2)
 	.form_h <~ "
-#define   ${fname}${c}       (((${c2}int)((Op)<<$down))>>$Up)"
+#define	${fname}${c}		(((${c2}int)((Op)<<$down))>>$Up)"
 
 
 function DefineGet (|string| fname,  |int| up,  |int| down, |message|)
@@ -64,15 +63,14 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 			return 5+bit_pos
 		if f0.isint
 			n = f.int
-		expect (n >= 1)        (line, "Too many total bits")
-		expect (n <= (Max-8))  (line, "Too large field. Found: " + n)
-		lname = "_" + line.name 
+		expect (n >= 1)			(line, "Too many total bits")
+		expect (n <= (Max-8))	(line, "Too large field. Found: " + n)
+		lname = "_" + line.name	
 	
 	lname = .Parent + lname
 	|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
 	
-	SCFunction.NewFunc(fnc_src, nil, line)
-	
+	SCFunction.NewFunc(fnc_src, nil, line)	
 	.FillTypePrm(lname, pname)
 	
 	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
@@ -93,9 +91,9 @@ function DataTypeModule
 
 
 function AddForm (|message| form, |µform|)
-	opt norefcounts 
+	opt norefcounts
 	rz = µform(form)
-	µform.forms.ValueLower(form.name) = rz 
+	µform.forms.ValueLower(form.name) = rz
 
 
 function DataTypeCreate (|message| form,  |int| fnum,  |message|)
@@ -131,15 +129,15 @@ function GenerateOne (|message| form_msg, |int| f)
 	.parent = form_msg.name
 	|| bit_pos = 8
 	|| p   = -1
-	|| arg = form_msg[@arg,-1]							#require
+	|| arg = form_msg[@arg, -1]							#require
 		
 	for l in arg
 		bit_pos = .GenAcc(l, bit_pos, ++p, 32)
 		if bit_pos > 32
 			exit
 	
-	if bit_pos < 32 and p < 5
-		.GenAcc(nil, bit_pos, 5, 32)
+//	if bit_pos < 32 and p < 5						// is this bad?
+//		.GenAcc(nil, bit_pos, 5, 32)
 	.FinishAcc
 	.form_h <~ '\n'
 
@@ -200,8 +198,8 @@ function BuildFiles (|bool|)
 	|| Code = FastString()
 	|| Jump = FastString()
 	.VMCpp(code, jump)
-	.SafeWrite("Instructions.i",       code)
-	.SafeWrite("InstructionList.h",    jump)
+	.SafeWrite("Instructions.i",		code)
+	.SafeWrite("InstructionList.h",		jump)
 	
 	|| ASM_Gen = Compiler.InputFileAlways( "speedie.input/ASMBuilder/ASM_AutoGen.spd" ).OutputStream
 		for s in .Appended
