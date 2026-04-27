@@ -167,8 +167,6 @@ typedef ASM ASM_Alloc;
 
 typedef ASM ASM_BFLD;
 
-typedef ASM ASM_BFLS;
-
 typedef ASM ASM_BoolNot;
 
 typedef ASM ASM_Bra;
@@ -456,8 +454,6 @@ struct InputStream;
 struct Instruction;
 
 struct MWrap;
-
-struct JB_Object;
 
 struct SCImport;
 
@@ -819,6 +815,7 @@ struct SavedRegisters {
 	byte RegCount;
 	byte ReturnCount;
 	byte BasicDepth;
+	byte BreakRequest;
 	u16 BasicBlock;
 	u16 BasicParent;
 	DeclAlterable Decls[32];
@@ -1655,7 +1652,7 @@ extern Message* SC__VM_Builder_ModuleArg;
 extern Array* SC__VM_Builder_NameList;
 extern Message* SC__VM_Builder_ohio;
 extern Message* SC__VM_Builder_Ooof;
-extern JB_String* SC__VM_Builder_parent;
+extern JB_String* SC__VM_Builder_Parent;
 extern Array* SC__VM_Builder_rdz;
 extern Message* SC__VM_Builder_rizzler;
 extern Message* SC__VM_Builder_skibidy;
@@ -1665,7 +1662,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2432])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2431])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1805,10 +1802,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2431])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2430])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2430])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2429])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2428])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2211,6 +2208,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__FailableInt_Min ((int)2147483649)
 #define kSC__FatNopMode_CanClose ((int)1)
 #define kSC__FatNopMode_Hard ((int)0)
+#define kSC__FatNopMode_Rewind ((int)4)
 #define kSC__FatNopMode_Soft ((int)2)
 #define kJB__FileDes_StdErr ((FileDes)2)
 #define kJB__FileDes_StdIn ((FileDes)0)
@@ -2437,17 +2435,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2424])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2426])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2427])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2426])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2423])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2427])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2428])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2426])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2427])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2504,7 +2502,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2423])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2422])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -4509,27 +4507,15 @@ ASM SC_ASM_AddB_KSet(ASM Self, uint Value);
 
 ASM SC_ASM_AddK_KSet(ASM Self, uint Value);
 
-ASM SC_ASM_AddOrSubM_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_AddOrSubM_ShSet(ASM Self, uint Value);
 
 ASM SC_ASM_Alloc_AmountSet(ASM Self, uint Value);
 
 ASM SC_ASM_BFLD_downSet(ASM Self, uint Value);
 
-ASM SC_ASM_BFLD_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_BFLD_signSet(ASM Self, uint Value);
 
 ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
-
-ASM SC_ASM_BFLS_downSet(ASM Self, uint Value);
-
-ASM SC_ASM_BFLS_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_BFLS_signSet(ASM Self, uint Value);
-
-ASM SC_ASM_BFLS_upSet(ASM Self, uint Value);
 
 ASM SC_ASM_BoolNot_KSet(ASM Self, uint Value);
 
@@ -4539,19 +4525,13 @@ ASM SC_ASM_Bra_SmallSet(ASM Self, uint Value);
 
 ASM SC_ASM_CmpF_CmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_CmpF_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_CmpI_CmpSet(ASM Self, uint Value);
-
-ASM SC_ASM_CmpI_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value);
 
 ASM SC_ASM_CNTC_offsetSet(ASM Self, uint Value);
 
 ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value);
-
-ASM SC_ASM_Compare4_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Compare4_SmallSet(ASM Self, uint Value);
 
@@ -4561,23 +4541,15 @@ ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value);
 
 ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, uint Value);
 
-ASM SC_ASM_Convert_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
 
 ASM SC_ASM_Div2_ClearSet(ASM Self, uint Value);
 
 ASM SC_ASM_Div2_DownSet(ASM Self, uint Value);
 
-ASM SC_ASM_Div2_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
 
-ASM SC_ASM_Div_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_Float_DSet(ASM Self, uint Value);
-
-ASM SC_ASM_Float_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
 
@@ -4651,10 +4623,6 @@ ASM SC_ASM_RefDecrMem_CountSet(ASM Self, uint Value);
 
 ASM SC_ASM_RefDecrMem_OffsetSet(ASM Self, uint Value);
 
-ASM SC_ASM_RefReturn_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_RefSet1_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_RefSet2_DecrSet(ASM Self, uint Value);
 
 ASM SC_ASM_RefSet2_OffsetSet(ASM Self, uint Value);
@@ -4662,8 +4630,6 @@ ASM SC_ASM_RefSet2_OffsetSet(ASM Self, uint Value);
 ASM SC_ASM_RefSet3_DecrSet(ASM Self, uint Value);
 
 ASM SC_ASM_RefSet3_OffsetSet(ASM Self, uint Value);
-
-ASM SC_ASM_RefSetApart_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_REQ_ModeSet(ASM Self, uint Value);
 
@@ -4679,31 +4645,15 @@ ASM SC_ASM_RotateConst_ValueSet(ASM Self, uint Value);
 
 ASM SC_ASM_Shift_ShSet(ASM Self, uint Value);
 
-ASM SC_ASM_Swap_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_Tail_JUMPSet(ASM Self, uint Value);
-
-ASM SC_ASM_TERN_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_TERN_SmallSet(ASM Self, uint Value);
 
 ASM SC_ASM_Trap_AtSet(ASM Self, uint Value);
 
-ASM SC_ASM_U0_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U1_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U2_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U3_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U4_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_VecConst_K1Set(ASM Self, uint Value);
 
 ASM SC_ASM_VecGet_IndSet(ASM Self, uint Value);
-
-ASM SC_ASM_VecGet_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_VecInc_AmountSet(ASM Self, uint Value);
 
@@ -4711,21 +4661,13 @@ ASM SC_ASM_VecInc_partSet(ASM Self, uint Value);
 
 ASM SC_ASM_VecIntMathPart(ASM Self);
 
-ASM SC_ASM_VecMix_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_VecMix_ModeSet(ASM Self, uint Value);
-
-ASM SC_ASM_VecOpPart_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_VecOpPart_ModeSet(ASM Self, uint Value);
 
 ASM SC_ASM_VecSet_IndSet(ASM Self, uint Value);
 
-ASM SC_ASM_VecSet_LSet(ASM Self, uint Value);
-
 ASM SC_ASM_VecSwizzle_FieldsSet(ASM Self, uint Value);
-
-ASM SC_ASM_VecSwizzle_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Write_moveSet(ASM Self, uint Value);
 
@@ -5352,11 +5294,6 @@ ASM* SC_ASM_Alloc__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 // ASM_BFLD
 ASM* SC_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
-// ASM_BFLS
-ASM* SC_ASM_BFLS__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -6222,8 +6159,6 @@ int SC_Pac_ASMTableID(Assembler* Self, Message* Exp, SCFunction* Fn);
 
 ASMReg SC_Pac_Assign(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src);
 
-void SC_Pac_BackCond(Assembler* Self, FatASM* Start);
-
 ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down);
 
 ASMReg SC_Pac_BFLG_Sub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down, bool Sign);
@@ -6494,6 +6429,8 @@ void SC_Pac_Nop2Consts(Assembler* Self, ASMReg A, ASMReg B);
 
 void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, int Depth);
 
+void SC_Pac_NopBranch(Assembler* Self, FatASM* Start);
+
 bool SC_Pac_NopConstWithRegInt64(Assembler* Self, ASMReg R, int64 K);
 
 void SC_Pac_NopConstWithReg(Assembler* Self, ASMReg R);
@@ -6568,6 +6505,8 @@ FatASM* SC_Pac_Register(Assembler* Self, int I);
 
 FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp);
 
+void SC_Pac_Rewind(Assembler* Self, FatASM* Start, FatASM* After);
+
 bool SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_RootGen(Assembler* Self, SCFunction* Fn);
@@ -6587,8 +6526,6 @@ ASMReg SC_Pac_SHR(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R
 ASMReg SC_Pac_SmallToBig(Assembler* Self, ASMReg Src, ASMReg Cmp, Message* Exp);
 
 void SC_Pac_SoftNop(Assembler* Self, FatASM* ToNop);
-
-void SC_Pac_SoftNopRange(Assembler* Self, FatASM* Start, FatASM* After);
 
 InlineState* SC_Pac_State(Assembler* Self);
 
@@ -7354,9 +7291,9 @@ int JB_FS_SyntaxCompare(FastString* Self, int N);
 
 void JB_FS_Fail(FastString* Self);
 
-FastString* JB_FS___Leaf();
-
 FastString* JB_FS__NewFile(JB_File* F);
+
+FastString* JB_FS__Shared();
 
 FastString* JB_FS__UseAsOutput(JB_Object* Other);
 
@@ -7504,9 +7441,6 @@ byte* JB_Mem__Zalloc(int N);
 
 
 // JB_MemoryLayer
-
-
-// JB_NameTableConcept
 
 
 // JB_SCImport
