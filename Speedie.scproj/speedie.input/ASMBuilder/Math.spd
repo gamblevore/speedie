@@ -1,7 +1,7 @@
 
 
-prototype fn_OpASM          (|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
-prototype fn_ASMConstifier  (|asmreg| L, |asmreg| R, |int64|)
+prototype fn_OpASM			(|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+prototype fn_ASMConstifier	(|asmreg| L, |asmreg| R, |int64|)
 
 
 
@@ -21,7 +21,7 @@ extend asmreg
 		return self
 		
 	function BoolAnswer (|asmreg|)
-		return .boolcondanswer.BoolNegateAnswer 
+		return .boolcondanswer.BoolNegateAnswer
 
 	
 	
@@ -88,9 +88,6 @@ extend Assembler
 		|| B = L.Fat
 			if .IsCurr(b, asm.bflg)
 				if b.prms[4] == 0  and  b.prms[3] == 63
-//					|| T = B.info
-//					T.µtype = DataTypeCode.bool
-//					B.info = T
 					L.µType = DataTypeCode.bool
 					B.info = L
 					return L
@@ -280,12 +277,17 @@ extend Assembler
 		mode ^= 1									// More graceful ASM design. Or else we need to change the VM.
 		return exp.JMPF(L, R, Mode, 0) * dest		// Allows cmpf+jmpf to share code, and the VM is more natural.
 
-
+		
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
-/*	 (A >  B)    (A <= B)	*/
+		if "jb_main".trap
+		if L.fat(asm.vget) and R.fat(asm.vget)						// i hope this works.
+			L = .Subtract(exp, dest, R, L)
+			R = asmreg()
+		
 		if l.IsInt
 			return .CompareInt(dest, l, r, exp, mode)
 		return .CompareFloat(dest, l, r, exp, mode)
+	
 	
 	function More   (fn_opasm)
 		return .compare(dest, l, r, exp, 0)

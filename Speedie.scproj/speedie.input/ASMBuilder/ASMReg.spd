@@ -149,6 +149,11 @@ datatype ASMReg (uint64)
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M
 
+	function asmreg.Fat (|asm| Op, |&FatAsm|)
+		|| f = .fat
+			if f isa Op
+				return f
+
 	operator iz (|asmreg| M, |bool|)
 		return .reg == M.reg
 

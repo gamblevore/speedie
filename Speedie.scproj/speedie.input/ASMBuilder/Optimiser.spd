@@ -34,7 +34,7 @@ function message.OptVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift,
 
 
 
-function fatasm.IsPartiable (|bool|)
+function fatasm.IsPartyAble (|bool|)
 	|| op = ._op
 	if (op >= asm.padd and op <= asm.pdiv) or (op >= asm.uadd and op <= asm.udiv)
 		return true
@@ -58,7 +58,7 @@ function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |A
 	// Doesn't yet handle:   x[1] = a - b 
 	if  !vara  and  (dest is temp)
 		|| party = dest.fat
-			if party.IsPartiable
+			if party.IsPartyAble
 				party.prms[3] |= k
 				return .redest(party, base)
 		
