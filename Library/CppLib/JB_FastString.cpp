@@ -666,9 +666,8 @@ JB_String* JB_FS_GetResult(FastString* self) {
 
 
 FastString* JB_FS__FastNew(FastString* other) {
-    if (other) {
+    if (other)
         return other;
-    }
     
 	FastString* fs = TheSharedFastString; 
 	if (fs and JB_RefCount(fs) > 100) debugger;
