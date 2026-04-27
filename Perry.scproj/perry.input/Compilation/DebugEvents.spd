@@ -55,7 +55,8 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	if key.IsAccept
 		return i.ContinueProgram(-1)
 	if key is space
-		return DebugStepRun(self, -1)
+		if i.RunCompiledApp
+			return i.ContinueProgram(-1)
 		
 
 function DebugArgsKeyDown (GUIKeyEvent)
