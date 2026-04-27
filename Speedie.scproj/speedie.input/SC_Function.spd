@@ -132,6 +132,7 @@ function ParentName (|string|)
 
 
 render RenderParams (|bool| ForErrors=true)
+	opt norefcounts
 	fs <~ '('
 	|| sep = ""
 	for a in .args
@@ -150,6 +151,7 @@ render RenderParams (|bool| ForErrors=true)
 
 
 render RenderTitle (|bool| ForErrors=true)
+	opt norefcounts
 	fs <~ .Name
 	if .args or (!forerrors and .ReturnType)
 		fs <~ " "
@@ -157,6 +159,7 @@ render RenderTitle (|bool| ForErrors=true)
 
 
 render RenderName
+	opt norefcounts
 	|| pname = .parentname
 		fs <~ pname
 		fs <~ '.'
@@ -164,6 +167,7 @@ render RenderName
 
 
 render Describe 
+	opt norefcounts
 	fs <~ "function "
 	fs <~ .Name
 	fs <~ " "

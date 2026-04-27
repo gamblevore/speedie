@@ -140,7 +140,6 @@ struct Assembler
 			if BP != PP 
 
 
-
 	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
 		return (f isa type) and (.basicblock == f.basicblock)
 
@@ -351,18 +350,18 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode,  |int| Depth=0)
-		|| info = fat.info
-		// nothing really uses canclose right now. This can be fixed
+		|| info = fat.info				// nothing uses canclose right now. This can be fixed
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
 
 		|| Type = asm.noop
-		|| Break = fat.ASMIndex
-			if .IsCurrBranch(fat)
-				.BreakRequest |= Break
-			if break & BreakPoint
-				type = asm.ADDB
-				.BreakRequest = 0
+		if NopMode isnt Rewind
+			|| Break = fat.ASMIndex
+				if .IsCurrBranch(fat)
+					.BreakRequest |= Break
+				if (break & BreakPoint)
+					type = asm.ADDB
+					.BreakRequest = 0
 
 		if type == asm.noop
 			|| C = .curr - 1
@@ -382,7 +381,7 @@ struct Assembler
 				.SetRegister(v, nil, fat.FindOlder)
 		
 		fat.setop = Type
-		if type != asm.noop
+		if type == asm.ADDB
 			fat.ASMIndex = breakpoint ||| Breakable
 			
 		
@@ -465,9 +464,10 @@ struct Assembler
 			.nop(ToNop)
 	
 	
-	function SoftNopRange (|fatasm| Start, |fatasm| After)
+	function Rewind (|fatasm| Start, |fatasm| After)
+		|| Mode = fatnopmode.soft|||fatnopmode.rewind
 		while start < After
-			.nop_sub(--After, fatnopmode.soft, 0)
+			.nop_sub(--After, mode, 0)
 	
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////

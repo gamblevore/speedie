@@ -673,6 +673,7 @@ datatype FatNopMode	(byte)
 		Hard = 0
 		CanClose
 		Soft
+		Rewind
 	
 	syntax is (|fatnopmode| f, |bool|)
 		return self&f

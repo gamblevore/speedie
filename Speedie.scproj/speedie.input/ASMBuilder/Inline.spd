@@ -142,7 +142,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		if  .EntireInlineFailed  and  (fn isnt linkinline)
 			.EntireInlineFailed = 0
 		svregs.Rewind(self)
-		.SoftNopRange(ll.start, .curr)				// rewind
+		.Rewind(ll.start, .curr)				// rewind
 		return nil
 	
 	if svregs.ReturnCount > 1

@@ -1,10 +1,11 @@
 
 
 
-struct SavedRegisters 
+struct SavedRegisters
 	|byte|					RegCount
 	|byte|					ReturnCount
 	|byte|					BasicDepth
+	|byte|					BreakRequest
 	|uint16|				BasicBlock
 	|uint16|				BasicParent
 	|DeclAlterable[32]|		Decls
@@ -13,6 +14,7 @@ struct SavedRegisters
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
 
+		.BreakRequest = sh.BreakRequest
 		.BasicDepth = sh.BasicDepth
 		.BasicBlock = sh.BasicBlock
 		.BasicParent = sh.BasicParent
@@ -23,6 +25,7 @@ struct SavedRegisters
 
 
 	function Rewind	(|assembler| sh)
+		sh.BreakRequest = .BreakRequest
 		sh.BasicDepth = .BasicDepth
 		sh.BasicBlock = .BasicBlock
 		sh.basicparent = .basicparent
@@ -38,7 +41,7 @@ struct SavedRegisters
 
 
 
-struct DeclAlterable 
+struct DeclAlterable
 	|uint64|			ExportPosition
 	|SCDeclInfo|		Info
 	|DataTypeCode|		DataType
