@@ -251,13 +251,14 @@ function listviewrow.ImproveVar (|int| Depth=0)
 		|| s1 = .second
 			s1.name = .name
 			s1.func = @thg
-	
+
 	|| fs = VarPrinter
 	fs.Length = 0
 	fs <~ .DebugName
-	fs <~ (' ', 11 - fs.LengthUTF8)
-	.PerryAppendMsg(" = ", 3)
-	fs <~ (' ', 32 - fs.LengthUTF8)
+	fs <~ ":"
+	fs <~ (' ', 6 - fs.LengthUTF8)
+	.PerryAppendMsg("", 3)
+	fs <~ (' ', 26 - fs.LengthUTF8)
 	.PerryAppendMsg(" |", 2)
 	fs <~ "|"
 	.name = fs

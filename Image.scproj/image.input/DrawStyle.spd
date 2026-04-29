@@ -5,7 +5,7 @@ prototype ImageDrawStyleEvent (|Image| self,  |ivec4| Rect, |drawstyle| G, |Move
 class DrawStyle
 	linkage
 		cpp_part Sty
-	default DrawStyle.new 
+	default DrawStyle.new
 	|imagePixel|				BG
 	|imagePixel|				Edge
 	|imagePixel|				Seps

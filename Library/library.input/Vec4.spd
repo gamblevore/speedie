@@ -230,10 +230,16 @@ datatype vec4
 		description "Make this vector have positive area." 
 		return (.x1 min .x2, .y1 min .y2, .x1 max .x2, .y1 max .y2)
 
-	
+		
 	render
 		opt norefcounts
-		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
+		fs <~ "("
+		for i in 4
+			if i 
+				fs <~ ", "
+			fs <~ self[i]
+		fs <~ ")"
+
 	
 	module
 		inline  New (|vec4|)

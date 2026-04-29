@@ -138,6 +138,10 @@ class TextView (GUIControl)
 		return MouseDragging.handled
 	
 	
+	behaviour RightClick
+		.SendSpecialClick(p, true)
+
+	
 	libinternal LineNumRight (|int|)
 		return 5 + .lastleft + ._LineNumWidth*font.width
 	
@@ -248,7 +252,7 @@ class TextView (GUIControl)
 			if (fn == @arg) and (self is style2)
 				return false
 			return true
-		if fn == @decl
+		if fn == @decl or @type
 			return true
 	
 	
@@ -327,7 +331,7 @@ class TextView (GUIControl)
 		if (C == 3)
 			return .ExpandToVis(t)
 		if (C >= 4)
-			return .lineexpand(t)
+			return .LineExpand(t)
 		return t
 
 
@@ -364,9 +368,6 @@ class TextView (GUIControl)
 		|| Code = -2 + IsRightClick
 		(.onclicked)(self, Code)?
 	
-	
-	behaviour RightClick
-		.SendSpecialClick(p, true)
 
 	function Sel (assigns:|int|)
 		disabled "Use selrange"
@@ -752,7 +753,6 @@ class TextView (GUIControl)
 	
 	behaviour KeyDown
 		opt norefcounts
-//		if self is editable // right? editable doesn't matter??
 		if (.OnKeyDown)(self, key)?
 			return true
 		if .KeyDownTest(key) // to be called by other funcs
@@ -764,8 +764,6 @@ class TextView (GUIControl)
 		if (key is RGUI or LGUI) and GUI.CursorVisible
 			.ShowExtraInfo(.mouSEXY)
 			return true
-//		|| sigh = .OnKeyDown // no need?
-//			return (sigh)(self, key)
 		
 	
 
@@ -890,17 +888,17 @@ class TextView (GUIControl)
 		
 		|| s1 = self[ i2 ]
 		|| s2 = self[ i2.x2,  i0 ]
-		.InsertText(s2+s1, (i2.x, i0)) 
+		.InsertText(s2+s1, (i2.x, i0))
 			
 		return true
 	
 	
 	libinternal NewLine (|bool|)
 		if .SingleLine
-			return true // eat it
+			return true									// eat it
 		|| extra = 0
 		if ((.onkeydown)(self, -10)?) and !keys.shift
-			.selrange = .ExtendToLineEnd(.sel1-1) // move sel to end of line
+			.selrange = .ExtendToLineEnd(.sel1-1)		// move sel to end of line
 			extra = 4
 		.NewLineSub(Extra)
 		return true
@@ -920,23 +918,6 @@ class TextView (GUIControl)
 		  else
 			.text = .text.right(max - s.length) + s
 		._LogTrimmed = NewLog
-
-//		|| L = 0
-		// use d.FindWhereLineBreaks(.text,  CharW,  .singleline,  p) isntead
-//		for line.lines in s
-//			._AddLine(line, L++)
-	
-	
-//	libinternal _AddLine (|string| s, |int| i)
-//		|| last = ._lines.Last!
-//		if !last.EndsWithLine
-//			last.Text += s
-//			return 
-//		(last isnt last)
-//		|| d = TextViewLine(last.after)
-//		d.vline = last.vline + 1
-//		d.tline = last.tline + 1
-//		last.next = d
 	
 		
 	libinternal DeComment (|bool|)
@@ -1041,15 +1022,6 @@ class TextView (GUIControl)
 			rz = true
 
 
-	libinternal TypeTab (|bool|)
-// not sure why I did this?
-//		|| sr = .SelRange
-//		if !sr.width and .IsJeeboxMode
-//			if .TabIndent(1, "\t", true)
-//				return true
-		return .typed("\t")
-
-
 	libinternal CanTypeTab (|bool|)
 		return !(.SingleLine & 1)
 	
@@ -1063,7 +1035,7 @@ class TextView (GUIControl)
 			if (.onkeydown)(self, -9)?
 				return true
 			if !sh or .isinline
-				return .TypeTab
+				return .typed("\t")
 		return .TabIndent(-sh.dir, "\t")
 
 		
@@ -1078,18 +1050,18 @@ class TextView (GUIControl)
 		return .text[a, b]
 
 
-	libinternal LineExpand (|IntRange| s, |bool| canback=false, |intrange|)
+	libinternal LineExpand (|IntRange| s, |bool| CanBack=false, |intrange|)
 		// this thing seems borked.
 		opt norefcounts
 		s = .clamp(s)
 		if canback
-			|| back = s.x2-1 
+			|| back = s.x2-1
 			if self[back].istextline
 				s.x2 = back
 		
 		if self[s.x].istextline and self[s.x-1].istextline and !s.width
 			return s
-		|| A = .FindLineSeperator(s.x, 0 )
+		|| A = .FindLineSeperator(s.x, 0)
 		|ind| b = s.x2
 		b += self[b-1].istextline
 			
@@ -1104,7 +1076,7 @@ class TextView (GUIControl)
 		while d != start
 			|| err = d.LineError
 				.ErrorAt(err)
-				return 
+				return
 			d = d.loop
 	
 	
@@ -2174,7 +2146,7 @@ class TextView (GUIControl)
 		return .NextVline(d, d, 0)
 
 
-	libinternal PrepareLinesOfText 
+	libinternal PrepareLinesOfText
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
 		.TextAlteredForDraw = 0
@@ -2322,7 +2294,7 @@ class TextView (GUIControl)
 		._JeeboxMode = value
 		
 
-	function JeeboxMode (|bool| Hard=false, |documentjeeboxmode|)
+	function JeeboxMode (|bool| Hard=false, |Documentjeeboxmode|)
 		opt norefcounts
 
 		rz = ._JeeboxMode

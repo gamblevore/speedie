@@ -358,10 +358,25 @@ class XVar (list)
 			  elseif v == 3
 				fs <~ (reg|&vec3|)[]
 			  elseif v == 4
-				fs <~ (reg|&vec4|)[]
+				(reg|&vec4|)[].SmallerVec4Render(fs)
 
 		return true
 
+
+	function vec4.SmallerVec4Render (|Faststring| fs)
+		if self == vec4()
+			fs <~ "vec4()"					// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell
+		  else
+			fs <~ "("
+			for i in 4
+				|| v = self[i]
+					fs <~ v
+				  else
+					fs <~ "0"
+				if i < 3
+					fs <~ ", "
+			fs <~ ")"
+	
 
 	function faststring.EscapeByte (|byte| value)
 		opt norefcounts
