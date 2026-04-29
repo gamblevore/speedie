@@ -21,14 +21,14 @@ function assembler.OptVecMathOne (|$asmreg| V, |int|)
 			return sh ||| 1K
 			
 
-function message.OptVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift, |ASM| Op,  |&fatasm|)
-	if !shift
-		Shift = assembler.sh.OptVecMathTwo(L, R)
-		if Shift
-			Shift &= 63
-			op = op.VecIntMathPart
+function message.OptIntVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift, |ASM| Op,  |&fatasm|)
+	if !Shift
+		|| Part = assembler.sh.OptVecMathTwo(L, R)
+			|| fat = .ADD(dest, l, r, Part & 63)
+			fat._op = op.VecIntMathPart
+			return fat
 
-	|| fat = .ADD(dest, l, r, shift)
+	|| fat = .ADD(dest, l, r, Shift)
 	fat._op = op
 	return fat
 

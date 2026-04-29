@@ -227,7 +227,7 @@ datatype vec4
 
 	
 	function Posify (|vec4|)
-		description "Make this vector have positive area." 
+		description "Make this vector have positive area. (4, 4, 1, 1) --> (1, 1, 4, 4)"
 		return (.x1 min .x2, .y1 min .y2, .x1 max .x2, .y1 max .y2)
 
 		

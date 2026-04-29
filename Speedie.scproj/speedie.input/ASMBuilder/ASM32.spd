@@ -20,7 +20,7 @@ function message.AddInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fata
 	|| BigLast = R.IsBig
 	if L.IsBig != BigLast
 		if  BigLast  and  (sh == 0  and  l isnt Alternate)
-			swap (L) (R)				   			// r1 = small + big --> r1 = big + small
+			swap (L) (R)							// r1 = small + big --> r1 = big + small
 			BigLast = false
 		if !BigLast									// r1 = big + small << sh
 			if l isnt Alternate
@@ -33,15 +33,14 @@ function message.AddInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fata
 				problem (self, "Subtraction upon smaller type, by a bigger one.")
 	
 	if Subtract
-		return .OptVecMath(dest, l,r,sh, asm.SUB)
+		return .OptIntVecMath(dest, l,r,sh, asm.SUB)
 
 	if (r is temp)
 		|| oof = .AddShifted(dest, l, r, sh)
 			return oof
 			
 	// if its a normal add a = b + c, then LMUL==1, which comes through here.
-
-	return .OptVecMath(dest, l,r,sh, asm.add)
+	return .OptIntVecMath(dest, l,r,sh, asm.add)
 
 
 function message.AddShifted (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)

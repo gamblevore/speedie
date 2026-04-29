@@ -279,9 +279,9 @@ extend Assembler
 
 		
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
-		if "jb_main".trap
-		if L.fat(asm.vget) and R.fat(asm.vget)						// i hope this works.
-			L = .Subtract(exp, dest, R, L)
+		if L.fat(asm.vget) or R.fat(asm.vget)
+			|| subdest = dest.µType(L.µtype)		// sub-part is a float/int not a bool!
+			L = .Subtract(exp, subdest, R, L)
 			R = asmreg()
 		
 		if l.IsInt
@@ -388,7 +388,7 @@ extend Assembler
 
 	function ASMReg.LeftScore (|int|) // we want pointers on the left, and consts on the right
 		rz += .SomePointer << 2				// pointers on left
-		rz += (self isnt Const) << 1	// consts on right
+		rz += (self isnt Const) << 1		// consts on right
 		rz += self isnt temp				// temps on right
 	
 	
@@ -456,7 +456,7 @@ extend Assembler
 				swapped = true
 	
 		if r.iszero // add or subtract zero
-			return l//.Assign(exp, dest, l)
+			return l
 
 		|| LMul = 1
 		if (l isnt noscale) and l.SomePointer
@@ -504,8 +504,8 @@ extend Assembler
 				return qq
 
 			if !dest.isvec
-				|| Shift = .OptVecMathTwo(L, R)
-					|| fat = exp.uadd(dest, l, r, shift&63)
+				|| Parts = .OptVecMathTwo(L, R)
+					|| fat = exp.UADD(dest, l, r, Parts&63)
 					fat._op += minus
 					return fat*dest
 
@@ -557,8 +557,8 @@ extend Assembler
 			return Q2
 
 		if !dest.IsVec and l.IsSmall
-			|| Shift = .OptVecMathTwo(L,R)
-				return exp.umul(dest, l, r, shift&63)*Dest
+			|| Parts = .OptVecMathTwo(L,R)
+				return exp.umul(dest, l, r, Parts&63)*Dest
 
 		if 0: exp.VMUL
 		return exp.FMUL(dest, L, R, asmreg(), l.IsSmall|int|).Vectorise(dest, asm.vmul)
@@ -604,7 +604,7 @@ extend Assembler
 		return .DivFloat(exp, dest, l, r, )
 
 
-	function DivFloat    (fn_opasm)
+	function DivFloat	(fn_opasm)
 		if (dest is Const) and (l isnt alternate)
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatDiv)
 		|| Q = .QuickFloatDiv(exp, dest, L, R)
@@ -613,8 +613,8 @@ extend Assembler
 
 		|| Small = dest.IsSmall|int|
 			if !dest.isvec
-				|| Shift = .OptVecMathTwo(L,R)
-					return exp.udiv(dest, l, r, shift&63) * dest
+				|| Parts = .OptVecMathTwo(L,R)
+					return exp.udiv(dest, l, r, Parts&63) * dest
 		
 		return exp.FDIV(dest,  L,  R,  asmreg(), Small).Vectorise(dest, asm.VDIV)
 
