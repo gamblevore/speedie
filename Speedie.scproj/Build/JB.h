@@ -4715,6 +4715,8 @@ Float64 SC_Reg_F64(ASMReg Self);
 
 FatASM* SC_Reg_FAT(ASMReg Self);
 
+FatASM* SC_Reg_Fat(ASMReg Self, ASM Op);
+
 uint SC_Reg_FatIndex(ASMReg Self);
 
 ASMReg SC_Reg_FatIndexSet(ASMReg Self, uint Value);
@@ -5881,7 +5883,7 @@ bool SC_FAT_IsFinisherWith0(FatASM* Self);
 
 bool SC_FAT_IsFunc(FatASM* Self);
 
-bool SC_FAT_IsPartiable(FatASM* Self);
+bool SC_FAT_IsPartyAble(FatASM* Self);
 
 bool SC_FAT_IsRead(FatASM* Self);
 
@@ -8978,7 +8980,7 @@ bool SC_Msg_OppExpand(Message* Self);
 
 int SC_Msg_OpScore(Message* Self);
 
-FatASM* SC_Msg_OptVecMath(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Shift, ASM Op);
+FatASM* SC_Msg_OptIntVecMath(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Shift, ASM Op);
 
 JB_String* JB_Msg_OriginalFilePath(Message* Self);
 

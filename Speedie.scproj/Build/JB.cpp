@@ -3504,7 +3504,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[449]);
-	JB_FS_AppendInt32(_fsf0, (2026042717));
+	JB_FS_AppendInt32(_fsf0, (2026042919));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10505,7 +10505,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1388]);
-	JB_FS_AppendInt32(_fsf0, (2026042717));
+	JB_FS_AppendInt32(_fsf0, (2026042919));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -12608,9 +12608,7 @@ ASMReg SC_FinalDecrements(Assembler* Self, Message* Exp, ASMReg Dest) {
 		return nil;
 	}
 	ASMReg D1 = SC_Pac_DecrObj(Self);
-	ASMReg D2 = SC_Pac_DecrObj(Self);
-	ASMReg D3 = SC_Pac_DecrObj(Self);
-	return SC_FAT_AsReg(SC_Msg_RFRT(Exp, D0, D1, D2, D3), kSC__Reg_Exit);
+	return SC_FAT_AsReg(SC_Msg_RFRT(Exp, D0, D1, nil, nil), kSC__Reg_Exit);
 }
 
 Message* SC_FindBytePos(Message* Node) {
@@ -16186,17 +16184,19 @@ JB_String* JB_vec3_Render(vec3 Self, FastString* Fs_in) {
 
 JB_String* JB_vec4_Render(vec4 Self, FastString* Fs_in) {
 	FastString* Fs = JB_FS__FastNew(Fs_in);
-	//;
 	JB_FS_AppendByte(Fs, '(');
-	JB_FS_AppendFloatAsText(Fs, Self[0]);
-	JB_FS_AppendString(Fs, JB_LUB[46]);
-	JB_FS_AppendFloatAsText(Fs, Self[1]);
-	JB_FS_AppendString(Fs, JB_LUB[46]);
-	JB_FS_AppendFloatAsText(Fs, Self[2]);
-	JB_FS_AppendString(Fs, JB_LUB[46]);
-	JB_FS_AppendFloatAsText(Fs, Self[3]);
+	{
+		int I = 0;
+		while (I < 4) {
+			if (I) {
+				JB_FS_AppendString(Fs, JB_LUB[46]);
+			}
+			JB_FS_AppendFloatAsText(Fs, Self[I]);
+			(++I);
+		};
+	}
+	;
 	JB_FS_AppendByte(Fs, ')');
-	//;
 	return JB_FS_SmartResult(Fs, Fs_in);
 }
 
@@ -16665,6 +16665,16 @@ Float64 SC_Reg_F64(ASMReg Self) {
 
 FatASM* SC_Reg_FAT(ASMReg Self) {
 	return SC_uint_FAT(SC_Reg_FatIndex(Self));
+}
+
+FatASM* SC_Reg_Fat(ASMReg Self, ASM Op) {
+	FatASM* F = SC_Reg_FAT(Self);
+	if (F) {
+		if (SC_FAT_OperatorIsa(F, Op)) {
+			return F;
+		}
+	}
+	return nil;
 }
 
 uint SC_Reg_FatIndex(ASMReg Self) {
@@ -21214,7 +21224,7 @@ bool SC_FAT_IsFunc(FatASM* Self) {
 	return (B == kSC__ASM_FNCX) or (B == kSC__ASM_FNC);
 }
 
-bool SC_FAT_IsPartiable(FatASM* Self) {
+bool SC_FAT_IsPartyAble(FatASM* Self) {
 	uint Op = Self->_Op;
 	if (((Op >= kSC__ASM_PADD) and (Op <= kSC__ASM_PDIV)) or ((Op >= kSC__ASM_UADD) and (Op <= kSC__ASM_UDIV))) {
 		return true;
@@ -23067,6 +23077,11 @@ ASMReg SC_Pac_CloseVars(Assembler* Self, uint64 Orig, Message* Exp, ASMReg Retur
 }
 
 ASMReg SC_Pac_Compare(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode) {
+	if (SC_Reg_Fat(L, kSC__ASM_VGET) or SC_Reg_Fat(R, kSC__ASM_VGET)) {
+		ASMReg Subdest = SC_Reg_xC2xB5TypeSetWithTC(Dest, SC_Reg_xC2xB5Type(L));
+		L = SC_Pac_Subtract(Self, Exp, Subdest, R, L);
+		R = SC_Reg__New();
+	}
 	if (SC_Reg_IsInt(L)) {
 		return SC_Pac_CompareInt(Self, Dest, L, R, Exp, Mode);
 	}
@@ -23291,9 +23306,9 @@ ASMReg SC_Pac_DivFloat(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 	int Small = ((int)SC_Reg_IsSmall(Dest));
 	if (Small) {
 		if (!SC_Reg_IsVec(Dest)) {
-			int Shift = SC_Pac_OptVecMathTwo(Self, L, R);
-			if (Shift) {
-				return SC_FAT_AsReg(SC_Msg_UDIV(Exp, Dest, L, R, Shift & 63), Dest);
+			int Parts = SC_Pac_OptVecMathTwo(Self, L, R);
+			if (Parts) {
+				return SC_FAT_AsReg(SC_Msg_UDIV(Exp, Dest, L, R, Parts & 63), Dest);
 			}
 		}
 	}
@@ -23650,9 +23665,9 @@ ASMReg SC_Pac_FloatMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 		return Q2;
 	}
 	if ((!SC_Reg_IsVec(Dest)) and SC_Reg_IsSmall(L)) {
-		int Shift = SC_Pac_OptVecMathTwo(Self, L, R);
-		if (Shift) {
-			return SC_FAT_AsReg(SC_Msg_UMUL(Exp, Dest, L, R, Shift & 63), Dest);
+		int Parts = SC_Pac_OptVecMathTwo(Self, L, R);
+		if (Parts) {
+			return SC_FAT_AsReg(SC_Msg_UMUL(Exp, Dest, L, R, Parts & 63), Dest);
 		}
 	}
 	if (0) {
@@ -23673,9 +23688,9 @@ ASMReg SC_Pac_FloatPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, AS
 			return Qq;
 		}
 		if (!SC_Reg_IsVec(Dest)) {
-			int Shift = SC_Pac_OptVecMathTwo(Self, L, R);
-			if (Shift) {
-				FatASM* Fat = SC_Msg_UADD(Exp, Dest, L, R, Shift & 63);
+			int Parts = SC_Pac_OptVecMathTwo(Self, L, R);
+			if (Parts) {
+				FatASM* Fat = SC_Msg_UADD(Exp, Dest, L, R, Parts & 63);
 				(SC_FAT__opSet(Fat, Fat->_Op + Minus));
 				return SC_FAT_AsReg(Fat, Dest);
 			}
@@ -25786,7 +25801,7 @@ ASMReg SC_Pac_VecAccess(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Base,
 	if ((!Vara) and (SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp))) {
 		FatASM* Party = SC_Reg_FAT(Dest);
 		if (Party) {
-			if (SC_FAT_IsPartiable(Party)) {
+			if (SC_FAT_IsPartyAble(Party)) {
 				Party->Prms[3] = (Party->Prms[3] | K);
 				return SC_Pac_ReDestWithFATReg(Self, Party, Base);
 			}
@@ -35620,7 +35635,7 @@ FatASM* SC_Msg_AddInt(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Sh) {
 		}
 	}
 	if (Subtract) {
-		return SC_Msg_OptVecMath(Self, Dest, L, R, Sh, kSC__ASM_SUB);
+		return SC_Msg_OptIntVecMath(Self, Dest, L, R, Sh, kSC__ASM_SUB);
 	}
 	if (SC_Reg_SyntaxIs(R, kSC__Reg_Temp)) {
 		FatASM* Oof = SC_Msg_AddShifted(Self, Dest, L, R, Sh);
@@ -35628,7 +35643,7 @@ FatASM* SC_Msg_AddInt(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Sh) {
 			return Oof;
 		}
 	}
-	return SC_Msg_OptVecMath(Self, Dest, L, R, Sh, kSC__ASM_ADD);
+	return SC_Msg_OptIntVecMath(Self, Dest, L, R, Sh, kSC__ASM_ADD);
 }
 
 FatASM* SC_Msg_ADDK(Message* Self, ASMReg R1, ASMReg R2, int K) {
@@ -41886,12 +41901,13 @@ int SC_Msg_OpScore(Message* Self) {
 	return SC__Opp_CustomOperatorScore;
 }
 
-FatASM* SC_Msg_OptVecMath(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Shift, ASM Op) {
+FatASM* SC_Msg_OptIntVecMath(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int Shift, ASM Op) {
 	if (!Shift) {
-		Shift = SC_Pac_OptVecMathTwo((&SC__Pac_Sh), L, R);
-		if (Shift) {
-			Shift = (Shift & 63);
-			Op = SC_ASM_VecIntMathPart(Op);
+		int Part = SC_Pac_OptVecMathTwo((&SC__Pac_Sh), L, R);
+		if (Part) {
+			FatASM* Fat = SC_Msg_ADD(Self, Dest, L, R, Part & 63);
+			(SC_FAT__opSet(Fat, SC_ASM_VecIntMathPart(Op)));
+			return Fat;
 		}
 	}
 	FatASM* Fat = SC_Msg_ADD(Self, Dest, L, R, Shift);
@@ -60762,4 +60778,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 7321403174794852562 -806651096732154374
+// 6078294091941953603 -806651096732154374
