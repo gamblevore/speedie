@@ -561,22 +561,22 @@ AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* Debu
 }
 
 
+
 AlwaysInline ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op) {
-	if (n4)
-		JB_Decr(o4);
-	if (n3)
-		JB_Decr(o3);
+// decring more than 1 is crazy. 1 is a lot as its an entire function call already.
+//	if (n4)
+//		JB_Decr(o4);
+//	if (n3) 
+//		JB_Decr(o3);
 	if (n2)
 		JB_Decr(o2);
-	if (n1)
+	if (n1) 
 		JB_SafeDecr(o1);
 	return RestoreStack(vm, r, (Op>>19)<<19, 0);
 }
 
-
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
-
 
 AlwaysInline void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?

@@ -1124,8 +1124,6 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
     }
 }
 
-
-
 // This COULD be optimised... so that we can do this with a... "stackless" system!
 // it just uses loops. We create a delete-tree using the objects RAM...
 // overwritign the last property. 
@@ -1136,29 +1134,26 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
 // no need to worry about jbobject/savable... PerryIDE is only 3 classes deep...
 // list is a bit of an issue, but that can be separately optimised :)
 // could store the delete-info in the behaviour table or the allocationblock... either is ok.
-
 // we could specify a compile flag that warns if any classes unnecssarily have too many vars
 // to use optimised destructors.
+// Not relevant to any CakeVM stuff. Put off till i die. (and come back.)
 
-// It could be very good to combine with reworking the constructor/new/alloc system which is
-// overcomplex... Also allows for a simpler disposer...
 
-//#ifdef PerryExec
-//	struct CakeVM;
-//	extern CakeVM* Cake__Cake_VM;
-//#endif
-__hot void JB_Delete( FreeObject* Obj ) {
-//#ifdef PerryExec
-//		static int x = 0;
-//		x++;
-//		void CakeCorrupt (int Sig);
-//		if (x == 612 and Cake__Cake_VM)
-//			CakeCorrupt(SIGSEGV);
-//#endif
+
+#if __VM__
+	__attribute__((always_inline)) ivec4*	JB_ASM_CallBack	 (u32* Code);
+#endif
+
+__hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 	Sanity(Block);
 	fpDestructor Destructor = GetDestructor_(Block);
 	if (Destructor) {
+		#if __VM__
+		if (((uint64)Destructor) >> 63) // VM based destructor
+			JB_ASM_CallBack((u32*)Destructor);
+		else
+		#endif
 		(Destructor)((JB_Object*)Obj); // do this before altering memory.
 	}
 	JB_DeleteSub_(Obj, Block);
@@ -1166,7 +1161,7 @@ __hot void JB_Delete( FreeObject* Obj ) {
 
 
 
-static void BlockFindLeakedObject_(AllocationBlock* Block, JB_Object* Obj, Array* R) {
+static void BlockFindLeakedObject_ (AllocationBlock* Block, JB_Object* Obj, Array* R) {
 	if (IsDummy(Block)) { // how???
 		debugger;
 		return;

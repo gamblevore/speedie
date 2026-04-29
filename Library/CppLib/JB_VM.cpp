@@ -22,6 +22,8 @@ extern "C" {
 jmp_buf 		CakeRestore;
 byte			SubCrash;							// If the crash reporting system itself crashes.
 uint			CrashCount;
+CakeVM*			JB_GlobalVM;
+
 
 #ifdef __VM__
 #pragma GCC optimize ("Os")
@@ -118,22 +120,21 @@ void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
 
  
 #define EROR HALT
-static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, uint Op) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm
+static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm
 static void * const GlobalJumpTable[] = {
 	#include "InstructionList.h"
 	&&TRYBREAK,
 	&&ALWAYSBREAK,
 };
-    if (Op) {
+    if_rare (!Code) {
 		vm.OriginalJumpTable = &GlobalJumpTable[0];
 		memcpy(vm.JumpTable,     GlobalJumpTable, sizeof(void*)     * 256);
 		memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
 		return 0;
 	}
   
-    RegVar(r, r21) = vm.Registers + 3;
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
-	Op = *Code++;									// spelled out for debug
+	uint Op = *Code++;									// spelled out for debug
 
 	// // // // //  START VM  // // // // // 
 	goto *JumpTable[Op>>24];
@@ -141,7 +142,7 @@ static void * const GlobalJumpTable[] = {
 	EXIT:;
 	return &vm.Registers[2].Ivec;
 	
-	ALWAYSBREAK:;											// Assume was in debug mode
+	ALWAYSBREAK:;									// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
 	goto BREAK;
 
@@ -251,7 +252,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
     V->Pico.Upon = V;
 	VMCodePtr(V)[CakeCodeMax-1] = VMHexFinalReturn;
 	VMCodePtr(V)[-1] = VMHexEndStack;
-	__CAKE_VM__(*V, 0, CakeStackSize);
+	__CAKE_VM__(*V, nil, nil);
 	return V;
 }
 
@@ -270,7 +271,9 @@ AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 		Base[1] = {};
 		Base += 2;
 	}
-	return __CAKE_VM__(V, Base[-2].Code, 0);
+	
+	JB_GlobalVM = &V;								// hopefully I won't run two VMs...
+	return __CAKE_VM__(V, Base[-2].Code, V.Registers + 3);
 }
 
 
@@ -353,13 +356,47 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 
 
 
+ivec4* JB_ASM_CallBack (ASM* Code) { // want this inlined...
+	CakeVM* V = JB_GlobalVM;
+	Code = VMClearHigh(Code);
+
+	int Dest = 31; // store in the decr instruction??
+	// well... even a FNCX() can call something...
+	// actually, in the case of FNCX(), the regs are saved already...
+	// wait... no? they are not? its stored in n1 in ForeignFunc
+	// so we could take that, and put it somewhere? like as a stack?
+	// hmmm... that is a little more... consistant. but slower.
+	// we could just store it somewhere for real... like in the vm props.
+	// we could do the same for decr? thats all we want really?
+	// what about the current stack position? I guess that needs storing too
+	// or... pre-write it.
+	
+	CakeRegister* r = 0; // so this is the current stack. Unknown right now.
+	CakeStack* NewStack = &((r + Dest)->Stack);
+	{
+		auto OldStack = (CakeStack*)(r-1);
+		OldStack->GoUp = Dest;
+		NewStack->Depth = OldStack->Depth+1;
+	}
+	
+	NewStack->DestReg = Dest;
+	NewStack->GoUp = 0;
+	NewStack->Code = Code;
+	
+	// Also need to pass the new stackpos! into the cakevm...
+	// Oooooofffff
+	return __CAKE_VM__(*V, Code, (CakeRegister*)(NewStack+1));
+}
+
+
+
 static JB_Class*	CakeClass;
 static void**		CakeVirtuals;
 
 bool JB_Cake__Prepare (int N, int B) {
-	// if its small enough... we could put this into the stack area.
+	// if its small enough...   we could put this into the stack area.
 	// needs a little rework... but could make things faster!
-	// lets say 128K or less. Otherwise, we allocate.
+	// lets say 128K or less.   Otherwise, we allocate.
 	N *= sizeof(JB_Class);
 	B *= sizeof(void*);
 	byte* Data = (byte*)JB_Realloc(nil, N + B + 8);

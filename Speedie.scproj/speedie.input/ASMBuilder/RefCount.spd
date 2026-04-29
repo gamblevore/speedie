@@ -179,7 +179,8 @@ function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
 function FinalDecrements (fn_asm)
 	|| D0 = .SafeDecr(dest)$
 	|| D1 = .DecrObj
-	|| D2 = .DecrObj
-	|| D3 = .DecrObj
-	return exp.RFRT(d0, d1, d2, d3) * asmreg.Exit
+//  i think this is overkill. its possible, but decrementing 3 objects in 1 instruction is madness.
+//	|| D2 = .DecrObj
+//	|| D3 = .DecrObj
+	return exp.RFRT(d0, d1) * asmreg.Exit
 

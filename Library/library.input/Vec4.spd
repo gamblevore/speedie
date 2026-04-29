@@ -39,7 +39,7 @@ datatype vec4
 		trin (3, LNG)
 		cpp_wrapper
 
-	function Abs (|vec4|) 
+	function Abs (|vec4|)
 		trin (4, ABS)
 		cpp_wrapper
 
@@ -47,32 +47,32 @@ datatype vec4
 		trin (5, POW)
 		cpp_wrapper JB_vec4_Pow
 
-	function Sqrt (|vec4|) 
+	function Sqrt (|vec4|)
 		trin (6, SQT)
 		cpp_wrapper
 
-	function Exp (|vec4|) 
+	function Exp (|vec4|)
 		trin (7, EXP)
 		description "Computes e to the power of (x)"
 		cpp_wrapper
 
-	function Log (|vec4|) 
+	function Log (|vec4|)
 		trin (8, LOG)
 		cpp_wrapper
 
-	function Exp2 (|vec4|) 
+	function Exp2 (|vec4|)
 		trin (9, XP2)
 		cpp_wrapper
 
-	function Log2 (|vec4|) 
+	function Log2 (|vec4|)
 		trin (10, LG2)
 		cpp_wrapper
 
-	function Unsin (|vec4|) 
+	function Unsin (|vec4|)
 		trin (12, NIS) // unsin
 		cpp_wrapper
 
-	function Uncos (|vec4|) 
+	function Uncos (|vec4|)
 		trin (13, SOC) // uncos
 		cpp_wrapper
 
@@ -80,15 +80,15 @@ datatype vec4
 		trin (14, NAT) // untan
 		cpp_wrapper
 
-	function Sine (|vec4|) 
+	function Sine (|vec4|)
 		trin (15, SIN)
 		cpp_wrapper
 
-	function Cos (|vec4|) 
+	function Cos (|vec4|)
 		trin (16, COS)
 		cpp_wrapper
 
-	function Tan (|vec4|) 
+	function Tan (|vec4|)
 		trin (17, TAN)
 		cpp_wrapper
 	
@@ -164,18 +164,11 @@ datatype vec4
 	function Right (|float| X, |vec4|)
 		return self + (x,0,x,0)
 
-//	operator dot3 (|vec4| V, |float|)
-//		v[0] = 0 // what on earth? surely i would clear a different part?
-//		return self • V
-	
 	operator absmax (|vec4| M, |vec4|)
 		return (.x longer m.x, .y longer m.y, .z longer m.z, .w longer m.w)
 
 	function CosR (|vec4|)
 		return (self * math.iTau).cos
-
-//	operator Pow (|vec4| p, |vec4|)
-//		return (.x pow p.x, .y.cos pow p.y, .z.cos pow p.z, .w.cos pow p.w)
 
 	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
