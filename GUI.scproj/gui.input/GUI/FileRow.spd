@@ -12,7 +12,7 @@ class FileRow (ListViewRow)
 	|int|							LastSize
 	|int|							LastScroll
 	|int|							LastFileCount
-	|byte| 							FindID
+	|byte|							FindID
 	|bool|							HasError
 	|bool|							InMainProj
 	|bool|							AsDir
@@ -20,7 +20,7 @@ class FileRow (ListViewRow)
 	|bool|							SameNameAsPrev
 	contains FileRow
 	
-	 
+	
 	constructor (|FileRow| R)
 		cpp_Part ConstructorCopy
 		.func = r.func
@@ -53,6 +53,7 @@ class FileRow (ListViewRow)
 		fs <~ .location
 		fs <~ .dirfile	
 
+	
 	function AskDelete (|fileviewer| fv)
 		|| ex = fv.extra
 		if ex contains self
@@ -95,7 +96,6 @@ class FileRow (ListViewRow)
 	
 	
 	function ReadFrom (|string|)
-//		.Sanity
 		return .Location + .dirfile
 
 
@@ -183,7 +183,8 @@ class FileRow (ListViewRow)
 		return n
 
 
-	function IsModified (|bool|)
+	inline IsModified (|bool|)
+		opt norefcounts
 		return ._Document$.ismodified
 
 
@@ -263,8 +264,7 @@ class FileRow (ListViewRow)
 			if DoRepl or (lastbefore != before)
 				LastBefore = before
 				
-				if !text[0].iswhite
-					s = s.trim.remove(charset.Line)
+				s = s.trim.remove(charset.Line)
 				|| result = error(nil, ErrorSeverity.OK)
 				parent ?= .FindAllParent(FoundList)
 				parent <~ result
