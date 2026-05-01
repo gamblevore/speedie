@@ -225,8 +225,6 @@ typedef ASM ASM_RET;
 
 typedef ASM ASM_Read;
 
-typedef ASM ASM_RefDecrMem;
-
 typedef ASM ASM_RefReturn;
 
 typedef ASM ASM_RefSet1;
@@ -1935,7 +1933,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_QRSS ((ASM)144)
 #define kSC__ASM_QSUB ((ASM)137)
 #define kSC__ASM_QXOR ((ASM)148)
-#define kSC__ASM_RALO ((ASM)90)
+#define kSC__ASM_RALO ((ASM)86)
 #define kSC__ASM_RD16 ((ASM)101)
 #define kSC__ASM_RD1S ((ASM)95)
 #define kSC__ASM_RD1U ((ASM)94)
@@ -1945,11 +1943,11 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_RD4U ((ASM)98)
 #define kSC__ASM_RD8U ((ASM)100)
 #define kSC__ASM_RET ((ASM)38)
-#define kSC__ASM_RFRD ((ASM)89)
+#define kSC__ASM_RFRD ((ASM)90)
 #define kSC__ASM_RFRT ((ASM)91)
-#define kSC__ASM_RFST ((ASM)87)
-#define kSC__ASM_RFUN ((ASM)86)
-#define kSC__ASM_RFWR ((ASM)88)
+#define kSC__ASM_RFST ((ASM)88)
+#define kSC__ASM_RFUN ((ASM)87)
+#define kSC__ASM_RFWR ((ASM)89)
 #define kSC__ASM_SUB ((ASM)48)
 #define kSC__ASM_SUBM ((ASM)55)
 #define kSC__ASM_TAIL ((ASM)2)
@@ -4619,17 +4617,17 @@ ASM SC_ASM_Read_moveSet(ASM Self, uint Value);
 
 ASM SC_ASM_Read_OffsetSet(ASM Self, uint Value);
 
-ASM SC_ASM_RefDecrMem_CountSet(ASM Self, uint Value);
-
-ASM SC_ASM_RefDecrMem_OffsetSet(ASM Self, uint Value);
-
-ASM SC_ASM_RefSet2_DecrSet(ASM Self, uint Value);
+ASM SC_ASM_RefSet1_SaveSet(ASM Self, uint Value);
 
 ASM SC_ASM_RefSet2_OffsetSet(ASM Self, uint Value);
 
-ASM SC_ASM_RefSet3_DecrSet(ASM Self, uint Value);
+ASM SC_ASM_RefSet2_SaveSet(ASM Self, uint Value);
 
 ASM SC_ASM_RefSet3_OffsetSet(ASM Self, uint Value);
+
+ASM SC_ASM_RefSet3_SaveSet(ASM Self, uint Value);
+
+ASM SC_ASM_RefSetApart_SaveSet(ASM Self, uint Value);
 
 ASM SC_ASM_REQ_ModeSet(ASM Self, uint Value);
 
@@ -5441,11 +5439,6 @@ ASM* SC_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 // ASM_Read
 ASM* SC_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
-// ASM_RefDecrMem
-ASM* SC_ASM_RefDecrMem__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -6500,6 +6493,8 @@ FatASM* SC_Pac_RefCountIncr2(Assembler* Self, Message* Exp, Message* Prms);
 FatASM* SC_Pac_RefCountSet(Assembler* Self, Message* Exp, Message* Prms);
 
 FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunction* Fn);
+
+int SC_Pac_RefSave(Assembler* Self);
 
 bool SC_Pac_RegIsConst(Assembler* Self, ASMReg R, int64 K);
 
@@ -9120,15 +9115,15 @@ Message* SC_Msg_Resync(Message* Self, Message* Parent);
 
 FatASM* SC_Msg_RET(Message* Self, ASMReg R1, int Value);
 
-FatASM* SC_Msg_RFRD(Message* Self, ASMReg R1, ASMReg R2, int Decr, int Offset);
+FatASM* SC_Msg_RFRD(Message* Self, ASMReg R1, ASMReg R2, int Save, int Offset);
 
-FatASM* SC_Msg_RFRT(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+FatASM* SC_Msg_RFRT(Message* Self, ASMReg R1, ASMReg R2);
 
-FatASM* SC_Msg_RFST(Message* Self, ASMReg R1, ASMReg R2);
+FatASM* SC_Msg_RFST(Message* Self, ASMReg R1, ASMReg R2, int Save);
 
-FatASM* SC_Msg_RFUN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
+FatASM* SC_Msg_RFUN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Save);
 
-FatASM* SC_Msg_RFWR(Message* Self, ASMReg R1, ASMReg R2, int Decr, int Offset);
+FatASM* SC_Msg_RFWR(Message* Self, ASMReg R1, ASMReg R2, int Save, int Offset);
 
 void SC_Msg_Safe(Message* Self, FastString* Fs);
 
