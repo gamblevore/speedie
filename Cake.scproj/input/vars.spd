@@ -317,7 +317,7 @@ class XVar (list)
 			fs <~ (reg|&bool|)[].string
 		  elseif t isnt Floating
 			if v <= 1
-				|uint64| Value 
+				|uint64| Value
 				if BC > 4
 					value = (reg|&int64|)[]
 				  elseif bc == 4

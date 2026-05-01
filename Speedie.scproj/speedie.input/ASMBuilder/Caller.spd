@@ -157,11 +157,12 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
-function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |asmreg|)				// dofunction function
+function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| fn,  |asmreg|)				// dofunction function
+	opt norefcounts
 	if !.InlineDepth
 		|| unable = (.EntireInlineFailed<2)
-		|| reason = ("Unable to inline function" (unable) "Inline depth too great")
-		error (exp, reason)
+		|| reason = ("Unable to inline function: " (unable) "Inlined too deep on function: ")
+		error (exp, reason + fn.RenderName)
 	.EntireInlineFailed = 1 + !DepthOK
 	return asmreg()
 
@@ -197,7 +198,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
 			if fn is LinkInline
-				return .CantLinkInline(exp, depthok)
+				return .CantLinkInline(exp, depthok, fn)
 		
 		TableID = .asmtableid(exp, fn)
 		

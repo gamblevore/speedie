@@ -346,11 +346,10 @@ function Transform ()
 	if !StillOK
 		.SavedError = StdErr.LastError
 		.Badness |= 1
-	  else
+	  elseif (self is ConOrDes) and .IsARealSpdFunc
 		.CallParents // hehe 🥰
-		if .CanBuildConstructor
-			.BuildConstructorDestructor
-			Tran_All( self, n, space )
+		.BuildConstructorDestructor
+		Tran_All( self, n, space )
 
 	scfunction.CurrFunc = nil
 	scmodule.curr = nil
@@ -1084,12 +1083,23 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 	|| c = .cls$
 	for (curr in root)
 		|| f = curr.IsParentConCall
-//			|| fcls = f.cls
-			expect  (f.IsOKConstructorCall(c))   (curr, "Function should belong to parent class, but doesn't.")
+			expect  (f.IsOKConstructorCall(c))		(curr, "Function should belong to parent class, but doesn't.")
 			rz ?= curr
 			FoundCount++
-			expect  (FoundCount < 2)  (curr, "Multiple calls to parent constructor/destructor not allowed.")		
+			expect  (FoundCount < 2)				(curr, "Multiple calls to parent constructor/destructor not allowed.")		
+	if rz and self is Destructor
+		expect (rz.IsLast)							(rz,   "Destructor must come last")
+		// could be relaxed so that self cant come after, but other stuff can.
 
+/*
+	So how to do this thing?
+	
+	We want to change how destructors are called, and work.
+
+	So how to do it?
+	
+	Each destructor must call a parent destructor, which can be JB_Obj_Destructor
+*/
 
 function Borked (|bool|)
 	return .Badness & 128

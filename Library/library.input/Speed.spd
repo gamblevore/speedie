@@ -58,6 +58,10 @@ function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Dur
 inline Date.ReportSpeed
 	disabled "Use .Report"
 
+
 inline Date.Report (|string| name, |int| Size=0,  |Date| After=date.now)
-	printline name.RenderSpeed(size, after-self)
+	opt norefcounts
+	|| str = name.RenderSpeed(size, after-self)
+	printline str
+	jb_freeifdead(str)
 

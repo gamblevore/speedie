@@ -953,7 +953,6 @@ function NoTail6 (|int| b, |int| c, |int|)
 
 
 function YesInline6 (|int| b, |int| c, |int|)
-	// how to do inlining? Not sure? Won't they inline anyhow?
 	return No4(b+1, c, c)
 
 

@@ -95,7 +95,7 @@ function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 		
 
 	if  Rel.ASMType is kreturn
-        /* return YY.new  -->  yy.new(rz), return */
+		/* return YY.new  -->  yy.new(rz), return */
 		|| prm = s.last
 			prm.func = @prm
 			|| subrz = prm.msg(@thg, "rz")					// we need to add rz.

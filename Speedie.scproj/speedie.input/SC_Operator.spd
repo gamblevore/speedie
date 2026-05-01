@@ -504,7 +504,6 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if  comp is shiftonly  and  rc is const
 		// check shift size
 		|| IsLeft = comp == scoperator.LeftShift
-		// OK... so how to do this?
 		//  || x = 1<<32 // upgrade
 		//  || x = y<<32 // fail
 		if lc isnt const

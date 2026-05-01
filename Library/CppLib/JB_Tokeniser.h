@@ -42,7 +42,6 @@ extern "C" {
 	int JB_Tk__ClearIndent ();
     int JB_Tk__CleanSpaces (  );
 	void JB_Tk__Constructor(  );
-	void JB_Tk__Destructor(  );
 	void JB_Tk__TokenSet( JB_String* TokStr, TokHan* Stuff );
     TokHan* JB_Tk__Token(JB_String* s);
     int JB_Tk__NextByte();

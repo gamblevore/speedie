@@ -2,7 +2,6 @@
 
 
 /*
-
 // bad code idea...
 module SCSelector
 	function BuildClassCode (|string| name, |string| type, |message|)

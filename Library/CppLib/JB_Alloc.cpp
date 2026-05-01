@@ -1165,6 +1165,10 @@ __hot void JB_Delete ( FreeObject* Obj ) {
 }
 
 
+void JB_Obj_Destructor (JB_Object* Obj) {
+	JB_DeleteSub_((FreeObject*)Obj, ObjBlock_(Obj));
+}
+
 
 static void BlockFindLeakedObject_ (AllocationBlock* Block, JB_Object* Obj, Array* R) {
 	if (IsDummy(Block)) { // how???

@@ -741,12 +741,12 @@ function SCFunction.CallSuperMem (|SCFunction| fn)
 
 
 	
-function SCFunction.FillInDestructor
+function SCFunction.FillInDestructor // filldestructor
 	opt norefcounts
-	|| s = .sourcearg$
-	|| c = .cls$
+	|| s = .SourceArg$
+	|| c = .Cls$
 	|| first = s.FindDestructor
-	Using s
+	using s
 	for d in c.Properties
 		if d.IsReffable(true)
 			s.AddBefore( first, d.RefDestructor )
@@ -764,8 +764,7 @@ function SCFunction.FindCallParents (|message|)
 
 function SCFunction.CallParents 
 	opt norefcounts
-	require self is Constructor or Destructor
-	require .IsARealSpdFunc and !.FindCallParents
+	require !.FindCallParents
 	|| c = .cls $
 	
 	|| parent = c.realsuper

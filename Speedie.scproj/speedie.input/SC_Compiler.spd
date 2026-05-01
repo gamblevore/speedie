@@ -750,10 +750,6 @@ function SCFunction.IsARealSpdFunc (|bool|)
 	return true
 
 
-function SCFunction.CanBuildConstructor (|bool|)
-	return (self is ConOrDes) and .IsARealSpdFunc
-
-
 function SortModulesAndClasses (|bool|)
 	opt norefcounts
 	for c in .ClassList
