@@ -1,6 +1,6 @@
 
 
-class InputStream 
+class InputStream
 	|int|						Length
 	|FastBuff|					Data
 	|file?|						File
@@ -14,8 +14,10 @@ class InputStream
 	linkage
 		cpp_part SS
 	
+	
 	constructor (|string| Data)
 		.reset(Data)
+	
 	
 	constructor (|file!| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorFile
@@ -24,11 +26,13 @@ class InputStream
 		.ChunkSize = chunksize
 		.length = file.size
 		.ReadChunk(file)
+
 	
 	function Reset (|string| Data)
 		.data.readfrom = Data
 		.length = Data.length
 		._NoMoreChunks = true
+
 
 	function ReadAll (|string|)
 		return .str(.length - .startfrom)
@@ -44,8 +48,9 @@ class InputStream
 			._NoMoreChunks = true // not technically true for pipes... but this will do for now!
 		return .data.readfrom
 	
+	
 	function Skip (|int| p = 1)
-		if p < 0 // end
+		if p < 0								// end
 			.position = .length
 		  else
 			.position += p
@@ -69,14 +74,15 @@ class InputStream
 			.startfrom += .data.size
 			if .ReadChunk(f)
 				return true
-			.file = nil // why not
+			.file = nil							// why not
 	
 	
 	function NonZeroByte (|int|)
 		while 
 			|| b = .byte
-			if b != 0 // -1 means end
+			if b != 0							// -1 means end
 				return b
+
 
 	function Find (|byte| c, |int|)
 		|| n = 0
@@ -87,6 +93,7 @@ class InputStream
 			n++
 			if b == c
 				return n
+
 	
 	function Byte (|ind|)
 		if .data.HasAny or .NextChunk
@@ -99,8 +106,8 @@ class InputStream
 		return .length - n
 	
 	
-	function Position (|int|)				// can't make this int64 without making remaining/length/startfrom also.
-		return .data.position + .StartFrom	// and data.position
+	function Position (|int|)					// cant be int64 without making remaining/length/startfrom also.
+		return .data.position + .StartFrom		// and data.position
 
 	setter Position (|int|)
 		.data.position = value - .StartFrom
