@@ -865,10 +865,8 @@ JB_App__StdIn
 JB_App__StdOut
 JB_App__Sudo
 JB_App__Switches
-JB_App__SyntaxAccess
 JB_App__TimeID
 JB_App__TurnInto
-JB_App__Yes
 JB_Arc_AppendFile
 JB_Arc_Base
 JB_Arc_Constructor
@@ -1331,8 +1329,6 @@ JB_MzSt_Durr
 JB_MzSt_LiveUpdate
 JB_MzSt_Report
 JB_MzSt_Start
-JB_NameTableConcept_Add
-JB_NameTableConcept_Get
 JB_Nav_Constructor
 JB_Nav_Destructor
 JB_Nav_MoveNext
@@ -1341,6 +1337,7 @@ JB_Nav_Value
 JB_ObjClass
 JB_ObjClassBehaviours
 JB_ObjLayer
+JB_Obj_Destructor
 JB_Obj_DictName
 JB_Obj_Print
 JB_Obj_Render
@@ -1652,7 +1649,6 @@ JB_Str_Reverse
 JB_Str_Rotate
 JB_Str_SetExt
 JB_Str_ShellPath
-JB_Str_Sibling
 JB_Str_SilentExecute
 JB_Str_Sort
 JB_Str_SpacesToTabs
@@ -1662,7 +1658,6 @@ JB_Str_StreamWithHeader
 JB_Str_StretchyFind
 JB_Str_SuffixSize
 JB_Str_SymLink
-JB_Str_SyntaxAccess
 JB_Str_System
 JB_Str_TabsToSpaces
 JB_Str_TextDouble
@@ -1670,7 +1665,6 @@ JB_Str_TextIntegerSection
 JB_Str_TextIntegerValid
 JB_Str_TitleCase
 JB_Str_Trim
-JB_Str_TrimExt
 JB_Str_TrimFirst
 JB_Str_TrimMiddle
 JB_Str_TrimSlashes
@@ -1885,13 +1879,8 @@ JB_fix_Clear
 JB_fix_ConstructorReplace
 JB_fix_ConstructorValue
 JB_fix_Destructor
-JB_fix_DownPart
 JB_fix_GetValue
-JB_fix_SetPart
 JB_fix_SetValue
-JB_fix_SyntaxAccess
-JB_fix_TypeOf
-JB_fix_TypeOfSet
 JB_flow_SyntaxUsing
 JB_flow_SyntaxUsingComplete
 JB_int64_AsFloat
