@@ -293,10 +293,10 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 		JB_Rec__NewErrorSub(nil, JB_FS_GetResult(Errs), nil, 4);
 	}
 	if (!ErrsIn and Errs)
-		JB_Delete((FreeObject*)Errs);
+		JB_FS_Destructor(Errs);
 	
 	int Exit = PicoStatus(Sh->Pico);
-	JB_Delete((FreeObject*)Sh);
+	JB_Sh_Destructor(Sh);
 	if (Exit > 128)									// died from a signal. Perhaps a SEGFAULT.
 		JB_ErrorHandleFile(self, nil, Exit, "crashed", "running");
 	return Exit;

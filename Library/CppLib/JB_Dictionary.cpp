@@ -87,8 +87,12 @@ void DictValueRemove_(JB_Object** Place) {
     if (!Item) return;
     *Place = 0; // just be safe?
     JB_Object* B = Obj_(Item);
-    if (Item == B)                    // a normal object
+    if (Item == B)						// a normal object
 		return JB_Decr(B);
+										// does this ever even happen?
+										// i think we don't allow ints anymore?
+										// i cant find the wrapper object anyhow
+										// or is this some kind of branch? i think its a branch?
 	JB_SetRefCount(B,0);
     JB_Delete((FreeObject*)B);
 }

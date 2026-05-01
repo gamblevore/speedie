@@ -221,7 +221,7 @@ Array* JB_Array_Copy(Array* self) {
 	if (!n)
 		return Result;
 	if (!GrowToLength_(Result, n, false)) {
-		JB_Delete((FreeObject*)Result);
+		JB_Array_Destructor(Result);
 		return 0;
 	}
 
