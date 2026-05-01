@@ -200,9 +200,9 @@ struct JBSaver_Behaviour {
 
 
 
-void JBClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
+void JB_ClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
 inline JB_Class JBClassInit (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
-	JBClassInitReal(Cls, Name, Size, Parent, b);
+	JB_ClassInitReal(Cls, Name, Size, Parent, b);
 	return Cls;
 }
 

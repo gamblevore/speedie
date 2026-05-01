@@ -630,8 +630,8 @@ function Message.RefDisappears (|bool|)
 		  elseif f == @prm
 			return false
 		  elseif f == @brel
-			return true // !obj
-		  elseif f == @tmp // if/while
+			return true			// !obj
+		  elseif f == @tmp		// if/while
 			|| T = p.asmtype
 			return T != asmtype.kreturn and asmtype.krejoin 
 		  elseif (F == @arg)
@@ -695,13 +695,12 @@ function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 	if ch.RefDisappears
 		|| fnc = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
 		msg.Prev = fnc
-//		msg.CheckFreeIfDeadValid
 		fnc.Last <~ msg
 		return
 	
 	if (parent == @prm)
 		if (parent.obj == compiler.TernaryFunc)
-			require ch.UseNonRefChangers == parent.first	//    (a,b)(c)-->(c,a,b)
+			require ch.UseNonRefChangers == parent.first	//	(a,b)(c)-->(c,a,b)
 		if (parent.obj == Compiler.RefFreeIfDead)
 			return nil										// already done!!!
 	
@@ -767,7 +766,7 @@ function SCFunction.CallParents
 	require !.FindCallParents
 	|| c = .cls					#require
 	|| parent = c.realsuper		#require
-
+	
 	|| t = c.isrole
 	require t != 2
 
@@ -873,6 +872,7 @@ function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
 		|| fn = dot.MsgFunc
 			if (fn is Destructor) and self isnt Destructor
 				error (dot, "Can only call destructors from within a destructor.")
+}
 
 
 
@@ -890,8 +890,7 @@ function scdecl.DeclToDot (|SCDecl| P0, |Message|)
 	thg.obj = p0
 	rz <~ @emb
 	rz.obj = self
-}
-
+	
 
 function scdecl.RefDestructor (|message|)
 	opt norefcounts

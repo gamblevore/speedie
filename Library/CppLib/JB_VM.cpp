@@ -25,21 +25,22 @@ uint			CrashCount;
 CakeVM*			JB_GlobalVM;
 
 
-#ifdef __VM__
+#ifdef __VM__		// hmmm... seems to cause compile errors. just remove the ifdef???
+					// i think it just affects libjeebox my boi...
 #pragma GCC optimize ("Os")
 
-#define kOverFlowStack		-2
-#define kStillInRange		-1
-#define	VMCodePtr(V)		((ASM*)(((byte*)(V)) + 1024*1024))
-#define	CanDebug(V)			(((uint64)(V))>>63)
+#define kOverFlowStack			-2
+#define kStillInRange			-1
+#define	VMCodePtr(V)			((ASM*)(((byte*)(V)) + 1024*1024))
+#define	CanDebug(V)				(((uint64)(V))>>63)
 
 
 #include "BitFields.h"
 #include "JB_VM.h"
 #include "JB_VM_Helpers.i"
 
-#define		ı				Op = *Code++;   goto *JumpTable[Op>>24];
-#define		ErrStck			(1<<10)
+#define		ı					Op = *Code++;   goto *JumpTable[Op>>24];
+#define		ErrStck				(1<<10)
 
 
 
@@ -86,7 +87,6 @@ uint* JB_ASM_SetDebug (CakeVM* V, int Level) {
 		return Rz;			// even if we did... the calling code can mess things up
 							// with no races in here.
 							// so the calling code would need locks or the logic-sorted out.
-							
 	if_rare (!CanDebug(V))
 		return 0;
 
@@ -408,7 +408,7 @@ JB_Class* JB_Cake__Class(const char* Name, int Size, JB_Class* Parent, int VCoun
 	CakeClass = Cls + 1;
 	auto V = CakeVirtuals;
 	CakeVirtuals = V + VCount;
-	JBClassInitReal(*Cls, Name, Size, Parent, (JBObject_Behaviour*)V);
+	JB_ClassInitReal(*Cls, Name, Size, Parent, (JBObject_Behaviour*)V);
 	return Cls;
 }
 
