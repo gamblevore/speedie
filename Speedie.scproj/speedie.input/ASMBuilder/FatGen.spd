@@ -699,47 +699,6 @@ function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Small = nil, 
 }
 
 
-function message.RFUN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.RFUN, self)
-	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-}
-
-
-function message.RFST (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.RFST, self)
-	rz.reginput(1) = r2
-	rz.dest(0, r1, a)
-}
-
-
-function message.RFWR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Decr = nil, |int| Offset = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.RFWR, self)
-	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.numinput(2) = Decr
-	rz.numinput(3) = Offset
-}
-
-
-function message.RFRD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Decr = nil, |int| Offset = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.RFRD, self)
-	rz.reginput(1) = r2
-	rz.numinput(2) = Decr
-	rz.numinput(3) = Offset
-	rz.dest(0, r1, a)
-}
-
-
 function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -749,14 +708,55 @@ function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+function message.RFUN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Save = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.RFUN, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Save
+}
+
+
+function message.RFST (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.RFST, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Save
+	rz.dest(0, r1, a)
+}
+
+
+function message.RFWR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |int| Offset = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.RFWR, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = Save
+	rz.numinput(3) = Offset
+}
+
+
+function message.RFRD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |int| Offset = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.RFRD, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Save
+	rz.numinput(3) = Offset
+	rz.dest(0, r1, a)
+}
+
+
+function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RFRT, self)
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
 }
 
 

@@ -302,7 +302,6 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
-//		JB_TotalSanity(false);
 		int N = self->RefCount - (1<<JB_RefCountShift);
 		self->RefCount = N;
 		JBObjRefTest(self);

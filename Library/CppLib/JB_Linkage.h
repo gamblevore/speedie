@@ -104,6 +104,7 @@ struct CakeVM {
     int				CakeFail;
     int				UserFlags;
     JB_ASM_Break	__VIEW__;
+    CakeStack*		ProposedStack;
     byte*			LibGlobs;
     byte*			PackGlobs;
     Fn0*			CppFuncs;

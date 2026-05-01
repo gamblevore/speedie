@@ -174,49 +174,84 @@ AlwaysInline vec4 VSwiz (CakeRegister* r, ASM Op) {
 	return Output;
 }
 
-///
+
+__restrict inline void JB_RefDecr (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
+    if ( self ) {
+		int N = self->RefCount - (1<<JB_RefCountShift);
+		self->RefCount = N;
+		JBObjRefTest(self);
+        if (!N) {
+			r += SaveReg + 1;			// In case the destructor ends back in the VM
+			vm.ProposedStack = r;		// We need to know how many regs to save.
+			r->DestReg = SaveReg;
+            JB_Delete( (FreeObject*)self );
+		}
+    }
+}
+
+__restrict inline void JB_RefFreeIfDead (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
+    if (self and !self->RefCount) {
+		r += SaveReg + 1;				// same...
+		vm.ProposedStack = r;
+		r->DestReg = SaveReg;
+		JB_Delete( (FreeObject*)self );
+	}
+}
 
 
 
-#define incr(o)					JB_Incr((JB_Object*)o)
-#define freeifdead(o)			JB_FreeIfDead((JB_Object*)o)
-#define decr(o)					JB_Decr((JB_Object*)o)
-#define safedecr(o)				JB_SafeDecr((JB_Object*)o)
+// r0(1), <stack/result>, <r0> (2)...<r31>
+
+AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) {
+	(DebugCode);
+	auto Stack	= (CakeStack*)(R0 - 1);
+	int StepBack= Stack->DestReg;
+	
+	auto Imm	= RET_Valuei;							// get before copy!
+	auto Src	= R0 + n1;
+	
+	*((CakeRegister*)Stack) = *Src;
+	((CakeRegister*)Stack)->Uint |= Imm;				// immediate
+	
+	auto NewR0 = (CakeRegister*)(Stack-StepBack);
+	R0			= NewR0;								// NewZero
+	Stack		= (CakeStack*)(NewR0 - 1);
+//	vm.CurrStack = Stack;
+	auto Code	= Stack->Code;
+	Stack->GoUp = 0;
+//	*R0			= {};									// unnecessary?
+	
+	return Code;
+}
 
 
 
-AlwaysInline void SetRefRegToMem(CakeRegister* r, ASM Op) {
+//   ///   /// REFCOUNTING
+AlwaysInline void SetRefRegToMem (CakeVM& vm, CakeRegister* r, ASM Op) {
 	auto New = o2;				 						// reg
 	auto pOld = ((JB_Object**)(u1))+RefSet2_Offsetu;	// mem
 	auto Old = *pOld;
 	
 	*pOld = JB_Incr(New);
-	if (RefSet2_Decru)
-		JB_Decr(Old);
+	int Saved = RefSet2_Saveu;
+	if (Saved)
+		JB_RefDecr(vm, (CakeStack*)r, Old, Saved);
 }
 
 
-AlwaysInline void SetRefMemToReg(CakeRegister* r, ASM Op) {
-	auto pNew = ((JB_Object**)(u2))+RefSet2_Offsetu;
+AlwaysInline void SetRefMemToReg (CakeVM& vm, CakeRegister* r, ASM Op) {
+	auto pNew = ((JB_Object**)(u2))+RefSet3_Offsetu;
 	auto New = *pNew;									// mem
 	auto Old = o1;				 						// reg
 	
 	o1 = JB_Incr(New);
-	if (RefSet2_Decru)
-		JB_Decr(Old);
+	int Saved = RefSet3_Saveu;
+	if (Saved)
+		JB_RefDecr(vm, (CakeStack*)r, Old, Saved);
 }
 
 
-AlwaysInline void SetRefDecrMem(CakeRegister* r, ASM Op) {
-	auto Where = ((JB_Object**)(u1))+RefDecrMem_Offsetu;	// mem
-	int n = RefDecrMem_Countu;
-	for (int i = 0;  i <= n;  i++) {
-		JB_Decr(*Where++);
-	} 
-}
-
-
-AlwaysInline void SetRefBasic(CakeRegister* r, ASM Op) {
+AlwaysInline void SetRefBasic (CakeVM& vm, CakeRegister* r, ASM Op) {
 	int out = n1;
 	int in = n2;
 	auto B = r[in].Obj;
@@ -224,23 +259,38 @@ AlwaysInline void SetRefBasic(CakeRegister* r, ASM Op) {
 	if (out) {
 		auto A = r[out].Obj;
 		r[out].Obj = B;
-		JB_Decr(A);
+		JB_RefDecr(vm, (CakeStack*)r, A, RefSet1_Saveu);
 	}
 }
 
 
-AlwaysInline void SetRefApart (CakeRegister* r, ASM Op) {
+AlwaysInline void SetRefApart (CakeVM& vm, CakeRegister* r, ASM Op) {
 	JB_Incr(o3);
 	JB_SafeDecr(o2);
-	JB_FreeIfDead(o1);
+	
+	if (int n = n1; n)
+		if (auto Obj = r[n].Obj; Obj)
+			JB_RefFreeIfDead(vm, (CakeStack*)r, Obj, RefSetApart_Saveu);
 }
+
+
+AlwaysInline ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op) {
+	auto Obj = o1;
+	if (n2) {
+		JB_RefDecr(vm, (CakeStack*)r, o2, 0);
+		o1 = Obj;							// restore smashed regs, cos we passed 0.
+	}
+	JB_SafeDecr(Obj);
+	return RestoreStack(vm, r, (Op>>19)<<19, 0);
+}
+
+/// END REFCOUNTING
 
 
 
 #define mem0(t)				({ (u2) ? ((t*)u2)[u3+Read_Offsetu-1] : 0; }) // safely read.
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu-1]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_movei))
-
 
 AlwaysInline JB_Object* alloc(void* o) {	// could RALO directly read from the globs?
 	JB_Class* Cls = *((JB_Class**)o);		// what about lib/packglobs?
@@ -537,44 +587,6 @@ AlwaysInline void IncrementAddr (CakeRegister* r, ASM Op, bool UseOld) {
 
 
 
-// r0(1), <stack/result>, <r0> (2)...<r31>
-
-AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) {
-	(DebugCode);
-	auto Stack	= (CakeStack*)(R0 - 1);
-	int StepBack= Stack->DestReg;
-	auto Imm	= RET_Valuei;						// get before copy!
-	auto Src	= R0 + n1;
-	
-	*((CakeRegister*)Stack) = *Src;
-	((CakeRegister*)Stack)->Uint |= Imm;			// immediate
-	
-	auto NewR0 = (CakeRegister*)(Stack-StepBack);
-	R0			= NewR0;							// NewZero
-	Stack		= (CakeStack*)(NewR0 - 1);
-//	vm.CurrStack = Stack;
-	auto Code	= Stack->Code;
-	Stack->GoUp = 0;
-//	*R0			= {};								// unnecessary?
-	
-	return Code;
-}
-
-
-
-AlwaysInline ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op) {
-// decring more than 1 is crazy. 1 is a lot as its an entire function call already.
-//	if (n4)
-//		JB_Decr(o4);
-//	if (n3) 
-//		JB_Decr(o3);
-	if (n2)
-		JB_Decr(o2);
-	if (n1) 
-		JB_SafeDecr(o1);
-	return RestoreStack(vm, r, (Op>>19)<<19, 0);
-}
-
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
 
@@ -695,21 +707,27 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 extern "C"  __attribute__((sysv_abi))   void  __CAKE_BRIDGE__ (u64 data, Fn0 fn, CakeRegister* r, int64 n);
 
-AlwaysInline int64 FuncAddr (CakeVM& vv, ASM Op, ASM* Code) {
+AlwaysInline int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
-		return (int64)(vv.CppFuncs[FuncAddr_Indexu]);
+		return (int64)(vm.CppFuncs[FuncAddr_Indexu]);
 	return (int64)(Code+FuncAddr_Indexi);
 }
 
 
-AlwaysInline void ForeignFunc (CakeVM& vv, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
+// __restrict helps to parellelize things more
+// probably many more places I could put it... 
+__restrict AlwaysInline void ForeignFunc (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
-	((CakeStack*)(r))[-1].Code = CodePtr;	// Make it better...
-											// Also need to set before calling the viewer
-											// Also need to pass just the vmstack...
-	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.CppFuncs[T]);
-	return __CAKE_BRIDGE__(funcdata, fn, r, n1);
+
+	((CakeStack*)(r))[-1].Code = CodePtr;	// nicer crash logs
+	int n = n1;
+	auto r2 = ((CakeStack*)r) + n + 1;
+	vm.ProposedStack = r2;
+	r2->DestReg = n;
+
+	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vm.CppFuncs[T]);
+	return __CAKE_BRIDGE__(funcdata, fn, r, n);
 }
 
 

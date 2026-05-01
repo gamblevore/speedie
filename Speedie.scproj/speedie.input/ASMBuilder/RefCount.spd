@@ -14,37 +14,40 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 		if B is ContainsAddr
 			|| offset = 0
 			B = .InlineOffsetOpt(B, 3, offset, 13, P.ASMDecl, p)
-			return exp.RFRD(A, B, 1, offset)				// mem to reg
-		return exp.RFST(A, B)								// reg to reg
+			return exp.RFRD(A, B, .RefSave, offset)				// mem to reg
+		return exp.RFST(A, B, .RefSave)							// reg to reg
 	
 	|| glob = DestMsg.ASMDecl
 	if  B is ContainsAddr
 		|| where = .TempOnly
 		where.µtype = datatypecode._voidptr
-		B = .Read(where, P, B, nil, p.ASMDecl) * where		// (mem to reg)?
+		B = .Read(where, P, B, nil, p.ASMDecl) * where			// (mem to reg)?
 	
 	|| offset = 0
 	A = .InlineOffsetOpt(A, 3, offset, 13, glob, p)
-	return exp.RFWR(A, B, 1, offset)						// reg to mem
+	return exp.RFWR(A, B, .RefSave, offset)						// reg to mem
 
 
+function assembler.RefSave (|int|)
+	return .VDecls.log2 max 1
+	
 
 function Assembler.RefCountClear (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
 	|| A = .µ(prms.first!, ASMReg.AddrRequest)
 	|| offset = 0
 	A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
-	return exp.RFWR(A, nil, 1, offset)						// reg to mem
+	return exp.RFWR(A, nil, .RefSave, offset)					// reg to mem
 
 
 function Assembler.RefCountIncr2 (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
 	|| A = .µ(prms.first!, asmreg.AddrRequest)
-	target debug: if a isnt ContainsAddr					// always memory
+	target debug: if a isnt ContainsAddr						// always memory
 	|| offset = 0
 	A = .InlineOffsetOpt(A, 3, offset, 13, nil, prms.first!)
 	|| B = .µ(prms.second!)
-	target debug: if b is ContainsAddr						// always reg
+	target debug: if b is ContainsAddr							// always reg
 	return exp.RFWR(A, B, 0, offset)
 
 
@@ -72,7 +75,7 @@ function Assembler.RefCountDecr (|message| exp, |message| prms, |ASMReg| Obj, |&
 			last.p2 = 0							// decring a global mem obj. Lets just NOT incr!
 			return nil
 	
-	return exp.RFUN(Obj, Obj)
+	return exp.RFUN(Obj, Obj, asmreg(), .RefSave)
 
 
 
@@ -96,7 +99,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 			return .RefCountIncr(exp, prms, Obj)
 	
 		if fn == Compiler.RefEarlyDecr
-			return exp.RFST(Obj, asmreg())								// reg to 0
+			return exp.RFST(Obj, asmreg(), .RefSave)				// reg to 0
 	
 		if fn == Compiler.RefDecr
 			|| fat = .RefCountDecr(exp, prms, obj)
@@ -143,7 +146,7 @@ function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
 		#! Disallow: if obj.X(),   when obj.X() is a disowner
 		#! Then we will never freeifdead within if-branch or other tests.
 		#! needs understanding of disowners!
-		exp.rfun(A)
+		exp.rfun(A, asmreg(), asmreg(), .RefSave)
 		return a
 
 	|| fat = .RefCountSub(exp, prms, fn)

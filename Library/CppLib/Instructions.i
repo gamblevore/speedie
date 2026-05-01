@@ -155,16 +155,16 @@
 	if (ii1-- > ii2)
 	Code += Loop_Jmpi
 ;
-ı RFUN:;
-	SetRefApart(r, Op);
-ı RFST:;
-	SetRefBasic(r, Op);
-ı RFWR:;
-	SetRefRegToMem(r, Op);
-ı RFRD:;
-	SetRefMemToReg(r, Op);
 ı RALO:;
 	o1 = alloc(o2);
+ı RFUN:;
+	SetRefApart(vm, r, Op);
+ı RFST:;
+	SetRefBasic(vm, r, Op);
+ı RFWR:;
+	SetRefRegToMem(vm, r, Op);
+ı RFRD:;
+	SetRefMemToReg(vm, r, Op);
 ı RFRT:;
 	Code = DeRefRegs(vm, r, Op);
 ı GOBJ:;

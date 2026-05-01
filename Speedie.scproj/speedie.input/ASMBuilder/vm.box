@@ -252,39 +252,37 @@ forms
 		r2		R
 		r3		R
 		r4		R
-
-	RefSet1
-		r1		R
-		r2		r
 	
+
+	// refcounting
 	RefReturn
 		r1		r
-		r2		r
-		r3		r
-		r4		r
+		r2		r		
 
 	RefSetApart
 		r1		r
 		r2		r
 		r3		r
+		Save	5
 	
+	RefSet1
+		r1		R
+		r2		r
+		Save	5
+
 	RefSet2
 		r1		r		// Small R
 		r2		r
-		Decr	1
+		Save	5
 		Offset	l
 	
 	RefSet3
 		r1		R		// Big R
 		r2		r
-		Decr	1
+		Save	5
 		Offset	l
+	/// yeeeet
 	
-	RefDecrMem
-		r1		r
-		Count	7
-		Offset	l
-
 	VecMix
 		r1		R
 		r2		r // can load a float, vec2, or vec3
@@ -589,23 +587,24 @@ POS 5
 
 
 #!						 (((((Refs)))))
-/**/ RFUN  (RefSetApart)
-		SetRefApart(r, Op) // freeifdead, safedecr, incr
-
-/**/ RFST  (RefSet1)
-		SetRefBasic(r, Op)		
-
-/**/ RFWR  (RefSet2)							// RefCount reg --> mem
-		SetRefRegToMem(r, Op)
-
-/**/ RFRD  (RefSet3)							// RefCount reg <-- mem
-		SetRefMemToReg(r, Op)
 
 /**/ RALO  (U2)	// could be nicer to use a gtab const directly.
 		o1 = alloc(o2) // 1 less instruction... gtabs suck anyway.
+
+/**/ RFUN  (RefSetApart)						// freeifdead, safedecr, incr
+		SetRefApart(vm, r, Op)		// ref!
+
+/**/ RFST  (RefSet1)
+		SetRefBasic(vm, r, Op)		// ref!
+
+/**/ RFWR  (RefSet2)							// RefCount reg --> mem
+		SetRefRegToMem(vm, r, Op)	// ref!
+
+/**/ RFRD  (RefSet3)							// RefCount reg <-- mem
+		SetRefMemToReg(vm, r, Op)	// ref!
 	
-/**/ RFRT  (RefReturn)							// this should be a return...
-		Code = DeRefRegs(vm, r, Op)				// its ONLY used for returns...
+/**/ RFRT  (RefReturn)							// its ONLY used for returns...
+		Code = DeRefRegs(vm, r, Op)	// ref?
 
 
 

@@ -1136,13 +1136,14 @@ void JB_DeleteSub_( FreeObject* Obj, AllocationBlock* Block ) {
 // could store the delete-info in the behaviour table or the allocationblock... either is ok.
 // we could specify a compile flag that warns if any classes unnecssarily have too many vars
 // to use optimised destructors.
-// Not relevant to any CakeVM stuff. Put off till i die. (and come back.)
+// Not relevant to any CakeVM stuff. Put off its time...
 
 
 
 #if __VM__
 	__attribute__((always_inline)) ivec4*	JB_ASM_CallBack	 (u32* Code);
 #endif
+
 
 __hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
@@ -1156,6 +1157,10 @@ __hot void JB_Delete ( FreeObject* Obj ) {
 		#endif
 		(Destructor)((JB_Object*)Obj); // do this before altering memory.
 	}
+
+	// this makes it easier for the VM to work with??
+	// doesn't seem to really...
+	
 	JB_DeleteSub_(Obj, Block);
 }
 

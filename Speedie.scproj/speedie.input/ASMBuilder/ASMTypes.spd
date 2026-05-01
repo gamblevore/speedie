@@ -64,11 +64,11 @@ extend_module ASM {
 		JBAN = 83
 		LUPU = 84
 		LUPD = 85
-		RFUN = 86
-		RFST = 87
-		RFWR = 88
-		RFRD = 89
-		RALO = 90
+		RALO = 86
+		RFUN = 87
+		RFST = 88
+		RFWR = 89
+		RFRD = 90
 		RFRT = 91
 		GOBJ = 92
 		GTAB = 93

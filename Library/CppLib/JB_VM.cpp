@@ -30,7 +30,6 @@ CakeVM*			JB_GlobalVM;
 
 #define kOverFlowStack		-2
 #define kStillInRange		-1
-//#define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
 #define	VMCodePtr(V)		((ASM*)(((byte*)(V)) + 1024*1024))
 #define	CanDebug(V)			(((uint64)(V))>>63)
 
@@ -301,19 +300,12 @@ static CakeStack* GetMaxStack (CakeVM* V) {
 	auto Curr = &(V->Registers[2].Stack);
 	while (true) {
 		int Up = Curr->GoUp;
-		if (Up < 1 or Up > 31)
+		if (Up < 1 or Up > 32)
 			return Curr;
-		auto Stack = Curr + Up;
+		auto Stack = Curr + Up + 1;
 		if (Stack >= &(V->Registers[CakeStackSize/sizeof(CakeRegister)].Stack))
 			return Curr;
 		Curr = Stack; // escaped?
-//struct CakeStack {
-//	u32*		Code;
-//	uint		Dummy;			
-//	byte		GoUp;
-//	byte		DestReg;
-//	u16			Depth;
-//};
 	}
 	
 	return Curr;
@@ -360,6 +352,7 @@ ivec4* JB_ASM_CallBack (ASM* Code) { // want this inlined...
 	CakeVM* V = JB_GlobalVM;
 	Code = VMClearHigh(Code);
 
+	// needs to use ProposedStack. ooof!
 	int Dest = 31; // store in the decr instruction??
 	// well... even a FNCX() can call something...
 	// actually, in the case of FNCX(), the regs are saved already...

@@ -177,22 +177,21 @@
 
 
 
+#define	RefSetApart_Savei		((( int)((Op)<<23))>>27)
+#define	RefSetApart_Saveu		(((uint)((Op)<<23))>>27)
 
+#define	RefSet1_Savei		((( int)((Op)<<18))>>27)
+#define	RefSet1_Saveu		(((uint)((Op)<<18))>>27)
 
-#define	RefSet2_Decri		((( int)((Op)<<18))>>31)
-#define	RefSet2_Decru		(((uint)((Op)<<18))>>31)
-#define	RefSet2_Offseti		((( int)((Op)<<19))>>19)
-#define	RefSet2_Offsetu		(((uint)((Op)<<19))>>19)
+#define	RefSet2_Savei		((( int)((Op)<<18))>>27)
+#define	RefSet2_Saveu		(((uint)((Op)<<18))>>27)
+#define	RefSet2_Offseti		((( int)((Op)<<23))>>23)
+#define	RefSet2_Offsetu		(((uint)((Op)<<23))>>23)
 
-#define	RefSet3_Decri		((( int)((Op)<<18))>>31)
-#define	RefSet3_Decru		(((uint)((Op)<<18))>>31)
-#define	RefSet3_Offseti		((( int)((Op)<<19))>>19)
-#define	RefSet3_Offsetu		(((uint)((Op)<<19))>>19)
-
-#define	RefDecrMem_Counti		((( int)((Op)<<13))>>25)
-#define	RefDecrMem_Countu		(((uint)((Op)<<13))>>25)
-#define	RefDecrMem_Offseti		((( int)((Op)<<20))>>20)
-#define	RefDecrMem_Offsetu		(((uint)((Op)<<20))>>20)
+#define	RefSet3_Savei		((( int)((Op)<<18))>>27)
+#define	RefSet3_Saveu		(((uint)((Op)<<18))>>27)
+#define	RefSet3_Offseti		((( int)((Op)<<23))>>23)
+#define	RefSet3_Offsetu		(((uint)((Op)<<23))>>23)
 
 #define	VecMix_Modei		((( int)((Op)<<28))>>29)
 #define	VecMix_Modeu		(((uint)((Op)<<28))>>29)
