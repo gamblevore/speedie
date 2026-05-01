@@ -83,6 +83,7 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
 
 void JB_BA_Destructor( JB_String* self ) {
     JB_FreeString( self->Addr );
+    JB_Obj_Destructor(self);
 }
 
 
@@ -234,6 +235,7 @@ JB_String* Str_Shrink (JB_String* u, int Length) {
 
 void JB_Str_Destructor(JB_StringShared* self) {
 	JB_Decr( self->Parent );
+	JB_Obj_Destructor(self);
 }
 
 
@@ -247,6 +249,7 @@ void JB_XStr_Destructor(JB_StringExternal* self) {
         self->Addr = 0; self->Obj = 0;
         ((XStrFree)(F))((const char*)A, O);
     }
+    JB_Obj_Destructor(self);
 }
 
 

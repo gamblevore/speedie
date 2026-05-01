@@ -125,8 +125,12 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 		Name += 3;
     Cls.Name = Name;
     Cls.Parent = Parent;
+    
     if (!Table) //
 		Table = &DummyFuncTable;
+	if (!Table->__destructor__)
+		Table->__destructor__ = (const void*)JB_Obj_Destructor;
+	
     Cls.Virtuals = Table;
     Cls.DefaultBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
     Cls.Memory.RefCount = 1024;
@@ -136,6 +140,7 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
     Cls.Memory.IsActive = true;
     Cls.Memory.World = &MemoryManager;
     Cls.Size = Max(Size, sizeof(FreeObject));
+    
     if (Parent) {
         Parent->HasSubClasses = true;
 		Cls.ClassDepth = Parent->ClassDepth + 1; 
@@ -433,6 +438,7 @@ void JB_Layer_Destructor( JB_MemoryLayer* self ) {
     }
     JB_SetRef( self->Obj, 0 );
     JB_SetRef( self->Obj2, 0 );
+    JB_Obj_Destructor(self);
 }
 
 
@@ -1149,19 +1155,13 @@ __hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 	Sanity(Block);
 	fpDestructor Destructor = GetDestructor_(Block);
-	if (Destructor) {
-		#if __VM__
-		if (((uint64)Destructor) >> 63) // VM based destructor
-			JB_ASM_CallBack((u32*)Destructor);
-		else
-		#endif
-		(Destructor)((JB_Object*)Obj); // do this before altering memory.
-	}
 
-	// this makes it easier for the VM to work with??
-	// doesn't seem to really...
-	
-	JB_DeleteSub_(Obj, Block);
+	#if __VM__
+	if (((uint64)Destructor) >> 63)			// VM based destructor
+		JB_ASM_CallBack((u32*)Destructor);
+	else
+	#endif
+	(Destructor)((JB_Object*)Obj);
 }
 
 
@@ -1328,7 +1328,7 @@ void JB_MemFree(JB_MemoryWorld* World) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-JBObject_Behaviour Obj_FuncTable = {};
+JBObject_Behaviour Obj_FuncTable = {(const void*)JB_Obj_Destructor};
 JBClassPlace5( JB_Object,		0,			"Object",		Obj_FuncTable );
 JBClassPlace( JB_MemoryLayer,	JB_Object,	"MemoryLayer",	JB_Layer_Destructor,	0 );
 /////////////////////////////////////////////////////////////////////////////////////////////////////////

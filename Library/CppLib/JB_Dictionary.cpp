@@ -690,6 +690,7 @@ void JB_Leaf_Destructor(DictionaryLeaf* self) {
     JB_Decr(self->Key);
     DictValueRemove_(&self->InPlaceValue);
     DictValueRemove_(&self->Value);
+    JB_Obj_Destructor(self);
 }
 
 
@@ -735,6 +736,7 @@ void JB_Dict_Destructor(Dictionary* self) {
 
     self->InPlaceValue = (JB_Object*) -1;        // garbage.
     self->Parent = (Dictionary*) -1;             // garbage.
+    JB_Obj_Destructor(self);
 }
 
 
@@ -887,7 +889,7 @@ JB_String* JB_Nav_Name(DictionaryReader* self) {
 
 
 void JB_Nav_Destructor( DictionaryReader* self ) {
-    // nothing
+   JB_Obj_Destructor(self);
 }
 
 DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict ) {

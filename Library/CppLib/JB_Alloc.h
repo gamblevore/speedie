@@ -239,6 +239,7 @@ void JB_DebugAllMemory(bool b);
 
 __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock );
 void JB_Delete( FreeObject* Obj );
+void JB_Obj_Destructor (JB_Object* Obj);
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);
 void JB_Mem_ClassLeakCounter ();
 __hot void JB_ClusterDelete( FreeObject* Obj );

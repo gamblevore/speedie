@@ -765,10 +765,8 @@ function SCFunction.FindCallParents (|message|)
 function SCFunction.CallParents 
 	opt norefcounts
 	require !.FindCallParents
-	|| c = .cls $
-	
-	|| parent = c.realsuper
-	require (parent and parent != TypeObject)
+	|| c = .cls					#require
+	|| parent = c.realsuper		#require
 
 	|| t = c.isrole
 	require t != 2

@@ -631,6 +631,7 @@ void JB_FS_Destructor (FastString* self) {
     JB_FS_Flush( self );
     JB_Decr( self->Result );
 	JB_Decr( self->File );
+	JB_Obj_Destructor(self);
 }
 
 FastString* TheSharedFastString;

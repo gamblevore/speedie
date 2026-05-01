@@ -204,6 +204,7 @@ void JB_Array_Destructor( Array* self ) {
 		ArrayDecrDownTo_(self, 0);
 		Clear_(self);
 	}
+	JB_Obj_Destructor(self);
 }
 
 

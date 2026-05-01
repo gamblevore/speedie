@@ -493,7 +493,7 @@ JB_List* JB_Ring_Constructor( JB_List* self, JB_List* Parent ) {
 void JB_Ring_Destructor( JB_List* self ) {
 	JB_List* Curr = self->Child;
 	// some kind of flattened destroyer sounds good?
-	// less ffing around with stuff.
+	// less oofing around with stuff.
 	while (Curr) {
 		JB_List* Next = Curr->Next;
 		RingOwnForDeref_( Curr );
@@ -506,6 +506,7 @@ void JB_Ring_Destructor( JB_List* self ) {
 		JB_SafeDecr( self );
 	}
 	JB_SetRef(self->Obj, 0);
+	JB_Obj_Destructor(self);
 }
 
 }

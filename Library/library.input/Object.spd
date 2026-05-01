@@ -9,6 +9,9 @@ class Object
 		wrapper
 		cpp_class JB_Object
 	
+	destructor
+		cpp_wrapper JB_Obj_Destructor
+			
 	virtual Render (|FastString|fs_in=nil, |string|)
 		nil self
 		cpp_wrapper JB_Obj_Render
