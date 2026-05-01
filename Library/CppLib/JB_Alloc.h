@@ -232,17 +232,16 @@ JB_Class* JB_Class__First();
 JB_MemoryLayer* JB_Layer_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
 void JB_Class_SetIndex(JB_Class* cls, int i);
-int JB_Class_Index(JB_Class* cls);
 void JB_DebugAllMemory(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock );
 void JB_Delete( FreeObject* Obj );
+fpDestructor JB_Destructor (JB_Object* Obj);
 void JB_Obj_Destructor (JB_Object* Obj);
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);
 void JB_Mem_ClassLeakCounter ();
-__hot void JB_ClusterDelete( FreeObject* Obj );
 void JB_MemFree(JB_MemoryWorld* World);
 JB_Class* JB_AllClasses();
 

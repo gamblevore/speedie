@@ -175,27 +175,31 @@ AlwaysInline vec4 VSwiz (CakeRegister* r, ASM Op) {
 }
 
 
+// "static __restrict __hot void"... now theres some real cpp
+static __restrict __hot void VM_RefDelete (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
+	r += SaveReg + 1;			// In case the destructor ends back in the VM
+	vm.ProposedStack = r;		// We need to know how many regs to save.
+	r->DestReg = SaveReg;
+	fpDestructor Destructor = JB_Destructor(self);
+
+	if (((uint64)Destructor) >> 63)
+		JB_ASM_CallBack((u32*)Destructor); // we can optimise this later! For now... lets just make it work.
+	  else
+		(Destructor)(self);					// already fast
+}
+
 __restrict inline void JB_RefDecr (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
     if ( self ) {
 		int N = self->RefCount - (1<<JB_RefCountShift);
 		self->RefCount = N;
-		JBObjRefTest(self);
-        if (!N) {
-			r += SaveReg + 1;			// In case the destructor ends back in the VM
-			vm.ProposedStack = r;		// We need to know how many regs to save.
-			r->DestReg = SaveReg;
-            JB_Delete( (FreeObject*)self );
-		}
+        if (!N)
+			VM_RefDelete(vm, r, self, SaveReg);
     }
 }
 
 __restrict inline void JB_RefFreeIfDead (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
-    if (self and !self->RefCount) {
-		r += SaveReg + 1;				// same...
-		vm.ProposedStack = r;
-		r->DestReg = SaveReg;
-		JB_Delete( (FreeObject*)self );
-	}
+    if (self and !self->RefCount)
+		VM_RefDelete(vm, r, self, SaveReg);
 }
 
 

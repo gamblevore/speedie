@@ -1141,7 +1141,11 @@ void JB_DeleteSub_ ( FreeObject* Obj, AllocationBlock* Block ) {
 #endif
 
 
-__hot void JB_Delete ( FreeObject* Obj ) {
+__restrict __hot fpDestructor JB_Destructor (JB_Object* Obj) {
+	return GetDestructor_(ObjBlock_(Obj));
+}
+
+__restrict __hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 	Sanity(Block);
 	fpDestructor Destructor = GetDestructor_(Block);
