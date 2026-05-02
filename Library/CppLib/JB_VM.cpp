@@ -67,7 +67,7 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 }
 
 
-AlwaysInline int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
+VMOpt int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
 	auto Break = Code[CakeCodeMax]; 
 	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
 	r = VMClearHigh(r);
@@ -191,13 +191,12 @@ void** JB_ASM_InitTable (CakeVM* vm, int FuncCount, int GlobBytes) {
 		return (void**)(vm->CppFuncs);
 	int FuncBytes = sizeof(void*) * FuncCount;
 	auto Result = (byte*)JB_Realloc(nil, FuncBytes + GlobBytes + 8);
-	if (Result) {
-		((int64*)(Result + GlobBytes))[0] = 0x12345789ABCDEFED; // sentinel
-		vm->PackGlobs = Result;
-		vm->CppFuncs = (Fn0*)(Result + GlobBytes + 8);
-		return (void**)(vm->CppFuncs);
-	}
-	return 0;
+	if (!Result) return 0;
+
+	((int64*)(Result + GlobBytes))[0] = 0x12345789ABCDEFED; // sentinel
+	vm->PackGlobs = Result;
+	vm->CppFuncs = (Fn0*)(Result + GlobBytes + 8);
+	return (void**)(vm->CppFuncs);
 }
 
 
@@ -255,9 +254,8 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	return V;
 }
 
-
  
-AlwaysInline ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
+VMOpt ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	// re-entrant code will be called differently.
 	auto Base = (CakeStack*)(&V.Registers[0]);
 	Base[0].Code = VMCodePtr(&V) + CakeCodeMax-1;
@@ -309,8 +307,8 @@ static CakeStack* GetMaxStack (CakeVM* V) {
 	}
 	
 	return Curr;
-	
 }
+
 
 static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 	if (SubCrash) {

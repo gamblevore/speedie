@@ -27,4 +27,4 @@ typedef u64 (*Fn0 )();
 #define kJB_VM_AskDebug 32
 
 
-#define AlwaysInline static inline __attribute__((__always_inline__))
+#define VMOpt static inline __restrict __attribute__((__always_inline__))

@@ -3504,7 +3504,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[449]);
-	JB_FS_AppendInt32(_fsf0, (2026050119));
+	JB_FS_AppendInt32(_fsf0, (2026050222));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10505,7 +10505,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1389]);
-	JB_FS_AppendInt32(_fsf0, (2026050119));
+	JB_FS_AppendInt32(_fsf0, (2026050222));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -25229,7 +25229,7 @@ FatASM* SC_Pac_RefCountClear(Assembler* Self, Message* Exp, Message* Prms) {
 	return SC_Msg_RFWR(Exp, A, nil, SC_Pac_RefSave(Self), Offset);
 }
 
-FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, Message* Prms, ASMReg Obj) {
+FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj) {
 	FatASM* Last = SC_Pac_Last(Self, kSC__ASM_RFUN, kSC__ASM_GOBJ);
 	if (Last) {
 		FatASM* Ret = SC_Pac_CanOptDecr(Self, Obj, Last);
@@ -25247,7 +25247,7 @@ FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, Message* Prms, ASMReg
 	return SC_Msg_RFUN(Exp, Obj, Obj, SC_Reg__New(), SC_Pac_RefSave(Self));
 }
 
-FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, Message* Prms, ASMReg Obj) {
+FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj) {
 	FatASM* Last = SC_Pac_LastWithASM(Self, kSC__ASM_GOBJ);
 	if (Last) {
 		if ((SC_ASMParam_OperatorIz(SC_FAT_p0(Last), Obj)) and (!SC_FAT_p1(Last))) {
@@ -25308,13 +25308,13 @@ FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunct
 	ASMReg Obj = SC_Pac_xC2xB5(Self, ((Message*)JB_Ring_First(Prms)), SC_Reg__New());
 	if (!SC_Pac_RegIsConst(Self, Obj, 0)) {
 		if (Fn == SC__Comp_RefIncr) {
-			return SC_Pac_RefCountIncr(Self, Exp, Prms, Obj);
+			return SC_Pac_RefCountIncr(Self, Exp, Obj);
 		}
 		if (Fn == SC__Comp_RefEarlyDecr) {
 			return SC_Msg_RFST(Exp, Obj, SC_Reg__New(), SC_Pac_RefSave(Self));
 		}
 		if (Fn == SC__Comp_RefDecr) {
-			FatASM* Fat = SC_Pac_RefCountDecr(Self, Exp, Prms, Obj);
+			FatASM* Fat = SC_Pac_RefCountDecr(Self, Exp, Obj);
 			SC_Pac_CloseOneVar(Self, nil, 1 << SC_Reg_Reg(Obj));
 			return Fat;
 		}
@@ -60781,4 +60781,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 997948314035376500 -2476123581080723075
+// -7047793694949501147 -2476123581080723075

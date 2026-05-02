@@ -17,7 +17,7 @@ static ivec4* CakeCrashed (CakeVM* V, int Signal);
 
 
 #define TryTrap() if (CanTrap(&vm, Op, Code)) {Op = *Code++; goto BREAK;}
-AlwaysInline bool CanTrap (CakeVM* V, ASM Op, ASM* Code) {
+VMOpt bool CanTrap (CakeVM* V, ASM Op, ASM* Code) {
 	if (!CanDebug(V))
 		return false;
 	uint At = Trap_Atu;
@@ -28,14 +28,14 @@ AlwaysInline bool CanTrap (CakeVM* V, ASM Op, ASM* Code) {
 }
 
 
-AlwaysInline int64 Div2 (int64 V, int Clear, int Down) {
+VMOpt int64 Div2 (int64 V, int Clear, int Down) {
 	int64 Sign = V < 0;
 	Sign = (Sign << Down) - Sign;
 	V = (V << Clear) >> Clear;
 	return (V + Sign) >> Down;
 }
 
-AlwaysInline void DivMath(CakeRegister* r, ASM Op) {
+VMOpt void DivMath(CakeRegister* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	uint A = n1;
@@ -56,7 +56,7 @@ AlwaysInline void DivMath(CakeRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void DivMath32(CakeRegister* r, ASM Op) {
+VMOpt void DivMath32(CakeRegister* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	uint A = n1;
@@ -79,7 +79,7 @@ inline u64 JB_u64_RotR (u64 x, u64 N) {
 	return (x >> N) | (x << (64-N));
 }
 
-AlwaysInline void RotateConst (CakeRegister* r, ASM Op) {
+VMOpt void RotateConst (CakeRegister* r, ASM Op) {
 	auto V = RotateConst_Valueu; auto R = RotateConst_Rotu;
 	uint64 A = JB_u64_RotR(V, R);
 	if (RotateConst_Invu)
@@ -105,7 +105,7 @@ double FloatSh2 (uint64 u, int S) {
 
 
 
-AlwaysInline void LoadConst (CakeRegister* r, ASM Op, uint64 Value) {
+VMOpt void LoadConst (CakeRegister* r, ASM Op, uint64 Value) {
 	int N = n1;
 	if (!ConstStretchy_Condu or !r[N].Int) {
 		Value <<= 17;
@@ -117,7 +117,7 @@ AlwaysInline void LoadConst (CakeRegister* r, ASM Op, uint64 Value) {
 }
 
 
-AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
+VMOpt u64 bitstats(u64 R2, u64 Mode) {
 					// popcount //
 	if (Mode == 0)
 		return __builtin_popcountll(R2); 
@@ -142,12 +142,12 @@ AlwaysInline u64 bitstats(u64 R2, u64 Mode) {
 ///
 
 
-AlwaysInline ivec4 VBuild (CakeRegister* r, ASM Op) {
+VMOpt ivec4 VBuild (CakeRegister* r, ASM Op) {
 	return ivec4{ii2, ii3, ii4, ii5};
 }
 
 
-AlwaysInline vec4 VBuild2 (CakeRegister* r, ASM Op) {
+VMOpt vec4 VBuild2 (CakeRegister* r, ASM Op) {
 	auto F = f2;
 	uint Bits = Alloc_Amountu; 
 	return vec4{
@@ -159,7 +159,7 @@ AlwaysInline vec4 VBuild2 (CakeRegister* r, ASM Op) {
 }
 
 
-AlwaysInline vec4 VSwiz (CakeRegister* r, ASM Op) {
+VMOpt vec4 VSwiz (CakeRegister* r, ASM Op) {
 	vec4 Output = {};
 	auto Input = v2;
 	auto F = VecSwizzle_Fieldsu;
@@ -175,38 +175,57 @@ AlwaysInline vec4 VSwiz (CakeRegister* r, ASM Op) {
 }
 
 
-// "static __restrict __hot void"... now theres some real cpp
-static __restrict __hot void VM_RefDelete (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
-	r += SaveReg + 1;			// In case the destructor ends back in the VM
-	vm.ProposedStack = r;		// We need to know how many regs to save.
-	r->DestReg = SaveReg;
+// "static __restrict __hot"... now theres some real cpp
+static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister* r, JB_Object* self, int Dest, ASM* CodePtr) {
 	fpDestructor Destructor = JB_Destructor(self);
 
-	if (((uint64)Destructor) >> 63)
-		JB_ASM_CallBack((u32*)Destructor); // we can optimise this later! For now... lets just make it work.
-	  else
-		(Destructor)(self);					// already fast
+	if (!(((uint64)Destructor) >> 63)) {
+		r += Dest + 1;								// The destructor can end back in the VM!
+		vm.ProposedStack = (CakeStack*)r;
+		((CakeStack*)r)->DestReg = Dest;
+		(Destructor)(self);
+		return CodePtr;
+	}
+	
+	Destructor = (fpDestructor)((((uint64)Destructor)<<2)>>2);
+	CakeStack* NewStack = ((CakeStack*)r + Dest + 1);
+	{
+		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
+		auto OldStack = (CakeStack*)(r-1);
+		if_rare (NewStack >= End) {					// Stackoverflow
+			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
+			vm.Registers[2] = {.Int = errno};		// Clear stack. Its gone. And we already reported it.
+			return VMCodePtr(&vm)+CakeCodeMax-1;
+		}
+		
+		OldStack->GoUp = Dest;
+		NewStack->Depth = OldStack->Depth+1;
+		OldStack->Code = CodePtr;
+	}
+	
+	NewStack->DestReg = Dest;
+	NewStack->GoUp = 0;
+	NewStack->Code = (ASM*)Destructor;
+	((CakeRegister*)NewStack)[2].Obj = self;
+	((CakeRegister*)NewStack)[1] = {};
+	return (ASM*)Destructor;
 }
 
-__restrict inline void JB_RefDecr (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
+
+__restrict inline ASM* JB_RefDecr (CakeVM& vm, CakeRegister* r, JB_Object* self, int SaveReg, ASM* Code) {
     if ( self ) {
 		int N = self->RefCount - (1<<JB_RefCountShift);
 		self->RefCount = N;
         if (!N)
-			VM_RefDelete(vm, r, self, SaveReg);
+			Code = VM_RefDelete(vm, r, self, SaveReg, Code);
     }
+    return Code;
 }
-
-__restrict inline void JB_RefFreeIfDead (CakeVM& vm, CakeStack* r, JB_Object* self, int SaveReg) {
-    if (self and !self->RefCount)
-		VM_RefDelete(vm, r, self, SaveReg);
-}
-
 
 
 // r0(1), <stack/result>, <r0> (2)...<r31>
 
-AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) {
+VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) {
 	(DebugCode);
 	auto Stack	= (CakeStack*)(R0 - 1);
 	int StepBack= Stack->DestReg;
@@ -220,7 +239,6 @@ AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* Debu
 	auto NewR0 = (CakeRegister*)(Stack-StepBack);
 	R0			= NewR0;								// NewZero
 	Stack		= (CakeStack*)(NewR0 - 1);
-//	vm.CurrStack = Stack;
 	auto Code	= Stack->Code;
 	Stack->GoUp = 0;
 //	*R0			= {};									// unnecessary?
@@ -231,7 +249,7 @@ AlwaysInline ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* Debu
 
 
 //   ///   /// REFCOUNTING
-AlwaysInline void SetRefRegToMem (CakeVM& vm, CakeRegister* r, ASM Op) {
+VMOpt ASM* SetRefRegToMem (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 	auto New = o2;				 						// reg
 	auto pOld = ((JB_Object**)(u1))+RefSet2_Offsetu;	// mem
 	auto Old = *pOld;
@@ -239,11 +257,12 @@ AlwaysInline void SetRefRegToMem (CakeVM& vm, CakeRegister* r, ASM Op) {
 	*pOld = JB_Incr(New);
 	int Saved = RefSet2_Saveu;
 	if (Saved)
-		JB_RefDecr(vm, (CakeStack*)r, Old, Saved);
+		Code = JB_RefDecr(vm, r, Old, Saved, Code);
+	return Code;
 }
 
 
-AlwaysInline void SetRefMemToReg (CakeVM& vm, CakeRegister* r, ASM Op) {
+VMOpt ASM* SetRefMemToReg (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 	auto pNew = ((JB_Object**)(u2))+RefSet3_Offsetu;
 	auto New = *pNew;									// mem
 	auto Old = o1;				 						// reg
@@ -251,11 +270,12 @@ AlwaysInline void SetRefMemToReg (CakeVM& vm, CakeRegister* r, ASM Op) {
 	o1 = JB_Incr(New);
 	int Saved = RefSet3_Saveu;
 	if (Saved)
-		JB_RefDecr(vm, (CakeStack*)r, Old, Saved);
+		Code = JB_RefDecr(vm, r, Old, Saved, Code);
+	return Code;
 }
 
 
-AlwaysInline void SetRefBasic (CakeVM& vm, CakeRegister* r, ASM Op) {
+VMOpt ASM* SetRefBasic (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 	int out = n1;
 	int in = n2;
 	auto B = r[in].Obj;
@@ -263,29 +283,34 @@ AlwaysInline void SetRefBasic (CakeVM& vm, CakeRegister* r, ASM Op) {
 	if (out) {
 		auto A = r[out].Obj;
 		r[out].Obj = B;
-		JB_RefDecr(vm, (CakeStack*)r, A, RefSet1_Saveu);
+		Code = JB_RefDecr(vm, r, A, RefSet1_Saveu, Code);
 	}
+	return Code;
 }
 
 
-AlwaysInline void SetRefApart (CakeVM& vm, CakeRegister* r, ASM Op) {
+VMOpt ASM* SetRefApart (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 	JB_Incr(o3);
 	JB_SafeDecr(o2);
 	
-	if (int n = n1; n)
-		if (auto Obj = r[n].Obj; Obj)
-			JB_RefFreeIfDead(vm, (CakeStack*)r, Obj, RefSetApart_Saveu);
+	int n = n1;
+	if (n) {
+		auto Obj = r[n].Obj;
+		if (Obj and !Obj->RefCount)
+			Code = VM_RefDelete(vm, r, Obj, RefSetApart_Saveu, Code);
+	}
+	return Code;
 }
 
 
-AlwaysInline ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op) {
+VMOpt ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 	auto Obj = o1;
 	if (n2) {
-		JB_RefDecr(vm, (CakeStack*)r, o2, 0);
-		o1 = Obj;							// restore smashed regs, cos we passed 0.
+		Code = JB_RefDecr(vm, r, o2, 0, Code);
+		o1 = Obj;								// restore smashed regs, cos we passed 0.
 	}
 	JB_SafeDecr(Obj);
-	return RestoreStack(vm, r, (Op>>19)<<19, 0);
+	return RestoreStack(vm, r, (Op>>19)<<19, Code);
 }
 
 /// END REFCOUNTING
@@ -296,8 +321,8 @@ AlwaysInline ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op) {
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu-1]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_movei))
 
-AlwaysInline JB_Object* alloc(void* o) {	// could RALO directly read from the globs?
-	JB_Class* Cls = *((JB_Class**)o);		// what about lib/packglobs?
+VMOpt JB_Object* alloc(void* o) {		// could RALO directly read from the globs?
+	JB_Class* Cls = *((JB_Class**)o);			// what about lib/packglobs?
 	return JB_AllocNew(Cls->DefaultBlock);
 }
 
@@ -316,7 +341,7 @@ JB_Object* gobj (CakeVM& vm, ASM Op) {
 	return Str;
 }
 
-AlwaysInline void VecConv (CakeRegister* r, ASM Op) {
+VMOpt void VecConv (CakeRegister* r, ASM Op) {
 	// vec/ivec conversions
 	auto s = r + n2;
 	auto d = r + n1;
@@ -329,7 +354,7 @@ AlwaysInline void VecConv (CakeRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void RegConv (CakeRegister* r, ASM Op) {
+VMOpt void RegConv (CakeRegister* r, ASM Op) {
 	// float, double, u64, s64. 12 conversions possible (and 6 pointless ones)
 	auto s = r + n2;
 	auto d = r + n1;
@@ -358,7 +383,7 @@ AlwaysInline void RegConv (CakeRegister* r, ASM Op) {
 //    s = s;
 }
 
-AlwaysInline void Time_ (CakeRegister* r, ASM Op) {
+VMOpt void Time_ (CakeRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = n2;
 	if (r2 == 1) {		// time
@@ -432,12 +457,12 @@ bool CompF_ (CakeRegister* A, CakeRegister* B, uint Mode) {
 
 
 
-AlwaysInline ASM* JumpI (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpI (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = CompI_(i1, i2, JCmpI_Cmpu);
 	return Code + V*JCmpI_Jmpi;
 }
 
-AlwaysInline void CompI (CakeRegister* r, ASM Op) {
+VMOpt void CompI (CakeRegister* r, ASM Op) {
 	auto V = CompI_(i2, i3, CmpI_Cmpu);
 	i1 = V;
 }
@@ -449,12 +474,12 @@ AlwaysInline void CompI (CakeRegister* r, ASM Op) {
 //		Jmp		j
 
 
-AlwaysInline ASM* JumpF (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpF (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = CompF_(r+n1, r+n2, JCmpF_Cmpu);
 	return Code + V*JCmpF_Jmpi;
 }
 
-AlwaysInline void CompF (CakeRegister* r, ASM Op) {
+VMOpt void CompF (CakeRegister* r, ASM Op) {
 	i1 = CompF_(r+n2, r+n3, CmpF_Cmpu);
 }
 
@@ -465,7 +490,7 @@ inline uint64 clip (uint64 x, uint64 s) {
 }
 
 
-AlwaysInline uint64 BitComp (CakeRegister* r, ASM Op) {
+VMOpt uint64 BitComp (CakeRegister* r, ASM Op) {
 	auto i = CmpI_Cmpu;
 	auto A = clip(u2, (i >> 1)&7);
 	auto B = clip(u3, (i >> 4)&7);
@@ -477,35 +502,35 @@ inline uint64 jclip (uint64 x, uint64 s) {
 	return (x << s) >> s;
 }
 
-AlwaysInline ASM* JumpEq (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpEq (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = jclip(u1, JCmpEq_LSmallu<<5) == jclip(u2, JCmpEq_RSmallu<<5);
 	return Code + V*JCmpEq_Jmpi;
 }
 
-AlwaysInline ASM* JumpNeq (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpNeq (CakeRegister* r, ASM Op, ASM* Code) {
 	auto V = jclip(u1, JCmpEq_LSmallu<<5) != jclip(u2, JCmpEq_RSmallu<<5);
 	return Code + V*JCmpEq_Jmpi;
 }
 
-AlwaysInline ASM* JumpK (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpK (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 > K);
 	return Code + J;
 }
 
-AlwaysInline ASM* JumpKN (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpKN (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 <= K);
 	return Code + J;
 }
 
-AlwaysInline ASM* JumpKE (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpKE (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 == K);
 	return Code + J;
 }
 
-AlwaysInline ASM* JumpKNE (CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* JumpKNE (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	auto J = JCmpK_Jmpi * (ii1 != K);
 	return Code + J;
@@ -544,7 +569,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 
-AlwaysInline void MemCopyRDWR (CakeRegister* r, ASM Op) {
+VMOpt void MemCopyRDWR (CakeRegister* r, ASM Op) {
 	byte* d = (byte*)u2;
 	uint s = n1;
 	uint n = MemoryCopy_Lengthu;
@@ -556,7 +581,7 @@ AlwaysInline void MemCopyRDWR (CakeRegister* r, ASM Op) {
 	}
 }
  
-AlwaysInline void IncrementAddr (CakeRegister* r, ASM Op, bool UseOld) {
+VMOpt void IncrementAddr (CakeRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = (int)(CNTC_offsetu);
 	int Add  = CNTC_cnsti;
@@ -594,7 +619,7 @@ AlwaysInline void IncrementAddr (CakeRegister* r, ASM Op, bool UseOld) {
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
 
-AlwaysInline void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
+VMOpt void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?
 	int Amount = Alloc_Amounti << 4;
 	auto B = vm.AllocBase;
@@ -612,7 +637,7 @@ AlwaysInline void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, ASM Code) {
+VMOpt ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, ASM Code) {
 	CakeStack* stck = (CakeStack*)(r-1);
 	#define Zero r
 	int J = Tail_JUMPi;
@@ -636,7 +661,7 @@ AlwaysInline ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, 
 }
 
 
-AlwaysInline ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
+VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
 	int Dest = n1;
 	CakeStack* NewStack = &((r + Dest)->Stack);
@@ -711,7 +736,7 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 extern "C"  __attribute__((sysv_abi))   void  __CAKE_BRIDGE__ (u64 data, Fn0 fn, CakeRegister* r, int64 n);
 
-AlwaysInline int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
+VMOpt int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 	if (FuncAddr_Libraryu)
 		return (int64)(vm.CppFuncs[FuncAddr_Indexu]);
 	return (int64)(Code+FuncAddr_Indexi);
@@ -720,7 +745,7 @@ AlwaysInline int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 
 // __restrict helps to parellelize things more
 // probably many more places I could put it... 
-__restrict AlwaysInline void ForeignFunc (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
+__restrict VMOpt void ForeignFunc (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
 
@@ -735,7 +760,7 @@ __restrict AlwaysInline void ForeignFunc (CakeVM& vm, ASM* CodePtr, CakeRegister
 }
 
 
-AlwaysInline ivec4 QMax (ivec4 A, ivec4 B) {
+VMOpt ivec4 QMax (ivec4 A, ivec4 B) {
 	return {
 		std::max(A[0], B[0]),
 		std::max(A[1], B[1]),
@@ -744,7 +769,7 @@ AlwaysInline ivec4 QMax (ivec4 A, ivec4 B) {
 	};
 }
 
-AlwaysInline ivec4 QMin (ivec4 A, ivec4 B) {
+VMOpt ivec4 QMin (ivec4 A, ivec4 B) {
 	return {
 		std::min(A[0], B[0]),
 		std::min(A[1], B[1]),
@@ -753,7 +778,7 @@ AlwaysInline ivec4 QMin (ivec4 A, ivec4 B) {
 	};
 }
 
-AlwaysInline void QInc (CakeRegister* r, ASM Op) {
+VMOpt void QInc (CakeRegister* r, ASM Op) {
 	int i = VecInc_partu;
 	auto V = iv2;
 	auto N = V[i] + VecInc_Amounti;

@@ -592,19 +592,19 @@ POS 5
 		o1 = alloc(o2) // 1 less instruction... gtabs suck anyway.
 
 /**/ RFUN  (RefSetApart)						// freeifdead, safedecr, incr
-		SetRefApart(vm, r, Op)		// ref!
+		Code = SetRefApart(vm, r, Op, Code)
 
 /**/ RFST  (RefSet1)
-		SetRefBasic(vm, r, Op)		// ref!
+		Code = SetRefBasic(vm, r, Op, Code)
 
 /**/ RFWR  (RefSet2)							// RefCount reg --> mem
-		SetRefRegToMem(vm, r, Op)	// ref!
+		Code = SetRefRegToMem(vm, r, Op, Code)
 
 /**/ RFRD  (RefSet3)							// RefCount reg <-- mem
-		SetRefMemToReg(vm, r, Op)	// ref!
+		Code = SetRefMemToReg(vm, r, Op, Code)
 	
 /**/ RFRT  (RefReturn)							// its ONLY used for returns...
-		Code = DeRefRegs(vm, r, Op)	// ref?
+		Code = DeRefRegs(vm, r, Op, Code)
 
 
 

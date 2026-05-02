@@ -13,22 +13,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// LANGUAGE ADDITIONS
-#define JBShift( exp, amount ) ( (__typeof__ ( exp )) ((byte*)(exp)+(amount)))
+#define JBShift(exp, amount)		((__typeof__(exp)) ((byte*)(exp)+(amount)))
 
-#define likely(x)				__builtin_expect(!!(x),1)
-#define unlikely(x)				__builtin_expect(!!(x),0)
+#define likely(x)					__builtin_expect(!!(x),1)
+#define unlikely(x)					__builtin_expect(!!(x),0)
 
-#define if_rare(x)				if (unlikely(x))
-#define if_usual(x)				if (likely(x))
+#define if_rare(x)					if (unlikely(x))
+#define if_usual(x)					if (likely(x))
 
-#define iif(x)					if (JB_Flow__Cond(x))
-#define wwhile(x)				while (JB_Flow__Cond2(x)) 
-#define JB_Ternary(cond,a,b)	((cond)?(a):(b))
-#define JB_Ternaryy(cond,a,b)	(JB_Flow__Cond(cond)?(a):(b))
+#define iif(x)						if (JB_Flow__Cond(x))
+#define wwhile(x)					while (JB_Flow__Cond2(x)) 
+#define JB_Ternary(cond,a,b)		((cond)?(a):(b))
+#define JB_Ternaryy(cond,a,b)		(JB_Flow__Cond(cond)?(a):(b))
 
-#define __hot					__attribute__((hot))
-
-#define __visible				__attribute__((__visibility__("default")))
+#define __hot						__attribute__((hot))
+#define __visible					__attribute__((__visibility__("default")))
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,10 +41,10 @@ void JB_Flow__PrintStats();
 
 
 
-#define require(test)   if  (!(test)) {return {};}
-#define require0(test)  if  (!(test)) {return;}
-#define for_(count) for (int i = 0; i < (count); i++)
-#define FOR_(var, count) for (int var = 0; var < (count); var++)
+#define require(test)   			if  (!(test)) {return {};}
+#define require0(test)  			if  (!(test)) {return;}
+#define for_(count)					for (int i = 0; i < (count); i++)
+#define FOR_(var, count)			for (int var = 0; var < (count); var++)
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +61,6 @@ struct JBObject_Behaviour;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define kObjMinSize				16 // safer.
 #define JB_MArray(type, num)    ((type*)(JB_MArray_(sizeof(type),num)))
 #define JB_NewClass(Cls)        (JB_Object*)(JB_AllocNew((Cls)->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))

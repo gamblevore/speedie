@@ -51,7 +51,7 @@ function Assembler.RefCountIncr2 (|message| exp, |message| prms, |&FatASM|)
 	return exp.RFWR(A, B, 0, offset)
 
 
-function Assembler.RefCountIncr (|message| exp, |message| prms, |ASMReg| Obj,  |&FatASM|)
+function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 	opt	NoRefCounts
 	|| Last = .last(asm.GOBJ)
 		if (Last.p0 iz Obj) and !Last.p1
@@ -62,8 +62,7 @@ function Assembler.RefCountIncr (|message| exp, |message| prms, |ASMReg| Obj,  |
 	return fat
 
 
-
-function Assembler.RefCountDecr (|message| exp, |message| prms, |ASMReg| Obj, |&FatASM|)
+function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 	opt	NoRefCounts
 	|| Last = .last(asm.rfun, asm.GOBJ)
 		|| Ret = .CanOptDecr(obj, last)
@@ -96,13 +95,13 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		target debug: if Obj is ContainsAddr						// always a reg!
 	
 		if fn == Compiler.RefIncr
-			return .RefCountIncr(exp, prms, Obj)
+			return .RefCountIncr(exp, Obj)
 	
 		if fn == Compiler.RefEarlyDecr
 			return exp.RFST(Obj, asmreg(), .RefSave)				// reg to 0
 	
 		if fn == Compiler.RefDecr
-			|| fat = .RefCountDecr(exp, prms, obj)
+			|| fat = .RefCountDecr(exp, obj)
 			.CloseOneVar(nil, 1<<Obj.reg)
 			return fat
 	
