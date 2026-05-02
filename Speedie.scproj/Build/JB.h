@@ -6484,9 +6484,9 @@ ASMReg SC_Pac_RefCount(Assembler* Self, Message* Exp, ASMReg Dest);
 
 FatASM* SC_Pac_RefCountClear(Assembler* Self, Message* Exp, Message* Prms);
 
-FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, Message* Prms, ASMReg Obj);
+FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj);
 
-FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, Message* Prms, ASMReg Obj);
+FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj);
 
 FatASM* SC_Pac_RefCountIncr2(Assembler* Self, Message* Exp, Message* Prms);
 
