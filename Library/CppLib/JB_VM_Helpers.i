@@ -176,11 +176,13 @@ VMOpt vec4 VSwiz (CakeRegister* r, ASM Op) {
 
 
 // "static __restrict __hot"... now theres some real cpp
-static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister* r, JB_Object* self, int Dest, ASM* CodePtr) {
+static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* self, int Dest, ASM* CodePtr) {
 	fpDestructor Destructor = JB_Destructor(self);
 
+	auto r = rp;
+	Dest++; // too small for some reason?
 	if (!(((uint64)Destructor) >> 63)) {
-		r += Dest + 1;								// The destructor can end back in the VM!
+		r += Dest;								// The destructor can end back in the VM!
 		vm.ProposedStack = (CakeStack*)r;
 		((CakeStack*)r)->DestReg = Dest;
 		(Destructor)(self);
@@ -188,10 +190,11 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister* r, JB_Objec
 	}
 	
 	Destructor = (fpDestructor)((((uint64)Destructor)<<2)>>2);
-	CakeStack* NewStack = ((CakeStack*)r + Dest + 1);
+	CakeStack* NewStack = ((CakeStack*)r + Dest);
+	rp = (CakeRegister*)(NewStack + 1);
 	{
-		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		auto OldStack = (CakeStack*)(r-1);
+		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		if_rare (NewStack >= End) {					// Stackoverflow
 			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
 			vm.Registers[2] = {.Int = errno};		// Clear stack. Its gone. And we already reported it.
@@ -212,7 +215,7 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister* r, JB_Objec
 }
 
 
-__restrict inline ASM* JB_RefDecr (CakeVM& vm, CakeRegister* r, JB_Object* self, int SaveReg, ASM* Code) {
+__restrict inline ASM* JB_RefDecr (CakeVM& vm, CakeRegister*& r, JB_Object* self, int SaveReg, ASM* Code) {
     if ( self ) {
 		int N = self->RefCount - (1<<JB_RefCountShift);
 		self->RefCount = N;
@@ -249,7 +252,7 @@ VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) 
 
 
 //   ///   /// REFCOUNTING
-VMOpt ASM* SetRefRegToMem (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* SetRefRegToMem (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 	auto New = o2;				 						// reg
 	auto pOld = ((JB_Object**)(u1))+RefSet2_Offsetu;	// mem
 	auto Old = *pOld;
@@ -262,7 +265,7 @@ VMOpt ASM* SetRefRegToMem (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 }
 
 
-VMOpt ASM* SetRefMemToReg (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* SetRefMemToReg (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 	auto pNew = ((JB_Object**)(u2))+RefSet3_Offsetu;
 	auto New = *pNew;									// mem
 	auto Old = o1;				 						// reg
@@ -275,10 +278,10 @@ VMOpt ASM* SetRefMemToReg (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 }
 
 
-VMOpt ASM* SetRefBasic (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* SetRefBasic (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 	int out = n1;
-	int in = n2;
-	auto B = r[in].Obj;
+//	int in = n2;
+	auto B = r[n2].Obj;
 	JB_Incr(B);
 	if (out) {
 		auto A = r[out].Obj;
@@ -289,7 +292,7 @@ VMOpt ASM* SetRefBasic (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
 }
 
 
-VMOpt ASM* SetRefApart (CakeVM& vm, CakeRegister* r, ASM Op, ASM* Code) {
+VMOpt ASM* SetRefApart (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 	JB_Incr(o3);
 	JB_SafeDecr(o2);
 	
@@ -743,8 +746,8 @@ VMOpt int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 }
 
 
-// __restrict helps to parellelize things more
-// probably many more places I could put it... 
+
+
 __restrict VMOpt void ForeignFunc (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
