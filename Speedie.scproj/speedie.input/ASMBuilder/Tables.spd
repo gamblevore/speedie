@@ -667,15 +667,15 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	|| offset = 0
 	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob, exp)
 	
-	|| fat = exp.CNTC(dest, Addr, offset, amount, bc)
+	|| fat = exp.CNTD(dest, Addr, offset, amount, bc)
 	fat.µRefCount++					// memory alteration!
 	(dest is set)
 	if !dest.reg
 		fat._Outputs &= ~1			// clear output
 	
 	if mode & IncrAfter
-		if 0: exp.CNTD
-		fat._op = asm.cntd
+		if 0: exp.CNTC
+		fat._op = asm.cntc
 	return fat * dest
 
 
@@ -706,7 +706,7 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	|| Src = .µGetASM(exp, ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
-	
+
 	if dest is discard
 		mode = IncrBefore
 	  elseif !dest.reg
@@ -716,7 +716,7 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		  else
 			dest.reg = src
 	  elseif (dest iz src) and (mode & IncrAfter)
-		problem (exp, "Your code is fucked up here")	 // x = x++ makes no sense
+		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	 // x = x++ makes no sense
 		return src
 	
 
