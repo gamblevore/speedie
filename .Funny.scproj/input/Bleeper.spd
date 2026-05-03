@@ -2,7 +2,7 @@
 
 
 function faststring.Bleep (|byte| c)
-	|| table = swearword.Letters.addr		// DYKE SQUID
+	|| table = funnyword.Letters.addr		// DYKE SQUID
 	
 	for 2
 		|| b = c & 15
@@ -14,6 +14,7 @@ function faststring.Bleep (|byte| c)
 
 
 function string.Bleep (|faststring?| fs_in=nil, |string|)
+	opt norefcounts
 	|| fs = faststring(fs_in)
 	|| o = 0
 	for (sloot in self)
@@ -25,19 +26,20 @@ function string.Bleep (|faststring?| fs_in=nil, |string|)
 
 
 function string.Unbleep (|faststring?| fs_in=nil, |string|)
+	opt norefcounts
 	|| fs = faststring(fs_in)
 	|byte[256]| Ugh 
-	for (c in swearword.Letters) (c2)
+	for (c in funnyword.Letters) (c2)
 		ugh[c] = c2+1
 	
 	|| i = 0
 	|| o = 0
 	
-	while (i < self) 
+	while (i < self)
 		|| c = self[i++]
 		if c.IsWhite
 			fs <~ c
-			continue 
+			continue
 		
 		if c == '!'
 			c = 8 + ugh[self[i++]]
@@ -45,7 +47,7 @@ function string.Unbleep (|faststring?| fs_in=nil, |string|)
 			|| c1 = ugh[c]
 			if !c1
 				fs <~ c
-				continue 
+				continue
 			c = c1
 
 		|| c2 = ugh[self[i++]]
@@ -57,3 +59,4 @@ function string.Unbleep (|faststring?| fs_in=nil, |string|)
 		fs <~ C3|byte|
 	
 	return fs.GetResult(fs_in)
+

@@ -168,11 +168,11 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 
 function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
 	opt norefcounts
-	// $x --> (swearword(x))
-	// $$$x --> (swearword(x))
-	// !!$$!x -- (swearword(X,3))
-	// $1 --> (swearword(1))
-	// {$1} --> {app.say swearword(1)}
+	// $x --> (funnyword(x))
+	// $$$x --> (funnyword(x))
+	// !!$$!x -- (funnyword(X,3))
+	// $1 --> (funnyword(1))
+	// {$1} --> {app.say funnyword(1)}
 	|| strength = 0
 	|| ch = exp
 	while ch == @brel
@@ -185,7 +185,7 @@ function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
 		ch = ch.first!
 	exp.become(@bra)
 	using exp
-	|| fnc = "swearword()"~parse
+	|| fnc = "funnyword()"~parse
 	|| prm = fnc.last
 	prm <~ exp.first
 	if strength > 0

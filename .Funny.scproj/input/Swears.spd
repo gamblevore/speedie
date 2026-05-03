@@ -1,8 +1,8 @@
 
 
-class SwearWord
+class FunnyWord
 	|string|	Name
-	|bool| 		Adjective
+	|bool|		Adjective
 
 	constructor (|string| s, |error| anything)
 		if s[] == '+'
@@ -11,26 +11,27 @@ class SwearWord
 		.name = s
 		
 	constants
-		Letters = "@*%^|&$?"				// swearing increases code quality :D
+		Letters = "@*%^|&$?"					// swearing increases code quality :D
 		
 	module
-		function Sorter (SorterComparer of swearword)
+		function Sorter (SorterComparer of funnyword)
 			return .name.SyntaxCompare(b.name)
 
 
-extend_module swearword
-	|[SwearWord]|					First
-	|[SwearWord]|					Second
-	|bool| 							AllowSame
-	|bool| 							Print
+extend_module funnyword
+	|[funnyword]|					First
+	|[funnyword]|					Second
+	|bool|							AllowSame
+	|bool|							Print
 
-	helper LoadTo (|[swearword]| list, |string| s)
+	helper LoadTo (|[funnyword]| list, |string| s)
+		opt norefcounts
 		for w in s.unbleep.Split
 			if w
-				list <~ SwearWord(w, nil|error|)
+				list <~ funnyword(w, nil|error|)
 		list.sort
 	
-	helper Accept (|SwearWord| a, |SwearWord| b, |bool|)
+	helper Accept (|funnyword| a, |funnyword| b, |bool|)
 		require a != b
 		if .AllowSame
 			require a.name[] == b.name[]
@@ -38,45 +39,45 @@ extend_module swearword
 		
 	function New (|string|)
 		return new("", 1)
-	function New (|int| n = 1,  |string|)
+
+	function New (|int| n = 1, |string|)
 		return new("", n)
-	function New (|int| a, |int| b,  |string|)
+	
+	function New (|int| a, |int| b, |string|)
 		return new("", a+b)
 	
 	function New (|string| upon, |int| n = 1,  |string|)
+		opt norefcounts
 		if !n
-			return upon
-		if !.first
+			return upon		if !.first
 			.loadto(.First, .firstwords)
 		if !.second
 			.loadto(.second, .secondwords)
-		|| fs = FastString()
+		|| fs = FastString.shared
 		if upon
 			fs <~ upon
 			fs <~ ' '
 		|| done = false
 		for i in n
-			for 100 
-				|| w1 = .first.now	#loop
-				|| w2 = .Second.now	#loop
+			for 100
+				|| w1 = .first.now			#loop
+				|| w2 = .Second.now			#loop
 				if .accept(w1, w2)
 					if done
 						fs <~ ", "
 					done = true
-					if 0.5[]
-						for 50
-							|| extra = .First[]!
-							if extra.Adjective and .Accept(w1, extra) and .Accept(w2, extra)
-								fs <~ extra.name
-								fs <~ " "
-								exit
+					for 50 * 0.5[]
+						|| extra = .First[]!
+						if extra.Adjective and .Accept(w1, extra) and .Accept(w2, extra)
+							fs <~ extra.name
+							fs <~ " "
+							exit
 							
 					fs <~ w1.name
 					fs <~ " "
 					fs <~ w2.name
 					exit
 		return fs
-		
 			
 	|| firstwords="
 *!%^!?!$!%|!^

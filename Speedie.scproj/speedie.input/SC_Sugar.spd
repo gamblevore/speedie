@@ -227,7 +227,7 @@ function message.InsertMainArgs (|message| prms)
 function compiler.AddFunny (|message| msg, |message| curr)	// autoimport
 	require !.HasFunny
 	.HasFunny = true
-	problem (curr, "Strange behaviour")
+	warn (curr, "Haha funny")
 	msg.msg(@tmp, "import") <~ ".Funny"			// hehe
 
 
