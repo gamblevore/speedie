@@ -2,10 +2,10 @@ extend_module ASM {
 	constants Types {
 		|asm|
 		TAIL = 2
+		FNC3 = 23
 		FNC = 24
-		FNC3 = 25
+		FNCX3 = 25
 		FNCX = 26
-		FNCX3 = 27
 		MARK = 255
 		KNST2 = 4
 		KNST3 = 5

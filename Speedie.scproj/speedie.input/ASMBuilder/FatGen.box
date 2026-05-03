@@ -8,17 +8,6 @@ function message.TAIL (|int| JUMP = nil, |int| Prm1 = nil, |&fatasm|) {
 }
 
 
-function message.FNC (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.FNC, self)
-	rz.numinput(1) = JUMP
-	rz.numinput(2) = Prm1
-	rz.numinput(3) = Prm2
-	rz.dest(0, r1, a)
-}
-
-
 function message.FNC3 (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -30,11 +19,11 @@ function message.FNC3 (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |i
 }
 
 
-function message.FNCX (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
+function message.FNC (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
-	rz = a.RequestOp(asm.FNCX, self)
-	rz.numinput(1) = Table
+	rz = a.RequestOp(asm.FNC, self)
+	rz.numinput(1) = JUMP
 	rz.numinput(2) = Prm1
 	rz.numinput(3) = Prm2
 	rz.dest(0, r1, a)
@@ -45,6 +34,17 @@ function message.FNCX3 (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, 
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FNCX3, self)
+	rz.numinput(1) = Table
+	rz.numinput(2) = Prm1
+	rz.numinput(3) = Prm2
+	rz.dest(0, r1, a)
+}
+
+
+function message.FNCX (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.FNCX, self)
 	rz.numinput(1) = Table
 	rz.numinput(2) = Prm1
 	rz.numinput(3) = Prm2

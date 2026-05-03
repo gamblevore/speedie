@@ -15,7 +15,7 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.length = self|memory|.size 
+		.length = self|memory|.size
 		.AreaInfo = s
 	
 
@@ -103,7 +103,7 @@ class Image (memory)
 
 	function ResetBoundsToSize
 		cpp_Part resetarea
-		.WindowBase   = (0, 0)
+		.WindowBase = (0, 0)
 		.noclip
 	
 	libinternal NoClip
@@ -140,7 +140,6 @@ class Image (memory)
 		require !.deathaction  or .SetSize(N)
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
 
-//		.size = n
 		.length = n
 		.AreaInfo = value
 		return true
@@ -475,7 +474,8 @@ class Image (memory)
 		
 		
 	inline DrawRect (|ivec4| Rect, |vec4| Color)
-		.DrawRect(Rect, color.px)
+		|| px = color.px
+		.DrawRect(Rect, px)
 	
 
 	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=0, |MoveCode| AllowEdge=MoveCode.allCodes)

@@ -76,7 +76,7 @@ typedef u64 (*Fn0 )();
 
 struct CakeStack {
 	u32*		Code;
-	uint		Dummy;			
+	uint		Kind;			
 	byte		GoUp;
 	byte		DestReg;
 	u16			Depth;

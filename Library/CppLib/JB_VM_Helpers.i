@@ -204,6 +204,7 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Obj
 		OldStack->Code = CodePtr;
 	}
 	
+	NewStack->Kind = 0x80000;
 	NewStack->GoUp = 0;
 	NewStack->Code = (ASM*)Destructor;
 	((CakeRegister*)NewStack)[2].Obj = self;
@@ -229,21 +230,24 @@ VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) 
 	(DebugCode);
 	auto Stack	= (CakeStack*)(R0 - 1);
 	int StepBack= Stack->DestReg;
+	int Kind = Stack->Kind;
 	
 	auto Imm	= RET_Valuei;							// get before copy!
 	auto Src	= R0 + n1;
 	
 	*((CakeRegister*)Stack) = *Src;
 	((CakeRegister*)Stack)->Uint |= Imm;				// immediate
-	
-	auto NewR0 = (CakeRegister*)(Stack-StepBack);
-	R0			= NewR0;								// NewZero
-	Stack		= (CakeStack*)(NewR0 - 1);
-	auto Code	= Stack->Code;
-	Stack->GoUp = 0;
-//	*R0			= {};									// unnecessary?
-	
-	return Code;
+	if (Kind) {
+		auto NewR0 = (CakeRegister*)(Stack-StepBack);
+		R0			= NewR0;							// NewZero
+		Stack		= (CakeStack*)(NewR0 - 1);
+		auto Code	= Stack->Code;
+		Stack->GoUp = 0;
+	//	*R0			= {};								// unnecessary
+		return Code;
+	}
+
+	return 0;											// callback... we need to end.
 }
 
 
@@ -305,11 +309,12 @@ VMOpt ASM* SetRefApart (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 
 VMOpt ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 	auto Obj = o1;
-	if (n2) {
-		Code = JB_RefDecr(vm, r, o2, 0, Code);
+	int n = n2;
+	if (n) {
+		Code = JB_RefDecr(vm, r, r[n].Obj, 0, Code);
 		o1 = Obj;								// restore smashed regs, cos we passed 0.
 	}
-	JB_SafeDecr(Obj);
+	JB_SafeDecr(Obj);							// how to return from here?
 	return RestoreStack(vm, r, (Op>>19)<<19, Code);
 }
 
@@ -660,6 +665,7 @@ VMOpt ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, ASM Cod
 	return CodePtr;
 }
 
+#define fallthrough
 
 VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) {	// jumpstack
 	auto r = rp;
@@ -674,10 +680,12 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		
-		OldStack->GoUp = Dest;
 		NewStack->Depth = OldStack->Depth+1;
+		OldStack->GoUp = Dest;
 		OldStack->Code = CodePtr;
 	}
+	
+	NewStack->Kind = 0xFFFF;
 	NewStack->DestReg = Dest;
 	NewStack->GoUp = 0;
 	auto Zero = ((CakeRegister*)NewStack)+1;

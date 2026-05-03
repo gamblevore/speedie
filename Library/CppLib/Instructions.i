@@ -8,7 +8,7 @@
 	else
 	CakeCrashed(&vm, SIGKILL)
 ;
-	goto EXIT;
+	return &vm.Registers[2].Ivec;
 ı TAIL:;
 	Code = TailStack(vm, r, Code + 1, Op, *Code);
 ı KNST2:;
@@ -16,16 +16,17 @@
 ı KNST3:;
 	LoadConst(r, Op, *((uint64 *)(Code)));
 	Code += 2;
-ı FNC:;
-	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 ı FNC3:;
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
-ı FNCX:;
-	ForeignFunc(vm, Code, r, Op, *Code);
-	Code++;
+ı FNC:;
+	Code = BumpStack(vm, r, Code + 1, Op, *Code);
+	fallthrough;
 ı FNCX3:;
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
+ı FNCX:;
+	ForeignFunc(vm, Code, r, Op, *Code);
+	Code++;
 ı TRAP:;
 	TryTrap();
 ı NOOP:;
@@ -42,6 +43,9 @@
 	u1 = (uint64)(&u2);
 ı RET:;
 	Code = RestoreStack(vm, r, Op, Code);
+	if (!Code)
+	return &(r[1].Ivec)
+;
 ı AFNC:;
 	i1 = FuncAddr(vm, Op, Code);
 ı ALLO:;
@@ -167,6 +171,9 @@
 	Code = SetRefMemToReg(vm, r, Op, Code);
 ı RFRT:;
 	Code = DeRefRegs(vm, r, Op, Code);
+	if (!Code)
+	return &(r[1].Ivec)
+;
 ı GOBJ:;
 	o1 = gobj(vm, Op);
 ı GTAB:;

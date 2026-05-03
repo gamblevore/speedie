@@ -161,11 +161,22 @@ function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| f
 	opt norefcounts
 	if !.InlineDepth
 		|| unable = (.EntireInlineFailed<2)
+		debugger 
 		|| reason = ("Unable to inline function: " (unable) "Inlined too deep on function: ")
-		error (exp, reason + fn.RenderName)
+		error (exp, reason + fn)
 	.EntireInlineFailed = 1 + !DepthOK
 	return asmreg()
 
+
+function string.operatorplus (|scfunction| fn, |string|)
+	opt norefcounts
+	|| fs = FastString.shared
+	fs <~ self
+	|| pname = fn.parentname
+		fs <~ pname
+		fs <~ '.'
+	fs <~ fn.Name
+	return fs
 
 
 function assembler.DepthOK (|scfunction| fn, |bool|)
@@ -187,7 +198,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	|| prms = exp.last!
 	|| TableID = 0
 	
-	.parentsanity
+	.ParentSanity
 	
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
@@ -219,11 +230,14 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	
 	|| PExt = P >> 32
 	(dest isnt Const)								// why would it be?
-	|| fat = exp.FNC(dest, TableID, P,  PExt)		// prms.fncx
+	|| fat = exp.FNC(dest, TableID, P, PExt)
 	if fn.HasCVersion
-		if 0: exp.fncx
 		fat._op = asm.FNCX
-	fat._op += PExt > 0
+		if PExt > 0
+			fat._op = asm.fncx3
+	  elseif PExt > 0
+		fat._op = asm.fnc3
+		
 	fat.µRefCount += fn isnt STATELESS				// NOICE!
 
 	.ClearTrampling(exp, Start, fat)

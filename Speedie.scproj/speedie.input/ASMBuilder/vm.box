@@ -349,7 +349,7 @@ forms
 			0
 		else
 			CakeCrashed(&vm, SIGKILL)
-		goto EXIT
+		return &vm.Registers[2].Ivec
 
 
 /**/ TRAP (Trap)
@@ -378,33 +378,40 @@ forms
 
 
 #!						 (((((FUNC)))))
-/**/ GRAB (U2) 
+/**/ GRAB (U2)
 		u1 = (uint64)(&u2)
 
 /**/ RET (Ret)
 		Code = RestoreStack(vm, r, Op, Code)
+		if (!Code)
+			return &(r[1].Ivec)
 
 POS 2
 	TAIL (Tail)
 		Code = TailStack(vm, r, Code+1, Op, *Code)
 
-POS 24 // force position
-	FNC (Func)			// func:		// we could merge these two by fall-through?
-		Code = BumpStack(vm, r, Code+1, Op, *Code)
 
-POS 25
+POS 23
 	FNC3 (Func)
 		Code = BumpStack(vm, r, Code+2, Op, Code64)
+
+POS 24					// force position
+	FNC (Func)			// fnc:		// want to merge these two...
+									// the problem is, my system doesn't really... allow for that.
+									// what if I explicitly say "Fallthrough" then it can?
+		Code = BumpStack(vm, r, Code+1, Op, *Code)
+		fallthrough // we also need to swap fnc3 and fnc... more annoying things...
+
+
+POS 25
+	FNCX3 (ForeignFunc)
+		ForeignFunc(vm, Code, r, Op, Code64) 
+		Code += 2
 
 POS 26
 	FNCX (ForeignFunc)
 		ForeignFunc(vm, Code, r, Op, *Code)
 		Code++ 
-
-POS 27
-	FNCX3 (ForeignFunc)
-		ForeignFunc(vm, Code, r, Op, Code64) 
-		Code += 2
 
 POS 255
 	MARK (U0)
@@ -591,20 +598,22 @@ POS 5
 /**/ RALO  (U2)	// could be nicer to use a gtab const directly.
 		o1 = alloc(o2) // 1 less instruction... gtabs suck anyway.
 
-/**/ RFUN  (RefSetApart)						// freeifdead, safedecr, incr
+/**/ RFUN  (RefSetApart)							// freeifdead, safedecr, incr
 		Code = SetRefApart(vm, r, Op, Code)
 
-/**/ RFST  (RefSet1)
+/**/ RFST  (RefSet1)								// RefCount reg --> reg
 		Code = SetRefBasic(vm, r, Op, Code)
 
-/**/ RFWR  (RefSet2)							// RefCount reg --> mem
+/**/ RFWR  (RefSet2)								// RefCount reg --> mem
 		Code = SetRefRegToMem(vm, r, Op, Code)
 
-/**/ RFRD  (RefSet3)							// RefCount reg <-- mem
+/**/ RFRD  (RefSet3)								// RefCount reg <-- mem
 		Code = SetRefMemToReg(vm, r, Op, Code)
 	
-/**/ RFRT  (RefReturn)							// its ONLY used for returns...
+/**/ RFRT  (RefReturn)								// its ONLY used for returns...
 		Code = DeRefRegs(vm, r, Op, Code)
+		if (!Code)
+			return &(r[1].Ivec)
 
 
 

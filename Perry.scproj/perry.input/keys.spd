@@ -51,7 +51,7 @@ extend PerryIDE
 				return .CancelKey
 			return ClickedPrevNext(.gonext)
 		if key is b
-/			Clickedcompile(.buildbutton)
+			Clickedcompile(.buildbutton)
 			return true
 		if key is r
 			return .RunKey

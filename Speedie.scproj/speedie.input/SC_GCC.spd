@@ -93,9 +93,10 @@ function ProjTmpPath (|string|)
 	|| t = .tmpbase(.ProductBaseName)
 	if !Options.SelfReplacement
 		|| fs = FastString()
-		fs.AppendHex(compiler.BaseProjectPath!.Hash|uint|)
+		|| s = compiler.BaseProjectPath!.lowercase
+		fs.AppendHex(s.Hash|uint|)
 		// int64.hex would be nice....
-		t = t.child(fs)
+		t = t.child(fs|string|)
 	return t
 
 

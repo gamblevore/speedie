@@ -720,7 +720,7 @@ function SCObject.CallFromName (|string|)
 	if self isa SCFunction
 		if self is InitFunc
 			return "(Initialiser)"	
-		return .RenderName
+		return ""+self
 		
 	if self isa SCDecl
 		return .AutoCompleteName

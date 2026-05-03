@@ -300,7 +300,7 @@ function NilFunction (NilTrackerFn)
 	
 	|| ret = fn.ReturnType
 		rz |= ret.NilDeclared
-		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on return type of function: " + fn.RenderName)
+		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on return type of function: " + fn)
 
 
 

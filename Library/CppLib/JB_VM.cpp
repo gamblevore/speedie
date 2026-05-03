@@ -262,7 +262,7 @@ VMOpt ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Base[2].Code = VMProtect(V, true) + CodeIndex;
 	for (int i = 1; i <= 2; i++) {
 		Base->DestReg = 1;
-		Base->Dummy = 987654321;
+		Base->Kind = 987654321;
 		Base->Depth = i;
 		Base->GoUp = 0;
 		Base[1] = {};
@@ -358,6 +358,7 @@ ivec4* JB_ASM_CallBack (CakeVM* V, ASM* Code) { // want this inlined...
 		NewStack->Depth = OldStack->Depth+1;
 	}
 	
+	NewStack->Kind = 0;
 	NewStack->GoUp = 0;
 	NewStack->Code = Code;
 	NewStack[1] = {};
