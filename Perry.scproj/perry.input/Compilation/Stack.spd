@@ -86,7 +86,7 @@ function AppInfoExtra (|UnixProcess| r, |string|)
 function ExtraAppInfo (|faststring| fs)
 	opt norefcounts
 	|| r = .RunCompiledApp
-	if !r or .DebugMode is Finished
+	if !r or (.DebugMode is Finished) or (.DebugMode isnt cakemode)
 		fs <~ "  --"
 		return
 	
