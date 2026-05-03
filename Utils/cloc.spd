@@ -2,14 +2,14 @@
 
 
 app.usage = "Usage: cloc path [...]
---types=cpp/c/h               Only report these types
---quiet=true/false            Makes less output
--k                            Keeps errors
--j							  The size if the data was converted to jbin (usually larger)
--s                            Report parse speed
--p                            Print parse tree
--m                            Report Memory Usage
--h                            Histogram
+--types=cpp/c/h					Only report these types
+--quiet=true/false				Makes less output
+-k								Keeps errors
+-j								The size if the data was converted to jbin (usually larger)
+-s								Report parse speed
+-p								Print parse tree
+-m								Report Memory Usage
+-h								Histogram
 " // set this before getting into main
 
 
@@ -31,10 +31,10 @@ module Counts
 	|int64|		Parsed
 	|int64|		Files
 	|int64|		Dirs
-	|int64| 	TotalSize
-	|int64| 	TotalJBin
-	|int64| 	ObjMem
-	|int64| 	StrMem
+	|int64|		TotalSize
+	|int64|		TotalJBin
+	|int64|		ObjMem
+	|int64|		StrMem
 	|int|		MaxNodeLength
 	|uint[65]|	Histogram
 	
@@ -42,18 +42,18 @@ module Counts
 	||			loud = !(app.yes("quiet") or app.yes("q"))
 	||			PrintTree = false
 	||			PrintedTree = false
-	|| 			JB = app.yes("j")
+	||			JB = app.yes("j")
 	||			ParseSpeed = app.yes("s")
-	|string| 	DefaultExt = "spd/box/jbin/jb/xml"
+	|string|	DefaultExt = "spd/box/jbin/jb/xml"
 	
 	function Init (|string| ss)
 		|| pt = app["p"]
 			.PrintTree = true
 			if pt != "true"
 				.MaxNodeLength = pt.int
-		ss = ss.trim 
+		ss = ss.trim
 		ss ?= .DefaultExt
-		for s in (ss / '/') 
+		for s in (ss / '/')
 			.exts[s] = s
 
 	function Count (|message| Msg)
@@ -122,7 +122,8 @@ function file.CLOC
 	require msg
 	if counts.jb
 		counts.TotalJBin += msg.RenderJbin.Length
-	counts.Count(msg) 
+
+	counts.Count(msg)
 	if counts.PrintTree
 		if counts.maxnodelength
 			for s.flat in msg 
