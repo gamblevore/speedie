@@ -235,10 +235,6 @@ function StdOut (|file!|)
 	opt norefcounts
 	return ._StdOut init file.NewPipe(filedes.stdout)
 
-//function StdOut (|faststring!|)
-// this wouldn't self-flush. and speedie isnt threaded.
-// Flush on exit... suffers crashes and delays. No, basically.
-
 
 function CWD (|string|)
 	cpp_wrapper JB_File__CWD
@@ -271,7 +267,7 @@ render MemoryUsage (|int| Over=0)
 	fs <~ "\n"
 	|| i = 0
 	while 
-		|&classdata| C = items[i++]|&classdata|  #loop
+		|&classdata| C = items[i++]|&classdata|		#loop
 		fs.memoryreport(c.name, nil, C.memoryused)
 	fs <~ "\n"
 
@@ -281,6 +277,7 @@ render MemoryUsage (|int| Over=0)
 	
 	
 libinternal FastString.MemoryReport (|cstring?| name, |string?| name2, |int64| Amount)
+	opt norefcounts
 	if amount
 		self <~ name
 		self <~ ": "

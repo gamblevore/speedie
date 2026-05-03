@@ -298,6 +298,7 @@ datatype FileSizeInt (int64)
 		inlined
 		return self >= 0
 	render
+		opt norefcounts
 		inlined
 		return .strsize(fs)
 

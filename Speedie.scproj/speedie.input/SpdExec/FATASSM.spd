@@ -6,17 +6,17 @@ struct FatASM
 		sort_properties true
 	
 	|ASMParam[6]|		Prms
-	|ASMReg| 			Info
-	|Message--| 		Msg			// Only used for reporting now. Not ASMGen. Not easy to remove.
-	|uint64| 			_Const
+	|ASMReg|			Info
+	|Message--|			Msg				// Only used for reporting now. Not ASMGen. Not easy to remove.
+	|uint64|			_Const
 	|uint|				FatMap
 	|int16|				µRefCount
-	|uint16| 			BasicBlock
-	|uint16| 			ASMIndex
+	|uint16|			BasicBlock
+	|uint16|			ASMIndex
 	|byte|				CurrGrabID
-	|byte|				InputFats 	// could merge with inputprms... easy and better probably. Do later
+	|byte|				InputFats		// could merge with inputprms... easy and better probably. Do later
 	|byte|				InputPrms	
-	|byte| 				_Outputs
+	|byte|				_Outputs
 	|byte|				_Op
 	|byte|				JumpPrm
 	
@@ -38,14 +38,14 @@ struct FatASM
 	setter _op (|byte|)
 		._op = value
 		
+	setter FatMap (|message|)
+		opt inline //
+		.msg = Value
+		.FatMap = value.SrcMap
+		
 	function InputFat (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat
-	
-//	function IsBitCorrect (|bool|)
-//		if self is Const
-//			return true
-//		return .IsRead
 	
 	function IsRead (|bool|)
 		|| op = .op
@@ -247,6 +247,7 @@ struct FatASM
 	function p2 (|ASMParam|): return .prms[2]
 	function p3 (|ASMParam|): return .prms[3]
 
+	function p0 (assigns:|uint|): .prms[0] = value
 	function p1 (assigns:|uint|): .prms[1] = value
 	function p2 (assigns:|uint|): .prms[2] = value
 	function p3 (assigns:|uint|): .prms[3] = value
@@ -437,17 +438,7 @@ struct FatASM
 			if !Simpler
 				.RendaMsg(fs, n)
 	
-
-//	function ConditionDoesAnything (|bool|)
-//		// to help remove branches!
-//		for o.RegOutputs in self
-//			|| r = o.Reg
-//				return true
-//		
-//		expect (!.IsFinisher) ("You can't return in the middle of a condition!")
-				
-
-
+	
 	function GuessSize (|int|)
 		// don't really know the size, as consts are awkward to guess
 		// and long-jumps might require more awkward encoding.

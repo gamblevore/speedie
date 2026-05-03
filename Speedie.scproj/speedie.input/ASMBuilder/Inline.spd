@@ -142,7 +142,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		if  .EntireInlineFailed  and  (fn isnt linkinline)
 			.EntireInlineFailed = 0
 		svregs.Rewind(self)
-		.Rewind(ll.start, .curr)				// rewind
+		.Rewind(ll.start, .curr)					// rewind
 		return nil
 	
 	if svregs.ReturnCount > 1
@@ -151,9 +151,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		(rz is Const)								// no longer zero
 
 	if (.curr > RealStart)							// useful, to stop jumping all over in IDE
-		|| P = prms.parent!							// cleanup
-		realstart.Msg = P
-		realstart.Fatmap = P.srcmap
+		realstart.Fatmap = prms.parent!				// cleanup
 
 
 	

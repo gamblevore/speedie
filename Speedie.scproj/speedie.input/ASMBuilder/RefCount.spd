@@ -40,7 +40,7 @@ function Assembler.RefCountClear (|message| exp, |message| prms, |&FatASM|)
 	return exp.RFWR(A, nil, .RefSave, offset)					// reg to mem
 
 
-function Assembler.RefCountIncr2 (|message| exp, |message| prms, |&FatASM|)
+function Assembler.RefCountIncrMemory (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
 	|| A = .µ(prms.first!, asmreg.AddrRequest)
 	target debug: if a isnt ContainsAddr						// always memory
@@ -65,7 +65,7 @@ function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 	opt	NoRefCounts
 	|| Last = .last(asm.rfun, asm.GOBJ)
-		|| Ret = .CanOptDecr(obj, last)
+		|| Ret = .CanOptDecr(exp, obj, last)
 			if ret != last
 				return nil
 			return ret
@@ -88,50 +88,54 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		return .RefCountSet(exp, prms)
 
 	if fn == Compiler.RefIncr2
-		return .RefCountIncr2(exp, prms)
+		return .RefCountIncrMemory(exp, prms)
 
 	|| Obj = .µ(prms.first!)
-	if !.RegIsConst(Obj, 0)
-		target debug: if Obj is ContainsAddr						// always a reg!
-	
-		if fn == Compiler.RefIncr
-			return .RefCountIncr(exp, Obj)
-	
-		if fn == Compiler.RefEarlyDecr
-			return exp.RFST(Obj, asmreg(), .RefSave)				// reg to 0
-	
-		if fn == Compiler.RefDecr
-			|| fat = .RefCountDecr(exp, obj)
-			.CloseOneVar(nil, 1<<Obj.reg)
-			return fat
-	
-		if fn == Compiler.RefSafeDecr
-			return exp.rfun(ASMReg(), Obj)
+	require !.RegIsConst(Obj, 0)
 
-		debugger
+	target debug: if Obj is ContainsAddr						// always a reg!
+
+	if fn == Compiler.RefIncr
+		return .RefCountIncr(exp, Obj)
+
+	if fn == Compiler.RefEarlyDecr
+		return exp.RFST(Obj, asmreg(), .RefSave)				// reg to 0
+
+	if fn == Compiler.RefDecr
+		|| fat = .RefCountDecr(exp, obj)
+		.CloseOneVar(nil, 1<<Obj.reg)
+		return fat
+
+	if fn == Compiler.RefSafeDecr
+		return exp.rfun(ASMReg(), Obj)
+
+	debugger
 
 
 // dead-code stripping means this is better in ASM, than at c-level phase.
-function assembler.CanOptDecr (|asmreg| Obj, |&fatasm| last, |&fatasm|)
-	require (last isa asm.rfun) // rfst 0?
-	require  !last.RegOnly(0)  and  !last.regonly(1)
+function assembler.CanOptDecr (|message| exp, |asmreg| Obj, |&fatasm| last, |&fatasm|)
+	require (last isa asm.rfun)
+	require  !last.RegOnly(0)  and  !last.RegOnly(1)
 
-	|| upon = last.p2
-	require (upon iz Obj)
+	|| incred = last.p2
+	require (incred iz Obj)
 
-	|| uponfat = last.InputFat(2)
+	// 0 = freeifdead,   1 = safedecr,   2 = incr
+	// So by now its incr only.
+	
+	|| UponFat = last.InputFat(2)
 		if uponfat.IsRead and (uponfat.basicblock == .basicblock)
 			// incr + decr = nothing... assuming it wasn't needed
 			.SoftNop(Last)
 			return last + 1
 	
-	// safe-decr result of func that returns disowned.
-	last.p1 = upon
-	last.p2 = 0
+	last.p0 = Incred				// freeifdead
+	last.p2 = 0						// no longer an incr!
+	last.fatmap = exp				// makes more sense to show we did both...
 	return last
 
 
-function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
+function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.obj|SCFunction|!

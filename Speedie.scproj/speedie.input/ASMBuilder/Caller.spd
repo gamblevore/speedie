@@ -12,7 +12,7 @@ function IsASMConst (|message| exp, |bool|)
 		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 
 
-function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcollect, paramscollect
+function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|)		// paramcollect, paramscollect
 	opt norefcounts
 	|int64| sh
 	|| args = fn.args
@@ -24,7 +24,6 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcol
 		|int64| v = .µFuncPrms(p!, args[i++]!).reg
 		sh += 5
 		rz |= v << sh
-	
 	rz |= i
 
 
@@ -205,13 +204,13 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 			return .DoIntrinsic(exp, dest, fn, intrin)
 			
 		if  fn isnt CantInline  and  fn isnt cpp
-			|| DepthOK = .Depthok(fn)
+			|| DepthOK = .DepthOK(fn)
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
 			if fn is LinkInline
 				return .CantLinkInline(exp, depthok, fn)
 		
-		TableID = .asmtableid(exp, fn)
+		TableID = .ASMTableID(exp, fn)
 		
 	  else // function pointers
 		|| f = exp.first!
@@ -258,6 +257,6 @@ function assembler.ASMReach (|SCFunction| fn)
 		if fn is Constructor // gotta reach the destructor also
 			fn = fn.cls!.DestructorFunc
 			if fn
-				(fn is usedbyasm)
+				(fn is UsedByASM)
 
 

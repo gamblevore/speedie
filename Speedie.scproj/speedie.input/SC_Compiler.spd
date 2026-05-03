@@ -179,8 +179,8 @@ function CompileAll
 	StringCorrector.CorrectConsts
 	
 	.Successfulness |= StdErr.ok
-	target debug
-		if Compiler.InPerry: app.DebugBreaksActive(false)
+//	target debug
+//		if Compiler.InPerry: app.DebugBreaksActive(false)
 
 	intrinsics.Process
 	

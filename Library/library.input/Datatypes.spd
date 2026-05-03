@@ -83,9 +83,6 @@ datatype int
 		opt norefcounts
 		fs.AppendDecimal(self, zeros)
 	
-//	operator AbsMin (|uint| Limit, |int|)
-//		if .abs|uint| < Limit: return self
-//		return Limit|int|.setsign(self<0)
 
 	operator Min (|int| other, |int|)
 		asm iclm(dest, p1, p1, p2, 1)
