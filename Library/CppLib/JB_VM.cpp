@@ -346,36 +346,22 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 
 
 
-ivec4* JB_ASM_CallBack (ASM* Code) { // want this inlined...
-	CakeVM* V = JB_GlobalVM;
+ivec4* JB_ASM_CallBack (CakeVM* V, ASM* Code) { // want this inlined...
 	Code = VMClearHigh(Code);
 
-	// needs to use ProposedStack. ooof!
-	int Dest = 31; // store in the decr instruction??
-	// well... even a FNCX() can call something...
-	// actually, in the case of FNCX(), the regs are saved already...
-	// wait... no? they are not? its stored in n1 in ForeignFunc
-	// so we could take that, and put it somewhere? like as a stack?
-	// hmmm... that is a little more... consistant. but slower.
-	// we could just store it somewhere for real... like in the vm props.
-	// we could do the same for decr? thats all we want really?
-	// what about the current stack position? I guess that needs storing too
-	// or... pre-write it.
-	
-	CakeRegister* r = 0; // so this is the current stack. Unknown right now.
-	CakeStack* NewStack = &((r + Dest)->Stack);
+	CakeStack* NewStack = V->ProposedStack;
+	int Dest = NewStack->DestReg;
+	CakeRegister* r = (CakeRegister*)NewStack - Dest;
 	{
 		auto OldStack = (CakeStack*)(r-1);
 		OldStack->GoUp = Dest;
 		NewStack->Depth = OldStack->Depth+1;
 	}
 	
-	NewStack->DestReg = Dest;
 	NewStack->GoUp = 0;
 	NewStack->Code = Code;
+	NewStack[1] = {};
 	
-	// Also need to pass the new stackpos! into the cakevm...
-	// Oooooofffff
 	return __CAKE_VM__(*V, Code, (CakeRegister*)(NewStack+1));
 }
 

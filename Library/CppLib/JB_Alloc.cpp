@@ -1137,7 +1137,15 @@ void JB_DeleteSub_ ( FreeObject* Obj, AllocationBlock* Block ) {
 
 
 #if __VM__
-	__attribute__((always_inline)) ivec4*	JB_ASM_CallBack	 (u32* Code);
+struct CakeVM {
+    int				CakeFail;
+    int				UserFlags;
+    void**			__VIEW__;
+    ivec4*			ProposedStack;
+};
+
+	extern CakeVM*	JB_GlobalVM;
+	ivec4* JB_ASM_CallBack	 (CakeVM* V, u32* Code);
 #endif
 
 
@@ -1151,11 +1159,15 @@ __restrict __hot void JB_Delete ( FreeObject* Obj ) {
 	fpDestructor Destructor = GetDestructor_(Block);
 
 	#if __VM__
-	if (((uint64)Destructor) >> 63)			// VM based destructor
-		JB_ASM_CallBack((u32*)Destructor);
-	else
+	if (((uint64)Destructor) >> 63) {			// VM based destructor
+		auto V = JB_GlobalVM;
+		((FreeObject**)((V->ProposedStack)+2))[0] = Obj;
+		JB_ASM_CallBack(V, (u32*)Destructor);
+	} else
 	#endif
+	{
 	(Destructor)((JB_Object*)Obj);
+	}
 }
 
 

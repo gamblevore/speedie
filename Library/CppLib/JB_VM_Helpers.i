@@ -177,20 +177,18 @@ VMOpt vec4 VSwiz (CakeRegister* r, ASM Op) {
 
 // "static __restrict __hot"... now theres some real cpp
 static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* self, int Dest, ASM* CodePtr) {
-	fpDestructor Destructor = JB_Destructor(self);
-
-	auto r = rp;
 	Dest++; // too small for some reason?
+	fpDestructor Destructor = JB_Destructor(self);
+	auto r = rp;
+	CakeStack* NewStack = (CakeStack*)r + Dest;
+	NewStack->DestReg = Dest;
 	if (!(((uint64)Destructor) >> 63)) {
-		r += Dest;								// The destructor can end back in the VM!
-		vm.ProposedStack = (CakeStack*)r;
-		((CakeStack*)r)->DestReg = Dest;
+		vm.ProposedStack = NewStack;
 		(Destructor)(self);
 		return CodePtr;
 	}
 	
 	Destructor = (fpDestructor)((((uint64)Destructor)<<2)>>2);
-	CakeStack* NewStack = ((CakeStack*)r + Dest);
 	rp = (CakeRegister*)(NewStack + 1);
 	{
 		auto OldStack = (CakeStack*)(r-1);
@@ -206,7 +204,6 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Obj
 		OldStack->Code = CodePtr;
 	}
 	
-	NewStack->DestReg = Dest;
 	NewStack->GoUp = 0;
 	NewStack->Code = (ASM*)Destructor;
 	((CakeRegister*)NewStack)[2].Obj = self;
