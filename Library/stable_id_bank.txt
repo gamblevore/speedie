@@ -139,7 +139,6 @@ GUI_FR_Document
 GUI_FR_FileData
 GUI_FR_FindAllParent
 GUI_FR_FindInFile
-GUI_FR_IsModified
 GUI_FR_Modifier
 GUI_FR_MoveTo
 GUI_FR_ReadFrom
@@ -1591,7 +1590,6 @@ JB_Str_IsIntFrom
 JB_Str_IsJbin
 JB_Str_IsLower
 JB_Str_IsOK
-JB_Str_IsURL
 JB_Str_IsUpper
 JB_Str_IsVolume
 JB_Str_Last
@@ -1635,6 +1633,7 @@ JB_Str_Print
 JB_Str_PrintError
 JB_Str_PrintLine
 JB_Str_PrintlineColor
+JB_Str_Protocol
 JB_Str_Range
 JB_Str_RangeVec
 JB_Str_ReadAll
