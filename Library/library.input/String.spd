@@ -581,7 +581,7 @@ class String
 		return true
 
 
-	function IsURL (|string|)
+	function Protocol (|string|)
 		for i in .length
 			if self[i, "://"]
 				return self[0, i]
