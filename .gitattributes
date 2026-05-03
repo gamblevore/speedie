@@ -1,1 +1,3 @@
 *.spd linguist-language=Speedie
+*.box linguist-language=jeebox
+*.jbin linguist-language=jbin
