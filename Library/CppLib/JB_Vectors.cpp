@@ -128,7 +128,7 @@ __H__ vec4 JB_vec4_UnTan (vec4 x, vec4 y) {
 	#endif
 }
 
-__H__ vec4 JB_vec4_Sine (vec4 x) {
+__H__ vec4 JB_vec4_Sin (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_sin)
 		return __builtin_elementwise_sin(x) * Tau;
 	#else

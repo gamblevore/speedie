@@ -474,6 +474,7 @@ class Image (memory)
 		
 		
 	inline DrawRect (|ivec4| Rect, |vec4| Color)
+		opt inline
 		|| px = color.px
 		.DrawRect(Rect, px)
 	

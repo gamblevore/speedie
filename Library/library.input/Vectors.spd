@@ -207,8 +207,8 @@ datatype vec3
 	function Lum (|float|)
 		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
 
-	inline Sine (|vec3|)
-		return self|vec4|.sine|vec3|
+	inline Sin (|vec3|)
+		return self|vec4|.sin|vec3|
 
 	inline Cos (|vec3|)
 		return self|vec4|.cos|vec3|
@@ -220,7 +220,7 @@ datatype vec3
 		return self|vec4|.ceil|vec3|
 
 	function SinBad (|vec3|)
-		return (self * math.iTau).sine
+		return (self * math.iTau).sin
 
 	function CosBad (|vec3|)
 		return (self * math.iTau).cos
@@ -671,14 +671,14 @@ datatype vec2
 	function SinCos (|vec4|)
 		return (.x.sincos, .y.sincos)
 		
-	function Sine (|vec2|)
-		return (.x.sine, .y.sine)
+	function Sin (|vec2|)
+		return (.x.sin, .y.sin)
 
 	function Cos (|vec2|)
 		return (.x.cos, .y.cos)
 
 	inline SinBad (|vec2|)
-		return (self * math.iTau).sine
+		return (self * math.iTau).sin
 
 	inline CosBad (|vec2|)
 		return (self * math.iTau).cos

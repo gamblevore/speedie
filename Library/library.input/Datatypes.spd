@@ -77,7 +77,7 @@ datatype int
 		cpp_part RenderSize
 		inlined
 		return self|int64|.strsize(fs_in)
-
+	
 	render (|int| zeros)
 		cpp_part RenderZeros
 		opt norefcounts
@@ -158,7 +158,12 @@ datatype int
 
 
 datatype SizeInt (int)
+// how does this differ from a filesizeint?
+// is it just that this is int32?
+// also seems... unused?
 	syntax cast (|string|)
+		cpp_name JB_SSSSS_ARGH
+		visible
 		inlined
 		return .strsize
 
@@ -435,7 +440,7 @@ datatype float
 			return -1
 
 	inline SinBad (|float|)
-		return (self * math.iTau).sine
+		return (self * math.iTau).sin
 
 	inline CosBad (|float|)
 		return (self * math.iTau).cos
@@ -538,8 +543,32 @@ datatype float
 		if rz < 0.0
 			rz ++
 
-	function Sine (|float|)
+/*
+	// i think the trin numbers help to syncronise Vector and float ops.
+	// however... what if I don't want all of them intrinsic?
+	// I could sync it using more syntax... like trin 15
+
+	// I think it would be nicer to have sin/unsin be on the same instruction.
+	// that... doesn't sync up with Spd code AT ALL
+	// I could kinda work around it... make a helper func...
+	// i think either way... its a lot of work...
+	
+	// maybe nicer to just... manually line everything. seems easier?
+	// if its hard, make it more manual.
+	
+	libinternal SineTestSub (|bool| Reverse, |float|)
 		trin (15, SIN)
+		if !Reverse
+			return math.sinpihalf(self*2.0)
+		return math.unsinebad(self) * math.iTau
+	
+	function SineTest (|float|)
+		return .SineTestSub(false) // rely on inlines
+*/
+	
+	function Sin (|float|)
+//		trin (15, SIN)
+		asm fsin(dest, p1)
 		return math.sinpihalf(self*2.0)
 
 	function Cos (|float|)
@@ -570,8 +599,8 @@ datatype float
 		|| t = ((self - low) / (high - low)).clamp
 		return t * t * (3.0 - 2.0 * t)
 	
-	function IsNan (|int|) // perhaps these IsNan/IsInf can be merged? makes more sense
-						   // than wasting opcodes.
+	function IsNan (|int|)	// perhaps these IsNan/IsInf can be merged? makes more sense
+							// than wasting opcodes.
 		trin (22, XNN)
 		cpp_wrapper (__isnanf)
 	
@@ -589,7 +618,7 @@ datatype float
 			self *= 0.5
 		return self
 	
-	function vec2.operatorby (|float| step,  |FloatRange|)
+	function vec2.operatorby (|float| step, |FloatRange|)
 		rz.From = .x
 		rz.To = .y
 		rz.step = step
@@ -627,24 +656,24 @@ datatype f64
 	inline Fract (|Float64|)
 		return self - .floor
 	
-	operator pow (|Float64| other, |Float64|)
+	operator Pow (|Float64| other, |Float64|)
 		cpp_wrapper (pow)
 	
 	function Log10 (|float64|)
 		cpp_wrapper (log10)
 
-	operator mod (|float64| upon, |float|)
+	operator Mod (|float64| upon, |float|)
 		asm fmod(dest, p1, p2, r0, 0)
 		cpp_wrapper (fmod)
 
 	function Abs (|Float64|)
 		cpp_wrapper (fabs)
 
-	operator max (|Float64| other, |Float64|)
+	operator Max (|Float64| other, |Float64|)
 		asm fclm(dest, p1, p2, p1, 0)
 		cpp_wrapper (fmax)
 
-	operator min (|Float64| other, |Float64|)
+	operator Min (|Float64| other, |Float64|)
 		asm fclm(dest, p1, p1, p2, 0)
 		cpp_wrapper (fmin)
 
@@ -939,9 +968,9 @@ datatype MoveCode (byte)
 
 	syntax is (|movecode| m, assigns:|bool|, |movecode|)
 		inlined
-		self |= m
-		if !value
-			self &= ~m
+		self &= ~m
+		if value
+			self |= m
 		return self
 
 	function Field (|int|)

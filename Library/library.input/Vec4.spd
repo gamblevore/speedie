@@ -80,7 +80,7 @@ datatype vec4
 		trin (14, NAT) // untan
 		cpp_wrapper
 
-	function Sine (|vec4|)
+	function Sin (|vec4|)
 		trin (15, SIN)
 		cpp_wrapper
 

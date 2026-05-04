@@ -41,9 +41,6 @@
 /**/ FNAT  (U3)
 	f1 = JB_f_UnTan(f2, f3);
 
-/**/ FSIN  (U2)
-	f1 = JB_f_Sine(f2);
-
 /**/ FCOS  (U2)
 	f1 = JB_f_Cos(f2);
 
@@ -108,7 +105,7 @@
 	v1 = JB_vec4_UnTan(v2, v3);
 
 /**/ VSIN  (U2)
-	v1 = JB_vec4_Sine(v2);
+	v1 = JB_vec4_Sin(v2);
 
 /**/ VCOS  (U2)
 	v1 = JB_vec4_Cos(v2);

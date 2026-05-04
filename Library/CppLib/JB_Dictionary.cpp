@@ -683,10 +683,11 @@ JB_Object* JB_Dict_Scan_(Dictionary* self, MiniStr Data, MiniStr* Result) {
 }
 
 
-
+static void DictClear (Dictionary* self);
 void JB_Dict_Dispose(Dictionary* self) {
-    JB_Dict_Destructor( self );
-    JB_Dict_Constructor( self );
+    DictClear( self );
+    JB_Zero( self );
+    self->Width = 255;
 }
 
 
@@ -727,7 +728,7 @@ JB_String* JB_Dict_Render(Dictionary* self, FastString* fs_in) {
 
 
 
-void JB_Dict_Destructor(Dictionary* self) {
+static void DictClear (Dictionary* self) {
     if (!self->Width) // has to come first. I'm sure there's some code around here that explains why?
         return;
     
@@ -737,9 +738,13 @@ void JB_Dict_Destructor(Dictionary* self) {
         DictValueRemove_(&self->Items[i]);
         self->Items[i] = (JB_Object*) - 1;       // garbage.
     }
-
     self->InPlaceValue = (JB_Object*) -1;        // garbage.
     self->Parent = (Dictionary*) -1;             // garbage.
+}
+
+
+void JB_Dict_Destructor(Dictionary* self) {
+	DictClear(self);
     JB_Obj_Destructor(self);
 }
 

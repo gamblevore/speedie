@@ -375,7 +375,7 @@ class String
 		cpp_wrapper JB_Str_Append6
 		
 	function Insert (|string| s, |int| i, |int| n = 0, |string|)
-		// perry uses this. Useful.
+		Description "Inserts one string within another. Useful for typing or text-editors." 
 		if i < 0
 			n += i
 			i = 0

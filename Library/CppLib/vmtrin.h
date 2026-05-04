@@ -10,8 +10,6 @@ float JB_f_Uncos(float Self);
 
 float JB_f_UnTan(float Self, float Y);
 
-float JB_f_Sine(float Self);
-
 float JB_f_Cos(float Self);
 
 float JB_f_Tan(float Self);
@@ -48,7 +46,7 @@ vec4 JB_vec4_Uncos(vec4 Self);
 
 vec4 JB_vec4_UnTan(vec4 Self, vec4 Y);
 
-vec4 JB_vec4_Sine(vec4 Self);
+vec4 JB_vec4_Sin(vec4 Self);
 
 vec4 JB_vec4_Cos(vec4 Self);
 

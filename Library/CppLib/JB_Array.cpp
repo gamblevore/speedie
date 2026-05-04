@@ -60,18 +60,19 @@ static bool GrowToLength_ (Array* self, int N, bool Extra) {
 }
 
 
-static void Clear_ (Array* self) {
+static void ArrayClear (Array* self) {
 	auto P = self->_Ptr;
 	self->Capacity = 0;
+	self->Length = 0;
 	self->_Ptr = 0;
 	JB_Free(P);
 }
 
 
 static void ShrinkCapacity_ (Array* self, uint Length) {
-	self->Length = Length;
 	if (Length <= 0)
-		return Clear_(self);
+		return ArrayClear(self);
+	self->Length = Length;
 
 	int C = self->Capacity;
 	if (C <= 5  or  Length*2 > C)
@@ -112,6 +113,7 @@ bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 bool JB_Array_Append( Array* self, JB_Object* Value ) {
 	return JB_Array_AppendCount(self, Value, 1);
 }
+
 
 bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
 	int n = self->Length;
@@ -178,13 +180,13 @@ JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 }
 
 
-
 void JB_Array_Reverse( Array* self ) {
     int n = (int)(self->Length)/2;
     auto F = self->_Ptr;
     for_(n)
         F[i] = F[n-(i+1)];
 }
+
 
 void JB_Array_Remove( Array* self, int Pos ) {
 	auto Item = JB_Array_Value(self, Pos);
@@ -202,7 +204,7 @@ void JB_Array_Remove( Array* self, int Pos ) {
 void JB_Array_Destructor( Array* self ) {
 	if (self->_Ptr) {
 		ArrayDecrDownTo_(self, 0);
-		Clear_(self);
+		ArrayClear(self);
 	}
 	JB_Obj_Destructor(self);
 }
@@ -213,6 +215,7 @@ int JB_Array_Size( Array* self ) {
         return (int)(self->Length);
     return 0;
 }
+
 
 Array* JB_Array_Copy(Array* self) {
     require(self);
@@ -236,14 +239,16 @@ Array* JB_Array_Copy(Array* self) {
     return Result;
 }
 
-void JB_Array_Swap(Array* self, uint i, uint j) {
+
+void JB_Array_Swap (Array* self, uint i, uint j) {
 	uint n = JB_Array_Size(self);
 	if (i < n and j < n) {
 		std::swap(self->_Ptr[i], self->_Ptr[j]);
 	}
 }
 
-Array* JB_Array_Constructor0( Array* self ) {
+
+Array* JB_Array_Constructor0 ( Array* self ) {
 	JB_New2(Array);
 	self->Length = 0;
 	self->Capacity = 0;
@@ -253,7 +258,7 @@ Array* JB_Array_Constructor0( Array* self ) {
 }
 
 
-int JB_Array_Wipe(Array* self) {
+int JB_Array_Wipe (Array* self) {
     if (self)
 		JB_Array_SizeSet(self, 0);
     return 0;

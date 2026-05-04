@@ -2191,3 +2191,6 @@ roundf
 sqrt
 sqrtf
 strlen
+JB_f_Sin
+JB_vec2_Sin
+JB_vec4_Sin

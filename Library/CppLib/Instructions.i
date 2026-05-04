@@ -384,11 +384,11 @@
 ı FNAT:;
 	f1 = JB_f_UnTan(f2, f3);
 ı FSIN:;
-	f1 = JB_f_Sine(f2);
+	f1 = __sinpif(f2 * 2.0f);
 ı FCOS:;
-	f1 = JB_f_Cos(f2);
+	f1 = __cospif(f2 * 2.0f);
 ı FTAN:;
-	f1 = JB_f_Tan(f2);
+	f1 = __tanpif(f2 * 2.0f);
 ı FSGN:;
 	f1 = copysignf(f2, f3);
 ı FMIX:;
@@ -428,7 +428,7 @@
 ı VNAT:;
 	v1 = JB_vec4_UnTan(v2, v3);
 ı VSIN:;
-	v1 = JB_vec4_Sine(v2);
+	v1 = JB_vec4_Sin(v2);
 ı VCOS:;
 	v1 = JB_vec4_Cos(v2);
 ı VTAN:;

@@ -23,7 +23,7 @@ vec4	JB_vec4_Log2		(vec4 x);
 vec4	JB_vec4_Unsin		(vec4 x);
 vec4	JB_vec4_Uncos		(vec4 x);
 vec4	JB_vec4_UnTan		(vec4 x, vec4 y);
-vec4	JB_vec4_Sine		(vec4 x);
+vec4	JB_vec4_Sin			(vec4 x);
 vec4	JB_vec4_Cos			(vec4 x);
 vec4	JB_vec4_Tan			(vec4 x);
 vec4	JB_vec4_Pow			(vec4 x, vec4 y);

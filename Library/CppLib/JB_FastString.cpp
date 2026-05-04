@@ -549,6 +549,9 @@ void JB_FS_ByteSet(FastString* fs, int offset, byte B) {
 
 
 
+
+static void ClearFS (FastString* self);
+
                /* Properties */
 
 int JB_FS_Size(FastString* fs) {
@@ -558,7 +561,7 @@ int JB_FS_Size(FastString* fs) {
 
 void JB_FS_SizeSet(FastString* fs, int NewSize) {
 	if (NewSize < 1)
-		JB_FS_Destructor( fs );
+		ClearFS( fs );
 	  else
 		JB_FS_ResizeTo_( fs, NewSize );
 }
@@ -623,6 +626,17 @@ FastString* JB_FS_ConstructorSize(FastString* Self, int Size) {
 	if ( Size )
 		JB_FS_SizeSet( Self, Size );
 	return Self;
+}
+
+
+
+static void ClearFS (FastString* self) {
+    JB_FS_Flush( self );
+    JB_Decr( self->Result );
+	JB_Decr( self->File );
+    JB_Zero(self);
+    self->IndentChar = '\t';
+    self->ResultPtr = DummySpace;
 }
 
 

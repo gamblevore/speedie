@@ -276,7 +276,7 @@ function TypeCast (fn_asm)
 	if oldtype.isfloat or newtype.isfloat
 		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest
 
-	|| sh2 = 64 - NewType.BitCount
+	|| sh2 = 64 - (NewType.BitCount min OldType.BitCount)
 	return .BFLG_Sub(exp, dest, from, sh2, sh2, dest.signed)
 
 

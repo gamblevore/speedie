@@ -13,10 +13,10 @@ import ".Funny"
 
 main (|int| AmountOfSwears=1)
 ////  You can always replace the word-list by altering ////
-////  swearword.firstwords or swearwords.secondwords   ////
-//	swearword.firstwords = "a\nb\nc\nd", swearword.secondwords = "a\nb\nc\nd"
-	SwearWord.AllowSame = app.yes("same")
-	|| hehe = SwearWord(amountofSwears)
+////  FunnyWord.firstwords or FunnyWord.secondwords   ////
+//	FunnyWord.firstwords = "a\nb\nc\nd", FunnyWord.secondwords = "a\nb\nc\nd"
+	FunnyWord.AllowSame = app.yes("same")
+	|| hehe = FunnyWord(amountofSwears)
 	if app.yes("speak")
 		`("killall say" in terminal to stop this.)`
 		``
