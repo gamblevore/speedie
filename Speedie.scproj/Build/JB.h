@@ -2108,7 +2108,8 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__ClassInfo_Stateless ((ClassInfo)512)
 #define kSC__ClassInfo_Symbol ((ClassInfo)8192)
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)32)
-#define kSC__CompilerStage_CppExport ((CompilerStage)7)
+#define kSC__CompilerStage_Baking ((CompilerStage)7)
+#define kSC__CompilerStage_CppExport ((CompilerStage)8)
 #define kSC__CompilerStage_Hungry ((CompilerStage)5)
 #define kSC__CompilerStage_Import ((CompilerStage)1)
 #define kSC__CompilerStage_Initialising ((CompilerStage)0)
@@ -11109,8 +11110,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
-inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value);
-
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self);
 
 inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
@@ -11120,6 +11119,8 @@ inline bool SC_Reg_IsInt(ASMReg Self);
 inline JB_String* JB_config_AsString(Message* Self);
 
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
+
+inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value);
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
 
@@ -11245,7 +11246,7 @@ inline JB_String* JB_FS_SyntaxCast(FastString* Self) {
 }
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
-	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(Self));
+	Object_Behaviour* Table = ((Object_Behaviour*)JB_Obj_ClassBehaviours(Self));
 	return (((__Object_Render__)(Table->render)))(Self, Fs_in);
 }
 
@@ -11299,11 +11300,6 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 	return JB_Str_IsOK(Self);
 }
 
-inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value) {
-	Self->Msg = Value;
-	Self->FatMap = SC_Msg_SrcMap(Value);
-}
-
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self) {
 	if (SC_Reg_SyntaxIs(Self, kSC__Reg_CondRequest)) {
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CondRequest, (!true));
@@ -11335,6 +11331,11 @@ inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
 	//cpp_name;
 	//visible;
 	return JB_int_RenderSize(Self, nil);
+}
+
+inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value) {
+	Self->Msg = Value;
+	Self->FatMap = SC_Msg_SrcMap(Value);
 }
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
