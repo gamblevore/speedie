@@ -3,10 +3,10 @@
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
-// * Use JB_List for world/super/block! makes code simpler!
+// * Use JB_List for world/super/block!		 // makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
-// * Simplify to have only one world?
+// * Simpler to have only one world?
 
 /*
 What about this idea? Pointer compression:
@@ -46,7 +46,9 @@ JB_MemoryWorld	MemoryManager;
 
 
 inline void failed(const char* c) {
+#if DEBUG
 	printf("jbmem error: %s\n", c);
+#endif
 	debugger;
 }
 
@@ -523,20 +525,6 @@ uint8* JB_ObjClassBehaviours (JB_Object* Obj) {
     return (uint8*)(Block->Virtuals);
 }
 
-
-//void JB_ObjDestroy( JB_Object* Obj ) {
-//  violates the nil-checker.
-//	if (Obj) {
-//		AllocationBlock* Block = ObjBlock_(Obj);
-//		fpDestructor Destructor = GetDestructor_(Block);
-//		if (Destructor) {
-//			(Destructor)(Obj);
-//		}
-//		// in theory... I could call the default constructor after? In fact it may be faster than calling memset!
-//		JB_Class* Cls = Block->Owner->Class;
-//		memzero(4+(char*)Obj, Cls->Size - 4);
-//	}
-//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

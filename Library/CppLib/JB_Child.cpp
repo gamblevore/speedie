@@ -120,8 +120,12 @@ void JB_CrashHandler (int Sig) {
 	}
 
 						// Print Normal Errors
-	JB_Rec_ShellPrintErrors(nil, nil);
 	PicoFinish();
+//	JB_Rec_ShellPrintErrors(nil, nil); // can inf-loop if memory manager is buggered...
+//	I think we just don't get them... unless we can be sure our data is correct.
+//	the only improvement is if you specify a log file and log them at the time they are made.
+//	In fact, if the memory-manager is broken, we don't care about the errors (like parse errors)
+//	we wanna find WHY the memory-manager got broken. Which happened earlier.
 	bool AskExit = (Sig == SIGHUP) or (Sig == SIGQUIT) or (Sig == SIGKILL);
 	if (!JB_NoExitOnCrash or AskExit) {
 		if (AskExit)
