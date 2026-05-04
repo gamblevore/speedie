@@ -1,6 +1,7 @@
 #!/usr/local/bin/spd
 
 app.usage = "Simple utility to compress a text-file containing lines.  Its just a concept.  Compression isn't tight."
+// its a good idea, but not very debuggable. It would be nice to have debug-info thats also... debuggable.
 
 main (|file.existing| Input, |file.output?| Output)
 	|| data = input.ReadAll

@@ -10,7 +10,7 @@ app.usage = "Usage: cloc path [...]
 -p								Print parse tree
 -m								Report Memory Usage
 -h								Histogram
-" // set this before getting into main
+"				// Set this before getting into main
 
 
 
@@ -115,11 +115,12 @@ function file.CLOC
 	|| Durr = start.ago
 	counts.MemEnd
 	if msg
-		counts.Lines += msg.linesofcontent[0]
+		Counts.Lines += msg.LinesOfContent[0]
 	  else
 		Counts.Lines += data.loc
 	counts.TotalSize += data.Length
 	require msg
+	
 	if counts.jb
 		counts.TotalJBin += msg.RenderJbin.Length
 
@@ -154,7 +155,7 @@ function Counts.ReportHisto
 	|| curr = 0
 	|| total = .names + .Histogram[0]
 	for i in 65
-		if .histogram[i]
+		if .Histogram[i]
 			if !h_done
 				h_done = true
 				"histogram:"
@@ -166,7 +167,7 @@ function Counts.ReportHisto
 
 
 function Counts.Report
-	if !app.yes("k")
+	if !app.yes("k") and !counts.PrintTree
 		stderr.clear
 	require !counts.PrintTree
 	|| f = .files
