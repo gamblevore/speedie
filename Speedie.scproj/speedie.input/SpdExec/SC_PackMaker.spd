@@ -188,7 +188,10 @@ module PackMaker
 		j.tmparg("debug")
 		.DebugClassesAndGlobals(j)
 		j.addrow(@bin, "pos", p|string|)
-		j.addrow(@str, "files", SCImport.AllFiles.join("\n").Compress)
+		|| files = SCImport.AllFiles.join("\n")
+//		if !Options.Dev
+//			files = files.Compress
+		j.addrow(@str, "files", files)
 
 		|faststring--| Breakable = SourceMap.Breakable
 		|faststring--| Points = SourceMap.Breakpoints
