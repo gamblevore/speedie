@@ -1869,9 +1869,9 @@ extern ASM_Encoder SC__ASM_Encoders[256];
 #define kSC__ASM_FMUL ((ASM)112)
 #define kSC__ASM_FNAT ((ASM)170)
 #define kSC__ASM_FNC ((ASM)24)
-#define kSC__ASM_FNC3 ((ASM)25)
+#define kSC__ASM_FNC3 ((ASM)23)
 #define kSC__ASM_FNCX ((ASM)26)
-#define kSC__ASM_FNCX3 ((ASM)27)
+#define kSC__ASM_FNCX3 ((ASM)25)
 #define kSC__ASM_FNIS ((ASM)168)
 extern ASM_Encoder SC__ASM_Forms[128];
 #define kSC__ASM_FPOW ((ASM)162)
@@ -4352,8 +4352,6 @@ float JB_f_FloatMix(float Self, float A, float B);
 
 float JB_f_Pow(float Self, int N);
 
-float JB_f_Sine(float Self);
-
 float JB_f_SmoothStep(float Self, float Low, float High);
 
 float JB_f_Tan(float Self);
@@ -5914,6 +5912,8 @@ void SC_FAT_OutputDebugVars(FatASM* Self);
 
 ASMParam SC_FAT_p0(FatASM* Self);
 
+void SC_FAT_p0Set(FatASM* Self, uint Value);
+
 ASMParam SC_FAT_p1(FatASM* Self);
 
 void SC_FAT_p1Set(FatASM* Self, uint Value);
@@ -6202,7 +6202,7 @@ bool SC_Pac_CanConst(Assembler* Self, SCDecl* D, FatASM* F);
 
 Ind SC_Pac_CanMergeBits(Assembler* Self, int UpA, int DownA, int UpB, int DownB, int Total);
 
-FatASM* SC_Pac_CanOptDecr(Assembler* Self, ASMReg Obj, FatASM* Last);
+FatASM* SC_Pac_CanOptDecr(Assembler* Self, Message* Exp, ASMReg Obj, FatASM* Last);
 
 ASMReg SC_Pac_CantLinkInline(Assembler* Self, Message* Exp, bool DepthOK, SCFunction* Fn);
 
@@ -6488,7 +6488,7 @@ FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj);
 
 FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj);
 
-FatASM* SC_Pac_RefCountIncr2(Assembler* Self, Message* Exp, Message* Prms);
+FatASM* SC_Pac_RefCountIncrMemory(Assembler* Self, Message* Exp, Message* Prms);
 
 FatASM* SC_Pac_RefCountSet(Assembler* Self, Message* Exp, Message* Prms);
 
@@ -7808,6 +7808,8 @@ JB_String* JB_Str_OperatorMul(JB_String* Self, int N);
 JB_String* JB_Str_OperatorPlusWithCstring(JB_String* Self, _cstring C);
 
 JB_String* JB_Str_OperatorPlusWithInt64(JB_String* Self, int64 I);
+
+JB_String* SC_Str_operatorplus(JB_String* Self, SCFunction* Fn);
 
 bool JB_Str_OperatorStarts(JB_String* Self, JB_String* S);
 
@@ -9210,6 +9212,8 @@ void JB_Msg_SyntaxIsSet(Message* Self, uint /*MsgParseFlags*/ F, bool Value);
 void JB_Msg_SyntaxProblem(Message* Self, JB_String* Error);
 
 void JB_Msg_SyntaxUsing(Message* Self, MessagePosition* Rz);
+
+void JB_Msg_SyntaxWarn(Message* Self, JB_String* Error);
 
 FatASM* SC_Msg_TAIL(Message* Self, int JUMP, int Prm1);
 
@@ -10762,8 +10766,6 @@ void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
 
 JB_String* SC_Func_Render(SCFunction* Self, FastString* Fs_in);
 
-JB_String* SC_Func_RenderName(SCFunction* Self, FastString* Fs_in);
-
 JB_String* SC_Func_RenderParams(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
 JB_String* SC_Func_RenderSheBless(SCFunction* Self);
@@ -11107,6 +11109,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
+inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value);
+
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self);
 
 inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
@@ -11114,6 +11118,8 @@ inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
 inline bool SC_Reg_IsInt(ASMReg Self);
 
 inline JB_String* JB_config_AsString(Message* Self);
+
+inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
 
@@ -11293,6 +11299,11 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 	return JB_Str_IsOK(Self);
 }
 
+inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value) {
+	Self->Msg = Value;
+	Self->FatMap = SC_Msg_SrcMap(Value);
+}
+
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self) {
 	if (SC_Reg_SyntaxIs(Self, kSC__Reg_CondRequest)) {
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CondRequest, (!true));
@@ -11318,6 +11329,12 @@ inline JB_String* JB_config_AsString(Message* Self) {
 		return JB_Msg_Value(Self);
 	}
 	return JB_LUB[0];
+}
+
+inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
+	//cpp_name;
+	//visible;
+	return JB_int_RenderSize(Self, nil);
 }
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
