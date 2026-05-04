@@ -162,7 +162,7 @@ JB_Class* Str_IsCSub ( JB_String* self ) { // 0 means true
 	// this effort to avoid reading into memory that we don't legally own!
 	int N = JB_Str_Length(self);
 	if (!N) return 0;
-    auto C = JB_ObjClass(self); 
+    auto C = JB_Obj_Class(self); 
     if (C == JB_AsClass(JB_StringC) or C == JB_AsClass(JB_String) or C == JB_AsClass(JB_File)) return 0;
 	if (HasCStringSpace_(C, N) and !self->Addr[N])
 		return 0;

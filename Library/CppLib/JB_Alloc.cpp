@@ -498,7 +498,7 @@ JB_MemoryLayer* JB_ObjLayer ( JB_Object* Obj ) {
 }
 
 
-uint JB_ObjectID ( JB_Object* Obj ) {
+uint JB_Obj_ID ( JB_Object* Obj ) {
 	if (Obj) {
 		AllocationBlock* Block = ObjBlock_(Obj);
 		require(((IntPtr)Block->Super) >= 4000);
@@ -511,7 +511,7 @@ uint JB_ObjectID ( JB_Object* Obj ) {
 }
 
 
-JB_Class* JB_ObjClass (JB_Object* Obj) {
+JB_Class* JB_Obj_Class (JB_Object* Obj) {
 	auto L = JB_ObjLayer(Obj);
 	if_usual (L) // whatever
 		return L->Class;
@@ -520,7 +520,7 @@ JB_Class* JB_ObjClass (JB_Object* Obj) {
 
   
 
-uint8* JB_ObjClassBehaviours (JB_Object* Obj) {
+uint8* JB_Obj_ClassBehaviours (JB_Object* Obj) {
     // assume exists.
     auto Block = ObjBlock_(Obj);
     return (uint8*)(Block->Virtuals);
@@ -1271,8 +1271,8 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_ (FreeObject* Obj) { // trap (  _trap(  trap_( 
-	if (JB_ObjectID((JB_Object*)Obj)==5352336)
-		debugger;
+//	if (JB_Obj_ID((JB_Object*)Obj)==5352336)
+//		debugger;
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }

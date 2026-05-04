@@ -216,7 +216,7 @@ JB_String* Str_Shrink (JB_String* u, int Length) {
 	// needs zero-terminate... if we shrink
 	// keep the class unless it's resizeable... otherwise just copy...
 	
-	JB_Class* Cls = JB_ObjClass(u);
+	JB_Class* Cls = JB_Obj_Class(u);
 	if ( Cls == JB_AsClass(JB_String8)  or  Cls == JB_AsClass(JB_String16) ) {
 	   u->Length = Length; // just keep it.
 	   return u;
@@ -1468,7 +1468,7 @@ JB_String* JB_Str_Reverse(JB_String* self, FastString* fs_in) {
 extern "C" void Str_Share_(JB_StringShared* u, JB_String* p, int i, int L) {
 	u->Addr = p->Addr + i;
 	u->Length = L;
-	JB_Class* Cls = JB_ObjClass(p);
+	JB_Class* Cls = JB_Obj_Class(p);
 	if (Cls==JB_AsClass(JB_StringShared)) {
 		p = (JB_String*)((JB_StringShared*)p)->Parent;
 	}
@@ -1584,7 +1584,7 @@ JB_String* JB_Str_OperatorPlus(JB_String* self, JB_String* other) {
 
 JB_String* JB_Str_Unshare(JB_String* self) {
 // avoid wasting RAM when we this str is only a small part of a big file!!
-    if (self and JB_ObjClass(self) == JB_AsClass(JB_StringShared)) {
+    if (self and JB_Obj_Class(self) == JB_AsClass(JB_StringShared)) {
         return JB_Str_Copy(self);
     }
     return self;
@@ -1593,7 +1593,7 @@ JB_String* JB_Str_Unshare(JB_String* self) {
 
 JB_Object* JB_Str_Owner(JB_String* self) {
 // avoid wasting RAM when we this str is only a small part of a big file!!
-    if (self and JB_ObjClass(self) == JB_AsClass(JB_StringShared)) {
+    if (self and JB_Obj_Class(self) == JB_AsClass(JB_StringShared)) {
         return ((JB_StringShared*)self)->Parent;
     }
     return self;
@@ -1828,10 +1828,10 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
     // [JB_List(741)] // seems to make sense?
     FastString* fs = JB_FS__FastNew(fs_in);
 
-    JB_Class* Cls = JB_ObjClass(self);
+    JB_Class* Cls = JB_Obj_Class(self);
     JB_FS_AppendCString(fs, (const char*)Cls->Name);
     JB_FS_AppendCString(fs, "(");
-    JB_FS_AppendIntegerAsText(fs, JB_ObjectID(self), 1);
+    JB_FS_AppendIntegerAsText(fs, JB_Obj_ID(self), 1);
     JB_FS_AppendByte(fs, ')');
 
 	return JB_FS_SmartResult( fs, fs_in );
@@ -1843,7 +1843,7 @@ JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in) {
         return JB_CStr_Render("(nil)", fs_in);
     }
     
-    JB_Class* Cls = JB_ObjClass(self);
+    JB_Class* Cls = JB_Obj_Class(self);
     auto R = Cls->Virtuals->render;
     fpRenderer FN = (fpRenderer)R;
     if (!FN or (FN == JB_Obj_Render)) {

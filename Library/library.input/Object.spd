@@ -18,10 +18,10 @@ class Object
 
 	function Class (|&ClassData|)
 		nil checker
-		cpp_wrapper JB_ObjClass
+		cpp_wrapper JB_Obj_Class
 
 	autogen ClassBehaviours (|&byte|)
-		cpp_wrapper JB_ObjClassBehaviours
+		cpp_wrapper JB_Obj_ClassBehaviours
 
 	function MemoryLayer (|MemoryLayer|)
 		cpp_wrapper JB_ObjLayer
@@ -32,7 +32,7 @@ class Object
 	function ObjectID (|int|)
 		description "Returns an object ID, decided by class-type, and order of creation (but not memory-location)."
 		nil checker
-		cpp_wrapper JB_ObjectID
+		cpp_wrapper JB_Obj_ID
 	
 	operator isa (|ClassData| cls, |bool|)
 		cpp_part Isa
