@@ -22,7 +22,6 @@ extend_module funnyword
 	|[funnyword]|					First
 	|[funnyword]|					Second
 	|bool|							AllowSame
-	|bool|							Print
 
 	helper LoadTo (|[funnyword]| list, |string| s)
 		opt norefcounts
