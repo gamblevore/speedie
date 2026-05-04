@@ -134,9 +134,6 @@ module PackMaker
 		.PackFuncIndex = 0
 		while (|| fn = .packfuncs[.PackFuncIndex++])
 			require Assembler.sh.FatterCompile(fn)
-
-//		|| T = assembler.debugsize
-//			T.Flush
 	
 	
 	function FATCompile (|bool|)
@@ -170,6 +167,8 @@ module PackMaker
 	
 	function BakePackToDisk 
 		|jbin| j = Compiler.ProductPath.OutputStream$
+		Compiler.During = CompilerStage.Baking
+
 		j.RunHeader("/usr/local/bin/cake")
 		j.Enter(@tmp, "cake")
 		j.AddHInt(.PackGlobSize.AlignUp(8))

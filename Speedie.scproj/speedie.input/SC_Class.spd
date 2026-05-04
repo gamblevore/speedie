@@ -473,7 +473,7 @@ function CanHaveEmptyConstructor (|bool|)
 
 function CreateEmptyConstructors (|scfunction|)
 	if .CanHaveEmptyConstructor
-		rz = .CreateEmptyFunc( "Constructor" )		#require
+		rz = .CreateEmptyFunc( "Constructor", "Constructor" )		#require
 		(rz is EmptyConstructor)
 
 	|| pc = .PassableCount
@@ -747,12 +747,13 @@ function IsObject (|bool|)
 	Return .BaseType is object
 
 
-function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
+function CreateEmptyFunc (|String| fname, |string| cpp_name, |SCFunction|)
+	|| s = .source!
 	SCNode.CurrVisibility = .IsVisible
-	cpp_name ?= fname
-	|| e	= "function $fname { cpp_part $cpp_name }"
+	|| e = "function $fname { cpp_part $cpp_name }"
+	using s
 	|| msg	= e.ParseClean
-	rz		= SCFunction.NewFunc( msg, self, .source )|SCFunction|
+	rz = SCFunction.NewFunc( msg, self, s )|SCFunction|
 	if rz
 		.TryAdd( msg, rz, fname )
 		rz.IsVisible = false
@@ -764,7 +765,7 @@ function FindAllocFunc (|String| fname, |bool| DontCreate = true, |SCFunction|)
 		Return it
 	
 	if !DontCreate and !.IsWrapper
-		Return .CreateEmptyFunc( fname )
+		Return .CreateEmptyFunc( fname, fname )
 
 
 function CStructName (|String|)

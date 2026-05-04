@@ -3,7 +3,7 @@
 module debugger
 	|message|		PackInfo
 	|Message|		Globs
-	|[fileWithData]| Files
+	|[fileWithData]| FileList
 	|Dictionary of filewithdata| FileMap
 	|string|		SrcMapStr
 	|string|		Breakables // breakmap
@@ -81,7 +81,10 @@ module debugger
 
 	function Path (|int| i, |filewithdata|)
 		opt norefcounts
-		return .files[i]						#expect ("Missing file at index: " + i)
+		|| f = .FileList[i]
+		if f != nil // what if i == 0? is that an output error? What about lib-internal code? like init-code?
+			return f
+/		expect ("Missing file at index: " + i)
 
 
 	function StartUp (|&uint|)
@@ -203,7 +206,7 @@ module debugger
 		opt norefcounts
 		|| Last = 0
 		|| i = 0
-		|| out = .Files
+		|| out = .FileList
 		.FileMap = Dictionary()
 		while
 			|| P = list.NextField('\n', Last)

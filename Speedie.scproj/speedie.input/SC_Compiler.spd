@@ -120,9 +120,9 @@ linkage
 
 |byte|						InPerry
 |SCNodeInfo|				InBuiltType
-|bool| 						HasFunny
+|bool|						HasFunny
 |byte|						During // unused but i don't want to remove. it could be useful?
-|bool| 						InitedOK = true
+|bool|						InitedOK = true
 |byte|						Successfulness
 |int|						stDebugInfo
 |int|						stLibFuncs
@@ -1012,6 +1012,7 @@ datatype CompilerStage (int)
 		RefCounts
 		Hungry
 		Packing
+		Baking
 		CppExport
 
 	

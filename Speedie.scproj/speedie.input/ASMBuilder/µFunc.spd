@@ -18,7 +18,11 @@ extend SCFunction
 		// 11-bits for the file num, 21-bits for the position
 		// 2K files and 2MB per-file max
 		// File Num goes at the top, to make it more significant
-		|| FileNum = (.tag&~31)|uint|
+		|| FileNum = (.tag&~31)|uint| // already shifted up by 5 in .ASTSub,
+		// 16 + 5 = 21
+		if Filenum << 16 == 0 // ooof. bad!
+			printline .objectid
+			debugger
 		return (FileNum<<16) ||| (.Position&(21~bits))
 	
 	
@@ -40,7 +44,6 @@ extend SCFunction
 			rz = fat.µBakeInto(rz, after)
 
 			if Positions
-//				if "recursivehello".trap and fat.Jump
 				|| pos = fat.FatMap
 				while (Curr++ < rz)
 					Positions++[] = pos
@@ -111,7 +114,7 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	return true
 
 
-function JBin.BakeASMSub (|SCFunction| fn, |int| T,  |bool|)
+function JBin.BakeASMSub (|SCFunction| fn, |int| T, |bool|)
 	opt norefcounts
 	|| Start = .StartAdd
 	|| Positions = SourceMap.Reserve(t*4)

@@ -403,8 +403,9 @@ void JB_Layer_Use ( JB_MemoryLayer* self ) {
     ClsBlock->Owner->IsActive = false;
     Cls->DefaultBlock = self->CurrBlock; // swap first...
     self->IsActive = true;
-    /// what does this do even, or why? I forgot?
     /// we are putting into the class, but why compare something to self and why incr or decr?
+	// I guess we don't want the memorylayer to disapear while being used... thats all? 
+	// but we didn't replace the owner... so whats to stop it being decrd multiple times?
     if (ClsBlock->Owner != self) {
         JB_Incr_((JB_Object*)self);
         JB_Decr(ClsBlock->Owner);
@@ -1270,8 +1271,8 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_ (FreeObject* Obj) { // trap (  _trap(  trap_( 
-//	if (JB_ObjectID((JB_Object*)Obj)==40981)
-//		debugger;
+	if (JB_ObjectID((JB_Object*)Obj)==5352336)
+		debugger;
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }

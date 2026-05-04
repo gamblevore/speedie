@@ -121,7 +121,7 @@ function RC_Rel (|Message| rel)
 	if first.func == @thg and first.obj == last.obj // oof
 		return // do nothing!
 	
-	parser.using.position = rel.position
+	using rel
 	|| result = RefMsg0( "JB_SetRef", Compiler.RefSetRef! )
 	|| lst = result.Last!
 	lst <~ first
@@ -161,10 +161,10 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 			return
 		if fn isnt StoresSelf
 			problem (msg, "Object evaporates here?")
-			
-	parser.using.position = msg.position
-	|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
-	msg.FuncWrap( free_if_dead )
+	
+	using msg		
+		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
+		msg.FuncWrap( free_if_dead )
 	parser.using.position = -1
 
 
@@ -232,11 +232,11 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 
 function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
-	parser.using.position = after.position
-	|| ref = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
-	after.next = ref
-	ref.last <~ prm
-	ref.obj = prm.obj
+	using after
+		|| ref = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
+		after.next = ref
+		ref.last <~ prm
+		ref.obj = prm.obj
 	parser.using.position = -1
 
 
@@ -340,7 +340,7 @@ function Message.DotType (|DotUseType|)
 
 function RefSafeDecr (|Message| msg, |Message| place)
 	// a = nil   ->   a = nil, JB_decr(a)
-	parser.using.position = msg.position
+	using msg
 	if (place == @Arg)
 		place <~ SafeDecrMsg( msg )
 	  else
@@ -601,12 +601,10 @@ function SafeDecrMsg (|Message| msg, |Message|)
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 	opt norefcounts
 	|| src = ar.source
-	if !src
-		src = fn.sourcearg
-	if src
-		parser.using.position = src.position
 	|| arg = fn.sourcearg!
-	using arg
+	if !src
+		src = arg
+	using src
 	|| dcl = AR.WriteNilDecl
 	arg.First = dcl
 	.DeclInit( fn, dcl, true )
@@ -675,8 +673,8 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 
 	
 function RC_HandleDisappearing (|Message| msg, |int| Basis)
-	parser.using.position = msg.position
-	.RC_HandleDisappearingSub(msg, basis)
+	using msg
+		.RC_HandleDisappearingSub(msg, basis)
 	parser.using.position = -1
 
 

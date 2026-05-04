@@ -830,3 +830,5 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 		check (fn.µasmlength <= max) (fn.SourceArg, "ASM too large")
 	return true
 
+
+
