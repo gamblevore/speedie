@@ -1202,8 +1202,7 @@ JB_MPC_Spawn
 JB_MSR_DecodeEntitySet
 JB_MSR_EscapeCodeSet
 JB_Macro_CallFast
-JB_Macro_Source
-JB_Macro__Build
+JB_Macro__New
 JB_Mat4_Columns
 JB_Mat4_Constructor
 JB_Mat4_GetRow
@@ -1333,14 +1332,14 @@ JB_Nav_Destructor
 JB_Nav_MoveNext
 JB_Nav_Name
 JB_Nav_Value
-JB_ObjClass
-JB_ObjClassBehaviours
 JB_ObjLayer
+JB_Obj_Class
+JB_Obj_ClassBehaviours
 JB_Obj_Destructor
 JB_Obj_DictName
+JB_Obj_ID
 JB_Obj_Print
 JB_Obj_Render
-JB_ObjectID
 JB_Object_As
 JB_Object_Fail
 JB_Object_FailStr
@@ -1858,8 +1857,8 @@ JB_f_RoundTo
 JB_f_Saw
 JB_f_Shrink
 JB_f_Sign
+JB_f_Sin
 JB_f_SinCos
-JB_f_Sine
 JB_f_SmoothStep
 JB_f_Steps
 JB_f_SyntaxAccess
@@ -2011,8 +2010,8 @@ JB_vec2_RotateAroundX
 JB_vec2_RotateAroundY
 JB_vec2_Rotation
 JB_vec2_RoundEven
+JB_vec2_Sin
 JB_vec2_SinCos
-JB_vec2_Sine
 JB_vec2_SyntaxCompare
 JB_vec2_SyntaxEquals
 JB_vec2_operatorby
@@ -2075,7 +2074,7 @@ JB_vec4_Right
 JB_vec4_Round
 JB_vec4_Shrink
 JB_vec4_Sign
-JB_vec4_Sine
+JB_vec4_Sin
 JB_vec4_Size
 JB_vec4_SmoothStep
 JB_vec4_Sqrt
@@ -2191,6 +2190,3 @@ roundf
 sqrt
 sqrtf
 strlen
-JB_f_Sin
-JB_vec2_Sin
-JB_vec4_Sin
