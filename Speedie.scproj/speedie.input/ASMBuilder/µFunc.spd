@@ -20,16 +20,33 @@ extend SCFunction
 		// File Num goes at the top, to make it more significant
 		|| FileNum = (.tag&~31)|uint| // already shifted up by 5 in .ASTSub,
 		// 16 + 5 = 21
-		if Filenum << 16 == 0 // ooof. bad!
-			printline .objectid
-			debugger
+
+		// Why am i explaining so much... I used to just assume it was obvious.
+		// am i explaining for someone else? Or myself? Am I explaining for
+		// stupid people or... for someone too tired to figure it out?
+		// maybe tired... I am more tired than normal...
+		
+		target debug
+			if !(Filenum << 16) and (.msgowningfunc isnt initfunc)
+				printline .objectid
+				printline self
+				debugger
 		return (FileNum<<16) ||| (.Position&(21~bits))
+	
+	
+	function FatBetterPos (|fatasm| fat, |uint|)
+		|| prev = fat-1
+		if prev >= .FatFirst
+			|| pos = prev.FatMap
+			fat.FatMap = pos							// chain it across
+			return pos
+		return 0										// just remove the whole thing...
 	
 	
 	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
 		opt norefcounts
 		rz = where
-		assembler.sh.funcstart_ = .fatfirst - 1						// for debug
+		assembler.sh.funcstart_ = .fatfirst - 1			// for debug
 
 		|byte| HasLabel
 		for fat.fat in self
@@ -39,12 +56,15 @@ extend SCFunction
 			|| Break = fat.ASMIndex
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
-				
+			
 			|| Curr = rz
 			rz = fat.µBakeInto(rz, after)
 
 			if Positions
 				|| pos = fat.FatMap
+				if pos >> 21 == 0						// init code... has no file
+					pos = .FatBetterPos(fat)
+					
 				while (Curr++ < rz)
 					Positions++[] = pos
 				if break
@@ -110,7 +130,7 @@ function packmaker.BakeAllFuncs (|jbin| j, |bool|)
 	for f in .PackFuncs
 		if .PackSaved.AddOrShrink(j, f)
 			SCFunction.currfunc = f
-			require j.BakeASM(f)
+			require j.BakeFunc(f)
 	return true
 
 
@@ -126,7 +146,7 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T, |bool|)
 	return sourcemap.check(fn, T*4)
 
 
-function JBin.BakeASM (|SCFunction| fn, |bool|)
+function JBin.BakeFunc (|SCFunction| fn, |bool|)
 	opt norefcounts
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t

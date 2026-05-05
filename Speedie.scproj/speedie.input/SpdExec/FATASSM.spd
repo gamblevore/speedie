@@ -38,6 +38,9 @@ struct FatASM
 	setter _op (|byte|)
 		._op = value
 		
+	setter FatMap (|uint|)
+		.FatMap = value
+	
 	setter FatMap (|message|)
 		opt inline //
 		.msg = Value

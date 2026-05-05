@@ -31,7 +31,6 @@ dispatch DebuggerActions (PerryResponse)
 	sendbreaks		SendBreakAction
 
 	stop:			app.quit, return StepAction.donothing
-		
 	pause:			return StepAction.SendVarsPause
 
 
@@ -301,7 +300,8 @@ function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata|)
 		|| err = .CheckStack(stack)
 		if err != nil			j.add(@tmp, err)
 			exit
-		|| File = .CollectStack(stack, j, Count++)
+		|| File = .CollectStack(stack, j, Count)
+		if ++count == 1
 			rz = file
 		Stack = .prev(stack)
 	
@@ -330,12 +330,17 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	opt norefcounts
 	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
-
 	
 	|| vars = debugger.VariablePrinter!
 	{
 	|| Where = debugger.SrcMap(index)
-	rz = Where.File								#expect (j, "MissingFile", where.filenum)
+	rz = Where.File
+	if rz == nil
+		return nil // error already made
+	if rz == "" // an internal file?
+		return rz
+	
+//	#expect (j, "MissingFile", where.filenum)
 	
 	vars.Length = 0
 	vars <~ fn.name

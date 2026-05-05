@@ -190,14 +190,15 @@ void JB_Array_Reverse( Array* self ) {
 
 void JB_Array_Remove( Array* self, int Pos ) {
 	auto Item = JB_Array_Value(self, Pos);
-	require0 (Item);
-	int N = self->Length;
-	while (Pos < N) {
-		self->_Ptr[Pos] = self->_Ptr[Pos+1];
-		Pos++;  
+	if (Item) {
+		int N = self->Length;
+		while (Pos < N) {
+			self->_Ptr[Pos] = self->_Ptr[Pos+1];
+			Pos++;  
+		}
+		ShrinkCapacity_(self, N-1);
+		JB_Decr(Item);
 	}
-	ShrinkCapacity_(self, N-1);
-	JB_Decr(Item);
 }
 
 

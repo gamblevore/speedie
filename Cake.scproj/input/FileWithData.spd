@@ -1,10 +1,11 @@
 
+
 class FileWithData (stringshared)
 	default NIL
 	false NIL
-	|string?|	_Data
-	|string|	FileName
-	|int|		Index
+	|string?|		_Data
+	|string|		FileName
+	|int|			Index
 
 	constructor (|string| Path, |int| I=0)
 		super.constructor(Path)
@@ -27,4 +28,8 @@ class FileWithData (stringshared)
 			d = .ReadAll(lim)
 			._Data = d
 		return d
+	
+	render
+		opt norefcounts
+		fs <~ self|string|
 	

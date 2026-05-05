@@ -1659,6 +1659,7 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 	|| arg = cond.next
 		require arg.expect(@arg)
 	  else
+		using node
 		arg = @arg.msg
 		if node == "if"
 			arg <~ (@tmp, "debugger")				// better than debugat
@@ -1986,10 +1987,9 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 function SCFunction.MakeMacro (|message| arg)
 	opt norefcounts
 	|| C = arg.first
-	|| prm = arg.prev
 	check (C and !C.next) (self, "Macros must be one line!")
-	check !(prm.HasAny)   ("Macros don't directly state arguments.")
-	.ismacro = macro.build(C)
+	check !(arg.prev.HasAny)   ("Macros don't directly state arguments.")
+	.ismacro = macro(C, true)				// x = "abc"~parse
 
 
 

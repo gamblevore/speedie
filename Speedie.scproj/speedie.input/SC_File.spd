@@ -22,21 +22,16 @@ class SCFile (file)
 		flow off // dates shouldn't matter ///
 		FlowControl.DisabledIncr
 		
-		|string--| x = (f.path (f != nil) string.error) // just feel like doing this.
+		|string--| x = (f.path (f != nil) string.error) 	// just feel like doing this.
 		super.constructor(x)
 		.Proj = p
 		.Types = nil
-		.FileNum = SCImport.AllFiles.Length
+		.FileNum = -1										// Set later in sort()
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
 		FlowControl.DisabledIncr(-1)
-		
-		if .FileNum >= 2K
-			if !TooManyFiles
-				TooManyFiles = true
-				problem (f, "Too many files included, debugging will misreport some file-positions")
 		
 	
 	
@@ -129,8 +124,8 @@ class SCFile (file)
 			StdErr.source = ""
 		(Message).restore
 	
+	
 	module
-		|bool|		TooManyFiles
 		|scfile--|	Curr
 		
 		function Sorter (SorterComparer of scfile)

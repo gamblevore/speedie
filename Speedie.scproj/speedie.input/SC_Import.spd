@@ -5,7 +5,7 @@
 
 
 
-class SCImport 
+class SCImport
 	linkage
 		cpp_part		Imp
 	
@@ -17,7 +17,7 @@ class SCImport
 	|[SCFile]|				Files
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
-	|dictionary of file| 	Resources
+	|dictionary of file|	Resources
 	
 
 	constructor ( |File?| F, |bool| Builtin )
@@ -47,12 +47,6 @@ class SCImport
 		
 		
 	function ImportMsg (|Message| j)
-//		error.sourceadd(j)
-		.ImportMsgSub(j)
-//		error.SourceRemove
-	
-	
-	function ImportMsgSub (|Message| j)
 		opt norefcounts
 		|| l	= J.last(@str)$
 		|| Name = l.name
@@ -69,7 +63,7 @@ class SCImport
 		scimport.CurrIsManuallyImported--
 	
 	
-	function PrepareAll 
+	function PrepareAll
 		opt norefcounts
 		for f in .files
 			f.AST
@@ -156,6 +150,7 @@ class SCImport
 	function message.Blind (|errorseverity|)
 		return ErrorSeverity.find(.name, self)
 
+
 	function IncludeCHeaders (|file| f, |[string]| output)
 		for c in f.ListFiles
 			if (!c.isDir) and (c isa "h")
@@ -177,9 +172,10 @@ class SCImport
 		|| path = c.LowerCase
 		check !compiler.files[ path ] (c, "File included twice")
 		rz = SCFile( c, self )
+		.files <~ rz
+
 		compiler.files![ path ] = rz
 		scimport.allfiles <~ rz
-		.files <~ rz
 	
 	
 	function ImportDir (|File| f,  |SCFile?|)
@@ -193,8 +189,9 @@ class SCImport
 			  elseif (c.IsDir)
 				.ImportDir( c )
 			
-			  elseif cname ~= "app.conf"
+			  elseif cname isa "conf"
 				rz = .ImportSpd(c)
+			
 			  elseif cname.IsSpeedieSrc
 				|| B = .ImportSpd(c)
 				if cName ~= "index.spd"
@@ -231,6 +228,24 @@ class SCImport
 		|byte|				CurrIsManuallyImported
 		
 		
+		function Neaten
+			opt norefcounts
+			.AllFiles.sort			// or else file-dates can mess things up.
+		
+			|| TooMany = .allfiles[2K]
+				if options.modecake		// only 11 bits free in SourceLocation type.
+					problem (TooMany, "Too many files included, debugging will misreport some file-positions")
+
+			for (f in .allfiles) (i)
+				f.filenum = i
+				//f.LiveAST = nil	// refresh message.tag... which stores filenumbers.
+									// only conf files use this, but I want them right too.
+									// --nevermind, that failed --
+									// I guess not then. More bugs. I hate this.
+									// I guess my conf system is too messy.
+									// oh well... I did almost everything else correct.
+									
+				
 		function DoImport (CollectFunc)
 			|| C = .curr
 				C.ImportMsg(node)

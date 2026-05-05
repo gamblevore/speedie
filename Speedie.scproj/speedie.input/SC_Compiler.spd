@@ -399,7 +399,7 @@ function ImportAll
 
 	.ImportLibs
 	.ImportProj
-	SCImport.AllFiles.sort // or else file-dates can mess things up.
+	SCImport.Neaten
 	.PrepareAST
 
 	require .Stage( "Import" )

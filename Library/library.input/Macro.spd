@@ -13,12 +13,12 @@ role Macro (Message)
 	function Cleaned (assigns:|bool|)
 		inlined
 		(self is MacroMade) = value
-		
+	
 	function Source (|message|) // can't I use a getter?
 		opt norefcounts
 		rz = .first
 		if !rz
-			rz = .name.parse
+			rz = .name.parse // remove this branch? its always via a message?
 			if rz
 				for v.flat in rz
 					v.position = -1
@@ -26,45 +26,47 @@ role Macro (Message)
 	
 	inline Run (|[message]| prms=nil, |message|)
 		opt norefcounts
+		opt inline
 		rz = message()
-		rz.BecomeMacro(self, prms)
+		rz.BecomeMacro(self, prms[0], prms)
 	
 	function Run (|message| prm1=nil, |message| prm2=nil, |message|)
 		cpp_part CallFast
 		rz = message()
 		TmpPrms_ <~ prm1
 		TmpPrms_ <~ prm2
-		rz.BecomeMacro(self, TmpPrms_)
+		rz.BecomeMacro(self, prm1, TmpPrms_)
 		TmpPrms_.clear
 	
 	module
 		|[message]| TmpPrms_
-		// can't call this "New" for some reason?
-		function Build (|message| s, |Macro!|)
+
+		function New (|message| s, |bool| UseSelf, |Macro!|)
 			rz = Message()
+			rz.Indent = UseSelf|byte|
 			rz <~ s
 		
 
 
 macro string.Macro
-	macro.build((–digest "_0").parsejbin)
+	macro.new((–digest "_0").parsejbin, false)
 	
 
 extend message
-	libinternal MacroAvoidCopy (|message|)
+	libinternal MacroAvoidCopy (|message| Orig, |message|)
 		if self isnt MacroMade
 			is Macromade
 			return self
-		return  .copy
+		return  .CopyWithoutUsing(orig)
 
 
-	libinternal MacroSame (|message| prm, |message|)
-		rz = .copy
-		(prm is Macromade)
+	libinternal MacroSame (|message| orig, |message| prm, |message|)
+		rz = .CopyWithoutUsing(orig)
+		(prm is MacroMade)
 		rz.name = prm.name // why?
 	
 	
-	libinternal MacroPrm (|message| root,  |array? of message| prms,  |message| dest,  |Message|)
+	libinternal MacroPrm (|message!| orig, |message| root, |array? of message| prms,  |message| dest,  |Message|)
 		opt norefcounts
 		|| n = .name
 		|| c = n[]
@@ -72,43 +74,58 @@ extend message
 			|| f = .first
 			if f == "_" and @thg
 				for p in prms
-					if p isnt MacroMade
-						dest <~ p.MacroAvoidCopy
+					if p isnt MacroMade							// take all unused.
+						dest <~ p.MacroAvoidCopy(orig)
 				return nil
-				// (first, secnd, A, B, C, D, E)
 		
-		if (c == '_'  and  n > 1) and n.IsInt(1) 
-			|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
+		if (c == '_'  and  n > 1) and n.IsInt(1)
+			|| oop = prms[n.int|int|]							#expect (root, "Not enough params.")
 			|| f = .func
-			if f == @dot or @sdot or @str or @sstr or @char // anything except @thg?
-				return .MacroSame(oop)
-			return oop.MacroAvoidCopy
+			if f == @dot or @sdot or @str or @sstr or @char		// anything except @thg?
+				return .MacroSame(orig, oop)
+			return oop.MacroAvoidCopy(orig)
+		
 		rz = Message(self)
-		rz.position = root.position
-		.MacroCopy(root, prms, rz)
+		rz.position = orig.position
+		rz.tag = orig.tag										// speedie needs this.
+
+		.MacroCopy(orig, root, prms, rz)
 
 
-	libinternal MacroCopy (|Message| root,  |array? of message| prms,  |Message| dest)
+	libinternal MacroCopy (|message!| orig, |Message| root,  |array? of message| prms,  |Message| dest)
 		opt norefcounts
 		for v in self
-			dest <~ v.MacroPrm(root, prms, dest)
+			dest <~ v.MacroPrm(orig, root, prms, dest)
 
 
-	function BecomeMacro (|Macro| M,  |array? of message| prms=nil)
+	function BecomeMacro (|Macro| M, |message?| orig = nil,  |array? of message| prms=nil)
 		opt norefcounts
 		|| s = m.source
 			.clear
 			.func = s.func
 			.name = s.name
-			.appendmacro(m, prms)
+			.appendmacro(m, orig, prms)
 	
-		
-	function AppendMacro (|Macro| M,  |array? of message| prms=nil)
-		using self,  opt norefcounts
+
+	function AppendMacro (|Macro| M, |message?| orig = nil,  |array? of message| prms=nil)
+		if .indent or !orig					// remove this? I mean... are we doing it at the call site now?
+			using self						// rather than at creation? Or should we just check that it
+			.AppendMacrosub(m, self, prms)	// always adds up. Never pass orig if .indent?
+		  else
+			.AppendMacrosub(m, orig, prms)
+	
+	
+	libinternal AppendMacroSub (|Macro| M,  |message!| orig,  |array? of message| prms)
+		opt norefcounts
+		// this is an issue. What if self came from a string, and has no file?
+		// lets say it came from a file. We might STILL want to use something else.
+		// So... should we use... or not?
+		// OK, for a start, lets NEVER use for strings.
+		// where am i making it frmo a file, even? I can't see it?
+
 		for r in prms
-			(r isnt MacroMade) // in case it was passed in
-//		debugat 0
-		m.Source.MacroCopy(self, prms, self)
+			(r isnt MacroMade)						// in case it was passed in
+		m.Source.MacroCopy(orig, self, prms, self)
 		for r in prms
 			check (r is MacroMade)  (r, "Unused parameter to macro")
 

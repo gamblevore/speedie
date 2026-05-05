@@ -1,19 +1,19 @@
 
 
 module debugger
-	|message|		PackInfo
-	|Message|		Globs
-	|[fileWithData]| FileList
+	|message|			PackInfo
+	|Message|			Globs
+	|[fileWithData]|	FileList
 	|Dictionary of filewithdata| FileMap
-	|string|		SrcMapStr
-	|string|		Breakables // breakmap
-	|string|		InbuiltBreaks
-	|uint|			DbgLength
-	|uint|			OverFlowTrack
-	|bool|			WantDebug
-	|bool|			BreakMapBad
-	|&uint|			BreakToClear
-	|faststring|	VariablePrinter
+	|string|			SrcMapStr
+	|string|			Breakables // breakmap
+	|string|			InbuiltBreaks
+	|uint|				DbgLength
+	|uint|				OverFlowTrack
+	|bool|				WantDebug
+	|bool|				BreakMapBad
+	|&uint|				BreakToClear
+	|faststring|		VariablePrinter
 	
 	
 	function SrcMap (|uint| Index, |SourceLocation|)
@@ -23,7 +23,7 @@ module debugger
 	
 	
 	function PicoReader (PicoActionFn)	
-		self|&cakevm|.Pause // cool. now we can safely do stuff
+		self|&cakevm|.Pause		// cool. now we can safely do stuff
 
 	
 	function ActivateInbuiltBreaks
@@ -82,9 +82,9 @@ module debugger
 	function Path (|int| i, |filewithdata|)
 		opt norefcounts
 		|| f = .FileList[i]
-		if f != nil // what if i == 0? is that an output error? What about lib-internal code? like init-code?
+		if f != nil				// what if i == 0? is that an output error? What about lib-internal code? like init-code?
 			return f
-/		expect ("Missing file at index: " + i)
+/		expect ("MissingFile " + i)
 
 
 	function StartUp (|&uint|)
@@ -164,8 +164,6 @@ module debugger
 		expect (L2 < 1MB)						("Oversized source-map: " + L2)
 		
 		.ActivateInbuiltBreaks
-//		target debug
-//			.PrintBreaks
 		
 		for fn in SpdTable.funcs
 			fn.LoadVars
@@ -233,7 +231,7 @@ function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| P
 		print TerminalColor.normal
 
 	|| Code = File.GetLine(position)
-	|| comment = Code.find("//") // whoop!
+	|| comment = Code.find("//")								// whoop!
 		Code = Code[0, comment]
 	Code = Code.trim
 
