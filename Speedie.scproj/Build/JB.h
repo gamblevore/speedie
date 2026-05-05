@@ -7493,6 +7493,8 @@ void SC_Imp__Neaten();
 
 void SC_Imp__NoProj();
 
+void SC_Imp__PleaseDoConfsDifferently(Message* S, int T);
+
 
 
 // JB_SCNodeRenamer

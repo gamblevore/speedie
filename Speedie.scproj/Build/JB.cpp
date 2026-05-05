@@ -3506,7 +3506,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[449]);
-	JB_FS_AppendInt32(_fsf0, (2026050514));
+	JB_FS_AppendInt32(_fsf0, (2026050517));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10520,7 +10520,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1390]);
-	JB_FS_AppendInt32(_fsf0, (2026050514));
+	JB_FS_AppendInt32(_fsf0, (2026050517));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -20317,7 +20317,7 @@ NilState SC_nil__PropertyToFunc(Message* Dot, SCFunction* Fn) {
 	(JB_Ring_FirstSet(Prms, Upon));
 	SC__nil_NewFuncsLoaded = true;
 	SC_Func_ReachFuncFromFunc(Fn, SC_Func__CurrFunc());
-	JB_Layer_Use(JB_ObjLayer(Dot));
+	JB_Layer_Use(JB_Obj_Layer(Dot));
 	Message* F = JB_Msg_Constructor(nil, nil, kJB_SyxThg, Fn->ExportName);
 	F->Position = Dot->Position;
 	(JB_Ring_FirstSet(Dot, F));
@@ -31332,6 +31332,10 @@ void SC_Imp__Neaten() {
 			}
 			int I = _if0;
 			F->FileNum = I;
+			Message* S = F->LiveAST;
+			if (S) {
+				SC_Imp__PleaseDoConfsDifferently(S, I << 5);
+			}
 			(++_if0);
 		};
 	};
@@ -31340,6 +31344,19 @@ void SC_Imp__Neaten() {
 void SC_Imp__NoProj() {
 	SC__Imp_Curr = nil;
 	JB_ClassData_Restore((&SCDeclData));
+}
+
+void SC_Imp__PleaseDoConfsDifferently(Message* S, int T) {
+	{
+		Message* Ch = S;
+		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(S));
+		while ((Ch) and (Ch != _afterf1)) {
+			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(Ch));
+			Ch->Tag = T;
+			Ch = _N_f2;
+		};
+		;
+	};
 }
 
 
@@ -38614,7 +38631,7 @@ SCFile* SC_Msg_File(Message* Self) {
 	{
 		Message* S = Self;
 		while (S) {
-			JB_Object* R = JB_ObjLayer(S)->Obj;
+			JB_Object* R = JB_Obj_Layer(S)->Obj;
 			if (JB_Object_FastIsa(R, &SCFileData)) {
 				return ((SCFile*)R);
 			}
@@ -40786,7 +40803,7 @@ JB_String* JB_Msg_Locate(Message* Self) {
 	if (Self->Position >= 0) {
 		JB_FS_AppendString(Fs, JB_LUB[619]);
 		JB_FS_AppendInt32(Fs, Self->Position);
-		JB_MemoryLayer* _tmPf0 = JB_ObjLayer(Self);
+		JB_MemoryLayer* _tmPf0 = JB_Obj_Layer(Self);
 		JB_Incr(_tmPf0);
 		JB_Object* R = _tmPf0->Obj;
 		JB_Incr(R);
@@ -41980,7 +41997,7 @@ FatASM* SC_Msg_OptIntVecMath(Message* Self, ASMReg Dest, ASMReg L, ASMReg R, int
 }
 
 JB_String* JB_Msg_OriginalFilePath(Message* Self) {
-	JB_Object* O = JB_ObjLayer(Self)->Obj;
+	JB_Object* O = JB_Obj_Layer(Self)->Obj;
 	if ((!false) and (JB_Object_Isa(O, &JB_FileData))) {
 		return JB_File_Path(((JB_File*)O));
 	}
@@ -41992,7 +42009,7 @@ JB_String* JB_Msg_OriginalFilePath(Message* Self) {
 
 JB_String* JB_Msg_OriginalParseData(Message* Self) {
 	if (Self) {
-		JB_Object* D = JB_ObjLayer(Self)->Obj2;
+		JB_Object* D = JB_Obj_Layer(Self)->Obj2;
 		if (JB_Object_Isa(D, &JB_StringData)) {
 			return ((JB_String*)D);
 		}
@@ -43288,8 +43305,8 @@ void SC_Msg_SpdFuncSet(Message* Self, Syntax Value) {
 }
 
 uint SC_Msg_SrcMap(Message* Self) {
-	uint FileNum = ((uint)(Self->Tag & (~31)));
-	return (FileNum << 16) | (JB_Ind_OperatorBitand(Self->Position, (((1 << 21) - 1))));
+	uint FileNum = ((uint)Self->Tag) >> 5;
+	return (FileNum << 21) | (JB_Ind_OperatorBitand(Self->Position, (((1 << 21) - 1))));
 }
 
 void JB_Msg_SStr__(Message* Self, FastString* Fs) {
@@ -43300,7 +43317,7 @@ void JB_Msg_SStr__(Message* Self, FastString* Fs) {
 
 void SC_Msg_StartUsingAfter(Message* Self) {
 	int Biggest = -1;
-	JB_MemoryLayer* L = JB_ObjLayer(Self);
+	JB_MemoryLayer* L = JB_Obj_Layer(Self);
 	JB_String* D = JB_Msg_OriginalParseData(Self);
 	if (JB_Str_Exists(D)) {
 		{
@@ -43308,7 +43325,7 @@ void SC_Msg_StartUsingAfter(Message* Self) {
 			Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(Self));
 			while ((S) and (S != _afterf1)) {
 				Message* _N_f2 = (((Message*)JB_Ring_FlatNext0(S)));
-				if ((S->Position >= 0) and (JB_ObjLayer(S) == L)) {
+				if ((S->Position >= 0) and (JB_Obj_Layer(S) == L)) {
 					(Biggest = JB_int_OperatorMax(Biggest, JB_Msg_After(S)));
 				}
 				S = _N_f2;
@@ -43324,7 +43341,7 @@ void SC_Msg_StartUsingAfter(Message* Self) {
 	}
 	JB__Tk_Using.Position = Biggest;
 	JB__Tk_Using.Flags = kJB__MsgParseFlags_Inserted;
-	JB_Layer_Use(JB_ObjLayer(Self));
+	JB_Layer_Use(JB_Obj_Layer(Self));
 }
 
 void SC_Msg_StatementExprSet(Message* Self, SCArg* Arg) {
@@ -43545,7 +43562,7 @@ void JB_Msg_SyntaxUsing(Message* Self, MessagePosition* Rz) {
 	JB__Tk_Using.Length = Self->RangeLength;
 	JB__Tk_Using.Tag = Self->Tag;
 	JB__Tk_Using.Flags = kJB__MsgParseFlags_Inserted;
-	JB_Layer_Use(JB_ObjLayer(Self));
+	JB_Layer_Use(JB_Obj_Layer(Self));
 }
 
 void JB_Msg_SyntaxWarn(Message* Self, JB_String* Error) {
@@ -47431,7 +47448,7 @@ SCDecl* SC_Decl_ProcessAs(SCDecl* Self, Message* Msg) {
 }
 
 SCImport* SC_Decl_Project(SCDecl* Self) {
-	return (((SCImport*)JB_Object_FastAs(JB_ObjLayer(Self)->Obj, &SCImportData)));
+	return (((SCImport*)JB_Object_FastAs(JB_Obj_Layer(Self)->Obj, &SCImportData)));
 }
 
 void SC_Decl_Reach(SCDecl* Self) {
@@ -50073,7 +50090,7 @@ SCNode* SC_Base_UpClass(SCNode* Self, Message* F) {
 void SC_Base_Use(SCNode* Self) {
 	Message* S = Self->Source;
 	if (S) {
-		JB_Layer_Use(JB_ObjLayer(S));
+		JB_Layer_Use(JB_Obj_Layer(S));
 	}
 	SC_Imp_Use(Self->Project);
 }
@@ -51423,7 +51440,7 @@ void SC_File_Use(SCFile* Self) {
 	SC__Imp_CurrIsManuallyImported = Self->Proj->Depth;
 	Message* L = Self->LiveAST;
 	if (L) {
-		JB_Layer_Use(JB_ObjLayer(L));
+		JB_Layer_Use(JB_Obj_Layer(L));
 	}
 }
 
@@ -60827,4 +60844,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 5464667956077628423 -7045027578998440457
+// -8562286673811899627 -7045027578998440457
