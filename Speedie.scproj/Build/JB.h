@@ -1660,7 +1660,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2432])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2431])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1800,10 +1800,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2431])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2430])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2430])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2429])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2428])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2434,17 +2434,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2424])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2426])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2427])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2426])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2423])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2427])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2428])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2426])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2427])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2501,7 +2501,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2423])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2422])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -2564,7 +2564,6 @@ extern bool SC__Base_CurrVisibility;
 #define kSC__Beh_kBehaviourProtoRequired ((int)6)
 #define kSC__Beh_kBehaviourTable ((int)1)
 extern SCFile* SC__File_Curr;
-extern bool SC__File_TooManyFiles;
 extern SCFunction* SC__Func__CurrFunc;
 extern FunctionType SC__Func__Info;
 extern int SC__Func_FuncStats[12];
@@ -5849,6 +5848,8 @@ float SC_FAT_F32(FatASM* Self);
 
 Float64 SC_FAT_F64(FatASM* Self);
 
+void SC_FAT_FatMapSetWithUint(FatASM* Self, uint Value);
+
 void SC_FAT_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 FatASM* SC_FAT_FindOlder(FatASM* Self);
@@ -7452,8 +7453,6 @@ SCFile* SC_Imp_ImportDir(SCImport* Self, JB_File* F);
 
 void SC_Imp_ImportMsg(SCImport* Self, Message* J);
 
-void SC_Imp_ImportMsgSub(SCImport* Self, Message* J);
-
 SCFile* SC_Imp_ImportSpd(SCImport* Self, JB_File* C);
 
 void SC_Imp_IncludeCHeaders(SCImport* Self, JB_File* F, Array* Output);
@@ -7489,6 +7488,8 @@ bool SC_Imp__ImportPathSub(JB_String* Path, JB_File* F, SCImport* Upon, JB_Strin
 int SC_Imp__Init_();
 
 bool SC_Imp__IsInputName(JB_String* Name);
+
+void SC_Imp__Neaten();
 
 void SC_Imp__NoProj();
 
@@ -8121,9 +8122,9 @@ void JB_bin_AddHint(FastString* Self, int64 Value);
 
 void JB_bin_AddRow(FastString* Self, Syntax Type, JB_String* Row, JB_String* Value);
 
-bool SC_bin_BakeASM(FastString* Self, SCFunction* Fn);
-
 bool SC_bin_BakeASMSub(FastString* Self, SCFunction* Fn, int T);
+
+bool SC_bin_BakeFunc(FastString* Self, SCFunction* Fn);
 
 void SC_bin_BakeFuncName(FastString* Self, SCFunction* Fn);
 
@@ -8202,7 +8203,9 @@ JB_String* SC_Msg_APICppProject(Message* Self);
 
 void SC_Msg_AppendAllInto(Message* Self, Message* Dest);
 
-void JB_Msg_AppendMacro(Message* Self, Message* M, Array* Prms);
+void JB_Msg_AppendMacro(Message* Self, Message* M, Message* Orig, Array* Prms);
+
+void JB_Msg_AppendMacroSub(Message* Self, Message* M, Message* Orig, Array* Prms);
 
 void JB_Msg_ARel__(Message* Self, FastString* Fs);
 
@@ -8262,7 +8265,7 @@ void SC_Msg_BecomeAppend(Message* Self, JB_String* S);
 
 void JB_Msg_BecomeCopy(Message* Self, Message* Src);
 
-void JB_Msg_BecomeMacro(Message* Self, Message* M, Array* Prms);
+void JB_Msg_BecomeMacro(Message* Self, Message* M, Message* Orig, Array* Prms);
 
 void SC_Msg_BecomeNil(Message* Self);
 
@@ -8842,15 +8845,15 @@ FatASM* SC_Msg_LUPD(Message* Self, ASMReg R1, ASMReg R2, int Small, int Jmp);
 
 FatASM* SC_Msg_LUPU(Message* Self, ASMReg R1, ASMReg R2, int Small, int Jmp);
 
-Message* JB_Msg_MacroAvoidCopy(Message* Self);
+Message* JB_Msg_MacroAvoidCopy(Message* Self, Message* Orig);
 
-void JB_Msg_MacroCopy(Message* Self, Message* Root, Array* Prms, Message* Dest);
+void JB_Msg_MacroCopy(Message* Self, Message* Orig, Message* Root, Array* Prms, Message* Dest);
 
 void SC_Msg_MacroFixSub(Message* Self, SCDecl* Contains);
 
-Message* JB_Msg_MacroPrm(Message* Self, Message* Root, Array* Prms, Message* Dest);
+Message* JB_Msg_MacroPrm(Message* Self, Message* Orig, Message* Root, Array* Prms, Message* Dest);
 
-Message* JB_Msg_MacroSame(Message* Self, Message* Prm);
+Message* JB_Msg_MacroSame(Message* Self, Message* Orig, Message* Prm);
 
 Message* SC_Msg_MainArgDotFix(Message* Self);
 
@@ -10144,15 +10147,13 @@ bool JB_Macro_Cleaned(Message* Self);
 
 void JB_Macro_CleanedSet(Message* Self, bool Value);
 
-Message* JB_Macro_Run(Message* Self, Array* Prms);
-
 Message* JB_Macro_CallFast(Message* Self, Message* Prm1, Message* Prm2);
 
 Message* JB_Macro_Source(Message* Self);
 
-Message* JB_Macro__Build(Message* S);
-
 int JB_Macro__Init_();
+
+Message* JB_Macro__New(Message* S, bool UseSelf);
 
 
 
@@ -10661,6 +10662,8 @@ void SC_Func_ErrorIsHere(SCFunction* Self);
 
 JB_String* SC_Func_ExportNameBuilder(SCFunction* Self, JB_String* CppPart);
 
+uint SC_Func_FatBetterPos(SCFunction* Self, FatASM* Fat);
+
 FatASM* SC_Func_FatFirst(SCFunction* Self);
 
 void SC_Func_FillInDestructor(SCFunction* Self);
@@ -11110,6 +11113,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
+inline void SC_FAT_FatMapSetWithMsg(FatASM* Self, Message* Value);
+
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self);
 
 inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
@@ -11120,7 +11125,7 @@ inline JB_String* JB_config_AsString(Message* Self);
 
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
 
-inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value);
+inline Message* JB_Macro_Run(Message* Self, Array* Prms);
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src);
 
@@ -11300,6 +11305,11 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 	return JB_Str_IsOK(Self);
 }
 
+inline void SC_FAT_FatMapSetWithMsg(FatASM* Self, Message* Value) {
+	Self->Msg = Value;
+	Self->FatMap = SC_Msg_SrcMap(Value);
+}
+
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self) {
 	if (SC_Reg_SyntaxIs(Self, kSC__Reg_CondRequest)) {
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CondRequest, (!true));
@@ -11333,9 +11343,11 @@ inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
 	return JB_int_RenderSize(Self, nil);
 }
 
-inline void SC_FAT_FatMapSet(FatASM* Self, Message* Value) {
-	Self->Msg = Value;
-	Self->FatMap = SC_Msg_SrcMap(Value);
+inline Message* JB_Macro_Run(Message* Self, Array* Prms) {
+	Message* Rz = nil;
+	Rz = JB_Msg_ConstructorEmpty(nil);
+	JB_Msg_BecomeMacro(Rz, Self, ((Message*)JB_Array_Value(Prms, 0)), Prms);
+	return Rz;
 }
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
