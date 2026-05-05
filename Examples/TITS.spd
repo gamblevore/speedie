@@ -1,24 +1,20 @@
 #!/usr/local/bin/spd
 
-
 main (|int| Width=3, |int| Depth=6)
 	"Tree Investigator Timing System"
 	|| t = .GrowTITS(Width, Depth, message())
 
-	for 10				// tits needs to be warmed up first
+	for 10							// tits needs to be warmed up first
 		.FlatTits(t)		
-						// now tits are nice and warm
-	time "flat"
+	time "flat"						// now tits are nice and warm
 		for 10000
 			.FlatTits(t)
 	
-	
-	for 10				// warm the other tits
+	for 10							// warm the other tits
 		.ExploreTits(t)		
 	time "explore"
 		for 10000
 			.ExploreTits(t)
-
 
 function app.GrowTITS (|int| Width, |int| Depth, |message!| into, |Message!|)
 	opt norefcounts
@@ -28,7 +24,6 @@ function app.GrowTITS (|int| Width, |int| Depth, |message!| into, |Message!|)
 		if Depth > 0
 			.GrowTITS(depth, width, tits)
 	return into
-
 
 function app.FlatTits (|message| t, |int|)
 	opt norefcounts

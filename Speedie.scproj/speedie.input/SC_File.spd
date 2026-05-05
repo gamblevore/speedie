@@ -107,19 +107,20 @@ class SCFile (file)
 			(Message).CreateLayerAndUse(self, str)
 			.fData = str
 			StdErr.source = .path
-			parser._DotInsertallow = true	// more consistant with IDE
+			parser._DotInsertallow = true		// more consistant with IDE
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.Using.Tag = .FileNum << 5
+			parser.Using.Tag = .FileNum << 5	// kinda useless, we sort the things later.
+												// so remove?
 			if !orig
-				rz = .fData.ParseClean
+				rz = .fData.ParseClean			// should parseclean not set tags?
 			  else
 				rz = .fdata.parse
 			scimport.CurrIsManuallyImported = oldimp
 			.DetectInsecureWords
 			
-			parser.using.tag = 0
+			parser.using.tag = 0				// remove too
 			parser._DotInsertallow = false
 			StdErr.source = ""
 		(Message).restore

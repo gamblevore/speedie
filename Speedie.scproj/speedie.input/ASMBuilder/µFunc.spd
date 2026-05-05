@@ -18,20 +18,16 @@ extend SCFunction
 		// 11-bits for the file num, 21-bits for the position
 		// 2K files and 2MB per-file max
 		// File Num goes at the top, to make it more significant
-		|| FileNum = (.tag&~31)|uint| // already shifted up by 5 in .ASTSub,
-		// 16 + 5 = 21
 
-		// Why am i explaining so much... I used to just assume it was obvious.
-		// am i explaining for someone else? Or myself? Am I explaining for
-		// stupid people or... for someone too tired to figure it out?
-		// maybe tired... I am more tired than normal...
+		|| FileNum = .tag|uint|>>5
+		// NO SOUL GOES IN SIDE THE MACHINE. NOT THIS SIDE ANYHOW.
 		
 		target debug
-			if !(Filenum << 16) and (.msgowningfunc isnt initfunc)
+			if (!Filenum or FileNum >= 300) and (.msgowningfunc isnt initfunc)
 				printline .objectid
 				printline self
 				debugger
-		return (FileNum<<16) ||| (.Position&(21~bits))
+		return (FileNum << 21) ||| (.Position&(21~bits))
 	
 	
 	function FatBetterPos (|fatasm| fat, |uint|)

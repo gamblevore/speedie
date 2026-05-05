@@ -24,7 +24,7 @@ class Object
 		cpp_wrapper JB_Obj_ClassBehaviours
 
 	function MemoryLayer (|MemoryLayer|)
-		cpp_wrapper JB_ObjLayer
+		cpp_wrapper JB_Obj_Layer
 	
 	function RefCount (|int|)
 		cpp_Wrapper JB_RefCount

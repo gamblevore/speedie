@@ -228,7 +228,14 @@ class SCImport
 		|byte|				CurrIsManuallyImported
 		
 		
-		function Neaten
+		function PleaseDoConfsDifferently (|message| s, |int| t)
+			// Confs shouldn't preload stuff... not before sort!
+			opt norefcounts
+			for ch.flat in s
+				ch.tag = t
+		
+		
+		function Neaten 
 			opt norefcounts
 			.AllFiles.sort			// or else file-dates can mess things up.
 		
@@ -238,12 +245,8 @@ class SCImport
 
 			for (f in .allfiles) (i)
 				f.filenum = i
-				//f.LiveAST = nil	// refresh message.tag... which stores filenumbers.
-									// only conf files use this, but I want them right too.
-									// --nevermind, that failed --
-									// I guess not then. More bugs. I hate this.
-									// I guess my conf system is too messy.
-									// oh well... I did almost everything else correct.
+				|| s = f.liveast
+					.PleaseDoConfsDifferently(s, i<<5)
 									
 				
 		function DoImport (CollectFunc)

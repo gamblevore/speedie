@@ -489,7 +489,7 @@ JB_MemoryLayer* JB_Class_DefaultLayer ( JB_Class* Cls ) {
 }
 
 
-JB_MemoryLayer* JB_ObjLayer ( JB_Object* Obj ) {
+JB_MemoryLayer* JB_Obj_Layer ( JB_Object* Obj ) {
     if (Obj) {
         AllocationBlock* Block = ObjBlock_(Obj);
         return Block->Owner;
@@ -512,7 +512,7 @@ uint JB_Obj_ID ( JB_Object* Obj ) {
 
 
 JB_Class* JB_Obj_Class (JB_Object* Obj) {
-	auto L = JB_ObjLayer(Obj);
+	auto L = JB_Obj_Layer(Obj);
 	if_usual (L) // whatever
 		return L->Class;
 	return 0;
