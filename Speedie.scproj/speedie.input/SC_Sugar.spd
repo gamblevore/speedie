@@ -200,7 +200,7 @@ function message.MainArgsCanBeZero (|bool|)
 
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
-	|| usage = "Usage: \$app " + prms.Render
+	|| usage = `Usage: $app ` + prms.Render
 	|| Src = –digest `
 	|| __ArgCount = app.mainargsstart("_0")
 	if !__ArgCount
