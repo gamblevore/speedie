@@ -6,7 +6,6 @@ main (|[file]| files)
 		return 0
 	
 	|[string]| data
-	|| fs = FastString()
 
 	|| Start = date.now
 	|| n = 0
@@ -18,6 +17,7 @@ main (|[file]| files)
 
 	expect (data) ("No readable files found.")
 		
+	|| fs = FastString()
 	"Read".RenderSpeed(fs, n, date.now-Start)
 	|[message]| msgs
 
