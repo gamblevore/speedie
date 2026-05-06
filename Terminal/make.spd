@@ -40,7 +40,7 @@ function UnMod (|string| Dir, |string|)
 chown \$U $dir"
 
 	
-function comp (|string| name, |string|)
+function compile_example (|string| name, |string|)
 	return "echo \"Compiling ${name}.cpp\"
 g++ -o Build/$name  $ExecFlags  ${name}.cpp
 ${unmod(`Build/`+name)}
@@ -75,6 +75,7 @@ ${unmod(dest)}
 module Vars
 	function InitVars (|string| plat)
 		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+		// what about -D __VM__=1 ???
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
 		shared = "shared"
 		LinkLibFlags = ""
@@ -114,7 +115,8 @@ cd ${CppLib}
 
 $GetUserName
 echo \"Compiling Speedie to $SpdTerm\"
-g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+g++ -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+mv ${SpdTerm}tmp $SpdTerm
 ${unmod(SpdTerm)}
 
 
@@ -130,11 +132,6 @@ echo \"Installing headers\"
 cp    *.h /usr/local/include/
 ${unmod(`/usr/local/include/jeebox*`)}
 
-${comp(`jb`)}
-${comp(`xml`)}
-${comp(`test`)}
-${comp(`users`)}
-
 echo \"Symlinking Speedie\"
 ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
@@ -147,15 +144,23 @@ ${link(CakeTerm, `/usr/local/bin/cake`)}
 ${link(CakeTerm, `/usr/local/bin/🎂`)}
 
 echo \"\"
-echo \"Build Complete.\"
+echo \"Compiling JeeboxLib.\"
 
-#better to continue if libjeebox can't be compiled
-set +e
-cd /usr/local/speedie/Library/CppLib                         # allow source to be found!
-/usr/local/bin/speedie /usr/local/speedie/jeebox.scproj -x   # regenerate libjeebox source
+set +e									# better to continue if libjeebox can't be compiled
+cd $Speedie/Library/CppLib				# allow source to be found!
+$SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
 echo \"Compiling $LibPath for user '\$U'\"
 g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 ${unmod(LibPath)}
+
+
+cd $Speedie/jeebox.scproj/Examples
+${compile_example(`jb`)}
+${compile_example(`xml`)}
+${compile_example(`test`)}
+${compile_example(`users`)}
+
+
 set -e
 
 
@@ -169,9 +174,9 @@ $SpdTerm $Speedie/Perry.scproj
 function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
 vars.initvars(plat)
 || tocompile = FastString()
-|| Count = 2 //jb.cpp and jb_globals.cpp
+|| Count = 2 //JB.cpp and JB_Globals.cpp
 for ch in CppLib!
-	if ch isa "cpp"
+	if ch isa "cpp" or "S"
 		tocompile <~ ch
 		tocompile <~ ' '
 		Count++

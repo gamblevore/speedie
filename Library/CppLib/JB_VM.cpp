@@ -25,8 +25,7 @@ uint			CrashCount;
 CakeVM*			JB_GlobalVM;
 
 
-#if 1 // __VM__		// hmmm... seems to cause compile errors. just remove the ifdef???
-					// i think it just affects libjeebox my boi...
+#if !AS_LIBRARY		// #ifdef __VM__		// hmmm... seems to cause compile errors.
 #pragma GCC optimize ("Os")
 
 #define kOverFlowStack			-2
