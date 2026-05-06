@@ -77,6 +77,7 @@ chown $U /usr/local/bin/🎂
 echo ""
 echo "Compiling JeeboxLib"
 
+
 set +e									# better to continue if libjeebox can't be compiled
 cd /usr/local/speedie/Library/CppLib				# allow source to be found!
 /usr/local/speedie/Terminal/Speedie /usr/local/speedie/jeebox.scproj -x		# regenerate libjeebox source
