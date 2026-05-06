@@ -1,29 +1,29 @@
 #!/usr/local/bin/spd
 
-main (|int| Width=3, |int| Depth=6)
+main (|int| Width=3, |int| Depth=6, |int| Reps = 100000)
 	"Tree Investigator Timing System"
-	|| t = .GrowTITS(Width, Depth, message())
+	|| t = Message()
+	t.GrowTITS(Width, Depth)
 
 	for 10							// tits needs to be warmed up first
 		.FlatTits(t)		
 	time "flat"						// now tits are nice and warm
-		for 10000
+		for Reps
 			.FlatTits(t)
 	
 	for 10							// warm the other tits
 		.ExploreTits(t)		
 	time "explore"
-		for 10000
+		for Reps
 			.ExploreTits(t)
 
-function app.GrowTITS (|int| Width, |int| Depth, |message!| into, |Message!|)
+function message.GrowTITS (|int| Width, |int| Depth)
 	opt norefcounts
 	depth--
 	for width
-		|| tits = into.msg(@list)
+		|| tits = .msg(@list)
 		if Depth > 0
-			.GrowTITS(depth, width, tits)
-	return into
+			tits.GrowTITS(depth, width)
 
 function app.FlatTits (|message| t, |int|)
 	opt norefcounts
@@ -32,7 +32,7 @@ function app.FlatTits (|message| t, |int|)
 
 function app.ExploreTits (|message| t, |int|)
 	opt norefcounts
-	for s in t
+	for s.fast in t
 		rz++
 		if s.hasany
 			rz += .ExploreTits(s)
