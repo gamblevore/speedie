@@ -17,17 +17,19 @@ ignore
 	
 	tell (me, –how %to~get home)
 
+
 extend Parser
 	function Init
+		opt norefcounts
 		target debug		// assert these are ordered properly
 			debugger @thg.translateable  and  @opp.translateable and  @cnj.translateable  and  @tmp.translateable
 			debugger @str.isstring and @char.isstring and @sstr.isstring and @bin.isstring and @back.isstring 
 			debugger @Cnj.NoChildren and @Opp.NoChildren and @Thg.NoChildren and @Sheb.NoChildren and @SCnj.NoChildren and @SThg.NoChildren and @Num.NoChildren and @SStr
-			debugger @cnj|int| == 8 
-			debugger @max|int| <= 63  
+			debugger @cnj|int| == 8
+			debugger @max|int| <= 63
 		
 		.Tokenz( "\r \n ;", kEndOfLine, fEndOfLine )
-		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
+		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine)
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
 		._EndOfLineMarker = message(@nil, "\n")
@@ -43,12 +45,11 @@ extend Parser
 		.Token( "[" )  = .Handler( kFuncAfterNoSpace, fAccess ).Link( kThingSyx, fArray )
 		.Token( "«" )  = .Handler( kThingSyx, fMsgList )
 		.Token( "." )  = .Handler( kFuncAfterNoSpace, fDot ).Link( kThingSyx, fSDot )
-//		.Token( ".." ) = .Handler( kFuncAfterNoSpace, fDotAccess ) // I don't like this
 		.Token("://")  = .Handler( kFuncAfterNoSpace, fURL)
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
 		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
-		.Token( `#` )  = .Handler( kTemporalSyx, fTmpSection ) // where is this used?
+		.Token( `#` )  = .Handler( kTemporalSyx, fTmpSection )		// where is this used?
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
 
@@ -65,8 +66,8 @@ extend Parser
 
 // I think better syntax that is less confusible with comments is better
 		.Tokenz( "%",			kThingSyx,				fOpAsThing			)
-		.TokenRange( "09", 		.Handler(kThingSyx,		fNumber)			)
-		.Tokenz( "\\", 			kThingSyx,				fHint				)
+		.TokenRange( "09",		.Handler(kThingSyx,		fNumber)			)
+		.Tokenz( "\\",			kThingSyx,				fHint				)
 		.Tokenz( "#!",			kTemporalSyxNoBar,		fShebang			)
 		.Tokenz( "//",			kEndOfLine,				fCommentLine		)
 		.Tokenz( "/*",			kEndOfLine,				fComment			)
@@ -114,10 +115,11 @@ extend Parser
 
 
 
-///////////////////////////////////////////////////////////////////////////// 
-///////////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 	
 	function ExpectEndChar (|int|start, |string| s, |bool| Expect = true, |bool|)
+		opt norefcounts
 		.CleanSpaces
 		if .Eats(s)
 			return true
@@ -126,32 +128,35 @@ extend Parser
 	
 	
 	function BarThings (|int| Start, |syntax| Syx, |Message|)
-		require (.nextbyte != '=')
+		opt norefcounts
+		require (.NextByte != '=')
 		._StopBars = kTemporalSyx (|) kFuncAfterBar
-		|| item = .ProcessThingNoBar // maybe we can remove stopbars? we'll see...
-									 // can't just comment out above line, but maybe use
-									 // ProcessThingNoBar in more places?
+		|| item = .ProcessThingNoBar		// maybe we can remove stopbars? we'll see...
+											// can't just comment out above line, but maybe
+											// use ProcessThingNoBar in more places?
 		if item
 			Item = .ParseItem(Item, 0, kOppNoBar)
 		  else
 			item = parser.newempty(nil, @Emb, start, start)
 
 		._StopBars = 0
-		require .ExpectEndChar(parser.nextstart, "|")
+		.ExpectEndChar(parser.NextStart, "|")
 
 		rz = parser.new(nil, Syx, start)
 		rz <~ item
 
 
-	function PostInnerAdj (|Message| Rel, |Message| opp, |Message|)
+	function PostInnerAdj (|Message| Rel, |Message|)
+		opt norefcounts
 		|| f = rel.first!
 		if !(rel == @rel) and !(rel==@bra and f==@rel)
 			return .ErrorAdd("Expected a rel.", rel.position)
+		
 		if rel == @bra
 			rel = f
 			f = f.first!
 		
-		|| Adverb = .Process( kOppWord (|) kOppBra, Parser.kExpect ) #require
+		|| Adverb = .Process( kOppWord (|) kOppBra, Parser.kExpect )			#require
 		|| adj = @adj.msg
 		f.next = adj
 		adj <~ Adverb
@@ -161,6 +166,7 @@ extend Parser
 	
 	
 	function ChainTemporalRels (|Message!| FirstThing, |Message!| opp, |Message!|)
+		opt norefcounts
 		if opp == @scom
 			opp <~ firstthing
 			return opp
@@ -175,6 +181,7 @@ extend Parser
 
 
 	function FixTRels (|Message| self, |Message| Last, |Message|)
+		opt norefcounts
 		if (!Last)
 			0 //
 
@@ -217,6 +224,7 @@ extend Parser
 
 	function fAccess (ParseHandler)
 		// x[a, b]
+		opt norefcounts
 		|| pos = start
 		if parent
 			pos = parent.position
@@ -228,22 +236,26 @@ extend Parser
 	
 	function fAdjectiveThing (ParseHandler)
 		//                         x~y
+		opt norefcounts
 		rz = parser.New(nil, @Adj, start)
 		rz <~ parser.ProcessThing( 0, Parser.kExpect )
 	
 	
 	function fBAdjectiveThing (ParseHandler)
 		//                         y ≈ x
+		opt norefcounts
 		rz = parser.New(nil, @badj, start)
 		rz <~ parser.ProcessThing( 0, Parser.kExpect )
 		rz <~ parent
 	
 	function fAdjectiveOp (ParseHandler)
+		opt norefcounts
 		rz = parser.new( nil, @Adj, start )
 		rz <~ parser.Process( kOppChain, Parser.kExpect )
 	
 
 	function fBAdjectiveOp (ParseHandler)
+		opt norefcounts
 		rz = parser.new( nil, @badj, start )
 		rz <~ parser.Process( kOppChain, Parser.kExpect )
 		rz <~ parent
@@ -256,6 +268,7 @@ extend Parser
 
 	function fArray (ParseHandler)
 		// x = [a, b, c:d, e:]
+		opt norefcounts
 		rz = parser.new( nil, @Arr, Start )
 		parser.ParseLoopFlags( rz, "]", kTemporalSyxNoBar )
 	
@@ -291,6 +304,7 @@ extend Parser
 	
 		
 	function fURL (ParseHandler)
+		opt norefcounts
 		require .NeedName(parent!)
 		.NextStart = .data.inwhite(start)
 		parent.Func = @url
@@ -320,6 +334,7 @@ extend Parser
 
 
 	function fAtNamedExp (ParseHandler)
+		opt norefcounts
 		require  parent and .needname(parent)
 		parent.func = @name
 		parent <~ parser.ProcessThing(0, Parser.kExpect)
@@ -327,6 +342,7 @@ extend Parser
 
 
 	function fBackTick (ParseHandler)
+		opt norefcounts
 		|| After = Parser.data.find( '`', Parser.Nextstart )
 		if !After
 			return Parser.ErrorAdd( "String did not close.", start )
@@ -396,6 +412,7 @@ extend Parser
 
 	function Params (|message| Parent, |int| N)
 			  // (,,a:b,,c:d,e,)
+		opt norefcounts
 		|| Result = parser(parent, @prm, N)
 		.ParseLoopFlags(result, ")", kTemporalSyxNoBar)
 
@@ -431,6 +448,7 @@ extend Parser
 
 
 	function fComment (ParseHandler)
+		opt norefcounts
 		|| Count	= 1
 		|ind| i		= parser.NextStart
 		|| d		= parser.data
@@ -455,12 +473,14 @@ extend Parser
 			if !parser.WillEnd
 				result <~ parser.ProcessThing(kOppSyx (|) kOppTemporal)
 		return Result
+	
 	// decl and typecast are neighbours :)
 	function fTypeCast (ParseHandler)
 		return parser.BarThings( Start, @Type )
 
 
 	function fDot (ParseHandler)
+		opt norefcounts
 		return parser.DotSub( @dot, start, parent.parent )
 
 	
@@ -641,6 +661,7 @@ extend Parser
 
 	function fYoda (ParseHandler)
 		// ¬how~slow you are
+		opt norefcounts
 		|| last = parser.ProcessThing(kOppSyx, true)
 		|| first = parser.ProcessThing(kOppSyx, true)
 		|| opp = parser.process(kOpp, true)
@@ -682,11 +703,13 @@ extend Parser
 	
 	
 	function fArgOpen (ParseHandler)
+		opt norefcounts
 		rz = parser.new( nil, @Arg, start )
 		parser.ParseLoopFlags( rz, "}", ktemporal )
 
 
 	function fArgColon (ParseHandler)
+		opt norefcounts
 		rz = parser.new( nil, @arg, start )
 		rz.RangeLength = 1
 		while {
@@ -696,6 +719,7 @@ extend Parser
 
 
 	function fString (ParseHandler) {
+		opt norefcounts
 		|| After = parser.data.jbfind( '"', parser.Nextstart... )
 		ifn After: return parser.ErrorAdd( "String didn't close!" )
 		
@@ -783,14 +807,16 @@ extend Parser
 
 	
 	function fTmpSub (|message!| result, |int| OpFlags, |int| ThingFlags, |message|)
+		opt norefcounts
 		if .WillEnd
 			return result
+
 		if parser.CanStatement
 			while
 				|| item = .ProcessSyxParent( result, opflags, thingflags ) #loop
 				result <~ item
 
-				if parser.WillEnd
+				if .WillEnd
 					return result
 				
 				if item == @Arg
@@ -842,8 +868,9 @@ ive been~running #since morning
 	
 
 	function fQuestion (ParseHandler)
+		opt norefcounts
 		rz = parser.NewWord( nil, @ques, Start, parser.NextStart ) 
-		rz <~ .processthing		// –how ∆can I die
+		rz <~ .processthing				// –how ∆can I die
 	
 	
 	function fThingWord (ParseHandler)
@@ -854,6 +881,7 @@ ive been~running #since morning
 	
 	function EmbeddedCode (|String| close, |Message| dest, |int| TmpFlags, |int|)
 		// should this... make sure we get at least one?
+		opt norefcounts
 		
 		|| result = .Data.find( close, parser.NextStart )
 		if !result
@@ -878,6 +906,7 @@ ive been~running #since morning
 
 
 	function GetFuncAfter (|Message!| result, |Message!|)
+		opt norefcounts
 		while
 			|| ThisAfter = kFuncAfterAny &~ ._StopBars
 			if NoFuncAfter(.NextByte)
@@ -895,7 +924,7 @@ ive been~running #since morning
 	
 	function MakeRel (|Message!| first, |int| Bits, |Message!|)
 		opt norefcounts
-		|| opp = .Process( Bits )              					 // kOpp
+		|| opp = .Process( Bits )									// kOpp
 		if !Opp
 			return first
 		
@@ -926,18 +955,19 @@ ive been~running #since morning
 
 
 	function ReRoute (|Message| output, |Message| cnj, |message| f, |Message|)
-		// a=b, -->, b=a
+		opt norefcounts										// a=b, -->, b=a
 		if (!f)
 			return .ErrorAdd("Can’t use temporals like this.")
 		
 		rz = .ChainTemporalRels( f, cnj )
-		if rz.HasChildCount(2) and .Allow(kEndOfLine) // good
+		if rz.HasChildCount(2) and .Allow(kEndOfLine)		// good
 			rz <~ .ProcessThing
 		
 		output <~ rz
 	
 
 	function ParseItem (|Message| ch, |int| TemporalFlags, |int|ops, |Message|)
+		opt norefcounts
 		|| ns = .nextstart
 		ifn .Allow(kColon)
 			return ch
@@ -952,9 +982,9 @@ ive been~running #since morning
 		Result <~ ch
 
 		|| ch2 = .Process( TemporalFlags, Result ) ?? .ProcessThing(ops)
-		ch2 ?= parser.new(Result, @emb, ns) // so we can do item.last
+		ch2 ?= parser.new(Result, @emb, ns)				// so we can do item.last
 		result <~ ch2
-		result.after = ch2.after 
+		result.after = ch2.after
 		return Result
 
 
@@ -1112,6 +1142,7 @@ ive been~running #since morning
 
 
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
+		opt norefcounts
 		|| ch = .Process( kTemporal&TmpoFlags, output)
 		if (!ch)
 			|| item = .ProcessSyxParent(output, kopp, kthing)
@@ -1129,6 +1160,7 @@ ive been~running #since morning
 
 
 	function ElseIfAdder (|Message| prev,  |message| curr, |message|)
+		opt norefcounts
 		|| cf = curr.func
 		if (prev.func != @tmp) or (cf != @tmp and @bra)
 			return parser.UnexpectedSyntax(curr)
@@ -1203,6 +1235,7 @@ ive been~running #since morning
 
 
 	function DecorateThing (|message!| R, |int| Ops, |Message!|)
+		opt norefcounts
 		R = .GetFuncAfter( R )
 		if .WillEnd: Return R
 		
@@ -1214,7 +1247,7 @@ ive been~running #since morning
 			|| opp = .Process( kOppTemporal )
 				if opp != "<≈"
 					return .ChainTemporalRels( R, opp )
-				|| A = .PostInnerAdj( R, opp )
+				|| A = .PostInnerAdj( R )
 					return .DecorateThing( A, ops ) // recursive? 
 		return R
 	
@@ -1232,6 +1265,7 @@ ive been~running #since morning
 
 	
 	function ProcessSyxSub (|message?| Parent, |int| Ops, |int| KindOfThing, |bool| Expect, |Message?|)
+		opt norefcounts
 		|| result = .Process( KindOfThing, Expect, parent )
 		if !result or (result == parent) or .WillEnd
 			return result
@@ -1240,16 +1274,18 @@ ive been~running #since morning
 
 	function Tokens (|[string]| arr, |int|bits, |ParseHandler|func=nil)
 		cpp_part TokensFn
+		opt norefcounts
 		.Tokens( arr, .Handler( bits, func ) )
 
 
 	function Tokens (|[string]| arr, |TokenHandler| H)
 		cpp_part TokensHan
+		opt norefcounts
 		for s in arr
 			.Token( s ) = H
 
 
-	function TokenRange (|string| Range, |tokenhandler|H)
+	function TokenRange (|string| Range, |tokenhandler| H)
 		cpp_part TokensChar
 		|| i = 0
 		while i < Range
@@ -1259,9 +1295,10 @@ ive been~running #since morning
 				.token(string.byte(A++)) = H
 
 
-	function Tokenz (|string| s, |int|bits, |ParseHandler| func = nil)
-		// perhaps a slightly better format could allow removing some of these tokensfuncs... whatever
-		// good for now!
+	function Tokenz (|string| s, |int| Bits, |ParseHandler| func = nil)
+		// perhaps a slightly better format could allow removing some of these
+		// tokensfuncs... whatever good for now!
+		opt norefcounts
 		cpp_part TokenzFn
 		if s contains " "
 			.Tokens( s.words, bits, func )	
@@ -1316,7 +1353,7 @@ module Parser
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData
 
-//	|uint|					CountStats  // better to put in the memory manager itself!
+//	|uint|					CountStats		// better to put in the memory manager itself!
 	|MessagePosition|		Using
 	|fnIDGenerator|			Splitter = &parser.range
 	visible false

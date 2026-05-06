@@ -3538,7 +3538,7 @@ bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpFlags);
 
 Message* JB_Tk__ParseLoopItem(Message* Output, int TmpoFlags, Message* Prev, int Indent);
 
-Message* JB_Tk__PostInnerAdj(Message* Rel, Message* Opp);
+Message* JB_Tk__PostInnerAdj(Message* Rel);
 
 Message* JB_Tk__ProcessSyxParent(Message* Parent, int Ops, int ThingFlags);
 
