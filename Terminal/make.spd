@@ -144,7 +144,7 @@ ${link(CakeTerm, `/usr/local/bin/cake`)}
 ${link(CakeTerm, `/usr/local/bin/🎂`)}
 
 echo \"\"
-echo \"Compiling JeeboxLib.\"
+echo \"Compiling JeeboxLib\"
 
 set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
