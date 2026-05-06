@@ -54,7 +54,7 @@ extend_module Error
 			fs <~ "Numeric overflow parsing number"
 		  else
 			fs <~ "Can’t parse number. Found: '"
-			fs.AppendRange(num, pos, 1)
+			fs.AppendRange(num, pos, pos+1)
 			fs <~ "' in: "
 			fs <~ num.Preview(32)
 		
