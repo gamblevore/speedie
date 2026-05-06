@@ -406,7 +406,7 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 
 libinternal TextView.UseColorAnyway (|int|)
 	if !.isinline
-		if .ParsedMessage // or .myerror
+		if .ParsedMessage
 			return 2
 		return 3
 

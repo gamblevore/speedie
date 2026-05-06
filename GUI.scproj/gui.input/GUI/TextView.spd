@@ -256,6 +256,14 @@ class TextView (GUIControl)
 			return true
 	
 	
+	libinternal message.ContainerLength (|int|)
+		|| fn = .Func
+		if fn == @sstr
+			return 3
+		if self == @arg and self is Style2
+			return 0
+		return 1
+	
 	libinternal ExpandWordLike (|intrange| T, |textviewline| D, |intrange|)
 		opt norefcounts		
 
@@ -264,10 +272,11 @@ class TextView (GUIControl)
 			|| msg = d.Message
 				|| inner = msg.FindTightest(t0)
 				if inner and inner._CanExpandClick
+					|| shrink = msg.ContainerLength
 					if (inner.Position == t0)
-						return (t0, inner.after)
+						return (t0, inner.after)|intrange| ± shrink
 					if (inner.after == t0)
-						return (inner.position, t0)
+						return (inner.position, t0)|intrange| ± shrink
 
 		if (t0 > t.x2)
 			t = (t[1], t0)
@@ -2276,6 +2285,8 @@ class TextView (GUIControl)
 		
 		d.SimpleUpdateFromDisk
 		if d.Load
+			if .JeeboxMode is Expect // makes sense
+				d.JeeboxMode |= DocumentJeeboxMode.Expect
 			.document = d
 			.MyError = nil
 			if show
