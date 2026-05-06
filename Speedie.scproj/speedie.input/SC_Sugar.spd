@@ -201,14 +201,17 @@ function message.MainArgsCanBeZero (|bool|)
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
 	|| usage = "Usage: \$app " + prms.Render
-	|| FirstArg = `
+	|| Src = –digest `
 	|| __ArgCount = app.mainargsstart("_0")
 	if !__ArgCount
 		return 0
-`.macro
+`
 	if prms.MainArgsCanBeZero
-		firstarg.Source.last.remove
+		Src = –digest`
+	|| __ArgCount = app.mainargsstart("_0", true)
+`
 
+	|| FirstArg = macro.new(src.parsejbin, false)	
 	using prms
 	.AppendMacro(FirstArg, [Usage.msg])
 	|| i = 0

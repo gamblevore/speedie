@@ -172,7 +172,7 @@ inline int.Msg (|message|)
 
 inline string.Msg (|message|)
 	opt norefcounts
-	return @str.msg(.render)
+	return @str.msg(self)					// wait... why render?
 
 inline bool.Msg (|message|)
 	opt norefcounts

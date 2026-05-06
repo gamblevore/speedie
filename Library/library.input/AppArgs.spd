@@ -90,11 +90,12 @@ autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringt
 
 ////////////////////////////////////////////////////////
 
-autogen app.MainArgsStart (|string| Usage, |int|)
+autogen app.MainArgsStart (|string| Usage, |bool| Silent=false, |int|)
 	opt norefcounts
 	if !.usage
 		.usage = usage
 	|| C = .args.length
 		return C
-	printline .usage.replaceall("\$app", .callpath.name)
+	if !Silent
+		printline .usage.replaceall("\$app", .callpath.name)
 
