@@ -136,10 +136,10 @@ role ListViewRow (message)
 			where.horz	= z2.h
 			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1.0)
 		
-		if self is Disabled
-			|| c = 0.5.mix(p.GNormal.BG.Color, vec4(0.5))
-			c.a = (str * 0.7) min 1.0
-			where.DrawRect(z2, c)
+//		if self is Disabled
+//			|| c = 0.5.mix(p.GNormal.BG.Color, vec4(0.5))
+//			c.a = (str * 0.7) min 1.0
+//			where.DrawRect(z2, c)
 
 		if self is Error
 			|| c = vec4(1.0, 0.25, 0.125, 0.2)
@@ -191,6 +191,8 @@ role ListViewRow (message)
 		
 		if parent.MultiLineDraw
 			r.y = rect.y2 - 10
+		if self is Disabled
+			str *= 0.375
 		TextCol.alpha *= str
 		font.small!.DrawTextWrap(na, Where, R, Textcol, parent.rowheight)
 	
