@@ -7079,7 +7079,7 @@ Message* JB_Tk__fMsgList(int Start, Message* Parent) {
 	if (JB_Tk__Allow(kJB__Tk_kEndOfLine)) {
 		JB_Msg_AppendSyx(Result, kJB_SyxStr, JB_LUB[0]);
 	}
-	JB_Tk__ParseLoopFlags(Result, JB_LUB[552], kJB__Tk_kTemporalSyxNoBar);
+	JB_Tk__ParseLoopFlags(Result, JB_LUB[552], kJB__Tk_kTemporal);
 	return Result;
 }
 
