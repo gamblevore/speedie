@@ -25,7 +25,7 @@ uint			CrashCount;
 CakeVM*			JB_GlobalVM;
 
 
-#ifdef __VM__		// hmmm... seems to cause compile errors. just remove the ifdef???
+#if 1 // __VM__		// hmmm... seems to cause compile errors. just remove the ifdef???
 					// i think it just affects libjeebox my boi...
 #pragma GCC optimize ("Os")
 
@@ -414,5 +414,5 @@ CakeVM* JB_ASM__VM			(int Flags)								{return 0;}
 ivec4*	JB_ASM_Run			(CakeVM* V, int CodeIndex)				{return 0;}
 void JB_ASM_LinkPico		(CakeVM* V, PicoComms* P, PicoActionFn Fn) {}
 
-#endif
+#endif // __vm__
 } // extern c
