@@ -225,6 +225,8 @@ extend Parser
 	function fAccess (ParseHandler)
 		// x[a, b]
 		opt norefcounts
+		ignore
+			x = [\12]
 		|| pos = start
 		if parent
 			pos = parent.position
@@ -288,7 +290,7 @@ extend Parser
 
 		if .Allow(kEndOfLine)
 			result <~ (@str, "")
-		parser.ParseLoopFlags( Result, "»", kTemporalSyxNoBar )
+		parser.ParseLoopFlags( Result, "»", kTemporal )
 		return Result
 
 
@@ -1371,7 +1373,7 @@ module Parser
 		kColonArg
 
 		kTemporal		= [kTemporalWord,	kTemporalSyxNoBar,	kTemporalBar]
-		kEnd			= [kEndOfLine,		kComma,				kEndContainer] 
+		kEnd			= [kEndOfLine,		kComma,				kEndContainer]
 		kFuncAfterAny	= [kFuncAfterNormal,kFuncAfterNoSpace,	kFuncAfterBar]
 		kOpp			= [kOppBra,			kOppSNB,			kOppBar,	kOppTemporal,	kOppWord,	kOppYoda]
 		kTemporalWordColon
@@ -1385,8 +1387,8 @@ module Parser
 		kAllow			= false
 		kExpect			= true
 		kTmpOpp			= kOppTemporal  (|) kTemporalSyxNoBar
-		kLameTemporal	= kTemporalWord (|) ktemporalsyx // kTemporalSyxNoBar? for .parseloopflags
-														 // might want to separate "#!shebang" from "||decl"
+		kLameTemporal	= kTemporalWord (|) ktemporalsyx	// kTemporalSyxNoBar? for .parseloopflags
+															// might want to separate "#!shebang" from "||decl"
 
 
 
