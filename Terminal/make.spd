@@ -59,18 +59,19 @@ ${unmod(dest)}
 "
 
 
-|string| CFlags
-|string| shared
-|string| LinkLibFlags
-|string| ext
-|string| PerryPreReqs
-|string| LibName
-|string| LibFlags
-|file|   CppLib
-|string| SpdSrc
-|string| SpdTerm
-|string| CakeTerm
-|string| LibPath
+|string|	CFlags
+|string|	shared
+|string|	LinkLibFlags
+|string|	ext
+|string|	PerryPreReqs
+|string|	LibName
+|string|	LibFlags
+|file|		CppLib
+|string|	SpdSrc
+|string|	SpdTerm
+|string|	CakeTerm
+|string|	LibPath
+
 
 module Vars
 	function InitVars (|string| plat)
@@ -95,7 +96,6 @@ sudo apt install gedit
 `
 		  else
 			PerryPreReqs = `echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."`
-		
 		
 		LibName  = "libjeebox.$ext" 
 		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
@@ -146,6 +146,7 @@ ${link(CakeTerm, `/usr/local/bin/🎂`)}
 echo \"\"
 echo \"Compiling JeeboxLib\"
 
+
 set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
 $SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
@@ -174,7 +175,7 @@ $SpdTerm $Speedie/Perry.scproj
 function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
 vars.initvars(plat)
 || tocompile = FastString()
-|| Count = 2 //JB.cpp and JB_Globals.cpp
+|| Count = 2							//JB.cpp and JB_Globals.cpp
 for ch in CppLib!
 	if ch isa "cpp" or "S"
 		tocompile <~ ch
