@@ -1344,18 +1344,25 @@ class ListView (GUIControl) {
 		.DrawBordersSub(where, rect)
 
 		|| bg		= .gnormal.bg
-		|| focus	= .gRowSel.bg
-		|| focuscol	= focus.color
-		|| bgcol	= bg.color
-		focuscol	= focuscol.a.mix(bgcol, focuscol)
+		|| Selected	= .gRowSel.bg
 		
-		|| unfoc	= vec4(focuscol.lum)
-		unfoc.a		= focuscol.a
-		unfoc		= 0.667.mix(focuscol, unfoc)
-		unfoc.a += 0.2
-		where.fillmarks(R, bg, .gnormal.seps, focuscol.px, unfoc.px)
-
-		rz.Overlay(bg.premul)
+		|| focusSel0= Selected.color
+		|| bgcol	= bg.color
+		
+		|| F0 = focusSel0.a
+		|| focusSel = f0.mix(bgcol, focusSel0)
+		focusSel.a = f0
+		
+		|| UnfocusSel= vec4(focusSel.lum)						// made it grayer...
+		UnfocusSel	 = 0.667.mix(focusSel, UnfocusSel)
+		UnfocusSel.a = f0
+		rz.Overlay(bg.premul)	// not sure why I need this. bg is already drawn by fillmarks.
+								// graphical bugs happen and I don't wanna fix it properly right now.
+								// it seems like its drawing it twice.
+								// so... i could just increase the alpha? sqrt or something?
+								// that or remove it and fix all my bg colors.
+								// I could remove bg from fillmarks, give it an alpha of 0.
+		where.fillmarks(R, bg, .gnormal.seps, focusSel.px, UnfocusSel.px)
 
 			
 	behaviour Gesture
@@ -1437,24 +1444,25 @@ class ListView (GUIControl) {
 		if ._ScrollStart!=value
 			._ScrollStart = value
 			.touch
-		
+	
+	
 	behaviour Draw
 		opt NoRefCounts
 		.ScrollProtect
-		.fixscroll								// Why do we need both?
+		.fixscroll										// Why do we need both?
 		
 		|| clip = where.ControlClip
 		|| rect = .ActualRect
 		.CalculateSkips
 
 		{
-			|| bg = .DrawBackground(where, rect)			// Cellborders too
+			|| bg = .DrawBackground(where, rect)		// Cellborders too
 			.DrawColumns(where, rect)
 			
 			rect.y2 += .ScrollSlide
 			|| End = .ListEnd
 			._CanSeeAllLines = false
-			|| NCols = .Columncount
+			|| NCols = .ColumnCount
 
 			for r.visible in self
 				rect.y = rect.y2 - .RowHeight
@@ -1474,11 +1482,10 @@ class ListView (GUIControl) {
 				// Using .gnormal.bg wouldn't do that. it really shouldn't flicker tho. Oh well...
 				// perhaps a math bug somwhere?... essentially, for the non-text-pixels, we should blend between
 				// x and x... leading to x. because its the same input. So why the flicker?
-				|| col = bg.Color // .gnormal.bg.color
+				|| col = bg.Color
 				col.a = 1.0 - str
 				where.DrawRect(clip, col.px)
 		}
-		
 		
 		|| cmm = .cmm
 			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.focusborder)
@@ -1490,7 +1497,6 @@ class ListView (GUIControl) {
 			where.DrawRectStyled(re, ¥.focusborder)
 		
 		.SetInlineSize
-		
 		where.DrawOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, ~.FindAttachedEdge)
 
 		if ._CanSeeAllLines

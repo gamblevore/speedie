@@ -7,8 +7,8 @@ class Document (list)
 	|int|					UndoChecker
 	|int|					ScrollPos
 	|byte|					MaxUndos
-	|bool|					WasJbin			// merge into jeeboxmode?
-    |bool|					WasCompressed	// also?
+	|bool|					WasJbin				// Merge into jeeboxmode?
+	|bool|					WasCompressed		// Also?
 	|DocumentJeeboxMode|	JeeboxMode
 	|bool|					CompareTreesOnSave
 	|bool|					_LoadedFromFile
