@@ -46,17 +46,24 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	|| i = .ide
 	if key is PERIOD
 		return i.MakeNothingRunning
+	if key.IsAccept
+		return i.ContinueProgram(-1)
+
+	if key is space
+		if i.RunCompiledApp
+			return i.ContinueProgram(-1)
+		return true
+	
+	if !i.RunCompiledApp
+		i.Editme.SetFocus
+		return true
+	
 	if key is RIGHT or Num6
 		return DebugStepOver(self, -1)
 	if key is DOWN or S or Num8
 		return DebugStepIn(self, -1)
 	if key is UP or W or Num2
 		return DebugStepOut(self, -1)
-	if key.IsAccept
-		return i.ContinueProgram(-1)
-	if key is space
-		if i.RunCompiledApp
-			return i.ContinueProgram(-1)
 		
 
 function DebugArgsKeyDown (GUIKeyEvent)
