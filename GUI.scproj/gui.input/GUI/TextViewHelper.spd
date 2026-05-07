@@ -283,7 +283,7 @@ class TextViewLine (list)
 	libinternal InitDefaults (|textview| parent, |int| t, |int|)
 		opt norefcounts
 		|| e = parent.MyError
-			if (self contains e.position) and (!e.obj) 
+			if (self contains e.position) and (!e.obj)
 				e.obj = self
 				.LineError = e
 		if parent.ParsedMessage

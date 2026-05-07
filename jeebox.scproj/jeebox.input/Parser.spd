@@ -512,7 +512,7 @@ extend Parser
 		parser.Params( rz, start )
 
 
-	function NumEnd ( |string| NumStr, |int| Start, |int| )
+	function NumEnd (|string| NumStr, |int| Start, |int|)
 		// "2..."			NO
 		// "1.2.3.4"		NO
 		// "2.12"			OK
@@ -542,7 +542,7 @@ extend Parser
 	function fHint (ParseHandler)
 		opt norefcounts
 		rz = .Numbersub(start+1, start)
-		if (rz.func != @num) or rz.HasAny
+		if (rz.func != @num) or rz.HasAny or !rz.Length
 			error rz
 		  else
 			|| fs = FastString.Shared
@@ -1362,6 +1362,7 @@ module Parser
 	|message|				_EndOfLineMarker
 	|dictionary of string|	_ErrorNames = nil
 	|uint16|				_StopBars
+	|ErrorFlags|			_ErrorFlags
 	|bool|					_DotInsertAllow
 
 	.using.Position = -1

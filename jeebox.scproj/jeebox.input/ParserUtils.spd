@@ -105,6 +105,8 @@ libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 
 	parser.StartParse( self )
 	parser._StopBars = 0
+	parser._ErrorFlags = ErrorFlags.dontstrip ||| ErrorFlags.parse
+	
 	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal
 	|| Func		= Owner
@@ -126,6 +128,8 @@ libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 	parser.startparse(nil) // clear error message
 	if !OK
 		into = nil
+
+	parser._ErrorFlags = 0
 	return into|MessageRoot|
 
 
@@ -141,11 +145,11 @@ extend Parser
 	function ErrorAlwaysAdd (|String| s, |ind| Start, |Message?|)
 		.ErrorStart = start
 		
-		// create msg for memory-layer
-		|| err				= Error.new(message())
+		// create msg to store the current memory-layer
+		|| MemLayer			= Message()
+		|| err				= Error.new(memlayer)
+		MemLayer.Position	= Start
 		err.Position		= Start
-		(err is dontstrip)
-		(err is parse)
 		err.name			= s
 		|| d = .data
 		if d.IsBinary

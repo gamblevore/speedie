@@ -399,11 +399,12 @@ function perryide.GotASM (|message| asm)
 function perryide.ClearOldASMErrors
 	opt	norefcounts
 	|| err = .Editme.MyError$
-	.editme.MyError = nil
+	.editme.ClearErrors
 	|| msg = .editme.MessageAt(err.Position)$
 	|| fn = msg.owningfunc$
 	|| After = fn.FlatLast.After
 	|| Start = fn.Position
+	
 	// how to clear lines in this range.
 	|| s = .EditMe.FindTextLine(Start)
 	while s and (s.Position <= after)

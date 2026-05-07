@@ -125,7 +125,7 @@ extend PerryIDE
 		|| RealErrors	= msg ~!= "check"
 		.ClearErrors(RealErrors)
 		|| NoErrors		= .ShowCompileErrors(msg, RealErrors)
-		|| ErrsVis		= .isviewing(.ErrorList) 
+		|| ErrsVis		= .isviewing(.ErrorList)
 		.errorlist.SelectFirst
 		if !RealErrors
 			0
@@ -135,6 +135,7 @@ extend PerryIDE
 		  elseif !errsvis
 			.view(.viewerrors)
 			.say(" failed. Could not compile")
+		.editme.ClearErrors
 		.LoadErrors(RealErrors, realerrors)
 		.showstats
 

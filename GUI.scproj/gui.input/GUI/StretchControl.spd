@@ -173,7 +173,6 @@ class StretchDivider (GuiControl)
 		constructor
 			is Animation
 		run
-			// now what?
 			|| p = .upon.parent$
 			|| pr = p.LastRect
 			if .upon.ActiveEnd.length < 10

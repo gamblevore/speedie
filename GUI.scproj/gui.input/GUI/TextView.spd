@@ -1107,6 +1107,7 @@ class TextView (GUIControl)
 
 	function ClearErrors
 		opt norefcounts
+		require .MyError
 		.MyError = nil
 		|| s = .Selectedline
 		for d in .WrappedLines
@@ -1488,11 +1489,11 @@ class TextView (GUIControl)
 	libinternal ValidateNewText (|message|)
 		|| msg = .text.Parse
 			msg.obj = .Filepath
-			if .MyError is parse
-				.MyError = nil
+			if .MyError is parse				// its ok now!
+				.ClearErrors
 		  else
 			|| e = StdErr.pop
-			if .JeeboxMode is Jeebox
+			if .JeeboxMode is Expect			// 
 				.myerror = e
 
 		|| J = .JeeboxMode(true)
@@ -1508,7 +1509,7 @@ class TextView (GUIControl)
 	
 	function InsertText (|string| S, |intrange| P, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
-		|| Same = (s == p.width) and .text[p.x, s] 
+		|| Same = (s == p.width) and .text[p.x, s]
 		|| i	= ( p.x2 (Same) p.x + s.length )
 		
 		if !same
@@ -1817,6 +1818,7 @@ class TextView (GUIControl)
 	
 	behaviour Draw
 		opt norefcounts
+		if (self ~= "editme") and keys.Shift
 		super.Draw(Where)
 		|| c = where.controlclip
 		where.ControlClip = c ± 1
@@ -2111,24 +2113,24 @@ class TextView (GUIControl)
 	
 	libinternal Parse (|bool| Changed, |documentjeeboxmode| Mode, |message|)
 		cpp_Part ViewParseSub
-		|| v = ._viewing
 		if !.WillAttemptParse(Mode)
-			.MyError = nil // more reliable
-			if v
+			.ClearErrors						// more reliable
+			|| v = ._viewing
 				v.DocParsed = nil
 			return nil
 		
 		|| p = .ParsedMessage
 		if p and !changed
 			return p
+		
 		|| sel = .SelRange
-		if !sel.width and sel.x > 0
+		if !sel.width and (sel.x > 0)
 			parser._DotInsertAllow = true
 
 		p = .ValidateNewText
 		
 		if Mode isnt expect
-			.myerror = nil
+			.ClearErrors
 		return p
 
 
@@ -2275,7 +2277,7 @@ class TextView (GUIControl)
 		if old <= 1
 			old.clear
 		.document = nil
-		.MyError = nil
+		.ClearErrors
 
 
 	function LoadDocument (|document| D, |bool| Show, |bool|)
@@ -2285,10 +2287,8 @@ class TextView (GUIControl)
 		
 		d.SimpleUpdateFromDisk
 		if d.Load
-			if .JeeboxMode is Expect // makes sense
-				d.JeeboxMode |= DocumentJeeboxMode.Expect
 			.document = d
-			.MyError = nil
+			.ClearErrors
 			if show
 				.SelDirect(d.TypingPlace, nil)
 				.scrollpos = d.scrollpos
@@ -2305,13 +2305,14 @@ class TextView (GUIControl)
 		._JeeboxMode = value
 		
 
-	function JeeboxMode (|bool| Hard=false, |Documentjeeboxmode|)
+	function JeeboxMode (|bool| Hard=false, |DocumentJeeboxMode|)
 		opt norefcounts
 
 		rz = ._JeeboxMode
 		|| d = .Document
-			rz = d.JeeboxMode
-	
+			rz &= ~DocumentJeeboxMode.Expect
+			rz |= d.JeeboxMode
+		
 		if !Hard
 			|| t = .text
 			if (t[] == '/') and t[0,"//jb"]

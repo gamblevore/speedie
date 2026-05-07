@@ -127,7 +127,7 @@ class PerryIDE (Window)
 		.clear
 		return true
 
-
+	
 	function Perry.HasOthers (|listviewrow| F, |bool|)
 		opt norefcounts
 		for w.fast in .Projects
@@ -136,7 +136,11 @@ class PerryIDE (Window)
 		
 		
 	function UpdateStatusErrors
-		.EditStatus.text = .PerryStatus
+		opt norefcounts
+		|| str = ""
+		|| p = .PerryError
+			str = p.name
+		.EditStatus.text = str
 
 
 	function PathExpand (|string| path, |string|)
@@ -145,7 +149,7 @@ class PerryIDE (Window)
 		rz = path.Path_Expand(perry.PathDict)					#expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(true)
 	
-	
+
 	function PerryError (|error?|)
 		opt norefcounts
 		if keys.shift
@@ -160,9 +164,6 @@ class PerryIDE (Window)
 	
 	
 	function PerryStatus (|string|)
-		opt norefcounts
-		|| p = .PerryError
-			return p.name
 
 
 	function RemoveProjFromList
@@ -285,7 +286,7 @@ class PerryIDE (Window)
 					fs <~ "no source found"
 		
 		  elseif i == 3
-			|| img = GUI.screen.size.area*4*2
+			|| img = GUI.screen.size.area * 4 * 2
 			fs.strsize("Obj ", app.ObjMemory)
 			fs.strsize("   Str ", app.stringmemory)
 			fs.strsize("   Img ", app.OtherMemory+img)
@@ -688,14 +689,18 @@ class PerryIDE (Window)
 		|| doc = txt.document
 		|| path = (doc.FilePath (doc) "")
 		|| lst = .errorlist
-		txt.ClearErrors
 		.filelist.ClearErrors
-
-		|error| jumpto
+		
+		|error| JumpTo
 		|| src = lst.ListSource
+		
+		|| parse_err = txt.MyError
+		if Parse_err is parse
+			src <~ parse_err
+
 		|| ActualErrors = 0
 		|| sel = txt.Selectedline
-		if src.hasany and src mustbe error
+		if src.HasAny and src mustbe error
 			for err in src
 				if err.severity >= ErrorSeverity.Error
 					ActualErrors++
@@ -867,13 +872,13 @@ So anything not 0 means "its OK"`
 		¥.LoadFromPrefs
 
 
-	function ParseErrorDetect						// not necessarily an error!? what if the file is not spd?
+	function ParseErrorDetect
 		for e.toplist in .errorlist
 			if e isa error
 				if e is parse
 					e.remove
 		
-		if .IsEditingSource	
+		if .editme.JeeboxMode is Expect
 			|| err = .editme.MyError
 				ifn err isa error
 					log "ParseErrorDetect bug"

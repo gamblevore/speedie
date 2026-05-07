@@ -29,6 +29,7 @@ class Error (Message)
 		.path = path
 		.when = date.now
 		.func = @sstr
+		.ErrorFlags = parser._ErrorFlags
 		.UpgradeWithNode
 	
 	
@@ -102,7 +103,7 @@ class Error (Message)
 		visible					// for lib
 		.Path = path
 		(self is PreferNoRenderPath) = desc contains path
-		.name = desc 
+		.name = desc
 	
 	
 	function GrabLine (|faststring| fs, |bool| Usecolor=false)
