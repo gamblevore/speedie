@@ -1,8 +1,8 @@
 
 
 class FileWithData (stringshared)
-	default NIL
-	false NIL
+	default	NIL
+	false	NIL
 	|string?|		_Data
 	|string|		FileName
 	|int|			Index
@@ -28,6 +28,9 @@ class FileWithData (stringshared)
 			d = .ReadAll(lim)
 			._Data = d
 		return d
+	
+	syntax cast (|bool|)
+		return self!=nil
 	
 	render
 		opt norefcounts

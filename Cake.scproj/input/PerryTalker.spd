@@ -214,8 +214,10 @@ function EditAction (PerryResponse)
 function BreakAction (PerryResponse)
 	opt norefcounts
 	|| F = debugger.file(m)
+	if f != nil
 		|| p = m[1].int
-		debugger.UserMultiBreak(F, p, state|bool|)
+		|| l = m[2].int
+		debugger.UserMultiBreak(F, p, p+l, debugger.dbgLength, state|bool|)
 		cake.perry!.SendBreaks(F)
 	return StepAction.DoNothing
 
@@ -335,12 +337,10 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	{
 	|| Where = debugger.SrcMap(index)
 	rz = Where.File
-	if rz == nil
-		return nil // error already made
-	if rz == "" // an internal file?
-		return rz
-	
-//	#expect (j, "MissingFile", where.filenum)
+	if !rz.Length
+		if rz == nil
+			return nil			// error already made
+		return rz				// an internal file?
 	
 	vars.Length = 0
 	vars <~ fn.name

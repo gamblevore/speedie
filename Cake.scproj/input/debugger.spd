@@ -36,37 +36,48 @@ module debugger
 			if Code < L
 				CakeBreak[Code] |= (1<<31)
 	
+	
+	function DebugList
+		target debug {
+		for Raw in .SourceMap
+			|| Src = raw.Location
+			|| Pos = src.Position
+			|| ff = src.file
+			|| F = (ff.FileName (ff) "")
+			|| Curr = Raw.code(debugger.dbgLength)
+			
+			"$F $Pos: $Curr"
+		"............."
+		}
+		
 
-	function UserMultiBreak (|FileWithData| Path, |uint| Position, |bool| Active=true)
+	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| L, |bool| Active)
 		opt norefcounts
 		|| CakeBreak = cake.ActiveBreaks$
-		|| ToFind = (path.index << 21) ||| Position
 		
 		|| BestScore = 0
 		|| BestValue = 0
 		|| BestCount = 0
-		|| L = debugger.dbgLength
 		
-		for Raw in .SourceMap
-			|| Src = raw.Location
-			|| Score = Src.MatchScore(ToFind)
+//		.DebugList
+		
+		for Src in .SourceMap
+			|| Score = Src.MatchScore(path, position, after, l)
 			if Score > BestScore
-				|| Best = Raw.code(l)
-					BestScore = Score
-					BestValue = Best
-					BestCount = 1
-			  elseif Score == BestScore
+				BestScore = Score
+				BestValue = Src
+				BestCount = 1
+			  elseif BestScore and (Score == BestScore)
 				BestCount++
 		
 		require BestCount
-		if BestCount == 1
+		if BestCount == 1 // same thing as below, but faster...
 			return .SetUserBreak(CakeBreak, BestValue, active)
-
-		for Raw in .SourceMap
-			|| Src = raw.location
-			|| Score = Src.MatchScore(ToFind)
+		
+		for Src in .SourceMap
+			|| Score = Src.MatchScore(path, position, after, l)
 			if Score == BestScore
-				.SetUserBreak(CakeBreak, Raw, active)			
+				.SetUserBreak(CakeBreak, Src, active)			
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |bool| Active)

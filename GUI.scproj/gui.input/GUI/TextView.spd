@@ -1818,7 +1818,6 @@ class TextView (GUIControl)
 	
 	behaviour Draw
 		opt norefcounts
-		if (self ~= "editme") and keys.Shift
 		super.Draw(Where)
 		|| c = where.controlclip
 		where.ControlClip = c ± 1

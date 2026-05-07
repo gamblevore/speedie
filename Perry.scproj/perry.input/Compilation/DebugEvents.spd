@@ -253,29 +253,19 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 			.editme.ShowAndSelect(where, true)
 	return true
 	
-
-function TextViewLine.MsgPos (|int|)
-	opt norefcounts	
-	rz = .Position
-	|| m = .Message
-		|| mp = m.Position
-		if self contains mp
-			(rz max= m.Position)
 	
 	
 function DebugBreakAdd (GuiTextLineEvent)
 	opt norefcounts
 	|| i = .ide
 	require i.DebugMode is CakeMode and Debug
-	if Direction < 0
-		beep
-		Notifications <~ "Removing this during debug breaks the debug positions."
-		return true
 	
 	|| cmd = ("brkadd" (direction > 0) "brkrem")
 	|| j = VarPrinter.start(@tmp, cmd)
-	j.addstr i.path
-	j.addint line.MsgPos
+	
+	j.AddStr i.path
+	j.AddInt Line.Position
+	j.AddInt line.text.Length
 	j.exit
 	i.SendJbin(j)
 
