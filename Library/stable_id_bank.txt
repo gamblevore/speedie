@@ -1332,12 +1332,12 @@ JB_Nav_Destructor
 JB_Nav_MoveNext
 JB_Nav_Name
 JB_Nav_Value
-JB_ObjLayer
 JB_Obj_Class
 JB_Obj_ClassBehaviours
 JB_Obj_Destructor
 JB_Obj_DictName
 JB_Obj_ID
+JB_Obj_Layer
 JB_Obj_Print
 JB_Obj_Render
 JB_Object_As

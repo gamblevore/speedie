@@ -15,6 +15,7 @@ GUI__App_TextInputEnabledAtStart
 GUI__App_TouchCount
 GUI__App_TouchFingersDown
 JB__Tk__DotInsertAllow
+JB__Tk__ErrorFlags
 GUI__ScrollInfo_JustClicked_
 GUI__Key_Debug
 GUI__SystemCursor_Curr
@@ -25,7 +26,6 @@ JB__Flow_AlwaysMove
 JB__Flow_BreakOnFail
 GUI__dcs_UseCompression
 JB__Proc_CheckedParent
-JB__Err_AutoPrint
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength
 JB__API_NilHappened_
@@ -51,7 +51,6 @@ GUI__App_TryResizeLater
 GUI__beep_OK
 GUI__font_Char
 GUI__MB_DownAt
-JB__Rec_Progress
 GUI__GridSection_Dummy
 GUI__VObject_DrawMovement
 GUI__LV_DelayEditTill_
