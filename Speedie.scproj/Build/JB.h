@@ -1549,6 +1549,7 @@ extern HairyMan SC__PackMaker_PackSaved;
 extern Array* SC__PackMaker_PackStrings;
 #define JB__Tk__DotInsertAllow JB__.Tk__DotInsertAllow
 #define JB__Tk__EndOfLineMarker JB__.Tk__EndOfLineMarker
+#define JB__Tk__ErrorFlags JB__.Tk__ErrorFlags
 #define JB__Tk__ErrorNames JB__.Tk__ErrorNames
 #define JB__Tk__StopBars JB__.Tk__StopBars
 #define kJB__Tk_kAdjectiveOp ((int)1)
@@ -2579,6 +2580,7 @@ extern int SC__Mod_ModuleDepth;
 
 struct JB_Globals {
 	byte __Dummy__;
+	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
 	bool TerminalColor_RainbowTerm;
 	bool Flow_AlwaysMove;
@@ -2591,31 +2593,30 @@ struct JB_Globals {
 	int Syx_CurrFuncID_;
 	JB_ErrorReceiver* StdErr;
 	JB_File* Platform_Logger_;
+	JB_String* App_Usage;
 	Dictionary* TC_Types_Dict;
-	Dictionary* Constants__SyxDict;
+	Dictionary* Constants_EscapeStr;
 	Message* Tk__EndOfLineMarker;
 	Dictionary* Constants_EscapeChr;
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_UnEscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
-	Dictionary* Constants_XML_EscapeStr;
-	JB_String* App_Usage;
-	FlowControl* Flow_Flow;
 	Message* App__Conf;
+	FlowControl* Flow_Flow;
 	Message* App__Prefs;
 	JB_File* App__StdOut;
-	JB_String* File__Speedie;
 	JB_File* App__stdin;
+	JB_String* File__Speedie;
+	Dictionary* Constants_XML_EscapeStr;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
-	Dictionary* Constants_EscapeStr;
+	Dictionary* Constants__SyxDict;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
-	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
 	InputStream_ParserCallBack_interface_prototype SS_ParserCallBack_run;
 	FP_fnIDGenerator Tk_Splitter;
@@ -2624,12 +2625,13 @@ struct JB_Globals {
 	CakeVM_CakeChef CakeVM_DummyChef;
 	FP_SorterComparer File__Sorter;
 	FP_SorterComparer Tree__Sorter;
+	FP_SorterComparer ID__ByID;
 	PicoComms* Proc__ForceParent;
 	RandomXOR* Random;
 	RandomXOR RandomShared;
 	RandomXOR zalgo_R;
-	CompressionStats MzSt_All;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -11396,6 +11398,7 @@ inline FatASM* SC_Pac_Write(Assembler* Self, ASMReg Value, Message* Exp, ASMReg 
 #ifdef __NEED_LIB_GLOBS__
 struct JB_Globals {
 	byte __Dummy__;
+	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
 	bool TerminalColor_RainbowTerm;
 	bool Flow_AlwaysMove;
@@ -11408,25 +11411,25 @@ struct JB_Globals {
 	int Syx_CurrFuncID_;
 	JB_Object* StdErr;
 	JB_Object* Platform_Logger_;
+	JB_Object* App_Usage;
 	JB_Object* TC_Types_Dict;
-	JB_Object* Constants__SyxDict;
+	JB_Object* Constants_EscapeStr;
 	JB_Object* Tk__EndOfLineMarker;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
-	JB_Object* Constants_XML_EscapeStr;
-	JB_Object* App_Usage;
-	JB_Object* Flow_Flow;
 	JB_Object* App__Conf;
+	JB_Object* Flow_Flow;
 	JB_Object* App__Prefs;
 	JB_Object* App__StdOut;
-	JB_Object* File__Speedie;
 	JB_Object* App__stdin;
+	JB_Object* File__Speedie;
+	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
-	JB_Object* Constants_EscapeStr;
+	JB_Object* Constants__SyxDict;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
 	JB_Object* App__Path;

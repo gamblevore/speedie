@@ -3506,7 +3506,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[449]);
-	JB_FS_AppendInt32(_fsf0, (2026050615));
+	JB_FS_AppendInt32(_fsf0, (2026050716));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -6563,14 +6563,13 @@ Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start) {
 
 Message* JB_Tk__ErrorAlwaysAdd(JB_String* S, Ind Start) {
 	(JB_Tk__ErrorStartSet(Start));
-	Message* _tmPf0 = JB_Msg_ConstructorEmpty(nil);
-	JB_Incr(_tmPf0);
-	JB_Error* Err = JB_Err_Constructor(nil, _tmPf0, JB_LUB[0], kJB__ErrorSeverity_Error, JB_LUB[0]);
+	Message* MemLayer = JB_Msg_ConstructorEmpty(nil);
+	JB_Incr(MemLayer);
+	JB_Error* Err = JB_Err_Constructor(nil, MemLayer, JB_LUB[0], kJB__ErrorSeverity_Error, JB_LUB[0]);
 	JB_Incr(Err);
-	JB_Decr(_tmPf0);
+	MemLayer->Position = Start;
+	JB_Decr(MemLayer);
 	Err->Position = Start;
-	(JB_Err_SyntaxIsSet(Err, kJB__ErrorFlags_DontStrip, true));
-	(JB_Err_SyntaxIsSet(Err, kJB__ErrorFlags_Parse, true));
 	JB_SetRef(Err->Name, S);
 	JB_String* D = JB_Tk__GetData();
 	JB_Incr(D);
@@ -6932,7 +6931,7 @@ Message* JB_Tk__fFuncCall(int Start, Message* Parent) {
 Message* JB_Tk__fHint(int Start, Message* Parent) {
 	Message* Rz = nil;
 	Rz = JB_Tk__NumberSub(Start + 1, Start);
-	if ((Rz->Func != kJB_SyxNum) or JB_Ring_HasChildren(Rz)) {
+	if ((Rz->Func != kJB_SyxNum) or (JB_Ring_HasChildren(Rz) or (!JB_Msg_Length(Rz)))) {
 		if (true) {
 			JB_Msg_Fail(Rz, nil);
 		}
@@ -10208,7 +10207,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1390]);
-	JB_FS_AppendInt32(_fsf0, (2026050615));
+	JB_FS_AppendInt32(_fsf0, (2026050716));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -33380,6 +33379,7 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner) {
 	}
 	JB_Tk__StartParse(Self);
 	JB__Tk__StopBars = 0;
+	JB__Tk__ErrorFlags = (kJB__ErrorFlags_DontStrip | kJB__ErrorFlags_Parse);
 	ErrorMarker OK = JB_Rec_Mark(JB_StdErr);
 	int Flags = kJB__Tk_kTemporal;
 	Syntax Func = Owner;
@@ -33403,6 +33403,7 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner) {
 	if (!JB_ErrorMarker_SyntaxCast(OK)) {
 		JB_SetRef(Into, nil);
 	}
+	JB__Tk__ErrorFlags = 0;
 	JB_SafeDecr(Into);
 	return ((Message*)Into);
 }
@@ -49921,7 +49922,6 @@ JB_Error* JB_Err_Constructor(JB_Error* Self, Message* Node, JB_String* Desc, uin
 	}
 	//visible;
 	JB_Msg_ConstructorEmpty(Self);
-	Self->ErrorFlags = 0;
 	JB_Incr2(Self->StackTrace, JB_LUB[0]);
 	JB_Incr2(Self->OriginalData, JB_LUB[0]);
 	Self->Position = -1;
@@ -49931,6 +49931,7 @@ JB_Error* JB_Err_Constructor(JB_Error* Self, Message* Node, JB_String* Desc, uin
 	JB_Incr2(Self->Path, Path);
 	Self->When = JB_Date__Now();
 	Self->Func = kJB_SyxSStr;
+	Self->ErrorFlags = JB__Tk__ErrorFlags;
 	JB_Err_UpgradeWithNode(Self);
 	return Self;
 }
@@ -60533,4 +60534,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -4936833027289700992 -4285477986178670903
+// 5049809296740295880 -4285477986178670903
