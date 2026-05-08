@@ -533,6 +533,16 @@ class list
 			_curr = N_
 		(self)
 
+
+	iterator fastflat
+		|| _curr = self
+		|| after = .FlatAfter
+
+		while ( _curr != after )
+			yield _curr (_curr)
+			_curr = _curr.FlatNext|...|
+		(self)
+
 	
 	iterator up
 		|| _curr = self
