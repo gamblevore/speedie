@@ -225,7 +225,7 @@ function BitTest (|int| i, |bool| Value)
 
 function SwapTest
 	maxasm 5				// Allows checking that opts are working properly!
-	|| x = 1				// speedie isnt returnign errors properly... via autocompletes
+	|| x = 1				// speedie isnt returning errors properly... via autocompletes
 	|| y = 2
 	swap (x) (y)
 	
