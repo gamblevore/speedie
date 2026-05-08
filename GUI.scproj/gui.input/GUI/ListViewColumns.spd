@@ -2,7 +2,6 @@
 
 // Perhaps I should make a tableview... as a "Role" of listview?? I mean... maybe?
 
-
 extend_module ListView
 	prototype ColumnFinder (|ListViewRow| self, |int| Column=-1, assigns:|string?| Value=nil, |string|)
 		description "Column -1 means the row's name (if hierarchical or single-column)
@@ -65,14 +64,13 @@ role ListViewCell (message)
 
 
 
-
 extend ListView
 	setter Columns (|listviewrow?| cols)
 		opt norefcounts
 		cpp_part SetColumnsMsg
 		if cols
 			|| Count = 0
-			if !cols.hasany // ugh
+			if !cols.HasAny						// ugh
 				|| arg = @arg.msg
 				arg.tag = cols.tag
 				cols = cols.wrapwith(arg)
@@ -89,7 +87,7 @@ extend ListView
 	
 	setter Columns (|string| value)
 		opt norefcounts
-		.Columns(/*KeepBrackets To Use function setter*/) = value.parse(@arg)|listviewrow|
+		.Columns( /*KeepBrackets To Use function setter*/ ) = value.parse(@arg)|listviewrow|
 	
 	
 	libinternal ColumnWidth (|Message| m, |int| w, |int|)

@@ -51,6 +51,11 @@ class Document (list)
 		.current = nil
 		._loadedfromfile = false
 		super.clear
+	
+	
+	setter DocParsed (|message?|)
+		.DocParsed = value
+		.JeeboxMode = .jeeboxmode.SyntaxIs(documentjeeboxmode.jeebox, value!=nil)
 		
 	
 	function MoveTo (|string| path)
@@ -260,10 +265,9 @@ class Document (list)
 		.WasJBin = bin // remove and use the mode instead?
 		if bin
 			.Jeeboxmode |= documentjeeboxmode.Expect
-			.DocParsed = data.parse
+			.DocParsed() = data.parse
 			if .DocParsed
 				data = .DocParsed.render
-				.Jeeboxmode |= documentjeeboxmode.Jeebox
 			
 		.filedate = f.modified
 		|| OldPos = (0,0)

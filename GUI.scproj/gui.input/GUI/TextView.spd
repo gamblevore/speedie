@@ -1487,14 +1487,11 @@ class TextView (GUIControl)
 				.ClearErrors
 		  else
 			|| e = StdErr.pop
-			if .JeeboxMode is Expect			// 
+			if .JeeboxMode is Expect			//
 				.myerror = e
 
 		|| J = .JeeboxMode(true)
-		(J isnt Jeebox)
-		if msg
-			(J is Jeebox)
-		.JeeboxMode = J
+		.JeeboxMode = J.SyntaxIs(DocumentJeeboxMode.jeebox, msg!=nil)
 
 		|| v = ._Viewing
 			v.DocParsed = msg
@@ -2106,7 +2103,12 @@ class TextView (GUIControl)
 		|| L = .text.Length
 		if Mode isnt expect
 			return L < 64K
-		return L < 4MB	// my largest jb file is 60k!
+		return L < 12MB	// My largest src file is 60k.
+						// however... editing large data-files can be nice.
+						// if this returns false... then we will say that "the file is invalid"
+						// sigh. but its not invalid! I guess... the .jeeboxmode needs to be updated.
+						// we could boost the size for now.
+		
 // todo: Just segment longer files into "chapters". No one needs 10000KB file word-wrapped.
 
 
@@ -2124,7 +2126,7 @@ class TextView (GUIControl)
 		cpp_Part ViewParseSub
 		if !.WillAttemptParse(Mode)
 			.ClearErrors						// more reliable
-			|| v = ._viewing
+			|| v = ._Viewing
 				v.DocParsed = nil
 			return nil
 		
@@ -2300,7 +2302,7 @@ class TextView (GUIControl)
 			.ClearErrors
 			if show
 				.SelDirect(d.TypingPlace, nil)
-				.scrollpos = d.scrollpos
+				.ScrollPos = d.scrollpos
 			return true
 		
 		.Clear("")

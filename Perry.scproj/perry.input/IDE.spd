@@ -161,9 +161,6 @@ class PerryIDE (Window)
 			if .editme.JeeboxMode is Expect
 				return e
 		return GUI.tooltip.useable
-	
-	
-	function PerryStatus (|string|)
 
 
 	function RemoveProjFromList
@@ -240,7 +237,7 @@ class PerryIDE (Window)
 		|| d = e.Document
 		if i == 0
 			.ExtraAppInfo(fs)		
-		  elseif i == 1
+		  elseif (i == 1)
 			|| t = e.text
 
 			fs <~ "Chars ${t.lengthutf8}   Lines ${t.linecount}"
@@ -283,7 +280,10 @@ class PerryIDE (Window)
 					fs <~ " in (${f.LastFileCount} \11)"
 				  else
 					fs.Length = 0
-					fs <~ "no source found"
+					if .IsEditingSource
+						fs <~ "no source found"
+					  else
+						fs <~ .path
 		
 		  elseif i == 3
 			|| img = GUI.screen.size.area * 4 * 2
