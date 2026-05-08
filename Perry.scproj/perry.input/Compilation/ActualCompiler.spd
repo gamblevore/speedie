@@ -4,6 +4,10 @@ function PerryIDE.ACTUAL_COMPILE
 	expect !.compilr (beep)  // wah?
 	require .FileList.SaveAll(DocumentState.saving)
 
+	// so should I save this here? Or in saveall?
+	// lets try here. Why not... in the textview itself?
+	// it would need to know whether to save or not...
+
 	|| args = ["--nocolor"]
 	if .name ~= "Speedie.scproj"
 		args <~ "--perry"

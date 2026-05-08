@@ -32,7 +32,7 @@ function SetBreaks (|message| breaks)
 	opt norefcounts
 	|| file = breaks.FirstName
 	require file ~= .editme.FilePath
-	for l in .editme.WrappedLines
+	for l.lines in .editme
 		(l isnt realbreakpoint)
 		(l isnt reached)
 	for line in breaks.last

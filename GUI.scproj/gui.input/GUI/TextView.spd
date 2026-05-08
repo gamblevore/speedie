@@ -36,6 +36,7 @@ class TextView (GUIControl)
 	|GUITextEvent?|				OnSelChanged
 	|GUITextLineEvent?|			OnBreakPoint
 	|GUITextLineBreakColor?|	OnDrawLineNumber
+	
 	|Document?|					_Viewing
 
 	|Error?|					MyError
@@ -175,7 +176,7 @@ class TextView (GUIControl)
 			return true
 	
 	
-	function AddBreak (|textviewline?| d=nil, |int| Pos=0,  |int|)
+	function AddBreak (|textviewline?| d=nil, |int| Pos=0)
 		opt norefcounts
 		if !d
 			d = .FindLine(pos)
@@ -185,28 +186,28 @@ class TextView (GUIControl)
 		|| Range = d.range
 		if (i == int.max) or (i < 0 and range.x <= 1)	// CANT BREAKPOINT
 			beep
-			return 0
+			return
 		
-		if (i < 0)										// ADD/REMOVE
-			range.y = range.x
-			|| x = --range.x
-			|| HasBreak = (self[x] == '\r')
-			|| OnBreak = .OnBreakPoint
-				require !(onbreak)(self, D, 1-HasBreak)	// true means cancel
-			
-			|| Line = ("\n" (HasBreak) "\r")
-			return .InsertText(Line, Range, false)
-
 		|| OnBreak = .OnBreakPoint
-			require !(onbreak)(self, D, -1)
-														// REMOVE
-		txt = txt.TrimMiddle(i, i+1)
+			(onbreak)(self, D, (i<0).dir)
+
+		|| dp = d.Position
+		if self[dp-1] == '\r'							// Outdated
+			.InsertText("\n", (dp-1, dp), false)
+			return	// i used to use \r as a breakpoint, but its not cool. So what if everything is off by 1?
+					// I can adapt my line-system to handle changes....
 		
 		|| Restore = .selrange
-		if Restore.x > d.position
-			Restore += txt.length - d.text.length
-		
-		.InsertText(txt, Range, false)
+		|| Break = ""
+		if (i < 0)										// ADD
+/			range.x2 = range.x
+			Break = "/"
+		  else											// REMOVE
+			i += dp
+			range = (i, i+1)
+			if Restore.x > dp
+				Restore += txt.length - d.text.length
+		.InsertText(Break, Range, false)
 		.selrange = Restore
 		
 		
@@ -1507,6 +1508,20 @@ class TextView (GUIControl)
 		return msg
 
 	
+	libinternal TrySaveDebugState (|guitextlineevent| ask)
+		// only problem is we don't save textview lines... sigh.
+		// so that needs to be fixed. OOOOFOFFFFF dont wrory you can doooo itttt
+		|| f = .needfirst
+		|| Has = f.CompilePos >= 0
+		|| IsDebugging = (ask)(self, f, 0) != 0
+		require IsDebugging != has
+		for s.lines in self
+			if IsDebugging
+				s.CompilePos = s.Position
+			  else
+				s.CompilePos = -1
+
+	
 	function InsertText (|string| S, |intrange| P, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
 		|| Same = (s == p.width) and .text[p.x, s]
@@ -1516,11 +1531,13 @@ class TextView (GUIControl)
 			i = p.x + s.length
 		|| UpdatedSel = (i,i)
 		if (SelectText)
-			UpdatedSel.x = p.x
-				
+			UpdatedSel.x = p.x		
 		if Same
 			.TypingPlaceTry(UpdatedSel, true, nil)
 		  else
+			|| ask = .OnBreakPoint
+				.TrySaveDebugState(ask)
+					
 			|| t = .text
 			|| nt = t.insert(s, p.x, p.width)
 			|| u = .undoer
@@ -2152,7 +2169,7 @@ class TextView (GUIControl)
 		(d isnt last)
 		d.tline = 0
 		d.vline = 0
-		d.Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
+		d._Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
 		return .NextVline(d, d, 0)
 
 
@@ -2338,6 +2355,12 @@ class TextView (GUIControl)
 		SingleLine = 1
 		SingleLineWithTabs = 2
 	
+	
+	iterator lines
+		|| D = .wrappedlines.first
+		while d
+			yield d
+			d = d.next
 	
 	module
 		|| CounterParts	= <(`{}[]()``''""||`)>

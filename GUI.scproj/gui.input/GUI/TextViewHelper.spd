@@ -19,17 +19,26 @@ class TextViewLine (list)
 		cpp_part Line
 	contains TextViewLine
 
-	|string|				Text
+	|string|				_Text		// should be removed. And the getter go through the parent!
 	|message?|				Message
 	|Error?|				LineError
 	|float|					UserInfo
-	|int|					AdderPos
+	|int|					AdderPos	// remove this?
 	|int|					vline
 	|int|					tline
+	|int|					CompilePos	// Position at compile time
+										// when we close a file we lose the info.
+										// The document could store a list of lines?
 	|TextLineFlags|			TextState
 
 	constructor (|int| p = 0)
 		.position = p
+		.CompilePos = -1
+	
+	function Text (|string|)
+		// I could make this using memorylayers... one per textview?
+		// then I always know the owner?
+		return ._text
 	
 	render
 		if !.parent
@@ -45,7 +54,7 @@ class TextViewLine (list)
 		.message = nil
 		.TextState = nil
 		.lineerror = nil
-		.text = ""
+		._text = ""
 
 
 	function textview.FindBackwardsIgnoringSpaces (|string| name, |int| pos, |codepoint|)
@@ -155,7 +164,7 @@ class TextViewLine (list)
 		
 		if r and !r.StartsAfter(range)
 			(self is BothBreaks) = r is breakpoint
-			.adderpos = .position // isn't it r.position?
+			.adderpos = .position
 			.message = r
 		  else
 			isnt breakpoint
@@ -292,7 +301,7 @@ class TextViewLine (list)
 
 
 	libinternal TakeEntireText (|string| txt, |ind| p, |ind|)
-		.Text = txt[p, int.max]
+		._Text = txt[p, int.max]
 		(self is AvoidLastChar) = .EndsWithLine
 		is last
 	
@@ -304,12 +313,12 @@ class TextViewLine (list)
 			return .TakeEntireText(txt, p)					// just give up wrapping
 
 		if p >= txt.length // edge case.
-			.Text = ""
+			._Text = ""
 			is last
 			return -1
 
 		|| i = txt.WrapSub(MaxWidth, IsInline, p)
-		.Text = txt[p, i]
+		._Text = txt[p, i]
 		(self is AvoidLastChar) = .EndsWithLine
 		if (i >= txt.length) and !.EndsWithLine
 			is last
