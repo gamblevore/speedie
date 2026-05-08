@@ -185,7 +185,7 @@ extend PerryIDE
 			is   editable
 			isnt drawsfocus
 			.ID				= "DrawMe"
-			.size = the~width by the~bottom to 0~before 
+			.size = the~width by the~bottom to 0~before
 			.gnormal.bg		= vec4(0.0, 0.81).px
 			.gnormal.edge	= vec4(0.2, 1.0).px
 			.gnormal.seps	= vec4(0.4, 1.0).px

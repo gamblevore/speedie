@@ -424,7 +424,7 @@ function EditMeSelError (GUITextLineEvent)
 function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
 	opt norefcounts
 	while row
-		|| nrow = row.step(i>0) 
+		|| nrow = row.step(i>0)
 		if !nrow or nrow.path != p
 			return row
 		row = nrow

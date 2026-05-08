@@ -6,11 +6,14 @@ class TextView (GUIControl)
 		cpp_part Text
 	|byte|						SingleLine
 
-	|bool|						GroupSaveAll
+	|bool|						GroupSaveAll		// needs a better name... not sure what.
 	|byte|						LineHeight
 	|bool|						IsALogTextView		// Is this textview used for displaying a Log.
 	|int8|						YAdjust
 	|MoveCode|					Alignment			// centered, left, right
+
+	|Error?|					MyError
+	|TextViewLine|				WrappedLines
 
 	|DocumentJeeboxMode|		_JeeboxMode			// used if the document is nil.
 	|byte|						_DrawInLineArea
@@ -30,17 +33,15 @@ class TextView (GUIControl)
 	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
-	
-	|TextViewLine|				WrappedLines
+	|Document?|					_Viewing
+	|DelayedShowError?|			_ErrorDelayer
+
+
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
 	|GUITextLineEvent?|			OnBreakPoint
 	|GUITextLineBreakColor?|	OnDrawLineNumber
 	
-	|Document?|					_Viewing
-
-	|Error?|					MyError
-	|DelayedShowError?|			_ErrorDelayer
 	|GUITextShowEvent?|			OnShowExtraInfo
 	|GUITextLineEvent?|			OnSelError
 
@@ -526,10 +527,8 @@ class TextView (GUIControl)
 					Found = 1
 			if Found
 				return Other
-			
-			
-		
-			
+	
+	
 	libinternal WordMoveSub (|ind| pos, |int| dir, |bool| ExpandContainers, |ind|)
 		opt norefcounts
 		ifn dir >= 0 or pos > 0
@@ -538,8 +537,8 @@ class TextView (GUIControl)
 		|| Adjust = (dir - 1) >> 1							// -1 = -1,   +1 = 0
 		|| ToFind = s[pos + Adjust]
 		if dir < 0 and ToFind == '.'
-			pos-- // MoveCodePoint instead?
-			ToFind = s[pos + adjust] // also adjust should use MoveCodePoint?
+			pos--											// MoveCodePoint instead?
+			ToFind = s[pos + adjust]						// also adjust should use MoveCodePoint?
 		|| FindCS = ToFind.charset
 
 		if FindCS is LettersUnderScore
@@ -608,7 +607,6 @@ class TextView (GUIControl)
 		if s and (s.position != .after)
 			return true
 
-
 	libinternal Sanity
 		opt norefcounts
 		for p in ._lines
@@ -619,6 +617,7 @@ class TextView (GUIControl)
 			p = s
 	}
 
+	
 	libinternal ShowTypingPlace (|ivec2| r)
 		opt norefcounts
 		|| i = (r.width > 0)|int|
@@ -776,7 +775,6 @@ class TextView (GUIControl)
 			return true
 		
 	
-
 	libinternal KeyDownTest (|keys| key, |bool|)
 		if self is editable
 			if .IsInline
@@ -995,11 +993,6 @@ class TextView (GUIControl)
 		return ._AutoCompleteString
 	
 	
-	function AutoCompleteBack (|int|)
-		opt inline, visible
-		return ._AutoCompleteBack
-
-
 	function CanAutoComplete (assigns:|byte|)
 		if ._CanAutoComplete != value
 			._CanAutoComplete = value
