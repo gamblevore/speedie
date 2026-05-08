@@ -44,9 +44,9 @@ module debugger
 			|| Pos = src.Position
 			|| ff = src.file
 			|| F = (ff.FileName (ff) "")
-			|| Curr = Raw.code(debugger.dbgLength)
+			|| PosInCode = Raw.code(debugger.dbgLength)
 			
-			"$F $Pos: $Curr"
+			"$F $Pos: $PosInCode"
 		"............."
 		}
 		
@@ -251,7 +251,7 @@ function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| P
 
 
 function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |CakeStack| Stack, |int| TabTo)
-	opt norefcounts 
+	opt norefcounts
 	index -= fn.Position
 	for v in fn.obj|[xvar]|
 		if v contains index
