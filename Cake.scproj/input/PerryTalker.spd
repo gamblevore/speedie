@@ -66,6 +66,8 @@ function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name,
 
 function __PerryView__ (cakevm.CakeChef)
 	description "We just hit a breakpoint! (or crashed)"
+	target debug
+		|| ASMIndex = .Index(stack.code)
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
 	if !p.IsOpen
 		app.Quit							// Stop the runaway!

@@ -2335,11 +2335,6 @@ class TextView (GUIControl)
 		|| j = .JeeboxMode
 		if j is Expect or Jeebox
 			data = data.SpacesToTabs
-// jeebox parses ; now... :]
-//			if (data contains ";") and !data.parse
-//				|| Q = "The text below contains ';'. Would you like to strip it?\n\n" + data.Preview(200)
-//				if Q.Confirm
-//					data = data.ReplaceAll(";", "")
 		.Insert(data)
 		return true
 

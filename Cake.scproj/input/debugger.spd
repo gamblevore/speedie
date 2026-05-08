@@ -37,20 +37,34 @@ module debugger
 				CakeBreak[Code] |= (1<<31)
 	
 	
-	function DebugList
-		target debug {
+	function DebugList (|string| name, |&uint| CakeBreak, |uint| Max)
+		target true {
+		".......$name......"
 		for Raw in .SourceMap
 			|| Src = raw.Location
-			|| Pos = src.Position
+			|| FilePos = src.Position
 			|| ff = src.file
 			|| F = (ff.FileName (ff) "")
-			|| PosInCode = Raw.code(debugger.dbgLength)
-			
-			"$F $Pos: $PosInCode"
-		"............."
+			|| PosInCode = Raw.code(Max)
+			|| Excl = ""
+			|| Op = 0
+			if PosInCode < max
+				if (Cakebreak[posincode]>>31)
+					Excl = "!!"
+				Op = (Cakebreak-256K)[posincode] >> 24
+				
+			"$F $FilePos: $PosInCode$Excl ($op)"
 		}
 		
 
+	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Max, |bool| Active, |bool|)
+		|| Code = self|uint|
+		if Code < Max
+			|| Curr = CakeBreak[Code] >> 31
+			if Curr != Active|uint|
+				return true
+		
+		
 	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| L, |bool| Active)
 		opt norefcounts
 		|| CakeBreak = cake.ActiveBreaks$
@@ -59,25 +73,31 @@ module debugger
 		|| BestValue = 0
 		|| BestCount = 0
 		
-//		.DebugList
+		target debug
+			debugger
+			.DebugList("Start", cakebreak, l)
 		
 		for Src in .SourceMap
-			|| Score = Src.MatchScore(path, position, after, l)
-			if Score > BestScore
-				BestScore = Score
-				BestValue = Src
-				BestCount = 1
-			  elseif BestScore and (Score == BestScore)
-				BestCount++
+			if src.NeedsChange(cakebreak, L, active)
+				|| Score = Src.MatchScore(path, position, after, l)
+				if Score > BestScore
+					BestScore = Score
+					BestValue = Src
+					BestCount = 1
+				  elseif BestScore and (Score == BestScore)
+					BestCount++
 		
 		require BestCount
-		if BestCount == 1 // same thing as below, but faster...
-			return .SetUserBreak(CakeBreak, BestValue, active)
-		
-		for Src in .SourceMap
-			|| Score = Src.MatchScore(path, position, after, l)
-			if Score == BestScore
-				.SetUserBreak(CakeBreak, Src, active)			
+		if BestCount == 1										// same thing as below, but faster...
+			.SetUserBreak(CakeBreak, BestValue, active)
+		  else
+			for Src in .SourceMap
+				|| Score = Src.MatchScore(path, position, after, l)
+				if src.NeedsChange(cakebreak, L, active) and (Score == BestScore)
+					.SetUserBreak(CakeBreak, Src, active)			
+
+		target debug
+			.DebugList("After", cakebreak, l)
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |bool| Active)
