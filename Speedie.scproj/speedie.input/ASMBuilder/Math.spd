@@ -968,7 +968,7 @@ extend Assembler
 		
 		if src isnt const
 			if !src.reg
-				debugger
+//				debugger // setinlinedest makes this happen. Why?
 				(src is const)
 			(Dest is const) = (src is const)
 			

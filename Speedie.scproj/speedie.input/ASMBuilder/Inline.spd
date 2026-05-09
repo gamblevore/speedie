@@ -75,6 +75,33 @@ struct InlineInfo
 
 
 extend assembler {
+function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|)
+	opt norefcounts
+	dest.tmpcheck
+	|| dest2 = dest
+	if (dest isnt discard) and (!dest.reg or dest is temp)
+		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
+		dest2.tmpcheck
+
+	
+	dest2 = dest2.simplify
+	dest2.µtype = fn.ASMReturn.ASMRegType
+	if !dest2.reg
+		(dest2 is discard)
+
+	target false // sigh... a nice idea but causes deep issues somewhere. not worth the pain to get this opt.
+		if 	fn.ReturnedVars == 1
+			|| last = fn.SourceArg.last
+			if (last and last.asmtype is kReturn)
+				(dest2 as= (dest & asmreg.InlineCopyable))	// <-- Seems to cause a crash in assign somehow...
+			// needs to be looked at properly...
+			// Also causes slightly different behaviour.
+			// Assigns is now getting vars with reg0 that aren't const??
+		
+	return dest2
+				
+	
+	
 function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
 	|| OV = .OpenVars
@@ -85,19 +112,8 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	st.fn = fn
 	st.BranchDepth = 0
 	
-	dest.tmpcheck
-	if (dest isnt discard) and (!dest.reg or dest is temp)
-		debugat 0
-		dest = .CallFunc(prms, dest, fn)			// better to put this in the right place...
-		dest.tmpcheck
-													// also, temps force subfuncs to store all!
-			
-	dest = dest.simplify
-	dest.µtype = fn.ASMReturn.ASMRegType
-	if !dest.reg
-		(dest is discard)
-	st.Return = dest
-				
+	st.Return = .SetInlineDest(prms, dest, fn)
+
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
 

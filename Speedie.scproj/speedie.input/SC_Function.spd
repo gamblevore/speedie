@@ -1763,6 +1763,8 @@ function Tran_Return (TranFunc)  // exitter
 	node.ASMType = ASMType.kreturn
 	
 	expect (fn) (node, "Only use this on functions")
+
+	fn.ReturnedVars++
 	node.obj = fn.returntype
 	ifn node.islast and (node in fn.sourcearg)
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")

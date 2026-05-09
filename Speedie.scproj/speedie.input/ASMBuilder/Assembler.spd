@@ -474,7 +474,8 @@ struct Assembler
 	
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		dest.µType = DataTypeCode.bool
-		(dest as= asmreg.PreferEqul)						// easier to optimise.
+//		(dest as= asmreg.PreferEqul)						// easier to optimise.
+// unused?
 		|| x = .µ(exp, dest)
 		if x.IsBool
 			return x
