@@ -2109,15 +2109,16 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__ClassInfo_Stateless ((ClassInfo)512)
 #define kSC__ClassInfo_Symbol ((ClassInfo)8192)
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)32)
-#define kSC__CompilerStage_Baking ((CompilerStage)7)
-#define kSC__CompilerStage_CppExport ((CompilerStage)8)
+#define kSC__CompilerStage_Baking ((CompilerStage)8)
+#define kSC__CompilerStage_CppExporting ((CompilerStage)9)
 #define kSC__CompilerStage_Hungry ((CompilerStage)5)
-#define kSC__CompilerStage_Import ((CompilerStage)1)
+#define kSC__CompilerStage_Importing ((CompilerStage)1)
 #define kSC__CompilerStage_Initialising ((CompilerStage)0)
 #define kSC__CompilerStage_NilChecking ((CompilerStage)3)
-#define kSC__CompilerStage_Packing ((CompilerStage)6)
+#define kSC__CompilerStage_Packing ((CompilerStage)7)
 #define kSC__CompilerStage_RefCounts ((CompilerStage)4)
-#define kSC__CompilerStage_Transform ((CompilerStage)2)
+#define kSC__CompilerStage_TextAssembling ((CompilerStage)6)
+#define kSC__CompilerStage_Transforming ((CompilerStage)2)
 #define kJB__ControlClipMode_Debug ((int)4)
 #define kJB__ControlClipMode_SlideBackInParent ((int)1)
 #define kJB__ControlClipMode_SlideBackInWindow ((int)2)
@@ -4693,7 +4694,9 @@ int SC_Reg_BitCount(ASMReg Self);
 
 int SC_Reg_BitLoss(ASMReg Self);
 
-ASMReg SC_Reg_BoolAnswer(ASMReg Self);
+ASMReg SC_Reg_BoolAnswerMaybeBugged(ASMReg Self);
+
+ASMReg SC_Reg_BoolAnswerOK(ASMReg Self);
 
 int SC_Reg_ByteCount(ASMReg Self);
 
@@ -11324,8 +11327,10 @@ inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self) {
 
 inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self) {
 	Self = SC_Reg_xC2xB5TypeSetWithTC(Self, kJB__TC_bool);
-	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_AlreadyNegated, true);
-	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Negate, (!true));
+	if (SC_Reg_SyntaxIs(Self, kSC__Reg_Negate)) {
+		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_AlreadyNegated, true);
+		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Negate, (!true));
+	}
 	return Self;
 }
 
