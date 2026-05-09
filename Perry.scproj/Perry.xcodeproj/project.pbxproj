@@ -215,6 +215,10 @@
 		ACB529C02EE9EFF100D6524D /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC12961F9B2005EFB9D /* JB_Main.cpp */; };
 		ACC38E772F0580BD00E6BE6C /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */; };
 		ACC38E782F0580C000E6BE6C /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */; };
+		ACE6EA3A2FAFC0F70085A66A /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */; };
+		ACE6EA3B2FAFC0F70085A66A /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */; };
+		ACE6EA3C2FAFC14B0085A66A /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C32EE9A6DC004D73E0 /* FF_ARM64.S */; };
+		ACE6EA3D2FAFC14B0085A66A /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC2218C22EE9A6DC004D73E0 /* FF_Intel.S */; };
 		ACE989EC2EF043BF00526C32 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */; };
 		ACE989ED2EF043BF00526C32 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */; };
 		ACE989EE2EF043BF00526C32 /* JB_Dylib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */; };
@@ -945,6 +949,7 @@
 				AC13B25A2EE1E77300BF1567 /* JB.cpp in Sources */,
 				AC13B25B2EE1E77300BF1567 /* JB_MSR.cpp in Sources */,
 				AC13B25C2EE1E77300BF1567 /* JB_BasicIO.cpp in Sources */,
+				ACC38E772F0580BD00E6BE6C /* FF_ARM64.S in Sources */,
 				ACC38E782F0580C000E6BE6C /* FF_Intel.S in Sources */,
 				AC13B25D2EE1E77300BF1567 /* JB_DirReaderUnix.cpp in Sources */,
 				AC13B25E2EE1E77300BF1567 /* JB_Pico.cpp in Sources */,
@@ -964,7 +969,6 @@
 				AC13B26C2EE1E77300BF1567 /* JB_List.cpp in Sources */,
 				AC13B26D2EE1E77300BF1567 /* JB_Run.cpp in Sources */,
 				AC13B26F2EE1E77300BF1567 /* JB_DirReaderWin32.cpp in Sources */,
-				ACC38E772F0580BD00E6BE6C /* FF_ARM64.S in Sources */,
 				AC13B2702EE1E77300BF1567 /* JB_File.cpp in Sources */,
 				AC13B2712EE1E77300BF1567 /* JB_Array.cpp in Sources */,
 				ACE989EE2EF043BF00526C32 /* JB_Dylib.cpp in Sources */,
@@ -1020,6 +1024,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACE6EA3C2FAFC14B0085A66A /* FF_ARM64.S in Sources */,
+				ACE6EA3D2FAFC14B0085A66A /* FF_Intel.S in Sources */,
 				AC528EAE2961F99F005EFB9D /* JB_Errors.cpp in Sources */,
 				AC528EB72961F99F005EFB9D /* JB_Compress.cpp in Sources */,
 				AC528EA92961F99F005EFB9D /* JB_File.cpp in Sources */,
@@ -1099,6 +1105,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACE6EA3A2FAFC0F70085A66A /* FF_ARM64.S in Sources */,
+				ACE6EA3B2FAFC0F70085A66A /* FF_Intel.S in Sources */,
 				ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */,
 				ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */,
 				ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */,
