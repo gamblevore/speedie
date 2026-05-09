@@ -51,26 +51,34 @@ extend_module funnyword
 			return upon
 		|| f = .first
 		|| fn = f.Length
-		if !f.SyntaxCast			.loadto(f, .firstwords)
+		if !f.SyntaxCast
+			.loadto(f, .firstwords)
 		return upon //// //// //// ////
 		
 		printline f
-		if !.second			.loadto(.second, .secondwords)
-		|| fs = FastString.shared		if upon
+		if !.second
+			.loadto(.second, .secondwords)
+		|| fs = FastString.shared
+		if upon
 			fs <~ upon
-			fs <~ ' '		|| done = false
+			fs <~ ' '
+		|| done = false
 		for i in n
-			for 100				|| w1 = .first.now			#loop
+			for 100
+				|| w1 = .first.now			#loop
 				|| w2 = .Second.now			#loop
 				if .accept(w1, w2)
 					if done
 						fs <~ ", "
 					done = true
-					for 50 * 0.5[]						|| extra = .First[]!
-						if extra.Adjective and .Accept(w1, extra) and .Accept(w2, extra)							fs <~ extra.name
+					for 50 * 0.5[]
+						|| extra = .First[]!
+						if extra.Adjective and .Accept(w1, extra) and .Accept(w2, extra)
+							fs <~ extra.name
 							fs <~ " "
 							exit
-												fs <~ w1.name
+							
+					fs <~ w1.name
 					fs <~ " "
 					fs <~ w2.name
 					exit
