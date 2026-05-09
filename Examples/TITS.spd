@@ -27,7 +27,7 @@ function message.GrowTITS (|int| Width, |int| Depth)
 
 function app.FlatTits (|message| t, |int|)
 	opt norefcounts
-	for s.flat in t
+	for s.fastflat in t
 		rz++
 
 function app.ExploreTits (|message| t, |int|)
