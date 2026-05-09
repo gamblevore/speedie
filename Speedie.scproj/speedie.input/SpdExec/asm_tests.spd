@@ -197,10 +197,10 @@ function Intrinsics (|vec4| x, |vec4| y, |float| a, |float| b)
 	|| z = x • y
 	|| z2 = x cross x
 	|| z3 = x.Sum
-	|| z4 = x.sine
+	|| z4 = x.sin
 	|| z5 = x.Length
 	|| z6 = a mod b
-	|| z7 = a.sine
+	|| z7 = a.sin
 	|| z8 = b.Length
 	
 	
@@ -703,21 +703,21 @@ function AddShifted (|bool| boolie)
 
 
 function TernTest (|int| a, |int| b, |int|)
-	rz = (a, b+1)(a)
+	rz = (a (a) b+1)
 	rz <<= 1
 
 
 function TernTest (|int| a, |int| b, |int| c, |int|)
-	return (a, b)(c)
+	return (a (c) b)
 
 
 function AndOrRest2 (|int| a, |int| b) // more stragglers
 	if 1 and b: b = 5
 	if 1 or  b: a = 2
 	if 0 and b: b = 4	
-
-	|| x3 = (a, b)(1)
-	|| x4 = (a, b)(0)
+					//
+	|| x3 = (a (1) b)
+	|| x4 = (a (0) b)
 	if a or a
 		x3 = (b or b)|int|
 	  else

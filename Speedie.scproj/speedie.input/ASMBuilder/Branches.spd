@@ -302,7 +302,6 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 	|| mode = ASMReg.CondRequest.negate(opp is OR)
 	return .Exists(mode, req, exp).fat!
 
-
 	
 function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
 	opt norefcounts
@@ -332,7 +331,7 @@ function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |A
 	na &= 1
 	if na == nb&1
 		.Rewind(start+1, last+1)
-		if ra iz rb				// a and/or a
+		if ra iz rb												// a and/or a
 			return bowl
 		start.RegInput(1) = rB
 		start.prms[3] = 63
@@ -367,18 +366,19 @@ function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Op
 		if asmtrapper == -1
 	|| first = .µBoolInto(A, dest)
 	if first is Const
-		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
+		return .BoolConst1(b, dest, opp, first).boolanswermaybebugged	// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a, first, opp)						// AND/OR
 	|| Second = .µBoolInto(B, dest)
 	if Second is Const
-		return .BoolConst2(first, second, opp, jump).boolanswer
+		return .BoolConst2(first, second, opp, jump).boolanswermaybebugged
 	
 	JUMP.JumpTo(.curr)
 	
 	if first.IsBool and Second.IsBool
-		return dest.boolanswer
+		return dest.boolanswermaybebugged
 
+	// exists always handles negate...
 	return .Exists(dest, dest, A.next!)
 
 
@@ -444,12 +444,13 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		fake.const = KF|int|
 		(first is condanswer)
 		first.fatindex = fake.index
-		return first.boolanswer						// only way around this. Cos we got asm-reg(0)
+		return first.boolanswerok						// only way around this. Cos we got asm-reg(0)
 
 	|fatrange| Br2
 	|| second = .Branch(B, Br2, dest is negate)
 	.BranchToCurr(OrTest)
 
+	// why do we not call .boolanswerok on these though?
 	if Br2.always
 		// a or 1
 		// 0 or 1

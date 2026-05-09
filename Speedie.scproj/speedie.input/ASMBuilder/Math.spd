@@ -9,8 +9,9 @@ extend asmreg
 	function BoolNegateAnswer (|asmreg|)
 		opt inline
 		.µtype = DataTypeCode.bool
-		is AlreadyNegated
-		isnt negate
+		if self is negate
+			is AlreadyNegated
+			isnt negate
 		return self
 		
 	function BoolCondAnswer (|asmreg|)
@@ -20,7 +21,35 @@ extend asmreg
 			is CondAnswer
 		return self
 		
-	function BoolAnswer (|asmreg|)
+	function BoolAnswerOK (|asmreg|)
+		return .boolcondanswer.BoolNegateAnswer
+
+	function BoolAnswerMaybeBugged (|asmreg|)
+		// not sure this is being used properly
+		// the issue is negate. BoolNegateAnswer is used to say that something is already negated...
+		// but only works if it really gets negated.
+		// And Im not sure the callers of boolanswer are doing that.
+		// boolconst1 does, but boolconst2 doesnt seem to!
+		
+		// unless µBoolInto does it, via .µ and .Exists which might do it internally?
+		// if they DO... wouldn't THEY clear the negatedness? So the call is not needed still?	
+
+		// I think lets wait for bugs to happen... if none do... this is probably correct.	
+		// otherwise we need to investigate every boolanswer.
+		// well... previously boolanswer would say that its already negated...
+		// sigh. IDK. just leave it.
+		
+		// ConstCompareInt is similar... its calling .ConstCompareIntSub and .NumToReg
+		// so are one of them doing the negation?
+		// well, numtoreg cant cos its already done. And ConstCompareIntSub doesnt
+		// so... i guess its wrong? it is NOT negating?
+		
+		// thats 9 more pieces of shit and my energy is exhausted. I can't do this. I want to...
+		// get out of this realm. For a while. For some time... a long... long time.
+		// how else can I get my energy back?
+		
+		// i hate feeling drained.
+
 		return .boolcondanswer.BoolNegateAnswer
 
 	
@@ -95,7 +124,7 @@ extend Assembler
 
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
 		|| negate = dest is negate
-		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
+		|| Res = dest.BoolAnswerOK						// Hmmm... so what should it be?
 		if  L is Const  and  R is Const
 			.Nop2Consts(r, l)
 			|| num = ((l.const==r.const) != negate)|int|
@@ -142,7 +171,7 @@ extend Assembler
 
 	function EqualsSame (fn_opasm)
 		|| num = (dest isnt negate)|int|
-		return .NumToReg(exp, dest, num, DataTypeCode.bool).BoolAnswer
+		return .NumToReg(exp, dest, num, DataTypeCode.bool).BoolAnswerok
 	
 	
 	function Equals (fn_opasm)
@@ -159,7 +188,7 @@ extend Assembler
 		  else
 			rz = .CompareFloat(dest, l, r, exp, 2)						
 			
-		rz = rz.boolanswer
+		rz = rz.boolanswerok // all of these handle negate!
 	
 		
 	function NotEq  (fn_opasm)
@@ -216,7 +245,7 @@ extend Assembler
 	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		.Nop2Consts(r, l)
 		|| Result = .ConstCompareFloatSub(l, r, mode)
-		return .NumToReg(exp, dest.BoolAnswer, result|int|, datatypecode.bool)
+		return .NumToReg(exp, dest.BoolAnswerMaybeBugged, result|int|, datatypecode.bool)
 		
 		
 	function ConstCompareFloatSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
@@ -246,7 +275,7 @@ extend Assembler
 	function ConstCompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		.Nop2Consts(r, l)
 		|| Result = .ConstCompareIntSub(l, r, mode)
-		return .NumToReg(exp, dest.BoolAnswer, result|int|, datatypecode.bool)
+		return .NumToReg(exp, dest.BoolAnswerMaybeBugged, result|int|, datatypecode.bool)
 		
 		
 	function ConstCompareIntSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)

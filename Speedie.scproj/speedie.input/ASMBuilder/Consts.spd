@@ -45,14 +45,14 @@ extend Assembler
 				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		
-//		if  ("jb_main".trap)  and  (v == 4)  and  (.BreakRequest & BreakPoint)
 		|| fat = exp.KNST(dest)
 		return fat.ConstFill(dest, v)
 
 
 	function NumToReg (|message| exp, |asmreg| Reg, |int64| K, |datatypecode| SrcType, |asmreg|)
 		reg.fatindex = 0 // nice
-		if reg is ContainsAddr			(reg isnt containsaddr) // hmmm never should happen.
+		if reg is ContainsAddr			
+/			(reg isnt containsaddr) // hmmm never should happen.
 		if K
 			return .LoadNumber(exp, K, srctype.specialreg, Reg)
 		reg.µType = SrcType

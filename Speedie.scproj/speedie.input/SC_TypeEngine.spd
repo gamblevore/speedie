@@ -1577,6 +1577,7 @@ function TypeOfRel (ExprResolver)
 		return (LC (leftvec) RC).NotLocal						// return bigger
 
 	if lc is IntendedAsReturn
+		using ln
 		ln = ln.MakeAccess0
 		lc = lc.internal!
 		ln.obj = lc // put inside MakeAccess0?

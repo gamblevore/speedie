@@ -20,13 +20,13 @@ extend SCFunction
 		// File Num goes at the top, to make it more significant
 
 		|| FileNum = .tag|uint|>>5
-		// NO SOUL GOES IN SIDE THE MACHINE. NOT THIS SIDE ANYHOW.
-		
-		target debug
-			if (!Filenum or FileNum >= 300) and (.msgowningfunc isnt initfunc)
-				printline .objectid
-				printline self
-				debugger
+
+		target false
+			if compiler isnt textassembling
+				if (!Filenum or FileNum >= 300) and (.msgowningfunc isnt initfunc)
+					printline .objectid
+					printline self
+					debugger
 		return (FileNum << 21) ||| (.Position&(21~bits))
 	
 	

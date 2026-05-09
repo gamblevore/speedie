@@ -155,7 +155,7 @@ module PackMaker
 		
 	function MakePack 
 		opt norefcounts
-		compiler.During = compilerstage.Packing
+		(compiler is Packing)
 		.OrderLibGlobs
 		assembler.sh.ASMInit
 		PackMaker.AddAll
@@ -167,7 +167,7 @@ module PackMaker
 	
 	function BakePackToDisk 
 		|jbin| j = Compiler.ProductPath.OutputStream$
-		Compiler.During = CompilerStage.Baking
+		(Compiler is Baking)
 
 		j.RunHeader("/usr/local/bin/cake")
 		j.Enter(@tmp, "cake")

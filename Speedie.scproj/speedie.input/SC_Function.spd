@@ -315,7 +315,7 @@ function @scfunction.TransformAll
 	if !globinits.HasActualCode 
 		|| fn = compiler.AppInitCode.find(@func, @thg, "InitAppGlobals_")
 			fn.parent.remove
-	Compiler.During = compilerstage.Transform
+	(Compiler is Transforming)
 	for f in compiler.FuncList
 		require !stderr.TooMany
 		f.Transform

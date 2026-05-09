@@ -22,6 +22,7 @@ module TextAssembler
 
 	function Assemble (|message| msg)
 		opt norefcounts
+		(compiler is TextAssembling)
 		for ch.fast in msg
 			if ch istmp "asm"
 				.textfunc(ch)

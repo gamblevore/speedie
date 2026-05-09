@@ -92,6 +92,10 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 		dest.tmpcheck
 													// also, temps force subfuncs to store all!
 			
+	dest = dest.simplify
+	dest.µtype = fn.ASMReturn.ASMRegType
+	if !dest.reg
+		(dest is discard)
 	st.Return = dest
 				
 	.InlineDepth = ++ID
@@ -100,11 +104,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
 	if dest isnt ExitFunction
 		.state.TailInlineable = false
-	
-	dest = dest.simplify
-	dest.µtype = fn.ASMReturn.ASMRegType
-	if !dest.reg
-		(dest is discard)
+
 	
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
@@ -125,6 +125,9 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	opt norefcounts
 	LL.Start = .curr
 
+//	if "jb_main".trap
+//		if fn == "JB_Array_SyntaxCast"
+	
 	|SavedRegisters| svregs
 	|InlineInfo| Info
 

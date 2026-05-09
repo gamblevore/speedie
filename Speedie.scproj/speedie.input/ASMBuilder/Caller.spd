@@ -185,8 +185,8 @@ function assembler.DepthOK (|scfunction| fn, |bool|)
 
 function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
 	rz = fn.FPackID + 31
-	if rz <= 31							// failed!
-		if !Compiler.InPerry					// shut the compiler up
+	if rz <= 31										// failed!
+		if !Compiler.InPerry						// shut the compiler up
 			if !fn.islibrary or !.state.fn.islibrary
 				error (exp, "Missing PackID[1]")
 		rz = 0xFFFF	
@@ -196,6 +196,9 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
+	
+//	if "jb_main".trap
+//		if prms.AsFunc == "JB_Array_SyntaxCast"
 	
 	.ParentSanity
 	

@@ -194,7 +194,7 @@ function CompileAll
 	if !compiler.inperry
 		intrinsics.Process
 		if Options.ModeCpp
-			compiler.during = compilerstage.CppExport
+			(compiler is CppExporting)
 			.Timer( "Export Cpp" )
 			Cpp_Export.ExportAllSource
 
@@ -390,7 +390,7 @@ function PrepareAST
 
 
 function ImportAll 
-	compiler.during = compilerstage.Import
+	(compiler is Importing)
 	.Timer( "Read" )
 	require .Stage( "Finding Files" )
 	
@@ -601,7 +601,7 @@ function PostInitCodeCall
 
 
 function InitCompiler
-	compiler.During = compilerstage.Initialising
+	(compiler is Initialising)
 	require (.Projects.fileCh("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
@@ -734,7 +734,7 @@ function NewConst (|scdecl| d)
 
 function DoRefAnalysis
 	opt norefcounts
-	compiler.during = compilerstage.RefCounts
+	(compiler is RefCounts)
 	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
 		if f.IsARealSpdFunc
@@ -1006,13 +1006,14 @@ datatype CompilerStage (int)
 	constants
 		|CompilerStage|
 		Initialising
-		Import
-		Transform
+		Importing
+		Transforming
 		NilChecking
 		RefCounts
 		Hungry
+		TextAssembling
 		Packing
 		Baking
-		CppExport
+		CppExporting
 
 	

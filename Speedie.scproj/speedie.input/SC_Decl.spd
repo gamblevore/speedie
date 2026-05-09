@@ -946,6 +946,7 @@ class SCDecl (SCObject) {
 		|| l = @thg + .name
 		return l.MakeAccess0
 	
+	
 	function message.MakeAccess0 (|message|)
 		opt norefcounts
 		rz = .wrapwith(@acc)
