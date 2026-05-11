@@ -209,13 +209,13 @@ function message.CopyDebugData (|message| InputRow, |int| Depth)
 	.CopyNames(Inputrow)
 	|| InputArg = InputRow.last
 	if InputArg == @arg
-		.givearg.StitchAndFixup(InputArg, Depth)
+		.givearg.ReStitchAndFixup(InputArg, Depth)
 		
 	
 
-function message.StitchAndFixup (|message| NewList, |int| Depth)
+function message.ReStitchAndFixup (|message| NewList, |int| Depth)
 	opt norefcounts
-	|| O = .last
+/	|| O = .last
 	while (|| N = NewList.Last)
 		if !o
 			.first = n
@@ -252,9 +252,12 @@ function listviewrow.ImproveVar (|int| Depth=0)
 			s1.name = .name
 			s1.func = @thg
 
+	|| dbname = .DebugName // not sure why it needs some bytes removed?
+	|| f = .first
+		f.name = dbname
 	|| fs = VarPrinter
 	fs.Length = 0
-	fs <~ .DebugName
+	fs <~ dbname
 	fs <~ ":"
 	fs <~ (' ', 6 - fs.LengthUTF8)
 	.PerryAppendMsg("", 3)
@@ -368,7 +371,7 @@ function perryide.UpdateStack (|message| stack)
 			for s in l
 				s|ListViewRow|.ImproveVar
 
-	StackSrc.StitchAndFixup(arg, 0)
+	StackSrc.ReStitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
 	
 	|| Break = stack != "stack"
@@ -430,32 +433,4 @@ function perryide.CollectExpansion
 			j.exit
 	
 	.SendJbin(j)
-
-
-/*
-Assumptions:
-	* Expansions only change when its visible.
-	* The program is stopped when expand/collapse changes.
-	
-	* Lets say is everything nicely synced up. We press run and hit a new break.
-	
-	* The old expansion info reflects what we HAD... the stack names/numbers might be different.
-	* We aren't going to stitch things on the cake-side. I don't wanna reimplement.
-	
-	So... lets assume we get the new stack... restitch stuff... 
-	
-	then reapply the expansion? seems... it could go wrong.
-	
-	So what then? is there a better way? I can't think of any. Lets make some possibilities:
-	
-	* Perry restitches, then reapplies the old expansion info?
-	
-	* What if we previously had stuff expanded, and its no longer expanded?
-		* Maybe thats OK? I mean... if it closed cos of running... then its expected?
-	
-	* OK... so... how do we know if a function changed? or what functions we are in?
-	
-	* Lets do it by source-position? So where to get the sourcepos from?
-		* its in ONE of our inputs, right?
-*/
 
