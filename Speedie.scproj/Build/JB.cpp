@@ -3506,7 +3506,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[449]);
-	JB_FS_AppendInt32(_fsf0, (2026050911));
+	JB_FS_AppendInt32(_fsf0, (2026051118));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10207,7 +10207,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1390]);
-	JB_FS_AppendInt32(_fsf0, (2026050911));
+	JB_FS_AppendInt32(_fsf0, (2026051118));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -21149,7 +21149,6 @@ void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs) {
 		 else {
 		}
 		if (!Fn) {
-			JB_DoAt(1);
 			JB_FS_AppendString(Fs, JB_LUB[591]);
 			return;
 		}
@@ -24902,7 +24901,13 @@ ASMReg SC_Pac_RealTernary(Assembler* Self, Message* Exp, ASMReg Dest, Message* A
 
 ASMReg SC_Pac_ReDestWithFATReg(Assembler* Self, FatASM* F, ASMReg Dest) {
 	int O = F->_Outputs;
-	return SC_Pac_ReDestWithFATRegUint(Self, F, Dest, JB_Int_Log2(O));
+	if (O) {
+		return SC_Pac_ReDestWithFATRegUint(Self, F, Dest, JB_Int_Log2(O));
+	}
+	if (true) {
+		SC_FAT_SyntaxExpect(F, kJB__Rec_NonFatal);
+	}
+	return ((ASMReg)0);
 }
 
 ASMReg SC_Pac_ReDestWithFATRegUint(Assembler* Self, FatASM* F, ASMReg Dest, uint A) {
@@ -25148,6 +25153,21 @@ ASMReg SC_Pac_SetConst(Assembler* Self, Message* Exp, int64 Value, ASMReg Ml, AS
 	return ((ASMReg)0);
 }
 
+ASMReg SC_Pac_SetInlineDest(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn) {
+	SC_Reg_TmpCheck(Dest, false);
+	ASMReg Dest2 = Dest;
+	if (((!SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard))) and ((!SC_Reg_Reg(Dest)) or SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp))) {
+		Dest2 = SC_Pac_CallFunc(Self, Prms, Dest, Fn);
+		SC_Reg_TmpCheck(Dest2, false);
+	}
+	Dest2 = SC_Reg_Simplify(Dest2);
+	Dest2 = SC_Reg_xC2xB5TypeSetWithTC(Dest2, SC_Decl_ASMRegType(SC_Func_ASMReturnWith0(Fn)));
+	if (!SC_Reg_Reg(Dest2)) {
+		Dest2 = SC_Reg_SyntaxIsSet(Dest2, kSC__Reg_Discard, true);
+	}
+	return Dest2;
+}
+
 ASMReg SC_Pac_SetRegister(Assembler* Self, int Changed, ASMReg NopDest, FatASM* Value) {
 	int N = 0;
 	FatASM* Start = Self->FuncStart_;
@@ -25362,18 +25382,7 @@ ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction*
 	St->ParentVars = SC_Pac_OpenVars(Self);
 	St->Fn = Fn;
 	St->BranchDepth = 0;
-	SC_Reg_TmpCheck(Dest, false);
-	if (((!SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard))) and ((!SC_Reg_Reg(Dest)) or SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp))) {
-		JB_DoAt(0);
-		Dest = SC_Pac_CallFunc(Self, Prms, Dest, Fn);
-		SC_Reg_TmpCheck(Dest, false);
-	}
-	Dest = SC_Reg_Simplify(Dest);
-	Dest = SC_Reg_xC2xB5TypeSetWithTC(Dest, SC_Decl_ASMRegType(SC_Func_ASMReturnWith0(Fn)));
-	if (!SC_Reg_Reg(Dest)) {
-		Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Discard, true);
-	}
-	St->Return = Dest;
+	St->Return = SC_Pac_SetInlineDest(Self, Prms, Dest, Fn);
 	Self->InlineDepth = (++ID);
 	Self->DeepestInline = JB_int_OperatorMax(ID, Self->DeepestInline);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_ExitFunction)) {
@@ -25630,7 +25639,6 @@ ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest) {
 
 ASMReg SC_Pac_xC2xB5BoolInto(Assembler* Self, Message* Exp, ASMReg Dest) {
 	Dest = SC_Reg_xC2xB5TypeSetWithTC(Dest, kJB__TC_bool);
-	(Dest = SC_Reg_OperatorAs(Dest, kSC__Reg_PreferEqul));
 	ASMReg X = SC_Pac_xC2xB5(Self, Exp, Dest);
 	if (SC_Reg_IsBool(X)) {
 		return X;
@@ -59498,6 +59506,7 @@ void SC_Func__Tran_ResultFinish(SCFunction* F, Message* R_z, SCNode* Space) {
 		JB__Tk_Using.Position = (JB_Msg_After(Last) + 1);
 		Message* Ret = JB_Msg_Msg(Src, kJB_SyxTmp, JB_LUB[464]);
 		(SC_Msg_ASMTypeSet(Ret, kSC__ASMType_kReturn));
+		(++F->ReturnedVars);
 		if (Used) {
 			JB_SetRef(JB_Msg_Msg(Ret, kJB_SyxThg, JB_LUB[1339])->Obj, D);
 		}
@@ -59518,6 +59527,7 @@ bool SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		JB_Msg_Fail(Node, JB_LUB[892]);
 		return nil;
 	}
+	(++Fn->ReturnedVars);
 	JB_SetRef(Node->Obj, Fn->ReturnType);
 	if (!(JB_Tree_IsLast(Node) and (JB_Tree_OperatorIn(Node, SC_Func_SourceArg(Fn))))) {
 		if (SC_Func_SyntaxIs(Fn, kSC__FunctionType_ConOrDes)) {
@@ -60543,4 +60553,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1621696549709930760 -4285477986178670903
+// 4841866755215352585 -4285477986178670903
