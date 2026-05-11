@@ -90,9 +90,9 @@ function ExtraAppInfo (|faststring| fs)
 		fs <~ "  --"
 		return
 	
-	|| R0 = r.args[0]
-		fs.AppendRange(r0, R0.NamePart)
-	fs <~ "://"
+//	|| R0 = r.args[0]
+//		fs.AppendRange(r0, R0.NamePart)
+//	fs <~ "://"
 	|| o = .appinfo.tag
 	if o isa Message
 		|message--| l = o.first$

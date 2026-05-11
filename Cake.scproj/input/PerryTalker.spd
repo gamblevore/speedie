@@ -452,6 +452,12 @@ function xvar.IsExpanded (|message?| xp, |message|)
 			if c_var.name ~= .Name
 				return c_var
 
+/*
+ expansion {
+	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \1 {
+	}
+}
+*/
 
 function spdfunc.IsExpanded (|FileWithData| F, |message|)
 	opt norefcounts

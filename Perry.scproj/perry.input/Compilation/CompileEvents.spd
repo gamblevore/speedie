@@ -3,7 +3,7 @@
 function ClickedCompile (GUIAction)
 	opt norefcounts
 	|| i = .ide
-	|| mode = i.WantCake(compilemode.compile)
+	|| mode = i.WantCake(CompileMode.compiling)
 		i.compile(mode)
 
 
@@ -53,6 +53,7 @@ function Perryide.ShowOutput
 
 function PerryIDE.Compile (|CompileMode| Mode)
 	if !.IsBuilding
+		(mode is compiling)
 		.DebugMode = mode
 		.Actual_Compile
 		return
@@ -77,7 +78,7 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 	(.RunButton isnt enabled)
 	(.Progress is visible)
 
-	(self is active)
+	(self is preparing)
 	.ShowCompileTab(.SpeedieText)
 	.ViewAsCurr
 

@@ -242,8 +242,14 @@ class XVar (list)
 				obj.RenderAST(Fs)
 			return true
 
+		if obj isa Array
+			fs <~ "("
+			fs <~ obj.length // could be expandable... I guess?
+			fs <~ ") "
+
 		fs <~ "0x"
-		fs.AppendHex(obj|int64|, 2)
+		fs <~ obj.objectid
+//		fs.AppendHex(obj|int64|, 2)
 		return true
 	
 	

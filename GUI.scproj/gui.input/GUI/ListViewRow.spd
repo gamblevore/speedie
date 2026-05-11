@@ -231,6 +231,7 @@ datatype ListViewState (uint16)
 		UnSelectable = [Separator, Disabled]
 		Broken		// we tried to use the item but it failed. maybe replace with "Missing"?
 		Error		// something is definitely wrong
+		Preparing
 		Active
 
 		Editable

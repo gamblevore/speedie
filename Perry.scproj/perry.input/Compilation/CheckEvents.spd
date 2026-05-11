@@ -158,6 +158,7 @@ extend PerryIDE
 		|| IsRunning = c.status.IsRunning
 		require !IsRunning or Killed
 
+		.DebugMode &= ~CompileMode.Compiling
 		// can we call .crashlog? lets say... c.status.crashed?
 		// simplify this?
 		|| Bad = .CheckCrashed(c,  "compiler")

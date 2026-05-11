@@ -3,7 +3,7 @@
 datatype CompileMode (int)
 	flags
 		|CompileMode|
-		Compile
+		Compiling
 		Debug
 		Run
 		CakeMode
@@ -260,6 +260,15 @@ function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
 			.editme.ShowAndSelect(where, true)
 	return true
 	
+	
+function PerryIDE.DebugMode (|CompileMode|)
+	return ._DebugMode
+
+
+function PerryIDE.DebugMode (assigns:|CompileMode|)
+	._DebugMode = value
+	(self is preparing) = value is compiling
+	(self is active) = (value is Run or debug) and (value is ReceivedHello)
 	
 	
 function DebugBreakAdd (GuiTextLineEvent)

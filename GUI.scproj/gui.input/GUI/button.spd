@@ -242,10 +242,10 @@ class ButtonView (GUIControl)
 		
 		|| WillDrawFocus = clicked and tab and .ClickedItem
 		|| fader = 1.0
-		if tab is Active
+		if tab is Preparing
 			strength += (GUI.cycle(1.25s)*0.95)-0.2
 			.Touch
-		  else
+		  elseif tab isnt Active // no fade
 			fader = .declutterer.strength					#require
 			
 		if WillDrawFocus or MouseXInside
@@ -263,9 +263,14 @@ class ButtonView (GUIControl)
 				if darker != .PressMakesLighter
 					G.Overlay(0.3~black, 0.25)
 				  else
-					|| amount = ((0.66) (tab is active) (0.3))
+					|| amount = 0.3
+					if tab is Preparing
+						amount = 0.66
 					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
-				
+
+			if tab is Active
+				G.overlay((1.0, 1.0, 0.5, 0.25))
+			
 			if disabled
 				G.overlay(0.6~gray, 0.4)
 			if WillDrawFocus
@@ -284,7 +289,8 @@ class ButtonView (GUIControl)
 		pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
 		
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
-		require  mi and !disabled and .pressing  and  r.Width > 19  
+		require  mi and !disabled and .pressing  and  r.Width > 19
+		
 		(pn.x min= r.x2-2)
 		|| ago = -.DelayTill.guiago.Float
 			ago *= 4		// effect needs improving

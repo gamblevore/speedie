@@ -101,7 +101,7 @@ class PerryIDE (Window)
 	|int8|						DuringNextPrev
 	|bool|						IsTextMode
 	|bool|						UsingSpdLib
-	|CompileMode|				DebugMode
+	|CompileMode|				_DebugMode
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool|						IsGraphics

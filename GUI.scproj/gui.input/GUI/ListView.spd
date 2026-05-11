@@ -544,13 +544,12 @@ class ListView (GUIControl) {
 		.ScrollSet(r) // we wanted this to slide smoothly... sigh. do it later.
 					  // in terms of the nodes and mousewheel.
 
-
 	libinternal ScrollSet (|ListViewrow?| s)
-		s ?= .liststart
-		.scrollshift = 0
+		s ?= .ListStart
+		.ScrollShift = 0
 		._ScrollRealigner = 0
 		debug_require s != .listsource
-		.scrollstart = s
+		.ScrollStart = s
 		.ExpandParents(s)
 		|| w = .window
 			|| i = w.inline
@@ -733,16 +732,17 @@ class ListView (GUIControl) {
 
 
 	function ClickedExpand (|ivec2| P, |int|)
+		opt norefcounts
 		require .Istree
 		|| T = .ColumnStart(0)
-		|| R = .findClicked(P)
+		|| R = .findClicked(P.y)
 		if r and r != .columns
 			T += .depthx(R)
 			|| T2 = T + font.width + 6
 			|| x = p.x
-			if (x >= T and x <= t2) and .listchild(R)// and ((r is selected) or keys.option or keys.gui)
+			if (x >= T and x <= t2)			// and ((r is selected) or keys.option or keys.gui)
 				.ExpandRow(R, (R isnt expanded).dir)
-				._SelJustChanged = true // block mouseup editing a cell
+				._SelJustChanged = true		// block mouseup editing a cell
 				return MouseDragging.Handled
 
 
@@ -758,7 +758,7 @@ class ListView (GUIControl) {
 		
 		|| AdjustScroll = (clicks == -1) and (.draggingrowFrom)
 		if (clicks == -1) and (.window!.droppinginto == self) // I guess the filter is already done...
-			|| i = .FindClicked(p)
+			|| i = .FindClicked(p.y)
 				.Select(i)
 			AdjustScroll = true
 
@@ -768,7 +768,7 @@ class ListView (GUIControl) {
 				debugger
 				return MouseDragging.handled				// why MouseDragging.DragWhatFixThis
 			|| p2 = (0, .rowheight / 2)
-			|| i  = .FindClicked(P - P2)
+			|| i  = .FindClicked((P - P2).y)
 			|ListViewrow--| WantsTo
 			
 			if i
@@ -1133,6 +1133,8 @@ class ListView (GUIControl) {
 	
 	
 	function Use (|ListViewrow!| PL, |bool| SendClickEvent=false)
+		// might be better to check on .__draw__ if the last listsource changed
+		// then do the update.
 		opt norefcounts
 		require pl != .listsource
 		._BlockedDuringUse = !SendClickEvent
@@ -1151,19 +1153,13 @@ class ListView (GUIControl) {
 		return .ClickedScrollbar(P, Clicks, .slh)
 
 
-	libinternal FindClicked (|ivec2| Search, |ListViewRow|)
-		search.x = 0
-		|| c = .FindClickedCell(search)
-			rz = c.row
-	
-	
 	libinternal FindClickedMenu (|int| y, |ListViewRow|)
+		opt norefcounts
 		if y <= .lastBottom
 			return .bmove(.LastVisible$, 1)
 		if y > .lastTop
 			return .bmove(.scrollstart$, -1)
-		|| c = .FindClickedCell((0,y)) // disowner
-			rz = c.row
+		return .FindClicked(y)
 	
 	
 	function StopFilter (|bool|)
@@ -1185,8 +1181,6 @@ class ListView (GUIControl) {
 			|int| i = c.indent
 				r = (.RowHeight max i)
 			rz.y2 -= r
-				
-			
 	
 
 	libinternal CellAtX (|ListViewrow| R, |int| x, |ListViewcell|)
@@ -1201,16 +1195,21 @@ class ListView (GUIControl) {
 		return R.ascell(col)
 
 
-	libinternal FindClickedCell (|ivec2| Search, |ListViewCell|)
+	libinternal FindClicked (|int| Search, |ListViewRow|)
 		opt NoRefCounts
 		|| r = .ActualRect
-		|| x = search.x - r.x
 		
 		for sc.visible in self
 			r.y = r.y2 - .RowHeight
-			if r.vert contains search.y
-				return .CellAtX( sc, x )
+			if  r.vert contains search
+				return sc
 			r.y2 = r.y
+
+	
+	libinternal FindClickedCell (|ivec2| Search, |ListViewCell|)
+		opt NoRefCounts
+		|| sc = .findclicked(search.y)
+			return .CellAtX( sc, search.x - .actualrect.x )
 
 
 	libinternal DrawYRow (|ListViewrow| search, |int|)

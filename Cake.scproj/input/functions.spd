@@ -7,7 +7,7 @@ role SpdFunc (message)
 		.RangeLength = 0
 		.name = "(unused code)"
 		.func = @tmp
-		.Position = -1
+		.Position = -1			// Position in the compiled code.
 
 	// We try to standardise the output structure
 	function message.CopyToVM

@@ -709,11 +709,12 @@ extend PerryIDE
 		btn.tooltip = tip
 		btn.Text = txt
 		(btn is Spacer)
-		|| opacity = 0.93
-		|| f	   = 0.15 / opacity
+		|| opacity	= 0.93
+		|| f		= 0.15 / opacity
 		if btn isa buttonview
 			btn.gnormal.solid = (f, f, f, opacity)
-	
+			btn.GNormal.StyleDrawer = image.RoundRectDrawer
+
 
 	function AddDebugButtons (|GUIAction| action, |string| icon, |string| id)
 		|| btn = buttonview(.DebugBtns, action)
@@ -721,9 +722,10 @@ extend PerryIDE
 		btn.id = id
 		btn.Tooltip = id
 		btn.Text = icon
+		btn.GNormal.StyleDrawer = image.RoundRectDrawer
 		(btn isnt enabled)
-		|| opacity = 0.93
-		|| f	   = 0.15 / opacity
+		|| opacity	= 0.93
+		|| f		= 0.15 / opacity
 		btn.gnormal.solid = (f, f, f, opacity)
 		
 		
@@ -741,14 +743,10 @@ extend PerryIDE
 		.ShowIDE
 		.ViewAsbetter
 		.LoadStartupErrors
-		.StartupDebugArea
+		.SetAppInfo
 		return true
 	
-	
-	function StartupDebugArea
-		.SetAppInfo
-	
-	
+		
 	function RelistStartupErrors
 		for err in .startuperrors
 			ifn err isa error
