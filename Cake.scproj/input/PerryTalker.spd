@@ -2,32 +2,28 @@
 /*
 	So how to do this?
 	
-	* "stepin / stepout / stepover" should all be very similar...
-	  need to view on every point... check if we hit a certain instruction...
-	  OR if we get in/out the stack... So we need to STAY in "pause" mode... Not go in/out all the time
-	* Stepout is a little faster... only needs to check if we hit the out point... set a break there...
+	* stepin... just alwaysbreak.
 	
-	* BreakOnObjID can be done by modifying the allocation system... to only preallocate x% objs
-	  in a block... so when we run out... we already have a hit-point to check... then we restore the
-	  other objects... right? :)
-		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
+	* stepout... set a flag on the stack, and a break... then break if the stack/flag is correct?
+		* OR... just store the stack thing itself?
+	
+	* Step over... similar
 */
 
 // We need to put a breakpoint in the original file... then see what happens
 
 
-
 prototype PerryResponse (|CakeVM| self, |message| m, |CakeStack| Stack, |uint| State,  |StepAction|)
 dispatch DebuggerActions (PerryResponse)
 	run				RunAction
-	stepin:			return .TempBreak(.StepIn)
-	stepout:		return .TempBreak(.StepOut)
-	stepover:		return .TempBreak(.StepOver)
+	stepin			StepInAction
+	stepout			stepoutAction
+	stepover		stepoverAction
 	
 	edit			EditAction
 	expansion		ExpandAction
 	brkadd			BreakAction
-	brkrem			BreakRemoveAction
+	brkrem			BreakRemoveAction //addrem
 	sendbreaks		SendBreakAction
 
 	stop:			app.quit, return StepAction.donothing
@@ -76,8 +72,6 @@ function __PerryView__ (cakevm.CakeChef)
 		.ClearTempBreak(stack)
 	
 	.SendStack(stack, p, "break", ErrorCode)
-
-	|| Stopped = (Break>>31)!=0
 	while
 		if !p.IsOpen
 			app.Quit
@@ -85,19 +79,25 @@ function __PerryView__ (cakevm.CakeChef)
 			|| Action = .Respond(m, stack)
 			if Action is SendVars
 				.SendStack(stack, p, "stack", ErrorCode)
-			if Action is pause
-				Stopped = true
-			if !ErrorCode and .GoRun(p, stopped, Action)
+			if !ErrorCode and .GoRun(p, Action)
 				exit
 
 	p <~ "run"
 
 
-function cakevm.GoRun (|spdprocess| p, |bool| Stopped, |StepAction| Action, |bool|)
+/*
+	OK... respond by collecting the current state? So what do we mean?
+	
+	Well... if we stop, brecause the breaklevel is 3... that doesn't mean that we want to just run. WHY is it 3. Because we set it, or because we got a new message? Where can it be set even? I think... we need to just collect what we are setting it to?
+*/
+
+
+function cakevm.GoRun (|spdprocess| p, |StepAction| Action, |bool|)
 	if Action is GoRun
 		return true
-	if (Stopped == false) and (p.pico.CanGet <= 0)
-		.SetBreakLevel(2)
+	// only stepin sets it to kBreakAlways, but stepin returns gorun
+	if (debugger.UserBreakLevel < kBreakAlways) and (p.pico.CanGet <= 0)
+		.SetBreakLevel(debugger.UserBreakLevel)
 		return true
 
 
@@ -110,7 +110,10 @@ function SendBreakAction (perryresponse)
 
 function RunAction (perryresponse)
 	opt norefcounts
-	.SetBreakLevel(2-(m.firstname=="fast"))
+	|| Level = cakevm.kBreakStated
+	if m.firstname=="fast"
+		Level = cakevm.kBreakNever
+	.SetBreakLevel(Level)
 	return StepAction.gorun
 
 
@@ -212,48 +215,12 @@ function EditAction (PerryResponse)
 	return StepAction.DoNothing
 
 
-
 function BreakAction (PerryResponse)
-	opt norefcounts
-	|| F = debugger.file(m)
-	if f != nil
-		|| p = m[1].int
-		|| l = m[2].int
-		debugger.UserMultiBreak(F, p, p+l, debugger.dbgLength, state|bool|)
-		cake.perry!.SendBreaks(F)
-	return StepAction.DoNothing
+	return debugger.SetBreaks(m, state, StepAction.DoNothing)
 
 
 function BreakRemoveAction (perryresponse)
 	return BreakAction(self, m, stack, state xor 1)
-
-
-function cakevm.ClearTempBreak (|cakestack| stack)
-	|| index = .Index(stack.code)
-	|| B = cake.ActiveBreaks
-	if B and index
-		|| Break = B + index
-		if break == debugger.BreakToClear
-			debugger.BreakToClear = nil
-			Break[] &= 1<<31
-
-	
-function cakevm.TempBreak (|?&uint| Break, |StepAction|)
-	if break and !(break[]>>31)					// has no breakpoint... add one
-		break[] |= 1<<31
-		debugger.BreakToClear = break			// nice
-	return StepAction.GoRun
-
-
-function cakevm.StepIn (|&Uint|)
-	// we need to mark a place to break at. how? is it just the next instruction?
-	// we need to get the curr code location... find the next line, set a break there.
-
-
-function cakevm.StepOut (|&uint|)
-
-
-function cakevm.StepOver (|&uint|)
 
 
 function cakevm.Respond (|message| m, |cakestack| stack, |StepAction|)
@@ -453,10 +420,8 @@ function xvar.IsExpanded (|message?| xp, |message|)
 				return c_var
 
 /*
- expansion {
-	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \1 {
-	}
-}
+expansion
+	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \1
 */
 
 function spdfunc.IsExpanded (|FileWithData| F, |message|)
@@ -469,4 +434,11 @@ function spdfunc.IsExpanded (|FileWithData| F, |message|)
 			if c_pos == .Position				// id pos match
 				return c
 
+
+/*
+	* BreakOnObjID can be done by modifying the allocation system... to only preallocate x% objs
+	  in a block... so when we run out... we already have a hit-point to check... then we restore the
+	  other objects... right? :)
+		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
+*/
 

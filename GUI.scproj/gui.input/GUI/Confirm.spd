@@ -103,15 +103,15 @@ function @confirmationdialog.Ask (|string| Q,  |string| Title,  |[string]| Answe
 class ConfirmationDialog (Window)
 	linkage
 		cpp_part cwin
-    |textview|			Question
-    |textview|			Response
-    |Buttonview|		Yes
-    |Buttonview|		No
-    |Buttonview|		Cancel
-    |[Buttonview]|		Buttons
-    |date|				DelayUntil // for accidental presses.
+	|textview|			Question
+	|textview|			Response
+	|Buttonview|		Yes
+	|Buttonview|		No
+	|Buttonview|		Cancel
+	|[Buttonview]|		Buttons
+	|date|				DelayUntil // for accidental presses.
 
-    constructor
+	constructor
 		super.constructor
 		.id				= "confirm"
 		.Yes			= buttonview(self, OnConfirmAnswer)
@@ -119,7 +119,7 @@ class ConfirmationDialog (Window)
 		.Cancel			= buttonview(self, OnConfirmAnswer)
 		.response		= textview(self, nil)
 		.Question		= textview(self, nil)
-		.gnormal        = ¥.systemstyle 
+		.gnormal		 = ¥.systemstyle 
 		.EntireScreen	= (300, 150)
 		.AddButton(.yes, "Yes")
 		.AddButton(.No,	 "No" )

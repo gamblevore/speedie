@@ -204,7 +204,7 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Obj
 		OldStack->Code = CodePtr;
 	}
 	
-	NewStack->Kind = 0x80000;
+	NewStack->SFlags = 0x80000;
 	NewStack->GoUp = 0;
 	NewStack->Code = (ASM*)Destructor;
 	((CakeRegister*)NewStack)[2].Obj = self;
@@ -230,14 +230,14 @@ VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) 
 	(DebugCode);
 	auto Stack	= (CakeStack*)(R0 - 1);
 	int StepBack= Stack->DestReg;
-	int Kind = Stack->Kind;
+	int Flags = Stack->SFlags;
 	
 	auto Imm	= RET_Valuei;							// get before copy!
 	auto Src	= R0 + n1;
 	
 	*((CakeRegister*)Stack) = *Src;
 	((CakeRegister*)Stack)->Uint |= Imm;				// immediate
-	if (Kind) {
+	if (!(Flags&2)) {
 		auto NewR0 = (CakeRegister*)(Stack-StepBack);
 		R0			= NewR0;							// NewZero
 		Stack		= (CakeStack*)(NewR0 - 1);
@@ -685,7 +685,7 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 		OldStack->Code = CodePtr;
 	}
 	
-	NewStack->Kind = 0xFFFF;
+	NewStack->SFlags = 0;
 	NewStack->DestReg = Dest;
 	NewStack->GoUp = 0;
 	auto Zero = ((CakeRegister*)NewStack)+1;

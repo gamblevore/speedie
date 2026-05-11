@@ -12,8 +12,9 @@ module debugger
 	|uint|				OverFlowTrack
 	|bool|				WantDebug
 	|bool|				BreakMapBad
-	|&uint|				BreakToClear
+	|byte|				UserBreakLevel // the break level that the user set by pressing pause/run/step/etc
 	|faststring|		VariablePrinter
+	|BlockOfPointers|	BreakToClear
 	
 	
 	function SrcMap (|uint| Index, |SourceLocation|)
@@ -57,15 +58,27 @@ module debugger
 		}
 		
 
-	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Max, |bool| Active, |bool|)
+	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Max, |uint| Active, |bool|)
 		|| Code = self|uint|
 		if Code < Max
 			|| Curr = CakeBreak[Code] >> 31
-			if Curr != Active|uint|
+			if Curr != (Active!=0)|uint|
 				return true
+
+
+	function SetBreaks (|message| m, |uint| Active, |stepaction| Action, |stepaction|)
+		opt norefcounts
+		|| F = debugger.file(m)
+		if f != nil
+			|| p = m[1].int
+			|| l = m[2].int
+			debugger.UserMultiBreak(F, p, p+l, Active)
+			cake.perry!.SendBreaks(F)
+		
+		return action
 		
 		
-	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| L, |bool| Active)
+	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active)
 		opt norefcounts
 		|| CakeBreak = cake.ActiveBreaks$
 		
@@ -77,9 +90,10 @@ module debugger
 			debugger
 			.DebugList("Start", cakebreak, l)
 		
+		|| Max = debugger.dbgLength
 		for Src in .SourceMap
-			if src.NeedsChange(cakebreak, L, active)
-				|| Score = Src.MatchScore(path, position, after, l)
+			if src.NeedsChange(cakebreak, Max, active)
+				|| Score = Src.MatchScore(path, position, after, Max)
 				if Score > BestScore
 					BestScore = Score
 					BestValue = Src
@@ -92,19 +106,22 @@ module debugger
 			.SetUserBreak(CakeBreak, BestValue, active)
 		  else
 			for Src in .SourceMap
-				|| Score = Src.MatchScore(path, position, after, l)
-				if src.NeedsChange(cakebreak, L, active) and (Score == BestScore)
+				|| Score = Src.MatchScore(path, position, after, max)
+				if src.NeedsChange(cakebreak, Max, active) and (Score == BestScore)
 					.SetUserBreak(CakeBreak, Src, active)			
 
 		target debug
 			.DebugList("After", cakebreak, l)
 	
 	
-	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |bool| Active)
+	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active)
 		if Code < .dbgLength
 			|| B = (CakeBreak[Code] <<1) >>1
-			B |= Active<<31
+			B |= (Active!=0)<<31
 			CakeBreak[Code] = B
+			if Active >= 2
+				debugger.breaktoclear <~ cake.vm.index(Cakebreak)
+			
 		  elseif !.BreakMapBad
 			.BreakMapBad = true
 			printerror "BreakMap out of range"
@@ -121,11 +138,11 @@ module debugger
 	function StartUp (|&uint|)
 		opt norefcounts
 		cake.vm.__View__ = __Dumper__
-		|| Dbg = 1+debugger.WantDebug
+		|| Dbg = cakevm.kbreaknever+debugger.WantDebug
 		|| p = cake.Perry
 			cake.vm.__View__ = __PerryView__
 			cake.vm.Action(p.pico) = PicoReader	
-			dbg = 2
+			dbg = cakevm.kBreakStated
 		rz = cake.VM.SetBreakLevel(dbg)
 			
 		

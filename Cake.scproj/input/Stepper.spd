@@ -1,0 +1,76 @@
+
+
+function cakevm.ClearTempBreak (|cakestack| stack)
+	|| index = .Index(stack.code)
+	|| B = cake.ActiveBreaks$
+	if debugger.BreakToClear.pop(index)
+		B[index] &= ~(1<<31)
+
+	
+function cakevm.TempBreak (|?&uint| Break)
+	if break and !(break[]>>31)							// has no breakpoint... add one
+		break[] |= 1<<31
+		debugger.breaktoclear <~ .index(break)			// nice
+
+
+function StepInAction (PerryResponse)
+	debugger.BreakToClear.clear
+	.SetBreakLevel(cakevm.kBreakAlways)
+	return StepAction.GoRun
+
+
+function StepOutAction (PerryResponse)
+	// So... we need to set something on the stack...
+	// But... where do we break? We need to set the stack to say that we need to break.
+	// And set a break, at the stack's return point. So where is that?
+	debugger.BreakToClear.clear
+	|&uint| Code
+	|| P = .prev(stack)
+		p.sflags |= 1
+		Code = p.code
+	.TempBreak(Code)
+	.SetBreakLevel(cakevm.kBreakStated)
+	return StepAction.GoRun
+
+
+
+function StepOverAction (PerryResponse)
+	StepOutAction(self, m, stack, state)				// clears the old breaks already
+	return debugger.SetBreaks(m, 2, StepAction.GoRun)
+	
+	
+function cakevm.SetBreakLevel (|int| level, |?&uint|)
+	debugger.UserBreakLevel = level
+	while
+		|| B = .SetDebug(level)
+			return B
+
+
+
+struct BlockOfPointers
+	|int|		Count
+	|uint[255]| Indexes
+	
+	function Pop (|uint| Index, |bool|)
+		|| C = .count - 1
+		|| i = 0
+		while i <= C
+			if .Indexes[i] == index
+				.count = C
+				if C > 0
+					.Indexes[i] = .Indexes[C] // remove ! :]
+				return true
+			i++
+	
+	syntax Append (|uint| I)
+		|| C = .count
+		if C < –count .Indexes
+			.Indexes[c] = I
+			.count = c + 1
+	
+	function Clear
+		real self
+		self = nil
+
+
+

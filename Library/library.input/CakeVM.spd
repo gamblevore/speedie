@@ -14,6 +14,10 @@ constants
 
 	ErrOverFlow		= -2
 	ErrStillInRange = -1
+	
+	kBreakNever = 1
+	kBreakStated = 2
+	kBreakAlways = 3
 
 
 target cpp or vm {
@@ -36,7 +40,7 @@ target cpp or vm {
 	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
 		cpp_wrapper JB_ASM_FillTable
 	
-	function SetBreakLevel (|int| BreakLevel, |?&uint|)
+	function SetDebug (|int| BreakLevel, |?&uint|)
 		cpp_wrapper JB_ASM_SetDebug
 	
 	function BaseStack	(|&CakeStack|)
@@ -46,7 +50,7 @@ target cpp or vm {
 		cpp_wrapper JB_ASM_LinkPico
 	
 	inline Pause
-		while !.SetBreakLevel(3)
+		while !.SetDebug(kBreakAlways)
 			0
 
 	function Index		(|&uint| Code, |ind|)
@@ -72,7 +76,7 @@ struct CakeStack
 		wrapper
 		cpp_class CakeStack
 	|&uint|			Code
-	|uint|			Alloc
+	|uint|			SFlags
 	|byte|			GoUp
 	|byte|			DestReg
 	|uint16|		Depth

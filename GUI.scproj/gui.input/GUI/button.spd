@@ -245,7 +245,9 @@ class ButtonView (GUIControl)
 		if tab is Preparing
 			strength += (GUI.cycle(1.25s)*0.95)-0.2
 			.Touch
-		  elseif tab isnt Active // no fade
+		  elseif (tab is Active) and !tab.IsOnlyChild		// no fade
+			0
+		  else
 			fader = .declutterer.strength					#require
 			
 		if WillDrawFocus or MouseXInside
@@ -262,8 +264,6 @@ class ButtonView (GUIControl)
 			if (tab is Selected) or darker
 				if darker != .PressMakesLighter
 					|| v = 0.25
-					if tab is Active
-						v = 0.125
 					G.Overlay(0.3~black, v)
 				  else
 					|| amount = 0.3
@@ -282,9 +282,9 @@ class ButtonView (GUIControl)
 			g.Strengthen(fader)
 			Where.DrawRectStyled(Grow, G)
 		
-
 		if !Tab
 			Tab = .ListSource // allow these text to be added.
+
 		|| t = .ButtonText(tab, .text)
 		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
 		|| TextCol = colors.white
@@ -295,7 +295,7 @@ class ButtonView (GUIControl)
 		require  mi and !disabled and .pressing  and  r.Width > 19
 		
 		(pn.x min= r.x2-2)
-		|| ago = -.DelayTill.guiago.Float
+		|| ago = -.DelayTill.GuiAgo.Float
 			ago *= 4		// effect needs improving
 			if ago > 4		// perhaps something like soft-explode or at least half-pixels
 				ago = 4		// also the maths is wrong somehow...
