@@ -82,22 +82,21 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 	if (dest isnt discard) and (!dest.reg or dest is temp)
 		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
 		dest2.tmpcheck
-
 	
 	dest2 = dest2.simplify
 	dest2.µtype = fn.ASMReturn.ASMRegType
 	if !dest2.reg
 		(dest2 is discard)
-
-	target false // sigh... a nice idea but causes deep issues somewhere. not worth the pain to get this opt.
+	
+	target false // sigh... a nice idea but causes deep issues somewhere. dont wanna do it now.
 		if 	fn.ReturnedVars == 1
 			|| last = fn.SourceArg.last
 			if (last and last.asmtype is kReturn)
-				(dest2 as= (dest & asmreg.InlineCopyable))	// <-- Seems to cause a crash in assign somehow...
+				(dest2 as= (dest & asmreg.InlineCopyable))	// <-- Makes assign fail
 			// needs to be looked at properly...
 			// Also causes slightly different behaviour.
 			// Assigns is now getting vars with reg0 that aren't const??
-		
+	
 	return dest2
 				
 	

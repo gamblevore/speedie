@@ -35,19 +35,18 @@ datatype ASMReg (uint64)
 		AllowNopDest
 		BlockNop
 		GlobalMemory
-//		PreferEqul
 		VerySpecial
 		Const
 //		NotNil			// probably a big addition. Will need tests...
-		TempFlags	= OKAsTemp ||| Temp
-		AddrNeed	= [AddrRequest, AddrForceRequest, AddrNoFiddle]
-		Exit		= [ExitFunction, ExitAtAll]
-		SetAlways	= Textual ||| Set  // reuse const
-		FlagsToRemove = Const ||| discard
-		InlineCopyable = AddrForceRequest ||| CondRequest ||| Negate ||| ConstRequest
+		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
+		Exit			= [ExitFunction, ExitAtAll]
+		SetAlways		= Textual	||| Set  // reuse const
+		TempFlags		= OKAsTemp	||| Temp
+		FlagsToRemove	= Const		||| Discard
+		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest
+		Zero			= Const		||| Param		||| 56	// 56 == datatypecode.uint64
 
 		// don't go above 47
-		Zero		= Const	||| 56 ||| param		// 56 == datatypecode.uint64
 
 	
 
