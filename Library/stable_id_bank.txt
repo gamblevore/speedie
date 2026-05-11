@@ -97,6 +97,7 @@ GUI_Doc_CheckModified
 GUI_Doc_Clear
 GUI_Doc_Constructor
 GUI_Doc_Destructor
+GUI_Doc_DocParsedSet
 GUI_Doc_InvalidJeebox
 GUI_Doc_IsModified
 GUI_Doc_Load
@@ -370,6 +371,7 @@ GUI_Line_Destructor
 GUI_Line_OperatorContains
 GUI_Line_Render
 GUI_Line_SlowMove
+GUI_Line_Text
 GUI_Line_syntaxisSet
 GUI_MenuItem_Constructor
 GUI_MenuItem_Destructor
@@ -538,7 +540,6 @@ GUI_SystemCursor_Use
 GUI_TFF_Tab
 GUI_Text_AddBreak
 GUI_Text_AddErrorToLine
-GUI_Text_AutoCompleteBack
 GUI_Text_AutoCompleteBackSet
 GUI_Text_AutoCompleteShowingDots_
 GUI_Text_AutoCompleteString
