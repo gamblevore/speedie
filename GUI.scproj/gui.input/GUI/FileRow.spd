@@ -49,6 +49,7 @@ class FileRow (ListViewRow)
 	
 
 	render
+		opt norefcounts
 		fs <~ "file: "
 		fs <~ .location
 		fs <~ .dirfile	
@@ -90,7 +91,8 @@ class FileRow (ListViewRow)
 	operator isa (|string| s, |bool|)
 		inlined
 		return .location isa s
-		
+	
+	
 	function IsDir (|bool|)
 		disabled "use .Asdir. Not quite the same, but usually close enough"
 	
@@ -102,6 +104,11 @@ class FileRow (ListViewRow)
 	libinternal IsAlsoDir (|file| f, |bool|)
 		return f.isdir == .asdir
 	
+	
+	libinternal GetField (|string| Name, |string|)
+//		opt norefcounts
+/		|| d = .FileData.parse
+			rz = d[Name].value
 	
 	function TryReload (|fileviewer|fv)
 		require .asdir
@@ -134,7 +141,7 @@ class FileRow (ListViewRow)
 		return true
 
 
-	function RemoveFile (|filerow| r, |fileviewer| fv)
+	libinternal RemoveFile (|filerow| r, |fileviewer| fv)
 		for c.flat in r
 			|| d = c._document
 				if d.ismodified
@@ -144,7 +151,7 @@ class FileRow (ListViewRow)
 		r.remove
 
 
-	function ReloadFiles (|file| dir, |fileviewer|o)
+	libinternal ReloadFiles (|file| dir, |fileviewer|o)
 		|| excl = o.excludes
 		|dictionary of filerow| found = dictionary()
 		for s in self
@@ -231,7 +238,7 @@ class FileRow (ListViewRow)
 			return preview
 
 
-	function FindAllParent (|message| FoundList, |error|)
+	libinternal FindAllParent (|message| FoundList, |error|)
 		opt norefcounts
 		rz = error(nil, .location, errorseverity.ok)
 		(rz|listviewrow| is expanded)
@@ -244,7 +251,7 @@ class FileRow (ListViewRow)
 		FoundList <~ rz
 
 
-	function FindInFile (|string| text,  |message| FoundList,  |$int| Remain,  |bool| DoRepl)
+	libinternal FindInFile (|string| text,  |message| FoundList,  |$int| Remain,  |bool| DoRepl)
 		|| t = .FileData$
 		
 		|error| parent

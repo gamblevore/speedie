@@ -24,18 +24,15 @@
 
 
 function StepInAction (PerryResponse)
-	debugger.BreakToClear.clearAll
+	debugger.clearBreaks
 	.SetBreakLevel(cakevm.kBreakAlways)
 	return StepAction.GoRun
 
 
 function StepOutAction (PerryResponse)
-	// So... we need to set something on the stack...
-	// But... where do we break? We need to set the stack to say that we need to break.
-	// And set a break, at the stack's return point. So where is that?
-	debugger.BreakToClear.clearAll
+	debugger.clearBreaks
 	|| P = .prev(stack)
-		p.sflags |= 1
+		p.sflags |= 1									// is this needed? didn't we set a temp-break?
 		|| Code = p.code
 		|| I = .index(code)
 		|| break = cake.ActiveBreaks
@@ -47,10 +44,11 @@ function StepOutAction (PerryResponse)
 	return StepAction.GoRun
 
 
-
 function StepOverAction (PerryResponse)
-	StepOutAction(self, m, stack, state)				// clears the old breaks already
-	return debugger.SetBreaks(m, 2, StepAction.GoRun)
+	debugger.ClearBreaks
+	debugger.StepOver.Collect
+	.SetBreakLevel(cakevm.kBreakStated)
+	return debugger.SetBreaks(m, false, true, StepAction.GoRun)	// CLEAR those in this range.
 	
 	
 function cakevm.SetBreakLevel (|int| level, |?&uint|)
@@ -61,7 +59,7 @@ function cakevm.SetBreakLevel (|int| level, |?&uint|)
 
 
 
-struct BlockOfPointers
+struct TempBreaks
 	|int|		Count
 	|uint[255]| Indexes
 	
@@ -101,4 +99,45 @@ struct BlockOfPointers
 		while (i <= C)
 			yield (.Indexes[i]) (i)
 			i++
+
+
+
+struct StepOverMaker
+	|uint|  Count
+	|&uint| Indexes
+	
+	function Init (|int| N)
+		.count = 0
+		.Indexes = memory.zalloc(N*4)|&uint|
+	
+	function Collect
+		|| B = cake.ActiveBreaks$
+		|| N = debugger.dbglength
+		.Count = 0
+		for i in n
+			if b[i]>>31
+				self <~ i
+			b[i] |= 1<<31
+	
+	// so now what do we want to do? we want to... collect the breaks, right?
+	// that is so that our stepover thing, can set ALL the breaks in the entire app.
+	// then clear them once we hit it.
+	// I think its just for step over, right?
+	
+	syntax Append (|uint| Index)
+		opt inline
+		.indexes[.Count++] = index
+	
+	function ClearAll
+		|| B = cake.ActiveBreaks
+			|| ouch = 1<<31
+			for i in debugger.DbgLength
+				B[i] &= ~ouch
+			for i in .count
+				B[i] |= ouch
+		.count = 0
+	
+	
+
+
 

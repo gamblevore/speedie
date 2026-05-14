@@ -14,7 +14,8 @@ module debugger
 	|bool|				BreakMapBad
 	|byte|				UserBreakLevel // the break level that the user set by pressing pause/run/step/etc
 	|faststring|		VariablePrinter
-	|BlockOfPointers|	BreakToClear
+	|TempBreaks|		BreakToClear
+	|StepOverMaker|		StepOver
 	
 	
 	function SrcMap (|uint| Index, |SourceLocation|)
@@ -27,15 +28,21 @@ module debugger
 		self|&cakevm|.Pause		// cool. now we can safely do stuff
 
 	
+	function ClearBreaks
+		.BreakToClear.ClearAll
+		.StepOver.ClearAll
+		
 	function ActivateInbuiltBreaks
 		|| CakeBreak = cake.ActiveBreaks$
 		|| P = .InbuiltBreaks.Addr|&uint|
 		|int| n = .InbuiltBreaks.Length >> 2
 		|| L = .dbgLength
+		.StepOver.Init(L)
 		for i in n
 			|| Code = P[i]
 			if Code < L
 				CakeBreak[Code] |= (1<<31)
+				
 	
 	
 	function DebugList (|string| name, |&uint| CakeBreak, |uint| Max)
@@ -66,22 +73,31 @@ module debugger
 				return true
 
 
-	function SetBreaks (|message| m, |uint| Active, |stepaction| Action, |stepaction|)
+	function SetBreaks (|message| m, |bool| Active, |bool| EntireRange, |stepaction| Action, |stepaction|)
 		opt norefcounts
 		|| F = debugger.file(m)
 		if f != nil
 			|| p = m[1].int
 			|| l = m[2].int
-			debugger.UserMultiBreak(F, p, p+l, Active)
-			cake.perry!.SendBreaks(F)
+			debugger.UserMultiBreak(F, p, p+l, Active|uint|, EntireRange)
+			if !EntireRange
+				cake.perry!.SendBreaks(F)
 		
 		return action
 		
 		
-	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active)
+	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active, |bool| EntireRange)
 		opt norefcounts
 		|| CakeBreak = cake.ActiveBreaks$
-		
+		|| Max = debugger.dbgLength
+
+		if EntireRange
+			for Src in .SourceMap
+				if Src.MatchScore(path, position, after, Max)
+					.SetUserBreak(CakeBreak, Src, active, max)
+			return
+			
+			
 		|| BestScore = 0
 		|| BestValue = 0
 		|| BestCount = 0
@@ -89,7 +105,6 @@ module debugger
 		target debug
 			.DebugList("Start", cakebreak, debugger.dbgLength)
 		
-		|| Max = debugger.dbgLength
 		for Src in .SourceMap
 			if src.NeedsChange(cakebreak, Max, active)
 				|| Score = Src.MatchScore(path, position, after, Max)
@@ -102,24 +117,22 @@ module debugger
 		
 		require BestCount
 		if BestCount == 1										// same thing as below, but faster...
-			.SetUserBreak(CakeBreak, BestValue, active)
+			.SetUserBreak(CakeBreak, BestValue, active, max)
 		  else
 			for Src in .SourceMap
 				|| Score = Src.MatchScore(path, position, after, max)
 				if src.NeedsChange(cakebreak, Max, active) and (Score == BestScore)
-					.SetUserBreak(CakeBreak, Src, active)			
+					.SetUserBreak(CakeBreak, Src, active, max)			
 
 		target debug
 			.DebugList("After", cakebreak, debugger.dbgLength)
 	
 	
-	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active)
-		if Code < .dbgLength
+	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active, |uint| Max)
+		if Code < Max
 			|| B = (CakeBreak[Code] <<1) >>1
 			B |= (Active!=0)<<31
 			CakeBreak[Code] = B
-			if Active >= 2
-/				debugger.breaktoclear <~ Code
 			
 		  elseif !.BreakMapBad
 			.BreakMapBad = true

@@ -141,7 +141,7 @@ extend PerryIDE
 			.IsMainListView = true
 			.tooltip		= "Displays files in project"
 			.folfile		= ".perry"
-			.takesfocus 	= takesfocusflag.CanFocus
+			.takesfocus		= takesfocusflag.CanFocus
 			.ID				= "FileList"
 			.size			= the~width by the~bottom to 15~down
 			.copypaste		|= copypasteflags.pastefile

@@ -350,7 +350,6 @@ class FileViewer (ListView)
 	function Listviewrow.FileSort
 		.sort(&fileviewer.FileRowNameSorter)
 	
-
 		
 	libinternal CanFind (|filerow| f, |uint| id, |bool|)
 		if id
@@ -362,18 +361,31 @@ class FileViewer (ListView)
 			if !f.location[0,Restrict]
 				return false
 		
-		if !.NoFind or !.nofind.valuelower(f.name)
-			return true
+		return !.nofind.valuelower(f.name)
 	
 	
+	libinternal BatchFindSub (|string| S, |bool| R, |message| L, |uint| ID, |$int| N, |FileRow| F)
+		opt norefcounts
+		
+		|| folf = .listsource.name
+		while F
+			if .CanFind(F, ID)
+				f.findinfile(S, L, N, R)
+				if f.DirFile ~= folf
+					if f.GetField("search") ~= "false"
+						return
+			|| Ch = F.First
+				.BatchFindSub(S, R, L, ID, N, Ch)
+			F = F.next
+		
+		
 	function BatchFind (|string| str,  |bool| ForReplace,  |message| FoundList,  |uint| FindID=0)
 		opt norefcounts
 		require str
 		
 		|| Remain = 6K
-		for f in self
-			if .CanFind(f, FindID)
-				f.FindInFile(str, FoundList, Remain, ForReplace)
+		|| First = .ListSource.first as filerow
+		.BatchFindSub(str, ForReplace, FoundList, FindID, Remain, first)
 		FoundList.sort(&filerow.BatchFindSorter)
 	
 

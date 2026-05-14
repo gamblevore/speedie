@@ -61,7 +61,7 @@ function __PerryView__ (cakevm.CakeChef)
 	HitBreak |= debugger.UserBreakLevel >= cakevm.kBreakAlways // stepin only sets this.
 	
 	if HitBreak
-		debugger.BreakToClear.clearAll
+		debugger.ClearBreaks
 	.SendStack(stack, p, "break", ErrorCode)
 
 	while
@@ -198,7 +198,7 @@ function EditAction (PerryResponse)
 
 
 function BreakAction (PerryResponse)
-	return debugger.SetBreaks(m, state, StepAction.DoNothing)
+	return debugger.SetBreaks(m, state|bool|, false, StepAction.DoNothing)
 
 
 function BreakRemoveAction (perryresponse)
