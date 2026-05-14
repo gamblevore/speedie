@@ -342,8 +342,10 @@ libinternal string.FindExistingPath (|string|)
 libinternal ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K, |string|)
 	|| path = InPath.TrimSlashes.FindExistingPath
 	require .listfiles(path, types, save, max) and inpath // also calls clear
-	|| r = filerow(path.parent, "..", ".nothing")
-	.listsource.first = r
+	|filerow| r
+	|| pp = path.parent
+		r = filerow(pp, "..", ".nothing")
+		.listsource.first = r
 	|| f = path.file
 	|| r2 = filerow.FindFileName(self, path.name) as filerow
 	if f.exists and !f.isdir and r2

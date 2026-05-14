@@ -837,11 +837,12 @@ Message is also:
 
 	function ReportFailiure (|syntax| s, |string?| name = nil, |message?| found = nil, |message|)
 		cpp_part CantFind
+		opt norefcounts
 		if !self and !found
 			jb_api.NilHandler
 			return nil
 		
-		|| fs = faststring.new
+		|| fs = faststring.shared
 		if found
 			fs <~ "Expected "
 			fs.MsgErrorName(name)

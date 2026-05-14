@@ -181,6 +181,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		if !d
 			d = .FindLine(pos)
+			d?=.wrappedlines.first!
 		
 		|| txt = d.Text
 		|| i = txt._FindBreakpoint
@@ -201,7 +202,7 @@ class TextView (GUIControl)
 		|| Restore = .selrange
 		|| Break = ""
 		if (i < 0)										// ADD
-/			range.x2 = range.x
+			range.x2 = range.x
 			Break = "/"
 		  else											// REMOVE
 			i += dp
@@ -2225,6 +2226,9 @@ class TextView (GUIControl)
 		  elseif (changed == 1) or .IsALogTextView
 			d = .FindLine(pos)
 		  else
+			d = nil
+		
+		if !d
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
 		.ClearReclaim	
@@ -2271,12 +2275,11 @@ class TextView (GUIControl)
 				return
 
 	
-	libinternal FindLine (|int| Value, |textviewline!|)
+	function FindLine (|int| Value, |textviewline|)
 		opt norefcounts
 		for s in .WrappedLines
-			if s.Position >= Value
+			if s contains Value
 				return s
-		return .WrappedLines.first!
 		
 		
 	libinternal UnloadDoc (|document| old)

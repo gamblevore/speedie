@@ -55,12 +55,16 @@ extend String
 		R[num] = With
 		return r.join("/")
 	
+	
 	function TrimSlashes (|string|)
+		// passing "/" returns ""
+		// not sure this is the right behaviour?
+		
 		|| trail = .FindTrailingSlashes
 		if trail >= self
-			return self							// entire path is '/'
-		|| Multi = self contains "//"
-		if !multi
+			return self
+		
+		if !.find("//", 0, trail)
 			return self[0, trail]
 			
 		|| fs = FastString()
@@ -125,7 +129,8 @@ extend String
 		return .child(s)
 
 	function Parent (|string|)
-		description "Gets the file path's parent'" 
+		description "Gets the file path's parent'"
+		// this won't handle a bad path like "////" sigh.
 		if self != "/"
 			return .TrimSlashes.BeforeLastByte('/', 1)
 
