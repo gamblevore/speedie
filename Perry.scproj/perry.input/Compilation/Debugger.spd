@@ -215,7 +215,7 @@ function message.CopyDebugData (|message| InputRow, |int| Depth)
 
 function message.ReStitchAndFixup (|message| NewList, |int| Depth)
 	opt norefcounts
-/	|| O = .last
+	|| O = .last
 	while (|| N = NewList.Last)
 		if !o
 			.first = n

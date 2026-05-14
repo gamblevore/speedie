@@ -87,7 +87,6 @@ module debugger
 		|| BestCount = 0
 		
 		target debug
-			debugger
 			.DebugList("Start", cakebreak, debugger.dbgLength)
 		
 		|| Max = debugger.dbgLength
@@ -120,7 +119,7 @@ module debugger
 			B |= (Active!=0)<<31
 			CakeBreak[Code] = B
 			if Active >= 2
-				debugger.breaktoclear <~ cake.vm.index(Cakebreak)
+				debugger.breaktoclear <~ Code
 			
 		  elseif !.BreakMapBad
 			.BreakMapBad = true
@@ -132,7 +131,7 @@ module debugger
 		|| f = .FileList[i]
 		if f != nil				// what if i == 0? is that an output error? What about lib-internal code? like init-code?
 			return f
-/		expect ("MissingFile " + i)
+		expect ("MissingFile " + i)
 
 
 	function StartUp (|&uint|)

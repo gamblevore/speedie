@@ -71,20 +71,13 @@ function __PerryView__ (cakevm.CakeChef)
 			|| Action = .Respond(m, stack)
 			if Action is SendVars
 				.SendStack(stack, p, "stack", ErrorCode)
-			if !ErrorCode and .GoRun(p, Action, hitbreak)
+			if Action is GoRun
+				HitBreak = false
+			if !ErrorCode and !HitBreak and (p.pico.CanGet <= 0)
 				exit
 
 	p <~ "run"
 
-
-
-function cakevm.GoRun (|spdprocess| p, |StepAction| Action, |bool| HitBreak, |bool|)
-	if Action is GoRun
-		return true
-	// only stepin sets it to kBreakAlways, but stepin returns gorun
-	if (debugger.UserBreakLevel < kBreakAlways) and (p.pico.CanGet <= 0)
-		.SetBreakLevel(debugger.UserBreakLevel)
-		return true
 
 
 function SendBreakAction (perryresponse)

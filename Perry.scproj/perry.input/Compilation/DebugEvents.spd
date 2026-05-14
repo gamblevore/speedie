@@ -279,17 +279,35 @@ function DebugBreakAdd (GuiTextLineEvent)
 		return 1			// tells textview to save compile positions on edit.
 	
 	|| cmd = ("brkadd" (direction > 0) "brkrem")
+	|| j = i.LineCommand(cmd, line)
+	.SendJbin(j)
+
+
+function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
+	opt norefcounts
 	|| j = VarPrinter.start(@tmp, cmd)
 	
-	j.AddStr i.path
+	j.AddStr .path
 	j.AddInt Line.Position
 	j.AddInt line.text.Length
 	j.exit
-	i.SendJbin(j)
+	return j
 
 
 function DebugStepOver (guiaction)
-	return .SendRunMsg("stepover", state)
+	opt norefcounts
+	|| i = .ide
+	with i
+		|| e = .editme
+		|| active = e._ActiveLine
+			if .EditPath(active.name, false)
+				|| l = e.FindLine(active.position).next
+					|| j = .LineCommand("stepover", l)	// kinda want it to be just NOT on the current line actually
+														// like step over a loop
+														// but we'll do that later!
+					.SendJbin(j)
+					return true
+	beep
 
 
 function DebugStepIn (guiaction)

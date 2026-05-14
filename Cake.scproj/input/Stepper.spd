@@ -1,20 +1,35 @@
 
 
+/*
+	How to do step over? its not so easy?
+	
+	So... really... we just want to break when we are OUTSIDE of the line
+
+	* It could be stepping on a branch. So... we'd need to step anywhere that is AFTER... Maybe multiple places
+	
+	* It could be stepping over the end of a loop! So... we could go back. Or it might go forward.
+	
+	* maybe something else wierd? maybe with optimisations... a branch could be removed, so we step within a future branch
+	
+	So... now what?
+	
+	So... we can't just spam all indexes... there are too many. Too many to keep track of.
+	
+	We could keep track of all the breaks we DO want to save? THEN set breaks everywhere in the function?
+	
+	Then we can use kbreakstated
+	
+	I mean... it should work?
+*/
+
+
 function cakevm.ClearTempBreak (|cakestack| stack)
 	|| index = .Index(stack.code)
-	|| B = cake.ActiveBreaks$
-	if debugger.BreakToClear.pop(index)
-		B[index] &= ~(1<<31)
-
-	
-function cakevm.TempBreak (|?&uint| Break)
-	if break and !(break[]>>31)							// has no breakpoint... add one
-		break[] |= 1<<31
-		debugger.breaktoclear <~ .index(break)			// nice
+	debugger.BreakToClear.pop(index)
 
 
 function StepInAction (PerryResponse)
-	debugger.BreakToClear.clear
+	debugger.BreakToClear.clearAll
 	.SetBreakLevel(cakevm.kBreakAlways)
 	return StepAction.GoRun
 
@@ -23,12 +38,16 @@ function StepOutAction (PerryResponse)
 	// So... we need to set something on the stack...
 	// But... where do we break? We need to set the stack to say that we need to break.
 	// And set a break, at the stack's return point. So where is that?
-	debugger.BreakToClear.clear
-	|&uint| Code
+	debugger.BreakToClear.clearAll
 	|| P = .prev(stack)
 		p.sflags |= 1
-		Code = p.code
-	.TempBreak(Code)
+		|| Code = p.code
+		|| I = .index(code)
+		|| break = cake.ActiveBreaks
+			ifn break[I] >> 31							// has no breakpoint... add one
+				break[I] |= 1<<31
+				debugger.breaktoclear <~ I				// nice
+		
 	.SetBreakLevel(cakevm.kBreakStated)
 	return StepAction.GoRun
 
@@ -59,6 +78,8 @@ struct BlockOfPointers
 				.count = C
 				if C > 0
 					.Indexes[i] = .Indexes[C] // remove ! :]
+				|| B = cake.ActiveBreaks
+					B[index] &= ~(1<<31)
 				return true
 			i++
 	
@@ -68,7 +89,7 @@ struct BlockOfPointers
 			.Indexes[c] = I
 			.count = c + 1
 	
-	function Clear
+	function ClearAll
 		self[0] = nil
 
 
