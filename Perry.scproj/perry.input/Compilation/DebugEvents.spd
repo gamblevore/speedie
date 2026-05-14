@@ -128,9 +128,10 @@ function PerryIDE.Stop (|unixprocess| prod, |bool|)
 
 function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
 	|| prod = .RunCompiledApp
-	if prod and .confirm("Kill running product " + .Name + Reason, fnStillRunning)
-		if .stop(prod)
-			prod = nil
+		.showide
+		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
+			if .stop(prod)
+				prod = nil
 	return !prod
 
 
@@ -210,7 +211,7 @@ function PerryIDE.ClearRun
 	.DelayedRun = nil
 	.SetAppInfo
 	.RunCompiledApp = nil
-	.editme._ActiveLine = nil
+	.editme.ClearActiveLine
 	.stack.clear
 	
 		

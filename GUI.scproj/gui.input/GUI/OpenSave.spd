@@ -82,13 +82,13 @@ class OpenSaveDialog (Window)
 		.LastGoodPath = "/"
 		.copypaste		|= copypasteflags.pastefile
 		.onpaste		= PastePathEvent|GUIPasteEvent|
-		.Accept			= buttonview(self, OnAskSaveAnswer)
-		.Cancel			= buttonview(self, OnAskSaveAnswer)
-		.Path			= textview(self, nil)
+		.Accept			= ButtonView(self, OnAskSaveAnswer)
+		.Cancel			= ButtonView(self, OnAskSaveAnswer)
+		.Path			= TextView(self, nil)
 		.files			= ListView(self, nil, OnAskSaveEntered)
-		.question		= textview(self)
-		.Name			= textview(self, OnAskSaveName)
-		.Reveal			= buttonview(self, OnAskSaveReveal)
+		.question		= TextView(self)
+		.Name			= TextView(self, OnAskSaveName)
+		.Reveal			= ButtonView(self, OnAskSaveReveal)
 		.size			= 500 by 225
 		.id				= "opensave"
 		isnt visible

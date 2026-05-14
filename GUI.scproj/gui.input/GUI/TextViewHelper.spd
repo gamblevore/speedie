@@ -2,7 +2,7 @@
 
 datatype TextLineFlags (uint16)
 	flags
-		BothBreaks = [BreakPoint, RealBreakPoint]
+		BothBreaks = [BreakPoint, ActiveBreakPoint]
 		Reached
 		Colored
 		Found
@@ -434,6 +434,12 @@ libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |int|)
 			rz += 0x0F000000
 
 	
+autogen TextView.ClearActiveLine
+	opt norefcounts
+	._ActiveLine = nil
+	for l.lines in self
+		(l isnt ActiveBreakPoint)
+
 
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
 	opt norefcounts
@@ -463,12 +469,13 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	
 	|| x	 = .DrawLineNumber(where, d, y)-1
 	|| state = MsgTextDrawState(x, d)
-	|| NoDrawFirst =  (self is CodeEditor)  and  (d is breakpoint or RealBreakPoint)
+	|| NoDrawFirst =  (self is CodeEditor)  and  ((m and d is ActiveBreakPoint) or (d is breakpoint))
 		|| col = vec4(0)
-		if (._ActiveLine) and (d is realbreakpoint)!=(d is BreakPoint)
-			col = (1.0, 1.0, 0.75, 0.375)
-			if d is realbreakpoint // purplebug!
-				col = colors.blue(0.375)
+		if keys.shift and (d is breakpoint)
+		if (m) and (d is ActiveBreakPoint)!=(d is BreakPoint)
+			col = (1.0, 1.0, 0.75, 0.375)		// pink
+			if d is ActiveBreakPoint			//	or
+				col = colors.blue(0.375)		// purple
 		state.font.DrawChar('\18', Where, (x, y), col, 0)
 		
 	|codepoint| Prev

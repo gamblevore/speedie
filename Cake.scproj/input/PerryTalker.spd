@@ -61,12 +61,12 @@ function __PerryView__ (cakevm.CakeChef)
 	HitBreak |= debugger.UserBreakLevel >= cakevm.kBreakAlways // stepin only sets this.
 	
 	if HitBreak
-		.ClearTempBreak(stack)
+		debugger.BreakToClear.clearAll
 	.SendStack(stack, p, "break", ErrorCode)
 
 	while
 		if !p.IsOpen
-			app.Quit
+			app.Quit // debugger.BreakToClear
 		|| m = p.Get(5.0)
 			|| Action = .Respond(m, stack)
 			if Action is SendVars
@@ -118,7 +118,7 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 	|| L = debugger.dbgLength
 	
 	|jbin| j = xvar.Printer
-	j.start(@tmp, "breakpoint")
+	j.Start(@tmp, "breakpoint")
 	j.AddStr(f)
 	j.Enter
 
@@ -129,10 +129,13 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 		|| Src = raw.Location
 		|| File = Src.FileNum
 		if file == tofind
-			|| P = raw.code(L)
-				|| Code = CakeBreak[P]
+			|| Code = raw.code(L)
+				|| Break = CakeBreak[Code]
+				if debugger.BreakToClear.get(Code)
+					Break &= ~(1<<31)
+				if Break
 					Count++
-					j.SendCode(Code, Src.Position)
+					j.SendCode(Break, Src.Position)
 	j.exit(2)
 	if Count
 		self <~ j

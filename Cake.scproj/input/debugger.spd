@@ -119,7 +119,7 @@ module debugger
 			B |= (Active!=0)<<31
 			CakeBreak[Code] = B
 			if Active >= 2
-				debugger.breaktoclear <~ Code
+/				debugger.breaktoclear <~ Code
 			
 		  elseif !.BreakMapBad
 			.BreakMapBad = true

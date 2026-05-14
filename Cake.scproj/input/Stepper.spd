@@ -23,11 +23,6 @@
 */
 
 
-function cakevm.ClearTempBreak (|cakestack| stack)
-	|| index = .Index(stack.code)
-	debugger.BreakToClear.pop(index)
-
-
 function StepInAction (PerryResponse)
 	debugger.BreakToClear.clearAll
 	.SetBreakLevel(cakevm.kBreakAlways)
@@ -71,26 +66,39 @@ struct BlockOfPointers
 	|uint[255]| Indexes
 	
 	function Pop (|uint| Index, |bool|)
-		|| C = .count - 1
-		|| i = 0
-		while i <= C
-			if .Indexes[i] == index
-				.count = C
-				if C > 0
-					.Indexes[i] = .Indexes[C] // remove ! :]
-				|| B = cake.ActiveBreaks
-					B[index] &= ~(1<<31)
-				return true
-			i++
+		|| i = .get(index)$
+		|| C = --.Count
+		if C > 0
+			.Indexes[i] = .Indexes[C]			// remove ! :]
+		|| B = cake.ActiveBreaks
+			B[index] &= ~(1<<31)
+		return true
 	
-	syntax Append (|uint| I)
+	
+	function Get (|uint| Index, |ind|)
+		for (idx in self) (i)
+			if idx == index
+				return i
+		
+	
+	syntax Append (|uint| Index)
 		|| C = .count
 		if C < –count .Indexes
-			.Indexes[c] = I
+			.Indexes[c] = Index
 			.count = c + 1
 	
+	
 	function ClearAll
+		|| B = cake.ActiveBreaks
+			for index in self
+				B[index] &= ~(1<<31)
 		self[0] = nil
 
-
+	
+	iterator
+		|| i = 0
+		|| C = .Count - 1
+		while (i <= C)
+			yield (.Indexes[i]) (i)
+			i++
 

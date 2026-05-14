@@ -33,7 +33,7 @@ function SetBreaks (|message| breaks)
 	|| file = breaks.FirstName
 	require file ~= .editme.FilePath
 	for l.lines in .editme
-		(l isnt realbreakpoint)
+		(l isnt ActiveBreakPoint)
 		(l isnt reached)
 	for line in breaks.last
 		|| Pos = line.second.int
@@ -41,7 +41,7 @@ function SetBreaks (|message| breaks)
 			|| D = .editme.FindTextLine(pos)
 			(D is reached)
 			if line ~= "break"
-				(D is realbreakpoint)
+				(D is ActiveBreakPoint)
 	.editme.Touch			
 		
 	
@@ -154,7 +154,7 @@ function SetAppInfo
 	if !CanDebug
 		.AppInfo.obj = nil
 	if !CanDebug or .DebugMode isnt paused
-		.editme._ActiveLine = nil
+		.editme.ClearActiveLine
 		.stack.clear
 	
 	|| fs = VarPrinter
