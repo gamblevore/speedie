@@ -843,7 +843,7 @@ function @AutoItem.Sorter (sortercomparer of autoitem)
 		return type
 	|| depth = .depth - b.depth // doesnt seem to work just yet?
 		return depth
-	return .sort.syntaxcompare(b.sort, true)
+	return b.sort.syntaxcompare(.sort, true)
 
 
 function FuncTmps (|message|)
