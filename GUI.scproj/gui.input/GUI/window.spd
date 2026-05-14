@@ -445,22 +445,27 @@ class Window (GUIControl)
 		GUI.StartResize // sigh
 
 
-	libinternal GUI.AskQuit (|SDLActivity|)
-//		|| Ask = "Quit " + app.AppName + "?"
-		.QuitReason = SDLActivity.questioning
-//		if Ask.confirm
-		rz = .AskQuitSub
-		.QuitReason = rz
-
-	
-	libinternal gui.AskQuitSub (|SDLActivity|)
-		opt norefcounts
-		for w in Window.all
+	libinternal GUI.AskAllQuit (|bool|)
+		|| m = window.all.array			// so we can call .show
+		rz = true
+		for w in m
 			if !w.IsDialog
-				require w.Close(SDLActivity.questioning)
+				w.show
+				.QuitReason = SDLActivity.questioning // in case of wierd events
+				rz = w.__TryClose__(SDLActivity.questioning)
+				loop rz			
+		
+		
+	libinternal GUI.AskQuit (|SDLActivity|)
+		opt norefcounts
+		
+		require .AskAllQuit
+		rz = SDLActivity.Terminating
 		for w in Window.all
-			require w.Close(SDLActivity.terminating)
-		return SDLActivity.Terminating
+			gui.QuitReason |= rz
+			w.Close(rz)
+
+		.QuitReason = rz
 		
 	
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)

@@ -120,7 +120,7 @@ class PerryIDE (Window)
 				if p isa perryide
 					p.showide
 					exit
-				p = .prev
+				p = p.prev
 			|| proj = .SharedProjectTabSource
 			if perry.HasOthers(proj)
 				.RemoveProjFromList
@@ -185,6 +185,8 @@ class PerryIDE (Window)
 			return false						// failed
 		if !ClickedCancel(self) or !.MakeNothingRunning(" for closing the project?")
 			return false
+		if reason is questioning
+			return true
 		return .closed
 			
 

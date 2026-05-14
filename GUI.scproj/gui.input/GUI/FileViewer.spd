@@ -254,7 +254,7 @@ class FileViewer (ListView)
 				fs <~ "\n"
 				fs <~ m0.readname
 		
-		|| answer = fs.render.AskSaveOrCancel
+		|| answer = fs|&nil||string|.AskSaveOrCancel
 		fs = nil
 		if answer >= 1  // save
 			return .saveall(documentstate.saving)
@@ -268,6 +268,8 @@ class FileViewer (ListView)
 
 	syntax access (|string| path, |filerow|)
 		cpp_part AccessPath
+		require path
+
 		if path.file.IsDir
 			path = path.PathDir // standardise
 		for f in self

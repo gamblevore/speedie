@@ -423,7 +423,7 @@ class list
 	
 	function Array (|[...]|)
 		opt norefcounts
-		for msg in self
+		for msg.fast in self
 			rz <~ msg
 
 

@@ -1045,13 +1045,7 @@ module GUI
 //		if Reason isnt windowclose
 //			return .quit(reason)
 
-		|| w = window.front
-			if (reason is exiting) and w.IsMainWindow
-				return GUI.AskQuit
-			.quitreason = 0 // i guess?
-			return w.close
-
-		return reason
+		return GUI.AskQuit
 	
 	
 	libinternal BackgroundChanged (|bool| back, |int|)
