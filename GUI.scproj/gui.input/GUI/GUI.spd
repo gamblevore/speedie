@@ -476,16 +476,18 @@ module GUI
 	
 	
 	libinternal ActualEvents (|SDLActivity|) // frameevents
-		while (.QuitReason isnt ExitOrTerminate) and .Event.Poll
+		while (.SingleFrameNest or .QuitReason isnt ExitOrTerminate) and .Event.Poll
 			.EventCount++
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
 		if .NeedMouseMove
 			.DoFakeMouseMove
-		|| Quitish = .QuitReason &~ (SDLActivity.Activity ||| SDLActivity.Questioning)
-			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
-
-		.QuitReason = 0
+		
+		if !.SingleFrameNest
+			|| Quitish = .QuitReason &~ (SDLActivity.Activity ||| SDLActivity.Questioning)
+				rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
+			.QuitReason = 0
+			
 		.StartResize	// don't remove! causes delayed updates! resizes can happen here
 						// and the next thing that happens is a draw!
 		if .NewSize
@@ -939,13 +941,13 @@ module GUI
 		
 		.SavePrefs // in case we crash during quit
 
-		SDL_SetRelativeMouseMode(false) // helpful
+		SDL_SetRelativeMouseMode(false)		// helpful
 		for w in window.all
-			.quitreason = SDLActivity.Terminating // in case of wierd events
-			w.close(SDLActivity.Terminating)
+			.quitreason |= reason			// in case of wierd events clearing the reason
+			w.close(reason)
 
 		.SavePrefs
-		return SDLActivity.Terminating
+		return reason
 
 
 	libinternal FileDroppedIntoApp (|window| w, |SDL_DropEvent| Drop, |SDLEventType| t, |int|)
@@ -1040,12 +1042,12 @@ module GUI
 		if Reason is Terminating
 			return SDLActivity.Terminating // terminate will call windowclose anyhow
 	
-		if Reason isnt windowclose
-			return .quit(reason)
+//		if Reason isnt windowclose
+//			return .quit(reason)
 
 		|| w = window.front
 			if (reason is exiting) and w.IsMainWindow
-				return GUI.AskQuitAndThenQuit
+				return GUI.AskQuit
 			.quitreason = 0 // i guess?
 			return w.close
 
@@ -1166,7 +1168,7 @@ module GUI
 			if (w != ww) and ww.ismainwindow
 				return nil
 		
-		if .AskQuitAndThenQuit
+		if .AskQuit
 			.quitreason |= sdlactivity.exiting
 			return sdlactivity.exiting
 		

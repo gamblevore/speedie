@@ -229,22 +229,33 @@ class FileViewer (ListView)
 		for r in self
 			if r.ismodified
 				m <~ r
-		if !m
+
+		|| first = m.first
+		if !first
 			return true
-		.focuson(m.first!)
+		
+		.focuson(first)
 
 		|| fs = faststring()
+		fs <~ "Save "
 		|| n = m.Length
-		|| fstr = "file".pluralize(n)
-		fs <~ "Save $fstr in project "
-		fs <~ .liststart!.name
+		if n > 1
+			fs <~ n
+			fs <~ " files in project "
+			fs <~ .liststart!.name
+		  else
+			fs <~ first.readname
+		if gui.quitreason
+			fs <~ ", before quitting"
 		fs <~ "?"
-		fs <~ "\n"
-		for m0 in m
+		if n > 1
 			fs <~ "\n"
-			fs <~ m0.readname
+			for m0 in m
+				fs <~ "\n"
+				fs <~ m0.readname
 		
 		|| answer = fs.render.AskSaveOrCancel
+		fs = nil
 		if answer >= 1  // save
 			return .saveall(documentstate.saving)
 		return answer == 0	// don't

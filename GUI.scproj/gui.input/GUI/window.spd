@@ -445,11 +445,11 @@ class Window (GUIControl)
 		GUI.StartResize // sigh
 
 
-	libinternal GUI.AskQuitAndThenQuit (|SDLActivity|)
-/		|| Ask = "Quit " + app.AppName + "?"
+	libinternal GUI.AskQuit (|SDLActivity|)
+//		|| Ask = "Quit " + app.AppName + "?"
 		.QuitReason = SDLActivity.questioning
-		if Ask.confirm
-			rz = .AskQuitSub
+//		if Ask.confirm
+		rz = .AskQuitSub
 		.QuitReason = rz
 
 	
