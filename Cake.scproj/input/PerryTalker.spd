@@ -1,17 +1,4 @@
 
-/*
-	So how to do this?
-	
-	* stepin... just alwaysbreak.
-	
-	* stepout... set a flag on the stack, and a break... then break if the stack/flag is correct?
-		* OR... just store the stack thing itself?
-	
-	* Step over... similar
-*/
-
-// We need to put a breakpoint in the original file... then see what happens
-
 
 prototype PerryResponse (|CakeVM| self, |message| m, |CakeStack| Stack, |uint| State,  |StepAction|)
 dispatch DebuggerActions (PerryResponse)
@@ -68,10 +55,15 @@ function __PerryView__ (cakevm.CakeChef)
 	if !p.IsOpen
 		app.Quit							// Stop the runaway!
 	
-	if !ErrorCode
-		.ClearTempBreak(stack)
+	|| HitBreak = (stack.SFlags & 1)!=0		// break? right? it seems so?
+		stack.SFlags &= ~1
+	HitBreak |= Break>>31
+	HitBreak |= debugger.UserBreakLevel >= cakevm.kBreakAlways // stepin only sets this.
 	
+	if HitBreak
+		.ClearTempBreak(stack)
 	.SendStack(stack, p, "break", ErrorCode)
+
 	while
 		if !p.IsOpen
 			app.Quit
@@ -79,20 +71,14 @@ function __PerryView__ (cakevm.CakeChef)
 			|| Action = .Respond(m, stack)
 			if Action is SendVars
 				.SendStack(stack, p, "stack", ErrorCode)
-			if !ErrorCode and .GoRun(p, Action)
+			if !ErrorCode and .GoRun(p, Action, hitbreak)
 				exit
 
 	p <~ "run"
 
 
-/*
-	OK... respond by collecting the current state? So what do we mean?
-	
-	Well... if we stop, brecause the breaklevel is 3... that doesn't mean that we want to just run. WHY is it 3. Because we set it, or because we got a new message? Where can it be set even? I think... we need to just collect what we are setting it to?
-*/
 
-
-function cakevm.GoRun (|spdprocess| p, |StepAction| Action, |bool|)
+function cakevm.GoRun (|spdprocess| p, |StepAction| Action, |bool| HitBreak, |bool|)
 	if Action is GoRun
 		return true
 	// only stepin sets it to kBreakAlways, but stepin returns gorun

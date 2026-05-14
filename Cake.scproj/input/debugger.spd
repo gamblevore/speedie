@@ -88,7 +88,7 @@ module debugger
 		
 		target debug
 			debugger
-			.DebugList("Start", cakebreak, l)
+			.DebugList("Start", cakebreak, debugger.dbgLength)
 		
 		|| Max = debugger.dbgLength
 		for Src in .SourceMap
@@ -111,7 +111,7 @@ module debugger
 					.SetUserBreak(CakeBreak, Src, active)			
 
 		target debug
-			.DebugList("After", cakebreak, l)
+			.DebugList("After", cakebreak, debugger.dbgLength)
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active)
