@@ -25,12 +25,12 @@ function message.GrowTITS (|int| Width, |int| Depth)
 		if Depth > 0
 			tits.GrowTITS(depth, width)
 
-function app.FlatTits (|message| t, |int|)
+function app.FlatTITS (|message| t, |int|)
 	opt norefcounts
 	for s.fastflat in t
 		rz++
 
-function app.ExploreTits (|message| t, |int|)
+function app.ExploreTITS (|message| t, |int|)
 	opt norefcounts
 	for s.fast in t
 		rz++
