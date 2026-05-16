@@ -1,55 +1,40 @@
 
-
-/*
-	How to do step over? its not so easy?
-	
-	So... really... we just want to break when we are OUTSIDE of the line
-
-	* It could be stepping on a branch. So... we'd need to step anywhere that is AFTER... Maybe multiple places
-	
-	* It could be stepping over the end of a loop! So... we could go back. Or it might go forward.
-	
-	* maybe something else wierd? maybe with optimisations... a branch could be removed, so we step within a future branch
-	
-	So... now what?
-	
-	So... we can't just spam all indexes... there are too many. Too many to keep track of.
-	
-	We could keep track of all the breaks we DO want to save? THEN set breaks everywhere in the function?
-	
-	Then we can use kbreakstated
-	
-	I mean... it should work?
-*/
-
-
-function StepInAction (PerryResponse)
-	debugger.clearBreaks
+function StepOneAction (PerryResponse)
+	debugger.RestoreBreaks
 	.SetBreakLevel(cakevm.kBreakAlways)
 	return StepAction.GoRun
 
 
-function StepOutAction (PerryResponse)
-	debugger.clearBreaks
-	|| P = .prev(stack)
-		p.sflags |= 1									// is this needed? didn't we set a temp-break?
-		|| Code = p.code
-		|| I = .index(code)
-		|| break = cake.ActiveBreaks
-			ifn break[I] >> 31							// has no breakpoint... add one
-				break[I] |= 1<<31
-				debugger.breaktoclear <~ I				// nice
-		
-	.SetBreakLevel(cakevm.kBreakStated)
-	return StepAction.GoRun
+function StepInAction (PerryResponse)
+	debugger.SetAllBreaks
+/	.SetBreakLevel(cakevm.kBreakStated)
+	return debugger.SetBreaks(m, false, StepAction.GoRun)		// CLEAR those in this range.
 
 
 function StepOverAction (PerryResponse)
-	debugger.ClearBreaks
-	debugger.StepOver.Collect
-	.SetBreakLevel(cakevm.kBreakStated)
-	return debugger.SetBreaks(m, false, true, StepAction.GoRun)	// CLEAR those in this range.
+	opt norefcounts
+	|| index = .Index(Stack.Code)
+	|| fn = (spdtable.Find(index) (index >= 0) nil)
+	debugger.SetAllBreaks(fn)
+/	.SetBreakLevel(cakevm.kBreakStated)
+	return debugger.SetBreaks(m, false, StepAction.GoRun)
 	
+
+function StepOutAction (PerryResponse)
+	debugger.RestoreBreaks
+/	|| P = .prev(stack)				// The main issue here is about recursion?
+									// Setting it to a point... that we come back to is fine.
+									// But if we get to that point by stepping forward
+									// even in the same function...
+									// So how do we know if a break isnt a real break?
+		|| Code = p.code			// lets deal with recursion separately...
+		|| I = .index(code)
+		|| break = cake.ActiveBreaks
+			break[I] |= 1<<31
+	
+	.SetBreakLevel(cakevm.kBreakStated)
+	return StepAction.GoRun
+
 	
 function cakevm.SetBreakLevel (|int| level, |?&uint|)
 	debugger.UserBreakLevel = level
@@ -59,85 +44,39 @@ function cakevm.SetBreakLevel (|int| level, |?&uint|)
 
 
 
-struct TempBreaks
+struct SavedBreaks
 	|int|		Count
-	|uint[255]| Indexes
+	|&uint|		Indexes
+	// Saves all the breaks that we SHOULD have.
+	// Starts ordered but can be unordered.
 	
-	function Pop (|uint| Index, |bool|)
-		|| i = .get(index)$
-		|| C = --.Count
-		if C > 0
-			.Indexes[i] = .Indexes[C]			// remove ! :]
-		|| B = cake.ActiveBreaks
-			B[index] &= ~(1<<31)
-		return true
+	function Init (|int| N, |&uint|)
+		.count = -1
+		rz = memory.zalloc(N*4)|&uint|
+		.Indexes = rz!
 	
-	
-	function Get (|uint| Index, |ind|)
-		for (idx in self) (i)
-			if idx == index
-				return i
+	function Add (|uint| Code)
+/		.Indexes[.Count++] = Code
 		
+	function Remove (|uint| Code)
+/		|| i = .get(code)
+			|| c = .count - 1
+			.indexes[i] = .Indexes[c]
+			.count = c
 	
-	syntax Append (|uint| Index)
-		|| C = .count
-		if C < –count .Indexes
-			.Indexes[c] = Index
-			.count = c + 1
+	function Get (|uint| Code, |ind|)
+		for i in .count
+			if .Indexes[i] == Code
+				return i
 	
-	
-	function ClearAll
-		|| B = cake.ActiveBreaks
-			for index in self
-				B[index] &= ~(1<<31)
-		self[0] = nil
-
-	
-	iterator
-		|| i = 0
-		|| C = .Count - 1
-		while (i <= C)
-			yield (.Indexes[i]) (i)
-			i++
-
-
-
-struct StepOverMaker
-	|uint|  Count
-	|&uint| Indexes
-	
-	function Init (|int| N)
-		.count = 0
-		.Indexes = memory.zalloc(N*4)|&uint|
-	
-	function Collect
-		|| B = cake.ActiveBreaks$
-		|| N = debugger.dbglength
-		.Count = 0
-		for i in n
-			if b[i]>>31
-				self <~ i
-			b[i] |= 1<<31
-	
-	// so now what do we want to do? we want to... collect the breaks, right?
-	// that is so that our stepover thing, can set ALL the breaks in the entire app.
-	// then clear them once we hit it.
-	// I think its just for step over, right?
-	
-	syntax Append (|uint| Index)
-		opt inline
-		.indexes[.Count++] = index
-	
-	function ClearAll
-		|| B = cake.ActiveBreaks
-			|| ouch = 1<<31
-			for i in debugger.DbgLength
-				B[i] &= ~ouch
-			for i in .count
-				B[i] |= ouch
-		.count = 0
+	function Restore
+		|| B = cake.ActiveBreaks		#require		
+		|| ouch = 1<<31
+		for i in debugger.DbgLength
+			B[i] &= ~ouch
+		|| dx = .Indexes
+		for i in .count
+			|| dixi = dx[i]
+			B[dixi] |= ouch
 	
 	
-
-
-

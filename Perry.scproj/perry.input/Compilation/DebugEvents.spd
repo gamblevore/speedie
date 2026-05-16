@@ -287,7 +287,6 @@ function DebugBreakAdd (GuiTextLineEvent)
 function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 	opt norefcounts
 	|| j = VarPrinter.start(@tmp, cmd)
-	
 	j.AddStr .path
 	j.AddInt Line.Position
 	j.AddInt line.text.Length
@@ -298,16 +297,12 @@ function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 function DebugStepOver (guiaction)
 	opt norefcounts
 	|| i = .ide
-	with i
-		|| e = .editme
-		|| active = e._ActiveLine
-			if .EditPath(active.name, false)
-				|| l = e.FindLine(active.position).next
-					|| j = .LineCommand("stepover", l)	// kinda want it to be just NOT on the current line actually
-														// like step over a loop
-														// but we'll do that later!
-					.SendJbin(j)
-					return true
+	|| e = i.editme
+	|| active = e._ActiveLine
+	if active and i.EditPath(active.name, false)
+		|| l = e.FindLine(active.position)
+			.SendJbin(i.LineCommand("stepover", l))
+			return true
 	beep
 
 

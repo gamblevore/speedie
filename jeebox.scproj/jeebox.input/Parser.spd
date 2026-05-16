@@ -49,7 +49,6 @@ extend Parser
 		.Token( "|" )  = .handler( kTemporalBar, fDecl ).link(kFuncAfterBar, fTypeCast).link( kThingBar, fdecl )
 		.Token( `^"` ) = .Handler( kthingsyx, fArgName )
 		.Token( `+` )  = .Handler( kTemporalSyx, fTmpPlus )
-		.Token( `#` )  = .Handler( kTemporalSyx, fTmpSection )		// where is this used?
 		.Token( "@" )  = .Handler( kThingSyx, fAtName ).Link( kFuncAfterNormal, fAtNamedExp )
 		.Token( "~" )  = .Handler( kFuncAfterNormal, fAdjectiveThing ).Link( kAdjectiveOp, fAdjectiveOp )
 
@@ -325,14 +324,6 @@ extend Parser
 				if tmp != @thg
 					return tmp
 		return parser.fError2(start, nil)
-
-
-	function fTmpSection (ParseHandler)
-//		#'abc'
-		opt norefcounts
-		|| tmp = .fTmpPlus(start, parent)
-			(tmp is splithere)
-			return tmp
 
 
 	function fAtNamedExp (ParseHandler)
@@ -1454,7 +1445,7 @@ datatype MsgParseFlags (uint16)
 		MacroMade			= 0x1000				// This is set via Jeebox's Macro system.
 
 		// These are set during parse.
-		SplitHere			= 0x2000				// Tells compressed jbin to split the document at this point.
+//		SplitHere			= 0x2000				// Tells compressed jbin to split the document at this point. // removed
 		Style2				= 0x4000				// Alters render style. +"name" vs name
 		BreakPoint			= 0x8000				// This message begun with a breakpoint. (The '/' char)
 		MacroInserted		= MacroMade+Inserted

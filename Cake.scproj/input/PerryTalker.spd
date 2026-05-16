@@ -3,6 +3,7 @@
 prototype PerryResponse (|CakeVM| self, |message| m, |CakeStack| Stack, |uint| State,  |StepAction|)
 dispatch DebuggerActions (PerryResponse)
 	run				RunAction
+	stepincutely	StepOneAction
 	stepin			StepInAction
 	stepout			stepoutAction
 	stepover		stepoverAction
@@ -55,13 +56,9 @@ function __PerryView__ (cakevm.CakeChef)
 	if !p.IsOpen
 		app.Quit							// Stop the runaway!
 	
-	|| HitBreak = (stack.SFlags & 1)!=0		// break? right? it seems so?
-		stack.SFlags &= ~1
-	HitBreak |= Break>>31
-	HitBreak |= debugger.UserBreakLevel >= cakevm.kBreakAlways // stepin only sets this.
-	
-	if HitBreak
-		debugger.ClearBreaks
+	Break >>= 31
+	if Break
+		debugger.RestoreBreaks
 	.SendStack(stack, p, "break", ErrorCode)
 
 	while
@@ -72,8 +69,8 @@ function __PerryView__ (cakevm.CakeChef)
 			if Action is SendVars
 				.SendStack(stack, p, "stack", ErrorCode)
 			if Action is GoRun
-				HitBreak = false
-			if !ErrorCode and !HitBreak and (p.pico.CanGet <= 0)
+				Break = 0
+			if !ErrorCode and !Break and (p.pico.CanGet <= 0)
 				exit
 
 	p <~ "run"
@@ -95,9 +92,6 @@ function RunAction (perryresponse)
 	.SetBreakLevel(Level)
 	return StepAction.gorun
 
-
-function Debugger.SourceMap (|&SourceMap|)
-	return .Breakables.Addr|&SourceMap|
 
 
 function jbin.SendCode (|uint| Break, |int| Position)
@@ -125,17 +119,17 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 	|| ToFind = F.Index
 	|| Count = 0
 
-	for raw in debugger.SourceMap
+	// surely we wanna do codetosrc?
+	for raw in debugger.SrcToCode
 		|| Src = raw.Location
-		|| File = Src.FileNum
-		if file == tofind
+		if Src.FileNum == ToFind
 			|| Code = raw.code(L)
-				|| Break = CakeBreak[Code]
-				if debugger.BreakToClear.get(Code)
-					Break &= ~(1<<31)
-				if Break
-					Count++
-					j.SendCode(Break, Src.Position)
+			|| Mask = -1|uint|
+			if !debugger.RealBreaks.Get(code)
+				Mask >>= 1
+			|| Break = CakeBreak[Code] & Mask
+				Count++
+				j.SendCode(Break, Src.Position)
 	j.exit(2)
 	if Count
 		self <~ j
@@ -198,7 +192,7 @@ function EditAction (PerryResponse)
 
 
 function BreakAction (PerryResponse)
-	return debugger.SetBreaks(m, state|bool|, false, StepAction.DoNothing)
+	return debugger.SetBreaks(m, state|bool|, StepAction.DoNothing)
 
 
 function BreakRemoveAction (perryresponse)
@@ -286,7 +280,7 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	
 	|| vars = debugger.VariablePrinter!
 	{
-	|| Where = debugger.SrcMap(index)
+	|| Where = debugger.CodeToSrc(index)
 	rz = Where.File
 	if !rz.Length
 		if rz == nil

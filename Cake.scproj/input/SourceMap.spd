@@ -9,6 +9,9 @@ datatype SourceLocation (uint)
 
 	function File (|FileWithData|)
 		return debugger.path(.FileNum)
+	
+	function Map (|uint| Code, |SourceMap|)
+		return ((self|SourceMap|) << 32) ||| Code
 
 
 datatype SourceMap (uint64)
@@ -30,7 +33,7 @@ datatype SourceMap (uint64)
 				return int.max - C
 	
 	iterator
-		|int| MapPos = (debugger.Breakables.Length>>3) - 1
+		|int| MapPos = (debugger.SrcToCodeStr.Length>>3) - 1
 		while (MapPos >= 0)
 			yield self[MapPos]
 			MapPos--

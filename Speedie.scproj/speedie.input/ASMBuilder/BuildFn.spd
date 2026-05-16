@@ -17,12 +17,12 @@ extend_module ASM
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
-				testvm.SetBreakLevel(2)
+				testvm.SetDebug(cake.kBreakStated)
 				testvm.load(ff.ptr, ff.length)
 				object.totalsanity
 				testvm.Run(0)
 				object.totalsanity
-				testvm.SetBreakLevel(0)
+				testvm.SetDebug(0)
 
 
 	function GetASMFunc (|message| m, |scfunction|)

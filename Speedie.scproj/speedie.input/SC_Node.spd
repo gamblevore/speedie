@@ -540,7 +540,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					ifn exp in @dot							// x = a.b is still a function call
 						|scdecl--| pr = o.HasProto
 							Return pr
-						|string--| err = "Using address of protoless-function: " + o.name
+						|string--| err = "Unexpected use of function address: " + o.name
 						if side and !paramsarray.MacroSize
 							err = "Not assignable."
 						error (exp, err)

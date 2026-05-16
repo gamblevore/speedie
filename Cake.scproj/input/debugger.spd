@@ -3,52 +3,71 @@
 module debugger
 	|message|			PackInfo
 	|Message|			Globs
-	|[fileWithData]|	FileList
+	|[FileWithData]|	FileList
 	|Dictionary of filewithdata| FileMap
-	|string|			SrcMapStr
-	|string|			Breakables // breakmap
+	|string|			CodeToSrcStr
+	|string|			SrcToCodeStr
 	|string|			InbuiltBreaks
 	|uint|				DbgLength
 	|uint|				OverFlowTrack
 	|bool|				WantDebug
 	|bool|				BreakMapBad
-	|byte|				UserBreakLevel // the break level that the user set by pressing pause/run/step/etc
+	|byte|				UserBreakLevel		// The break level that the user set by pressing pause/run/step/etc
 	|faststring|		VariablePrinter
-	|TempBreaks|		BreakToClear
-	|StepOverMaker|		StepOver
+	|SavedBreaks|		RealBreaks
 	
 	
-	function SrcMap (|uint| Index, |SourceLocation|)
-		|| Base = .SrcMapStr.Addr|&uint|
+	function CodeToSrc (|uint| Index, |SourceLocation|)
+		|| Base = .CodeToSrc
 		if index < .dbgLength
 			return base[index]
 	
+	function CodeToSrc (|&SourceLocation|)
+		return .CodeToSrcStr.Addr|&SourceLocation|
+	
+	function SrcToCode (|&SourceMap|)
+		return .SrcToCodeStr.Addr|&SourceMap|
+
 	
 	function PicoReader (PicoActionFn)	
 		self|&cakevm|.Pause		// cool. now we can safely do stuff
 
 	
-	function ClearBreaks
-		.BreakToClear.ClearAll
-		.StepOver.ClearAll
-		
+	function RestoreBreaks
+		.RealBreaks.Restore
+	
+	
+	function SetAllBreaks (|spdfunc| fn = nil)
+		|| B = cake.ActiveBreaks				#require
+		|| After = B + .DbgLength
+		if fn
+			B += fn.Position
+			After = B + fn.RangeLength
+		while B < After
+			B[] |= 1<<31
+			B++
+	
+
+	
 	function ActivateInbuiltBreaks
-		|| CakeBreak = cake.ActiveBreaks$
+		|| L = .DbgLength
+		|| DX = .RealBreaks.Init(L)				#require
+		|| CakeBreak = cake.ActiveBreaks		#require
 		|| P = .InbuiltBreaks.Addr|&uint|
 		|int| n = .InbuiltBreaks.Length >> 2
-		|| L = .dbgLength
-		.StepOver.Init(L)
+		|| C = 0
 		for i in n
 			|| Code = P[i]
 			if Code < L
 				CakeBreak[Code] |= (1<<31)
-				
+				DX[c++] = Code
+		.RealBreaks.Count = C
 	
 	
 	function DebugList (|string| name, |&uint| CakeBreak, |uint| Max)
 		target true {
 		".......$name......"
-		for Raw in .SourceMap
+		for Raw in .SrcToCode
 			|| Src = raw.Location
 			|| FilePos = src.Position
 			|| ff = src.file
@@ -68,36 +87,48 @@ module debugger
 	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Max, |uint| Active, |bool|)
 		|| Code = self|uint|
 		if Code < Max
-			|| Curr = CakeBreak[Code] >> 31
-			if Curr != (Active!=0)|uint|
+			|| Curr = (CakeBreak[Code] >> 31) << 31
+			if Curr != Active
 				return true
 
 
-	function SetBreaks (|message| m, |bool| Active, |bool| EntireRange, |stepaction| Action, |stepaction|)
+	function GoRunClearBreaks (|fileWithData| F, |stepaction| Action, |uint| P, |uint| A, |stepaction|)
+		|| CakeBreak = cake.ActiveBreaks!
+		|| N = debugger.dbgLength
+		|| Map = .CodeToSrc
+/		|uint| i = 0
+
+		while (i < N)
+			|| Src = Map[i].map(i)
+			if Src.MatchScore(F, P, A, N)
+				.SetUserBreak(CakeBreak, Src, 0, N)
+			i++
+		
+		return Action
+		
+		
+	function SetBreaks (|message| M, |bool| Active, |stepaction| Action, |stepaction|)
 		opt norefcounts
 		|| F = debugger.file(m)
-		if f != nil
-			|| p = m[1].int
-			|| l = m[2].int
-			debugger.UserMultiBreak(F, p, p+l, Active|uint|, EntireRange)
-			if !EntireRange
-				cake.perry!.SendBreaks(F)
+		if f == nil
+			return action
+			
+		|| p = m[1].int
+		|| a = p + m[2].int
+		if action is GoRun
+			return .GoRunClearBreaks(F, Action, P, A)
 		
+		debugger.UserMultiBreak(F, p, a, Active<<31)
+		cake.perry!.SendBreaks(F)
+	
 		return action
 		
 		
-	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active, |bool| EntireRange)
+	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active)
 		opt norefcounts
 		|| CakeBreak = cake.ActiveBreaks$
 		|| Max = debugger.dbgLength
 
-		if EntireRange
-			for Src in .SourceMap
-				if Src.MatchScore(path, position, after, Max)
-					.SetUserBreak(CakeBreak, Src, active, max)
-			return
-			
-			
 		|| BestScore = 0
 		|| BestValue = 0
 		|| BestCount = 0
@@ -105,7 +136,7 @@ module debugger
 		target debug
 			.DebugList("Start", cakebreak, debugger.dbgLength)
 		
-		for Src in .SourceMap
+		for Src in .SrcToCode
 			if src.NeedsChange(cakebreak, Max, active)
 				|| Score = Src.MatchScore(path, position, after, Max)
 				if Score > BestScore
@@ -119,7 +150,7 @@ module debugger
 		if BestCount == 1										// same thing as below, but faster...
 			.SetUserBreak(CakeBreak, BestValue, active, max)
 		  else
-			for Src in .SourceMap
+			for Src in .SrcToCode
 				|| Score = Src.MatchScore(path, position, after, max)
 				if src.NeedsChange(cakebreak, Max, active) and (Score == BestScore)
 					.SetUserBreak(CakeBreak, Src, active, max)			
@@ -131,10 +162,16 @@ module debugger
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active, |uint| Max)
 		if Code < Max
 			|| B = (CakeBreak[Code] <<1) >>1
-			B |= (Active!=0)<<31
-			CakeBreak[Code] = B
+			|| ToAdd = (Active>>31)<<31
+			CakeBreak[Code] = B|||ToAdd
+			if Active & 1
+				if ToAdd
+					debugger.RealBreaks.add(code)
+				  else
+					debugger.RealBreaks.remove(code)
+			return
 			
-		  elseif !.BreakMapBad
+		if !.BreakMapBad
 			.BreakMapBad = true
 			printerror "BreakMap out of range"
 		
@@ -173,7 +210,7 @@ module debugger
 	function cakevm.DumpStackAtIndex (|CakeStack| Stack)
 		opt norefcounts
 		|| index = .Index(Stack.Code)
-		|| Where = debugger.SrcMap(index)
+		|| Where = debugger.CodeToSrc(index)
 		|| fn = spdtable.Find(index)
 		|| Path = debugger.path(Where.FileNum)
 			|| TabTo = .PrintCodeLocation(Path, fn, Where.Position)
@@ -214,10 +251,10 @@ module debugger
 		.LoadLibAndGlobs(packinfo)
 		
 		.LoadFiles(PackInfo["files"].value.decompress)
-		.Breakables = PackInfo["breakmap"]
+		.SrcToCodeStr = PackInfo["breakmap"]
 		.InbuiltBreaks = PackInfo["breakpoint"]
-		.SrcMapStr = PackInfo["pos"]
-		.dbgLength = .SrcMapStr.Length >> 2
+		.CodeToSrcStr = PackInfo["pos"]
+		.dbgLength = .CodeToSrcStr.Length >> 2
 
 		|| L2 = SpdTable.CodeLength
 		expect (L2 == .dbgLength)				("Map-length is: " + .dbgLength) + (" but code-length is: " + L2)
@@ -238,7 +275,7 @@ module debugger
 		|filewithdata--| LastFile
 		printline "--- BreakInfo ---"
 		
-		for raw in .SourceMap
+		for raw in .SrcToCode
 			|| Src = raw.Location
 			|| P = src.Position
 			|| Code = raw.code(T)

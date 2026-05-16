@@ -352,6 +352,7 @@ class FileViewer (ListView)
 	
 		
 	libinternal CanFind (|filerow| f, |uint| id, |bool|)
+		opt norefcounts
 		if id
 			require f.findid != id
 		f.findID = ID
