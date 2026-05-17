@@ -180,24 +180,54 @@ module PackMaker
 			.BakeDebug(j)
 			j.ExitAll
 	
+	
+	function scfunction.ASMRange (|ivec3|)
+		opt norefcounts
+		|| low = int.max
+		|| high = 0
+		|| file = 0
+		|| src = .source
+		if src and src isnt Inserted // sigh
+			file = src.tag >> 5
+			for s.flat in src
+				if (s isnt inserted) and (s.tag>>5 == file)
+					|| r = s.Range
+					(low min= r[0])
+					(high max= r[1])
+				
+		if !high // oof
+			low = 0
+		return (low, high, file)
+	
+	
+//	function Limits (|faststring|)
+//		opt norefcounts
+//		rz = FastString()
+//		for fn in .packfuncs
+//			|| range = fn.asmrange
+//			rz.appendhint(range[0])
+//			rz.appendhint(range[1])
+//			rz.appendhint(range[2])
+
 		
 	function BakeDebug (|jbin| j)		
 		|faststring--| p = SourceMap.Positions$
 		|| JL = J.Length
 		j.tmparg("debug")
 		.DebugClassesAndGlobals(j)
-		j.addrow(@bin, "pos", p|string|)
 		|| files = SCImport.AllFiles.join("\n")
 //		if !Options.Dev
 //			files = files.Compress
 		j.addrow(@str, "files", files)
 
+		j.addrow(@bin, "pos", p|string|)
 		|faststring--| Breakable = SourceMap.Breakable
-		|faststring--| Points = SourceMap.Breakpoints
-		if breakable and points
 			SourceMap.SortBreaks(breakable)
-			j.addrow(@str, "breakmap", Breakable|string|)
-			j.addrow(@str, "breakpoint", Points|string|)
+			j.addrow(@bin, "breakmap", Breakable|string|)
+
+		|faststring--| Points = SourceMap.Breakpoints
+			j.addrow(@bin, "breakpoint", Points|string|)
+
 		j.exit(2)
 		compiler.stDebugInfo += j.Length - JL
 	

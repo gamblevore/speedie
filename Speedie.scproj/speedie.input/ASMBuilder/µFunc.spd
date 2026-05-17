@@ -160,6 +160,12 @@ function JBin.BakeFunc (|SCFunction| fn, |bool|)
 		.add(@bin, dd)
 		dd.Length = 0
 		
+		|| R = fn.ASMRange
+		for i in 3
+			dd.AppendHInt(r[i])
+		.add(@bin, dd)
+		dd.Length = 0
+		
 	if !Options.StripNames
 		.exit
 

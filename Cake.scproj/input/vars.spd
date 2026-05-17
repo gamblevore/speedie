@@ -411,6 +411,7 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 	cpp_part xvar
 	|| input = xtype.shared
 	input.Reset(.name)
+	
 	while (|| Section = input.byte)
 		|| ReadEnd = input.Position + Section
 		|| pos = Input.hint
@@ -419,7 +420,7 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 		if registers: OK = (reg-1)|uint| < 31
 		expect (OK) ("Bad register")
 		
-		if input.Position >= ReadEnd // Close
+		if input.Position >= ReadEnd			// Close
 			expect (Registers) "Bad register"
 			Registers[reg].Close(pos)
 		  else

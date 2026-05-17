@@ -8,6 +8,7 @@ module debugger
 	|string|			CodeToSrcStr
 	|string|			SrcToCodeStr
 	|string|			InbuiltBreaks
+	|&cakestack?|		StackTrap
 	|uint|				DbgLength
 	|uint|				OverFlowTrack
 	|bool|				WantDebug
@@ -34,6 +35,7 @@ module debugger
 
 	
 	function RestoreBreaks
+		.StackTrap = nil
 		.RealBreaks.Restore
 	
 	
@@ -92,19 +94,45 @@ module debugger
 				return true
 
 
-	function GoRunClearBreaks (|fileWithData| F, |stepaction| Action, |uint| P, |uint| A, |stepaction|)
+	function spdfunc.ASMRange (|ivec3|)
+		opt norefcounts
+		|| f = self[2]
+			|| input = xtype.shared
+			input.Reset(f.name)
+			for i in 3
+				rz[i] = Input.hint
+				
+		
+	function GoRunClearBreaks (|message| M, |spdfunc| fn, |stepaction|)
+		opt norefcounts
+		cake.vm.SetBreakLevel(cakevm.kBreakStated)
+		
+		|| F = debugger.file(m)
+		if f == nil
+			return StepAction.GoRun
+		
+		|| Range = fn.ASMRange
+		|| p = m[1].int
+		|| a = p + m[2].int
 		|| CakeBreak = cake.ActiveBreaks!
 		|| N = debugger.dbgLength
 		|| Map = .CodeToSrc
-/		|uint| i = 0
-
-		while (i < N)
+		|| Lowest = int.max
+		|| Highest = 0
+		
+		for i in n
 			|| Src = Map[i].map(i)
 			if Src.MatchScore(F, P, A, N)
 				.SetUserBreak(CakeBreak, Src, 0, N)
-			i++
+				Lowest = Lowest min i
+				Highest = Highest max i
+
+		while Lowest <= Highest
+			|| Src = Map[lowest].map(lowest)
+			.SetUserBreak(CakeBreak, Src, 0, N)
+			Lowest++
 		
-		return Action
+		return StepAction.GoRun
 		
 		
 	function SetBreaks (|message| M, |bool| Active, |stepaction| Action, |stepaction|)
@@ -115,9 +143,6 @@ module debugger
 			
 		|| p = m[1].int
 		|| a = p + m[2].int
-		if action is GoRun
-			return .GoRunClearBreaks(F, Action, P, A)
-		
 		debugger.UserMultiBreak(F, p, a, Active<<31)
 		cake.perry!.SendBreaks(F)
 	

@@ -1,4 +1,10 @@
 
+
+function cakevm.Func (|cakestack| stack, |spdfunc|)
+	|| index = .Index(Stack.Code)
+		return spdtable.Find(index)
+
+
 function StepOneAction (PerryResponse)
 	debugger.RestoreBreaks
 	.SetBreakLevel(cakevm.kBreakAlways)
@@ -6,31 +12,27 @@ function StepOneAction (PerryResponse)
 
 
 function StepInAction (PerryResponse)
+	opt norefcounts
+	debugger 
 	debugger.SetAllBreaks
-/	.SetBreakLevel(cakevm.kBreakStated)
-	return debugger.SetBreaks(m, false, StepAction.GoRun)		// CLEAR those in this range.
+	return debugger.GoRunClearBreaks(m, .func(stack))		// CLEAR those in this range.
 
 
 function StepOverAction (PerryResponse)
 	opt norefcounts
-	|| index = .Index(Stack.Code)
-	|| fn = (spdtable.Find(index) (index >= 0) nil)
+	debugger 
+	|| fn = .func(stack)
 	debugger.SetAllBreaks(fn)
-/	.SetBreakLevel(cakevm.kBreakStated)
-	return debugger.SetBreaks(m, false, StepAction.GoRun)
+	return debugger.GoRunClearBreaks(m, fn)
 	
 
 function StepOutAction (PerryResponse)
 	debugger.RestoreBreaks
-/	|| P = .prev(stack)				// The main issue here is about recursion?
-									// Setting it to a point... that we come back to is fine.
-									// But if we get to that point by stepping forward
-									// even in the same function...
-									// So how do we know if a break isnt a real break?
-		|| Code = p.code			// lets deal with recursion separately...
-		|| I = .index(code)
+/	|| P = .prev(stack)
 		|| break = cake.ActiveBreaks
+			|| I = .index(p.code)
 			break[I] |= 1<<31
+	debugger.StackTrap = P
 	
 	.SetBreakLevel(cakevm.kBreakStated)
 	return StepAction.GoRun

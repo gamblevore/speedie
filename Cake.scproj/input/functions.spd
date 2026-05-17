@@ -9,7 +9,7 @@ role SpdFunc (message)
 		.func = @tmp
 		.Position = -1			// Position in the compiled code.
 
-	// We try to standardise the output structure
+	
 	function message.CopyToVM
 		opt norefcounts
 		|| Code = .name
@@ -46,6 +46,6 @@ role SpdFunc (message)
 
 	function LoadVars
 		opt norefcounts
-		.obj = .Last.xvariables
+		.obj = .second.xvariables
 		
 
