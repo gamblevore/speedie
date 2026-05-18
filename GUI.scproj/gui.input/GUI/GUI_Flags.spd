@@ -5,7 +5,7 @@ datatype CopyPasteFlags (uint16)
 	linkage
 		cpp_part CPF
 	Flags
-		|CopyPasteFlags| 
+		|CopyPasteFlags|
 		// Important to have copyfile and pastefile being separate.
 		// We might want to copy a file but not being able to paste a file
 		Copy  = [CopyFile,  CopyText,  CopyImage,  CopyNode]
@@ -31,7 +31,7 @@ datatype TakesFocusFlag (byte)
 		CanFocus
 		CanTabInto
 		None = 0
-		On = CanTabInto ||| CanFocus 
+		On = CanTabInto ||| CanFocus
 
 	inline Able (|bool|)
 		return (self&canfocus) != 0
@@ -50,7 +50,7 @@ datatype GuiControlFlags (uint)
 	linkage
 		cpp_part GCF
 	flags
-		|GuiControlFlags| 
+		|GuiControlFlags|
 		Visible
 		Enabled
 		Editable
@@ -73,7 +73,7 @@ datatype GuiControlFlags (uint)
 
 struct TimeFader
 	linkage: cpp_part Fade
-	|Date| 		Final
+	|Date|		Final
 	|float|		Scale
 	
 	function Strength (|float|)
@@ -92,14 +92,10 @@ struct TimeFader
 		|| f = .final
 			return now >= f
 
-	function Value (assigns:|bool|)
+	function Hide
 		GUI.touch
-		if value
-			.final = gui.framestart
-			.scale = 1.0
-		  else
-			.final = 0
-			.scale = 0 
+		.final = gui.framestart
+		.scale = 0
 		
 
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
@@ -109,5 +105,5 @@ struct TimeFader
 			.scale = 1.0 / seconds
 		  else
 			.final = 0
-			.scale = 0 
+			.scale = 0
 		

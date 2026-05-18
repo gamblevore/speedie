@@ -420,7 +420,7 @@ class PerryIDE (Window)
 
 		// OK... so .. if one is visible, we don't make the other invis
 		if .filelist.cmm == .openedmenu
-			hideside = false 
+			hideside = false
 
 		if VisSide and VisTop and (HideSide != HideTop)
 			HideSide = false
@@ -430,6 +430,9 @@ class PerryIDE (Window)
 		require !.CurrMouseDown
 		if HideTabs == VisTabs
 			.ProjectTabs.declutter = HideTabs
+			if .IsTextMode
+				.ProjectTabs.Declutterer.hide
+
 			
 		if (hidetop == vistop)
 			.RecentAndSplash.declutter = hidetop

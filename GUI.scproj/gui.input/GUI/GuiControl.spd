@@ -211,7 +211,7 @@ class GUIControl (list)
 		if self
 			return .state & F
 		
-	syntax is (|guicontrolflags|F, assigns:|bool|)
+	syntax is (|guicontrolflags| F, assigns:|bool|)
 		require ((.state&f)!=0) != value
 		
 		if value
@@ -228,7 +228,7 @@ class GUIControl (list)
 		return .Declutterer.final
 	
 
-	setter Declutter (|bool|) 
+	setter Declutter (|bool|)
 		.declutterer.fire(0.334, 0.5) = value
 		
 		

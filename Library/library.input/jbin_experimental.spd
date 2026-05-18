@@ -19,7 +19,6 @@ datatype jbinLeaver (int)
 						// The rework would break all my syntax usings. SyntaxUsing2?
 						// then rework moving each to using2, then rename using2 to using.
 
-
 	
 /*
 function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| name=nil,  |Message|)
@@ -36,7 +35,6 @@ function InputStream.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string?| 
 		* Allow MessageID during parse. Could save on RAM+CPU, if done properly, say only on @tmp, or
 		  done on a per-document-basis that knows what types to use.
 */
-
 
 
 
