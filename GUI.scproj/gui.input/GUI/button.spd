@@ -245,10 +245,13 @@ class ButtonView (GUIControl)
 		if tab is Preparing
 			strength += (GUI.cycle(1.25s)*0.95)-0.2
 			.Touch
-		  elseif (tab is Active) and !tab.IsOnlyChild		// no fade
-			0
 		  else
-			fader = .declutterer.strength					#require
+			fader = .declutterer.strength
+			if (tab is Active) and !tab.IsOnlyChild
+				if tab is Selected
+					fader = 1
+
+			require fader or tab is active
 			
 		if WillDrawFocus or MouseXInside
 			grow += r
@@ -266,10 +269,15 @@ class ButtonView (GUIControl)
 				|| amount = 0.3
 				if tab is Preparing
 					amount = 0.66
+				// this is a bit of a mess.
+				// just get the final colors and put them in
+				// also the final orange for unselected should be a little different
+				
+				// also drawing the button ALWAYS even if its not selected... isnt so fun?
 				G.overlay((1.0, 1.0, 0.5, amount), 0.25)
-				|| C = (1.2, 0.8, 0.0, 0.85)
-				if tab isnt Selected
-					c.g *= 0.5
+				|| C = (1.2, 0.6, 0.0, 0.85)
+				if tab is Selected
+					c.g = 0.4
 				G.overlay(C)
 				
 			  elseif (tab is Selected) or darker
@@ -287,32 +295,35 @@ class ButtonView (GUIControl)
 			if WillDrawFocus
 				g.edge = .FocusBorderStyle.edge
 				g.edge.Alpha = 1.0
-			g.Strengthen(fader)
+			if tab isnt active
+				g.Strengthen(fader)
 			Where.DrawRectStyled(Grow, G)
 		
 		if !Tab
 			Tab = .ListSource // allow these text to be added.
 
-		|| t = .ButtonText(tab, .text)
-		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
-		|| TextCol = colors.white
-		textcol.a = fader
-		pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
-		
-		|| MI = MouseXInside and  (R.y1y2 contains M.y)
-		require  mi and !disabled and .pressing  and  r.Width > 19
-		
-		(pn.x min= r.x2-2)
-		|| ago = -.DelayTill.GuiAgo.Float
-			ago *= 4		// effect needs improving
-			if ago > 4		// perhaps something like soft-explode or at least half-pixels
-				ago = 4		// also the maths is wrong somehow...
-			  else
-				.Touch
-			pn.y -= (ago-4.0)|int|
-		  elseif .MenuIsOpen
-			pn.y += 4
-		where.DrawText("\03", pn, TextCol, false)
+		if fader > 0
+			|| t = .ButtonText(tab, .text)
+			|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
+			|| TextCol = colors.white
+			
+			textcol.a = fader
+			pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
+			
+			|| MI = MouseXInside and  (R.y1y2 contains M.y)
+			require  mi and !disabled and .pressing  and  r.Width > 19
+			
+			(pn.x min= r.x2-2)
+			|| ago = -.DelayTill.GuiAgo.Float
+				ago *= 4		// effect needs improving
+				if ago > 4		// perhaps something like soft-explode or at least half-pixels
+					ago = 4		// also the maths is wrong somehow...
+				  else
+					.Touch
+				pn.y -= (ago-4.0)|int|
+			  elseif .MenuIsOpen
+				pn.y += 4
+			where.DrawText("\03", pn, TextCol, false)
 		
 		
 	function ButtonText (|listviewrow| Tab, |string| Default, |string|)
