@@ -2282,7 +2282,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__MsgParseFlags_Inserted ((int)2048)
 #define kJB__MsgParseFlags_MacroInserted ((int)6144)
 #define kJB__MsgParseFlags_MacroMade ((int)4096)
-#define kJB__MsgParseFlags_SplitHere ((int)8192)
 #define kJB__MsgParseFlags_Style2 ((int)16384)
 #define kSC__khalai_Active ((NilCheckMode)3)
 #define kSC__khalai_AllowRegisterAddr ((NilCheckMode)512)
@@ -3471,8 +3470,6 @@ Message* JB_Tk__fThingWord(int Start, Message* Parent);
 Message* JB_Tk__fTmp(int Start, int OpFlags, int ThingFlags, Message* Parent);
 
 Message* JB_Tk__fTmpPlus(int Start, Message* Parent);
-
-Message* JB_Tk__fTmpSection(int Start, Message* Parent);
 
 Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags);
 
@@ -10583,6 +10580,8 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAlter, SCNode* Name_space, SCParamArray* Incoming);
 
 ASM* SC_Func_ASMBake(SCFunction* Self, ASM* Where, ASM* After, uint* Positions);
+
+ivec3 SC_Func_ASMRange(SCFunction* Self);
 
 SCDecl* SC_Func_ASMReturnWith0(SCFunction* Self);
 
