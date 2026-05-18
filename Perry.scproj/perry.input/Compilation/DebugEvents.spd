@@ -42,11 +42,14 @@ function perryide.ContinueProgram (|int| state, |bool|)
 
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
-	// keys.movement is almost ok... but it uses ctrl for down... sigh.
+	// Keys.movement is almost OK... but it uses ctrl for down... sigh.
 	|| i = .ide
 	if key is PERIOD
 		return i.MakeNothingRunning
+
 	if key.IsAccept
+		if i.RunCompiledApp
+			return DebugStepOver(self, -1)
 		return i.ContinueProgram(-1)
 
 	if key is space
@@ -55,14 +58,13 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 		return true
 	
 	if !i.RunCompiledApp
-		i.Editme.SetFocus
+		if !key.IsModifier
+			i.Editme.SetFocus
 		return true
 	
-	if key is RIGHT or Num6
-		return DebugStepOver(self, -1)
-	if key is DOWN or S or Num8
+	if key is COMMA
 		return DebugStepIn(self, -1)
-	if key is UP or W or Num2
+	if key is SEMICOLON
 		return DebugStepOut(self, -1)
 		
 
@@ -245,21 +247,24 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 function ClickedStack (GUIListEvent)
 	opt norefcounts
 	if row
-		return .ide.ClickedStack(row)
+		.ide.UpdateCodePointer(row, false)
 	return true
 
 
-function perryide.ClickedStack (|listviewrow| row, |bool| Active=false, |bool|)
+function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active)
 	opt norefcounts
-	|| path = row.firstname
-		if .EditPath(path, false)
-			|| Where = row[1].int
-			if Active
-				|| file_path = row.first
-					file_path.Position = where
-				.editme._ActiveLine = file_path
-			.editme.ShowAndSelect(where, true)
-	return true
+	|| path = row.firstname$
+	require .EditPath(path, false)
+	
+	|| Where = row[1].int
+	if Active
+		|| file_path = row.first
+			file_path.Position = where
+		.editme._ActiveLine = file_path
+
+	|| Line = .editme.Show(where)
+	if Active
+		.editme.Doexplode(Line)
 	
 	
 function PerryIDE.DebugMode (|CompileMode|)
@@ -294,22 +299,27 @@ function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 	return j
 
 
-function DebugStepOver (guiaction)
+function perryide.DebugStep (|string| kind, |bool|)
 	opt norefcounts
-	|| i = .ide
-	|| e = i.editme
+	|| e = .editme
 	|| active = e._ActiveLine
-	if active and i.EditPath(active.name, false)
+	if active and .EditPath(active.name, false)
 		|| l = e.FindLine(active.position)
-			.SendJbin(i.LineCommand("stepover", l))
+			.SendJbin(.LineCommand(kind, l))
 			return true
 	beep
 
+	
+function DebugStepOver (guiaction)
+	opt norefcounts
+	return .ide.DebugStep("stepover")
+
 
 function DebugStepIn (guiaction)
+	opt norefcounts
 	if keys.Shift
 		return .SendRunMsg("stepincutely", state)
-	return .SendRunMsg("stepin", state)
+	return .ide.DebugStep("stepin")
 
 
 function DebugStepOut (guiaction)

@@ -1,6 +1,8 @@
 
 
 class FileWithData (stringshared)
+	linkage
+		cpp_part File
 	default	NIL
 	false	NIL
 	|string?|		_Data

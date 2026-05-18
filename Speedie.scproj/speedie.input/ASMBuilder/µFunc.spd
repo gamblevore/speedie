@@ -60,9 +60,9 @@ extend SCFunction
 				|| pos = fat.FatMap
 				if pos >> 21 == 0						// init code... has no file
 					pos = .FatBetterPos(fat)
-					
+				Positions[] = pos
 				while (Curr++ < rz)
-					Positions++[] = pos
+					Positions++
 				if break
 					fat.BakeBreak(Pos, break)
 				if fat.info is DebugVars

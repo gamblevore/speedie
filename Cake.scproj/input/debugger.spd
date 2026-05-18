@@ -70,7 +70,7 @@ module debugger
 		target true {
 		".......$name......"
 		for Raw in .SrcToCode
-			|| Src = raw.Location
+			|| Src = raw.Loc
 			|| FilePos = src.Position
 			|| ff = src.file
 			|| F = (ff.FileName (ff) "")
@@ -102,13 +102,14 @@ module debugger
 			for i in 3
 				rz[i] = Input.hint
 				
-		
-	function GoRunClearBreaks (|message| M, |spdfunc| fn, |stepaction|)
+	
+	
+	function GoRunClearBreaks (|message| M, |spdfunc| fn, |bool| Over, |stepaction|)
 		opt norefcounts
 		cake.vm.SetBreakLevel(cakevm.kBreakStated)
 		
 		|| F = debugger.file(m)
-		if f == nil
+		if F == nil
 			return StepAction.GoRun
 		
 		|| Range = fn.ASMRange
@@ -116,20 +117,23 @@ module debugger
 		|| a = p + m[2].int
 		|| CakeBreak = cake.ActiveBreaks!
 		|| N = debugger.dbgLength
-		|| Map = .CodeToSrc
+		|| Locations = .CodeToSrc
 		|| Lowest = int.max
 		|| Highest = 0
 		
 		for i in n
-			|| Src = Map[i].map(i)
-			if Src.MatchScore(F, P, A, N)
+			|| loc = Locations[i]
+			|| Src = loc.map(i)
+			if Src.Score(F, P, A, N) or (Over and !(loc in range))
 				.SetUserBreak(CakeBreak, Src, 0, N)
 				Lowest = Lowest min i
 				Highest = Highest max i
 
 		while Lowest <= Highest
-			|| Src = Map[lowest].map(lowest)
-			.SetUserBreak(CakeBreak, Src, 0, N)
+			|| loc = Locations[lowest]
+				ifn loc in range
+					|| Src = loc.map(lowest)
+					.SetUserBreak(CakeBreak, Src, 0, N)
 			Lowest++
 		
 		return StepAction.GoRun
@@ -163,7 +167,7 @@ module debugger
 		
 		for Src in .SrcToCode
 			if src.NeedsChange(cakebreak, Max, active)
-				|| Score = Src.MatchScore(path, position, after, Max)
+				|| Score = Src.Score(path, position, after, Max)
 				if Score > BestScore
 					BestScore = Score
 					BestValue = Src
@@ -176,7 +180,7 @@ module debugger
 			.SetUserBreak(CakeBreak, BestValue, active, max)
 		  else
 			for Src in .SrcToCode
-				|| Score = Src.MatchScore(path, position, after, max)
+				|| Score = Src.Score(path, position, after, max)
 				if src.NeedsChange(cakebreak, Max, active) and (Score == BestScore)
 					.SetUserBreak(CakeBreak, Src, active, max)			
 
@@ -301,7 +305,7 @@ module debugger
 		printline "--- BreakInfo ---"
 		
 		for raw in .SrcToCode
-			|| Src = raw.Location
+			|| Src = raw.Loc
 			|| P = src.Position
 			|| Code = raw.code(T)
 			|| fn = src.FileNum

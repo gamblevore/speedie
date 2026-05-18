@@ -258,7 +258,8 @@ function listviewrow.ImproveVar (|int| Depth=0)
 	|| fs = VarPrinter
 	fs.Length = 0
 	fs <~ dbname
-	fs <~ ":"
+	fs <~ ':'
+	fs <~ ' '
 	fs <~ (' ', 6 - fs.LengthUTF8)
 	.PerryAppendMsg("", 3)
 	fs <~ (' ', 26 - fs.LengthUTF8)
@@ -389,7 +390,7 @@ function perryide.UpdateStack (|message| stack)
 		(m is paused)
 		.DebugMode = m
 
-		.ClickedStack(F, true)
+		.UpdateCodePointer(F, true)
 	.SetAppInfo
 
 

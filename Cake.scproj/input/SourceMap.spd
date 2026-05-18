@@ -1,6 +1,8 @@
 
 
 datatype SourceLocation (uint)
+	linkage
+		cpp_part Loc
 	function FileNum (|uint|)
 		return self >> 21
 	
@@ -13,9 +15,20 @@ datatype SourceLocation (uint)
 	function Map (|uint| Code, |SourceMap|)
 		return ((self|SourceMap|) << 32) ||| Code
 
+	operator in (|ivec3| Range, |bool|)
+		opt norefcounts
+		|| F = .File
+		require (f!=nil) and f.index == range[2]
+		|int| Pos = .Position
+		return pos >= range[0] and pos < range[1]
+		
+
 
 datatype SourceMap (uint64)
-	function Location (|SourceLocation|)
+	linkage
+		cpp_part Map
+	
+	function Loc (|SourceLocation|)
 		return self>>32
 		
 	function Code (|uint| Max, |uint|)
@@ -23,9 +36,9 @@ datatype SourceMap (uint64)
 		if self < Max
 			return self
 	
-	function MatchScore (|filewithdata| File, |int| Position, |int| After, |uint| Max, |int|)
-		|| Where = .Location
-		require Where.FileNum == File.Index
+	function Score (|filewithdata| File, |int| Position, |int| After, |uint| Max, |int|)
+		|| Where = .Loc
+		require where and Where.FileNum == File.Index
 
 		|| P = Where.Position|int|
 		if P >= Position and P < After

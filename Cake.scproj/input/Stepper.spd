@@ -15,15 +15,14 @@ function StepInAction (PerryResponse)
 	opt norefcounts
 	debugger 
 	debugger.SetAllBreaks
-	return debugger.GoRunClearBreaks(m, .func(stack))		// CLEAR those in this range.
+	return debugger.GoRunClearBreaks(m, .func(stack), false)		// CLEAR those in this range.
 
 
 function StepOverAction (PerryResponse)
 	opt norefcounts
-	debugger 
 	|| fn = .func(stack)
 	debugger.SetAllBreaks(fn)
-	return debugger.GoRunClearBreaks(m, fn)
+	return debugger.GoRunClearBreaks(m, fn, true)
 	
 
 function StepOutAction (PerryResponse)

@@ -199,16 +199,6 @@ module PackMaker
 			low = 0
 		return (low, high, file)
 	
-	
-//	function Limits (|faststring|)
-//		opt norefcounts
-//		rz = FastString()
-//		for fn in .packfuncs
-//			|| range = fn.asmrange
-//			rz.appendhint(range[0])
-//			rz.appendhint(range[1])
-//			rz.appendhint(range[2])
-
 		
 	function BakeDebug (|jbin| j)		
 		|faststring--| p = SourceMap.Positions$

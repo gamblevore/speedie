@@ -124,7 +124,7 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 
 	// surely we wanna do codetosrc?
 	for raw in debugger.SrcToCode
-		|| Src = raw.Location
+		|| Src = raw.Loc
 		if Src.FileNum == ToFind
 			|| Code = raw.code(L)
 			|| Mask = -1|uint|

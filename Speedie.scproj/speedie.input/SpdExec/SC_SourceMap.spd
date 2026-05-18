@@ -34,7 +34,9 @@ module SourceMap
 			.breakpoints ?= faststring()
 			.breakable ?= faststring()
 			.lastlength = p.length
-			return p.Reserve(T)|&uint|
+			rz = p.Reserve(T)|&uint|
+			for i in t
+				rz[i] = 0
 
 
 	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
