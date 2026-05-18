@@ -23,7 +23,7 @@ inline PrintLine (|string?| data=nil)
 
 inline PrintLine (|Faststring!| data)
 	cpp_part PrintFS
-	StrPrintLine_(Data|string|)				// breaks cake
+	StrPrintLine_(Data|string|)
 	data.Length = 0
 
 

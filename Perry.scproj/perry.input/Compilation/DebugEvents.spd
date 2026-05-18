@@ -49,6 +49,8 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 
 	if key.IsAccept
 		if i.RunCompiledApp
+			if keys.Shift
+				return i.DebugStep("stepin")
 			return DebugStepOver(self, -1)
 		return i.ContinueProgram(-1)
 

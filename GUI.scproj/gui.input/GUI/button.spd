@@ -261,8 +261,19 @@ class ButtonView (GUIControl)
 		using G
 			G.strengthen(strength)
 			|| darker = (!Tab and clicked)
-			if (tab is Selected) or darker
-				if darker != .PressMakesLighter
+
+			if tab is Active
+				|| amount = 0.3
+				if tab is Preparing
+					amount = 0.66
+				G.overlay((1.0, 1.0, 0.5, amount), 0.25)
+				|| C = (1.2, 0.8, 0.0, 0.85)
+				if tab isnt Selected
+					c.g *= 0.5
+				G.overlay(C)
+				
+			  elseif (tab is Selected) or darker
+				if (darker != .PressMakesLighter)
 					|| v = 0.25
 					G.Overlay(0.3~black, v)
 				  else
@@ -270,9 +281,6 @@ class ButtonView (GUIControl)
 					if tab is Preparing
 						amount = 0.66
 					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
-
-			if tab is Active
-				G.overlay((1.0, 0.65, 0.0, 0.85))
 			
 			if disabled
 				G.overlay(0.6~gray, 0.4)

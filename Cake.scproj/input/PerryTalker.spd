@@ -56,9 +56,9 @@ function __PerryView__ (cakevm.CakeChef)
 	if !p.IsOpen
 		app.Quit							// Stop the runaway!
 	
-//	|| T = debugger.stacktrap
-//	if T and T>stack
-//		break = 0
+	|| T = debugger.stacktrap
+	if T and Stack > T
+		break = 0							// haven't really hit this (yet)
 	Break >>= 31
 	if Break
 		debugger.RestoreBreaks

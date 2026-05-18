@@ -22,20 +22,28 @@ function StepOverAction (PerryResponse)
 	opt norefcounts
 	|| fn = .func(stack)
 	debugger.SetAllBreaks(fn)
-	return debugger.GoRunClearBreaks(m, fn, true)
+	debugger.GoRunClearBreaks(m, fn, true)
+	.BreakParentStack(Stack)
+	return StepAction.GoRun
 	
 
 function StepOutAction (PerryResponse)
 	debugger.RestoreBreaks
-/	|| P = .prev(stack)
-		|| break = cake.ActiveBreaks
-			|| I = .index(p.code)
-			break[I] |= 1<<31
-	debugger.StackTrap = P
-	
+	.BreakParentStack(stack)
 	.SetBreakLevel(cakevm.kBreakStated)
 	return StepAction.GoRun
 
+
+function cakevm.BreakParentStack (|cakestack| stack)
+	debugger.StackTrap = nil
+/	|| P = .prev(stack)
+	|| break = cake.ActiveBreaks
+	if p and break
+		|| I = .index(p.code)
+		if I and !(break[I] >> 31)
+			break[I] |= 1<<31
+			debugger.StackTrap = P
+	
 	
 function cakevm.SetBreakLevel (|int| level, |?&uint|)
 	debugger.UserBreakLevel = level

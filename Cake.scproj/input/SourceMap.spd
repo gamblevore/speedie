@@ -15,6 +15,9 @@ datatype SourceLocation (uint)
 	function Map (|uint| Code, |SourceMap|)
 		return ((self|SourceMap|) << 32) ||| Code
 
+	operator out (|ivec3| Range, |bool|)
+		return !(self in range)
+		
 	operator in (|ivec3| Range, |bool|)
 		opt norefcounts
 		|| F = .File

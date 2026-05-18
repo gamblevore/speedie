@@ -104,7 +104,7 @@ module debugger
 				
 	
 	
-	function GoRunClearBreaks (|message| M, |spdfunc| fn, |bool| Over, |stepaction|)
+	function GoRunClearBreaks (|message| M, |spdfunc| fn, |bool| StepOver, |stepaction|)
 		opt norefcounts
 		cake.vm.SetBreakLevel(cakevm.kBreakStated)
 		
@@ -112,7 +112,7 @@ module debugger
 		if F == nil
 			return StepAction.GoRun
 		
-		|| Range = fn.ASMRange
+		|| CurrFunc = fn.ASMRange
 		|| p = m[1].int
 		|| a = p + m[2].int
 		|| CakeBreak = cake.ActiveBreaks!
@@ -123,15 +123,16 @@ module debugger
 		
 		for i in n
 			|| loc = Locations[i]
-			|| Src = loc.map(i)
-			if Src.Score(F, P, A, N) or (Over and !(loc in range))
-				.SetUserBreak(CakeBreak, Src, 0, N)
-				Lowest = Lowest min i
-				Highest = Highest max i
+				|| Src = loc.map(i)
+				|| WithinLine = Src.Score(F, P, A, N)
+					Lowest = Lowest min i
+					Highest = Highest max i
+				if WithinLine or (StepOver and (loc out CurrFunc))
+					.SetUserBreak(CakeBreak, Src, 0, N)
 
 		while Lowest <= Highest
 			|| loc = Locations[lowest]
-				ifn loc in range
+				if loc out CurrFunc
 					|| Src = loc.map(lowest)
 					.SetUserBreak(CakeBreak, Src, 0, N)
 			Lowest++
