@@ -138,14 +138,10 @@ GUI_FR_Destructor
 GUI_FR_DirSize
 GUI_FR_Document
 GUI_FR_FileData
-GUI_FR_FindAllParent
-GUI_FR_FindInFile
 GUI_FR_Modifier
 GUI_FR_MoveTo
 GUI_FR_ReadFrom
 GUI_FR_ReadName
-GUI_FR_ReloadFiles
-GUI_FR_RemoveFile
 GUI_FR_Render
 GUI_FR_SyntaxAppend
 GUI_FR_TryReload
@@ -192,8 +188,8 @@ GUI_FV__QuickOpenModified
 GUI_Fade_Constructor
 GUI_Fade_Finished
 GUI_Fade_FireSet
+GUI_Fade_Hide
 GUI_Fade_Strength
-GUI_Fade_ValueSet
 GUI_FileViewerCMMShow
 GUI_FileViewerCopyPath
 GUI_FileViewerCreateFile
@@ -548,6 +544,7 @@ GUI_Text_Byte
 GUI_Text_CanAutoComplete
 GUI_Text_CanAutoCompleteSet
 GUI_Text_CancelEditing
+GUI_Text_ClearActiveLine
 GUI_Text_ClearErrors
 GUI_Text_Constructor
 GUI_Text_CurrLine
@@ -563,6 +560,7 @@ GUI_Text_ErrorAt
 GUI_Text_FilePath
 GUI_Text_FillErrors
 GUI_Text_FindBackwardsIgnoringSpaces
+GUI_Text_FindLine
 GUI_Text_FindTextLine
 GUI_Text_Gesture
 GUI_Text_GotFocus
@@ -1244,7 +1242,6 @@ JB_MsgPos_Destructor
 JB_Msg_Ancestor
 JB_Msg_AppendMacro
 JB_Msg_AppendNum
-JB_Msg_Array
 JB_Msg_BecomeCopy
 JB_Msg_BecomeMacro
 JB_Msg_BecomeMsg
