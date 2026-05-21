@@ -12,18 +12,16 @@ class XType
 	
 	constructor (|message| msg, |int| index)
 		opt norefcounts
+		|| fn = msg.func
+		.IsLib = fn == @tmp or @sthg
+		.msg = msg
 		|| Sup = msg[@nil]
 		|| SupIndex = Sup.Int
-		.IsLib = msg == @tmp
-		.IsObject = SupIndex & 1
-		.msg = msg
-		// hmm.... did we get these twice?
-		// if an object subclasses from message, whats the super-index?
-		// thats no fun.
+		.IsObject = (SupIndex & 1)
 		.Super = xtype.GetType(SupIndex, Sup)
-		|| JBCls = cakerun.ClassTable.valuelower(.msg.name)|&Classdata|
-			jbcls.Index = index
-
+		if .IsObject and (fn == @tmp or @msg)
+			|| JBCls = cakerun.ClassTable.valuelower(.msg.name)|&Classdata|
+				jbcls.Index = index
 	
 	function Name (|string|)
 		return .msg.name
@@ -59,7 +57,8 @@ class XType
 			|| i = 0
 			for Type.fast in List
 				++i
-				if type.func == @msg or @tmp
+				|| fn = Type.Func
+				if fn == @msg or @tmp or @thg or @sthg
 					.types <~ XType(Type, i)
 				  else
 					.types <~ .unreached
