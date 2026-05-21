@@ -127,7 +127,10 @@ class Document (list)
 	function SaveBeforeClose (|bool|)
 		if !.IsModified
 			return true
-		|| Answer = ("Save file " + .FilePath.name + "?").AskSaveOrCancel()
+		|| Q = "Save file ".append(.FilePath.name, "?") // compiler should do this automatically?
+		// or does sometimes... on:   "Save file " + .FilePath.name + "?"
+		// whatever... fix that later. Or perhaps its just from faststring? 
+		|| Answer = Q.AskSaveOrCancel()
 		if answer >= 1		// save
 			return .save(DocumentState.Closing)
 		return answer == 0	// don't

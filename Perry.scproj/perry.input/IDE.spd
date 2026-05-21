@@ -431,8 +431,11 @@ class PerryIDE (Window)
 		require !.CurrMouseDown
 		if HideTabs == VisTabs
 			.ProjectTabs.declutter = HideTabs
-			if .IsTextMode
-				.ProjectTabs.Declutterer.hide
+		if .IsTextMode
+			.ProjectTabs.Declutterer.hide // not good enough? it should be made invisible?
+			(.ProjectTabs isnt visible)
+		  else
+			(.ProjectTabs is visible)
 
 			
 		if (hidetop == vistop)

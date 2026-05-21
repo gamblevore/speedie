@@ -471,7 +471,6 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	|| state = MsgTextDrawState(x, d)
 	|| NoDrawFirst =  (self is CodeEditor)  and  ((m and d is ActiveBreakPoint) or (d is breakpoint))
 		|| col = vec4(0)
-		if keys.shift and (d is breakpoint)
 		if (m) and (d is ActiveBreakPoint)!=(d is BreakPoint)
 			col = (1.0, 1.0, 0.75, 0.375)		// pink
 			if d is ActiveBreakPoint			//	or

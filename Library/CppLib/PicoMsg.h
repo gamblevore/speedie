@@ -39,6 +39,8 @@
 #include <stdint.h> // for picodate
 
 /// todo: Could remove some locks, for a pico hard-coded to one worker-thread
+/// todo: Seems to be a bug? In the picotest project, setting 1, when run sometimes output "<--" does not appear
+/// It might not be an actual problem but a test problem?
 
 static float	PicoRemainDefault = 5.0;
 typedef	int64_t	PicoDate;  // Resolution is 1s/64K, at ±445M years range.
@@ -1042,7 +1044,6 @@ struct PicoComms : PicoConfig {
 				PIDStatus = WEXITSTATUS(ExitCode);
 			if (SocketStatus == 0 and PIDStatus > 0)
 				SocketStatus = EPIPE;
-				
 		}
 		if (CanSayDebug())
 			Say("Process", StatusName(PIDStatus), -PID);

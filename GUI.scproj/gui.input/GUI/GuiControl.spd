@@ -485,7 +485,7 @@ class GUIControl (list)
 			.DrawFocusRect(Where, .lastrect, .FaintingEdge * strength)
 
 
-	libinternal FocusBorderStyle (|drawstyle|)
+	libinternal FocusBorderStyle (|drawstyle--|)
 		if (self isnt modified) or (self is NeverDrawModified)
 			return ¥.FocusBorder
 		return ¥.ModifiedBorder

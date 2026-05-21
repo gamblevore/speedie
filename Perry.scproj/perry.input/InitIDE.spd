@@ -102,10 +102,10 @@ extend PerryIDE
 		.onpaste	= perryopendoc
 
 		|| LeftBG = vec4(0.125, 0.975)
-		with .toolbar 
+		with .toolbar
 			.size			= the~width  by  20~down
 			.takesfocus		= 0
-			.ID				= "toolbar" 
+			.ID				= "toolbar"
 			isnt drawsfocus
 			.align			= ListViewState.aligncenter
 			.gnormal.solid  = vec4(0.125, 0.94)

@@ -73,7 +73,7 @@ datatype GuiControlFlags (uint)
 
 struct TimeFader
 	linkage: cpp_part Fade
-	|Date|		Final
+	|date|		Final
 	|float|		Scale
 	
 	function Strength (|float|)
@@ -96,7 +96,6 @@ struct TimeFader
 		GUI.touch
 		.final = gui.framestart
 		.scale = 0
-		
 
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
 		GUI.touch

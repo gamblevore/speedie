@@ -229,7 +229,7 @@ class ButtonView (GUIControl)
 			return xy 
 
 
-	libinternal DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow| Tab)
+	libinternal DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow--| Tab)
 		|| disabled = (tab and tab is disabled) or (self isnt enabled)
 			grow = nil
 		if .MenuIsOpen
@@ -260,7 +260,7 @@ class ButtonView (GUIControl)
 		
 		where.ControlClip = grow
 
-		|| G = .GNormal
+		|drawstyle--| G = .GNormal
 		using G
 			G.strengthen(strength)
 			|| darker = (!Tab and clicked)
@@ -273,7 +273,6 @@ class ButtonView (GUIControl)
 				// just get the final colors and put them in
 				// also the final orange for unselected should be a little different
 				
-				// also drawing the button ALWAYS even if its not selected... isnt so fun?
 				G.overlay((1.0, 1.0, 0.5, amount), 0.25)
 				|| C = (1.2, 0.6, 0.0, 0.85)
 				if tab is Selected
