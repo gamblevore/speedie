@@ -87,7 +87,6 @@ struct PicoTrousers { // only one person can wear them at a time.
 #endif
 
 
-
 struct PicoConfig {
 	char 				Name[16];		/// Used for reporting events to stdout.
 	PicoDate			LastRead;		/// The date of the last read.
@@ -102,8 +101,8 @@ struct PicoConfig {
 	unsigned char		Bits; 			/// The size we used to allocate stuff:  1 << Bits
 	bool				IsParent;		/// Are we the parent.
 	unsigned char		ExecFlags;
-#if defined(PICO_IMPLEMENTATION) || defined(PICO_SEE_INTERNALS) /// Don't alter the internals. 
 	unsigned char		SocketStatus;
+#if defined(PICO_IMPLEMENTATION) || defined(PICO_SEE_INTERNALS) /// Don't alter the internals. 
 	unsigned char		PartClosed;
 	PicoTrousers		SendLock;
 	PicoTrousers		ReadLock;
@@ -233,6 +232,7 @@ static	int						pico_timeout_count;
 static  std::atomic_int         pico_open_sockets;
 static  PicoGlobalConfig		pico_global_conf;
 static	PicoConfig				pico_all[64];
+
 
 
 struct PicoLister {
@@ -406,7 +406,7 @@ struct PicoComms : PicoConfig {
 	void Destroy () {
 		free(PreData);
 		if (Socket > 0)
-			msg_close_for_real(Socket);
+			close_socket_for_real(Socket);
 		PicoBuff::Decr(Sending);
 		PicoBuff::Decr(Reading);
 		PicoBuff::Decr(StdErr );
@@ -797,7 +797,7 @@ struct PicoComms : PicoConfig {
 		}
 	}
 	
-	inline void do_io() {
+	inline void do_io () {
 		if ((PartClosed&14) != 14 and ReadLock.enter())
 			do_reading();
 		if (can_send() and SendLock.enter())
@@ -951,16 +951,19 @@ struct PicoComms : PicoConfig {
 		int C = PartClosed;				
 		if (C&P)					// already closed
 			return nullptr;
-		
+
 		C |= P;
 		PartClosed = C;
-		if (C == 15)				// fully closed! perhaps the process died. Lets find out fast.
-			check_exit_code();
+		check_exit_code();			// perhaps the process died?
+
+		if ((C&3) == 3)
+			close_socket_for_real(Socket);		
 		
 		if (Err == EPIPE) {			// A normal close.
 			if ( !(P & 3) or !((C&3)==3) )
 				return nullptr;		// messages are still somewhat open.
-			SocketStatus = EPIPE;	// messages are closed now.
+			
+			SocketStatus = Err;		// messages are closed now.
 			if (CanSayDebug())
 				return Say("ClosedGracefully");
 			return nullptr;
@@ -977,7 +980,7 @@ struct PicoComms : PicoConfig {
 	}
 	
 	bool io_pass (int Error, int Part) {
-		if (!Error)
+		if (!Error) //  recv()/read() == 0, means close.
 			return failed(EPIPE, Part);
 
 		int e = errno;
@@ -987,7 +990,7 @@ struct PicoComms : PicoConfig {
 		return failed(e, Part);
 	}
 	
-	void io_buff_report(PicoBuff* B) {
+	void io_buff_report (PicoBuff* B) {
 		int SL = Sending->Length();
 		if (SL) Say(B->Name, "Still Contains", SL);
 		SL = Sending->Tail;
@@ -995,7 +998,7 @@ struct PicoComms : PicoConfig {
 			Say(B->Name, "", SL);
 	}
 
-	void msg_close_for_real (int S) {
+	void close_socket_for_real (int S) {
 		Socket = -1;
 		if (S > 0) {
 			pico_open_sockets--;
@@ -1008,10 +1011,10 @@ struct PicoComms : PicoConfig {
 		}
 	}
 	
-	bool all_closed() {
+	bool all_closed () {
 		int S = Socket; if (S < 0) return false;
 		if (!ReadLock.enter()) return false;
-		msg_close_for_real(S);
+		close_socket_for_real(S);
 		ReadLock.leave();
 		return true;
 	}								;;;/*_*/;;;
@@ -1025,18 +1028,21 @@ struct PicoComms : PicoConfig {
 		
 		int ExitCode = 0;
 		if (!PID) {
-			if (getppid() <= 1)		// parent died.
+			if (getppid() <= 1) {	// parent died.
 				PIDStatus = 0;		// unknown why. So lets say it ended nicely.
+				SocketStatus = EPIPE;
+			}
 
-		} else if (waitpid(PID, &ExitCode, WNOHANG) <= 0) {
-			if (PartClosed!=15) return;
-			errno = 0;
-			if (kill(PID, 0)>=0) return;
-			PIDStatus = errno;		// Process closed, but we missed it? was SIGCHLD ignored?
-		} else if (WIFSIGNALED(ExitCode)) {
-			PIDStatus = WTERMSIG(ExitCode)|128;
-		} else if (WIFEXITED(ExitCode)) {
-			PIDStatus = WEXITSTATUS(ExitCode);
+		} else if (waitpid(PID, &ExitCode, WNOHANG) <= 0)
+			(0); // 0 == still alive,  -1 == unknown
+		  else {
+			if (WIFSIGNALED(ExitCode))
+				PIDStatus = WTERMSIG(ExitCode)|128;
+			  else if (WIFEXITED(ExitCode))
+				PIDStatus = WEXITSTATUS(ExitCode);
+			if (SocketStatus == 0 and PIDStatus > 0)
+				SocketStatus = EPIPE;
+				
 		}
 		if (CanSayDebug())
 			Say("Process", StatusName(PIDStatus), -PID);

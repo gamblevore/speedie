@@ -33,7 +33,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			
 	function CommsOpen (|bool|)
 		if self
-			return .pico.MessageStatus == 0
+			return .pico.MessageError == 0
+	
 	
 	libinternal ParentAlive (|bool|)
 		return app.ParentID > 1
@@ -50,7 +51,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		opt norefcounts			
 		if .status.NotStarted
 			.start
-		if .pico.MessageStatus == 0
+		if .pico.MessageError == 0
 			.writer.length = 0
 			msg.RenderJbin(.writer)
 			rz = .pico <~ .writer|string|
@@ -67,7 +68,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		cpp_Part SendStr
 		if .status.NotStarted
 			.start
-		if .pico.MessageStatus == 0
+		if .pico.MessageError == 0
 			return .pico <~ str
 
 
@@ -121,7 +122,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	
 	function SpawnAsChild (|bool|)
-		if !.pico.isok
+		|| s = .pico.MessageError
+		if s == 255 // impossible?
+		if s > 0
 			require pico.replace(.pico)
 		return .Start.successful
 

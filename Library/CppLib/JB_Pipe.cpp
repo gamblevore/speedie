@@ -81,12 +81,8 @@ int JB_Sh_Kill (ShellStream* F, int Code) {
 	PicoStatus(F->Pico, &S);
 	if (S.Status == -1) {
 		PicoConfig* M = (PicoConfig*)F->Pico;
-//		PicoKill(M); // why not?
-		if (Code >= 0)
-			M->PIDStatus = Code;
-		#if DEBUG
-		printf("killing: %i\n", S.PID);
-		#endif
+		if (Code > 0)
+			M->SocketStatus = Code;
 		return JB_Kill(S.PID);
 	}
 	return -1;

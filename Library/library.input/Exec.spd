@@ -35,22 +35,24 @@ datatype PID_Int (int)
 datatype ExitCode (int)
 	constants
 		EINPROGRESS = 36
+		SIGKILL = 9
 	
 	description "Can describe both signal errors, and exit codes."
 	
-	function Crashed (|bool|)
+	inline Killed (|bool|)
+		return self == SIGKILL|||128
+	
+	inline Crashed (|bool|)
+		// not all signals are really a crash? what about sigkill?
 		description "This is a signal error (a crash)" 
-		inlined
 		return  self > 128
 		
-	function NoErrors (|bool|)
+	inline NoErrors (|bool|)
 		description "We have either completed successfully, or not yet started. Either way there is no error." 
-		inlined
 		return  self <= 0
 		
-	function Successful (|bool|)
+	inline Successful (|bool|)
 		description "Completed successfully." 
-		inlined
 		return  self == 0
 		
 	syntax cast (|bool|)
@@ -62,12 +64,10 @@ datatype ExitCode (int)
 			return (self|errorint|&~128).SignalName
 		return self|errorint|.Name
 	
-	function IsRunning (|bool|)
-		inlined
+	inline IsRunning (|bool|)
 		return self == -1 or EINPROGRESS
 
-	function NotStarted (|bool|)
-		inlined
+	inline NotStarted (|bool|)
 		return self < -1
 
 
