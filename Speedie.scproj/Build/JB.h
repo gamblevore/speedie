@@ -1661,7 +1661,7 @@ extern byte SC__VM_Builder_XType;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2432])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2429])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1801,10 +1801,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2431])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2430])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2428])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2427])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2429])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2426])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2204,6 +2204,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ErrorSeverity_Problem ((ErrorSeverity)3)
 #define kJB__ErrorSeverity_Warning ((ErrorSeverity)2)
 #define kJB__ExitCode_EINPROGRESS ((int)36)
+#define kJB__ExitCode_SIGKILL ((int)9)
 #define kJB__FailableInt_Fail ((int)2147483648)
 #define kJB__FailableInt_Max ((int)2147483647)
 #define kJB__FailableInt_Min ((int)2147483649)
@@ -2435,17 +2436,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2425])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2422])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2426])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2427])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2423])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2424])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2421])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2427])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2428])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2424])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2425])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2505,7 +2506,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2423])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2420])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -5038,8 +5039,6 @@ ErrorSeverity JB_ErrorSeverity__Find(JB_String* Name, Message* Err);
 
 
 // ExitCode
-bool JB_ExitCode_IsRunning(ExitCode Self);
-
 bool JB_ExitCode_NotStarted(ExitCode Self);
 
 bool JB_ExitCode_Successful(ExitCode Self);
@@ -10056,8 +10055,6 @@ void JB_Proc_Destructor(SpdProcess* Self);
 void JB_Proc_Disconnect(SpdProcess* Self, JB_String* Why);
 
 Message* JB_Proc_Get(SpdProcess* Self, float T);
-
-bool JB_Proc_IsOpen(SpdProcess* Self);
 
 bool JB_Proc_Send(SpdProcess* Self, Message* Msg);
 
