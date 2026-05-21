@@ -9,8 +9,9 @@ module debugger
 	|string|			SrcToCodeStr
 	|string|			InbuiltBreaks
 	|&cakestack?|		StackTrap
+	|uint|				StackOverDepth
 	|uint|				DbgLength
-	|uint|				OverFlowTrack
+	|bool|				OverFlowTrack
 	|bool|				WantDebug
 	|bool|				BreakMapBad
 	|byte|				UserBreakLevel		// The break level that the user set by pressing pause/run/step/etc
@@ -36,6 +37,7 @@ module debugger
 	
 	function RestoreBreaks
 		.StackTrap = nil
+		.StackOverDepth = nil
 		.RealBreaks.Restore
 	
 	
@@ -49,7 +51,6 @@ module debugger
 			B[] |= 1<<31
 			B++
 	
-
 	
 	function ActivateInbuiltBreaks
 		|| L = .DbgLength
@@ -66,8 +67,11 @@ module debugger
 		.RealBreaks.Count = C
 	
 	
-	function DebugList (|string| name, |&uint| CakeBreak, |uint| Max)
+	function DebugList (|string| name)
 		target true {
+		name ?= "breaks"
+		|| CakeBreak = cake.ActiveBreaks!
+		|| Max = debugger.dbgLength
 		".......$name......"
 		for Raw in .SrcToCode
 			|| Src = raw.Loc
@@ -101,10 +105,9 @@ module debugger
 			input.Reset(f.name)
 			for i in 3
 				rz[i] = Input.hint
-				
 	
 	
-	function GoRunClearBreaks (|message| M, |spdfunc| fn, |bool| StepOver, |stepaction|)
+	function GoRunClearBreaks (|message| M, |spdfunc| fn, |StepAction| Action, |stepaction|)
 		opt norefcounts
 		cake.vm.SetBreakLevel(cakevm.kBreakStated)
 		
@@ -127,7 +130,7 @@ module debugger
 				|| WithinLine = Src.Score(F, P, A, N)
 					Lowest = Lowest min i
 					Highest = Highest max i
-				if WithinLine or (StepOver and (loc out CurrFunc))
+				if WithinLine or ((Action is stepover) and (loc out CurrFunc))
 					.SetUserBreak(CakeBreak, Src, 0, N)
 
 		while Lowest <= Highest
@@ -137,7 +140,7 @@ module debugger
 					.SetUserBreak(CakeBreak, Src, 0, N)
 			Lowest++
 		
-		return StepAction.GoRun
+		return Action ||| StepAction.GoRun
 		
 		
 	function SetBreaks (|message| M, |bool| Active, |stepaction| Action, |stepaction|)
@@ -164,7 +167,7 @@ module debugger
 		|| BestCount = 0
 		
 		target debug
-			.DebugList("Start", cakebreak, debugger.dbgLength)
+			.DebugList("Start")
 		
 		for Src in .SrcToCode
 			if src.NeedsChange(cakebreak, Max, active)
@@ -186,7 +189,7 @@ module debugger
 					.SetUserBreak(CakeBreak, Src, active, max)			
 
 		target debug
-			.DebugList("After", cakebreak, debugger.dbgLength)
+			.DebugList("After")
 	
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active, |uint| Max)

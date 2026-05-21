@@ -135,13 +135,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			return true
 	
 		
-	function IsOpen (|bool|)
-		nil checker // shouldn't be necessary
-		return .CommsOpen and .status.isrunning
-	
-	
 	function ActivateChild (|bool|)
-		if .isopen
+		if .CommsOpen and .Status.IsRunning
 			return true
 		.Kill(0)
 		if .CanActivate
@@ -179,9 +174,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 	module
-		|bool|		 CheckedParent
-		|&pico|		 _ForceParent
-		|SpdProcess| _Parent
+		|bool|			CheckedParent
+		|&pico|			_ForceParent
+		|SpdProcess|	_Parent
 				
 
 		libinternal CreateArgs (|string| path, |[string]!| Args, |&cstring|)

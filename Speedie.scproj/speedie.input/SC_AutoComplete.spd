@@ -58,10 +58,9 @@ function ParserRestore
 
 
 function EnterAutoComplete (|bool|)
-	|| perry = app.parent
+	|spdprocess--| perry = app.parent
 	
-	require stderr.ok
-	require perry.isopen
+	require stderr.ok and perry.CommsOpen
 	app.AllowInteruptCrash = false			// To debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
 

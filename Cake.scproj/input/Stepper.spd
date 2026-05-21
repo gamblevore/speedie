@@ -1,8 +1,35 @@
 
 
-function cakevm.Func (|cakestack| stack, |spdfunc|)
-	|| index = .Index(Stack.Code)
-		return spdtable.Find(index)
+datatype StepAction (uint)
+	default 0
+	flags
+		|StepAction|
+		DoNothing = 0
+		SendVars
+		Pause
+		GoRun				// run will already send the vars, after we hit the next break.
+		StepOver
+		StepIn
+		StepOut
+//		StepBack
+		SendVarsPause = SendVars+Pause
+	
+	syntax is (|stepaction| k, |bool|)
+		return self|uint|&k|uint|
+	
+	module
+		|stepaction| Curr
+
+
+
+
+function RunAction (perryresponse)
+	opt norefcounts
+	|| Level = cakevm.kBreakStated
+	if m.firstname=="fast"
+		Level = cakevm.kBreakNever
+	.SetBreakLevel(Level)
+	return StepAction.gorun
 
 
 function StepOneAction (PerryResponse)
@@ -13,30 +40,29 @@ function StepOneAction (PerryResponse)
 
 function StepInAction (PerryResponse)
 	opt norefcounts
-	debugger 
 	debugger.SetAllBreaks
-	return debugger.GoRunClearBreaks(m, .func(stack), false)		// CLEAR those in this range.
+	return debugger.GoRunClearBreaks(m, .func(stack), stepaction.stepin)		// CLEAR those in this range.
 
 
 function StepOverAction (PerryResponse)
 	opt norefcounts
 	|| fn = .func(stack)
 	debugger.SetAllBreaks(fn)
-	debugger.GoRunClearBreaks(m, fn, true)
+	rz = debugger.GoRunClearBreaks(m, fn, StepAction.StepOver)
+	debugger.StackOverDepth = stack.Depth
 	.BreakParentStack(Stack)
-	return StepAction.GoRun
 	
 
 function StepOutAction (PerryResponse)
 	debugger.RestoreBreaks
 	.BreakParentStack(stack)
 	.SetBreakLevel(cakevm.kBreakStated)
-	return StepAction.GoRun
+	return StepAction.GoRun ||| StepAction.StepOut
 
 
 function cakevm.BreakParentStack (|cakestack| stack)
 	debugger.StackTrap = nil
-/	|| P = .prev(stack)
+	|| P = .prev(stack)
 	|| break = cake.ActiveBreaks
 	if p and break
 		|| I = .index(p.code)
@@ -89,3 +115,4 @@ struct SavedBreaks
 			B[dixi] |= ouch
 	
 	
+
