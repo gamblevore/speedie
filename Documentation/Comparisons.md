@@ -262,8 +262,9 @@ Heres the same in speedie:
     function ReadFileExample (|string| path, |StringThatWasReadSafely|)
         || f = path.file
         return f.ReadAll(File.ExpectExists)
-        // File.ExpectExists is a bit flag telling speedie to report missing files as errors.
-        // If we removed this param and left it as its default of 0, upon calling f.Readall, any missing file would create an error, and return "" (non-nil).
+        // File.ExpectExists is a constant, making missing files create errors.
+        // If we removed this param and left it as its default,
+        // upon calling f.Readall, any missing file is ignored and returns ""
     
     main
         || f = ReadFileExample("file.txt")
