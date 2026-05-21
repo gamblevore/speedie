@@ -95,11 +95,11 @@ class Validator
 	autogen ReportMissing
 		opt norefcounts
 		if self
-			"!!!!"
-			printline .msg_
-			"----"
-			printline .curr
-			"????"
+//			"!!!!" // debug code.
+//			printline .msg_
+//			"----"
+//			printline .curr
+//			"????"
 			.msg_.ReportFailiure(.testfunc, .testname, .upon)
 	
 	syntax Equals (|string?| s, |bool| Aware=false, |bool|)

@@ -12,8 +12,8 @@ tv (generator_name: "my listings generator")
 		programme
 			start 200006031633
 			title "blah" (de)
-			title "blah" (en) 
-			desc "Blah Blah Blah." (de) 
+			title "blah" (en)
+			desc "Blah Blah Blah." (de)
 			credits 
 				director "James Blond"
 				actor "Snoopy"
