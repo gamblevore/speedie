@@ -105,10 +105,12 @@ class FileRow (ListViewRow)
 		return f.isdir == .asdir
 	
 	
-	libinternal GetField (|string| Name, |string|)
+	libinternal MatchField (|string| Name, |string| Match, |bool|)
 //		opt norefcounts
-/		|| d = .FileData.parse
-			rz = d[Name].value
+		|| d = .FileData.parse
+			|message--| m = d[name]
+			|string--| str = m.value
+			rz = str ~= Match 
 	
 	function TryReload (|fileviewer|fv)
 		require .asdir

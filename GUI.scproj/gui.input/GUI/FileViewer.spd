@@ -372,11 +372,9 @@ class FileViewer (ListView)
 		while F
 			if .CanFind(F, ID)
 				f.findinfile(S, L, N, R)
-				if f.DirFile ~= folf
-					if f.GetField("search") ~= "false"
-						return
-			|| Ch = F.First
-				.BatchFindSub(S, R, L, ID, N, Ch)
+			ifn (f.DirFile ~= folf) and f.MatchField("search", "false")
+				|| Ch = F.First
+					.BatchFindSub(S, R, L, ID, N, Ch)
 			F = F.next
 		
 		
