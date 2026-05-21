@@ -39,14 +39,15 @@ datatype SourceMap (uint64)
 		if self < Max
 			return self
 	
-	function Score (|filewithdata| File, |int| Position, |int| After, |uint| Max, |int|)
+	function Score (|filewithdata| File, |int| Position, |int| After, |uint| Max, |uint| Active, |int|)
 		|| Where = .Loc
 		require where and Where.FileNum == File.Index
 
 		|| P = Where.Position|int|
 		if P >= Position and P < After
 			|| C = .code(max)
-				return int.max - C
+				rz = int.max
+				rz -= C*(active>0)
 	
 	iterator
 		|int| MapPos = (debugger.SrcToCodeStr.Length>>3) - 1

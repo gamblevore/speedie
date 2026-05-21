@@ -10,8 +10,8 @@ dispatch DebuggerActions (PerryResponse)
 	
 	edit			EditAction
 	expansion		ExpandAction
-	brkadd			BreakAction
-	brkrem			BreakRemoveAction //addrem
+	brkadd			BreakAction			// AddBrk
+	brkrem			BreakRemoveAction	// RemBrk
 	sendbreaks		SendBreakAction
 
 	stop:			app.quit, return StepAction.donothing

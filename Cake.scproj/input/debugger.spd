@@ -61,7 +61,7 @@ module debugger
 		|| C = 0
 		for i in n
 			|| Code = P[i]
-/			if Code < L
+			if Code < L
 				CakeBreak[Code] |= (1<<31)
 				DX[c++] = Code
 		.RealBreaks.Count = C
@@ -127,7 +127,7 @@ module debugger
 		for i in n
 			|| loc = Locations[i]
 				|| Src = loc.map(i)
-				|| WithinLine = Src.Score(F, P, A, N)
+				|| WithinLine = Src.Score(F, P, A, N, 0)
 					Lowest = Lowest min i
 					Highest = Highest max i
 				if WithinLine or ((Action is stepover) and (loc out CurrFunc))
@@ -168,10 +168,10 @@ module debugger
 		
 		target debug
 			.DebugList("Start")
-		
+		// return int.max - C
 		for Src in .SrcToCode
 			if src.NeedsChange(cakebreak, Max, active)
-				|| Score = Src.Score(path, position, after, Max)
+				|| Score = Src.Score(path, position, after, Max, Active)
 				if Score > BestScore
 					BestScore = Score
 					BestValue = Src
@@ -184,7 +184,7 @@ module debugger
 			.SetUserBreak(CakeBreak, BestValue, active, max)
 		  else
 			for Src in .SrcToCode
-				|| Score = Src.Score(path, position, after, max)
+				|| Score = Src.Score(path, position, after, max, Active)
 				if src.NeedsChange(cakebreak, Max, active) and (Score == BestScore)
 					.SetUserBreak(CakeBreak, Src, active, max)			
 
