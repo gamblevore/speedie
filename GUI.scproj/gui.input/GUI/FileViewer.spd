@@ -350,7 +350,7 @@ class FileViewer (ListView)
 	function Listviewrow.FileSort
 		.sort(&fileviewer.FileRowNameSorter)
 	
-		
+	
 	libinternal CanFind (|filerow| f, |uint| id, |bool|)
 		opt norefcounts
 		if id
@@ -580,7 +580,7 @@ class FileViewer (ListView)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect
-				|| v	= (6 + parent.depthx(self), texty)
+				|| v	= (6 + parent.IndentDepth(self), texty)
 				|| D	= ._Document
 				|| mod	= (D.ismodified (D) nil)
 				|| ddd	= (Colors.black(0.5) (mod) Colors.clear)

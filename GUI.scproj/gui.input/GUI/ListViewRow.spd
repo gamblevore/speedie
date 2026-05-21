@@ -118,7 +118,7 @@ role ListViewRow (message)
 		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
 
 	
-	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depthx, |int| N)
+	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| indent_depth, |int| N)
 		opt NoRefCounts
 		|| w	= p.window	
 		|| z2	= rect
@@ -126,7 +126,7 @@ role ListViewRow (message)
 
 		for i in n
 			rect.horz	= p.ColumnBounds(i, z2, self)
-			rect.x		+= depthx
+			rect.x		+= indent_depth
 			where.controlclip = rect.clip(p.lastrect)
 			.DrawRowColumn(rect, where,  p, i, str)
 		

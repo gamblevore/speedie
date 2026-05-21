@@ -416,8 +416,6 @@ function Message.IsCake (|bool|)
 
 function scclass.NeedsClassLayout (|bool|)
 	opt norefcounts
-	require !.isrole
-	require !.IsBehaviourTable
 	if (.IsLibrary == options.MakeExec)
 		return true
 	|| r = .MyReacher
@@ -429,18 +427,27 @@ function packmaker.ClassLayout (|jbin| j)
 	opt norefcounts
 	|| names = FastString()
 	for c in Compiler.ReachedClassTable
-		if c.NeedsClassLayout
-			c.exportname.MiniName(names, c.IsObject)
-			|| fn = @msg
+		if c.IsRole or c.IsBehaviourTable
+			j.add(@char)
+			continue
+		
+		c.exportname.MiniName(names, c.IsObject)
+		|| fn = @msg
+		|| NeedsLayout = c.NeedsClassLayout
 			if c.IsLibrary
 				fn = @tmp // whatever
-			j.Enter(fn, names|string|)
-			names.Length = 0
-//					j.addhint(c.IsLibrary|int|)
-			c.ListLayout(j)
-			j.exit
 		  else
-			j.add(@char)
+			fn = @thg
+			if c.IsLibrary
+				fn = @sthg
+		
+		j.Enter(fn, names|string|)
+		if NeedsLayout
+			c.ListLayout(j)
+		  else
+			j.AddHint(c.islibrary|int|)
+		j.exit
+		names.Length = 0
 
 
 function packmaker.DebugClassesAndGlobals (|jbin| j)

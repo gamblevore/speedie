@@ -5,6 +5,7 @@ extend PerryIDE
 		super.constructor
 		(dummy)
 		.IsMainWindow		= true
+		.DebugHideUnderscore = true
 		.Project			= project
 		.InConstructor		= true
 		.CanAskingAboutMissing = true
@@ -374,6 +375,7 @@ extend PerryIDE
 			.tooltip		= "Variables and the Stack"
 			.UseColorScheme	= true
 			.ID				= "Stack"
+			.xindentperdepth = font.Width
 			.size			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid	= vec4(0.13, 0.135, 0.120, 0.975)

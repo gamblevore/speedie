@@ -90,9 +90,9 @@ function ExtraAppInfo (|faststring| fs)
 		fs <~ "  --"
 		return
 	
-//	|| R0 = r.args[0]
-//		fs.AppendRange(r0, R0.NamePart)
-//	fs <~ "://"
+	|| R0 = r.args[0]
+		fs.AppendRange(r0, R0.NamePart)
+		fs <~ "://"
 	|| o = .appinfo.tag
 	if o isa Message
 		|message--| l = o.first$
@@ -238,39 +238,49 @@ function message.DebugName (|string|)
 		n = n[0, i]
 	.obj = n
 	return n
-	
 
-function listviewrow.ImproveVar (|int| Depth=0)
+
+function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
 	opt norefcounts
+	.PerryAppendMsg("|", 2)
+	fs <~ "| "
+	fs <~ dbname
+	fs <~ " = "
+	fs <~ (' ', 6 - fs.LengthUTF8)
+	.PerryAppendMsg("", 3)
+	
+// DebugHideUnderscore
+
+
+function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
+	opt norefcounts
+
 	|| thg = self[4]
 	|| bad = (thg == @thg and "bad")
 		Notifications <~ "Something wrong with var: " + .name
 		is error
+	|| dbname = .DebugName // not sure why it needs some bytes removed?
+	if (CanHide and dbname[] == '_')
+		.Remove
+		return
+
 	is editable
 	if depth > 0
 		|| s1 = .second
 			s1.name = .name
 			s1.func = @thg
 
-	|| dbname = .DebugName // not sure why it needs some bytes removed?
 	|| f = .first
 		f.name = dbname
 	|| fs = VarPrinter
 	fs.Length = 0
-	fs <~ dbname
-	fs <~ ':'
-	fs <~ ' '
-	fs <~ (' ', 6 - fs.LengthUTF8)
-	.PerryAppendMsg("", 3)
-	fs <~ (' ', 26 - fs.LengthUTF8)
-	.PerryAppendMsg(" |", 2)
-	fs <~ "|"
+	.ImproveVarSub(dbname, fs)
 	.name = fs
 
 	|| Fields = .Last
 	if fields == @arg
-		for prop.fast in Fields
-			prop.ImproveVar(depth+1)
+		for prop in Fields
+			prop.ImproveVar(depth+1, CanHide)
 
 
 
@@ -324,7 +334,7 @@ function PerryStackEditCell (GUIListEditEvent)
 		if value==nil
 			return field.name
 		field.name = value
-		row.ImproveVar
+//		row.ImproveVar(0, false) // not sure about this. Remove this line?
 		.ide.DebugEditVar(row, value)
 	
 	
@@ -370,7 +380,7 @@ function perryide.UpdateStack (|message| stack)
 		|| l = m.Last
 		if l == @arg					// Assume its a var-dump
 			for s in l
-				s|ListViewRow|.ImproveVar
+				s|ListViewRow|.ImproveVar(0, .DebugHideUnderscore)
 
 	StackSrc.ReStitchAndFixup(arg, 0)
 	StackSrc.name = "vars"

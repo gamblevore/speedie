@@ -17,7 +17,7 @@ extend_module ASM
 			|| fn = .GetASMFunc(testname)
 				|| ff = fn.µTest
 				testvm.Registers(true)
-				testvm.SetDebug(cake.kBreakStated)
+				testvm.SetDebug(cakevm.kBreakStated)
 				testvm.load(ff.ptr, ff.length)
 				object.totalsanity
 				testvm.Run(0)

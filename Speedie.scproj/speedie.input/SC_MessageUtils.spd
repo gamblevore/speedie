@@ -106,7 +106,6 @@ function Message.IsAssignable (|bool|)
 			|| t = fn.ReturnType
 				if t.IsNumeric // hmmm not possible. even for a temp-vector.
 					return false
-		
 			
 	return f != @Func and @type and @num
 

@@ -12,6 +12,7 @@ class ListView (GUIControl) {
 	|bool|							RightClickSelects
 	|bool|							AlwaysSendChangeEvent
 	|byte|							CommandSelectRow
+	|byte|							XIndentPerDepth
 
 	|bool|							MultiSelection		// These two...
 	|bool|							KeepOneSelected		// Should be merged.  Maybe _Hierarchical also.
@@ -19,7 +20,7 @@ class ListView (GUIControl) {
 
 	|byte|							_ScrollRealigner
 	|bool|							_DuringSelect
-	|bool| 							_BlockedDuringUse
+	|bool|							_BlockedDuringUse
 	|bool|							_SelJustChanged
 
 	|ListViewRow?|					_DraggingRowTo
@@ -59,6 +60,7 @@ class ListView (GUIControl) {
 		.listsource		= ListViewrow()
 		.gRowSel		= .gnormal.copy
 		.RightClickSelects = true
+		.xindentperdepth = font.Width*2
 		.init
 
 
@@ -737,7 +739,7 @@ class ListView (GUIControl) {
 		|| T = .ColumnStart(0)
 		|| R = .findClicked(P.y)
 		if r and r != .columns
-			T += .depthx(R)
+			T += .IndentDepth(R)
 			|| T2 = T + font.width + 6
 			|| x = p.x
 			if (x >= T and x <= t2)			// and ((r is selected) or keys.option or keys.gui)
@@ -1286,7 +1288,7 @@ class ListView (GUIControl) {
 		|| sc = cell.row!
 		|| B = .RowBounds(.scrollstart, sc, .rowheight)			#require
 		B.horz = .ColumnBounds(cell.column, B, sc)
-		B.x += .depthx(sc)
+		B.x += .IndentDepth(sc)
 		return (B down .lastbottom) left .lastleft 
 
 
@@ -1465,7 +1467,7 @@ class ListView (GUIControl) {
 
 			for r.visible in self
 				rect.y = rect.y2 - .RowHeight
-				r.ListRowDraw(Where, rect, self, .depthx(R), NCols)
+				r.ListRowDraw(Where, rect, self, .IndentDepth(R), NCols)
 				rect.y2 = rect.y
 				if (r == end) and .liststart == .scrollstart
 					._CanSeeAllLines = (rect.y >= .lastrect.y)
@@ -1503,17 +1505,19 @@ class ListView (GUIControl) {
 		  else
 			.DrawScroll(.slh, where)
 
-
-	libinternal textview.MoveListLine (|int| i, |bool|)
-		opt norefcounts
-		|| inl = .isinline$
-		|| c = inl.cell$ // wat
-		|| c2 = c.step(i)
-			inl.Edit(c2, nil)
-			if i < 0
-				.selrange = 0
-		return true
 	
+	libinternal IndentDepth (|listviewRow| Row, |int|)
+		// maybe better to just return an indent... 
+		opt norefcounts
+		if .Istree
+			rz = -1
+			|| root = .listsource
+			|| c = Row
+			while c and (root != c)
+				rz++
+				c = c.parent
+			rz *= .XIndentPerDepth
+
 	
 	syntax Append (|string| name, |GUIMenuEvent| ev, |object| obj=nil)
 		cpp_part AppendMenuItem
@@ -1592,17 +1596,4 @@ class ListView (GUIControl) {
 }
 
 
-
-function ListView.DepthX (|listviewRow| Row, |int|)
-	// maybe better to just return an indent... 
-	opt norefcounts
-	if .Istree
-		rz = -1
-		|| root = .listsource
-		|| c = Row
-		while c and (root != c)
-			rz++
-			c = c.parent
-		rz *= font.Width*2
-		
 

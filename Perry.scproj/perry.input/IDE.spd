@@ -102,6 +102,7 @@ class PerryIDE (Window)
 	|bool|						IsTextMode
 	|bool|						UsingSpdLib
 	|CompileMode|				_DebugMode
+	|bool|						DebugHideUnderscore
 	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool|						IsGraphics
@@ -459,6 +460,8 @@ class PerryIDE (Window)
 	function CheckCrashed (|UnixProcess| p, |string| what, |bool|)
 		require p
 		|| Exit = p.Status
+		if exit.killed
+			return true
 		if !exit.Crashed
 			return false
 		
@@ -466,13 +469,15 @@ class PerryIDE (Window)
 		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
 		fs <~ p.ReadStdErr.FindStacktrace
 		.Notify(fs, @emb + what)
-		return .CancelCompile
+		if p == .Compilr
+			return .CancelCompile
+		return true
 
 
 	function string.FindStacktrace (|string|)
 		|| f = "\n****** CRASH"
-		|| where = .find(f) #require
-		where = .find("\n", where) #require
+		|| where = .find(f)				#require
+		where = .find("\n", where)		#require
 		where += f.length
 		|| After = .find("\n-----------------------\n", where)
 		if !after: after = int.max
@@ -487,8 +492,8 @@ class PerryIDE (Window)
 		delay += .position|float|
 		|| D = delay.date
 		if (f.lastsend.ago > D)
-			if app.yes("print")
-				printline f.lastsend.ago.float.render + " ago means death for " + f.pico.name
+//			if app.yes("print")
+//				printline f.lastsend.ago.float.render + " ago means death for " + f.pico.name
 			return true
 		
 	
