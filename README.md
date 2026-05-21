@@ -63,7 +63,7 @@ Beta Release:
 * General ASM fixes, especially around SIMD.
 * Minor GUI improvements to Perry
 * ASM needs to be self-compiling for Speedie. (Speedie compiling itself via Cake!)
-* TextView needs line resyncronisation. (Allows editing code while keeping breakpoints for more fluid editing.)
+* TextView needs line resyncronisation. (Allows editing live code while keeping breakpoints for more fluid editing. Your new changes **don't** get entered until re-run, but at least your breakpoints remain functional.)
 
 Proper Release:
 
