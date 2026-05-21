@@ -166,9 +166,9 @@ module debugger
 		|| BestValue = 0
 		|| BestCount = 0
 		
-		target debug
-			.DebugList("Start")
-		// return int.max - C
+//		target debug
+//			.DebugList("Start")
+
 		for Src in .SrcToCode
 			if src.NeedsChange(cakebreak, Max, active)
 				|| Score = Src.Score(path, position, after, Max, Active)
