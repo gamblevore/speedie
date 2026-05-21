@@ -197,9 +197,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	|| prms = exp.last!
 	|| TableID = 0
 	
-//	if "jb_main".trap
-//		if prms.AsFunc == "JB_Array_SyntaxCast"
-	
 	.ParentSanity
 	
 	|| fn = prms.AsFunc

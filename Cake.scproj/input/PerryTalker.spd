@@ -41,12 +41,12 @@ function __PerryView__ (cakevm.CakeChef)
 	|| Mode = StepAction.curr
 	if Mode is stepover
 		if (stack.depth == debugger.StackOverDepth)
-			"OverOK"// its ok we can actually break, if needed.
+//			"OverOK"// its ok we can actually break, if needed.
 		  elseif (Stack > debugger.stacktrap)
-			"NotOver"// we went in! So... *IN* is definitely not *OVER*
+//			"NotOver"// we went in! So... *IN* is definitely not *OVER*
 			break = 0 // no break.
 	  elseif (mode is stepout) and (Stack > debugger.stacktrap)
-		"OutOK"
+//		"OutOK"
 		break = 0
 				
 	Break >>= 31

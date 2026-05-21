@@ -43,7 +43,7 @@ extend SCFunction
 		opt norefcounts
 		rz = where
 		assembler.sh.funcstart_ = .fatfirst - 1			// for debug
-
+		
 		|byte| HasLabel
 		for fat.fat in self
 			HasLabel |= fat.JumpPrm

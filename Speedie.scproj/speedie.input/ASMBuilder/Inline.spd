@@ -138,10 +138,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
-	LL.Start = .curr
-
-//	if "jb_main".trap
-//		if fn == "JB_Array_SyntaxCast"
+	LL.Start = .curr 
 	
 	|SavedRegisters| svregs
 	|InlineInfo| Info

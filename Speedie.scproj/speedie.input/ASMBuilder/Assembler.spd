@@ -518,6 +518,8 @@ struct Assembler
 		0:	nil			// otherwise
 	*/
 
+		if exp is BreakPoint
+			.Breakrequest |= BreakPoint
 		|| OV = .OpenVars
 		Dest = .DeclareBody(exp, a) as dest
 		|| r = .µGetASM(Exp, dest)
@@ -552,6 +554,8 @@ struct Assembler
 			Dest.TmpCheck(true)
 
 		|| OV = .OpenVars
+		if exp is BreakPoint
+			.BreakRequest |= assembler.Breakable
 
 		if Dest is NewlyDeclared									// || x = (y + 1) + (z + 1)
 			Dest = Dest asnt ASMReg.NewlyDeclared

@@ -77,7 +77,7 @@ function Debugger (fn_asm)
 	opt norefcounts
 	|| fn = exp.func
 	if (fn == @tmp) and (exp is BreakPoint)
-		.Breakrequest |= assembler.BreakPoint
+//		.Breakrequest |= assembler.BreakPoint		// unnecessary? argumentsub does it.
 		return nil
 
 	require Options.ShouldBuildTrap
@@ -91,7 +91,7 @@ function Debugger (fn_asm)
 		exp = exp.last!
 		|| ch = exp.first
 			num = ch.int + 1
-			if num <= 1   // debugat 0 --> non-removeable noop. To track BreakCount
+			if num <= 1			// debugat 0 --> non-removeable noop. To track BreakCount
 				fat = exp.nop2
 	if !fat
 		fat = exp.TRAP(num)
@@ -424,6 +424,8 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	.parentsanity
 	while
 		.BreakRequest |= assembler.Breakable
+		if (ch is BreakPoint)
+			.Breakrequest |= assembler.BreakPoint
 		if ch.func == @decl
 			rz = decl(self, ch, nil)
 		  else

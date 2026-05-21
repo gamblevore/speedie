@@ -953,7 +953,6 @@ function message.DeOpp
 function TypeOfTernary2 (ExprResolver)
 	opt norefcounts
 	using exp
-	if "jb_main".trap
 	|| first	= exp.first!
 	|| Test		= first.next!
 	|| second	= test.next

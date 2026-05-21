@@ -61,7 +61,7 @@ module debugger
 		|| C = 0
 		for i in n
 			|| Code = P[i]
-			if Code < L
+/			if Code < L
 				CakeBreak[Code] |= (1<<31)
 				DX[c++] = Code
 		.RealBreaks.Count = C
