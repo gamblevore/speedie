@@ -145,7 +145,7 @@ module debugger
 		|| F = debugger.file(m)
 		if f == nil
 			return action
-			
+		
 		|| p = m[1].int
 		|| a = p + m[2].int
 		debugger.UserMultiBreak(F, p, a, Active<<31)
@@ -204,7 +204,7 @@ module debugger
 		if !.BreakMapBad
 			.BreakMapBad = true
 			printerror "BreakMap out of range"
-		
+	
 
 	function Path (|int| i, |filewithdata|)
 		opt norefcounts
@@ -261,7 +261,6 @@ module debugger
 			.VariablePrinter = FastString(64)
 			require .VariablePrinter
 			return .LoadSub(.PackInfo)
-
 		return !(debugger.WantDebug or cake.perry)			#expect "Program file doesn't contain debug info."
 
 
