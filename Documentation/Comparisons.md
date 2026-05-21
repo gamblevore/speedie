@@ -131,13 +131,13 @@ Speedie realises that `F` might not exist. And so this code won't compile. Speed
 
 _On November 18 2025, Cloudflare, which runs 20% of websites, and has micro-services used by many other websites such as Twitter, and ChatGPT, went down. Specifically their code used `.unwrap()`, which can crash your app._
 
-Rust can take down around 1/3rd of the internet and still be considered "Safe". Yeah its not safe. It could be more dangerous if a Rust program crashed on software running an airplane, or hospital or industrial machinery.
+Rust can take down around 1/5th of the internet and still be considered "Safe". Yeah its not safe. It could be more dangerous if a Rust program crashed on software running an airplane, or hospital or industrial machinery.
 
 Youtuber Tsoding had this to say about Rust: 
 
 [![Rust Guide for C devs](http://img.youtube.com/vi/Jge1Qry2RRs/0.jpg)](https://www.youtube.com/shorts/Jge1Qry2RRs?feature=share)
 
-> The problem with Rust, is that they **achieved safety by sacrificing sanity of the the programmer**. Thats how they acheived safety, it becomes an absolutely unusable annoying shitty language. _"But at least its safe right?"_ Its like: _"F*&^ programmers! F!!$ programmer health. Safety above all else! Think about the children! Think about the children!"_
+> The problem with Rust, is that they **achieved safety by sacrificing sanity of the programmer**. Thats how they acheived safety, it becomes an absolutely unusable annoying shitty language. _"But at least its safe right?"_ Its like: _"F*&^ programmers! F!!$ programmer health. Safety above all else! Think about the children! Think about the children!"_
 > So we gonna try to go in the opposite direction, lets cut out all that bullshit, lets actually for once think about the mental health of the programmer and just let them enjoy. And with the rise of vibe coding, its obvious that no one gives a sh%@ about safety anyway... so why should we?
 
 Wow. Well... he basically expressed my emotional reaction to Rust better than I could.
