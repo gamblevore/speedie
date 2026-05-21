@@ -54,31 +54,43 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * Other languages ([Rust](Documentation/Comparisons.md)) feel like pedantic "form-filling" ask the government to build on your own land, (and hoping the bureaucrats don't block you), rather than simply building. Speedie is more like a friend that helps you build your barn while stopping you when your chainsaw is too close to your leg.
 
 
-# Remaining Challenges #
+# Road Map To Release #
 
-That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
+There is still work to be done before Speedie is release ready. Here is the current road-map.
 
-* Finishing [`Cake`](Documentation/Cake.md)
-* GPU acceleration. (OpenCL perhaps?)
+Beta Release:
 
-Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
+* General ASM fixes, especially around SIMD.
+* Minor GUI improvements to Perry
+* ASM needs to be self-compiling for Speedie. (Speedie compiling itself via Cake!)
+* TextView needs line resyncronisation. (Allows editing code while keeping breakpoints for more fluid editing.)
+
+Proper Release:
+
+* GPU acceleration via OpenCL
+
+Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked. But overall... Speedie is in a very good state. The C++ compile-mode is fully working and produces fast apps. It really is going to be wonderful.
+
+Its more about unlocking that wonderfulness (by making it easy to debug and productive) than actually making it wonderful. The greatness is already within.
 
 
 # Downsides #
 *Is Speedie some magical land where all coding-projects become better?* **Well... no.** There are downsides! Speedie's downsides are heavy enough that, for many people, other languages are a better choice.
 
-The biggest downsides are:
+Like everything in life, there are downsides. By avoiding the downsides of C++ (complexity) and Python (slowness), we gained new downsides. This is just life I guess.
 
 * The community is (currently) tiny
 * Lack of 3rd party libs or 3rd party examples
 
-There are other possible reasons not to use speedie, including: "We don't want to learn a new language" or "our existing code-base is in lang-XYZ".
+So no... its not some *"magical land where everything becomes better"*.
+
+Other possible reasons not to use speedie, include: "We don't want to learn a new language" or "our existing code-base is in lang-XYZ".
     
 For some people, the small community isn't a problem. Some people prefer to write all their own code and have been doing that for their most successful products in the past anyhow. Others might want to create libs, and Speedie might be a good environment to do it in. (Speedie can compile libs with C-APIs! For example [jeebox_api.h](jeebox.scproj/Examples/jeebox_api.h))
 
-But for others, the small community is the largest factor. For some, without existing code to include, it will slow down your development too much. For others, a small community will slow down development, but not too much.
-
 And some may prefer a small community. Perhaps a student or someone who enjoys learning new things. You will just want to explore. And speedie does have a nice bunch of [example](Examples/) - [projects](GameExamples/) already, to learn from.
+
+I prefer coding in Speedie to any other language, including C++.
 
 
 
