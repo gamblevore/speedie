@@ -173,3 +173,57 @@ function file.CodeSign (|string| sign, |ExitCode|)
 		  else
 			error (f, errs.GetResult)
 
+
+
+function file.CompareFile (|File| A, |string| Error="", |bool|)
+	cpp_part FileCompare
+	FlowControl.DisabledIncr()
+	|| code = .CompareSub(a)
+	.Close
+	A.Close
+	rz = .CompareMsg(code, Error)
+	FlowControl.DisabledIncr(-1)
+
+
+function file.CompareMsg (|errorint| code, |string| Error, |bool|)
+	flow off
+	if (code==0) or !error
+		return code == 0
+
+	|string| msg = self
+	if code == 1
+		msg += " has different length to "
+	  else
+		msg += " has different contents to "
+	msg += Error
+	error msg
+	
+	
+function file.CompareSub (|File| A, |ErrorInt|)
+	cpp_part FileCompareSub
+	flow off
+	if (.Size != A.Size)
+		return 1
+	A.close
+	.close
+	.Open(readmode)
+	A.Open(readmode)
+	
+	while {
+		|| S_ = .Read(64K)
+		|| SA = A.Read(64K)
+		if S_ != SA
+			rz = 2
+			exit
+	} (S_)
+
+
+function file.CompareData (|String| A, |string| Error="", |bool|)
+	flow off
+	|| code = 0
+	if (.Size != A.length)
+		code = 1
+	  elseif (.readall(true) != A)
+		code = 2
+	return .CompareMsg(code, error)
+
