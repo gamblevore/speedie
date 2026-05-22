@@ -296,7 +296,7 @@ function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 	|| j = VarPrinter.start(@tmp, cmd)
 	j.AddStr .path
 	j.AddInt Line.Position
-	j.AddInt line.text.Length
+	j.AddInt line.Length
 	j.exit
 	return j
 

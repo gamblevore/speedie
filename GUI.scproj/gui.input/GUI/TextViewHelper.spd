@@ -12,6 +12,7 @@ datatype TextLineFlags (uint16)
 		AvoidLastChar
 		FakeMsg
 		Selected
+		ColoriseUsingPosition
 
 
 class TextViewLine (list)
@@ -23,7 +24,7 @@ class TextViewLine (list)
 	|message?|				Message
 	|Error?|				LineError
 	|float|					UserInfo
-	|int|					AdderPos	// remove this?
+//	|int|					AdderPos	// remove this?
 	|int|					vline
 	|int|					tline
 	|int|					CompilePos	// Position at compile time
@@ -32,15 +33,23 @@ class TextViewLine (list)
 	|TextLineFlags|			TextState
 
 	constructor (|int| p = 0)
+		inlined
 		.position = p
 		.CompilePos = -1
 	
-	function Text (|string|)
+	inline Text (|string|)
 		// I could make this using memorylayers... one per textview?
 		// then I always know the owner?
+		// its quite a large effort to change this...
+		// woudl also disable features like my logtrimming and... line shortening and other tricks.
+		// even things like .render become impossible to do nicely.
 		return ._text
 	
+	inline Length (|int|)
+		return ._text.Length
+	
 	render
+		opt norefcounts
 		if !.parent
 			for c in self
 				c.render(fs)
@@ -104,10 +113,12 @@ class TextViewLine (list)
 
 	
 	function After (|int|)
+		opt norefcounts
 		return .position + .text.length
 
 
 	libinternal ByteOfX (|int| X, |ind|)
+		opt norefcounts
 		|| chars	= (x max 0) / font.width
 		|| bytes	= .text.CountBytesInSquares(chars) min .text.length
 		return bytes + .position
@@ -120,7 +131,7 @@ class TextViewLine (list)
 
 
 	libinternal ColoriseText (|message| msg, |bool| ParsedOK, |message|)
-		.adderpos = -1
+		isnt ColoriseUsingPosition
 		.message = nil
 		isnt fakemsg
 
@@ -129,8 +140,8 @@ class TextViewLine (list)
 
 		require !parsedok
 
-		|| r = .text.Parse
-			.adderpos = .position // not sure what its used for?
+		|| r = ._text.Parse
+			is ColoriseUsingPosition
 			r.addpos(.position)
 			.ColoriseSub(r)
 			is fakemsg
@@ -139,13 +150,16 @@ class TextViewLine (list)
 	
 	
 	libinternal Range (|intrange|)
+		opt norefcounts
 		|| p = .position
 		|| L = .text.length
 		return (P, P+L)
 
 	
 	libinternal EmptyLine (|bool|)
-		return (.text == 1) and .text[].istextline
+		opt norefcounts
+		|| t = .text
+		return (t == 1) and t[].istextline
 
 
 	libinternal ColoriseSub (|message| srch, |message|)
@@ -164,7 +178,7 @@ class TextViewLine (list)
 		
 		if r and !r.StartsAfter(range)
 			(self is BothBreaks) = r is breakpoint
-			.adderpos = .position
+			is ColoriseUsingPosition
 			.message = r
 		  else
 			isnt breakpoint
@@ -236,11 +250,13 @@ class TextViewLine (list)
 		
 		
 	libinternal EndsWithLine (|bool|)
+		opt norefcounts
 		return .text.last.IsTextLine
 
 
 	libinternal DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| G)
 		opt min 3
+		opt norefcounts
 		|| M = .Range
 		require (r.x <= m.x2) and (r.x2 >= m.x)
 		|| Start  = .SquaresAtByte(R.x1 max M.x1)
@@ -388,7 +404,7 @@ libinternal textview.DrawLighter (|image| Where, |int| y)
 libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |int|)
 	opt norefcounts
 	
-	|| x = .DrawOneStartLine(d.text) 
+	|| x = .DrawOneStartLine(d.text)
 	|int| big = ._LineNumWidth
 		x += big * font.width
 		|| P = (x-(4+font.width), y)
@@ -557,9 +573,12 @@ struct MsgTextDrawState
 		
 	module
 		libinternal New (|int| x, |textviewline| d, |MsgTextDrawState|)
+			opt norefcounts
 			rz.i = 0
 			rz.x = x
-			rz.adder = d.AdderPos
+			rz.Adder = -1
+			if d is ColoriseUsingPosition
+				rz.adder = d.Position
 			rz.msg = d.message
 			rz.t = d.text
 			rz.font = font.small!
