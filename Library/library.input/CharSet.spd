@@ -46,6 +46,10 @@ datatype CharSet (uint)
 		cpp_Part ContainsStr
 		inlined
 		return s.OutCharSet(self) < 0
+	
+	operator in (|string| s, |bool|)
+		inlined
+		return s.find(self) >= 0
 		
 	syntax Access (|uint| b, |bool|)
 		if b <= 255
@@ -62,7 +66,7 @@ datatype CharSet (uint)
 		
 	
 	constants
-		|int| 
+		|int|
 		fInvalid
 		fNull					// 0
 		fUnprintable 			// 1-8, 11, 12, 14-30

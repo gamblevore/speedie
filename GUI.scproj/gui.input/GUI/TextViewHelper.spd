@@ -24,7 +24,6 @@ class TextViewLine (list)
 	|message?|				Message
 	|Error?|				LineError
 	|float|					UserInfo
-//	|int|					AdderPos	// remove this?
 	|int|					vline
 	|int|					tline
 	|int|					CompilePos	// Position at compile time
@@ -38,11 +37,21 @@ class TextViewLine (list)
 		.CompilePos = -1
 	
 	inline Text (|string|)
-		// I could make this using memorylayers... one per textview?
-		// then I always know the owner?
-		// its quite a large effort to change this...
-		// woudl also disable features like my logtrimming and... line shortening and other tricks.
-		// even things like .render become impossible to do nicely.
+		// its quite a large effort to remove ._text property
+		// splitting has to be done differently, I need to store the length directly also.
+		// drawing differently... everything differently.
+		// I'd need to disable logtrimming and... never create line shortening
+		// opt norefcounts is the biggest problem, as we'd be creating temporaries
+		// temps are unavoidable in some places, like .render, so I'd need to delete .render
+		
+		// A lot of things rely on ._text to get the length, so that needs storing.
+		
+		// i'll do it some other day (never). it only makes things faster and take less memory
+		
+		// I feel like i'm letting myself down... but im not right?
+		// Right now, we have the simpler design. We are already faster and take less memory.
+		// why not reserve some spare powers?
+		
 		return ._text
 	
 	inline Length (|int|)
@@ -111,11 +120,6 @@ class TextViewLine (list)
 			  else
 				rz++
 
-	
-	function After (|int|)
-		opt norefcounts
-		return .position + .text.length
-
 
 	libinternal ByteOfX (|int| X, |ind|)
 		opt norefcounts
@@ -124,7 +128,7 @@ class TextViewLine (list)
 		return bytes + .position
 	
 
-	libinternal message.AddPos (|int| p)
+	libinternal message.TVAddPos (|int| p)
 		opt norefcounts
 		for ch.flat in self
 			ch.position += p
@@ -142,18 +146,22 @@ class TextViewLine (list)
 
 		|| r = ._text.Parse
 			is ColoriseUsingPosition
-			r.addpos(.position)
+			r.TVAddPos(.position)
 			.ColoriseSub(r)
 			is fakemsg
 		  else
 			stderr.pop
 	
 	
+	
+	function After (|int|)
+		opt norefcounts
+		return .position + .text.length
+
+
 	libinternal Range (|intrange|)
 		opt norefcounts
-		|| p = .position
-		|| L = .text.length
-		return (P, P+L)
+		return (.position, .after)
 
 	
 	libinternal EmptyLine (|bool|)

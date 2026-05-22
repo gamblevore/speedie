@@ -68,7 +68,7 @@ class FileRow (ListViewRow)
 	
 	
 	function MoveTo (|string| v, |bool|) // rename
-		if (v contains '/') or (v.FindBadUTF8) or (v.linecount > 1)
+		if (v contains '/') or (v.FindBadUTF8) or (Charset.line in v)
 			beep v + " is not a valid filename!"
 			return false
 		

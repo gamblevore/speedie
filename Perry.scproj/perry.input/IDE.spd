@@ -243,7 +243,7 @@ class PerryIDE (Window)
 		  elseif (i == 1)
 			|| t = e.text
 
-			fs <~ "Chars ${t.lengthutf8}   Lines ${t.linecount}"
+			fs <~ "Chars ${t.lengthutf8}   Lines ${e.wrappedlines.last!.vline}"
 			|| msg = e.ParsedMessage
 				|| loc = msg.LinesOfContent
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
@@ -332,11 +332,12 @@ class PerryIDE (Window)
 		if sel2.last.IsTextLine
 			sel2 = sel2.Shorten(1)
 		fs <~ "ln "
-		fs <~ t[0, sel0].LineCount
-		|| n = sel2.linecount-1			
-			fs <~ "+"
-			fs <~ n+1
-		.LineInfo.text = fs
+		fs <~ .editme.CurrLine
+		|| n = sel2.linecount-1  // could probably remove this call to linecount
+			fs <~ "+"			 // just compare vlines within textviewline
+			fs <~ n+1			 // then its literally used in one place...
+		.LineInfo.text = fs		 // can just inline it
+								 // we could make a generic str.count(charset)... might be better than remove
 		
 		if .BytesInfoMode
 			fs <~ "byte $sel0"

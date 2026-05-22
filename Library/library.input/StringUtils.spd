@@ -181,7 +181,7 @@ libinternal cstring.temp (|VirtualJBString|)
 
 
 function String.ExtractPathAndLine (|$ivec2| LineAndByte, |string|)
-	if .LineCount > 1	
+	if charset.line in self
 		|| parsed = .Parse
 			|| isArg = (parsed == @arg)
 			|| curr = (parsed.first (isarg) parsed)

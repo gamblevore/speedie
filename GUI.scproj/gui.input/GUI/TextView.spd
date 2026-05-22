@@ -300,21 +300,33 @@ class TextView (GUIControl)
 		return (A,B)
 
 	
-	libinternal TextViewLine.ooof (|bool| t, |int|)
-		if t
-			return .position
-		return .after
+//	libinternal TextViewLine.ooof (|bool| t, |int|)
+//		if t
+//			return .position
+//		return .after
+//		
+//		
+//	libinternal ExpandToVis (|intrange| t, |intrange|)
+//		opt norefcounts
+//		|| d1 = .FindTextLine(t.x1)
+//		|| d2 = .FindTextLine(t.x2)
+//		|intrange| m 
+//		m.x1 = d1.ooof(t.x1 <= t.x2)
+//		m.x2 = d2.ooof(t.x2 <  t.x1)
+//		return m
 		
-		
+
 	libinternal ExpandToVis (|intrange| t, |intrange|)
 		opt norefcounts
-		|| m = t
-		|| d1 = .FindTextLine(m.x1)
-		|| d2 = .FindTextLine(m.x2)
-		t.x1 = d1.ooof(m.x1 <= m.x2)
-		t.x2 = d2.ooof(m.x2 <  m.x1)
-		return t
-		
+		|| d1 = .FindTextLine(t.x1)
+		|| a = d1.Position
+		if t.x1 >  t.x2
+			a = d1.After
+		|| d2 = .FindTextLine(t.x2)
+		|| b = d2.Position
+		if t.x2 >= t.x1
+			b = d2.After
+		return (a,b)
 		
 	libinternal ByteAtXY (|ivec2| p, |$ivec2| v, |textviewline|)
 		opt norefcounts
@@ -626,7 +638,8 @@ class TextView (GUIControl)
 
 
 	function CurrLine (|int|)
-		return .text[0, .sel0].linecount
+		|| d = .FindTextLine(.sel0)
+		return d.vline
 	
 	
 	libinternal DrawInfoAtLine (|int| L, |textviewline|)

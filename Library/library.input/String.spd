@@ -286,9 +286,11 @@ class String
 		for n in .length
 			rz <~ string.byte(self[n])
 
-	function LineCount (|int|)
+	function LineCount (|int| From = 0, |int| After = int.max, |int|)
 		rz = 1
-		for c in self
+		After = After min .Length
+		while From < After
+			|| c = self[From++]
 			rz += (c=='\n' or '\r')
 	
 //	function LineAtByte (|int| b, |intrange|)
