@@ -309,7 +309,6 @@ GUI_LV_ColumnsSet
 GUI_LV_ColumnsToDraw
 GUI_LV_Constructor
 GUI_LV_DefaultCopy
-GUI_LV_DepthX
 GUI_LV_DesiredHeight
 GUI_LV_Destructor
 GUI_LV_Draw
@@ -362,12 +361,10 @@ GUI_LV_TypedString
 GUI_LV_Use
 GUI_LV_VisibleRows
 GUI_Line_After
-GUI_Line_Constructor
 GUI_Line_Destructor
 GUI_Line_OperatorContains
 GUI_Line_Render
 GUI_Line_SlowMove
-GUI_Line_Text
 GUI_Line_syntaxisSet
 GUI_MenuItem_Constructor
 GUI_MenuItem_Destructor
@@ -1082,7 +1079,6 @@ JB_File_Accessed
 JB_File_Child
 JB_File_ChildExisting
 JB_File_Close
-JB_File_CompareData
 JB_File_Config
 JB_File_Constructor
 JB_File_Copy
@@ -1096,7 +1092,6 @@ JB_File_Destructor
 JB_File_DirectoryContains
 JB_File_Existing__MainArg
 JB_File_Exists
-JB_File_FileCompare
 JB_File_Flush
 JB_File_HardLinkTo
 JB_File_IsDir
@@ -1348,7 +1343,6 @@ JB_Object___Render__
 JB_OutOfMemoryOccurred
 JB_PIDM_SyntaxIs
 JB_Pico_Get
-JB_Pico_IsOK
 JB_Pico_Name
 JB_Pico_NameSet
 JB_Pico_SendString
@@ -1377,7 +1371,6 @@ JB_Proc_Destructor
 JB_Proc_Disconnect
 JB_Proc_Fail
 JB_Proc_Get
-JB_Proc_IsOpen
 JB_Proc_Send
 JB_Proc_SendStr
 JB_Proc_SpawnAsChild
@@ -1533,7 +1526,6 @@ JB_Str_BadUTF8
 JB_Str_Before
 JB_Str_BeforeLastByte
 JB_Str_ByteCount
-JB_Str_ByteSplit
 JB_Str_ByteValue
 JB_Str_ByteValue2
 JB_Str_CRC
@@ -1550,9 +1542,9 @@ JB_Str_Copy
 JB_Str_CopyFromCString
 JB_Str_CopyFromPtr
 JB_Str_CopyTo
+JB_Str_Count
 JB_Str_Decompress
 JB_Str_Dict
-JB_Str_DiffAt
 JB_Str_Digest
 JB_Str_EndsWith
 JB_Str_Equals
@@ -1592,7 +1584,6 @@ JB_Str_IsVolume
 JB_Str_Last
 JB_Str_Length
 JB_Str_LengthUTF8
-JB_Str_LineCount
 JB_Str_LowerCase
 JB_Str_MakeC
 JB_Str_MakeDir
