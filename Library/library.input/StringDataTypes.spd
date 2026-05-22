@@ -34,6 +34,10 @@ datatype byte
 			return self - 32
 		return self
 
+	 operator in (|charset| c, |bool|)
+		inlined
+		return c[self]
+
 	function IsHex (|bool|)
 		return .IsInt  or  .in('a', 'f')  or  .in('A', 'F')
 

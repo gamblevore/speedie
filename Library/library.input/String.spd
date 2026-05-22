@@ -196,9 +196,6 @@ class String
 		if (.Length <= N)
 			return self
 		return self[0, N].UnicodeSync + "..."
-
-//	function SimpleName (|string|)
-//		return .lowercase.TrimExtAndPath
 	
 	function UpperFirst (|String|)
 		if self[].IsUpper
@@ -271,35 +268,18 @@ class String
 				exit
 			rz <~ Word
 
-
-	inline FirstLine (|string|)
-		return .Before("\n")
-		
-		
 	function Before (|string| s, |string|)
 		|| f = .find(s)
 			return self[0, f]
 		return self
-	
-	function ByteSplit (|[string]|)
-		opt norefcounts
-		for n in .length
-			rz <~ string.byte(self[n])
 
-	function LineCount (|int| From = 0, |int| After = int.max, |int|)
+	function Count (|charset| CS, |int| From = 0, |int| After = int.max, |int|)
 		rz = 1
 		After = After min .Length
+		From = From max 0
 		while From < After
 			|| c = self[From++]
-			rz += (c=='\n' or '\r')
-	
-//	function LineAtByte (|int| b, |intrange|)
-//		for (L.lines in self) (after)
-//			if after >= b
-//				return (after-l.length, after)
-	
-	function DiffAt (|string| A, |ind|)
-		cpp_wrapper
+			rz += c in cs
 	
 	operator Contains (|string| s, |bool|)
 		cpp_part ContainsString
@@ -338,8 +318,7 @@ class String
 		if !n
 			return self
 		n = n mod (.length+1)
-	    return self[n, int.max] + self[0, n]
-		
+		return self[n, int.max] + self[0, n]
 		
 	function FindBadUTF8 (|int| From=0, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8

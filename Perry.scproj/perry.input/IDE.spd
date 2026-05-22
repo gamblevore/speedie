@@ -333,11 +333,11 @@ class PerryIDE (Window)
 			sel2 = sel2.Shorten(1)
 		fs <~ "ln "
 		fs <~ .editme.CurrLine
-		|| n = sel2.linecount-1  // could probably remove this call to linecount
-			fs <~ "+"			 // just compare vlines within textviewline
-			fs <~ n+1			 // then its literally used in one place...
-		.LineInfo.text = fs		 // can just inline it
-								 // we could make a generic str.count(charset)... might be better than remove
+		|| n = sel2.count(charset.line)-1		// could probably remove this call to linecount
+			fs <~ "+"				// just compare vlines within textviewline
+			fs <~ n+1				// then its literally used in one place...
+		.LineInfo.text = fs			// can just inline it
+									// we could make a generic str.count(charset)... might be better than remove
 		
 		if .BytesInfoMode
 			fs <~ "byte $sel0"

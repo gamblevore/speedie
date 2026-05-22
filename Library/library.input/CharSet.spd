@@ -55,7 +55,7 @@ datatype CharSet (uint)
 		if b <= 255
 			|| cp = CharSet.Props[b]|uint|
 			return (1<<cp) & self|uint|
-	
+			
 	operator Plus (|Charset| C, |charset|)
 		inlined // selftool uses this
 		return (self|uint| ||| c|uint|)|charset|

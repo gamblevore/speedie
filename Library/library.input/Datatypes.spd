@@ -61,10 +61,6 @@ datatype int
 		return self
 
 
-//	syntax cast (|bool|)
-//		return self|bool|
-		// don't put a cast to string here. not even in 'datatype Byte'
-
 	render
 		opt norefcounts
 		cpp_part RenderFS
@@ -223,7 +219,7 @@ struct IntDownRange   /// :3
 			--_c
 
 
-struct FloatRange   /// :3
+struct FloatRange	/// :3
 	|Float| From
 	|Float| To
 	|float| Step
@@ -319,9 +315,6 @@ datatype uint16
 		|uint16|
 		max = 0xffff_
 		min = 0
-
-//	syntax cast (|bool|)
-//		return self|bool|
 
 
 
@@ -643,9 +636,6 @@ datatype f64
 		cpp_part dbl
 	
 	default 0.0
-
-//	syntax cast (|bool|)
-//		return self|bool|
 	
 	function AsInt (|int64|)
 		cpp_wrapper
@@ -711,9 +701,6 @@ datatype int64
 	constants
 		max = 0x7FFFffffFFFFffff_
 		min = max+1
-
-//	syntax cast (|bool|)
-//		return self|bool|
 
 	render
 		opt norefcounts
@@ -902,7 +889,6 @@ datatype bool
 		disabled "use .dir"
 	
 //	syntax cast (|maybebool|) // bad. Many types seem to cast via this unintentionally.
-//		return self|maybebool|
 		
 	function Dir (|int|)
 		inlined
@@ -933,7 +919,7 @@ datatype bool
 
 datatype MoveCode (byte)
 	Flags
-		|movecode| 
+		|movecode|
 		Right
 		Left
 		Up

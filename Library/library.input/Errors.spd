@@ -77,7 +77,7 @@ class Error (Message)
 	
 	function LinePos (|string| data, |int|)
 		if (.HasPosition)
-			return data.LineCount(0, .Position)
+			return data.Count(charset.line, 0, .Position)
 
 	inline HasPosition (|bool|)
 		return .Position >= 0 

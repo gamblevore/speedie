@@ -105,7 +105,17 @@ function CallFromSorter (SorterComparer of message)
 
 
 function string.LowerDiffAt (|string| A, |ind|)
-	return .LowerCase.DiffAt(A.LowerCase)
+	|| i = 0
+	while
+		|| aa = a[i]
+		|| sa = self[i]
+		if aa.LowerCase!=sa.lowercase
+			return i
+		if !aa
+			if !sa
+				return -1
+			return i
+		i++
 
 	
 function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |string| reason, |bool|)
