@@ -32,8 +32,7 @@ class XVar (list)
 		.CodeEnd = pos
 	
 	operator contains (|int| P, |bool|)
-		// if p == .position, then the instruction isn't yet run.
-		return P > .Position and P < .codeend
+		return P >= .Position and P < .codeend
 		
 	function CanBeNil (|bool|)
 		return .DataType & (DataTypeCode.PossibleBits+1)
@@ -82,8 +81,8 @@ class XVar (list)
 			require memory.test(Where, 16)
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
-			return .ObjectValue(Where|&object|, value)
-		return .DataValue(Where, value)
+			return .SetObjectValue(Where|&object|, value)
+		return .SetDataValue(Where, value)
 	
 	
 	function RenderValue (|faststring| fs, |&nil| Where, |$int| RefCount,  |bool|)
@@ -187,7 +186,7 @@ class XVar (list)
 					rz = msg.first
 
 
-	function ObjectValue (|!&object| Reg, |string| Value, |bool|)
+	function SetObjectValue (|!&object| Reg, |string| Value, |bool|)
 		opt norefcounts		|| OldObj = Reg[]
 			require Memory.test(OldObj)
 		if value ~= "nil" or "0" or "0x0"
@@ -205,7 +204,7 @@ class XVar (list)
 		return true
 	
 	
-	function DataValue (|!&nil| Reg, |string| Value, |bool|)
+	function SetDataValue (|!&nil| Reg, |string| Value, |bool|)
 		opt norefcounts
 //		|| OldObj = Reg[]
 //		require Memory.test(OldObj)

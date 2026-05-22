@@ -39,9 +39,14 @@ function __PerryView__ (cakevm.CakeChef)
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
 
 	|| Mode = StepAction.curr
-	if Mode is stepover
+	if Mode is stepover 
 		if (stack.depth == debugger.StackOverDepth)
 //			"OverOK"// its ok we can actually break, if needed.
+		  elseif (stack.depth > debugger.StackOverDepth) and debugger.realbreaks.get(.index(stack.code))
+			// this needs to store 2 bits per break instead of 1!!
+			// more shitty work!
+			// on the other hand, the curr system is shitty.
+			"oof"
 		  elseif (Stack > debugger.stacktrap)
 //			"NotOver"// we went in! So... *IN* is definitely not *OVER*
 			break = 0 // no break.

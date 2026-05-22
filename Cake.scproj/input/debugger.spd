@@ -14,7 +14,7 @@ module debugger
 	|bool|				OverFlowTrack
 	|bool|				WantDebug
 	|bool|				BreakMapBad
-	|byte|				UserBreakLevel		// The break level that the user set by pressing pause/run/step/etc
+//	|byte|				UserBreakLevel		// The break level that the user set by pressing pause/run/step/etc
 	|faststring|		VariablePrinter
 	|SavedBreaks|		RealBreaks
 	
