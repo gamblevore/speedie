@@ -113,6 +113,6 @@ target debug and xcode
 		cpp_libwrapper Cake_Main (spdprocess.MicroProcess)
 	  else
 		cpp_libwrapper Speedie_Main (spdprocess.MicroProcess)
-|| SpdLibAlreadyInUse = true
+|| SpdLibAlreadyInUse = false
 
 
