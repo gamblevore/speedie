@@ -5,9 +5,9 @@ constants
 	kNeedsAddressOfButAlsoNeedsSuperMatch  = 64 << 22
 	kNeedsAddressOf				= 32 << 22
 	kNeedsTypeCast				= 16 << 22
-	kNeeds						= kNeedsTypeCast ||| kNeedsAddressOf ||| kNeedsAddressOfButAlsoNeedsSuperMatch 
+	kNeeds						= kNeedsTypeCast ||| kNeedsAddressOf ||| kNeedsAddressOfButAlsoNeedsSuperMatch
 
-	kUseDefaultParams  			= 8 << 22
+	kUseDefaultParams			= 8 << 22
 	kLossyCastedMatch			= 7 << 22
 	kCastedMatch				= 6 << 22
 	kVoidPtrMatch				= 5 << 22
@@ -23,7 +23,7 @@ constants
 	kTypeCastIgnoreContained	= 4
 	kTypeCastIgnoreAddressOf	= 8
 	kTypeCastBothWays			= 16
-	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // the default case
+	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers	// the default case
 	kNoBoolTypeCast				= 32
 	kTypeCastAssigns			= 64
 	kTypeCastWantSuperDistance	= 128
@@ -34,7 +34,7 @@ constants
 	kTypeCastFromSmallInt		= 4K
 	kTypeCastForRelSet			= 8K
 	kTypeCastForParams			= 16K
-	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast ||| kTypeCastForParams)  
+	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast ||| kTypeCastForParams)
 	kTypeCastFalse				= 0
 
 
