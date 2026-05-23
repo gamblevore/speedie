@@ -210,9 +210,4 @@ function message.CallChainError (|string| name)
 			problem (src, "\tInlined from here.")
 
 
-function message.NOP2 (|&fatasm|)
-	|| r1 = 56|asmreg|
-	r1.reg = 1
-	return .ADDB(r1, 0)
-
 

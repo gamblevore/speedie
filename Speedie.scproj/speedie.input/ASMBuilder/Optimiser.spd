@@ -36,7 +36,7 @@ function message.OptIntVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shi
 
 function fatasm.IsPartyAble (|bool|)
 	|| op = ._op
-	if (op >= asm.padd and op <= asm.pdiv) or (op >= asm.uadd and op <= asm.udiv)
+	if (op >= asm.PADD and op <= asm.PDIV) or (op >= asm.UADD and op <= asm.UDIV)
 		return true
 	
 
@@ -53,7 +53,6 @@ function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |A
 	
 	if dest isnt set
 		return exp.VGET(dest, base, vara, k) * dest
-
 
 	// Doesn't yet handle:   x[1] = a - b 
 	if  !vara  and  (dest is temp)

@@ -84,15 +84,16 @@ function Debugger (fn_asm)
 		// inperry because I just wanna see it... in action. Its confusing a little otherwise
 		// what difference does it make?
 										
-
 	|| num = 0
 	|&fatasm| fat
 	if fn == @func
 		exp = exp.last!
 		|| ch = exp.first
 			num = ch.int + 1
-			if num <= 1			// debugat 0 --> non-removeable noop. To track BreakCount
-				fat = exp.nop2
+			if num <= 1								// debugat 0 --> non-removeable noop. To track BreakCount
+				|| r1 = 56|asmreg|
+				r1.reg = 1
+				fat = exp.ADDB(r1, 0)
 	if !fat
 		fat = exp.TRAP(num)
 	
