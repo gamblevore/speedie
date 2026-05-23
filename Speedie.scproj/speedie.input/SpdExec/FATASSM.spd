@@ -10,8 +10,8 @@ struct FatASM
 	|Message--|			Msg				// Only used for reporting now. Not ASMGen. Not easy to remove.
 	|uint64|			_Const
 	|uint|				FatMap
-	|int16|				µRefCount
 	|uint16|			BasicBlock
+	|int16|				µRefCount
 	|uint16|			ASMIndex
 	|byte|				CurrGrabID
 	|byte|				InputFats		// could merge with inputprms... easy and better probably. Do later
@@ -29,11 +29,13 @@ struct FatASM
 		|| m = .Msg
 		|| s = .FatMap
 		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
+		|| b = .BasicBlock
 		self[0] = nil
 		.Msg = m
 		.FatMap = s
 		._Const = k
 		._op = value
+		.BasicBlock = b
 	
 	setter _op (|byte|)
 		._op = value
@@ -106,7 +108,7 @@ struct FatASM
 		
 		(flags isnt FlagsToRemove)
 		if (flags is Exit) and !.IsFinisher(flags)
-			(flags isnt exit) // right?
+			(flags isnt exit)				// right?
 		flags = flags.FatIndex(.index)
 		.info = flags
 		return flags
@@ -123,17 +125,17 @@ struct FatASM
 	function F32 (|float|)
 		|&uint64| A = &._Const 
 		rz = (A|&float|)[]
-		if !rz: rz = 0					// rationalise
+		if !rz: rz = 0						// rationalise
 
 	function F64 (|Float64|)
 		rz = ((&._const)|&f64|)[]
-		if !rz: rz = 0					// rationalise
+		if !rz: rz = 0						// rationalise
 		
 	syntax equals (|uint| x, |bool|)
 		disabled "Use isa asm.xxx instead"
 		// if I need to compare vs an int, I can do... if 123 == fat
 	
-	function Index (|uint|) // for storing in uint16 actually
+	function Index (|uint|)					// for storing in uint16 actually
 		return self - Assembler.sh.funcstart_
 
 	function uint.FAT (|&FATASM|)
@@ -509,7 +511,7 @@ struct FatASM
 	}
 	
 	
-	function RendaKnst (|faststring| fs, |int| sofar)
+	function RendaKnst (|faststring| fs, |int| SoFar)
 		|| ty = .info.µType
 		fs <~ (' ', 26-sofar)
 		fs <~ "/# "
@@ -585,6 +587,7 @@ struct FatASM
 
 
 	function DebugPrint 
+		target debug {
 		visible
 		nil self
 		if !self
@@ -594,7 +597,7 @@ struct FatASM
 			|| fs = faststring()
 			.RenderFat(fs)
 			printline fs
-
+		}
 
 	iterator RegInputs
 		|| ir = .InputPrms
