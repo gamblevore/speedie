@@ -563,7 +563,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 		if (f is disabled)
 			error (exp, f.description)
 		  elseif !paramsarray.MadeError
-			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors )
+			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors ||| kTypeCastTrue )
 		if ParamsHere
 			ParamsHere.obj = f // for auto-complete
 		Return f
