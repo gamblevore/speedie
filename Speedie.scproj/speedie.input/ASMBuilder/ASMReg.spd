@@ -1,6 +1,6 @@
 
 
-prototype fn_asm    (|&Assembler| self=Assembler.sh, |message!| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
+prototype fn_asm	(|&Assembler| self=Assembler.sh, |message!| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
 
 
 
@@ -22,14 +22,14 @@ datatype ASMReg (uint64)
 		Subtract = Alternate
 		Set
 		NewlyDeclared
-		DebugVars
+		DebugVars = [DebugVarOpen, DebugVarClose]
 		ForceInto
 		NoScale
 		FromInline
 		ContainsAddr
 		Textual
-		ConstRequest	// Could we merge? Probably dont want const+cond+AddrRequest
-		CondRequest		// Perhaps the responses could also be merged into a number, all exclusive.
+		ConstRequest		// Could we merge? Probably dont want const+cond+AddrRequest
+		CondRequest			// Perhaps the responses could also be merged into a number, all exclusive.
 		CondAnswer
 		OKAsTemp
 		AllowNopDest
@@ -37,10 +37,10 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		VerySpecial
 		Const
-//		NotNil			// probably a big addition. Will need tests...
+//		NotNil				// probably a big addition. Will need tests...
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
-		SetAlways		= Textual	||| Set  // reuse const
+		SetAlways		= Textual	||| Set			// reuse const
 		TempFlags		= OKAsTemp	||| Temp
 		FlagsToRemove	= Const		||| Discard
 		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest

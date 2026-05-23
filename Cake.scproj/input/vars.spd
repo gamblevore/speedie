@@ -248,7 +248,6 @@ class XVar (list)
 
 		fs <~ "0x"
 		fs <~ obj.objectid
-//		fs.AppendHex(obj|int64|, 2)
 		return true
 	
 	
@@ -410,24 +409,28 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 	cpp_part xvar
 	|| input = xtype.shared
 	input.Reset(.name)
-	
+
 	while (|| Section = input.byte)
-		|| ReadEnd = input.Position + Section
-		|| pos = Input.hint
-		|| reg = Input.hint
+		|| StartPos = input.Position
+		|| ReadEnd = StartPos + Section
+		|| Pos = Input.hint
+		|| Reg = Input.hint
 		|| OK = !Reg
-		if registers: OK = (reg-1)|uint| < 31
-		expect (OK) ("Bad register")
+		if registers
+			OK = (reg-1)|uint| < 31
+		expect (OK) (self, "Bad register")
 		
-		if input.Position >= ReadEnd			// Close
-			expect (Registers) "Bad register"
+		if input.Position >= ReadEnd					// Close
+			expect (Registers) (self, "Bad register")
 			Registers[reg].Close(pos)
 		  else
 			|| var = xvar(input, pos, reg, ReadEnd)
 			if Registers
 				Registers[reg] = var
+				target debug							// now what?
+					"${var.name}: $pos"
 			out <~ var
 
-		expect (input.position == ReadEnd) ("Corrupted debug vars")
+		expect (input.position == ReadEnd)				(self, "Corrupted debug vars")
 	
 

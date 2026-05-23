@@ -127,7 +127,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	|| IsReal = true
 	if !Extra
 		Curr = T
-		Extra = Curr & Missing #require
+		Extra = Curr & Missing				#require
 		IsReal = false
 
 	|| v = extra.Log2
@@ -136,7 +136,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	.Regs.KnownMap &=~ v_bits
 	
 	if IsReal
-		.vdecls = Result 
+		.vdecls = Result
 		if .RegDebugInfo & v_bits
 			.MarkVarClosed(v_bits)
 	  else

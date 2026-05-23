@@ -66,7 +66,7 @@ extend SCFunction
 				if break
 					fat.BakeBreak(Pos, break)
 				if fat.info is DebugVars
-					fat.OutputDebugVars
+					fat.OutputDebugVars(rz-where)
 
 		if HasLabel
 			for fat.fat in self

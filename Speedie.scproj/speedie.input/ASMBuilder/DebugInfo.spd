@@ -53,15 +53,24 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
 
 
 
-function FATASM.OutputDebugVars
+function FATASM.OutputDebugVars (|int| Next)
 	opt norefcounts
 	|| dd = Assembler.DebugDecls!
-	for i.bits in ._Const
-		dd.DebugCloseVar(.ASMIndex, i.log2)
+	|| Index = .ASMIndex
+	if self isa asm.mark
+		next = index
+		index = (self-1).ASMIndex
 	
-	if ._outputs
-		|| ty = .msg.NilDecl #debug_require
-		ty.DumpDecl(dd, .ASMIndex)
+	if self is DebugVarClose
+		for i.bits in ._Const
+			dd.DebugCloseVar(index, i.log2)
+
+	  else
+		index = Next
+		if self isnt DebugVarOpen // hmmm
+		if ._outputs
+			|| ty = .msg.NilDecl #debug_require
+			ty.DumpDecl(dd, index)
 
 
 
@@ -109,19 +118,20 @@ function Assembler.MarkVarClosed (|int| RegBits)
 		mark = mark.Msg.MARK()
 		mark.µrefcount = 1
 		
-	(mark is DebugVars)
+	(mark is DebugVarClose)
 	mark._Const |= RegBits
 
 
 
 function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
 	opt norefcounts
-	require (self isnt DebugVars) or (self isa asm.mark)
+	require (self isnt DebugVarOpen) or (self isa asm.mark)
+	require self isnt DebugVarClose			// for cleanlyness
 	if (.Output.Reg == Declared.reg)
 		|| msg = .msg
 		if (msg.NilDecl == ty)
 			return true
-		if msg.func != @func	// fatrenderer needs @func
+		if msg.func != @func				// fatrenderer needs @func
 			.msg = exp
 			return true
 
@@ -134,24 +144,13 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 	
 	while Start <= Last
 		if Last.CanMarkSomething(exp, Declared, ty)
-			(Last is DebugVars)
+			(Last is DebugVarOpen)
 			return declared
 		Last--
 
 	last = exp.mark()
 	last._Outputs = 1,  last.µrefcount = 1,  last.prms[0] = Declared.reg
-	(last is DebugVars)	
+	(Last is DebugVarOpen)	
 	return Declared
-
-
-
-function SCDecl.Inner (|scdecl|)
-	opt norefcounts
-	visible
-	rz = self
-	self = .internal
-	while self
-		rz = self
-		self = .Internal
 
 
