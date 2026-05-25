@@ -44,7 +44,7 @@ module GUI
 	|bool|						TextInputEnabledAtStart
 	|byte|						TouchCount=3  // draw the first few frames always
 											  // helps with startup events! at least on osx
-	|byte|						SingleFrameNest
+	|byte|						SingleFrameDepth
 	|byte|						TouchFingersDown
 	|byte|						CanDrag
 	|byte|						ResizedCounter // for resize bug fix
@@ -171,6 +171,7 @@ module GUI
 		|| sz = .Sizeraw/2
 		.SDL_WarpMouseInWindow(.screenwindow!, sz.x, sz.y)
 		
+
 	libinternal NukeCursor
 		|| w = .ScreenWindow$
 		SDL_Cursor.Empty.Use
@@ -225,24 +226,33 @@ module GUI
 		return ev is TEXTINPUT or KEYDOWN
 	
 	
+	libinternal RunError (|string?|)
+		if (!window.all.HasAny)
+			return "Create a window first, then call GUI.run"
+		if .SingleFrameDepth
+			return "To nest the event loop, use Window.SyntaxCall" // not good
+		return nil
+	
+	
 	function Run (|errorint|)
+		opt norefcounts
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 
-		expect (window.all.HasAny) "Create a window first, then call GUI.run"
-			
+		|| msg = .runerror
+		if msg!=nil
+			error msg
+			return 1
+
 		require .init
+		.SingleFrameDepth++
 		while .SingleFrameSub
 			0
+		.SingleFrameDepth--
 		.quit
 		.sdl_quit
 		
-		rz = (!StdErr.OK)|int|
-		if .SingleFrameNest > 0
-			// we could get stuck in an inf-loop when they are trying to quit
-			// besides... the calling code will be in an invalid state...
-			// and can come from anywhere
-			app.quit(rz)
+		return (!StdErr.OK)|int|
 
 	
 	libinternal PostLoads
@@ -476,14 +486,14 @@ module GUI
 	
 	
 	libinternal ActualEvents (|SDLActivity|) // frameevents
-		while (.SingleFrameNest or .QuitReason isnt ExitOrTerminate) and .Event.Poll
+		while ((.SingleFrameDepth > 1) or (.QuitReason isnt ExitOrTerminate)) and .Event.Poll
 			.EventCount++
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
 		if .NeedMouseMove
 			.DoFakeMouseMove
 		
-		if !.SingleFrameNest
+		if .SingleFrameDepth <= 1
 			|| Quitish = .QuitReason &~ (SDLActivity.Activity ||| SDLActivity.Questioning)
 				rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
 			.QuitReason = 0
@@ -799,11 +809,11 @@ module GUI
 
 	
 	libinternal SingleFrameNested (|bool|)
-		if .SingleFrameNest <= 1
-			.SingleFrameNest++
+		if .SingleFrameDepth <= 1
+			.SingleFrameDepth++
 			|| WasQuitting = .quitreason
 			rz = .SingleFrameSub
-			.SingleFrameNest--
+			.SingleFrameDepth--
 
 			|| NowQuit = .quitreason
 			gui.quitreason = NowQuit ||| (WasQuitting &~ sdlactivity.exiting)
@@ -937,7 +947,7 @@ module GUI
 
 	function Quit (|sdlactivity| Reason=0, |SDLActivity|)
 		opt norefcounts
-		reason |= sdlactivity.Exiting
+/		reason |= sdlactivity.Exiting
 		
 		.SavePrefs // in case we crash during quit
 
@@ -1325,7 +1335,7 @@ module GUI
 			if w.__keydown__(key)
 				return SDLActivity.activity
 		
-		if (.SingleFrameNest < 2) and keys.escape.HeldKey(0.75s)
+		if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)
 			keys.escape.eat
 			return  AppMenu.show
 		

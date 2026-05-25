@@ -180,7 +180,10 @@ class PerryIDE (Window)
 //		.Feedback$.Pico.Tickle
 	
 
-	behaviour TryClose 
+	behaviour CancelClose 
+		return !.TryClose(reason)
+	
+	function TryClose (|sdlactivity| reason, |bool|)
 		GUI.SavePrefs							// seems better
 		if !.filelist.AskSaveall
 			return false						// failed

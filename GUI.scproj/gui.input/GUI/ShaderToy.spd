@@ -4,13 +4,14 @@ prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |ve
 	linkage: cpp_Part ToyFn
 	syntax cast (|ErrorInt|)
 		cpp_name GUI_Toy_SilentRun
+		opt norefcounts
 		|| win = ShaderToy(self)
 		return win.RunAsMain(60)
 
 
 class FPSView (GuiControl)
-	|date| 			LastDraw
-	|date| 			LastFPSChange
+	|date|			LastDraw
+	|date|			LastFPSChange
 
 	constructor (|guicontrol| parent)
 		super.constructor(parent)

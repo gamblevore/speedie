@@ -69,8 +69,14 @@ class Window (GUIControl)
 	virtual FrameStep (|bool| GUIActive)
 		0
 
-	virtual TryClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
-		return reason
+//	virtual TryClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
+//		return true
+
+	virtual CancelClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
+		// Better to have CanceClose==false mean close, than TryClose==true
+		// Using TryClose, many programmers (me) would forget to return true,
+		// and their program refuses to quit.
+		return false
 
 
 	virtual DrawBackground (|image| where)
@@ -96,7 +102,7 @@ class Window (GUIControl)
 		return .innerfocus ?? .focus
 
 
-	function OpenedMenu (assigns:|menu|)
+	libinternal OpenedMenu (assigns:|menu|)
 		.SetInnerFocus(value)
 
 
@@ -116,13 +122,18 @@ class Window (GUIControl)
 		.SimulationFPS = SimulationFPS
 		if SimulationFPS > 0
 			(fpsView(self))
-		if gui.init(scaling)
-			gui.CenterCursor
-			.BlockScale ?= 20
-			gui.CalculateWindowSize(self, true, true)
-			if !gui.singleframenest
-				gui.NukeCursor
-				return GUI.run
+		if !gui.init(scaling)
+			return -1
+		
+		gui.CenterCursor
+		.BlockScale ?= 20
+		gui.CalculateWindowSize(self, true, true)
+		if gui.SingleFrameDepth // just make it a normal window
+			return 0
+		
+		rz = gui.run
+		if rz
+			gui.NukeCursor
 
 		
 	syntax call (|ConfirmCanceller| Cancel=nil, |object?|)
@@ -293,12 +304,12 @@ class Window (GUIControl)
 					(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.ReturnValue and .__TryClose__ // do we mean .TryCloseDialog?
+			if !.ReturnValue and !.__CancelClose__
 				.CancelReturn
 			return true
 	
 		
-	function Show  
+	function Show
 		opt norefcounts
 		keys.Reset
 		is visible
@@ -452,7 +463,7 @@ class Window (GUIControl)
 			if !w.IsDialog
 				w.show
 				.QuitReason = SDLActivity.questioning // in case of wierd events
-				rz = w.__TryClose__(SDLActivity.questioning)
+				rz = !w.__CancelClose__(SDLActivity.questioning)
 				loop rz			
 		
 		
@@ -478,7 +489,7 @@ class Window (GUIControl)
 			.remove
 			return reason
 		
-		require .__TryClose__(reason) or reason is terminating
+		require !.__CancelClose__(reason) or (reason is terminating)
 		.ClearTree
 		.remove
 		return reason
@@ -547,7 +558,7 @@ class Window (GUIControl)
 		|GUIControl|				ActiveControl
 		|guicontrol of Window|		All = guicontrol(nil)
 		
-		function Front (|Window|)
+		inline Front (|Window|)
 			return  .all.last
 		
 
