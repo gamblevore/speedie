@@ -645,6 +645,7 @@ GUI_Win_AppForeGroundChange
 GUI_Win_BlockXSet
 GUI_Win_BlockYSet
 GUI_Win_CalculateSize
+GUI_Win_CancelClose
 GUI_Win_CancelReturn
 GUI_Win_Close
 GUI_Win_Confirm
@@ -661,7 +662,6 @@ GUI_Win_Inline
 GUI_Win_KeyDown
 GUI_Win_MouseXY
 GUI_Win_OpenedMenu
-GUI_Win_OpenedMenuSet
 GUI_Win_RealFocus
 GUI_Win_Remove
 GUI_Win_RunAsMain
@@ -670,13 +670,11 @@ GUI_Win_Show
 GUI_Win_SyntaxCall
 GUI_Win_SyntaxIsSet
 GUI_Win_Tickle
-GUI_Win_TryClose
 GUI_Win_TypedString
-GUI_Win__Front
+GUI_Win___CancelClose__
 GUI_Win___DrawBackground__
 GUI_Win___FrameStep__
 GUI_Win___Tickle__
-GUI_Win___TryClose__
 GUI_bin_AddImage
 GUI_cncl_ConstructorAuto
 GUI_cncl_Destructor
@@ -1362,7 +1360,6 @@ JB_Platform__OSX
 JB_Platform__Win
 JB_PointerSize
 JB_PrintCString
-JB_PrintStackTrace
 JB_Proc_ActivateChild
 JB_Proc_CanActivate
 JB_Proc_CommsOpen
