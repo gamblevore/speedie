@@ -38,31 +38,27 @@ function __PerryView__ (cakevm.CakeChef)
 		|| ASMIndex = .Index(stack.code)
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
 
-	|| Mode = StepAction.curr
-	if Mode is stepover 
+/	|| Mode = StepAction.curr
+	if Mode is stepover
 		if (stack.depth == debugger.StackOverDepth)
-//			"OverOK"// its ok we can actually break, if needed.
-		  elseif (stack.depth > debugger.StackOverDepth) and debugger.realbreaks.get(.index(stack.code))
-			// this needs to store 2 bits per break instead of 1!!
-			// more shitty work!
-			// on the other hand, the curr system is shitty.
-			"oof"
+/			0
+		  elseif (stack.depth > debugger.StackOverDepth) and (break&debugger.BreakReqBit)
+/			0
 		  elseif (Stack > debugger.stacktrap)
-//			"NotOver"// we went in! So... *IN* is definitely not *OVER*
 			break = 0 // no break.
 	  elseif (mode is stepout) and (Stack > debugger.stacktrap)
-//		"OutOK"
 		break = 0
 				
-	Break >>= 31
+	Break &= debugger.BreakRealBit
 	
-	|| NeedsRun = break > 0
+	|| NeedsRun = break
 		debugger.RestoreBreaks
 		.SendStack(stack, p, "break", ErrorCode)
 
 	while p.CommsOpen
 		if !ErrorCode and !Break and (p.pico.CanGet <= 0)
 			if NeedsRun
+				debugger.DebugList
 				p <~ "run"
 			return 0
 			
@@ -90,11 +86,10 @@ function SendBreakAction (perryresponse)
 function jbin.SendCode (|uint| Break, |int| Position)
 	opt norefcounts
 	|| name = "line"
-	if break >> 31
+	if break & debugger.BreakReqBit
 		name = "break"
-		break = (break << 1) >> 1
 	.Enter(@tmp, name)
-	.AddhInt(break)
+	.AddhInt(break & ~debugger.breakbits)
 	.AddhInt(position)
 	.exit
 	
@@ -113,13 +108,11 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 	|| Count = 0
 
 	// surely we wanna do codetosrc?
+	|| Mask = ~debugger.BreakRealBit
 	for raw in debugger.SrcToCode
 		|| Src = raw.Loc
 		if Src.FileNum == ToFind
 			|| Code = raw.code(L)
-			|| Mask = -1|uint|
-			if !debugger.RealBreaks.Get(code)
-				Mask >>= 1
 			|| Break = CakeBreak[Code] & Mask
 				Count++
 				j.SendCode(Break, Src.Position)

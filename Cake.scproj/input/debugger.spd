@@ -16,8 +16,12 @@ module debugger
 	|bool|				BreakMapBad
 //	|byte|				UserBreakLevel		// The break level that the user set by pressing pause/run/step/etc
 	|faststring|		VariablePrinter
-	|SavedBreaks|		RealBreaks
 	
+	constants
+		BreakRealBit = 1<<30
+		BreakReqBit  = 2<<30
+		BreakBits    = 3<<30
+		ClearRealKeepUser = 2
 	
 	function CodeToSrc (|uint| Index, |SourceLocation|)
 		|| Base = .CodeToSrc
@@ -38,37 +42,40 @@ module debugger
 	function RestoreBreaks
 		.StackTrap = nil
 		.StackOverDepth = nil
-		.RealBreaks.Restore
+		|| B = cake.ActiveBreaks!
+
+		|| After = B + .DbgLength
+		while B < After
+			|uint| C = B[] &~ BreakRealBit
+			C |= (C>>31)<<30 // replenish
+			B++[] = C
 	
 	
 	function SetAllBreaks (|spdfunc| fn = nil)
-		|| B = cake.ActiveBreaks				#require
-		|| After = B + .DbgLength
+		|| B = cake.ActiveBreaks! // no need to check if its real, because if its not, then dbglength == 0
+		|| After = B + .DbgLength // also we won't come here anyhow.
 		if fn
 			B += fn.Position
 			After = B + fn.RangeLength
 		while B < After
-			B[] |= 1<<31
+			B[] |= BreakRealBit
 			B++
 	
 	
 	function ActivateInbuiltBreaks
 		|| L = .DbgLength
-		|| DX = .RealBreaks.Init(L)				#require
-		|| CakeBreak = cake.ActiveBreaks		#require
+		|| CakeBreak = cake.ActiveBreaks!
 		|| P = .InbuiltBreaks.Addr|&uint|
 		|int| n = .InbuiltBreaks.Length >> 2
 		|| C = 0
 		for i in n
 			|| Code = P[i]
 			if Code < L
-				CakeBreak[Code] |= (1<<31)
-				DX[c++] = Code
-		.RealBreaks.Count = C
+				CakeBreak[Code] |= BreakBits
 	
 	
-	function DebugList (|string| name)
-		target true {
+	function DebugList (|string?| name=nil)
+		target debug {
 		name ?= "breaks"
 		|| CakeBreak = cake.ActiveBreaks!
 		|| Max = debugger.dbgLength
@@ -79,23 +86,26 @@ module debugger
 			|| ff = src.file
 			|| F = (ff.FileName (ff) "")
 			|| PosInCode = Raw.code(Max)
-			|| Excl = ""
+			|| Excl = " "
 			|| Op = 0
 			if PosInCode < max
-				if (Cakebreak[posincode]>>31)
-					Excl = "!!"
+				|| br = Cakebreak[posincode]
+				if br&breakreqbit
+					excl = "?"
+				if br&BreakRealBit
+					Excl += "!"
 				Op = (Cakebreak-256K)[posincode] >> 24
 				
 			"$F $FilePos: $PosInCode$Excl ($op)"
 		}
 		
 
-	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Max, |uint| Active, |bool|)
+	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Active, |bool|)
 		|| Code = self|uint|
-		if Code < Max
-			|| Curr = (CakeBreak[Code] >> 31) << 31
-			if Curr != Active
-				return true
+		|| Curr = CakeBreak[Code]
+		|| Final = curr.breakset(Active)
+		if Curr != Final
+			return true
 
 
 	function spdfunc.ASMRange (|ivec3|)
@@ -127,17 +137,21 @@ module debugger
 		for i in n
 			|| loc = Locations[i]
 				|| Src = loc.map(i)
-				|| WithinLine = Src.Score(F, P, A, N, 0)
+				if Src.Score(F, P, A, N, 0)
 					Lowest = Lowest min i
 					Highest = Highest max i
-				if WithinLine or ((Action is stepover) and (loc out CurrFunc))
-					.SetUserBreak(CakeBreak, Src, 0, N)
+					.SetUserBreak(CakeBreak, i, ClearRealKeepUser, N)
+				  elseif (Action is stepover) and (loc out CurrFunc)
+			// step over inlined funcs that CAKE (not user) set via debugger.SetAllBreaks(fn)
+			// but we don't want to clear breaks the user DID set in other funcs
+					ifn CakeBreak[i]&BreakReqBit
+						.SetUserBreak(CakeBreak, i, ClearRealKeepUser, N)
+				
 
 		while Lowest <= Highest
 			|| loc = Locations[lowest]
 				if loc out CurrFunc
-					|| Src = loc.map(lowest)
-					.SetUserBreak(CakeBreak, Src, 0, N)
+					.SetUserBreak(CakeBreak, Lowest, ClearRealKeepUser, N)
 			Lowest++
 		
 		return Action ||| StepAction.GoRun
@@ -151,7 +165,8 @@ module debugger
 		
 		|| p = m[1].int
 		|| a = p + m[2].int
-		debugger.UserMultiBreak(F, p, a, Active<<31)
+		
+		debugger.UserMultiBreak(F, p, a, Active*BreakBits)
 		cake.perry!.SendBreaks(F)
 	
 		return action
@@ -170,7 +185,7 @@ module debugger
 //			.DebugList("Start")
 
 		for Src in .SrcToCode
-			if src.NeedsChange(cakebreak, Max, active)
+			if src.NeedsChange(cakebreak, active)
 				|| Score = Src.Score(path, position, after, Max, Active)
 				if Score > BestScore
 					BestScore = Score
@@ -185,23 +200,24 @@ module debugger
 		  else
 			for Src in .SrcToCode
 				|| Score = Src.Score(path, position, after, max, Active)
-				if src.NeedsChange(cakebreak, Max, active) and (Score == BestScore)
+				if src.NeedsChange(cakebreak, active) and (Score == BestScore)
 					.SetUserBreak(CakeBreak, Src, active, max)			
 
 		target debug
 			.DebugList("After")
 	
+
+	function uint.BreakSet (|uint| Active, |uint|)
+		|| Keep = (-1|uint|) >> 2
+		keep |= Active << 30
+		self &= Keep
+		self |= (Active>>30)<<30
+		return self
+
 	
 	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active, |uint| Max)
 		if Code < Max
-			|| B = (CakeBreak[Code] <<1) >>1
-			|| ToAdd = (Active>>31)<<31
-			CakeBreak[Code] = B|||ToAdd
-			if Active & 1
-				if ToAdd
-					debugger.RealBreaks.add(code)
-				  else
-					debugger.RealBreaks.remove(code)
+			CakeBreak[Code] = CakeBreak[Code].BreakSet(Active)
 			return
 			
 		if !.BreakMapBad

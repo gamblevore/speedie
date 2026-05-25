@@ -947,7 +947,7 @@ module GUI
 
 	function Quit (|sdlactivity| Reason=0, |SDLActivity|)
 		opt norefcounts
-/		reason |= sdlactivity.Exiting
+		reason |= sdlactivity.Exiting
 		
 		.SavePrefs // in case we crash during quit
 

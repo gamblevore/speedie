@@ -148,10 +148,10 @@ static void * const GlobalJumpTable[] = {
 	TRYBREAK:; {
 		auto BreakValue = ++(Code[CakeCodeMax-1]);
 		((CakeStack*)(r))[-1].Code = Code-1;		// save for crash-debug
-		if_usual (!(BreakValue & 0x80000000))
+		if_usual (!(BreakValue & 0x40000000))
 			goto *JumpTable[256+(Op>>24)];			// Resume
-		if_rare (!(BreakValue<<1)) {				// Accidental trap from 2GB loop.
-			Code[CakeCodeMax-1] = ((~BreakValue>>31)<<31)|0x40000000;// Reset to a big number 
+		if_rare (!(BreakValue<<2)) {				// Accidental trap from 2GB loop.
+			Code[CakeCodeMax-1] = BreakValue-0x20000001; // Reset to a big number 
 			if (!(vm.VFlags & kJB_VM_TrapTooFar))
 				goto *JumpTable[256+(Op>>24)];		// Resume
 		}

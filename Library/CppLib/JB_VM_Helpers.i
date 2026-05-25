@@ -363,7 +363,7 @@ VMOpt void RegConv (CakeRegister* r, ASM Op) {
 	// float, double, u64, s64. 12 conversions possible (and 6 pointless ones)
 	auto s = r + n2;
 	auto d = r + n1;
-
+	
     switch (Convert_Modeu) {
         case 0 : d->Float  = s->Float; 		break; // just copies
         case 1 : d->Float  = s->Double;		break;
@@ -384,14 +384,13 @@ VMOpt void RegConv (CakeRegister* r, ASM Op) {
 		default:
 		__builtin_unreachable();
     }
-//    d = d;
-//    s = s;
 }
+
 
 VMOpt void Time_ (CakeRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = n2;
-	if (r2 == 1) {		// time
+	if (r2 == 1) {							// Time
 		r[r1].Uint = RDTSC();
 	} else if (r2 == 2) {
 		JB_Date__Sleep(1);

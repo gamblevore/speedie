@@ -66,8 +66,9 @@ function cakevm.BreakParentStack (|cakestack| stack)
 	|| break = cake.ActiveBreaks
 	if p and break
 		|| I = .index(p.code)
-		if I and !(break[I] >> 31)
-			break[I] |= 1<<31
+		|| Bits = debugger.BreakRealBit
+		if I and !(break[I] & Bits)
+			break[I] |= Bits
 			debugger.StackTrap = P
 	
 	
@@ -77,42 +78,4 @@ function cakevm.SetBreakLevel (|int| level, |?&uint|)
 		|| B = .SetDebug(level)
 			return B
 
-
-
-struct SavedBreaks
-	|int|		Count
-	|&uint|		Indexes
-	// Saves all the breaks that we SHOULD have.
-	// Starts ordered but can be unordered.
-	
-	function Init (|int| N, |&uint|)
-		.count = -1
-		rz = memory.zalloc(N*4)|&uint|
-		.Indexes = rz!
-	
-	function Add (|uint| Code)
-/		.Indexes[.Count++] = Code
-		
-	function Remove (|uint| Code)
-/		|| i = .get(code)
-			|| c = .count - 1
-			.indexes[i] = .Indexes[c]
-			.count = c
-	
-	function Get (|uint| Code, |ind|)
-		for i in .count
-			if .Indexes[i] == Code
-				return i
-	
-	function Restore
-		|| B = cake.ActiveBreaks		#require		
-		|| ouch = 1<<31
-		for i in debugger.DbgLength
-			B[i] &= ~ouch
-		|| dx = .Indexes
-		for i in .count
-			|| dixi = dx[i]
-			B[dixi] |= ouch
-	
-	
 
