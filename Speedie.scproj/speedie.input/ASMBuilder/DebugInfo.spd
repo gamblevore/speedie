@@ -27,12 +27,12 @@ function string.MiniName (|faststring| fs, |bool| IsClass)
 
 
 
-function SCDecl.DumpDecl (|jbin!| dd, |int| Pos)
+function SCDecl.DumpDecl (|jbin!| dd, |int| Pos, |int| Reg)
 	opt norefcounts
 	|| Mark = dd.Length
 	dd <~ '\0'											// range-length
 	dd.AppendHInt(pos)
-	dd.AppendHInt(.Reg * (self is local))
+	dd.AppendHInt(Reg * (self is local))
 	
 	|| s = .source
 	|| SrcMap = (s.SrcMap (s) 0)
@@ -72,7 +72,7 @@ function FATASM.OutputDebugVars (|int| Next)
 		|| ty = .msg.NilDecl #debug_require
 		if ty.reg == 9 or 8
 		if ._outputs
-			ty.DumpDecl(dd, index)
+			ty.DumpDecl(dd, index, .output.reg)
 
 
 

@@ -666,7 +666,7 @@ struct Assembler
 		opt norefcounts
 		|| S = .Startadd
 		for p in list
-			p.DumpDecl(self, p.exportposition)
+			p.DumpDecl(self, p.exportposition, p.reg)
 		.FinishAdd(@bin, S)
 
 		

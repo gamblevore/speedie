@@ -382,16 +382,36 @@ struct FatASM
 				return false
 		return true
 	
+
+	function RendaOpenClose (|faststring| fs)
+		opt norefcounts
+		if self is DebugVarClose
+			fs <~ "\t\tClose: "
+			|| any = false
+			for i.bits in ._Const
+				if any
+					fs <~ ", "
+				fs <~ i.log2
+				any = true
+			fs <~ "\n"
+		  elseif self is DebugVarOpen
+			fs <~ "\t\tOpen: "
+			fs <~ .output.reg
+			fs <~ "\n"
+	
 	
 	function RenderFat (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts		
+		target debug
+			if self is debugvars
+				.RendaOpenClose(fs)
 		if !.WillRenderFat
 			target debug
 				.RendaMsg(fs, 0)
-			return 
+			return
 		
 		|| M = fs.StreamLength
-		|| op = instruction.typelist[.baseop]!
+		|| op = instruction.typelist[.BaseOp]!
 		if .baseop != asm.noop
 			if self is Const
 				fs.appendlower(op.name)
@@ -409,7 +429,6 @@ struct FatASM
 		|| GotAny = ""
 		|| Remain = 24
 		|| f = op.sizes
-		/// 
 		
 		for i in f.count
 			|| bs = f[i].BitSize

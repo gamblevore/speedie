@@ -56,7 +56,6 @@ class SCDecl (SCObject) {
 	
 	setter WholeType (|asmreg|)
 		value.tmpcheck
-		if (value.reg == 8) and "jb_main".trap and (.name ~= "Str")
 		.mu.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)
