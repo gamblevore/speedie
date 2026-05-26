@@ -39,16 +39,21 @@ function __PerryView__ (cakevm.CakeChef)
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
 
 /	|| Mode = StepAction.curr
-	if Mode is stepover
 		|| Deeper = stack.depth - debugger.StackOverDepth
-		if (!Deeper)
-/			0
-		  elseif (Deeper > 0) and (break&debugger.BreakReqBit)
-/			0
-		  elseif (Stack > debugger.stacktrap)
-			break = 0 // no break.
-	  elseif (mode is stepout) and (Stack > debugger.stacktrap)
-		break = 0
+		if Mode is stepover
+			if (!Deeper)
+/				0
+			  elseif (Deeper > 0) and (break&debugger.BreakReqBit)
+/				0
+			  elseif (Stack > debugger.stacktrap)
+				break = 0 // no break.
+	
+		  elseif (mode is stepout)
+			ifn break&debugger.BreakReqBit
+				|| T = debugger.stacktrap
+				if !T or (Stack > T)
+					break = 0
+
 	
 	Break &= debugger.BreakRealBit
 	
