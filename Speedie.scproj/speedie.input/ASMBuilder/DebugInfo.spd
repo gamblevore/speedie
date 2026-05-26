@@ -10,7 +10,7 @@ function jbin.DebugCloseVar (|int| Pos, |int| Reg)
 
 
 function SCDecl.MiniName (|faststring| fs)
-	|| Bra = self is classobj
+	|| Bra = self is ClassObj
 	.name.MiniName(fs, Bra)
 
 
@@ -70,7 +70,6 @@ function FATASM.OutputDebugVars (|int| Next)
 		index = Next
 		if self isnt DebugVarOpen // hmmm
 		|| ty = .msg.NilDecl #debug_require
-		if ty.reg == 9 or 8
 		if ._outputs
 			ty.DumpDecl(dd, index, .output.reg)
 
