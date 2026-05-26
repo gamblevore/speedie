@@ -8,7 +8,7 @@ GUI__App_MouseMoveInited
 GUI__App_NeedMouseMove
 GUI__App_QuitReason
 GUI__App_ResizedCounter
-GUI__App_SingleFrameNest
+GUI__App_SingleFrameDepth
 GUI__App_StartedProperly
 GUI__App_TextInputEnabled
 GUI__App_TextInputEnabledAtStart
@@ -79,10 +79,10 @@ JB_Str__Sorter
 GUI_Ray__DistanceSorter
 JB_CakeVM_DummyChef
 JB_Tree__Sorter
+JB_Msg__Sorter
 JB_File__Sorter
 GUI_Img_ClippedRectDrawer
 GUI_Img_CurlieQueDrawer
-JB_Msg__Sorter
 JB_ID__ByID
 GUI_LV_DefaultCopy
 JB_ID__ByFreq
