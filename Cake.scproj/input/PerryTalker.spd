@@ -40,15 +40,16 @@ function __PerryView__ (cakevm.CakeChef)
 
 /	|| Mode = StepAction.curr
 	if Mode is stepover
-		if (stack.depth == debugger.StackOverDepth)
+		|| Deeper = stack.depth - debugger.StackOverDepth
+		if (!Deeper)
 /			0
-		  elseif (stack.depth > debugger.StackOverDepth) and (break&debugger.BreakReqBit)
+		  elseif (Deeper > 0) and (break&debugger.BreakReqBit)
 /			0
 		  elseif (Stack > debugger.stacktrap)
 			break = 0 // no break.
 	  elseif (mode is stepout) and (Stack > debugger.stacktrap)
 		break = 0
-				
+	
 	Break &= debugger.BreakRealBit
 	
 	|| NeedsRun = break
@@ -58,7 +59,7 @@ function __PerryView__ (cakevm.CakeChef)
 	while p.CommsOpen
 		if !ErrorCode and !Break and (p.pico.CanGet <= 0)
 			if NeedsRun
-				debugger.DebugList
+//				debugger.DebugList
 				p <~ "run"
 			return 0
 			

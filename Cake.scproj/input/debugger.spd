@@ -5,24 +5,27 @@ module debugger
 	|Message|			Globs
 	|[FileWithData]|	FileList
 	|Dictionary of filewithdata| FileMap
+//	|{filewithdata}|	FileMap // ideal
 	|string|			CodeToSrcStr
 	|string|			SrcToCodeStr
 	|string|			InbuiltBreaks
 	|&cakestack?|		StackTrap
 	|uint|				StackOverDepth
-	|uint|				DbgLength
 	|bool|				OverFlowTrack
 	|bool|				WantDebug
 	|bool|				BreakMapBad
-//	|byte|				UserBreakLevel		// The break level that the user set by pressing pause/run/step/etc
 	|faststring|		VariablePrinter
 	
 	constants
-		BreakRealBit = 1<<30
-		BreakReqBit  = 2<<30
-		BreakBits    = 3<<30
-		ClearRealKeepUser = 2
+		BreakRealBit		= 1<<30
+		BreakReqBit			= 2<<30
+		BreakBits			= 3<<30
+		ClearRealKeepUser	= 2
 	
+	function DbgLength (|uint|)
+		opt inline
+		return SpdTable.CodeLength
+		
 	function CodeToSrc (|uint| Index, |SourceLocation|)
 		|| Base = .CodeToSrc
 		if index < .dbgLength
@@ -67,7 +70,6 @@ module debugger
 		|| CakeBreak = cake.ActiveBreaks!
 		|| P = .InbuiltBreaks.Addr|&uint|
 		|int| n = .InbuiltBreaks.Length >> 2
-		|| C = 0
 		for i in n
 			|| Code = P[i]
 			if Code < L
@@ -180,9 +182,6 @@ module debugger
 		|| BestScore = 0
 		|| BestValue = 0
 		|| BestCount = 0
-		
-//		target debug
-//			.DebugList("Start")
 
 		for Src in .SrcToCode
 			if src.NeedsChange(cakebreak, active)
@@ -201,10 +200,7 @@ module debugger
 			for Src in .SrcToCode
 				|| Score = Src.Score(path, position, after, max, Active)
 				if src.NeedsChange(cakebreak, active) and (Score == BestScore)
-					.SetUserBreak(CakeBreak, Src, active, max)			
-
-		target debug
-			.DebugList("After")
+					.SetUserBreak(CakeBreak, Src, active, max)
 	
 
 	function uint.BreakSet (|uint| Active, |uint|)
@@ -302,10 +298,10 @@ module debugger
 		.SrcToCodeStr = PackInfo["breakmap"]
 		.InbuiltBreaks = PackInfo["breakpoint"]
 		.CodeToSrcStr = PackInfo["pos"]
-		.dbgLength = .CodeToSrcStr.Length >> 2
+		|| DbgLength = .CodeToSrcStr.Length >> 2
 
 		|| L2 = SpdTable.CodeLength
-		expect (L2 == .dbgLength)				("Map-length is: " + .dbgLength) + (" but code-length is: " + L2)
+		expect (L2 == dbgLength)				("Map-length is: " + dbgLength) + (" but code-length is: " + L2)
 		expect (L2 < 1MB)						("Oversized source-map: " + L2)
 		
 		.ActivateInbuiltBreaks

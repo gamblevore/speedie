@@ -1,6 +1,6 @@
 
 
-module SpdTable 
+module SpdTable
 	|int|			LinksOK
 	|int|			CodeLength
 	|bool|			FailedIndex
