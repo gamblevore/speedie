@@ -63,13 +63,15 @@ function FATASM.OutputDebugVars (|int| Next)
 	
 	if self is DebugVarClose
 		for i.bits in ._Const
+			if i.log2 == 9
 			dd.DebugCloseVar(index, i.log2)
 
 	  else
 		index = Next
 		if self isnt DebugVarOpen // hmmm
+		|| ty = .msg.NilDecl #debug_require
+		if ty.reg == 9 or 8
 		if ._outputs
-			|| ty = .msg.NilDecl #debug_require
 			ty.DumpDecl(dd, index)
 
 

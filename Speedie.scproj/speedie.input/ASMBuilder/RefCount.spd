@@ -28,6 +28,10 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	return exp.RFWR(A, B, .RefSave, offset)						// reg to mem
 
 
+function assembler.RefSave (|asmreg| reg, |int|)
+	|| s = .RefSave()
+	return s - (s == reg.reg)
+	
 function assembler.RefSave (|int|)
 	return .VDecls.log2 max 1
 	
@@ -74,7 +78,7 @@ function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 			last.p2 = 0							// decring a global mem obj. Lets just NOT incr!
 			return nil
 	
-	return exp.RFUN(Obj, Obj, asmreg(), .RefSave)
+	return exp.RFUN(Obj, Obj, asmreg(), .RefSave(Obj))
 
 
 
@@ -149,7 +153,7 @@ function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)
 		#! Disallow: if obj.X(),   when obj.X() is a disowner
 		#! Then we will never freeifdead within if-branch or other tests.
 		#! needs understanding of disowners!
-		exp.rfun(A, asmreg(), asmreg(), .RefSave)
+		exp.rfun(A, asmreg(), asmreg(), .RefSave(A))
 		return a
 
 	|| fat = .RefCountSub(exp, prms, fn)

@@ -61,8 +61,6 @@ function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
 	if break & Assembler.BreakPoint
 		SourceMap.BreakPoints!.AppendInt(I)
 	
-	// surely if theres a breakpoint... we need to know where we can put it?
-	// Perhaps... we should output every instruction's location? Im too stressed to try now.
 	|| value = (SrcMap|uint64| << 32) ||| I
 	SourceMap.Breakable!.AppendInt64(Value)
 

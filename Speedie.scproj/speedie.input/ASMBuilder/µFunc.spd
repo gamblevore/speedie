@@ -55,16 +55,17 @@ extend SCFunction
 			
 			|| Curr = rz
 			rz = fat.µBakeInto(rz, after)
-
+			
 			if Positions
 				|| pos = fat.FatMap
 				if pos >> 21 == 0						// init code... has no file
 					pos = .FatBetterPos(fat)
-				Positions[] = pos
-				while (Curr++ < rz)
-					Positions++
-				if break
-					fat.BakeBreak(Pos, break)
+				if curr < rz
+					Positions[] = pos
+					while (Curr++ < rz)
+						Positions++
+					if break
+						fat.BakeBreak(Pos, break)
 				if fat.info is DebugVars
 					fat.OutputDebugVars(rz-where)
 

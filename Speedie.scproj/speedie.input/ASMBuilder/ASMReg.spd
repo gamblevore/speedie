@@ -290,8 +290,7 @@ datatype ASMReg (uint64)
 				is const
 		
 		value.µType = .mu.DataType
-		.mu.DataType = value|datatypecode|
-		.WholeType.tmpcheck
+		.WholeType = value
 	
 	
 	operator mul (|bool| b, |asmreg|)

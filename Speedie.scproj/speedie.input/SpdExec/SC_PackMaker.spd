@@ -187,7 +187,7 @@ module PackMaker
 		|| high = 0
 		|| file = 0
 		|| src = .source
-		if src and src isnt Inserted // sigh
+		if src and src isnt Inserted				// sigh
 			file = src.tag >> 5
 			for s.flat in src
 				if (s isnt inserted) and (s.tag>>5 == file)
@@ -195,7 +195,7 @@ module PackMaker
 					(low min= r[0])
 					(high max= r[1])
 				
-		if !high // oof
+		if !high									// oof
 			low = 0
 		return (low, high, file)
 	
@@ -267,22 +267,21 @@ module PackMaker
 	function BakeClasses (|jbin| j)
 		if .AnyClassesNeeded
 			j.TmpArg("clss")
-//			.ReachSupers
 			.PackClasses(j, true)
 			.PackClasses(j, false)
 			j.exit(2)
 	
 	
-	function SCClass.NeedsPackExport (|bool|) // needsexport, needexport, PackneedsExport
+	function SCClass.NeedsPackExport (|bool|)		// needsexport, needexport, PackneedsExport
 		opt norefcounts
 		require .isobject and !.IsRole and !.IsBehaviourTable
 		|| R = .MyReacher
 		require r and !r.IsLibrary
 		
-		if .IsLibrary // what about lib only?
+		if .IsLibrary								// what about lib only?
 			require self|scnode| isnt EmbeddedOnly
-			require (.ClassType is ASMReached)// or (!r.islibrary)
-			
+			require (.ClassType is ASMReached)		// or (!r.islibrary)
+		
 		return true
 
 	
@@ -293,8 +292,8 @@ module PackMaker
 
 		|| ft = b.functable$
 		|| ftc = ft.cls!
-		for (M in ftc.properties)				// could I change the cpp exporter to use this same approach?
-			|| fn = .BestBehaviourFor(m.name)	// might as well?
+		for (M in ftc.properties)					// could I change the cpp exporter to use this same approach?
+			|| fn = .BestBehaviourFor(m.name)		// might as well?
 				|| BaseClass = .InterfaceForBehaviour(fn)
 					j.Cakeify(fn)
 					continue
