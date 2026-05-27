@@ -247,6 +247,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	V->__VIEW__ = JB_ASM_NoBreak;
 	V->VFlags = Flags;
     V->Pico.Upon = V;
+    V->AllocBase = (byte*)calloc(1, CakeStackObjSize);
 	VMCodePtr(V)[CakeCodeMax-1] = VMHexFinalReturn;
 	VMCodePtr(V)[-1] = VMHexEndStack;
 	__CAKE_VM__(*V, nil, nil);

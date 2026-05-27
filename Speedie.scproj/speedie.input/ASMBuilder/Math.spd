@@ -539,7 +539,7 @@ extend Assembler
 					return fat*dest
 
 		if 0: exp.VADD
-		return exp.FADD(dest, l, r*!Minus, r*Minus, 1-IsF32).Vectorise(dest, asm.vadd)
+		return exp.FADD(dest, l, r*!Minus, r*Minus, IsF32|int|).Vectorise(dest, asm.vadd)
 
 
 	function Plus (fn_opasm)
@@ -699,8 +699,8 @@ extend Assembler
 	function ModFloat    (fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
-		|| big = dest.IsSmall|int|
-		return exp.fmod(dest, L, R, asmreg(), big).Vectorise(dest, asm.VMOD)
+		|| small = dest.IsSmall|int|
+		return exp.fmod(dest, L, R, asmreg(), small).Vectorise(dest, asm.VMOD)
 
 	
 	function Mod    (fn_opasm)
@@ -985,7 +985,7 @@ extend Assembler
 			return .LoadNumber(exp, K, src.µtype.SpecialReg, dest)		// Consts are the most optimisable thing we have
 
 		if src.IsFloat
-			return exp.FADD(dest, src, asmreg(), asmreg(), 1-src.FourBytes) * dest
+			return exp.FADD(dest, src, asmreg(), asmreg(), src.FourBytes|int|) * dest
 		// BFLG is VERY optimisable :] (but consts are even more)
 		
 		|| sh = src.BitCount - dest.BitCount

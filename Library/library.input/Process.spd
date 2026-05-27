@@ -31,6 +31,7 @@ class UnixProcess
 		return .pico.config.deathcount
 		
 	function Status (|ExitCode|)
+		nil checker
 		cpp_wrapper
 
 	function Kill (|int| ExitCode)

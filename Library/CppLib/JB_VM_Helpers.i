@@ -624,19 +624,14 @@ VMOpt void IncrementAddr (CakeRegister* r, ASM Op, bool UseOld) {
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
 
 VMOpt void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
-	debugger; // do this later. We we need a separate stack for these?
 	int Amount = Alloc_Amounti << 4;
 	auto B = vm.AllocBase;
+	if (Amount > 0)
+		memzero(B, Amount);
 	int n = n1;
 	if (n)
 		r[n].Int = (uint64)(B);
-	if (Amount > 0) {
-		memzero(B, Amount);
-		B += Amount;
-	} else {
-		debugger;
-		B -= Amount;
-	}
+	B += Amount;
 	vm.AllocBase = B;
 }
 

@@ -1,14 +1,5 @@
 
 
-function jbin.DebugCloseVar (|int| Pos, |int| Reg)
-	|| Mark = .Length
-	self <~ '\0'					// range-length states that theres no name/type. So it must be a close!
-	.AppendHInt(pos)
-	.AppendHInt(Reg)
-	self[mark] = .length - (mark + 1)
-
-
-
 function SCDecl.MiniName (|faststring| fs)
 	|| Bra = self is ClassObj
 	.name.MiniName(fs, Bra)
@@ -26,13 +17,20 @@ function string.MiniName (|faststring| fs, |bool| IsClass)
 	fs.AppendRange(n, i * 3, after)
 
 
+function SCDecl.DumpFlags (|byte|)
+	rz = (self is Param)|byte|
+	rz |= .IsBareStruct << 1
+	rz |= (.NilDeclared is Nilish) << 2
 
-function SCDecl.DumpDecl (|jbin!| dd, |int| Pos, |int| Reg)
+
+function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg)
 	opt norefcounts
 	|| Mark = dd.Length
 	dd <~ '\0'											// range-length
+	if "main".trap
 	dd.AppendHInt(pos)
 	dd.AppendHInt(Reg * (self is local))
+	dd <~ .DumpFlags
 	
 	|| s = .source
 	|| SrcMap = (s.SrcMap (s) 0)
@@ -43,13 +41,24 @@ function SCDecl.DumpDecl (|jbin!| dd, |int| Pos, |int| Reg)
 	
 	|| PB = DataTypeCode.PossibleBits
 	|| T = .Type.TypeInfo  &  PB
-	if .NilDeclared is Nilish
+	if .NilDeclared is Nilish // remove this
 		T |= PB + 1
 	
 	dd.AppendHInt(T)
 	.DumpWierdness(dd)
 	
 	dd[mark] = dd.length - (mark + 1)
+
+
+
+function jbin.DumpDeclClose (|int| Pos, |int| Reg)
+	|| Mark = .Length
+	self <~ '\0'					// range-length states that theres no name/type. So it must be a close!
+	.AppendHInt(pos)
+	.AppendHInt(Reg)
+	self[mark] = .length - (mark + 1)
+
+
 
 
 
@@ -63,15 +72,14 @@ function FATASM.OutputDebugVars (|int| Next)
 	
 	if self is DebugVarClose
 		for i.bits in ._Const
-			if i.log2 == 9
-			dd.DebugCloseVar(index, i.log2)
+			dd.DumpDeclClose(index, i.log2)
 
 	  else
 		index = Next
-		if self isnt DebugVarOpen // hmmm
-		|| ty = .msg.NilDecl #debug_require
-		if ._outputs
-			ty.DumpDecl(dd, index, .output.reg)
+		|| ty = .msg.NilDecl
+		|| reg = .Output.reg
+		if ty and reg
+			ty.DumpDeclOpen(dd, index, reg)
 
 
 
@@ -85,6 +93,8 @@ function scdecl.DumpCls (|int|)
 
 function SCDecl.Wierdness (|int|)
 	rz = (self is reference) << 1
+	if .IsBareStruct // bare structs are still pointerlike...
+		rz |= 2
 	rz |= .pointercount > 0
 	rz |= .C_Array<<2
 

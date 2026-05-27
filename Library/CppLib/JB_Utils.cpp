@@ -47,21 +47,26 @@ void JB_TooLargeAlloc(int64 N, const char* S) {
 
 
 static uint8* AllocateSub (int N, const void* Arr, uint* Where) {
-	uint8* Result = 0;
-	int64 Diff = 0;
 	if (Arr) {
-		Diff = -JB_msize(Arr);
-		Result = (uint8*)realloc((void*)Arr, N);
+		int64 Old = JB_msize(Arr);
+		uint8* Result = (uint8*)realloc((void*)Arr, N);
+		if (Result) {
+			int64 Gain = JB_msize(Result) - Old;
+//			if (Gain > 0) {						// unsure if I need this
+//				memzero(Result+Old, Gain);		// my code was all written assuming
+//			}									// that its garbage
+			*Where += Gain;
+			return Result;
+		}
 	} else {
-		Result = (uint8*)calloc(1, N); // zeroed
-	}
-	if (Result) {
-		Diff += JB_msize(Result);
-		*Where += Diff;
-		return Result;
+		uint8* Result = (uint8*)calloc(1, N);	// And yet its not so consistant with this?
+		if (Result) {							// sigh. Leave the code as-is...
+			*Where += JB_msize(Result);
+			return Result;
+		}
 	}
 	
-	JB_OutOfUserMemory(N);					// Nothing has changed...
+	JB_OutOfUserMemory(N);						// Nothing has changed...
     return 0;
 }
 

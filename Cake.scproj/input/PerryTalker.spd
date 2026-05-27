@@ -38,13 +38,13 @@ function __PerryView__ (cakevm.CakeChef)
 		|| ASMIndex = .Index(stack.code)
 	|spdprocess--| p = cake.perry!			// Perry always exists by now
 
-/	|| Mode = StepAction.curr
+	|| Mode = StepAction.curr
 		|| Deeper = stack.depth - debugger.StackOverDepth
 		if Mode is stepover
 			if (!Deeper)
-/				0
+				0
 			  elseif (Deeper > 0) and (break&debugger.BreakReqBit)
-/				0
+				0
 			  elseif (Stack > debugger.stacktrap)
 				break = 0 // no break.
 	

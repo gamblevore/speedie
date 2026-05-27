@@ -1,9 +1,10 @@
 
-#define CakeStackSize	(1024*1024)
-#define CakeCodeMax		(1024*256)
-#define VMHexEndCleanly	0x00BADA55 
-#define VMHexFinalReturn 11537169
-#define VMHexEndStack	0xBAD57ACC 
+#define CakeStackSize		(1024*1024)
+#define CakeStackObjSize	(1024*1024)
+#define CakeCodeMax			(1024*256)
+#define VMHexEndCleanly		0x00BADA55 
+#define VMHexFinalReturn	11537169
+#define VMHexEndStack		0xBAD57ACC 
 
 
 #define std_swap std::swap

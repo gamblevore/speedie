@@ -305,12 +305,15 @@ module debugger
 		expect (L2 < 1MB)						("Oversized source-map: " + L2)
 		
 		.ActivateInbuiltBreaks
-		
-		for fn in SpdTable.funcs
-			fn.LoadVars
-		
-		return StdErr.ok
+		return .LoadFuncVars
+
 	
+	function LoadFuncVars (|bool|)
+		opt norefcounts
+		for fn in SpdTable.funcs
+			fn.obj = fn.second.xvariables
+		return StdErr.ok
+		
 	
 	function PrintBreaks
 		target debug {

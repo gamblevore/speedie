@@ -5,13 +5,19 @@ class XVar (list)
 	|int|				CodeEnd
 	|SourceLocation|	SrcMap
 	|byte|				ViewStrength
+	|byte|				Flags
 	|uint16|			Reg
 	|DataTypeCode|		DataType
 	|string|			Name
 	
 	contains xvar
 	
+	constants
+		kParameter = 1
+		kBareStruct = 2
+	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
+		.Flags = s.Byte
 		.SrcMap = s.hint
 		.ViewStrength = 0
 		.position = pos
@@ -31,6 +37,9 @@ class XVar (list)
 		expect (self) ("Bad close var index")
 		.CodeEnd = pos
 	
+	function IsBareStruct (|bool|)
+		return .flags & kBareStruct
+		
 	operator contains (|int| P, |bool|)
 		return P >= .Position and P < .codeend
 		
@@ -93,7 +102,7 @@ class XVar (list)
 		|| C = .obj|&nil||xtype|
 		if c and c.IsObject
 			return .RenderObject(fs, Where, RefCount)
-		return .RenderData(fs, Where)
+		return .RenderDataOrStruct(fs, Where)
 
 
 	function RenderForPrint (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo, |bool| Color)
@@ -255,7 +264,7 @@ class XVar (list)
 		opt norefcounts
 		for W in .Weirdness
 			loop W
-			if w is Reference // ref
+			if (w is Reference) and !.IsBareStruct
 				fs <~ "$"
 			if w is Pointer
 				fs <~ "&"
@@ -295,7 +304,7 @@ class XVar (list)
 			.AppendHex(Mem|int64|)
 	
 	
-	function RenderData (|faststring| fs, |!&nil| Reg, |bool|)
+	function RenderDataOrStruct (|faststring| fs, |!&nil| Reg, |bool|)
 		opt norefcounts
 		|| T = .DataType
 		|| V = t.VecCount
@@ -309,14 +318,20 @@ class XVar (list)
 			if !ptr
 				fs <~ "(nil)"
 				return true
-			fs <~ "0x"
-			fs.AppendHex(ptr, 2)
-			if .weirdness[1] // its a pointer to a pointer, so we don't want to render it
-				return true
-			reg = ptr|&ivec4|
-			fs <~ ": "
+			if !.IsBareStruct
+				fs <~ "0x"
+				fs.AppendHex(ptr, 2)
 				
+				if !.weirdness[1] // dont render pointer to a pointer
+					reg = ptr|&ivec4|
+					fs <~ ": "
+		
 		require fs.TestMem(reg, bc, "UnReadable")
+		
+		if .IsBareStruct or ((w is pointer or reference) and .weirdness[1]) // tested readability
+			fs <~ ('.', 3)
+			return true		// time to go
+		
 		if t is bool
 			fs <~ (reg|&bool|)[].string
 		  elseif t isnt Floating

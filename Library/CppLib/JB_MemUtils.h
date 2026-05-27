@@ -103,7 +103,7 @@ inline int JB_u64_Log2 (u64 X) {
 
 
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
-inline void memzero (void* Where, int N) {
+inline void memzero (void* Where, int64 N) {
     memset(Where, 0, N);
 }
 

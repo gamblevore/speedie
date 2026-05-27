@@ -43,9 +43,5 @@ role SpdFunc (message)
 		SpdTable.LinksOK++
 		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
 
-
-	function LoadVars
-		opt norefcounts
-		.obj = .second.xvariables
 		
 

@@ -66,7 +66,9 @@ void JB_App__SetCanBreak (bool b) {
 
 
 int JB_Sh_Status (ShellStream* F) {
-	return PicoStatus(F->Pico);
+	if (F)
+		return PicoStatus(F->Pico);
+	return ESRCH;
 }
 
 int JB_Sh_PID (ShellStream* F) {
