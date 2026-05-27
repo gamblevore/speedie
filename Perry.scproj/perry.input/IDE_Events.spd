@@ -604,7 +604,7 @@ function perryide.ClearIDE (|keys| key, |bool|)
 		return true
 	if LogAreaKeys(.CommsLogList, key)
 		return true
-	|| r = .RunCompiledApp
+	|| r = .RunningProd
 		if .IsViewing(.debugger) and !r.status.IsRunning
 			.DebugMode = 0
 			.SetAppInfo

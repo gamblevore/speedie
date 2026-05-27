@@ -112,6 +112,9 @@ function PressingTabs (guiaction)
 					p <~ ( "Copy " + file.name, MenuCopyFile, ref)
 				p <~ ("Show In Desktop", MenuShowProject, ref)
 				p <~ ("Close", MenuCloseProject, ref)
+				if ide.RunningProd.Status.IsRunning
+					p <~ ("Kill", MenuKillProject, ref)
+					
 				.OpenMenu(row)
 
 
@@ -157,6 +160,11 @@ function MenuCloseProject (guimenuevent)
 	opt norefcounts
 	|| ide = menu.MenuIde
 		ide.Close
+
+function MenuKillProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.MenuIde
+		ide.Stop(ide.RunningProd)
 
 
 function ClickedTabs (GUIAction)

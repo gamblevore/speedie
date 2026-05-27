@@ -217,7 +217,7 @@ extend PerryIDE
 	function CancelKey (|bool|)
 		if .compilr
 			return .CancelCompile(true)
-		if .RunCompiledApp
+		if .RunningProd
 			return .MakeNothingRunning
 	
 	

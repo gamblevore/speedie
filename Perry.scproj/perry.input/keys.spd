@@ -22,7 +22,7 @@ extend PerryIDE
 		|| B = .RunButton
 		if keys.shift or keys.Option
 			return PressingDebug(B)
-		if .RunCompiledApp  and  .DebugMode is CakeMode // Run key
+		if .RunningProd  and  .DebugMode is CakeMode // Run key
 			return .ViewRun
 		ClickedDebug(B)
 		return true 

@@ -30,7 +30,7 @@ function ClickedDebug (GUIAction)
 	opt norefcounts
 	|| i = .ide
 	if (.text == "\07")				// stop
-		i.Stop(i.RunCompiledApp)
+		i.Stop(i.RunningProd)
 		return nil
 	return i.start
 	
@@ -85,7 +85,7 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 
 function PerryIDE.RunCompileSub (|unixprocess?| r)
 	if r and r.PID or (r isa SpdProcess)
-		.RunCompiledApp = r
+		.RunningProd = r
 		if r isa SpdProcess
 			|| btn = .DebugBtns.last
 				btn.text = "\0E" // pause

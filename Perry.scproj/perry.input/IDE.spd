@@ -6,7 +6,7 @@ class PerryIDE (Window)
 
 	|SpdProcess?|				Feedback
 	|UnixProcess?|				compilr
-	|UnixProcess?|				RunCompiledApp
+	|UnixProcess?|				RunningProd
 	|UnixProcess?|				Talker				// for app.say
 	|date|						DelayedRun
 

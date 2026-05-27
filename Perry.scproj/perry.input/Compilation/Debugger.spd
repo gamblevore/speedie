@@ -85,7 +85,7 @@ function AppInfoExtra (|UnixProcess| r, |string|)
 
 function ExtraAppInfo (|faststring| fs)
 	opt norefcounts
-	|| r = .RunCompiledApp
+	|| r = .RunningProd
 	if !r or (.DebugMode is Finished) or (.DebugMode isnt cakemode)
 		fs <~ "  --"
 		return
@@ -108,7 +108,7 @@ function ExtraAppInfo (|faststring| fs)
 
 function UpdateDebugButtons (|bool| ForceRunning=false, |bool|)
 	opt norefcounts
-	|| r = .RunCompiledApp
+	|| r = .RunningProd
 	|| D = .DebugMode
 	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (D isnt finished)
 	|| Paused = D is paused
@@ -160,7 +160,7 @@ function SetAppInfo
 	|| fs = VarPrinter
 	fs.Length = 0
 	fs.AppendRange(.project, .project.namepart)
-	|| r = .RunCompiledApp
+	|| r = .RunningProd
 		fs <~ ": "
 		fs <~ r.pid
 

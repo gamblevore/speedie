@@ -29,7 +29,7 @@ function perryide.ViewRun (|bool|)
 
 
 function perryide.ContinueProgram (|int| state, |bool|)
-	if !.RunCompiledApp
+	if !.RunningProd
 		return .start
 
 	if .DebugMode isnt Paused
@@ -48,18 +48,18 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 		return i.MakeNothingRunning
 
 	if key.IsAccept
-		if i.RunCompiledApp
+		if i.RunningProd
 			if keys.Shift
 				return i.DebugStep("stepin")
 			return DebugStepOver(self, -1)
 		return i.ContinueProgram(-1)
 
 	if key is space
-		if i.RunCompiledApp
+		if i.RunningProd
 			return i.ContinueProgram(-1)
 		return true
 	
-	if !i.RunCompiledApp
+	if !i.RunningProd
 		if !key.IsModifier
 			i.Editme.SetFocus
 		return true
@@ -120,7 +120,7 @@ function textview.InitDebugArgs
 function fnStillRunning (fnConfirmCanceller)
 	if self isa perryide
 		.UpdateDebuggedApp(false)
-		return !.RunCompiledApp
+		return !.RunningProd
 
 
 function PerryIDE.Stop (|unixprocess| prod, |bool|)
@@ -131,7 +131,7 @@ function PerryIDE.Stop (|unixprocess| prod, |bool|)
 
 
 function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
-	|| prod = .RunCompiledApp
+	|| prod = .RunningProd
 		.showide
 		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
 			if .stop(prod)
@@ -214,13 +214,13 @@ function PerryIDE.ClearRun
 	.RunButton.text = "\02"
 	.DelayedRun = nil
 	.SetAppInfo
-	.RunCompiledApp = nil
+	.RunningProd = nil
 	.editme.ClearActiveLine
 	.stack.clear
 	
 		
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
-	|| r = .RunCompiledApp						#require
+	|| r = .RunningProd						#require
 
 	|| rout = r.ReadStdOut
 		.UpdateProductText(r, rout)
@@ -346,7 +346,7 @@ function GUIControl.SendJbin (|jbin| j, |bool|)
 
 function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
 	|perryide--| i = .ide
-	|unixprocess--| r = i.RunCompiledApp
+	|unixprocess--| r = i.RunningProd
 	if r isa SpdProcess
 		i.LogOneCake(s.parse, "\1C ")
 		if (r <~ s)
