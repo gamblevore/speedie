@@ -267,7 +267,7 @@ function float.Mix (|vec2| A, |vec2| B, |vec2|)
 
 
 
-function float.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
+function float.RangeConvert (|float| lfrom, |float| lto, |float| hfrom, |float| hto, |float| )
 	|| range = hfrom - lfrom
 	// if its lfrom, return lto
 	// if its hfrom, return hto
@@ -275,10 +275,10 @@ function float.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| 
 	return lto + (inbetweenfromness * (hto - lto))
 
 function float.RangeConvertClamped (|float| lfrom, |float| lto, |float| hfrom, |float| hto, |float| )
-	self = .RangeConvert(lfrom, hfrom, lto, hto)
+	self = .RangeConvert(lfrom, lto, hfrom, hto)
 	return .clamp(lto, hto)
 
-function math.RangeConvert (|float| low_from, |float| high_from, |float| low_to, |float| high_to, |FloatRangeConverter|)
+function math.RangeConvert (|float| low_from, |float| low_to, |float| high_from, |float| high_to, |FloatRangeConverter|)
 	description "Converts numbers from one range, to another range. Turns something awkward into something simple" 
 	cpp_part RangeConv4
 	return (-low_from,  1.0 / (high_from - low_from),  low_to,  high_to)|FloatRangeConverter|

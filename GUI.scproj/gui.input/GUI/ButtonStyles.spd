@@ -1,33 +1,33 @@
 
 function image.RoundRectDrawer (ImageDrawStyleEvent)
 	require Edges is open
-    || Col = g.bg.PreMul
-    || Edge = g.edge.Color
-    || center = rect.CenterVec2
-    center.y -= 0.5
+	|| Col = g.bg.PreMul
+	|| Edge = g.edge.Color
+	|| center = rect.CenterVec2
+	center.y -= 0.5
 
-    || CS = G.CornerSize|float| * 0.25 + 1.0
-    || Lim1 = (CS-0.5).pow2
-    || Lim2 = (CS+g.LineWidth|float|-0.5).pow2
-    || Conv = math.RangeConvert(lim2, lim1)
-    || SubX = center.x - (rect.x|float| + CS)
-    || SubY = center.y - (rect.y|float| + CS)
-    
-    rect = .Clip(rect)
-    for Y in rect.Vert
-        || Y2 = (Y|float| - center.y).length.minus0(suby).Pow2
-        || W = self[rect.x, Y]
-        for X in rect.Horz
-            || X2 = (X|float| - center.x).length.minus0(subx).pow2
-            || D2 = X2 + Y2
-            
-            if D2 <= lim1
-                w.Overlay(Col)
-              elseif D2 <= Lim2
-                || E = Edge
-                E.a *= Conv.Convert(d2)
-                w.Overlay(E.premul)
-            W++
+	|| CS = G.CornerSize|float| * 0.25 + 1.0
+	|| Lim1 = (CS-0.5).pow2
+	|| Lim2 = (CS+g.LineWidth|float|-0.5).pow2
+	|| Conv = math.RangeConvert(lim2, lim1)
+	|| SubX = center.x - (rect.x|float| + CS)
+	|| SubY = center.y - (rect.y|float| + CS)
+	
+	rect = .Clip(rect)
+	for Y in rect.Vert
+		|| Y2 = (Y|float| - center.y).length.minus0(suby).Pow2
+		|| W = self[rect.x, Y]
+		for X in rect.Horz
+			|| X2 = (X|float| - center.x).length.minus0(subx).pow2
+			|| D2 = X2 + Y2
+			
+			if D2 <= lim1
+				w.Overlay(Col)
+			  elseif D2 <= Lim2
+				|| E = Edge
+				E.a *= Conv.Convert(d2)
+				w.Overlay(E.premul)
+			W++
 
 
 function image.ClippedRectDrawer (ImageDrawStyleEvent)
