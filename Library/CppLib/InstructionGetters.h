@@ -145,6 +145,9 @@
 #define	Float_Di		((( int)((Op)<<28))>>31)
 #define	Float_Du		(((uint)((Op)<<28))>>31)
 
+#define	Float3_Di		((( int)((Op)<<23))>>31)
+#define	Float3_Du		(((uint)((Op)<<23))>>31)
+
 #define	FloatConst_Highi		((( int)((Op)<<18))>>18)
 #define	FloatConst_Highu		(((uint)((Op)<<18))>>18)
 

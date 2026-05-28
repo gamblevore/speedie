@@ -1,20 +1,24 @@
 
 
+datatype XVarFlags (byte)
+	flags
+		Parameter
+		BareStruct
+		CanBeNil
+	
+
+
 class XVar (list)
 	|Wierdness[5]|		Weirdness // pointers, references, carrays
 	|int|				CodeEnd
 	|SourceLocation|	SrcMap
 	|byte|				ViewStrength
-	|byte|				Flags
+	|XVarFlags|			Flags
 	|uint16|			Reg
 	|DataTypeCode|		DataType
 	|string|			Name
 	
 	contains xvar
-	
-	constants
-		kParameter = 1
-		kBareStruct = 2
 	
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
 		.Flags = s.Byte
@@ -37,14 +41,17 @@ class XVar (list)
 		expect (self) ("Bad close var index")
 		.CodeEnd = pos
 	
-	function IsBareStruct (|bool|)
-		return .flags & kBareStruct
+	syntax is (|xvarflags| V, |bool|)
+		return .flags&V
+	
+//	function IsBareStruct (|bool|)
+//		return self is BareStruct
 		
 	operator contains (|int| P, |bool|)
 		return P >= .Position and P < .codeend
 		
-	function CanBeNil (|bool|)
-		return .DataType & (DataTypeCode.PossibleBits+1)
+//	function CanBeNil (|bool|)
+//		return self is CanBeNil
 
 	function Print (|!&CakeStack| Stack, |int| TabTo=0)
 		opt norefcounts
@@ -70,7 +77,7 @@ class XVar (list)
 	function NilOK (|faststring!| fs, |&nil| Where,  |bool|)
 		require fs.TestMem(Where, 8, "Unreadable")
 		|| Ptr = (Where|&uint64|)[]
-		if (!Ptr and .CanBeNil) or (Ptr >= 64K)
+		if (!Ptr and (self is canbenil)) or (Ptr >= 64K)
 			return true
 
 		fs <~ "0x"
@@ -196,7 +203,7 @@ class XVar (list)
 		|| OldObj = Reg[]
 			require Memory.test(OldObj)
 		if value ~= "nil" or "0" or "0x0"
-			require .CanBeNil
+			require self is CanBeNil
 			reg[] = nil
 			return true
 	
@@ -261,7 +268,7 @@ class XVar (list)
 		opt norefcounts
 		for W in .Weirdness
 			loop W
-			if (w is Reference) and !.IsBareStruct
+			if (w is Reference) and (self isnt barestruct)
 				fs <~ "$"
 			if w is Pointer
 				fs <~ "&"
@@ -309,8 +316,8 @@ class XVar (list)
 		|| C = .type
 		if c and c.IsObject
 			return .RenderObject(fs, Where, RefCount)
-		if .IsBareStruct
-			return .RenderBareStruct(Fs, where) // what about structs in general?
+		if self is BareStruct
+			return .RenderBareStruct(Fs, where)				// what about structs in general?
 		return .RenderDataOrStruct(fs, Where)
 
 		
@@ -432,8 +439,8 @@ class XVar (list)
 		self <~ value|byte|
 	
 	
-	syntax is (|datatypecode| T, |bool|)
-		return .DataType.SyntaxIs(t)
+//	syntax is (|datatypecode| T, |bool|)
+//		return .DataType.SyntaxIs(t)
 	
 
 
@@ -459,12 +466,14 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 		|| OK = !Reg
 		if registers
 			OK = (reg-1)|uint| < 31
-		expect (OK) (self, "Bad register")
+		
 		
 		if input.Position >= ReadEnd					// Close
-			expect (Registers) (self, "Bad register")
+			expect (OK) (self, "CloseOutRange: " + reg)
+			expect (Registers) (self, "BadRegClose: " + reg)
 			Registers[reg].Close(pos)
 		  else
+			expect (OK) (self, "OpenOutRange: " + reg)
 			|| var = xvar(input, pos, reg, ReadEnd)
 			if Registers
 				Registers[reg] = var
