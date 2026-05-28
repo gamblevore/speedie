@@ -27,7 +27,7 @@ function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|)		// paramco
 	rz |= i
 
 
-function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
+function CollectParams (|message| prms,  |SCFunction| fn,  |uint64|)
 	opt norefcounts
 	
 	if !fn.HasCVersion
@@ -53,7 +53,10 @@ function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 	
 	rz >>= 64-((n*5)+12)
 	if fc>8 or ic>8			// hmmm
-	rz |= fn.ASMReturn.SpecialReg << 11
+	if fn.ASMReturn.SpecialReg
+		rz |= 1|uint64| << ((n*5)+12)		// uint64 cos C++ sucks
+											// I'd need to update my compiler to add ull to this...
+											// do later.
 	if fc
 		rz |= (8-fc) << 6
 		rz |= (8-ic) << 0
@@ -224,7 +227,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	.CurrFuncGrab++
 	
 	|| Closer = .OpenVars
-	|| P = .PrmCollect(prms, fn)
+	|| P = .CollectParams(prms, fn)
 	.CloseVars(Closer)
 	
 	|| PExt = P >> 32

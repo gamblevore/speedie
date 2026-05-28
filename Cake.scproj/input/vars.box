@@ -314,23 +314,18 @@ class XVar (list)
 		return .RenderDataOrStruct(fs, Where)
 
 		
-	function RenderBareStruct (|faststring| fs, |!&nil| Ptr, |bool|)
+	function RenderBareStruct (|faststring| fs, |!&nil| Where, |bool|)
 		opt norefcounts
-		require .NilOK(fs, Ptr)
-		|| Where = Ptr|&&nil|[]
-		rz = true
+		require .NilOK(fs, Where)
 		|| Ty = .type
-			fs <~ "<"
 			|| n = fs.Length
 			for (v in ty.Properties) (i)
-				loop (n - fs.Length) < 100
+				require (n - fs.Length) < 100
 				if i > 0
 					fs <~ ", "
 				|| Prop = Where|&byte| + v.position
 				|| Ref = 0
-				if !v.RenderValue(fs, prop, ref)
-					rz = false
-			fs <~ ">"
+				v.RenderValue(fs, prop, ref)
 
 
 	function RenderDataOrStruct (|faststring| fs, |!&nil| Reg, |bool|)

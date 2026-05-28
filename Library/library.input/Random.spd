@@ -4,6 +4,16 @@
 */
 
 
+/*
+// to help me debug my Bridge
+function FloatPrint (|float| A, |float| B, |float| C, |float| D, |float| E)
+	printline A
+	printline B
+	printline C
+	printline D
+	printline E
+*/
+
 struct RandomXOR
 	linkage
 		cpp_part Rnd

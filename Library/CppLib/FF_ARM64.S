@@ -28,27 +28,27 @@
 #endif
 
 #ifdef __realarm64__
-	/*** __CAKE_BRIDGE__(u64 DATA, void* FN, Register* R, int n) ***/
+	/*** __CAKE_BRIDGE__(u64 data, void* FN, Register* r15, int n) ***/
 	.text
 	.global ___CAKE_BRIDGE__
 	.balign 4
 
 	___CAKE_BRIDGE__:								
-		r		.req x15
-		inj		.req x14
-		flj		.req x13
-		dest	.req x12
-		fn		.req x11
-		data	.req x10
-		j9		.req x9
-		j8		.req x8
+		r15			.req x15
+		inj			.req x14
+		flj			.req x13
+		dest		.req x12
+		fn			.req x11
+		data10		.req x10
+		j9			.req x9
+		j8			.req x8
 
-		lsr     data, x0, 12				// data  = DATA>>12
+		lsr     data10, x0, 12				// data10 = DATA>>12
 		adr		flj, .floats
 		adr		inj, .ints
 		mov     fn,  x1						// fn    = FN
-		mov     r,   x2						// r     = R
-		add     dest, r, x3, lsl 4			// dest  = R+n 
+		mov     r15,   x2					// r     = R
+		add     dest, r15, x3, lsl 4		// dest  = R+n 
 		ubfx    j8,  x0,  6,  5				// j8    = (DATA>>6)&31
 		and     j9,  x0,  63				// j9    = DATA&63
 		add		j8,  j8,  j8, lsl 1			// j8    = j8*3
@@ -58,75 +58,75 @@
 		br		j8 // jump
 
 	.floats:
-											// float-7
-		ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
-		lsr     data, data,  5				// data = data >> 5
-		ldr     q7,  [r, x7]				// q7 = r[x7]
+												// float-7
+		ubfiz   x7, data10, 4, 5				// x7 = (data10&31) << 4
+		lsr     data10, data10,  5				// data10 = data10 >> 5
+		ldr     q7,  [r15, x7]					// q7 = r[x7]
 
-		ubfiz   x6, data, 4, 5				// float-6
-		lsr     data, data,  5	
-		ldr     q6,  [r, x6]		
+		ubfiz   x6, data10, 4, 5				// float-6
+		lsr     data10, data10,  5	
+		ldr     q6,  [r15, x6]		
 
-		ubfiz   x5, data, 4, 5				// float-5
-		lsr     data, data,  5	
-		ldr     q5,  [r, x5]		
+		ubfiz   x5, data10, 4, 5				// float-5
+		lsr     data10, data10,  5	
+		ldr     q5,  [r15, x5]		
 
-		ubfiz   x4, data, 4, 5				// float-4
-		lsr     data, data,  5	
-		ldr     q4,  [r, x4]		
+		ubfiz   x4, data10, 4, 5				// float-4
+		lsr     data10, data10,  5	
+		ldr     q4,  [r15, x4]		
 
-		ubfiz   x3, data, 4, 5				// float-3
-		lsr     data, data,  5	
-		ldr     q3,  [r, x3]		
+		ubfiz   x3, data10, 4, 5				// float-3
+		lsr     data10, data10,  5	
+		ldr     q3,  [r15, x3]		
 
-		ubfiz   x2, data, 4, 5				// float-2
-		lsr     data, data,  5	
-		ldr     q2,  [r, x2]		
+		ubfiz   x2, data10, 4, 5				// float-2
+		lsr     data10, data10,  5	
+		ldr     q2,  [r15, x2]		
 
-		ubfiz   x1, data, 4, 5				// float-1
-		lsr     data, data,  5	
-		ldr     q1,  [r, x1]		
+		ubfiz   x1, data10, 4, 5				// float-1
+		lsr     data10, data10,  5	
+		ldr     q1,  [r15, x1]		
 
-		ubfiz   x0, data, 4, 5				// float-0
-		lsr     data, data,  5	
-		ldr     q0,  [r, x0]		
+		ubfiz   x0, data10, 4, 5				// float-0
+		lsr     data10, data10,  5	
+		ldr     q0,  [r15, x0]		
 
 		br j9
 		nop
 		nop
 
 	.ints:
-											// int-7
-		ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
-		lsr     data, data,  5				// data = data >> 5
-		ldr     x7,  [r, x7]				// x7 = r[x7]
+												// int-7
+		ubfiz   x7, data10, 4, 5				// x7 = (data10&31) << 4
+		lsr     data10, data10,  5				// data10 = data10 >> 5
+		ldr     x7,  [r15, x7]					// x7 = r[x7]
 			
-		ubfiz   x6, data, 4, 5				// int-6
-		lsr     data, data,  5
-		ldr     x6,  [r, x6]
+		ubfiz   x6, data10, 4, 5				// int-6
+		lsr     data10, data10,  5
+		ldr     x6,  [r15, x6]
 			
-		ubfiz   x5, data, 4, 5				// int-5
-		lsr     data, data,  5
-		ldr     x5,  [r, x5]
+		ubfiz   x5, data10, 4, 5				// int-5
+		lsr     data10, data10,  5
+		ldr     x5,  [r15, x5]
 			
-		ubfiz   x4, data, 4, 5				// int-4
-		lsr     data, data,  5
-		ldr     x4,  [r, x4]
+		ubfiz   x4, data10, 4, 5				// int-4
+		lsr     data10, data10,  5
+		ldr     x4,  [r15, x4]
 			
-		ubfiz   x3, data, 4, 5				// int-3
-		lsr     data, data,  5
-		ldr     x3,  [r, x3]
+		ubfiz   x3, data10, 4, 5				// int-3
+		lsr     data10, data10,  5
+		ldr     x3,  [r15, x3]
 			
-		ubfiz   x2, data, 4, 5				// int-2
-		lsr     data, data,  5
-		ldr     x2,  [r, x2]
+		ubfiz   x2, data10, 4, 5				// int-2
+		lsr     data10, data10,  5
+		ldr     x2,  [r15, x2]
 			
-		ubfiz   x1, data, 4, 5				// int-1
-		lsr     data, data,  5
-		ldr     x1,  [r, x1]
+		ubfiz   x1, data10, 4, 5				// int-1
+		lsr     data10, data10,  5
+		ldr     x1,  [r15, x1]
 		
-		ubfiz   x0, data, 4, 5				// int-0
-		ldr     x0,  [r, x0]
+		ubfiz   x0, data10, 4, 5				// int-0
+		ldr     x0,  [r15, x0]
 		nop
 		
 			// **STACK MANAGEMENT HERE**
@@ -135,7 +135,7 @@
 		stp     dest, xzr, [sp, 16]
 
 	// branch
-		tbnz    data, 11, .SIMD_Return
+		tbnz    data10, 0, .SIMD_Return
 	
 	.Int_Return:
 		blr     fn							// call fn... so we can store in x0

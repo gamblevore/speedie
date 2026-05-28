@@ -286,8 +286,9 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 		return rz				// an internal file?
 	
 	vars.Length = 0
+	vars <~ stack.depth-1
+	vars <~ ")  "
 	vars <~ fn.name
-	vars <~ "(${stack.depth-1})"
 	
 	j.Enter(@tmp, vars|&nil||string|)
 	
@@ -317,7 +318,7 @@ function xtype.ExpandSub (|jbin| j, |&byte| Obj, |message| xp)
 	opt norefcounts
 	|| Sue = .Super
 		sue.ExpandSub(j, obj, xp)
-//	depth++
+
 	for v in .Properties
 		v.DescribeJBin(j, Obj+v.position, xp)
 

@@ -27,7 +27,6 @@ function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg)
 	opt norefcounts
 	|| Mark = dd.Length
 	dd <~ '\0'											// range-length
-	if "main".trap
 	dd.AppendHInt(pos)
 	dd.AppendHInt(Reg * (self is local))
 	dd <~ .DumpFlags

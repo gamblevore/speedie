@@ -95,6 +95,7 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 		.WantAs(ns)
 
 	|| r = .ReturnType
+		r.CalculateDataType
 		if r.IsBareStruct
 			(r is ReturnedStruct)
 		if self is HidesProperties
@@ -136,18 +137,18 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	if !dcl.type.isstruct
 		check (dcl.name ~!= "rz") (self, "Using reserved name.")
 	
+	func.AddTypeInfo(dcl)
 	if dcl.name
-		func.AddTypeInfo(dcl)
 		(dcl is Param)
 	  else
-		(dcl is return)		// This is for struct returns, right? which are always params.
-	(dcl isnt Altered)		// SCDecl defaults as being altered... not sure why.
+		(dcl is return)					// A struct return.
+	(dcl isnt Altered)					// SCDecl defaults as being altered... not sure why.
 	(dcl isnt NumberConst)
 
 	func.args <~ dcl
 	if func.IsLibrary
-		check (func.IntPrmCount <= 6)    (self, "Too many int/ptr/obj params, 6 max for lib funcs.")
-	check (func.args <= 8)  			 (self, "Too many parameters defined. (8 max)")
+		check (func.IntPrmCount <= 6)	(self, "Too many int/ptr/obj params, 6 max for lib funcs.")
+	check (func.args <= 8)				(self, "Too many parameters defined. (8 max)")
 
 	return true
 
