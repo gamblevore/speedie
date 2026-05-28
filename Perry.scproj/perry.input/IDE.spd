@@ -180,14 +180,18 @@ class PerryIDE (Window)
 //		.Feedback$.Pico.Tickle
 	
 
-	behaviour CancelClose 
+	behaviour CancelClose
 		return !.TryClose(reason)
 	
 	function TryClose (|sdlactivity| reason, |bool|)
+		opt norefcounts
 		GUI.SavePrefs							// seems better
 		if !.filelist.AskSaveall
 			return false						// failed
-		if !ClickedCancel(self) or !.MakeNothingRunning(" for closing the project?")
+		|| Q = " before closing the project?"
+		if reason is ExitOrTerminate
+			Q = " before quitting?"				// todo: this isnt firing...
+		if !ClickedCancel(self) or !.MakeNothingRunning(Q)
 			return false
 		if reason is questioning
 			return true

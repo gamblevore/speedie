@@ -133,7 +133,9 @@ function PerryIDE.Stop (|unixprocess| prod, |bool|)
 function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
 	|| prod = .RunningProd
 		.showide
-		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
+		|| str = "Kill running product '".append(.Name, "'", Reason) // should be automatic but isnt FN
+		// from a + b + c + d --> a.append...
+		if .confirm(str, fnStillRunning)
 			if .stop(prod)
 				prod = nil
 	return !prod
