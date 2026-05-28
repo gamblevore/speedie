@@ -645,7 +645,7 @@ extend Assembler
 				|| Parts = .OptVecMathTwo(L,R)
 					return exp.udiv(dest, l, r, Parts&63) * dest
 		
-		return exp.FDIV(dest,  L,  R,  asmreg(), Small).Vectorise(dest, asm.VDIV)
+		return exp.FDIV(dest,  L,  R, Small).Vectorise(dest, asm.VDIV)
 
 
 	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
@@ -700,7 +700,7 @@ extend Assembler
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
 		|| small = dest.IsSmall|int|
-		return exp.fmod(dest, L, R, asmreg(), small).Vectorise(dest, asm.VMOD)
+		return exp.fmod(dest, L, R, small).Vectorise(dest, asm.VMOD)
 
 	
 	function Mod    (fn_opasm)
