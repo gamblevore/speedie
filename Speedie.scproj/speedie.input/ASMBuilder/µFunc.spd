@@ -152,7 +152,7 @@ function JBin.BakeFunc (|SCFunction| fn, |bool|)
 		.BakeFuncName(fn)
 
 	|| dd = assembler.DebugDecls
-		for a in fn.args	
+		for a in fn.args
 			a.DumpDeclOpen(dd, 0, a.reg)
 	
 	rz = .BakeASMSub(fn, t)

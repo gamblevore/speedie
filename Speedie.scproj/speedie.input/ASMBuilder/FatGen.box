@@ -1015,50 +1015,46 @@ function message.FMLK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| High = nil, |
 }
 
 
-function message.FDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+function message.FDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FDIV, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
+	rz.numinput(3) = D
 	rz.dest(0, r1, a)
 }
 
 
-function message.FMOD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+function message.FMOD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FMOD, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
+	rz.numinput(3) = D
 	rz.dest(0, r1, a)
 }
 
 
-function message.FMAX (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+function message.FMAX (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FMAX, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
+	rz.numinput(3) = D
 	rz.dest(0, r1, a)
 }
 
 
-function message.FMIN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
+function message.FMIN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FMIN, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = D
+	rz.numinput(3) = D
 	rz.dest(0, r1, a)
 }
 

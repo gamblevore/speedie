@@ -204,6 +204,12 @@ forms
 		r4		r
 		D		1
 
+	Float3
+		r1		R
+		r2		r
+		r3		r
+		D		1
+
 	FloatConst
 		r1		R
 		r2		r
@@ -696,25 +702,25 @@ POS 5
 /**/ FMLK  (FloatConst)
 		f1 = f2 * FloatIncr1(Op)
 
-/**/ FDIV  (float)
+/**/ FDIV  (Float3)
 		if (!Float_Du)
 			d1 = d2 / d3
 		else
 			f1 = f2 / f3
 
-/**/ FMOD  (float)
+/**/ FMOD  (Float3)
 		if (!Float_Du)
 			d1 = fmod(d2, d3)
 		else
 			f1 = fmodf(f2, f3)
 
-/**/ FMAX (Float)
+/**/ FMAX (Float3)
 		if (!Float_Du)
 			d1 = std_max(d2,d3)
 		else
 			f1 = std_max(f2,f3)
 
-/**/ FMIN (Float)
+/**/ FMIN (Float3)
 		if (!Float_Du)
 			d1 = std_min(d2,d3)
 		else

@@ -23,12 +23,13 @@ function SCDecl.DumpFlags (|byte|)
 	rz |= (.NilDeclared is Nilish) << 2
 
 
-function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg)
+function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true)
 	opt norefcounts
 	|| Mark = dd.Length
 	dd <~ '\0'											// range-length
 	dd.AppendHInt(pos)
-	dd.AppendHInt(Reg * (self is local))
+	reg *= IsLocal
+	dd.AppendHInt(Reg)
 	dd <~ .DumpFlags
 	
 	|| s = .source
@@ -40,9 +41,6 @@ function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg)
 	
 	|| PB = DataTypeCode.PossibleBits
 	|| T = .Type.TypeInfo  &  PB
-	if .NilDeclared is Nilish // remove this
-		T |= PB + 1
-	
 	dd.AppendHInt(T)
 	.DumpWierdness(dd)
 	

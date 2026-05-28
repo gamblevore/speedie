@@ -152,11 +152,11 @@ struct FatASM
 		if self
 			return (.info & flags)|uint64| != 0
 
-	syntax is (|asmreg| flags, assigns:|bool|)
+	syntax is (|asmreg| F, assigns:|bool|)
+		|| i = .info &~ F
 		if value
-			(.info as= flags)
-		  else
-			(.info &= ~flags)
+			(i as= F)
+		.info = f
 
 
 	function asmreg.Within (|asm| op, |&fatasm|)
