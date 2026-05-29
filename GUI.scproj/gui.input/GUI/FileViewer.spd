@@ -210,7 +210,7 @@ class FileViewer (ListView)
 
 	libinternal CanSave (|int| Purpose, |filerow| f, |bool|)
 		opt norefcounts
-		|| d = f._Document		#require
+		|| d = f._Document						#require
 		if !d.InvalidJeebox
 			return true
 
@@ -234,7 +234,7 @@ class FileViewer (ListView)
 		if !first
 			return true
 		
-		.focuson(first)
+		.FocusOn(first)
 
 		|| fs = faststring()
 		fs <~ "Save "
@@ -372,7 +372,7 @@ class FileViewer (ListView)
 		while F
 			if .CanFind(F, ID)
 				f.findinfile(S, L, N, R)
-			ifn (f.DirFile ~= folf) and f.MatchField("search", "false")
+			if (f.DirFile ~!= folf) or !f.MatchField("search", "false")
 				|| Ch = F.First
 					.BatchFindSub(S, R, L, ID, N, Ch)
 			F = F.next
@@ -506,7 +506,7 @@ class FileViewer (ListView)
 			opt norefcounts
 			|| o = cell.row as filerow
 				if value==nil
-					return FileRowCell(o, cell.column) // getting the value for edit.
+					return FileRowCell(o, cell.column)		// getting the value for edit.
 				o.MoveTo(value)
 		
 		
