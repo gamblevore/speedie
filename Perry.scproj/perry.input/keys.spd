@@ -46,6 +46,8 @@ extend PerryIDE
 			return true
 		if key is comma
 			return ClickedPrevNext(.goprev)
+		if key is ESCAPE
+			return .CancelKey
 		if key is period
 			if keys.shift
 				return .CancelKey

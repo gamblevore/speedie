@@ -169,6 +169,8 @@ function string.OperatorPlus (|int64| i, |string|)
 	
 
 struct VirtualJBString // fakejbstring
+	linkage
+		noauto // no need for people to see this.
 	|int| Refcount
 	|int| Length
 	|&byte| Addr

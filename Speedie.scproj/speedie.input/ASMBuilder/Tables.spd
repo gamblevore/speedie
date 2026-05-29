@@ -250,7 +250,7 @@ function TypeCast (fn_asm)
 	if NewType is bool
 		if (OldType is bool) and (dest isnt negate)				// x = true|bool| // why?
 			return from
-		return .NotEq(exp, dest, asmreg(), from)
+		return .exists(exp, dest, from)
 
 	dest.µType = NewType
 	if from is Const
@@ -420,9 +420,9 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	if !ch
 		return asmreg()
 	|| v = .OpenVars
-	|regfile| Restore = .Regs // adapt nilchecker to check if arg COULD return? If not... dont save.
+	|regfile| Restore = .Regs	// adapt nilchecker to check if arg COULD return? If not... dont save.
 	
-	.parentsanity
+//	.parentsanity
 	while
 		.BreakRequest |= assembler.Breakable
 		if (ch is BreakPoint)
@@ -431,7 +431,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 			rz = decl(self, ch, nil)
 		  else
 			rz = .µ(ch, asmreg.discard)
-		.parentsanity
+//		.parentsanity
 		ch++
 		loop ch and rz isnt exit
 	
@@ -630,7 +630,7 @@ function BoolNot (fn_asm)							// !a
 	|| src = .µGetASM(exp, dest)
 	if src is AlreadyNegated
 		return src
-	return .Exists(dest, src, exp)
+	return .Exists(exp, dest, src)
 	
 
 

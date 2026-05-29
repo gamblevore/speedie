@@ -37,18 +37,11 @@ extend asmreg
 		// I think lets wait for bugs to happen... if none do... this is probably correct.	
 		// otherwise we need to investigate every boolanswer.
 		// well... previously boolanswer would say that its already negated...
-		// sigh. IDK. just leave it.
 		
 		// ConstCompareInt is similar... its calling .ConstCompareIntSub and .NumToReg
 		// so are one of them doing the negation?
 		// well, numtoreg cant cos its already done. And ConstCompareIntSub doesnt
 		// so... i guess its wrong? it is NOT negating?
-		
-		// thats 9 more pieces of shit and my energy is exhausted. I can't do this. I want to...
-		// get out of this realm. For a while. For some time... a long... long time.
-		// how else can I get my energy back?
-		
-		// i hate feeling drained.
 
 		return .boolcondanswer.BoolNegateAnswer
 
@@ -163,16 +156,25 @@ extend Assembler
 		if 0: exp.JMKN, exp.JMPE, exp.JBOR
 		return fat * res
 	
-	
-	function Exists (|ASMReg| dest, |ASMReg| L, |message| exp, |ASMReg|)
+//	
+	function Exists (|message| exp, |ASMReg| dest, |ASMReg| L, |ASMReg|)
 		opt inline
+		// if we already wanted to negate the result...
+		// well... we are comparing this vs 0, so we negate some that was already negated.
+		// so negate is cleared.
+		// and then we DON'T set alreadynegated
+		// so we lose it.
+		// seems either way... we should return alreadynegated???
+		
+		// i mean... if its negate, we want already negated
+		// if its NOT negate, we negate it, so it will be alreadynegated
+		
 		return .Equals(exp, dest.negate, l, ASMReg())
 
+		
+	function NotEq  (fn_opasm)
+		return .Equals(exp, dest.negate, l, r)
 
-	function EqualsSame (fn_opasm)
-		|| num = (dest isnt negate)|int|
-		return .NumToReg(exp, dest, num, DataTypeCode.bool).BoolAnswerok
-	
 	
 	function Equals (fn_opasm)
 		|| rr = r.reg,  || ll = l.reg
@@ -181,19 +183,19 @@ extend Assembler
 		(Dest  as=  l & r & asmreg.Const)
 		
 		if rr == ll
-			return .EqualsSame(exp, dest, l, r)
+			|| num = (dest isnt negate)|int|
+			rz = .NumToReg(exp, dest, num, DataTypeCode.bool)
+//			rz = .EqualsSame(exp, dest, l, r)
 		
-		if dest.IsInt
+		  elseif dest.IsInt
 			rz = .EqualsInt(exp, dest, l, r)
 		  else
 			rz = .CompareFloat(dest, l, r, exp, 2)						
 			
-		rz = rz.boolanswerok // all of these handle negate!
+		rz = rz.boolanswerok		// all of these handle negate!
+		(rz is alreadynegated)		// in case of double negation but the original wants to check that it is negated
+									// I'd need to add a "really tell us that we want negation" flag otherwise.
 	
-		
-	function NotEq  (fn_opasm)
-		return .Equals(exp, dest.negate, l, r)
-
 
 	function JumpIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
 		require  l is Const  or  r is Const

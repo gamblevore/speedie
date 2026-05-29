@@ -480,7 +480,7 @@ struct Assembler
 		|| x = .µ(exp, dest)
 		if x.IsBool
 			return x
-		return .Exists(dest, X, exp)
+		return .Exists(exp, dest, X)
 	
 	
 	function message.FoundFunc (|bool|)

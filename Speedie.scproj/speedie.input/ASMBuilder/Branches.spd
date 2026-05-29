@@ -28,6 +28,7 @@ function IfSub (fn_asm)
 	|| Other = arg1.next
 	
 	|FATRange| B
+	debugat 0
 	.Branch(cond, B)
 	if b.Never
 		return .ElseSub(other)								// if k0 {b()} else {return}
@@ -237,7 +238,7 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 
 	rz = .µ(cond, mode)
 	if rz isnt CondAnswer
-		rz = .Exists(mode, rz, cond)
+		rz = .Exists(cond, mode, rz)
 
 	if rz is Const
 		range.Constness = (rz.const!=0)|maybebool|
@@ -300,7 +301,7 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 
 function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 	|| mode = ASMReg.CondRequest.negate(opp is OR)
-	return .Exists(mode, req, exp).fat!
+	return .Exists(exp, mode, req).fat!
 
 	
 function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
@@ -379,7 +380,7 @@ function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Op
 		return dest.boolanswermaybebugged
 
 	// exists always handles negate...
-	return .Exists(dest, dest, A.next!)
+	return .Exists(A.next!, dest, dest)
 
 
 
@@ -402,7 +403,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 	
 	if mr.isbool
 		return mr
-	return .Exists(dest, mr, B)
+	return .Exists(B, dest, mr)
 
 
 function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
