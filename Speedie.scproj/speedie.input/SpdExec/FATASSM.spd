@@ -460,8 +460,8 @@ struct FatASM
 			fs <~ "..."
 			n += 2
 
-		target debug
-			if !Simpler
+		if !Simpler
+			target debug
 				.RendaMsg(fs, n)
 	
 	

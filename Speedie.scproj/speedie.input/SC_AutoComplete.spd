@@ -1218,13 +1218,20 @@ function message.AsmIndent (|message| top, |int|)
 function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
 	opt norefcounts
 	|| bb = 0
-	|message| path 
+	|message| path
 	|| lp = 0
 	|| top = fn.SourceArg
 	|| Count = 0
 	|| Size = 0
 	
-	for fat.fat in fn
+	|| Fat = fn.FatFirst
+	|| Skinny = Fat + fn.µfatlength-1
+	while fat <= Skinny and fat isa asm.noop
+		fat++
+	while fat <= Skinny and skinny isa asm.noop
+		skinny--
+	
+	while Fat <= Skinny
 		if fat.WillRenderFat
 			|| hisss = fat.GuessSize
 			count += hisss > 0
@@ -1243,6 +1250,7 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 			tmp <~ p
 			lp = p
 			path = msg.NextPath(tmp, path)
+		fat++
 	
 	|| title = out.first // going into the wrong place :D
 	title <~ count
