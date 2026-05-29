@@ -464,8 +464,9 @@ class PerryIDE (Window)
 				.editme.SetFocus
 			if .viewing == .viewfiles
 				.noneed
-				|| fl = .filelist.ListSource as filerow
-					fl.Name = "file".pluralize(fl.LastFileCount)
+//				|| fl = .filelist.ListSource as filerow
+//					fl.Name = "file".pluralize(fl.LastFileCount)
+// 				// this isnt what we want to do.
 
 
 	function CheckCrashed (|UnixProcess| p, |string| what, |bool|)
