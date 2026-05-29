@@ -220,7 +220,7 @@ function Return (fn_asm)
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0
 	|| fat = exp.RET(dest*!HasK, K * HasK)
-	fat.µRefCount++
+	fat.µRefCount = 1
 	return fat * asmreg.Exit
 	
 

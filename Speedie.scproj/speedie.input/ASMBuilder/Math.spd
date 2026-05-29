@@ -527,21 +527,39 @@ extend Assembler
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatPlus)
 
-		|| Minus = (l is Subtract)
-		|| IsF32 = dest.FourBytes
+		|| IsF32 = dest.FourBytes|int|
 			|| qq = .QuickFloat32Plus(exp, dest, l, r)
 				return qq
-
 			if !dest.isvec
 				|| Parts = .OptVecMathTwo(L, R)
 					|| fat = exp.UADD(dest, l, r, Parts&63)
-					fat._op += minus
+					fat._op += (l is Subtract)
 					return fat*dest
 
 		if 0: exp.VADD
-		return exp.FADD(dest, l, r*!Minus, r*Minus, IsF32|int|).Vectorise(dest, asm.vadd)
-
-
+		|&fatasm| Fat
+		if l isnt Subtract
+			|| mul = .OptFMUL(dest, l, r)
+				return mul
+			mul = .OptFMUL(dest, r, l)
+			if mul
+				return mul
+			fat = exp.FADD(dest, l, r, asmreg(), IsF32)
+		  else
+			fat = exp.FADD(dest, l, asmreg(), r, IsF32)
+		return fat.Vectorise(dest, asm.vadd)
+	
+	
+	function OptFMul (|asmreg| dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
+		|| fat = mul.FAT!
+		require .IsCurr(fat, asm.fmul)
+		require (fat is temp) or (dest iz fat.info)
+		|| P3 = fat.p3
+		if !p3.reg
+/			fat.reginput(3) = add
+			return fat * dest
+	
+	
 	function Plus (fn_opasm)
 		rz = .Plussub(exp, dest, l, r)
 		rz = rz asnt asmreg.subtract
@@ -968,7 +986,6 @@ extend Assembler
 		
 		if src isnt const
 			if !src.reg
-//				debugger // setinlinedest makes this happen. Why?
 				(src is const)
 			(Dest is const) = (src is const)
 			

@@ -13,6 +13,7 @@ function Assembler.FinishMost
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish
+			.AskNop(s)			// doing it on ALL of them... has issues. I guess the refcounts arent perfect yet.
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC
@@ -60,6 +61,7 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc.prms[2] = 0
 	Fnc._Outputs = 0
 	Fnc._op = asm.tail
+	fnc.µRefCount++
 	(Fnc.info as= ASMReg.exit)
 	if (fnc.BasicBlock == ret.BasicBlock)
 		ret._op = asm.noop // nice

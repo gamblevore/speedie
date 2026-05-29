@@ -125,7 +125,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
-				.asmreach(des)
+				.ASMReach(des)
 	
 	.InlineState[ID] = nil
 	.InlineDepth = --ID
@@ -138,7 +138,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
-	LL.Start = .curr 
+	LL.Start = .curr
 	
 	|SavedRegisters| svregs
 	|InlineInfo| Info
@@ -154,7 +154,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	rz = .InlineFinish(ll, svregs)
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain) or .EntireInlineFailed
-		if  .EntireInlineFailed  and  (fn isnt linkinline)
+		if .EntireInlineFailed  and  (fn isnt linkinline)
 			.EntireInlineFailed = 0
 		svregs.Rewind(self)
 		.Rewind(ll.start, .curr)					// rewind
@@ -257,6 +257,9 @@ function InlineFinish (|fatrange| R, |savedregisters| sv, |ASMReg|)
 			s.SetOp = asm.jump
 			s.JumpPrm = 1
 			s.JumpFix(.curr)
+		  elseif op == asm.knst
+			.AskNop(s)			// doing it on ALL of ops... has issues
+			
 		if s.GuessSize
 			(s.info as= asmreg.FromInline)
 	

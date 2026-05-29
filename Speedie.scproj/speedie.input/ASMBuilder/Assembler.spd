@@ -141,7 +141,8 @@ struct Assembler
 
 
 	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
-		return (f isa type) and (.basicblock == f.basicblock)
+		if (f isa type)
+			return (.basicblock == f.basicblock)
 
 
 	function IsCurr (|&fatasm| f, |bool|)
@@ -756,7 +757,7 @@ struct Assembler
 		|| dl = .fn.Source!.FlatLast
 		.CloseVars(1, dl)
 		ASMType.ReturnOpt(self, nil)
-		dl.RET
+		dl.RET.µRefCount = 1
 
 	
 	function FinishASM 

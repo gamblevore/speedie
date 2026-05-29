@@ -156,7 +156,7 @@ struct FatASM
 		|| i = .info &~ F
 		if value
 			(i as= F)
-		.info = f
+		.info = i
 
 
 	function asmreg.Within (|asm| op, |&fatasm|)
