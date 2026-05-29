@@ -1287,7 +1287,7 @@ module GUI
 		if .AllowTyping and .CanDrag <= mousedragging.Handled
 			|| e = ev.Editing.str
 			if w.__TypedString__(e)
-				return SDLActivity.activity
+				rz = SDLActivity.activity
 
 
 	libinternal KeyUpEvent (|&SDL_Event| ev, |int|)

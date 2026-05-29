@@ -207,9 +207,9 @@ class TextView (GUIControl)
 		  else											// REMOVE
 			i += dp
 			range = (i, i+1)
-			if Restore.x > dp
-				Restore += txt.length - d.text.length
 		.InsertText(Break, Range, false)
+		if restore.x > dp
+			Restore += (i < 0).dir
 		.selrange = Restore
 		
 		
