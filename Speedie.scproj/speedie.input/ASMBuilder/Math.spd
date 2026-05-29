@@ -156,7 +156,7 @@ extend Assembler
 		if 0: exp.JMKN, exp.JMPE, exp.JBOR
 		return fat * res
 	
-//	
+
 	function Exists (|message| exp, |ASMReg| dest, |ASMReg| L, |ASMReg|)
 		opt inline
 		// if we already wanted to negate the result...
@@ -183,8 +183,8 @@ extend Assembler
 		(Dest  as=  l & r & asmreg.Const)
 		
 		if rr == ll
-			|| num = (dest isnt negate)|int|
-			rz = .NumToReg(exp, dest, num, DataTypeCode.bool)
+			|| One = (dest isnt negate)|int|
+			rz = .NumToReg(exp, dest, One, DataTypeCode.bool)
 //			rz = .EqualsSame(exp, dest, l, r)
 		
 		  elseif dest.IsInt
