@@ -267,6 +267,7 @@ class TextView (GUIControl)
 			return 0
 		return 1
 	
+	
 	libinternal ExpandWordLike (|intrange| T, |textviewline| D, |intrange|)
 		opt norefcounts		
 

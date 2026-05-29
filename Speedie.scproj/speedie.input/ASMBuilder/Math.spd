@@ -556,7 +556,7 @@ extend Assembler
 		require (fat is temp) or (dest iz fat.info)
 		|| P3 = fat.p3
 		if !p3.reg
-/			fat.reginput(3) = add
+			fat.reginput(3) = add
 			return fat * dest
 	
 	

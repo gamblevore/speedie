@@ -39,16 +39,16 @@ function CollectParams (|message| prms,  |SCFunction| fn,  |uint64|)
 	|| args = fn.args
 	|| n = args.Length
 
-	for Ints in 2
+	for Floats in 2
 		|| i = 0
 		for p.fast in prms
 			|| ty = p.ASMDecl
-			if ty.SpecialReg|int| != Ints
+			if ty.SpecialReg|int| == floats
 				|int64| v = .µFuncPrms(p!, args[i]!).reg
 				sh -= 5
 				rz  |=  v << sh
-				ic += ints
-				fc += !ints
+				ic += !floats
+				fc += floats
 			i++
 	
 	rz >>= 64-((n*5)+12)
