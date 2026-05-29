@@ -100,12 +100,14 @@ struct RandomXOR
 		rz = self[from, to+step]
 		rz -= rz mod step
 		
-	function Float (|float| From, |float| To, |float|step, |float| Power, |float|) 
-		cpp_part FloatPow
-		rz = self[from, to, step]
-		rz = rz.rangeconvert(from, to, 1.0, 0)
-		rz = rz pow power
-		rz = rz.rangeconvert(1.0, 0, from, to)
+//	function Float (|float| From, |float| To, |float| Step, |float| Power, |float|) 
+//		cpp_part FloatPow
+//		// this could be simplified but it needs visualisation
+//		rz = self[from, to+step]
+//		rz -= rz mod step
+//		rz = rz.rangeconvert(from, to, 1.0, 0)
+//		rz = rz pow power
+//		rz = rz.rangeconvert(1.0, 0, from, to)
 	
 	function Vec3 (|vec3|)
 		return (.float, .float, .float)
@@ -135,10 +137,6 @@ struct RandomXOR
 	syntax access (|float| From, |float| To, |float| step, |float|)
 		cpp_part AccessStep
 		return .float(From, to, step)
-
-	syntax access (|float| From, |float| To, |float|step, |float| Pow, |float|) 
-		cpp_part AccessPow
-		return .float(From,to,step, pow)
 
 	syntax access (|Float64|)
 		return .Float64
