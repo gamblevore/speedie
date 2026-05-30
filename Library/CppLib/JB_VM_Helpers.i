@@ -89,8 +89,8 @@ VMOpt void RotateConst (CakeRegister* r, ASM Op) {
 
 
 float FloatIncr1 (ASM Op) {
-    uint f = (FloatConst_Highu << 19);
-    return reinterpret_cast<float&>(f);
+    Op <<= 18;
+    return reinterpret_cast<float&>(Op);
 }
 
 float FloatSh1 (uint64 u, int S) {
@@ -102,8 +102,6 @@ double FloatSh2 (uint64 u, int S) {
 	uint64 Exp = u + ((uint64)S << 53);
 	return reinterpret_cast<double&>(Exp);
 }
-
-
 
 VMOpt void LoadConst (CakeRegister* r, ASM Op, uint64 Value) {
 	int N = n1;

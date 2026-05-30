@@ -691,7 +691,7 @@ POS 5
 
 /**/ FADK (FloatConst)
 		// we just want simple things like MyFloat += 2.0
-		f1 += f2 + FloatIncr1(Op)
+		f1 = f2 + FloatIncr1(Op)
 
 /**/ FMUL  (Float)
 		if (!Float_Du)
@@ -753,7 +753,7 @@ POS 5
 /**/ VADD  (Float)
 		v1 = v2 + v3 - v4
 /**/ VADK (FloatConst)
-		v1 += v2 + FloatIncr1(Op)
+		v1 = v2 + FloatIncr1(Op)
 /**/ VMUL  (Float)
 		v1 = (v2 * v3)+v4
 /**/ VMLK  (FloatConst)

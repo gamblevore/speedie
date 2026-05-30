@@ -233,7 +233,7 @@
 	f1 = f2 + f3 - f4
 ;
 ı FADK:;
-	f1 += f2 + FloatIncr1(Op);
+	f1 = f2 + FloatIncr1(Op);
 ı FMUL:;
 	if (!Float_Du)
 	d1 = (d2 * d3) + d4
@@ -292,7 +292,7 @@
 ı VADD:;
 	v1 = v2 + v3 - v4;
 ı VADK:;
-	v1 += v2 + FloatIncr1(Op);
+	v1 = v2 + FloatIncr1(Op);
 ı VMUL:;
 	v1 = (v2 * v3) + v4;
 ı VMLK:;

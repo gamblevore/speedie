@@ -170,8 +170,8 @@ extend Assembler
 		// if its NOT negate, we negate it, so it will be alreadynegated
 		
 		return .Equals(exp, dest.negate, l, ASMReg())
-
-		
+	
+	
 	function NotEq  (fn_opasm)
 		return .Equals(exp, dest.negate, l, r)
 
@@ -185,7 +185,6 @@ extend Assembler
 		if rr == ll
 			|| One = (dest isnt negate)|int|
 			rz = .NumToReg(exp, dest, One, DataTypeCode.bool)
-//			rz = .EqualsSame(exp, dest, l, r)
 		
 		  elseif dest.IsInt
 			rz = .EqualsInt(exp, dest, l, r)
@@ -336,10 +335,10 @@ extend Assembler
 
 	// MATH 
 	function QuickFloat32Plus	(fn_OpASM)
-		if  r is Const // a + 1,   a - 1
+		if  r is Const								// a + 1,   a - 1
 			|| QQ = .QuickFloatPlusConstSub(exp, dest, l, r)
 				return qq
-		if  l is Const  and  l isnt Alternate   // 1 + a --> a + 1
+		if  l is Const  and  l isnt Alternate		// 1 + a --> a + 1
 			return .QuickFloatPlusConstSub(exp, dest, r asnt asmreg.alternate, l)
 	
 			
@@ -349,14 +348,14 @@ extend Assembler
 		require (k >> 18) << 18 == k
 		.NopConst(r)
 		if 0: exp.VADK
-		return exp.FADK(dest, l, k).Vectorise(dest, asm.vadk)
+		return exp.FADK(dest, l, k>>18).Vectorise(dest, asm.vadk)
 
 
 	function message.DivByZero
 		.CallChainError("Divide by zero???")
 
 
-	function QuickFloatDiv    (fn_OpASM)
+	function QuickFloatDiv	(fn_OpASM)
 		require r is Const
 		|| v = r.float
 		|| v2 = v.abs
@@ -370,14 +369,14 @@ extend Assembler
 
 	// from 1 to -1
 	function Quick1Or1Sub (|&Assembler| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
-		if ptoi == -1										//   x * -1  -->  0-x 
+		if ptoi == -1										//   x * -1  -->  0-x
 			return .Subtract(exp, dest, ASMReg(), l)
-		if ptoi == 1										//   x * 1   -->  x 
+		if ptoi == 1										//   x * 1   -->  x
 			return l.µtype(dest)
 		return dest.µtype.zero								//   x * 0   -->  0
 	
 	
-	function QuickIntMul    (fn_OpASM)
+	function QuickIntMul	(fn_OpASM)
 		require r is Const
 		|| Pow2 = .IntPowerOfTwo(r)
 			if Pow2 <= 1
@@ -394,7 +393,7 @@ extend Assembler
 			return exp.MULK(dest, L, RR) * dest
 
 
-	function QuickFloatMul    (fn_OpASM)
+	function QuickFloatMul	(fn_OpASM)
 		require r is Const	
 		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0

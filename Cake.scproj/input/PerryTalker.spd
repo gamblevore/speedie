@@ -58,13 +58,13 @@ function __PerryView__ (cakevm.CakeChef)
 	Break &= debugger.BreakRealBit
 	
 	|| NeedsRun = break
+	if NeedsRun or ErrorCode
 		debugger.RestoreBreaks
 		.SendStack(stack, p, "break", ErrorCode)
 
 	while p.CommsOpen
 		if !ErrorCode and !Break and (p.pico.CanGet <= 0)
 			if NeedsRun
-//				debugger.DebugList
 				p <~ "run"
 			return 0
 			
