@@ -170,10 +170,10 @@ class String
 		nil checker
 		cpp_Wrapper JB_Str_TextIntegerValid
 	
-	inline Int (|int64|)
+	inline Int (|int64|) // remove?
 		return .parseint(nil)
 	
-	inline Float (|bool| Suffixes = false, |Float64|)
+	inline Float (|bool| Suffixes = false, |Float64|) // rename?
 		nil checker
 		return .parsefloat(nil, suffixes)
 	

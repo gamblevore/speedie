@@ -139,9 +139,9 @@ function BranchTest (|int|)												/// Active ///
 	while c!=d
 		app.Quit
 
-	while a <= 1
+	while a <= 3
 		d += a == b
-		if a == b: c++			// failing. how to get everything in sync?
+		if a == b: c++
 		if d!=c: return 5
 
 		d += a > b
@@ -468,8 +468,6 @@ function Inline_More
 	#! IDK3
 	y = 1
 	y = gggAlter(2, Y)
-	// test register-reuse and failing to re-use.
-	// also double-inlines
 
 
 function LLL (|int| Y, |int|)

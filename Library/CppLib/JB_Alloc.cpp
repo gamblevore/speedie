@@ -556,11 +556,20 @@ static void MemoryAccessError (int sig) {
 
 
 
-static int ReadMemory (byte* B, int N) {
+static int TestMemory (volatile byte* B, int N, int Mode) {
 	int C = 0;
+
 	for (int i = 0; i < N; i++)
 		C ^= B[i];
-	MemFailKeeper = C; // stop optimiser
+
+	if (Mode & 2) {
+		for (int i = 0; i < N; i++)
+			B[i] ^= Mode;
+		for (int i = 0; i < N; i++)
+			B[i] ^= Mode; // restore
+	}
+	
+	MemFailKeeper = C;			// stop optimiser
 	return 0;
 }
 
@@ -603,18 +612,18 @@ static int ObjIsValid (JB_Object* Obj) {
 	if (TotalSize > AllowedTotal)
 		return 1002; // block itself is invalid
 
-	return ReadMemory((byte*)Obj, Size);
+	return TestMemory((byte*)Obj, Size, 0);
 }
 
 
-int JB_CanReadMemory (void* B, int N) {
+int JB_TestMemory (void* B, int N, int Mode) {
 	if (!B or !N) return -1;
 
 	auto OldSeg = signal(SIGSEGV, MemoryAccessError);
 	auto OldBus = signal(SIGBUS, MemoryAccessError);
 	int Err = setjmp(MemFailJump);
 	if (!Err)
-		Err =  (N < 0)  ?  ObjIsValid((JB_Object*)B)  :  ReadMemory((byte*)B, N);
+		Err =  (N < 0)  ?  ObjIsValid((JB_Object*)B)  :  TestMemory((byte*)B, N, Mode);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
 	return Err;

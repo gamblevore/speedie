@@ -97,10 +97,11 @@ class XVar (list)
 				return Ty
 
 		
-	function SetValue (|&nil| where, |string| Value, |bool|)
+	function SetValue (|&nil| where, |message| Value)
 		opt norefcounts
+		require value
 		if .Reg
-			require memory.test(Where, 16)
+			require memory.Readable(Where, 16)
 		|| C = .Type
 		if c and c.IsObject
 			return .SetObjectValue(Where|&object|, value)
@@ -198,34 +199,79 @@ class XVar (list)
 					rz = msg.first
 
 
-	function SetObjectValue (|!&object| Reg, |string| Value, |bool|)
+	function SetObjectValue (|!&object| Reg, |message| Value)
 		opt norefcounts
 		|| OldObj = Reg[]
-			require Memory.test(OldObj)
+			require Memory.Test(OldObj)
 		if value ~= "nil" or "0" or "0x0"
 			require self is CanBeNil
 			reg[] = nil
-			return true
+			return
 	
 		|object| NewObj
-		if value.IsInt
-			NewObj = Value.ParseInt()|object|!
+		if value.name.IsInt
+			NewObj = Value.int|object|!
 		  else
-			NewObj = .ParseObj(OldObj, value)$
-		require Memory.test(NewObj)
+			NewObj = .ParseObj(OldObj, value.name)$
+		
+		expect (Memory.Test(NewObj)) (value, "Invalid address")
 		reg[] = NewObj
-		return true
 	
 	
-	function SetDataValue (|!&nil| Reg, |string| Value, |bool|)
+	function SetDataValue (|!&nil| Where, |message| Msg)
 		opt norefcounts
-//		|| OldObj = Reg[]
-//		require Memory.test(OldObj)
-//		|| NewObj = value.CakeObj
-//		if !NewObj
-//			require Memory.test(NewObj)
-//			
-//		reg[] = NewObj
+		expect (!.weirdness[0] and self isnt BareStruct) (msg, "Unalterable")
+		expect (msg < 60) (msg, "SizeOverflow")
+
+		|| T = .DataType
+		|| V = t.VecCount
+		|| BC = t.ByteCount
+		if (bc >= 12): bc = 16		
+
+		expect (memory.Writeable(Where, BC)) (msg, "Unwriteable")
+		
+		|| value = msg.name
+
+		if v > 1
+			|| items = value.parse
+				|| fn = items.func
+				expect (fn == @arg or @list or @arr) (msg)
+				|| i = 0
+				|| ch = items.first
+				while i < v
+					if t is Float
+						(where|&float|)[i] = ch.Float
+					  else
+						(where|&int|)[i] = ch.int
+					i++
+					ch++
+					if (i == 3) and (v == 3) and ch
+						v = 4 // allow setting last in vec3.
+
+		if t is bool
+			(Where|&bool|)[] = value.Yes
+		  elseif t isnt Floating
+			if !t.IsSigned and (bc == 1) and !value.IsInt
+				if value[] == '\'' and value.Last == '\''
+					|| c = value[1]
+					(Where|&int8|)[] = c
+					return
+			|uint64| IntValue = value.parseint
+			if BC > 4
+				(Where|&int64|)[] = intvalue
+			  elseif bc == 4
+				(Where|&int|)[] = IntValue
+			  elseif bc == 2
+				(Where|&int16|)[] = IntValue
+			  else
+				(Where|&int8|)[] = IntValue
+				
+		  else
+			|| ValueFloat = msg.float
+			if BC <= 4
+				(Where|&float|)[] = ValueFloat
+			  else
+				(Where|&f64|)[] = ValueFloat
 	
 
 	function RenderObject (|faststring| fs, |!&nil| Reg, |$int| RefCount,  |bool|)
@@ -300,7 +346,7 @@ class XVar (list)
 	
 	
 	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
-		|| Err = memory.test(Mem, N)
+		|| Err = memory.Readable(Mem, N)
 			return true
 		if self
 			self <~ ErrName
@@ -380,8 +426,8 @@ class XVar (list)
 					value = (reg|&int8|)[]
 				
 				|| sh = 64 - (bc*8)
-				if !t.IsSigned and (sh > 0)
-					value = (value << sh) >> sh
+				if !t.IsSigned and (sh > 0) // unnecessary??
+					value = (value << sh) >> sh // remove later
 				fs.AppendDecimal(value)
 
 				if value and (bc == 1) and !t.IsSigned

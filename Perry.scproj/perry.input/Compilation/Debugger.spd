@@ -340,24 +340,26 @@ function PerryStackEditCell (GUIListEditEvent)
 	
 
 extend ListViewRow
-	function DebugPath (|jbin| j)
+	function DebugPath (|jbin| j, |bool|)
 		opt norefcounts
 		|| p = .parent
 		if !p.isroot
-			p.DebugPath(j)
+			require p.DebugPath(j)
 		
 		if self != @arg
 			if p.isroot
 				j.addHInt(.index)
 			  else
-				j.addstr(.debugname)
+				|| f = .first #require
+				j.addstr(f.debugname)
+		return true
 	
 
 
 function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
 	|jbin--| j = VarPrinter.start(@tmp, "edit")
 	j.addstr value
-	row.DebugPath(j)
+	expect row.DebugPath(j) (Beep)
 	.SendJbin(j)
 
 

@@ -160,15 +160,19 @@ function CakeVM.GetVar (|xvar| Var, |message| Name, |xvar|)
 		if Name ~= v.Name
 			return v
 
-
-function EditAction (PerryResponse)
-	opt norefcounts
-	|| path = m.second
-	|| n = path.int
+function cakevm.Prev (|CakeStack| Stack, |int| n, |&cakestack|)
 	while n > 0
 		n--
 		stack = .prev(stack)$
+	return stack
 	
+	
+
+function EditAction (PerryResponse)
+	opt norefcounts
+	debugger
+	|| path = m.second
+	stack = .prev(stack, path.int)$
 	path++
 	
 	|| v = .GetReg(stack, path)$
@@ -176,11 +180,9 @@ function EditAction (PerryResponse)
 	
 	while v
 		xvar.Printer.Length = 0
-		n++
 		path++
 		if !path
-			if !v.SetValue(Where, m.firstname)
-				error "Invalid address"
+			v.SetValue(Where, m.first)
 			return StepAction.SendVars
 		where = where|&&byte|[]
 		v = .GetVar(v, path)
@@ -253,7 +255,7 @@ function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata|)
 
 
 function cakevm.CheckStack (|cakestack| stack, |string?|)
-	if !Memory.Test(Stack, 16):				return "StackCorrupt!"
+	if !Memory.Readable(Stack, 16):				return "StackCorrupt!"
 	if stack < .basestack:					return "StackUnderflow!"
 	|| Depth = stack.Depth - 1
 	|| Down = stack.DestReg

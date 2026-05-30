@@ -36,7 +36,7 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 	|| Depth = Stack.Depth
 	LastStack ?= Stack + 1MB/16
 	while
-		if !Memory.Test(Stack, 16):				return "Stack Corrupt"
+		if !Memory.Readable(Stack, 16):				return "Stack Corrupt"
 		if (Depth >= 1K):						return "..." // huge stacks aren't that useful
 			
 		|| CodePtr = Stack.Code
