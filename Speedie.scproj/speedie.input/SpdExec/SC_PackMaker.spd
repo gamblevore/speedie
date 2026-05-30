@@ -102,23 +102,25 @@ module PackMaker
 		return true
 	
 	
-	function message.InlineCount (|int| Remain, |int|)
+	function message.InlineCount (|int| Limit, |int|)
 		opt norefcounts
-		|| fn = .func
-		require fn != @thg and @char
-		if fn == @num
-			return 1 - .IsZero
-			
-		if fn == @bra
-			return .first!.InlineCount(Remain)
-
-		|| Count = (fn != @list and @emb and @decl and @arg)|int|
-		for s in self
-			|| Found = s.InlineCount(Remain)
-			Count += Found
-			Remain -= Found
-			loop Remain > 0
-		return count
+		// this is pretty much a definition of "what does stuff in C" :]
+		for s.flat in self
+			|| fn = s.func
+			if fn == @char or @opp or @brel or @num or @acc or @dot or @type or @tmp
+				rz++
+			  elseif fn == @arel
+				if s != "!" and "?"
+					rz++
+			  elseif fn == @thg
+				|| obj = s.obj
+				if obj isa SCDecl
+					if (obj is Global or Const) and (obj.ExportPosition)
+						rz++
+			  elseif fn == @func
+				rz += 2
+			if rz > Limit
+				exit
 	
 
 	helper PackIDFuncs (|[scfunction]| list)
@@ -345,7 +347,7 @@ function SCFunction.CanLibLoad (|bool|)
 function SCFunction.CanPrepareInline (|bool|)
 	opt norefcounts
 	require (self isnt cpp) and .HasProperSpeedieCode
-	|| Allowed = 15 + (self is OptInline)<<4
+	|| Allowed = 14 + (self is OptInline)<<4
 	|| Count = .SourceArg!.InlineCount(Allowed)
 	if Count <= Allowed
 		return true
