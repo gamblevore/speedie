@@ -53,15 +53,18 @@ function CollectParams (|message| prms,  |SCFunction| fn,  |uint64|)
 	
 	rz >>= 64-((n*5)+12)
 	if fc>8 or ic>8			// hmmm
-	if fn.ASMReturn.SpecialReg
-		rz |= 1|uint64| << ((n*5)+12)		// uint64 cos C++ sucks
-											// I'd need to update my compiler to add ull to this...
-											// do later.
 	if fc
 		rz |= (8-fc) << 6
 		rz |= (8-ic) << 0
 	  else
 		rz |= (17-ic) << 6
+
+	|| v = 1|uint64| << ((n*5)+12)			// uint64 cos C++ sucks
+	if rz & ~(v-1) // oof?
+	if fn.ASMReturn.SpecialReg
+		rz |= v
+											// I'd need to update my compiler to add ull to this...
+											// do later.
 
 
 function message.RegCheck (|int| Bad)
