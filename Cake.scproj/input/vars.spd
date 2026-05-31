@@ -156,7 +156,7 @@ class XVar (list)
 		if n > 50
 			Skkrt.length = (&skkrt)|string|.ByteCountUTF8(50)	// shrink string
 		fs.AppendQuotedEscape((&Skkrt)|string|)
-		if n < Skkrt.Length
+		if n > Skkrt.Length
 			fs <~ ('.', 3)
 		
 		return true
