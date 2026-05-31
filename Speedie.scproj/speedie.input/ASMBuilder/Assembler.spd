@@ -755,13 +755,13 @@ struct Assembler
 		opt norefcounts
 		debugger !.fn.ASMReturn
 		|| arg = .fn.source!
-		|| Faked = arg.FakeReturnPos
+		|| Faked = arg.FrenchSpyReturn
 		|| old = arg.position
 		arg.Position = Faked
 		.CloseVars(1, arg)
 		ASMType.ReturnOpt(self, nil)
-		|| fatret = arg.ret
-		fatret.µRefCount = 1
+		|| fatrat = arg.ret
+		fatrat.µRefCount = 1
 		arg.Position = old
 
 	

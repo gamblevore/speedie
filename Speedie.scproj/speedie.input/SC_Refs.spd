@@ -168,13 +168,6 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 	parser.using.position = -1
 
 
-function message.RefMsgToUse (|message|)
-	opt norefcounts
-	if self == @arg
-		return .last!
-	return self!
-
-
 function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
 	// a = nil   ->   JB_decr(a),  a = nil 
 	opt norefcounts
@@ -183,8 +176,14 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
 	if (OldPrev) and (OldPrev == @Func) and (OldPrev.first ~= "JB_SafeDecr")
 		place = OldPrev // safedecr always comes last
 	
-	using place.refmsgtouse
-	|message| what 
+	|| ToUse = place
+	if place == @arg
+		Touse = ToUse.FlatLast
+	using ToUse
+	if place == @arg
+/		parser.using.position = touse.FrenchSpyReturn
+		
+	|message| what
 	if basis & kBasisCArray
 		what = DecrMulti( msg.parent!.asdecl!, msg.copy, IsReturn )
 	  else

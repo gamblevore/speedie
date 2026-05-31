@@ -520,12 +520,16 @@ function message.ExpectEmpty
 		error f
 
 
-function message.FakeReturnPos (|int|)
+function message.InFile (|int| file, |bool|)
+	return .tag>>5 == file
+
+
+function message.FrenchSpyReturn (|int| file=0, |int|) // naturally!
 	opt norefcounts
 	|| text = .OriginalParseData
 	|| Last = .FlatLast
 	|| after = last.After
-	while after <= 0 // what?
+	while (after <= 0) or (file and !last.infile(file))
 		last = last.parent
 		if !last // welp
 			return -1
@@ -539,7 +543,7 @@ function message.FakeReturnPos (|int|)
 	
 function message.AddReturn (|bool| NoSet=false, |message|)
 	opt norefcounts
-	parser.using.position = .fakereturnpos
+	parser.using.position = .FrenchSpyReturn
 	|| ret = .msg(@tmp, "return")
 	if !NoSet
 		ret.ASMType = ASMType.kReturn

@@ -192,11 +192,12 @@ module PackMaker
 		if src and src isnt Inserted				// sigh
 			file = src.tag >> 5
 			for s.flat in src
-				if (s isnt inserted) and (s.tag>>5 == file)
+				if (s isnt inserted) and s.infile(file)
 					|| r = s.Range
 					(low min= r[0])
-					(high max= r[1])
-				
+					(high max= r[1])				// unnecessary now we unlocked the spy?? write a test maybe...
+			|| after = src.FrenchSpyReturn(file)
+/				(high max= after)
 		if !high									// oof
 			low = 0
 		return (low, high, file)
