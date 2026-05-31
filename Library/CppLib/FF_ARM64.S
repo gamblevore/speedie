@@ -100,27 +100,27 @@
 		ubfiz   x7, data10, 4, 5				// x7 = (data10&31) << 4
 		lsr     data10, data10,  5				// data10 = data10 >> 5
 		ldr     x7,  [r15, x7]					// x7 = r[x7]
-			
+		
 		ubfiz   x6, data10, 4, 5				// int-6
 		lsr     data10, data10,  5
 		ldr     x6,  [r15, x6]
-			
+		
 		ubfiz   x5, data10, 4, 5				// int-5
 		lsr     data10, data10,  5
 		ldr     x5,  [r15, x5]
-			
+		
 		ubfiz   x4, data10, 4, 5				// int-4
 		lsr     data10, data10,  5
 		ldr     x4,  [r15, x4]
-			
+		
 		ubfiz   x3, data10, 4, 5				// int-3
 		lsr     data10, data10,  5
 		ldr     x3,  [r15, x3]
-			
+		
 		ubfiz   x2, data10, 4, 5				// int-2
 		lsr     data10, data10,  5
 		ldr     x2,  [r15, x2]
-			
+		
 		ubfiz   x1, data10, 4, 5				// int-1
 		lsr     data10, data10,  5
 		ldr     x1,  [r15, x1]

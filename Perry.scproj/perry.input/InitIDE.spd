@@ -234,6 +234,7 @@ extend PerryIDE
 		with .CommsLogList
 			.IsMainListView = true
 			.GNormal.Solid = LeftBG
+			.oncopy = listview.PerryCopyComms|guicopyevent|
 		
 		
 		.ASMVis = false

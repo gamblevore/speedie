@@ -84,7 +84,7 @@ function __PerryView__ (cakevm.CakeChef)
 function SendBreakAction (perryresponse)
 	opt norefcounts
 	|| f = debugger.file(m)
-		cake.perry!.SendBreaks(f)
+		cake.perry!.SendBreaks(f, true)
 	return StepAction.DoNothing
 
 
@@ -100,7 +100,7 @@ function jbin.SendCode (|uint| Break, |int| Position)
 	.exit
 	
 
-function Spdprocess.SendBreaks (|filewithdata| F)
+function Spdprocess.SendBreaks (|filewithdata| F, |bool| All=false)
 	opt norefcounts
 	|| CakeBreak = cake.ActiveBreaks$
 	|| L = debugger.dbgLength
@@ -108,6 +108,7 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 	|jbin| j = xvar.Printer
 	j.Start(@tmp, "breakpoint")
 	j.AddStr(f)
+	j.AddHint(all|int|)
 	j.Enter
 
 	|| ToFind = F.Index
@@ -120,10 +121,11 @@ function Spdprocess.SendBreaks (|filewithdata| F)
 		if Src.FileNum == ToFind
 			|| Code = raw.code(L)
 			|| Break = CakeBreak[Code] & Mask
+			if Break or all
 				Count++
 				j.SendCode(Break, Src.Position)
 	j.exit(2)
-	if Count
+	if Count or all
 		self <~ j
 	j.Length = 0
 	

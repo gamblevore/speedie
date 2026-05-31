@@ -36,11 +36,15 @@ function Assembler.FinishMost
 
 function fatasm.AddBFix (|&fatasm| after)
 	// addb(x,0)
-	|| n = self + 1
-	require n < after
-	require (n.BasicBlock == .BasicBlock) and (.p1 == 0)
-	._op = asm.noop
-	n.ASMIndex |= .ASMIndex // actually .breakrequest
+	|| n = self
+	require (.p1 == 0)
+	while (++n < after)
+		require (n.BasicBlock == .BasicBlock)
+		|| op = n.op
+		if op != asm.noop and asm.addb and asm.mark
+			._op = asm.noop
+			n.ASMIndex |= .ASMIndex // actually .breakrequest
+			return
 	
 	
 

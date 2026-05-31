@@ -449,44 +449,47 @@ libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |int|)
 	rz = 0x13FFFFFF
 	if ._DrawInLineArea & 1
 		._DrawInLineArea |= 2
-//		|| mx = .MouseXY.x
-//		if mx < .LineNumRight and mx >= .LastLeft
-//			rz += 0x2F000000
-//			if d is Selected
-//				rz += 0x3F000000 // not pretty
 		if d is Selected
 			rz += 0x0F000000
 
 	
 autogen TextView.ClearActiveLine
 	opt norefcounts
-	._ActiveLine = nil
+	|| m = ._Activeline
+		m.indent = 0
+		._ActiveLine = nil
 	for l.lines in self
 		(l isnt ActiveBreakPoint)
+		(l isnt reached)
 
 
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
 	opt norefcounts
 	opt min 3
-	(d isnt Selected)
+	if keys.Shift and self ~= "editme"
 	|| GoUp = (7 - .lineheight)/2
 	if d.LineError
 		if .MyError
-			.DrawErrorBackground(where, y+GoUp, d)
+			.DrawErrorBackground(where, y + GoUp, d)
 		  else
 			d.LineError = nil								// sigh. crappy bug fix
-	
+
 	|| m = ._ActiveLine
-	if (m) and (d contains m.Position) and (m ~= .FilePath)
-		|| bg = ¥.ActiveTextLine
-		if m.flags&1
-			bg = colors.red(0.25).px
-		.Drawbackground(where, y + GoUp, bg)
-		|| str = m.firstname
-			|| x = .LastRight - (.gnormal.width(str) + 10)
-			where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
+	|| UnReached = false
+	if (m and m ~= .filepath)
+		if d contains m.Position
+			|| bg = ¥.ActiveTextLine
+			if m.flags&1
+				bg = colors.red(0.25).px
+			.Drawbackground(where, y + GoUp, bg)
+			|| str = m.firstname
+				|| x = .LastRight - (.gnormal.width(str) + 10)
+				where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
+		  elseif m.indent&1
+			if (d isnt reached)
+				unreached = true
 
-
+	(d isnt Selected)
 	if .CanDrawSelected(d)									// linelight
 		(d is Selected)
 		.DrawLighter(where, y+GoUp)
@@ -495,7 +498,11 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	|| state = MsgTextDrawState(x, d)
 	|| NoDrawFirst =  (self is CodeEditor)  and  ((m and d is ActiveBreakPoint) or (d is breakpoint))
 		|| col = vec4(0)
-		if (m) and (d is ActiveBreakPoint)!=(d is BreakPoint)
+		if !m
+			0
+		  elseif d isnt Reached
+			col.a = 0.5
+		  elseif (d is ActiveBreakPoint)!=(d is BreakPoint)
 			col = (1.0, 1.0, 0.75, 0.375)		// pink
 			if d is ActiveBreakPoint			//	or
 				col = colors.blue(0.375)		// purple
@@ -521,13 +528,15 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 				yadd = 3
 				c = '.'
 				col = SpaceDisplay
+			  elseif UnReached
+				col.a /= 2
 			state.font.DrawChar(c, Where, (x, y+yadd), col, 1)
 		prev = c
 	
 	if .AutoLim(d)
 		if (._CanAutoComplete != 2) or (!.text)
-			if d.IsLast				// last line draw too early with autocomplete
-				x += font.width		// but we shouldn't need this!
+			if d.IsLast							// Last line draw too early with autocomplete
+				x += font.width					// but we shouldn't need this!
 			.DrawAuto(Where, x, y)
 
 

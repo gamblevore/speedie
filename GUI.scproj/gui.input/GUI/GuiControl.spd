@@ -74,7 +74,7 @@ class GUIControl (list)
 	
 	virtual Search		(|string| s, |bool|JustUpdate, |bool|)
 	virtual MouseMove	(|ivec2| P,  |ivec2| Move,   |SDL_WindowEventID| State, |bool|)
-	virtual Gesture	    (|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
+	virtual Gesture		(|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
 	virtual RightClick	(|ivec2| P)
 	virtual KeyDown		(|keys| Key, |bool|)
 		if (.OnKeydown)(self, key)?

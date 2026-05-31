@@ -1912,7 +1912,7 @@ class TextView (GUIControl)
 
 		y += .YAdjust-2
 		if .SingleLine
-			y-=self is Editable
+			y -= self is Editable
 		  else
 			yend += font.height-2
 		

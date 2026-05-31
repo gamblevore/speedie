@@ -32,14 +32,21 @@ function SetBreaks (|message| breaks)
 	opt norefcounts
 	|| file = breaks.FirstName
 	require file ~= .editme.FilePath
-	for l.lines in .editme
-		(l isnt ActiveBreakPoint)
-		(l isnt reached)
+
+	|| All = breaks.second.int
+		for l.lines in .editme
+			(l isnt ActiveBreakPoint)
+			(l isnt reached)
+		|| active = .editme._ActiveLine
+			active.indent |= 1
+		// so what do we do with this? we want to set the textview as having... nothing!
+
 	for line in breaks.last
 		|| Pos = line.second.int
 		if pos <= .editme.text.Length
 			|| D = .editme.FindTextLine(pos)
-			(D is reached)
+			if all
+				(D is reached)
 			if line ~= "break"
 				(D is ActiveBreakPoint)
 	.editme.Touch			
@@ -52,6 +59,7 @@ function GotHello (|string| msg)
 	if m is ReceivedHello
 		Notifications <~ msg				// Weird?
 	  else
+		.ReloadBreaks
 		(M is ReceivedHello)
 		.DebugMode = M
 		.StrongView(.ViewDebugger)			// View debugger!

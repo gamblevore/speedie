@@ -611,3 +611,17 @@ function perryide.ClearIDE (|keys| key, |bool|)
 	return true
 
 
+function listview.PerryCopyComms (guicopyevent)
+	|| sel = .FirstSelected
+		if sel.HasAny
+			|| fs = faststring()
+			for s in sel
+				|| it = .copyid(s)
+				if fs.length
+					fs <~ '\n'
+				fs <~ it
+			return fs
+	return .DefaultCopy(item)
+	
+	
+	
