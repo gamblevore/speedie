@@ -919,7 +919,6 @@ JB_CP_Render
 JB_CPath_ReadAll
 JB_CakeVM_DummyChef
 JB_CakeVM_Load
-JB_CanReadMemory
 JB_CharSet_SyntaxAccess
 JB_ClassData_CreateLayerAndUse
 JB_Class_AllocZeroed
@@ -1143,6 +1142,7 @@ JB_File__Trash
 JB_FillInts
 JB_FindLeakedObject
 JB_Float64_SyntaxCall
+JB_FloatPrint
 JB_FloatRangeConverter_Convert
 JB_FloatRange_Constructor
 JB_Flow_Constructor
@@ -1426,7 +1426,6 @@ JB_Ring_PrevSib
 JB_Ring_PrevSibSet
 JB_Ring_Root
 JB_Rnd_AccessIVec2
-JB_Rnd_AccessPow
 JB_Rnd_AccessRange
 JB_Rnd_AccessScale
 JB_Rnd_AccessStep
@@ -1435,7 +1434,6 @@ JB_Rnd_Constructor
 JB_Rnd_Data
 JB_Rnd_Float
 JB_Rnd_Float64
-JB_Rnd_FloatPow
 JB_Rnd_FloatRange
 JB_Rnd_FloatScale
 JB_Rnd_FloatStep
@@ -1706,6 +1704,7 @@ JB_TerminalDisplay_Flat
 JB_TerminalDisplay_FrameText
 JB_TerminalDisplay_SyntaxAppend
 JB_TerminalDisplay__New
+JB_TestMemory
 JB_TotalSanity
 JB_Tree_Across
 JB_Tree_AppendAfter
