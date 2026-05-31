@@ -126,8 +126,8 @@
 		ldr     x1,  [r15, x1]
 		
 		ubfiz   x0, data10, 4, 5				// int-0
+		lsr     data10, data10,  5
 		ldr     x0,  [r15, x0]
-		nop
 		
 			// **STACK MANAGEMENT HERE**
 		stp     fp, lr, [sp, -32]!			// save fp and lr 
