@@ -21,7 +21,7 @@ function CakeRun.LoadPackClasses (|message| PackCls) // loadclasses
 
 
 
-function CakeRun.Func (|message| V, |uint64|)
+function CakeRun.Virtual (|message| V, |uint64|)
 	opt norefcounts
 	|| Info = V.int(0, 1, 64K)$
 	|| Index = Info >> 1
@@ -29,8 +29,8 @@ function CakeRun.Func (|message| V, |uint64|)
 	if Info&FuncIsLib
 		return ((spdtable.LibFuncs+Index)|int64|) &~ Spd
 
-	|| Fn = SpdTable.Funcs[Index]					#expect (V, "Virtual out of bounds")
-	|| spdfn = fn.ASMStart							#expect (V, "Virtual is missing")
+	|| Fn = SpdTable.Funcs[Index]					#EXPECT (V, "VirtualEscaped")
+	|| spdfn = fn.ASMStart							#EXPECT (V, "VirtualMissing")
 	return spdfn|int64| ||| Spd
 
 
@@ -48,7 +48,7 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 
 	|| V = ClsData.Virtuals|&&nil|
 	for VFn.fast in PK
-		V++[] = .Func(Vfn[@nil])|&nil|
+		V++[] = .Virtual(Vfn[@nil])|&nil|
 
 
 

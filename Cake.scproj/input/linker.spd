@@ -30,7 +30,7 @@ module SpdTable
 	
 	function RunFunc (|int| i, |int|)
 		opt norefcounts
-		|| fn = .funcs[i]					#expect ("Missing function: " + i)
+		|| fn = .funcs[i]					#EXPECT ("MissingFunc")
 		|| ExitReg = fn.Run
 			|| Err = ExitReg|&int64|[]
 			|uint| MiniErr = Err

@@ -276,7 +276,7 @@ module debugger
 			.VariablePrinter = FastString(64)
 			require .VariablePrinter
 			return .LoadSub(.PackInfo)
-		return !(debugger.WantDebug or cake.perry)			#expect "Program file doesn't contain debug info."
+		return !(debugger.WantDebug or cake.perry)			#EXPECT "Program file doesn't contain debug info."
 
 
 	function LoadLibAndGlobs (|message| PackInfo)

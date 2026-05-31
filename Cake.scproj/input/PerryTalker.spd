@@ -133,7 +133,10 @@ function Spdprocess.SendBreaks (|filewithdata| F, |bool| All=false)
 
 function debugger.file (|message| m, |FileWithData|)
 	opt norefcounts
-	return .FileMap[m.firstname]						#expect (m, "Can't find file")	
+	|| name = m.FirstName
+	|| f = .FileMap[name]
+		return f
+	error (XVar.printer|jbin|, "File " + name, 0)
 
 
 
@@ -242,14 +245,14 @@ function cakevm.StartStack (|string| name, |int| ErrorCode,  |jbin--|)
 
 
 
-function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata|)
+function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata?|)
 	opt norefcounts
 	|| Count = 0
 	while stack
 		|| err = .CheckStack(stack)
 		if err != nil			j.add(@tmp, err)
 			exit
-		|| File = .CollectStack(stack, j, Count)
+		|| File = .CollectStack(stack, j, Count)$
 		if ++count == 1
 			rz = file
 		Stack = .prev(stack)
@@ -257,7 +260,7 @@ function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata|)
 
 
 function cakevm.CheckStack (|cakestack| stack, |string?|)
-	if !Memory.Readable(Stack, 16):				return "StackCorrupt!"
+	if !Memory.Readable(Stack, 16):			return "StackCorrupt!"
 	if stack < .basestack:					return "StackUnderflow!"
 	|| Depth = stack.Depth - 1
 	|| Down = stack.DestReg
@@ -269,15 +272,17 @@ function cakevm.CheckStack (|cakestack| stack, |string?|)
 
 
 function jbin.SyntaxExpect (|string| s, |int64| Code)
-/	.Enter(@tmp, s)
+	.Start(@tmp, "Error")
+	.addstr(s)
 	.AddhInt(Code)
 	.exit
+	cake.Perry! <~ self
 
 
 
-function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData|)
+function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData?|)
 	opt norefcounts
-	|| index = .Index(Stack.Code)				#expect (j, "EscapedCode", stack.code|int64|)
+	|| index = .Index(Stack.Code)				#expect (j, "Escaped", stack.code|int64|)
 	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
 	
 	|| vars = debugger.VariablePrinter!
