@@ -15,19 +15,17 @@ extend SCFunction
 	
 	
 	function Message.SrcMap (|uint|)
+		opt inline
+		return .SrcMap2(.position)
+
+	
+	function Message.SrcMap2 (|int| Fake, |uint|)
 		// 11-bits for the file num, 21-bits for the position
 		// 2K files and 2MB per-file max
 		// File Num goes at the top, to make it more significant
 
 		|| FileNum = .tag|uint|>>5
-
-		target false
-			if compiler isnt textassembling
-				if (!Filenum or FileNum >= 300) and (.msgowningfunc isnt initfunc)
-					printline .objectid
-					printline self
-					debugger
-		return (FileNum << 21) ||| (.Position&(21~bits))
+		return (FileNum << 21) ||| (Fake&(21~bits))
 	
 	
 	function FatBetterPos (|fatasm| fat, |uint|)
