@@ -754,17 +754,23 @@ struct Assembler
 	function MissingReturn 
 		opt norefcounts
 		debugger !.fn.ASMReturn
-		|| dl = .fn.Source!.FlatLast
-		.CloseVars(1, dl)
+		|| arg = .fn.source!
+		if "abc".trap
+		|| Faked = arg.FakeReturnPos
+		|| old = arg.position
+		arg.Position = Faked
+		.CloseVars(1, arg)
 		ASMType.ReturnOpt(self, nil)
-		dl.RET.µRefCount = 1
+		|| fatret = arg.ret
+		fatret.µRefCount = 1
+		arg.Position = old
 
 	
 	function FinishASM 
 		opt norefcounts
+		.FinishMost
 		if (.FnLength <= 0) or !.last.IsFinisher
 			.MissingReturn
-		.FinishMost
 
 
 	function Guard

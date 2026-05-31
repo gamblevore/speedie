@@ -321,6 +321,13 @@ function @scfunction.TransformAll
 		f.Transform
 
 
+//function NeedsReturn (|message| arg)
+//	opt norefcounts
+//	|| last = arg.last
+//	if last.Blocks isnt return
+//		|| ret = arg.AddReturn // should happen always now?
+// does not work
+
 function Transform ()
 	opt norefcounts
 
@@ -332,13 +339,13 @@ function Transform ()
 	.SavedError = nil
 	|| StillOK = StdErr.Mark
 
-	|| n = .SourceArg						#require
-	|| Space = n.SCArg( self )				#require
+	|| arg = .SourceArg							#require
+	|| Space = arg.SCArg( self )				#require
 	
-	space.ProcessLinkage( n, FuncLinkageTable, self is wrapper )
+	space.ProcessLinkage( arg, FuncLinkageTable, self is wrapper )
 	if self Isnt Wrapper
 		|| r_z = Tran_Result( self )
-		Tran_All( self, n, space )
+		Tran_All( self, arg, space )
 		if r_z
 			Tran_ResultFinish( self, r_z, space )
 		parser.Using.Flags = 0
@@ -347,9 +354,9 @@ function Transform ()
 		.SavedError = StdErr.LastError
 		.Badness |= 1
 	  elseif (self is ConOrDes) and .IsARealSpdFunc
-		.CallParents // hehe 🥰
+		.CallParents					// hehe 🥰
 		.BuildConstructorDestructor
-		Tran_All( self, n, space )
+		Tran_All( self, arg, space )
 
 	scfunction.CurrFunc = nil
 	scmodule.curr = nil

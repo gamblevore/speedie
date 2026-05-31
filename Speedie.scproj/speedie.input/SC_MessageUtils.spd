@@ -520,6 +520,32 @@ function message.ExpectEmpty
 		error f
 
 
+function message.FakeReturnPos (|int|)
+	opt norefcounts
+	|| text = .OriginalParseData
+	|| Last = .FlatLast
+	|| after = last.After
+	while after <= 0 // what?
+		last = last.parent
+		if !last // welp
+			return -1
+		after = last.after
+
+	|| position = text.find(charset.Line, after)
+	if !position
+		position = after + 1
+	return position
+	
+	
+function message.AddReturn (|bool| NoSet=false, |message|)
+	opt norefcounts
+	parser.using.position = .fakereturnpos
+	|| ret = .msg(@tmp, "return")
+	if !NoSet
+		ret.ASMType = ASMType.kReturn
+	return ret	
+
+
 function message.IsAlwaysBool (|maybebool|)
 	opt norefcounts
 	|| d = .obj as SCDecl

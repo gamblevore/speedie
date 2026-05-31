@@ -514,8 +514,8 @@ function SCFunction.AddConstructorReturn2
 			args.first = macros.ConstructorNew.run(type)
 			|| prms = type.parent!
 			prms.asmtype = asmtype.krefcount
-		parser.using.position = args.FlatLast.position
-		args.msg(@tmp, "return") <~ (@thg, "self")
+
+		args.AddReturn(true) <~ (@thg, "self")
 	
 	  else
 		|| ret = .args.first
