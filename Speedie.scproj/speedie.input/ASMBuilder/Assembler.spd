@@ -755,7 +755,6 @@ struct Assembler
 		opt norefcounts
 		debugger !.fn.ASMReturn
 		|| arg = .fn.source!
-		if "abc".trap
 		|| Faked = arg.FakeReturnPos
 		|| old = arg.position
 		arg.Position = Faked
