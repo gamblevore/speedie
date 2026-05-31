@@ -558,7 +558,9 @@ class ListView (GUIControl) {
 			if (i.editingfor == self) and (s and !.InView(s))
 				.ClearEdits
 
-
+	function IsVisible (|ListViewRow!| s, |bool|)
+		disabled "Use .InView"
+		
 	function InView (|ListViewRow!| s, |bool|)
 		opt norefcounts
 		for r.fullyvisible in self
@@ -1442,7 +1444,11 @@ class ListView (GUIControl) {
 
 	
 	function ScrollStart (assigns:|listviewrow|)
-		if ._ScrollStart!=value
+		opt norefcounts
+		|| L = .ListSource
+		if !value
+			value = L.first
+		if (._ScrollStart!=value) and (L contains value)
 			._ScrollStart = value
 			.touch
 	

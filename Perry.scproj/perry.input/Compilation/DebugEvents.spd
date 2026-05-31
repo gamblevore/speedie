@@ -398,11 +398,14 @@ function perryide.TryReselectASM (|bool|)
 
 function perryide.ReselectASM
 	opt norefcounts
-	|| i = .editme.SelectedLine.Position
-	for s in .ASMView.ListSource
-		if !(s.name contains "JUMP: ") and (s.first.int >= i)
-			.ASMView.Select(s)
-			exit
+	|| AV = .ASMView
+	|| Sel = AV.FirstSelected
+	if sel and AV.InView(sel)
+		|| i = .editme.SelectedLine.Position
+		for s in AV.ListSource
+			if !(s.name contains "JUMP: ") and (s.first.int >= i)
+				AV.Select(s)
+				exit
 	
 	
 function perryide.HideASM
@@ -461,18 +464,19 @@ function perryide.GotASMError (|message| Error_List)
 
 
 function perryide.GotASMSub (|message| asm)
-	|ListViewRow| name = asm.first$
-	|| l = .ASMView
+	|ListViewRow--| name = asm.first$
+	|listview--| l = .ASMView
+	|| index = l.ScrollStart.Index
 	l.clear
 	|| src = l.ListSource
 	(name is AlignCenter)
 	src <~ name
-	|| arg = asm.last
+	|message--| arg = asm.last
 	if !arg.HasAny
 		l.AddFail "--(ASM Unavailable)--"
 	
 	|| n = 0
-	|message| file
+	|message--| file
 	for s in arg
 		if !s.name
 			(s|listviewrow| is separator)
@@ -484,7 +488,9 @@ function perryide.GotASMSub (|message| asm)
 			|| cpy = s.copy
 			src <~ cpy
 			cpy.obj = file.name
-
+	
+	l.ScrollStart = src[index]
+	
 	|| fs = FastString()
 	fs <~ name.name
 	file = arg.first
@@ -506,7 +512,6 @@ function SelectedASM (guilistevent)
 	|| i = .ide
 	require !i.DuringASMEvent
 	|| file = row.obj as string				#require
-	if keys.option 
 	|| f = row.first
 	|| n = f.int
 	i.DuringASMEvent = true
