@@ -1,0 +1,44 @@
+
+
+
+     					 		// Additions Beta //
+* Stepbackwards in code! This will kick ass. (take breakcount at old code-pos using resynced textview, and ask for position of the new code...)
+* Figure out why the entire string table keeps thrashing despite all my efforts
+	* shrink history https://passingcuriosity.com/2017/truncating-git-history/
+* Compression use gz? make my compression experimental...
+* Step into func... ignoring param funcs
+
+
+     					       	// Proper Release //
+* carrays :(
+	* structs work wierdly with carrays also. mat4 rows and stuff.
+	* my_mat4 *= somemat4() // should create tempstruct
+* CalledFrom datatypes too
+* To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
+
+
+							    // Additions Later //
+* Skinning support? .HelloKitty.spd or .emo.spd file endings could reskin the IDE dynamically.
+	* name.emo.scproj could tell speedie that to use .emo files.
+	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... that can't just be commented out.
+* Last 5 (or so) files in the file-tab area could be nice.
+* tile-editor. For fonts/animations. Uses alpha for SDF edges.
+* 3D SDF textures for game hit-detection. (maybe import some assets from a 35 year old racing game also)
+* 3-instruction static allocator instruction... good for modding
+* Once we do OpenCL... make Perry more creative, more and more creative. Left-brain activation.
+	* maybe offer shader functions for various things?
+
+
+					// Future ASM opts (more relaxing NOT do at release!) //
+* a pixel instruction to convert floats/ints so don't need knst+div+conv to turn a float into an int? with clamping too!
+* vector building seems quite large, for simple vecs.
+	* imagepixel opts... 
+* x = {v[1], v[2], v[3]} should auto-swizzle.
+	* .xy = .vec4.zw					// wz is just a vec2, can be copied in MEMCPY(8) instruction
+	* v[1] = 1.0						// should be single op
+* vector equality ASM...
+* LUPU/LUPD mini-opt in "while"
+* EQUL: r5, r0, r5, 48  +  JBOR: r5, 1, 1	// turn into a simpler thing. Like "if compiler is hungry"
+* hoisting
+* .position = Range.x					// unnecessary vget
+
