@@ -1124,7 +1124,9 @@ Date JB_File_Created ( JB_File* self ) {
 }
 
 
-bool JB_Str_IsOK(JB_String* Self);
+bool JB_Str_IsOK(JB_String* Self) {
+	return (Self != nil) and (Self != JB_Str__Error());
+}
 
 bool JB_File_Exists ( JB_String* self ) {
 	JB_String* Fixed = JB_File_PathFix(self);

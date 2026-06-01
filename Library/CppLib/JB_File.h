@@ -63,6 +63,7 @@ JB_File* JB_File__StdOut( );
 bool JB_File_IsPipe(JB_File* self);
 int JB_File_MoveTo(JB_File* self, JB_String* New);
 
+bool JB_Str_IsOK(JB_String* Self);
 bool JB_File_Exists( JB_String* self );
 Date JB_File_Accessed( JB_File* self );
 Date JB_File_Modified( JB_File* self );
