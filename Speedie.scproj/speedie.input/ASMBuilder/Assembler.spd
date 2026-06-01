@@ -762,14 +762,8 @@ struct Assembler
 		ASMType.ReturnOpt(self, nil)
 		|| fatrat = arg.ret
 		fatrat.µRefCount = 1
-		arg.Position = old
-
-	
-	function FinishASM 
-		opt norefcounts
-		.FinishMost
-		if (.FnLength <= 0) or !.last.IsFinisher
-			.MissingReturn
+		fatrat.ASMIndex = Breakable
+		arg.Position = old		
 
 
 	function Guard

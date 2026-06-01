@@ -537,8 +537,9 @@ function message.FrenchSpyReturn (|int| file=0, |int|) // naturally!
 
 	|| position = text.find(charset.Line, after)
 	if !position
-		position = after + 1
-	return position
+		position = after
+	return position + 1
+	// aka "invisible return"
 	
 	
 function message.AddReturn (|bool| NoSet=false, |message|)

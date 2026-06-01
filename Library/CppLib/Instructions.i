@@ -6,7 +6,7 @@
 	0
 ;
 	else
-	CakeCrashed(&vm, SIGKILL)
+	CakeCrashed(&vm, SIGILL)
 ;
 	return &vm.Registers[2].Ivec;
 ı TAIL:;

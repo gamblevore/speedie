@@ -49,7 +49,7 @@ class XType
 
 			for T in .types
 				|| P = T.msg.Second
-					P.xvariables(nil, T.properties)
+					P.LoadXVars(nil, T.properties)
 		
 		
 		function LoadTypesSub (|message| list)

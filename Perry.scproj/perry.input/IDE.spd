@@ -7,6 +7,7 @@ class PerryIDE (Window)
 	|SpdProcess?|				Feedback
 	|UnixProcess?|				compilr
 	|UnixProcess?|				RunningProd
+	|message?|					LastCakeError
 	|UnixProcess?|				Talker				// for app.say
 	|date|						DelayedRun
 
@@ -15,13 +16,13 @@ class PerryIDE (Window)
 	|FileViewer|				FileList
 
 	|listview|					Stack
-	|guiControl|				Debugger
+	|GuiControl|				Debugger
 
 	|textview|					AppInfo
-	|Guicontrol|				DebugBtns
-	|Guicontrol|				SearchArea
-	|Guicontrol|				rborder
-	|guicontrol|				CompileArea
+	|GuiControl|				DebugBtns
+	|GuiControl|				SearchArea
+	|GuiControl|				rborder
+	|GuiControl|				CompileArea
 	
 	|listviewrow?|				SharedProjectTabSource
 	|File|						Project				// merge this and SharedProjectTabSource?

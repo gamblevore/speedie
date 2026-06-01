@@ -1,25 +1,25 @@
 
 
 // MiniOptimisations, miniopts, optimize
-function Assembler.FinishMost
-	|| A = .Curr
+function Assembler.FinishASM
+	|| Last = .Last
 	|| S = .FuncStart
 	|| Length = 0
 	
 	target debug
 		|ASM[4]| TestSpace
-		
-	while A > S
+	
+	while Last >= S
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish
-			.AskNop(s)			// doing it on ALL of them... has issues. I guess the refcounts arent perfect yet.
+			.AskNop(s)					// doing it on ALL of them... has issues. I guess the refcounts arent perfect yet.
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC
 			.TryTail(s)
 		  elseif op == asm.addb
-			s.AddBFix(A)
+			s.AddBFix(Last)
 
 		|| Predicted = s.guesssize
 		length += Predicted
@@ -28,17 +28,22 @@ function Assembler.FinishMost
 			|| Start = &TestSpace[0]
 			|| After = s.µBakeInto(Start, start+4)
 			|| Actual = After - Start
-			if Actual != Predicted // uugh		
+			if Actual != Predicted		// uugh		
 		S++
+
+	if (length <= 0) or !Last.IsFinisher
+		.MissingReturn
+		Length++
 		
 	.out.µASMLength = Length
 
 
-function fatasm.AddBFix (|&fatasm| after)
+
+function fatasm.AddBFix (|&fatasm| Last)
 	// addb(x,0)
 	|| n = self
 	require (.p1 == 0)
-	while (++n < after)
+	while (++n <= Last)
 		require (n.BasicBlock == .BasicBlock)
 		|| op = n.op
 		if op != asm.noop and asm.addb and asm.mark

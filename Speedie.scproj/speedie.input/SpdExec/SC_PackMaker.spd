@@ -197,7 +197,7 @@ module PackMaker
 					(low min= r[0])
 					(high max= r[1])				// unnecessary now we unlocked the spy?? write a test maybe...
 			|| after = src.FrenchSpyReturn(file)
-/				(high max= after)
+				(high max= after)
 		if !high									// oof
 			low = 0
 		return (low, high, file)

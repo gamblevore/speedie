@@ -466,8 +466,7 @@ autogen TextView.ClearActiveLine
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
 	opt norefcounts
 	opt min 3
-	if keys.Shift and self ~= "editme"
-	|| GoUp = (7 - .lineheight)/2
+	|| GoUp = (7 - .lineheight) / 2
 	if d.LineError
 		if .MyError
 			.DrawErrorBackground(where, y + GoUp, d)
@@ -485,7 +484,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 			|| str = m.firstname
 				|| x = .LastRight - (.gnormal.width(str) + 10)
 				where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
-		  elseif m.indent&1
+		  elseif (m.indent&1)
 			if (d isnt reached)
 				unreached = true
 

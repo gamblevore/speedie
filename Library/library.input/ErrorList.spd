@@ -276,7 +276,7 @@ extend File
 
 
 extend faststring
-	syntax expect
+	syntax Expect
 		opt norefcounts
 		cpp_part Fail
 		inlined

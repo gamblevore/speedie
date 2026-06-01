@@ -23,6 +23,9 @@ function CakeTalk (|SpdProcess| Cake)
 			.GotHello(msg.name)
 		  elseif msg ~= "breakpoint"
 			.SetBreaks(msg)
+		  elseif msg ~= "error"
+			.LastCakeError = msg
+			.SetAppInfo
 		  else
 			Notifications <~ ("unrecognised message", msg)
 
@@ -153,6 +156,14 @@ function AppInfoWrite (|faststring| fs, |message| info, |string| extra)
 	if mem
 		fs <~ "\n"
 		mem.StrSize(Fs)
+	
+	|| err = .LastCakeError
+		fs <~ "\nVM Error: "
+		fs <~ err.firstname
+		|| errnum = err.second.int
+			fs <~ ' '
+			fs <~ errnum
+		
 
 
 function SetAppInfo

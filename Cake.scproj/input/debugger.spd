@@ -15,6 +15,7 @@ module debugger
 	|bool|				WantDebug
 	|bool|				BreakMapBad
 	|faststring|		VariablePrinter
+	|faststring|		ErrorPrinter
 	
 	constants
 		BreakRealBit		= 1<<30
@@ -218,7 +219,7 @@ module debugger
 			
 		if !.BreakMapBad
 			.BreakMapBad = true
-			printerror "BreakMap out of range"
+			printerror "BreakMapBad"
 	
 
 	function Path (|int| i, |filewithdata|)
@@ -226,7 +227,7 @@ module debugger
 		|| f = .FileList[i]
 		if f != nil				// what if i == 0? is that an output error? What about lib-internal code? like init-code?
 			return f
-		expect ("MissingFile " + i)
+		debugger.senderror("MissingFile", i)
 
 
 	function StartUp (|&uint|)

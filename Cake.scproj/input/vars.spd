@@ -36,10 +36,6 @@ class XVar (list)
 			if s.Position < After
 				x = s.hint
 			.Weirdness[i] = x
-
-	function Close (|int| Pos)
-		expect (self) ("Bad close var index")
-		.CodeEnd = pos
 	
 	syntax is (|xvarflags| V, |bool|)
 		return .flags&V
@@ -495,10 +491,10 @@ function message.xvariables (|[xvar]|)
 	cpp_part xvar0
 	if self
 		|xvar[32]| Regs
-		.xvariables(Regs, rz)
+		.LoadXVars(Regs, rz)
 
 
-function message.xvariables (|?&xvar| Registers, |[xvar]| out)
+function message.LoadXVars (|?&xvar| Registers, |[xvar]| out)
 	opt norefcounts
 	cpp_part xvar
 	|| input = xtype.shared
@@ -517,7 +513,8 @@ function message.xvariables (|?&xvar| Registers, |[xvar]| out)
 		if input.Position >= ReadEnd					// Close
 			expect (OK) (self, "CloseOutRange: " + reg)
 			expect (Registers) (self, "BadRegClose: " + reg)
-			Registers[reg].Close(pos)
+			|| r = Registers[reg] #expect (self, "BadRegClose: " + reg)
+			R.CodeEnd = pos
 		  else
 			expect (OK) (self, "OpenOutRange: " + reg)
 			|| var = xvar(input, pos, reg, ReadEnd)

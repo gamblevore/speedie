@@ -136,8 +136,24 @@ function debugger.file (|message| m, |FileWithData|)
 	|| name = m.FirstName
 	|| f = .FileMap[name]
 		return f
-	error (XVar.printer|jbin|, "File " + name, 0)
+	
+	.SendError("MissingFile", name, 0)
 
+
+function debugger.SendError (|string| kind, |string?| value=nil, |int| Number=0)
+	opt norefcounts
+	|| j = .ErrorPrinter|jbin|
+	if !j
+		j = FastString()
+		.ErrorPrinter = j
+	j.Start(@tmp, "Error")
+	j.AddStr(kind)
+	if value != nil
+		j.AddStr(value)
+	if Number != 0
+		j.AddhInt(Number)
+	j.exit
+	cake.perry! <~ j
 
 
 function cakevm.Func (|cakestack| stack, |spdfunc|)
@@ -266,24 +282,23 @@ function cakevm.CheckStack (|cakestack| stack, |string?|)
 	|| Down = stack.DestReg
 	if !Down or Down > 31:					return "StackBad!"
 	Stack -= Down + 1
-	if stack.Depth>Depth:					return "StackTripped!"
+	if stack.Depth > Depth:					return "StackTripped!"
 	return nil
 
 
 
 function jbin.SyntaxExpect (|string| s, |int64| Code)
-	.Start(@tmp, "Error")
+	.enter(@tmp, "Error")
 	.addstr(s)
 	.AddhInt(Code)
 	.exit
-	cake.Perry! <~ self
 
 
 
 function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData?|)
 	opt norefcounts
-	|| index = .Index(Stack.Code)				#expect (j, "Escaped", stack.code|int64|)
-	|| fn = spdtable.Find(index)				#expect (j, "MissingFunc", index)
+	|| index = .Index(Stack.Code)				#expect (j, "Code pointer escaped", stack.code|int64|)
+	|| fn = spdtable.Find(index)				#expect (j, "No function found at code: ", index)
 	
 	|| vars = debugger.VariablePrinter!
 	{

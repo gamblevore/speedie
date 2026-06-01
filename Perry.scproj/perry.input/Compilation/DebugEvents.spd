@@ -215,6 +215,7 @@ function PerryIDE.ClearRun
 	.DebugMode = CompileMode.Finished
 	.RunButton.text = "\02"
 	.DelayedRun = nil
+	.lastcakeerror = nil
 	.SetAppInfo
 	.RunningProd = nil
 	.editme.ClearActiveLine
@@ -264,6 +265,7 @@ function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active)
 	if Active
 		|| file_path = row.first
 			file_path.Position = where
+			file_path.Indent |= 1
 		.editme._ActiveLine = file_path
 
 	|| Line = .editme.Show(where)

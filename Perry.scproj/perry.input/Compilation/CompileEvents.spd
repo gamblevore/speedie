@@ -17,8 +17,6 @@ function perryide.WantCake (|CompileMode| Mode, |compilemode|)
 				(mode isnt cakemode)
 			  else
 				Notifications <~ "Unrecognised compile mode: " + req.name
-		if keys.Shift
-			Mode ^= CompileMode.CakeMode
 	  else
 		.DebugArgsText.SetFocus
 		notifications <~ "Please fix the debug args first."
