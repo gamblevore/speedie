@@ -297,8 +297,8 @@ function jbin.SyntaxExpect (|string| s, |int64| Code)
 
 function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData?|)
 	opt norefcounts
-	|| index = .Index(Stack.Code)				#expect (j, "Code pointer escaped", stack.code|int64|)
-	|| fn = spdtable.Find(index)				#expect (j, "No function found at code: ", index)
+	|| index = .Index(Stack.Code)				#expect (j, "Code pointer escaped",			stack.code|int64|)
+	|| fn = spdtable.Find(index)				#expect (j, "No function found at code: ",	index)
 	
 	|| vars = debugger.VariablePrinter!
 	{
