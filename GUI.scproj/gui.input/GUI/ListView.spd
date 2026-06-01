@@ -503,7 +503,7 @@ class ListView (GUIControl) {
 
 	function EnableDrag
 		.OnDragRow = nil 
-		if .istree
+		if !.istree
 			.ondragrow = &BasicRowDrag
 	
 
@@ -807,7 +807,7 @@ class ListView (GUIControl) {
 				.SelectNone
 			return MouseDragging.handled
 		
-		|| l = lc.row
+		|| L = lc.row
 		if L is Separator
 			return MouseDragging.handled
 			
@@ -823,9 +823,9 @@ class ListView (GUIControl) {
 			  else
 				.Select(L)
 
-		if (!.istree and .OnDragRow and l is editable)
+		if (!.IsTree  and  .OnDragRow  and  l is editable)
 			.DraggingRowFrom = L
-			._draggingrowto = nil
+			._DraggingRowTo = nil
 			return MouseDragging.Within
 		return MouseDragging.handled
 	
