@@ -1124,21 +1124,33 @@ Date JB_File_Created ( JB_File* self ) {
 }
 
 
+bool JB_Str_IsOK(JB_String* Self);
+
 bool JB_File_Exists ( JB_String* self ) {
-    uint8 Tmp[PATH_MAX];
-	auto tmp = (const char*)JB_FastFileString(self, Tmp);
-	int err = access(tmp, 0);
-	if (!err)
-		return true;
-	if (errno == ENOENT) {
-		if (!JB_File_IsLink(self))
-			return false;
-		errno = EMLINK; // no broken link errno!
-		JB_ErrorHandleFile(self, nil, EMLINK, "broken link", "testing the existance of");
+	JB_String* Fixed = JB_File_PathFix(self);
+	bool Result = false;
+	if (!JB_Str_IsOK(Fixed)) {
+		; // 
 	} else {
-		ErrorHandle_(err, self, nil, "testing the existance of");
+		uint8 Tmp[PATH_MAX];
+		auto tmp = (const char*)JB_FastFileString(Fixed, Tmp);
+		int err = access(tmp, 0);
+		if (!err) {
+			Result = true;
+		} else {
+			if (errno == ENOENT) {
+				if (JB_File_IsLink(Fixed)) {
+					errno = EMLINK; // no broken link errno!
+					JB_ErrorHandleFile(self, nil, EMLINK, "broken link", "testing the existance of");
+				}
+			} else {
+				ErrorHandle_(err, self, nil, "testing the existance of");
+			}
+		}
 	}
-	return false;
+	if (Fixed!=self)
+		JB_FreeIfDead(Fixed);
+	return Result;
 }
 
 
