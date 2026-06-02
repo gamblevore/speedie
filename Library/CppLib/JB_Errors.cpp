@@ -123,9 +123,7 @@ int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char
 		return 0;
 	JB_String* Desc = Desc_(self, other, errnum, DefaultErr, op, verb);
 	JB_String* Path = Path_(self);
-	extern JB_Class JB_ErrorData;
-	JB_Error* Err = (JB_Error*)JB_NewClass(&JB_ErrorData);
-	JB_Err_Constructor(Err, 0, Desc, Severity, Path);
+	auto Err = JB_Err_Constructor(nil, 0, Desc, Severity, Path);
 	JB_Rec_AppendErr(nil, Err);
 
     return errnum;

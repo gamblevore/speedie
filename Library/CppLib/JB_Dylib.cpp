@@ -11,7 +11,9 @@ extern "C" void* JB_dylib_Load (JB_Dylib* Self, JB_String* Name) {
 		return dlsym(Self->handle, (const char*)(Name->Addr));
 	}
     uint8 Buffer[PATH_MAX];
-    NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( Name, Buffer );
+    char* tmp = (char*)JB_FastFileString( Name, Buffer );
+    if (!tmp)
+		return 0;
 	return dlsym(Self->handle, tmp);
 }
 
@@ -23,7 +25,9 @@ extern "C" void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode) {
 		return;
 	}
     uint8 Buffer[PATH_MAX];
-    NativeFileChar2* tmp = (NativeFileChar2*)JB_FastFileString( Path, Buffer );
+    char* tmp = (char*)JB_FastFileString( Path, Buffer );
+    if (!tmp)
+		return;
 	Self->handle = dlopen(tmp, Mode);
 }
 

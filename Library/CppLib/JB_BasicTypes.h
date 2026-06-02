@@ -68,18 +68,6 @@ typedef u32						CodePoint;
 typedef int64					Date;
 
 
-
-#ifdef TARGET_WIN32
-	#define NativeFileChar u16
-	#define NativeFileChar2 u16
-	#define NFS_ L
-#else
-	#define NativeFileChar uint8
-	#define NativeFileChar2 char
-	#define NFS_ 
-#endif
-
-
 #if _WIN64 || __x86_64__ || __ppc64__ || _M_ARM64 || __powerpc64__ || __ppc64__ || _ARCH_PPC64 || __ia64 || _M_IA64 || __aarch64__
     #define ENV64BIT
 #else
