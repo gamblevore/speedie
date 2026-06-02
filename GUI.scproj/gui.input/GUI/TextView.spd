@@ -7,8 +7,8 @@ class TextView (GUIControl)
 	|byte|						SingleLine
 
 	|bool|						GroupSaveAll		// needs a better name... not sure what.
-	|byte|						LineHeight
 	|bool|						IsALogTextView		// Is this textview used for displaying a Log.
+	|byte|						LineHeight
 	|int8|						YAdjust
 	|MoveCode|					Alignment			// centered, left, right
 
@@ -28,6 +28,7 @@ class TextView (GUIControl)
 	|int|						_RemainingHeight
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
+	|bool|						_DimUnReachedLines
 	|message?|					_ActiveLine
 	|TextViewLine|				_Start
 	|ivec3|						_Reclaim		

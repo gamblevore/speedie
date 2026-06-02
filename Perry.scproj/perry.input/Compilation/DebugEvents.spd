@@ -219,6 +219,7 @@ function PerryIDE.ClearRun
 	.SetAppInfo
 	.RunningProd = nil
 	.editme.ClearActiveLine
+	.editme.ClearDebugInfo
 	.stack.clear
 	
 		
@@ -265,7 +266,7 @@ function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active)
 	if Active
 		|| file_path = row.first
 			file_path.Position = where
-			file_path.Indent |= 1
+		.editme._DimUnReachedLines = true
 		.editme._ActiveLine = file_path
 
 	|| Line = .editme.Show(where)

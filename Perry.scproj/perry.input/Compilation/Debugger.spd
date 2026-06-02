@@ -14,7 +14,7 @@ function CakeTalk (|SpdProcess| Cake)
 
 	if msg ~= "run"
 		.DelayedRun = date.now
-		.UpdateDebugButtons		//(true)
+		.UpdateDebugButtons
 	  else
 		.DelayedRun = nil
 		if msg ~= "stack" or "break" or "crash"
@@ -37,12 +37,10 @@ function SetBreaks (|message| breaks)
 	require file ~= .editme.FilePath
 
 	|| All = breaks.second.int
+		.editme._DimUnReachedLines = true
 		for l.lines in .editme
 			(l isnt ActiveBreakPoint)
 			(l isnt reached)
-		|| active = .editme._ActiveLine
-			active.indent |= 1
-		// so what do we do with this? we want to set the textview as having... nothing!
 
 	for line in breaks.last
 		|| Pos = line.second.int

@@ -456,11 +456,16 @@ libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |int|)
 autogen TextView.ClearActiveLine
 	opt norefcounts
 	|| m = ._Activeline
-		m.indent = 0
+/		m.indent = 0
 		._ActiveLine = nil
+
+
+autogen TextView.ClearDebugInfo
+	opt norefcounts
+	._DimUnReachedLines = false
+	|| f = ~(TextLineFlags.ActiveBreakPoint|||TextLineFlags.reached)
 	for l.lines in self
-		(l isnt ActiveBreakPoint)
-		(l isnt reached)
+		l.textstate	&= F
 
 
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
@@ -474,7 +479,6 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 			d.LineError = nil								// sigh. crappy bug fix
 
 	|| m = ._ActiveLine
-	|| UnReached = false
 	if (m and m ~= .filepath)
 		if d contains m.Position
 			|| bg = ¥.ActiveTextLine
@@ -484,9 +488,6 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 			|| str = m.firstname
 				|| x = .LastRight - (.gnormal.width(str) + 10)
 				where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
-		  elseif (m.indent&1)
-			if (d isnt reached)
-				unreached = true
 
 	(d isnt Selected)
 	if .CanDrawSelected(d)									// linelight
@@ -527,7 +528,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 				yadd = 3
 				c = '.'
 				col = SpaceDisplay
-			  elseif UnReached
+			  elseif (d isnt reached) and ._DimUnReachedLines
 				col.a /= 2
 			state.font.DrawChar(c, Where, (x, y+yadd), col, 1)
 		prev = c
