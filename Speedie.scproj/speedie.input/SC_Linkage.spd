@@ -59,7 +59,8 @@ module Linkage
 				print node.OriginalFilePath
 				print "' to: "
 				printline path
-			feedback.SetOutputPath path
+			if !options.HideawayScripts
+				feedback.SetOutputPath path
 
 		arg.ConfTake(.flagz, "flags")
 		arg.ConfTake(.osxframeworks, "frameworks")

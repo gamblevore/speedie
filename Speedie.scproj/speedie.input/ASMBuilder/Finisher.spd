@@ -2,13 +2,16 @@
 
 // MiniOptimisations, miniopts, optimize
 function Assembler.FinishASM
+	if (.FnLength <= 0) or !.Last.IsFinisher
+		.MissingReturn
+
 	|| Last = .Last
 	|| S = .FuncStart
 	|| Length = 0
 	
 	target debug
 		|ASM[4]| TestSpace
-	
+
 	while Last >= S
 		|| op = s.op
 		if op == asm.knst
@@ -17,7 +20,8 @@ function Assembler.FinishASM
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC
-			.TryTail(s)
+			if s < last
+				.TryTail(s)
 		  elseif op == asm.addb
 			s.AddBFix(Last)
 
@@ -30,10 +34,6 @@ function Assembler.FinishASM
 			|| Actual = After - Start
 			if Actual != Predicted		// uugh		
 		S++
-
-	if (length <= 0) or !Last.IsFinisher
-		.MissingReturn
-		Length++
 		
 	.out.µASMLength = Length
 
@@ -50,8 +50,7 @@ function fatasm.AddBFix (|&fatasm| Last)
 			._op = asm.noop
 			n.ASMIndex |= .ASMIndex // actually .breakrequest
 			return
-	
-	
+
 
 
 function assembler.TryTail (|fatasm| FNC)

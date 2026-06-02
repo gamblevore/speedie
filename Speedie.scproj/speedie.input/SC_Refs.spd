@@ -181,7 +181,7 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
 		Touse = ToUse.FlatLast
 	using ToUse
 	if place == @arg
-/		parser.using.position = touse.FrenchSpyReturn
+		parser.using.position = touse.FrenchSpyReturn
 		
 	|message| what
 	if basis & kBasisCArray

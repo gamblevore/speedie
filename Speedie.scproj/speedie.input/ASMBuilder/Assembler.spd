@@ -760,7 +760,7 @@ struct Assembler
 		arg.Position = Faked
 		.CloseVars(1, arg)
 		ASMType.ReturnOpt(self, nil)
-		|| fatrat = arg.ret
+		|| FatRat = arg.ret
 		fatrat.µRefCount = 1
 		fatrat.ASMIndex = Breakable
 		arg.Position = old		
@@ -798,7 +798,7 @@ function assembler.RootGen (|scfunction| fn)
 	asmtype.ArgumentSub(self, fn.SourceArg!, nil)
 
 
-function Assembler.Rework (|SCFunction| fn, |bool|)
+function Assembler.Rework (|SCFunction| fn)
 	HoistSpace.NeedSpare(.FnLength)
 	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 
