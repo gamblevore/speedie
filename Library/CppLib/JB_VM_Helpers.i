@@ -486,17 +486,13 @@ VMOpt void CompF (CakeRegister* r, ASM Op) {
 }
 
 
-inline uint64 clip (uint64 x, uint64 s) {
-	s = 64 - (1<<s);
-	return (x << s) >> s;
-}
-
-
 VMOpt uint64 BitComp (CakeRegister* r, ASM Op) {
 	auto i = CmpI_Cmpu;
-	auto A = clip(u2, (i >> 1)&7);
-	auto B = clip(u3, (i >> 4)&7);
-	return (A!=B) xor (i&1);
+	auto sA = 64 - (8<<(i&3));
+	auto sB = 64 - (8<<((i >> 2)&3));
+	auto A = (u2 << sA) >> sA;
+	auto B = (u3 << sB) >> sB;
+	return (A==B);
 }
 
 

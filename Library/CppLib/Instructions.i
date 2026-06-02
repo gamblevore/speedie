@@ -112,19 +112,6 @@
 	u1 = u2 | AddK_Ki;
 ı BXRK:;
 	u1 = u2 ^ AddK_Ki;
-ı EQUL:;
-	u1 = BitComp(r, Op);
-ı TERN:;
-	if (u2)
-	r[n1] = r[n3]
-;
-	else
-	r[n1] = r[n4]
-;
-ı CMPI:;
-	CompI(r, Op);
-ı CMPF:;
-	CompF(r, Op);
 ı JUMP:;
 	Code += Jump_JUMPi;
 ı JMPI:;
@@ -159,6 +146,21 @@
 	if (ii1-- > ii2)
 	Code += Loop_Jmpi
 ;
+ı EQUL:;
+	u1 = BitComp(r, Op);
+ı NQUL:;
+	u1 = !BitComp(r, Op);
+ı TERN:;
+	if (u2)
+	r[n1] = r[n3]
+;
+	else
+	r[n1] = r[n4]
+;
+ı CMPI:;
+	CompI(r, Op);
+ı CMPF:;
+	CompF(r, Op);
 ı RALO:;
 	o1 = alloc(o2);
 ı RFUN:;

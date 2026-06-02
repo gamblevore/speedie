@@ -130,7 +130,11 @@ extend Assembler
 				|| B2 = .AlreadyABool(R, L)
 					return B2
 			dest = .TempTyped(TypeBool!.TypeNormal, dest)
-			return exp.EQUL(dest, L, R, negate.EqulMode(l,r)) * dest
+			|| Mode = L.EqulClip ||| (R.EqulClip << 2)
+			|| fat = exp.EQUL(dest, L, R, Mode)
+			if negate
+				fat._op = asm.NQUL
+			return fat * dest
 
 		if  r is Const  and  l isnt Const
 			swap (l) (r)

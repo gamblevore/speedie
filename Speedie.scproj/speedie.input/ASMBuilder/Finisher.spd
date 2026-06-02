@@ -1,7 +1,8 @@
 
 
-// MiniOptimisations, miniopts, optimize
-function Assembler.FinishASM
+// MiniOptimisations, miniopts, optimize, finishmost 
+function Assembler.FinishASM 
+	if "AndOrTest".trap
 	if (.FnLength <= 0) or !.Last.IsFinisher
 		.MissingReturn
 
@@ -16,7 +17,27 @@ function Assembler.FinishASM
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish
-			.AskNop(s)					// doing it on ALL of them... has issues. I guess the refcounts arent perfect yet.
+//			.AskNop(s) // this is not good for consts even
+			// breaks andortest...
+			// so we need some kind of phinode.
+			// i don't really want to do that.
+			// can we check if this const is used by looking at the ASM?
+			// using the blockparent map thing?
+			// if we are going linearly forward... that makes it easier
+			// but we don't know when a var opens or closes.
+			// so r4 can mean multiple variables.
+			// loops make it more tricky. Something can be used by something behind it...
+			// I think we need some kind of graphing data-structure?
+			// each thing can be used by multiple things...
+			// and each thing can use multiple things...
+			// even if we only track the "things that we use"...
+			// thats not so simple.
+			// each open/close var... (for args mostly, including if/while)...
+			// could keep track of what decls are open... and what fats made those registers
+			// then each time it is used... we track back the fats. (maybe using RegFile to help.)
+			// nopping isnt so fun then... if its separate... it should be on the fat
+			// but theres no more space. unless I wanna go to 128-bytes.
+			// leave this for now... its not so easy.
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC

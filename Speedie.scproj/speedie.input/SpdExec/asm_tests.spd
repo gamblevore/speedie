@@ -98,7 +98,7 @@ function Uint64Trim (|uint64|)
 	return UintOnly()
 
 
-function AndOrTest (|int| a, |int| b, |bool| c, |string| Curr,  |int|)	/// Active ///
+function AndOrTest (|int| a, |int| b, |bool| c,  |int|)	/// Active ///
 	opt norefcounts
 	visible
 	|| five = 5, || min = -1

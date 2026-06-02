@@ -533,24 +533,6 @@ POS 5
 
 
 
-#!						 (((((MiniCompare)))))
-// maybe good to get a comparison vs a const? do later...
-/**/ EQUL  (CmpI)
-		u1 = BitComp(r, Op)
-
-/**/ TERN  (TERN)
-		if (u2) // needs a shift
-			r[n1] = r[n3]
-		else
-			r[n1] = r[n4]
-
-/**/ CMPI  (CmpI)
-		CompI(r, Op)
-
-/**/ CMPF  (CmpF)
-		CompF(r, Op)
-
-
 
 #!						 (((((Branches)))))
 /**/ JUMP (jump)
@@ -596,6 +578,27 @@ POS 5
 /**/ LUPD  (Loop)
 		if (ii1-- > ii2)
 			Code += Loop_Jmpi
+
+
+#!						 (((((MiniCompare)))))
+// maybe good to get a comparison vs a const? do later...
+/**/ EQUL  (CmpI)
+		u1 = BitComp(r, Op)
+
+/**/ NQUL  (CmpI)
+		u1 = !BitComp(r, Op)
+
+/**/ TERN  (TERN)
+		if (u2) // needs a shift
+			r[n1] = r[n3]
+		else
+			r[n1] = r[n4]
+
+/**/ CMPI  (CmpI)
+		CompI(r, Op)
+
+/**/ CMPF  (CmpF)
+		CompF(r, Op)
 
 
 

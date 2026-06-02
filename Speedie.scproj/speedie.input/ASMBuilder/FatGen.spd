@@ -144,6 +144,7 @@ function message.GRAB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 
 function message.RET (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 	visible
+	if "andortest".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RET, self)
 	rz.reginput(0) = r1
@@ -477,51 +478,6 @@ function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fa
 }
 
 
-function message.EQUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.EQUL, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Cmp
-	rz.dest(0, r1, a)
-}
-
-
-function message.TERN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.TERN, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = Small
-	rz.dest(0, r1, a)
-}
-
-
-function message.CMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.CMPI, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Cmp
-	rz.dest(0, r1, a)
-}
-
-
-function message.CMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
-	visible
-	|| a = assembler.sh
-	rz = a.RequestOp(asm.CMPF, self)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Cmp
-	rz.dest(0, r1, a)
-}
-
-
 function message.JUMP (|int| JUMP = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -695,6 +651,62 @@ function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Small = nil, 
 		error (self, `Jumped too far`)
 	}
 
+	rz.dest(0, r1, a)
+}
+
+
+function message.EQUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.EQUL, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Cmp
+	rz.dest(0, r1, a)
+}
+
+
+function message.NQUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.NQUL, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Cmp
+	rz.dest(0, r1, a)
+}
+
+
+function message.TERN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.TERN, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Small
+	rz.dest(0, r1, a)
+}
+
+
+function message.CMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.CMPI, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Cmp
+	rz.dest(0, r1, a)
+}
+
+
+function message.CMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.CMPF, self)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Cmp
 	rz.dest(0, r1, a)
 }
 

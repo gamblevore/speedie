@@ -145,7 +145,7 @@ datatype ASMReg (uint64)
 		|| f = .fatindex.fat
 			return f
 		error "anorexic register"
-		return Assembler.sh.zero
+		return Assembler.sh.Start
 	
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M
@@ -172,17 +172,14 @@ datatype ASMReg (uint64)
 	function IsVec (|bool|)
 		return self|datatypecode| & 0x03
 	
-	function Clip (|int|)
-		if .isbool or !.reg
+	function EqulClip (|int|)
+		if !.reg
 			return 0
-		return 3 + self|datatypecode|.ByteShift
-
-	function bool.EqulMode (|asmreg| L, |asmreg| R, |int|)
-		rz = self|int| xor 1
-		rz |= L.clip << 1
-		rz |= R.clip << 4
+		return self|datatypecode|.ByteShift
 
 	function uint.EqulInputsAreBothBool (|bool|)
+		// we don't actualy know if something is a bool now... not based on the input
+		// only 5 bits remain, split into 2,2,1
 		return (self >> 1) == 0	
 	
 	function IsBig (|bool|)
