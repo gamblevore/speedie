@@ -78,9 +78,9 @@ function message.GoodArgName (|bool| NeedName=false, |string|)
 	return name
 	
 
-function message.SmartName (assigns:|string|)
-	if .name != value
-		.name = value // save memory for often generated strings
+//function message.SmartName (assigns:|string|)
+//	if .name != value
+//		.name = value // save memory for often generated strings
 	
 	
 function message.GoodArgNameSub (|string|)

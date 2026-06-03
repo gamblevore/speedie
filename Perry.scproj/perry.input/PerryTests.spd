@@ -1,8 +1,0 @@
-// nothing here...
-// just some tests!
-
-function TestVec (|ivec2| V)
-	visible
-	v.x = V.Width
-
-

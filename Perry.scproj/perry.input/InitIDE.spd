@@ -796,7 +796,7 @@ extend PerryIDE
 				|| str = .PathExpand(ro.name)
 					f.addroot(str.file)
 				  else
-/					error (ro, "Can't find this project root. Please fix this path.")
+					error (ro, "Can't find project root. Please fix this path.")
 		
 		f.CheckSize
 		error.BackupErrorSource = nil

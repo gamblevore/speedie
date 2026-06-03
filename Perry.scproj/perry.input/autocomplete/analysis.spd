@@ -40,9 +40,9 @@ function message.FuncAtPos (|int| n, |message|)
 
 function PerryIDE.FindSelectedMenuItem (|message| result)
 	opt norefcounts
-	require result.hasany
-	|| fn = result.FuncAtPos(.editme.selrange.x)
-	.FunctionMenu.SubMenu!.select(result)
+	if result.hasany
+		result.FuncAtPos(.editme.selrange.x)
+		.FunctionMenu.SubMenu!.select(result)
 
 
 function string.FuncListSep (|string|)

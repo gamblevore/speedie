@@ -252,8 +252,9 @@ function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
 	fs <~ (' ', 6 - fs.LengthUTF8)
 	.PerryAppendMsg("", 3)
 	
-// DebugHideUnderscore
-
+// DebugHideFeminism
+// BoysNeedToDefeatTheMatriarchy
+// tbh it kinda defeated itself... but whatever.
 
 function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	opt norefcounts
@@ -337,7 +338,6 @@ function PerryStackEditCell (GUIListEditEvent)
 		if value==nil
 			return field.name
 		field.name = value
-//		row.ImproveVar(0, false) // not sure about this. Remove this line?
 		.ide.DebugEditVar(row, value)
 	
 	
