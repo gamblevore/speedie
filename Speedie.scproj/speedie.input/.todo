@@ -40,37 +40,15 @@ class-changes:
 
 
 Additions:
-	* vargs could really shrink faststring compile-size, which expands "abc $d e $f $g h" a lot.
-		* the string could be compiled like "{typ1}{len}{ty2}{ln}{end}stringdata"
-	* refcount opts in general
-		* passing properties as params, SHOULD NOT assume its safe... Refcount optimiser should decide this.
+	* string vargs
+	* passing properties as params, SHOULD NOT assume its safe... Refcount optimiser should decide this.
 	* Rename "flags" to something else. I wanna use "flags" for some kinda default Info and SyntaxIs
-	* AutoComplete use class description 
-	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
-		* first byte (if float) can also store the sign of the exponent.
-		* could be an interesting type to have generally... like perhaps as a string subclass?
-	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
 	* nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 		* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
-	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
-		* perhaps parseclean should use an ID system...
 	*  msg <~ {
 		dot "hi"
 		thg "ok"
 		prm
 			thg "yep" }    -->    ok.hi(yep)
 	* new destructor! bitfield 64 for objs! no super! works for most!
-		// could be done better with ast-spawner?
-	* any object can be created with an virtual-function override table, just store before the refcount?
-		* if refcounts come in multiple of 2 (or even 4), we could store if we have a override table... per object
-	* || x = .SomeCArray // should just get the address... :)
-	* months.scproj demo needs better compiler support, including .render not being needed.
-
-	* auto foo() { // multiple return?
-		struct retVals {        // Declare a local structure 
-			int i1, i2;
-			string str;
-		};
-		return retVals {10, 20, "Hi"}; // Return the local structure
-	}
 
