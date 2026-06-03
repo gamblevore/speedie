@@ -180,25 +180,6 @@ class Image (memory)
 		rz.a = a
 	
 	
-	function Colorise (|Memory| data, |float| Strength=1)
-		require strength > 0
-		|| in = data.ptr
-		|| after = data.Next
-		|| w = ((strength)~gray).PreMul
-		|premultipliedcolor| c
-		|| Top = .ControlClip.y2 & 1
-		
-		for (p in self) (i)
-			if i.y & 1 == Top
-				p.overlay(w)
-			  else
-				ifn i.x & 1
-					c = vec4.colorise(in[0], strength).PreMul
-					if ++in >= after
-						in = data.ptr
-				p.overlay(c)
-		
-
 	function Interp (|vec2| P, |vec4|)
 		|| base = p.ifloor
 		for i in 4

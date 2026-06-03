@@ -147,6 +147,9 @@ extend PerryIDE
 			|| p = errors.parse
 				.ShowCompileErrors(p, true)
 		.compilr = nil
+		|| d = .DebugMode
+		(d isnt compiling)
+		.DebugMode = d
 		.RenableAfterCompile
 		return true
 

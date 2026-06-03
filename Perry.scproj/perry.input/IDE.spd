@@ -340,7 +340,7 @@ class PerryIDE (Window)
 		if sel2.last.IsTextLine
 			sel2 = sel2.Shorten(1)
 		fs <~ "ln "
-		fs <~ .editme.CurrLine
+		fs <~ .editme.CurrLine + 1
 		|| n = sel2.count(charset.line)-1		// could probably remove this call to linecount
 			fs <~ "+"				// just compare vlines within textviewline
 			fs <~ n+1				// then its literally used in one place...
@@ -531,7 +531,7 @@ class PerryIDE (Window)
 		if .CheckCrashed(.feedback, "feedback")
 			.Feedback = nil
 		if .CheckCrashed(.compilr,  "compiler")
-			.Compilr = nil
+			.Compilr = nil // not needed? checkcrashed clears it (via wierd logic)
 
 		|| f = .Feedback
 			.SpeedieMsgReceive(f)

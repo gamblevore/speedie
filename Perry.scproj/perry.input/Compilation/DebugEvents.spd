@@ -210,6 +210,21 @@ function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 		.ProductSep.Show
 	
 
+function perryide.GotHello (|string| msg)
+	opt norefcounts
+	|| m = .DebugMode
+	require m isnt Finished					// hah. a bit slow.
+	if m is ReceivedHello
+		Notifications <~ msg				// Weird?
+	  else
+		.ReloadBreaks
+		(M is ReceivedHello)
+		.DebugMode = M
+		.StrongView(.ViewDebugger)			// View debugger!
+	.SetAppInfo
+	.AppInfo.setfocus						// I generally don't like stealing the focus... leads to mistypes
+											// But as long as it runs instantly, it should be OK?
+
 function PerryIDE.ClearRun
 	.LogOneCake("--Finished--")
 	.DebugMode = CompileMode.Finished
@@ -244,7 +259,7 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 		|| exitcode = "\n(--Exit OK--)"
 		if x!=0
 			exitcode = "\n(--Exit Error: ${x}--)"
-			.addProductErr(exitcode)
+			.AddProductErr(exitcode)
 		.ProductOut.log(exitcode)
 	
 	return !kill

@@ -54,21 +54,6 @@ function SetBreaks (|message| breaks)
 		
 	
 
-function GotHello (|string| msg)
-	opt norefcounts
-	|| m = .DebugMode
-	if m is ReceivedHello
-		Notifications <~ msg				// Weird?
-	  else
-		.ReloadBreaks
-		(M is ReceivedHello)
-		.DebugMode = M
-		.StrongView(.ViewDebugger)			// View debugger!
-	.SetAppInfo
-	.AppInfo.setfocus						// I generally don't like stealing the focus... leads to mistypes
-											// But as long as it runs instantly, it should be OK?
-
-
 function AppInfoExtra (|UnixProcess| r, |string|)
 	if !r
 		return "Inactive"
@@ -183,6 +168,7 @@ function SetAppInfo
 
 	|| Info = .AppInfo.obj as message
 	|| extra = .AppInfoExtra(r)
+
 	.AppInfoWrite(fs, info, extra)
 	.AppInfo.text = fs
 
