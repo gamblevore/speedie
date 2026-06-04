@@ -2216,7 +2216,7 @@ class TextView (GUIControl)
 			d._text = t[d.range]	// unpin old, 	// remove line.text later
 			d++
 			saved++
-		Notifications <~ saved.render
+//		Notifications <~ saved.render
 		return d
 			
 	
@@ -2252,6 +2252,7 @@ class TextView (GUIControl)
 		if  self is CodeEditor
 			|| Diff = .StartReclaim(d)
 			while D != diff
+				// this isn't quite right... the wrapping might change with the width!
 				msg = .PrepareLineColor(d, msg, jx, &lastowner)
 				|| n = d.next
 				if !n // now what? all same?
