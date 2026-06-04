@@ -654,28 +654,6 @@ extend message
 		
 	
 	
-libinternal Textviewline.ReclaimStart (|int| p, |textviewline|)
-	description "Sigh. Just an idea to 'reclaim' existing textviewlines. Will take probably 3 days work to get this reliable. Don't wanna do this right now! Just a placeholder right now. Actual code not here." 
-	opt norefcounts
-	rz = self
-	while
-		if rz.after > p
-			return rz 
-		rz = rz.next #loop
-
-
-libinternal Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
-	opt norefcounts
-	|| v  = .vline
-	
-	while
-		self = .next #loop
-		.position += dp
-		T = .setlinenum(T)
-		.vline = ++v
-	return self
-
-
 function message.FlatRange (|intrange|)
 	opt norefcounts
 	rz = (int.max, 0)

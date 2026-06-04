@@ -31,7 +31,6 @@ class TextView (GUIControl)
 	|bool|						_DimUnReachedLines
 	|message?|					_ActiveLine
 	|TextViewLine|				_Start
-	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
 	|Document?|					_Viewing
@@ -48,7 +47,6 @@ class TextView (GUIControl)
 
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
-		._reclaim = (0, 1GB, 0)
 		|| TV = TextViewLine()
 		.WrappedLines = TV
 		._Start = TV							// Make nilchecker happy
@@ -1567,7 +1565,6 @@ class TextView (GUIControl)
 			|| tab = (s in '\t')
 				.UndoChecker() = -1
 			
-			._Reclaim = (p, s.length - p.width)
 			.TryCaptureUndo(x, nt, updatedsel)
 			|| it = .isinline
 			if it Is Searching
@@ -2072,7 +2069,6 @@ class TextView (GUIControl)
 
 		|| d = textviewline()
 		.WrappedLines <~ d
-		.ClearReclaim
 		d.tline = 1
 		d.position = -1
 		.start = D
@@ -2195,58 +2191,96 @@ class TextView (GUIControl)
 		return .NextVline(d, d, 0)
 
 
+	libinternal PrepareCharWidth (|int|)
+		opt norefcounts
+		._LineNumWidth = 0
+		if .UsingLineNumbers
+			._LineNumWidth = .text.TextLineCount.LineNumWidth
+
+		(.WrappedLines isnt breakpoint)
+		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
+		if .SingleLine
+			charw = 4KB
+		return charw
+	
+	
+	libinternal textviewline.Match (|string| t, |bool|)
+		return t[.position, .Text, false]
+	
+	
+	libinternal StartReclaim (|textViewLine| d, |textviewline|)
+		opt norefcounts		
+		|| t = .text
+		|| saved = 0
+		while d and d.Match(t)
+			d._text = t[d.range]	// unpin old, 	// remove line.text later
+			d++
+			saved++
+		Notifications <~ saved.render
+		return d
+			
+	
+	
+	libinternal PrepareLineColor (|textViewLine| d, |message| msg, |DocumentJeeboxMode| jx, |&Message?| lastowner, |message|)
+		opt norefcounts
+		if JX is Colorise
+			|| OK = (msg!=nil) or (JX isnt expect)
+			msg = d.ColoriseText(msg, OK)
+		|| draw = .OnDrawLineNumber
+			(draw)(d, &LastOwner, false)
+			
+		if d is breakpoint
+			(.WrappedLines is breakpoint)
+		return msg
+	
+	
 	libinternal PrepareLinesOfText
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
 		.TextAlteredForDraw = 0
 		|| JX		= .JeeboxMode
 		|| msg		= .Parse(changed >= 2, JX)
-		|| ParsedOK	= (msg!=nil) or (JX isnt expect)
 		|| Pos		= .StartPos
-		|| StayAtEnd= .IsALogTextView and ._CanSeeLastLine
 		|| d		= .NeedFirst
 		|message--| LastOwner
 		
-		._LineNumWidth = 0
-		if .UsingLineNumbers
-			._LineNumWidth = .text.TextLineCount.LineNumWidth
-
-		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
-		if .SingleLine
-			charw = 4KB
+		|| CharW = .PrepareCharWidth
 	
-		|| ARGH = 0					// .ReclaimRestart(d) // disabled for now.
-		|| t = d.tline				// always 0?
-		|| p = 0
-		(.WrappedLines isnt breakpoint)
-
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
+		
+		if  self is CodeEditor
+			|| Diff = .StartReclaim(d)
+			while D != diff
+				msg = .PrepareLineColor(d, msg, jx, &lastowner)
+				|| n = d.next
+				if !n // now what? all same?
+					.PrepareLinesEnd(d, changed, pos)
+					return
+				d = n
+		
+		
+		|| t = d.tline
+		|| p = d.Position
+		
+		// Lets make sure this works first... then we can try restitch
 		
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
-			if JX is Colorise
-				msg = d.ColoriseText(msg, ParsedOK)
-			|| draw = .OnDrawLineNumber
-				(draw)(d, &LastOwner, false)
-				
-			if d is breakpoint
-				(.WrappedLines is breakpoint)
+			msg = .PrepareLineColor(d, msg, jx, &lastowner)
 			loop p >= 0
-			|| n = d.next
 				
-			if  true  or  !n  or  n.position < ._reclaim[1]
-				d = .NextVline(d, d, p)
-			  elseif p < ARGH
-				d = .NextVline(d, nil, p)
-			  else
-				d = d.ReclaimEnd(t, ._reclaim[2])
-				exit
+			d = .NextVline(d, d, p)
 
+		.PrepareLinesEnd(d, changed, pos)
+	
+	
+	function PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
+		opt norefcounts
 		d.RemoveAfter
 		._PreferPrevLine = false
-		if StayAtEnd
+		if .IsALogTextView and ._CanSeeLastLine
 			|| n = 1 - .MaxVisibleLines
 			d = d.MoveCapped(n)
 		  elseif (changed == 1) or .IsALogTextView
@@ -2254,33 +2288,10 @@ class TextView (GUIControl)
 		  else
 			d = nil
 		
-		if !d
+		if !d? // nilchecker bug here. It doesnt realise d can be nil
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
-		.ClearReclaim	
 	
-	
-	libinternal textview.ClearReclaim
-		._reclaim = (0, 1GB, 0)
-	
-
-	target ReclaimAttempt {
-	function ReclaimRestart (|textviewline| d, |int|)
-		return int.max // too hard to do right now.
-		opt norefcounts
-
-	
-	libinternal MapToOld (|int| P, |int|)
-		|| add = ._reclaim[2]
-		if p < ._reclaim[0]
-			return p
-		
-		|| R1 = ._reclaim[1]
-		if p - add > R1
-			return p - add
-		return R1
-	}
-		
 	
 	libinternal TextCopy (GUICopyEvent)
 		if .SelRange
