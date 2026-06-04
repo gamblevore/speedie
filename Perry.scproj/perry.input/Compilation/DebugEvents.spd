@@ -40,6 +40,12 @@ function perryide.ContinueProgram (|int| state, |bool|)
 	return .SendRunMsg("run", state)
 
 
+function perryide.DebugStepEvent (|bool|)
+	if keys.Shift
+		return .DebugStep("stepin")
+	return DebugStepOver(self, -1)
+
+
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
 	// Keys.movement is almost OK... but it uses ctrl for down... sigh.
@@ -49,14 +55,12 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 
 	if key.IsAccept
 		if i.RunningProd
-			if keys.Shift
-				return i.DebugStep("stepin")
-			return DebugStepOver(self, -1)
+			return i.debugstepevent
 		return i.ContinueProgram(-1)
 
 	if key is space
 		if i.RunningProd
-			return i.ContinueProgram(-1)
+			return i.DebugStepEvent
 		return true
 	
 	if !i.RunningProd
