@@ -35,7 +35,6 @@ GUI_Bar_Destructor
 GUI_Bar_Draw
 GUI_Bar_Mouseup
 GUI_Bar_ProgressSet
-GUI_Bar_StripeDark
 GUI_Btn_ButtonText
 GUI_Btn_Click
 GUI_Btn_ClickXY
@@ -219,7 +218,6 @@ GUI_Img_Clear
 GUI_Img_Clip
 GUI_Img_ClipVec
 GUI_Img_ClippedRectDrawer
-GUI_Img_Colorise
 GUI_Img_ConstructorPointer
 GUI_Img_ContainsPixel
 GUI_Img_ControlClipSet4
@@ -542,6 +540,7 @@ GUI_Text_CanAutoComplete
 GUI_Text_CanAutoCompleteSet
 GUI_Text_CancelEditing
 GUI_Text_ClearActiveLine
+GUI_Text_ClearDebugInfo
 GUI_Text_ClearErrors
 GUI_Text_Constructor
 GUI_Text_CurrLine
