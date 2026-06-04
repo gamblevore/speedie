@@ -2,7 +2,6 @@
 
 // MiniOptimisations, miniopts, optimize, finishmost 
 function Assembler.FinishASM 
-	if "AndOrTest".trap
 	if (.FnLength <= 0) or !.Last.IsFinisher
 		.MissingReturn
 

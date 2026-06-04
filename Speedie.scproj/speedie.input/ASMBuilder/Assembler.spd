@@ -352,7 +352,6 @@ struct Assembler
 	
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode,  |int| Depth=0)
 		|| info = fat.info				// nothing uses canclose right now. This can be fixed
-		if "AndOrTest".trap
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
 

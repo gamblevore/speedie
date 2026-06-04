@@ -99,6 +99,7 @@ function WhileSub (|message| exp,  |asmreg|)
 	|| InitialJump = exp.JUMP										// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
+	.breakrequest |= assembler.breakable ||| InitialJump.ASMIndex
 	.Branch(exp.first!, loop_test, true)
 
 	|| Known = loop_test.Constness.negate							// loops are weird :]

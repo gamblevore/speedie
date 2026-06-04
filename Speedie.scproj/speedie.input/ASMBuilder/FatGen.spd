@@ -144,7 +144,6 @@ function message.GRAB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 
 function message.RET (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 	visible
-	if "andortest".trap
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RET, self)
 	rz.reginput(0) = r1
