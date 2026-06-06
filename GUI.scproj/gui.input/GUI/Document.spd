@@ -106,7 +106,7 @@ class Document (list)
 			c.RemoveAfter
 		
 		|| latest = documentstate()
-		latest.typingplace = ns
+		latest.TypingPlace = ns
 		latest.text = nt
 		self <~ latest
 		
@@ -136,8 +136,8 @@ class Document (list)
 		return answer == 0	// don't
 
 
-	libinternal SaveText (|documentstate| l, |string|)
-		|| t = l.text
+	libinternal SaveText (|string|)
+		|| t = .text
 		if .Wasjbin
 			t = t.digest
 		if .WasCompressed
@@ -151,7 +151,7 @@ class Document (list)
 		|| l = .FilePath			#require
 		|| c = .current				#require	
 		|| f = l.file
-		|| t = .SaveText(c)
+		|| t = .SaveText
 		|| KeepDate = false
 		rz = t.Length
 		|| Deleted = !t and !f.visible

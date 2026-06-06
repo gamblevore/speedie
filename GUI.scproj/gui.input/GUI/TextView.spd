@@ -50,7 +50,6 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		|| TV = TextViewLine()
 		.WrappedLines = TV
-		._LastInsert = (0, 1GB)
 		._Start = TV							// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
@@ -1543,11 +1542,12 @@ class TextView (GUIControl)
 		|| Same = (s == p.width) and .text[p.x, s]
 		|| i	= ( p.x2 (Same) p.x + s.length )
 		
-		if !same
+		if !Same
 			i = p.x + s.length
-		|| UpdatedSel = (i,i)
+		|| UpdatedSel = (i, i)
 		if (SelectText)
-			UpdatedSel.x = p.x		
+			UpdatedSel.x = p.x
+		
 		if Same
 			.TypingPlaceTry(UpdatedSel, true, nil)
 		  else
@@ -1568,7 +1568,6 @@ class TextView (GUIControl)
 			|| tab = (s in '\t')
 				.UndoChecker() = -1
 			
-			._lastinsert = p
 			.TryCaptureUndo(x, nt, UpdatedSel)
 			|| it = .isinline
 			if it Is Searching
@@ -2073,14 +2072,9 @@ class TextView (GUIControl)
 
 		|| d = textviewline()
 		.WrappedLines <~ d
-		.ClearReclaim
 		d.tline = 1
 		d.position = -1
 		.start = D
-
-	libinternal textview.ClearReclaim
-		._lastinsert = (0, 1GB)
-
 
 	libinternal NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
 		opt norefcounts
@@ -2276,7 +2270,6 @@ class TextView (GUIControl)
 		if !d? // nilchecker bug here. It doesnt realise d can be nil
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
-		.ClearReclaim
 	
 	
 	libinternal TextCopy (GUICopyEvent)
