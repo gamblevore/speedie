@@ -86,7 +86,7 @@ dataType Keys (int)
 		|| r = .Record
 			return r.date.guiago >= durr
 	
-	function IsNumber (|failableint|)
+	function Number (|failableint|)
 		if self >= Num0 and self <= num9
 			return self-num0
 		

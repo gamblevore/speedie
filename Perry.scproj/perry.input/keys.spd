@@ -2,7 +2,7 @@
 
 extend PerryIDE
 	behaviour KeyDown
-		if keys.cmd and !keys.option and .cmdkey(key)
+		if keys.cmd and .cmdkey(key)
 			return true
 		if (key is tab) and .OpenedMenu == .autocomplete
 			return .autocomplete.doreturn
@@ -29,6 +29,10 @@ extend PerryIDE
 
 
 	function CmdKey (|keys| key, |bool|)
+		|| NumKey = key.Number
+			return .NumberKey(numkey)
+		if keys.Option
+			return false
 		if key is t
 			return PressingDebug(.runbutton)		
 		if key.IsAccept
@@ -86,8 +90,6 @@ extend PerryIDE
 		if key is NUM3 or E // e for error
 			return .SaveAndShowErrors
 		
-		|| NumKey = key.IsNumber
-			return .NumberKey(numkey)
 		if key is p
 			.CommandsMenu.Click
 			return true
@@ -98,6 +100,7 @@ extend PerryIDE
 	function OptionCmdNum (|int| Num, |bool|)
 		|| w = perry.projects[num-1]
 			.ProjectTabs.Selected() = w
+		return true
 		
 		
 	function NumberKey (|int| Num, |bool|)
