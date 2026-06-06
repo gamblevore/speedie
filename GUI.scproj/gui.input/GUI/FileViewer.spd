@@ -197,7 +197,7 @@ class FileViewer (ListView)
 		return true
 
 
-	function Save (|filerow| f, |int| Purpose=documentstate.saving, |bool|)
+	function Save (|filerow| f, |int| Purpose=documentaction.saving, |bool|)
 		opt norefcounts
 		require .CanSave(purpose, f)
 		
@@ -215,10 +215,10 @@ class FileViewer (ListView)
 
 		// some kinda error. We'll save anyhow. but alert them.
 		.editme.LoadDocument(d, false)
-		d.ShowParseErrorInViewers
-		if Purpose == DocumentState.ErrorChecking
+		d.ShowErrorInViewers
+		if Purpose == DocumentAction.ErrorChecking
 			return false
-		if (purpose == DocumentState.Saving)
+		if (purpose == DocumentAction.Saving)
 			Notifications <~ "Invalid jeebox saved to: " + f.location
 		return true
 
@@ -256,7 +256,7 @@ class FileViewer (ListView)
 		|| answer = fs|&nil||string|.AskSaveOrCancel
 		fs = nil
 		if answer >= 1  // save
-			return .saveall(documentstate.saving)
+			return .saveall(DocumentAction.saving)
 		return answer == 0	// don't
 
 

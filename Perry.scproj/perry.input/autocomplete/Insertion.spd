@@ -265,12 +265,12 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 
 	
 function PerryInsert7 (|textview| self, |int| A, |bool|)
-	.undochecker = -1
+	.DontMergeUndo
 	.InsertText("||", (A,A))
 	.selrange = A+1
 	return true								// fn X () --> fn X (|*|) 
 function PerryInsert6 (|textview| self, |intrange| a, |bool|)
-	.undochecker = -1
+	.DontMergeUndo
 	|| toInsert = "|| name"
 
 	|| sel = a.x+1
@@ -286,17 +286,17 @@ function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 	return true								// f* --> fn *
 
 function PerryInsert5 (|textview| self, |intrange| A, |bool|)
-	.undochecker = -1
+	.DontMergeUndo
 	.InsertText(", ||", A)
 	.selrange = A.x+3
 	return true								// fn X (|type| name*) --> fn X (|type| name, |*|) 
-function PerryInsert34 (|textview| self, |intrange| A, |bool|)
-	.UndoChecker = -1
+function PerryInsert3And4 (|textview| self, |intrange| A, |bool|)
+	.DontMergeUndo
 	.InsertText(" ", A)
 	.Insert("...", true)
 	return true								// fn X (|T*|) -->fn X (|T| *)
 function PerryInsert2 (|textview| self, |intrange| A, |bool|)
-	.undochecker = -1
+	.DontMergeUndo
 	|| decl = " (||)"
 	if self[a.x] == ' ' or '\t'
 		decl = decl[1...]
@@ -306,7 +306,7 @@ function PerryInsert2 (|textview| self, |intrange| A, |bool|)
 	.selrange = .selrange.x-2
 	return true								// fn X* --> fn X (|*|)
 function PerryInsert1 (|textview| self, |intrange| a, |bool|)
-	.undochecker = -1
+	.DontMergeUndo
 	.InsertText(" name ", a)
 	.selrange = (a.x2+1, a.x2+5)
 	return true								// f* --> fn *
@@ -462,7 +462,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 				return PerryInsert7(self, where.position+1)|int|
 		if inrange
 			if state == 4
-				return PerryInsert34(self, A)|int|
+				return PerryInsert3And4(self, A)|int|
 			if state == 5
 				return PerryInsert5(self, A)|int|
 

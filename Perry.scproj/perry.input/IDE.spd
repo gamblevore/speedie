@@ -928,7 +928,7 @@ So anything not 0 means "its OK"`
 		.ParseErrorDetect
 				
 		|| e = .editme
-		if purpose == documentstate.errorchecking
+		if purpose == documentaction.errorchecking
 			require e is modified
 		// otherwise resave anyhow.
 		

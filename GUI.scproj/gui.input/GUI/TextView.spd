@@ -424,8 +424,6 @@ class TextView (GUIControl)
 		._TypingPlace = result
 		|| doc = .document
 			doc.TypingPlace = result
-			|| L = doc.current
-				L.typingplace = result
 
 	libinternal TypingPlaceDirect (|intrange| result, |bool|)
 		opt norefcounts
@@ -822,7 +820,8 @@ class TextView (GUIControl)
 			if (key iscmd keys.x) or (key is cut)
 				return .DoCut
 			if (key iscmd keys.z) or (key is undo or again)
-				return .DoUndo(!keys.shift)
+				.undo(!keys.shift)
+				return true
 
 		if key is left:				return .MoveSel(-1)
 		if key is BACKTICK or MacBackTick
@@ -903,11 +902,11 @@ class TextView (GUIControl)
 							.selrange = sr.x+i
 							exit
 		
-		.UndoChecker = -1
+		.DontMergeUndo
 		.Typed("\n" + .improveindent(ind, extra))
 		if i
 			.selrange = .selrange.x-i
-		.UndoChecker = -1 // needed
+		.DontMergeUndo // needed
 		return true
 	
 	
@@ -980,7 +979,8 @@ class TextView (GUIControl)
 	libinternal string.DeslashComment (|string|)
 		|| i = .OutWhite
 			if self[i, "//"]
-				return .insert("", i, 2)
+				|| P = (i, i+2)
+				return .insert("", P)
 		return self
 		
 	
@@ -1045,7 +1045,7 @@ class TextView (GUIControl)
 			|| r = .selrange - (._autocompleteback, 0)
 			if (c2 endswith "()") and self[r.x2] == '('
 				c2 = c2[0, c2.length-2]
-			.undochecker = -1
+			.DontMergeUndo
 			.InsertText(c2, r, false)
 			.selrange += (trim - c2.length)
 			rz = true
@@ -1460,7 +1460,7 @@ class TextView (GUIControl)
 		if !SW
 			require s != '{'
 		
-		.undochecker = -1
+		.DontMergeUndo
 		|| t    = .seltext
 		|| x = .insert(s.render + t + other.render)
 		.selrange = (x+1, x+t.length+1)
@@ -1526,7 +1526,7 @@ class TextView (GUIControl)
 	
 	libinternal TrySaveDebugState (|guitextlineevent| ask)
 		opt norefcounts
-/		|| f = .needfirst
+		|| f = .needfirst
 		|| Has = f.CompilePos >= 0
 		|| IsDebugging = (ask)(self, f, 0) != 0
 		require IsDebugging != has
@@ -1540,42 +1540,40 @@ class TextView (GUIControl)
 	function InsertText (|string| S, |intrange| P, |bool| SelectText=false, |bool| Show = true, |int|)
 		p = .clamp(p)
 		|| Same = (s == p.width) and .text[p.x, s]
-		|| i	= ( p.x2 (Same) p.x + s.length )
-		
-		if !Same
-			i = p.x + s.length
-		|| UpdatedSel = (i, i)
-		if (SelectText)
-			UpdatedSel.x = p.x
+		|| AfterNewText	= p.x + s.length
+		|| NewSel = (AfterNewText, AfterNewText)
+		if SelectText
+			NewSel.x = p.x
 		
 		if Same
-			.TypingPlaceTry(UpdatedSel, true, nil)
+			.TypingPlaceTry(NewSel, true, nil)
 		  else
 			|| ask = .OnBreakPoint
 				.TrySaveDebugState(ask)
 					
 			|| t = .text
-			|| nt = t.insert(s, p.x, p.width)
-			|| u = .undoer
-				|| c = u.current
-					c.typingplace = p
+			|| nt = t.insert(s, P)
+//			|| u = .undoer
+//				|| c = u.current
+//					c.typingplace = p
 			
 			if ._CanAutoComplete <= 1
 				.CanAutoComplete = 0
 				.AutoCompleteString = ""
 			
-			|| x = (p.x (s) p.x2)
+//			|| x = (p.x (s) p.x2)
 			|| tab = (s in '\t')
-				.UndoChecker() = -1
+				.DontMergeUndo
 			
-			.TryCaptureUndo(x, nt, UpdatedSel)
+			.TryCaptureUndo(nt, NewSel, s, p, t[p])
 			|| it = .isinline
 			if it Is Searching
 				it.UpdateSearch(nt)
 		
 		if show
-			.ShowTypingplace((p.x, i))
-		.UndoChecker = i
+			.ShowTypingplace((p.x, AfterNewText))
+		|| u = .undoer
+			u.UndoChecker = AfterNewText
 		return p.x
 
 
@@ -1597,7 +1595,7 @@ class TextView (GUIControl)
 	function Save (|bool|)
 		opt norefcounts
 		|| u = .undoer
-			if u.save(DocumentState.saving)
+			if u.save(documentaction.saving)
 				.AlphaFade
 				return true
 
@@ -1718,7 +1716,8 @@ class TextView (GUIControl)
 		if .Clear(value)
 			|| u = .undoer
 				u.clear
-				u.AddState(.text, nil)
+				u._text = .text
+				u.TypingPlace = nil
 	
 
 	libinternal TextLeft (|int|)
@@ -2302,8 +2301,6 @@ class TextView (GUIControl)
 		opt norefcounts
 		old.ScrollPos = .scrollpos
 		old.TypingPlace = .selrange
-		|| c = old.current
-			c.typingplace = .selrange
 		if old <= 1
 			old.clear
 		.document = nil
@@ -2316,7 +2313,7 @@ class TextView (GUIControl)
 			.UnloadDoc(old)
 		
 		d.SimpleUpdateFromDisk
-		if d.Load
+		if d.Load(false)
 			.document = d
 			.ClearErrors
 			if show
@@ -2352,7 +2349,7 @@ class TextView (GUIControl)
 	libinternal TextPaste (GUIPasteEvent)
 		require (self is Editable) and (purpose is PasteTextLike)
 		if data > 1
-			.UndoChecker = -1
+			.DontMergeUndo
 		|| j = .JeeboxMode
 		if j is Expect or Jeebox
 			data = data.SpacesToTabs

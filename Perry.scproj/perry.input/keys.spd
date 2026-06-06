@@ -84,7 +84,7 @@ extend PerryIDE
 		if key is d
 			return .ShowQuickStuff(false)
 		if  key is s  and  .editme is visible
-			.SaveEditing(documentstate.saving)
+			.SaveEditing(documentaction.saving)
 			return true
 
 		if key is NUM3 or E // e for error

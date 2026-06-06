@@ -355,15 +355,16 @@ class String
 		nil checker
 		cpp_wrapper JB_Str_Append6
 		
-	function Insert (|string| s, |int| i, |int| n = 0, |string|)
+	function Insert (|string| s, |ivec2| Range, |string|)
 		Description "Inserts one string within another. Useful for typing or text-editors." 
+		|| i = range.x
+		|| n = range.Width
 		if i < 0
 			n += i
 			i = 0
 		if n < 0
 			n = 0
-		|| fs = faststring()
-		fs.size = .length + s.length - n
+		|| fs = faststring(.length + s.length - n)
 		fs.appendRange(self, 0, i)
 		fs <~ s
 		fs.appendRange(self, i+n, int.max)

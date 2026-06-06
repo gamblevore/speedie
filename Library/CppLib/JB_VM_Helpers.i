@@ -481,6 +481,7 @@ VMOpt ASM* JumpF (CakeRegister* r, ASM Op, ASM* Code) {
 	return Code + V*JCmpF_Jmpi;
 }
 
+
 VMOpt void CompF (CakeRegister* r, ASM Op) {
 	i1 = CompF_(r+n2, r+n3, CmpF_Cmpu);
 }

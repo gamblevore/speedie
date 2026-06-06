@@ -102,7 +102,7 @@ function ClickedOpenFile (GUIaction)
 
 
 function ClickedCreateFile (GUIaction)
-	|| path = app.AskSave("spd",  "",  "Enter Name For New File",  "New", "OpenProj")
+	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")
 		perry.CreateProj(path)
 	perry.HideStartIfNeeded
 

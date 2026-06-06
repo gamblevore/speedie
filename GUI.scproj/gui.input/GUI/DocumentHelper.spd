@@ -27,47 +27,17 @@ class CachedPath
 		.path = ""
 
 
-class DocumentViewer (list)
-	linkage: cpp_part docview
-	contains DocumentViewer
-	|GUIControl--?|				Viewer
 
-	constructor (|GUIControl| V)
-		.viewer = V
-
-	function Clear
-		opt norefcounts
-		for o in self
-			if o isa textview
-				o.document = nil
-		super.clear
-		
-	function Find (|GUIControl| V, |documentviewer|)
-		opt norefcounts
-		for (o in self) (s)
-			if o == v
-				return s
-	destructor
-		.clear
-	
-	iterator
-		|| ff = .first
-		while ff
-			yield (ff.viewer) (ff)
-			ff = ff.next
-
-
-function document.RemoveViewer (|guicontrol| g)
+libinternal document.RemoveViewer (|guicontrol| g)
 	opt norefcounts
-	|| found = .viewers.find(g)
-		found.remove
+	if .viewers.find(g)
+		g.remove
 
 
-function document.AddViewer (|guicontrol| g)
+libinternal document.AddViewer (|guicontrol| g)
 	opt norefcounts
 	if !.viewers.find(g)
-		.viewers <~ documentviewer(g)
+		.viewers <~ g
 	if g isa textview
-		|| c = .current
-			g.UseState(c,  self,  c.typingplace, DocumentState.InitialSet)
+		g.UpdateToDocument(self, documentaction.InitialSet)
 

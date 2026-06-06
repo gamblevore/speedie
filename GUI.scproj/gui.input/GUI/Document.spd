@@ -3,7 +3,7 @@
 class Document (list)
 	linkage
 		cpp_part Doc
-	contains DocumentState
+	contains DocumentReverser
 	|int|					UndoChecker
 	|int|					ScrollPos
 	|uint16|				MaxUndos
@@ -12,14 +12,15 @@ class Document (list)
 	|DocumentJeeboxMode|	JeeboxMode
 	|bool|					CompareTreesOnSave
 	|bool|					_LoadedFromFile
-	|DocumentState?|		Current
-	|DocumentState?|		Original
+	|string|				_Text
+	|DocumentReverser?|		Current
+	|DocumentReverser?|		Original
 	|message?|				DocParsed
 	|string|				FilePath
 	|date|					FileDate
 	|date|					ViewDate
 	|intrange|				TypingPlace
-	|DocumentViewer|		Viewers
+	|[GuiControl]|			Viewers
 	|CachedPath|			Ref
 	
 	
@@ -27,7 +28,7 @@ class Document (list)
 		.maxundos	= Undos
 		.FilePath	= path
 		.ref		= CachedPath(path, document.Cache_, self)
-		.Viewers	= DocumentViewer(nil)
+//		.Viewers	= DocumentViewer(nil)
 //		.JeeboxMode = DocumentJeeboxMode.Prefer // Actually no. then todo/txt files get linenumbers
 												// Its a known file-type, so it should be set explicitly.
 		if path isa "spd" or "box" or "xml" or "jb"
@@ -68,60 +69,38 @@ class Document (list)
 	
 	function Text (|string|)
 		opt norefcounts
-		|| c = .Current
-			return c.text
+		return ._text
 
 
-	libinternal ExpectCurr (||)
-		opt NoRefCounts
-		|| o = .original
-		|| c = .Current
-		if c and (c.parent|object| != self|object|)
-			debugger //!!??
-			c = nil
-		if o and (o.parent|object| != self|object|)
-			debugger //????
-			o = nil
-		if (!c)
-			c = .first
-			.current = c
-		return c
-
-
-	libinternal UpdateState (|string| nt, |ivec2| ns)
+	libinternal TryMergeChange ( |string| Insertion, |ivec2| Point, |string| OldText, |bool|)
 		opt norefcounts
-		|| c = .Current
-			if c != .original
-				c.text = nt
-				c.typingplace = ns
-				return
+		// try merge changes... assuming the position carries on.
 		
-		.addstate(nt, ns)
+		return false
+//		|| c = .Current
+//			if c != .original
+//				c.text = nt
+//				c.typingplace = ns
+//				return
+//		
+//		.addstate(nt, ns)
 	
 
-	libinternal AddState (|string| nt, |ivec2| ns, |DocumentState|)
+	libinternal AddState (|string| Insertion, |ivec2| Point, |string| OldText)
+		opt norefcounts
 		|| c = .current
-			if c.text == nt
-				return c
 			c.RemoveAfter
 		
-		|| latest = documentstate()
-		latest.TypingPlace = ns
-		latest.text = nt
+		|| latest = DocumentReverser(Insertion, Point, OldText)
 		self <~ latest
 		
 		.current = latest
 		.original ?= latest
 		.Trim
-		return latest
 
 
-	function IsModified (|bool|)
-		opt norefcounts
-		|| c = .current
-		|| o = .original
-		require o and c
-		return (c != o) and (c.text!=o.text)
+	inline IsModified (|bool|)
+		return .current
 
 
 	function SaveBeforeClose (|bool|)
@@ -132,7 +111,7 @@ class Document (list)
 		// whatever... fix that later. Or perhaps its just from faststring? 
 		|| Answer = Q.AskSaveOrCancel()
 		if answer >= 1		// save
-			return .save(DocumentState.Closing)
+			return .save(DocumentAction.Closing)
 		return answer == 0	// don't
 
 
@@ -146,8 +125,8 @@ class Document (list)
 
 
 	function Save (|int| Purpose=0, |ind|)
-		(purpose)// purpose is unused, right now.
-		// it was used, originally... and might be again.
+		(Purpose)
+		// purpose is unused, right now. It was used, originally... and might be again.
 		|| l = .FilePath			#require
 		|| c = .current				#require	
 		|| f = l.file
@@ -159,7 +138,7 @@ class Document (list)
 				rz = -1
 		  else
 			KeepDate = .FindKeepDate(t, f)
-			if !f.writeall(t)
+			if !f.WriteAll(t)
 				rz = -1
 		f.close
 		if rz
@@ -169,7 +148,7 @@ class Document (list)
 				if KeepDate
 					NewDate = .filedate
 				  else
-					NewDate = gui.FrameStart // just clear the subsecond bits
+					NewDate = gui.FrameStart	// just clear the subsecond bits
 				f.modified = NewDate
 			.filedate = f.modified				// read it back to be sure its what we think it is.
 			.UpdateSavedState
@@ -188,15 +167,15 @@ class Document (list)
 	libinternal SimpleUpdateFromDisk (|bool|)
 		|| d = .FileDate
 		if !d
-			return true			// unsaved... must be ok.
+			return true				// unsaved... must be ok.
 		
 		|| DiskMod = .FilePath.file.modified
 		|| DiskIsNewer = DiskMod - d
 		if DiskIsNewer == 0
-			return true			// no need
+			return true				// no need
 		if .IsModified
-			return false		// not sure which to use.
-		return .load(true)		// Reload!
+			return false			// not sure which to use.
+		return .Load(true)			// Reload!
 
 	
 	function CheckModified (|bool|)
@@ -205,48 +184,60 @@ class Document (list)
 		
 		|| Options	= ["Save", "Reload"]
 		|| Answer	= confirmationdialog.ask("The file ${.FilePath.name} has been externally modified. Reload or resave?", "", Options)
-		if answer >=  1			// save
-			.save(DocumentState.Saving)
-		if answer ==  0			// reload
-			.load(true)
+		if answer >= 1				// save
+			.save(DocumentAction.Saving)
+		if answer == 0				// reload
+			.Load(true)
 		return true
 
 	
-	libinternal DocumentViewer.NextViewer (|$?DocumentViewer| out, |textview|)
-		opt norefcounts
-		|| it = .Viewer
-		out = .next
-		if !it.Window
-			.Remove
-			return nil
-		if it isa TextView
-			return it
+//	libinternal DocumentViewer.NextViewer (|$?DocumentViewer| out, |textview|)
+//		opt norefcounts
+//		|| it = .obj as GUIControl
+//		out = .next
+//		if !it.Window
+//			.Remove
+//			return nil
+//		if it isa TextView
+//			return it
 	
 	
-	function ShowParseErrorInViewers
+	libinternal GetViewer (|int| i, |TextView|)
 		opt norefcounts
-		|| v = .viewers.first
-		while v
-			|| it = v.NextViewer(v)
-				it.parse
+		|| v = .Viewers[i]
+			if !v.Window
+				.Viewers.Remove(i)
+				return nil
+			if v isa TextView
+				return v
+	
+	
+	iterator viewer
+		|| i = .viewers.length
+		while --i >= 0
+			yield .GetViewer(i)
+		
+	
+	function ShowErrorInViewers
+		opt norefcounts
+		for v.Viewer in self
+			if v
+				v.parse
 
 
 	libinternal UpdateViewers (|int| Reason)
 		opt norefcounts
-		|| a = .current$
-		|| v = .viewers.first
-		while v
-			|| it = v.NextViewer(v)
-				it.UseState(a,  self,  a.typingplace, Reason)
+		for v.Viewer in self
+			if v
+				v.UpdateToDocument(self, Reason)
 
 
 	libinternal UpdateSavedState 
 		opt norefcounts
-		|| v = .viewers.first
-		while v
-			|| it = v.Nextviewer(v)
-				(it is modified) = false
-				(it.ontextchanged)(it, documentstate.Saving, false)?
+		for v.Viewer in self
+			if v
+				(v is modified) = false
+				(v.ontextchanged)(v, documentaction.Saving, false)?
 	
 	
 	function InvalidJeebox (|bool|)
@@ -261,35 +252,36 @@ class Document (list)
 		
 		.viewdate = gui.FrameStart
 		.wascompressed = data.IsCompressed
-		if .wascompressed
+		if .WasCompressed
 			data = data.decompress
 
 		|| bin = data.Isjbin
-		.WasJBin = bin // remove and use the mode instead?
+		.WasJBin = bin									// remove and use the mode instead?
 		if bin
-			.Jeeboxmode |= documentjeeboxmode.Expect
-			.DocParsed() = data.parse
+			.JeeboxMode |= documentjeeboxmode.Expect
+			.DocParsed = data.parse
 			if .DocParsed
 				data = .DocParsed.render
 			
 		.filedate = f.modified
-		|| OldPos = (0,0)
 		if ChangedExternal
-			|| c = .Current
-				OldPos = ivec2(.scrollpos)
+			.TypingPlace = ivec2(.scrollpos)
+			|string--| OldText = ._Text
+			.addstate(data, (0, oldtext.length), OldText)
+			.Original = .Current
 		  else
 			.clear
-			
-		.AddState(data, OldPos)
-		.Original = .Current
+			.TypingPlace = nil
+
+		._text = data
 		._LoadedFromFile = true
 		return true
 
 
-	function Load (|bool| ChangedExternal = false, |bool|)
+	libinternal Load (|bool| ChangedExternal, |bool|)
 		if ChangedExternal or !._LoadedFromFile
 			require .LoadSub(ChangedExternal)
-		.UpdateViewers(DocumentState.Initialset)
+		.UpdateViewers(DocumentAction.Initialset)
 		return true
 
 
@@ -334,7 +326,7 @@ class Document (list)
 			|| n = f.size
 			if n <= 128MB or n >= int.max
 				return 128MB
-			if "The file ${f.name} is ${n|int|.strsize} big. Do you still want to load it?\n\nText-editor performance may suffer.".confirm
+			if "The file ${f.name} is ${n|int|.StrSize} big. Do you still want to load it?\n\nText-editor performance may suffer.".confirm
 				return n+1
 			return 128MB
 
@@ -364,54 +356,65 @@ extend TextView
 	libinternal KeepUndosOnLoseFocus (|bool|)
 		return (self is editable) and !.isinline
 
-	
-	libinternal UpdateAllViews (|string| nt, |ivec2| NS, |int| Reason)
-		opt norefcounts
-		|| u = .document
-			u.UpdateViewers(Reason)
-		  else
-			super.textset(nt)
-			(self is modified) = true
-			.touch
-			.TypingPlaceTry(ns, true, nil)
-			(.OnTextChanged)(self, reason, true)?
 
-
-	libinternal TryCaptureUndo (|int| UndoChecker, |string| nt, |ivec2| ns)
+	libinternal TryCaptureUndo (|string| NewText, |ivec2| NewSel,  |string| Insertion, |ivec2| Point, |string| OldText)
 		opt NoRefCounts
 		|| u = .undoer
-			if self is editable
-				if UndoChecker == u.UndoChecker
-					u.UpdateState(nt, ns)
-				  else
-					u.AddState(nt, ns)
-		.UpdateAllViews(nt, ns, DocumentState.Typing)				// updates self
+		if !u
+			super.textset(NewText)
+			(self is modified) = true
+			.touch
+			.TypingPlaceTry(NewSel, true, nil)
+			(.OnTextChanged)(self, documentaction.Typing, true)?
+			return
+
+		if self is editable
+			if !u.TryMergeChange(Insertion, Point, OldText)
+				u.AddState(Insertion, Point, OldText)
+		u._text = NewText
+		u.TypingPlace = newSel
+		u.UpdateViewers(documentaction.Typing)
 
 
-	function UndoChecker (assigns:|int| x)
+	function DontMergeUndo
 		opt norefcounts
-		with .undoer
-			.UndoChecker = x
+		|| u = .undoer
+			u.UndoChecker = -1
 
 
-	inline DoUndo (|bool| undo, |bool|)
-		.undo(undo)
-		return true
+//	libinternal ExpectCurr (||)
+//		opt NoRefCounts
+//		|| c = .Current
+//		if (!c)
+//			c = .first
+//			.current = c
+//		return c
 
 
 	function Undo (|bool| undo)
 		opt norefcounts
 		|| u = .undoer$
-		|| m = u.ExpectCurr$
-		|| pos = m.TypingPlace.xx
+		// I think we should have a default first state?
+		// at least... it makes the undo simpler.
+		// We need some way to say that we are at the start, or at the end
+		// If .current being nil... is the default state... what do we do?
+		|| m = u.current
 		
-		m = m.step(!undo)										#expect beep
 		if undo
-			pos = m.TypingPlace
-		u.current = m
+			expect (m) (Beep)
+			m.Undo(u)
+			m = m.prev
+		  else
+			if m
+				m = m.next	
+			  else
+				m = u.first
+			expect (m) (beep)
+			
+			m.Redo(u)
 		
-		if .text != m.text
-			.UseState(m, u, pos, DocumentState.UndoOrRedo)
+		u.current = m
+		.UpdateToDocument(u, documentaction.UndoOrRedo)
 
 
 	libinternal UpdateModState (|document| D, |int| reason)
@@ -423,55 +426,70 @@ extend TextView
 		(.OnTextChanged)(self, Reason, ismod)?
 
 
-	libinternal UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
+	libinternal UpdateToDocument (|document| D, |int| Reason)
 		require .parent
-		.UndoChecker = -1
-		if l.text
-			self|guicontrol|.text = l.text
+		.DontMergeUndo
+		if d._text
+			self|guicontrol|.text = d._text
 			|| i = d.scrollpos
 			.PrepareLinesOfText
-			.TypingPlaceTry( ty, true, nil)
+			|| ty = d.typingplace
+			.TypingPlaceTry(ty, true, nil)
 			.scrollpos = i
-			if reason == DocumentState.typing
+			if reason == documentaction.typing
 				.ShowTypingPlace(ty)
-			  elseif reason == DocumentState.UndoOrRedo
+			  elseif reason == documentaction.UndoOrRedo
 				.show(ty.x)
 		  else	
-			.Clear(l.text)		
+			.Clear(d._text)		
 		
 		.UpdateModState(d, reason)	
 
 
 
-class DocumentState (list)
+class DocumentReverser (list)
 	linkage
 		cpp_part dcs
-	contains DocumentState
-	|string|			_Text
-	|IntRange|			TypingPlace
+	contains DocumentReverser
+	
+	|string|			Inserted
+	|ivec2|				InsertionPlace
+	
+	constructor (|string| Insertion, |ivec2| Point, |string| OldText)
+		.Inserted = Insertion
+		.InsertionPlace = point
+		.obj = OldText
+		
+	function Undo (|document| D)
+		// abcdef<123>gh		//	"123"	(6,6)	""
+		// abcdef123gh
+		opt norefcounts
 
+		|| fs = FastString.shared
+		|| x = .InsertionPlace.x
+		d.TypingPlace = (x, x)
+		fs.AppendRange(d._text, 0, X)
+		|| t = .obj as string
+		fs <~ t
+		x += .Inserted.Length
+		fs.AppendRange(d._text, X, int.max)
+		d._text = fs
+		
+		
+	function Redo (|document| D)
+		|| P = .InsertionPlace
+		d._Text = d._Text.Insert(.inserted, P)
+		|| x = p.x2 + .inserted.length
+		d.TypingPlace = (x,x)
+		
+
+
+datatype DocumentAction (byte)
 	constants
-		InitialSet = 0
-		Typing = -1
-		UndoOrRedo = -2
-		Saving = -3
-		Closing = -4
-		ErrorChecking = -5
-
-	function Text	(|string|)
-		opt norefcounts
-		|| T = ._Text
-		if UseCompression
-			T = T.Decompress
-		return T
-
-	setter Text (|string|)
-		opt norefcounts
-		if UseCompression
-			value = value.Compress // mz is pretty fast anyway
-		._Text = value
-
-	module
-		|bool| UseCompression
-
+		InitialSet		=  0
+		Typing			= -1
+		UndoOrRedo		= -2
+		Saving			= -3
+		Closing			= -4
+		ErrorChecking	= -5
 

@@ -388,7 +388,7 @@ function EditMeModified (guitextevent)
 	i.EditMeTabRetryThing = 0
 	i.ShowStats
 	
-	if (reason != documentstate.saving) and !i.DuringTempView
+	if (reason != documentaction.saving) and !i.DuringTempView
 		|| x = .SelRange.x2
 		if !GUI.IsTyping
 			i.InteractUpdate
