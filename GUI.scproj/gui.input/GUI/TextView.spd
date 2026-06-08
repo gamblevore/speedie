@@ -182,7 +182,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		if !d
 			d = .FindLine(pos)
-			d?=.wrappedlines.first!
+			d ?=.wrappedlines.first!
 		
 		|| txt = d.Text
 		|| i = txt._FindBreakpoint
@@ -302,22 +302,6 @@ class TextView (GUIControl)
 		return (A,B)
 
 	
-//	libinternal TextViewLine.ooof (|bool| t, |int|)
-//		if t
-//			return .position
-//		return .after
-//		
-//		
-//	libinternal ExpandToVis (|intrange| t, |intrange|)
-//		opt norefcounts
-//		|| d1 = .FindTextLine(t.x1)
-//		|| d2 = .FindTextLine(t.x2)
-//		|intrange| m 
-//		m.x1 = d1.ooof(t.x1 <= t.x2)
-//		m.x2 = d2.ooof(t.x2 <  t.x1)
-//		return m
-		
-
 	libinternal ExpandToVis (|intrange| t, |intrange|)
 		opt norefcounts
 		|| d1 = .FindTextLine(t.x1)
@@ -329,7 +313,8 @@ class TextView (GUIControl)
 		if t.x2 >= t.x1
 			b = d2.After
 		return (a,b)
-		
+	
+	
 	libinternal ByteAtXY (|ivec2| p, |$ivec2| v, |textviewline|)
 		opt norefcounts
 		|| D = .LineAtY(p.y)
@@ -1631,7 +1616,7 @@ class TextView (GUIControl)
 			return (a, b+1)
 		|| b2 = .FindLineSeperator(b)
 			return (a, b2+1)
-		return (a, .length+1) 
+		return (a, .length+1)
 	
 	
 	libinternal DeleteLine (|bool|)
@@ -1640,6 +1625,7 @@ class TextView (GUIControl)
 			return false
 		if !keys.option
 			i -= (0, 1)
+		.DontMergeUndo
 		.InsertText("", i, false)
 		return true
 		
@@ -1652,6 +1638,7 @@ class TextView (GUIControl)
 		|| x = r.x
 		if keys.option or keys.platcmd(false)
 			r.x2 = .wordmove(x, keys.shift.dir)
+			.DontMergeUndo
 			return r
 	
 		if  (self[x-1] == '(')  and  (self[x] == ')')
@@ -2070,6 +2057,7 @@ class TextView (GUIControl)
 		d.position = -1
 		.start = D
 
+	
 	libinternal NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
 		opt norefcounts
 		
