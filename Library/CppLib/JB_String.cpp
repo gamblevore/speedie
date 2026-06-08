@@ -88,11 +88,11 @@ void JB_BA_Destructor( JB_String* self ) {
 
 
 JB_String* JB_Str_CopyFromPtr( const void* Addr, int N ) {
-    JB_String* e = JB_Str_New( N );
-    if (e and N) {
-        CopyBytes(Addr, e->Addr, N);
+    JB_String* s = JB_Str_New( N );
+    if (s and N > 0) {
+        CopyBytes(Addr, s->Addr, N);
     }
-    return e;
+    return s;
 }
 
 JB_String* JB_Str_CopyFromCString( const char* C ) {
@@ -179,10 +179,12 @@ JB_String* JB_Str_NewCStr (int64 N) {
 
 JB_String* JB_Str_New (int64 Length) {
 	// only allows huge values to "Catch" file-errors... otherwise limited to int-length.
+	if_rare (Length < 0)
+		return 0; // error
 	if (Length < 16) {
         if (Length < 8) {
-            if (Length <= 0) 
-				return 0;	// error
+            if (Length <= 0)
+				return JB_Str__Empty();
 			return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String8) );
         }
         return JB_Str_NewInlined( (int)Length, JB_AsClass(JB_String16) );
@@ -1568,9 +1570,9 @@ JB_String* JB_Str_Append6(JB_String* A, JB_String* B, JB_String* C, JB_String* D
 JB_String* JB_Str_OperatorPlus(JB_String* self, JB_String* other) {
     int NS = JB_Str_Length(self);
     int NO = JB_Str_Length(other);
-    if (!NS)
+    if (NS <= 0)
         return other;
-    if (!NO)
+    if (NO <= 0)
         return self;
 
     JB_String* s = JB_Str_New( NS + NO );

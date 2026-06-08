@@ -25,7 +25,7 @@ class TextView (GUIControl)
 
 	|byte|						_LineNumWidth
 	|byte|						_CodeInsertionState
-	|uint16|					_LastDrawWidth
+	|uint16|					_LastCharWidth
 	|int|						_RemainingHeight
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
@@ -63,7 +63,7 @@ class TextView (GUIControl)
 		.init
 
 	destructor
-		.document = nil		
+		.document = nil
 	
 	inline Document (|document|)
 		return ._Viewing
@@ -81,11 +81,12 @@ class TextView (GUIControl)
 	libinternal Undoer (|Document?|)
 		opt norefcounts
 		|| v = ._viewing
-		if v or self isnt editable
-			return v
-		._Viewing = v
-		v = document("")
-		v.AddViewer(self)
+		if !v and self is editable
+			v = document("")		
+			._Viewing = v
+			// circular ref... could cause leaks.
+			// probably not if the window destructor works properly? 
+			v.viewers <~ self
 		return v
 	
 	
@@ -1553,16 +1554,12 @@ class TextView (GUIControl)
 					
 			|| t = .text
 			|| nt = t.insert(s, P)
-//			|| u = .undoer
-//				|| c = u.current
-//					c.typingplace = p
 			
 			if ._CanAutoComplete <= 1
 				.CanAutoComplete = 0
 				.AutoCompleteString = ""
 			
-//			|| x = (p.x (s) p.x2)
-			|| tab = (s in '\t')
+			if s in '\t' // tabonly
 				.DontMergeUndo
 			
 			.TryCaptureUndo(nt, NewSel, s, p, t[p])
@@ -1572,8 +1569,6 @@ class TextView (GUIControl)
 		
 		if show
 			.ShowTypingplace((p.x, AfterNewText))
-		|| u = .undoer
-			u.UndoChecker = AfterNewText
 		return p.x
 
 
@@ -1594,7 +1589,7 @@ class TextView (GUIControl)
 
 	function Save (|bool|)
 		opt norefcounts
-		|| u = .undoer
+		|| u = ._viewing
 			if u.save(documentaction.saving)
 				.AlphaFade
 				return true
@@ -1714,8 +1709,8 @@ class TextView (GUIControl)
 		opt norefcounts
 		isnt modified
 		if .Clear(value)
-			|| u = .undoer
-				u.clear
+			|| u = ._viewing
+				u.cleardoc
 				u._text = .text
 				u.TypingPlace = nil
 	
@@ -2089,12 +2084,12 @@ class TextView (GUIControl)
 
 	libinternal NeedsPrepare (|int|)
 		|| CW	= .MaxWidthInChars
-		|| ldw	= ._LastDrawWidth
-		._LastDrawWidth = CW
-		if (!.WrappedLines.hasany) or (.TextAlteredForDraw & 2)
-			return 2
-		if (CW != ldw)
-			return 1
+		|| ldw	= ._LastCharWidth
+		._LastCharWidth = CW
+		|| Result = (CW != ldw)|int|
+		if .TextAlteredForDraw & 2
+			Result |= 2
+		return Result
 
 
 	function string.Bounds (|ivec2|)
@@ -2199,7 +2194,7 @@ class TextView (GUIControl)
 			._LineNumWidth = .text.TextLineCount.LineNumWidth
 
 		(.WrappedLines isnt breakpoint)
-		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
+		|int| CharW	= ._LastCharWidth - ._LineNumWidth
 		if .SingleLine
 			charw = 4KB
 		return charw
@@ -2236,12 +2231,8 @@ class TextView (GUIControl)
 		|| t = d.tline
 		|| p = d.Position
 		
-		// OK... so lets try making undo/redo do inserts. Right? That should be... easier, right?
-		
-		// then we upgrade insertsub.
-		
-		// its hard cos I'm doing this the wrong way. We just need to approach the problem properly!
-		// it could be done... much faster too. Keep the info... nice!
+		// undo/redo do inserts
+		// then we upgrade inserttext
 		
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
@@ -2302,7 +2293,7 @@ class TextView (GUIControl)
 		old.ScrollPos = .scrollpos
 		old.TypingPlace = .selrange
 		if old <= 1
-			old.clear
+			old.cleardoc
 		.document = nil
 		.ClearErrors
 
@@ -2348,8 +2339,7 @@ class TextView (GUIControl)
 	
 	libinternal TextPaste (GUIPasteEvent)
 		require (self is Editable) and (purpose is PasteTextLike)
-		if data > 1
-			.DontMergeUndo
+		.DontMergeUndo
 		|| j = .JeeboxMode
 		if j is Expect or Jeebox
 			data = data.SpacesToTabs

@@ -33,23 +33,27 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 			  else
 				w.Show
 
-
-		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
+	
+		function CreateOptionSub (|string| name,  |string| tooltip, |guiaction| fnc, |buttonview|)
+			opt norefcounts
 			|| b = buttonview(._win,	fnc)
-			|| t = buttonview(._win,	fnc,		nil)
+			b.tooltip	= tooltip
+			b.id		= name
+			b.PressMakesLighter = true
+			b.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
+			return b
+
+	
+		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
+			opt norefcounts
+			|| b = .CreateOptionSub(name, tooltip, fnc)
+			|| t = .CreateOptionSub(name, tooltip, fnc)
 			
 			(t isnt editable)
 			t.text		= "\n" + name
-			t.tooltip	= tooltip
-			b.tooltip	= tooltip
 			b.text		= icon
-			b.id		= name
-			t.id		= name
+
 			t.takesfocus = 0
-			b.PressMakesLighter = true
-			t.PressMakesLighter = true
-			b.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
-			t.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
 			
 			b.size		= 4~right for 30 by 4~after for 30 
 			t.size		= 6~after to 6~left  by  the~same

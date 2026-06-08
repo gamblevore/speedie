@@ -1,6 +1,6 @@
- 
 
-	
+
+
 function dictionary.DocumentCached (|string| path, |document|)
 	opt norefcounts
 	|| i = .valuelower(path) as cachedpath
@@ -29,9 +29,8 @@ class CachedPath
 
 
 libinternal document.RemoveViewer (|guicontrol| g)
-	opt norefcounts
-	if .viewers.find(g)
-		g.remove
+	|| pos =.viewers.find(g)
+		.Viewers.Remove(pos)
 
 
 libinternal document.AddViewer (|guicontrol| g)

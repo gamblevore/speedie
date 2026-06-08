@@ -86,10 +86,13 @@ static void ShrinkCapacity_ (Array* self, uint Length) {
 int JB_Array_Find (Array* Self, JB_Object* F) {
 	if (Self) {
 		auto P = Self->_Ptr; 
-		auto A = P + Self->Length; 
-		while (P < A)
-			if (*P++ == F)
-				return (A - P)-1;
+		int N = Self->Length;
+		int i = 0; 
+		while (i < N) {
+			if (P[i] == F)
+				return i;
+			i++;
+		}
 	}
 	return -1;
 }

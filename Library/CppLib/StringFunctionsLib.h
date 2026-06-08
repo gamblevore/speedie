@@ -59,7 +59,7 @@ inline bool OffsetEquals_( uint8* S, MiniStr F );
 bool OffsetEqualsLex( uint8* S, MiniStr F );
 int OffsetCompareLex( MiniStr S, MiniStr F );
 
-bool IsAscii_(JB_String* e);
+bool IsAscii_(JB_String* s);
 bool IsAsciiSub_(uint8* SelfPos, u32 Length);
 
 

@@ -4,13 +4,13 @@ class Document (list)
 	linkage
 		cpp_part Doc
 	contains DocumentReverser
-	|int|					UndoChecker
 	|int|					ScrollPos
 	|uint16|				MaxUndos
 	|bool|					WasJbin				// Merge into jeeboxmode?
 	|bool|					WasCompressed		// Also?
 	|DocumentJeeboxMode|	JeeboxMode
 	|bool|					CompareTreesOnSave
+	|byte|					_AvoidMerge
 	|bool|					_LoadedFromFile
 	|string|				_Text
 	|DocumentReverser?|		Current
@@ -45,13 +45,13 @@ class Document (list)
 		fs <~ .FilePath
 		fs <~ "\n"
 		super.render(fs)
+	
 
-
-	function Clear 
+	libinternal ClearDoc
 		.original = nil
 		.current = nil
 		._loadedfromfile = false
-		super.clear
+		.clear
 	
 	
 	setter DocParsed (|message?|)
@@ -70,37 +70,56 @@ class Document (list)
 	function Text (|string|)
 		opt norefcounts
 		return ._text
+	
 
 
-	libinternal TryMergeChange ( |string| Insertion, |ivec2| Point, |string| OldText, |bool|)
+	libinternal documentreverser.TryMerge (|string| Insertion, |ivec2| Point, |string| OldText, |bool|)
 		opt norefcounts
-		// try merge changes... assuming the position carries on.
-		
-		return false
-//		|| c = .Current
-//			if c != .original
-//				c.text = nt
-//				c.typingplace = ns
-//				return
-//		
-//		.addstate(nt, ns)
+		|| MyOld = .obj|&nil||string|
+		require MyOld isa string
+		|| Mine = .Inserted.Length
+		if !Insertion
+			if !Mine  and  point.x2 == .point.x								// DELETE
+				// abcdefghj<k>			// (9, 10), "", "k"
+				// abcdefgh<j>			// (8, 9),  "", "j"
+				.obj = OldText + MyOld
+				.point.x = point.x
+				return true
+		  else
+			|| P = .point
+			if Mine and !p.width and !point.width and p.x+Mine == point.x	// INSERT
+				// abcdefgh<c>			// (8, 8),  "c", ""
+				// abcdefghc<d>			// (9, 9),  "d", ""
+				.Inserted += Insertion
+				return true
+
+
+	libinternal TryMerge (|string| Insertion, |ivec2| Point, |string| OldText, |bool|)
+		opt norefcounts
+		|| av = ._AvoidMerge
+			._AvoidMerge = av - 1
+			return false
+		|| c = .Current
+			return c.TryMerge(Insertion, point, oldtext)
 	
 
 	libinternal AddState (|string| Insertion, |ivec2| Point, |string| OldText)
 		opt norefcounts
+		|| Merged = .TryMerge(Insertion, Point, OldText)
 		|| c = .current
 			c.RemoveAfter
+		  else
+			.clear
 		
+		require !merged
 		|| latest = DocumentReverser(Insertion, Point, OldText)
 		self <~ latest
-		
 		.current = latest
-		.original ?= latest
 		.Trim
 
 
 	inline IsModified (|bool|)
-		return .current
+		return .current != .Original
 
 
 	function SaveBeforeClose (|bool|)
@@ -265,12 +284,13 @@ class Document (list)
 			
 		.filedate = f.modified
 		if ChangedExternal
+			._AvoidMerge = 2
 			.TypingPlace = ivec2(.scrollpos)
 			|string--| OldText = ._Text
 			.addstate(data, (0, oldtext.length), OldText)
 			.Original = .Current
 		  else
-			.clear
+			.clearDoc
 			.TypingPlace = nil
 
 		._text = data
@@ -362,24 +382,22 @@ extend TextView
 		|| u = .undoer
 		if !u
 			super.textset(NewText)
-			(self is modified) = true
+			is modified
 			.touch
 			.TypingPlaceTry(NewSel, true, nil)
 			(.OnTextChanged)(self, documentaction.Typing, true)?
 			return
 
-		if self is editable
-			if !u.TryMergeChange(Insertion, Point, OldText)
-				u.AddState(Insertion, Point, OldText)
+		u.AddState(Insertion, Point, OldText)
 		u._text = NewText
-		u.TypingPlace = newSel
+		u.TypingPlace = NewSel
 		u.UpdateViewers(documentaction.Typing)
 
 
 	function DontMergeUndo
 		opt norefcounts
-		|| u = .undoer
-			u.UndoChecker = -1
+		|| u = ._Viewing
+			u._AvoidMerge = 2
 
 
 //	libinternal ExpectCurr (||)
@@ -393,7 +411,7 @@ extend TextView
 
 	function Undo (|bool| undo)
 		opt norefcounts
-		|| u = .undoer$
+		|| u = ._viewing$
 		// I think we should have a default first state?
 		// at least... it makes the undo simpler.
 		// We need some way to say that we are at the start, or at the end
@@ -412,7 +430,8 @@ extend TextView
 			expect (m) (beep)
 			
 			m.Redo(u)
-		
+
+		u._AvoidMerge = 1
 		u.current = m
 		.UpdateToDocument(u, documentaction.UndoOrRedo)
 
@@ -428,11 +447,10 @@ extend TextView
 
 	libinternal UpdateToDocument (|document| D, |int| Reason)
 		require .parent
-		.DontMergeUndo
 		if d._text
 			self|guicontrol|.text = d._text
 			|| i = d.scrollpos
-			.PrepareLinesOfText
+//			.PrepareLinesOfText
 			|| ty = d.typingplace
 			.TypingPlaceTry(ty, true, nil)
 			.scrollpos = i
@@ -449,37 +467,34 @@ extend TextView
 
 class DocumentReverser (list)
 	linkage
-		cpp_part dcs
+		cpp_part Undo
 	contains DocumentReverser
 	
 	|string|			Inserted
-	|ivec2|				InsertionPlace
+	|ivec2|				Point
 	
 	constructor (|string| Insertion, |ivec2| Point, |string| OldText)
 		.Inserted = Insertion
-		.InsertionPlace = point
+		.Point = point
 		.obj = OldText
-		
+	
 	function Undo (|document| D)
 		// abcdef<123>gh		//	"123"	(6,6)	""
 		// abcdef123gh
 		opt norefcounts
 
-		|| fs = FastString.shared
-		|| x = .InsertionPlace.x
-		d.TypingPlace = (x, x)
-		fs.AppendRange(d._text, 0, X)
 		|| t = .obj as string
-		fs <~ t
-		x += .Inserted.Length
-		fs.AppendRange(d._text, X, int.max)
-		d._text = fs
+		expect (t!=nil)
+		|| x = .Point.x
+		d._Text = d._Text.insert(t, (x, x+.inserted.length))
+		|| TP = x + t.Length
+		d.TypingPlace = (tp, tp)
 		
 		
 	function Redo (|document| D)
-		|| P = .InsertionPlace
+		|| P = .Point
 		d._Text = d._Text.Insert(.inserted, P)
-		|| x = p.x2 + .inserted.length
+		|| x = p.x + .inserted.length
 		d.TypingPlace = (x,x)
 		
 
@@ -492,4 +507,6 @@ datatype DocumentAction (byte)
 		Saving			= -3
 		Closing			= -4
 		ErrorChecking	= -5
+
+
 

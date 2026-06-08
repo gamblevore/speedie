@@ -739,7 +739,8 @@ JB_String* JB_Str_ResolvePath ( JB_String* self, bool AllowMissing ) {
 			u32 N = 0;
 			_NSGetExecutablePath(0, &N);
 			Result = JB_Str_New(N-1);
-			_NSGetExecutablePath((char*)(Result->Addr), &N);
+			if (N > 0)
+				_NSGetExecutablePath((char*)(Result->Addr), &N);
 			JB_Incr(Result);
 		}
 		return Result;
@@ -1404,13 +1405,13 @@ JB_String* JB_File_CurrChild (JB_DirReader* self, int MakeDirsObvious) {
 
 	int IsDir = (MakeDirsObvious!=0) and ChildIsDir(self->File, MakeDirsObvious, Child, NameLength);
 	// what about if its not? we need the full-file-path, then. So we need to concat two strings.
-    JB_String* e = JB_Str_New( (int)NameLength + IsDir );
-    if (e) {
-        CopyBytes((uint8*)(Child->d_name), e->Addr, (int)NameLength);
+    JB_String* s = JB_Str_New( (int)NameLength + IsDir );
+    if (s) {
+        CopyBytes((uint8*)(Child->d_name), s->Addr, (int)NameLength);
         if (IsDir)
-			e->Addr[NameLength] = '/';
+			s->Addr[NameLength] = '/';
     }
-    return e;
+    return s;
 }
 
 
