@@ -306,8 +306,9 @@ function InitBasicStuff (|int|) // compiler.init
 	.AddGlobalConstNum( "__time_id__",		typeint!,		scimport.recent.timeid )
 	.AddGlobalConstNum( "__now__",			typedate!,		date.now )
 	.AddGlobalConstNum( "__modified__",		typedate!,		scimport.recent)
-	.AddGlobalConstFloat( "π",				typefloat64!,	"3.1415926535897932")
-	.AddGlobalConstFloat( "τ",				typefloat64!,	"6.2831853071795864")
+
+	.AddGlobalConstFloat( "π",				typefloat64!,	0x400921fb54442d18)		//3.1415926535897932
+	.AddGlobalConstFloat( "τ",				typefloat64!,	0x401921fb54442d18)		//6.2831853071795864
 	if stderr.ErrorCount > rz
 		compiler.InitedOK = false
 		
@@ -831,10 +832,10 @@ function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
 	d.numberconst = value
 
 
-function AddGlobalConstFloat (|string| name, |SCClass| c, |string| value)
+function AddGlobalConstFloat (|string| name, |SCClass| c, |int64| value)
 	|| d = .AddGlobalConst(name, c)
 	d.IsLookupOnly = @num + value
-	d.numberconst = value.float.asint
+	d.numberconst = value
 
 
 function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.real, |SCDecl|)

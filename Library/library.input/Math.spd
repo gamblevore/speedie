@@ -6,6 +6,7 @@
 
 module Math
 	constants
+		// these should go into binary form...
 		E = 2.7182818284590452353602874713526
 		iTau = 0.15915494309
 		// Maths is just a place to put constants on...
