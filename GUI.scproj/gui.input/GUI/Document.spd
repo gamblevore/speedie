@@ -246,6 +246,7 @@ class Document (list)
 
 	libinternal UpdateViewers (|int| Reason)
 		opt norefcounts
+		.notifychange
 		for v.Viewer in self
 			if v
 				v.UpdateToDocument(self, Reason)
@@ -308,28 +309,22 @@ class Document (list)
 	libinternal Trim
 		opt norefcounts
 		|| L = .last$
-		|| F = .first
-		require L != F
-		
-		|| n = .maxundos - 2
-		for (n)
+		|| n = .maxundos-1
+		while --n > 0
 			l--
-			require L != F
-		
-		while
-			|| nxt = f.next
-			if nxt == l
-				exit
-			nxt.remove
-		
-		if !.current.parent			// how?? its the last!
-			debugger			
-			self <~ .current
-		
-		if !.original.parent		// original sometimes isnt first
-			debugat					// just wanna see :)
-			.first = .original
-			f.remove
+			require l
+
+		l.RemoveBefore
+		|| o = .Original
+		if o and !o.parent
+			.Original = nil
+
+
+	libinternal NotifyChange
+		opt norefcounts
+		for v.Viewer in self
+			if v
+				v.TextAlteredForDraw |= 4
 
 	
 	module
@@ -433,8 +428,9 @@ extend TextView
 
 		u._AvoidMerge = 1
 		u.current = m
+		u.NotifyChange
 		.UpdateToDocument(u, documentaction.UndoOrRedo)
-
+		
 
 	libinternal UpdateModState (|document| D, |int| reason)
 		|| ismod = d.ismodified
@@ -450,7 +446,6 @@ extend TextView
 		if d._text
 			self|guicontrol|.text = d._text
 			|| i = d.scrollpos
-//			.PrepareLinesOfText
 			|| ty = d.typingplace
 			.TypingPlaceTry(ty, true, nil)
 			.scrollpos = i

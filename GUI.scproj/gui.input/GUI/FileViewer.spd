@@ -463,18 +463,23 @@ class FileViewer (ListView)
 	
 	
 	function OpenQuick (|string| s)
-		|| LineByte = (0, 0)
-		|| Path = s.ExtractPathAndLine(LineByte)				
-			|| r = .FindAPath(path) ?? .AddExtra(path)
-				.Select(nil) // do we need this?
-				.SelectFast(r)
-		  else
+		if  !s.OutWhite
 			.editme.SetFocus
+			return
 		
-		if LineByte.x1
-			.editme.ViewLineAndSel(LineByte.x1)
-		if LineByte.x2
-			.editme.ShowAndSelect(LineByte.x2, true)
+		|| Path = s.ExtractPathAndLine
+		|| n = path.name
+			|| r = .FindAPath(n) ?? .AddExtra(n)
+				.Select(nil)					// do we need this?
+				.SelectFast(r)
+		
+		|| Pos = path.Position
+		|| Line = path.rangelength
+			.editme.ViewLineAndSel(Line)
+			if pos								// surely... its a position ON a line?
+				pos += .editme.SelRange.x
+		if pos
+			.editme.ShowAndSelect(Pos, true)
 
 
 	function AddExtra (|string| path, |filerow|)

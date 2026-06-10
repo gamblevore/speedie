@@ -221,30 +221,31 @@ class TextViewLine (list)
 				srch = Attempt
 		
 		return srch
+	
 
-
-	libinternal message.NextColor (|int| s, |message|)
+	libinternal message.NextColor (|int| ToFind, |message|)
 		opt norefcounts
 		|| nxt = self
 		rz = nxt
-		|| LastAfter = nxt.after
+//		|| LastAfter = nxt.after
 		while nxt
 			|| curr = nxt
 			nxt	= nxt.flatnext
-			if curr.after <= s					// too far back
-				if curr.after > lastafter
-					LastAfter = curr.after
-					rz = curr
-				continue						// go next
+			|| CurrPos = curr.position
+//			|| CurrAfter = CurrPos + curr.RangeLength
+//			if CurrAfter <= ToFind					// too far back
+//				if curr.after > lastafter			// seemed only to cause problems
+//					LastAfter = CurrAfter
+//					rz = curr
+//				continue							// go next
 
-			|| cp	= curr.position
-			if (cp <= s)
+			if (CurrPos <= ToFind)
 				rz = curr
-			  elseif !nxt or nxt.position > cp
+			  elseif !nxt or nxt.position > CurrPos
 				exit
 
-			|| par	= curr.parent				// special coloring
-			if par and par.contains(s, true)
+			|| par	= curr.parent					// special coloring
+			if par and par.contains(ToFind, true)
 				|| pt = par.func
 				if pt == @type
 					return par

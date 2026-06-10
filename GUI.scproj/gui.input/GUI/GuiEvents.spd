@@ -6,11 +6,11 @@ struct SDL_Event
 		wrapper union
 		cpp_part Event
 	
-	|SDLEventType|	 			type
+	|SDLEventType|				type
 	|uint|						timestamp
 
 
-	module 
+	module
 		inline HasAny (|bool|)
 			return (nil|&SDL_Event|).poll
 	
@@ -71,9 +71,9 @@ struct SDL_TextEditingEvent
 	|uint|			windowID							// The window with keyboard focus, if any
 	|int8[32]|		text								// The editing text
 	|uint|			start								// The start cursor of selected editing text
-    |uint|			length								// The length of selected editing text
-    
-    function Str (|string|)
+	|uint|			length								// The length of selected editing text
+	
+	function Str (|string|)
 		|| n = 0
 		while n < 32
 			loop .text[n++] // sigh why is the length wrong? we have to do this instead.
@@ -89,12 +89,12 @@ struct SDL_MouseMotionEvent
 	|SDLEventType|		type
 	|uint|				timestamp
 	|uint|				windowID
-    |Uint|				which
-    |Uint|				state
-    |int|				x
-    |int|				y
-    |int|				xrel
-    |int|				yrel
+	|Uint|				which
+	|Uint|				state
+	|int|				x
+	|int|				y
+	|int|				xrel
+	|int|				yrel
 
 
 
@@ -175,15 +175,15 @@ struct SDL_MultiGestureEvent
 	linkage
 		wrapper
 		cpp_part MGE
-    |Uint|		type
-    |Uint|		timestamp		/**< In milliseconds, populated using SDL_GetTicks() */
-    |uint64|	touchId			/**< The touch device id */
-    |float|		dTheta
-    |float|		dDist
-    |float|		x
-    |float|		y
-    |Uint16|	numFingers
-    |Uint16|	padding
+	|Uint|		type
+	|Uint|		timestamp		/**< In milliseconds, populated using SDL_GetTicks() */
+	|uint64|	touchId			/**< The touch device id */
+	|float|		dTheta
+	|float|		dDist
+	|float|		x
+	|float|		y
+	|Uint16|	numFingers
+	|Uint16|	padding
 
 
 
@@ -210,10 +210,10 @@ struct SDL_DropEvent
 	linkage
 		wrapper
 		cpp_part Drop
-    |Uint|		type
-    |Uint|		timestamp			/**< In milliseconds, populated using SDL_GetTicks() */
-    |cstring|	file				/**< Should be freed with SDL_free(), NULL on begin/complete */
-    |Uint|		windowID			/**< The window that was dropped on, if any */
+	|Uint|		type
+	|Uint|		timestamp			/**< In milliseconds, populated using SDL_GetTicks() */
+	|cstring|	file				/**< Should be freed with SDL_free(), NULL on begin/complete */
+	|Uint|		windowID			/**< The window that was dropped on, if any */
 
 
 
@@ -228,14 +228,14 @@ datatype SDLEventType (uint)
 	constants
 		|SDLEventType|
 		/* Application events */
-		QUIT           = 0x100 /* User-requested quit */
+		QUIT			= 0x100 /* User-requested quit */
 
 		/* These application events have special meaning on iOS see README-ios.md for details */
-		APP_TERMINATING        /* The application is being terminated by the OS
+		APP_TERMINATING			/* The application is being terminated by the OS
 										 Called on iOS in applicationWillTerminate()
 										 Called on Android in onDestroy()
 									*/
-		APP_LOWMEMORY          /* The application is low on memory free memory if possible.
+		APP_LOWMEMORY			/* The application is low on memory free memory if possible.
 										 Called on iOS in applicationDidReceiveMemoryWarning()
 										 Called on Android in onLowMemory()
 									*/

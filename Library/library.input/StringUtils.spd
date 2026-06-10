@@ -182,34 +182,27 @@ libinternal cstring.temp (|VirtualJBString|)
 	rz.addr = self|&byte|
 
 
-function String.ExtractPathAndLine (|$ivec2| LineAndByte, |string|)
+function String.ExtractPathAndLine (|message|)
+	|message--| msg = Message()
 	if charset.line in self
 		|| parsed = .Parse
-			|| isArg = (parsed == @arg)
-			|| curr = (parsed.first (isarg) parsed)
-			while curr
-				|| pos = curr["pos"]
-				|| path = curr["file"]
-				path ?= curr["path"]
-				if path and pos
-					|int| n = pos.int // make the c++ compile D:
-					LineAndByte = (1, n)
-					return path.name
-				curr++
+			|message--| path = parsed["file"]
+			path ?= parsed["path"]
+			if path
+				msg.name = path.name
+				|message--| pos = parsed["pos"]
+					msg.Position = pos.int
+				|message--| line = parsed["line"]
+					msg.RangeLength = line.int
+				|message--| Sub = parsed["view"]|message|
+				msg <~ Sub
+				return msg
 
-	rz = .TrimStart("line ")
-	|| tr = rz.trim
-	if tr.isint
-		|| v = (tr.int|int|, 0)
-		LineAndByte = v
-		return ""
-	
-	|| parts = rz / ':'
-	rz = parts[0].trim
-	|| v2 = (parts[1].trim.int|int|, parts[2].trim.int|int|) 
-	LineAndByte = v2
-	if rz[] == '~'
-		rz = rz.AbsolutePath()
+	|| parts = self / ':'
+	msg.name = parts[0].trim.AbsolutePath
+	msg.rangelength = parts[1].int
+	msg.position = parts[2].int
+	return msg
 
 
 libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)

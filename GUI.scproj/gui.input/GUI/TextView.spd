@@ -623,6 +623,7 @@ class TextView (GUIControl)
 
 
 	function CurrLine (|int|)
+		opt norefcounts
 		|| d = .FindTextLine(.sel0)
 		return d.vline
 	
@@ -1547,6 +1548,7 @@ class TextView (GUIControl)
 			if s in '\t' // tabonly
 				.DontMergeUndo
 			
+			.TextAlteredForDraw |= 4
 			.TryCaptureUndo(nt, NewSel, s, p, t[p])
 			|| it = .isinline
 			if it Is Searching
@@ -2015,7 +2017,7 @@ class TextView (GUIControl)
 
 		|| n = 3 - .MaxVisibleLines
 		|| L = .WrappedLines.last!
-		|| last = L.movecapped(n)!
+		|| last = L.movecapped(n)
 		
 		if d.position > last.position
 			d = last
@@ -2025,6 +2027,7 @@ class TextView (GUIControl)
 	function Start (assigns:|textviewline!| d)
 		opt norefcounts
 		require ._Start != d
+		if keys.Shift and self ~= "editme"
 		._Start = d
 		|| p = d.Position
 			.WrappedLines.Position = p
@@ -2075,8 +2078,7 @@ class TextView (GUIControl)
 		|| ldw	= ._LastCharWidth
 		._LastCharWidth = CW
 		|| Result = (CW != ldw)|int|
-		if .TextAlteredForDraw & 2
-			Result |= 2
+		Result |= .TextAlteredForDraw
 		return Result
 
 
@@ -2232,6 +2234,28 @@ class TextView (GUIControl)
 
 		.PrepareLinesEnd(d, changed, pos)
 	
+
+//	libinternal BUGBUG3 (|listviewrow| row, |listviewrow|)
+//		opt norefcounts
+//		if 1
+//			row = row.Last
+//		if row
+//			0
+	
+
+//	function BUGBUG (|textviewline| D)
+//		opt norefcounts
+//		if 1
+//			d = nil
+/*
+		setting it to real always if unknown seems OK. The problem is more that
+		it seems to go wierd. It alters the "realnesses", which disturbs things all over.
+		
+		Not sure what to do with realnesses?
+*/
+	
+//		if !d
+
 	
 	function PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
 		opt norefcounts
@@ -2240,7 +2264,8 @@ class TextView (GUIControl)
 		if .IsALogTextView and ._CanSeeLastLine
 			|| n = 1 - .MaxVisibleLines
 			d = d.MoveCapped(n)
-		  elseif (changed == 1) or .IsALogTextView
+		  elseif (changed & 5) or .IsALogTextView
+			// 5 means width is changed, OR the change came from typing/undo/etcs
 			d = .FindLine(pos)
 		  else
 			d = nil

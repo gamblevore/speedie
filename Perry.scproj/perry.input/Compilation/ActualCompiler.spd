@@ -54,9 +54,9 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 	|| ArgMsg = DebugArgs["args"]
 		ArgMsg = ArgMsg.Copy
 		argmsg.Ask
-	
+		
 	|[string]| args	
-	if ArgMsg.DebugArgNames(args)
+	if  ArgMsg.DebugArgNames(args)
 		|| f = Product
 		if product.IsDir and Platform.OSX
 			f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
@@ -65,10 +65,10 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 		.DebugPath(debugargs)	
 		.DebugEnvs(debugargs["env"])		
 		.ACTUAL_DEBUG(f, args)
-	
-		if !StdErr.ok
-			.DebugArgsText.FillErrors(StdErr)
-			|| err = StdErr.LastError
-				Notifications <~ err
 		app.cwd = old
+	
+	if !StdErr.ok
+		.DebugArgsText.FillErrors(StdErr)
+		|| err = StdErr.LastError
+			Notifications <~ err
 

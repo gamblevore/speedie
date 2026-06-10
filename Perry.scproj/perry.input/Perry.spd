@@ -28,12 +28,19 @@ module Perry
 	
 	
 	function LoadAppArg (|string| arg, |perryide|)
-		|| line = (0, 0)
-		|| path = arg.ExtractPathAndLine(line)
-		|| ide = GUI.OpenDocument(path, true)
+		// xcode can't even pass params containing \n in it... and lots of things.
+		// despite having a GUI... you know the thing designed to store any text...
+		// meanwhile perry can pass any param despite being textual.
+		
+		|| path = arg.ExtractPathAndLine
+		|| ide = GUI.OpenDocument(path.name, true)
 		if ide isa PerryIDE
-			ide.editme.ViewLineAndSel(line.x)
-			return ide
+			|| Sub = path.first
+				ide.EditPath(Sub.name)
+			|| Line = path.rangelength
+				ide.editme.ViewLineAndSel(Line)
+			
+			rz = ide
 
 
 	function OpenProj (|[PerryIDE]|)
@@ -46,8 +53,8 @@ module Perry
 		app.prefs.save
 	
 	
-	function UpdateColors
-		app.prefs["colors"] = ¥.savecolors.parse
+//	function UpdateColors
+//		app.prefs["colors"] = ¥.savecolors.parse
 
 	
 	function CleanProjectList
@@ -98,9 +105,9 @@ module Perry
 	function BuildAppMenu
 		appmenu.addsep
 //		|| extra = platform.isdebug or app.prefs["dev"].Yes
-//			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
-//			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
-		appmenu <~ ("Edit Preferences", ClickedEditPrefs)
+//			appmenu <~ ("Prepare Upload",	ClickedMakeArchiveMenu)
+//			appmenu <~ ("Uninstall",		ClickedUninstallMenu)
+		appmenu <~ ("Edit Preferences",	ClickedEditPrefs)
 //		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
 //		appmenu <~ ("Install",  		ClickedInstallMenu)
 
