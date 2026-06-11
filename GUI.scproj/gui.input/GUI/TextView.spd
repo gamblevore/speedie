@@ -2027,7 +2027,6 @@ class TextView (GUIControl)
 	function Start (assigns:|textviewline!| d)
 		opt norefcounts
 		require ._Start != d
-		if keys.Shift and self ~= "editme"
 		._Start = d
 		|| p = d.Position
 			.WrappedLines.Position = p
@@ -2235,7 +2234,7 @@ class TextView (GUIControl)
 		.PrepareLinesEnd(d, changed, pos)
 	
 	
-	function PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
+	libinternal PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
 		opt norefcounts
 		d.RemoveAfter
 		._PreferPrevLine = false
@@ -2278,29 +2277,24 @@ class TextView (GUIControl)
 			if s contains Value
 				return s
 		
-		
-	libinternal UnloadDoc (|document| old)
-		opt norefcounts
-		old.ScrollPos = .scrollpos
-		old.TypingPlace = .selrange
-		if old <= 1
-			old.cleardoc
-		.document = nil
-		.ClearErrors
 
 
 	function LoadDocument (|document| D, |bool| Show, |bool|)
 		|| old = .document
 			require .GroupSaveAll or old.SaveBeforeClose
-			.UnloadDoc(old)
+			.document = nil
+			.ClearErrors
 		
 		d.SimpleUpdateFromDisk
+		|| S = d.scrollpos			// in case events bugger it up
+		|| T = d.typingplace		// same
 		if d.Load(false)
 			.document = d
 			.ClearErrors
 			if show
-				.SelDirect(d.TypingPlace, nil)
-				.ScrollPos = d.scrollpos
+				.PrepareLinesOfText
+				.SelDirect(T, nil)
+				.ScrollPos = S
 			return true
 		
 		.Clear("")

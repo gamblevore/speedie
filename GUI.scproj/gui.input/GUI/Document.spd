@@ -244,7 +244,7 @@ class Document (list)
 				v.parse
 
 
-	libinternal UpdateViewers (|int| Reason)
+	libinternal UpdateViewers (|DocumentAction| Reason)
 		opt norefcounts
 		.notifychange
 		for v.Viewer in self
@@ -302,7 +302,7 @@ class Document (list)
 	libinternal Load (|bool| ChangedExternal, |bool|)
 		if ChangedExternal or !._LoadedFromFile
 			require .LoadSub(ChangedExternal)
-		.UpdateViewers(DocumentAction.Initialset)
+			.UpdateViewers(DocumentAction.Initialset)
 		return true
 
 
@@ -441,18 +441,19 @@ extend TextView
 		(.OnTextChanged)(self, Reason, ismod)?
 
 
-	libinternal UpdateToDocument (|document| D, |int| Reason)
+	libinternal UpdateToDocument (|document| D, |DocumentAction| Reason)
 		require .parent
 		if d._text
 			self|guicontrol|.text = d._text
-			|| i = d.scrollpos
-			|| ty = d.typingplace
-			.TypingPlaceTry(ty, true, nil)
-			.scrollpos = i
-			if reason == documentaction.typing
-				.ShowTypingPlace(ty)
-			  elseif reason == documentaction.UndoOrRedo
-				.show(ty.x)
+//			|| i = d.scrollpos
+			if reason isnt Initialset
+				|| ty = d.typingplace
+				.TypingPlaceTry(ty, true, nil)
+	//			.scrollpos = i
+				if reason is typing
+					.ShowTypingPlace(ty)
+				  elseif reason is UndoOrRedo
+					.show(ty.x)
 		  else	
 			.Clear(d._text)		
 		
@@ -473,7 +474,7 @@ class DocumentReverser (list)
 		.Point = point
 		.obj = OldText
 	
-	function Undo (|document| D)
+	libinternal Undo (|document| D)
 		// abcdef<123>gh		//	"123"	(6,6)	""
 		// abcdef123gh
 		opt norefcounts
@@ -486,7 +487,7 @@ class DocumentReverser (list)
 		d.TypingPlace = (tp, tp)
 		
 		
-	function Redo (|document| D)
+	libinternal Redo (|document| D)
 		|| P = .Point
 		d._Text = d._Text.Insert(.inserted, P)
 		|| x = p.x + .inserted.length
@@ -502,6 +503,11 @@ datatype DocumentAction (byte)
 		Saving			= -3
 		Closing			= -4
 		ErrorChecking	= -5
+		
+	syntax is (|DocumentAction| V, |bool|)
+		inlined
+		return self==V
+		
 
 
 

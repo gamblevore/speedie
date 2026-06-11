@@ -33,12 +33,6 @@ struct InlineEditor
 	syntax Is (|InlineEditorMode| Mode, assigns:|bool|)
 		if value and self
 			.mode=Mode
-		
-//	libinternal IsSearching (|bool|)
-//		return .mode == 1
-//
-//	libinternal IsEditing (|bool|)
-//		return .mode == 2
 	
 	libinternal NextSearch
 		opt norefcounts

@@ -27,7 +27,8 @@
 "Press the section-key (underneath esc) to open a CMM!"
 
 "\1F0-\1F9 can show or hide, various IDE sections. \1F0 can expand the text-editor to full-size."
-"\1F0-\1F9 (holding option key on OSX) flips between various open projects"
+
+"\1F0-\1F9 (holding option key) flips between various open projects"
 
 "Press your project button, to flip between a todo-list and your current file."
 

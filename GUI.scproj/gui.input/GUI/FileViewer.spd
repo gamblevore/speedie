@@ -187,7 +187,7 @@ class FileViewer (ListView)
 		n.remove
 	
 	
-	function SaveAll (|int| Purpose, |bool|)
+	function SaveAll (|DocumentAction| Purpose, |bool|)
 		cpp_part SaveAllArr
 		opt norefcounts
 		// what if like 100 are invalid? THEN? ask for all?
@@ -197,7 +197,7 @@ class FileViewer (ListView)
 		return true
 
 
-	function Save (|filerow| f, |int| Purpose=documentaction.saving, |bool|)
+	function Save (|filerow| f, |DocumentAction| Purpose=documentaction.saving, |bool|)
 		opt norefcounts
 		require .CanSave(purpose, f)
 		
@@ -207,7 +207,7 @@ class FileViewer (ListView)
 		return true
 
 
-	libinternal CanSave (|int| Purpose, |filerow| f, |bool|)
+	libinternal CanSave (|DocumentAction| Purpose, |filerow| f, |bool|)
 		opt norefcounts
 		|| d = f._Document						#require
 		if !d.InvalidJeebox
@@ -216,9 +216,9 @@ class FileViewer (ListView)
 		// some kinda error. We'll save anyhow. but alert them.
 		.editme.LoadDocument(d, false)
 		d.ShowErrorInViewers
-		if Purpose == DocumentAction.ErrorChecking
-			return false
-		if (purpose == DocumentAction.Saving)
+		require Purpose isnt ErrorChecking
+
+		if (purpose is Saving)
 			Notifications <~ "Invalid jeebox saved to: " + f.location
 		return true
 

@@ -920,7 +920,7 @@ So anything not 0 means "its OK"`
 		.DrawMe.Save
 
 
-	function SaveEditing (|int| Purpose) // savetext, savefile, filesave
+	function SaveEditing (|DocumentAction| Purpose) // savetext, savefile, filesave
 		opt norefcounts
 		if .DrawMe is visible
 			return .SaveDrawing
@@ -928,7 +928,7 @@ So anything not 0 means "its OK"`
 		.ParseErrorDetect
 				
 		|| e = .editme
-		if purpose == documentaction.errorchecking
+		if purpose is errorchecking
 			require e is modified
 		// otherwise resave anyhow.
 		
