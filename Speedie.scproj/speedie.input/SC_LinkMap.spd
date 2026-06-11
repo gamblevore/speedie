@@ -15,7 +15,7 @@ module LinkMap
 		require to.CanLinkFrom(self)
 		
 		if to.IsLibrary and (to is libonly) and .IsLibrary
-			check (self isnt LinkInline) (self, "Inline function should not call a helper function.")
+			check (self isnt LinkInline) (self, "Inline function should not call a libinternal function.")
 			(self is CantInline) // can't inline this
 
 		(.linkto init []) <~ to

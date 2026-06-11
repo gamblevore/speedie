@@ -274,7 +274,7 @@ struct MessagePosition
 		inlined
 
 
-prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)
+prototype ParseHandler			(|int| Start, |message| Parent=nil, |Message?|)
 prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
 
 

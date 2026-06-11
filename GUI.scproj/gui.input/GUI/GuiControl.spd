@@ -137,7 +137,7 @@ class GUIControl (list)
 		.sizer.setsize(self, sz)
 
 
-	function MiniSizeSet (|ivec4| Rect)
+	libinternal MiniSizeSet (|ivec4| Rect)
 		opt norefcounts
 		|| p = .parent
 		// not sure this should happen? its going to be set later, anyhow, right?
@@ -195,7 +195,7 @@ class GUIControl (list)
 		return c_Extra > 0
 	
 	
-	function TextWidth (|int|)
+	libinternal TextWidth (|int|)
 		opt norefcounts
 		return .text.bounds.x * font.width
 	

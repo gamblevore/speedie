@@ -49,6 +49,7 @@ module PostIncrementNil
 		.Size = s + 1
 	
 	function Clear
+		opt norefcounts
 		for i in .size
 			|| d = .msgs[i]!.FastDecl
 			(d isnt postincremented)

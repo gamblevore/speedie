@@ -22,19 +22,12 @@ struct ArchonPurger
 	|int|					InsideBoolLogic
 	|bool|					FnAbleToNilCheck
 	|bool|					AnyReturns
+	|bool|					NeedsRestart
 	|NilRecord[64]|			Rows
 	
 	
 	function BranchDepth (|int|)
 		return (.Neel - &.rows[0])|int|
-	
-	
-	function BecomeRealSub (|scdecl| V)
-		V.NilDeclared = NilState.real
-		if v is self
-			.FnAbleToNilCheck = false
-		if .BranchDepth > 0				// We need to affect the other branches.
-			.Realnesses &= ~(nilstate.nilish << (V.NilReg<<1))
 	
 	
 	function BranchEnter (|message| where, |NilRecord|)
@@ -60,7 +53,7 @@ struct ArchonPurger
 	
 	function BranchRestore (|NilRecord| A,  |nilstate|)
 		.Neel--[] = 0 // cleanup
-		t.value = A
+		.value = A
 		if .BranchDepth == 0
 			.Realnesses = -1
 		return NilState.real
@@ -69,11 +62,11 @@ struct ArchonPurger
 	function BranchExit (|NilRecord| A,  |nilstate|)
 		|| B = value()
 		.Neel--[] = 0 // cleanup
-		t.value = A ||| B
+		.value = A ||| B
 		if .BranchDepth == 0
 			.Realnesses = -1
 		return nilstate.real
-
+	
 			
 	function Declare (|scdecl| D, |nilstate| nd, |message| ToClose, |nilstate|)
 		rz = .DeclareSub(d, nd, toclose)
@@ -89,9 +82,9 @@ struct ArchonPurger
 		if !d.Suffers
 			d.NilDeclared = NilState.Real
 		
-		t.closers[n] = nil
+		.closers[n] = nil
 		if d isnt Grabbed						// grabbed's previous use was only on properties. can't clash.
-			t.closers[n] = ToClose
+			.closers[n] = ToClose
 		
 		d.DepthOfBranch = .BranchDepth
 		|| P = (.Neel)|&nilrecorder|
@@ -112,6 +105,11 @@ struct ArchonPurger
 		return New
 
 
+	function CheckParam (|scdecl| d)
+		d.Paramfix
+		.DeclareSub(d, d.nildeclared, d.source!)
+
+
 	function StartNil (|SCFunction| f, |message|)
 		opt norefcounts
 		require f.HasProperSpeedieCode
@@ -124,11 +122,11 @@ struct ArchonPurger
 		.Realnesses = -1
 		loops = nil
 		.AnyReturns = false
+		.NeedsRestart = false
 		.CheckNilCheck(F)
 		
 		for d in f.args
-			d.Paramfix
-			.DeclareSub(d, d.nildeclared, d.source!)
+			.CheckParam(d)
 		
 		|| r = f.ReturnType
 			if !r.nilstated
@@ -169,12 +167,28 @@ struct ArchonPurger
 	setter Value (|NilRecord| Dest)
 		.neel[] = dest & .Realnesses
 
+	function ExterminateZergBugs (|SCFunction| f)
+		opt norefcounts
+		
+		|| arg = .Startnil(f)
+			Argument(arg)
+			if .NeedsRestart
+				RestartCount++
+				StdErr.Clear
+				.StartNil(f)
+				Argument(arg)
+				
+			if .FnAbleToNilCheck and !f.isnilchecker
+				f.isnilchecker = 1
+		.FinishNil(f)
+
 
 	module
-		|LoopInfo| 				Loops
+		|LoopInfo|				Loops
 		|ArchonPurger|			T
 		|byte|					OldPrint
 		|bool|					NewFuncsLoaded
+		|int|					RestartCount
 
 		function BeginLoop (|bool| HasExitCond, |Loopinfo|)
 			rz = .loops
@@ -191,19 +205,13 @@ struct ArchonPurger
 			.t.value = nilstate.Basic
 
 		function ExterminateZergBugs (|SCFunction| f)
-			opt norefcounts
-			
-			|| arg = .t.Startnil(f)
-				Argument(arg)
-				if .t.FnAbleToNilCheck and !f.isnilchecker
-					f.isnilchecker = 1
-			.t.FinishNil(f)
-
+			.t.exterminatezergbugs(f)			
 		
 		function LaunchMothership
 			(compiler is NilChecking)
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
+			rec.PrintNewErrors = old.PrintNewErrors // inherit
 			.LaunchMothershipSub(old, rec)
 			SCFunction.currfunc = nil
 	

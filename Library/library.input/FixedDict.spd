@@ -134,7 +134,7 @@ class FixedDict
 			|| B	= addr[i++]
 			self	= self[B&15]				#require
 			|| T	= .typeof(B>>4)
-			self	= self[B>>4]
+			self	= self[B>>4]!
 			if i >= n
 				return .InlineValue(t)
 			require T == typedict

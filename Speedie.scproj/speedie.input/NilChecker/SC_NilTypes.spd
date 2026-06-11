@@ -40,7 +40,7 @@ datatype NilCheckMode (int)
 		Reversed
 		While
 		Disappears
-		Assigns
+		TryingToAssign
 		ForBools
 		AllowRegisterAddr
 		IfPos = Positive ||| ForBools ||| AllowRegisterAddr

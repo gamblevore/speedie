@@ -239,13 +239,13 @@ function SCFunction.RefFunc (|message| prm, |message!| after)
 	parser.using.position = -1
 
 
-function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
+function RefIncr (|Message!| msg, |Message| Place, |bool| IsJustAnArg=false)
 	opt norefcounts
 	if (IsJustAnArg)
-		Place = msg.parent.parent
+		Place = msg.parent.parent!
 	  else
 		if (Place == @decl)
-			msg = Place.last
+			msg = Place.last!
 			if (msg == @rel)
 				msg = msg.last!
 				if msg.IsStatementExpr

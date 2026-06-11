@@ -2234,28 +2234,6 @@ class TextView (GUIControl)
 
 		.PrepareLinesEnd(d, changed, pos)
 	
-
-//	libinternal BUGBUG3 (|listviewrow| row, |listviewrow|)
-//		opt norefcounts
-//		if 1
-//			row = row.Last
-//		if row
-//			0
-	
-
-//	function BUGBUG (|textviewline| D)
-//		opt norefcounts
-//		if 1
-//			d = nil
-/*
-		setting it to real always if unknown seems OK. The problem is more that
-		it seems to go wierd. It alters the "realnesses", which disturbs things all over.
-		
-		Not sure what to do with realnesses?
-*/
-	
-//		if !d
-
 	
 	function PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
 		opt norefcounts
@@ -2270,7 +2248,7 @@ class TextView (GUIControl)
 		  else
 			d = nil
 		
-		if !d? // nilchecker bug here. It doesnt realise d can be nil
+		if !d // nilchecker bug here. It doesnt realise d can be nil
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
 	

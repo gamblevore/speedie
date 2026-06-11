@@ -132,7 +132,7 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 	|| actual = .Jump(ch, chmode)
 	if actual is nilish
 		|| ddd = dcl.hiderfunc
-		if ddd and (reason is property) and !ddd.isassigns and (test isnt assigns)				// OK... 
+		if ddd and (reason is property) and !ddd.isassigns and (test isnt TryingToAssign)				// OK... 
 			return .PropertyToFunc(ch.parent!, ddd)
 			
 		.BecomeReal(ch.FastDecl, ch, reason)
@@ -394,10 +394,12 @@ function If (NilTrackerFn)
 		arg2 = arg2.next
 
 	|| Orig = .T.BranchEnter(msg) #require
+	
 	#!"First Branch"
 	.SyncJump(Cond, NilCheckMode.Ifpos)
 	.Argument(arg1)
 	
+	#!"Swap"
 	|| First = .T.BranchSwap(Orig)
 
 	#!"Second Branch"
@@ -406,6 +408,8 @@ function If (NilTrackerFn)
 		.if(Else)
 	  elseif arg2.HasAny
 		.Argument(arg2)
+	
+	#!"Exit"
 	return .t.BranchExit(First)
 
 
@@ -540,6 +544,10 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 
 	if !dcl.Suffers
 		return dcl.nildeclared
+	
+//	if test is TryingToAssign		// used for things like: x[0] = y, which requires x to be real. 
+//		return dcl.nildeclared		// but x = y does not require x to be real.
+//  actually just making it real is better
 	
 	|| Unknown = dcl.IsUnknownParam 		
 	if Unknown and (test isnt soft and disappears)
@@ -698,9 +706,8 @@ function SetRel (NilTrackerFn)
 	|| LD = L.FastDecl
 	test = (nilcheckmode.soft) * (ld isnt local  and  ld.nildeclared == nilstate.optional)
 	|| RN = .Jump(R, test)
-	// to run this:  *a = *b
-	// we would need to run *b first to get the value. So right-side has to be run first.
-	.Jump(L, nilcheckmode.Assigns)
+	
+	.Jump(L, nilcheckmode.TryingToAssign)
 								
 	return .VariableSet(LD, L, R.FastDecl, R, RN)
 
@@ -754,7 +761,13 @@ function BecomeReal (|scdecl| sent,  |message| where,  |nilreason| reason,  |scd
 
 function BecomeRealSub (|scdecl| sent,  |message| where,  |nilreason| reason,  |scdecl?| recv,  |scfunction?| To, |nilstate| curr, |nilstate|)
 	if (Curr == nilstate.either) and sent.IsUnknownParam
-		.T.BecomeRealSub(sent)
+		sent.NilDeclared = NilState.real
+		|| t = .t
+		if sent is self
+			t.FnAbleToNilCheck = false
+		t.NeedsRestart = true
+		if t.BranchDepth > 0				// We need to affect the other branches.
+			t.Realnesses &= ~(nilstate.nilish << (sent.NilReg<<1))
 		return .T.SetNilness(sent, NilState.real)
 
 	if recv and !recv.TypeSuffers		// passing nil to int

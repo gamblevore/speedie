@@ -588,8 +588,10 @@ helper message.ConstructorAddNil (|bool| isdot)
 	opt norefcounts
 	if isdot
 		|| p = .parent
+		require p
 		.first = p.first
 		self = p
+		
 	.first = .CreateNil
 
 

@@ -301,16 +301,17 @@ extend Parser
 	function NeedName ( |message| thg, |bool|)
 		if (thg == @thg)
 			return true
-		return .ErrorAdd( "Must be a proper name (a-z or unicode-letters)", thg.position )
+		.ErrorAdd( "Must be a proper name (a-z or unicode-letters)", thg.position )
 	
 		
 	function fURL (ParseHandler)
 		opt norefcounts
-		require .NeedName(parent!)
-		.NextStart = .data.inwhite(start)
-		parent.Func = @url
-		parent.RangeLength += 3
-		parent <~ parser.new( nil, @str, start+3, .NextStart )
+		if parent
+			require .NeedName(parent)
+			.NextStart = .data.inwhite(start)
+			parent.Func = @url
+			parent.RangeLength += 3
+			parent <~ parser.new( nil, @str, start+3, .NextStart )
 		return parent
 		
 		

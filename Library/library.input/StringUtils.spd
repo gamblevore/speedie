@@ -186,6 +186,9 @@ function String.ExtractPathAndLine (|message|)
 	|message--| msg = Message()
 	if charset.line in self
 		|| parsed = .Parse
+//			|message--| p2 = parsed.first
+//			if (p2 == @arg) and p2.IsLast
+//				parsed = p2
 			|message--| path = parsed["file"]
 			path ?= parsed["path"]
 			if path

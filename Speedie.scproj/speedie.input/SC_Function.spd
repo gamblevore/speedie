@@ -1288,6 +1288,11 @@ function SCDecl.MarkAsAltered  // markaltered
 	(self is setto)
 	require self is local
 	(self is altered)
+	// //                 ////////////////////                 //////////////////
+	/////////////////// //////////// / / /    ///////// // /  /  / /  /////////
+	
+	///// IT LOOKS COOL... but..,. it could be sooo much more.
+	
 	if SCFunction.InBranch > .DepthOfBranch
 		is AlteredInIf
 	if SCFunction.InLoop > .DepthOfLoop
@@ -1326,6 +1331,7 @@ module {
 |FunctionType|	_Info
 |int[12]|		FuncStats
 
+
 function CurrFunc (assigns:|scfunction?|)
 	opt norefcounts
 	._currfunc = value
@@ -1335,7 +1341,8 @@ function CurrFunc (assigns:|scfunction?|)
 	if flowcontrol.active
 		FlowControl.inputline("function: ", value.name)
 		FlowControl.inputline("stage: ", compiler.stagename)
-	
+
+
 function CurrFunc (|scfunction|)
 	return ._currfunc
 

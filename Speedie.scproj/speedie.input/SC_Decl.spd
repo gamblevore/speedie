@@ -16,7 +16,7 @@ class SCDecl (SCObject) {
 	|Object?|			IsLookupOnly
 
 	|SCDecl?|			Internal					// pointers
-	|scdecl?|			LocalVarList
+	|SCdecl?|			LocalVarList
 	|SCDecl?|			Contains
 
 	|Message?|			Default
@@ -1061,15 +1061,16 @@ class SCDecl (SCObject) {
 	function CArrayTotal (|int|)
 		opt norefcounts
 		rz = 1
-		while (|| m = .c_Array)
+		while (|| m = .c_array)
 			rz *= m
 			self = .internal #loop
 			
 
 	function CArrayInner (|scdecl|)
 		opt norefcounts
+		
 		while (.iscarray)
-			self = .internal
+			self = .internal!
 		return self
 			
 
