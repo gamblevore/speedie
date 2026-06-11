@@ -132,8 +132,9 @@ module Perry
 		.BuildAppMenu
 		.LoadRecents
 	
-		if app.CWD == "/"
-			app.RemoveArg("YES")
+		target debug
+			if app.CWD == "/"
+				app.RemoveArg("YES") // work around for Xcode bug
 
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
