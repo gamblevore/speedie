@@ -706,7 +706,6 @@ GUI_ctrl_InScrollArea
 GUI_ctrl_IsViewable
 GUI_ctrl_KeyDown
 GUI_ctrl_LostFocus
-GUI_ctrl_MiniSizeSet
 GUI_ctrl_MouseDown
 GUI_ctrl_MouseDownOnSelfOrNil
 GUI_ctrl_MouseMove
@@ -736,7 +735,6 @@ GUI_ctrl_TaskGUI_Constructor
 GUI_ctrl_TaskGUI_TaskProgress
 GUI_ctrl_TaskGUI_interface_SyntaxCall
 GUI_ctrl_TextSetter
-GUI_ctrl_TextWidth
 GUI_ctrl_Touch
 GUI_ctrl_TouchScrollBar
 GUI_ctrl_Transition

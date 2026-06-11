@@ -24,7 +24,6 @@ GUI__SDL_Cursor_Nothing
 JB__Flow_Active
 JB__Flow_AlwaysMove
 JB__Flow_BreakOnFail
-GUI__dcs_UseCompression
 JB__Proc_CheckedParent
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength
