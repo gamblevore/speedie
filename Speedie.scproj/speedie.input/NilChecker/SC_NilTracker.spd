@@ -175,7 +175,7 @@ struct ArchonPurger
 			if .NeedsRestart
 				RestartCount++
 				StdErr.Clear
-				.StartNil(f)
+				arg = .StartNil(f)
 				Argument(arg)
 				
 			if .FnAbleToNilCheck and !f.isnilchecker
@@ -211,7 +211,8 @@ struct ArchonPurger
 			(compiler is NilChecking)
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
-			rec.PrintNewErrors = old.PrintNewErrors // inherit
+			target debug
+				rec.PrintNewErrors = old.PrintNewErrors // inherit
 			.LaunchMothershipSub(old, rec)
 			SCFunction.currfunc = nil
 	
