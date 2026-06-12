@@ -65,8 +65,8 @@ JB_Globals JB__;
 		fs <~ "#pragma GCC visibility push(hidden) // hide\n"
 
 
-function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
-	opt norefcounts
+function JB_GlobalsMadeHere (|FastStringCpp| fs, |bool| Simple=false)
+
 	fs <~ "\nstruct JB_Globals {\n\tbyte __Dummy__;\n\t"
 	for prop in PackMaker.LibGlobs
 		if simple and prop.Complexity > 1
@@ -532,7 +532,6 @@ function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
 		hfile <~ ';'
 	
 	hfile <~ "\n);\n"
-
 	
 	if !cls.isrole
 		|| HasTable = .ExportBehaviourInstance(cls, cppfile)
@@ -554,11 +553,11 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 	fs <~ ";\n}\n\n"
 
 
-function FillInterpreter 
+function FillInterpreter
 	LibStability.StabiliseFuncs
 	LibStability.StabiliseGlobs
 
-	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs) 		// rebuild size
+	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs)		// rebuild size
 	assembler.sh.FillDebugInfo
 
 	.WriteVMGlobsAndPtrs(.ModuleProperties)
@@ -575,7 +574,7 @@ function faststring.AppendVoid (|string| s, |byte| extra=0)
 
 
 function faststring.AppendWrap (|scfunction| f)
-	if (f.iscppinbuilt == 1) 
+	if (f.iscppinbuilt == 1)
 		.appendvoid(f.ExportName + "Wrap")
 	  else
 		.appendvoid(f.ExportName)
@@ -642,7 +641,7 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	
 	fs <~ "// entire_function_list!\n\n"
 	for f in packmaker.LibFuncs
-		if (f.iscppinbuilt == 1) 
+		if (f.iscppinbuilt == 1)
 			.MakeWrapperFor(fs, f)
 	
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
@@ -668,6 +667,22 @@ extern \"C\" void** JB_App__LibFuncs() {
 }
 
 extern \"C\" void** JB_App__LibGlobs() {
+"
+	
+//	printline PackMaker.LibGlobs
+	for dcl in PackMaker.LibGlobs
+		|| fn = dcl.Func			
+			fs <~ "\tJB__."
+			fs.AppendLibGlob(dcl)
+			fs <~ "=("
+			writetype(dcl, fs)
+			fs <~ ")"
+			fs <~ fn.exportname
+			fs <~ ";"
+			fs <~ "\n"
+	
+//	debugger 
+	fs <~ "
 	return (void**)(&JB__);
 }
 
@@ -799,7 +814,7 @@ extern "C" {
 	fs <~ "\n}\n#endif // __JB_H__\n\n\n"
 	
 	fs <~ "#ifdef __NEED_LIB_GLOBS__"
-	.FillLibGlobs(fs, true)
+	.JB_GlobalsMadeHere(fs, true)
 	fs <~ "\n"
 	fs <~ "#endif // __NEED_LIB_GLOBS__ "
 	Cpp_Export.SmartWrite(fs, Cpp_Export.HProduct)
@@ -863,9 +878,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			Return
 		
 		if d.IsCarray
-			.WriteDeclNoName( d.internal!, T )
+			.WriteType( d.internal!, T )
 		  else
-			.WriteDeclNoName( d, T )
+			.WriteType( d, T )
 		
 		if (d.exportName)
 			T <~ ' '
@@ -964,11 +979,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| exp = Cpp_Export()
 		exp.PreRun
 		exp.ExportSyx
-		if options.makeexec
+		if options.MakeExec
 			exp.FillInterpreter
 		  else
 			packmaker.OrderLibGlobs
-		exp.FillLibGlobs(exp.GlobsInLib)
+		exp.JB_GlobalsMadeHere(exp.GlobsInLib)
 		exp.run
 		exp.WriteHeader
 		exp.FinalMergeOutputIntoACpp
@@ -1295,7 +1310,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		t <~ " ("
 		if d.IsInt
 			t <~ "("
-			.WriteDeclNoName(D,T)
+			.WriteType(D,T)
 			t <~ ")"
 		if d.ExportPosition and d.IsInt
 			t <~ d.ExportPosition|int64|
@@ -1383,7 +1398,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if ActualType != D.type
 			fs <~ '('							//  wrapper calls ')' after
 			fs <~ '('
-			WriteDeclNoName( d, fs )
+			WriteType( d, fs )
 			fs <~ ')'
 			return true
 	
@@ -1468,12 +1483,12 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 					return ""
 		
 		fs <~ "(("
-		.WriteDeclNoName( Type, fs )
+		.WriteType( Type, fs )
 		fs <~ ")("
 		return "))"
 
 
-	function WriteDeclNoName (|SCDecl| D, |FastString| T)
+	function WriteType (|SCDecl| D, |FastString| T)
 		opt norefcounts
 		|| c = d.Type
 		|| ptrs = C.IsObject + D.PointerCount
@@ -1639,7 +1654,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ '('
 		
 		|| d = .AsDecl // it should be?
-			WriteDeclNoName( d, fs )
+			WriteType( d, fs )
 		  else
 			.second!.Export( fs )
 		

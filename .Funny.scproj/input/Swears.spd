@@ -26,7 +26,7 @@ extend_module funnyword
 	helper LoadTo (|[funnyword]| list, |string| s)
 		opt norefcounts
 		for w in s.unbleep.Split
-			if w
+			if w 
 				list <~ funnyword(w, nil|error|)
 		list.sort
 	
@@ -50,12 +50,12 @@ extend_module funnyword
 		if !n
 			return upon
 		|| f = .first
-		|| fn = f.Length
+//		|| fn = f.Length
 		if !f.SyntaxCast
 			.loadto(f, .firstwords)
-		return upon //// //// //// ////
+//		return upon //// //// //// ////
 		
-		printline f
+//		printline f
 		if !.second
 			.loadto(.second, .secondwords)
 		|| fs = FastString.shared

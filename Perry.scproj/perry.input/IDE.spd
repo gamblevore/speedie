@@ -184,7 +184,7 @@ class PerryIDE (Window)
 	behaviour CancelClose
 		return !.TryClose(reason)
 	
-	function TryClose (|sdlactivity| reason, |bool|)
+	function TryClose (|GUIActivity| reason, |bool|)
 		opt norefcounts
 		GUI.SavePrefs							// seems better
 		if !.filelist.AskSaveall

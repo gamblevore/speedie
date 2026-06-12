@@ -457,7 +457,7 @@ libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |int|)
 autogen TextView.ClearActiveLine
 	opt norefcounts
 	|| m = ._Activeline
-/		m.indent = 0
+		m.indent = 0
 		._ActiveLine = nil
 
 

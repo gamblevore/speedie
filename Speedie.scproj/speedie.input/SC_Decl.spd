@@ -799,6 +799,11 @@ class SCDecl (SCObject) {
 		if .HasStruct
 			return .type.destructorfunc
 
+	function Func (|SCFunction|)
+		opt norefcounts
+		|| fn = .IsLookupOnly
+		if fn isa SCFunction
+			return fn
 
 	function ReallyContains (|scdecl|)
 		opt norefcounts

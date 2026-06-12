@@ -480,10 +480,6 @@ class XVar (list)
 				return
 		self <~ value|byte|
 	
-	
-//	syntax is (|datatypecode| T, |bool|)
-//		return .DataType.SyntaxIs(t)
-	
 
 
 function message.xvariables (|[xvar]|)
@@ -511,17 +507,17 @@ function message.LoadXVars (|?&xvar| Registers, |[xvar]| out)
 		
 		
 		if input.Position >= ReadEnd					// Close
-			expect (OK) (self, "CloseOutRange: " + reg)
-			expect (Registers) (self, "BadRegClose: " + reg)
-			|| r = Registers[reg] #expect (self, "BadRegClose: " + reg)
+			expect (OK)							(self, "CloseOutRange: "	+ reg)
+			expect (Registers)					(self, "BadRegClose: "		+ reg)
+			|| r = Registers[reg]		#expect	(self, "BadRegClose: "		+ reg)
 			R.CodeEnd = pos
 		  else
 			expect (OK) (self, "OpenOutRange: " + reg)
 			|| var = xvar(input, pos, reg, ReadEnd)
 			if Registers
 				Registers[reg] = var
-				target debug							// now what?
-					"${var.name}: $pos"
+//				target debug							// now what?
+//					"${var.name}: $pos"
 			out <~ var
 
 		expect (input.position == ReadEnd)				(self, "Corrupted debug vars")

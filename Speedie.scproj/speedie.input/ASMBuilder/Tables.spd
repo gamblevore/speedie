@@ -488,8 +488,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 
 function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
-	|| fn = prop.islookuponly
-	if fn isa scfunction
+	|| fn = prop.Func
 		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
 		return DoGlobal(self, dest, exp, prop)
 	return ConstFromThgName(self, exp, dest, prop)
@@ -589,8 +588,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if dest is Discard
 		return asmreg()	
 
-	|| fn = d.IsLookupOnly
-	if fn isa scfunction
+	|| fn = d.Func
 		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
 	return DoGlobal(self, dest, exp, d)
 		

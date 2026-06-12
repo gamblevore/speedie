@@ -71,7 +71,7 @@ class AppMenu (Window)
 			|| m = .GetAppMenu
 			m.choices.setfocus
 			m.ShowAsDialog
-			return SDLActivity.activity
+			return GUIActivity.activity
 
 
 //		libinternal MenuScreen (GuiMenuEvent)
@@ -89,7 +89,7 @@ class AppMenu (Window)
 		
 		
 		libinternal MenuQuit (GuiMenuEvent)
-			GUI.QuitReason |= sdlactivity.exiting
+			GUI.QuitReason |= GUIActivity.exiting
 		
 
 		libinternal MenuReturnkey (GuiListEvent)

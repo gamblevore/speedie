@@ -211,8 +211,8 @@ struct ArchonPurger
 			(compiler is NilChecking)
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
-			target debug
-				rec.PrintNewErrors = old.PrintNewErrors // inherit
+//			target debug
+//				rec.PrintNewErrors = old.PrintNewErrors // inherit
 			.LaunchMothershipSub(old, rec)
 			SCFunction.currfunc = nil
 	

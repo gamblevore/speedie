@@ -33,8 +33,8 @@ module GUI
 	|bool|						StartedProperly
 	|date|						ForeGroundTime
 	|bool|						FlashSelector
-	|SDLActivity|				QuitReason
-	|SDLActivity|				DuringAction
+	|GUIActivity|				QuitReason
+	|GUIActivity|				DuringAction
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
 	|bool|						NeedMouseMove
@@ -448,8 +448,10 @@ module GUI
 	libinternal SetHint (|cstring| name, |cstring| value)
 		cpp_wrapper SDL_SetHint
 	
+	
 	inline IsBackground (|bool|)
 		return !.ForeGroundTime
+	
 	
 	libinternal TrySelectorFlash
 		if !.IsBackground and (GUI.ChangeSelFlash.fired)
@@ -486,7 +488,7 @@ module GUI
 			.MouseMoveEvent(nil, w, .MouseXY)
 	
 	
-	libinternal ActualEvents (|SDLActivity|) // frameevents
+	libinternal ActualEvents (|GUIActivity|) // frameevents
 		while ((.SingleFrameDepth > 1) or (.QuitReason isnt ExitOrTerminate)) and .Event.Poll
 			.EventCount++
 			rz |= .CheckEvent(.event)
@@ -495,8 +497,8 @@ module GUI
 			.DoFakeMouseMove
 		
 		if .SingleFrameDepth <= 1
-			|| Quitish = .QuitReason &~ (SDLActivity.Activity ||| SDLActivity.Questioning)
-				rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
+			|| Quitish = .QuitReason &~ (GUIActivity.Activity ||| GUIActivity.Questioning)
+				rz = .StrongClose(Quitish) ||| GUIActivity.Activity 
 			.QuitReason = 0
 			
 		.StartResize	// don't remove! causes delayed updates! resizes can happen here
@@ -514,7 +516,7 @@ module GUI
 	libinternal UpdateTextFocus (|window| w)
 		opt norefcounts
 		|| f = w.RealFocus
-		|| AllowTyping = f and ((f is editable) or (f isa menu) or (f isa textview))
+		|| AllowTyping = (f is editable) or (f isa menu) or (f isa textview)
 		if !f and (w is editable)
 			AllowTyping = true	// allow type-through if the window is "editable". like to type secret codes in
 		if (f isa textview)
@@ -524,9 +526,9 @@ module GUI
 		require .TextInputEnabled != AllowTyping
 		.TextInputEnabled = AllowTyping
 		if AllowTyping
-			.sdl_starttextinput
+			.SDL_StartTextInput
 		  else
-			.sdl_stoptextinput
+			.SDL_StopTextInput
 		
 			
 	libinternal PreframeText (|window| W)
@@ -573,16 +575,16 @@ module GUI
 				window.all.first = w
 
 		
-	libinternal PreFrame (|sdlactivity|)
+	libinternal PreFrame (|GUIActivity|)
 		opt norefcounts
 //		if .FixScreenBug.Fired
 //			.BumpSize
-//			rz = SDLActivity.activity
+//			rz = GUIActivity.activity
 		
 		while (|| err = stderr.pop)
 			notifications <~ err
 			beep
-			rz = SDLActivity.activity
+			rz = GUIActivity.activity
 
 		.HandleOpenFile
 		
@@ -597,7 +599,7 @@ module GUI
 			if .CanDrag >= mousedragging.EvenIfNoMovement
 				.touch
 				w.DoMouseDrag(.MouseXY, true)
-				rz = SDLActivity.activity
+				rz = GUIActivity.activity
 	
 	
 	libinternal DoDrawDrag (|window| w)
@@ -638,12 +640,12 @@ module GUI
 		require .acontrolwasresized
 		.acontrolwasresized = false
 		.Touch
-		.DuringAction = SDLActivity.Resizing
+		.DuringAction = GUIActivity.Resizing
 		for w.fast in window.all
 			.CalculateWindowSize(w, force, true)
 		for w.fast in notifications.Alerts
 			.CalculateWindowSize(w, force, false)
-		.DuringAction = SDLActivity.Nothing
+		.DuringAction = GUIActivity.Nothing
 
 
 	function Window.CalculateSize
@@ -690,6 +692,7 @@ module GUI
 		
 	libinternal StartDraw
 		opt norefcounts
+		.DuringAction = GUIActivity.Drawing
 		|| CanBlur = !app.prefs["noblur"]
 		
 		if !.DialogIsOpen
@@ -713,6 +716,7 @@ module GUI
 			.DoDrawDrag(w)
 			if app.prefs["beep"]
 				beep // debug drawing!
+		.DuringAction = 0
 
 
 	libinternal BGBlurAmount (|float|)
@@ -777,6 +781,7 @@ module GUI
 	libinternal DoSimulation
 		opt norefcounts
 		|| wf = Window.front$
+		.DuringAction = guiactivity.Simulation
 		|| FrontIsDialog = .DialogIsOpen
 		if FrontIsDialog or wf.AnyFrameStepsNeeded()
 			keys.FlushKeys
@@ -791,11 +796,12 @@ module GUI
 		if Got
 			window.all.sort(DialogSorter|sortercomparer|)
 			.StartResize
+		.DuringAction = 0
 
 // ideally we remove the whole concept of sorting windows
 // there is just one window... the main window.
-// it might have subwindows, though? games have invnetories and settings and stuff
-// maybe window.|[window]| SubWindows makes sense for games? kinda?
+// it might have subwindows, though? games have inventories and settings and stuff
+// maybe window.SubWindows(|[window]|) makes sense for games? kinda?
 // settings would just be a dialog window.
 // who knows? Also dialogs and the confirm window exist...
 
@@ -819,7 +825,7 @@ module GUI
 			.SingleFrameDepth--
 
 			|| NowQuit = .quitreason
-			gui.quitreason = NowQuit ||| (WasQuitting &~ sdlactivity.exiting)
+			gui.quitreason = NowQuit ||| (WasQuitting &~ GUIActivity.exiting)
 			return (NowQuit isnt exitorterminate and wasquitting isnt terminating)
 
 
@@ -879,7 +885,8 @@ module GUI
 			app.Sleep(Remain)
 	
 	
-	libinternal HandleEvents (|SDLActivity|)
+	libinternal HandleEvents (|GUIActivity|)
+		.DuringAction = GUIActivity.EventHandling
 		.StartResize
 		rz = .PreFrame
 
@@ -888,6 +895,7 @@ module GUI
 		.PostLoads
 		notifications.CheckForDisappear
 		rz |= .ActualEvents
+		.DuringAction = 0
 
 
 	libinternal CheckQuarantine
@@ -948,9 +956,9 @@ module GUI
 		return .quitreason is ExitOrTerminate
 
 
-	function Quit (|sdlactivity| Reason=0, |SDLActivity|)
+	function Quit (|GUIActivity| Reason=0, |GUIActivity|)
 		opt norefcounts
-		reason |= sdlactivity.Exiting
+		reason |= GUIActivity.Exiting
 		
 		.SavePrefs // in case we crash during quit
 
@@ -971,7 +979,7 @@ module GUI
 		|| c = w[.MouseXY] ?? w
 		c.PasteFromClipboard(path, p)
 		w.DroppingInto = nil
-		return SDLActivity.activity
+		return GUIActivity.activity
 
 
 	libinternal AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
@@ -1050,10 +1058,10 @@ module GUI
 			return gw.PasteFromClipboard(clipboard.text)
 
 
-	libinternal StrongClose (|sdlactivity| Reason, |SDLActivity|)
+	libinternal StrongClose (|GUIActivity| Reason, |GUIActivity|)
 		opt norefcounts
 		if Reason is Terminating
-			return SDLActivity.Terminating // terminate will call windowclose anyhow
+			return GUIActivity.Terminating // terminate will call windowclose anyhow
 	
 //		if Reason isnt windowclose
 //			return .quit(reason)
@@ -1078,7 +1086,7 @@ module GUI
 			for w in window.all
 				w.__AppForegroundChange__(!back)
 		.touch
-		return SDLActivity.activity
+		return GUIActivity.activity
 
 
 	libinternal EventWindow (|window--|)
@@ -1097,12 +1105,12 @@ module GUI
 			return .BackgroundChanged(t is APP_DIDENTERBACKGROUND)
 		
 		if  t is APP_TERMINATING
-			.quitreason |= SDLActivity.ExitOrTerminate
-			return sdlactivity.ExitOrTerminate
+			.quitreason |= GUIActivity.ExitOrTerminate
+			return GUIActivity.ExitOrTerminate
 		
 		if  t is QUIT // comes from cmd-w! this code is to block this bad SDL2 design.
 			if !.Quitreason
-				.Quitreason |= SDLActivity.Exiting
+				.Quitreason |= GUIActivity.Exiting
 			return .Quitreason
 		
 		if  t is WINDOWEVENT
@@ -1116,14 +1124,14 @@ module GUI
 		w.__Tickle__
 		if T is dropbegin
 			w.DroppingInto = w[.MouseXY] ?? w
-			return SDLActivity.activity
+			return GUIActivity.activity
 		
 		if t is DROPFILE or Droptext
 			return .FileDroppedIntoApp(w, ev.drop, t)
 		
 		if t is DropComplete
 			w.DroppingInto = nil
-			return SDLActivity.activity
+			return GUIActivity.activity
 
 		if t is TEXTINPUT
 			return .TextInputevent(ev, w)
@@ -1139,7 +1147,7 @@ module GUI
 
 		|| b = ev.button
 		if (b.button >= 4) and (t is mousedown)					// what about holding it?
-			return w.DoListViewNext(b.button == 4)|int|			// assumes SDLActivity.activity == 1
+			return w.DoListViewNext(b.button == 4)|int|			// assumes GUIActivity.activity == 1
 	
 		if t is MOUSEDOWN
 			return .MouseDownEvent(w, b)
@@ -1166,7 +1174,7 @@ module GUI
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
 			
 		
-	libinternal QuitBecauseWindowClosed (|window| w, |sdlactivity|)
+	libinternal QuitBecauseWindowClosed (|window| w, |GUIActivity|)
 		opt norefcounts
 		if !w.ismainwindow
 			return nil
@@ -1176,10 +1184,10 @@ module GUI
 				return nil
 		
 		if .AskQuit
-			.quitreason |= sdlactivity.exiting
-			return sdlactivity.exiting
+			.quitreason |= GUIActivity.exiting
+			return GUIActivity.exiting
 		
-		return SDLActivity.Activity
+		return GUIActivity.Activity
 			
 		
 		
@@ -1190,20 +1198,20 @@ module GUI
 		if wt is CLOSE										// A request to close ANY window.
 			|| w = window.front // should really be .frontvisible
 			if !w
-				return sdlactivity.exiting
+				return GUIActivity.exiting
 								// or .front should only return visible windows...
 			if w.isdialog
 /				return 0 // hmmm. Can this happen?
 			|| Activity = .QuitBecauseWindowClosed(w)
 				return Activity
-			.Quitreason |= SDLActivity.activity
-			w.Close(SDLActivity.WindowClose)
-			.Quitreason |= SDLActivity.activity
-			return SDLActivity.activity
+			.Quitreason |= GUIActivity.activity
+			w.Close(GUIActivity.WindowClose)
+			.Quitreason |= GUIActivity.activity
+			return GUIActivity.activity
 			
 		if wt is RESIZED
 			.NewSize = (wev.data1, wev.data2)
-			return SDLActivity.activity
+			return GUIActivity.activity
 		
 		if wt is FOCUS_GAINED
 			return .BackgroundChanged(false)
@@ -1227,7 +1235,7 @@ module GUI
 		  elseif dow and (button!=3) and !ScrollInfo.JustClicked_
 			dow.__MouseUp__(xy)
 		ScrollInfo.JustClicked_ = false
-		return SDLActivity.activity
+		return GUIActivity.activity
 
 
 	libinternal MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
@@ -1240,7 +1248,7 @@ module GUI
 		if !move
 			move = xy - OldXY		#require
 			if !.MouseMoveInited
-				return SDLActivity.Activity				// or else we never get there
+				return GUIActivity.Activity				// or else we never get there
 
 		|| MB = .MouseButtons
 		require MB or !.IsBackground
@@ -1258,7 +1266,7 @@ module GUI
 
 		if (.CanDrag >= MouseDragging.Within) and (MB is left)
 			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
-			return SDLActivity.activity
+			return GUIActivity.activity
 
 		return .MouseMoveEventSub(move, w, xy)
 
@@ -1282,7 +1290,7 @@ module GUI
 			if !over
 				Over = w
 			if Over.__MouseMove__(xy, move, state)
-				return SDLActivity.activity
+				return GUIActivity.activity
 
 
 	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
@@ -1290,18 +1298,18 @@ module GUI
 		if .AllowTyping and .CanDrag <= mousedragging.Handled
 			|| e = ev.Editing.str
 			if w.__TypedString__(e)
-				rz = SDLActivity.activity
+				rz = GUIActivity.activity
 
 
 	libinternal KeyUpEvent (|&SDL_Event| ev, |int|)
 		|| key = ev.key.key
 		keys.Removekey(key)
-		return sdlactivity.activity
+		return GUIActivity.activity
 
 
 	libinternal MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
 		w.__gesture__(ev.wheel.xy*(1,-1), 0, 0)
-		return sdlactivity.Activity
+		return GUIActivity.Activity
 	
 	
 	libinternal KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
@@ -1313,12 +1321,12 @@ module GUI
 //		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
 
 		if .ForeGroundTime.GuiAgo < 0.1s
-			return SDLActivity.nothing
+			return GUIActivity.nothing
 		if .CanDrag >= mousedragging.Within
-			return SDLActivity.nothing
+			return GUIActivity.nothing
 
 		if key.IsEaten
-			return SDLActivity.nothing
+			return GUIActivity.nothing
 
 		if (key is w) and (keys.cmd)
 			// i think we could try eliminate this test.
@@ -1330,13 +1338,13 @@ module GUI
 		keys.AddKey(key)
 
 		if !w.openedmenu and !.AllowKeyDown(kev)
-			return SDLActivity.nothing
+			return GUIActivity.nothing
 		
 		if (key isnt escape) or key.IsFirstFrame
 			if .StandardKeys(key)
-				return SDLActivity.activity
+				return GUIActivity.activity
 			if w.__keydown__(key)
-				return SDLActivity.activity
+				return GUIActivity.activity
 		
 		if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)
 			keys.escape.eat
@@ -1354,26 +1362,26 @@ module GUI
 		|| xy = b.xy
 		beep.OK = 1
 		if notifications.Clickedat(xy)
-			return SDLActivity.activity
+			return GUIActivity.activity
 			
 		|| InsideWin = w.lastrect.soothe contains xy
 		if !InsideWin and (w == .FrontDialog)
 			if w.ClickOutsideCloses
 				w.Close
-				return SDLActivity.activity
+				return GUIActivity.activity
 			w.GetUserAttention
-			return SDLActivity.nothing
+			return GUIActivity.nothing
 		
 		.candrag = nil
 
 		|| foc = w.realFocus
 			if foc.ClickOutsideCloses and !(foc contains xy)
 				w.setfocus(nil)
-				return SDLActivity.activity
+				return GUIActivity.activity
 
 		if w.MouseDownEvent(b.button, b.clicks, xy)
 			.Touch
-			return SDLActivity.activity
+			return GUIActivity.activity
 		
 	
 	libinternal Window.MouseDownEvent (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
@@ -1428,9 +1436,9 @@ inline guicontrol.Description (|string|)
 	return .tooltip // :)
 	
 
-datatype SDLActivity (byte)
+datatype GUIActivity (byte)
 	flags
-		|SDLActivity|
+		|GUIActivity|
 		Nothing = 0
 		Activity
 		Questioning
@@ -1440,8 +1448,11 @@ datatype SDLActivity (byte)
 
 	constants
 		Resizing = 1
+		Drawing
+		Simulation
+		EventHandling
 
-	syntax is (|SDLActivity| act, |bool|)
+	syntax is (|GUIActivity| act, |bool|)
 		return self & act
 
 

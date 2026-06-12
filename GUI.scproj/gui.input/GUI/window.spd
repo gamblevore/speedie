@@ -69,10 +69,10 @@ class Window (GUIControl)
 	virtual FrameStep (|bool| GUIActive)
 		0
 
-//	virtual TryClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
+//	virtual TryClose (|GUIActivity| Reason=GUIActivity.windowclose, |bool|)
 //		return true
 
-	virtual CancelClose (|SDLActivity| Reason, |bool|)
+	virtual CancelClose (|GUIActivity| Reason, |bool|)
 		// Better to have CanceClose==false mean close, than TryClose==true
 		// Using TryClose, many programmers (me) would forget to return true,
 		// and their program refuses to quit.
@@ -304,7 +304,7 @@ class Window (GUIControl)
 					(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.ReturnValue and !.__CancelClose__(SDLActivity.windowclose)
+			if !.ReturnValue and !.__CancelClose__(GUIActivity.windowclose)
 				.CancelReturn
 			return true
 	
@@ -462,16 +462,16 @@ class Window (GUIControl)
 		for w in m
 			if !w.IsDialog
 				w.show
-				.QuitReason = SDLActivity.questioning				// in case of wierd events
-				rz = !w.__CancelClose__(SDLActivity.questioning|||SDLActivity.exiting)
+				.QuitReason = GUIActivity.questioning				// in case of wierd events
+				rz = !w.__CancelClose__(GUIActivity.questioning|||GUIActivity.exiting)
 				loop rz			
 		
 		
-	libinternal GUI.AskQuit (|SDLActivity|)
+	libinternal GUI.AskQuit (|GUIActivity|)
 		opt norefcounts
 		
 		require .AskAllQuit
-		rz = SDLActivity.Terminating
+		rz = GUIActivity.Terminating
 		for w in Window.all
 			gui.QuitReason |= rz
 			w.Close(rz)
@@ -479,7 +479,7 @@ class Window (GUIControl)
 		.QuitReason = rz
 		
 	
-	function Close (|SDLActivity| Reason = SDLActivity.windowclose, |SDLActivity|)
+	function Close (|GUIActivity| Reason = GUIActivity.windowclose, |GUIActivity|)
 		if !self
 			return 0
 			
