@@ -671,7 +671,8 @@ extern \"C\" void** JB_App__LibGlobs() {
 	
 //	printline PackMaker.LibGlobs
 	for dcl in PackMaker.LibGlobs
-		|| fn = dcl.Func			
+		|| fn = dcl.Func	
+			printline fn.exportname	
 			fs <~ "\tJB__."
 			fs.AppendLibGlob(dcl)
 			fs <~ "=("

@@ -2249,7 +2249,7 @@ class TextView (GUIControl)
 		  else
 			d = nil
 		
-		if !d // nilchecker bug here. It doesnt realise d can be nil
+		if !d
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
 	
