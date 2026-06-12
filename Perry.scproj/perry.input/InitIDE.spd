@@ -89,7 +89,7 @@ extend PerryIDE
 	function perry.AddRecent (|file| project)
 		|| f = .Findrecent(project)
 			f.name = project // fix case
-			return 
+			return
 		|| Added = @tmp + project
 		added <~ (@str, project.name)
 		Perry.RecentProjects.first = added
@@ -241,7 +241,7 @@ extend PerryIDE
 		.ErrorLogInit(.Errorlist, "ErrorList" )
 		.ErrorLogInit(.CommsLogList,   "LogArea" )
 
-		with .UnNeededLabel 
+		with .UnNeededLabel
 			.takesfocus		= 0
 			.ID				= "NoNeed"
 			.size			= 5~inside  by  100~down back 60
@@ -250,14 +250,14 @@ extend PerryIDE
 			isnt drawsfocus
 			.copypaste		|= copypasteflags.copytext
 			.alignment		= MoveCode.Center
-			.gnormal.clear 
+			.gnormal.Clear
 
 
-		with .SearchArea 
+		with .SearchArea
 			.tooltip		= "Searches stuff. Press \1f; or \1f' to step in list."
-			.takesfocus 	= takesfocusflag.CanFocus
+			.takesfocus		= takesfocusflag.CanFocus
 			.ID				= "SearchArea"
-			.size 			= the~width by the~bottom to 15~down
+			.size			= the~width by the~bottom to 15~down
 			isnt visible
 			isnt drawsfocus
 			.gnormal		= self.errorlist.gnormal
@@ -295,7 +295,7 @@ extend PerryIDE
 			.gnormal.solid = (0, 0, 0, 0.25)
 
 
-		with .FoundList // with .findlist
+		with .FoundList	// with .findlist
 			is   editable
 			is   visible
 			is   UnSearchable
@@ -366,8 +366,8 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.ColumnFinder	= &Perry.VariableFinder
-			.OnExpandRow = &Perry.collectexpansion
-			.Hierarchical()	= ListViewHierarchy.Last
+			.OnExpandRow	= &Perry.collectexpansion
+			.Hierarchical	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
 			.IsMainListView	= true
 			.MultiSelection	= true
@@ -381,7 +381,7 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid	= vec4(0.13, 0.135, 0.120, 0.975)
 			.gRowSel.solid	= vec4(0.11, 0.335, 0.12, 0.675)
-			.GNormal.Seps = 0
+			.GNormal.Seps	= 0
 			.GNormal.StyleDrawer = image.CurlieQueDrawer
 			
 			

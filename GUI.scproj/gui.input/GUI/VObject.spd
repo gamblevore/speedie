@@ -14,8 +14,8 @@ class VObject (list)
 	visible false
 	// ray acceleration
 	|byte|			_DrawID
-	|float|			_MaxDist  
-	|float|			_MinDist  
+	|float|			_MaxDist
+	|float|			_MinDist
 	|?VObject--|	_CellNext
 	
 	visible true

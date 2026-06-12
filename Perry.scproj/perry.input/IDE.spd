@@ -767,7 +767,7 @@ So anything not 0 means "its OK"`
 		return .editme.FilePath
 	
 
-	function EditFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
+	function EditFile (|FileRow| r, |int|) // loadfile, fileload, fileedit, openfile, fileopen
 		require r and r.location and !.DuringLoad
 		// the drawing thing needs a document too!
 		// why not the same?
@@ -782,6 +782,7 @@ So anything not 0 means "its OK"`
 			.DuringLoad++
 			.ViewAsCurr
 			.DuringLoad--
+		
 		|| ok = (.EditDraw(r) (g) .EditText(r))
 		if ok != 1
 			return ok
@@ -831,7 +832,7 @@ So anything not 0 means "its OK"`
 		|document--| doc = r.document
 		if e.Document == doc
 			return -1
-
+				
 		if doc.FilePath.pathiscode
 			doc.JeeboxMode |= documentjeeboxmode.Expect
 		

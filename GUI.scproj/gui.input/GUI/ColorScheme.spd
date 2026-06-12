@@ -14,8 +14,8 @@ class ColorScheme
 	|int|					HistoryIndex
 	|int|					Altered
 //Border
-	|drawstyle| 			Scroll
-	|drawstyle| 			TextSelection
+	|drawstyle|				Scroll
+	|drawstyle|				TextSelection
 	|drawstyle|				TextSelectionUnfocus
 	|drawstyle|				ModifiedBorder
 	|drawstyle|				FocusBorder
@@ -23,7 +23,7 @@ class ColorScheme
 	|drawstyle|				WhiteStyle
 	|drawstyle|				SystemStyle
 	|drawstyle|				Menus
-	|DrawStyle|				MenuRowSel 
+	|DrawStyle|				MenuRowSel
 
 
 	function LoadDefaults
@@ -92,11 +92,11 @@ class ColorScheme
 		fs.FieldEnter("syx")
 		for i in @max|int|
 			|| obj = i|syntax|.obj
-				fs.field( obj.name, .SyxCol[i].render ) 
+				fs.field( obj.name, .SyxCol[i].render )
 		fs.indent--
 		
-		fs.field( "root", .RootTmp.render ) 
-		fs.field( "none", .None.render ) 
+		fs.field( "root", .RootTmp.render )
+		fs.field( "none", .None.render )
 
 
 	syntax access (|int| i, assigns: |vec3|)

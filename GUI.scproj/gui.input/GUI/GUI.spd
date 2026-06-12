@@ -17,8 +17,8 @@ module GUI
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
-	|ivec2| 					NewSize
-	|ivec2| 					CurrMouseXY
+	|ivec2|						NewSize
+	|ivec2|						CurrMouseXY
 	|ivec2|						TryResizeLater
 
 	|date|						DrawFinish
@@ -33,8 +33,8 @@ module GUI
 	|bool|						StartedProperly
 	|date|						ForeGroundTime
 	|bool|						FlashSelector
-	|sdlactivity|				QuitReason
-//	|date|						FixScreenBug
+	|SDLActivity|				QuitReason
+	|SDLActivity|				DuringAction
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
 	|bool|						NeedMouseMove
@@ -42,12 +42,13 @@ module GUI
 	|bool|						AControlWasResized
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
-	|byte|						TouchCount=3  // draw the first few frames always
-											  // helps with startup events! at least on osx
+	|byte|						TouchCount=3		// draw the first few frames always
+													// helps with startup events! at least on osx
 	|byte|						SingleFrameDepth
 	|byte|						TouchFingersDown
 	|byte|						CanDrag
-	|byte|						ResizedCounter // for resize bug fix
+	|byte|						ResizedCounter		// for resize bug fix
+	
 	visible true
 	
 	cpp_func SDL_Init				(|uint| c)
@@ -637,10 +638,12 @@ module GUI
 		require .acontrolwasresized
 		.acontrolwasresized = false
 		.Touch
+		.DuringAction = SDLActivity.Resizing
 		for w.fast in window.all
 			.CalculateWindowSize(w, force, true)
 		for w.fast in notifications.Alerts
 			.CalculateWindowSize(w, force, false)
+		.DuringAction = SDLActivity.Nothing
 
 
 	function Window.CalculateSize
@@ -1434,6 +1437,10 @@ datatype SDLActivity (byte)
 		WindowClose
 		ExitOrTerminate = [Exiting, Terminating]
 		StrongWindowClose = WindowClose+Exiting
+
+	constants
+		Resizing = 1
+
 	syntax is (|SDLActivity| act, |bool|)
 		return self & act
 

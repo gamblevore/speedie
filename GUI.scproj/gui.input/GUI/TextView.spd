@@ -1545,7 +1545,7 @@ class TextView (GUIControl)
 				.CanAutoComplete = 0
 				.AutoCompleteString = ""
 			
-			if s in '\t' // tabonly
+			if s in '\t'							// tab only
 				.DontMergeUndo
 			
 			.TextAlteredForDraw |= 4
@@ -1700,7 +1700,7 @@ class TextView (GUIControl)
 		if .Clear(value)
 			|| u = ._viewing
 				u.cleardoc
-				u._text = .text
+				u.text = .text
 				u.TypingPlace = nil
 	
 
@@ -1804,7 +1804,7 @@ class TextView (GUIControl)
 		if i < 0
 			x2 = r.x
 		return x2
- 
+
 
 	libinternal FindDrawSelMove (|intrange| t, |int| i, |bool|page, |ivec2|)
 		opt norefcounts		
@@ -1894,7 +1894,7 @@ class TextView (GUIControl)
 		|| Remain	= .LastRect.Height
 		|| UseCol	= .UseColorAnyway
 
-		y += .YAdjust-2
+		y += .YAdjust - 2
 		if .SingleLine
 			y -= self is Editable
 		  else
@@ -1903,9 +1903,10 @@ class TextView (GUIControl)
 		._CanSeeLastLine = false
 		._CanSeeAllLines = false
 		._DrawInLineArea &=~ 2
+		|| H = .LineHeight
 		while (y > yEnd)
-			y -= .LineHeight
-			Remain -= .LineHeight
+			y -= H
+			Remain -= H
 			if Draw
 				.DrawOneLine(where, D, y, usecol)
 			d++
@@ -1989,6 +1990,7 @@ class TextView (GUIControl)
 	
 	libinternal StartLine (assigns:|int| v)
 		cpp_part StartAtInt
+		opt norefcounts
 		.StartLine = .needfirst.MoveCapped(V)!
 	
 	
@@ -2262,7 +2264,7 @@ class TextView (GUIControl)
 	libinternal ScrollPos (|int|)
 		return ._Start.position
 
-	
+
 	libinternal ScrollPos (assigns:|int|)
 		opt norefcounts
 		for s in .WrappedLines
@@ -2276,7 +2278,6 @@ class TextView (GUIControl)
 		for s in .WrappedLines
 			if s contains Value
 				return s
-		
 
 
 	function LoadDocument (|document| D, |bool| Show, |bool|)

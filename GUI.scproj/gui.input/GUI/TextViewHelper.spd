@@ -250,7 +250,7 @@ class TextViewLine (list)
 				if pt == @type
 					return par
 				if !curr.prev
-					if (pt == @decl) or (pt == @func and curr == @thg) 
+					if (pt == @decl) or (pt == @func and curr == @thg)
 						return par
 
 

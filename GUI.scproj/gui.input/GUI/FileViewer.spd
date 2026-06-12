@@ -15,7 +15,7 @@ class FileViewer (ListView)
 
 	constructor (|window| p, |GUIListEvent| select, |GUIListEvent| return, |TextView| EditMe)
 		super.constructor(p, select, return)
-		.MultiSelection		= true
+		//.MultiSelection		= true
 		.editme				= editme
 		.OnReturn			= ReturnFileList|GUIListEvent|		// c++ work around
 		.OnRightClick		= RightClickFileList|GUIListEvent|

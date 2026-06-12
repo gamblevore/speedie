@@ -60,7 +60,7 @@ class ListView (GUIControl) {
 		.listsource		= ListViewrow()
 		.gRowSel		= .gnormal.copy
 		.RightClickSelects = true
-		.xindentperdepth = font.Width*2
+		.XIndentPerDepth = font.Width*2
 		.init
 
 

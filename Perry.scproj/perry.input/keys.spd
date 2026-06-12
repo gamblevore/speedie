@@ -25,7 +25,7 @@ extend PerryIDE
 		if .RunningProd  and  .DebugMode is CakeMode // Run key
 			return .ViewRun
 		ClickedDebug(B)
-		return true 
+		return true
 
 
 	function CmdKey (|keys| key, |bool|)
