@@ -7,7 +7,7 @@ datatype SCNodeType (byte)
 		|SCNodeType|
 		Module = 0	// not actually a type
 		DataType
-		Struct		// hasptr
+		Struct		// hasptr-ish
 		ProtoType	// hasptr
 		Object		// hasptr
 		Pointer		// hasptr

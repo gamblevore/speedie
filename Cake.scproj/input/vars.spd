@@ -5,6 +5,9 @@ datatype XVarFlags (byte)
 		Parameter
 		BareStruct
 		CanBeNil
+		Prototype
+	syntax is (|xvarflags| F, |bool|)
+		return self & F
 	
 
 
@@ -318,6 +321,10 @@ class XVar (list)
 			if w
 				fs <~ "[$w]"
 		
+		if .flags is Prototype
+			fs <~ "(function)"
+			return true
+
 		|| C = .type
 		if !C and !type
 			|| T = .DataType|||datatypecode.Numeric
@@ -360,7 +367,8 @@ class XVar (list)
 			return .RenderObject(fs, Where, RefCount)
 		if self is BareStruct
 			return .RenderBareStruct(Fs, where)				// what about structs in general?
-		return .RenderDataOrStruct(fs, Where)
+
+		return .RenderData(fs, Where)
 
 		
 	function RenderBareStruct (|faststring| fs, |!&nil| Ptr, |bool|)
@@ -382,15 +390,16 @@ class XVar (list)
 			fs <~ ">"
 
 
-	function RenderDataOrStruct (|faststring| fs, |!&nil| Reg, |bool|)
+	function RenderData (|faststring| fs, |!&nil| Reg, |bool|)
 		opt norefcounts
 		|| T = .DataType
 		|| V = t.VecCount
 		|| BC = t.ByteCount
 		if (bc >= 12): bc = 16		
 		|| W = .weirdness[0]
-		
-		if W is pointer or reference
+		|| F = .flags
+
+		if (W is pointer or reference) or (F is prototype)
 			require .NilOK(fs, reg)
 			|| Ptr = Reg|&&nil|[]|int64|
 			if !ptr
@@ -402,6 +411,8 @@ class XVar (list)
 			if .Weirdness[1]
 				return fs.TestMem(reg, bc, "UnReadable") // dont render pointer to a pointer
 			
+			if f is Prototype
+				return true
 			reg = ptr|&ivec4|
 			fs <~ ": "
 		
@@ -427,7 +438,7 @@ class XVar (list)
 				fs.AppendDecimal(value)
 
 				if value and (bc == 1) and !t.IsSigned
-					fs <~ " "								// what if this is UTF-8?
+					fs <~ " "
 					|| Container = '('+(256*')')
 					if  "()[]<>{}"  contains  value|byte|
 						Container = '\''+(256*'\'')

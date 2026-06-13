@@ -18,9 +18,13 @@ function string.MiniName (|faststring| fs, |bool| IsClass)
 
 
 function SCDecl.DumpFlags (|byte|)
+	opt norefcounts
 	rz = (self is Param)|byte|
 	rz |= .IsBareStruct << 1
 	rz |= (.NilDeclared is Nilish) << 2
+	if .IsNormal
+		|| t = .Type
+		rz |= (t.BaseType is ProtoType)<<3
 
 
 function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true)
@@ -89,9 +93,8 @@ function scdecl.DumpCls (|int|)
 
 
 function SCDecl.Wierdness (|int|)
-	rz = (self is reference) << 1
-	if .IsBareStruct // bare structs are still pointerlike...
-		rz |= 2
+	rz = (.IsBareStruct or (self is reference)) << 1
+	// bare structs are still pointerlike...
 	rz |= .pointercount > 0
 	rz |= .C_Array<<2
 

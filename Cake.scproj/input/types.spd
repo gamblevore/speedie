@@ -74,7 +74,7 @@ class XType
 
 
 
-datatype Wierdness (int)
+datatype Wierdness (uint)
 	flags
 		Pointer
 		Reference
