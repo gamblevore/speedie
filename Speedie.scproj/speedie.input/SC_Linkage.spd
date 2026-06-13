@@ -88,6 +88,7 @@ dispatch FuncLinkageTable (TranFunc)
 		return true
 
 
+
 dispatch ClassOrModuleLinkage (TranFunc)
 	// these items with {} are processed elsewhere...
 	// it would have been better to process them all here. but I wrote this after
@@ -110,7 +111,6 @@ dispatch ClassOrModuleLinkage (TranFunc)
 	+'sort_properties'
 		if name_space.mustbe(scclass, node)
 			(name_Space is SortsProperties) = node.first.yes(true)
-	
 	
 	+'tighten'
 		opt norefcounts
@@ -163,8 +163,8 @@ dispatch ClassOrModuleLinkage (TranFunc)
 				error type
 
 
-// now we have a numeric reduction... how to disable it nicely?
-// we need a test function
+// Now we have a numeric reduction... how to disable it nicely?
+// We need a test function
 
 function SCNode.ProcessLinkage (|message| node,  |dictionary of tranfunc| Table,  |bool| Strict,  |SCNode|)
 	opt norefcounts
@@ -185,19 +185,21 @@ function SCNode.ProcessLinkage (|message| node,  |dictionary of tranfunc| Table,
 	return compiler.program
 
 
-function scclass.CheckStateful (|message| node)
+function scclass.CheckStateful	(|message| node)
 	expect (self isnt stateful or self isnt stateless) (node, "Can't be both stateful and stateless")
 
 
 function Scnode.SetLibOrEmbed	(|message| node, |scnodeinfo| info)
 	opt norefcounts
-	real self
-	if self isa scclass
-		self = .modul|scclass|
+	while self
+		|| I = .nodeinfo ||| Info
+		|| Clash = SCNodeInfo.clash
+		expect ((I&Clash) != Clash) (node, "internal/embedded conflict")
+		.nodeinfo = I
+		if self isa scclass
+			self = .modul|scclass|
+		  else
+			return
 
-	|| I = .nodeinfo ||| Info
-	|| Clash = SCNodeInfo.clash
-	expect ((I&Clash) != Clash) (node, "internal/embedded conflict")
-	.nodeinfo = I
 
 

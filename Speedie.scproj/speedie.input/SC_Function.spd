@@ -1981,15 +1981,15 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 		SCFunction.currfunc = self
 		if node != "iterator"
 			Compiler.FuncList <~ self
-		.FLookup = name_space  // sets as a module even if parent is a class
+		.FLookup = name_space				// Sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
+		.ParseName( node )
 		if name_space is EmbeddedOnly
 			self|scnode| is EmbeddedOnly
 		if name_space is libonlyAll
 			.MakeLibOnly(node)
 
-	.ParseName( node )
-	using ErrorDelayer // not a terrible error but still an error 
+	using ErrorDelayer						// Not a terrible error but still an error 
 		.PreProcessExpects
 		.TranStrings
 	.PreRead(arg)

@@ -228,13 +228,11 @@ function scdecl.AddToGlobs (|bool|)
 
 	if  self is Library  and  self isnt ClassObj
 		|| fn = .func
-			require fn|scnode| isnt embeddedonly
-		// classobj done separately: Class data (via jbclassplace) is stored anywhere
-		// by the C++ compiler. Cake needs to store them manually into packglobs
-		PackMaker.LibGlobs <~ self
-	  else
-		packmaker.PackGlobs <~ self
+		ifn fn and fn|scnode| is embeddedonly
+			PackMaker.LibGlobs <~ self
+			return true
 
+	packmaker.PackGlobs <~ self
 	return true
 
 

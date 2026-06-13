@@ -1,4 +1,4 @@
-  
+
 // archive
 //    +"/path/"
 //		  data "abc"
@@ -29,7 +29,7 @@ role FileArchive (message)
 		return self
 
 
-	function Install (|message| item, |file| base, |bool| overwrite, |int64|)
+	libinternal InstallItem (|message| item, |file| base, |bool| overwrite, |int64|)
 		|| path = item.name 
 			|| data = item["data"].value
 			|| chld = base.child(path)
@@ -51,7 +51,7 @@ role FileArchive (message)
 		opt norefcounts
 		require self and dest.MakeEntirePath
 		for f in self
-			rz += .install(f, dest, overwrite)
+			rz += .InstallItem(f, dest, overwrite)
 
 
 	inline FileCount (|int|)
