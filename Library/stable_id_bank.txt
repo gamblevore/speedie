@@ -785,15 +785,6 @@ JB_App__Sudo
 JB_App__Switches
 JB_App__TimeID
 JB_App__TurnInto
-JB_Arc_AppendFile
-JB_Arc_Base
-JB_Arc_Constructor
-JB_Arc_Install
-JB_Arc_InstallTo
-JB_Arc_SaveTo
-JB_Arc_Size
-JB_Arc_StripFileContents
-JB_Arc_SyntaxAppend
 JB_Array_Active
 JB_Array_AppendCount
 JB_Array_AppendMany
@@ -1476,7 +1467,6 @@ JB_Str_FindCharset
 JB_Str_FindExt
 JB_Str_FindSlash
 JB_Str_First
-JB_Str_GetArchive
 JB_Str_GlobExpand
 JB_Str_HasName
 JB_Str_Hex
@@ -2095,4 +2085,3 @@ roundf
 sqrt
 sqrtf
 strlen
-JB_Arc_Validate
