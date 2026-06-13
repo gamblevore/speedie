@@ -417,12 +417,12 @@ class String
 			cpp_Wrapper JB_Str_New
 
 		function New (|cstring| s, |StringZeroTerminated|)
-			description "Wraps an existing cstring into a Speedie string"
+			description "Wraps an existing cstring into a Speedie string. Expects the cstring to last longer than us."
 			cpp_Wrapper JB_StrC
 
 		// could merge these two... give it a 0 length and see what you get?
 		function New (|cstring| s, |int| n, |StringZeroTerminated|)
-			description "Wraps existing memory into a Speedie string. Must be a c-string. The length is just for speed."
+			description "Wraps existing memory into a Speedie string. Must be a c-string. The length is just for speed.  Expects the cstring to last longer than us."
 			cpp_Wrapper JB_StrCN
 
 		function Own (|&byte| addr,  |int| n, |string|)

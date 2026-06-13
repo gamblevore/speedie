@@ -307,7 +307,7 @@ function PressedSearchWithin (Guiaction)
 	opt norefcounts
 	|| i = .ide
 	|| f = i.FileList
-	|filerow| r = nil 
+	|filerow| r = nil
 	if !f.SearchWithin
 		r = f.FindSearchWithin
 	f.SearchWithin = r
@@ -565,12 +565,13 @@ function PerrySearchWithin (GUIListEvent)
 
 
 function PerryFileViewRightClick (GuiListEvent)
-	require self|fileviewer|.RightClickFileList(row, mode)
-	if row isa filerow
-		|| m = .CMM									#require
-		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
-		|| where = m.listsource[4]
-			where.prev = menu
+	|| RC = self|fileviewer|.onrightclick
+		require (RC)(self, row, mode)
+		if row isa filerow
+			|| m = .CMM									#require
+			|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
+			|| where = m.listsource[4]
+				where.prev = menu
 	return true
 
 
@@ -598,12 +599,15 @@ function perryide.ClearIDE (|keys| key, |bool|)
 	opt norefcounts
 	if super.KeyDown(key)
 		return true
-	|| t = .outtext 
+	
+	|| t = .OutText
 	if t and t.text
 		t.text = ""
 		return true
+	
 	if LogAreaKeys(.CommsLogList, key)
 		return true
+	
 	|| r = .RunningProd
 		if .IsViewing(.debugger) and !r.status.IsRunning
 			.DebugMode = 0
@@ -621,7 +625,10 @@ function listview.PerryCopyComms (guicopyevent)
 					fs <~ '\n'
 				fs <~ it
 			return fs
-	return .DefaultCopy(item)
 	
-	
-	
+	|| cp = .oncopy
+		rz = (cp)(self, item)
+
+
+
+

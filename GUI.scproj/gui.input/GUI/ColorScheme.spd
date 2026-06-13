@@ -77,7 +77,7 @@ class ColorScheme
 			.bgcorners[i] = (value, 1.0)
 
 
-	function Load (|message| s)
+	libinternal Load (|message| s)
 		|| list = s["syx"]$
 		for syx in list
 			|| num = syntax.Func(syx.Name, syx)
@@ -97,10 +97,6 @@ class ColorScheme
 		
 		fs.field( "root", .RootTmp.render )
 		fs.field( "none", .None.render )
-
-
-	syntax access (|int| i, assigns: |vec3|)
-		.BGCorners[i] = (value, 1.0)
 		
 //	function FadeV (|vec4| top, |vec4| bottom)
 //		.BGCorners[0] = top
@@ -109,7 +105,7 @@ class ColorScheme
 //		.BGCorners[3] = bottom
 		
 		
-	function DrawIntoBackground (|image| where)
+	libinternal DrawIntoBackground (|image| where)
 		// so...
 		|| C0 = .BGCorners[0]
 		|| C1 = .BGCorners[1]
@@ -140,7 +136,7 @@ libinternal message.ColorDeclNicely (|message?|)
 		self = p
 		
 	
-function FixupColor (|message| self, |ind| pos, |message|)
+libinternal FixupColor (|message| self, |ind| pos, |message|)
 	opt norefcounts						// need to fixup container colors...
 	require self
 
@@ -173,7 +169,7 @@ libinternal message.UseRootTmpColor (|bool|)
 		return true
 
 
-function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)
+libinternal colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)
 	opt NoRefCounts
 	if !HasColor
 		return 0

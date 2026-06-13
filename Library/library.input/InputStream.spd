@@ -237,7 +237,10 @@ class InputStream
 
 
 	task ParserCallBack (|InputStream| Upon)
+		constructor
+			libinternal
 		run (|message| msg)
+			libinternal
 
 
 

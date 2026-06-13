@@ -200,7 +200,7 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 	return q.confirm(can)
 
 
-function OnConfirmAnswer (GUIAction)
+libinternal OnConfirmAnswer (GUIAction)
 	opt norefcounts
 	|| w = .window
 		w.ReturnValue = self // self isa button, not a window! (i made this mistake once)

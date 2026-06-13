@@ -93,7 +93,7 @@ datatype cstring
 	function PrintLine
 		cpp_wrapper puts // hehe
 	
-	function Print
+	inline Print
 		print self
 	
 	inline Wrap (|string|)

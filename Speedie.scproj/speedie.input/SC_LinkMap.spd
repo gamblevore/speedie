@@ -130,6 +130,8 @@ function IsUnused (|bool|)
 	|| MR = .MyReacher
 	if MR and MR != Compiler.VisibleFuncs
 		return false
+	if self|scnode| is EmbeddedOnly
+		return false
 	
 	if .isvisible and .islibrary
 		return false

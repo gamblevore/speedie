@@ -426,7 +426,7 @@ class ListView (GUIControl) {
 			return .ExpandRow((key is right).dir)
 
 		
-	function DefaultCopy (GUICopyEvent)
+	libinternal DefaultCopy (GUICopyEvent)
 		|| fs = faststring()
 		for s.listsel in self
 			|| it = .copyid(s)

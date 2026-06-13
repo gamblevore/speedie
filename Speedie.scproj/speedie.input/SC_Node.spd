@@ -1081,9 +1081,10 @@ datatype SCNodeInfo (byte)
 		Visible
 		AllowLinkedLists
 		InBuiltDataType
-		LibOnly								// how is this different to internalonly?
+		LibOnly
 		LibOnlyAll
 		EmbeddedOnly
+		Clash = LibOnly + EmbeddedOnly
 		
 
 

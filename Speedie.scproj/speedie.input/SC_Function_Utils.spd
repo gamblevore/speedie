@@ -44,7 +44,12 @@ dispatch FuncPreReader (fnPreReader)
 		msg[@nil].expectlast
 		compiler.TodoList <~ msg
 	
-	
+	+'libinternal'
+		.MakeLibOnly(msg)
+
+	+'embedded'
+		.SetLibOrEmbed(msg, scnodeinfo.embeddedonly)
+
 	+'numeric'
 		opt norefcounts
 		|| f = msg.first
@@ -66,7 +71,6 @@ dispatch FuncPreReader (fnPreReader)
 		opt norefcounts
 		msg.expectempty
 		is StoresSelf
-		
 	
 	+'opt'
 		opt norefcounts

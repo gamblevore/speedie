@@ -22,7 +22,7 @@ constants
 
 target cpp or vm {
 	function Load		(|&uint| ASM, |int| Length)
-		|| Code = .code(Length) // length is just used to check that its within the maximum
+		|| Code = .code(Length)					// length is just used to check that its within the maximum
 			memory.copy(code, asm, length<<2)
 	
 	function Code		(|int| CodeLength=0, |?&uint|)
@@ -56,7 +56,7 @@ target cpp or vm {
 	function Index		(|&uint| Code, |ind|)
 		cpp_wrapper JB_ASM_Index
 	
-	function DummyChef	(CakeChef)		
+//	function DummyChef	(CakeChef)		
 
 	module
 		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)

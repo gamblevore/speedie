@@ -387,14 +387,14 @@ class FileViewer (ListView)
 		FoundList.sort(&filerow.BatchFindSorter)
 	
 
-	function HideOpenList (|bool|)
+	libinternal HideOpenList (|bool|)
 		.ListOpen.clear
 		.QuickOpen.hide
 		.ListOpen.hide
 		return true
 
 
-	function OpenQuickRelist (|string| path, |bool| Improve=false)
+	libinternal OpenQuickRelist (|string| path, |bool| Improve=false)
 		opt norefcounts
 		|| b = .OpenQuickRelistsub(path, improve)
 			path = b
@@ -499,14 +499,14 @@ class FileViewer (ListView)
 
 
 	module
-		function FileRowCell (listview.columnfinder)
+		libinternal FileRowCell (listview.columnfinder)
 			if Value == nil
 				if (Column < -1) and (self isa FileRow)
 					return .location
 				return .name
 		
 		
-		function FileRowRenamer (guilisteditevent)
+		libinternal FileRowRenamer (guilisteditevent)
 			opt norefcounts
 			|| o = cell.row as filerow
 				if value==nil
@@ -514,7 +514,7 @@ class FileViewer (ListView)
 				o.MoveTo(value)
 		
 		
-		function FileRowScoreSorter (SorterComparer of FileRow)
+		libinternal FileRowScoreSorter (SorterComparer of FileRow)
 			opt norefcounts
 			if b.rangelength == .rangelength
 				|| aprj = .InMainProj
@@ -526,20 +526,20 @@ class FileViewer (ListView)
 			return b.rangelength - .rangelength
 
 
-		function FileRowNameSorter (SorterComparerFileRow)
+		libinternal FileRowNameSorter (SorterComparerFileRow)
 			opt norefcounts
 			|| c = b.asdir - a.asdir
 				return c
 			return A.name.syntaxcompare(b.name, true)
 
 
-		function QuickOpenModified (GUITextEvent)
+		libinternal QuickOpenModified (GUITextEvent)
 			opt norefcounts
 			|| fv = .tag as fileviewer
 				fv.OpenQuickRelist(.text)
 
 
-		function QuickOpenKey (guikeyevent)
+		libinternal QuickOpenKey (guikeyevent)
 			opt norefcounts
 			|| fv = .tag as fileviewer				#require
 			|| l = fv.listopen
@@ -556,14 +556,14 @@ class FileViewer (ListView)
 				rz = l.KeyDown(key)
 
 
-		function QuickOpenFocus (guiaction)
+		libinternal QuickOpenFocus (guiaction)
 			opt norefcounts
 			require state == 0
 			|| fv = .tag as FileViewer
 				rz = fv.hideopenlist
 
 
-		function ClickedOpenList (GuiListevent)
+		libinternal ClickedOpenList (GuiListevent)
 			opt norefcounts
 			|| V = .tag as FileViewer
 			|| r = row!.obj as filerow
@@ -578,7 +578,7 @@ class FileViewer (ListView)
 			return true
 			
 
-		function InsideFileViewRowDraw (ListViewRowDraw)
+		libinternal InsideFileViewRowDraw (ListViewRowDraw)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect
@@ -633,16 +633,16 @@ function fileviewer.FindSearchWithin (|filerow|)
 	|| s = .FirstSelected as filerow
 		while (s isa filerow) and !s.AsDir
 			s = s.parent
-		return s
+	return s
 
 
-function fileviewer.ReturnFileList (GUIListEvent)
+libinternal fileviewer.ReturnFileList (GUIListEvent)
 	if self isa FileViewer
 		.Editme.SetFocus
 		return true
 
 
-function fileviewer.RightClickFileList (GUIListEvent)
+libinternal fileviewer.RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .NewCmm
@@ -663,19 +663,19 @@ function fileviewer.RightClickFileList (GUIListEvent)
 	return true
 
 
-function FileViewerCMMShow (GuiMenuEvent)
+libinternal FileViewerCMMShow (GuiMenuEvent)
 	opt norefcounts
 	|| row = clicked!.row
 	if row isa FileRow
 		row.location.Reveal
 
 
-function FileViewerRenameFile (GuiMenuEvent)
+libinternal FileViewerRenameFile (GuiMenuEvent)
 	if clicked and self isa FileViewer
 		.editcell(clicked)
 	
 
-function FileViewerCreateFile (GuiMenuEvent)
+libinternal FileViewerCreateFile (GuiMenuEvent)
 	|| row = clicked!.row as filerow					#require
 	if !row.asdir
 		row = row.parent!
@@ -690,7 +690,7 @@ function FileViewerCreateFile (GuiMenuEvent)
 		.SomethingChanged(row)
 
 
-function FileViewer.SomethingChanged (|filerow?| row)
+libinternal FileViewer.SomethingChanged (|filerow?| row)
 	.TryReloadPath
 	(.OnChange)(self, row)?
 
@@ -700,14 +700,14 @@ function File.CreateEmpty (|bool|)
 	return .writeall("")
 
 
-function FileViewerCopyPath (GuiMenuEvent)
+libinternal FileViewerCopyPath (GuiMenuEvent)
 	opt norefcounts
 	if Clicked
 		|| row = clicked.row as FileRow
 			clipboard.NotifiedText = row.location
 
 
-function FileViewerTrash (GuiMenuEvent)
+libinternal FileViewerTrash (GuiMenuEvent)
 	opt norefcounts
 	|| row = clicked!.row
 	if  row isa FileRow  and  self isa fileviewer
@@ -715,7 +715,7 @@ function FileViewerTrash (GuiMenuEvent)
 		.SomethingChanged(nil)
 
 
-function FileViewerRemove (GuiMenuEvent) // just removes knowledge of the item
+libinternal FileViewerRemove (GuiMenuEvent) // just removes knowledge of the item
 	opt norefcounts
 	|| row = clicked!.row
 	if row isa FileRow and self isa FileViewer
@@ -723,7 +723,7 @@ function FileViewerRemove (GuiMenuEvent) // just removes knowledge of the item
 		.SomethingChanged(nil)
 
 
-function FileViewerSearchWithin (GuiMenuEvent)
+libinternal FileViewerSearchWithin (GuiMenuEvent)
 	opt norefcounts
 	|| row = menu.obj as filerow
 	if self isa FileViewer

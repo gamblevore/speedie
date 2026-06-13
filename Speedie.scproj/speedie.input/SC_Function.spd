@@ -193,7 +193,7 @@ function MakeLibOnly (|message| node)
 	if self != Interact.AnonFn
 		check (.IsLibrary) (node, "This function can't be lib-internal")
 	.NoAutoComplete = 2
-	(self|scnode| is libonly)					// limited to internal within a project
+	.SetLibOrEmbed(node, scnodeinfo.LibOnly)		// limited to internal within a project
 
 	
 function ParseName (|Message| node, |bool|)
@@ -1983,10 +1983,10 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 			Compiler.FuncList <~ self
 		.FLookup = name_space  // sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
-		if name_space is libonlyAll
-			.MakeLibOnly(node)
 		if name_space is EmbeddedOnly
 			self|scnode| is EmbeddedOnly
+		if name_space is libonlyAll
+			.MakeLibOnly(node)
 
 	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 

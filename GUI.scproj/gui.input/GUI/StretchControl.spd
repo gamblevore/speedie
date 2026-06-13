@@ -173,14 +173,17 @@ class StretchDivider (GuiControl)
 		constructor
 			is Animation
 		run
-			|| p = .upon.parent$
+			libinternal
+			opt norefcounts
+			|| u = .upon
+			|| p = u.parent$
 			|| pr = p.LastRect
-			if .upon.ActiveEnd.length < 10
-				|| s = .upon.start.length
+			if u.ActiveEnd.length < 10
+				|| s = u.start.length
 				if s < 10
-					|| d = .upon.d
+					|| d = u.d
 					s = 0.333.mix(pr[d]|float|, pr[d+2]|float|)|int|
-				.upon.ActiveEnd = (.s)~up
+				u.ActiveEnd = (.s)~up
 
 
 	libinternal DefaultEnd (|guicontrol| P, |int|)
@@ -299,7 +302,7 @@ class StretchDivider (GuiControl)
 		constants
 			kGrabDist = 6
 		
-		function DrawDash (Image.Shader)
+		libinternal DrawDash (Image.Shader)
 			|| C = vec4(0)
 			if P.y != rect.y
 				C = colors.white(0.1)

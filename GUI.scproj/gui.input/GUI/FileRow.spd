@@ -311,7 +311,7 @@ class FileRow (ListViewRow)
 				|| d = f._Document
 					return d.ViewDate
 		
-		function BatchFindSorter (SorterComparer of Error)
+		libinternal BatchFindSorter (SorterComparer of Error)
 			// the document viewfrom date logic elsewhere
 			// via load seems buggered somehow.... not sure why?
 			|| an = .path.name 

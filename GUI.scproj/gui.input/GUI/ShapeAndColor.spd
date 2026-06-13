@@ -46,7 +46,7 @@ datatype RayInfo (vec4)
 		.w = .w max r.w
 		return self
 	
-	function vec4.syntaxcast (|rayinfo|)
+	inline vec4.syntaxcast (|rayinfo|)
 		return self|rayinfo|
 
 
@@ -54,17 +54,20 @@ module VShapes
 // https://www.youtube.com/watch?v=aNR4n0i2ZlM // a heart shape?
 
 	function OpSmooth (|float| a, |float| b, |float| k=0.125, |float|)
-	    k *= 4.0
-	    || h = ( k-(a-b).length max 0.0 ) / k
-	    return (a min b) - h*h*k*0.25
+		embedded
+		k *= 4.0
+		|| h = ( k-(a-b).length max 0.0 ) / k
+		return (a min b) - h*h*k*0.25
 	
 
 	function OpRepLim (|vec3| p, |float| spacing, |vec3| lima, |vec3| limb, |vec3|)
-	    return p - spacing*((p / spacing).round.clamp(lima, limb)) // from inigo. Doesnt quite work yet?
+		embedded
+		return p - spacing*((p / spacing).round.clamp(lima, limb)) // from inigo. Doesnt quite work yet?
 	
 	// this is just not my thing lol.
 	// i dont konw how to do it.
 	function Heart (DistanceFunction)
+		embedded
 		p.w *= 0.5
 		p.y += gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if hit
@@ -91,6 +94,7 @@ module VShapes
 		
 		
 	function Sphere (DistanceFunction)
+		embedded
 		opt min 3
 		if Hit
 			return NormalColor(self, ray, p, Hit)
@@ -108,6 +112,7 @@ module VShapes
 
 
 	function Debug (DistanceFunction)
+		embedded
 		p.w *= 0.5
 		if Hit
 			return NormalColor(self, ray, p, Hit)
@@ -129,38 +134,43 @@ module VShapes
 
 
 	function PhotoMetricR0 (|float| n2, |float| n1, |float|)
+		embedded
 		return ((n1-n2)/(n1+n2)).pow2
 	
-    function PhotoMetricR0 (|float| n2, |float|)
-        cpp_Part PhotoMetricAir
-        return ((1.0-n2)/(1.0+n2)).pow2
+	function PhotoMetricR0 (|float| n2, |float|)
+		embedded
+		cpp_Part PhotoMetricAir
+		return ((1.0-n2)/(1.0+n2)).pow2
 	
 	
 	function PhotoMetric (|float| R0, |float| dot, |float|)
+		embedded
 		|| s = 1.0 - dot // improved schlick equation...
 						 // no idea how to use it.
 		return r0 + (s - R0) * s.pow4
 	
 	
 	function PlasticBall (DistanceFunction)
+		embedded
 		if !Hit or !ray
 			return Sphere(self, ray, p)
 		return plasticColor(self, ray, p, hit)
 		
 
 	function PlasticColor (ColorFunction)
+		embedded
 		|| Flux = 4.0
 		|| Normal = (P - .Pos).Normal
 
-	    || Kd = 0.072
-	    || Ks = 0.04
+		|| Kd = 0.072
+		|| Ks = 0.04
 		|| dir = ray._camdir
 		
 							// Diffuse
 		|| LightDir = ray.MainLight
-        || Light = kd * Flux * ((Normal • lightDir).pow2 + 1.3)
+		|| Light = kd * Flux * ((Normal • lightDir).pow2 + 1.3)
 
-        if 1				// Phong
+		if 1				// Phong
 			|| R = LightDir.reflect(Normal)
 			light += ks * Flux * (((R • dir) max 0.0).pow8)
 
@@ -178,6 +188,7 @@ module VShapes
 	
 	
 	function CloudColor (ColorFunction)
+		embedded
 		// clouds aren't like this, they are more like aura-bulbs
 		// with particles that drift off them randomly
 
@@ -189,8 +200,7 @@ module VShapes
 
 
 	function CloudBubble (DistanceFunction)
-		// don't want these in the libs... but not really inline either.
-		// perhaps this entire thing should be consdired... project only.
+		embedded
 		p.w *= 0.5
 		p.y+=gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if hit
@@ -202,6 +212,7 @@ module VShapes
 
 
 	function Box (DistanceFunction)
+		embedded
 		opt min 3
 		if hit
 			return NormalColor(self, ray, p, hit)
@@ -227,17 +238,20 @@ module VShapes
 
 
 	function NormalColor (ColorFunction)
+		embedded
 		|| Norm = (P - .Pos).normal.abs		// Spherical color
 		return (norm, 1.0) * .Color
 	
 	
 	function FudgeBlock (DistanceFunction)
+		embedded
 		if !Hit
 			return box(self, ray, P, hit)
 		return IceFudgeColor(self, ray, P, hit)
 	
 		
 	function IceFudgeColor (ColorFunction)
+		embedded
 		|| Norm = (P - .Pos).normal
 		|| y = Norm.y.uncos
 		|| x = Norm.z.length.untan(Norm.x)
@@ -246,9 +260,12 @@ module VShapes
 		|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
 		return (grid, grid, grid, 1.0)*.Color
 
+
 	function Black (ColorFunction)
+		embedded
 	
 	function Rainbows (ColorFunction)
+		embedded
 		|| r = 0.0
 //		|| r = ray.Rotation.x*300 // can't quite get this right.
 		return Colors.Rainbow(hit.x+r, 1, 0.5)
@@ -265,8 +282,10 @@ w: material-info
 If y == 0, then an SDF-engine is used to call this again until its good enough.
 "
 	function New (|vec3| Pos, |vec3| Radius, |vec4| color=vec4(1),   |vobject|)
+		inlined
 		return VObject(pos, radius, self, color)
 	function New (|vec3| Pos, |float| Radius, |vec4| color=vec4(1),   |vobject|)
+		inlined
 		cpp_part NewSphere
 		return VObject(pos, vec3(radius), self, color)
 

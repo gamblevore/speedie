@@ -1196,12 +1196,10 @@ module GUI
 		|| wev = ev.window
 		|| wt = wev.event
 		if wt is CLOSE										// A request to close ANY window.
-			|| w = window.front // should really be .frontvisible
+			|| w = window.front								// should really be .frontvisible
 			if !w
 				return GUIActivity.exiting
 								// or .front should only return visible windows...
-			if w.isdialog
-/				return 0 // hmmm. Can this happen?
 			|| Activity = .QuitBecauseWindowClosed(w)
 				return Activity
 			.Quitreason |= GUIActivity.activity
@@ -1222,7 +1220,7 @@ module GUI
 
 	libinternal MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
 		SDL_CaptureMouse(false)
-		|| dd   = .drawdrag 
+		|| dd   = .drawdrag
 		|| di	= w.DroppingInto
 			for c in dd
 				di.PasteFromClipboard(c, copypasteflags.pastefile)

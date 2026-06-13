@@ -76,7 +76,7 @@ class TextView (GUIControl)
 		._viewing = value
 		if value
 			value.addviewer(self)
-	
+//	libinternal
 
 	libinternal Undoer (|Document?|)
 		opt norefcounts
@@ -1147,9 +1147,11 @@ class TextView (GUIControl)
 
 	task LineAttention (taskgui, |TextViewLine| D)
 		constructor
+			libinternal
 			is Animation
 		
 		run
+			libinternal
 			require .d in .upon.WrappedLines
 			|| LH = .upon.lineheight|float|
 			|| Y = .upon.Y(.d)|float| + LH*0.75
@@ -1464,15 +1466,16 @@ class TextView (GUIControl)
 	
 	behaviour TypedString
 		// shouldn't it be shift-space? option-space is a real char.
+		if (input == "§") and !(keys.option or keys.shift)
+			return false		
+
 		if (keys.option and input == " ") or input == " "
 			return .SwapChars
-		
+			
 		if input == "\\"
 			input = "|"
 		  elseif input == "|"
 			input = "\\"
-		  elseif (input == "§") and !(keys.option or keys.shift)
-			return false
 		if input.LengthUTF8 == 1
 			if (.onkeydown)(self, input.codepoint(false))?
 				return true
@@ -2261,8 +2264,8 @@ class TextView (GUIControl)
 			return .text
 	
 	
-	libinternal ScrollPos (|int|)
-		return ._Start.position
+//	libinternal ScrollPos (|int|)
+//		return ._Start.position
 
 
 	libinternal ScrollPos (assigns:|int|)
@@ -2348,6 +2351,7 @@ class TextView (GUIControl)
 		|| CounterParts	= <(`{}[]()``''""||`)>
 		
 		function Block (|guicontrol| parent, |float| x, |float| w, |float| y, |float| h, |textview|)
+			opt norefcounts
 			rz = TextView(parent)
 			rz.MakeInline
 			rz.BlockSize(x,w,y,h)
@@ -2356,9 +2360,11 @@ class TextView (GUIControl)
 		
 		task DelayedShowError (TaskGUI, |error| err, |ivec2| Point)
 			constructor
+				libinternal
 				is WaitStillStart
 			
 			run (TaskGUI)
+				libinternal
 				// would be better to make OnShowExtraInfo actually a task
 				// then we can just refire it... when necessary.
 				|| fp = .upon.OnShowExtraInfo

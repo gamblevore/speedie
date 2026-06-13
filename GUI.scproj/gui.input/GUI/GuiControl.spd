@@ -248,8 +248,10 @@ class GUIControl (list)
 //// SCROLL ////
 	task ScrollEvent (taskgui)
 		constructor
+			libinternal
 			is animation
 		run
+			libinternal
 			// do nothing
 
 
@@ -610,7 +612,8 @@ class GUIControl (list)
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		constructor
 			is animation  // doing this seems to break the system? no idea why.
-		run 
+		run
+			libinternal
 			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
 			if .dir is close
@@ -643,6 +646,7 @@ class GUIControl (list)
 			return 1.0
 				
 		run (|window| window, |float| progress, |ErrorInt|)
+			libinternal
 			inlined
 			return -1
 		

@@ -8,8 +8,10 @@
 role FileArchive (message)
 	linkage
 		cpp_part Arc
+		embedded
 	
 	constructor (|string| base)
+		opt norefcounts
 		super.Constructor(@tmp, "archive")
 		.msg(@arg).obj = base.PathDir
 
@@ -103,5 +105,6 @@ role FileArchive (message)
 
 
 function string.GetArchive (|int|lim, |FileArchive|)
+	embedded
 	return .decompress(lim).parse|FileArchive|.validate
 
