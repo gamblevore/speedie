@@ -66,6 +66,7 @@ GUI_Img_CurlieQueDrawer
 JB_ID__ByID
 JB_ID__ByFreq
 GUI_Img_RoundRectDrawer
+GUI_FV_RightClickFileList
 JB__App__Args
 JB__App__Conf
 JB__App__Path

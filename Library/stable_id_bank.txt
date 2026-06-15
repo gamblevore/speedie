@@ -154,6 +154,7 @@ GUI_FV_Init
 GUI_FV_KeyDown
 GUI_FV_MouseDown
 GUI_FV_OpenQuick
+GUI_FV_RightClickFileList
 GUI_FV_Save
 GUI_FV_SaveAllArr
 GUI_FV_ShowQuickOpen
@@ -329,7 +330,6 @@ GUI_Line_After
 GUI_Line_Destructor
 GUI_Line_OperatorContains
 GUI_Line_Render
-GUI_Line_SlowMove
 GUI_Line_syntaxisSet
 GUI_MenuItem_Constructor
 GUI_MenuItem_Destructor
@@ -505,7 +505,6 @@ GUI_Text_ClearDebugInfo
 GUI_Text_ClearErrors
 GUI_Text_Constructor
 GUI_Text_CurrLine
-GUI_Text_DeleteKey
 GUI_Text_Destructor
 GUI_Text_DoExplode
 GUI_Text_DocumentSet
@@ -523,6 +522,7 @@ GUI_Text_GotFocus
 GUI_Text_Insert
 GUI_Text_InsertAutoComplete
 GUI_Text_InsertText
+GUI_Text_IsModified
 GUI_Text_JeeboxMode
 GUI_Text_JeeboxModeSet
 GUI_Text_JumpToError
@@ -531,7 +531,6 @@ GUI_Text_LoadDocument
 GUI_Text_Log
 GUI_Text_LostFocus
 GUI_Text_MakeInline
-GUI_Text_MaxVisibleLines
 GUI_Text_MessageAtSel
 GUI_Text_MessageWithin
 GUI_Text_MouseDown
@@ -553,16 +552,15 @@ GUI_Text_ShowAndSelect
 GUI_Text_ShowExtraInfoAtPos
 GUI_Text_ShowNextParseError
 GUI_Text_StartSet
-GUI_Text_SyntacticEndOfLine_
 GUI_Text_TextSize
 GUI_Text_TextViewSet
 GUI_Text_TryShowLineError
 GUI_Text_TypedString
 GUI_Text_Undo
 GUI_Text_ViewLineAndSel
-GUI_Text_WasEverAltered
 GUI_Text_XYOfChar
 GUI_Text__Block
+GUI_Text__SyntacticEndOfLine
 GUI_Toy_Constructor
 GUI_Toy_Destructor
 GUI_Toy_Drawbackground
