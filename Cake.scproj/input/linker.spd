@@ -2,9 +2,10 @@
 
 module SpdTable
 	|int|			LinksOK
-	|int|			CodeLength
+	|uint|			CodeLength
 	|[SpdFunc]|		Funcs
 	|spdfunc--|		CurrFunc
+	|string|		CallBack
 	|&&nil|			LibFuncs = cakerun.LibFuncs
 	
 	function Find (|int| index, |spdfunc|)
@@ -83,11 +84,29 @@ module SpdTable
 	function spdfunc.length
 		disabled "Do you mean message.length or spdfunc.rangelength?"
 		
+	
+	function FillCallBacks (|string| ang)
+/		|| i = InputStream(ang)
+		|| g = Globals.PackGlobs!
+		|| gmax = Globals.PackGlobSize
+		|| fmax = .CodeLength
+		|| Code = cake.BeginCode|uint64| ||| (1|uint64|<<63)
+
+		while i.HasAny
+			|uint| D = i.HInt
+			|uint| Fn = i.HInt
+			expect (D < gmax and Fn < fmax) ("CallbackOutOfRange")
+			|| where = (g+d)|&uint64|
+			where[] = Code + Fn
+			
+			
 		
 	function LinkAll
 		opt norefcounts
 		for f in .funcs
 			f.Link❗
+		|| boomer = .CallBack
+			.FillCallBacks(boomer)
 
 
 	function spdfunc.Link❗

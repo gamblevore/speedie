@@ -806,12 +806,6 @@ function Assembler.Rework (|SCFunction| fn)
 	.FinishASM
 
 
-target debug
-	function Assembler.PrintASM (|SCFunction| fn, |int| i, |bool|)
-		// printline "µFunc: $i", (fn)
-		fn.µprint
-
-
 function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 // AsmGenerate, ASMRender, GenerateASM, ASMCompile, RenderASM, genasm
 	opt norefcounts
@@ -824,7 +818,7 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 		.Rework(fn)
 	.CapASM
 	
-	target debug
+	target false
 		ifn options.silent or compiler.InPerry or options.perryoutput
 			.PrintASM(fn, packmaker.PackFuncIndex)
 	

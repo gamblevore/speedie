@@ -642,7 +642,7 @@ libinternal fileviewer.ReturnFileList (GUIListEvent)
 		return true
 
 
-libinternal fileviewer.RightClickFileList (GUIListEvent)
+function fileviewer.RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .NewCmm

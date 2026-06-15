@@ -4,7 +4,7 @@
 // which are free to use whatever licence for the rest of their project.
 
 
-// Spdsort is like a normal quicksort, but with better characteristics:
+// SpdSort is like a normal quicksort, but with better characteristics:
 	// 1) Handles invalid sort functions. You need this if you are making a programming language, cos you don't want some kid making his first game to crash his computer just cos the sort function is a little bit off. Garbage in = garbage out... thats all we want. C++ sorts will actually crash your app with invalid sort functions.
 	// 2) Seems a lil faster?
 	// 3) Handles sorted and reverse sorted arrays very fast
@@ -34,12 +34,19 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 #endif
 
 #ifndef __spdsort_swap__
-#define __spdsort_swap__ std::swap
-#include <algorithm>
+	#define __spdsort_swap__(a,b) ({auto _T = b; b = a; a = _T;})
 #endif
 
-static __spdsort_type__* SortABit(void* dat__, __spdsort_type__* low, __spdsort_type__* high) {
-// Future upgrade for pathalogical data: Swap a random element for the high element
+#ifndef __spd_variant__
+	#define __spd_variant__(a) a
+#endif
+#ifndef __spd_dat__
+	#define __spd_dat__ void*
+#endif
+
+
+static __spdsort_type__* __spd_variant__(SortABit) (__spd_dat__ dat__, __spdsort_type__* low, __spdsort_type__* high) {
+// Future upgrade for pathological data: Swap a random element for the high element
 // We'd need to only do that if our stack depth gets too high.
     auto pivot = *high;
     while (__spdsort_func__(dat__, pivot, *low++) <= 0)
@@ -58,20 +65,20 @@ static __spdsort_type__* SortABit(void* dat__, __spdsort_type__* low, __spdsort_
 }
 
 
-static void QuickReverse(__spdsort_type__* low, __spdsort_type__* high) {
+static void __spd_variant__(QuickReverse) (__spdsort_type__* low, __spdsort_type__* high) {
 	do {
 		__spdsort_swap__(*low, *high);
 	} while (++low < --high);
 }
 
 
-extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* high) {
-	if (high == low+1) { // reduce comparisons...
+extern "C" void __spd_variant__(SpdSort) (__spd_dat__ dat__, __spdsort_type__* low, __spdsort_type__* high) {
+	if (high == low+1) {									// reduce comparisons...
 		if (__spdsort_func__(dat__, *low, *high) <= 0)	
 			__spdsort_swap__(*high, *low);
 		return;
 	}
-    auto p = SortABit(dat__, low, high);
+    auto p = __spd_variant__(SortABit)(dat__, low, high);
     if (!p) {
 		p = low;
 		while (__spdsort_func__(dat__, p[1], p[0]) <= 0)
@@ -79,20 +86,20 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 				return;										// Avoid disasterous worst-case (sorted data).
 		p = high;
     } else {
-		if (p == low) { // avoid pointless compares for 2 element reversals.
+		if (p == low) {										// avoid pointless compares for 2 element reversals.
 			while (__spdsort_func__(dat__, p[0], p[1]) <= 0)
 				if (++p >= high)							// Avoid reverse-sort. Also disasterous.
-					return QuickReverse(low, high);
+					return __spd_variant__(QuickReverse)(low, high);
 			p = low;
 		}
 		__spdsort_swap__(*p, *high);
 	}
 	
     if (low < p - 1) {
-		SpdSort(dat__, low, p - 1);
+		__spd_variant__(SpdSort)(dat__, low, p - 1);
 	}
 	if (p+1 < high) {
-		SpdSort(dat__, p + 1, high);
+		__spd_variant__(SpdSort)(dat__, p + 1, high);
 	}
 }
 

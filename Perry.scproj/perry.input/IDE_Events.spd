@@ -565,13 +565,13 @@ function PerrySearchWithin (GUIListEvent)
 
 
 function PerryFileViewRightClick (GuiListEvent)
-	|| RC = self|fileviewer|.onrightclick
-		require (RC)(self, row, mode)
-		if row isa filerow
-			|| m = .CMM									#require
-			|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
-			|| where = m.listsource[4]
-				where.prev = menu
+	|| RC = FileViewer.RightClickFileList|GuiListEvent|
+	require (RC)(self, row, mode)
+	if row isa filerow
+		|| m = .CMM									#require
+		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
+		|| where = m.listsource[4]
+			where.prev = menu
 	return true
 
 

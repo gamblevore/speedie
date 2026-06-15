@@ -344,7 +344,7 @@ function textview.PerryDeclKey (|bool|)
 	// ASSUME by here, that this line parses properly.
 	
 	|| clearback = .IsClearBackLine(s.x-1)
-	|| endofline = .SyntacticEndOfLine_(s.x)
+	|| endofline = ._SyntacticEndOfLine(s.x)
 	|| inclass = .IsInClass(d) 
 	if clearback and !inclass
 		return .insert("|| ")

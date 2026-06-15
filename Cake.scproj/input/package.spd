@@ -2,8 +2,6 @@
 
 module CakeRun
 	linkage: cpp_part Pack
-	|String|				Strings
-	|String|				FileSrc
 	|dictionary of object| ClassTable = dictionary()
 	
 	constants
@@ -39,7 +37,8 @@ module CakeRun
 
 		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
 		Debugger.PackInfo = arg["debug"]
-		.Strings = arg["strs"].name
+		GLobals.Strings = arg["strs"].name
+		spdtable.CallBack = arg["call"].name
 
 		|| PackCls = arg["clss"]
 		.CountClasses(PackCls)

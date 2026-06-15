@@ -118,7 +118,7 @@ void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
 
  
 #define EROR HALT
-static ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm
+ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm
 static void * const GlobalJumpTable[] = {
 	#include "InstructionList.h"
 	&&TRYBREAK,

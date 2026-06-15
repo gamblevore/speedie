@@ -191,7 +191,7 @@ function Message.TestFuncName (|bool|)
 
 function MakeLibOnly (|message| node)
 	if self != Interact.AnonFn
-		check (.IsLibrary) (node, "This function can't be lib-internal")
+		check (.IsLibrary) (node, "Can't use libinternal functions if you are not making a lib.")
 	.NoAutoComplete = 2
 	.SetLibOrEmbed(node, scnodeinfo.LibOnly)		// limited to internal within a project
 
@@ -313,7 +313,7 @@ function @scfunction.TransformAll
 	opt norefcounts
 	|| globinits = compiler.AppInitGlobals
 	if !globinits.HasActualCode 
-		|| fn = compiler.AppInitCode.find(@func, @thg, "InitAppGlobals_")
+		|| fn = compiler.AppInitCode.find(@func, @thg, "AppInitSub_")
 			fn.parent.remove
 	(Compiler is Transforming)
 	for f in compiler.FuncList

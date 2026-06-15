@@ -96,6 +96,7 @@ function SCModule.CreateInitFuncSub (|message| init, |string| name)
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)
 
+
 function SCModule.CreateInitFunc
 	SCNode.CurrVisibility = true
 	scmodule.Curr = self

@@ -613,9 +613,13 @@ function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, 
 	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
 
-
+	
 function AddressOf (fn_asm)
-	rz = .µGetASM(exp, dest as asmreg.addrneed)
+	opt norefcounts
+	if exp.declfunc					// function pointers need to be read normally...
+		return .µGetASM(exp, dest)
+
+	rz = .µGetASM(exp, dest  as asmreg.AddrNeed)
 	target debug: if (rz isnt ContainsAddr)
 	(rz isnt ContainsAddr)
 	(rz isnt AddrRequest)
@@ -951,3 +955,9 @@ function Message.TypeCastDoesNothing (|bool|)
 	if (Output is bool) == (Input is bool)				// Boolness
 		return Input.ByteCount == Output.ByteCount
 
+
+function message.DeclFunc (|scfunction|)
+	opt norefcounts
+	|| D = .obj
+	if D isa SCDecl
+		return d.Func

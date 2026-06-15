@@ -36,8 +36,7 @@ module PackMaker
 		if (!.IsMacro) and (self isnt disabled and LinkInline)
 			if self|scnode| is libonly // hmm
 			return true
-	// why not use noexport instead? (NoExport = LinkInline + Disabled + InitFunc)
-											
+	// why not use noexport instead? (NoExport = LinkInline + Disabled + InitFunc)							
 
 	
 	helper AddFunc (|SCFunction| f)
@@ -57,7 +56,7 @@ module PackMaker
 		for f in Compiler.FuncList
 			if f.CanLibLoad
 				.addfunc(f)
-	
+			
 	
 	function GlobalsSize (|[scdecl]| List, |int|)	// SortGlobals, GlobalsSort
 		opt norefcounts
@@ -67,6 +66,7 @@ module PackMaker
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
+
 			|| X = d.ExportPosition
 			if !X or X == globals
 				d.ExportPosition = globals			// its ok
@@ -169,6 +169,7 @@ module PackMaker
 	
 	function BakePackToDisk 
 		|jbin| j = Compiler.ProductPath.OutputStream$
+		|| boomerang = FastString() // callback? Or is it a throwback? 
 		(Compiler is Baking)
 
 		j.RunHeader("/usr/local/bin/cake")
@@ -176,7 +177,8 @@ module PackMaker
 		j.AddHInt(.PackGlobSize.AlignUp(8))
 		j.enter
 		
-		if .BakeASM(j)
+		if .BakeASM(j, boomerang)
+			.BakeCallbacks(j, boomerang)
 			.BakeStrings(j)
 			.BakeClasses(j)
 			.BakeDebug(j)
@@ -225,16 +227,23 @@ module PackMaker
 		compiler.stDebugInfo += j.Length - JL
 	
 	
-	function BakeASM (|jbin| j, |bool|)
+	function BakeASM (|jbin| j, |faststring| boomer,   |bool|)
 		opt norefcounts
 		j.enter(@tmp, "code")
 		j.Enter
-		require .BakeAllFuncs(j)
+		require .BakeAllFuncs(j, boomer)
 		j.exit(2)
 		scfunction.currfunc = nil
 		return true
 		
-		
+
+	function BakeCallbacks (|jbin| j, |faststring| booma)
+		if booma.Length
+			j.enter(@tmp, "call")
+			j.Add(@str, booma)
+			j.exit
+	
+	
 	function BakeStrings (|jbin| j)
 		|| strs = FastString()
 		.DumpStringsSub(strs)

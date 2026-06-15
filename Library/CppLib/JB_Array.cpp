@@ -9,18 +9,48 @@
 #include "JB_Umbrella.hpp"
 #define __spdsort_type__ JB_Object*
 #define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
-#define __spdsort_swap__ JB_Swap
 #include "spdsort/spdsort.h"
+
+#if __VM__
+#undef __SPD_SORT__
+#undef __spd_variant__
+#undef __spdsort_func__
+#define __spd_variant__(fn) (fn##VM) 
+#define __spdsort_func__(fp,b,c)  ({					\
+														\
+	auto V = JB_GlobalVM;								\
+	((JB_Object**)((V->ProposedStack)+2))[0] = b;		\
+	((JB_Object**)((V->ProposedStack)+3))[0] = c;		\
+	JB_ASM_CallBack(V, (u32*)fp)[0][0];					\
+})
+// this COULD be optimised but I don't want to ruin my life optimising everything.
+// You need to err on one side or the other... and I tend to err on the optimising side
+// so... I might as well err the other way, for once.
+
+#include "spdsort/spdsort.h"
+#endif
+
 
 extern "C" {
 void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
 	int N = JB_Array_Size(self);
-	if (fp and N >= 2) // remove the check for fp? nilchecker should find it.
-		SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
+	require0(N >= 2);
+	
+
+	#if __VM__
+	if (((IntPtr)fp)>>63)		// speedie func!
+		return SpdSortVM((void*)fp, self->_Ptr, self->_Ptr+N-1);
+	#endif
+	
+	SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
 }
 
 
-#define kArrayLengthMax (2147483644)	 	// 16GB on 64-bit platforms, 8GB on 32-bit platforms.
+
+
+
+
+#define kArrayLengthMax (2147483644)
 #define PtrSize (sizeof(void*))
 
 

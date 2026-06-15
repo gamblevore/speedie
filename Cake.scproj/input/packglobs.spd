@@ -6,6 +6,7 @@ module Globals
 	|&uint16|				LibLink = Globals.GlobTable
 	|uint|					LibMax
 	|uint|					PackGlobSize
+	|string|				Strings
 
 
 	function GlobTable (|&uint16|)
@@ -21,7 +22,7 @@ module Globals
 		|int| Glob_Size = size_msg.int(0, 1, 216MB)$
 		expect (!(Glob_Size&7)) (size_msg, "Unaligned")		// always a multiple of 8.
 		
-		|| input		= InputStream(cakerun.strings)
+		|| input		= InputStream(.strings)
 		|| n_strs		= input.HInt
 		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
 		|| Alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)

@@ -1,9 +1,9 @@
 
-// archive
-//    +"/path/"
-//		  data "abc"
-//		  modified "123123123"
-//		  mode 123
+//	archive
+//		+"/path/"
+//			data "abc"
+//			modified "123123123"
+//			mode 123
 
 role FileArchive (message)
 	linkage
@@ -88,7 +88,7 @@ role FileArchive (message)
 		cpp_part AppendFile
 		opt norefcounts
 		|| p = f.path
-		|| where = p.trimstart(.base)
+		|| where = p.TrimStart(.base)
 		if where != p
 			|| item = .last.msg(@tmp, where)
 			item["data"] = f.readall
@@ -107,4 +107,5 @@ role FileArchive (message)
 function string.GetArchive (|int|lim, |FileArchive|)
 	embedded
 	return .decompress(lim).parse|FileArchive|.validate
+
 

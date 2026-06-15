@@ -70,7 +70,7 @@ linkage
 |[SCImport]|				ImportedList
 |Dictionary of SCImport|	ImportedNames = Dictionary.new
 
-|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, InitAppGlobals_()}`~parse).WipePos
+|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, AppInitSub_()}`~parse).WipePos
 |Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
 
 |SCModule|					Program = InternalFile.Proj.Mod
@@ -366,9 +366,9 @@ function ImportLibs
 
 	scimport.curr = compiler.project // perhaps I should put it into there instead of compiler.program anyhow.
 	scnode.currvisibility = false
-	compiler.program.CreateInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
+	compiler.program.CreateInitFuncSub(.AppInitGlobals,	"AppInitSub_")
 	scnode.currvisibility = true
-	compiler.program.CreateInitFuncSub(.AppInitCode,    "InitAppCode_")
+	compiler.program.CreateInitFuncSub(.AppInitCode,	"InitAppCode_")
 
 
 function ImportProj 

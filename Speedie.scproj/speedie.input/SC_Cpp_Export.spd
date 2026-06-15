@@ -58,15 +58,19 @@ const char* JB_ThreadName = "`
 	fs <~ compiler.projectname
 	fs <~ `";
 
-JB_Globals JB__;
+JB_Globals `
+	if Options.MakeExec
+		fs <~ `JBC__;
+`
+	  else
+		fs <~ `JB__;
 `
 
 	if !options.targetdebug
 		fs <~ "#pragma GCC visibility push(hidden) // hide\n"
 
 
-function JB_GlobalsMadeHere (|FastStringCpp| fs, |bool| Simple=false)
-
+function JB_GlobalsMadeHere (|FastStringCpp| fs, |bool| Simple=false) // makeglobs
 	fs <~ "\nstruct JB_Globals {\n\tbyte __Dummy__;\n\t"
 	for prop in PackMaker.LibGlobs
 		if simple and prop.Complexity > 1
@@ -78,7 +82,11 @@ function JB_GlobalsMadeHere (|FastStringCpp| fs, |bool| Simple=false)
 			WriteDecl( prop, fs, nil )
 		fs <~ ";\n\t"
 	fs.Length--
-	fs <~ "};\nextern JB_Globals JB__;\n\n"
+	fs <~ "};\nextern JB_Globals "
+	if Options.MakeExec
+		fs <~ "JBC__;\n\n"
+	  else
+		fs <~ "JB__;\n\n"
 
 
 function CanOpt (|bool| force, |bool|)
@@ -602,17 +610,13 @@ function WriteVMFuncs (|faststringcpp| fs)
 function WriteLibGlobLookup (|faststringcpp| fs)
 	opt norefcounts
 	|| Position = 0
-	// so... what should I do?
-	// make a instruction to get the address of a func? or read it from a glob?
-	// you can't get the address of a libfunc. It needs to be in the libglobs.
-	// libfuncs are stored all over the place.
-	// so why isnt it in the libglobs?
-	// it seems to be? or else... it wouldbe be here.
-	// OK... what about jb_globals ?
 	
-	fs <~ "#define JB_GlobOffset(g) ((unsigned short)(int64)(  &(((JB_Globals*)0)->g)  )) //
+	fs <~ "#define JB_GlobOffset(g)		((unsigned short)(int64)(  &(((JB_Globals*)0)->g)  ))
+#define JB_LibFunc(ty, fn)		((ty)((IntPtr)(fn)))
 
-__lib__ unsigned short JB_GlobTable[] = {
+//#define JB_LibFunc(ty, fn)	((ty)((IntPtr)(fn)|(1ull<<(sizeof(IntPtr)*8-1))))
+
+__lib__ unsigned short JB_GlobTable[] = {  // glob list
 "
 	for g in packmaker.LibGlobs
 		|| id = g.gpackid|int|
@@ -636,7 +640,6 @@ extern \"C\" unsigned short* JB_App__GlobTable() {
 	
 function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 	opt norefcounts
-	fs <~ "// glob list\n"
 	.WriteLibGlobLookup(fs)
 	
 	fs <~ "// entire_function_list!\n\n"
@@ -669,23 +672,25 @@ extern \"C\" void** JB_App__LibFuncs() {
 extern \"C\" void** JB_App__LibGlobs() {
 "
 	
-//	printline PackMaker.LibGlobs
-	for dcl in PackMaker.LibGlobs
-		|| fn = dcl.Func	
-			fs <~ "\tJB__."
-			fs.AppendLibGlob(dcl)
-			fs <~ " = ("
-			writetype(dcl, fs)
-			fs <~ ")"
-			fs <~ fn.exportname
-			fs <~ ";\n"
-	
-//	debugger 
+	.GlobalLibProtoTypes(fs)	
 	fs <~ "
-	return (void**)(&JB__);
+	return (void**)(&JBC__);
 }
 
 "
+
+
+function GlobalLibProtoTypes (|faststring| fs)
+	opt norefcounts
+	for dcl in PackMaker.LibGlobs
+		|| fn = dcl.Func
+			fs <~ "\tJBC__."
+			fs.AppendLibGlob(dcl)
+			fs <~ " = JB_LibFunc("
+			writetype(dcl, fs)
+			fs <~ ", "
+			fs <~ fn.exportname
+			fs <~ ");\n"
 
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
@@ -710,8 +715,11 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 		if prop is library and prop is Global
 			if !intomodule
 				self <~ "#define "
-				self <~ prop.exportName		// 
-				self <~ " JB__."
+				self <~ prop.exportName		//
+				if Options.MakeExec
+					self <~ " JBC__."
+				  else
+					self <~ " JB__."
 				.Appendlibglob(prop)
 				return true
 			return false
@@ -731,7 +739,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 
 
 
-function ExportSyx 
+function ExportSyx
 	require Compiler.SyxArray
 	|| fs = .Syxes
 	for (syx in Compiler.SyxArray) (i)
@@ -820,7 +828,7 @@ extern "C" {
 
 
 module
-	|bool|						WriteAPI 
+	|bool|						WriteAPI
 	|[string]|					H_Input
 	|[string]|					H_PostInput
 	|[string]|					Cpp_Input
@@ -829,9 +837,9 @@ module
 	|| IfName = ""
 	|| WhileName = ""
 
-	|SCClass| 	CurrClass
-	|uint64| 	LubHash
-	|string| 	FindGlobalsCpp = (`		
+	|SCClass|	CurrClass
+	|uint64|	LubHash
+	|string|	FindGlobalsCpp = (`		
 
 extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	*src = JB_LUBSrc2;
@@ -1008,7 +1016,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 //			if (c.IsSaveableObject and c.MyReacher)
 //				fs <~ "\tfn(&"
 //				fs <~ c.CStructName
-//				fs <~ "Data, (char*)" 
+//				fs <~ "Data, (char*)"
 //				c.RenderSaveable(fs)
 //				fs <~ ");\n"
 		

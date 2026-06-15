@@ -139,6 +139,7 @@ ivec4*		JB_ASM_CallBack		(CakeVM* V, u32* Code);
 bool		JB_Cake__Prepare	(int N, int B);
 JB_Class*	JB_Cake__Class		(const char* Name, int Size, JB_Class* Parent, int VCount);
 void**		JB_Cake_Virtuals	(JB_Class* C);
+ivec4*		__CAKE_VM__			(CakeVM& vm, u32* Code, CakeRegister* r);
 
 extern CakeVM*	JB_GlobalVM;
 

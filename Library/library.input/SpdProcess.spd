@@ -17,7 +17,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	contains SpdProcess
 	|jbin|						Writer
 	|?MicroProcess|				SubProcess		// mostly exists for debug
-	|int| 						DeathLimit
+	|int|						DeathLimit
 	|bool|						AlreadyWarnedDied
 
 	constructor	(|string| path, |?MicroProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)

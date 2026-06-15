@@ -34,7 +34,7 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 				w.Show
 
 	
-		function CreateOptionSub (|string| name,  |string| tooltip, |guiaction| fnc, |buttonview|)
+		helper CreateOptionSub (|string| name,  |string| tooltip, |guiaction| fnc, |buttonview|)
 			opt norefcounts
 			|| b = buttonview(._win,	fnc)
 			b.tooltip	= tooltip

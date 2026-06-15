@@ -118,14 +118,20 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	.prms[reg] = J2
 	.µBakeInto(SelfOut, SelfOut+1)			// rerender
 	.prms[reg] = J							// restore!
+	
 
-
-function packmaker.BakeAllFuncs (|jbin| j, |bool|)
+	
+function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr,   |bool|)
 	opt norefcounts
-	for f in .PackFuncs
-		if .PackSaved.AddOrShrink(j, f)
-			SCFunction.currfunc = f
-			require j.BakeFunc(f)
+	for fn in .PackFuncs
+		if .PackSaved.AddOrShrink(j, fn)
+			SCFunction.CurrFunc = fn
+			|| Start = sourcemap.ASMTotal
+			require j.BakeFunc(fn)
+			|| glob = fn.HasProto
+				bmr.appendhint(glob.ExportPosition)
+				bmr.appendhint(Start)
+			fn.µprint
 	return true
 
 

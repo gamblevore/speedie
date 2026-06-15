@@ -202,6 +202,7 @@ class XVar (list)
 		opt norefcounts
 		|| OldObj = Reg[]
 			require Memory.Test(OldObj)
+		
 		if value ~= "nil" or "0" or "0x0"
 			require self is CanBeNil
 			reg[] = nil
@@ -249,6 +250,7 @@ class XVar (list)
 
 		if t is bool
 			(Where|&bool|)[] = value.Yes
+			
 		  elseif t isnt Floating
 			if !t.IsSigned and (bc == 1) and !value.IsInt
 				if value[] == '\'' and value.Last == '\''
@@ -301,7 +303,7 @@ class XVar (list)
 
 		if obj isa Array
 			fs <~ "("
-			fs <~ obj.length // could be expandable... I guess?
+			fs <~ obj.length						// Could be expandable... I guess?
 			fs <~ ") "
 
 		fs <~ "0x"
@@ -351,6 +353,7 @@ class XVar (list)
 	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
 		|| Err = memory.Readable(Mem, N)
 			return true
+		
 		if self
 			self <~ ErrName
 			self <~ ": 0x"
@@ -365,6 +368,7 @@ class XVar (list)
 		|| C = .type
 		if c and c.IsObject
 			return .RenderObject(fs, Where, RefCount)
+		
 		if self is BareStruct
 			return .RenderBareStruct(Fs, where)				// what about structs in general?
 

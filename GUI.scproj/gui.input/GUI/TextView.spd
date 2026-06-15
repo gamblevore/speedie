@@ -610,8 +610,7 @@ class TextView (GUIControl)
 		for p in ._lines
 			|| s = p.next
 			if p.insane(s)
-				debugat
-				return
+/				return
 			p = s
 	}
 
@@ -625,7 +624,7 @@ class TextView (GUIControl)
 	function CurrLine (|int|)
 		opt norefcounts
 		|| d = .FindTextLine(.sel0)
-		return d.vline
+		return d.vline + 1
 	
 	
 	libinternal DrawInfoAtLine (|int| L, |textviewline|)
@@ -1386,7 +1385,7 @@ class TextView (GUIControl)
 	
 	libinternal SelMsgValid (|ivec2| sel, |bool|)
 		opt norefcounts
-		require  sel.width or .SyntacticEndOfLine_(sel.x)
+		require  sel.width or ._SyntacticEndOfLine(sel.x)
 
 		if .JeeboxMode
 			|| d = .FindTextLine(sel.x)
@@ -1396,7 +1395,7 @@ class TextView (GUIControl)
 		return true
 
 
-	function SyntacticEndOfLine_ (|int| p, |ind|) // .endofline
+	autogen _SyntacticEndOfLine (|int| p, |ind|) // .endofline
 		opt norefcounts
 		|| n = .length
 		|| s = .text
@@ -1436,7 +1435,7 @@ class TextView (GUIControl)
 				require (s == '\'' or '"') and (s != tb)
 		
 		
-		if (c&1)
+		if (c & 1)
 			return false
 		// what about ' within a comment. its quite frustrating.
 		|| other = CounterParts[c+1]
@@ -1570,7 +1569,7 @@ class TextView (GUIControl)
 			w._FlashSelf |= 2
 
 	
-	function WasEverAltered (|bool|)
+	function IsModified (|bool|)
 		opt norefcounts
 		with .document
 			return .current != .original
@@ -1591,7 +1590,7 @@ class TextView (GUIControl)
 			return u.FilePath
 
 
-	function DeleteKey (|bool| fwd, |bool|)
+	libinternal DeleteKey (|bool| fwd, |bool|)
 		|| d = fwd.dir
 		if !.deletekeysub(d)
 			beep
@@ -1932,7 +1931,7 @@ class TextView (GUIControl)
 		return .height / .lineheight|int|
 	
 	
-	function MaxVisibleLines (|int|)
+	libinternal MaxVisibleLines (|int|)
 		return .height / .lineheight|int|
 	
 	
@@ -2005,7 +2004,7 @@ class TextView (GUIControl)
 		.WrappedLines <~ rz
 	
 	
-	function TextViewLine.SlowMove (|TextViewLine| start, |int| amount, |...!|)
+	libinternal TextViewLine.SlowMove (|TextViewLine| start, |int| amount, |...!|)
 		if start == self
 			return self
 		|| diff = start.vline - .vline

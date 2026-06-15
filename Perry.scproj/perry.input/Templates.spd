@@ -2,7 +2,7 @@
 
 module Templates
 	|| Todo = "
-		 			*** Todo file ***
+					*** Todo file ***
 
 * Enter list of things to do
 * Do them
@@ -10,7 +10,7 @@ module Templates
 "
 	
 	|| Roots = `
-roots 	// Extra roots for the IDE to display. This doesn't affect compilation.
+roots	// Extra roots for the IDE to display. This doesn't affect compilation.
 	"@spd/Library/library.input/"
 	"@spd/jeebox.scproj/jeebox.input/"
 

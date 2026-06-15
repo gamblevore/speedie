@@ -98,11 +98,11 @@ class Array
 		|| p = .pop
 			self[pos] = P
 
-//	macro Sort
-//	// need a better macro? or alternative? to allow array.sort
-//		{|| tmp = _0, (tmp.sort(&–contained(tmp).__sorter__)), rejoin 0}
-	
 	function Sort (|SorterComparer| Compare=&(...).Sorter)
+		// this wierd syntax is just to say, that the default sort function, is the default
+		// sort function for that object type.
+		// for example, string would use string.sorter, and message would use message.sorter
+		// this way, you can just call myarray.sort and not need to remember the sorter's name.
 		cpp_wrapper JB_Array_Sort
 	
 	function Count (|int|)
