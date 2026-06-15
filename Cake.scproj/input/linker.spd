@@ -86,7 +86,7 @@ module SpdTable
 		
 	
 	function FillCallBacks (|string| ang)
-/		|| i = InputStream(ang)
+		|| i = InputStream(ang)
 		|| g = Globals.PackGlobs!
 		|| gmax = Globals.PackGlobSize
 		|| fmax = .CodeLength

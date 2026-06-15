@@ -11,6 +11,9 @@
 #define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
 #include "spdsort/spdsort.h"
 
+#define kArrayLengthMax (2147483644)
+#define PtrSize (sizeof(void*))
+
 #if __VM__
 #undef __SPD_SORT__
 #undef __spd_variant__
@@ -23,7 +26,7 @@
 	((JB_Object**)((V->ProposedStack)+3))[0] = c;		\
 	JB_ASM_CallBack(V, (u32*)fp)[0][0];					\
 })
-// this COULD be optimised but I don't want to ruin my life optimising everything.
+// This COULD be optimised but I don't want to ruin my life optimising everything.
 // You need to err on one side or the other... and I tend to err on the optimising side
 // so... I might as well err the other way, for once.
 
@@ -32,10 +35,9 @@
 
 
 extern "C" {
-void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
+void JB_Array_Sort (Array* self, ArraySorterComparerInt fp) {
 	int N = JB_Array_Size(self);
-	require0(N >= 2);
-	
+	require0 (N >= 2);
 
 	#if __VM__
 	if (((IntPtr)fp)>>63)		// speedie func!
@@ -46,12 +48,6 @@ void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
 }
 
 
-
-
-
-
-#define kArrayLengthMax (2147483644)
-#define PtrSize (sizeof(void*))
 
 
 

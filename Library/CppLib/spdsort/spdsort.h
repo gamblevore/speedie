@@ -73,7 +73,7 @@ static void __spd_variant__(QuickReverse) (__spdsort_type__* low, __spdsort_type
 
 
 extern "C" void __spd_variant__(SpdSort) (__spd_dat__ dat__, __spdsort_type__* low, __spdsort_type__* high) {
-	if (high == low+1) {									// reduce comparisons...
+	if (high == low+1) {									// Reduce comparisons...
 		if (__spdsort_func__(dat__, *low, *high) <= 0)	
 			__spdsort_swap__(*high, *low);
 		return;
@@ -86,7 +86,7 @@ extern "C" void __spd_variant__(SpdSort) (__spd_dat__ dat__, __spdsort_type__* l
 				return;										// Avoid disasterous worst-case (sorted data).
 		p = high;
     } else {
-		if (p == low) {										// avoid pointless compares for 2 element reversals.
+		if (p == low) {										// Avoid pointless compares for 2 element reversals.
 			while (__spdsort_func__(dat__, p[0], p[1]) <= 0)
 				if (++p >= high)							// Avoid reverse-sort. Also disasterous.
 					return __spd_variant__(QuickReverse)(low, high);
