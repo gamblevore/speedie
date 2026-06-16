@@ -357,7 +357,7 @@ function textview.PerryDeclKey (|bool|)
 				.insert("|")
 			return true
 		if m
-/			|| decl = m.at(s.x)
+			|| decl = m.at(s.x)
 			if decl == @decl and decl == 1
 				.insert(" ")
 				return true
