@@ -411,12 +411,12 @@ POS 24					// force position
 
 POS 25
 	FNCX3 (ForeignFunc)
-		ForeignFunc(vm, Code, r, Op, Code64) 
+		BridgeEntry(vm, Code, r, Op, Code64) 
 		Code += 2
 
 POS 26
 	FNCX (ForeignFunc)
-		ForeignFunc(vm, Code, r, Op, *Code)
+		BridgeEntry(vm, Code, r, Op, *Code)
 		Code++ 
 
 POS 255

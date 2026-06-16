@@ -22,10 +22,10 @@
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 	fallthrough;
 ı FNCX3:;
-	ForeignFunc(vm, Code, r, Op, Code64);
+	BridgeEntry(vm, Code, r, Op, Code64);
 	Code += 2;
 ı FNCX:;
-	ForeignFunc(vm, Code, r, Op, *Code);
+	BridgeEntry(vm, Code, r, Op, *Code);
 	Code++;
 ı TRAP:;
 	TryTrap();

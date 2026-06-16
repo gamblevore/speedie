@@ -973,7 +973,7 @@ class SCDecl (SCObject) {
 		rz = .ExpectMatchSub( O, Cast, exp, ErrNode )
 		
 		if side
-			.MarkAsAltered
+			.MarkAsAltered(exp)
 			if (self is self) and (scfunction.currfunc is Destructor) 
 				error (exp, "You can’t modify 'self' in a destructor.")
 
@@ -1147,17 +1147,23 @@ class SCDecl (SCObject) {
 			rz *= .CArrayTotal
 
 
-	function MarkAsUsed (|message| side, |message| exp)
+	function SetSelfProp (|message| exp, |bool|)
 		opt norefcounts
-		if exp and (SCFunction._Info is ConOrDes) and (self is Property)
+		if exp and (SCFunction._Info is conordes) and (self is Property)
 			if exp.func == @dot
 				|| f = exp.first
-				if f isthing "self"
-					return
+				return f isthing "self"
+
+
+	function MarkAsUsed (|message| side, |message| exp)
+		opt norefcounts
+		|| SelfProp = .SetSelfProp(exp)
 		if side
-			is setto
+			if !SelfProp
+				is setto
 		  else
-			is ReadFrom
+			if !SelfProp or (exp isnt inserted)
+				is ReadFrom
 	
 }
 

@@ -414,7 +414,7 @@ function message.AssignsFix (|scfunction| f)
 		if upon
 			rp.first = upon
 			|| d = upon.obj|scdecl|
-				d.MarkAsAltered
+				d.MarkAsAltered(self)
 	  else
 		rp.SpdFunc = @Bra
 		L.remove
@@ -482,7 +482,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| PArg_Ch = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
 		if  PArg_Type is Local  and  funcarg is Reference
-			PArg_Type.MarkAsAltered
+			PArg_Type.MarkAsAltered(nil)
 			
 		if Base
 			FuncArg = FuncArg.ContainedReplace(base, false)
@@ -1283,9 +1283,10 @@ function FixCnjSub (|Message| exp)
 
 
 
-function SCDecl.MarkAsAltered  // markaltered
+function SCDecl.MarkAsAltered (|message| Exp)  // markaltered
 	opt norefcounts
-	(self is setto)
+	if exp isnt inserted
+		(self is setto)
 	require self is local
 	(self is altered)
 	// //                 ////////////////////                 //////////////////
@@ -1440,14 +1441,14 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 	check (type isnt const) (msg, "Not assignable.")
 	if type.PointerCount > 0
 		check (!side) (msg, "Not assignable.")
-		type.MarkAsAltered
+		type.MarkAsAltered(msg)
 		return type.CheckMath(msg)
 
 	check (!Type.IsBool) (msg, "Can't do ++ or -- on bools. (use '!' instead")
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
-		type.MarkAsAltered
+		type.MarkAsAltered(nil)
 		check (!side) (msg, "Not assignable.")
 		return type
 

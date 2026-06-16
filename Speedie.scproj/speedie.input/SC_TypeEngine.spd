@@ -230,7 +230,7 @@ function TypeOfBRel (ExprResolver)
 	if n == '&'
 		if Subtype.type.funcproto
 			return TypeOfFuncPointer(F, name_space, side)
-		subtype.MarkAsAltered
+		subtype.MarkAsAltered(nil)
 
 		require F.CanGetAddress(name_Space)
 		return Subtype.GetAddress

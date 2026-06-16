@@ -178,7 +178,7 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Obj
 	Dest++; // too small for some reason?
 	fpDestructor Destructor = JB_Destructor(self);
 	auto r = rp;
-	CakeStack* NewStack = (CakeStack*)r + Dest;
+	CakeStack* NewStack = (CakeStack*)r + Dest + 1;
 	NewStack->DestReg = Dest;
 	if (!(((uint64)Destructor) >> 63)) {
 		vm.ProposedStack = NewStack;
@@ -740,9 +740,9 @@ VMOpt int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 }
 
 
+// stack, r0, <r1>, -->r2
 
-
-__restrict VMOpt void ForeignFunc (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
+__restrict VMOpt void BridgeEntry (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 //	printf("T: %i\n", T);
 

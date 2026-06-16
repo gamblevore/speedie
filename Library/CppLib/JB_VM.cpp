@@ -349,11 +349,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 ivec4* 	JB_ASM_CallBack (CakeVM* V, ASM* Code) { // want this inlined...
 	Code = VMClearHigh(Code);
 
-	// JB_Delete and JB_Array_Sort... are not... both using the right
-	// amount of dest? they are different by 1. But both seem to need
-	// a different number. Which number is correcT?
-	// which needs fixing?
-	// IDK??? F----------!!!!
+	// I think this works now.
 	CakeStack* NewStack = V->ProposedStack;
 	int Dest = NewStack->DestReg;
 	CakeRegister* r = (CakeRegister*)NewStack - (Dest + 1);
