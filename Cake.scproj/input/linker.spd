@@ -95,9 +95,11 @@ module SpdTable
 		while i.HasAny
 			|uint| D = i.HInt
 			|uint| Fn = i.HInt
-			expect (D < gmax and Fn < fmax) ("CallbackOutOfRange")
+			ifn (D < gmax and Fn < fmax) 
+				error ("CallbackOutOfRange")
+				exit
 			|| where = (g+d)|&uint64|
-			where[] = Code + Fn
+			where[] = Code + (Fn<<2)
 			
 			
 		

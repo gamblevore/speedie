@@ -98,7 +98,7 @@ extern "C" void __spd_variant__(SpdSort) (__spd_dat__ dat__, __spdsort_type__* l
     if (low < p - 1) {
 		__spd_variant__(SpdSort)(dat__, low, p - 1);
 	}
-	if (p+1 < high) {
+	if (p + 1 < high) {
 		__spd_variant__(SpdSort)(dat__, p + 1, high);
 	}
 }

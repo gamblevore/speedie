@@ -270,7 +270,8 @@ VMOpt ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	}
 	
 	JB_GlobalVM = &V;								// hopefully I won't run two VMs...
-	return __CAKE_VM__(V, Base[-2].Code, V.Registers + 3);
+	auto Code = Base[-2].Code;
+	return __CAKE_VM__(V, Code, V.Registers + 3);
 }
 
 
@@ -350,14 +351,14 @@ ivec4* JB_ASM_CallBack (CakeVM* V, ASM* Code) { // want this inlined...
 
 	CakeStack* NewStack = V->ProposedStack;
 	int Dest = NewStack->DestReg;
-	CakeRegister* r = (CakeRegister*)NewStack - Dest;
+	CakeRegister* r = (CakeRegister*)NewStack - (Dest + 1);
 	{
 		auto OldStack = (CakeStack*)(r-1);
 		OldStack->GoUp = Dest;
 		NewStack->Depth = OldStack->Depth+1;
 	}
 	
-	NewStack->SFlags |= 2;
+	NewStack->SFlags = 2;
 	NewStack->GoUp = 0;
 	NewStack->Code = Code;
 	NewStack[1] = {};
