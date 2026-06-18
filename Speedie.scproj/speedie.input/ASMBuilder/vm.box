@@ -116,6 +116,11 @@ forms
 		r1		r
 		Small	1
 		Jmp		j
+		
+	JBitTest
+		r1		r
+		Sh		6
+		Jmp		j
 	
 	Loop
 		r1		R // assume one is an int64?
@@ -578,6 +583,10 @@ POS 5
 /**/ LUPD  (Loop)
 		if (ii1-- > ii2)
 			Code += Loop_Jmpi
+
+/**/ JTST  (JBitTest)				
+		if (!(u1&(1<<JBitTest_Shu)))
+			Code += JBitTest_Jmpi
 
 
 #!						 (((((MiniCompare)))))

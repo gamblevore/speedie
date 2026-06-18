@@ -79,6 +79,11 @@
 #define	Bra_Jmpi		((( int)((Op)<<14))>>14)
 #define	Bra_Jmpu		(((uint)((Op)<<14))>>14)
 
+#define	JBitTest_Shi		((( int)((Op)<<13))>>26)
+#define	JBitTest_Shu		(((uint)((Op)<<13))>>26)
+#define	JBitTest_Jmpi		((( int)((Op)<<19))>>19)
+#define	JBitTest_Jmpu		(((uint)((Op)<<19))>>19)
+
 #define	Loop_Smalli		((( int)((Op)<<18))>>31)
 #define	Loop_Smallu		(((uint)((Op)<<18))>>31)
 #define	Loop_Jmpi		((( int)((Op)<<19))>>19)

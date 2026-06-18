@@ -4,35 +4,44 @@
 */
 
 
-function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name="", |Message|)
+function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name, |Message|)
 	Opt NoRefCounts
 	cpp_part NewParentName
-	rz = Message.new(parent, func, Start, name, .nextstart - start)
+	// Should offer messageID Creation somehow. We'd need a second callback...
+	return Message.new(parent, func, Start, name, .nextstart - start)
 
 
-function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |int| End, |Message|)
+function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |Message|)
+	Opt NoRefCounts
+	|| NoName = parser[start, start, F] // use messageID even if empty.
+	return message.new(P, F, start, NoName, after - start)
+
+
+function parser.New (|Message| Parent, |Syntax| F, |int| Start, |Message|)
+	Opt NoRefCounts
+	cpp_part NewEmpty1
+	|| NoName = parser[start, start, F] // use messageID still!
+	return Message.new(parent, F, Start, NoName, .nextstart - start)
+
+
+function parser.New (|Message| Parent, |Syntax| F, |int| Start, |int| End, |Message|)
 	Opt NoRefCounts
 	cpp_part NewParent
-	|| name = parser[start, end, func]
-	rz = Message.new(Parent, func, Start, name, end - start)
+	|| name = parser[start, end, F] // uses messageID
+	return Message.new(Parent, F, Start, name, end - start)
 
 
 function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom, |Message|)
 	Opt NoRefCounts
 	|| after = parser.WordAfter( SearchFrom )
-	|| name = parser[searchfrom, after, f]
-	rz = message.New( P, F, start, name, after - start )
-
-
-function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |Message|)
-	Opt NoRefCounts
-	rz = message.new(P, F, start, "", after - start)
+	|| name = parser[searchfrom, after, f] // uses messageID
+	return message.New( P, F, start, name, after - start )
 
 
 function parser.NewSkip ( |Message| P, |Syntax| F, |int| Start, |int| NameStart, |int| NameEnd, |Message|)
 	Opt NoRefCounts
-	|| name = parser[namestart, nameend, f]
-	rz = message.New( P, F, start, name, parser.nextstart - start )
+	|| name = parser[namestart, nameend, f] // uses messageID
+	return message.New( P, F, start, name, parser.nextstart - start )
 
 
 
@@ -275,8 +284,10 @@ struct MessagePosition
 
 
 prototype ParseHandler			(|int| Start, |message| Parent=nil, |Message?|)
-prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
+	libinternal
 
+prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
+	description "Could be used to turn messages into MessageIDs during parse, for faster later processing."
 
 
 struct ParserLineAndIndent

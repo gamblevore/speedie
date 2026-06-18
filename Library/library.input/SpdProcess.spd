@@ -228,7 +228,7 @@ prototype MicroProcess (|&pico| Comms, |int64| Mode, |&cstring| args, |int|)
 
 
 
-prototype SpdDeathActionFn
+//prototype SpdDeathActionFn
 
 }
 

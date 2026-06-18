@@ -626,8 +626,8 @@ function listview.PerryCopyComms (guicopyevent)
 				fs <~ it
 			return fs
 	
-	|| cp = .oncopy
-		rz = (cp)(self, item)
+	|| cp = listview.defaultcopy|guicopyevent|
+	return (cp)(self, item)
 
 
 

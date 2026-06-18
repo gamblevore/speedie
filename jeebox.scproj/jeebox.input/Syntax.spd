@@ -5,6 +5,8 @@
 
 
 prototype fpMsgRender (|Message| self, |FastString| fs)
+	libinternal // shouldn't be changed, ever. jeebox should render as jeebox.
+prototype fpMsgExport (|Message| self, |FastString| fs)
 		
 
 datatype Syntax (Byte)
@@ -76,34 +78,19 @@ datatype Syntax (Byte)
 	// replace with int64.msg? seems better.
 	function Msg ( |int64| name, |Message| )
 		disabled "Use int64.msg instead"
-		
-	inline ExportAddr (assigns:|fpMsgRender|)
-		Opt NoRefCounts
-		.obj!.exportaddr = Value
-	
-	inline ExportAddr (|fpMsgRender|)
-		Opt NoRefCounts
-		return .obj!.exportaddr
-	
-	inline RenderAddr (|fpMsgRender|)
-		Opt NoRefCounts
-		return .obj!.renderaddr
 	
 	
 	module 
 		|int|		CurrFuncID_
 		
-		function Func (|message!| where, |syntax|)
-			cpp_Part FuncCute
-			return .func(where.name, where)
-		
 		function Func (|string?| name, |message| where=nil, |syntax|)
 			visible
-			|| obj = jeebox._syxdict.valuelower(name)		#expect (where, "Unknown syntax " + name)
+			|| obj = jeebox._syxdict.valuelower(name)		#expect (where, "Unknown syntax: " + name)
 			return obj.id
 			
-		function StdNew (|fpMsgRender| msg, |string| Name, |String| LongName, |int| ID, |Syntax|)
-			|| result = Syntaxobj.new(msg, name, ID)
+		function StdNew (|fpMsgRender| Render, |string| Name, |String| LongName, |int| ID, |Syntax|)
+			opt norefcounts
+			|| result = Syntaxobj.new(Render, name, ID)
 			jeebox._syxdict[name] = result
 			jeebox._Funcarray[ID] = result
 			if (LongName)
@@ -120,8 +107,8 @@ class SyntaxObj
 		cpp_part Fn
 	visible			true
 
-	|fpMsgRender|			RenderAddr
-	|fpMsgRender|			ExportAddr
+	|fpMsgRender|			RenderAddr // shouldn't change after creation
+	|fpMsgExport|			ExportAddr
 	|String|				Name
 	|String|				LongName
 	|Syntax|				ID

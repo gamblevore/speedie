@@ -464,12 +464,14 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	
 	expect parent "noparent"
 
-	if parent == .AnonParent and str == layer.obj2|string| and myfile == layer.obj
+	if  (parent == .AnonParent)  and  (str == layer.obj2|string|)  and  (myfile == layer.obj)
 		return fn
 
-	.OrigFn = fn.InsertIn(parent, src.name)
+	|| Orig = fn.InsertIn(parent, src.name)
+		fn.ExportName = Orig.ExportName
+	.OrigFn = Orig
 	|| pos = mpos.int
-	parser._dotinsertallow = true
+	parser._DotInsertAllow = true
 
 	layer.obj = myfile
 	layer.obj2 = str.name
@@ -478,6 +480,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	if fn.update_source(pos, str.name, myfile)
 		.AnonParent = parent
 		return fn
+	
 	layer.obj = nil
 	layer.obj2 = nil
 
@@ -1260,14 +1263,15 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 
 
 function scfunction.RenderSheBless (|string|)
-	|| a = .SourceArg
-		|| b = a.copy
-		.SourceArg = b
-		for s.flat in b
+	|message--| src = .source$
+	|message--| a = src.Last
+		|| b = src.copy
+		|| f = src.first
+			f.name = .ExportName
+		for s.fastflat in b
 			if s.func == @sheb
 				s.remove
-		rz = .render
-		.SourceArg = a
+		rz = src.Render
 
 	
 function CppView (|message| out, |scfunction| fn)

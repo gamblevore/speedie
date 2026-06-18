@@ -30,6 +30,7 @@
 
 
 					// Future ASM opts (more relaxing NOT do at release!) //
+* int.max seems to use knst2? isnt there a knsr or something that can do it?
 * a pixel instruction to convert floats/ints so don't need knst+div+conv to turn a float into an int? with clamping too!
 * vector building seems quite large, for simple vecs.
 	* imagepixel opts... 
@@ -38,6 +39,7 @@
 	* v[1] = 1.0						// should be single op
 * vector equality ASM...
 * LUPU/LUPD mini-opt in "while"
+	* JTST use a bit more
 * EQUL: r5, r0, r5, 48  +  JBOR: r5, 1, 1	// turn into a simpler thing. Like "if compiler is hungry"
 * hoisting
 * .position = Range.x					// unnecessary vget

@@ -183,7 +183,7 @@ function PerryIDE.DebugPath (|message| conf)
 		p = p.Parent
 	app.cwd = p
 	
-	|| pwd = conf["pwd"]
+	|message--| pwd = conf["pwd"] ?? conf["cwd"]
 		|| path = pwd.GoodArgName
 		if pwd != "."
 			app.cwd = path

@@ -654,6 +654,19 @@ function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Small = nil, 
 }
 
 
+function message.JTST (|asmreg| r1 = nil, |int| Sh = nil, |int| Jmp = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.JTST, self)
+	rz.reginput(0) = r1
+	rz.numinput(1) = Sh
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 19) >> 19) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
 function message.EQUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh

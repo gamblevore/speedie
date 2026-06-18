@@ -1219,7 +1219,6 @@ function TypeOfDot (ExprResolver)
 		return o
 	
 	|| decl = o.BaseAsDecl
-//		if decl is const
 		decl.MarkAsUsed(side, exp)
 		if contains
 			if (DotVar isa scclass) and !exp.IsSettablePlace

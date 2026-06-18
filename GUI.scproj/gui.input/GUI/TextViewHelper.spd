@@ -227,31 +227,29 @@ class TextViewLine (list)
 		opt norefcounts
 		|| nxt = self
 		rz = nxt
-//		|| LastAfter = nxt.after
 		while nxt
 			|| curr = nxt
 			nxt	= nxt.flatnext
 			|| CurrPos = curr.position
-//			|| CurrAfter = CurrPos + curr.RangeLength
-//			if CurrAfter <= ToFind					// too far back
-//				if curr.after > lastafter			// seemed only to cause problems
-//					LastAfter = CurrAfter
-//					rz = curr
-//				continue							// go next
 
 			if (CurrPos <= ToFind)
 				rz = curr
 			  elseif !nxt or nxt.position > CurrPos
 				exit
 
-			|| par	= curr.parent					// special coloring
+			|| par = curr.parent						// special coloring
 			if par and par.contains(ToFind, true)
 				|| pt = par.func
-				if pt == @type
-					return par
-				if !curr.prev
-					if (pt == @decl) or (pt == @func and curr == @thg)
+				if (pt == @type)  
+					if	(par.After > ToFind)
 						return par
+				
+				  elseif (pt == @decl or @func) and !curr.prev
+					if (pt == @decl)
+						return par
+					  elseif (curr == @thg)	// (par)<curr(xyz)>
+						if par.After == ToFind
+							return par
 
 
 	libinternal Ends (|bool|)

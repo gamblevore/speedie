@@ -1,4 +1,5 @@
 
+
 module Effects
 	function DoFirework (|float| strength)
 		opt NoRefCounts
@@ -8,6 +9,7 @@ module Effects
 	task Fireworks (guicontrol.taskgui, |vec2| V, |ivec2| Start, |float| Strength)
 		constructor
 			is Animation
+
 		
 		run
 			|| Particles = 24
@@ -63,8 +65,7 @@ function PerryColorLineNum (GUITextLineBreakColor)
 		c.g = 0.75
 		f = -f
 	if (f >= 0.25) and (m == @arg)
-//		if InBreakArea
-			f = 0.275
+		f = 0.275
 	c.a = f
 	return c
 

@@ -361,3 +361,6 @@ datatype ASMReg (uint64)
 		function New (|asmreg|)
 			return Zero
 		
+		function New (|int| reg, |asmreg|)
+			rz.reg = reg
+		

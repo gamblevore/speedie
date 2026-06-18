@@ -146,6 +146,10 @@
 	if (ii1-- > ii2)
 	Code += Loop_Jmpi
 ;
+ı JTST:;
+	if (!(u1 & (1 << JBitTest_Shu)))
+	Code += JBitTest_Jmpi
+;
 ı EQUL:;
 	u1 = BitComp(r, Op);
 ı NQUL:;

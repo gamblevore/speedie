@@ -123,6 +123,7 @@ linkage
 |bool|						HasFunny
 |byte|						During // unused but i don't want to remove. it could be useful?
 |bool|						InitedOK = true
+|bool|						DuringConstructorFillIn
 |byte|						Successfulness
 |int|						stDebugInfo
 |int|						stLibFuncs

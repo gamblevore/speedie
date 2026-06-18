@@ -757,7 +757,8 @@ class SCDecl (SCObject) {
 		rz.Obj = TypeNil
 
 
-	function CreateDefault (|message| errs, |bool|isfunc=true, |Message|)
+	function CreateDefault (|message| errs, |bool| isfunc=true, |Message|)
+		opt norefcounts
 		if (.CantBeNilInCpp) // in case we are storing objects... need to have non-corrupt data.
 			if isfunc
 				return .CreateStructNil(errs)
@@ -768,7 +769,10 @@ class SCDecl (SCObject) {
 				return errs.CreateNil
 			return nil
 	
-		|| d = .type.Defawlt
+		|| T = .type
+		|| d = T.Defawlt
+			if compiler.DuringConstructorFillIn and !d.IsNilOrZero
+				(self is SetTo) // nice
 			return d.copy(errs)
 
 
@@ -1147,9 +1151,9 @@ class SCDecl (SCObject) {
 			rz *= .CArrayTotal
 
 
-	function SetSelfProp (|message| exp, |bool|)
+	function SetSelfProp (|message| exp, |functiontype| Ty,  |bool|)
 		opt norefcounts
-		if exp and (SCFunction._Info is conordes) and (self is Property)
+		if exp and (SCFunction._Info & ty) and (self is Property)
 			if exp.func == @dot
 				|| f = exp.first
 				return f isthing "self"
@@ -1157,12 +1161,12 @@ class SCDecl (SCObject) {
 
 	function MarkAsUsed (|message| side, |message| exp)
 		opt norefcounts
-		|| SelfProp = .SetSelfProp(exp)
+		
 		if side
-			if !SelfProp
+			if !.SetSelfProp(exp, functiontype.destructor)
 				is setto
 		  else
-			if !SelfProp or (exp isnt inserted)
+			if (exp isnt inserted) or !.SetSelfProp(exp, functiontype.conordes)
 				is ReadFrom
 	
 }

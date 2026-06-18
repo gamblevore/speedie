@@ -12,26 +12,25 @@ function IsASMConst (|message| exp, |bool|)
 		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 
 
-function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|)		// paramcollect, paramscollect
+function PrmCollectSpd (|&int64| prms,  |SCFunction| fn,  |uint64|)		// paramcollect, paramscollect
 	opt norefcounts
 	|int64| sh
-	|| args = fn.args
 	|| i = 0
-	if ! prms.AsFunc
-		rz |= 16
-	
-	for p.fast in prms
-		|int64| v = .µFuncPrms(p!, args[i++]!).reg
+	|| n = fn.args.Length
+	while i < n
+		|| v = prms[i++]
 		sh += 5
 		rz |= v << sh
 	rz |= i
 
 
-function CollectParams (|message| prms,  |SCFunction| fn,  |uint64|)
+function CollectParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| Regs,  |uint64|)
 	opt norefcounts
-	
-	if !fn.HasCVersion
-		return .PrmCollectSpd(prms, fn)
+	if !Cpp
+		rz = .PrmCollectSpd(regs, fn)
+		if !prms.AsFunc
+/			rz |= 16 // huh?
+		return rz
 	
 	|int64| sh = 64
 	|| fc = 0
@@ -44,7 +43,7 @@ function CollectParams (|message| prms,  |SCFunction| fn,  |uint64|)
 		for p.fast in prms
 			|| ty = p.ASMDecl
 			if ty.SpecialReg|int| == floats
-				|int64| v = .µFuncPrms(p!, args[i]!).reg
+				|| v = regs[i]
 				sh -= 5
 				rz  |=  v << sh
 				ic += !floats
@@ -74,6 +73,7 @@ function message.RegCheck (|int| Bad)
 
 function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	opt norefcounts
+	.CurrFuncGrab++
 	.ASMReach(fn)
 	|uint| v = 0
 	
@@ -105,43 +105,19 @@ function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg
 	
 	|| fat = exp.GRAB(dest, t)
 	fat.CurrGrabID = .CurrFuncGrab
-	if false and d.IsInt and !d.IsBool
-		|| L = t.BitLoss(D)
-			
-			// What if it has enough bits already?    How can we tell?
-			// So... we never need it if its 64-bit.  Hmmmm
-			// What if its 32-bit... I mean... most ops are 32-bit clean, right?
-			// We could compare the bit-size of the param-passed, and register?
-			// see if its more? rarely, right?
-
-			// need a real problem case before we can write this...
-		
-			L = L.SetSign(t.signed)
-			fat.const = L // what if we are passing a const? well... its not an address!
 	return fat * dest.HaveAddr
 
 
-target false {
-function RegClear (|message| exp, |&fatasm| C, |asmreg| R)
-	c.CurrGrabID = 0
-	|| L = c.Const
-	|| signed = L < 0
-		L = -L
-	.BFLG_Sub(exp, R, R, L, L, signed)
-}
 
-
-function ClearTrampling (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
-	// asmtodo: unnecessary? Values are always 32 or 64-bit. everthing else should be
-	// set correctly, right? remove later?
+function GrabbedRegisters (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
 	opt norefcounts
 	if 0: AllPrms.FNC3, AllPrms.FNCX3			// MARK USED
 
+	.CurrFuncGrab--
 	|| c = .Last - 1
 	while C >= Start
 		if (c isa asm.GRAB)
 			if c.CurrGrabID == .CurrFuncGrab
-//				.RegClear(AllPrms, c, c.output.asmreg)
 				.SetRegister(c.regonly(1), nil, fn)
 		c--
 		
@@ -151,8 +127,8 @@ function ClearTrampling (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
 
 
 function SCFunction.HasCVersion (|bool|)
+	// is this different than (self is cpp)?
 	if .IsCppInBuilt == 2						// cpp_nothing: For JB_Decr, JB_Ternary, etc
-		debugat
 		return false
 
 	if .IsLibrary
@@ -198,6 +174,7 @@ function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
 		rz = 0xFFFF	
 
 
+
 function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	opt norefcounts
 	|| prms = exp.last!
@@ -221,38 +198,62 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	  else // function pointers
 		|| f = exp.first!
 		TableID = .µ(f).Reg
-		|| dcl = f.ASMDecl
-		fn = dcl.Type.FuncProto						#expect (exp)
+		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
 
+	if (fn == "App_abc_Constructor")
+	
 	dest = .CallFunc(exp, dest, fn)
-
-	|| Start = .curr
-	.CurrFuncGrab++
-	
-	|| Closer = .OpenVars
-	|| P = .CollectParams(prms, fn)
-	.CloseVars(Closer)
-	
-	|| PExt = P >> 32
 	(dest isnt Const)								// why would it be?
+	|| Start = .curr
+	|int64[8]| Regs
+
+	{
+		|| Closer = .OpenVars
+		|| i = 0
+		|| args = fn.args
+		for	p.fast in prms
+			regs[i] = .µFuncPrms(p!, args[i]!).reg
+			i++
+		.CloseVars(Closer)
+	}
+
+	|| C = fn.HasCVersion
+	if !fn.ProtoType or (fn.ASMAndCpp != 3)
+		|| fat = .Whatever(exp, dest, fn, tableid, regs, C)
+		.GrabbedRegisters(exp, Start, fat)
+		return fat * dest
+
+	|| HighBit = .TempOnly(datatypecode.uint64|asmreg|)
+	|| branch = exp.JTST(asmreg(tableid), 63)
+	branch.OperatorMul(highbit)
+	.Whatever(exp, dest, fn, tableid, regs, true)
+	|| J = exp.jump
+	
+	|| fn2 = .Whatever(exp, dest, fn, tableid, regs, false)
+	j.Jumpto(.curr)
+	branch.JumpTo(fn2)
+	
+	.GrabbedRegisters(exp, Start,  fn2)
+	return fn2 * dest
+
+
+function assembler.Whatever (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&int64| Regs, |bool| Cpp, |&fatasm|)
+	opt norefcounts
+	|| P = .CollectParams(exp.last!, fn, Cpp, regs)
+	|| PExt = P >> 32
 	|| fat = exp.FNC(dest, TableID, P, PExt)
-	if fn.HasCVersion
+	if Cpp
 		fat._op = asm.FNCX
 		if PExt > 0
 			fat._op = asm.fncx3
 	  elseif PExt > 0
 		fat._op = asm.fnc3
-		
-	fat.µRefCount += fn isnt STATELESS				// NOICE!
-
-	.ClearTrampling(exp, Start, fat)
-	.CurrFuncGrab--
 	
+	fat.µRefCount += fn isnt STATELESS				// NOICE!
 	if fn is Killer
 		dest = asmreg.exit
 		fat.µrefcount++
-	return fat * dest
-
+	return fat
 
 
 function assembler.ASMReach (|SCFunction| fn)

@@ -637,7 +637,7 @@ Message is also:
 		fs <~ b2
 
 
-	libinternal Dummy (fpMsgRender)
+	libinternal Dummy (fpMsgExport)
 		// Dummy function used by .ExportAddr. Stops crashes if someone calls export but hasn't set his own function yet.
 
 	
@@ -1050,11 +1050,12 @@ Message is also:
 		cpp_part EqualsSyx
 		return self and (.Func == X)
 
-//	sadly... this would mess up anything that tests msg == 1. bytes aren't really numbers...
 //	syntax equals (|byte| B, |bool|Aware, |bool|)
+	//	sadly... this would mess up anything that tests msg == 1. bytes aren't really numbers...
 
 	function Export (|FastString| fs)
-		|| fn = (.Func.ExportAddr)
+		opt norefcounts
+		|| fn = (.func.obj!.exportaddr)
 		(fn)( self, fs )
 
 	function MiniName (|string|prefix="", |string|)
@@ -1246,6 +1247,7 @@ Message is also:
 
 
 function FastString.SyntaxAppend (|Message| msg)
+	Opt NoRefCounts
 	if (msg)
-		(msg.Func.RenderAddr)( msg, self )
+		(msg.Func.obj!.RenderAddr)( msg, self )
 

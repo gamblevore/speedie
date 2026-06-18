@@ -40,6 +40,13 @@ function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 			dest <~ c
 
 
+function MakeLibOnly (|message| node)
+	if self != Interact.AnonFn
+		check (.IsLibrary) (node, "libinternal is only used by library functions")
+	.NoAutoComplete = 2
+	.SetLibOrEmbed(node, scnodeinfo.LibOnly)		// limited to internal within a project
+
+
 function FuncSrc (|Message|)
 	opt norefcounts
 	return .Owningfunc$.Source

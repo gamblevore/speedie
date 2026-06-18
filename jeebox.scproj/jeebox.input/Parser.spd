@@ -1349,7 +1349,7 @@ module Parser
 
 //	|uint|					CountStats		// better to put in the memory manager itself!
 	|MessagePosition|		Using
-	|fnIDGenerator|			Splitter = &parser.range
+	|fnIDGenerator|			Splitter = &parser.range // mostly unused really right now.
 	visible false
 	|message|				_EndOfLineMarker
 	|dictionary of string|	_ErrorNames = nil

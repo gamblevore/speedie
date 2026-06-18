@@ -59,7 +59,7 @@ linkage
 |SCClass?|					ProcessAs
 |SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
-//|(&ClassData)?|				InbuiltClass
+//|(&ClassData)?|			InbuiltClass
 |ClassInfo|					Flags
 |DataTypeCode|				TypeInfo
 |DataTypeCode|				ASMTypeInfo

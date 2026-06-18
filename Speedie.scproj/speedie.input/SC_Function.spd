@@ -88,6 +88,7 @@ linkage
 |byte|					Badness
 |byte|					IntPrmCount
 |byte|					StructReturnPos
+|byte|					ASMAndCpp
 |uint16|				µASMLength
 |uint|					µStart
 |uint|					µFATLength
@@ -187,13 +188,6 @@ function Message.TestFuncName (|bool|)
 	expect (fn != @Func and @prm and @list)	(self, "Need space between bracket and name.")
 	expect (fn == @Thg)						(self, "Doesn't follow 'function name (|Type| Name)'")
 	return true
-
-
-function MakeLibOnly (|message| node)
-	if self != Interact.AnonFn
-		check (.IsLibrary) (node, "Can't use libinternal functions if you are not making a lib.")
-	.NoAutoComplete = 2
-	.SetLibOrEmbed(node, scnodeinfo.LibOnly)		// limited to internal within a project
 
 	
 function ParseName (|Message| node, |bool|)
@@ -320,13 +314,6 @@ function @scfunction.TransformAll
 		require !stderr.TooMany
 		f.Transform
 
-
-//function NeedsReturn (|message| arg)
-//	opt norefcounts
-//	|| last = arg.last
-//	if last.Blocks isnt return
-//		|| ret = arg.AddReturn // should happen always now?
-// does not work
 
 function Transform ()
 	opt norefcounts
@@ -743,13 +730,6 @@ function DeclsPrototypeClass (|Message!| ch0)
 	
 	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
 	|| dcl = .DeclsProtoTypeAdd(fpType)
-
-	// OK... so... BasicRowDrag isnt getting in here. its a lib func.
-	// but its not private? how can it be private?
-	// OK... so it is marked as a helper. Well... thats not very useful.
-	// that would mean it CAN'T be accessed externally. but it can?
-	// OK... so its not right now. either way...
-	// so... basically... it ok that its at 0? should we give a dummy address?
 	
 	(dcl is Global) // in case we don't do the below branch
 	if (!.islibrary) or (self|scnode| isnt libonly)
@@ -825,6 +805,7 @@ function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
 
 
 function DeclsProtoTypeAdd (|SCClass| fpType,  |scdecl|)
+	opt norefcounts
 	|| Dcl = SCDecl(fpType)
 	dcl.source = .source
 	dcl.IsLookupOnly = self
@@ -834,6 +815,11 @@ function DeclsProtoTypeAdd (|SCClass| fpType,  |scdecl|)
 	dcl.Name = .Name
 	if .Cls
 		.parent!.TryAdd( .Source, Dcl, .Name )
+	|| orig = fpType.FuncProto
+		|| Cpp = .HasCVersion
+		if orig|scnode| is LibOnly
+			check (cpp) (self, fptype.name + " is libinternal.")
+		orig.ASMAndCpp |= 1 << Cpp
 	return dcl
 
 
@@ -1007,6 +993,7 @@ function FillInMissingConstructorDefaults (|Message!| After)
 	|| oof = .ConstructorLinePlace$
 	|| p = cls.Properties
 //	.SetZeroProperties(After, P) // not working yet
+	Compiler.DuringConstructorFillIn = true
 	
 	for (d.backwards in P)
 		if d isnt ASMReached
@@ -1020,6 +1007,8 @@ function FillInMissingConstructorDefaults (|Message!| After)
 			(d isnt ASMReached)
 			(d isnt PropertyWasConstructed)
 		cls = cls.super
+
+	Compiler.DuringConstructorFillIn = false
 	
 
 
@@ -1283,10 +1272,11 @@ function FixCnjSub (|Message| exp)
 
 
 
-function SCDecl.MarkAsAltered (|message| Exp)  // markaltered
+function SCDecl.MarkAsAltered (|message| Exp)	// markaltered
 	opt norefcounts
 	if exp isnt inserted
 		(self is setto)
+
 	require self is local
 	(self is altered)
 	// //                 ////////////////////                 //////////////////
@@ -1998,6 +1988,7 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 	
 	if (node == "macro")
 		.MakeMacro(arg)
+	
 			
 
 

@@ -1059,6 +1059,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ ";\n"
 
 
+	function syntax.ExportAddr (assigns:|fpMsgExport|)
+		opt norefcounts
+		.obj!.exportaddr = Value
+
+
 	function Init
 		.Cpp_Includes = []
 		@Acc.ExportAddr  = C_RenderAcc
@@ -1094,7 +1099,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		@Sheb.ExportAddr = C_RenderShe
 	
 	
-	function C_RenderAcc (fpMsgRenderCpp) // name, params
+	function C_RenderAcc (fpMsgExportCpp) // name, params
 		opt norefcounts
 		.first!.Export(fs)
 		fs <~ '['
@@ -1102,13 +1107,13 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ ']'
 	
 	
-	function C_RenderItem (fpMsgRenderCpp)
+	function C_RenderItem (fpMsgExportCpp)
 		opt norefcounts
 		// func(a:b, c:d)
 		.second!.Export( fs )
 
 	
-	function C_RenderList (fpMsgRenderCpp)
+	function C_RenderList (fpMsgExportCpp)
 		opt norefcounts
 		|| d = .obj
 		if (d isa scdecl)
@@ -1126,7 +1131,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ '}'
 
 	
-	function C_RenderArg (fpMsgRenderCpp)
+	function C_RenderArg (fpMsgExportCpp)
 		opt norefcounts
 		fs <~ '{'
 		fs.indent++
@@ -1156,7 +1161,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			error (self, "Missing property name")
 
 
-	function C_RenderDot (fpMsgRenderCpp)
+	function C_RenderDot (fpMsgExportCpp)
 		opt norefcounts
 		|| type = .DotMustBeProperty						#require
 		|| ch = .first!
@@ -1187,7 +1192,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			loop self == @bra
 
 				
-	function C_RenderFnc (fpMsgRenderCpp)
+	function C_RenderFnc (fpMsgExportCpp)
 		opt norefcounts
 		|| F = .first!
 		|| ch1 = f.next!
@@ -1215,7 +1220,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		// x[1]()
 
 
-	function C_RenderDcl (fpMsgRenderCpp)
+	function C_RenderDcl (fpMsgExportCpp)
 		opt norefcounts
 		|| name = .GetDclName!
 		|| d = name.AsDecl				#expect
@@ -1223,7 +1228,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		WriteDecl( d, fs, DeclsDefault(.last) )
 			
 	
-	function C_RenderTmp (fpMsgRenderCpp)
+	function C_RenderTmp (fpMsgExportCpp)
 		opt norefcounts			
 		|| name = .name
 		|| needbra = false
@@ -1276,7 +1281,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			needbra = false
 		
 
-	function C_RenderOpp (fpMsgRenderCpp)
+	function C_RenderOpp (fpMsgExportCpp)
 		opt norefcounts
 		|| s = .name
 		if s == "(|)"
@@ -1297,7 +1302,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		opt norefcounts
 		return .PointerCount and .Internal!.IsCarray
 		
-	function C_RenderBrel (fpMsgRenderCpp)
+	function C_RenderBrel (fpMsgExportCpp)
 		opt norefcounts
 		if .name == "&" // address
 			|| type = .obj|scdecl|
@@ -1327,7 +1332,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			
 
 
-	function C_RenderUnt (fpMsgRenderCpp)
+	function C_RenderUnt (fpMsgExportCpp)
 		expect (self == "x")
 		|| num = .first!
 		|| s = num.name.ReplaceAll( "_", "" )
@@ -1338,17 +1343,17 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ s
 
 
-	function C_RenderBak (fpMsgRenderCpp)
+	function C_RenderBak (fpMsgExportCpp)
 		opt norefcounts
 		fs <~ .name // assume pre-rendered in C!
 
 
 
-	function C_RenderNothing (fpMsgRenderCpp)
+	function C_RenderNothing (fpMsgExportCpp)
 		opt norefcounts
 
 
-	function C_RenderThg (fpMsgRenderCpp)
+	function C_RenderThg (fpMsgExportCpp)
 		opt norefcounts
 		|| o = .obj
 		if o isa SCDecl
@@ -1360,7 +1365,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		.safe(fs)
 
 
-	function C_RenderRel (fpMsgRenderCpp)
+	function C_RenderRel (fpMsgExportCpp)
 		opt norefcounts
 		|| F = .first!
 		RenderInBracketsIfRel( F, fs )
@@ -1371,7 +1376,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		RenderInBracketsIfRel( f.next!, fs )
 
 
-	function RenderInBracketsIfRel (fpMsgRenderCpp)
+	function RenderInBracketsIfRel (fpMsgExportCpp)
 		opt norefcounts
 		if self == @Rel
 			fs <~ '('
@@ -1437,7 +1442,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		return Result
 
 
-	function C_RenderTyp (fpMsgRenderCpp)
+	function C_RenderTyp (fpMsgExportCpp)
 		|| Saveness = DontNeedMoreBrackets(self)
 		|| fc		= .first!
 		if (Saveness == kNeedsNoBrackets)
@@ -1528,7 +1533,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ .CStructName
 
 
-	function C_RenderNum (fpMsgRenderCpp)
+	function C_RenderNum (fpMsgExportCpp)
 		opt norefcounts
 		|| d = .FastDecl
 		|| Num = d.ExportPosition|int64|
@@ -1542,7 +1547,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ .name
 
 
-	function C_RenderBra (fpMsgRenderCpp)
+	function C_RenderBra (fpMsgExportCpp)
 		opt norefcounts
 		|| f = .first!
 		ifn self in @arg and f == @thg
@@ -1551,7 +1556,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ ')'
 
 
-	function C_RenderArel (fpMsgRenderCpp)
+	function C_RenderArel (fpMsgExportCpp)
 		opt norefcounts
 		// ("arl" @x "++" )								x++
 		.first!.Export( fs )
@@ -1560,7 +1565,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ .name
 
 
-	function C_RenderChr (fpMsgRenderCpp)
+	function C_RenderChr (fpMsgExportCpp)
 		// ("chr" "x")									'x'
 		fs <~ '\''
 		
@@ -1596,7 +1601,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ ')'
 	
 
-	function C_RenderSStr (fpMsgRenderCpp)
+	function C_RenderSStr (fpMsgExportCpp)
 		// so... convert it to an obj
 		opt norefcounts
 		|| n = .name
@@ -1622,7 +1627,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		return "InternalError: " + self
 
 
-	function C_RenderStr (fpMsgRenderCpp)
+	function C_RenderStr (fpMsgExportCpp)
 		fs.AppendCpp(.name)
 
 	
@@ -1657,7 +1662,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		self <~ '"'
 
 
-	function WriteDeclBrackets (fpMsgRenderCpp)
+	function WriteDeclBrackets (fpMsgExportCpp)
 		fs <~ '('
 		
 		|| d = .AsDecl // it should be?
@@ -1668,7 +1673,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ ')'
 
 
-	function C_RenderShe (fpMsgRenderCpp)
+	function C_RenderShe (fpMsgExportCpp)
 		fs <~ "//"
 		fs <~ .name
 
@@ -1721,7 +1726,7 @@ function string.Safe (|faststring| fs, |bool| Local=false)
 			fs.appendhex(s)
 
 
-prototype fpMsgRenderCpp (|Message| self, |FastStringCpp| fs)
+prototype fpMsgExportCpp (|Message| self, |FastStringCpp| fs)
 class FastStringCpp (FastString)
 	|string|		Cpp_Name
 
