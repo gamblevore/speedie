@@ -241,12 +241,13 @@ class TextViewLine (list)
 			if par and par.contains(ToFind, true)
 				|| pt = par.func
 				if (pt == @type)  
-					if	(par.After > ToFind)
+					if (par.After > ToFind)
 						return par
 				
 				  elseif (pt == @decl or @func) and !curr.prev
 					if (pt == @decl)
-						return par
+						if par.After > ToFind
+							return par
 					  elseif (curr == @thg)	// (par)<curr(xyz)>
 						if par.After == ToFind
 							return par
