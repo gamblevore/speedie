@@ -111,21 +111,27 @@ class SCBehaviour (SCNode)
 		fn.DeclsProtoCleanup(interface, f, true, false)
 
 		require stderr.ok
-		|| prms = fn.source!.findnested(@sthg, "...")				#expect
-		// so... now we have prms? fill them in?
+		while
+			|| prms = fn.source!.findnested(@sthg, "...")			#require
+		
+			|| WriteTo = prms.parent!
+			WriteTo.func = @prm
+			prms.Remove
 	
-		|| WriteTo = prms.parent!
-		WriteTo.func = @prm
-		prms.Remove
+			|| Using = fn.source!.syntaxusing
+			|| CopyFrom = fn.source.Second
+			WriteTo <~ (@thg, "self")
+	
+			for C in CopyFrom
+				if C == @decl
+					|| it = c.declname
+						WriteTo <~ (@thg, it.name)
 
-		|| Using = fn.source!.syntaxusing
-		|| CopyFrom = fn.source.Second
-		WriteTo <~ (@thg, "self")
 
-		for C in CopyFrom
-			if C == @decl
-				|| it = c.declname
-					WriteTo <~ (@thg, it.name)
+		// || V = globalvm // this is the one!
+		// yikes
+//		((FreeObject**)((V->ProposedStack)+2))[0] = Obj;
+//		JB_ASM_CallBack(V, (u32*)fn)
 
 		
 	function SCClass.IsBehaviourTable (|bool|)
@@ -261,14 +267,29 @@ class SCBehaviour (SCNode)
 			|| InterName = mod.name
 			|| Type = cls.behaviourname
 			|| FuncName = Intername.InterfaceToBehaviour
-			|| FNStr = "
+			|| fs = faststring()
+
+			fs <~ "
 function $InterName (,$InterName)
 	opt inline
 	|| Table = .ClassBehaviours|&$Type|
-	return (Table.$FuncName)(...)
+	|| fn = Table.$FuncName"
+
+			if !Options.MakeExec		// cpp
+				fs <~ "
+	return (fn)(...)
 "
+					
+			  else						// cake
+				fs <~ "
+	if (fn|int64| >> 63) // spd
+		return (FN)(...)
+	  else
+		return (fn)(...)
+		"
+
 			using Errplace
-			|| FNSrc = FNStr.ParseClean
+			|| FNSrc = fs.getresult.ParseClean
 				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
 				if rz
 					(rz is Behaviour)

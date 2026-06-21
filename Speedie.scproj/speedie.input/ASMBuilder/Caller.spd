@@ -226,10 +226,10 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 	|| HighBit = .TempOnly(datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(asmreg(tableid), 63)
 	branch.OperatorMul(highbit)
-	.Whatever(exp, dest, fn, tableid, regs, true)
+	.Whatever(exp, dest, fn, tableid, regs, false)
 	|| J = exp.jump
 	
-	|| fn2 = .Whatever(exp, dest, fn, tableid, regs, false)
+	|| fn2 = .Whatever(exp, dest, fn, tableid, regs, true)
 	j.Jumpto(.curr)
 	branch.JumpTo(fn2)
 	

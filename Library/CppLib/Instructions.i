@@ -147,7 +147,7 @@
 	Code += Loop_Jmpi
 ;
 ı JTST:;
-	if (!(u1 & (1 << JBitTest_Shu)))
+	if (!(u1 & (1ull << JBitTest_Shu)))
 	Code += JBitTest_Jmpi
 ;
 ı EQUL:;

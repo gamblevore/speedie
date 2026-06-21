@@ -585,7 +585,7 @@ POS 5
 			Code += Loop_Jmpi
 
 /**/ JTST  (JBitTest)				
-		if (!(u1&(1<<JBitTest_Shu)))
+		if (!(u1&(1ull<<JBitTest_Shu)))
 			Code += JBitTest_Jmpi
 
 

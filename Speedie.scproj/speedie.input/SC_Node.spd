@@ -501,7 +501,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 				o = o.hiderfunc|scdecl|
 			  else
 				if o.Type.FuncProto
-					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap this in a bracket, before calling it as a function." )
+					expect ((ParamsArray.IsDot or !ParamsHere) and (!ParamsArray))  ( exp, "Wrap callbacks in a bracket, before calling as function." )
 					Return o
 
 				if (!side and paramsarray.isdot and o.type.processas)

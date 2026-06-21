@@ -19,28 +19,28 @@ function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |M
 
 function parser.New (|Message| Parent, |Syntax| F, |int| Start, |Message|)
 	Opt NoRefCounts
-	cpp_part NewEmpty1
-	|| NoName = parser[start, start, F] // use messageID still!
+	cpp_part NewAt
+	|| NoName = parser[start, start, F]
 	return Message.new(parent, F, Start, NoName, .nextstart - start)
 
 
 function parser.New (|Message| Parent, |Syntax| F, |int| Start, |int| End, |Message|)
 	Opt NoRefCounts
 	cpp_part NewParent
-	|| name = parser[start, end, F] // uses messageID
+	|| name = parser[start, end, F]
 	return Message.new(Parent, F, Start, name, end - start)
 
 
 function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom, |Message|)
 	Opt NoRefCounts
 	|| after = parser.WordAfter( SearchFrom )
-	|| name = parser[searchfrom, after, f] // uses messageID
+	|| name = parser[searchfrom, after, f]
 	return message.New( P, F, start, name, after - start )
 
 
 function parser.NewSkip ( |Message| P, |Syntax| F, |int| Start, |int| NameStart, |int| NameEnd, |Message|)
 	Opt NoRefCounts
-	|| name = parser[namestart, nameend, f] // uses messageID
+	|| name = parser[namestart, nameend, f]
 	return message.New( P, F, start, name, parser.nextstart - start )
 
 
