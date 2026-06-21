@@ -247,7 +247,7 @@ function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
 		return // no problem
 	require self isnt ClassObj
 	|| fn = .Func
-		require fn isnt Behaviour
+		require fn isnt Behaviour and VirtualCaller
 
 	.MarkUnused(feedback, dbg)
 

@@ -999,6 +999,7 @@ class SCDecl (SCObject) {
 
 
 	function WriteTypeCast (|Message| msg, |Message|)
+		opt norefcounts
 		|| TheType = @type + ":)"
 		TheType <~ msg
 		TheType <~ .WriteType

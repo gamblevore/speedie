@@ -484,7 +484,7 @@ class list
 		return .prev ?? p.last!
 	
 	
-	function Upward (|int| n, |...?|)
+	function Parent (|int| n, |...?|)
 		opt norefcounts
 		while self and --n >= 0
 			self = .parent

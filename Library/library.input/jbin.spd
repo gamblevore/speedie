@@ -153,7 +153,7 @@ libinternal InputStream.NextMsgInfo (|uint64|)
 	while 
 		info = .NonZeroByte
 		loop info > 239
-		msg = Msg.upward(info - 239)
+		msg = Msg.parent(info - 239)
 		._Object = msg, require msg
 
 	|| T = (info >> 1)|syntax|

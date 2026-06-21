@@ -33,6 +33,7 @@ role Macro (Message)
 		|[message]| TmpPrms_
 
 		function New (|message| s, |bool| UseSelf, |Macro!|)
+			opt norefcounts
 			rz = Message()
 			rz.Indent = UseSelf|byte|
 			rz <~ s

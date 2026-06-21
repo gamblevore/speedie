@@ -737,10 +737,10 @@ function NewConst (|scdecl| d)
 
 function DoRefAnalysis
 	opt norefcounts
-	(compiler is RefCounts)
+	(compiler is RefCounting)
 	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
-		if f.IsARealSpdFunc
+		if f.IsARealSpdFunc and (f isnt VirtualCaller)
 			list.clear
 			f.AnalyseRefs(list)
 	scfunction.currfunc = nil
@@ -1012,7 +1012,7 @@ datatype CompilerStage (int)
 		Importing
 		Transforming
 		NilChecking
-		RefCounts
+		RefCounting
 		Hungry
 		TextAssembling
 		Packing

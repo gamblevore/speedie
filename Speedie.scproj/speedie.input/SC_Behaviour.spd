@@ -103,7 +103,22 @@ class SCBehaviour (SCNode)
 			fn.DeclsPrototypeInterface(f, interface, late)
 
 
+	function message.StartCakeVirtual (|message| Prms, |message| WriteTo)
+		opt norefcounts
+
+		debugger 
+		|| Tmp = macro.TmpPrms_
+		tmp.Length = 0
+		|| ret = .last
+		if (ret == @decl) and !ret.declname
+			tmp <~ ret.first
+			prms.BecomeMacro(CakeVirtualReturn, prms, tmp)
+		writeto.first = "|| Reg = v.callback(fn|&u32|)" ~ Parse
+		writeto.first = "|| v = cakevm.vm" ~ parse
+
+	
 	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
+		opt norefcounts
 		|| Interface = .InterfaceForBehaviour(fn)					#require
 		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
 		
@@ -111,27 +126,32 @@ class SCBehaviour (SCNode)
 		fn.DeclsProtoCleanup(interface, f, true, false)
 
 		require stderr.ok
+	
+		|| CakeAlso = options.makeexec and .IsLibrary
+
 		while
 			|| prms = fn.source!.findnested(@sthg, "...")			#require
 		
 			|| WriteTo = prms.parent!
-			WriteTo.func = @prm
-			prms.Remove
-	
-			|| Using = fn.source!.syntaxusing
+			|| Using = fn.source!.SyntaxUsing
 			|| CopyFrom = fn.source.Second
-			WriteTo <~ (@thg, "self")
+
+			if CakeAlso
+				CopyFrom.StartCakeVirtual(prms, writeto)
+			  else
+				WriteTo.func = @prm
+				prms.Remove
+			
+			WriteTo.VirtualAdd("self", cakealso, nil, 0)
 	
+			|| i = 0
 			for C in CopyFrom
 				if C == @decl
 					|| it = c.declname
-						WriteTo <~ (@thg, it.name)
+						i++
+						WriteTo.VirtualAdd(it.name, cakealso, C.first, i)
+			CakeAlso = false
 
-
-		// || V = globalvm // this is the one!
-		// yikes
-//		((FreeObject**)((V->ProposedStack)+2))[0] = Obj;
-//		JB_ASM_CallBack(V, (u32*)fn)
 
 		
 	function SCClass.IsBehaviourTable (|bool|)
@@ -283,7 +303,7 @@ function $InterName (,$InterName)
 			  else						// cake
 				fs <~ "
 	if (fn|int64| >> 63) // spd
-		return (FN)(...)
+		...
 	  else
 		return (fn)(...)
 		"
@@ -292,7 +312,8 @@ function $InterName (,$InterName)
 			|| FNSrc = fs.getresult.ParseClean
 				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
 				if rz
-					(rz is Behaviour)
+					(rz is VirtualCaller)
+//					(rz is Behaviour) // this cant be right!
 					(rz is ExpectsRealVars)
 					cls.behaviour!.WrapperFuncs <~ rz
 		
@@ -367,3 +388,30 @@ function SCClass.RenameInterfaces
 	for (f in b.interfaces)
 		|| it = f.cls
 			it.name = it.CppClass + it.name
+
+
+
+function Message.VirtualAdd (|string| name, |bool| Cake, |message| Ty, |int| i)
+	opt norefcounts
+	if !cake
+		self <~ (@thg, name)
+		return
+	
+	|| prms = macro.TmpPrms_
+	prms.Length = 0
+	prms <~ i.msg
+	if !ty
+		ty = @thg+"Object"
+	prms <~ ty
+	prms <~ @thg+name
+	|| msg = CakeVirtualMacro.run(prms)
+	.last.prev!.prev = msg
+//	((FreeObject**)((V->ProposedStack)+2))[0] = Obj
+
+
+
+|macro| CakeVirtualMacro = `(v.proposedstack + _0)|&_1|[] = _2`.macro
+|macro| CakeVirtualReturn = `return reg|&_0|[]`.macro
+
+
+

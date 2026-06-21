@@ -55,10 +55,16 @@ target cpp or vm {
 
 	function Index		(|&uint| Code, |ind|)
 		cpp_wrapper JB_ASM_Index
+		
+	function CallBack	(|&uint| Code, |&ivec4|)
+		cpp_wrapper JB_ASM_CallBack
 
 	module
 		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
+		
+		function VM (|&cakevm|)
+			cpp_Wrapper JB_ASM_GlobalVM
 }
 
 

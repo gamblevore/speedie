@@ -142,6 +142,7 @@ void**		JB_Cake_Virtuals	(JB_Class* C);
 ivec4*		__CAKE_VM__			(CakeVM& vm, u32* Code, CakeRegister* r);
 
 extern CakeVM*	JB_GlobalVM;
+inline CakeVM* JB_ASM_GlobalVM	() {return JB_GlobalVM;}
 
 
 inline CakeStack* JB_ASM_BaseStack (CakeVM* V) {
