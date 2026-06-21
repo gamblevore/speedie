@@ -7,7 +7,7 @@
 function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name, |Message|)
 	Opt NoRefCounts
 	cpp_part NewParentName
-	// Should offer messageID Creation somehow. We'd need a second callback...
+	// Callers create the messageIDs themself.
 	return Message.new(parent, func, Start, name, .nextstart - start)
 
 
@@ -215,7 +215,7 @@ extend Parser
 			  else
 				err <~ '\''
 				|ind| N = parser.NextStart min (start + 100)
-				err <~ parser[ start, N, @nil ].escape
+				err <~ parser.range( start, N ).escape
 				err <~ '\''
 
 		Parser.ErrorAdd( err, start )
@@ -286,9 +286,16 @@ struct MessagePosition
 prototype ParseHandler			(|int| Start, |message| Parent=nil, |Message?|)
 	libinternal
 
-prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
+prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |string| Data, |String|)
 	description "Could be used to turn messages into MessageIDs during parse, for faster later processing."
 
+
+	function id (|string| Str, |syntax| F, |string|)
+		libinternal
+		if self
+			return (self)(0, str.length, F, Str)
+		return str
+	
 
 struct ParserLineAndIndent
 	linkage

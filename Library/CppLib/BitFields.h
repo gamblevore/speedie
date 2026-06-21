@@ -15,7 +15,7 @@
 #define n2      ((Op<<13)>>27)
 #define n3      ((Op<<18)>>27)
 #define n4      ((Op<<23)>>27)
-#define n5      ((Op<<28)>>27) // loses 1 bit!
+#define n5      ((Op<<28)>>27) // loses 1 bit! half the range.
 #define i1      (r[((Op<< 8)>>27)].Int)
 #define i2      (r[n2].Int)
 #define i3      (r[n3].Int)

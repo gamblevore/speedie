@@ -319,8 +319,7 @@ extend Parser
 		opt norefcounts
 		|| c = .nextbyte
 		if c == '\''
-			|| tmp = fCharSub(start, start+1, c)
-				tmp.func = @tmp
+			|| tmp = fCharSub(start, start+1, c, @tmp)
 				tmp = ftmpsub(tmp, kOpp & ~kOppBra, kthing )
 				if tmp != @thg
 					return tmp
@@ -414,19 +413,20 @@ extend Parser
 	function CharName (|int| start, |byte| find, |string?|)
 		|| After = parser.data.jbfind( find, start+1, int.max )
 			parser.NextStart = After + 1
-			return parser[ start + 1, After, @char ].unescape
+			return parser.range( start + 1, After ).unescape
 		return nil
 	
-	function fCharSub (|int| pos, |int| start, |byte| find, |message|)
+	
+	function fCharSub (|int| pos, |int| start, |byte| find, |syntax| F, |message|)
 		opt norefcounts
 		|| name = .CharName(start, find)
 		if name != nil
-			rz = parser.new( nil, @char, pos, name )
+			rz = parser.new( nil, F, pos, .splitter.id(name, F) )
 
 
 	function fChar (ParseHandler)
 		opt norefcounts
-		rz = fcharsub(start, start, '\'')
+		rz = fCharSub(start, start, '\'', @char)
 		if !rz
 			Return parser.ErrorAdd( "Char didn't close!" )
 
@@ -480,18 +480,6 @@ extend Parser
 	
 	function fAfterRel (ParseHandler)
 		return parser.New( nil, @ARel, Start, parser.NextStart )		// sigh...
-	
-	
-//	function fDotAccess (ParseHandler)
-//		opt norefcounts
-//		|| n = .nextstart
-//		|| name = parser.NewWord(nil, @str, n, n)
-//		|| after = parser.nextstart
-//		name.name = name.name.replaceall("–", " ")
-//		rz = parser.NewEmpty(nil, @acc, start, after)
-//		problem rz // i actually don't like this...
-//		|| prms = parser.NewEmpty(rz, @arr, start, start)
-//		prms <~ name
 
 
 	function fEndOfLine (ParseHandler)
@@ -692,7 +680,7 @@ extend Parser
 			if f == @arg or @list or @bra or @arr
 				|| name = .CharName(start+1, '"')
 				if name != nil
-					parent.name = name 
+					parent.name = .splitter.id(name, f)
 					return parent
 	
 	
@@ -1062,7 +1050,7 @@ ive been~running #since morning
 		|| addr			= D.addr
 		|| State		= 0				// 2 = line, 1 = space, 0 = neither, 3 = both
 		|| Commas		= 0
-		lin.FirstLine = -1
+		lin.FirstLine	= -1
 
 		while (n < end)
 			|| c = addr[n++]
@@ -1312,7 +1300,7 @@ ive been~running #since morning
 		Opt NoRefCounts
 		return .WordAfterSub(start, CharSet.NameMid)
 	
-		
+	
 	libinternal WordAfterSub (|int| Start, |CharSet| cs, |int|)
 		Opt NoRefCounts
 		|| n = .data.length
@@ -1328,11 +1316,17 @@ ive been~running #since morning
 	Syntax Access (|int| p, |byte|)
 		cpp_Wrapper JB_Tk__Byte
 
+
 	Syntax Access (|int| s, |int| e, |syntax| f, |string|)
 		opt inline
-		return (parser.Splitter)(s,e,f)
+		opt norefcounts
+		|| p = parser.Splitter // When compiling Cake, this should become VM only?
+		if !p
+			return parser.range(s,e)
+		return (p)(s,e,f, .data)
 
-	function Range (fnIDGenerator)
+
+	function Range (|int| Start, |int| End, |string|)
 		cpp_Wrapper JB_Tk__Range
 
 
@@ -1349,7 +1343,7 @@ module Parser
 
 //	|uint|					CountStats		// better to put in the memory manager itself!
 	|MessagePosition|		Using
-	|fnIDGenerator|			Splitter = &parser.range // mostly unused really right now.
+	|fnIDGenerator?|		Splitter		// = &parser.range // mostly unused really right now.
 	visible false
 	|message|				_EndOfLineMarker
 	|dictionary of string|	_ErrorNames = nil

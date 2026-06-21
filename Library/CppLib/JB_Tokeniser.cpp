@@ -36,10 +36,9 @@ byte JB_Tk__Byte (int S) {
 	return JB_Str_ByteValue(PzData, S);
 }
 
-JB_String* JB_Tk__Range (int S, int E, byte F) {
+JB_String* JB_Tk__Range (int S, int E) {
 	return JB_Str_Range(PzData, S, E);
 }
-
 
 
 /// stuff
