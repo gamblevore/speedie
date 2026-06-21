@@ -81,6 +81,34 @@
 			remoteGlobalIDString = AC85018B299FF9AE00B63E29;
 			remoteInfo = asdweasd;
 		};
+		ACB814562FE7F23800D08D5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACB814302FE7F23700D08D5A /* Test.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AC4C0CC22276F33100D28B0D;
+			remoteInfo = Test;
+		};
+		ACB814582FE7F23800D08D5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACB814302FE7F23700D08D5A /* Test.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AC34D52B2278A38500C1320F;
+			remoteInfo = UsersExample;
+		};
+		ACB8145A2FE7F23800D08D5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACB814302FE7F23700D08D5A /* Test.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AC760FF7227A0DBA00707427;
+			remoteInfo = jb;
+		};
+		ACB8145C2FE7F23800D08D5A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACB814302FE7F23700D08D5A /* Test.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AC7CD4FB227F07E000C3F69A;
+			remoteInfo = TestDirect;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -199,6 +227,51 @@
 		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACA86A032EEDC951005EFC36 /* JB_Dylib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dylib.cpp; path = ../Library/CppLib/JB_Dylib.cpp; sourceTree = "<group>"; };
 		ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../../lib/libSDL2.dylib; sourceTree = "<group>"; };
+		ACB8141C2FE7F23700D08D5A /* jeebox.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = jeebox.dylib; sourceTree = "<group>"; };
+		ACB8141D2FE7F23700D08D5A /* jeebox.dbg.zpd */ = {isa = PBXFileReference; lastKnownFileType = file; path = jeebox.dbg.zpd; sourceTree = "<group>"; };
+		ACB8141F2FE7F23700D08D5A /* JB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JB.h; sourceTree = "<group>"; };
+		ACB814202FE7F23700D08D5A /* JB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JB.cpp; sourceTree = "<group>"; };
+		ACB814212FE7F23700D08D5A /* JB_Globals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JB_Globals.cpp; sourceTree = "<group>"; };
+		ACB814232FE7F23700D08D5A /* jb */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jb; sourceTree = "<group>"; };
+		ACB814242FE7F23700D08D5A /* jb.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = jb.dSYM; sourceTree = "<group>"; };
+		ACB814252FE7F23700D08D5A /* test */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = test; sourceTree = "<group>"; };
+		ACB814262FE7F23700D08D5A /* test.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = test.dSYM; sourceTree = "<group>"; };
+		ACB814272FE7F23700D08D5A /* users */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = users; sourceTree = "<group>"; };
+		ACB814282FE7F23700D08D5A /* users.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = users.dSYM; sourceTree = "<group>"; };
+		ACB814292FE7F23700D08D5A /* xml */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = xml; sourceTree = "<group>"; };
+		ACB8142A2FE7F23700D08D5A /* xml.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = xml.dSYM; sourceTree = "<group>"; };
+		ACB8142C2FE7F23700D08D5A /* jb.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jb.cpp; sourceTree = "<group>"; };
+		ACB8142D2FE7F23700D08D5A /* jeebox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jeebox.h; sourceTree = "<group>"; };
+		ACB8142E2FE7F23700D08D5A /* jeebox_api.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jeebox_api.h; sourceTree = "<group>"; };
+		ACB8142F2FE7F23700D08D5A /* test.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
+		ACB814302FE7F23700D08D5A /* Test.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Test.xcodeproj; sourceTree = "<group>"; };
+		ACB814312FE7F23700D08D5A /* users.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = users.cpp; sourceTree = "<group>"; };
+		ACB814322FE7F23700D08D5A /* Users.box */ = {isa = PBXFileReference; lastKnownFileType = text; path = Users.box; sourceTree = "<group>"; };
+		ACB814332FE7F23700D08D5A /* xml.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
+		ACB814352FE7F23700D08D5A /* MzCompression.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = MzCompression.spd; sourceTree = "<group>"; };
+		ACB814362FE7F23700D08D5A /* MzResearch.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = MzResearch.spd; sourceTree = "<group>"; };
+		ACB814372FE7F23700D08D5A /* MzUtils.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = MzUtils.spd; sourceTree = "<group>"; };
+		ACB814392FE7F23700D08D5A /* .perry */ = {isa = PBXFileReference; lastKnownFileType = text; path = .perry; sourceTree = "<group>"; };
+		ACB8143A2FE7F23700D08D5A /* Binary.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Binary.spd; sourceTree = "<group>"; };
+		ACB8143B2FE7F23700D08D5A /* Config.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Config.spd; sourceTree = "<group>"; };
+		ACB8143C2FE7F23700D08D5A /* Constants.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Constants.spd; sourceTree = "<group>"; };
+		ACB8143D2FE7F23700D08D5A /* CppApi.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = CppApi.spd; sourceTree = "<group>"; };
+		ACB8143E2FE7F23700D08D5A /* ErrorsMessage.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = ErrorsMessage.spd; sourceTree = "<group>"; };
+		ACB8143F2FE7F23700D08D5A /* FreeWords (disabled).spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = "FreeWords (disabled).spd"; sourceTree = "<group>"; };
+		ACB814402FE7F23700D08D5A /* ID.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = ID.spd; sourceTree = "<group>"; };
+		ACB814412FE7F23700D08D5A /* jeebox.conf */ = {isa = PBXFileReference; lastKnownFileType = text; path = jeebox.conf; sourceTree = "<group>"; };
+		ACB814422FE7F23700D08D5A /* licence.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = licence.txt; sourceTree = "<group>"; };
+		ACB814432FE7F23700D08D5A /* Message.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Message.spd; sourceTree = "<group>"; };
+		ACB814442FE7F23700D08D5A /* MessageVName.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = MessageVName.spd; sourceTree = "<group>"; };
+		ACB814452FE7F23700D08D5A /* Parser.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Parser.spd; sourceTree = "<group>"; };
+		ACB814462FE7F23700D08D5A /* ParserUtils.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = ParserUtils.spd; sourceTree = "<group>"; };
+		ACB814472FE7F23700D08D5A /* Syntax.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Syntax.spd; sourceTree = "<group>"; };
+		ACB814482FE7F23700D08D5A /* Tests.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Tests.spd; sourceTree = "<group>"; };
+		ACB814492FE7F23700D08D5A /* Validator.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = Validator.spd; sourceTree = "<group>"; };
+		ACB8144A2FE7F23700D08D5A /* XML.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = XML.spd; sourceTree = "<group>"; };
+		ACB8144C2FE7F23700D08D5A /* .perry */ = {isa = PBXFileReference; lastKnownFileType = text; path = .perry; sourceTree = "<group>"; };
+		ACB8144D2FE7F23700D08D5A /* .strings.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = .strings.txt; sourceTree = "<group>"; };
+		ACB8144E2FE7F23700D08D5A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ACC8F9F22C960FD000A549D7 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
@@ -223,6 +296,7 @@
 		AC6ADADE29872AA8009CFFBB = {
 			isa = PBXGroup;
 			children = (
+				ACB8144F2FE7F23700D08D5A /* jeebox.scproj */,
 				AC7D3E4C29A284EA00148ADB /* library.input */,
 				AC7D3E4B29A284DB00148ADB /* speedie.input */,
 				AC7D3E0C29A283FF00148ADB /* Headers */,
@@ -352,6 +426,118 @@
 			name = Headers;
 			sourceTree = "<group>";
 		};
+		ACB8141E2FE7F23700D08D5A /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				ACB8141C2FE7F23700D08D5A /* jeebox.dylib */,
+				ACB8141D2FE7F23700D08D5A /* jeebox.dbg.zpd */,
+			);
+			path = Build;
+			sourceTree = "<group>";
+		};
+		ACB814222FE7F23700D08D5A /* Cpp */ = {
+			isa = PBXGroup;
+			children = (
+				ACB8141F2FE7F23700D08D5A /* JB.h */,
+				ACB814202FE7F23700D08D5A /* JB.cpp */,
+				ACB814212FE7F23700D08D5A /* JB_Globals.cpp */,
+			);
+			path = Cpp;
+			sourceTree = "<group>";
+		};
+		ACB8142B2FE7F23700D08D5A /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				ACB814232FE7F23700D08D5A /* jb */,
+				ACB814242FE7F23700D08D5A /* jb.dSYM */,
+				ACB814252FE7F23700D08D5A /* test */,
+				ACB814262FE7F23700D08D5A /* test.dSYM */,
+				ACB814272FE7F23700D08D5A /* users */,
+				ACB814282FE7F23700D08D5A /* users.dSYM */,
+				ACB814292FE7F23700D08D5A /* xml */,
+				ACB8142A2FE7F23700D08D5A /* xml.dSYM */,
+			);
+			path = Build;
+			sourceTree = "<group>";
+		};
+		ACB814342FE7F23700D08D5A /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+				ACB8142B2FE7F23700D08D5A /* Build */,
+				ACB8142C2FE7F23700D08D5A /* jb.cpp */,
+				ACB8142D2FE7F23700D08D5A /* jeebox.h */,
+				ACB8142E2FE7F23700D08D5A /* jeebox_api.h */,
+				ACB8142F2FE7F23700D08D5A /* test.cpp */,
+				ACB814302FE7F23700D08D5A /* Test.xcodeproj */,
+				ACB814312FE7F23700D08D5A /* users.cpp */,
+				ACB814322FE7F23700D08D5A /* Users.box */,
+				ACB814332FE7F23700D08D5A /* xml.cpp */,
+			);
+			path = Examples;
+			sourceTree = "<group>";
+		};
+		ACB814382FE7F23700D08D5A /* mz */ = {
+			isa = PBXGroup;
+			children = (
+				ACB814352FE7F23700D08D5A /* MzCompression.spd */,
+				ACB814362FE7F23700D08D5A /* MzResearch.spd */,
+				ACB814372FE7F23700D08D5A /* MzUtils.spd */,
+			);
+			path = mz;
+			sourceTree = "<group>";
+		};
+		ACB8144B2FE7F23700D08D5A /* jeebox.input */ = {
+			isa = PBXGroup;
+			children = (
+				ACB814382FE7F23700D08D5A /* mz */,
+				ACB814392FE7F23700D08D5A /* .perry */,
+				ACB8143A2FE7F23700D08D5A /* Binary.spd */,
+				ACB8143B2FE7F23700D08D5A /* Config.spd */,
+				ACB8143C2FE7F23700D08D5A /* Constants.spd */,
+				ACB8143D2FE7F23700D08D5A /* CppApi.spd */,
+				ACB8143E2FE7F23700D08D5A /* ErrorsMessage.spd */,
+				ACB8143F2FE7F23700D08D5A /* FreeWords (disabled).spd */,
+				ACB814402FE7F23700D08D5A /* ID.spd */,
+				ACB814412FE7F23700D08D5A /* jeebox.conf */,
+				ACB814422FE7F23700D08D5A /* licence.txt */,
+				ACB814432FE7F23700D08D5A /* Message.spd */,
+				ACB814442FE7F23700D08D5A /* MessageVName.spd */,
+				ACB814452FE7F23700D08D5A /* Parser.spd */,
+				ACB814462FE7F23700D08D5A /* ParserUtils.spd */,
+				ACB814472FE7F23700D08D5A /* Syntax.spd */,
+				ACB814482FE7F23700D08D5A /* Tests.spd */,
+				ACB814492FE7F23700D08D5A /* Validator.spd */,
+				ACB8144A2FE7F23700D08D5A /* XML.spd */,
+			);
+			path = jeebox.input;
+			sourceTree = "<group>";
+		};
+		ACB8144F2FE7F23700D08D5A /* jeebox.scproj */ = {
+			isa = PBXGroup;
+			children = (
+				ACB8141E2FE7F23700D08D5A /* Build */,
+				ACB814222FE7F23700D08D5A /* Cpp */,
+				ACB814342FE7F23700D08D5A /* Examples */,
+				ACB8144B2FE7F23700D08D5A /* jeebox.input */,
+				ACB8144C2FE7F23700D08D5A /* .perry */,
+				ACB8144D2FE7F23700D08D5A /* .strings.txt */,
+				ACB8144E2FE7F23700D08D5A /* README.md */,
+			);
+			name = jeebox.scproj;
+			path = ../jeebox.scproj;
+			sourceTree = SOURCE_ROOT;
+		};
+		ACB814502FE7F23700D08D5A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ACB814572FE7F23800D08D5A /* Test */,
+				ACB814592FE7F23800D08D5A /* UsersExample */,
+				ACB8145B2FE7F23800D08D5A /* jb */,
+				ACB8145D2FE7F23800D08D5A /* TestDirect */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		ACF8AA912B23400C009A9B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -444,6 +630,12 @@
 			mainGroup = AC6ADADE29872AA8009CFFBB;
 			productRefGroup = AC6ADAE829872AA8009CFFBB /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = ACB814502FE7F23700D08D5A /* Products */;
+					ProjectRef = ACB814302FE7F23700D08D5A /* Test.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				AC6ADAE629872AA8009CFFBB /* Update */,
@@ -452,6 +644,37 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		ACB814572FE7F23800D08D5A /* Test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Test;
+			remoteRef = ACB814562FE7F23800D08D5A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ACB814592FE7F23800D08D5A /* UsersExample */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = UsersExample;
+			remoteRef = ACB814582FE7F23800D08D5A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ACB8145B2FE7F23800D08D5A /* jb */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = jb;
+			remoteRef = ACB8145A2FE7F23800D08D5A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ACB8145D2FE7F23800D08D5A /* TestDirect */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = TestDirect;
+			remoteRef = ACB8145C2FE7F23800D08D5A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AC6ADAE329872AA8009CFFBB /* Sources */ = {
