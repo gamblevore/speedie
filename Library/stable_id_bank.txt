@@ -728,8 +728,10 @@ JB_API__NilCallBack
 JB_API__NilHandler
 JB_API__Parse
 JB_ASM_BaseStack
+JB_ASM_CallBack
 JB_ASM_Code
 JB_ASM_FillTable
+JB_ASM_GlobalVM
 JB_ASM_Index
 JB_ASM_InitTable
 JB_ASM_LinkPico
@@ -1588,7 +1590,6 @@ JB_Syx_LongName
 JB_Syx_Name
 JB_Syx_NilCheck
 JB_Syx__Func
-JB_Syx__FuncCute
 JB_Syx__StdNew
 JB_TC_BitCount
 JB_TC_NumericCount
@@ -1638,6 +1639,7 @@ JB_Tree_MoveN
 JB_Tree_MoveTo
 JB_Tree_OperatorContains
 JB_Tree_OperatorLessOrEqual
+JB_Tree_Parent
 JB_Tree_Pop
 JB_Tree_PopFirst
 JB_Tree_PrependAll
@@ -1650,7 +1652,6 @@ JB_Tree_ShuffleNow
 JB_Tree_Sort
 JB_Tree_StepN
 JB_Tree_Trim
-JB_Tree_Upward
 JB_Tree__Sorter
 JB_Tree_stepbool
 JB_Validator_All
