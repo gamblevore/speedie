@@ -350,13 +350,12 @@ function xtype.ExpandSub (|jbin| j, |&byte| Obj, |message| xp)
 function xtype.ActualType (|&nil| ObjAddr, |xtype|)
 	opt norefcounts
 	if .IsObject and ObjAddr
-		|| Cls = ObjAddr|&object|[].Class
-		while Cls
-			|| i = cls.Index
-				|| Improved = xtype.Types[i-1]
-					return Improved
-			Cls = Cls.Parent						// in case it wasn't found?
-	return self
+		|| Mine = ObjAddr|&object|[].Class
+		for T in xtype.types
+			if t.Class == mine
+				return t
+	return self		
+
 
 
 function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| xp)
