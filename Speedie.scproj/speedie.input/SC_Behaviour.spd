@@ -106,15 +106,17 @@ class SCBehaviour (SCNode)
 	function message.StartCakeVirtual (|message| Prms, |message| WriteTo)
 		opt norefcounts
 
-		debugger 
-		|| Tmp = macro.TmpPrms_
-		tmp.Length = 0
 		|| ret = .last
 		if (ret == @decl) and !ret.declname
-			tmp <~ ret.first
+			|| Tmp = macro.TmpPrms_
+			tmp.Length = 0
+			tmp <~ ret.first!.copy
 			prms.BecomeMacro(CakeVirtualReturn, prms, tmp)
-		writeto.first = "|| Reg = v.callback(fn|&u32|)" ~ Parse
-		writeto.first = "|| v = cakevm.vm" ~ parse
+			tmp.clear
+		  else
+			prms.func = @sheb
+		writeto.first = "|| _r = _v.callback(fn|&uint|)" ~ Parse
+		writeto.first = "|| _v = cakevm.vm" ~ parse
 
 	
 	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
@@ -189,10 +191,12 @@ class SCBehaviour (SCNode)
 			.FillInterFaceIn(fn, false)
 		
 		for (W in b.Wrapperfuncs)
+			scfunction.currfunc = w
 			.FillInterfaceWrapper(w)
 
 		for (interface in B.interfaces)
 			interface.AddInterfaceToTable(TableCls)
+		scfunction.currfunc = nil
 	
 	
 	function SCClass.ProcessInterfaces
@@ -402,16 +406,19 @@ function Message.VirtualAdd (|string| name, |bool| Cake, |message| Ty, |int| i)
 	prms <~ i.msg
 	if !ty
 		ty = @thg+"Object"
+	  else
+		ty = ty.copy
 	prms <~ ty
-	prms <~ @thg+name
+	prms <~ @thg + name
+	
 	|| msg = CakeVirtualMacro.run(prms)
 	.last.prev!.prev = msg
-//	((FreeObject**)((V->ProposedStack)+2))[0] = Obj
+	prms.Length = 0
 
 
 
-|macro| CakeVirtualMacro = `(v.proposedstack + _0)|&_1|[] = _2`.macro
-|macro| CakeVirtualReturn = `return reg|&_0|[]`.macro
+|macro| CakeVirtualMacro = `(_v.proposedstack + _0)|&_1|[] = _2`.macro
+|macro| CakeVirtualReturn = `return _r|&_0|[]`.macro
 
 
 

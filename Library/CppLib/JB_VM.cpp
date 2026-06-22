@@ -346,7 +346,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 
 
 
-ivec4* 	JB_ASM_CallBack (CakeVM* V, ASM* Code) { // want this inlined...
+ivec4* 	JB_ASM_CallBack (CakeVM* V, ASM* Code) {
 	Code = VMClearHigh(Code);
 
 	// I think this works now.

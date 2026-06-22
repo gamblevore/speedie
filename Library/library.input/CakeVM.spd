@@ -2,9 +2,11 @@
 
 
 struct CakeVM {
-|int|		CakeFail
-|int|		UserFlags
-|CakeChef|	__VIEW__
+|int|			CakeFail
+|int|			UserFlags
+|CakeChef|		__VIEW__
+|&CakeStack|	ProposedStack
+
 
 linkage: cpp_class CakeVM, wrapper
 

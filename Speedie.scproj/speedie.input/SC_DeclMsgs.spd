@@ -135,7 +135,10 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		dcl.NilDeclared = nilstate.optional
 
 	if !dcl.type.isstruct
-		check (dcl.name ~!= "rz") (self, "Using reserved name.")
+		|| n = dcl.name
+		check (n ~!= "rz") (self, "Using reserved name.")
+		if self isnt inserted
+			check (n[] != '_') (self, "Using reserved name.")
 	
 	func.AddTypeInfo(dcl)
 	if dcl.name
@@ -259,6 +262,8 @@ function Message.CollectFromBody (|SCNode| Name_space)
 	|| dcl = .CollectDecl(Name_space, Name_space, DeclMode.FunctionBody)
 		dcl.AsBody
 		StructStuff.DelayedFix
+		if self isnt inserted
+			check (dcl.name[] != '_') (self, "Using reserved name.")
 		|| def = dcl.Default
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
 

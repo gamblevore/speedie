@@ -109,12 +109,6 @@ extend message
 	
 	libinternal AppendMacroSub (|Macro| M,  |message!| orig,  |array? of message| prms)
 		opt norefcounts
-		// this is an issue. What if self came from a string, and has no file?
-		// lets say it came from a file. We might STILL want to use something else.
-		// So... should we use... or not?
-		// OK, for a start, lets NEVER use for strings.
-		// where am i making it frmo a file, even? I can't see it?
-
 		for r in prms
 			(r isnt MacroMade)						// in case it was passed in
 		m.Source.MacroCopy(orig, self, prms, self)

@@ -834,7 +834,8 @@ function scnode.Module (|scmodule|)
 	if self isa scmodule
 		return self
 	if self isa scclass
-		return .modul	return compiler.program // never happens?
+		return .modul
+	return compiler.program // never happens?
 
 
 function CreateNameDict (|Message| FuncName, |[message]| NameList) {
@@ -865,22 +866,22 @@ function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 function $name (|dictionary of $AllSameType|)
 	visible false
 	opt norefcounts
-	|| _T = .${name}_Dict 
-	if _T
-		return _T
-	_T = dictionary.new
-	.${name}_Dict = _T
+	|| T_ = .${name}_Dict 
+	if T_
+		return T_
+	T_ = dictionary.new
+	.${name}_Dict = T_
 "
 
 	for s in NameList
-		fs <~ `	_T["`
+		fs <~ `	T_["`
 		fs.appendlower(s.name)
 		fs <~ `"] = `
 		fs <~ s
 		fs <~ "\n"
 		
 	fs <~ "
-	return _T
+	return T_
 "
 
 	|| FuncSrc = fs.GetResult
