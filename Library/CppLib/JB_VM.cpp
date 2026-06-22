@@ -261,10 +261,10 @@ VMOpt ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 	Base[0].Code = VMCodePtr(&V) + CakeCodeMax-1;
 	Base[2].Code = VMProtect(V, true) + CodeIndex;
 	for (int i = 1; i <= 2; i++) {
-		Base->DestReg = 1;
+		Base->Down = 1;
 		Base->SFlags = 987654320<<2;
 		Base->Depth = i;
-		Base->GoUp = 0;
+		Base->Up = 0;
 		Base[1] = {};
 		Base += 2;
 	}
@@ -298,7 +298,7 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 static CakeStack* GetMaxStack (CakeVM* V) {
 	auto Curr = &(V->Registers[2].Stack);
 	while (true) {
-		int Up = Curr->GoUp;
+		int Up = Curr->Up;
 		if (Up < 1 or Up > 32)
 			return Curr;
 		auto Stack = Curr + Up + 1;
@@ -349,18 +349,17 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 ivec4* 	JB_ASM_CallBack (CakeVM* V, ASM* Code) {
 	Code = VMClearHigh(Code);
 
-	// I think this works now.
 	CakeStack* NewStack = V->ProposedStack;
-	int Dest = NewStack->DestReg;
-	CakeRegister* r = (CakeRegister*)NewStack - (Dest + 1);
+	int Dest = NewStack->Down;
+	CakeRegister* r = (CakeRegister*)NewStack - Dest;
 	{
 		auto OldStack = (CakeStack*)(r-1);
-		OldStack->GoUp = Dest;
+		OldStack->Up = Dest;
 		NewStack->Depth = OldStack->Depth+1;
 	}
 	
 	NewStack->SFlags = 2;
-	NewStack->GoUp = 0;
+	NewStack->Up = 0;
 	NewStack->Code = Code;
 	NewStack[1] = {};
 	

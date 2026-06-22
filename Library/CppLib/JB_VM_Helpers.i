@@ -174,12 +174,13 @@ VMOpt vec4 VSwiz (CakeRegister* r, ASM Op) {
 
 
 // "static __restrict __hot"... now theres some real cpp
-static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* self, int Dest, ASM* CodePtr) {
-	Dest++; // too small for some reason?
+static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* self, int Save, ASM* CodePtr) {
+// vm_delete, vm_deleteref, vm_decr
 	fpDestructor Destructor = JB_Destructor(self);
 	auto r = rp;
-	CakeStack* NewStack = (CakeStack*)r + Dest + 1;
-	NewStack->DestReg = Dest;
+	
+	CakeStack* NewStack = (CakeStack*)r + Save + 1;  // +1 here for same reason as BridgeEntry's +1
+	NewStack->Down = Save + 1;
 	if (!(((uint64)Destructor) >> 63)) {
 		vm.ProposedStack = NewStack;
 		(Destructor)(self);
@@ -197,13 +198,13 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Obj
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		
-		OldStack->GoUp = Dest;
+		OldStack->Up = Save;
 		NewStack->Depth = OldStack->Depth+1;
 		OldStack->Code = CodePtr;
 	}
 	
 	NewStack->SFlags = 0x80000;
-	NewStack->GoUp = 0;
+	NewStack->Up = 0;
 	NewStack->Code = (ASM*)Destructor;
 	((CakeRegister*)NewStack)[2].Obj = self;
 	((CakeRegister*)NewStack)[1] = {};
@@ -227,7 +228,7 @@ __restrict inline ASM* JB_RefDecr (CakeVM& vm, CakeRegister*& r, JB_Object* self
 VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) {
 	(DebugCode);
 	auto Stack	= (CakeStack*)(R0 - 1);
-	int StepBack= Stack->DestReg;
+	int StepBack= Stack->Down;
 	int Flags = Stack->SFlags;
 	
 	auto Imm	= RET_Valuei;							// get before copy!
@@ -240,7 +241,7 @@ VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) 
 		R0			= NewR0;							// NewZero
 		Stack		= (CakeStack*)(NewR0 - 1);
 		auto Code	= Stack->Code;
-		Stack->GoUp = 0;
+		Stack->Up = 0;
 	//	*R0			= {};								// unnecessary
 		return Code;
 	}
@@ -670,13 +671,13 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 		}
 		
 		NewStack->Depth = OldStack->Depth+1;
-		OldStack->GoUp = Dest;
+		OldStack->Up = Dest;
 		OldStack->Code = CodePtr;
 	}
 	
 	NewStack->SFlags = 0;
-	NewStack->DestReg = Dest;
-	NewStack->GoUp = 0;
+	NewStack->Down = Dest;
+	NewStack->Up = 0;
 	auto Zero = ((CakeRegister*)NewStack)+1;
 	rp = Zero;
 	
@@ -740,17 +741,26 @@ VMOpt int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 }
 
 
-// stack, r0, <r1>, -->r2
+/*
+	function referencer (|$int| x)
+		cpp_wrapper
+		x = 2
+		Call CakeFunc
+		It needs to put a stack somwhere...
+		So... normally, the stack would be put... where the result is (Currently 2).
+		But that doesnt work for C++ calling. So it needs to work differently.
+	
+	|int| x = 1
+	referencer(x)
+*/
 
 __restrict VMOpt void BridgeEntry (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
-//	printf("T: %i\n", T);
-
-	((CakeStack*)(r))[-1].Code = CodePtr;	// nicer crash logs
+	((CakeStack*)(r))[-1].Code = CodePtr;	 // nicer crash logs
 	int n = n1;
-	auto r2 = ((CakeStack*)r) + n + 1;
-	vm.ProposedStack = r2;
-	r2->DestReg = n;
+	auto NewStack = ((CakeStack*)r) + n + 1; // explained above.
+	vm.ProposedStack = NewStack;
+	NewStack->Down = n + 1;
 
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vm.CppFuncs[T]);
 	return __CAKE_BRIDGE__(funcdata, fn, r, n);

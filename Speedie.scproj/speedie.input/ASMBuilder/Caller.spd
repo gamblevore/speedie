@@ -29,7 +29,7 @@ function CollectParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| R
 	if !Cpp
 		rz = .PrmCollectSpd(regs, fn)
 		if !prms.AsFunc
-/			rz |= 16 // huh?
+			rz |= 16 // mark this as being a function callback
 		return rz
 	
 	|int64| sh = 64

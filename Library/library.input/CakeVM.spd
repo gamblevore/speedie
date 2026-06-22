@@ -66,7 +66,7 @@ target cpp or vm {
 			cpp_wrapper JB_ASM__VM
 		
 		function VM (|&cakevm|) // this is not a real function, its an inline
-			cpp_Wrapper JB_ASM_GlobalVM // how to remove it?
+			cpp_Wrapper JB_ASM_GlobalVM // how to remove it? some target? which? no idea.
 }
 
 
@@ -83,8 +83,8 @@ struct CakeStack
 		cpp_class CakeStack
 	|&uint|			Code
 	|uint|			SFlags
-	|byte|			GoUp
-	|byte|			DestReg
+	|byte|			Up
+	|byte|			Down
 	|uint16|		Depth
 	
 	inline Reg0 (|&ivec4|)

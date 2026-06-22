@@ -279,8 +279,8 @@ function cakevm.CheckStack (|cakestack| stack, |string?|)
 	if !Memory.Readable(Stack, 16):			return "StackCorrupt!"
 	if stack < .basestack:					return "StackUnderflow!"
 	|| Depth = stack.Depth - 1
-	|| Down = stack.DestReg
-	if !Down or Down > 31:					return "StackBad!"
+	|| Down = stack.Down
+	if !Down or Down > 31:					return "BadStack!"
 	Stack -= Down + 1
 	if stack.Depth > Depth:					return "StackTripped!"
 	return nil

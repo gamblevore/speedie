@@ -31,12 +31,12 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 //6   JB_SP_Run + 344
 //7   main + 28
 //8   start + 7184
-
+	
 	|| Stack = (.Registers(false)-2)|&CakeStack|
 	|| Depth = Stack.Depth
 	LastStack ?= Stack + 1MB/16
 	while
-		if !Memory.Readable(Stack, 16):				return "Stack Corrupt"
+		if !Memory.Readable(Stack, 16):			return "Stack Corrupt"
 		if (Depth >= 1K):						return "..." // huge stacks aren't that useful
 			
 		|| CodePtr = Stack.Code
@@ -49,9 +49,12 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 			print "[Unknown]"					// Avoid string/memory alterations by using faststring...
 		printline "()"
 
-		require stack!=LastStack
+		if stack==LastStack
+			return nil
 		if stack > LastStack:					return "Stack Too Large"
-		|| Up = stack.GoUp	#require
+		|| Up = stack.Up
+		if !up
+			return nil
 		Stack += Up+1
 		Depth++
 		if (Up > 32):							return "Stack Chain Invalid"
@@ -60,7 +63,7 @@ function CakeVM.PrintStackTrace (|?&CakeStack| LastStack, |?string|)
 
 
 function cakevm.Prev (|cakestack| stack, |&cakestack|)
-	|| Down = stack.DestReg
+	|| Down = stack.Down
 	Stack -= Down + 1
 	if stack >= .BaseStack
 		return Stack
