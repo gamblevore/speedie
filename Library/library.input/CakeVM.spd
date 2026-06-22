@@ -65,8 +65,8 @@ target cpp or vm {
 		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)
 			cpp_wrapper JB_ASM__VM
 		
-		function VM (|&cakevm|)
-			cpp_Wrapper JB_ASM_GlobalVM
+		function VM (|&cakevm|) // this is not a real function, its an inline
+			cpp_Wrapper JB_ASM_GlobalVM // how to remove it?
 }
 
 
