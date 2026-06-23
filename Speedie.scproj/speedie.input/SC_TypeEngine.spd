@@ -1349,16 +1349,15 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 
 
 
-function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |bool|)
+function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |int|)
 	opt norefcounts
 	ifn exp in @arg
-		|| eq = (self Is EqualOrNot)|bool|
-		if LC.CanCompare(RC, eq)
-			return true
+		return LC.CanCompare(RC, (self Is EqualOrNot)|bool|)
 
 
-function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|)
+function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |int| DoCompare, |scdecl|)
 	using (exp)
+	opt norefcounts
 	|| dot = @dot.msg
 	dot <~ exp.first
 	|| p = dot.msg(@prm)
@@ -1366,21 +1365,24 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	if comp is caseaware
 		p <~ «thg "true"»
 	exp.First = dot
-
-	if (comp Is EqualOrNot)
+	
+	if !DoCompare
 		exp.Last.Remove
 		dot.name = "SyntaxEquals"
 		if (comp.CompOp == "!=")
 			exp.become( @BRel, "!" )
 			exp <~ dot
 		  else
-			exp.become(@bra) // don't break the AST...
+			exp.become(@bra)				// don't break the AST...
 	  else
 		dot.name = "SyntaxCompare"
-		exp.Last!.name = comp.compOp
+		|| opmsg = exp.last!
+		opmsg.name = comp.compOp
+		opmsg.obj = nil						// sigh
+		opmsg.obj = scoperator.lookup(opmsg)
 		exp <~ (@num, comp.compparam)
 
-	rz = TypeOfExpr( dot, name_space ) // testing exp corrupts this. Shouldn't!
+	rz = TypeOfExpr( dot, name_space )		// testing exp corrupts this. Shouldn't!
 	if !rz
 		if StdErr.LastError.FromSamePlace(exp)
 			stderr.pop
@@ -1562,8 +1564,8 @@ function TypeOfRel (ExprResolver)
 		if (comp isnt CompOrSet)
 			return CustomFuncOp( exp, comp, name_space, RN )
 		if RC != TypeNil
-			if (comp is caseaware) or comp.CanOpCompare(lc, rc, exp)
-				return DoOpCompare(exp, lc, rc, comp, name_space)
+			|| compare = comp.CanOpCompare(lc, rc, exp)
+				return DoOpCompare(exp, lc, rc, comp, name_space, compare-1)
 	  elseif (comp is Bit)
 		require RC.IntsOnly(RN) and LC.IntsOnly(LN)
 	

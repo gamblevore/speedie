@@ -54,8 +54,9 @@ extend Assembler
 		|| scop = op.obj|scoperator|!
 		if scop is AndOr
 			return .ASMBoolMaker(exp, dest, scop.Kind)
-		|| fn = scop.OpASM!
-		return .DoMathSub(exp, dest, fn)
+		|| fn = scop.OpASM
+			return .DoMathSub(exp, dest, fn)
+		error (exp, errorreceiver.nonfatal)
 
 
 	helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)

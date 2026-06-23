@@ -26,8 +26,10 @@ class XType
 	function Name (|string|)
 		return .msg.name
 	
-//	syntax compare (|string| s, |bool| Aware,   |int|)
-//		return .msg.name.syntaxcompare(s)
+	syntax compare (|string| s, |bool| Aware, |int|)
+		if self
+			return .msg.name.syntaxcompare(s, aware)
+		return 1
 		
 	operator in (|xtype| Sup, |bool|)
 		opt norefcounts
