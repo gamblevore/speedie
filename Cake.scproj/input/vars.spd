@@ -30,7 +30,7 @@ class XVar (list)
 		.position = pos
 		.reg = reg
 		.name = s.CString
-		.obj = xtype.GetType(s.hint, nil)
+		.obj = xtype.GetType(s.hint, nil) // doesn't need to exist, .datatype is used for ints/etc.
 		.DataType = s.HInt
 		.CodeEnd = int.max
 
@@ -42,15 +42,9 @@ class XVar (list)
 	
 	syntax is (|xvarflags| V, |bool|)
 		return .flags&V
-	
-//	function IsBareStruct (|bool|)
-//		return self is BareStruct
 		
 	operator contains (|int| P, |bool|)
 		return P >= .Position and P < .codeend
-		
-//	function CanBeNil (|bool|)
-//		return self is CanBeNil
 
 	function Print (|!&CakeStack| Stack, |int| TabTo=0)
 		opt norefcounts
@@ -89,11 +83,17 @@ class XVar (list)
 		return .obj|&nil||xtype|
 	
 	
-	function ObjType (|xtype|)
+	function TestObjectType (|xtype| Type, |&nil| Where, |xtype|)
 		opt norefcounts
-		|| Ty = .Type
-			if Ty.IsObject or .Weirdness[]
-				return Ty
+		require Memory.Readable(Where, 8)
+		|| obj = Where|&object|[]
+			require Memory.TestObject(obj)
+			|| Mine = obj.Class
+			|| ind = mine.Index
+			if ind > 0
+				|| T = xtype.types[ind-1]
+					return T
+		return type
 
 		
 	function SetValue (|&nil| where, |message| Value)
@@ -201,7 +201,7 @@ class XVar (list)
 	function SetObjectValue (|!&object| Reg, |message| Value)
 		opt norefcounts
 		|| OldObj = Reg[]
-			require Memory.Test(OldObj)
+			require Memory.TestObject(OldObj)
 		
 		if value ~= "nil" or "0" or "0x0"
 			require self is CanBeNil
@@ -214,7 +214,7 @@ class XVar (list)
 		  else
 			NewObj = .ParseObj(OldObj, value.name)$
 		
-		expect (Memory.Test(NewObj)) (value, "Invalid address")
+		expect (Memory.TestObject(NewObj)) (value, "Invalid address")
 		reg[] = NewObj
 	
 	
@@ -329,20 +329,21 @@ class XVar (list)
 
 		|| C = .type
 		if !C and !type
-			|| T = .DataType|||datatypecode.Numeric
+			|| T = .DataType ||| datatypecode.Numeric
 			T.Render(Fs)
 			return true
 		
 		if C
-			fs <~ C.Name
-		if type and type != C
-			fs <~ "("
-			fs <~ type.name
-			fs <~ ")"
+			if type and type.IsObject
+				|| Good = type in C
+				if !good
+					fs <~ "!"
+				fs <~ type.name
+				if !good
+					fs <~ "!"
+			  else
+				fs <~ C.Name
 			
-			ifn type in C
-				require c in type // we lost info?
-				fs <~ '?'
 		return true
 		
 	
