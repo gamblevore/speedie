@@ -8,6 +8,7 @@ struct SavedRegisters
 	|byte|					BreakRequest
 	|uint16|				BasicBlock
 	|uint16|				BasicParent
+	|bool|					ExpectOneMore
 	|DeclAlterable[32]|		Decls
 	|RegFile|				Regs
 
@@ -18,6 +19,7 @@ struct SavedRegisters
 		.BasicDepth = sh.BasicDepth
 		.BasicBlock = sh.BasicBlock
 		.BasicParent = sh.BasicParent
+		.ExpectOneMore = sh.ExpectOneMore
 		.regs = sh.regs
 		expect args <= 32 - .RegCount
 		for p in args
@@ -29,6 +31,7 @@ struct SavedRegisters
 		sh.BasicDepth = .BasicDepth
 		sh.BasicBlock = .BasicBlock
 		sh.basicparent = .basicparent
+		sh.ExpectOneMore = .ExpectOneMore
 		sh.regs = .regs
 
 

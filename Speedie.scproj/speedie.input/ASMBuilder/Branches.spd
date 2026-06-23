@@ -39,6 +39,7 @@ function IfSub (fn_asm)
 	if !other.HasAsmStuff									// if (x): func()
 		|| Clamped = .MiniClampOpt(exp, b.start)
 			return Clamped
+		.ExpectOneMore = true
 		.BranchToCurr(b)
 		return asmreg()
 	
@@ -548,10 +549,10 @@ function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 
 
 Struct FatRange
-	|&FatASM|   Start
-	|&FatASM|   After
-	|uint16|	FirstBlock
-	|maybebool| Constness
+	|&FatASM|		Start
+	|&FatASM|		After
+	|uint16|		FirstBlock
+	|maybebool|		Constness
 	
 	function Length (|int|)
 		return .after - .Start
@@ -572,7 +573,7 @@ Struct FatRange
 extend Assembler
 	function fatasm.JumpFix (|&fatasm| curr)
 		isnt CondAnswer
-		.JumpTo(curr) // shouldn't (s isnt CondAnswer) go inside .jumpto?
+		.JumpTo(curr)							// shouldn't (s isnt CondAnswer) go inside .jumpto?
 	
 	
 	function BranchToCurr (|FatRange| range)
@@ -586,7 +587,7 @@ extend Assembler
 	
 
 function @assembler.PrintProgress
-	cpp_name adb 
+	cpp_name adb
 	visible
 	opt norefcounts
 	target debug

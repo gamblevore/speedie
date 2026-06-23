@@ -33,6 +33,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		p._op = op
 		p.FatMap = exp						// could remove this?
 		.breakrequest = nil
+		.ExpectOneMore = false
 		p.BasicBlock = .BasicBlock
 		return p
 

@@ -2,7 +2,7 @@
 
 // MiniOptimisations, miniopts, optimize, finishmost 
 function Assembler.FinishASM 
-	if (.FnLength <= 0) or !.Last.IsFinisher
+	if (.FnLength <= 0) or !.Last.IsFinisher or .ExpectOneMore
 		.MissingReturn
 
 	|| Last = .Last
@@ -21,7 +21,7 @@ function Assembler.FinishASM
 			// so we need some kind of phinode.
 			// i don't really want to do that.
 			// can we check if this const is used by looking at the ASM?
-			// using the blockparent map thing?
+			// using the *BlockParent* map thing?
 			// if we are going linearly forward... that makes it easier
 			// but we don't know when a var opens or closes.
 			// so r4 can mean multiple variables.

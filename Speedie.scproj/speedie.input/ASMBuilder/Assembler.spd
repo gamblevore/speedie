@@ -21,24 +21,25 @@ struct Assembler
 	contains asmreg
 	linkage: cpp_part Pac
 
-	|InlineState[8]|			InlineState
 	|uint16|					BasicBlock
 	|uint16|					BasicParent
+	|bool|						ExpectOneMore
+	|byte|						BreakRequest
 	|byte|						BasicDepth
 	|byte|						InlineDepth
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
 	|byte|						EntireInlineFailed
-	target debug
-		|byte|					StackSize
+	|byte|						CurrFuncGrab
+	|bool|						NeedsRework				// hoisting
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
-	|byte|						CurrFuncGrab
-	|bool|						NeedsRework				// hoisting
+	target debug
+		|byte|					StackSize
+	|InlineState[8]|			InlineState
 	|scfunction--|				Out
 
-	|byte|						BreakRequest
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
 	|&FatASM|					Start
