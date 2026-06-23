@@ -2084,3 +2084,4 @@ roundf
 sqrt
 sqrtf
 strlen
+strcmp

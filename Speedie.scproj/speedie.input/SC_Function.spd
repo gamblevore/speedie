@@ -12,7 +12,7 @@ datatype DotUseType (int) // replace entire thing with a bool?
 		return self == d
 
 
-datatype FunctionType (int)
+datatype FunctionType (uint)
 	flags
 		|FunctionType|
 		Constructor
@@ -23,6 +23,7 @@ datatype FunctionType (int)
 		TypeTest
 		InitFunc
 		Recursive
+		DirectlyRecursive
 		EmptyConstructor
 		VirtualCaller
 		Behaviour
@@ -50,7 +51,7 @@ datatype FunctionType (int)
 		NoExport = LinkInline + Disabled + InitFunc
 		DontCheckInCakeLib = Disabled + InitFunc
 		ConOrDes = Constructor + Destructor
-		NoInline = CantInline + cpp + Recursive
+		NoInline = CantInline + cpp + DirectlyRecursive
 		
 	syntax is (|functiontype| t, |bool|)
 		return self&t

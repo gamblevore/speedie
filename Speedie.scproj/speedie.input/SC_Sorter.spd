@@ -57,12 +57,14 @@ module CodeSorter
 	
 function SCFunction.MarkRecursive (|scfunction| EndAt)
 	opt norefcounts
+	is DirectlyRecursive
 	|| s = self
 	while
 		(s is Recursive)
 		require s != endat
 		s = s.DepthFinder
 		require s != nil and s != EndAt
+
 
 
 function SCFunction.FindDepths (|int|)

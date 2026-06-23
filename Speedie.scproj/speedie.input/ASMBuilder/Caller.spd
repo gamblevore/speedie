@@ -175,7 +175,7 @@ function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
 
 
 
-function @ASMType.ASMFunction (fn_asm)				// dofunction function
+function @ASMType.ASMFunction (fn_asm)				// dofunction
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
@@ -190,6 +190,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 			|| DepthOK = .DepthOK(fn)
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
+			
 			if fn is LinkInline
 				return .CantLinkInline(exp, depthok, fn)
 		
