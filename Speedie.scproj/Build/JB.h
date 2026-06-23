@@ -790,21 +790,22 @@ struct VirtualJBString {
 };
 
 struct Assembler {
-	InlineState InlineState[8];
 	u16 BasicBlock;
 	u16 BasicParent;
+	bool ExpectOneMore;
+	byte BreakRequest;
 	byte BasicDepth;
 	byte InlineDepth;
 	byte DeepestInline;
 	byte InlineDepthLimit;
 	byte EntireInlineFailed;
+	byte CurrFuncGrab;
+	bool NeedsRework;
 	uint RegDebugInfo;
 	uint VDecls_;
 	uint VTemps_;
-	byte CurrFuncGrab;
-	bool NeedsRework;
+	InlineState InlineState[8];
 	SCFunction* Out;
-	byte BreakRequest;
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
 	FatASM* Start;
@@ -820,6 +821,7 @@ struct SavedRegisters {
 	byte BreakRequest;
 	u16 BasicBlock;
 	u16 BasicParent;
+	bool ExpectOneMore;
 	DeclAlterable Decls[32];
 	RegFile Regs;
 };

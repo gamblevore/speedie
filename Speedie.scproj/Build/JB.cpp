@@ -23468,7 +23468,7 @@ Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message*
 }
 
 void SC_Pac_FinishASM(Assembler* Self) {
-	if ((SC_Pac_FnLength(Self) <= 0) or (!SC_FAT_IsFinisherWith0(SC_Pac_LastWith0(Self)))) {
+	if ((SC_Pac_FnLength(Self) <= 0) or ((!SC_FAT_IsFinisherWith0(SC_Pac_LastWith0(Self))) or Self->ExpectOneMore)) {
 		SC_Pac_MissingReturn(Self);
 	}
 	FatASM* Last = SC_Pac_LastWith0(Self);
@@ -23687,6 +23687,7 @@ ASMReg SC_Pac_IfSub(Assembler* Self, Message* Exp, ASMReg Dest) {
 		if (Clamped) {
 			return Clamped;
 		}
+		Self->ExpectOneMore = true;
 		SC_Pac_BranchToCurr(Self, (&B));
 		return SC_Reg__NewWith0();
 	}
@@ -25230,6 +25231,7 @@ FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp) {
 		(SC_FAT__opSet(P, Op));
 		(SC_FAT_FatMapSetWithMsg(P, Exp));
 		Self->BreakRequest = nil;
+		Self->ExpectOneMore = false;
 		P->BasicBlock = Self->BasicBlock;
 		return P;
 	}
@@ -25921,6 +25923,7 @@ void SC_SavedRegisters_Collect(SavedRegisters* Self, Array* Args, Assembler* Sh)
 	Self->BasicDepth = Sh->BasicDepth;
 	Self->BasicBlock = Sh->BasicBlock;
 	Self->BasicParent = Sh->BasicParent;
+	Self->ExpectOneMore = Sh->ExpectOneMore;
 	Self->Regs = Sh->Regs;
 	if (JB_Array_SyntaxCompare(Args, 32 - Self->RegCount) >= 1) {
 		JB_Object_Fail(nil);
@@ -25960,6 +25963,7 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh) {
 	Sh->BasicDepth = Self->BasicDepth;
 	Sh->BasicBlock = Self->BasicBlock;
 	Sh->BasicParent = Self->BasicParent;
+	Sh->ExpectOneMore = Self->ExpectOneMore;
 	Sh->Regs = Self->Regs;
 }
 
@@ -60911,4 +60915,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -1210913687155725208 8541332425629425499
+// 1650036515208607064 8541332425629425499
