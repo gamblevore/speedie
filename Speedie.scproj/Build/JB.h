@@ -1669,7 +1669,7 @@ extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2452])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2451])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1809,10 +1809,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2451])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2450])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2450])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2449])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2449])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2448])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2254,6 +2254,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__FunctionType_NewNew ((FunctionType)2048)
 #define kSC__FunctionType_NewStruct ((FunctionType)8)
 #define kSC__FunctionType_NoExport ((FunctionType)2621504)
+#define kSC__FunctionType_NoInline ((FunctionType)268566656)
 #define kSC__FunctionType_NotRefCounted ((FunctionType)4194304)
 #define kSC__FunctionType_NumberCreator ((FunctionType)16)
 #define kSC__FunctionType_OptInline ((FunctionType)262144)
@@ -2449,17 +2450,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2445])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2444])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2446])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2447])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2445])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2446])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2444])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2443])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2447])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2448])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2446])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2447])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2520,7 +2521,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2443])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2442])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -4077,7 +4078,7 @@ SCObject* SC_DollaDolla(Message* Exp, SCNode* Name_space);
 
 SCNode* SC_DontRemove(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
-SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, SCNode* Name_space);
+SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, SCNode* Name_space, int DoCompare);
 
 JB_String* JB_EntityTest();
 
@@ -7622,7 +7623,7 @@ JB_String* SC_SCObject_UnusedStr(SCObject* Self, JB_String* Name);
 
 
 // JB_SCOperator
-bool SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* Lc, SCDecl* Rc, Message* Exp);
+int SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* Lc, SCDecl* Rc, Message* Exp);
 
 SCOperator* SC_Opp_Constructor(SCOperator* Self, JB_String* Name, fn_OpASM ASM, OpMode Mode);
 
@@ -9169,6 +9170,8 @@ Message* SC_Msg_Resync(Message* Self, Message* Parent);
 
 FatASM* SC_Msg_RET(Message* Self, ASMReg R1, int Value);
 
+bool SC_Msg_Returns(Message* Self);
+
 FatASM* SC_Msg_RFRD(Message* Self, ASMReg R1, ASMReg R2, int Save, int Offset);
 
 FatASM* SC_Msg_RFRT(Message* Self, ASMReg R1, ASMReg R2);
@@ -9561,7 +9564,7 @@ DataTypeCode SC_Decl_CalculateDataTypeSub(SCDecl* Self);
 
 int SC_Decl_CalculateDeclSize(SCDecl* Self, int Depth);
 
-bool SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals);
+int SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals);
 
 bool SC_Decl_CanCopyNormally(SCDecl* Self);
 
@@ -11002,7 +11005,7 @@ bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls);
 
 Message* SC_Func__Tran_Result(SCFunction* F);
 
-void SC_Func__Tran_ResultFinish(SCFunction* F, Message* R_z, SCNode* Space);
+void SC_Func__Tran_ResultFinish(SCFunction* F, Message* R_z, SCNode* Space, Message* Arg);
 
 bool SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
