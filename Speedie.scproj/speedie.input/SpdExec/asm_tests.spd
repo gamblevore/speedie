@@ -19,6 +19,21 @@ module ASMExamples {
 
 target cake {
 
+function TypeReach2 (|int| x)
+	visible
+	if x
+		return nothing()
+
+function nothing
+	opt noinline
+
+
+function MacroNew (|message| s, |bool| UseSelf, |Macro!|)
+	visible
+	rz = Message()
+	rz.Indent = UseSelf|byte|
+	rz <~ s
+
 function ivec4.CenterBroken2 (|ivec2|)
 	rz.x = (.x2 + .x)
 	rz.y = (.y2 + .y)

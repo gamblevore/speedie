@@ -546,6 +546,7 @@ function message.AddReturn (|bool| NoSet=false, |message|)
 	opt norefcounts
 	parser.using.position = .FrenchSpyReturn
 	|| ret = .msg(@tmp, "return")
+	(ret is inserted)
 	if !NoSet
 		ret.ASMType = ASMType.kReturn
 	return ret	
@@ -607,4 +608,10 @@ function Message.find (|syntax| P, |syntax| Ch, |string| name, |message|)
 			|| f = s.first
 				if f.func == ch and f.name ~= name
 					return f
-					
+
+
+function message.Returns (|bool|)
+	opt norefcounts
+	return (.blocks is return) or (.last istmp "return")
+	
+

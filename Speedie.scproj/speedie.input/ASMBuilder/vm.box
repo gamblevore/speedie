@@ -443,6 +443,12 @@ POS 255
 
 
 #!						 (((((Consts)))))
+// should make these 30 to 33
+// we get ASM clashes, though
+// need smarter ID gen
+// or... simpler! I think simpler is better.
+// just assign a start position. Like my existing const/flag system does
+
 /**/ KNSR (RotateConst)
 		RotateConst(r, Op)
 

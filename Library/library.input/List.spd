@@ -302,10 +302,9 @@ class list
 
 	function Clear   // for debug
 		opt norefcounts
-		while
-			|| f = .first$
+		while (|| f = .first)
 			f.remove
-
+	
 	function Count (|int|)
 		description "This will loop over the list and count them."
 		opt norefcounts

@@ -50,6 +50,7 @@ datatype FunctionType (int)
 		NoExport = LinkInline + Disabled + InitFunc
 		DontCheckInCakeLib = Disabled + InitFunc
 		ConOrDes = Constructor + Destructor
+		NoInline = CantInline + cpp + Recursive
 		
 	syntax is (|functiontype| t, |bool|)
 		return self&t
@@ -334,7 +335,9 @@ function Transform ()
 		|| r_z = Tran_Result( self )
 		Tran_All( self, arg, space )
 		if r_z
-			Tran_ResultFinish( self, r_z, space )
+			Tran_ResultFinish( self, r_z, space, arg )
+//		  else
+//			Tran_ReturnFinish( self, arg ) // seems to break the compiler?
 		parser.Using.Flags = 0
 
 	if !StillOK

@@ -91,8 +91,10 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc._op = asm.tail
 	fnc.µRefCount++
 	(Fnc.info as= ASMReg.exit)
-	if (fnc.BasicBlock == ret.BasicBlock)
-		ret._op = asm.noop // nice
+// can't do this as its too late. Something can jump to it.
+// we'd have to do this at the time we created the fnc in the first place.
+//	if (fnc.BasicBlock == ret.BasicBlock)
+//		ret._op = asm.noop // nice
 	if 0: nil|message|!.TAIL
 
 

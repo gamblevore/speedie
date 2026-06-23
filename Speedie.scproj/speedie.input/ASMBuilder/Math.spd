@@ -708,7 +708,7 @@ extend Assembler
 		if 0
 			exp.DIVS
 			exp.QDIV
-		|| fat = exp.DIV(dest, ASMReg(), l, r, dest.signed|int|)
+		|| fat = exp.DIV(dest, nil, l, r, dest.signed|int|)
 		fat._Outputs &= ~2 // clear this output
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
@@ -716,7 +716,7 @@ extend Assembler
 	function ModInt    (fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntMod)
-		|| fat = exp.DIV(asmreg(), dest, L, R, dest.signed|int|)
+		|| fat = exp.DIV(nil, dest, L, R, dest.signed|int|)
 		fat._Outputs &= ~1 // clear unused output 
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 

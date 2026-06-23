@@ -92,7 +92,10 @@ class XVar (list)
 			|| ind = mine.Index
 			if ind > 0
 				|| T = xtype.types[ind-1]
-					return T
+					// if the type is string, and it starts with string... its still a string
+					// otherwise we get stringzeroterminated as the typical string type. no fun.
+					ifn T.name[0, "String", true] and (T in type)
+						return T
 		return type
 
 		

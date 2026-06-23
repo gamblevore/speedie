@@ -233,4 +233,4 @@ function scdecl.TypeReach (|SCNode| from, |message| src)
 	if self
 		return .type.reach(from, src)
 
-	
+

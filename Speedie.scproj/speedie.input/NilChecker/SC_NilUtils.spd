@@ -1,9 +1,10 @@
 
-struct LoopInfo 
-	|NilRecord| 		ContRecord
-	|NilRecord| 		ExitRecord
-	|byte| 				BranchDepth
-	|bool| 				HasEscape
+
+struct LoopInfo
+	|NilRecord|			ContRecord
+	|NilRecord|			ExitRecord
+	|byte|				BranchDepth
+	|bool|				HasEscape
 	
 	function BeginLoop (|bool| HasExitCond)
 		|| v = ArchonPurger.value
@@ -31,7 +32,7 @@ struct LoopInfo
 
 	
 module PostIncrementNil
-	|message--[32]| 		Msgs
+	|message--[32]|			Msgs
 	|int|					Size
 	|bool|					Sync
 

@@ -407,30 +407,36 @@ function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f)
 									  // altering the tree isn't cool really... makes things too tricky. 
 
 
-function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
+//function Tran_ReturnFinish (|scfunction| self, |message| arg)
+//	opt norefcounts
+//	if !arg.Returns
+//		arg.AddReturn  // this seems to break the compiler somehow
+//		printline self // its making it do different behaviour. perhaps... refcounting?
+
+
+function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space, |message| arg)
 	opt norefcounts
 	if f is constructor
-		require f.returnsobject
-	|| Src = f.SourceArg!
+		require f.ReturnsObject
 	|| d = r_z.MsgDecl
 		(d is CompilerCreated)
 	|| Used = d and (d is readfrom or setto)
 		
-	src.StartUsingAfter
+	arg.StartUsingAfter
 	if !used
 		r_z.Remove
 	  elseif d isnt setto
 		r_z.NotNilRZ(f.ReturnType!, space)
 
-	ifn (src.blocks is return) or (src.last istmp "return")
-		|| last = Src.FlatLast
+	if !arg.returns
+		|| last = arg.FlatLast
 		using last
-		|| ret = src.AddReturn
+		|| ret = arg.AddReturn
 		f.ReturnedVars++
 		if used
 			ret.msg(@thg, "rz").obj = d
 		  else
-			ret <~ f.ReturnType!.CreateDefault(src)
+			ret <~ f.ReturnType!.CreateDefault(arg)
 
 
 function Tran_Result (|SCFunction| f, |message|)
@@ -1025,6 +1031,5 @@ function Tran_Time (TranFunc)
 		node.next = `|date| _StartTime` ~ parse
 
 	node.func = @sheb
-
 
 

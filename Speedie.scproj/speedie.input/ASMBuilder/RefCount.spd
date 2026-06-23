@@ -10,6 +10,15 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	if A iz B
 		return nil // wat?
 	
+	(A isnt const)	// shouldn't be necessary...
+					// I understand that it might be const at the time
+					// but is it really a const... if it got set but could change?
+					// const just means "we definitely know that it IS a certain value, at this time"
+					// but it won't be that value... after we change it.
+					// so it seems it should always be cleared... unless its set by a const instruction
+					// wheres the best place to clear it, though.
+					// in fatasm.dest? what about div? it sets two registers... (But doesnt really)
+					
 	if A isnt ContainsAddr
 		if B is ContainsAddr
 			|| offset = 0
@@ -85,6 +94,7 @@ function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)
 	opt	NoRefCounts
 	
+//	if "MacroNew".trap
 	if fn == compiler.RefClear
 		return .RefCountClear(exp, prms)
 

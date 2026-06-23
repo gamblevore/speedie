@@ -186,7 +186,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
 			
-		if  fn isnt CantInline  and  fn isnt cpp
+		if  fn isnt NoInline
 			|| DepthOK = .DepthOK(fn)
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
@@ -199,8 +199,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction function
 		|| f = exp.first!
 		TableID = .µ(f).Reg
 		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
-
-	if (fn == "App_abc_Constructor")
 	
 	dest = .CallFunc(exp, dest, fn)
 	(dest isnt Const)								// why would it be?

@@ -18,7 +18,7 @@ function ElseSub (|message?| other, |asmreg|)
 		debugger
 	rz = ASMType.Argument(self, other)
 	// .NextBasicBlock // Will be done by the caller (IfSub)
-  
+
 
 
 function IfSub (fn_asm)
@@ -28,7 +28,6 @@ function IfSub (fn_asm)
 	|| Other = arg1.next
 	
 	|FATRange| B
-	debugat 0
 	.Branch(cond, B)
 	if b.Never
 		return .ElseSub(other)								// if k0 {b()} else {return}
