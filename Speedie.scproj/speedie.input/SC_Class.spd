@@ -868,7 +868,7 @@ function message.HasSelfAsFirst (|bool|)
 function SCNode.ReachedName (|string|)
 	|| c = .MyReacher
 	rz = "    via: " + .name
-	if c.class == SCNode
+	if c and c.class == SCNode
 		rz += " (visible func)"
 
 

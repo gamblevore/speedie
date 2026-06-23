@@ -231,7 +231,7 @@ class Memory
 		autogen  Test		(|!&nil| p, |int| n, |int| Mode=0, |ErrorInt|): cpp_wrapper JB_TestMemory
 		inline   Readable	(|!&nil| p, |int| n, |ErrorInt|):			return .Test(p|&nil|, n)
 		inline   Writeable	(|!&nil| p, |int| n, |ErrorInt|):			return .Test(p|&nil|, n, 3)
-		inline   Test		(|object!| p, |ErrorInt|):					return .Test(p|&nil|, -1)
+		inline   TestObject	(|object!| p, |ErrorInt|):					return .Test(p|&nil|, -1)
 
 		libinternal _Free (|?&nil| b):									cpp_wrapper free
 	

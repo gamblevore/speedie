@@ -17,7 +17,6 @@ class Object
 		cpp_wrapper JB_Obj_Render
 
 	function Class (|&ClassData|)
-		nil checker
 		cpp_wrapper JB_Obj_Class
 
 	autogen ClassBehaviours (|&byte|)

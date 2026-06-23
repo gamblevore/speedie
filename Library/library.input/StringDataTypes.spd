@@ -98,7 +98,10 @@ datatype cstring
 	
 	inline Wrap (|string|)
 		return string.new(self)
-
+		
+	function StrCmp (|cstring| other, |int|)
+		cpp_wrapper strcmp
+	
 	function FileName (|cstring|)
 		|| c = self|&byte|
 		|| b = c

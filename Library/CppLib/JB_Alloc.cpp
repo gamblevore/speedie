@@ -512,10 +512,8 @@ uint JB_Obj_ID ( JB_Object* Obj ) {
 
 
 JB_Class* JB_Obj_Class (JB_Object* Obj) {
-	auto L = JB_Obj_Layer(Obj);
-	if_usual (L) // whatever
-		return L->Class;
-	return 0;
+	auto L = ObjBlock_(Obj);
+	return L->Owner->Class;
 }
 
   
