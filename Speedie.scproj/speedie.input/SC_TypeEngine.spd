@@ -323,7 +323,7 @@ function TypeOfSString (ExprResolver)
 	return TypeStringZero!.TypeReal
 
 
-|dictionary of scdecl| CodePointTable
+|{scdecl}| CodePointTable
 function TypeOfChar (ExprResolver)
 	|ind| cp
 	|| IsByte = exp.name == 1

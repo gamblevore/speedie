@@ -166,7 +166,7 @@ dispatch ClassOrModuleLinkage (TranFunc)
 // Now we have a numeric reduction... how to disable it nicely?
 // We need a test function
 
-function SCNode.ProcessLinkage (|message| node,  |dictionary of tranfunc| Table,  |bool| Strict,  |SCNode|)
+function SCNode.ProcessLinkage (|message| node,  |{tranfunc}| Table,  |bool| Strict,  |SCNode|)
 	opt norefcounts
 	|| fn = .owningfunc
 	for ch in node

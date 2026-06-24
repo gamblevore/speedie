@@ -155,7 +155,7 @@ class FileRow (ListViewRow)
 
 	libinternal ReloadFiles (|file| dir, |fileviewer|o)
 		|| excl = o.excludes
-		|dictionary of filerow| found = dictionary()
+		|{filerow}| found = dictionary()
 		for s in self
 			found[s.name] = s
 

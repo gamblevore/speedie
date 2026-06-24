@@ -92,13 +92,13 @@ class Dictionary
 	
 	
 	module
-		function Reverse (|dictionary of string| Dict, |dictionary of string|)
+		function Reverse (|{string}| Dict, |{string}|)
 			cpp_name JB_Dict__Reverse
 			rz = dictionary()
 			for (value in Dict) (key)
 				rz[value] = key
 
-		function Copy (|dictionary of string| Dict, |dictionary of string|)
+		function Copy (|{string}| Dict, |{string}|)
 			cpp_name JB_Dict__Copy
 			rz = dictionary()
 			for (value in Dict) (key)
@@ -139,13 +139,13 @@ class DictionaryReader
 
 
 
-function String.ReplaceAll (|dictionary of string| Dict, |ErrorReceiver| Rec=StdErr, |string|)
+function String.ReplaceAll (|{string}| Dict, |ErrorReceiver| Rec=StdErr, |string|)
 	cpp_wrapper JB_Str_MultiReplaceAll
 
-function SetDecodeEntities (|dictionary of string|Dict, |bool| Value)
+function SetDecodeEntities (|{string}|Dict, |bool| Value)
 	cpp_wrapper JB_MSR_DecodeEntitySet
 
-function SetEscapeCode (|dictionary of string| Dict, |bool| Value)
+function SetEscapeCode (|{string}| Dict, |bool| Value)
 	cpp_wrapper JB_MSR_EscapeCodeSet
 
 

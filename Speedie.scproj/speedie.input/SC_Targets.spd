@@ -5,7 +5,7 @@
 
 
 module SC_Targets
-	|dictionary of string| Items = dictionary()
+	|{string}| Items = dictionary()
 	syntax Access (|string| name, |bool|)
 		opt norefcounts
 		return .items.valuelower(name).yes

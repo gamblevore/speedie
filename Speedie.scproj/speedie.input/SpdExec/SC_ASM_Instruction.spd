@@ -49,7 +49,7 @@ class Instruction
 			//.NoExpect // shouldnt have removed this?
 
 	module
-		|dictionary of instruction|			OpDict = dictionary()
+		|{instruction}|						OpDict = dictionary()
 		|instruction[256]|					TypeList
 
 		syntax access (|message| m, |instruction|)

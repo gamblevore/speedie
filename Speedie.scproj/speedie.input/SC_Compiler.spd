@@ -63,12 +63,12 @@ linkage
 |scfunction|				MainFunc
 |message|					ConfMsg
 |dictionary|				InsecureWords
-|dictionary of scdecl|		Numbers = dictionary()
-|[message]| 				TodoList
+|{scdecl}|					Numbers = dictionary()
+|[message]|					TodoList
 
-|Dictionary of SCFile|		Files = nil
+|{SCFile}|					Files = nil
 |[SCImport]|				ImportedList
-|Dictionary of SCImport|	ImportedNames = Dictionary.new
+|{SCImport}|				ImportedNames = Dictionary.new
 
 |Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, AppInitSub_()}`~parse).WipePos
 |Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
@@ -81,9 +81,9 @@ linkage
 |[SCFunction]|				ProtoTypes
 |[scdecl]|					ActualSyxes
 
-|Dictionary of scobject|	ExportNames = Dictionary()
-|Dictionary of scdecl|		ExportGlobs = Dictionary()
-|dictionary of dictionary of macro|	AdjDicts = Dictionary()
+|{scobject}|				ExportNames = Dictionary()
+|{scdecl}|					ExportGlobs = Dictionary()
+|{{macro}}|					AdjDicts = Dictionary()
 
 |SCFunction|				RefIncr
 |SCFunction|				RefIncr2

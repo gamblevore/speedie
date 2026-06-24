@@ -854,7 +854,7 @@ Message is also:
 				fs <~ "Missing "
 				fs <~ s.longName
 			  else
-				fs <~ "Missing syntax"
+				/fs <~ "Missing syntax"
 			fs.MsgErrorName(name)
 			found = self
 

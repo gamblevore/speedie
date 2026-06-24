@@ -17,7 +17,7 @@ class SCImport
 	|[SCFile]|				Files
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
-	|dictionary of file|	Resources
+	|{file}|				Resources
 	
 
 	constructor ( |File?| F, |bool| Builtin )

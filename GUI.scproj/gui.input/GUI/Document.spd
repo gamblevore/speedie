@@ -290,7 +290,7 @@ class Document (list)
 
 	
 	module
-		|dictionary of cachedpath| Cache_ = dictionary()
+		|{cachedpath}| Cache_ = dictionary()
 		
 		function New (|string| path, |document|)
 			cpp_part NewShared

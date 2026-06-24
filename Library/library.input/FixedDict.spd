@@ -143,7 +143,7 @@ class FixedDict
 	module
 		libinternal TimeTest (|[string]| items)
 			|fixeddict of string|  fd = fixeddict()
-			|dictionary of string| ed = dictionary()
+			|{string}| ed = dictionary()
 			|| n = 4
 			
 			printline

@@ -131,7 +131,7 @@ struct ObjectLoader {
 			dict[name.name] = result
 
 
-	function LoadForReal (|message| root, |dictionary of saveable| d)
+	function LoadForReal (|message| root, |{saveable}| d)
 		opt norefcounts
 		.Dict = d
 		for (Cls in root)
@@ -161,7 +161,7 @@ struct ObjectLoader {
 	
 	
 	module
-		|dictionary of int64| ClassList
+		|{int64}| ClassList
 		
 		function LoadOne (SaverLoadClass)
 			|| name = string.new(cls.name).lowercase
@@ -200,7 +200,7 @@ function Message.RestoreLoad (|Object|)
 	|ObjectLoader| L = nil
 	require L.VerifyFormat(self)
 
-	|dictionary of saveable| objs = dictionary.new
+	|{saveable}| objs = dictionary.new
 	L.Preload(self, objs)
 	if StdErr.ok
 		L.LoadForReal(self, objs)

@@ -76,7 +76,7 @@ libinternal CompareError (|Message?| expected, |Message?| found, |bool|)
 libinternal EntityTest (|string|)
 	|| replicate	= `\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) `
 
-	|dictionary of string| repl = dictionary.new
+	|{string}| repl = dictionary.new
 	repl["\\n"] = "\n"
 	SetDecodeEntities(repl, true)
 	SetEscapeCode(repl, true)

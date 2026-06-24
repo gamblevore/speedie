@@ -93,7 +93,7 @@ class µForm
 	
 
 	module
-		|dictionary of µForm|				Forms = dictionary()
+		|{µForm}|				Forms = dictionary()
 		|int| Count
 		function NeedForm (|string| Form, |message| m=nil, |µform|)
 			opt norefcounts

@@ -1,7 +1,7 @@
 
 
 module TextAssembler
-	|dictionary of uint64|			Labels
+	|{uint64}|			Labels
 		
 	
 	function TextFunc (|message| msg, |bool|) // assemble a function from text

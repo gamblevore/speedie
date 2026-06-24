@@ -115,7 +115,7 @@ function InitComp (|string| name_)
 
 
 module {
-	|Dictionary of SCOperator|			Dict = dictionary()
+	|{SCOperator}|						Dict = dictionary()
 	|int|								CustomOperatorScore
 	|scoperator|						Assigns
 	|scoperator|						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!

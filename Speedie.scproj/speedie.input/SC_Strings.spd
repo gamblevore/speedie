@@ -464,9 +464,9 @@ function Create_JeeboxTest (|Message| msg)
 
 module StringCorrector
 	linkage: cpp_Part Crkt
-	|dictionary of MessageID| 		Table2 = dictionary()
-	|array of messageid|			CppStrings
-	|int| 							TotalSize
+	|{MessageID}|			Table2 = dictionary()
+	|[messageid]|			CppStrings
+	|int|					TotalSize
 
 	function Count (|int|)
 		return .CppStrings.Length
@@ -498,7 +498,7 @@ module StringCorrector
 		return true
 
 		
-	function MergeTable (|message| disk, |dictionary of message| D3)
+	function MergeTable (|message| disk, |{message}| D3)
 		opt norefcounts
 		visible
 		|| NextID = 0

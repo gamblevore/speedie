@@ -1346,7 +1346,7 @@ module Parser
 	|fnIDGenerator?|		Splitter		// = &parser.range // mostly unused really right now.
 	visible false
 	|message|				_EndOfLineMarker
-	|dictionary of string|	_ErrorNames = nil
+	|{string}|	_ErrorNames = nil
 	|uint16|				_StopBars
 	|ErrorFlags|			_ErrorFlags
 	|bool|					_DotInsertAllow

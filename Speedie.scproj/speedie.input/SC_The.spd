@@ -38,7 +38,7 @@ module SCThe
 		return compiler.program
 
 
-function compiler.Adj (|message| f, |dictionary of macro|)
+function compiler.Adj (|message| f, |{macro}|)
 	opt norefcounts
 	|| d = compiler.AdjDicts
 	if f == @thg

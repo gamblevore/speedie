@@ -20,7 +20,7 @@ module SC_Errors
 40 - 47: black, red, green, yellow, blue, magenta, cyan, and white background
 */	
 
-	|dictionary of error| IgnoredBranches = dictionary.new
+	|{error}| IgnoredBranches = dictionary.new
 
 	function AlreadyIgnored (|Message| F, |scfunction| fn, |error|)
 		opt norefcounts

@@ -1838,14 +1838,17 @@ function message.InDecl (|bool|)
 
 function message.NeedsPreprocess (|bool|)
 	opt norefcounts
-	if self == @TRel
+	|| fn = .func
+	if fn == @TRel
 		return true
-	if self IsARel "$"
+	if fn == @arel and self == "$"
 		return !.InDecl
-	if self == @tmp
-		return .name == "using" or "expect" or "require" or "debug_require" or "warn" or "error" or "check" or "loop"
+	if fn == @tmp
+		if .name == "using" or "expect" or "require" or "debug_require" or "warn" or "error" or "check" or "loop"
+			|| p = .parent
+			return !(p in @decl or @type)
 
-	require (self == @rel)
+	require (fn == @rel)
 	|| L = .first
 	if (L == @rel) and (L.next == "or")
 		return (L.second == "=") and (.last.second == "=")

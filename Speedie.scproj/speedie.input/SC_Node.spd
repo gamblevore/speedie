@@ -856,17 +856,17 @@ function CreateNameDict (|Message| FuncName, |[message]| NameList) {
 
 	|| Name = FuncName.Name
 
-	|| DclSrc = "|dictionary of $AllSameType| ${Name}_Dict = nil"
+	|| DclSrc = "|{$AllSameType}| ${Name}_Dict = nil"
 	|| DclMsg = DclSrc.ParseClean
 		DclMsg.CollectAGlobalDecl(.module)
 
 	|| fs = FastString.new
 
 	fs <~ "
-function $name (|dictionary of $AllSameType|)
+function $name (|{$AllSameType}|)
 	visible false
 	opt norefcounts
-	|| T_ = .${name}_Dict 
+	|| T_ = .${name}_Dict
 	if T_
 		return T_
 	T_ = dictionary.new

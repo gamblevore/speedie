@@ -327,7 +327,7 @@ class FileViewer (ListView)
 		
 		if rz
 			rz.sort(FileRowScoreSorter)
-			|dictionary of filerow| D = dictionary.new
+			|{filerow}| D = dictionary.new
 			for f in rz
 				f.samenameasprev = false
 				|| old = D[f.name]

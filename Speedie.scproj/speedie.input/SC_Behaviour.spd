@@ -7,7 +7,7 @@
 
 class SCBehaviour (SCNode)
 	|SCModule?|							FuncTable
-	|dictionary of SCModule|			Interfaces
+	|{SCModule}|						Interfaces
 	|[SCFunction]|						WrapperFuncs	
 	
 	
