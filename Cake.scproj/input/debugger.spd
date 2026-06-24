@@ -1,20 +1,20 @@
 
 
 module debugger
-	|uint|						StackOverDepth
-	|bool|						OverFlowTrack
-	|bool|						WantDebug
-	|bool|						BreakMapBad
-	|message|					PackInfo
-	|Message|					Globs
-	|[FileWithData]|			FileList
-	|Dictionary of filewithdata| FileMap
-	|string|					CodeToSrcStr
-	|string|					SrcToCodeStr
-	|string|					InbuiltBreaks
-	|&cakestack?|				StackTrap
-	|faststring|				VariablePrinter
-	|faststring|				ErrorPrinter
+	|uint|					StackOverDepth
+	|bool|					OverFlowTrack
+	|bool|					WantDebug
+	|bool|					BreakMapBad
+	|message|				PackInfo
+	|Message|				Globs
+	|[FileWithData]|		FileList
+	|{FileWithData}|		FileMap
+	|string|				CodeToSrcStr
+	|string|				SrcToCodeStr
+	|string|				InbuiltBreaks
+	|&cakestack?|			StackTrap
+	|faststring|			VariablePrinter
+	|faststring|			ErrorPrinter
 	
 	constants
 		BreakRealBit		= 1<<30
@@ -149,8 +149,7 @@ module debugger
 			// but we don't want to clear breaks the user DID set in other funcs
 					ifn CakeBreak[i]&BreakReqBit
 						.SetUserBreak(CakeBreak, i, ClearRealKeepUser, N)
-				
-
+		
 		while Lowest <= Highest
 			|| loc = Locations[lowest]
 				if loc out CurrFunc

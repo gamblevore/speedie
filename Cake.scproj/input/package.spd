@@ -2,7 +2,7 @@
 
 module CakeRun
 	linkage: cpp_part Pack
-	|dictionary of object| ClassTable = dictionary()
+	|{object}| ClassTable = dictionary()
 	
 	constants
 		FuncIsLib = 1
