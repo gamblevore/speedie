@@ -41571,16 +41571,20 @@ Message* SC_Msg_NeedMarker(Message* Self, JB_String* S, bool B) {
 }
 
 bool SC_Msg_NeedsPreprocess(Message* Self) {
-	if (JB_Msg_EqualsSyx(Self, kJB_SyxTRel)) {
+	Syntax Fn = Self->Func;
+	if (Fn == kJB_SyxTRel) {
 		return true;
 	}
-	if (SC_Msg_OperatorIsARel(Self, JB_LUB[491])) {
+	if ((Fn == kJB_SyxARel) and (JB_Msg_SyntaxEquals(Self, JB_LUB[491], false))) {
 		return (!SC_Msg_InDecl(Self));
 	}
-	if (JB_Msg_EqualsSyx(Self, kJB_SyxTmp)) {
-		return (JB_Str_Equals(Self->Name, JB_LUB[492], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[493], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[494], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[495], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[496], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[497], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[498], false)) or (JB_Str_Equals(Self->Name, JB_LUB[499], false))))))));
+	if (Fn == kJB_SyxTmp) {
+		if ((JB_Str_Equals(Self->Name, JB_LUB[492], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[493], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[494], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[495], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[496], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[497], false)) or ((JB_Str_Equals(Self->Name, JB_LUB[498], false)) or (JB_Str_Equals(Self->Name, JB_LUB[499], false))))))))) {
+			Message* P = ((Message*)JB_Ring_Parent(Self));
+			return (!(JB_Msg_OperatorIn(P, kJB_SyxDecl) or JB_Msg_OperatorIn(P, kJB_SyxType)));
+		}
 	}
-	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxRel))) {
+	if (Fn != kJB_SyxRel) {
 		return nil;
 	}
 	Message* L = ((Message*)JB_Ring_First(Self));
@@ -43052,6 +43056,7 @@ Message* JB_Msg_CantFind(Message* Self, Syntax S, JB_String* Name, Message* Foun
 			JB_FS_AppendString(Fs, JB_Syx_LongName(S));
 		}
 		 else {
+			JB_DoAt(1);
 			JB_FS_AppendString(Fs, JB_LUB[749]);
 		}
 		JB_FS_MsgErrorName(Fs, Name);
@@ -60943,4 +60948,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1395685893321791503 8541332425629425499
+// 1395685893321791503 -9008376782172371027
