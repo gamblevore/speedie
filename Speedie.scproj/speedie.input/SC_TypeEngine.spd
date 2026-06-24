@@ -595,19 +595,22 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		return Compiler.FindClassType( c )
 		
 
+	|| ch = c.first
+	if !ch
+		if (f == @arr)
+			Return TypeArray!.TypeNormal
+		if (f == @arg)
+			Return TypeDictionary!.TypeNormal
+
 	rz = SCDecl(TypeVoid_!)
 	|| ErrCount = stderr.ErrorCount
 
 	if (f == @arr)
-		|| ch = c.first
-		if !ch														// |[]|
-			Return TypeArray!.TypeNormal
-		
-		expect (ch != @Item) (c)
-		|| dcl = ExtractDecl( ch, name_space, purpose, depth )
-			rz.Contains = dcl.MakeContainedOptional
-			rz.Type = TypeArray!
-		
+		require ExtractContainer(c, name_space, purpose, depth, rz)
+		rz.Type = TypeArray!
+	  elseif (f == @arg)
+		require ExtractContainer(c, name_space, purpose, depth, rz)
+		rz.Type = TypeDictionary!
 	  elseif (f == @Adj)
 		problem (c, "Use 'of' instead.")
 		rz.LoadContained(c.first!, c.last!, name_Space, purpose)		#require
@@ -625,6 +628,19 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 	if (ErrCount != StdErr.errorCount)
 		rz = nil
 
+
+
+function ExtractContainer (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth, |scdecl| input, |bool|)
+	opt norefcounts
+	|| ch = c.first!
+	|| fn = ch.func
+	expect (fn != @Item) (c)
+	require ch.ExpectLast
+	if fn == @tmp
+		ch.func = @thg
+	|| dcl = ExtractDecl( ch, name_space, purpose, depth )
+		input.Contains = dcl.MakeContainedOptional
+		return true
 
 
 //function SCDecl.MakeStatic (|Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
