@@ -73,9 +73,11 @@ class XVar (list)
 		if (!Ptr and (self is canbenil)) or (Ptr >= 64K)
 			return true
 
-		fs <~ "0x"
-		fs.AppendHex(Ptr)
-		fs <~ "!"
+		if !ptr
+			fs <~ "nil"
+		  else
+			fs <~ "0x"
+			fs.AppendHex(Ptr)
 	
 	
 	function Type (|xtype|)
@@ -283,7 +285,7 @@ class XVar (list)
 		require .NilOK(fs, reg)
 		|| obj = reg|&object|[]
 		if !obj
-			fs <~ "(nil)"
+			fs <~ "nil"
 			return true
 		
 		require fs.TestObj(obj)									// check object is readable and sane
@@ -411,7 +413,7 @@ class XVar (list)
 			require .NilOK(fs, reg)
 			|| Ptr = Reg|&&nil|[]|int64|
 			if !ptr
-				fs <~ "(nil)"
+				fs <~ "nil"
 				return true
 			fs <~ "0x"
 			fs.AppendHex(ptr, 2)

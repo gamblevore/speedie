@@ -610,7 +610,7 @@ class TextView (GUIControl)
 		for p in ._lines
 			|| s = p.next
 			if p.insane(s)
-/				return
+				return
 			p = s
 	}
 
@@ -811,9 +811,9 @@ class TextView (GUIControl)
 
 		if key is left:				return .MoveSel(-1)
 		if key is BACKTICK or MacBackTick
-			if keys.Option or keys.Ctrl or keys.cmd
-				return .sectionkey
-		if key is section:			return .SectionKey
+			if (keys.Option or keys.Ctrl or keys.cmd)
+				return .CmmKey
+		if key is section:			return .CmmKey
 		if key is right:			return .MoveSel(1)
 		if key is pageup:			return .MoveSelLine(-1, 1)
 		if key is pagedown:			return .MoveSelLine( 1, 1)
@@ -833,7 +833,7 @@ class TextView (GUIControl)
 		return true
 	
 	
-	libinternal SectionKey (|bool|)
+	libinternal CmmKey (|bool|)
 		return (.onclicked)(self, -1)?
 	
 		
@@ -1482,7 +1482,7 @@ class TextView (GUIControl)
 	
 
 	libinternal Typed (|string| s, |int|)
-		debug_require self is editable
+		require self is editable
 		GUI.ShowCursor(false)
 		
 		if (s == 1) and .TypedACounterPart(s[])

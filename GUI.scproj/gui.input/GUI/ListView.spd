@@ -159,8 +159,7 @@ class ListView (GUIControl) {
 	function PressReturnKey (|bool|)
 		opt norefcounts
 		|| r = .OnReturn
-			(r)(self, .FirstSelected)
-			return true
+			return (r)(self, .FirstSelected)
 		
 	
 	function Clear
@@ -372,7 +371,9 @@ class ListView (GUIControl) {
 			return true
 
 		if key.IsAccept
-			return .PressReturnKey
+			if !.PressReturnKey
+				.EditCell
+			return true
 		
 		if key.iscancel
 			if .DraggingRowFrom
@@ -387,6 +388,8 @@ class ListView (GUIControl) {
 		if key.IsCmm
 			if .OnRightClick
 				.menuforselrow
+			  else
+				.EditCell
 			return true
 			
 		if key iscmd keys.A

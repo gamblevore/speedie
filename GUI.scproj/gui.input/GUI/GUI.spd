@@ -31,6 +31,7 @@ module GUI
 	|float|						Scale
 	|bool|						MouseMoveInited
 	|bool|						StartedProperly
+	|bool|						BlockTextInput
 	|date|						ForeGroundTime
 	|bool|						FlashSelector
 	|GUIActivity|				QuitReason
@@ -896,6 +897,7 @@ module GUI
 		notifications.CheckForDisappear
 		rz |= .ActualEvents
 		.DuringAction = 0
+		.BlockTextInput = false
 
 
 	libinternal CheckQuarantine
@@ -1293,7 +1295,7 @@ module GUI
 
 	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!textinput!
-		if .AllowTyping and .CanDrag <= mousedragging.Handled
+		if .AllowTyping and !.BlockTextInput and (.CanDrag <= mousedragging.Handled)
 			|| e = ev.Editing.str
 			if w.__TypedString__(e)
 				rz = GUIActivity.activity
@@ -1320,6 +1322,7 @@ module GUI
 
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return GUIActivity.nothing
+		
 		if .CanDrag >= mousedragging.Within
 			return GUIActivity.nothing
 
@@ -1339,9 +1342,8 @@ module GUI
 			return GUIActivity.nothing
 		
 		if (key isnt escape) or key.IsFirstFrame
-			if .StandardKeys(key)
-				return GUIActivity.activity
-			if w.__keydown__(key)
+			if .StandardKeys(key) or w.__keydown__(key)
+				.BlockTextInput = true
 				return GUIActivity.activity
 		
 		if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)

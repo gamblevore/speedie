@@ -278,13 +278,14 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 function ClickedStack (GUIListEvent)
 	opt norefcounts
 	if row
-		.ide.UpdateCodePointer(row, false)
+		return .ide.UpdateCodePointer(row, false)
 	return true
 
 
-function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active)
+function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active, |bool|)
 	opt norefcounts
 	|| path = row.firstname$
+	require path[] == '/'
 	require .EditPath(path, false)
 	
 	|| Where = row[1].int
@@ -297,6 +298,7 @@ function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active)
 	|| Line = .editme.Show(where)
 	if Active
 		.editme.Doexplode(Line)
+	return true
 	
 	
 function PerryIDE.DebugMode (|CompileMode|)

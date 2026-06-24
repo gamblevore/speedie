@@ -207,8 +207,16 @@ function message.IsSameItem (|message| row, |int| Depth, |bool|)
 		return .NameCheck(row, index)
 
 
+function listviewrow.BadVar
+	opt norefcounts
+	Notifications <~ "Something wrong with var: " + .name
+
+
 function listviewrow.CopyNames (|listviewrow| Row)
 	opt norefcounts
+	if self isnt error and row is error
+		row.badvar
+	
 	(self is error) = (row is Error)
 	.name = row.name
 	self = .first
@@ -231,18 +239,21 @@ function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
 		
 	
 
-function listviewrow.ReStitchAndFixup (|message| NewList, |int| Depth)
+function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
 	opt norefcounts
 	|| O = .last
 	while (|| N = NewList.Last)
-		if !o
-			.first = n
-		  elseif !o.IsSameItem(n, Depth)
-			o.next = n
-		  else
+		if o and o.IsSameItem(n, Depth)
 			o.CopyDebugData(n, Depth+1)
 			n.remove
 			o--
+		  else
+			if o
+				o.next = n
+			  else
+				.first = n
+			if n is error
+				n.badvar
 
 	o.RemoveBefore
 	o.remove
@@ -285,7 +296,6 @@ function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	{
 		|| Last = .Last
 		|| bad = (Last == @thg and "bad")
-			Notifications <~ "Something wrong with var: " + dbname
 		(self is error) = bad
 		if (!bad and CanHide and dbname[] == '_')
 			.Remove
@@ -330,13 +340,6 @@ function message.PerryAppendMsg (|string| s, |int| Item)
 	|| ch = self[item]
 		v <~ ch.name
 
-
-function listviewrow.PerryCopyVar (|string|)
-	opt norefcounts
-	.PerryAppendMsg("|",	2)
-	.PerryAppendMsg("| ",	4)
-	.PerryAppendMsg(" = ",	3)
-	return VarPrinter
 }
 
 
@@ -345,7 +348,7 @@ function @perry.VariableFinder (listview.columnfinder)
 	|| upon = self
 	if Column
 		if column == -2
-			return .PerryCopyVar
+			return .name
 		if column != -1
 			upon = self[3]
 	if value == nil
