@@ -1,21 +1,20 @@
 
 
 module debugger
-	|message|			PackInfo
-	|Message|			Globs
-	|[FileWithData]|	FileList
+	|uint|						StackOverDepth
+	|bool|						OverFlowTrack
+	|bool|						WantDebug
+	|bool|						BreakMapBad
+	|message|					PackInfo
+	|Message|					Globs
+	|[FileWithData]|			FileList
 	|Dictionary of filewithdata| FileMap
-//	|{filewithdata}|	FileMap // ideal
-	|string|			CodeToSrcStr
-	|string|			SrcToCodeStr
-	|string|			InbuiltBreaks
-	|&cakestack?|		StackTrap
-	|uint|				StackOverDepth
-	|bool|				OverFlowTrack
-	|bool|				WantDebug
-	|bool|				BreakMapBad
-	|faststring|		VariablePrinter
-	|faststring|		ErrorPrinter
+	|string|					CodeToSrcStr
+	|string|					SrcToCodeStr
+	|string|					InbuiltBreaks
+	|&cakestack?|				StackTrap
+	|faststring|				VariablePrinter
+	|faststring|				ErrorPrinter
 	
 	constants
 		BreakRealBit		= 1<<30
@@ -78,6 +77,7 @@ module debugger
 	
 	
 	function DebugList (|string?| name=nil)
+		(name)
 		target debug {
 		name ?= "breaks"
 		|| CakeBreak = cake.ActiveBreaks!
