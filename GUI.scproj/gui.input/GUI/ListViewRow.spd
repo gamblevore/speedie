@@ -31,8 +31,8 @@ role ListViewRow (message)
 		|| t = .tag
 		|| t2 = (t &~ s) ||| (s*b)
 		if t2 != t
-			gui.touch
 			.tag = t2
+			gui.touch
 
 
 	libinternal NotDeclutteredCell (|int| i, |bool|)

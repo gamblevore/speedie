@@ -67,7 +67,7 @@ Message is also:
 		description "Default message constructor function. Intended for general-use"
 		opt norefcounts
 		super.constructor(Parent)
-		if !name
+		if name==nil
 			name = ""
 		.name		= name
 		.Position	= parser.using.Position

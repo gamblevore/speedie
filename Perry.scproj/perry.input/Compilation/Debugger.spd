@@ -207,8 +207,9 @@ function message.IsSameItem (|message| row, |int| Depth, |bool|)
 		return .NameCheck(row, index)
 
 
-function message.CopyNames (|message| Row)
+function listviewrow.CopyNames (|listviewrow| Row)
 	opt norefcounts
+	(self is error) = (row is Error)
 	.name = row.name
 	self = .first
 	row = row.first
@@ -221,16 +222,16 @@ function message.CopyNames (|message| Row)
 		.Remove
 
 
-function message.CopyDebugData (|message| InputRow, |int| Depth)
+function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
 	opt norefcounts
 	.CopyNames(Inputrow)
 	|| InputArg = InputRow.last
 	if InputArg == @arg
-		.givearg.ReStitchAndFixup(InputArg, Depth)
+		.givearg|listviewrow|.ReStitchAndFixup(InputArg, Depth)
 		
 	
 
-function message.ReStitchAndFixup (|message| NewList, |int| Depth)
+function listviewrow.ReStitchAndFixup (|message| NewList, |int| Depth)
 	opt norefcounts
 	|| O = .last
 	while (|| N = NewList.Last)
@@ -400,7 +401,7 @@ function perryide.ReloadBreaks
 function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
-/	|| arg = stack.last$
+	|| arg = stack.last$
 	.appinfo.obj = stack.first			// Nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
 	
