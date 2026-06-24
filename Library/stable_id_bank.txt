@@ -258,7 +258,6 @@ GUI_Key_Name
 GUI_Key_Number
 GUI_Key_OperatorIsCmd
 GUI_Key_SyntaxAccess
-GUI_Key_SyntaxIs
 GUI_Key__Cancel
 GUI_Key__Cmd
 GUI_Key__CmdAgo
@@ -315,7 +314,7 @@ GUI_LV_Select
 GUI_LV_SelectAdd
 GUI_LV_SelectAll
 GUI_LV_SelectAtLeastFirst
-GUI_LV_SelectFirst
+GUI_LV_SelectEdge
 GUI_LV_SelectMove
 GUI_LV_SelectNone
 GUI_LV_SelectShift
@@ -427,9 +426,6 @@ GUI_SC__Build
 GUI_SC__Horz
 GUI_SC__Vert
 GUI_SDL_Cursor__Empty
-GUI_SDL_KeyboardEvent_Key
-GUI_SDL_KeyboardEvent_Scan
-GUI_SDL_KeyboardEvent_SyntaxIs
 GUI_SDL_TextEditingEvent_Render
 GUI_SDL_TextEditingEvent_Str
 GUI_SDL_Texture_Destructor
@@ -2083,5 +2079,5 @@ puts
 roundf
 sqrt
 sqrtf
-strlen
 strcmp
+strlen
