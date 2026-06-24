@@ -989,12 +989,16 @@ class ListView (GUIControl) {
 		return .selectshift(.liststart, .listend)
 
 
-	function SelectFirst (|listviewselectmode| mode = listviewselectmode.normal, |bool|)
-		opt norefcounts
-		
-		.select(.edge(-1), mode)
-		return true
+	inline SelectFirst (|ListViewSelectMode| Mode = ListViewSelectMode.normal, |bool|)
+		return .SelectEdge(false, mode)
 
+	inline SelectLast (|ListViewSelectMode| Mode = ListViewSelectMode.normal, |bool|)
+		return .SelectEdge(true, mode)
+
+	function SelectEdge (|bool| Last=false, |ListViewSelectMode| Mode = ListViewSelectMode.normal, |bool|)
+		opt norefcounts
+		.select(.edge( last*2 - 1 ), mode)
+		return true
 
 	function SelectShift (|ListViewrow| l, |ListViewrow| m, |bool|)
 		opt norefcounts

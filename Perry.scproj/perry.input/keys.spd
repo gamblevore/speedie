@@ -28,71 +28,95 @@ extend PerryIDE
 		return true
 
 
+	function CanSwapToAppInfo (|bool|)
+		return (.editme.HasFocus or .stack.HasFocus) and (.debugmode is Debug and CakeMode) and .IsViewing(.debugger)		
+
+
 	function CmdKey (|keys| key, |bool|)
 		|| NumKey = key.Number
 			return .NumberKey(numkey)
+		
 		if keys.Option
 			return false
+		
 		if key is t
-			return PressingDebug(.runbutton)		
+			return PressingDebug(.runbutton)
+		
 		if key.IsAccept
 			return .ContinueProgram(0)
+		
 		if key is f
 			if .MassSearchField.hasfocus
 				|| p = .PrevView
 					p.Click
 				return .editme.OpenSearch
 			return .ShowFind
+		
 		if key is k
 			return .ClearIDE(key)
+		
 		if key is i
 			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.ascell)
 			return true
-		if key is comma
+		
+		if key is COMMA
 			return ClickedPrevNext(.goprev)
+		
 		if key is ESCAPE
 			return .CancelKey
+
+		target osx
+			if key.IsCtrl and .CanSwapToAppInfo
+				.AppInfo.SetFocus
+				return true			
+				
 		if key is period
 			if keys.shift
 				return .CancelKey
 			return ClickedPrevNext(.gonext)
+		
 		if key is b
 			Clickedcompile(.buildbutton)
 			return true
+		
 		if key is r
 			return .RunKey
+		
 		if key is o
 			if keys.shift
 				clickedopenfile(self)
 			  else
 				clickedopenproj(self)
 			return true
+		
 		if key is n
 			if keys.shift
 				clickedCreatefile(self)
 			  else
 				clickedCreateproj(self)
 			return true
-//		if key is m
-//			return .markup()
-		if key is l // l = file list
+
+		if key is l							// l = file list
 			if keys.option or keys.Shift
 				RightClickNext(.goprev)
 				return .goprev.searchmenu
 			  else
 				return .ShowQuickStuff(true)
+		
 		if key is d
 			return .ShowQuickStuff(false)
+		
 		if  key is s  and  .editme is visible
 			.SaveEditing(documentaction.saving)
 			return true
 
-		if key is NUM3 or E // e for error
+		if key is NUM3 or E					// e for error
 			return .SaveAndShowErrors
 		
 		if key is p
 			.CommandsMenu.Click
 			return true
+		
 		if key is BACKSLASH
 			.editme.AddBreak(.editme.SelRange.x)
 		

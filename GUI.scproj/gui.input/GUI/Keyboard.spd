@@ -18,12 +18,15 @@ struct SDL_KeyboardEvent
 	|SDL_Keysym|				keysym
 	
 	function Scan (|SDL_Scancode|)
+		inlined
 		return .keysym.scancode
 
 	function Key (|keys|)
+		inlined
 		return .keysym.sym
 
 	syntax is (|keys| x, |bool|)
+		inlined
 		return .key == x
 
 
@@ -32,12 +35,12 @@ struct SDL_Keysym
 	linkage
 		wrapper
 		cpp_part KS
-    |SDL_Scancode|	scancode		/**< SDL physical key code - see ::SDL_Scancode for details */
-    |keys|			sym				/**< SDL virtual key code - see ::SDL_Keycode for details */
-    |Uint16|		mod				/**< current key modifiers */
-    |Uint|			unused
+	|SDL_Scancode|	scancode		/* SDL physical key code - see ::SDL_Scancode for details */
+	|keys|			sym				/* SDL virtual key code - see ::SDL_Keycode for details */
+	|Uint16|		mod				/* current key modifiers */
+	|Uint|			unused
 
-    function Command (|bool|)
+	function Command (|bool|)
 		return .mod & (1024|||64|||128|||2048)
 	
 
@@ -69,7 +72,7 @@ dataType Keys (int)
 		if self < 128
 			return self|byte|.Render
 	
-	function Eat 
+	function Eat
 		|| r = .record
 			r.date = 0
 
@@ -124,7 +127,7 @@ dataType Keys (int)
 	function IsModifier (|bool|)
 		return (self is lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
 
-	function IsCancel (|bool|) 
+	function IsCancel (|bool|)
 		return (self is cancel_key or escape)
 
 	function IsDelete (|bool|)
@@ -154,7 +157,7 @@ dataType Keys (int)
 		disabled "Use [] to test keydown. Use != 0 to test key is real"
 
 	syntax is (|keys| x, |bool|)
-		// need an automatic inline...
+		inlined
 		return self == x
 	
 	module
@@ -203,10 +206,10 @@ dataType Keys (int)
 		
 		
 		function Movement (|vec4| Limiter=vec4(), |vec4|)
-			rz[0] = .KeysVs(d,right,    a,left,      limiter[0])
-			rz[1] = .KeysVs(space, 0,   LCTRL,RCTRL, limiter[1])
-			rz[2] = .KeysVs(w,up,       s,down,      limiter[2])
-			rz[3] = .KeysVs(e, 0,       q,0,         limiter[3])
+			rz[0] = .KeysVs(d,right,	a,		left,	limiter[0])
+			rz[1] = .KeysVs(space, 0,	LCTRL,	RCTRL,	limiter[1])
+			rz[2] = .KeysVs(w,up,		s,		down,	limiter[2])
+			rz[3] = .KeysVs(e, 0,		q,		0,		limiter[3])
 			// can get into a wierd state where s[] or w[]
 			// get buggered and it thinks it is up when
 			// its down. Not sure why. the problem isnt here.
@@ -227,7 +230,7 @@ dataType Keys (int)
 			gui.sdl_Resetkeyboard
 
 		libinternal EmptySlot (|keys| Key, |&guikeyrecord|)
-			if key!=0
+			if key != 0
 				for i in MaxKeyRecord
 					|| r = .Record[i]
 					if r.key == 0
@@ -274,10 +277,10 @@ dataType Keys (int)
 			return .FindTwoModifiers(lctrl, rctrl)
 
 		function Cmd (|bool|)
-			if .ctrl
-				return true
 			target osx
-				return .gui
+				if .gui
+					return true
+			return .ctrl
 			
 		function CmdAgo (|date| ago, |bool|)
 			if keys.LCTRL.HeldKey(ago) or keys.RCTRL.HeldKey(ago)

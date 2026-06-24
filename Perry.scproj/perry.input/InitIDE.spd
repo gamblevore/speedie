@@ -15,7 +15,7 @@ extend PerryIDE
 		.RecentFiles 		= message()
 		.id					= "IDE"
 		.Debugger			= guicontrol(self)
-		.AppInfo			= TextView(self)
+		.AppInfo			= TextView(self, nil, PerryAppInfoKeys)
 		.DebugBtns			= guicontrol(self)
 		.Stack				= listview(self, ClickedStack, ClickedStack)
 		.SearchArea			= guicontrol(self)
@@ -336,13 +336,12 @@ extend PerryIDE
 		with .appinfo
 			is   visible
 			is   drawsfocus
-			.OnKeyDown		= PerryAppInfoKeys
 			.Alignment		= MoveCode.Center
 			.tooltip		= self.debugger.Tooltip
 			.ID				= "Application Info"
 			.size			= (the~width back 1)  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
-			.GNormal.edge = (0.5, 0.5, 0.1, 0.25).px
+			.GNormal.edge	= (0.5, 0.5, 0.1, 0.25).px
 			.GNormal.StyleDrawer = image.CurlieQueDrawer
 
 

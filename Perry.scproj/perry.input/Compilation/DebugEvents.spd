@@ -48,11 +48,17 @@ function perryide.DebugStepEvent (|bool|)
 
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
-	// Keys.movement is almost OK... but it uses ctrl for down... sigh.
+	// now what? down and up should go into the variable editor
 	|| i = .ide
 	if key is PERIOD
 		return i.MakeNothingRunning
-
+	
+	if key is up or down
+		|| st = i.stack
+		st.setfocus
+		st.Selectedge(key is up)
+		return true
+	
 	if key.IsAccept
 		if i.RunningProd
 			return i.debugstepevent

@@ -5,7 +5,7 @@ class PerryIDE (Window)
 	linkage: cpp_part IDE
 
 	|SpdProcess?|				Feedback
-	|UnixProcess?|				compilr
+	|UnixProcess?|				Compilr
 	|UnixProcess?|				RunningProd
 	|message?|					LastCakeError
 	|UnixProcess?|				Talker				// for app.say
