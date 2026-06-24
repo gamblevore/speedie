@@ -11,7 +11,7 @@ main
 	require Globals.VerifyGlobs
 	|| p = cake.perry
 		p <~ "`hoi :3`"
-	
+
 	require CakeRun.GetStructure
 	SpdTable.LinkAll
 	if debugger.LoadDebugger

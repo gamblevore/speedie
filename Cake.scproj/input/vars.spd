@@ -368,7 +368,7 @@ class XVar (list)
 		opt norefcounts
 		if .Reg
 			require fs.TestMem(Where, 16, "BadStack")		// we still need to check for readability, though!
-
+		
 		|| C = .type
 		if c and c.IsObject
 			return .RenderObject(fs, Where, RefCount)

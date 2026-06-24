@@ -32,12 +32,7 @@ function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name,
 
 
 
-function __PerryView__ (cakevm.CakeChef)
-	description "We just hit a breakpoint! (or crashed)"
-	target debug
-		|| ASMIndex = .Index(stack.code)
-	|spdprocess--| p = cake.perry!			// Perry always exists by now
-
+function cakevm.BreakOrNot (|cakestack| stack, |uint| Break, |uint|)
 	|| Mode = StepAction.curr
 		|| Deeper = stack.depth - debugger.StackOverDepth
 		if Mode is stepover
@@ -54,17 +49,28 @@ function __PerryView__ (cakevm.CakeChef)
 				if !T or (Stack > T)
 					break = 0
 
+	return break & debugger.BreakRealBit
+
+
+
+function __PerryView__ (cakevm.CakeChef)
+	description "We just hit a breakpoint! (or crashed)"
+	target debug
+		|| ASMIndex = .Index(stack.code)
 	
-	Break &= debugger.BreakRealBit
+	Break = .BreakOrNot(stack, break)
 	
-	|| NeedsRun = break
-	if NeedsRun or ErrorCode
+	
+	|spdprocess--| p = cake.perry!					// Perry always exists by now
+	if break or ErrorCode
 		debugger.RestoreBreaks
 		.SendStack(stack, p, "break", ErrorCode)
 
+	Break |= (Break!=0)								// Bit 1 = needs run
+	
 	while p.CommsOpen
-		if !ErrorCode and !Break and (p.pico.CanGet <= 0)
-			if NeedsRun
+		if !ErrorCode and Break.Runs and p.CantGet
+			if Break&1								// Needs run
 				p <~ "run"
 			return 0
 			
@@ -74,9 +80,10 @@ function __PerryView__ (cakevm.CakeChef)
 				.SendStack(stack, p, "stack", ErrorCode)
 			if Action is GoRun
 				StepAction.Curr = Action
-				Break = 0
+				Break &= ~debugger.BreakRealBit
+			p.SendErrors
 
-	app.Quit								// Stop runaways
+	app.Quit(-1)									// Stop runaways
 	
 
 
@@ -140,13 +147,15 @@ function debugger.file (|message| m, |FileWithData|)
 	.SendError("MissingFile", name, 0)
 
 
+function debugger.NeedErrors (|faststring--|)
+	opt norefcounts
+	return .ErrorPrinter init faststring()
+
+
 function debugger.SendError (|string| kind, |string?| value=nil, |int| Number=0)
 	opt norefcounts
-	|| j = .ErrorPrinter|jbin|
-	if !j
-		j = FastString()
-		.ErrorPrinter = j
-	j.Start(@tmp, "Error")
+	|| j = .NeedErrors|jbin|
+	j.Start(@tmp, "error")
 	j.AddStr(kind)
 	if value != nil
 		j.AddStr(value)
@@ -289,7 +298,7 @@ function cakevm.CheckStack (|cakestack| stack, |string?|)
 
 
 function jbin.SyntaxExpect (|string| s, |int64| Code)
-	.enter(@tmp, "Error")
+	.enter(@tmp, "error")
 	.addstr(s)
 	.AddhInt(Code)
 	.exit
@@ -412,10 +421,6 @@ function xvar.IsExpanded (|message?| xp, |message|)
 			if c_var ~= .Name
 				return c_var
 
-/*
-expansion
-	+'Main(1)' "/usr/local/speedie/Examples/hello_world.spd" \1
-*/
 
 function spdfunc.IsExpanded (|FileWithData| F, |message|)
 	opt norefcounts
@@ -428,10 +433,24 @@ function spdfunc.IsExpanded (|FileWithData| F, |message|)
 				return c
 
 
+function uint.Runs (|bool|)
+	return !(self & debugger.BreakRealBit)
+
+
+function spdprocess.CantGet (|bool|)
+	return (.pico.CanGet <= 0)
+
+
+function SpdProcess.SendErrors (|bool|)
+	|| err = StdErr.pop
+		|faststring--| e = debugger.NeedErrors
+		err.Render(e)
+		self <~ e
+
+
 /*
 	* BreakOnObjID can be done by modifying the allocation system... to only preallocate x% objs
 	  in a block... so when we run out... we already have a hit-point to check... then we restore the
 	  other objects... right? :)
 		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
 */
-

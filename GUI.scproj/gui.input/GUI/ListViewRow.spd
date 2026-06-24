@@ -29,9 +29,7 @@ role ListViewRow (message)
 
 	syntax is (|ListViewState| s, assigns:|bool| b)
 		|| t = .tag
-		|| t2 = t ||| s
-		if !b
-			t2 = t&~s
+		|| t2 = (t &~ s) ||| (s*b)
 		if t2 != t
 			gui.touch
 			.tag = t2

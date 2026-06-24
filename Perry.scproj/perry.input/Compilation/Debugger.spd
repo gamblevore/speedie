@@ -3,15 +3,10 @@
 |jbin| VarPrinter = faststring()	
 
 extend PerryIDE {
-function CakeTalk (|SpdProcess| Cake)
-	if .DelayedRun.ago > 0.5s
-		.DelayedRun = nil
-		.DebugMode &= ~compilemode.paused
-		.SetAppInfo		
-	
-	|| msg = cake.Get$							// getmsg
-	.LogOneCake(msg, "\1B ")
 
+
+function HandleCake (|message| msg)
+	opt norefcounts
 	if msg ~= "run"
 		.DelayedRun = date.now
 		.UpdateDebugButtons
@@ -24,10 +19,29 @@ function CakeTalk (|SpdProcess| Cake)
 		  elseif msg ~= "breakpoint"
 			.SetBreaks(msg)
 		  elseif msg ~= "error"
-			.LastCakeError = msg
-			.SetAppInfo
+			|| ch = msg.first
+			if ch == @arg
+				Notifications <~ (ch.FirstName, msg)
+			  else
+				.LastCakeError = msg
+				.SetAppInfo
 		  else
 			Notifications <~ ("unrecognised message", msg)
+	
+	
+function CakeTalk (|SpdProcess| Cake)
+	if .DelayedRun.ago > 0.5s
+		.DelayedRun = nil
+		.DebugMode &= ~compilemode.paused
+		.SetAppInfo		
+	
+	|| root = cake.Get$							// getmsg
+	.LogOneCake(root, "\1B ")
+	if root != @arg
+		.HandleCake(root)
+	  else
+		for msg.fast in root
+			.HandleCake(msg)
 
 
 
@@ -251,23 +265,32 @@ function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
 	fs <~ " = "
 	fs <~ (' ', 6 - fs.LengthUTF8)
 	.PerryAppendMsg("", 3)
-	
+
+
 // DebugHideFeminism
 // BoysNeedToDefeatTheMatriarchy
 // tbh it kinda defeated itself... but whatever.
 
+//stack ((\516096, \29072, \6064), (\1, \1), (\0, )) {
+//	+'1)  Main' "/usr/local/speedie/Examples/branch_test.spd" \902 \1 {
+//		r "" \0 "Array" "0x00!" \1 bad
+//	}
+//}
+
 function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	opt norefcounts
 
-	|| thg = self[4]
-	|| bad = (thg == @thg and "bad")
-		Notifications <~ "Something wrong with var: " + .name
-		is error
 	|| dbname = .DebugName // not sure why it needs some bytes removed?
-	if (CanHide and dbname[] == '_')
-		.Remove
-		return
-
+	{
+		|| Last = .Last
+		|| bad = (Last == @thg and "bad")
+			Notifications <~ "Something wrong with var: " + dbname
+		(self is error) = bad
+		if (!bad and CanHide and dbname[] == '_')
+			.Remove
+			return
+	}
+	
 	is editable
 	if depth > 0
 		|| s1 = .second
@@ -377,7 +400,7 @@ function perryide.ReloadBreaks
 function perryide.UpdateStack (|message| stack)
 	opt norefcounts
 	
-	|| arg = stack.last$
+/	|| arg = stack.last$
 	.appinfo.obj = stack.first			// Nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
 	

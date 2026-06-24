@@ -85,6 +85,7 @@ module Notifications
 		cpp_part Str
 		self <~ error(details, desc, strength)
 
+	
 	syntax append (|error| note)
 		cpp_part Msg
 		|| s = note.name

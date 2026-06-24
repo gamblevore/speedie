@@ -496,39 +496,3 @@ datatype DocumentAction (byte)
 		return self==V
 		
 
-
-//
-//
-//2   Perry                               0x0000000104493b70 Per_IDE_EditText + 92
-//3   Perry                               0x000000010444b314 Per_IDE_EditFile + 220
-//4   Perry                               0x000000010444735c Per_IDE_EditPath2 + 76
-//5   Perry                               0x00000001044472ac Per_PerryAutoCompleteSelected + 152
-//6   Perry                               0x0000000104471ea8 GUI_LV_SelectedEvent + 104
-//7   Perry                               0x000000010443b7f8 GUI_LV_Select + 224
-//8   Perry                               0x000000010447033c GUI_LV_KeyDownTest + 1228
-//9   Perry                               0x000000010446fe1c GUI_LV_KeyDown + 24
-//10  Perry                               0x00000001044878d8 GUI_Menu_KeyDown + 188
-//11  Perry                               0x000000010447fd18 GUI_Win_KeyDownWin + 152
-//12  Perry                               0x0000000104496ca0 Per_IDE_KeyDown + 132
-//13  Perry                               0x00000001044298a8 GUI_App__KeyDownEvent + 308
-//14  Perry                               0x0000000104428034 GUI_App__ActualEvents + 80
-//15  Perry                               0x000000010442b450 GUI_App__HandleEvents + 48
-//16  Perry                               0x000000010442e254 GUI_App__SingleFrameSub + 104
-//17  Perry                               0x0000000104426430 GUI_App__Run + 120
-//18  Perry                               0x000000010441bd18 JB_SP_Run + 248
-//19  Perry                               0x000000010440e574 main + 20
-//
-//2   Perry                               0x0000000104493b70 Per_IDE_EditText + 92
-//3   Perry                               0x000000010444b314 Per_IDE_EditFile + 220
-//4   Perry                               0x000000010444735c Per_IDE_EditPath2 + 76
-//5   Perry                               0x00000001044472ac Per_PerryAutoCompleteSelected + 152
-//6   Perry                               0x0000000104471ea8 GUI_LV_SelectedEvent + 104
-//7   Perry                               0x000000010443b7f8 GUI_LV_Select + 224
-//8   Perry                               0x0000000104487ae0 GUI_Menu_MouseMove + 112
-//9   Perry                               0x00000001044292c0 GUI_App__MouseMoveEventSub + 328
-//10  Perry                               0x0000000104428fa0 GUI_App__CalcWinSize + 184
-//11  Perry                               0x00000001044284a4 GUI_App__StartResize + 92
-//12  Perry                               0x000000010442e268 GUI_App__SingleFrameSub + 124
-//13  Perry                               0x0000000104426430 GUI_App__Run + 120
-//14  Perry                               0x000000010441bd18 JB_SP_Run + 248
-//15  Perry                               0x000000010440e574 main + 20
