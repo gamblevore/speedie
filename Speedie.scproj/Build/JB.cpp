@@ -3497,7 +3497,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026062317));
+	JB_FS_AppendInt32(_fsf0, (2026062412));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10237,7 +10237,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026062317));
+	JB_FS_AppendInt32(_fsf0, (2026062412));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -12421,6 +12421,27 @@ JB_String* JB_EntityTest() {
 	return _tmPf1;
 }
 
+bool SC_ExtractContainer(Message* C, SCNode* Name_space, DeclMode Purpose, int Depth, SCDecl* Input) {
+	Message* Ch = ((Message*)JB_Ring_First(C));
+	Syntax Fn = Ch->Func;
+	if (Fn == kJB_SyxItem) {
+		JB_Msg_Fail(C, nil);
+		return nil;
+	}
+	if (!JB_Msg_ExpectLast(Ch, nil)) {
+		return nil;
+	}
+	if (Fn == kJB_SyxTmp) {
+		Ch->Func = kJB_SyxThg;
+	}
+	SCDecl* Dcl = SC_ExtractDecl(Ch, Name_space, Purpose, Depth);
+	if (Dcl) {
+		JB_SetRef(Input->Contains, SC_Decl_MakeContainedOptional(Dcl));
+		return true;
+	}
+	return false;
+}
+
 SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose, int Depth) {
 	SCDecl* Rz = nil;
 	Syntax F = C->Func;
@@ -12525,22 +12546,28 @@ SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose, int Dep
 	if (F == kJB_SyxDot) {
 		return SC_Comp__FindClassType(C);
 	}
+	Message* Ch = ((Message*)JB_Ring_First(C));
+	if (!Ch) {
+		if (F == kJB_SyxArr) {
+			return SC_TypeArray->TypeNormal;
+		}
+		if (F == kJB_SyxArg) {
+			return SC_TypeDictionary->TypeNormal;
+		}
+	}
 	Rz = SC_Decl_Constructor(nil, SC_TypeVoid_);
 	int ErrCount = JB_StdErr->ErrorCount;
 	if (F == kJB_SyxArr) {
-		Message* Ch = ((Message*)JB_Ring_First(C));
-		if (!Ch) {
-			return SC_TypeArray->TypeNormal;
-		}
-		if ((JB_Msg_EqualsSyx(Ch, kJB_SyxItem))) {
-			JB_Msg_Fail(C, nil);
+		if (!SC_ExtractContainer(C, Name_space, Purpose, Depth, Rz)) {
 			return nil;
 		}
-		SCDecl* Dcl = SC_ExtractDecl(Ch, Name_space, Purpose, Depth);
-		if (Dcl) {
-			JB_SetRef(Rz->Contains, SC_Decl_MakeContainedOptional(Dcl));
-			JB_SetRef(Rz->Type, SC_TypeArray);
+		JB_SetRef(Rz->Type, SC_TypeArray);
+	}
+	 else if (F == kJB_SyxArg) {
+		if (!SC_ExtractContainer(C, Name_space, Purpose, Depth, Rz)) {
+			return nil;
 		}
+		JB_SetRef(Rz->Type, SC_TypeDictionary);
 	}
 	 else if (F == kJB_SyxAdj) {
 		(JB_Msg_SyntaxProblem(C, JB_LUB[2065]));
@@ -37558,7 +37585,7 @@ Message* JB_Msg_Constructor(Message* Self, Message* Parent, Syntax Func, JB_Stri
 	}
 	JB_Ring_Constructor(Self, Parent);
 	Self->Indent = 0;
-	if (!JB_Str_Exists(Name)) {
+	if (Name == nil) {
 		Name = JB_LUB[0];
 	}
 	JB_Incr2(Self->Name, Name);
@@ -56838,6 +56865,7 @@ JB_String* SC_Func_MakeProtoClassName(SCFunction* Self, JB_String* Start) {
 }
 
 void SC_Func_MarkRecursive(SCFunction* Self, SCFunction* EndAt) {
+	(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_DirectlyRecursive, true));
 	SCFunction* S = Self;
 	while (true) {
 		(SC_Func_SyntaxIsSet(S, kSC__FunctionType_Recursive, true));
@@ -60915,4 +60943,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1650036515208607064 8541332425629425499
+// 1395685893321791503 8541332425629425499

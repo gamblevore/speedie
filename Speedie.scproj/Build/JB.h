@@ -99,7 +99,7 @@ typedef vec2 FloatRangeConverterBasic;
 
 typedef int FlowControlStopper;
 
-typedef int FunctionType;
+typedef uint FunctionType;
 
 typedef int Ind;
 
@@ -2235,40 +2235,41 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__FileMode_Other ((FileMode)7)
 #define kJB__FileMode_Owner ((FileMode)448)
 #define kJB__FileMode_Process ((FileMode)493)
-#define kSC__FunctionType_AlreadyExported ((FunctionType)8192)
-#define kSC__FunctionType_API ((FunctionType)8388608)
-#define kSC__FunctionType_Behaviour ((FunctionType)1024)
-#define kSC__FunctionType_CantInline ((FunctionType)131072)
+#define kSC__FunctionType_AlreadyExported ((FunctionType)16384)
+#define kSC__FunctionType_API ((FunctionType)16777216)
+#define kSC__FunctionType_Behaviour ((FunctionType)2048)
+#define kSC__FunctionType_CantInline ((FunctionType)262144)
 #define kSC__FunctionType_ConOrDes ((FunctionType)3)
 #define kSC__FunctionType_Constructor ((FunctionType)1)
-#define kSC__FunctionType_Cpp ((FunctionType)268435456)
+#define kSC__FunctionType_Cpp ((FunctionType)536870912)
 #define kSC__FunctionType_Destructor ((FunctionType)2)
-#define kSC__FunctionType_Disabled ((FunctionType)2097152)
-#define kSC__FunctionType_DontCheckInCakeLib ((FunctionType)2097216)
-#define kSC__FunctionType_EmptyConstructor ((FunctionType)256)
-#define kSC__FunctionType_ExpectsRealVars ((FunctionType)4096)
-#define kSC__FunctionType_ExternalLib ((FunctionType)65536)
-#define kSC__FunctionType_FlowDisabled ((FunctionType)32768)
-#define kSC__FunctionType_HidesProperties ((FunctionType)33554432)
+#define kSC__FunctionType_DirectlyRecursive ((FunctionType)256)
+#define kSC__FunctionType_Disabled ((FunctionType)4194304)
+#define kSC__FunctionType_DontCheckInCakeLib ((FunctionType)4194368)
+#define kSC__FunctionType_EmptyConstructor ((FunctionType)512)
+#define kSC__FunctionType_ExpectsRealVars ((FunctionType)8192)
+#define kSC__FunctionType_ExternalLib ((FunctionType)131072)
+#define kSC__FunctionType_FlowDisabled ((FunctionType)65536)
+#define kSC__FunctionType_HidesProperties ((FunctionType)67108864)
 #define kSC__FunctionType_InitFunc ((FunctionType)64)
-#define kSC__FunctionType_Killer ((FunctionType)1048576)
-#define kSC__FunctionType_LinkInline ((FunctionType)524288)
-#define kSC__FunctionType_NewNew ((FunctionType)2048)
+#define kSC__FunctionType_Killer ((FunctionType)2097152)
+#define kSC__FunctionType_LinkInline ((FunctionType)1048576)
+#define kSC__FunctionType_NewNew ((FunctionType)4096)
 #define kSC__FunctionType_NewStruct ((FunctionType)8)
-#define kSC__FunctionType_NoExport ((FunctionType)2621504)
-#define kSC__FunctionType_NoInline ((FunctionType)268566656)
-#define kSC__FunctionType_NotRefCounted ((FunctionType)4194304)
+#define kSC__FunctionType_NoExport ((FunctionType)5242944)
+#define kSC__FunctionType_NoInline ((FunctionType)537133312)
+#define kSC__FunctionType_NotRefCounted ((FunctionType)8388608)
 #define kSC__FunctionType_NumberCreator ((FunctionType)16)
-#define kSC__FunctionType_OptInline ((FunctionType)262144)
+#define kSC__FunctionType_OptInline ((FunctionType)524288)
 #define kSC__FunctionType_Recursive ((FunctionType)128)
 #define kSC__FunctionType_Reffer ((FunctionType)4)
-#define kSC__FunctionType_Render ((FunctionType)16384)
-#define kSC__FunctionType_Stateless ((FunctionType)16777216)
-#define kSC__FunctionType_StoresSelf ((FunctionType)67108864)
+#define kSC__FunctionType_Render ((FunctionType)32768)
+#define kSC__FunctionType_Stateless ((FunctionType)33554432)
+#define kSC__FunctionType_StoresSelf ((FunctionType)134217728)
 #define kSC__FunctionType_TypeTest ((FunctionType)32)
-#define kSC__FunctionType_UsedByASM ((FunctionType)536870912)
-#define kSC__FunctionType_VirtualCaller ((FunctionType)512)
-#define kSC__FunctionType_Wrapper ((FunctionType)134217728)
+#define kSC__FunctionType_UsedByASM ((FunctionType)1073741824)
+#define kSC__FunctionType_VirtualCaller ((FunctionType)1024)
+#define kSC__FunctionType_Wrapper ((FunctionType)268435456)
 #define kJB__MaybeBool_False ((MaybeBool)0)
 #define kJB__MaybeBool_MaybeFalse ((MaybeBool)8)
 #define kJB__MaybeBool_MaybeTrue ((MaybeBool)9)
@@ -4083,6 +4084,8 @@ SCNode* SC_DontRemove(Message* Node, SCNode* Name_space, Message* ErrPlace);
 SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, SCNode* Name_space, int DoCompare);
 
 JB_String* JB_EntityTest();
+
+bool SC_ExtractContainer(Message* C, SCNode* Name_space, DeclMode Purpose, int Depth, SCDecl* Input);
 
 SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose, int Depth);
 

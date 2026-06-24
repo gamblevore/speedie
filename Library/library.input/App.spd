@@ -173,7 +173,7 @@ function OtherMemory (|int64|)
 function GUIMode (assigns:|bool|)
 	cpp_wrapper JB_App__GUIMode
 	
-function Env (|dictionary of string|)
+function Env (|{string}|)
 	cpp_wrapper JB_App__Env
 
 function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| value, |int|)

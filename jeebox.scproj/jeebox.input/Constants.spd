@@ -8,7 +8,7 @@
 
 Module Jeebox
 	|SyntaxObj[64]|				_FuncArray
-	|Dictionary of SyntaxObj|	_SyxDict = Dictionary.New
+	|{SyntaxObj}|	_SyxDict = Dictionary.New
 	linkage
 		cpp_part Constants
 	
@@ -43,10 +43,10 @@ Module Jeebox
 		"\\"	: `\\`
 	]
 	
-	|dictionary of string| UnEscapeStr
-	|dictionary of string| JS_UnEscapeStr
-	|dictionary of string| XML_UnEscapeStr
-	|dictionary of string| EscapeChr
+	|{string}| UnEscapeStr
+	|{string}| JS_UnEscapeStr
+	|{string}| XML_UnEscapeStr
+	|{string}| EscapeChr
 
 	.InitConstants
 
