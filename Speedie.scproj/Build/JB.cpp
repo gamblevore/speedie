@@ -3497,7 +3497,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026062412));
+	JB_FS_AppendInt32(_fsf0, (2026062914));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -8834,7 +8834,7 @@ int SC_Refs__RefBasisStruct(Message* Msg, bool SetOnly) {
 			return 0;
 		}
 	}
-	if (SC_Decl_IsReffable(Type, SetOnly)) {
+	if (SC_Decl_IsRefCountable(Type, SetOnly)) {
 		if (SC_Decl_IsCArray(Type)) {
 			return kSC__Refs_kBasisCArray | kSC__Refs_kBasisObj;
 		}
@@ -10237,7 +10237,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026062412));
+	JB_FS_AppendInt32(_fsf0, (2026062914));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -15106,7 +15106,7 @@ SCObject* SC_TypeOfThg(Message* Exp, SCNode* Name_space, Message* Side) {
 				return T;
 			}
 			if (true) {
-				JB_Msg_Fail(Exp, nil);
+				JB_Msg_Fail(Exp, kJB__Rec_NonFatal);
 			}
 		}
 		if (true) {
@@ -25853,7 +25853,7 @@ ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A) {
 	ASMReg R = SC_Pac_xC2xB5GetPrms(Self, Exp, Mode);
 	if (SC_Decl_SyntaxIs(A, kSC__SCDeclInfo_Reference) and (!SC_Reg_SyntaxIs(R, kSC__Reg_ContainsAddr))) {
 		if (true) {
-			JB_Object_Fail(((JB_Object*)Exp));
+			JB_Msg_Fail(Exp, kJB__Rec_NonFatal);
 		}
 	}
 	return SC_Reg_incr(R);
@@ -42761,6 +42761,17 @@ bool SC_Msg_RefDisappears(Message* Self) {
 	return false;
 }
 
+bool SC_Msg_RefFallback(Message* Self) {
+	Message* Ch = Self;
+	while (JB_Msg_EqualsSyx(Ch, kJB_SyxAcc)) {
+		Ch = ((Message*)JB_Ring_First(Ch));
+	};
+	if (Ch and (Ch != Self)) {
+		return SC_Decl_SyntaxIs(SC_Msg_FastDecl(Ch), kSC__SCDeclInfo_Referable);
+	}
+	return false;
+}
+
 bool SC_Msg_RefTransparent(Message* Self) {
 	Syntax F = Self->Func;
 	if (F == kJB_SyxBra) {
@@ -46425,7 +46436,12 @@ byte SC_Decl_DumpFlags(SCDecl* Self) {
 	uint Rz = 0;
 	Rz = ((byte)(SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param)));
 	Rz = (Rz | (SC_Decl_IsBareStruct(Self) << 1));
-	Rz = (Rz | ((SC_NilState_SyntaxIs(Self->NilDeclared, kSC__NilState_Nilish)) << 2));
+	if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local) and SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Altered)) {
+		Rz = (Rz | (1 << 2));
+	}
+	 else {
+		Rz = (Rz | ((SC_NilState_SyntaxIs(Self->NilDeclared, kSC__NilState_Nilish)) << 2));
+	}
 	if (SC_Decl_IsNormal(Self)) {
 		SCClass* T = Self->Type;
 		Rz = (Rz | ((SC_SCNodeType_SyntaxIs(T->BaseType, kSC__SCNodeType_ProtoType)) << 3));
@@ -46801,10 +46817,7 @@ bool SC_Decl_IsInteger(SCDecl* Self) {
 }
 
 bool SC_Decl_IsMemoryOnly(SCDecl* Self) {
-	if (Self->PointerCount) {
-		return false;
-	}
-	return SC_Decl_IsCArray(Self) or SC_Class_IsStruct(Self->Type);
+	return Self->PointerCount or (SC_Decl_IsCArray(Self) or SC_Class_IsStruct(Self->Type));
 }
 
 bool SC_Decl_IsMostlyNormal(SCDecl* Self) {
@@ -46878,7 +46891,7 @@ bool SC_Decl_IsReallyNumeric(SCDecl* Self) {
 	return false;
 }
 
-bool SC_Decl_IsReffable(SCDecl* Self, bool SetOnly) {
+bool SC_Decl_IsRefCountable(SCDecl* Self, bool SetOnly) {
 	if (!((!Self->PointerCount) and (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Altered) or SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Body)))) {
 		return nil;
 	}
@@ -53094,7 +53107,7 @@ bool SC_Class_HasStuffToHandleInDestructor(SCClass* Self) {
 					if (SC_Decl_HasStructDestructor(D)) {
 						return true;
 					}
-					if (SC_Decl_IsReffable(D, true)) {
+					if (SC_Decl_IsRefCountable(D, true)) {
 						return true;
 					}
 					(++_if1);
@@ -54672,8 +54685,10 @@ int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAl
 		JB_Incr(PArg_Ch);
 		SCDecl* PArg_Type = SC_TypeOfExpr(PArg_Ch, Name_space, nil);
 		JB_Incr(PArg_Type);
-		if (SC_Decl_SyntaxIs(PArg_Type, kSC__SCDeclInfo_Local) and SC_Decl_SyntaxIs(FuncArg, kSC__SCDeclInfo_Reference)) {
-			SC_Decl_MarkAsAltered(PArg_Type, nil);
+		if (SC_Decl_SyntaxIs(FuncArg, kSC__SCDeclInfo_Reference)) {
+			if (SC_Decl_SyntaxIs(PArg_Type, kSC__SCDeclInfo_Local)) {
+				SC_Decl_MarkAsAltered(PArg_Type, nil);
+			}
 		}
 		if (Base) {
 			JB_SetRef(FuncArg, SC_Decl_ContainedReplace(FuncArg, Base, false));
@@ -54685,7 +54700,10 @@ int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAl
 		if ((Incoming->HasSide) and (Fi == Fin)) {
 			Cast = (Cast & (~kJB_kNoBoolTypeCast));
 		}
-		int Matched = SC_Decl_TypeMatch(FuncArg, PArg_Type, Cast, LArg_ch);
+		int Matched = 0;
+		if (((!SC_Decl_SyntaxIs(FuncArg, kSC__SCDeclInfo_Reference))) or ((SC_Decl_SyntaxIs(PArg_Type, kSC__SCDeclInfo_Referable)) or SC_Msg_RefFallback(PArg_Ch))) {
+			Matched = SC_Decl_TypeMatch(FuncArg, PArg_Type, Cast, LArg_ch);
+		}
 		JB_Decr(PArg_Type);
 		JB_Decr(LArg_ch);
 		SelfCast = 0;
@@ -55838,7 +55856,7 @@ void SC_Func_DescribeParamFail(SCFunction* Self, SCParamArray* Params, int Bad) 
 		}
 		if (Badarg) {
 			RefToFail = ((int)(Badarg->PointerCount and (SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_Reference))));
-			if ((SC_Decl_SyntaxIs(Badarg, kSC__SCDeclInfo_Reference)) and (SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_Const))) {
+			if ((SC_Decl_SyntaxIs(Badarg, kSC__SCDeclInfo_Reference)) and ((!SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_Referable)))) {
 				RefToFail = 2;
 			}
 		}
@@ -56174,7 +56192,7 @@ void SC_Func_FillInDestructor(SCFunction* Self) {
 			if (D == nil) {
 				break;
 			}
-			if (SC_Decl_IsReffable(D, true)) {
+			if (SC_Decl_IsRefCountable(D, true)) {
 				SC_Msg_AddBefore(S, First, SC_Decl_RefDestructor(D));
 			}
 			 else {
@@ -60948,4 +60966,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1395685893321791503 -9008376782172371027
+// -5192018549460552743 6078240502494744799

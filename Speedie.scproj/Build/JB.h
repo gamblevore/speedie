@@ -2411,6 +2411,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_Property ((SCDeclInfo)8192)
 #define kSC__SCDeclInfo_PropertyWasConstructed ((SCDeclInfo)1024)
 #define kSC__SCDeclInfo_ReadFrom ((SCDeclInfo)8388608)
+#define kSC__SCDeclInfo_Referable ((SCDeclInfo)30720)
 #define kSC__SCDeclInfo_Reference ((SCDeclInfo)1048576)
 #define kSC__SCDeclInfo_Return ((SCDeclInfo)32768)
 #define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)268435456)
@@ -9139,6 +9140,8 @@ NilState SC_Msg_RedundantVar(Message* Self, SCDecl* Dcl, NilCheckMode Test);
 
 bool SC_Msg_RefDisappears(Message* Self);
 
+bool SC_Msg_RefFallback(Message* Self);
+
 bool SC_Msg_RefTransparent(Message* Self);
 
 void SC_Msg_RegCheck(Message* Self, int Bad);
@@ -9731,7 +9734,7 @@ bool SC_Decl_IsObject(SCDecl* Self);
 
 bool SC_Decl_IsReallyNumeric(SCDecl* Self);
 
-bool SC_Decl_IsReffable(SCDecl* Self, bool SetOnly);
+bool SC_Decl_IsRefCountable(SCDecl* Self, bool SetOnly);
 
 bool SC_Decl_IsReg(SCDecl* Self);
 
