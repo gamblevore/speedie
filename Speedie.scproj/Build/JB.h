@@ -7826,7 +7826,7 @@ ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last);
 
 void SC_Str_MiniName(JB_String* Self, FastString* Fs, bool IsClass);
 
-JB_String* JB_Str_Moat(JB_String* Self);
+JB_String* JB_Str_Moat(JB_String* Self, JB_String* Prepend);
 
 Message* JB_Str_Msg(JB_String* Self);
 
@@ -8202,6 +8202,8 @@ void JB_bin_WriteType(FastString* Self, Syntax Type, bool GoIn);
 
 
 // JB_Message
+void JB_Msg__Trap(Message* Self);
+
 void JB_Msg_Acc__(Message* Self, FastString* Fs);
 
 Message* JB_Msg_AccessAdd(Message* Self, JB_String* Key);
