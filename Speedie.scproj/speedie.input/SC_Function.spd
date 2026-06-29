@@ -470,7 +470,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	
 	while fi < fin
 		|| FuncArg = .Args[fi++]!
-		|| PArg_Ch = Incoming[Pos]
+		|| PArg_Ch = Incoming[Pos]!
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
 		if funcarg is reference
 			if  PArg_Type is Local

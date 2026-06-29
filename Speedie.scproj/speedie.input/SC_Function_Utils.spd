@@ -125,7 +125,7 @@ dispatch FuncPreReader (fnPreReader)
 function message.RefFallback (|bool|)
 	opt norefcounts
 	// just check if we STILL have an address
-	|| ch = .first
+	|| ch = self
 	while ch == @acc
 		ch = ch.first
 	if ch and ch != self
