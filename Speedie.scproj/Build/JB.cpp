@@ -3497,7 +3497,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026062914));
+	JB_FS_AppendInt32(_fsf0, (2026062915));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10237,7 +10237,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026062914));
+	JB_FS_AppendInt32(_fsf0, (2026062915));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -43975,74 +43975,51 @@ void SC_Msg_Tran_Isnt(Message* Self, JB_String* Name) {
 
 void SC_Msg_Tran_QMark(Message* Self) {
 	Message* Thedot = ((Message*)JB_Ring_First(Self));
-	JB_Incr(Thedot);
 	if (!Thedot) {
-		JB_EarlyDecr(Thedot);
 		return;
 	}
 	bool IsNormal = ((JB_Msg_EqualsSyx(Thedot, kJB_SyxDot)) or ((JB_Msg_EqualsSyx(Thedot, kJB_SyxSDot)) or (JB_Msg_EqualsSyx(Thedot, kJB_SyxFunc))));
 	if (!IsNormal) {
 		if ((!JB_Msg_EqualsSyx(Thedot, kJB_SyxThg))) {
 			JB_Msg_Fail(Thedot, JB_LUB[1583]);
-			JB_EarlyDecr(Thedot);
 			return;
 		}
 		Self->Func = kJB_SyxBra;
-		JB_EarlyDecr(Thedot);
 		return;
 	}
 	if (JB_Msg_EqualsSyx(Thedot, kJB_SyxSDot)) {
 		SC_Func__Tran_Sdt(Thedot);
 	}
 	Message* Inside = ((Message*)JB_Ring_First(Thedot));
-	JB_Incr(Inside);
 	if (JB_Msg_EqualsSyx(Thedot, kJB_SyxFunc)) {
 		if (!JB_Msg_Expect(Inside, kJB_SyxBra, nil)) {
-			JB_EarlyDecr(Inside);
-			JB_EarlyDecr(Thedot);
 			return;
 		}
-		JB_SetRef(Inside, ((Message*)JB_Ring_First(Inside)));
+		Inside = ((Message*)JB_Ring_First(Inside));
 	}
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Self, (&_usingf0));
 	Message* Rel = SC_Msg_QMarkRel(Self);
-	JB_Incr(Rel);
 	if (Rel) {
 		(JB_Ring_PrevSibSet(Self, Thedot));
 		(JB_Ring_NextSibSet(Rel, Self));
 		JB_Msg_BecomeStr(Self, kJB_SyxArg, JB_LUB[0]);
-		Message* _tmPf1 = JB_Syx_Msg(kJB_SyxThg, JB_LUB[1584]);
-		JB_Incr(_tmPf1);
-		JB_FreeIfDead(SC_Msg_ReplaceWith(Inside, _tmPf1));
-		JB_Decr(_tmPf1);
+		(JB_Ring_NextSibSet(Inside, JB_Syx_Msg(kJB_SyxThg, JB_LUB[1584])));
 		Message* Decl = SC_MakeDecl(JB_LUB[0], JB_LUB[1584], Inside, kSC__SCDeclInfo_Temp);
 		JB_Tree_SyntaxAppend(Self, Decl);
-		Message* _tmPf2 = JB_Msg_Msg(Decl, kJB_SyxArg, nil);
-		JB_Incr(_tmPf2);
-		JB_Tree_SyntaxAppend(_tmPf2, Rel);
-		JB_EarlyDecr(_tmPf2);
-		JB_EarlyDecr(Rel);
+		JB_Tree_SyntaxAppend(JB_Msg_Msg(Decl, kJB_SyxArg, nil), Rel);
 		JB_MsgPos_Destructor((&_usingf0));
-		JB_EarlyDecr(Inside);
-		JB_EarlyDecr(Thedot);
 		return;
 	}
-	JB_Decr(Rel);
 	Message* Cond = JB_Syx_OperatorPlus(kJB_SyxThg, Inside->Name);
-	JB_Incr(Cond);
 	Message* Tern = Self;
-	JB_Incr(Tern);
 	if (JB_Msg_OperatorIn(Self, kJB_SyxArg)) {
 		JB_Msg_BecomeStr(Self, kJB_SyxArg, JB_LUB[0]);
 		(JB_Msg_SyntaxIsSet(Self, kJB__MsgParseFlags_Style2, true));
-		JB_SetRef(Tern, JB_Msg_Msg(Self, kJB_SyxTmp, JB_LUB[429]));
+		Tern = JB_Msg_Msg(Self, kJB_SyxTmp, JB_LUB[429]);
 		JB_Tree_SyntaxAppend(Tern, Cond);
-		Message* _tmPf3 = JB_Msg_Msg(Tern, kJB_SyxArg, nil);
-		JB_Incr(_tmPf3);
-		JB_Tree_SyntaxAppend(_tmPf3, Thedot);
-		JB_Decr(_tmPf3);
+		JB_Tree_SyntaxAppend(JB_Msg_Msg(Tern, kJB_SyxArg, nil), Thedot);
 	}
 	 else {
 		if ((JB_Msg_EqualsSyx(Inside, kJB_SyxThg))) {
@@ -44051,34 +44028,19 @@ void SC_Msg_Tran_QMark(Message* Self) {
 			}
 		}
 		Self->Func = kJB_SyxBra;
-		JB_SetRef(Tern, JB_Msg_Msg(Self, kJB_SyxArg, nil));
+		Tern = JB_Msg_Msg(Self, kJB_SyxArg, nil);
 		(JB_Msg_SyntaxIsSet(Tern, kJB__MsgParseFlags_Style2, true));
-		JB_SetRef(Tern, JB_Msg_Msg(Tern, kJB_SyxFunc, nil));
+		Tern = JB_Msg_Msg(Tern, kJB_SyxFunc, nil);
 		Message* Options = JB_Msg_Msg(Tern, kJB_SyxList, nil);
-		JB_Incr(Options);
-		Message* _tmPf4 = JB_Msg_Msg(Tern, kJB_SyxPrm, nil);
-		JB_Incr(_tmPf4);
-		JB_Tree_SyntaxAppend(_tmPf4, Cond);
-		JB_Decr(_tmPf4);
+		JB_Tree_SyntaxAppend(JB_Msg_Msg(Tern, kJB_SyxPrm, nil), Cond);
 		JB_Tree_SyntaxAppend(Options, Thedot);
 		JB_Msg_AppendSyx(Options, kJB_SyxThg, JB_LUB[327]);
-		JB_Decr(Options);
 	}
-	JB_Decr(Thedot);
 	if ((!JB_Msg_EqualsSyx(Inside, kJB_SyxThg))) {
 		JB_SetRef(Cond->Name, JB_LUB[1584]);
-		Message* _tmPf5 = JB_Syx_Msg(kJB_SyxThg, JB_LUB[1584]);
-		JB_Incr(_tmPf5);
-		JB_FreeIfDead(SC_Msg_ReplaceWith(Inside, _tmPf5));
-		JB_Decr(_tmPf5);
-		Message* _tmPf6 = SC_MakeDecl(JB_LUB[0], JB_LUB[1584], Inside, kSC__SCDeclInfo_Temp);
-		JB_Incr(_tmPf6);
-		(JB_Ring_PrevSibSet(Tern, _tmPf6));
-		JB_Decr(_tmPf6);
+		(JB_Ring_NextSibSet(Inside, JB_Syx_Msg(kJB_SyxThg, JB_LUB[1584])));
+		(JB_Ring_PrevSibSet(Tern, SC_MakeDecl(JB_LUB[0], JB_LUB[1584], Inside, kSC__SCDeclInfo_Temp)));
 	}
-	JB_Decr(Inside);
-	JB_Decr(Cond);
-	JB_Decr(Tern);
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Self);
 	JB_MsgPos_Destructor((&_usingf0));
 }

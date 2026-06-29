@@ -77,7 +77,8 @@ function message.MsgFix (|message| parent=nil, |message!|)	// «
 
 
 
-function message.Tran_QMark//"?"
+function message.Tran_QMark				//"?"
+	opt norefcounts
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func)
 	if !isnormal							// if x? --> if (x)
@@ -96,7 +97,7 @@ function message.Tran_QMark//"?"
 		.prev = thedot
 		rel.next = self
 		.become(@arg)
-		inside.replaceWith(@thg.msg("_t"))
+		inside.next = @thg.msg("_t")
 		|message--| decl = MakeDecl("",  "_t", inside, scdeclinfo.temp) 
 		self <~ decl
 		decl.msg(@arg) <~ rel
@@ -131,7 +132,7 @@ function message.Tran_QMark//"?"
 											// So I don't even need to enter "nil"! Just delete it!
 	if (inside != @thg)
 		cond.name = "_t"
-		inside.replaceWith(@thg.msg("_t"))
+		inside.next = @thg.msg("_t")
 		tern.prev = MakeDecl("",  "_t", inside, scdeclinfo.temp)
 
 
