@@ -41,7 +41,7 @@ Message is also:
 	constructor (|Message!| other)
 		cpp_part ConstructorCopy
 		super.constructor
-		
+
 //		parser.CountStats++ // better to put in the memory manager itself... right?
 		.Position	= other.Position
 		.Name		= other.Name
@@ -52,6 +52,8 @@ Message is also:
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
 		
+		._trap
+		
 
 	constructor
 		cpp_part ConstructorEmpty
@@ -61,6 +63,8 @@ Message is also:
 		.flags		= parser.using.Flags
 		.RangeLength= parser.Using.Length
 		.tag		= parser.Using.Tag
+
+		._trap
 
 			
 	constructor (|Message| Parent=nil, |Syntax| Func,  |string?| name=nil)
@@ -75,6 +79,8 @@ Message is also:
 		.RangeLength= parser.using.Length
 		.flags		= parser.using.Flags
 		.tag		= parser.Using.Tag
+		
+		._trap
 
 
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength)
@@ -88,8 +94,14 @@ Message is also:
 		.RangeLength= RangeLength
 		.flags		= 0 // not set, because parsing shouldn't have default flags! These are parse-variables!
 		.tag		= parser.Using.Tag
+		
+		._trap
 
-	
+
+	libinternal _Trap
+		inlined
+		target __PROJECT_SPEEDIE__
+			0 // if "App_abc_Constructor".trap
 
 ///////////////////////////////////////////////////////////////////////////////
 	

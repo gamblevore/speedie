@@ -94,11 +94,13 @@ extend string
 			fs <~ "s"
 
 
-function string.Moat (|string|)
+function string.Moat (|string?| Prepend=nil, |string|)
 	opt norefcounts
 	|| fs = faststring()
-	fs.size = .length + 4
+	fs.size = .length + 4 + Prepend.Length
 	fs <~ "__"
+	if Prepend!=nil
+		fs <~ prepend
 	fs <~ self
 	fs <~ "__"
 	return fs

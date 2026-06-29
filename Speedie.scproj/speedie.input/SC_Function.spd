@@ -1977,13 +1977,17 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 	|| arg = node.NormaliseFunc
 
 	node.obj = self
+	SCFunction.currfunc = self
+
 	if name_space
-		SCFunction.currfunc = self
 		if node != "iterator"
 			Compiler.FuncList <~ self
 		.FLookup = name_space				// Sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
-		.ParseName( node )
+
+	.ParseName( node )
+
+	if name_space
 		if name_space is EmbeddedOnly
 			self|scnode| is EmbeddedOnly
 		if name_space is libonlyAll

@@ -501,10 +501,11 @@ function scfunction.BeforeTransform
 
 function SCFunction.AddConstructorReturn2 
 	|| c = .cls
-	require c  and  self Isnt Wrapper  and  self is newnew
+	require  c  and  self Isnt Wrapper  and  self is Constructor
 	|| args = .source![@arg, 2]
 	require args
 	using .source!
+	scfunction.currfunc = self
 	
 	if c.isobject
 		|| type = message(@thg, c.name)
@@ -526,7 +527,7 @@ function SCFunction.AddConstructorReturn2
 function SCFunction.AddConstructorReturn (|message| prms)
 	opt norefcounts
 	|| c = .cls$
-	is newnew, using prms
+	using prms
 	|| dcl = prms.msg(@decl)
 	dcl.msg(@arel, "!") <~ (@thg, c.name)
 		

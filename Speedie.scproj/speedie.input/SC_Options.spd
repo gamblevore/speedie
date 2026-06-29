@@ -190,7 +190,7 @@ module Feedback
 			Compiler.BaseProjectPath = f
 
 		.CheckSelfModifying
-		sc_targets["__PROJECT_" + compiler.projectname + "__"] = true
+		sc_targets[compiler.projectname.moat("PROJECT_")] = true
 
 		if !options.SingleFileInput
 			F.mustexist
