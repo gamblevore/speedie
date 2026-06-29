@@ -87,8 +87,8 @@ class ButtonView (GUIControl)
 				(i is selected) = x
 				changed++
 		
-		.Touch(2)
 		if !._DuringSelectEvent++
+			.Touch(2)
 			|| fn = (.onrightclick (RightClick) .OnClicked)
 				(fn)(self, value, prev)
 		._DuringSelectEvent--

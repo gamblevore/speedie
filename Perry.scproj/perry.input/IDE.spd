@@ -135,6 +135,7 @@ class PerryIDE (Window)
 		for w.fast in .Projects
 			if w != f
 				return true
+		debugger  // i don't get this? how is this different than checking if we are the last item?
 		
 		
 	function UpdateStatusErrors
@@ -168,11 +169,13 @@ class PerryIDE (Window)
 	function RemoveProjFromList
 		opt norefcounts
 		|| r = .SharedProjectTabSource
-			|| n = r.next
-			n ?= r.prev
-			.ProjectTabs.selected = n
-			.SharedProjectTabSource = message() // for now
-			r.remove
+		require r and r.parent
+
+		|| n = r.next
+		n ?= r.prev
+		.ProjectTabs.selected = n
+		.SharedProjectTabSource = message() // for now
+		r.remove
 
 
 	behaviour Tickle

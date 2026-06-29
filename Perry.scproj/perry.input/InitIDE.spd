@@ -505,8 +505,8 @@ extend PerryIDE
 			.CanReOrderButtons = true
 			.ButtonSource = perry.projects
 			.ColumnFinder = &Perry.ReadButtonNames
-			|| pf = perry.projects.first 
-				(pf is selected)
+//			|| pf = perry.projects.first 
+//				(pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
 			.GNormal.StyleDrawer = image.RoundRectDrawer
 			.GNormal.CornersCut = 12

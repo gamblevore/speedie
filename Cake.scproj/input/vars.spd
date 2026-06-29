@@ -106,6 +106,8 @@ class XVar (list)
 		require value
 		if .Reg
 			require memory.Readable(Where, 16)
+
+		// references should be understood also. Alter the thing we are pointing to!
 		|| C = .Type
 		if c and c.IsObject
 			return .SetObjectValue(Where|&object|, value)
