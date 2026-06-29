@@ -290,7 +290,7 @@ function TypeOfThg (ExprResolver)
 			|| T = Cls.classtype
 				exp.name = t.name			// right?
 				return T
-			error (exp)
+			error (exp, errorreceiver.nonfatal)
 		expect (false) (exp, "Expected an object here.")
 	
 	  elseif R isa SCDecl

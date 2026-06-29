@@ -654,9 +654,7 @@ class SCDecl (SCObject) {
 
 	
 	function IsMemoryOnly (|bool|)
-		if .pointercount
-			return false
-		return .iscarray or .Type.IsStruct
+		return .pointercount or .iscarray or .Type.IsStruct
 		
 	function IsNormal (|bool|)
 		return !.PointerCount and !.IsNil and !.IsCArray and !.Type.IsStruct
@@ -786,7 +784,7 @@ class SCDecl (SCObject) {
 		return true
 
 
-	function IsReffable (|bool| SetOnly, |bool|)
+	function IsRefCountable (|bool| SetOnly, |bool|)
 		opt norefcounts
 		// we want to refcount all local vars...
 		require !.PointerCount and (self is altered or body)

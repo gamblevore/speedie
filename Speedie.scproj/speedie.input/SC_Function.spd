@@ -472,8 +472,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| FuncArg = .Args[fi++]!
 		|| PArg_Ch = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
-		if  PArg_Type is Local  and  funcarg is Reference
-			PArg_Type.MarkAsAltered(nil)
+		if funcarg is reference
+			if  PArg_Type is Local
+				PArg_Type.MarkAsAltered(nil)
 			
 		if Base
 			FuncArg = FuncArg.ContainedReplace(base, false)
@@ -484,7 +485,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 		if (incoming.HasSide) and fi==fin
 			cast &= ~kNoBoolTypeCast
-		|| Matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
+		|| Matched = 0							// error (parg_ch, "Can't pass this as a reference")
+		if (funcarg isnt reference) or ((PArg_Type is Referable) or parg_ch.RefFallback)
+			matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
 		SelfCast = 0
 		
 		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)
@@ -520,13 +523,12 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	if Pos >= Incoming.Size
 		Return result
 
-	if (typecast & ktypeCastDescribeErrors) and !incoming.MadeError
+	if (TypeCast & ktypeCastDescribeErrors) and !incoming.MadeError
 		|| first = Incoming.FailedAt
 			.DescribeParamFail(incoming, first)
 		  else
 			error (incoming.exp, "Too many params sent to " + .RenderTitle)
 			.ErrorIsHere
-//			problem (self.source,  kusingstr)
 
 
 function ErrorIsHere
@@ -587,7 +589,7 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 			fs <~ "(Unknown Type)"
 		if badarg
 			RefToFail = (badarg.pointercount and (type is Reference))|int|
-			if (badarg is reference) and (type is const)
+			if (badarg is reference) and (type isnt Referable)		// aren't consts always not referable?
 				RefToFail = 2
 	  else
 		p = params.exp
@@ -596,9 +598,9 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 		fs <~ ". Expected: "
 		badarg.rendertypename(fs)
 	  elseif RefToFail == 1
-		fs <~ " (Pointer params can't accept references)"
+		fs <~ " (Pointer params can't accept references)"			// is this error no longer possible?
 	  elseif reftofail == 2
-		fs <~ " (Can't pass consts to references)"
+		fs <~ " (Can't pass this as a reference)"
 	error ( P, fs )
 	fs <~ "to "
 	.RenderTitle(fs)

@@ -606,7 +606,7 @@ struct Assembler
 
 		|| r = .µGetPrms(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
-			error (exp|object|)
+			error (exp, errorreceiver.nonfatal)
 		return r.incr
 
 

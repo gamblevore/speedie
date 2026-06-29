@@ -122,6 +122,16 @@ dispatch FuncPreReader (fnPreReader)
 		
 	
 
+function message.RefFallback (|bool|)
+	opt norefcounts
+	// just check if we STILL have an address
+	|| ch = .first
+	while ch == @acc
+		ch = ch.first
+	if ch and ch != self
+		return ch.FastDecl is Referable
+	// not exhaustive but I don't care its good enough for now
+	
 
 function SCFunction.MakeLinkInline
 	check (.islibrary) (self, "Only library funcs can use this. Use `opt inline` if you want to optimise without affecting linking.")

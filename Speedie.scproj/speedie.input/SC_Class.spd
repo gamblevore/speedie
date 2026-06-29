@@ -785,8 +785,8 @@ function HasStuffToHandleInDestructor (|bool|)
 	opt norefcounts
 	for p.upwards in self
 		for d in p.Properties
-			if d.HasStructDestructor: return true
-			if d.IsReffable(true):    return true
+			if d.HasStructDestructor:	return true
+			if d.IsRefCountable(true):	return true
 
 
 function CanCompareSub (|string| s, |scdecl| Against, |bool|)

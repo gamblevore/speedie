@@ -95,7 +95,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	ifn type isa SCDecl
 		type = TypeOfExpr( msg, nil )$
 	
-	if type.IsReffable(SetOnly)
+	if type.IsRefCountable(SetOnly)
 		if type.IsCArray
 			return kBasisCArray ||| kBasisObj
 		if  type is self  and  scfunction.CurrFunc is Constructor
@@ -744,7 +744,7 @@ function SCFunction.FillInDestructor // filldestructor
 	|| first = s.FindDestructor
 	using s
 	for d in c.Properties
-		if d.IsReffable(true)
+		if d.IsRefCountable(true)
 			s.AddBefore( first, d.RefDestructor )
 		  else
 			|| Destr = d.HasStructDestructor
