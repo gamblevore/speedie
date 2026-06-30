@@ -19,6 +19,15 @@ module ASMExamples {
 
 target cake {
 
+function TestKnst
+	visible
+	opt norefcounts
+/	|| Start = 62.5
+	while Start < 100.0
+		"Exit $Start"
+		Start += 0.25
+
+
 function MacroNew (|message| s, |bool| UseSelf, |Macro!|)
 	visible
 	rz = Message()
