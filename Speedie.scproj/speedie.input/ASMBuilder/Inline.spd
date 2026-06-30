@@ -50,6 +50,11 @@ struct InlineInfo
 			.Normal |= vr
 
 		(a is reference) = (d is reference)
+		a.mu.Info |= (d.mu.info & scdeclinfo.alteredcopy)
+		if a is TypeImprove // oof? typeimprove param?
+//		require self is TypeImprove
+//		|| orig = .IsLookupOnly
+//		if orig isa SCDecl
 		return v	
 	
 	

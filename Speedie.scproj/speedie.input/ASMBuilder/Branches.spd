@@ -57,9 +57,9 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		|| k = c._const
 		if (op == asm.jump) and k >= kContinue
 			C._Const = 0
-			if k == kContinue			// continue
+			if k == kContinue				// continue
 				C.JumpTo(S)
-			  else       				// exit
+			  else							// exit
 				C.JumpTo(A)
 		C++
 
@@ -91,7 +91,9 @@ function MainBrancher (fn_asm)
 	
 
 function While (fn_asm)
-	return .MainBrancher(exp, nil)
+	.LoopDepth++
+	rz = .MainBrancher(exp, nil)
+	.loopdepth--
 	
 
 function WhileSub (|message| exp,  |asmreg|)
@@ -147,7 +149,7 @@ function NopBranch (|fatasm| start)
 	|| l = .last
 	require l >= start
 	|| bb = l.basicblock
-	.nop(l)
+	.Nop(l)
 	--l
 	if l.basicblock == bb  and  l >= start  and  l is Const
 		.nop(l)

@@ -14,7 +14,7 @@ struct SavedRegisters
 
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
-
+		
 		.BreakRequest = sh.BreakRequest
 		.BasicDepth = sh.BasicDepth
 		.BasicBlock = sh.BasicBlock

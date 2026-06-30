@@ -860,7 +860,7 @@ helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 function CanConst (|scdecl| D, |&fatasm| f, |bool|)
 	if .IsCurr(f)
 		return true
-	if d is Alteredinloop
+	if (.LoopDepth > d.DepthOfLoop) and (d is Alteredinloop)
 		return false
 	if .IsWithin(f)
 		return true
@@ -869,7 +869,7 @@ function CanConst (|scdecl| D, |&fatasm| f, |bool|)
 	return f isnt FromInline
 	
 
-function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
+function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
 
@@ -885,7 +885,7 @@ function LocalThg (|scdecl| d, |asmreg|)     // asmlocal, localasm
 		if rr == ret.reg
 			t = t.temp(ret)
 	  else
-		(t is const)
+		(T is const)
 		
 	return T
 }

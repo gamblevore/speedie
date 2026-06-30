@@ -1284,7 +1284,7 @@ function SCDecl.MarkAsAltered (|message| Exp)	// markaltered
 		(self is setto)
 
 	require self is local
-	(self is altered)
+	is altered
 	// //                 ////////////////////                 //////////////////
 	/////////////////// //////////// / / /    ///////// // /  /  / /  /////////
 	

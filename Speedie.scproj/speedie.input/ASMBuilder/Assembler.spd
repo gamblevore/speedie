@@ -26,6 +26,7 @@ struct Assembler
 	|bool|						ExpectOneMore
 	|byte|						BreakRequest
 	|byte|						BasicDepth
+	|byte|						LoopDepth
 	|byte|						InlineDepth
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
@@ -176,7 +177,7 @@ struct Assembler
 		dest = .TempOnly(dest)
 		|| Where = orig • dest
 		(where is Const)
-		(where isnt containsaddr)
+		(where isnt ContainsAddr)
 		where.µType = T // why so much fiddling?
 		|| K = .NumToReg(exp, where, amount, T)
 		return .Plus(exp, dest, Orig, K)
@@ -233,6 +234,8 @@ struct Assembler
 		
 		rz = .DeclareMe(where, rz)
 		Type.WholeType = rz
+		type.DepthOfLoop = .LoopDepth
+		
 		target debug: Type.ASMSanity
 
 
@@ -299,7 +302,7 @@ struct Assembler
 			return .Nop(f)
 		target debug
 			if r.reg and r isnt param
-				debugat // we don't know what made it, but we should!!
+				debugat						// we don't know what made it, but we should!!
 	
 	
 	function Nop2Consts (|asmreg| A, |asmreg| B)
@@ -307,12 +310,12 @@ struct Assembler
 			.NopConst(A)
 		.NopConst(B)
 		if !Further
-			.NopConst(A) // in case of swapped order
+			.NopConst(A)					// in case of swapped order
 	
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
 		if r.reg == 0
-			return 0 // sigh. I DIE.
+			return 0						// sigh. I DIE.
 		
 		require R is Const
 
@@ -352,7 +355,7 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode,  |int| Depth=0)
-		|| info = fat.info				// nothing uses canclose right now. This can be fixed
+		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
 
@@ -368,7 +371,7 @@ struct Assembler
 		if type == asm.noop
 			|| C = .curr - 1
 			if fat == C
-				.curr_ = C // do it before both kinds of nop...
+				.curr_ = C					// do it before both kinds of nop...
 				Type = nil
 
 		depth++

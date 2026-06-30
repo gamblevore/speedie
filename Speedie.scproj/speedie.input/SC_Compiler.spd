@@ -731,14 +731,14 @@ function SCFunction.IsAllocOrNew (|bool|)
 
 function NewConst (|scdecl| d)
 	d.nildeclared = nilstate.real
-	d <~ scdeclinfo.Const // ||| scdeclinfo.Global
+	d <~ scdeclinfo.Const			// ||| scdeclinfo.Global
 	.DeclConstants <~ d
 	
 
 function DoRefAnalysis
 	opt norefcounts
 	(compiler is RefCounting)
-	|[message]| list // avoid reading same thing that we alter.
+	|[message]| list				// avoid reading same thing that we alter.
 	for f in .FuncList
 		if f.IsARealSpdFunc and (f isnt VirtualCaller)
 			list.clear
