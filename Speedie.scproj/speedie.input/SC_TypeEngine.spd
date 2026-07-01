@@ -1071,8 +1071,8 @@ function TypeOfSwizSub (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 	// So... we are getting like: v.z --> v[2]	
 	|| Count = swiz >> 16
 	|| W = type.type.NumericCount
-	expect (Count == 1 or side == nil)    (exp, "Can't swizzle that many yet.")
-	expect (count <= 4)                   (exp, "Vectors max out at 4 items.")
+	expect (Count == 1 or side == nil)		(exp, "Can't swizzle that many yet.")
+	expect (count <= 4)						(exp, "Vectors max out at 4 items.")
 	if w == 3 // vec3 is a secret vec4
 		w = 4
 	

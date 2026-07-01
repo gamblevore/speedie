@@ -40,6 +40,10 @@ class XVar (list)
 				x = s.hint
 			.Weirdness[i] = x
 	
+	function Type (|xtype|)
+		opt norefcounts
+		return .obj|&nil||xtype|
+	
 	syntax is (|xvarflags| V, |bool|)
 		return .flags&V
 		
@@ -80,14 +84,9 @@ class XVar (list)
 			fs.AppendHex(Ptr)
 	
 	
-	function Type (|xtype|)
-		opt norefcounts
-		return .obj|&nil||xtype|
-	
-	
 	function TestObjectType (|xtype| Type, |&nil| Where, |xtype|)
 		opt norefcounts
-		require Memory.Readable(Where, 8)
+		require cake.Readable(Where, 8)
 		|| obj = Where|&object|[]
 			require Memory.TestObject(obj)
 			|| Mine = obj.Class
@@ -105,7 +104,7 @@ class XVar (list)
 		opt norefcounts
 		require value
 		if .Reg
-			require memory.Readable(Where, 16)
+			require cake.Readable(Where, 16)
 
 		// references should be understood also. Alter the thing we are pointing to!
 		|| C = .Type
@@ -228,7 +227,7 @@ class XVar (list)
 	function SetDataValue (|!&nil| Where, |message| Msg)
 		opt norefcounts
 		expect (!.weirdness[0] and self isnt BareStruct) (msg, "Unalterable")
-		expect (msg < 60) (msg, "SizeOverflow")
+		expect (msg.length < 60) (msg, "SizeOverflow")
 
 		|| T = .DataType
 		|| V = t.VecCount
@@ -323,7 +322,7 @@ class XVar (list)
 		for W in .Weirdness
 			loop W
 			if (w is Reference) and (self isnt barestruct)
-				fs <~ "$"
+/				fs <~ "$"
 			if w is Pointer
 				fs <~ "&"
 			w >>= 2

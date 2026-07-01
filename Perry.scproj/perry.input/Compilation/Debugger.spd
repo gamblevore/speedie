@@ -429,7 +429,7 @@ function perryide.UpdateStack (|message| stack)
 				l.Flags = crash|int|
 			(m is paused)
 			.DebugMode = m
-			.UpdateCodePointer(F, true)
+			.UpdateCodePointer(F, PerryUpdateStack)
 
 	.SetAppInfo
 

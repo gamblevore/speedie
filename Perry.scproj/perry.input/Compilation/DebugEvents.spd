@@ -275,22 +275,31 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	return !kill
 		
 
+
+constants
+	PerryReturnStack = 0
+	PerryClickedStack
+	PerryUpdateStack
+	
 function ReturnStack (GUIListEvent)
 	opt norefcounts
-	ClickedStack(self, row, mode)
-	.ide.AppInfo.SetFocus
+	if row
+		|| i = .ide
+		|| Found = i.UpdateCodePointer(row, PerryReturnStack)
+		if Found != Row											// its a var, not a func
+			return false
+		i.AppInfo.SetFocus
 	return true
 
 	
 function ClickedStack (GUIListEvent)
 	opt norefcounts
 	if row
-/		return .ide.UpdateCodePointer(row, false)
+		.ide.UpdateCodePointer(row, PerryClickedStack)
 	return true
 
 
-
-function perryide.UpdateCodePointer (|listviewrow| row, |bool| Always,  |bool|)
+function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,  |ListViewRow|)
 	opt norefcounts
 	|| Path = ""
 	while
@@ -299,21 +308,20 @@ function perryide.UpdateCodePointer (|listviewrow| row, |bool| Always,  |bool|)
 			exit
 		row = row.parent				#require
 			
-	require .EditPath(path, false)
-
-	|| Where = row[1].int
-	|| file_path = row.first
-		file_path.Position = where
+	if .EditPath(path, false)	
+		|| Where = row[1].int
+		|| file_path = row.first
+			file_path.Position = where
+		
+		|| e = .editme
+		e._ActiveLine = file_path
+		|| Line = e.show(Where)
+		if (Mode == PerryUpdateStack) or (.LastStack != row)
+			e.DoExplode(Line)
 	
-	|| e = .editme
-	e._ActiveLine = file_path
-	|| Line = e.show(Where)
-	if Always or .LastStack != row
-		e.DoExplode(Line)
+		.LastStack = row	
 
-	.LastStack = row	
-
-	return true
+	return Row
 
 
 	

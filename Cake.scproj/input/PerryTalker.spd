@@ -184,9 +184,10 @@ function CakeVM.GetReg (|cakestack| Stack, |message| Name, |xvar|)
 					return v
 
 
-function CakeVM.GetVar (|xvar| Var, |message| Name, |xvar|)
+function CakeVM.GetProperty (|xvar| Var, |message| Name, |xvar|)
 	opt norefcounts
-	for v.fast in var
+	|| Type = var.type$
+	for v in type.Properties
 		if Name ~= v.Name
 			return v
 
@@ -198,6 +199,12 @@ function cakevm.Prev (|CakeStack| Stack, |int| n, |&cakestack|)
 	
 	
 
+function Cake.Readable (|&nil| Where, |int| n, |bool|)
+	if Memory.Readable(where, n)
+		return true
+	error "Unreadable memory at: " + ((Where|int64|<<1)>>1).hex
+	
+	
 function EditAction (PerryResponse)
 	opt norefcounts
 	debugger
@@ -208,14 +215,17 @@ function EditAction (PerryResponse)
 	|| v = .GetReg(stack, path)$
 	|| Where = stack + v
 	
-	while v
+	while
 		xvar.Printer.Length = 0
 		path++
 		if !path
 			v.SetValue(Where, m.first)
 			return StepAction.SendVars
+		require cake.Readable(where, 8)
 		where = where|&&byte|[]
-		v = .GetVar(v, path)
+
+		v = .GetProperty(v, path)							#loop
+		where = where|&byte| + v.Position
 
 	xvar.Printer.Length = 0
 	return StepAction.DoNothing

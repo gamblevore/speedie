@@ -94,7 +94,6 @@ function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)
 	opt	NoRefCounts
 	
-//	if "MacroNew".trap
 	if fn == compiler.RefClear
 		return .RefCountClear(exp, prms)
 
