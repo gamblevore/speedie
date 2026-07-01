@@ -348,7 +348,7 @@ GUI_Menu_ShowCmm
 GUI_Menu_ShowMenu
 GUI_Menu_TypedString
 GUI_Menu_UseMenu
-GUI_Msg_FlatRange
+GUI_Msg_EntireRange
 GUI_Msg_TableCellSet
 GUI_Note__CheckForDisappear
 GUI_Note__Clicked
@@ -554,6 +554,7 @@ GUI_Text_TryShowLineError
 GUI_Text_TypedString
 GUI_Text_Undo
 GUI_Text_ViewLineAndSel
+GUI_Text_ViewRange
 GUI_Text_XYOfChar
 GUI_Text__Block
 GUI_Text__SyntacticEndOfLine

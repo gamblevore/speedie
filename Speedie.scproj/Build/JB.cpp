@@ -3488,7 +3488,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026070117));
+	JB_FS_AppendInt32(_fsf0, (2026070120));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10222,7 +10222,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026070117));
+	JB_FS_AppendInt32(_fsf0, (2026070120));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -46406,7 +46406,9 @@ byte SC_Decl_DumpFlags(SCDecl* Self) {
 	Rz = ((byte)(SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param)));
 	Rz = (Rz | (SC_Decl_IsBareStruct(Self) << 1));
 	if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)) {
-		Rz = (Rz | (SC_Decl_TypeSuffers(Self) << 2));
+		if (SC_Decl_TypeSuffers(Self)) {
+			Rz = (Rz | (1 << 2));
+		}
 	}
 	 else {
 		Rz = (Rz | ((SC_NilState_SyntaxIs(Self->NilDeclared, kSC__NilState_Nilish)) << 2));

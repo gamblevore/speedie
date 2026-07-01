@@ -1,5 +1,6 @@
 // beta-file. Unstable.
 GUI__App_AControlWasResized
+GUI__App_BlockTextInput
 GUI__App_CanDrag
 GUI__App_ControlResizedSafely
 GUI__App_DrawState
