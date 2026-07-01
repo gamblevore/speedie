@@ -1,12 +1,11 @@
 
+target cake {
+
 struct StructWithObj
 	|object|	A
 	|object|	B
 	|vec4[2]|	carray
 
-
-function UintOnly (|int|)
-	return ASMExamples.BBB
 
 
 module ASMExamples {
@@ -17,7 +16,6 @@ module ASMExamples {
 |float|		KNOB1 = 10
 
 
-target cake {
 
 function TestKnst
 	visible
@@ -107,7 +105,10 @@ function ConstBranch1 (|int| y)
 	y |= x
 	
 	
-	
+function UintOnly (|int|)
+	return ASMExamples.BBB
+
+
 function Uint64Trim (|uint64|)
 	visible
 	return UintOnly()
