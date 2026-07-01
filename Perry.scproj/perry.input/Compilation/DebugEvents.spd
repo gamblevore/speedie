@@ -285,26 +285,37 @@ function ReturnStack (GUIListEvent)
 function ClickedStack (GUIListEvent)
 	opt norefcounts
 	if row
-		return .ide.UpdateCodePointer(row)
+/		return .ide.UpdateCodePointer(row, false)
 	return true
 
 
-function perryide.UpdateCodePointer (|listviewrow| row, |bool|)
+
+function perryide.UpdateCodePointer (|listviewrow| row, |bool| Always,  |bool|)
 	opt norefcounts
-	|| path = row.firstname$
-	require path[] == '/'
+	|| Path = ""
+	while
+		path = row.firstname
+		if path[] == '/'
+			exit
+		row = row.parent				#require
+			
 	require .EditPath(path, false)
-	
+
 	|| Where = row[1].int
 	|| file_path = row.first
 		file_path.Position = where
+	
+	|| e = .editme
+	e._ActiveLine = file_path
+	|| Line = e.show(Where)
+	if Always or .LastStack != row
+		e.DoExplode(Line)
 
-	.editme._ActiveLine = file_path
-	|| Line = .editme.Show(where)
-	.editme.DoExplode(Line)
+	.LastStack = row	
 
 	return true
-	
+
+
 	
 function PerryIDE.DebugMode (|CompileMode|)
 	return ._DebugMode

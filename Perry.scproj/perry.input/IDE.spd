@@ -15,6 +15,7 @@ class PerryIDE (Window)
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
 
+	|message?|					LastStack
 	|listview|					Stack
 	|GuiControl|				Debugger
 

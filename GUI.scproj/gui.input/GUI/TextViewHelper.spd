@@ -654,7 +654,7 @@ extend message
 		
 	
 	
-function message.FlatRange (|intrange|)
+function message.EntireRange (|intrange|)
 	opt norefcounts
 	rz = (int.max, 0)
 	for ch.flat in self

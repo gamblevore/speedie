@@ -489,7 +489,7 @@ function PerryIDE.FuncText (|message| spd_func, |message|)
 	require spd_func
 	rz = spd_func.OwningFullName(@prm)
 	|| Last = rz.last
-	|| oop = spd_func.flatrange
+	|| oop = spd_func.EntireRange
 	last <~ oop.x 
 	oop.x2 += .editme[oop.x2].iswhite 
 	Last.msg(@sstr, .editme[oop])

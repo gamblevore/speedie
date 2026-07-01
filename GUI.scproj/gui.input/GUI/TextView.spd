@@ -386,6 +386,13 @@ class TextView (GUIControl)
 	inline SelRange (assigns: |int| r)
 		cpp_part TypingPlaceInt
 		.selrange = (r, r)
+	
+	function ViewRange (|IntRange|)
+		opt norefcounts
+		|| S = ._start
+		rz.x = s.Position
+		|| E = S.MoveCapped(.MaxVisibleLines)
+		rz.x2 = E.After
 		
 	function SelRange (assigns:|intrange|)
 		.TypingPlaceTry(value, false, nil)
