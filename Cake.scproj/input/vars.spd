@@ -111,13 +111,17 @@ class XVar (list)
 		return type
 
 		
-	function SetValue (|&nil| where, |message| Value)
+	function SetValue (|!&nil| where, |message| Value)
 		opt norefcounts
 		require value
 		if .Reg
 			require cake.Readable(Where, 16)
 
-		// references should be understood also. Alter the thing we are pointing to!
+		expect (self isnt BareStruct)							(value, "Unalterable")
+
+		if .weirdness[0] is reference
+			where = where|&&nil|[]
+
 		|| C = .Type
 		if c and c.IsObject
 			return .SetObjectValue(Where|&object|, value)
@@ -215,14 +219,14 @@ class XVar (list)
 					rz = msg.first
 
 
-	function SetObjectValue (|!&object| Reg, |message| Value)
+	function SetObjectValue (|!&object| Where, |message| Value)
 		opt norefcounts
-		|| OldObj = Reg[]
+		|| OldObj = Where[]
 			require Memory.TestObject(OldObj)
 		
 		if value ~= "nil" or "0" or "0x0"
 			require self is CanBeNil
-			reg[] = nil
+			Where[] = nil
 			return
 	
 		|object| NewObj
@@ -232,27 +236,47 @@ class XVar (list)
 			NewObj = .ParseObj(OldObj, value.name)$
 		
 		expect (Memory.TestObject(NewObj)) (value, "Invalid address")
-		reg[] = NewObj
+		Where[] = NewObj
 	
 	
 	function SetDataValue (|!&nil| Where, |message| Msg)
 		opt norefcounts
-		expect (!.weirdness[0] and self isnt BareStruct) (msg, "Unalterable")
-		expect (msg.length < 60) (msg, "SizeOverflow")
+		expect (msg.length < 60)						(msg, "SizeOverflow")
+
+		|| W = .Weirdness[0]
+		expect (W isnt CArray)							(msg, "Unwriteable") // surely it should be expanded first?
+			
+		// pointers can be altered... im sure of it
+		// and references just need to be dereferenced...
+		// i guess its a pointer TO data. So... just alter the value?
+		
+		
+		
 
 		|| T = .DataType
 		|| V = t.VecCount
 		|| BC = t.ByteCount
-		if (bc >= 12): bc = 16		
+		if (bc > 8): bc = 16		
 
-		expect (memory.Writeable(Where, BC)) (msg, "Unwriteable")
+		if w is Pointer
+/			bc = 8 // is it not already?
+
+		expect (memory.Writeable(Where, BC))			(msg, "Unwriteable")
+
+		if w is Pointer
+			|| mark = StdErr.Mark
+			|| addr = msg.int|&byte|							// 0x1234
+			require mark == stderr.mark
+			require cake.Readable(addr, 8)
+			(where|&&byte|)[] = addr
+			return
 		
 		|| value = msg.name
 
 		if v > 1
 			|| items = value.parse
 				|| fn = items.func
-				expect (fn == @arg or @list or @arr) (msg)
+				expect (fn == @arg or @list or @arr)	(msg)
 				|| i = 0
 				|| ch = items.first
 				while i < v
@@ -263,7 +287,9 @@ class XVar (list)
 					i++
 					ch++
 					if (i == 3) and (v == 3) and ch
-						v = 4 // allow setting last in vec3.
+						v = 4							// allow setting last in vec3.
+			return
+	
 
 		if t is bool
 			(Where|&bool|)[] = value.Yes
@@ -274,7 +300,8 @@ class XVar (list)
 					|| c = value[1]
 					(Where|&int8|)[] = c
 					return
-			|uint64| IntValue = value.parseint
+
+			|uint64| IntValue = msg.int
 			if BC > 4
 				(Where|&int64|)[] = intvalue
 			  elseif bc == 4
@@ -333,7 +360,7 @@ class XVar (list)
 		for W in .Weirdness
 			loop W
 			if (w is Reference) and (self isnt barestruct)
-/				fs <~ "$"
+				fs <~ "$"
 			if w is Pointer
 				fs <~ "&"
 			w >>= 2
@@ -424,13 +451,12 @@ class XVar (list)
 		if (W is pointer or reference) or (F is prototype)
 			require .NilOK(fs, addr)
 
+			|| Ptr = addr|&&nil|[]|int64|
 			if (w is Reference)										// barestructs already handled in rendervalue
-				if self is CanBeNil
-				|| Ptr = addr|&&nil|[]|int64|						#expect ErrorReceiver.NonFatal
-				Addr = ptr|&nil|
+				expect (Ptr) (ErrorReceiver.NonFatal)
+				Addr = ((ptr>>1)<<1)|&nil|
 				
 			  else
-				|| Ptr = addr|&&nil|[]|int64|
 				if !ptr
 					fs <~ "nil"
 					return true

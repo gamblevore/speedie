@@ -17,6 +17,7 @@ function string.MiniName (|faststring| fs, |bool| IsClass)
 	fs.AppendRange(n, i * 3, after)
 
 
+
 function SCDecl.DumpFlags (|byte|)
 	opt norefcounts
 	rz = (self is Param)|byte|

@@ -207,7 +207,6 @@ function Cake.Readable (|&nil| Where, |int| n, |bool|)
 	
 function EditAction (PerryResponse)
 	opt norefcounts
-	debugger
 	|| path = m.second
 	stack = .prev(stack, path.int)$
 	path++

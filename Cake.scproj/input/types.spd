@@ -83,6 +83,7 @@ datatype Wierdness (uint)
 	flags
 		Pointer
 		Reference
+		CArray
 	syntax is (|Wierdness| N, |bool|)
 		return self & N
 
