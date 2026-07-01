@@ -3488,7 +3488,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026070108));
+	JB_FS_AppendInt32(_fsf0, (2026070117));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -3887,14 +3887,11 @@ bool SC_AC__Active() {
 
 void SC_AC__ActualDefine(Message* M, Message* S) {
 	JB_String* F = JB_Msg_OriginalFilePath(S);
-	JB_Incr(F);
 	if (!JB_Str_Exists(F)) {
 		JB_Str_Fail(JB_LUB[818]);
-		JB_EarlyDecr(F);
 		return;
 	}
 	JB_Msg_AppendSyx(M, kJB_SyxSStr, F);
-	JB_Decr(F);
 	JB_Msg_AppendNum(M, S->Position);
 }
 
@@ -10225,7 +10222,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026070108));
+	JB_FS_AppendInt32(_fsf0, (2026070117));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -21178,11 +21175,10 @@ ASMParam SC_FAT_Output(FatASM* Self) {
 void SC_FAT_OutputDebugVars(FatASM* Self, int Next) {
 	FastString* Dd = SC__Pac_DebugDecls;
 	uint Index = Self->ASMIndex;
-	if (SC_FAT_OperatorIsa(Self, kSC__ASM_MARK)) {
-		Next = Index;
-		Index = (Self - 1)->ASMIndex;
-	}
 	if (SC_FAT_SyntaxIs(Self, kSC__Reg_DebugVarClose)) {
+		if (SC_FAT_OperatorIsa(Self, kSC__ASM_MARK)) {
+			Index = (Self - 1)->ASMIndex;
+		}
 		{
 			uint64 _LoopSrcf2 = Self->_Const;
 			uint64 _currf0 = ((uint64)_LoopSrcf2);
@@ -21194,7 +21190,9 @@ void SC_FAT_OutputDebugVars(FatASM* Self, int Next) {
 		};
 	}
 	 else {
-		Index = Next;
+		if (!SC_FAT_OperatorIsa(Self, kSC__ASM_MARK)) {
+			Index = Next;
+		}
 		SCDecl* Ty = SC_Msg_NilDecl(Self->Msg);
 		int Reg = SC_ASMParam_Reg(SC_FAT_Output(Self));
 		if (Ty and Reg) {
@@ -23887,6 +23885,11 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 				SC_FAT_JumpFix(S, SC_Pac_Curr(Self));
 			}
 			 else if (Op == kSC__ASM_KNST) {
+				int Reg = SC_FAT_RegOnly(S, 0);
+				SCDeclInfo Info = Sv->Decls[Reg - 1].Info;
+				if (SC_SCDeclInfo_SyntaxIs(Info, kSC__SCDeclInfo_Reference)) {
+					(++S->xC2xB5RefCount);
+				}
 				SC_Pac_AskNopWithFAT(Self, S);
 			}
 			if (SC_FAT_GuessSize(S)) {
@@ -46402,8 +46405,8 @@ byte SC_Decl_DumpFlags(SCDecl* Self) {
 	uint Rz = 0;
 	Rz = ((byte)(SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param)));
 	Rz = (Rz | (SC_Decl_IsBareStruct(Self) << 1));
-	if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local) and SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Altered)) {
-		Rz = (Rz | (1 << 2));
+	if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)) {
+		Rz = (Rz | (SC_Decl_TypeSuffers(Self) << 2));
 	}
 	 else {
 		Rz = (Rz | ((SC_NilState_SyntaxIs(Self->NilDeclared, kSC__NilState_Nilish)) << 2));
