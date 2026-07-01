@@ -23,14 +23,8 @@ function SCDecl.DumpFlags (|byte|)
 	rz |= .IsBareStruct << 1
 	
 	if self is Local
-		if self is Reference
-			if .PointerCount
-				debugat	// Not sure how this works...
-			  else
-				debugat	// Can references suffer? references should never be nil
-						// but do we mean actually a reference to a pointer?
-						// In that case it COULD be nil.
-		rz |= .typesuffers << 2
+		if .TypeSuffers
+			rz |= 1 << 2
 	  else
 		rz |= (.NilDeclared is Nilish) << 2
 	
