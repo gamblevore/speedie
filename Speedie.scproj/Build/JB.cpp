@@ -31,15 +31,6 @@ extern JB_StringC* JB_LUB[2452];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
-int SC_ASMExamples__Init_() {
-	{
-		SC__ASMExamples_KNOB1 = ((float)10);
-	}
-	;
-	return 0;
-}
-
-
 JB_String* JB_App__AppName() {
 	return JB_Str_Name(JB_App__OrigPath());
 }
@@ -3497,7 +3488,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026062915));
+	JB_FS_AppendInt32(_fsf0, (2026070108));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10234,7 +10225,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026062915));
+	JB_FS_AppendInt32(_fsf0, (2026070108));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -11742,8 +11733,6 @@ int JB_SP_AppInitSub_() {
 	SC_ExprFuncs[11] = ((&SC_TypeOfNothing));
 	SC_ExprFuncs[63] = ((&SC_TypeOfNothing));
 	//;
-	//// ASMExamples;
-	SC_ASMExamples__Init_();
 	//// AutoComplete;
 	SC_AutoComplete__Init_();
 	//// Compiler;
@@ -21689,6 +21678,9 @@ ASMReg SC_InlineInfo_PreInlineOneParam(InlineInfo* Self, Message* P, SCDecl* A, 
 		Self->Normal = (Self->Normal | Vr);
 	}
 	((SC_Decl_SyntaxIsSet(A, kSC__SCDeclInfo_Reference, (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_Reference)))));
+	A->mu.Info = (A->mu.Info | (D->mu.Info & kSC__SCDeclInfo_AlteredCopy));
+	if (SC_Decl_SyntaxIs(A, kSC__SCDeclInfo_TypeImprove)) {
+	}
 	return V;
 }
 
@@ -21882,7 +21874,6 @@ int JB_Rnd__InitCode_() {
 	JB_Rnd_TimeSeed(JB_Random);
 	return 0;
 }
-
 
 
 
@@ -22720,7 +22711,7 @@ bool SC_Pac_CanConst(Assembler* Self, SCDecl* D, FatASM* F) {
 	if (SC_Pac_IsCurrWithFAT(Self, F)) {
 		return true;
 	}
-	if (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredInLoop)) {
+	if ((Self->LoopDepth > D->DepthOfLoop) and (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredInLoop))) {
 		return false;
 	}
 	if (SC_Pac_IsWithin(Self, F)) {
@@ -23120,6 +23111,7 @@ ASMReg SC_Pac_DeclareVar(Assembler* Self, Message* Where, SCDecl* Type) {
 	}
 	Rz = SC_Pac_DeclareMe(Self, Where, Rz);
 	(SC_Decl_WholeTypeSet(Type, Rz));
+	Type->DepthOfLoop = Self->LoopDepth;
 	return Rz;
 }
 
@@ -25796,7 +25788,11 @@ FatASM* SC_Pac_Whatever(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* 
 }
 
 ASMReg SC_Pac_While(Assembler* Self, Message* Exp, ASMReg Dest) {
-	return SC_Pac_MainBrancher(Self, Exp, nil);
+	ASMReg Rz = ((ASMReg)0);
+	(++Self->LoopDepth);
+	Rz = SC_Pac_MainBrancher(Self, Exp, nil);
+	(--Self->LoopDepth);
+	return Rz;
 }
 
 ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp) {
@@ -60938,4 +60934,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 3523611876651737906 6223219523295676220
+// -8071229107716153436 -1897883032701103671

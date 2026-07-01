@@ -8,11 +8,6 @@ const char* JB_ThreadName = "Speedie";
 
 JB_Globals JB__;
 #pragma GCC visibility push(hidden) // hide
-byte SC__ASMExamples_BBB;
-int SC__ASMExamples_Bolg;
-vec2 SC__ASMExamples_carray[2];
-int SC__ASMExamples_Glob;
-float SC__ASMExamples_KNOB1;
 JB_String* SC__AutoComplete_function_anywhere;
 JB_String* SC__AutoComplete_function_cls_only;
 JB_String* SC__AutoComplete_function_names;

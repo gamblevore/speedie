@@ -333,8 +333,6 @@ struct RegFile;
 
 struct RetroFloat;
 
-struct StructWithObj;
-
 struct TerminalDisplay;
 
 struct VirtualJBString;
@@ -795,6 +793,7 @@ struct Assembler {
 	bool ExpectOneMore;
 	byte BreakRequest;
 	byte BasicDepth;
+	byte LoopDepth;
 	byte InlineDepth;
 	byte DeepestInline;
 	byte InlineDepthLimit;
@@ -1344,11 +1343,6 @@ JBClass ( SCModule , SCBetterNode ,
 	SCClass* Cls;
 	Message* InitVarsArg;
 );
-extern byte SC__ASMExamples_BBB;
-extern int SC__ASMExamples_Bolg;
-extern vec2 SC__ASMExamples_carray[2];
-extern int SC__ASMExamples_Glob;
-extern float SC__ASMExamples_KNOB1;
 #define JB__App__Args JB__.App__Args
 #define JB__App__Conf JB__.App__Conf
 #define JB__App__Path JB__.App__Path
@@ -2661,11 +2655,6 @@ extern JB_Globals JB__;
 
 
 //// HEADER JB.h
-
-
-
-// ASMExamples
-int SC_ASMExamples__Init_();
 
 
 
@@ -6138,9 +6127,6 @@ int JB_Rnd__InitCode_();
 
 
 // JB_RetroFloat
-
-
-// JB_StructWithObj
 
 
 // JB_TerminalDisplay
