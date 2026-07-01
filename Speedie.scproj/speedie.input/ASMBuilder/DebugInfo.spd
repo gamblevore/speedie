@@ -21,10 +21,19 @@ function SCDecl.DumpFlags (|byte|)
 	opt norefcounts
 	rz = (self is Param)|byte|
 	rz |= .IsBareStruct << 1
+	
 	if self is Local
+		if self is Reference
+			if .PointerCount
+				debugat	// Not sure how this works...
+			  else
+				debugat	// Can references suffer? references should never be nil
+						// but do we mean actually a reference to a pointer?
+						// In that case it COULD be nil.
 		rz |= .typesuffers << 2
 	  else
 		rz |= (.NilDeclared is Nilish) << 2
+	
 	if .IsNormal
 		|| t = .Type
 		rz |= (t.BaseType is ProtoType)<<3
