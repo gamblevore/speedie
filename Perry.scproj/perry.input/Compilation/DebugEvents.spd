@@ -275,29 +275,34 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	return !kill
 		
 
+function ReturnStack (GUIListEvent)
+	opt norefcounts
+	ClickedStack(self, row, mode)
+	.ide.AppInfo.SetFocus
+	return true
+
+	
 function ClickedStack (GUIListEvent)
 	opt norefcounts
 	if row
-		return .ide.UpdateCodePointer(row, false)
+		return .ide.UpdateCodePointer(row)
 	return true
 
 
-function perryide.UpdateCodePointer (|listviewrow| row, |bool| Active, |bool|)
+function perryide.UpdateCodePointer (|listviewrow| row, |bool|)
 	opt norefcounts
 	|| path = row.firstname$
 	require path[] == '/'
 	require .EditPath(path, false)
 	
 	|| Where = row[1].int
-	if Active
-		|| file_path = row.first
-			file_path.Position = where
-//		.editme._DimUnReachedLines = true
-		.editme._ActiveLine = file_path
+	|| file_path = row.first
+		file_path.Position = where
 
+	.editme._ActiveLine = file_path
 	|| Line = .editme.Show(where)
-	if Active
-		.editme.Doexplode(Line)
+	.editme.DoExplode(Line)
+
 	return true
 	
 	

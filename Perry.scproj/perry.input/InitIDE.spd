@@ -17,7 +17,7 @@ extend PerryIDE
 		.Debugger			= guicontrol(self)
 		.AppInfo			= TextView(self, nil, PerryAppInfoKeys)
 		.DebugBtns			= guicontrol(self)
-		.Stack				= listview(self, ClickedStack, ClickedStack)
+		.Stack				= listview(self, ClickedStack, ReturnStack)
 		.SearchArea			= guicontrol(self)
 		.ViewButtons		= guicontrol(self)
 		.RBorder			= guicontrol(self)

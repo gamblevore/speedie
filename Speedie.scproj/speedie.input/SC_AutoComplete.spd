@@ -980,6 +980,7 @@ function AutoCompleteSub (|message| ff, |string| name, |message| into)
 
 
 function ActualDefine (|message| m, |message| s)
+	opt norefcounts
 	|| f = s.originalfilepath			#expect "nopath"
 	m <~ (@sstr, f)
 	m <~ s.position
@@ -1009,12 +1010,12 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	if msg == @name
 		if purpose == "display"  and  s istmp "prototype"
 			return s
-		msg.func = @thg // findmoduleorclass needs this
+		msg.func = @thg							// findmoduleorclass needs this
 		|| obj = compiler.findmoduleorclass(msg, true)
-			return obj.diissplayobj(rz)
+			return obj.DiissplayObj(rz)
 	
 	if (s == @decl) and (!fn or msg.deepequals(s.DeclName))
-		rz <~ (@emb, s.AutoCompleteDecl) // constants get written through here!!! >_> wew
+		rz <~ (@emb, s.AutoCompleteDecl)		// constants get written through here!!! >_> wew
 		return rz
 
 	if !fn
@@ -1024,7 +1025,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	
 	if purpose ~= "displayall"
 		if fn and !fn.nextfunc and !fn.args
-			return rz // I guess we want empty result.
+			return rz							// I guess we want empty result.
 	if !fn
 		return s.copy
 	

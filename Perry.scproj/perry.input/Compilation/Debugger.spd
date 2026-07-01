@@ -238,7 +238,6 @@ function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
 		.givearg|listviewrow|.ReStitchAndFixup(InputArg, Depth)
 		
 	
-
 function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
 	opt norefcounts
 	|| O = .last
@@ -432,7 +431,7 @@ function perryide.UpdateStack (|message| stack)
 		(m is paused)
 		.DebugMode = m
 
-		.UpdateCodePointer(F, true)
+		.UpdateCodePointer(F)
 	.SetAppInfo
 
 

@@ -64,22 +64,26 @@ function jbin.DumpDeclClose (|int| Pos, |int| Reg)
 
 
 
-
-
 function FATASM.OutputDebugVars (|int| Next)
 	opt norefcounts
 	|| dd = Assembler.DebugDecls!
 	|| Index = .ASMIndex
-	if self isa asm.mark
-		next = index
-		index = (self-1).ASMIndex
-	
 	if self is DebugVarClose
+		if self isa asm.mark
+			index = (self-1).ASMIndex
+		
 		for i.bits in ._Const
 			dd.DumpDeclClose(index, i.log2)
 
 	  else
-		index = Next
+		ifn self isa asm.mark
+			index = Next
+//		  else
+//			|| prev = self - 1
+//			if prev isa asm.FNC or asm.fnc3
+//				index = next
+//			next = index
+//			index = (self-1).ASMIndex
 		|| ty = .msg.NilDecl
 		|| reg = .Output.reg
 		if ty and reg
