@@ -21,6 +21,8 @@ module debugger
 		BreakReqBit			= 2<<30
 		BreakBits			= 3<<30
 		ClearRealKeepUser	= 2
+		
+		MinPointer			= 64K
 	
 	function DbgLength (|uint|)
 		opt inline

@@ -21,8 +21,8 @@ function SCDecl.DumpFlags (|byte|)
 	opt norefcounts
 	rz = (self is Param)|byte|
 	rz |= .IsBareStruct << 1
-	if self is Local and self is Altered
-		rz |= 1 << 2
+	if self is Local
+		rz |= .typesuffers << 2
 	  else
 		rz |= (.NilDeclared is Nilish) << 2
 	if .IsNormal
@@ -30,7 +30,7 @@ function SCDecl.DumpFlags (|byte|)
 		rz |= (t.BaseType is ProtoType)<<3
 
 
-function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true) // decldump
+function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true) // decldump, debugdump
 	opt norefcounts
 	|| Mark = dd.Length
 	dd <~ '\0'											// range-length

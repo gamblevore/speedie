@@ -43,6 +43,7 @@ class SCDecl (SCObject) {
 		|| m = SCModule.curr
 			.mu.ModuleNum = m.ModuleNum
 
+	
 	setter Name (|string|)
 		super.exportname = value
 		super.name = value

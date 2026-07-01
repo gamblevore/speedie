@@ -71,17 +71,28 @@ class XVar (list)
 		Disabled "Spelt wrong!"
 	
 	
-	function NilOK (|faststring!| fs, |&nil| Where,  |bool|)
-		require fs.TestMem(Where, 8, "Unreadable")
-		|| Ptr = (Where|&uint64|)[]
-		if (!Ptr and (self is canbenil)) or (Ptr >= 64K)
+	function PointerOK (|&nil| Ptr, |bool|)
+		if (Ptr|uint64| >= debugger.MinPointer)
+			return true
+		return !Ptr and (self is canbenil)
+	
+	
+	function NilOK (|faststring!| fs, |!&nil| Where, |bool|)
+		ifn (where|uint64| >= debugger.MinPointer) and fs.TestMem(Where, 8, "Unreadable")
+		// both should never happen. Its like a register being nil, or an object being nil.
+		// Despite that we should have tested it for nil and not come here.
+			debugger
+			error (ErrorReceiver.nonfatal)
+
+		|| Ptr = (Where|&?&nil|)[]
+		if .PointerOK(ptr)
 			return true
 
-		if !ptr
+/		if !ptr
 			fs <~ "nil"
 		  else
 			fs <~ "0x"
-			fs.AppendHex(Ptr)
+			fs.AppendHex(Ptr|uint64|)
 	
 	
 	function TestObjectType (|xtype| Type, |&nil| Where, |xtype|)
@@ -281,10 +292,10 @@ class XVar (list)
 				(Where|&f64|)[] = ValueFloat
 	
 
-	function RenderObject (|faststring| fs, |!&nil| Reg, |$int| RefCount,  |bool|)
+	function RenderObject (|faststring| fs, |!&nil| Addr, |$int| RefCount,  |bool|)
 		opt norefcounts
-		require .NilOK(fs, reg)
-		|| obj = reg|&object|[]
+		require .NilOK(fs, Addr)
+		|| obj = Addr|&object|[]
 		if !obj
 			fs <~ "nil"
 			return true
@@ -367,7 +378,7 @@ class XVar (list)
 			.AppendHex(Mem|int64|)
 	
 	
-	function RenderValue (|faststring| fs, |&nil| Where, |$int| RefCount,  |bool|)
+	function RenderValue (|faststring| fs, |!&nil| Where, |$int| RefCount,  |bool|)
 		opt norefcounts
 		if .Reg
 			require fs.TestMem(Where, 16, "BadStack")		// we still need to check for readability, though!
@@ -401,7 +412,7 @@ class XVar (list)
 			fs <~ ">"
 
 
-	function RenderData (|faststring| fs, |!&nil| Reg, |bool|)
+	function RenderData (|faststring| fs, |!&nil| Addr, |bool|)
 		opt norefcounts
 		|| T = .DataType
 		|| V = t.VecCount
@@ -411,41 +422,48 @@ class XVar (list)
 		|| F = .flags
 
 		if (W is pointer or reference) or (F is prototype)
-			require .NilOK(fs, reg)
-			|| Ptr = Reg|&&nil|[]|int64|
-			if !ptr
-				fs <~ "nil"
-				return true
-			fs <~ "0x"
-			fs.AppendHex(ptr, 2)
-			
-			if .Weirdness[1]
-				return fs.TestMem(reg, bc, "UnReadable") // dont render pointer to a pointer
-			
-			if f is Prototype
-				return true
-			reg = ptr|&ivec4|
-			fs <~ ": "
+			require .NilOK(fs, addr)
+
+			if (w is Reference)										// barestructs already handled in rendervalue
+				if self is CanBeNil
+				|| Ptr = addr|&&nil|[]|int64|						#expect ErrorReceiver.NonFatal
+				Addr = ptr|&nil|
+				
+			  else
+				|| Ptr = addr|&&nil|[]|int64|
+				if !ptr
+					fs <~ "nil"
+					return true
+				fs <~ "0x"
+				fs.AppendHex(ptr, 2)
+				
+				if .Weirdness[1]
+					return fs.TestMem(addr, bc, "UnReadable")		// dont render pointer to a pointer
+				
+				if f is Prototype
+					return true
+				addr = ptr|&ivec4|
+				fs <~ ": "
 		
-		require fs.TestMem(reg, bc, "UnReadable")
+		require fs.TestMem(addr, bc, "UnReadable")
 				
 		if t is bool
-			fs <~ (reg|&bool|)[].string
+			fs <~ (addr|&bool|)[].string
 		  elseif t isnt Floating
 			if v <= 1
 				|uint64| Value
 				if BC > 4
-					value = (reg|&int64|)[]
+					value = (addr|&int64|)[]
 				  elseif bc == 4
-					value = (reg|&int|)[]
+					value = (addr|&int|)[]
 				  elseif bc == 2
-					value = (reg|&int16|)[]
+					value = (addr|&int16|)[]
 				  else
-					value = (reg|&int8|)[]
+					value = (addr|&int8|)[]
 				
 				|| sh = 64 - (bc*8)
-				if !t.IsSigned and (sh > 0) // unnecessary??
-					value = (value << sh) >> sh // remove later
+				if !t.IsSigned and (sh > 0)							// unnecessary??
+					value = (value << sh) >> sh						// remove later
 				fs.AppendDecimal(value)
 
 				if value and (bc == 1) and !t.IsSigned
@@ -458,23 +476,23 @@ class XVar (list)
 					fs <~ (Container>>8)|byte|
 				
 			  elseif v == 2
-				fs <~ (reg|&ivec2|)[]
+				fs <~ (addr|&ivec2|)[]
 			  elseif v == 3
-				fs <~ (reg|&ivec3|)[]
+				fs <~ (addr|&ivec3|)[]
 			  elseif v == 4
-				fs <~ (reg|&ivec4|)[]
+				fs <~ (addr|&ivec4|)[]
 		  else
 			if v <= 1
 				if BC <= 4
-					fs <~ (reg|&float|)[]
+					fs <~ (addr|&float|)[]
 				  else
-					fs <~ (reg|&f64|)[]
+					fs <~ (addr|&f64|)[]
 			  elseif v == 2
-				fs <~ (reg|&vec2|)[]
+				fs <~ (addr|&vec2|)[]
 			  elseif v == 3
-				fs <~ (reg|&vec3|)[]
+				fs <~ (addr|&vec3|)[]
 			  elseif v == 4
-				(reg|&vec4|)[].SmallerVec4Render(fs)
+				(addr|&vec4|)[].SmallerVec4Render(fs)
 
 		return true
 

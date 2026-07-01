@@ -360,7 +360,7 @@ function cakestack.OperatorPlus (|xvar| v, |&nil|)
 	return .reg0 + v.reg
 
 
-function xtype.ExpandSub (|jbin| j, |&byte| Obj, |message| xp)
+function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp)
 	opt norefcounts
 	|| Sue = .Super
 		sue.ExpandSub(j, obj, xp)
