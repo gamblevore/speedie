@@ -364,6 +364,7 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			.OnKeyDown		= PerryStackKeyDown
 			.ColumnFinder	= &Perry.VariableFinder
 			.OnExpandRow	= &Perry.collectexpansion
 			.Hierarchical	= ListViewHierarchy.Last

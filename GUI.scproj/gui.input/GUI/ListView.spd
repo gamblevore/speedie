@@ -196,6 +196,10 @@ class ListView (GUIControl) {
 		return .listsource.first
 	
 
+	function ListEdge (|listviewrow|)
+		disabled "use .Edge"
+
+
 	libinternal ListEnd (|ListViewrow|)
 		opt norefcounts
 		|| li = .listsource 
@@ -360,12 +364,15 @@ class ListView (GUIControl) {
 	
 	behaviour KeyDown
 		opt norefcounts
-		if .KeyDownTest(key) or (.OnKeydown)(self, key)?
+		if .KeyDownTest(key)
 			._EditDelayed = nil
 			return true
 			
 			
 	libinternal KeyDownTest (|keys| key, |bool|)
+		if (.OnKeydown)(self, key)?
+			return true
+		
 		if key is INSERT or Enter
 			.editcell
 			return true
@@ -505,7 +512,7 @@ class ListView (GUIControl) {
 		
 
 	function EnableDrag
-		.OnDragRow = nil 
+		.OnDragRow = nil
 		if !.istree
 			.ondragrow = &BasicRowDrag
 	
@@ -842,14 +849,14 @@ class ListView (GUIControl) {
 			l = .listPrev(l)
 			
 		
-	libinternal Edge (|int| i, |ListViewrow|)
+	function SelectableEdge (|bool| Last, |ListViewrow|)
 		opt norefcounts
-		if i > 0
+		if Last
 			rz = .listend
 		  else
 			rz = .liststart
 		while rz and rz is UnSelectable
-			rz = rz.step(i <= 0)
+			rz = rz.step(!Last)
 	
 
 	libinternal SearchStep (|ListViewrow| l, |bool| fwd, |ListViewrow|)
@@ -1000,7 +1007,7 @@ class ListView (GUIControl) {
 
 	function SelectEdge (|bool| Last=false, |ListViewSelectMode| Mode = ListViewSelectMode.normal, |bool|)
 		opt norefcounts
-		.select(.edge( last*2 - 1 ), mode)
+		.select(.SelectableEdge( Last ), mode)
 		return true
 
 	function SelectShift (|ListViewrow| l, |ListViewrow| m, |bool|)
@@ -1034,8 +1041,7 @@ class ListView (GUIControl) {
 		  else
 			l = .FirstSelected
 		if !l
-			// what if .start or .end is disabled?
-			|| f = .edge(i)
+			|| f = .SelectableEdge(i>0)
 			return .Select(f)
 		
 		|| m = .bmove(l, i)

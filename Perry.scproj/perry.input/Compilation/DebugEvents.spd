@@ -55,8 +55,9 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	
 	if key is up or down
 		|| st = i.stack
-		st.setfocus
-		st.Selectedge(key is up)
+		if st.ListSource.HasAny
+			st.setfocus
+			st.Selectedge(key is up)
 		return true
 	
 	if key.IsAccept

@@ -357,6 +357,17 @@ function @perry.VariableFinder (listview.columnfinder)
 
 
 
+function PerryStackKeyDown (guikeyevent)
+	opt norefcounts
+	if (key is up or down) and (self isa ListView)
+		|| i = .ide
+		|| sel = .FirstSelected
+		|| Edge = .SelectableEdge(key is down)
+		if sel == edge
+			i.AppInfo.SetFocus
+			return true
+			
+
 function PerryStackEditCell (GUIListEditEvent)
 	opt norefcounts
 	|| row = cell.row!
