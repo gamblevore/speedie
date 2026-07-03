@@ -22,8 +22,9 @@ module LibStability
 		|| fs = (faststring() (exec) nil)
 			fs <~ data ?? "// beta-file. Unstable."
 		.StabiliseSub2(fs, list, isfuncs)
-		if fs and !Options.TargetDebug
-			funcs.SmartData = fs|string|
+		if !Compiler.InPerry
+			if fs and !Options.TargetDebug
+				funcs.SmartData = fs|string|
 
 	
 	function StabiliseSub2 (|faststring| fs, |[scobject]| list, |bool| IsFunc)

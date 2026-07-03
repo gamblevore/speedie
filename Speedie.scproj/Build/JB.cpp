@@ -5621,8 +5621,10 @@ void SC_LibStability__StabiliseSub(JB_String* Name, Array* List, bool IsFuncs) {
 	}
 	JB_Decr(Data);
 	SC_LibStability__StabiliseSub2(Fs, List, IsFuncs);
-	if (Fs and (!SC__Options_TargetDebug)) {
-		(JB_File_SmartDataSet(Funcs, ((JB_String*)Fs)));
+	if (!SC__Comp_InPerry) {
+		if (Fs and (!SC__Options_TargetDebug)) {
+			(JB_File_SmartDataSet(Funcs, ((JB_String*)Fs)));
+		}
 	}
 	JB_Decr(Funcs);
 	JB_Decr(Fs);
