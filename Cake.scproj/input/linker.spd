@@ -85,7 +85,7 @@ module SpdTable
 		disabled "Do you mean message.length or spdfunc.rangelength?"
 		
 	
-	function FillCallBacks (|string| ang)
+	function FillCallBacks (|string| Ang)
 		|| i = InputStream(ang)
 		|| g = Globals.PackGlobs!
 		|| gmax = Globals.PackGlobSize
@@ -96,7 +96,7 @@ module SpdTable
 			|uint| D = i.HInt
 			|uint| Fn = i.HInt
 			ifn (D < gmax and Fn < fmax)
-				error ("CallbackOutOfRange")
+				error "CallbackOutOfRange"
 				exit
 			|| where = (g+d)|&uint64|
 			where[] = Code + (Fn<<2)

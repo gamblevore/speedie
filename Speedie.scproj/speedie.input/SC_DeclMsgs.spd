@@ -234,7 +234,7 @@ function scdecl.AddToGlobs (|bool|)
 		ifn fn and fn|scnode| is embeddedonly
 			PackMaker.LibGlobs <~ self
 			return true
-
+	
 	packmaker.PackGlobs <~ self
 	return true
 

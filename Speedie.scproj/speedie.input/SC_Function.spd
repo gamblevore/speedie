@@ -690,9 +690,9 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 	while (exp == @bra)
 		exp.obj = .ReturnType
 		exp = exp.first!
-		if exp == @arg // unbra fail.
+		if exp == @arg									// unbra fail.
 			exp = exp.parent!
-			exit // we really want args to be statement-exprs by themself
+			exit										// we really want args to be statement-exprs by themself
 
 	|| Using = exp.SyntaxUsing
 	|| cst = .IsSimpleCast
@@ -705,7 +705,7 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 		cst.First!.ReplaceWith( exp )
 
 	  else
-		cst = (@thg + .ExportName).wrapwith(@func)  // JB_Str_Exists(obj)
+		cst = (@thg + .ExportName).wrapwith(@func)		// JB_Str_Exists(obj)
 		exp.Next = cst
 		cst.msg(@prm) <~ exp
 		if MyType.IsBareStruct
@@ -735,13 +735,11 @@ function DeclsPrototypeClass (|Message!| ch0)
 			fptype = task_proto
 	
 	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
+
 	|| dcl = .DeclsProtoTypeAdd(fpType)
-	
-	(dcl is Global) // in case we don't do the below branch
-	if (!.islibrary) or (self|scnode| isnt libonly)
-		dcl.AddToGlobs
-	  else
-		dcl.exportposition = 64K-8 // sigh. just mark it somehow.
+	(dcl is Global)
+//	if (.islibrary) and (self|scnode| is libonly)
+//		dcl.exportposition = 64K-8 // sigh. just mark it somehow.
 
 
 function scnode.Route (|string| name, |message|)

@@ -45,7 +45,7 @@ module LibStability
 		opt norefcounts
 		if !.LibGlobSize
 			.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after
-			.LibGlobSize = .GlobalsSize(.libglobs)		// rebuild size
+/			.LibGlobSize = .GlobalsSize(.libglobs)		// rebuild size
 	
 	
 	function SCObject.PackID (|bool| isFunc, |int|)

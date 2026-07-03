@@ -121,7 +121,7 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	
 
 	
-function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr,   |bool|)
+function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 	opt norefcounts
 	for fn in .PackFuncs
 		if .PackSaved.AddOrShrink(j, fn)
@@ -129,6 +129,7 @@ function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr,   |bool|)
 			|| Start = sourcemap.ASMTotal
 			require j.BakeFunc(fn)
 			|| glob = fn.HasProto
+				if !glob.ExportPosition
 				bmr.appendhint(glob.ExportPosition)
 				bmr.appendhint(Start)
 			fn.µprint

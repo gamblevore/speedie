@@ -90,7 +90,8 @@ module PackMaker
 
 	function BuildGlobs (|bool|)
 		opt norefcounts
-		require .UseMain("JB_SP_AppInit", 1) and  .UseMain("JB_Main", 2)
+		require .UseMain("JB_SP_AppInit", 1)
+		require .UseMain("JB_Main", 2)
 
 		LibStability.StabiliseFuncs	
 		LibStability.StabiliseGlobs
