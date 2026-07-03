@@ -7,13 +7,10 @@
 
 #include <stdio.h>
 
-extern "C" {
+#define API extern "C" // ??
 
-
-int JB_SP_Run (const char** Args, int Mode);
-int main (int count, const char** Args) {
+API int JB_SP_Run (const char** Args, int Mode);
+API int main (int count, const char** Args) {
     return 255 & JB_SP_Run(Args, 3);
-}
-
 }
 
