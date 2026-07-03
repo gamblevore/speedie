@@ -845,74 +845,92 @@ void SC_Comp__DeadStrip() {
 	}
 	;
 	{
-		Array* _LoopSrcf5 = SC__PackMaker_LibGlobs;
+		Array* _LoopSrcf5 = SC__Comp_FuncList;
 		int _if3 = 0;
 		while (true) {
-			SCDecl* F = ((SCDecl*)JB_Array_Value(_LoopSrcf5, _if3));
+			SCFunction* F = ((SCFunction*)JB_Array_Value(_LoopSrcf5, _if3));
 			if (F == nil) {
 				break;
 			}
-			SC_Decl_StoreExport(F);
-			SC_Decl_Reach(F);
+			SCDecl* Cb = F->HasProto;
+			if (Cb) {
+				if (SC_Func_PutProtoInGlobs(F)) {
+					SC_Decl_AddToGlobs(Cb);
+				}
+			}
 			(++_if3);
 		};
 	}
 	;
 	{
-		Array* _LoopSrcf8 = SC__PackMaker_PackGlobs;
+		Array* _LoopSrcf8 = SC__PackMaker_LibGlobs;
 		int _if6 = 0;
 		while (true) {
 			SCDecl* F = ((SCDecl*)JB_Array_Value(_LoopSrcf8, _if6));
 			if (F == nil) {
 				break;
 			}
+			SC_Decl_StoreExport(F);
 			SC_Decl_Reach(F);
 			(++_if6);
 		};
 	}
 	;
+	{
+		Array* _LoopSrcf11 = SC__PackMaker_PackGlobs;
+		int _if9 = 0;
+		while (true) {
+			SCDecl* F = ((SCDecl*)JB_Array_Value(_LoopSrcf11, _if9));
+			if (F == nil) {
+				break;
+			}
+			SC_Decl_Reach(F);
+			(++_if9);
+		};
+	}
+	;
 	if (SC__Options_MakeExec) {
 		{
-			Array* _LoopSrcf11 = SC__Comp_ClassList;
-			int _if9 = 0;
+			Array* _LoopSrcf14 = SC__Comp_ClassList;
+			int _if12 = 0;
 			while (true) {
-				SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf11, _if9));
+				SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf14, _if12));
 				if (C == nil) {
 					break;
 				}
 				SC_Class_Reach(C, SC__Comp_Interpreter, nil);
-				(++_if9);
+				(++_if12);
 			};
 		};
 	}
 	{
-		Array* _LoopSrcf14 = SC__Comp_ClassList;
-		int _if12 = 0;
-		while (true) {
-			SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf14, _if12));
-			if (C == nil) {
-				break;
-			}
-			if (C->MyReacher) {
-				SC_Class_ReachBehaviours(C);
-			}
-			(++_if12);
-		};
-	}
-	;
-	SC_CodeSorter__LeafsFirst();
-	JB_Array_Sort(SC__Comp_ReachedClassTable, ((FP_SorterComparer)((&SC_Class__Sorter))));
-	{
-		Array* _LoopSrcf17 = SC__Comp_ReachedClassTable;
+		Array* _LoopSrcf17 = SC__Comp_ClassList;
 		int _if15 = 0;
 		while (true) {
 			SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf17, _if15));
 			if (C == nil) {
 				break;
 			}
-			int I = _if15;
-			C->TableID = (I + 1);
+			if (C->MyReacher) {
+				SC_Class_ReachBehaviours(C);
+			}
 			(++_if15);
+		};
+	}
+	;
+	SC_CodeSorter__LeafsFirst();
+	JB_Array_Sort(SC__Comp_ReachedClassTable, ((FP_SorterComparer)((&SC_Class__Sorter))));
+	{
+		Array* _LoopSrcf20 = SC__Comp_ReachedClassTable;
+		int _if18 = 0;
+		while (true) {
+			SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf20, _if18));
+			if (C == nil) {
+				break;
+			}
+			int I = _if18;
+			C->TableID = (I + 1);
+			(++_if18);
 		};
 	};
 }
@@ -3488,7 +3506,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026070120));
+	JB_FS_AppendInt32(_fsf0, (2026070312));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -5971,6 +5989,8 @@ bool SC_PackMaker__BakeAllFuncs(FastString* J, FastString* Bmr) {
 				}
 				SCDecl* Glob = Fn->HasProto;
 				if (Glob) {
+					if (!SC_Decl_ExportPosition(Glob)) {
+					}
 					JB_FS_AppendHInt(Bmr, SC_Decl_ExportPosition(Glob));
 					JB_FS_AppendHInt(Bmr, Start);
 				}
@@ -6077,7 +6097,10 @@ void SC_PackMaker__BakeStrings(FastString* J) {
 }
 
 bool SC_PackMaker__BuildGlobs() {
-	if (!(SC_PackMaker__UseMain(JB_LUB[1453], 1) and SC_PackMaker__UseMain(JB_LUB[1454], 2))) {
+	if (!SC_PackMaker__UseMain(JB_LUB[1453], 1)) {
+		return nil;
+	}
+	if (!SC_PackMaker__UseMain(JB_LUB[1454], 2)) {
 		return nil;
 	}
 	SC_LibStability__StabiliseFuncs();
@@ -6288,6 +6311,7 @@ void SC_PackMaker__MakePack() {
 void SC_PackMaker__OrderLibGlobs() {
 	if (!SC__PackMaker_LibGlobSize) {
 		JB_Array_Sort(SC__PackMaker_LibGlobs, ((FP_SorterComparer)(SC_SimplestFirst)));
+		JB_DoAt(1);
 		SC__PackMaker_LibGlobSize = SC_PackMaker__GlobalsSize(SC__PackMaker_LibGlobs);
 	}
 }
@@ -10222,7 +10246,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026070120));
+	JB_FS_AppendInt32(_fsf0, (2026070312));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -55765,12 +55789,6 @@ void SC_Func_DeclsPrototypeClass(SCFunction* Self, Message* Ch0) {
 	SC_Func_DeclsProtoCleanup(Self, fpType, Ch0, false, false, Route);
 	SCDecl* Dcl = SC_Func_DeclsProtoTypeAdd(Self, fpType);
 	(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_Global, true));
-	if (((!SC_Base_IsLibrary(Self))) or ((!SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibOnly)))) {
-		SC_Decl_AddToGlobs(Dcl);
-	}
-	 else {
-		(SC_Decl_ExportPositionSet(Dcl, 65536 - 8));
-	}
 }
 
 void SC_Func_DeclsPrototypeInterface(SCFunction* Self, Message* Ch0, SCClass* fpType, bool Late) {
@@ -57187,6 +57205,16 @@ void SC_Func_ProtoExportName(SCFunction* Self) {
 	if (!JB_Str_Exists(Cls->CppClass)) {
 		JB_SetRef(Cls->CppClass, SC_Func_MakeProtoClassName(Self, Cls->Name));
 	}
+}
+
+bool SC_Func_PutProtoInGlobs(SCFunction* Self) {
+	if (!SC_Base_IsLibrary(Self)) {
+		return Self->MyReacher or SC__Comp_InPerry;
+	}
+	if (!SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibOnly)) {
+		return true;
+	}
+	return false;
 }
 
 void SC_Func_Reach(SCFunction* Self) {
@@ -60939,4 +60967,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -8071229107716153436 -1897883032701103671
+// 1535719959938229676 -1897883032701103671
