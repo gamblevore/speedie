@@ -209,7 +209,7 @@ function compiler.DeadStrip
 
 	for f in .FuncList
 		|| cb = f.HasProto
-			if f.islibrary or f.MyReacher
+			if f.islibrary or f.MyReacher or Compiler.InPerry
 				cb.AddToGlobs
 
 	for f in packmaker.libglobs

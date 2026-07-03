@@ -17,7 +17,7 @@ function scfunction.SetZeroProperties (|Message| After, |[scdecl]| P)
 	|[scdecl]| sorted
 	.SetZeroPropertiesSub(After, p, sorted)
 //	printline sorted
-	
+
 
 function scdecl.BiggestType (|[scdecl]| sorted, |int| i, |bool| CanSIMD, |scdecl!|)
 	opt norefcounts
