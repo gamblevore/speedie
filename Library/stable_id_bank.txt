@@ -318,6 +318,7 @@ GUI_LV_SelectEdge
 GUI_LV_SelectMove
 GUI_LV_SelectNone
 GUI_LV_SelectShift
+GUI_LV_SelectableEdge
 GUI_LV_SetColumnsMsg
 GUI_LV_Show
 GUI_LV_StopFilter
@@ -1826,7 +1827,6 @@ JB_ivec2_OperatorMin
 JB_ivec2_OperatorMinus0
 JB_ivec2_OperatorMul
 JB_ivec2_OperatorSign
-JB_ivec2_Point
 JB_ivec2_RayCast
 JB_ivec2_Render
 JB_ivec2_SyntaxCall
