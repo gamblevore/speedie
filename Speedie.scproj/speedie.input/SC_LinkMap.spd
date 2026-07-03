@@ -200,8 +200,10 @@ function SCDecl.Reach
 	
 
 function scfunction.PutProtoInGlobs (|bool|)
+	if Compiler.InPerry
+		return true
 	if !.islibrary
-		return .MyReacher or Compiler.InPerry
+		return .MyReacher
 	return self|scnode| isnt LibOnly
 
 

@@ -3506,7 +3506,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026070312));
+	JB_FS_AppendInt32(_fsf0, (2026070313));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10246,7 +10246,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1400]);
-	JB_FS_AppendInt32(_fsf0, (2026070312));
+	JB_FS_AppendInt32(_fsf0, (2026070313));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -57208,13 +57208,13 @@ void SC_Func_ProtoExportName(SCFunction* Self) {
 }
 
 bool SC_Func_PutProtoInGlobs(SCFunction* Self) {
-	if (!SC_Base_IsLibrary(Self)) {
-		return Self->MyReacher or SC__Comp_InPerry;
-	}
-	if (!SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibOnly)) {
+	if (SC__Comp_InPerry) {
 		return true;
 	}
-	return false;
+	if (!SC_Base_IsLibrary(Self)) {
+		return ((bool)Self->MyReacher);
+	}
+	return (!SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibOnly));
 }
 
 void SC_Func_Reach(SCFunction* Self) {
@@ -60967,4 +60967,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1535719959938229676 -1897883032701103671
+// -3441845413243652865 -1897883032701103671
