@@ -13,7 +13,7 @@ main
 		p <~ "`hoi :3`"
 
 	require CakeRun.GetStructure
-	SpdTable.LinkAll
+	SpdTable.LinkFunctions
 	if debugger.LoadDebugger
 		return SpdTable.RunProgram
 

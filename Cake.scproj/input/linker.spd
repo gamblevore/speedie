@@ -44,7 +44,7 @@ module SpdTable
 			return f.Length
 	
 	
-	function PreLoad (|message| code)
+	function InitialiseFuncs (|message| code)
 		opt norefcounts
 		.funcs <~ SpdFunc()							// null func
 		|| CodeLength = 0
@@ -67,13 +67,13 @@ module SpdTable
 		.CodeLength = CodeLength
 
 
-	function CopyToVM (|message| code)
+	function CopyCodeToVM (|message| code)
 		opt norefcounts
-		.PreLoad(code)
+		.InitialiseFuncs(code)
 		for spd.fast in code
 			|| fn = spd.func
 			if fn != @num and @hint
-				spd.CopyToVM
+				spd.CodeToVM
 	
 
 	function SpdFunc.ASMStart (|&ASM|)
@@ -103,7 +103,7 @@ module SpdTable
 			
 			
 		
-	function LinkAll
+	function LinkFunctions
 		opt norefcounts
 		for f in .funcs
 			f.Link❗

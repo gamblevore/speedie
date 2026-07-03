@@ -28,14 +28,14 @@ module CakeRun
 		opt norefcounts
 		
 		for cd in ClassData.First_
-			.StoreClass(cd)
+			.ClassesToTable(cd)
 
 		|| App = Cake.CollectInput
 		|| sz = app[@nil]
 		|| arg = sz.next(@arg)$
 		arg.ExpectLast
 
-		SpdTable.CopyToVM(arg[@tmp, "code"][@arg])
+		SpdTable.CopyCodeToVM(arg[@tmp, "code"][@arg])
 		Debugger.PackInfo = arg["debug"]
 		GLobals.Strings = arg["strs"].name
 		spdtable.CallBack = arg["call"].name

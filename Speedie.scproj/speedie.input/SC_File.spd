@@ -131,7 +131,7 @@ class SCFile (file)
 		
 		function Sorter (SorterComparer of scfile)
 			opt norefcounts
-			|| lib = .Proj.IsSTDLib - b.Proj.IsSTDLib
+			|| lib = .Proj.IsLibraryImp - b.Proj.IsLibraryImp
 				return lib
 			|| asm = .UsedByASM - b.UsedByASM
 				return asm

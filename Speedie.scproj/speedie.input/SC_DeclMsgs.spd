@@ -229,12 +229,13 @@ function scdecl.AddToGlobs (|bool|)
 //		is hidden
 // maybe just do visibility textually?
 
-	if  self is Library  and  self isnt ClassObj
+	if  self is Library
 		|| fn = .func
 		ifn fn and fn|scnode| is embeddedonly
 			PackMaker.LibGlobs <~ self
 			return true
-	
+
+	if self == "PlasticBall"
 	packmaker.PackGlobs <~ self
 	return true
 

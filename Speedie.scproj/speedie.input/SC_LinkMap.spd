@@ -98,12 +98,10 @@ function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach
 	opt norefcounts
 	flow off							// memory order dependant!
 	
-	require .UnReached(from)
+	require .WasUnReached(from)
 	if .borked
 		error (.source,	"Borked function reached!")
 		error (from.source, from.ReachedName)
-
-	.MyReacher = from
 		
 	Compiler.stReachedFunc++
 	if .IsLibrary
@@ -149,21 +147,24 @@ function message.HateUnusedFuncs
 		.expect(.func, "Can't find project")
 
 
-function scnode.UnReached (|scnode| from, |bool|)
+function scnode.WasUnReached (|scnode| from, |bool|)
 	opt norefcounts
 	|| MR = .MyReacher
 	if !MR
+		.MyReacher = from
 		return true
+	
+	if (self == "message") and !from.IsLibrary
 	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
 		.MyReacher = from
+		// set to a better thing.
 
 
 function scclass.Reach (|SCNode| from, |message| src=nil)
 	opt norefcounts
 	flow off
-	require .UnReached(from)
+	require .WasUnReached(from)
 	
-	.MyReacher = from
 	Compiler.stReachedClass++
 	if !.IsDataTypeOnly
 		Compiler.ReachedClassTable <~ self
@@ -199,18 +200,16 @@ function SCDecl.Reach
 
 	
 
-function scfunction.PutProtoInGlobs (|bool|)
-	if Compiler.InPerry
-		return true
-	if !.islibrary
-		return .MyReacher
-	return self|scnode| isnt LibOnly
+function scfunction.ReachedByPack (|bool|)
+	opt norefcounts
+	|| r = .MyReacher
+		return !r.IsLibrary
 
 
 
 function compiler.DeadStrip
 	opt norefcounts
-	|| main = Compiler.MainFunc
+	|| main = .MainFunc
 		main.DetectIfReached
 	
 	for f in .FuncList
@@ -218,9 +217,9 @@ function compiler.DeadStrip
 
 	for f in .FuncList
 		|| cb = f.HasProto
-			if f.PutProtoInGlobs
+			if .InPerry or f.ReachedByPack
 				cb.AddToGlobs
-
+	
 	for f in packmaker.libglobs
 		f.StoreExport
 		f.reach
@@ -228,15 +227,22 @@ function compiler.DeadStrip
 	for f in packmaker.PackGlobs
 		f.reach
 
-	if options.MakeExec		// must come before the next loop
+	if options.MakeExec				// Must come before the next loop
 		for c in .classlist
-			c.reach(Compiler.Interpreter)
+			c.reach(.Interpreter)
 	
 	for c in .classlist
-		if c.MyReacher				// shorten-discovery-chains, 
-			c.ReachBehaviours		// behaviour chains tend to be long.
+		if c.MyReacher				// Shorten-discovery-chains,
+			c.ReachBehaviours		// Behaviour chains tend to be long.
+			
+			
+			if c.IsLibrary and packmaker.needspackexport(C, -1)
+				packmaker.PackGlobs <~ C.ClassType
+				// pack globs still need lib classes, assuming we reached it
 
-	CodeSorter.LeafsFirst			// super-refcounter wants this
+
+
+	CodeSorter.LeafsFirst			// Super-refcounter wants this
 
 	.ReachedClassTable.sort
 	for (c in .ReachedClassTable) (i)

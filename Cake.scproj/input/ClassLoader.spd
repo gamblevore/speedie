@@ -56,9 +56,7 @@ function Cakerun.LoadPackClass (|message| s)
 	opt norefcounts
 	|| c = S[@list]!
 	|| Num = c[@nil]
-	|| I = Num.int										#require
-
-	expect (i|uint|+7 < globals.PackGlobSize) (num)
+	|| I = Num.int(0, 0, globals.PackGlobSize-8)										#require
 	|| Where = (globals.packglobs + I)|&?&classdata|!
 	|| PK = c.next
 		PK.Expect(@list)
@@ -76,7 +74,7 @@ function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
 
 
 
-function CakeRun.StoreClass (|&ClassData| cd)
+function CakeRun.ClassesToTable (|&ClassData| cd)
 	|| name = cd.Name.wrap
 	.ClassTable.ValueLower(name) = cd|object|
 

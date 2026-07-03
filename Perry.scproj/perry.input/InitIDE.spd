@@ -352,7 +352,7 @@ extend PerryIDE
 			.size			= the~width  by  1~under back 18
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			self.AddDebugButtons(DebugStepOver, "\02",		"Step Over = \1f\15")
-			self.AddDebugButtons(DebugStepIn,   "\03",		"Step In = \1f'")
+			self.AddDebugButtons(DebugStepIn,   "\03",		"Step In = \1f\04\15")
 			self.AddDebugButtons(DebugStepOut,  "\04",		"Step Out = \1f;")
 			self.AddDebugButtons(DebugStepRun,  "\02\02",	"Run")
 

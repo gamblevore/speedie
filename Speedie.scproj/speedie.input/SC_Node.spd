@@ -21,7 +21,7 @@ linkage
 function IsLibrary (|bool|) // .islib, .isntlib
 	opt norefcounts
 	|| p = .project
-		return p.IsSTDLib
+		return p.IsLibraryImp
 
 
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
@@ -646,7 +646,7 @@ function ImportFile (|SCFile| file)
 	
 	file.Use
 	compiler.project = file.proj 
-	|| v = file.proj.IsSTDLib and Options.MakeExec
+	|| v = file.proj.IsLibraryImp and Options.MakeExec
 	compiler.program.CollectFromNode( ast, v )
 	file.Stop
 

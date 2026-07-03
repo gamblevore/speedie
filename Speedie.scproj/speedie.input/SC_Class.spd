@@ -946,7 +946,6 @@ function MakeClassType (|scdecl| TypeNormal, |scdecl|)
 	c.Internal = i
 	i.name = name
 	i.source = .source
-	(i is library) = false
 	i.nildeclared = nilstate.real
 
 	c.name = name
@@ -956,8 +955,6 @@ function MakeClassType (|scdecl| TypeNormal, |scdecl|)
 	C.Contains = typenormal // also used by CollectLinks to get the SCClass
 	(c is ClassObj)
 	(c is global)
-	(c is library) = false
-	// the ASM loads the classes into it's own packglobs, so its technically never a lib.
 	if !.IsRole
 		c.AddToGlobs
 	return c

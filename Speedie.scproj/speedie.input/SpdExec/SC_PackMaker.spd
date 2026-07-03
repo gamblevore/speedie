@@ -43,7 +43,6 @@ module PackMaker
 		opt norefcounts
 		if f.IsLibrary
 			if f.NeedsLibExport
-				if f == "fAfterRel" or f|scnode| is LibOnly
 				.LibFuncs <~ f
 		  else
 			|| R = f.MyReacher
@@ -263,43 +262,51 @@ module PackMaker
 			strs <~ s
 
 
-	function PackClasses (|jbin| j, |bool| Lib)
-		opt norefcounts
-		for c in Compiler.ClassList
-			if (c.islibrary == Lib)
-				if c.NeedsPackExport
-					C.DescribeInPack(j)
-
-
 	function AnyClassesNeeded (|bool|)
 		opt norefcounts
 		for c in Compiler.ClassList
-			if c.NeedsPackExport
+			if .NeedsPackExport(c, kAny)
 				return true
+
+
+	function PackClasses (|jbin| j, |int| LibOrPack)
+		opt norefcounts
+		for c in Compiler.ClassList
+			if .NeedsPackExport(c, LibOrPack)
+				C.DescribeInPack(j)
 
 
 	function BakeClasses (|jbin| j)
 		if .AnyClassesNeeded
 			j.TmpArg("clss")
-			.PackClasses(j, true)
-			.PackClasses(j, false)
+			.PackClasses(j, kLib)
+			.PackClasses(j, kPack)
 			j.exit(2)
 	
 	
-	function SCClass.NeedsPackExport (|bool|)		// needsexport, needexport, PackneedsExport
+	constants
+		kLib	= 1
+		kPack	= 2
+		kAny	= 3
+	
+	
+	function NeedsPackExport (|scclass| self, |int| LibOrPack, |bool|)		// needsexport, needexport, PackneedsExport
 		opt norefcounts
 		require .isobject and !.IsRole and !.IsBehaviourTable
+
+		// Perhaps this is better to just to make it project-based? And remove EmbeddedOnly?
+		|| IsLibLike = .IsLibrary and (self|scnode| isnt embeddedonly)
+			require LibOrPack&klib
+			if LibOrPack != -1
+				require (.ClassType is ASMReached)
+		  else	
+			require LibOrPack&kpack
+
 		|| R = .MyReacher
-		require r and !r.IsLibrary
-		
-		if .IsLibrary								// what about lib only?
-			require self|scnode| isnt EmbeddedOnly
-			require (.ClassType is ASMReached)		// or (!r.islibrary)
-		
-		return true
+		return r and !r.IsLibrary
 
 	
-	function scclass.CollectBehaviours (|jbin| j, |scbehaviour!| B)
+	function scclass.CollectBehaviours (|jbin| j, |SCBehaviour!| B)
 		opt norefcounts
 		|| up = b.upwards
 			.CollectBehaviours(j, up)
@@ -331,7 +338,10 @@ module PackMaker
 		j.enter(@tmp, .name.lowercase)
 		
 		j.Enter(@list)		//////		//////		//////
-		j.AddhInt(.classtype!.ExportPosition)
+
+// this number is wrong somehow...
+// perhaps cos it is in two lists? I don't know.
+/		j.AddhInt(.classtype!.ExportPosition)
 		if !.IsLibrary
 			j.Add(@thg, .super!.name.lowercase)
 			j.addhint(sz)

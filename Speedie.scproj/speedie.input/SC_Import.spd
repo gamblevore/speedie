@@ -9,7 +9,7 @@ class SCImport
 	linkage
 		cpp_part		Imp
 	
-	|bool|					IsSTDLib
+	|bool|					IsLibraryImp
 	|bool|					WarnUnusedFuncs
 	|errorseverity|			BlindCast
 	|int|					Depth
@@ -21,8 +21,8 @@ class SCImport
 	
 
 	constructor ( |File?| F, |bool| Builtin )
-		.IsSTDLib = SCImport.STDLibTime or f==nil
-		.WarnUnusedFuncs = !.IsSTDLib 
+		.IsLibraryImp = SCImport.STDLibTime or f==nil
+		.WarnUnusedFuncs = !.IsLibraryImp 
 		.Resources = Dictionary()
 		.BlindCast = (0 (builtin) errorseverity.error)
 		.DeclLayer = MemoryLayer(scdecl, self)
@@ -124,7 +124,7 @@ class SCImport
 	
 	function  IndexLinkage (|message| link, |scfile| scf)
 		if link["type"] ~= "library"
-			.IsSTDLib = true
+			.IsLibraryImp = true
 			.WarnUnusedFuncs = false 
 		if link["apps_folder"].yes and options.modecpp
 			Options.output_path = file.Applications[compiler.Productpath.name]

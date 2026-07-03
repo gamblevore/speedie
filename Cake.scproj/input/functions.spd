@@ -10,7 +10,7 @@ role SpdFunc (message)
 		.Position = -1			// Position in the compiled code.
 
 	
-	function message.CopyToVM
+	function message.CodeToVM
 		opt norefcounts
 		|| Code = .name
 		if .func == @tmp
