@@ -202,8 +202,8 @@ function SCDecl.Reach
 function scfunction.PutProtoInGlobs (|bool|)
 	if !.islibrary
 		return .MyReacher or Compiler.InPerry
-	if self|scnode| isnt LibOnly
-		return true
+	return self|scnode| isnt LibOnly
+
 
 
 function compiler.DeadStrip
@@ -240,6 +240,7 @@ function compiler.DeadStrip
 	for (c in .ReachedClassTable) (i)
 		c.TableID = i+1
 	
+
 
 function scdecl.TypeReach (|SCNode| from, |message| src)
 	opt norefcounts, flow off
