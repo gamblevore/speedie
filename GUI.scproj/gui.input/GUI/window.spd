@@ -429,23 +429,24 @@ class Window (GUIControl)
 	syntax access (|ivec2| P, |bool| ForDrag=false, |guicontrol|)
 		opt NoRefCounts
 		cpp_part ControlAtXY
-		|| r = p.point
-		rz = .ControlAt(r,  0)
+		rz = .ControlAt(p)
 		if ForDrag
-			rz ?= .ControlAt(r, 10)
+			rz ?= .ControlAt(p, 10)
+		if rz isnt Enabled
+			rz = nil
 
 
-// passthru always true?
-	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| PassThru=true, |Guicontrol?|)
+	function guicontrol.ControlAt (|ivec2| P, |int| Pad=0, |Guicontrol?|)
 		opt norefcounts
+		description "Returns a control at the position P. To ignore disabled controls use syntaxaccess"
 		for R.reverse in self
-			if (r is visible and enabled) and !r.decluttering
-				|| rr = r.lastrect ± -pad 
-				if rr overlaps p
-					if r > 0
-						|| it = r.controlat(p, pad, PassThru)
+			if (r is visible) and !r.decluttering
+				|| rr = r.lastrect ± -pad
+				if rr contains P
+					if r.HasAny
+						|| it = r.controlat(p, pad)
 							return it
-					if !PassThru or r isnt PassThru
+					if r isnt PassThru
 						return r
 						
 	
@@ -508,7 +509,8 @@ class Window (GUIControl)
 			require  r  and  r is opensmenu  and  r != O
 		
 		._FocusWasSet = false
-		|| Found = .ControlAt(p.point, 0)
+		|| Found = .ControlAt(p)
+		if found is Enabled
 			|| clicks2 = Found.__MouseDown__(p, clicks)
 				GUI.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
 				if !._FocusWasSet and (found != .innerfocus)

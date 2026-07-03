@@ -1278,8 +1278,9 @@ module GUI
 
 		w.CurrMouseOver = Over
 		|| Down = w.CurrMouseDown
-		if !Down and over
-			.SetToolTips(Over)
+		if !Down
+			|| TT = w.ControlAt(xy)
+				.SetToolTips(TT)
 		
 		require w.CreatedDate.guiago > 0.01s
 		if (PrevOver != nil and Over) and (Down == nil or PrevOver)
@@ -1423,7 +1424,7 @@ module GUI
 			info = r.Description
 		|| delay = 0.0s
 		if GUI.FastToolTipDate.fired
-			delay = 1.5s
+			delay = 1.25s
 		|| now = gui.FrameStart
 		|| t = .tooltip
 		if t.name and t.when.fired

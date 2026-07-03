@@ -514,9 +514,6 @@ datatype ivec2
 	inline Rect (|ivec4|)
 		return (0, 0, .x, .y)
 
-	function Point (|ivec4|) 
-		return .xyxy + (0,0,1,1)
-	
 	inline syntaxcast (|bool|)
 		cpp_part Bool
 		return self != ivec2()
