@@ -43,6 +43,7 @@ module PackMaker
 		opt norefcounts
 		if f.IsLibrary
 			if f.NeedsLibExport
+				if f == "fAfterRel" or f|scnode| is LibOnly
 				.LibFuncs <~ f
 		  else
 			|| R = f.MyReacher
@@ -88,7 +89,7 @@ module PackMaker
 			return true
 
 
-	function BuildGlobs (|bool|)
+	function BuildPackGlobs (|bool|)
 		opt norefcounts
 		require .UseMain("JB_SP_AppInit", 1)
 		require .UseMain("JB_Main", 2)
@@ -162,7 +163,7 @@ module PackMaker
 		.OrderLibGlobs
 		assembler.sh.ASMInit
 		PackMaker.AddAll
-		if stderr.OK and .BuildGlobs 
+		if stderr.OK and .BuildPackGlobs
 			if .FATCompile and options.ModeCake		// ModeCake can be false, if compiler.InPerry
 				.BakePackToDisk
 		compiler.During = 0
@@ -228,7 +229,7 @@ module PackMaker
 		compiler.stDebugInfo += j.Length - JL
 	
 	
-	function BakeASM (|jbin| j, |faststring| boomer,   |bool|)
+	function BakeASM (|jbin| j, |faststring| boomer, |bool|)
 		opt norefcounts
 		j.enter(@tmp, "code")
 		j.Enter
@@ -358,6 +359,8 @@ function SCFunction.CanLibLoad (|bool|)
 function SCFunction.CanPrepareInline (|bool|)
 	opt norefcounts
 	require (self isnt cpp) and .HasProperSpeedieCode
+	require self isnt noinline
+	
 	|| Allowed = 14 + (self is OptInline)<<4
 	|| Count = .SourceArg!.InlineCount(Allowed)
 	if Count <= Allowed

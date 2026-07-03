@@ -227,8 +227,9 @@ function ParseName (|Message| node, |bool|)
 
 function MakeConstructor
 	is Constructor
-	if .islibrary
-		is CantInline
+	if .islibrary		// no reason for this. It COULD be inlined.
+		is CantInline	// should I reallow this? its a little... messy, I think.
+						// maybe reallow later.
 
 
 function ApparantArgCount (|int|)

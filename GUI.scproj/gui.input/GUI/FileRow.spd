@@ -377,13 +377,13 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 	|| s = .listsource
 	s.clear
 	|| path = InPath.Resolve(true)			#require
-	|| AllSight = path.hasname(".")
-	|| AtRoot   = (path == "/")
-	|| pf		= path.file 
+	|| AllSight	= path.hasname(".")
+	|| AtRoot	= (path == "/")
+	|| pf		= path.file
 	if !pf.exists or !pf.isdir
 		pf = pf.parent
 	
-	for f.files in pf // merge these two
+	for f.files in pf						// merge these two
 		|| p = f.path
 		|| n = p.name
 		if AllSight or n.PlatformVisible(ATroot)
@@ -399,7 +399,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 			self <~ r
 			|| IsOK = isdirlike
 			if !save and !isdirlike and !types and f.isdir
-				isok = false // can't open package if we want files
+				isok = false				// can't open package if we want files
 			  elseif save and isdirlike and types.typecontains(ext + "/")
 				isok = false
 			  elseif !save and !isok
@@ -408,7 +408,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 					if isdirlike or f.isdir
 						ext = ext.pathdir
 					isok = types.typecontains(ext)
-			(r isnt disabled) = IsOK 
+			(r isnt disabled) = IsOK
 			
 	s.filesort
 	return true
