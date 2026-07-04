@@ -154,9 +154,9 @@ function scnode.WasUnReached (|scnode| from, |bool|)
 		.MyReacher = from
 		return true
 	
-	target debug
-		if (self == "message") and !from.IsLibrary and Options.modecake
 	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
+		target debug
+			if (self == "message") and !from.IsLibrary and Options.modecake
 		.MyReacher = from
 		// set to a better thing.
 

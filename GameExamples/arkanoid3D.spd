@@ -100,7 +100,7 @@ class Breakout (Window)
 		if (hp <= 0) or 0.5[]
 			|| pu = .PowerUp(8)
 			if !pu
-				0 //
+				0											//
 			  elseif pu <= 2
 				if .Balls < 4
 					|| b2 = .addballs(cn)
@@ -109,7 +109,7 @@ class Breakout (Window)
 					b2.Velocity = -b2.Velocity
 			  elseif pu <= 5
 				|| b2 = (&vshapes.sphere).new(ball.pos.xy_, (1+(pu-3))|float|*0.3)
-				b2.Color = colors.Red // 
+				b2.Color = colors.Red						//
 				.Explosions <~ b2
 			  elseif pu <= 7
 				ball.Radius += 16th
@@ -136,7 +136,7 @@ class Breakout (Window)
 				.blocks.FastRemove(i)
 				if !.blocks
 					.reset( "Success! You beat level-1")
-				return 
+				return
 	
 	
 	function MoveBar (|float| x)
@@ -162,7 +162,7 @@ class Breakout (Window)
 			b.Radius -= 0.03
 			if b.Radius <= 0.02
 				.explosions.fastRemove(i)
-			  else 
+			  else
 				.Dohits(b)
 
 		for (b in .blocks)
@@ -216,7 +216,7 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |f
 	Pulse = Pulse * max
 	for j in max
 		if j <= sub
-			continue 
+			continue
 		|| i = j - sub
 		|| R = ((i*0.2123)+angle).SinCos
 		|| closeness = (i - Pulse + 4.0() ).length

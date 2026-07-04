@@ -19,7 +19,19 @@ function message.Declable (|message!|)
 
 
 
+
 extend Assembler {
+
+
+function SCDecl.ASMIsPack (|bool|)
+	opt norefcounts
+	if self isnt library
+		return true
+	|| fn = .islookuponly
+	if fn isa scfunction
+		return fn|scnode| is embeddedonly
+	// what if its an embedded function
+
 
 function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
@@ -29,7 +41,8 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	(Dest is GlobalMemory)
 	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr
-	if (d Isnt Library)
+	
+	if d.ASMIsPack
 		return .PackGlobAddr(d, exp, dest, d.exportposition)
 	
 	|| ID = d.gpackid							#expect (exp, errorreceiver.nonfatal)
