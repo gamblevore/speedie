@@ -250,17 +250,18 @@ libinternal MemorySorter (sortercomparer of classdata)
 	return .MemoryUsed < b.MemoryUsed
 
 
-render MemoryUsage (|int| Over=0)
+render MemoryUsage (|int| AtLeast=0)
 	|[]| items
 
 	for cls in classdata.First_
-		items <~ cls|object|
+		if cls.memoryused >= AtLeast
+			items <~ cls|object|								// hackity hack hack hack
 	items.sort(MemorySorter)
 
 	fs <~ "\n"
 	|| i = 0
 	while 
-		|&classdata| C = items[i++]|&classdata|		#loop
+		|&classdata| C = items[i++]|&classdata|				#loop
 		fs.memoryreport(c.name, nil, C.memoryused)
 	fs <~ "\n"
 
@@ -273,6 +274,7 @@ libinternal FastString.MemoryReport (|cstring?| name, |string?| name2, |int64| A
 	opt norefcounts
 	if amount
 		self <~ name
+		self <~ name2
 		self <~ ": "
 		amount.strsize(self)
 		self <~ "\n"

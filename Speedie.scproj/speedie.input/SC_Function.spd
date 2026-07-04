@@ -200,7 +200,7 @@ function ParseName (|Message| node, |bool|)
 	.Name = cname.name
 	
 	if ftype == "libinternal"
-		.MakeLibOnly(node)
+		.MakeLibInternal(node)
 	  elseif ftype == "autogen"
 		.NoAutoComplete = 2
 	  elseif fType == "helper"
@@ -739,7 +739,7 @@ function DeclsPrototypeClass (|Message!| ch0)
 
 	|| dcl = .DeclsProtoTypeAdd(fpType)
 	(dcl is Global)
-//	if (.islibrary) and (self|scnode| is libonly)
+//	if (.islibrary) and (self|scnode| is LibInternal)
 //		dcl.exportposition = 64K-8 // sigh. just mark it somehow.
 
 
@@ -822,7 +822,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType,  |scdecl|)
 		.parent!.TryAdd( .Source, Dcl, .Name )
 	|| orig = fpType.FuncProto
 		|| Cpp = .HasCVersion
-		if orig|scnode| is LibOnly
+		if orig|scnode| is LibInternal
 			check (cpp) (self, fptype.name + " is libinternal.")
 		orig.ASMAndCpp |= 1 << Cpp
 	return dcl
@@ -1989,8 +1989,8 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 	if name_space
 		if name_space is EmbeddedOnly
 			self|scnode| is EmbeddedOnly
-		if name_space is libonlyAll
-			.MakeLibOnly(node)
+		if name_space is LibInternalAll
+			.MakeLibInternal(node)
 
 	using ErrorDelayer						// Not a terrible error but still an error 
 		.PreProcessExpects

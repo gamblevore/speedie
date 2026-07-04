@@ -45,7 +45,7 @@ dispatch FuncPreReader (fnPreReader)
 		compiler.TodoList <~ msg
 	
 	+'libinternal'
-		.MakeLibOnly(msg)
+		.MakeLibInternal(msg)
 
 	+'embedded'
 		.SetLibOrEmbed(msg, scnodeinfo.embeddedonly)

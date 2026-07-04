@@ -21,8 +21,7 @@ function compiler.PrintCompileTime (|date| durr)
 	packmaker.LibGlobSize.strsize(fs)
 	|| G = packmaker.PackGlobs
 		fs <~ ", app "
-		|| gs = packmaker.GlobalsSize(G)
-		gs.StrSize(fs)
+		packmaker.PackGlobSize.StrSize(fs)
 	
 	|| vm_ops = VM_Builder.InstructionCount
 		fs.normal  "vm_ops",    fs <~ vm_ops

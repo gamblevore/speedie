@@ -397,6 +397,9 @@ function ImportAll
 	require .Stage( "Finding Files" )
 	
 	if options.SelfReplacement
+		if !options.variant
+			TransCompiler.Clean(true)				// avoid caching issues
+
 		require VM_Builder.MakeTheVM
 
 	.ImportLibs

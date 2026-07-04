@@ -44,7 +44,7 @@ module Linkage
 		Linkage.LinkCollect(s, Compiler.Program, nil)
 		options.MakeExec = linkage.interpreter
 		|| Combo = options.MakeExec + options.modecake
-		check (Combo <= 1) ("Can't bake exec!")
+		check (Combo <= 1) ("Can't bake this!")
 		s.remove
 	
 
@@ -106,7 +106,7 @@ dispatch ClassOrModuleLinkage (TranFunc)
 		
 	+'libinternal'
 		|| v = node.first.yes(true)
-		(name_space is libonlyall) = v
+		(name_space is LibInternalall) = v
 
 	+'sort_properties'
 		if name_space.mustbe(scclass, node)

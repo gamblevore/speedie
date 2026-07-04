@@ -14,7 +14,7 @@ module LinkMap
 		require to isnt InBuiltDataType // int, bool, etc
 		require to.CanLinkFrom(self)
 		
-		if to.IsLibrary and (to is libonly) and .IsLibrary
+		if to.IsLibrary and (to is LibInternal) and .IsLibrary
 			check (self isnt LinkInline) (self, "Inline function should not call a libinternal function.")
 			(self is CantInline) // can't inline this
 
@@ -154,7 +154,8 @@ function scnode.WasUnReached (|scnode| from, |bool|)
 		.MyReacher = from
 		return true
 	
-	if (self == "message") and !from.IsLibrary
+	target debug
+		if (self == "message") and !from.IsLibrary and Options.modecake
 	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
 		.MyReacher = from
 		// set to a better thing.
@@ -217,7 +218,7 @@ function compiler.DeadStrip
 
 	for f in .FuncList
 		|| cb = f.HasProto
-			if .InPerry or f.ReachedByPack
+			if .InPerry or f.ReachedByPack or Options.ModeCpp
 				cb.AddToGlobs
 	
 	for f in packmaker.libglobs
@@ -234,12 +235,6 @@ function compiler.DeadStrip
 	for c in .classlist
 		if c.MyReacher				// Shorten-discovery-chains,
 			c.ReachBehaviours		// Behaviour chains tend to be long.
-			
-			
-			if c.IsLibrary and packmaker.needspackexport(C, -1)
-				packmaker.PackGlobs <~ C.ClassType
-				// pack globs still need lib classes, assuming we reached it
-
 
 
 	CodeSorter.LeafsFirst			// Super-refcounter wants this

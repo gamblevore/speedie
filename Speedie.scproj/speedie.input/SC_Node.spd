@@ -40,11 +40,11 @@ function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 			dest <~ c
 
 
-function MakeLibOnly (|message| node)
+function MakeLibInternal (|message| node)
 	if self != Interact.AnonFn
 		check (.IsLibrary) (node, "libinternal is only used by library functions")
 	.NoAutoComplete = 2
-	.SetLibOrEmbed(node, scnodeinfo.LibOnly)		// limited to internal within a project
+	.SetLibOrEmbed(node, scnodeinfo.LibInternal)		// limited to internal within a project
 
 
 function FuncSrc (|Message|)
@@ -1089,10 +1089,10 @@ datatype SCNodeInfo (byte)
 		Visible
 		AllowLinkedLists
 		InBuiltDataType
-		LibOnly
-		LibOnlyAll
+		LibInternal
+		LibInternalAll
 		EmbeddedOnly
-		Clash = LibOnly + EmbeddedOnly
+		Clash = LibInternal + EmbeddedOnly
 		
 
 

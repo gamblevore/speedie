@@ -167,7 +167,6 @@ function scclass.CollectProp (|Message| msg, |bool|)
 		return true
 
 
-// remove these... but later.
 function CollectDeclsGlobals (|Message| arg, |SCmodule| Mod)
 	opt norefcounts
 	mod.use
@@ -217,7 +216,7 @@ function Message.CollectAGlobalDecl (|SCModule| Mod, |bool|)
 			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
 	
 	(mod.Globals init []) <~ dcl
-	return dcl.AddToGlobs
+	return dcl.AddToGlobs							// return false for error.
 
 
 function scdecl.AddToGlobs (|bool|)
@@ -228,14 +227,22 @@ function scdecl.AddToGlobs (|bool|)
 //	if ('_' == n[]) ||| ('_' == n.Last)
 //		is hidden
 // maybe just do visibility textually?
-
-	if  self is Library
+// add more in perry mode?
+	
+	if  self is Library and self isnt ClassObj
 		|| fn = .func
+		if fn and fn|scnode| is LibInternal
+			return true								// no error. just ignore.
 		ifn fn and fn|scnode| is embeddedonly
 			PackMaker.LibGlobs <~ self
 			return true
 
-	if self == "PlasticBall"
+	// classobjs go in here. Thats just how it is. The system is designed that way.
+	// it works better overall. Its just for Packs not normal compiles, which have
+	// no difference between lib/pack.
+	
+	// and wheres the freaking energy behind my thought-voice...???
+
 	packmaker.PackGlobs <~ self
 	return true
 

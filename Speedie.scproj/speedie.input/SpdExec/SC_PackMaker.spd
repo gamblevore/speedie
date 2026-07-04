@@ -16,7 +16,7 @@ module PackMaker
 		opt norefcounts
 		require (.MyReacher or options.MakeExec)
 		require !.ismacro
-		require self|scnode| isnt libonly
+		require self|scnode| isnt LibInternal
 		require self|scnode| isnt embeddedonly
 		require (.IsCppInBuilt < 2)
 		if (self is NoExport)
@@ -34,7 +34,7 @@ module PackMaker
 		opt norefcounts
 		require (self|scnode| isnt EmbeddedOnly)
 		if (!.IsMacro) and (self isnt disabled and LinkInline)
-			if self|scnode| is libonly // hmm
+			if self|scnode| is LibInternal // hmm
 			return true
 	// why not use noexport instead? (NoExport = LinkInline + Disabled + InitFunc)							
 
@@ -58,18 +58,25 @@ module PackMaker
 				.addfunc(f)
 			
 	
-	function GlobalsSize (|[scdecl]| List, |int|)	// SortGlobals, GlobalsSort
+	function GlobalsSize (|[scdecl]| List, |bool| IgnoreUnused=false, |int|)	// SortGlobals, GlobalsSort
 		opt norefcounts
-		|| Globals = 1								// always positive.
-		
+		|| Globals = 1									// always positive.
+
 		for d in list
+			if IgnoreUnused and (d is ClassObj)			// optimisation
+				|| c = d.contains!.type
+				if c.IsLibrary and !packmaker.needspackexport(c, -1)
+					d.ExportPosition = 0xFADE
+					target debug: "Skipping: ${C.name}"
+					continue
+
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			globals = globals align s16
 
 			|| X = d.ExportPosition
 			if !X or X == globals
-				d.ExportPosition = globals			// its ok
+				d.ExportPosition = globals				// its ok
 			  elseif (options.MakeExec)
 				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes.")
 			  elseif (x <= globals)
@@ -77,7 +84,7 @@ module PackMaker
 			
 			globals += s
 
-		return (Globals+7).AlignUp(8)				// add sentinel.
+		return (Globals+7).AlignUp(8)					// add sentinel
 
 
 	function UseMain (|string| Name, |int| id, |bool|)
@@ -98,7 +105,7 @@ module PackMaker
 		
 		.PackIDFuncs(.PackFuncs)
 		.PackGlobs.sort
-		.PackGlobSize = .GlobalsSize(.PackGlobs)
+		.PackGlobSize = .GlobalsSize(.PackGlobs, true)
 	
 		return true
 	

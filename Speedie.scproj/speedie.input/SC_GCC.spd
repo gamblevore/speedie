@@ -172,7 +172,7 @@ function CollectCppsInto ( |File| Fol,  |File| Objects, |[File]| )
 	return .FilterCppsIfAlreadyDone(Cpps, Objects)
 	
  
-function Clean (|bool|)
+function Clean (|bool| Silent = options.silent, |bool|)
 	|| paths = "
 /tmp/Speedie
 /tmp/Speedie64
@@ -182,10 +182,12 @@ function Clean (|bool|)
 @spd/Speedie.scproj/BuildTest2
 @spd/Speedie.scproj/BuildTest3
 ".ReplaceAll("@spd", file.Speediedir)
+
 	for l.lines in paths
 		if l and l.file.deleteall
-			if !options.Silent
+			if !Silent
 				printline l
+
 	return stderr.ok
 
 

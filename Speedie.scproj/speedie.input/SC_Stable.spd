@@ -38,11 +38,11 @@ module LibStability
 		list.Sort(ObjSort)
 		
 		for obj in list
-			if (obj isnt libonly) and (!isfunc or obj|scfunction|.NeedsStableID)
+			if (obj isnt LibInternal) and (!isfunc or obj|scfunction|.NeedsStableID)
 				obj.MakeID(fs, table, isFunc)
 			
 		
-	function packmaker.OrderLibGlobs // why is it done from the main compile func and not in the execmaker?
+	function packmaker.OrderLibGlobs
 		opt norefcounts
 		if !.LibGlobSize
 			.LibGlobs.Sort(SimplestFirst)				// sort them so empty values come after

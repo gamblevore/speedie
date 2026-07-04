@@ -46,7 +46,7 @@ function Tran_Rejoin (TranFunc)  // exitter
 
 function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
 	opt norefcounts
-	if (self|scnode| is libonly)  or  ((self is ExternalLib) and options.modecake)
+	if (self|scnode| is LibInternal)  or  ((self is ExternalLib) and options.modecake)
 		|| curr = scfunction.currfunc
 		if curr and !curr.IsLibrary and (.project != curr.project)
 			error (incoming.exp, "Lib-internal function '" + .name + "' reached." )
