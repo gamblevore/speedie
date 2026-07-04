@@ -962,7 +962,7 @@ struct SCImport_Behaviour: Object_Behaviour {
 JBClass ( SCImport , JB_Object , 
 	int Depth;
 	JB_File* Where;
-	bool IsSTDLib;
+	bool IsLibraryImp;
 	bool WarnUnusedFuncs;
 	ErrorSeverity BlindCast;
 	Array* Files;
@@ -1540,6 +1540,9 @@ extern bool SC__Options_TargetDebug;
 extern bool SC__Options_TrapFromPerry;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
+#define kSC__PackMaker_kAny ((int)3)
+#define kSC__PackMaker_kLib ((int)1)
+#define kSC__PackMaker_kPack ((int)2)
 extern Array* SC__PackMaker_LibFuncs;
 extern Array* SC__PackMaker_LibGlobs;
 extern int SC__PackMaker_LibGlobSize;
@@ -1665,7 +1668,7 @@ extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2452])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2451])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1805,10 +1808,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2451])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2450])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2450])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2449])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2449])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2448])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2429,8 +2432,8 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeInfo_EmbeddedOnly ((int)64)
 #define kSC__SCNodeInfo_ExplicitExport ((int)1)
 #define kSC__SCNodeInfo_InBuiltDataType ((int)8)
-#define kSC__SCNodeInfo_LibOnly ((int)16)
-#define kSC__SCNodeInfo_LibOnlyAll ((int)32)
+#define kSC__SCNodeInfo_LibInternal ((int)16)
+#define kSC__SCNodeInfo_LibInternalAll ((int)32)
 #define kSC__SCNodeInfo_Visible ((int)2)
 #define kSC__SCNodeType_DataType ((SCNodeType)1)
 #define kSC__SCNodeType_Module ((SCNodeType)0)
@@ -2448,17 +2451,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2445])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2444])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2446])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2447])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2445])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2446])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2444])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2443])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2447])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2448])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2446])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2447])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2519,7 +2522,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2443])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2442])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -2690,7 +2693,7 @@ ErrorInt JB_Main();
 
 SortComparison JB_App__MemorySorter(JB_Class* Self, JB_Class* B);
 
-JB_String* JB_App__MemoryUsage(int Over, FastString* Fs_in);
+JB_String* JB_App__MemoryUsage(int AtLeast, FastString* Fs_in);
 
 bool JB_App__No(JB_String* Name);
 
@@ -3322,15 +3325,17 @@ void SC_PackMaker__FatCompileSub();
 
 void SC_PackMaker__FinalPrepare();
 
-int SC_PackMaker__GlobalsSize(Array* List);
+int SC_PackMaker__GlobalsSize(Array* List, bool IgnoreUnused);
 
 int SC_PackMaker__Init_();
 
 void SC_PackMaker__MakePack();
 
+bool SC_PackMaker__NeedsPackExport(SCClass* Self, int LibOrPack);
+
 void SC_PackMaker__OrderLibGlobs();
 
-void SC_PackMaker__PackClasses(FastString* J, bool Lib);
+void SC_PackMaker__PackClasses(FastString* J, int LibOrPack);
 
 void SC_PackMaker__PackIDFuncs(Array* List);
 
@@ -3834,7 +3839,7 @@ JB_String* SC_Ext__BackupPath();
 
 bool SC_Ext__CanCompile(JB_String* Name);
 
-bool SC_Ext__Clean();
+bool SC_Ext__Clean(bool Silent);
 
 void SC_Ext__ClearThis();
 
@@ -10055,7 +10060,7 @@ SCDecl* SC_Base_LookUpVarDecl(SCNode* Self, JB_String* Name);
 
 SCObject* SC_Base_LookUpVarRootDecl(SCNode* Self, JB_String* Name, Message* Exp);
 
-void SC_Base_MakeLibOnly(SCNode* Self, Message* Node);
+void SC_Base_MakeLibInternal(SCNode* Self, Message* Node);
 
 SCModule* SC_Base_Module(SCNode* Self);
 
@@ -10093,13 +10098,13 @@ void SC_Base_TryAdd(SCNode* Self, Message* ErrPlace, SCObject* IncObj, JB_String
 
 void SC_Base_TryAddBase(SCNode* Self, Message* C, SCNode* Neu);
 
-bool SC_Base_UnReached(SCNode* Self, SCNode* From);
-
 SCObject* SC_Base_UpCheck(SCNode* Self, JB_String* Name, bool LookUp);
 
 SCNode* SC_Base_UpClass(SCNode* Self, Message* F);
 
 void SC_Base_Use(SCNode* Self);
+
+bool SC_Base_WasUnReached(SCNode* Self, SCNode* From);
 
 int SC_Base__Init_();
 
@@ -10517,8 +10522,6 @@ void SC_Class_NeedsDefaultValue(SCClass* Self, Message* Def, Message** Place, JB
 
 bool SC_Class_NeedsExport(SCClass* Self);
 
-bool SC_Class_NeedsPackExport(SCClass* Self);
-
 void SC_Class_NewDeclInClassModule(SCClass* Self, JB_String* S, SCClass* T);
 
 SCDecl* SC_Class_NotConst(SCClass* Self);
@@ -10828,9 +10831,9 @@ Message* SC_Func_Prms(SCFunction* Self);
 
 void SC_Func_ProtoExportName(SCFunction* Self);
 
-bool SC_Func_PutProtoInGlobs(SCFunction* Self);
-
 void SC_Func_Reach(SCFunction* Self);
+
+bool SC_Func_ReachedByPack(SCFunction* Self);
 
 void SC_Func_ReachFunc(SCFunction* Self, SCNode* From);
 
