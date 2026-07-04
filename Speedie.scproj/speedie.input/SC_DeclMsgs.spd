@@ -206,7 +206,7 @@ function scdecl.AsLocal (|scdecl|)
 function Message.CollectAGlobalDecl (|SCModule| Mod, |bool|)
 	opt norefcounts
 	|| f = .file
-		f.proj.decllayer.use
+		f.proj.use
 	
 	|| dcl = .CollectDecl(Mod, Mod, declmode.Globals)		#require
 	|| def = dcl.Default

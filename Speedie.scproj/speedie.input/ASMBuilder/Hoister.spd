@@ -32,7 +32,8 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	if (d Isnt Library)
 		return .PackGlobAddr(d, exp, dest, d.exportposition)
 	
-	|| fat = exp.GTAB(dest,  1,  d.gpackid)
+	|| ID = d.gpackid							#expect (exp, errorreceiver.nonfatal)
+	|| fat = exp.GTAB(dest,  1,  ID)
 	fat.Const = d.ExportPosition
 	return fat * dest
 

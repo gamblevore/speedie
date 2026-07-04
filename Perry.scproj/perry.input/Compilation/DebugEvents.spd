@@ -41,7 +41,9 @@ function perryide.ContinueProgram (|int| state, |bool|)
 
 
 function perryide.DebugStepEvent (|bool|)
-	if keys.Shift
+	if keys.shift and .RunningProd
+		return .ContinueProgram(-1)
+	if keys.option
 		return .DebugStep("stepin")
 	return DebugStepOver(self, -1)
 

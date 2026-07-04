@@ -18,6 +18,7 @@
 
 
 							    // Additions Later //
+* new vars should "pop off" like wow-numbers like i = 1! i = 2! i = 3! glittering and stuff from the line they are on
 * Skinning support? .HelloKitty.spd or .emo.spd file endings could reskin the IDE dynamically.
 	* name.emo.scproj could tell speedie that to use .emo files.
 	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... that can't just be commented out.

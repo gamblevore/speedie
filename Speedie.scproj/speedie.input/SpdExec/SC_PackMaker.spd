@@ -66,7 +66,7 @@ module PackMaker
 			if IgnoreUnused and (d is ClassObj)			// optimisation
 				|| c = d.contains!.type
 				if c.IsLibrary and !packmaker.needspackexport(c, -1)
-					d.ExportPosition = 0xFADE
+					d.ExportPosition = 0xFADE // fake
 					target debug: "Skipping: ${C.name}"
 					continue
 
@@ -348,7 +348,7 @@ module PackMaker
 
 // this number is wrong somehow...
 // perhaps cos it is in two lists? I don't know.
-/		j.AddhInt(.classtype!.ExportPosition)
+		j.AddhInt(.classtype!.ExportPosition)
 		if !.IsLibrary
 			j.Add(@thg, .super!.name.lowercase)
 			j.addhint(sz)
