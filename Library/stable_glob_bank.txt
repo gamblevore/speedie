@@ -165,6 +165,7 @@ JB_File__Sorter
 GUI_Img_ClippedRectDrawer
 GUI_Img_CurlieQueDrawer
 JB_ID__ByID
+GUI_LV_DefaultCopy
 JB_ID__ByFreq
 GUI_Img_RoundRectDrawer
 GUI_FV_RightClickFileList

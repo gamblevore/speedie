@@ -1161,6 +1161,9 @@ class SCDecl (SCObject) {
 
 	function MarkAsUsed (|message| side, |message| exp)
 		opt norefcounts
+		|| fn = .IsLookupOnly
+		if fn isa SCFunction
+			fn.CheckUsedProperly(exp)
 		
 		if side
 			if !.SetSelfProp(exp, functiontype.destructor)

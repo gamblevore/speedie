@@ -274,6 +274,7 @@ GUI_LV_ClickedExpand
 GUI_LV_ColumnsSet
 GUI_LV_ColumnsToDraw
 GUI_LV_Constructor
+GUI_LV_DefaultCopy
 GUI_LV_DesiredHeight
 GUI_LV_Destructor
 GUI_LV_Draw

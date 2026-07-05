@@ -44,18 +44,23 @@ function Tran_Rejoin (TranFunc)  // exitter
 
 
 
-function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
+function SCFunction.CheckUsedProperly (|message| exp)
 	opt norefcounts
 	if (self|scnode| is LibInternal)  or  ((self is ExternalLib) and options.modecake)
 		|| curr = scfunction.currfunc
 		if curr and !curr.IsLibrary and (.project != curr.project)
-			error (incoming.exp, "Lib-internal function '" + .name + "' reached." )
+			error (exp, "Lib-internal function '" + .name + "' reached." )
 			error (.source, "   Original:")	
+	
+	
+function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
+	opt norefcounts
+	.CheckUsedProperly(incoming.exp)
 
 	|| ft = .StructReturned
 		incoming.StructReturner(ft.AsLocal, self)
 	  elseif .returntype is ReturnedStruct			// remove this? its always the prev?
-		error (self, "StructExtract function is missing")
+		error (self, ErrorREceiver.nonfatal)
 		//incoming.StructExtract(.ReturnType)
 	return self
 

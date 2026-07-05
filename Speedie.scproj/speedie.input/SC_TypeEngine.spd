@@ -280,12 +280,13 @@ function TypeOfThg (ExprResolver)
 	|| R = name_space.LookUpvar( exp.name, exp, side )
 
 	if R isa SCModule
-		|| Cls = R.Cls							// #expect (Exp, "Can't refer to a module like that.")
+		|| Cls = R.Cls
 		if !cls
-			return R // hmmm. Will the code survive this?
+			return R
 
-		if Cls.IsModel
+		if Cls.IsModel // to remove
 			return Cls.GetFlyingMemory(exp)
+		
 		if cls.isobject
 			|| T = Cls.classtype
 				exp.name = t.name			// right?
