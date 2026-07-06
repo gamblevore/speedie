@@ -69,8 +69,6 @@ typedef int64 Date;
 
 typedef int DeclMode;
 
-typedef int DotUseType;
-
 typedef byte ErrorFlags;
 
 typedef int ErrorInt;
@@ -107,9 +105,9 @@ typedef ivec2 IntRange;
 
 typedef byte MaybeBool;
 
-typedef byte MoveCode;
+typedef u16 MessageFlags;
 
-typedef u16 MsgParseFlags;
+typedef byte MoveCode;
 
 typedef int NilCheckMode;
 
@@ -748,7 +746,7 @@ struct MessagePosition {
 	JB_MemoryLayer* Layer;
 	int Position;
 	int Length;
-	MsgParseFlags Flags;
+	MessageFlags Flags;
 	u16 Tag;
 };
 
@@ -1094,7 +1092,7 @@ JBClass ( Message , JB_List ,
 	Syntax Func;
 	byte Indent;
 	u16 RangeLength;
-	MsgParseFlags Flags;
+	MessageFlags Flags;
 	u16 Tag;
 	JB_String* Name;
 );
@@ -1668,7 +1666,7 @@ extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2451])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2450])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1780,6 +1778,7 @@ extern SCClass* SC_TypeBool;
 extern SCClass* SC_TypeByte;
 extern SCClass* SC_TypeChar;
 extern SCClass* SC_TypeCodePoint;
+extern SCClass* SC_TypeCString;
 extern SCClass* SC_TypeDate;
 extern SCClass* SC_TypeDictionary;
 extern SCClass* SC_TypeDuration;
@@ -1808,10 +1807,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2450])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2449])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2449])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2448])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2448])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2447])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2199,7 +2198,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__DeclMode_Proto ((DeclMode)16)
 #define kSC__DeclMode_ProtoParam ((DeclMode)20)
 #define kSC__DeclMode_TypeCast ((DeclMode)32)
-#define kSC__DotUseType_Property ((DotUseType)1)
 #define kJB__ErrorFlags_DontStrip ((ErrorFlags)1)
 #define kJB__ErrorFlags_Parse ((ErrorFlags)4)
 #define kJB__ErrorFlags_PreferNoRenderPath ((ErrorFlags)2)
@@ -2232,45 +2230,49 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__FileMode_Other ((FileMode)7)
 #define kJB__FileMode_Owner ((FileMode)448)
 #define kJB__FileMode_Process ((FileMode)493)
-#define kSC__FunctionType_AlreadyExported ((FunctionType)16384)
-#define kSC__FunctionType_API ((FunctionType)16777216)
+#define kSC__FunctionType_AlreadyExported ((FunctionType)8192)
+#define kSC__FunctionType_API ((FunctionType)8388608)
 #define kSC__FunctionType_Behaviour ((FunctionType)2048)
-#define kSC__FunctionType_CantInline ((FunctionType)262144)
+#define kSC__FunctionType_CantInline ((FunctionType)131072)
 #define kSC__FunctionType_ConOrDes ((FunctionType)3)
 #define kSC__FunctionType_Constructor ((FunctionType)1)
-#define kSC__FunctionType_Cpp ((FunctionType)536870912)
+#define kSC__FunctionType_Cpp ((FunctionType)268435456)
 #define kSC__FunctionType_Destructor ((FunctionType)2)
 #define kSC__FunctionType_DirectlyRecursive ((FunctionType)256)
-#define kSC__FunctionType_Disabled ((FunctionType)4194304)
-#define kSC__FunctionType_DontCheckInCakeLib ((FunctionType)4194368)
+#define kSC__FunctionType_Disabled ((FunctionType)2097152)
+#define kSC__FunctionType_DontCheckInCakeLib ((FunctionType)2097216)
 #define kSC__FunctionType_EmptyConstructor ((FunctionType)512)
-#define kSC__FunctionType_ExpectsRealVars ((FunctionType)8192)
-#define kSC__FunctionType_ExternalLib ((FunctionType)131072)
-#define kSC__FunctionType_FlowDisabled ((FunctionType)65536)
-#define kSC__FunctionType_HidesProperties ((FunctionType)67108864)
+#define kSC__FunctionType_ExpectsRealVars ((FunctionType)4096)
+#define kSC__FunctionType_ExternalLib ((FunctionType)65536)
+#define kSC__FunctionType_FlowDisabled ((FunctionType)32768)
+#define kSC__FunctionType_HidesProperties ((FunctionType)33554432)
 #define kSC__FunctionType_InitFunc ((FunctionType)64)
-#define kSC__FunctionType_Killer ((FunctionType)2097152)
-#define kSC__FunctionType_LinkInline ((FunctionType)1048576)
-#define kSC__FunctionType_NewNew ((FunctionType)4096)
+#define kSC__FunctionType_Killer ((FunctionType)1048576)
+#define kSC__FunctionType_LinkInline ((FunctionType)524288)
 #define kSC__FunctionType_NewStruct ((FunctionType)8)
-#define kSC__FunctionType_NoExport ((FunctionType)5242944)
-#define kSC__FunctionType_NoInline ((FunctionType)537133312)
-#define kSC__FunctionType_NotRefCounted ((FunctionType)8388608)
+#define kSC__FunctionType_NoExport ((FunctionType)2621504)
+#define kSC__FunctionType_NoInline ((FunctionType)268566784)
+#define kSC__FunctionType_NotRefCounted ((FunctionType)4194304)
 #define kSC__FunctionType_NumberCreator ((FunctionType)16)
-#define kSC__FunctionType_OptInline ((FunctionType)524288)
+#define kSC__FunctionType_OptInline ((FunctionType)262144)
 #define kSC__FunctionType_Recursive ((FunctionType)128)
 #define kSC__FunctionType_Reffer ((FunctionType)4)
-#define kSC__FunctionType_Render ((FunctionType)32768)
-#define kSC__FunctionType_Stateless ((FunctionType)33554432)
-#define kSC__FunctionType_StoresSelf ((FunctionType)134217728)
+#define kSC__FunctionType_Render ((FunctionType)16384)
+#define kSC__FunctionType_Stateless ((FunctionType)16777216)
+#define kSC__FunctionType_StoresSelf ((FunctionType)67108864)
 #define kSC__FunctionType_TypeTest ((FunctionType)32)
-#define kSC__FunctionType_UsedByASM ((FunctionType)1073741824)
+#define kSC__FunctionType_UsedByASM ((FunctionType)536870912)
 #define kSC__FunctionType_VirtualCaller ((FunctionType)1024)
-#define kSC__FunctionType_Wrapper ((FunctionType)268435456)
+#define kSC__FunctionType_Wrapper ((FunctionType)134217728)
 #define kJB__MaybeBool_False ((MaybeBool)0)
 #define kJB__MaybeBool_MaybeFalse ((MaybeBool)8)
 #define kJB__MaybeBool_MaybeTrue ((MaybeBool)9)
 #define kJB__MaybeBool_True ((MaybeBool)1)
+#define kJB__MessageFlags_BreakPoint ((MessageFlags)32768)
+#define kJB__MessageFlags_Inserted ((MessageFlags)2048)
+#define kJB__MessageFlags_MacroInserted ((MessageFlags)6144)
+#define kJB__MessageFlags_MacroMade ((MessageFlags)4096)
+#define kJB__MessageFlags_Style2 ((MessageFlags)16384)
 #define kJB__MoveCode_AllCodes ((MoveCode)255)
 #define kJB__MoveCode_Back ((MoveCode)32)
 #define kJB__MoveCode_Backward ((MoveCode)32)
@@ -2292,11 +2294,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__MoveCode_Top ((MoveCode)4)
 #define kJB__MoveCode_Up ((MoveCode)4)
 #define kJB__MoveCode_Vertical ((MoveCode)12)
-#define kJB__MsgParseFlags_BreakPoint ((int)32768)
-#define kJB__MsgParseFlags_Inserted ((int)2048)
-#define kJB__MsgParseFlags_MacroInserted ((int)6144)
-#define kJB__MsgParseFlags_MacroMade ((int)4096)
-#define kJB__MsgParseFlags_Style2 ((int)16384)
 #define kSC__khalai_Active ((NilCheckMode)3)
 #define kSC__khalai_AllowRegisterAddr ((NilCheckMode)512)
 #define kSC__khalai_And ((NilCheckMode)8)
@@ -2451,17 +2448,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2444])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2443])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2445])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2446])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2444])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2445])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2443])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2442])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2446])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2447])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2445])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2446])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2522,7 +2519,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2442])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2441])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -2638,29 +2635,16 @@ struct JB_Globals {
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
 	FP_fnIDGenerator Tk_Splitter;
-	__Object_Render__ Array_Render;
-	__Object_Render__ Wrap_Render;
-	__Object_Render__ Dict_Render;
-	__Object_Render__ Rec_Render;
-	__Object_Render__ FS_Render;
 	FP_SorterComparer File__Sorter;
-	__Object_Render__ File_Render;
 	FP_SorterComparer Tree__Sorter;
-	__Object_Render__ List_Render;
-	__Object_Render__ Obj_Render;
-	__Object_Render__ Sh_Render;
 	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
-	__Object_Render__ ID_Render;
-	__Object_Render__ Msg_Render;
-	__Object_Render__ Fn_Render;
-	__Object_Render__ Validator_Render;
 	FP_SorterComparer Str__Sorter;
 	FP_SorterComparer Msg__Sorter;
-	RandomXOR* Random;
 	PicoComms* Proc__ForceParent;
-	RandomXOR zalgo_R;
+	RandomXOR* Random;
 	RandomXOR RandomShared;
+	RandomXOR zalgo_R;
 	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
 	uint64 Mem_MDummy_[2];
@@ -5049,11 +5033,6 @@ bool SC_DeclMode_SyntaxIs(DeclMode Self, DeclMode O);
 
 
 
-// DotUseType
-bool SC_DotUseType_SyntaxIs(DotUseType Self, DotUseType D);
-
-
-
 // ErrorFlags
 
 
@@ -5151,10 +5130,10 @@ MaybeBool JB_MaybeBool__Known(bool As);
 
 
 
+// MessageFlags
+
+
 // MoveCode
-
-
-// MsgParseFlags
 
 
 // NilCheckMode
@@ -8242,6 +8221,8 @@ int JB_Msg_After(Message* Self);
 
 void JB_Msg_AfterSet(Message* Self, int Value);
 
+void SC_Msg_AllFlagsSet(Message* Self, uint /*MessageFlags*/ Value);
+
 FatASM* SC_Msg_ALLO(Message* Self, ASMReg R1, int Amount);
 
 bool SC_Msg_AllowedMoveToInit(Message* Self);
@@ -8523,8 +8504,6 @@ void JB_Msg_Dot__(Message* Self, FastString* Fs);
 SCDecl* SC_Msg_DotMustBeProperty(Message* Self);
 
 SCObject* SC_Msg_DotSpace(Message* Self, SCNode* Name_space);
-
-DotUseType SC_Msg_DotType(Message* Self);
 
 void JB_Msg_Dummy(Message* Self, FastString* Fs);
 
@@ -9276,9 +9255,9 @@ bool JB_Msg_EqualsSyx(Message* Self, Syntax X);
 
 void JB_Msg_Fail(Message* Self, JB_String* Error);
 
-bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F);
+bool JB_Msg_SyntaxIs(Message* Self, uint /*MessageFlags*/ F);
 
-void JB_Msg_SyntaxIsSet(Message* Self, uint /*MsgParseFlags*/ F, bool Value);
+void JB_Msg_SyntaxIsSet(Message* Self, uint /*MessageFlags*/ F, bool Value);
 
 void JB_Msg_SyntaxProblem(Message* Self, JB_String* Error);
 
@@ -9551,6 +9530,8 @@ void SC_Decl_AsBody(SCDecl* Self);
 uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, uint /*DataTypeCode*/& Ty);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
+
+bool SC_Decl_ASMIsPack(SCDecl* Self);
 
 void SC_Decl_ASMRegSet(SCDecl* Self, ASMReg Value);
 
@@ -10675,6 +10656,8 @@ void SC_Func_CheckUnused(SCFunction* Self, Message* Feedback);
 
 void SC_Func_CheckUnusedArgs(SCFunction* Self, Message* Feedback);
 
+void SC_Func_CheckUsedProperly(SCFunction* Self, Message* Exp);
+
 void SC_Func_Cleanupfunc(SCFunction* Self, Message* S);
 
 void SC_Func_CollectDeclsParams(SCFunction* Self, Message* Prms, SCNode* AddToSpace);
@@ -11322,9 +11305,9 @@ inline JB_String* JB_FS_SyntaxCast(FastString* Self) {
 }
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
-	Object_Behaviour* Table = ((Object_Behaviour*)JB_Obj_ClassBehaviours(Self));
-	__Object_Render__ Fn = ((__Object_Render__)(Table->render));
-	return (Fn)(Self, Fs_in);
+	Object_Behaviour* _Table = ((Object_Behaviour*)JB_Obj_ClassBehaviours(Self));
+	__Object_Render__ _fn = ((__Object_Render__)(_Table->render));
+	return (_fn)(Self, Fs_in);
 }
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self) {
