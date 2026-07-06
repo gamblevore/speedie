@@ -6,6 +6,7 @@ datatype XVarFlags (byte)
 		BareStruct
 		CanBeNil
 		Prototype
+		CString
 	syntax is (|xvarflags| F, |bool|)
 		return self & F
 	
@@ -78,7 +79,7 @@ class XVar (list)
 	
 	
 	function NilOK (|faststring!| fs, |!&nil| Where, |bool|)
-		ifn (where|uint64| >= debugger.MinPointer) and fs.TestMem(Where, 8, "Unreadable")
+		ifn (where|uint64| >= debugger.MinPointer) and fs.TestMem(Where, 8)
 		// both should never happen. Its like a register being nil, or an object being nil.
 		// Despite that we should have tested it for nil and not come here.
 			debugger
@@ -88,7 +89,7 @@ class XVar (list)
 		if .PointerOK(ptr)
 			return true
 
-/		if !ptr
+		if !ptr
 			fs <~ "nil"
 		  else
 			fs <~ "0x"
@@ -367,6 +368,9 @@ class XVar (list)
 			if w
 				fs <~ "[$w]"
 		
+		if .flags is CString
+			fs <~ "CString"
+			return true
 		if .flags is Prototype
 			fs <~ "(function)"
 			return true
@@ -395,7 +399,7 @@ class XVar (list)
 		return .TestMem(obj|&nil|, -1, "BadObject")
 	
 	
-	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName,  |bool|)
+	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName="Unreadable",  |bool|)
 		|| Err = memory.Readable(Mem, N)
 			return true
 		
@@ -448,7 +452,7 @@ class XVar (list)
 		|| W = .weirdness[0]
 		|| F = .flags
 
-		if (W is pointer or reference) or (F is prototype)
+		if (W is pointer or reference) or (F is prototype or f is cstring)
 			require .NilOK(fs, addr)
 
 			|| Ptr = addr|&&nil|[]|int64|
@@ -460,18 +464,26 @@ class XVar (list)
 				if !ptr
 					fs <~ "nil"
 					return true
+				if f is CString
+					|| len = ptr|cstring|.Length(256)
+					if fs.TestMem(ptr|&byte|, len)
+						fs <~ '"'
+						fs.AppendMemory(ptr|&byte|, len)
+						fs <~ '"'
+						return true
+					return false
 				fs <~ "0x"
 				fs.AppendHex(ptr, 2)
 				
 				if .Weirdness[1]
-					return fs.TestMem(addr, bc, "UnReadable")		// dont render pointer to a pointer
+					return fs.TestMem(addr, bc)		// dont render pointer to a pointer
 				
 				if f is Prototype
 					return true
 				addr = ptr|&ivec4|
 				fs <~ ": "
 		
-		require fs.TestMem(addr, bc, "UnReadable")
+		require fs.TestMem(addr, bc)
 				
 		if t is bool
 			fs <~ (addr|&bool|)[].string

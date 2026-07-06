@@ -147,7 +147,7 @@ function message.HateUnusedFuncs
 		.expect(.func, "Can't find project")
 
 
-function scnode.WasUnReached (|scnode| from, |bool|)
+function scnode.WasUnReached (|SCNode| from, |bool|)
 	opt norefcounts
 	|| MR = .MyReacher
 	if !MR
@@ -155,10 +155,9 @@ function scnode.WasUnReached (|scnode| from, |bool|)
 		return true
 	
 	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
-		target debug
-			if (self == "message") and !from.IsLibrary and Options.modecake
-		.MyReacher = from
-		// set to a better thing.
+//		target debug
+//			if (self == "message") and !from.IsLibrary and Options.modecake
+		.MyReacher = from		// set to a better thing.
 
 
 function scclass.Reach (|SCNode| from, |message| src=nil)
@@ -218,7 +217,8 @@ function compiler.DeadStrip
 
 	for f in .FuncList
 		|| cb = f.HasProto
-			if .InPerry or f.ReachedByPack or Options.ModeCpp
+			|| ty = cb.type
+			if !ty.IsInterface and (.InPerry or f.ReachedByPack or Options.ModeCpp)
 				cb.AddToGlobs
 	
 	for f in packmaker.libglobs

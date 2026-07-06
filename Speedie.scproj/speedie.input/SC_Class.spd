@@ -262,6 +262,10 @@ function CalculateSize (|int| Depth=0, |int|)
 			rz = s.clssize							#expect (self)
 			
 		AlignTo = AlignTo max s.Alignment
+
+	if .IsBehaviourTable
+		rz = rz max 8		// .destructor already exists as a property in each behaviour table.
+		AlignTo = 8
 	
 	|| bits = 0
 	for p in .properties

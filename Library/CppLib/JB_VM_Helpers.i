@@ -326,8 +326,8 @@ VMOpt ASM* DeRefRegs (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_movei))
 
 VMOpt JB_Object* alloc(void* o) {		// could RALO directly read from the globs?
-	JB_Class* Cls = *((JB_Class**)o);			// what about lib/packglobs?
-	return JB_AllocNew(Cls->DefaultBlock);
+//	JB_Class* Cls = *((JB_Class**)o);	// what about lib/packglobs?
+	return JB_AllocNew(((JB_Class*)(o))->DefaultBlock);
 }
 
 u64 gtable (CakeVM& vm, ASM Op) {

@@ -27,7 +27,9 @@ function CakeRun.Virtual (|message| V, |uint64|)
 	|| Index = Info >> 1
 	|| Spd = 1|uint64|<<63
 	if Info&FuncIsLib
-		return ((spdtable.LibFuncs+Index)|int64|) &~ Spd
+		expect (index|uint64| < 8K)							(V, "VirtualEscaped")
+		index += 31
+		return ((spdtable.LibFuncs![Index|int|])|int64|) &~ Spd
 
 	|| Fn = SpdTable.Funcs[Index]					#EXPECT (V, "VirtualEscaped")
 	|| spdfn = fn.ASMStart							#EXPECT (V, "VirtualMissing")
@@ -47,8 +49,17 @@ function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |m
 	cakerun.ClassTable[name] = ClsData
 
 	|| V = ClsData.Virtuals|&&nil|
+	target debug
+		|| fs = faststring.shared
+		fs <~ Name
+		fs <~ ": 0x"
+		fs.AppendHex(v|int64|)
+		printline fs
+		fs.Length = 0
+
 	for VFn.fast in PK
-		V++[] = .Virtual(Vfn[@nil])|&nil|
+		|| msg = Vfn[@nil]
+		V++[] = .Virtual(msg)|&nil|
 
 
 

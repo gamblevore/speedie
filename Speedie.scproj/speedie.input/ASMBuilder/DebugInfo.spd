@@ -24,14 +24,14 @@ function SCDecl.DumpFlags (|byte|)
 	rz |= .IsBareStruct << 1
 	
 	if self is Local
-		if .TypeSuffers
-			rz |= 1 << 2
+		rz |= .TypeSuffers << 2
 	  else
 		rz |= (.NilDeclared is Nilish) << 2
 	
 	if .IsNormal
 		|| t = .Type
-		rz |= (t.BaseType is ProtoType)<<3
+		rz |= (t.BaseType is ProtoType) << 3
+		rz |= (t == TypeCString) << 4
 
 
 function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true) // decldump, debugdump

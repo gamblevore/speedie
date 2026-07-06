@@ -128,7 +128,7 @@ struct ClassData
 	|int|					LeakCounter
 	|int|					Index
 	|&&nil|					Virtuals
-	|&byte|					SaveInfo
+	|?&byte|				SaveInfo
 	visible true
 	
 	function AllocZeroed (|Object|)

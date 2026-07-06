@@ -129,7 +129,7 @@
 		lsr     data10, data10,  5
 		ldr     x0,  [r15, x0]
 		
-			// **STACK MANAGEMENT HERE**
+			// **STACK MANAGEMENT HERE** //
 		stp     fp, lr, [sp, -32]!			// save fp and lr 
 		mov     fp, sp						// fp = sp
 		stp     dest, xzr, [sp, 16]

@@ -227,9 +227,8 @@ function ParseName (|Message| node, |bool|)
 
 function MakeConstructor
 	is Constructor
-	if .islibrary		// no reason for this. It COULD be inlined.
-		is CantInline	// should I reallow this? its a little... messy, I think.
-						// maybe reallow later.
+	if (self isnt OptInline) and .islibrary		// Disabled for lib classes, in case the classes change.
+		is CantInline							// No good to inline old lib code. Can be overridden by OptInline.
 
 
 function ApparantArgCount (|int|)

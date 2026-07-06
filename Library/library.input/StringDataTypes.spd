@@ -86,6 +86,9 @@ datatype cstring
 	function Length (|int|)
 		cpp_wrapper strlen
 	
+	function Length (|int| Maximum, |int|)
+		cpp_wrapper strnlen
+	
 	function Copy (|string|)
 		|| n = .length
 			return string.copy(self|&byte|, n)

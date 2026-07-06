@@ -345,9 +345,7 @@ module PackMaker
 		j.enter(@tmp, .name.lowercase)
 		
 		j.Enter(@list)		//////		//////		//////
-
-// this number is wrong somehow...
-// perhaps cos it is in two lists? I don't know.
+		
 		j.AddhInt(.classtype!.ExportPosition)
 		if !.IsLibrary
 			j.Add(@thg, .super!.name.lowercase)
@@ -363,7 +361,7 @@ module PackMaker
 
 
 function SCFunction.WrappedName (|string|)
-	if !.iscppinbuilt
+	if !.IsCppInBuilt
 		return .ExportName
 	return .ExportName + "Wrap"
 

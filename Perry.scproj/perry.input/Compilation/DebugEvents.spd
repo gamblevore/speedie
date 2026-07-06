@@ -35,7 +35,7 @@ function perryide.ContinueProgram (|int| state, |bool|)
 	if .DebugMode isnt Paused
 		return .SendRunMsg("pause", state)
 
-	if keys.Shift and "Run fast?\n\n(Breakpoints will not fire)".Confirm
+	if (keys.Shift and keys.option) and "Run fast?\n\n(Breakpoints will not fire)".Confirm
 		return .SendRunMsg("run fast", state)
 	return .SendRunMsg("run", state)
 

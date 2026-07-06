@@ -496,6 +496,7 @@ function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Pro
 
 function Dot (fn_asm)										// a.b
 	opt	NoRefCounts
+
 	|| prop = exp.ASMDecl		
 	if prop is const
 		return DotConst(self, dest, exp, prop)
@@ -580,8 +581,11 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return asmreg()	
 		return ConstFromThgName(self, exp, dest, d)
 
-	if d is classobj
-		(dest is AddrNeed)
+//	if d is classobj
+//		(dest is AddrNeed) // that would be storing the classdata directly in the globs
+// which is totally doable and faster and uses less memory.
+// But my design does not do that right now. So... lets get the system working first optimise later.
+
 	if (dest is ConstRequest)
 		return nil
 
