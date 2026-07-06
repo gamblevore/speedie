@@ -43,7 +43,7 @@ extend PerryIDE
 			return PressingDebug(.runbutton)
 		
 		if key.IsAccept
-			return .ContinueProgram(0)
+			return .ResumeRunning(0)
 		
 		if key is f
 			if .MassSearchField.hasfocus

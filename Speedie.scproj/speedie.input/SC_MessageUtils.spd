@@ -577,7 +577,7 @@ function Message.StartUsingAfter // for "return" debugging.
 			biggest = b2
 		biggest++
 	parser.Using.Position = biggest
-	parser.Using.Flags = MsgParseFlags.Inserted
+	parser.Using.Flags = MessageFlags.Inserted
 	.MemoryLayer.use
 
 

@@ -943,7 +943,7 @@ class ListView (GUIControl) {
 			return true
 		
 		|| Expand = WantExpand >= 0
-		|| Force = keys.option
+		|| Force = wantexpand and keys.option
 		if  !Expand  and  (sel isnt expanded)
 			sel = .listparent(sel)
 			if sel and sel isnt Selected

@@ -1395,7 +1395,7 @@ extend Message
 			if indextra == 4
 				return IndExtra
 			if IndExtra < 0
-				if (indextra isa 4) or (.indent|int| isa 4) or (.InInvisArg)
+				if (IndExtra isa 4) or (.indent|int| isa 4) or (.InInvisArg)
 					return indextra
 			if (IndExtra > 0) and (pr == @tmp)
 				return IndExtra
@@ -1407,11 +1407,11 @@ extend Message
 		disabled "Use .func instead"
 
 
-	syntax is (|MsgParseFlags| F, |bool|)
+	syntax is (|MessageFlags| F, |bool|)
 		if self
 			return .flags & F
 
-	syntax is (|MsgParseFlags|F, assigns:|bool|)
+	syntax is (|MessageFlags| F, assigns:|bool|)
 		if self
 			if Value
 				.flags |= f
@@ -1430,11 +1430,14 @@ extend Message
 	In the end... I love myself...
 */
 
-datatype MsgParseFlags (uint16)
-	syntax is (|MsgParseFlags| v, |bool|)
+
+datatype MessageFlags (uint16)
+	syntax is (|MessageFlags| v, |bool|)
 		inlined
 		return self & v
+
 	flags
+		|MessageFlags|
 		// These are not set during parse, but after.
 		Inserted			= 0x0800				// Jeebox sets this on messages created via "syntax using"".
 		MacroMade			= 0x1000				// This is set via Jeebox's Macro system.

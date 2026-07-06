@@ -42,9 +42,11 @@ module Linkage
 	function CompilerCollect (|message| s)
 		opt norefcounts
 		Linkage.LinkCollect(s, Compiler.Program, nil)
-		options.MakeExec = linkage.interpreter
-		|| Combo = options.MakeExec + options.modecake
-		check (Combo <= 1) ("Can't bake this!")
+		if linkage.interpreter
+			Options.MakeExec = true
+			if Options.ModeCake
+				options.mode = Options.cpp
+				"Removing bake"
 		s.remove
 	
 

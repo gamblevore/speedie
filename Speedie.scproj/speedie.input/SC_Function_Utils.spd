@@ -157,7 +157,7 @@ function SettingAProperty (|Message| Rel, |Message|)
 	opt norefcounts
 	require (Rel.IssetRel)
 	|| f = Rel.first
-	if f and f.DotType
+	if f and f.IsProperty
 		return f
 
 

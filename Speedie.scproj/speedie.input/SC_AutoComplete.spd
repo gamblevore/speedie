@@ -498,7 +498,7 @@ function SCFunction.Update_Source (|int| start, |string| text, |scfile| File,   
 		source.SlidePositions(start)
 		.source = source
 		.Cleanupfunc(Source)
-		parser.using.Flags = MsgParseFlags.Inserted
+		parser.using.Flags = MessageFlags.Inserted
 		|[message]| list
 		rz = .UpdateSourceSub(source, list)
 		source.obj = interact.OrigFn.disambiguate(source)

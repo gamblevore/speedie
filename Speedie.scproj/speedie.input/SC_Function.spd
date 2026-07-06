@@ -3,13 +3,13 @@
 	Speedie Internals. By Theodore H. Smith...
 */
 
-datatype DotUseType (int) // replace entire thing with a bool?
-	flags					// sigh. i wish i had made this unused stuff earlier
-		|DotUseType|
-		Property
-		
-	syntax is (|DotUseType| d, |bool|)
-		return self == d
+//datatype DotUseType (int) // replace entire thing with a bool?
+//	flags					// sigh. i wish i had made this unused stuff earlier
+//		|DotUseType|
+//		Property
+//		
+//	syntax is (|DotUseType| d, |bool|)
+//		return self == d
 
 
 datatype FunctionType (uint)
@@ -27,7 +27,6 @@ datatype FunctionType (uint)
 		EmptyConstructor
 		VirtualCaller
 		Behaviour
-		NewNew
 		ExpectsRealVars
 		AlreadyExported
 		Render
@@ -53,8 +52,8 @@ datatype FunctionType (uint)
 		ConOrDes = Constructor + Destructor
 		NoInline = CantInline + cpp + DirectlyRecursive
 		
-	syntax is (|functiontype| t, |bool|)
-		return self&t
+//	syntax is (|functiontype| t, |bool|)
+//		return self&t
 
 
 
@@ -942,7 +941,7 @@ function Message.SelfUsedForProperty (|int|)
 	|| R = .parent
 	require r and .func == @dot  and  r.func == @rel
 	if .first IsThing "self"
-		if .DotType
+		if .IsProperty
 			|| op = r.second
 			return 1 + !(.isfirst and op == "=")
 

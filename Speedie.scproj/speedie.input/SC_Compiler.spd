@@ -421,7 +421,7 @@ function ImportAll
 	|| mark = .InitBasicStuff
 	require .AddMain(mark) and .InitedOK		
 	
-	parser.using.Flags = MsgParseFlags.Inserted // noice
+	parser.using.Flags = MessageFlags.Inserted // noice
 	scimport.noproj
 	
 	sctasks.CollectAll

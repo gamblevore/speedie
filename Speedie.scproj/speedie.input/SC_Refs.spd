@@ -329,12 +329,12 @@ function RelNeedsRef (|Message| first, |bool|)
 	Return first.VarOptFlag(kSufferedNoise)
 
 
-function Message.DotType (|DotUseType|)
+function Message.IsProperty (|bool|)
 	opt norefcounts
 	if .func == @Dot
 		|| d = .obj
 		if d isa scdecl
-			Return (d is property) * DotUseType.Property 
+			Return (d is property)
 
 
 function RefSafeDecr (|Message| msg, |Message| place)
@@ -468,10 +468,6 @@ function message.Become (|scfunction| func)
 	.obj = func.ReturnType
 	if func is Reffer
 		.ASMType = ASMType.kRefCount
-
-
-function Message.IsProperty (|bool|)
-	Return .DotType is Property
 
 
 function Message.NiceParent (|Message|)

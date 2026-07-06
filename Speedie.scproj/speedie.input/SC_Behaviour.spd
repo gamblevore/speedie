@@ -115,8 +115,9 @@ class SCBehaviour (SCNode)
 			tmp.clear
 		  else
 			prms.func = @sheb
-		writeto.first = "|| _r = _v.callback(fn|&uint|)" ~ Parse
+		writeto.first = "|| _r = _v.callback(_fn|&uint|)" ~ Parse
 		writeto.first = "|| _v = cakevm.vm" ~ parse
+		writeto.allflags = messageflags.inserted
 
 	
 	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
@@ -285,7 +286,13 @@ class SCBehaviour (SCNode)
 					(fn is ExpectsRealVars)
 					Return fn
 
-
+		
+		function message.AllFlags (assigns:|MessageFlags|)
+			opt norefcounts
+			for s.fastflat in self
+				s!.flags = value
+		
+		
 		function MakeVirtualCaller (|SCModule| Mod, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
 			// so it's a func, on the base, with the same name... as... the module
 			|| InterName = mod.name
@@ -296,28 +303,29 @@ class SCBehaviour (SCNode)
 			fs <~ "
 function $InterName (,$InterName)
 	opt inline
-	|| Table = .ClassBehaviours|&$Type|
-	|| fn = Table.$FuncName"
+	|| _Table = .ClassBehaviours|&$Type|
+	|| _fn = _Table.$FuncName"
 
 			if !Options.MakeExec		// cpp
 				fs <~ "
-	return (fn)(...)
+	return (_fn)(...)
 "
 					
 			  else						// cake
 				fs <~ "
-	if (fn|int64| >> 63) // spd
+	if (_fn|int64| >> 63) // spd
 		...
 	  else
-		return (fn)(...)
+		return (_fn)(...)
 		"
 
 			using Errplace
+			
 			|| FNSrc = fs.getresult.ParseClean
+				FNSrc.AllFlags = MessageFlags.Inserted
 				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
 				if rz
 					(rz is VirtualCaller)
-//					(rz is Behaviour) // this cant be right!
 					(rz is ExpectsRealVars)
 					cls.behaviour!.WrapperFuncs <~ rz
 		

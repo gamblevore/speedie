@@ -31,10 +31,10 @@ Message is also:
 
 	|Byte|					Indent		// Re-purposeable.  Output only
 	|uint16|				RangeLength // Re-purposeable.  Output only
-	|MsgParseFlags|			Flags		// Re-purposeable.  Input and output. Affects render-style only. Some bits unused.
+	|MessageFlags|			Flags		// Re-purposeable.  Input and output. Affects render-style only. Some bits unused.
 	|uint16|				Tag			// Freely-useable.  Not input or output
-//  |Object|				Obj			// Freely-useable.  Not input or output (inherited from List)
-//  |int|					Position	// Re-purposeable.  Output only
+//	|Object|				Obj			// Freely-useable.  Not input or output (inherited from List)
+//	|int|					Position	// Re-purposeable.  Output only
 ////////////////////////////////		
 	
 	
@@ -1125,7 +1125,7 @@ Message is also:
 		parser.Using.Position = .position
 		parser.Using.Length = .RangeLength
 		parser.Using.Tag = .Tag
-		parser.Using.Flags = MsgParseFlags.Inserted // right?
+		parser.Using.Flags = MessageFlags.Inserted // right?
 		.MemoryLayer.use
 
 

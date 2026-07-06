@@ -272,7 +272,7 @@ struct MessagePosition
 	|MemoryLayer--|		Layer
 	|int|				Position
 	|int|				Length
-	|MsgParseFlags|		Flags
+	|MessageFlags|		Flags
 	|uint16|			Tag
 	
 	destructor
