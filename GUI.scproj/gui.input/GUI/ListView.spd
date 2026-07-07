@@ -433,7 +433,7 @@ class ListView (GUIControl) {
 			return true
 		
 		if .IsTree and (key is left or right)
-			return .ExpandRow((key is right).dir)
+			return .ExpandRow((key is right).dir<<keys.option)
 
 		
 	autogen DefaultCopy (GUICopyEvent)
@@ -755,7 +755,7 @@ class ListView (GUIControl) {
 			|| T2 = T + font.width + 6
 			|| x = p.x
 			if (x >= T and x <= t2)			// and ((r is selected) or keys.option or keys.gui)
-				.ExpandRow(R, (R isnt expanded).dir)
+				.ExpandRow(R, (R isnt expanded).dir<<keys.option)
 				._SelJustChanged = true		// block mouseup editing a cell
 				return MouseDragging.Handled
 
@@ -943,7 +943,7 @@ class ListView (GUIControl) {
 			return true
 		
 		|| Expand = WantExpand >= 0
-		|| Force = wantexpand and keys.option
+		|| Force = wantexpand.abs > 1
 		if  !Expand  and  (sel isnt expanded)
 			sel = .listparent(sel)
 			if sel and sel isnt Selected

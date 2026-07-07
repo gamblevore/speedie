@@ -129,7 +129,7 @@ function string.InBuiltTarget (|message| err=nil, |SortComparison|)	// target tr
 	if self ~= "vm"
 		return Linkage.vm
 	if self ~= "exec"
-		return Linkage.interpreter
+		return Options.MakeExec
 	if self ~= "direct"
 		return options.IsDirectTest
 	if self ~= "true"

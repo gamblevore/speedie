@@ -9,13 +9,10 @@ module Linkage
 		opt norefcounts
 		return linkage.GetFlag(name).yes
 	
-	function Interpreter (|bool|)
-		return self["interpreter"]
-	
 	function VM (|bool|)
 		return self["vm"]
 	
-	function CombineFlags (|string| name,, |string|)
+	function CombineFlags (|string| name, |string|)
 		|| fs = faststring()
 		.getflag(name, fs)
 		return fs
@@ -42,7 +39,7 @@ module Linkage
 	function CompilerCollect (|message| s)
 		opt norefcounts
 		Linkage.LinkCollect(s, Compiler.Program, nil)
-		if linkage.interpreter
+		if linkage["interpreter"]
 			Options.MakeExec = true
 			if Options.ModeCake
 				options.mode = Options.cpp
