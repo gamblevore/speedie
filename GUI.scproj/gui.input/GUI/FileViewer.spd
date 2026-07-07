@@ -99,7 +99,7 @@ class FileViewer (ListView)
 	function filerow.DirSize (|[string]|sc, |ivec2|)
 		opt norefcounts
 		require .asdir
-		for f in self
+		for f.fast in self
 			for ext in sc
 				if f isa ext
 					rz += (f.lastsize|int|, 1)
@@ -166,7 +166,7 @@ class FileViewer (ListView)
 			
 	function ClearErrors
 		opt norefcounts
-		for s in self
+		for s.fast in self
 			s.HasError = false
 
 
@@ -179,6 +179,14 @@ class FileViewer (ListView)
 		(self)
 
 
+	iterator fast
+		|| _curr = .NextFileRow(.listsource, true)
+		while _curr
+			yield _curr
+			_curr = .NextFileRow(_curr)
+		(self)
+
+
 	libinternal NextFileRow (|listviewrow| Upon, |bool| First=false, |filerow|)
 		opt norefcounts
 		|| n = (Upon.first (first) Upon.flatnext)
@@ -188,10 +196,10 @@ class FileViewer (ListView)
 	
 	
 	function SaveAll (|DocumentAction| Purpose, |bool|)
-		cpp_part SaveAllArr
+		cpp_part SaveAllAlways
 		opt norefcounts
 		// what if like 100 are invalid? THEN? ask for all?
-		for f in self
+		for f.fast in self
 			if f.ismodified
 				require .Save(f, purpose)
 		return true
@@ -225,7 +233,7 @@ class FileViewer (ListView)
 
 	function AskSaveAll (|bool|)
 		|[filerow]| m
-		for r in self
+		for r.fast in self
 			if r.ismodified
 				m <~ r
 
@@ -271,7 +279,7 @@ class FileViewer (ListView)
 
 		if path.file.IsDir
 			path = path.PathDir // standardise
-		for f in self
+		for f.fast in self
 			if path ~= f.location or f.ReadFrom
 				return f
 

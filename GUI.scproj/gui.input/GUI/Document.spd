@@ -120,7 +120,6 @@ class Document (list)
 		(Purpose)
 		// purpose is unused, right now. It was used, originally... and might be again.
 		|| l = .FilePath			#require
-		|| c = .current				#require	
 		|| f = l.file
 		|| t = .SaveText
 		|| KeepDate = false
@@ -134,7 +133,8 @@ class Document (list)
 				rz = -1
 		f.close
 		if rz
-			.original = c
+			|| c = .current
+				.original = c
 			|date| NewDate
 			if !deleted
 				if KeepDate
