@@ -196,6 +196,10 @@ function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
 	return fs.GetResult(fs_in)
 
 
+function scfunction.Unfinished (|bool|)
+	opt norefcounts	
+	|| f = .file
+		return f.Unfinished
 
 
 datatype SCBlockage (int)

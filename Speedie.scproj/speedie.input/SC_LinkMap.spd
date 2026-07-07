@@ -218,7 +218,7 @@ function compiler.DeadStrip
 	for f in .FuncList
 		|| cb = f.HasProto
 			|| ty = cb.type
-			if !ty.IsInterface and (.InPerry or f.ReachedByPack or Options.ModeCpp)
+			if !ty.IsInterface and (.InPerry or Options.ModeCpp or f.ReachedByPack)
 				cb.AddToGlobs
 	
 	for f in packmaker.libglobs

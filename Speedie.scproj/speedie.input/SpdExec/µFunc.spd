@@ -129,9 +129,9 @@ function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 			|| Start = sourcemap.ASMTotal
 			require j.BakeFunc(fn)
 			|| glob = fn.HasProto
-				if !glob.ExportPosition
-				bmr.appendhint(glob.ExportPosition)
-				bmr.appendhint(Start)
+				if !glob.type.IsInterface
+					bmr.appendhint(glob.ExportPosition)
+					bmr.appendhint(Start)
 			fn.µprint
 	return true
 

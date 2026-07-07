@@ -67,7 +67,6 @@ module PackMaker
 				|| c = d.contains!.type
 				if c.IsLibrary and !packmaker.needspackexport(c, -1)
 					d.ExportPosition = 0xFADE // fake
-//					"Skipping: ${C.name}"
 					continue
 
 			|| s = d.CarraySize

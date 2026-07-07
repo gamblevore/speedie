@@ -95,7 +95,7 @@ module SpdTable
 		while i.HasAny
 			|uint| D = i.HInt
 			|uint| Fn = i.HInt
-			ifn (D+8 <= gmax and Fn < fmax)
+			ifn (d != 0  and  D+8 <=  gmax  and  Fn < fmax)
 				error "CallbackOutOfRange"
 				exit
 			|| where = (g+d)|&uint64|
