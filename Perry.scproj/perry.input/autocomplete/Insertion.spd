@@ -345,9 +345,10 @@ function textview.PerryDeclKey (|bool|)
 	
 	|| clearback = .IsClearBackLine(s.x-1)
 	|| endofline = ._SyntacticEndOfLine(s.x)
-	|| inclass = .IsInClass(d) 
+	|| inclass = .IsInClass(d)
 	if clearback and !inclass
-		return .insert("|| ")
+		.insert("|| ")
+		return true
 	
 	if endofline or inclass
 		|| Before = .FindBackwardsIgnoringSpaces("||", s.x)

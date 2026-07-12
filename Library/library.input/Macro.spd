@@ -113,6 +113,6 @@ extend message
 			(r isnt MacroMade)						// in case it was passed in
 		m.Source.MacroCopy(orig, self, prms, self)
 		for r in prms
-			check (r is MacroMade)  (r, "Unused parameter to macro")
+			check (r is MacroMade)  (r, "Unused param to macro")
 
 

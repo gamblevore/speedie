@@ -97,7 +97,7 @@ class SCBehaviour (SCNode)
 	
 	function SCClass.FillInterFaceIn  (|SCFunction| fn, |bool| Late)
 		|| Interface = .InterfaceForBehaviour(fn)					#require
-		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
+		|| prm = fn.source.find(@prm)								#expect (fn.source, "No params found")
 		
 		|| f = prm.first
 			fn.DeclsPrototypeInterface(f, interface, late)
@@ -123,7 +123,7 @@ class SCBehaviour (SCNode)
 	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
 		opt norefcounts
 		|| Interface = .InterfaceForBehaviour(fn)					#require
-		|| prm = fn.source.find(@prm)								#expect (fn.source, "No parameters found")
+		|| prm = fn.source.find(@prm)								#expect (fn.source, "No params found")
 		
 		|| f = prm.first											#require
 		fn.DeclsProtoCleanup(interface, f, true, false)
@@ -264,7 +264,7 @@ class SCBehaviour (SCNode)
 			expect !cls.IsRole (node, "roles can't specify behaviours (roles aren't real classes!)")
 			|| name = node[@thg]$
 			|| lst = name.next
-				expect (lst != @bra and @prm and @list)  (lst, "Behaviours can't specify parameters")
+				expect (lst != @bra and @prm and @list)  (lst, "Behaviours can't specify params")
 			using node 
 				|| it = name.next
 					it.expect(@arg)

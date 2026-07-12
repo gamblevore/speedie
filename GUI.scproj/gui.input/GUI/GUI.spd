@@ -577,11 +577,7 @@ module GUI
 
 		
 	libinternal PreFrame (|GUIActivity|)
-		opt norefcounts
-//		if .FixScreenBug.Fired
-//			.BumpSize
-//			rz = GUIActivity.activity
-		
+		opt norefcounts		
 		while (|| err = stderr.pop)
 			notifications <~ err
 			beep

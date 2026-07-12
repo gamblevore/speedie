@@ -116,7 +116,7 @@ class SCDecl (SCObject) {
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |message| Type, |SCDecl|)
 		opt norefcounts
 		if mode is funcparam
-			check (!.IsCarray) (Src, "No c-arrays in function parameters")
+			check (!.IsCarray) (Src, "No c-arrays in function params")
 			if .IsBareStruct
 				return .GetAddress
 		  elseif type == @emb

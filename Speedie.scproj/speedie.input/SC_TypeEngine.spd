@@ -1286,7 +1286,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 	|| upon = typeofexprmodulesok(self, name_space)		#require
 	|| fn = upon.TheIsFunc2(opch)						#require
 	|| ParamIndex = (fn.cls!=nil)|int|
-	|| arg1 = fn.args[ParamIndex]						#expect (fn.source, "This func needs a parameter!")
+	|| arg1 = fn.args[ParamIndex]						#expect (fn.source, "This func needs a param!")
 	|| LookupType = arg1.type							// OK so... we have the arg. it's a decl, with a type
 	require rn.expect(@thg)
 	

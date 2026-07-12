@@ -148,7 +148,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|SavedRegisters| svregs
 	|InlineInfo| Info
 	svregs.Collect(fn.args, self)
-	.InlineParameters(prms, info)
+	.InlineParams(prms, info)
 	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	info.NopParams(fn.args.length, .state.return)
@@ -175,7 +175,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 
 	
-function InlineParameters (|message| prms, |InlineInfo| Info)
+function InlineParams (|message| prms, |InlineInfo| Info)
 	opt norefcounts
 	|| p = prms.first$
 

@@ -524,7 +524,7 @@ function ImportAll
 //	.DoSavers(2)
 
 	
-	require .Stage( "Parsing Function Parameters" )
+	require .Stage( "Parsing Function Params" )
 	for f in .FuncList
 		f.FuncParamsLoad
 		f.LoadExportName

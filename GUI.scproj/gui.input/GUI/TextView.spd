@@ -50,12 +50,12 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		|| TV = TextViewLine()
 		.WrappedLines = TV
-		._Start = TV							// Make nilchecker happy
+		._Start = TV									// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
 		._CanAutoComplete = 2
-		.LineHeight = font.Height + 4			// Whatever
+		.LineHeight = font.Height + 4					// Whatever
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
 		.oncopy = textCopy|GUICopyEvent|
@@ -68,7 +68,7 @@ class TextView (GUIControl)
 	inline Document (|document|)
 		return ._Viewing
 	
-	function Document (assigns:|document?|)
+	libinternal Document (assigns:|document?|)
 		opt norefcounts
 		require value != ._viewing
 		|| old = ._viewing
@@ -76,7 +76,6 @@ class TextView (GUIControl)
 		._viewing = value
 		if value
 			value.addviewer(self)
-//	libinternal
 
 	libinternal Undoer (|Document?|)
 		opt norefcounts
@@ -219,11 +218,13 @@ class TextView (GUIControl)
 		
 		
 	behaviour LostFocus
+		opt norefcounts
 		|| c = .IsInline
 			c.clear(False)
 		
-		if !.KeepUndosOnLoseFocus
-			.document = nil
+		|| d = .Document
+		if d and !d.FilePath and ((self isnt editable) or .isinline)
+			.Document = nil
 		super.lostfocus
 
 
@@ -387,15 +388,15 @@ class TextView (GUIControl)
 		cpp_part TypingPlaceInt
 		.selrange = (r, r)
 	
-	function ViewRange (|IntRange|)
-		opt norefcounts
-		|| S = ._start
-		rz.x = s.Position
-		|| E = S.MoveCapped(.MaxVisibleLines)
-		rz.x2 = E.After
+//	function ViewRange (|IntRange|)
+//		opt norefcounts
+//		|| S = ._start
+//		rz.x = s.Position
+//		|| E = S.MoveCapped(.MaxVisibleLines)
+//		rz.x2 = E.After
 		
 	function SelRange (assigns:|intrange|)
-		.TypingPlaceTry(value, false, nil)
+		.TrySelect(value, false, nil)
 
 	inline SelRange (|intrange|)
 		return ._typingplace.resolve
@@ -407,7 +408,7 @@ class TextView (GUIControl)
 		return .selrange.y
 
 	libinternal SelDirect (|IntRange| value, |TextViewLine| d)
-		.TypingPlaceTry(value, false, d)
+		.TrySelect(value, false, d)
 
 	autogen SelectedLine (|textviewline|)
 		return .FindTextLine(.sel0)
@@ -418,7 +419,8 @@ class TextView (GUIControl)
 		|| doc = .document
 			doc.TypingPlace = result
 
-	libinternal TypingPlaceDirect (|intrange| result, |bool|)
+
+	libinternal SelectDirect (|intrange| result, |bool|)
 		opt norefcounts
 		require result != ._TypingPlace
 		.TypingPlaceReal = result
@@ -431,18 +433,16 @@ class TextView (GUIControl)
 		return true
 
 
-	libinternal TypingPlaceTry (|IntRange| result, |bool| insert, |textviewline| d)
+	libinternal TrySelect2 (|IntRange| Result, |bool| Insert, |textviewline| d)
+	libinternal TrySelect (|IntRange| Result, |bool| Insert, |textviewline| d)
 		opt norefcounts
-		if .TypingPlaceDirect(result)
-			.TypingPlaceChanged(insert, d)
+		require .SelectDirect(result)
 
-
-	libinternal TypingPlaceChanged (|bool| insert, |textviewline| d)
-		opt norefcounts
 		if .hasfocus
 			GUI.selchanged
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
+		
 		d ?= .FindTextLine(.sel0)
 
 		while
@@ -622,7 +622,7 @@ class TextView (GUIControl)
 	}
 
 	
-	libinternal ShowTypingPlace (|ivec2| r)
+	libinternal ShowSelection (|ivec2| r)
 		opt norefcounts
 		|| i = (r.width > 0)|int|
 		.ViewPos(r[i], 0)
@@ -1457,7 +1457,8 @@ class TextView (GUIControl)
 		
 		.DontMergeUndo
 		|| t    = .seltext
-		|| x = .insert(s.render + t + other.render)
+		|| x = .SelRange.x
+		.insert(s.render + t + other.render)
 		.selrange = (x+1, x+t.length+1)
 		return true
 
@@ -1498,8 +1499,8 @@ class TextView (GUIControl)
 		return 1
 
 	
-	function Insert (|string| s, |bool| SelNew = false, |int|)
-		return .InsertText(s, .SelRange, selnew)
+	function Insert (|string| s, |bool| SelNew = false)
+		.InsertText(s, .SelRange, selnew)
 
 
 	libinternal ValidateNewText (|message|)
@@ -1533,39 +1534,50 @@ class TextView (GUIControl)
 				s.CompilePos = -1
 
 	
-	function InsertText (|string| S, |intrange| P, |bool| SelectText=false, |bool| Show = true, |int|)
+	libinternal ClearAutoComplete
+		if ._CanAutoComplete <= 1
+			.CanAutoComplete = 0
+			.AutoCompleteString = ""
+		.TextAlteredForDraw |= 4
+
+	
+	libinternal ShowInserted (|bool| Show, |int| Start, |int| After)
+		if !show
+			return
+		|| ToShow = (Start, After)
+		return .ShowSelection(ToShow)
+		
+	
+	libinternal InsertionClutter (|string| s)
+		opt inline
+		|| ask = .OnBreakPoint
+			.TrySaveDebugState(ask)							// Not actually used? Remove?
+		if s in '\t'										// Tab only
+			.DontMergeUndo
+		.ClearAutoComplete
+		
+	
+	function InsertText (|String| S, |IntRange| P, |bool| SelectText=false, |bool| Show = true)
 		p = .clamp(p)
-		|| Same = (s == p.width) and .text[p.x, s]
 		|| AfterNewText	= p.x + s.length
 		|| NewSel = (AfterNewText, AfterNewText)
 		if SelectText
 			NewSel.x = p.x
 		
-		if Same
-			.TypingPlaceTry(NewSel, true, nil)
-		  else
-			|| ask = .OnBreakPoint
-				.TrySaveDebugState(ask)
-					
-			|| t = .text
-			|| nt = t.insert(s, P)
-			
-			if ._CanAutoComplete <= 1
-				.CanAutoComplete = 0
-				.AutoCompleteString = ""
-			
-			if s in '\t'							// tab only
-				.DontMergeUndo
-			
-			.TextAlteredForDraw |= 4
-			.TryCaptureUndo(nt, NewSel, s, p, t[p])
-			|| it = .isinline
-			if it Is Searching
-				it.UpdateSearch(nt)
+		if (s == p.width) and .text[p.x, s]						// Same text! So just select and show
+			.TrySelect(NewSel, true, nil)						// (Select)
+			return .ShowInserted(show, p.x, AfterNewText)		// (Show)
+
+		.InsertionClutter(s)									// clutter...
 		
-		if show
-			.ShowTypingplace((p.x, AfterNewText))
-		return p.x
+		|| nt = .DebugInsert(s, p)								// Actual work
+		
+		.InsertionCapture(nt, NewSel, s, p, .text[p])
+		|| it = .isinline
+		if it Is Searching
+			it.UpdateSearch(nt)
+		
+		return .ShowInserted(show, p.x, AfterNewText)
 
 
 	libinternal AlphaFade
@@ -2058,7 +2070,7 @@ class TextView (GUIControl)
 		._LogTrimmed = 0
 		|| sel = 0
 		if .SingleLine: sel = .text.length
-		.TypingPlaceDirect((sel,sel))
+		.SelectDirect((sel,sel))
 		
 		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
@@ -2187,11 +2199,11 @@ class TextView (GUIControl)
 		return .NextVline(d, d, 0)
 
 
-	libinternal PrepareCharWidth (|int|)
+	libinternal PrepareCharWidth (|string| s, |int|)
 		opt norefcounts
 		._LineNumWidth = 0
 		if .UsingLineNumbers
-			._LineNumWidth = .text.TextLineCount.LineNumWidth
+			._LineNumWidth = s.TextLineCount.LineNumWidth
 
 		(.WrappedLines isnt breakpoint)
 		|int| CharW	= ._LastCharWidth - ._LineNumWidth
@@ -2223,16 +2235,13 @@ class TextView (GUIControl)
 		|| d		= .NeedFirst
 		|message| LastOwner
 		
-		|| CharW = .PrepareCharWidth
+		|| CharW = .PrepareCharWidth(.text)
 	
 		if ._LogTrimmed
 			d = .AddLogTrim(d)		
 		
 		|| t = d.tline
 		|| p = d.Position
-		
-		// undo/redo do inserts
-		// then we upgrade inserttext
 		
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)

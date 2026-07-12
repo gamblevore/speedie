@@ -39,7 +39,7 @@ destructor
 "datatype <name> (super_class)"
 "extend <class_name>"
 "module <name>"
-"dispatch <name> (<Parameters>)"
+"dispatch <name> (<Params>)"
 @L
 "cpp_part <name>"
 "cpp_class <name>"
@@ -333,11 +333,13 @@ function scobject.UnusedStr (|string| name, |string|)
 	|| plural = name contains ','
 	.AutoCompleteKind.Pluralize(plural, fs)
 	fs <~ " "
+	if !plural
+		fs <~ "'"
 	fs <~ name
 	if plural
 		fs <~ " are "
 	  else
-		fs <~ " is "
+		fs <~ "' is "
 	fs <~ reason
 	return fs
 

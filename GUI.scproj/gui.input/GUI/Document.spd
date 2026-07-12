@@ -10,8 +10,16 @@ class Document (list)
 	|bool|					WasCompressed		// Also?
 	|DocumentJeeboxMode|	JeeboxMode
 	|bool|					CompareTreesOnSave
+
 	|byte|					_AvoidMerge
 	|bool|					_LoadedFromFile
+	|bool|					_DuringUndo
+	|string?|				_LastText
+	// what about the last text?
+	// hold on... we HAVE the last insert? In the undo system!
+	// OK... so... what about the previous text?
+	// we could just... update later?
+	
 	|string|				Text
 	|DocumentReverser?|		Current
 	|DocumentReverser?|		Original
@@ -47,6 +55,7 @@ class Document (list)
 		super.render(fs)
 	
 
+	
 	libinternal ClearDoc
 		.original = nil
 		.current = nil
@@ -84,11 +93,11 @@ class Document (list)
 		  else
 			.clear
 		
-		require !merged
-		|| latest = DocumentReverser(Insertion, Point, OldText)
-		self <~ latest
-		.current = latest
-		.Trim
+		if !merged
+			|| latest = DocumentReverser(Insertion, Point, OldText)
+			self <~ latest
+			.current = latest
+			.Trim
 
 
 	inline IsModified (|bool|)
@@ -211,7 +220,11 @@ class Document (list)
 		.notifychange
 		for v.Viewer in self
 			if v
-				v.UpdateToDocument(self, Reason)
+				v.UpdateToDocument(self, Reason, 1)
+
+		for v.Viewer in self
+			if v
+				v.UpdateToDocument(self, Reason, 2)
 
 
 	libinternal UpdateSavedState 
@@ -329,94 +342,106 @@ datatype DocumentJeeboxMode (byte)
 
 
 extend TextView
-	libinternal KeepUndosOnLoseFocus (|bool|)
-		return (self is editable) and !.isinline
-
-
-	libinternal TryCaptureUndo (|string| NewText, |ivec2| NewSel,  |string| Insertion, |ivec2| Point, |string| OldText)
+	libinternal InsertionCapture (|string| NewText, |ivec2| NewSel,  |string| Insertion, |ivec2| Point, |string| OldText)
 		opt NoRefCounts
 		|| u = .undoer
-		if !u
-			super.textset(NewText)
-			is modified
-			.touch
-			.TypingPlaceTry(NewSel, true, nil)
-			(.OnTextChanged)(self, documentaction.Typing, true)?
+			if u._LastText==nil							// no recurse!
+				u._LastText = u.text					// Need to protect against events.
+				if !u._DuringUndo
+					u.AddState(Insertion, Point, OldText)
+				u.text = NewText
+				u.TypingPlace = NewSel
+				u.UpdateViewers(documentaction.Typing)
+				u._LastText = nil
 			return
 
-		u.AddState(Insertion, Point, OldText)
-		u.text = NewText
-		u.TypingPlace = NewSel
-		u.UpdateViewers(documentaction.Typing)
+		super.textset(NewText)
+		is modified
+		.touch
+		.TrySelect(NewSel, true, nil)
+		(.OnTextChanged)(self, documentaction.Typing, true)?
 
 
-	function DontMergeUndo
+	autogen DontMergeUndo
 		opt norefcounts
 		|| u = ._Viewing
 			u._AvoidMerge = 2
-
-
-//	libinternal ExpectCurr (||)
-//		opt NoRefCounts
-//		|| c = .Current
-//		if (!c)
-//			c = .first
-//			.current = c
-//		return c
-
-
-	function Undo (|bool| undo)
+		
+		
+	inline Undo (|bool| Undo)
 		opt norefcounts
-		|| u = ._viewing$
-		// I think we should have a default first state?
-		// at least... it makes the undo simpler.
-		// We need some way to say that we are at the start, or at the end
-		// If .current being nil... is the default state... what do we do?
+		|| u = ._viewing
+			.undo(undo, u)
+	
+	
+	autogen guicontrol.Undo (|bool| Undo, |document| u)
+		opt norefcounts
 		|| m = u.current
+		|| Next = m.prev
 		
 		if undo
-			expect (m) (Beep)
-			m.Undo(u)
-			m = m.prev
-		  else
-			if m
-				m = m.next	
-			  else
-				m = u.first
 			expect (m) (beep)
-			
-			m.Redo(u)
+		  else
+			next = u.first
+			if m
+				next = m.next
+			expect (next) (beep)
 
+	
 		u._AvoidMerge = 1
-		u.current = m
-		u.NotifyChange
-		.UpdateToDocument(u, documentaction.UndoOrRedo)
-		
+		u._DuringUndo = true
+		u.current = Next
 
-	libinternal UpdateModState (|document| D, |int| reason)
+		// could be extended to work in general
+		// but I want to get this working, first!
+		if self isa textview
+			if undo
+				.Undo_(u, m!)
+			  else
+				|| P = next!.point
+				.inserttext(next!.inserted, P)
+			
+		u._DuringUndo = false
+	
+
+	
+	libinternal Undo_ (|document| D, |documentreverser| m)
+		// abcdef<123>gh		//	"123"	(6,6)	""
+		// abcdef123gh
+		|| t = m.obj as string
+		if t != nil
+			|| x = m.Point.x
+			|| P = (x, x + m.inserted.length)
+			.InsertText(t, p)
+		  else
+/			d.cleardoc // huh?
+									
+	
+	
+	libinternal UpdateToDocument (|document| D, |DocumentAction| Reason, |int| Part=3)
+		opt norefcounts
+		|| text = d.text
+		if (Part & 1)
+			self|guicontrol|.text = text
+			.PrepareLinesOfText
+
+		require (Part & 2)
+		if !text
+			.Clear(text)		
+		  elseif reason isnt Initialset
+			|| ty = d.typingplace
+			.TrySelect(ty, true, nil)
+			if reason is typing
+				.ShowSelection(ty)
+			  elseif reason is UndoOrRedo
+				.show(ty.x)
+		
 		|| ismod = d.ismodified
 		if (self is modified) != ismod
 			(self is modified) = ismod
 			if ismod
 				.touch
 		(.OnTextChanged)(self, Reason, ismod)?
-
-
-	libinternal UpdateToDocument (|document| D, |DocumentAction| Reason)
-		require .parent
-		if d.text
-			self|guicontrol|.text = d.text
-			if reason isnt Initialset
-				|| ty = d.typingplace
-				.TypingPlaceTry(ty, true, nil)
-				if reason is typing
-					.ShowTypingPlace(ty)
-				  elseif reason is UndoOrRedo
-					.show(ty.x)
-		  else	
-			.Clear(d.text)		
-		
-		.UpdateModState(d, reason)	
 
 
 
@@ -432,26 +457,6 @@ class DocumentReverser (list)
 		.Inserted = Insertion
 		.Point = point
 		.obj = OldText
-	
-	
-	libinternal Undo (|document| D)
-		// abcdef<123>gh		//	"123"	(6,6)	""
-		// abcdef123gh
-		opt norefcounts
-
-		|| t = .obj as string
-		expect (t!=nil)
-		|| x = .Point.x
-		d.Text = d.Text.insert(t, (x, x+.inserted.length))
-		|| TP = x + t.Length
-		d.TypingPlace = (tp, tp)
-		
-		
-	libinternal Redo (|document| D)
-		|| P = .Point
-		d.Text = d.Text.Insert(.inserted, P)
-		|| x = p.x + .inserted.length
-		d.TypingPlace = (x,x)
 
 
 	libinternal TryMerge (|string| Insertion, |ivec2| New, |string| Del, |bool|)

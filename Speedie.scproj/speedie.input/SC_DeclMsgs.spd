@@ -100,7 +100,7 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 			(r is ReturnedStruct)
 		if self is HidesProperties
 			.ReturnType = r.makereal
-		check (r isnt Reference) (r.source, "Only parameters can be references")
+		check (r isnt Reference) (r.source, "Only params can be references")
 
 
 
@@ -151,7 +151,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	func.args <~ dcl
 	if func.IsLibrary
 		check (func.IntPrmCount <= 6)	(self, "Too many int/ptr/obj params, 6 max for lib funcs.")
-	check (func.args <= 8)				(self, "Too many parameters defined. (8 max)")
+	check (func.args <= 8)				(self, "Too many params defined. (8 max)")
 
 	return true
 
@@ -283,7 +283,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	expect (FuncPrmz or Name)  (self, "No name found.")
 	|| Default = DeclsDefault( name )
 	|| Sdcl = ExtractDecl( Type, P, mode )
-		check ((sdcl isnt reference) or (mode is FuncParam)) (Type, "Only parameters can be references")
+		check ((sdcl isnt reference) or (mode is FuncParam)) (Type, "Only params can be references")
 	  elseif !default  and  (P isa SCArg)
 		Sdcl = P.ParentFunc!.ReturnType
 
@@ -319,7 +319,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * (nameitm!=nil), type)
 	dcl.source = self
 	if !NameItm
-		check (.islast) ( self, "Parameter is missing a name." )
+		check (.islast) ( self, "Param is missing a name." )
 		if !FuncPrmz
 			return nil
 		if FuncPrmz.CollectReturnAsReal		// allocs dont fail (assumed so)
