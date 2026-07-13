@@ -85,16 +85,16 @@ class Document (list)
 			return c.TryMerge(Insertion, point, oldtext)
 	
 
-	libinternal AddState (|string| Insertion, |ivec2| Point, |string| OldText)
+	libinternal AddState (|string| Insertion, |ivec2| Point, |string| LostText)
 		opt norefcounts
-		|| Merged = .TryMerge(Insertion, Point, OldText)
+		|| Merged = .TryMerge(Insertion, Point, LostText)
 		|| c = .current
 			c.RemoveAfter
 		  else
 			.clear
 		
 		if !merged
-			|| latest = DocumentReverser(Insertion, Point, OldText)
+			|| latest = DocumentReverser(Insertion, Point, LostText)
 			self <~ latest
 			.current = latest
 			.Trim
@@ -215,16 +215,12 @@ class Document (list)
 				v.parse
 
 
-	libinternal UpdateViewers (|DocumentAction| Reason)
+	libinternal UpdateAllToDocument (|DocumentAction| Reason)
 		opt norefcounts
-		.notifychange
 		for v.Viewer in self
 			if v
-				v.UpdateToDocument(self, Reason, 1)
-
-		for v.Viewer in self
-			if v
-				v.UpdateToDocument(self, Reason, 2)
+				v.TextAlteredForDraw |= 4
+				v.UpdateToDocument(self, Reason)
 
 
 	libinternal UpdateSavedState 
@@ -277,7 +273,7 @@ class Document (list)
 	libinternal Load (|bool| ChangedExternal, |bool|)
 		if ChangedExternal or !._LoadedFromFile
 			require .LoadSub(ChangedExternal)
-			.UpdateViewers(DocumentAction.Initialset)
+			.UpdateAllToDocument(DocumentAction.Initialset)
 		return true
 
 
@@ -295,13 +291,6 @@ class Document (list)
 			.Original = nil
 
 
-	libinternal NotifyChange
-		opt norefcounts
-		for v.Viewer in self
-			if v
-				v.TextAlteredForDraw |= 4
-
-	
 	module
 		|{cachedpath}| Cache_ = dictionary()
 		
@@ -342,24 +331,37 @@ datatype DocumentJeeboxMode (byte)
 
 
 extend TextView
-	libinternal InsertionCapture (|string| NewText, |ivec2| NewSel,  |string| Insertion, |ivec2| Point, |string| OldText)
-		opt NoRefCounts
-		|| u = .undoer
-			if u._LastText==nil							// no recurse!
-				u._LastText = u.text					// Need to protect against events.
-				if !u._DuringUndo
-					u.AddState(Insertion, Point, OldText)
-				u.text = NewText
-				u.TypingPlace = NewSel
-				u.UpdateViewers(documentaction.Typing)
-				u._LastText = nil
-			return
-
+	libinternal SimpleInsert (|string| NewText, |ivec2| NewSel)
 		super.textset(NewText)
 		is modified
 		.touch
 		.TrySelect(NewSel, true, nil)
-		(.OnTextChanged)(self, documentaction.Typing, true)?
+		(.OnTextChanged)(self, documentaction.TextInserted, true)?
+
+
+	libinternal InsertionCapture (|string| GainedText, |ivec2| Point, |string| NewText, |ivec2| NewSel)
+		opt NoRefCounts
+		|| u = .undoer
+		if !u
+			return .SimpleInsert(newtext, newsel)
+
+		require u._LastText==nil						// no recurse!
+		u._LastText = u.text							// Need to protect against events.
+
+		if !u._DuringUndo
+			|| LostText = .text[Point]
+			u.AddState(GainedText, Point, LostText)
+
+		u.text = NewText
+		u.TypingPlace = NewSel
+
+		for v.viewer in u
+			if v
+				v|guicontrol|.text = NewText
+				v.PrepareLinesOfText(gainedtext, point)
+		
+		u.UpdateAllToDocument(documentaction.TextInserted)
+		u._LastText = nil
 
 
 	autogen DontMergeUndo
@@ -376,6 +378,8 @@ extend TextView
 	
 	autogen guicontrol.Undo (|bool| Undo, |document| u)
 		opt norefcounts
+		expect (!u._Duringundo) (beep) // event madness
+
 		|| m = u.current
 		|| Next = m.prev
 		
@@ -386,8 +390,8 @@ extend TextView
 			if m
 				next = m.next
 			expect (next) (beep)
-
-	
+		
+		
 		u._AvoidMerge = 1
 		u._DuringUndo = true
 		u.current = Next
@@ -418,23 +422,18 @@ extend TextView
 									
 	
 	
-	libinternal UpdateToDocument (|document| D, |DocumentAction| Reason, |int| Part=3)
+	libinternal UpdateToDocument (|document| D, |DocumentAction| Reason)
 		opt norefcounts
 		|| text = d.text
-		if (Part & 1)
-			self|guicontrol|.text = text
-			.PrepareLinesOfText
+		self|guicontrol|.text = text // does nothing if already done
 
-		require (Part & 2)
 		if !text
 			.Clear(text)		
 		  elseif reason isnt Initialset
 			|| ty = d.typingplace
 			.TrySelect(ty, true, nil)
-			if reason is typing
+			if reason is TextInserted
 				.ShowSelection(ty)
-			  elseif reason is UndoOrRedo
-				.show(ty.x)
 		
 		|| ismod = d.ismodified
 		if (self is modified) != ismod
@@ -490,8 +489,7 @@ class DocumentReverser (list)
 datatype DocumentAction (byte)
 	constants
 		InitialSet		= 0
-		Typing			= 1
-		UndoOrRedo		= 2
+		TextInserted	= 1
 		Saving			= 3
 		Closing			= 4
 		ErrorChecking	= 5

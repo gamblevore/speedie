@@ -899,7 +899,6 @@ class TextView (GUIControl)
 		.Typed("\n" + .improveindent(ind, extra))
 		if i
 			.selrange = .selrange.x-i
-		.DontMergeUndo // needed
 		return true
 	
 	
@@ -1240,7 +1239,6 @@ class TextView (GUIControl)
 		|| r	= sel.width and self[sel.x2 - 1].istextline
 		|| r2	= (0, r|int|)
 		|| t	= .LineExpand(sel - r2)
-		//if t.width > 0
 		t.x2 -= self[t.x2].istextline
 		t.x2++ // whatever... just for now
 		return  t
@@ -1456,8 +1454,8 @@ class TextView (GUIControl)
 			require s != '{'
 		
 		.DontMergeUndo
-		|| t    = .seltext
-		|| x = .SelRange.x
+		|| t	= .seltext
+		|| x	= .SelRange.x
 		.insert(s.render + t + other.render)
 		.selrange = (x+1, x+t.length+1)
 		return true
@@ -1572,7 +1570,7 @@ class TextView (GUIControl)
 		
 		|| nt = .DebugInsert(s, p)								// Actual work
 		
-		.InsertionCapture(nt, NewSel, s, p, .text[p])
+		.InsertionCapture(s, p, nt, NewSel)
 		|| it = .isinline
 		if it Is Searching
 			it.UpdateSearch(nt)
@@ -1654,13 +1652,13 @@ class TextView (GUIControl)
 		
 		
 	libinternal DeleteKeySel (|int| d, |intrange|)
-		|| r = .selrange
+		|| r = .SelRange()
 		if r.width
 			return r
 
 		|| x = r.x
 		if keys.option or keys.platcmd(false)
-			r.x2 = .wordmove(x, keys.shift.dir)
+			r.x2 = .WordMove(x, keys.shift.dir)
 			.DontMergeUndo
 			return r
 	
@@ -2134,7 +2132,7 @@ class TextView (GUIControl)
 		|| L = .text.Length
 		if Mode isnt expect
 			return L < 64K
-		return L < 12MB	// My largest src file is 60k.
+		return L < 64MB	// My largest src file is 60k.
 						// however... editing large data-files can be nice.
 						// if this returns false... then we will say that "the file is invalid"
 						// sigh. but its not invalid! I guess... the .jeeboxmode needs to be updated.
@@ -2144,12 +2142,14 @@ class TextView (GUIControl)
 
 
 	function ParsedMessage (|message|)
+		description "Returns the existing parse for this document, if any. Does not create a new one if none exist."
 		opt norefcounts
 		|| v = ._viewing
 			return v.DocParsed
-						
 
+	
 	function Parse (|message|)
+		description "Parses the document and returns it. If no changes were made and a parse exists, it returns the old parsed message."
 		return .Parse(false, .JeeboxMode)
 	
 	
@@ -2165,7 +2165,7 @@ class TextView (GUIControl)
 		if p and !changed
 			return p
 		
-		|| sel = .SelRange
+		|| Sel = .SelRange
 		if !sel.width and (sel.x > 0)
 			parser._DotInsertAllow = true
 
@@ -2225,7 +2225,7 @@ class TextView (GUIControl)
 		return msg
 	
 	
-	libinternal PrepareLinesOfText
+	libinternal PrepareLinesOfText (|string?| Insertion=nil, |ivec2| InsertPlace=(0,0))
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
 		.TextAlteredForDraw = 0
@@ -2236,9 +2236,10 @@ class TextView (GUIControl)
 		|message| LastOwner
 		
 		|| CharW = .PrepareCharWidth(.text)
+		
 	
 		if ._LogTrimmed
-			d = .AddLogTrim(d)		
+			d = .AddLogTrim(d)	
 		
 		|| t = d.tline
 		|| p = d.Position
@@ -2277,10 +2278,6 @@ class TextView (GUIControl)
 			return .SelText
 		if self isnt editable
 			return .text
-	
-	
-//	libinternal ScrollPos (|int|)
-//		return ._Start.position
 
 
 	libinternal ScrollPos (assigns:|int|)
@@ -2365,7 +2362,7 @@ class TextView (GUIControl)
 	module
 		|| CounterParts	= <(`{}[]()``''""||`)>
 		
-		function Block (|guicontrol| parent, |float| x, |float| w, |float| y, |float| h, |textview|)
+		function Block (|GuiControl| parent, |float| x, |float| w, |float| y, |float| h, |TextView|)
 			opt norefcounts
 			rz = TextView(parent)
 			rz.MakeInline
