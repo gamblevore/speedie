@@ -157,15 +157,7 @@ render RenderTitle (|bool| ForErrors=true)
 	fs <~ .Name
 	if .args or (!forerrors and .ReturnType)
 		fs <~ " "
-		.renderparams(forerrors, fs)
-
-
-render RenderName
-	opt norefcounts
-	|| pname = .parentname
-		fs <~ pname
-		fs <~ '.'
-	fs <~ .Name
+		.RenderParams(ForErrors, fs)
 
 
 render Describe 
@@ -449,7 +441,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|scdecl--| i = typeofexpr(incoming[0], name_space)
 		require i and a
 		
-		require  (typecast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
+		require  (TypeCast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
 		// Local.b = c --> local = local.breturn(c)...  structptr.b = c --> structptr.bset(C)
 	
 	if (.IsAssigns!=0) != Incoming.HasSide
@@ -481,11 +473,11 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| Cast = TypeCast ||| SelfCast
 		SelfCast = 0
 		Cast |= PArg_ch.IntSmallness(parg_type)
-		if (incoming.HasSide) and fi==fin
+		if incoming.HasSide and (fi == fin)
 			cast &= ~kNoBoolTypeCast
 
 		|| Matched = kNoMatch
-		|| CanGetReference = (funcarg isnt reference) or ((PArg_Type is Referable) or parg_ch.RefFallback)
+		|| CanGetReference = (funcarg isnt reference) or (PArg_Type is Referable) or parg_ch.RefFallback
 			// passing x+1, to a reference param should not work.
 			|message--| LArg_ch = (PArg_Ch (ThisAlter) nil)
 			matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
@@ -520,7 +512,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		  else
 			Incoming.FailedAt ?= fi		
 			Result = kUseDefaultParams
-		fi += (fi+1 == .structreturnpos)
+		fi += (fi+1 == .StructReturnPos)
 	
 	if Pos >= Incoming.Size
 		Return result
@@ -1664,7 +1656,7 @@ function message.Blocks (assigns:|int|)
 	.TAG = (.TAG & ~SCBlockage.bits) ||| Value
 
 
-function Tran_IfSub (|message| node, |SCNode| name_space) 
+function Tran_IfSub (|message| node, |SCNode| name_space)
 	opt norefcounts
 	|| cond = node.NeedFirst						#require
 	|| arg = cond.next
@@ -1685,7 +1677,7 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 			Tran_IfSub(SubTest, name_Space)
 		  else // "else" branch
 			|| ElseArg = SubTest.first
-				check (ElseArg ~!= "if")    (ElseArg, "Use 'elseif' instead.")
+				check (ElseArg ~!= "if")			(ElseArg, "Use 'elseif' instead.")
 				elsearg.expect(@arg)
 			  else
 				SubTest.msg(@arg)
@@ -2008,8 +2000,8 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 function SCFunction.MakeMacro (|message| arg)
 	opt norefcounts
 	|| C = arg.first
-	check (C and !C.next) (self, "Macros must be one line!")
-	check !(arg.prev.HasAny)   ("Macros don't directly state arguments.")
+	check (C and !C.next)					(self, "Macros must be one line!")
+	check !(arg.prev.HasAny)				("Macros don't directly state arguments.")
 	.ismacro = macro(C, true)				// x = "abc"~parse
 
 

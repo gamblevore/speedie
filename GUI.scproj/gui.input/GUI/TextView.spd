@@ -2081,16 +2081,18 @@ class TextView (GUIControl)
 		.start = D
 
 	
-	libinternal NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
+	libinternal NextVline (|TextViewLine| Curr, |int| P=0, |TextViewLine|)
 		opt norefcounts
 		
 		rz = curr.next
 		if !rz
 			rz = textviewline(p)
-			place.next = rz
+			curr.next = rz
 		  else
-			rz.ClearForPrepare
-		rz.vline = place.vline + 1
+			rz.message = nil
+			rz.TextFlags &= TextLineFlags.UserFlags
+			rz.LineError = nil
+		rz.vline = curr.vline + 1
 
 
 	libinternal NeedsPrepare (|int|)
@@ -2196,7 +2198,7 @@ class TextView (GUIControl)
 		d.tline = 0
 		d.vline = 0
 		d._Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
-		return .NextVline(d, d, 0)
+		return .NextVline(d)
 
 
 	libinternal PrepareCharWidth (|string| s, |int|)
@@ -2214,9 +2216,17 @@ class TextView (GUIControl)
 	
 	libinternal PrepareLineColor (|textViewLine| d, |message| msg, |DocumentJeeboxMode| jx, |&Message?| lastowner, |message|)
 		opt norefcounts
+		|| e = .MyError
+			if (d contains e.position) and (!e.obj)
+				e.obj = d
+				d.LineError = e
+
+		(d is colored) = .ParsedMessage
+
 		if JX is Colorise
 			|| OK = (msg!=nil) or (JX isnt expect)
 			msg = d.ColoriseText(msg, OK)
+
 		|| draw = .OnDrawLineNumber
 			(draw)(d, &LastOwner, false)
 			
@@ -2240,20 +2250,28 @@ class TextView (GUIControl)
 		|| CharW = .PrepareCharWidth(.text)
 	
 		if ._LogTrimmed
-			d = .AddLogTrim(d)	
-		
-		|| t = d.tline
-		|| p = d.Position
+			d = .AddLogTrim(d)
+
+		|| t = 1
+		|| p = 0			
 		
 		while
-			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
-			t = d.InitDefaults(self, t)
+			if (Insertion != nil) and keys.Shift and (insertplace.x > d.after) and !d.IsLast
+				// keep old data!
+				d._text = .text[p, d.after]				// free memory... would be nicer to remove .text property
+				p = d.After
+			  else
+				p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
+				d.tline = t
+
+			// still needs to insert new nodes...
+			t += d.EndsWithLine
 			msg = .PrepareLineColor(d, msg, jx, &lastowner)
 			loop p >= 0
-				
-			d = .NextVline(d, d, p)
+			d = .NextVline(d, p)
 
 		.PrepareLinesEnd(d, changed, pos)
+	
 	
 	
 	libinternal PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
@@ -2264,7 +2282,7 @@ class TextView (GUIControl)
 			|| n = 1 - .MaxVisibleLines
 			d = d.MoveCapped(n)
 		  elseif (changed & 5) or .IsALogTextView
-			// 5 means width is changed, OR the change came from typing/undo/etcs
+			// 5 means width is changed, OR the change came from TextInsertion
 			d = .FindLine(pos)
 		  else
 			d = nil
@@ -2272,6 +2290,7 @@ class TextView (GUIControl)
 		if !d
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
+	
 	
 	
 	libinternal TextCopy (GUICopyEvent)

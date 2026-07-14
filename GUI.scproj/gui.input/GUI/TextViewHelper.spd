@@ -2,17 +2,17 @@
 
 datatype TextLineFlags (uint16)
 	flags
-		BothBreaks = [BreakPoint, ActiveBreakPoint]
-		Reached
 		Colored
-		Found
-		CurrFound
-		Last
+		ColoriseUsingPosition
+		FakeMsg
 		StartsNormally
 		AvoidLastChar
-		FakeMsg
+		Last
 		Selected
-		ColoriseUsingPosition
+
+		CodeBreak = [BreakPoint, ActiveBreakPoint]
+		CodeReached
+		UserFlags = CodeReached + CodeBreak
 
 
 class TextViewLine (list)
@@ -29,7 +29,7 @@ class TextViewLine (list)
 	|int|					CompilePos	// Position at compile time
 										// when we close a file we lose the info.
 										// The document could store a list of lines?
-	|TextLineFlags|			TextState
+	|TextLineFlags|			TextFlags
 
 	constructor (|int| p = 0)
 		inlined
@@ -66,14 +66,7 @@ class TextViewLine (list)
 		  else
 			fs <~ "${.position}: "
 			fs.AppendQuotedEscape(.text)
-
-
-	libinternal ClearForPrepare
-		.message = nil
-		.TextState = nil
-		.lineerror = nil
-		._text = ""
-
+	
 
 	function textview.FindBackwardsIgnoringSpaces (|string| name, |int| pos, |codepoint|)
 		while --pos >= 0
@@ -93,13 +86,13 @@ class TextViewLine (list)
 
 
 	inline SyntaxIs (|TextLineFlags| F, |bool|)
-		return .TextState&F
+		return .textFlags&F
 
 	
 	function syntaxis (|TextLineFlags| F, assigns:|bool|)
-		|| T = .textstate&~F
+		|| T = .textFlags&~F
 		T |= F*value
-		.textstate = T
+		.textFlags = T
 
 
 	libinternal XOfChar (|ind| Pos, |int|)
@@ -136,8 +129,8 @@ class TextViewLine (list)
 
 	libinternal ColoriseText (|message| msg, |bool| ParsedOK, |message|)
 		isnt ColoriseUsingPosition
-		.message = nil
 		isnt fakemsg
+		.message = nil
 
 		if msg
 			return .ColoriseSub(msg)
@@ -151,7 +144,6 @@ class TextViewLine (list)
 			is fakemsg
 		  else
 			stderr.pop
-	
 	
 	
 	function After (|int|)
@@ -185,7 +177,7 @@ class TextViewLine (list)
 						exit
 		
 		if r and !r.StartsAfter(range)
-			(self is BothBreaks) = r is breakpoint
+			(self is CodeBreak) = r is breakpoint
 			is ColoriseUsingPosition
 			.message = r
 		  else
@@ -297,11 +289,6 @@ class TextViewLine (list)
 		if !msg or msg == @arg
 			return colors.white(0.175)
 		return colors.white(0.35)
-	
-	
-	libinternal SetLineNum (|int| t, |int|)
-		.tline = t
-		return t + .endswithline
 
 	
 	libinternal TrySetError (|error| e, |bool|)
@@ -311,44 +298,26 @@ class TextViewLine (list)
 		.LineError = e
 		e.Obj = self
 		return e != old
-
-
-	libinternal InitDefaults (|textview| parent, |int| t, |int|)
-		opt norefcounts
-		|| e = parent.MyError
-			if (self contains e.position) and (!e.obj)
-				e.obj = self
-				.LineError = e
-		if parent.ParsedMessage
-			is colored
-		return .SetLineNum(t)
-
-
-	libinternal TakeEntireText (|string| txt, |ind| p, |ind|)
-		._Text = txt[p, int.max]
-		(self is AvoidLastChar) = .EndsWithLine
-		is last
 	
 	
 	libinternal FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
 		(self is StartsNormally) = txt[p-1].IsTextLine
-		.position = p
+		.Position = p
 		if .vline > 1000K
-			return .TakeEntireText(txt, p)					// just give up wrapping
+			._Text = txt[p, int.max]
+			(self is AvoidLastChar) = .EndsWithLine
 
-		if p >= txt.length // edge case.
+		  elseif p >= txt.length									// edge case.
 			._Text = ""
-			is last
-			return -1
-
-		|| i = txt.WrapSub(MaxWidth, IsInline, p)
-		._Text = txt[p, i]
-		(self is AvoidLastChar) = .EndsWithLine
-		if (i >= txt.length) and !.EndsWithLine
-			is last
-			return -1
-		isnt last
-		return i
+		  else
+			|| i = txt.WrapSub(MaxWidth, IsInline, p)
+			._Text = txt[p, i]
+			(self is AvoidLastChar) = .EndsWithLine
+			if (i < txt.length) or .EndsWithLine
+				isnt last
+				return i
+		is last
+		return -1
 
 
 libinternal textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
@@ -463,9 +432,8 @@ autogen TextView.ClearActiveLine
 autogen TextView.ClearDebugInfo
 	opt norefcounts
 	._DimUnReachedLines = false
-	|| f = ~(TextLineFlags.ActiveBreakPoint|||TextLineFlags.reached)
 	for l.lines in self
-		l.textstate	&= F
+		l.textFlags	&=~ TextLineFlags.UserFlags
 
 
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
@@ -500,7 +468,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		|| col = vec4(0)
 		if !m
 			0
-		  elseif d isnt Reached
+		  elseif d isnt CodeReached
 			col.a = 0.5
 		  elseif (d is ActiveBreakPoint)!=(d is BreakPoint)
 			col = (1.0, 1.0, 0.75, 0.375)		// pink
@@ -528,7 +496,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 				yadd = 3
 				c = '.'
 				col = SpaceDisplay
-			  elseif (d isnt reached) and ._DimUnReachedLines
+			  elseif (d isnt CodeReached) and ._DimUnReachedLines
 				col.a /= 2
 			state.font.DrawChar(c, Where, (x, y+yadd), col, 1)
 		prev = c
