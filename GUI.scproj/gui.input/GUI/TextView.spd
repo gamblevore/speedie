@@ -2225,9 +2225,11 @@ class TextView (GUIControl)
 		return msg
 	
 	
-	libinternal PrepareLinesOfText (|string?| Insertion=nil, |ivec2| InsertPlace=(0,0))
+	libinternal PrepareLinesOfText (|string?| Insertion=nil, |ivec2| InsertPlace=nil)
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
+		if changed & 1
+			Insertion = nil // cant save
 		.TextAlteredForDraw = 0
 		|| JX		= .JeeboxMode
 		|| msg		= .Parse(changed >= 2, JX)
@@ -2236,7 +2238,6 @@ class TextView (GUIControl)
 		|message| LastOwner
 		
 		|| CharW = .PrepareCharWidth(.text)
-		
 	
 		if ._LogTrimmed
 			d = .AddLogTrim(d)	

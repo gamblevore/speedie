@@ -730,12 +730,12 @@ class SCDecl (SCObject) {
 
 	function CantBeNilInCpp (|bool|)
 		require !.pointercount
-		return (.IsCArray) or (.type.IsStruct) or (.IsNumeric > 1) 
-
+		return (.IsCArray) or (.type.IsStruct) or (.IsNumeric > 1)
+	
 
 	function CreateStructNil (|message| where, |Message!|)
 		using where
-		rz = .CreateStructNilsub()
+		rz = .CreateStructNilsub
 		rz.obj = self
 	
 		

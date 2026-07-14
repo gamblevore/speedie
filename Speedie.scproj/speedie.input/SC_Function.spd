@@ -445,8 +445,8 @@ function int.IsNormalMatch (|bool|)
 
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
 	if  .IsAssigns  and  .ReturnType
-		|| a = .args[0]
-		|| i = typeofexpr(incoming[0], name_space)
+		|scdecl--| a = .args[0]
+		|scdecl--| i = typeofexpr(incoming[0], name_space)
 		require i and a
 		
 		require  (typecast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
@@ -468,26 +468,27 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	fi += (fi+1 == .structreturnpos)
 	
 	while fi < fin
-		|| FuncArg = .Args[fi++]!
+		|scdecl--| FuncArg = .Args[fi++]!
 		|| PArg_Ch = Incoming[Pos]!
-		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
+		|scdecl--| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
 		if funcarg is reference
-			if  PArg_Type is Local
+			if PArg_Type is Local
 				PArg_Type.MarkAsAltered(nil)
 			
 		if Base
 			FuncArg = FuncArg.ContainedReplace(base, false)
 
-		|| LArg_ch = (PArg_Ch (ThisAlter) nil)
 		|| Cast = TypeCast ||| SelfCast
+		SelfCast = 0
 		Cast |= PArg_ch.IntSmallness(parg_type)
-
 		if (incoming.HasSide) and fi==fin
 			cast &= ~kNoBoolTypeCast
-		|| Matched = 0							// error (parg_ch, "Can't pass this as a reference")
-		if (funcarg isnt reference) or ((PArg_Type is Referable) or parg_ch.RefFallback)
+
+		|| Matched = kNoMatch
+		|| CanGetReference = (funcarg isnt reference) or ((PArg_Type is Referable) or parg_ch.RefFallback)
+			// passing x+1, to a reference param should not work.
+			|message--| LArg_ch = (PArg_Ch (ThisAlter) nil)
 			matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
-		SelfCast = 0
 		
 		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)
 			if  result > kSimpleMatch  and  matched != kUseDefaultParams  and  matched != ksimplematch
@@ -506,13 +507,15 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			Return kNoMatch
 			
 		  elseif (ThisAlter)	// we need to put something in exp
-			|| prms = Incoming.exp.last!
-			|| def = FuncArg.Default!.Copy(prms)
+			|message--| prms = Incoming.exp.last!
+			|message--| def = FuncArg.Default!.Copy(prms)
 			def.DefaultPrmFix(base)
 			prms.InsertBefore( def, PArg_Ch )
-			|| ty = TypeOfExpr( def, Name_Space )
-				if ty.IsBareStruct // oof
+			PArg_Type = TypeOfExpr( def, Name_Space )
+			if PArg_Type
+				if PArg_Type.IsBareStruct				// oof
 					TypeOfExpr( def.wrapwith(@brel + "&"), name_space )
+				FuncArg.TypeMatch( PArg_Type, Cast|||kTypeCastTrue, def )
 
 		  else
 			Incoming.FailedAt ?= fi		

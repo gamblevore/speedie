@@ -14,12 +14,7 @@ class Document (list)
 	|byte|					_AvoidMerge
 	|bool|					_LoadedFromFile
 	|bool|					_DuringUndo
-	|string?|				_LastText
-	// what about the last text?
-	// hold on... we HAVE the last insert? In the undo system!
-	// OK... so... what about the previous text?
-	// we could just... update later?
-	
+	|byte|					_DuringInsert	
 	|string|				Text
 	|DocumentReverser?|		Current
 	|DocumentReverser?|		Original
@@ -215,14 +210,6 @@ class Document (list)
 				v.parse
 
 
-	libinternal UpdateAllToDocument (|DocumentAction| Reason)
-		opt norefcounts
-		for v.Viewer in self
-			if v
-				v.TextAlteredForDraw |= 4
-				v.UpdateToDocument(self, Reason)
-
-
 	libinternal UpdateSavedState 
 		opt norefcounts
 		for v.Viewer in self
@@ -273,7 +260,10 @@ class Document (list)
 	libinternal Load (|bool| ChangedExternal, |bool|)
 		if ChangedExternal or !._LoadedFromFile
 			require .LoadSub(ChangedExternal)
-			.UpdateAllToDocument(DocumentAction.Initialset)
+
+			for v.Viewer in self
+				if v
+					v.UpdateToDocument(self, DocumentAction.Initialset)
 		return true
 
 
@@ -345,23 +335,25 @@ extend TextView
 		if !u
 			return .SimpleInsert(newtext, newsel)
 
-		require u._LastText==nil						// no recurse!
-		u._LastText = u.text							// Need to protect against events.
+		require !u._DuringInsert						// no recurse!
+		u._DuringInsert = 1
+		u.TypingPlace = NewSel
 
 		if !u._DuringUndo
 			|| LostText = .text[Point]
 			u.AddState(GainedText, Point, LostText)
-
-		u.text = NewText
-		u.TypingPlace = NewSel
 
 		for v.viewer in u
 			if v
 				v|guicontrol|.text = NewText
 				v.PrepareLinesOfText(gainedtext, point)
 		
-		u.UpdateAllToDocument(documentaction.TextInserted)
-		u._LastText = nil
+		u.text = NewText
+
+		for v.viewer in u
+			if v
+				v.UpdateToDocument(u, documentaction.TextInserted)
+		u._DuringInsert = 0
 
 
 	autogen DontMergeUndo

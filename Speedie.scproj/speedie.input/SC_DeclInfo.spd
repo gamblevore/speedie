@@ -82,7 +82,7 @@ datatype SCDeclInfo (uint)
 		ASMReached
 		IntendedAsReturn
 		
-		Referable = Param ||| Body ||| Property ||| Global
+		Referable		= Param ||| Body ||| Property ||| Global
 		Temp			= body ||| CompilerCreated
 		VarType			= Param ||| Body ||| Global ||| Property
 		Local			= Body  ||| Param

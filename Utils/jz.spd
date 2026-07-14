@@ -349,7 +349,7 @@ module Conv
 		return str.file
 	
 	
-	function FormatInfo (|$int| Size = 0, |string|)
+	function FormatInfo (|$int| Size, |string|)
 		|| str = .in!.Section(0, 64) // just read 64 bytes? why this helper?
 			if str == string.error
 				return str

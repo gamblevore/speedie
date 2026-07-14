@@ -69,11 +69,7 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	opt norefcounts
 	using (dcl)
 	rz = dcl.msg(@rel)
-	|| first = dcl.second
-//	if (mode is globals) and first == @thg
-//		first.func = @sdot
-		// now what?
-	rz <~ first
+	rz <~ dcl.second
 	rz <~ (@Opp, "=")
 	rz <~ Default
 
@@ -143,6 +139,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	func.AddTypeInfo(dcl)
 	if dcl.name
 		(dcl is Param)
+		check (!dcl.Default or dcl isnt reference) (self, "References can't have default values")
 	  else
 		(dcl is return)					// A struct return.
 	(dcl isnt Altered)					// SCDecl defaults as being altered... not sure why.
@@ -154,7 +151,6 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	check (func.args <= 8)				(self, "Too many params defined. (8 max)")
 
 	return true
-
 
 
 function scclass.CollectProp (|Message| msg, |bool|)
