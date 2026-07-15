@@ -148,6 +148,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	func.args <~ dcl
 	if func.IsLibrary
 		check (func.IntPrmCount <= 6)	(self, "Too many int/ptr/obj params, 6 max for lib funcs.")
+		// i think this is an X86 limitation. My ARM CakeBridge has a limit of 8 each, and 10 total.
 	check (func.args <= 8)				(self, "Too many params defined. (8 max)")
 
 	return true
