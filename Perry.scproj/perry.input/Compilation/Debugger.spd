@@ -278,9 +278,8 @@ function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
 	.PerryAppendMsg("", 3)
 
 
-// DebugHideFeminism
-// BoysNeedToDefeatTheMatriarchy
 // tbh it kinda defeated itself... but whatever.
+// maybe creation is the answer. a holy holey creation
 
 //stack ((\516096, \29072, \6064), (\1, \1), (\0, )) {
 //	+'1)  Main' "/usr/local/speedie/Examples/branch_test.spd" \902 \1 {
