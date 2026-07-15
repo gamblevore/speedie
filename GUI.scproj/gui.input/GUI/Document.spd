@@ -329,7 +329,7 @@ extend TextView
 		(.OnTextChanged)(self, documentaction.TextInserted, true)?
 
 
-	libinternal InsertionCapture (|string| GainedText, |ivec2| Point, |string| NewText, |ivec2| NewSel)
+	libinternal InsertionCapture (|string| GainedText, |ivec4| Point, |string| NewText, |ivec2| NewSel)
 		opt NoRefCounts
 		|| u = .undoer
 		if !u
@@ -340,13 +340,13 @@ extend TextView
 		u.TypingPlace = NewSel
 
 		if !u._DuringUndo
-			|| LostText = .text[Point]
-			u.AddState(GainedText, Point, LostText)
+			|| LostText = .text[Point.xy]
+			u.AddState(GainedText, Point.xy, LostText)
 
 		for v.viewer in u
 			if v
 				v|guicontrol|.text = NewText
-				v.PrepareLinesOfText(gainedtext, point)
+				v.PrepareLinesOfText(Point)
 		
 		u.text = NewText
 

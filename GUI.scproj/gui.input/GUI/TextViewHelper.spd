@@ -7,7 +7,7 @@ datatype TextLineFlags (uint16)
 		FakeMsg
 		StartsNormally
 		AvoidLastChar
-		Last
+		Last					// remove this? we could just check .IsLast
 		Selected
 
 		CodeBreak = [BreakPoint, ActiveBreakPoint]
@@ -308,6 +308,7 @@ class TextViewLine (list)
 			(self is AvoidLastChar) = .EndsWithLine
 
 		  elseif p >= txt.length									// edge case.
+			isnt AvoidLastChar
 			._Text = ""
 		  else
 			|| i = txt.WrapSub(MaxWidth, IsInline, p)
@@ -316,6 +317,7 @@ class TextViewLine (list)
 			if (i < txt.length) or .EndsWithLine
 				isnt last
 				return i
+		
 		is last
 		return -1
 
@@ -503,7 +505,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	
 	if .AutoLim(d)
 		if (._CanAutoComplete != 2) or (!.text)
-			if d.IsLast							// Last line draw too early with autocomplete
+			if d is last						// Last line draw too early with autocomplete
 				x += font.width					// but we shouldn't need this!
 			.DrawAuto(Where, x, y)
 

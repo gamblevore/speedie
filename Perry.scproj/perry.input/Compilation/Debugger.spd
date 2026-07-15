@@ -54,14 +54,14 @@ function SetBreaks (|message| breaks)
 		.editme._DimUnReachedLines = true
 		for l.lines in .editme
 			(l isnt ActiveBreakPoint)
-			(l isnt reached)
+			(l isnt CodeReached)
 
 	for line in breaks.last
 		|| Pos = line.second.int
 		if pos <= .editme.text.Length
 			|| D = .editme.FindTextLine(pos)
 			if all
-				(D is reached)
+				(D is Codereached)
 			if line ~= "break"
 				(D is ActiveBreakPoint)
 	.editme.Touch			

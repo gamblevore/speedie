@@ -433,7 +433,6 @@ class TextView (GUIControl)
 		return true
 
 
-	libinternal TrySelect2 (|IntRange| Result, |bool| Insert, |textviewline| d)
 	libinternal TrySelect (|IntRange| Result, |bool| Insert, |textviewline| d)
 		opt norefcounts
 		require .SelectDirect(result)
@@ -1570,7 +1569,7 @@ class TextView (GUIControl)
 		
 		|| nt = .DebugInsert(s, p)								// Actual work
 		
-		.InsertionCapture(s, p, nt, NewSel)
+		.InsertionCapture(s, (p, s.length, 0), nt, NewSel)
 		|| it = .isinline
 		if it Is Searching
 			it.UpdateSearch(nt)
@@ -2091,7 +2090,6 @@ class TextView (GUIControl)
 		  else
 			rz.message = nil
 			rz.TextFlags &= TextLineFlags.UserFlags
-			rz.LineError = nil
 		rz.vline = curr.vline + 1
 
 
@@ -2235,11 +2233,9 @@ class TextView (GUIControl)
 		return msg
 	
 	
-	libinternal PrepareLinesOfText (|string?| Insertion=nil, |ivec2| InsertPlace=nil)
+	libinternal PrepareLinesOfText (|ivec4| In=nil)
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
-		if changed & 1
-			Insertion = nil // cant save
 		.TextAlteredForDraw = 0
 		|| JX		= .JeeboxMode
 		|| msg		= .Parse(changed >= 2, JX)
@@ -2252,23 +2248,48 @@ class TextView (GUIControl)
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
 
-		|| t = 1
-		|| p = 0			
+		|| tLine = 1
+		|| LastTLine = 0
+		(LastTLine)
+		|| P = 0
+		if (changed & 1) or (In == ivec4())
+			In[2] = -1 // cant save
+		In[3] = In[2] + (In[0] - In[1]) // growth
+		// (start, after, gainedlength, growthtotal)
 		
 		while
-			if (Insertion != nil) and keys.Shift and (insertplace.x > d.after) and !d.IsLast
-				// keep old data!
-				d._text = .text[p, d.after]				// free memory... would be nicer to remove .text property
-				p = d.After
+			|| Keep = (In[2] >= 0) and (d isnt last)
+			|| AfterLine = d.After
+			if Keep and (AfterLine < In[0])
+				#! RESTORE
+				d._text = .text[p, AfterLine]//
+				
 			  else
-				p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
-				d.tline = t
-
-			// still needs to insert new nodes...
-			t += d.EndsWithLine
+				if LastTLine >= tLine
+					keep = false
+				if Keep and (p > In[0]+In[2])
+					#! INSERT / DELETE
+					// what about overlap?
+					d.Position = p
+					AfterLine = p+d.Length
+					d._Text = .text[p, AfterLine]
+				  else
+					#! WRAP
+/					AfterLine = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
+				d.tline = tLine
+					
+			
+			p = AfterLine
+			LastTLine = tLine
+			tLine += d.EndsWithLine
 			msg = .PrepareLineColor(d, msg, jx, &lastowner)
 			loop p >= 0
 			d = .NextVline(d, p)
+
+			// * insert/delete a byte on a line.
+			// * insert text that adds wrapped lines
+			// * insert a byte to add a line
+			// * delete text that removes a line
 
 		.PrepareLinesEnd(d, changed, pos)
 	
