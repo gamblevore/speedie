@@ -1567,7 +1567,7 @@ class TextView (GUIControl)
 
 		.InsertionClutter(s)									// clutter...
 		
-		|| nt = .DebugInsert(s, p)								// Actual work
+		|| nt = .text.insert(s, p)
 		
 		.InsertionCapture(s, (p, s.length, 0), nt, NewSel)
 		|| it = .isinline
