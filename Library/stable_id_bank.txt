@@ -156,7 +156,7 @@ GUI_FV_MouseDown
 GUI_FV_OpenQuick
 GUI_FV_RightClickFileList
 GUI_FV_Save
-GUI_FV_SaveAllArr
+GUI_FV_SaveAllAlways
 GUI_FV_ShowQuickOpen
 GUI_FV_SyntaxAccess
 GUI_FV_TryReloadPath
@@ -505,7 +505,6 @@ GUI_Text_Constructor
 GUI_Text_CurrLine
 GUI_Text_Destructor
 GUI_Text_DoExplode
-GUI_Text_DocumentSet
 GUI_Text_DontMergeUndo
 GUI_Text_Draw
 GUI_Text_EditClickText
@@ -554,9 +553,7 @@ GUI_Text_TextSize
 GUI_Text_TextViewSet
 GUI_Text_TryShowLineError
 GUI_Text_TypedString
-GUI_Text_Undo
 GUI_Text_ViewLineAndSel
-GUI_Text_ViewRange
 GUI_Text_XYOfChar
 GUI_Text__Block
 GUI_Text__SyntacticEndOfLine
@@ -674,6 +671,7 @@ GUI_ctrl_Touch
 GUI_ctrl_TouchScrollBar
 GUI_ctrl_Transition
 GUI_ctrl_TypedString
+GUI_ctrl_Undo
 GUI_ctrl_VisTextSet
 GUI_ctrl_WidthSet
 GUI_ctrl_Window
