@@ -26,10 +26,10 @@ class TextViewLine (list)
 	|float|					UserInfo
 	|int|					vline
 	|int|					tline
+	|TextLineFlags|			TextFlags
 	|int|					CompilePos	// Position at compile time
 										// when we close a file we lose the info.
 										// The document could store a list of lines?
-	|TextLineFlags|			TextFlags
 
 	constructor (|int| p = 0)
 		inlined
@@ -78,6 +78,19 @@ class TextViewLine (list)
 				require .Text[pos, name]
 				rz = '\n'
 		
+
+	libinternal CompileContains (|ind| b, |bool| RealPos=false, |bool|)
+		opt norefcounts
+		|| p = .compilepos
+		|| l = .length
+		if (p < 0) or RealPos
+			p = .Position
+		  else
+			|| next = .Next
+				l = next.CompilePos - p
+		|| d = (p, p+l-(self is last))
+		return d contains b
+
 
 	operator contains (|ind| b, |bool|)
 		|| d = .range
@@ -357,7 +370,7 @@ libinternal textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine|
 	if e == .myerror
 		v.a *= 0.75
 
-	if d contains .sel1
+	if d.CompileContains(.sel1)
 		.myerror = e
 	if e is parse
 		|| Alpa = (e.when.guiago.float - 1.0) * lm
@@ -450,7 +463,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
-		if d contains m.Position
+		if d.CompileContains(m.Position)
 			|| bg = ¥.ActiveTextLine
 			if m.flags&1
 				bg = colors.red(0.25).px
