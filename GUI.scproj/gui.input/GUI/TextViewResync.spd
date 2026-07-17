@@ -1,0 +1,82 @@
+
+libinternal ivec4.TextMapToOld (|int| P, |int|)
+	// AAA<BBB>CCC		2-->2,		6-->3
+	// AAACCC
+	// AAABBBCCC
+
+	if P < self[0]
+		return P
+
+	|| Start = self[0]					// 3
+	|| InsertLength = Self[2]			// 3
+	|| InsertEnd = Start + InsertLength	// 6
+	if P >= InsertEnd					// P==6
+		|| Gain = self[3]				// 3
+		return P - Gain
+	return -1						// deleted :O
+
+
+libinternal textviewline.TextMapAfter (|int| OldPos, |textviewline|)
+	opt norefcounts
+	while
+		|| P = .Position
+		if P == OldPos
+			return self
+
+		if P > OldPos
+			return .textmapinside
+
+		|| n = .next
+		if !n
+			return self
+		.remove
+		self = n
+
+	
+libinternal textviewline.TextMapInside (|textviewline|)
+	opt norefcounts
+	|| Empty = TextViewLine.new
+	.prev = empty
+	return empty
+
+
+
+libinternal ivec4.TextMapShrink (|string| Old, |string| New, |ivec4|)
+	// for large alterations in a silly way. might as well allow it
+	// for code-debugging, its nice to have a more solid debugger.
+	|| Start = self[0]
+	|| End = self[1] min new.Length
+	if start >= End
+		return self
+
+	|| A = old.Addr
+	|| B = new.Addr
+	|| Loss = 0
+	while  start < End
+		if A[Start] != B[Start]
+			exit
+		Start++
+		loss++
+	A--
+	B--
+	while Start < End
+		if A[End] != B[End]
+			exit
+		End--
+		loss++
+
+	self[2] -= Loss
+	self[0] = Start
+	Self[1] = End
+	return self
+
+
+libinternal ivec4.TextMapFix (|ivec4|)
+	opt inline
+	self[3] = (self[0] - self[1]) + self[2]
+	if self == ivec4()
+		self[2] = -1 // cant save
+	return self
+
+
+
