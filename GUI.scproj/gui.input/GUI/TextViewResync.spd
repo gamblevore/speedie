@@ -79,4 +79,32 @@ libinternal ivec4.TextMapFix (|ivec4|)
 	return self
 
 
+libinternal textview.TrySaveDebugInfo (|guitextlineevent| ask)
+	opt norefcounts
+	|| f = .needfirst
+	|| Has = f.CompilePos >= 0
+	|| IsDebugging = (ask)(self, f, 0) != 0
+	require IsDebugging != has
+	if !IsDebugging
+		._SavedCompileInfos.Clear
+	for s.lines in self
+		|| P = (s.Position (IsDebugging) -1)
+		s.CompilePos = P
+
+
+libinternal textview.ReallyTrySaveDebugInfo (|guitextlineevent| ask)
+	opt norefcounts
+	|| f = .needfirst
+	|| Has = f.CompilePos >= 0
+	|| IsDebugging = (ask)(self, f, 0) != 0
+	require IsDebugging != has
+	if !IsDebugging
+		._SavedCompileInfos.Clear
+	for s.lines in self
+		|| P = (s.Position (IsDebugging) -1)
+		s.CompilePos = P
+
+
+
+
 

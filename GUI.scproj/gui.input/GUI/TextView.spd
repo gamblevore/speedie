@@ -36,6 +36,7 @@ class TextView (GUIControl)
 	|IntRange|					_UncorrectedSel
 	|Document?|					_Viewing
 	|DelayedShowError?|			_ErrorDelayer
+	|[textviewline]|			_SavedCompileInfos
 
 
 	|GUITextEvent?|				OnTextChanged
@@ -45,6 +46,7 @@ class TextView (GUIControl)
 	
 	|GUITextShowEvent?|			OnShowExtraInfo
 	|GUITextLineEvent?|			OnSelError
+	
 
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
@@ -1518,17 +1520,6 @@ class TextView (GUIControl)
 		return msg
 
 	
-	libinternal TrySaveDebugState (|guitextlineevent| ask)
-		opt norefcounts
-		|| f = .needfirst
-		|| Has = f.CompilePos >= 0
-		|| IsDebugging = (ask)(self, f, 0) != 0
-		require IsDebugging != has
-		for s.lines in self
-			|| P = (s.Position (IsDebugging) -1)
-			s.CompilePos = P
-
-	
 	libinternal ClearAutoComplete
 		if ._CanAutoComplete <= 1
 			.CanAutoComplete = 0
@@ -1546,7 +1537,7 @@ class TextView (GUIControl)
 	libinternal InsertionClutter (|string| s)
 		opt inline
 		|| ask = .OnBreakPoint
-			.TrySaveDebugState(ask)							// Not actually used? Remove?
+			.TrySaveDebugInfo(ask)
 		if s in '\t'										// Tab only
 			.DontMergeUndo
 		.ClearAutoComplete
@@ -2309,10 +2300,10 @@ class TextView (GUIControl)
 				return
 
 	
-	function FindLine (|int| Value, |textviewline|)
+	function FindLine (|int| Position, |textviewline|)
 		opt norefcounts
 		for s in .WrappedLines
-			if s contains Value
+			if s contains Position
 				return s
 
 
@@ -2326,6 +2317,12 @@ class TextView (GUIControl)
 		|| S = d.scrollpos			// in case events bugger it up
 		|| T = d.typingplace		// same
 		if d.Load(false)
+
+//			.ReallyTrySaveDebugInfo // perhaps this should go in preparelinesoftext
+//			|| f = .needfirst
+//			|| Has = f.CompilePos >= 0
+									// it can be called from outsideof here... 
+			
 			.document = d
 			.ClearErrors
 			if show

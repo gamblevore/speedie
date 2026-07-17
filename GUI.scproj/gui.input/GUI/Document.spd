@@ -343,7 +343,7 @@ extend TextView
 			|| LostText = .text[Point.xy]
 			u.AddState(GainedText, Point.xy, LostText)
 
-		Point = point.TextMapShrink(u.text, NewText)
+		Point = point.TextMapShrink(u.text, NewText)	// for copy/paste larger blocks that barely altered anything
 		for v.viewer in u
 			if v
 				v|guicontrol|.text = NewText
