@@ -2078,7 +2078,7 @@ class TextView (GUIControl)
 		.start = D
 
 	
-	libinternal NextVline (|TextViewLine| Curr, |int| P=0, |TextViewLine|)
+	libinternal NextVline (|TextViewLine| Curr, |int| P, |TextViewLine|)
 		opt norefcounts
 		
 		rz = curr.next
@@ -2193,7 +2193,7 @@ class TextView (GUIControl)
 		d.tline = 0
 		d.vline = 0
 		d._Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
-		return .NextVline(d)
+		return .NextVline(d, 0)
 
 
 	libinternal PrepareCharWidth (|string| s, |int|)
@@ -2253,11 +2253,14 @@ class TextView (GUIControl)
 		|| P = 0
 
 		while
-			|| Old = Map.TextMapToOld(P)
-			if old < 0
-				d = d.TextMapInside
-			  elseif Old >= Map[1]
-				d = d.TextMapAfter(old)
+			if map[2] >= 0
+				|| Old = Map.TextMapToOld(P)
+				if old < 0
+					d = d.TextMapInside
+				  elseif Old >= Map[1]
+					d = d.TextMapAfter(old)
+			  else
+				d.TextFlags = 0
 
 			if last
 				d.vline = last.vline + 1
