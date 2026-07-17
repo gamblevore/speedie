@@ -60,7 +60,6 @@ There is still work to be done before Speedie is release ready. Here is the curr
 
 Beta Release:
 
-* Fix the Text Editor (was working till today 15thJuly2026! I just broke it today haha)
 * General ASM fixes, especially around SIMD.
 * Minor GUI improvements to Perry
 * ASM needs to be self-compiling for Speedie. (Speedie compiling itself via Cake!)
