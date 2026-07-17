@@ -2378,7 +2378,6 @@ class TextView (GUIControl)
 			d = d.next
 	
 	module
-		|textviewline| _Wrapper
 		|| _CounterParts	= <(`{}[]()``''""||`)>
 		
 		function Block (|GuiControl| parent, |float| x, |float| w, |float| y, |float| h, |TextView|)
