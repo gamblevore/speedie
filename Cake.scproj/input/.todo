@@ -17,20 +17,8 @@
 * To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
 
 
-							    // Additions Later //
-* new vars should "pop off" like wow-numbers like i = 1! i = 2! i = 3! glittering and stuff from the line they are on
-* Skinning support? .HelloKitty.spd or .emo.spd file endings could reskin the IDE dynamically.
-	* name.emo.scproj could tell speedie that to use .emo files.
-	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... that can't just be commented out.
-* Last 5 (or so) files in the file-tab area could be nice.
-* tile-editor. For fonts/animations. Uses alpha for SDF edges.
-* 3D SDF textures for game hit-detection. (maybe import some assets from a 35 year old racing game also)
-* 3-instruction static allocator instruction... good for modding
-* Once we do OpenCL... make Perry more creative, more and more creative. Left-brain activation.
-	* maybe offer shader functions for various things?
-
-
 					// Future ASM opts (more relaxing NOT do at release!) //
+* if ((self&M) == M)...  M = 1,2,4,8,etc  -->   if self&m
 * int.max seems to use knst2? isnt there a knsr or something that can do it?
 * a pixel instruction to convert floats/ints so don't need knst+div+conv to turn a float into an int? with clamping too!
 * vector building seems quite large, for simple vecs.
@@ -44,4 +32,18 @@
 * EQUL: r5, r0, r5, 48  +  JBOR: r5, 1, 1	// turn into a simpler thing. Like "if compiler is hungry"
 * hoisting
 * .position = Range.x					// unnecessary vget
+
+
+							    // Additions Later //
+* new vars should "pop off" like wow-numbers like i = 1! i = 2! i = 3! glittering and stuff from the line they are on
+* Skinning support? .HelloKitty.spd or .emo.spd file endings could reskin the IDE dynamically.
+	* name.emo.scproj could tell speedie that to use .emo files.
+	* game-like IDE. functionality, "fix" using gameplay states. Mini-games that "Restore state". Do after the VM. Like collect items that are code and get unlocked in the right order... that can't just be commented out.
+* Last 5 (or so) files in the file-tab area could be nice.
+* tile-editor. For fonts/animations. Uses alpha for SDF edges.
+* 3D SDF textures for game hit-detection. (maybe import some assets from a 35 year old racing game also)
+* 3-instruction static allocator instruction... good for modding
+* Once we do OpenCL... make Perry more creative, more and more creative. Left-brain activation.
+	* maybe offer shader functions for various things?
+
 

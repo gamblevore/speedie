@@ -11,6 +11,8 @@ datatype CompileMode (int)
 		Paused
 		Finished
 		Crashed
+		DebugSet = Debug // easier to search for. now I know which places set it.
+
 		
 	syntax is (|CompileMode| M, |bool|)
 		return (self&M) == M
@@ -246,8 +248,10 @@ function PerryIDE.ClearRun
 	.lastcakeerror = nil
 	.SetAppInfo
 	.RunningProd = nil
-	.editme.ClearActiveLine
-	.editme.ClearDebugInfo
+	.editme.DebugLevel = TextView.DebugLevelOff
+//	.editme.ClearActiveLine
+//	.editme.ClearDebugInfo
+	
 	.stack.clear
 	
 		
@@ -336,15 +340,21 @@ function PerryIDE.DebugMode (assigns:|CompileMode|)
 	._DebugMode = value
 	(self is preparing) = value is compiling
 	(self is active) = (value is Run or debug) and (value is ReceivedHello)
+	|| Level = 0
+	if value is CakeMode
+		if value is run
+			level = 1
+		if value is debug
+			level = 2
+	.EditMe.DebugLevel = level
+	
+	
 	
 	
 function DebugBreakAdd (GuiTextLineEvent)
 	opt norefcounts
 	|| i = .ide
-	require i.DebugMode is CakeMode and Debug
-	if !Direction
-		return 1			// tells textview to save compile positions on edit.
-	
+	require i.DebugMode is CakeMode and Debug	
 	|| cmd = ("brkadd" (direction > 0) "brkrem")
 	|| j = i.LineCommand(cmd, line)
 	.SendJbin(j)

@@ -35,7 +35,7 @@ function ClickedDebug (GUIAction)
 
 function perryide.Start (|bool|)
 	if .MakeNothingRunning(" before debugging?")
-		|| CakeMode = .WantCake(CompileMode.CakeMode|||compilemode.debug)
+		|| CakeMode = .WantCake(CompileMode.CakeMode ||| compilemode.DebugSet)
 			.compile(CakeMode)
 			.Showoutput
 	return true

@@ -51,7 +51,7 @@ function SetBreaks (|message| breaks)
 	require file ~= .editme.FilePath
 
 	|| All = breaks.second.int
-		.editme._DimUnReachedLines = true
+		.editme.debuglevel = TextView.DebugLevelDebugging
 		for l.lines in .editme
 			(l isnt ActiveBreakPoint)
 			(l isnt CodeReached)
@@ -170,7 +170,8 @@ function SetAppInfo
 	if !CanDebug
 		.AppInfo.obj = nil
 	if !CanDebug or .DebugMode isnt paused
-		.editme.ClearActiveLine
+		// clears this because its not yet running. Not good.
+//		.editme.DebugLevel = textview.debuglevelrunning * (.DebugMode is Run)
 		.stack.clear
 	
 	|| fs = VarPrinter

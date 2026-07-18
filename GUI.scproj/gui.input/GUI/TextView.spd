@@ -29,7 +29,7 @@ class TextView (GUIControl)
 	|int|						_RemainingHeight
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
-	|bool|						_DimUnReachedLines
+	|byte|						_DebugLevel
 	|message?|					_ActiveLine
 	|TextViewLine|				_Start
 	|IntRange|					_TypingPlace
@@ -256,11 +256,8 @@ class TextView (GUIControl)
 	libinternal message._CanExpandClick (|bool|)
 		|| fn = .func
 		if (.IsContainer or .IsString)
-			if (fn == @arg) and (self is style2)
-				return false
-			return true
-		if fn == @decl or @type
-			return true
+			return !((fn == @arg) and (self is style2))
+		return fn == @decl or @type
 	
 	
 	libinternal message.ContainerLength (|int|)
@@ -1536,8 +1533,8 @@ class TextView (GUIControl)
 	
 	libinternal InsertionClutter (|string| s)
 		opt inline
-		|| ask = .OnBreakPoint
-			.TrySaveDebugInfo(ask)
+		if ._DebugLevel
+			.DebugInfoSave
 		if s in '\t'										// Tab only
 			.DontMergeUndo
 		.ClearAutoComplete
@@ -1765,7 +1762,7 @@ class TextView (GUIControl)
 		char = .clamp(char)
 		|| c = -int.max
 		|| s = .StartLine
-		|| d = .needfirst
+		|| d = .FirstLine
 		
 		while
 			|| n = d.next
@@ -1998,15 +1995,17 @@ class TextView (GUIControl)
 	libinternal StartLine (assigns:|int| v)
 		cpp_part StartAtInt
 		opt norefcounts
-		.StartLine = .needfirst.MoveCapped(V)!
+		.StartLine = .FirstLine.MoveCapped(V)!
 	
 	
-	libinternal NeedFirst (|textviewline|)
+	libinternal FirstLine (|textviewline|)
 		opt norefcounts
-		|| f = .WrappedLines.first
-			return f
-		rz = TextViewLine()
-		.WrappedLines <~ rz
+		|| w = .WrappedLines
+		|| f = w.first
+		if !f
+			f = TextViewLine()
+			w <~ f
+		return f
 	
 	
 	libinternal TextViewLine.SlowMove (|TextViewLine| start, |int| amount, |...!|)
@@ -2228,7 +2227,8 @@ class TextView (GUIControl)
 		|| JX		= .JeeboxMode
 		|| msg		= .Parse(changed >= 2, JX)
 		|| Pos		= .StartPos
-		|| d		= .NeedFirst
+		|| d		= .FirstLine
+		
 		|message| LastOwner
 		
 		|| CharW = .PrepareCharWidth(.text)
@@ -2238,7 +2238,6 @@ class TextView (GUIControl)
 
 		d.tLine = 1
 		map = map.TextMapFix
-		if map[2] >= 0
 
 		|TextViewLine| Last
 		|| P = 0
@@ -2307,31 +2306,29 @@ class TextView (GUIControl)
 				return s
 
 
-	function LoadDocument (|document| D, |bool| Show, |bool|)
+	function LoadDocument (|document| U, |bool| Show, |bool|)
 		|| old = .document
 			require .GroupSaveAll or old.SaveBeforeClose
 			.document = nil
 			.ClearErrors
 		
-		d.SimpleUpdateFromDisk
-		|| S = d.scrollpos			// in case events bugger it up
-		|| T = d.typingplace		// same
-		if d.Load(false)
-
-//			.ReallyTrySaveDebugInfo // perhaps this should go in preparelinesoftext
-//			|| f = .needfirst
-//			|| Has = f.CompilePos >= 0
-									// it can be called from outsideof here... 
-			
-			.document = d
-			.ClearErrors
-			if show
-				.PrepareLinesOfText
-				.SelDirect(T, nil)
-				.ScrollPos = S
-			return true
+		u.SimpleUpdateFromDisk
+		.DebugInfoRestore(u)
 		
-		.Clear("")
+		|| S = u.scrollpos			// in case events bugger it up
+		|| T = u.typingplace		// same
+			
+		if !u.Load(false)
+			.clear("")
+			return false
+
+		.document = u
+		.ClearErrors
+		if show
+			.PrepareLinesOfText
+			.SelDirect(T, nil)
+			.ScrollPos = S
+		return true
 
 
 	setter JeeboxMode (|documentjeeboxmode|)

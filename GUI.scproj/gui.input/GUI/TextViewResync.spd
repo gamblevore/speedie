@@ -1,20 +1,4 @@
 
-libinternal ivec4.TextMapToOld (|int| P, |int|)
-	// AAA<BBB>CCC		2-->2,		6-->3
-	// AAACCC
-	// AAABBBCCC
-
-	if P < self[0]
-		return P
-
-	|| Start = self[0]					// 3
-	|| InsertLength = Self[2]			// 3
-	|| InsertEnd = Start + InsertLength	// 6
-	if P >= InsertEnd					// P==6
-		|| Gain = self[3]				// 3
-		return P - Gain
-	return -1						// deleted :O
-
 
 libinternal textviewline.TextMapAfter (|int| OldPos, |textviewline|)
 	opt norefcounts
@@ -41,11 +25,29 @@ libinternal textviewline.TextMapInside (|textviewline|)
 
 
 
+libinternal ivec4.TextMapToOld (|int| P, |int|)
+	// AAA<BBB>CCC		2-->2,		6-->3
+	// AAACCC
+	// AAABBBCCC
+
+	if P < self[0]
+		return P
+
+	|| Start = self[0]					// 3
+	|| InsertLength = Self[2]			// 3
+	|| InsertEnd = Start + InsertLength	// 6
+	if P >= InsertEnd					// P==6
+		|| Gain = self[3]				// 3
+		return P - Gain
+	return -1						// deleted :O
+
+
 libinternal ivec4.TextMapShrink (|string| Old, |string| New, |ivec4|)
 	// for large alterations in a silly way. might as well allow it
 	// for code-debugging, its nice to have a more solid debugger.
 	|| Start = self[0]
 	|| End = self[1] min new.Length
+
 	if start >= End
 		return self
 
@@ -79,32 +81,72 @@ libinternal ivec4.TextMapFix (|ivec4|)
 	return self
 
 
-libinternal textview.TrySaveDebugInfo (|guitextlineevent| ask)
-	opt norefcounts
-	|| f = .needfirst
-	|| Has = f.CompilePos >= 0
-	|| IsDebugging = (ask)(self, f, 0) != 0
-	require IsDebugging != has
-	if !IsDebugging
-		._SavedCompileInfos.Clear
-	for s.lines in self
-		|| P = (s.Position (IsDebugging) -1)
-		s.CompilePos = P
+
+////////////////////////////////////////////////////////////////////////////////
+extend textview
+	constants
+		DebugLevelOff
+		DebugLevelRunning
+		DebugLevelDebugging
 
 
-libinternal textview.ReallyTrySaveDebugInfo (|guitextlineevent| ask)
-	opt norefcounts
-	|| f = .needfirst
-	|| Has = f.CompilePos >= 0
-	|| IsDebugging = (ask)(self, f, 0) != 0
-	require IsDebugging != has
-	if !IsDebugging
-		._SavedCompileInfos.Clear
-	for s.lines in self
-		|| P = (s.Position (IsDebugging) -1)
-		s.CompilePos = P
-
-
-
+	function DebugLevel (assigns:|byte| Level)
+	// 0 = off, 1 = running, 2 = debugging
+		opt norefcounts
+		opt noinline
+		if !._Viewing
+/			level = 0
+		
+		if level <= 1
+	/		._ActiveLine = nil
+		require ._debuglevel != Level
+/		._debuglevel = level
+	
+		require level == 0
+/		|| w = .wrappedlines			
+		w.obj = nil
+		|| f = w.first
+		while f
+			f.textFlags	&=~ TextLineFlags.UserFlags
+			f.CompilePos = -1
+			f++
+	
+		._SavedCompileInfos.clear
+			
+	
+	libinternal DebugInfoRestore (|document| u)
+		|| w = .DebugInfoRestoreSub(u)
+		.WrappedLines = w
+		._Start = w
+	
+	
+	libinternal DebugInfoRestoreSub (|document| u, |textviewline|)
+		opt norefcounts
+	
+		if ._debuglevel				// each file needs its own wrapped lines
+/			|| f = u.FilePath
+			for wr in ._SavedCompileInfos	
+				if (wr.obj as string) ~= f
+					return wr
+		
+		return textviewline()	
+	
+	
+	libinternal DebugInfoSave
+		opt norefcounts
+/		|| f = .FirstLine
+		|| u = ._Viewing
+		require u and f.compilepos < 0
+/		|| W = .WrappedLines
+		if !w.obj
+			|| info = ._SavedCompileInfos
+			info <~ w
+		  else
+			debugger
+		W.obj = u.FilePath
+		
+		while f
+			f.CompilePos = f.Position
+			f++
 
 
