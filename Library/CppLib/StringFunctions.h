@@ -133,8 +133,6 @@ JB_String* JB_Str_BOM(int Encoding, bool IsBigEndian);
 double JB_Str_TextDouble(JB_String* self, Message* Where, bool Suffixes);
 int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b );
 int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b );
-s64 JB_Str_HexInteger(JB_String* self, Message* b);
-s64 JB_Str_TextIntegerValid(JB_String* self, Message* b);
 
 
 

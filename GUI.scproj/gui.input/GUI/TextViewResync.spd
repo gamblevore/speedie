@@ -91,18 +91,18 @@ extend textview
 
 
 	function DebugLevel (assigns:|byte| Level)
-	// 0 = off, 1 = running, 2 = debugging
+	// 0 = Off,  1 = Running,  2 = Debugging
 		opt norefcounts
 		opt noinline
 		if !._Viewing
 			level = 0
 		
-		if level <= 1
+		if level < DebugLevelDebugging
 			._ActiveLine = nil
 		require ._debuglevel != Level
 		._debuglevel = level
 	
-		require level == 0
+		require level == DebugLevelOff
 		|| w = .wrappedlines			
 		w.obj = nil
 		|| f = w.first
@@ -123,7 +123,7 @@ extend textview
 	libinternal DebugInfoRestoreSub (|document| u, |textviewline|)
 		opt norefcounts
 	
-		if ._debuglevel				// each file needs its own wrapped lines
+		if ._debuglevel	>= debuglevelrunning			// each file needs its own wrapped lines
 /			|| f = u.FilePath
 			for wr in ._SavedCompileInfos	
 				if (wr.obj as string) ~= f

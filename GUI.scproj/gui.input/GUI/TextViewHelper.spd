@@ -494,7 +494,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 				yadd = 3
 				c = '.'
 				col = SpaceDisplay
-			  elseif (d isnt CodeReached) and ._DebugLevel >= 2
+			  elseif (d isnt CodeReached) and ._DebugLevel >= DebugLevelDebugging
 				col.a /= 2
 			state.font.DrawChar(c, Where, (x, y+yadd), col, 1)
 		prev = c

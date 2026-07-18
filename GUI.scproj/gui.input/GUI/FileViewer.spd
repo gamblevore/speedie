@@ -474,17 +474,23 @@ class FileViewer (ListView)
 		if  !s.OutWhite
 			.editme.SetFocus
 			return
+
+		|| cuter = s.trim.TrimStart("line ")
+		if cuter.isint								// "line 1234"
+			|| Line = cuter.ParseInt
+				.editme.ViewLineAndSel(Line)
+				return
 		
 		|| Path = s.ExtractPathAndLine
 		|| n = path.name
 			|| r = .FindAPath(n) ?? .AddExtra(n)
-				.Select(nil)					// do we need this?
+				.Select(nil)						// do we need this?
 				.SelectFast(r)
 		
 		|| Pos = path.Position
 		|| Line = path.rangelength
 			.editme.ViewLineAndSel(Line)
-			if pos								// surely... its a position ON a line?
+			if pos									// surely... its a position ON a line?
 				pos += .editme.SelRange.x
 		if pos
 			.editme.ShowAndSelect(Pos, true)
@@ -493,7 +499,7 @@ class FileViewer (ListView)
 	function AddExtra (|string| path, |filerow|)
 		require path[0] == '/' or '~'
 		|| f = path.file
-		require f.mustexist
+		require f.MustExist
 		|| x = .extra
 		if !x
 			x = filerow("", "(Extra)", ".")

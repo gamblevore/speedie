@@ -91,6 +91,7 @@ datatype CharSet (uint)
 		Unicode			= (1<<fUnicode)
 		LowerCase		= (1<<fLower)
 		UpperCase		= (1<<fUpper)
+		Numbers			= (1<<fNumber)
 		UnderScore		= (1<<fUnderscore)
 		LettersOnly 	= (1<<fUpper) + (1<<fLower) + Unicode
 		LettersUnderScore= LettersOnly+ (1<<fUnderscore) 

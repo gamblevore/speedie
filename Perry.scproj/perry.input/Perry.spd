@@ -242,12 +242,9 @@ function View (|ButtonView| btn, |bool| CanChangeFocus=true)
 	  elseif (btn == .ViewDebugger)
 		g = .stack
 	
-	if changed
-		if CanChangeFocus
-			g.setfocus
-	  elseif btn == .viewfiles
-		if !.InConstructor
-			.filelist.ShowQuickOpen
+	if changed and CanChangeFocus
+		g.setfocus
+
 	.CheckViewWorthIt(old)
 
 

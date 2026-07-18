@@ -172,8 +172,6 @@ function SetAppInfo
 	if !CanDebug
 		.AppInfo.obj = nil
 	if !CanDebug or .DebugMode isnt paused
-		// clears this because its not yet running. Not good.
-//		.editme.DebugLevel = textview.debuglevelrunning * (.DebugMode is Run)
 		.stack.clear
 	
 	|| fs = VarPrinter

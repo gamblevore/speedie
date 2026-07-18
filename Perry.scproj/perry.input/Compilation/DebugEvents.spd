@@ -248,10 +248,7 @@ function PerryIDE.ClearRun
 	.lastcakeerror = nil
 	.SetAppInfo
 	.RunningProd = nil
-	.editme.DebugLevel = TextView.DebugLevelOff
-//	.editme.ClearActiveLine
-//	.editme.ClearDebugInfo
-	
+	.editme.DebugLevel = TextView.DebugLevelOff	
 	.stack.clear
 	
 		
@@ -340,15 +337,15 @@ function PerryIDE.DebugMode (assigns:|CompileMode|)
 	._DebugMode = value
 	(self is preparing) = value is compiling
 	(self is active) = (value is Run or debug) and (value is ReceivedHello)
-	|| Level = 0
+	.EditMe.DebugLevel = .DebugLevel(value)
+
+
+function PerryIDE.DebugLevel (|CompileMode| value, |int|)
 	if value is CakeMode
-		if value is run
-			level = 1
 		if value is debug
-			level = 2
-	.EditMe.DebugLevel = level
-	
-	
+			return textview.debugleveldebugging
+		if value is run
+			return textview.debuglevelrunning
 	
 	
 function DebugBreakAdd (GuiTextLineEvent)

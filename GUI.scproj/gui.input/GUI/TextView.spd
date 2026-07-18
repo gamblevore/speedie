@@ -1533,7 +1533,7 @@ class TextView (GUIControl)
 	
 	libinternal InsertionClutter (|string| s)
 		opt inline
-		if ._DebugLevel
+		if ._DebugLevel >= debuglevelrunning
 			.DebugInfoSave
 		if s in '\t'										// Tab only
 			.DontMergeUndo

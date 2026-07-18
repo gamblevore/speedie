@@ -841,8 +841,11 @@ So anything not 0 means "its OK"`
 			doc.JeeboxMode |= documentjeeboxmode.Expect
 		
 		|| Loaded = E.LoadDocument(doc, true)					#require
-		if e._ActiveLine
+
+		e.DebugLevel = .DebugLevel(.Debugmode)
+		if .debugmode is debug
 			.ReloadBreaks
+
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
 		doc.CompareTreesOnSave = doc.JeeboxMode is Jeebox

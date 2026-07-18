@@ -1199,19 +1199,14 @@ static int64 ParseNumbers_( JB_String* self, int Start, Message* Where, int AsHe
 int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b ) {
 	return ParseNumbers_( self, Start, b, 0 );
 }
+int64 JB_Str_TextIntegerValid( JB_String* self, Message* b ) {
+// remove this?
+	return ParseNumbers_( self, 0, b, 0 );
+}
 
 int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b ) {
 	return ParseNumbers_( self, Start, b, 2 );
 }
-
-int64 JB_Str_HexInteger( JB_String* self, Message* b ) {
-	return ParseNumbers_( self, 0, b, 2 );
-}
-
-int64 JB_Str_TextIntegerValid( JB_String* self, Message* b ) {
-	return ParseNumbers_( self, 0, b, 0 );
-}
-
 
 
 ////////////    #include "StringAlterCopy.i" 

@@ -186,6 +186,7 @@ libinternal cstring.temp (|VirtualJBString|)
 
 function String.ExtractPathAndLine (|message|)
 	|message--| msg = Message()
+	
 	if charset.line in self
 		|| parsed = .Parse
 //			|message--| p2 = parsed.first

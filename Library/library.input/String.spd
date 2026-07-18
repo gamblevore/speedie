@@ -157,18 +157,14 @@ class String
 	function UnHex (|faststring| fs=nil, |string|)
 		cpp_wrapper JB_Str_UnHex
 
-	function ParseInt (|int| Start, |message| where, |int64|)
+	function ParseInt (|int| Start=0, |message?| where=nil, |int64|)
 		nil checker
+		// could be nice to add KB, MB, GB, TB suffixes to this
 		cpp_Wrapper JB_Str_TextIntegerSection
 	
-	function ParseHex (|int| Start=0, |message| where=nil, |int64|)
+	function ParseHex (|int| Start=0, |message?| where=nil, |int64|)
 		nil checker
 		cpp_Wrapper JB_Str_HexIntegerSection
-	
-	function ParseInt (|Message| Where=nil, |int64|)
-		// could be nice to add KB, MB, GB, TB suffixes to JB_Str_TextIntegerValid
-		nil checker
-		cpp_Wrapper JB_Str_TextIntegerValid
 	
 	inline Int (|int64|) // remove?
 		return .parseint(nil)
@@ -180,10 +176,6 @@ class String
 	function ParseFloat (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
 		nil checker
 		cpp_Wrapper JB_Str_TextDouble
-	
-	function ParseHexInt (|message|where=nil,|int|) 
-		nil checker
-		cpp_Wrapper JB_Str_HexInteger
 
 	function UnicodeSync (|string|)
 		cpp_wrapper JB_Str_UnicodeSync
