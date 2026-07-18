@@ -779,7 +779,7 @@ extend PerryIDE
 		for ex in conf["excludes"]
 			f.Excludes![ex.value] = "x"
 		
-		if !conf and .projIsSpeedieCode
+		if !conf and .ProjectIsCode
 			conf = templates.Roots.parse
 		
 		.LostFunks = conf["unused_lib_funcs"]

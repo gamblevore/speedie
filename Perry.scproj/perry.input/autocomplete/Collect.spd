@@ -48,7 +48,7 @@ function PerryIDE.CanSend (|string| cmd, |bool|)
 
 
 function PerryIDE.SendFeedbackStr (|string| op)
-	if .projIsSpeedieCode
+	if .ProjectIsCode
 		.SendFeedbackMsg(.checkmsg(op, false))
 	
 
@@ -61,7 +61,7 @@ function PerryIDE.DateWrap (|message| msg, |date| d, |message|)
 
 
 function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
-	require msg and .ProjIsSpeedieCode
+	require msg and .ProjectIsCode
 	|| fb = .FeedbackInit(.feedback)					#require
 	.feedback = fb
 	|| d = gui.framestart

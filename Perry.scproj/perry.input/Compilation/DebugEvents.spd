@@ -118,7 +118,7 @@ function DebugArgsGotFocus (guiaction)
 
 function textview.InitDebugArgs
 	|| i = .ide
-	if i.ProjIsSpeedieCode
+	if i.ProjectIsCode
 		if !.Document
 			|| f = i.DebugArgsFile
 			.LoadDocument(Document(f), true)

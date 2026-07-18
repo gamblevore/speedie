@@ -157,9 +157,11 @@ function AppInfoWrite (|faststring| fs, |message| info, |string| extra)
 	|| err = .LastCakeError
 		fs <~ "\nVM Error: "
 		fs <~ err.firstname
-		|| errnum = err.second.int
-			fs <~ ' '
-			fs <~ errnum
+		|| num = err.second
+		if num.name.isint
+			|| errnum = num.int
+				fs <~ ' '
+				fs <~ errnum
 		
 
 
@@ -405,9 +407,10 @@ function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
 
 
 function perryide.ReloadBreaks
-	|jbin--| j = VarPrinter.start(@tmp, "sendbreaks")
-	j.addstr .path
-	.SendJbin(j)
+	if .EditorIsCode
+		|jbin--| j = VarPrinter.start(@tmp, "sendbreaks")
+		j.addstr .path
+		.SendJbin(j)
 
 
 

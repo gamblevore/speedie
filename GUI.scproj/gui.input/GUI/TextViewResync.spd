@@ -45,31 +45,31 @@ libinternal ivec4.TextMapToOld (|int| P, |int|)
 libinternal ivec4.TextMapShrink (|string| Old, |string| New, |ivec4|)
 	// for large alterations in a silly way. might as well allow it
 	// for code-debugging, its nice to have a more solid debugger.
-	|| Start = self[0]
-	|| End = self[1] min new.Length
-
-	if start >= End
+	|| N = self[2]
+	if N <= 0
 		return self
+
+	|| Start = self[0]
+	|| End = Start + N
 
 	|| A = old.Addr
 	|| B = new.Addr
-	|| Loss = 0
 	while  start < End
 		if A[Start] != B[Start]
 			exit
 		Start++
-		loss++
+		n--
 	A--
 	B--
 	while Start < End
 		if A[End] != B[End]
 			exit
-		End--
-		loss++
+		End--				// bug: thats the inserted end, not the selection end!
+		n--
 
-	self[2] -= Loss
+	self[2] = N
 	self[0] = Start
-	Self[1] = End
+	Self[1] = End			// bug here
 	return self
 
 
@@ -95,15 +95,15 @@ extend textview
 		opt norefcounts
 		opt noinline
 		if !._Viewing
-/			level = 0
+			level = 0
 		
 		if level <= 1
-	/		._ActiveLine = nil
+			._ActiveLine = nil
 		require ._debuglevel != Level
-/		._debuglevel = level
+		._debuglevel = level
 	
 		require level == 0
-/		|| w = .wrappedlines			
+		|| w = .wrappedlines			
 		w.obj = nil
 		|| f = w.first
 		while f
@@ -134,10 +134,10 @@ extend textview
 	
 	libinternal DebugInfoSave
 		opt norefcounts
-/		|| f = .FirstLine
+		|| f = .FirstLine
 		|| u = ._Viewing
 		require u and f.compilepos < 0
-/		|| W = .WrappedLines
+		|| W = .WrappedLines
 		if !w.obj
 			|| info = ._SavedCompileInfos
 			info <~ w

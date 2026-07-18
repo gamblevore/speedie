@@ -193,7 +193,12 @@ function SetTab2Name (|message| old)
 			ii.name = f.name + "[]"
 
 
-function ProjIsSpeedieCode (|bool|)
+function EditorIsCode (|bool|)
+	opt norefcounts
+	return .editme.FilePath.PathIsCode
+
+
+function ProjectIsCode (|bool|)
 	opt norefcounts
 	// why not just use .project?
 	return .Project.PathIsCode

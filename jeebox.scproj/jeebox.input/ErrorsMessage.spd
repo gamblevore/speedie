@@ -49,14 +49,15 @@ extend_module Error
 	function CantParseNum (|Message| Where, |string| num, |int| Pos, |bool| Overflow)
 		visible							// for lib
 		
-		|| fs = FastString()
+/		|| fs = FastString()
 		if Overflow
-			fs <~ "Numeric overflow parsing number"
+			fs <~ "Overflowing number"
 		  else
-			fs <~ "Can’t parse number. Found: '"
+			fs <~ "Invalid number (found '"
 			fs.AppendRange(num, pos, pos+1)
-			fs <~ "' in: "
-			fs <~ num.Preview(32)
+			fs <~ "')"
+		fs <~ " in: "
+		fs <~ num.Preview(32)
 		
 		|string--| str = fs.GetResult
 		|error--| err = error(where, str)

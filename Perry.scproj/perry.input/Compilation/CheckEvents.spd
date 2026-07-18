@@ -20,7 +20,7 @@ extend PerryIDE
 	
 	function ProjectWasModified
 		.ModifiedForCompile = false
-		require .projIsSpeedieCode and !.UsingSpdLib
+		require .ProjectIsCode and !.UsingSpdLib
 		.Feedback = nil
 		.AskCheck
 	
@@ -239,7 +239,7 @@ extend PerryIDE
 
 
 	function RenableAfterCompile (|bool|)
-		|| code = .ProjIsSpeedieCode
+		|| code = .ProjectIsCode
 		(.buildbutton is enabled) = code
 		(.runbutton is enabled) = code
 		(.buildbutton is visible)

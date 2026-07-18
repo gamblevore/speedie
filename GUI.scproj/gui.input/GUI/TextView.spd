@@ -2250,7 +2250,7 @@ class TextView (GUIControl)
 				  elseif Old >= Map[1]
 					d = d.TextMapAfter(old)
 			  else
-				d.TextFlags = 0
+				d = d.TextMapAfter(P)
 
 			if last
 				d.vline = last.vline + 1

@@ -442,11 +442,8 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	opt min 3
 	|| GoUp = (7 - .lineheight) / 2
 	if d.LineError
-		if .MyError
-			.DrawErrorBackground(where, y + GoUp, d)
-		  else
-			d.LineError = nil								// sigh. crappy bug fix
-
+		.DrawErrorBackground(where, y + GoUp, d)
+	
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
 		if d.CompileContains(m.Position)

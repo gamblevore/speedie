@@ -837,7 +837,7 @@ So anything not 0 means "its OK"`
 		if e.Document == doc
 			return -1
 				
-		if doc.FilePath.pathiscode
+		if .EditorIsCode
 			doc.JeeboxMode |= documentjeeboxmode.Expect
 		
 		|| Loaded = E.LoadDocument(doc, true)					#require
@@ -937,7 +937,7 @@ So anything not 0 means "its OK"`
 			require e is modified
 		// otherwise resave anyhow.
 		
-		if (!keys.shift and .projIsSpeedieCode)
+		if (!keys.shift and .ProjectIsCode)
 			.filelist.saveall(Purpose)
 		  elseif e.IsModified
 			require e.Save
