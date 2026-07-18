@@ -290,7 +290,9 @@ bool JB_Obj_IsValid (JB_Object* Obj);
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
-//		JB_TotalSanity(false);
+    #if DEBUG
+		JB_TotalSanity(false);
+	#endif
         self->RefCount += 1<<JB_RefCountShift;
 		JBObjRefTest(self);
     }
@@ -310,6 +312,9 @@ inline void JB_Decr(JB_Object* self) {
 
 
 inline void JB_Clear_(JB_Object** Place) {
+    #if DEBUG
+		JB_TotalSanity(false);
+	#endif
 	JB_Object* self = *Place;
 	*Place = nil;
 	JB_Decr(self);
@@ -317,6 +322,9 @@ inline void JB_Clear_(JB_Object** Place) {
 
 #define JB_DecrMulti(a, b)  (JB_DecrMulti_((JB_Object**)(a),b))
 inline void JB_DecrMulti_(JB_Object** Start, int n) {
+    #if DEBUG
+		JB_TotalSanity(false);
+	#endif
 	JB_Object** End = Start+n;
 	while (Start < End) {
 		JB_Decr(*Start++);
@@ -328,10 +336,16 @@ inline JB_Object* JB_SafeDecr_(JB_Object* self) {
         self->RefCount -= 1<<JB_RefCountShift;
 		JBObjRefTest(self);
     }
+    #if DEBUG
+		JB_TotalSanity(false);
+	#endif
     return self;
 }
 
 inline JB_Object* JB_FreeIfDead(JB_Object* self) {
+    #if DEBUG
+		JB_TotalSanity(false);
+	#endif
     if (self) {
 		JBObjRefTest(self);
         if (self->RefCount  <  1<<JB_RefCountShift)
