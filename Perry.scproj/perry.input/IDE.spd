@@ -939,19 +939,20 @@ So anything not 0 means "its OK"`
 		if purpose is errorchecking
 			require e is modified
 		// otherwise resave anyhow.
-		
+		|| Curr = .CurrFileRow
+
 		if (!keys.shift and .ProjectIsCode)
-			.filelist.saveall(Purpose)
+			.filelist.saveall(Purpose, curr)
 		  elseif e.IsModified
 			require e.Save
 		  else
 			return
 		
 		.UpdateActiveFile
-		with .currfilerow
-			.lastsize = e.Length
-			if .FilePath.pathiscode
-				self.HandleAltered
+		if curr
+			curr.lastsize = e.Length
+			if curr.FilePath.pathiscode
+				.HandleAltered
 		(self is modified) = (e is modified)
 
 

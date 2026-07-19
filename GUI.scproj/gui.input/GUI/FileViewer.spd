@@ -195,12 +195,12 @@ class FileViewer (ListView)
 		n.remove
 	
 	
-	function SaveAll (|DocumentAction| Purpose, |bool|)
+	function SaveAll (|DocumentAction| Purpose, |filerow| ForceSave=nil,  |bool|)
 		cpp_part SaveAllAlways
 		opt norefcounts
 		// what if like 100 are invalid? THEN? ask for all?
 		for f.fast in self
-			if f.ismodified
+			if (ForceSave == f) or f.ismodified
 				require .Save(f, purpose)
 		return true
 
@@ -255,6 +255,7 @@ class FileViewer (ListView)
 		if gui.quitreason
 			fs <~ ", before quitting"
 		fs <~ "?"
+		
 		if n > 1
 			fs <~ "\n"
 			for m0 in m
@@ -263,9 +264,9 @@ class FileViewer (ListView)
 		
 		|| answer = fs|&nil||string|.AskSaveOrCancel
 		fs = nil
-		if answer >= 1  // save
+		if answer >= 1			// save
 			return .saveall(DocumentAction.saving)
-		return answer == 0	// don't
+		return answer == 0		// don't
 
 
 	syntax access (|int| i, |filerow|)

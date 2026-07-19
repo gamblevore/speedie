@@ -2,7 +2,7 @@
 
 function PerryIDE.ACTUAL_COMPILE
 	expect !.compilr (beep)  // wah?
-	require .FileList.SaveAll(documentaction.saving)
+	require .FileList.SaveAll(documentaction.saving, .CurrFileRow)
 
 	// so should I save this here? Or in saveall?
 	// lets try here. Why not... in the textview itself?

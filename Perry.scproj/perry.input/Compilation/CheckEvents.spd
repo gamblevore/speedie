@@ -112,10 +112,8 @@ extend PerryIDE
 			rz = !div.Collapsed
 
 
-	function CheckMsg (|string| operation, |bool| SaveAll, |message|)
+	function CheckMsg (|string| operation, |message|)
 		opt norefcounts
-		if SaveAll
-			require .filelist.SaveAll(documentaction.saving)
 		|| cmd = @tmp + operation
 		cmd <~ .Project.path
 		return cmd

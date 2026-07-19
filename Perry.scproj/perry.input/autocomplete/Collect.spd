@@ -49,7 +49,7 @@ function PerryIDE.CanSend (|string| cmd, |bool|)
 
 function PerryIDE.SendFeedbackStr (|string| op)
 	if .ProjectIsCode
-		.SendFeedbackMsg(.checkmsg(op, false))
+		.SendFeedbackMsg(.checkmsg(op))
 	
 
 function PerryIDE.DateWrap (|message| msg, |date| d, |message|)

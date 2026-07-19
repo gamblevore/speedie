@@ -454,6 +454,9 @@ class DocumentReverser (list)
 
 	libinternal TryMerge (|string| Insertion, |ivec2| New, |string| Del, |bool|)
 		opt norefcounts
+		// merging breaks the modified checker... because the "current" is still the original
+		// assuming we just saved last.
+		
 		|| MyOld = .obj|&nil||string|
 		require MyOld isa string
 		|| Mine = .Inserted.Length
