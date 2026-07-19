@@ -5,7 +5,7 @@ class FileRow (ListViewRow)
 // then fileviewer can handle it...
 	linkage
 		cpp_part FR
-	|string|						Location
+	|string|						FilePath
 	|Document?|						_Document
 	|date|							DateOfFileAtRead
 	|string|						DirFile
@@ -24,7 +24,7 @@ class FileRow (ListViewRow)
 	constructor (|FileRow| R)
 		cpp_Part ConstructorCopy
 		.func = r.func
-		.location = R.location
+		.FilePath = R.FilePath
 		.dirfile	= r.DirFile
 		.asdir		= r.asdir
 		.name		= r.name
@@ -38,7 +38,7 @@ class FileRow (ListViewRow)
 		.func		= @file
 		.rangelength = 0 // for the sorter
 
-		.Location	= (path.PathDir (DirFile) path)
+		.FilePath	= (path.PathDir (DirFile) path)
 		.dirfile	= DirFile
 
 		.asdir		= dirfile
@@ -51,7 +51,7 @@ class FileRow (ListViewRow)
 	render
 		opt norefcounts
 		fs <~ "file: "
-		fs <~ .location
+		fs <~ .FilePath
 		fs <~ .dirfile	
 
 	
@@ -60,7 +60,7 @@ class FileRow (ListViewRow)
 		if ex contains self
 			fv.Removerow(self)
 			return
-		|| l = .Location$
+		|| l = .FilePath$
 		require keys.shift or "Delete file: ${l.name}?\n\nAt ${l.parent}".confirm
 		if l.file.MoveToTrash
 			fv.removerow(self)
@@ -72,15 +72,15 @@ class FileRow (ListViewRow)
 			beep v + " is not a valid filename!"
 			return false
 		
-		if .location ~= v
+		if .FilePath ~= v
 			return false
-		|| l = .location.file
+		|| l = .FilePath.file
 		|| f = l.sibling(v)
-		if .location != f
+		if .FilePath != f
 			if f.Exists
 				beep v + " already exists!"
 			  elseif l.moveto(f)
-				.location = f.path
+				.FilePath = f.path
 				.name = f.name
 				.parent.filesort
 				|| d = ._Document
@@ -90,7 +90,7 @@ class FileRow (ListViewRow)
 
 	operator isa (|string| s, |bool|)
 		inlined
-		return .location isa s
+		return .FilePath isa s
 	
 	
 	function IsDir (|bool|)
@@ -98,7 +98,7 @@ class FileRow (ListViewRow)
 	
 	
 	function ReadFrom (|string|)
-		return .Location + .dirfile
+		return .FilePath + .dirfile
 
 
 	libinternal IsAlsoDir (|file| f, |bool|)
@@ -114,7 +114,7 @@ class FileRow (ListViewRow)
 	
 	function TryReload (|fileviewer|fv)
 		require .asdir
-		|| l = .location
+		|| l = .FilePath
 			|| f = l.file
 			|| d = f.modified
 			if d > .DateOfFileAtRead
@@ -134,7 +134,7 @@ class FileRow (ListViewRow)
 		|| r = filerow(f.path, f.name)
 		self <~ r
 		if f.isdir
-			r.location = r.location.pathdir
+			r.FilePath = r.FilePath.pathdir
 			r.dirfile = folfile
 
 		if f.IsntAnOSXBundle and !f.issymlink
@@ -186,7 +186,7 @@ class FileRow (ListViewRow)
 
 
 	function ReadName (|string|)
-		|| n = .location.name
+		|| n = .FilePath.name
 		if .dirfile
 			return n.pathdir + .dirfile
 		return n
@@ -239,12 +239,12 @@ class FileRow (ListViewRow)
 
 	libinternal FindAllParent (|message| FoundList, |error|)
 		opt norefcounts
-		rz = error(nil, .location, errorseverity.ok)
+		rz = error(nil, .FilePath, errorseverity.ok)
 		(rz|listviewrow| is expanded)
 		|| str = "\11 "
 		if .asdir: str = "\11 "
-		rz.name = str + .location.name
-		rz.path = .location
+		rz.name = str + .FilePath.name
+		rz.path = .FilePath
 		rz.obj = self
 		rz.position = -1
 		FoundList <~ rz
@@ -279,7 +279,7 @@ class FileRow (ListViewRow)
 				
 				result.range = R
 				result.obj = self
-				result.path = .location
+				result.path = .FilePath
 				result.name = s
 		Remain = lim
 
@@ -290,7 +290,7 @@ class FileRow (ListViewRow)
 
 
 	libinternal Match (|string| path, |bool| NameOnly, |int|)
-		rz = .location.name(nameonly).FileViewMatch(path)
+		rz = .FilePath.name(nameonly).FileViewMatch(path)
 		if .dirfile
 			|| r = .readfrom
 			if rz and path.last != '/' and r.filesize == 0
@@ -302,7 +302,7 @@ class FileRow (ListViewRow)
 		function FindFileName (|listview| s, |string| name, |filerow|)
 			for r.all in s
 				if r isa filerow
-					if r.location.hasname(name)
+					if r.FilePath.hasname(name)
 						return r
 
 		libinternal error.ViewDate (|date|)

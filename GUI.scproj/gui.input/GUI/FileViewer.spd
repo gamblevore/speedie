@@ -7,7 +7,7 @@ class FileViewer (ListView)
 	|dictionary?|					NoFind
 	|TextView|						QuickOpen
 	|ListView|						ListOpen
-	|textView|						Editme
+	|textView|						EditMe
 	|filerow?|						Extra
 	|filerow?|						SearchWithin
 	|[string]|						SizeCheckers
@@ -227,7 +227,7 @@ class FileViewer (ListView)
 		require Purpose isnt ErrorChecking
 
 		if (purpose is Saving)
-			Notifications <~ "Invalid jeebox saved to: " + f.location
+			Notifications <~ "Invalid jeebox saved to: " + f.FilePath
 		return true
 
 
@@ -280,7 +280,7 @@ class FileViewer (ListView)
 		if path.file.IsDir
 			path = path.PathDir // standardise
 		for f.fast in self
-			if path ~= f.location or f.ReadFrom
+			if path ~= f.FilePath or f.ReadFrom
 				return f
 
 
@@ -329,7 +329,7 @@ class FileViewer (ListView)
 					f.rangelength = it
 					if Copy
 						f = FileRow(f)
-						if f.Location.file.IsDir
+						if f.FilePath.file.IsDir
 							f.name = f.name.PathDir
 					rz <~ f
 		
@@ -346,7 +346,7 @@ class FileViewer (ListView)
 		for (f.backwards in rz) (i)
 			if f.SameNameAsPrev
 				if copy
-					|| name = f.name + "  --  " + f.location.neatenpath
+					|| name = f.name + "  --  " + f.FilePath.neatenpath
 					f = filerow(f)
 					f.name = name
 					rz[i] = f
@@ -365,8 +365,8 @@ class FileViewer (ListView)
 		f.findID = ID
 		
 		|| s = .SearchWithin
-			|| Restrict = s.location
-			if !f.location[0,Restrict]
+			|| Restrict = s.FilePath
+			if !f.FilePath[0,Restrict]
 				return false
 		
 		return !.nofind.valuelower(f.name)
@@ -439,7 +439,7 @@ class FileViewer (ListView)
 		.clear
 		for p in items
 			|| m = message(@str, p.name)
-			|| dir = p.Location.file.isdir
+			|| dir = p.FilePath.file.isdir
 			m.name = ("\10 " (dir) "\11 ") + m.name
 			
 			if HasSel and p isnt UnSelectable
@@ -516,7 +516,7 @@ class FileViewer (ListView)
 		libinternal FileRowCell (listview.columnfinder)
 			if Value == nil
 				if (Column < -1) and (self isa FileRow)
-					return .location
+					return .FilePath
 				return .name
 		
 		
@@ -583,7 +583,7 @@ class FileViewer (ListView)
 			|| r = row!.obj as filerow
 			require r and v
 
-			|| loc = r.location
+			|| loc = r.FilePath
 			if loc.file.isdir
 				V.OpenQuickRelist(loc, true)
 				return true
@@ -621,7 +621,7 @@ libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
 function FileRow.Modifier (|byte|)
 	if .DoesntExist
 		return '?'
-	return FileIcon(.location, "", self is expanded, !.asdir)
+	return FileIcon(.FilePath, "", self is expanded, !.asdir)
 
 
 extend_module filerow
@@ -681,7 +681,7 @@ libinternal FileViewerCMMShow (GuiMenuEvent)
 	opt norefcounts
 	|| row = clicked!.row
 	if row isa FileRow
-		row.location.Reveal
+		row.FilePath.Reveal
 
 
 libinternal FileViewerRenameFile (GuiMenuEvent)
@@ -693,7 +693,7 @@ libinternal FileViewerCreateFile (GuiMenuEvent)
 	|| row = clicked!.row as filerow					#require
 	if !row.asdir
 		row = row.parent!
-	|| l = row.location
+	|| l = row.FilePath
 	|| f = l.file.UniqueChild("untitled")
 	if f and f.CreateEmpty and self isa FileViewer
 		|| created = filerow(f.path, f.name)
@@ -718,7 +718,7 @@ libinternal FileViewerCopyPath (GuiMenuEvent)
 	opt norefcounts
 	if Clicked
 		|| row = clicked.row as FileRow
-			clipboard.NotifiedText = row.location
+			clipboard.NotifiedText = row.FilePath
 
 
 libinternal FileViewerTrash (GuiMenuEvent)

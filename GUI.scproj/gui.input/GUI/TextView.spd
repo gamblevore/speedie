@@ -2307,7 +2307,10 @@ class TextView (GUIControl)
 
 
 	function LoadDocument (|document| U, |bool| Show, |bool|)
-		|| old = .document
+		|document--| old = .document
+			if old == u
+				u.SimpleUpdateFromDisk
+				return true
 			require .GroupSaveAll or old.SaveBeforeClose
 			.document = nil
 			.ClearErrors

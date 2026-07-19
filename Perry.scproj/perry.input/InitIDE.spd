@@ -833,7 +833,7 @@ extend PerryIDE
 	function StartFileList
 		perry.AddProj(.project.path, self)
 		|| r = .root
-			.id = r.location
+			.id = r.FilePath
 		.nottodo = nil
 		.RecentFiles.clear
 		.StartFiles

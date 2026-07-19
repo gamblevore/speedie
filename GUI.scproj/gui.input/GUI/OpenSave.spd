@@ -200,15 +200,15 @@ class OpenSaveDialog (Window)
 		|| f = .files.FirstSelected as filerow				#expect beep
 		|| Acceptable = (f isnt disabled)					#expect beep
 		if f.asdir
-			if (f.name == "..") or !.types or !.types.typecontains(f.location.ext+"/")
-				.path.text = f.location
-				.RelistFiles(f.location)
+			if (f.name == "..") or !.types or !.types.typecontains(f.FilePath.ext+"/")
+				.path.text = f.FilePath
+				.RelistFiles(f.FilePath)
 				return true
 		if (f.name != "..")
 			if .Name is visible
 				beep
 			  else
-				.ReturnValue = f.Location
+				.ReturnValue = f.FilePath
 			return true
 	
 	
@@ -269,7 +269,7 @@ class OpenSaveDialog (Window)
 			|| f = w.files.FirstSelected
 			|| p = w.path.text
 			if f isa filerow
-				|| p2 = f.location
+				|| p2 = f.FilePath
 				if (f.name != "..")
 					p = p2
 			p.reveal

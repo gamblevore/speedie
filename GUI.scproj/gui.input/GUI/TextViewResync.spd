@@ -115,9 +115,11 @@ extend textview
 			
 	
 	libinternal DebugInfoRestore (|document| u)
+		opt norefcounts
 		|| w = .DebugInfoRestoreSub(u)
 		.WrappedLines = w
 		._Start = w
+		.ClearAutoComplete
 	
 	
 	libinternal DebugInfoRestoreSub (|document| u, |textviewline|)

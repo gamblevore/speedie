@@ -1,7 +1,7 @@
 
 
 
-     					 		// Additions Beta //
+								// Additions Beta //
 * Stepbackwards in code! This will kick ass. (take breakcount at old code-pos using resynced textview, and ask for position of the new code...)
 * Figure out why the entire string table keeps thrashing despite all my efforts
 	* shrink history https://passingcuriosity.com/2017/truncating-git-history/
@@ -9,7 +9,7 @@
 * Step into func... ignoring param funcs
 
 
-     					       	// Proper Release //
+								// Proper Release //
 * carrays :(
 	* structs work wierdly with carrays also. mat4 rows and stuff.
 	* my_mat4 *= somemat4() // should create tempstruct

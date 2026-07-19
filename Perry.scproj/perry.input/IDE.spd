@@ -207,7 +207,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| R = .FindPath(path)$
 		|| P = .MainProjFol$
-		if r.location[0, p.location]
+		if r.FilePath[0, p.FilePath]
 			return r
 			
 
@@ -772,7 +772,7 @@ So anything not 0 means "its OK"`
 	
 
 	function EditFile (|FileRow| r, |int|) // loadfile, fileload, fileedit, openfile, fileopen
-		require r and r.location and !.DuringLoad
+		require r and r.FilePath and !.DuringLoad
 		// the drawing thing needs a document too!
 		// why not the same?
 		// we could make editfield have an internal draw editor...
@@ -819,7 +819,7 @@ So anything not 0 means "its OK"`
 			
 
 	function EditDraw (|FileRow| r, |int|)
-		require .drawme.LoadFile(r.location, r)
+		require .drawme.LoadFile(r.FilePath, r)
 		.HideASM
 		return 1
 		
@@ -837,12 +837,12 @@ So anything not 0 means "its OK"`
 		if e.Document == doc
 			return -1
 				
-		if .EditorIsCode
+		if doc.FilePath.PathIsCode
 			doc.JeeboxMode |= documentjeeboxmode.Expect
 		
 		|| Loaded = E.LoadDocument(doc, true)					#require
 
-		e.DebugLevel = .DebugLevel(.Debugmode)
+//		e.DebugLevel = .DebugLevel(.Debugmode)
 		if .debugmode is debug
 			.ReloadBreaks
 
@@ -853,7 +853,7 @@ So anything not 0 means "its OK"`
 		.CheckScrollErrors(0, gui.framestart + 0.25s)		
 		|| it = .SharedProjectTabSource
 			if !.DuringLoad
-				it["edit"] = r.location
+				it["edit"] = r.FilePath
 			it["pos"] = doc.Position
 			perry.save
 
@@ -950,7 +950,7 @@ So anything not 0 means "its OK"`
 		.UpdateActiveFile
 		with .currfilerow
 			.lastsize = e.Length
-			if .location.pathiscode
+			if .FilePath.pathiscode
 				self.HandleAltered
 		(self is modified) = (e is modified)
 

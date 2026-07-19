@@ -178,10 +178,11 @@ struct VirtualJBString // fakejbstring
 	|&byte| Addr
 
 
-libinternal cstring.temp (|VirtualJBString|)
+libinternal cstring.Temp (|VirtualJBString|)
 	rz.refcount = 0
 	rz.length = .length
 	rz.addr = self|&byte|
+
 
 
 function String.ExtractPathAndLine (|message|)
@@ -189,12 +190,12 @@ function String.ExtractPathAndLine (|message|)
 	
 	if charset.line in self
 		|| parsed = .Parse
-//			|message--| p2 = parsed.first
-//			if (p2 == @arg) and p2.IsLast
-//				parsed = p2
+			|message--| p2 = parsed.first
+			if p2 == @arg
+			if (p2 == @arg) and p2.IsLast
+				parsed = p2							// to read: error {file abc, line 123}
+
 			|message--| path = parsed["file"]
-			path ?= parsed["path"]
-			if path
 				msg.name = path.name
 				|message--| pos = parsed["pos"]
 					msg.Position = pos.int
