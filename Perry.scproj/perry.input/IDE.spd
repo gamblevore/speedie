@@ -105,7 +105,6 @@ class PerryIDE (Window)
 	|bool|						UsingSpdLib
 	|CompileMode|				_DebugMode
 	|bool|						DebugHideUnderscore
-	|bool|						InConstructor
 	|bool|						ModifiedForCompile
 	|bool|						IsGraphics
 	|byte|						PopupReason
@@ -937,7 +936,7 @@ So anything not 0 means "its OK"`
 				
 		|| e = .editme
 		if purpose is errorchecking
-			require e is modified
+			require e.IsModified
 		// otherwise resave anyhow.
 		|| Curr = .CurrFileRow
 
@@ -953,7 +952,7 @@ So anything not 0 means "its OK"`
 			curr.lastsize = e.Length
 			if curr.FilePath.pathiscode
 				.HandleAltered
-		(self is modified) = (e is modified)
+		(self is modified) = e.ismodified
 
 
 function string.GetSpeedieProj (|string|)

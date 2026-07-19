@@ -6,7 +6,7 @@
 
 class list
 	size 48
-	|ind|			Position
+	|int|			Position
 	|object?|		Obj
 	linkage
 		wrapper
@@ -567,3 +567,9 @@ class list
 //module RingTree
 //	function New ()
 //		disabled "Use List() instead of ringtree()"
+
+//datatype notind (int)
+//	syntax cast (|bool|)
+//		disabled "sigh"
+
+

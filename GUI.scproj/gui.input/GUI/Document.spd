@@ -95,11 +95,15 @@ class Document (list)
 			.Trim
 
 
-	inline IsModified (|bool|)
-		return .current != .Original
+	function IsModified (|bool|)
+		opt norefcounts
+		|| c = .Current
+		if (c != .Original)
+			return true
+		return (c and c.Position != 0)
 
 
-	function SaveBeforeClose (|bool|)
+	libinternal SaveBeforeClose (|bool|)
 		if !.IsModified
 			return true
 		|| Q = "Save file ".append(.FilePath.name, "?") // compiler should do this automatically?
@@ -107,7 +111,7 @@ class Document (list)
 		// whatever... fix that later. Or perhaps its just from faststring? 
 		|| Answer = Q.AskSaveOrCancel()
 		if answer >= 1		// save
-			return .save(DocumentAction.Closing)
+			return .save//(DocumentAction.Closing)
 		return answer == 0	// don't
 
 
@@ -120,9 +124,7 @@ class Document (list)
 		return t
 
 
-	function Save (|int| Purpose=0, |ind|)
-		(Purpose)
-		// purpose is unused, right now. It was used, originally... and might be again.
+	function Save (|ind|)
 		|| l = .FilePath			#require
 		|| f = l.file
 		|| t = .SaveText
@@ -139,6 +141,7 @@ class Document (list)
 		if rz
 			|| c = .current
 				.original = c
+				c.Position = 0
 			|date| NewDate
 			if !deleted
 				if KeepDate
@@ -181,7 +184,7 @@ class Document (list)
 		|| Options	= ["Save", "Reload"]
 		|| Answer	= confirmationdialog.ask("The file ${.FilePath.name} has been externally modified. Reload or resave?", "", Options)
 		if answer >= 1				// save
-			.save(DocumentAction.Saving)
+			.save//(DocumentAction.Saving)
 		if answer == 0				// reload
 			.Load(true)
 		return true
@@ -203,14 +206,14 @@ class Document (list)
 			yield .GetViewer(i)
 		
 	
-	function ShowErrorInViewers
+	libinternal ShowErrorInViewers
 		opt norefcounts
 		for v.Viewer in self
 			if v
 				v.parse
 
 
-	libinternal UpdateSavedState 
+	libinternal UpdateSavedState
 		opt norefcounts
 		for v.Viewer in self
 			if v
@@ -218,7 +221,8 @@ class Document (list)
 				(v.ontextchanged)(v, documentaction.Saving, false)?
 	
 	
-	function InvalidJeebox (|bool|)
+	inline InvalidJeebox (|bool|)
+		opt inline
 		|| j = .JeeboxMode
 		return (j isnt Jeebox) & (j is Expect)
 
@@ -412,8 +416,7 @@ extend TextView
 			|| P = (x, x + m.inserted.length)
 			.InsertText(t, p)
 		  else
-/			d.cleardoc // huh?
-									
+/			d.cleardoc // huh?						
 	
 	
 	libinternal UpdateToDocument (|document| D, |DocumentAction| Reason)
@@ -451,7 +454,6 @@ class DocumentReverser (list)
 		.Point = point
 		.obj = OldText
 
-
 	libinternal TryMerge (|string| Insertion, |ivec2| New, |string| Del, |bool|)
 		opt norefcounts
 		// merging breaks the modified checker... because the "current" is still the original
@@ -461,24 +463,27 @@ class DocumentReverser (list)
 		require MyOld isa string
 		|| Mine = .Inserted.Length
 		|| Old = .point
-		if !Insertion
+		if !Insertion				
 			if !Mine
 				if Old.x == New.x2											// DELETE
 					// abcdefghj<k>			// (9, 10), "", "k"
 					// abcdefgh<j>			// (8, 9),  "", "j"
 					.obj = Del + MyOld
 					.point.x = New.x
+					.Position++
 					return true
 				if Old.x == New.x											// FWD DELETE
 					// abcde<f>gh			// (5, 6),  "", "f"
 					// abcde<g>h			// (5, 6),  "", "g"
 					.obj = MyOld + Del
+					.Position++
 					return true
 		  else
 			if Mine and !Old.width and !New.width and Old.x+Mine == New.x	// INSERT
 				// abcdefgh<c>				// (8, 8),  "c", ""
 				// abcdefghc<d>				// (9, 9),  "d", ""
 				.Inserted += Insertion
+				.Position++
 				return true
 
 

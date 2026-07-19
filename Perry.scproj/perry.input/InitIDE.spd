@@ -7,7 +7,6 @@ extend PerryIDE
 		.IsMainWindow		= true
 		.DebugHideUnderscore = true
 		.Project			= project
-		.InConstructor		= true
 		.CanAskingAboutMissing = true
 		.LogComms			= Message()
 		.LogActions			= Message()
@@ -69,7 +68,6 @@ extend PerryIDE
 		
 		.InitIDE
 		perry.AddRecent(project)
-		.InConstructor = false
 	
 	
 	function perry.FindRecent (|string| p, |message|)

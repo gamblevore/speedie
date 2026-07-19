@@ -210,7 +210,7 @@ class FileViewer (ListView)
 		require .CanSave(purpose, f)
 		
 		|| d = f._Document
-			|| tSize = D.save(purpose)
+			|| tSize = D.save//(purpose)
 				f.lastsize = tsize
 		return true
 
@@ -491,9 +491,9 @@ class FileViewer (ListView)
 		|| Pos = path.Position
 		|| Line = path.rangelength
 			.editme.ViewLineAndSel(Line)
-			if pos									// surely... its a position ON a line?
+			if pos > 0								// surely... its a position ON a line?
 				pos += .editme.SelRange.x
-		if pos
+		if pos > 0
 			.editme.ShowAndSelect(Pos, true)
 
 

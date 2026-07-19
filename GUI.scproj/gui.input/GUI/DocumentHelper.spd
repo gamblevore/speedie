@@ -1,6 +1,5 @@
 
 
-
 function dictionary.DocumentCached (|string| path, |document|)
 	opt norefcounts
 	|| i = .valuelower(path) as cachedpath

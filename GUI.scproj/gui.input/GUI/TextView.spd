@@ -1573,15 +1573,15 @@ class TextView (GUIControl)
 	
 	function IsModified (|bool|)
 		opt norefcounts
-		with .document
-			return .current != .original
+		|| D = .document
+			(self is modified) =  D.IsModified
 		return self is modified
 
 
 	function Save (|bool|)
 		opt norefcounts
 		|| u = ._viewing
-			if u.save(documentaction.saving)
+			if u.save//(documentaction.saving)
 				.AlphaFade
 				return true
 
@@ -1916,7 +1916,7 @@ class TextView (GUIControl)
 			d++
 			if !d
 				._CanSeeLastLine = true
-				._CanSeeAllLines = !.StartLine.position
+				._CanSeeAllLines = .StartLine.position == 0
 				exit
 
 		return Remain
@@ -2037,6 +2037,7 @@ class TextView (GUIControl)
 		require ._Start != d
 		._Start = d
 		|| p = d.Position
+		if p >= 0
 			.WrappedLines.Position = p
 			|| doc = .document
 				doc.scrollpos = p

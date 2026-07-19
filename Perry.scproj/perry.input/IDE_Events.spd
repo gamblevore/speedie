@@ -453,7 +453,7 @@ function file.IsNicelyViewable (|bool|)
 function PerryIDE.ClickedFind (|error| row)
 	opt norefcounts
 	.GotoIncludedFile(row.path)
-	if row.position
+	if row.position >= 0
 		|| L = row.rangelength
 		L ?= .MassSearchField.text.length
 		.editme.ShowAndSelect(row.position, L, true)
