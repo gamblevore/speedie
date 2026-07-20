@@ -377,6 +377,13 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	.DuringMsgFB = false
 
 
+
+function PerryIDE.UnusedFB (|message!| arg)
+	opt norefcounts
+	for tmp.fast in arg
+		.UnusedFuncsSub(tmp, arg.name)
+
+
 function PerryIDE.CheckFB (|message| msg)
 	|| Extracted = .UnusedExtract(msg)
 	.ErrorListFB(msg)

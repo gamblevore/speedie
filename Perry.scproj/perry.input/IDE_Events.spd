@@ -10,15 +10,9 @@ function PerryIDE.UnusedExtract (|message| stuff, |message|)
 	rz = Message()
 	|| arg = stuff.arg
 		rz.name = stuff.second.name
-		for tmp.reverse in arg
+		for tmp in arg
 			if (tmp ~!= "error") and (tmp.last!=@arg)
 				rz <~ tmp
-	
-
-function PerryIDE.UnusedFB (|message!| arg)
-	opt norefcounts
-	for tmp.fast in arg
-		.UnusedFuncsSub(tmp, arg.name)
 
 
 function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)
