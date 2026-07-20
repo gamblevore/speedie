@@ -383,7 +383,7 @@ extend ListViewRow
 	function DebugPath (|jbin| j, |bool|)
 		opt norefcounts
 		|| p = .parent
-		if !p.isroot
+		if p and !p.isroot
 			require p.DebugPath(j)
 		
 		if self != @arg

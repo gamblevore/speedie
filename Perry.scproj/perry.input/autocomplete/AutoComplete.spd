@@ -364,8 +364,6 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
 		  elseif msg starts "display"
 			.DisplayFB(msg)
-		  elseif msg starts "unused"
-			.UnusedFuncsFB(msg)
 		  elseif msg starts "log"
 			0 //
 		  elseif msg starts "callfrom"
@@ -373,12 +371,17 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		  elseif msg starts "asm"
 			.GotASM(msg)
 		  elseif msg starts "check"
-			.ErrorListFB(msg)
+			.CheckFB(msg)
 		  elseif msg starts "define"
 			.DefineFB(msg)
 	.DuringMsgFB = false
 
 
+function PerryIDE.CheckFB (|message| msg)
+	|| Extracted = .UnusedExtract(msg)
+	.ErrorListFB(msg)
+	.UnusedFB(extracted)
+	
 
 function EditMeModified (guitextevent)
 	|| i = .ide

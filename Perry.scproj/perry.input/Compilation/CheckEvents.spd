@@ -2,27 +2,23 @@
 
 extend PerryIDE
 	function Recheck
+		|| WantCheck = false
+		|| p = .path
 		if .ModifiedForCompile
-			.ProjectWasModified
-		|| p = .path					#debug_require
+			.ModifiedForCompile = false
+			if .ProjectIsCode and !.UsingSpdLib
+				.Feedback = nil
+				WantCheck = true
 
 		|| StartAt = Perry.FinishedStartUp #require
-		StartAt += 0.125s * .position
-		|| now = date.now
+		StartAt += 0.125s * .index
 		// remove or true later...
-		if (true) or (now >= StartAt) or (now < Perry.FinishedStartUp)
-			|| unused = @tmp + "unused"
-			unused <~ p
+		if WantCheck or StartAt.Fired
+			|| unused = @tmp + "check"
+			unused <~ p * .EditorIsCode
 			|| lf = .LostFunks
 				unused <~ lf.copy
 			.SendFeedbackMsg(unused)
-	
-	
-	function ProjectWasModified
-		.ModifiedForCompile = false
-		require .ProjectIsCode and !.UsingSpdLib
-		.Feedback = nil
-		.AskCheck
 	
 	
 	function AskCheck
@@ -42,8 +38,8 @@ extend PerryIDE
 	function ClearErrors (|bool| Compiled)
 		isnt Broken
 		.CompileOKString = ("Compile OK" (Compiled) "Check OK")
-		.errorlist.Clear
 		.editme.ClearErrors
+		.errorlist.Clear
 		.filelist.ClearErrors
 		.RelistStartupErrors
 		.UpdateErrorCount
@@ -72,23 +68,19 @@ extend PerryIDE
 
 
 	function ShowCompileErrors (|message!| msg, |bool| RealCompile, |bool|)
-		|| MaybeOK = msg.last
-		if (MaybeOK == @thg and "ok")
+/		|| MaybeOK = msg.first
+		if maybeok.yes
 			.ErrorList.clear
 			.UpdateErrorCount
 			return .CheckedOK(msg.name)
 	
 		// inconsistant input...
-		|| arg = msg
-		if arg != @arg
-			arg = msg.arg
-		  else
-			MaybeOK = msg
+		|| arg = msg.arg
 		arg.cleanErrors
 		
 		is Broken
 		.NoNeed
-		|| newlist = error.from(MaybeOK)
+		|| newlist = error.from(arg)
 		newlist ?= Error()
 		.errorlist.listsource = newlist
 		.UpdateErrorCount
@@ -133,7 +125,6 @@ extend PerryIDE
 		  elseif !errsvis
 			.view(.viewerrors)
 			.say(" failed. Could not compile")
-		.editme.ClearErrors
 		.LoadErrors(RealErrors, realerrors)
 		.showstats
 
@@ -149,6 +140,7 @@ extend PerryIDE
 		(d isnt compiling)
 		.DebugMode = d
 		.RenableAfterCompile
+		|| i = 0
 		return true
 
 
@@ -170,7 +162,7 @@ extend PerryIDE
 		  elseif !bad
 			if !killed
 				|| msg = @tmp + "compile"
-				msg <~ (@thg, "ok")
+				msg <~ (@thg, "true")
 				.ShowCompileErrors(msg, false)
 			.CompiledOK(killed)
 		.compilr = nil

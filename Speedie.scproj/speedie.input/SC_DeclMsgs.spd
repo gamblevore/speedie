@@ -94,9 +94,9 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 		r.CalculateDataType
 		if r.IsBareStruct
 			(r is ReturnedStruct)
+		check (r isnt Reference) (r.source, "Only params can be references")
 		if self is HidesProperties
 			.ReturnType = r.makereal
-		check (r isnt Reference) (r.source, "Only params can be references")
 
 
 

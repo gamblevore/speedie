@@ -271,15 +271,16 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 		if (!O) return;
 		auto Curr = B->Super;
 		if (O < Curr->StartObj)
-			failed("startobj");
+			return failed("startobj");
 		if (O >= Curr->BlockEnd)
-			failed("blockend");
+			return failed("blockend");
 		int i = 0;
 		while (O) {
 			O = O->Next; // check for memory corruption
 			i++;
-			if (i >= (1<<kBlockSize)>>2)
-				failed("corrupt1");
+			if (i >= (1<<kBlockSize)>>2) {
+				return failed("corrupt1");
+			}
 		}
 	}
 
@@ -1149,12 +1150,18 @@ __restrict __hot fpDestructor JB_Destructor (JB_Object* Obj) {
 	return GetDestructor_(ObjBlock_(Obj));
 }
 
+
+//byte* CheckTrashed;
 __restrict __hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
-	Sanity(Block);
+
 	#if DEBUG
+//	if (JB_Obj_ID((JB_Object*)Obj)==31545429)
+//		debugger;
 	int N = Block->ObjSize - 12;
 	#endif
+
+	Sanity(Block);
 	fpDestructor Destructor = GetDestructor_(Block);
 
 	#if __VM__
@@ -1164,12 +1171,16 @@ __restrict __hot void JB_Delete ( FreeObject* Obj ) {
 		JB_ASM_CallBack(V, (u32*)Destructor);
 	} else
 	#endif
-	{
-	(Destructor)((JB_Object*)Obj);
-	}
+	{(Destructor)((JB_Object*)Obj);}
+	
+	
 	#if DEBUG
-	if (N > 0)
-		memset(((byte*)Obj)+12, 0xfe, N);
+	if (N > 0) {
+		byte* Bob = 12 + ((byte*)Obj);
+//		if (CheckTrashed>=Bob and ((CheckTrashed+8)<=Bob+N))
+//			debugger;
+		memset(Bob, 0xfe, N);
+	}
 	#endif
 }
 
@@ -1285,7 +1296,7 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_ (FreeObject* Obj) { // trap (  _trap(  trap_( 
-//	if (JB_Obj_ID((JB_Object*)Obj)==6315816)
+//	if (JB_Obj_ID((JB_Object*)Obj)==31545429)
 //		debugger;
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;

@@ -329,20 +329,17 @@ class list
 		inlined
 		description "Returns the first item. Consistant with ptr[] == ptr[0]" 
 		return .first
-
+ 
 
 	function Index (|int|)
 		opt norefcounts
 		|| p = .parent
-		if !p
-			return -1
-	
-		|| ch = p.first
-		while ch!=self
-			if !ch
-				return -1 // should never happen
-			rz++
-			ch++
+			|| c = -1
+			while self
+				self--
+				c++
+			return c
+		return -1
 		
 	
 	syntax Access (|int| n, ||)

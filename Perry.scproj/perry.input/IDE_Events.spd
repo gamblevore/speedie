@@ -5,15 +5,20 @@ function FileSepClicker (guiaction)
 	.ide.ViewTextModeSwap
 
 
-function PerryIDE.UnusedFuncsFB (|message| stuff)
+function PerryIDE.UnusedExtract (|message| stuff, |message|)
 	opt norefcounts
-	|| arg = stuff.Last
-	require arg == @arg
-	|| where = stuff.FirstName
-	for tmp in arg
-		if tmp ~!= "error"	// ignore errors for now.
-							// they shouldn't be sent really.
-			.UnusedFuncsSub(tmp, where)
+	rz = Message()
+	|| arg = stuff.arg
+		rz.name = stuff.second.name
+		for tmp.fast in arg
+			if (tmp ~!= "error") and (tmp.last!=@arg)
+				rz <~ tmp
+	
+
+function PerryIDE.UnusedFB (|message!| arg)
+	opt norefcounts
+	for tmp.fast in arg
+		.UnusedFuncsSub(tmp, arg.name)
 
 
 function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)

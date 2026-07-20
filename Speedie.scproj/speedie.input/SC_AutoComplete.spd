@@ -155,30 +155,44 @@ function CmdWrap (|Message| arg, |bool|)
 
 
 function MiniErrors (|errorreceiver| L, |errorseverity| sev = errorseverity.warning, |message|)
-	return compiler.RenderErrors(L, sev).parse
+	rz = compiler.RenderErrors(L, sev).parse
+	if rz and rz!=@arg
+		rz = rz.WrapWith(@arg)
 
 
 function ErrorsInAWayThatPerryLikes (|message|)
 	if !.Cleaned
+		|| i = 0
 		.errors!.PrePrintErrors
 		.Cleaned = true
 	return .MiniErrors(.errors!)
 
 
-function UnusedStuff (|message| cmd, |message|)
+function UnusedStuff (|message| cmd)
 	opt norefcounts
-	|| path = cmd[@str]										#require
-	|| scf = compiler.files.valuelower(path.name)			#expect ("No file at: " + path.name)
+	|| path = cmd[@str]
+	if !path
+		path = cmd.msg(@str)
+/	path.RemoveAfter
+	path.RemoveBefore
+	cmd.name = "check"
+	cmd <~ (@thg, (!.errors.HasProblems).render)
+	path.prev = path.next
+	|| arg = cmd.GiveArg
+	
+	|| name = path.name									#require
+	|| scf = compiler.files.valuelower(name)			#expect ("No file at: " + name)
 
+	// special feature to check if an important project uses all the functions of a library
+	// which is nice... so you know all your lib funcs are actually tested. Some might be...
+	// useless and better off removed if no one needs them. This is set somewhere in the conf I guess.
 	|| unused_libs = path.next
 		for lib in unused_libs
 			if lib.ExpectString
 				lib.HateUnusedFuncs
 	
-	cmd.Clear
-	
 	if !Compiler.Successfulness or scf.Unfinished
-		return cmd
+		return
 
 	// what about constants, and globals that are unused?
 	// we have a global list... but constants? I guess theres a module-list?
@@ -187,7 +201,6 @@ function UnusedStuff (|message| cmd, |message|)
 	// unused properties too? I think those must be in a class.
 	// we could mark each constant-section in the file?
 	
-	|| arg = cmd.GiveArg
 	for fn in Compiler.FuncList
 		if fn.File == scf
 			fn.CheckUnused(arg)
@@ -202,8 +215,6 @@ function UnusedStuff (|message| cmd, |message|)
 	
 	for c in scf.Types
 		c.CheckUnusedClass(arg)
-
-	return cmd
 
 
 function SCDecl.LocalIsUsed (|bool|)
@@ -355,23 +366,16 @@ function scobject.UnusedReason (|string|)
 	return "unused."
 
 
-function Check (|message| cmd=nil, |message|)
-	if cmd
-		return .CheckSub(cmd)
-	return .CheckSub(@tmp + "check")
-
-
-function CheckSub (|message| cmd, |message|)
-	if .errors.HasProblems
-		return cmd.SendPerryErrors
-	cmd.name = "check"
-	cmd <~ (@thg, "ok")
+function Check (|message| cmd=@tmp.msg, |message|)
+	.UnusedStuff(cmd) // clears
+	|| Errors = Interact.ErrorsInAWayThatPerryLikes
+	cmd.GiveArg.AppendAll(errors)
 	return cmd
 
 
 function Message.SendPerryErrors (|message|)
 	.clear
-	self <~ Interact.ErrorsInAWayThatPerryLikes
+	self <~ Interact.ErrorsInAWayThatPerryLikes // appends an @arg to the @tmp
 	return self
 	
 
@@ -387,7 +391,6 @@ function DoCmd (|Message| cmd, |message|)
 	require cmd == @tmp
 	
 	if !.InitedOK:						return cmd.SendPerryErrors
-	if cmd ~= "unused":					return .UnusedStuff(cmd)
 	if cmd ~= "check":					return .Check(cmd)
 	if cmd ~= "mem":					return .ReportMemory(cmd)
 	if cmd == 1 or cmd.last == @name:	return .autoJump(cmd)

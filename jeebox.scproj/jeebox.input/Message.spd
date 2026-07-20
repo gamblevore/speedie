@@ -304,7 +304,7 @@ Message is also:
 		fs <~ .name  // 20cm, 0xFF_cm
 	
 
-	syx ARel (After_Relationship)
+	syx ARel (Decorator) // after relationship
 		opt norefcounts
 		fs <~ .First
 		fs <~ .Name
@@ -348,7 +348,7 @@ Message is also:
 		fs <~ ch.Next
 	
 	
-	syx BRel (Before_Relationship)
+	syx BRel (PreDecorator)
 		opt norefcounts
 		fs <~ .name
 		fs <~ .First

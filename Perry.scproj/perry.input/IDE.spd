@@ -227,8 +227,9 @@ class PerryIDE (Window)
 
 	behaviour AppForeGroundChange
 		.CheckModified
-		if IsForeGround and .IsFront
-			.Recheck
+		target !debug
+			if IsForeGround and .IsFront
+				.Recheck
 		.PopupHide
 		if !.focus
 			.setfocus(.editme)

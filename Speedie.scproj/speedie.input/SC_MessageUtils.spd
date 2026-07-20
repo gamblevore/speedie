@@ -361,10 +361,9 @@ function Message.Move (|Message| last, |Message| into)
 		curr = next_
 
 
-function Message.AppendAllInto (|Message|Dest)
+function Message.AppendAllInto (|Message| Dest)
 	opt norefcounts
-	While .hasany
-		Dest.Last = .First
+	dest.Appendall(self)
 
 
 function Message.MoveAllAfter (|Message| after)
