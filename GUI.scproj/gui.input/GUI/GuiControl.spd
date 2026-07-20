@@ -223,14 +223,11 @@ class GUIControl (list)
 			GUI.resized(self)
 			
 
-	function Decluttering (|bool|)
-		inlined
+	inline Decluttering (|bool|)
 		return .Declutterer.final
-	
 
-	setter Declutter (|bool|)
+	setter Decluttered (|bool|)
 		.declutterer.fire(0.334, 0.5) = value
-		
 		
 	inline Decluttered (|bool|)
 		return .Declutterer.Finished

@@ -334,9 +334,15 @@ function PerryIDE.DebugMode (|CompileMode|)
 
 
 function PerryIDE.DebugMode (assigns:|CompileMode|)
+	opt norefcounts
+	if (._DebugMode is debug) != (value is debug)
+		for btn in .DebugBtns
+			btn.Decluttered = value isnt debug
+
 	._DebugMode = value
 	(self is preparing) = value is compiling
 	(self is active) = (value is Run or debug) and (value is ReceivedHello)
+
 	.EditMe.DebugLevel = .DebugLevel(value)
 
 

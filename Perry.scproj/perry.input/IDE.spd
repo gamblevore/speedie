@@ -443,7 +443,7 @@ class PerryIDE (Window)
 		
 		require !.CurrMouseDown
 		if HideTabs == VisTabs
-			.ProjectTabs.declutter = HideTabs
+			.ProjectTabs.decluttered = HideTabs
 		if .IsTextMode
 			.ProjectTabs.Declutterer.hide // not good enough? it should be made invisible?
 			(.ProjectTabs isnt visible)
@@ -452,18 +452,18 @@ class PerryIDE (Window)
 
 			
 		if (hidetop == vistop)
-			.RecentAndSplash.declutter = hidetop
-			.ASMButton.Declutter = Hidetop
+			.RecentAndSplash.decluttered = hidetop
+			.ASMButton.Decluttered = Hidetop
 			if HideTop
 				(.DebugArgsText isnt visible)			// better to declutter
 			|| ShowBuilders = !HideTop and (!.IsTextMode or .path.isspd)
 			|| HideBuilders = !ShowBuilders
-			.runbutton.declutter		= HideBuilders
-			.buildbutton.declutter		= HideBuilders
-			.Progress.Declutter			= HideBuilders
+			.runbutton.decluttered		= HideBuilders
+			.buildbutton.decluttered	= HideBuilders
+			.Progress.Decluttered		= HideBuilders
 		
 		if (hideside == visside)
-			.filelist.declutter = hideside
+			.filelist.decluttered = hideside
 			|| f = .Focus
 			if HideSide and (!f or f.declutterer.final)
 				.editme.SetFocus
