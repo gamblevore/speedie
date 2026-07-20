@@ -90,7 +90,7 @@ function PerryTalk (|SpdProcess| perry)		// ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	compiler.InPerry = 2
 	.ParserRestore
-	perry <~ .check
+//	perry <~ .check
 	
 	for cmd in perry
 		target debug
@@ -150,6 +150,7 @@ function CmdWrap (|Message| arg, |bool|)
 		cmd.ReplaceWith(response)
 	app.parent! <~ arg
 	stderr.clear						// super-important!!!
+	Compiler.InPerry = 3
 	
 	return true
 

@@ -1,24 +1,23 @@
 
 
+
 extend PerryIDE
-	function Recheck
-		|| WantCheck = false
+	function ReCheck
+		|| StartAt = Perry.FinishedStartUp					#require
+		StartAt += 0.125s * .index
+		require StartAt.Fired or .ModifiedForCompile
+
 		|| p = .path
 		if .ModifiedForCompile
 			.ModifiedForCompile = false
 			if .ProjectIsCode and !.UsingSpdLib
 				.Feedback = nil
-				WantCheck = true
 
-		|| StartAt = Perry.FinishedStartUp #require
-		StartAt += 0.125s * .index
-		// remove or true later...
-		if WantCheck or StartAt.Fired
-			|| unused = @tmp + "check"
-			unused <~ p * .EditorIsCode
-			|| lf = .LostFunks
-				unused <~ lf.copy
-			.SendFeedbackMsg(unused)
+		|| unused = @tmp + "check"
+		unused <~ p * .EditorIsCode
+		|| lf = .LostFunks
+			unused <~ lf.copy
+		.SendFeedbackMsg(unused)
 	
 	
 	function AskCheck

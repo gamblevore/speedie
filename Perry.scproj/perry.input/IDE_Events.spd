@@ -10,7 +10,7 @@ function PerryIDE.UnusedExtract (|message| stuff, |message|)
 	rz = Message()
 	|| arg = stuff.arg
 		rz.name = stuff.second.name
-		for tmp.fast in arg
+		for tmp.reverse in arg
 			if (tmp ~!= "error") and (tmp.last!=@arg)
 				rz <~ tmp
 	
