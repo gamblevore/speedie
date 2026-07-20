@@ -1666,7 +1666,7 @@ extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2451])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2450])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1807,10 +1807,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2450])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2449])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2449])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2448])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2448])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2447])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2095,6 +2095,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__CharSet_Line ((CharSet)8)
 #define kJB__CharSet_LowerCase ((CharSet)16384)
 #define kJB__CharSet_NameMid ((CharSet)61472)
+#define kJB__CharSet_Numbers ((CharSet)4096)
 #define JB__CharSet_Props JB__.CharSet_Props
 #define kJB__CharSet_SafeInC ((CharSet)28704)
 #define kJB__CharSet_Trim ((CharSet)26)
@@ -2448,17 +2449,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2444])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2443])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2445])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2446])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2444])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2445])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2443])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2442])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2446])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2447])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2445])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2446])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2519,7 +2520,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2442])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2441])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -3088,8 +3089,6 @@ bool SC_AC__CanUseName(SCNode* L);
 
 Message* SC_AC__Check(Message* Cmd);
 
-Message* SC_AC__CheckSub(Message* Cmd);
-
 Message* SC_AC__CmdCleanUp(Message* Arg);
 
 bool SC_AC__CmdWrap(Message* Arg);
@@ -3156,7 +3155,7 @@ Message* SC_AC__RootTmpComplete(Message* Cmd);
 
 Message* SC_AC__TmpAutoComplete(Message* F, JB_String* Name, JB_String* Type);
 
-Message* SC_AC__UnusedStuff(Message* Cmd);
+void SC_AC__UnusedStuff(Message* Cmd);
 
 Message* SC_AC__WriteError(JB_String* Name);
 
@@ -4310,6 +4309,8 @@ int JB_zalgo__Init_();
 // bool
 int JB_bool_Dir(bool Self);
 
+JB_String* JB_bool_Render(bool Self);
+
 void JB_bool_Append(bool Self, FastString* Fs_in);
 
 JB_String* JB_bool_Render0(bool Self);
@@ -4346,7 +4347,7 @@ byte JB_byte_UpperCase(uint /*byte*/ Self);
 
 
 // cstring
-void JB_cstring_temp(_cstring Self, VirtualJBString* Rz);
+void JB_cstring_Temp(_cstring Self, VirtualJBString* Rz);
 
 JB_String* JB_cstring_Wrap(_cstring Self);
 
@@ -8011,6 +8012,8 @@ void JB_Tree_PrependAll(JB_List* Self, JB_List* Src);
 void JB_Tree_Remove(JB_List* Self);
 
 void JB_Tree_RemoveAfter(JB_List* Self);
+
+void JB_Tree_RemoveBefore(JB_List* Self);
 
 JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in);
 

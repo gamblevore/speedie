@@ -91,12 +91,10 @@ GUI_Doc_CheckModified
 GUI_Doc_Constructor
 GUI_Doc_Destructor
 GUI_Doc_DocParsedSet
-GUI_Doc_InvalidJeebox
+GUI_Doc_IsModified
 GUI_Doc_MoveTo
 GUI_Doc_Render
 GUI_Doc_Save
-GUI_Doc_SaveBeforeClose
-GUI_Doc_ShowErrorInViewers
 GUI_Doc__NewShared
 GUI_DrawToolBar_Constructor
 GUI_DrawToolBar_Destructor
@@ -498,11 +496,10 @@ GUI_Text_Byte
 GUI_Text_CanAutoComplete
 GUI_Text_CanAutoCompleteSet
 GUI_Text_CancelEditing
-GUI_Text_ClearActiveLine
-GUI_Text_ClearDebugInfo
 GUI_Text_ClearErrors
 GUI_Text_Constructor
 GUI_Text_CurrLine
+GUI_Text_DebugLevelSet
 GUI_Text_Destructor
 GUI_Text_DoExplode
 GUI_Text_DontMergeUndo
@@ -1467,7 +1464,6 @@ JB_Str_First
 JB_Str_GlobExpand
 JB_Str_HasName
 JB_Str_Hex
-JB_Str_HexInteger
 JB_Str_HexIntegerSection
 JB_Str_InByte
 JB_Str_InStr
@@ -1552,7 +1548,6 @@ JB_Str_System
 JB_Str_TabsToSpaces
 JB_Str_TextDouble
 JB_Str_TextIntegerSection
-JB_Str_TextIntegerValid
 JB_Str_TitleCase
 JB_Str_Trim
 JB_Str_TrimFirst
