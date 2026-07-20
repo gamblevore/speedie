@@ -1152,6 +1152,9 @@ __restrict __hot fpDestructor JB_Destructor (JB_Object* Obj) {
 __restrict __hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 	Sanity(Block);
+	#if DEBUG
+	int N = Block->ObjSize - 12;
+	#endif
 	fpDestructor Destructor = GetDestructor_(Block);
 
 	#if __VM__
@@ -1164,6 +1167,10 @@ __restrict __hot void JB_Delete ( FreeObject* Obj ) {
 	{
 	(Destructor)((JB_Object*)Obj);
 	}
+	#if DEBUG
+	if (N > 0)
+		memset(((byte*)Obj)+12, 0xfe, N);
+	#endif
 }
 
 
