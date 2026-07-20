@@ -85,7 +85,6 @@ module GUI
 	cpp_func SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_func SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_func SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
-	cpp_func SDL_ResetKeyboard		()
 	cpp_func SDL_StartTextInput		()
 	cpp_func SDL_StopTextInput		()
 	cpp_func SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
@@ -1010,7 +1009,7 @@ module GUI
 		return .MenuAt(xy, test) ?? self[xy]
 
 
-	libinternal StandardKeys (|keys| key, |bool|)
+	libinternal StandardKeyHandler (|keys| key, |bool|)
 		opt norefcounts
 		|| w = window.front						#require
 		|| cmd = keys.cmd
@@ -1339,7 +1338,7 @@ module GUI
 			return GUIActivity.nothing
 		
 		if (key isnt escape) or key.IsFirstFrame
-			if .StandardKeys(key) or w.__keydown__(key)
+			if .StandardKeyHandler(key) or w.__keydown__(key)
 				.BlockTextInput = true
 				return GUIActivity.activity
 		

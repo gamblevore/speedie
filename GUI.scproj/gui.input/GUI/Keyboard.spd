@@ -216,18 +216,20 @@ dataType Keys (int)
 			// we need to figure out what or where releaseed
 			// w[] or s[] or didn't add them.
 			// this probably affects everything, even typing
+		
 				
+		libinternal ResetKeyboard		()
+			cpp_wrapper SDL_ResetKeyboard
 		
-		function State (|&int| n, |&byte|)
+		function State (|?&int| n, |&byte|)
 			cpp_wrapper SDL_GetKeyboardState
-		
 		
 		libinternal Count (|int|)
 			disabled "Keys can be disparate"
-		
+
 		function Reset
 			.Clear
-			gui.sdl_Resetkeyboard
+			.Resetkeyboard
 
 		libinternal EmptySlot (|keys| Key, |&guikeyrecord|)
 			if key != 0
@@ -253,11 +255,15 @@ dataType Keys (int)
 			|| r = key.record
 				r.State = guiKeyRecordInfo.ToRemove
 		
-
+		
 		libinternal FlushKeys
-			|| m = .MaxKeyRecord
-			for i in m
+			|| Buff = .state(nil)|&byte|			// C++ bug
+			for i in MaxKeyRecord
 				|| r = .record[i]
+				|| scan = r.Key.Scan
+				if !buff[Scan]						// SDL dangling key bug work around.
+					.RemoveKey(r.key)
+				
 				|| s = r.state
 					if s == guikeyrecordinfo.ToRemove
 						r.clear
@@ -273,25 +279,23 @@ dataType Keys (int)
 					if k == A or B
 						return r
 
+
 		function Ctrl (|bool|)
 			return .FindTwoModifiers(lctrl, rctrl)
+
 
 		function Cmd (|bool|)
 			target osx
 				if .gui
 					return true
 			return .ctrl
-			
-		function CmdAgo (|date| ago, |bool|)
-			if keys.LCTRL.HeldKey(ago) or keys.RCTRL.HeldKey(ago)
-				return true
-			target osx
-				return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
-
+		
+		
 		function GUI (|bool|)
 			return .FindTwoModifiers(lgui, rgui)
 
-		function PlatCmd (|bool|yes=true,|bool|)
+
+		function PlatCmd (|bool| Yes=true,|bool|)
 			|| OSX = true
 			target !osx
 				OSX = false
@@ -299,20 +303,24 @@ dataType Keys (int)
 				return .gui
 			return .ctrl
 
-		function Shift (|bool|) 
+
+		function Shift (|bool|)
 			return .FindTwoModifiers(lshift, rshift)
 
-		function Cancel (|bool|) 
+
+		function Cancel (|bool|)
 			return .FindTwoModifiers(cancel_key, escape) // ac_back too?
 
-		function Option (|bool|) 
+
+		function Option (|bool|)
 			return .FindTwoModifiers(lalt, ralt)
 
 
 	constants
 		|int|
 		MaxKeyRecord = 6
-		
+
+		|SDL_ScanCode|		
 		SDL_SCANCODE_CAPSLOCK = 57
 
 		SDL_SCANCODE_F1 = 58
@@ -531,7 +539,25 @@ dataType Keys (int)
 		SDL_SCANCODE_AUDIOREWIND = 285
 		SDL_SCANCODE_AUDIOFASTFORWARD = 286
 
-
+		/* @} *//* Mobile keys */
+		SDL_SCANCODE_SOFTLEFT = 287 /**< Usually situated below the display on phones and
+										  used as a multi-function feature key for selecting
+										  a software defined function shown on the bottom left
+										  of the display. */
+		SDL_SCANCODE_SOFTRIGHT = 288 /**< Usually situated below the display on phones and
+										   used as a multi-function feature key for selecting
+										   a software defined function shown on the bottom right
+										   of the display. */
+		SDL_SCANCODE_CALL = 289		 /**< Used for accepting phone calls. */
+		SDL_SCANCODE_ENDCALL = 290	 /**< Used for rejecting phone calls. */
+	
+	
+		/* Add any other keys here. */
+	
+		SDL_NUM_SCANCODES = 512 /**< not a key, just marks the number of scancodes
+									for array bounds */
+	
+	
 
 	constants
 		|keys|
@@ -788,7 +814,7 @@ dataType Keys (int)
 
 datatype GUIKeyRecordInfo (byte)
 	constants
-		|GUIKeyRecordInfo|  
+		|GUIKeyRecordInfo|
 		Empty		= 0
 		ToRemove	= 1
 		ToAdd		= 2

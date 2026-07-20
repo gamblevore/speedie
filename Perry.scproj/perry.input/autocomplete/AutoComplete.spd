@@ -290,6 +290,15 @@ function PerryIDE.StartPopupVis (|bool| instant)
 	.PopupDisplayFadeIn
 
 
+function @keys.CmdAgo (|date| ago, |bool|)
+	if keys.LCTRL.HeldKey(ago) or keys.RCTRL.HeldKey(ago)
+		return true
+	target osx
+		return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
+
+
+
+
 function PerryIDE.PopupDisplayFadeIn
 	// using guitask would be better... sigh.
 	(.PopupDisplay is visible) = .PopupDisplayFadeInSub
