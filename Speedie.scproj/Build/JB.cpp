@@ -4261,6 +4261,7 @@ bool SC_AC__CmdWrap(Message* Arg) {
 	JB_Incr(_tmPf0);
 	JB_Proc_Send(_tmPf0, Arg);
 	JB_Rec_Clear(JB_StdErr);
+	SC__Comp_InPerry = 3;
 	JB_EarlyDecr(_tmPf0);
 	return true;
 }
@@ -5032,12 +5033,6 @@ void SC_AC__PerryTalk(SpdProcess* Perry) {
 	SC_Comp__CompileAll();
 	SC__Comp_InPerry = 2;
 	SC_AC__ParserRestore();
-	Message* _tmPf2 = JB_Syx_Msg(kJB_SyxTmp, nil);
-	JB_Incr(_tmPf2);
-	Message* _tmPf1 = SC_AC__Check(_tmPf2);
-	JB_Incr(_tmPf1);
-	JB_Decr(_tmPf2);
-	JB_Proc_Send(Perry, _tmPf1);
 	{
 		while (JB_Ind_SyntaxCast((PicoCanGet(Perry->Pico)))) {
 			Message* Cmd = JB_Proc_Get(Perry, 10.0f);
@@ -5052,7 +5047,6 @@ void SC_AC__PerryTalk(SpdProcess* Perry) {
 			}
 			JB_Decr(Cmd);
 		};
-		JB_Decr(_tmPf1);
 	}
 	;
 	JB_PrintLine(JB_LUB[2436]);
