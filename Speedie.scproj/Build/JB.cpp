@@ -3509,7 +3509,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026072019));
+	JB_FS_AppendInt32(_fsf0, (2026072116));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -5155,7 +5155,6 @@ void SC_AC__UnusedStuff(Message* Cmd) {
 	if (!Path) {
 		Path = JB_Msg_Msg(Cmd, kJB_SyxStr, nil);
 	}
-	JB_DoAt(1);
 	JB_Tree_RemoveAfter(Path);
 	JB_Tree_RemoveBefore(Path);
 	JB_SetRef(Cmd->Name, JB_LUB[498]);
@@ -10273,7 +10272,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1403]);
-	JB_FS_AppendInt32(_fsf0, (2026072019));
+	JB_FS_AppendInt32(_fsf0, (2026072116));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -17714,7 +17713,10 @@ void JB_CharSet__MakeDefault() {
 	Item['.'] = kJB__CharSet_fDotDash;
 	Item[','] = kJB__CharSet_fCommaSlash;
 	Item['\\'] = kJB__CharSet_fCommaSlash;
+	Item[127] = kJB__CharSet_fInvalid;
 	Item[192] = kJB__CharSet_fInvalid;
+	Item[254] = kJB__CharSet_fInvalid;
+	Item[255] = kJB__CharSet_fInvalid;
 }
 
 
@@ -61016,4 +61018,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 5042793093504902885 -8945958707610701725
+// 5042793093504902885 3994819651519680330
