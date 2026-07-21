@@ -77,7 +77,7 @@ class Document (list)
 			._AvoidMerge = av - 1
 			return false
 		|| c = .Current
-			return c.TryMerge(Insertion, point, oldtext)
+			return c.TryMergeFRFRLegit(Insertion, point, oldtext)
 	
 
 	libinternal AddState (|string| Insertion, |ivec2| Point, |string| LostText)
@@ -454,7 +454,7 @@ class DocumentReverser (list)
 		.Point = point
 		.obj = OldText
 
-	libinternal TryMerge (|string| Insertion, |ivec2| New, |string| Del, |bool|)
+	libinternal TryMergeFRFRLegit (|string| Insertion, |ivec2| New, |string| Del, |bool|)
 		opt norefcounts
 		// merging breaks the modified checker... because the "current" is still the original
 		// assuming we just saved last.
@@ -476,6 +476,7 @@ class DocumentReverser (list)
 					// abcde<f>gh			// (5, 6),  "", "f"
 					// abcde<g>h			// (5, 6),  "", "g"
 					.obj = MyOld + Del
+					.point.x2 += new.width
 					.Position++
 					return true
 		  else
