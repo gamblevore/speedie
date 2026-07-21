@@ -168,7 +168,6 @@ GUI_File_LoadQOI
 GUI_GUIActivity_SyntaxIs
 GUI_GUIKeyRecord_Clear
 GUI_GUIKeyRecord_Constructor
-GUI_GUIKeyRecord_SyntaxIs
 GUI_GridSection_AccessVec
 GUI_GridSection_At
 GUI_GridSection_Constructor
@@ -258,7 +257,6 @@ GUI_Key_OperatorIsCmd
 GUI_Key_SyntaxAccess
 GUI_Key__Cancel
 GUI_Key__Cmd
-GUI_Key__CmdAgo
 GUI_Key__Ctrl
 GUI_Key__GUI
 GUI_Key__Movement
@@ -289,11 +287,13 @@ GUI_LV_JumpTo
 GUI_LV_KeyDown
 GUI_LV_LastSelected
 GUI_LV_LastVisible
+GUI_LV_ListEdge
 GUI_LV_ListFiles
 GUI_LV_LostFocus
 GUI_LV_MouseDown
 GUI_LV_MouseMove
 GUI_LV_MouseUp
+GUI_LV_MoveSelection
 GUI_LV_NewCmm
 GUI_LV_NextSearch
 GUI_LV_OpenMenu
@@ -314,10 +314,8 @@ GUI_LV_SelectAdd
 GUI_LV_SelectAll
 GUI_LV_SelectAtLeastFirst
 GUI_LV_SelectEdge
-GUI_LV_SelectMove
 GUI_LV_SelectNone
 GUI_LV_SelectShift
-GUI_LV_SelectableEdge
 GUI_LV_SetColumnsMsg
 GUI_LV_Show
 GUI_LV_StopFilter
@@ -467,10 +465,8 @@ GUI_Str_FixLineEndings
 GUI_Str_LoadQOI
 GUI_Str_TextLineCount
 GUI_Str_TypeContains
-GUI_Sty_Clear
 GUI_Sty_Constructor
 GUI_Sty_ConstructorCopy
-GUI_Sty_Copy
 GUI_Sty_Destructor
 GUI_Sty_Height
 GUI_Sty_InsideSet
@@ -625,7 +621,7 @@ GUI_ctrl_ContainsMouse
 GUI_ctrl_ControlAt
 GUI_ctrl_Copy
 GUI_ctrl_CopyToClipboard
-GUI_ctrl_DeclutterSet
+GUI_ctrl_DeclutteredSet
 GUI_ctrl_Destructor
 GUI_ctrl_Draw
 GUI_ctrl_EntireScreenSet
@@ -2022,7 +2018,6 @@ SDL_Quit
 SDL_RaiseWindow
 SDL_RenderCopy
 SDL_RenderPresent
-SDL_ResetKeyboard
 SDL_RestoreWindow
 SDL_SetClipboardText
 SDL_SetRelativeMouseMode
