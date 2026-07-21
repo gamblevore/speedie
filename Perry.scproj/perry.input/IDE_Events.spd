@@ -81,7 +81,7 @@ function PerryIDE.CompileTabSelect (|object| Desired)
 
 function ClickedToolbar (GUIAction)
 	opt norefcounts
-	if self isa ButtonView
+	if self isa Button
 		if (._clickcount == 2)
 			.ide.ViewTextModeSwap
 
@@ -168,7 +168,7 @@ function ReturnAllFuncs (GUIListEvent)
 function OpenProjectPath (GUIaction)
 	opt norefcounts
 	|| f = .ide.filelist.FirstSelected as FileRow
-		if (self isa buttonview)
+		if (self isa Button)
 			.FillMenuPath(f.FilePath)
 
 
@@ -210,12 +210,12 @@ function PerryIDE.ShowErrors (|bool|)
 
 function ClickedAView (GUIaction)
 	opt norefcounts
-	if self isa ButtonView
+	if self isa Button
 		.ide.UseThisView(self, true)
 	return true
 
 
-function PerryIDE.UseThisView (|buttonview| btn, |bool| chng=false)
+function PerryIDE.UseThisView (|Button| btn, |bool| chng=false)
 	opt norefcounts
 	// merge into .view?
 	|| el = .errorlist

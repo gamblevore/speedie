@@ -34,9 +34,9 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 				w.Show
 
 	
-		helper CreateOptionSub (|string| name,  |string| tooltip, |guiaction| fnc, |buttonview|)
+		helper CreateOptionSub (|string| name,  |string| tooltip, |guiaction| fnc, |Button|)
 			opt norefcounts
-			|| b = buttonview(._win,	fnc)
+			|| b = Button(._win,	fnc)
 			b.tooltip	= tooltip
 			b.id		= name
 			b.PressMakesLighter = true

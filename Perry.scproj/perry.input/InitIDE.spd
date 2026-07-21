@@ -21,21 +21,21 @@ extend PerryIDE
 		.ViewButtons		= guicontrol(self)
 		.RBorder			= guicontrol(self)
 		.CompileArea		= guicontrol(self)
-		.Toolbar			= buttonview(self,		ClickedToolBar)
-		.RunButton			= buttonview(.Toolbar,	ClickedDebug,		PressingDebug, nil, PressingDebug)
-		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
-		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
-		.RecentAndSplash	= ButtonView(.Toolbar,	&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
+		.Toolbar			= Button(self,		ClickedToolBar)
+		.RunButton			= Button(.Toolbar,	ClickedDebug,		PressingDebug, nil, PressingDebug)
+		.BuildButton		= Button(.Toolbar,	Clickedcompile)
+		.ProjectTabs		= Button(.Toolbar,	ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
+		.RecentAndSplash	= Button(.Toolbar,	&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
-		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
-		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
-		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
-		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs)
-		.CommandsMenu		= ButtonView(.RBorder,	MenuCommands,	 nil,	ReturnCommands)
-		.ASMButton			= ButtonView(.rborder,  ClickedASMButton)
+		.GoPrev				= Button(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
+		.GoNext				= Button(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
+		.CurrFileName		= Button(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
+		.FunctionMenu		= Button(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs)
+		.CommandsMenu		= Button(.RBorder,	MenuCommands,	 nil,	ReturnCommands)
+		.ASMButton			= Button(.rborder,  ClickedASMButton)
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
-		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin)
+		.SubFindCheckBox	= Button(.searcharea, PressedSearchWithin)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList)
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList)
 		.CommsLogList		= ListView(self,		nil,					nil)
@@ -52,14 +52,14 @@ extend PerryIDE
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
-		.CompileTabs		= ButtonView(.CompileArea,		ClickedCompileTabs)
+		.CompileTabs		= Button(.CompileArea,		ClickedCompileTabs)
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self,			AutoCompleteKeys,		AutoCompleteInsertText)
-		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
-		.ViewSearch			= ButtonView(.ViewButtons,		ClickedAView)
-		.ViewDebugger		= ButtonView(.ViewButtons,		ClickedAView)
-		.ViewErrors			= ButtonView(.ViewButtons,		ClickedAView)
-		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
+		.ViewFiles			= Button(.ViewButtons,		ClickedAView)
+		.ViewSearch			= Button(.ViewButtons,		ClickedAView)
+		.ViewDebugger		= Button(.ViewButtons,		ClickedAView)
+		.ViewErrors			= Button(.ViewButtons,		ClickedAView)
+		.viewlog			= Button(.ViewButtons,		clickedaview)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
 		.FileSep			= StretchControl.horz(self, 175~right, 113, 210)
 		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
@@ -156,7 +156,6 @@ extend PerryIDE
 			.GNormal.Solid = LeftBG
 			.OnRightClick = PerryFileViewRightClick
 			.OnChange = PerryRecheckEvent
-			.UseColorScheme	= true
 			.KeepOneSelected = true
 			.SetFocus
 			.Init
@@ -187,7 +186,7 @@ extend PerryIDE
 			.size = the~width by the~bottom to 0~before
 			.gnormal.bg		= vec4(0.0, 0.81).px
 			.gnormal.edge	= vec4(0.2, 1.0).px
-			.gnormal.seps	= vec4(0.4, 1.0).px
+			.gnormal.Separator	= vec4(0.4, 1.0).px
 
 
 		with .ASMView
@@ -304,7 +303,6 @@ extend PerryIDE
 			.Hierarchical	= true
 			.tooltip		= self.SearchArea.Tooltip			
 			.KeepOneSelected = true
-			.UseColorScheme	= true
 			.OnKeyDown		= DeleteableListKeys
 			.ID				= "FoundList"
 			.size 			= the~width  by  the~bottom to 0~under 
@@ -312,7 +310,7 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
-			.GNormal.seps = 0
+			.GNormal.Separator = 0
 		.UpdateFoundHeader
 			
 
@@ -339,7 +337,7 @@ extend PerryIDE
 			.size			= (the~width back 1)  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.GNormal.edge	= (0.5, 0.5, 0.1, 0.25).px
-			.GNormal.StyleDrawer = image.CurlieQueDrawer
+			.GNormal.PixelShader = image.CurlieQueDrawer
 
 
 		with .DebugBtns
@@ -371,15 +369,14 @@ extend PerryIDE
 			.OnEditCell = PerryStackEditCell
 			.AlwaysSendChangeEvent = true
 			.tooltip		= "Variables and the Stack"
-			.UseColorScheme	= true
 			.ID				= "Stack"
 			.xindentperdepth = font.Width
 			.size			= the~width by 0~up to 1~under
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid	= vec4(0.13, 0.135, 0.120, 0.975)
 			.gRowSel.solid	= vec4(0.11, 0.335, 0.12, 0.675)
-			.GNormal.Seps	= 0
-			.GNormal.StyleDrawer = image.CurlieQueDrawer
+			.GNormal.Separator	= 0
+			.GNormal.PixelShader = image.CurlieQueDrawer
 			
 			
 		with .progress
@@ -504,7 +501,7 @@ extend PerryIDE
 			.ButtonSource = perry.projects
 			.ColumnFinder = &Perry.ReadButtonNames
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
-			.GNormal.StyleDrawer = image.RoundRectDrawer
+			.GNormal.PixelShader = image.RoundRectDrawer
 			.GNormal.CornersCut = 12
 			.GNormal.CornerSize = 6
 
@@ -619,8 +616,8 @@ extend PerryIDE
 		g.Hierarchical = true
 		g.id = "log"
 		require !app.prefs["nolog"]
-		g.gnormal.seps = g.gnormal.bg
-		g.gnormal.seps.alpha *= 0.8
+		g.gnormal.Separator = g.gnormal.bg
+		g.gnormal.Separator.alpha *= 0.8
 		
 		g.OnKeyDown = LogAreaKeys
 		.AddBaseLog("-- speedie comms --", .logcomms)
@@ -687,7 +684,7 @@ extend PerryIDE
 			.rowheight		= .rowheight * 2
 
 
-	function AddViewButton (|ButtonView| BTN, |string| Oof, |guicontrol| tag)
+	function AddViewButton (|Button| BTN, |string| Oof, |guicontrol| tag)
 		.ViewButtons <~ btn
 		btn.obj		= tag
 		.addlbutton(Btn, oof, tag.id, tag.tooltip)
@@ -696,7 +693,7 @@ extend PerryIDE
 		tag.tooltip	= ""
 	
 	
-	function AddLButton (|ButtonView| BTN, |string| txt, |string| id, |string|tool)
+	function AddLButton (|Button| BTN, |string| txt, |string| id, |string|tool)
 		.AddIDEButton(btn, txt, tool, id)
 		btn.size = 1~after for 16  by  1~inside
 		btn.gnormal.clear
@@ -709,19 +706,19 @@ extend PerryIDE
 		(btn is Spacer)
 		|| opacity	= 0.93
 		|| f		= 0.15 / opacity
-		if btn isa buttonview
+		if btn isa Button
 			btn.gnormal.solid = (f, f, f, opacity)
-			btn.GNormal.StyleDrawer = image.RoundRectDrawer
+			btn.GNormal.PixelShader = image.RoundRectDrawer
 
 
 	function AddDebugButtons (|GUIAction| action, |string| icon, |string| id)
-		|| btn = buttonview(.DebugBtns, action)
+		|| btn = Button(.DebugBtns, action)
 		btn.Decluttered = true
 		btn.size = 5~after for (22*icon.length)  by  3~inside
 		btn.id = id
 		btn.Tooltip = id
 		btn.Text = icon
-		btn.GNormal.StyleDrawer = image.RoundRectDrawer
+		btn.GNormal.PixelShader = image.RoundRectDrawer
 		(btn isnt enabled)
 		|| opacity	= 0.93
 		|| f		= 0.15 / opacity

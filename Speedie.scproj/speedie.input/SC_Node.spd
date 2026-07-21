@@ -577,7 +577,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 
 	|| ErrMsg = "" // can't find "" on something "".
 	if (paramsarray.found)
-		ErrMsg = "Unexpected params on variable."
+		ErrMsg = "Unexpected Params. This variable is not a function."
 	  elseif (!ParamsHere)
 		ErrMsg = "Can’t find object “${OrigName}”."
 	  elseif (ParamsArray.IsDot)

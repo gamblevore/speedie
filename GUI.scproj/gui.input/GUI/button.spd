@@ -1,6 +1,6 @@
 
 
-class ButtonView (GUIControl)
+class Button (GUIControl)
 	linkage
 		cpp_part Btn
 		

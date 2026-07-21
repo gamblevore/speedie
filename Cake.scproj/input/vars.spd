@@ -502,17 +502,23 @@ class XVar (list)
 				|| sh = 64 - (bc*8)
 				if !t.IsSigned and (sh > 0)							// unnecessary??
 					value = (value << sh) >> sh						// remove later
-				fs.AppendDecimal(value)
 
-				if value and (bc == 1) and !t.IsSigned
+				ifn value and (bc == 1) and !t.IsSigned
+					fs.AppendDecimal(value)
+
+				  else
+					fs <~ "0x"
+					fs.AppendHex(value)
 					fs <~ " "
-					|| Container = '('+(256*')')
-					if  "()[]<>{}"  contains  value|byte|
-						Container = '\''+(256*'\'')
-					fs <~ Container|byte|
-					fs.EscapeByte(value)
-					fs <~ (Container>>8)|byte|
-				
+
+					if Value|byte|.isprintable
+						|| Container = '\''
+						if value == Container
+							Container = '"'
+						fs <~ Container
+						fs <~ value|byte|
+						fs <~ Container
+									
 			  elseif v == 2
 				fs <~ (addr|&ivec2|)[]
 			  elseif v == 3
@@ -533,8 +539,8 @@ class XVar (list)
 				(addr|&vec4|)[].SmallerVec4Render(fs)
 
 		return true
-
-
+	
+	
 	function vec4.SmallerVec4Render (|Faststring| fs)
 		if self == vec4()
 			fs <~ "vec4()"					// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell

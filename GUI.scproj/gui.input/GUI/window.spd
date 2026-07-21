@@ -331,7 +331,7 @@ class Window (GUIControl)
 		.__drawbackground__(where)
 		.DrawContents(where)
 		.__draw__(where)
-		|| gd = .GNormal.StyleDrawer
+		|| gd = .GNormal.PixelShader
 			(gd)(where, .LastRect, .GNormal, MoveCode.Edges)
 		.RunWindowTasks(true)
 

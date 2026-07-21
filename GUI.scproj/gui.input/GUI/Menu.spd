@@ -138,7 +138,7 @@ class Menu (ListView)
 			|| w = .window
 				w.OpenedMenu = nil
 		|| p = .parent
-		if p isa ButtonView
+		if p isa Button
 			p.__MouseUp__((-1,-1))
 
 	

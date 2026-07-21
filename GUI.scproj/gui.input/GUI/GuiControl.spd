@@ -497,7 +497,7 @@ class GUIControl (list)
 		where.controlclip = (0, 0, 31K, 31K)
 		|| g = .FocusBorderStyle
 		|| g2 = .GNormal
-		if g2.StyleDrawer
+		if g2.PixelShader
 			g = g2
 		using g								// restores old values
 			g.edge.alpha = Strength

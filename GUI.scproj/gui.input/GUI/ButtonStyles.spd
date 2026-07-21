@@ -7,8 +7,9 @@ function image.RoundRectDrawer (ImageDrawStyleEvent)
 	center.y -= 0.5
 
 	|| CS = G.CornerSize|float| * 0.25 + 1.0
-	|| Lim1 = (CS-0.5).pow2
-	|| Lim2 = (CS+g.LineWidth|float|-0.5).pow2
+	|| LW = g.EdgeWidth|float| * 0.5
+	|| Lim1 = (CS-LW).pow2
+	|| Lim2 = (CS+LW).pow2
 	|| Conv = math.RangeConvert(lim2, lim1)
 	|| SubX = center.x - (rect.x|float| + CS)
 	|| SubY = center.y - (rect.y|float| + CS)

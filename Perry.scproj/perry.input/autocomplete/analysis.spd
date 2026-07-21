@@ -11,7 +11,7 @@ function PerryFuncListFilter (GUIListFilterEvent)
 
 function MenuAllFuncs (GUIaction)
 	opt norefcounts
-	if self isa buttonview
+	if self isa Button
 		.ide.ListAllFuncs(true, "")
 		.OpenMenu
 

@@ -69,9 +69,9 @@ class OpenSaveDialog (Window)
 	|textview|					Name
 	|textview|					Question
 	|ListView|					Files
-	|Buttonview|				Cancel
-	|Buttonview|				Accept
-	|Buttonview|				Reveal
+	|Button|				Cancel
+	|Button|				Accept
+	|Button|				Reveal
 	|string|					Types
 	|string|					LastGoodPath
 	|string|					Keyboard
@@ -82,13 +82,13 @@ class OpenSaveDialog (Window)
 		.LastGoodPath = "/"
 		.copypaste		|= copypasteflags.pastefile
 		.onpaste		= PastePathEvent|GUIPasteEvent|
-		.Accept			= ButtonView(self, OnAskSaveAnswer)
-		.Cancel			= ButtonView(self, OnAskSaveAnswer)
+		.Accept			= Button(self, OnAskSaveAnswer)
+		.Cancel			= Button(self, OnAskSaveAnswer)
 		.Path			= TextView(self, nil)
 		.files			= ListView(self, nil, OnAskSaveEntered)
 		.question		= TextView(self)
 		.Name			= TextView(self, OnAskSaveName)
-		.Reveal			= ButtonView(self, OnAskSaveReveal)
+		.Reveal			= Button(self, OnAskSaveReveal)
 		.size			= 500 by 225
 		.id				= "opensave"
 		isnt visible
@@ -141,7 +141,7 @@ class OpenSaveDialog (Window)
 			.growsel = ¥.Menurowsel
 		
 		.gnormal = ¥.systemstyle.Copy
-		.gnormal.StyleDrawer = image.CurlieQueDrawer
+		.gnormal.PixelShader = image.CurlieQueDrawer
 
 
 	behaviour TypedString
@@ -176,7 +176,7 @@ class OpenSaveDialog (Window)
 		return super.keydown(key)
 
 
-	libinternal AddButton (|ButtonView| BTN,  |string| Name)
+	libinternal AddButton (|Button| BTN,  |string| Name)
 		btn.ExpandOnMouseOver = 2
 		btn.size = (44~long to 4~before) by (4~up for 16)
 		btn.Text = Name

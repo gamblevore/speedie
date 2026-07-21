@@ -204,14 +204,14 @@ function ProjectIsCode (|bool|)
 	return .Project.PathIsCode
 	
 
-function StrongView (|ButtonView| btn, |bool|)
+function StrongView (|Button| btn, |bool|)
 	if .IsTextMode
 		.ViewAsProject
 	.view(btn)
 	return true
 
 
-function View (|ButtonView| btn, |bool| CanChangeFocus=true)
+function View (|Button| btn, |bool| CanChangeFocus=true)
 	opt norefcounts
 	require !.IsTextMode
 	|| g		= btn.tag as guicontrol #require
@@ -270,7 +270,7 @@ function SwitchedToErrors
 		.editme.ShowNextParseError
 
 
-function NoNeed (|string| s = "", |buttonview| old = nil)
+function NoNeed (|string| s = "", |Button| old = nil)
 	|| n = .UnNeededLabel
 	n.text = s
 	|bool| Vis = s
@@ -279,14 +279,14 @@ function NoNeed (|string| s = "", |buttonview| old = nil)
 		n.obj = old
 
 
-function CheckViewWorthIt (|buttonview| old)
+function CheckViewWorthIt (|Button| old)
 	|| s = ""
 	if (.errorlist is visible) and .errorlist.isempty
 		s = .CompileOKString
 	.noneed(s, old)
 
 
-function Viewing (|buttonview|) // currview
+function Viewing (|Button|) // currview
 	opt norefcounts
 	for i in .ViewButtons
 		if (i.tag as guicontrol) is visible

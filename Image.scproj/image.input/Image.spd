@@ -397,14 +397,14 @@ class Image (memory)
 	function DrawEdge (|ivec4| R, |DrawStyle| G, |MoveCode| Edges)
 		opt norefcounts
 		(Edges isnt open)
-		|| d = g.StyleDrawer
+		|| d = g.PixelShader
 			(d)(self, r, G, Edges)
 		  else
 			.DrawOutlineOnly(R, g.SafeEdge, g.SafeBG, Edges)
 
 
 	function DrawRectStyled (|ivec4| R, |DrawStyle| G, |MoveCode| Edges=movecode.allcodes)
-		|| D = g.StyleDrawer
+		|| D = g.PixelShader
 			(D)(self, r, G!, edges)
 		  else
 			.DrawRectOutlined(r, g, edges)

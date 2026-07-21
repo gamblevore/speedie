@@ -4,7 +4,6 @@ class ListView (GUIControl) {
 		cpp_part LV
 	|int|							RowHeight
 	|bool|							MultiLineDraw
-	|bool|							UseColorScheme
 
 	|bool|							IsMainListView
 
@@ -67,7 +66,7 @@ class ListView (GUIControl) {
 	libinternal Init
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
-		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
+		.gnormal.Separator		<~ ((0.5, 0.5, 0.5, 0.65))
 		.GNormal.TextColor = -1 // oof
 
 
@@ -1335,7 +1334,7 @@ class ListView (GUIControl) {
 		z2.y2 += .scrollshift
 		z2.y  = z2.y2 - .rowheight
 		
-		if .gnormal.seps.a
+		if .gnormal.Separator.a
 			|| c = .Columns
 			if c and c isnt hidden
 				Where.MarkLineH(z2.x1y2, z2.width, 1)
@@ -1378,7 +1377,7 @@ class ListView (GUIControl) {
 								// so... i could just increase the alpha? sqrt or something?
 								// that or remove it and fix all my bg colors.
 								// I could remove bg from fillmarks, give it an alpha of 0.
-		where.fillmarks(R, bg, .gnormal.seps, focusSel.px, UnfocusSel.px)
+		where.fillmarks(R, bg, .gnormal.Separator, focusSel.px, UnfocusSel.px)
 
 			
 	behaviour Gesture

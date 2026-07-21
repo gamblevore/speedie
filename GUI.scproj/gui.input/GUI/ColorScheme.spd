@@ -61,14 +61,14 @@ class ColorScheme
 		.systemstyle.bg		<~ ((0.0, 0.1, 0.0, 0.96))
 		.systemstyle.edge	<~ vec4(1)
 		
-		.systemstyle.StyleDrawer = image.CurlieQueDrawer		
+		.systemstyle.PixelShader = image.CurlieQueDrawer		
 		.BGCorners[0]		= (0.7, 1.0, 0.2, 1.0)
 		.BGCorners[1]		= .BGCorners[0] 
 		.BGCorners[2]		= (0.6, 1.0, 0.1, 1.0)
 		.BGCorners[3]		= .BGCorners[2]
 		.menus.edge			= (1.0, 0, 1.0, 1.0).px
 		.menus.bg			= (0.0, 0.0, 0.0, 1.0).px
-		.menus.seps			= nil
+		.menus.Separator			= nil
 		.MenuRowSel.solid	= (0.5, 0.5, 0.5, 0.65)
 
 	

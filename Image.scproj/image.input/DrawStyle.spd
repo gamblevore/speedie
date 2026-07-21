@@ -3,23 +3,54 @@
 prototype ImageDrawStyleEvent (|Image| self,  |ivec4| Rect, |drawstyle| G, |MoveCode| Edges)
 
 class DrawStyle
+	description "DrawStyle is used for colorising GUIControls, and text. It also allows for some (limited) styling options, such as rounding buttons.
+
+It has a very powerful feature using the 'PixelShader', which allows a function callback to fill in the GUIControl while drawing, allowing you to per-pixel shade your GUIControl.
+
+DrawStyle is not a finished class. Eventually I want to add font-sizes and font-styles on here too. Which will be a large overhaul of my drawing system.
+
+Properties:
+	BG:			Background Color
+	Edge:		The color of the border of the control
+	Separator:	The color of any lines between elements. ListView uses this.
+	TextColor:	The color of the text
+	PixelShader: Callback for shading the background
+
+Unfinished or mostly unused:
+	CornerSize: Rounds the corners of buttons (only right now). ListView/TextView are unaffected right now.
+	CornersCut: Unused. The idea is to make button styles more interesting. Perhaps a pixelshader is better.
+	EdgeWidth:  Mostly Unused. Intended for the width the the edge. RoundRectDrawer uses it but it only looked good at value 1 anyhow.
+	
+	You can always make your own GuiControls and use these properties! Just look at how some simpler controls use DrawStyle.
+	
+DrawStyle has the ability to alter the Edge and background colors 'Safely', then restore them. Example:
+
+	|| g = SomeDrawStyle
+	using g 	// temporarily alter g.bg
+		g.bg = g.Overlay(colors.red(0.5)) // make the background redder.
+		.DoTheDrawing(g)
+	// g.bg is now safely restored. It is no longer redder.
+"
+	
 	linkage
 		cpp_part Sty
 	default DrawStyle.new
-	|imagePixel|				BG
-	|imagePixel|				Edge
-	|imagePixel|				Seps
-	|imagePixel|				TextColor
-	|imagePixel|				_BackupBG
-	|imagePixel|				_BackupEdge
-	|ImageDrawStyleEvent?|		StyleDrawer
+	|ImagePixel|				BG
+	|ImagePixel|				Edge
+	|ImagePixel|				Separator
+	|ImagePixel|				TextColor
+	|ImageDrawStyleEvent?|		PixelShader
+	|ImagePixel|				_BackupBG
+	|ImagePixel|				_BackupEdge
+	
+	// unfinished
 	|Byte|						CornerSize
-	|byte| 						CornersCut
-	|Byte|						LineWidth
+	|byte| 						CornersCut // movecode would be better.
+	|Byte|						EdgeWidth
 
 		
 	constructor
-		.LineWidth = 1
+		.EdgeWidth = 1
 		.clear
 		.textColor <~ vec4(1.0)
 
@@ -27,7 +58,7 @@ class DrawStyle
 		cpp_part ConstructorCopy
 		.bg = c.bg
 		.edge = c.edge
-		.seps = c.seps
+		.Separator = c.Separator
 		.textcolor = c.textcolor
 		.CornerSize = c.CornerSize
 		.CornersCut = c.CornersCut
@@ -39,11 +70,11 @@ class DrawStyle
 		fs <~ "\nEdge: "
 		.edge.Render(fs)
 		fs <~ "\nSeps: "
-		.seps.Render(fs)
+		.Separator.Render(fs)
 		fs <~ "\ntext: "
 		.textColor.Render(fs)
 	
-	function Overlay (|vec4| C, |float| a=0)
+	function Overlay (|vec4| C, |float| A=0)
 		|| T = C.PreMul
 		.BG.overlay(T)
 		.Edge.overlay(T)
@@ -51,10 +82,10 @@ class DrawStyle
 			.bg.AddAlpha(a)
 			.Edge.addalpha(A)
 
-	function Clear
-		.solid = (0.0, 0.0, 0.0, 0.0)
+	inline Clear
+		.solid = nil
 	
-	function Copy (|DrawStyle|)
+	inline Copy (|DrawStyle|)
 		return DrawStyle(self)
 	
 	function Solid (assigns:|vec4|c)
@@ -63,7 +94,7 @@ class DrawStyle
 		
 	function Inside (assigns:|vec4|c)
 		.bg <~ c
-		.seps = .bg
+		.Separator = .bg
 		
 	function SafeEdge (|imagepixel|)
 		if self

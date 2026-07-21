@@ -69,7 +69,7 @@ datatype CharSet (uint)
 		|int|
 		fInvalid
 		fNull					// 0
-		fUnprintable 			// 1-8, 11, 12, 14-30
+		fUnprintable			// 1-8, 11, 12, 14-30
 		fLine					// nl, rt
 		fHSpace					// space, tab
 		fUnderscore				// _
@@ -105,6 +105,11 @@ datatype CharSet (uint)
 	
 	inline byte.CharSet (|charset|)
 		return (1<<charset.Props[self])|charset|
+	
+	inline byte.IsPrintable (|bool|)
+		|| p = CharSet.Props[self]
+		return p > charset.fUnprintable and p < CharSet.fUnicode
+
 	
 	module
 		|byte[256]| Props
@@ -142,8 +147,9 @@ datatype CharSet (uint)
 			item[','] = fCommaSlash
 			item['\\'] = fCommaSlash
 
-///			item[0x7f] = Invalid // not set above
+			item[0x7f] = fInvalid
 			item[0xC0] = fInvalid
-//			item[0xFE] = Invalid // also
-//			item[0xFF] = Invalid
+			item[0xFE] = fInvalid
+			item[0xFF] = fInvalid
+
 

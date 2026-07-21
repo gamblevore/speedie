@@ -1080,11 +1080,11 @@ class TextView (GUIControl)
 		
 		if self[s.x].istextline and self[s.x-1].istextline and !s.width
 			return s
-		|| A = .FindLineSeperator(s.x, 0)
+		|| A = .FindLineSeparator(s.x, 0)
 		|ind| b = s.x2
 		b += self[b-1].istextline
 			
-		B = .FindLineSeperator(b) ?? .text.length
+		B = .FindLineSeparator(b) ?? .text.length
 		return (A+1, b) // don't include the line.
 
 	
@@ -1608,19 +1608,19 @@ class TextView (GUIControl)
 		return .text.length
 
 	
-	libinternal FindLineSeperator (|int| Start = 0, |int| End = int.max, |ind|)
+	libinternal FindLineSeparator (|int| Start = 0, |int| End = int.max, |ind|)
 		return .text.find(charset.Line, start, End)
 
 
 	libinternal SelectToLineStart (|intrange|)
 		|| r = .SelRange
-		|ind| A = .FindLineSeperator(r.x, 0)+1
+		|ind| A = .FindLineSeparator(r.x, 0)+1
 		|ind| B = r.x2
 		if (b > a) and self[b-1].istextline
 			b-- 
 		if a != r.x
 			return (a, b+1)
-		|| b2 = .FindLineSeperator(b)
+		|| b2 = .FindLineSeparator(b)
 			return (a, b2+1)
 		return (a, .length+1)
 	

@@ -105,18 +105,18 @@ class ConfirmationDialog (Window)
 		cpp_part cwin
 	|textview|			Question
 	|textview|			Response
-	|Buttonview|		Yes
-	|Buttonview|		No
-	|Buttonview|		Cancel
-	|[Buttonview]|		Buttons
+	|Button|		Yes
+	|Button|		No
+	|Button|		Cancel
+	|[Button]|		Buttons
 	|date|				DelayUntil // for accidental presses.
 
 	constructor
 		super.constructor
 		.id				= "confirm"
-		.Yes			= buttonview(self, OnConfirmAnswer)
-		.No				= buttonview(self, OnConfirmAnswer)
-		.Cancel			= buttonview(self, OnConfirmAnswer)
+		.Yes			= Button(self, OnConfirmAnswer)
+		.No				= Button(self, OnConfirmAnswer)
+		.Cancel			= Button(self, OnConfirmAnswer)
 		.response		= textview(self, nil)
 		.Question		= textview(self, nil)
 		.gnormal		 = ¥.systemstyle 
@@ -184,7 +184,7 @@ class ConfirmationDialog (Window)
 		return super.keydown(key)
 
 
-	function AddButton (|ButtonView| BTN, |string| Oof)
+	function AddButton (|Button| BTN, |string| Oof)
 		.Buttons <~ btn
 		btn.ExpandOnMouseOver = 2
 		btn.Text			= Oof

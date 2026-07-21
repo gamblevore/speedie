@@ -39,7 +39,7 @@ class FileViewer (ListView)
 
 	function Init
 		.Hierarchical = true
-		.gnormal.seps = 0
+		.gnormal.Separator = 0
 		with .quickopen
 			is enabled
 			is editable

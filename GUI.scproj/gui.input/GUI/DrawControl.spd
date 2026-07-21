@@ -118,7 +118,7 @@ class GraphicsEditor (GuiControl)
 			for (P in range) (V)
 				where[v+d] <~ p
 		  else
-			|| b1 = g.seps
+			|| b1 = g.Separator
 			|| b2 = g.edge
 			for (P in range) (V)
 				|| dest = where[v+d]

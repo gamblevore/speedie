@@ -1,6 +1,6 @@
 
 
-function ButtonView.FillMenuPath (|string| L, |listviewrow| tab=nil)
+function Button.FillMenuPath (|string| L, |listviewrow| tab=nil)
 	|| p = .SubMenu		#require
 	|| orig = l
 	p.listsource.clear
@@ -49,7 +49,7 @@ function PerryIDE.AddToJumpHistory
 	
 
 function RightClickNext (GUIaction)
-	if self isa ButtonView
+	if self isa Button
 		|| s = .SubMenu
 			s.OnTypingFilter = PerryFileListFilter
 			s.ListSource = .ide.SortedPrevious
@@ -101,7 +101,7 @@ function PerryIDE.SortedPrevious (|string| StrFilter = "", |message|)
 
 
 function PressingTabs (guiaction)
-	if self isa ButtonView
+	if self isa Button
 		|| p = .submenu|listview|
 			|| ide = row.ide
 				p.ListSource.clear
@@ -129,7 +129,7 @@ function message.IDE (|perryide|)
 					return w
 
 function ClickedOpenRecent (GUIaction)
-	if self isa ButtonView
+	if self isa Button
 		|| s = .SubMenu
 			s.ListSource = Perry.RecentProjects
 			s.ColumnFinder = &perry.RecentProjNames
@@ -180,7 +180,7 @@ function MenuShowProject (guimenuevent)
 	
 
 function RightClickedTabs (GUIAction)
-	if row and self isa ButtonView
+	if row and self isa Button
 		|| i = row.ide
 			.FillMenuPath(i.Project, row)
 
