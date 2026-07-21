@@ -868,9 +868,11 @@ bool JB_Str_Equals(JB_String* self, JB_String* find, bool Lexer) {
 			self = EmptyString_;
 		if (!find)
 			find = EmptyString_;
+		auto S = Mini(self);
+		auto F = Mini(find);
 		if ( !Lexer )
-			return StrEquals( Mini(self), Mini(find) );
-		return StrEqualsLex( Mini(self), Mini(find) );
+			return StrEquals( S, F );
+		return StrEqualsLex( S, F );
 	}
 	return true;
 }
