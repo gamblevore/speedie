@@ -465,7 +465,7 @@ class PerryIDE (Window)
 		if (hideside == visside)
 			.filelist.decluttered = hideside
 			|| f = .Focus
-			if HideSide and (!f or f.declutterer.final)
+			if HideSide and (!f or f.Decluttering)
 				.editme.SetFocus
 			if .viewing == .viewfiles
 				.noneed

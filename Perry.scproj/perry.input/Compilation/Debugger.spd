@@ -362,8 +362,9 @@ function PerryStackKeyDown (guikeyevent)
 	if (key is up or down) and (self isa ListView)
 		|| i = .ide
 		|| sel = .FirstSelected
-		|| Edge = .SelectableEdge(key is down)
+		|| Edge = .ListEdge(key is down)
 		if sel == edge
+			.selectnone
 			i.AppInfo.SetFocus
 			return true
 			

@@ -12,6 +12,7 @@ DrawStyle is not a finished class. Eventually I want to add font-sizes and font-
 Properties:
 	BG:			Background Color
 	Edge:		The color of the border of the control
+	Solid:		A 'virtual' property, this sets both the BG and the Edge in one go.
 	Separator:	The color of any lines between elements. ListView uses this.
 	TextColor:	The color of the text
 	PixelShader: Callback for shading the background
@@ -88,11 +89,11 @@ DrawStyle has the ability to alter the Edge and background colors 'Safely', then
 	inline Copy (|DrawStyle|)
 		return DrawStyle(self)
 	
-	function Solid (assigns:|vec4|c)
+	function Solid (assigns:|vec4| c)
 		.inside = c
 		.edge = .bg
 		
-	function Inside (assigns:|vec4|c)
+	function Inside (assigns:|vec4| c)
 		.bg <~ c
 		.Separator = .bg
 		

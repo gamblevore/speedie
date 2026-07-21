@@ -100,8 +100,10 @@ struct TimeFader
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
 		GUI.touch
 		if value
-			.final = gui.framestart + (seconds+delay).date
-			.scale = 1.0 / seconds
+			|| next = gui.framestart + (seconds+delay).date
+			if !.final or next < .final
+				.final = next
+				.scale = 1.0 / seconds
 		  else
 			.final = 0
 			.scale = 0

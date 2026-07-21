@@ -399,7 +399,7 @@ function PerryIDE.CheckFB (|message| msg)
 	.UnusedFB(extracted)
 	
 
-function EditMeModified (guitextevent)
+function EditMeModified (guitextChangeEvent)
 	|| i = .ide
 	require i? // somehow we are getting called when we are nil?
 	i.LastSendTime = 0
@@ -465,7 +465,7 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| r
 
 function OnShowExtraInfo (GUITextShowEvent)
 	opt NoRefCounts
-	.ide.ShowExtraInfo(LeftCorner, msg, err, reason, !WasDelayed)
+	.ide.ShowExtraInfo(LeftCorner, msg, Error, reason, !WasDelayed)
 
 
 function PerryIDE.ShowImport (|string| name)

@@ -67,7 +67,7 @@ extend PerryIDE
 
 
 	function ShowCompileErrors (|message!| msg, |bool| RealCompile, |bool|)
-/		|| MaybeOK = msg.first
+		|| MaybeOK = msg.first
 		if maybeok.yes
 			.ErrorList.clear
 			.UpdateErrorCount

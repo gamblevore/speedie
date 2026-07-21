@@ -137,7 +137,7 @@ function PerryIDE.ClickedTodo
 		fl.show(todo)
 	  else
 		.nottodo = .CurrFileRow
-	fl.SelectNoShow(todo)
+	fl.Select(todo, ListViewSelectMode.Noshow)
 
 		
 function PerryRecheckEvent (guilistevent)
@@ -318,12 +318,14 @@ function PressedSearchWithin (Guiaction)
 
 function PerryIDE.MassSearch (|bool|)
 	opt norefcounts
+	(.MassReplaceField is Enabled)
+	.MassReplaceField.decluttered = false
 	|| t = .MassSearchField.Text
 	.ViewAsProject
 
 	// i forgot what the ID is about.
-	// some clever algorithm something that stops something bad happening
-	// just keep it... till i remmeber what it does.
+	// some clever algorithm something that stops something bad happening?
+	// Just keep it... till i remmeber what it does.
 	// maybe something to do with searches across multiple projects.
 	// i think thats it. So theres no point finding something in another
 	// project if we already found it in ours.
@@ -334,7 +336,7 @@ function PerryIDE.MassSearch (|bool|)
 	
 	.BatchPhind(t, true, ID)
 	
-	if t and .FoundList.isempty
+	if t and !.FoundList.HasAnyRows
 		.NoNeed("The search text “${t}” wasn't found", nil)
 		perry.FindElseWhere(self, t, ID)
 	  else
@@ -372,10 +374,9 @@ function PerryIDE.CanReplace (|string| r,  |listviewrow| root,  |string| src,  |
 
 function PerryIDE.DoReplacements (|bool|)
 	opt norefcounts
-	if .FoundList.isempty
-		.MassSearch
-	|| r = .massreplacefield.text
 	|| l = .FoundList.ListSource
+	require l.HasAny
+	|| r = .massreplacefield.text
 	|| f = l.first
 	|| src = .MassSearchField.text
 	require .CanReplace(r, l, src)
@@ -392,7 +393,7 @@ function PerryIDE.DoReplacements (|bool|)
 	
 
 
-function EditMeSelChange (GUITextEvent)
+function EditMeSelChange (GUITextSelectEvent)
 	opt norefcounts
 	|| i = .ide
 	|| proj = i.SharedProjectTabSource

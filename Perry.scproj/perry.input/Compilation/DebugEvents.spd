@@ -52,7 +52,7 @@ function perryide.DebugStepEvent (|bool|)
 
 function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	opt norefcounts
-	// now what? down and up should go into the variable editor
+
 	|| i = .ide
 	if key is PERIOD
 		return i.MakeNothingRunning
@@ -79,9 +79,7 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 			i.Editme.SetFocus
 		return true
 	
-	if key is COMMA
-		return DebugStepIn(self, -1)
-	if key is SEMICOLON
+	if key is ESCAPE or SQUOTE
 		return DebugStepOut(self, -1)
 		
 

@@ -486,7 +486,7 @@ class FileViewer (ListView)
 		|| n = path.name
 			|| r = .FindAPath(n) ?? .AddExtra(n)
 				.Select(nil)						// do we need this?
-				.SelectFast(r)
+				.Select(r)
 		
 		|| Pos = path.Position
 		|| Line = path.rangelength
@@ -510,7 +510,7 @@ class FileViewer (ListView)
 		|| C = 3000
 		rz = .AddRootSub(path.file, false, C) 
 		x <~ rz
-		.SelectFast(rz)
+		.Select(rz)
 
 
 	module
@@ -548,7 +548,7 @@ class FileViewer (ListView)
 			return A.name.syntaxcompare(b.name, true)
 
 
-		libinternal QuickOpenModified (GUITextEvent)
+		libinternal QuickOpenModified (GUITextChangeEvent)
 			opt norefcounts
 			|| fv = .tag as fileviewer
 				fv.OpenQuickRelist(.text)

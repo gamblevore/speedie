@@ -225,7 +225,7 @@ class OpenSaveDialog (Window)
 					f.remove
 			
 
-		libinternal RelistKey (guitextevent)
+		libinternal RelistKey (guitextChangeevent)
 			opt NoRefCounts
 			|| w = .window as OpenSaveDialog
 				|| p = w.path

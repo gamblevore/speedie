@@ -4,18 +4,18 @@ import "GUI"
 
 function PressedSquare (guiaction)
 	|| w = .Window as StartWindow	#require
-	w.Add(self as buttonview		#require)
+	w.Add(self as button			#require)
 
 
 class StartWindow (window)
 	|int|			XGot
 	|int|			OGot
-	|[buttonview]|	Buttons
+	|[button]|		Buttons
 	
 	constructor
 		super.constructor(414 by 400)
 		for V in (3, 3)
-			|| btn = ButtonView(self, PressedSquare)
+			|| btn = Button(self, PressedSquare)
 			.Buttons <~ btn
 			|| x = (v.x*100)~right for 100
 			|| y = (v.y*100)~up for 100
@@ -31,12 +31,12 @@ class StartWindow (window)
 		|| v = x+y*3
 		return .XGot[v] - .OGot[v]
 	
-	syntax access (|ivec2| v, |buttonview|)
+	syntax access (|ivec2| v, |button|)
 		|| b = .Buttons[v.x+v.y*3]
 			return b
 		return .Buttons[0]!
 	
-	function Add (|buttonview| c)
+	function Add (|button| c)
 		|| pos = c.Position
 		if .XGot[pos]
 			.xgot = .xgot[pos,false] // .xgot[pos]=false would be better!

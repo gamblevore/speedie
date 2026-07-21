@@ -158,26 +158,47 @@ extend PerryIDE
 
 
 
+function PerrySearchChanged (guitextChangeEvent)
+	opt norefcounts
+	|| w = .ide
+	|| f = w.MassReplaceField
+	(f isnt Enabled)	
+	f.Decluttered = true
+	
+	
+function PressedReplaceKeys (GUIKeyEvent)
+	opt norefcounts
+	|| w = .ide
+	
+	if key.isaccept
+		return w.DoReplacements
+	
+	return PressedSearchKeys(self, key)
+
+	
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts
 	|| w = .ide
 	
 	if key.isaccept
-		if self == w.MassReplaceField
-			return w.DoReplacements
 		return w.MassSearch
-		
-	|| t = w.MassSearchField
-	if (key is down) and (t.selrange == t.text.length)
-		w.FoundList.setfocus
-		return true
 	
 	if key.IsCancel
-		if t.text
-			t.text = ""
-		  else
-			w.view(W.viewfiles)
+		.text = ""
 		return true
+		
+	|| Srch = w.MassSearchField
+	if self isa TextView
+		|| sr = .SelRange
+		if (key is down) and (sr == .text.length)
+			if self == Srch
+				w.massreplacefield.setfocus
+			  else
+				w.FoundList.SetFocus
+			return true
+		if (key is up) and (sr == 0) and (self != Srch)
+			w.masssearchfield.setfocus
+			return true
 
 
 

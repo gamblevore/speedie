@@ -34,7 +34,7 @@ extend PerryIDE
 		.CommandsMenu		= Button(.RBorder,	MenuCommands,	 nil,	ReturnCommands)
 		.ASMButton			= Button(.rborder,  ClickedASMButton)
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
-		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
+		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedReplaceKeys)
 		.SubFindCheckBox	= Button(.searcharea, PressedSearchWithin)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList)
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList)
@@ -264,6 +264,7 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
+			.OnTextChanged	= PerrySearchChanged
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "find"
@@ -274,6 +275,7 @@ extend PerryIDE
 
 		with .MassReplaceField
 			is   editable
+			isnt enabled
 			is   visible
 			isnt drawsfocus
 			.tooltip		= self.SearchArea.Tooltip			

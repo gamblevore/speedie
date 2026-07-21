@@ -124,7 +124,6 @@ extend textview
 	
 	libinternal DebugInfoRestoreSub (|document| u, |textviewline|)
 		opt norefcounts
-	
 		if ._debuglevel	>= debuglevelrunning			// each file needs its own wrapped lines
 /			|| f = u.FilePath
 			for wr in ._SavedCompileInfos	

@@ -207,7 +207,7 @@ class Window (GUIControl)
 				GUI.JB_SDL_SetModified(n, value)
 		super.syntaxis(f) = value
 
-// -wheel.y
+
 	behaviour Gesture
 		opt norefcounts
 		|| XY = GUI.MouseXY
@@ -221,7 +221,7 @@ class Window (GUIControl)
 
 	behaviour TypedString
 		opt norefcounts
-		|| f = .realFocus
+/		|| f = .realFocus
 			|| o = f
 			if (f isa menu) and (f != .focus) and (f is typethrough)
 				o = .focus$

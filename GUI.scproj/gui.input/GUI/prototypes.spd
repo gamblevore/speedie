@@ -18,17 +18,16 @@ prototype ListViewRowDraw		(|ListViewrow|	self,  |int| rowy, |int| texty, |image
 prototype GUIAction				(|GUIControl|	self,  |int| State=0, |ListViewrow?| Row=nil, |ListViewrow?| Prev=nil, |bool|)
 prototype GUIMenuEvent			(|GUIControl|	self,  |menuitem| menu, |ListViewcell?| Clicked)
 prototype GUIKeyEvent			(|GUIControl|	self,  |keys| Key, |bool|)
-prototype GUIPasteEvent			(|GUIControl?|	self,  |ListViewrow?| After, |string| Data, |CopyPasteFlags| purpose, |object|)
-prototype GUICopyEvent			(|GUIControl|	self,  |object?| item, |string|)
+prototype GUIPasteEvent			(|GUIControl?|	self,  |ListViewrow?| After, |string| Data, |CopyPasteFlags| Purpose, |object|)
+prototype GUICopyEvent			(|GUIControl|	self,  |object?| Item, |string|)
 
-prototype GUITextEvent			(|textview|		self,  |DocumentAction| Reason, |bool| TextWasAltered, |int|)
+prototype GUITextChangeEvent	(|textview|		self,  |DocumentAction| Reason, |bool| IsModified,		|int|)
+prototype GUITextSelectEvent	(|textview|		self,  |DocumentAction| Reason, |bool| TextWasAltered,	|int|)
 prototype GUITextLineEvent		(|textview|		self,  |textviewline| Line, |int| Direction=0, |int|)
 prototype GUITextLineBreakColor	(|textviewline|	self, |?&message--| PreRun, |bool| InBreakArea,  |vec4|)
-prototype GUITextShowEvent		(|TextView|		self,  |ivec2| LeftCorner, |message?| Msg, |error?| err, |string| reason, |bool| WasDelayed)
+prototype GUITextShowEvent		(|TextView|		self,  |ivec2| LeftCorner, |message?| Msg, |error?| Error, |string| Reason, |bool| WasDelayed)
 prototype SorterComparerWindow	(|window|		A,	|window| B, |int|)
 
-
-///
 
 prototype GUIMouseMoveEvent		(|window| self,  |guicontrol| Curr,  |guicontrol| Old) // remove this? we have a mousemove virtual! SelfTool uses it.
 

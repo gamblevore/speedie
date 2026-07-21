@@ -833,6 +833,7 @@ struct GUIKeyRecord
 		.state = nil
 	
 	syntax is (|GUIKeyRecordInfo| V, |bool|)
+		inlined
 		// need an automatic inliner...
 		return .state == v
 

@@ -255,7 +255,7 @@ datatype ListViewSelectMode (uint)
 	flags
 		|ListViewSelectMode|
 		InitialSelection
-		Fast
+//		Fast
 		NoShow
 		NoEvent
 		SendEvent

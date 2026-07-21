@@ -39,8 +39,8 @@ class TextView (GUIControl)
 	|[textviewline]|			_SavedCompileInfos
 
 
-	|GUITextEvent?|				OnTextChanged
-	|GUITextEvent?|				OnSelChanged
+	|GUITextChangeEvent?|		OnTextChanged
+	|GUITextSelectEvent?|		OnSelChanged
 	|GUITextLineEvent?|			OnBreakPoint
 	|GUITextLineBreakColor?|	OnDrawLineNumber
 	
@@ -779,7 +779,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		if (.OnKeyDown)(self, key)?
 			return true
-		if .KeyDownTest(key) // to be called by other funcs
+		if .SpecialKeyTest(key)
 			return true
 		|| oncl = .onclicked
 		if oncl and (self isnt editable) and (key.isaccept or key.IsCmm)
@@ -790,8 +790,8 @@ class TextView (GUIControl)
 			return true
 		
 	
-	libinternal KeyDownTest (|keys| key, |bool|)
-		if self is editable
+	libinternal SpecialKeyTest (|keys| key, |bool|)
+		if self is editable and Enabled
 			if .IsInline
 				if key.IsCancel:		return .CancelEditing
 				if key.IsAccept:		return .InlineAcceptKey
@@ -1467,8 +1467,15 @@ class TextView (GUIControl)
 		.Insert(value, true)
 
 	
+	libinternal AllowTyping (|bool|)
+		if self is Editable and Enabled
+			return true
+		beep
+	
+	
 	behaviour TypedString
-		// shouldn't it be shift-space? option-space is a real char.
+		require  .AllowTyping
+
 		if (input == "§") and !(keys.option or keys.shift)
 			return false		
 
@@ -1486,7 +1493,7 @@ class TextView (GUIControl)
 	
 
 	libinternal Typed (|string| s, |int|)
-		require self is editable
+		require .AllowTyping
 		GUI.ShowCursor(false)
 		
 		if (s == 1) and .TypedACounterPart(s[])

@@ -312,7 +312,7 @@ class ListView (GUIControl) {
 			return p.StopFilter
 
 
-	libinternal textview.RefilterTextChange (GUITextEvent)
+	libinternal textview.RefilterTextChange (guitextChangeEvent)
 		opt norefcounts
 		|| p = .parent as ListView
 			p.UpdateFilter
@@ -418,17 +418,17 @@ class ListView (GUIControl) {
 			if keys.Cmd
 				if (Key is up)
 					d = -d
-				.SelectMove( d )
+				.MoveSelection( d )
 			  elseif !.FirstSelected
 				if key is down
 					d = -d
-				.SelectMove( d )
+				.MoveSelection( d )
 			  else
 				|| i = 1
 				if keys.option: i = .VisibleRows/2
 				if key is up
 					i = -i
-				.SelectMove(i)
+				.MoveSelection(i)
 			return true
 		
 		if .IsTree and (key is left or right)
@@ -469,8 +469,8 @@ class ListView (GUIControl) {
 				rz <~ it
 
 	
-	inline IsEmpty (|bool|) // similar: hasany, rowcount
-		return !.listsource.hasany
+	inline HasAnyRows (|bool|) // similar: hasany, rowcount
+		return .listsource.hasany
 	
 	
 	function JumpTo (|string| s, |bool|)
@@ -848,7 +848,7 @@ class ListView (GUIControl) {
 			l = .listPrev(l)
 			
 		
-	function SelectableEdge (|bool| Last, |ListViewrow|)
+	function ListEdge (|bool| Last, |ListViewrow|)
 		opt norefcounts
 		if Last
 			rz = .listend
@@ -1006,7 +1006,7 @@ class ListView (GUIControl) {
 
 	function SelectEdge (|bool| Last=false, |ListViewSelectMode| Mode = ListViewSelectMode.normal, |bool|)
 		opt norefcounts
-		.select(.SelectableEdge( Last ), mode)
+		.select(.ListEdge( Last ), mode)
 		return true
 
 	function SelectShift (|ListViewrow| l, |ListViewrow| m, |bool|)
@@ -1031,7 +1031,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	function SelectMove (|int| i, |bool| Multi=keys.shift)
+	function MoveSelection (|int| i, |bool| Multi=keys.shift)
 		opt norefcounts
 		require i
 		|listviewrow| l
@@ -1040,7 +1040,7 @@ class ListView (GUIControl) {
 		  else
 			l = .FirstSelected
 		if !l
-			|| f = .SelectableEdge(i>0)
+			|| f = .ListEdge(i>0)
 			return .Select(f)
 		
 		|| m = .bmove(l, i)
@@ -1073,14 +1073,6 @@ class ListView (GUIControl) {
 		return .Select(s)
 	
 	
-	inline SelectNoShow (|ListViewRow| s)
-		.select(s, ListViewSelectMode.Noshow)
-	
-	
-	inline SelectFast (|ListViewRow| s)
-		.select(s, ListViewSelectMode.Fast)
-		
-		
 	function Select (|ListViewRow?| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
 		opt norefcounts
 		require !._DuringSelect
