@@ -406,9 +406,12 @@ class GUIControl (list)
 		return (.oncopy$)(self, item)
 	
 	
-	syntax equals (|string| s, |bool| aware=false, |bool|)
+	syntax equals (|string| s, |bool|)
 		if self
-			return .id.syntaxequals(s, aware)
+			return .id.syntaxequals(s, true) // why would we want to tell "EditMe" apart from "editme"?
+
+	syntax equals (|string| s, |bool| Aware, |bool|)
+		disabled "Just use == which is always case-aware"
 
 	operator Contains (|ivec2| p, |bool|)
 		inlined

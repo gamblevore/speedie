@@ -352,7 +352,7 @@ extend TextView
 		for v.viewer in u
 			if v
 				v|guicontrol|.text = NewText
-				v.PrepareLinesOfText(Point)
+				v.WrapText(Point)
 		
 		u.text = NewText
 

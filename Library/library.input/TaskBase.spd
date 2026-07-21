@@ -47,7 +47,7 @@ class Task (list)
 
 datatype TaskState (byte)
 	flags
-		|TaskState| 
+		|TaskState|
 		Started
 		Paused
 		WaitsTillStart

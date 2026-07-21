@@ -221,7 +221,7 @@ class Window (GUIControl)
 
 	behaviour TypedString
 		opt norefcounts
-/		|| f = .realFocus
+		|| f = .realFocus
 			|| o = f
 			if (f isa menu) and (f != .focus) and (f is typethrough)
 				o = .focus$

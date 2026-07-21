@@ -6,13 +6,18 @@ datatype TextLineFlags (uint16)
 		ColoriseUsingPosition
 		FakeMsg
 		StartsNormally
+		Keepable
 		AvoidLastChar
 		Last					// remove this? we could just check .IsLast
 		Selected
 
-		CodeBreak = [BreakPoint, ActiveBreakPoint]
-		CodeReached
-		UserFlags = CodeReached + CodeBreak
+	///
+		BreakPoint = 1<<13
+		ActiveBreakPoint = 1<<14
+		CodeReached = 1<<15
+		CodeBreak = ActiveBreakPoint+BreakPoint
+		UserFlags = 7<<13
+		
 
 
 class TextViewLine (list)

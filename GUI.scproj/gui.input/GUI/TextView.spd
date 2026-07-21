@@ -634,7 +634,7 @@ class TextView (GUIControl)
 	
 	libinternal DrawInfoAtLine (|int| L, |textviewline|)
 		opt norefcounts
-		.PrepareLinesOfText
+		.WrapText
 		for r in .WrappedLines
 			if r.tline >= l
 				return r
@@ -1765,7 +1765,7 @@ class TextView (GUIControl)
 	libinternal FindDrawInfoSub (|int| Char,  |$int| VLine,  |TextViewLine!|)
 		opt norefcounts
 
-		.PrepareLinesOfText
+		.WrapText
 		char = .clamp(char)
 		|| c = -int.max
 		|| s = .StartLine
@@ -1850,7 +1850,7 @@ class TextView (GUIControl)
 		|| c = where.controlclip
 		where.ControlClip = c ± 1
 		
-		.PrepareLinesOfText
+		.WrapText
 		.DrawPreparedText(where)
 		|| Sel = self is Editable or AlwaysScrollable
 			.DrawSel(where, c)
@@ -2214,11 +2214,16 @@ class TextView (GUIControl)
 			e.obj = d
 			d.LineError = e
 
-		(d is colored) = .ParsedMessage
-
 		if JX is Colorise
 			|| OK = (msg!=nil) or (JX isnt expect)
 			msg = d.ColoriseText(msg, OK)
+
+		|| Parsed = .ParsedMessage
+			// try keep important lines. So... " // abc hahaha", or "", can be removed
+			// but something like "obj.func()" won't be. (That is for merging lines together.)
+			(d is keepable) = msg and !msg.Func.IsList // Don't keep containers
+
+		(d is colored) = Parsed
 
 		|| draw = .OnDrawLineNumber
 			(draw)(d, &LastOwner, false)
@@ -2228,10 +2233,12 @@ class TextView (GUIControl)
 		return msg
 	
 	
-	libinternal PrepareLinesOfText (|ivec4| Map=nil)
+	libinternal WrapText (|ivec4| Map=nil)
 		opt norefcounts
 		|| Changed	= .NeedsPrepare										#require
 		.TextAlteredForDraw = 0
+		map = map.TextMapFix
+
 		|| JX		= .JeeboxMode
 		|| msg		= .Parse(changed >= 2, JX)
 		|| Pos		= .StartPos
@@ -2243,16 +2250,15 @@ class TextView (GUIControl)
 	
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
-
+		
 		d.tLine = 1
-		map = map.TextMapFix
-
 		|TextViewLine| Last
 		|| P = 0
+		if self == "Editme" and map[2] >= 0
 
 		while
 			if map[2] >= 0
-				|| Old = Map.TextMapToOld(P)
+				|| Old = .TextMapToOld(Map, P)
 				if old < 0
 					d = d.TextMapInside
 				  elseif Old >= Map[1]
@@ -2270,10 +2276,10 @@ class TextView (GUIControl)
 			Last = D
 			d = .NextVline(d, p)
 		
-		.PrepareLinesEnd(d, changed, pos)
+		.WrapTextEnd(d, changed, pos)
 	
 	
-	libinternal PrepareLinesEnd (|textviewline| D, |int| Changed, |int| Pos)
+	libinternal WrapTextEnd (|textviewline| D, |int| Changed, |int| Pos)
 		opt norefcounts
 		d.RemoveAfter
 		._PreferPrevLine = false
@@ -2336,7 +2342,7 @@ class TextView (GUIControl)
 		.document = u
 		.ClearErrors
 		if show
-			.PrepareLinesOfText
+			.WrapText
 			.SelDirect(T, nil)
 			.ScrollPos = S
 		return true
