@@ -160,7 +160,7 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 			check (first isthing "self") (first)
 			return
 		if (fn isnt StoresSelf) and !.Unfinished
-			problem (msg, "Object just evaporates here. (Into the clouds... pooof!)")
+			problem (msg, "Object just evaporates here. (Into the clouds)")
 	
 	using msg		
 		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
