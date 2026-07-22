@@ -374,10 +374,10 @@ class Window (GUIControl)
 	libinternal FixFocus
 		opt norefcounts
 		|| f = .innerfocus
-			if f isnt visible
+			if f isnt visible or Enabled
 				.SetInnerFocus(nil)
 		|| f2 = .focus
-			if f2 isnt visible
+			if f2 isnt visible or Enabled
 				.SetFocus(nil)
 
 

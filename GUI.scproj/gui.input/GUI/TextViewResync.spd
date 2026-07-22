@@ -33,7 +33,7 @@ libinternal TextView.TextMapHasLine (|int| A, |int| B, |bool|)
 			return true
 			
 	
-libinternal TextView.TextMapToOld (|ivec4| Map, |int| P, |int|)
+libinternal TextView.TextMapToOld (|ivec4| Map, |int| P, |textviewline| D,  |int|)
 	// AAA<BBB>CCC		2-->2,		6-->3
 	// AAACCC
 	// AAABBBCCC
@@ -45,26 +45,12 @@ libinternal TextView.TextMapToOld (|ivec4| Map, |int| P, |int|)
 	|| InsertLength = Map[2]			// 3
 	|| InsertEnd = Start + InsertLength	// 6
 
-	if P == Start	// edge-case... maybe theres a more graceful approach
-					// can't think of it now.
-					// Theres no OBVIOUS answer.
-		
-		// Also... would be nice to be able to delete a return on the start of a line
-		// but this relies on knowing if a line is "empty"... which isn't a simple question.
-		
-				// abc\ndef --> abcdef // So here... we want to keep ABC!
-				//    // comments and spaces\ndef --> def // Keep DEF!
-			
-				// so the behaviour depends on if the first line is "empty" or not
-				// how to tell? Is it just by error messages?
-				// or actual syntax?
-				// I guess if theres no syntax... it could be considered "Shrinkable".
-				// do later.		
-				
-				// what if the parse failed?		
-				// We'd probably want a textlineflag to say "Keepable"		
-		
-		if !.TextMapHasLine(start, insertend)
+	if P == Start	// Edge-case... maybe theres a more graceful approach
+					// Can't think of it now. Theres no OBVIOUS answer.
+		if d is EndsNormally // ends normally
+		if !.TextMapHasLine(start, insertend) // no lines added... but what about deleted?
+											  // surely, that depends on D? we don't know what used to be there
+											  // we can check if it ends normally, then  check its range.
 			return P
 
 	if P >= InsertEnd					// P==6

@@ -338,8 +338,8 @@ class SCImport
 		function ExportShaders
 			require .shaders
 			
-			Compiler.stage( "Copying Shaders" )
-			compiler.Timer( "Copying Shaders" )
+			Compiler.stage( "Copying_Shaders" )
+			compiler.Timer( "Copying_Shaders" )
 			
 			|| P = compiler.BuildFolder["Resources/Shaders"]
 			P.MakeAndGoInto

@@ -197,7 +197,7 @@ function CompileAll
 		intrinsics.Process
 		if Options.ModeCpp
 			(compiler is CppExporting)
-			.Timer( "Export Cpp" )
+			.Timer( "Export_Cpp" )
 			Cpp_Export.ExportAllSource
 
 		SCImport.ExportShaders

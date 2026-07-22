@@ -284,7 +284,6 @@ function PerryIDE.BatchPhind (|string| text,  |bool| DoReplace, |uint| ID,  |boo
 	f.name = "FoundList"
 	f.clear
 	.filelist.BatchFind(text, DoReplace, f, ID)
-	.foundlist.setfocus
 	.UpdateFoundHeader
 	return f.HasAny
 

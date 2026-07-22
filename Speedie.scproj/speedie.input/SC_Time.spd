@@ -29,12 +29,12 @@ function compiler.PrintCompileTime (|date| durr)
 	|| ASM_Ops = compiler.stTotalASMOps
 		fs.Normal  "ASM",    (ASM_Ops*4).strsize(fs)
 		if PackMaker.PackSaved.Savings
-			fs.Normal  "PackFuncs Trimmed", packmaker.PackSaved.Churn(fs)
+			fs.Normal  "PackFuncs_Trimmed", packmaker.PackSaved.Churn(fs)
 		if .stDebugInfo
 			fs.normal  "DebugInfo",  .stdebuginfo.strsize(fs)
 
-	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
-	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
+	fs.normal  "Total_Elapsed",	durr.renderdurr(fs), fs <~ "s"
+	fs.normal  "Input_Src",		Compiler.stTotalSourceSize.strsize(fs)
 	if options.color
 		fs <~ TerminalColor.normal
 	

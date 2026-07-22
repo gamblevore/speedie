@@ -773,25 +773,26 @@ class TextView (GUIControl)
 		.Doexplode(D)
 
 		return true
-			
+	
 	
 	behaviour KeyDown
 		opt norefcounts
-		if (.OnKeyDown)(self, key)?
-			return true
-		if .SpecialKeyTest(key)
-			return true
-		|| oncl = .onclicked
-		if oncl and (self isnt editable) and (key.isaccept or key.IsCmm)
-			(oncl)(self)
-			return true			
+		if self is Enabled
+			if (.OnKeyDown)(self, key)?
+				return true
+			if .SpecialKeyTest(key)
+				return true
+			|| oncl = .onclicked
+			if oncl and (self isnt editable) and (key.isaccept or key.IsCmm)
+				(oncl)(self)
+				return true			
 		if (key is RGUI or LGUI) and GUI.CursorVisible
 			.ShowExtraInfo(.mouSEXY)
 			return true
 		
 	
 	libinternal SpecialKeyTest (|keys| key, |bool|)
-		if self is editable and Enabled
+		if self is editable
 			if .IsInline
 				if key.IsCancel:		return .CancelEditing
 				if key.IsAccept:		return .InlineAcceptKey
@@ -1808,9 +1809,9 @@ class TextView (GUIControl)
 		|| d = .FindTextLine(x2)
 		|| r = d.range
 		x2 = r.x2
-		if (i > 0) and (keys.shift) and (d is avoidlastchar) and !d.endswithline
+		if (i > 0) and (keys.shift) and (d is EndsNormally) and !d.endswithline
 			//
-		  elseif (d is AvoidLastChar) and canavoid
+		  elseif (d is EndsNormally) and canavoid
 			x2 = .text.MoveCodePoint(x2, -1)
 		if i < 0
 			x2 = r.x
@@ -2258,7 +2259,7 @@ class TextView (GUIControl)
 
 		while
 			if map[2] >= 0
-				|| Old = .TextMapToOld(Map, P)
+				|| Old = .TextMapToOld(Map, P, D)
 				if old < 0
 					d = d.TextMapInside
 				  elseif Old >= Map[1]

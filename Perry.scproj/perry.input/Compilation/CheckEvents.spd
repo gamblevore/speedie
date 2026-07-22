@@ -72,13 +72,16 @@ extend PerryIDE
 					e.ActualReplaceError(str)
 
 
+	function ShowCompileOK (|string| kind, |bool|)
+		.ErrorList.clear
+		.UpdateErrorCount
+		return .CheckedOK(kind)
+
+		
 	function ShowCompileErrorsFB (|message!| msg, |bool| RealErrors, |bool|)
 		opt norefcounts
-		|| maybeok = msg.first
-		if maybeok.yes
-			.ErrorList.clear
-			.UpdateErrorCount
-			return .CheckedOK(msg.name)
+		if msg.first.yes
+			return .ShowCompileOK(msg.name)
 		return .ShowCompileErrors(msg, RealErrors)
 	
 	
@@ -167,9 +170,7 @@ extend PerryIDE
 			// Notifications will pick up the err otherwise!
 		  elseif !bad
 			if !killed
-				|| msg = @tmp + "compile"
-				msg <~ (@thg, "true")
-				.ShowCompileErrors(msg, false)
+				.ShowCompileOK("compile")
 			.CompiledOK(killed)
 		.compilr = nil
 		.RenableAfterCompile

@@ -7,7 +7,7 @@ datatype TextLineFlags (uint16)
 		FakeMsg
 		StartsNormally
 		Keepable
-		AvoidLastChar
+		EndsNormally
 		Last					// remove this? we could just check .IsLast
 		Selected
 
@@ -323,15 +323,15 @@ class TextViewLine (list)
 		.Position = p
 		if .vline > 1000K
 			._Text = txt[p, int.max]
-			(self is AvoidLastChar) = .EndsWithLine
+			(self is EndsNormally) = .EndsWithLine
 
 		  elseif p >= txt.length									// edge case.
-			isnt AvoidLastChar
+			isnt EndsNormally
 			._Text = ""
 		  else
 			|| i = txt.WrapSub(MaxWidth, IsInline, p)
 			._Text = txt[p, i]
-			(self is AvoidLastChar) = .EndsWithLine
+			(self is EndsNormally) = .EndsWithLine
 			if (i < txt.length) or .EndsWithLine
 				isnt last
 				return i

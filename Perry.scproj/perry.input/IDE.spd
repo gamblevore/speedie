@@ -60,26 +60,26 @@ class PerryIDE (Window)
 	|listview|					CommsLogList
 	|ListView|					FoundList
 	|textview|					DebugArgsText
-	|Guicontrol of Button|	ViewButtons
-	|Button?--|				PrevView
-	|Button|				CurrFileName
-	|Button|				ASMButton
-	|Button|				FunctionMenu // .funclist
-	|Button|				CommandsMenu
-	|Button|				Toolbar
-	|Button|				ProjectTabs
-	|Button|				CompileTabs // compilertabs
-	|Button|				SubFindCheckBox
-	|Button|				ViewErrors
-	|Button|				ViewFiles
-	|Button|				ViewSearch
-	|Button|				ViewDebugger
-	|Button|				ViewLog
-	|Button|				GoNext
-	|Button|				GoPrev
-	|Button|				RecentAndSplash
-	|Button|				BuildButton
-	|Button|				RunButton
+	|Guicontrol of Button|		ViewButtons
+	|Button?--|					PrevView
+	|Button|					CurrFileName
+	|Button|					ASMButton
+	|Button|					FunctionMenu // .funclist
+	|Button|					CommandsMenu
+	|Button|					Toolbar
+	|Button|					ProjectTabs
+	|Button|					CompileTabs // compilertabs
+	|Button|					SubFindCheckBox
+	|Button|					ViewErrors
+	|Button|					ViewFiles
+	|Button|					ViewSearch
+	|Button|					ViewDebugger
+	|Button|					ViewLog
+	|Button|					GoNext
+	|Button|					GoPrev
+	|Button|					RecentAndSplash
+	|Button|					BuildButton
+	|Button|					RunButton
 	|message|					RecentFiles
 	|string|					LastCmdStr
 	|date|						LastSendTime
