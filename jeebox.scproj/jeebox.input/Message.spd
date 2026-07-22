@@ -391,7 +391,7 @@ Message is also:
 		fs <~ ch.Next
 
 	
-	syx Bra (Bracket) // don't reorder these... @bra, @list, @prm, @arr is used in iscontainezr.
+	syx Bra (Bracket) // don't reorder these... @bra, @list, @prm, @arr is used in iscontainer.
 		opt norefcounts
 		fs <~ '('
 		fs <~ .First

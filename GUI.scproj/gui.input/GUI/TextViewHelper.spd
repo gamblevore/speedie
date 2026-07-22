@@ -262,10 +262,6 @@ class TextViewLine (list)
 						if par.After == ToFind
 							return par
 
-
-	libinternal Ends (|bool|)
-		return .endswithline or self is last
-		
 		
 	libinternal EndsWithLine (|bool|)
 		opt norefcounts
@@ -332,7 +328,7 @@ class TextViewLine (list)
 			|| i = txt.WrapSub(MaxWidth, IsInline, p)
 			._Text = txt[p, i]
 			(self is EndsNormally) = .EndsWithLine
-			if (i < txt.length) or .EndsWithLine
+			if (i < txt.length) or (self is endsnormally)
 				isnt last
 				return i
 		
@@ -518,7 +514,7 @@ libinternal TextView.AutoLim (|textviewline| d, |bool|)
 		|| after = d.after
 		if d is last
 			after++ // ??
-		if (.Sel1 == after-1)  and  (d.Ends)
+		if (.Sel1 == after-1)  and  (d.endswithline or d is last)
 			return true
 
 

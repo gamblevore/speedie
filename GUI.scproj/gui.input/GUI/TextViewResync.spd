@@ -32,36 +32,45 @@ libinternal TextView.TextMapHasLine (|int| A, |int| B, |bool|)
 		if t[A++].IsTextLine
 			return true
 			
-	
-libinternal TextView.TextMapToOld (|ivec4| Map, |int| P, |textviewline| D,  |int|)
+
+libinternal textviewline.UnimportantDeletion (|ivec4| Map, |int| After,  |bool|)
+	opt norefcounts
+	// deleted an unimportant line
+	if .EndsWithLine
+		if map[1] >= after and self isnt Keepable
+			|| n = .next
+			return n and n is Keepable
+
+
+libinternal TextView.TextMapToOld (|ivec4| Map, |int| NewStart, |textviewline| D,  |int|)
 	// AAA<BBB>CCC		2-->2,		6-->3
 	// AAACCC
 	// AAABBBCCC
+	opt norefcounts
 	
-	|| Start = Map[0]					// 3
-	if P < Start
-		return P
+	|| InsertStart = Map[0]					// 3
+	|| OldAfter = d.After
+	if NewStart < InsertStart
+//		if (LineAfter >= InsertStart) and d.UnimportantDeletion(Map, OldAfter)
+//			return OldAfter	// yikes // can't make sense of this. the concept makes sense.
+								// im frazzled. No idea what to do.
+		return NewStart
 
-	|| InsertLength = Map[2]			// 3
-	|| InsertEnd = Start + InsertLength	// 6
+	|| InsertEnd = InsertStart + Map[2]		// 6
 
-	if P == Start	// Edge-case... maybe theres a more graceful approach
-					// Can't think of it now. Theres no OBVIOUS answer.
-		if d is EndsNormally // ends normally
-		if !.TextMapHasLine(start, insertend) // no lines added... but what about deleted?
-											  // surely, that depends on D? we don't know what used to be there
-											  // we can check if it ends normally, then  check its range.
-			return P
+	if NewStart == InsertStart						
+		if !d.UnimportantDeletion(Map, OldAfter) and !.TextMapHasLine(InsertStart, insertend)
+			return NewStart
 
-	if P >= InsertEnd					// P==6
-		|| Gain = Map[3]				// 3
-		return P - Gain
-	return -1						// deleted :O
+	if NewStart >= InsertEnd				// P==6
+		|| Gain = Map[3]					// 3
+		return NewStart - Gain
+	return -1								// deleted :O
 
 
 libinternal ivec4.TextMapShrink (|string| Old, |string| New, |ivec4|)
-	// for large alterations in a silly way. might as well allow it
-	// for code-debugging, its nice to have a more solid debugger.
+	// For large alterations in a silly way. Might as well allow it
+	// For code-debugging, its nice to have a more solid debugger.
 	|| N = self[2]
 	if N <= 0
 		return self

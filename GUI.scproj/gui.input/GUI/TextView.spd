@@ -599,7 +599,7 @@ class TextView (GUIControl)
 		  else
 			t = (x, x)
 		|| d = .show(x)
-		._PreferPrevLine = fwd and (!d.emptyline or !d.EndsWithLine) 
+		._PreferPrevLine = fwd and (!d.emptyline or !d.EndsWithLine)
 		.SelDirect(t,d)
 		return true
 	
@@ -2222,7 +2222,7 @@ class TextView (GUIControl)
 		|| Parsed = .ParsedMessage
 			// try keep important lines. So... " // abc hahaha", or "", can be removed
 			// but something like "obj.func()" won't be. (That is for merging lines together.)
-			(d is keepable) = msg and !msg.Func.IsList // Don't keep containers
+			(d is keepable) = msg and !msg.iscontainer // Don't keep containers
 
 		(d is colored) = Parsed
 
@@ -2255,7 +2255,7 @@ class TextView (GUIControl)
 		d.tLine = 1
 		|TextViewLine| Last
 		|| P = 0
-		if self == "Editme" and map[2] >= 0
+		if keys.shift and self == "editme" and map[2] >= 0
 
 		while
 			if map[2] >= 0

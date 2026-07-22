@@ -358,7 +358,7 @@ function scobject.UnusedReason (|string|)
 
 
 function Check (|message| cmd, |message|)
-	|| OK = "?"
+	|string--| OK = "?"
 	|| Check = cmd ~= "check"
 		OK = (!.errors.HasProblems).Render
 	.UnusedStuff(cmd, OK) // builds correct structure
