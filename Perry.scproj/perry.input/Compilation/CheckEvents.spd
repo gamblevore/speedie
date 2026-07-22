@@ -2,7 +2,7 @@
 
 
 extend PerryIDE
-	function ReCheck
+	function ReCheck (|object| ReloadOnly=nil)
 		|| StartAt = Perry.FinishedStartUp					#require
 		StartAt += 0.125s * .index
 		require StartAt.Fired or .ModifiedForCompile
@@ -15,7 +15,13 @@ extend PerryIDE
 
 		|| unused = @tmp + "check"
 		unused <~ p * .EditorIsCode
+		
+		if ReloadOnly
+			unused.name = "unused"
 		|| lf = .LostFunks
+			// this is just to help debug my libs.  So it displays which functions are unused
+			// within some libraries that I wrote. (GUI, jeebox, etc). This helps me to spot
+			// unused functions that need to be removed.
 			unused <~ lf.copy
 		.SendFeedbackMsg(unused)
 	
@@ -66,13 +72,17 @@ extend PerryIDE
 					e.ActualReplaceError(str)
 
 
-	function ShowCompileErrors (|message!| msg, |bool| RealCompile, |bool|)
-		|| MaybeOK = msg.first
+	function ShowCompileErrorsFB (|message!| msg, |bool| RealErrors, |bool|)
+		opt norefcounts
+		|| maybeok = msg.first
 		if maybeok.yes
 			.ErrorList.clear
 			.UpdateErrorCount
 			return .CheckedOK(msg.name)
+		return .ShowCompileErrors(msg, RealErrors)
 	
+	
+	function ShowCompileErrors (|message!| msg, |bool| RealCompile, |bool|)
 		// inconsistant input...
 		|| arg = msg.arg
 		arg.cleanErrors
@@ -113,14 +123,12 @@ extend PerryIDE
 	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
 		|| RealErrors	= msg ~!= "check"
 		.ClearErrors(RealErrors)
-		|| NoErrors		= .ShowCompileErrors(msg, RealErrors)
-		|| ErrsVis		= .isviewing(.ErrorList)
+
+		|| NoErrors = .ShowCompileErrorsFB(msg, RealErrors)
+		|| ErrsVis	= .isviewing(.ErrorList)
 		.errorlist.SelectFirst
-		if !RealErrors
+		if !RealErrors or NoErrors
 			0
-		  elseif NoErrors
-			if errsvis
-				.view(.viewfiles)
 		  elseif !errsvis
 			.view(.viewerrors)
 			.say(" failed. Could not compile")
@@ -139,7 +147,6 @@ extend PerryIDE
 		(d isnt compiling)
 		.DebugMode = d
 		.RenableAfterCompile
-		|| i = 0
 		return true
 
 

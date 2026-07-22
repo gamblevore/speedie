@@ -380,23 +380,26 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		  elseif msg starts "asm"
 			.GotASM(msg)
 		  elseif msg starts "check"
-			.CheckFB(msg)
+			.CheckFB(msg, true)
+		  elseif msg starts "unused"
+			.CheckFB(msg, false)
 		  elseif msg starts "define"
 			.DefineFB(msg)
 	.DuringMsgFB = false
 
 
 
-function PerryIDE.UnusedFB (|message!| arg)
+function PerryIDE.UnusedShow (|message!| arg)
 	opt norefcounts
 	for tmp.fast in arg
 		.UnusedFuncsSub(tmp, arg.name)
 
 
-function PerryIDE.CheckFB (|message| msg)
+function PerryIDE.CheckFB (|message| msg, |bool| check)
 	|| Extracted = .UnusedExtract(msg)
-	.ErrorListFB(msg)
-	.UnusedFB(extracted)
+	if check
+		.ErrorListFB(msg)
+	.UnusedShow(extracted)
 	
 
 function EditMeModified (guitextChangeEvent)

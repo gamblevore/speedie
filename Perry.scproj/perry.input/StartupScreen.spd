@@ -78,8 +78,8 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 
 			.CreateOption("Open Project",	"\1a",	ClickedOpenProj,   "Open a Speedie project.")
 			.CreateOption("Open File",		"\11",	ClickedOpenFile,   "Open a text file.")
-			.CreateOption("Create Project", "\19+",	ClickedCreateProj, "Create new Speedie project!")
-			.CreateOption("Create File",	"\11+",	ClickedCreateFile, "Create new text file.")
+			.CreateOption("New Project", "\19+",	ClickedCreateProj, "Create new Speedie project!")
+			.CreateOption("New Script",	"\11+",	ClickedCreateFile, "Create new single file project.")
 
 
 
@@ -94,20 +94,20 @@ function ClickedOpenProj (GUIaction)
 
 
 function ClickedCreateProj (GUIAction)
-	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")
-		perry.CreateProj(path)
+	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")		#require
+	perry.CreateProj(path)
 	perry.HideStartIfNeeded
 
 
 function ClickedOpenFile (GUIaction)
-	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
-		perry.IdeAddProj(file)
+	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")					#require
+	perry.IdeAddProj(file)
 	perry.HideStartIfNeeded
 
 
 function ClickedCreateFile (GUIaction)
-	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")
-		perry.CreateProj(path)
+	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")		#require
+	perry.CreateProj(path)
 	perry.HideStartIfNeeded
 
 

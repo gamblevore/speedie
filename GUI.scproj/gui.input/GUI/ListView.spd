@@ -123,7 +123,6 @@ class ListView (GUIControl) {
 			rz.ListSource.Clear
 			return rz
 		rz = menu(self, nil, nil)
-		rz.clipmode = ControlClipMode.SlideBackInWindow
 		rz.id = "cmm"
 		.cmm = rz
 	

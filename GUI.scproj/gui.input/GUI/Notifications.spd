@@ -1,7 +1,7 @@
 
 
 module Notifications
-	linkage: cpp_part Note 
+	linkage: cpp_part Note
 	|Guicontrol of window| Alerts = guicontrol(nil)
 	init()
 	

@@ -809,7 +809,7 @@ So anything not 0 means "its OK"`
 		.PopupHide
 		.AddToJumpHistory
 		if  !g  and  .IsEditingSource
-			.Recheck
+			.Recheck(self)
 			.TryReselectASM
 		  else
 			.HideASM

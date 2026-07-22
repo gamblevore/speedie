@@ -814,7 +814,7 @@ module GUI
 
 	
 	libinternal SingleFrameNested (|bool|)
-		if .SingleFrameDepth <= 1
+		if .SingleFrameDepth <= 4
 			.SingleFrameDepth++
 			|| WasQuitting = .quitreason
 			rz = .SingleFrameSub
@@ -1342,6 +1342,8 @@ module GUI
 				.BlockTextInput = true
 				return GUIActivity.activity
 		
+		// not sure why this is 2. Are we trying to stop this from dialogs?
+		// or stop it being opened just to close? Or what?
 		if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)
 			keys.escape.eat
 			return  AppMenu.show

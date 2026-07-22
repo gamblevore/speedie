@@ -90,13 +90,12 @@ function PerryTalk (|SpdProcess| perry)		// ReturnsWhenPerryClosesUs
 	Compiler.CompileAll
 	compiler.InPerry = 2
 	.ParserRestore
-//	perry <~ .check
 	
 	for cmd in perry
-		target debug
-			printline "------------"
-			printline cmd
-		
+//		target debug
+//			printline "------------"
+//			printline cmd
+//		
 		loop .CmdWrap(cmd)
 
 	"StartExit"
@@ -163,28 +162,26 @@ function MiniErrors (|errorreceiver| L, |errorseverity| sev = errorseverity.warn
 
 function ErrorsInAWayThatPerryLikes (|message|)
 	if !.Cleaned
-		|| i = 0
 		.errors!.PrePrintErrors
 		.Cleaned = true
 	return .MiniErrors(.errors!)
 
 
-function UnusedStuff (|message| cmd)
+function UnusedStuff (|message| cmd, |string| OK)
 	opt norefcounts
 	|| path = cmd[@str]
 	if !path
 		path = cmd.msg(@str)
 	path.RemoveAfter
 	path.RemoveBefore
-	cmd.name = "check"
-	cmd <~ (@thg, (!.errors.HasProblems).render)
+	cmd <~ (@thg, OK)
 	path.prev = path.next
 	|| arg = cmd.GiveArg
 	
 	|| name = path.name									#require
 	|| scf = compiler.files.valuelower(name)			#expect ("No file at: " + name)
 
-	// special feature to check if an important project uses all the functions of a library
+	// Special feature to check if an important project uses all the functions of a library
 	// which is nice... so you know all your lib funcs are actually tested. Some might be...
 	// useless and better off removed if no one needs them. This is set somewhere in the conf I guess.
 	|| unused_libs = path.next
@@ -192,15 +189,8 @@ function UnusedStuff (|message| cmd)
 			if lib.ExpectString
 				lib.HateUnusedFuncs
 	
-	if !Compiler.Successfulness or scf.Unfinished
+	if scf.Unfinished
 		return
-
-	// what about constants, and globals that are unused?
-	// we have a global list... but constants? I guess theres a module-list?
-	// but we also have the ability to set constant anywhere, right?
-	// they'd need to have an array, per-file, of consts
-	// unused properties too? I think those must be in a class.
-	// we could mark each constant-section in the file?
 	
 	for fn in Compiler.FuncList
 		if fn.File == scf
@@ -294,7 +284,7 @@ function SCFunction.CheckUnused (|message| feedback)
 	require self isnt Disabled
 	require self isnt InitFunc
 
-	if .IsUnused
+	if .IsUnused and Compiler.Successfulness
 		|| src = .source
 			|| str = "() is unused."
 			if .linkfrom != nil
@@ -367,10 +357,14 @@ function scobject.UnusedReason (|string|)
 	return "unused."
 
 
-function Check (|message| cmd=@tmp.msg, |message|)
-	.UnusedStuff(cmd) // clears
-	|| Errors = Interact.ErrorsInAWayThatPerryLikes
-	cmd.GiveArg.AppendAll(errors)
+function Check (|message| cmd, |message|)
+	|| OK = "?"
+	|| Check = cmd ~= "check"
+		OK = (!.errors.HasProblems).Render
+	.UnusedStuff(cmd, OK) // builds correct structure
+	if Check
+		|| Errors = Interact.ErrorsInAWayThatPerryLikes
+		cmd.GiveArg.AppendAll(errors)
 	return cmd
 
 
@@ -391,10 +385,10 @@ function ReportMemory (|Message| cmd, |message|)
 function DoCmd (|Message| cmd, |message|)
 	require cmd == @tmp
 	
-	if !.InitedOK:						return cmd.SendPerryErrors
-	if cmd ~= "check":					return .Check(cmd)
-	if cmd ~= "mem":					return .ReportMemory(cmd)
-	if cmd == 1 or cmd.last == @name:	return .autoJump(cmd)
+	if !.InitedOK:							return cmd.SendPerryErrors
+	if cmd ~= "check" or "unused":			return .Check(cmd)
+	if cmd ~= "mem":						return .ReportMemory(cmd)
+	if cmd == 1 or cmd.last == @name:		return .autoJump(cmd)
 
 	|| req = cmd[@str].name
 	|| my_file = compiler.files.valuelower(req)
