@@ -152,7 +152,7 @@ class Breakout (Window)
 		
 	
 	behaviour FrameStep
-		require GUIActive
+		require WindowActive
 		|| MinSp = .BallSpeed/4
 		for (b.backwards in .explosions) (i)
 			b.Radius -= 0.03

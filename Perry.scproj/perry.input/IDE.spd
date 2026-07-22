@@ -146,7 +146,7 @@ class PerryIDE (Window)
 		.EditStatus.text = str
 
 
-	function PathExpand (|string| path, |string|)
+	function @perryide.PathExpand (|string| path, |string|)
 		if !perry.pathdict
 			perry.pathdict = [ "spd"  :  file.speediedir ]
 		rz = path.Path_Expand(perry.PathDict)					#expect ("Unrecognised @ in: " + path)
@@ -366,7 +366,8 @@ class PerryIDE (Window)
 	
 	function ProjName (|string|)
 		disabled "Use .name"
-		
+	
+	
 	function Name (|string|) //.ProjName
 		opt norefcounts
 		|| m = .SharedProjectTabSource
@@ -525,8 +526,9 @@ class PerryIDE (Window)
 	
 	
 	behaviour FrameStep // perframe, eachframe, onframe
+		.CurrFileName.Text = .path.Name				// in case of rename?
 		.ProjectTabs.TrimWidth
-		if GUIactive
+		if WindowActive
 			.SaveMemory
 			if !.focus
 				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
@@ -554,7 +556,7 @@ class PerryIDE (Window)
 		if ._FrameNum == 1
 			.CheckModified
 		
-		if GUIActive and !.DebugArgsText.HasFocus
+		if WindowActive and !.DebugArgsText.HasFocus
 			.HideStuff
 
 

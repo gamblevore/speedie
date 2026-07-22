@@ -67,13 +67,16 @@ class FileRow (ListViewRow)
 		fv.checksize
 	
 	
-	function MoveTo (|string| v, |bool|) // rename
+	libinternal MoveTo (|string| v, |bool|) // rename
 		if (v contains '/') or (v.FindBadUTF8) or (Charset.line in v)
 			beep v + " is not a valid filename!"
 			return false
 		
 		if .FilePath ~= v
 			return false
+
+				// we need to send an event so the editor knows the file-name has changed...
+		
 		|| l = .FilePath.file
 		|| f = l.sibling(v)
 		if .FilePath != f

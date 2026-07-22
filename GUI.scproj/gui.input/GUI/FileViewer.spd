@@ -523,10 +523,10 @@ class FileViewer (ListView)
 		
 		libinternal FileRowRenamer (guilisteditevent)
 			opt norefcounts
-			|| o = cell.row as filerow
-				if value==nil
-					return FileRowCell(o, cell.column)		// getting the value for edit.
-				o.MoveTo(value)
+			|| fr = cell.row as filerow		#require
+			if value == nil
+				return FileRowCell(fr, cell.column)		// getting the value for edit.
+			fr.MoveTo(value)
 		
 		
 		libinternal FileRowScoreSorter (SorterComparer of FileRow)

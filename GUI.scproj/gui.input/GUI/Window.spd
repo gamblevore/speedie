@@ -66,7 +66,7 @@ class Window (GUIControl)
 		.ClearTree
 
 
-	virtual FrameStep (|bool| GUIActive)
+	virtual FrameStep (|bool| WindowActive)
 		0
 
 //	virtual TryClose (|GUIActivity| Reason=GUIActivity.windowclose, |bool|)
@@ -439,7 +439,7 @@ class Window (GUIControl)
 	function guicontrol.ControlAt (|ivec2| P, |int| Pad=0, |Guicontrol?|)
 		opt norefcounts
 		description "Returns a control at the position P. To ignore disabled controls use syntaxaccess"
-		for R.reverse in self
+		for R.backwards in self
 			if (r is visible) and !r.decluttering
 				|| rr = r.lastrect ± -pad
 				if rr contains P

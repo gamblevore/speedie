@@ -1116,13 +1116,19 @@ class TextView (GUIControl)
 			.AddErrorToLine( err, true )
 	
 
-	function ClearErrors
+	inline ClearParseErrors
+		.ClearErrors(true)
+	
+	
+	function ClearErrors (|bool| ParseOnly = false)
 		opt norefcounts
-		require .MyError
-		.MyError = nil
+		|| e = .MyError$
+		if !Parseonly or e is parse
+			.MyError = nil
 		|| s = .Selectedline
 		for d in .WrappedLines
-			if d.LineError
+			e = d.lineerror
+			if e and (!Parseonly or e is parse)
 				if d == s
 					.shownoextra
 				d.LineError = nil
@@ -1511,7 +1517,7 @@ class TextView (GUIControl)
 		|| msg = .text.Parse
 			msg.obj = .Filepath
 			if .MyError is parse				// its ok now!
-				.ClearErrors
+				.ClearParseErrors
 		  else
 			|| e = StdErr.pop
 			if .JeeboxMode is Expect			//
@@ -2152,7 +2158,7 @@ class TextView (GUIControl)
 	libinternal Parse (|bool| Changed, |documentjeeboxmode| Mode, |message|)
 		cpp_Part ViewParseSub
 		if !.WillAttemptParse(Mode)
-			.ClearErrors						// more reliable
+			.ClearParseErrors						// more reliable
 			|| v = ._Viewing
 				v.DocParsed = nil
 			return nil
@@ -2168,7 +2174,7 @@ class TextView (GUIControl)
 		p = .ValidateNewText
 		
 		if Mode isnt expect
-			.ClearErrors
+			.ClearParseErrors
 		return p
 
 

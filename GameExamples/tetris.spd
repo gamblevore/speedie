@@ -99,7 +99,7 @@ class TetrisWin (Window)
 
 	
 	behaviour FrameStep
-		require GUIActive
+		require WindowActive
 		if .Grid.State >= 1 // game over
 			.GameOver
 		  else

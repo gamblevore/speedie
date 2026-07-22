@@ -577,7 +577,7 @@ function PerryFileViewRightClick (GuiListEvent)
 
 
 function FileViewerCountCode (GuiMenuEvent)
-	|| row = clicked!.row as filerow			#require
+	|| row = clicked!.row as filerow				#require
 	|| CLOC = (0, 0)
 	|| FileCount = 0
 	|| Size = 0
@@ -630,6 +630,18 @@ function listview.PerryCopyComms (guicopyevent)
 	|| cp = listview.defaultcopy|guicopyevent|
 	return (cp)(self, item)
 
+
+// So... we are tired
+// we are sooo tired
+// not knowing what to do...
+// its a function
+// its a function of destruction
+// we are disconnected
+// i can't see... what to do.
+// yeah... callbacks, functions, tasks, overrides, whatever
+// it should be easy.
+// but its not.
+// in theory... just override PerryRenameFile. But not so easy.
 
 
 

@@ -98,7 +98,7 @@ class SandSimulator (Window)
 		
 		
 	behaviour FrameStep
-		require GUIActive // and (.FrameCount+1) isa 16
+		require WindowActive // and (.FrameCount+1) isa 16
 		.Touch
 		
 		|| rnd = 64K()

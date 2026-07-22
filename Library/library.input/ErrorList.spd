@@ -210,7 +210,7 @@ class ErrorReceiver
 	function LastError (|error|)
 		visible
 		opt norefcounts
-		for err.reverse in .errors
+		for err.backwards in .errors
 			if Err.iserror
 				return err
 

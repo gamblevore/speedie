@@ -132,9 +132,7 @@ module Perry
 		.BuildAppMenu
 		.LoadRecents
 	
-		target debug
-			if app.CWD == "/"
-				app.RemoveArg("YES") // work around for Xcode bug
+		app.GoddamnXcodeBugs // work around for Xcode bug
 
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
@@ -155,7 +153,7 @@ module Perry
 
 	function ProjContaining (|string| path, |PerryIDE|)
 		opt norefcounts
-		for w.reverse in window.all
+		for w.backwards in window.all
 			if w isa perryide
 				if w.FindPath(path)
 					return w

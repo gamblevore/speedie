@@ -155,7 +155,7 @@ class Breakout (Window)
 	
 	
 	behaviour FrameStep
-		require GUIActive
+		require WindowActive
 		// we want to draw the framecount... and the total number of seconds we have run...
 		|| MinSp = .BallSpeed/4.0
 		for (b.backwards in .explosions) (i)

@@ -1,10 +1,12 @@
 
 
-function App.RemoveArg (|string| Name)
+function App.GoddamnXcodeBugs
 	opt norefcounts
-	for (s.backwards in .args) (ind)
-		if s ~= name
-			.args.remove(ind)
+	target debug
+		if app.CWD == "/"
+			for (s.backwards in .args) (ind)
+				if s ~= "YES"
+					.args.remove(ind)
 
 
 function ClickedEditPrefs (GUIMenuEvent)

@@ -476,7 +476,7 @@ module GUI
 
 	function FrontDialog (|window|)
 		opt norefcounts
-		for w.reverse in window.all
+		for w.backwards in window.all
 			if w.IsDialog
 				return w
 	
@@ -625,7 +625,7 @@ module GUI
 
 	libinternal DrawWinFrom (|window|)
 		opt norefcounts
-		for w.reverse in window.all
+		for w.backwards in window.all
 			if w.isviewable and w.UsesEntireScreen
 				return w
 		return window.all.first

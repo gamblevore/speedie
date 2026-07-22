@@ -57,7 +57,7 @@ class SnakeWin (window)
 		return .Snake.Last!.pos
 		
 	behaviour FrameStep
-		require GUIActive
+		require WindowActive
 		|| D2 = keys.Movement.Sign.xz.iVec2
 			if d2.x: d2.y = 0
 			|| H2 = .head+d2
