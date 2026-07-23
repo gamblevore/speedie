@@ -33,25 +33,25 @@ function String.ArgSwitch (|string| name, |bool|)
 	// * (value)	  for paths:	 "/usr/dir/filexx"
 
 
-autogen @int.MainArg         (|int| Pos, |string| name, |int|)
+autogen @int.MainArg		(|int| Pos, |string| name, |int|)
 	|| big = int64.mainarg(pos, name)
 	expect (big <= int.max and big >= int.min) ("Int out of range")
 	return big
 
 
-autogen @int64.MainArg       (|int| Pos, |string| name,  |int64|)
+autogen @int64.MainArg		(|int| Pos, |string| name,  |int64|)
 	return string.MainArgSub(Pos, name, "integer")$.int
 
 
-autogen @bool.MainArg        (|int| Pos, |string| name,  |bool|)
+autogen @bool.MainArg		(|int| Pos, |string| name,  |bool|)
 	return string.MainArgSub(Pos, name, "boolean")$.Yes
 
 
-autogen @string.MainArg      (|int| Pos, |string| name, |string|)
+autogen @string.MainArg		(|int| Pos, |string| name, |string|)
 	return string.MainArgSub(Pos, name, "string")
 
 
-autogen @message.MainArg     (|int| Pos, |string| name, |message|)
+autogen @message.MainArg	(|int| Pos, |string| name, |message|)
 	|| str = string.MainArgSub(Pos, name, "jeebox")
 	ifn str contains '\n' // a file-path?
 		|| s0 = str[]
@@ -60,7 +60,7 @@ autogen @message.MainArg     (|int| Pos, |string| name, |message|)
 	return str.parse
 
 
-autogen @float.MainArg       (|int| Pos, |string| name, |Float64|)
+autogen @float.MainArg		(|int| Pos, |string| name, |Float64|)
 	return string.MainArgSub(Pos, name, "float")$.float
 
 
@@ -76,7 +76,7 @@ autogen @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
 	return string.MainArgSub(Pos, name, "file-size")$.float(true)|FileSizeInt|
 
 
-autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
+autogen @string.MainArgSub	(|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
 	opt norefcounts
 	|| str = app.args[pos.abs-1]
@@ -90,7 +90,7 @@ autogen @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringt
 
 ////////////////////////////////////////////////////////
 
-autogen app.MainArgsStart (|string| Usage, |bool| Silent=false, |int|)
+autogen app.MainArgsStart	(|string| Usage, |bool| Silent=false, |int|)
 	opt norefcounts
 	if !.usage
 		.usage = usage
