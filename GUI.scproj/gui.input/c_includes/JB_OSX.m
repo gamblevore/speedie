@@ -33,6 +33,34 @@ void JB_App__Beep(void) {
 	NSBeep();
 }
 
+/*
+// How to actually REGISTER for receiving the keypresses? and how
+// to report that you caught the keypress? So that no other apps get it?
+// Something to do with togglePlayPauseCommand MPNowPlayingInfoCenter ?
+
+- (void)setupRemoteCommandCenter {
+    // 1. Get the shared remote command center
+    MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
+    
+    // 2. Add a target action specifically for togglePlayPauseCommand
+    [commandCenter.togglePlayPauseCommand addTarget:self action:@selector(handleTogglePlayPauseCommand:)];
+}
+
+// 3. Implement the callback method
+- (MPRemoteCommandHandlerStatus)handleTogglePlayPauseCommand:(MPRemoteCommandEvent *)event {
+    // Check your custom playback state
+    if (self.isAudioPlaying) { 
+        [self pausePlayback];
+    } else {
+        [self startPlayback];
+    }
+    
+    // Inform the OS that the command was processed successfully
+    return MPRemoteCommandHandlerStatusSuccess;
+}
+ */
+ 
+ 
 void JB_App__ShowURL (const char* Path) {
 	NSString* Where = [NSString stringWithUTF8String: Path];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:Where]];
