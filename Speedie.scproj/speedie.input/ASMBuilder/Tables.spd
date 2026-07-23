@@ -725,17 +725,17 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		  else
 			dest.reg = src
 	  elseif (dest iz src) and (mode & IncrAfter)
-		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	 // x = x++ makes no sense
+		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	// x = x++ makes no sense
 		return src
 	
 
 	src = src as asmreg.noscale
-	dest.µType = src.µType							// right? it can't be different.
-	|| p = exp.parent!								// better positions
+	dest.µType = src.µType									// right? it can't be different.
+	|| p = exp.parent!										// better positions
 	if src is ContainsAddr
 		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
-	if src is temp // x[1]++,  // y = x[1], y++, x[1] = y
+	if src is temp											// x[1]++,  // y = x[1], y++, x[1] = y
 		|| fat = src.fat
 		if fat isa asm.VGET
 			return .IncrVectorPart(p, dest, src, amount, mode)

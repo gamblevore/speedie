@@ -143,7 +143,7 @@ function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty,
 	opt norefcounts
 	require (self isnt DebugVarOpen) or (self isa asm.mark)
 	require self isnt DebugVarClose			// for cleanlyness
-	if (.Output.Reg == Declared.reg)
+	if (.Output iz Declared)
 		|| msg = .msg
 		if (msg.NilDecl == ty)
 			return true

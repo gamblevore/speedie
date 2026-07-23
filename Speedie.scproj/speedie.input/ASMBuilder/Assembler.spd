@@ -175,25 +175,32 @@ struct Assembler
 		if !dest or dest == asmreg()
 			dest.µtype = T
 		dest = .TempOnly(dest)
+
 		|| Where = orig • dest
 		(where is Const)
 		(where isnt ContainsAddr)
 		where.µType = T // why so much fiddling?
+
 		|| K = .NumToReg(exp, where, amount, T)
-		return .Plus(exp, dest, Orig, K)
+		rz = .Plus(exp, dest, Orig, K)
+		ifn rz iz dest // it took a shortcut, like adding 1 to 0, it just returned the 1
+			rz = .assign(exp, dest, rz) // but we don't want that here.
+			
 	
 	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-		if !dest.reg // more about keeping the type, I guess.
-			dest = src
-		return .AddToReg(exp, dest, src, value) 
+//		if !dest.reg // more about keeping the type, I guess.
+//			dest = src
+		return .AddToReg(exp, src, src, value)
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
 			return exp.ADAK(dest, Src, Value) * Dest
 		rz = .Assign(exp,  .temponly(dest),  Src)
-		.IncrPre(exp, Src, Src, value)
+		if !dest.reg
+			dest = src
+		.AddToReg(exp, dest, src, value) 
 
 
 	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)

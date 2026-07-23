@@ -20,7 +20,7 @@ extend Assembler
 		|| vget = src.fat!
 		|| VReg = vget.asmreg(2)
 		|| VecIndex = vget.prms[3]
-		if src.isfloat or vreg.reg
+		if src.isfloat or vreg.reg // not sure this makes sense. how does adding to a reg extract the vecindex?
 			|| NewValue = .AddToReg(exp, nil, src, value)		// S[1]++  -->  x = S[1], x++, S[1] = x			exp.VSET(src, NewValue, vreg, VecIndex)
 			if dest is Discard
 				return dest
