@@ -800,7 +800,7 @@ class ListView (GUIControl) {
 			return MouseDragging.DragEvenIfStill
 		
 		if .ClickedScroll(P, clicks)
-			return mousedragging.DragWithin
+			return mousedragging.DragWithin + MouseDragging.Eaten
 		
 		|| FirstSel = .FirstSelected
 		|| LC = .FindClickedCell(P)							// leaks

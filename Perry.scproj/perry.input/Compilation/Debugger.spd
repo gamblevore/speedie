@@ -48,7 +48,7 @@ function CakeTalk (|SpdProcess| Cake)
 function SetBreaks (|message| breaks)
 	opt norefcounts
 	|| file = breaks.FirstName
-	require file ~= .editme.FilePath
+	require file ~= .Path
 
 	|| All = breaks.second.int
 		.editme.debuglevel = TextView.DebugLevelDebugging

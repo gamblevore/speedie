@@ -526,18 +526,18 @@ class PerryIDE (Window)
 	
 	
 	behaviour FrameStep // perframe, eachframe, onframe
-		.CurrFileName.Text = .path.Name				// in case of rename?
+		.LoadCurrFileName						// in case of rename?
 		.ProjectTabs.TrimWidth
 		if WindowActive
 			.SaveMemory
 			if !.focus
-				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
+				.setfocus(.editme)				// shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 
 		if .CheckCrashed(.feedback, "feedback")
 			.Feedback = nil
 		if .CheckCrashed(.compilr,  "compiler")
-			.Compilr = nil // not needed? checkcrashed clears it (via wierd logic)
+			.Compilr = nil						// not needed? checkcrashed clears it (via wierd logic)
 
 		|| f = .Feedback
 			.SpeedieMsgReceive(f)
@@ -773,6 +773,14 @@ So anything not 0 means "its OK"`
 		return .editme.FilePath
 	
 
+	function LoadCurrFileName
+		|string--| p = .path
+		|| s = p.name
+		if s[] == '.'
+			s = p.parent.name + "/" + s
+		.CurrFileName.text = s
+	
+	
 	function EditFile (|FileRow| r, |int|) // loadfile, fileload, fileedit, openfile, fileopen
 		require r and r.FilePath and !.DuringLoad
 		// the drawing thing needs a document too!
@@ -794,12 +802,7 @@ So anything not 0 means "its OK"`
 			return ok
 
 		|| IsNewlyOpened = !r._Document
-		|| s = r.DirFile.name
-		if s[] == '.'
-			s = r.name + "/" + s
-		  else
-			s = r.name
-		.CurrFileName.text = s
+		.LoadCurrFileName
 		.DuringLoad++
 		.filelist.select(r)
 		

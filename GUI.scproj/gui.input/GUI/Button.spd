@@ -4,7 +4,7 @@ class Button (GUIControl)
 	linkage
 		cpp_part Btn
 		
-	|GUIAction?|				Pressing
+	|GUIAction?|				OnPress
 	|GUIAction?|				OnOver
 	|guiaction?|				OnRightClick
 	|date|						StepDuration
@@ -25,15 +25,15 @@ class Button (GUIControl)
 	|bool| 						DontDrawClicked
 	|ListViewState|				Align
 
-	constructor (|guicontrol| p,  |GUIAction| act,  |GUIAction| pressing=nil,  |GUIListEvent| ret=nil, |guiaction| OnRightClick=nil)
+	constructor (|guicontrol| p,  |GUIAction| OnClicked,  |GUIAction| OnPress=nil,  |GUIListEvent| MenuAccept=nil, |guiaction| OnRightClick=nil)
 		super.constructor(p)
-		.onclicked = act
-		.pressing = pressing
+		.onclicked = OnClicked
+		.OnPress = OnPress
 		.ItemGap = 4
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
 		.align = ListViewState.aligncenter 
-		.subcontrol = .InitMenu(ret, pressing)
+		.subcontrol = .InitMenu(MenuAccept, OnPress)
 
 	libinternal InitMenu (|GUIListEvent| ret, |guiaction| Pressing,   |menu|)
 		if ret
@@ -163,7 +163,7 @@ class Button (GUIControl)
 		
 	libinternal DoPressing (|listviewrow| D, |bool|)
 		.ClearMouse
-		return (.Pressing!)(self, 0, D)
+		return (.OnPress!)(self, 0, D)
 
 	
 	behaviour MouseDown
@@ -181,11 +181,11 @@ class Button (GUIControl)
 					cl.moveto(D)
 					.touch
 					._PressingDone = true
-				if !.pressing or ._PressingDone
+				if !.OnPress or ._PressingDone
 					return mousedragging.DragBeyond
 				ret = mousedragging.DragEvenIfStill // ?
 		
-		if keys.option and .pressing
+		if keys.option and .OnPress
 			.DoPressing(D)
 			return mousedragging.DragEvenIfStill
 
@@ -200,7 +200,7 @@ class Button (GUIControl)
 		if D
 			.ClickedItem ?= d
 		
-		if !.Pressing
+		if !.OnPress
 			return (mousedragging.DragBeyond (D) mousedragging.handled)
 		
 		|| n = gui.FrameStart
@@ -310,7 +310,7 @@ class Button (GUIControl)
 			pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
 			
 			|| MI = MouseXInside and  (R.y1y2 contains M.y)
-			require  mi and !disabled and .pressing  and  r.Width > 19
+			require  mi and !disabled and .OnPress  and  r.Width > 19
 			
 			(pn.x min= r.x2-2)
 			|| ago = -.DelayTill.GuiAgo.Float

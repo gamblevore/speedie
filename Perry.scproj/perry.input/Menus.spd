@@ -48,7 +48,7 @@ function PerryIDE.AddToJumpHistory
 	.EnablePrevNext
 	
 
-function RightClickNext (GUIaction)
+function RightClickHistory (GUIaction)
 	if self isa Button
 		|| s = .SubMenu
 			s.OnTypingFilter = PerryFileListFilter
@@ -56,14 +56,14 @@ function RightClickNext (GUIaction)
 			.OpenMenu
 
 
-function ChosePrevItem (GUIListEvent)
+function ChoseHistoryItem (GUIListEvent)
 	|| i = .ide
 	|| old = i.FindInHistory(row.firstname)
 	i.GoToMarker(old ?? row, 1)
 	return true
 
 
-function ClickedPrevNext (GUIaction)
+function ClickedHistory (GUIaction)
 	opt norefcounts
 	|| i = .ide
 	|| m = i.FindInHistory(i.Path)

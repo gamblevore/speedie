@@ -60,7 +60,7 @@ extend PerryIDE
 			return true
 		
 		if key is COMMA
-			return ClickedPrevNext(.goprev)
+			return ClickedHistory(.goprev)
 		
 		if key is ESCAPE
 			return .CancelKey
@@ -73,7 +73,7 @@ extend PerryIDE
 		if key is period
 			if keys.shift
 				return .CancelKey
-			return ClickedPrevNext(.gonext)
+			return ClickedHistory(.gonext)
 		
 		if key is b
 			Clickedcompile(.buildbutton)
@@ -98,7 +98,7 @@ extend PerryIDE
 
 		if key is l							// l = file list
 			if keys.option or keys.Shift
-				RightClickNext(.goprev)
+				RightClickHistory(.goprev)
 				return .goprev.searchmenu
 			  else
 				return .ShowQuickStuff(true)

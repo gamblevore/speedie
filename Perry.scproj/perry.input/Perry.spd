@@ -193,7 +193,7 @@ function SetTab2Name (|message| old)
 
 function EditorIsCode (|bool|)
 	opt norefcounts
-	return .editme.FilePath.PathIsCode
+	return .Path.PathIsCode
 
 
 function ProjectIsCode (|bool|)

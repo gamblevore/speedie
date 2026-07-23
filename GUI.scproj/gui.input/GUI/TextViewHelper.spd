@@ -7,14 +7,14 @@ datatype TextLineFlags (uint16)
 		FakeMsg
 		StartsNormally
 		Keepable
-		EndsNormally
+		EndsNormally			// getting out of sync with .endswithline somehow.
 		Last					// remove this? we could just check .IsLast
-		Selected
+//		Selected
 
 	///
 		BreakPoint = 1<<13
-		ActiveBreakPoint = 1<<14
-		CodeReached = 1<<15
+		ActiveBreakPoint = 2<<13
+		CodeReached = 4<<13
 		CodeBreak = ActiveBreakPoint+BreakPoint
 		UserFlags = 7<<13
 		
@@ -33,8 +33,6 @@ class TextViewLine (list)
 	|int|					tline
 	|TextLineFlags|			TextFlags
 	|int|					CompilePos	// Position at compile time
-										// when we close a file we lose the info.
-										// The document could store a list of lines?
 
 	constructor (|int| p = 0)
 		inlined
@@ -394,7 +392,7 @@ libinternal textview.DrawLighter (|image| Where, |int| y)
 	.drawbackground(Where, y, col.px)
 
 
-libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |int|)
+libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y, |bool| Selected,   |int|)
 	opt norefcounts
 	
 	|| x = .DrawOneStartLine(d.text)
@@ -403,7 +401,7 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 		|| P = (x-(4+font.width), y)
 		|| TLine = d.tline
 		|| pr = d.prev
-		|| lc = .LineNumColor(d)
+		|| lc = .LineNumColor(d, selected)
 		if !pr or (tline != pr.tline)
 			|| F = font.small!
 			while
@@ -429,18 +427,23 @@ libinternal TextView.UseColorAnyway (|int|)
 		return 3
 
 
-libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |int|)
+libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |bool| Selected,   |int|)
 	require .UsingLineNumbers
 	rz = 0x13FFFFFF
 	if ._DrawInLineArea & 1
 		._DrawInLineArea |= 2
-		if d is Selected
+		if Selected
 			rz += 0x0F000000
 
 
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
 	opt norefcounts
 	opt min 3
+	target debug
+		if keys.shift and self == "editme"
+			if d.text[] == '/' 
+				if	d.text[1] != '/'
+		
 	|| GoUp = (7 - .lineheight) / 2
 	if d.LineError
 		.DrawErrorBackground(where, y + GoUp, d)
@@ -456,12 +459,10 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 				|| x = .LastRight - (.gnormal.width(str) + 10)
 				where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
 
-	(d isnt Selected)
-	if .CanDrawSelected(d)									// linelight
-		(d is Selected)
+	|| Selected = .CanDrawSelected(d)									// linelight
 		.DrawLighter(where, y+GoUp)
 	
-	|| x	 = .DrawLineNumber(where, d, y)-1
+	|| x	 = .DrawLineNumber(where, d, y, selected)-1
 	|| state = MsgTextDrawState(x, d)
 	|| NoDrawFirst =  (self is CodeEditor)  and  ((m and d is ActiveBreakPoint) or (d is breakpoint))
 		|| col = vec4(0)
@@ -477,7 +478,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		
 	|codepoint| Prev
 	|| xlimit = .lastrect.x2
-	|| SpaceDisplay = .SpaceDisplayAsDot(d)
+	|| SpaceDisplay = .SpaceDisplayAsDot(d, Selected)
 	for (c.CodePoints2 in state.t) (pos)
 		x = state.next(c, pos)
 		if x > xlimit
@@ -642,11 +643,11 @@ function error.TextColor (|float| alpha=1.0, |vec4|)
 		rz.a *= 0.5
 
 
-libinternal textview.LineNumColor (|textviewline| D, |imagepixel|)
+libinternal textview.LineNumColor (|textviewline| D, |bool| Selected,  |imagepixel|)
 	opt norefcounts
 	|| fn = .OnDrawLineNumber ?? textviewline.ColorLineNum
 	|| w = (fn)(d, nil, (._DrawInLineArea&1)!=0)
-	if d is Selected
+	if Selected
 		w.a *= 2.0
 	|| c = w.a.mix(.gnormal.bg.Color, w)
 	c.a = 1.0

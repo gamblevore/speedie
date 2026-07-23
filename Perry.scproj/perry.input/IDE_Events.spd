@@ -339,7 +339,7 @@ function PerryIDE.MassSearch (|bool|)
 		.NoNeed("The search text “${t}” wasn't found", nil)
 		perry.FindElseWhere(self, t, ID)
 	  else
-		.noneed
+		.NoNeed
 	return true
 
 			
@@ -435,7 +435,7 @@ function PerryIDE.ClickedError (|error| row)
 	require !.DuringMsgFB
 	using self
 		|| f = row.path.file
-		if (row.path != .editme.filepath) and f.IsNicelyViewable
+		if (row.path != .path) and f.IsNicelyViewable
 			.EditPath(f, false)
 		.editme.ShowAndSelect(row.position, true)
 		.editme.MyError = row

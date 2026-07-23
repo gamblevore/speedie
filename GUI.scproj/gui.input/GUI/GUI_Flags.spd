@@ -80,21 +80,21 @@ struct TimeFader
 		|| f = .final
 		if !f
 			return 1.0
+		if f == -1
+			return 0
+		GUI.touch
 		|| remain = f - gui.framestart
-		if remain > 0
-			GUI.touch
-			rz = (remain.float * .Scale).clamp
-			if !rz
-				.final = 0
-				.scale = 0
+		if remain <= 0
+			.final = -1
+			return 0
+		return (remain.float * .Scale).clamp
 	
-	function Finished (|date| now=gui.framestart, |bool|)
-		|| f = .final
-			return now >= f
+	inline Finished (|bool|)
+		return .final == -1
 
 	function Hide
 		GUI.touch
-		.final = gui.framestart
+		.final = -1
 		.scale = 0
 
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)

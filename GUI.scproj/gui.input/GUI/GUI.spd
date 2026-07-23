@@ -269,6 +269,7 @@ module GUI
 
 
 	function MouseXY (|ivec2|)
+		// sexy mouse
 		|| x = -1,  || y = -1
 		SDL_GetMouseState(x, y)
 		return (x,  y).sdlxy

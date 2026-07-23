@@ -1119,18 +1119,14 @@ void JB_DeleteSub_ ( FreeObject* Obj, AllocationBlock* Block ) {
 
 // This COULD be optimised... so that we can do this with a... "stackless" system!
 // it just uses loops. We create a delete-tree using the objects RAM...
-// overwritign the last property. 
+// overwriting the memory we have decremented.
 // that is... if we are deleting an object-tree... we don't actually need a function stack
-// We'd need our optimised refcounting system... where we have like a 64-bit
-// number that stores all the stuff we need to delete an object. PerryIDE only has 61 objects
-// we can perhaps store the class-hierarchy within the 64-bit number or whatever.
-// no need to worry about jbobject/savable... PerryIDE is only 3 classes deep...
-// list is a bit of an issue, but that can be separately optimised :)
-// could store the delete-info in the behaviour table or the allocationblock... either is ok.
-// we could specify a compile flag that warns if any classes unnecssarily have too many vars
-// to use optimised destructors.
-// Not relevant to any CakeVM stuff. Put off its time...
 
+
+// Another opt could be optimised decrementing. 
+// Each class gets a 64-bit number, storing all the po itions to destroy objects at.
+// could store the delete-info in the behaviour table or the allocationblock... either is ok.
+//Put off for now.
 
 
 #if __VM__

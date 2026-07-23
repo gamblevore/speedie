@@ -2256,7 +2256,8 @@ class TextView (GUIControl)
 		d.tLine = 1
 		|TextViewLine| Last
 		|| P = 0
-		if keys.shift and self == "editme" and map[2] >= 0
+		target debug
+			if keys.shift and self == "editme" and map[2] >= 0
 
 		while
 			if map[2] >= 0

@@ -172,7 +172,7 @@ function PerryIDE.ShowAutoBeep (|bool| beeps)
 function PerryIDE.ShowAutoComplete (|bool|)
 	|| a = .autocomplete
 	if a.listsource.hasany
-		a.ListSource.obj = .editme.FilePath
+		a.ListSource.obj = .Path
 		
 		// this thing can get too large. So... how to make it smaller.
 		// those job is it to limit the size? us? the cmm itself? a huge menu
@@ -612,7 +612,7 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message|
 
 
 function PerryIDE.DescribeWhere (|message| out, |message| where)
-	out <~ (@str, .editme.Filepath) 
+	out <~ (@str, .path) 
 	out <~ where.position
 	out <~ where.rangelength
 

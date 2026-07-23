@@ -27,8 +27,9 @@ extend PerryIDE
 		.ProjectTabs		= Button(.Toolbar,	ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
 		.RecentAndSplash	= Button(.Toolbar,	&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
-		.GoPrev				= Button(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
-		.GoNext				= Button(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
+		.GoPrev				= Button(.RBorder,	ClickedHistory, RightClickHistory, ChoseHistoryItem, RightClickHistory)
+		
+		.GoNext				= Button(.RBorder,	ClickedHistory, RightClickHistory, ChoseHistoryItem, RightClickHistory)
 		.CurrFileName		= Button(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
 		.FunctionMenu		= Button(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs)
 		.CommandsMenu		= Button(.RBorder,	MenuCommands,	 nil,	ReturnCommands)

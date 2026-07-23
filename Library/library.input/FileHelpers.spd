@@ -44,14 +44,19 @@ extend String
 		return super.sibling(name).file
 	
 	function Components (|[string]|)
-		return .TrimSlashes.Split('/')
+		|| i = 0
+		while i < self
+			|| n = .find('/', i) ?? .length
+			if i == 0 or n > i
+				rz <~ self[i, n]
+			i = n + 1
 
-	function ReplacePathComponent (|int| num, |string| With, |string|)
+	function ReplacePathComponent (|int| i, |string| With, |string|)
 		|| R = .components
-		if (num < 0)
-			num += R.length
+		if (i < 0)
+			i += R.length
 		
-		R[num] = With
+		R[i] = With
 		return r.join("/")
 	
 	

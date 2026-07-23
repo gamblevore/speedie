@@ -133,7 +133,7 @@ extend textview
 		w.obj = nil
 		|| f = w.first
 		while f
-			f.textFlags	&=~ TextLineFlags.UserFlags
+			f.textFlags	&=~ (TextLineFlags.CodeReached ||| TextLineFlags.ActiveBreakPoint)
 			f.CompilePos = -1
 			f++
 	

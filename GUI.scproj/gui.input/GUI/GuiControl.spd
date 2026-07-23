@@ -539,6 +539,9 @@ class GUIControl (list)
 		|| remain = 1s - delay
 		if w._FlashSelf & 2
 			remain += 0.5s
+		if .Decluttered
+			remain -= 0.5s
+			remain >>= 1
 		if remain > 0
 			GUI.touch(Self)
 			|| f2 = (remain)|float| / 1s|float|
