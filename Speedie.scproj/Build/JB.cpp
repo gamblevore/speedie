@@ -3509,7 +3509,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[471]);
-	JB_FS_AppendInt32(_fsf0, (2026072217));
+	JB_FS_AppendInt32(_fsf0, (2026072314));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10277,7 +10277,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1403]);
-	JB_FS_AppendInt32(_fsf0, (2026072217));
+	JB_FS_AppendInt32(_fsf0, (2026072314));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -20800,7 +20800,7 @@ bool SC_FAT_CanMarkSomething(FatASM* Self, Message* Exp, ASMReg Declared, SCDecl
 	if (SC_FAT_SyntaxIs(Self, kSC__Reg_DebugVarClose)) {
 		return nil;
 	}
-	if (SC_ASMParam_Reg(SC_FAT_Output(Self)) == SC_Reg_Reg(Declared)) {
+	if (SC_ASMParam_OperatorIz(SC_FAT_Output(Self), Declared)) {
 		Message* Msg = Self->Msg;
 		if (SC_Msg_NilDecl(Msg) == Ty) {
 			return true;
@@ -22131,6 +22131,7 @@ void SC_Pac_AddFuncParams(Assembler* Self, SCFunction* Fn) {
 }
 
 ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount) {
+	ASMReg Rz = ((ASMReg)0);
 	uint T = SC_Reg_xC2xB5Type(Orig);
 	if (JB_TC_SyntaxIs(T, kJB__TC_Pointer)) {
 		T = kJB__TC_Int;
@@ -22144,7 +22145,11 @@ ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, 
 	Where = SC_Reg_SyntaxIsSet(Where, kSC__Reg_ContainsAddr, (!true));
 	Where = SC_Reg_xC2xB5TypeSetWithTC(Where, T);
 	ASMReg K = SC_Pac_NumToReg(Self, Exp, Where, Amount, T);
-	return SC_Pac_Plus(Self, Exp, Dest, Orig, K);
+	Rz = SC_Pac_Plus(Self, Exp, Dest, Orig, K);
+	if (!SC_Reg_OperatorIz(Rz, Dest)) {
+		Rz = SC_Pac_Assign(Self, Exp, Dest, Rz);
+	}
+	return Rz;
 }
 
 ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L, ASMReg Zero) {
@@ -23809,15 +23814,15 @@ ASMReg SC_Pac_IncrPost(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, i
 		return SC_FAT_AsReg(SC_Msg_ADAK(Exp, Dest, Src, Value), Dest);
 	}
 	Rz = SC_Pac_Assign(Self, Exp, SC_Pac_TempOnly(Self, Dest), Src);
-	SC_Pac_IncrPre(Self, Exp, Src, Src, Value);
+	if (!SC_Reg_Reg(Dest)) {
+		Dest = Src;
+	}
+	SC_Pac_AddToReg(Self, Exp, Dest, Src, Value);
 	return Rz;
 }
 
 ASMReg SC_Pac_IncrPre(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int64 Value) {
-	if (!SC_Reg_Reg(Dest)) {
-		Dest = Src;
-	}
-	return SC_Pac_AddToReg(Self, Exp, Dest, Src, Value);
+	return SC_Pac_AddToReg(Self, Exp, Src, Src, Value);
 }
 
 ASMReg SC_Pac_IncrVectorPart(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int64 Value, int Mode) {
