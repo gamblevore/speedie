@@ -37,16 +37,14 @@ function perryide.ResumeRunning (|int| state, |bool|)
 	if .DebugMode isnt Paused
 		return .SendRunMsg("pause", state)
 
-	if (keys.Shift and keys.option) and "Run fast?\n\n(Breakpoints will not fire)".Confirm
-		return .SendRunMsg("run fast", state)
 	return .SendRunMsg("run", state)
 
 
 function perryide.DebugStepEvent (|bool|)
-	if (keys.shift and keys.option) and .RunningProd
-		return .ResumeRunning(-1)
-	if keys.option or Keys.Shift
+	if Keys.Shift
 		return .DebugStep("stepin")
+	if keys.Option
+		return .ResumeRunning(-1)
 	return DebugStepOver(self, -1)
 
 
@@ -64,22 +62,23 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 			st.Selectedge(key is up)
 		return true
 	
-	if key.IsAccept
+	if key.IsAccept or (key is SPACE)
 		if i.RunningProd
 			return i.debugstepevent
-		return i.ResumeRunning(-1)
-
-	if key is space
-		if i.RunningProd
-			return i.DebugStepEvent
-		return true
+		return (key is space) or i.start
 	
 	if !i.RunningProd
 		if !key.IsModifier
 			i.Editme.SetFocus
 		return true
-	
+
+	if key is RIGHTBRACKET
+		return i.ResumeRunning(-1)
+
 	if key is ESCAPE or SQUOTE
+		if i.RunningProd
+			if (keys.Shift or keys.option) and "Run fast?\n\n(Breakpoints will not fire)".Confirm
+				return .SendRunMsg("run fast", -1)
 		return DebugStepOut(self, -1)
 		
 
