@@ -51,6 +51,7 @@ extend String
 				rz <~ self[i, n]
 			i = n + 1
 
+
 	function ReplacePathComponent (|int| i, |string| With, |string|)
 		|| R = .components
 		if (i < 0)
@@ -251,14 +252,11 @@ Relative paths take the current working directory.`
 		
 	function File (|File!|)
 		cpp_part AsFile
+		nil self
 		if self isa file
 			return self
-		return .filesub
-	
-	libinternal FileSub (|File|)
-		nil self
-		cpp_Wrapper JB_Str_File
-	
+		return file.new(self)
+		
 	function FileCh (|string| ch, |File|)
 		cpp_Part ChildFile
 		return self.Child(ch).file

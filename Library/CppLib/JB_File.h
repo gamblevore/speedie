@@ -57,7 +57,6 @@ int JB_Str_MakeDir(JB_String* self);
 int JB_File_RelaxPath(JB_File* self, bool NeedsMode);
 JB_String* JB_File_Read(JB_File* self, int Length, bool Ignore);
 int64 JB_File_DataSet( JB_File* self, JB_String* Data );
-JB_File* JB_Str_File( JB_String* Path );
 JB_File* JB_File__NewPipe(int Pipe);
 JB_File* JB_File__StdOut( );
 bool JB_File_IsPipe(JB_File* self);

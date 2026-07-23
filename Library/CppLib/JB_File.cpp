@@ -1349,10 +1349,6 @@ bool JB_File_IsPipe (JB_File* f) {
 	return f->MyFlags & 2;
 }
 
-JB_File* JB_Str_File ( JB_String* Path ) {
-	return JB_File_Constructor( 0, Path );
-}
-
 
 int JB_File__chdir ( JB_String* Path ) {
     uint8 Buffer1[PATH_MAX];

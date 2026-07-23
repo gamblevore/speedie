@@ -30,8 +30,16 @@ class File (String)
 
 ////////////////////////////////////////////////////////////////////////////
 
-	constructor (|string| path = "" )
+	constructor (|string?| path = "" )
 		cpp_wrapper JB_File_Constructor
+		description `The file constructor does a few things:
+		
+* Errors if the length is over PATH_MAX (1024 on OSX)
+* Replaces paths starting with ~/ , with the user's home folder.
+* Turns relative paths (paths not starting with / or ~/) into full-paths
+* Removes garbage from the file path. So /////usr///./././local/bin///// --> /usr/local/bin
+* Trims newlines from both ends of the path. (This was done to make Perry more reliable when copy/pasting filepaths in, for example someone presses Cmd-D and pastes in /my/path/to/File\n which just happened to contain an accidental line not in the actual filepath, because the text he copied it from had multiple lines.)
+`
 	
 	destructor
 		cpp_wrapper JB_File_Destructor
