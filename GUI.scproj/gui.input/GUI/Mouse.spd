@@ -1,12 +1,17 @@
 
 
-datatype MouseDragging (int)
+datatype MouseDragging (byte)
 	constants
-		Ignored = 0
-		Handled = 1<<4
-		Within = 2<<4
-		Beyond = 3<<4
-		EvenIfNoMovement = 4<<4
+		Ignored	= 0
+		Eaten	= 1<<1
+		Flags	= 7
+
+		Handled	= 1<<4
+		DragWithin	= 2<<4
+		DragBeyond	= 3<<4
+		DragEvenIfStill = 4<<4
+	
+		
 
 
 

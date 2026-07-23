@@ -422,7 +422,7 @@ class Window (GUIControl)
 		
 		if !Beyond
 			require (r.lastrect ± -20) contains p
-		GUI.candrag = R.__mousedown__(p, -1)
+		GUI.CanDrag = R.__mousedown__(p, -1) & ~MouseDragging.flags
 
 	
 	syntax access (|ivec2| P, |bool| ForDrag=false, |guicontrol|)
@@ -500,7 +500,7 @@ class Window (GUIControl)
 		|| M = .openedmenu 
 			|| O = .focus
 			if (m contains p) and (m is enabled)
-				GUI.CanDrag = M.__mousedown__(p, clicks)
+				GUI.CanDrag = M.__mousedown__(p, clicks) & ~MouseDragging.flags
 				return m
 			
 			m.CloseMenu
@@ -511,10 +511,11 @@ class Window (GUIControl)
 		|| Found = .ControlAt(p)
 		if found is Enabled
 			|| clicks2 = Found.__MouseDown__(p, clicks)
-				GUI.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
-				if !._FocusWasSet and (found != .innerfocus)
-					.setfocus(Found)
-				return Found
+				GUI.CanDrag = (clicks2 * (clicks2 > mousedragging.handled)) & ~MouseDragging.flags
+				ifn clicks2 & MouseDragging.Eaten
+					if !._FocusWasSet and (found != .innerfocus)
+						.setfocus(Found)
+				rz = Found
 
 
 	libinternal RunWindowTasks (|bool| WantAnims)

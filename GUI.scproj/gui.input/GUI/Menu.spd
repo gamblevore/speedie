@@ -32,7 +32,7 @@ class Menu (ListView)
 
 	behaviour MouseDown
 		if .ClickedScroll(P, clicks)
-			return mousedragging.within
+			return mousedragging.DragWithin
 		|| L = .FindClicked(P.y) as listviewrow
 		if L isnt UnSelectable
 			if L isnt selected

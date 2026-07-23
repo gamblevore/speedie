@@ -235,7 +235,7 @@ class StretchDivider (GuiControl)
 			return mousedragging.handled
 		
 		.MoveTo(p)
-		return mousedragging.Beyond
+		return mousedragging.DragBeyond
 
 
 	function MoveTo (|ivec2| P)

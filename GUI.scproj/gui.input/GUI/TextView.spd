@@ -122,12 +122,13 @@ class TextView (GUIControl)
 			return MouseDragging.handled
 		
 		if .ClickedScroll(P, clicks)
-			return MouseDragging.Within
+			return MouseDragging.DragWithin + MouseDragging.Eaten
+		
 		if (clicks >= 1) and .ClickedLineNum(P)
-			return MouseDragging.Handled
+			return MouseDragging.Eaten
 		
 		if self is editable or AlwaysScrollable
-			if clicks >= 1							// remove this test?
+			if clicks >= 1							// Remove this test?
 				._ClicksDown = clicks
 			|| x = .EditClickText(p, clicks, false)
 				return x
@@ -137,7 +138,7 @@ class TextView (GUIControl)
 			(onc)(self, clicks)
 		
 		if self is editable or AlwaysScrollable
-			return MouseDragging.Within				// used to be 4, now 2?
+			return mousedragging.DragWithin				// Used to be 4, now 2?
 		
 		return MouseDragging.handled
 	
@@ -356,7 +357,7 @@ class TextView (GUIControl)
 		
 		ifn .lastrect.vert contains p.y
 			.show(b, textviewjumpmode.slowscroll)
-			rz = MouseDragging.EvenIfNoMovement
+			rz = MouseDragging.DragEvenIfStill
 		
 		|| t = ._UncorrectedSel
 		if keys.shift or (clicks == -1)

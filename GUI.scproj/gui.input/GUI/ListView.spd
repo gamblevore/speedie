@@ -797,10 +797,10 @@ class ListView (GUIControl) {
 			
 			if .draggingrowFrom and (.CanDrawDrag(Wantsto))
 				._draggingrowto = wantsto
-			return MouseDragging.EvenIfNoMovement
+			return MouseDragging.DragEvenIfStill
 		
 		if .ClickedScroll(P, clicks)
-			return MouseDragging.Within
+			return mousedragging.DragWithin
 		
 		|| FirstSel = .FirstSelected
 		|| LC = .FindClickedCell(P)							// leaks
@@ -823,7 +823,7 @@ class ListView (GUIControl) {
 			.CommandSelectRow ?= 1 + (L is selected)
 			|| State = .CommandSelectRow
 			.selectadd(l, State == 1, true)
-			return MouseDragging.Within
+			return mousedragging.DragWithin
 		
 		if (L isnt selected) or .AlwaysSendChangeEvent
 			if keys.shift
@@ -834,7 +834,7 @@ class ListView (GUIControl) {
 		if (!.IsTree  and  .OnDragRow  and  l is editable)
 			.DraggingRowFrom = L
 			._DraggingRowTo = nil
-			return MouseDragging.Within
+			return mousedragging.DragWithin
 		return MouseDragging.handled
 	
 	

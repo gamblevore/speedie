@@ -182,12 +182,12 @@ class Button (GUIControl)
 					.touch
 					._PressingDone = true
 				if !.pressing or ._PressingDone
-					return mousedragging.beyond
-				ret = mousedragging.EvenIfNoMovement // ?
+					return mousedragging.DragBeyond
+				ret = mousedragging.DragEvenIfStill // ?
 		
 		if keys.option and .pressing
 			.DoPressing(D)
-			return mousedragging.EvenIfNoMovement
+			return mousedragging.DragEvenIfStill
 
 		if !(D or !.ButtonSource)  or  (.ItemWidth and !D)
 			return ret
@@ -201,7 +201,7 @@ class Button (GUIControl)
 			.ClickedItem ?= d
 		
 		if !.Pressing
-			return (mousedragging.Beyond (D) mousedragging.handled)
+			return (mousedragging.DragBeyond (D) mousedragging.handled)
 		
 		|| n = gui.FrameStart
 		if !.DelayTill
@@ -212,7 +212,7 @@ class Button (GUIControl)
 			if !.DoPressing(D)
 				.delaytill = 0
 				return MouseDragging.handled
-		return mousedragging.EvenIfNoMovement
+		return mousedragging.DragEvenIfStill
 
 	
 	function ivec4.TextCorner (|drawstyle| g, |string| T, |ListViewState| C, |ivec2|)

@@ -84,7 +84,7 @@ class Slider (GuiControl)
 			.LastMouseY = y
 			|| f = (y|float| - v.x) / (v.x2 - v.x)
 			.setvalue(f)
-		return MouseDragging.Beyond
+		return mousedragging.DragBeyond
 	
 	
 	function MiniSize (|ivec4|)

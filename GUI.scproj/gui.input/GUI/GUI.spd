@@ -47,7 +47,7 @@ module GUI
 													// helps with startup events! at least on osx
 	|byte|						SingleFrameDepth
 	|byte|						TouchFingersDown
-	|byte|						CanDrag
+	|MouseDragging|				CanDrag
 	|byte|						ResizedCounter		// for resize bug fix
 	
 	visible true
@@ -592,7 +592,7 @@ module GUI
 			if ed.needshide
 				ed.clear
 
-			if .CanDrag >= mousedragging.EvenIfNoMovement
+			if .CanDrag >= mousedragging.DragEvenIfStill
 				.touch
 				w.DoMouseDrag(.MouseXY, true)
 				rz = GUIActivity.activity
@@ -1259,8 +1259,8 @@ module GUI
 				.CenterCursor
 			SDL_SetRelativeMouseMode(contrain)			// in case a window comes up or closes
 
-		if (.CanDrag >= MouseDragging.Within) and (MB is left)
-			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
+		if (.CanDrag >= mousedragging.DragWithin) and (MB is left)
+			w.DoMouseDrag(xy, .CanDrag >= mousedragging.DragBeyond)
 			return GUIActivity.activity
 
 		return .MouseMoveEventSub(move, w, xy)
@@ -1319,7 +1319,7 @@ module GUI
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return GUIActivity.nothing
 		
-		if .CanDrag >= mousedragging.Within
+		if .CanDrag >= mousedragging.DragWithin
 			return GUIActivity.nothing
 
 		if key.IsEaten
