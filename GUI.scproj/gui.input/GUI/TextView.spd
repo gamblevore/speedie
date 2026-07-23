@@ -1474,17 +1474,11 @@ class TextView (GUIControl)
 		.Insert(value, true)
 
 	
-	libinternal AllowTyping (|bool|)
-		if self is Editable and Enabled
-			return true
-		beep
-	
-	
 	behaviour TypedString
-		require  .AllowTyping
+		require  self is Editable and Enabled
 
-		if (input == "§") and !(keys.option or keys.shift)
-			return false		
+//		if (input == "§") and !(keys.option or keys.shift)
+//			return false// can't even remember what this is for.
 
 		if (keys.option and input == " ") or input == " "
 			return .SwapChars
@@ -1500,7 +1494,7 @@ class TextView (GUIControl)
 	
 
 	libinternal Typed (|string| s, |int|)
-		require .AllowTyping
+		require  self is Editable and Enabled
 		GUI.ShowCursor(false)
 		
 		if (s == 1) and .TypedACounterPart(s[])
