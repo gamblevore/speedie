@@ -126,7 +126,6 @@ GUI_FR_DirSize
 GUI_FR_Document
 GUI_FR_FileData
 GUI_FR_Modifier
-GUI_FR_MoveTo
 GUI_FR_ReadFrom
 GUI_FR_ReadName
 GUI_FR_Render
@@ -159,7 +158,6 @@ GUI_FV_ShowQuickOpen
 GUI_FV_SyntaxAccess
 GUI_FV_TryReloadPath
 GUI_Fade_Constructor
-GUI_Fade_Finished
 GUI_Fade_FireSet
 GUI_Fade_Hide
 GUI_Fade_Strength

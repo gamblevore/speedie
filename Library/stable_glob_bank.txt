@@ -58,6 +58,7 @@ GUI__LV_DelayEditTill_
 GUI__App_AppDocumentOpen
 JB__Tk_Splitter
 JB_Str__Sorter
+GUI_Img_RoundRectDrawer
 GUI_Ray__DistanceSorter
 JB_Tree__Sorter
 JB_Msg__Sorter
@@ -67,7 +68,6 @@ GUI_Img_CurlieQueDrawer
 JB_ID__ByID
 GUI_LV_DefaultCopy
 JB_ID__ByFreq
-GUI_Img_RoundRectDrawer
 GUI_FV_RightClickFileList
 JB__App__Args
 JB__App__Conf

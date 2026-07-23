@@ -4,14 +4,13 @@ datatype TextLineFlags (uint16)
 	flags
 		Colored
 		ColoriseUsingPosition
-		FakeMsg
+		FakeMsg					// could we just check.... if .isroot?
 		StartsNormally
 		Keepable
 		EndsNormally			// getting out of sync with .endswithline somehow.
 		Last					// remove this? we could just check .IsLast
-//		Selected
 
-	///
+
 		BreakPoint = 1<<13
 		ActiveBreakPoint = 2<<13
 		CodeReached = 4<<13
@@ -439,10 +438,6 @@ libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |bool| Selected,   |in
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
 	opt norefcounts
 	opt min 3
-	target debug
-		if keys.shift and self == "editme"
-			if d.text[] == '/' 
-				if	d.text[1] != '/'
 		
 	|| GoUp = (7 - .lineheight) / 2
 	if d.LineError
