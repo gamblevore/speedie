@@ -12,8 +12,8 @@ extend PerryIDE
 			return false
 		require !keys.cmd
 		
-		ifn .focus isa textview // the main listview IS considered editable!
-			.Editme.SetFocus	// should I just do this anyhow?
+		ifn .focus isa textview		// the main listview IS considered editable!
+			.Editme.SetFocus		// should I just do this anyhow?
 			return .editme.__KeyDown__(key)
 
 
@@ -39,7 +39,7 @@ extend PerryIDE
 		if keys.Option
 			return false
 		
-		if key is t
+		if key is T
 			return PressingDebug(.runbutton)
 		
 		if key.IsAccept
