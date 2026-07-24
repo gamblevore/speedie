@@ -2229,7 +2229,6 @@ class TextView (GUIControl)
 			(d is keepable) = msg and !msg.iscontainer // Don't keep containers
 
 		(d is colored) = Parsed
-
 		|| draw = .OnDrawLineNumber
 			(draw)(d, &LastOwner, false)
 			
@@ -2301,7 +2300,6 @@ class TextView (GUIControl)
 		if !d
 			d = .WrappedLines.first!
 		.StartWithoutScrollDraw(d)
-	
 	
 	
 	libinternal TextCopy (GUICopyEvent)
