@@ -970,8 +970,6 @@ JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 	self->Length = Path->Length;
 	self->Parent = JB_Incr(Path);
 	
-//	if (DebugFile(self, "1_Speedie.cpp") or DebugFile(self, "1_Speedie.h"))
-//		debugger;
     self->Descriptor = -1;
     self->MyFlags = 0;
     self->OpenMode = 0;
