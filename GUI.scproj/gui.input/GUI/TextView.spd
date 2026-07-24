@@ -330,8 +330,8 @@ class TextView (GUIControl)
 	libinternal LastLineFix (|textviewline| d, |int| x, |ivec2|)
 		x += 2
 		|| t = d.ByteOfX(x)
-		|| PreferFirst = (d.after == t) and (d isnt last)
-		if PreferFirst and d.endswithline
+		|| PreferFirst = (d.after == t) and (!d.islast)
+		if PreferFirst and d is EndsNormally
 			t = .text.MoveCodePoint(t, -1)
 			preferfirst = false
 		return (t, PreferFirst|int|)
@@ -600,7 +600,7 @@ class TextView (GUIControl)
 		  else
 			t = (x, x)
 		|| d = .show(x)
-		._PreferPrevLine = fwd and (!d.emptyline or !d.EndsWithLine)
+		._PreferPrevLine = fwd and (!d.emptyline or (d isnt endsnormally))
 		.SelDirect(t,d)
 		return true
 	
@@ -1689,7 +1689,7 @@ class TextView (GUIControl)
 		|| i	= 0
 		|| d	= .StartLine
 		|| End	= d.movecapped(.maxvisiblelines + 1)
-		if end is last
+		if end.islast
 			end = nil
 		while d and d != End
 			d.DrawSelSub(where, r, self, i++, g)
@@ -1810,9 +1810,10 @@ class TextView (GUIControl)
 		|| d = .FindTextLine(x2)
 		|| r = d.range
 		x2 = r.x2
-		if (i > 0) and (keys.shift) and (d is EndsNormally) and !d.endswithline
+//		if (i > 0) and (keys.shift) and (d is EndsNormally) // and !d.endswithline // this never happened before?
 			//
-		  elseif (d is EndsNormally) and canavoid
+		//  else
+		if (d is EndsNormally) and canavoid
 			x2 = .text.MoveCodePoint(x2, -1)
 		if i < 0
 			x2 = r.x
@@ -2087,7 +2088,6 @@ class TextView (GUIControl)
 			curr.next = rz
 		  else
 			rz.message = nil
-			rz.TextFlags &= TextLineFlags.UserFlags
 
 
 	libinternal NeedsPrepare (|int|)
@@ -2189,7 +2189,7 @@ class TextView (GUIControl)
 	libinternal AddLogTrim (|TextViewLine| d, |TextViewLine|)
 		opt norefcounts
 		d.position = 0
-		(d isnt last)
+		d.TextFlags = 0
 		d.tline = 0
 		d.vline = 0
 		d._Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
@@ -2216,6 +2216,9 @@ class TextView (GUIControl)
 			e.obj = d
 			d.LineError = e
 
+		(d isnt ColoriseUsingPosition)
+		(d isnt fakemsg)
+		d.message = nil
 		if JX is Colorise
 			|| OK = (msg!=nil) or (JX isnt expect)
 			msg = d.ColoriseText(msg, OK)
@@ -2271,7 +2274,7 @@ class TextView (GUIControl)
 
 			if last
 				d.vline = last.vline + 1
-				d.tLine = last.tline + last.EndsWithLine
+				d.tLine = last.tline + (last is endsnormally)
 
 			p = D.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  P)
 			msg = .PrepareLineColor(d, msg, jx, &lastowner)

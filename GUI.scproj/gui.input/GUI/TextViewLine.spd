@@ -2,15 +2,17 @@
 
 datatype TextLineFlags (uint16)
 	flags
+		// coloring
 		Colored
 		ColoriseUsingPosition
-		FakeMsg					// could we just check.... if .isroot?
+		FakeMsg
+
+		// wrapping
 		StartsNormally
 		Keepable
-		EndsNormally			// getting out of sync with .endswithline somehow.
-		Last					// remove this? we could just check .IsLast
+		EndsNormally
 
-
+		// user stuff
 		BreakPoint = 1<<13
 		ActiveBreakPoint = 2<<13
 		CodeReached = 4<<13
@@ -90,13 +92,13 @@ class TextViewLine (list)
 		  else
 			|| next = .Next
 				l = next.CompilePos - p
-		|| d = (p, p+l-(self is last))
+		|| d = (p, p+l-.islast)
 		return d contains b
 
 
 	operator contains (|ind| b, |bool|)
 		|| d = .range
-		d.x2 -= (self is last)
+		d.x2 -= .islast
 		return d contains b
 
 
@@ -143,10 +145,6 @@ class TextViewLine (list)
 
 
 	libinternal ColoriseText (|message| msg, |bool| ParsedOK, |message|)
-		isnt ColoriseUsingPosition
-		isnt fakemsg
-		.message = nil
-
 		if msg
 			return .ColoriseSub(msg)
 
@@ -259,11 +257,6 @@ class TextViewLine (list)
 						if par.After == ToFind
 							return par
 
-		
-	libinternal EndsWithLine (|bool|)
-		opt norefcounts
-		return .text.last.IsTextLine
-
 
 	libinternal DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| G)
 		opt min 3
@@ -312,11 +305,14 @@ class TextViewLine (list)
 	
 	
 	libinternal FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
-		(self is StartsNormally) = txt[p-1].IsTextLine
+		opt norefcounts
+		|| prev = .prev
+		(self is StartsNormally) = prev and (prev is endsnormally)
 		.Position = p
+
 		if .vline > 1000K
 			._Text = txt[p, int.max]
-			(self is EndsNormally) = .EndsWithLine
+			(self is EndsNormally) = txt.Last.IsTextLine
 
 		  elseif p >= txt.length									// edge case.
 			isnt EndsNormally
@@ -324,12 +320,10 @@ class TextViewLine (list)
 		  else
 			|| i = txt.WrapSub(MaxWidth, IsInline, p)
 			._Text = txt[p, i]
-			(self is EndsNormally) = .EndsWithLine
+			(self is EndsNormally) = txt[i-1].IsTextLine
 			if (i < txt.length) or (self is endsnormally)
-				isnt last
 				return i
 		
-		is last
 		return -1
 
 
@@ -500,7 +494,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	
 	if .AutoLim(d)
 		if (._CanAutoComplete != 2) or (!.text)
-			if d is last						// Last line draw too early with autocomplete
+			if d.islast							// Last line draw too early with autocomplete
 				x += font.width					// but we shouldn't need this!
 			.DrawAuto(Where, x, y)
 
@@ -508,9 +502,9 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 libinternal TextView.AutoLim (|textviewline| d, |bool|)
 	if (._CanAutoComplete >= 1) and ._AutoCompleteString
 		|| after = d.after
-		if d is last
+		if d.IsLast
 			after++ // ??
-		if (.Sel1 == after-1)  and  (d.endswithline or d is last)
+		if (.Sel1 == after-1)  and  ((d is endsnormally) or d.islast)
 			return true
 
 
