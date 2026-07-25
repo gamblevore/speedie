@@ -1,7 +1,12 @@
 
 
 prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil, |ErrorInt|)
+		description "This acts like main. So you are passing a function that will receive arguments, as if it were a C++ main function."
+
 prototype PicoActionFn (|&nil| self, |&int8| Data, |int| Length, |ErrorInt|)
+	description "Used by CakeVM right now. Not used elsewhere yet. This will notify the VM, that it received a message. So Cake can pause the VM.
+
+So PicoActionFn basically notifies you that a message was received, and does it from a thread. So any PicoActionFn you write must be threadable. This includes almost nothing out of speedie :] which is highly object oriented, and can't refcount objects across threads. Assuming you can avoid that, you can use this. Doing work on global ints... thats usually much safer."
 
 
 // todo: pico could use shared memory, instead of pipes. Reduces memory use
@@ -96,7 +101,6 @@ struct Pico
 		nil checker
 		cpp_wrapper PicoError
 	
-
 	function IsSending (|bool|)
 		cpp_wrapper PicoStillSending
 
@@ -168,6 +172,7 @@ struct Pico
 						return pico_out
 					pico_out.Close("")
 
+
 module PicoNoise
 	constants
 		DebugChild	= 1
@@ -186,6 +191,7 @@ struct PicoGlobalConfig
 	|Date|						TimeOut
 	|int|						ExitCode
 	
+
 
 struct PicoGlobalStats
 	linkage: wrapper

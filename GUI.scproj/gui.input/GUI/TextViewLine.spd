@@ -83,17 +83,40 @@ class TextViewLine (list)
 				rz = '\n'
 		
 
-	libinternal CompileContains (|ind| b, |bool| RealPos=false, |bool|)
-		opt norefcounts
+	function CompilePos2 (|int|)
 		|| p = .compilepos
-		|| l = .length
-		if (p < 0) or RealPos
+		if p < 0
 			p = .Position
-		  else
-			|| next = .Next
-				l = next.CompilePos - p
-		|| d = (p, p+l-.islast)
-		return d contains b
+		return p
+	
+	
+	libinternal CompileContains (|ind| b, |bool|)
+		opt norefcounts
+		|| p = .CompilePos2
+		if p == -1
+			return false //
+		|| p2 = p + .Length
+		|| next = .Next
+			p2 = next.CompilePos2
+		return b >= p and b < p2
+
+
+	libinternal CompileContains2 (|ind| b, |bool|)
+		// needs to always be setup...
+		// on wrap if not existing
+		// and on debugmode set
+		opt norefcounts
+		|| p = .CompilePos
+		require p >= -1 and b >= p
+		
+		while
+			self++
+			if !self
+				return true
+			|| p2 = .CompilePos
+			if p2 >= 0
+				return b < p2
+
 
 
 	operator contains (|ind| b, |bool|)
@@ -362,8 +385,8 @@ libinternal textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine|
 	if e == .myerror
 		v.a *= 0.75
 
-	if d.CompileContains(.sel1)
-		.myerror = e
+//	if d.CompileContains(.sel1)
+//		.myerror = e
 	if e is parse
 		|| Alpa = (e.when.guiago.float - 1.0) * lm
 		if (Alpa <= lm)
@@ -420,13 +443,18 @@ libinternal TextView.UseColorAnyway (|int|)
 		return 3
 
 
-libinternal TextView.SpaceDisplayAsDot (|TextViewLine| d, |bool| Selected,   |int|)
+libinternal TextView.SpaceDisplayAsDot (|bool| Selected, |int|)
 	require .UsingLineNumbers
 	rz = 0x13FFFFFF
 	if ._DrawInLineArea & 1
 		._DrawInLineArea |= 2
 		if Selected
 			rz += 0x0F000000
+
+
+function textviewline.DebugDraw (|image| Where, |int| y)
+	|| s = .CompilePos.Render
+	where.DrawText(s, (where.ControlClip.x2-40, y))
 
 
 libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
@@ -439,12 +467,14 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
-		if d.CompileContains(m.Position)
+		if keys.Shift
+			d.DebugDraw(Where, y)
+		if d.CompileContains2(m.Position)
 			|| bg = ¥.ActiveTextLine
 			if m.flags&1
 				bg = colors.red(0.25).px
 			.Drawbackground(where, y + GoUp, bg)
-			|| str = m.firstname
+			|| str = m.FirstName
 				|| x = .LastRight - (.gnormal.width(str) + 10)
 				where.DrawText(str, (x,y), vec4(1,0.5,0.5,1))
 
@@ -467,7 +497,7 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 		
 	|codepoint| Prev
 	|| xlimit = .lastrect.x2
-	|| SpaceDisplay = .SpaceDisplayAsDot(d, Selected)
+	|| SpaceDisplay = .SpaceDisplayAsDot(Selected)
 	for (c.CodePoints2 in state.t) (pos)
 		x = state.next(c, pos)
 		if x > xlimit

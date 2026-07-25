@@ -51,7 +51,7 @@ function SetBreaks (|message| breaks)
 	require file ~= .Path
 
 	|| All = breaks.second.int
-		.editme.debuglevel = TextView.DebugLevelDebugging
+//		.editme.debuglevel = TextView.DebugLevelDebugging
 		for l.lines in .editme
 			(l isnt ActiveBreakPoint)
 			(l isnt CodeReached)
@@ -59,11 +59,11 @@ function SetBreaks (|message| breaks)
 	for line in breaks.last
 		|| Pos = line.second.int
 		if pos <= .editme.text.Length
-			|| D = .editme.FindTextLine(pos)
-			if all
-				(D is Codereached)
-			if line ~= "break"
-				(D is ActiveBreakPoint)
+			|| D = .editme.FindCompilePos(pos)
+				if all
+					(D is Codereached)
+				if line ~= "break"
+					(D is ActiveBreakPoint)
 	.editme.Touch			
 		
 	

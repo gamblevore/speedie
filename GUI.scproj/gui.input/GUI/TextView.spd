@@ -183,8 +183,7 @@ class TextView (GUIControl)
 	function AddBreak (|textviewline?| d=nil, |int| Pos=0)
 		opt norefcounts
 		if !d
-			d = .FindLine(pos)
-			d ?=.wrappedlines.first!
+			d = .FindTextLine(pos)
 		
 		|| txt = d.Text
 		|| i = txt._FindBreakpoint
@@ -633,7 +632,7 @@ class TextView (GUIControl)
 		return d.vline + 1
 	
 	
-	libinternal DrawInfoAtLine (|int| L, |textviewline|)
+	libinternal LineInfo (|int| L, |textviewline|)
 		opt norefcounts
 		.WrapText
 		for r in .WrappedLines
@@ -644,7 +643,7 @@ class TextView (GUIControl)
 	
 	function ViewLineAndSel (|int| L)
 		opt norefcounts
-		|| d = .DrawInfoAtLine(L)
+		|| d = .LineInfo(L)
 			.ShowAndSelect(d.position)
 
 	
@@ -672,7 +671,13 @@ class TextView (GUIControl)
 	libinternal ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
-		|| d	= .FindDrawInfoSub(x, i)
+		|textviewline| d
+		if mode is CompilePos
+			d = .FindCompilePos(x)
+			if !d
+				d = .WrappedLines.first!
+		  else
+			d = .FindDrawInfoSub(x, i)
 		before = before.abs
 
 		|| lim = .MaxVisibleLines
@@ -1752,19 +1757,24 @@ class TextView (GUIControl)
 			return w.inline.editingfor == self
 
 
-	libinternal FoundInfo (|ivec2| m, |int| Pos, |bool|)
+	libinternal FoundInfo (|ivec2| m, |int| Pos,  |bool|)
 		if M contains Pos
 			if (m.x2 == Pos) and !._PreferPrevLine
 				return false
 			return true
 
-	
-	function FindTextLine (|int| Char, |TextViewLine!|)
-		|| vline = 0
-		return .FindDrawInfoSub(char, vline)
+	function FindCompilePos (|int| Position, |textviewline|)
+		opt norefcounts
+		for s in .WrappedLines
+			if s.CompileContains2(Position)
+				return s
+
+	function FindTextLine (|int| Pos, |TextViewLine!|)
+		|| vlines = 0
+		return .FindDrawInfoSub(Pos, vlines)
 	
 
-	libinternal FindDrawInfoSub (|int| Char,  |$int| VLine,  |TextViewLine!|)
+	libinternal FindDrawInfoSub (|int| Char,  |$int| VLine,   |TextViewLine!|)
 		opt norefcounts
 
 		.WrapText
@@ -2047,10 +2057,8 @@ class TextView (GUIControl)
 		require ._Start != d
 		._Start = d
 		|| p = d.Position
-		if p >= 0
-			.WrappedLines.Position = p
-			|| doc = .document
-				doc.scrollpos = p
+		|| doc = .document
+			doc.scrollpos = p
 		.ShowExtraInfo(GUI.mousexy, false)
 		GUI.touch(self)
 			
@@ -2181,9 +2189,11 @@ class TextView (GUIControl)
 
 	libinternal StartPos (|int|)
 		opt norefcounts
-		if ._start.position < 0
-			._start.position = 0
-		return .WrappedLines.position
+		|| P = ._Start.Position
+		if P < 0
+			P = 0
+			._Start.Position = 0
+		return P
 
 
 	libinternal AddLogTrim (|TextViewLine| d, |TextViewLine|)
@@ -2211,10 +2221,13 @@ class TextView (GUIControl)
 	
 	libinternal PrepareLineColor (|textViewLine| d, |message| msg, |DocumentJeeboxMode| jx, |&Message?| lastowner, |message|)
 		opt norefcounts
-		|| e = .MyError
-		if e and (!e.obj) and d.CompileContains(e.position, e is parse)
-			e.obj = d
-			d.LineError = e
+// maybe not the best way to do this.
+// our resyncing is pretty good in general wnyhow...
+// so just don't clear the lineerrors in here
+//		|| e = .MyError
+//		if e and (!e.obj) and d.CompileContains(e.position)
+//			e.obj = d
+//			d.LineError = e
 
 		(d isnt ColoriseUsingPosition)
 		(d isnt fakemsg)
@@ -2245,7 +2258,7 @@ class TextView (GUIControl)
 
 		|| JX		= .JeeboxMode
 		|| msg		= .Parse(changed >= 2, JX)
-		|| Pos		= .StartPos
+		|| Scroll	= .StartPos
 		|| d		= .FirstLine
 		
 		|message| LastOwner
@@ -2257,9 +2270,10 @@ class TextView (GUIControl)
 		
 		d.tLine = 1
 		|TextViewLine| Last
+		|textviewline| NewScroll
 		|| P = 0
-		target debug
-			if keys.shift and self == "editme" and map[2] >= 0
+//		target debug
+//			if keys.shift and self == "editme" and map[2] >= 0
 
 		while
 			if map[2] >= 0
@@ -2277,14 +2291,16 @@ class TextView (GUIControl)
 
 			p = D.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  P)
 			msg = .PrepareLineColor(d, msg, jx, &lastowner)
+			if d contains Scroll
+				NewScroll = d
 			loop p >= 0
 			Last = D
 			d = .NextVline(d, p)
 		
-		.WrapTextEnd(d, changed, pos)
+		.WrapTextEnd(d, changed, NewScroll)
 	
 	
-	libinternal WrapTextEnd (|textviewline| D, |int| Changed, |int| Pos)
+	libinternal WrapTextEnd (|textviewline| D, |int| Changed, |textviewline?| Scroll)
 		opt norefcounts
 		d.RemoveAfter
 		._PreferPrevLine = false
@@ -2292,8 +2308,8 @@ class TextView (GUIControl)
 			|| n = 1 - .MaxVisibleLines
 			d = d.MoveCapped(n)
 		  elseif (changed & 5) or .IsALogTextView
-			// 5 means width is changed, OR the change came from TextInsertion
-			d = .FindLine(pos)
+			// 5: Width changed, or InsertText
+			d = Scroll
 		  else
 			d = nil
 		
@@ -2317,13 +2333,6 @@ class TextView (GUIControl)
 				return
 
 	
-	function FindLine (|int| Position, |textviewline|)
-		opt norefcounts
-		for s in .WrappedLines
-			if s contains Position
-				return s
-
-
 	function LoadDocument (|document| U, |bool| Show, |bool|)
 		|document--| old = .document
 			if old == u
@@ -2455,6 +2464,7 @@ datatype TextViewJumpMode (int)
 		Nothing = 0
 		SlowScroll
 		WantAGoodView
+		CompilePos
 	syntax is (|TextViewJumpMode| m, |bool|)
 		inlined
 		return self|int| & m|int|

@@ -12,7 +12,7 @@ dispatch DebuggerActions (PerryResponse)
 	expansion		ExpandAction
 	brkadd			BreakAction			// AddBrk
 	brkrem			BreakRemoveAction	// RemBrk
-	sendbreaks		SendBreakAction
+	sendbreaks		SendAllBreaksAction
 
 	stop:			app.quit, return StepAction.donothing
 	pause:			return StepAction.SendVarsPause
@@ -88,7 +88,7 @@ function __PerryView__ (cakevm.CakeChef)
 
 
 
-function SendBreakAction (perryresponse)
+function SendAllBreaksAction (perryresponse)
 	opt norefcounts
 	|| f = debugger.file(m)
 		cake.perry!.SendBreaks(f, true)
@@ -121,14 +121,16 @@ function Spdprocess.SendBreaks (|filewithdata| F, |bool| All=false)
 	|| ToFind = F.Index
 	|| Count = 0
 
-	// surely we wanna do codetosrc?
 	|| Mask = ~debugger.BreakRealBit
+	|| LastP = -1
 	for raw in debugger.SrcToCode
 		|| Src = raw.Loc
 		if Src.FileNum == ToFind
 			|| Code = raw.code(L)
 			|| Break = CakeBreak[Code] & Mask
-			if Break or all
+			|| SP = Src.Position ||| Break
+			if (SP != LastP) and (Break or all)
+				LastP = SP
 				Count++
 				j.SendCode(Break, Src.Position)
 	j.exit(2)

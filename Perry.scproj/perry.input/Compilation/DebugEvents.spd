@@ -316,7 +316,7 @@ function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,  |ListViewRo
 		
 		|| e = .editme
 		e._ActiveLine = file_path
-		|| Line = e.show(Where)
+		|| Line = e.show(Where, textviewjumpmode.CompilePos)
 		if (Mode == PerryUpdateStack) or (.LastStack != row)
 			e.DoExplode(Line)
 	
@@ -364,7 +364,7 @@ function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 	opt norefcounts
 	|| j = VarPrinter.start(@tmp, cmd)
 	j.AddStr .path
-	j.AddInt Line.Position
+	j.AddInt Line.CompilePos2
 	j.AddInt line.Length
 	j.exit
 	return j
@@ -375,7 +375,7 @@ function perryide.DebugStep (|string| kind, |bool|)
 	|| e = .editme
 	|| active = e._ActiveLine
 	if active and .EditPath(active.name, false)
-		|| l = e.FindLine(active.position)
+		|| l = e.FindCompilePos(active.position)
 			.SendJbin(.LineCommand(kind, l))
 			return true
 	beep

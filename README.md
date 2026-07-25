@@ -68,13 +68,11 @@ Proper Release:
 
 * GPU acceleration via OpenCL
 
-Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked. But overall... Speedie is in a very good state. The C++ compile-mode is fully working and produces fast apps. It really is going to be wonderful.
-
-Its more about unlocking that wonderfulness (by making it easy to debug and productive) than actually making it wonderful. The greatness is already within.
+Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked. But overall... Speedie is in a very good state.
 
 
 # Downsides #
-*Is Speedie some magical land where all coding-projects become better?* **Well... no.** There are downsides! Speedie's downsides are heavy enough that, for many people, other languages are a better choice.
+*Is this some magical land where all code becomes better?* **Well... no.** There are downsides! Speedie's downsides are heavy enough that, for most people, other languages are better.
 
 Like everything in life, there are downsides. By avoiding the downsides of C++ (complexity) and Python (slowness), we gained new downsides. This is just life I guess.
 
@@ -83,7 +81,7 @@ Like everything in life, there are downsides. By avoiding the downsides of C++ (
 
 So no... its not some *"magical land where everything becomes better"*.
 
-Other possible reasons not to use speedie, include: "We don't want to learn a new language" or "our existing code-base is in lang-XYZ".
+Other possible reasons not to use Speedie include: "We don't want to learn a new language" or "our existing code-base is in lang-XYZ".
     
 For some people, the small community isn't a problem. Some people prefer to write all their own code and have been doing that for their most successful products in the past anyhow. Others might want to create libs, and Speedie might be a good environment to do it in. (Speedie can compile libs with C-APIs! For example [jeebox_api.h](jeebox.scproj/Examples/jeebox_api.h))
 
