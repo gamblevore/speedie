@@ -90,24 +90,10 @@ class TextViewLine (list)
 		return p
 	
 	
-//	libinternal CompileContains (|ind| b, |bool|)
-//		opt norefcounts
-//		|| p = .CompilePos2
-//		if p == -1
-//			return false //
-//		|| p2 = p + .Length
-//		|| next = .Next
-//			p2 = next.CompilePos2
-//		return b >= p and b < p2
-
-
 	libinternal CompileContains (|ind| b, |bool|)
-		// needs to always be setup...
-		// on wrap if not existing
-		// and on debugmode set
 		opt norefcounts
 		|| p = .CompilePos
-		require p >= -1 and b >= p
+		require p >= 0 and b >= p
 		
 		while
 			self++
@@ -457,7 +443,7 @@ function textviewline.DebugDraw (|image| Where, |int| y)
 	where.DrawText(s, (where.ControlClip.x2-40, y))
 
 
-libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| UseCol)
+libinternal TextView.DrawOneLine (|image| Where,  |TextViewLine| D,  |int| Y,  |int| UseCol)
 	opt norefcounts
 	opt min 3
 		
@@ -467,8 +453,9 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
-//		if keys.Shift
-//			d.DebugDraw(Where, y)
+		target __PROJECT_PERRY__ // debugging my stuff... still not 100% perfect
+			if keys.Shift
+				d.DebugDraw(Where, y)
 		if d.CompileContains(m.Position)
 			|| bg = ¥.ActiveTextLine
 			if m.flags&1

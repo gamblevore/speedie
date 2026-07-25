@@ -357,17 +357,20 @@ function DebugBreakAdd (GuiTextLineEvent)
 	require i.DebugMode is CakeMode and Debug	
 	|| cmd = ("brkadd" (direction > 0) "brkrem")
 	|| j = i.LineCommand(cmd, line)
-	.SendJbin(j)
+		.SendJbin(j)
 
 
 function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 	opt norefcounts
-	|| j = VarPrinter.start(@tmp, cmd)
-	j.AddStr .path
-	j.AddInt Line.CompilePos2
-	j.AddInt line.Length
-	j.exit
-	return j
+	|| CP = line.CompilePos
+	if CP >= 0
+		|| j = VarPrinter.start(@tmp, cmd)
+		j.AddStr .path
+		j.AddInt CP
+		j.AddInt line.Length
+		j.exit
+		return j
+	debugger 
 
 
 function perryide.DebugStep (|string| kind, |bool|)
@@ -377,8 +380,9 @@ function perryide.DebugStep (|string| kind, |bool|)
 	if active and .EditPath(active.name, false)
 		|| Vline = -1
 		|| l = e.FindTextLine(active.position, Vline, true)
-			.SendJbin(.LineCommand(kind, l))
-			return true
+			|| j = .LineCommand(kind, l)
+				.SendJbin(j)
+				return true
 	Notifications <~ app.StackTrace
 	beep
 
@@ -411,7 +415,7 @@ function GUIControl.SendRunMsg (|string| s, |int| state, |bool|)
 	return .SendMsg(s, state >= 0)
 
 
-function GUIControl.SendJbin (|jbin| j, |bool|)
+function GUIControl.SendJbin (|jbin!| j, |bool|)
 	.SendMsg(j.getresult, false)
 
 
