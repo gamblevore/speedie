@@ -125,14 +125,21 @@ extend textview
 		if level < DebugLevelDebugging
 			._ActiveLine = nil
 		require ._debuglevel != Level
+
+		if level > DebugLevelOff
+			.DebugInfoSave
+			
 		._debuglevel = level
 	
 		require level == DebugLevelOff
-		|| w = .wrappedlines			
+		|| w = .WrappedLines			
 		w.obj = nil
+		
 		|| f = w.first
+		|| cleared = TextLineFlags.CodeReached ||| TextLineFlags.ActiveBreakPoint
+		w.CompilePos = -1
 		while f
-			f.textFlags	&=~ (TextLineFlags.CodeReached ||| TextLineFlags.ActiveBreakPoint)
+			f.textFlags	&=~ cleared
 			f.CompilePos = -1
 			f++
 	
@@ -160,10 +167,10 @@ extend textview
 	
 	libinternal DebugInfoSave
 		opt norefcounts
-		|| f = .FirstLine
+		|| w = .WrappedLines
+		|| f = w.first!
 		|| u = ._Viewing
-		require u and f.compilepos < 0
-		|| W = .WrappedLines
+		require u and w.compilepos < 0
 		if !w.obj
 			|| info = ._SavedCompileInfos
 			info <~ w
@@ -171,6 +178,7 @@ extend textview
 			debugger
 		W.obj = u.FilePath
 		
+		w.CompilePos = 0
 		while f
 			f.CompilePos = f.Position
 			f++

@@ -1126,17 +1126,18 @@ class TextView (GUIControl)
 		.ClearErrors(true)
 	
 	
-	function ClearErrors (|bool| ParseOnly = false)
+	function ClearErrors (|bool| ParseOnly = false, |ErrorSeverity| AtLeast=0)
 		opt norefcounts
 		|| e = .MyError$
 		if !Parseonly or e is parse
 			.MyError = nil
+
 		|| s = .Selectedline
 		for d in .WrappedLines
 			e = d.lineerror
-			if e and (!Parseonly or e is parse)
+			if e and (!Parseonly or e is parse) and (e.Severity >= AtLeast)
 				if d == s
-					.shownoextra
+					.ShowNoExtra
 				d.LineError = nil
 	
 	
@@ -1766,7 +1767,7 @@ class TextView (GUIControl)
 	function FindCompilePos (|int| Position, |textviewline|)
 		opt norefcounts
 		for s in .WrappedLines
-			if s.CompileContains2(Position)
+			if s.CompileContains(Position)
 				return s
 
 	function FindTextLine (|int| Pos, |TextViewLine!|)
@@ -2296,6 +2297,9 @@ class TextView (GUIControl)
 			loop p >= 0
 			Last = D
 			d = .NextVline(d, p)
+
+		if ._debuglevel
+			.DebugInfoSave
 		
 		.WrapTextEnd(d, changed, NewScroll)
 	
@@ -2399,7 +2403,7 @@ class TextView (GUIControl)
 	
 	
 	iterator lines
-		|| D = .wrappedlines.first
+		|| D = .WrappedLines.first
 		while d
 			yield d
 			d = d.next

@@ -40,10 +40,10 @@ extend PerryIDE
 				(sub.ListSource is modified) = Mod
 
 
-	function ClearErrors (|bool| Compiled)
+	function ClearErrors (|bool| Compiled, |errorseverity| AtLeast=0)
 		isnt Broken
 		.CompileOKString = ("Compile OK" (Compiled) "Check OK")
-		.editme.ClearErrors
+		.editme.ClearErrors(AtLeast)
 		.errorlist.Clear
 		.filelist.ClearErrors
 		.RelistStartupErrors
@@ -51,7 +51,7 @@ extend PerryIDE
 		
 	
 	function CheckedOK (|string| kind, |bool|)
-		.ClearErrors(kind=="compile")
+		.ClearErrors(kind=="compile", errorseverity.error)
 		if .viewing == .ViewErrors
 			.NoNeed(.CompileOKString, .viewfiles)
 		return true

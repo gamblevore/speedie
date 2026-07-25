@@ -90,18 +90,18 @@ class TextViewLine (list)
 		return p
 	
 	
+//	libinternal CompileContains (|ind| b, |bool|)
+//		opt norefcounts
+//		|| p = .CompilePos2
+//		if p == -1
+//			return false //
+//		|| p2 = p + .Length
+//		|| next = .Next
+//			p2 = next.CompilePos2
+//		return b >= p and b < p2
+
+
 	libinternal CompileContains (|ind| b, |bool|)
-		opt norefcounts
-		|| p = .CompilePos2
-		if p == -1
-			return false //
-		|| p2 = p + .Length
-		|| next = .Next
-			p2 = next.CompilePos2
-		return b >= p and b < p2
-
-
-	libinternal CompileContains2 (|ind| b, |bool|)
 		// needs to always be setup...
 		// on wrap if not existing
 		// and on debugmode set
@@ -467,9 +467,9 @@ libinternal TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int
 	
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
-		if keys.Shift
-			d.DebugDraw(Where, y)
-		if d.CompileContains2(m.Position)
+//		if keys.Shift
+//			d.DebugDraw(Where, y)
+		if d.CompileContains(m.Position)
 			|| bg = ¥.ActiveTextLine
 			if m.flags&1
 				bg = colors.red(0.25).px
