@@ -13,15 +13,15 @@ class File (String)
 	|filedes|		Descriptor
 
 	constants
-		AllowMissing = true
-		ExpectExists = false
-		CreateMode	 = 0x200			/* create if nonexistant */
-		TruncateMode = 0x400			/* truncate to zero length */
-		ExclusiveMode = 0x800			/* error if already exists */
-		AppendMode = 0x008				/* set append mode */
-		ReadMode = 0x000				/* open for reading only */
-		WriteMode = 0x001				/* open for writing only */
-		ReadWriteMode = 0x002			/* open for reading and writing */
+		AllowMissing	= true
+		ExpectExists	= false
+		CreateMode		= 0x200			/* create if nonexistant */
+		TruncateMode	= 0x400			/* truncate to zero length */
+		ExclusiveMode	= 0x800			/* error if already exists */
+		AppendMode		= 0x008			/* set append mode */
+		ReadMode		= 0x000			/* open for reading only */
+		WriteMode		= 0x001			/* open for writing only */
+		ReadWriteMode	= 0x002			/* open for reading and writing */
 
 	flags
 		AllowInvisible
@@ -66,7 +66,7 @@ class File (String)
 		return Value.cstr.SymLink(self)
 
 	function HardLinkTo (assigns:|stringzeroterminated|, |bool|)
-		cpp_wrapper JB_File_HardLinkTo 
+		cpp_wrapper JB_File_HardLinkTo
 
 	function IsOpen (|bool|)
 		disabled "use .opened"
@@ -178,10 +178,10 @@ class File (String)
 	function IsPipe (|bool|)
 		cpp_wrapper JB_File_IsPipe
 
-	function Peek (|int| n, |string|)
-		|| i = .offset
-		rz = .read(n)
-		.offset = i
+//	function Peek (|int| n, |string|)
+//		|| i = .offset
+//		rz = .read(n)
+//		.offset = i
 	
 
 	render 
@@ -336,17 +336,13 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		disabled "Use .outputstream"
 	function string.In (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
 		disabled "Use .inputstream"
-		
-	function string.OutputStream (|bool| Clear=true, |Faststring|)
+	
+	function string.OutputStream (|Faststring|)
 		description "Lets you write to a file, via a faststring object." 
 		|| f = .file
-		if f.ispipe
-			0
-		  elseif Clear
+		if !f.ispipe
 			f.close
 			require f.openempty
-		  elseif !f.opened
-			require f.open
 		return faststring(f)
 
 

@@ -186,7 +186,7 @@ class TextViewLine (list)
 			is ColoriseUsingPosition
 			isnt BreakPoint
 			return rz
-		
+
 //		|| Bigger = rz
 //		if !Bigger or Bigger.StartsAfter(range)
 //			Bigger = srch
