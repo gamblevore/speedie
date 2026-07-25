@@ -179,5 +179,7 @@ libinternal colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |ima
 			return .SyxCol[fixed_msg.func|uint| & 63]
 	if HasColor == 3
 		return .None
+	if hascolor == 2
+		return .SyxCol[@arg|int|]
 	return .SyxCol[0]
 

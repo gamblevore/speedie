@@ -446,11 +446,11 @@ libinternal TextView.DrawOneLine (|image| Where,  |TextViewLine| D,  |int| Y,  |
 	if d.LineError
 		.DrawErrorBackground(where, y + GoUp, d)
 	
+//	target __PROJECT_PERRY__ // debugging my stuff... still not 100% perfect
+//		if keys.Shift and self == "editme"
+//			d.DebugDraw(Where, y)
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
-		target __PROJECT_PERRY__ // debugging my stuff... still not 100% perfect
-			if keys.Shift
-				d.DebugDraw(Where, y)
 		if d.CompileContains(m.Position)
 			|| bg = ¥.ActiveTextLine
 			if m.flags&1

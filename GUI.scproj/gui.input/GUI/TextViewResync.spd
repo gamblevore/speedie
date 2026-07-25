@@ -36,20 +36,30 @@ libinternal TextView.TextMapHasLine (|int| A, |int| B, |bool|)
 libinternal textviewline.UnimportantDeletion (|ivec4| Map, |int| After,  |bool|)
 	opt norefcounts
 	// deleted an unimportant line
-	if self is EndsNormally and self isnt Keepable
+	if self is EndsNormally
 		|| n = .next
-		if n and n is Keepable
+		if n.MoreKeepable(self)
 			return map[1] >= after
 
 
+libinternal textviewline.MoreKeepable (|TextViewLine| other, |bool|)
+	nil checker
+	if self
+		if .CompilePos >= 0 and other.CompilePos < 0
+			return true
+		if self is Keepable and other isnt Keepable
+			return true
+
+	
 libinternal textviewline.TextMapLineDeleted (|ivec4| Map, |textviewline|)
 	opt norefcounts
+	
 	// so we deleted the end of the line
-	// kinda similar to the prev
+	// kinda similar to UnimportantDeletion
 
-	if self is EndsNormally and self isnt Keepable
+	if self is EndsNormally
 		|| n = .next
-		while n and self isnt keepable
+		while n.Morekeepable(Self)
 			|| OldAfter = .After
 			loop (map[0] < OldAfter  and  map[1] >= OldAfter)
 			.Remove
