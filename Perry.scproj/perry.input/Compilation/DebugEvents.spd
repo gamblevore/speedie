@@ -375,9 +375,11 @@ function perryide.DebugStep (|string| kind, |bool|)
 	|| e = .editme
 	|| active = e._ActiveLine
 	if active and .EditPath(active.name, false)
-		|| l = e.FindCompilePos(active.position)
+		|| Vline = -1
+		|| l = e.FindTextLine(active.position, Vline, true)
 			.SendJbin(.LineCommand(kind, l))
 			return true
+	Notifications <~ app.StackTrace
 	beep
 
 	
@@ -560,7 +562,7 @@ function perryide.GotASMSub (|message| asm)
 			src <~ cpy
 			cpy.obj = file.name
 	
-	l.ScrollStart = src[index]
+	l.ScrollStart() = src[index]
 	
 	|| fs = FastString()
 	fs <~ name.name

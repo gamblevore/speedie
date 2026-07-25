@@ -150,7 +150,7 @@ extend textview
 		opt norefcounts
 		|| w = .DebugInfoRestoreSub(u)
 		.WrappedLines = w
-		._Start = w
+		.ScrollStart = w
 		.ClearAutoComplete
 	
 	

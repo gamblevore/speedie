@@ -25,7 +25,7 @@ libinternal ListView.SLH (|vec3|)
  
 libinternal textview.SLH (|vec3|)
 	opt norefcounts
-	|| s = .StartLine
+	|| s = .ScrollStart
 	|| ll = .WrappedLines.last!
 	|| n = ll.vline - (.maxvisiblelines - 2)
 	return (s.vline,  n max 1,  .lineheight).vec3
@@ -87,9 +87,9 @@ libinternal ScrollBarMove (|vec3| slh, |int| shift)
 	if shift
 		|| t = .ScrollRect(slh, shift).x
 		if self isa ListView
-			.ScrollMoveTo(t)
+			.ScrollMoveTo(t) // this doesn't quite make sense?? moveto? but the other is moveby?
 		  elseif self isa textview
-			.StartLine = t
+			.ScrollStart() = .FirstLine.MoveCapped(t)
 
 
 libinternal ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)

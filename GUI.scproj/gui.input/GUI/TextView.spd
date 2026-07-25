@@ -31,7 +31,7 @@ class TextView (GUIControl)
 	|bool|						_PreferPrevLine
 	|byte|						_DebugLevel
 	|message?|					_ActiveLine
-	|TextViewLine|				_Start
+	|TextViewLine|				ScrollStart
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
 	|Document?|					_Viewing
@@ -52,7 +52,7 @@ class TextView (GUIControl)
 		super.Constructor(p)
 		|| TV = TextViewLine()
 		.WrappedLines = TV
-		._Start = TV									// Make nilchecker happy
+		.ScrollStart = TV									// Make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
@@ -239,7 +239,7 @@ class TextView (GUIControl)
 
 	behaviour Gesture
 		if (self is editable or AlwaysScrollable) and !.singleline
-			.StartLine = .StartLine.movecapped(wheel.y)
+			.ScrollStart() = .ScrollStart.movecapped(wheel.y)
 			return true
 
 
@@ -250,7 +250,7 @@ class TextView (GUIControl)
 		|| L = Dist / .lineheight|int|
 		if dist < 0
 			l = -1
-		return .StartLine.move(L)
+		return .ScrollStart.move(L)
 		
 	
 	libinternal message._CanExpandClick (|bool|)
@@ -662,7 +662,7 @@ class TextView (GUIControl)
 
 	libinternal InRange (|int| pos, |bool|)
 		opt norefcounts
-		|| d = ._Start
+		|| d = .ScrollStart
 		require pos >= d.Position
 		|| d2 = d.MoveCapped(.MaxPartialVisibleLines)
 		return pos <= d2.After
@@ -671,23 +671,17 @@ class TextView (GUIControl)
 	libinternal ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
-		|textviewline| d
-		if mode is CompilePos
-			d = .FindCompilePos(x)
-			if !d
-				d = .WrappedLines.first!
-		  else
-			d = .FindDrawInfoSub(x, i)
+		|| d = .FindTextLine(x, i, mode is compilepos)!
 		before = before.abs
 
 		|| lim = .MaxVisibleLines
 		if i inrange lim
 			return d
-		|| vdiff = d.vline - ._Start.vline
+		|| vdiff = d.vline - .ScrollStart.vline
 		if vdiff > 0
 			before = (vdiff min (lim-(before+1))) max 0
 			
-		.StartLine(mode) = d.MoveCapped(-before) 
+		.ScrollStart(mode) = d.MoveCapped(-before) 
 		return d
 		
 		
@@ -1693,7 +1687,7 @@ class TextView (GUIControl)
 	libinternal DrawSelRange (|image| Where, |intRange| R, |drawstyle| g)
 		opt norefcounts
 		|| i	= 0
-		|| d	= .StartLine
+		|| d	= .ScrollStart
 		|| End	= d.movecapped(.maxvisiblelines + 1)
 		if end.islast
 			end = nil
@@ -1764,45 +1758,53 @@ class TextView (GUIControl)
 				return false
 			return true
 
-	function FindCompilePos (|int| Position, |textviewline|)
-		opt norefcounts
-		for s in .WrappedLines
-			if s.CompileContains(Position)
-				return s
 
-	function FindTextLine (|int| Pos, |TextViewLine!|)
+	inline FindTextLine (|int| Pos, |TextViewLine!|)
 		|| vlines = 0
-		return .FindDrawInfoSub(Pos, vlines)
+		return .FindTextLine(Pos, vlines)!
 	
 
-	libinternal FindDrawInfoSub (|int| Char,  |$int| VLine,   |TextViewLine!|)
+	function FindTextLine (|int| Position, |$int| VLine, |bool| ForCompile=false,  |TextViewLine?|)
+		cpp_part FindTextLineSub
 		opt norefcounts
 
 		.WrapText
-		char = .clamp(char)
+		Position = .clamp(Position)
 		|| c = -int.max
-		|| s = .StartLine
+		|| s = .ScrollStart
 		|| d = .FirstLine
+		
+		// Go through all the lines. if we hit 'Position', thats cool.
 		
 		while
 			|| n = d.next
 			if d == s
 				c = 0
-			if !n or .FoundInfo(d.Range, char)
+			if !n
+				if VLine == -1
+					return nil
 				vline = c
 				return d
+			if ForCompile
+				if d.CompileContains(Position)
+					vline = c
+					return d
+			  else
+				if .FoundInfo(d.Range, Position)
+					vline = c
+					return d
 			d = n
 			c++
 	
 	
 	libinternal Y (|textviewline| D,  |int|)
-		rz = .lasttop - (D.vline - (._Start.vline-1)) * .lineheight|int|
+		rz = .lasttop - (D.vline - (.ScrollStart.vline-1)) * .lineheight|int|
 
 	
 	function XYOfChar (|ind| pos, |ivec2|)
 		opt norefcounts
 		|| VLine = 0
-		|| d = .FindDrawInfoSub(pos, VLine)
+		|| d = .FindTextLine(pos, VLine)!
 		if  vline >= 0  and  vline <= .maxvisiblelines
 			return .XYOfCharSub(d, vline, pos)
 
@@ -1901,7 +1903,7 @@ class TextView (GUIControl)
 			|| Diff = NO - NR
 			if Diff < 0
 				._RemainingHeight += Diff * .LineHeight
-				.start = ._Start.MoveCapped(Diff)
+				.scrollstart = .ScrollStart.MoveCapped(Diff)
 // were losing some remain somehow. not sure why. IDK maths?
 //				|| OldLoss = Old - (NO * .lineheight)
 //				|| NewLoss = Remain - (NR * .lineheight)
@@ -1913,7 +1915,7 @@ class TextView (GUIControl)
 	libinternal DrawPreparedTextSub (|image| where, |bool| Draw, |int|)
 		opt norefcounts
 		
-		|| d		= .StartLine
+		|| d		= .ScrollStart
 		|| y		= (.lineheight - font.height) + .LastTop
 		|| yEnd		= .LastBottom
 		|| Remain	= .LastRect.Height
@@ -1937,7 +1939,7 @@ class TextView (GUIControl)
 			d++
 			if !d
 				._CanSeeLastLine = true
-				._CanSeeAllLines = .StartLine.position == 0
+				._CanSeeAllLines = .ScrollStart.position == 0
 				exit
 
 		return Remain
@@ -2001,23 +2003,7 @@ class TextView (GUIControl)
 			|| M = .MessageAt(B)
 				xy = .XYOfChar(M.position)
 			(fp)(self, XY, M, err, reason, false)
-	
-	
-	libinternal StartLine (|TextViewLine|)
-		return ._Start
-	
-	
-	libinternal StartLine (|TextViewJumpMode| mode=0, assigns:|TextViewLine| d)
-		cpp_part StartAtLine
-		.StartWithoutScrollDraw(mode) = d
-		.TouchScrollBar
-	
-	
-	libinternal StartLine (assigns:|int| v)
-		cpp_part StartAtInt
-		opt norefcounts
-		.StartLine = .FirstLine.MoveCapped(V)!
-	
+			
 	
 	libinternal FirstLine (|textviewline|)
 		opt norefcounts
@@ -2039,30 +2025,30 @@ class TextView (GUIControl)
 			rz = curr		
 	
 	
-	libinternal StartWithoutScrollDraw (|TextViewJumpMode| mode=0, assigns:|TextViewLine!| d)
+	setter ScrollStart (|TextViewJumpMode| mode=TextViewJumpMode.nothing, assigns:|TextViewLine!| d)
 		opt norefcounts
-		if mode is SlowScroll
-			d = d.SlowMove(._Start, 2)
 
-		|| n = 3 - .MaxVisibleLines
-		|| L = .WrappedLines.last!
-		|| last = L.movecapped(n)
-		
-		if d.position > last.position
-			d = last
-		.Start = d
+		if mode isnt InternalSet // WrapText uses this.
+			if mode is SlowScroll
+				d = d.SlowMove(.ScrollStart, 2)
 	
-	
-	function Start (assigns:|textviewline!| d)
-		opt norefcounts
-		require ._Start != d
-		._Start = d
-		|| p = d.Position
+			|| n = 3 - .MaxVisibleLines
+			|| L = .WrappedLines.last!
+			|| last = L.movecapped(n)
+			
+			if d.position > last.position
+				d = last
+
 		|| doc = .document
-			doc.scrollpos = p
+			doc.scrollpos = d.Position
+
+		require .ScrollStart != d
+		.ScrollStart = d
 		.ShowExtraInfo(GUI.mousexy, false)
 		GUI.touch(self)
-			
+		if mode isnt InternalSet
+			.TouchScrollBar
+	
 	
 	setter WrappedLines (|textviewline|)
 		disabled
@@ -2079,13 +2065,13 @@ class TextView (GUIControl)
 		
 		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
-		.WrappedLines.clear
 
+		.WrappedLines.clear
 		|| d = textviewline()
 		.WrappedLines <~ d
 		d.tline = 1
 		d.position = -1
-		.start = D
+		.scrollstart() = D
 
 	
 	libinternal NextVline (|TextViewLine| Curr, |int| P, |TextViewLine|)
@@ -2188,12 +2174,12 @@ class TextView (GUIControl)
 		return !d or d.position < 0
 
 
-	libinternal StartPos (|int|)
+	libinternal StartPos (|int|)				// remove?
 		opt norefcounts
-		|| P = ._Start.Position
+		|| P = .ScrollStart.Position
 		if P < 0
-			P = 0
-			._Start.Position = 0
+/			P = 0
+			.ScrollStart.Position = 0
 		return P
 
 
@@ -2319,7 +2305,7 @@ class TextView (GUIControl)
 		
 		if !d
 			d = .WrappedLines.first!
-		.StartWithoutScrollDraw(d)
+		.scrollstart(TextViewJumpMode.InternalSet) = d
 	
 	
 	libinternal TextCopy (GUICopyEvent)
@@ -2333,7 +2319,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		for s in .WrappedLines
 			if s.Position >= Value
-				.start = s
+				.scrollstart() = s
 				return
 
 	
@@ -2469,6 +2455,8 @@ datatype TextViewJumpMode (int)
 		SlowScroll
 		WantAGoodView
 		CompilePos
+		InternalSet
+	
 	syntax is (|TextViewJumpMode| m, |bool|)
 		inlined
 		return self|int| & m|int|

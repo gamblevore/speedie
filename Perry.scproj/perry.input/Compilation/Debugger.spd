@@ -59,7 +59,8 @@ function SetBreaks (|message| breaks)
 	for line in breaks.last
 		|| Pos = line.second.int
 		if pos <= .editme.text.Length
-			|| D = .editme.FindCompilePos(pos)
+			|| dummy = -1
+			|| D = .editme.FindTextLine(pos, dummy, true)
 				if all
 					(D is Codereached)
 				if line ~= "break"
