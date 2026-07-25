@@ -82,13 +82,6 @@ class TextViewLine (list)
 				require .Text[pos, name]
 				rz = '\n'
 		
-
-	function CompilePos2 (|int|)
-		|| p = .compilepos
-		if p < 0
-			p = .Position
-		return p
-	
 	
 	libinternal CompileContains (|ind| b, |bool|)
 		opt norefcounts

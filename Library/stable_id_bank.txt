@@ -322,6 +322,7 @@ GUI_LV_TypedString
 GUI_LV_Use
 GUI_LV_VisibleRows
 GUI_Line_After
+GUI_Line_DebugDraw
 GUI_Line_Destructor
 GUI_Line_OperatorContains
 GUI_Line_Render
@@ -503,8 +504,7 @@ GUI_Text_ErrorAt
 GUI_Text_FilePath
 GUI_Text_FillErrors
 GUI_Text_FindBackwardsIgnoringSpaces
-GUI_Text_FindLine
-GUI_Text_FindTextLine
+GUI_Text_FindTextLineSub
 GUI_Text_Gesture
 GUI_Text_GotFocus
 GUI_Text_Insert
@@ -530,6 +530,7 @@ GUI_Text_Range
 GUI_Text_RangeVec
 GUI_Text_RightClick
 GUI_Text_Save
+GUI_Text_ScrollStartSet
 GUI_Text_Search
 GUI_Text_SelRangeSet
 GUI_Text_SelectAll
@@ -539,7 +540,6 @@ GUI_Text_Show
 GUI_Text_ShowAndSelect
 GUI_Text_ShowExtraInfoAtPos
 GUI_Text_ShowNextParseError
-GUI_Text_StartSet
 GUI_Text_TextSize
 GUI_Text_TextViewSet
 GUI_Text_TryShowLineError
@@ -2070,4 +2070,3 @@ sqrtf
 strcmp
 strlen
 strnlen
-GUI_Line_DebugDraw
