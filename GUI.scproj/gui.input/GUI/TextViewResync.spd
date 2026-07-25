@@ -36,35 +36,49 @@ libinternal TextView.TextMapHasLine (|int| A, |int| B, |bool|)
 libinternal textviewline.UnimportantDeletion (|ivec4| Map, |int| After,  |bool|)
 	opt norefcounts
 	// deleted an unimportant line
-	if self is EndsNormally
-		if map[1] >= after and self isnt Keepable
-			|| n = .next
-			return n and n is Keepable
+	if self is EndsNormally and self isnt Keepable
+		|| n = .next
+		if n and n is Keepable
+			return map[1] >= after
 
 
-libinternal TextView.TextMapToOld (|ivec4| Map, |int| NewStart, |textviewline| D,  |int|)
+libinternal textviewline.TextMapLineDeleted (|ivec4| Map, |textviewline|)
+	opt norefcounts
+	// so we deleted the end of the line
+	// kinda similar to the prev
+
+	if self is EndsNormally and self isnt Keepable
+		|| n = .next
+		while n and self isnt keepable
+			|| OldAfter = .After
+			loop (map[0] < OldAfter  and  map[1] >= OldAfter)
+			.Remove
+			self = n
+			n++
+				
+	return self
+
+
+libinternal TextView.TextMapToOld (|ivec4| Map, |int| P, |textviewline| D,  |int|)
 	// AAA<BBB>CCC		2-->2,		6-->3
 	// AAACCC
 	// AAABBBCCC
 	opt norefcounts
 	
 	|| InsertStart = Map[0]					// 3
-	|| OldAfter = d.After
-	if NewStart < InsertStart
-//		if (LineAfter >= InsertStart) and d.UnimportantDeletion(Map, OldAfter)
-//			return OldAfter	// yikes // can't make sense of this. the concept makes sense.
-								// im frazzled. No idea what to do.
-		return NewStart
+	if P < InsertStart
+		return P
 
 	|| InsertEnd = InsertStart + Map[2]		// 6
 
-	if NewStart == InsertStart						
+	if P == InsertStart						
+		|| OldAfter = d.After
 		if !d.UnimportantDeletion(Map, OldAfter) and !.TextMapHasLine(InsertStart, insertend)
-			return NewStart
+			return P
 
-	if NewStart >= InsertEnd				// P==6
+	if P >= InsertEnd						// P==6
 		|| Gain = Map[3]					// 3
-		return NewStart - Gain
+		return P - Gain
 	return -1								// deleted :O
 
 

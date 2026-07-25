@@ -187,21 +187,27 @@ class TextViewLine (list)
 	libinternal ColoriseSub (|message| srch, |message|)
 		opt norefcounts
 		rz = .ColoriseSub2(srch)
-		|| r = rz
 		|| range = .range
-		if !r or r.StartsAfter(range)
-			r = srch
-			while r
-				r = r.parent
-				if (r == @arg) and r.StartsNotAfter(range)
-					rz ?= r
-					if !r.endsbefore(range)
-						exit
-		
-		if r and !r.StartsAfter(range)
-			(self is CodeBreak) = r is breakpoint
+
+		if rz and rz.StartsAfter(range)
 			is ColoriseUsingPosition
-			.message = r
+			isnt BreakPoint
+			return rz
+		
+//		|| Bigger = rz
+//		if !Bigger or Bigger.StartsAfter(range)
+//			Bigger = srch
+//			while Bigger
+//				Bigger = Bigger.parent
+//				if (Bigger == @arg) and Bigger.StartsNotAfter(range)
+//					rz ?= Bigger
+//					if !Bigger.endsbefore(range)
+//						exit
+//		
+		if rz and !rz.StartsAfter(range)
+			(self is CodeBreak) = rz is breakpoint
+			is ColoriseUsingPosition
+			.message = rz
 		  else
 			isnt breakpoint
 	
@@ -220,10 +226,6 @@ class TextViewLine (list)
 		
 		if srch.StartsAfter(r)					// starting after is OK, so lets just use it now!
 			return srch
-		
-		// What to do with things that wrap us, but we have something better?
-//		if r[0] <= srch.Position and r[1] >= srch.After
-//			return srch							// seems good?
 		
 		|| Attempt = Srch
 		while Attempt.StartsNotAfter(R) and Attempt.iscontainer

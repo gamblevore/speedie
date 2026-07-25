@@ -2070,7 +2070,7 @@ class TextView (GUIControl)
 		|| d = textviewline()
 		.WrappedLines <~ d
 		d.tline = 1
-		d.position = -1
+//		d.position = -1 // why?
 		.scrollstart() = D
 
 	
@@ -2208,14 +2208,6 @@ class TextView (GUIControl)
 	
 	libinternal PrepareLineColor (|textViewLine| d, |message| msg, |DocumentJeeboxMode| jx, |&Message?| lastowner, |message|)
 		opt norefcounts
-// maybe not the best way to do this.
-// our resyncing is pretty good in general wnyhow...
-// so just don't clear the lineerrors in here
-//		|| e = .MyError
-//		if e and (!e.obj) and d.CompileContains(e.position)
-//			e.obj = d
-//			d.LineError = e
-
 		(d isnt ColoriseUsingPosition)
 		(d isnt fakemsg)
 		d.message = nil
@@ -2226,7 +2218,8 @@ class TextView (GUIControl)
 		|| Parsed = .ParsedMessage
 			// try keep important lines. So... " // abc hahaha", or "", can be removed
 			// but something like "obj.func()" won't be. (That is for merging lines together.)
-			(d is keepable) = msg and !msg.iscontainer // Don't keep containers
+			|| msg2 = d.Message
+			(d is keepable) = msg2 and !msg2.iscontainer // maybe containers are OK now?
 
 		(d is colored) = Parsed
 		|| draw = .OnDrawLineNumber
@@ -2269,6 +2262,9 @@ class TextView (GUIControl)
 					d = d.TextMapInside
 				  elseif Old >= Map[1]
 					d = d.TextMapAfter(old)
+				  else
+					d = d.TextMapLineDeleted(Map)		// if the end of line was deleted somehow
+					
 			  else
 				d = d.TextMapAfter(P)
 
