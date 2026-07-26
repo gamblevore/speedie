@@ -538,9 +538,8 @@ extend Assembler
 			|| qq = .QuickFloat32Plus(exp, dest, l, r)
 				return qq
 			if !dest.isvec
-				|| Parts = .OptVecMathTwo(L, R)
-					|| fat = exp.UADD(dest, l, r, Parts&63)
-					fat._op += (l is Subtract)
+				|| Fat = exp.OptVecMathTwo(dest, L, R)
+					fat._op = asm.uadd + (l is Subtract)
 					return fat*dest
 
 		if 0: exp.VADD
@@ -611,8 +610,9 @@ extend Assembler
 			return Q2
 
 		if !dest.IsVec and l.IsSmall
-			|| Parts = .OptVecMathTwo(L,R)
-				return exp.umul(dest, l, r, Parts&63)*Dest
+			|| Fat = exp.OptVecMathTwo(dest, L, R)
+				fat._op = asm.UMUL
+				return fat*Dest
 
 		if 0: exp.VMUL
 		return exp.FMUL(dest, L, R, asmreg(), l.IsSmall|int|).Vectorise(dest, asm.vmul)
@@ -667,8 +667,9 @@ extend Assembler
 
 		|| Small = dest.IsSmall|int|
 			if !dest.isvec
-				|| Parts = .OptVecMathTwo(L,R)
-					return exp.udiv(dest, l, r, Parts&63) * dest
+				|| Fat = exp.OptVecMathTwo(dest, L, R)
+					fat._op = asm.udiv
+					return fat * dest
 		
 		return exp.FDIV(dest,  L,  R, Small).Vectorise(dest, asm.VDIV)
 
@@ -969,7 +970,23 @@ extend Assembler
 		|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign|int|)
 			return Merge
 		
-		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|) 
+		if (up == down) and !dest.IsVec and (!src.Signed or sign)
+			// converting a byte to an int, ok
+			// byte to uint, also ok
+			// int8 to int, also ok
+			// int8 to uint... bad
+			|| mem = src.fat
+			if mem and mem.IsRead and .IsCurr(mem)
+				|| size = 64-src.BitCount // already bit correct!
+				if size == up
+					// why not set dest.reg to src.reg?, and return dest? to be more consistant?
+					// because its creating lowreg-marked temps?
+					// then why aren't the others considered temp??
+					// sigh
+					src.µType = dest.µType
+					return src
+		
+		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|)
 		return fat.Vectorise(dest, asm.QFLG)
 
 	

@@ -168,11 +168,11 @@ struct Assembler
 			return v.Log2+1
 
 
-	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|) // addnum
+	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg| Stronger=nil, |asmreg|) // addnum
 		|| T = orig.µtype
 		if t is pointer // makes no sense
-			T = DataTypeCode.int
-		if !dest or dest == asmreg()
+/			T = DataTypeCode.int
+		if !dest.reg
 			dest.µtype = T
 		dest = .TempOnly(dest)
 
@@ -183,7 +183,7 @@ struct Assembler
 
 		|| K = .NumToReg(exp, where, amount, T)
 		rz = .Plus(exp, dest, Orig, K)
-		ifn rz iz dest // it took a shortcut, like adding 1 to 0, it just returned the 1
+		if Stronger and !(rz iz dest) // Took a shortcut: adding 1 to 0, it returned the 1 in the available constants
 			rz = .assign(exp, dest, rz) // but we don't want that here.
 			
 	
@@ -191,7 +191,7 @@ struct Assembler
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 //		if !dest.reg // more about keeping the type, I guess.
 //			dest = src
-		return .AddToReg(exp, src, src, value)
+		return .AddToReg(exp, src, src, value, src)
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
@@ -200,7 +200,7 @@ struct Assembler
 		rz = .Assign(exp,  .temponly(dest),  Src)
 		if !dest.reg
 			dest = src
-		.AddToReg(exp, dest, src, value) 
+		.AddToReg(exp, dest, src, value, src)
 
 
 	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
@@ -302,6 +302,11 @@ struct Assembler
 		if R is temp
 			|| f = r.fat
 				return .AskNop(f)
+	
+
+	function AskNopTemp (|?&Fatasm| Fat)
+		if fat is temp
+			return .AskNop(fat)
 	
 
 	function NopReg (|asmreg| R)

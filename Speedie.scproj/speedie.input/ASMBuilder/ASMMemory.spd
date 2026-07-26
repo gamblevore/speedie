@@ -128,8 +128,6 @@ function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |u
 
 function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, ||)
 	opt norefcounts
-	//|| f = base.fat
-		//if f isa asm.gobj or asm.gtab // hmmm.
 	
 	if base is AddrNoFiddle
 		return base asnt ASMReg.AddrNoFiddle
@@ -144,14 +142,16 @@ function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBi
 			expect LostBytes >= 0
 
 	|| i = index
-	i += LostBytes >> pow2
+	i += (LostBytes >> pow2)
 	if i <= maximum|int|
 		index = i
 		return base
-														// Too large to inline. increase via addtoreg				
+															// Too large to inline. increase via addtoreg				
 	i = (index << pow2) + LostBytes
 	index = 0
-	return .AddToReg(exp, base, base as ASMReg.NoScale, i)
+
+	base = base as asmreg.NoScale
+	return .AddToReg(exp, nil, base, i, base)
 
 
 

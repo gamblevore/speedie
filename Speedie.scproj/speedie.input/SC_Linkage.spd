@@ -21,13 +21,13 @@ module Linkage
 		opt norefcounts
 		for ch in .Flagz
 			if ch ~= name
-				if !fs
-					return ch.firstname
 				|| str = ch.firstname
+				if !fs
+					return str
+				if str
 					if fs.length
 						fs <~ ' '
 					fs <~ str
-
 
 	function message.ConfTake (|message| dest, |string| name)
 		opt norefcounts
