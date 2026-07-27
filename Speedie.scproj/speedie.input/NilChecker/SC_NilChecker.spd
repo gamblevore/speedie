@@ -149,8 +149,10 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 function Rel (NilTrackerFn)									// x = y
 	opt norefcounts
 	|| ll = msg.first!
-	|| op = ll.next!
-	|| scop = op.obj!|SCOperator|
+	|SCOperator| scop
+	|| op = ll.next
+		scop = op.obj|scoperator|
+	expect (scop) (msg) 
 	|| rr = op.next!
 
 	if scop Is Compare

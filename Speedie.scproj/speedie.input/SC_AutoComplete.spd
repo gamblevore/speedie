@@ -13,7 +13,7 @@ cpp_part AC
 |int|				Total
 ||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
  `)>.macro
- 
+
 ||					all_tmp_src	= <(`
 @RCM
 "function <name>"
