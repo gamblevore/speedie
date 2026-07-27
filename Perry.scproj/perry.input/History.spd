@@ -7,14 +7,21 @@ function PerryIDE.EnablePrevNext
 
 
 function PerryIDE.BestFunctionName (|textviewline--| Scroll, |string|)
+	|| good_name = .BestFunctionName(scroll, .editme.selection)
+		return good_name
+	return .BestFunctionName(scroll, (0, int.max))
+	
+	
+function PerryIDE.BestFunctionName (|textviewline--| Scroll, |intrange| Within, |string|)
 	|| Remain = .EditMe.MaxVisibleLines	
 	while scroll and (--Remain >= 0)
-		|message--| fn = Scroll.Message.OwningFunc
-			|| name = fn.name
-			|| msg_name = fn.OwningFullName(@emb)
-				name = msg_name.name
-			name = ":     ".append(name, "()")
-			return name
+		if Scroll.Range overlaps Within
+			|message--| fn = Scroll.Message.OwningFunc
+				|| name = fn.name
+				|| msg_name = fn.OwningFullName(@emb)
+					name = msg_name.name
+				name = ":     ".append(name, "()")
+				return name
 		scroll++
 	
 
@@ -54,6 +61,7 @@ function PerryIDE.GoToHistory (|message!| m, |bool|)
 	if rz
 		.RecentFiles.obj = m
 		.EnablePrevNext
+		// we want to use .show... cos we don't wanna select that line!
 		.editme.ViewLineAndSel(Line)
 	.JumpMode = 0
 

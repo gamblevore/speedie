@@ -246,7 +246,7 @@ function perryIDE.FlipJeeboxField (|bool|)
 
 function PerryIDE.UpdateJeeboxField (|bool|)
 	|| e = .EditMe
-	|| sr = e.SelRange
+	|| sr = e.Selection
 	|| txt = e.SelText
 	if !sr.width
 		txt = e.FindTextLine(sr.x).text
@@ -396,7 +396,7 @@ function EditMeSelChange (GUITextSelectEvent)
 	opt norefcounts
 	|| i = .ide
 	|| proj = i.SharedProjectTabSource
-		proj["pos"] = self|textview|.SelRange.x
+		proj["pos"] = self|textview|.Selection.x
 
 	i.TryReselectASM
 	if i.ProductSep.IsOpen and i.jeeboxtext is visible
@@ -407,7 +407,7 @@ function EditMeSelChange (GUITextSelectEvent)
 	i.EditMeTabRetryThing = 0
 	require !TextWasAltered and i.feedback.CommsOpen
 	|| e = self|textview|
-	|| s = e.selrange
+	|| s = e.Selection
 	if s.width
 		e.PerryTryAutoComplete(s.x2, "autocomplete_sel", PerryAutoCompleteReason.sel)
 

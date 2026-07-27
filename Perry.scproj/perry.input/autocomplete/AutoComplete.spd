@@ -76,7 +76,7 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	list.first = listviewrow.NewSeparator(1)
 	list.first = define
 	.autocomplete.listsource = list!
-	.SetAutoPoint(.editme.selrange.x)
+	.SetAutoPoint(.editme.Selection.x)
 	.CallFromSelect(list)
 	.ShowAutoComplete
 	(.AutoComplete isnt typethrough)
@@ -220,7 +220,7 @@ function AutoCompleteInsertText (GuiListEvent)
 function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 	if path.isproj
 		path = path.file.FindProjectMain$
-		
+	
 	if .EditPath(path, false)
 		.editme.ShowAndSelect(l, true)
 	.popuphide
@@ -410,10 +410,10 @@ function EditMeModified (guitextChangeEvent)
 	i.ShowStats
 	
 	if (reason isnt saving) and !i.DuringTempView
-		|| x = .SelRange.x2
+		|| x = .Selection.x2
 		if !GUI.IsTyping
 			i.InteractUpdate
-		  elseif !i.DuringLoad and (.selrange.x1 == x)
+		  elseif !i.DuringLoad and (.Selection.x1 == x)
 			|| b = self[x]
 			if !b or b.istextline or i.autocomplete.isopenedmenu
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)

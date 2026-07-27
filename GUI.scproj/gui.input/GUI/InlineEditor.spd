@@ -108,7 +108,7 @@ struct InlineEditor
 			if t == nil
 				return false
 			.text = t
-			.selrange = t.length
+			.Selection = t.length
 			.visible = true
 			.setfocus
 		

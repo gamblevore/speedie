@@ -201,7 +201,7 @@ class TextView (GUIControl)
 			return	// i used to use \r as a breakpoint, but its not cool. So what if everything is off by 1?
 					// I can adapt my line-system to handle changes....
 		
-		|| Restore = .selrange
+		|| Restore = .Selection
 		|| Break = ""
 		if (i < 0)										// ADD
 			range.x2 = range.x
@@ -212,7 +212,7 @@ class TextView (GUIControl)
 		.InsertText(Break, Range, false)
 		if restore.x > dp
 			Restore += (i < 0).dir
-		.selrange = Restore
+		.Selection = Restore
 		
 		
 	libinternal ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
@@ -231,8 +231,8 @@ class TextView (GUIControl)
 
 
 	behaviour GotFocus
-		if (.isinline or .singleline) and !.selrange.width
-			.selrange = .text.length
+		if (.isinline or .singleline) and !.Selection.width
+			.Selection = .text.length
 		GUI.SelChanged
 		super.gotfocus
 
@@ -351,7 +351,7 @@ class TextView (GUIControl)
 		|ivec2| bs
 		|| d = .ByteAtXY(p, bs)
 		|| b = bs.x
-		if !cmdkey  and  !clicks  and  .SelRange contains b
+		if !cmdkey  and  !clicks  and  .Selection contains b
 			return 0
 		
 		ifn .lastrect.vert contains p.y
@@ -383,28 +383,23 @@ class TextView (GUIControl)
 	function Sel (assigns:|int|)
 		disabled "Use selrange"
 		
-	inline SelRange (assigns: |int| r)
+	inline Selection (assigns: |int| r)
 		cpp_part TypingPlaceInt
-		.selrange = (r, r)
-	
-//	function ViewRange (|IntRange|)
-//		opt norefcounts
-//		|| S = ._start
-//		rz.x = s.Position
-//		|| E = S.MoveCapped(.MaxVisibleLines)
-//		rz.x2 = E.After
-		
-	function SelRange (assigns:|intrange|)
+		.Selection = (r, r)
+			
+	function Selection (assigns:|intrange|)
 		.TrySelect(value, false, nil)
 
-	inline SelRange (|intrange|)
+	inline Selection (|intrange|)
 		return ._typingplace.resolve
 		
 	libinternal Sel0 (|int|)
-		return .selrange.x
+		inlined
+		return .Selection.x
 	
 	libinternal Sel1 (|int|)
-		return .selrange.y
+		inlined
+		return .Selection.y
 
 	libinternal SelDirect (|IntRange| value, |TextViewLine| d)
 		.TrySelect(value, false, d)
@@ -718,7 +713,7 @@ class TextView (GUIControl)
 		|| c2 = c.step(i)
 			inl.Edit(c2, nil)
 			if i < 0
-				.selrange = 0
+				.Selection = 0
 		return true
 	
 
@@ -756,7 +751,7 @@ class TextView (GUIControl)
 			return true
 		if JustUpdate
 			return true
-		|| r = .SelRange
+		|| r = .Selection
 		|| range = (R.x2, .text.length)
 		if keys.shift
 			range = (r.x, 0)
@@ -836,7 +831,7 @@ class TextView (GUIControl)
 	
 	
 	libinternal DoSelectAll (|bool|)
-		.selrange = (0, .text.length)
+		.Selection = (0, .text.length)
 		return true
 	
 	
@@ -880,7 +875,7 @@ class TextView (GUIControl)
 
 
 	libinternal NewLineSub (|int| Extra, |bool|)
-		|| sr = .selrange
+		|| sr = .Selection
 		|| ind = 0
 		|| i = 0
 		if !.SingleLine and !keys.shift
@@ -892,18 +887,18 @@ class TextView (GUIControl)
 						if c == ' ' or '\t'
 							i++
 						  else
-							.selrange = sr.x+i
+							.Selection = sr.x+i
 							exit
 		
 		.DontMergeUndo
 		.Typed("\n" + .improveindent(ind, extra))
 		if i
-			.selrange = .selrange.x-i
+			.Selection = .Selection.x-i
 		return true
 	
 	
 	libinternal SwapChars (|bool|)
-		|| i  = .selrange
+		|| i  = .Selection
 		|| i0 = i.x1
 		|| i2 = i
 		if i.width
@@ -923,7 +918,7 @@ class TextView (GUIControl)
 			return true									// eat it
 		|| extra = 0
 		if ((.onkeydown)(self, -10)?) and !keys.shift
-			.selrange = .ExtendToLineEnd(.sel1-1)		// move sel to end of line
+			.Selection = .ExtendToLineEnd(.sel1-1)		// move sel to end of line
 			extra = 4
 		.NewLineSub(Extra)
 		return true
@@ -947,7 +942,7 @@ class TextView (GUIControl)
 		
 	libinternal DeComment (|bool|)
 		require !.singleline
-		|| r = .selrange
+		|| r = .Selection
 		|| s = ""
 		|| t = .text
 		if T[r.x, "/*"]  and  T[r.x2-2, "*/"]
@@ -1034,12 +1029,12 @@ class TextView (GUIControl)
 		|| old = self[ins - ._autocompleteback, ins]
 		if old != c2
 			c2 = c2.DeleteTwoBytes(trim)
-			|| r = .selrange - (._autocompleteback, 0)
+			|| r = .Selection - (._autocompleteback, 0)
 			if (c2 endswith "()") and self[r.x2] == '('
 				c2 = c2[0, c2.length-2]
 			.DontMergeUndo
 			.InsertText(c2, r, false)
-			.selrange += (trim - c2.length)
+			.Selection += (trim - c2.length)
 			rz = true
 
 
@@ -1242,7 +1237,7 @@ class TextView (GUIControl)
 		
 	
 	libinternal CommentableRange	(|intrange|)
-		|| sel	= .selrange
+		|| sel	= .Selection
 		|| r	= sel.width and self[sel.x2 - 1].istextline
 		|| r2	= (0, r|int|)
 		|| t	= .LineExpand(sel - r2)
@@ -1252,7 +1247,7 @@ class TextView (GUIControl)
 
 	
 	libinternal PrevIsTabbable (|int| R, |bool|)
-		|| s = .SelRange
+		|| s = .Selection
 		require !s.Width
 		|| i = s.x
 		while R < i
@@ -1279,7 +1274,7 @@ class TextView (GUIControl)
 		.TypingPlaceReal = t
 		.InsertText(Tabbed, t, !IsTypingLike)
 		if istypinglike
-			.selrange = s + (dir > 0)
+			.Selection = s + (dir > 0)
 		return true
 	
 	
@@ -1386,7 +1381,7 @@ class TextView (GUIControl)
 	
 	
 	function SelectAll
-		.selrange = (0, .text.length)
+		.Selection = (0, .text.length)
 			
 
 	libinternal init
@@ -1423,13 +1418,13 @@ class TextView (GUIControl)
 		
 	libinternal TypedACounterPart (|byte| s, |bool|)
 		require (!.singleline)
-		|| sel  = .SelRange
+		|| sel  = .Selection
 		|| sel2 = sel.x2
 		|| SW = sel.Width
 		
 		if (!SW  and  s == '=')							//   a |=| b   -->   a |= b
 			if  self[sel2] == '|'  and  self[sel2-1] == '|'
-				.SelRange = (sel2, sel2+1)
+				.Selection = (sel2, sel2+1)
 			return false
 
 		require SW or (.JeeboxMode is colorise)
@@ -1437,7 +1432,7 @@ class TextView (GUIControl)
 
 		|| After = self[sel2]							// type through
 		if (c&1) and (after == s)
-			.selrange = sel2+1
+			.Selection = sel2+1
 			return true
 			
 		
@@ -1452,7 +1447,7 @@ class TextView (GUIControl)
 		// what about ' within a comment. its quite frustrating.
 		|| other = _CounterParts[c+1]
 		if (Other==s) and (after == s)
-			.SelRange = sel2+1
+			.Selection = sel2+1
 			return true
 
 		require .SelMsgValid(sel)	// we want to avoid this after comments.
@@ -1462,14 +1457,14 @@ class TextView (GUIControl)
 		
 		.DontMergeUndo
 		|| t	= .seltext
-		|| x	= .SelRange.x
+		|| x	= .Selection.x
 		.insert(s.render + t + other.render)
-		.selrange = (x+1, x+t.length+1)
+		.Selection = (x+1, x+t.length+1)
 		return true
 
 
 	inline SelText (|string|)
-		return self[.selrange]
+		return self[.Selection]
 	
 	
 	inline SelText (assigns:|string|)
@@ -1506,7 +1501,7 @@ class TextView (GUIControl)
 
 	
 	function Insert (|string| s, |bool| SelNew = false)
-		.InsertText(s, .SelRange, selnew)
+		.InsertText(s, .Selection, selnew)
 
 
 	libinternal ValidateNewText (|message|)
@@ -1623,7 +1618,7 @@ class TextView (GUIControl)
 
 
 	libinternal SelectToLineStart (|intrange|)
-		|| r = .SelRange
+		|| r = .Selection
 		|ind| A = .FindLineSeparator(r.x, 0)+1
 		|ind| B = r.x2
 		if (b > a) and self[b-1].istextline
@@ -1647,7 +1642,7 @@ class TextView (GUIControl)
 		
 		
 	libinternal DeleteKeySel (|int| d, |intrange|)
-		|| r = .SelRange()
+		|| r = .Selection()
 		if r.width
 			return r
 
@@ -1724,7 +1719,7 @@ class TextView (GUIControl)
 
 	libinternal DrawSel (|image| where, |ivec4| c)
 		opt norefcounts
-		|| r = .SelRange
+		|| r = .Selection
 		if R.width
 			if .SingleLine
 				c.y--
@@ -2155,7 +2150,7 @@ class TextView (GUIControl)
 		if p and !changed
 			return p
 		
-		|| Sel = .SelRange
+		|| Sel = .Selection
 		if !sel.width and (sel.x > 0)
 			parser._DotInsertAllow = true
 
@@ -2301,7 +2296,7 @@ class TextView (GUIControl)
 	
 	
 	libinternal TextCopy (GUICopyEvent)
-		if .SelRange
+		if .Selection
 			return .SelText
 		if self isnt editable
 			return .text

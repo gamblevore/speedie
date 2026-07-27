@@ -337,7 +337,7 @@ class PerryIDE (Window)
 		(.lineinfo is visible)
 		|| fs = FastString()
 		|| t = .Editme.Text
-		|| sel0 = .editme.SelRange.x
+		|| sel0 = .editme.Selection.x
 		|| sel = .EditMe.SelText
 		|| sel2 = sel
 		if sel2.last.IsTextLine
@@ -416,7 +416,7 @@ class PerryIDE (Window)
 			GUI.LastSearch = t
 			if other.text != t
 				other.text = t
-				other.Selrange = 0
+				other.Selection = 0
 
 
 	function HideStuff
@@ -778,7 +778,7 @@ So anything not 0 means "its OK"`
 		// or a fileviewer or a gamepreview player
 		// better to have a generalised "fileviewer"
 		|| g = (r isa "voi" or "png" or "qoi")
-		if .IsGraphics != g
+/		if .IsGraphics != g
 			.IsGraphics = g
 			.DuringLoad++
 			.ViewAsCurr

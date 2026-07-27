@@ -118,7 +118,7 @@ extend PerryIDE
 			return true
 		
 		if key is BACKSLASH
-			.editme.AddBreak(.editme.SelRange.x)
+			.editme.AddBreak(.editme.Selection.x)
 		
 	
 	function OptionCmdNum (|int| Num, |bool|)
@@ -189,7 +189,7 @@ function PressedSearchKeys (GUIKeyEvent)
 		
 	|| Srch = w.MassSearchField
 	if self isa TextView
-		|| sr = .SelRange
+		|| sr = .Selection
 		if (key is down) and (sr == .text.length)
 			if self == Srch
 				w.massreplacefield.setfocus

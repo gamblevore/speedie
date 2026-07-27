@@ -62,7 +62,7 @@ function TextView.CodeInsertion (|textviewline| D, |$int| s_end, |$bool| InRange
 			
 		return nil
 
-	require d.after >= msg.after
+	require d.range.x2 >= msg.after
 
 	if !autocomplete.IsAFunc(msg)
 		if CanUsePrms  // myfunc(a,b,c ^)
@@ -267,7 +267,7 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 function PerryInsert7 (|textview| self, |int| A, |bool|)
 	.DontMergeUndo
 	.InsertText("||", (A,A))
-	.selrange = A+1
+	.Selection = A+1
 	return true								// fn X () --> fn X (|*|) 
 function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 	.DontMergeUndo
@@ -282,13 +282,13 @@ function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 		toInsert += ", "
 		
 	.InsertText(toinsert , a)
-	.selrange = sel
+	.Selection = sel
 	return true								// f* --> fn *
 
 function PerryInsert5 (|textview| self, |intrange| A, |bool|)
 	.DontMergeUndo
 	.InsertText(", ||", A)
-	.selrange = A.x+3
+	.Selection = A.x+3
 	return true								// fn X (|type| name*) --> fn X (|type| name, |*|) 
 function PerryInsert3And4 (|textview| self, |intrange| A, |bool|)
 	.DontMergeUndo
@@ -303,12 +303,12 @@ function PerryInsert2 (|textview| self, |intrange| A, |bool|)
 		A += (1,1)
 		
 	.InsertText(decl, A)
-	.selrange = .selrange.x-2
+	.Selection = .Selection.x-2
 	return true								// fn X* --> fn X (|*|)
 function PerryInsert1 (|textview| self, |intrange| a, |bool|)
 	.DontMergeUndo
 	.InsertText(" name ", a)
-	.selrange = (a.x2+1, a.x2+5)
+	.Selection = (a.x2+1, a.x2+5)
 	return true								// f* --> fn *
 
 
@@ -331,7 +331,7 @@ function textview.IsInClass (|textviewline| d, |bool|)
 
 function textview.PerryDeclKey (|bool|)
 	opt norefcounts
-	|| s = .SelRange
+	|| s = .Selection
 	require !s.width
 
 	|| d = .FindTextLine(s.x)
@@ -364,7 +364,7 @@ function textview.PerryDeclKey (|bool|)
 				return true
 
 		.insert("||")
-		.selrange = .selrange.x-1 // :)
+		.Selection = .Selection.x-1 // :)
 		return true
 
 
@@ -402,7 +402,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 		return 1
 	require  .JeeboxMode is Expect
 	
-	|| s = .SelRange
+	|| s = .Selection
 	|| i2 = s.x2
 	if  !s.width
 		if key is escape
@@ -418,7 +418,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 			while .text.CharMode(fwd) == '_'
 				fwd++
 			s.x2 = fwd
-			.Selrange = s
+			.Selection = s
 			return 1
 	
 	require key isnt escape
@@ -447,7 +447,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
 			return (s.x <= i2)|int|
 		if (state == 2)
 			if s.width
-				.selrange = s.x2x2
+				.Selection = s.x2x2
 			return 1 // why not
 		return 0 // i think?
 	

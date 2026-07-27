@@ -492,7 +492,7 @@ class FileViewer (ListView)
 		|| Line = path.rangelength
 			.editme.ViewLineAndSel(Line)
 			if pos > 0								// surely... its a position ON a line?
-				pos += .editme.SelRange.x
+				pos += .editme.Selection.x
 		if pos > 0
 			.editme.ShowAndSelect(Pos, true)
 
