@@ -493,7 +493,6 @@ GUI_Text_CanAutoCompleteSet
 GUI_Text_CancelEditing
 GUI_Text_ClearErrors
 GUI_Text_Constructor
-GUI_Text_CurrLine
 GUI_Text_DebugLevelSet
 GUI_Text_Destructor
 GUI_Text_DoExplode
@@ -519,6 +518,7 @@ GUI_Text_LoadDocument
 GUI_Text_Log
 GUI_Text_LostFocus
 GUI_Text_MakeInline
+GUI_Text_MaxVisibleLines
 GUI_Text_MessageAtSel
 GUI_Text_MessageWithin
 GUI_Text_MouseDown
@@ -532,6 +532,7 @@ GUI_Text_RightClick
 GUI_Text_Save
 GUI_Text_ScrollStartSet
 GUI_Text_Search
+GUI_Text_SelLineNum
 GUI_Text_SelRangeSet
 GUI_Text_SelectAll
 GUI_Text_SelectedLine
@@ -1020,7 +1021,6 @@ JB_File_Output__MainArg
 JB_File_Parse
 JB_File_Path
 JB_File_PathFix
-JB_File_Peek
 JB_File_Read
 JB_File_ReadAll
 JB_File_RelaxPath
@@ -1620,7 +1620,6 @@ JB_Tree_Get
 JB_Tree_Index
 JB_Tree_IsOnlyChild
 JB_Tree_Loop
-JB_Tree_Move
 JB_Tree_MoveN
 JB_Tree_MoveTo
 JB_Tree_OperatorContains
