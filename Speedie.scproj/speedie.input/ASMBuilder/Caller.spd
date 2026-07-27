@@ -116,7 +116,7 @@ function GrabbedRegisters (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
 	.CurrFuncGrab--
 	|| c = .Last - 1
 	while C >= Start
-		if (c isa asm.GRAB)
+		if c isa asm.GRAB
 			if c.CurrGrabID == .CurrFuncGrab
 				.SetRegister(c.regonly(1), nil, fn)
 		c--

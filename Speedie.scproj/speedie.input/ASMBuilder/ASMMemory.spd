@@ -1,7 +1,6 @@
 
 extend Assembler {
 
-
 function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
 	|| dest = base
 	if base isnt temp

@@ -60,12 +60,20 @@ struct FatASM
 		|| b = .BaseOp
 		return b == asm.fncx or asm.fnc
 	
+	function asm.IsReffer (|bool|)
+		return self >= asm.RFUN and self <= asm.RFRD
+
+	function IsTrasher (|bool|)
+		|asm| b = .BaseOp
+		return (b == asm.fncx or asm.fnc) or b.isReffer
+	
 	function BaseOp (|int|)
-		rz = .op
-		if rz == asm.FNCX3
-			rz = asm.FNCX
-		  elseif rz == asm.FNC3
-			rz = asm.FNC
+		|| f = .op
+		if f == asm.FNCX3
+			return asm.FNCX
+		if f == asm.FNC3
+			return asm.FNC
+		return f
 
 	
 	function Form (|µform|)
@@ -190,6 +198,7 @@ struct FatASM
 		return f.Dest(a, dest, self)						// Then we set it to the new value
 	
 
+
 	function FindOlder (|&fatasm|)
 		|| reg = .Output.reg$
 		|| b = .BasicBlock
@@ -199,14 +208,16 @@ struct FatASM
 		
 		
 		|| f = self-1
-		while f.BasicBlock == b // asmtodo: use blockid
+		while f.BasicBlock == b
+			// asmtodo: use blockid
+			// asmtodo: also, if the function returns or exits past some code... it can't affect those regs
+			// or if its in a branch that couldn't have reached us.
+
 			|| d = f.Output.reg
 			if d == reg
 				return f
-			// Also this todo: if the function returns or exits past some code... it can't affect those regs
-			// or if its in a branch that couldn't have reached us.
-			if f.IsFunc and d < reg
-				return nil // can't go past funcs that wipe stuff!
+			if f.IsTrasher and d < reg
+				return nil // can't go past ops that wipe stuff!
 			f--
 		
 		
@@ -653,6 +664,8 @@ struct FatASM
 			require (asm.jbor xor 1) == asm.jban
 			|| S = –sizeof FatASM
 			require S == 64
+			require (asm.rfrd > asm.RFUN and asm.rfwr and asm.rfst)
+			require (asm.rfun < asm.RFST and asm.RFWR)
 			return true
 
 

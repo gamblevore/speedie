@@ -171,7 +171,7 @@ struct Assembler
 	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg| Stronger=nil, |asmreg|) // addnum
 		|| T = orig.µtype
 		if t is pointer // makes no sense
-/			T = DataTypeCode.int
+			T = DataTypeCode.int
 		if !dest.reg
 			dest.µtype = T
 		dest = .TempOnly(dest)
@@ -366,7 +366,7 @@ struct Assembler
 		return BlockParents[B&(16K-1)]
 	
 	
-	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode,  |int| Depth=0)
+	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
 		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
@@ -418,7 +418,7 @@ struct Assembler
 		.regs.KnownMap = M
 			
 
-	function SetRegister (|int| changed, |asmreg| NopDest, |?&FATASM| Value, |asmreg|)
+	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Value, |asmreg|)
 		|| n = 0
 		|| start = .FuncStart_
 		if value
@@ -433,7 +433,7 @@ struct Assembler
 		
 		if oldi and (NopDest is AllowNopDest)
 			|| old = start + oldi
-			if (old.µRefCount <= 0) and (old.BasicBlock == .BasicBlock)
+			if (old.µRefCount <= 0) and .iscurr(old)
 				sh.nop_sub(old, fatnopmode.hard)
 		(NopDest isnt AllowNopDest)
 		return NopDest
@@ -445,7 +445,7 @@ struct Assembler
 	
 	
 	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
-		|| changed = info.prm
+		|| Changed = info.prm
 		.prms[a] = changed
 		changed &= 31
 		info.FatIndex = self - sh.funcstart_
@@ -460,6 +460,7 @@ struct Assembler
 
 		if !changed
 			return info
+		
 		._Outputs |= 1 << a
 		if info
 			(info is AllowNopDest)

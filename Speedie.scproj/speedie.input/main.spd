@@ -39,6 +39,7 @@ function Compiler.PrintResults
 
 
 function Compiler.MiniTests
+	expect fatasm.VerifyNumbers "ASM Setup failiure"
 	target debug
 		jeebox.Test
 	.TestDate
