@@ -731,18 +731,23 @@ extend PerryIDE
 	function LoadProject (|bool|)
 //		require .project.mustexist("load project")
 		.DuringLoad++
+		.JumpMode++
 		.StartFileList
 		.DuringLoad--
 		.StartProj
 
 		StartupWindow.hide
-		.viewasproject
+		.ViewAsProject
 		.AskCheck
 		GUI.SavePrefs // for pref-file editing
 		.ShowIDE
 		.ViewAsbetter
 		.LoadStartupErrors
 		.SetAppInfo
+		.RecentFiles.clear
+		.RecentFiles.obj = nil
+		.EnablePrevNext
+		.JumpMode--
 		return true
 	
 		
@@ -834,6 +839,5 @@ extend PerryIDE
 		|| r = .root
 			.id = r.FilePath
 		.nottodo = nil
-		.RecentFiles.clear
 		.StartFiles
 	

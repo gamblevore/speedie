@@ -165,11 +165,10 @@ function PerryIDE.ListAllFuncsMsg (|message| items, |message| result, |string| f
 
 
 function message.IDEAddfunc (|message| line, |string| filter)
-	opt norefcounts
 	if line != @decl
-		|| name = line.OwningFullName(@emb) 
+		|| name = line.OwningFullName(@emb)
 		if name and filter.filter(name.name)
-			|| fn = .msg(@str)
+			|message--| fn = .msg(@str)
 			fn.position = line.position
 			fn <~ name
 

@@ -221,9 +221,8 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 	if path.isproj
 		path = path.file.FindProjectMain$
 		
-	using self
-		if .EditPath(path, false)
-			.editme.ShowAndSelect(l, true)
+	if .EditPath(path, false)
+		.editme.ShowAndSelect(l, true)
 	.popuphide
 
 
@@ -512,8 +511,8 @@ function PerryIDE.FuncText (|message| spd_func, |message|)
 	rz = spd_func.OwningFullName(@prm)
 	|| Last = rz.last
 	|| oop = spd_func.EntireRange
-	last <~ oop.x 
-	oop.x2 += .editme[oop.x2].iswhite 
+	last <~ oop.x
+	oop.x2 += .editme[oop.x2].iswhite
 	Last.msg(@sstr, .editme[oop])
 
 
@@ -588,7 +587,7 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message|
 		
 	if jump or (!jump and where.IsUsefulTypeOfDecl)
 		.describewhere(rz, where)
-		|| jj = (@name + where.name) 
+		|| jj = (@name + where.name)
 		rz <~ jj
 		if jump == 2
 			jj <~ (@ask, "prototype")
@@ -612,7 +611,7 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message|
 
 
 function PerryIDE.DescribeWhere (|message| out, |message| where)
-	out <~ (@str, .path) 
+	out <~ (@str, .path)
 	out <~ where.position
 	out <~ where.rangelength
 

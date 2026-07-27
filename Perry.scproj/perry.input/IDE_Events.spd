@@ -292,7 +292,7 @@ function PressedLineInfo (GUIaction)
 	opt norefcounts
 	|| i = .ide
 	|| q = i.filelist.quickopen
-	q.text = "line " + i.editme.CurrLine.Render
+	q.text = "line " + i.editme.SelLineNum
 	i.filelist.showquickopen
 
 
@@ -433,12 +433,11 @@ function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
 
 function PerryIDE.ClickedError (|error| row)
 	require !.DuringMsgFB
-	using self
-		|| f = row.path.file
-		if (row.path != .path) and f.IsNicelyViewable
-			.EditPath(f, false)
-		.editme.ShowAndSelect(row.position, true)
-		.editme.MyError = row
+	|| f = row.path.file
+	if (row.path != .path) and f.IsNicelyViewable
+		.EditPath(f, false)
+	.editme.ShowAndSelect(row.position, true)
+	.editme.MyError = row
 
 
 function file.IsNicelyViewable (|bool|)

@@ -438,7 +438,7 @@ class TextView (GUIControl)
 
 		if .hasfocus
 			GUI.selchanged
-		if !.IsCleared
+		if !.IsCleared					// Relies on .position being -1, via .Clear
 			(.OnSelChanged)(self, 0, insert)?
 		
 		d ?= .FindTextLine(.sel0)
@@ -626,17 +626,18 @@ class TextView (GUIControl)
 		.ViewPos(r[i], 0)
 
 
-	function CurrLine (|int|)
+	function SelLineNum (|int|)
+		description "The number of the selected line"
 		opt norefcounts
 		|| d = .FindTextLine(.sel0)
-		return d.vline + 1
+		return d.LineNumber
 	
 	
 	libinternal LineInfo (|int| L, |textviewline|)
 		opt norefcounts
 		.WrapText
 		for r in .WrappedLines
-			if r.tline >= l
+			if r.LineNumber >= l
 				return r
 		return .WrappedLines.last
 	
@@ -664,7 +665,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| d = .ScrollStart
 		require pos >= d.Position
-		|| d2 = d.MoveCapped(.MaxPartialVisibleLines)
+		|| d2 = d.MoveCapped(.MaxVisibleLines(true))
 		return pos <= d2.After
 	
 	
@@ -1950,15 +1951,13 @@ class TextView (GUIControl)
 		return c max 16
 
 
-	libinternal MaxPartialVisibleLines (|int|)
-		|| h = .height
-		h += .LineHeight-3
-		return .height / .lineheight|int|
-	
-	
-	libinternal MaxVisibleLines (|int|)
-		return .height / .lineheight|int|
-	
+	function MaxVisibleLines (|bool| Partial=false, |int|)
+		|| h = .Height
+		|int| L = .LineHeight
+		if Partial
+			h += L-3
+		return H / L
+		
 	
 	libinternal ShowNoExtra
 		(.OnShowExtraInfo)(self, (0,0), nil, nil, "", false)?
@@ -1994,7 +1993,6 @@ class TextView (GUIControl)
 			.CancelDelayedError
 			._ErrorDelayer = DelayedShowError(self, 0.33s, gui.framestart, err, P2)
 				
-	
 	
 	function ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)
 		opt NoRefCounts
@@ -2069,8 +2067,8 @@ class TextView (GUIControl)
 		.WrappedLines.clear
 		|| d = textviewline()
 		.WrappedLines <~ d
-		d.tline = 1
-//		d.position = -1 // why?
+		d.LineNumber = 1
+		d.position = -1				// For TrySelect, which tests IF something was cleared.
 		.scrollstart() = D
 
 	
@@ -2174,11 +2172,11 @@ class TextView (GUIControl)
 		return !d or d.position < 0
 
 
-	libinternal StartPos (|int|)				// remove?
+	libinternal StartPos (|int|)
 		opt norefcounts
 		|| P = .ScrollStart.Position
-		if P < 0
-/			P = 0
+		if P < 0						// the clearing system uses this... .Clear and .IsCleared (via .TrySelect)
+			P = 0						// care about the position < 0
 			.ScrollStart.Position = 0
 		return P
 
@@ -2187,7 +2185,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		d.position = 0
 		d.TextFlags = 0
-		d.tline = 0
+		d.LineNumber = 0
 		d.vline = 0
 		d._Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
 		return .NextVline(d, 0)
@@ -2248,12 +2246,10 @@ class TextView (GUIControl)
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
 		
-		d.tLine = 1
+		d.LineNumber = 1
 		|TextViewLine| Last
 		|textviewline| NewScroll
 		|| P = 0
-//		target debug
-//			if keys.shift and self == "editme" and map[2] >= 0
 
 		while
 			if map[2] >= 0
@@ -2270,7 +2266,7 @@ class TextView (GUIControl)
 
 			if last
 				d.vline = last.vline + 1
-				d.tLine = last.tline + (last is endsnormally)
+				d.LineNumber = last.LineNumber + (last is endsnormally)
 
 			p = D.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  P)
 			msg = .PrepareLineColor(d, msg, jx, &lastowner)
@@ -2383,6 +2379,14 @@ class TextView (GUIControl)
 		SingleLine = 1
 		SingleLineWithTabs = 2
 	
+	
+	iterator Viewable
+		|| D = .scrollstart
+		|| n = .MaxVisibleLines
+		while d and n > 0
+			yield d
+			d = d.next
+			n--
 	
 	iterator lines
 		|| D = .WrappedLines.first

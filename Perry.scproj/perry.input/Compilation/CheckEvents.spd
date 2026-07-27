@@ -122,6 +122,9 @@ extend PerryIDE
 		cmd <~ .Project.path
 		return cmd
 	
+	
+	function NameStr (|string| s, |string|)
+		return .name.trimext + s
 		
 	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
 		|| RealErrors	= msg ~!= "check"
@@ -134,7 +137,7 @@ extend PerryIDE
 			0
 		  elseif !errsvis
 			.view(.viewerrors)
-			.say(" failed. Could not compile")
+			.say(.namestr(" failed. Could not compile"))
 		.LoadErrors(RealErrors, realerrors)
 		.showstats
 
@@ -179,7 +182,7 @@ extend PerryIDE
 	function Say (|string| str)
 		target osx
 			if !.IsFront or GUI.IsBackground
-				.Talker = unixProcess.spawn("/usr/bin/say", [.name.trimext + str])
+				.Talker = unixProcess.spawn("/usr/bin/say", [str])
 				(.talker)
 	
 	
@@ -200,7 +203,8 @@ extend PerryIDE
 				|| f = path.name.file
 				if !f.exists
 					str += " But it doesn't exist :("
-				.notify(.name + str, file)
+				str = .NameStr(str)
+				.notify(str, file)
 				.say(str)
 				if !killed
 					if (db is run or debug) and f.exists and stderr.ok

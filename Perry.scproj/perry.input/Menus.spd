@@ -21,83 +21,14 @@ function string.NameOrRoot (|string|)
 	|| s = .name
 		return s
 	return "Root"
-
-
-function PerryIDE.EnablePrevNext
-	|| m = .FindInHistory(.path)
-	(.GoNext is enabled) = m.next!=nil
-	(.GoPrev is enabled) = m.prev!=nil
-
-
-function PerryIDE.FindInHistory (|string| p, |message|)
-	opt norefcounts
-	for s in .RecentFiles
-		if s.firstname ~= p
-			return s
-
-
-function PerryIDE.AddToJumpHistory
-	require !.StillJumping
-	|| p = .path
-	|| old = .findinhistory(p)
-	if  !.duringNextPrev  or  !old
-		if old
-			old.remove
-		.RecentFiles.msg(@str, p.name).msg(@str, p)
-		.RecentFiles.trim(60, false)
-	.EnablePrevNext
 	
 
-function RightClickHistory (GUIaction)
-	if self isa Button
-		|| s = .SubMenu
-			s.OnTypingFilter = PerryFileListFilter
-			s.ListSource = .ide.SortedPrevious
-			.OpenMenu
-
-
-function ChoseHistoryItem (GUIListEvent)
-	|| i = .ide
-	|| old = i.FindInHistory(row.firstname)
-	i.GoToMarker(old ?? row, 1)
-	return true
-
-
-function ClickedHistory (GUIaction)
-	opt norefcounts
-	|| i = .ide
-	|| m = i.FindInHistory(i.Path)
-		|| fwd = self == i.gonext
-		|| m2 = m.step(fwd)
-		if m2 and m != m2
-			i.GoToMarker(m2, fwd.dir)
-		  else
-			beep
-		return true
-	
-
-function PerryFileListFilter (GUIListFilterEvent)
-	opt norefcounts
-	if value != nil
-		.ListSource = .ide.SortedPrevious(value)
-	  else
-		debugger
-
-
-function PerryIDE.GoToMarker (|message| m, |int| dir)
-	require m 
-	.duringNextPrev = dir
-	using self
-		.EditPath(m.firstname)
-	.duringNextPrev = 0
-
-
-function PerryIDE.SortedPrevious (|string| StrFilter = "", |message|)
-	rz = Message()
-	for ch in .RecentFiles
-		if StrFilter.filter(ch.name)
-			|| cpy = ch.copy
-			rz <~ cpy
+//function PerryFileListFilter (GUIListFilterEvent)
+//	opt norefcounts
+//	if value != nil
+//		.ListSource = .ide.SortedPrevious(value)
+//	  else
+//		debugger
 
 
 function PressingTabs (guiaction)

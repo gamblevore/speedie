@@ -1,0 +1,99 @@
+
+
+function PerryIDE.EnablePrevNext
+	opt norefcounts
+	(.GoNext is enabled) = .NextHistory(true)
+	(.GoPrev is enabled) = .NextHistory(false)
+
+
+function PerryIDE.BestFunctionName (|textviewline--| Scroll, |string|)
+	|| Remain = .EditMe.MaxVisibleLines	
+	while scroll and (--Remain >= 0)
+		|message--| fn = Scroll.Message.OwningFunc
+			|| name = fn.name
+			|| msg_name = fn.OwningFullName(@emb)
+				name = msg_name.name
+			name = ":     ".append(name, "()")
+			return name
+		scroll++
+	
+
+function PerryIDE.AddToJumpHistory
+	opt norefcounts
+	require (.JumpMode <= 0) and perry.FinishedStartUp
+	|| p = .path
+	|| scr = .editme.ScrollStart
+	|| item = .RecentFiles.msg(@str, p.name + .BestFunctionName(scr))
+	item <~ p
+	item.Position = scr.LineNumber
+	.RecentFiles.trim(84, false)
+	.RecentFiles.obj = nil
+	.EnablePrevNext
+
+
+function perryide.NextHistory (|bool| Forward, |message|)
+	opt norefcounts
+	|| Item = .RecentFiles.obj as Message
+		return item.Step(forward)
+	if !Forward
+		return .RecentFiles.Last
+	
+	
+function perryide.ClickedFwdBack (|bool| Forward)
+	opt norefcounts
+	|| Item = .NextHistory(forward)		#expect (Beep)
+	.GoToHistory(item)
+
+
+function PerryIDE.GoToHistory (|message!| m, |bool|)
+	require !.JumpMode
+	.JumpMode = (.RecentFiles.obj!=nil)|int|
+	|| path = m.firstname
+	|| Line = m.Position
+	rz = .EditPath(Path)
+	if rz
+		.RecentFiles.obj = m
+		.EnablePrevNext
+		.editme.ViewLineAndSel(Line)
+	.JumpMode = 0
+
+
+/*
+	OK... so what should happen?
+	* Keep the order
+		* I go from main.spd to Document.spd, it should stay where it is.
+	* If I jump to another position, the new pos goes to the bottom.
+
+Story 2:
+	
+	We are in file main: No history.
+	Jump to another func in main: Add old position in main.
+	Press Prev: Use file pos found from "main" in history. Update item to curr position.  Item.indent = 3
+	Press Prev: if Item.indent == 3, then that means... its forward. So... its ahead of us, so we ignore it.
+		* So... we go to it's prev. But that is nil, so... we do nothing.
+	Press next: the curr in the curr thing is... fwd, so we use it.
+		* If not, use it's next. otherwise fail.
+*/
+
+
+function ClickedHistory (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	i.ClickedFwdBack(self == i.gonext)
+	return true
+
+
+function RightClickHistory (GUIaction)
+	if self isa Button
+		|| s = .SubMenu
+//			s.OnTypingFilter = PerryFileListFilter
+			s.ListSource = .ide.RecentFiles
+			.OpenMenu
+
+
+function ChoseHistoryItem (GUIListEvent)
+	opt norefcounts
+	if row
+		.ide.GoToHistory(row)
+	return true
+

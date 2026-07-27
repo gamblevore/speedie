@@ -31,7 +31,7 @@ class TextViewLine (list)
 	|Error?|				LineError
 	|float|					UserInfo
 	|int|					vline
-	|int|					tline
+	|int|					LineNumber
 	|TextLineFlags|			TextFlags
 	|int|					CompilePos	// Position at compile time
 
@@ -396,10 +396,10 @@ libinternal TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,
 	|int| big = ._LineNumWidth
 		x += big * font.width
 		|| P = (x-(4+font.width), y)
-		|| TLine = d.tline
+		|| TLine = d.LineNumber
 		|| pr = d.prev
 		|| lc = .LineNumColor(d, selected)
-		if !pr or (tline != pr.tline)
+		if !pr or (tline != pr.LineNumber)
 			|| F = font.small!
 			while
 				|| c = TLine mod 10

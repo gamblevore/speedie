@@ -34,7 +34,7 @@ Message is also:
 	|MessageFlags|			Flags		// Re-purposeable.  Input and output. Affects render-style only. Some bits unused.
 	|uint16|				Tag			// Freely-useable.  Not input or output
 //	|Object|				Obj			// Freely-useable.  Not input or output (inherited from List)
-//	|int|					Position	// Re-purposeable.  Output only
+//	|int|					Position	// Re-purposeable.  Output only			(inherited from List)
 ////////////////////////////////		
 	
 	

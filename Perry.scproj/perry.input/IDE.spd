@@ -97,10 +97,9 @@ class PerryIDE (Window)
 	|bool|						BytesInfoMode
 	|bool|						DuringASMEvent
 	|bool|						AlreadyExpandedCompileTab
-	|bool|						StillJumping
+	|int8|						JumpMode
 	|bool|						CanAskingAboutMissing
 	|bool|						DuringMsgFB				// canloadfile, canupdate, .disable 
-	|int8|						DuringNextPrev
 	|bool|						IsTextMode
 	|bool|						UsingSpdLib
 	|CompileMode|				_DebugMode
@@ -344,7 +343,7 @@ class PerryIDE (Window)
 		if sel2.last.IsTextLine
 			sel2 = sel2.Shorten(1)
 		fs <~ "ln "
-		fs <~ .editme.CurrLine
+		fs <~ .editme.SelLineNum
 		|| n = sel2.count(charset.line)-1		// could probably remove this call to linecount
 			fs <~ "+"				// just compare vlines within textviewline
 			fs <~ n+1				// then its literally used in one place...
@@ -420,7 +419,7 @@ class PerryIDE (Window)
 				other.Selrange = 0
 
 
-	function HideStuff 
+	function HideStuff
 		opt norefcounts
 		|| M  = .MouSEXY
 		|| LB = .ViewButtons.lastrect.y1
@@ -592,7 +591,7 @@ class PerryIDE (Window)
 				
 
 	function ShowFind (|bool|)
-		.retextsubfind
+		.ReTextSubFind
 		.ViewAsProject
 		.View(.ViewSearch)
 		.MassSearchField.SelectAll
@@ -650,26 +649,14 @@ class PerryIDE (Window)
 		
 	function Root (|filerow|)
 		opt norefcounts
-		return .FileList.liststart as filerow
+		return .FileList.liststart as FileRow
 
 
 	function file.NeedsOwnWindow (|bool|)
 		if .IsProj
 			return true
-		if .isspd
-			rz = .parse.Find(@tmp, "main")
-
-
-	Syntax UsingComplete (|object| idk)
-		(Idk)
-		.StillJumping = false
-		.AddToJumpHistory
-
-		
-	Syntax Using (|PerryIDE|)
-		.AddToJumpHistory
-		.StillJumping = true
-		return self
+		if .IsSpd
+			return .parse.Find(@tmp, "main")
 
 
 	module
@@ -707,7 +694,7 @@ class PerryIDE (Window)
 			ide = perry.IdeAddProj(p)					// add as project
 		  else
 			.filelist.addextra(p)						// add root
-		startupwindow.hide
+		StartupWindow.hide
 		ide.ShowIDE
 		return ide
 
@@ -723,7 +710,7 @@ class PerryIDE (Window)
 		|error| JumpTo
 		|| src = lst.ListSource
 		
-		|| parse_err = txt.MyError
+		|| Parse_err = txt.MyError
 		if Parse_err is parse
 			src <~ parse_err
 
@@ -759,7 +746,7 @@ class PerryIDE (Window)
 1 means "its OK, we managed to load it"
 So anything not 0 means "its OK"`
 
-		if r isa filerow
+		if r isa FileRow
 			rz = .EditFile(r)
 
 
@@ -797,8 +784,10 @@ So anything not 0 means "its OK"`
 			.ViewAsCurr
 			.DuringLoad--
 		
+		.AddToJumpHistory
 		|| ok = (.EditDraw(r) (g) .EditText(r))
 		if ok != 1
+			.RecentFiles.pop
 			return ok
 
 		|| IsNewlyOpened = !r._Document
@@ -812,7 +801,6 @@ So anything not 0 means "its OK"`
 				.ProductSep.Collapse
 		
 		.PopupHide
-		.AddToJumpHistory
 		if  !g  and  .IsEditingSource
 			.Recheck(self)
 			.TryReselectASM
@@ -916,10 +904,11 @@ So anything not 0 means "its OK"`
 		
 		if .editme.JeeboxMode is Expect
 			|| err = .editme.MyError
-				ifn err isa error
-					log "ParseErrorDetect bug"
-				  elseif err is parse
-					.errorlist <~ err				// right?
+				if err isa error
+					if err is parse
+						.errorlist <~ err				// right?
+				  else
+					debugger
 
 	
 	function LoadStartupErrors
