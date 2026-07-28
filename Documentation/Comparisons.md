@@ -271,15 +271,39 @@ Heres the same in speedie:
             printline f
 
 
-Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors. Also, we pass `File.ExpectExists` (an integer constant containing bit-flags) to tell Speedie to create an error if the file does not.
+Its a little different, because Speedie's inbuilt file functions already test for problems, and then reports the errors.
 
-Or we can just do this (use the function `string.ReadFile`):
+Also, we pass `File.ExpectExists` (an integer constant containing bit-flags) to tell Speedie to create an error if the file does not. This might seem wierd, but think about it this way:
 
-    main
-        || f = "file.txt".ReadFile(File.ExpectExists)
-            printline f
+Often you do not care about if the file exist or not. if it doesn't, you often want to just read an empty string. So that is Speedie's default behaviour.
+    
+Now this entirely depends on what you are doing. For some programs it is almost always that a missing file is bad. For other programs, it is almost always that a missing file is OK. Now, in my personal experience, its always been that "missing file is usually OK". For example, lets say that I am trying to read a necessary font-file, you can do something like:
+    
+    function NeedFontBadly (|file| f, |stringthatwasreadsafely|)
+        if f.mustexist
+            return f.readall
+        
+Or this:
 
+    function GetSettingsFile (|message|)
+        || f = path.file
+        || s = f.readall
+        if s != ""
+            return s.parse
+        
+So the second person, does not care if the file is empty or missing. This might be OK!<small> _̣̣̟̞̤̐̄͝͡D̔ͩ̈́̓̏̄͗ͦ҉̧̣̹͔͉͇͝pͬͨ̄̊҉̴̩̜͇͈̕e͎̞̣̻̜̖̩͈͙̱̓ͪͭ̐ͥͪ͋̎͑̑̂̀̀ń̑͊̔ͨ̒ͪͨ̐͘͟͏̲̣̳̯̣̟̹̜̮͎ͅḑ̴̯̻͙̼̀̑̒ͫ̿̕i̸̭͉̯̱͎͕̬͓̳̇́͗̿ͥͮ̓͘n̷̩̪̣̙̼͔̫̞ͫͤ̄̋̿ͦͧ̃͢ǧ̤͎̈́̊̄͟ͅ ̵͉̺͔͙͋̿̈́̓͑o̖̳̳̎̽̐ͣ͡͡ͅn̡̝̞̉̂̀̏͆̿ ̱̦͑͊̀̄̕͡ͅͅw̢͖͙̩̠ͤ̃ͣ̅̈́͟a̶ͣ̎̿̔̅̎͊̀͜͏̭̬͙̞͕͕̖͈̦t̸̥͎̪̩̱͉ͫ̈ͤ͒͘ ̍̅̿̈ͬ͏͓̯͇u̧̠̬̩͎̿ͬ ̡͓͚̭̳͗ͪͪd͔̯͚̟ͬ̍̓͢o̫͉̩̼̤̫̳̖̩͖͐́̐̏͂́̀̚͡ͅȋ̶̠̳͈̩̦͓̒̉̒̌ͩ͜n̸̰̙͕̦̝̱̻̮̻̙̭ͩ̆̌̔͗́!̖̭͓ͥ́͌͡͝ͅ ͕̻̗͎̔ͩ̌͢_
+</small>
+    
 
-Neat huh?
+...
+
+So anyways... the Go example (way above) cos it's simplier, unfortunately just errors out, if ur file missin. This is often not the right answer, as often you do not care if the file exists, lets say reading a settings file. You'd be happy to get an empty string. But the Go example above doesn't do that. So we add an extra param to replicate the less desirable behaviour in Go's simple example.
+
+Now, just assume, we want usual behaviour, so missing files are OK. So... just do it in one function call.
+
+    || MyString = my_path.ReadFile
+    printline MyString
+
+As a bonus, Speedie reads files 6x faster than idiomatic C++ file-reading functions. Sure you can use boosted fast-file reading C++ libs. But... when 100,000 different software companies each use their own speed-boosted routines... and you are hired to work in them one after another... C++ gets old fast. Its nice to just have something fast right off.
 
 
