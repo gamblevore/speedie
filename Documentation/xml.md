@@ -17,7 +17,7 @@ That said, a lot of people have had complaints about XML, so lets list them, and
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*“XML is a classic political compromise: it balances the needs of man and machine by being equally unreadable to both.”* – Matthew Might
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*XSLT is a failure wrapped in pain. There’s no job for which XSLT is the right tool. If you think you found a job for which XSLT is a good tool, chances are the job itself is fucked up.* – masklinn
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*“XSLT is a failure wrapped in pain. There’s no job for which XSLT is the right tool. If you think you found a job for which XSLT is a good tool, chances are the job itself is fucked up.”* – masklinn
 
 OK well thats very funny... so lets look at a common list of reasons... why people aren't fans of XML.
 
@@ -44,7 +44,12 @@ XML is bad at storing dictionaries. Think you can store a dictionary like this?
         <address>Boulder Road</address>
     </dict>
 
-Well.. you can't. I mean... often you can, and you should be able to. The problem is that you won't be able to make a DTD that works with this. Also, what if the key happens to contain something that isn't a valid XML name? It is possible! (Depending on your program). This is why many formats (like Apple's plists) use dictionaries this way:
+Well.. you can't. I mean... often you can, and you should be able to. The problem is that you won't be able to make a DTD that works with this.
+
+Why? Why can't you just specify the DTD has a 'name' and 'address' field? Well... its a dictionary. The actual key values (name/address/etc), are indeterminant. It could be "name" or "address" or "blubblubglub" or "fish" or ")(*@£$U@£" or anything.
+
+
+Also, what if the key happens to contain something that isn't a valid XML name? It is possible! (Depending on your program). This is why many formats (like Apple's plists) use dictionaries this way:
 
     <dict>
         <key>name</key>
