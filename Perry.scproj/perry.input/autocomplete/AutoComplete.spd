@@ -213,20 +213,26 @@ function AutoCompleteInsertText (GuiListEvent)
 		|| num = row[2].int
 		i.DefineSub(file, num|int|)
 	  else
-		e.autocompletestring = row.Name
-		e.insertautocomplete
+		e.AutoCompleteString = row.Name
+		e.InsertAutoComplete
 
 
-function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
-	if path.isproj
-		path = path.file.FindProjectMain$
+function PerryIDE.DefineSub (|string| NewPath, |int| L, |bool|)
+	if NewPath.isproj
+		NewPath = NewPath.file.FindProjectMain$	
 	
-	if .EditPath(path, false)
+	|| CurrPath = .Path
+	if CurrPath ~= NewPath
+		.AddToJumpHistory
 		.editme.ShowAndSelect(l, true)
-	.popuphide
+	  else
+		if .EditPath(NewPath, false)
+			.editme.ShowAndSelect(l, true)
+	.PopupHide
 
 
 function PerryIDE.DefineFB (|message| msg, |bool|)
+	opt norefcounts
 	.DefineSub(msg.firstname, msg.second.int|int|)
 
 
@@ -238,14 +244,14 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 	  else
 		.PopupDisplay.JeeboxMode = documentjeeboxmode.prefer
 		(f is style2)
-		.popupreason = 1
+		.PopupReason = 1
 		.DisplayInPopup(f.render.trim, display.name contains "forced")
 
 
 // "" '' <(``)> ``
 
 function PerryIDE.DisplayStr (|message| f, |date|)
-	|| r = f.Range						// + f.rangetrim
+	|| r = f.Range										// f.rangetrim
 	|| orig = .EditMe[r]
 	if f.name != orig
 		.PopupDisplay.jeeboxMode = 0
@@ -637,13 +643,18 @@ function message.OwningFunc (|bool| EndAtArg = false, |message|) // isfunction
 	return .owningSyntax(AutoComplete.spdFunctions, EndAtArg)
 
 		
-function message.OwningModclass (|bool| EndAtArg=true, |message|)
+function message.OwningModClassSub (|bool| EndAtArg=true, |message|)
+	return .owningSyntax(AutoComplete.owner_dict, EndAtArg)
+
+
+function message.OwningModClass (|bool| EndAtArg=true, |message|)
 	opt norefcounts
 	require self
-	rz = .owningSyntax(AutoComplete.owner_dict, EndAtArg)
+	rz = .OwningModClassSub(EndAtArg)
 	if !.parent
 		rz ?= @tmp+"root"
 	
+
 
 function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
 	opt norefcounts

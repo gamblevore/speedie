@@ -778,7 +778,7 @@ So anything not 0 means "its OK"`
 		// or a fileviewer or a gamepreview player
 		// better to have a generalised "fileviewer"
 		|| g = (r isa "voi" or "png" or "qoi")
-/		if .IsGraphics != g
+		if .IsGraphics != g
 			.IsGraphics = g
 			.DuringLoad++
 			.ViewAsCurr

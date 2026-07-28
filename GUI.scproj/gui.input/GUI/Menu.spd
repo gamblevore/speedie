@@ -2,18 +2,17 @@
 
 
 class Menu (ListView)
-	|ListViewrow?|						EditingRow // 
+	|ListViewrow?|						EditingRow
 	|bool|								DelayedOpen
 	|bool|								NoCloseOnClick
 	|bool|								IsSearchMenu
 	
-	
-	constructor (|guicontrol| p,  |GUIKeyEvent| keys,  |GUIListEvent| ret)
-		super.constructor(p, nil, ret)
+	constructor (|guicontrol| p,  |GUIKeyEvent| Keys,  |GUIListEvent| Return)
+		super.constructor(p, nil, Return)
 		isnt visible
 		.Padding = 8
 		.MultiSelection = false
-		.OnKeyDown = keys
+		.OnKeyDown = Keys
 		.ClipMode = ControlClipMode.SlideBackInWindow
 		.gnormal = ¥.Menus
 		.gRowSel = ¥.MenuRowSel
@@ -126,15 +125,15 @@ class Menu (ListView)
 			return w.openedmenu == self
 	
 	
-	function CloseMenu 
+	function CloseMenu
 		opt norefcounts
-		.selectNone
+/		.SelectNone
 		if !.IsSearchMenu
 			.StopFilter
 		.UpdateFilter
 		isnt visible
 		.EditingRow = nil
-		if .isopenedmenu
+		if .IsOpenedMenu
 			|| w = .window
 				w.OpenedMenu = nil
 		|| p = .parent

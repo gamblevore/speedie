@@ -253,14 +253,11 @@ class ListView (GUIControl) {
 		opt norefcounts
 		.CheckRemoved(r)
 		
-		|ListViewrow| willsel
-		if r is selected
-			willsel = r.prev ?? r.next
-		r.remove
-		
-		if willsel
-			.ChangeSel(willsel, true)
-			.SelectedEvent( willsel, ListViewSelectMode.normal )
+		if r is Selected
+			|ListViewrow| WillSel = r.prev ?? r.next
+				.ChangeSel(WillSel, true)
+				.SelectedEvent( willsel, ListViewSelectMode.normal )
+		r.Remove
 
 //		GUI.touch(self)
 		if !NoUpdate

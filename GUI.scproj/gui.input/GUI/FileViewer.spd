@@ -479,7 +479,8 @@ class FileViewer (ListView)
 		|| cuter = s.trim.TrimStart("line ")
 		if cuter.isint								// "line 1234"
 			|| Line = cuter.ParseInt
-				.editme.ViewLineAndSel(Line)
+				|textviewline--| D = .editme.LineInfo(Line)
+					.editme.ShowAndSelect(D.position)
 				return
 		
 		|| Path = s.ExtractPathAndLine
@@ -490,7 +491,8 @@ class FileViewer (ListView)
 		
 		|| Pos = path.Position
 		|| Line = path.rangelength
-			.editme.ViewLineAndSel(Line)
+			|textviewline--| D = .editme.LineInfo(Line)
+				.editme.ShowAndSelect(D.position)
 			if pos > 0								// surely... its a position ON a line?
 				pos += .editme.Selection.x
 		if pos > 0

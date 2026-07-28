@@ -628,19 +628,19 @@ class TextView (GUIControl)
 		return d.LineNumber
 	
 	
-	libinternal LineInfo (|int| L, |textviewline|)
+	function LineInfo (|int| LineNum, |textviewline|)
 		opt norefcounts
 		.WrapText
-		for r in .WrappedLines
-			if r.LineNumber >= l
+		for r.fast in .WrappedLines
+			if r.LineNumber >= LineNum
 				return r
 		return .WrappedLines.last
 	
 	
-	function ViewLineAndSel (|int| L)
-		opt norefcounts
-		|| d = .LineInfo(L)
-			.ShowAndSelect(d.position)
+//	function ViewLineAndSel (|int| L)
+//		opt norefcounts
+//		|| d = .LineInfo(L)
+//			.ShowAndSelect(d.position)
 
 	
 	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine!|)
@@ -1123,7 +1123,7 @@ class TextView (GUIControl)
 			.MyError = nil
 
 		|| s = .Selectedline
-		for d in .WrappedLines
+		for d.fast in .WrappedLines
 			e = d.lineerror
 			if e and (!Parseonly or e is parse) and (e.Severity >= AtLeast)
 				if d == s
@@ -1878,7 +1878,7 @@ class TextView (GUIControl)
 	libinternal DrawScrollMarks (|image| where)
 		opt norefcounts
 		require .DrawScrollStrength
-		for s in .WrappedLines
+		for s.fast in .WrappedLines
 			|| E = s.LineError
 				|| Sev = E.Severity
 				|| c = Sev.color(1.0)
@@ -2304,7 +2304,7 @@ class TextView (GUIControl)
 
 	libinternal ScrollPos (assigns:|int|)
 		opt norefcounts
-		for s in .WrappedLines
+		for s.fast in .WrappedLines
 			if s.Position >= Value
 				.scrollstart() = s
 				return

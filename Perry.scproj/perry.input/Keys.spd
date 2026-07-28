@@ -98,7 +98,7 @@ extend PerryIDE
 
 		if key is l							// l = file list
 			if keys.option or keys.Shift
-				RightClickHistory(.goprev)
+				OpenHistory(.goprev)
 				return .goprev.searchmenu
 			  else
 				return .ShowQuickStuff(true)

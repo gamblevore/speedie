@@ -38,7 +38,8 @@ module Perry
 			|| Sub = path.first
 				ide.EditPath(Sub.name)
 			|| Line = path.rangelength
-				ide.editme.ViewLineAndSel(Line)
+				|| D = ide.editme.LineInfo(Line)
+					ide.Editme.ShowAndSelect(D.position)
 			
 			rz = ide
 

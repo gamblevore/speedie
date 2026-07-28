@@ -9,7 +9,7 @@ function compiler.Bundle
 		require SC_Targets["gui"] // what about exec? or other that want to be cmd-line?
 		require !linkage["nobundle"]
 		|| Pd = .productfile
-		|| Pj = .BaseProjectPath 
+		|| Pj = .BaseProjectPath
 			.AppleBuildApp(pd, pj)
 
 	

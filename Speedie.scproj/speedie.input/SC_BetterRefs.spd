@@ -61,7 +61,7 @@ class CppRefs
 	}
 */
 		.SetDefaultRefStatus
-		|| arg = node[@arg] #require
+		|| arg = node[@arg]				#require
 		arg.expectlast
 		
 		for c in arg

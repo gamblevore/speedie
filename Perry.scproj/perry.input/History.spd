@@ -2,27 +2,72 @@
 
 function PerryIDE.EnablePrevNext
 	opt norefcounts
+	for s in .RecentFiles
+		|| f = s.FirstName
+		if !f.FileExists
+			s.Remove
+		|| p = s.prev
+			|| pf = p.FirstName
+			if (pf ~= f) and (p.Position == s.position)
+				p.Remove
+	
 	(.GoNext is enabled) = .NextHistory(true)
 	(.GoPrev is enabled) = .NextHistory(false)
 
 
-function PerryIDE.BestFunctionName (|textviewline--| Scroll, |string|)
-	|| good_name = .BestFunctionName(scroll, .editme.selection)
+function DeleteHistory (GuiKeyEvent)
+	opt norefcounts
+	if key.IsDelete and self isa ListView
+		.RemoveRow(.FirstSelected)
+		.ide.EnablePrevNext
+
+
+function SelectHistory (GUIListEvent)
+	opt norefcounts
+	if  self isa ListView
+		|| i = .ide
+		if row
+			i.GoToHistory(row, 1)
+		  else
+			|| old = .obj as string
+				i.EditPath(old)
+
+
+function PerryIDE.BestFunctionName (|string| owner, |textviewline--| Scroll, |string?|)
+	|string--| good_name = .BestFunctionName(owner, scroll, .editme.selection)
+	if good_name != nil
 		return good_name
-	return .BestFunctionName(scroll, (0, int.max))
 	
-	
-function PerryIDE.BestFunctionName (|textviewline--| Scroll, |intrange| Within, |string|)
+	return .BestFunctionName(owner, scroll, (-1, int.max))
+
+
+function PerryIDE.BestFunctionName (|string| parent_name, |textviewline--| Scroll, |intrange| Within, |string?|)
 	|| Remain = .EditMe.MaxVisibleLines	
 	while scroll and (--Remain >= 0)
 		if Scroll.Range overlaps Within
-			|message--| fn = Scroll.Message.OwningFunc
-				|| name = fn.name
-				|| msg_name = fn.OwningFullName(@emb)
-					name = msg_name.name
-				name = ":     ".append(name, "()")
-				return name
+			|message--| msg = Scroll.Message
+				|message--| fn = msg.OwningFunc
+				|| owner = msg.OwningModClassSub(true)
+				if fn or owner or msg == @decl
+					|| fs = FastString()
+					fs <~ parent_name
+					fs <~ ":"
+					fs <~ (' ', (27-parent_name.length) max 1)
+					if fn
+						|| fn_name = fn.OwningFullName(@emb)
+						fn_name.Render(fs)
+					  elseif msg == @decl
+						msg.Render(fs)
+					  elseif owner
+						|string--| name = owner.FirstName
+							fs <~ name
+						  else
+							fs <~ owner.name
+					return fs
 		scroll++
+	if Within.x < 0
+		return parent_name
+	return nil
 	
 
 function PerryIDE.AddToJumpHistory
@@ -30,10 +75,10 @@ function PerryIDE.AddToJumpHistory
 	require (.JumpMode <= 0) and perry.FinishedStartUp
 	|| p = .path
 	|| scr = .editme.ScrollStart
-	|| item = .RecentFiles.msg(@str, p.name + .BestFunctionName(scr))
+	|| item = .RecentFiles.msg(@str, .BestFunctionName(p.name, scr))
 	item <~ p
 	item.Position = scr.LineNumber
-	.RecentFiles.trim(84, false)
+	.RecentFiles.trim(16, false)
 	.RecentFiles.obj = nil
 	.EnablePrevNext
 
@@ -48,40 +93,28 @@ function perryide.NextHistory (|bool| Forward, |message|)
 	
 function perryide.ClickedFwdBack (|bool| Forward)
 	opt norefcounts
-	|| Item = .NextHistory(forward)		#expect (Beep)
+	|| Item = .NextHistory(forward)						#expect (Beep)
 	.GoToHistory(item)
 
 
-function PerryIDE.GoToHistory (|message!| m, |bool|)
-	require !.JumpMode
-	.JumpMode = (.RecentFiles.obj!=nil)|int|
+function PerryIDE.GoToHistory (|message!| m)
+	|| J = .RecentFiles.obj!=nil
+	.GoToHistory(m, J|int|)
+
+
+function PerryIDE.GoToHistory (|message!| m, |int| J)
+	require !.JumpMode and !.DuringTempView
+	.JumpMode = J
+	.DuringTempView++
 	|| path = m.firstname
 	|| Line = m.Position
-	rz = .EditPath(Path)
-	if rz
+	if .EditPath(Path)
 		.RecentFiles.obj = m
 		.EnablePrevNext
-		// we want to use .show... cos we don't wanna select that line!
-		.editme.ViewLineAndSel(Line)
+		|| D = .editme.LineInfo(Line)
+			.editme.Show(D.position)
+	.DuringTempView--
 	.JumpMode = 0
-
-
-/*
-	OK... so what should happen?
-	* Keep the order
-		* I go from main.spd to Document.spd, it should stay where it is.
-	* If I jump to another position, the new pos goes to the bottom.
-
-Story 2:
-	
-	We are in file main: No history.
-	Jump to another func in main: Add old position in main.
-	Press Prev: Use file pos found from "main" in history. Update item to curr position.  Item.indent = 3
-	Press Prev: if Item.indent == 3, then that means... its forward. So... its ahead of us, so we ignore it.
-		* So... we go to it's prev. But that is nil, so... we do nothing.
-	Press next: the curr in the curr thing is... fwd, so we use it.
-		* If not, use it's next. otherwise fail.
-*/
 
 
 function ClickedHistory (GUIaction)
@@ -91,17 +124,23 @@ function ClickedHistory (GUIaction)
 	return true
 
 
-function RightClickHistory (GUIaction)
-	if self isa Button
+function OpenHistory (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| r = i.RecentFiles
+	if r.hasany and self isa Button
 		|| s = .SubMenu
-//			s.OnTypingFilter = PerryFileListFilter
-			s.ListSource = .ide.RecentFiles
+			i.DuringTempView++
+			s.ListSource = r
+			s.obj = i.path
 			.OpenMenu
+			i.DuringTempView--
 
 
 function ChoseHistoryItem (GUIListEvent)
 	opt norefcounts
 	if row
-		.ide.GoToHistory(row)
+		|| i = .ide
+		i.GoToHistory(row)
 	return true
 

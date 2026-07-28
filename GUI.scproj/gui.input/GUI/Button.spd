@@ -15,7 +15,7 @@ class Button (GUIControl)
 	|listviewrow?|				ClickedItem
 	|listview.columnfinder?|	ColumnFinder
 	|int|						ItemWidth
-	|int| 						ItemGap
+	|int|						ItemGap
 	|byte|						_ClickCount
 	|byte|						_DuringSelectEvent
 	|bool|						_PressingDone
@@ -32,7 +32,7 @@ class Button (GUIControl)
 		.ItemGap = 4
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
-		.align = ListViewState.aligncenter 
+		.align = ListViewState.AlignCenter
 		.subcontrol = .InitMenu(MenuAccept, OnPress)
 
 	libinternal InitMenu (|GUIListEvent| ret, |guiaction| Pressing,   |menu|)
@@ -60,10 +60,10 @@ class Button (GUIControl)
 
 		|| sub = .SubControl
 			|| w = .window
-				|| m = w.OpenedMenu()
+				|| m = w.OpenedMenu
 				require m != sub
 
-		|| Always = p.x == int.min 
+		|| Always = p.x == int.min
 		require always or .lastrect contains p
 
 		if Always

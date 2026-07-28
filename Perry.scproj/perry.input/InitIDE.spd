@@ -11,7 +11,7 @@ extend PerryIDE
 		.LogComms			= Message()
 		.LogActions			= Message()
 		.LogCake			= Message()
-		.RecentFiles 		= message()
+		.RecentFiles		= message()
 		.id					= "IDE"
 		.Debugger			= guicontrol(self)
 		.AppInfo			= TextView(self, nil, PerryAppInfoKeys)
@@ -21,27 +21,26 @@ extend PerryIDE
 		.ViewButtons		= guicontrol(self)
 		.RBorder			= guicontrol(self)
 		.CompileArea		= guicontrol(self)
-		.Toolbar			= Button(self,		ClickedToolBar)
-		.RunButton			= Button(.Toolbar,	ClickedDebug,		PressingDebug, nil, PressingDebug)
-		.BuildButton		= Button(.Toolbar,	Clickedcompile)
-		.ProjectTabs		= Button(.Toolbar,	ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
-		.RecentAndSplash	= Button(.Toolbar,	&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
+		.Toolbar			= Button(self,			ClickedToolBar)
+		.RunButton			= Button(.Toolbar,		ClickedDebug,		PressingDebug, nil, PressingDebug)
+		.BuildButton		= Button(.Toolbar,		ClickedCompile)
+		.ProjectTabs		= Button(.Toolbar,		ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
+		.RecentAndSplash	= Button(.Toolbar,		&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
-		.GoPrev				= Button(.RBorder,	ClickedHistory, RightClickHistory, ChoseHistoryItem, RightClickHistory)
-		
-		.GoNext				= Button(.RBorder,	ClickedHistory, RightClickHistory, ChoseHistoryItem, RightClickHistory)
-		.CurrFileName		= Button(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
-		.FunctionMenu		= Button(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs)
-		.CommandsMenu		= Button(.RBorder,	MenuCommands,	 nil,	ReturnCommands)
-		.ASMButton			= Button(.rborder,  ClickedASMButton)
+		.GoPrev				= Button(.RBorder,		ClickedHistory, OpenHistory, ChoseHistoryItem, OpenHistory)
+		.GoNext				= Button(.RBorder,		ClickedHistory, OpenHistory, ChoseHistoryItem, OpenHistory)
+		.CurrFileName		= Button(.RBorder,		OpenProjectPath, nil,	ReturnProjectPath)
+		.FunctionMenu		= Button(.RBorder,		MenuAllFuncs,	 nil,	ReturnAllFuncs)
+		.CommandsMenu		= Button(.RBorder,		MenuCommands,	 nil,	ReturnCommands)
+		.ASMButton			= Button(.rborder,		ClickedASMButton)
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedReplaceKeys)
-		.SubFindCheckBox	= Button(.searcharea, PressedSearchWithin)
+		.SubFindCheckBox	= Button(.searcharea,	PressedSearchWithin)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList)
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList)
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
-		.ASMView			= Listview(self,		SelectedASM, SelectedASM)
+		.ASMView			= Listview(self,		SelectedASM,			SelectedASM)
 		.ASMStretch			= StretchControl.horz(self, 200~left, 110, 110)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme)
@@ -53,14 +52,14 @@ extend PerryIDE
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
-		.CompileTabs		= Button(.CompileArea,		ClickedCompileTabs)
+		.CompileTabs		= Button(.CompileArea,	ClickedCompileTabs)
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self,			AutoCompleteKeys,		AutoCompleteInsertText)
-		.ViewFiles			= Button(.ViewButtons,		ClickedAView)
-		.ViewSearch			= Button(.ViewButtons,		ClickedAView)
-		.ViewDebugger		= Button(.ViewButtons,		ClickedAView)
-		.ViewErrors			= Button(.ViewButtons,		ClickedAView)
-		.viewlog			= Button(.ViewButtons,		clickedaview)
+		.ViewFiles			= Button(.ViewButtons,	ClickedAView)
+		.ViewSearch			= Button(.ViewButtons,	ClickedAView)
+		.ViewDebugger		= Button(.ViewButtons,	ClickedAView)
+		.ViewErrors			= Button(.ViewButtons,	ClickedAView)
+		.viewlog			= Button(.ViewButtons,	ClickedAView)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
 		.FileSep			= StretchControl.horz(self, 175~right, 113, 210)
 		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
@@ -537,7 +536,13 @@ extend PerryIDE
 		.addlbutton(.goprev,		"<",	"prev", "Go to previous file.")
 		.addlbutton(.gonext,		">",	"next", "Go to next file.")
 		
-		.gonext.SubControl = .GoPrev.SubControl
+		{
+			|| submenu = .GoPrev.SubControl as menu
+				.gonext.SubControl = submenu
+				submenu.OnKeyDown = &DeleteHistory
+				submenu.OnSelected = &SelectHistory
+		}
+		
 		
 		with .CurrFileName
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
