@@ -41,7 +41,8 @@ extend PerryIDE
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.ASMView			= Listview(self,		SelectedASM,			SelectedASM)
-		.ASMStretch			= StretchControl.horz(self, 200~left, 110, 110)
+		.ASMStretch			= StretchControl.horz(self, 200~left,  110, 110)
+		.FileSep			= StretchControl.horz(self, 175~right, 113, 210)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme)
 		.EditStatus			= TextView(self,		ClickedStatus)
@@ -61,7 +62,6 @@ extend PerryIDE
 		.ViewErrors			= Button(.ViewButtons,	ClickedAView)
 		.viewlog			= Button(.ViewButtons,	ClickedAView)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
-		.FileSep			= StretchControl.horz(self, 175~right, 113, 210)
 		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
 		.PopupDisplay		= textview(self)
 		.DebugArgsText		= textview(self)

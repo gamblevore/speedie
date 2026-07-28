@@ -127,7 +127,7 @@ class Menu (ListView)
 	
 	function CloseMenu
 		opt norefcounts
-/		.SelectNone
+		.SelectNone
 		if !.IsSearchMenu
 			.StopFilter
 		.UpdateFilter

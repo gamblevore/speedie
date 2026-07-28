@@ -186,6 +186,8 @@ class Window (GUIControl)
 			.setInnerFocus(focus)
 			return
 		
+		ifn .InnerFocus isa menu
+			.setinnerfocus(nil)
 		require (.focus != focus)
 		.setinnerfocus(nil)
 		

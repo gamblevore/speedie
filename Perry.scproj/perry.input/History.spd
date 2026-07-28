@@ -134,6 +134,7 @@ function OpenHistory (GUIaction)
 			s.ListSource = r
 			s.obj = i.path
 			.OpenMenu
+			s.SelectLast
 			i.DuringTempView--
 
 

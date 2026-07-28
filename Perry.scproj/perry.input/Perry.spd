@@ -248,12 +248,12 @@ function View (|Button| btn, |bool| CanChangeFocus=true)
 
 
 function ShowCompileCutely (|bool| Always=false)
-	require .ProductSep.iscollapsed
+	require .ProductSep.Collapsed
 	if !always
 		if .AlreadyExpandedCompileTab
 			return
 		.AlreadyExpandedCompileTab = true
-	.ProductSep.Show
+	.ProductSep.Open
 
 
 function OutText (|textview|)
@@ -338,7 +338,7 @@ function ViewAsVis (|bool| AsProject)
 	if AsProject and !AnyViews
 		.viewfiles.selected = nil|listviewrow| // typecast shouldn't be necessary
 
-	.FileSep.isCollapsed = !AsProject
+	.FileSep.Collapsed = !AsProject
 	(.gonext is visible)	= AsProject
 	(.goPrev is visible)	= AsProject
 	(.rborder is visible)	= AsProject

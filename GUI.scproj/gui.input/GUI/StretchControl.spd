@@ -15,52 +15,52 @@ class StretchControl (GuiControl)
 		rz.ID = name
 		(rz is PassThru)
 	
-	setter IsCollapsed (|bool|)
+	setter Collapsed (|bool|)
 		opt norefcounts
-		.Divider.setcollapsed(false, value)
-	
-	function IsCollapsed (|bool|)
+		|| d = .Divider
+		if Value
+			d.collapse
+		  elseif d.collapsed
+			d.Open
+
+	function Collapsed (|bool|)
 		opt norefcounts
 		return !.Divider.ActiveEnd.length
 		
-	function IsOpen (|bool|)
+	inline IsOpen (|bool|)
 		opt norefcounts
-		return !.IsCollapsed()
+		return !.Collapsed
 		
 	function Reset
 		opt norefcounts
 		.Divider.ActiveEnd = .Divider.start
 
-	function Collapse (|bool| soft = false)
-		opt norefcounts
-		.Divider.Collapse(soft)
-	
 	function AddHigh (|guicontrol| G)
 		opt norefcounts
 		.Divider.high <~ g
 		
-    function AddLeft (|guicontrol| G)
-        .AddLow(g)
+	inline AddLeft (|guicontrol| G)
+		.AddLow(g)
 
-    function AddRight (|guicontrol| G)
-        .AddHigh(g)
-        
+	inline AddRight (|guicontrol| G)
+		.AddHigh(g)
+
 	function AddLow (|guicontrol| G)
 		opt norefcounts
 		.Divider.low <~ g
 
-	function Divider (|stretchdivider!|)
+	inline Divider (|stretchdivider!|)
 		return .last|stretchdivider|!
 	
-	function Show 
+	inline Open
 		opt norefcounts
-		.Divider.show
+		.Divider.Open
 		
 	module
-		function Horz (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
+		inline Horz (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
 			return .Build(p, start, min, max, 0)
 
-		function Vert (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
+		inline Vert (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
 			return .Build(p, start, min, max, 1)
 
 		function Build (|guicontrol| p, |controlpoint| start, |int| min, |int| max, |int| d, |stretchcontrol|)
@@ -81,14 +81,14 @@ class StretchControl (GuiControl)
 
 class StretchDivider (GuiControl)
 	linkage:cpp_part Div
-	|guiAction?|				OnHide 
+	|guiAction?|				OnHide
 	|guiAction?|				OnShow
 	|guiAction?|				OnStretch
 	|int|						Min
 	|int|						Max
 	|controlpoint|				Start
 	|date|						Entered
-	|int|						d
+	|int|						D
 	|float|						DefaultFraction
 
 	constructor (|guicontrol| p,  |int| d)
@@ -136,54 +136,50 @@ class StretchDivider (GuiControl)
 		.InTest(GUI.mousexy, true)
 		
 
-	function Collapsed (|bool|)
+	libinternal Collapsed (|bool|)
+		inlined
 		return !.ActiveEnd.length
 
 
-	function Collapse (|bool| soft = false)
+	libinternal Collapse
 		opt norefcounts
 		if !.Collapsed
-			.start = .ActiveEnd
-			.ActiveEnd = ((.min (soft) 0)) ~ Right
-
-
-	libinternal SetCollapsed (|bool| Soft, |bool| value)
-		if value
-			.collapse(soft)
-		  elseif .collapsed
-			.show
+/			if .start is low
+				.ActiveEnd = 0 ~ Right
+			  else
+				.ActiveEnd = 0 ~ left
 
 
 	function SlowFlip
 		if .Collapsed
-			|| onshow = .onshow
-			if onshow and .min > 0 // shouldnt be possible?
-				(onshow)(self, 1)
+			|| OnShow = .onshow
+			if OnShow and .min > 0 // shouldnt be possible?
+				(OnShow)(self, 1)
 			  else
-				.Show
+				.Open
 		  else
-			|| onhide = .onhide
+			|| OnHide = .onhide
 			if onhide and .min > 0
 				(onhide)(self, 0)
 			  else
-				.Collapse(true)
+				.Collapse
 
 
-	task SlowShow (taskgui, |int| s)
-		constructor
-			is Animation
-		run
-			libinternal
-			opt norefcounts
-			|| u = .upon
-			|| p = u.parent$
-			|| pr = p.LastRect
-			if u.ActiveEnd.length < 10
-				|| s = u.start.length
-				if s < 10
-					|| d = u.d
-					s = 0.333.mix(pr[d]|float|, pr[d+2]|float|)|int|
-				u.ActiveEnd = (.s)~up
+//	task SlowShow (taskgui, |int| s)
+//		constructor
+//			is Animation
+//		run
+//			libinternal
+//			opt norefcounts
+//			|| u = .upon
+//			|| p = u.parent$
+//			|| pr = p.LastRect
+//			if u.ActiveEnd.length < 10
+//				|| s = u.start.length
+//				if s < 10
+//					|| d = u.d
+//					s = 0.333.mix(pr[d]|float|, pr[d+2]|float|)|int|
+//				u.ActiveEnd = (.s)~up
 
 
 	libinternal DefaultEnd (|guicontrol| P, |int|)
@@ -191,24 +187,24 @@ class StretchDivider (GuiControl)
 		return .DefaultFraction.mix(pr[.d]|float|, pr[.d+2]|float|)|int|	
 
 
-	function Show (|bool| anim=false)
+	function Open //(|bool| anim=false)
 		opt norefcounts
 		|| p = .parent$
 		require .ActiveEnd.length < 10
 		|| s = .start.length
 		if s < 10
 			s = .DefaultEnd(p)
-		if anim
-			.slowshow(0.75s, s)
-		  else
-			.ActiveEnd = (s)~up
+//		if anim
+//			.slowshow(0.75s, s)
+//		  else
+		.ActiveEnd = (s)~up
 
 
-	function High (|guicontrol|)
+	libinternal High (|guicontrol|)
 		opt norefcounts
 		return .parent.second
 
-	function Low (|guicontrol|)
+	libinternal Low (|guicontrol|)
 		opt norefcounts
 		return .parent.first
 
@@ -232,10 +228,10 @@ class StretchDivider (GuiControl)
 		require .InTest(P, false)
 		if keys.cmd or (clicks == 2)
 			.SlowFlip
-			return mousedragging.handled
+			return MouseDragging.handled
 		
 		.MoveTo(p)
-		return mousedragging.DragBeyond
+		return MouseDragging.DragBeyond
 
 
 	function MoveTo (|ivec2| P)
@@ -244,7 +240,7 @@ class StretchDivider (GuiControl)
 		|| d = .d
 		|| x  = p[d] - pr[d]
 		(x max= .min)
-		(x min= pr.size[d]-.max) 
+		(x min= pr.size[d]-.max)
 		.ActiveEnd = (x)~up
 
 
@@ -323,9 +319,10 @@ class StretchDivider (GuiControl)
 			Drawcolored = false
 		
 		|| win = .Window
-			|| u = win.currscroll
-			if u and u.CanDrawScroll(win) and u.InScrollArea(win.mousexy)
-				drawcolored = false
+			|| scr = win._Scroller
+				|| u = scr.upon			
+				if u.CanDrawScroll(win) and u.InScrollArea(win.mousexy)
+					drawcolored = false
 		
 		|| a = .FadeAlpha
 		|| scale = rect.size.Vec2
@@ -380,15 +377,9 @@ class StretchDivider (GuiControl)
 
 
 
-function GuiControl.MouseDownOnSelfOrNil (|bool|)
+libinternal GuiControl.MouseDownOnSelfOrNil (|bool|)
 	opt norefcounts
 	|| w = .window
 		|| c = w.CurrMouseDown
 		return (c == self or nil)
-
-
-function window.CurrScroll (|GUIControl|)
-	opt norefcounts
-	|| x = ._Scroller
-		return x.Upon
 

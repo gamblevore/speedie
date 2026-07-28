@@ -18,10 +18,10 @@ insertion the
 
 insertion
 	timeit	({|| starttime = date.now, (_0), rejoin (starttime.ago)})
-	right	the~left + _0
-	left	the~right-(_0)
-	up		the~bottom+_0
-	down	the~top - (_0)
+	right	the~left + (_0)
+	left	the~right- (_0)
+	up		the~bottom+(_0)
+	down	the~top -  (_0)
 	wide	_0.middlelayout
 	high	_0.middlelayout
 	after	ControlPoint.After.layout(_0)

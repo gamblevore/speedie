@@ -205,7 +205,7 @@ function PerryIDE.AddProductErr (|string| err)
 	if err
 		.ProductErrors.log(err)
 		|| t = .CompileTab(3)$
-		if .ProductSep.iscollapsed or t is hidden
+		if .ProductSep.Collapsed or t is hidden
 			.ShowText(.ProductErrors, nil, true)
 		(t isnt hidden)
 
@@ -219,7 +219,7 @@ function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
 	if .ShowProductIfMoreOutput < .ProductOut.Length
 		.ShowProductIfMoreOutput = int.max	// no more updates
 		.CompileTabSelect(.ProductOut)
-		.ProductSep.Show
+		.ProductSep.Open
 	
 
 function perryide.GotHello (|string| msg)
@@ -438,17 +438,19 @@ function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
 	
 
 function Perryide.ASMVis (|bool|)
-	return .ASMStretch is Visible
+	return .ASMStretch.IsViewable and !.ASMStretch.collapsed
 
 
 function Perryide.ASMVis (assigns:|bool|)
 	(.ASMStretch is Visible) = Value
+	if value and .ASMStretch.Collapsed()
+		.ASMStretch.Open
 	
 
 function ClickedASMButton (guiaction)
 	opt norefcounts
 	|| i = .ide
-	|| v = i.ASMView
+/	|| v = i.ASMView
 	v.clear
 	if i.ASMVis
 		i.HideASM

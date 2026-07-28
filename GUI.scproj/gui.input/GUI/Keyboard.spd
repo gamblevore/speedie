@@ -89,9 +89,13 @@ dataType Keys (int)
 		|| r = .Record
 			return r.date.guiago >= durr
 	
-	function Number (|failableint|)
-		if self >= Num0 and self <= num9
-			return self-num0
+	function Number (|ind|)
+		|uint| x = self-num0
+		if x <= 9
+			return x
+		return -1
+//		if self >= Num0 and self <= num9
+//			return self-num0
 		
 	function IsFirstFrame (|bool|)
 		|| r = .Record

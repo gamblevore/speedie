@@ -109,11 +109,12 @@ extend PerryIDE
 			|| n = .errorlist.listsource.Count
 				h.name = n of "issue"
 
+	
 	function ExpandCompileSep (|bool|)
-		|| div = .ProductSep.Divider
-		|| coll = div.Collapsed
+		opt norefcounts
+		if .ProductSep.Collapsed()
 			.ShowCompileTab(.SpeedieText)
-			rz = !div.Collapsed
+			rz = !.ProductSep.Collapsed()
 
 
 	function CheckMsg (|string| operation, |message|)

@@ -602,7 +602,7 @@ class PerryIDE (Window)
 	function Flip (|textview| s, |bool|)
 		|| Item = .compiletabs.selected
 		if item  and  .ProductSep.isopen  and item.obj == s
-			.ProductSep.collapse
+			.ProductSep.Collapsed = true
 			return false
 		.ShowText(s, nil, true)
 		return true
@@ -798,7 +798,7 @@ So anything not 0 means "its OK"`
 		if !g
 			.LoadErrors(IsNewlyOpened, false)
 			if .editme.JeeboxMode isnt expect
-				.ProductSep.Collapse
+				.ProductSep.Collapsed = true
 		
 		.PopupHide
 		if  !g  and  .IsEditingSource
