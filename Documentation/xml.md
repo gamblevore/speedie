@@ -131,7 +131,7 @@ Or if what you have is really "binary-like", you can use the binary string.
 
     #(6da7494de9243de7)#
     
-Additionally, we have "sister format" to Jeebox called "jbin". Jbin does everything jeebox does, except it is stored as binary. The C++ code to parse jbin takes about 35 lines of code, its a very small and fast format. Yes, you can now store jpegs or other pictures/music directly in a Jeebox file with no encoding-overhead, or hexing needed. This is done in speedie via like this:
+Additionally, we have the "sister format" to Jeebox called "jbin". Jbin does everything jeebox does, except it is stored as binary. The C++ code to parse jbin takes about 35 lines of code, its a very small and fast format. Yes, you can now store jpegs or other pictures/music directly in a Jeebox file with no encoding-overhead, or hexing needed. This is done in speedie via like this:
 
     || data = document.renderjbin
 
