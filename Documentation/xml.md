@@ -197,7 +197,7 @@ Do you need a dictionary anyhow? Where keys can contain any byte? Easy:
     dict
         name    "Fred Flintstone"
         address "Boulder Road"
-        +"/file/path/as-key.txt"   "File-Data"
+        +'/file/path/as-key.txt'   "File-Data"
 
 This is useful for file-paths. Compared to this, its perfect:
 
