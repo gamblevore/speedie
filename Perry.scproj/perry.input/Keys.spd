@@ -96,6 +96,10 @@ extend PerryIDE
 				clickedCreateproj(self)
 			return true
 
+		if key is h
+			OpenHistory(.goprev)
+			return true
+			
 		if key is l							// l = file list
 			if keys.option or keys.Shift
 				OpenHistory(.goprev)

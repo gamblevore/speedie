@@ -329,7 +329,7 @@ class PerryIDE (Window)
 
 
 	function ShowRightStats
-		if .isgraphics
+		if .IsGraphics
 			(.charinfo isnt visible)
 			return
 		

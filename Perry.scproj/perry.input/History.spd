@@ -1,15 +1,18 @@
 
 
+function PerryIDE.FindInHistory (|string| Path, |int| Line, |message|)
+	opt norefcounts
+	for s.fast in .RecentFiles
+		if s.Position == Line
+			if s.FirstName ~= Path
+				return s
+	
+	
 function PerryIDE.EnablePrevNext
 	opt norefcounts
 	for s in .RecentFiles
-		|| f = s.FirstName
-		if !f.FileExists
+		if !s.firstname.FileExists
 			s.Remove
-		|| p = s.prev
-			|| pf = p.FirstName
-			if (pf ~= f) and (p.Position == s.position)
-				p.Remove
 	
 	(.GoNext is enabled) = .NextHistory(true)
 	(.GoPrev is enabled) = .NextHistory(false)
@@ -70,11 +73,29 @@ function PerryIDE.BestFunctionName (|string| parent_name, |textviewline--| Scrol
 	return nil
 	
 
+function textview.ViewedLine (|textviewline|)
+	opt norefcounts
+	|| scr = .ScrollStart
+	|| obj = scr
+	|| n = .MaxVisibleLines
+	|| sel = .Selection()
+	for i in n
+		if obj.range overlaps sel
+			return obj
+		obj++
+		loop obj
+		
+	return scr.MoveCapped((n/3) max 1)
+
+
 function PerryIDE.AddToJumpHistory
 	opt norefcounts
 	require (.JumpMode <= 0) and perry.FinishedStartUp
 	|| p = .path
-	|| scr = .editme.ScrollStart
+
+	|| scr = .editme.ViewedLine
+	|| old = .FindInHistory(p, scr.linenumber)
+		old.Remove
 	|| item = .RecentFiles.msg(@str, .BestFunctionName(p.name, scr))
 	item <~ p
 	item.Position = scr.LineNumber
@@ -86,7 +107,9 @@ function PerryIDE.AddToJumpHistory
 function perryide.NextHistory (|bool| Forward, |message|)
 	opt norefcounts
 	|| Item = .RecentFiles.obj as Message
-		return item.Step(forward)
+		if item.Parent
+			return item.Step(forward)
+		.RecentFiles.obj = nil
 	if !Forward
 		return .RecentFiles.Last
 	
@@ -144,4 +167,5 @@ function ChoseHistoryItem (GUIListEvent)
 		|| i = .ide
 		i.GoToHistory(row)
 	return true
+
 
