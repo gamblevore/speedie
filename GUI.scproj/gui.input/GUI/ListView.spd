@@ -692,7 +692,8 @@ class ListView (GUIControl) {
 		if (L is selected) and (.SelCount > 1)
 			.Select(l)
 		  elseif !keys.Cmd and (W._SelBeforeMouseDown == self)
-			.DelayedRename(Lc)
+			if  .CanEdit(L)
+				.DelayedRename(Lc)
 			
 
 	function SelCount (|int|)

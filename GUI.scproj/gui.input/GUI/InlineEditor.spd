@@ -48,14 +48,14 @@ struct InlineEditor
 			.clear
 	
 	
-	function UpdateSearch (|string| s)
+	libinternal UpdateSearch (|string| s)
 		|| l = .editingfor
 		if l isa listview
 			GUI.LastSearch = s
 			l.__Search__(s, true)
 	
 	
-	function FinishAndClear (|bool| focus = true)
+	libinternal FinishAndClear (|bool| focus = true)
 		opt norefcounts
 		|| e = .editor
 		|| c = .cell
@@ -66,7 +66,7 @@ struct InlineEditor
 		.Clear(focus)
 		
 	
-	function Clear (|bool| Focus = true)
+	libinternal Clear (|bool| Focus = true)
 		.NeedsHide = false
 		.cell = nil
 		|| s = .EditingFor
@@ -82,7 +82,7 @@ struct InlineEditor
 		.EditingFor = nil
 	
 
-	function GetListValue (|listviewcell| C, |listview| L, |string?|)
+	libinternal GetListValue (|listviewcell| C, |listview| L, |string?|)
 		opt norefcounts
 		|| ed = l.OnEditCell
 			|| t = (ed)(l, c, nil)
@@ -93,15 +93,17 @@ struct InlineEditor
 		return l.TableCell(c)
 
 	
+	libinternal ListView.CanEdit (|listviewrow| row, |bool|)
+		return row is editable and row isnt UnSelectable and self is editable
+	
 	
 	function Edit (|ListViewCell| r, |ListView| l, |bool|)
 		opt norefcounts
 		
 		l ?= .editingfor as ListView
 		
-		debug_require l and r
 		|| row = r.row
-		require row is editable and row isnt UnSelectable and l is editable
+		require l.canedit(row)
 		with .editor
 			.FinishEditing(false)
 			|| t = self.getlistvalue(r, l)
