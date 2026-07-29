@@ -113,7 +113,9 @@ Message is also:
 
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
-		rz = pos_msg ?? self
+		rz = pos_msg
+		if !rz
+			rz = self
 		using rz
 			rz = .CopyWithoutUsing(pos_msg)
 	
