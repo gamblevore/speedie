@@ -219,7 +219,7 @@ class list
 			|| c = .movesub(n, r)
 				return c
 			|| Nega = n < 0
-			return ((p.first!) (nega) (p.last!))
+			return (nega)(p.first!, p.last!)
 		return self
 
 	

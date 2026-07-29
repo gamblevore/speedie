@@ -96,7 +96,7 @@ function __JunkTest_10__
 helper __junktest_11__
 	visible
 	|| sss = "abc"
-	|| y = (sss.decompress(int.max), sss)(0.5[]) // make sure .decomp doesnt get extracted
+	|| y = (0.5[])(sss.decompress(int.max), sss) // make sure .decomp doesnt get extracted
 	printline y
 
 

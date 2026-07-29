@@ -26,9 +26,9 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 		.question.vistext = question
 	
 	|| bigger = question and save
-	|| wsize = ((350 by 300) (bigger) (350 by 275))
+	|| wsize = (bigger)(350 by 300, 350 by 275)
 	w.size = wsize
-	|| bot = ((39~up) (bigger) (23~up))
+	|| bot = (bigger)(39~up, 23~up)
 	w.files.size = 1~inside by bot to 16~down
 	
 	if save

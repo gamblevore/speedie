@@ -218,7 +218,7 @@ class Tetris (GridSection)
 		
 	
 	function NextShape (|bool| Troll=false)
-		|| bag = (trollshapes (troll) Shapes)
+		|| bag = (troll)(trollshapes, Shapes)
 		|| B = bag.Next
 		if !b
 			bag.Shuffle

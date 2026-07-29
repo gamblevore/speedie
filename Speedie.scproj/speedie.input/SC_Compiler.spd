@@ -364,7 +364,7 @@ function ImportLibs
 	
 	scimport.STDLibTime = false
 	|| Single = (options.SingleFileInput)
-	|| ToUse = (options.SingleFileInput.file (single) .BaseProjectPath!)
+	|| ToUse = (single != "")(options.SingleFileInput.file, .BaseProjectPath!)
 	compiler.Project = SCImport(ToUse, false)
 
 	scimport.curr = compiler.project // perhaps I should put it into there instead of compiler.program anyhow.

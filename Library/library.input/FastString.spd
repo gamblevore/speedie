@@ -100,7 +100,7 @@ class FastString {
 		cpp_wrapper JB_FS_WriteAlloc_
 
 	function AppendHInt (|int64| n)
-		|| s = (n (n>=0) -n)				// what about int.min?
+		|| s = (n>=0)(n, -n)				// what about int.min?
 		while s >= 128
 			.AppendByte(s ||| 128)
 			s >>= 7

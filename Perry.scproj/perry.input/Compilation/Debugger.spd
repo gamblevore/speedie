@@ -126,7 +126,7 @@ function UpdateDebugButtons (|bool| ForceRunning=false, |bool|)
 
 	for btn in .DebugBtns
 		|| Last = btn.IsLast
-			btn.text = ("\02\02" (paused) "\0E")
+			btn.text = (paused)("\02\02", "\0E")
 		|| On = CanDebug and (Paused or Last) and (D isnt crashed)
 		(btn is enabled) = On
 	

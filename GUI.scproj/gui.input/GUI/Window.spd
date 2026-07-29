@@ -244,7 +244,7 @@ class Window (GUIControl)
 		if keys.shift
 			fwd = !fwd
 		if !Item
-			item = (L.liststart (fwd) l.Listend)
+			item = (fwd)(L.liststart, l.Listend)
 		  else
 			item = l.SearchStep(item, fwd)
 		if item

@@ -530,7 +530,7 @@ Message is also:
 		|| OF = opp.first
 
 		fs <~ SepA
-		fs <~ (of (of) opp)
+		fs <~ (of!=nil)(of, opp)
 		fs <~ ' '
 		fs <~ f
 

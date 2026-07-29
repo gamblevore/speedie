@@ -12,7 +12,7 @@ main (|FileSizeInt| Amount) {
 		|| Low  = ('ᐇ', 'ᑈ'+1) // lets create unicode
 	
 		while xml < Amount
-			|| alive = ("yes", "no")(0.5[])
+			|| alive = (0.5[])("yes", "no")
 	
 			xml <~ "
 		<Book>

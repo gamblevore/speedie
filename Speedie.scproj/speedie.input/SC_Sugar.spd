@@ -52,7 +52,7 @@ function message.BecomeAppend (|string| s)
 		.last = n
 
 
-function message.MsgFix (|message| parent=nil, |message!|)	// «
+function message.MsgFix (|message!|)	// «
 	opt norefcounts
 	using self
 
@@ -104,36 +104,30 @@ function message.Tran_QMark				//"?"
 		return
 
 	|| Cond = @thg + inside.name
-	|| tern = self
+	|| tern = self							//  a.b?		  OR   a().b?
 	if self in @arg							//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
 		.become(@arg)
-		is style2
 		tern = .msg(@tmp, "if")
 		tern <~ cond
 		// add |()--| to thedot?
 		// is there an easier way? Just add... like a bit somewhere to the msg?
 		tern.msg(@arg) <~ thedot
+		if inside != @thg
+			cond.name = "_t"
+			inside.next = @thg.msg("_t")
+			tern.prev = MakeDecl("",  "_t", inside, scdeclinfo.temp)
+
+	  elseif (inside == @thg)
+		error self
+
 	  else
-		if (inside == @thg)
-			error self						// im trying to remove '?' syntax bit by bit...
-											// sometimes its really nice, but we have other alternatives
-											// like terns... (a (t) b)
-											// its still really nice for this!   (.somefunc)(a,b)?
-											// ({ || t = a(), (t.b, nil)(t) })
-		.func = @bra
-		tern = .msg(@arg)
-		(tern is style2)
-		tern = tern.msg(@func)
-//		tern = tern.msg(@rel)				// need a rel instead of a func! // todoooooo!!
-		|| options = tern.msg(@list)
-		tern.msg(@prm) <~ cond
-		options <~ thedot
-		options <~ (@thg, "nil")			// TypeOfTern could "just give the default"!
-											// So I don't even need to enter "nil"! Just delete it!
-	if (inside != @thg)
-		cond.name = "_t"
-		inside.next = @thg.msg("_t")
-		tern.prev = MakeDecl("",  "_t", inside, scdeclinfo.temp)
+		|| r = macro.TmpPrms_
+		r.clear
+		r <~ inside
+		r <~ thedot
+		.BecomeMacro(macros.TernQMark, nil, r)
+		thedot.first.msg(@thg, "_t")
+		r.clear
 
 
 function message.MainArgDotFix (|message|)

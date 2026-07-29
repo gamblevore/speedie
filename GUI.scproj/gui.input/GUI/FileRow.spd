@@ -38,7 +38,7 @@ class FileRow (ListViewRow)
 		.func		= @file
 		.rangelength = 0 // for the sorter
 
-		.FilePath	= (path.PathDir (DirFile) path)
+		.FilePath	= (DirFile!="")(path.PathDir, path)
 		.dirfile	= DirFile
 
 		.asdir		= dirfile

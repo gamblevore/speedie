@@ -59,7 +59,7 @@ class StartWindow (window)
 				b.text += "o"
 		
 	function Win (|int| who, |ivec2| From, |ivec2| To)
-		|| name = ("crosses", "noughts")(who>0)
+		|| name = (who>0)("crosses", "noughts")
 		self[from].text += "!"
 		self[(from+to)/2].text += "!"
 		self[to].text += "!"
@@ -82,7 +82,7 @@ class StartWindow (window)
 		.Win(t, (x,0), (x,2))
 		
 	function CheckDiagonal (|int| i, |int| t)
-		|| x = (0, 2)(i>0)
+		|| x = (i>0)(0, 2)
 		for y in 3
 			require self[x, y] == t
 			x += i

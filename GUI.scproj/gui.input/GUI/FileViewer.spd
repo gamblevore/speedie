@@ -189,7 +189,7 @@ class FileViewer (ListView)
 
 	libinternal NextFileRow (|listviewrow| Upon, |bool| First=false, |filerow|)
 		opt norefcounts
-		|| n = (Upon.first (first) Upon.flatnext)
+		|| n = (first)(Upon.first, Upon.flatnext)
 		|| n2 = n as filerow
 			return n2
 		n.remove
@@ -307,7 +307,7 @@ class FileViewer (ListView)
 			return 0
 			
 		|| HasSlash = ToFind contains '/'
-		|| which = (self (HasSlash) .name)
+		|| which = (HasSlash)(self, .name)
 		if which contains ToFind
 			rz = 2
 			if .endswith(ToFind) and self[(self-ToFind)-1] == '.'
@@ -441,7 +441,7 @@ class FileViewer (ListView)
 		for p in items
 			|| m = message(@str, p.name)
 			|| dir = p.FilePath.file.isdir
-			m.name = ("\10 " (dir) "\11 ") + m.name
+			m.name = (dir)("\10 ", "\11 ") + m.name
 			
 			if HasSel and p isnt UnSelectable
 				(p is selected)
@@ -601,8 +601,8 @@ class FileViewer (ListView)
 				|| z	= parent.lastrect
 				|| v	= (6 + parent.IndentDepth(self), texty)
 				|| D	= ._Document
-				|| mod	= (D.ismodified (D) nil)
-				|| ddd	= (Colors.black(0.5) (mod) Colors.clear)
+				|| mod	= (D!=nil)(D.ismodified, nil)
+				|| ddd	= (mod)(Colors.black(0.5), Colors.clear)
 				ddd.a *= strength // sigh...
 				font.small!.drawicon(.Modifier, where, V, ddd)
 

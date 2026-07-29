@@ -67,8 +67,8 @@ class StretchControl (GuiControl)
 			opt norefcounts
 			|StretchControl| sG = StretchControl(p)
 			(sg is PassThru)
-			sG.AddPane("bottom" (d) "left" )
-			sG.AddPane("top"    (d) "right")
+			sG.AddPane((d!=nil)("bottom", "left"))
+			sG.AddPane((d!=nil)("top", "right"))
 			|| SD   = StretchDivider(sG, d)
 			SD.start= start
 			SD.min  = min
@@ -249,7 +249,7 @@ class StretchDivider (GuiControl)
 		|| dateout = !.entered
 		if Out != dateout
 			.touch
-			.Entered = (0 (out) gui.FrameStart)
+			.Entered = (out)(0, gui.FrameStart)
 		if GUI.MouseButtons is left
 			|| d = gui.FrameStart-0.75s
 			if .Entered > d

@@ -12,8 +12,9 @@ class CheeseShop // An example to show how bad c++ is compared to speedie.
 	syntax access (|string| cheeseName, |string|)
 		if (cheeseName ~= .clerkName)
 			return "Sir?"
-		return ("Yes", "No")(.inventory[cheeseName])
+		return (.inventory[cheeseName]!=nil)("Yes", "No")
 
+//	return JB_Ternary(( JB_FreeIfDead( Get(.inventory, cheeseName) )|bool|), <(`Yes`)>, <(`No`)>)
 
 main
 	|| shop = CheeseShop(ConfigData.parse #require)

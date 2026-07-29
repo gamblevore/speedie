@@ -505,7 +505,7 @@ function JumpToDefinition (GUIAction)
 			|| f = msg.owningfunc
 				if msg == f  or  msg in f
 					cmd = false
-			|| op = ("define" (cmd) "callfrom")
+			|| op = (cmd)("define", "callfrom")
 			|| d = ide.MaybeSendMessage(op, msg)
 			ide.SectionKeyTime = d * rightclick
 			

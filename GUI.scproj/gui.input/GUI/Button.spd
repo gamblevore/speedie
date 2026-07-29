@@ -89,7 +89,7 @@ class Button (GUIControl)
 		
 		if !._DuringSelectEvent++
 			.Touch(2)
-			|| fn = (.onrightclick (RightClick) .OnClicked)
+			|| fn = (RightClick)(.onrightclick, .OnClicked)
 				(fn)(self, value, prev)
 		._DuringSelectEvent--
 
@@ -201,7 +201,7 @@ class Button (GUIControl)
 			.ClickedItem ?= d
 		
 		if !.OnPress
-			return (mousedragging.DragBeyond (D) mousedragging.handled)
+			return (D!=nil)(mousedragging.DragBeyond, mousedragging.handled)
 		
 		|| n = gui.FrameStart
 		if !.DelayTill

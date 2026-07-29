@@ -189,7 +189,7 @@ role ListViewRow (message)
 		
 		  elseif (Column==0) and parent.Istree and (self!=parent.Columns)
 			if parent.CanExpand(self)
-				|| exp = ("\02" (self isnt expanded) "\03")
+				|| exp = (self isnt expanded)("\02", "\03")
 				|| VCol = vec4(1, 0.5)
 				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.rowheight)
 			r.x += font.width + 2

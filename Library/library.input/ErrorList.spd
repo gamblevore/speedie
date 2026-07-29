@@ -170,7 +170,7 @@ class ErrorReceiver
 	
 	function PrintErrors (|errorseverity| Level=nil, |bool| shell=false, |int|)
 		cpp_part PrintErrorsMain
-		|| rec = (self (self) StdErr)
+		|| rec = (self!=nil)(self, StdErr)
 		|| fs	= faststring()
 		|| Count = rec.RenderErrors(level, shell, fs)
 			"issue".Pluralize(fs, Count)

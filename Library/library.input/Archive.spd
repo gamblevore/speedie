@@ -19,7 +19,7 @@ role FileArchive (message)
 	function Validate (|FileArchive|)
 		require self
 		|| argfn = @arg
-		|| arc = (.first (self == argfn) self)
+		|| arc = (self == argfn)(.first, self)
 		require .expect(@tmp, "archive")
 		for p in arc.last(@arg)
 			require p.expect(@tmp)

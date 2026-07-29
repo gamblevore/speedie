@@ -35,7 +35,7 @@ class GUIControl (list)
 
 	constructor (|guicontrol| parent)
 		super.constructor(parent)
-		.id = ("" (parent) "root")
+		.id = (parent!=nil)("", "root")
 		if parent
 			.tabindex = parent.loadtabindex
 		.gnormal = drawstyle()
@@ -78,7 +78,7 @@ class GUIControl (list)
 	virtual RightClick	(|ivec2| P)
 	virtual KeyDown		(|keys| Key, |bool|)
 		if (.OnKeydown)(self, key)?
-			return true	
+			return true
 	virtual MouseUp		(|ivec2| P)
 	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
 		return 1

@@ -11,7 +11,7 @@ class Country
 		"$name was founded with $.population population and $.ATP power"
 		
 	function Attack (|Country| other)
-		|| oth = ("itself", other.name)(self == other)
+		|| oth = (self == other)("itself", other.name)
 		"$.name attacks $oth"
 		other.Damage .ATP
 		if other != self

@@ -973,7 +973,7 @@ module GUI
 		|| path = drop.file.copy
 		memory.free((drop.file)|&byte|)
 		Drop.file = nil
-		|| p = ((copypasteflags.pastefile) (t is dropfile) (copypasteflags.pastetext))
+		|| p = (t is dropfile)(copypasteflags.pastefile, copypasteflags.pastetext)
 		|| c = w[.MouseXY] ?? w
 		c.PasteFromClipboard(path, p)
 		w.DroppingInto = nil
@@ -1283,7 +1283,7 @@ module GUI
 			PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
 						
 		if (down == Over or nil)
-			|| state = ((SDL_WindowEventID.moved) (PrevOver == Over) (SDL_WindowEventID.enter))
+			|| state = (PrevOver == Over)(SDL_WindowEventID.moved, SDL_WindowEventID.enter)
 			if !over
 				Over = w
 			if Over.__MouseMove__(xy, move, state)

@@ -112,9 +112,6 @@ function TypeOfARel (ExprResolver)
 
 function TypeOfFunc (ExprResolver)
 	opt norefcounts
-	if exp.istern
-		return TypeOfTernary(exp, name_space, side)
-
 	|| fn = TypeOfFuncSub(exp, name_space, side)			#expect (exp, "Can’t use this as a function.")
 	if fn isa SCFunction
 		|| obj = fn.ReturnType
@@ -913,31 +910,43 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 	
 
 
-function TypeOfTernary (ExprResolver)
-	// want to remove this!
+function TypeOfTernary3 (ExprResolver)
 	opt norefcounts
-	|| list		= exp.first
-	|| params	= list.next
-	expect  list.hasany and params.HasOneChild  (exp, "expected: (a,b)(cond)")
 	
-	|| first	= list.first!
-	|| second	= first.next
-		require second.expectlast
-	  else
-		second = exp.createnil
-		first.next = second
-
-	|| Test = params[@nil]$
-	|| result = SameTypeSub(first, second, name_space)	
-	if result and test.ExpandToBool( name_space )
-		params <~ list.first
-		list.become(@thg, "JB_Ternary")
-		params.obj = compiler.TernaryFunc
-		params <~ list.first
-		exp.ASMType = ASMType.ktern
-		if params.second != @func
-			problem exp
-		return result
+	|| cond	= exp.first
+	|| params = cond.next!
+	|| first = params.first!
+	|| second = params.second
+	if !second
+		second = params.msg(@thg, "nil")
+		second.Obj = TypeNil
+		
+	expect (params.haschildcount(2))							(exp, "expected: cond(a,b)")		
+	
+	|| Result = SameTypeSub(first, second, name_space)
+	params.first = cond
+	params.obj = compiler.TernaryFunc
+	exp.ASMType = ASMType.ktern
+	using exp
+		exp.first = @thg + "JB_Ternary"
+	return Result
+	// a(b,c) --> JB_Ternary(a,b,c)
+/*	«func 
+		«thg "a"»
+		«prm 
+			«thg "b"»
+			«thg "c"»
+		»
+	»
+	«func 
+		«thg "JB_Ternary"»
+		«prm 
+			«thg "a"»
+			«thg "b"»
+			«thg "c"»
+		»
+	»
+*/
 
 
 function message.DeOpp
@@ -1521,6 +1530,7 @@ function message.AndOrExpansionTest (|int|)
 function TypeOfRel (ExprResolver)
 	|message--| opch = exp.second!
 	if opch == @bra										/// ooh!... interesting!
+		problem (exp, "Deprecated")
 		return TypeOfTernary2(exp, name_Space)
 	
 	|SCOperator--| Comp = SCOperator.Lookup( opch )
@@ -1870,14 +1880,18 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	|| ch = exp.first
 	|| params = ch.next
 	
-	|scdecl| ThgDecl 
+	|scdecl| ThgDecl
 	if ch == @Thg
 		ThgDecl = name_space.LookUpFunc( ch.name, exp )|scdecl|
 		ifn ThgDecl isa scdecl
 			return ThgDecl
 	  else
-		ThgDecl = TypeOfExpr( ch, name_space )		   #require
-	
+		ThgDecl = TypeOfExpr( ch, name_space )			#require
+
+	if ThgDecl.MiniMatch(typebool!.typenormal)			// called a bool as if it were a function.
+		return TypeOfTernary3(exp, name_space, side)
+		
+		
 	fn = ThgDecl.Type.FuncProto
 	if !fn
 		fn = exp.prmfunc

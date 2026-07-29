@@ -256,7 +256,7 @@ class PerryIDE (Window)
 			|| t = e.text
 
 			|| wl = e.WrappedLines.last
-			|| vl = (wl.vline (wl) 0)
+			|| vl = (wl!=nil)(wl.vline, 0)
 			fs <~ "Chars ${t.lengthutf8}   Lines $vl"
 			|| msg = e.ParsedMessage
 				|| loc = msg.LinesOfContent
@@ -677,7 +677,7 @@ class PerryIDE (Window)
 	
 		function PerryOpenDoc (GUIPasteEvent)
 			opt norefcounts
-			|| i = (.ide (self) nil)
+			|| i = (self!=nil)(.ide, nil)
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)
@@ -710,7 +710,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| txt = .EditMe
 		|| doc = txt.document
-		|| path = (doc.FilePath (doc) "")
+		|| path = (doc!=nil)(doc.FilePath, "")
 		|| lst = .errorlist
 		.filelist.ClearErrors
 		
@@ -792,7 +792,7 @@ So anything not 0 means "its OK"`
 			.DuringLoad--
 		
 		.AddToJumpHistory
-		|| ok = (.EditDraw(r) (g) .EditText(r))
+		|| ok = (g)(.EditDraw(r), .EditText(r))
 		if ok != 1
 			.RecentFiles.pop
 			return ok

@@ -355,7 +355,7 @@ function DebugBreakAdd (GuiTextLineEvent)
 	opt norefcounts
 	|| i = .ide
 	require i.DebugMode is CakeMode and Debug	
-	|| cmd = ("brkadd" (direction > 0) "brkrem")
+	|| cmd = (direction > 0)("brkadd", "brkrem")
 	|| j = i.LineCommand(cmd, line)
 		.SendJbin(j)
 
