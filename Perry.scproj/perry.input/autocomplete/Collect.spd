@@ -43,7 +43,7 @@ function message.ShouldDisplayString (|bool|)
 function PerryIDE.CanSend (|string| cmd, |bool|)
 	if .LastCmdStr != cmd
 		return true
-	if !.LastSendTime or .LastSendTime.ago > 0.66s
+	if !.LastSendTime or .LastSendTime.ago > 0.667s
 		return true
 
 
