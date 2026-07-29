@@ -10,13 +10,13 @@ class ListView (GUIControl) {
 	|int|							ScrollShift
 	|bool|							RightClickSelects
 	|bool|							AlwaysSendChangeEvent
-	|byte|							CommandSelectRow
 	|byte|							XIndentPerDepth
 
 	|bool|							MultiSelection		// These two...
 	|bool|							KeepOneSelected		// Should be merged.  Maybe _Hierarchical also.
 	|ListViewHierarchy|				_Hierarchical
 
+	|byte|							_CommandSelectRow
 	|byte|							_ScrollRealigner
 	|bool|							_DuringSelect
 	|bool|							_BlockedDuringUse
@@ -368,6 +368,17 @@ class ListView (GUIControl) {
 		if (.OnKeydown)(self, key)?
 			return true
 		
+		if key.iscancel
+			|| D = .DraggingRowFrom
+				return .ClearDragcutely
+			if .ClearSearch
+				return true
+			if keys.shift
+				return .editcell
+
+		if gui.CanDrag >= mousedragging.DragWithin
+			return false
+		
 		if key is INSERT or Enter
 			.editcell
 			return true
@@ -376,16 +387,6 @@ class ListView (GUIControl) {
 			if !.PressReturnKey
 				.EditCell
 			return true
-		
-		if key.iscancel
-			if .DraggingRowFrom
-				.DraggingRowFrom = nil
-				._DraggingRowTo = nil
-				return true
-			if .ClearSearch
-				return true
-			if keys.shift
-				return .editcell
 			
 		if key.IsCmm
 			if .OnRightClick
@@ -456,10 +457,10 @@ class ListView (GUIControl) {
 		return cell.row.CellValue(Cell.column, .ColumnFinder, value)
 
 
-	libinternal CopyList (|array of string|)
+	libinternal MultiDragList (|array of string|)
 		opt norefcounts
 		._EditDelayed = nil
-		.clearinternaldrops
+//		.ClearDrag
 		for s.listsel in self
 			|| it = .copyid(s)
 				rz <~ it
@@ -488,8 +489,9 @@ class ListView (GUIControl) {
 
 
 	function VisibleRows (|int|)
-		|| h = .height + .scrollshift + (.RowHeight - 1)
 		|| r = .RowHeight
+		|| h = .actualrect.height
+		h += .scrollshift + (r - 1)
 		return h / r
 	
 
@@ -543,7 +545,7 @@ class ListView (GUIControl) {
 	behaviour LostFocus
 		|| c = .inlinecell
 			c.clear(false)
-		.clearinternaldrops
+		.ClearDragcutely
 		super.lostfocus
 	
 	
@@ -659,9 +661,17 @@ class ListView (GUIControl) {
 		return .TouchScrollBar
 	
 	
-	libinternal ClearInternalDrops
+	libinternal ClearDragCutely (|bool|)
+		|| D = .DraggingRowFrom
+			.show(D)
+			.cleardrag
+			return true
+	
+	
+	libinternal ClearDrag
+		.DraggingRowFrom = nil
 		._DraggingRowTo = nil
-		.CommandSelectRow = nil
+		._CommandSelectRow = nil
 		._SelJustChanged = false
 		.MouseDownCell = nil
 		
@@ -672,8 +682,7 @@ class ListView (GUIControl) {
 		|object--| f = .DraggingRowFrom
 		|listviewrow--| t = ._DraggingRowTo
 		|| sl = ._SelJustChanged
-		.DraggingRowFrom = nil
-		.ClearInternalDrops
+		.ClearDrag
 
 		if f and t
 			|| dr = .OnDragRow						#debug_require
@@ -763,38 +772,41 @@ class ListView (GUIControl) {
 			|| Expanding = .ClickedExpand(P)
 				return Expanding			
 			._SelJustChanged = clicks > 1
-		if (!keys.Cmd) and (.CommandSelectRow)
+		
+		
+		if (!keys.Cmd) and (._CommandSelectRow)
 			return MouseDragging.handled
 		
-		|| AdjustScroll = (clicks == -1) and (.draggingrowFrom)
-		if (clicks == -1) and (.window!.droppinginto == self) // I guess the filter is already done...
+		|| AdjustScroll = (clicks == -1) and (.DraggingRowFrom)			
+		if (clicks == -1) and (.window!.droppinginto == self)	// I guess the filter is already done...
 			|| i = .FindClicked(p.y)
 				.Select(i)
 			AdjustScroll = true
 
 		if AdjustScroll
 			if !.fixscroll
-				.ClearInternalDrops
-				debugger
-				return MouseDragging.handled				// why MouseDragging.DragWhatFixThis
+				.ClearDragcutely
+				return MouseDragging.handled
+
 			|| p2 = (0, .rowheight / 2)
 			|| i  = .FindClicked((P - P2).y)
-			|ListViewrow--| WantsTo
+			|ListViewrow--| DesiredDest
 			
-			if i
-				WantsTo = i
-			  else
-				WantsTo = .listsource
-				if (p.y+p2.y > .lasttop)
-					|| s = .scrollstart
-						WantsTo = .bmove(s, -1)
-					.ScrollByRows(-1)
-					
-				  elseif (p.y-p2.y < .LastBottom)
+			|| VisRect = .actualrect
+			if (p.y+p2.y >= visrect.y2) or (!i and p.y > visrect.y2-p2.y)				// above
+				DesiredDest = .ListSource
+				|| s = .ScrollStart
+					DesiredDest = .bmove(s, -1)
+				.ScrollByRows(-1)
+			  elseif !i								// below
+				DesiredDest = .listsource
+				if p.y-p2.y <= visrect.y
 					.ScrollByRows(1)
+			  else									// inside
+				DesiredDest = i
 			
-			if .draggingrowFrom and (.CanDrawDrag(Wantsto))
-				._draggingrowto = wantsto
+			if .draggingrowFrom and (.CanDrawDrag(DesiredDest))
+				._draggingrowto = DesiredDest
 			return MouseDragging.DragEvenIfStill
 		
 		if .ClickedScroll(P, clicks)
@@ -818,9 +830,9 @@ class ListView (GUIControl) {
 			return MouseDragging.handled
 			
 		if keys.Cmd
-			.CommandSelectRow ?= 1 + (L is selected)
-			|| State = .CommandSelectRow
-			.selectadd(l, State == 1, true)
+			|| CmdSel = ._CommandSelectRow ?? (1 + (L is selected))
+			._CommandSelectRow = CmdSel
+			.selectadd(l, CmdSel == 1, true)
 			return mousedragging.DragWithin
 		
 		if (L isnt selected) or .AlwaysSendChangeEvent
@@ -1235,7 +1247,7 @@ class ListView (GUIControl) {
 
 
 	libinternal RowBorderDraw (|ListViewrow| curr, |ListViewrow| find, |int| add, |image| where, |drawstyle| g)
-		|| r = .RowBounds(curr, find, add)
+		|| r = .RowBounds(curr, find, add, true)
 			where.DrawRectStyled(r, g)
 	
 	
@@ -1261,16 +1273,21 @@ class ListView (GUIControl) {
 			prev = sk
 	
 	
-	libinternal RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| add, |ivec4|)
+	libinternal RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| Add, |bool| AllowBottom=true, |ivec4|)
 		opt norefcounts
 		require find
-		
+
 		|| s	= .ActualRect
 		|| low	= s.y1
 		|| top	= s.y2 + .scrollshift - .rowheight
+		if find == .ListSource
+			find = nil
 		while curr != find
 			top -= .rowheight
-			require (curr) and (top >= low)
+			ifn (curr) and (top >= low)
+				if AllowBottom
+					exit
+				return nil
 			curr = .listnext(curr)
 		return (s.x, top, s.x2, top + add)
 
@@ -1498,10 +1515,13 @@ class ListView (GUIControl) {
 		|| cmm = .cmm
 			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.focusborder)
 
-		|| re = .RowBounds(.scrollstart, ._DraggingRowTo, 1)
-			re = re up .rowheight
-			if !._draggingrowto.prev
-				re = re down 2
+		|| re = .RowBounds(.scrollstart, ._DraggingRowTo, 1, true)
+			if ._draggingrowto.prev
+				re = re up .rowheight
+			|| below = (.LastBottom + 1) - re.y
+			if below > 0
+				re = re up below			
+				
 			where.DrawRectStyled(re, ¥.focusborder)
 		
 		.SetInlineSize

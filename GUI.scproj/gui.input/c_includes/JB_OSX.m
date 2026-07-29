@@ -33,11 +33,11 @@ void JB_App__Beep(void) {
 	NSBeep();
 }
 
-/*
+
 // How to actually REGISTER for receiving the keypresses? and how
 // to report that you caught the keypress? So that no other apps get it?
 // Something to do with togglePlayPauseCommand MPNowPlayingInfoCenter ?
-
+/*
 - (void)setupRemoteCommandCenter {
     // 1. Get the shared remote command center
     MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];

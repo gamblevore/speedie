@@ -1319,9 +1319,6 @@ module GUI
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return GUIActivity.nothing
 		
-		if .CanDrag >= mousedragging.DragWithin
-			return GUIActivity.nothing
-
 		if key.IsEaten
 			return GUIActivity.nothing
 
@@ -1331,7 +1328,7 @@ module GUI
 			// so hopefully only 1 gets through?
 			return 0
 		beep.OK = 1
-		
+
 		keys.AddKey(key)
 
 		if !w.openedmenu and !.AllowKeyDown(kev)

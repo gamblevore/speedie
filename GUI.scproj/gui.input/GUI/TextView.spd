@@ -773,6 +773,9 @@ class TextView (GUIControl)
 	
 	behaviour KeyDown
 		opt norefcounts
+		if gui.CanDrag >= mousedragging.DragWithin
+			return false
+		
 		if self is Enabled
 			if (.OnKeyDown)(self, key)?
 				return true

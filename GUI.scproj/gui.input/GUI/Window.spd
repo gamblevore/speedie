@@ -398,7 +398,7 @@ class Window (GUIControl)
 
 
 	libinternal DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
-		GUI.drawdrag ?= r.CopyList
+		GUI.drawdrag ?= r.DragList
 		if GUI.drawdrag
 			|| dest = r.CanPasteInto(self[p, true])
 			.DroppingInto = dest

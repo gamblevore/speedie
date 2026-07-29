@@ -377,10 +377,10 @@ class GUIControl (list)
 		return .OnPaste
 
 	
-	libinternal CopyList (|array|)
+	libinternal DragList (|array|)
 		opt norefcounts
 		if self isa ListView
-			return .CopyList
+			return .MultiDragList
 		if self isa textview
 			return [.seltext]
 		return []
