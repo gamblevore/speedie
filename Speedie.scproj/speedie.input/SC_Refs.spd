@@ -511,9 +511,9 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 			|| D = Curr.Obj
 			if (D isa SCDecl)
 				if !D.IsNormalObject
-					return (curr (parent) last)
+					return  (parent)(curr, last)
 		  elseif !curr.reftransparent
-			return (curr (parent) Last)
+			return  (parent)(curr, Last)
 		
 		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
 

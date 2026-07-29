@@ -860,7 +860,7 @@ extend Assembler
 	function SHR  (fn_opasm)
 		if dest is Const
 			|| Signed = l.signed
-			|| fn = (ConstifyBitSHS (signed) ConstifyBitSHR)
+			|| fn = (signed)(ConstifyBitSHS, ConstifyBitSHR)
 			return .MakeConstFromTwo(exp, dest, l, r, fn)
 		|| K = .const(R, 6, false)
 			if k == 0

@@ -44,7 +44,8 @@ function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=t
 	dd <~ .DumpFlags
 	
 	|| s = .source
-	|| SrcMap = (s.SrcMap (s) 0)
+	|| SrcMap = (s!=nil)(s.SrcMap, 0)
+//	|| SrcMap = (s.SrcMap, 0)(s) // I guess the original was cleaner.
 	dd.AppendHInt(SrcMap)
 	.MiniName(dd)
 	dd <~ '\0'

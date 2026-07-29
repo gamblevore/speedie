@@ -533,7 +533,7 @@ function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 	
 	.SoftNop(bflg)
 	.SoftNop(compare)
-	|| input = (y (ismax) x)
+	|| input = (ismax!=nil)(y, x)
 	|| f = exp.iclm(a, x, input, y, small)
 	if IsFloat
 		f.prms[4] = small^1						// other way around, wew.

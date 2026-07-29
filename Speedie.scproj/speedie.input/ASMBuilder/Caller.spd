@@ -143,7 +143,7 @@ function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| f
 	if !.InlineDepth
 		|| unable = (.EntireInlineFailed<2)
 		debugger 
-		|| reason = ("Unable to inline function: " (unable) "Inlined too deep on function: ")
+		|| reason =  (unable!=nil)("Unable to inline function: ", "Inlined too deep on function: ")
 		error (exp, reason + fn)
 	.EntireInlineFailed = 1 + !DepthOK
 	return asmreg()

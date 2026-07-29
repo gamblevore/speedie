@@ -204,7 +204,7 @@ module {
 		opp.InitComp( s )
 
 		|| NotEq = (s != "==")
-		|| newname = (("~" + s) (noteq) ("~="))
+		|| newname = (noteq)("~" + s, "~=")
 		Mode = mode &~ opmode.NilTest
 		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
 	
@@ -300,7 +300,7 @@ function Message.AOrBExpand (|bool|)
 		|| _t = _0|()--|
 		if !_t
 			_t = _1|()--|
-		rejoin _t
+
 	})
 */
 // only has 1 caller. why not fix this to use the above macro?
@@ -308,7 +308,7 @@ function Message.AOrBExpand (|bool|)
 	using (rel)
 	|| f = rel.first!
 	if !f.HasAny
-		.msg(f.func, f.name)
+/		.msg(f.func, f.name)
 		.become(@bra)
 	  else
 		|| P			= rel.BunchFixPrepare
@@ -543,7 +543,7 @@ function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	require uk or size > lc.typeinfo.bitcount
 
 	|| IsBig = (size > 32)
-	|| ty = (typeint64! (isbig) typeint!)
+	|| ty =  (isbig)(typeint64!, typeint!)
 	if uk and rk > 32
 		ty = typeint64!
 	|| ty2 = ty.typenormal.copydecl

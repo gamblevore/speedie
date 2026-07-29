@@ -334,7 +334,7 @@ function TypeOfChar (ExprResolver)
 	|| place = d.MakePlace(str)
 	|| char_decl = place[]
 	if !char_decl
-		|| type = (typebyte! (IsByte) TypeCodePoint!)
+		|| type = (IsByte)(typebyte!, TypeCodePoint!)
 		char_decl = type.typenormal.CopyDecl
 		place[] = char_decl
 		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
@@ -1602,7 +1602,7 @@ function TypeOfRel (ExprResolver)
 
 	if Custom > CustomOps.needed
 		|| LeftVec = Custom == CustomOps.OnlyLeftIsVector
-		return (LC (leftvec) RC).NotLocal						// return bigger
+		return (leftvec)(LC, RC).NotLocal						// return bigger
 
 	if lc is IntendedAsReturn
 		using ln
@@ -1762,7 +1762,7 @@ function TypeOfList (ExprResolver)
 		return cns
 
 	using (exp)
-	|| name = ("vecmix" (isfloat) "ivecmix")
+	|| name = (isfloat)("vecmix", "ivecmix")
 	|| list = @prm.msg
 	exp.AppendAllInto(list)
 	exp <~ (@thg, name)

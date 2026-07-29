@@ -29,7 +29,7 @@ function RelSetOrExpansion (|Message| exp)
 	tmp.msg(@arg) <~ r
 	|message--| P = exp.parent
 	|| IsDecl = P == @decl
-	((p! (isdecl) exp)).next = tmp
+	((isdecl)(p!, exp)).next = tmp
 
 
 

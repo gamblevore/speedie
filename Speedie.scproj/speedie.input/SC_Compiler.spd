@@ -876,7 +876,7 @@ function AddMain (|int| mark, |bool|)
 		Compiler.AppInitCode.first = P
 	
 	|| IsLib = Options.ProjectisLibrary
-	|| b = (Truebool! (IsLib) falsebool!)
+	|| b =  (IsLib)(Truebool!, falsebool!)
 	.program.TryAdd( nil, b, "__IS_LIBRARY__" )
 
 	stderr.LowerErrorsTo = 0

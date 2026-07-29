@@ -306,7 +306,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		if (cls) and (cls.Contained)
 			sdcl = cls.Contained!			// (|| x = Y), (|object| x = Y)
 		  else
-			|string--| str = ("Missing type, or default value." (FuncPrmz) "Missing type" )
+			|string--| str = (FuncPrmz!=nil)("Missing type, or default value.", "Missing type" )
 			expect (!FuncPrmz and defaultdcl) (self, str)
 			sdcl = DefaultDcl
 	
@@ -388,7 +388,7 @@ function scdecl.Containedfix (|scdecl|)
 	opt norefcounts
 	|| t = .type
 	|| IsSelf = T.typenormal == self
-	rz = (.copydecl (isself) self)
+	rz =  (isself)(.copydecl, self)
 	rz.contains = t.SelfDecl.Contains
 
 

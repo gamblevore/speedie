@@ -24,7 +24,9 @@ extend_module ErrorReceiver
 		if stderr.CanAddMore(sev)
 			if !desc
 				desc = node.MiniName("Unexpected ")
-			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path??"")
+			if path == nil
+				path = ""
+			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path)
 
 
 

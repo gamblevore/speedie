@@ -22,7 +22,7 @@ class SCFile (file)
 		flow off // dates shouldn't matter ///
 		FlowControl.DisabledIncr
 		
-		|string--| x = (f.path (f != nil) string.error) 	// just feel like doing this.
+		|string--| x = (f != nil)(f.path, string.error) 	// just feel like doing this.
 		super.constructor(x)
 		.Proj = p
 		.Types = nil
