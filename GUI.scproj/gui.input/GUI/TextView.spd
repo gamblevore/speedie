@@ -2241,7 +2241,6 @@ class TextView (GUIControl)
 		if ._LogTrimmed
 			d = .AddLogTrim(d)
 		
-		d.LineNumber = 1
 		|TextViewLine| Last
 		|textviewline| NewScroll
 		|| P = 0
@@ -2262,6 +2261,9 @@ class TextView (GUIControl)
 			if last
 				d.vline = last.vline + 1
 				d.LineNumber = last.LineNumber + (last is endsnormally)
+			  else
+				d.vline = 0
+				d.LineNumber = 1
 
 			p = D.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  P)
 			msg = .PrepareLineColor(d, msg, jx, &lastowner)
