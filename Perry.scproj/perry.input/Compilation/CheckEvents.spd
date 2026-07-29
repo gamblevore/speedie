@@ -12,6 +12,7 @@ extend PerryIDE
 			.ModifiedForCompile = false
 			if .ProjectIsCode and !.UsingSpdLib
 				.Feedback = nil
+				.ASMProcess = nil
 
 		|| unused = @tmp + "check"
 		unused <~ p * .EditorIsCode

@@ -5,6 +5,7 @@ class PerryIDE (Window)
 	linkage: cpp_part IDE
 
 	|SpdProcess?|				Feedback
+	|SpdProcess?|				ASMProcess
 	|UnixProcess?|				Compilr
 	|UnixProcess?|				RunningProd
 	|message?|					LastCakeError
@@ -156,7 +157,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		if keys.shift
 			|| u = GUI.tooltip.useable
-				return u
+				return u 
 		|| e = .editme.myerror.useable(0)
 			if .editme.ParsedMessage				// don't show simple parse errors
 				return e
@@ -254,7 +255,9 @@ class PerryIDE (Window)
 		  elseif (i == 1)
 			|| t = e.text
 
-			fs <~ "Chars ${t.lengthutf8}   Lines ${e.WrappedLines.last!.vline}"
+			|| wl = e.WrappedLines.last
+			|| vl = (wl.vline (wl) 0)
+			fs <~ "Chars ${t.lengthutf8}   Lines $vl"
 			|| msg = e.ParsedMessage
 				|| loc = msg.LinesOfContent
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
@@ -533,6 +536,8 @@ class PerryIDE (Window)
 				.setfocus(.editme)				// shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 
+		if .CheckCrashed(.ASMProcess, "ASM View")
+			.ASMProcess = nil
 		if .CheckCrashed(.feedback, "feedback")
 			.Feedback = nil
 		if .CheckCrashed(.compilr,  "compiler")
@@ -540,6 +545,8 @@ class PerryIDE (Window)
 
 		|| f = .Feedback
 			.SpeedieMsgReceive(f)
+		|| asm = .ASMProcess
+			.SpeedieMsgReceive(asm)
 		.UpdateSearchText
 		.UpdateStatusErrors
 		.ReadLog(false)

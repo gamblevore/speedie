@@ -14,7 +14,17 @@ class TextView (GUIControl)
 
 	|Error?|					MyError
 	|TextViewLine|				WrappedLines
+	|TextViewLine|				ScrollStart
+	
+	|GUITextChangeEvent?|		OnTextChanged
+	|GUITextSelectEvent?|		OnSelChanged
+	|GUITextLineEvent?|			OnBreakPoint
+	|GUITextLineBreakColor?|	OnDrawLineNumber
+	
+	|GUITextShowEvent?|			OnShowExtraInfo
+	|GUITextLineEvent?|			OnSelError
 
+	visible false
 	|DocumentJeeboxMode|		_JeeboxMode			// used if the document is nil.
 	|byte|						_DrawInLineArea
 	|byte|						_CanAutoComplete
@@ -31,21 +41,11 @@ class TextView (GUIControl)
 	|bool|						_PreferPrevLine
 	|byte|						_DebugLevel
 	|message?|					_ActiveLine
-	|TextViewLine|				ScrollStart
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
 	|Document?|					_Viewing
 	|DelayedShowError?|			_ErrorDelayer
 	|[textviewline]|			_SavedCompileInfos
-
-
-	|GUITextChangeEvent?|		OnTextChanged
-	|GUITextSelectEvent?|		OnSelChanged
-	|GUITextLineEvent?|			OnBreakPoint
-	|GUITextLineBreakColor?|	OnDrawLineNumber
-	
-	|GUITextShowEvent?|			OnShowExtraInfo
-	|GUITextLineEvent?|			OnSelError
 	
 
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)

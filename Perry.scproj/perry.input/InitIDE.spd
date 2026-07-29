@@ -193,7 +193,7 @@ extend PerryIDE
 			.tooltip		= "Displays ASM"
 			.MultiSelection	= true
 			.TakesFocus		= TakesFocusFlag.CanFocus
-			.ID				= "ASMView"
+			.ID				= "ASM View"
 			.size			= the~area
 			is NoSearch
 			.AttachedFrom	= ~MoveCode.Left
@@ -669,7 +669,6 @@ extend PerryIDE
 		
 	
 	function LogOneComm (|object| msg, |string| type="")
-		opt norefcounts
 		.LogOneThing(msg, type, .LogComms)
 
 
