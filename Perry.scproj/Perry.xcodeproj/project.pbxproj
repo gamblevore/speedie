@@ -1690,6 +1690,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__ALLOW_OSX_EXTENSIONS__=1",
 				);
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_NAME = Perry;
@@ -1757,6 +1758,7 @@
 					"-ffast-math",
 					"-Wno-return-type-c-linkage",
 					"-Wno-nullability-completeness",
+					"-D__ALLOW_OSX_EXTENSIONS__=1",
 				);
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_NAME = Perry;
@@ -1815,11 +1817,6 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OBJROOT = "/tmp/$(SYMROOT)";
-				OTHER_CFLAGS = (
-					"-ffast-math",
-					"-Wno-return-type-c-linkage",
-					"-Wno-nullability-completeness",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = Build;
@@ -1861,11 +1858,6 @@
 				MTL_FAST_MATH = YES;
 				OBJROOT = /tmp/build;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-ffast-math",
-					"-Wno-return-type-c-linkage",
-					"-Wno-nullability-completeness",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = website.klinkerhoppen.Perry;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = Build;
