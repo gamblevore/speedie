@@ -536,7 +536,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		return name_space.RequireContained( c )
 		
 	if (f == @list) and !c.hasany
-		|| p = c.UpToType    // abc|()--|
+		|| p = c.UpToType								// abc|()--|
 			return typeofexpr(p.first, name_space)				
 			
 	|| fi = c.first!

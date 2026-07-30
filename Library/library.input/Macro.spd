@@ -31,6 +31,13 @@ role Macro (Message)
 	
 	module
 		|[message]| TmpPrms_
+		
+		function TmpPrms (|[message]|)
+			opt norefcounts
+			|| r = .TmpPrms_
+			if r.Length
+				r.clear
+			return r
 
 		function New (|message| s, |bool| UseSelf, |Macro!|)
 			opt norefcounts

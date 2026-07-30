@@ -290,33 +290,15 @@ function Message.OpScore (|int|)
 
 
 function Message.AOrBExpand (|bool|)
-	ifn self in @rel
-		return true
+	opt norefcounts
+	if self in @rel
+		|| rel = .parent!
+		|| prms = macro.TmpPrms
+		prms <~ .prev
+		prms <~ .next
+		rel.BecomeMacro(macros.DoubleQQ, nil, prms)
+		prms.clear
 
-	.name = "or"
-	|| rel = .parent!
-/*
-	({
-		|| _t = _0|()--|
-		if !_t
-			_t = _1|()--|
-
-	})
-*/
-// only has 1 caller. why not fix this to use the above macro?
-
-	using (rel)
-	|| f = rel.first!
-	if !f.HasAny
-/		.msg(f.func, f.name)
-		.become(@bra)
-	  else
-		|| P			= rel.BunchFixPrepare
-		|| subject		= P.first!
-		|| multi_opp	= subject.Next
-			rel.RelFix(false)
-			P.ReplaceWith(rel)
-			multi_opp.BunchFixSub(subject, rel)
 	return true
 
 

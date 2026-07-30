@@ -100,11 +100,11 @@ constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	(T isnt altered) // decls default as being altered... for some odd reason. no idea why.
 
 
-syntax is (|classinfo| cls, |bool|) 
+syntax is (|classinfo| cls, |bool|)
 	return .flags & cls
 
 
-syntax is (|classinfo| cls, assigns:|bool|) 
+syntax is (|classinfo| cls, assigns:|bool|)
 	if value
 		.flags |= cls
 	  else
@@ -158,16 +158,16 @@ function CreateAutoConstructor (|scfunction|)
 
 
 function IsTask (|bool|)
-	return self and .isrole & 2
+	return self and .IsRole & 2
 
 
-function TaskProperties 
+function TaskProperties
 	opt norefcounts
 	for (p in .Properties)
 		(p is task)
 
 
-function CollectProperties 
+function CollectProperties
 	opt norefcounts
 	require !.IsBehaviourTable
 
@@ -224,7 +224,7 @@ function scdecl.CalculateDeclSize (|int| depth = 0, |int|)
 
 	
 function mini_size (|int| B, |int|)
-	.clssize = B
+	.ClsSize = B
 	.ClsSizeRaw = B
 	.Alignment = B
 	return B
@@ -279,7 +279,7 @@ function CalculateSize (|int| Depth=0, |int|)
 		p.ExportPosition = rz
 		p.sanity
 		|| Mul = P.c_Array ?? 1
-		rz += Curr * Mul 
+		rz += Curr * Mul
 
 	.alignment = AlignTo
 
@@ -445,7 +445,7 @@ function SCFunction.CopyParams (|message| list)
 	|| a = .source.GiveArg
 	|| dot = @dot.msg("Constructor")
 	a.first = dot
-	|| name = dot.msg(@thg, "super")
+	dot.msg(@thg, "super")
 	|| SubPrms = dot.msg(@prm)
 	
 	for s in list
@@ -478,12 +478,12 @@ function CreateEmptyConstructors (|scfunction|)
 
 	|| pc = .PassableCount
 	|| s = .super
-	if s and rz and s != TypeObject // object has no constructor-func
+	if s and rz and s != TypeObject			// object has no constructor-func
 		|| con2 = s.constructorfunc
-			|| l = con2.Prms 
+			|| l = con2.Prms
 			if l.HasAny
 				rz.CopyParams(l)
-				pc = 0 // i guess?
+				pc = 0						// i guess?
 	
 	if .isobject
 		if pc >= 1 and pc <= 7
@@ -537,14 +537,14 @@ function CreateConstructors
 	if .IsObject or (.isstruct and !.Behaviourness and !.ismodel)
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
-			|| s = .super! // roles always have supers
+			|| s = .super!					// roles always have supers
 			check (!con or s.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
 			con ?= s.ConstructorFunc
 			.DestructorFunc = s.DestructorFunc
 			require con
 		
 		using .Source!
-		if !con and !.IsWrapper		// some wrapper classes cant be newed.
+		if !con and !.IsWrapper				// some wrapper classes cant be newed.
 			con = .CreateEmptyConstructors
 		.ConstructorFunc = con
 		
@@ -557,13 +557,13 @@ function CreateConstructors
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
 	
 	  elseif .isrole == 3
-		check (.super!.isrole == 2) (self, "Tasks can't nestedly subclass.")
+		check (.super!.isrole == 2)			(self, "Tasks can't nestedly subclass.")
 
 
 function scclass.FillRoleConstructor (|scfunction| con)
 	opt norefcounts
 	for f in con
-		f.MakeConstructor				// in case the lib gets updated?
+		f.MakeConstructor					// in case the lib gets updated?
 		if .istask
 			.FillTaskConstructor(f)
 
@@ -600,25 +600,24 @@ function NumericReduction (|classinfo|)
 	return .flags & ClassInfo.NumericReduction
 
 
-function ContainedTypeLoad 
-	.use
+function ContainedTypeLoad
+	.Use
 	|| sup = .super
 		.Contained = sup.Contained
 		.SelfDecl.Contains = sup.SelfDecl.Contains
 		
 		if .NumericReduction == sup.NumericReduction
-			.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
-			.NeedsDefaultValue(sup.false,   .false,   "false")
+			.NeedsDefaultValue(sup.Defawlt,	.defawlt,	"default")
+			.NeedsDefaultValue(sup.false,	.false,		"false")
 		if sup is IgnoreContainedSelf
 			is IgnoreContainedSelf
-//		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
 		(self is ContainsParentClass) = (sup is ContainsParentClass)
 		
 	
 	.defawlt ?= @thg + "nil"
 	if .false
 		//
-	  elseif .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
+	  elseif .NumericCount == 1				// what if its a vec4? (0,0,0,0)? sigh.
 		.false = @num + "0"
 	  else
 		.false = @thg + "nil"
@@ -646,7 +645,7 @@ function FindContainedClass (|scclass|)
 	|| m = .modul
 	if C == @ques
 		expect (C == "parentclass") (C)
-		|| p = m.parent|SCModule| /// could go up a chain until we find one
+		|| p = m.parent|SCModule| 			/// could go up a chain until we find one
 		expect (p and p.cls) (c, "No parent class found.")
 		is ContainsParentClass
 		return p.cls
@@ -665,11 +664,11 @@ function SCFunction.DontWantSameReturnType (|scfunction| f)
 	
 
 
-function FindNilChecker 
+function FindNilChecker
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
 	
 	if !.IsStruct
-		is HasNilChecker // default to true
+		is HasNilChecker				// default to true
 
 	|| s = .super
 		(self is HasNilChecker) = (s is HasNilChecker)
@@ -680,7 +679,7 @@ function FindNilChecker
 
 	for f in cast
 		(f Is OptInline)
-		check  (f.args == 1)		  (f.Source, "No params allowed." )
+		check  (f.args == 1)			(f.Source, "No params allowed." )
 		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
 		|| ret = f.ReturnType
@@ -917,7 +916,7 @@ function Real_Isa (|SCClass| cls, |bool|)
 	return .realclass.isa(cls)
 
 
-function AfterAfterFuncs 
+function AfterAfterFuncs
 	|| s = .Super
 		if s.TheCompareFunc and !.TheCompareFunc
 			.TheCompareFunc = s.TheCompareFunc
@@ -968,7 +967,7 @@ function LoadClassType
 		.ClassType = .MakeClassType(.typenormal)
 
 
-function TryAddToProject 
+function TryAddToProject
 	opt norefcounts
 	require !.FuncProto
 	|| NameNode = .Source.first!
@@ -1015,7 +1014,6 @@ module
 		cls.ASMTypeInfo = cls.TypeInfo
 		cls.IsRole = (node ~= "role")|int|
 
-		|| SA = cls.SourceArg
 		cls.loadlinkage
 		Compiler.ClassList <~ cls
 
@@ -1127,7 +1125,7 @@ module
 			require l.ExpectLast
 			|| prm = @prm.msg
 			l.prev = prm
-			prm <~ NewRel(@thg + "SorterComparer", @thg+name_space.name, "of") 
+			prm <~ NewRel(@thg + "SorterComparer", @thg+name_space.name, "of")
 			
 		
 	function LoadSyntax (CollectFunc)
@@ -1252,3 +1250,4 @@ extend SCClass
 		while (Curr_)
 			yield Curr_
 			Curr_ = Curr_.super
+

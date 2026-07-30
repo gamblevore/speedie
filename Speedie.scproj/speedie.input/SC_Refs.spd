@@ -355,7 +355,7 @@ function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
 			Return true
 
 
-function Destructable (|Message| Blocker, |Message?| arg, |Message| name)
+function Destructable (|Message?| Blocker, |Message?| arg, |Message| name)
 	opt norefcounts	
 	|| type = TypeOfExpr(name, nil, nil)
 		(type is Readfrom)

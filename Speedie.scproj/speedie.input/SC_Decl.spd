@@ -632,7 +632,7 @@ class SCDecl (SCObject) {
 				return contains				// we are missing UpgradeableContained?
 			
 			|| SameType = contains.type == .type
-				if .SameForReplace(contains) 
+				if .SameForReplace(contains)
 					return self
 			
 			|| C = .copydecl
@@ -1016,8 +1016,7 @@ class SCDecl (SCObject) {
 
 
 	render RenderTypeNameNicer
-		opt norefcounts
-		return .DownGrade.RenderTypeName(fs_in)
+		return .RenderTypeName(fs_in)
 
 
 	render RenderTypeName 

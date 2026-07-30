@@ -19,7 +19,13 @@ module Macros {
 || TernQMark = 	`({
 	|| _t = _0
 	(_t|bool|)(_1, nil)
-})`.Macro // need some way to force this to cast to a bool. like expandtobool. how?
+})`.Macro // Is this casting to a bool actually... working? or good enough? Does it force the syntaxcast to be called?
+|| DoubleQQ = `({
+	|| _t = _0|()--|
+	if !_t
+		_t = _1
+	(_t)
+})`.macro
 
 
 || MultiDecr = `JB_DecrMulti(_0, _1)`.macro

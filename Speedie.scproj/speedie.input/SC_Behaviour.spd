@@ -108,8 +108,7 @@ class SCBehaviour (SCNode)
 
 		|| ret = .last
 		if (ret == @decl) and !ret.declname
-			|| Tmp = macro.TmpPrms_
-			tmp.Length = 0
+			|| Tmp = macro.TmpPrms
 			tmp <~ ret.first!.copy
 			prms.BecomeMacro(CakeVirtualReturn, prms, tmp)
 			tmp.clear
@@ -409,8 +408,7 @@ function Message.VirtualAdd (|string| name, |bool| Cake, |message| Ty, |int| i)
 		self <~ (@thg, name)
 		return
 	
-	|| prms = macro.TmpPrms_
-	prms.Length = 0
+	|| prms = macro.TmpPrms
 	prms <~ i.msg
 	if !ty
 		ty = @thg+"Object"

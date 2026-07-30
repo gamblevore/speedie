@@ -121,8 +121,7 @@ function message.Tran_QMark				//"?"
 		error self
 
 	  else
-		|| r = macro.TmpPrms_
-		r.clear
+		|| r = macro.TmpPrms
 		r <~ inside
 		r <~ thedot
 		.BecomeMacro(macros.TernQMark, nil, r)

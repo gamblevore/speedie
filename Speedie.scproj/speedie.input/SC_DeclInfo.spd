@@ -47,6 +47,7 @@ datatype SCDeclInfo (uint)
 		|SCDeclInfo|
 		Borrowed
 		StayBorrowed
+		BothBorrowed = StayBorrowed|||Borrowed
 		DirectNumber						// Eg: 7, 1, 100
 		Const
 		UnknownConst
