@@ -19,19 +19,11 @@ extern "C" {
 #define kStrLengthMax (2147483644) // 2GB string max
 
 // probably should move all this into the string header... utf-8 isnt needed elsewhere
-#if kPlatformEndian == 0
-    #define kWrongUTF16			/*Becomes*/		(16+1)
-	#define kUTF16BBOM			/*Becomes*/		0xFFFE
-	#define kUTF16LBOM			/*Becomes*/		0xFEFF
-	#define kUTF32LBOM			/*Becomes*/		0x0000FEFF
-	#define kUTF32BBOM			/*Becomes*/		0xFFFE0000
-#elif kPlatformEndian == 1
-    #define kWrongUTF16			/*Becomes*/		(16)
-	#define kUTF16BBOM			/*Becomes*/		0xFEFF
-	#define kUTF16LBOM			/*Becomes*/		0xFFFE
-	#define kUTF32LBOM			/*Becomes*/		0xFFFE0000
-	#define kUTF32BBOM			/*Becomes*/		0x0000FEFF
-#endif
+#define kWrongUTF16			/*Becomes*/		(16+1)
+#define kUTF16BBOM			/*Becomes*/		0xFFFE
+#define kUTF16LBOM			/*Becomes*/		0xFEFF
+#define kUTF32LBOM			/*Becomes*/		0x0000FEFF
+#define kUTF32BBOM			/*Becomes*/		0xFFFE0000
 
 
 #define kUTF8BOM			/*Becomes*/		0xEFBBBF
@@ -466,6 +458,9 @@ int u8Count_ (uint8* a, int Len) {
 			cCount++;
 	return cCount;
 }
+
+
+#define Min(a, b) (((a) < (b)) ? (a) : (b))
 
 
 int JB_Str_CharCount (JB_String* self, int s, int s2) {
@@ -928,7 +923,7 @@ bool IsAsciiSub_(uint8* SelfPos, u32 Length) {
 	int TrimLength = (int)(SelfEnd - SelfPos) / 4;
 	u32* intPos = (u32*)SelfPos;
 	while ( TrimLength-- )
-		if ( (*intPos++) & k4HighBits )
+		if ( (*intPos++) & 0x80808080 )
 			return false;
 
 	return true;
@@ -1418,8 +1413,9 @@ JB_String* JB_Str_ReplaceAllB(JB_String* self, int lFrom, int lTo) {
 	return JB_Str_ReplaceBytesSub_(self, lFrom, lTo, 0 );
 }
 
+
 JB_String* JB_Str_ReplaceBytesSub_(JB_String* self, int lFrom, int lTo, FastString* fs_in) {
-	int FirstOff = JB_Str_InByte( self, 0, kMaxint, lFrom );
+	int FirstOff = JB_Str_InByte( self, 0, 2147483647, lFrom );
 	if ( FirstOff < 0 )
 		return JB_FS_Return(self, fs_in);
 

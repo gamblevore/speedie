@@ -137,7 +137,8 @@ void JB_ClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Pare
     Cls.Memory.CurrBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
     Cls.Memory.IsActive = true;
     Cls.Memory.World = &MemoryManager;
-    Cls.Size = Max(Size, sizeof(FreeObject));
+    if (Size < sizeof(FreeObject)) Size = sizeof(FreeObject); 
+    Cls.Size = Size;
     
     if (Parent) {
         Parent->HasSubClasses = true;

@@ -561,16 +561,6 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 	fs <~ ";\n}\n\n"
 
 
-function FillInterpreter
-	LibStability.StabiliseFuncs
-	LibStability.StabiliseGlobs
-
-	packmaker.LibGlobSize = packmaker.GlobalsSize(packmaker.libglobs)		// rebuild size
-	assembler.sh.FillDebugInfo
-
-	.WriteVMGlobsAndPtrs(.ModuleProperties)
-
-
 
 function faststring.AppendVoid (|string| s, |byte| extra=0)
 	opt norefcounts
@@ -586,111 +576,6 @@ function faststring.AppendWrap (|scfunction| f)
 		.appendvoid(f.ExportName + "Wrap")
 	  else
 		.appendvoid(f.ExportName)
-
-
-function WriteVMFuncs (|faststringcpp| fs)
-	opt norefcounts
-	for 32
-		fs.appendvoid("(int64)(-1)") // ooof
-	
-	|| Position = 0
-	for fn in packmaker.libfuncs
-		if fn.NeedsLibExport
-			|| id = fn.fpackid|int|
-			|| Missing = id - position
-			check (Missing > 0) (fn, "Bad PackID?")
-			
-			while --missing >= 1
-				fs.appendvoid("(int64)(-1)")
-			fs.appendwrap(fn)
-			position = id
-	fs.appendvoid("0")
-
-
-function WriteLibGlobLookup (|faststringcpp| fs)
-	opt norefcounts
-	|| Position = 0
-	
-	fs <~ "#define JB_GlobOffset(g)		((unsigned short)(int64)(  &(((JB_Globals*)0)->g)  ))
-#define JB_LibFunc(ty, fn)		((ty)((IntPtr)(fn)))
-
-//#define JB_LibFunc(ty, fn)	((ty)((IntPtr)(fn)|(1ull<<(sizeof(IntPtr)*8-1))))
-
-__lib__ unsigned short JB_GlobTable[] = {  // glob list
-"
-	for g in packmaker.LibGlobs
-		|| id = g.gpackid|int|
-		|| Missing = id - position
-		check (Missing > 0) (g.source!, "Bad PackID?")
-		expect (Missing < 1000) // what?
-		
-		while --missing >= 1
-			fs <~ "\t65535,\n"
-		fs <~ "\tJB_GlobOffset("
-		fs.AppendLibGlob(g)
-		fs <~ "),\n"
-		position = id
-	fs <~ "0 \n};
-
-extern \"C\" unsigned short* JB_App__GlobTable() {
-	return &JB_GlobTable[0];
-}
-"
-
-	
-function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
-	opt norefcounts
-	.WriteLibGlobLookup(fs)
-	
-	fs <~ "// entire_function_list!\n\n"
-	for f in packmaker.LibFuncs
-		if (f.iscppinbuilt == 1)
-			.MakeWrapperFor(fs, f)
-	
-	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
-
-	.WriteVMFuncs(fs)
-	|| j = jbin()
-	packmaker.DebugClassesAndGlobals(j)
-
-	fs <~ "};
-
-extern \"C\" JB_StringC* JB_App__LibDebug() {
-	int n = ${j.length};
-	const char* Data = "
-
-	fs.AppendCppAll(j|string|)
-	
-	fs <~ ";
-	return JB_StrCN(Data, n);
-}
-
-extern \"C\" void** JB_App__LibFuncs() {
-	return &(JB_PackPtrs[0]);
-}
-
-extern \"C\" void** JB_App__LibGlobs() {
-"
-	
-	.GlobalLibProtoTypes(fs)	
-	fs <~ "
-	return (void**)(&JBC__);
-}
-
-"
-
-
-function GlobalLibProtoTypes (|faststring| fs)
-	opt norefcounts
-	for dcl in PackMaker.LibGlobs
-		|| fn = dcl.Func
-			fs <~ "\tJBC__."
-			fs.AppendLibGlob(dcl)
-			fs <~ " = JB_LibFunc("
-			writetype(dcl, fs)
-			fs <~ ", "
-			fs <~ fn.exportname
-			fs <~ ");\n"
 
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
@@ -987,7 +872,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		exp.PreRun
 		exp.ExportSyx
 		if options.MakeExec
-			exp.FillInterpreter
+			exp.FillCake
 		  else
 			packmaker.OrderLibGlobs
 		exp.JB_GlobalsMadeHere(exp.GlobsInLib)

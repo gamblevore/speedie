@@ -133,24 +133,9 @@ typedef int64					Date;
 
 
 
-#ifndef kPlatformEndian
-	#define kPlatformEndian 0
+#ifndef JB_FieldOffset
+	#define JB_FieldOffset(type, field) ((int64)(&((type *) 0)->field))
 #endif
-
-
-#define kMaxint								2147483647
-
-
-/* used for testing if it is ascii! */
-#define k4HighBits							0x80808080
-#define Max(a, b) (((a) > (b)) ? (a) : (b))
-#define Min(a, b) (((a) < (b)) ? (a) : (b))
-
-
-#ifndef FieldOffset
-	#define FieldOffset(type, field) ((int64)(&((type *) 0)->field))
-#endif
-#define CountCArray(x) (sizeof(x)/sizeof(x[0]))
 
 
 #define __lib__ __attribute__ ((visibility ("default")))

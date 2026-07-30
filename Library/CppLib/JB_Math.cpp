@@ -91,9 +91,13 @@ extern "C" {
 //		return res + copysignf(pi, y) * (x < 0.0f);
 //	}
 
+#define Min(a, b) (((a) < (b)) ? (a) : (b))
+#define Max(a, b) (((a) > (b)) ? (a) : (b))
+
 	double JB_Pow10(double rz, int x) {
-		x = Min(x, 350);
-		x = Max(x,-350);
+	// isn't there a std math func to do this?
+		if (x > 350) x = 350;
+		if (x < -350) x = -350;
 		if (x < 0) {
 			for_(-x)
 				rz *= 0.1;

@@ -9,5 +9,4 @@ ExternCEnd
 
 
 #define TARGET_WIN32 1
-#define kPlatformEndian 0
 

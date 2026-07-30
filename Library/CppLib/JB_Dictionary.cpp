@@ -10,7 +10,10 @@
 
 
 extern "C" {
-    
+
+#define Min(a, b) (((a) < (b)) ? (a) : (b))
+#define Max(a, b) (((a) > (b)) ? (a) : (b))
+
 struct Range {
     int Start;
     int Last;

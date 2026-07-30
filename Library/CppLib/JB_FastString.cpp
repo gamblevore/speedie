@@ -15,6 +15,8 @@
 extern "C" {
 
 #define kDefaultSize (1024*2)
+#define Min(a, b) (((a) < (b)) ? (a) : (b))
+
 
 inline uint8 NumToHex(u32 Num) {
 	if ( Num <= 9 )
@@ -425,7 +427,7 @@ void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp
 	if (!D or !DoubleIsNormal(D))
 		return JB_FS_AppendCString(self, "0.0");
 
-    dp = Max(dp, 1);
+	if (dp < 1) dp = 1;
     dp = Min(dp, 16);
     
     if (D < 0)
