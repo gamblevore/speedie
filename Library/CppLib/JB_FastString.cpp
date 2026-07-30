@@ -113,15 +113,15 @@ uint8* JB_FS_WriteAlloc_(FastString* fs, int GrowBy) {
 }
 
 int JB_FS_FreeSize(FastString* fs) {
-	return fs->Size - fs->Length;
+	return fs->_Size - fs->Length;
 }
 
 uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { // JB_FS_FreeSizeSet
     int Spare = JB_FS_FreeSize(fs);
     if (Spare < Extra)
-        if (!JB_FS_ResizeTo_(fs, fs->Size + Extra))
+        if (!JB_FS_ResizeTo_(fs, fs->_Size + Extra))
 			return 0;
-    return fs->ResultPtr + fs->Length;
+    return fs->_Addr + fs->Length;
 }
 
 void JB_FS_AppendLocalTime (FastString* fs, Date self) {
@@ -138,7 +138,7 @@ void JB_FS_AppendLocalTime (FastString* fs, Date self) {
 
 JB_String* JB_FS_Copy (FastString* fs) {
     FS_SanityCheck_(fs);
-    return JB_Str_CopyFromPtr(fs->ResultPtr, fs->Length);
+    return JB_Str_CopyFromPtr(fs->_Addr, fs->Length);
 }
 
 
@@ -146,25 +146,25 @@ static byte DummySpace[4];
 
 bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
     FS_SanityCheck_(fs);
-    if (NewLength == fs->Size)
+    if (NewLength == fs->_Size)
         return true;
     
 
-	auto S = fs->Result;
+	auto S = fs->_Result;
 	if (!S) {
-		auto Old = fs->ResultPtr;
+		auto Old = fs->_Addr;
 		if (Old and Old!=DummySpace) return false; // direct memory write.
 		S = JB_Incr(JB_New( JB_String ));
 		S->Addr = 0;
 		S->Length = 0;
-		fs->Result = S;
+		fs->_Result = S;
 	}
 	// So what if the size is lower than the current? AND if the current is... shared?
 
 	require (JB_BA_Realloc_(S, NewLength));
     
-    fs->Size = (int)JB_msize(S->Addr);
-    fs->ResultPtr = S->Addr;
+    fs->_Size = (int)JB_msize(S->Addr);
+    fs->_Addr = S->Addr;
 	fs->Length = Min(NewLength, fs->Length);
 
     return true;
@@ -172,9 +172,9 @@ bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
 
 
 uint8* JB_FS_GrowBy (FastString* fs, int Needs) {
-    if ( JB_FS_Flush( fs ) and fs->Size >= Needs ) {
+    if ( JB_FS_Flush( fs ) and fs->_Size >= Needs ) {
         fs->Length = Needs;
-        return fs->ResultPtr;
+        return fs->_Addr;
     }
 
     int NewLength = fs->Length + Needs;
@@ -187,7 +187,7 @@ uint8* JB_FS_GrowBy (FastString* fs, int Needs) {
             if (JB_FS_ResizeTo_(fs, (NewLength*i)-1)) { // -1 to zeroterm
                 int L = fs->Length;
                 fs->Length = L + Needs;
-                return fs->ResultPtr + L;
+                return fs->_Addr + L;
             }
         }
     }
@@ -239,13 +239,13 @@ int JB_FS_Last (FastString* self, int off) {
 	int N = self->Length; 
 	int i = N-(1+off);
 	if ((uint)i < N)
-		return self->ResultPtr[i];
+		return self->_Addr[i];
 	return -1;
 }
 
     
 void JB_FS_RemoveByte(FastString* self, byte B) {
-    uint8* Addr = self->ResultPtr;
+    uint8* Addr = self->_Addr;
     if (Addr) {
         int Len_m_1 = self->Length - 1;
         if (Addr[Len_m_1] == B) {
@@ -527,7 +527,7 @@ void JB_FS_AppendDouble(FastString* self, double d) {
                /* Utilities */
 
 int64 JB_FS_Mark(FastString* self) {
-	return self->WrittenLength + self->Length;
+	return self->_WrittenLength + self->Length;
 }
 
 
@@ -537,14 +537,14 @@ bool JB_FS_Grew(FastString* self, int Old) {
 
 
 int JB_FS_Byte(FastString* fs, int offset) {
-	if ((u32)offset < fs->Size)
-		return fs->ResultPtr[offset];
+	if ((u32)offset < fs->_Size)
+		return fs->_Addr[offset];
 	return -1;
 }
 
 void JB_FS_ByteSet(FastString* fs, int offset, byte B) {
-	if ((u32)offset < fs->Size)
-		fs->ResultPtr[offset] = B;
+	if ((u32)offset < fs->_Size)
+		fs->_Addr[offset] = B;
 }
 
 
@@ -556,7 +556,7 @@ static void ClearFS (FastString* self);
 
 int JB_FS_Size(FastString* fs) {
 	FS_SanityCheck_(fs);
-	return fs->Size;
+	return fs->_Size;
 }
 
 void JB_FS_SizeSet(FastString* fs, int NewSize) {
@@ -574,12 +574,12 @@ int JB_FS_Length(FastString* self) {
 
 int64 JB_FS_StreamLength(FastString* self) {
 	if (self)
-		return self->Length + self->WrittenLength;
+		return self->Length + self->_WrittenLength;
 	return 0;
 }
 
 void JB_FS_LengthSet(FastString* fs, int NewLength) {
-    if ((u32)NewLength < (u32)fs->Size) {
+    if ((u32)NewLength < (u32)fs->_Size) {
         fs->Length = NewLength;
     }
 	FS_SanityCheck_(fs);
@@ -590,8 +590,8 @@ bool JB_FS_Flush(FastString* fs) {
     if ( File ) {
         int N = fs->Length;
         if ( N ) {
-            N = (int)JB_File_WriteRaw_( File, fs->ResultPtr, N );
-            fs->WrittenLength += N;
+            N = (int)JB_File_WriteRaw_( File, fs->_Addr, N );
+            fs->_WrittenLength += N;
             fs->Length = 0;
         }
 		JB_File_Flush(File);
@@ -616,7 +616,7 @@ FastString* JB_FS_Constructor(FastString* self) {
 	JB_New2(FastString);
     JB_Zero(self);
     self->IndentChar = '\t';
-    self->ResultPtr = DummySpace;
+    self->_Addr = DummySpace;
 	return self;
 }
 
@@ -632,18 +632,18 @@ FastString* JB_FS_ConstructorSize(FastString* Self, int Size) {
 
 static void ClearFS (FastString* self) {
     JB_FS_Flush( self );
-    JB_Decr( self->Result );
+    JB_Decr( self->_Result );
 	JB_Decr( self->File );
     JB_Zero(self);
     self->IndentChar = '\t';
-    self->ResultPtr = DummySpace;
+    self->_Addr = DummySpace;
 }
 
 
 void JB_FS_Destructor (FastString* self) {
 // object.dispose() doesn't exist anymore :]
     JB_FS_Flush( self );
-    JB_Decr( self->Result );
+    JB_Decr( self->_Result );
 	JB_Decr( self->File );
 	JB_Obj_Destructor(self);
 }
@@ -655,25 +655,25 @@ JB_String* JB_FS_GetResult(FastString* self) {
 		return JB_Str__Empty();
 	
 	int Length = self->Length;
-	int Actual = self->Size;
-	JB_String* Result = self->Result;
+	int Actual = self->_Size;
+	JB_String* Result = self->_Result;
 	
 	self->Length = 0;
-    self->WrittenLength = 0;
+    self->_WrittenLength = 0;
     self->Indent = 0;
     self->IndentChar = '\t';
 
     if (Result) {
 		if (Actual >= Length*4 and self == TheSharedFastString)
-			return JB_Str_CopyFromPtr(self->ResultPtr, Length);
+			return JB_Str_CopyFromPtr(self->_Addr, Length);
 		JB_SafeDecr(Result);
 	} else {
 		Result = JB_Str__Empty();
 	}
     
-	self->Size = 0;
-    self->Result = 0;
-    self->ResultPtr = DummySpace;
+	self->_Size = 0;
+    self->_Result = 0;
+    self->_Addr = DummySpace;
 
 	return Str_Shrink(Result, Length); // calls freeifdead
 }

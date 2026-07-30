@@ -598,6 +598,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		if (f == @arr)
 			Return TypeArray!.TypeNormal
 		if (f == @arg)
+			c.NeatenDict
 			Return TypeDictionary!.TypeNormal
 
 	rz = SCDecl(TypeVoid_!)
@@ -608,10 +609,8 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		rz.Type = TypeArray!
 	  elseif (f == @arg)
 		require ExtractContainer(c, name_space, purpose, depth, rz)
+		c.NeatenDict
 		rz.Type = TypeDictionary!
-	  elseif (f == @Adj)
-		problem (c, "Use 'of' instead.")
-		rz.LoadContained(c.first!, c.last!, name_Space, purpose)		#require
 		
 	  elseif (f == @rel)
 		|| op = c[@opp, 1]												#require
@@ -626,6 +625,18 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 	if (ErrCount != StdErr.errorCount)
 		rz = nil
 
+
+function message.NeatenDict
+	opt norefcounts
+	using self
+	|| f = .first
+	if !f
+		f = @thg + "object"
+	.func = @rel
+	.msg(@thg, "dictionary")
+	.msg(@opp, "of")
+	self <~ f
+	
 
 
 function ExtractContainer (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth, |scdecl| input, |bool|)

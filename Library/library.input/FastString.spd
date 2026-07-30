@@ -13,16 +13,11 @@ class FastString {
 // Fast appends and tools for building data formats
 
 	|int|			Length
-	visible false	// todo: reorder...
-	|&Byte|			ResultPtr
-	|?object|		__
-	visible true
+	|&Byte|			_Addr
+	|?object|		_Result
 	|?File|			File
-	visible false
-	|int64|			_WrittenLength // invisible
-	
-	|int|			_Reserved
-	visible true
+	|int64|			_WrittenLength
+	|int|			_Size
 	|uint16|		Indent
 	|Byte|			IndentChar
 	
@@ -34,8 +29,8 @@ class FastString {
 
 	function Length (|int|)				{ nil safe, cpp_wrapper JB_FS_Length }
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
-	setter Reserved (|int|)				{ disabled }
-	setter _ResultPtr (|int|)			{ disabled }
+	setter _Result (|int|)				{ disabled }
+	setter _Addr (|int|)				{ disabled }
 	
 	function AppendLower (|string| data)
 		cpp_wrapper JB_FS_AppendLower
@@ -262,9 +257,6 @@ class FastString {
 		inlined // disambiguation
 		cpp_part AppendInt32
 		.AppendDecimal(data, 1)
-		
-//	function AppendFile (|File| f, |int64| N=-1, |bool| LeaveOpen=false,  |ErrorInt|)
-//		cpp_wrapper JB_FS_AppendFile
 	
 	syntax cast (|string|)
 		inlined
@@ -281,7 +273,7 @@ class FastString {
 			.fieldstart(name)
 			.AppendQuotedEscape(data)
 	
-	function PadTo (|int| n, |byte| b=' ')
+	inline PadTo (|int| n, |byte| b=' ')
 		self <~ (b, n-.length)
 	
 	function FieldStart (|string| name)
@@ -290,7 +282,7 @@ class FastString {
 			self <~ name
 			self <~ ' '
 
-	function FieldEnter (|string| name)
+	inline FieldEnter (|string| name)
 		.fieldstart(name)
 		++.indent
 

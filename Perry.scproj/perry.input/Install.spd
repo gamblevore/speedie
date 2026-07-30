@@ -19,7 +19,7 @@ extend_module perry
 
 
 	function Daily_Name (|date| n, |string|)
-		|| fs = faststring() 
+		|| fs = faststring()
 		fs <~ "~/Backups/perry/".PathFix
 		fs.AppendIntegerAsText(n.Days, 4)
 		fs <~ ".zip"

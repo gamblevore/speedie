@@ -46,7 +46,7 @@ module SourceMap
 
 
 	function SortBreaks (|FastString| B)
-		|| Start = B.ResultPtr
+		|| Start = B._Addr
 		|| Last = (Start + B.length)|&object| - 1
 		memory.sort((&BreakableSorter)|&nil|, Start|&object|, Last)
 

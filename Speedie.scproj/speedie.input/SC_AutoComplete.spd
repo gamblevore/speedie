@@ -1006,7 +1006,7 @@ function CanUseName (|SCNode| l, |bool|)
 
 function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	rz = @arg.msg
-	|| fn = s.Identifyfunc
+/	|| fn = s.Identifyfunc
 	if msg == @name
 		if purpose == "display"  and  s istmp "prototype"
 			return s
@@ -1298,28 +1298,26 @@ function Define_Behaviour (|SCFunction| fn,  |string| purpose,  |message|)
 		if found isa SCFunction
 			rz = .DefineOrCall(found.source!, purpose, found)
 
-
+	
 function message.CutifyCopy (|message!|)
 	rz = message(self)
-	for v in self
-		if v == @arg
+	for v.fast in self
+		if (v == @arg)
 			0 //
 		  elseif v.isreffer
 			|| vll = v.last.last
 				rz <~ vll.CutifyCopy
-			  else
-				debugger // what?
 		  else
 			rz <~ v.CutifyCopy
 
 	|| fn = rz.MsgFunc			// what about modules?
-		|| cls = fn.cls
-		|| modname = ""
-		|| space = fn.parent
+		|scclass--| cls = fn.cls
+		|string--| modname = ""
+		|scnode--| space = fn.parent
 		if space isa scmodule
 			modname = space.name
 		if cls or modname // ok so...
-			|| name = rz.first
+			|message--| name = rz.first
 			if name == @thg
 				|| prm = name.next!
 				rz.become( @dot, fn.name )

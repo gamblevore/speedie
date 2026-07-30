@@ -1284,7 +1284,7 @@ JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
     JB_FS_SizeSet(fs, SelfLen / 2);
 	
 	
-	if ( fs->Size ) {
+	if ( fs->_Size ) {
 		int PrevByte = -1;
 
 		while ( SelfLen-- ) {

@@ -108,8 +108,6 @@ inline message.IsTypeOfDecl (|bool|)
 
 
 function message.WithinType (|int| Allowed=3, |bool|)
-	// used by both speedie and perry...
-	// should I remove this from the lib? Sigh....
 	opt norefcounts
 	|| p = .parent
 	|| msg = self

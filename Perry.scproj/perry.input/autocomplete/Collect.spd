@@ -60,7 +60,7 @@ function PerryIDE.DateWrap (|message| msg, |date| d, |message|)
 		.LastAutoCompleteDate = d
 
 
-function PerryIDE.GetFeedback (|message| msg, |spdprocess|)
+function PerryIDE.SendFeedback (|message| msg, |spdprocess|)
 	opt norefcounts
 	if msg ~= "asm"
 		|| fb = .FeedbackInit(.ASMProcess)
@@ -75,7 +75,7 @@ function PerryIDE.GetFeedback (|message| msg, |spdprocess|)
 	
 function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
 	require msg and .ProjectIsCode
-	|| fb = .GetFeedback(msg)						#require
+	|| fb = .SendFeedback(msg)						#require
 	|| d = gui.framestart
 	|| record = .DateWrap(msg, d)
 	fb <~ record

@@ -16,12 +16,13 @@ typedef void (*FSEventResize)(FastString* self, int Needed);
 
 JBClass( FastString, JB_Object,
 	int 			Length;
-    uint8*			ResultPtr;
-    JB_String*      Result;
-    JB_File*        File;
-    int64           WrittenLength;
+    uint8*			_Addr;			// lines up with string.Addr
 
-	int 			Size;			// reserved size of buffer. here for speeeed.
+    JB_String*      _Result;
+    JB_File*        File;
+    int64           _WrittenLength;
+
+	int 			_Size;			// reserved size of buffer. here for speeeed.
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
 );
@@ -108,9 +109,9 @@ inline uint8* JB_FS_WriteAlloc_Inline_(FastString* fs, int GrowBy) {
 	int OldLen = fs->Length;
 	int NewLen = OldLen + GrowBy;
 
-	if ( fs->Size >= NewLen ) { // we put the usual case first :)
+	if ( fs->_Size >= NewLen ) { // we put the usual case first :)
 		fs->Length = NewLen;
-		return fs->ResultPtr + OldLen;
+		return fs->_Addr + OldLen;
 	}
 
     return JB_FS_GrowBy(fs, GrowBy);
