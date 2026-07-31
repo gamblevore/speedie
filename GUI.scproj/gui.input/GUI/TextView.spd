@@ -2178,16 +2178,16 @@ class TextView (GUIControl)
 		return charw
 	
 	
-	libinternal PrepareLineColor (|textViewLine| d, |message| msg, |DocumentJeeboxMode| jx, |&Message?| lastowner, |message|)
+	libinternal PrepareLineColor (|textViewLine| d, |message?| msg, |DocumentJeeboxMode| jx, |&Message?| lastowner, |message|)
 		opt norefcounts
 		(d isnt ColoriseUsingPosition)
 		(d isnt fakemsg)
 		d.message = nil
-		if JX is Colorise
-			|| OK = (msg!=nil) or (JX isnt expect)
-			msg = d.ColoriseText(msg, OK)
-
 		|| Parsed = .ParsedMessage
+		if JX is Colorise
+			msg = d.ColoriseText(msg, parsed!=nil)
+
+		if parsed
 			// try keep important lines. So... " // abc hahaha", or "", can be removed
 			// but something like "obj.func()" won't be. (That is for merging lines together.)
 			|| msg2 = d.Message

@@ -188,16 +188,6 @@ class TextViewLine (list)
 			isnt BreakPoint
 			return rz
 
-//		|| Bigger = rz
-//		if !Bigger or Bigger.StartsAfter(range)
-//			Bigger = srch
-//			while Bigger
-//				Bigger = Bigger.parent
-//				if (Bigger == @arg) and Bigger.StartsNotAfter(range)
-//					rz ?= Bigger
-//					if !Bigger.endsbefore(range)
-//						exit
-//		
 		if rz and !rz.StartsAfter(range)
 			(self is CodeBreak) = rz is breakpoint
 			is ColoriseUsingPosition
@@ -447,9 +437,6 @@ libinternal TextView.DrawOneLine (|image| Where,  |TextViewLine| D,  |int| Y,  |
 	if d.LineError
 		.DrawErrorBackground(where, y + GoUp, d)
 	
-//	target __PROJECT_PERRY__ // debugging my stuff... still not 100% perfect
-//		if keys.Shift and self == "editme"
-//			d.DebugDraw(Where, y)
 	|| m = ._ActiveLine
 	if (m and m ~= .filepath)
 		if d.CompileContains(m.Position)
