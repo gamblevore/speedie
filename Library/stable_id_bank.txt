@@ -499,9 +499,7 @@ GUI_Text_InsertText
 GUI_Text_IsModified
 GUI_Text_JeeboxMode
 GUI_Text_JeeboxModeSet
-GUI_Text_JumpToError
 GUI_Text_KeyDown
-GUI_Text_LineInfo
 GUI_Text_LoadDocument
 GUI_Text_Log
 GUI_Text_LostFocus
@@ -511,7 +509,6 @@ GUI_Text_MessageAtSel
 GUI_Text_MessageWithin
 GUI_Text_MouseDown
 GUI_Text_MouseMove
-GUI_Text_MoveSelection
 GUI_Text_Parse
 GUI_Text_ParsedMessage
 GUI_Text_Range
@@ -520,7 +517,6 @@ GUI_Text_RightClick
 GUI_Text_Save
 GUI_Text_ScrollStartSet
 GUI_Text_Search
-GUI_Text_SelLineNum
 GUI_Text_SelectAll
 GUI_Text_SelectedLine
 GUI_Text_SelectionSet
@@ -528,6 +524,7 @@ GUI_Text_SendSpecialClick
 GUI_Text_Show
 GUI_Text_ShowAndSelect
 GUI_Text_ShowExtraInfoAtPos
+GUI_Text_ShowLine
 GUI_Text_ShowNextParseError
 GUI_Text_TextSize
 GUI_Text_TextViewSet
@@ -676,15 +673,11 @@ GUI_cwin_Resize
 GUI_cwin_SetResponse
 GUI_cwin__Ask
 GUI_font__Small
-GUI_inl_Clear
 GUI_inl_Constructor
 GUI_inl_Destructor
 GUI_inl_Edit
-GUI_inl_FinishAndClear
-GUI_inl_GetListValue
 GUI_inl_SyntaxIs
 GUI_inl_SyntaxIsSet
-GUI_inl_UpdateSearch
 GUI_ivec2_SDLXY
 GUI_ivec4_DistToCorner
 GUI_ivec4_Msg
@@ -914,7 +907,6 @@ JB_FS_ByteSet
 JB_FS_Constructor
 JB_FS_ConstructorSize
 JB_FS_Destructor
-JB_FS_FieldEnter
 JB_FS_FieldStart
 JB_FS_FileSet
 JB_FS_Flush
@@ -926,7 +918,6 @@ JB_FS_LengthSet
 JB_FS_LineIndent
 JB_FS_MsgErrorName
 JB_FS_NeedSpare
-JB_FS_PadTo
 JB_FS_RemoveByte
 JB_FS_Render
 JB_FS_Size
@@ -1082,6 +1073,7 @@ JB_MSR_DecodeEntitySet
 JB_MSR_EscapeCodeSet
 JB_Macro_CallFast
 JB_Macro__New
+JB_Macro__TmpPrms
 JB_Mat4_Columns
 JB_Mat4_Constructor
 JB_Mat4_GetRow
