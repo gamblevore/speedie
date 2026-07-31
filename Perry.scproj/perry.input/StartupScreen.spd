@@ -85,33 +85,38 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 
 function ClickedOpenProj (GUIaction)
 	|| start		= "~/".resolve
-	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project", "Open", "OpenProj")	#require
-	|| better_path	= path.GetSpeedieProj
-		perry.IdeAddProj(better_path)
-	  else
+	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project", "Open", "OpenProj")
+		|| better_path	= path.GetSpeedieProj
+			path = better_path
 		perry.IdeAddProj(path)
-	perry.HideStartIfNeeded
+		perry.HideStartIfNeeded
 
 
 function ClickedCreateProj (GUIAction)
-	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")		#require
-	perry.CreateProj(path)
-	perry.HideStartIfNeeded
+	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")
+		perry.CreateProj(path)
+		perry.HideStartIfNeeded
 
 
 function ClickedOpenFile (GUIaction)
-	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")					#require
-	perry.IdeAddProj(file)
-	perry.HideStartIfNeeded
+	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
+		perry.IdeAddProj(file)
+		perry.HideStartIfNeeded
 
 
 function ClickedCreateFile (GUIaction)
-	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")		#require
-	perry.CreateProj(path)
-	perry.HideStartIfNeeded
+	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")
+		perry.CreateProj(path)
+		perry.HideStartIfNeeded
 
 
 function perry.HideStartIfNeeded
 	if .projects.hasany
 		startupwindow.hide
 		
+
+
+function message.test (|ivec2| range)
+	.position = Range.x // wr4u should be enough
+
+
