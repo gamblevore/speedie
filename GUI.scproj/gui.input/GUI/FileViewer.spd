@@ -19,7 +19,7 @@ class FileViewer (ListView)
 		.editme				= editme
 		.OnReturn			= ReturnFileList|GUIListEvent|		// c++ work around
 		.OnRightClick		= RightClickFileList|GUIListEvent|
-		.quickopen			= textview(nil,		nil,		nil)
+		.quickopen			= textview(nil,		nil,		QuickOpenKey)
 		.Listopen			= ListView(nil,		nil,		ClickedOpenList)
 		.ondrawrow			= InsideFileViewRowDraw
 		.Oneditcell			= FileRowRenamer
@@ -47,7 +47,7 @@ class FileViewer (ListView)
 			.clipmode		= ControlClipMode.SlideBackInWindow
 			.ID				= "quickopen"
 			.size			= 400~wide by 15~high
-			.OnKeyDown		= QuickOpenKey
+//			.OnKeyDown		= QuickOpenKey // set in constructor
 			.OnTextChanged	= QuickOpenModified
 			.onfocus		= QuickOpenFocus
 			.SingleLine		= TextView.SingleLine
@@ -338,7 +338,7 @@ class FileViewer (ListView)
 			rz.sort(FileRowScoreSorter)
 			|{filerow}| D = dictionary.new
 			for f in rz
-				f.samenameasprev = false
+				f.SameNameAsPrev = false
 				|| old = D[f.name]
 					old.SameNameAsPrev = true
 					f.SameNameAsPrev = true
@@ -406,33 +406,35 @@ class FileViewer (ListView)
 	libinternal OpenQuickRelist (|string| path, |bool| Improve=false)
 		opt norefcounts
 		|| b = .OpenQuickRelistsub(path, improve)
-			path = b
-		.QuickOpen.text = b
+			.QuickOpen.text = b
 		
 		
-	libinternal OpenQuickRelistSub (|string| path,  |bool| Improve,  |string|)
-		rz = path
+	libinternal OpenQuickRelistSub (|string| path,  |bool| Improve,  |string?|)
 		if path < 2
 			.listopen.clear
-			return rz
+			return nil
 		
+		|| before = path.Before(":")
 		ifn path[0, "/"] or path[0, "~/"]
-			|| r = .FindPaths(path, nil, true)
+			|| r = .FindPaths(before, nil, true)
 			.ListOpen.QuickOpenFill(r)
-			return rz
+			return nil
 		
-		|| f = path.before(":").file
+/		|| f = before.file
 		|| filter = ""
 		if !f.Exists
 			f = f.Parent
 			if !f.exists
 				Notifications <~ f + " doesn't exist"
 				beep
-				return rz
+				return nil
 			filter = path.name
-		  elseif Improve
-			rz = path.PathDir
+			Improve = false
 		.OpenQuickRelistDir(f, filter)
+
+		if Improve
+			return path.PathDir
+		return nil
 
 
 	libinternal ListView.QuickOpenFill (|[filerow]| Items)
@@ -479,20 +481,17 @@ class FileViewer (ListView)
 		|| cuter = s.trim.TrimStart("line ")
 		if cuter.isint								// "line 1234"
 			|| Line = cuter.ParseInt
-				|textviewline--| D = .editme.LineInfo(Line)
-					.editme.ShowAndSelect(D.position)
+				.editme.ShowLine(line)
 				return
 		
 		|| Path = s.ExtractPathAndLine
 		|| n = path.name
 			|| r = .FindAPath(n) ?? .AddExtra(n)
-				.Select(nil)						// do we need this?
 				.Select(r)
 		
 		|| Pos = path.Position
 		|| Line = path.rangelength
-			|textviewline--| D = .editme.LineInfo(Line)
-				.editme.ShowAndSelect(D.position)
+			.editme.ShowLine(Line)
 			if pos > 0								// surely... its a position ON a line?
 				pos += .editme.Selection.x
 		if pos > 0
@@ -590,7 +589,14 @@ class FileViewer (ListView)
 			if loc.file.isdir
 				V.OpenQuickRelist(loc, true)
 				return true
+			
+			|| t = v.quickopen.text
+			|| LineNum = t.find(':')
+				LineNum = t.parseint(LineNum+1)
 			v.OpenQuick(loc)
+			if LineNum > 0
+				v.editme.ShowLine(linenum)
+				
 			V.HideOpenList
 			return true
 			

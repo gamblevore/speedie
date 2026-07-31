@@ -292,7 +292,7 @@ function PressedLineInfo (GUIaction)
 	opt norefcounts
 	|| i = .ide
 	|| q = i.filelist.quickopen
-	q.text = "line " + i.editme.SelLineNum
+	q.text = "line " + i.editme.SelectedLine.LineNumber
 	i.filelist.showquickopen
 
 

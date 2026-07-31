@@ -430,7 +430,7 @@ extend TextView
 			|| ty = d.typingplace
 			.TrySelect(ty, true, nil)
 			if reason is TextInserted
-				.ShowSelection(ty)
+				.ViewPos(ty.resolve[1], 0)
 		
 		|| ismod = d.ismodified
 		if (self is modified) != ismod

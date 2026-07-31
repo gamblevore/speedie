@@ -212,7 +212,7 @@ class PerryIDE (Window)
 
 	function FindPath (|string| path, |filerow|)
 		opt norefcounts
-		return .FileList.FindAPath(Path) 
+		return .FileList.FindAPath(Path)
 
 		
 	function MainProjFol (|filerow|)
@@ -346,7 +346,7 @@ class PerryIDE (Window)
 		if sel2.last.IsTextLine
 			sel2 = sel2.Shorten(1)
 		fs <~ "ln "
-		fs <~ .editme.SelLineNum
+		fs <~ .editme.SelectedLine.LineNumber
 		|| n = sel2.count(charset.line)-1		// could probably remove this call to linecount
 			fs <~ "+"				// just compare vlines within textviewline
 			fs <~ n+1				// then its literally used in one place...
@@ -737,7 +737,7 @@ class PerryIDE (Window)
 				.filelist.ErrorAt(err)
 				
 		if jumpto
-			txt.JumpToError(jumpto.position)
+			txt.showandselect(jumpto.position)
 		  elseif jump and actual_compile
 			if .DuringMsgFB
 				.DuringMsgFB = false

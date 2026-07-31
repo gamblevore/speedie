@@ -517,7 +517,7 @@ libinternal TextView.AutoLim (|textviewline| d, |bool|)
 		|| after = d.after
 		if d.IsLast
 			after++ // ??
-		if (.Sel1 == after-1)  and  ((d is endsnormally) or d.islast)
+		if (.SelAfter == after-1)  and  ((d is endsnormally) or d.islast)
 			return true
 
 

@@ -367,7 +367,7 @@ class TextView (GUIControl)
 		|| xt = t
 		if !CmdKey
 			xt = .ExpandSel(t, ._clicksdown, d)
-		.SelDirect(xt, d)
+		.TrySelect(xt, false, d)
 		._PreferPrevLine = bs.x2
 		._UncorrectedSel = t
 
@@ -382,7 +382,7 @@ class TextView (GUIControl)
 
 	function Sel (assigns:|int|)
 		disabled "Use selrange"
-		
+
 	inline Selection (assigns: |int| r)
 		cpp_part TypingPlaceInt
 		.Selection = (r, r)
@@ -393,19 +393,37 @@ class TextView (GUIControl)
 	inline Selection (|intrange|)
 		return ._typingplace.resolve
 		
-	libinternal Sel0 (|int|)
+	libinternal SelStart (|int|)
 		inlined
-		return .Selection.x
+		return ._typingplace.resolve.x
 	
-	libinternal Sel1 (|int|)
+	libinternal SelAfter (|int|)
 		inlined
-		return .Selection.y
+		return ._typingplace.resolve.x2
 
-	libinternal SelDirect (|IntRange| value, |TextViewLine| d)
-		.TrySelect(value, false, d)
+	
+	function SelectedLine (|textviewline|)
+		return .FindTextLine(.SelStart)
 
-	autogen SelectedLine (|textviewline|)
-		return .FindTextLine(.sel0)
+
+	libinternal TrySelect (|IntRange| Result, |bool| Insert=false, |textviewline| d=nil)
+		opt norefcounts
+		require .SelectReal(result)
+
+		if .HasFocus
+			GUI.selchanged
+		
+		if !.IsCleared					// Relies on .position being -1, via .Clear
+			(.OnSelChanged)(self, 0, insert)?
+		
+		d ?= .FindTextLine(.SelStart)
+
+		while
+			.TryShowLineError(d)
+			d++
+			if  !d  or  d.Position > .SelAfter
+				exit
+	
 
 	libinternal TypingPlaceReal (assigns:|intrange| result)
 		opt norefcounts
@@ -414,36 +432,18 @@ class TextView (GUIControl)
 			doc.TypingPlace = result
 
 
-	libinternal SelectDirect (|intrange| result, |bool|)
+	libinternal SelectReal (|intrange| result, |bool|)
 		opt norefcounts
 		require result != ._TypingPlace
 		.TypingPlaceReal = result
 		._PreferPrevLine = false
 		if ._CanAutoComplete <= 1
 			.CanAutoComplete = 0
-			.autocompletestring = ""
+			.AutoCompleteString = ""
 		._UncorrectedSel = result
 		gui.touch
 		return true
 
-
-	libinternal TrySelect (|IntRange| Result, |bool| Insert, |textviewline| d)
-		opt norefcounts
-		require .SelectDirect(result)
-
-		if .hasfocus
-			GUI.selchanged
-		if !.IsCleared					// Relies on .position being -1, via .Clear
-			(.OnSelChanged)(self, 0, insert)?
-		
-		d ?= .FindTextLine(.sel0)
-
-		while
-			.TryShowLineError(d)
-			d++
-			if  !d  or  d.Position > .sel1
-				exit
-	
 	
 	function TryShowLineError (|textviewline| d)
 		opt norefcounts
@@ -563,7 +563,6 @@ class TextView (GUIControl)
 	
 	libinternal MoveSel (|int| i, |bool|)
 		opt norefcounts
-		debug_require i
 		GUI.showcursor(false)
 
 		|| t = ._TypingPlace
@@ -595,8 +594,9 @@ class TextView (GUIControl)
 			t = (x, x)
 		|| d = .show(x)
 		._PreferPrevLine = fwd and (!d.emptyline or (d isnt endsnormally))
-		.SelDirect(t,d)
+		.TrySelect(t, false, d)
 		return true
+	
 	
 	target false {
 	libinternal textviewline.InSane (|textviewline|s, |bool|)
@@ -615,20 +615,8 @@ class TextView (GUIControl)
 	}
 
 	
-	libinternal ShowSelection (|ivec2| r)
-		opt norefcounts
-		|| i = (r.width > 0)|int|
-		.ViewPos(r[i], 0)
-
-
-	function SelLineNum (|int|)
-		description "The number of the selected line"
-		opt norefcounts
-		|| d = .FindTextLine(.sel0)
-		return d.LineNumber
-	
-	
-	function LineInfo (|int| LineNum, |textviewline|)
+	// seems that showing a certain line is needed
+	libinternal LineInfo (|int| LineNum, |textviewline|)
 		opt norefcounts
 		.WrapText
 		for r.fast in .WrappedLines
@@ -636,24 +624,31 @@ class TextView (GUIControl)
 				return r
 		return .WrappedLines.last
 	
-	
-//	function ViewLineAndSel (|int| L)
-//		opt norefcounts
-//		|| d = .LineInfo(L)
-//			.ShowAndSelect(d.position)
+		
+	function ShowLine (|int| LineNum, |TextViewJumpMode| Mode=0, |bool| Explode=false)
+		opt norefcounts
+		|| D = .LineInfo(LineNum)
+			.ShowAndSelect(D.position, Explode)
 
 	
-	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine!|)
-		return .ViewPos(x, .MaxVisibleLines/3, mode)
-	
-
-	function ShowAndSelect (|int| P, |int| Length=0, |bool| Explode=false, |textviewline|)
+	function ShowAndSelect (|int| Position, |int| Length=0, |bool| Explode=false, |textviewline|)
 		opt NoRefCounts
-		rz = .Show(P)
-		.SelDirect((P, P + length), rz)
+		if Position < 0
+			rz = .lineinfo(-Position)$
+			Position = rz.Position
+		  else
+			rz = .Show(Position)
+		
+		.TrySelect((Position, Position + length), false, rz)
 
 		if explode
 			.Doexplode(rz)
+	
+	
+	function Show (|int| P, |TextViewJumpMode| Mode=0,  |TextViewLine!|)
+		return .ViewPos(P, .MaxVisibleLines/3, mode)
+	
+	// merge these two? Or not? I mean.. it would allow us to use a mode.
 
 
 	libinternal InRange (|int| pos, |bool|)
@@ -664,38 +659,23 @@ class TextView (GUIControl)
 		return pos <= d2.After
 	
 	
-	libinternal ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
+	libinternal ViewPos (|int| P, |int| LinesBefore, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
-		|| d = .FindTextLine(x, i, mode is compilepos)!
-		before = before.abs
+		|| d = .FindTextLine(P, i, mode is compilepos)!
+		LinesBefore = LinesBefore.abs
 
 		|| lim = .MaxVisibleLines
 		if i inrange lim
 			return d
 		|| vdiff = d.vline - .ScrollStart.vline
 		if vdiff > 0
-			before = (vdiff min (lim-(before+1))) max 0
+			LinesBefore = (vdiff min (lim-(LinesBefore+1))) max 0
 			
-		.ScrollStart(mode) = d.MoveCapped(-before) 
+		.ScrollStart(mode) = d.MoveCapped(-LinesBefore)
 		return d
 		
 		
-	function MoveSelection (|int| x, |int| Before=0, |bool|)
-		// views X, and sets new typing place.
-		opt norefcounts		
-		|| t = ._typingplace
-		x = .Clamp(x)
-		|| d = .ViewPos(x, before) // idk
-			
-		if keys.shift
-			t.x2 = x
-		  else
-			t = (x, x)
-		.SelDirect(t, d)
-		return true	
-
-
 	libinternal Clamp (|intrange| r, |intrange|)
 		cpp_part Clamp2
 		r = r.resolve
@@ -719,7 +699,6 @@ class TextView (GUIControl)
 
 	libinternal MoveSelLine (|int| i, |int| Page, |bool|)
 		opt norefcounts
-		debug_require i
 		GUI.showcursor(false)
 		if !page
 			page = (keys.Option)|int|
@@ -733,14 +712,22 @@ class TextView (GUIControl)
 		if .SingleLine and (t == bs.x)
 			return .MoveListLine(i)
 
+		|| PrevLines = bs.x2|bool|
 		if !page and Keys.Cmd
-			._PreferPrevLine = i < 0
-			.MoveSelection(x)
-			._PreferPrevLine = i < 0
-			return true
+			PrevLines = i < 0
+			._PreferPrevLine = PrevLines
+		  else
+			x = bs.x
 
-		.MoveSelection(bs.x)
-		._PreferPrevLine = bs.x2
+		x = .Clamp(x)
+		if keys.shift
+			t.x2 = x
+		  else
+			t = (x, x)
+
+		|| d = .ViewPos(x, 0)					// idk
+		.TrySelect(t, false, d)
+		._PreferPrevLine = PrevLines
 		return true
 	
 	
@@ -764,7 +751,7 @@ class TextView (GUIControl)
 			range = .text.stretchyfind(s, range.x, range.x2)
 			require range.x >= 0
 		
-		.SelDirect(range, nil)
+		.TrySelect(range, false, nil)
 		|| D = .ViewPos(range.x, .MaxVisibleLines/2)
 		.Doexplode(D)
 
@@ -814,18 +801,18 @@ class TextView (GUIControl)
 				.undo(!keys.shift)
 				return true
 
-		if key is left:				return .MoveSel(-1)
 		if key is BACKTICK or MacBackTick
 			if (keys.Option or keys.Ctrl or keys.cmd)
 				return .CmmKey
 		if key is section:			return .CmmKey
+		if key is left:				return .MoveSel(-1)
 		if key is right:			return .MoveSel(1)
-		if key is pageup:			return .MoveSelLine(-1, 1)
-		if key is pagedown:			return .MoveSelLine( 1, 1)
 		if key is up:				return .MoveSelLine(-1, 0)
 		if key is down:				return .MoveSelLine( 1, 0)
-		if key is home:				return .MoveSelection(0)
-		if key is end:				return .MoveSelection(.text.length)
+		if key is pageup:			return .MoveSelLine(-1, 1)
+		if key is pagedown:			return .MoveSelLine( 1, 1)
+		if key is home:				return .MoveSelLine(int.min, 1)
+		if key is end:				return .MoveSelLine(int.max, 1)
 
 		if (key iscmd keys.c or keys.x) or (key is copy or cut)		// copy
 			return .CopyToClipboard
@@ -921,7 +908,7 @@ class TextView (GUIControl)
 			return true									// eat it
 		|| extra = 0
 		if ((.onkeydown)(self, -10)?) and !keys.shift
-			.Selection = .ExtendToLineEnd(.sel1-1)		// move sel to end of line
+			.Selection = .ExtendToLineEnd(.SelAfter-1)		// move sel to end of line
 			extra = 4
 		.NewLineSub(Extra)
 		return true
@@ -1028,7 +1015,7 @@ class TextView (GUIControl)
 		require ._CanAutoComplete == 1
 		|| c2 = ._AutoCompleteString			#require
 		|| trim = c2.InsertTrim
-		|| ins = .sel0
+		|| ins = .SelStart
 		|| old = self[ins - ._autocompleteback, ins]
 		if old != c2
 			c2 = c2.DeleteTwoBytes(trim)
@@ -1102,16 +1089,11 @@ class TextView (GUIControl)
 	function FillErrors (|ErrorReceiver| err)
 		for e in err
 			.ErrorAt(e)
-	
-	
-	function JumpToError (|int| pos)
-		.MoveSelection(pos, .MaxVisibleLines/2)
-	
-	
+		
 	function ErrorAt (|error| err)
 		opt norefcounts
 		if err
-			.JumpToError(err.position)
+			.showandselect(err.position)
 			.AddErrorToLine( err, true )
 	
 
@@ -1207,7 +1189,7 @@ class TextView (GUIControl)
 	
 	
 	function MessageAtSel (|message|)
-		return .MessageWithin(.sel0, false, true)
+		return .MessageWithin(.SelStart, false, true)
 
 		
 	inline MessageAt (|int| pos, |bool| named=false, |message|)
@@ -1273,7 +1255,7 @@ class TextView (GUIControl)
 			beep
 			return true
 		
-		|| s = .sel0
+		|| s = .SelStart
 		.TypingPlaceReal = t
 		.InsertText(Tabbed, t, !IsTypingLike)
 		if istypinglike
@@ -1532,13 +1514,6 @@ class TextView (GUIControl)
 		.TextAlteredForDraw |= 4
 
 	
-	libinternal ShowInserted (|bool| Show, |int| Start, |int| After)
-		if !show
-			return
-		|| ToShow = (Start, After)
-		return .ShowSelection(ToShow)
-		
-	
 	libinternal InsertionClutter (|string| s)
 		opt inline
 		if ._DebugLevel >= debuglevelrunning
@@ -1557,18 +1532,19 @@ class TextView (GUIControl)
 		
 		if (s == p.width) and .text[p.x, s]						// Same text! So just select and show
 			.TrySelect(NewSel, true, nil)						// (Select)
-			return .ShowInserted(show, p.x, AfterNewText)		// (Show)
+		
+		  else
+			.InsertionClutter(s)								// clutter...
+			
+			|| nt = .text.insert(s, p)
+			
+			.InsertionCapture(s, (p, s.length, 0), nt, NewSel)
+			|| it = .isinline
+			if it Is Searching
+				it.UpdateSearch(nt)
 
-		.InsertionClutter(s)									// clutter...
-		
-		|| nt = .text.insert(s, p)
-		
-		.InsertionCapture(s, (p, s.length, 0), nt, NewSel)
-		|| it = .isinline
-		if it Is Searching
-			it.UpdateSearch(nt)
-		
-		return .ShowInserted(show, p.x, AfterNewText)
+		if show
+			.ViewPos(p[1], 0)
 
 
 	libinternal AlphaFade
@@ -2057,7 +2033,7 @@ class TextView (GUIControl)
 		._LogTrimmed = 0
 		|| sel = 0
 		if .SingleLine: sel = .text.length
-		.SelectDirect((sel,sel))
+		.SelectReal((sel,sel))
 		
 		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
@@ -2338,7 +2314,7 @@ class TextView (GUIControl)
 		.ClearErrors
 		if show
 			.WrapText
-			.SelDirect(T, nil)
+			.TrySelect(T, false, nil)
 			.ScrollPos = S
 		return true
 

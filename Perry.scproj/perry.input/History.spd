@@ -134,8 +134,7 @@ function PerryIDE.GoToHistory (|message!| m, |int| J)
 	if .EditPath(Path)
 		.RecentFiles.obj = m
 		.EnablePrevNext
-		|| D = .editme.LineInfo(Line)
-			.editme.Show(D.position)
+		.Editme.ShowLine(Line)
 	.DuringTempView--
 	.JumpMode = 0
 
