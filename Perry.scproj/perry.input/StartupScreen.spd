@@ -98,16 +98,17 @@ function ClickedCreateProj (GUIAction)
 		perry.HideStartIfNeeded
 
 
+function ClickedCreateFile (GUIaction)
+	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")
+		perry.CreateProj(path)
+		perry.HideStartIfNeeded
+
+
 function ClickedOpenFile (GUIaction)
 	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
 		perry.IdeAddProj(file)
 		perry.HideStartIfNeeded
 
-
-function ClickedCreateFile (GUIaction)
-	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")
-		perry.CreateProj(path)
-		perry.HideStartIfNeeded
 
 
 function perry.HideStartIfNeeded
