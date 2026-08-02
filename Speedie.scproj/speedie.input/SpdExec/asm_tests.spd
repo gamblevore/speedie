@@ -717,12 +717,12 @@ function AddShifted (|bool| boolie)
 
 
 function TernTest (|int| a, |int| b, |int|)
-	rz = (a (a) b+1)
+	rz = (a!=0)(a, b+1)
 	rz <<= 1
 
 
 function TernTest (|int| a, |int| b, |int| c, |int|)
-	return (a (c) b)
+	return (c!=0)(a, b)
 
 
 function AndOrRest2 (|int| a, |int| b) // more stragglers

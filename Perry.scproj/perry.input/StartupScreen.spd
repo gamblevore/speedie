@@ -117,7 +117,4 @@ function perry.HideStartIfNeeded
 		
 
 
-function message.test (|ivec2| range)
-	.position = Range.x // wr4u should be enough
-
 
