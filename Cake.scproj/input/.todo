@@ -3,17 +3,14 @@
 
 								// Additions Beta //
 * Stepbackwards in code! This will kick ass. (take breakcount at .compilepos, and ask for position of the new code...)
-* Figure out why the entire string table keeps thrashing despite all my efforts
-	* shrink history https://passingcuriosity.com/2017/truncating-git-history/
-* Compression use gz? make my compression experimental...
 * Step into func... ignoring param funcs
+* Compression use gz? make my compression experimental...
 
 
 								// Proper Release //
 * carrays :(
 	* structs work wierdly with carrays also. mat4 rows and stuff.
 	* my_mat4 *= somemat4() // should create tempstruct
-* CalledFrom datatypes too
 * To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
 
 
