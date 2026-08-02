@@ -119,8 +119,11 @@ tmp tetris
 */
 
 
-function cakerun.Virtuals (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
-	cpp_Wrapper JB_Cake__Virtuals
+function cakerun.TestOffsets
+	cpp_wrapper JB_Cake__Tester
+
+//function cakerun.Virtuals (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
+//	cpp_Wrapper JB_Cake__Virtuals // no callers?
 
 function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, |int| Virtuals,  |&ClassData|)
 	cpp_wrapper JB_Cake__Class

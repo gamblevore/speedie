@@ -18,13 +18,13 @@ class String
 	default			""
 	false			""				// is string.error better?
 	
-	|int|		Length_
+	|int|		Length
 	|&byte|		Addr
 
 
 // accessing
 	function Length (|int|)
-		nil checker
+		nil safe
 		cpp_wrapper JB_Str_Length
 
 	inline Addr (|&byte|)
@@ -95,14 +95,16 @@ class String
 		return fs
 		
 	function IsLower (|bool|)
-		for s in self
-			require !s.isupper
-		return true
+		if self
+			for s in self
+				require !s.isupper
+			return true
 
 	function IsUpper (|bool|)
-		for s in self
-			require !s.islower
-		return true
+		if self
+			for s in self
+				require !s.islower
+			return true
 
 	inline IsInt (|bool|)
 		return .isint(0)
@@ -114,7 +116,6 @@ class String
 			require self[i++].IsInt
 		return true
 	
-//	function Owner		(|object|)					{ cpp_wrapper }
 	function Unshare	(|string|)					{ cpp_wrapper }
 	function Copy		(|string|)					{ cpp_wrapper }
 

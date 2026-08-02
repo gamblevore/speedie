@@ -133,7 +133,14 @@ struct AllocationBlock {
 };
 
 
-struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bug won't let me use "JBClass(JB_MemoryLayer..."
+struct JB_MemoryLayer : JB_Object  { // is actually a JB_Object... but a clang bug won't let me use "JBClass(JB_MemoryLayer..."
+
+// User values
+	int					Int;
+    JB_Object*          Obj;
+    JB_Object*          Obj2;
+
+// Internal
     u16                 HiddenRefCount;
     bool                IsActive;
     bool                DummyBool;
@@ -142,26 +149,24 @@ struct JB_MemoryLayer : JB_Object  { // is actually a JBObject... but a clang bu
     AllocationBlock*    SpareBlock;
     JB_MemoryWorld*     World;
     
-    JB_Object*          Obj;
-    JB_Object*          Obj2;
     AllocationBlock     Dummy;
 }; 
 JBStructData (JB_MemoryLayer);
 
 
 
-struct JB_Class : JB_Object { // JB_ClassData
-    u16                 Size;
-    bool                HasSubClasses;  // for optimised isa testing
-    uint8               ClassDepth;		// also
+struct JB_Class : JB_Object { // JB_ClassData (is NOT a JB_Object. Would be nice but not so simple to achieve.)
+    int					Index;
     const char*         Name;
     JB_Class*           Parent;
-    AllocationBlock*    DefaultBlock;
     JB_Class*           NextClass;
-    int					LeakCounter;
-    int					Index;
     JBObject_Behaviour* Virtuals; 
+    int					LeakCounter;
+    u16                 Size;
+    uint8               ClassDepth;		// also
+    bool                HasSubClasses;  // for optimised isa testing
     uint8*              SaveInfo;
+    AllocationBlock*    DefaultBlock;
 
     JB_MemoryLayer      Memory;
 };

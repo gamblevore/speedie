@@ -196,7 +196,7 @@ class InputStream
 
 		// Failed, lets try to stitch new data together
 		|| Remaining = n - skip
-		|| r = string(Remaining) #require
+		|| r = string(Remaining)				#require
 		|| Dest = r.addr
 		while
 			|| Copied = .data.CopyTo(dest, .data.Remaining min Remaining)

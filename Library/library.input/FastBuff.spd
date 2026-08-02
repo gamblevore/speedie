@@ -5,8 +5,8 @@ struct FastBuff
 	|&byte|		Start
 	|&byte|		End
 	|?string|	ReadFrom
-	|bool| 		Owns
-	|bool| 		WentBad
+	|bool|		Owns
+	|bool|		WentBad
 	
 	destructor
 		if .owns
@@ -23,7 +23,7 @@ struct FastBuff
 		buff.Start = c
 		c += length
 		buff.end = c
-		.curr = c 
+		.curr = c
 
 	function Reset
 		inlined
@@ -173,12 +173,4 @@ struct FastBuff
 		while c < e
 			yield c[]
 			c++
-
-
-
-//function jbin.Add		(|syntax| type, |&FastBuff| data, |bool| into = false)
-//	cpp_part AddBuff
-//	|| L = data.length
-//	|| addr = (data.start, nil)(L)
-//	.addmemory(type, L, into, addr)
 

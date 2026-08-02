@@ -5,7 +5,7 @@ class AppMenu (Window)
 	linkage:	cpp_Part AM
 	|ListView|					Choices
 
-    constructor
+	constructor
 		super.constructor
 		.id					= "appmenu"
 		.ClickOutsideCloses = true

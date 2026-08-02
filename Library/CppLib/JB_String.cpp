@@ -228,7 +228,7 @@ JB_String* Str_Shrink (JB_String* u, int Length) {
 
 
 void JB_Str_Destructor(JB_StringShared* self) {
-	JB_Decr( self->Parent );
+	JB_Decr( self->_Parent );
 	JB_Obj_Destructor(self);
 }
 
@@ -1465,9 +1465,9 @@ extern "C" void Str_Share_(JB_StringShared* u, JB_String* p, int i, int L) {
 	u->Length = L;
 	JB_Class* Cls = JB_Obj_Class(p);
 	if (Cls==JB_AsClass(JB_StringShared)) {
-		p = (JB_String*)((JB_StringShared*)p)->Parent;
+		p = (JB_String*)((JB_StringShared*)p)->_Parent;
 	}
-	u->Parent = JB_Incr( p );
+	u->_Parent = JB_Incr( p );
 }
 
 extern "C" void JB_Str_Clone(JB_StringShared* self, JB_String* orig) {
@@ -1589,7 +1589,7 @@ JB_String* JB_Str_Unshare(JB_String* self) {
 JB_Object* JB_Str_Owner(JB_String* self) {
 // avoid wasting RAM when we this str is only a small part of a big file!!
     if (self and JB_Obj_Class(self) == JB_AsClass(JB_StringShared)) {
-        return ((JB_StringShared*)self)->Parent;
+        return ((JB_StringShared*)self)->_Parent;
     }
     return self;
 }

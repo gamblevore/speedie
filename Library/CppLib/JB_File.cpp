@@ -867,7 +867,7 @@ int JB_File_Delete (JB_String* self) {
 
 JB_String* JB_File_Path (JB_File* P) {
 	if (P) 
-		return (JB_String*)(P->Parent); // hmmmm
+		return (JB_String*)(P->_Parent); // hmmmm
 	return JB_Str__Empty();
 }
 
@@ -968,7 +968,7 @@ JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 
 	self->Addr = Path->Addr;
 	self->Length = Path->Length;
-	self->Parent = JB_Incr(Path);
+	self->_Parent = JB_Incr(Path);
 	
     self->Descriptor = -1;
     self->MyFlags = 0;

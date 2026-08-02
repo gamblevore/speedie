@@ -470,7 +470,7 @@ extend PerryIDE
 	
 		.JeeboxText.SetupOut("Jeebox")
 		.SpeedieText.SetupOut("Speedie")
-		.ProductOut.SetupOut("Product", documentjeeboxmode.prefer)
+		.ProductOut.SetupOut("Product", documentjeeboxmode.NotJeebox)
 		.ProductErrors.SetupOut("Errors")
 
 		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")

@@ -8,7 +8,7 @@
 
 		
 class FlowControl
-	linkage:cpp_part Flow
+	linkage: cpp_part Flow
 	|FastBuff|				Buff
 	|InputStream?|			ReadInput
 	|faststring?|			Write

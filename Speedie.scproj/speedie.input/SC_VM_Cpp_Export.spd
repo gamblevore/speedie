@@ -72,8 +72,7 @@ function WriteVMGlobsAndPtrs (|FastStringCpp| fs)
 		if (f.iscppinbuilt == 1)
 			.MakeWrapperFor(fs, f)
 	
-	if Options.TargetDebug
-		.WriteCakeTests(fs)
+	.WriteCakeTests(fs)
 	fs <~ "\n__lib__ void* JB_PackPtrs[] = {\n"
 
 	.WriteVMFuncs(fs)
@@ -120,35 +119,37 @@ function GlobalLibProtoTypes (|faststring| fs)
 
 
 
-function TestCakeClass (|faststring| fs, |scclass| C)
+function TestCakeStruct (|faststring| fs, |scclass| C)
 	opt norefcounts
-	|| n = c.ExportName
+	|| n = c.CStructName
 	for p in c.Properties
 		.TestCakeProp(fs, n, p)
 
 
 function TestCakeProp (|faststring| fs, |string| Name, |scdecl| Prop)
-	fs <~ "\t\t_CakeTest($Name, ${Prop.exportname}), ${Prop.ExportPosition});\n"
+	fs <~ "\t_CakeTest($Name, ${Prop.exportname}, ${Prop.ExportPosition});\n"
 	
 
 function WriteCakeTests (|faststring| fs)
-	opt norefcounts
-	return // do later
+	opt norefcounts	
 	
-	fs <~ "void JB_CakeTester() {\n"
+	fs <~ `
+#define _CakeTest(C, P, W) {if ( ((int64)(&((C*) 0)->P)) != W ) { puts("fail"); debugger;} }
+
+extern "C" void JB_Cake__Tester() {
+`
+		
+	if !Options.TargetDebug
+		fs <~ "}\n"
+		return
+	
 	for c in Compiler.ClassList
-		if c.IsStruct or c.IsObject
-			.TestCakeClass(fs, c)
+		if (c.IsStruct or c.IsObject) and (c.Properties > 0) and c.IsLibrary and (!c.name[0, "cake", true])
+			|| R = c.MyReacher
+			if (R and R !=Compiler.Interpreter) or c.IsObject
+				fs <~ "\t//\n"
+				.TestCakeStruct(fs, c)
 	fs <~ "}\n"
-	// So now we can write some tests to make sure all the properties are in the right place
-/*	
-	void JB_CakeTester() {
-		_CakeTest(JB_FieldOffset(Cls, Field), 4);
-		_CakeTest(JB_FieldOffset(Cls, Field), 12);
-		_CakeTest(JB_FieldOffset(Cls, Field), 16);
-	}
-*/
-	
 }
 
 

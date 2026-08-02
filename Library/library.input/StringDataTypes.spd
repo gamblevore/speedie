@@ -54,7 +54,7 @@ datatype byte
 	inline IsAlphaNum (|bool|)
 		return self|codepoint|.isalphanum
 	inline IsWhite (|bool|)
-		return self|codepoint|.iswhite 
+		return self|codepoint|.iswhite
 	inline IsUpper (|bool|)
 		return self|codepoint|.isupper
 	inline IsLower (|bool|)

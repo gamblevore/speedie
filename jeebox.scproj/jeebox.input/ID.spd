@@ -12,6 +12,7 @@ class StringShared (string)
 	constructor (|string| data)
 		cpp_wrapper JB_Str_Clone
 
+	|string|		_Parent
 	default			""
 	false			""
 

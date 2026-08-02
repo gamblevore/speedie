@@ -89,7 +89,7 @@ module debugger
 			|| Src = raw.Loc
 			|| FilePos = src.Position
 			|| ff = src.file
-			|| F = (ff.FileName (ff) "")
+			|| F = (ff!=nil)(ff.FileName, "")
 			|| PosInCode = Raw.code(Max)
 			|| Excl = " "
 			|| Op = 0

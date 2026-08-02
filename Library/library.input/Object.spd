@@ -116,19 +116,20 @@ struct ClassData
 		wrapper
 		cpp_class JB_Class
 	
-	visible false
 	|int|					RefCount
-	|uint16|				Size
-	|bool|					HasSubClasses
-	|byte|					ClassDepth
+	|int|					Index
 	|cstring|				Name
 	|?&ClassData|			Parent
-	|&nil|					DefaultBlock
 	|?&ClassData|			NextClass
-	|int|					LeakCounter
-	|int|					Index
 	|&&nil|					Virtuals
+	|int|					LeakCounter
+	|uint16|				Size
+
+	visible false
+	|byte|					ClassDepth
+	|bool|					HasSubClasses
 	|?&byte|				SaveInfo
+	|&nil|					DefaultBlock
 	visible true
 	
 	function AllocZeroed (|Object|)
@@ -203,9 +204,21 @@ class MemoryLayer
 		cpp_class JB_MemoryLayer
 		cpp_part  Layer
 
-	|Object?|		Obj
-	|Object?|		Obj2
-	
+
+	|int|				Int
+	|Object?|			Obj
+	|Object?|			Obj2
+
+/*	
+	|uint16|			HiddenRefCount
+	|bool|				IsActive
+	|bool|				DummyBool
+	|&nil|				CurrBlock	
+	|&ClassData|		Class
+	|&nil|				SpareBlock
+	|&nil|				World
+*/
+
 	constructor (|&ClassData| Cls, |object?| obj=nil)
 		cpp_wrapper JB_Layer_Constructor
 

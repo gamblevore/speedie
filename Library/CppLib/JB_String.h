@@ -39,7 +39,7 @@ inline uint8 LowerCaseB(uint8 c) {
 
 
 JBClass( JB_StringShared, JB_String,
-    JB_Object*      Parent; // refcount parent
+    JB_Object*      _Parent; // refcount parent
 );
 
 JBClass( JB_StringExternal, JB_String,

@@ -248,6 +248,8 @@ function CalculateSize (|int| Depth=0, |int|)
 		return .mini_size(Platform.PointerBytes)
 	
 	if .IsDataTypeOnly
+		|| sz = .clssize // for vectors, etc
+			return sz
 		return .mini_size(.typeinfo.ByteCount)
 	
 	expect (Depth < 16) (.SourceArg, "Class hierarchy too deep")
@@ -259,12 +261,12 @@ function CalculateSize (|int| Depth=0, |int|)
 	|| s = .super  // we can rely on everything being sorted.
 		rz = 4
 		if s != typeobject
-			rz = s.clssize							#expect (self)
+			rz = s.clssizeraw						#expect (self)
 			
 		AlignTo = AlignTo max s.Alignment
 
 	if .IsBehaviourTable
-		rz = rz max 8		// .destructor already exists as a property in each behaviour table.
+		rz = rz max 8						// .destructor already exists as a property in each behaviour table.
 		AlignTo = 8
 	
 	|| bits = 0
@@ -274,12 +276,13 @@ function CalculateSize (|int| Depth=0, |int|)
 
 		|| curr = P.CalculateDeclSize(depth)
 		|| pal = p.alignment
-		AlignTo = AlignTo max pal
 		rz = rz Align pal					// .alignup
 		p.ExportPosition = rz
-		p.sanity
 		|| Mul = P.c_Array ?? 1
 		rz += Curr * Mul
+		#!...
+		AlignTo = AlignTo max pal
+		p.sanity
 
 	.alignment = AlignTo
 
