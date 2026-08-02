@@ -40,6 +40,7 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
+	if "test4u".trap
 	(dest isnt AddrRequest)
 	|| T = dest.µtype
 	|| byte_shift = t.ByteCount.log2	
@@ -73,23 +74,34 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 					decl! is ASMReached
 				.AskNop(bs)								// assume this works for now
 				return exp.GOBJ(dest, 0, 0, K>>3)
-
+	
 	|| op = ASMType.WriteASM[byte_shift]
 	if dest is set
 		// avoid setting ._output
 		rz = exp.WR4U(dest, base, VarAdd, index, pinc)
 		rz.µrefcount = 1
+		if byte_shift <= 2
+			// vector opt... writing vec[0] can just write the actual thing itself.
+			// assuming we are writing 4 bytes or less.
+			|| destfat = dest.fat
+			if (destfat isa asm.vget) and (destfat is Temp)
+				if !destfat.regonly(2) and !destfat.prms[3]
+					|| input = destfat.prms[1]
+					rz.prms[0] = input
+					destfat.prms[1] = 0 // stop nop going mad.
+					.nop(destfat)
+			
 	  else
 		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
 		byte_shift = (byte_shift<<1) + t.issigned
 		op = ASMType.ReadASM[byte_shift]
 	
+	
 	rz._op = op
-	if pinc     // || y = (x++)[]
+	if pinc				// || y = (x++)[]
 		rz.µrefcount++
 		rz.Dest(1, base, self) // base is being written to, but it is still an input
 	if rz is const // what
-	
 
 
 function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
