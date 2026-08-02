@@ -397,8 +397,6 @@ struct xC2xB5Form_Behaviour;
 
 struct FastStringCpp_Behaviour;
 
-struct File_Behaviour;
-
 struct Message_Behaviour;
 
 struct SCDecl_Behaviour;
@@ -417,6 +415,8 @@ struct Task_Behaviour;
 
 struct Error_Behaviour;
 
+struct File_Behaviour;
+
 struct MessageID_Behaviour;
 
 struct SCArg_Behaviour;
@@ -425,9 +425,9 @@ struct SCBehaviour_Behaviour;
 
 struct SCBetterNode_Behaviour;
 
-struct SCFile_Behaviour;
-
 struct SCClass_Behaviour;
+
+struct SCFile_Behaviour;
 
 struct SCFunction_Behaviour;
 
@@ -515,8 +515,6 @@ struct SCBehaviour;
 
 struct SCBetterNode;
 
-struct SCFile;
-
 struct Message;
 
 struct JB_Task;
@@ -524,6 +522,8 @@ struct JB_Task;
 struct ParserCallBack;
 
 struct SCClass;
+
+struct SCFile;
 
 struct SCFunction;
 
@@ -1082,9 +1082,6 @@ JBClass ( FastStringCpp , FastString ,
 	JB_String* Cpp_Name;
 );
 
-struct File_Behaviour: String_Behaviour {
-};
-
 struct Message_Behaviour: list_Behaviour {
 };
 
@@ -1183,6 +1180,9 @@ JBClass ( JB_Error , Message ,
 	JB_String* OriginalData;
 );
 
+struct File_Behaviour: StringShared_Behaviour {
+};
+
 struct MessageID_Behaviour: StringShared_Behaviour {
 };
 
@@ -1218,22 +1218,6 @@ struct SCBetterNode_Behaviour: SCNode_Behaviour {
 
 JBClass ( SCBetterNode , SCNode , 
 	JB_String* Description;
-);
-
-struct SCFile_Behaviour: File_Behaviour {
-};
-
-JBClass ( SCFile , JB_File , 
-	bool Unfinished;
-	bool IsInternal;
-	bool UsedByASM;
-	u16 FileNum;
-	Message* OrigAST;
-	Message* LiveAST;
-	JB_String* ExportName;
-	SCImport* Proj;
-	JB_String* FData;
-	Array* Types;
 );
 
 JBClass ( ParserCallBack , JB_Task , 
@@ -1285,6 +1269,22 @@ JBClass ( SCClass , SCBetterNode ,
 	Array* Properties;
 	SCDecl* TypeNormal;
 	SCDecl* TypeOptional;
+);
+
+struct SCFile_Behaviour: File_Behaviour {
+};
+
+JBClass ( SCFile , JB_File , 
+	bool Unfinished;
+	bool IsInternal;
+	bool UsedByASM;
+	u16 FileNum;
+	Message* OrigAST;
+	Message* LiveAST;
+	JB_String* ExportName;
+	SCImport* Proj;
+	JB_String* FData;
+	Array* Types;
 );
 
 struct SCFunction_Behaviour: SCBetterNode_Behaviour {
@@ -2554,19 +2554,6 @@ extern SCOperator* SC__Opp_Negative;
 extern SCOperator* SC__Opp_Subtract;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
-#define JB__File__Speedie JB__.File__Speedie
-#define kJB__File_AllowInvisible ((int)1)
-#define kJB__File_AllowMissing ((bool)1)
-#define kJB__File_AllowSymLinks ((int)2)
-#define kJB__File_AppendMode ((int)8)
-#define kJB__File_CreateMode ((int)512)
-#define kJB__File_ExclusiveMode ((int)2048)
-#define kJB__File_ExpectExists ((bool)false)
-#define kJB__File_ReadMode ((int)0x000)
-#define kJB__File_ReadWriteMode ((int)2)
-#define kJB__File_TruncateMode ((int)1024)
-#define kJB__File_WantFileObjects ((int)4)
-#define kJB__File_WriteMode ((int)1)
 #define kJB__bin_JBinHeader ((int)3806990337)
 extern SCIterator* SC__Iter_carray;
 extern bool SC__Base_ConstantsLoadingOverride;
@@ -2581,6 +2568,19 @@ extern bool SC__Base_CurrVisibility;
 #define JB__Proc_CheckedParent JB__.Proc_CheckedParent
 #define JB__Err_BackupErrorSource JB__.Err_BackupErrorSource
 #define JB__Err_KeepStackTrace JB__.Err_KeepStackTrace
+#define JB__File__Speedie JB__.File__Speedie
+#define kJB__File_AllowInvisible ((int)1)
+#define kJB__File_AllowMissing ((bool)1)
+#define kJB__File_AllowSymLinks ((int)2)
+#define kJB__File_AppendMode ((int)8)
+#define kJB__File_CreateMode ((int)512)
+#define kJB__File_ExclusiveMode ((int)2048)
+#define kJB__File_ExpectExists ((bool)false)
+#define kJB__File_ReadMode ((int)0x000)
+#define kJB__File_ReadWriteMode ((int)2)
+#define kJB__File_TruncateMode ((int)1024)
+#define kJB__File_WantFileObjects ((int)4)
+#define kJB__File_WriteMode ((int)1)
 #define JB__Macro_TmpPrms_ JB__.Macro_TmpPrms_
 #define kSC__Beh_kBehaviourProto ((int)2)
 #define kSC__Beh_kBehaviourProtoRequired ((int)6)
@@ -2628,11 +2628,11 @@ struct JB_Globals {
 	Message* App__Prefs;
 	JB_File* App__StdOut;
 	JB_File* App__stdin;
-	JB_String* File__Speedie;
 	Dictionary* Constants_XML_EscapeStr;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
 	Dictionary* Constants__SyxDict;
+	JB_String* File__Speedie;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
 	JB_String* App__Path;
@@ -6719,9 +6719,6 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // JB_FastStringCpp_Behaviour
 
 
-// JB_File_Behaviour
-
-
 // JB_Message_Behaviour
 
 
@@ -6749,6 +6746,9 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // JB_Error_Behaviour
 
 
+// JB_File_Behaviour
+
+
 // JB_MessageID_Behaviour
 
 
@@ -6761,10 +6761,10 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // JB_SCBetterNode_Behaviour
 
 
-// JB_SCFile_Behaviour
-
-
 // JB_SCClass_Behaviour
+
+
+// JB_SCFile_Behaviour
 
 
 // JB_SCFunction_Behaviour
@@ -7000,6 +7000,10 @@ void SC_Cpp_Run(Cpp_Export* Self);
 void SC_Cpp_SetupFlow(Cpp_Export* Self, SCFunction* F);
 
 FastStringCpp* SC_Cpp_StreamChild(Cpp_Export* Self, JB_String* S);
+
+void SC_Cpp_TestCakeProp(Cpp_Export* Self, FastString* Fs, JB_String* Name, SCDecl* Prop);
+
+void SC_Cpp_TestCakeStruct(Cpp_Export* Self, FastString* Fs, SCClass* C);
 
 void SC_Cpp_WriteAPIFuncHeader(Cpp_Export* Self, SCFunction* F, FastStringCpp* Fs);
 
@@ -8055,79 +8059,6 @@ void SC_FastStringCpp_AppendBehaviour(FastStringCpp* Self, JB_String* Name, SCFu
 FastStringCpp* SC_FastStringCpp_Constructor(FastStringCpp* Self, JB_String* Name);
 
 void SC_FastStringCpp_Destructor(FastStringCpp* Self);
-
-
-
-// JB_File
-JB_File* JB_File_Child(JB_File* Self, JB_String* Name);
-
-ExitCode SC_File_CodeSign(JB_File* Self, JB_String* Sign);
-
-bool SC_File_CompareData(JB_File* Self, JB_String* A, JB_String* Error);
-
-bool SC_File_FileCompare(JB_File* Self, JB_File* A, JB_String* Error);
-
-bool SC_File_CompareMsg(JB_File* Self, ErrorInt Code, JB_String* Error);
-
-ErrorInt SC_File_FileCompareSub(JB_File* Self, JB_File* A);
-
-Message* JB_File_Config(JB_File* Self, int Limit);
-
-ErrorInt JB_File_CopyAll(JB_File* Self, JB_String* Dest, bool AttrOnly);
-
-ErrorInt JB_File_DeleteAll(JB_File* Self, bool KeepSelf);
-
-bool JB_File_DirectoryContains(JB_File* Self, JB_String* Path);
-
-bool JB_File_FileExistance(JB_File* Self);
-
-ErrorInt JB_File_LinkToSet(JB_File* Self, JB_String* Value);
-
-Array* JB_File_List(JB_File* Self, int Mode);
-
-Array* JB_File_ListFiles(JB_File* Self, int Mode);
-
-bool JB_File_MustExist(JB_File* Self, JB_String* Operation);
-
-bool JB_File_Opened(JB_File* Self);
-
-bool JB_File_NewerThanFile(JB_File* Self, JB_File* F);
-
-bool JB_File_OperatorIsNewerThan(JB_File* Self, Date F);
-
-JB_File* JB_File_Parent(JB_File* Self);
-
-Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing, Syntax Owner);
-
-JB_File* JB_File_Sibling(JB_File* Self, JB_String* Name);
-
-bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu);
-
-FileSizeInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data);
-
-JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name);
-
-bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware);
-
-void JB_File_Fail(JB_File* Self, JB_String* Error);
-
-void JB_File_SyntaxProblem(JB_File* Self, JB_String* Error);
-
-bool SC_File_TestBatch(JB_File* Self);
-
-bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
-
-ExitCode JB_File_Touch(JB_File* Self);
-
-JB_String* JB_File__Applications();
-
-int JB_File__Init_();
-
-JB_File* JB_File__Logs();
-
-JB_File* JB_File__Prefs(JB_String* Name);
-
-JB_String* JB_File__SpeedieDir();
 
 
 
@@ -10181,6 +10112,79 @@ int JB_Err__Init_();
 
 
 
+// JB_File
+JB_File* JB_File_Child(JB_File* Self, JB_String* Name);
+
+ExitCode SC_File_CodeSign(JB_File* Self, JB_String* Sign);
+
+bool SC_File_CompareData(JB_File* Self, JB_String* A, JB_String* Error);
+
+bool SC_File_FileCompare(JB_File* Self, JB_File* A, JB_String* Error);
+
+bool SC_File_CompareMsg(JB_File* Self, ErrorInt Code, JB_String* Error);
+
+ErrorInt SC_File_FileCompareSub(JB_File* Self, JB_File* A);
+
+Message* JB_File_Config(JB_File* Self, int Limit);
+
+ErrorInt JB_File_CopyAll(JB_File* Self, JB_String* Dest, bool AttrOnly);
+
+ErrorInt JB_File_DeleteAll(JB_File* Self, bool KeepSelf);
+
+bool JB_File_DirectoryContains(JB_File* Self, JB_String* Path);
+
+bool JB_File_FileExistance(JB_File* Self);
+
+ErrorInt JB_File_LinkToSet(JB_File* Self, JB_String* Value);
+
+Array* JB_File_List(JB_File* Self, int Mode);
+
+Array* JB_File_ListFiles(JB_File* Self, int Mode);
+
+bool JB_File_MustExist(JB_File* Self, JB_String* Operation);
+
+bool JB_File_Opened(JB_File* Self);
+
+bool JB_File_NewerThanFile(JB_File* Self, JB_File* F);
+
+bool JB_File_OperatorIsNewerThan(JB_File* Self, Date F);
+
+JB_File* JB_File_Parent(JB_File* Self);
+
+Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing, Syntax Owner);
+
+JB_File* JB_File_Sibling(JB_File* Self, JB_String* Name);
+
+bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu);
+
+FileSizeInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data);
+
+JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name);
+
+bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware);
+
+void JB_File_Fail(JB_File* Self, JB_String* Error);
+
+void JB_File_SyntaxProblem(JB_File* Self, JB_String* Error);
+
+bool SC_File_TestBatch(JB_File* Self);
+
+bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
+
+ExitCode JB_File_Touch(JB_File* Self);
+
+JB_String* JB_File__Applications();
+
+int JB_File__Init_();
+
+JB_File* JB_File__Logs();
+
+JB_File* JB_File__Prefs(JB_String* Name);
+
+JB_String* JB_File__SpeedieDir();
+
+
+
 // JB_FileArchive
 
 
@@ -10263,37 +10267,6 @@ void SC_SCBetterNode_LoadExportName(SCBetterNode* Self);
 void SC_SCBetterNode_ReadDescription(SCBetterNode* Self, Message* Msg);
 
 void SC_SCBetterNode_SetExportName(SCBetterNode* Self, JB_String* Name, bool Explicit);
-
-
-
-// JB_SCFile
-Message* SC_File_AST(SCFile* Self);
-
-Message* SC_File_ASTSub(SCFile* Self, bool Orig);
-
-void SC_File_CollectGlobals(SCFile* Self, SCModule* P);
-
-SCFile* SC_File_Constructor(SCFile* Self, JB_File* F, SCImport* P);
-
-void SC_File_Destructor(SCFile* Self);
-
-void SC_File_DetectInsecureWords(SCFile* Self);
-
-Message* SC_File_GetMsg(SCFile* Self, int Pos);
-
-Message* SC_File_Orig(SCFile* Self);
-
-Message* SC_File_Start_AST(SCFile* Self);
-
-void SC_File_Stop(SCFile* Self);
-
-void SC_File_SyntaxAppend(SCFile* Self, SCClass* C);
-
-void SC_File_Use(SCFile* Self);
-
-int SC_File__Init_();
-
-SortComparison SC_File__Sorter(SCFile* Self, SCFile* B);
 
 
 
@@ -10586,6 +10559,37 @@ SortComparison SC_Class__Sorter(SCClass* Self, SCClass* B);
 SCNode* SC_Class__StoreExtend(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 SCNode* SC_Class__StoreExtendModule(Message* Node, SCNode* Name_space, Message* ErrPlace);
+
+
+
+// JB_SCFile
+Message* SC_File_AST(SCFile* Self);
+
+Message* SC_File_ASTSub(SCFile* Self, bool Orig);
+
+void SC_File_CollectGlobals(SCFile* Self, SCModule* P);
+
+SCFile* SC_File_Constructor(SCFile* Self, JB_File* F, SCImport* P);
+
+void SC_File_Destructor(SCFile* Self);
+
+void SC_File_DetectInsecureWords(SCFile* Self);
+
+Message* SC_File_GetMsg(SCFile* Self, int Pos);
+
+Message* SC_File_Orig(SCFile* Self);
+
+Message* SC_File_Start_AST(SCFile* Self);
+
+void SC_File_Stop(SCFile* Self);
+
+void SC_File_SyntaxAppend(SCFile* Self, SCClass* C);
+
+void SC_File_Use(SCFile* Self);
+
+int SC_File__Init_();
+
+SortComparison SC_File__Sorter(SCFile* Self, SCFile* B);
 
 
 
@@ -11478,11 +11482,11 @@ struct JB_Globals {
 	JB_Object* App__Prefs;
 	JB_Object* App__StdOut;
 	JB_Object* App__stdin;
-	JB_Object* File__Speedie;
 	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
 	JB_Object* Constants__SyxDict;
+	JB_Object* File__Speedie;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
 	JB_Object* App__Path;

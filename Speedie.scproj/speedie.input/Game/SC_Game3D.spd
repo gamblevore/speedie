@@ -129,7 +129,9 @@ extend Message {
 		if (F.Length >= 2) // Cube, sdf, etc... use a standard vertex shader
 			F = F[0, 1]
 		  else
-			SCGame3D.NeedShader(TypeName + ".vert")			#require
+			// actually .vert but ignore that this entire code is
+			// going to go :D
+			SCGame3D.NeedShader(TypeName + ".frag")			#require
 		
 		// "type points" --> "type P"
 		// and then the temporal_statement is removed.

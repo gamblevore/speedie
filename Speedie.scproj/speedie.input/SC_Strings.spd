@@ -292,7 +292,7 @@ function Message.Clean (|bool| erl = false)
 					curr.Tran_Isnt("self")
 				  elseif SCGlobals.UniqueNum and AutoComplete.spdfunctions[s]!=nil
 					SCGlobals.UniqueNum = 0 // why not? make for smaller/more-predictable numbers
-				  elseif s == "dispatch" or "functiontable" or "flags" or "constants"
+				  elseif s == "dispatch" or "flags" or "constants"
 					IgnoreArg = curr.last
 				  elseif s == "with"
 					curr.tran_with
@@ -420,17 +420,6 @@ function message.BunchFixSub (|message| subject, |message| stuff)
 		stuff.first!.ReplaceInto(test)
 		stuff = R
 		subject = subject.copy
-
-
-function Message.BunchFixPrepare (|Message|)
-	opt norefcounts
-	// if a == b or c
-	
-	|| P = .NiceParent
-	if P == @rel
-		return p
-	return scfunction.tempmoveout(self).last!
-
 
 	
 function Message.BunchlessFix

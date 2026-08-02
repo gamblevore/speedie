@@ -1823,7 +1823,7 @@ function message.PrepareAST
 	|| After = .FlatAfter
 	|| msg = self 
 	while msg != After
-		if (msg == @tmp) and (msg == "functiontable" or "dispatch")
+		if (msg == @tmp) and (msg == "dispatch")
 			SCFunction.Tran_FuncTable( msg )
 		msg = msg.flatnext
 
