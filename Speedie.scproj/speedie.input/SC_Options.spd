@@ -19,10 +19,9 @@ module Options
 	||		MakeExec				= false
 	||		Compile					= true
 	||		TargetDebug				= false
-	||		CompileDebugSeparately	= false // for now
 	||		PrintMemoryUsage		= false
 	||		PrintLibraries			= false
-	||		GenFlowControlCode		= false
+	||		GenFlowLogCode			= false
 	||		KeepAllErrors			= false
 	||		Scripting				= false
 	||		ForceRecompile			= false
@@ -72,18 +71,18 @@ module Feedback
 	
 	
 	function SetFlow
-		if app["flow"] 	// options.GenFlowControlCode specified by --flow
-			|| v = options.GenFlowControlCode.string
+		if app["flow"] 	// options.GenFlowLogCode specified by --flow
+			|| v = options.GenFlowLogCode.string
 			if app.prefs["self_flow"] != v
 				// update current self_flow pref
 				app.prefs["self_flow"] = v
 				app.Prefs.Save
 		  else
 			// load from prefs unless overwritten by --flow
-			Options.GenFlowControlCode = app.prefs["self_flow"].yes
+			Options.GenFlowLogCode = app.prefs["self_flow"].yes
 		
 		// update current target
-		SC_Targets["flow"] = options.GenFlowControlCode
+		SC_Targets["flow"] = options.GenFlowLogCode
 	
 	
 	function CheckSelfModifying
@@ -295,7 +294,7 @@ module Feedback
 		+'flow'
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			|| b = value.optionbool
-			Options.GenFlowControlCode = b 
+			Options.GenFlowLogCode = b 
 			SC_Targets["flow"] = b
 
 		+'optinline'

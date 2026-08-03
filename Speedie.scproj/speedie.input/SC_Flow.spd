@@ -10,7 +10,7 @@ function Tran_Flow (TranFunc)
 
 	
 insertion
-	quietly	({FlowControl.DisabledIncr, (_0), FlowControl.DisabledIncr(-1), rejoin 0})
+	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
 
 
 target Debug

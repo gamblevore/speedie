@@ -8,7 +8,7 @@ main // main {
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile
-		using FlowControl.attempt("Speedie"+options.variant)
+		using FlowLog.attempt("Speedie"+options.variant)
 			compiler.CompileTime
 	Compiler.PrintResults
 

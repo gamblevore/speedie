@@ -72,7 +72,7 @@ module LibStability
 		
 		if table
 			if !SelfLib.IsOpen
-				selflib = DynamicLibrary.new(nil)
+				selflib.DyLibOpen(nil)
 			|| fn = SelfLib[.exportname] // an actual function pointer for testing
 				Table[id+31] = fn
 

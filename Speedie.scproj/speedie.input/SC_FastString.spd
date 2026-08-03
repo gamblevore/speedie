@@ -1,24 +1,18 @@
 
 
-extend_module scfunction
-	function OptMe (|string| t)
-		opt norefcounts
-		|| s = "help$t!"
-
-
 module FastStringOpts {
 
-|| FSRemoved  = 0
-|| StrRemoved = 0
-|| InitedOK   = 0
-|| VargCount  = 0
+|| FSRemoved	= 0
+|| StrRemoved	= 0
+|| InitedOK		= 0
+|| VargCount	= 0
 
 |SCFunction| FnByte
-|SCFunction| FnGetResult 
-|SCFunction| FnAppend 
+|SCFunction| FnGetResult
+|SCFunction| FnAppend
 |SCFunction| FnAppend4
 |SCFunction| FnAppend6
-|SCFunction| FnPlus 
+|SCFunction| FnPlus
 
 
 function FSOptInit (|string| name, |message| s)

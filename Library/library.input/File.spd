@@ -396,8 +396,8 @@ Creates an error, if the file is bigger than the 'Limit' param."
 					rz <~ name
 		
 		rz.sort
-		if !flowcontrol.isdisabled
-			flowcontrol.input(rz, self)
+		if !FlowLog.isdisabled
+			FlowLog.input(rz, self)
 		
 	
 	function MoveTo (|string| Path, |ErrorInt|)

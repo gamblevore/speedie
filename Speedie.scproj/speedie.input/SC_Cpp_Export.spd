@@ -190,7 +190,7 @@ function Codify (|SCModule| scb, |string| fName)
 
 function SetupFlow (|SCFunction| f)
 	scfunction.CurrFunc = f
-	if Options.GenFlowControlCode and (f isnt FlowDisabled)
+	if Options.GenFlowLogCode and (f isnt FlowDisabled)
 		Cpp_Export.IfName = "iif"
 		Cpp_Export.WhileName = "wwhile"
 		compiler.TernaryFunc!.exportname = "JB_Ternaryy"
@@ -759,7 +759,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ "static const char* JB_LUBSrc2 = "
 		fs.AppendCppAll(blob)
 		fs <~ ";\n"
-		|| FlowStr = Options.GenFlowControlCode.string
+		|| FlowStr = Options.GenFlowLogCode.string
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
 
 
@@ -845,11 +845,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function SmartWrite (|string| S, |File| F)
 		flow off
-		FlowControl.DisabledIncr // we don't care about previous file contents
+		FlowLog.DisabledIncr // we don't care about previous file contents
 		.cpp_includes <~ s.hash|int64|.render
 		if F and !F.CompareData(S)
 			F.writeall(S)
-		FlowControl.DisabledIncr(-1)
+		FlowLog.DisabledIncr(-1)
 	
 	
 	function DoSavers (|bool|)

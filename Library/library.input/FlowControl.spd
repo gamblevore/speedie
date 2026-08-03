@@ -7,7 +7,7 @@
 */
 
 		
-class FlowControl
+class FlowLog
 	linkage: cpp_part Flow
 	|FastBuff|				Buff
 	|InputStream?|			ReadInput
@@ -27,7 +27,7 @@ class FlowControl
 			printline InPath
 			s = inpath.InputStream
 		.ReadInput = s
-		flowcontrol.disabled = 0
+		FlowLog.disabled = 0
 
 	
 	libinternal Flush
@@ -39,7 +39,7 @@ class FlowControl
 
 	destructor
 		flow off
-		FlowControl.Disabled = int.max
+		FlowLog.Disabled = int.max
 		
 		.flush
 		if .ReadInput!=nil
@@ -86,7 +86,7 @@ class FlowControl
 		printline fs.GetResult
 		.CanDoErrors = false
 		.ReadInput = nil
-		if FlowControl.BreakOnFail
+		if FlowLog.BreakOnFail
 			debugger
 
 
@@ -112,7 +112,7 @@ class FlowControl
 	
 	
 	module
-		|flowcontrol|			Flow			// DONT directly alter this 
+		|FlowLog|			Flow			// DONT directly alter this 
 		|bool|					AlwaysMove		= true
 		|bool|					BreakOnFail
 		|byte|					Active
@@ -174,7 +174,7 @@ class FlowControl
 			require !.isdisabled
 
 			.disabled = 1
-			|flowcontrol--| f = .flow!
+			|FlowLog--| f = .flow!
 			|InputStream--| r = f.ReadInput
 			if r != nil
 				|| str = r.str(data.length)
@@ -198,20 +198,20 @@ class FlowControl
 				if .Active >= Validate
 					name += "debug"
 				print "logging at: "
-			rz = "/tmp/Speedie/FlowControl".child( name + ".txt" )
+			rz = "/tmp/Speedie/FlowLog".child( name + ".txt" )
 			printline
 
-		function Activate (|string| name,  |FlowControlStopper|)
+		function Activate (|string| name,  |FlowLogStopper|)
 			flow off
 			if !.Active
-				"#!Use --flowmode=log or --flowmode=validate to activate FlowControl"
+				"#!Use --flowmode=log or --flowmode=validate to activate FlowLog"
 				return nil
 
-			print "#!FlowControl "
+			print "#!FlowLog "
 			.Disabled = int.max			// in case its set badly
-			.flow = FlowControl(.askpath(name,false), .askpath(name,true))
+			.flow = FlowLog(.askpath(name,false), .askpath(name,true))
 
-		function Attempt (|string| name, |FlowControlStopper|)
+		function Attempt (|string| name, |FlowLogStopper|)
 			flow off
 			(name)
 			target flow
@@ -219,12 +219,12 @@ class FlowControl
 
 
 
-datatype FlowControlStopper (int)
+datatype FlowLogStopper (int)
 	linkage: cpp_part flow
 	syntax UsingComplete (|object| dummy=nil)
 		flow off
-		flowcontrol.stop
+		FlowLog.stop
 
-	syntax Using (|FlowControlStopper|)
+	syntax Using (|FlowLogStopper|)
 		flow off
 

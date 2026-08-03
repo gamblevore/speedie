@@ -20,7 +20,7 @@ class SCFile (file)
 
 	constructor (|File| f, |scimport| p)
 		flow off // dates shouldn't matter ///
-		FlowControl.DisabledIncr
+		FlowLog.DisabledIncr
 		
 		|string--| x = (f != nil)(f.path, string.error) 	// just feel like doing this.
 		super.constructor(x)
@@ -31,7 +31,7 @@ class SCFile (file)
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
-		FlowControl.DisabledIncr(-1)
+		FlowLog.DisabledIncr(-1)
 		
 	
 	
@@ -96,11 +96,11 @@ class SCFile (file)
 		
 		
 	function ASTSub (|bool| Orig, |Message|)
-		FlowControl.input(self, "AST")
+		FlowLog.input(self, "AST")
 		
-		FlowControl.DisabledIncr		// i want it a bit less sensitive to random file-cleanups
+		FlowLog.DisabledIncr		// i want it a bit less sensitive to random file-cleanups
 		|| str = .Readall(true).decompress // like: x() --> x() // comment
-		FlowControl.DisabledIncr(-1)	// also... parse/parseclean will find REAL differences.
+		FlowLog.DisabledIncr(-1)	// also... parse/parseclean will find REAL differences.
 		
 		if str
 			curr = self
@@ -177,12 +177,12 @@ function file.CodeSign (|string| sign, |ExitCode|)
 
 function file.CompareFile (|File| A, |string| Error="", |bool|)
 	cpp_part FileCompare
-	FlowControl.DisabledIncr()
+	FlowLog.DisabledIncr()
 	|| code = .CompareSub(a)
 	.Close
 	A.Close
 	rz = .CompareMsg(code, Error)
-	FlowControl.DisabledIncr(-1)
+	FlowLog.DisabledIncr(-1)
 
 
 function file.CompareMsg (|errorint| code, |string| Error, |bool|)

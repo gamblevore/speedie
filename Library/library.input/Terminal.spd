@@ -3,7 +3,7 @@
 // cleanup:
 	// Replace Dictionary with FixedDict
 	// Validator should be embedded (if used)
-	// flowcontrol can be deleted... i don't know if we need it. Perhaps after getting speedie working.
+	// FlowLog can be deleted... i don't know if we need it. Perhaps after getting speedie working.
 
 
 datatype TerminalColor (int)

@@ -77,9 +77,9 @@ function JumpWithinBool (NilTrackerFn)
 function Jump (NilTrackerFn)
 	cpp_part FlowJump
 	target flow
-		if FlowControl.Active
-			FlowControl <~ msg.func|byte|
-			FlowControl.input("", msg.name)
+		if FlowLog.Active
+			FlowLog <~ msg.func|byte|
+			FlowLog.input("", msg.name)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|ASMType|

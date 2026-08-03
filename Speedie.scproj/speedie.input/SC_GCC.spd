@@ -60,8 +60,8 @@ function compiler.ProductFile (|File|)
 
 
 function Compiler.CakeExt (|string|)
-	if options.targetdebug and options.CompileDebugSeparately
-		return ".dbg.cake"
+//	if options.targetdebug and options.CompileDebugSeparately
+//		return ".dbg.cake"
 	return ".cake"
 
 
@@ -139,7 +139,7 @@ function NoGoodObject ( |string| Cpp,  |File| h,  |File| o,  |int| )
 
 
 function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
-	flowcontrol.input(cpp, "objtest")
+	FlowLog.input(cpp, "objtest")
 	|| aslib = options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
 	require ! (!(SC_Targets["gui"] or options.makeexec) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
@@ -339,9 +339,9 @@ function ClearThis
 function IsCompilerAndNeedsInstall (|bool|)
 	require (Options.SelfReplacement)
 	require (StdErr.OK and !Compiler.IsTest)
-	FlowControl.DisabledIncr
+	FlowLog.DisabledIncr
 	rz = (.TestNewCompiler and .BackupCompiler)
-	FlowControl.DisabledIncr(-1)
+	FlowLog.DisabledIncr(-1)
 
 
 function ExportAndInstall (|date| Elapsed)
@@ -531,11 +531,11 @@ function InstallCompiler
 	options.output_path = Compiler.Projects.child("Terminal/Speedie")
 	OldProd.File.MoveTo( options.output_path )
 
-	FlowControl.DisabledIncr
+	FlowLog.DisabledIncr
 	.InstallOne Cpp_Export.CppProduct
 	.InstallOne Cpp_Export.HProduct
 	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
-	FlowControl.DisabledIncr(-1)
+	FlowLog.DisabledIncr(-1)
 	
 //	if options.Makelib
 //		.MakeLib

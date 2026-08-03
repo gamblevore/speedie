@@ -1327,9 +1327,9 @@ function CurrFunc (assigns:|scfunction?|)
 
 	._Info = (value!=nil)(value.FuncInfo, 0)
 		
-	if flowcontrol.active
-		FlowControl.inputline("function: ", value.name)
-		FlowControl.inputline("stage: ", compiler.stagename)
+	if FlowLog.active
+		FlowLog.inputline("function: ", value.name)
+		FlowLog.inputline("stage: ", compiler.stagename)
 
 
 function CurrFunc (|scfunction|)
