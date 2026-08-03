@@ -1,0 +1,75 @@
+
+
+
+ignore
+	dylib Name // --> struct libName (DynamicLibrary), |&libname| Name
+		// might have 1000 funcs.
+		// Also structs can be "properly global" which is nice!
+		at ("path1",  "path2",  "path3")
+		
+		// user made
+		function ABC (|int| A=0, |&byte| B=nil, |&nil|)
+			// no code allowed in here
+			// Oh... also the funcs can't be function-pointers... unless specified.
+			// so it needs special handling by speedie.
+		
+
+		module // auto generated for spdlibs. like there is spdprocess vs unixprocess
+			function Recompile (|&Name|)
+			function Compile (|string| Code, |&Name|)
+				
+
+	function Example
+		|| SomeLib = name.new // uses an auto-generated load func
+		SomeLib.ABC
+		somelib = somelib.recompile
+		SomeLib.ABC
+		somelib = somelib.compile(`blablabla`)
+		SomeLib.ABC
+
+
+struct MyDylib (DynamicLibrary) // example
+	|&nil| MySpecialFunc
+	|&nil| MySpecialFunc2
+
+	module
+		function New (|string| paths=`path1
+path2
+path3
+/usr/lib/libName.dylib
+/usr/local/lib/libName.dylib`, |int| Mode=DynamicLibrary.default,  |&MyDylib|)
+			|| lib = Memory.zalloc(16)|&MyDylib|
+				if lib._loadsub(paths, mode)
+					return lib
+				lib.DyLibClose
+				Memory.free(lib)
+
+// going kinda crazy with the paths here... not the best idea.
+
+	function _LoadSub (|string| paths, |int| mode,  |bool|)
+		for p.lines in paths
+			rz = .DyLibOpen(p, mode)
+			loop !rz
+		
+		require rz
+		|| fn = .SyntaxAccess("MySpecialFunc")		#require
+		.myspecialfunc = fn
+					
+		fn = .SyntaxAccess("MySpecialFunc2")		#require
+		.myspecialfunc2 = fn
+						
+						
+// Could this make speedie code... embeddable, by speedie? Like... for game-state? Well... how does
+// it deal with object allocation? Each lib has it's own objects and libs. So it would need its per-frame step.
+ 
+// Well what about loading normal lib code? Like loading libcurl or sql. I guess you just load it.
+// What about if some functions can't load? well... the lib does not get loaded. OR we have to load them individually.
+// i think both are good tactics. Depends on what you want to do.
+// I mean... you'd need to test each function before it is used. Even if it were loaded at startup,
+// unless the compiler treats it as always loaded, because the program exits if it can't be loaded.
+// could be a good time to make other globs kill the app if they can't be loaded. Like: || globx = message.new
+// if globx is nil, the entire app should not reach main.
+ 
+// Anyhow, I think this is a good design.
+
+

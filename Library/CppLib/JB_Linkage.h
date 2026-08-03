@@ -62,11 +62,12 @@ int	 JB_SP_Init (const char** R, bool IsThread);
 #include <dlfcn.h>
 
 struct JB_Dylib {
-	void* handle;
+	void* _handle;
 };
 
 void* JB_dylib_Load (JB_Dylib* Self, JB_String* Path);
-void JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
+bool JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
+void JB_dylib_Close (JB_Dylib* Self);
 
 
 // VM 

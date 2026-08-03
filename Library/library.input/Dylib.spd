@@ -6,7 +6,7 @@ struct DynamicLibrary
 		cpp_class JB_Dylib
 		wrapper
 
-	|?&nil|		handle
+	|?&nil|		_handle
 	
 	flags
 		Lazy
@@ -14,19 +14,20 @@ struct DynamicLibrary
 		Local
 		Global
 		NoLoad
+		Default = Now + Local
 		NoDelete	= 0x80
 	
 	inline IsOpen (|bool|)
-		return .handle != nil
+		return ._handle != nil
 	
 	syntax access (|string| S, |?&nil|)
 		cpp_wrapper JB_dylib_Load
 		
-	libinternal Open (|string?| F, |int| Mode = 0)
-		cpp_wrapper
+	function DyLibOpen (|string?| F, |int| Mode = dynamiclibrary.Default, |bool|)
+		cpp_wrapper JB_dylib_Open
 	
-	module
-		function New (|string?| F, |int| Mode = 0, |DynamicLibrary|)
-			rz.Open(F, mode)
-
+	function DyLibClose
+		cpp_wrapper JB_dylib_Close
+		
+	
 
