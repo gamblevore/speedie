@@ -12,12 +12,13 @@
 //		return self == d
 
 
-datatype FunctionType (uint)
+datatype FunctionType (uint64)
 	flags
 		|FunctionType|
 		Constructor
 		Destructor
 		Reffer
+		NotRefCounted
 		NewStruct
 		NumberCreator
 		TypeTest
@@ -37,7 +38,6 @@ datatype FunctionType (uint)
 		LinkInline
 		Killer
 		Disabled
-		NotRefCounted
 		API
 		Stateless
 		HidesProperties
@@ -46,6 +46,7 @@ datatype FunctionType (uint)
 		Wrapper // isn't this the same as cpp?
 		Cpp
 		UsedByASM
+		
 		
 		NoExport = LinkInline + Disabled + InitFunc
 		DontCheckInCakeLib = Disabled + InitFunc

@@ -21,6 +21,7 @@ datatype ClassInfo (int)
 		Stateful
 		Builtin
 		SortsProperties
+		Dylib
 		NumericReduction = [Symbol, Flags]
 		
 
@@ -537,7 +538,8 @@ function SCFunction.AddConstructorReturn (|message| prms)
 
 
 function CreateConstructors
-	if .IsObject or (.isstruct and !.Behaviourness)
+//	if self == "DynamicLibrary" or .super == "DynamicLibrary"
+	if .IsObject or (.isstruct and !.Behaviourness and self isnt Dylib)
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
 			|| s = .super!					// roles always have supers

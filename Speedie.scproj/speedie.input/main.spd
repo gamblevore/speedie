@@ -4,7 +4,12 @@
 */
 
 
+//dylib libcurl `/usr/local/lib`
+//	cpp_func curl_global_init (|int| Flags=3, |int|)
+//|| curl = libcurl.new
+
 main // main {
+//	curl.curl_global_init
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile

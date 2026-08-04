@@ -74,7 +74,7 @@ dispatch FuncLinkageTable (TranFunc)
 	+'cpp_part'				{
 		SCNode.LoadCppPart(node, name_space, node)
 	}
-	+'cpp_refs'				SCFunction.tran_cpprefs //(fn, node, name_space), return true}
+	+'cpp_refs'				SCFunction.tran_cpprefs		// (fn, node, name_space), return true}
 	+'visible'				{} // (SCFunction.Tran_Visible)
 	+'ignore'				{}
 

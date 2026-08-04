@@ -1,8 +1,16 @@
 
 
+unfinished // still need to rework the functions to be callable.
+
 extend_module Macros
 	|| DylibConstructor = `
+module {
 function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.default,  |&_0|) {
+// super constructor system! Can both create new, and init existing struct! Sooo much simpler to use.
+// one of my super-theo inventions... go F*&*K urself if u dont agreeee :]
+// i mean i literally tested it. its faster and uses less code so if ur brain doesn't like it...
+// thats a fault in your brain. Not mine.
+// modelled after speedie's object constructor system.
 	|| Orig = self
 	if !self
 		self = Memory.zalloc(–sizeof _0)|&_0|
@@ -12,8 +20,8 @@ function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.
 		return self
 	if orig != self
 		Memory.free(self)
+}
 }`.macro
-
 
 
 
@@ -23,9 +31,14 @@ function message.DylibFuncs (|message|)
 
 	for ch in self
 		if ch istmp "cpp_func"
-			if fs.Length
-				fs <~ '\n'
-			fs <~ ch.firstname
+			|| name = ch.firstname
+				if fs.Length
+					fs <~ '\n'
+				fs <~ name
+				
+				|| dcl = .msg(@decl)
+				dcl <~ @list
+				dcl <~ (@thg, name)
 	
 	return @str + fs.GetResult
 
@@ -55,9 +68,13 @@ function @scclass.NewDylib (CollectFunc)
 	arg.AppendMacro(macros.DylibConstructor, tmp)
 	tmp.Length = 0
 	|| struct = NewStruct(node, name_space, errplace)
+	if Struct isa SCModule
+		|| cls = Struct.cls
+			(cls is Dylib)
+			
 	if paths in node // oof
 		paths.remove // macro behaviour needs cleanup. (^^^ above note)
-/	return struct
+	return struct
 
 
 
@@ -106,12 +123,5 @@ path3`  // --> struct libName (DynamicLibrary) // might have 1000 funcs.
 // if globx is nil, the entire app should not reach main.
  
 // Anyhow, I think this is a good design.
-
-
-target debug2 {
-dylib libcurl `/usr/local/lib`
-	cpp_func curl_global_init (|int| Flags=3, |int|)
-	
-}
 
 

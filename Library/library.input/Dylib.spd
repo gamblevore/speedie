@@ -4,9 +4,10 @@ struct DynamicLibrary
 	linkage
 		cpp_part dylib
 		cpp_class JB_Dylib
-		wrapper
-
+		wrapper // commenting out this causes speedie to not compile vaguely
+				// but why.
 	|?&nil|		_handle
+	
 	
 	flags
 		Lazy
