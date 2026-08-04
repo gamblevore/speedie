@@ -127,7 +127,7 @@ function CanExportFunc (|SCFunction| F, |bool|)
 	require (f.MyReacher or f is api)
 	require (f isnt disabled)
 	if f Isnt ExternalLib
-		require (f Isnt Wrapper) and !f.isMacro
+		require (f Isnt cpp) and !f.isMacro
 	return f isnt NewStruct  and  f isnt AlreadyExported
 
 
@@ -298,7 +298,7 @@ struct jbobject {int RefCount;};
 				fs <~ "Global"
 			fs <~ " functions\n\n"
 		
-		if (f Isnt Wrapper)
+		if (f Isnt cpp)
 			.WriteAPIFuncHeader( f, fs )
 		fs <~ ';'
 		if (f.description)

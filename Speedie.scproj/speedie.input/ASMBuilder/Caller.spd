@@ -134,7 +134,7 @@ function SCFunction.HasCVersion (|bool|)
 	if .IsLibrary
 		return true
 
-	return self is wrapper
+	return self is cpp
 
 
 

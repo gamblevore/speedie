@@ -505,7 +505,7 @@ function scfunction.BeforeTransform
 
 function SCFunction.AddConstructorReturn2 
 	|| c = .cls
-	require  c  and  self Isnt Wrapper  and  self is Constructor
+	require  c  and  self Isnt cpp  and  self is Constructor
 	|| args = .source![@arg, 2]
 	require args
 	using .source!
@@ -835,7 +835,7 @@ function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
 	if !IsConstructor
 		require .FirstDestructor
 	
-	if (f Isnt Wrapper)
+	if (f Isnt cpp)
 		error (.Source, "Wrapper classes must have a constructor that is a wrapper function.")
 
 

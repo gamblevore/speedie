@@ -752,7 +752,7 @@ function DoRefAnalysis
 
 
 function SCFunction.IsARealSpdFunc (|bool|)
-	if (self Is Wrapper) or .IsMacro
+	if (self Is cpp) or .IsMacro
 		return false
 	scfunction.currfunc = self
 	return true

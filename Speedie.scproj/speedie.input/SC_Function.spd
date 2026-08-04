@@ -43,7 +43,7 @@ datatype FunctionType (uint64)
 		HidesProperties
 		StoresSelf
 
-		Wrapper // isn't this the same as cpp?
+//		Wrapper // isn't this the same as cpp?
 		Cpp
 		UsedByASM
 		
@@ -323,8 +323,8 @@ function Transform ()
 	|| arg = .SourceArg							#require
 	|| Space = arg.SCArg( self )				#require
 	
-	space.ProcessLinkage( arg, FuncLinkageTable, self is wrapper )
-	if self Isnt Wrapper
+	space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
+	if self Isnt cpp
 		|| r_z = Tran_Result( self )
 		Tran_All( self, arg, space )
 		if r_z
@@ -1033,7 +1033,7 @@ function ParamlessConstructor (|SCFunction|)
 
 function TranStrings
 	|| S = .SourceArg
-		if self Isnt Wrapper
+		if self Isnt cpp
 			SCFunction.Tran_Strings( S.parent!, self )
 
 
@@ -1068,7 +1068,7 @@ function scfunction.IsOKConstructorCall (|scclass| c, |bool|)
 		return true
 	if fc == c.realsuper
 		return true
-	if self is wrapper
+	if self is cpp
 		return true				// OK?
 
 

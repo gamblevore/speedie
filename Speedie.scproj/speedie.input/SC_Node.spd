@@ -300,7 +300,7 @@ function SubProjName (|string|)
 
 function SCFunction.UseExportWrapper (|string| CppWrapper, |bool|)
 	if CppWrapper
-		is Wrapper
+		is cpp
 		.SetExportName( CppWrapper, true )
 		return true
 
@@ -433,7 +433,6 @@ function SCBetterNode.LoadExportName
 		(self is cpp) = cw
 		|| CppWrapper = cw.WrapperCpp
 		if cw!=nil
-			is wrapper
 			.MakeParamsReal
 		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and (self isnt disabled)
 
