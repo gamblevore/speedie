@@ -74,13 +74,17 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	rz <~ Default
 
 
+function scfunction.IsDylib (|scclass| cls, |bool|)
+	return (cls is Dylib) and (self is cpp)
+
+
 function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	opt norefcounts
 	scmodule.curr = .parent|scmodule|
 	|| cls = .Cls
 	if !cls
 		cls = .parent|SCModule|!.Cls
-	  elseif !prms.HasSelfAsFirst
+	  elseif !prms.HasSelfAsFirst and !.isdylib(cls)
 		expect (AddToSpace) (prms)
 		.AddSelfToFunc(cls, AddToSpace)
 

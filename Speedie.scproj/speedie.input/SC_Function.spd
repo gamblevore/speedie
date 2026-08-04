@@ -1808,7 +1808,7 @@ function NewCppWrapper (CollectFunc)
 				
 
 function NewHider (CollectFunc)
-	expect (name_space isa SCClass) (errplace, "Must go in a class") // move this tow here sets .hidesproperties
+	expect (name_space isa SCClass) (errplace, "Must go in a class") // move this to where sets .hidesproperties
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
