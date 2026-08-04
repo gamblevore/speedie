@@ -50,7 +50,7 @@ linkage
 |string?|					CppClass
 |SCDecl?|					ClassType
 |SCDecl|					SelfDecl
-|Message?|					IsModel
+//|Message?|					IsModel
 |SCBehaviour?|				Behaviour
 |SCClass?|					ProcessAs
 |SCClass?|					DowngradeTo
@@ -126,8 +126,8 @@ render
 		fs <~ " prototype"
 	  elseif (.isdatatypeonly)
 		fs <~ " datatype"
-	if .ismodel
-		fs <~ " model"
+//	if .ismodel
+//		fs <~ " model"
 
 
 
@@ -183,8 +183,8 @@ function CollectProperties
 			.AlignProperties
 			check (!.IsRole) (it.source, "Roles can't have properties!")
 
-	if .IsModel
-		.ModelDecls
+//	if .IsModel
+//		.ModelDecls
 
 
 function GetDepth (|int|)
@@ -536,8 +536,8 @@ function SCFunction.AddConstructorReturn (|message| prms)
 		
 
 
-function CreateConstructors 
-	if .IsObject or (.isstruct and !.Behaviourness and !.ismodel)
+function CreateConstructors
+	if .IsObject or (.isstruct and !.Behaviourness)
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
 			|| s = .super!					// roles always have supers
@@ -545,7 +545,7 @@ function CreateConstructors
 			con ?= s.ConstructorFunc
 			.DestructorFunc = s.DestructorFunc
 			require con
-		
+
 		using .Source!
 		if !con and !.IsWrapper				// some wrapper classes cant be newed.
 			con = .CreateEmptyConstructors
@@ -751,6 +751,7 @@ function IsObject (|bool|)
 
 
 function CreateEmptyFunc (|String| fname, |string| cpp_name, |SCFunction|)
+	opt norefcounts
 	|| s = .source!
 	SCNode.CurrVisibility = .IsVisible
 	|| e = "function $fname { cpp_part $cpp_name }"
@@ -931,7 +932,7 @@ function AfterAfterFuncs
 			if self is DefaultsToReal
 				check (d.StatedReal) (def, "Object default must be real (non-nil)")
 	
-	.DeclModel
+//	.DeclModel
 
 
 function StructName (|String|)
@@ -1074,33 +1075,6 @@ module
 			it.classcollect
 			return it.modul
 	
-
-	function NewDylib (CollectFunc)
-		opt norefcounts
-		node.name = "struct"
-		|| libname = node[@thg]$
-		|| arg = node.Last(@arg)$
-		require arg.Find(@tmp, "dynamic", true)
-		using node
-		|| bra = @bra.msg
-		libname.next = bra
-		bra.Msg(@thg, "DynamicLibrary")
-		|| paths = bra.next
-		libname.obj = paths
-		|| struct = NewStruct(node, name_space, errplace)
-		if struct isa SCModule
-			if paths.IsString
-				Struct.DylibPaths = paths.name
-			  else
-				error paths
-		libname.obj = nil
-		return struct
-		
-//	dylib libName `
-//path1
-//path2
-//path3`  // --> struct libName (DynamicLibrary)
-
 
 	function SCClass.DataTypePostLoad
 		opt norefcounts

@@ -925,7 +925,7 @@ Message is also:
 
 	function GiveArg (|message|)
 		Opt NoRefCounts
-		|| r = .last 
+		|| r = .last
 		if r == @arg
 			return r
 		return .msg(@arg)
@@ -942,7 +942,7 @@ Message is also:
 				return .ReportFailiure(need, nil, found)
 	
 	
-	inline NeedFirst (|message|)
+	inline NeedFirst (|message|) // needa needa needa needa
 		return self[@nil]
 
 
@@ -1252,6 +1252,15 @@ Message is also:
 
 
 ////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\
+// pretty cool pattern I wrote. very beautiful.
+// you know what? it reminds me of herringbone gears. This is a super-advanced gear-system
+// that produces cooler-running, quieter and more powerful gears for machinery.
+// less vibrations and noise. And vibrations tend to destroy machinery overtime with
+// loosening bolts and stuff like that. I guess appreciating beauty has a kind of
+// deeper meaning in itself before you realise what it really is.
+// or perhaps it just looks nice. But look into herringbone gears. Interesting stuff.
+////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\
+
 
 
 function FastString.SyntaxAppend (|Message| msg)

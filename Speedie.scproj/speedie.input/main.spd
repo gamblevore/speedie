@@ -59,7 +59,6 @@ function compiler.SetupEnv
 	
 	app.Parent									// sigh. do this before clearenvs
 	.ClearEnvs
-	options.dev = app.prefs["dev"].int
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
 

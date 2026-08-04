@@ -24,6 +24,7 @@ struct DynamicLibrary
 		cpp_wrapper JB_dylib_Load
 		
 	function DyLibOpen (|string?| F, |int| Mode = dynamiclibrary.Default, |bool|)
+		description "Opens a dylib. Will also close the existing library (if any)."
 		cpp_wrapper JB_dylib_Open
 	
 	function DyLibClose

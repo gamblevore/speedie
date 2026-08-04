@@ -18,8 +18,9 @@ role Macro (Message)
 	inline Run (|[message]| prms=nil, |message|)
 		opt norefcounts
 		opt inline						// more breathing room.
-		rz = message()
-		rz.BecomeMacro(self, prms[0], prms)
+		|| msg = message()
+		msg.BecomeMacro(self, prms[0], prms)
+		return msg
 	
 	function Run (|message| prm1=nil, |message| prm2=nil, |message|)
 		cpp_part CallFast

@@ -691,12 +691,12 @@ function SCFunction.SourceArg (|message|)
 	if arg == @arg
 		return arg
 
-function SCFunction.SourceArg (assigns:|message|)
-	opt norefcounts
-	|| arg = .Source.last
-	if arg != value
-		if arg == @arg
-			arg.ReplaceWith(value)
+//function SCFunction.SourceArg (assigns:|message|)
+//	opt norefcounts
+//	|| arg = .Source.last
+//	if arg != value
+//		if arg == @arg
+//			arg.ReplaceWith(value)
 
 
 function SCFunction.ParamUniquer (|string| s, |string|)
@@ -989,12 +989,12 @@ function DontRemove (CollectFunc)
 
  
 dispatch RootCollectTable (CollectFunc)
-	+'love'					SCGame3D.Love
+//	+'love'					SCGame3D.Love
 	+'function'				SCFunction.NewFunc
 	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
 	+'api'					SCFunction.NewFunc
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
-	+'cpp_wrapper'			SCFunction.NewCppWrapper
+//	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_func'				SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
@@ -1012,7 +1012,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'task'					sctasks.NewTask
 	+'role'					SCClass.neuRole
 	+'export_api'			SC_API.NewExportAPI
-	+'model'				SCGame3D.NeuModel
+//	+'model'				SCGame3D.NeuModel
 	+'prototype'			SCFunction.NewProtoType
 	+'render'				SCFunction.NewRender
 	+'import'				(scimport.DoImport)
@@ -1051,7 +1051,7 @@ dispatch ClsCollectTable (CollectFunc)
 	+'virtual'				SCBehaviour.NewVirtual
 	+'iterator'				SCIterator.NeuIter
 	+'syx'					SCFunction.NeuSyx				// jeebox specific
-	+'cpp_wrapper'			SCFunction.NewCppWrapper
+//	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_func'				SCFunction.NewCppWrapper
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
 	+'prototype'			SCFunction.NewProtoType

@@ -447,7 +447,7 @@ class Image (memory)
 				sigh.Overlay(C)
 				i++
 		  elseif Rect == .rect
-			memory.fillint(.ptr|&int|, .length, Color)
+			memory.fill(.ptr|&int|, .length, Color)
 		  else
 			for sigh in range
 				sigh[0] = Color

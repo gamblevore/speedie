@@ -8,11 +8,10 @@ module Options
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""
-	|| 		Arch					= ""		// TargetArchitecture
+	||		Arch					= ""		// TargetArchitecture
 	||		SingleCppOutput			= true
-	|| 		NilTestAllocNeverFails	= true
-	|| 		Beep					= false
-	||		Dev						= 0
+	||		NilTestAllocNeverFails	= true
+	||		Beep					= false
 
 	|bool|	InlineLib				= true
 	|byte|	Mode					= Cpp

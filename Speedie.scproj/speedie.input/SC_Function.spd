@@ -1793,8 +1793,8 @@ function NewCppWrapper (CollectFunc)
 	|| thg = @thg + name.name
 	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
-	if !IsNothing and !islib and node == "cpp_wrapper"
-		problem (node, "Deprecated")
+//	if !IsNothing and !islib and node == "cpp_wrapper"
+//		problem (node, "Deprecated") // already gone!
 	node.name = "function"
 	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ thg
 

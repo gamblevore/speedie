@@ -28,6 +28,7 @@ module Macros {
 })`.macro
 
 
+
 || MultiDecr = `JB_DecrMulti(_0, _1)`.macro
 || MultiEarlyDecr = `JB_EarlyDecrMulti(_0, _1)`.macro
 

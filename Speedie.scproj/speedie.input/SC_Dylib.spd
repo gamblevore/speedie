@@ -1,5 +1,66 @@
 
 
+extend_module Macros
+	|| DylibConstructor = `
+function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.default,  |&_0|) {
+	|| Orig = self
+	if !self
+		self = Memory.zalloc(–sizeof _0)|&_0|
+	if paths == nil
+		paths = "_1"
+	if self and .DyLibInit(paths, mode, "_2")
+		return self
+	if orig != self
+		Memory.free(self)
+}`.macro
+
+
+
+
+function message.DylibFuncs (|message|)
+	opt norefcounts
+	|| fs = FastString.shared
+
+	for ch in self
+		if ch istmp "cpp_func"
+			if fs.Length
+				fs <~ '\n'
+			fs <~ ch.firstname
+	
+	return @str + fs.GetResult
+
+
+function @scclass.NewDylib (CollectFunc)
+	opt norefcounts
+	node.name = "struct"
+	|| libname = node[@thg]$
+	|| arg = node.Last(@arg)$
+	require arg.Find(@tmp, "cpp_func", true)
+	using node
+	|| bra = @bra.msg
+	libname.next = bra
+	bra.Msg(@thg, "DynamicLibrary")
+	|| paths = bra.next
+
+	// For some reason... @thg is used directly, but strings are copied?
+	// well... that is awkward. we should use standard behaviour all over!
+	// i understand somethings shouldn't be put in directly. Like @dot stuff I guess?
+	// but even then... man IDK.
+	
+
+	|| tmp = macro.TmpPrms
+	tmp <~ @thg + libname.name
+	tmp <~ paths
+	tmp <~ arg.Dylibfuncs
+	arg.AppendMacro(macros.DylibConstructor, tmp)
+	tmp.Length = 0
+	|| struct = NewStruct(node, name_space, errplace)
+	if paths in node // oof
+		paths.remove // macro behaviour needs cleanup. (^^^ above note)
+/	return struct
+
+
+
 
 ignore
 	dylib libName `
@@ -8,15 +69,13 @@ path2
 path3`  // --> struct libName (DynamicLibrary) // might have 1000 funcs.
 		// Also structs can be "properly global" which is nice!
 		
-		
-		// user made
-		dynamic ABC (|int| A=0, |&byte| B=nil, |&nil|)
+		cpp_func ABC (|int| A=0, |&byte| B=nil, |&nil|)
 			// no code allowed in here
 			// Oh... also the funcs can't be function-pointers... unless specified.
 			// so it needs special handling by speedie.
 		
 
-		module // auto generated for spdlibs. like there is spdprocess vs unixprocess
+		module // auto generate for spdlibs. like there is spdprocess vs unixprocess
 			function Recompile (|&Name|)
 			function Compile (|string| Code, |&Name|)
 				
@@ -28,30 +87,6 @@ path3`  // --> struct libName (DynamicLibrary) // might have 1000 funcs.
 		SomeLib.ABC
 		somelib = somelib.compile(`blablabla`)
 		SomeLib.ABC
-
-
-struct MyDylib (DynamicLibrary) // example
-	|&nil| MySpecialFunc
-	|&nil| MySpecialFunc2
-
-	module
-		function New (|string--?| paths=nil, |int| Mode=DynamicLibrary.default,  |&MyDylib|)
-			|| lib = Memory.zalloc(16)|&MyDylib|
-				if lib.InitDylib(paths, mode)
-					return lib
-				Memory.free(lib)
-
-
-	function InitDylib (|string--?| Paths, |int| Mode,  |bool|)
-		if !paths
-			paths = `path1
-path2
-path3
-/usr/lib/libName.dylib
-/usr/local/lib/libName.dylib`
-		return .DyLibInit(paths, mode, `MySpecialFunc
-MySpecialFunc2`)
-				
 						
 						
 // Could this make speedie code... embeddable, by speedie? Like... for game-scripts?
@@ -71,5 +106,12 @@ MySpecialFunc2`)
 // if globx is nil, the entire app should not reach main.
  
 // Anyhow, I think this is a good design.
+
+
+target debug2 {
+dylib libcurl `/usr/local/lib`
+	cpp_func curl_global_init (|int| Flags=3, |int|)
+	
+}
 
 

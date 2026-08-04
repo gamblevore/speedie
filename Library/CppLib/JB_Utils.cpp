@@ -28,8 +28,8 @@ int JB_PointerSize() {
 
 
 int OutOfMemoryHappenedAlready;
-static uint  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELVES
-static uint  TotalStringBytes;
+static uint64  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELVES
+static uint64  TotalStringBytes;
 
 
 JB_String* JB_Str__Freeable(uint8* p, int n) {
@@ -46,21 +46,20 @@ void JB_TooLargeAlloc(int64 N, const char* S) {
 }
 
 
-static uint8* AllocateSub (int N, const void* Arr, uint* Where) {
+static uint8* AllocateSub (int N, const void* Arr, uint64* Where) {
 	if (Arr) {
 		int64 Old = JB_msize(Arr);
 		uint8* Result = (uint8*)realloc((void*)Arr, N);
 		if (Result) {
 			int64 Gain = JB_msize(Result) - Old;
-//			if (Gain > 0) {						// unsure if I need this
-//				memzero(Result+Old, Gain);		// my code was all written assuming
-//			}									// that its garbage
+			if (Gain > 0)
+				memzero(Result+Old, Gain);
 			*Where += Gain;
 			return Result;
 		}
 	} else {
-		uint8* Result = (uint8*)calloc(1, N);	// And yet its not so consistant with this?
-		if (Result) {							// sigh. Leave the code as-is...
+		uint8* Result = (uint8*)calloc(1, N);
+		if (Result) {
 			*Where += JB_msize(Result);
 			return Result;
 		}
@@ -70,9 +69,11 @@ static uint8* AllocateSub (int N, const void* Arr, uint* Where) {
     return 0;
 }
 
+
 uint8* JB_Realloc (const void* Arr, int N) {
 	return AllocateSub(N, Arr, &TotalOtherBytes);
 }
+
 
 uint8* JB_AllocateString (const void* Arr, int N) {
 	return AllocateSub(N, Arr, &TotalStringBytes);

@@ -36,7 +36,7 @@ function FillTypePrm (|string| fname, |int| pname)
 	.dt_prm <~ .Ooof.run(prop, pname.msg)
 
 
-function FinishAcc 
+function FinishAcc
 	opt NoRefCounts
 	
 	|| s = .dt_prm
