@@ -32,8 +32,8 @@ class SCIterator (SCObject)
 		.source = src
 		
 		
-		.WhileLoop  = .source.find( @tmp, "while" )				#check (msg, "missing while")
-		|| WhileArg = .WhileLoop.find(@Arg)						#check (.WhileLoop, "missing argument for 'while'")
+		.WhileLoop  = .source.find( @tmp, "while", true )
+		|| WhileArg = .WhileLoop.find(@Arg, true)
 
 		.LoopEndCond = WhileArg.Next.first
 		
@@ -44,7 +44,7 @@ class SCIterator (SCObject)
 		
 		|message| w
 		if whilearg
-			w = WhileArg.FindNested( @Tmp, "yield" )			#check (WhileArg, "Missing yield statement.")		
+			w = WhileArg.FindNested( @Tmp, "yield", true )
 		.yield = w
 		|| v = .yield.first										#check (.yield, "Missing value")
 		if v

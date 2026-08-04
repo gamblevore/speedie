@@ -804,42 +804,36 @@ Message is also:
 			return f.name
 
 
-	function Ancestor (|Syntax| f, |Message|)
+	function Ancestor (|Syntax| syx, |Message|)
 		Opt NoRefCounts
 		for ch.Up in .parent
-			if ch == f
+			if ch == syx
 				return ch
 
 
-	function Find (|Syntax| s, |Message|)
-		cpp_part FindSyx
-		nil self // remove once we improve the nil-checker to "link" variables
-		Opt NoRefCounts
-		for ch.fast in self
-			if ch == s
-				return ch
-		
+	inline Find (|Syntax| syx, |Message|)
+		return .find(syx, nil, false)		
 	
-// merge these two! find and find flat... seem to do the same except the err-param
-	function Find (|Syntax| s=@nil, |string| name, |bool| Err = false, |Message|)
+	function Find (|Syntax| syx=@nil, |string?| name=nil, |bool| Err = false, |Message|)
 		cpp_part FindSyxName
 		opt norefcounts
 		for ch.fast in self
-			if ((!s or ch == s)  and  ch ~= name)
-				return ch
+			if (!syx or ch == syx)
+				if (name == nil) or (ch ~= name)
+					return ch
 
 		if Err
-			return .ReportFailiure(s, name, nil)
+			return .ReportFailiure(syx, name, nil)
 	
 
-	function FindNested (|Syntax| fn, |string?| name = nil, |bool| Err = false, |Message|)
+	function FindNested (|Syntax| syx, |string?| name = nil, |bool| Err = false, |Message|)
 		Opt NoRefCounts
 		nil self
 		for curr.flat in self
-			if curr == fn or fn == nil
+			if curr == syx or syx == nil
 				if name == nil  or  curr ~= name: Return curr
 		if err
-			return .ReportFailiure(fn, name, nil)
+			return .ReportFailiure(syx, name, nil)
 	
 	
 	function FastString.MsgErrorName (|string?| name)

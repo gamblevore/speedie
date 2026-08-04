@@ -14,6 +14,7 @@ linkage
 |Message?|					InitVarsArg // remove this and use .globals?
 |Message?|					InitCodeArg
 |[scdecl]?|					Globals
+|string|					DylibPaths
 |string|					CppPart
 |CppRefs|					DefaultRefs
 |message?|					InitAfter
@@ -186,7 +187,7 @@ module
 		  else
 			m.source = .source
 	
-	
+
 	function NeuModule (CollectFunc)
 		|| m = SCModule.new
 		m.Project = scimport.curr

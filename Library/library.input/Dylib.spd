@@ -28,6 +28,22 @@ struct DynamicLibrary
 	
 	function DyLibClose
 		cpp_wrapper JB_dylib_Close
+	
+	function DyLibInit (|string--| Paths, |int| Mode, |string| Funcs, |bool|)
+		for p.lines in paths
+			if p or !paths
+				rz = .DyLibOpen(p, mode)
+				if rz
+					|| Curr = &._handle + 1
+					for fname.lines in Funcs
+						|| Fn = .SyntaxAccess(fname)
+						if !fn
+							rz = false
+							.DyLibClose
+							exit
+						Curr++[] = Fn
+					exit
+		
 		
 	
 

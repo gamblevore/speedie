@@ -2,13 +2,15 @@
 
 
 ignore
-	dylib Name // --> struct libName (DynamicLibrary), |&libname| Name
-		// might have 1000 funcs.
+	dylib libName `
+path1
+path2
+path3`  // --> struct libName (DynamicLibrary) // might have 1000 funcs.
 		// Also structs can be "properly global" which is nice!
-		at ("path1",  "path2",  "path3")
+		
 		
 		// user made
-		function ABC (|int| A=0, |&byte| B=nil, |&nil|)
+		dynamic ABC (|int| A=0, |&byte| B=nil, |&nil|)
 			// no code allowed in here
 			// Oh... also the funcs can't be function-pointers... unless specified.
 			// so it needs special handling by speedie.
@@ -33,35 +35,33 @@ struct MyDylib (DynamicLibrary) // example
 	|&nil| MySpecialFunc2
 
 	module
-		function New (|string| paths=`path1
+		function New (|string--?| paths=nil, |int| Mode=DynamicLibrary.default,  |&MyDylib|)
+			|| lib = Memory.zalloc(16)|&MyDylib|
+				if lib.InitDylib(paths, mode)
+					return lib
+				Memory.free(lib)
+
+
+	function InitDylib (|string--?| Paths, |int| Mode,  |bool|)
+		if !paths
+			paths = `path1
 path2
 path3
 /usr/lib/libName.dylib
-/usr/local/lib/libName.dylib`, |int| Mode=DynamicLibrary.default,  |&MyDylib|)
-			|| lib = Memory.zalloc(16)|&MyDylib|
-				if lib._loadsub(paths, mode)
-					return lib
-				lib.DyLibClose
-				Memory.free(lib)
-
-// going kinda crazy with the paths here... not the best idea.
-
-	function _LoadSub (|string| paths, |int| mode,  |bool|)
-		for p.lines in paths
-			rz = .DyLibOpen(p, mode)
-			loop !rz
-		
-		require rz
-		|| fn = .SyntaxAccess("MySpecialFunc")		#require
-		.myspecialfunc = fn
-					
-		fn = .SyntaxAccess("MySpecialFunc2")		#require
-		.myspecialfunc2 = fn
+/usr/local/lib/libName.dylib`
+		return .DyLibInit(paths, mode, `MySpecialFunc
+MySpecialFunc2`)
+				
 						
 						
-// Could this make speedie code... embeddable, by speedie? Like... for game-state? Well... how does
-// it deal with object allocation? Each lib has it's own objects and libs. So it would need its per-frame step.
- 
+// Could this make speedie code... embeddable, by speedie? Like... for game-scripts?
+// the idea is that speedie is meant to be good at everything. Game-engines, scripting, etc.
+// but sometimes games need scripts, even games made in speedie. So could... speedie be scripting speedie?
+// I know it sounds silly, but sometimes, at the least, you might want to hot-load code.
+// Or restart crashed systems. Easier if you are using a dylib.
+
+// SO how to deal with object allocation? Each lib has it's own objects and libs. Would need its per-frame step.
+
 // Well what about loading normal lib code? Like loading libcurl or sql. I guess you just load it.
 // What about if some functions can't load? well... the lib does not get loaded. OR we have to load them individually.
 // i think both are good tactics. Depends on what you want to do.

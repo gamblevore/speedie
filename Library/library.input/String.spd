@@ -637,6 +637,20 @@ class String
 			Prev = Curr_ + 1
 		} (Curr_)
 
+
+	iterator FakeLines
+		|| Prev = 0
+		|VirtualJBString| Value
+		Value.RefCount = -1
+		while (self) {
+			|| Curr_ = .find( CharSet.Line, Prev )
+			|| Start_ = .addr + prev
+			Value.Addr = Start_
+			Value.Length = Start_ - curr_
+			yield  &Value
+			Prev = Curr_ + 1
+		} (Curr_)
+
 	
 	iterator CodePoints
 		|| Start	= .Addr

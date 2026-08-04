@@ -18,7 +18,7 @@ class Person
 
 
 main
-	using flowcontrol.Attempt("maybe")
+	using flowlog.Attempt("maybe")
 		app.TestSyntax
 
 
@@ -53,11 +53,11 @@ function app.TestSyntax
 	"zz is $zz"
 
 
-	FlowControl.DisabledIncr(1)
+	FlowLog.DisabledIncr(1)
 	for 4
 		|| fn = (0.5[])(mesayer, shesayer)
 		(fn)(app.args[0] ?? "hello")
-	FlowControl.DisabledIncr(-1)
+	Flowlog.DisabledIncr(-1)
 
 	bug()
 

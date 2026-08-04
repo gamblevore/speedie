@@ -176,7 +176,7 @@ JB_Class* Str_IsCSub ( JB_String* self ) { // 0 means true
 
 
 bool JB_Str_IsC ( JB_String* self ) {
-	if (self) {
+	if (self and self->RefCount >= 0) {
 		auto C = Str_IsCSub(self);
 		if (!C) return true;
 		if (C == JB_AsClass(JB_StringShared)) {

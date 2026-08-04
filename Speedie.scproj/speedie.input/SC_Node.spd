@@ -1006,6 +1006,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'conf'					compiler.WrongConf
 	+'crash'				{app.crash(node.firstname)}
 	+'module'				SCModule.NeuModule
+	+'dylib'				SCClass.NewDylib
 	+'static'				{error (node, "static is called 'module' in speedie.")}
 	+'class'				SCClass.neuClass
 	+'task'					sctasks.NewTask
