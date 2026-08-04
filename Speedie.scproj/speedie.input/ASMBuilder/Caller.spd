@@ -8,7 +8,7 @@ function IsASMConst (|message| exp, |bool|)
 	|| fn = exp.func
 	if fn == @num
 		return true
-	if fn == @thg // now what?
+	if fn == @thg
 		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 
 

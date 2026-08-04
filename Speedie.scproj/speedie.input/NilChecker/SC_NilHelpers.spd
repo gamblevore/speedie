@@ -96,13 +96,13 @@ function LastInBlock (|SCBlockage| Reason)
 }
 
 
-|message| ReturnSelfEqNil
+|message| SelfEqNilReturn
 
 function @message.NilchCompare (|message|)
-	if ReturnSelfEqNil
-		return ReturnSelfEqNil
-	ReturnSelfEqNil = "return self!=nil"~parse
-	return ReturnSelfEqNil
+	if SelfEqNilReturn
+		return SelfEqNilReturn
+	SelfEqNilReturn = "return self!=nil"~parse
+	return SelfEqNilReturn
 
 
 function message.NilCheckMode (|bool| ok, |int|)

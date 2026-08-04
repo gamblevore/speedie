@@ -101,7 +101,7 @@ function Message.IsAssignable (|bool|)
 	self = .unbra
 	|| f = .func
 	if f == @acc // hmmmmm
-		|| L = .first!.unbra // now what
+		|| L = .first!.unbra
 		|| fn = l.MsgFunc
 			|| t = fn.ReturnType
 				if t.IsNumeric // hmmm not possible. even for a temp-vector.

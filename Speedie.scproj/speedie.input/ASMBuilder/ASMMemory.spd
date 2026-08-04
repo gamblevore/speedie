@@ -31,8 +31,6 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 	// what about structs like 53 bytes long? What is their alignment?
 	
 	if index
-//		if d isnt property							// Sigh. now what? the size isnt right?
-//		if amount > 16								// previous version did "min 16". why? thats wrong?
 		dest = .AddConst(index*amount, exp, dest)
 	
 	check (Amount <= 1<<14) (exp, "Object too large memory-copy requested. Copy this manually.")

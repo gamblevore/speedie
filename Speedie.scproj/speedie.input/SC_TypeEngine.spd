@@ -600,7 +600,11 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		if (f == @arg)
 			c.NeatenDict
 			Return TypeDictionary!.TypeNormal
-
+		if (f == @ques and c == "dylib")
+			|| d = TypeVoidPtr!.CopyDecl
+			(d is Dylib)
+			return d
+		
 	rz = SCDecl(TypeVoid_!)
 	|| ErrCount = stderr.ErrorCount
 
@@ -617,7 +621,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		op.expect(@opp, "of")
 		|| contained = c[@nil, 2]										#require
 		rz.loadContained(contained, c.first!, name_Space, purpose)		#require
-		
+	
 	  elseif (ErrCount == StdErr.errorCount)
 		error ( c ) // no spam
 

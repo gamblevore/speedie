@@ -12,7 +12,7 @@
 //		return self == d
 
 
-datatype FunctionType (uint64)
+datatype FunctionType (uint)
 	flags
 		|FunctionType|
 		Constructor
@@ -42,8 +42,6 @@ datatype FunctionType (uint64)
 		Stateless
 		HidesProperties
 		StoresSelf
-
-//		Wrapper // isn't this the same as cpp?
 		Cpp
 		UsedByASM
 		
@@ -1785,19 +1783,20 @@ function Tran_Return (TranFunc)  // exitter
 
 
 function NewCppWrapper (CollectFunc)
+	opt norefcounts
 	|| name = node[@thg]$
 	|| prm = name.Next$
 	expect (prm.islast) (prm)
 	// this doesn't code-autocomplete so well in perry...
 	
 	using name
-	|| thg = @thg + name.name
+//	|| thg = @thg + name.name
 	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
 //	if !IsNothing and !islib and node == "cpp_wrapper"
 //		problem (node, "Deprecated") // already gone!
+	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ (@thg, name.name)
 	node.name = "function"
-	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ thg
 
 	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
 	if rz isa SCFunction
@@ -1806,7 +1805,7 @@ function NewCppWrapper (CollectFunc)
 			rz.IsCppInBuilt = 2
 		(rz Is ExternalLib) = islib
 		rz.MakeParamsReal
-
+				
 
 function NewHider (CollectFunc)
 	expect (name_space isa SCClass) (errplace, "Must go in a class") // move this tow here sets .hidesproperties

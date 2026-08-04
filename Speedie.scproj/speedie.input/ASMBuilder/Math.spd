@@ -799,7 +799,7 @@ extend Assembler
 			if k == 0
 				return dest.zero
 		|| f = l.fat
-		if  f  and  (f isa asm.bnot or asm.qnot)  and  (f.prms[3]==-1) // now what?
+		if  f  and  (f isa asm.bnot or asm.qnot)  and  (f.prms[3]==-1)
 			// D = ~L & R
 			if .IsWithin(f)
 				|| bnot = exp.bnot(dest, f.asmreg(1), R, 0)

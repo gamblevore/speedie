@@ -143,7 +143,7 @@ function assembler.Fries (|&ASMReg| Collection, |fatasm| fat, |message| s, |int|
 	|| name = s.name
 	if name ~= "p0"
 		error (fat, "Use r0")
-	if name ~= "r0" // now what?
+	if name ~= "r0"
 		fat.RegInput(i) = asmreg()
 		return
 	

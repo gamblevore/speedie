@@ -219,6 +219,7 @@ function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 		|| scls = incobj.class
 		if scls == scclass or scmodule
 			self = self.modul|scclass|
+
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
 	
 	if (!Old)
@@ -236,6 +237,10 @@ function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 				expect (!IncObj.hiderfunc) (errplace, "Multiple property-hiders found.")
 				incobj.hiderfunc = old
 				return .ActualAdd(name, IncObj)
+			if incobj is Dylib and self isa SCClass
+				if self is Dylib
+					IncObj.IsLookupOnly = old
+					return
 	
 	if  (name == "self")  and  scfunction.intype(scnodetype.object)
 		error ( ErrPlace, "Can't use 'self' here." )

@@ -203,19 +203,19 @@ struct Assembler
 		.AddToReg(exp, dest, src, value, src)
 
 
-	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
-		// A param/body var, that we return.
-		// .DeclareMe is also called from inlines. What does it do there, then?
-		// does it still make sense?
-		
-		// VarThatGotReturned isnt set anywhere?
-		// remove this?
-		|| st = .state
-		|| ret = st.return
-		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
-			ret.µtype = rz|DataTypeCode|
-			D.wholetype = ret
-			return ret
+//	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
+//		// A param/body var, that we return.
+//		// .DeclareMe is also called from inlines. What does it do there, then?
+//		// does it still make sense?
+//		
+//		// VarThatGotReturned isnt set anywhere?
+//		// remove this?
+//		|| st = .state
+//		|| ret = st.return
+//		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
+//			ret.µtype = rz|DataTypeCode|
+//			D.wholetype = ret
+//			return ret
 
 	
 	function DeclareBody (|Message| where,  |scdecl| Type,  |asmreg|)
@@ -236,8 +236,8 @@ struct Assembler
 
 	function DeclareVar (|Message| where,  |scdecl| Type,  |asmreg|)
 		rz = Type.CalculateASMType
-		|| ret = .IsOnlyVarThatWeReturn(type)
-			return ret
+//		|| ret = .IsOnlyVarThatWeReturn(type)
+//			return ret
 		
 		rz = .DeclareMe(where, rz)
 		Type.WholeType = rz

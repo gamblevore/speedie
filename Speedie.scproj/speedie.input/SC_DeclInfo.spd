@@ -68,7 +68,6 @@ datatype SCDeclInfo (uint)
 		
 		Return
 		AlteredCopy = [Altered,AlteredInIf,AlteredInLoop,AlteredParamObject]
-		AlteredByBranch = AlteredInIf|||AlteredInLoop
 		Reference
 		AlteredOrRef = Altered ||| Reference
 		Task
@@ -77,11 +76,11 @@ datatype SCDeclInfo (uint)
 		SetTo
 		Grabbed
 		PostIncremented
-		VarThatGotReturned // unused? but it should be?
 		ReturnedStruct
 		Library
 		ASMReached
 		IntendedAsReturn
+		Dylib
 		
 		Referable		= Param ||| Body ||| Property ||| Global
 		Temp			= body ||| CompilerCreated

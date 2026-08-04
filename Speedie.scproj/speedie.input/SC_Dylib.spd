@@ -23,8 +23,7 @@ function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.
 }
 }`.macro
 
-
-
+	
 function message.DylibFuncs (|message|)
 	opt norefcounts
 	|| fs = FastString.shared
@@ -37,7 +36,7 @@ function message.DylibFuncs (|message|)
 				fs <~ name
 				
 				|| dcl = .msg(@decl)
-				dcl <~ @list
+				dcl <~ (@ques, "dylib")
 				dcl <~ (@thg, name)
 	
 	return @str + fs.GetResult
