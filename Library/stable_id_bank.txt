@@ -1072,7 +1072,7 @@ JB_MPC_Spawn
 JB_MSR_DecodeEntitySet
 JB_MSR_EscapeCodeSet
 JB_Macro_CallFast
-JB_Macro__New
+JB_Macro_Constructor
 JB_Macro__TmpPrms
 JB_Mat4_Columns
 JB_Mat4_Constructor
@@ -1141,7 +1141,6 @@ JB_Msg_FSListArg
 JB_Msg_FSListSep
 JB_Msg_FindNested
 JB_Msg_FindNotInserted
-JB_Msg_FindSyx
 JB_Msg_FindSyxName
 JB_Msg_FindTightest
 JB_Msg_FirstName
@@ -1682,8 +1681,10 @@ JB_dbl_AsInt
 JB_dbl_Clamp
 JB_dbl_Render
 JB_dbl_RenderFloat
+JB_dylib_Close
+JB_dylib_DyLibInit
 JB_dylib_Load
-JB_dylib__New
+JB_dylib_Open
 JB_f_AsInt
 JB_f_Bounce
 JB_f_Ceil

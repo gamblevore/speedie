@@ -62,10 +62,10 @@ GUI_Img_RoundRectDrawer
 GUI_Ray__DistanceSorter
 JB_Tree__Sorter
 JB_Msg__Sorter
-JB_File__Sorter
 GUI_Img_ClippedRectDrawer
 GUI_Img_CurlieQueDrawer
 JB_ID__ByID
+JB_File__Sorter
 GUI_LV_DefaultCopy
 JB_ID__ByFreq
 GUI_FV_RightClickFileList
@@ -107,13 +107,13 @@ GUI__SDL_Cursor__Empty
 GUI__Sch_DefaultColors
 JB__Flow_Flow
 GUI__Doc_Cache_
-JB__File__Speedie
 GUI__Img_CurlieQue_
 GUI__SpaceTree_Holders
 JB__Proc__ForceParent
 JB__Proc__Parent
 GUI__VObject__Particles
 JB__Err_BackupErrorSource
+JB__File__Speedie
 JB__Macro_TmpPrms_
 GUI__Bar_RandomBank
 GUI__Text__CounterParts
