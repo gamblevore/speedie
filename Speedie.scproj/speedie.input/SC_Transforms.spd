@@ -665,6 +665,7 @@ function Tran_ForSub (TranFunc)					// :3
 
 
 function Tran_Sdt (|Message| exp)
+	opt norefcounts
 	using (exp)
 	|| f = @thg + "self"
 	f.RangeLength = 1 // simpler for autocomplete
@@ -673,6 +674,7 @@ function Tran_Sdt (|Message| exp)
 
 
 function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
+	opt norefcounts
 	|| start = arg.GetMarker( "start" )				#require
 	
 	expect (index) (arg, "No index found for the iterator for this loop." ) 
@@ -744,6 +746,7 @@ function Tran_Syx (|Message| msg, |Message|)
 
 
 function Tran_Isa (|Message| S, |SCNode!| p)
+	opt norefcounts
 	expect (!IsaTester.t.inuse) (s, "Too many nested isas")
 	isatester.t.inuse = true
 	if compiler.CollectIsaTests( s.first! )
@@ -784,7 +787,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 	|| nameMsg		= msg[@thg]$
 	|| protoMsg		= namemsg.next$
-    expect (protomsg == @bra or @prm or @list) (protomsg)
+	expect (protomsg == @bra or @prm or @list) (protomsg)
 	|| items		= protoMsg.Next(@arg)$
 	|| ProtoFirst	= protomsg.first!
 	|| name			= namemsg.name
@@ -893,6 +896,7 @@ function message.NotNilRZ (|scdecl| type,  |SCNode|space)
 
 
 function message.MiniTran (|SCNode| name_space, |string| On="app")
+	opt norefcounts
 	using (self)
 		|| f = .first
 		.msg(@prm) <~ f
@@ -957,6 +961,7 @@ function message.ObjCls (|scclass|)
 
 
 function Message.Next_Index (|sciterator| iter, |message| node2)
+	opt norefcounts
 	|| i = iter.index
 		.prev = NewEqRel( i.copy(node2), .last )
 	  else
@@ -1003,6 +1008,7 @@ function scnode.AddNumericConst (|string| name, |int64| value, |message| where, 
 
 
 function Tran_Log (TranFunc)
+	opt norefcounts
 	using (node)
 		|| f = node.first
 		node <~ (@Thg, "platform")			// this seems better... than tran_print
@@ -1083,7 +1089,7 @@ function scfunction.ProtectOneGlobal (|message| Rel)
 	|| fn = f.func
 	if d and (fn == @thg or @dot) and (d is global or property)
 		|| l = rel.last!
-		if l != @arr // assume arrays are never nil
+		if l != @arr					// assume arrays are never nil
 			if d.StatedReal and d.TypeSuffers
 				d.ProtectOneSub(Rel, f)
 	
@@ -1092,9 +1098,10 @@ function scdecl.ProtectOneSub (|message| Rel, |message| f)
 	opt norefcounts
 	|| l = rel.last!.Unwrap
 	|| fn = l.MsgFunc
-		if fn isnt Constructor
+		if fn isnt Constructor			// constructors should never fail...
 			rel.next = ProtectGlobalMacro.Run(f.copy)
+										// we really are just protecting from user-functions.
 
-|| ProtectGlobalMacro = "if _0==nil : -1|&byte|[] = 0".macro // crashes if not inited.
+|| ProtectGlobalMacro = "if _0==nil : -1|&byte|[] = 0".macro // this crash will tell us where the wrong thing is
 
 

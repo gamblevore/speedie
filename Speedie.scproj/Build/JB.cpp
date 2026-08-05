@@ -13596,13 +13596,8 @@ bool SC_Tran_Log(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		MessagePosition _usingf0 = ((MessagePosition){});
 		JB_Msg_SyntaxUsing(Node, (&_usingf0));
 		Message* F = ((Message*)JB_Ring_First(Node));
-		JB_Incr(F);
 		JB_Msg_AppendSyx(Node, kJB_SyxThg, JB_LUB[1376]);
-		Message* _tmPf1 = JB_Msg_Msg(Node, kJB_SyxPrm, nil);
-		JB_Incr(_tmPf1);
-		JB_Tree_SyntaxAppend(_tmPf1, F);
-		JB_Decr(F);
-		JB_Decr(_tmPf1);
+		JB_Tree_SyntaxAppend(JB_Msg_Msg(Node, kJB_SyxPrm, nil), F);
 		Node->Func = kJB_SyxDot;
 		JB_MsgPos_SyntaxUsingComplete((&_usingf0), Node);
 		JB_MsgPos_Destructor((&_usingf0));
@@ -40559,17 +40554,9 @@ void SC_Msg_MiniTran(Message* Self, SCNode* Name_space, JB_String* On) {
 		MessagePosition _usingf0 = ((MessagePosition){});
 		JB_Msg_SyntaxUsing(Self, (&_usingf0));
 		Message* F = ((Message*)JB_Ring_First(Self));
-		JB_Incr(F);
-		Message* _tmPf1 = JB_Msg_Msg(Self, kJB_SyxPrm, nil);
-		JB_Incr(_tmPf1);
-		JB_Tree_SyntaxAppend(_tmPf1, F);
-		JB_Decr(_tmPf1);
+		JB_Tree_SyntaxAppend(JB_Msg_Msg(Self, kJB_SyxPrm, nil), F);
 		;
-		JB_Decr(F);
-		Message* _tmPf2 = JB_Syx_OperatorPlus(kJB_SyxThg, On);
-		JB_Incr(_tmPf2);
-		(JB_Ring_FirstSet(Self, _tmPf2));
-		JB_Decr(_tmPf2);
+		(JB_Ring_FirstSet(Self, JB_Syx_OperatorPlus(kJB_SyxThg, On)));
 		Self->Func = kJB_SyxDot;
 		JB_MsgPos_SyntaxUsingComplete((&_usingf0), Self);
 		JB_MsgPos_Destructor((&_usingf0));
@@ -40932,22 +40919,11 @@ Message* JB_Msg_NextOf(Message* Self, Syntax Need, JB_String* Name) {
 
 void SC_Msg_Next_Index(Message* Self, SCIterator* Iter, Message* Node2) {
 	Message* I = Iter->Index;
-	JB_Incr(I);
 	if (I) {
-		Message* _tmPf1 = JB_Msg_Copy(I, Node2);
-		JB_Incr(_tmPf1);
-		Message* _tmPf2 = ((Message*)JB_Ring_Last(Self));
-		JB_Incr(_tmPf2);
-		Message* _tmPf0 = SC_NewEqRelWithMsgMsg(_tmPf1, _tmPf2);
-		JB_Incr(_tmPf0);
-		JB_Decr(_tmPf1);
-		JB_Decr(_tmPf2);
-		(JB_Ring_PrevSibSet(Self, _tmPf0));
-		JB_Decr(_tmPf0);
+		(JB_Ring_PrevSibSet(Self, SC_NewEqRelWithMsgMsg(JB_Msg_Copy(I, Node2), ((Message*)JB_Ring_Last(Self)))));
 	}
 	 else {
 	}
-	JB_Decr(I);
 }
 
 Message* SC_Msg_NextPath(Message* Self, Message* Before, Message* Path) {
@@ -58679,58 +58655,28 @@ bool SC_Func__Tran_For(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 
 void SC_Func__Tran_ForStart(Message* Arg, Message* Index, SCNode* P) {
 	Message* Start = SC_Msg_GetMarker(Arg, JB_LUB[1459]);
-	JB_Incr(Start);
 	if (!Start) {
-		JB_EarlyDecr(Start);
 		return;
 	}
 	if ((!Index)) {
 		JB_Msg_Fail(Arg, JB_LUB[1460]);
-		JB_EarlyDecr(Start);
 		return;
 	}
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Arg, (&_usingf0));
 	JB_String* CondName = SC_UniqueTmpVar(P, JB_LUB[1461]);
-	JB_Incr(CondName);
-	Message* _tmPf1 = ((Message*)JB_Ring_Parent(Arg));
-	JB_Incr(_tmPf1);
-	Message* _tmPf3 = JB_Msg_Copy(Index, Arg);
-	JB_Incr(_tmPf3);
-	Message* _tmPf2 = SC_MakeDecl(JB_LUB[0], CondName, _tmPf3, kSC__SCDeclInfo_Temp);
-	JB_Incr(_tmPf2);
-	JB_Decr(_tmPf3);
-	(JB_Ring_PrevSibSet(_tmPf1, _tmPf2));
-	JB_Decr(_tmPf1);
-	JB_Decr(_tmPf2);
+	(JB_Ring_PrevSibSet(((Message*)JB_Ring_Parent(Arg)), SC_MakeDecl(JB_LUB[0], CondName, JB_Msg_Copy(Index, Arg), kSC__SCDeclInfo_Temp)));
 	Message* IfTest = JB_Syx_OperatorPlus(kJB_SyxTmp, JB_LUB[410]);
-	JB_Incr(IfTest);
 	Message* Bra = JB_Msg_Msg(IfTest, kJB_SyxBra, nil);
-	JB_Incr(Bra);
 	JB_Msg_AppendSyx(IfTest, kJB_SyxArg, JB_LUB[0]);
 	Message* Rel = JB_Msg_Msg(Bra, kJB_SyxRel, nil);
-	JB_Incr(Rel);
-	JB_Decr(Bra);
 	JB_Msg_AppendSyx(Rel, kJB_SyxThg, CondName);
-	JB_Decr(CondName);
 	JB_Msg_AppendSyx(Rel, kJB_SyxOpp, JB_LUB[1462]);
-	Message* _tmPf4 = JB_Msg_Copy(Index, Arg);
-	JB_Incr(_tmPf4);
-	JB_Tree_SyntaxAppend(Rel, _tmPf4);
-	JB_Decr(Rel);
-	JB_Decr(_tmPf4);
+	JB_Tree_SyntaxAppend(Rel, JB_Msg_Copy(Index, Arg));
 	(JB_Ring_FirstSet(Arg, IfTest));
-	Message* _tmPf5 = ((Message*)JB_Ring_NextSib(IfTest));
-	JB_Incr(_tmPf5);
-	Message* _tmPf6 = ((Message*)JB_Ring_Last(IfTest));
-	JB_Incr(_tmPf6);
-	JB_Decr(IfTest);
-	SC_Msg_Move(_tmPf5, Start, _tmPf6);
-	JB_Decr(_tmPf5);
-	JB_Decr(_tmPf6);
+	SC_Msg_Move(((Message*)JB_Ring_NextSib(IfTest)), Start, ((Message*)JB_Ring_Last(IfTest)));
 	SC_Msg_MakeComment(Start);
-	JB_Decr(Start);
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Arg);
 	JB_MsgPos_Destructor((&_usingf0));
 }
@@ -59360,25 +59306,17 @@ void SC_Func__Tran_Isa(Message* S, SCNode* P) {
 		return;
 	}
 	SC__IsaTester_T.InUse = true;
-	Message* _tmPf1 = ((Message*)JB_Ring_First(S));
-	JB_Incr(_tmPf1);
-	if (SC_Comp__CollectIsaTests(_tmPf1)) {
+	if (SC_Comp__CollectIsaTests(((Message*)JB_Ring_First(S)))) {
 		int N = SC__IsaTester_T.Count;
 		{
 			int I = 0;
 			while (I < N) {
 				Message* Isa_ = SC__IsaTester_T.Items[I];
-				JB_Incr(Isa_);
-				Message* _tmPf2 = JB_Msg_Find(S, kJB_SyxArg);
-				JB_Incr(_tmPf2);
-				SC_Func__Tran_OneIsa(Isa_, _tmPf2, P);
-				JB_Decr(Isa_);
-				JB_Decr(_tmPf2);
+				SC_Func__Tran_OneIsa(Isa_, JB_Msg_Find(S, kJB_SyxArg), P);
 				(++I);
 			};
 		};
 	}
-	JB_Decr(_tmPf1);
 	SC__IsaTester_T.InUse = false;
 	SC__IsaTester_T.Count = 0;
 }
@@ -59696,10 +59634,8 @@ void SC_Func__Tran_Sdt(Message* Exp) {
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Exp, (&_usingf0));
 	Message* F = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[419]);
-	JB_Incr(F);
 	F->RangeLength = 1;
 	(JB_Ring_FirstSet(Exp, F));
-	JB_Decr(F);
 	Exp->Func = kJB_SyxDot;
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Exp);
 	JB_MsgPos_Destructor((&_usingf0));
