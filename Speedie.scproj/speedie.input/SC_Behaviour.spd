@@ -110,7 +110,7 @@ class SCBehaviour (SCNode)
 		if (ret == @decl) and !ret.declname
 			|| Tmp = macro.TmpPrms
 			tmp <~ ret.first!.copy
-			prms.BecomeMacro(CakeVirtualReturn, prms, tmp)
+			prms.BecomeMacro(CakeVirtualReturn, prms, tmp) // just use .run?
 			tmp.clear
 		  else
 			prms.func = @sheb

@@ -3,8 +3,15 @@
 role Macro (Message)
 	// Its a role. One less class to bloat Speedie.
 	constructor (|message| s)
-		disabled "Use Macro.build"
+		disabled "Use string.macro instead"
 		super.constructor
+		
+	constructor (|message| s, |bool| UseSelf)
+		opt norefcounts
+		super.constructor
+		.Indent = UseSelf|byte|
+		self <~ s
+	
 	
 	inline Cleaned (|bool|)
 		return self is MacroMade
@@ -22,11 +29,12 @@ role Macro (Message)
 		msg.BecomeMacro(self, prms[0], prms)
 		return msg
 	
-	function Run (|message| prm1=nil, |message| prm2=nil, |message|)
+	function Run (|message| prm1, |message| prm2=nil, |message| prm3=nil, |message|)
 		cpp_part CallFast
 		rz = message()
 		TmpPrms_ <~ prm1
 		TmpPrms_ <~ prm2
+		TmpPrms_ <~ prm3
 		rz.BecomeMacro(self, prm1, TmpPrms_)
 		TmpPrms_.clear
 	
@@ -39,12 +47,6 @@ role Macro (Message)
 			if r.Length
 				r.clear
 			return r
-
-		function New (|message| s, |bool| UseSelf, |Macro!|)
-			opt norefcounts
-			rz = Message()
-			rz.Indent = UseSelf|byte|
-			rz <~ s
 		
 
 

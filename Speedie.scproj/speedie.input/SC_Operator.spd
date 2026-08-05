@@ -296,7 +296,7 @@ function Message.AOrBExpand (|bool|)
 		|| prms = macro.TmpPrms
 		prms <~ .prev
 		prms <~ .next
-		rel.BecomeMacro(macros.DoubleQQ, nil, prms)
+		rel.BecomeMacro(macros.DoubleQQ, nil, prms) // just use .run?
 		prms.clear
 
 	return true

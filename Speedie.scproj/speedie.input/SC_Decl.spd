@@ -12,7 +12,7 @@ class SCDecl (SCObject) {
 
 	|int|				C_Array
 	
-	|SCFunction--?|		HiderFunc
+	|SCFunction--?|		HiderFunc					// this property can hide behind this func.
 	|Object?|			IsLookupOnly
 
 	|SCDecl?|			Internal					// pointers

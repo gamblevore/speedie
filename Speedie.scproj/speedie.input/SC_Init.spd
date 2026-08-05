@@ -50,13 +50,6 @@ module SC_Init
 
 	function SCModule.MoveToInitFunc (|Message| c)
 		description "Put globally found decls+funcs, into a function that can be called at init-time. Each module will have an init-func... and it will be called if it has any code. We just store the stuff right now, but later, we create them via .CreateInitFunc"
-		
-		// (Why not create the init funcs right away? via .CreateInitFunc. I mean... its less confusing?)
-		
-		// So... we also want a simpler initarg thing. We have a nested arg. Why?
-		// just to separate things into two groups? We can use a marker for that.
-		// even the opt norefcounts could be one.
-		
 		opt norefcounts
 		
 		if (c == @sheb or @url)
@@ -64,7 +57,7 @@ module SC_Init
 			return
 		expect c.AllowedMoveToInit (c)
 
-		|message| dest 
+		|message| dest
 		if .AvoidMain(c)
 			if c != @decl
 				dest = compiler.AppInitCode
@@ -76,7 +69,7 @@ module SC_Init
 			dest = dest.first
 		  else
 			dest = .InitCodeArg init .BuildInitArg
-		dest <~ c
+		dest <~ c			
 
 
 function Message.AllowedMoveToInit (|bool|)

@@ -49,7 +49,7 @@ function compiler.Adj (|message| f, |{macro}|)
 function TypeOfAdj (ExprResolver)
 	|[message]| args 
 	|| found = compiler.findadj(exp, args)
-		exp.BecomeMacro(found, Args)
+		exp.BecomeMacro(found, Args) // just use .run?
 		return TypeOfExpr(exp, name_space, side)
 
 

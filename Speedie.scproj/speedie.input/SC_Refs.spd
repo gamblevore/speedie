@@ -456,7 +456,7 @@ function Message.FuncWrap (|Message| fnc)
 
 function RefMsg0 (|String| name, |SCFunction| func, |Message|)
 	opt norefcounts
-	rz = NewFnc( name )
+	rz = NewFunc( name )
 	rz.become(func)
 
 
@@ -712,7 +712,7 @@ function SCFunction.CallSuperMem (|SCFunction| fn)
 	expect ((fnargs == 1) or .cls.istask) (root, "Unable to auto-call super-class constructor.")
 	
 	using root
-	|| PCon = NewFnc(fn.exportName)
+	|| PCon = NewFunc(fn.exportName)
 	|| lst = PCon.last!
 	lst.obj = fn
 	

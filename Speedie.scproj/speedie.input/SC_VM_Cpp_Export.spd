@@ -28,8 +28,6 @@ function WriteLibGlobLookup (|faststringcpp| fs)
 	fs <~ "#define JB_GlobOffset(g)		((unsigned short)(int64)(  &(((JB_Globals*)0)->g)  ))
 #define JB_LibFunc(ty, fn)		((ty)((IntPtr)(fn)))
 
-//#define JB_LibFunc(ty, fn)	((ty)((IntPtr)(fn)|(1ull<<(sizeof(IntPtr)*8-1))))
-
 __lib__ unsigned short JB_GlobTable[] = {  // glob list
 "
 	for g in packmaker.LibGlobs

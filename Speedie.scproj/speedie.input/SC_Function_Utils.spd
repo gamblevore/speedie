@@ -33,6 +33,7 @@ dispatch FuncPreReader (fnPreReader)
 	+'disabled'
 		opt norefcounts
 		is disabled
+		check (self isnt dylib) (msg, "Can't disable cpp-funcs")
 		.description = "Called a disabled function."
 		|| s = msg.first
 			s.Expectlast

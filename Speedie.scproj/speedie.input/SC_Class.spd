@@ -1019,6 +1019,7 @@ module
 				cls.Typeinfo = DataTypeCode._voidptr
 		cls.ASMTypeInfo = cls.TypeInfo
 		cls.IsRole = (node ~= "role")|int|
+		(cls is dylib) = (node ~= "dylib")
 
 		cls.loadlinkage
 		Compiler.ClassList <~ cls

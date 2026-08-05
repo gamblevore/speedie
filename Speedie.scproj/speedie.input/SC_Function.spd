@@ -44,6 +44,7 @@ datatype FunctionType (uint)
 		StoresSelf
 		Cpp
 		UsedByASM
+		Dylib
 		
 		
 		NoExport = LinkInline + Disabled + InitFunc
@@ -53,6 +54,8 @@ datatype FunctionType (uint)
 		
 //	syntax is (|functiontype| t, |bool|)
 //		return self&t
+	function TestParts
+		|| P = UsedByASM
 
 
 
@@ -307,41 +310,6 @@ function @scfunction.TransformAll
 		f.Transform
 
 
-function Transform ()
-	opt norefcounts
-
-	.CheckNotBadName
-	require !.isMacro
-	scfunction.CurrFunc = self
-	scmodule.curr = .parent as scmodule
-	.Badness = 0
-	.SavedError = nil
-	|| StillOK = StdErr.Mark
-
-	|| arg = .SourceArg							#require
-	|| Space = arg.SCArg( self )				#require
-	
-	space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
-	if self Isnt cpp
-		|| r_z = Tran_Result( self )
-		Tran_All( self, arg, space )
-		if r_z
-			Tran_ResultFinish( self, r_z, space, arg )
-//		  else
-//			Tran_ReturnFinish( self, arg ) // seems to break the compiler?
-		parser.Using.Flags = 0
-
-	if !StillOK
-		.SavedError = StdErr.LastError
-		.Badness |= 1
-	  elseif (self is ConOrDes) and .IsARealSpdFunc
-		.CallParents					// hehe 🥰
-		.BuildConstructorDestructor
-		Tran_All( self, arg, space )
-
-	scfunction.CurrFunc = nil
-	scmodule.curr = nil
-
 
 function message.MacroFixSub (|SCDecl?| contains)
 	opt norefcounts
@@ -354,7 +322,7 @@ function message.MacroFixSub (|SCDecl?| contains)
 function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incoming, |scdecl|)
 	|| Orig = incoming.exp
 		|| R = incoming.MacroCopyArgs
-		orig.BecomeMacro(.ismacro!, r)
+		orig.BecomeMacro(.ismacro!, r) // just use .run?
 		orig.MacroFixSub(contains) 
 		rz = TypeOfExpr(orig, name_space) 
 		rz ?= typevoid!
@@ -437,7 +405,8 @@ function int.IsNormalMatch (|bool|)
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
 	if  .IsAssigns  and  .ReturnType
 		|scdecl--| a = .args[0]
-		|scdecl--| i = typeofexpr(incoming[0], name_space)
+		|message--| inc = Incoming[0]
+		|scdecl--| i = TypeOfExpr(inc, name_space)
 		require i and a
 		
 		require  (TypeCast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
@@ -446,7 +415,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	if (.IsAssigns!=0) != Incoming.HasSide
 		require (TypeCast & kTypeCastassigns) and (!Incoming.HasSide)
 	
-	|| Pos = 0
+	|| Pos = (self is Dylib)|int|
 	|| Result = kSimpleMatch
 	
 	|| SelfCast = Incoming.IgnoreSelfContain
@@ -454,7 +423,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	if self is NumberCreator
 		TypeCast |= kTypeCastFromSmallInt
 	
-	|| fin = .args.length
+	|| fin = .Args.Length
 	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
 	fi += (fi+1 == .structreturnpos)
 	
@@ -477,7 +446,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 		|| Matched = kNoMatch
 		|| CanGetReference = (funcarg isnt reference) or (PArg_Type is Referable) or parg_ch.RefFallback
-			// passing x+1, to a reference param should not work.
+														// passing x+1, to a reference param should not work.
 			|message--| LArg_ch = (ThisAlter)(PArg_Ch, nil)
 			matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
 		
@@ -486,8 +455,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 				result |= kMultipleErrors
 				matched |= kMultipleErrors
 			if Matched > result
-				result = matched
-				// don't replace better matches with worse ones.
+				result = matched						// don't replace better matches with worse ones.
 			pos++
 			Incoming.FailedAt = 0
 			
@@ -497,7 +465,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 			Return kNoMatch
 			
-		  elseif (ThisAlter)	// we need to put something in exp
+		  elseif (ThisAlter)							// we need to put something in exp
 			|message--| prms = Incoming.exp.last!
 			|message--| def = FuncArg.Default!.Copy(prms)
 			def.DefaultPrmFix(base)
@@ -522,6 +490,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		  else
 			error (incoming.exp, "Too many params sent to " + .RenderTitle)
 			.ErrorIsHere
+
 
 
 function ErrorIsHere
@@ -1787,24 +1756,25 @@ function NewCppWrapper (CollectFunc)
 	|| name = node[@thg]$
 	|| prm = name.Next$
 	expect (prm.islast) (prm)
-	// this doesn't code-autocomplete so well in perry...
+	// This doesn't code-autocomplete so well in perry...
 	
 	using name
-//	|| thg = @thg + name.name
 	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
-//	if !IsNothing and !islib and node == "cpp_wrapper"
-//		problem (node, "Deprecated") // already gone!
 	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ (@thg, name.name)
-	node.name = "function"
 
 	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
 	if rz isa SCFunction
-		rz.noautocomplete = 1
+		rz.NoAutoComplete = 1
 		if isnothing
 			rz.IsCppInBuilt = 2
 		(rz Is ExternalLib) = islib
+		(rz is cpp)
+		|| cls = rz.cls
+			if cls is Dylib
+				(rz is dylib)
 		rz.MakeParamsReal
+	node.name = "function"
 				
 
 function NewHider (CollectFunc)

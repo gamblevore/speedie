@@ -229,6 +229,7 @@ function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 	
 	if Old isa SCFunction
 		if IncObj isa SCFunction		// link
+			expect (old isnt dylib and incobj isnt dylib) (errplace, "dylib functions can't be overloaded.")
 			if (old.cls == IncObj.cls) or incobj.IsConstructorOnModule(old)
 				old.Last.NextFunc = IncObj
 				Return
@@ -240,12 +241,15 @@ function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 			if incobj is Dylib and self isa SCClass
 				if self is Dylib
 					IncObj.IsLookupOnly = old
-					return
+					incobj.HiderFunc = old // its technically a property on a struct.
+					// a.b(c) --> (a.b)(c) // ? should we do this transform? still needs detection even if so.
+					return .ActualAdd(name, incobj)
 	
 	if  (name == "self")  and  scfunction.intype(scnodetype.object)
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
 		incobj.NameConflict(old, name)
+
 
 
 function SCFunction.IsConstructorOnModule (|scfunction| old, |bool|)
@@ -477,6 +481,9 @@ function ProjectFix (|SCNode|)
 
 function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
+//	if !exp and purpose != kPurposeVarDecl and Purpose != kPurposeVar
+// seems just used for detecting variables.
+
 	|| ParamsArray	= SCParamArray.new(exp, origname)
 	|scnode--| Curr = ParamsArray.DetectDotSuper(self, arg_space)
 	|message--| paramshere = exp.last
@@ -501,6 +508,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl
+			//
 			if  ((owning_cls != curr) or exp.isfuncdot) and  o.Hiderfunc.Hidermatch(paramsarray.HasSide) 
 				o = o.hiderfunc|scdecl|
 			  else
@@ -511,6 +519,11 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 				if (!side and paramsarray.isdot and o.type.processas)
 					expect (exp) // hmmm... should never happen
 					return o.ProcessAs(exp)
+				if o is Dylib
+					f = o.HiderFunc!
+					|scfunction--| f2 = f.ArgsMatch( contains, arg_space, ParamsArray )
+						return exp.Dylibfix(f2, o)
+					curr = nil
 
 		
 		paramsarray.AllowSelfToConstructor = AllowSelfToConstructor
@@ -520,7 +533,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 		
 		
 		if CanFunction and (o isa SCFunction)
-			f = o								// store for later return? not needed?
+			f = o											// Store for later return? not needed?
 			o = f.ArgsMatch( contains, arg_space, ParamsArray )
 			if !o
 				0
@@ -534,8 +547,9 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					error (o.source, "Disabled here.")
 
 				if Paramshere
-					ParamsHere.obj = o // multiple return :3
-					if !paramsarray.AllowSelfToConstructor and (o is constructor)
+					ParamsHere.obj = o
+					if !ParamsArray.AllowSelfToConstructor and (o is constructor)
+					// For constructors, like:  x = obj.new  -->  x = obj.constructor(nil)
 						if o.ReturnsObject
 							ParamsHere.ConstructorAddNil(paramsarray.isdot and !(self isa scmodule))
 				Return o
@@ -543,7 +557,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 		if o
 			paramsarray.found = true
 			if !ParamsArray
-				if (purpose == kPurposeDot) and !paramsarray.isaddress and (o isa scdecl) 
+				if (purpose == kPurposeDot) and !paramsarray.isaddress and (o isa scdecl)
 					Return o
 				///////
 				

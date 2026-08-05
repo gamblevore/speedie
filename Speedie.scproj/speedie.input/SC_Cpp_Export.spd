@@ -1048,6 +1048,18 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			error (self, "Missing property name")
 
 
+	function FunctionPointerCast (|scfunction| fn, |faststring| fs)
+		opt norefcounts
+		fs <~ "("
+		.WriteDecl(fn.returntype, fs)
+		fs <~ " (*)("
+		for (p in fn.args) (i)
+			if i > 0
+				fs <~ ", "
+			.WriteType(p, fs)
+		fs <~ "))"
+		
+
 	function C_RenderDot (fpMsgExportCpp)
 		opt norefcounts
 		|| type = .DotMustBeProperty						#require
@@ -1056,7 +1068,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if (ch.obj isa SCModule)
 			type.exportName.safe(fs)
 		  else
-			|| CloseStr = cpp_export.CDotType( self, type, fs, type is upgradeablecontained )
+			if type is Dylib
+				cpp_export.FunctionPointerCast(type.hiderfunc!, fs)
+			|| CloseStr = cpp_export.CDotType( self, fs, type, type is upgradeablecontained )
 	
 			ch.Export( fs )
 			|| ch_decl = DeclOfObjForC( ch )
@@ -1086,7 +1100,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| fn = ch1.obj|scfunction|
 		|| PostBracket = false
 		
-		if (fn isa SCFunction) and !fn.prototype							// easy
+		
+		if (fn isa SCFunction) and !fn.prototype and (fn isnt dylib)				// easy
 			if Fn.ReturnType and (.Parent != @arg)
 				PostBracket = C_OneParamType(fs, self, .BraDeclFind)
 
@@ -1368,10 +1383,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			Return true
 
 
-	function CDotType (|Message| msg, |SCDecl| Type, |FastStringCpp| fs, |bool| DoIt, |String|)
+	function CDotType (|Message| msg, |FastStringCpp| fs, |SCDecl| Type, |bool| DoIt, |String|)
 		opt norefcounts
-		require type and (doit or type.type.funcproto)
-
+		require type
+		require (doit or type.type.funcproto)
+		
 		if msg.IsFirstOfSetRel
 			return ""
 
@@ -1480,7 +1496,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			if dest is reference
 				fs <~ "&"
 			|| ty2 = item.obj|scdecl|
-			|| CloseStr = cpp_export.CDotType( self, ty2, fs, false ) // what about setting this like a = b. should be done at the dot/thg level?
+			|| CloseStr = cpp_export.CDotType( self, fs, ty2, false ) // what about setting this like a = b. should be done at the dot/thg level?
 				
 			item.Export( fs )
 			fs <~ CloseStr

@@ -376,6 +376,9 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 		TypeOfExpr( s, p )
 		if s == @func
 			FastStringOpts.optimise(s)
+		if fn and (f == @rel) and (fn is InitFunc) and (s in @arg)
+			fn.protectOneGlobal(s)
+			
 			
 	  elseif f == @unit // wait this never gets called?
 		return  // units have internal structure that can be damaged
@@ -1031,5 +1034,67 @@ function Tran_Time (TranFunc)
 		node.next = `|date| _StartTime` ~ parse
 
 	node.func = @sheb
+
+
+
+
+function scfunction.Transform ()
+	opt norefcounts
+
+	.CheckNotBadName
+	require !.isMacro
+	scfunction.CurrFunc = self
+	scmodule.curr = .parent as scmodule
+	.Badness = 0
+	.SavedError = nil
+	|| StillOK = StdErr.Mark
+
+	|| arg = .SourceArg							#require
+	|| Space = arg.SCArg( self )				#require
+	
+	space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
+	if self Isnt cpp
+		|| r_z = Tran_Result( self )
+		Tran_All( self, arg, space )
+		if r_z
+			Tran_ResultFinish( self, r_z, space, arg )
+//		  else
+//			Tran_ReturnFinish( self, arg ) // seems to break the compiler?
+		parser.Using.Flags = 0
+
+	if !StillOK
+		.SavedError = StdErr.LastError
+		.Badness |= 1
+	  elseif (self is ConOrDes) and .IsARealSpdFunc
+		.CallParents					// hehe 🥰
+		.BuildConstructorDestructor
+		Tran_All( self, arg, space )
+	
+	scfunction.CurrFunc = nil
+	scmodule.curr = nil
+
+
+
+function scfunction.ProtectOneGlobal (|message| Rel)
+	opt norefcounts
+	if rel contains "vm"
+	|| f = rel.first!
+	|| d = f.AsDecl
+	|| fn = f.func
+	if d and (fn == @thg or @dot) and (d is global or property)
+		|| l = rel.last!
+		if l != @arr // assume arrays are never nil
+			if d.StatedReal and d.TypeSuffers
+				d.ProtectOneSub(Rel, f)
+	
+
+function scdecl.ProtectOneSub (|message| Rel, |message| f)
+	opt norefcounts
+	|| l = rel.last!.Unwrap
+	|| fn = l.MsgFunc
+		if fn isnt Constructor
+			rel.next = ProtectGlobalMacro.Run(f.copy)
+
+|| ProtectGlobalMacro = "if _0==nil : -1|&byte|[] = 0".macro // crashes if not inited.
 
 

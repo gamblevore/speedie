@@ -25,8 +25,8 @@ extern "C" void JB_dylib_Close (JB_Dylib* Self) {
 
 extern "C" bool JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode) {
 	char* tmp = 0;
+	uint8 Buffer[PATH_MAX];
 	if (JB_Str_Length(Path)) {
-		uint8 Buffer[PATH_MAX];
 		tmp = (char*)JB_FastFileString( Path, Buffer );
 		if (!tmp)
 			return false;

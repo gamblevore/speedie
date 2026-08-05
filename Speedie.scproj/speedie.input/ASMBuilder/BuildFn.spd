@@ -1,9 +1,9 @@
 
 
 target debug and vm
-	|!&CakeVM| TestVM = CakeVM(1MB)
+	|!&CakeVM| TestVM = CakeVM()
 
-  
+
 extend_module ASM
 	function TextASMTestSub (|message| tests)
 		opt norefcounts

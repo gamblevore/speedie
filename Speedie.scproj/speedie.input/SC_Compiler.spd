@@ -71,7 +71,7 @@ linkage
 |[SCImport]|				ImportedList
 |{SCImport}|				ImportedNames = Dictionary.new
 
-|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, AppInitSub_()}`~parse).WipePos
+|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, {||E=AppInitSub_(), if E!=0: return E}}`~parse).WipePos
 |Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
 
 |SCModule|					Program = InternalFile.Proj.Mod

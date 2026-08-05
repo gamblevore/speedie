@@ -1,6 +1,6 @@
 
 
-unfinished // still need to rework the functions to be callable.
+//unfinished // still need to rework the functions to be callable.
 
 extend_module Macros
 	|| DylibConstructor = `
@@ -44,7 +44,6 @@ function message.DylibFuncs (|message|)
 
 function @scclass.NewDylib (CollectFunc)
 	opt norefcounts
-	node.name = "struct"
 	|| libname = node[@thg]$
 	|| arg = node.Last(@arg)$
 	require arg.Find(@tmp, "cpp_func", true)
@@ -66,44 +65,33 @@ function @scclass.NewDylib (CollectFunc)
 	tmp <~ arg.Dylibfuncs
 	arg.AppendMacro(macros.DylibConstructor, tmp)
 	tmp.Length = 0
-	|| struct = NewStruct(node, name_space, errplace)
-	if Struct isa SCModule
-		|| cls = Struct.cls
-			(cls is Dylib)
-			
 	if paths in node // oof
 		paths.remove // macro behaviour needs cleanup. (^^^ above note)
+	|| struct = NewStruct(node, name_space, errplace)
+	node.name = "struct"
 	return struct
 
 
+function message.DylibFix (|scfunction| F, |scdecl| D, |scfunction|)
+	// curl.func(1,2,3) --> (curl.func)(1,2,3)
+	opt norefcounts
+	expect (self) // should never fail
 
+	|| NewBra = @bra.msg
+	|| NewDot = NewBra.msg(@dot, .name)
+	newdot <~ .first
+	.first = NewBra
+	newdot <~ @emb
+	.Become(@func)
 
-ignore
-	dylib libName `
-path1
-path2
-path3`  // --> struct libName (DynamicLibrary) // might have 1000 funcs.
-		// Also structs can be "properly global" which is nice!
+	if F Is Killer
+		.LastInBlock(SCBlockage.Quit)
 		
-		cpp_func ABC (|int| A=0, |&byte| B=nil, |&nil|)
-			// no code allowed in here
-			// Oh... also the funcs can't be function-pointers... unless specified.
-			// so it needs special handling by speedie.
-		
+	NewBra.obj = D
+	NewDot.Obj = D
+	.Last!.obj = F
+	return f
 
-		module // auto generate for spdlibs. like there is spdprocess vs unixprocess
-			function Recompile (|&Name|)
-			function Compile (|string| Code, |&Name|)
-				
-
-	function Example
-		|| SomeLib = name.new // uses an auto-generated load func
-		SomeLib.ABC
-		somelib = somelib.recompile
-		SomeLib.ABC
-		somelib = somelib.compile(`blablabla`)
-		SomeLib.ABC
-						
 						
 // Could this make speedie code... embeddable, by speedie? Like... for game-scripts?
 // the idea is that speedie is meant to be good at everything. Game-engines, scripting, etc.

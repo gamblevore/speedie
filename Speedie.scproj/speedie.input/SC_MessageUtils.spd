@@ -501,7 +501,7 @@ function Message.NeedBra (|Message|)
 	return .wrapwith(@bra)
 
 
-function NewFnc (|string| name, |Message|)
+function NewFunc (|string| name, |Message|)
 	opt norefcounts
 	rz = @func.msg
 	rz <~ (@thg, name)
