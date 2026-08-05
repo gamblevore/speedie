@@ -58308,20 +58308,13 @@ void SC_Func__Tran_All_Final(SCFunction* Fn, Message* S, SCNode* P, Syntax F) {
 
 void SC_Func__Tran_Array(Message* S, SCNode* Name_space) {
 	SCDecl* Type = SC_Msg_AsDecl(S);
-	JB_Incr(Type);
 	if (!Type) {
-		JB_EarlyDecr(Type);
 		return;
 	}
 	Message* Thg = SC_Msg_IsSetIntoVar(S);
-	JB_Incr(Thg);
 	if ((!Thg)) {
-		Message* _tmPf3 = SC_Msg_UpToArg(S);
-		JB_Incr(_tmPf3);
-		JB_SetRef(Thg, SC_Func__TempMoveOut(S, _tmPf3));
-		JB_Decr(_tmPf3);
+		Thg = SC_Func__TempMoveOut(S, SC_Msg_UpToArg(S));
 		SCDecl* Dcl = SC_Msg_AsDecl(Thg);
-		JB_Incr(Dcl);
 		if (Dcl) {
 			SC_Base_TryAdd(Name_space, Thg, Dcl, Thg->Name);
 		}
@@ -58330,89 +58323,52 @@ void SC_Func__Tran_Array(Message* S, SCNode* Name_space) {
 				JB_Msg_Fail(Thg, nil);
 			}
 		}
-		JB_Decr(Dcl);
 	}
 	Message* P = SC_Msg_NiceParent(S);
-	JB_Incr(P);
 	Message* Place = SC_Msg_UpToArg(P);
-	JB_Incr(Place);
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(S, (&_usingf0));
 	Message* DotNew = JB_Syx_OperatorPlus(kJB_SyxDot, JB_LUB[714]);
-	JB_Incr(DotNew);
 	JB_Msg_AppendSyx(DotNew, kJB_SyxThg, Type->Type->Name);
-	JB_Decr(Type);
 	JB_Msg_AppendSyx(DotNew, kJB_SyxEmb, JB_LUB[0]);
 	if (JB_Msg_OperatorIn(P, kJB_SyxDecl)) {
 		SCDecl* D = SC_Msg_AsDecl(P);
-		JB_Incr(D);
 		if (!D) {
-			JB_EarlyDecr(D);
-			JB_EarlyDecr(DotNew);
 			JB_MsgPos_Destructor((&_usingf0));
-			JB_EarlyDecr(Place);
-			JB_EarlyDecr(P);
-			JB_EarlyDecr(Thg);
 			return;
 		}
 		JB_SetRef(D->Default, DotNew);
-		JB_Decr(D);
 	}
-	JB_Decr(P);
 	SC_Msg_FixMultiArr(S);
 	{
 		Message* Item = ((Message*)JB_Ring_First(S));
-		JB_Incr(Item);
 		while (Item) {
 			Message* _Nf2 = ((Message*)JB_Ring_NextSib(Item));
-			JB_Incr(_Nf2);
 			Message* Rel = nil;
-			JB_Incr(Rel);
 			if (JB_Msg_EqualsSyx(Item, kJB_SyxItem)) {
-				JB_Tree_Remove(Item);
-				JB_SetRef(Rel, JB_Syx_Msg(kJB_SyxRel, nil));
+				Rel = JB_Syx_Msg(kJB_SyxRel, nil);
 				Message* Acc = JB_Msg_Msg(Rel, kJB_SyxAcc, nil);
-				JB_Incr(Acc);
 				JB_Msg_AppendSyx(Acc, kJB_SyxThg, Thg->Name);
-				Message* _tmPf4 = JB_Msg_Msg(Acc, kJB_SyxArr, nil);
-				JB_Incr(_tmPf4);
-				JB_Decr(Acc);
-				Message* _tmPf5 = ((Message*)JB_Ring_First(Item));
-				JB_Incr(_tmPf5);
-				JB_Tree_SyntaxAppend(_tmPf4, _tmPf5);
-				JB_Decr(_tmPf4);
-				JB_Decr(_tmPf5);
+				JB_Tree_SyntaxAppend(JB_Msg_Msg(Acc, kJB_SyxArr, nil), ((Message*)JB_Ring_First(Item)));
 				JB_Msg_AppendSyx(Rel, kJB_SyxOpp, JB_LUB[473]);
-				Message* _tmPf6 = ((Message*)JB_Ring_Last(Item));
-				JB_Incr(_tmPf6);
-				JB_Tree_SyntaxAppend(Rel, _tmPf6);
-				JB_Decr(_tmPf6);
+				JB_Tree_SyntaxAppend(Rel, ((Message*)JB_Ring_Last(Item)));
 			}
 			 else {
-				JB_SetRef(Rel, JB_Syx_Msg(kJB_SyxDot, JB_LUB[1556]));
+				Rel = JB_Syx_Msg(kJB_SyxDot, JB_LUB[1556]);
 				JB_Msg_AppendSyx(Rel, kJB_SyxThg, Thg->Name);
-				Message* _tmPf7 = JB_Msg_Msg(Rel, kJB_SyxPrm, nil);
-				JB_Incr(_tmPf7);
-				JB_Tree_SyntaxAppend(_tmPf7, Item);
-				JB_Decr(_tmPf7);
+				JB_Tree_SyntaxAppend(JB_Msg_Msg(Rel, kJB_SyxPrm, nil), Item);
 			}
 			(JB_Ring_NextSibSet(Place, Rel));
-			JB_SetRef(Place, Rel);
+			Place = Rel;
 			JB_FreeIfDead(SC_TypeOfExpr(Rel, Name_space, nil));
-			JB_Decr(Rel);
-			JB_SetRef(Item, _Nf2);
-			JB_Decr(_Nf2);
+			Item = _Nf2;
 		};
-		JB_Decr(Item);
 		;
 	}
 	;
-	JB_Decr(Thg);
-	JB_Decr(Place);
 	JB_FreeIfDead(SC_TypeOfExpr(DotNew, Name_space, nil));
 	SC_Msg_SafeReplaceWith(S, DotNew);
-	JB_Decr(DotNew);
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), S);
 	JB_MsgPos_Destructor((&_usingf0));
 }
@@ -58428,12 +58384,10 @@ bool SC_Func__Tran_BlindCasts(SCFunction* Fn, Message* Node, SCNode* Name_space)
 		return nil;
 	}
 	Message* Thg = JB_Msg_NeedSyx(Node, kJB_SyxThg);
-	JB_Incr(Thg);
 	if (Thg) {
 		JB_Tree_Remove(Node);
 		Fn->BlindCasts = SC_Msg_Blind(Thg);
 	}
-	JB_EarlyDecr(Thg);
 	return false;
 }
 
@@ -58537,7 +58491,6 @@ bool SC_Func__Tran_Description(SCFunction* Fn, Message* Node, SCNode* Name_space
 		return nil;
 	}
 	Message* Str = JB_Msg_NeedSyx(Node, kJB_SyxStr);
-	JB_Incr(Str);
 	if (Str) {
 		if (!SC_Func_SyntaxIs(Fn, kSC__FunctionType_Disabled)) {
 			if (((JB_String*)JB_Str_Exists(Fn->Description))) {
@@ -58547,7 +58500,6 @@ bool SC_Func__Tran_Description(SCFunction* Fn, Message* Node, SCNode* Name_space
 		}
 		JB_Tree_Remove(Node);
 	}
-	JB_EarlyDecr(Str);
 	return false;
 }
 

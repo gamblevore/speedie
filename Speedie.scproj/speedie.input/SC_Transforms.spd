@@ -156,6 +156,7 @@ function Tran_Using (TranFunc)
 
 
 function Tran_Array (|Message| S, |SCNode| name_space) {
+	opt norefcounts
 	// || x = [("a", "b", "c"):d()] 	// wouldve been better? than my 'dispatch' thing...
 	// || tmp = d(), || x = ["a":tmp, "b":tmp, "c":tmp] 	// wouldve been better? than my 'dispatch' thing...
 	|| Type = S.AsDecl #require
@@ -188,7 +189,7 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 	for item in s
 		|Message| Rel
 		if item == @Item
-			item.remove
+//			item.remove
 			Rel = @rel.msg
 			|| acc = rel.msg(@acc)
 			acc <~ (@thg, thg.name)
@@ -213,6 +214,7 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 
 
 function Tran_Description (TranFunc)
+	opt norefcounts
 	expect (fn) (node, "Only use this on functions")
 	|| str = node[@str]
 		if fn isnt disabled
@@ -222,6 +224,7 @@ function Tran_Description (TranFunc)
 
 
 function Tran_BlindCasts (tranfunc)
+	opt norefcounts
 	expect (fn) (node, "Only use this on functions")
 	|| thg = node[@thg]
 		node.remove
