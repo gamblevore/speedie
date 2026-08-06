@@ -74,7 +74,7 @@ class ErrorReceiver
 
 		|| CanPrint = .PrintNewErrors
 		if CanPrint and err.IsBad
-			if (CanPrint != ErrorFlags.PrintFirst) or !.BadCount
+			if (CanPrint != ErrorFlags.PrintFirst) or !.errorcount
 				printline err.render
 				target debug
 					if err.severity > Errorseverity.problem

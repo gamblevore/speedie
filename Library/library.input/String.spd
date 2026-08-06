@@ -387,7 +387,9 @@ class String
 					return false
 			return true
 	
-	function CStr (|stringZeroTerminated|)
+	function CStr (|stringZeroTerminated?|)
+		nil checker 
+		description "Can return nil if self is nil"
 		cpp_Wrapper JB_Str_MakeC
 	
 	inline CopyTo (|&byte| Where, |bool|)
@@ -473,7 +475,8 @@ class String
 	syntax cast (|StringZeroTerminated|)
 		cpp_part CastZero
 		inlined
-		return .cstr
+		if self != nil
+			return .cstr!
 
 	function Byte (|int| index, |int| Missing=-1, |int|)
 		description "Returns 'Missing' if the value can't be found. Negative numbers are treated as missing, unlike str[index]." 

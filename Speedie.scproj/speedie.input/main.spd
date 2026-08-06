@@ -4,15 +4,13 @@
 */
 
 
-target debug
-	dylib libcurl `libCurl`
-		cpp_func curl_global_init (|int| Flags=3, |int|)
-	|| curl = libcurl.new
 
+target debug
+	import "Net"
 
 main // main {
-//	target debug2
-//		curl.curl_global_init
+	target debug
+/		printline "https://tulips.com/".Download
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile

@@ -20,7 +20,8 @@ class StringZeroTerminated (string)
 	function CString (|cstring|)
 		inlined
 		return .addr|cstring|
-	
+	function Cstr (|StringZeroTerminated|)
+		disabled "This is already a StringZeroTerminated"
 	syntax cast (|cstring|)
 		inlined
 		return .addr|cstring|

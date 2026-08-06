@@ -307,14 +307,15 @@ function Sudo (|string| p, |ExitCode|)
 
 function Icon (assigns:|string| path)
 	|| ico = path.AbsolutePath
-		.SetIcon(ico.cstr)
+		.SetIcon(ico.cstr!)
 
 function SetIcon (|cstring| path)
 	cpp_wrapper JB_App__SetIcon
 
 function ShowURL (|string| path)
 	cpp_part ShowURLStr
-	.showurlc(path.cstr)
+	if path
+		.showurlc(path.cstr!)
 
 function ShowURLC (|cstring| path)
 	cpp_wrapper JB_App__ShowURL

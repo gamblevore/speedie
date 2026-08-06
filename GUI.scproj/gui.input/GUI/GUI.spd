@@ -124,7 +124,7 @@ module GUI
 	function Alert (|string| msg, |string| title="")
 		cpp_part MsgBox
 		visible
-		SDL_ShowSimpleMessageBox(0, title.cstr, msg.cstr, nil)
+		SDL_ShowSimpleMessageBox(0, title.cstr!, msg.cstr!, nil)
 
 	
 	libinternal SelChanged
@@ -157,8 +157,9 @@ module GUI
 
 
 	function Title (assigns:|string|)
-		|| s = .ScreenWindow
-			SDL_SetWindowTitle(s, value.cstr)
+		|| s = .ScreenWindow 
+			|stringzeroterminated| c = value
+			SDL_SetWindowTitle(s, c)
 
 
 	libinternal ScreenPosRaw (|ivec2|)
@@ -307,7 +308,7 @@ module GUI
 		SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
 
 		|| DS = .CurrDisplaySize
-		|| W = SDL_CreateWindow(.NiceAppName.cstr, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
+		|| W = SDL_CreateWindow(.NiceAppName.cstr!, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
 			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
@@ -323,7 +324,7 @@ module GUI
 		|byte[2]| cvalue
 		cvalue[0] = '0' + value
 //		|| v = ("1" (value) "0")
-		.SetHint("SDL_RENDER_VSYNC".cstr, (&cvalue[0])|cstring|)
+		.SetHint("SDL_RENDER_VSYNC", (&cvalue[0])|cstring|)
 	
 	
 	function RemoveBorder

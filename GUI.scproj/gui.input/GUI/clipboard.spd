@@ -40,7 +40,7 @@ module Clipboard
 		
 		c = c.cstr
 		|| err = .SDL_SetClipboardText(c.addr|cstring|)
-		if (err!=0)											// can't use .FindBadUTF8, osx might fail anyhow
+		if (err!=0) and c											// can't use .FindBadUTF8, osx might fail anyhow
 			._internalcopy = c
 			Notifications.NotifySDLError		
 	

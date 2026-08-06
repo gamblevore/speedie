@@ -6,18 +6,18 @@ extend_module Macros
 	|| DylibConstructor = `
 module {
 function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.default,  |&_0|) {
-// super constructor system! Can both create new, and init existing struct! Sooo much simpler to use.
-// one of my super-theo inventions... go F*&*K urself if u dont agreeee :]
-// i mean i literally tested it. its faster and uses less code so if ur brain doesn't like it...
-// thats a fault in your brain. Not mine.
-// modelled after speedie's object constructor system.
+// consistant with speedie's object-constructor design.
 	|| Orig = self
 	if !self
 		self = Memory.zalloc(–sizeof _0)|&_0|
 	if paths == nil
 		paths = "_1"
-	if self and .DyLibInit(paths, mode, "_2")
-		return self
+	if self
+		if .DyLibInit(paths, mode, "_2")
+			return self
+		|faststring--| reason = faststring.shared
+		.DyLibInit(paths, mode, "_2", reason)
+		error reason
 	if orig != self
 		Memory.free(self)
 }

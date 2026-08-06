@@ -63,7 +63,7 @@ class File (StringShared)
 
 	function LinkTo (assigns:|string|, |errorint|)
 		// This API confuses me... not sure if it's me or unix right now. 
-		return Value.cstr.SymLink(self)
+		return Value.cstr!.SymLink(self)
 
 	function HardLinkTo (assigns:|stringzeroterminated|, |bool|)
 		cpp_wrapper JB_File_HardLinkTo

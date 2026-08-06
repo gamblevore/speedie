@@ -1,0 +1,92 @@
+
+dylib libcurl `libcurl`
+	cpp_func curl_global_init	(|int| Flags=curlenv.GLOBAL_DEFAULT, |int|)
+	cpp_func curl_easy_init		(|?&CurlEnv|)
+	cpp_func curl_easy_cleanup	(|&CurlEnv| curl)
+	cpp_func curl_global_cleanup
+	cpp_func curl_easy_setopt	(|&CurlEnv| curl, |int| Type, |&nil| Value, |int|)
+	cpp_func curl_easy_perform	(|&CurlEnv| curl, |int|)
+	cpp_func curl_easy_strerror	(|int| err, |cstring|)
+		
+|| curl = libcurl.new!
+
+
+
+struct CurlEnv
+	constants
+		GLOBAL_DEFAULT	= 3
+		OPT_TIMEOUT		= 13
+		OPT_FOLLOWLOCATION = 52
+		OPT_CA_CACHE_TIMEOUT = 321
+		OPT_WRITEDATA	= 10001
+		OPT_URL			= 10002
+		OPT_USERAGENT	= 10018
+		OPT_COOKIE		= 10022
+		OPT_WRITEFUNCTION = 20011
+
+		FOLLOW_FIRSTONLY = 3
+
+	function Report (|int| Err)
+		if Err
+			error curl.curl_easy_strerror(err).wrap
+		
+	function Opt (|int| Type, assigns:|&nil| Value)
+		|| err = curl.curl_easy_setopt(self, Type, Value)
+			.report(Err)
+			
+	function Opt (|int| Type, assigns:|stringzeroterminated?| Value)
+		.opt(type, value.addr|&nil|)
+	
+	function Perform (|ErrorInt|)
+		|| err = curl.curl_easy_perform(self)
+			.report(err)
+
+
+	module
+		|&CurlEnv| MyEnv
+		function Init (|&CurlEnv|)
+			|| env = .MyEnv
+				return env
+			curl.curl_global_init
+			env = curl.curl_easy_init								#expect ("Can't init Curl")
+			.MyEnv = env
+			env.opt(OPT_WRITEFUNCTION) = &CurlAppender
+			env.opt(OPT_USERAGENT) = "libcurl-agent/1.0"
+//			env.opt(OPT_FOLLOWLOCATION) = FOLLOW_FIRSTONLY|&nil|
+			return env
+			
+		function Cleanup
+			|| env = .MyEnv
+				curl.curl_easy_cleanup(env)
+				curl.curl_global_cleanup()
+				.myenv = nil
+
+		prototype Reader (|&nil| contents, |uint64| size, |uint64| nmemb, |FastString| FS, |int|)
+		function CurlAppender (Reader)
+			|| realsize = size * nmemb
+			fs.AppendMemory(contents|&byte|, realsize)
+			return realsize
+			
+		function String.Download (|Date| Timeout=nil, |string?| Cookie=nil, |string|)
+			|| fs = FastString()
+			if fs.AppendURL(self, timeout, cookie) == 0
+				return fs
+			return string.error
+
+
+function faststring.AppendURL (|string| URL, |Date| Timeout=nil, |string?| Cookie=nil, |ErrorInt|)
+	|stringzeroterminated| U = url.cstr!
+	|cstring| cook
+	if Cookie!=nil
+		cook = cookie.cstr!
+	return .AppendURLC(U.cstring, Timeout, cook)
+
+
+function faststring.AppendURLC (|cstring| URL, |Date| Timeout=nil, |cstring?| Cookie=nil, |ErrorInt|)
+	|| env = CurlEnv.Init
+		env.opt(curlenv.OPT_URL) = URL|&nil|
+		env.opt(curlenv.OPT_WRITEDATA) = self|&nil|
+		if Cookie != nil
+			env.opt(curlenv.OPT_COOKIE) = Cookie|&nil|
+		rz = env.Perform
+
