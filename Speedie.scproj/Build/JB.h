@@ -1665,7 +1665,7 @@ extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2418])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2417])
 extern Dictionary* SC_CppRefTable;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
@@ -1707,7 +1707,6 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
 #define kJB_kVoidPtrMatch ((int)20971520)
-extern Message* SC_ProtectGlobalMacro;
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
 extern Dictionary* SC_RootCollectTable;
@@ -1807,10 +1806,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2417])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2416])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2416])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2415])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2415])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2414])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2450,17 +2449,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2411])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2410])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2412])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2413])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2411])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2412])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2410])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2409])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2413])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2414])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2412])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2413])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((MuParam)512)
@@ -2522,7 +2521,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2409])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2408])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -8940,6 +8939,8 @@ SCFunction* SC_Msg_PrmFunc(Message* Self);
 
 Message* SC_Msg_PrmFuncStructMsg(Message* Self);
 
+void SC_Msg_ProtectOneSub(Message* Self, Message* F, Message* L, Message* Test);
+
 FatASM* SC_Msg_PSUB(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
 
 FatASM* SC_Msg_QADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
@@ -9398,6 +9399,8 @@ void JB_Msg__TreeComparePrint(Message* Orig);
 
 
 // JB_SCDecl
+void SC_Decl_Absorb(SCDecl* Self, SCDecl* Default);
+
 SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl* Type);
 
 int SC_Decl_AccessType(SCDecl* Self, SCDecl* Access, Message* Ch);
@@ -9713,8 +9716,6 @@ JB_String* SC_Decl_PrmStateMsg(SCDecl* Self, JB_String* Needed);
 SCDecl* SC_Decl_ProcessAs(SCDecl* Self, Message* Msg);
 
 SCImport* SC_Decl_Project(SCDecl* Self);
-
-void SC_Decl_ProtectOneSub(SCDecl* Self, Message* Rel, Message* F);
 
 void SC_Decl_Reach(SCDecl* Self);
 
@@ -10762,7 +10763,9 @@ void SC_Func_PreRead(SCFunction* Self, Message* Arg);
 
 Message* SC_Func_Prms(SCFunction* Self);
 
-void SC_Func_ProtectOneGlobal(SCFunction* Self, Message* Rel);
+void SC_Func_ProtectGlobals(SCFunction* Self);
+
+void SC_Func_ProtectOneGlobal(SCFunction* Self, Message* Rel, Message* Test);
 
 void SC_Func_ProtoExportName(SCFunction* Self);
 
@@ -11264,7 +11267,10 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
 	//cpp_part;
-	return JB_Str_MakeC(Self);
+	if (Self != nil) {
+		return JB_Str_MakeC(Self);
+	}
+	return JB_LUB[0];
 }
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
