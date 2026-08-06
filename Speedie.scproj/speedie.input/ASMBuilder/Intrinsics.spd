@@ -173,7 +173,7 @@ function scfunction.PostTrin (|message| s)
 	|| list = src.second
 	
 	for i in .args.Length
-		list <~ @thg + ("p" + (i+1))
+		list! <~ @thg + ("p" + (i+1))
 	
 
 

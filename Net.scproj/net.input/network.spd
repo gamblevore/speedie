@@ -7,9 +7,13 @@ dylib libcurl `libcurl`
 	cpp_func curl_easy_setopt	(|&CurlEnv| curl, |int| Type, |&nil| Value, |int|)
 	cpp_func curl_easy_perform	(|&CurlEnv| curl, |int|)
 	cpp_func curl_easy_strerror	(|int| err, |cstring|)
-		
-|| curl = libcurl.new!
+	
+	module
+		function H (|&libcurl|)
+			return curl
+//		|libcurl| H = libcurl.new! putting this here crashes... bad code gen.
 
+|| curl = libcurl.new!
 
 
 struct CurlEnv
@@ -28,17 +32,17 @@ struct CurlEnv
 
 	function Report (|int| Err)
 		if Err
-			error curl.curl_easy_strerror(err).wrap
+			error libcurl.h.curl_easy_strerror(err).wrap
 		
 	function Opt (|int| Type, assigns:|&nil| Value)
-		|| err = curl.curl_easy_setopt(self, Type, Value)
+		|| err = libcurl.h.curl_easy_setopt(self, Type, Value)
 			.report(Err)
 			
 	function Opt (|int| Type, assigns:|stringzeroterminated?| Value)
 		.opt(type, value.addr|&nil|)
 	
 	function Perform (|ErrorInt|)
-		|| err = curl.curl_easy_perform(self)
+		|| err = libcurl.h.curl_easy_perform(self)
 			.report(err)
 
 
@@ -47,8 +51,8 @@ struct CurlEnv
 		function Init (|&CurlEnv|)
 			|| env = .MyEnv
 				return env
-			curl.curl_global_init
-			env = curl.curl_easy_init								#expect ("Can't init Curl")
+			libcurl.h.curl_global_init
+			env = libcurl.h.curl_easy_init								#expect ("Can't init Curl")
 			.MyEnv = env
 			env.opt(OPT_WRITEFUNCTION) = &CurlAppender
 			env.opt(OPT_USERAGENT) = "libcurl-agent/1.0"
@@ -57,8 +61,8 @@ struct CurlEnv
 			
 		function Cleanup
 			|| env = .MyEnv
-				curl.curl_easy_cleanup(env)
-				curl.curl_global_cleanup()
+				libcurl.h.curl_easy_cleanup(env)
+				libcurl.h.curl_global_cleanup()
 				.myenv = nil
 
 		prototype Reader (|&nil| contents, |uint64| size, |uint64| nmemb, |FastString| FS, |int|)
@@ -66,12 +70,6 @@ struct CurlEnv
 			|| realsize = size * nmemb
 			fs.AppendMemory(contents|&byte|, realsize)
 			return realsize
-			
-		function String.Download (|Date| Timeout=nil, |string?| Cookie=nil, |string|)
-			|| fs = FastString()
-			if fs.AppendURL(self, timeout, cookie) == 0
-				return fs
-			return string.error
 
 
 function faststring.AppendURL (|string| URL, |Date| Timeout=nil, |string?| Cookie=nil, |ErrorInt|)
@@ -90,3 +88,9 @@ function faststring.AppendURLC (|cstring| URL, |Date| Timeout=nil, |cstring?| Co
 			env.opt(curlenv.OPT_COOKIE) = Cookie|&nil|
 		rz = env.Perform
 
+
+function String.Download (|Date| Timeout=nil, |string?| Cookie=nil, |string|)
+	|| fs = FastString()
+	if fs.AppendURL(self, timeout, cookie) == 0
+		return fs
+	return string.error

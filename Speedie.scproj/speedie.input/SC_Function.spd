@@ -1573,7 +1573,7 @@ function SCNode.LateAddTemporary (|string| type, |string| name1, |message| Value
 	|| msg = MakeDecl(type, name, Value, scdeclinfo.temp)
 	|| D = TypeOfExpr(msg, self)$
 	(d is NumberConst) = false
-	.Source <~ msg
+	.Source! <~ msg
 	.TryAdd( err, D, name )
 	return name
 
@@ -2017,27 +2017,27 @@ function message.MainFix (|message|)
 
 	.name = "function"
 	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main, visible true}".ParseClean
-	|| src_arg = fn_src.Last!
+		|| src_arg = fn_src.Last!
+		
+		|| fn = prms.func
+		|message| inc_arg
+		if fn == @list or @bra
+			inc_arg = prms.next(@arg)
+			fn = @prm
+		  else
+			inc_arg = self[@arg]
 	
-	|| fn = prms.func
-	|message| inc_arg
-	if fn == @list or @bra
-		inc_arg = prms.next(@arg)
-		fn = @prm
-	  else
-		inc_arg = self[@arg]
-
-	if inc_arg
-		if (fn == @prm) and prms.HasAny
-			src_arg.InsertMainArgs(prms)
-
-		fn_src <~ inc_arg
-		inc_Arg.expectlast
-
-		src_arg.Remove
-		inc_arg.prependall( src_arg )
-	  else
-		fn_src = nil
+		if inc_arg
+			if (fn == @prm) and prms.HasAny
+				src_arg.InsertMainArgs(prms)
+	
+			fn_src <~ inc_arg
+			inc_Arg.expectlast
+	
+			src_arg.Remove
+			inc_arg.prependall( src_arg )
+		  else
+			fn_src = nil
 	return fn_Src
 
 

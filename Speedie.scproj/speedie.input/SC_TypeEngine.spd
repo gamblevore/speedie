@@ -184,12 +184,12 @@ function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
 	using exp
 	|| fnc = "funnyword()"~parse
 	|| prm = fnc.last
-	prm <~ exp.first
+		prm <~ exp.first
 	if strength > 0
 		prm <~ strength
 	if exp in @arg
 		|| say = "app.say()"~parse
-		say.last <~ fnc
+		say.last! <~ fnc
 		fnc = say
 	exp <~ fnc
 	return TypeOfExpr(exp, name_space)
@@ -857,9 +857,10 @@ function MoveFutureStaticsIn (|Message| msg)
 // module {|int|a=0}, module {|int|b=0} --> module {|int|a=0, |int|b=0}, module {}
 
 	opt norefcounts
-	for ch.forward in msg$.next
-		if (ch istmp "module")
-			ch.last(@arg).AppendAllInto( msg.Last )
+	|| Next = msg$.next
+	for ch.forward in Next
+		if ch istmp "module"
+			ch.last(@arg).AppendAllInto( msg.givearg )
 
 
 

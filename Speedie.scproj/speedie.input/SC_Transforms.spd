@@ -863,7 +863,7 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 					// create a function...
 					if !newname
 						NewName = name + "_" + item_name.CollectFuncTableName
-						msg.CollectionPlace <~ ArgToFunc( NewName, @Thg+ protoName, item_value )
+						msg.CollectionPlace! <~ ArgToFunc( NewName, @Thg+ protoName, item_value )
 					I.msg(@brel, "&") <~ (@Thg, NewName)
 				  else
 					error (I, "Missing name")

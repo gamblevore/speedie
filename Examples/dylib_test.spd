@@ -1,76 +1,7 @@
-#!/usr/local/bin/spd
-
-dylib libcurl `libcurl`
-	cpp_func curl_global_init	(|int| Flags=libCURL.GLOBAL_DEFAULT, |int|)
-	cpp_func curl_easy_init		(|?&CurlEnv|)
-	cpp_func curl_easy_cleanup	(|&CurlEnv| curl)
-	cpp_func curl_global_cleanup
-	cpp_func curl_easy_setopt	(|&CurlEnv| curl, |int| Type, |&nil| Value)
-	cpp_func curl_easy_perform	(|&CurlEnv| curl, |ErrorInt|)
-	cpp_func curl_easy_strerror	(|int| err, |cstring|)
-		
-	constants
-		GLOBAL_DEFAULT	= 3
-		OPT_TIMEOUT		= 13
-		OPT_WRITEDATA	= 10001
-		OPT_URL			= 10002
-		OPT_USERAGENT	= 10018
-		OPT_COOKIE		= 10022
-		OPT_WRITEFUNCTION = 20011
-		
-|| curl = libcurl.new!
-
+import "Net"
 
 main
+	"A"
 /	printline "http://tulips.com/".Download
-
-
-struct CurlEnv
-	function Opt (|int| Type, assigns:|&nil| Value)
-		curl.curl_easy_setopt(self, Type, Value)
-	function Opt (|int| Type, assigns:|stringzeroterminated?| Value)
-		.opt(type, value.addr|&nil|)
-	
-	function Perform (|ErrorInt|)
-		rz = curl.curl_easy_perform(curlenv.myenv!)
-		if rz != 0
-			error curl.curl_easy_strerror(rz).wrap
-
-
-	module
-		|&CurlEnv| MyEnv
-		function Init (|&CurlEnv|)
-			|| env = .MyEnv
-				return env
-			.MyEnv = env
-			curl.curl_global_init
-			env = curl.curl_easy_init								#expect ("Can't init Curl")
-			env.opt(libCURL.OPT_WRITEFUNCTION) = &CurlAppender
-			env.opt(libCURL.OPT_USERAGENT) = "libcurl-agent/1.0"
-			return env
-			
-		function Cleanup
-			|| env = .MyEnv
-				curl.curl_easy_cleanup(env)
-				curl.curl_global_cleanup()
-				.myenv = nil
-
-		prototype Reader (|&nil| contents, |uint64| size, |uint64| nmemb, |FastString| FS, |int|)
-		function CurlAppender (Reader)
-			|| realsize = size * nmemb
-			fs.AppendMemory(contents|&byte|, realsize)
-			return realsize
-			
-		function String.Download (|Date| Timeout=nil, |string?| Cookie=nil, |string|)
-			|| fs = FastString()
-			fs.AppendURL(self, timeout, cookie)
-			return fs
-
-function faststring.AppendURL (|string| URL, |Date| Timeout=nil, |string?| Cookie=nil, |int|)
-	|| env = CurlEnv.Init
-		env.opt(libCURL.OPT_COOKIE) = Cookie
-		env.opt(libCURL.OPT_URL) = url
-		env.opt(libCURL.OPT_WRITEDATA) = self|&nil|
-		return env.Perform
-
+	"B"
 

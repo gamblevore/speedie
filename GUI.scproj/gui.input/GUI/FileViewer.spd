@@ -120,17 +120,17 @@ class FileViewer (ListView)
 	function ShowQuickOpen (|bool|)
 		opt norefcounts
 		|| w = .window
-		|| q = .quickopen
-		q.text ?= .editme.seltext.before("\n").trim
-		w <~ q
-		w <~ .listopen
-		if q is visible
-			.HideOpenList
-			return true
-		(q is visible)
-		q.SetFocus
-		q.SelectAll
-		.OpenQuickRelist(q.text)
+			|| q = .quickopen
+			q.text ?= .editme.seltext.before("\n").trim
+			w <~ q
+			w <~ .listopen
+			if q is visible
+				.HideOpenList
+				return true
+			(q is visible)
+			q.SetFocus
+			q.SelectAll
+			.OpenQuickRelist(q.text)
 		return true
 
 			

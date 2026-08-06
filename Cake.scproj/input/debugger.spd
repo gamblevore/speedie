@@ -286,9 +286,10 @@ module debugger
 		|| LibInfo = cakerun.LibDebug.parse
 		xtype.LoadTypes(PackInfo["type"])
 		
-		.Globs = PackInfo.giveitem("glob", @msg)
-		|| LibGlobs = LibInfo["glob"]						// probably need to keep the libglobs.
-			.globs.Appendall(libglobs)						// merge!
+		|| g = PackInfo.giveitem("glob", @msg)
+		.Globs = g
+		|| LibGlobs = LibInfo["glob"]					// probably need to keep the libglobs.
+			g.Appendall(libglobs)						// merge!
 	
 	
 	function LoadSub (|message| PackInfo, |bool|)

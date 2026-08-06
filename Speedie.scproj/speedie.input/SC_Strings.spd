@@ -34,9 +34,9 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 		msg.first = @thg + "Render"
 		if cls
 			msg.name = "behaviour"
-	|| arg = msg.NormaliseFunc
+	|| arg = msg.NormaliseFunc$
 	|| name = msg.first
-	|| params = name.next 
+	|| params = name.next$
 
 	if msg.isbehaviour
 		params <~ (@thg, "render")

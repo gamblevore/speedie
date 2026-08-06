@@ -33,7 +33,7 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |message|)
 // we need to create an array of forms...
 function FillTypePrm (|string| fname, |int| pname)
 	|| prop = @thg + fname
-	.dt_prm <~ .Ooof.run(prop, pname.msg)
+	.dt_prm! <~ .Ooof.run(prop, pname.msg)
 
 
 function FinishAcc
@@ -416,11 +416,11 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 
 
 
-function AddµOp (|string| name, |int| id) 
+function AddµOp (|string| name, |int| id)
 	opt norefcounts
 	|| msg = id.msg
 	|| thg = @thg + name
-	.ModuleArg <~ NewEqRel(thg, msg)
+	.ModuleArg! <~ NewEqRel(thg, msg)
 
 
 function VMLine (|message| line, |faststring| vm)

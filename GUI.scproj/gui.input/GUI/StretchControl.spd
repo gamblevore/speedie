@@ -37,7 +37,7 @@ class StretchControl (GuiControl)
 
 	function AddHigh (|guicontrol| G)
 		opt norefcounts
-		.Divider.high <~ g
+		.Divider.high! <~ g
 		
 	inline AddLeft (|guicontrol| G)
 		.AddLow(g)
@@ -47,7 +47,7 @@ class StretchControl (GuiControl)
 
 	function AddLow (|guicontrol| G)
 		opt norefcounts
-		.Divider.low <~ g
+		.Divider.low! <~ g
 
 	inline Divider (|stretchdivider!|)
 		return .last|stretchdivider|!

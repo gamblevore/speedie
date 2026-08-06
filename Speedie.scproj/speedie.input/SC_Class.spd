@@ -145,16 +145,16 @@ function CreateAutoConstructor (|scfunction|)
 	|| node = rz.source
 	|| prms = node.Second
 	|| arg	= prms.next
-
-	for prop in .sourcearg
-		if prop == @decl
-			|| name = prop.declname.name
-			check (name != "__rz__") (prop, "Invalid name.")
-			prms <~ prop.copy
-			|| rel = arg.msg(@rel)
-			rel <~ (@sdot, name)
-			rel <~ (@opp,  "=")
-			rel <~ (@thg,  name)
+	
+		for prop in .sourcearg
+			if prop == @decl
+				|| name = prop.declname.name
+				check (name != "__rz__") (prop, "Invalid name.")
+				prms! <~ prop.copy
+				|| rel = arg.msg(@rel)
+				rel <~ (@sdot, name)
+				rel <~ (@opp,  "=")
+				rel <~ (@thg,  name)
 
 
 
@@ -444,7 +444,7 @@ function LoadClassName (|message| node, |string|)
 
 function SCFunction.CopyParams (|message| list)
 	opt norefcounts
-	|| p = .prms
+	|| p = .prms$
 	using list
 	|| a = .source.GiveArg
 	|| dot = @dot.msg("Constructor")

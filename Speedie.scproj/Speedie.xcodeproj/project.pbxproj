@@ -561,7 +561,7 @@
 			dependencies = (
 			);
 			name = "speedie builder";
-			passBuildSettingsInEnvironment = 1;
+			passBuildSettingsInEnvironment = 0;
 			productName = asdweasd;
 		};
 /* End PBXLegacyTarget section */

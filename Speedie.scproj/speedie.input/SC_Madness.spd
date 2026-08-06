@@ -10,7 +10,7 @@ function Message.WrapExpr (|scdecl| src, |int|)
 	if src.isfloat
 		w.name = "newfloat" // sigh
 	.ReplaceWith(W)
-	W.last <~ self
+	W.last! <~ self
 	TypeOfExpr(W, compiler.program)
 	|| D = .AsDecl
 		w.obj = D.NewWrapper(D)

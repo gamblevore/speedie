@@ -43,7 +43,11 @@ class list
 	function First (assigns:||)			{ cpp_wrapper JB_Ring_FirstSet, nil safe }
 	
 	function Last (||)					{ cpp_wrapper JB_Ring_Last, nil checker }
-	function Last (assigns:||)			{ cpp_wrapper JB_Ring_LastSet, nil safe}
+	function Last (assigns:||)			{ cpp_wrapper JB_Ring_LastSet}
+
+	syntax Append (|| Last)
+		inlined
+		.Last = Last
 
 	function Second (||)
 		nil checker
@@ -64,11 +68,13 @@ class list
 
 	function PrependAll (|| src)
 		opt norefcounts
+		real self
 		while (|| l = src.Last)
 			.First = l
 	
 	function AppendAll (|| src)
 		opt norefcounts
+		real self // why is it not assumed real? it should be.
 		while (|| l = src.first)
 			.last = l
 	
@@ -368,10 +374,6 @@ class list
 			fs <~ ")"
 		  else
 			fs <~ "(nil)"
-
-	syntax Append (|| Last)
-		inlined
-		.Last = Last
 
 
 	function RemoveAfter

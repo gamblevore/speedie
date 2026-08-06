@@ -1,16 +1,19 @@
 
 
 module SC_Init
-	function SCModule.BuildInitArg (|message|)
+	function SCModule.BuildInitArg (|message!|)
 		opt norefcounts
+		|| arg
 		|| s = .source
 			using s
-				rz = .BuildInitArgSub
-		  else
-			rz = .BuildInitArgSub
+				arg = .BuildInitArgSub
+
+		if !arg
+			arg = .BuildInitArgSub
+		return arg
 	
 	
-	function SCModule.BuildInitArgSub (|message|)
+	function SCModule.BuildInitArgSub (|message!|)
 		rz = @arg.msg
 		rz <~ @arg
 		rz.msg(@tmp, "opt") <~ (@thg, "norefcounts")
@@ -60,13 +63,13 @@ module SC_Init
 		|message| dest
 		if .AvoidMain(c)
 			if c != @decl
-				dest = compiler.AppInitCode
+				dest = compiler.AppInitCode!
 			  else
-				dest = compiler.AppInitGlobals
+				dest = compiler.AppInitGlobals!
 		  elseif c == @decl
 			require !c.SettingToNil
 			dest = .InitVarsArg init .BuildInitArg
-			dest = dest.first
+			dest = dest.first!
 		  else
 			dest = .InitCodeArg init .BuildInitArg
 		dest <~ c			
@@ -85,7 +88,7 @@ function SCModule.CreateInitFuncSub (|message| init, |string| name)
 	if !.islibrary or (curr and !curr.IsLibraryImp)
 		type = "autogen "
 	|| msg = "$type$Name (|int|)".ParseClean
-	msg <~ init
+		msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)
 

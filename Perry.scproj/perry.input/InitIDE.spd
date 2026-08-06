@@ -513,13 +513,14 @@ extend PerryIDE
 			.itemwidth = 101
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 			.ButtonSource = message()   // ("Jeebox, Speedie, '', Errors"~parse)|listviewrow|
-			self.IDESetNext(self.JeeboxText,  .ButtonSource)
-			self.IDESetNext(self.SpeedieText, .ButtonSource)
-			self.IDESetNext(self.ProductOut,  .ButtonSource)
-			|| c = self.IDESetNext(self.ProductErrors, .ButtonSource)
-
-			(c is hidden)
-			(c is Broken)
+			|| btnsrc = .ButtonSource
+				self.IDESetNext(self.JeeboxText, btnsrc )
+				self.IDESetNext(self.SpeedieText, btnsrc)
+				self.IDESetNext(self.ProductOut,  btnsrc)
+				|| c = self.IDESetNext(self.ProductErrors, btnsrc)
+	
+				(c is hidden)
+				(c is Broken)
 			
 
 		.AddIDEButton(.RecentAndSplash,	"\1a", "Startup screen", "startup")

@@ -234,7 +234,7 @@ function SCFunction.RefFunc (|message| prm, |message!| after)
 	using after
 		|| ref = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
 		after.next = ref
-		ref.last <~ prm
+		ref.last! <~ prm
 		ref.obj = prm.obj
 	parser.using.position = -1
 
@@ -371,7 +371,7 @@ function Destructable (|Message?| Blocker, |Message?| arg, |Message| name)
 		if (Blocker)
 			Blocker.Prev = Fnmsg
 		  else
-			arg <~ Fnmsg
+			arg! <~ Fnmsg
 
 
 function ReturnTempMoveOut (|Message| Child, |Message| blocker)
@@ -451,7 +451,7 @@ function RC_RelConstructor (|Message| rel)
 function Message.FuncWrap (|Message| fnc)
 	opt norefcounts
 	.Prev = fnc
-	fnc.Last <~ self
+	fnc.Last! <~ self
 
 
 function RefMsg0 (|String| name, |SCFunction| func, |Message|)
@@ -688,7 +688,7 @@ function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 	if ch.RefDisappears
 		|| fnc = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
 		msg.Prev = fnc
-		fnc.Last <~ msg
+		fnc.Last! <~ msg
 		return
 	
 	if (parent == @prm)
