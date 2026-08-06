@@ -38,7 +38,6 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
-	if "test4u".trap
 	(dest isnt AddrRequest)
 	|| T = dest.µtype
 	|| byte_shift = t.ByteCount.log2	

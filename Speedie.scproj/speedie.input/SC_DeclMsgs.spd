@@ -341,7 +341,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if mode isnt Properties								// the old .obj is needed
 		nameitm.obj = dcl
 	
-	if (Mode & 8) and NoOriginalDcl						// functionbody
+	if (Mode & declmode.functionbody) and NoOriginalDcl						// functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
 		dcl.nildeclared = NilState.real >> dcl.TypeSuffers
@@ -356,8 +356,8 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	(dcl Isnt Const)									// on "|| bla = true", make "bla" editable.
 
 	if DefaultDcl										// default must exist if DefaultDcl does
-		if DefaultDcl.StatedReal and !dcl.NilStated
-			dcl.NilDeclared = DefaultDcl.NilDeclared	// absorb realness
+		if mode & DeclMode.Globals
+			dcl.Absorb(defaultdcl)
 		dcl.AssignabilityCheck(nil, default!, DefaultDcl)
 
 	if Recv												// nil for prototypes
@@ -366,6 +366,14 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	return dcl
 
 
+function scdecl.Absorb (|scdecl| Default)
+	require !.NilStated
+	if Default.StatedReal
+		.NilDeclared = Default.NilDeclared	// absorb realness
+	  elseif .TypeSuffers
+		.NilDeclared = NilState.Optional	// normalise
+					
+	
 
 function Message.CollectFuncTableName (|string|)
 	//	@msg.ID-->"msg"

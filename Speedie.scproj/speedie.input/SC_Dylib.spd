@@ -102,7 +102,7 @@ function scfunction.ProtectGlobals
 	
 	|| arg = .SourceArg
 	for rel.flat in arg
-		if rel.IsSetRel and rel in @arg
+		if (rel.func == @rel) and (rel in @arg) and rel.IsSetRel
 			.ProtectOneGlobal(rel, tocopy)
 
 
