@@ -375,7 +375,8 @@ uint8* JB_FastFileString (JB_String* Path, uint8* Tmp) { // just use posix funcs
 		JB_String* Home = JB_File__Home();
 		CopyBytes( Home->Addr, (char*)Write, Home->Length );
 		Write += Home->Length;
-	
+		Src++;
+		N--;
 	}
 	/*else if (Src[0] != '/') { // relative paths are understood by syscalls anyhow.
 		const char* CWD = getcwd( (char*)Write, PATH_MAX/2 );

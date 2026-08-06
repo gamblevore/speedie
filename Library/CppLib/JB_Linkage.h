@@ -68,6 +68,7 @@ struct JB_Dylib {
 void* JB_dylib_Load (JB_Dylib* Self, JB_String* Path);
 bool JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
 void JB_dylib_Close (JB_Dylib* Self);
+const char* JB_dylib_Error (JB_Dylib* Self);
 
 
 // VM 

@@ -23,6 +23,10 @@ extern "C" void JB_dylib_Close (JB_Dylib* Self) {
 	}
 }
 
+extern "C" const char* JB_dylib_Error (JB_Dylib* Self) {
+	return dlerror();
+}
+
 extern "C" bool JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode) {
 	char* tmp = 0;
 	uint8 Buffer[PATH_MAX];
@@ -33,8 +37,9 @@ extern "C" bool JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode) {
 	}
 
 	JB_dylib_Close(Self);
-	Self->_handle = dlopen(tmp, Mode);
-	return Self->_handle;
+	auto R = dlopen(tmp, Mode);
+	Self->_handle = R;
+	return R;
 }
 
 #endif
