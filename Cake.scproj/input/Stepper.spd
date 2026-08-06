@@ -63,16 +63,15 @@ function StepOutAction (PerryResponse)
 function cakevm.BreakParentStack (|cakestack| stack)
 	debugger.StackTrap = nil
 	|| P = .prev(stack)
-	|| break = cake.ActiveBreaks
-	if p and break
 		|| I = .index(p.code)
 		|| Bits = debugger.BreakRealBit
+		|| break = cake.ActiveBreaks
 		if I and !(break[I] & Bits)
 			break[I] |= Bits
 			debugger.StackTrap = P
 	
-	
-function cakevm.SetBreakLevel (|int| level, |?&uint|)
+
+function cakevm.SetBreakLevel (|int| level, |&uint|)
 //	debugger.UserBreakLevel = level
 	while
 		|| B = .SetDebug(level)

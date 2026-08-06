@@ -213,7 +213,7 @@ function @scfunction.InType (|scnodetype| ty, |bool|)
 function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 	opt norefcounts
 	real self
-	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
+	expect ((name.length-1)|uint| < 64) ( ErrPlace, "Name should be 1-64 bytes long." )
 	
 	if self isa scclass
 		|| scls = incobj.class
@@ -221,14 +221,13 @@ function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 			self = self.modul|scclass|
 
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
-	
-	if (!Old)
+	if !Old
 		return .ActualAdd(name, IncObj)
 	
 	require (Old != IncObj) // possible?
 	
 	if Old isa SCFunction
-		if IncObj isa SCFunction		// link
+		if IncObj isa SCFunction							// link
 			expect (old isnt dylib and incobj isnt dylib) (errplace, "dylib functions can't be overloaded.")
 			if (old.cls == IncObj.cls) or incobj.IsConstructorOnModule(old)
 				old.Last.NextFunc = IncObj
@@ -240,9 +239,7 @@ function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 				return .ActualAdd(name, IncObj)
 			if incobj is Dylib and self isa SCClass
 				if self is Dylib
-					IncObj.IsLookupOnly = old
-					incobj.HiderFunc = old // its technically a property on a struct.
-					// a.b(c) --> (a.b)(c) // ? should we do this transform? still needs detection even if so.
+					incobj.HiderFunc = old					// its technically a property on a struct.
 					return .ActualAdd(name, incobj)
 	
 	if  (name == "self")  and  scfunction.intype(scnodetype.object)
@@ -1007,12 +1004,9 @@ function DontRemove (CollectFunc)
 
 
 dispatch RootCollectTable (CollectFunc)
-//	+'love'					SCGame3D.Love
 	+'function'				SCFunction.NewFunc
-//	+'extend_function'		SCFunction.NewFunc // user shouldn't write these
 	+'api'					SCFunction.NewFunc
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
-//	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_func'				SCFunction.NewCppWrapper
 	+'cpp_nothing'			SCFunction.NewCppWrapper
 	+'helper'				SCFunction.NewHelper
@@ -1030,11 +1024,9 @@ dispatch RootCollectTable (CollectFunc)
 	+'task'					sctasks.NewTask
 	+'role'					SCClass.neuRole
 	+'export_api'			SC_API.NewExportAPI
-//	+'model'				SCGame3D.NeuModel
 	+'prototype'			SCFunction.NewProtoType
 	+'render'				SCFunction.NewRender
 	+'import'				(scimport.DoImport)
-//	+'shell_args'			InbuiltShellArgs.collect // should remove this?
 	+'syntax'				SCClass.LoadSyntax
 	+'linkage'				CppRefs.Linkage
 	+'struct'				SCClass.newstruct
@@ -1057,7 +1049,6 @@ dispatch ClsCollectTable (CollectFunc)
 	+'render'				SCFunction.NewRender
 	+'setter'				SCFunction.NewHider
 	+'function'				SCFunction.NewFunc
-//	+'extend_function'		SCFunction.NewFunc				// user shouldn't write these
 	+'api'					SCFunction.NewFunc
 	+'macro'				SCFunction.NewMacro
 	+'inline'				SCFunction.NewHelper
@@ -1069,7 +1060,6 @@ dispatch ClsCollectTable (CollectFunc)
 	+'virtual'				SCBehaviour.NewVirtual
 	+'iterator'				SCIterator.NeuIter
 	+'syx'					SCFunction.NeuSyx				// jeebox specific
-//	+'cpp_wrapper'			SCFunction.NewCppWrapper
 	+'cpp_func'				SCFunction.NewCppWrapper
 	+'cpp_libwrapper'		SCFunction.NewCppWrapper
 	+'prototype'			SCFunction.NewProtoType

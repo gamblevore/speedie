@@ -730,8 +730,8 @@ function AndOrRest2 (|int| a, |int| b) // more stragglers
 	if 1 or  b: a = 2
 	if 0 and b: b = 4	
 					//
-	|| x3 = (a (1) b)
-	|| x4 = (a (0) b)
+	|| x3 = (1!=0)(a, b)
+	|| x4 = (0!=0)(a, b)
 	if a or a
 		x3 = (b or b)|int|
 	  else

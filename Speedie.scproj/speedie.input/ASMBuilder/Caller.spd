@@ -127,7 +127,6 @@ function GrabbedRegisters (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
 
 
 function SCFunction.HasCVersion (|bool|)
-	// is this different than (self is cpp)?
 	if .IsCppInBuilt == 2						// cpp_nothing: For JB_Decr, JB_Ternary, etc
 		return false
 

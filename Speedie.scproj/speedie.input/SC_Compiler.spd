@@ -72,7 +72,7 @@ linkage
 |{SCImport}|				ImportedNames = Dictionary.new
 
 |Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, {||E=AppInitSub_(), if E!=0: return E}}`~parse).WipePos
-|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
+|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts, {^"NilChecking", if (1==nil): -1|&byte|[] = 0}}`~parse).WipePos
 
 |SCModule|					Program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
@@ -186,7 +186,7 @@ function CompileAll
 
 	intrinsics.Process
 	
-	if (compiler.InPerry or Options.ModeCake)
+	if compiler.InPerry or Options.ModeCake
 		.Timer( "Assemble" )
 		PackMaker.MakePack	
 
@@ -745,6 +745,8 @@ function DoRefAnalysis
 	(compiler is RefCounting)
 	|[message]| list				// avoid reading same thing that we alter.
 	for f in .FuncList
+		if f is InitFunc
+			f.ProtectGlobals
 		if f.IsARealSpdFunc and (f isnt VirtualCaller)
 			list.clear
 			f.AnalyseRefs(list)

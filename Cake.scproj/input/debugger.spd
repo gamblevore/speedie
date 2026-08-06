@@ -178,7 +178,7 @@ module debugger
 		
 	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active)
 		opt norefcounts
-		|| CakeBreak = cake.ActiveBreaks$
+		|| CakeBreak = cake.ActiveBreaks
 		|| Max = debugger.dbgLength
 
 		|| BestScore = 0
@@ -231,7 +231,7 @@ module debugger
 		debugger.senderror("MissingFile", i)
 
 
-	function StartUp (|&uint|)
+	function StartUp (|!&uint|)
 		opt norefcounts
 		cake.vm.__View__ = __Dumper__
 		|| Dbg = cakevm.kbreaknever+debugger.WantDebug
@@ -239,7 +239,7 @@ module debugger
 			cake.vm.__View__ = __PerryView__
 			cake.vm.Action(p.pico) = PicoReader	
 			dbg = cakevm.kBreakStated
-		rz = cake.VM.SetBreakLevel(dbg)
+		return cake.VM.SetBreakLevel(dbg)
 			
 		
 	function __Dumper__ (cakevm.CakeChef)
@@ -339,7 +339,7 @@ module debugger
 			printline "textpos: $P,  code: $code"
 		
 		printline "--- InbuiltBreaks ---"
-		|| CakeBreak = cake.ActiveBreaks$
+		|| CakeBreak = cake.ActiveBreaks
 		for i in T
 			|| Code = CakeBreak[i]
 				printline "break: $i"

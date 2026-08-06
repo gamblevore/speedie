@@ -298,7 +298,7 @@ class SCDecl (SCObject) {
 		rz.c_array = 0
 		|| ns = nilstate.realish
 		if purpose == declmode.globals
-			ns = nilstate.optional
+			ns = nilstate.Either // can be refined later
 		  elseif purpose isnt FuncParam
 			ns |= nilstate.stated
 		rz.NilDeclared = ns

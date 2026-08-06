@@ -1,0 +1,40 @@
+
+
+
+datatype NilState (byte) // Exec.scproj needs this here
+	constants
+		|nilstate|
+		Failed			= 0
+		Nilish			= 1
+		Realish			= 2
+		Either			= 3
+		Stated			= 4
+		FnBecomesNilCh	= 8
+		FalseValue		= 16
+		TrueValue		= 32
+//		Solved			= 64		// compiler figured this out during niltest
+		KnownValue		= FalseValue + TrueValue
+		ActuallyNil		= Nilish  + Stated + FalseValue
+		Optional		= Either  + Stated
+		Real			= Realish + Stated
+		Basic			= Realish
+		Borked			= 128
+		Killer			= 255
+	
+	function RawName (|string|)
+		description "Raw: (Does not include whether its stated or other wierd things.)" 
+		if self is either
+			return "optional"
+		if self is nilish
+			return "nil"
+		if self is realish
+			return "real"
+		return "lost"
+	
+	syntax is (|nilstate| type, |bool|)
+		return (self & type) == type
+	
+	function StatedReal (|nilstate|)
+		if self & nilstate.optional == NilState.Real
+			return NilState.real
+

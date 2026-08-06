@@ -817,21 +817,22 @@ Message is also:
 	function Find (|Syntax| syx=@nil, |string?| name=nil, |bool| Err = false, |Message|)
 		cpp_part FindSyxName
 		opt norefcounts
-		for ch.fast in self
-			if (!syx or ch == syx)
-				if (name == nil) or (ch ~= name)
-					return ch
+		for curr.fast in self
+			if curr == syx or syx == nil
+				if (name == nil) or (curr ~= name)
+					return curr
 
 		if Err
 			return .ReportFailiure(syx, name, nil)
 	
 
-	function FindNested (|Syntax| syx, |string?| name = nil, |bool| Err = false, |Message|)
+	function FindNested (|Syntax| syx=@nil, |string?| name = nil, |bool| Err = false, |Message|)
 		Opt NoRefCounts
 		nil self
 		for curr.flat in self
 			if curr == syx or syx == nil
-				if name == nil  or  curr ~= name: Return curr
+				if (name == nil) or (curr ~= name)
+					return curr
 		if err
 			return .ReportFailiure(syx, name, nil)
 	

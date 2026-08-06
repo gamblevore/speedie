@@ -1,6 +1,6 @@
 
 
-//unfinished // still need to rework the functions to be callable.
+// unfinished // still need to rework the functions to be callable.
 
 extend_module Macros
 	|| DylibConstructor = `
@@ -23,6 +23,7 @@ function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.
 }
 }`.macro
 
+
 	
 function message.DylibFuncs (|message|)
 	opt norefcounts
@@ -42,6 +43,7 @@ function message.DylibFuncs (|message|)
 	return @str + fs.GetResult
 
 
+
 function @scclass.NewDylib (CollectFunc)
 	opt norefcounts
 	|| libname = node[@thg]$
@@ -58,7 +60,6 @@ function @scclass.NewDylib (CollectFunc)
 	// i understand somethings shouldn't be put in directly. Like @dot stuff I guess?
 	// but even then... man IDK.
 	
-
 	|| tmp = macro.TmpPrms
 	tmp <~ @thg + libname.name
 	tmp <~ paths
@@ -92,14 +93,54 @@ function message.DylibFix (|scfunction| F, |scdecl| D, |scfunction|)
 	.Last!.obj = F
 	return f
 
-						
+
+function scfunction.ProtectGlobals
+	// done after the nil-checker, so we know what this func returns.
+	opt norefcounts
+	|| tocopy = Compiler.AppInitGlobals.find("NilChecking")
+	tocopy = tocopy.first #require
+	
+	|| arg = .SourceArg
+	for rel.flat in arg
+		if rel.IsSetRel and rel in @arg
+			.ProtectOneGlobal(rel, tocopy)
+
+
+function scfunction.ProtectOneGlobal (|message| Rel, |message| test)
+// make sure that dylibs are loaded properly (And other globs)
+	opt norefcounts
+	|| f = rel.first!
+	|| d = f.AsDecl
+	|| fn = f.func
+	
+	//
+	require d and (fn == @thg or @dot) and (d is global or property)
+	|| l = rel.last!
+	require l != @arr					// assume arrays are never nil
+//	|| input = l.AsDecl
+
+	require D.StatedReal and D.TypeSuffers
+	rel.ProtectOneSub(f, l, test)
+
+
+function message.ProtectOneSub (|message| F, |message| L,  |message| test)
+	opt norefcounts
+	|| fn = l.unwrap.MsgFunc$
+	require fn isnt Constructor			// constructors should never fail...
+	test = test.copy					// we really are just protecting from user-functions.
+	|| One = test.FindNested("1")				#require
+	one.ReplaceWith f.copy
+	.next = test
+
+
+
 // Could this make speedie code... embeddable, by speedie? Like... for game-scripts?
 // the idea is that speedie is meant to be good at everything. Game-engines, scripting, etc.
 // but sometimes games need scripts, even games made in speedie. So could... speedie be scripting speedie?
 // I know it sounds silly, but sometimes, at the least, you might want to hot-load code.
 // Or restart crashed systems. Easier if you are using a dylib.
 
-// SO how to deal with object allocation? Each lib has it's own objects and libs. Would need its per-frame step.
+// So how to deal with object allocation? Each lib has it's own objects and libs. Would need its per-frame step.
 
 // Well what about loading normal lib code? Like loading libcurl or sql. I guess you just load it.
 // What about if some functions can't load? well... the lib does not get loaded. OR we have to load them individually.
@@ -108,7 +149,7 @@ function message.DylibFix (|scfunction| F, |scdecl| D, |scfunction|)
 // unless the compiler treats it as always loaded, because the program exits if it can't be loaded.
 // could be a good time to make other globs kill the app if they can't be loaded. Like: || globx = message.new
 // if globx is nil, the entire app should not reach main.
- 
+
 // Anyhow, I think this is a good design.
 
 

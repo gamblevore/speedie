@@ -1,9 +1,9 @@
 
 
 module Globals
+	|&uint16|				LibLink = Globals.GlobTable
 	|&byte|					LibBase = Globals.LibGlobs|&byte|
 	|&byte|					PackGlobs
-	|&uint16|				LibLink = Globals.GlobTable
 	|uint|					LibMax
 	|uint|					PackGlobSize
 	|string|				Strings

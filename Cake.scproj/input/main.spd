@@ -7,7 +7,6 @@ main
 	target debug
 		stderr.PrintNewErrors = ErrorFlags.PrintFirst
 		cakerun.TestOffsets
-	expect (cake.BeginCode) ("Can't allocate VM")
 
 	require Globals.VerifyGlobs
 	|| p = cake.perry

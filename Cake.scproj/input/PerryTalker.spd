@@ -109,7 +109,7 @@ function jbin.SendCode (|uint| Break, |int| Position)
 
 function Spdprocess.SendBreaks (|filewithdata| F, |bool| All=false)
 	opt norefcounts
-	|| CakeBreak = cake.ActiveBreaks$
+	|| CakeBreak = cake.ActiveBreaks
 	|| L = debugger.dbgLength
 	
 	|jbin| j = xvar.Printer
