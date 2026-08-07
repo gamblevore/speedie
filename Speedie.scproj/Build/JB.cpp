@@ -3517,7 +3517,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[454]);
-	JB_FS_AppendInt32(_fsf0, (2026080620));
+	JB_FS_AppendInt32(_fsf0, (2026080714));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10251,7 +10251,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[1335]);
-	JB_FS_AppendInt32(_fsf0, (2026080620));
+	JB_FS_AppendInt32(_fsf0, (2026080714));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -37796,7 +37796,7 @@ Message* SC_Msg_ExpectParamsTransform(Message* Self, int P, Message* Errnode, JB
 	if ((!L)) {
 		JB_SetRef(On, JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[324]));
 	}
-	 else if ((JB_Msg_EqualsSyx(L, kJB_SyxList)) or ((JB_Msg_EqualsSyx(L, kJB_SyxBra)) or (JB_Msg_EqualsSyx(L, kJB_SyxPrm)))) {
+	 else if (SC_Msg_IsParams(L)) {
 		L->Func = kJB_SyxPrm;
 		JB_SetRef(On, ((Message*)JB_Ring_First(L)));
 	}
@@ -39640,6 +39640,11 @@ int SC_Msg_IsNowNil(Message* Self) {
 	return 0;
 }
 
+bool SC_Msg_IsParams(Message* Self) {
+	Syntax Fn = Self->Func;
+	return (Fn == kJB_SyxPrm) or ((Fn == kJB_SyxList) or (Fn == kJB_SyxBra));
+}
+
 SCFunction* SC_Msg_IsParentConCall(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc))) {
 		return nil;
@@ -41146,8 +41151,7 @@ Message* SC_Msg_NormaliseFunc(Message* Self, SCClass* AddSelf) {
 		Prm = JB_Msg_Msg(Self, kJB_SyxPrm, nil);
 	}
 	 else {
-		Syntax Fn = Prm->Func;
-		if (!((Fn == kJB_SyxBra) or ((Fn == kJB_SyxList) or (Fn == kJB_SyxPrm)))) {
+		if (!SC_Msg_IsParams(Prm)) {
 			JB_Msg_Fail(Prm, nil);
 			JB_MsgPos_Destructor((&_usingf0));
 			return nil;
@@ -51027,7 +51031,7 @@ bool SC_Beh__Tran_Behaviour(Message* Node, SCClass* Cls) {
 	Message* Lst = ((Message*)JB_Ring_NextSib(Name));
 	JB_Incr(Lst);
 	if (Lst) {
-		if (!((!JB_Msg_EqualsSyx(Lst, kJB_SyxBra)) and ((!JB_Msg_EqualsSyx(Lst, kJB_SyxPrm)) and (!JB_Msg_EqualsSyx(Lst, kJB_SyxList))))) {
+		if ((SC_Msg_IsParams(Lst))) {
 			JB_Msg_Fail(Lst, JB_LUB[980]);
 			JB_EarlyDecr(Lst);
 			JB_EarlyDecr(Name);
@@ -57244,7 +57248,7 @@ void SC_Func_SubFuncParamsLoad(SCFunction* Self, Message* P) {
 	SCArg* Space = SC_Msg_SCArg(A, Self, nil);
 	JB_Incr(Space);
 	JB_Decr(A);
-	if ((JB_Msg_EqualsSyx(P, kJB_SyxList)) or ((JB_Msg_EqualsSyx(P, kJB_SyxBra)) or (JB_Msg_EqualsSyx(P, kJB_SyxPrm)))) {
+	if (SC_Msg_IsParams(P)) {
 		P->Func = kJB_SyxPrm;
 		SC_Func_CollectDeclsParams(Self, P, Space);
 	}
@@ -57810,19 +57814,15 @@ SCNode* SC_Func__NewCppWrapper(Message* Node, SCNode* Name_space, Message* ErrPl
 		return nil;
 	}
 	Message* Prm = ((Message*)JB_Ring_NextSib(Name));
-	if (!Prm) {
-		return nil;
-	}
-	if (!JB_Tree_IsLast(Prm)) {
-		JB_Msg_Fail(Prm, nil);
-		return nil;
-	}
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Name, (&_usingf0));
+	if ((!Prm) or (!SC_Msg_IsParams(Prm))) {
+		(JB_Ring_NextSibSet(Name, JB_Syx_Msg(kJB_SyxPrm, nil)));
+	}
 	bool IsNothing = (JB_Msg_SyntaxEquals(Node, JB_LUB[318], false));
 	bool IsLib = (JB_Msg_SyntaxEquals(Node, JB_LUB[319], false));
-	JB_Msg_AppendSyx(JB_Msg_Msg(JB_Msg_Msg(Node, kJB_SyxArg, nil), kJB_SyxTmp, JB_LUB[1141]), kJB_SyxThg, Name->Name);
+	JB_Msg_AppendSyx(JB_Msg_Msg(JB_Msg_GiveArg(Node), kJB_SyxTmp, JB_LUB[1141]), kJB_SyxThg, Name->Name);
 	Rz = SC_Func__NewFunc(Node, Name_space, ErrPlace);
 	if (JB_Object_FastIsa(Rz, &SCFunctionData)) {
 		((SCFunction*)Rz)->NoAutoComplete = 1;
@@ -59010,7 +59010,7 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 		JB_EarlyDecr(nameMsg);
 		return nil;
 	}
-	if (!((JB_Msg_EqualsSyx(protoMsg, kJB_SyxBra)) or ((JB_Msg_EqualsSyx(protoMsg, kJB_SyxPrm)) or (JB_Msg_EqualsSyx(protoMsg, kJB_SyxList))))) {
+	if (!SC_Msg_IsParams(protoMsg)) {
 		JB_Msg_Fail(protoMsg, nil);
 		JB_EarlyDecr(protoMsg);
 		JB_EarlyDecr(nameMsg);
@@ -60657,4 +60657,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 6576343182889418685 -3173245625546143494
+// -1290835851227396355 -3173245625546143494

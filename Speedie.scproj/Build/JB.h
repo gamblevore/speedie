@@ -8681,6 +8681,8 @@ bool SC_Msg_IsNilOrZero(Message* Self);
 
 int SC_Msg_IsNowNil(Message* Self);
 
+bool SC_Msg_IsParams(Message* Self);
+
 SCFunction* SC_Msg_IsParentConCall(Message* Self);
 
 bool SC_Msg_IsProperty(Message* Self);
