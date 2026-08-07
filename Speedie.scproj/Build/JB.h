@@ -1243,7 +1243,6 @@ JBClass ( SCClass , SCBetterNode ,
 	u16 TaskObjectCount;
 	ClassInfo Flags;
 	SCDecl* DataObject;
-	SCClass* DowngradeTo;
 	SCClass* ProcessAs;
 	SCBehaviour* Behaviour;
 	SCDecl* SelfDecl;
@@ -2107,18 +2106,19 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__ClassInfo_Builtin ((ClassInfo)2048)
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
 #define kSC__ClassInfo_DefaultsToReal ((ClassInfo)256)
+#define kSC__ClassInfo_DownGradeToString ((ClassInfo)16384)
 #define kSC__ClassInfo_Dylib ((ClassInfo)8192)
-#define kSC__ClassInfo_Flags ((ClassInfo)32768)
+#define kSC__ClassInfo_Flags ((ClassInfo)65536)
 #define kSC__ClassInfo_HasEqualsFunc ((ClassInfo)4)
 #define kSC__ClassInfo_HasNilChecker ((ClassInfo)128)
 #define kSC__ClassInfo_HasSubClass ((ClassInfo)8)
 #define kSC__ClassInfo_IgnoreContainedSelf ((ClassInfo)2)
 #define kSC__ClassInfo_NoEarlyFree ((ClassInfo)16)
-#define kSC__ClassInfo_NumericReduction ((ClassInfo)49152)
+#define kSC__ClassInfo_NumericReduction ((ClassInfo)98304)
 #define kSC__ClassInfo_SortsProperties ((ClassInfo)4096)
 #define kSC__ClassInfo_Stateful ((ClassInfo)1024)
 #define kSC__ClassInfo_Stateless ((ClassInfo)512)
-#define kSC__ClassInfo_Symbol ((ClassInfo)16384)
+#define kSC__ClassInfo_Symbol ((ClassInfo)32768)
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)32)
 #define kSC__CompilerStage_Baking ((CompilerStage)8)
 #define kSC__CompilerStage_CppExporting ((CompilerStage)9)
@@ -6855,8 +6855,6 @@ JB_Object* JB_Object_TypeFailed(JB_Object* Self, JB_Class* Cls, Message* Where);
 
 
 // JB_Array
-void SC_Array_AddCStr(Array* Self, JB_String* S);
-
 void SC_Array_AppendWords(Array* Self, JB_String* R);
 
 int SC_Array_CArraySize(Array* Self, int Size);
@@ -9227,8 +9225,6 @@ FatASM* SC_Msg_UMUL(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
 
 Message* SC_Msg_UnBra(Message* Self);
 
-bool SC_Msg_UnbraIstype(Message* Self);
-
 Message* SC_Msg_UnBraType(Message* Self);
 
 void JB_Msg_UnEmbedStr(Message* Self);
@@ -11269,10 +11265,7 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
 	//cpp_part;
-	if (Self != nil) {
-		return JB_Str_MakeC(Self);
-	}
-	return JB_LUB[0];
+	return JB_Str_ZeroTerm(Self);
 }
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
