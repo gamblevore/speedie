@@ -401,30 +401,28 @@ function SCDecl.Containedfix (|scdecl|)
 	rz.contains = t.SelfDecl.Contains
 
 
-function message.UnbraIstype (|bool|)
-	opt norefcounts
-	return .unbra.func == @type
-
 
 function SCDecl.DownGrade (|message| Orig, |scdecl|)
-	// remove borrowing and also downgrade stringzeroterminated to a plain old string
+	// Remove borrowing and also downgrade stringzeroterminated to a plain old string
 	opt norefcounts
 	if !.IsNormalObject
 		return self
 	
-	|| y = .type.DowngradeTo
-		|| d = y.TypeNormal
-		if (self is StayBorrowed) and orig.UnbraIstype
+	orig = orig.unbra
+	if orig.isstring and (.type is downgradetostring)
+		|| d = typestring!.TypeNormal
+		if (self is StayBorrowed) and orig == @type
 			d = d.CopyDecl
 			(d is BothBorrowed)
 		return d
 	
-	if (self is StayBorrowed)  and !orig.UnbraIstype
+	if (self is StayBorrowed)  and orig != @type
 		self = .CopyDecl
 		isnt BothBorrowed
-		
-	return self
 	
+	return self
+
+
 	
 function message.AddValue (|scfunction| f)
 	opt norefcounts

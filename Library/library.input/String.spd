@@ -387,8 +387,9 @@ class String
 					return false
 			return true
 	
-	function ZeroTerm (|stringZeroTerminated|)
-		cpp_Wrapper JB_Str_MakeC
+	function ZeroTerm (|StringZeroTerminated|)
+		nil self
+		cpp_Wrapper JB_Str_ZeroTerm
 	
 	inline CopyTo (|&byte| Where, |bool|)
 		cpp_Part CopyToHopeful
@@ -421,11 +422,11 @@ class String
 		function Own (|&byte| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str__Freeable
 
-		function Copy (|cstring| str, |stringzeroterminated|)
-			cpp_wrapper JB_Str_CopyFromCString
-
 		function Copy (|&nil| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
+
+		function Copy (|cstring| str, |stringzeroterminated|)
+			cpp_wrapper JB_Str_CopyFromCString
 
 		inline Hex (|int64| i, |string|)
 			return i.hex!

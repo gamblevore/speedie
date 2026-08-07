@@ -17,11 +17,10 @@ class StringZeroTerminated (string)
 	false			""
 	default			""
 	
-	function CString (|cstring|)
+	function Cstr (|cstring|)
 		inlined
 		return .addr|cstring|
-	function Cstr (|StringZeroTerminated|)
-		disabled "This is already a StringZeroTerminated"
+
 	syntax cast (|cstring|)
 		inlined
 		return .addr|cstring|

@@ -318,7 +318,7 @@ static const char* MiniName (JB_String* Path) {
 ShellStream* JB_Sh_Constructor (ShellStream* self, JB_String* Path, byte Mode, Array* Args, PicoComms* Comms) {
 	JB_New2(ShellStream);
 	self->Args = JB_Incr(Args);
-	self->Path = JB_Incr(JB_Str_MakeC(Path));
+	self->Path = JB_Incr(JB_Str_ZeroTerm(Path));
 	self->Mode = Mode;
 #ifndef AS_LIBRARY
 	if (!Comms)
@@ -341,7 +341,7 @@ void JB_Sh_Destructor (ShellStream* self) {
 
 
 bool JB_App__TurnInto(JB_String* self, Array* R) {
-	auto argv = JB_Proc__CreateArgs(JB_Str_MakeC(self), R);
+	auto argv = JB_Proc__CreateArgs(JB_Str_ZeroTerm(self), R);
 	execvp(argv[0], (char* const*)argv); // may exit here. :)
 	free(argv);
 	JB_ErrorHandleFile(self, nil, errno, nil, "running");

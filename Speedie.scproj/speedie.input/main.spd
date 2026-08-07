@@ -3,7 +3,7 @@
 	Speedie. By Theodore H. Smith.  Licence available in licence.txt
 */
 
-import "Net"
+
 
 main // main {
 	Compiler.SetupEnv

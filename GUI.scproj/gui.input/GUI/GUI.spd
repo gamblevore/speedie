@@ -124,7 +124,7 @@ module GUI
 	function Alert (|string| msg, |string| title="")
 		cpp_part MsgBox
 		visible
-		SDL_ShowSimpleMessageBox(0, title.ZeroTerm, msg.ZeroTerm, nil)
+		SDL_ShowSimpleMessageBox(0, Title.ZeroTerm, msg.ZeroTerm, nil)
 
 	
 	libinternal SelChanged
@@ -158,8 +158,7 @@ module GUI
 
 	function Title (assigns:|string|)
 		|| s = .ScreenWindow 
-			|stringzeroterminated| c = value
-			SDL_SetWindowTitle(s, c)
+			SDL_SetWindowTitle(s, value.ZeroTerm)
 
 
 	libinternal ScreenPosRaw (|ivec2|)
@@ -323,7 +322,6 @@ module GUI
 		// if we draw into our own buffer anyhow.
 		|byte[2]| cvalue
 		cvalue[0] = '0' + value
-//		|| v = ("1" (value) "0")
 		.SetHint("SDL_RENDER_VSYNC", (&cvalue[0])|cstring|)
 	
 	

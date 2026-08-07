@@ -29,7 +29,7 @@ module EightBall
 "Outlook not so good"
 "Very doubtful"
 `
-	|[message]| Items = nil 
+	|[message]| Items = nil
 	function SleepAndAsk (|uint64| Question, |uint64|)
 		for 1000
 			app.Sleep(1 + (Question&3))

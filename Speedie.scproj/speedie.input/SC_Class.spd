@@ -22,6 +22,7 @@ datatype ClassInfo (int)
 		Builtin
 		SortsProperties
 		Dylib
+		DownGradeToString
 		NumericReduction = [Symbol, Flags]
 		
 
@@ -51,12 +52,9 @@ linkage
 |string?|					CppClass
 |SCDecl?|					ClassType
 |SCDecl|					SelfDecl
-//|Message?|					IsModel
 |SCBehaviour?|				Behaviour
 |SCClass?|					ProcessAs
-|SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
-//|(&ClassData)?|			InbuiltClass
 |ClassInfo|					Flags
 |DataTypeCode|				TypeInfo
 |DataTypeCode|				ASMTypeInfo

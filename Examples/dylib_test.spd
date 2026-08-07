@@ -6,9 +6,9 @@
 
 
 dylib libxml2 `libxml2`
-	cpp_func xmlReadFile (|cstring| path, |?&nil| IDK, |int| Flags,  |?&xmlDocument|)
-	cpp_func xmlDocGetRootElement (|&xmlDocument| doc, |&xmlNode|)
-	cpp_func xmlFreeDoc (|&xmlDocument| doc)
+	cpp_func xmlReadFile			(|cstring| path, |?&nil| IDK, |int| Flags,  |?&xmlDocument| )
+	cpp_func xmlDocGetRootElement	(|&xmlDocument| doc, |&xmlNode|)
+	cpp_func xmlFreeDoc				(|&xmlDocument| doc)
 	cpp_func xmlCleanupParser
 
 || libxml = libxml2.new!

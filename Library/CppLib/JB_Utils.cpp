@@ -190,7 +190,7 @@ bool JB_Str_IsC ( JB_String* self ) {
 }
 
 
-JB_StringC* JB_Str_MakeC ( JB_String* self ) {
+JB_StringC* JB_Str_ZeroTerm ( JB_String* self ) {
 	if (JB_Str_IsC(self))
 		return (JB_StringC*)self;
 
