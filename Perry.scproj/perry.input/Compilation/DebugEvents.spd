@@ -155,7 +155,7 @@ function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
 
 function PressingDebug (GUIAction)
 	opt norefcounts
-	|| db = .ide.DebugArgsText
+	|| db = .ide.RunArgsText
 	if db.HasAnyFocus
 		db.ClearFocus
 	  else

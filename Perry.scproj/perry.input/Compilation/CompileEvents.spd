@@ -18,7 +18,7 @@ function perryide.WantCake (|CompileMode| Mode, |compilemode|)
 			  else
 				Notifications <~ "Unrecognised compile mode: " + req.name
 	  else
-		.DebugArgsText.SetFocus
+		.RunArgsText.SetFocus
 		notifications <~ "Please fix the debug args first."
 		mode = nil	
 	return mode	
@@ -63,8 +63,8 @@ function PerryIDE.Compile (|CompileMode| Mode)
 
 
 function PerryIDE.DebugArgs (|message|)
-	.DebugArgsText.InitDebugArgs
-	return .DebugArgsText.text.Parse(@arg)	
+	.RunArgsText.InitDebugArgs
+	return .RunArgsText.text.Parse(@arg)	
 
 
 function PerryIDE.GUIIsCompiling (|[string]| args)

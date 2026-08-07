@@ -136,12 +136,14 @@
 		AC0A9ED72EB24D4000F9F1CB /* PicoMsg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PicoMsg.h; path = ../Library/CppLib/PicoMsg.h; sourceTree = "<group>"; };
 		AC1050002D61EF6C00BB929B /* FF_Intel.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_Intel.S; path = ../Library/CppLib/FF_Intel.S; sourceTree = "<group>"; };
 		AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
+		AC508C13302541D0006605FC /* index.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = index.spd; sourceTree = "<group>"; };
+		AC508C14302541D0006605FC /* network.spd */ = {isa = PBXFileReference; lastKnownFileType = text; path = network.spd; sourceTree = "<group>"; };
+		AC508C16302541D0006605FC /* .perry */ = {isa = PBXFileReference; lastKnownFileType = text; path = .perry; sourceTree = "<group>"; };
 		AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
 		AC6AB9262CB1AEB800555461 /* FF_ARM64.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_ARM64.S; path = ../Library/CppLib/FF_ARM64.S; sourceTree = "<group>"; };
 		AC6ADAE729872AA8009CFFBB /* Speedie */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Speedie; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC7A83172BC29DAE00DD6590 /* JB_OSX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JB_OSX.m; path = ../GUI.scproj/gui.input/c_includes/JB_OSX.m; sourceTree = "<group>"; };
 		AC7A83182BC29DAE00DD6590 /* JB_OSNative.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_OSNative.cpp; path = ../GUI.scproj/gui.input/c_includes/JB_OSNative.cpp; sourceTree = "<group>"; };
-		AC7A831D2BC2AEC000DD6590 /* JB_curl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_curl.cpp; path = ../network.scproj/network.input/c_includes/JB_curl.cpp; sourceTree = "<group>"; };
 		AC7D3C7929A27C1D00148ADB /* JB_List.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_List.cpp; path = ../Library/CppLib/JB_List.cpp; sourceTree = "<group>"; };
 		AC7D3C7A29A27C1D00148ADB /* JB_Umbrella.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
 		AC7D3C7B29A27C1D00148ADB /* JB_Compress.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Compress.cpp; path = ../Library/CppLib/JB_Compress.cpp; sourceTree = "<group>"; };
@@ -272,7 +274,6 @@
 		ACB8144C2FE7F23700D08D5A /* .perry */ = {isa = PBXFileReference; lastKnownFileType = text; path = .perry; sourceTree = "<group>"; };
 		ACB8144D2FE7F23700D08D5A /* .strings.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = .strings.txt; sourceTree = "<group>"; };
 		ACB8144E2FE7F23700D08D5A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		ACC8F9F22C960FD000A549D7 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,9 +294,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AC508C15302541D0006605FC /* net.input */ = {
+			isa = PBXGroup;
+			children = (
+				AC508C13302541D0006605FC /* index.spd */,
+				AC508C14302541D0006605FC /* network.spd */,
+			);
+			path = net.input;
+			sourceTree = "<group>";
+		};
+		AC508C17302541D0006605FC /* Net.scproj */ = {
+			isa = PBXGroup;
+			children = (
+				AC508C15302541D0006605FC /* net.input */,
+				AC508C16302541D0006605FC /* .perry */,
+			);
+			name = Net.scproj;
+			path = ../Net.scproj;
+			sourceTree = SOURCE_ROOT;
+		};
 		AC6ADADE29872AA8009CFFBB = {
 			isa = PBXGroup;
 			children = (
+				AC508C17302541D0006605FC /* Net.scproj */,
 				ACB8144F2FE7F23700D08D5A /* jeebox.scproj */,
 				AC7D3E4C29A284EA00148ADB /* library.input */,
 				AC7D3E4B29A284DB00148ADB /* speedie.input */,
@@ -344,7 +365,6 @@
 				AC7D3C9629A27C1D00148ADB /* JB_MSR.cpp */,
 				AC7A83182BC29DAE00DD6590 /* JB_OSNative.cpp */,
 				AC7A83172BC29DAE00DD6590 /* JB_OSX.m */,
-				AC7A831D2BC2AEC000DD6590 /* JB_curl.cpp */,
 				AC7D3C8529A27C1D00148ADB /* JB_Pipe.cpp */,
 				AC7D3C8A29A27C1D00148ADB /* JB_PNG.cpp */,
 				AC7D3C7929A27C1D00148ADB /* JB_List.cpp */,
@@ -542,7 +562,6 @@
 			isa = PBXGroup;
 			children = (
 				ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */,
-				ACC8F9F22C960FD000A549D7 /* libcurl.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -897,6 +916,7 @@
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
 					"-D__VM__",
+					"-lcurl",
 				);
 				PRODUCT_NAME = Speedie;
 			};
@@ -910,6 +930,7 @@
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
 					"-D__VM__",
+					"-lcurl",
 				);
 				PRODUCT_NAME = Speedie;
 			};

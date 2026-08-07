@@ -270,7 +270,7 @@ function SubFuncParamsLoad (|message| P)
 	|| A = .SourceArg
 	|| space = a.SCArg(self)
 
-	if (P==@List or @Bra or @prm)
+	if P.isparams
 		p.Func = @prm
 		.CollectDeclsParams( P, space )
 	
@@ -1078,7 +1078,7 @@ function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Typ
 	
 	if (!L)
 		On = @thg + "nil"
-	  elseif (L == @list or @bra or @prm)
+	  elseif L.isparams
 		L.Func = @prm
 		on = L.first
 	  else
@@ -1750,18 +1750,23 @@ function Tran_Return (TranFunc)  // exitter
 	node.CheckNotInStatExpr(fn.SourceArg)
 
 
+function message.IsParams (|bool|)
+	|| fn = .func
+	return fn == @prm or @list or @bra
 
 function NewCppWrapper (CollectFunc)
 	opt norefcounts
-	|| name = node[@thg]$
-	|| prm = name.Next$
-	expect (prm.islast) (prm)
 	// This doesn't code-autocomplete so well in perry...
-	
+
+	|| name = node[@thg]$
+	|| prm = name.next
 	using name
-	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
+	if !prm or !prm.IsParams
+		name.next = @prm.msg
+	
+	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM instructions
 	|| IsLib	 = node == "cpp_libwrapper"
-	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ (@thg, name.name)
+	node.givearg.msg(@Tmp, "cpp_wrapper") <~ (@thg, name.name)
 
 	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
 	if rz isa SCFunction
@@ -1853,8 +1858,7 @@ function message.NormaliseFunc (|scclass| AddSelf = nil, |message|)
 	  elseif !prm
 		prm = .msg(@prm)
 	  else
-		|| fn = prm.func
-		expect (fn == @bra or @list or @prm) (prm)
+		expect (prm.isparams) (prm)
 		prm.Func = @prm
 	if (addself)
 		|| d = prm.first

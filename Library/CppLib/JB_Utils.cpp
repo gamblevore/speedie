@@ -191,18 +191,15 @@ bool JB_Str_IsC ( JB_String* self ) {
 
 
 JB_StringC* JB_Str_MakeC ( JB_String* self ) {
-	if (self) { 
-		if (JB_Str_IsC(self))
-			return (JB_StringC*)self;
+	if (JB_Str_IsC(self))
+		return (JB_StringC*)self;
 
-		int N = JB_Str_Length(self);
-		JB_StringC* Rz = (JB_StringC*)JB_Str_NewCStr( N );
-		if_usual (Rz) {
-			CopyBytes(self->Addr, Rz->Addr, N);
-		}
-		return Rz;
+	int N = JB_Str_Length(self);
+	JB_StringC* Rz = (JB_StringC*)JB_Str_NewCStr( N );
+	if_usual (Rz) {
+		CopyBytes(self->Addr, Rz->Addr, N);
 	}
-	return 0;
+	return Rz;
 }
 
 } // 

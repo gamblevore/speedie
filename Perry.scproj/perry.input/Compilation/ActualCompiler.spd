@@ -68,7 +68,7 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 		app.cwd = old
 	
 	if !StdErr.ok
-		.DebugArgsText.FillErrors(StdErr)
+		.RunArgsText.FillErrors(StdErr)
 		|| err = StdErr.LastError
 			Notifications <~ err
 

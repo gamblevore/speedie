@@ -263,7 +263,7 @@ class SCBehaviour (SCNode)
 			expect !cls.IsRole (node, "roles can't specify behaviours (roles aren't real classes!)")
 			|| name = node[@thg]$
 			|| lst = name.next
-				expect (lst != @bra and @prm and @list)  (lst, "Behaviours can't specify params")
+				expect (!lst.isparams)  (lst, "Behaviours can't specify params")
 			using node 
 				|| it = name.next
 					it.expect(@arg)

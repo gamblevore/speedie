@@ -387,9 +387,8 @@ class String
 					return false
 			return true
 	
-	function CStr (|stringZeroTerminated?|)
+	function CStr (|stringZeroTerminated|)
 		nil checker 
-		description "Can return nil if self is nil"
 		cpp_Wrapper JB_Str_MakeC
 	
 	inline CopyTo (|&byte| Where, |bool|)

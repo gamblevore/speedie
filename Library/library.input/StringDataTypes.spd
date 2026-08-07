@@ -99,6 +99,11 @@ datatype cstring
 	inline Print
 		print self
 	
+	function String (|string|)
+		disabled "Do you mean .Copy or .Wrap?"
+	function Str (|string|)
+		disabled "Do you mean .Copy or .Wrap?"
+	
 	inline Wrap (|string|)
 		return string.new(self)
 		

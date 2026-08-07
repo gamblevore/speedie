@@ -790,7 +790,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 	|| nameMsg		= msg[@thg]$
 	|| protoMsg		= namemsg.next$
-	expect (protomsg == @bra or @prm or @list) (protomsg)
+	expect (protomsg.isparams) (protomsg)
 	|| items		= protoMsg.Next(@arg)$
 	|| ProtoFirst	= protomsg.first!
 	|| name			= namemsg.name

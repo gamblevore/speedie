@@ -4,13 +4,7 @@
 */
 
 
-
-target debug2
-	import "Net"
-
 main // main {
-	target debug2
-/		printline "https://tulips.com/".Download
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile
