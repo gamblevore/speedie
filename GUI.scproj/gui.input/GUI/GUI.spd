@@ -124,7 +124,7 @@ module GUI
 	function Alert (|string| msg, |string| title="")
 		cpp_part MsgBox
 		visible
-		SDL_ShowSimpleMessageBox(0, title.cstr!, msg.cstr!, nil)
+		SDL_ShowSimpleMessageBox(0, title.ZeroTerm, msg.ZeroTerm, nil)
 
 	
 	libinternal SelChanged
@@ -308,7 +308,7 @@ module GUI
 		SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
 
 		|| DS = .CurrDisplaySize
-		|| W = SDL_CreateWindow(.NiceAppName.cstr!, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
+		|| W = SDL_CreateWindow(.NiceAppName.ZeroTerm, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
 			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)

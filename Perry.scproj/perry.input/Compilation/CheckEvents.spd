@@ -125,7 +125,7 @@ extend PerryIDE
 	
 	
 	function NameStr (|string| s, |string|)
-		return .name.trimext + s
+		return .projname.trimext + s
 		
 	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
 		|| RealErrors	= msg ~!= "check"

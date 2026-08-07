@@ -118,7 +118,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 	function Disconnect (|string| why = "")
-		.pico.close(why.cstr!)
+		.pico.close(why.zeroterm)
 
 	
 	function SpawnAsChild (|bool|)

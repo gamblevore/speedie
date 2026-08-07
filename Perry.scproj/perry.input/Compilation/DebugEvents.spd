@@ -145,7 +145,7 @@ function PerryIDE.Stop (|unixprocess| prod, |bool|)
 function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
 	|| prod = .RunningProd
 		.showide
-		|| str = "Kill running product '".append(.Name, "'", Reason) // should be automatic but isnt FN
+		|| str = "Kill running product '".append(.projName, "'", Reason) // should be automatic but isnt FN
 		// from a + b + c + d --> a.append...
 		if .confirm(str, fnStillRunning)
 			if .stop(prod)
@@ -450,7 +450,7 @@ function Perryide.ASMVis (assigns:|bool|)
 function ClickedASMButton (guiaction)
 	opt norefcounts
 	|| i = .ide
-/	|| v = i.ASMView
+	|| v = i.ASMView
 	v.clear
 	if i.ASMVis
 		i.HideASM
@@ -537,6 +537,15 @@ function perryide.GotASMError (|message| Error_List)
 	opt norefcounts
 	.ClearOldASMErrors
 	for s in Error_List
+		|| arg = s.arg
+			|| f = arg.first
+			if f.isstring and f == "nofile"
+				|| v = .ASMView
+				v.clear
+				v.AddFail "ASM unavailable for " + .path.name
+				v.addfail "File not in " + .projname
+				continue
+			
 		|| err = error.from(s)
 			s.Tag = 8888
 			.editme.addErrorToLine(err, false)

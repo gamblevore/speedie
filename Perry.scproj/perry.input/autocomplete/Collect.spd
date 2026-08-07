@@ -106,7 +106,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
 				.UsingSpdLib = true
-				f.name = .name.TrimExt + "()"
+				f.name = .projname.TrimExt + "()"
 			|| spd = (Speedie_Main).Spawn(f.name, p)
 				return spd
 

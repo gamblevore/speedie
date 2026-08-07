@@ -1051,38 +1051,41 @@ int JB_File_ModeSet ( JB_File* self, int Mode ) {
 }
 
 
-int JB_Str_SymLink ( JB_StringC* Existing, JB_String* ToCreate ) {
+int JB_Str_SymLink ( JB_String* TheSource, JB_String* ToCreate ) {
 	int Err = 0;
 	struct _stat st;
-	// we are doing JB_FastFileString below but Stat_ is doing it also... could be merged.
 	if (Stat_(ToCreate, &st, false)) {
 		Err = JB_File_Delete(ToCreate);
 		if (Err)
 			errno = EEXIST; // clearer error message.
 	}
 	if (!Err) {
-		uint8 Tmp[PATH_MAX];
-		auto Created = (const char*)JB_FastFileString(ToCreate, Tmp);
-		if (!Created) return errno;
-		Err	= symlink((const char*)(Existing->Addr), Created);
+		uint8 PCreate[PATH_MAX];
+		uint8 PSource[PATH_MAX];
+		auto Created = (const char*)JB_FastFileString(ToCreate, PCreate);
+		auto Existing = (const char*)JB_FastFileString(TheSource, PSource);
+		if (!Created or !Existing) return errno;
+		Err	= symlink(Existing, Created);
 		
 		if (Err and errno == ENOENT) {
 			Err = 1; // creates clearer error messages.
 			if (RetryMakePath(ToCreate))
-				Err = symlink((const char*)(Existing->Addr), Created);
+				Err = symlink(Existing, Created);
 		}
 		if (!Err)
-			RelaxPath_(Created, true, ToCreate); // needed on MacOSX but not linux!
+			RelaxPath_(Created, true, ToCreate); // makes this file not need sudo. needed on MacOSX but not linux!
 	}
-	return (int)ErrorHandle_(Err, ToCreate, Existing, "linking");
+	return (int)ErrorHandle_(Err, ToCreate, TheSource, "linking");
 }
 
 
-bool JB_File_HardLinkTo ( JB_File* self, JB_StringC* Link ) {
+bool JB_File_HardLinkTo ( JB_File* self, JB_String* Link ) {
 	auto C	= ((const char*)JB_FastFileThing(self));
-    int Err	= link(C, (const char*)(Link->Addr));
+	uint8 PCreate[PATH_MAX];
+	auto LinkPath = (const char*)JB_FastFileString(Link, PCreate);
+    int Err	= link(C, LinkPath);
     if (Err and RetryMakePath(Link))
-		Err = link(C, (const char*)(Link->Addr));
+		Err = link(C, LinkPath);
 	ErrorHandle_(Err, self, Link, "hardlinking");
 	return !Err;
 }

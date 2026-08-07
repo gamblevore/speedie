@@ -54,7 +54,7 @@ function print_element_names (|&xmlNode| cur_node)
 
 
 main  (|file.existing| xml_file)
-	|| doc = libxml.xmlReadFile(xml_file.cstr, nil, 0)			#expect "Could not parse file $xml_file"
+	|| doc = libxml.xmlReadFile(xml_file.ZeroTerm, nil, 0)			#expect "Could not parse file $xml_file"
 	|| root_element = libxml.xmlDocGetRootElement(doc)
 
 	print_element_names(root_element)

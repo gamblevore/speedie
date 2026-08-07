@@ -367,13 +367,13 @@ class PerryIDE (Window)
 
 	
 	function ProjName (|string|)
-		disabled "Use .name"
-	
-	
-	function Name (|string|) //.ProjName
 		opt norefcounts
 		|| m = .SharedProjectTabSource
 			return m.name.name
+	
+	
+	function Name (|string|)
+		disabled "Use .projname"
 
 
 	function Show (|bool| FromClick=false)
@@ -395,7 +395,7 @@ class PerryIDE (Window)
 			.ProjectTabs.selected = .SharedProjectTabSource
 			.editme.SetFocus				// Make it simple
 			super.show
-		.id = .name
+		.id = .projname
 		GUI.Title = .id
 
 
@@ -523,7 +523,7 @@ class PerryIDE (Window)
 		require !.UsingSpdLib
 		|| f = .Feedback
 		if f.CommsOpen  and  .FeedBackLivedTooLong(f)
-			.LogOneAction("Released Speedie: " + .name)
+			.LogOneAction("Released Speedie: " + .projname)
 			f.Kill(0) // savememory
 	
 	

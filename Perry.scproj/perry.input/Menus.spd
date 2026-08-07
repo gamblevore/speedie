@@ -37,7 +37,7 @@ function PressingTabs (guiaction)
 			|| ide = row.ide
 				p.ListSource.clear
 				|| ref = ide.first
-				p <~ ("Copy " + ide.name, MenuCopyProject, ref)
+				p <~ ("Copy " + ide.projname, MenuCopyProject, ref)
 				|| file = ide.path|string|
 				if file and file != ide.Project|string|
 					p <~ ( "Copy " + file.name, MenuCopyFile, ref)

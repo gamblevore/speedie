@@ -588,15 +588,11 @@ function File.TestSpeedie (|string| v, |bool|)
 	return StdErr.OK
 
 	
-function array.AddCStr (|array of string| self, |string| s)
-	opt norefcounts
-	if s
-		self <~ s.cstr
-
 
 function array.AppendWords (|array of string| self, |string| R)		// appendoptions, addoptions
 	for S in R / ' '
-		.AddCStr(s)
+		if s
+			self <~ s
 
 
 function string.MakeAndGoInto (|File|)

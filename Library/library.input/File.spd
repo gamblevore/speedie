@@ -58,14 +58,14 @@ class File (StringShared)
 	function LinksTo (|string|)
 		cpp_wrapper JB_File_LinkToGet
 
-	function StringZeroTerminated.SymLink (assigns:|file|, |errorint|)
+	libinternal String.SymLink (assigns:|string|, |errorint|)
 		cpp_wrapper JB_Str_SymLink
 
 	function LinkTo (assigns:|string|, |errorint|)
-		// This API confuses me... not sure if it's me or unix right now. 
-		return Value.cstr!.SymLink(self)
+		// reverses the order to something I can understand more easily.
+		return Value.SymLink(self)
 
-	function HardLinkTo (assigns:|stringzeroterminated|, |bool|)
+	function HardLinkTo (assigns:|string|, |bool|)
 		cpp_wrapper JB_File_HardLinkTo
 
 	function IsOpen (|bool|)

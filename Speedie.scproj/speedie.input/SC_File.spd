@@ -150,8 +150,8 @@ function file.CodeSign (|string| sign, |ExitCode|)
 		if options.PrintCompileString
 			args <~ "--verbose"
 		args <~ "-s"
-		args <~ sign.cstr
-		args <~ self.cstr
+		args <~ sign
+		args <~ self
 
 		|| errs = FastString()
 		|| f = "/usr/bin/codesign".file

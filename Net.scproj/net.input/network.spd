@@ -87,10 +87,10 @@ struct CurlEnv
 
 
 function faststring.AppendURL (|string| URL, |Date| Timeout=nil, |string?| Cookie=nil, |ErrorInt|)
-	|stringzeroterminated| U = url.cstr!
-	|cstring| cook
+	|stringzeroterminated| U = url.zeroterm
+	|stringzeroterminated| cook
 	if Cookie!=nil
-		cook = cookie.cstr!
+		cook = cookie.zeroterm
 	return .AppendURLC(U.cstring, Timeout, cook)
 
 
