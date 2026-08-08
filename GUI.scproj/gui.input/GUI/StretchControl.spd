@@ -19,6 +19,12 @@ role StretchControl (GuiControl)
 		  elseif d.DistanceToEdge <= 0
 			d.Open
 
+
+	function StretchTo (|int| P)
+		opt norefcounts
+		.Divider.StretchTo(P)
+
+
 	function Collapsed (|bool|)
 		opt norefcounts
 		return .divider.DistanceToEdge <= 0
@@ -26,6 +32,11 @@ role StretchControl (GuiControl)
 	inline IsOpen (|bool|)
 		opt norefcounts
 		return !.Collapsed
+		
+	
+	function Reset
+		.Divider.distancetoedge = .Divider.Initial
+		
 		
 	function AddHigh (|guicontrol| G)
 		opt norefcounts
@@ -45,7 +56,7 @@ role StretchControl (GuiControl)
 		return .last|stretchdivider|!
 	
 	inline Open
-		.Collapsed = false
+		.divider.open
 		
 	module
 		inline Horz (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
@@ -80,14 +91,14 @@ class StretchDivider (GuiControl)
 	|int|						HighGap
 	|int|						Initial
 	|date|						Entered
-	|int|						D
 	|float|						DefaultFraction
 	|bool|						CollapseToRight
+	|byte|						D
 
-	constructor (|guicontrol| p,  |int| d)
+	constructor (|guicontrol| p, |int| d)
 		super.constructor(p)
 		isnt drawsfocus
-		.d = d
+		.d = D&1
 		.DefaultFraction = 0.333
 		.takesfocus = 0
 		.gnormal.solid = (0.65, 0.75, 0.0, 1.0)
@@ -98,7 +109,7 @@ class StretchDivider (GuiControl)
 		.id = "stretch"
 		|| A = .low!
 		|| C = .high!
-/		|| s = .alignvalue(.initial)
+		|| s = .alignvalue(.initial)
 		if A == "left"								// noice
 			|| H = the~height
 			A.size = the~left to s		by  H
@@ -117,7 +128,7 @@ class StretchDivider (GuiControl)
 		if .DistanceToEdge <= 0
 			W = 0~before for 4
 		|| H = W
-		if .d
+		if .d & 1
 			W = the~width
 		  else
 			H = the~height
@@ -152,44 +163,46 @@ class StretchDivider (GuiControl)
 		.ActiveEnd = .alignvalue(value)
 
 
-	function MoveTo (|ivec2| P)
+	libinternal StretchTo (|int| P)
 		opt norefcounts
 		|| pr = .parent!.lastrect ± 1
-		|| d = .d
+		|| d = .d & 1
 		|| x = 0
 		if !.CollapseToRight
-			x  = p[d] - pr[d]
+			x  = p - pr[d]
 			(x max= .LowGap)
 			(x min= pr.size[d]-.HighGap)
 		  else
-			x  = pr[d + 2] - p[d]
+			x  = pr[d + 2] - p
 			(x max= .HighGap)
 			(x min= pr.size[d]-.LowGap)
 		.distancetoedge = x
 
 
-	function ActiveEnd (|controlpoint|)
+	libinternal ActiveEnd (|controlpoint|)
 		opt NoRefCounts
 		|| l = .low
-			return l.sizer[2+.d]
+			return l.sizer[2+(.d&1)]
 	
-	setter ActiveEnd (|controlpoint|)
+	
+	libinternal ActiveEnd (assigns:|controlpoint|)
 		opt NoRefCounts
 		|| l = .low
-			l.sizer.g(2+.d, self) = value
+			l.sizer.g(2+(.d&1), self) = value
 			.ResizeDivider
 	
 
 	libinternal Flip
+		|| E = .edge
 		if .DistanceToEdge <= 0
 			|| OnShow = .onshow
-			if OnShow and .LowGap > 0 // shouldnt be possible?
+			if OnShow and E > 0 // shouldnt be possible?
 				(OnShow)(self, 1)
 			  else
 				.Open
 		  else
 			|| OnHide = .onhide
-			if onhide and .LowGap > 0
+			if onhide and E > 0
 				(onhide)(self, 0)
 			  else
 				.Collapse
@@ -197,16 +210,23 @@ class StretchDivider (GuiControl)
 
 	libinternal DefaultEnd (|guicontrol| P, |int|)
 		|| pr = p.lastrect
-		return .DefaultFraction.mix(pr[.d]|float|, pr[.d+2]|float|)|int|	
+		|| d = (.d&1)
+		return .DefaultFraction.mix(pr[d]|float|, pr[d+2]|float|)|int|	
 
 
+	libinternal Edge (|int|)
+		|| v = .lowgap
+		if .CollapseToRight
+			v = .HighGap
+		return v
+	
+	
 	function Open
 		opt norefcounts
 		|| p = .parent$
-		|| M = .LowGap max 10
+		|| M = .Edge max 10
 		if .distancetoedge < M
-			|| ini = .initial max m
-			.distancetoedge = ini
+			.distancetoedge = .initial max m
 
 
 	libinternal High (|guicontrol|)
@@ -223,7 +243,7 @@ class StretchDivider (GuiControl)
 			.Flip
 			return MouseDragging.handled
 		
-		.MoveTo(p)
+		.StretchTo(p[.d&1])
 		return MouseDragging.DragBeyond
 
 
@@ -242,7 +262,7 @@ class StretchDivider (GuiControl)
 
 	behaviour MouseMove
 		opt norefcounts
-		|| Cursor = SystemCursor.SizeWE+.d
+		|| Cursor = SystemCursor.SizeWE+(.d&1)
 		if state is enter or systemcursor.curr != Cursor
 			Cursor.Use
 		
@@ -291,19 +311,20 @@ class StretchDivider (GuiControl)
 		
 		|| a = .FadeAlpha
 		|| scale = rect.size.Vec2
-		|| h = scale[1-.d]
-		|| w = scale[.d]
+		|| d = .d&1
+		|| h = scale[1-d]
+		|| w = scale[d]
 		scale = 2.5 / (w, h)
 		w = 3.0
 		xy[.d] += 1
-		|| add = (.d, 1-.d)
+		|| add = (d|int|, (1-d)|int|)
 		|| stride = 1
-		if .d: stride = where.width
+		if d: stride = where.width
 		|| col = .gnormal.edge.Color
 		|| center = (w, h)*0.5 - 0.5
 
 		// not sure why I neeed these wierd adjustments...
-		if !.d
+		if !d
 			center.x += 2
 			scale.x *= 1.26th
 			scale.y *= 2th
@@ -313,7 +334,7 @@ class StretchDivider (GuiControl)
 			scale.x *= 1th
 
 		
-		if !.d
+		if !d
 			|| TickCount = 7
 			|| txy = (xy + add * (h*0.5)|int|) - (kGrabDist*add*TickCount)
 			

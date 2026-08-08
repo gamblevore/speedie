@@ -62,7 +62,7 @@ extend PerryIDE
 		.ViewErrors			= Button(.ViewButtons,	ClickedAView)
 		.viewlog			= Button(.ViewButtons,	ClickedAView)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
-		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
+		.ProductSep			= StretchControl.vert(self, 0~right, 113, 100)
 		.PopupDisplay		= textview(self)
 		.RunArgsText		= textview(self)
 		
