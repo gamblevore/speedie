@@ -374,17 +374,34 @@ function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 
 
 function perryide.DebugStep (|string| kind, |bool|)
+	|| Err = .DebugStepSub(kind)
+	if err != 0
+		Notifications <~ "Can't step. Failed at stage: $Err"
+		beep
+	return true
+
+
+function perryide.DebugStepSub (|string| kind, |ErrorInt|)
 	opt norefcounts
 	|| e = .editme
 	|| active = e._ActiveLine
-	if active and .EditPath(active.name, false)
-		|| Vline = -1
-		|| l = e.FindTextLine(active.position, Vline, true)
-			|| j = .LineCommand(kind, l)
-				.SendJbin(j)
-				return true
-	Notifications <~ app.StackTrace
-	beep
+	if !active
+		return 1
+	
+	if !.EditPath(active.name, false)
+		return 2
+		
+	|| Vline = -1
+	|| l = e.FindTextLine(active.position, Vline, true)
+	if !l
+		Notifications <~ ("Can't find debug position: " + active.Position) + "\nTry stepping out or running instead."
+		return 0
+		
+	|| j = .LineCommand(kind, l)
+	if !j
+		return 4
+	.SendJbin(j)
+	return 0
 
 	
 function DebugStepOver (guiaction)

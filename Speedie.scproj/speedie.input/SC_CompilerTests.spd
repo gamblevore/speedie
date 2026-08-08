@@ -23,21 +23,13 @@ helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 	// So we have a few paths... and they don't exist, lets create them.
 	Src.linkto(Dest)
 	A.writeall(q)
-
+	
 	|| ReadBack = B.file.ReadAll
 	check (ReadBack == q) ("Testing link+write failed. Read: " + Readback)
 		
 
-//function app.FlowTest (|string| path)
-//	|| msg = path.file.parse$
-//	|| str = msg.Render$
-//	for 1000
-//		if 0.1[] : exit
-//	path = path.AddExt("flowtest")
-//	path <~ str
-//	
 
-target debug 
+target debug
 	class CArrayTest
 		|int[20]| Items
 		
@@ -46,4 +38,24 @@ target debug
 		function B
 			visible
 			.a(.items)
+
+
+
+target debug2
+	struct BadParamErrorReportTests
+		// everything is reported OK...
+		// but I know there errors in the reporting
+		// can't replicate easily.
+		function A (|int| A, |int| B)
+		function Tester (|string| s)
+			if 1
+				|| i = .A("s", "ss")
+			if 2
+				|| i = .A(0,0,0)
+			if 3
+				|| i = .A(0)
+			if 4
+				|| i = s.Compress("s") // correct
+
+
 

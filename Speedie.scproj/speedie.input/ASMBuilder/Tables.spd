@@ -378,9 +378,11 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	rel = rel.last!
-	if .InlineDepth > 0
-		return .µInto(rel, dest) // tail.
-	return .µInto(rel, dest).incr
+	|| Incr = (.InlineDepth > 0)			// tail
+	rz = .µInto(rel, dest)
+	if incr					// and rel isnt Inserted // what about deliberate syntactic sugar?
+		rz = rz.incr		// either way... SOME things could go. like the appinit decls.
+	
 	
 	
 function StatExpr (fn_asm)

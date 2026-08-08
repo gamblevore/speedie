@@ -119,8 +119,11 @@ function SCDecl.DumpWierdness (|jbin| j)
 function FatASM.CanCloseRegs (|int| R, |bool|)
 	if .Index|int| <= 0 // oof
 	|| op = ._Op
-	if op == asm.ret or asm.RFRT or asm.MARK
+	if op == asm.ret or asm.RFRT
 		return true
+	if  (op == asm.MARK) and (self isnt debugvaropen)
+		return true
+		
 	if (op == asm.rfun) and (R&(R-1) == 0)
 		|| v = R.log2
 		if  .RegOnly(0) == v  and  .regonly(1) == v  and  .regonly(2) == 0
@@ -140,7 +143,7 @@ function Assembler.MarkVarClosed (|int| RegBits)
 
 
 
-function fatasm.CanMarkSomething (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
+function fatasm.CanMarkOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
 	opt norefcounts
 	require (self isnt DebugVarOpen) or (self isa asm.mark)
 	require self isnt DebugVarClose			// for cleanlyness
@@ -160,7 +163,7 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 		start -= .IsCurr(start-1)|int|		// and it gets replaced into a .gobj
 	
 	while Start <= Last
-		if Last.CanMarkSomething(exp, Declared, ty)
+		if Last.CanMarkOpen(exp, Declared, ty)
 			(Last is DebugVarOpen)
 			return declared
 		Last--
