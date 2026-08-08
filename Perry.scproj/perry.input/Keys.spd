@@ -199,7 +199,10 @@ function PressedSearchKeys (GUIKeyEvent)
 			if (self == Srch) and (repl is Enabled and Editable)
 				repl.setfocus
 			  else
-				w.FoundList.SetFocus
+				|| fl = w.FoundList
+				fl.SetFocus
+				if !fl.FirstSelected
+					fl.SelectFirst
 			return true
 		if (key is up) and (sr == 0) and (self != Srch)
 			srch.setfocus

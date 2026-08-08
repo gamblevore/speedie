@@ -92,18 +92,20 @@ struct ControlSize
 //				if dbg
 //					.PrintExplain(i, 0, rz)
 		
-		|| E = upon.FindAttachedEdge.flip
-		for i in 4
-			if .mode(i) == ControlPoint.Length
-				|| other = i xor 2
-				|| ro = rz[other]
-				|| sz = .size(i)
-				
-				sz = upon.Transition(sz, i, e)
-				rz[i] = ro + (sz * (i>=2).dir)
-//				if dbg
-//					.PrintExplain(i, ro, rz)
-
+		if 1234 { // find the length. Could be sliding.
+			|| E = upon.FindAttachedEdge.flip
+			for i in 4
+				if .mode(i) == ControlPoint.Length
+					|| other = i xor 2
+					|| ro = rz[other]
+					|| sz = .size(i)
+					
+					sz = upon.Transition(sz, i, e)
+					rz[i] = ro + (sz * (i>=2).dir)
+	//				if dbg
+	//					.PrintExplain(i, ro, rz)
+		}
+		
 		if upon.ClipMode is SlideBackInParent
 			|| rz2 = rz.Bound(parent)
 //			if dbg

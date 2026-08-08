@@ -504,7 +504,7 @@ extend PerryIDE
 			.ColumnFinder = &Perry.ReadButtonNames
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
 			.GNormal.PixelShader = image.RoundRectDrawer
-			.GNormal.CornersCut = 12
+			.GNormal.CornersCut = 6
 			.GNormal.CornerSize = 6
 
 		with .CompileTabs

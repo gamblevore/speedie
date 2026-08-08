@@ -46,7 +46,7 @@ DrawStyle has the ability to alter the Edge and background colors 'Safely', then
 	
 	// unfinished
 	|Byte|						CornerSize
-	|byte| 						CornersCut // movecode would be better.
+	|byte|						CornersCut // 1, 2, 4, 8 represent corners that can be cut off
 	|Byte|						EdgeWidth
 
 		

@@ -40,6 +40,7 @@ class-changes:
 
 
 Additions:
+	* module: || H = libxml2.new! // this would get inited much later in the app. i wonder if we can fix this?
 	* string vargs
 	* passing properties as params, SHOULD NOT assume its safe... Refcount optimiser should decide this.
 	* Rename "flags" to something else. I wanna use "flags" for some kinda default Info and SyntaxIs
