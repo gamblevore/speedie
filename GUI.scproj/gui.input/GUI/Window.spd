@@ -521,7 +521,9 @@ class Window (GUIControl)
 
 
 	libinternal RunWindowTasks (|bool| WantAnims)
-		opt norefcounts
+		// not sure why but somehow soemthing is being destroyed here
+		// i guess any code could do anything at any point so...
+		// lets not make assumptions
 		// wait, WantAnims (animated) isnt used? 
 		// does that mean this is being called more than it should?
 		for p in .Tasks

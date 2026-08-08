@@ -1,14 +1,10 @@
 
 
-class StretchControl (GuiControl)
+role StretchControl (GuiControl)
 	contains stretchdivider
 	linkage
 		cpp_part SC
 	
-	behaviour Resized
-		if Initial
-			.reset
-		
 	libinternal AddPane (|string| name)
 		opt norefcounts
 		|| rz = GUIControl(self)
@@ -20,21 +16,17 @@ class StretchControl (GuiControl)
 		|| d = .Divider
 		if Value
 			d.collapse
-		  elseif d.collapsed
+		  elseif d.DistanceToEdge <= 0
 			d.Open
 
 	function Collapsed (|bool|)
 		opt norefcounts
-		return !.Divider.ActiveEnd.length
+		return .divider.DistanceToEdge <= 0
 		
 	inline IsOpen (|bool|)
 		opt norefcounts
 		return !.Collapsed
 		
-	function Reset
-		opt norefcounts
-		.Divider.ActiveEnd = .Divider.start
-
 	function AddHigh (|guicontrol| G)
 		opt norefcounts
 		.Divider.high! <~ g
@@ -53,26 +45,26 @@ class StretchControl (GuiControl)
 		return .last|stretchdivider|!
 	
 	inline Open
-		opt norefcounts
-		.Divider.Open
+		.Collapsed = false
 		
 	module
-		inline Horz (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
-			return .Build(p, start, min, max, 0)
+		inline Horz (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
+			return .Build(p, start, LowGap, HighGap, 0)
 
-		inline Vert (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
-			return .Build(p, start, min, max, 1)
+		inline Vert (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
+			return .Build(p, start, LowGap, HighGap, 1)
 
-		function Build (|guicontrol| p, |controlpoint| start, |int| min, |int| max, |int| d, |stretchcontrol|)
+		function Build (|guicontrol| p, |ControlPoint| start, |int| LowGap, |int| HighGap, |int| D, |stretchcontrol|)
 			opt norefcounts
 			|StretchControl| sG = StretchControl(p)
 			(sg is PassThru)
 			sG.AddPane((d!=nil)("bottom", "left"))
 			sG.AddPane((d!=nil)("top", "right"))
 			|| SD   = StretchDivider(sG, d)
-			SD.start= start
-			SD.min  = min
-			SD.max  = max
+			SD.Initial= start.Length.abs
+			SD.LowGap  = LowGap
+			SD.HighGap  = HighGap
+			sd.CollapseToRight = start is high
 			sd.InitGroup
 			return sG
 
@@ -84,12 +76,13 @@ class StretchDivider (GuiControl)
 	|guiAction?|				OnHide
 	|guiAction?|				OnShow
 	|guiAction?|				OnStretch
-	|int|						Min
-	|int|						Max
-	|controlpoint|				Start
+	|int|						LowGap
+	|int|						HighGap
+	|int|						Initial
 	|date|						Entered
 	|int|						D
 	|float|						DefaultFraction
+	|bool|						CollapseToRight
 
 	constructor (|guicontrol| p,  |int| d)
 		super.constructor(p)
@@ -102,11 +95,10 @@ class StretchDivider (GuiControl)
 	
 	function InitGroup
 		opt norefcounts
-		cpp_part SSST
 		.id = "stretch"
 		|| A = .low!
 		|| C = .high!
-		|| s = .start
+/		|| s = .alignvalue(.initial)
 		if A == "left"								// noice
 			|| H = the~height
 			A.size = the~left to s		by  H
@@ -120,9 +112,9 @@ class StretchDivider (GuiControl)
 
 
 	function ResizeDivider
-		// W basically overlaps the panes... unless collapsed.
+		// puts divider overlapping the panes... unless collapsed.
 		|| W = 3~before for 6
-		if .collapsed
+		if .DistanceToEdge <= 0
 			W = 0~before for 4
 		|| H = W
 		if .d
@@ -133,87 +125,50 @@ class StretchDivider (GuiControl)
 
 
 	behaviour Resized
+		if Initial
+			.distancetoedge = .Initial
 		.InTest(GUI.mousexy, true)
-		
-
-	libinternal Collapsed (|bool|)
-		inlined
-		return !.ActiveEnd.length
-
-
+	
+	
 	libinternal Collapse
 		opt norefcounts
-		if !.Collapsed
-/			if .start is low
-				.ActiveEnd = 0 ~ Right
-			  else
-				.ActiveEnd = 0 ~ left
+		debugger 
+		if .DistanceToEdge > 0
+			.distancetoedge = 0
 
 
-	function SlowFlip
-		if .Collapsed
-			|| OnShow = .onshow
-			if OnShow and .min > 0 // shouldnt be possible?
-				(OnShow)(self, 1)
-			  else
-				.Open
+	libinternal DistanceToEdge (|int|)
+		rz = .ActiveEnd.length
+		if .CollapseToRight
+			rz = -rz
+	
+	libinternal AlignValue (|int| Value, |Controlpoint|)
+		|| V = (value) ~ Right
+		if .CollapseToRight
+			V = (value) ~ left
+		return v
+		
+	libinternal DistanceToEdge (assigns:|int|)
+		.ActiveEnd = .alignvalue(value)
+
+
+	function MoveTo (|ivec2| P)
+		opt norefcounts
+		|| pr = .parent!.lastrect ± 1
+		|| d = .d
+		|| x = 0
+		if !.CollapseToRight
+			x  = p[d] - pr[d]
+			(x max= .LowGap)
+			(x min= pr.size[d]-.HighGap)
 		  else
-			|| OnHide = .onhide
-			if onhide and .min > 0
-				(onhide)(self, 0)
-			  else
-				.Collapse
+			x  = pr[d + 2] - p[d]
+			(x max= .HighGap)
+			(x min= pr.size[d]-.LowGap)
+		.distancetoedge = x
 
-
-//	task SlowShow (taskgui, |int| s)
-//		constructor
-//			is Animation
-//		run
-//			libinternal
-//			opt norefcounts
-//			|| u = .upon
-//			|| p = u.parent$
-//			|| pr = p.LastRect
-//			if u.ActiveEnd.length < 10
-//				|| s = u.start.length
-//				if s < 10
-//					|| d = u.d
-//					s = 0.333.mix(pr[d]|float|, pr[d+2]|float|)|int|
-//				u.ActiveEnd = (.s)~up
-
-
-	libinternal DefaultEnd (|guicontrol| P, |int|)
-		|| pr = p.lastrect
-		return .DefaultFraction.mix(pr[.d]|float|, pr[.d+2]|float|)|int|	
-
-
-	function Open //(|bool| anim=false)
-		opt norefcounts
-		|| p = .parent$
-		require .ActiveEnd.length < 10
-		|| s = .start.length
-		if s < 10
-			s = .DefaultEnd(p)
-//		if anim
-//			.slowshow(0.75s, s)
-//		  else
-		.ActiveEnd = (s)~up
-
-
-	libinternal High (|guicontrol|)
-		opt norefcounts
-		return .parent.second
-
-	libinternal Low (|guicontrol|)
-		opt norefcounts
-		return .parent.first
 
 	function ActiveEnd (|controlpoint|)
-		// this seems to have some kinda flaw
-		// where collapsing something on the right... expands it instead.
-		// sigh. do we need active start?
-		// i don't wanna do this now.
-		
 		opt NoRefCounts
 		|| l = .low
 			return l.sizer[2+.d]
@@ -224,24 +179,52 @@ class StretchDivider (GuiControl)
 			l.sizer.g(2+.d, self) = value
 			.ResizeDivider
 	
+
+	libinternal Flip
+		if .DistanceToEdge <= 0
+			|| OnShow = .onshow
+			if OnShow and .LowGap > 0 // shouldnt be possible?
+				(OnShow)(self, 1)
+			  else
+				.Open
+		  else
+			|| OnHide = .onhide
+			if onhide and .LowGap > 0
+				(onhide)(self, 0)
+			  else
+				.Collapse
+
+
+	libinternal DefaultEnd (|guicontrol| P, |int|)
+		|| pr = p.lastrect
+		return .DefaultFraction.mix(pr[.d]|float|, pr[.d+2]|float|)|int|	
+
+
+	function Open
+		opt norefcounts
+		|| p = .parent$
+		|| M = .LowGap max 10
+		if .distancetoedge < M
+			|| ini = .initial max m
+			.distancetoedge = ini
+
+
+	libinternal High (|guicontrol|)
+		opt norefcounts
+		return .parent.second
+
+	libinternal Low (|guicontrol|)
+		opt norefcounts
+		return .parent.first
+	
 	behaviour MouseDown
 		require .InTest(P, false)
 		if keys.cmd or (clicks == 2)
-			.SlowFlip
+			.Flip
 			return MouseDragging.handled
 		
 		.MoveTo(p)
 		return MouseDragging.DragBeyond
-
-
-	function MoveTo (|ivec2| P)
-		opt norefcounts
-		|| pr = .parent!.lastrect ± 1
-		|| d = .d
-		|| x  = p[d] - pr[d]
-		(x max= .min)
-		(x min= pr.size[d]-.max)
-		.ActiveEnd = (x)~up
 
 
 	libinternal InTest (|ivec2| P, |bool| MightBeOut, |bool|)
@@ -274,24 +257,6 @@ class StretchDivider (GuiControl)
 		rz = f.clamp
 		if rz >= 0 and rz < 1.0
 			.touch
-
-
-//	function Image.DrawOutlinedCircle (|vec4| R, |vec4| Inner, |vec4| Edge, |float| EdgeWidth)
-//		|| Back		= .Clip(R)$
-//
-//		|| mid		= r.Center
-//		|| maxdist	= ((0.5 * r.width) + 0.5) * 0.15
-//		|| scale	= (1.0, r.aspect)
-//		|| Dim		= r.area.RangeConvertClamped(2000.0, 0.15, 8000.0, 0.26)
-//		|| c1		= inner * inner.a
-//		|| MD		= (maxdist / dim).pow2
-//
-//		for Pix.rect in Back.ivec4
-//			|| V = (mid - pix.vec2)*scale
-//			|| vv = v • v
-//			if MD > vv
-//				|| D = maxdist / vv.sqrt
-//				self[Pix].add((D-dim)*c1)
 	
 	
 	module
@@ -343,7 +308,7 @@ class StretchDivider (GuiControl)
 			scale.x *= 1.26th
 			scale.y *= 2th
 		  else
-			xy.y+=(!.collapsed)*3
+			xy.y+=(.DistanceToEdge > 0)*3
 			scale.y *= 1.2th
 			scale.x *= 1th
 

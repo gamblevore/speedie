@@ -41,7 +41,7 @@ extend PerryIDE
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.ASMView			= Listview(self,		SelectedASM,			SelectedASM)
-		.ASMStretch			= StretchControl.horz(self, 200~left,  110, 110)
+		.ASMStretch			= StretchControl.horz(self, 200~left,  113, 210)
 		.FileSep			= StretchControl.horz(self, 175~right, 113, 210)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme)
