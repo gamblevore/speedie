@@ -7,7 +7,8 @@ app.usage = "Usage: size path [...]
 
 |bool|		ShowInvis = app.yes("v")
 ||			Types = app["types"].trim.dict('/')
-|[message]| Found
+|[message]| FilesFound
+|[message]| FoldersFound
 
 
 main (|[file]| FileList)
@@ -19,15 +20,22 @@ main (|[file]| FileList)
 	for F in FileList
 		F.CountAll
 	
-	found.sort
-	|int64| Total
-	for m in found
+	FilesFound.sort
+	FoldersFound.sort
+	"\n-------Folders-----\n"
+	report(foldersfound, cwd)
+	"\n-------Files-----\n"
+	|| Total = report(filesfound, cwd)
+	"\nTotal: ${Total.strsize}"
+
+
+function Report (|[message]| List, |string| cwd,  |int64| )
+	for m in List
 		|| sz = m.position
 		|| n = m.name.TrimStart(cwd)
 			
 		"$n: ${sz.strsize}"
-		total += sz
-	"\nTotal: ${Total.strsize}"
+		rz += sz
 
 
 function file.CountAll (|int64|)
@@ -40,4 +48,8 @@ function file.CountAll (|int64|)
 		rz = .size
 	|| m = message(@str, self)
 	m.Position = rz
-	Found <~ m
+	if !.IsDir
+		FilesFound <~ m
+	  else
+		FoldersFound <~ m
+
